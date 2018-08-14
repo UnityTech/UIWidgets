@@ -141,6 +141,13 @@ namespace UIWidgets.painting {
             this.size = size;
         }
 
+        public ImageConfiguration copyWith(
+            Size size = null) {
+            return new ImageConfiguration(
+                size: size ?? this.size
+            );
+        }
+
         public readonly Size size;
     }
 }

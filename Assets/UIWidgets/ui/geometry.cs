@@ -94,6 +94,14 @@ namespace UIWidgets.ui {
             return new Offset(this.dx + translateX, this.dy + translateY);
         }
 
+        public static Offset operator -(Offset a, Offset b) {
+            return new Offset(a.dx - b.dx, a.dy - b.dy);
+        }
+
+        public static Offset operator +(Offset a, Offset b) {
+            return new Offset(a.dx + b.dx, a.dy + b.dy);
+        }
+
         public static Rect operator &(Offset a, Size other) {
             return Rect.fromLTWH(a.dx, a.dy, other.width, other.height);
         }
@@ -334,6 +342,9 @@ namespace UIWidgets.ui {
             return Rect.fromLTRB(this.left - delta, this.top - delta, this.right + delta, this.bottom + delta);
         }
 
+        public bool contains(Offset offset) {
+            return offset.dx >= this.left && offset.dx < this.right && offset.dy >= this.top && offset.dy < this.bottom;
+        }        
 
         public bool Equals(Rect other) {
             if (object.ReferenceEquals(null, other)) return false;

@@ -1,0 +1,395 @@
+﻿using System;
+using System.Collections.Generic;
+using UIWidgets.painting;
+using UIWidgets.ui;
+using UnityEngine;
+using Rect = UIWidgets.ui.Rect;
+
+namespace UIWidgets.rendering {
+    public class BoxConstraints : Constraints {
+        public BoxConstraints(
+            double minWidth = 0.0,
+            double maxWidth = double.PositiveInfinity,
+            double minHeight = 0.0,
+            double maxHeight = double.PositiveInfinity) {
+            this.minWidth = minWidth;
+            this.maxWidth = maxWidth;
+            this.minHeight = minHeight;
+            this.maxHeight = maxHeight;
+        }
+
+        public readonly double minWidth;
+        public readonly double maxWidth;
+        public readonly double minHeight;
+        public readonly double maxHeight;
+
+        public static BoxConstraints tight(Size size) {
+            return new BoxConstraints(
+                size.width,
+                size.width,
+                size.height,
+                size.height
+            );
+        }
+
+        public BoxConstraints widthConstraints() {
+            return new BoxConstraints(minWidth: this.minWidth, maxWidth: this.maxWidth);
+        }
+
+        public BoxConstraints heightConstraints() {
+            return new BoxConstraints(minHeight: this.minHeight, maxHeight: this.maxHeight);
+        }
+
+        public double constrainWidth(double width = double.PositiveInfinity) {
+            return Mathf.Clamp((float) width, (float) this.minWidth, (float) this.maxWidth);
+        }
+
+        public double constrainHeight(double height = double.PositiveInfinity) {
+            return Mathf.Clamp((float) height, (float) this.minHeight, (float) this.maxHeight);
+        }
+
+        public Size constrain(Size size) {
+            return new Size(this.constrainWidth(size.width), this.constrainHeight(size.height));
+        }
+
+        public Size constrainDimensions(double width, double height) {
+            return new Size(this.constrainWidth(width), this.constrainHeight(height));
+        }
+
+        public Size constrainSizeAndAttemptToPreserveAspectRatio(Size size) {
+            if (this.isTight) {
+                Size result = this.smallest;
+                return result;
+            }
+
+            double width = size.width;
+            double height = size.height;
+            double aspectRatio = width / height;
+
+            if (width > this.maxWidth) {
+                width = this.maxWidth;
+                height = width / aspectRatio;
+            }
+
+            if (height > this.maxHeight) {
+                height = this.maxHeight;
+                width = height * aspectRatio;
+            }
+
+            if (width < this.minWidth) {
+                width = this.minWidth;
+                height = width / aspectRatio;
+            }
+
+            if (height < this.minHeight) {
+                height = this.minHeight;
+                width = height * aspectRatio;
+            }
+
+            return new Size(this.constrainWidth(width), this.constrainHeight(height));
+        }
+
+        public Size biggest {
+            get { return new Size(this.constrainWidth(), this.constrainHeight()); }
+        }
+
+        public Size smallest {
+            get { return new Size(this.constrainWidth(0.0), this.constrainHeight(0.0)); }
+        }
+
+        public bool hasTightWidth {
+            get { return this.minWidth >= this.maxWidth; }
+        }
+
+        public bool hasTightHeight {
+            get { return this.minHeight >= this.maxHeight; }
+        }
+
+        public override bool isTight {
+            get { return this.hasTightWidth && this.hasTightHeight; }
+        }
+
+        public bool hasBoundedWidth {
+            get { return this.minWidth < double.PositiveInfinity; }
+        }
+
+        public bool hasBoundedHeight {
+            get { return this.minHeight < double.PositiveInfinity; }
+        }
+
+        public bool hasInfiniteWidth {
+            get { return this.minWidth >= double.PositiveInfinity; }
+        }
+
+        public bool hasInfiniteHeight {
+            get { return this.minHeight >= double.PositiveInfinity; }
+        }
+
+        public bool isSatisfiedBy(Size size) {
+            return this.minWidth <= size.width && size.width <= this.maxWidth &&
+                   this.minHeight <= size.height && size.height <= this.maxHeight;
+        }
+
+        public override bool isNormalized {
+            get {
+                return this.minWidth >= 0.0 &&
+                       this.minWidth <= this.maxWidth &&
+                       this.minHeight >= 0.0 &&
+                       this.minHeight <= this.maxHeight;
+            }
+        }
+
+        public BoxConstraints normalize() {
+            if (this.isNormalized) {
+                return this;
+            }
+
+            var minWidth = this.minWidth >= 0.0 ? this.minWidth : 0.0;
+            var minHeight = this.minHeight >= 0.0 ? this.minHeight : 0.0;
+
+            return new BoxConstraints(
+                minWidth,
+                minWidth > this.maxWidth ? minWidth : this.maxWidth,
+                minHeight,
+                minHeight > this.maxHeight ? minHeight : this.maxHeight
+            );
+        }
+
+        protected bool Equals(BoxConstraints other) {
+            return this.minWidth.Equals(other.minWidth)
+                   && this.maxWidth.Equals(other.maxWidth)
+                   && this.minHeight.Equals(other.minHeight)
+                   && this.maxHeight.Equals(other.maxHeight);
+        }
+
+        public override bool Equals(object obj) {
+            if (object.ReferenceEquals(null, obj)) return false;
+            if (object.ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return this.Equals((BoxConstraints) obj);
+        }
+
+        public override int GetHashCode() {
+            unchecked {
+                var hashCode = this.minWidth.GetHashCode();
+                hashCode = (hashCode * 397) ^ this.maxWidth.GetHashCode();
+                hashCode = (hashCode * 397) ^ this.minHeight.GetHashCode();
+                hashCode = (hashCode * 397) ^ this.maxHeight.GetHashCode();
+                return hashCode;
+            }
+        }
+
+        public static bool operator ==(BoxConstraints a, BoxConstraints b) {
+            return object.Equals(a, b);
+        }
+
+        public static bool operator !=(BoxConstraints a, BoxConstraints b) {
+            return !(a == b);
+        }
+    }
+
+    public class BoxParentData : ParentData {
+        public Offset offset = Offset.zero;
+    }
+
+    public enum _IntrinsicDimension {
+        minWidth,
+        maxWidth,
+        minHeight,
+        maxHeight
+    }
+
+    public class _IntrinsicDimensionsCacheEntry : IEquatable<_IntrinsicDimensionsCacheEntry> {
+        public _IntrinsicDimensionsCacheEntry(_IntrinsicDimension dimension, double argument) {
+            this.dimension = dimension;
+            this.argument = argument;
+        }
+
+        public readonly _IntrinsicDimension dimension;
+        public readonly double argument;
+
+        public bool Equals(_IntrinsicDimensionsCacheEntry other) {
+            if (object.ReferenceEquals(null, other)) return false;
+            if (object.ReferenceEquals(this, other)) return true;
+            return this.dimension == other.dimension && this.argument.Equals(other.argument);
+        }
+
+        public override bool Equals(object obj) {
+            if (object.ReferenceEquals(null, obj)) return false;
+            if (object.ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return this.Equals((_IntrinsicDimensionsCacheEntry) obj);
+        }
+
+        public override int GetHashCode() {
+            unchecked {
+                return ((int) this.dimension * 397) ^ this.argument.GetHashCode();
+            }
+        }
+
+        public static bool operator ==(_IntrinsicDimensionsCacheEntry a, _IntrinsicDimensionsCacheEntry b) {
+            return object.Equals(a, b);
+        }
+
+        public static bool operator !=(_IntrinsicDimensionsCacheEntry a, _IntrinsicDimensionsCacheEntry b) {
+            return !(a == b);
+        }
+    }
+
+    public abstract class RenderBox : RenderObject {
+        public override void setupParentData(RenderObject child) {
+            if (!(child.parentData is BoxParentData)) {
+                child.parentData = new BoxParentData();
+            }
+        }
+
+        public Dictionary<_IntrinsicDimensionsCacheEntry, double> _cachedIntrinsicDimensions;
+
+        public double _computeIntrinsicDimension(_IntrinsicDimension dimension, double argument,
+            Func<double, double> computer) {
+            if (this._cachedIntrinsicDimensions == null) {
+                this._cachedIntrinsicDimensions = new Dictionary<_IntrinsicDimensionsCacheEntry, double>();
+            }
+
+            var key = new _IntrinsicDimensionsCacheEntry(dimension, argument);
+
+            double result;
+            if (this._cachedIntrinsicDimensions.TryGetValue(key, out result)) {
+                return result;
+            }
+
+            return this._cachedIntrinsicDimensions[key] = computer(argument);
+        }
+
+        public double getMinIntrinsicWidth(double height) {
+            return this._computeIntrinsicDimension(_IntrinsicDimension.minWidth, height, this.computeMinIntrinsicWidth);
+        }
+
+        public virtual double computeMinIntrinsicWidth(double height) {
+            return 0.0;
+        }
+
+        public double getMaxIntrinsicWidth(double height) {
+            return this._computeIntrinsicDimension(_IntrinsicDimension.maxWidth, height, this.computeMaxIntrinsicWidth);
+        }
+
+        public virtual double computeMaxIntrinsicWidth(double height) {
+            return 0.0;
+        }
+
+        public double getMinIntrinsicHeight(double width) {
+            return this._computeIntrinsicDimension(_IntrinsicDimension.minHeight, width,
+                this.computeMinIntrinsicHeight);
+        }
+
+        public virtual double computeMinIntrinsicHeight(double width) {
+            return 0.0;
+        }
+
+        public double getMaxIntrinsicHeight(double width) {
+            return this._computeIntrinsicDimension(_IntrinsicDimension.maxHeight, width,
+                this.computeMaxIntrinsicHeight);
+        }
+
+        public virtual double computeMaxIntrinsicHeight(double width) {
+            return 0.0;
+        }
+
+        public bool hasSize {
+            get { return this._size != null; }
+        }
+
+        public Size size {
+            get { return this._size; }
+            set { this._size = value; }
+        }
+
+        public Size _size;
+
+        public Dictionary<TextBaseline, double?> _cachedBaselines;
+
+        public double? getDistanceToBaseline(TextBaseline baseline, bool onlyReal = false) {
+            double? result = this.getDistanceToActualBaseline(baseline);
+            if (result == null && !onlyReal) {
+                return this.size.height;
+            }
+
+            return result;
+        }
+
+        public double? getDistanceToActualBaseline(TextBaseline baseline) {
+            if (this._cachedBaselines == null) {
+                this._cachedBaselines = new Dictionary<TextBaseline, double?>();
+            }
+
+            double? result;
+            if (this._cachedBaselines.TryGetValue(baseline, out result)) {
+                return result;
+            }
+
+            return this._cachedBaselines[baseline] = this.computeDistanceToActualBaseline(baseline);
+        }
+
+        public virtual double? computeDistanceToActualBaseline(TextBaseline baseline) {
+            return null;
+        }
+
+        public new BoxConstraints constraints {
+            get { return (BoxConstraints) base.constraints; }
+        }
+
+        public override void markNeedsLayout() {
+            if (this._cachedBaselines != null && this._cachedBaselines.Count > 0 ||
+                this._cachedIntrinsicDimensions != null && this._cachedIntrinsicDimensions.Count > 0) {
+                if (this._cachedBaselines != null) {
+                    this._cachedBaselines.Clear();
+                }
+
+                if (this._cachedIntrinsicDimensions != null) {
+                    this._cachedIntrinsicDimensions.Clear();
+                }
+
+                if (this.parent is RenderObject) {
+                    this.markParentNeedsLayout();
+                    return;
+                }
+            }
+
+            base.markNeedsLayout();
+        }
+
+
+        public override void performResize() {
+            this.size = this.constraints.smallest;
+        }
+
+        public override void performLayout() {
+        }
+
+        public override void applyPaintTransform(RenderObject child, Matrix4x4 transform) {
+            var childParentData = (BoxParentData) child.parentData;
+            var offset = childParentData.offset;
+            transform.SetTRS(new Vector2((float) offset.dx, (float) offset.dy), Quaternion.identity, Vector3.one);
+        }
+
+        public Offset globalToLocal(Offset point, RenderObject ancestor = null) {
+            var transform = this.getTransformTo(ancestor);
+            var det = transform.determinant;
+            if (det == 0f) {
+                return Offset.zero;
+            }
+
+            transform = transform.inverse;
+            return MatrixUtils.transformPoint(transform, point);
+        }
+
+
+        public Offset localToGlobal(Offset point, RenderObject ancestor = null) {
+            return MatrixUtils.transformPoint(this.getTransformTo(ancestor), point);
+        }
+
+        public override Rect paintBounds {
+            get { return Offset.zero & this.size; }
+        }
+    }
+}

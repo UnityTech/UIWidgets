@@ -13,7 +13,7 @@ namespace UIWidgets.foundation {
             }
         }
 
-        public void redepthChildren() {
+        public virtual void redepthChildren() {
         }
 
         public object owner {
@@ -26,11 +26,11 @@ namespace UIWidgets.foundation {
             get { return this._owner != null; }
         }
 
-        public void attach(object owner) {
+        public virtual void attach(object owner) {
             this._owner = owner;
         }
 
-        public void detach() {
+        public virtual void detach() {
             this._owner = null;
         }
 
@@ -40,7 +40,7 @@ namespace UIWidgets.foundation {
 
         public AbstractNode _parent;
 
-        public void adoptChild(AbstractNode child) {
+        public virtual void adoptChild(AbstractNode child) {
             child._parent = this;
             if (this.attached) {
                 child.attach(this._owner);
@@ -49,7 +49,7 @@ namespace UIWidgets.foundation {
             this.redepthChild(child);
         }
 
-        public void dropChild(AbstractNode child) {
+        public virtual void dropChild(AbstractNode child) {
             child._parent = null;
             if (this.attached) {
                 child.detach();

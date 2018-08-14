@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using UIWidgets.painting;
 using UnityEditor;
 using UnityEngine;
@@ -93,12 +95,76 @@ namespace UIWidgets.ui {
         }
     }
 
-    public abstract class Canvas {
-        public abstract void drawPloygon4(Paint paint, params Offset[] points);
+    public class Canvas {
+        public Canvas(PictureRecorder recorder) {
+            this.recorder = recorder;
+        }
 
-        public abstract void drawRect(Paint paint, Rect rect, BorderWidth borderWidth, BorderRadius borderRadius);
+        public readonly PictureRecorder recorder;
 
-        public abstract void drawRectShadow(Paint paint, Rect rect);
+        public void drawPloygon4(Paint paint, params Offset[] points) {
+            this.recorder.addDrawCmd(new drawPloygon4 {
+                color = paint.color,
+                points = points,
+            });
+        }
+
+        public void drawRect(Paint paint, Rect rect, BorderWidth borderWidth, BorderRadius borderRadius) {
+            this.recorder.addDrawCmd(new drawRect {
+                color = paint.color,
+                rect = rect,
+                borderWidth = borderWidth,
+                borderRadius = borderRadius,
+            });
+        }
+
+        public void drawRectShadow(Paint paint, Rect rect) {
+            this.recorder.addDrawCmd(new drawRectShadow {
+                color = paint.color,
+                blurSigma = paint.blurSigma,
+                rect = rect,
+            });
+        }
+    }
+
+    public class Picture {
+        public Picture(List<object> drawCmds) {
+            this.drawCmds = drawCmds;
+        }
+
+        public readonly List<object> drawCmds;
+    }
+
+    public class PictureRecorder {
+        public List<object> _drawCmds = new List<object>();
+
+        public Picture endRecording() {
+            var drawCmd = this._drawCmds;
+            this._drawCmds = new List<object>();
+            return new Picture(drawCmd);
+        }
+
+        public void addDrawCmd(object drawCmd) {
+            this._drawCmds.Add(drawCmd);
+        }
+    }
+
+    public class drawPloygon4 {
+        public Color color;
+        public Offset[] points;
+    }
+
+    public class drawRect {
+        public Color color;
+        public Rect rect;
+        public BorderWidth borderWidth;
+        public BorderRadius borderRadius;
+    }
+
+    public class drawRectShadow {
+        public Color color;
+        public double blurSigma;
+        public Rect rect;
     }
 
     public class Paint {
