@@ -124,12 +124,17 @@ namespace UIWidgets.rendering {
         public override void detach() {
             this._offset.removeListener(this.markNeedsLayout);
             base.detach();
-        } 
-        
-        
+        }
+
+
+        public RevealedOffset getOffsetToReveal(RenderObject target, double alignment, Rect rect = null) {
+            throw new System.NotImplementedException();
+        }
     }
 
 
     public class RenderViewport : RenderViewportBase<SliverPhysicalContainerParentData> {
+        public RenderViewport(AxisDirection crossAxisDirection, ViewportOffset offset, double cacheExtent = RenderAbstractViewportUtils.defaultCacheExtent, AxisDirection axisDirection = AxisDirection.down) : base(crossAxisDirection, offset, cacheExtent, axisDirection) {
+        }
     }
 }

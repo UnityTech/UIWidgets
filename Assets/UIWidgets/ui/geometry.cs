@@ -164,6 +164,14 @@ namespace UIWidgets.ui {
             get { return this.width <= 0.0 || this.height <= 0.0; }
         }
 
+        public static Size operator *(Size a, double operand) {
+            return new Size(a.width * operand, a.height * operand);
+        }
+
+        public static Size operator /(Size a, double operand) {
+            return new Size(a.width / operand, a.height / operand);
+        }
+
         public double shortestSide {
             get { return Math.Min(Math.Abs(this.width), Math.Abs(this.height)); }
         }
@@ -314,7 +322,8 @@ namespace UIWidgets.ui {
 
         public const double _giantScalar = 1.0E+9;
 
-        public static readonly Rect largest = Rect.fromLTRB(-_giantScalar, -_giantScalar, _giantScalar, _giantScalar);
+        public static readonly Rect largest =
+            Rect.fromLTRB(-Rect._giantScalar, -Rect._giantScalar, Rect._giantScalar, Rect._giantScalar);
 
         public bool isInfinite {
             get {
@@ -342,9 +351,27 @@ namespace UIWidgets.ui {
             return Rect.fromLTRB(this.left - delta, this.top - delta, this.right + delta, this.bottom + delta);
         }
 
+        public Rect intersect(Rect other) {
+            return Rect.fromLTRB(
+                Math.Max(this.left, other.left),
+                Math.Max(this.top, other.top),
+                Math.Min(this.right, other.right),
+                Math.Min(this.bottom, other.bottom)
+            );
+        }
+
+        public Rect expandToInclude(Rect other) {
+            return Rect.fromLTRB(
+                Math.Min(this.left, other.left),
+                Math.Min(this.top, other.top),
+                Math.Max(this.right, other.right),
+                Math.Max(this.bottom, other.bottom)
+            );
+        }
+
         public bool contains(Offset offset) {
             return offset.dx >= this.left && offset.dx < this.right && offset.dy >= this.top && offset.dy < this.bottom;
-        }        
+        }
 
         public bool Equals(Rect other) {
             if (object.ReferenceEquals(null, other)) return false;

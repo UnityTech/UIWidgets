@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UIWidgets.foundation;
 using UIWidgets.ui;
@@ -56,18 +57,19 @@ namespace UIWidgets.painting {
 
         public Paint _getBackgroundPaint(Rect rect) {
             if (this._cachedBackgroundPaint == null) {
-                this._cachedBackgroundPaint = new Paint();
+                var paint = new Paint();
+                if (this._decoration.color != null) {
+                    paint.color = this._decoration.color;
+                }
+
+                this._cachedBackgroundPaint = paint;
             }
 
             return this._cachedBackgroundPaint;
         }
 
         public void _paintBox(Canvas canvas, Rect rect, Paint paint) {
-            if (this._decoration.borderRadius == null) {
-                //canvas.drawRect(rect, paint);
-            } else {
-                //canvas.drawRRect(_decoration.borderRadius.resolve().toRRect(rect), paint);
-            }
+            canvas.drawRect(paint, rect, borderRadius: this._decoration.borderRadius);
         }
 
         public void _paintShadows(Canvas canvas, Rect rect) {

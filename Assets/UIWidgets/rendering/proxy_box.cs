@@ -20,7 +20,10 @@ namespace UIWidgets.rendering {
             DecorationPosition position = DecorationPosition.background,
             ImageConfiguration configuration = null,
             RenderBox child = null
-        ) {
+        ) : base(child) {
+            this._decoration = decoration;
+            this._position = position;
+            this._configuration = configuration ?? ImageConfiguration.empty;
         }
 
         public BoxPainter _painter;

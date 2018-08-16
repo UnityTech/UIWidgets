@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UIWidgets.foundation;
 using UIWidgets.rendering;
+using UIWidgets.ui;
 using UnityEngine.Assertions;
 
 namespace UIWidgets.widgets {

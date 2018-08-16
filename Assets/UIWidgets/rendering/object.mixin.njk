@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace UIWidgets.rendering {
 {% macro ContainerRenderObjectMixin(with) %}
-    public class Container{{with}}<ChildType, ParentDataType> : {{with}}
+    public abstract class Container{{with}}<ChildType, ParentDataType> : {{with}}
         where ChildType : RenderObject
         where ParentDataType : ContainerParentDataMixin<ChildType> {
         public int _childCount = 0;
@@ -146,7 +146,7 @@ namespace UIWidgets.rendering {
             }
         }
 
-        public override void vivitChildren(RenderObjectVisitor visitor) {
+        public override void visitChildren(RenderObjectVisitor visitor) {
             ChildType child = this._firstChild;
             while (child != null) {
                 visitor(child);
@@ -227,5 +227,7 @@ namespace UIWidgets.rendering {
 {% endmacro %}
 
 {{ RenderObjectWithChildMixin('RenderBox') }}
+
+{{ RenderObjectWithChildMixin('RenderObject') }}
 
 }

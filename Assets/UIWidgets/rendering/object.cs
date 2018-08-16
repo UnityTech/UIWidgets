@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using TMPro;
 using UIWidgets.foundation;
 using UIWidgets.ui;
 using UnityEditor.Rendering;
@@ -138,10 +137,14 @@ namespace UIWidgets.rendering {
     }
 
     public class PipelineOwner {
-        public PipelineOwner(VoidCallback onNeedVisualUpdate = null) {
+        public PipelineOwner(
+            RendererBinding binding = null, 
+            VoidCallback onNeedVisualUpdate = null) {
+            this.binding = binding;
             this.onNeedVisualUpdate = onNeedVisualUpdate;
         }
 
+        public readonly RendererBinding binding;
         public readonly VoidCallback onNeedVisualUpdate;
 
         public void requestVisualUpdate() {
@@ -287,7 +290,7 @@ namespace UIWidgets.rendering {
             var owner = (PipelineOwner) ownerObject;
 
             base.attach(owner);
-            if (this._needsLayout && this._relayoutBoundary == null) {
+            if (this._needsLayout && this._relayoutBoundary != null) {
                 this._needsLayout = false;
                 this.markNeedsLayout();
             }
@@ -414,11 +417,11 @@ namespace UIWidgets.rendering {
             }
         }
 
-        public bool isRepaintBoundary {
+        public virtual bool isRepaintBoundary {
             get { return false; }
         }
 
-        public bool alwaysNeedsCompositing {
+        public virtual bool alwaysNeedsCompositing {
             get { return false; }
         }
 

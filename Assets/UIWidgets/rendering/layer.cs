@@ -1,5 +1,8 @@
 ﻿using UIWidgets.foundation;
+using UIWidgets.rendering;
 using UIWidgets.ui;
+using UnityEngine;
+using Rect = UIWidgets.ui.Rect;
 
 namespace UIWidgets.rendering {
     public abstract class Layer : AbstractNode {
@@ -215,6 +218,11 @@ namespace UIWidgets.rendering {
     }
 
     public class TransformLayer : OffsetLayer {
+        public TransformLayer(Matrix4x4 transform, Offset offset = null) : base(offset) {
+            this._transform = transform;
+        }
+
+        public Matrix4x4 _transform;
     }
 
     public class OpacityLayer : ContainerLayer {
