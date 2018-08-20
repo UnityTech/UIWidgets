@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UIWidgets.painting;
 using UIWidgets.ui;
 using Matrix4x4 = UnityEngine.Matrix4x4;
 
@@ -44,17 +45,51 @@ namespace UIWidgets.flow {
         }
 
         public void pushTransform(Matrix4x4 matrix) {
+            Rect cullRect = Rect.largest;
+
+            var det = matrix.determinant;
+            if (det != 0f) {
+                cullRect = MatrixUtils.transformRect(matrix.inverse, this._cullRects.Peek());
+            }
+
+            var layer = new TransformLayer();
+            layer.transform = matrix;
+
+            this.pushLayer(layer, cullRect);
         }
 
         public void pushClipRect(Rect clipRect) {
-            
-        }
-        
-        public void pushOpacity(int alpha) {
+            Rect cullRect = clipRect.intersect(this._cullRects.Peek());
+
+            var layer = new ClipRectLayer();
+            layer.clipRect = clipRect;
+
+            this.pushLayer(layer, cullRect);
         }
 
-        public void pushPicture(Offset offset, Picture picture) {
-            
+        public void pushOpacity(int alpha) {
+            var layer = new OpacityLayer();
+            layer.alpha = alpha;
+
+            this.pushLayer(layer, this._cullRects.Peek());
+        }
+
+        public void addPicture(Offset offset, Picture picture) {
+            if (this._currentLayer == null) {
+                return;
+            }
+
+            Rect pictureRect = picture.cullRect();
+            pictureRect = pictureRect.shift(offset);
+
+            if (!pictureRect.overlaps(this._cullRects.Peek())) {
+                return;
+            }
+
+            var layer = new PictureLayer();
+            layer.offset = offset;
+            layer.picture = picture;
+            this._currentLayer.add(layer);
         }
     }
 }

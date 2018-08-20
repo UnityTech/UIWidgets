@@ -23,7 +23,7 @@ namespace UIWidgets.ui {
         }
 
         public void addPicture(Offset offset, Picture picture) {
-            this._layerBuilder.pushPicture(offset, picture);
+            this._layerBuilder.addPicture(offset, picture);
         }
 
         public Scene build() {

@@ -17,14 +17,14 @@ namespace UIWidgets.flow {
 
         public override void preroll(PrerollContext context, Matrix4x4 matrix) {
             Rect childPaintBounds = Rect.zero;
-            this.prerollChildren(context, matrix, childPaintBounds);
+            this.prerollChildren(context, matrix, ref childPaintBounds);
             this.paintBounds = childPaintBounds;
         }
 
-        protected void prerollChildren(PrerollContext context, Matrix4x4 childMatrix, Rect childPaintBounds) {
+        protected void prerollChildren(PrerollContext context, Matrix4x4 childMatrix, ref Rect childPaintBounds) {
             foreach (var layer in this._layers) {
                 layer.preroll(context, childMatrix);
-                childPaintBounds.expandToInclude(layer.paintBounds);
+                childPaintBounds = childPaintBounds.expandToInclude(layer.paintBounds);
             }
         }
 

@@ -103,14 +103,14 @@ namespace UIWidgets.ui {
         public readonly PictureRecorder recorder;
 
         public void drawPloygon4(Paint paint, params Offset[] points) {
-            this.recorder.addDrawCmd(new drawPloygon4 {
+            this.recorder.addDrawCmd(new DrawPloygon4 {
                 color = paint.color,
                 points = points,
             });
         }
 
         public void drawRect(Paint paint, Rect rect, BorderWidth borderWidth = null, BorderRadius borderRadius = null) {
-            this.recorder.addDrawCmd(new drawRect {
+            this.recorder.addDrawCmd(new DrawRect {
                 color = paint.color,
                 rect = rect,
                 borderWidth = borderWidth,
@@ -119,7 +119,7 @@ namespace UIWidgets.ui {
         }
 
         public void drawRectShadow(Paint paint, Rect rect) {
-            this.recorder.addDrawCmd(new drawRectShadow {
+            this.recorder.addDrawCmd(new DrawRectShadow {
                 color = paint.color,
                 blurSigma = paint.blurSigma,
                 rect = rect,
@@ -133,6 +133,10 @@ namespace UIWidgets.ui {
         }
 
         public readonly List<object> drawCmds;
+
+        public Rect cullRect() {
+            return Rect.zero;
+        }
     }
 
     public class PictureRecorder {
@@ -149,19 +153,19 @@ namespace UIWidgets.ui {
         }
     }
 
-    public class drawPloygon4 {
+    public class DrawPloygon4 {
         public Color color;
         public Offset[] points;
     }
 
-    public class drawRect {
+    public class DrawRect {
         public Color color;
         public Rect rect;
         public BorderWidth borderWidth;
         public BorderRadius borderRadius;
     }
 
-    public class drawRectShadow {
+    public class DrawRectShadow {
         public Color color;
         public double blurSigma;
         public Rect rect;

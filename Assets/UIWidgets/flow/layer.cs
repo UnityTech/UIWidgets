@@ -6,7 +6,9 @@ namespace UIWidgets.flow {
     }
 
     public class PaintContext {
+        public LayerCanvas canvas;
     }
+
 
     public abstract class Layer {
         private ContainerLayer _parent;

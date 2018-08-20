@@ -198,79 +198,6 @@ namespace UIWidgets.ui {
         }
     }
 
-    public class Radius : IEquatable<Radius> {
-        private Radius(double x, double y) {
-            this.x = x;
-            this.y = y;
-        }
-
-        public readonly double x;
-
-        public readonly double y;
-
-        public static Radius circular(double radius) {
-            return new Radius(radius, radius);
-        }
-
-        public static Radius elliptical(double x, double y) {
-            return new Radius(x, y);
-        }
-
-        public static readonly Radius zero = Radius.circular(0);
-
-        public static Radius operator -(Radius a) {
-            return new Radius(-a.x, -a.y);
-        }
-
-        public static Radius operator -(Radius a, Radius b) {
-            return new Radius(a.x - b.x, a.y - b.y);
-        }
-
-        public static Radius operator +(Radius a, Radius b) {
-            return new Radius(a.x + b.x, a.y + b.y);
-        }
-
-        public static Radius operator *(Radius a, double operand) {
-            return new Radius(a.x * operand, a.y * operand);
-        }
-
-        public static Radius operator /(Radius a, double operand) {
-            return new Radius(a.x / operand, a.y / operand);
-        }
-
-        public static Radius operator %(Radius a, double operand) {
-            return new Radius(a.x % operand, a.y % operand);
-        }
-
-        public bool Equals(Radius other) {
-            if (object.ReferenceEquals(null, other)) return false;
-            if (object.ReferenceEquals(this, other)) return true;
-            return this.x.Equals(other.x) && this.y.Equals(other.y);
-        }
-
-        public override bool Equals(object obj) {
-            if (object.ReferenceEquals(null, obj)) return false;
-            if (object.ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return this.Equals((Radius) obj);
-        }
-
-        public override int GetHashCode() {
-            unchecked {
-                return (this.x.GetHashCode() * 397) ^ this.y.GetHashCode();
-            }
-        }
-
-        public override String ToString() {
-            if (this.x == this.y) {
-                return "Radius.circular(" + this.x.ToString("0.0") + ")";
-            }
-
-            return "Radius.elliptical(" + this.x.ToString("0.0") + ", " + this.y.ToString("0.0") + ")";
-        }
-    }
-
-
     public class Rect : IEquatable<Rect> {
         private Rect(double left, double top, double right, double bottom) {
             this.left = left;
@@ -300,7 +227,6 @@ namespace UIWidgets.ui {
             );
         }
 
-
         public readonly double left;
         public readonly double top;
         public readonly double right;
@@ -319,6 +245,9 @@ namespace UIWidgets.ui {
         }
 
         public static readonly Rect zero = new Rect(0, 0, 0, 0);
+
+        public static readonly Rect infinity = new Rect(double.NegativeInfinity, double.NegativeInfinity,
+            double.PositiveInfinity, double.PositiveInfinity);
 
         public const double _giantScalar = 1.0E+9;
 
@@ -369,8 +298,69 @@ namespace UIWidgets.ui {
             );
         }
 
+        public bool overlaps(Rect other) {
+            if (this.right <= other.left || other.right <= this.left) {
+                return false;
+            }
+
+            if (this.bottom <= other.top || other.bottom <= this.top) {
+                return false;
+            }
+
+            return true;
+        }
+
+
+        public double shortestSide {
+            get { return Math.Min(Math.Abs(this.width), Math.Abs(this.height)); }
+        }
+
+        public double longestSide {
+            get { return Math.Max(Math.Abs(this.width), Math.Abs(this.height)); }
+        }
+
+        public Offset topLeft {
+            get { return new Offset(this.left, this.top); }
+        }
+
+        public Offset topCenter {
+            get { return new Offset(this.left + this.width / 2.0, this.top); }
+        }
+
+        public Offset topRight {
+            get { return new Offset(this.right, this.top); }
+        }
+
+        public Offset centerLeft {
+            get { return new Offset(this.left, this.top + this.height / 2.0); }
+        }
+
+        public Offset center {
+            get { return new Offset(this.left + this.width / 2.0, this.top + this.height / 2.0); }
+        }
+
+        public Offset centerRight {
+            get { return new Offset(this.right, this.bottom); }
+        }
+
+        public Offset bottomLeft {
+            get { return new Offset(this.left, this.bottom); }
+        }
+
+        public Offset bottomCenter {
+            get { return new Offset(this.left + this.width / 2.0, this.bottom); }
+        }
+
+        public Offset bottomRight {
+            get { return new Offset(this.right, this.bottom); }
+        }
+
         public bool contains(Offset offset) {
             return offset.dx >= this.left && offset.dx < this.right && offset.dy >= this.top && offset.dy < this.bottom;
+        }
+        
+        public bool contains(Rect rect) {
+            return this.contains(rect.topLeft) && this.contains(rect.bottomRight);
         }
 
         public bool Equals(Rect other) {
@@ -400,6 +390,267 @@ namespace UIWidgets.ui {
         public override String ToString() {
             return "Rect.fromLTRB(" + this.left.ToString("0.0") + ", " + this.top.ToString("0.0") + ", " +
                    this.right.ToString("0.0") + ", " + this.bottom.ToString("0.0") + ")";
+        }
+    }
+
+    public class RRect : IEquatable<RRect> {
+        private RRect(double left, double top, double right, double bottom,
+            double tlRadius, double trRadius, double brRadius, double blRadius) {
+            this.left = left;
+            this.top = top;
+            this.right = right;
+            this.bottom = bottom;
+            this.tlRadius = tlRadius;
+            this.trRadius = trRadius;
+            this.brRadius = brRadius;
+            this.blRadius = blRadius;
+        }
+
+        public static RRect fromLTRBAndRadius(
+            double left, double top, double right, double bottom,
+            double radius) {
+            return new RRect(left, top, right, bottom,
+                radius, radius, radius, radius);
+        }
+
+        public static RRect fromRectAndRadius(Rect rect, double radius) {
+            return new RRect(rect.left, rect.top, rect.right, rect.bottom,
+                radius, radius, radius, radius);
+        }
+
+        public static RRect fromLTRBAndCorners(
+            double left, double top, double right, double bottom,
+            double topLeft = 0.0, double topRight = 0.0, double bottomRight = 0.0, double bottomLeft = 0.0) {
+            return new RRect(left, top, right, bottom,
+                topLeft, topRight, bottomRight, bottomLeft);
+        }
+
+        public static RRect fromRectAndCorners(
+            Rect rect,
+            double topLeft = 0.0, double topRight = 0.0, double bottomRight = 0.0, double bottomLeft = 0.0) {
+            return new RRect(rect.left, rect.top, rect.right, rect.bottom,
+                topLeft, topRight, bottomRight, bottomLeft);
+        }
+
+        public static readonly RRect zero = new RRect(0, 0, 0, 0, 0, 0, 0, 0);
+
+        public readonly double left;
+        public readonly double top;
+        public readonly double right;
+        public readonly double bottom;
+
+        public readonly double tlRadius;
+        public readonly double trRadius;
+        public readonly double brRadius;
+        public readonly double blRadius;
+
+        public RRect shift(Offset offset) {
+            return RRect.fromLTRBAndCorners(
+                this.left + offset.dx,
+                this.top + offset.dy,
+                this.right + offset.dx,
+                this.bottom + offset.dy,
+                this.tlRadius,
+                this.trRadius,
+                this.brRadius,
+                this.blRadius
+            );
+        }
+
+        public RRect inflate(double delta) {
+            return RRect.fromLTRBAndCorners(
+                this.left - delta,
+                this.top - delta,
+                this.right + delta,
+                this.bottom + delta,
+                this.tlRadius + delta,
+                this.trRadius + delta,
+                this.brRadius + delta,
+                this.blRadius + delta
+            );
+        }
+
+        public RRect deflate(double delta) {
+            return this.inflate(-delta);
+        }
+
+        public double width {
+            get { return this.right - this.left; }
+        }
+
+        public double height {
+            get { return this.bottom - this.top; }
+        }
+
+        public Rect outerRect {
+            get { return Rect.fromLTRB(this.left, this.top, this.right, this.bottom); }
+        }
+
+        public Rect safeInnerRect {
+            get {
+                const double kInsetFactor = 0.29289321881; // 1-cos(pi/4)
+
+                double leftRadius = Math.Max(this.blRadius, this.tlRadius);
+                double topRadius = Math.Max(this.tlRadius, this.trRadius);
+                double rightRadius = Math.Max(this.trRadius, this.brRadius);
+                double bottomRadius = Math.Max(this.brRadius, this.blRadius);
+
+                return Rect.fromLTRB(
+                    this.left + leftRadius * kInsetFactor,
+                    this.top + topRadius * kInsetFactor,
+                    this.right - rightRadius * kInsetFactor,
+                    this.bottom - bottomRadius * kInsetFactor
+                );
+            }
+        }
+
+        public Rect middleRect {
+            get {
+                double leftRadius = Math.Max(this.blRadius, this.tlRadius);
+                double topRadius = Math.Max(this.tlRadius, this.trRadius);
+                double rightRadius = Math.Max(this.trRadius, this.brRadius);
+                double bottomRadius = Math.Max(this.brRadius, this.blRadius);
+
+                return Rect.fromLTRB(
+                    this.left + leftRadius,
+                    this.top + topRadius,
+                    this.right - rightRadius,
+                    this.bottom - bottomRadius
+                );
+            }
+        }
+
+        public Rect wideMiddleRect {
+            get {
+                double topRadius = Math.Max(this.tlRadius, this.trRadius);
+                double bottomRadius = Math.Max(this.brRadius, this.blRadius);
+
+                return Rect.fromLTRB(
+                    this.left,
+                    this.top + topRadius,
+                    this.right,
+                    this.bottom - bottomRadius
+                );
+            }
+        }
+
+        public Rect tallMiddleRect {
+            get {
+                double leftRadius = Math.Max(this.blRadius, this.tlRadius);
+                double rightRadius = Math.Max(this.trRadius, this.brRadius);
+
+                return Rect.fromLTRB(
+                    this.left + leftRadius,
+                    this.top,
+                    this.right - rightRadius,
+                    this.bottom
+                );
+            }
+        }
+
+        public bool isEmpty {
+            get { return this.left >= this.right || this.top >= this.bottom; }
+        }
+
+        public bool isFinite {
+            get {
+                return !Double.IsInfinity(this.left)
+                       && !Double.IsInfinity(this.top)
+                       && !Double.IsInfinity(this.right)
+                       && !Double.IsInfinity(this.bottom);
+            }
+        }
+
+        public bool isInfinite {
+            get { return !this.isFinite; }
+        }
+
+        public bool isRect {
+            get {
+                return this.tlRadius == 0.0 &&
+                       this.trRadius == 0.0 &&
+                       this.blRadius == 0.0 &&
+                       this.brRadius == 0.0;
+            }
+        }
+
+        public bool isStadium {
+            get {
+                return this.tlRadius == this.trRadius
+                       && this.trRadius == this.brRadius
+                       && this.brRadius == this.blRadius
+                       && (this.width <= 2.0 * this.tlRadius || this.height <= 2.0 * this.tlRadius);
+            }
+        }
+
+        public bool isEllipse {
+            get {
+                return this.tlRadius == this.trRadius
+                       && this.trRadius == this.brRadius
+                       && this.brRadius == this.blRadius
+                       && (this.width <= 2.0 * this.tlRadius && this.height <= 2.0 * this.tlRadius);
+            }
+        }
+
+        public bool isCircle {
+            get {
+                return this.width == this.height
+                       && this.isEllipse;
+            }
+        }
+
+        public double shortestSide {
+            get { return Math.Min(Math.Abs(this.width), Math.Abs(this.height)); }
+        }
+
+        public double longestSide {
+            get { return Math.Max(Math.Abs(this.width), Math.Abs(this.height)); }
+        }
+
+        public Offset center {
+            get { return new Offset(this.left + this.width / 2.0, this.top + this.height / 2.0); }
+        }
+
+        public bool Equals(RRect other) {
+            if (object.ReferenceEquals(null, other)) return false;
+            if (object.ReferenceEquals(this, other)) return true;
+            return this.left.Equals(other.left)
+                   && this.top.Equals(other.top)
+                   && this.right.Equals(other.right)
+                   && this.bottom.Equals(other.bottom)
+                   && this.tlRadius.Equals(other.tlRadius)
+                   && this.trRadius.Equals(other.trRadius)
+                   && this.brRadius.Equals(other.brRadius)
+                   && this.blRadius.Equals(other.blRadius);
+        }
+
+        public override bool Equals(object obj) {
+            if (object.ReferenceEquals(null, obj)) return false;
+            if (object.ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return this.Equals((RRect) obj);
+        }
+
+        public override int GetHashCode() {
+            unchecked {
+                var hashCode = this.left.GetHashCode();
+                hashCode = (hashCode * 397) ^ this.top.GetHashCode();
+                hashCode = (hashCode * 397) ^ this.right.GetHashCode();
+                hashCode = (hashCode * 397) ^ this.bottom.GetHashCode();
+                hashCode = (hashCode * 397) ^ this.tlRadius.GetHashCode();
+                hashCode = (hashCode * 397) ^ this.trRadius.GetHashCode();
+                hashCode = (hashCode * 397) ^ this.brRadius.GetHashCode();
+                hashCode = (hashCode * 397) ^ this.blRadius.GetHashCode();
+                return hashCode;
+            }
+        }
+
+        public static bool operator ==(RRect a, RRect b) {
+            return object.Equals(a, b);
+        }
+
+        public static bool operator !=(RRect a, RRect b) {
+            return !(a == b);
         }
     }
 }
