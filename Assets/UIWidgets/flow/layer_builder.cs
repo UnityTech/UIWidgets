@@ -79,7 +79,7 @@ namespace UIWidgets.flow {
                 return;
             }
 
-            Rect pictureRect = picture.cullRect();
+            Rect pictureRect = picture.paintBounds;
             pictureRect = pictureRect.shift(offset);
 
             if (!pictureRect.overlaps(this._cullRects.Peek())) {

@@ -86,7 +86,7 @@ namespace UIWidgets.rendering {
         public void _startRecording() {
             this._currentLayer = new PictureLayer();
             this._recorder = new PictureRecorder();
-            this._canvas = new Canvas(this._recorder);
+            this._canvas = new RecorderCanvas(this._recorder);
             this._containerLayer.append(this._currentLayer);
         }
 

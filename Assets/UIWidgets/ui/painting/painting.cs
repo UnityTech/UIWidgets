@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using UIWidgets.painting;
-using UnityEditor;
 using UnityEngine;
 
 namespace UIWidgets.ui {
@@ -93,82 +90,6 @@ namespace UIWidgets.ui {
         public static bool operator !=(Color a, Color b) {
             return !(a == b);
         }
-    }
-
-    public class Canvas {
-        public Canvas(PictureRecorder recorder) {
-            this.recorder = recorder;
-        }
-
-        public readonly PictureRecorder recorder;
-
-        public void drawPloygon4(Paint paint, params Offset[] points) {
-            this.recorder.addDrawCmd(new DrawPloygon4 {
-                color = paint.color,
-                points = points,
-            });
-        }
-
-        public void drawRect(Paint paint, Rect rect, BorderWidth borderWidth = null, BorderRadius borderRadius = null) {
-            this.recorder.addDrawCmd(new DrawRect {
-                color = paint.color,
-                rect = rect,
-                borderWidth = borderWidth,
-                borderRadius = borderRadius,
-            });
-        }
-
-        public void drawRectShadow(Paint paint, Rect rect) {
-            this.recorder.addDrawCmd(new DrawRectShadow {
-                color = paint.color,
-                blurSigma = paint.blurSigma,
-                rect = rect,
-            });
-        }
-    }
-
-    public class Picture {
-        public Picture(List<object> drawCmds) {
-            this.drawCmds = drawCmds;
-        }
-
-        public readonly List<object> drawCmds;
-
-        public Rect cullRect() {
-            return Rect.zero;
-        }
-    }
-
-    public class PictureRecorder {
-        public List<object> _drawCmds = new List<object>();
-
-        public Picture endRecording() {
-            var drawCmd = this._drawCmds;
-            this._drawCmds = new List<object>();
-            return new Picture(drawCmd);
-        }
-
-        public void addDrawCmd(object drawCmd) {
-            this._drawCmds.Add(drawCmd);
-        }
-    }
-
-    public class DrawPloygon4 {
-        public Color color;
-        public Offset[] points;
-    }
-
-    public class DrawRect {
-        public Color color;
-        public Rect rect;
-        public BorderWidth borderWidth;
-        public BorderRadius borderRadius;
-    }
-
-    public class DrawRectShadow {
-        public Color color;
-        public double blurSigma;
-        public Rect rect;
     }
 
     public class Paint {

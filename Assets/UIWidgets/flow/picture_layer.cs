@@ -16,7 +16,7 @@ namespace UIWidgets.flow {
         }
 
         public override void preroll(PrerollContext context, Matrix4x4 matrix) {
-            var bounds = this._picture.cullRect().shift(this._offset);
+            var bounds = this._picture.paintBounds.shift(this._offset);
             this.paintBounds = bounds;
         }
 

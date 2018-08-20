@@ -82,9 +82,9 @@ namespace UIWidgets.painting {
             if (this.isSameColor) {
                 paint.color = this.top.color;
 
-                canvas.drawRect(paint, rect,
+                canvas.drawRect(rect,
                     BorderWidth.only(this.top.width, this.right.width, this.bottom.width, this.left.width),
-                    borderRadius ?? BorderRadius.zero);
+                    borderRadius ?? BorderRadius.zero, paint);
 
                 return;
             }
@@ -97,7 +97,7 @@ namespace UIWidgets.painting {
                     new Offset(rect.right - this.right.width, rect.top + this.top.width),
                     new Offset(rect.left + this.right.width, rect.top + this.top.width),
                 };
-                canvas.drawPloygon4(paint, points);
+                canvas.drawPloygon4(points, paint);
             }
 
             if (this.right.width > 0) {
@@ -108,7 +108,7 @@ namespace UIWidgets.painting {
                     new Offset(rect.right - this.right.width, rect.bottom - this.bottom.width),
                     new Offset(rect.right - this.right.width, rect.top + this.top.width),
                 };
-                canvas.drawPloygon4(paint, points);
+                canvas.drawPloygon4(points, paint);
             }
 
             if (this.bottom.width > 0) {
@@ -119,7 +119,7 @@ namespace UIWidgets.painting {
                     new Offset(rect.left + this.left.width, rect.bottom - this.bottom.width),
                     new Offset(rect.right - this.right.width, rect.bottom - this.bottom.width),
                 };
-                canvas.drawPloygon4(paint, points);
+                canvas.drawPloygon4(points, paint);
             }
 
             if (this.left.width > 0) {
@@ -130,7 +130,7 @@ namespace UIWidgets.painting {
                     new Offset(rect.left + this.left.width, rect.top + this.top.width),
                     new Offset(rect.left + this.left.width, rect.bottom - this.bottom.width),
                 };
-                canvas.drawPloygon4(paint, points);
+                canvas.drawPloygon4(points, paint);
             }
         }
     }

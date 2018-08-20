@@ -69,7 +69,7 @@ namespace UIWidgets.painting {
         }
 
         public void _paintBox(Canvas canvas, Rect rect, Paint paint) {
-            canvas.drawRect(paint, rect, borderRadius: this._decoration.borderRadius);
+            canvas.drawRect(rect, null, this._decoration.borderRadius, paint);
         }
 
         public void _paintShadows(Canvas canvas, Rect rect) {
@@ -84,7 +84,7 @@ namespace UIWidgets.painting {
                     color = boxShadow.color,
                     blurSigma = boxShadow.blurRadius
                 };
-                canvas.drawRectShadow(paint, bounds);
+                canvas.drawRectShadow(bounds, paint);
             }
         }
 

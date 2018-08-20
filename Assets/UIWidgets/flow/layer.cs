@@ -1,14 +1,14 @@
 ﻿using UnityEngine;
 using Rect = UIWidgets.ui.Rect;
+using Canvas = UIWidgets.ui.Canvas;
 
 namespace UIWidgets.flow {
     public class PrerollContext {
     }
 
     public class PaintContext {
-        public LayerCanvas canvas;
+        public Canvas canvas;
     }
-
 
     public abstract class Layer {
         private ContainerLayer _parent;
