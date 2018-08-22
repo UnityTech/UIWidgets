@@ -28,7 +28,7 @@ namespace UIWidgets.ui {
             this._transform = Matrix4x4.identity;
             this._clipRect = null;
             this._isInLayer = false;
-            this._paintBounds = Rect.zero;
+            this._paintBounds = null;
         }
 
         private Stack<CanvasRec> stack {
@@ -85,7 +85,7 @@ namespace UIWidgets.ui {
                 this._transform = Matrix4x4.identity;
                 this._clipRect = drawSaveLayer.rect;
                 this._isInLayer = true;
-                this._paintBounds = Rect.zero;
+                this._paintBounds = null;
             } else if (drawCmd is DrawRestore) {
                 var isLayer = this._isInLayer;
 
@@ -123,12 +123,18 @@ namespace UIWidgets.ui {
         }
 
         private void addPaintBounds(Rect paintBounds) {
+            if (paintBounds == null) {
+                return;
+            }
+
             paintBounds = MatrixUtils.transformRect(this._transform, paintBounds);
             if (this._clipRect != null) {
                 paintBounds = paintBounds.intersect(this._clipRect);
             }
 
-            this._paintBounds = this._paintBounds.expandToInclude(paintBounds);
+            this._paintBounds = this._paintBounds == null
+                ? paintBounds
+                : this._paintBounds.expandToInclude(paintBounds);
         }
 
         private void addPaintBounds(Offset[] points) {
@@ -137,7 +143,9 @@ namespace UIWidgets.ui {
                 paintBounds = paintBounds.intersect(this._clipRect);
             }
 
-            this._paintBounds = this._paintBounds.expandToInclude(paintBounds);
+            this._paintBounds = this._paintBounds == null
+                ? paintBounds
+                : this._paintBounds.expandToInclude(paintBounds);
         }
 
         private class CanvasRec {

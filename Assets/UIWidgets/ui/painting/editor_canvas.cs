@@ -108,6 +108,10 @@ namespace UIWidgets.ui {
         }
 
         public void drawPicture(Picture picture) {
+            this.save();
+
+            int saveCount = 0;
+
             var drawCmds = picture.drawCmds;
             foreach (var drawCmd in drawCmds) {
                 if (drawCmd is DrawPloygon4) {
@@ -125,11 +129,18 @@ namespace UIWidgets.ui {
                 } else if (drawCmd is DrawConcat) {
                     this.concat(((DrawConcat) drawCmd).transform);
                 } else if (drawCmd is DrawSave) {
+                    saveCount++;
                     this.save();
                 } else if (drawCmd is DrawSaveLayer) {
+                    saveCount++;
                     var drawSaveLayer = (DrawSaveLayer) drawCmd;
                     this.saveLayer(drawSaveLayer.rect, drawSaveLayer.paint);
                 } else if (drawCmd is DrawRestore) {
+                    saveCount--;
+                    if (saveCount < 0) {
+                        throw new Exception("unmatched save/restore in picture");
+                    }
+
                     this.restore();
                 } else if (drawCmd is DrawClipRect) {
                     var drawClipRect = (DrawClipRect) drawCmd;
@@ -141,6 +152,12 @@ namespace UIWidgets.ui {
                     throw new Exception("unknown drawCmd: " + drawCmd);
                 }
             }
+
+            if (saveCount != 0) {
+                throw new Exception("unmatched save/restore in picture");
+            }
+
+            this.restore();
         }
 
         public void concat(Matrix4x4 transform) {
@@ -182,25 +199,25 @@ namespace UIWidgets.ui {
         }
 
         public void restore() {
-            var layerRect = this._layerRec;
+            var layerRec = this._layerRec;
 
             var state = this._stack.Pop();
             this._transform = state.transform;
             this._clipRec = state.clipRect;
             this._layerRec = state.layerRec;
 
-            RenderTexture.active = this._layerRec != null ? this._layerRec.texture : null;
-            GL.PopMatrix();
+            if (layerRec != this._layerRec) {
+                RenderTexture.active = this._layerRec != null ? this._layerRec.texture : null;
+                GL.PopMatrix();
 
-            if (layerRect != null) {
                 this.prepareGL(EditorCanvas.guiTextureClipMat);
 
-                Graphics.DrawTexture(layerRect.bounds.toRect(), layerRect.texture,
+                Graphics.DrawTexture(layerRec.bounds.toRect(), layerRec.texture,
                     new UnityEngine.Rect(0.0f, 0.0f, 1f, 1f), 0, 0, 0, 0,
-                    layerRect.paint.color.toColor(), EditorCanvas.guiTextureClipMat);
+                    layerRec.paint.color.toColor(), EditorCanvas.guiTextureClipMat);
 
-                RenderTexture.ReleaseTemporary(layerRect.texture);
-                layerRect.texture = null;
+                RenderTexture.ReleaseTemporary(layerRec.texture);
+                layerRec.texture = null;
             }
         }
 

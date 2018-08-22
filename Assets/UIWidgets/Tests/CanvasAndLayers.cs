@@ -21,6 +21,9 @@ namespace Editor.Tests {
                 this.drawRect,
                 this.drawRectShadow,
                 this.drawPicture,
+                this.clipRect,
+                this.clipRRect,
+                this.saveLayer,
             };
             this._optionStrings = this._options.Select(x => x.Method.Name).ToArray();
             this._selected = 0;
@@ -103,6 +106,198 @@ namespace Editor.Tests {
         }
 
         void drawPicture() {
+            var pictureRecorder = new PictureRecorder();
+            var canvas = new RecorderCanvas(pictureRecorder);
+            
+            var paint = new Paint {
+                color = new Color(0xFFFF0000),
+            };
+
+            canvas.drawPloygon4(
+                new[] {new Offset(10, 10), new Offset(10, 110), new Offset(90, 110), new Offset(110, 10)},
+                paint);
+            
+            paint = new Paint {
+                color = new Color(0xFFFFFF00),
+            };
+            
+            canvas.drawRect(
+                Rect.fromLTWH(10, 150, 100, 100),
+                BorderWidth.only(2, 4, 6, 8),
+                BorderRadius.only(0, 4, 8, 16),
+                paint);
+            
+            canvas.concat(Matrix4x4.Translate(new Vector2(-150, -150)));
+            canvas.concat(Matrix4x4.Rotate(Quaternion.Euler(0, 0, -45)));
+            canvas.concat(Matrix4x4.Translate(new Vector2(150, 150)));
+
+            paint = new Paint {
+                color = new Color(0xFF00FFFF),
+                blurSigma = 3,
+            };
+            canvas.drawRectShadow(
+                Rect.fromLTWH(150, 150, 110, 120),
+                paint);
+
+            var picture = pictureRecorder.endRecording();
+            Debug.Log("picture.paintBounds: " + picture.paintBounds);
+            
+            var editorCanvas = new EditorCanvas();
+            editorCanvas.drawPicture(picture);
+            
+            editorCanvas.concat(Matrix4x4.Rotate(Quaternion.Euler(0, 0, -15)));
+            editorCanvas.concat(Matrix4x4.Translate(new Vector2(100, 100)));
+            editorCanvas.drawPicture(picture);
+        }
+
+        void clipRect() {
+            var pictureRecorder = new PictureRecorder();
+            var canvas = new RecorderCanvas(pictureRecorder);
+            
+            var paint = new Paint {
+                color = new Color(0xFFFF0000),
+            };
+
+            canvas.drawPloygon4(
+                new[] {new Offset(10, 10), new Offset(10, 110), new Offset(90, 110), new Offset(110, 10)},
+                paint);
+            
+            paint = new Paint {
+                color = new Color(0xFFFFFF00),
+            };
+            
+            canvas.drawRect(
+                Rect.fromLTWH(10, 150, 100, 100),
+                BorderWidth.only(2, 4, 6, 8),
+                BorderRadius.only(0, 4, 8, 16),
+                paint);
+            
+            canvas.concat(Matrix4x4.Translate(new Vector2(-150, -150)));
+            canvas.concat(Matrix4x4.Rotate(Quaternion.Euler(0, 0, -45)));
+            canvas.concat(Matrix4x4.Translate(new Vector2(150, 150)));
+
+            paint = new Paint {
+                color = new Color(0xFF00FFFF),
+                blurSigma = 3,
+            };
+            canvas.drawRectShadow(
+                Rect.fromLTWH(150, 150, 110, 120),
+                paint);
+
+            var picture = pictureRecorder.endRecording();
+            Debug.Log("picture.paintBounds: " + picture.paintBounds);
+            
+            var editorCanvas = new EditorCanvas();
+            editorCanvas.concat(Matrix4x4.Rotate(Quaternion.Euler(0, 0, -5)));
+            editorCanvas.clipRect(Rect.fromLTWH(25, 15, 250, 250));
+            editorCanvas.concat(Matrix4x4.Rotate(Quaternion.Euler(0, 0, 5)));
+            
+            editorCanvas.drawPicture(picture);
+            
+            editorCanvas.concat(Matrix4x4.Rotate(Quaternion.Euler(0, 0, -15)));
+            editorCanvas.concat(Matrix4x4.Translate(new Vector2(100, 100)));
+            editorCanvas.drawPicture(picture);
+        }
+
+        void clipRRect() {
+            var pictureRecorder = new PictureRecorder();
+            var canvas = new RecorderCanvas(pictureRecorder);
+            
+            var paint = new Paint {
+                color = new Color(0xFFFF0000),
+            };
+
+            canvas.drawPloygon4(
+                new[] {new Offset(10, 10), new Offset(10, 110), new Offset(90, 110), new Offset(110, 10)},
+                paint);
+            
+            paint = new Paint {
+                color = new Color(0xFFFFFF00),
+            };
+            
+            canvas.drawRect(
+                Rect.fromLTWH(10, 150, 100, 100),
+                BorderWidth.only(2, 4, 6, 8),
+                BorderRadius.only(0, 4, 8, 16),
+                paint);
+            
+            canvas.concat(Matrix4x4.Translate(new Vector2(-150, -150)));
+            canvas.concat(Matrix4x4.Rotate(Quaternion.Euler(0, 0, -45)));
+            canvas.concat(Matrix4x4.Translate(new Vector2(150, 150)));
+
+            paint = new Paint {
+                color = new Color(0xFF00FFFF),
+                blurSigma = 3,
+            };
+            canvas.drawRectShadow(
+                Rect.fromLTWH(150, 150, 110, 120),
+                paint);
+
+            var picture = pictureRecorder.endRecording();
+            Debug.Log("picture.paintBounds: " + picture.paintBounds);
+            
+            var editorCanvas = new EditorCanvas();
+            editorCanvas.concat(Matrix4x4.Rotate(Quaternion.Euler(0, 0, -5)));
+            editorCanvas.clipRRect(RRect.fromRectAndRadius(Rect.fromLTWH(25, 15, 250, 250), 50));
+            editorCanvas.concat(Matrix4x4.Rotate(Quaternion.Euler(0, 0, 5)));
+            
+            editorCanvas.drawPicture(picture);
+            
+            editorCanvas.concat(Matrix4x4.Rotate(Quaternion.Euler(0, 0, -15)));
+            editorCanvas.concat(Matrix4x4.Translate(new Vector2(100, 100)));
+            editorCanvas.drawPicture(picture);
+        }
+        
+        void saveLayer() {
+            var pictureRecorder = new PictureRecorder();
+            var canvas = new RecorderCanvas(pictureRecorder);
+            
+            var paint = new Paint {
+                color = new Color(0xFFFF0000),
+            };
+
+            canvas.drawPloygon4(
+                new[] {new Offset(10, 10), new Offset(10, 110), new Offset(90, 110), new Offset(110, 10)},
+                paint);
+            
+            paint = new Paint {
+                color = new Color(0xFFFFFF00),
+            };
+            
+            canvas.drawRect(
+                Rect.fromLTWH(10, 150, 100, 100),
+                BorderWidth.only(2, 4, 6, 8),
+                BorderRadius.only(0, 4, 8, 16),
+                paint);
+            
+            canvas.concat(Matrix4x4.Translate(new Vector2(-150, -150)));
+            canvas.concat(Matrix4x4.Rotate(Quaternion.Euler(0, 0, -45)));
+            canvas.concat(Matrix4x4.Translate(new Vector2(150, 150)));
+
+            canvas.clipRRect(RRect.fromRectAndRadius(Rect.fromLTWH(180, 150, 60, 120), 40));
+            paint = new Paint {
+                color = new Color(0xFF00FFFF),
+                blurSigma = 3,
+            };
+            canvas.drawRectShadow(
+                Rect.fromLTWH(150, 150, 110, 120),
+                paint);
+
+            var picture = pictureRecorder.endRecording();
+            Debug.Log("picture.paintBounds: " + picture.paintBounds);
+            
+            var editorCanvas = new EditorCanvas();
+            editorCanvas.concat(Matrix4x4.Rotate(Quaternion.Euler(0, 0, -5)));
+            editorCanvas.clipRRect(RRect.fromRectAndRadius(Rect.fromLTWH(25, 15, 250, 250), 50));
+            editorCanvas.concat(Matrix4x4.Rotate(Quaternion.Euler(0, 0, 5)));
+            
+            editorCanvas.saveLayer(picture.paintBounds, new Paint {color = new Color(0x7FFFFFFF)});
+            editorCanvas.drawPicture(picture);
+            
+            editorCanvas.concat(Matrix4x4.Rotate(Quaternion.Euler(0, 0, -15)));
+            editorCanvas.concat(Matrix4x4.Translate(new Vector2(100, 100)));
+            editorCanvas.drawPicture(picture);
+            editorCanvas.restore();
         }
     }
 }
