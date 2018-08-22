@@ -94,6 +94,10 @@ namespace UIWidgets.ui {
             return new Offset(this.dx + translateX, this.dy + translateY);
         }
 
+        public static Offset operator -(Offset a) {
+            return new Offset(-a.dx, -a.dy);
+        }
+
         public static Offset operator -(Offset a, Offset b) {
             return new Offset(a.dx - b.dx, a.dy - b.dy);
         }

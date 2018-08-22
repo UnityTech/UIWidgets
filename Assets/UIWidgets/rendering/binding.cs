@@ -3,17 +3,25 @@ using UIWidgets.scheduler;
 using UIWidgets.ui;
 
 namespace UIWidgets.rendering {
-    public abstract class RendererBinding : SchedulerBinding {
-        public RendererBinding(Window window) : base(window) {
+    public class RendererBinding {
+        public RendererBinding(Window window, SchedulerBinding schedulerBinding) {
+            this._window = window;
+
+            this._schedulerBinding = schedulerBinding;
+
             this._pipelineOwner = new PipelineOwner(
                 binding: this,
-                onNeedVisualUpdate: this.ensureVisualUpdate
+                onNeedVisualUpdate: this._schedulerBinding.ensureVisualUpdate
             );
 
             window._onMetricsChanged = this.handleMetricsChanged;
             this.initRenderView();
-            this.addPersistentFrameCallback(this._handlePersistentFrameCallback);
+            this._schedulerBinding.addPersistentFrameCallback(this._handlePersistentFrameCallback);
         }
+
+        public readonly Window _window;
+
+        public readonly SchedulerBinding _schedulerBinding;
 
         public void initRenderView() {
             this.renderView = new RenderView(configuration: this.createViewConfiguration());
@@ -33,7 +41,7 @@ namespace UIWidgets.rendering {
 
         public void handleMetricsChanged() {
             this.renderView.configuration = this.createViewConfiguration();
-            this.scheduleForcedFrame();
+            this._schedulerBinding.scheduleForcedFrame();
         }
 
         public ViewConfiguration createViewConfiguration() {
@@ -60,9 +68,19 @@ namespace UIWidgets.rendering {
         }
     }
 
-    public class RendererBindingImpl : RendererBinding {
-        public RendererBindingImpl(Window window, RenderBox root) : base(window) {
-            this.renderView.child = root;
+    public class RendererBindings {
+        public RendererBindings(Window window) {
+            this._window = window;
+            this._schedulerBinding = new SchedulerBinding(window);
+            this._rendererBinding = new RendererBinding(window, this._schedulerBinding);
+        }
+
+        public readonly Window _window;
+        public readonly RendererBinding _rendererBinding;
+        public readonly SchedulerBinding _schedulerBinding;
+
+        public void setRoot(RenderBox root) {
+            this._rendererBinding.renderView.child = root;
         }
     }
 }

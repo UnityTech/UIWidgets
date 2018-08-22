@@ -1,5 +1,4 @@
 ﻿using UIWidgets.foundation;
-using UIWidgets.rendering;
 using UIWidgets.ui;
 using UnityEngine;
 using Rect = UIWidgets.ui.Rect;
@@ -54,17 +53,11 @@ namespace UIWidgets.rendering {
             this.parent.dropChild(this);
         }
 
-        public abstract S find<S>(Offset regionOffset);
-
         public abstract void addToScene(SceneBuilder builder, Offset layerOffset);
     }
 
     public class PictureLayer : Layer {
         public Picture picture;
-
-        public override S find<S>(Offset regionOffset) {
-            return default(S);
-        }
 
         public override void addToScene(SceneBuilder builder, Offset layerOffset) {
             builder.addPicture(layerOffset, this.picture);
@@ -83,20 +76,6 @@ namespace UIWidgets.rendering {
         }
 
         public Layer _lastChild;
-
-        public override S find<S>(Offset regionOffset) {
-            Layer current = this.lastChild;
-            while (current != null) {
-                var value = current.find<S>(regionOffset);
-                if (value != null) {
-                    return value;
-                }
-
-                current = current.previousSibling;
-            }
-
-            return default(S);
-        }
 
         public override void attach(object owner) {
             base.attach(owner);
@@ -174,9 +153,6 @@ namespace UIWidgets.rendering {
                 child = child.nextSibling;
             }
         }
-
-        public virtual void applyTransform(Layer child, UnityEngine.Matrix4x4 transform) {
-        }
     }
 
     public class OffsetLayer : ContainerLayer {
@@ -185,10 +161,6 @@ namespace UIWidgets.rendering {
         }
 
         public Offset offset;
-
-        public override S find<S>(Offset regionOffset) {
-            return base.find<S>(regionOffset - this.offset);
-        }
 
         public override void addToScene(SceneBuilder builder, Offset layerOffset) {
             this.addChildrenToScene(builder, this.offset + layerOffset);
@@ -202,16 +174,22 @@ namespace UIWidgets.rendering {
 
         public Rect clipRect;
 
-        public override S find<S>(Offset regionOffset) {
-            if (!this.clipRect.contains(regionOffset)) {
-                return default(S);
-            }
-
-            return base.find<S>(regionOffset);
-        }
-
         public override void addToScene(SceneBuilder builder, Offset layerOffset) {
             builder.pushClipRect(this.clipRect.shift(layerOffset));
+            this.addChildrenToScene(builder, layerOffset);
+            builder.pop();
+        }
+    }
+
+    public class ClipRRectLayer : ContainerLayer {
+        public ClipRRectLayer(RRect clipRRect) {
+            this.clipRRect = clipRRect;
+        }
+
+        public RRect clipRRect;
+
+        public override void addToScene(SceneBuilder builder, Offset layerOffset) {
+            builder.pushClipRRect(this.clipRRect.shift(layerOffset));
             this.addChildrenToScene(builder, layerOffset);
             builder.pop();
         }
@@ -222,7 +200,27 @@ namespace UIWidgets.rendering {
             this._transform = transform;
         }
 
+        public Matrix4x4 transform {
+            get { return this._transform; }
+            set { this._transform = value; }
+        }
+
         public Matrix4x4 _transform;
+        public Matrix4x4 _lastEffectiveTransform;
+
+        public override void addToScene(SceneBuilder builder, Offset layerOffset) {
+            this._lastEffectiveTransform = this.transform;
+
+            var totalOffset = this.offset + layerOffset;
+            if (totalOffset != Offset.zero) {
+                this._lastEffectiveTransform =
+                    Matrix4x4.Translate(totalOffset.toVector()) * this._lastEffectiveTransform;
+            }
+
+            builder.pushTransform(this._lastEffectiveTransform);
+            this.addChildrenToScene(builder, Offset.zero);
+            builder.pop();
+        }
     }
 
     public class OpacityLayer : ContainerLayer {

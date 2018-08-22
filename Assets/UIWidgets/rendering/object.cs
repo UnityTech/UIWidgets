@@ -17,8 +17,6 @@ namespace UIWidgets.rendering {
 
     public delegate void PaintingContextCallback(PaintingContext context, Offset offset);
 
-    public delegate void LayoutCallback<T>(T constraints) where T : Constraints;
-
     public class PaintingContext {
         private PaintingContext(ContainerLayer containerLayer) {
             this._containerLayer = containerLayer;
@@ -50,7 +48,6 @@ namespace UIWidgets.rendering {
         public void _compositeChild(RenderObject child, Offset offset) {
             if (child._needsPaint) {
                 PaintingContext.repaintCompositedChild(child);
-            } else {
             }
 
             child._layer.offset = offset;
@@ -117,34 +114,66 @@ namespace UIWidgets.rendering {
         public void pushClipRect(bool needsCompositing, Offset offset, Rect clipRect, PaintingContextCallback painter) {
             Rect offsetClipRect = clipRect.shift(offset);
             if (needsCompositing) {
-                this.pushLayer(new ClipRectLayer(clipRect: offsetClipRect), painter, offset);
+                this.pushLayer(new ClipRectLayer(offsetClipRect), painter, offset);
             } else {
-//                canvas
-//                    ..save()
-//                    ..clipRect(offsetClipRect);
-//                painter(this, offset);
-//                canvas
-//                    ..restore();
+                this.canvas.save();
+                this.canvas.clipRect(offsetClipRect);
+                painter(this, offset);
+                this.canvas.restore();
             }
         }
 
-        void pushTransform(Offset offset, Matrix4x4 transform, PaintingContextCallback painter) {
+        public void pushClipRRect(bool needsCompositing, Offset offset, RRect clipRRect,
+            PaintingContextCallback painter) {
+            RRect offsetClipRRect = clipRRect.shift(offset);
+            if (needsCompositing) {
+                this.pushLayer(new ClipRRectLayer(offsetClipRRect), painter, offset);
+            } else {
+                this.canvas.save();
+                this.canvas.clipRRect(offsetClipRRect);
+                painter(this, offset);
+                this.canvas.restore();
+            }
+        }
+
+        void pushTransform(bool needsCompositing, Offset offset, Matrix4x4 transform, PaintingContextCallback painter) {
+            var effectiveTransform = Matrix4x4.Translate(offset.toVector())
+                                     * transform * Matrix4x4.Translate(-offset.toVector());
+
+            if (needsCompositing) {
+                this.pushLayer(new TransformLayer(effectiveTransform), painter, offset);
+            } else {
+                this.canvas.save();
+                this.canvas.concat(effectiveTransform);
+                painter(this, offset);
+                this.canvas.restore();
+            }
         }
 
         void pushOpacity(Offset offset, int alpha, PaintingContextCallback painter) {
-            this.pushLayer(new OpacityLayer(alpha: alpha), painter, offset);
+            this.pushLayer(new OpacityLayer(alpha), painter, offset);
         }
     }
 
+    public abstract class Constraints {
+        public abstract bool isTight { get; }
+        public abstract bool isNormalized { get; }
+    }
+
+    public delegate void RenderObjectVisitor(RenderObject child);
+
+    public delegate void LayoutCallback<T>(T constraints) where T : Constraints;
+
     public class PipelineOwner {
         public PipelineOwner(
-            RendererBinding binding = null, 
+            RendererBinding binding = null,
             VoidCallback onNeedVisualUpdate = null) {
             this.binding = binding;
             this.onNeedVisualUpdate = onNeedVisualUpdate;
         }
 
         public readonly RendererBinding binding;
+
         public readonly VoidCallback onNeedVisualUpdate;
 
         public void requestVisualUpdate() {
@@ -219,13 +248,6 @@ namespace UIWidgets.rendering {
         }
     }
 
-    public abstract class Constraints {
-        public abstract bool isTight { get; }
-        public abstract bool isNormalized { get; }
-    }
-
-    public delegate void RenderObjectVisitor(RenderObject child);
-
     public abstract class ContainerParentDataMixin<ChildType> : ParentData where ChildType : RenderObject {
         public ChildType previousSibling;
 
@@ -251,6 +273,7 @@ namespace UIWidgets.rendering {
 
     public abstract class RenderObject : AbstractNode {
         protected RenderObject() {
+            this._needsCompositing = this.isRepaintBoundary || this.alwaysNeedsCompositing;
         }
 
         public ParentData parentData;
@@ -265,8 +288,8 @@ namespace UIWidgets.rendering {
             var child = (RenderObject) childNode;
             this.setupParentData(child);
             base.adoptChild(child);
-
             this.markNeedsLayout();
+            this.markNeedsCompositingBitsUpdate();
         }
 
         public override void dropChild(AbstractNode childNode) {
@@ -275,8 +298,8 @@ namespace UIWidgets.rendering {
             child.parentData.detach();
             child.parentData = null;
             base.dropChild(child);
-
             this.markNeedsLayout();
+            this.markNeedsCompositingBitsUpdate();
         }
 
         public virtual void visitChildren(RenderObjectVisitor visitor) {
@@ -295,7 +318,14 @@ namespace UIWidgets.rendering {
                 this.markNeedsLayout();
             }
 
-            if (this._needsPaint) {
+            if (this._needsCompositingBitsUpdate) {
+                this._needsCompositingBitsUpdate = false;
+                this.markNeedsCompositingBitsUpdate();
+            }
+
+            if (this._needsPaint && this._layer != null) {
+                this._needsPaint = false;
+                this.markNeedsPaint();
             }
         }
 
@@ -309,14 +339,13 @@ namespace UIWidgets.rendering {
 
         public Constraints _constraints;
 
-
         public virtual void markNeedsLayout() {
             if (this._needsLayout) {
                 return;
             }
 
             if (this._relayoutBoundary != this) {
-                this.markNeedsLayout();
+                this.markParentNeedsLayout();
             } else {
                 this._needsLayout = true;
                 if (this.owner != null) {
@@ -328,9 +357,8 @@ namespace UIWidgets.rendering {
 
         public void markParentNeedsLayout() {
             this._needsLayout = true;
-            var parent = (RenderObject) this.parent;
             if (!this._doingThisLayoutWithCallback) {
-                parent.markNeedsLayout();
+                ((RenderObject) this.parent).markNeedsLayout();
             }
         }
 
@@ -366,14 +394,14 @@ namespace UIWidgets.rendering {
 
         public void layout(Constraints constraints, bool parentUsesSize = false) {
             RenderObject relayoutBoundary;
-            if (!parentUsesSize || this.sizedByParent || constraints.isTight || !(parent is RenderObject)) {
+            if (!parentUsesSize || this.sizedByParent || constraints.isTight || !(this.parent is RenderObject)) {
                 relayoutBoundary = this;
             } else {
-                var parent1 = (RenderObject) this.parent;
-                relayoutBoundary = parent1._relayoutBoundary;
+                relayoutBoundary = ((RenderObject) this.parent)._relayoutBoundary;
             }
 
-            if (!this._needsLayout && constraints == this._constraints && relayoutBoundary == this._relayoutBoundary) {
+            if (!this._needsLayout && object.Equals(constraints, this._constraints) &&
+                relayoutBoundary == this._relayoutBoundary) {
                 return;
             }
 
@@ -434,7 +462,7 @@ namespace UIWidgets.rendering {
         public bool _needsCompositingBitsUpdate = false;
 
         public void markNeedsCompositingBitsUpdate() {
-            if (!this._needsCompositingBitsUpdate) {
+            if (this._needsCompositingBitsUpdate) {
                 return;
             }
 
@@ -566,8 +594,9 @@ namespace UIWidgets.rendering {
         public Matrix4x4 getTransformTo(RenderObject ancestor) {
             if (ancestor == null) {
                 AbstractNode rootNode = this.owner.rootNode;
-                if (rootNode is RenderObject)
+                if (rootNode is RenderObject) {
                     ancestor = (RenderObject) rootNode;
+                }
             }
 
             var renderers = new List<RenderObject>();
@@ -582,20 +611,5 @@ namespace UIWidgets.rendering {
 
             return transform;
         }
-    }
-
-
-    public class GUIContext {
-        public void paintChild(RenderObject child) {
-            //child.onGUI(this);
-        }
-    }
-
-    public class RenderLabel {
-        public RenderLabel() {
-        }
-    }
-
-    public class TextSpan {
     }
 }

@@ -5,39 +5,39 @@ using UnityEditor;
 using UnityEngine;
 
 namespace UIWidgets.ui {
-    public class EditorCanvas : Canvas {
-        static EditorCanvas() {
+    public class CanvasImpl : Canvas {
+        static CanvasImpl() {
             var shader = Shader.Find("UIWidgets/2D Handles Lines");
             if (shader == null) {
                 throw new Exception("UIWidgets/2D Handles Lines not found");
             }
 
-            EditorCanvas.linesMat = new Material(shader);
-            EditorCanvas.linesMat.hideFlags = HideFlags.HideAndDontSave;
+            CanvasImpl.linesMat = new Material(shader);
+            CanvasImpl.linesMat.hideFlags = HideFlags.HideAndDontSave;
 
             shader = Shader.Find("UIWidgets/GUIRoundedRect");
             if (shader == null) {
                 throw new Exception("UIWidgets/GUIRoundedRect not found");
             }
 
-            EditorCanvas.guiRoundedRectMat = new Material(shader);
-            EditorCanvas.guiRoundedRectMat.hideFlags = HideFlags.HideAndDontSave;
+            CanvasImpl.guiRoundedRectMat = new Material(shader);
+            CanvasImpl.guiRoundedRectMat.hideFlags = HideFlags.HideAndDontSave;
 
             shader = Shader.Find("UIWidgets/GUITextureClip");
             if (shader == null) {
                 throw new Exception("UIWidgets/GUITextureClip not found");
             }
 
-            EditorCanvas.guiTextureClipMat = new Material(shader);
-            EditorCanvas.guiTextureClipMat.hideFlags = HideFlags.HideAndDontSave;
+            CanvasImpl.guiTextureClipMat = new Material(shader);
+            CanvasImpl.guiTextureClipMat.hideFlags = HideFlags.HideAndDontSave;
 
             shader = Shader.Find("UIWidgets/ShadowRect");
             if (shader == null) {
                 throw new Exception("UIWidgets/ShadowRect not found");
             }
 
-            EditorCanvas.shadowRectMat = new Material(shader);
-            EditorCanvas.shadowRectMat.hideFlags = HideFlags.HideAndDontSave;
+            CanvasImpl.shadowRectMat = new Material(shader);
+            CanvasImpl.shadowRectMat.hideFlags = HideFlags.HideAndDontSave;
         }
 
         private static readonly Material linesMat;
@@ -54,7 +54,7 @@ namespace UIWidgets.ui {
             get { return this._stack ?? (this._stack = new Stack<CanvasRec>()); }
         }
 
-        public EditorCanvas() {
+        public CanvasImpl() {
             this._transform = Matrix4x4.identity;
         }
 
@@ -66,8 +66,8 @@ namespace UIWidgets.ui {
                     verts[i] = points[i].toVector();
                 }
 
-                this.prepareGL(EditorCanvas.linesMat);
-                EditorCanvas.linesMat.SetPass(0);
+                this.prepareGL(CanvasImpl.linesMat);
+                CanvasImpl.linesMat.SetPass(0);
 
                 GL.Begin(GL.TRIANGLES);
                 GL.Color(color.toColor());
@@ -85,26 +85,26 @@ namespace UIWidgets.ui {
         }
 
         public void drawRect(Rect rect, BorderWidth borderWidth, BorderRadius borderRadius, Paint paint) {
-            this.prepareGL(EditorCanvas.guiRoundedRectMat);
+            this.prepareGL(CanvasImpl.guiRoundedRectMat);
 
-            EditorCanvas.guiRoundedRectMat.SetFloatArray("UIWidgets_BorderWidth",
+            CanvasImpl.guiRoundedRectMat.SetFloatArray("UIWidgets_BorderWidth",
                 borderWidth == null ? new[] {0f, 0f, 0f, 0f} : borderWidth.toFloatArray());
-            EditorCanvas.guiRoundedRectMat.SetFloatArray("UIWidgets_CornerRadius",
+            CanvasImpl.guiRoundedRectMat.SetFloatArray("UIWidgets_CornerRadius",
                 borderRadius == null ? new[] {0f, 0f, 0f, 0f} : borderRadius.toFloatArray());
 
             Graphics.DrawTexture(rect.toRect(), EditorGUIUtility.whiteTexture,
                 new UnityEngine.Rect(0.0f, 0.0f, 1f, 1f), 0, 0, 0, 0,
-                paint.color.toColor(), EditorCanvas.guiRoundedRectMat);
+                paint.color.toColor(), CanvasImpl.guiRoundedRectMat);
         }
 
         public void drawRectShadow(Rect rect, Paint paint) {
-            this.prepareGL(EditorCanvas.shadowRectMat);
+            this.prepareGL(CanvasImpl.shadowRectMat);
 
-            EditorCanvas.shadowRectMat.SetFloat("UIWidgets_sigma", (float) paint.blurSigma);
+            CanvasImpl.shadowRectMat.SetFloat("UIWidgets_sigma", (float) paint.blurSigma);
 
             Graphics.DrawTexture(rect.toRect(), EditorGUIUtility.whiteTexture,
                 new UnityEngine.Rect(0.0f, 0.0f, 1f, 1f), 0, 0, 0, 0,
-                paint.color.toColor(), EditorCanvas.shadowRectMat);
+                paint.color.toColor(), CanvasImpl.shadowRectMat);
         }
 
         public void drawPicture(Picture picture) {
@@ -210,11 +210,11 @@ namespace UIWidgets.ui {
                 RenderTexture.active = this._layerRec != null ? this._layerRec.texture : null;
                 GL.PopMatrix();
 
-                this.prepareGL(EditorCanvas.guiTextureClipMat);
+                this.prepareGL(CanvasImpl.guiTextureClipMat);
 
                 Graphics.DrawTexture(layerRec.bounds.toRect(), layerRec.texture,
                     new UnityEngine.Rect(0.0f, 0.0f, 1f, 1f), 0, 0, 0, 0,
-                    layerRec.paint.color.toColor(), EditorCanvas.guiTextureClipMat);
+                    layerRec.paint.color.toColor(), CanvasImpl.guiTextureClipMat);
 
                 RenderTexture.ReleaseTemporary(layerRec.texture);
                 layerRec.texture = null;

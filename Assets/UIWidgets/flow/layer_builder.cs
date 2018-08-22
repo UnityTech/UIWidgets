@@ -45,12 +45,7 @@ namespace UIWidgets.flow {
         }
 
         public void pushTransform(Matrix4x4 matrix) {
-            Rect cullRect = Rect.largest;
-
-            var det = matrix.determinant;
-            if (det != 0f) {
-                cullRect = MatrixUtils.transformRect(matrix.inverse, this._cullRects.Peek());
-            }
+            Rect cullRect = MatrixUtils.transformRect(matrix.inverse, this._cullRects.Peek());
 
             var layer = new TransformLayer();
             layer.transform = matrix;
@@ -63,6 +58,15 @@ namespace UIWidgets.flow {
 
             var layer = new ClipRectLayer();
             layer.clipRect = clipRect;
+
+            this.pushLayer(layer, cullRect);
+        }
+        
+        public void pushClipRRect(RRect clipRRect) {
+            Rect cullRect = clipRRect.outerRect.intersect(this._cullRects.Peek());
+            
+            var layer = new ClipRRectLayer();
+            layer.clipRRect = clipRRect;
 
             this.pushLayer(layer, cullRect);
         }

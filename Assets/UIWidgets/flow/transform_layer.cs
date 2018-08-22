@@ -11,7 +11,7 @@ namespace UIWidgets.flow {
         }
 
         public override void preroll(PrerollContext context, Matrix4x4 matrix) {
-            var childMatrix = matrix * this._tranform;
+            var childMatrix = this._tranform * matrix;
 
             Rect childPaintBounds = Rect.zero;
             this.prerollChildren(context, childMatrix, ref childPaintBounds);

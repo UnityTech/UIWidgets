@@ -23,8 +23,12 @@ namespace UIWidgets.flow {
         public override void paint(PaintContext context) {
             var canvas = context.canvas;
 
-            canvas.save();
+            if (this._offset == Offset.zero) {
+                canvas.drawPicture(this._picture);
+                return;
+            }
 
+            canvas.save();
             try {
                 canvas.concat(Matrix4x4.Translate(new Vector2((float) this._offset.dx, (float) this._offset.dy)));
                 canvas.drawPicture(this._picture);

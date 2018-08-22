@@ -6,7 +6,7 @@ var nunjucks = require('nunjucks');
 var chokidar = require('chokidar');
 
 exports.command = 'codegen [dir]';
-exports.desc = "codegen";
+exports.desc = "generate mixin code";
 exports.builder = function (yargs) {
     return yargs.positional('dir', {
         describe: 'the working directory',

@@ -15,7 +15,7 @@ namespace UIWidgets.ui {
     }
 
     public class PictureRecorder {
-        private List<DrawCmd> _drawCmds = new List<DrawCmd>();
+        private readonly List<DrawCmd> _drawCmds = new List<DrawCmd>();
 
         private Matrix4x4 _transform;
         private Rect _clipRect;

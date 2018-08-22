@@ -14,6 +14,10 @@ namespace UIWidgets.ui {
             this._layerBuilder.pushClipRect(rect);
         }
 
+        public void pushClipRRect(RRect rrect) {
+            this._layerBuilder.pushClipRRect(rrect);
+        }
+
         public void pushOpacity(int alpha) {
             this._layerBuilder.pushOpacity(alpha);
         }
@@ -31,7 +35,7 @@ namespace UIWidgets.ui {
         }
     }
 
-    public class Scene : IDisposable {
+    public class Scene {
         public Scene(Layer rootLayer) {
             this._rootLayer = rootLayer;
         }
@@ -40,9 +44,6 @@ namespace UIWidgets.ui {
 
         public Layer takeLayer() {
             return this._rootLayer;
-        }
-
-        public void Dispose() {
         }
     }
 }

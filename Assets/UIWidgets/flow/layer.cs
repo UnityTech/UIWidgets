@@ -18,7 +18,7 @@ namespace UIWidgets.flow {
             set { this._parent = value; }
         }
 
-        private Rect _paintBounds;
+        private Rect _paintBounds = Rect.zero;
 
         public Rect paintBounds {
             get { return this._paintBounds; }

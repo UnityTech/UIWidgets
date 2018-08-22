@@ -11,9 +11,7 @@ namespace UIWidgets.flow {
         public override void paint(PaintContext context) {
             var canvas = context.canvas;
 
-            var paint = new Paint();
-            paint.color = Color.fromARGB(this._alpha, 255, 255, 255);
-
+            var paint = new Paint {color = Color.fromARGB(this._alpha, 255, 255, 255)};
             canvas.saveLayer(this.paintBounds, paint);
             try {
                 this.paintChildren(context);

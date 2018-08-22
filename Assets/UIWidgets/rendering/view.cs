@@ -18,7 +18,7 @@ namespace UIWidgets.rendering {
         public readonly double devicePixelRatio;
 
         public Matrix4x4 toMatrix() {
-            return Matrix4x4.TRS(Vector3.zero, Quaternion.identity, new Vector3(
+            return Matrix4x4.Scale(new Vector3(
                 (float) this.devicePixelRatio, (float) this.devicePixelRatio, 1));
         }
 
@@ -26,7 +26,6 @@ namespace UIWidgets.rendering {
             return string.Format("${0} at ${1}x", this.size, this.devicePixelRatio);
         }
     }
-
 
     public class RenderView : RenderObjectWithChildMixinRenderObject<RenderBox> {
         public RenderView(
@@ -93,7 +92,7 @@ namespace UIWidgets.rendering {
             }
         }
 
-        public void applyPaintTransform(RenderBox child, Matrix4x4 transform) {
+        public override void applyPaintTransform(RenderObject child, Matrix4x4 transform) {
             transform *= this._rootTransform;
             base.applyPaintTransform(child, transform);
         }
@@ -101,9 +100,8 @@ namespace UIWidgets.rendering {
         public void compositeFrame() {
             var builder = new SceneBuilder();
             this.layer.addToScene(builder, Offset.zero);
-            using (var scene = builder.build()) {
-                this.owner.binding.render(scene);
-            }
+            var scene = builder.build();
+            this.owner.binding.render(scene);
         }
 
         public override Rect paintBounds {

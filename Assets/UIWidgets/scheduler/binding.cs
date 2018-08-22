@@ -4,14 +4,6 @@ using UIWidgets.ui;
 using UnityEngine;
 
 namespace UIWidgets.scheduler {
-    public enum SchedulerPhase {
-        idle,
-        transientCallbacks,
-        midFrameMicrotasks,
-        persistentCallbacks,
-        postFrameCallbacks,
-    }
-
     public class _FrameCallbackEntry {
         public _FrameCallbackEntry(FrameCallback callback, bool rescheduling = false) {
             this.callback = callback;
@@ -20,7 +12,15 @@ namespace UIWidgets.scheduler {
         public readonly FrameCallback callback;
     }
 
-    public abstract class SchedulerBinding {
+    public enum SchedulerPhase {
+        idle,
+        transientCallbacks,
+        midFrameMicrotasks,
+        persistentCallbacks,
+        postFrameCallbacks,
+    }
+
+    public class SchedulerBinding {
         public SchedulerBinding(Window window) {
             this._window = window;
 
@@ -43,7 +43,6 @@ namespace UIWidgets.scheduler {
         }
 
         public double _timeDilation = 1.0;
-
 
         public int _nextFrameCallbackId = 0;
         public Dictionary<int, _FrameCallbackEntry> _transientCallbacks = new Dictionary<int, _FrameCallbackEntry>();

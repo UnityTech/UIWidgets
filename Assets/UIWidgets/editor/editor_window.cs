@@ -21,12 +21,14 @@ namespace UIWidgets.editor {
         public readonly DateTime _epoch = DateTime.Now;
 
         public void OnGUI() {
-            if (this.onBeginFrame != null) {
-                this.onBeginFrame(DateTime.Now - this._epoch);
-            }
+            if (Event.current.type == EventType.Repaint) {
+                if (this.onBeginFrame != null) {
+                    this.onBeginFrame(DateTime.Now - this._epoch);
+                }
 
-            if (this.onDrawFrame != null) {
-                this.onDrawFrame();
+                if (this.onDrawFrame != null) {
+                    this.onDrawFrame();
+                }
             }
         }
 
@@ -62,39 +64,8 @@ namespace UIWidgets.editor {
             var prerollContext = new PrerollContext();
             layer.preroll(prerollContext, Matrix4x4.identity);
 
-            var paintContext = new PaintContext();
+            var paintContext = new PaintContext {canvas = new CanvasImpl()};
             layer.paint(paintContext);
-        }
-    }
-
-    public class EditorWindow : UnityEditor.EditorWindow {
-        protected virtual void OnGUI() {
-            if (this.windowAdapter != null) {
-                this.windowAdapter.OnGUI();
-            }
-        }
-
-        protected virtual void Update() {
-            if (this.windowAdapter != null) {
-                this.windowAdapter.Update();
-            }
-        }
-
-        protected virtual void Awake() {
-            this.windowAdapter = new WindowAdapter(this);
-        }
-
-        protected void OnDestroy() {
-            this.windowAdapter = null;
-        }
-
-        public WindowAdapter windowAdapter;
-
-        public void runWidget(Widget root) {
-        }
-
-        public void runRenderBox(RenderBox root) {
-            new RendererBindingImpl(this.windowAdapter, root);
         }
     }
 }
