@@ -34,5 +34,3 @@ sysinfo.txt
 # Builds
 *.apk
 *.unitypackage
-
-*.gen.cs
