@@ -30,11 +30,20 @@ namespace UIWidgets.ui {
 
             EditorCanvas.guiTextureClipMat = new Material(shader);
             EditorCanvas.guiTextureClipMat.hideFlags = HideFlags.HideAndDontSave;
+
+            shader = Shader.Find("UIWidgets/ShadowRect");
+            if (shader == null) {
+                throw new Exception("UIWidgets/ShadowRect not found");
+            }
+
+            EditorCanvas.shadowRectMat = new Material(shader);
+            EditorCanvas.shadowRectMat.hideFlags = HideFlags.HideAndDontSave;
         }
 
         private static readonly Material linesMat;
         private static readonly Material guiRoundedRectMat;
         private static readonly Material guiTextureClipMat;
+        private static readonly Material shadowRectMat;
 
         private Matrix4x4 _transform;
         private ClipRec _clipRec;
@@ -76,11 +85,26 @@ namespace UIWidgets.ui {
         }
 
         public void drawRect(Rect rect, BorderWidth borderWidth, BorderRadius borderRadius, Paint paint) {
-            throw new NotImplementedException();
+            this.prepareGL(EditorCanvas.guiRoundedRectMat);
+
+            EditorCanvas.guiRoundedRectMat.SetFloatArray("UIWidgets_BorderWidth",
+                borderWidth == null ? new[] {0f, 0f, 0f, 0f} : borderWidth.toFloatArray());
+            EditorCanvas.guiRoundedRectMat.SetFloatArray("UIWidgets_CornerRadius",
+                borderRadius == null ? new[] {0f, 0f, 0f, 0f} : borderRadius.toFloatArray());
+
+            Graphics.DrawTexture(rect.toRect(), EditorGUIUtility.whiteTexture,
+                new UnityEngine.Rect(0.0f, 0.0f, 1f, 1f), 0, 0, 0, 0,
+                paint.color.toColor(), EditorCanvas.guiRoundedRectMat);
         }
 
         public void drawRectShadow(Rect rect, Paint paint) {
-            throw new NotImplementedException();
+            this.prepareGL(EditorCanvas.shadowRectMat);
+
+            EditorCanvas.shadowRectMat.SetFloat("UIWidgets_sigma", (float) paint.blurSigma);
+
+            Graphics.DrawTexture(rect.toRect(), EditorGUIUtility.whiteTexture,
+                new UnityEngine.Rect(0.0f, 0.0f, 1f, 1f), 0, 0, 0, 0,
+                paint.color.toColor(), EditorCanvas.shadowRectMat);
         }
 
         public void drawPicture(Picture picture) {

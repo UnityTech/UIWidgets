@@ -1,0 +1,14 @@
+{
+    "name": "Tests",
+    "references": [
+        "UIWidgets"
+    ],
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false
+}

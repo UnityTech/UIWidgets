@@ -116,9 +116,24 @@ namespace UIWidgets.ui {
                 (float) borderWidth.bottom);
         }
 
+        public static float[] toFloatArray(this BorderWidth borderWidth) {
+            return new[] {
+                (float) borderWidth.left, (float) borderWidth.top,
+                (float) borderWidth.right, (float) borderWidth.bottom
+            };
+        }
+
+
         public static Vector4 toVector(this BorderRadius borderRadius) {
             return new Vector4((float) borderRadius.topLeft, (float) borderRadius.topRight,
                 (float) borderRadius.bottomRight, (float) borderRadius.bottomLeft);
+        }
+
+        public static float[] toFloatArray(this BorderRadius borderRadius) {
+            return new[] {
+                (float) borderRadius.topLeft, (float) borderRadius.topRight,
+                (float) borderRadius.bottomRight, (float) borderRadius.bottomLeft
+            };
         }
     }
 

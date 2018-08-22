@@ -2,17 +2,17 @@ uniform float4x4 UIWidgets_GUIClipMatrix;
 uniform float4 UIWidgets_GUIClipRect;
 uniform float4 UIWidgets_GUIClipRectRadius;
 
-half GetCornerAlpha(float2 p, float2 center, float radius, float pixelScale) {
+half __getCornerAlpha (float2 p, float2 center, float radius, float pixelScale) {
     float2 v = p - center;
     float pixelCenterDist = length(v);
 
     float outerDist = (pixelCenterDist - radius) * pixelScale;
-    half outerDistAlpha = saturate(0.5f + outerDist);
+    half outerDistAlpha = saturate(0.5f - outerDist);
 
-    return 1.0f - outerDistAlpha;
+    return outerDistAlpha;
 }
 
-float getClipAlpha(float2 p, float pixelScale) {
+float getClipAlpha (float2 p, float pixelScale) {
     bool xIsLeft = (p.x - UIWidgets_GUIClipRect[0] - UIWidgets_GUIClipRect[2] / 2.0f) <= 0.0f;
     bool yIsTop = (p.y - UIWidgets_GUIClipRect[1] - UIWidgets_GUIClipRect[3] / 2.0f) <= 0.0f;
 
@@ -35,7 +35,7 @@ float getClipAlpha(float2 p, float pixelScale) {
     float clipAlpha = 1.0f;        
     
     bool isInCorner = (xIsLeft ? p.x <= center.x : p.x >= center.x) && (yIsTop ? p.y <= center.y : p.y >= center.y);
-    float cornerAlpha = isInCorner ? GetCornerAlpha(p, center, activeRadius, pixelScale) : 1.0f;
+    float cornerAlpha = isInCorner ? __getCornerAlpha(p, center, activeRadius, pixelScale) : 1.0f;
     clipAlpha *= cornerAlpha;
 
     bool isInRect =
