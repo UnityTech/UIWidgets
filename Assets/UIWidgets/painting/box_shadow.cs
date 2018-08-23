@@ -28,6 +28,13 @@ namespace UIWidgets.painting {
             get { return BoxShadow.convertRadiusToSigma(this.blurRadius); }
         }
 
+        public Paint toPaint() {
+            return new Paint {
+                color = this.color,
+                blurSigma = this.blurSigma
+            };
+        }
+
         public bool Equals(BoxShadow other) {
             if (object.ReferenceEquals(null, other)) return false;
             if (object.ReferenceEquals(this, other)) return true;

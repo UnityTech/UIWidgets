@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Linq;
 using UIWidgets.editor;
+using UIWidgets.painting;
 using UIWidgets.rendering;
+using UIWidgets.ui;
 using UnityEditor;
 using UnityEngine;
+using Color = UIWidgets.ui.Color;
 
 namespace UIWidgets.Tests {
     public class RenderBoxes : EditorWindow {
@@ -15,7 +18,8 @@ namespace UIWidgets.Tests {
 
         RenderBoxes() {
             this._options = new Func<RenderBox>[] {
-                this.test1,
+                this.none,
+                this.decoratedBox,
             };
             this._optionStrings = this._options.Select(x => x.Method.Name).ToArray();
             this._selected = 0;
@@ -30,10 +34,6 @@ namespace UIWidgets.Tests {
         [NonSerialized] private bool hasInvoked = false;
 
         void OnGUI() {
-            if (this.windowAdapter != null) {
-                this.windowAdapter.OnGUI();
-            }
-
             var selected = EditorGUILayout.Popup("test case", this._selected, this._optionStrings);
             if (selected != this._selected || !this.hasInvoked) {
                 this._selected = selected;
@@ -41,6 +41,10 @@ namespace UIWidgets.Tests {
 
                 var renderBox = this._options[this._selected]();
                 this.rendererBindings.setRoot(renderBox);
+            }
+
+            if (this.windowAdapter != null) {
+                this.windowAdapter.OnGUI();
             }
         }
 
@@ -60,8 +64,23 @@ namespace UIWidgets.Tests {
             this.rendererBindings = null;
         }
 
-        RenderBox test1() {
+        RenderBox none() {
             return null;
+        }
+
+        RenderBox decoratedBox() {
+            return new RenderConstrainedOverflowBox(
+                minWidth: 100,
+                maxWidth: 100,
+                minHeight: 100,
+                maxHeight: 100,
+                child: new RenderDecoratedBox(
+                    decoration: new BoxDecoration(
+                        color: new Color(0xFFFFFFFF),
+                        borderRadius: BorderRadius.all(3)
+                    )
+                )
+            );
         }
     }
 }

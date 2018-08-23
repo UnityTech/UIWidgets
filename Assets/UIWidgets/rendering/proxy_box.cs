@@ -9,11 +9,6 @@ namespace UIWidgets.rendering {
         }
     }
 
-    public enum DecorationPosition {
-        background,
-        foreground,
-    }
-
     public class RenderConstrainedBox : RenderProxyBox {
         public RenderConstrainedBox(
             RenderBox child = null,
@@ -159,6 +154,11 @@ namespace UIWidgets.rendering {
         }
     }
 
+    public enum DecorationPosition {
+        background,
+        foreground,
+    }
+    
     public class RenderDecoratedBox : RenderProxyBox {
         public RenderDecoratedBox(
             Decoration decoration,

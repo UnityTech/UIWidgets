@@ -523,6 +523,7 @@ namespace UIWidgets.rendering {
                 return;
             }
 
+            this._needsPaint = true;
             if (this.isRepaintBoundary) {
                 if (this.owner != null) {
                     this.owner._nodesNeedingPaint.Add(this);
