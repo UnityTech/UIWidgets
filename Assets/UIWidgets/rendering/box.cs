@@ -32,6 +32,117 @@ namespace UIWidgets.rendering {
             );
         }
 
+        public static BoxConstraints tightFor(
+            double? width = null,
+            double? height = null
+        ) {
+            return new BoxConstraints(
+                width ?? 0.0,
+                width ?? double.PositiveInfinity,
+                height ?? 0.0,
+                height ?? double.PositiveInfinity
+            );
+        }
+
+        public static BoxConstraints tightForFinite(
+            double width = double.PositiveInfinity,
+            double height = double.PositiveInfinity
+        ) {
+            return new BoxConstraints(
+                !double.IsPositiveInfinity(width) ? width : 0.0,
+                !double.IsPositiveInfinity(width) ? width : double.PositiveInfinity,
+                !double.IsPositiveInfinity(height) ? height : 0.0,
+                !double.IsPositiveInfinity(height) ? height : double.PositiveInfinity
+            );
+        }
+
+        public static BoxConstraints expand(
+            double? width = null,
+            double? height = null
+        ) {
+            return new BoxConstraints(
+                width ?? double.PositiveInfinity,
+                width ?? double.PositiveInfinity,
+                height ?? double.PositiveInfinity,
+                height ?? double.PositiveInfinity
+            );
+        }
+
+        public BoxConstraints copyWith(
+            double? minWidth = null,
+            double? maxWidth = null,
+            double? minHeight = null,
+            double? maxHeight = null
+        ) {
+            return new BoxConstraints(
+                minWidth ?? this.minWidth,
+                maxWidth ?? this.maxWidth,
+                minHeight ?? this.minHeight,
+                maxHeight ?? this.maxHeight
+            );
+        }
+
+        public BoxConstraints loosen() {
+            return new BoxConstraints(
+                minWidth: 0.0,
+                maxWidth: this.maxWidth,
+                minHeight: 0.0,
+                maxHeight: this.maxHeight
+            );
+        }
+
+        public BoxConstraints enforce(BoxConstraints constraints) {
+            return new BoxConstraints(
+                minWidth: Mathf.Clamp(
+                    (float) this.minWidth,
+                    (float) constraints.minWidth,
+                    (float) constraints.maxWidth),
+                maxWidth: Mathf.Clamp(
+                    (float) this.maxWidth,
+                    (float) constraints.minWidth,
+                    (float) constraints.maxWidth),
+                minHeight: Mathf.Clamp(
+                    (float) this.minHeight,
+                    (float) constraints.minHeight,
+                    (float) constraints.maxHeight),
+                maxHeight: Mathf.Clamp(
+                    (float) this.maxHeight,
+                    (float) constraints.minHeight,
+                    (float) constraints.maxHeight)
+            );
+        }
+
+        public BoxConstraints tighten(
+            double? width = null,
+            double? height = null
+        ) {
+            return new BoxConstraints(
+                minWidth: width == null
+                    ? this.minWidth
+                    : Mathf.Clamp((float) width.Value, (float) this.minWidth, (float) this.maxWidth),
+                maxWidth: width == null
+                    ? this.maxWidth
+                    : Mathf.Clamp((float) width.Value, (float) this.minWidth, (float) this.maxWidth),
+                minHeight: height == null
+                    ? this.minHeight
+                    : Mathf.Clamp((float) height.Value, (float) this.minHeight, (float) this.maxHeight),
+                maxHeight: height == null
+                    ? this.maxHeight
+                    : Mathf.Clamp((float) height.Value, (float) this.minHeight, (float) this.maxHeight)
+            );
+        }
+
+        public BoxConstraints flipped {
+            get {
+                return new BoxConstraints(
+                    minWidth: this.minHeight,
+                    maxWidth: this.maxHeight,
+                    minHeight: this.minWidth,
+                    maxHeight: this.maxWidth
+                );
+            }
+        }
+
         public BoxConstraints widthConstraints() {
             return new BoxConstraints(minWidth: this.minWidth, maxWidth: this.maxWidth);
         }
@@ -110,11 +221,11 @@ namespace UIWidgets.rendering {
         }
 
         public bool hasBoundedWidth {
-            get { return this.minWidth < double.PositiveInfinity; }
+            get { return this.maxWidth < double.PositiveInfinity; }
         }
 
         public bool hasBoundedHeight {
-            get { return this.minHeight < double.PositiveInfinity; }
+            get { return this.maxHeight < double.PositiveInfinity; }
         }
 
         public bool hasInfiniteWidth {
@@ -366,23 +477,17 @@ namespace UIWidgets.rendering {
         public override void performLayout() {
         }
 
-        public override void applyPaintTransform(RenderObject child, Matrix4x4 transform) {
+        public override void applyPaintTransform(RenderObject child, ref Matrix4x4 transform) {
             var childParentData = (BoxParentData) child.parentData;
             var offset = childParentData.offset;
-            transform.SetTRS(new Vector2((float) offset.dx, (float) offset.dy), Quaternion.identity, Vector3.one);
+            transform = Matrix4x4.Translate(offset.toVector()) * transform;
         }
 
         public Offset globalToLocal(Offset point, RenderObject ancestor = null) {
             var transform = this.getTransformTo(ancestor);
-            var det = transform.determinant;
-            if (det == 0f) {
-                return Offset.zero;
-            }
-
             transform = transform.inverse;
             return MatrixUtils.transformPoint(transform, point);
         }
-
 
         public Offset localToGlobal(Offset point, RenderObject ancestor = null) {
             return MatrixUtils.transformPoint(this.getTransformTo(ancestor), point);

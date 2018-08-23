@@ -6,7 +6,7 @@ namespace UIWidgets.painting {
         protected Decoration() {
         }
 
-        public virtual EdgeInsetsGeometry padding {
+        public virtual EdgeInsets padding {
             get { return EdgeInsets.zero; }
         }
 

@@ -29,7 +29,7 @@ namespace UIWidgets.painting {
         public readonly Gradient gradient;
 
 
-        public override EdgeInsetsGeometry padding {
+        public override EdgeInsets padding {
             get {
                 if (this.border != null) {
                     return this.border.dimensions;

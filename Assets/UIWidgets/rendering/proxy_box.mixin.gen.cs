@@ -54,14 +54,14 @@ namespace UIWidgets.rendering {
 
         public override void performLayout() {
             if (this.child != null) {
-                this.child.layout(this.constraints, true);
+                this.child.layout(this.constraints, parentUsesSize: true);
                 this.size = this.child.size;
             } else {
                 this.performResize();
             }
         }
 
-        public override void applyPaintTransform(RenderObject child, Matrix4x4 transform) {
+        public override void applyPaintTransform(RenderObject child, ref Matrix4x4 transform) {
         }
 
         public override void paint(PaintingContext context, Offset offset) {

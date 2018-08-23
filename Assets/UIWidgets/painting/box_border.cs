@@ -65,7 +65,7 @@ namespace UIWidgets.painting {
         public readonly BorderSide left;
 
 
-        public override EdgeInsetsGeometry dimensions {
+        public override EdgeInsets dimensions {
             get { return null; }
         }
 

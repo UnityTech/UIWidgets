@@ -31,7 +31,8 @@ namespace UIWidgets.rendering {
         public readonly Rect rect;
     }
 
-    public abstract class RenderViewportBase<ParentDataClass> : ContainerRenderBox<RenderSliver, ParentDataClass>,
+    public abstract class RenderViewportBase<ParentDataClass> :
+        ContainerRenderObjectMixinRenderBox<RenderSliver, ParentDataClass>,
         RenderAbstractViewport
         where ParentDataClass : ContainerParentDataMixin<RenderSliver> {
         protected RenderViewportBase(
@@ -68,6 +69,7 @@ namespace UIWidgets.rendering {
                 if (value == this._crossAxisDirection) {
                     return;
                 }
+
                 this._crossAxisDirection = value;
                 this.markNeedsLayout();
             }
@@ -95,11 +97,11 @@ namespace UIWidgets.rendering {
                 if (this.attached) {
                     this._offset.addListener(this.markNeedsLayout);
                 }
-                
+
                 this.markNeedsLayout();
             }
         }
-        
+
         public ViewportOffset _offset;
 
         public double cacheExtent {
@@ -113,7 +115,7 @@ namespace UIWidgets.rendering {
                 this.markNeedsLayout();
             }
         }
-        
+
         public double _cacheExtent;
 
         public override void attach(object owner) {
@@ -134,7 +136,10 @@ namespace UIWidgets.rendering {
 
 
     public class RenderViewport : RenderViewportBase<SliverPhysicalContainerParentData> {
-        public RenderViewport(AxisDirection crossAxisDirection, ViewportOffset offset, double cacheExtent = RenderAbstractViewportUtils.defaultCacheExtent, AxisDirection axisDirection = AxisDirection.down) : base(crossAxisDirection, offset, cacheExtent, axisDirection) {
+        public RenderViewport(AxisDirection crossAxisDirection, ViewportOffset offset,
+            double cacheExtent = RenderAbstractViewportUtils.defaultCacheExtent,
+            AxisDirection axisDirection = AxisDirection.down) : base(crossAxisDirection, offset, cacheExtent,
+            axisDirection) {
         }
     }
 }

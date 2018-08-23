@@ -588,7 +588,7 @@ namespace UIWidgets.rendering {
         public virtual void paint(PaintingContext context, Offset offset) {
         }
 
-        public virtual void applyPaintTransform(RenderObject child, Matrix4x4 transform) {
+        public virtual void applyPaintTransform(RenderObject child, ref Matrix4x4 transform) {
         }
 
         public Matrix4x4 getTransformTo(RenderObject ancestor) {
@@ -606,7 +606,7 @@ namespace UIWidgets.rendering {
 
             var transform = Matrix4x4.identity;
             for (int index = renderers.Count - 1; index > 0; index -= 1) {
-                renderers[index].applyPaintTransform(renderers[index - 1], transform);
+                renderers[index].applyPaintTransform(renderers[index - 1], ref transform);
             }
 
             return transform;
