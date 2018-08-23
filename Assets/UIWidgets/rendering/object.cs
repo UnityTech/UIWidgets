@@ -427,7 +427,7 @@ namespace UIWidgets.rendering {
             this.markNeedsPaint();
         }
 
-        public bool sizedByParent {
+        public virtual bool sizedByParent {
             get { return false; }
         }
 

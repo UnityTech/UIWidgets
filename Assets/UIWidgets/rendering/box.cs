@@ -82,6 +82,19 @@ namespace UIWidgets.rendering {
             );
         }
 
+        public BoxConstraints deflate(EdgeInsets edges) {
+            double horizontal = edges.horizontal;
+            double vertical = edges.vertical;
+            double deflatedMinWidth = Math.Max(0.0, this.minWidth - horizontal);
+            double deflatedMinHeight = Math.Max(0.0, this.minHeight - vertical);
+            return new BoxConstraints(
+                minWidth: deflatedMinWidth,
+                maxWidth: Math.Max(deflatedMinWidth, this.maxWidth - horizontal),
+                minHeight: deflatedMinHeight,
+                maxHeight: Math.Max(deflatedMinHeight, this.maxHeight - vertical)
+            );
+        }
+
         public BoxConstraints loosen() {
             return new BoxConstraints(
                 minWidth: 0.0,
