@@ -6,51 +6,6 @@ using UnityEngine;
 
 namespace UIWidgets.rendering {
 
-    public abstract class RenderObjectWithChildMixinRenderBox<ChildType> : RenderBox where ChildType : RenderObject {
-        public ChildType _child;
-
-        public ChildType child {
-            get { return this._child; }
-            set {
-                if (this._child != null) {
-                    this.dropChild(this._child);
-                }
-
-                this._child = value;
-                if (this._child != null) {
-                    this.adoptChild(this._child);
-                }
-            }
-        }
-
-        public override void attach(object owner) {
-            base.attach(owner);
-            if (this._child != null) {
-                this._child.attach(owner);
-            }
-        }
-
-        public override void detach() {
-            base.detach();
-            if (this._child != null) {
-                this._child.detach();
-            }
-        }
-
-        public override void redepthChildren() {
-            if (this._child != null) {
-                this.redepthChild(this._child);
-            }
-        }
-
-        public override void visitChildren(RenderObjectVisitor visitor) {
-            if (this._child != null) {
-                visitor(this._child);
-            }
-        }
-    }
-
-
     public abstract class RenderObjectWithChildMixinRenderObject<ChildType> : RenderObject where ChildType : RenderObject {
         public ChildType _child;
 
@@ -96,11 +51,108 @@ namespace UIWidgets.rendering {
     }
 
 
+    public abstract class RenderObjectWithChildMixinRenderBox<ChildType> : RenderBox where ChildType : RenderObject {
+        public ChildType _child;
+
+        public ChildType child {
+            get { return this._child; }
+            set {
+                if (this._child != null) {
+                    this.dropChild(this._child);
+                }
+
+                this._child = value;
+                if (this._child != null) {
+                    this.adoptChild(this._child);
+                }
+            }
+        }
+
+        public override void attach(object owner) {
+            base.attach(owner);
+            if (this._child != null) {
+                this._child.attach(owner);
+            }
+        }
+
+        public override void detach() {
+            base.detach();
+            if (this._child != null) {
+                this._child.detach();
+            }
+        }
+
+        public override void redepthChildren() {
+            if (this._child != null) {
+                this.redepthChild(this._child);
+            }
+        }
+
+        public override void visitChildren(RenderObjectVisitor visitor) {
+            if (this._child != null) {
+                visitor(this._child);
+            }
+        }
+    }
+
+
+
+
+    public abstract class ContainerParentDataMixinParentData<ChildType> : ParentData, ContainerParentDataMixin<ChildType> where ChildType : RenderObject {
+        public ChildType previousSibling { get; set; }
+
+        public ChildType nextSibling { get; set; }
+
+        public override void detach() {
+            base.detach();
+
+            if (this.previousSibling != null) {
+                var previousSiblingParentData = (ContainerParentDataMixin<ChildType>) this.previousSibling.parentData;
+                previousSiblingParentData.nextSibling = this.nextSibling;
+            }
+
+            if (this.nextSibling != null) {
+                var nextSiblingParentData = (ContainerParentDataMixin<ChildType>) this.nextSibling.parentData;
+                nextSiblingParentData.previousSibling = this.previousSibling;
+            }
+
+            this.previousSibling = null;
+            this.nextSibling = null;
+        }
+    }
+
+
+
+    public abstract class ContainerParentDataMixinBoxParentData<ChildType> : BoxParentData, ContainerParentDataMixin<ChildType> where ChildType : RenderObject {
+        public ChildType previousSibling { get; set; }
+
+        public ChildType nextSibling { get; set; }
+
+        public override void detach() {
+            base.detach();
+
+            if (this.previousSibling != null) {
+                var previousSiblingParentData = (ContainerParentDataMixin<ChildType>) this.previousSibling.parentData;
+                previousSiblingParentData.nextSibling = this.nextSibling;
+            }
+
+            if (this.nextSibling != null) {
+                var nextSiblingParentData = (ContainerParentDataMixin<ChildType>) this.nextSibling.parentData;
+                nextSiblingParentData.previousSibling = this.previousSibling;
+            }
+
+            this.previousSibling = null;
+            this.nextSibling = null;
+        }
+    }
+
+
+
 
 
     public abstract class ContainerRenderObjectMixinRenderBox<ChildType, ParentDataType> : RenderBox
         where ChildType : RenderObject
-        where ParentDataType : ContainerParentDataMixin<ChildType> {
+        where ParentDataType : ParentData, ContainerParentDataMixin<ChildType> {
 
         public int _childCount = 0;
 
@@ -271,7 +323,7 @@ namespace UIWidgets.rendering {
 
     public abstract class ContainerRenderObjectMixinRenderSliver<ChildType, ParentDataType> : RenderSliver
         where ChildType : RenderObject
-        where ParentDataType : ContainerParentDataMixin<ChildType> {
+        where ParentDataType : ParentData, ContainerParentDataMixin<ChildType> {
 
         public int _childCount = 0;
 

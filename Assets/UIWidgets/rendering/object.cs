@@ -248,27 +248,10 @@ namespace UIWidgets.rendering {
         }
     }
 
-    public abstract class ContainerParentDataMixin<ChildType> : ParentData where ChildType : RenderObject {
-        public ChildType previousSibling;
+    public interface ContainerParentDataMixin<ChildType> where ChildType : RenderObject {
+        ChildType previousSibling { get; set; }
 
-        public ChildType nextSibling;
-
-        public override void detach() {
-            base.detach();
-
-            if (this.previousSibling != null) {
-                var previousSiblingParentData = (ContainerParentDataMixin<ChildType>) this.previousSibling.parentData;
-                previousSiblingParentData.nextSibling = this.nextSibling;
-            }
-
-            if (this.nextSibling != null) {
-                var nextSiblingParentData = (ContainerParentDataMixin<ChildType>) this.nextSibling.parentData;
-                nextSiblingParentData.previousSibling = this.previousSibling;
-            }
-
-            this.previousSibling = null;
-            this.nextSibling = null;
-        }
+        ChildType nextSibling { get; set; }
     }
 
     public abstract class RenderObject : AbstractNode {

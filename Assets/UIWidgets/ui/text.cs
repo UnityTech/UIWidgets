@@ -3,4 +3,9 @@
         alphabetic,
         ideographic,
     }
+    
+    public enum TextDirection {
+        rtl,
+        ltr,
+    }
 }

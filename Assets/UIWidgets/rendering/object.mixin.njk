@@ -51,15 +51,46 @@ namespace UIWidgets.rendering {
     }
 {% endmacro %}
 
+{{ RenderObjectWithChildMixin('RenderObject') }}
+
 {{ RenderObjectWithChildMixin('RenderBox') }}
 
-{{ RenderObjectWithChildMixin('RenderObject') }}
+
+{% macro ContainerParentDataMixin(with) %}
+    public abstract class ContainerParentDataMixin{{with}}<ChildType> : {{with}}, ContainerParentDataMixin<ChildType> where ChildType : RenderObject {
+        public ChildType previousSibling { get; set; }
+
+        public ChildType nextSibling { get; set; }
+
+        public override void detach() {
+            base.detach();
+
+            if (this.previousSibling != null) {
+                var previousSiblingParentData = (ContainerParentDataMixin<ChildType>) this.previousSibling.parentData;
+                previousSiblingParentData.nextSibling = this.nextSibling;
+            }
+
+            if (this.nextSibling != null) {
+                var nextSiblingParentData = (ContainerParentDataMixin<ChildType>) this.nextSibling.parentData;
+                nextSiblingParentData.previousSibling = this.previousSibling;
+            }
+
+            this.previousSibling = null;
+            this.nextSibling = null;
+        }
+    }
+
+{% endmacro %}
+
+{{ ContainerParentDataMixin('ParentData') }}
+
+{{ ContainerParentDataMixin('BoxParentData') }}
 
 
 {% macro ContainerRenderObjectMixin(with) %}
     public abstract class ContainerRenderObjectMixin{{with}}<ChildType, ParentDataType> : {{with}}
         where ChildType : RenderObject
-        where ParentDataType : ContainerParentDataMixin<ChildType> {
+        where ParentDataType : ParentData, ContainerParentDataMixin<ChildType> {
 
         public int _childCount = 0;
 

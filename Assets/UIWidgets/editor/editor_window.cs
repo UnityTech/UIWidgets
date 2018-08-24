@@ -1,8 +1,7 @@
 ﻿using System;
 using UIWidgets.flow;
-using UIWidgets.rendering;
+
 using UIWidgets.ui;
-using UIWidgets.widgets;
 using UnityEditor;
 using UnityEngine;
 using Rect = UnityEngine.Rect;

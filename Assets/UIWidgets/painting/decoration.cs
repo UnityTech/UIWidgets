@@ -22,7 +22,7 @@ namespace UIWidgets.painting {
 
         public abstract void paint(Canvas canvas, Offset offset, ImageConfiguration configuration);
 
-        public void dispose() {
+        public virtual void dispose() {
         }
     }
 }

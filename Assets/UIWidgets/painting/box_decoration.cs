@@ -138,23 +138,23 @@ namespace UIWidgets.painting {
             }
         }
 
-        public void dispose() {
+        public override void dispose() {
             base.dispose();
         }
 
         public override void paint(Canvas canvas, Offset offset, ImageConfiguration configuration) {
             Rect rect = offset & configuration.size;
 
-           // this._paintShadows(canvas, rect);
+            this._paintShadows(canvas, rect);
             this._paintBackgroundColor(canvas, rect);
-           // this._paintBackgroundImage(canvas, rect, configuration);
-//            if (this._decoration.border != null) {
-//                this._decoration.border.paint(
-//                    canvas,
-//                    rect,
-//                    borderRadius: this._decoration.borderRadius
-//                );
-//            }
+            this._paintBackgroundImage(canvas, rect, configuration);
+            if (this._decoration.border != null) {
+                this._decoration.border.paint(
+                    canvas,
+                    rect,
+                    borderRadius: this._decoration.borderRadius
+                );
+            }
         }
     }
 }

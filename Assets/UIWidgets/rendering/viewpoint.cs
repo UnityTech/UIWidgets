@@ -34,7 +34,7 @@ namespace UIWidgets.rendering {
     public abstract class RenderViewportBase<ParentDataClass> :
         ContainerRenderObjectMixinRenderBox<RenderSliver, ParentDataClass>,
         RenderAbstractViewport
-        where ParentDataClass : ContainerParentDataMixin<RenderSliver> {
+        where ParentDataClass : ParentData, ContainerParentDataMixin<RenderSliver> {
         protected RenderViewportBase(
             AxisDirection crossAxisDirection,
             ViewportOffset offset,
