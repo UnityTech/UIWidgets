@@ -55,7 +55,10 @@ namespace UIWidgets.ui {
         }
 
         public CanvasImpl() {
-            this._transform = Matrix4x4.identity;
+            this._transform = Matrix4x4.Scale(new Vector3(
+                1.0f / EditorGUIUtility.pixelsPerPoint,
+                1.0f / EditorGUIUtility.pixelsPerPoint,
+                1.0f));
         }
 
         public void drawPloygon4(Offset[] points, Paint paint) {

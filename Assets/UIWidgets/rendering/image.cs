@@ -17,7 +17,7 @@ namespace UIWidgets.rendering
             Rect centerSlice,
 //            TextDirection textDirection,
             bool matchTextDirection = false,
-            AlignmentGeometry alignment = null,
+//            AlignmentGeometry alignment = null,
             double scale = 1.0
         )
         {
@@ -32,7 +32,7 @@ namespace UIWidgets.rendering
             this._centerSlice = centerSlice;
 //            this._matchTextDirection = matchTextDirection;
 //            this._textDir
-            this._alignment = alignment ?? Alignment.center;
+//            this._alignment = alignment ?? Alignment.center;
             this._textDirection = textDirection;
             _updateColorFilter();
         }
@@ -44,7 +44,7 @@ namespace UIWidgets.rendering
         {
             if (_resolvedAlignment != null)
                 return;
-            _resolvedAlignment = alignment.resolve(textDirection);
+//            _resolvedAlignment = alignment.resolve(textDirection);
             _flipHorizontally = matchTextDirection && textDirection == TextDirection.rtl;
         }
 
@@ -171,19 +171,19 @@ namespace UIWidgets.rendering
             }
         }
 
-        private AlignmentGeometry _alignment;
+//        private AlignmentGeometry _alignment;
 
-        public AlignmentGeometry alignment
-        {
-            get { return _alignment; }
-            set
-            {
-                if (value == _alignment)
-                    return;
-                _alignment = value;
-                _markNeedsResolution();
-            }
-        }
+//        public AlignmentGeometry alignment
+//        {
+//            get { return _alignment; }
+//            set
+//            {
+//                if (value == _alignment)
+//                    return;
+//                _alignment = value;
+//                _markNeedsResolution();
+//            }
+//        }
 
         private ImageRepeat _repeat;
 

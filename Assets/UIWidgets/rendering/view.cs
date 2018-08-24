@@ -92,9 +92,9 @@ namespace UIWidgets.rendering {
             }
         }
 
-        public override void applyPaintTransform(RenderObject child, Matrix4x4 transform) {
+        public override void applyPaintTransform(RenderObject child, ref Matrix4x4 transform) {
             transform *= this._rootTransform;
-            base.applyPaintTransform(child, transform);
+            base.applyPaintTransform(child, ref transform);
         }
 
         public void compositeFrame() {

@@ -6,7 +6,7 @@ namespace UIWidgets.painting {
         protected Decoration() {
         }
 
-        public virtual EdgeInsetsGeometry padding {
+        public virtual EdgeInsets padding {
             get { return EdgeInsets.zero; }
         }
 
@@ -22,7 +22,7 @@ namespace UIWidgets.painting {
 
         public abstract void paint(Canvas canvas, Offset offset, ImageConfiguration configuration);
 
-        public void dispose() {
+        public virtual void dispose() {
         }
     }
 }

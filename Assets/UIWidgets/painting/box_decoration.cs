@@ -2,9 +2,10 @@ using System;
 using System.Collections.Generic;
 using UIWidgets.foundation;
 using UIWidgets.ui;
+using UnityEditor;
 
 namespace UIWidgets.painting {
-    public class BoxDecoration : Decoration {
+    public class BoxDecoration : Decoration, IEquatable<BoxDecoration> {
         public BoxDecoration(
             Color color = null,
             DecorationImage image = null,
@@ -29,7 +30,7 @@ namespace UIWidgets.painting {
         public readonly Gradient gradient;
 
 
-        public override EdgeInsetsGeometry padding {
+        public override EdgeInsets padding {
             get {
                 if (this.border != null) {
                     return this.border.dimensions;
@@ -42,17 +43,57 @@ namespace UIWidgets.painting {
         public override BoxPainter createBoxPainter(VoidCallback onChanged = null) {
             return new _BoxDecorationPainter(this, onChanged);
         }
+
+        public bool Equals(BoxDecoration other) {
+            if (object.ReferenceEquals(null, other)) return false;
+            if (object.ReferenceEquals(this, other)) return true;
+            return object.Equals(this.color, other.color)
+                   && object.Equals(this.image, other.image)
+                   && object.Equals(this.border, other.border)
+                   && object.Equals(this.borderRadius, other.borderRadius)
+                   && object.Equals(this.boxShadow, other.boxShadow)
+                   && object.Equals(this.gradient, other.gradient);
+        }
+
+        public override bool Equals(object obj) {
+            if (object.ReferenceEquals(null, obj)) return false;
+            if (object.ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return this.Equals((BoxDecoration) obj);
+        }
+
+        public override int GetHashCode() {
+            unchecked {
+                var hashCode = (this.color != null ? this.color.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (this.image != null ? this.image.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (this.border != null ? this.border.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (this.borderRadius != null ? this.borderRadius.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (this.boxShadow != null ? this.boxShadow.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (this.gradient != null ? this.gradient.GetHashCode() : 0);
+                return hashCode;
+            }
+        }
+
+        public static bool operator ==(BoxDecoration a, BoxDecoration b) {
+            return object.Equals(a, b);
+        }
+
+        public static bool operator !=(BoxDecoration a, BoxDecoration b) {
+            return !(a == b);
+        }
     }
 
 
     public class _BoxDecorationPainter : BoxPainter {
-        public _BoxDecorationPainter(BoxDecoration _decoration, VoidCallback onChanged) : base(onChanged) {
-            this._decoration = _decoration;
+        public _BoxDecorationPainter(BoxDecoration decoration, VoidCallback onChanged)
+            : base(onChanged) {
+            this._decoration = decoration;
         }
 
         public readonly BoxDecoration _decoration;
 
         public Paint _cachedBackgroundPaint;
+
         public Rect _rectForCachedBackgroundPaint;
 
         public Paint _getBackgroundPaint(Rect rect) {
@@ -78,19 +119,16 @@ namespace UIWidgets.painting {
             }
 
             foreach (BoxShadow boxShadow in this._decoration.boxShadow) {
+                Paint paint = boxShadow.toPaint();
                 Rect bounds = rect.shift(boxShadow.offset).inflate(boxShadow.spreadRadius);
-
-                Paint paint = new Paint {
-                    color = boxShadow.color,
-                    blurSigma = boxShadow.blurRadius
-                };
                 canvas.drawRectShadow(bounds, paint);
             }
         }
 
         public void _paintBackgroundColor(Canvas canvas, Rect rect) {
             if (this._decoration.color != null || this._decoration.gradient != null) {
-                this._paintBox(canvas, rect, this._getBackgroundPaint(rect));
+                var paint = this._getBackgroundPaint(rect);
+                canvas.drawRect(rect, null, this._decoration.borderRadius, paint);
             }
         }
 
@@ -98,23 +136,9 @@ namespace UIWidgets.painting {
             if (this._decoration.image == null) {
                 return;
             }
-
-//            _imagePainter ??= _decoration.image.createPainter(onChanged);
-//            Path clipPath;
-//            switch (_decoration.shape) {
-//                case BoxShape.circle:
-//                    clipPath = new Path()..addOval(rect);
-//                    break;
-//                case BoxShape.rectangle:
-//                    if (_decoration.borderRadius != null)
-//                        clipPath = new Path()..addRRect(_decoration.borderRadius.resolve(configuration.textDirection).toRRect(rect));
-//                    break;
-//            }
-//            _imagePainter.paint(canvas, rect, clipPath, configuration);
         }
 
-
-        public void dispose() {
+        public override void dispose() {
             base.dispose();
         }
 
@@ -124,12 +148,11 @@ namespace UIWidgets.painting {
             this._paintShadows(canvas, rect);
             this._paintBackgroundColor(canvas, rect);
             this._paintBackgroundImage(canvas, rect, configuration);
-
             if (this._decoration.border != null) {
                 this._decoration.border.paint(
                     canvas,
                     rect,
-                    borderRadius: (BorderRadius) this._decoration.borderRadius
+                    borderRadius: this._decoration.borderRadius
                 );
             }
         }

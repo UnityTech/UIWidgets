@@ -1,6 +1,6 @@
 ﻿namespace UIWidgets.rendering {
 
-    public class SliverPhysicalParentData : ContainerParentDataMixin<RenderSliver> {
+    public class SliverPhysicalParentData : ContainerParentDataMixinParentData<RenderSliver> {
     }
 
     public class SliverPhysicalContainerParentData : SliverPhysicalParentData {

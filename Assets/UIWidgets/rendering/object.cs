@@ -248,27 +248,10 @@ namespace UIWidgets.rendering {
         }
     }
 
-    public abstract class ContainerParentDataMixin<ChildType> : ParentData where ChildType : RenderObject {
-        public ChildType previousSibling;
+    public interface ContainerParentDataMixin<ChildType> where ChildType : RenderObject {
+        ChildType previousSibling { get; set; }
 
-        public ChildType nextSibling;
-
-        public override void detach() {
-            base.detach();
-
-            if (this.previousSibling != null) {
-                var previousSiblingParentData = (ContainerParentDataMixin<ChildType>) this.previousSibling.parentData;
-                previousSiblingParentData.nextSibling = this.nextSibling;
-            }
-
-            if (this.nextSibling != null) {
-                var nextSiblingParentData = (ContainerParentDataMixin<ChildType>) this.nextSibling.parentData;
-                nextSiblingParentData.previousSibling = this.previousSibling;
-            }
-
-            this.previousSibling = null;
-            this.nextSibling = null;
-        }
+        ChildType nextSibling { get; set; }
     }
 
     public abstract class RenderObject : AbstractNode {
@@ -427,7 +410,7 @@ namespace UIWidgets.rendering {
             this.markNeedsPaint();
         }
 
-        public bool sizedByParent {
+        public virtual bool sizedByParent {
             get { return false; }
         }
 
@@ -523,6 +506,7 @@ namespace UIWidgets.rendering {
                 return;
             }
 
+            this._needsPaint = true;
             if (this.isRepaintBoundary) {
                 if (this.owner != null) {
                     this.owner._nodesNeedingPaint.Add(this);
@@ -588,7 +572,7 @@ namespace UIWidgets.rendering {
         public virtual void paint(PaintingContext context, Offset offset) {
         }
 
-        public virtual void applyPaintTransform(RenderObject child, Matrix4x4 transform) {
+        public virtual void applyPaintTransform(RenderObject child, ref Matrix4x4 transform) {
         }
 
         public Matrix4x4 getTransformTo(RenderObject ancestor) {
@@ -606,7 +590,7 @@ namespace UIWidgets.rendering {
 
             var transform = Matrix4x4.identity;
             for (int index = renderers.Count - 1; index > 0; index -= 1) {
-                renderers[index].applyPaintTransform(renderers[index - 1], transform);
+                renderers[index].applyPaintTransform(renderers[index - 1], ref transform);
             }
 
             return transform;

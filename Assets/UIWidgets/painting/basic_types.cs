@@ -14,7 +14,23 @@ namespace UIWidgets.painting {
         vertical,
     }
 
+    public enum VerticalDirection {
+        up,
+        down,
+    }
+    
     public static class AxisUtils {
+        public static Axis flipAxis(Axis direction) {
+            switch (direction) {
+                case Axis.horizontal:
+                    return Axis.vertical;
+                case Axis.vertical:
+                    return Axis.horizontal;
+            }
+            
+            throw new Exception("unknown axis");
+        }
+        
         public static Axis axisDirectionToAxis(AxisDirection axisDirection) {
             switch (axisDirection) {
                 case AxisDirection.up:
@@ -27,7 +43,5 @@ namespace UIWidgets.painting {
 
             throw new Exception("unknown axisDirection");
         }
-        
-        
     }
 }

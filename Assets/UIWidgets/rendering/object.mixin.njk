@@ -5,10 +5,93 @@ using UIWidgets.foundation;
 using UnityEngine;
 
 namespace UIWidgets.rendering {
+{% macro RenderObjectWithChildMixin(with) %}
+    public abstract class RenderObjectWithChildMixin{{with}}<ChildType> : {{with}} where ChildType : RenderObject {
+        public ChildType _child;
+
+        public ChildType child {
+            get { return this._child; }
+            set {
+                if (this._child != null) {
+                    this.dropChild(this._child);
+                }
+
+                this._child = value;
+                if (this._child != null) {
+                    this.adoptChild(this._child);
+                }
+            }
+        }
+
+        public override void attach(object owner) {
+            base.attach(owner);
+            if (this._child != null) {
+                this._child.attach(owner);
+            }
+        }
+
+        public override void detach() {
+            base.detach();
+            if (this._child != null) {
+                this._child.detach();
+            }
+        }
+
+        public override void redepthChildren() {
+            if (this._child != null) {
+                this.redepthChild(this._child);
+            }
+        }
+
+        public override void visitChildren(RenderObjectVisitor visitor) {
+            if (this._child != null) {
+                visitor(this._child);
+            }
+        }
+    }
+{% endmacro %}
+
+{{ RenderObjectWithChildMixin('RenderObject') }}
+
+{{ RenderObjectWithChildMixin('RenderBox') }}
+
+
+{% macro ContainerParentDataMixin(with) %}
+    public abstract class ContainerParentDataMixin{{with}}<ChildType> : {{with}}, ContainerParentDataMixin<ChildType> where ChildType : RenderObject {
+        public ChildType previousSibling { get; set; }
+
+        public ChildType nextSibling { get; set; }
+
+        public override void detach() {
+            base.detach();
+
+            if (this.previousSibling != null) {
+                var previousSiblingParentData = (ContainerParentDataMixin<ChildType>) this.previousSibling.parentData;
+                previousSiblingParentData.nextSibling = this.nextSibling;
+            }
+
+            if (this.nextSibling != null) {
+                var nextSiblingParentData = (ContainerParentDataMixin<ChildType>) this.nextSibling.parentData;
+                nextSiblingParentData.previousSibling = this.previousSibling;
+            }
+
+            this.previousSibling = null;
+            this.nextSibling = null;
+        }
+    }
+
+{% endmacro %}
+
+{{ ContainerParentDataMixin('ParentData') }}
+
+{{ ContainerParentDataMixin('BoxParentData') }}
+
+
 {% macro ContainerRenderObjectMixin(with) %}
-    public abstract class Container{{with}}<ChildType, ParentDataType> : {{with}}
+    public abstract class ContainerRenderObjectMixin{{with}}<ChildType, ParentDataType> : {{with}}
         where ChildType : RenderObject
-        where ParentDataType : ContainerParentDataMixin<ChildType> {
+        where ParentDataType : ParentData, ContainerParentDataMixin<ChildType> {
+
         public int _childCount = 0;
 
         public int countCount {
@@ -16,6 +99,7 @@ namespace UIWidgets.rendering {
         }
 
         public ChildType _firstChild;
+
         public ChildType _lastChild;
 
         public void _insertIntoChildList(ChildType child, ChildType after = null) {
@@ -114,7 +198,7 @@ namespace UIWidgets.rendering {
             
             this._removeFromChildList(child);
             this._insertIntoChildList(child, after);
-            // this.markNeedsLayout();
+            this.markNeedsLayout();
         }
 
         public override void attach(object owner) {
@@ -179,55 +263,5 @@ namespace UIWidgets.rendering {
 
 {{ ContainerRenderObjectMixin('RenderSliver') }}
 
-
-{% macro RenderObjectWithChildMixin(with) %}
-    public abstract class RenderObjectWithChildMixin{{with}}<ChildType> : {{with}} where ChildType : RenderObject {
-        public ChildType _child;
-
-        public ChildType child {
-            get { return this._child; }
-            set {
-                if (this._child != null) {
-                    this.dropChild(this._child);
-                }
-
-                this._child = value;
-                if (this._child != null) {
-                    this.adoptChild(this._child);
-                }
-            }
-        }
-
-        public override void attach(object owner) {
-            base.attach(owner);
-            if (this._child != null) {
-                this._child.attach(owner);
-            }
-        }
-
-        public override void detach() {
-            base.detach();
-            if (this._child != null) {
-                this._child.detach();
-            }
-        }
-
-        public override void redepthChildren() {
-            if (this._child != null) {
-                this.redepthChild(this._child);
-            }
-        }
-
-        public override void visitChildren(RenderObjectVisitor visitor) {
-            if (this._child != null) {
-                visitor(this._child);
-            }
-        }
-    }
-{% endmacro %}
-
-{{ RenderObjectWithChildMixin('RenderBox') }}
-
-{{ RenderObjectWithChildMixin('RenderObject') }}
 
 }

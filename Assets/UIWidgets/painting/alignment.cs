@@ -1,71 +1,22 @@
+using System;
 using UIWidgets.ui;
 
 namespace UIWidgets.painting
 {
-    // todo should be in text.cs
-    public enum TextDirection
-    {
-        /// The text flows from right to left (e.g. Arabic, Hebrew).
-        rtl,
-
-        /// The text flows from left to right (e.g., English, French).
-        ltr,
-    }
-
-    public abstract class AlignmentGeometry
-    {
-        public AlignmentGeometry()
-        {
-        }
-
-        public abstract double x { get; }
-        public abstract double start { get; }
-        public abstract double y { get; }
-
-        AlignmentGeometry add(AlignmentGeometry other)
-        {
-            return new _MixedAlignment(
-                x + other.x,
-                start + other.start,
-                y + other.y
-            );
-        }
-
-        public virtual Alignment resolve(TextDirection direction)
-        {
-            return null;
-        }
-    }
-
-    public class Alignment : AlignmentGeometry
+    public class Alignment : IEquatable<Alignment>
     {
         public Alignment(double x, double y)
         {
-            this._x = x;
-            this._y = y;
+            this.x = x;
+            this.y = y;
         }
 
-        private readonly double _x;
+        public readonly double x;
 
-        public override double x
-        {
-            get { return _x; }
-        }
-
-        private readonly double _y;
-
-        public override double y
-        {
-            get { return _y; }
-        }
-
-        public override double start
-        {
-            get { return 0.0; }
-        }
+        public readonly double y;
 
         public static readonly Alignment topLeft = new Alignment(-1.0, -1.0);
-        public static readonly Alignment topCenter = new Alignment(0.0, -1.0);
+        public static readonly Alignment topCenter = new Alignment(0, -1.0);
         public static readonly Alignment topRight = new Alignment(1.0, -1.0);
         public static readonly Alignment centerLeft = new Alignment(-1.0, 0.0);
         public static readonly Alignment center = new Alignment(0.0, 0.0);
@@ -74,16 +25,70 @@ namespace UIWidgets.painting
         public static readonly Alignment bottomCenter = new Alignment(0.0, 1.0);
         public static readonly Alignment bottomRight = new Alignment(1.0, 1.0);
 
-        public static Alignment operator -(Alignment a, Alignment b)
-        {
-            return new Alignment(a._x - b._x, a._y - b._y);
-        }
-
         // todo more operators
 
-        public override Alignment resolve(TextDirection direction)
+        public Alignment resolve(TextDirection direction)
         {
             return this;
+        }
+
+        public Alignment add(Alignment other)
+        {
+            return this + other;
+        }
+
+        public static Alignment operator -(Alignment a, Alignment b)
+        {
+            return new Alignment(a.x - b.x, a.y - b.y);
+        }
+
+        public static Alignment operator +(Alignment a, Alignment b)
+        {
+            return new Alignment(a.x + b.x, a.y + b.y);
+        }
+
+        public static Alignment operator -(Alignment a)
+        {
+            return new Alignment(-a.x, -a.y);
+        }
+
+        public static Alignment operator *(Alignment a, double b)
+        {
+            return new Alignment(a.x * b, a.y * b);
+        }
+
+        public static Alignment operator /(Alignment a, double b)
+        {
+            return new Alignment(a.x / b, a.y / b);
+        }
+
+        public static Alignment operator %(Alignment a, double b)
+        {
+            return new Alignment(a.x % b, a.y % b);
+        }
+
+        public Offset alongOffset(Offset other)
+        {
+            double centerX = other.dx / 2.0;
+            double centerY = other.dy / 2.0;
+            return new Offset(centerX + this.x * centerX, centerY + this.y * centerY);
+        }
+
+        public Offset alongSize(Size other)
+        {
+            double centerX = other.width / 2.0;
+            double centerY = other.height / 2.0;
+            return new Offset(centerX + this.x * centerX, centerY + this.y * centerY);
+        }
+
+        public Offset withinRect(Rect rect)
+        {
+            double halfWidth = rect.width / 2.0;
+            double halfHeight = rect.height / 2.0;
+            return new Offset(
+                rect.left + halfWidth + this.x * halfWidth,
+                rect.top + halfHeight + this.y * halfHeight
+            );
         }
 
         public Rect inscribe(Size size, Rect rect)
@@ -91,92 +96,117 @@ namespace UIWidgets.painting
             double halfWidthDelta = (rect.width - size.width) / 2.0;
             double halfHeightDelta = (rect.height - size.height) / 2.0;
             return Rect.fromLTWH(
-                rect.left + halfWidthDelta + _x * halfWidthDelta,
-                rect.top + halfHeightDelta + _y * halfHeightDelta,
+                rect.left + halfWidthDelta + this.x * halfWidthDelta,
+                rect.top + halfHeightDelta + this.y * halfHeightDelta,
                 size.width,
                 size.height
             );
         }
-    }
 
-    public class _MixedAlignment : AlignmentGeometry
-    {
-        public _MixedAlignment(double x, double start, double y)
+        public bool Equals(Alignment other)
         {
-            this._x = x;
-            this._start = start;
-            this._y = y;
+            if (object.ReferenceEquals(null, other)) return false;
+            if (object.ReferenceEquals(this, other)) return true;
+            return this.x.Equals(other.x) && this.y.Equals(other.y);
         }
 
-        private readonly double _x;
-
-        public override double x
+        public override bool Equals(object obj)
         {
-            get { return _x; }
+            if (object.ReferenceEquals(null, obj)) return false;
+            if (object.ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return this.Equals((Alignment) obj);
         }
 
-        private readonly double _start;
-
-        public override double start
+        public override int GetHashCode()
         {
-            get { return _start; }
-        }
-
-        private readonly double _y;
-
-        public override double y
-        {
-            get { return _y; }
-        }
-
-
-        public static _MixedAlignment operator -(_MixedAlignment a)
-        {
-            return new _MixedAlignment(
-                -a._x,
-                -a._start,
-                -a._y
-            );
-        }
-
-        public static _MixedAlignment operator *(_MixedAlignment a, double other)
-        {
-            return new _MixedAlignment(
-                a._x * other,
-                a._start * other,
-                a._y * other
-            );
-        }
-
-        public static _MixedAlignment operator /(_MixedAlignment a, double other)
-        {
-            return new _MixedAlignment(
-                a._x / other,
-                a._start / other,
-                a._y / other
-            );
-        }
-
-        public static _MixedAlignment operator %(_MixedAlignment a, double other)
-        {
-            return new _MixedAlignment(
-                a._x % other,
-                a._start % other,
-                a._y % other
-            );
-        }
-
-        public override Alignment resolve(TextDirection direction)
-        {
-            switch (direction)
+            unchecked
             {
-                case TextDirection.rtl:
-                    return new Alignment(_x - _start, _y);
-                case TextDirection.ltr:
-                    return new Alignment(_x + _start, _y);
+                return (this.x.GetHashCode() * 397) ^ this.y.GetHashCode();
+            }
+        }
+
+        public static bool operator ==(Alignment a, Alignment b)
+        {
+            return object.Equals(a, b);
+        }
+
+        public static bool operator !=(Alignment a, Alignment b)
+        {
+            return !(a == b);
+        }
+
+        public class _MixedAlignment : IEquatable<_MixedAlignment>
+        {
+            public _MixedAlignment(double x, double start, double y)
+            {
+                this.x = x;
+                this.start = start;
+                this.y = y;
             }
 
-            return null;
+            private readonly double x;
+
+            private readonly double start;
+
+            private readonly double y;
+
+
+            public static _MixedAlignment operator -(_MixedAlignment a)
+            {
+                return new _MixedAlignment(
+                    -a.x,
+                    -a.start,
+                    -a.y
+                );
+            }
+
+            public static _MixedAlignment operator *(_MixedAlignment a, double other)
+            {
+                return new _MixedAlignment(
+                    a.x * other,
+                    a.start * other,
+                    a.y * other
+                );
+            }
+
+            public static _MixedAlignment operator /(_MixedAlignment a, double other)
+            {
+                return new _MixedAlignment(
+                    a.x / other,
+                    a.start / other,
+                    a.y / other
+                );
+            }
+
+            public static _MixedAlignment operator %(_MixedAlignment a, double other)
+            {
+                return new _MixedAlignment(
+                    a.x % other,
+                    a.start % other,
+                    a.y % other
+                );
+            }
+
+            public Alignment resolve(TextDirection direction)
+            {
+                switch (direction)
+                {
+                    case TextDirection.rtl:
+                        return new Alignment(x - start, y);
+                    case TextDirection.ltr:
+                        return new Alignment(x + start, y);
+                }
+
+                return null;
+            }
+
+            public bool Equals(_MixedAlignment other)
+            {
+                if (object.ReferenceEquals(null, other)) return false;
+                if (object.ReferenceEquals(this, other)) return true;
+                return this.x.Equals(other.x) && this.y.Equals(other.y) && this.start.Equals(other.start);
+            }
         }
     }
 }

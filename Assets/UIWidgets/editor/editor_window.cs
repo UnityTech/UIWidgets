@@ -1,8 +1,7 @@
 ﻿using System;
 using UIWidgets.flow;
-using UIWidgets.rendering;
+
 using UIWidgets.ui;
-using UIWidgets.widgets;
 using UnityEditor;
 using UnityEngine;
 using Rect = UnityEngine.Rect;
@@ -35,17 +34,20 @@ namespace UIWidgets.editor {
         public void Update() {
             bool dirty = false;
             if (this._devicePixelRatio != EditorGUIUtility.pixelsPerPoint) {
-                this._devicePixelRatio = EditorGUIUtility.pixelsPerPoint;
                 dirty = true;
             }
 
             if (this._lastPosition != this.editorWindow.position) {
-                this._lastPosition = this.editorWindow.position;
-                this._physicalSize = new Size(this._lastPosition.width, this._lastPosition.height);
                 dirty = true;
             }
 
             if (dirty) {
+                this._devicePixelRatio = EditorGUIUtility.pixelsPerPoint;
+                this._lastPosition = this.editorWindow.position;
+                this._physicalSize = new Size(
+                    this._lastPosition.width * EditorGUIUtility.pixelsPerPoint,
+                    this._lastPosition.height * EditorGUIUtility.pixelsPerPoint);
+
                 if (this._onMetricsChanged != null) {
                     this._onMetricsChanged();
                 }

@@ -9,11 +9,156 @@ namespace UIWidgets.rendering {
         }
     }
 
+    public class RenderConstrainedBox : RenderProxyBox {
+        public RenderConstrainedBox(
+            RenderBox child = null,
+            BoxConstraints additionalConstraints = null) : base(child) {
+            this._additionalConstraints = additionalConstraints;
+        }
+
+        public BoxConstraints additionalConstraints {
+            get { return this._additionalConstraints; }
+
+            set {
+                if (this._additionalConstraints == value) {
+                    return;
+                }
+
+                this._additionalConstraints = value;
+                this.markNeedsLayout();
+            }
+        }
+
+        public BoxConstraints _additionalConstraints;
+
+        public override double computeMinIntrinsicWidth(double height) {
+            if (this._additionalConstraints.hasBoundedWidth && this._additionalConstraints.hasTightWidth) {
+                return this._additionalConstraints.minWidth;
+            }
+
+            double width = base.computeMinIntrinsicWidth(height);
+            if (!this._additionalConstraints.hasInfiniteWidth) {
+                return this._additionalConstraints.constrainWidth(width);
+            }
+
+            return width;
+        }
+
+        public override double computeMaxIntrinsicWidth(double height) {
+            if (this._additionalConstraints.hasBoundedWidth && this._additionalConstraints.hasTightWidth) {
+                return this._additionalConstraints.maxWidth;
+            }
+
+            double width = base.computeMaxIntrinsicWidth(height);
+            if (!this._additionalConstraints.hasInfiniteWidth) {
+                return this._additionalConstraints.constrainWidth(width);
+            }
+
+            return width;
+        }
+
+        public override double computeMinIntrinsicHeight(double width) {
+            if (this._additionalConstraints.hasBoundedHeight && this._additionalConstraints.hasTightHeight) {
+                return this._additionalConstraints.minHeight;
+            }
+
+            double height = base.computeMinIntrinsicHeight(width);
+            if (!this._additionalConstraints.hasInfiniteHeight) {
+                return this._additionalConstraints.constrainHeight(height);
+            }
+
+            return height;
+        }
+
+        public override double computeMaxIntrinsicHeight(double width) {
+            if (this._additionalConstraints.hasBoundedHeight && this._additionalConstraints.hasTightHeight) {
+                return this._additionalConstraints.minHeight;
+            }
+
+            double height = base.computeMaxIntrinsicHeight(width);
+            if (!this._additionalConstraints.hasInfiniteHeight) {
+                return this._additionalConstraints.constrainHeight(height);
+            }
+
+            return height;
+        }
+
+        public override void performLayout() {
+            if (this.child != null) {
+                this.child.layout(this._additionalConstraints.enforce(this.constraints), parentUsesSize: true);
+                this.size = this.child.size;
+            } else {
+                this.size = this._additionalConstraints.enforce(this.constraints).constrain(Size.zero);
+            }
+        }
+    }
+
+    public class RenderLimitedBox : RenderProxyBox {
+        public RenderLimitedBox(
+            RenderBox child = null,
+            double maxWidth = double.PositiveInfinity,
+            double maxHeight = double.PositiveInfinity
+        ) : base(child) {
+            this._maxWidth = maxWidth;
+            this._maxHeight = maxHeight;
+        }
+
+        public double maxWidth {
+            get { return this._maxWidth; }
+            set {
+                if (this._maxWidth == value) {
+                    return;
+                }
+
+                this._maxWidth = value;
+                this.markNeedsLayout();
+            }
+        }
+
+        public double _maxWidth;
+
+        public double maxHeight {
+            get { return this._maxHeight; }
+            set {
+                if (this._maxHeight == value) {
+                    return;
+                }
+
+                this._maxHeight = value;
+                this.markNeedsLayout();
+            }
+        }
+
+        public double _maxHeight;
+
+        public BoxConstraints _limitConstraints(BoxConstraints constraints) {
+            return new BoxConstraints(
+                minWidth: constraints.minWidth,
+                maxWidth: constraints.hasBoundedWidth
+                    ? constraints.maxWidth
+                    : constraints.constrainWidth(this.maxWidth),
+                minHeight: constraints.minHeight,
+                maxHeight: constraints.hasBoundedHeight
+                    ? constraints.maxHeight
+                    : constraints.constrainHeight(this.maxHeight)
+            );
+        }
+
+        public override void performLayout() {
+            if (this.child != null) {
+                this.child.layout(this._limitConstraints(this.constraints), parentUsesSize: true);
+                this.size = this.constraints.constrain(this.child.size);
+            } else {
+                this.size = this._limitConstraints(this.constraints).constrain(Size.zero);
+            }
+        }
+    }
+
     public enum DecorationPosition {
         background,
         foreground,
     }
-
+    
     public class RenderDecoratedBox : RenderProxyBox {
         public RenderDecoratedBox(
             Decoration decoration,

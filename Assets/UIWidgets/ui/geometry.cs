@@ -176,6 +176,10 @@ namespace UIWidgets.ui {
             return new Size(a.width + b.dx, a.height + b.dy);
         }
 
+        public static Offset operator -(Size a, Size b) {
+            return new Offset(a.width - b.width, a.height - b.width);
+        }
+        
         public static Size operator *(Size a, double operand) {
             return new Size(a.width * operand, a.height * operand);
         }
