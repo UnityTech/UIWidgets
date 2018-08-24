@@ -167,6 +167,14 @@ namespace UIWidgets.ui {
         public bool isEmpty {
             get { return this.width <= 0.0 || this.height <= 0.0; }
         }
+        
+        public static Size operator -(Size a, Offset b) {
+            return new Size(a.width - b.dx, a.height - b.dy);
+        }
+        
+        public static Size operator +(Size a, Offset b) {
+            return new Size(a.width + b.dx, a.height + b.dy);
+        }
 
         public static Size operator *(Size a, double operand) {
             return new Size(a.width * operand, a.height * operand);

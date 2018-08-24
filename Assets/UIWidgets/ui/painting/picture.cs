@@ -64,6 +64,10 @@ namespace UIWidgets.ui {
             } else if (drawCmd is DrawPicture) {
                 var drawPicture = (DrawPicture) drawCmd;
                 this.addPaintBounds(drawPicture.picture.paintBounds);
+            } else if (drawCmd is DrawImageRect)
+            {
+                var drawImageRect = (DrawImageRect) drawCmd;
+                // todo
             } else if (drawCmd is DrawConcat) {
                 this._transform = ((DrawConcat) drawCmd).transform * this._transform;
             } else if (drawCmd is DrawSave) {

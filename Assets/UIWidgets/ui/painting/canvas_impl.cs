@@ -160,6 +160,16 @@ namespace UIWidgets.ui {
             this.restore();
         }
 
+        public void drawImageRect(Rect src, Rect dst, Paint paint, ImageStream stream)
+        {
+            if (stream.completer._currentImgae != null)
+            {
+                Texture2D _texture = new Texture2D(0, 0);
+                _texture.LoadImage(stream.completer._currentImgae.image.rawData);
+                Graphics.DrawTexture(dst.toRect(), _texture);
+            }
+        }
+
         public void concat(Matrix4x4 transform) {
             this._transform = transform * this._transform;
         }

@@ -32,7 +32,28 @@ namespace UIWidgets.rendering {
             );
         }
 
-        public BoxConstraints widthConstraints() {
+        public static BoxConstraints tightFor(double width, double height)
+        {
+            return new BoxConstraints(
+                width,
+                width,
+                height,
+                height
+            );
+        }
+        
+        public BoxConstraints enforce(BoxConstraints constraints) {
+            return new BoxConstraints(
+                // may lose precision here
+                Mathf.Clamp((float)this.minWidth, (float)constraints.minWidth, (float)constraints.maxWidth),
+                Mathf.Clamp((float)this.minWidth, (float)constraints.minWidth, (float)constraints.maxWidth),
+                Mathf.Clamp((float)this.minHeight, (float)constraints.minWidth, (float)constraints.maxWidth),
+                Mathf.Clamp((float)this.maxHeight, (float)constraints.minHeight, (float)constraints.maxHeight)
+            );
+        }
+
+        public BoxConstraints widthConstraints()
+        {
             return new BoxConstraints(minWidth: this.minWidth, maxWidth: this.maxWidth);
         }
 

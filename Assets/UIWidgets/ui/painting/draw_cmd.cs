@@ -1,5 +1,6 @@
 ﻿using UIWidgets.painting;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace UIWidgets.ui {
     public interface DrawCmd {
@@ -24,6 +25,13 @@ namespace UIWidgets.ui {
 
     public class DrawPicture : DrawCmd {
         public Picture picture;
+    }
+
+    public class DrawImageRect : DrawCmd
+    {
+        public ImageStream stream;
+        public Rect src;
+        public Rect dst;
     }
 
     public class DrawConcat : DrawCmd {
