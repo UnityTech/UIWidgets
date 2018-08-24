@@ -41,7 +41,6 @@ namespace UIWidgets.rendering {
 
     public class RenderFlex : RenderBoxContainerDefaultsMixinContainerRenderObjectMixinRenderBox<RenderBox,
         FlexParentData> {
-        
         public RenderFlex(
             List<RenderBox> children = null,
             Axis direction = Axis.horizontal,
@@ -319,7 +318,9 @@ namespace UIWidgets.rendering {
         public override void performLayout() {
             int totalFlex = 0;
             int totalChildren = 0;
-            double maxMainSize = this._direction == Axis.horizontal ? this.constraints.maxWidth : this.constraints.maxHeight;
+            double maxMainSize = this._direction == Axis.horizontal
+                ? this.constraints.maxWidth
+                : this.constraints.maxHeight;
             bool canFlex = maxMainSize < double.PositiveInfinity;
 
             double crossSize = 0.0;
@@ -338,21 +339,25 @@ namespace UIWidgets.rendering {
                     if (this.crossAxisAlignment == CrossAxisAlignment.stretch) {
                         switch (this._direction) {
                             case Axis.horizontal:
-                                innerConstraints = new BoxConstraints(minHeight: this.constraints.maxHeight,
+                                innerConstraints = new BoxConstraints(
+                                    minHeight: this.constraints.maxHeight,
                                     maxHeight: this.constraints.maxHeight);
                                 break;
                             case Axis.vertical:
-                                innerConstraints = new BoxConstraints(minWidth: this.constraints.maxWidth,
+                                innerConstraints = new BoxConstraints(
+                                    minWidth: this.constraints.maxWidth,
                                     maxWidth: this.constraints.maxWidth);
                                 break;
                         }
                     } else {
                         switch (this._direction) {
                             case Axis.horizontal:
-                                innerConstraints = new BoxConstraints(maxHeight: this.constraints.maxHeight);
+                                innerConstraints = new BoxConstraints(
+                                    maxHeight: this.constraints.maxHeight);
                                 break;
                             case Axis.vertical:
-                                innerConstraints = new BoxConstraints(maxWidth: this.constraints.maxWidth);
+                                innerConstraints = new BoxConstraints(
+                                    maxWidth: this.constraints.maxWidth);
                                 break;
                         }
                     }
@@ -391,13 +396,15 @@ namespace UIWidgets.rendering {
                         if (this.crossAxisAlignment == CrossAxisAlignment.stretch) {
                             switch (this._direction) {
                                 case Axis.horizontal:
-                                    innerConstraints = new BoxConstraints(minWidth: minChildExtent,
+                                    innerConstraints = new BoxConstraints(
+                                        minWidth: minChildExtent,
                                         maxWidth: maxChildExtent,
                                         minHeight: this.constraints.maxHeight,
                                         maxHeight: this.constraints.maxHeight);
                                     break;
                                 case Axis.vertical:
-                                    innerConstraints = new BoxConstraints(minWidth: this.constraints.maxWidth,
+                                    innerConstraints = new BoxConstraints(
+                                        minWidth: this.constraints.maxWidth,
                                         maxWidth: this.constraints.maxWidth,
                                         minHeight: minChildExtent,
                                         maxHeight: maxChildExtent);
@@ -406,12 +413,14 @@ namespace UIWidgets.rendering {
                         } else {
                             switch (this._direction) {
                                 case Axis.horizontal:
-                                    innerConstraints = new BoxConstraints(minWidth: minChildExtent,
+                                    innerConstraints = new BoxConstraints(
+                                        minWidth: minChildExtent,
                                         maxWidth: maxChildExtent,
                                         maxHeight: this.constraints.maxHeight);
                                     break;
                                 case Axis.vertical:
-                                    innerConstraints = new BoxConstraints(maxWidth: this.constraints.maxWidth,
+                                    innerConstraints = new BoxConstraints(
+                                        maxWidth: this.constraints.maxWidth,
                                         minHeight: minChildExtent,
                                         maxHeight: maxChildExtent);
                                     break;
