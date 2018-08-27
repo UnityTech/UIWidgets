@@ -1,6 +1,14 @@
+using UIWidgets.ui;
+
 namespace UIWidgets.painting {
     public class PaintingBinding {
+
+        public PaintingBinding(Window window) {
+            this._window = window;
+        }
+        
         private static PaintingBinding _instance;
+        public readonly Window _window;
 
         public static PaintingBinding instance {
             get { return _instance; }

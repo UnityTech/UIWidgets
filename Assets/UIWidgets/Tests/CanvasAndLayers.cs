@@ -63,7 +63,7 @@ namespace UIWidgets.Tests {
         }
 
         private void OnEnable() {
-            this.paintingBinding = new PaintingBinding();
+            this.paintingBinding = new PaintingBinding(null);
             paintingBinding.initInstances();
         }
 

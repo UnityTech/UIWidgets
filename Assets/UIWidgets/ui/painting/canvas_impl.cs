@@ -120,38 +120,48 @@ namespace UIWidgets.ui {
                 if (drawCmd is DrawPloygon4) {
                     var drawPloygon4 = (DrawPloygon4) drawCmd;
                     this.drawPloygon4(drawPloygon4.points, drawPloygon4.paint);
-                } else if (drawCmd is DrawRect) {
+                }
+                else if (drawCmd is DrawRect) {
                     var drawRect = (DrawRect) drawCmd;
                     this.drawRect(drawRect.rect, drawRect.borderWidth, drawRect.borderRadius, drawRect.paint);
-                } else if (drawCmd is DrawRectShadow) {
+                }
+                else if (drawCmd is DrawRectShadow) {
                     var drawRectShadow = (DrawRectShadow) drawCmd;
                     this.drawRectShadow(drawRectShadow.rect, drawRectShadow.paint);
-                } else if (drawCmd is DrawPicture) {
+                }
+                else if (drawCmd is DrawPicture) {
                     var drawPicture = (DrawPicture) drawCmd;
                     this.drawPicture(drawPicture.picture);
-                } else if (drawCmd is DrawConcat) {
+                }
+                else if (drawCmd is DrawConcat) {
                     this.concat(((DrawConcat) drawCmd).transform);
-                } else if (drawCmd is DrawSave) {
+                }
+                else if (drawCmd is DrawSave) {
                     saveCount++;
                     this.save();
-                } else if (drawCmd is DrawSaveLayer) {
+                }
+                else if (drawCmd is DrawSaveLayer) {
                     saveCount++;
                     var drawSaveLayer = (DrawSaveLayer) drawCmd;
                     this.saveLayer(drawSaveLayer.rect, drawSaveLayer.paint);
-                } else if (drawCmd is DrawRestore) {
+                }
+                else if (drawCmd is DrawRestore) {
                     saveCount--;
                     if (saveCount < 0) {
                         throw new Exception("unmatched save/restore in picture");
                     }
 
                     this.restore();
-                } else if (drawCmd is DrawClipRect) {
+                }
+                else if (drawCmd is DrawClipRect) {
                     var drawClipRect = (DrawClipRect) drawCmd;
                     this.clipRect(drawClipRect.rect);
-                } else if (drawCmd is DrawClipRRect) {
+                }
+                else if (drawCmd is DrawClipRRect) {
                     var drawClipRRect = (DrawClipRRect) drawCmd;
                     this.clipRRect(drawClipRRect.rrect);
-                } else {
+                }
+                else {
                     throw new Exception("unknown drawCmd: " + drawCmd);
                 }
             }
@@ -164,8 +174,7 @@ namespace UIWidgets.ui {
         }
 
         public void drawImageRect(Rect src, Rect dst, Paint paint, Image image) {
-            if (image != null)
-            {
+            if (image != null) {
                 Texture2D _texture = new Texture2D(0, 0);
                 _texture.LoadImage(image.rawData);
                 Graphics.DrawTexture(dst.toRect(), _texture);
@@ -276,7 +285,8 @@ namespace UIWidgets.ui {
                         (float) rect.width,
                         (float) rect.height));
                     mat.SetVector("UIWidgets_GUIClipRectRadius", new Vector4(0, 0, 0, 0));
-                } else {
+                }
+                else {
                     var rrect = this._clipRec.rrect;
                     var rect = rrect.outerRect;
                     mat.SetVector("UIWidgets_GUIClipRect", new Vector4(
@@ -291,7 +301,8 @@ namespace UIWidgets.ui {
                             (float) rrect.brRadius,
                             (float) rrect.blRadius));
                 }
-            } else {
+            }
+            else {
                 mat.SetMatrix("UIWidgets_GUIClipMatrix", Matrix4x4.identity);
                 var rect = Rect.largest;
                 mat.SetVector("UIWidgets_GUIClipRect", new Vector4(
