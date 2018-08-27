@@ -135,42 +135,6 @@ namespace UIWidgets.ui {
             };
         }
     }
-
-//    public class GUICanvas : Canvas {
-//        static GUICanvas() {
-//            GUICanvas.shadowMat = Resources.Load<Material>("UIWidgets_ShadowMat");
-//            if (GUICanvas.shadowMat == null) {
-//                throw new Exception("UIWidgets_ShadowShader not found");
-//            }
-//        }
-//
-//        public static readonly Material shadowMat;
-//
-//        public override void drawPloygon4(Paint paint, params Offset[] points) {
-//            Vector3[] vectors = new Vector3 [points.Length];
-//            for (int i = 0; i < points.Length; i++) {
-//                vectors[i] = points[i].toVector();
-//            }
-//
-//            Handles.DrawSolidRectangleWithOutline(vectors, paint.color.toColor(),
-//                new UnityEngine.Color(0f, 0f, 0f, 0f));
-//        }
-//
-//        public override void drawRect(Paint paint, Rect rect, BorderWidth borderWidth, BorderRadius borderRadius) {
-//            GUI.DrawTexture(rect.toRect(), EditorGUIUtility.whiteTexture, ScaleMode.StretchToFill, true, 0,
-//                paint.color.toColor(), borderWidth.toVector(), borderRadius.toVector());
-//        }
-//
-//        public override void drawRectShadow(Paint paint, Rect rect) {
-//            GUICanvas.shadowMat.SetFloatArray("_Rect", new float[] {
-//                (float) rect.left, (float) rect.top, (float) rect.width, (float) rect.height,
-//            });
-//            GUICanvas.shadowMat.SetFloat("_sigma", (float) paint.blurSigma);
-//
-//            Graphics.DrawTexture(rect.toRect(), EditorGUIUtility.whiteTexture,
-//                new UnityEngine.Rect(0.0f, 0.0f, 1f, 1f), 0, 0, 0, 0, paint.color.toColor(), GUICanvas.shadowMat);
-//        }
-//    }
     
     public class ColorFilter
     {
@@ -182,14 +146,6 @@ namespace UIWidgets.ui {
 
         Color _color;
         BlendMode _blendMode;
-
-//        public static bool operator ==(ColorFilter a, dynamic other) {
-//            if (other is! ColorFilter)
-//                return false;
-//            ColorFilter typedOther = other;
-//            return a._color == typedOther._color &&
-//                   a._blendMode == typedOther._blendMode;
-//        }
     }
     
     public enum BlendMode

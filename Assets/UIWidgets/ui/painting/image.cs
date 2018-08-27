@@ -14,8 +14,8 @@ namespace UIWidgets.ui
             this.width = width;
         }
 
-        public byte[] rawData; // todo temp hack
-        public int height; //有别的用吗
+        public byte[] rawData;
+        public int height;
         public int width;
     }
 }

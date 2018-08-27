@@ -25,8 +25,6 @@ namespace UIWidgets.painting
         public static readonly Alignment bottomCenter = new Alignment(0.0, 1.0);
         public static readonly Alignment bottomRight = new Alignment(1.0, 1.0);
 
-        // todo more operators
-
         public Alignment resolve(TextDirection direction)
         {
             return this;
@@ -134,79 +132,6 @@ namespace UIWidgets.painting
         public static bool operator !=(Alignment a, Alignment b)
         {
             return !(a == b);
-        }
-    }
-
-    public class _MixedAlignment : IEquatable<_MixedAlignment>
-    {
-        public _MixedAlignment(double x, double start, double y)
-        {
-            this.x = x;
-            this.start = start;
-            this.y = y;
-        }
-
-        private readonly double x;
-
-        private readonly double start;
-
-        private readonly double y;
-
-
-        public static _MixedAlignment operator -(_MixedAlignment a)
-        {
-            return new _MixedAlignment(
-                -a.x,
-                -a.start,
-                -a.y
-            );
-        }
-
-        public static _MixedAlignment operator *(_MixedAlignment a, double other)
-        {
-            return new _MixedAlignment(
-                a.x * other,
-                a.start * other,
-                a.y * other
-            );
-        }
-
-        public static _MixedAlignment operator /(_MixedAlignment a, double other)
-        {
-            return new _MixedAlignment(
-                a.x / other,
-                a.start / other,
-                a.y / other
-            );
-        }
-
-        public static _MixedAlignment operator %(_MixedAlignment a, double other)
-        {
-            return new _MixedAlignment(
-                a.x % other,
-                a.start % other,
-                a.y % other
-            );
-        }
-
-        public Alignment resolve(TextDirection direction)
-        {
-            switch (direction)
-            {
-                case TextDirection.rtl:
-                    return new Alignment(x - start, y);
-                case TextDirection.ltr:
-                    return new Alignment(x + start, y);
-            }
-
-            return null;
-        }
-
-        public bool Equals(_MixedAlignment other)
-        {
-            if (object.ReferenceEquals(null, other)) return false;
-            if (object.ReferenceEquals(this, other)) return true;
-            return this.x.Equals(other.x) && this.y.Equals(other.y) && this.start.Equals(other.start);
         }
     }
 }

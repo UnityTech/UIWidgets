@@ -44,7 +44,6 @@ namespace UIWidgets.painting
 
         public override NetworkImage obtainKey(ImageConfiguration configuration)
         {
-//        return new SynchronousFuture<NetworkImage> (this);
             return this;
         }
 
