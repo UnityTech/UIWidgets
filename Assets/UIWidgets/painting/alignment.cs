@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UIWidgets.ui;
 
 namespace UIWidgets.painting {
@@ -8,9 +8,9 @@ namespace UIWidgets.painting {
             this.y = y;
         }
 
-        private readonly double x;
+        public readonly double x;
 
-        private readonly double y;
+        public readonly double y;
 
         public static readonly Alignment topLeft = new Alignment(-1.0, -1.0);
         public static readonly Alignment topCenter = new Alignment(0, -1.0);
@@ -71,7 +71,7 @@ namespace UIWidgets.painting {
             );
         }
 
-        Rect inscribe(Size size, Rect rect) {
+        public Rect inscribe(Size size, Rect rect) {
             double halfWidthDelta = (rect.width - size.width) / 2.0;
             double halfHeightDelta = (rect.height - size.height) / 2.0;
             return Rect.fromLTWH(
