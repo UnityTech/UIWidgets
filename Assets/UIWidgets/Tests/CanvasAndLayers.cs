@@ -44,20 +44,17 @@ namespace UIWidgets.Tests {
             {
                 if (GUI.Button(new UnityEngine.Rect(20, 50, 100, 20), "Image 1"))
                 {
-                    _stream =
-                        LoadImage(
+                    LoadImage(
                             "http://a.hiphotos.baidu.com/image/h%3D300/sign=10b374237f0e0cf3bff748fb3a47f23d/adaf2edda3cc7cd90df1ede83401213fb80e9127.jpg");
                 }
                 if (GUI.Button(new UnityEngine.Rect(20, 150, 100, 20), "Image 2"))
                 {
-                    _stream =
-                        LoadImage(
+                    LoadImage(
                             "http://a.hiphotos.baidu.com/image/pic/item/cf1b9d16fdfaaf519b4aa960875494eef11f7a47.jpg");
                 }
                 if (GUI.Button(new UnityEngine.Rect(20, 250, 100, 20), "Image 3"))
                 {
-                    _stream =
-                        LoadImage(
+                    LoadImage(
                             "http://a.hiphotos.baidu.com/image/pic/item/2f738bd4b31c8701c1e721dd2a7f9e2f0708ffbc.jpg"); 
                 }
             }
@@ -65,10 +62,6 @@ namespace UIWidgets.Tests {
             if (Event.current.type == EventType.Repaint) {
                 this._options[this._selected]();
             }
-            
-            Debug.Log("currentSize: " + PaintingBinding.instance.imageCache.currentSize);
-            Debug.Log("currentSizeBytes: " + PaintingBinding.instance.imageCache.currentSizeBytes);
-            Debug.Log("maxSizeBytes: " + PaintingBinding.instance.imageCache.maximumSizeBytes);
         }
         
         private void OnEnable() {
@@ -76,13 +69,12 @@ namespace UIWidgets.Tests {
             paintingBinding.initInstances();
         }
 
-        private ImageStream LoadImage(string url)
+        private void LoadImage(string url)
         {  
             Dictionary<string, string> headers = new Dictionary<string, string>();
             NetworkImage networkImage = new NetworkImage(url, headers);
             ImageConfiguration imageConfig = new ImageConfiguration();
-            var stream = networkImage.resolve(imageConfig);
-            return stream;
+            _stream = networkImage.resolve(imageConfig);
         }
 
         void drawPloygon4() {
