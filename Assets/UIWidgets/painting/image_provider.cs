@@ -10,7 +10,6 @@ namespace UIWidgets.painting
 {
     public abstract class ImageProvider<T>
     {
-//        ImageStream resolve(ImageConfiguration configuration) {
         public ImageStream resolve(ImageConfiguration configuration)
         {
             ImageStream stream = new ImageStream();
@@ -85,6 +84,24 @@ namespace UIWidgets.painting
         public override string ToString()
         {
             return "NetworkImage with Url: " + this.url;
+        }
+        
+        public bool Equals(NetworkImage other) {
+            return this.url.Equals(other.url) && this.scale.Equals(other.scale);
+        }
+
+        public override bool Equals(object obj) {
+            if (object.ReferenceEquals(null, obj)) return false;
+            if (object.ReferenceEquals(this, obj)) return true;
+            return obj is NetworkImage && this.Equals((NetworkImage) obj);
+        }
+        
+        public override int GetHashCode() {
+            unchecked {
+                var hashCode = this.url.GetHashCode();
+                hashCode = (hashCode * 397) ^ this.scale.GetHashCode();
+                return hashCode;
+            }
         }
     }
 

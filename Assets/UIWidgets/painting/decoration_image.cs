@@ -30,7 +30,7 @@ namespace UIWidgets.painting
     public static class DecorationImageUtil
     {
         public static void paintImage(Canvas canvas, Rect rect, ui.Image image, BoxFit fit, Rect centerSlice, Alignment alignment = null,
-            ImageRepeat repeat = ImageRepeat.noRepeat, bool flipHorizontally = false) // todo more parameters
+            ImageRepeat repeat = ImageRepeat.noRepeat, bool flipHorizontally = false) 
         {
             if (rect.isEmpty)
                 return;
@@ -76,12 +76,12 @@ namespace UIWidgets.painting
             double dy = halfHeightDelta + alignment.y * halfHeightDelta;
             Offset destinationPosition = rect.topLeft.translate(dx, dy);
             Rect destinationRect = destinationPosition & destinationSize;
-            // todo repeat and flip
-//            bool needSave = repeat != ImageRepeat.noRepeat || flipHorizontally;
-//            if (needSave)
-//                canvas.save();
-//            if (repeat != ImageRepeat.noRepeat)
-//                canvas.clipRect(rect);
+            bool needSave = repeat != ImageRepeat.noRepeat || flipHorizontally;
+            if (needSave)
+                canvas.save();
+            if (repeat != ImageRepeat.noRepeat)
+                canvas.clipRect(rect);
+            // todo flip
 //            if (flipHorizontally) {
 //                dx = -(rect.left + rect.width / 2.0);
 //                canvas.translate(-dx, 0.0);
@@ -93,7 +93,7 @@ namespace UIWidgets.painting
                     fittedSizes.source, Offset.zero & inputSize
                 );
                 foreach (Rect tileRect in _generateImageTileRects(rect, destinationRect, repeat)) {
-//                    canvas.drawImageRect(sourceRect, tileRect, paint, image);
+                    canvas.drawImageRect(sourceRect, tileRect, paint, image);
                 }
             } else {
                 // todo
@@ -102,8 +102,8 @@ namespace UIWidgets.painting
 //                canvas.drawImageNine(image, centerSlice, tileRect, paint);
                 }
             }
-//            if (needSave)
-//                canvas.restore();
+            if (needSave)
+                canvas.restore();
         }
 
         public static List<Rect> _generateImageTileRects(Rect outputRect, Rect fundamentalRect,
@@ -139,7 +139,6 @@ namespace UIWidgets.painting
             {
                 for (int j = startY; j <= stopY; ++j)
                     tileRects.Add(fundamentalRect.shift(new Offset(i * strideX, j * strideY)));
-//                        yield return fundamentalRect.shift(new Offset(i * strideX, j * strideY));
             }
 
             return tileRects;

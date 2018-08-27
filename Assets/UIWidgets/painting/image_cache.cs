@@ -1,6 +1,4 @@
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using UnityEngine;
 using Object = System.Object;
 
 namespace UIWidgets.painting
@@ -89,7 +87,6 @@ namespace UIWidgets.painting
 
         public delegate ImageStreamCompleter Loader();
 
-        [MethodImpl(MethodImplOptions.Synchronized)]
         public ImageStreamCompleter putIfAbsent(Object key, Loader loader)
         {
             ImageStreamCompleter result;
