@@ -25,11 +25,6 @@ namespace UIWidgets.painting
         public static readonly Alignment bottomCenter = new Alignment(0.0, 1.0);
         public static readonly Alignment bottomRight = new Alignment(1.0, 1.0);
 
-        public Alignment resolve(TextDirection direction)
-        {
-            return this;
-        }
-
         public Alignment add(Alignment other)
         {
             return this + other;
