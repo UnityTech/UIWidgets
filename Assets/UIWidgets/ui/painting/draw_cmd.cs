@@ -29,7 +29,7 @@ namespace UIWidgets.ui {
 
     public class DrawImageRect : DrawCmd
     {
-        public ImageStream stream;
+        public Image image;
         public Rect src;
         public Rect dst;
     }

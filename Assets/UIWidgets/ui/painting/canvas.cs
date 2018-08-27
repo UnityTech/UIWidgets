@@ -11,7 +11,7 @@ namespace UIWidgets.ui {
 
         void drawPicture(Picture picture);
 
-        void drawImageRect(Rect src, Rect dst, Paint paint, ImageStream stream);
+        void drawImageRect(Rect src, Rect dst, Paint paint, Image image);
 
         void concat(Matrix4x4 transform);
 
@@ -62,11 +62,11 @@ namespace UIWidgets.ui {
             });
         }
 
-        public void drawImageRect(Rect src, Rect dst, Paint paint, ImageStream stream)
+        public void drawImageRect(Rect src, Rect dst, Paint paint, Image image)
         {
             this._recorder.addDrawCmd(new DrawImageRect
             {
-                stream = stream,
+                image = image,
                 src = src,
                 dst = dst,
             });

@@ -163,12 +163,12 @@ namespace UIWidgets.ui {
             this.restore();
         }
 
-        public void drawImageRect(Rect src, Rect dst, Paint paint, ImageStream stream)
+        public void drawImageRect(Rect src, Rect dst, Paint paint, Image image)
         {
-            if (stream.completer._currentImgae != null)
+            if (image != null)
             {
                 Texture2D _texture = new Texture2D(0, 0);
-                _texture.LoadImage(stream.completer._currentImgae.image.rawData);
+                _texture.LoadImage(image.rawData);
                 Graphics.DrawTexture(dst.toRect(), _texture);
             }
         }

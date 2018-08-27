@@ -200,7 +200,7 @@ namespace UIWidgets.Tests {
 
         void drawImageRect()
         {
-            if (_stream == null)
+            if (_stream == null || _stream.completer == null || _stream.completer._currentImgae == null)
             {
                 return;
             }
@@ -216,7 +216,7 @@ namespace UIWidgets.Tests {
                 Rect.fromLTWH(150, 50, 250, 250),
                 Rect.fromLTWH(150, 50, 250, 250),
                 paint,
-                _stream
+                _stream.completer._currentImgae.image
             );
         }
 
@@ -355,7 +355,6 @@ namespace UIWidgets.Tests {
                 paint);
 
             var picture = pictureRecorder.endRecording();
-            Debug.Log("picture.paintBounds: " + picture.paintBounds);
 
             var editorCanvas = new CanvasImpl();
             editorCanvas.concat(Matrix4x4.Rotate(Quaternion.Euler(0, 0, -5)));
