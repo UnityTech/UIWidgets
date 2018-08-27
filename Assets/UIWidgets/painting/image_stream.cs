@@ -66,7 +66,6 @@ namespace UIWidgets.painting
             this._listeners.Add(new _ImageListenerPair(listener, onError));
             if (_currentImgae != null)
             {
-                // todo refine
                 try
                 {
                     listener(_currentImgae, true);
