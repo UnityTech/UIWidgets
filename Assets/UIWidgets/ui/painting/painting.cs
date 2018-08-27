@@ -135,11 +135,9 @@ namespace UIWidgets.ui {
             };
         }
     }
-    
-    public class ColorFilter
-    {
-        public ColorFilter(Color color, BlendMode blendMode)
-        {
+
+    public class ColorFilter {
+        public ColorFilter(Color color, BlendMode blendMode) {
             _color = color;
             _blendMode = blendMode;
         }
@@ -147,9 +145,8 @@ namespace UIWidgets.ui {
         Color _color;
         BlendMode _blendMode;
     }
-    
-    public enum BlendMode
-    {
+
+    public enum BlendMode {
         None = 0, // explicitly assign zero to make it more clear
         clear,
         src,
@@ -179,5 +176,5 @@ namespace UIWidgets.ui {
         saturation,
         color,
         luminosity,
-    } 
+    }
 }

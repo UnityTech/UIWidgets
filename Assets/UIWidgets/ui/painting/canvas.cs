@@ -62,8 +62,7 @@ namespace UIWidgets.ui {
             });
         }
 
-        public void drawImageRect(Rect src, Rect dst, Paint paint, Image image)
-        {
+        public void drawImageRect(Rect src, Rect dst, Paint paint, Image image) {
             this._recorder.addDrawCmd(new DrawImageRect
             {
                 image = image,

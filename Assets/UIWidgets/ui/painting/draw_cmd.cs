@@ -27,8 +27,7 @@ namespace UIWidgets.ui {
         public Picture picture;
     }
 
-    public class DrawImageRect : DrawCmd
-    {
+    public class DrawImageRect : DrawCmd {
         public Image image;
         public Rect src;
         public Rect dst;

@@ -3,10 +3,8 @@ using UIWidgets.painting;
 using UnityEngine.Rendering;
 using BlendMode = UIWidgets.ui.BlendMode;
 
-namespace UIWidgets.rendering
-{
-    class RenderImage : RenderBox
-    {
+namespace UIWidgets.rendering {
+    class RenderImage : RenderBox {
         public RenderImage(ui.Image image,
             double width,
             double height,
@@ -15,12 +13,9 @@ namespace UIWidgets.rendering
             BoxFit fit,
             ImageRepeat repeat,
             Rect centerSlice,
-            TextDirection textDirection,
-            bool matchTextDirection = false,
             Alignment alignment = null,
             double scale = 1.0
-        )
-        {
+        ) {
             this._image = image;
             this._width = width;
             this._height = height;
@@ -30,38 +25,27 @@ namespace UIWidgets.rendering
             this._fit = fit;
             this._repeat = repeat;
             this._centerSlice = centerSlice;
-            this._matchTextDirection = matchTextDirection;
-//            this._textDir
             this._alignment = alignment ?? Alignment.center;
-            this._textDirection = textDirection;
-            _updateColorFilter();
         }
 
         Alignment _resolvedAlignment;
-        bool _flipHorizontally;
 
-        void _resolve()
-        {
+        void _resolve() {
             if (_resolvedAlignment != null)
                 return;
             _resolvedAlignment = alignment;
-            _flipHorizontally = matchTextDirection && textDirection == TextDirection.rtl;
         }
 
-        void _markNeedsResolution()
-        {
+        void _markNeedsResolution() {
             _resolvedAlignment = null;
-            _flipHorizontally = false;
             markNeedsPaint();
         }
 
         private ui.Image _image;
 
-        public ui.Image image
-        {
+        public ui.Image image {
             get { return this._image; }
-            set
-            {
+            set {
                 if (value == _image)
                     return;
                 _image = value;
@@ -73,11 +57,9 @@ namespace UIWidgets.rendering
 
         private double _width;
 
-        public double width
-        {
+        public double width {
             get { return _width; }
-            set
-            {
+            set {
                 if (value == _width)
                     return;
                 _width = value;
@@ -87,11 +69,9 @@ namespace UIWidgets.rendering
 
         private double _height;
 
-        public double height
-        {
+        public double height {
             get { return _height; }
-            set
-            {
+            set {
                 if (value == _height)
                     return;
                 _height = value;
@@ -101,11 +81,9 @@ namespace UIWidgets.rendering
 
         private double _scale;
 
-        public double scale
-        {
+        public double scale {
             get { return _scale; }
-            set
-            {
+            set {
                 if (value == _scale)
                     return;
                 _scale = value;
@@ -113,57 +91,35 @@ namespace UIWidgets.rendering
             }
         }
 
-        ColorFilter _colorFilter;
-
-        void _updateColorFilter()
-        {
-            if (_color == null)
-                _colorFilter = null;
-            else
-            {
-                _colorFilter = new ColorFilter(_color,
-                    _colorBlendMode == BlendMode.None ? BlendMode.srcIn : _colorBlendMode);
-            }
-        }
-
         private Color _color;
 
-        public Color color
-        {
+        public Color color {
             get { return _color; }
-            set
-            {
+            set {
                 if (value == _color)
                     return;
                 _color = value;
-                _updateColorFilter();
                 markNeedsPaint();
             }
         }
-        // todo more parameters
 
         private ui.BlendMode _colorBlendMode;
 
-        public ui.BlendMode colorBlendMode
-        {
+        public ui.BlendMode colorBlendMode {
             get { return _colorBlendMode; }
-            set
-            {
+            set {
                 if (value == _colorBlendMode)
                     return;
                 _colorBlendMode = value;
-                _updateColorFilter();
                 markNeedsPaint();
             }
         }
 
         private BoxFit _fit;
 
-        public BoxFit fit
-        {
+        public BoxFit fit {
             get { return _fit; }
-            set
-            {
+            set {
                 if (value == _fit)
                     return;
                 _fit = value;
@@ -173,11 +129,9 @@ namespace UIWidgets.rendering
 
         private Alignment _alignment;
 
-        public Alignment alignment
-        {
+        public Alignment alignment {
             get { return _alignment; }
-            set
-            {
+            set {
                 if (value == _alignment)
                     return;
                 _alignment = value;
@@ -187,11 +141,9 @@ namespace UIWidgets.rendering
 
         private ImageRepeat _repeat;
 
-        public ImageRepeat repeat
-        {
+        public ImageRepeat repeat {
             get { return _repeat; }
-            set
-            {
+            set {
                 if (value == _repeat)
                     return;
                 _repeat = value;
@@ -201,11 +153,9 @@ namespace UIWidgets.rendering
 
         private Rect _centerSlice;
 
-        public Rect centerSlice
-        {
+        public Rect centerSlice {
             get { return _centerSlice; }
-            set
-            {
+            set {
                 if (value == _centerSlice)
                     return;
                 _centerSlice = value;
@@ -213,36 +163,7 @@ namespace UIWidgets.rendering
             }
         }
 
-        private bool _matchTextDirection;
-
-        public bool matchTextDirection
-        {
-            get { return _matchTextDirection; }
-            set
-            {
-                if (value == _matchTextDirection)
-                    return;
-                _matchTextDirection = value;
-                _markNeedsResolution();
-            }
-        }
-
-        private TextDirection _textDirection;
-
-        public TextDirection textDirection
-        {
-            get { return _textDirection; }
-            set
-            {
-                if (_textDirection == value)
-                    return;
-                _textDirection = value;
-                _markNeedsResolution();
-            }
-        }
-
-        Size _sizeForConstraints(BoxConstraints constraints)
-        {
+        Size _sizeForConstraints(BoxConstraints constraints) {
             // Folds the given |width| and |height| into |constraints| so they can all
             // be treated uniformly.
             constraints = BoxConstraints.tightFor(
@@ -260,8 +181,7 @@ namespace UIWidgets.rendering
             ));
         }
 
-        public override void paint(PaintingContext context, Offset offset)
-        {
+        public override void paint(PaintingContext context, Offset offset) {
             if (_image == null)
                 return;
             _resolve();
@@ -272,9 +192,7 @@ namespace UIWidgets.rendering
                 _fit,
                 _centerSlice,
                 _resolvedAlignment,
-                _repeat,
-                _flipHorizontally
-                // todo
+                _repeat
             );
         }
     }

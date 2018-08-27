@@ -1,12 +1,9 @@
 using System;
 using UIWidgets.ui;
 
-namespace UIWidgets.painting
-{
-    public class Alignment : IEquatable<Alignment>
-    {
-        public Alignment(double x, double y)
-        {
+namespace UIWidgets.painting {
+    public class Alignment : IEquatable<Alignment> {
+        public Alignment(double x, double y) {
             this.x = x;
             this.y = y;
         }
@@ -25,57 +22,47 @@ namespace UIWidgets.painting
         public static readonly Alignment bottomCenter = new Alignment(0.0, 1.0);
         public static readonly Alignment bottomRight = new Alignment(1.0, 1.0);
 
-        public Alignment add(Alignment other)
-        {
+        public Alignment add(Alignment other) {
             return this + other;
         }
 
-        public static Alignment operator -(Alignment a, Alignment b)
-        {
+        public static Alignment operator -(Alignment a, Alignment b) {
             return new Alignment(a.x - b.x, a.y - b.y);
         }
 
-        public static Alignment operator +(Alignment a, Alignment b)
-        {
+        public static Alignment operator +(Alignment a, Alignment b) {
             return new Alignment(a.x + b.x, a.y + b.y);
         }
 
-        public static Alignment operator -(Alignment a)
-        {
+        public static Alignment operator -(Alignment a) {
             return new Alignment(-a.x, -a.y);
         }
 
-        public static Alignment operator *(Alignment a, double b)
-        {
+        public static Alignment operator *(Alignment a, double b) {
             return new Alignment(a.x * b, a.y * b);
         }
 
-        public static Alignment operator /(Alignment a, double b)
-        {
+        public static Alignment operator /(Alignment a, double b) {
             return new Alignment(a.x / b, a.y / b);
         }
 
-        public static Alignment operator %(Alignment a, double b)
-        {
+        public static Alignment operator %(Alignment a, double b) {
             return new Alignment(a.x % b, a.y % b);
         }
 
-        public Offset alongOffset(Offset other)
-        {
+        public Offset alongOffset(Offset other) {
             double centerX = other.dx / 2.0;
             double centerY = other.dy / 2.0;
             return new Offset(centerX + this.x * centerX, centerY + this.y * centerY);
         }
 
-        public Offset alongSize(Size other)
-        {
+        public Offset alongSize(Size other) {
             double centerX = other.width / 2.0;
             double centerY = other.height / 2.0;
             return new Offset(centerX + this.x * centerX, centerY + this.y * centerY);
         }
 
-        public Offset withinRect(Rect rect)
-        {
+        public Offset withinRect(Rect rect) {
             double halfWidth = rect.width / 2.0;
             double halfHeight = rect.height / 2.0;
             return new Offset(
@@ -84,8 +71,7 @@ namespace UIWidgets.painting
             );
         }
 
-        public Rect inscribe(Size size, Rect rect)
-        {
+        public Rect inscribe(Size size, Rect rect) {
             double halfWidthDelta = (rect.width - size.width) / 2.0;
             double halfHeightDelta = (rect.height - size.height) / 2.0;
             return Rect.fromLTWH(
@@ -96,36 +82,30 @@ namespace UIWidgets.painting
             );
         }
 
-        public bool Equals(Alignment other)
-        {
+        public bool Equals(Alignment other) {
             if (object.ReferenceEquals(null, other)) return false;
             if (object.ReferenceEquals(this, other)) return true;
             return this.x.Equals(other.x) && this.y.Equals(other.y);
         }
 
-        public override bool Equals(object obj)
-        {
+        public override bool Equals(object obj) {
             if (object.ReferenceEquals(null, obj)) return false;
             if (object.ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
             return this.Equals((Alignment) obj);
         }
 
-        public override int GetHashCode()
-        {
-            unchecked
-            {
+        public override int GetHashCode() {
+            unchecked {
                 return (this.x.GetHashCode() * 397) ^ this.y.GetHashCode();
             }
         }
 
-        public static bool operator ==(Alignment a, Alignment b)
-        {
+        public static bool operator ==(Alignment a, Alignment b) {
             return object.Equals(a, b);
         }
 
-        public static bool operator !=(Alignment a, Alignment b)
-        {
+        public static bool operator !=(Alignment a, Alignment b) {
             return !(a == b);
         }
     }

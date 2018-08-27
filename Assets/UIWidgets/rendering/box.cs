@@ -32,8 +32,7 @@ namespace UIWidgets.rendering {
             );
         }
 
-        public static BoxConstraints tightFor(double width, double height)
-        {
+        public static BoxConstraints tightFor(double width, double height) {
             return new BoxConstraints(
                 width,
                 width,
@@ -41,7 +40,7 @@ namespace UIWidgets.rendering {
                 height
             );
         }
-        
+
         public static BoxConstraints tightFor(
             double? width = null,
             double? height = null
@@ -526,7 +525,6 @@ namespace UIWidgets.rendering {
         : ContainerRenderObjectMixinRenderBox<ChildType, ParentDataType>
         where ChildType : RenderBox
         where ParentDataType : ContainerParentDataMixinBoxParentData<ChildType> {
-        
         public double? defaultComputeDistanceToFirstActualBaseline(TextBaseline baseline) {
             var child = this.firstChild;
             while (child != null) {
@@ -552,7 +550,8 @@ namespace UIWidgets.rendering {
                     candidate += childParentData.offset.dy;
                     if (result != null) {
                         result = Math.Min(result.Value, candidate.Value);
-                    } else {
+                    }
+                    else {
                         result = candidate;
                     }
                 }

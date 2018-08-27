@@ -1,10 +1,8 @@
 using UIWidgets.ui;
 using System;
 
-namespace UIWidgets.painting
-{
-    public enum BoxFit
-    {
+namespace UIWidgets.painting {
+    public enum BoxFit {
         fill,
         contain,
         cover,
@@ -14,10 +12,8 @@ namespace UIWidgets.painting
         scaleDown,
     }
 
-    public class FittedSizes
-    {
-        public FittedSizes(Size source, Size destination)
-        {
+    public class FittedSizes {
+        public FittedSizes(Size source, Size destination) {
             this.source = source;
             this.destination = destination;
         }
@@ -25,15 +21,13 @@ namespace UIWidgets.painting
         public Size source;
         public Size destination;
 
-        public static FittedSizes applyBoxFit(BoxFit fit, Size inputSize, Size outputSize)
-        {
+        public static FittedSizes applyBoxFit(BoxFit fit, Size inputSize, Size outputSize) {
             if (inputSize.height <= 0.0 || inputSize.width <= 0.0 || outputSize.height <= 0.0 ||
                 outputSize.width <= 0.0)
                 return new FittedSizes(Size.zero, Size.zero);
             Size sourceSize = null;
             Size destinationSize = null;
-            switch (fit)
-            {
+            switch (fit) {
                 case BoxFit.fill:
                     sourceSize = inputSize;
                     destinationSize = outputSize;
@@ -48,12 +42,10 @@ namespace UIWidgets.painting
                             sourceSize.height * outputSize.width / sourceSize.width);
                     break;
                 case BoxFit.cover:
-                    if (outputSize.width / outputSize.height > inputSize.width / inputSize.height)
-                    {
+                    if (outputSize.width / outputSize.height > inputSize.width / inputSize.height) {
                         sourceSize = new Size(inputSize.width, inputSize.width * outputSize.height / outputSize.width);
                     }
-                    else
-                    {
+                    else {
                         sourceSize = new Size(inputSize.height * outputSize.width / outputSize.height,
                             inputSize.height);
                     }
@@ -85,6 +77,7 @@ namespace UIWidgets.painting
                         destinationSize = new Size(outputSize.width, outputSize.width / aspectRatio);
                     break;
             }
+
             return new FittedSizes(sourceSize, destinationSize);
         }
     }

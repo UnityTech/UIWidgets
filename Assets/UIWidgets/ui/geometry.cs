@@ -167,11 +167,11 @@ namespace UIWidgets.ui {
         public bool isEmpty {
             get { return this.width <= 0.0 || this.height <= 0.0; }
         }
-        
+
         public static Size operator -(Size a, Offset b) {
             return new Size(a.width - b.dx, a.height - b.dy);
         }
-        
+
         public static Size operator +(Size a, Offset b) {
             return new Size(a.width + b.dx, a.height + b.dy);
         }
@@ -179,7 +179,7 @@ namespace UIWidgets.ui {
         public static Offset operator -(Size a, Size b) {
             return new Offset(a.width - b.width, a.height - b.width);
         }
-        
+
         public static Size operator *(Size a, double operand) {
             return new Size(a.width * operand, a.height * operand);
         }
@@ -374,7 +374,7 @@ namespace UIWidgets.ui {
         public bool contains(Offset offset) {
             return offset.dx >= this.left && offset.dx < this.right && offset.dy >= this.top && offset.dy < this.bottom;
         }
-        
+
         public bool contains(Rect rect) {
             return this.contains(rect.topLeft) && this.contains(rect.bottomRight);
         }

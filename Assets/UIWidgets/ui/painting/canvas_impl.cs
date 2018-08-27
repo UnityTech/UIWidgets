@@ -163,8 +163,7 @@ namespace UIWidgets.ui {
             this.restore();
         }
 
-        public void drawImageRect(Rect src, Rect dst, Paint paint, Image image)
-        {
+        public void drawImageRect(Rect src, Rect dst, Paint paint, Image image) {
             if (image != null)
             {
                 Texture2D _texture = new Texture2D(0, 0);

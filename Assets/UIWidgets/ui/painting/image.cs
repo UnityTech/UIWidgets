@@ -7,8 +7,7 @@ namespace UIWidgets.ui
 {
     public class Image
     {
-        public Image(byte[] raw, int height = 100, int width = 100)
-        {
+        public Image(byte[] raw, int height = 100, int width = 100) {
             this.rawData = raw;
             this.height = height;
             this.width = width;

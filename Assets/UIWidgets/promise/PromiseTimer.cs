@@ -1,34 +1,26 @@
 using System;
 using System.Collections.Generic;
 
-namespace RSG
-{
-
-    public class PromiseCancelledException : Exception
-    {
+namespace RSG {
+    public class PromiseCancelledException : Exception {
         /// <summary>
         /// Just create the exception
         /// </summary>
-        public PromiseCancelledException()
-        {
-
+        public PromiseCancelledException() {
         }
 
         /// <summary>
         /// Create the exception with description
         /// </summary>
         /// <param name="message">Exception description</param>
-        public PromiseCancelledException(String message) : base(message)
-        {
-
+        public PromiseCancelledException(String message) : base(message) {
         }
     }
 
     /// <summary>
     /// A class that wraps a pending promise with it's predicate and time data
     /// </summary>
-    internal class PredicateWait
-    {
+    internal class PredicateWait {
         /// <summary>
         /// Predicate for resolving the promise
         /// </summary>
@@ -58,8 +50,7 @@ namespace RSG
     /// <summary>
     /// Time data specific to a particular pending promise.
     /// </summary>
-    public struct TimeData
-    {
+    public struct TimeData {
         /// <summary>
         /// The amount of time that has elapsed since the pending promise started running
         /// </summary>
@@ -76,8 +67,7 @@ namespace RSG
         public int elapsedUpdates;
     }
 
-    public interface IPromiseTimer
-    {
+    public interface IPromiseTimer {
         /// <summary>
         /// Resolve the returned promise once the time has elapsed
         /// </summary>
@@ -104,8 +94,7 @@ namespace RSG
         bool Cancel(IPromise promise);
     }
 
-    public class PromiseTimer : IPromiseTimer
-    {
+    public class PromiseTimer : IPromiseTimer {
         /// <summary>
         /// The current running total for time that this PromiseTimer has run for
         /// </summary>
@@ -124,28 +113,24 @@ namespace RSG
         /// <summary>
         /// Resolve the returned promise once the time has elapsed
         /// </summary>
-        public IPromise WaitFor(float seconds)
-        {
+        public IPromise WaitFor(float seconds) {
             return WaitUntil(t => t.elapsedTime >= seconds);
         }
 
         /// <summary>
         /// Resolve the returned promise once the predicate evaluates to false
         /// </summary>
-        public IPromise WaitWhile(Func<TimeData, bool> predicate)
-        {
+        public IPromise WaitWhile(Func<TimeData, bool> predicate) {
             return WaitUntil(t => !predicate(t));
         }
 
         /// <summary>
         /// Resolve the returned promise once the predicate evalutes to true
         /// </summary>
-        public IPromise WaitUntil(Func<TimeData, bool> predicate)
-        {
+        public IPromise WaitUntil(Func<TimeData, bool> predicate) {
             var promise = new Promise();
 
-            var wait = new PredicateWait()
-            {
+            var wait = new PredicateWait() {
                 timeStarted = curTime,
                 pendingPromise = promise,
                 timeData = new TimeData(),
@@ -158,12 +143,10 @@ namespace RSG
             return promise;
         }
 
-        public bool Cancel(IPromise promise)
-        {
+        public bool Cancel(IPromise promise) {
             var node = FindInWaiting(promise);
 
-            if (node == null)
-            {
+            if (node == null) {
                 return false;
             }
 
@@ -173,12 +156,9 @@ namespace RSG
             return true;
         }
 
-        LinkedListNode<PredicateWait> FindInWaiting(IPromise promise)
-        {
-            for (var node = waiting.First; node != null; node = node.Next)
-            {
-                if (node.Value.pendingPromise.Id.Equals(promise.Id))
-                {
+        LinkedListNode<PredicateWait> FindInWaiting(IPromise promise) {
+            for (var node = waiting.First; node != null; node = node.Next) {
+                if (node.Value.pendingPromise.Id.Equals(promise.Id)) {
                     return node;
                 }
             }
@@ -189,14 +169,12 @@ namespace RSG
         /// <summary>
         /// Update all pending promises. Must be called for the promises to progress and resolve at all.
         /// </summary>
-        public void Update(float deltaTime)
-        {
+        public void Update(float deltaTime) {
             curTime += deltaTime;
             curFrame += 1;
 
             var node = waiting.First;
-            while (node != null)
-            {
+            while (node != null) {
                 var wait = node.Value;
 
                 var newElapsedTime = curTime - wait.timeStarted;
@@ -206,26 +184,22 @@ namespace RSG
                 wait.timeData.elapsedUpdates = newElapsedUpdates;
 
                 bool result;
-                try
-                {
+                try {
                     result = wait.predicate(wait.timeData);
                 }
-                catch (Exception ex)
-                {
+                catch (Exception ex) {
                     wait.pendingPromise.Reject(ex);
 
                     node = RemoveNode(node);
                     continue;
                 }
 
-                if (result)
-                {
+                if (result) {
                     wait.pendingPromise.Resolve();
 
                     node = RemoveNode(node);
                 }
-                else
-                {
+                else {
                     node = node.Next;
                 }
             }
@@ -234,8 +208,7 @@ namespace RSG
         /// <summary>
         /// Removes the provided node and returns the next node in the list.
         /// </summary>
-        private LinkedListNode<PredicateWait> RemoveNode(LinkedListNode<PredicateWait> node)
-        {
+        private LinkedListNode<PredicateWait> RemoveNode(LinkedListNode<PredicateWait> node) {
             var currentNode = node;
             node = node.Next;
 
