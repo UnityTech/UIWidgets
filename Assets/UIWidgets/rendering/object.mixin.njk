@@ -55,6 +55,7 @@ namespace UIWidgets.rendering {
 
 {{ RenderObjectWithChildMixin('RenderBox') }}
 
+{{ RenderObjectWithChildMixin('RenderSliver') }}
 
 {% macro ContainerParentDataMixin(with) %}
     public abstract class ContainerParentDataMixin{{with}}<ChildType> : {{with}}, ContainerParentDataMixin<ChildType> where ChildType : RenderObject {
@@ -86,6 +87,10 @@ namespace UIWidgets.rendering {
 
 {{ ContainerParentDataMixin('BoxParentData') }}
 
+{{ ContainerParentDataMixin('SliverPhysicalParentData') }}
+
+{{ ContainerParentDataMixin('SliverLogicalParentData') }}
+
 
 {% macro ContainerRenderObjectMixin(with) %}
     public abstract class ContainerRenderObjectMixin{{with}}<ChildType, ParentDataType> : {{with}}
@@ -94,7 +99,7 @@ namespace UIWidgets.rendering {
 
         public int _childCount = 0;
 
-        public int countCount {
+        public int childCount {
             get { return this._childCount; }
         }
 

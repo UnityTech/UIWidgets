@@ -1,6 +1,28 @@
 using System;
 
 namespace UIWidgets.ui {
+    public static class MathUtils {
+        public static double clamp(this double value, double min, double max) {
+            if (value < min) {
+                value = min;
+            } else if (value > max) {
+                value = max;
+            }
+
+            return value;
+        }
+
+        public static int clamp(this int value, int min, int max) {
+            if (value < min) {
+                value = min;
+            } else if (value > max) {
+                value = max;
+            }
+
+            return value;
+        }
+    }
+
     public abstract class OffsetBase : IEquatable<OffsetBase> {
         protected OffsetBase(double _dx, double _dy) {
             this._dx = _dx;
@@ -106,6 +128,14 @@ namespace UIWidgets.ui {
             return new Offset(a.dx + b.dx, a.dy + b.dy);
         }
 
+        public static Offset operator *(Offset a, double operand) {
+            return new Offset(a.dx * operand, a.dy * operand);
+        }
+
+        public static Offset operator /(Offset a, double operand) {
+            return new Offset(a.dx / operand, a.dy / operand);
+        }
+
         public static Rect operator &(Offset a, Size other) {
             return Rect.fromLTWH(a.dx, a.dy, other.width, other.height);
         }
@@ -179,7 +209,7 @@ namespace UIWidgets.ui {
         public static Offset operator -(Size a, Size b) {
             return new Offset(a.width - b.width, a.height - b.width);
         }
-        
+
         public static Size operator *(Size a, double operand) {
             return new Size(a.width * operand, a.height * operand);
         }
@@ -292,6 +322,11 @@ namespace UIWidgets.ui {
                 this.bottom + offset.dy);
         }
 
+        public Rect translate(double translateX, double translateY) {
+            return Rect.fromLTRB(this.left + translateX, this.top + translateY, this.right + translateX,
+                this.bottom + translateY);
+        }
+
         public Rect inflate(double delta) {
             return Rect.fromLTRB(this.left - delta, this.top - delta, this.right + delta, this.bottom + delta);
         }
@@ -374,7 +409,7 @@ namespace UIWidgets.ui {
         public bool contains(Offset offset) {
             return offset.dx >= this.left && offset.dx < this.right && offset.dy >= this.top && offset.dy < this.bottom;
         }
-        
+
         public bool contains(Rect rect) {
             return this.contains(rect.topLeft) && this.contains(rect.bottomRight);
         }
