@@ -198,12 +198,12 @@ namespace UIWidgets.ui {
             get { return this.width <= 0.0 || this.height <= 0.0; }
         }
 
-        public static Size operator +(Size a, Offset b) {
-            return new Size(a.width + b.dx, a.height + b.dy);
-        }
-
         public static Size operator -(Size a, Offset b) {
             return new Size(a.width - b.dx, a.height - b.dy);
+        }
+
+        public static Size operator +(Size a, Offset b) {
+            return new Size(a.width + b.dx, a.height + b.dy);
         }
 
         public static Offset operator -(Size a, Size b) {
