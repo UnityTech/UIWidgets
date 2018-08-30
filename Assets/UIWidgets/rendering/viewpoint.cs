@@ -140,6 +140,8 @@ namespace UIWidgets.rendering {
             double cacheExtent = RenderAbstractViewportUtils.defaultCacheExtent,
             AxisDirection axisDirection = AxisDirection.down) : base(crossAxisDirection, offset, cacheExtent,
             axisDirection) {
+            Font x = new Font();
+            // x.characterInfo
         }
     }
 }

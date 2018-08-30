@@ -48,4 +48,8 @@ namespace UIWidgets.ui {
     public class DrawClipRRect : DrawCmd {
         public RRect rrect;
     }
+    
+    public class DrawMesh : DrawCmd {
+        public Mesh mesh;
+    }
 }

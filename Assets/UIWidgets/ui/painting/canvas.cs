@@ -22,6 +22,7 @@ namespace UIWidgets.ui {
         void clipRect(Rect rect);
 
         void clipRRect(RRect rrect);
+        
     }
 
     public class RecorderCanvas : Canvas {
