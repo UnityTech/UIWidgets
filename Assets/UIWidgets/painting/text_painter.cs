@@ -237,7 +237,7 @@ namespace UIWidgets.painting
 
         public void paint(Canvas canvas, Offset offset)
         {
-            Debug.Assert(_needsLayout);
+            Debug.Assert(!_needsLayout);
             _paragraph.paint(canvas, offset.dx, offset.dy);
         }
 

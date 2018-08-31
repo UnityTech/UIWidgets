@@ -22,7 +22,8 @@ namespace UIWidgets.ui {
         void clipRect(Rect rect);
 
         void clipRRect(RRect rrect);
-        
+
+        void drawMesh(Mesh mesh, Material material);
     }
 
     public class RecorderCanvas : Canvas {
@@ -93,6 +94,14 @@ namespace UIWidgets.ui {
         public void clipRRect(RRect rrect) {
             this._recorder.addDrawCmd(new DrawClipRRect {
                 rrect = rrect,
+            });
+        }
+
+        public void drawMesh(Mesh mesh, Material material)
+        {
+            this._recorder.addDrawCmd(new DrawMesh() {
+                mesh = mesh,
+                material = material,
             });
         }
     }

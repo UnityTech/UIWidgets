@@ -51,5 +51,7 @@ namespace UIWidgets.ui {
     
     public class DrawMesh : DrawCmd {
         public Mesh mesh;
+        public Material material;
     }
+    
 }

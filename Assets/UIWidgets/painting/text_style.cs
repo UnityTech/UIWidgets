@@ -19,9 +19,9 @@ namespace UIWidgets.painting
         public readonly TextDecoration decoration;
         public readonly string fontFamily;
 
-        public TextStyle(bool? inherit, Color color, double? fontSize, FontWeight? fontWeight, 
-            FontStyle? fontStyle, double? letterSpacing, double? wordSpacing, 
-            TextBaseline? textBaseline, double? height, TextDecoration decoration)
+        public TextStyle(bool? inherit = null, Color color = null, double? fontSize = null, FontWeight? fontWeight = null, 
+            FontStyle? fontStyle = null, double? letterSpacing = null, double? wordSpacing = null, 
+            TextBaseline? textBaseline = null, double? height = null, TextDecoration decoration = null, string fontFamily = null)
         {
             this.inherit = inherit;
             this.color = color;
@@ -33,6 +33,7 @@ namespace UIWidgets.painting
             this.textBaseline = textBaseline;
             this.height = height;
             this.decoration = decoration;
+            this.fontFamily = fontFamily;
         }
 
         public ui.TextStyle getTextStyle(double textScaleFactor = 1.0)

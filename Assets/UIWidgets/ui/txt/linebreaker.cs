@@ -16,27 +16,26 @@ namespace UIWidgets.ui
         
         public Vector2[] _characterPositions;
         public float[] _characterWidth;
- //       private List<int> breaks;
         private string _text;
         private float _width;
         private int _lineStart;
         private int _wordStart;
-       // private int _preWordEnd;
         private int _runIndex = 0;
         private int _spaceCount = 0;
         private int tabCount = 4;
         private double _lineLength;
+        private Font[] _styleRunFonts;
 
         private List<LineInfo> _lines;
-        // private double lengths
 
-        public void setup(string text, StyledRuns runs, float width, Vector2[] characterPositions, float[] characterWidth)
+        public void setup(string text, StyledRuns runs, Font[] styleRunFonts, float width, Vector2[] characterPositions, float[] characterWidth)
         {
             _text = text;
             _runs = runs;
             _characterPositions = characterPositions;
             _characterWidth = characterWidth;
             _width = width;
+            _styleRunFonts = styleRunFonts;
         }
         
         public List<LineInfo> getLines()
@@ -48,31 +47,22 @@ namespace UIWidgets.ui
         {
             _lines = new List<LineInfo>();
             float offsetX = 0.0f;
-
+            var runIterator = _runs.iterator();
             for (var charIndex = blockStart; charIndex < blockEnd; charIndex++)
             {
-                var run = _runs.getRun(_runIndex);
-                while ((run == null || run.end <= charIndex || charIndex < run.start) &&
-                       _runIndex + 1 < _runs.size)
-                {
-                    _runIndex++;
-                    run = _runs.getRun(_runIndex);
-                }
-
+                runIterator.nextTo(charIndex);
+                var run = runIterator.run;
+                var font = _styleRunFonts[runIterator.runIndex];
                 if (run.start == charIndex)
                 {
-                    run.font.RequestCharactersInTexture(_text.Substring(run.start, run.end - run.start), run.style.UnityFontSize, run.style.UnityFontStyle);
+                    font.RequestCharactersInTexture(_text.Substring(run.start, run.end - run.start), 0, run.style.UnityFontStyle);
                 }
 
                 var style = run.style;
-                var font = run.font;
-
-
                 CharacterInfo charInfo;
-                var result = font.GetCharacterInfo(_text[charIndex], out charInfo);
-                // _characterSize[charIndex] = style.UnityFontSize;
-
-                // 
+                
+                var result = font.GetCharacterInfo(_text[charIndex], out charInfo, 0, run.style.UnityFontStyle);
+ 
                 if (_text[charIndex] == '\t')
                 {
                     _spaceCount++;
@@ -129,20 +119,6 @@ namespace UIWidgets.ui
                 }
 
 
-                /*
-                 *  CharacterInfo charInfo;
-        context.font.GetCharacterInfo(c, out charInfo,
-            context.style.UnityFontSize, context.style.UnityFontStyle);
-        _characterInfos[context.index] = charInfo;
-        _characterPositions[context.index].x = context.offset.x;
-       //  _characterPositions[context.index].y = context.offset.y;
-    
-        if (context.offset.x + charInfo.advance > _width)
-        {
-            wordWrap(context);
-        }
-        return null;
-                 */
             }
 
             makeLine(blockEnd, blockEnd);

@@ -49,7 +49,9 @@ namespace UIWidgets.ui
         private List<double> _lineWidths = new List<double>();
         private Vector2[] _characterPositions;
         private CharacterInfo[] _characterInfos;
-        private Font[] _fonts;
+        private double _maxIntrinsicWidth;
+        private double _minIntrinsicWidth;
+        private Font[] _styleRunFonts;
         
         private float[] _characterWidths; 
         private float[] _characterSize; 
@@ -99,8 +101,19 @@ namespace UIWidgets.ui
 
         public void paint(Canvas canvas, double x, double y)
         {
-            var mesh = generateMesh();
-            
+            //var mesh = ;
+            for (int runIndex = 0; runIndex < _runs.size; ++runIndex)
+            {
+                var run = _runs.getRun(runIndex);
+                if (run.start < run.end)
+                {
+                    var font = _styleRunFonts[runIndex];
+                    var mesh = generateMesh(x, y, font, run);
+                    canvas.drawMesh(mesh, font.material);
+                }
+     
+            }
+           // canvas.drawMesh(mesh, _text, _runs);
         }
 
         public void layout(ParagraphConstraints constraints)
@@ -109,6 +122,7 @@ namespace UIWidgets.ui
 //            {
 //                return;
 //            }
+            
             _needsLayout = false;
             _width = Math.Floor(constraints.width);
             
@@ -117,6 +131,19 @@ namespace UIWidgets.ui
             computeLineBreak();
             layoutLines();
 
+            _maxIntrinsicWidth = 0;
+            double lineBlockWidth = 0;
+            for (int i = 0; i < _lineRanges.Count; ++i)
+            {
+                var line = _lineRanges[i];
+                lineBlockWidth += _lineWidths[i];
+                if (line.hardBreak)
+                {
+                    _maxIntrinsicWidth = Math.Max(lineBlockWidth, _maxIntrinsicWidth);
+                    lineBlockWidth = 0;
+                }
+            }
+            
         }
         
         
@@ -126,12 +153,14 @@ namespace UIWidgets.ui
             _text = text;
             _runs = runs;
             _needsLayout = true;
+            _styleRunFonts = null;
         }
 
         public void setParagraphStyle(ParagraphStyle style)
         {
             _needsLayout = true;
             _paragraphStyle = style;
+            _styleRunFonts = null;
         }
 
         public static void offsetCharacters(Vector2 offset, Vector2[] characterPos, int start, int end)
@@ -144,22 +173,6 @@ namespace UIWidgets.ui
                 }
             }
         }
-        
-        private Offset insertCharacter(char c, LayoutContext context)
-        {
-            CharacterInfo charInfo;
-            context.font.GetCharacterInfo(c, out charInfo,
-                context.style.UnityFontSize, context.style.UnityFontStyle);
-            _characterInfos[context.index] = charInfo;
-            _characterPositions[context.index].x = context.offset.x;
-           //  _characterPositions[context.index].y = context.offset.y;
-        
-            if (context.offset.x + charInfo.advance > _width)
-            {
-                wordWrap(context);
-            }
-            return null;
-        }
 
         private void wordWrap(LayoutContext context)
         {
@@ -169,15 +182,26 @@ namespace UIWidgets.ui
             }
         }
         
-       
-        
         private void setup()
         {
             _characterPositions = new Vector2[_text.Length];
             _characterInfos = new CharacterInfo[_text.Length];
             _characterSize = new float[_text.Length];
             _characterWidths = new float[_text.Length];
-            _fonts = new Font[_text.Length];
+            if (_styleRunFonts == null)
+            {
+                _styleRunFonts = new Font[_runs.size];
+                for (int i = 0; i < _styleRunFonts.Length; ++i)
+                {
+                    var run = _runs.getRun(i);
+                    if (run.start < run.end)
+                    {
+                        _styleRunFonts[i] =  Font.CreateDynamicFontFromOSFont(run.style.safeFontFamily,
+                            run.style.UnityFontSize);
+                    }
+                }
+            }
+
             
             
 //            for (var i = 0; i < _runs.size; i++)
@@ -206,16 +230,21 @@ namespace UIWidgets.ui
                 for (;runIndex < _runs.size;runIndex++)
                 {
                     var run = _runs.getRun(runIndex);
-                    var ascent = run.font.ascent * (run.style.height??1.0);
-                    var descent = (run.font.lineHeight - run.font.ascent) * (run.style.height??1.0);
-                    if (ascent > maxAscent)
+                    if (run.start < run.end)
                     {
-                        maxAscent = ascent;
+                        var font = _styleRunFonts[runIndex];
+                        var ascent = font.ascent * (run.style.height??1.0);
+                        var descent = (font.lineHeight - font.ascent) * (run.style.height??1.0);
+                        if (ascent > maxAscent)
+                        {
+                            maxAscent = ascent;
+                        }
+                        if (descent > maxDescent)
+                        {
+                            maxDescent = descent;
+                        }
                     }
-                    if (descent > maxDescent)
-                    {
-                        maxDescent = descent;
-                    }
+
                     if (runIndex + 1 < _runs.size)
                     {
                         var nextRun = _runs.getRun(runIndex + 1);
@@ -232,6 +261,8 @@ namespace UIWidgets.ui
                 {
                     _characterPositions[charIndex].y = (float)yOffset;
                 }
+
+               
             }
         }
         
@@ -254,7 +285,7 @@ namespace UIWidgets.ui
             int runIndex = 0;
             StyledRuns.Run lastRun = null;
             var lineBreaker = new LineBreaker();
-            lineBreaker.setup(_text, _runs, (float)_width, _characterPositions, _characterWidths);
+            lineBreaker.setup(_text, _runs, _styleRunFonts, (float)_width, _characterPositions, _characterWidths);
             
             for (var newlineIndex = 0; newlineIndex < newLinePositions.Count; ++newlineIndex)
             {
@@ -289,41 +320,42 @@ namespace UIWidgets.ui
 
         }
 
-        private Mesh generateMesh()
+        private Mesh generateMesh(double x, double y, Font font, StyledRuns.Run run)
         {
             var vertices = new Vector3[_text.Length * 4];
             var triangles = new int[_text.Length * 6];
             var uv = new Vector2[_text.Length * 4];
-            Vector3 pos = Vector3.zero;
-
-            int runIndex = 0;
-            for (int charIndex = 0; charIndex < _text.Length; charIndex++)
+            Vector3 pos = new Vector3((float)x, (float)y, 0);
+            var offset = new Vector2((float) x, (float) y);
+            font.RequestCharactersInTexture(_text.Substring(run.start, run.end - run.start), run.style.UnityFontSize, run.style.UnityFontStyle);
+            for (int charIndex = run.start; charIndex < run.end; ++charIndex)
             {
-                var run = _runs.getRun(runIndex);
-                while ((run == null || run.end <= charIndex || charIndex < run.start) &&
-                       charIndex + 1 < _runs.size)
-                {
-                    charIndex++;
-                    run = _runs.getRun(charIndex);
-                }
-
-                if (run.start == charIndex)
-                {
-                    run.font.RequestCharactersInTexture(_text.Substring(run.start, run.end - run.start), run.style.UnityFontSize, run.style.UnityFontStyle);
-                }
-
                 CharacterInfo charInfo;
-                var result = run.font.GetCharacterInfo(_text[charIndex], out charInfo);
-                var position = _characterPositions[charIndex];
-                vertices[4 * charIndex + 0] = pos + new Vector3(charInfo.minX, position.y - charInfo.maxY, 0);
-                vertices[4 * charIndex + 1] = pos + new Vector3(charInfo.maxX, position.y - charInfo.maxY, 0);
-                vertices[4 * charIndex + 2] = pos + new Vector3(charInfo.maxX, position.y + charInfo.minY, 0);
-                vertices[4 * charIndex + 3] = pos + new Vector3(charInfo.minX, position.y + charInfo.minY, 0);
-                
-                uv[4 * charIndex + 0] = charInfo.uvTopLeft;
-                uv[4 * charIndex + 1] = charInfo.uvTopRight;
-                uv[4 * charIndex + 2] = charInfo.uvBottomRight;
-                uv[4 * charIndex + 3] = charInfo.uvBottomLeft;
+                var result = font.GetCharacterInfo(_text[charIndex], out charInfo);
+                var position = _characterPositions[charIndex] + offset;
+                 
+                vertices[4 * charIndex + 0] = pos + new Vector3(position.x + charInfo.minX, position.y - charInfo.maxY, 0);
+                vertices[4 * charIndex + 1] = pos + new Vector3(position.x + charInfo.maxX, position.y - charInfo.maxY, 0);
+                vertices[4 * charIndex + 2] = pos + new Vector3(position.x + charInfo.maxX, position.y - charInfo.minY, 0);
+                vertices[4 * charIndex + 3] = pos + new Vector3(position.x + charInfo.minX, position.y - charInfo.minY, 0);
+
+                if (_text[charIndex] != ' ' && _text[charIndex] != '\t')
+                {
+                    uv[4 * charIndex + 0] = charInfo.uvTopLeft;
+                    uv[4 * charIndex + 1] = charInfo.uvTopRight;
+                    uv[4 * charIndex + 2] = charInfo.uvBottomRight;
+                    uv[4 * charIndex + 3] = charInfo.uvBottomLeft;
+                   
+                }
+                else
+                {
+                    uv[4 * charIndex + 0] = Vector2.zero;
+                    uv[4 * charIndex + 1] = Vector2.zero;
+                    uv[4 * charIndex + 2] = Vector2.zero;
+                    uv[4 * charIndex + 3] = Vector2.zero;
+                    
+                }
+               
 
                 triangles[6 * charIndex + 0] = 4 * charIndex + 0;
                 triangles[6 * charIndex + 1] = 4 * charIndex + 1;
@@ -333,13 +365,20 @@ namespace UIWidgets.ui
                 triangles[6 * charIndex + 4] = 4 * charIndex + 2;
                 triangles[6 * charIndex + 5] = 4 * charIndex + 3;
             }
-            
+
             var mesh = new Mesh()
             {
                 vertices = vertices,
                 triangles = triangles,
                 uv = uv
             };
+            var colors = new UnityEngine.Color[vertices.Length];
+            for (var i = 0; i < colors.Length; i++)
+            {
+                colors[i] = run.style.UnityColor;
+            }
+
+            mesh.colors = colors;
  
             return mesh;
         }

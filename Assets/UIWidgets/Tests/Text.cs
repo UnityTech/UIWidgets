@@ -80,15 +80,18 @@ namespace UIWidgets.Tests
             TextBaseline textBaseline, double height, TextDecoration decoration
              * 
              */
-            var style1 = new painting.TextStyle(true, Color.fromARGB(1, 2, 2, 2), null, FontWeight.w400, FontStyle.normal, 1,
+            var style1 = new painting.TextStyle(true, Color.fromARGB(255, 0, 0, 0), null, FontWeight.w400, FontStyle.normal, 1,
                 1, TextBaseline.alphabetic, 1, TextDecoration.none);
-            var style2 = new painting.TextStyle(true, Color.fromARGB(1, 2, 2, 2), null, FontWeight.w400, FontStyle.normal, 1,
-                1, TextBaseline.alphabetic, 1, TextDecoration.none);
+            var style2 = new painting.TextStyle(true, Color.fromARGB(255, 255, 0, 0), null, FontWeight.w400, FontStyle.normal, 1,
+                1, TextBaseline.alphabetic, 1, TextDecoration.none, fontFamily:"Helvetica");
             return new RenderConstrainedOverflowBox(
-                minWidth: 100,
-                maxWidth: 100,
+                minWidth: 200,
+                maxWidth: 200,
                 minHeight: 100,
                 maxHeight: 100,
+                alignment: Alignment.center,
+//                child: new RenderParagraph(new TextSpan(style1, "is is FontStyle fontStyle, double letterSpacing, double wordSpacing, ",
+//                    null))
                 child: new RenderParagraph(new TextSpan(style1, "",
                     new List<TextSpan>()
                     {

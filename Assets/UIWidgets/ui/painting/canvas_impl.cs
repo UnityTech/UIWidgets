@@ -86,6 +86,7 @@ namespace UIWidgets.ui {
                 GL.End();
             }
         }
+        
 
         public void drawRect(Rect rect, BorderWidth borderWidth, BorderRadius borderRadius, Paint paint) {
             this.prepareGL(CanvasImpl.guiRoundedRectMat);
@@ -99,6 +100,7 @@ namespace UIWidgets.ui {
                 new UnityEngine.Rect(0.0f, 0.0f, 1f, 1f), 0, 0, 0, 0,
                 paint.color.toColor(), CanvasImpl.guiRoundedRectMat);
         }
+        
 
         public void drawRectShadow(Rect rect, Paint paint) {
             this.prepareGL(CanvasImpl.shadowRectMat);
@@ -151,6 +153,9 @@ namespace UIWidgets.ui {
                 } else if (drawCmd is DrawClipRRect) {
                     var drawClipRRect = (DrawClipRRect) drawCmd;
                     this.clipRRect(drawClipRRect.rrect);
+                } else if (drawCmd is DrawMesh) {
+                    var drawMesh = (DrawMesh) drawCmd;
+                    this.drawMesh(drawMesh.mesh, drawMesh.material);
                 } else {
                     throw new Exception("unknown drawCmd: " + drawCmd);
                 }
@@ -238,6 +243,12 @@ namespace UIWidgets.ui {
             }
 
             this.pushClipRRect(rect, this._transform);
+        }
+
+        public void drawMesh(Mesh mesh, Material material)
+        {
+            material.SetPass(0);
+            Graphics.DrawMeshNow(mesh, Matrix4x4.identity);
         }
 
         private void pushClipRect(Rect clipRect, Matrix4x4 transform) {
