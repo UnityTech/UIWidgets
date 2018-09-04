@@ -289,16 +289,16 @@ namespace UIWidgets.rendering {
             }
         }
 
-        public void insert(ChildType child, ChildType after = null) {
+        public virtual void insert(ChildType child, ChildType after = null) {
             this.adoptChild(child);
             this._insertIntoChildList(child, after);
         }
 
-        public void add(ChildType child) {
+        public virtual void add(ChildType child) {
             this.insert(child, this._lastChild);
         }
 
-        public void addAll(List<ChildType> children) {
+        public virtual void addAll(List<ChildType> children) {
             if (children != null) {
                 children.ForEach(this.add);
             }
@@ -326,12 +326,12 @@ namespace UIWidgets.rendering {
             this._childCount--;
         }
 
-        public void remove(ChildType child) {
+        public virtual void remove(ChildType child) {
             this._removeFromChildList(child);
             this.dropChild(child);
         }
 
-        public void removeAll() {
+        public virtual void removeAll() {
             ChildType child = this._firstChild;
             while (child != null) {
                 var childParentData = (ParentDataType) child.parentData;
@@ -460,16 +460,16 @@ namespace UIWidgets.rendering {
             }
         }
 
-        public void insert(ChildType child, ChildType after = null) {
+        public virtual void insert(ChildType child, ChildType after = null) {
             this.adoptChild(child);
             this._insertIntoChildList(child, after);
         }
 
-        public void add(ChildType child) {
+        public virtual void add(ChildType child) {
             this.insert(child, this._lastChild);
         }
 
-        public void addAll(List<ChildType> children) {
+        public virtual void addAll(List<ChildType> children) {
             if (children != null) {
                 children.ForEach(this.add);
             }
@@ -497,12 +497,12 @@ namespace UIWidgets.rendering {
             this._childCount--;
         }
 
-        public void remove(ChildType child) {
+        public virtual void remove(ChildType child) {
             this._removeFromChildList(child);
             this.dropChild(child);
         }
 
-        public void removeAll() {
+        public virtual void removeAll() {
             ChildType child = this._firstChild;
             while (child != null) {
                 var childParentData = (ParentDataType) child.parentData;
