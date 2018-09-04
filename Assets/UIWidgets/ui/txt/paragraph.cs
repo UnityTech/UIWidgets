@@ -121,6 +121,15 @@ namespace UIWidgets.ui
             return ch == ' ' || ch == CHAR_NBSP;
         }
         
+        // This function determines whether a character is a space that disappears at end of line.
+        // It is the Unicode set: [[:General_Category=Space_Separator:]-[:Line_Break=Glue:]],
+        // plus '\n'.
+        // Note: all such characters are in the BMP, so it's ok to use code units for this.
+        static bool isLineEndSpace(char c) {
+            return c == '\n' || c == ' ' || c == 0x1680 || (0x2000 <= c && c <= 0x200A && c != 0x2007) ||
+                   c == 0x205F || c == 0x3000;
+        }
+        
         public double height
         {
             get { return _lineHeights.Count == 0 ? 0 : _lineHeights[_lineHeights.Count - 1]; }
@@ -205,7 +214,24 @@ namespace UIWidgets.ui
                     {
                         maxWordWidth = wordWidth;
                     }
-                });  
+                });
+
+                if (_paragraphStyle.TextAlign == TextAlign.justify && !_lineRanges[lineNumber].hardBreak
+                    && lineNumber != lineLimits - 1)
+                {
+                    justifyLine(lineNumber, words);
+                } else if (line.endExcludingWhitespace > line.start)
+                {
+                    Debug.Assert(!isLineEndSpace(_text[line.endExcludingWhitespace - 1]));
+                    var lineTotalAdvance = _characterPositions[line.endExcludingWhitespace - 1].x +
+                                           _characterWidths[line.endExcludingWhitespace - 1];
+                    double xOffset = getLineXOffset(lineTotalAdvance);
+                    if (xOffset > 0 || xOffset < 0)
+                    {
+                        offsetCharacters(new Vector2((float)xOffset, 0), 
+                            _characterPositions, line.start, line.endExcludingWhitespace);
+                    }
+                }
                 
             }
             
@@ -346,6 +372,8 @@ namespace UIWidgets.ui
                     _characterPositions[charIndex].y = (float)yOffset;
                 }
                
+                
+                
                 _lineHeights.Add((_lineHeights.Count == 0 ? 0 : _lineHeights[_lineHeights.Count - 1]) + 
                                  Math.Round(maxAscent + maxDescent));
             }
@@ -388,13 +416,13 @@ namespace UIWidgets.ui
                     var line = lines[i];
                     var end = i + 1 < lines.Count ? lines[i + 1].start : blockEnd;
 
-                    var nonWhiteSpace = end - 1;
-                    while (nonWhiteSpace >= line.start && _text[nonWhiteSpace] == ' ' || _text[nonWhiteSpace] == '\t')
+                    var nonSpaceEnd = end;
+                    while (nonSpaceEnd > line.start && isLineEndSpace(_text[nonSpaceEnd - 1]))
                     {
-                        nonWhiteSpace--;
+                        nonSpaceEnd--;
                     }
                     
-                    _lineRanges.Add(new LineRange(line.start, end, nonWhiteSpace, end + 1, end == blockEnd));
+                    _lineRanges.Add(new LineRange(line.start, end, nonSpaceEnd, end + 1, end == blockEnd));
                     _lineWidths.Add(line.width);
                 }
             }
@@ -421,21 +449,19 @@ namespace UIWidgets.ui
                 vertices[4 * charIndex + 2] = offset + new Vector3(position.x + charInfo.maxX, position.y - charInfo.minY, 0);
                 vertices[4 * charIndex + 3] = offset + new Vector3(position.x + charInfo.minX, position.y - charInfo.minY, 0);
 
-                if (_text[charIndex] != ' ' && _text[charIndex] != '\t' && _text[charIndex] != '\n')
+                if (isWordSpace(_text[charIndex]) || isLineEndSpace(_text[charIndex]) || _text[charIndex] == '\t')
+                {                    
+                    uv[4 * charIndex + 0] = Vector2.zero;
+                    uv[4 * charIndex + 1] = Vector2.zero;
+                    uv[4 * charIndex + 2] = Vector2.zero;
+                    uv[4 * charIndex + 3] = Vector2.zero;
+                } else
                 {
                     uv[4 * charIndex + 0] = charInfo.uvTopLeft;
                     uv[4 * charIndex + 1] = charInfo.uvTopRight;
                     uv[4 * charIndex + 2] = charInfo.uvBottomRight;
                     uv[4 * charIndex + 3] = charInfo.uvBottomLeft;
                    
-                }
-                else
-                {
-                    uv[4 * charIndex + 0] = Vector2.zero;
-                    uv[4 * charIndex + 1] = Vector2.zero;
-                    uv[4 * charIndex + 2] = Vector2.zero;
-                    uv[4 * charIndex + 3] = Vector2.zero;
-                    
                 }
                
                 triangles[6 * charIndex + 0] = 4 * charIndex + 0;
@@ -464,6 +490,44 @@ namespace UIWidgets.ui
             return mesh;
         }
 
+        private double getLineXOffset(double lineTotalAdvance) {
+            if (double.IsInfinity(_width))
+            {
+                return 0;
+            }
+                
+            var align = _paragraphStyle.TextAlign;
+            if (align == TextAlign.right) {
+                return _width - lineTotalAdvance;
+            } else if (align == TextAlign.center) {
+                return (_width - lineTotalAdvance) / 2;
+            } else {
+                return 0;
+            }
+        }
+
+        private void justifyLine(int lineNumber, List<Range<int>> words)
+        {
+            if (words.Count <= 1)
+            {
+                return;
+            }
+
+            var line = _lineRanges[lineNumber];
+            Debug.Assert(!isLineEndSpace(_text[line.endExcludingWhitespace - 1]));
+            var lineTotalAdvance = _characterPositions[line.endExcludingWhitespace - 1].x +
+                                   _characterWidths[line.endExcludingWhitespace - 1];
+            double gapWidth = (_width - lineTotalAdvance) / (words.Count - 1);
+    
+            double justifyOffset = 0.0;
+            foreach (var word in words)
+            {
+                offsetCharacters(new Vector2((float)(justifyOffset), 0.0f), 
+                    _characterPositions, word.start, word.end);
+                justifyOffset += gapWidth;
+            }
+        }
+        
         private List<Range<int>> findWords(int start, int end)
         {
             var inWord = false;

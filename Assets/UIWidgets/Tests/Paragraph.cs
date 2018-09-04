@@ -25,7 +25,8 @@ namespace UIWidgets.Tests
             this._options = new Func<RenderBox>[] {
                 this.text,
                 this.textHeight,
-                this.textOverflow
+                this.textOverflow,
+                this.textAlign,
             };
             this._optionStrings = this._options.Select(x => x.Method.Name).ToArray();
             this._selected = 0;
@@ -119,6 +120,38 @@ namespace UIWidgets.Tests
                         new TextSpan(style: new painting.TextStyle(fontSize: 14), 
                             text: "FontSize 14"),
                     })));
+        }
+        
+        
+        RenderBox textAlign()
+        {
+//            var flexbox = new RenderFlex(
+//                direction: Axis.horizontal,
+//                crossAxisAlignment: CrossAxisAlignment.center);
+//
+//            flexbox.add(box(
+//                new RenderParagraph(new TextSpan("Align To Left\nMaterials define how light reacts with the " +
+//                                                 "surface of a model, and are an essential ingredient in making " +
+//                                                 "believable visuals. When you’ve created a "), textAlign: TextAlign.left)
+//            ));
+//            flexbox.add(box(
+//                new RenderParagraph(new TextSpan("Align To Right\nMaterials define how light reacts with the " +
+//                                                 "surface of a model, and are an essential ingredient in making " +
+//                                                 "believable visuals. When you’ve created a "), textAlign: TextAlign.right)
+//            ));
+//            flexbox.add(box(
+//                new RenderParagraph(new TextSpan("Align To Center\nMaterials define how light reacts with the " +
+//                                                 "surface of a model, and are an essential ingredient in making " +
+//                                                 "believable visuals. When you’ve created a "), textAlign: TextAlign.center)
+//            ));
+          //return flexbox;
+            return box(
+                new RenderParagraph(new TextSpan("Align To Center\nMaterials define how light reacts with the " +
+                                                 "surface of a model, and    are an essential ingredient in making " +
+                                                 "believable visuals.       When you’ve created  a when you want to un-tether " +
+                                                 "the specular   color from the material’s albedo. This is the case with " +
+                                                 "non-metal \t materials or "), textAlign: TextAlign.center)
+            );
         }
         
         RenderBox textOverflow()
