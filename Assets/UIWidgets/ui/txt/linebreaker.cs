@@ -20,7 +20,6 @@ namespace UIWidgets.ui
         private float _width;
         private int _lineStart;
         private int _wordStart;
-        private int _runIndex = 0;
         private int _spaceCount = 0;
         private int tabCount = 4;
         private double _lineLength;
@@ -42,10 +41,14 @@ namespace UIWidgets.ui
         {
             return _lines;
         }
-        
+   
         public void doBreak(int blockStart, int blockEnd)
         {
             _lines = new List<LineInfo>();
+            _lineStart = blockStart;
+            _wordStart = blockStart;
+            _spaceCount = 0;
+            
             float offsetX = 0.0f;
             var runIterator = _runs.iterator();
             for (var charIndex = blockStart; charIndex < blockEnd; charIndex++)
@@ -53,10 +56,6 @@ namespace UIWidgets.ui
                 runIterator.nextTo(charIndex);
                 var run = runIterator.run;
                 var font = _styleRunFonts[runIterator.runIndex];
-                if (run.start == charIndex)
-                {
-                    font.RequestCharactersInTexture(_text.Substring(run.start, run.end - run.start), 0, run.style.UnityFontStyle);
-                }
 
                 var style = run.style;
                 CharacterInfo charInfo;

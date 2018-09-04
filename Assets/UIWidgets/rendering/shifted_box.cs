@@ -65,7 +65,7 @@ namespace UIWidgets.rendering {
     }
 
     public class RenderPadding : RenderShiftedBox {
-        RenderPadding(
+        public RenderPadding(
             EdgeInsets padding = null,
             RenderBox child = null
         ) : base(child) {

@@ -76,7 +76,7 @@ namespace UIWidgets.ui {
         public static readonly double defaultFontSize = 14.0;
         public static readonly FontWeight defaultFontWeight = FontWeight.w400;
         public static readonly FontStyle defaultFontStyle = FontStyle.normal;
-        public static readonly Color defaultColor = Color.fromARGB(255, 255, 255, 255);
+        public static readonly Color defaultColor = Color.fromARGB(255, 0, 0, 0);
         public Color color;
         public double? fontSize;
         public FontWeight? fontWeight;

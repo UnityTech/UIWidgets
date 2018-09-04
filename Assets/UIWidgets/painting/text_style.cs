@@ -42,6 +42,7 @@ namespace UIWidgets.painting
                 color: color,
                 decoration: decoration,
                 fontWeight: fontWeight,
+                fontStyle: fontStyle,
                 fontSize: fontSize == null ? null : fontSize * textScaleFactor,
                 letterSpacing: letterSpacing,
                 wordSpacing: wordSpacing,

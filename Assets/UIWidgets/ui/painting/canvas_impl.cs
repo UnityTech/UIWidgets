@@ -247,6 +247,7 @@ namespace UIWidgets.ui {
 
         public void drawMesh(Mesh mesh, Material material)
         {
+            prepareGL(material);
             material.SetPass(0);
             Graphics.DrawMeshNow(mesh, Matrix4x4.identity);
         }

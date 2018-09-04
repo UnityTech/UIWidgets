@@ -18,6 +18,7 @@ namespace UIWidgets.ui
         
         public Paragraph build()
         {
+            _runs.endRunIfNeeded(_text.Length);
             var paragraph = new Paragraph();
             paragraph.setText(_text.ToString(), _runs);
             paragraph.setParagraphStyle(_paragraphStyle);

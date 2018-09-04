@@ -12,9 +12,9 @@ namespace UIWidgets.Tests {
             EditorWindow.GetWindow(typeof(RenderBoxes));
         }
         
-        [MenuItem("UIWidgetsTests/Text")]
-        public static void renderText() {
-            EditorWindow.GetWindow(typeof(Text));
+        [MenuItem("UIWidgetsTests/RenderParagraph")]
+        public static void renderRenderParagraph() {
+            EditorWindow.GetWindow(typeof(Paragraph));
         }
     }
 }

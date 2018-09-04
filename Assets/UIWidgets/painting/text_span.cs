@@ -20,7 +20,7 @@ namespace UIWidgets.painting
         public readonly List<TextSpan> children;
         public readonly GestureMock recognizer;
 
-        public TextSpan(TextStyle style, string text, List<TextSpan> children)
+        public TextSpan(string text = "", TextStyle style = null, List<TextSpan> children = null)
         {
             this.text = text;
             this.style = style;
