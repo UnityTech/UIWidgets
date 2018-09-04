@@ -135,4 +135,46 @@ namespace UIWidgets.ui {
             };
         }
     }
+
+    public class ColorFilter {
+        public ColorFilter(Color color, BlendMode blendMode) {
+            _color = color;
+            _blendMode = blendMode;
+        }
+
+        Color _color;
+        BlendMode _blendMode;
+    }
+
+    public enum BlendMode {
+        None = 0, // explicitly assign zero to make it more clear
+        clear,
+        src,
+        dst,
+        dstOver,
+        srcIn,
+        dstIn,
+        srcOut,
+        dstOut,
+        srcATop,
+        dstATop,
+        xor,
+        plus,
+        modulate,
+        screen, // The last coeff mode.
+        overlay,
+        darken,
+        lighten,
+        colorDodge,
+        colorBurn,
+        hardLight,
+        softLight,
+        difference,
+        exclusion,
+        multiply, // The last separable mode.
+        hue,
+        saturation,
+        color,
+        luminosity,
+    }
 }

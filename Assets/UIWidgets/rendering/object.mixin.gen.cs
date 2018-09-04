@@ -96,6 +96,50 @@ namespace UIWidgets.rendering {
     }
 
 
+    public abstract class RenderObjectWithChildMixinRenderSliver<ChildType> : RenderSliver where ChildType : RenderObject {
+        public ChildType _child;
+
+        public ChildType child {
+            get { return this._child; }
+            set {
+                if (this._child != null) {
+                    this.dropChild(this._child);
+                }
+
+                this._child = value;
+                if (this._child != null) {
+                    this.adoptChild(this._child);
+                }
+            }
+        }
+
+        public override void attach(object owner) {
+            base.attach(owner);
+            if (this._child != null) {
+                this._child.attach(owner);
+            }
+        }
+
+        public override void detach() {
+            base.detach();
+            if (this._child != null) {
+                this._child.detach();
+            }
+        }
+
+        public override void redepthChildren() {
+            if (this._child != null) {
+                this.redepthChild(this._child);
+            }
+        }
+
+        public override void visitChildren(RenderObjectVisitor visitor) {
+            if (this._child != null) {
+                visitor(this._child);
+            }
+        }
+    }
+
 
 
     public abstract class ContainerParentDataMixinParentData<ChildType> : ParentData, ContainerParentDataMixin<ChildType> where ChildType : RenderObject {
@@ -148,6 +192,56 @@ namespace UIWidgets.rendering {
 
 
 
+    public abstract class ContainerParentDataMixinSliverPhysicalParentData<ChildType> : SliverPhysicalParentData, ContainerParentDataMixin<ChildType> where ChildType : RenderObject {
+        public ChildType previousSibling { get; set; }
+
+        public ChildType nextSibling { get; set; }
+
+        public override void detach() {
+            base.detach();
+
+            if (this.previousSibling != null) {
+                var previousSiblingParentData = (ContainerParentDataMixin<ChildType>) this.previousSibling.parentData;
+                previousSiblingParentData.nextSibling = this.nextSibling;
+            }
+
+            if (this.nextSibling != null) {
+                var nextSiblingParentData = (ContainerParentDataMixin<ChildType>) this.nextSibling.parentData;
+                nextSiblingParentData.previousSibling = this.previousSibling;
+            }
+
+            this.previousSibling = null;
+            this.nextSibling = null;
+        }
+    }
+
+
+
+    public abstract class ContainerParentDataMixinSliverLogicalParentData<ChildType> : SliverLogicalParentData, ContainerParentDataMixin<ChildType> where ChildType : RenderObject {
+        public ChildType previousSibling { get; set; }
+
+        public ChildType nextSibling { get; set; }
+
+        public override void detach() {
+            base.detach();
+
+            if (this.previousSibling != null) {
+                var previousSiblingParentData = (ContainerParentDataMixin<ChildType>) this.previousSibling.parentData;
+                previousSiblingParentData.nextSibling = this.nextSibling;
+            }
+
+            if (this.nextSibling != null) {
+                var nextSiblingParentData = (ContainerParentDataMixin<ChildType>) this.nextSibling.parentData;
+                nextSiblingParentData.previousSibling = this.previousSibling;
+            }
+
+            this.previousSibling = null;
+            this.nextSibling = null;
+        }
+    }
+
+
+
 
 
     public abstract class ContainerRenderObjectMixinRenderBox<ChildType, ParentDataType> : RenderBox
@@ -156,7 +250,7 @@ namespace UIWidgets.rendering {
 
         public int _childCount = 0;
 
-        public int countCount {
+        public int childCount {
             get { return this._childCount; }
         }
 
@@ -327,7 +421,7 @@ namespace UIWidgets.rendering {
 
         public int _childCount = 0;
 
-        public int countCount {
+        public int childCount {
             get { return this._childCount; }
         }
 

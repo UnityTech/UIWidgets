@@ -165,21 +165,4 @@ namespace UIWidgets.painting {
             }
         }
     }
-
-    public class ImageConfiguration {
-        public ImageConfiguration(Size size = null) {
-            this.size = size;
-        }
-
-        public static readonly ImageConfiguration empty = new ImageConfiguration();
-
-        public ImageConfiguration copyWith(
-            Size size = null) {
-            return new ImageConfiguration(
-                size: size ?? this.size
-            );
-        }
-
-        public readonly Size size;
-    }
 }
