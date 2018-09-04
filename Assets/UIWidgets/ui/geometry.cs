@@ -1,6 +1,28 @@
 using System;
 
 namespace UIWidgets.ui {
+    public static class MathUtils {
+        public static double clamp(this double value, double min, double max) {
+            if (value < min) {
+                value = min;
+            } else if (value > max) {
+                value = max;
+            }
+
+            return value;
+        }
+
+        public static int clamp(this int value, int min, int max) {
+            if (value < min) {
+                value = min;
+            } else if (value > max) {
+                value = max;
+            }
+
+            return value;
+        }
+    }
+
     public abstract class OffsetBase : IEquatable<OffsetBase> {
         protected OffsetBase(double _dx, double _dy) {
             this._dx = _dx;
@@ -104,6 +126,14 @@ namespace UIWidgets.ui {
 
         public static Offset operator +(Offset a, Offset b) {
             return new Offset(a.dx + b.dx, a.dy + b.dy);
+        }
+
+        public static Offset operator *(Offset a, double operand) {
+            return new Offset(a.dx * operand, a.dy * operand);
+        }
+
+        public static Offset operator /(Offset a, double operand) {
+            return new Offset(a.dx / operand, a.dy / operand);
         }
 
         public static Rect operator &(Offset a, Size other) {
@@ -290,6 +320,11 @@ namespace UIWidgets.ui {
         public Rect shift(Offset offset) {
             return Rect.fromLTRB(this.left + offset.dx, this.top + offset.dy, this.right + offset.dx,
                 this.bottom + offset.dy);
+        }
+
+        public Rect translate(double translateX, double translateY) {
+            return Rect.fromLTRB(this.left + translateX, this.top + translateY, this.right + translateX,
+                this.bottom + translateY);
         }
 
         public Rect inflate(double delta) {

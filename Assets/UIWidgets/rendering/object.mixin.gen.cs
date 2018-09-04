@@ -96,6 +96,50 @@ namespace UIWidgets.rendering {
     }
 
 
+    public abstract class RenderObjectWithChildMixinRenderSliver<ChildType> : RenderSliver where ChildType : RenderObject {
+        public ChildType _child;
+
+        public ChildType child {
+            get { return this._child; }
+            set {
+                if (this._child != null) {
+                    this.dropChild(this._child);
+                }
+
+                this._child = value;
+                if (this._child != null) {
+                    this.adoptChild(this._child);
+                }
+            }
+        }
+
+        public override void attach(object owner) {
+            base.attach(owner);
+            if (this._child != null) {
+                this._child.attach(owner);
+            }
+        }
+
+        public override void detach() {
+            base.detach();
+            if (this._child != null) {
+                this._child.detach();
+            }
+        }
+
+        public override void redepthChildren() {
+            if (this._child != null) {
+                this.redepthChild(this._child);
+            }
+        }
+
+        public override void visitChildren(RenderObjectVisitor visitor) {
+            if (this._child != null) {
+                visitor(this._child);
+            }
+        }
+    }
+
 
 
     public abstract class ContainerParentDataMixinParentData<ChildType> : ParentData, ContainerParentDataMixin<ChildType> where ChildType : RenderObject {
@@ -148,6 +192,56 @@ namespace UIWidgets.rendering {
 
 
 
+    public abstract class ContainerParentDataMixinSliverPhysicalParentData<ChildType> : SliverPhysicalParentData, ContainerParentDataMixin<ChildType> where ChildType : RenderObject {
+        public ChildType previousSibling { get; set; }
+
+        public ChildType nextSibling { get; set; }
+
+        public override void detach() {
+            base.detach();
+
+            if (this.previousSibling != null) {
+                var previousSiblingParentData = (ContainerParentDataMixin<ChildType>) this.previousSibling.parentData;
+                previousSiblingParentData.nextSibling = this.nextSibling;
+            }
+
+            if (this.nextSibling != null) {
+                var nextSiblingParentData = (ContainerParentDataMixin<ChildType>) this.nextSibling.parentData;
+                nextSiblingParentData.previousSibling = this.previousSibling;
+            }
+
+            this.previousSibling = null;
+            this.nextSibling = null;
+        }
+    }
+
+
+
+    public abstract class ContainerParentDataMixinSliverLogicalParentData<ChildType> : SliverLogicalParentData, ContainerParentDataMixin<ChildType> where ChildType : RenderObject {
+        public ChildType previousSibling { get; set; }
+
+        public ChildType nextSibling { get; set; }
+
+        public override void detach() {
+            base.detach();
+
+            if (this.previousSibling != null) {
+                var previousSiblingParentData = (ContainerParentDataMixin<ChildType>) this.previousSibling.parentData;
+                previousSiblingParentData.nextSibling = this.nextSibling;
+            }
+
+            if (this.nextSibling != null) {
+                var nextSiblingParentData = (ContainerParentDataMixin<ChildType>) this.nextSibling.parentData;
+                nextSiblingParentData.previousSibling = this.previousSibling;
+            }
+
+            this.previousSibling = null;
+            this.nextSibling = null;
+        }
+    }
+
+
+
 
 
     public abstract class ContainerRenderObjectMixinRenderBox<ChildType, ParentDataType> : RenderBox
@@ -156,7 +250,7 @@ namespace UIWidgets.rendering {
 
         public int _childCount = 0;
 
-        public int countCount {
+        public int childCount {
             get { return this._childCount; }
         }
 
@@ -195,16 +289,16 @@ namespace UIWidgets.rendering {
             }
         }
 
-        public void insert(ChildType child, ChildType after = null) {
+        public virtual void insert(ChildType child, ChildType after = null) {
             this.adoptChild(child);
             this._insertIntoChildList(child, after);
         }
 
-        public void add(ChildType child) {
+        public virtual void add(ChildType child) {
             this.insert(child, this._lastChild);
         }
 
-        public void addAll(List<ChildType> children) {
+        public virtual void addAll(List<ChildType> children) {
             if (children != null) {
                 children.ForEach(this.add);
             }
@@ -232,12 +326,12 @@ namespace UIWidgets.rendering {
             this._childCount--;
         }
 
-        public void remove(ChildType child) {
+        public virtual void remove(ChildType child) {
             this._removeFromChildList(child);
             this.dropChild(child);
         }
 
-        public void removeAll() {
+        public virtual void removeAll() {
             ChildType child = this._firstChild;
             while (child != null) {
                 var childParentData = (ParentDataType) child.parentData;
@@ -327,7 +421,7 @@ namespace UIWidgets.rendering {
 
         public int _childCount = 0;
 
-        public int countCount {
+        public int childCount {
             get { return this._childCount; }
         }
 
@@ -366,16 +460,16 @@ namespace UIWidgets.rendering {
             }
         }
 
-        public void insert(ChildType child, ChildType after = null) {
+        public virtual void insert(ChildType child, ChildType after = null) {
             this.adoptChild(child);
             this._insertIntoChildList(child, after);
         }
 
-        public void add(ChildType child) {
+        public virtual void add(ChildType child) {
             this.insert(child, this._lastChild);
         }
 
-        public void addAll(List<ChildType> children) {
+        public virtual void addAll(List<ChildType> children) {
             if (children != null) {
                 children.ForEach(this.add);
             }
@@ -403,12 +497,12 @@ namespace UIWidgets.rendering {
             this._childCount--;
         }
 
-        public void remove(ChildType child) {
+        public virtual void remove(ChildType child) {
             this._removeFromChildList(child);
             this.dropChild(child);
         }
 
-        public void removeAll() {
+        public virtual void removeAll() {
             ChildType child = this._firstChild;
             while (child != null) {
                 var childParentData = (ParentDataType) child.parentData;

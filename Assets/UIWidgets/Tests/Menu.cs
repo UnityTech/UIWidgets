@@ -11,5 +11,10 @@ namespace UIWidgets.Tests {
         public static void renderBoxes() {
             EditorWindow.GetWindow(typeof(RenderBoxes));
         }
+        
+        [MenuItem("UIWidgetsTests/RenderParagraph")]
+        public static void renderRenderParagraph() {
+            EditorWindow.GetWindow(typeof(Paragraph));
+        }
     }
 }
