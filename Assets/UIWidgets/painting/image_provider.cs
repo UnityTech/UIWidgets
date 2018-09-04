@@ -3,6 +3,7 @@ using RSG;
 using System.Net;
 using System;
 using System.IO;
+using UIWidgets.lib.cache_manager;
 using UIWidgets.ui;
 using UnityEngine;
 
@@ -42,7 +43,8 @@ namespace UIWidgets.painting {
         }
 
         public override ImageStreamCompleter load(NetworkImage key) {
-            return new OneFrameImageStreamCompleter(_loadAsync(key));
+//            return new OneFrameImageStreamCompleter(_loadAsync(key));
+            return new OneFrameImageStreamCompleter(_loadAsyncWithCache(key));
         }
 
         public static IPromise<ImageInfo> _loadAsync(NetworkImage key) {
@@ -66,6 +68,15 @@ namespace UIWidgets.painting {
             }
 
             return promise; // Return the promise so the caller can await resolution (or error).
+        }
+        
+        public static IPromise<ImageInfo> _loadAsyncWithCache(NetworkImage key) {
+            var cache = CacheManager.getInstance();
+            var result = cache.getMeta(key.url).
+                Then(meta => cache.downloadFileIfNeeded(meta)).
+                Then(meta => cache.updateMeta(meta)).
+                Then(path => cache.loadCacheFile(path));
+            return result;
         }
 
         public override string ToString() {
