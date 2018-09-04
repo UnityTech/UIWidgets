@@ -84,4 +84,15 @@ namespace UIWidgets.painting {
             throw new Exception("unknown axisDirection");
         }
     }
+
+    /// The values in this enum are ordered such that they are in increasing order
+    /// of cost. A value with index N implies all the values with index less than N.
+    /// For example, [layout] (index 3) implies [paint] (2).
+    public enum RenderComparison
+    {
+        identical,
+        metadata,
+        paint,
+        layout,
+    }
 }
