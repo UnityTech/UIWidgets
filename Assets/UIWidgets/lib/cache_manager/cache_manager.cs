@@ -41,7 +41,6 @@ namespace UIWidgets.lib.cache_manager {
 
         private void _init() {
             _setupDatabase();
-//            _getLastCleanTimestampFromPreferences();
         }
 
         private void _setupDatabase() {
@@ -221,7 +220,7 @@ namespace UIWidgets.lib.cache_manager {
                 }
             }
 
-//            _removeOldObjectsFromCache(); // do we need this?
+            _removeOldObjectsFromCache(); 
             _shrinkLargeCache();
 
             var promise = new Promise<string>();
