@@ -1,6 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using UIWidgets.async;
 using UIWidgets.flow;
-
 using UIWidgets.ui;
 using UnityEditor;
 using UnityEngine;
@@ -18,20 +19,71 @@ namespace UIWidgets.editor {
         public EditorWindow editorWindow;
         public Rect _lastPosition;
         public readonly DateTime _epoch = DateTime.Now;
+        public readonly MicrotaskQueue _microtaskQueue = new MicrotaskQueue();
+        public readonly TimerProvider _timerProvider = new TimerProvider();
 
         public void OnGUI() {
-            if (Event.current.type == EventType.Repaint) {
+            var evt = Event.current;
+
+            if (evt.type == EventType.Repaint) {
                 if (this.onBeginFrame != null) {
                     this.onBeginFrame(DateTime.Now - this._epoch);
                 }
 
+                this.flushMicrotasks();
+
                 if (this.onDrawFrame != null) {
                     this.onDrawFrame();
+                }
+
+                return;
+            }
+
+            if (this.onPointerEvent != null) {
+                PointerData pointerData = null;
+
+                if (evt.type == EventType.MouseDown) {
+                    pointerData = new PointerData(
+                        timeStamp: DateTime.Now,
+                        change: PointerChange.down,
+                        kind: PointerDeviceKind.mouse,
+                        device: evt.button,
+                        physicalX: evt.mousePosition.x,
+                        physicalY: evt.mousePosition.y
+                    );
+                } else if (evt.type == EventType.MouseUp) {
+                    pointerData = new PointerData(
+                        timeStamp: DateTime.Now,
+                        change: PointerChange.up,
+                        kind: PointerDeviceKind.mouse,
+                        device: evt.button,
+                        physicalX: evt.mousePosition.x,
+                        physicalY: evt.mousePosition.y
+                    );
+                } else if (evt.type == EventType.MouseDrag) {
+                    pointerData = new PointerData(
+                        timeStamp: DateTime.Now,
+                        change: PointerChange.move,
+                        kind: PointerDeviceKind.mouse,
+                        device: evt.button,
+                        physicalX: evt.mousePosition.x,
+                        physicalY: evt.mousePosition.y
+                    );
+                }
+
+                if (pointerData != null) {
+                    this.onPointerEvent(new PointerDataPacket(new List<PointerData> {
+                        pointerData
+                    }));
                 }
             }
         }
 
         public void Update() {
+            this.flushMicrotasks();
+
+            this._timerProvider.update();
+
             bool dirty = false;
             if (this._devicePixelRatio != EditorGUIUtility.pixelsPerPoint) {
                 dirty = true;
@@ -68,6 +120,18 @@ namespace UIWidgets.editor {
 
             var paintContext = new PaintContext {canvas = new CanvasImpl()};
             layer.paint(paintContext);
+        }
+
+        public override void scheduleMicrotask(Action callback) {
+            this._microtaskQueue.scheduleMicrotask(callback);
+        }
+
+        public override void flushMicrotasks() {
+            this._microtaskQueue.flushMicrotasks();
+        }
+
+        public override Timer run(TimeSpan duration, Action callback) {
+            return this._timerProvider.run(duration, callback);
         }
     }
 }

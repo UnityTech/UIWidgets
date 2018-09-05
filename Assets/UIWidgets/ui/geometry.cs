@@ -58,7 +58,7 @@ namespace UIWidgets.ui {
         }
 
         public static bool operator ==(OffsetBase a, OffsetBase b) {
-            return a.Equals(b);
+            return object.Equals(a, b);
         }
 
         public static bool operator !=(OffsetBase a, OffsetBase b) {
