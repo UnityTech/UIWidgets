@@ -23,11 +23,11 @@ namespace UIWidgets.foundation {
             return it.Count != 0;
         }
 
-        public static bool isEmpty(this ICollection it) {
+        public static bool isEmpty<T>(this Queue<T> it) {
             return it.Count == 0;
         }
 
-        public static bool isNotEmpty(this ICollection it) {
+        public static bool isNotEmpty<T>(this Queue<T> it) {
             return it.Count != 0;
         }
 
