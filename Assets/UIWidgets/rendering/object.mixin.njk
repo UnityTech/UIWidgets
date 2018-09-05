@@ -143,11 +143,11 @@ namespace UIWidgets.rendering {
             this._insertIntoChildList(child, after);
         }
 
-        public void add(ChildType child) {
+        public virtual void add(ChildType child) {
             this.insert(child, this._lastChild);
         }
 
-        public void addAll(List<ChildType> children) {
+        public virtual void addAll(List<ChildType> children) {
             if (children != null) {
                 children.ForEach(this.add);
             }

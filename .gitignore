@@ -34,3 +34,9 @@ sysinfo.txt
 # Builds
 *.apk
 *.unitypackage
+
+# node.js
+#
+node_modules/
+npm-debug.log
+yarn-error.log
