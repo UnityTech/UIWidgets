@@ -75,7 +75,7 @@ namespace UIWidgets.Tests
             return null;
         }
 
-        private RenderBox box(RenderParagraph p, int width = 300, int height = 300)
+        private RenderBox box(RenderParagraph p, int width = 100, int height = 100)
         {
             return new RenderConstrainedOverflowBox(
                 minWidth: width,
@@ -93,6 +93,22 @@ namespace UIWidgets.Tests
                             )
                     )
                 );
+        }
+        
+        private RenderBox flexItemBox(RenderParagraph p, int width = 200, int height = 150)
+        {
+            return new RenderConstrainedBox(
+                additionalConstraints: new BoxConstraints(minWidth: width, maxWidth: width, minHeight: height,
+                    maxHeight: height),
+                child: new RenderDecoratedBox(
+                    decoration: new BoxDecoration(
+                        color: new Color(0xFFFFFFFF),
+                        borderRadius: BorderRadius.all(3),
+                        border: Border.all(Color.fromARGB(255, 255, 0, 0), 1)
+                    ),
+                    child: new RenderPadding(EdgeInsets.all(10), p
+                    )
+                ));
         }
         
         RenderBox text()
@@ -125,33 +141,37 @@ namespace UIWidgets.Tests
         
         RenderBox textAlign()
         {
-//            var flexbox = new RenderFlex(
-//                direction: Axis.horizontal,
-//                crossAxisAlignment: CrossAxisAlignment.center);
-//
-//            flexbox.add(box(
-//                new RenderParagraph(new TextSpan("Align To Left\nMaterials define how light reacts with the " +
-//                                                 "surface of a model, and are an essential ingredient in making " +
-//                                                 "believable visuals. When you’ve created a "), textAlign: TextAlign.left)
-//            ));
-//            flexbox.add(box(
-//                new RenderParagraph(new TextSpan("Align To Right\nMaterials define how light reacts with the " +
-//                                                 "surface of a model, and are an essential ingredient in making " +
-//                                                 "believable visuals. When you’ve created a "), textAlign: TextAlign.right)
-//            ));
-//            flexbox.add(box(
-//                new RenderParagraph(new TextSpan("Align To Center\nMaterials define how light reacts with the " +
-//                                                 "surface of a model, and are an essential ingredient in making " +
-//                                                 "believable visuals. When you’ve created a "), textAlign: TextAlign.center)
-//            ));
-          //return flexbox;
-            return box(
+            var flexbox = new RenderFlex(
+                direction: Axis.vertical,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                crossAxisAlignment: CrossAxisAlignment.center);
+            var height = 120;
+           
+            flexbox.add(flexItemBox(
+                new RenderParagraph(new TextSpan("Align To Left\nMaterials define how light reacts with the " +
+                                                 "surface of a model, and are an essential ingredient in making " +
+                                                 "believable visuals. When you’ve created a "), textAlign: TextAlign.left),
+                height: height
+            ));
+            flexbox.add(flexItemBox(
+                new RenderParagraph(new TextSpan("Align To Right\nMaterials define how light reacts with the " +
+                                                 "surface of a model, and are an essential ingredient in making " +
+                                                 "believable visuals. When you’ve created a "), textAlign: TextAlign.right),
+                height: height
+            ));
+            flexbox.add(flexItemBox(
                 new RenderParagraph(new TextSpan("Align To Center\nMaterials define how light reacts with the " +
-                                                 "surface of a model, and    are an essential ingredient in making " +
-                                                 "believable visuals.       When you’ve created  a when you want to un-tether " +
-                                                 "the specular   color from the material’s albedo. This is the case with " +
-                                                 "non-metal \t materials or "), textAlign: TextAlign.center)
-            );
+                                                 "surface of a model, and are an essential ingredient in making " +
+                                                 "believable visuals. When you’ve created a "), textAlign: TextAlign.center),
+                height: height
+            ));
+            flexbox.add(flexItemBox(
+                new RenderParagraph(new TextSpan("Align To Justify\nMaterials define how light reacts with the " +
+                                                 "surface of a model, and are an essential ingredient in making " +
+                                                 "believable visuals. When you’ve created a "), textAlign: TextAlign.justify),
+                 height: height
+            ));
+          return flexbox;
         }
         
         RenderBox textOverflow()
