@@ -124,7 +124,7 @@ namespace UIWidgets.ui {
             if (this._clipRect != null) {
                 throw new Exception("already a clipRec, considering using saveLayer.");
             }
-
+ 
             this._clipRect = MatrixUtils.transformRect(this._transform, rect);
         }
 
