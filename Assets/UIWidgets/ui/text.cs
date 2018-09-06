@@ -292,6 +292,11 @@ namespace UIWidgets.ui {
                 );
         }
 
+        public TextAlign TextAlign
+        {
+            get { return textAlign ?? TextAlign.left; }
+        }
+
         public readonly TextAlign? textAlign;
         public readonly TextDirection? textDirection;
         public readonly FontWeight? fontWeight;
