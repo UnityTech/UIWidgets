@@ -9,7 +9,6 @@ using UnityEditor;
 using UnityEngine;
 using Color = UIWidgets.ui.Color;
 using FontStyle = UIWidgets.ui.FontStyle;
-using Rect = UIWidgets.ui.Rect;
 
 namespace UIWidgets.Tests
 {
@@ -75,7 +74,7 @@ namespace UIWidgets.Tests
             return null;
         }
 
-        private RenderBox box(RenderParagraph p, int width = 100, int height = 100)
+        private RenderBox box(RenderParagraph p, int width = 200, int height = 200)
         {
             return new RenderConstrainedOverflowBox(
                 minWidth: width,
@@ -83,16 +82,9 @@ namespace UIWidgets.Tests
                 minHeight: height,
                 maxHeight: height,
                 alignment: Alignment.center,
-                child: new RenderDecoratedBox(
-                    decoration: new BoxDecoration(
-                        color: new Color(0xFFFFFFFF),
-                        borderRadius: BorderRadius.all(3),
-                        border: Border.all(Color.fromARGB(255, 255, 0, 0), 1)
-                    ),
-                    child: new RenderPadding(EdgeInsets.all(10), p
-                            )
-                    )
-                );
+                child: p
+                )
+                ;
         }
         
         private RenderBox flexItemBox(RenderParagraph p, int width = 200, int height = 150)
@@ -146,21 +138,21 @@ namespace UIWidgets.Tests
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 crossAxisAlignment: CrossAxisAlignment.center);
             var height = 120;
-           
+
             flexbox.add(flexItemBox(
-                new RenderParagraph(new TextSpan("Align To Left\nMaterials define how light reacts with the " +
+                new RenderParagraph(new TextSpan(EditorGUIUtility.pixelsPerPoint.ToString() + "Align To Left\nMaterials define how light reacts with the " +
                                                  "surface of a model, and are an essential ingredient in making " +
                                                  "believable visuals. When you’ve created a "), textAlign: TextAlign.left),
                 height: height
             ));
             flexbox.add(flexItemBox(
-                new RenderParagraph(new TextSpan("Align To Right\nMaterials define how light reacts with the " +
+                new RenderParagraph(new TextSpan(EditorGUIUtility.pixelsPerPoint.ToString() + "Align To Rgit\nMaterials define how light reacts with the " +
                                                  "surface of a model, and are an essential ingredient in making " +
                                                  "believable visuals. When you’ve created a "), textAlign: TextAlign.right),
                 height: height
             ));
             flexbox.add(flexItemBox(
-                new RenderParagraph(new TextSpan("Align To Center\nMaterials define how light reacts with the " +
+                new RenderParagraph(new TextSpan(EditorGUIUtility.pixelsPerPoint.ToString() + "Align To Center\nMaterials define how light reacts with the " +
                                                  "surface of a model, and are an essential ingredient in making " +
                                                  "believable visuals. When you’ve created a "), textAlign: TextAlign.center),
                 height: height
@@ -180,7 +172,7 @@ namespace UIWidgets.Tests
                 new RenderParagraph(new TextSpan("", children:
                     new List<TextSpan>()
                     {
-                        new TextSpan("Real-time 3D revolutionizes:\n the animation pipeline.\n\n\revolutionizesn\n\nReal-time 3D revolutionizes the animation pipeline ", null),
+                        new TextSpan("Real-time 3D revolutionizes:\n the animation pipeline.\n\n\nrevolutionizesn\n\nReal-time 3D revolutionizes the animation pipeline ", null),
                     })), 200, 80);
         }
         
@@ -198,7 +190,7 @@ namespace UIWidgets.Tests
                             text: "Height 1.2 Text:" + text),
                         new TextSpan(style: new painting.TextStyle(height: 1.5), 
                            text: "Height 1.5 Text:" + text),
-                    })));
+                    })), width: 300, height: 300);
         }
         
     }
