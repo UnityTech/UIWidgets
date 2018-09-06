@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using UIWidgets.foundation;
+using UIWidgets.gestures;
 using UIWidgets.painting;
 using UIWidgets.ui;
 using UnityEngine;
@@ -321,6 +323,25 @@ namespace UIWidgets.rendering {
         }
     }
 
+    public class BoxHitTestEntry : HitTestEntry {
+        public BoxHitTestEntry(RenderBox target, Offset localPosition)
+            : base(target) {
+            D.assert(localPosition != null);
+            this.localPosition = localPosition;
+        }
+
+        public new RenderBox target {
+            get { return (RenderBox) base.target; }
+        }
+
+        public readonly Offset localPosition;
+
+        public override string ToString() {
+            return string.Format("{0}@{1}",
+                Diagnostics.describeIdentity(this.target), this.localPosition);
+        }
+    }
+
     public class BoxParentData : ParentData {
         public Offset offset = Offset.zero;
     }
@@ -499,6 +520,33 @@ namespace UIWidgets.rendering {
         public override void performLayout() {
         }
 
+        public virtual bool hitTest(HitTestResult result, Offset position) {
+            D.assert(() => {
+                if (!this.hasSize) {
+                    throw new Exception("has no size during hitTest");
+                }
+
+                return true;
+            });
+
+            if (this._size.contains(position)) {
+                if (this.hitTestChildren(result, position: position) || this.hitTestSelf(position)) {
+                    result.add(new BoxHitTestEntry(this, position));
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        protected virtual bool hitTestSelf(Offset position) {
+            return false;
+        }
+
+        protected bool hitTestChildren(HitTestResult result, Offset position = null) {
+            return false;
+        }
+
         public override void applyPaintTransform(RenderObject child, ref Matrix4x4 transform) {
             var childParentData = (BoxParentData) child.parentData;
             var offset = childParentData.offset;
@@ -550,8 +598,7 @@ namespace UIWidgets.rendering {
                     candidate += childParentData.offset.dy;
                     if (result != null) {
                         result = Math.Min(result.Value, candidate.Value);
-                    }
-                    else {
+                    } else {
                         result = candidate;
                     }
                 }

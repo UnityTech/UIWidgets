@@ -1,4 +1,5 @@
-﻿using UIWidgets.painting;
+﻿using UIWidgets.gestures;
+using UIWidgets.painting;
 using UIWidgets.ui;
 using UnityEngine;
 
@@ -6,6 +7,39 @@ namespace UIWidgets.rendering {
     public class RenderProxyBox : RenderProxyBoxMixinRenderObjectWithChildMixinRenderBox<RenderBox> {
         public RenderProxyBox(RenderBox child = null) {
             this.child = child;
+        }
+    }
+
+    public enum HitTestBehavior {
+        deferToChild,
+        opaque,
+        translucent,
+    }
+
+    public abstract class RenderProxyBoxWithHitTestBehavior : RenderProxyBox {
+        RenderProxyBoxWithHitTestBehavior(
+            HitTestBehavior behavior = HitTestBehavior.deferToChild,
+            RenderBox child = null
+        ) : base(child) {
+            this.behavior = behavior;
+        }
+
+        public HitTestBehavior behavior;
+
+        public override bool hitTest(HitTestResult result, Offset position = null) {
+            bool hitTarget = false;
+            if (this.size.contains(position)) {
+                hitTarget = this.hitTestChildren(result, position: position) || this.hitTestSelf(position);
+                if (hitTarget || this.behavior == HitTestBehavior.translucent) {
+                    result.add(new BoxHitTestEntry(this, position));
+                }
+            }
+
+            return hitTarget;
+        }
+
+        public override bool hitTestSelf(Offset position) {
+            return this.behavior == HitTestBehavior.opaque;
         }
     }
 
@@ -158,7 +192,7 @@ namespace UIWidgets.rendering {
         background,
         foreground,
     }
-    
+
     public class RenderDecoratedBox : RenderProxyBox {
         public RenderDecoratedBox(
             Decoration decoration,

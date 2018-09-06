@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using UIWidgets.foundation;
+using UIWidgets.gestures;
 using UIWidgets.ui;
-using UnityEditor.Rendering;
 using UnityEngine;
-using UnityEngine.XR.WSA.Persistence;
 using Canvas = UIWidgets.ui.Canvas;
 using Rect = UIWidgets.ui.Rect;
 
@@ -254,7 +252,7 @@ namespace UIWidgets.rendering {
         ChildType nextSibling { get; set; }
     }
 
-    public abstract class RenderObject : AbstractNode {
+    public abstract class RenderObject : AbstractNode, HitTestTarget {
         protected RenderObject() {
             this._needsCompositing = this.isRepaintBoundary || this.alwaysNeedsCompositing;
         }
@@ -594,6 +592,9 @@ namespace UIWidgets.rendering {
             }
 
             return transform;
+        }
+
+        public virtual void handleEvent(PointerEvent evt, HitTestEntry entry) {
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using UIWidgets.gestures;
 using UIWidgets.ui;
 using UnityEngine;
 using Rect = UIWidgets.ui.Rect;
@@ -80,6 +81,15 @@ namespace UIWidgets.rendering {
             if (this.child != null) {
                 this.child.layout(BoxConstraints.tight(this._size));
             }
+        }
+
+        public bool hitTest(HitTestResult result, Offset position = null) {
+            if (this.child != null) {
+                this.child.hitTest(result, position: position);
+            }
+
+            result.add(new HitTestEntry(this));
+            return true;
         }
 
         public override bool isRepaintBoundary {

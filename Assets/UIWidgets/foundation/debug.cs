@@ -4,14 +4,14 @@ using System.Diagnostics;
 namespace UIWidgets.foundation {
     public static class D {
         [Conditional("UIWidgets_DEBUG")]
-        public static void assert(Func<bool> result) {
-            D.assert(result());
+        public static void assert(Func<bool> result, string message = null) {
+            D.assert(result(), message);
         }
 
         [Conditional("UIWidgets_DEBUG")]
-        public static void assert(bool result) {
+        public static void assert(bool result, string message = null) {
             if (!result) {
-                throw new Exception("assertion failed. check stacktrace.");
+                throw new Exception(message ?? "assertion failed.");
             }
         }
 

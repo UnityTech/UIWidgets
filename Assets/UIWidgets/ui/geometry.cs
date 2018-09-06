@@ -226,6 +226,10 @@ namespace UIWidgets.ui {
             get { return Math.Max(Math.Abs(this.width), Math.Abs(this.height)); }
         }
 
+        public bool contains(Offset offset) {
+            return offset.dx >= 0.0 && offset.dx < this.width && offset.dy >= 0.0 && offset.dy < this.height;
+        }
+
         public bool Equals(Size other) {
             return this._dx.Equals(other._dx) && this._dy.Equals(other._dy);
         }

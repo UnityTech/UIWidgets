@@ -9,22 +9,26 @@ namespace UIWidgets.gestures {
     }
 
     public interface HitTestDispatcher {
-        void dispatchEvent(PointerEvent @event, HitTestResult result);
+        void dispatchEvent(PointerEvent evt, HitTestResult result);
     }
 
     public interface HitTestTarget {
-        void handleEvent(PointerEvent @event, HitTestEntry entry);
+        void handleEvent(PointerEvent evt, HitTestEntry entry);
     }
 
     public class HitTestEntry {
         public HitTestEntry(HitTestTarget target) {
-            this.target = target;
+            this._target = target;
         }
 
-        public readonly HitTestTarget target;
+        public virtual HitTestTarget target {
+            get { return this._target; }
+        }
+
+        readonly HitTestTarget _target;
 
         public override string ToString() {
-            return this.target.ToString();
+            return this._target.ToString();
         }
     }
 
