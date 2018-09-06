@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using JetBrains.Annotations;
 using UnityEngine;
-using UnityEngine.Assertions;
-using UnityEngine.Experimental.UIElements;
 
 namespace UIWidgets.ui
 {
@@ -391,9 +387,6 @@ namespace UIWidgets.ui
             }
             newLinePositions.Add(_text.Length);
 
-
-            int runIndex = 0;
-            StyledRuns.Run lastRun = null;
             var lineBreaker = new LineBreaker();
             lineBreaker.setup(_text, _runs, _styleRunFonts, (float)_width, _characterPositions, _characterWidths);
             
@@ -440,14 +433,22 @@ namespace UIWidgets.ui
             font.RequestCharactersInTexture(_text.Substring(run.start, run.end - run.start), run.style.UnityFontSize, run.style.UnityFontStyle);
             for (int charIndex = run.start; charIndex < run.end; ++charIndex)
             {
-                CharacterInfo charInfo;
-                var result = font.GetCharacterInfo(_text[charIndex], out charInfo, run.style.UnityFontSize, run.style.UnityFontStyle);
-                var position = _characterPositions[charIndex];
-                 
-                vertices[4 * charIndex + 0] = offset + new Vector3(position.x + charInfo.minX, position.y - charInfo.maxY, 0);
-                vertices[4 * charIndex + 1] = offset + new Vector3(position.x + charInfo.maxX, position.y - charInfo.maxY, 0);
-                vertices[4 * charIndex + 2] = offset + new Vector3(position.x + charInfo.maxX, position.y - charInfo.minY, 0);
-                vertices[4 * charIndex + 3] = offset + new Vector3(position.x + charInfo.minX, position.y - charInfo.minY, 0);
+                CharacterInfo charInfo = new CharacterInfo();
+                if (_text[charIndex] != '\n')
+                {
+                    var result = font.GetCharacterInfo(_text[charIndex], out charInfo, run.style.UnityFontSize, run.style.UnityFontStyle);
+                    Debug.Assert(result, "fail to get character info");
+                    var position = _characterPositions[charIndex];
+                    vertices[4 * charIndex + 0] = offset + new Vector3(position.x + charInfo.minX, position.y - charInfo.maxY, 0);
+                    vertices[4 * charIndex + 1] = offset + new Vector3(position.x + charInfo.maxX, position.y - charInfo.maxY, 0);
+                    vertices[4 * charIndex + 2] = offset + new Vector3(position.x + charInfo.maxX, position.y - charInfo.minY, 0);
+                    vertices[4 * charIndex + 3] = offset + new Vector3(position.x + charInfo.minX, position.y - charInfo.minY, 0);
+                }
+                else
+                {
+                    vertices[4 * charIndex + 0] = vertices[4 * charIndex + 1] =
+                        vertices[4 * charIndex + 2] = vertices[4 * charIndex + 3] = offset;
+                } 
 
                 if (isWordSpace(_text[charIndex]) || isLineEndSpace(_text[charIndex]) || _text[charIndex] == '\t')
                 {                    
@@ -471,6 +472,12 @@ namespace UIWidgets.ui
                 triangles[6 * charIndex + 3] = 4 * charIndex + 0;
                 triangles[6 * charIndex + 4] = 4 * charIndex + 2;
                 triangles[6 * charIndex + 5] = 4 * charIndex + 3;
+            }
+
+            for (var i = 0; i < vertices.Length; i++)
+            {
+                vertices[i].x = (float)Math.Round(vertices[i].x);
+                vertices[i].y = (float)Math.Round(vertices[i].y);
             }
 
             var mesh = new Mesh()

@@ -61,7 +61,8 @@ namespace UIWidgets.ui
                 CharacterInfo charInfo;
                 
                 var result = font.GetCharacterInfo(_text[charIndex], out charInfo, 0, run.style.UnityFontStyle);
- 
+                Debug.Assert(result, "fail to get character info");
+                
                 if (_text[charIndex] == '\t')
                 {
                     _spaceCount++;
