@@ -1,11 +1,12 @@
 ﻿using System;
-using UIWidgets.rendering;
-using UIWidgets.widgets;
+using UIWidgets.async;
 
 namespace UIWidgets.ui {
     public delegate void VoidCallback();
 
     public delegate void FrameCallback(TimeSpan duration);
+
+    public delegate void PointerDataPacketCallback(PointerDataPacket packet);
 
     public abstract class Window {
         public double devicePixelRatio {
@@ -41,10 +42,25 @@ namespace UIWidgets.ui {
 
         public VoidCallback _onDrawFrame;
 
+        public PointerDataPacketCallback onPointerEvent {
+            get { return this._onPointerEvent; }
+            set { this._onPointerEvent = value; }
+        }
+
+        public PointerDataPacketCallback _onPointerEvent;
+
         public abstract void scheduleFrame();
 
         public abstract void render(Scene scene);
-    }
 
-   
+        public abstract void scheduleMicrotask(Action callback);
+
+        public abstract void flushMicrotasks();
+
+        public abstract Timer run(TimeSpan duration, Action callback);
+
+        public Timer run(Action callback) {
+            return this.run(TimeSpan.Zero, callback);
+        }
+    }
 }

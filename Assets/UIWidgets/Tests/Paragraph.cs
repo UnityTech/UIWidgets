@@ -30,7 +30,7 @@ namespace UIWidgets.Tests
             this._optionStrings = this._options.Select(x => x.Method.Name).ToArray();
             this._selected = 0;
 
-            this.titleContent = new GUIContent("RenderBoxes");
+            this.titleContent = new GUIContent("RenderParagraph");
         }
 
         private WindowAdapter windowAdapter;
