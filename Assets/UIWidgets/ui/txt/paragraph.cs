@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UIWidgets.ui.txt;
 using UnityEngine;
 
 namespace UIWidgets.ui
@@ -114,6 +115,7 @@ namespace UIWidgets.ui
         private double _ideographicBaseline;
         private double[] _characterWidths; 
         private List<double> _lineHeights = new List<double>();
+        private List<PaintRecord> _paintRecords = new List<PaintRecord>();
         private bool _didExceedMaxLines;
       
         // private double _characterWidth;
@@ -173,15 +175,9 @@ namespace UIWidgets.ui
 
         public void paint(Canvas canvas, double x, double y)
         {
-            for (int runIndex = 0; runIndex < _runs.size; ++runIndex)
+            foreach (var paintRecord in _paintRecords)
             {
-                var run = _runs.getRun(runIndex);
-                if (run.start < run.end)
-                {
-                    var fontEntry = FontManager.instance.getOrCreate(run.style.safeFontFamily, run.style.UnityFontSize);
-                    var mesh = new TextMesh(new Vector2d(x, y), _text, _characterPositions, fontEntry, run);
-                    canvas.drawMesh(mesh, fontEntry.font.material);
-                }
+                canvas.drawTextBlob(paintRecord.text, x, y);
             }
         }
         
@@ -199,7 +195,7 @@ namespace UIWidgets.ui
             computeLineBreak();
 
             var maxLines = _paragraphStyle.maxLines ?? 0;
-            _didExceedMaxLines = maxLines == 0 || _lineRanges.Count <= maxLines;
+            _didExceedMaxLines = !(maxLines == 0 || _lineRanges.Count <= maxLines);
             var lineLimits = maxLines == 0 ? _lineRanges.Count : Math.Min(maxLines, _lineRanges.Count);
             layoutLines(lineLimits);
 
@@ -302,13 +298,14 @@ namespace UIWidgets.ui
             _lineHeights.Clear();
             _lineRanges.Clear();
             _lineWidths.Clear();
+            _paintRecords.Clear();
             _characterWidths = new double[_text.Length];
             for (int i = 0; i < _runs.size; ++i)
             {
                 var run = _runs.getRun(i);
                 if (run.start < run.end)
                 {
-                    var font = FontManager.instance.getOrCreate(run.style.safeFontFamily, run.style.UnityFontSize).font;
+                    var font = FontManager.instance.getOrCreate(run.style.safeFontFamily, run.style.UnityFontSize);
                     font.RequestCharactersInTexture(_text.Substring(run.start, run.end - run.start), 0, 
                         run.style.UnityFontStyle);
                 } 
@@ -331,7 +328,7 @@ namespace UIWidgets.ui
                     var run = _runs.getRun(runIndex);
                     if (run.start < run.end && run.start < line.end && run.end > line.start)
                     {
-                        var font = FontManager.instance.getOrCreate(run.style.safeFontFamily, run.style.UnityFontSize).font;
+                        var font = FontManager.instance.getOrCreate(run.style.safeFontFamily, run.style.UnityFontSize);
                         var ascent = font.ascent * (run.style.height??1.0);
                         var descent = (font.lineHeight - font.ascent) * (run.style.height??1.0);
                         if (ascent > maxAscent)
@@ -341,6 +338,21 @@ namespace UIWidgets.ui
                         if (descent > maxDescent)
                         {
                             maxDescent = descent;
+                        }
+
+                        int start = Math.Max(run.start, line.start);
+                        int end = Math.Min(run.end, line.end);
+                        var width = _characterPositions[end - 1].x + _characterWidths[end - 1] -
+                                    _characterPositions[start].x;
+                        if (end > start)
+                        {
+                            var bounds = Rect.fromLTWH(0, -ascent,
+                                _characterPositions[end - 1].x + _characterWidths[end - 1] -
+                                _characterPositions[start].x,
+                                descent);
+                            _paintRecords.Add(new PaintRecord(run.style, new TextBlob(
+                                    _text, start, end, _characterPositions, run.style, bounds), 
+                                lineNumber, width));
                         }
                     }
 
@@ -423,82 +435,6 @@ namespace UIWidgets.ui
 
             return;
 
-        }
-
-        private Mesh generateMesh(double x, double y, Font font, StyledRuns.Run run)
-        {
-            var vertices = new Vector3[_text.Length * 4];
-            var triangles = new int[_text.Length * 6];
-            var uv = new Vector2[_text.Length * 4];
-            Vector3 offset = new Vector3((float)Utils.PixelCorrectRound(x), (float)Utils.PixelCorrectRound(y), 0);
-            font.RequestCharactersInTexture(_text.Substring(run.start, run.end - run.start), 
-                run.style.UnityFontSize, run.style.UnityFontStyle);
-            for (int charIndex = run.start; charIndex < run.end; ++charIndex)
-            {
-                CharacterInfo charInfo = new CharacterInfo();
-                if (_text[charIndex] != '\n' && _text[charIndex] != '\t')
-                {
-                    font.GetCharacterInfo(_text[charIndex], out charInfo, run.style.UnityFontSize, run.style.UnityFontStyle);
-                    var position = _characterPositions[charIndex];
-                    vertices[4 * charIndex + 0] = offset + new Vector3((float)(position.x + charInfo.minX), 
-                                                      (float)(position.y - charInfo.maxY), 0);
-                    vertices[4 * charIndex + 1] = offset + new Vector3((float)(position.x + charInfo.maxX), 
-                                                      (float)(position.y - charInfo.maxY), 0);
-                    vertices[4 * charIndex + 2] = offset + new Vector3(
-                                                      (float)(position.x + charInfo.maxX), (float)(position.y - charInfo.minY), 0);
-                    vertices[4 * charIndex + 3] = offset + new Vector3(
-                                                      (float)(position.x + charInfo.minX), (float)(position.y - charInfo.minY), 0);
-                }
-                else
-                {
-                    vertices[4 * charIndex + 0] = vertices[4 * charIndex + 1] =
-                        vertices[4 * charIndex + 2] = vertices[4 * charIndex + 3] = offset;
-                } 
-
-                if (isWordSpace(_text[charIndex]) || isLineEndSpace(_text[charIndex]) || _text[charIndex] == '\t')
-                {                    
-                    uv[4 * charIndex + 0] = Vector2.zero;
-                    uv[4 * charIndex + 1] = Vector2.zero;
-                    uv[4 * charIndex + 2] = Vector2.zero;
-                    uv[4 * charIndex + 3] = Vector2.zero;
-                } else
-                {
-                    uv[4 * charIndex + 0] = charInfo.uvTopLeft;
-                    uv[4 * charIndex + 1] = charInfo.uvTopRight;
-                    uv[4 * charIndex + 2] = charInfo.uvBottomRight;
-                    uv[4 * charIndex + 3] = charInfo.uvBottomLeft;
-                }
-               
-                triangles[6 * charIndex + 0] = 4 * charIndex + 0;
-                triangles[6 * charIndex + 1] = 4 * charIndex + 1;
-                triangles[6 * charIndex + 2] = 4 * charIndex + 2;
-
-                triangles[6 * charIndex + 3] = 4 * charIndex + 0;
-                triangles[6 * charIndex + 4] = 4 * charIndex + 2;
-                triangles[6 * charIndex + 5] = 4 * charIndex + 3;
-            }
-
-//            for (var i = 0; i < vertices.Length; i++)
-//            {
-//                vertices[i].x = (float)Math.Round(vertices[i].x);
-//                vertices[i].y = (float)Math.Round(vertices[i].y);
-//            }
-
-            var mesh = new Mesh()
-            {
-                vertices = vertices,
-                triangles = triangles,
-                uv = uv
-            };
-            var colors = new UnityEngine.Color[vertices.Length];
-            for (var i = 0; i < colors.Length; i++)
-            {
-                colors[i] = run.style.UnityColor;
-            }
-
-            mesh.colors = colors;
- 
-            return mesh;
         }
 
         private double getLineXOffset(double lineTotalAdvance) {

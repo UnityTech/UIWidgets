@@ -38,7 +38,7 @@ namespace UIWidgets.rendering {
             return hitTarget;
         }
 
-        public override bool hitTestSelf(Offset position) {
+        protected override bool hitTestSelf(Offset position) {
             return this.behavior == HitTestBehavior.opaque;
         }
     }

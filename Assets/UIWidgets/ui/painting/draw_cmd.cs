@@ -1,6 +1,6 @@
 ﻿using UIWidgets.painting;
+using UIWidgets.ui.txt;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace UIWidgets.ui {
     public interface DrawCmd {
@@ -56,16 +56,12 @@ namespace UIWidgets.ui {
         public RRect rrect;
     }
     
-    public class DrawMesh : DrawCmd {
-        public IMesh mesh;
-        public Material material;
-    }
-
-    public interface IMesh
+    public class DrawTextBlob : DrawCmd
     {
-        void syncTextureUV();
-
-        Mesh mesh { get; }
+        public TextBlob textBlob;
+        public double x;
+        public double y;
     }
+
 }
 
