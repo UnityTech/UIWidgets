@@ -23,18 +23,16 @@ namespace UIWidgets.ui
         private int _spaceCount = 0;
         private int tabCount = 4;
         private double _lineLength;
-        private Font[] _styleRunFonts;
 
         private List<LineInfo> _lines;
 
-        public void setup(string text, StyledRuns runs, Font[] styleRunFonts, double width, Vector2d[] characterPositions, double[] characterWidth)
+        public void setup(string text, StyledRuns runs, double width, Vector2d[] characterPositions, double[] characterWidth)
         {
             _text = text;
             _runs = runs;
             _characterPositions = characterPositions;
             _characterWidth = characterWidth;
             _width = width;
-            _styleRunFonts = styleRunFonts;
         }
         
         public List<LineInfo> getLines()
@@ -55,7 +53,7 @@ namespace UIWidgets.ui
             {
                 runIterator.nextTo(charIndex);
                 var run = runIterator.run;
-                var font = _styleRunFonts[runIterator.runIndex];
+                var font = FontManager.instance.getOrCreate(run.style.safeFontFamily, run.style.UnityFontSize).font;
 
                 var style = run.style;
                 var charInfo = new CharacterInfo();
@@ -82,7 +80,7 @@ namespace UIWidgets.ui
                 }
                 else if (_text[charIndex] == ' ')
                 {
-                    font.GetCharacterInfo(_text[charIndex], out charInfo, 0, run.style.UnityFontStyle);
+                    font.GetCharacterInfo(_text[charIndex], out charInfo, style.UnityFontSize, run.style.UnityFontStyle);
                     _spaceCount++;
                     _characterPositions[charIndex].x = offsetX;
                     _characterWidth[charIndex] = charInfo.advance;
@@ -91,7 +89,8 @@ namespace UIWidgets.ui
                 }
                 else
                 {
-                    font.GetCharacterInfo(_text[charIndex], out charInfo, 0, run.style.UnityFontStyle);
+                    font.GetCharacterInfo(_text[charIndex], out charInfo, style.UnityFontSize,
+                        run.style.UnityFontStyle);
                     if (_spaceCount > 0 || blockStart == charIndex)
                     {
                         _wordStart = charIndex;
