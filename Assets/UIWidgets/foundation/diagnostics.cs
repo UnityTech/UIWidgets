@@ -225,6 +225,11 @@ namespace UIWidgets.foundation {
         internal _NoDefaultValue() {
         }
     }
+    
+    class _NullDefaultValue {
+        internal _NullDefaultValue() {
+        }
+    }
 
     public abstract class DiagnosticsNode {
         protected DiagnosticsNode(
@@ -596,9 +601,92 @@ namespace UIWidgets.foundation {
         }
     }
 
+    public class EnumerableProperty<T> : DiagnosticsProperty<IEnumerable<T>> {
+        public EnumerableProperty(
+            string name,
+            IEnumerable<T> value,
+            object defaultValue = null,
+            string ifNull = null,
+            string ifEmpty = "[]",
+            DiagnosticsTreeStyle style = DiagnosticsTreeStyle.singleLine,
+            bool showName = true,
+            DiagnosticLevel level = DiagnosticLevel.info
+        ) : base(
+            name,
+            value,
+            defaultValue: defaultValue,
+            ifNull: ifNull,
+            ifEmpty: ifEmpty,
+            style: style,
+            showName: showName,
+            level: level
+        ) {
+        }
+
+        protected override string valueToString(TextTreeConfiguration parentConfiguration = null) {
+            if (this.value == null) {
+                return "null";
+            }
+
+            if (!this.value.Any()) {
+                return this.ifEmpty ?? "[]";
+            }
+
+            if (parentConfiguration != null && !parentConfiguration.lineBreakProperties) {
+                return string.Join(", ", this.value.Select(v => v.ToString()).ToArray());
+            }
+
+            return string.Join(this.style == DiagnosticsTreeStyle.singleLine ? ", " : "\n",
+                this.value.Select(v => v.ToString()).ToArray());
+        }
+
+        public override DiagnosticLevel level {
+            get {
+                if (this.ifEmpty == null &&
+                    this.value != null && !this.value.Any()
+                    && base.level != DiagnosticLevel.hidden) {
+                    return DiagnosticLevel.fine;
+                }
+
+                return base.level;
+            }
+        }
+
+        public override Dictionary<string, object> toJsonMap() {
+            var json = base.toJsonMap();
+            if (this.value != null) {
+                json["values"] = this.value.Select(v => v.ToString()).ToList();
+            }
+
+            return json;
+        }
+    }
+
+
+    public class EnumProperty<T> : DiagnosticsProperty<T> {
+        public EnumProperty(String name, T value,
+            Object defaultValue = null,
+            DiagnosticLevel level = DiagnosticLevel.info
+        ) : base(
+            name,
+            value,
+            defaultValue: defaultValue,
+            level: level
+        ) {
+        }
+
+        protected override string valueToString(TextTreeConfiguration parentConfiguration = null) {
+            if (this.value == null) {
+                return "null";
+            }
+
+            return this.value.ToString();
+        }
+    }
+
     public delegate T ComputePropertyValueCallback<T>();
 
-    public class DiagnosticsProperty<T> : DiagnosticsNode where T : class {
+    public class DiagnosticsProperty<T> : DiagnosticsNode {
         public DiagnosticsProperty(
             string name,
             T value,
@@ -619,7 +707,10 @@ namespace UIWidgets.foundation {
             style: style
         ) {
             defaultValue = defaultValue ?? Diagnostics.kNoDefaultValue;
-            D.assert(defaultValue == Diagnostics.kNoDefaultValue || defaultValue is T);
+            if (defaultValue == Diagnostics.kNullDefaultValue) {
+                defaultValue = null;
+            }
+            D.assert(defaultValue == null || defaultValue == Diagnostics.kNoDefaultValue || defaultValue is T);
 
             this._description = description;
             this._valueComputed = true;
@@ -654,11 +745,14 @@ namespace UIWidgets.foundation {
             style: style
         ) {
             defaultValue = defaultValue ?? Diagnostics.kNoDefaultValue;
-            D.assert(defaultValue == Diagnostics.kNoDefaultValue || defaultValue is T);
+            if (defaultValue == Diagnostics.kNullDefaultValue) {
+                defaultValue = null;
+            }
+            D.assert(defaultValue == null || defaultValue == Diagnostics.kNoDefaultValue || defaultValue is T);
 
             this._description = description;
             this._valueComputed = false;
-            this._value = null;
+            this._value = default(T);
             this._computeValue = computeValue;
             this._defaultLevel = level;
             this.ifNull = ifNull ?? (missingIfNull ? "MISSING" : null);
@@ -704,7 +798,7 @@ namespace UIWidgets.foundation {
             var json = base.toJsonMap();
 
             if (this.defaultValue != Diagnostics.kNoDefaultValue) {
-                json["defaultValue"] = this.defaultValue.ToString();
+                json["defaultValue"] = this.defaultValue == null ? "null" : this.defaultValue.ToString();
             }
 
             if (this.ifEmpty != null) {
@@ -819,7 +913,7 @@ namespace UIWidgets.foundation {
             }
             catch (Exception ex) {
                 this._exception = ex;
-                this._value = null;
+                this._value = default(T);
             }
         }
 
@@ -841,7 +935,7 @@ namespace UIWidgets.foundation {
                     return DiagnosticLevel.warning;
                 }
 
-                if (this.defaultValue != Diagnostics.kNoDefaultValue && this.value == this.defaultValue) {
+                if (this.defaultValue != Diagnostics.kNoDefaultValue && object.Equals(this.value, this.defaultValue)) {
                     return DiagnosticLevel.fine;
                 }
 
@@ -940,7 +1034,7 @@ namespace UIWidgets.foundation {
     }
 
     public class DiagnosticPropertiesBuilder {
-        void add(DiagnosticsNode property) {
+        public void add(DiagnosticsNode property) {
             this.properties.Add(property);
         }
 
@@ -973,11 +1067,14 @@ namespace UIWidgets.foundation {
             );
         }
 
-        public virtual void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+        protected internal virtual void debugFillProperties(DiagnosticPropertiesBuilder properties) {
         }
     }
 
     public abstract class DiagnosticableTree : Diagnosticable {
+        protected DiagnosticableTree() {
+        }
+        
         public string toStringShallow(
             String joiner = ", ",
             DiagnosticLevel minLevel = DiagnosticLevel.debug
@@ -1018,7 +1115,7 @@ namespace UIWidgets.foundation {
             );
         }
 
-        public virtual List<DiagnosticsNode> debugDescribeChildren() {
+        protected internal virtual List<DiagnosticsNode> debugDescribeChildren() {
             return new List<DiagnosticsNode>();
         }
     }
@@ -1109,6 +1206,7 @@ namespace UIWidgets.foundation {
         );
 
         internal static readonly _NoDefaultValue kNoDefaultValue = new _NoDefaultValue();
+        internal static readonly _NoDefaultValue kNullDefaultValue = new _NoDefaultValue();
 
         public static string shortHash(object o) {
             return (o.GetHashCode() & 0xFFFFF).ToString("X").PadLeft(5, '0');

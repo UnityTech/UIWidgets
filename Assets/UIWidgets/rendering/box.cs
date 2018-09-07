@@ -566,6 +566,28 @@ namespace UIWidgets.rendering {
         public override Rect paintBounds {
             get { return Offset.zero & this.size; }
         }
+        
+        int _debugActivePointers = 0;
+        
+        protected bool debugHandleEvent(PointerEvent evt, HitTestEntry entry) {
+            D.assert(()  =>{
+                if (D.debugPaintPointersEnabled) {
+                    if (evt is PointerDownEvent) {
+                        this._debugActivePointers += 1;
+                    } else if (evt is PointerUpEvent || evt is PointerCancelEvent) {
+                        this._debugActivePointers -= 1;
+                    }
+                    this.markNeedsPaint();
+                }
+                return true;
+            });
+            return true;
+        }
+        
+        protected internal override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new DiagnosticsProperty<Size>("size", this._size, missingIfNull: true));
+        }
     }
 
     public abstract class

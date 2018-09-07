@@ -180,7 +180,7 @@ namespace UIWidgets.rendering {
             }
         }
 
-        public AbstractNode rootNode {
+        public AbstractNodeMixinDiagnosticableTree rootNode {
             get { return this._rootNode; }
             set {
                 if (this._rootNode == value) {
@@ -198,7 +198,7 @@ namespace UIWidgets.rendering {
             }
         }
 
-        public AbstractNode _rootNode;
+        public AbstractNodeMixinDiagnosticableTree _rootNode;
 
         public List<RenderObject> _nodesNeedingLayout = new List<RenderObject>();
 
@@ -252,7 +252,7 @@ namespace UIWidgets.rendering {
         ChildType nextSibling { get; set; }
     }
 
-    public abstract class RenderObject : AbstractNode, HitTestTarget {
+    public abstract class RenderObject : AbstractNodeMixinDiagnosticableTree, HitTestTarget {
         protected RenderObject() {
             this._needsCompositing = this.isRepaintBoundary || this.alwaysNeedsCompositing;
         }
@@ -265,7 +265,7 @@ namespace UIWidgets.rendering {
             }
         }
 
-        public override void adoptChild(AbstractNode childNode) {
+        protected override void adoptChild(AbstractNodeMixinDiagnosticableTree childNode) {
             var child = (RenderObject) childNode;
             this.setupParentData(child);
             base.adoptChild(child);
@@ -273,7 +273,7 @@ namespace UIWidgets.rendering {
             this.markNeedsCompositingBitsUpdate();
         }
 
-        public override void dropChild(AbstractNode childNode) {
+        protected override void dropChild(AbstractNodeMixinDiagnosticableTree childNode) {
             var child = (RenderObject) childNode;
             child._cleanRelayoutBoundary();
             child.parentData.detach();
@@ -285,6 +285,14 @@ namespace UIWidgets.rendering {
 
         public virtual void visitChildren(RenderObjectVisitor visitor) {
         }
+
+        public object debugCreator;
+
+        public bool debugCanParentUseSize {
+            get { return this._debugCanParentUseSize; }
+        }
+
+        bool _debugCanParentUseSize;
 
         public new PipelineOwner owner {
             get { return (PipelineOwner) base.owner; }
@@ -521,7 +529,7 @@ namespace UIWidgets.rendering {
         }
 
         public void _skippedPaintingOnLayer() {
-            AbstractNode ancestor = this.parent;
+            var ancestor = this.parent;
             while (ancestor is RenderObject) {
                 var node = (RenderObject) ancestor;
                 if (node.isRepaintBoundary) {
@@ -575,7 +583,7 @@ namespace UIWidgets.rendering {
 
         public Matrix4x4 getTransformTo(RenderObject ancestor) {
             if (ancestor == null) {
-                AbstractNode rootNode = this.owner.rootNode;
+                var rootNode = this.owner.rootNode;
                 if (rootNode is RenderObject) {
                     ancestor = (RenderObject) rootNode;
                 }
@@ -595,6 +603,17 @@ namespace UIWidgets.rendering {
         }
 
         public virtual void handleEvent(PointerEvent evt, HitTestEntry entry) {
+        }
+
+        protected internal override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            properties.add(new DiagnosticsProperty<object>(
+                "creator", this.debugCreator, defaultValue: Diagnostics.kNullDefaultValue,
+                level: DiagnosticLevel.debug));
+            properties.add(new DiagnosticsProperty<ParentData>("parentData", this.parentData,
+                tooltip: this._debugCanParentUseSize ? "can use size" : null, missingIfNull: true));
+            properties.add(new DiagnosticsProperty<Constraints>("constraints", this.constraints, missingIfNull: true));
+            properties.add(new DiagnosticsProperty<OffsetLayer>("layer", this._layer,
+                defaultValue: Diagnostics.kNullDefaultValue));
         }
     }
 }

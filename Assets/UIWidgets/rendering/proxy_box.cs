@@ -1,4 +1,6 @@
-﻿using UIWidgets.gestures;
+﻿using System.Collections.Generic;
+using UIWidgets.foundation;
+using UIWidgets.gestures;
 using UIWidgets.painting;
 using UIWidgets.ui;
 using UnityEngine;
@@ -17,7 +19,7 @@ namespace UIWidgets.rendering {
     }
 
     public abstract class RenderProxyBoxWithHitTestBehavior : RenderProxyBox {
-        RenderProxyBoxWithHitTestBehavior(
+        protected RenderProxyBoxWithHitTestBehavior(
             HitTestBehavior behavior = HitTestBehavior.deferToChild,
             RenderBox child = null
         ) : base(child) {
@@ -38,8 +40,14 @@ namespace UIWidgets.rendering {
             return hitTarget;
         }
 
-        public override bool hitTestSelf(Offset position) {
+        protected override bool hitTestSelf(Offset position) {
             return this.behavior == HitTestBehavior.opaque;
+        }
+
+        protected internal override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new EnumProperty<HitTestBehavior>(
+                "behavior", this.behavior, defaultValue: Diagnostics.kNullDefaultValue));
         }
     }
 
@@ -280,6 +288,84 @@ namespace UIWidgets.rendering {
             if (this.position == DecorationPosition.foreground) {
                 this._painter.paint(context.canvas, offset, filledConfiguration);
             }
+        }
+    }
+
+    public delegate void PointerDownEventListener(PointerDownEvent evt);
+
+    public delegate void PointerMoveEventListener(PointerMoveEvent evt);
+
+    public delegate void PointerUpEventListener(PointerUpEvent evt);
+
+    public delegate void PointerCancelEventListener(PointerCancelEvent evt);
+
+    public class RenderPointerListener : RenderProxyBoxWithHitTestBehavior {
+        public RenderPointerListener(
+            PointerDownEventListener onPointerDown = null,
+            PointerMoveEventListener onPointerMove = null,
+            PointerUpEventListener onPointerUp = null,
+            PointerCancelEventListener onPointerCancel = null,
+            HitTestBehavior behavior = HitTestBehavior.deferToChild,
+            RenderBox child = null
+        ) : base(behavior: behavior, child: child) {
+            this.onPointerDown = onPointerDown;
+            this.onPointerMove = onPointerMove;
+            this.onPointerUp = onPointerUp;
+            this.onPointerCancel = onPointerCancel;
+        }
+
+        public PointerDownEventListener onPointerDown;
+
+        public PointerMoveEventListener onPointerMove;
+
+        public PointerUpEventListener onPointerUp;
+
+        public PointerCancelEventListener onPointerCancel;
+
+        public override void performResize() {
+            this.size = this.constraints.biggest;
+        }
+
+        public override void handleEvent(PointerEvent evt, HitTestEntry entry) {
+            D.assert(this.debugHandleEvent(evt, entry));
+
+            if (this.onPointerDown != null && evt is PointerDownEvent) {
+                this.onPointerDown((PointerDownEvent) evt);
+                return;
+            }
+
+            if (this.onPointerMove != null && evt is PointerMoveEvent) {
+                this.onPointerMove((PointerMoveEvent) evt);
+                return;
+            }
+
+            if (this.onPointerUp != null && evt is PointerUpEvent) {
+                this.onPointerUp((PointerUpEvent) evt);
+                return;
+            }
+
+            if (this.onPointerCancel != null && evt is PointerCancelEvent) {
+                this.onPointerCancel((PointerCancelEvent) evt);
+                return;
+            }
+        }
+
+        protected internal override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            var listeners = new List<string>();
+            if (this.onPointerDown != null)
+                listeners.Add("down");
+            if (this.onPointerMove != null)
+                listeners.Add("move");
+            if (this.onPointerUp != null)
+                listeners.Add("up");
+            if (this.onPointerCancel != null)
+                listeners.Add("cancel");
+            if (listeners.isEmpty()) {
+                listeners.Add("<none>");
+            }
+
+            properties.add(new EnumerableProperty<string>("listeners", listeners));
         }
     }
 }

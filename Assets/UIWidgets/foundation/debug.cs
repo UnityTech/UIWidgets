@@ -18,5 +18,7 @@ namespace UIWidgets.foundation {
         public static bool debugPrintGestureArenaDiagnostics = true;
 
         public static bool debugPrintHitTestResults = true;
+        
+        public static bool debugPaintPointersEnabled = false;
     }
 }

@@ -46,63 +46,14 @@ namespace UIWidgets.gestures {
             int pointer = 0,
             PointerDeviceKind kind = PointerDeviceKind.mouse,
             int device = 0,
-            Offset position = null,
-            Offset delta = null,
-            bool down = false,
-            bool synthesized = false)
+            Offset position = null)
             : base(
                 timeStamp,
-                pointer,
-                kind,
-                device,
-                position,
-                delta,
-                down,
-                synthesized) {
-        }
-    }
-
-    public class PointerUpEvent : PointerEvent {
-        public PointerUpEvent(
-            DateTime timeStamp,
-            int pointer = 0,
-            PointerDeviceKind kind = PointerDeviceKind.mouse,
-            int device = 0,
-            Offset position = null,
-            Offset delta = null,
-            bool down = false,
-            bool synthesized = false)
-            : base(
-                timeStamp,
-                pointer,
-                kind,
-                device,
-                position,
-                delta,
-                down,
-                synthesized) {
-        }
-    }
-
-    public class PointerCancelEvent : PointerEvent {
-        public PointerCancelEvent(
-            DateTime timeStamp,
-            int pointer = 0,
-            PointerDeviceKind kind = PointerDeviceKind.mouse,
-            int device = 0,
-            Offset position = null,
-            Offset delta = null,
-            bool down = false,
-            bool synthesized = false)
-            : base(
-                timeStamp,
-                pointer,
-                kind,
-                device,
-                position,
-                delta,
-                down,
-                synthesized) {
+                pointer: pointer,
+                kind: kind,
+                device: device,
+                position: position,
+                down: true) {
         }
     }
 
@@ -114,17 +65,50 @@ namespace UIWidgets.gestures {
             int device = 0,
             Offset position = null,
             Offset delta = null,
-            bool down = false,
             bool synthesized = false)
             : base(
                 timeStamp,
-                pointer,
-                kind,
-                device,
-                position,
-                delta,
-                down,
-                synthesized) {
+                pointer: pointer,
+                kind: kind,
+                device: device,
+                position: position,
+                delta: delta,
+                down: true,
+                synthesized: synthesized) {
+        }
+    }
+
+    public class PointerUpEvent : PointerEvent {
+        public PointerUpEvent(
+            DateTime timeStamp,
+            int pointer = 0,
+            PointerDeviceKind kind = PointerDeviceKind.mouse,
+            int device = 0,
+            Offset position = null)
+            : base(
+                timeStamp,
+                pointer: pointer,
+                kind: kind,
+                device: device,
+                position: position,
+                down: false) {
+        }
+    }
+
+    public class PointerCancelEvent : PointerEvent {
+        public PointerCancelEvent(
+            DateTime timeStamp,
+            int pointer = 0,
+            PointerDeviceKind kind = PointerDeviceKind.mouse,
+            int device = 0,
+            Offset position = null)
+            : base(
+                timeStamp,
+                pointer: pointer,
+                kind: kind,
+                device: device,
+                position: position,
+                down: false) {
         }
     }
 }

@@ -16,5 +16,10 @@ namespace UIWidgets.Tests {
         public static void renderRenderParagraph() {
             EditorWindow.GetWindow(typeof(Paragraph));
         }
+        
+        [MenuItem("UIWidgetsTests/Gestures")]
+        public static void gestures() {
+            EditorWindow.GetWindow(typeof(Gestures));
+        }
     }
 }

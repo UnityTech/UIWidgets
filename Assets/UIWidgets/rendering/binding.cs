@@ -1,9 +1,11 @@
 ﻿using System;
+using UIWidgets.foundation;
+using UIWidgets.gestures;
 using UIWidgets.scheduler;
 using UIWidgets.ui;
 
 namespace UIWidgets.rendering {
-    public class RendererBinding {
+    public class RendererBinding : HitTestable {
         public RendererBinding(Window window, SchedulerBinding schedulerBinding) {
             this._window = window;
 
@@ -55,6 +57,11 @@ namespace UIWidgets.rendering {
         public void _handlePersistentFrameCallback(TimeSpan timeStamp) {
             this.drawFrame();
         }
+        
+        public void hitTest(HitTestResult result, Offset position) {
+            D.assert(this.renderView != null);
+            this.renderView.hitTest(result, position: position);
+        }
 
         public void drawFrame() {
             this.pipelineOwner.flushLayout();
@@ -70,17 +77,19 @@ namespace UIWidgets.rendering {
 
     public class RendererBindings {
         public RendererBindings(Window window) {
-            this._window = window;
-            this._schedulerBinding = new SchedulerBinding(window);
-            this._rendererBinding = new RendererBinding(window, this._schedulerBinding);
+            this.window = window;
+            this.schedulerBinding = new SchedulerBinding(window);
+            this.rendererBinding = new RendererBinding(window, this.schedulerBinding);
+            this.gestureBinding = new GestureBinding(window, this.rendererBinding);
         }
 
-        public readonly Window _window;
-        public readonly RendererBinding _rendererBinding;
-        public readonly SchedulerBinding _schedulerBinding;
+        public readonly Window window;
+        public readonly RendererBinding rendererBinding;
+        public readonly SchedulerBinding schedulerBinding;
+        public readonly GestureBinding gestureBinding;
 
         public void setRoot(RenderBox root) {
-            this._rendererBinding.renderView.child = root;
+            this.rendererBinding.renderView.child = root;
         }
     }
 }

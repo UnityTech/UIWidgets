@@ -6,17 +6,20 @@ using UnityEngine;
 
 namespace UIWidgets.gestures {
     public class GestureBinding : HitTestable, HitTestDispatcher, HitTestTarget {
-        public GestureBinding(Window window) {
+        public GestureBinding(Window window, HitTestable hitTestable = null) {
             this.window = window;
             this.window._onPointerEvent += this._handlePointerDataPacket;
 
             this.gestureArena = new GestureArenaManager(window);
+            this._hitTestable = hitTestable;
         }
 
         public readonly Window window;
 
-        readonly Queue<PointerEvent> _pendingPointerEvents = new Queue<PointerEvent>();
+        readonly HitTestable _hitTestable;
 
+        readonly Queue<PointerEvent> _pendingPointerEvents = new Queue<PointerEvent>();
+        
         void _handlePointerDataPacket(PointerDataPacket packet) {
             foreach (var pointerEvent in PointerEventConverter.expand(packet.data)) {
                 this._pendingPointerEvents.Enqueue(pointerEvent);
@@ -51,7 +54,11 @@ namespace UIWidgets.gestures {
             if (evt is PointerDownEvent) {
                 D.assert(!this._hitTests.ContainsKey(evt.pointer));
                 result = new HitTestResult();
+                if (this._hitTestable != null) {
+                    this._hitTestable.hitTest(result, evt.position);
+                }
                 this.hitTest(result, evt.position);
+                
                 this._hitTests[evt.pointer] = result;
                 D.assert(() => {
                     if (D.debugPrintHitTestResults) {
