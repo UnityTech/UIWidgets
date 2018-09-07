@@ -262,11 +262,12 @@ namespace UIWidgets.ui {
             this.pushClipRRect(rect, this._transform);
         }
 
-        public void drawMesh(Mesh mesh, Material material)
+        public void drawMesh(IMesh mesh, Material material)
         {
             prepareGL(material);
             material.SetPass(0);
-            Graphics.DrawMeshNow(mesh, Matrix4x4.identity);
+            mesh.syncTextureUV();
+            Graphics.DrawMeshNow(mesh.mesh, Matrix4x4.identity);
         }
 
         private void pushClipRect(Rect clipRect, Matrix4x4 transform) {

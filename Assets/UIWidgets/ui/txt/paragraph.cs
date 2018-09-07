@@ -112,7 +112,6 @@ namespace UIWidgets.ui
         private double _minIntrinsicWidth;
         private double _alphabeticBaseline;
         private double _ideographicBaseline;
-        private Font[] _styleRunFonts;
         private double[] _characterWidths; 
         private List<double> _lineHeights = new List<double>();
         private bool _didExceedMaxLines;
@@ -131,7 +130,7 @@ namespace UIWidgets.ui
         // It is the Unicode set: [[:General_Category=Space_Separator:]-[:Line_Break=Glue:]],
         // plus '\n'.
         // Note: all such characters are in the BMP, so it's ok to use code units for this.
-        static bool isLineEndSpace(char c) {
+        public static bool isLineEndSpace(char c) {
             return c == '\n' || c == ' ' || c == 0x1680 || (0x2000 <= c && c <= 0x200A && c != 0x2007) ||
                    c == 0x205F || c == 0x3000;
         }
@@ -162,7 +161,6 @@ namespace UIWidgets.ui
             get { return _alphabeticBaseline; }
         }
         
-        
         public double ideographicBaseline
         {
             get { return _ideographicBaseline; }
@@ -180,11 +178,10 @@ namespace UIWidgets.ui
                 var run = _runs.getRun(runIndex);
                 if (run.start < run.end)
                 {
-                    var font = _styleRunFonts[runIndex];
-                    var mesh = generateMesh(x, y, font, run);
-                    canvas.drawMesh(mesh, font.material);
+                    var fontEntry = FontManager.instance.getOrCreate(run.style.safeFontFamily, run.style.UnityFontSize);
+                    var mesh = new TextMesh(new Vector2d(x, y), _text, _characterPositions, fontEntry, run);
+                    canvas.drawMesh(mesh, fontEntry.font.material);
                 }
-     
             }
         }
         
@@ -250,14 +247,12 @@ namespace UIWidgets.ui
             _text = text;
             _runs = runs;
             _needsLayout = true;
-            _styleRunFonts = null;
         }
 
         public void setParagraphStyle(ParagraphStyle style)
         {
             _needsLayout = true;
             _paragraphStyle = style;
-            _styleRunFonts = null;
         }
 
         public static void offsetCharacters(Vector2d offset, Vector2d[] characterPos, int start, int end)
@@ -308,21 +303,15 @@ namespace UIWidgets.ui
             _lineRanges.Clear();
             _lineWidths.Clear();
             _characterWidths = new double[_text.Length];
-            if (_styleRunFonts == null)
+            for (int i = 0; i < _runs.size; ++i)
             {
-                _styleRunFonts = new Font[_runs.size];
-                for (int i = 0; i < _styleRunFonts.Length; ++i)
+                var run = _runs.getRun(i);
+                if (run.start < run.end)
                 {
-                    var run = _runs.getRun(i);
-                    if (run.start < run.end)
-                    {
-                        _styleRunFonts[i] =  Font.CreateDynamicFontFromOSFont(run.style.safeFontFamily,
-                            run.style.UnityFontSize);
-                        _styleRunFonts[i].material.shader = textShader;
-                        _styleRunFonts[i].RequestCharactersInTexture(_text.Substring(run.start, run.end - run.start), 0, 
-                            run.style.UnityFontStyle);
-                    }
-                }
+                    var font = FontManager.instance.getOrCreate(run.style.safeFontFamily, run.style.UnityFontSize).font;
+                    font.RequestCharactersInTexture(_text.Substring(run.start, run.end - run.start), 0, 
+                        run.style.UnityFontStyle);
+                } 
             }
         }
 
@@ -342,7 +331,7 @@ namespace UIWidgets.ui
                     var run = _runs.getRun(runIndex);
                     if (run.start < run.end && run.start < line.end && run.end > line.start)
                     {
-                        var font = _styleRunFonts[runIndex];
+                        var font = FontManager.instance.getOrCreate(run.style.safeFontFamily, run.style.UnityFontSize).font;
                         var ascent = font.ascent * (run.style.height??1.0);
                         var descent = (font.lineHeight - font.ascent) * (run.style.height??1.0);
                         if (ascent > maxAscent)
@@ -400,7 +389,7 @@ namespace UIWidgets.ui
             newLinePositions.Add(_text.Length);
 
             var lineBreaker = new LineBreaker();
-            lineBreaker.setup(_text, _runs, _styleRunFonts, _width, _characterPositions, _characterWidths);
+            lineBreaker.setup(_text, _runs, _width, _characterPositions, _characterWidths);
             
             for (var newlineIndex = 0; newlineIndex < newLinePositions.Count; ++newlineIndex)
             {
@@ -442,7 +431,8 @@ namespace UIWidgets.ui
             var triangles = new int[_text.Length * 6];
             var uv = new Vector2[_text.Length * 4];
             Vector3 offset = new Vector3((float)Utils.PixelCorrectRound(x), (float)Utils.PixelCorrectRound(y), 0);
-            font.RequestCharactersInTexture(_text.Substring(run.start, run.end - run.start), run.style.UnityFontSize, run.style.UnityFontStyle);
+            font.RequestCharactersInTexture(_text.Substring(run.start, run.end - run.start), 
+                run.style.UnityFontSize, run.style.UnityFontStyle);
             for (int charIndex = run.start; charIndex < run.end; ++charIndex)
             {
                 CharacterInfo charInfo = new CharacterInfo();
