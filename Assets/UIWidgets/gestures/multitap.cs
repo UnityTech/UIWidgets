@@ -1,0 +1,190 @@
+using System.Collections.Generic;
+using System.Linq;
+using RSG.Promises;
+using UIWidgets.async;
+using UIWidgets.foundation;
+using UIWidgets.ui;
+
+namespace UIWidgets.gestures {
+    public delegate void GestureDoubleTapCallback();
+
+    class _TapTracker {
+        internal _TapTracker(
+            GestureBinding binding = null,
+            PointerDownEvent evt = null,
+            GestureArenaEntry entry = null) {
+            this._binding = binding;
+            this.pointer = evt.pointer;
+            this._initialPosition = evt.position;
+            this.entry = entry;
+        }
+
+        public readonly int pointer;
+        public readonly GestureArenaEntry entry;
+        readonly Offset _initialPosition;
+        readonly GestureBinding _binding;
+
+        bool _isTrackingPointer = false;
+
+        public void startTrackingPointer(PointerRoute route) {
+            if (!this._isTrackingPointer) {
+                this._isTrackingPointer = true;
+                this._binding.pointerRouter.addRoute(this.pointer, route);
+            }
+        }
+
+        public void stopTrackingPointer(PointerRoute route) {
+            if (this._isTrackingPointer) {
+                this._isTrackingPointer = false;
+                this._binding.pointerRouter.removeRoute(this.pointer, route);
+            }
+        }
+
+        public bool isWithinTolerance(PointerEvent evt, double tolerance) {
+            Offset offset = evt.position - this._initialPosition;
+            return offset.distance <= tolerance;
+        }
+    }
+
+    public class DoubleTapGestureRecognizer : GestureRecognizer {
+        public DoubleTapGestureRecognizer(
+            GestureBinding binding = null, object debugOwner = null)
+            : base(binding: binding, debugOwner: debugOwner) {
+        }
+
+        public GestureDoubleTapCallback onDoubleTap;
+
+        Timer _doubleTapTimer;
+        _TapTracker _firstTap;
+        readonly Dictionary<int, _TapTracker> _trackers = new Dictionary<int, _TapTracker>();
+
+        public override void addPointer(PointerDownEvent evt) {
+            if (this._firstTap != null &&
+                !this._firstTap.isWithinTolerance(evt, Constants.kDoubleTapSlop)) {
+                return;
+            }
+
+            this._stopDoubleTapTimer();
+            _TapTracker tracker = new _TapTracker(
+                binding: this._binding,
+                evt: evt,
+                entry: this._binding.gestureArena.add(evt.pointer, this)
+            );
+            this._trackers[evt.pointer] = tracker;
+            tracker.startTrackingPointer(this._handleEvent);
+        }
+
+        void _handleEvent(PointerEvent evt) {
+            _TapTracker tracker = this._trackers[evt.pointer];
+            D.assert(tracker != null);
+            if (evt is PointerUpEvent) {
+                if (this._firstTap == null) {
+                    this._registerFirstTap(tracker);
+                } else {
+                    this._registerSecondTap(tracker);
+                }
+            } else if (evt is PointerMoveEvent) {
+                if (!tracker.isWithinTolerance(evt, Constants.kDoubleTapTouchSlop)) {
+                    this._reject(tracker);
+                }
+            } else if (evt is PointerCancelEvent) {
+                this._reject(tracker);
+            }
+        }
+
+        public override void acceptGesture(int pointer) {
+        }
+
+        public override void rejectGesture(int pointer) {
+            _TapTracker tracker;
+            this._trackers.TryGetValue(pointer, out tracker);
+            
+            if (tracker == null &&
+                this._firstTap != null &&
+                this._firstTap.pointer == pointer) {
+                tracker = this._firstTap;
+            }
+
+            if (tracker != null) {
+                this._reject(tracker);
+            }
+        }
+
+        void _reject(_TapTracker tracker) {
+            this._trackers.Remove(tracker.pointer);
+            tracker.entry.resolve(GestureDisposition.rejected);
+            this._freezeTracker(tracker);
+            if (this._firstTap != null &&
+                (this._trackers.isEmpty() || tracker == this._firstTap)) {
+                this._reset();
+            }
+        }
+
+        public override void dispose() {
+            this._reset();
+            base.dispose();
+        }
+
+        void _reset() {
+            this._stopDoubleTapTimer();
+            if (this._firstTap != null) {
+                _TapTracker tracker = this._firstTap;
+                this._firstTap = null;
+                this._reject(tracker);
+                this._binding.gestureArena.release(tracker.pointer);
+            }
+
+            this._clearTrackers();
+        }
+
+        void _registerFirstTap(_TapTracker tracker) {
+            this._startDoubleTapTimer();
+            this._binding.gestureArena.hold(tracker.pointer);
+            this._freezeTracker(tracker);
+            this._trackers.Remove(tracker.pointer);
+            this._clearTrackers();
+            this._firstTap = tracker;
+        }
+
+        void _registerSecondTap(_TapTracker tracker) {
+            this._firstTap.entry.resolve(GestureDisposition.accepted);
+            tracker.entry.resolve(GestureDisposition.accepted);
+            this._freezeTracker(tracker);
+            this._trackers.Remove(tracker.pointer);
+            if (this.onDoubleTap != null) {
+                this.invokeCallback<object>("onDoubleTap", () => {
+                    this.onDoubleTap();
+                    return null;
+                });
+            }
+
+            this._reset();
+        }
+
+        void _clearTrackers() {
+            this._trackers.Values.ToList().Each(this._reject);
+            D.assert(this._trackers.isEmpty());
+        }
+
+        void _freezeTracker(_TapTracker tracker) {
+            tracker.stopTrackingPointer(this._handleEvent);
+        }
+
+        void _startDoubleTapTimer() {
+            this._doubleTapTimer =
+                this._doubleTapTimer
+                ?? this._binding.window.run(Constants.kDoubleTapTimeout, this._reset);
+        }
+
+        void _stopDoubleTapTimer() {
+            if (this._doubleTapTimer != null) {
+                this._doubleTapTimer.cancel();
+                this._doubleTapTimer = null;
+            }
+        }
+
+        public override string debugDescription {
+            get { return "double tap"; }
+        }
+    }
+}

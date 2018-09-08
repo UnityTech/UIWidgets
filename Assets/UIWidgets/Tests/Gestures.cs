@@ -7,7 +7,7 @@ using UIWidgets.rendering;
 using UIWidgets.ui;
 using UnityEditor;
 using UnityEngine;
-using Color=UIWidgets.ui.Color;
+using Color = UIWidgets.ui.Color;
 
 namespace UIWidgets.Tests {
     public class Gestures : EditorWindow {
@@ -57,12 +57,15 @@ namespace UIWidgets.Tests {
         private void OnEnable() {
             this.windowAdapter = new WindowAdapter(this);
             this.rendererBindings = new RendererBindings(this.windowAdapter);
-            
+
             this._tapRecognizer = new TapGestureRecognizer(this.rendererBindings.gestureBinding);
             this._tapRecognizer.onTap = () => { Debug.Log("tap"); };
-            
+
             this._panRecognizer = new PanGestureRecognizer(this.rendererBindings.gestureBinding);
             this._panRecognizer.onUpdate = (details) => { Debug.Log("onUpdate " + details); };
+
+            this._doubleTapGesture = new DoubleTapGestureRecognizer(this.rendererBindings.gestureBinding);
+            this._doubleTapGesture.onDoubleTap = () => { Debug.Log("onDoubleTap"); };
         }
 
         void OnDestroy() {
@@ -74,11 +77,14 @@ namespace UIWidgets.Tests {
 
         PanGestureRecognizer _panRecognizer;
 
+        DoubleTapGestureRecognizer _doubleTapGesture;
+
         void _handlePointerDown(PointerDownEvent evt) {
             this._tapRecognizer.addPointer(evt);
             this._panRecognizer.addPointer(evt);
+            this._doubleTapGesture.addPointer(evt);
         }
-        
+
         RenderBox tap() {
             return new RenderPointerListener(
                 onPointerDown: this._handlePointerDown,
@@ -90,7 +96,7 @@ namespace UIWidgets.Tests {
                             color: new Color(0xFF00FF00)
                         )
                     ))
-                );
+            );
         }
     }
 }
