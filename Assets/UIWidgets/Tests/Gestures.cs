@@ -60,6 +60,9 @@ namespace UIWidgets.Tests {
             
             this._tapRecognizer = new TapGestureRecognizer(this.rendererBindings.gestureBinding);
             this._tapRecognizer.onTap = () => { Debug.Log("tap"); };
+            
+            this._panRecognizer = new PanGestureRecognizer(this.rendererBindings.gestureBinding);
+            this._panRecognizer.onUpdate = (details) => { Debug.Log("onUpdate " + details); };
         }
 
         void OnDestroy() {
@@ -69,8 +72,11 @@ namespace UIWidgets.Tests {
 
         TapGestureRecognizer _tapRecognizer;
 
+        PanGestureRecognizer _panRecognizer;
+
         void _handlePointerDown(PointerDownEvent evt) {
             this._tapRecognizer.addPointer(evt);
+            this._panRecognizer.addPointer(evt);
         }
         
         RenderBox tap() {

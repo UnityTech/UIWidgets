@@ -40,6 +40,34 @@ namespace UIWidgets.gestures {
         public readonly bool synthesized;
     }
 
+    public class PointerAddedEvent : PointerEvent {
+        public PointerAddedEvent(
+            DateTime timeStamp,
+            PointerDeviceKind kind = PointerDeviceKind.touch,
+            int device = 0,
+            Offset position = null
+        ) : base(
+            timeStamp: timeStamp,
+            kind: kind,
+            device: device,
+            position: position
+        ) {
+        }
+    }
+
+    public class PointerRemovedEvent : PointerEvent {
+        public PointerRemovedEvent(
+            DateTime timeStamp,
+            PointerDeviceKind kind = PointerDeviceKind.touch,
+            int device = 0
+        ) : base(
+            timeStamp: timeStamp,
+            kind: kind,
+            device: device
+        ) {
+        }
+    }
+
     public class PointerDownEvent : PointerEvent {
         public PointerDownEvent(
             DateTime timeStamp,

@@ -8,7 +8,7 @@ namespace UIWidgets.gestures {
     public class GestureBinding : HitTestable, HitTestDispatcher, HitTestTarget {
         public GestureBinding(Window window, HitTestable hitTestable = null) {
             this.window = window;
-            this.window._onPointerEvent += this._handlePointerDataPacket;
+            this.window.onPointerEvent += this._handlePointerDataPacket;
 
             this.gestureArena = new GestureArenaManager(window);
             this._hitTestable = hitTestable;
@@ -21,7 +21,7 @@ namespace UIWidgets.gestures {
         readonly Queue<PointerEvent> _pendingPointerEvents = new Queue<PointerEvent>();
         
         void _handlePointerDataPacket(PointerDataPacket packet) {
-            foreach (var pointerEvent in PointerEventConverter.expand(packet.data)) {
+            foreach (var pointerEvent in PointerEventConverter.expand(packet.data, this.window.devicePixelRatio)) {
                 this._pendingPointerEvents.Enqueue(pointerEvent);
             }
 

@@ -24,8 +24,8 @@ namespace UIWidgets.scheduler {
         public SchedulerBinding(Window window) {
             this._window = window;
 
-            window.onBeginFrame = this._handleBeginFrame;
-            window.onDrawFrame = this._handleDrawFrame;
+            window.onBeginFrame += this._handleBeginFrame;
+            window.onDrawFrame += this._handleDrawFrame;
         }
 
         public readonly Window _window;

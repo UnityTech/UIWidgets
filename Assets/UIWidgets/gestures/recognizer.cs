@@ -8,21 +8,41 @@ using UnityEngine;
 namespace UIWidgets.gestures {
     public delegate T RecognizerCallback<T>();
 
-    public abstract class GestureRecognizer : GestureArenaMember {
-        protected GestureRecognizer(GestureBinding binding = null) {
+    public abstract class GestureRecognizer : DiagnosticableTree, GestureArenaMember {
+        protected GestureRecognizer(GestureBinding binding = null, object debugOwner = null) {
             this._binding = binding;
+            this.debugOwner = debugOwner;
         }
 
         protected readonly GestureBinding _binding;
+
+        public readonly object debugOwner;
 
         public abstract void addPointer(PointerDownEvent evt);
 
         public virtual void dispose() {
         }
 
-        protected T invokeCallback<T>(string name, RecognizerCallback<T> callback) {
+        public abstract string debugDescription { get; }
+
+        protected T invokeCallback<T>(string name, RecognizerCallback<T> callback, Func<string> debugReport = null) {
+            D.assert(callback != null);
+
             T result = default(T);
             try {
+                D.assert(() => {
+                    if (D.debugPrintRecognizerCallbacksTrace) {
+                        var report = debugReport != null ? debugReport() : null;
+                        // The 19 in the line below is the width of the prefix used by
+                        // _debugLogDiagnostic in arena.dart.
+                        var prefix = D.debugPrintGestureArenaDiagnostics ? new string(' ', 19) + "❙ " : "";
+                        Debug.LogFormat("{0}this calling {1} callback.{2}",
+                            prefix, name, report.isNotEmpty() ? " " + report : "");
+                    }
+
+                    return true;
+                });
+
                 result = callback();
             }
             catch (Exception ex) {
@@ -34,10 +54,17 @@ namespace UIWidgets.gestures {
 
         public abstract void acceptGesture(int pointer);
         public abstract void rejectGesture(int pointer);
+
+        protected internal override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new DiagnosticsProperty<object>("debugOwner", this.debugOwner,
+                defaultValue: Diagnostics.kNullDefaultValue));
+        }
     }
 
     public abstract class OneSequenceGestureRecognizer : GestureRecognizer {
-        protected OneSequenceGestureRecognizer(GestureBinding binding = null) : base(binding) {
+        protected OneSequenceGestureRecognizer(
+            GestureBinding binding = null, object debugOwner = null) : base(binding, debugOwner) {
         }
 
         readonly Dictionary<int, GestureArenaEntry> _entries = new Dictionary<int, GestureArenaEntry>();
@@ -127,8 +154,9 @@ namespace UIWidgets.gestures {
     public abstract class PrimaryPointerGestureRecognizer : OneSequenceGestureRecognizer {
         protected PrimaryPointerGestureRecognizer(
             TimeSpan? deadline = null,
-            GestureBinding binding = null
-        ) : base(binding: binding) {
+            GestureBinding binding = null,
+            object debugOwner = null
+        ) : base(binding: binding, debugOwner: debugOwner) {
             this.deadline = deadline;
         }
 
@@ -201,6 +229,11 @@ namespace UIWidgets.gestures {
         double _getDistance(PointerEvent evt) {
             Offset offset = evt.position - this.initialPosition;
             return offset.distance;
+        }
+
+        protected internal override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new EnumProperty<GestureRecognizerState>("state", this.state));
         }
     }
 }

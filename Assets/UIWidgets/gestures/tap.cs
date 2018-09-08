@@ -1,3 +1,4 @@
+using UIWidgets.foundation;
 using UIWidgets.ui;
 
 namespace UIWidgets.gestures {
@@ -26,8 +27,8 @@ namespace UIWidgets.gestures {
     public delegate void GestureTapCancelCallback();
 
     public class TapGestureRecognizer : PrimaryPointerGestureRecognizer {
-        public TapGestureRecognizer(GestureBinding binding)
-            : base(deadline: Constants.kPressTimeout, binding: binding) {
+        public TapGestureRecognizer(GestureBinding binding, object debugOwner = null)
+            : base(deadline: Constants.kPressTimeout, binding: binding, debugOwner: debugOwner) {
         }
 
         public GestureTapDownCallback onTapDown;
@@ -133,6 +134,21 @@ namespace UIWidgets.gestures {
             this._sentTapDown = false;
             this._wonArenaForPrimaryPointer = false;
             this._finalPosition = null;
+        }
+
+        public override string debugDescription {
+            get { return "tap"; }
+        }
+
+        protected internal override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new FlagProperty("wonArenaForPrimaryPointer",
+                value: this._wonArenaForPrimaryPointer,
+                ifTrue: "won arena"));
+            properties.add(new DiagnosticsProperty<Offset>("finalPosition", 
+                this._finalPosition, defaultValue: Diagnostics.kNullDefaultValue));
+            properties.add(new FlagProperty("sentTapDown", 
+                value: this._sentTapDown, ifTrue: "sent tap down"));
         }
     }
 }

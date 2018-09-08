@@ -54,9 +54,9 @@ namespace UIWidgets.gestures {
                 () => new _PointerState(position));
         }
 
-        public static IEnumerable<PointerEvent> expand(IEnumerable<PointerData> data) {
+        public static IEnumerable<PointerEvent> expand(IEnumerable<PointerData> data, double devicePixelRatio) {
             foreach (PointerData datum in data) {
-                var position = new Offset(datum.physicalX, datum.physicalY);
+                var position = new Offset(datum.physicalX, datum.physicalY) / devicePixelRatio;
                 var timeStamp = datum.timeStamp;
                 var kind = datum.kind;
 

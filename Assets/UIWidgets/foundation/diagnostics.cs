@@ -225,7 +225,7 @@ namespace UIWidgets.foundation {
         internal _NoDefaultValue() {
         }
     }
-    
+
     class _NullDefaultValue {
         internal _NullDefaultValue() {
         }
@@ -601,6 +601,83 @@ namespace UIWidgets.foundation {
         }
     }
 
+    public class FlagProperty : DiagnosticsProperty<bool> {
+        public FlagProperty(String name,
+            bool value,
+            string ifTrue = null,
+            string ifFalse = null,
+            bool showName = false,
+            object defaultValue = null,
+            DiagnosticLevel level = DiagnosticLevel.info
+        ) : base(name,
+            value,
+            showName: showName,
+            defaultValue: defaultValue,
+            level: level
+        ) {
+            D.assert(ifTrue != null || ifFalse != null);
+        }
+
+        public override Dictionary<string, object> toJsonMap() {
+            var json = base.toJsonMap();
+            if (this.ifTrue != null) {
+                json["ifTrue"] = this.ifTrue;
+            }
+
+            if (this.ifFalse != null) {
+                json["ifFalse"] = this.ifFalse;
+            }
+
+            return json;
+        }
+
+        public readonly string ifTrue;
+
+        public readonly string ifFalse;
+
+        protected override string valueToString(TextTreeConfiguration parentConfiguration = null) {
+            if (this.value) {
+                if (this.ifTrue != null) {
+                    return this.ifTrue;
+                }
+            } else if (!this.value) {
+                if (this.ifFalse != null) {
+                    return this.ifFalse;
+                }
+            }
+
+            return base.valueToString(parentConfiguration: parentConfiguration);
+        }
+
+        public override bool showName {
+            get {
+                if (this.value && this.ifTrue == null || !this.value == false && this.ifFalse == null) {
+                    return true;
+                }
+
+                return base.showName;
+            }
+        }
+
+        public override DiagnosticLevel level {
+            get {
+                if (this.value) {
+                    if (this.ifTrue == null) {
+                        return DiagnosticLevel.hidden;
+                    }
+                }
+
+                if (!this.value) {
+                    if (this.ifFalse == null) {
+                        return DiagnosticLevel.hidden;
+                    }
+                }
+
+                return base.level;
+            }
+        }
+    }
+
     public class EnumerableProperty<T> : DiagnosticsProperty<IEnumerable<T>> {
         public EnumerableProperty(
             string name,
@@ -710,6 +787,7 @@ namespace UIWidgets.foundation {
             if (defaultValue == Diagnostics.kNullDefaultValue) {
                 defaultValue = null;
             }
+
             D.assert(defaultValue == null || defaultValue == Diagnostics.kNoDefaultValue || defaultValue is T);
 
             this._description = description;
@@ -748,6 +826,7 @@ namespace UIWidgets.foundation {
             if (defaultValue == Diagnostics.kNullDefaultValue) {
                 defaultValue = null;
             }
+
             D.assert(defaultValue == null || defaultValue == Diagnostics.kNoDefaultValue || defaultValue is T);
 
             this._description = description;
@@ -1074,7 +1153,7 @@ namespace UIWidgets.foundation {
     public abstract class DiagnosticableTree : Diagnosticable {
         protected DiagnosticableTree() {
         }
-        
+
         public string toStringShallow(
             String joiner = ", ",
             DiagnosticLevel minLevel = DiagnosticLevel.debug

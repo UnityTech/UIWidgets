@@ -11,16 +11,23 @@ namespace UIWidgets.editor {
     public class WindowAdapter : Window {
         public WindowAdapter(EditorWindow editorWindow) {
             this.editorWindow = editorWindow;
+            this.editorWindow.wantsMouseMove = false;
+            this.editorWindow.wantsMouseEnterLeaveWindow = false;
+
             this._devicePixelRatio = EditorGUIUtility.pixelsPerPoint;
+
             this._lastPosition = editorWindow.position;
-            this._physicalSize = new Size(this._lastPosition.width, this._lastPosition.height);
+            this._physicalSize = new Size(
+                this._lastPosition.width * EditorGUIUtility.pixelsPerPoint, 
+                this._lastPosition.height * EditorGUIUtility.pixelsPerPoint);
         }
 
-        public EditorWindow editorWindow;
-        public Rect _lastPosition;
-        public readonly DateTime _epoch = DateTime.Now;
-        public readonly MicrotaskQueue _microtaskQueue = new MicrotaskQueue();
-        public readonly TimerProvider _timerProvider = new TimerProvider();
+        public readonly EditorWindow editorWindow;
+        
+        Rect _lastPosition;
+        readonly DateTime _epoch = DateTime.Now;
+        readonly MicrotaskQueue _microtaskQueue = new MicrotaskQueue();
+        readonly TimerProvider _timerProvider = new TimerProvider();
 
         public void OnGUI() {
             var evt = Event.current;
@@ -48,17 +55,17 @@ namespace UIWidgets.editor {
                         change: PointerChange.down,
                         kind: PointerDeviceKind.mouse,
                         device: evt.button,
-                        physicalX: evt.mousePosition.x,
-                        physicalY: evt.mousePosition.y
+                        physicalX: evt.mousePosition.x * this._devicePixelRatio,
+                        physicalY: evt.mousePosition.y * this._devicePixelRatio
                     );
-                } else if (evt.type == EventType.MouseUp) {
+                } else if (evt.type == EventType.MouseUp || evt.rawType == EventType.MouseUp) {
                     pointerData = new PointerData(
                         timeStamp: DateTime.Now,
                         change: PointerChange.up,
                         kind: PointerDeviceKind.mouse,
                         device: evt.button,
-                        physicalX: evt.mousePosition.x,
-                        physicalY: evt.mousePosition.y
+                        physicalX: evt.mousePosition.x * this._devicePixelRatio,
+                        physicalY: evt.mousePosition.y * this._devicePixelRatio
                     );
                 } else if (evt.type == EventType.MouseDrag) {
                     pointerData = new PointerData(
@@ -66,8 +73,8 @@ namespace UIWidgets.editor {
                         change: PointerChange.move,
                         kind: PointerDeviceKind.mouse,
                         device: evt.button,
-                        physicalX: evt.mousePosition.x,
-                        physicalY: evt.mousePosition.y
+                        physicalX: evt.mousePosition.x * this._devicePixelRatio,
+                        physicalY: evt.mousePosition.y * this._devicePixelRatio
                     );
                 }
 
@@ -100,8 +107,8 @@ namespace UIWidgets.editor {
                     this._lastPosition.width * EditorGUIUtility.pixelsPerPoint,
                     this._lastPosition.height * EditorGUIUtility.pixelsPerPoint);
 
-                if (this._onMetricsChanged != null) {
-                    this._onMetricsChanged();
+                if (this.onMetricsChanged != null) {
+                    this.onMetricsChanged();
                 }
             }
         }

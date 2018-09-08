@@ -13,41 +13,41 @@ namespace UIWidgets.ui {
             get { return this._devicePixelRatio; }
         }
 
-        public double _devicePixelRatio = 1.0;
+        protected double _devicePixelRatio = 1.0;
 
         public Size physicalSize {
             get { return this._physicalSize; }
         }
 
-        public Size _physicalSize = Size.zero;
+        protected Size _physicalSize = Size.zero;
 
         public VoidCallback onMetricsChanged {
             get { return this._onMetricsChanged; }
             set { this._onMetricsChanged = value; }
         }
 
-        public VoidCallback _onMetricsChanged;
+        VoidCallback _onMetricsChanged;
 
         public FrameCallback onBeginFrame {
             get { return this._onBeginFrame; }
             set { this._onBeginFrame = value; }
         }
 
-        public FrameCallback _onBeginFrame;
+        FrameCallback _onBeginFrame;
 
         public VoidCallback onDrawFrame {
             get { return this._onDrawFrame; }
             set { this._onDrawFrame = value; }
         }
 
-        public VoidCallback _onDrawFrame;
+        VoidCallback _onDrawFrame;
 
         public PointerDataPacketCallback onPointerEvent {
             get { return this._onPointerEvent; }
             set { this._onPointerEvent = value; }
         }
 
-        public PointerDataPacketCallback _onPointerEvent;
+        PointerDataPacketCallback _onPointerEvent;
 
         public abstract void scheduleFrame();
 

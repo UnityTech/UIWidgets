@@ -16,7 +16,7 @@ namespace UIWidgets.rendering {
                 onNeedVisualUpdate: this._schedulerBinding.ensureVisualUpdate
             );
 
-            window._onMetricsChanged = this.handleMetricsChanged;
+            window.onMetricsChanged += this.handleMetricsChanged;
             this.initRenderView();
             this._schedulerBinding.addPersistentFrameCallback(this._handlePersistentFrameCallback);
         }
