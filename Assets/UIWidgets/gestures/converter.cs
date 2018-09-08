@@ -64,7 +64,10 @@ namespace UIWidgets.gestures {
                     case PointerChange.down: {
                         _PointerState state = _ensureStateForPointer(datum, position);
                         D.assert(!state.down);
-
+                        if (state.lastPosition != position) {
+                            // a hover event to be here.
+                            state.lastPosition = position;
+                        }
                         state.startNewPointer();
                         state.setDown();
                         yield return new PointerDownEvent(
