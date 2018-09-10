@@ -11,7 +11,7 @@ namespace UIWidgets.foundation {
         [Conditional("UIWidgets_DEBUG")]
         public static void assert(bool result, string message = null) {
             if (!result) {
-                throw new Exception(message ?? "assertion failed.");
+                throw new AssertionError(message);
             }
         }
 
@@ -22,5 +22,17 @@ namespace UIWidgets.foundation {
         public static bool debugPaintPointersEnabled = false;
         
         public static bool debugPrintRecognizerCallbacksTrace = true;
+        
+        public static bool debugPrintBeginFrameBanner = true;
+
+        public static bool debugPrintEndFrameBanner = true;
+        
+        public static bool debugPrintScheduleFrameStacks = true;
+    }
+
+    [Serializable]
+    public class AssertionError : Exception {
+        public AssertionError(string message) : base(message) {
+        }
     }
 }

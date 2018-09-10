@@ -1,22 +1,17 @@
 using System;
 using System.Collections.Generic;
 using UIWidgets.foundation;
+using UIWidgets.scheduler;
 using UIWidgets.ui;
 using UnityEngine;
 
 namespace UIWidgets.gestures {
-    public class GestureBinding : HitTestable, HitTestDispatcher, HitTestTarget {
-        public GestureBinding(Window window, HitTestable hitTestable = null) {
-            this.window = window;
+    public class GestureBinding : SchedulerBinding, HitTestable, HitTestDispatcher, HitTestTarget {
+        public GestureBinding(Window window) : base(window) {
             this.window.onPointerEvent += this._handlePointerDataPacket;
 
             this.gestureArena = new GestureArenaManager(window);
-            this._hitTestable = hitTestable;
         }
-
-        public readonly Window window;
-
-        readonly HitTestable _hitTestable;
 
         readonly Queue<PointerEvent> _pendingPointerEvents = new Queue<PointerEvent>();
         
@@ -54,9 +49,6 @@ namespace UIWidgets.gestures {
             if (evt is PointerDownEvent) {
                 D.assert(!this._hitTests.ContainsKey(evt.pointer));
                 result = new HitTestResult();
-                if (this._hitTestable != null) {
-                    this._hitTestable.hitTest(result, evt.position);
-                }
                 this.hitTest(result, evt.position);
                 
                 this._hitTests[evt.pointer] = result;
@@ -81,7 +73,7 @@ namespace UIWidgets.gestures {
             }
         }
 
-        public void hitTest(HitTestResult result, Offset position) {
+        public virtual void hitTest(HitTestResult result, Offset position) {
             result.add(new HitTestEntry(this));
         }
 

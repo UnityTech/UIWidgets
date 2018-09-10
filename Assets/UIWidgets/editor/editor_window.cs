@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using UIWidgets.async;
 using UIWidgets.flow;
 using UIWidgets.ui;
@@ -25,7 +26,7 @@ namespace UIWidgets.editor {
         public readonly EditorWindow editorWindow;
         
         Rect _lastPosition;
-        readonly DateTime _epoch = DateTime.Now;
+        readonly DateTime _epoch = new DateTime(Stopwatch.GetTimestamp());
         readonly MicrotaskQueue _microtaskQueue = new MicrotaskQueue();
         readonly TimerProvider _timerProvider = new TimerProvider();
 
@@ -34,7 +35,7 @@ namespace UIWidgets.editor {
 
             if (evt.type == EventType.Repaint) {
                 if (this.onBeginFrame != null) {
-                    this.onBeginFrame(DateTime.Now - this._epoch);
+                    this.onBeginFrame(new DateTime(Stopwatch.GetTimestamp()) - this._epoch);
                 }
 
                 this.flushMicrotasks();

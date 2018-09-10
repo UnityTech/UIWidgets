@@ -58,13 +58,13 @@ namespace UIWidgets.Tests {
             this.windowAdapter = new WindowAdapter(this);
             this.rendererBindings = new RendererBindings(this.windowAdapter);
 
-            this._tapRecognizer = new TapGestureRecognizer(this.rendererBindings.gestureBinding);
+            this._tapRecognizer = new TapGestureRecognizer(this.rendererBindings.rendererBinding);
             this._tapRecognizer.onTap = () => { Debug.Log("tap"); };
 
-            this._panRecognizer = new PanGestureRecognizer(this.rendererBindings.gestureBinding);
+            this._panRecognizer = new PanGestureRecognizer(this.rendererBindings.rendererBinding);
             this._panRecognizer.onUpdate = (details) => { Debug.Log("onUpdate " + details); };
 
-            this._doubleTapGesture = new DoubleTapGestureRecognizer(this.rendererBindings.gestureBinding);
+            this._doubleTapGesture = new DoubleTapGestureRecognizer(this.rendererBindings.rendererBinding);
             this._doubleTapGesture.onDoubleTap = () => { Debug.Log("onDoubleTap"); };
         }
 

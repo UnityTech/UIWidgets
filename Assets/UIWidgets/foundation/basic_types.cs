@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 
 namespace UIWidgets.foundation {
+    public delegate IEnumerable<T> EnumerableFilter<T>(IEnumerable<T> input);
+
     public static class CollectionUtils {
         public static V putIfAbsent<K, V>(this IDictionary<K, V> it, K key, Func<V> ifAbsent) {
             V value;
@@ -46,6 +48,5 @@ namespace UIWidgets.foundation {
         public static bool isNotEmpty(this string it) {
             return !string.IsNullOrEmpty(it);
         }
-
     }
 }
