@@ -14,27 +14,25 @@ namespace UIWidgets.ui
         
         private StyledRuns _runs;
         
-        public Vector2[] _characterPositions;
-        public float[] _characterWidth;
+        public Vector2d[] _characterPositions;
+        public double[] _characterWidth;
         private string _text;
-        private float _width;
+        private double _width;
         private int _lineStart;
         private int _wordStart;
         private int _spaceCount = 0;
         private int tabCount = 4;
         private double _lineLength;
-        private Font[] _styleRunFonts;
 
         private List<LineInfo> _lines;
 
-        public void setup(string text, StyledRuns runs, Font[] styleRunFonts, float width, Vector2[] characterPositions, float[] characterWidth)
+        public void setup(string text, StyledRuns runs, double width, Vector2d[] characterPositions, double[] characterWidth)
         {
             _text = text;
             _runs = runs;
             _characterPositions = characterPositions;
             _characterWidth = characterWidth;
             _width = width;
-            _styleRunFonts = styleRunFonts;
         }
         
         public List<LineInfo> getLines()
@@ -49,27 +47,25 @@ namespace UIWidgets.ui
             _wordStart = blockStart;
             _spaceCount = 0;
             
-            float offsetX = 0.0f;
+            double offsetX = 0.0;
             var runIterator = _runs.iterator();
             for (var charIndex = blockStart; charIndex < blockEnd; charIndex++)
             {
                 runIterator.nextTo(charIndex);
                 var run = runIterator.run;
-                var font = _styleRunFonts[runIterator.runIndex];
+                var font = FontManager.instance.getOrCreate(run.style.safeFontFamily, run.style.UnityFontSize).font;
 
                 var style = run.style;
-                CharacterInfo charInfo;
-                
-                var result = font.GetCharacterInfo(_text[charIndex], out charInfo, 0, run.style.UnityFontStyle);
- 
+                var charInfo = new CharacterInfo();
+
                 if (_text[charIndex] == '\t')
                 {
                     _spaceCount++;
 
                     font.GetCharacterInfo(' ', out charInfo,
                         style.UnityFontSize, style.UnityFontStyle);
-                    float tabSize = charInfo.advance * tabCount;
-                    var newX = (float)Math.Floor(((offsetX / tabSize) + 1) * tabSize);
+                    double tabSize = charInfo.advance * tabCount;
+                    var newX = Math.Floor(((offsetX / tabSize) + 1) * tabSize);
                     if (newX > _width && _lineStart != charIndex)
                     {
                         _characterWidth[charIndex] = tabSize;
@@ -84,6 +80,7 @@ namespace UIWidgets.ui
                 }
                 else if (_text[charIndex] == ' ')
                 {
+                    font.GetCharacterInfo(_text[charIndex], out charInfo, style.UnityFontSize, run.style.UnityFontStyle);
                     _spaceCount++;
                     _characterPositions[charIndex].x = offsetX;
                     _characterWidth[charIndex] = charInfo.advance;
@@ -92,6 +89,8 @@ namespace UIWidgets.ui
                 }
                 else
                 {
+                    font.GetCharacterInfo(_text[charIndex], out charInfo, style.UnityFontSize,
+                        run.style.UnityFontStyle);
                     if (_spaceCount > 0 || blockStart == charIndex)
                     {
                         _wordStart = charIndex;
@@ -139,7 +138,7 @@ namespace UIWidgets.ui
             {
                 return;
             }
-            var offset = new Vector2(-_characterPositions[end].x, 0);
+            var offset = new Vector2d(-_characterPositions[end].x, 0);
             _characterPositions[end].x = 0;
             if (end < last)
             {

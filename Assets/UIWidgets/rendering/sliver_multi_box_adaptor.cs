@@ -59,7 +59,7 @@ namespace UIWidgets.rendering {
 
         public readonly Dictionary<int, RenderBox> _keepAliveBucket = new Dictionary<int, RenderBox>();
 
-        public override void adoptChild(AbstractNode childNode) {
+        protected override void adoptChild(AbstractNodeMixinDiagnosticableTree childNode) {
             base.adoptChild(childNode);
             var child = (RenderBox) childNode;
             var childParentData = (SliverMultiBoxAdaptorParentData) child.parentData;

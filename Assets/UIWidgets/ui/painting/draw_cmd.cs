@@ -57,8 +57,15 @@ namespace UIWidgets.ui {
     }
     
     public class DrawMesh : DrawCmd {
-        public Mesh mesh;
+        public IMesh mesh;
         public Material material;
     }
-    
+
+    public interface IMesh
+    {
+        void syncTextureUV();
+
+        Mesh mesh { get; }
+    }
 }
+

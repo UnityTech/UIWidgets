@@ -1,15 +1,46 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Text;
+using RSG.Promises;
+using UIWidgets.foundation;
 using UIWidgets.ui;
-using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace UIWidgets.scheduler {
-    public class _FrameCallbackEntry {
-        public _FrameCallbackEntry(FrameCallback callback, bool rescheduling = false) {
+    class _FrameCallbackEntry {
+        internal _FrameCallbackEntry(FrameCallback callback, bool rescheduling = false) {
             this.callback = callback;
+
+            D.assert(() => {
+                if (rescheduling) {
+                    D.assert(() => {
+                        if (_FrameCallbackEntry.debugCurrentCallbackStack == null) {
+                            throw new UIWidgetsError(
+                                "scheduleFrameCallback called with rescheduling true, but no callback is in scope.\n" +
+                                "The \"rescheduling\" argument should only be set to true if the " +
+                                "callback is being reregistered from within the callback itself, " +
+                                "and only then if the callback itself is entirely synchronous. " +
+                                "If this is the initial registration of the callback, or if the " +
+                                "callback is asynchronous, then do not use the \"rescheduling\" " +
+                                "argument.");
+                        }
+
+                        return true;
+                    });
+                    this.debugStack = _FrameCallbackEntry.debugCurrentCallbackStack;
+                } else {
+                    this.debugStack = new StackTrace(2, true);
+                }
+
+                return true;
+            });
         }
 
         public readonly FrameCallback callback;
+
+        public static StackTrace debugCurrentCallbackStack;
+        public StackTrace debugStack;
     }
 
     public enum SchedulerPhase {
@@ -22,13 +53,14 @@ namespace UIWidgets.scheduler {
 
     public class SchedulerBinding {
         public SchedulerBinding(Window window) {
-            this._window = window;
+            D.assert(window != null);
+            this.window = window;
 
-            window.onBeginFrame = this._handleBeginFrame;
-            window.onDrawFrame = this._handleDrawFrame;
+            window.onBeginFrame += this._handleBeginFrame;
+            window.onDrawFrame += this._handleDrawFrame;
         }
 
-        public readonly Window _window;
+        public readonly Window window;
 
         public double timeDilation {
             get { return this._timeDilation; }
@@ -42,11 +74,11 @@ namespace UIWidgets.scheduler {
             }
         }
 
-        public double _timeDilation = 1.0;
+        double _timeDilation = 1.0;
 
-        public int _nextFrameCallbackId = 0;
-        public Dictionary<int, _FrameCallbackEntry> _transientCallbacks = new Dictionary<int, _FrameCallbackEntry>();
-        public HashSet<int> _removedIds = new HashSet<int>();
+        int _nextFrameCallbackId = 0;
+        Dictionary<int, _FrameCallbackEntry> _transientCallbacks = new Dictionary<int, _FrameCallbackEntry>();
+        readonly HashSet<int> _removedIds = new HashSet<int>();
 
         public int transientCallbackCount {
             get { return this._transientCallbacks.Count; }
@@ -61,17 +93,18 @@ namespace UIWidgets.scheduler {
         }
 
         public void cancelFrameCallbackWithId(int id) {
+            D.assert(id > 0);
             this._transientCallbacks.Remove(id);
             this._removedIds.Add(id);
         }
 
-        public readonly List<FrameCallback> _persistentCallbacks = new List<FrameCallback>();
+        readonly List<FrameCallback> _persistentCallbacks = new List<FrameCallback>();
 
         public void addPersistentFrameCallback(FrameCallback callback) {
             this._persistentCallbacks.Add(callback);
         }
 
-        public readonly List<FrameCallback> _postFrameCallbacks = new List<FrameCallback>();
+        readonly List<FrameCallback> _postFrameCallbacks = new List<FrameCallback>();
 
         public void addPostFrameCallback(FrameCallback callback) {
             this._postFrameCallbacks.Add(callback);
@@ -81,13 +114,13 @@ namespace UIWidgets.scheduler {
             get { return this._hasScheduledFrame; }
         }
 
-        public bool _hasScheduledFrame = false;
+        bool _hasScheduledFrame = false;
 
         public SchedulerPhase schedulerPhase {
             get { return this._schedulerPhase; }
         }
 
-        public SchedulerPhase _schedulerPhase = SchedulerPhase.idle;
+        SchedulerPhase _schedulerPhase = SchedulerPhase.idle;
 
         public void ensureVisualUpdate() {
             switch (this.schedulerPhase) {
@@ -107,24 +140,45 @@ namespace UIWidgets.scheduler {
                 return;
             }
 
-            this._window.scheduleFrame();
+            D.assert(() => {
+                if (D.debugPrintScheduleFrameStacks) {
+                    Debug.LogFormat("scheduleFrame() called. Current phase is {0}.", this.schedulerPhase);
+                }
+
+                return true;
+            });
+
+            this.window.scheduleFrame();
             this._hasScheduledFrame = true;
         }
 
         public void scheduleForcedFrame() {
-            this.scheduleFrame();
+            if (this._hasScheduledFrame) {
+                return;
+            }
+
+            D.assert(() => {
+                if (D.debugPrintScheduleFrameStacks) {
+                    Debug.LogFormat("scheduleForcedFrame() called. Current phase is {0}.", this.schedulerPhase);
+                }
+
+                return true;
+            });
+
+            this.window.scheduleFrame();
+            this._hasScheduledFrame = true;
         }
 
-        public TimeSpan? _firstRawTimeStampInEpoch;
-        public TimeSpan _epochStart = TimeSpan.Zero;
-        public TimeSpan _lastRawTimeStamp = TimeSpan.Zero;
+        TimeSpan? _firstRawTimeStampInEpoch;
+        TimeSpan _epochStart = TimeSpan.Zero;
+        TimeSpan _lastRawTimeStamp = TimeSpan.Zero;
 
         public void resetEpoch() {
             this._epochStart = this._adjustForEpoch(this._lastRawTimeStamp);
             this._firstRawTimeStampInEpoch = null;
         }
 
-        public TimeSpan _adjustForEpoch(TimeSpan rawTimeStamp) {
+        TimeSpan _adjustForEpoch(TimeSpan rawTimeStamp) {
             var rawDurationSinceEpoch = this._firstRawTimeStampInEpoch == null
                 ? TimeSpan.Zero
                 : rawTimeStamp - this._firstRawTimeStampInEpoch.Value;
@@ -135,27 +189,54 @@ namespace UIWidgets.scheduler {
             get { return this._currentFrameTimeStamp.Value; }
         }
 
-        public TimeSpan? _currentFrameTimeStamp;
+        TimeSpan? _currentFrameTimeStamp;
 
-        public void _handleBeginFrame(TimeSpan rawTimeStamp) {
+        int _profileFrameNumber = 0;
+        string _debugBanner;
+
+        void _handleBeginFrame(TimeSpan rawTimeStamp) {
             this.handleBeginFrame(rawTimeStamp);
         }
 
-        public void _handleDrawFrame() {
+        void _handleDrawFrame() {
             this.handleDrawFrame();
         }
 
         public void handleBeginFrame(TimeSpan? rawTimeStamp) {
-            if (this._firstRawTimeStampInEpoch == null) {
-                this._firstRawTimeStampInEpoch = rawTimeStamp;
-            }
-
+            this._firstRawTimeStampInEpoch = this._firstRawTimeStampInEpoch ?? rawTimeStamp;
             this._currentFrameTimeStamp = this._adjustForEpoch(rawTimeStamp ?? this._lastRawTimeStamp);
 
             if (rawTimeStamp != null) {
                 this._lastRawTimeStamp = rawTimeStamp.Value;
             }
 
+            D.assert(() => {
+                this._profileFrameNumber += 1;
+                return true;
+            });
+
+            D.assert(() => {
+                if (D.debugPrintBeginFrameBanner || D.debugPrintEndFrameBanner) {
+                    var frameTimeStampDescription = new StringBuilder();
+                    if (rawTimeStamp != null) {
+                        SchedulerBinding._debugDescribeTimeStamp(
+                            this._currentFrameTimeStamp.Value, frameTimeStampDescription);
+                    } else {
+                        frameTimeStampDescription.Append("(warm-up frame)");
+                    }
+
+                    this._debugBanner = string.Format("▄▄▄▄▄▄▄▄ Frame {0}   {1} ▄▄▄▄▄▄▄▄",
+                        this._profileFrameNumber.ToString().PadRight(7),
+                        frameTimeStampDescription.ToString().PadLeft(18));
+                    if (D.debugPrintBeginFrameBanner) {
+                        Debug.Log(this._debugBanner);
+                    }
+                }
+
+                return true;
+            });
+
+            D.assert(this._schedulerPhase == SchedulerPhase.idle);
             this._hasScheduledFrame = false;
 
             try {
@@ -164,7 +245,8 @@ namespace UIWidgets.scheduler {
                 this._transientCallbacks = new Dictionary<int, _FrameCallbackEntry>();
                 foreach (var entry in callbacks) {
                     if (!this._removedIds.Contains(entry.Key)) {
-                        this._invokeFrameCallback(entry.Value.callback, this._currentFrameTimeStamp.Value);
+                        this._invokeFrameCallback(
+                            entry.Value.callback, this._currentFrameTimeStamp.Value, entry.Value.debugStack);
                     }
                 }
 
@@ -175,16 +257,10 @@ namespace UIWidgets.scheduler {
             }
         }
 
-        public void _invokeFrameCallback(FrameCallback callback, TimeSpan timeStamp) {
-            try {
-                callback(timeStamp);
-            }
-            catch (Exception ex) {
-                Debug.LogError("error in frame callback: " + ex);
-            }
-        }
 
         public void handleDrawFrame() {
+            D.assert(this._schedulerPhase == SchedulerPhase.midFrameMicrotasks);
+
             try {
                 this._schedulerPhase = SchedulerPhase.persistentCallbacks;
                 foreach (FrameCallback callback in this._persistentCallbacks) {
@@ -200,8 +276,79 @@ namespace UIWidgets.scheduler {
             }
             finally {
                 this._schedulerPhase = SchedulerPhase.idle;
+                D.assert(() => {
+                    if (D.debugPrintEndFrameBanner) {
+                        Debug.Log(new string('▀', this._debugBanner.Length));
+                    }
+
+                    this._debugBanner = null;
+                    return true;
+                });
                 this._currentFrameTimeStamp = null;
             }
+        }
+
+        static void _debugDescribeTimeStamp(TimeSpan timeStamp, StringBuilder buffer) {
+            if (timeStamp.TotalDays > 0) {
+                buffer.AppendFormat("{0}d ", timeStamp.Days);
+            }
+
+            if (timeStamp.TotalHours > 0) {
+                buffer.AppendFormat("{0}h ", timeStamp.Hours);
+            }
+
+            if (timeStamp.TotalMinutes > 0) {
+                buffer.AppendFormat("{0}m ", timeStamp.Minutes);
+            }
+
+            if (timeStamp.TotalSeconds > 0) {
+                buffer.AppendFormat("{0}s ", timeStamp.Seconds);
+            }
+
+            buffer.AppendFormat("{0}", timeStamp.Milliseconds);
+
+            int microseconds = (int) (timeStamp.Ticks % 10000 / 10);
+            if (microseconds > 0) {
+                buffer.AppendFormat(".{0}", microseconds.ToString().PadLeft(3, '0'));
+            }
+
+            buffer.Append("ms");
+        }
+
+        void _invokeFrameCallback(FrameCallback callback, TimeSpan timeStamp, StackTrace callbackStack = null) {
+            D.assert(callback != null);
+            D.assert(_FrameCallbackEntry.debugCurrentCallbackStack == null);
+            D.assert(() => {
+                _FrameCallbackEntry.debugCurrentCallbackStack = callbackStack;
+                return true;
+            });
+
+            try {
+                callback(timeStamp);
+            }
+            catch (Exception ex) {
+                UIWidgetsError.reportError(new UIWidgetsErrorDetails(
+                    exception: ex,
+                    library: "scheduler library",
+                    context: "during a scheduler callback",
+                    informationCollector: callbackStack == null
+                        ? (InformationCollector) null
+                        : information => {
+                            information.AppendLine(
+                                "\nThis exception was thrown in the context of a scheduler callback. " +
+                                "When the scheduler callback was _registered_ (as opposed to when the " +
+                                "exception was thrown), this was the stack:"
+                            );
+                            UIWidgetsError.defaultStackFilter(callbackStack.ToString().TrimEnd().Split('\n'))
+                                .Each((line) => information.AppendLine(line));
+                        }
+                ));
+            }
+
+            D.assert(() => {
+                _FrameCallbackEntry.debugCurrentCallbackStack = null;
+                return true;
+            });
         }
     }
 }

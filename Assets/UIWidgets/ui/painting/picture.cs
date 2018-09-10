@@ -106,7 +106,7 @@ namespace UIWidgets.ui {
                 var drawClipRRect = (DrawClipRRect) drawCmd;
                 this.addClipRect(drawClipRRect.rrect.outerRect);
             } else if (drawCmd is DrawMesh) {
-                var bounds = ((DrawMesh)drawCmd).mesh.bounds;
+                var bounds = ((DrawMesh)drawCmd).mesh.mesh.bounds;
                 
                 var rect = Rect.fromLTRB(bounds.min.x, bounds.min.y, bounds.max.x, bounds.max.y);
                 this.addPaintBounds(rect);
@@ -124,7 +124,7 @@ namespace UIWidgets.ui {
             if (this._clipRect != null) {
                 throw new Exception("already a clipRec, considering using saveLayer.");
             }
-
+ 
             this._clipRect = MatrixUtils.transformRect(this._transform, rect);
         }
 

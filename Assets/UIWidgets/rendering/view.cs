@@ -1,4 +1,5 @@
 ﻿using System;
+using UIWidgets.gestures;
 using UIWidgets.ui;
 using UnityEngine;
 using Rect = UIWidgets.ui.Rect;
@@ -82,6 +83,15 @@ namespace UIWidgets.rendering {
             }
         }
 
+        public bool hitTest(HitTestResult result, Offset position = null) {
+            if (this.child != null) {
+                this.child.hitTest(result, position: position);
+            }
+
+            result.add(new HitTestEntry(this));
+            return true;
+        }
+
         public override bool isRepaintBoundary {
             get { return true; }
         }
@@ -101,7 +111,7 @@ namespace UIWidgets.rendering {
             var builder = new SceneBuilder();
             this.layer.addToScene(builder, Offset.zero);
             var scene = builder.build();
-            this.owner.binding.render(scene);
+            this.owner.binding.window.render(scene);
         }
 
         public override Rect paintBounds {

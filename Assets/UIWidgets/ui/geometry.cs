@@ -58,7 +58,7 @@ namespace UIWidgets.ui {
         }
 
         public static bool operator ==(OffsetBase a, OffsetBase b) {
-            return a.Equals(b);
+            return object.Equals(a, b);
         }
 
         public static bool operator !=(OffsetBase a, OffsetBase b) {
@@ -224,6 +224,10 @@ namespace UIWidgets.ui {
 
         public double longestSide {
             get { return Math.Max(Math.Abs(this.width), Math.Abs(this.height)); }
+        }
+
+        public bool contains(Offset offset) {
+            return offset.dx >= 0.0 && offset.dx < this.width && offset.dy >= 0.0 && offset.dy < this.height;
         }
 
         public bool Equals(Size other) {
