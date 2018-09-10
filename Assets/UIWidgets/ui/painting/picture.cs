@@ -105,11 +105,11 @@ namespace UIWidgets.ui {
             } else if (drawCmd is DrawClipRRect) {
                 var drawClipRRect = (DrawClipRRect) drawCmd;
                 this.addClipRect(drawClipRRect.rrect.outerRect);
-            } else if (drawCmd is DrawMesh) {
-                var bounds = ((DrawMesh)drawCmd).mesh.mesh.bounds;
-                
-                var rect = Rect.fromLTRB(bounds.min.x, bounds.min.y, bounds.max.x, bounds.max.y);
-                this.addPaintBounds(rect);
+            } else if (drawCmd is DrawTextBlob)
+            {
+                var drawTextBlob = (DrawTextBlob) drawCmd;
+                var bounds = drawTextBlob.textBlob.boundsInText.shift(new Offset(drawTextBlob.x, drawTextBlob.y));
+                this.addPaintBounds(bounds);
             } else
             {
                 throw new Exception("unknown drawCmd: " + drawCmd);

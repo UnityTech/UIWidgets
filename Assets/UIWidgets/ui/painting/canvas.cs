@@ -1,4 +1,5 @@
 ﻿using UIWidgets.painting;
+using UIWidgets.ui.txt;
 using UnityEngine;
 
 namespace UIWidgets.ui {
@@ -25,7 +26,7 @@ namespace UIWidgets.ui {
 
         void clipRRect(RRect rrect);
 
-        void drawMesh(IMesh mesh, Material material);
+        void drawTextBlob(TextBlob textBlob, double x, double y);
     }
 
     public class RecorderCanvas : Canvas {
@@ -108,11 +109,12 @@ namespace UIWidgets.ui {
             });
         }
 
-        public void drawMesh(IMesh mesh, Material material)
+        public void drawTextBlob(TextBlob textBlob, double x, double y)
         {
-            this._recorder.addDrawCmd(new DrawMesh() {
-                mesh = mesh,
-                material = material,
+            this._recorder.addDrawCmd(new DrawTextBlob() {
+                textBlob = textBlob,
+                x = x,
+                y = y,
             });
         }
     }
