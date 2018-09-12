@@ -122,6 +122,22 @@ namespace UIWidgets.scheduler {
 
         SchedulerPhase _schedulerPhase = SchedulerPhase.idle;
 
+        public bool framesEnabled {
+            get { return this._framesEnabled; }
+            set {
+                if (this._framesEnabled == value) {
+                    return;
+                }
+
+                this._framesEnabled = value;
+                if (value) {
+                    this.scheduleFrame();
+                }
+            }
+        }
+
+        bool _framesEnabled = true; // todo: set it to false when app switched to background
+
         public void ensureVisualUpdate() {
             switch (this.schedulerPhase) {
                 case SchedulerPhase.idle:
@@ -136,7 +152,7 @@ namespace UIWidgets.scheduler {
         }
 
         public void scheduleFrame() {
-            if (this._hasScheduledFrame) {
+            if (this._hasScheduledFrame || !this._framesEnabled) {
                 return;
             }
 
