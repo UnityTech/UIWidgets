@@ -8,7 +8,11 @@ using UIWidgets.ui;
 using UnityEngine;
 
 namespace UIWidgets.painting {
-    public abstract class ImageProvider<T> {
+    public interface IImageProvider<out T> {
+        ImageStream resolve(ImageConfiguration configuration);
+    }
+
+    public abstract class ImageProvider<T> : IImageProvider<T> {
         public ImageStream resolve(ImageConfiguration configuration) {
             ImageStream stream = new ImageStream();
             T obtainedKey;
