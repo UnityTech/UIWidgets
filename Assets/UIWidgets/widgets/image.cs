@@ -130,14 +130,14 @@ namespace UIWidgets.widgets {
             if ((_imageStream == null ? null : _imageStream.key) == (newStream == null ? null : newStream.key))
                 return;
 
-            if (_isListeningToStream)
+            if (_isListeningToStream && _imageStream != null)
                 _imageStream.removeListener(_handleImageChanged);
 
             if (!((Image<T>) widget).gaplessPlayback) {
                 setState(() => { _imageInfo = null; });
 
                 _imageStream = newStream;
-                if (_isListeningToStream)
+                if (_isListeningToStream && _imageStream != null)
                     _imageStream.addListener(_handleImageChanged);
             }
         }
