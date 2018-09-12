@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using UIWidgets.painting;
+using UIWidgets.ui.painting.txt;
+using UIWidgets.ui.txt;
 using UnityEditor;
 using UnityEngine;
 
@@ -162,9 +164,9 @@ namespace UIWidgets.ui {
                 else if (drawCmd is DrawClipRRect) {
                     var drawClipRRect = (DrawClipRRect) drawCmd;
                     this.clipRRect(drawClipRRect.rrect);
-                } else if (drawCmd is DrawMesh) {
-                    var drawMesh = (DrawMesh) drawCmd;
-                    this.drawMesh(drawMesh.mesh, drawMesh.material);
+                } else if (drawCmd is DrawTextBlob) {
+                    var drawTextBlob = (DrawTextBlob) drawCmd;
+                    this.drawTextBlob(drawTextBlob.textBlob, drawTextBlob.x, drawTextBlob.y);
                 } else {
                     throw new Exception("unknown drawCmd: " + drawCmd);
                 }
@@ -262,12 +264,13 @@ namespace UIWidgets.ui {
             this.pushClipRRect(rect, this._transform);
         }
 
-        public void drawMesh(IMesh mesh, Material material)
+        public void drawTextBlob(TextBlob textBlob, double x, double y)
         {
-            prepareGL(material);
-            material.SetPass(0);
-            mesh.syncTextureUV();
-            Graphics.DrawMeshNow(mesh.mesh, Matrix4x4.identity);
+            var mesh = MeshGenrator.generateMesh(textBlob, x, y);
+            var font = FontManager.instance.getOrCreate(textBlob.style.safeFontFamily, textBlob.style.UnityFontSize);
+            prepareGL(font.material);
+            font.material.SetPass(0);
+            Graphics.DrawMeshNow(mesh, Matrix4x4.identity);
         }
 
         private void pushClipRect(Rect clipRect, Matrix4x4 transform) {
@@ -327,6 +330,11 @@ namespace UIWidgets.ui {
 
             GL.MultMatrix(this._transform);
         }
+//
+//        private double PixelRound(double v)
+//        {
+//            return Math.Floor(v * EditorGUIUtility.pixelsPerPoint)  EditorGUIUtility.pixelsPerPoint;
+//        }
 
         private class ClipRec {
             public ClipRec(Matrix4x4 transform, Rect rect = null, RRect rrect = null) {

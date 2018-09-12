@@ -132,6 +132,9 @@ namespace UIWidgets.widgets {
             }
         }
 
+        public void visitAncestorElements(Func<Element, bool> visitor) {
+        }
+
         public virtual void visitChildren(ElementVisitor visitor) {
         }
 
@@ -417,6 +420,7 @@ namespace UIWidgets.widgets {
 
     public interface BuildContext {
         Widget widget { get; }
+        void visitAncestorElements(Func<Element, bool> visitor);
     }
 
     public class BuildOwner {

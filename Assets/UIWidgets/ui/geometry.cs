@@ -21,6 +21,14 @@ namespace UIWidgets.ui {
 
             return value;
         }
+        
+        public static double abs(this double value) {
+            return Math.Abs(value);
+        }
+        
+        public static int sign(this double value) {
+            return Math.Sign(value);
+        }
     }
 
     public abstract class OffsetBase : IEquatable<OffsetBase> {

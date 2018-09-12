@@ -173,7 +173,7 @@ namespace UIWidgets.Tests
                     new List<TextSpan>()
                     {
                         new TextSpan("Real-time 3D revolutionizes:\n the animation pipeline.\n\n\nrevolutionizesn\n\nReal-time 3D revolutionizes the animation pipeline ", null),
-                    })), 200, 80);
+                    }), maxLines: 3), 200, 80);
         }
         
         RenderBox textHeight()

@@ -48,5 +48,9 @@ namespace UIWidgets.foundation {
         public static bool isNotEmpty(this string it) {
             return !string.IsNullOrEmpty(it);
         }
+
+        public static bool isFinite(this double it) {
+            return !double.IsInfinity(it);
+        }
     }
 }
