@@ -5,7 +5,7 @@ using UIWidgets.ui;
 
 namespace UIWidgets.animation {
 {% macro AnimationLazyListenerMixin(with) %} 
-    public abstract class AnimationLazyListenerMixin{{with}} : {{with}} {
+    public abstract class AnimationLazyListenerMixin{{with | safe}} : {{with | safe}} {
         int _listenerCounter = 0;
 
         protected void didRegisterListener() {
@@ -35,10 +35,10 @@ namespace UIWidgets.animation {
     }
 {% endmacro %}
 
-{{ AnimationLazyListenerMixin('AnimationDouble') }}
+{{ AnimationLazyListenerMixin('Animation<T>') }}
 
 {% macro AnimationEagerListenerMixin(with) %} 
-    public abstract class AnimationEagerListenerMixin{{with}} : {{with}} {
+    public abstract class AnimationEagerListenerMixin{{with | safe}} : {{with | safe}} {
         protected void didRegisterListener() {
         }
 
@@ -50,10 +50,10 @@ namespace UIWidgets.animation {
     }
 {% endmacro %}
 
-{{ AnimationEagerListenerMixin('AnimationDouble') }}
+{{ AnimationEagerListenerMixin('Animation<T>') }}
 
 {% macro AnimationLocalListenersMixin(with) %} 
-    public abstract class AnimationLocalListenersMixin{{with}} : {{with}} {
+    public abstract class AnimationLocalListenersMixin{{with | safe}} : {{with | safe}} {
         readonly ObserverList<VoidCallback> _listeners = new ObserverList<VoidCallback>();
 
         public override void addListener(VoidCallback listener) {
@@ -90,12 +90,12 @@ namespace UIWidgets.animation {
     }
 {% endmacro %}
 
-{{ AnimationLocalListenersMixin('AnimationLazyListenerMixinAnimationDouble') }}
+{{ AnimationLocalListenersMixin('AnimationLazyListenerMixinAnimation<T>') }}
 
-{{ AnimationLocalListenersMixin('AnimationEagerListenerMixinAnimationDouble') }}
+{{ AnimationLocalListenersMixin('AnimationEagerListenerMixinAnimation<T>') }}
 
 {% macro AnimationLocalStatusListenersMixin(with) %} 
-    public abstract class AnimationLocalStatusListenersMixin{{with}} : {{with}} {
+    public abstract class AnimationLocalStatusListenersMixin{{with | safe}} : {{with | safe}} {
         readonly ObserverList<AnimationStatusListener> _statusListeners = new ObserverList<AnimationStatusListener>();
 
         public override void addStatusListener(AnimationStatusListener listener) {
@@ -132,10 +132,10 @@ namespace UIWidgets.animation {
     }
 {% endmacro %}
 
-{{ AnimationLocalStatusListenersMixin('AnimationLocalListenersMixinAnimationLazyListenerMixinAnimationDouble') }}
+{{ AnimationLocalStatusListenersMixin('AnimationLocalListenersMixinAnimationLazyListenerMixinAnimation<T>') }}
 
-{{ AnimationLocalStatusListenersMixin('AnimationLazyListenerMixinAnimationDouble') }}
+{{ AnimationLocalStatusListenersMixin('AnimationLazyListenerMixinAnimation<T>') }}
 
-{{ AnimationLocalStatusListenersMixin('AnimationLocalListenersMixinAnimationEagerListenerMixinAnimationDouble') }}
+{{ AnimationLocalStatusListenersMixin('AnimationLocalListenersMixinAnimationEagerListenerMixinAnimation<T>') }}
 
 }

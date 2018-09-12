@@ -4,11 +4,8 @@ using UIWidgets.ui;
 namespace UIWidgets.animation {
     public enum AnimationStatus {
         dismissed,
-
         forward,
-
         reverse,
-
         completed,
     }
 

@@ -3,6 +3,12 @@ using UIWidgets.painting;
 using UnityEngine;
 
 namespace UIWidgets.ui {
+    public static class PaintingUtils {
+        internal static Color _scaleAlpha(this Color a, double factor) {
+            return a.withAlpha((a.alpha * factor).round().clamp(0, 255));
+        }
+    }
+
     public class Color : IEquatable<Color> {
         public Color(long value) {
             this.value = value & 0xFFFFFFFF;
@@ -64,6 +70,27 @@ namespace UIWidgets.ui {
 
         public Color withBlue(int b) {
             return Color.fromARGB(this.alpha, this.red, this.green, b);
+        }
+
+        public static Color lerp(Color a, Color b, double t) {
+            if (a == null && b == null) {
+                return null;
+            }
+
+            if (a == null) {
+                return b._scaleAlpha(t);
+            }
+
+            if (b == null) {
+                return a._scaleAlpha(1.0 - t);
+            }
+
+            return Color.fromARGB(
+                ((int) MathUtils.lerpDouble(a.alpha, b.alpha, t)).clamp(0, 255),
+                ((int) MathUtils.lerpDouble(a.red, b.red, t)).clamp(0, 255),
+                ((int) MathUtils.lerpDouble(a.green, b.green, t)).clamp(0, 255),
+                ((int) MathUtils.lerpDouble(a.blue, b.blue, t)).clamp(0, 255)
+            );
         }
 
         public bool Equals(Color other) {

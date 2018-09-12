@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UIWidgets.foundation;
+using UIWidgets.ui;
 
 namespace UIWidgets.animation {
     public abstract class Animatable<T> {
@@ -122,6 +123,94 @@ namespace UIWidgets.animation {
 
         public static bool operator !=(Tween<T> left, Tween<T> right) {
             return !object.Equals(left, right);
+        }
+    }
+
+    public class ReverseTween<T> : Tween<T> {
+        public ReverseTween(Tween<T> parent) : base(begin: parent.end, end: parent.begin) {
+        }
+
+        public readonly Tween<T> parent;
+
+        public override T lerp(double t) {
+            return this.parent.lerp(1.0 - t);
+        }
+    }
+
+    public class ColorTween : Tween<Color> {
+        public ColorTween(Color begin = null, Color end = null) : base(begin: begin, end: end) {
+        }
+
+        public override Color lerp(double t) {
+            return Color.lerp(this.begin, this.end, t);
+        }
+    }
+
+    public class SizeTween : Tween<Size> {
+        public SizeTween(Size begin = null, Size end = null) : base(begin: begin, end: end) {
+        }
+
+        public override Size lerp(double t) {
+            return Size.lerp(this.begin, this.end, t);
+        }
+    }
+
+    public class RectTween : Tween<Rect> {
+        public RectTween(Rect begin = null, Rect end = null) : base(begin: begin, end: end) {
+        }
+
+        public override Rect lerp(double t) {
+            return Rect.lerp(this.begin, this.end, t);
+        }
+    }
+
+    public class IntTween : Tween<int> {
+        public IntTween(int begin, int end) : base(begin: begin, end: end) {
+        }
+
+        public override int lerp(double t) {
+            return (this.begin + (this.end - this.begin) * t).round();
+        }
+    }
+
+    public class DoubleTween : Tween<double> {
+        public DoubleTween(int begin, int end) : base(begin: begin, end: end) {
+        }
+
+        public override double lerp(double t) {
+            return this.begin + (this.end - this.begin) * t;
+        }
+    }
+
+    public class StepTween : Tween<int> {
+        public StepTween(int begin, int end) : base(begin: begin, end: end) {
+        }
+
+        public override int lerp(double t) {
+            return (this.begin + (this.end - this.begin) * t).floor();
+        }
+    }
+
+    public class CurveTween : Animatable<double> {
+        public CurveTween(Curve curve = null) {
+            D.assert(curve != null);
+            this.curve = curve;
+        }
+
+        public readonly Curve curve;
+
+        public override double evaluate(Animation<double> animation) {
+            double t = animation.value;
+            if (t == 0.0 || t == 1.0) {
+                D.assert(this.curve.transform(t).round() == t);
+                return t;
+            }
+
+            return this.curve.transform(t);
+        }
+
+        public override string ToString() {
+            return string.Format("{0}(curve: {1})", this.GetType(), this.curve);
         }
     }
 }

@@ -6,7 +6,7 @@ using UIWidgets.ui;
 namespace UIWidgets.animation {
 
  
-    public abstract class AnimationLazyListenerMixinAnimationDouble : AnimationDouble {
+    public abstract class AnimationLazyListenerMixinAnimation<T> : Animation<T> {
         int _listenerCounter = 0;
 
         protected void didRegisterListener() {
@@ -38,7 +38,7 @@ namespace UIWidgets.animation {
 
 
  
-    public abstract class AnimationEagerListenerMixinAnimationDouble : AnimationDouble {
+    public abstract class AnimationEagerListenerMixinAnimation<T> : Animation<T> {
         protected void didRegisterListener() {
         }
 
@@ -52,7 +52,7 @@ namespace UIWidgets.animation {
 
 
  
-    public abstract class AnimationLocalListenersMixinAnimationLazyListenerMixinAnimationDouble : AnimationLazyListenerMixinAnimationDouble {
+    public abstract class AnimationLocalListenersMixinAnimationLazyListenerMixinAnimation<T> : AnimationLazyListenerMixinAnimation<T> {
         readonly ObserverList<VoidCallback> _listeners = new ObserverList<VoidCallback>();
 
         public override void addListener(VoidCallback listener) {
@@ -90,7 +90,7 @@ namespace UIWidgets.animation {
 
 
  
-    public abstract class AnimationLocalListenersMixinAnimationEagerListenerMixinAnimationDouble : AnimationEagerListenerMixinAnimationDouble {
+    public abstract class AnimationLocalListenersMixinAnimationEagerListenerMixinAnimation<T> : AnimationEagerListenerMixinAnimation<T> {
         readonly ObserverList<VoidCallback> _listeners = new ObserverList<VoidCallback>();
 
         public override void addListener(VoidCallback listener) {
@@ -129,7 +129,7 @@ namespace UIWidgets.animation {
 
 
  
-    public abstract class AnimationLocalStatusListenersMixinAnimationLocalListenersMixinAnimationLazyListenerMixinAnimationDouble : AnimationLocalListenersMixinAnimationLazyListenerMixinAnimationDouble {
+    public abstract class AnimationLocalStatusListenersMixinAnimationLocalListenersMixinAnimationLazyListenerMixinAnimation<T> : AnimationLocalListenersMixinAnimationLazyListenerMixinAnimation<T> {
         readonly ObserverList<AnimationStatusListener> _statusListeners = new ObserverList<AnimationStatusListener>();
 
         public override void addStatusListener(AnimationStatusListener listener) {
@@ -167,7 +167,7 @@ namespace UIWidgets.animation {
 
 
  
-    public abstract class AnimationLocalStatusListenersMixinAnimationLazyListenerMixinAnimationDouble : AnimationLazyListenerMixinAnimationDouble {
+    public abstract class AnimationLocalStatusListenersMixinAnimationLazyListenerMixinAnimation<T> : AnimationLazyListenerMixinAnimation<T> {
         readonly ObserverList<AnimationStatusListener> _statusListeners = new ObserverList<AnimationStatusListener>();
 
         public override void addStatusListener(AnimationStatusListener listener) {
@@ -205,7 +205,7 @@ namespace UIWidgets.animation {
 
 
  
-    public abstract class AnimationLocalStatusListenersMixinAnimationLocalListenersMixinAnimationEagerListenerMixinAnimationDouble : AnimationLocalListenersMixinAnimationEagerListenerMixinAnimationDouble {
+    public abstract class AnimationLocalStatusListenersMixinAnimationLocalListenersMixinAnimationEagerListenerMixinAnimation<T> : AnimationLocalListenersMixinAnimationEagerListenerMixinAnimation<T> {
         readonly ObserverList<AnimationStatusListener> _statusListeners = new ObserverList<AnimationStatusListener>();
 
         public override void addStatusListener(AnimationStatusListener listener) {

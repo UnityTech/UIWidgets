@@ -11,7 +11,7 @@ namespace UIWidgets.animation {
     }
 
     public class AnimationController :
-        AnimationLocalStatusListenersMixinAnimationLocalListenersMixinAnimationEagerListenerMixinAnimationDouble {
+        AnimationLocalStatusListenersMixinAnimationLocalListenersMixinAnimationEagerListenerMixinAnimation<double> {
         public AnimationController(
             double? value = null,
             TimeSpan? duration = null,
@@ -403,7 +403,7 @@ namespace UIWidgets.animation {
         public override double x(double timeInSeconds) {
             D.assert(timeInSeconds >= 0.0);
             double t = (timeInSeconds / this._periodInSeconds) % 1.0;
-            return this.lerpDouble(this.min, this.max, t);
+            return MathUtils.lerpDouble(this.min, this.max, t);
         }
 
         public override double dx(double timeInSeconds) {
@@ -412,10 +412,6 @@ namespace UIWidgets.animation {
 
         public override bool isDone(double timeInSeconds) {
             return false;
-        }
-
-        private double lerpDouble(double a, double b, double t) {
-            return a + (b - a) * t;
         }
     }
 }
