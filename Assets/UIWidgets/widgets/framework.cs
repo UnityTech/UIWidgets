@@ -445,6 +445,33 @@ namespace UIWidgets.widgets {
         public abstract void performRebuild();
     }
 
+    public delegate Widget ErrorWidgetBuilder(object exception);
+
+    public class ErrorWidget : LeafRenderObjectWidget {
+
+        public ErrorWidget(object exception) : base(new UniqueKey()) {
+            message = _stringify(exception);
+        }
+
+        public static ErrorWidgetBuilder builder = exception => { return new ErrorWidget(exception); };
+
+        public String message;
+
+        static String _stringify(object exception) {
+            try {
+                return exception.ToString();
+            }
+            catch (Exception e) {
+            } // ignore: empty_catches
+
+            return "Error";
+        }
+
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderErrorBox(message);
+        }
+    }
+
 
     public abstract class ComponentElement : Element {
         protected ComponentElement(Widget widget) : base(widget) {
@@ -545,7 +572,7 @@ namespace UIWidgets.widgets {
     public abstract class ProxyElement : ComponentElement {
         protected ProxyElement(Widget widget) : base(widget) {
         }
-        
+
         public ProxyWidget widget {
             get { return (ProxyWidget) base.widget; }
         }
@@ -558,11 +585,11 @@ namespace UIWidgets.widgets {
     public class InheritedElement : ProxyElement {
         public InheritedElement(Widget widget) : base(widget) {
         }
-        
+
         public InheritedWidget widget {
             get { return (InheritedWidget) base.widget; }
         }
-        
+
         public HashSet<Element> _dependents = new HashSet<Element>();
 
         public void _updateInheritance() {

@@ -97,10 +97,10 @@ namespace UIWidgets.widgets {
 
         public override void didChangeDependencies() {
             _resolveImage();
-//            if (TickerMode.of(context))
-//                _listenToStream();
-//            else
-//                _stopListeningToStream();
+            if (TickerMode.of(context))
+                _listenToStream();
+            else
+                _stopListeningToStream();
         }
 
         public override void didUpdateWidget(StatefulWidget oldWidget) {
