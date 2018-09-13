@@ -41,6 +41,70 @@ namespace UIWidgets.widgets {
         public abstract Widget build(BuildContext context);
     }
 
+    public abstract class StatefulWidget : Widget {
+        protected StatefulWidget(string key) : base(key) {
+        }
+        
+        public override Element createElement() {
+            return new StatefulElement(this);
+        }
+
+        public abstract State createState();
+    }
+    
+    enum _StateLifecycle {
+        created,
+        initialized,
+        ready,
+        defunct,
+    }
+
+    public abstract class State : Diagnosticable {
+        public StatefulWidget widget {
+            get { return _widget; }
+            set { _widget = value; }
+        }
+
+        private StatefulWidget _widget;
+        
+        _StateLifecycle _debugLifecycleState = _StateLifecycle.created;
+
+        public BuildContext context {
+            get { return _element; }
+        }
+
+        public StatefulElement element {
+            get { return _element; }
+            set { _element = value; }
+        }
+        
+        private StatefulElement _element;
+
+        public bool mounted {
+            get { return _element != null; }
+        }
+
+        public virtual void initState() {
+            D.assert(_debugLifecycleState == _StateLifecycle.created);    
+        }
+
+        public abstract void didChangeDependencies();
+        public abstract void didUpdateWidget(StatefulWidget oldWidget);
+
+        public abstract void reassemble();
+
+        public void setState(VoidCallback fn) {
+            fn();
+            _element.markNeedsBuild();
+        }
+
+        public abstract Widget build(BuildContext context);
+
+        protected internal override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+        }
+    }
+
     public abstract class RenderObjectWidget : Widget {
         protected RenderObjectWidget(string key) : base(key) {
         }
@@ -51,6 +115,26 @@ namespace UIWidgets.widgets {
         }
 
         public virtual void didUnmountRenderObject(RenderObject renderObject) {
+        }
+    }
+
+    public abstract class LeafRenderObjectWidget : RenderObjectWidget {
+        protected LeafRenderObjectWidget(string key) : base(key) {
+        }
+
+        public override Element createElement() {
+            return new LeafRenderObjectElement(this);
+        }
+    }
+
+    public abstract class SingleChildRenderObjectWidget : RenderObjectWidget {
+        protected SingleChildRenderObjectWidget(string key) : base(key) {
+        }
+
+        public Widget child;
+
+        public override Element createElement() {
+            return new SingleChildRenderObjectElement(this);
         }
     }
 
@@ -112,6 +196,13 @@ namespace UIWidgets.widgets {
 
         public bool _active = false;
 
+        public virtual void _reassemble() {
+            markNeedsBuild();
+            ElementVisitor visit = null;
+            visit = child => { child._reassemble(); };
+            visitChildren(visit);
+        }
+
         public RenderObject renderObject {
             get {
                 RenderObject result = null;
@@ -121,7 +212,8 @@ namespace UIWidgets.widgets {
                     Assert.IsNull(result);
                     if (element is RenderObjectElement) {
                         result = element.renderObject;
-                    } else {
+                    }
+                    else {
                         element.visitChildren(visit);
                     }
                 };
@@ -130,6 +222,9 @@ namespace UIWidgets.widgets {
 
                 return result;
             }
+        }
+
+        public void visitAncestorElements(Func<Element, bool> visitor) {
         }
 
         public virtual void visitChildren(ElementVisitor visitor) {
@@ -314,7 +409,7 @@ namespace UIWidgets.widgets {
             this._firstBuild();
         }
 
-        public void _firstBuild() {
+        public virtual void _firstBuild() {
             this.rebuild();
         }
 
@@ -375,6 +470,33 @@ namespace UIWidgets.widgets {
         }
     }
 
+    public class StatefulElement : ComponentElement {
+        public StatefulElement(StatefulWidget widget) : base(widget) {
+            _state = widget.createState();
+            _state.element = this;
+            _state.widget = widget;
+        }
+
+        public State state {
+            get { return _state; }
+        }
+
+        private State _state;
+
+        public override Widget build() {
+            return state.build(this);
+        }
+
+        public override void _reassemble() {
+            state.reassemble();
+            base._reassemble();
+        }
+
+        public override void _firstBuild() {
+            base._firstBuild();
+        }
+    }
+
     public abstract class RenderObjectElement : Element {
         protected RenderObjectElement(RenderObjectWidget widget) : base(widget) {
         }
@@ -417,6 +539,7 @@ namespace UIWidgets.widgets {
 
     public interface BuildContext {
         Widget widget { get; }
+        void visitAncestorElements(Func<Element, bool> visitor);
     }
 
     public class BuildOwner {
@@ -494,6 +617,23 @@ namespace UIWidgets.widgets {
 
         public void finalizeTree() {
             this._inactiveElements._unmountAll();
+        }
+    }
+
+    public class LeafRenderObjectElement : RenderObjectElement {
+        public LeafRenderObjectElement(LeafRenderObjectWidget widget) : base(widget) {
+        }
+
+        public override void forgetChild(Element child) {
+        }
+    }
+
+    public class SingleChildRenderObjectElement : RenderObjectElement {
+        public SingleChildRenderObjectElement(SingleChildRenderObjectWidget widget) : base(widget) {
+        }
+
+
+        public override void forgetChild(Element child) {
         }
     }
 

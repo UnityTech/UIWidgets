@@ -1,0 +1,2 @@
+namespace UIWidgets.animation {
+}

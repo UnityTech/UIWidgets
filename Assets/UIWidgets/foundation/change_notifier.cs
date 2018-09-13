@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UIWidgets.ui;
 using UnityEngine;
 
@@ -11,7 +12,7 @@ namespace UIWidgets.foundation {
     }
 
     public static class ListenableUtils {
-        public static Listenable merge(List<Listenable> listenables) {
+        public static Listenable merge(this List<Listenable> listenables) {
             return new _MergingListenable(listenables);
         }
     }
@@ -20,26 +21,52 @@ namespace UIWidgets.foundation {
         T value { get; }
     }
 
-    public class ChangeNotifier : Listenable {
-        public ObserverList<VoidCallback> _listeners = new ObserverList<VoidCallback>();
+    public class ChangeNotifier : Listenable, IDisposable {
+        ObserverList<VoidCallback> _listeners = new ObserverList<VoidCallback>();
 
-        public bool hasListeners {
-            get { return this._listeners.Count > 0; }
+        bool _debugAssertNotDisposed() {
+            D.assert(() => {
+                if (this._listeners == null) {
+                    throw new UIWidgetsError(
+                        string.Format("A {0} was used after being disposed.\n" +
+                                      "Once you have called dispose() on a {0}, it can no longer be used.",
+                            this.GetType()));
+                }
+
+                return true;
+            });
+
+            return true;
+        }
+
+        protected bool hasListeners {
+            get {
+                D.assert(this._debugAssertNotDisposed());
+                return this._listeners.isNotEmpty();
+            }
         }
 
         public void addListener(VoidCallback listener) {
+            D.assert(this._debugAssertNotDisposed());
             this._listeners.Add(listener);
         }
 
         public void removeListener(VoidCallback listener) {
+            D.assert(this._debugAssertNotDisposed());
             this._listeners.Remove(listener);
         }
 
+        public void Dispose() {
+            this.dispose();
+        }
+
         public virtual void dispose() {
+            D.assert(this._debugAssertNotDisposed());
             this._listeners = null;
         }
 
-        public void notifyListeners() {
+        protected void notifyListeners() {
+            D.assert(this._debugAssertNotDisposed());
             if (this._listeners != null) {
                 var localListeners = new List<VoidCallback>(this._listeners);
                 foreach (VoidCallback listener in localListeners) {
@@ -49,15 +76,23 @@ namespace UIWidgets.foundation {
                         }
                     }
                     catch (Exception ex) {
-                        Debug.LogError("error while dispatching notifications: " + ex);
+                        UIWidgetsError.reportError(new UIWidgetsErrorDetails(
+                            exception: ex,
+                            library: "foundation library",
+                            context: "while dispatching notifications for " + this.GetType(),
+                            informationCollector: information => {
+                                information.AppendLine("The " + this.GetType() + " sending notification was:");
+                                information.Append("  " + this);
+                            }
+                        ));
                     }
                 }
             }
         }
     }
 
-    public class _MergingListenable : ChangeNotifier {
-        public _MergingListenable(List<Listenable> _children) {
+    class _MergingListenable : ChangeNotifier {
+        internal _MergingListenable(List<Listenable> _children) {
             this._children = _children;
 
             foreach (Listenable child in _children) {
@@ -67,7 +102,7 @@ namespace UIWidgets.foundation {
             }
         }
 
-        public readonly List<Listenable> _children;
+        readonly List<Listenable> _children;
 
         public override void dispose() {
             foreach (Listenable child in this._children) {
@@ -77,6 +112,10 @@ namespace UIWidgets.foundation {
             }
 
             base.dispose();
+        }
+
+        public override string ToString() {
+            return "Listenable.merge([" + string.Join(", ", this._children.Select(c => c.ToString()).ToArray()) + "])";
         }
     }
 
@@ -97,6 +136,10 @@ namespace UIWidgets.foundation {
             }
         }
 
-        public T _value;
+        T _value;
+
+        public override string ToString() {
+            return Diagnostics.describeIdentity(this) + "(" + this._value + ")";
+        }
     }
 }

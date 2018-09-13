@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using RSG;
+using UIWidgets.animation;
 using UIWidgets.foundation;
 
 namespace UIWidgets.rendering {
@@ -19,7 +22,8 @@ namespace UIWidgets.rendering {
                     return ScrollDirection.forward;
             }
 
-            throw new Exception("unknown direction");
+            D.assert(false);
+            return default(ScrollDirection);
         }
     }
 
@@ -42,19 +46,33 @@ namespace UIWidgets.rendering {
         public abstract void correctBy(double correction);
         public abstract void jumpTo(double pixels);
 
+        public abstract IPromise<object> animateTo(double to, TimeSpan duration, Curve curve);
+
         public abstract ScrollDirection userScrollDirection { get; }
+
+        public abstract bool allowImplicitScrolling { get; }
+
+        public override string ToString() {
+            var description = new List<string>();
+            this.debugFillDescription(description);
+            return Diagnostics.describeIdentity(this) + "(" + string.Join(", ", description.ToArray()) + ")";
+        }
+
+        protected virtual void debugFillDescription(List<String> description) {
+            description.Add("offset: " + this.pixels.ToString("F1"));
+        }
     }
 
-    public class _FixedViewportOffset : ViewportOffset {
-        public _FixedViewportOffset(double _pixels) {
+    class _FixedViewportOffset : ViewportOffset {
+        internal _FixedViewportOffset(double _pixels) {
             this._pixels = _pixels;
         }
 
-        public new static _FixedViewportOffset zero() {
+        internal new static _FixedViewportOffset zero() {
             return new _FixedViewportOffset(0.0);
         }
 
-        public double _pixels;
+        double _pixels;
 
         public override double pixels {
             get { return this._pixels; }
@@ -75,8 +93,16 @@ namespace UIWidgets.rendering {
         public override void jumpTo(double pixels) {
         }
 
+        public override IPromise<object> animateTo(double to, TimeSpan duration, Curve curve) {
+            return Promise<object>.Resolved(null);
+        }
+
         public override ScrollDirection userScrollDirection {
             get { return ScrollDirection.idle; }
+        }
+
+        public override bool allowImplicitScrolling {
+            get { return false; }
         }
     }
 }

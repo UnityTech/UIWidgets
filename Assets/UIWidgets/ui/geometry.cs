@@ -21,6 +21,30 @@ namespace UIWidgets.ui {
 
             return value;
         }
+
+        public static double abs(this double value) {
+            return Math.Abs(value);
+        }
+
+        public static int sign(this double value) {
+            return Math.Sign(value);
+        }
+
+        public static bool isFinite(this double it) {
+            return !double.IsInfinity(it);
+        }
+
+        public static double lerpDouble(double a, double b, double t) {
+            return a + (b - a) * t;
+        }
+
+        public static int round(this double value) {
+            return (int) Math.Round(value);
+        }
+        
+        public static int floor(this double value) {
+            return (int) Math.Floor(value);
+        }
     }
 
     public abstract class OffsetBase : IEquatable<OffsetBase> {
@@ -230,6 +254,22 @@ namespace UIWidgets.ui {
             return offset.dx >= 0.0 && offset.dx < this.width && offset.dy >= 0.0 && offset.dy < this.height;
         }
 
+        public static Size lerp(Size a, Size b, double t) {
+            if (a == null && b == null) {
+                return null;
+            }
+
+            if (a == null) {
+                return b * t;
+            }
+
+            if (b == null) {
+                return a * (1.0 - t);
+            }
+
+            return new Size(MathUtils.lerpDouble(a.width, b.width, t), MathUtils.lerpDouble(a.height, b.height, t));
+        }
+
         public bool Equals(Size other) {
             return this._dx.Equals(other._dx) && this._dy.Equals(other._dy);
         }
@@ -416,6 +456,28 @@ namespace UIWidgets.ui {
 
         public bool contains(Rect rect) {
             return this.contains(rect.topLeft) && this.contains(rect.bottomRight);
+        }
+
+        public static Rect lerp(Rect a, Rect b, double t) {
+            if (a == null && b == null) {
+                return null;
+            }
+
+            if (a == null) {
+                return Rect.fromLTRB(b.left * t, b.top * t, b.right * t, b.bottom * t);
+            }
+
+            if (b == null) {
+                double k = 1.0 - t;
+                return Rect.fromLTRB(a.left * k, a.top * k, a.right * k, a.bottom * k);
+            }
+
+            return Rect.fromLTRB(
+                MathUtils.lerpDouble(a.left, b.left, t),
+                MathUtils.lerpDouble(a.top, b.top, t),
+                MathUtils.lerpDouble(a.right, b.right, t),
+                MathUtils.lerpDouble(a.bottom, b.bottom, t)
+            );
         }
 
         public bool Equals(Rect other) {

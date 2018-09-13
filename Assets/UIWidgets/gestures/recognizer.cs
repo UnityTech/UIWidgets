@@ -46,7 +46,16 @@ namespace UIWidgets.gestures {
                 result = callback();
             }
             catch (Exception ex) {
-                Debug.LogError("Error while handling a gesture [" + name + "]: " + ex);
+                UIWidgetsError.reportError(new UIWidgetsErrorDetails(
+                    exception: ex,
+                    library: "gesture",
+                    context: "while handling a gesture",
+                    informationCollector: information => {
+                        information.AppendLine("Handler: " + name);
+                        information.AppendLine("Recognizer:");
+                        information.AppendLine("  " + this);
+                    }
+                ));
             }
 
             return result;

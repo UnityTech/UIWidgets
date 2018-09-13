@@ -28,6 +28,20 @@ namespace UIWidgets.ui {
 
         VoidCallback _onMetricsChanged;
 
+        public VoidCallback onLocaleChanged {
+            get { return this._onLocaleChanged; }
+            set { this._onLocaleChanged = value; }
+        }
+
+        private VoidCallback _onLocaleChanged;
+
+        public VoidCallback onAccessibilityFeaturesChanged {
+            get { return this._onAccessibilityFeaturesChanged; }
+            set { this._onAccessibilityFeaturesChanged = value; }
+        }
+
+        private VoidCallback _onAccessibilityFeaturesChanged;
+        
         public FrameCallback onBeginFrame {
             get { return this._onBeginFrame; }
             set { this._onBeginFrame = value; }

@@ -28,6 +28,12 @@ namespace UIWidgets.painting {
         private ImageStreamCompleter _completer;
         private List<_ImageListenerPair> _listeners;
 
+        public System.Object key {
+            get {
+               return  _completer != null ? (object) _completer : this;
+            }
+        }
+
         public ImageStreamCompleter completer {
             get { return _completer; }
         }
@@ -43,6 +49,25 @@ namespace UIWidgets.painting {
                         listenerPair.errorListener
                     );
                 }
+            }
+        }
+
+        public void addListener(ImageListener listener,  ImageErrorListerner onError = null) {
+            if (_completer != null) {
+                _completer.addListener(listener, onError);
+            } else {
+                if (_listeners == null) {
+                    _listeners = new List<_ImageListenerPair>();
+                }
+                _listeners.Add(new _ImageListenerPair(listener, onError));
+            }
+        }
+
+        public void removeListener(ImageListener listener) {
+            if (_completer != null) {
+                _completer.removeListener(listener);
+            } else {
+                _listeners.RemoveAll(listenerPair => listenerPair.listener == listener);
             }
         }
     }
