@@ -412,4 +412,89 @@ namespace UIWidgets.ui {
             }
         }
     }
+
+    public class TextBox: IEquatable<TextBox>
+    {
+        public readonly double left;
+        
+        public readonly double top;
+        
+        public readonly double right;
+        
+        public readonly double bottom;
+
+        public readonly TextDirection direction;
+
+        private TextBox(double left, double top, double right, double bottom, TextDirection direction)
+        {
+            this.left = left;
+            this.top = top;
+            this.right = right;
+            this.bottom = bottom;
+            this.direction = direction;
+        }
+        
+        public static TextBox fromLTBD(double left, double top, double right, double bottom, TextDirection direction)
+        {
+            return new TextBox(left, top, right, bottom, direction);
+        }
+
+        public Rect toRect()
+        {
+            return Rect.fromLTRB(left, top, right, bottom);
+        }
+
+        public double start
+        {
+            get { return direction == TextDirection.ltr ? left : right; }
+        }
+        
+        public double end
+        {
+            get { return direction == TextDirection.ltr ? right : left; }
+        }
+
+        public bool Equals(TextBox other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return left.Equals(other.left) && top.Equals(other.top) && right.Equals(other.right) && bottom.Equals(other.bottom) && direction == other.direction;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((TextBox) obj);
+        }
+
+        public override string ToString()
+        {
+            return string.Format("Left: {0}, Top: {1}, Right: {2}, Bottom: {3}, Direction: {4}", left, top, right, bottom, direction);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hashCode = left.GetHashCode();
+                hashCode = (hashCode * 397) ^ top.GetHashCode();
+                hashCode = (hashCode * 397) ^ right.GetHashCode();
+                hashCode = (hashCode * 397) ^ bottom.GetHashCode();
+                hashCode = (hashCode * 397) ^ (int) direction;
+                return hashCode;
+            }
+        }
+
+        public static bool operator ==(TextBox left, TextBox right)
+        {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(TextBox left, TextBox right)
+        {
+            return !Equals(left, right);
+        }
+    }
 }
