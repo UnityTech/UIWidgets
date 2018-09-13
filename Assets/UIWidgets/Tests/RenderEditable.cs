@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using RSG;
+using UIWidgets.animation;
 using UIWidgets.editor;
 using UIWidgets.foundation;
 using UIWidgets.painting;
@@ -23,6 +25,48 @@ namespace UIWidgets.Tests
 
         private int _selected;
 
+        class _FixedViewportOffset : ViewportOffset {
+            internal _FixedViewportOffset(double _pixels) {
+                this._pixels = _pixels;
+            }
+
+            internal new static _FixedViewportOffset zero() {
+                return new _FixedViewportOffset(0.0);
+            }
+
+            double _pixels;
+
+            public override double pixels {
+                get { return this._pixels; }
+            }
+
+            public override bool applyViewportDimension(double viewportDimension) {
+                return true;
+            }
+
+            public override bool applyContentDimensions(double minScrollExtent, double maxScrollExtent) {
+                return true;
+            }
+
+            public override void correctBy(double correction) {
+                this._pixels += correction;
+            }
+
+            public override void jumpTo(double pixels) {
+            }
+
+            public override IPromise<object> animateTo(double to, TimeSpan duration, Curve curve) {
+                return Promise<object>.Resolved(null);
+            }
+
+            public override ScrollDirection userScrollDirection {
+                get { return ScrollDirection.idle; }
+            }
+
+            public override bool allowImplicitScrolling {
+                get { return false; }
+            }
+        }
         
         RenderEditable() {
             this._options = new Func<RenderBox>[] {
