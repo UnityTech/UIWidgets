@@ -605,7 +605,7 @@ namespace UIWidgets.rendering {
         public virtual void handleEvent(PointerEvent evt, HitTestEntry entry) {
         }
 
-        protected internal override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             properties.add(new DiagnosticsProperty<object>(
                 "creator", this.debugCreator, defaultValue: Diagnostics.kNullDefaultValue,
                 level: DiagnosticLevel.debug));

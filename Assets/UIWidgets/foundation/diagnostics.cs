@@ -761,6 +761,97 @@ namespace UIWidgets.foundation {
         }
     }
 
+    public class ObjectFlagProperty<T> : DiagnosticsProperty<T> {
+        public ObjectFlagProperty(String name, T value,
+            string ifPresent = null,
+            String ifNull = null,
+            bool showName = false,
+            DiagnosticLevel level = DiagnosticLevel.info
+        ) : base(
+            name,
+            value,
+            showName: showName,
+            ifNull: ifNull,
+            level: level
+        ) {
+            D.assert(ifPresent != null || ifNull != null);
+        }
+
+        private ObjectFlagProperty(
+            String name,
+            T value,
+            DiagnosticLevel level = DiagnosticLevel.info
+        ) : base(
+            name,
+            value,
+            showName: false,
+            level: level
+        ) {
+            D.assert(name != null);
+            this.ifPresent = "has " + name;
+        }
+
+        public static ObjectFlagProperty<T> has(
+            String name,
+            T value,
+            DiagnosticLevel level = DiagnosticLevel.info
+        ) {
+            return new ObjectFlagProperty<T>(name, value, level);
+        }
+
+        public readonly string ifPresent;
+
+        protected override string valueToString(
+            TextTreeConfiguration parentConfiguration = null) {
+            if (this.value != null) {
+                if (this.ifPresent != null) {
+                    return this.ifPresent;
+                }
+            } else {
+                if (this.ifNull != null) {
+                    return this.ifNull;
+                }
+            }
+
+            return base.valueToString(parentConfiguration: parentConfiguration);
+        }
+
+        public override bool showName {
+            get {
+                if ((this.value != null && this.ifPresent == null) || (this.value == null && this.ifNull == null)) {
+                    return true;
+                }
+
+                return base.showName;
+            }
+        }
+
+        public override DiagnosticLevel level {
+            get {
+                if (this.value != null) {
+                    if (this.ifPresent == null) {
+                        return DiagnosticLevel.hidden;
+                    }
+                } else {
+                    if (this.ifNull == null) {
+                        return DiagnosticLevel.hidden;
+                    }
+                }
+
+                return base.level;
+            }
+        }
+
+        public override Dictionary<String, Object> toJsonMap() {
+            var json = base.toJsonMap();
+            if (this.ifPresent != null) {
+                json["ifPresent"] = this.ifPresent;
+            }
+
+            return json;
+        }
+    }
+
     public delegate T ComputePropertyValueCallback<T>();
 
     public class DiagnosticsProperty<T> : DiagnosticsNode {
@@ -789,14 +880,12 @@ namespace UIWidgets.foundation {
             }
 
             D.assert(defaultValue == null || defaultValue == Diagnostics.kNoDefaultValue || defaultValue is T);
-
             this._description = description;
             this._valueComputed = true;
             this._value = value;
             this._computeValue = null;
             this.ifNull = ifNull ?? (missingIfNull ? "MISSING" : null);
             this._defaultLevel = level;
-
             this.ifEmpty = ifEmpty;
             this.defaultValue = defaultValue;
             this.tooltip = tooltip;
@@ -828,14 +917,12 @@ namespace UIWidgets.foundation {
             }
 
             D.assert(defaultValue == null || defaultValue == Diagnostics.kNoDefaultValue || defaultValue is T);
-
             this._description = description;
             this._valueComputed = false;
             this._value = default(T);
             this._computeValue = computeValue;
             this._defaultLevel = level;
             this.ifNull = ifNull ?? (missingIfNull ? "MISSING" : null);
-
             this.ifEmpty = ifEmpty;
             this.defaultValue = defaultValue;
             this.tooltip = tooltip;
@@ -875,7 +962,6 @@ namespace UIWidgets.foundation {
 
         public override Dictionary<string, object> toJsonMap() {
             var json = base.toJsonMap();
-
             if (this.defaultValue != Diagnostics.kNoDefaultValue) {
                 json["defaultValue"] = this.defaultValue == null ? "null" : this.defaultValue.ToString();
             }
@@ -893,17 +979,13 @@ namespace UIWidgets.foundation {
             }
 
             json["missingIfNull"] = this.missingIfNull;
-
             if (this.exception != null) {
                 json["exception"] = this.exception.ToString();
             }
 
             json["propertyType"] = this.propertyType.ToString();
-
             json["valueToString"] = this.valueToString();
-
             json["defaultLevel"] = this._defaultLevel.ToString();
-
             if (typeof(Diagnosticable).IsAssignableFrom(typeof(T))) {
                 json["isDiagnosticableValue"] = true;
             }
@@ -948,11 +1030,8 @@ namespace UIWidgets.foundation {
         }
 
         public readonly string ifNull;
-
         public readonly string ifEmpty;
-
         public readonly string tooltip;
-
         public readonly bool missingIfNull;
 
         public Type propertyType {
@@ -997,7 +1076,6 @@ namespace UIWidgets.foundation {
         }
 
         public readonly object defaultValue;
-
         DiagnosticLevel _defaultLevel;
 
         public override DiagnosticLevel level {
@@ -1052,7 +1130,6 @@ namespace UIWidgets.foundation {
         }
 
         readonly T _value;
-
         DiagnosticPropertiesBuilder _cachedBuilder;
 
         DiagnosticPropertiesBuilder _builder {
@@ -1146,7 +1223,7 @@ namespace UIWidgets.foundation {
             );
         }
 
-        protected internal virtual void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+        public virtual void debugFillProperties(DiagnosticPropertiesBuilder properties) {
         }
     }
 
@@ -1194,7 +1271,7 @@ namespace UIWidgets.foundation {
             );
         }
 
-        protected internal virtual List<DiagnosticsNode> debugDescribeChildren() {
+        public virtual List<DiagnosticsNode> debugDescribeChildren() {
             return new List<DiagnosticsNode>();
         }
     }

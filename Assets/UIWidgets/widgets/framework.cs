@@ -1,57 +1,307 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using UIWidgets.foundation;
 using UIWidgets.rendering;
 using UIWidgets.ui;
 using UnityEngine.Assertions;
 
 namespace UIWidgets.widgets {
+    public class UniqueKey : LocalKey {
+        public UniqueKey() {
+        }
+
+        public override string ToString() {
+            return string.Format("[#{0}]", Diagnostics.shortHash(this));
+        }
+    }
+
+    public class ObjectKey : LocalKey, IEquatable<ObjectKey> {
+        public ObjectKey(object value) {
+            this.value = value;
+        }
+
+        public readonly object value;
+
+        public bool Equals(ObjectKey other) {
+            if (object.ReferenceEquals(null, other)) return false;
+            if (object.ReferenceEquals(this, other)) return true;
+            return object.Equals(this.value, other.value);
+        }
+
+        public override bool Equals(object obj) {
+            if (object.ReferenceEquals(null, obj)) return false;
+            if (object.ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return this.Equals((ObjectKey) obj);
+        }
+
+        public override int GetHashCode() {
+            return (this.value != null ? this.value.GetHashCode() : 0);
+        }
+
+        public static bool operator ==(ObjectKey left, ObjectKey right) {
+            return object.Equals(left, right);
+        }
+
+        public static bool operator !=(ObjectKey left, ObjectKey right) {
+            return !object.Equals(left, right);
+        }
+
+        public override string ToString() {
+            return string.Format("[{0} {1}]", this.GetType(), Diagnostics.describeIdentity(this.value));
+        }
+    }
+
+    public abstract class GlobalKey<T> : Key where T : State<StatefulWidget> {
+        protected GlobalKey() {
+        }
+
+        public static GlobalKey<T> key(string debugLabel = null) {
+            return new LabeledGlobalKey<T>(debugLabel);
+        }
+
+        static readonly Dictionary<GlobalKey<T>, Element> _registry = new Dictionary<GlobalKey<T>, Element>();
+        static readonly HashSet<GlobalKey<T>> _removedKeys = new HashSet<GlobalKey<T>>();
+        static readonly HashSet<Element> _debugIllFatedElements = new HashSet<Element>();
+        static readonly Dictionary<GlobalKey<T>, Element> _debugReservations = new Dictionary<GlobalKey<T>, Element>();
+
+        void _register(Element element) {
+            D.assert(() => {
+                if (_registry.ContainsKey(this)) {
+                    D.assert(element.widget != null);
+                    D.assert(_registry[this].widget != null);
+                    D.assert(element.widget.GetType() != _registry[this].widget.GetType());
+                    _debugIllFatedElements.Add(_registry[this]);
+                }
+
+                return true;
+            });
+            _registry[this] = element;
+        }
+
+        void _unregister(Element element) {
+            D.assert(() => {
+                if (_registry.ContainsKey(this) && _registry[this] != element) {
+                    D.assert(element.widget != null);
+                    D.assert(_registry[this].widget != null);
+                    D.assert(element.widget.GetType() != _registry[this].widget.GetType());
+                }
+
+                return true;
+            });
+            if (_registry[this] == element) {
+                _registry.Remove(this);
+                _removedKeys.Add(this);
+            }
+        }
+
+        void _debugReserveFor(Element parent) {
+            D.assert(() => {
+                D.assert(parent != null);
+                if (_debugReservations.ContainsKey(this) && _debugReservations[this] != parent) {
+                    string older = _debugReservations[this].ToString();
+                    string newer = parent.ToString();
+                    if (older != newer) {
+                        throw new UIWidgetsError(
+                            string.Format(
+                                "Multiple widgets used the same GlobalKey.\n" +
+                                "The key {0} was used by multiple widgets. The parents of those widgets were:\n" +
+                                "- {1}\n" +
+                                "- {2}\n" +
+                                "A GlobalKey can only be specified on one widget at a time in the widget tree.",
+                                this, older, newer));
+                    }
+
+                    throw new UIWidgetsError(
+                        string.Format(
+                            "Multiple widgets used the same GlobalKey.\n" +
+                            "The key {0} was used by multiple widgets. The parents of those widgets were " +
+                            "different widgets that both had the following description:\n" +
+                            "  {1}\n" +
+                            "A GlobalKey can only be specified on one widget at a time in the widget tree.",
+                            this, newer));
+                }
+
+                _debugReservations[this] = parent;
+                return true;
+            });
+        }
+
+        static void _debugVerifyIllFatedPopulation() {
+            D.assert(() => {
+                Dictionary<GlobalKey<T>, HashSet<Element>> duplicates = null;
+                foreach (Element element in _debugIllFatedElements) {
+                    if (element._debugLifecycleState != _ElementLifecycle.defunct) {
+                        D.assert(element != null);
+                        D.assert(element.widget != null);
+                        D.assert(element.widget.key != null);
+                        GlobalKey key = element.widget.key;
+                        D.assert(_registry.ContainsKey(key));
+                        duplicates = duplicates ?? new Dictionary<GlobalKey<T>, HashSet<Element>>();
+                        var elements = duplicates.putIfAbsent(key, () => new HashSet<Element>());
+                        elements.Add(element);
+                        elements.Add(_registry[key]);
+                    }
+                }
+
+                _debugIllFatedElements.Clear();
+                _debugReservations.Clear();
+                if (duplicates != null) {
+                    var buffer = new StringBuilder();
+                    buffer.AppendLine("Multiple widgets used the same GlobalKey.\n");
+                    foreach (GlobalKey<T> key in duplicates.Keys) {
+                        HashSet<Element> elements = duplicates[key];
+                        buffer.AppendLine(string.Format("The key {0} was used by {1} widgets:", key, elements.Count));
+                        foreach (Element element in elements) {
+                            buffer.AppendLine("- " + element);
+                        }
+                    }
+
+                    buffer.Append("A GlobalKey can only be specified on one widget at a time in the widget tree.");
+                    throw new UIWidgetsError(buffer.ToString());
+                }
+
+                return true;
+            });
+        }
+
+        Element _currentElement {
+            get { return _registry[this]; }
+        }
+
+        public BuildContext currentContext {
+            get { return this._currentElement; }
+        }
+
+        public Widget currentWidget {
+            get { return this._currentElement == null ? null : this._currentElement.widget; }
+        }
+
+        public T currentState {
+            get {
+                Element element = this._currentElement;
+                if (element is StatefulElement) {
+                    var statefulElement = (StatefulElement) element;
+                    State state = statefulElement.state;
+                    if (state is T) {
+                        return (T) state;
+                    }
+                }
+
+                return null;
+            }
+        }
+    }
+
+    public class LabeledGlobalKey<T> : GlobalKey<T> where T : State<StatefulWidget> {
+        public LabeledGlobalKey(string _debugLabel = null) {
+        }
+
+        readonly string _debugLabel;
+
+        public override string ToString() {
+            string label = this._debugLabel != null ? " " + this._debugLabel : "";
+            if (this.GetType() == typeof(LabeledGlobalKey<T>)) {
+                return string.Format("[GlobalKey#{0}{1}]", Diagnostics.shortHash(this), label);
+            }
+
+            return string.Format("[{0}{1}]", Diagnostics.describeIdentity(this), label);
+        }
+    }
+
+    class GlobalObjectKey<T> : GlobalKey<T>, IEquatable<GlobalObjectKey<T>> where T : State<StatefulWidget> {
+        public GlobalObjectKey(object value) {
+        }
+
+        public readonly Object value;
+
+        public bool Equals(GlobalObjectKey<T> other) {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return Equals(this.value, other.value);
+        }
+
+        public override bool Equals(object obj) {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((GlobalObjectKey<T>) obj);
+        }
+
+        public override int GetHashCode() {
+            return (this.value != null ? this.value.GetHashCode() : 0);
+        }
+
+        public static bool operator ==(GlobalObjectKey<T> left, GlobalObjectKey<T> right) {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(GlobalObjectKey<T> left, GlobalObjectKey<T> right) {
+            return !Equals(left, right);
+        }
+
+        public override string ToString() {
+            String selfType = this.GetType().ToString();
+            string suffix = "<State<StatefulWidget>>";
+            if (selfType.EndsWith(suffix)) {
+                selfType = selfType.Substring(0, selfType.Length - suffix.Length);
+            }
+
+            return string.Format("[{0} {1}]", selfType, Diagnostics.describeIdentity(this.value));
+        }
+    }
+
     public delegate void ElementVisitor(Element element);
+
     public delegate bool ElementVisitorBool(Element element);
 
-
-
-    public abstract class Widget {
-        protected Widget(string key) {
-            this._key = key;
+    public abstract class Widget : DiagnosticableTree {
+        protected Widget(Key key = null) {
+            this.key = key;
         }
 
-        public readonly string _key;
+        public readonly Key key;
 
-        public string key {
-            get { return this._key; }
+        protected abstract Element createElement();
+
+        public override string toStringShort() {
+            return this.key == null ? this.GetType().ToString() : this.GetType() + "-" + this.key;
         }
 
-        public abstract Element createElement();
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.defaultDiagnosticsTreeStyle = DiagnosticsTreeStyle.dense;
+        }
 
         public static bool canUpdate(Widget oldWidget, Widget newWidget) {
-            return oldWidget.GetType() == newWidget.GetType() && oldWidget.key == newWidget.key;
+            return oldWidget.GetType() == newWidget.GetType() && object.Equals(oldWidget.key, newWidget.key);
         }
     }
 
     public abstract class StatelessWidget : Widget {
-        protected StatelessWidget(string key) : base(key) {
+        protected StatelessWidget(Key key = null) : base(key: key) {
         }
 
-        public override Element createElement() {
+        protected override Element createElement() {
             return new StatelessElement(this);
         }
 
-        public abstract Widget build(BuildContext context);
+        protected abstract Widget build(BuildContext context);
     }
 
     public abstract class StatefulWidget : Widget {
-        protected StatefulWidget(string key) : base(key) {
+        protected StatefulWidget(Key key) : base(key: key) {
         }
-        
-        public override Element createElement() {
+
+        protected override Element createElement() {
             return new StatefulElement(this);
         }
 
-        public abstract State createState();
+        protected abstract State createState();
     }
-    
+
     enum _StateLifecycle {
         created,
         initialized,
@@ -59,49 +309,176 @@ namespace UIWidgets.widgets {
         defunct,
     }
 
+    public delegate void StateSetter(VoidCallback fn);
+
     public abstract class State : Diagnosticable {
         public StatefulWidget widget {
-            get { return _widget; }
-            set { _widget = value; }
+            get { return this._widget; }
         }
 
-        private StatefulWidget _widget;
-        
+        StatefulWidget _widget;
+
         _StateLifecycle _debugLifecycleState = _StateLifecycle.created;
 
-        public BuildContext context {
-            get { return _element; }
+        protected virtual bool _debugTypesAreRight(Widget widget) {
+            return widget is StatefulWidget;
         }
 
-        public StatefulElement element {
-            get { return _element; }
-            set { _element = value; }
+        public BuildContext context {
+            get { return this._element; }
         }
-        
-        private StatefulElement _element;
+
+        StatefulElement _element;
 
         public bool mounted {
-            get { return _element != null; }
+            get { return this._element != null; }
         }
 
-        public virtual void initState() {
-            D.assert(_debugLifecycleState == _StateLifecycle.created);    
+        protected virtual void initState() {
+            D.assert(this._debugLifecycleState == _StateLifecycle.created);
         }
 
-        public abstract void didChangeDependencies();
         public abstract void didUpdateWidget(StatefulWidget oldWidget);
 
-        public abstract void reassemble();
+        protected void setState(VoidCallback fn) {
+            D.assert(fn != null);
 
-        public void setState(VoidCallback fn) {
+            D.assert(() => {
+                if (this._debugLifecycleState == _StateLifecycle.defunct) {
+                    throw new UIWidgetsError(
+                        "setState() called after dispose(): " + this + "\n" +
+                        "This error happens if you call setState() on a State object for a widget that " +
+                        "no longer appears in the widget tree (e.g., whose parent widget no longer " +
+                        "includes the widget in its build). This error can occur when code calls " +
+                        "setState() from a timer or an animation callback. The preferred solution is " +
+                        "to cancel the timer or stop listening to the animation in the dispose() " +
+                        "callback. Another solution is to check the \"mounted\" property of this " +
+                        "object before calling setState() to ensure the object is still in the " +
+                        "tree.\n" +
+                        "This error might indicate a memory leak if setState() is being called " +
+                        "because another object is retaining a reference to this State object " +
+                        "after it has been removed from the tree. To avoid memory leaks, " +
+                        "consider breaking the reference to this object during dispose()."
+                    );
+                }
+
+                if (this._debugLifecycleState == _StateLifecycle.created && !this.mounted) {
+                    throw new UIWidgetsError(
+                        "setState() called in constructor: " + this + "\n" +
+                        "This happens when you call setState() on a State object for a widget that " +
+                        "hasn\"t been inserted into the widget tree yet. It is not necessary to call " +
+                        "setState() in the constructor, since the state is already assumed to be dirty " +
+                        "when it is initially created."
+                    );
+                }
+
+                return true;
+            });
+
             fn();
-            _element.markNeedsBuild();
+            this._element.markNeedsBuild();
+        }
+
+        protected virtual void deactivate() {
+        }
+
+        protected void dispose() {
+            D.assert(this._debugLifecycleState == _StateLifecycle.ready);
+            D.assert(() => {
+                this._debugLifecycleState = _StateLifecycle.defunct;
+                return true;
+            });
         }
 
         public abstract Widget build(BuildContext context);
 
-        protected internal override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+        protected virtual void didChangeDependencies() {
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
+
+            D.assert(() => {
+                properties.add(new EnumProperty<_StateLifecycle>("lifecycle state", _debugLifecycleState,
+                    defaultValue: _StateLifecycle.ready));
+                return true;
+            });
+
+            properties.add(new ObjectFlagProperty<StatefulWidget>("_widget", this._widget, ifNull: "no widget"));
+            properties.add(new ObjectFlagProperty<StatefulElement>("_element", this._element, ifNull: "not mounted"));
+        }
+    }
+
+    public abstract class State<T> : State where T : StatefulWidget {
+        public new T widget {
+            get { return (T) base.widget; }
+        }
+
+        protected bool _debugTypesAreRight(Widget widget) {
+            return widget is T;
+        }
+    }
+
+    public abstract class ProxyWidget : Widget {
+        protected ProxyWidget(Key key = null, Widget child = null) : base(key: key) {
+            this.child = child;
+        }
+
+        public readonly Widget child;
+    }
+
+    public abstract class ParentDataWidget<T> : ProxyWidget where T : RenderObjectWidget {
+        public ParentDataWidget(Key key = null, Widget child = null)
+            : base(key: key, child: child) {
+        }
+
+        protected override Element createElement() {
+            return new ParentDataElement<T>(this);
+        }
+
+        protected virtual bool debugIsValidAncestor(RenderObjectWidget ancestor) {
+            D.assert(typeof(T) != typeof(RenderObjectWidget));
+            return ancestor is T;
+        }
+
+        protected virtual string debugDescribeInvalidAncestorChain(
+            String description = null, String ownershipChain = null, bool foundValidAncestor = false,
+            IEnumerable<Widget> badAncestors = null
+        ) {
+            D.assert(typeof(T) != typeof(RenderObjectWidget));
+
+            String result;
+            if (!foundValidAncestor) {
+                result = string.Format("{0} widgets must be placed inside {1} widgets.\n" +
+                                       "{2} has no {1} ancestor at all.\n", this.GetType(), typeof(T), description);
+            } else {
+                D.assert(badAncestors != null);
+                D.assert(badAncestors.Any());
+                result = string.Format("{0} widgets must be placed directly inside {1} widgets.\n" +
+                                       "{2} has a {1} ancestor, but there are other widgets between them:\n",
+                    this.GetType(), typeof(T), description);
+
+                foreach (Widget ancestor in badAncestors) {
+                    if (ancestor.GetType() == this.GetType()) {
+                        result += string.Format("- {0} (this is a different {1} than the one with the problem)\n",
+                            ancestor, this.GetType());
+                    } else {
+                        result += string.Format("- {0}\n", ancestor);
+                    }
+                }
+
+                result += "These widgets cannot come between a " + this.GetType() + " and its " + typeof(T) + ".\n";
+            }
+
+            result += "The ownership chain for the parent of the offending "
+                      + this.GetType() + " was:\n  " + ownershipChain;
+            return result;
+        }
+
+        protected abstract void applyParentData(RenderObject renderObject);
+
+        protected virtual bool debugCanApplyOutOfTurn() {
+            return false;
         }
     }
 
@@ -151,7 +528,6 @@ namespace UIWidgets.widgets {
         }
 
         private static int _nextHashCode = 1;
-
         private readonly int _cachedHash = Element._nextHashCode = (Element._nextHashCode + 1) % 0xffffff;
 
         public override int GetHashCode() {
@@ -206,20 +582,16 @@ namespace UIWidgets.widgets {
         public RenderObject renderObject {
             get {
                 RenderObject result = null;
-
                 ElementVisitor visit = null;
                 visit = (element) => {
                     Assert.IsNull(result);
                     if (element is RenderObjectElement) {
                         result = element.renderObject;
-                    }
-                    else {
+                    } else {
                         element.visitChildren(visit);
                     }
                 };
-
                 visit(this);
-
                 return result;
             }
         }
@@ -280,7 +652,7 @@ namespace UIWidgets.widgets {
                 this._owner = parent.owner;
             }
 
-            // _updateInheritance();
+// _updateInheritance();
         }
 
         void updateSlotForChild(Element child, object newSlot) {
@@ -305,7 +677,6 @@ namespace UIWidgets.widgets {
                 this.visitChildren(child => { child._updateDepth(expectedDepth); });
             }
         }
-
 
         public void detachRenderObject() {
             this.visitChildren(child => { child.detachRenderObject(); });
@@ -396,7 +767,6 @@ namespace UIWidgets.widgets {
         public abstract void performRebuild();
     }
 
-
     public abstract class ComponentElement : Element {
         protected ComponentElement(Widget widget) : base(widget) {
         }
@@ -405,7 +775,6 @@ namespace UIWidgets.widgets {
 
         public override void mount(Element parent, object newSlot) {
             base.mount(parent, newSlot);
-
             this._firstBuild();
         }
 
@@ -415,7 +784,6 @@ namespace UIWidgets.widgets {
 
         public override void performRebuild() {
             Widget built;
-
             try {
                 built = this.build();
             }
@@ -464,7 +832,6 @@ namespace UIWidgets.widgets {
 
         public override void update(Widget newWidget) {
             base.update(newWidget);
-
             this._dirty = true;
             this.rebuild();
         }
@@ -521,7 +888,6 @@ namespace UIWidgets.widgets {
 
         public override void update(Widget newWidget) {
             base.update(newWidget);
-
             this.widget.updateRenderObject(this, this.renderObject);
             this._dirty = false;
         }
@@ -551,7 +917,6 @@ namespace UIWidgets.widgets {
 
         public readonly _InactiveElements _inactiveElements = new _InactiveElements();
         public readonly List<Element> _dirtyElements = new List<Element>();
-
         public bool _scheduledFlushDirtyElements = false;
         public bool _dirtyElementsNeedsResorting = false;
 
@@ -575,7 +940,6 @@ namespace UIWidgets.widgets {
                 return;
             }
 
-
             try {
                 this._scheduledFlushDirtyElements = true;
                 if (callback != null) {
@@ -585,14 +949,11 @@ namespace UIWidgets.widgets {
 
                 this._dirtyElements.Sort(Element._sort);
                 this._dirtyElementsNeedsResorting = false;
-
                 int dirtyCount = this._dirtyElements.Count;
                 int index = 0;
-
                 while (index < dirtyCount) {
                     this._dirtyElements[index].rebuild();
                     index++;
-
                     if (dirtyCount < this._dirtyElements.Count || this._dirtyElementsNeedsResorting) {
                         this._dirtyElements.Sort(Element._sort);
                         this._dirtyElementsNeedsResorting = false;
@@ -632,7 +993,6 @@ namespace UIWidgets.widgets {
         public SingleChildRenderObjectElement(SingleChildRenderObjectWidget widget) : base(widget) {
         }
 
-
         public override void forgetChild(Element child) {
         }
     }
@@ -651,10 +1011,8 @@ namespace UIWidgets.widgets {
         public void _unmountAll() {
             List<Element> elements = this._elements.ToList();
             this._elements.Clear();
-
             elements.Sort(Element._sort);
             elements.Reverse();
-
             elements.ForEach(this._unmount);
         }
 
