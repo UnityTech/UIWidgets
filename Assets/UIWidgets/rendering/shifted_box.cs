@@ -1,4 +1,5 @@
 ﻿using System;
+using UIWidgets.gestures;
 using UIWidgets.painting;
 using UIWidgets.ui;
 
@@ -61,6 +62,21 @@ namespace UIWidgets.rendering {
                 var childParentData = (BoxParentData) this.child.parentData;
                 context.paintChild(this.child, childParentData.offset + offset);
             }
+        }
+
+        protected override bool hitTestChildren(HitTestResult result, Offset position = null)
+        {
+            if (child != null)
+            {
+                var childParentData = child.parentData as BoxParentData;
+                if (childParentData != null)
+                {
+                    position = position - childParentData.offset;
+                }
+
+                return child.hitTest(result, position);
+            }
+            return false;
         }
     }
 

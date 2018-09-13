@@ -1,9 +1,11 @@
 ﻿using System;
-using System.Runtime.ConstrainedExecution;
-using UIWidgets.math;
+using System.Collections.Generic;
+using UIWidgets.foundation;
+using UIWidgets.service;
 using UIWidgets.ui;
 using UnityEngine;
 using Canvas = UIWidgets.ui.Canvas;
+using Rect = UIWidgets.ui.Rect;
 
 namespace UIWidgets.painting
 {
@@ -227,7 +229,7 @@ namespace UIWidgets.painting
   
             if (minWidth != maxWidth)
             {
-                var newWidth = MathUtil.Clamp(maxIntrinsicWidth, minWidth, maxWidth);
+                var newWidth = MathUtils.clamp(maxIntrinsicWidth, minWidth, maxWidth);
                 if (newWidth != width)
                 {
                     _paragraph.layout(new ParagraphConstraints(newWidth));
@@ -239,6 +241,47 @@ namespace UIWidgets.painting
         {
             Debug.Assert(!_needsLayout);
             _paragraph.paint(canvas, offset.dx, offset.dy);
+        }
+
+        public Offset getOffsetForCaret(TextPosition position, Rect caretPrototype)
+        {
+            D.assert(!_needsLayout);
+            var offset = position.offset;
+            switch (position.affinity)
+            {
+                    case TextAffinity.upstream:
+                        return _getOffsetFromUpstream(offset, caretPrototype) ??
+                               _getOffsetFromDownstream(offset, caretPrototype) ?? _emptyOffset;  
+                    case TextAffinity.downstream:
+                        return _getOffsetFromDownstream(offset, caretPrototype) ??
+                               _getOffsetFromUpstream(offset, caretPrototype) ?? _emptyOffset;
+            }
+
+            return null;
+        }
+
+        public List<TextBox> getBoxesForSelection(TextSelection selection)
+        {
+            D.assert(!_needsLayout);
+            var results =  _paragraph.getRectsForRange(selection.start, selection.end);
+            if (results.Count > 0)
+            {
+                Debug.Log(string.Format(" getBoxesForSelection {0}", results[0]));
+            }
+            return results;
+        }
+        
+        public TextPosition getPositionForOffset(Offset offset) {
+            D.assert(!_needsLayout);
+            var result = _paragraph.getGlyphPositionAtCoordinate(offset.dx, offset.dy);
+            return new TextPosition(result.position, result.affinity);
+        }
+
+        public TextRange getWordBoundary(TextPosition position)
+        {
+            D.assert(!_needsLayout);
+            var range = _paragraph.getWordBoundary(position.offset);
+            return new TextRange(range.start, range.end);
         }
 
         private ParagraphStyle _createParagraphStyle(TextDirection defaultTextDirection = TextDirection.ltr)
@@ -284,5 +327,63 @@ namespace UIWidgets.painting
         {
             return Math.Ceiling(layoutValue);
         }
+        
+        
+        private Offset _getOffsetFromUpstream(int offset, Rect caretPrototype) {
+            var prevCodeUnit = _text.codeUnitAt(offset - 1);
+            if (prevCodeUnit == null)
+                return null;
+            var  prevRuneOffset = _isUtf16Surrogate((int)prevCodeUnit) ? offset - 2 : offset - 1;
+            var boxes = _paragraph.getRectsForRange(prevRuneOffset, offset);
+            if (boxes.Count == 0)
+                return null;
+            var box = boxes[0];
+            var caretEnd = box.end;
+            var dx = box.direction == TextDirection.rtl ? caretEnd : caretEnd - caretPrototype.width;
+            return new Offset(dx, box.top);
+        }
+
+        private Offset _getOffsetFromDownstream(int offset, Rect caretPrototype) {
+            var nextCodeUnit = _text.codeUnitAt(offset);
+            if (nextCodeUnit == null)
+                return null;
+            var nextRuneOffset = _isUtf16Surrogate((int)nextCodeUnit) ? offset + 2 : offset + 1;
+            var boxes = _paragraph.getRectsForRange(offset, nextRuneOffset);
+            if (boxes.Count == 0)
+                return null;
+            var box = boxes[0];
+            var caretStart = box.start;
+            var dx = box.direction == TextDirection.rtl ? caretStart - caretPrototype.width : caretStart;
+            return new Offset(dx, box.top);
+        }
+
+        private Offset _emptyOffset
+        {
+            get
+            {
+                D.assert(!_needsLayout);
+                switch (textAlign)
+                {
+                        case TextAlign.left:
+                            return Offset.zero;
+                        case TextAlign.right:
+                            return new Offset(width, 0.0);
+                        case TextAlign.center:
+                            return new Offset(width / 2.0, 0.0);
+                        case TextAlign.justify:
+                            if (textDirection == TextDirection.rtl)
+                            {
+                                return new Offset(width, 0.0);
+                            }
+                            return Offset.zero;
+                }
+                return null;
+            }
+        }
+        private static bool _isUtf16Surrogate(int value)
+        {
+            return (value & 0xF800) == 0xD800;
+        }
+
     }
 }

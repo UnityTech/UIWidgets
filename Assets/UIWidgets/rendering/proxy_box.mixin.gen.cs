@@ -1,4 +1,5 @@
 ﻿using UIWidgets.ui;
+using UIWidgets.gestures;
 using UnityEngine;
 
 namespace UIWidgets.rendering {
@@ -68,6 +69,14 @@ namespace UIWidgets.rendering {
             if (this.child != null) {
                 context.paintChild(this.child, offset);
             }
+        }
+        
+        protected override bool hitTestChildren(HitTestResult result, Offset position = null) {
+            if (this.child != null) {
+                return this.child.hitTest(result, position);
+            }
+
+            return false;
         }
     }
 
