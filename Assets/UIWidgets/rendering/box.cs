@@ -543,7 +543,7 @@ namespace UIWidgets.rendering {
             return false;
         }
 
-        protected bool hitTestChildren(HitTestResult result, Offset position = null) {
+        protected virtual bool hitTestChildren(HitTestResult result, Offset position = null) {
             return false;
         }
 

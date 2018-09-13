@@ -21,5 +21,10 @@ namespace UIWidgets.Tests {
         public static void gestures() {
             EditorWindow.GetWindow(typeof(Gestures));
         }
+        
+        [MenuItem("UIWidgetsTests/RenderEditable")]
+        public static void renderEditable() {
+            EditorWindow.GetWindow(typeof(RenderEditable));
+        }
     }
 }
