@@ -66,7 +66,7 @@ namespace UIWidgets.widgets {
         }
 
         private StatefulWidget _widget;
-        
+
         _StateLifecycle _debugLifecycleState = _StateLifecycle.created;
 
         public BuildContext context {
@@ -77,7 +77,7 @@ namespace UIWidgets.widgets {
             get { return _element; }
             set { _element = value; }
         }
-        
+
         private StatefulElement _element;
 
         public bool mounted {
@@ -85,7 +85,7 @@ namespace UIWidgets.widgets {
         }
 
         public virtual void initState() {
-            D.assert(_debugLifecycleState == _StateLifecycle.created);    
+            D.assert(_debugLifecycleState == _StateLifecycle.created);
         }
 
         public abstract void didChangeDependencies();
@@ -105,6 +105,21 @@ namespace UIWidgets.widgets {
         }
     }
 
+    public abstract class ProxyWidget : Widget {
+        protected ProxyWidget(string key, Widget child) : base(key) {
+            this.child = child;
+        }
+
+        public Widget child;
+    }
+
+    public abstract class InheritedWidget : ProxyWidget {
+        protected InheritedWidget(string key, Widget child) : base(key, child) {
+        }
+
+        public abstract bool updateShouldNotify(InheritedWidget oldWidget);
+    }
+
     public abstract class RenderObjectWidget : Widget {
         protected RenderObjectWidget(string key) : base(key) {
         }
@@ -115,6 +130,21 @@ namespace UIWidgets.widgets {
         }
 
         public virtual void didUnmountRenderObject(RenderObject renderObject) {
+        }
+    }
+
+    public abstract class RootRenderObjectElement : RenderObjectElement {
+        protected RootRenderObjectElement(RenderObjectWidget widget) : base(widget) {
+        }
+
+        public void assignOwner(BuildOwner owner) {
+            _owner = owner;
+        }
+        
+        public override void mount(Element parent, object newSlot) {
+            D.assert(parent == null);
+            D.assert(newSlot == null);
+            base.mount(parent, newSlot);
         }
     }
 
@@ -222,6 +252,21 @@ namespace UIWidgets.widgets {
 
                 return result;
             }
+        }
+
+        public virtual InheritedWidget inheritFromWidgetOfExactType(Type targetType) {
+            InheritedElement ancestor =
+                _inheritedWidgets == null ? null : _inheritedWidgets[targetType];
+            if (ancestor != null) {
+                if (_dependencies == null) {
+                    _dependencies = new HashSet<InheritedElement>();
+                }
+                _dependencies.Add(ancestor);
+                ancestor._dependents.Add(this);
+                return ancestor.widget;
+            }
+            _hadUnsatisfiedDependencies = true;
+            return null;
         }
 
         public void visitAncestorElements(Func<Element, bool> visitor) {
@@ -351,6 +396,10 @@ namespace UIWidgets.widgets {
         public RenderObject findRenderObject() {
             return this.renderObject;
         }
+        
+        public Dictionary<Type, InheritedElement> _inheritedWidgets;
+        public HashSet<InheritedElement> _dependencies;
+        bool _hadUnsatisfiedDependencies = false;
 
         public void didChangeDependencies() {
             this.markNeedsBuild();
@@ -491,9 +540,57 @@ namespace UIWidgets.widgets {
             state.reassemble();
             base._reassemble();
         }
+    }
 
-        public override void _firstBuild() {
-            base._firstBuild();
+    public abstract class ProxyElement : ComponentElement {
+        protected ProxyElement(Widget widget) : base(widget) {
+        }
+        
+        public ProxyWidget widget {
+            get { return (ProxyWidget) base.widget; }
+        }
+
+        public override Widget build() {
+            return ((ProxyWidget) widget).child;
+        }
+    }
+
+    public class InheritedElement : ProxyElement {
+        public InheritedElement(Widget widget) : base(widget) {
+        }
+        
+        public InheritedWidget widget {
+            get { return (InheritedWidget) base.widget; }
+        }
+        
+        public HashSet<Element> _dependents = new HashSet<Element>();
+
+        public void _updateInheritance() {
+            Dictionary<Type, InheritedElement> incomingWidgets = _parent == null ? null : _inheritedWidgets;
+            if (incomingWidgets != null) {
+                _inheritedWidgets = new Dictionary<Type, InheritedElement>(incomingWidgets);
+            }
+            else {
+                _inheritedWidgets = new Dictionary<Type, InheritedElement>();
+            }
+
+            _inheritedWidgets[widget.GetType()] = this;
+        }
+
+        public void notifyClients(InheritedWidget oldWidget) {
+            if (!widget.updateShouldNotify(oldWidget)) return;
+            foreach (Element dependent in _dependents) {
+                D.assert(() => {
+                    Element ancestor = dependent._parent;
+                    while (ancestor != this && ancestor != null) {
+                        ancestor = ancestor._parent;
+                    }
+
+                    return ancestor == this;
+                });
+                D.assert(dependent._dependencies.Contains(this));
+                dependent.didChangeDependencies();
+            }
         }
     }
 
@@ -539,6 +636,7 @@ namespace UIWidgets.widgets {
 
     public interface BuildContext {
         Widget widget { get; }
+        InheritedWidget inheritFromWidgetOfExactType(Type targetType);
         void visitAncestorElements(Func<Element, bool> visitor);
     }
 
