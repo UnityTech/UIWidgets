@@ -246,10 +246,26 @@ namespace UIWidgets.rendering {
         }
     }
 
+    public interface RenderObjectWithChildMixin {
+        bool debugValidateChild(RenderObject child);            
+        RenderObject child { get; set; }
+    }
+    
     public interface ContainerParentDataMixin<ChildType> where ChildType : RenderObject {
         ChildType previousSibling { get; set; }
-
         ChildType nextSibling { get; set; }
+    }
+
+    public interface ContainerRenderObjectMixin {
+        int childCount { get; }
+        bool debugValidateChild(RenderObject child);
+        void insert(RenderObject child, RenderObject after = null);
+        void remove(RenderObject child);
+        void move(RenderObject child, RenderObject after = null);
+        RenderObject firstChild { get; }
+        RenderObject lastChild { get; }
+        RenderObject childBefore(RenderObject child);
+        RenderObject childAfter(RenderObject child);
     }
 
     public abstract class RenderObject : AbstractNodeMixinDiagnosticableTree, HitTestTarget {
@@ -318,7 +334,19 @@ namespace UIWidgets.rendering {
             }
         }
 
-        public bool _needsLayout = true;
+        public bool debugNeedsLayout {
+            get {
+                bool result = false;
+                D.assert(() => {
+                    result = this._needsLayout;
+                    return true;
+                });
+                return result;
+            }
+        }
+
+        internal bool _needsLayout = true;
+
         public RenderObject _relayoutBoundary;
         bool _doingThisLayoutWithCallback = false;
 

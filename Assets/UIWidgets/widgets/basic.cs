@@ -9,7 +9,7 @@ using UnityEngine.Assertions;
 
 namespace UIWidgets.widgets {
     public class RawImage : LeafRenderObjectWidget {
-        public RawImage(string key, ui.Image image, double width, double height, double scale, Color color,
+        public RawImage(Key key, ui.Image image, double width, double height, double scale, Color color,
             BlendMode colorBlendMode, BoxFit fit, Rect centerSlice, Alignment alignment = null,
             ImageRepeat repeat = ImageRepeat.noRepeat) : base(key) {
             this.image = image;

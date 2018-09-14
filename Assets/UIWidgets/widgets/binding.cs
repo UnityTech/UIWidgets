@@ -41,7 +41,7 @@ namespace UIWidgets.widgets {
 //            }
         }
 
-        public void drawFrame() {
+        protected override void drawFrame() {
             if (renderViewElement != null) {
                 buildOwner.buildScope(renderViewElement);
             }

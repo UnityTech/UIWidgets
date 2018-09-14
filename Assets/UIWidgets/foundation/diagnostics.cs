@@ -545,7 +545,7 @@ namespace UIWidgets.foundation {
     }
 
     public class MessageProperty : DiagnosticsProperty<object> {
-        MessageProperty(String name, String message,
+        public MessageProperty(String name, String message,
             DiagnosticLevel level = DiagnosticLevel.info
         ) : base(name, null, description: message, level: level) {
             D.assert(name != null);
@@ -554,9 +554,9 @@ namespace UIWidgets.foundation {
     }
 
     public class StringProperty : DiagnosticsProperty<string> {
-        StringProperty(string name, string value,
-            string description,
-            string tooltip,
+        public StringProperty(string name, string value,
+            string description = null,
+            string tooltip = null,
             bool showName = true,
             object defaultValue = null,
             bool quoted = true,
@@ -1362,7 +1362,7 @@ namespace UIWidgets.foundation {
         );
 
         internal static readonly _NoDefaultValue kNoDefaultValue = new _NoDefaultValue();
-        internal static readonly _NoDefaultValue kNullDefaultValue = new _NoDefaultValue();
+        internal static readonly _NullDefaultValue kNullDefaultValue = new _NullDefaultValue();
 
         public static string shortHash(object o) {
             return (o.GetHashCode() & 0xFFFFF).ToString("X").PadLeft(5, '0');

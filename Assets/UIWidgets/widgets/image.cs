@@ -33,7 +33,7 @@ namespace UIWidgets.widgets {
         public bool gaplessPlayback;
 
         public Image(
-            string key,
+            Key key,
             ImageProvider<System.Object> image,
             double width,
             double height,
@@ -60,7 +60,7 @@ namespace UIWidgets.widgets {
         // Network Image
         public Image(
             string src,
-            string key,
+            Key key,
             double width,
             double height,
             Color color,
@@ -108,9 +108,9 @@ namespace UIWidgets.widgets {
                 _resolveImage();
         }
 
-        public override void reassemble() {
-            _resolveImage(); // in case the image cache was flushed
-        }
+//        public override void reassemble() {
+//            _resolveImage(); // in case the image cache was flushed
+//        }
 
         void _resolveImage() {
             var imageWidget = (Image<T>) widget;
@@ -159,7 +159,7 @@ namespace UIWidgets.widgets {
         public override Widget build(BuildContext context) {
             var imageWidget = (Image<T>) widget;
             RawImage image = new RawImage(
-                "", // todo
+                null, // todo
                 _imageInfo == null ? null : _imageInfo.image,
                 imageWidget.width,
                 imageWidget.height,

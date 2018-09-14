@@ -6,8 +6,8 @@ using UnityEngine;
 
 namespace UIWidgets.rendering {
 
-    public abstract class RenderObjectWithChildMixinRenderObject<ChildType> : RenderObject where ChildType : RenderObject {
-        public ChildType _child;
+    public abstract class RenderObjectWithChildMixinRenderObject<ChildType> : RenderObject, RenderObjectWithChildMixin where ChildType : RenderObject {
+        internal ChildType _child;
 
         public ChildType child {
             get { return this._child; }
@@ -21,6 +21,36 @@ namespace UIWidgets.rendering {
                     this.adoptChild(this._child);
                 }
             }
+        }
+
+        RenderObject RenderObjectWithChildMixin.child {
+            get { return this.child; }
+            set { this.child = (ChildType) value; }
+        }
+
+        public bool debugValidateChild(RenderObject child) {
+            D.assert(() => {
+                if (!(child is ChildType)) {
+                    throw new UIWidgetsError(
+                        "A " + this.GetType() + " expected a child of type " + typeof(ChildType) + " but received a " +
+                        "child of type " + child.GetType() + ".\n" +
+                        "RenderObjects expect specific types of children because they " +
+                        "coordinate with their children during layout and paint. For " +
+                        "example, a RenderSliver cannot be the child of a RenderBox because " +
+                        "a RenderSliver does not understand the RenderBox layout protocol.\n" +
+                        "\n" +
+                        "The " + this.GetType() + " that expected a " + typeof(ChildType) + " child was created by:\n" +
+                        "  " + this.debugCreator + "\n" +
+                        "\n" +
+                        "The " + child.GetType() + " that did not match the expected child type " +
+                        "was created by:\n" +
+                        "  " + child.debugCreator + "\n"
+                    );
+                }
+
+                return true;
+            });
+            return true;
         }
 
         public override void attach(object owner) {
@@ -51,8 +81,8 @@ namespace UIWidgets.rendering {
     }
 
 
-    public abstract class RenderObjectWithChildMixinRenderBox<ChildType> : RenderBox where ChildType : RenderObject {
-        public ChildType _child;
+    public abstract class RenderObjectWithChildMixinRenderBox<ChildType> : RenderBox, RenderObjectWithChildMixin where ChildType : RenderObject {
+        internal ChildType _child;
 
         public ChildType child {
             get { return this._child; }
@@ -66,6 +96,36 @@ namespace UIWidgets.rendering {
                     this.adoptChild(this._child);
                 }
             }
+        }
+
+        RenderObject RenderObjectWithChildMixin.child {
+            get { return this.child; }
+            set { this.child = (ChildType) value; }
+        }
+
+        public bool debugValidateChild(RenderObject child) {
+            D.assert(() => {
+                if (!(child is ChildType)) {
+                    throw new UIWidgetsError(
+                        "A " + this.GetType() + " expected a child of type " + typeof(ChildType) + " but received a " +
+                        "child of type " + child.GetType() + ".\n" +
+                        "RenderObjects expect specific types of children because they " +
+                        "coordinate with their children during layout and paint. For " +
+                        "example, a RenderSliver cannot be the child of a RenderBox because " +
+                        "a RenderSliver does not understand the RenderBox layout protocol.\n" +
+                        "\n" +
+                        "The " + this.GetType() + " that expected a " + typeof(ChildType) + " child was created by:\n" +
+                        "  " + this.debugCreator + "\n" +
+                        "\n" +
+                        "The " + child.GetType() + " that did not match the expected child type " +
+                        "was created by:\n" +
+                        "  " + child.debugCreator + "\n"
+                    );
+                }
+
+                return true;
+            });
+            return true;
         }
 
         public override void attach(object owner) {
@@ -96,8 +156,8 @@ namespace UIWidgets.rendering {
     }
 
 
-    public abstract class RenderObjectWithChildMixinRenderSliver<ChildType> : RenderSliver where ChildType : RenderObject {
-        public ChildType _child;
+    public abstract class RenderObjectWithChildMixinRenderSliver<ChildType> : RenderSliver, RenderObjectWithChildMixin where ChildType : RenderObject {
+        internal ChildType _child;
 
         public ChildType child {
             get { return this._child; }
@@ -111,6 +171,36 @@ namespace UIWidgets.rendering {
                     this.adoptChild(this._child);
                 }
             }
+        }
+
+        RenderObject RenderObjectWithChildMixin.child {
+            get { return this.child; }
+            set { this.child = (ChildType) value; }
+        }
+
+        public bool debugValidateChild(RenderObject child) {
+            D.assert(() => {
+                if (!(child is ChildType)) {
+                    throw new UIWidgetsError(
+                        "A " + this.GetType() + " expected a child of type " + typeof(ChildType) + " but received a " +
+                        "child of type " + child.GetType() + ".\n" +
+                        "RenderObjects expect specific types of children because they " +
+                        "coordinate with their children during layout and paint. For " +
+                        "example, a RenderSliver cannot be the child of a RenderBox because " +
+                        "a RenderSliver does not understand the RenderBox layout protocol.\n" +
+                        "\n" +
+                        "The " + this.GetType() + " that expected a " + typeof(ChildType) + " child was created by:\n" +
+                        "  " + this.debugCreator + "\n" +
+                        "\n" +
+                        "The " + child.GetType() + " that did not match the expected child type " +
+                        "was created by:\n" +
+                        "  " + child.debugCreator + "\n"
+                    );
+                }
+
+                return true;
+            });
+            return true;
         }
 
         public override void attach(object owner) {
@@ -244,23 +334,75 @@ namespace UIWidgets.rendering {
 
 
 
-    public abstract class ContainerRenderObjectMixinRenderBox<ChildType, ParentDataType> : RenderBox
+    public abstract class ContainerRenderObjectMixinRenderBox<ChildType, ParentDataType> : RenderBox, ContainerRenderObjectMixin
         where ChildType : RenderObject
         where ParentDataType : ParentData, ContainerParentDataMixin<ChildType> {
 
-        public int _childCount = 0;
+        bool _debugUltimatePreviousSiblingOf(ChildType child, ChildType equals = null) {
+            ParentDataType childParentData = (ParentDataType) child.parentData;
+            while (childParentData.previousSibling != null) {
+                D.assert(childParentData.previousSibling != child);
+                child = childParentData.previousSibling;
+                childParentData = (ParentDataType) child.parentData;
+            }
+
+            return child == equals;
+        }
+
+        bool _debugUltimateNextSiblingOf(ChildType child, ChildType equals = null) {
+            ParentDataType childParentData = (ParentDataType) child.parentData;
+            while (childParentData.nextSibling != null) {
+                D.assert(childParentData.nextSibling != child);
+                child = childParentData.nextSibling;
+                childParentData = (ParentDataType) child.parentData;
+            }
+
+            return child == equals;
+        }
+
+        int _childCount = 0;
 
         public int childCount {
             get { return this._childCount; }
         }
 
-        public ChildType _firstChild;
+        public bool debugValidateChild(RenderObject child) {
+            D.assert(() => {
+                if (!(child is ChildType)) {
+                    throw new UIWidgetsError(
+                        "A " + this.GetType() + " expected a child of type " + typeof(ChildType) + " but received a " +
+                        "child of type " + child.GetType() + ".\n" +
+                        "RenderObjects expect specific types of children because they " +
+                        "coordinate with their children during layout and paint. For " +
+                        "example, a RenderSliver cannot be the child of a RenderBox because " +
+                        "a RenderSliver does not understand the RenderBox layout protocol.\n" +
+                        "\n" +
+                        "The " + this.GetType() + " that expected a $ChildType child was created by:\n" +
+                        "  " + this.debugCreator + "\n" +
+                        "\n" +
+                        "The " + child.GetType() + " that did not match the expected child type " +
+                        "was created by:\n" +
+                        "  " + child.debugCreator + "\n"
+                    );
+                }
 
-        public ChildType _lastChild;
+                return true;
+            });
+            return true;
+        }
 
-        public void _insertIntoChildList(ChildType child, ChildType after = null) {
+        ChildType _firstChild;
+
+        ChildType _lastChild;
+
+        void _insertIntoChildList(ChildType child, ChildType after = null) {
             var childParentData = (ParentDataType) child.parentData;
+            D.assert(childParentData.nextSibling == null);
+            D.assert(childParentData.previousSibling == null);
+
             this._childCount++;
+            D.assert(this._childCount > 0);
+
             if (after == null) {
                 childParentData.nextSibling = this._firstChild;
                 if (this._firstChild != null) {
@@ -269,12 +411,15 @@ namespace UIWidgets.rendering {
                 }
 
                 this._firstChild = child;
-                if (this._lastChild == null) {
-                    this._lastChild = child;
-                }
+                this._lastChild = this._lastChild ?? child;
             } else {
+                D.assert(this._firstChild != null);
+                D.assert(this._lastChild != null);
+                D.assert(this._debugUltimatePreviousSiblingOf(after, equals: this._firstChild));
+                D.assert(this._debugUltimateNextSiblingOf(after, equals: this._lastChild));
                 var afterParentData = (ParentDataType) after.parentData;
                 if (afterParentData.nextSibling == null) {
+                    D.assert(after == this._lastChild);
                     childParentData.previousSibling = after;
                     afterParentData.nextSibling = child;
                     this._lastChild = child;
@@ -285,11 +430,19 @@ namespace UIWidgets.rendering {
                     var childNextSiblingParentData = (ParentDataType) childParentData.nextSibling.parentData;
                     childPreviousSiblingParentData.nextSibling = child;
                     childNextSiblingParentData.previousSibling = child;
+                    D.assert(afterParentData.nextSibling == child);
                 }
             }
         }
 
         public virtual void insert(ChildType child, ChildType after = null) {
+            D.assert(child != this, "A RenderObject cannot be inserted into itself.");
+            D.assert(after != this,
+                "A RenderObject cannot simultaneously be both the parent and the sibling of another RenderObject.");
+            D.assert(child != after, "A RenderObject cannot be inserted after itself.");
+            D.assert(child != this._firstChild);
+            D.assert(child != this._lastChild);
+
             this.adoptChild(child);
             this._insertIntoChildList(child, after);
         }
@@ -306,8 +459,12 @@ namespace UIWidgets.rendering {
 
         public void _removeFromChildList(ChildType child) {
             var childParentData = (ParentDataType) child.parentData;
+            D.assert(this._debugUltimatePreviousSiblingOf(child, equals: this._firstChild));
+            D.assert(this._debugUltimateNextSiblingOf(child, equals: this._lastChild));
+            D.assert(this._childCount >= 0);
 
             if (childParentData.previousSibling == null) {
+                D.assert(this._firstChild == child);
                 this._firstChild = childParentData.nextSibling;
             } else {
                 var childPreviousSiblingParentData = (ParentDataType) childParentData.previousSibling.parentData;
@@ -315,6 +472,7 @@ namespace UIWidgets.rendering {
             }
 
             if (childParentData.nextSibling == null) {
+                D.assert(this._lastChild == child);
                 this._lastChild = childParentData.previousSibling;
             } else {
                 var childNextSiblingParentData = (ParentDataType) childParentData.nextSibling.parentData;
@@ -341,17 +499,23 @@ namespace UIWidgets.rendering {
                 this.dropChild(child);
                 child = next;
             }
+
             this._firstChild = null;
             this._lastChild = null;
             this._childCount = 0;
         }
 
         public void move(ChildType child, ChildType after = null) {
+            D.assert(child != this);
+            D.assert(after != this);
+            D.assert(child != after);
+            D.assert(child.parent == this);
+
             var childParentData = (ParentDataType) child.parentData;
             if (childParentData.previousSibling == after) {
                 return;
             }
-            
+
             this._removeFromChildList(child);
             this._insertIntoChildList(child, after);
             this.markNeedsLayout();
@@ -404,34 +568,140 @@ namespace UIWidgets.rendering {
         }
 
         public ChildType childBefore(ChildType child) {
+            D.assert(child != null);
+            D.assert(child.parent == this);
+
             var childParentData = (ParentDataType) child.parentData;
             return childParentData.previousSibling;
         }
-        
+
         public ChildType childAfter(ChildType child) {
+            D.assert(child != null);
+            D.assert(child.parent == this);
+
             var childParentData = (ParentDataType) child.parentData;
             return childParentData.nextSibling;
+        }
+
+        public override List<DiagnosticsNode> debugDescribeChildren() {
+            var children = new List<DiagnosticsNode>();
+            if (this.firstChild != null) {
+                ChildType child = this.firstChild;
+                int count = 1;
+                while (true) {
+                    children.Add(child.toDiagnosticsNode(name: "child " + count));
+                    if (child == this.lastChild) {
+                        break;
+                    }
+
+                    count += 1;
+                    var childParentData = (ParentDataType) child.parentData;
+                    child = childParentData.nextSibling;
+                }
+            }
+
+            return children;
+        }
+
+        void ContainerRenderObjectMixin.insert(RenderObject child, RenderObject after) {
+            this.insert((ChildType) child, (ChildType) after);
+        }
+
+        void ContainerRenderObjectMixin.remove(RenderObject child) {
+            this.remove((ChildType) child);
+        }
+
+        void ContainerRenderObjectMixin.move(RenderObject child, RenderObject after) {
+            this.move((ChildType) child, (ChildType) after);
+        }
+
+        RenderObject ContainerRenderObjectMixin.firstChild {
+            get { return this.firstChild; }
+        }
+
+        RenderObject ContainerRenderObjectMixin.lastChild {
+            get { return this.lastChild; }
+        }
+
+        RenderObject ContainerRenderObjectMixin.childBefore(RenderObject child) {
+            return this.childBefore((ChildType) child);
+        }
+
+        RenderObject ContainerRenderObjectMixin.childAfter(RenderObject child) {
+            return this.childAfter((ChildType) child);
         }
     }
 
 
-    public abstract class ContainerRenderObjectMixinRenderSliver<ChildType, ParentDataType> : RenderSliver
+    public abstract class ContainerRenderObjectMixinRenderSliver<ChildType, ParentDataType> : RenderSliver, ContainerRenderObjectMixin
         where ChildType : RenderObject
         where ParentDataType : ParentData, ContainerParentDataMixin<ChildType> {
 
-        public int _childCount = 0;
+        bool _debugUltimatePreviousSiblingOf(ChildType child, ChildType equals = null) {
+            ParentDataType childParentData = (ParentDataType) child.parentData;
+            while (childParentData.previousSibling != null) {
+                D.assert(childParentData.previousSibling != child);
+                child = childParentData.previousSibling;
+                childParentData = (ParentDataType) child.parentData;
+            }
+
+            return child == equals;
+        }
+
+        bool _debugUltimateNextSiblingOf(ChildType child, ChildType equals = null) {
+            ParentDataType childParentData = (ParentDataType) child.parentData;
+            while (childParentData.nextSibling != null) {
+                D.assert(childParentData.nextSibling != child);
+                child = childParentData.nextSibling;
+                childParentData = (ParentDataType) child.parentData;
+            }
+
+            return child == equals;
+        }
+
+        int _childCount = 0;
 
         public int childCount {
             get { return this._childCount; }
         }
 
-        public ChildType _firstChild;
+        public bool debugValidateChild(RenderObject child) {
+            D.assert(() => {
+                if (!(child is ChildType)) {
+                    throw new UIWidgetsError(
+                        "A " + this.GetType() + " expected a child of type " + typeof(ChildType) + " but received a " +
+                        "child of type " + child.GetType() + ".\n" +
+                        "RenderObjects expect specific types of children because they " +
+                        "coordinate with their children during layout and paint. For " +
+                        "example, a RenderSliver cannot be the child of a RenderBox because " +
+                        "a RenderSliver does not understand the RenderBox layout protocol.\n" +
+                        "\n" +
+                        "The " + this.GetType() + " that expected a $ChildType child was created by:\n" +
+                        "  " + this.debugCreator + "\n" +
+                        "\n" +
+                        "The " + child.GetType() + " that did not match the expected child type " +
+                        "was created by:\n" +
+                        "  " + child.debugCreator + "\n"
+                    );
+                }
 
-        public ChildType _lastChild;
+                return true;
+            });
+            return true;
+        }
 
-        public void _insertIntoChildList(ChildType child, ChildType after = null) {
+        ChildType _firstChild;
+
+        ChildType _lastChild;
+
+        void _insertIntoChildList(ChildType child, ChildType after = null) {
             var childParentData = (ParentDataType) child.parentData;
+            D.assert(childParentData.nextSibling == null);
+            D.assert(childParentData.previousSibling == null);
+
             this._childCount++;
+            D.assert(this._childCount > 0);
+
             if (after == null) {
                 childParentData.nextSibling = this._firstChild;
                 if (this._firstChild != null) {
@@ -440,12 +710,15 @@ namespace UIWidgets.rendering {
                 }
 
                 this._firstChild = child;
-                if (this._lastChild == null) {
-                    this._lastChild = child;
-                }
+                this._lastChild = this._lastChild ?? child;
             } else {
+                D.assert(this._firstChild != null);
+                D.assert(this._lastChild != null);
+                D.assert(this._debugUltimatePreviousSiblingOf(after, equals: this._firstChild));
+                D.assert(this._debugUltimateNextSiblingOf(after, equals: this._lastChild));
                 var afterParentData = (ParentDataType) after.parentData;
                 if (afterParentData.nextSibling == null) {
+                    D.assert(after == this._lastChild);
                     childParentData.previousSibling = after;
                     afterParentData.nextSibling = child;
                     this._lastChild = child;
@@ -456,11 +729,19 @@ namespace UIWidgets.rendering {
                     var childNextSiblingParentData = (ParentDataType) childParentData.nextSibling.parentData;
                     childPreviousSiblingParentData.nextSibling = child;
                     childNextSiblingParentData.previousSibling = child;
+                    D.assert(afterParentData.nextSibling == child);
                 }
             }
         }
 
         public virtual void insert(ChildType child, ChildType after = null) {
+            D.assert(child != this, "A RenderObject cannot be inserted into itself.");
+            D.assert(after != this,
+                "A RenderObject cannot simultaneously be both the parent and the sibling of another RenderObject.");
+            D.assert(child != after, "A RenderObject cannot be inserted after itself.");
+            D.assert(child != this._firstChild);
+            D.assert(child != this._lastChild);
+
             this.adoptChild(child);
             this._insertIntoChildList(child, after);
         }
@@ -477,8 +758,12 @@ namespace UIWidgets.rendering {
 
         public void _removeFromChildList(ChildType child) {
             var childParentData = (ParentDataType) child.parentData;
+            D.assert(this._debugUltimatePreviousSiblingOf(child, equals: this._firstChild));
+            D.assert(this._debugUltimateNextSiblingOf(child, equals: this._lastChild));
+            D.assert(this._childCount >= 0);
 
             if (childParentData.previousSibling == null) {
+                D.assert(this._firstChild == child);
                 this._firstChild = childParentData.nextSibling;
             } else {
                 var childPreviousSiblingParentData = (ParentDataType) childParentData.previousSibling.parentData;
@@ -486,6 +771,7 @@ namespace UIWidgets.rendering {
             }
 
             if (childParentData.nextSibling == null) {
+                D.assert(this._lastChild == child);
                 this._lastChild = childParentData.previousSibling;
             } else {
                 var childNextSiblingParentData = (ParentDataType) childParentData.nextSibling.parentData;
@@ -512,17 +798,23 @@ namespace UIWidgets.rendering {
                 this.dropChild(child);
                 child = next;
             }
+
             this._firstChild = null;
             this._lastChild = null;
             this._childCount = 0;
         }
 
         public void move(ChildType child, ChildType after = null) {
+            D.assert(child != this);
+            D.assert(after != this);
+            D.assert(child != after);
+            D.assert(child.parent == this);
+
             var childParentData = (ParentDataType) child.parentData;
             if (childParentData.previousSibling == after) {
                 return;
             }
-            
+
             this._removeFromChildList(child);
             this._insertIntoChildList(child, after);
             this.markNeedsLayout();
@@ -575,13 +867,67 @@ namespace UIWidgets.rendering {
         }
 
         public ChildType childBefore(ChildType child) {
+            D.assert(child != null);
+            D.assert(child.parent == this);
+
             var childParentData = (ParentDataType) child.parentData;
             return childParentData.previousSibling;
         }
-        
+
         public ChildType childAfter(ChildType child) {
+            D.assert(child != null);
+            D.assert(child.parent == this);
+
             var childParentData = (ParentDataType) child.parentData;
             return childParentData.nextSibling;
+        }
+
+        public override List<DiagnosticsNode> debugDescribeChildren() {
+            var children = new List<DiagnosticsNode>();
+            if (this.firstChild != null) {
+                ChildType child = this.firstChild;
+                int count = 1;
+                while (true) {
+                    children.Add(child.toDiagnosticsNode(name: "child " + count));
+                    if (child == this.lastChild) {
+                        break;
+                    }
+
+                    count += 1;
+                    var childParentData = (ParentDataType) child.parentData;
+                    child = childParentData.nextSibling;
+                }
+            }
+
+            return children;
+        }
+
+        void ContainerRenderObjectMixin.insert(RenderObject child, RenderObject after) {
+            this.insert((ChildType) child, (ChildType) after);
+        }
+
+        void ContainerRenderObjectMixin.remove(RenderObject child) {
+            this.remove((ChildType) child);
+        }
+
+        void ContainerRenderObjectMixin.move(RenderObject child, RenderObject after) {
+            this.move((ChildType) child, (ChildType) after);
+        }
+
+        RenderObject ContainerRenderObjectMixin.firstChild {
+            get { return this.firstChild; }
+        }
+
+        RenderObject ContainerRenderObjectMixin.lastChild {
+            get { return this.lastChild; }
+        }
+
+        RenderObject ContainerRenderObjectMixin.childBefore(RenderObject child) {
+            return this.childBefore((ChildType) child);
+        }
+
+        RenderObject ContainerRenderObjectMixin.childAfter(RenderObject child) {
+            return this.childAfter((ChildType) child);
         }
     }
 

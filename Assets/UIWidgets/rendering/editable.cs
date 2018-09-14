@@ -506,7 +506,7 @@ namespace UIWidgets.rendering
         // describeSemanticsConfiguration todo
         
         
-        protected internal override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             properties.add(new DiagnosticsProperty<Color>("cursorColor", cursorColor));
             properties.add(new DiagnosticsProperty<ValueNotifier<bool>>("showCursor", showCursor));

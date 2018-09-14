@@ -50,6 +50,11 @@ namespace UIWidgets.foundation {
 
         public override string ToString() {
             string valueString = typeof(T) == typeof(string) ? "<\'" + this.value + "\'>" : "<" + this.value + ">";
+
+            if (this.GetType() == typeof(ValueKey<T>)) {
+                return string.Format("[{0}]", valueString);
+            }
+
             return string.Format("[{0} {1}]", this.GetType(), valueString);
         }
     }
