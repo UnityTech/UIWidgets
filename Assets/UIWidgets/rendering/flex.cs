@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UIWidgets.gestures;
 using UIWidgets.painting;
 using UIWidgets.ui;
 
@@ -589,6 +590,10 @@ namespace UIWidgets.rendering {
                 return;
 
             context.pushClipRect(this.needsCompositing, offset, Offset.zero & this.size, this.defaultPaint);
+        }
+
+        protected override bool  hitTestChildren(HitTestResult result, Offset position = null) {
+            return defaultHitTestChildren(result, position: position);
         }
     }
 }
