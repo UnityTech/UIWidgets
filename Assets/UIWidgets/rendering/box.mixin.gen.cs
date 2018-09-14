@@ -56,8 +56,8 @@ namespace UIWidgets.rendering {
                 child = childParentData.nextSibling;
             }
         }
-        
-        public bool defaultHitTestChildren(HitTestResult result, Offset position) {
+
+       public bool defaultHitTestChildren(HitTestResult result, Offset position) {
             // the x, y parameters have the top left of the node's box as the origin
             ChildType child = lastChild;
             while (child != null)
