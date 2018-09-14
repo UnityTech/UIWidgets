@@ -11,8 +11,8 @@ using Color = UIWidgets.ui.Color;
 using Rect = UnityEngine.Rect;
 
 namespace UIWidgets.widgets {
-    internal class Util {
-        public static ImageConfiguration createLocalImageConfiguration(BuildContext context, Size size) {
+    internal class ImageUtil {
+        public static ImageConfiguration createLocalImageConfiguration(BuildContext context, Size size = null) {
             return new ImageConfiguration(
                 size: size
             );
@@ -115,7 +115,7 @@ namespace UIWidgets.widgets {
         void _resolveImage() {
             var imageWidget = (Image<T>) widget;
             ImageStream newStream =
-                imageWidget.image.resolve(Util.createLocalImageConfiguration(
+                imageWidget.image.resolve(ImageUtil.createLocalImageConfiguration(
                     context,
                     size: new Size(imageWidget.width, imageWidget.height)
                 ));

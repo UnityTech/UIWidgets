@@ -368,4 +368,133 @@ namespace UIWidgets.rendering {
             properties.add(new EnumerableProperty<string>("listeners", listeners));
         }
     }
+
+    public class RenderTransform : RenderProxyBox {
+        public RenderTransform(
+            Matrix4x4 transform,
+            Offset origin,
+            Alignment alignment,
+            TextDirection textDirection,
+            RenderBox child = null,
+            bool transformHitTests = true
+        ) {
+            this.transform = transform;
+            this.origin = origin;
+            this.alignment = alignment;
+            this.textDirection = textDirection;
+            this.child = child;
+            this.transformHitTests = transformHitTests;
+        }
+
+        public Offset origin {
+            get { return _origin; }
+            set {
+                if (_origin.Equals(value)) {
+                    return;
+                }
+
+                _origin = value;
+                markNeedsPaint();
+            }
+        }
+
+        private Offset _origin;
+
+        public Alignment alignment {
+            get { return _alignment; }
+            set {
+                if (_alignment.Equals(value)) {
+                    return;
+                }
+
+                _alignment = value;
+                markNeedsPaint();
+            }
+        }
+
+        private Alignment _alignment;
+
+        public TextDirection textDirection {
+            get { return _textDirection; }
+            set {
+                if (_textDirection.Equals(value)) {
+                    return;
+                }
+
+                _textDirection = value;
+                markNeedsPaint();
+            }
+        }
+
+        private TextDirection _textDirection;
+
+        public bool transformHitTests;
+
+        public Matrix4x4 transform {
+            set {
+                if (_transform.Equals(value)) {
+                    return;
+                }
+
+                _transform = value;
+            }
+        }
+
+        private Matrix4x4 _transform;
+    }
+
+    public class RenderOpacity : RenderProxyBox {
+        public RenderOpacity(RenderBox child = null, double opacity = 1.0) : base(child) {
+            D.assert(opacity >= 0.0 && opacity <= 1.0);
+            this._opacity = opacity;
+            this._alpha = _getAlphaFromOpacity(opacity);
+        }
+
+        public override bool alwaysNeedsCompositing {
+            get { return base.alwaysNeedsCompositing; }
+        }
+
+        private int _alpha;
+
+        private static int _getAlphaFromOpacity(double opacity) {
+            return (opacity * 255).round();
+        }
+
+        public double opacity {
+            get { return _opacity; }
+            set {
+                D.assert(value >= 0.0 && value <= 1.0);
+                if (_opacity == value) {
+                    return;
+                }
+
+                bool didNeedCompositing = alwaysNeedsCompositing;
+                bool wasVisible = _alpha != 0;
+                _opacity = value;
+                _alpha = _getAlphaFromOpacity(_opacity);
+                if (didNeedCompositing != alwaysNeedsCompositing) {
+                    markNeedsCompositingBitsUpdate();
+                }
+                markNeedsPaint();
+            }
+        }
+
+        private double _opacity;
+
+        public override void paint(PaintingContext context, Offset offset) {
+            if (child != null) {
+                if (_alpha == 0) {
+                    return;
+                }
+            }
+
+            if (_alpha == 255) {
+                context.paintChild(child, offset);
+                return;
+            }
+            D.assert(needsCompositing);
+            context.pushOpacity(offset, _alpha, base.paint);
+        }
+        
+    }
 }

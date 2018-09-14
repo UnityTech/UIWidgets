@@ -9,8 +9,6 @@ using Rect = UIWidgets.ui.Rect;
 
 namespace UIWidgets.rendering {
     public class RenderErrorBox : RenderBox {
-        const double _kMaxWidth = 100000.0;
-        const double _kMaxHeight = 100000.0;
         const string _kLine = "\n\n────────────────────\n\n";
 
         public RenderErrorBox(string message = "") {

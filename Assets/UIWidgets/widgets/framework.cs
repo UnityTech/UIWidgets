@@ -158,7 +158,8 @@ namespace UIWidgets.widgets {
     }
 
     public abstract class SingleChildRenderObjectWidget : RenderObjectWidget {
-        protected SingleChildRenderObjectWidget(string key) : base(key) {
+        protected SingleChildRenderObjectWidget(string key, Widget child) : base(key) {
+            this.child = child;
         }
 
         public Widget child;

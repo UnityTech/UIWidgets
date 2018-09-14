@@ -148,7 +148,7 @@ namespace UIWidgets.rendering {
             }
         }
 
-        void pushOpacity(Offset offset, int alpha, PaintingContextCallback painter) {
+        public void pushOpacity(Offset offset, int alpha, PaintingContextCallback painter) {
             this.pushLayer(new OpacityLayer(alpha), painter, offset);
         }
     }

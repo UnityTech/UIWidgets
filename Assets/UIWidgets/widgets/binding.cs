@@ -81,7 +81,7 @@ namespace UIWidgets.widgets {
 
         public RenderObjectWithChildMixinRenderObject<T> container;
 
-        public String debugShortDescription;
+        public string debugShortDescription;
 
         public override Element createElement() {
             return new RenderObjectToWidgetElement<T>(this);
@@ -96,7 +96,6 @@ namespace UIWidgets.widgets {
 
         public RenderObjectToWidgetElement<T> attachToRenderTree(BuildOwner owner, RenderObjectToWidgetElement<T> element) {
             if (element == null) {
-                // lock state?
                 element = (RenderObjectToWidgetElement<T>) createElement();
                 element.assignOwner(owner);
                 owner.buildScope(element, () => { element.mount(null, null); });
