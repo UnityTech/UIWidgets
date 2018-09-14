@@ -543,7 +543,7 @@ namespace UIWidgets.rendering {
             return false;
         }
 
-        protected bool hitTestChildren(HitTestResult result, Offset position = null) {
+        protected virtual bool hitTestChildren(HitTestResult result, Offset position = null) {
             return false;
         }
 
@@ -584,7 +584,7 @@ namespace UIWidgets.rendering {
             return true;
         }
         
-        protected internal override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             properties.add(new DiagnosticsProperty<Size>("size", this._size, missingIfNull: true));
         }

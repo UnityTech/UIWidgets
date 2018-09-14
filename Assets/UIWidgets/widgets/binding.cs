@@ -53,7 +53,7 @@ namespace UIWidgets.widgets {
 //            dispatchLocaleChanged(window.locale);
         }
 
-        public void drawFrame() {
+        protected override void drawFrame() {
             if (renderViewElement != null) {
                 buildOwner.buildScope(renderViewElement);
             }
@@ -72,7 +72,7 @@ namespace UIWidgets.widgets {
 
     public class RenderObjectToWidgetAdapter<T> : RenderObjectWidget where T : RenderObject {
         public RenderObjectToWidgetAdapter(Widget child, RenderObjectWithChildMixinRenderObject<T> container) : base(
-            new GlobalObjectKey(container)) {
+            new GlobalObjectKey<State<StatefulWidget>>(container)) {
             this.child = child;
             this.container = container;
         }
@@ -123,12 +123,16 @@ namespace UIWidgets.widgets {
 
         public Widget _newWidget;
 
+        public new RenderObjectWithChildMixin renderObject {
+            get { return base.renderObject as RenderObjectWithChildMixin; }
+        }
+
         public override void visitChildren(ElementVisitor visitor) {
             if (_child != null)
                 visitor(_child);
         }
 
-        public override void forgetChild(Element child) {
+        protected override void forgetChild(Element child) {
             D.assert(child == _child);
             _child = null;
         }
@@ -145,7 +149,7 @@ namespace UIWidgets.widgets {
             _rebuild();
         }
 
-        public override void performRebuild() {
+        protected override void performRebuild() {
             if (_newWidget != null) {
                 Widget newWidget = _newWidget;
                 _newWidget = null;
@@ -156,13 +160,27 @@ namespace UIWidgets.widgets {
             D.assert(_newWidget == null);
         }
 
+        protected override void insertChildRenderObject(RenderObject child, object slot) {
+            D.assert(slot == _rootChildSlot);
+            renderObject.child = child;
+        }
+
+        protected override void moveChildRenderObject(RenderObject child, object slot) {
+            D.assert(false);
+        }
+
+        protected override void removeChildRenderObject(RenderObject child) {
+            D.assert(renderObject.child == child);
+            renderObject.child = null;
+        }
+
         void _rebuild() {
             try {
                 _child = updateChild(_child, widget.child, _rootChildSlot);
                 D.assert(_child != null);
             }
             catch (Exception e) {
-                Widget error = ErrorWidget.builder(e);
+                Widget error = ErrorWidget.builder(new UIWidgetsErrorDetails(e));
                 _child = updateChild(null, error, _rootChildSlot);
             }
         }

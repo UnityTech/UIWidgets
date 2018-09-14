@@ -64,7 +64,7 @@ namespace UIWidgets.gestures {
         public abstract void acceptGesture(int pointer);
         public abstract void rejectGesture(int pointer);
 
-        protected internal override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             properties.add(new DiagnosticsProperty<object>("debugOwner", this.debugOwner,
                 defaultValue: Diagnostics.kNullDefaultValue));
@@ -240,7 +240,7 @@ namespace UIWidgets.gestures {
             return offset.distance;
         }
 
-        protected internal override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             properties.add(new EnumProperty<GestureRecognizerState>("state", this.state));
         }

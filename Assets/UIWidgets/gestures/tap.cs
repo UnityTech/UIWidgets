@@ -140,7 +140,7 @@ namespace UIWidgets.gestures {
             get { return "tap"; }
         }
 
-        protected internal override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             properties.add(new FlagProperty("wonArenaForPrimaryPointer",
                 value: this._wonArenaForPrimaryPointer,

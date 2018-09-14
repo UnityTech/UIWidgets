@@ -1,4 +1,6 @@
 using System;
+using RSG;
+using UIWidgets.animation;
 using UIWidgets.foundation;
 using UIWidgets.gestures;
 using UIWidgets.painting;
@@ -20,19 +22,19 @@ namespace UIWidgets.widgets {
     }
 
     public abstract class ScrollActivity {
-        public ScrollActivity(ScrollActivityDelegate @delegate) {
-            this._delegate = @delegate;
+        public ScrollActivity(ScrollActivityDelegate del) {
+            this._del = del;
         }
 
-        public ScrollActivityDelegate @delegate {
-            get { return this._delegate; }
+        public ScrollActivityDelegate del {
+            get { return this._del; }
         }
 
-        ScrollActivityDelegate _delegate;
+        ScrollActivityDelegate _del;
 
         public void updateDelegate(ScrollActivityDelegate value) {
-            D.assert(this._delegate != value);
-            this._delegate = value;
+            D.assert(this._del != value);
+            this._del = value;
         }
 
         public virtual void resetActivity() {
@@ -67,7 +69,7 @@ namespace UIWidgets.widgets {
         public abstract double velocity { get; }
 
         public virtual void dispose() {
-            this._delegate = null;
+            this._del = null;
         }
 
         public override string ToString() {
@@ -76,11 +78,11 @@ namespace UIWidgets.widgets {
     }
 
     public class IdleScrollActivity : ScrollActivity {
-        public IdleScrollActivity(ScrollActivityDelegate @delegate) : base(@delegate) {
+        public IdleScrollActivity(ScrollActivityDelegate del) : base(del) {
         }
 
         public override void applyNewDimensions() {
-            this.@delegate.goBallistic(0.0);
+            this.del.goBallistic(0.0);
         }
 
         public override bool shouldIgnorePointer {
@@ -102,9 +104,9 @@ namespace UIWidgets.widgets {
 
     public class HoldScrollActivity : ScrollActivity, ScrollHoldController {
         public HoldScrollActivity(
-            ScrollActivityDelegate @delegate = null,
+            ScrollActivityDelegate del = null,
             VoidCallback onHoldCanceled = null
-        ) : base(@delegate) {
+        ) : base(del) {
             this.onHoldCanceled = onHoldCanceled;
         }
 
@@ -123,7 +125,7 @@ namespace UIWidgets.widgets {
         }
 
         public void cancel() {
-            this.@delegate.goBallistic(0.0);
+            this.del.goBallistic(0.0);
         }
 
         public override void dispose() {
@@ -135,20 +137,20 @@ namespace UIWidgets.widgets {
 
     public class ScrollDragController : Drag {
         public ScrollDragController(
-            ScrollActivityDelegate @delegate = null,
+            ScrollActivityDelegate del = null,
             DragStartDetails details = null,
             VoidCallback onDragCanceled = null,
             double? carriedVelocity = null,
             double? motionStartDistanceThreshold = null
         ) {
-            D.assert(@delegate != null);
+            D.assert(del != null);
             D.assert(details != null);
             D.assert(
                 motionStartDistanceThreshold == null || motionStartDistanceThreshold > 0.0,
                 "motionStartDistanceThreshold must be a positive number or null"
             );
 
-            this._delegate = @delegate;
+            this._del = del;
             this._lastDetails = details;
             this._retainMomentum = carriedVelocity != null && carriedVelocity != 0.0;
             this._lastNonStationaryTimestamp = details.sourceTimeStamp;
@@ -159,11 +161,11 @@ namespace UIWidgets.widgets {
             this.motionStartDistanceThreshold = motionStartDistanceThreshold;
         }
 
-        public ScrollActivityDelegate @delegate {
-            get { return this._delegate; }
+        public ScrollActivityDelegate del {
+            get { return this._del; }
         }
 
-        ScrollActivityDelegate _delegate;
+        ScrollActivityDelegate _del;
 
         public readonly VoidCallback onDragCanceled;
 
@@ -184,12 +186,12 @@ namespace UIWidgets.widgets {
         const double _bigThresholdBreakDistance = 24.0;
 
         bool _reversed {
-            get { return AxisUtils.axisDirectionIsReversed(this.@delegate.axisDirection); }
+            get { return AxisUtils.axisDirectionIsReversed(this.del.axisDirection); }
         }
 
         public void updateDelegate(ScrollActivityDelegate value) {
-            D.assert(this._delegate != value);
-            this._delegate = value;
+            D.assert(this._del != value);
+            this._del = value;
         }
 
         void _maybeLoseMomentum(double offset, DateTime? timestamp) {
@@ -254,7 +256,7 @@ namespace UIWidgets.widgets {
                 offset = -offset;
             }
 
-            this.@delegate.applyUserOffset(offset);
+            this.del.applyUserOffset(offset);
         }
 
         public void end(DragEndDetails details) {
@@ -270,11 +272,11 @@ namespace UIWidgets.widgets {
                 velocity += this.carriedVelocity.Value;
             }
 
-            this.@delegate.goBallistic(velocity);
+            this.del.goBallistic(velocity);
         }
 
         public void cancel() {
-            this.@delegate.goBallistic(0.0);
+            this.del.goBallistic(0.0);
         }
 
         public virtual void dispose() {
@@ -297,9 +299,9 @@ namespace UIWidgets.widgets {
 
     public class DragScrollActivity : ScrollActivity {
         public DragScrollActivity(
-            ScrollActivityDelegate @delegate,
+            ScrollActivityDelegate del,
             ScrollDragController controller
-        ) : base(@delegate) {
+        ) : base(del) {
             this._controller = controller;
         }
 
@@ -351,6 +353,146 @@ namespace UIWidgets.widgets {
 
         public override void dispose() {
             this._controller = null;
+            base.dispose();
+        }
+
+        public override string ToString() {
+            return string.Format("{0}({1})", Diagnostics.describeIdentity(this), this._controller);
+        }
+    }
+
+    public class BallisticScrollActivity : ScrollActivity {
+        public BallisticScrollActivity(
+            ScrollActivityDelegate del,
+            Simulation simulation,
+            TickerProvider vsync
+        ) : base(del) {
+            this._controller = AnimationController.unbounded(
+                debugLabel: this.GetType().ToString(),
+                vsync: vsync
+            );
+
+            this._controller.addListener(this._tick);
+            this._controller.animateWith(simulation).Then(() => this._end());
+        }
+
+        public override double velocity {
+            get { return this._controller.velocity; }
+        }
+
+        readonly AnimationController _controller;
+
+        public override void resetActivity() {
+            this.del.goBallistic(this.velocity);
+        }
+
+        public override void applyNewDimensions() {
+            this.del.goBallistic(this.velocity);
+        }
+
+        void _tick() {
+            if (!this.applyMoveTo(this._controller.value)) {
+                this.del.goIdle();
+            }
+        }
+
+        protected bool applyMoveTo(double value) {
+            return this.del.setPixels(value) == 0.0;
+        }
+
+        void _end() {
+            if (this.del != null) {
+                this.del.goBallistic(0.0);
+            }
+        }
+
+        public override void dispatchOverscrollNotification(
+            ScrollMetrics metrics, BuildContext context, double overscroll) {
+            new OverscrollNotification(metrics: metrics, context: context, overscroll: overscroll,
+                velocity: this.velocity).dispatch(context);
+        }
+
+        public override bool shouldIgnorePointer {
+            get { return true; }
+        }
+
+        public override bool isScrolling {
+            get { return true; }
+        }
+
+        public override void dispose() {
+            this._controller.dispose();
+            base.dispose();
+        }
+
+        public override string ToString() {
+            return string.Format("{0}({1})", Diagnostics.describeIdentity(this), this._controller);
+        }
+    }
+
+    public class DrivenScrollActivity : ScrollActivity {
+        public DrivenScrollActivity(
+            ScrollActivityDelegate del,
+            double from,
+            double to,
+            TimeSpan duration,
+            Curve curve,
+            TickerProvider vsync
+        ) : base(del) {
+            D.assert(duration > TimeSpan.Zero);
+            D.assert(curve != null);
+
+            this._completer = new Promise();
+            this._controller = AnimationController.unbounded(
+                value: from,
+                debugLabel: this.GetType().ToString(),
+                vsync: vsync
+            );
+            this._controller.addListener(this._tick);
+            this._controller.animateTo(to, duration: duration, curve: curve)
+                .Then(() => this._end());
+        }
+
+        readonly Promise _completer;
+        readonly AnimationController _controller;
+
+        public IPromise done {
+            get { return this._completer; }
+        }
+
+        public override double velocity {
+            get { return this._controller.velocity; }
+        }
+
+        void _tick() {
+            if (this.del.setPixels(this._controller.value) != 0.0) {
+                this.del.goIdle();
+            }
+        }
+
+        void _end() {
+            if (this.del != null) {
+                this.del.goBallistic(this.velocity);
+            }
+        }
+
+        public override void dispatchOverscrollNotification(
+            ScrollMetrics metrics, BuildContext context, double overscroll) {
+            new OverscrollNotification(metrics: metrics, context: context, overscroll: overscroll,
+                velocity: this.velocity).dispatch(context);
+        }
+
+        public override bool shouldIgnorePointer {
+            get { return true; }
+        }
+
+        public override bool isScrolling {
+            get { return true; }
+        }
+
+        public override void dispose() {
+            this._completer.Resolve();
+            this._controller.dispose();
             base.dispose();
         }
 

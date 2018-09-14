@@ -15,7 +15,7 @@ namespace UIWidgets.widgets {
         public Directionality(
             Widget child,
             TextDirection textDirection,
-            string key = null
+            Key key = null
         ) : base(key, child) {
             this.textDirection = textDirection;
         }
@@ -37,7 +37,7 @@ namespace UIWidgets.widgets {
     }
 
     public class Opacity : SingleChildRenderObjectWidget {
-        public Opacity(double opacity, string key = null, Widget child = null) : base(key, child) {
+        public Opacity(double opacity, Key key = null, Widget child = null) : base(key, child) {
             this.opacity = opacity;
         }
 
@@ -54,7 +54,7 @@ namespace UIWidgets.widgets {
 
     public class LimitedBox : SingleChildRenderObjectWidget {
         public LimitedBox(
-            string key = null,
+            Key key = null,
             Widget child = null,
             double maxWidth = double.MaxValue,
             double maxHeight = double.MaxValue
@@ -81,7 +81,7 @@ namespace UIWidgets.widgets {
 
     public class ConstrainedBox : SingleChildRenderObjectWidget {
         public ConstrainedBox(
-            string key = null,
+            Key key = null,
             BoxConstraints constraints = null,
             Widget child = null
         ) : base(key, child) {
@@ -102,7 +102,7 @@ namespace UIWidgets.widgets {
     public class Padding : SingleChildRenderObjectWidget {
         public Padding(
             EdgeInsets padding,
-            string key = null,
+            Key key = null,
             Widget child = null
         ) : base(key, child) {
             this.padding = padding;
@@ -127,7 +127,7 @@ namespace UIWidgets.widgets {
             Offset origin = null,
             Alignment alignment = null,
             bool transformHitTests = false,
-            string key = null,
+            Key key = null,
             Widget child = null
         ) : base(key, child) {
             this.alignment = alignment ?? Alignment.center;
@@ -142,7 +142,7 @@ namespace UIWidgets.widgets {
             Offset origin,
             Alignment alignment,
             bool transformHitTests = false,
-            string key = null,
+            Key key = null,
             Widget child = null
         ) : base(key, child) {
             this.alignment = alignment ?? Alignment.center;
@@ -180,7 +180,7 @@ namespace UIWidgets.widgets {
         public Align(
             double widthFactor = 0.0,
             double heightFactor = 0.0,
-            string key = null,
+            Key key = null,
             Widget child = null,
             Alignment alignment = null
         ) : base(key, child) {
@@ -205,7 +205,7 @@ namespace UIWidgets.widgets {
     }
 
     public class RawImage : LeafRenderObjectWidget {
-        public RawImage(string key, ui.Image image, double width, double height, double scale, Color color,
+        public RawImage(Key key, ui.Image image, double width, double height, double scale, Color color,
             BlendMode colorBlendMode, BoxFit fit, Rect centerSlice, Alignment alignment = null,
             ImageRepeat repeat = ImageRepeat.noRepeat) : base(key) {
             this.image = image;

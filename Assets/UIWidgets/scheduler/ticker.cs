@@ -11,6 +11,7 @@ namespace UIWidgets.scheduler {
 
     public interface TickerProvider {
         Ticker createTicker(TickerCallback onTick);
+        SchedulerBinding schedulerBinding { get; }
     }
 
     public class Ticker {

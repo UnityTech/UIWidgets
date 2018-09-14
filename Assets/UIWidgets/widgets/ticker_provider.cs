@@ -8,7 +8,7 @@ using UnityEngine.Assertions;
 
 namespace UIWidgets.widgets {
     public class TickerMode : InheritedWidget {
-        public TickerMode(string key, bool enabled, Widget child) : base(key, child) {
+        public TickerMode(Key key, bool enabled, Widget child) : base(key, child) {
             this.enabled = enabled;
         }
 

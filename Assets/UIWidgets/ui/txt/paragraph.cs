@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UIWidgets.painting;
 using UIWidgets.ui.txt;
 using UnityEngine;
 
@@ -25,6 +26,97 @@ namespace UIWidgets.ui
         public static Vector2d operator -(Vector2d a, Vector2d b)
         {
             return new Vector2d(a.x - b.x, a.y - b.y);
+        }
+    }
+
+    public class CodeUnitRun
+    {
+        public int lineNumber;
+        public TextDirection direction;
+        public IndexRange codeUnits;
+        public FontMetrics fontMetrics;
+
+        public CodeUnitRun(IndexRange cu, int line, FontMetrics fontMetrics, TextDirection direction)
+        {
+            this.lineNumber = line;
+            this.codeUnits = cu;
+            this.fontMetrics = fontMetrics;
+            this.direction = direction;
+        }
+    }
+
+    public class FontMetrics
+    {
+        public readonly double ascent;
+        public readonly double descent;
+
+        public FontMetrics(double ascent, double descent)
+        {
+            this.ascent = ascent;
+            this.descent = descent;
+        }
+    }
+
+    public struct IndexRange :IEquatable<IndexRange>
+    {
+        public int start, end;
+
+        public IndexRange(int s, int e)
+        {
+            start = s;
+            end = e;
+        }
+
+        int width()
+        {
+            return end - start;
+        }
+
+        void shift(int delta)
+        {
+            start += delta;
+            end += delta;
+        }
+
+        public bool Equals(IndexRange other)
+        {
+            return start == other.start && end == other.end;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            return obj is IndexRange && Equals((IndexRange) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return (start * 397) ^ end;
+            }
+        }
+
+        public static bool operator ==(IndexRange left, IndexRange right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(IndexRange left, IndexRange right)
+        {
+            return !left.Equals(right);
+        }
+    }
+
+    public class PositionWithAffinity
+    {
+        public readonly int position;
+        public readonly TextAffinity affinity;
+
+        public PositionWithAffinity(int p, TextAffinity a)
+        {
+            position = p;
+            affinity = a;
         }
     }
     
@@ -108,6 +200,7 @@ namespace UIWidgets.ui
         private ParagraphStyle _paragraphStyle;
         private List<LineRange> _lineRanges = new List<LineRange>();
         private List<double> _lineWidths = new List<double>();
+        private List<double> _lineBaseLines = new List<double>();
         private Vector2d[] _characterPositions;
         private double _maxIntrinsicWidth;
         private double _minIntrinsicWidth;
@@ -116,6 +209,7 @@ namespace UIWidgets.ui
         private double[] _characterWidths; 
         private List<double> _lineHeights = new List<double>();
         private List<PaintRecord> _paintRecords = new List<PaintRecord>();
+        private List<CodeUnitRun> _codeUnitRuns = new List<CodeUnitRun>();
         private bool _didExceedMaxLines;
       
         // private double _characterWidth;
@@ -251,6 +345,138 @@ namespace UIWidgets.ui
             _paragraphStyle = style;
         }
 
+        public List<TextBox> getRectsForRange(int start, int end)
+        {
+            var lineBoxes = new SortedDictionary<int, List<TextBox>>();
+            foreach (var run in _codeUnitRuns)
+            {
+                if (run.codeUnits.start >= end)
+                {
+                    break;
+                }
+
+                if (run.codeUnits.end <= start)
+                {
+                    continue;
+                }
+
+                var baseLine = _lineBaseLines[run.lineNumber];
+                double top = baseLine - run.fontMetrics.ascent;
+                double bottom = baseLine + run.fontMetrics.descent;
+
+                // double left, right;
+                var from = Math.Max(start, run.codeUnits.start);
+                var to = Math.Min(end, run.codeUnits.end);
+                if (from < to)
+                {
+                    List<TextBox> boxs;
+                    if (!lineBoxes.TryGetValue(run.lineNumber, out boxs))
+                    {
+                        boxs = new List<TextBox>();
+                        lineBoxes.Add(run.lineNumber, boxs);
+                    }
+
+                    double left = _characterPositions[from].x;
+                    double right = _characterPositions[to - 1].x + _characterWidths[to - 1];
+                    boxs.Add(TextBox.fromLTBD(left, top, right, bottom, run.direction));
+                }
+            }
+
+            for (int lineNumber = 0; lineNumber < _lineRanges.Count; ++lineNumber)
+            {
+                var line = _lineRanges[lineNumber];
+                if (line.start >= end)
+                {
+                    break;
+                }
+
+                if (line.endIncludingNewLine <= start)
+                {
+                    continue;
+                }
+
+                if (!lineBoxes.ContainsKey(lineNumber))
+                {
+                    if (line.end != line.endIncludingNewLine && line.end >= start && line.endIncludingNewLine <= end)
+                    {
+                        var x = _lineWidths[lineNumber];
+                        var top = (lineNumber > 0) ? _lineHeights[lineNumber - 1] : 0;
+                        var bottom = _lineHeights[lineNumber];
+                        lineBoxes.Add(lineNumber, new List<TextBox>(){TextBox.fromLTBD(
+                            x, top, x, bottom, TextDirection.ltr)});
+                    }
+                }
+                
+            }
+
+            var result = new List<TextBox>();
+            foreach (var keyValuePair in lineBoxes)
+            {
+                result.AddRange(keyValuePair.Value);
+            }
+
+            return result;
+        }
+
+        public PositionWithAffinity getGlyphPositionAtCoordinate(double dx, double dy)
+        {
+            if (_lineHeights.Count == 0)
+            {
+                return new PositionWithAffinity(0, TextAffinity.downstream);
+            }
+
+            int yIndex;
+            for (yIndex = 0; yIndex < _lineHeights.Count - 1; ++yIndex)
+            {
+                if (dy < _lineHeights[yIndex])
+                {
+                    break;
+                }
+            }
+
+            var line = _lineRanges[yIndex];
+            if (line.start >= line.end)
+            {
+                return new PositionWithAffinity(line.start, TextAffinity.downstream);
+            }
+
+            int index;
+            for (index = line.start; index < line.end; ++index)
+            {
+                if (dx < _characterPositions[index].x + _characterWidths[index])
+                {
+                    break;
+                }
+            }
+
+            if (index >= line.end)
+            {
+                return new PositionWithAffinity(line.end, TextAffinity.upstream);
+            }
+            
+            TextDirection direction = TextDirection.ltr;
+            var codeUnit = _codeUnitRuns.Find((u) => u.codeUnits.start >= index && index < u.codeUnits.end);
+            if (codeUnit != null)
+            {
+                direction = codeUnit.direction;
+            }
+
+            double glyphCenter = (_characterPositions[index].x + _characterPositions[index].x + _characterWidths[index]) / 2;
+            if ((direction == TextDirection.ltr && dx < glyphCenter) || (direction == TextDirection.rtl && dx >= glyphCenter))
+            {
+                return new PositionWithAffinity(index, TextAffinity.downstream);
+            } else
+            {
+                return new PositionWithAffinity(index, TextAffinity.upstream);
+            }
+        }
+
+        public IndexRange getWordBoundary(int offset)
+        {
+            WordSeparate s = new WordSeparate(_text);
+            return s.findWordRange(offset);
+        }
+
         public static void offsetCharacters(Vector2d offset, Vector2d[] characterPos, int start, int end)
         {
             if (characterPos != null)
@@ -261,6 +487,7 @@ namespace UIWidgets.ui
                 }
             }
         }
+        
 
         private void computeWidthMetrics(double maxWordWidth)
         {
@@ -298,7 +525,9 @@ namespace UIWidgets.ui
             _lineHeights.Clear();
             _lineRanges.Clear();
             _lineWidths.Clear();
+            _lineBaseLines.Clear();
             _paintRecords.Clear();
+            _codeUnitRuns.Clear();
             _characterWidths = new double[_text.Length];
             for (int i = 0; i < _runs.size; ++i)
             {
@@ -353,6 +582,8 @@ namespace UIWidgets.ui
                             _paintRecords.Add(new PaintRecord(run.style, new TextBlob(
                                     _text, start, end, _characterPositions, run.style, bounds), 
                                 lineNumber, width));
+                            _codeUnitRuns.Add(new CodeUnitRun(
+                                new IndexRange(start, end), lineNumber, new FontMetrics(ascent, descent), TextDirection.ltr));
                         }
                     }
 
@@ -385,6 +616,7 @@ namespace UIWidgets.ui
                
                 _lineHeights.Add((_lineHeights.Count == 0 ? 0 : _lineHeights[_lineHeights.Count - 1]) + 
                                  Math.Round(maxAscent + maxDescent));
+                _lineBaseLines.Add(yOffset);
             }
         }
         

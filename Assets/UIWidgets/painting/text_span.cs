@@ -110,11 +110,11 @@ namespace UIWidgets.painting
             return sb.ToString();
         }
 
-        public int codeUnitAt(int index)
+        public int? codeUnitAt(int index)
         {
             if (index < 0)
             {
-                return -1;
+                return null;
             }
 
             var offset = 0;
@@ -210,7 +210,16 @@ namespace UIWidgets.painting
             if (ReferenceEquals(this, other)) return true;
             return Equals(style, other.style) && string.Equals(text, other.text) && childEquals(children, other.children);
         }
+        
+        public static bool operator ==(TextSpan left, TextSpan right)
+        {
+            return Equals(left, right);
+        }
 
+        public static bool operator !=(TextSpan left, TextSpan right)
+        {
+            return !Equals(left, right);
+        }
         private int childHash()
         {
             unchecked

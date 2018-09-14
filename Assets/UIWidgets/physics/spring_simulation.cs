@@ -87,13 +87,13 @@ namespace UIWidgets.physics {
         ) : base(spring, start, end, velocity, tolerance: tolerance) {
         }
 
-        public double x(double time) {
+        public override double x(double time) {
             return this.isDone(time) ? this._endPosition : base.x(time);
         }
     }
 
     abstract class _SpringSolution {
-        public static _SpringSolution create(
+        internal static _SpringSolution create(
             SpringDescription spring,
             double initialPosition,
             double initialVelocity
@@ -118,7 +118,7 @@ namespace UIWidgets.physics {
     }
 
     class _CriticalSolution : _SpringSolution {
-        internal static _CriticalSolution create(
+        internal new static _CriticalSolution create(
             SpringDescription spring,
             double distance,
             double velocity
@@ -154,7 +154,7 @@ namespace UIWidgets.physics {
     }
 
     class _OverdampedSolution : _SpringSolution {
-        internal static _OverdampedSolution create(
+        internal new static _OverdampedSolution create(
             SpringDescription spring,
             double distance,
             double velocity
@@ -194,7 +194,7 @@ namespace UIWidgets.physics {
     }
 
     class _UnderdampedSolution : _SpringSolution {
-        internal static _UnderdampedSolution create(
+        internal new static _UnderdampedSolution create(
             SpringDescription spring,
             double distance,
             double velocity

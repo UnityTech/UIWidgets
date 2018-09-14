@@ -11,7 +11,7 @@ namespace UIWidgets.widgets {
         public DecoratedBox(
             Decoration decoration,
             Widget child,
-            string key = null,
+            Key key = null,
             DecorationPosition position = DecorationPosition.background
         ) : base(key, child) {
             this.position = position;
@@ -39,7 +39,7 @@ namespace UIWidgets.widgets {
 
     public class Container : StatelessWidget {
         public Container(
-            string key,
+            Key key,
             Alignment alignment,
             EdgeInsets padding,
             Color color,

@@ -44,7 +44,7 @@ namespace UIWidgets.rendering {
             return this.behavior == HitTestBehavior.opaque;
         }
 
-        protected internal override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             properties.add(new EnumProperty<HitTestBehavior>(
                 "behavior", this.behavior, defaultValue: Diagnostics.kNullDefaultValue));
@@ -350,7 +350,7 @@ namespace UIWidgets.rendering {
             }
         }
 
-        protected internal override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             var listeners = new List<string>();
             if (this.onPointerDown != null)

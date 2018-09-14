@@ -40,7 +40,7 @@ namespace UIWidgets.widgets {
 
     public class NotificationListener<T> : StatelessWidget, _NotificationListener where T : Notification {
         public NotificationListener(
-            string key = null,
+            Key key = null,
             Widget child = null,
             NotificationListenerCallback<T> onNotification = null) : base(key) {
             this.child = child;
