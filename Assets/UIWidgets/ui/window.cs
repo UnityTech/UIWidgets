@@ -35,13 +35,6 @@ namespace UIWidgets.ui {
 
         private VoidCallback _onLocaleChanged;
 
-        public VoidCallback onAccessibilityFeaturesChanged {
-            get { return this._onAccessibilityFeaturesChanged; }
-            set { this._onAccessibilityFeaturesChanged = value; }
-        }
-
-        private VoidCallback _onAccessibilityFeaturesChanged;
-        
         public FrameCallback onBeginFrame {
             get { return this._onBeginFrame; }
             set { this._onBeginFrame = value; }
