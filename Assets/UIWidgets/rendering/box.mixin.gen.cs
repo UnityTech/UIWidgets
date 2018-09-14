@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UIWidgets.gestures;
 using UIWidgets.ui;
 
 namespace UIWidgets.rendering {
@@ -54,6 +55,19 @@ namespace UIWidgets.rendering {
                 context.paintChild(child, childParentData.offset + offset);
                 child = childParentData.nextSibling;
             }
+        }
+
+       public bool defaultHitTestChildren(HitTestResult result, Offset position) {
+            // the x, y parameters have the top left of the node's box as the origin
+            ChildType child = lastChild;
+            while (child != null)
+            {
+                ParentDataType childParentData = (ParentDataType) child.parentData;
+                if (child.hitTest(result, position: position - childParentData.offset))
+                    return true;
+                child = childParentData.previousSibling;
+            }
+            return false;
         }
 
         public List<ChildType> getChildrenAsList() {
