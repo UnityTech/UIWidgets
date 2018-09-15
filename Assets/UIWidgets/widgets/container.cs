@@ -38,23 +38,24 @@ namespace UIWidgets.widgets {
     }
 
     public class Container : StatelessWidget {
+        // todo transform
         public Container(
-            Key key,
-            Alignment alignment,
-            EdgeInsets padding,
-            Color color,
-            Decoration decoration,
-            Decoration forgroundDecoration,
-            double width,
-            double height,
-            BoxConstraints constraints,
-            EdgeInsets margin,
-            Matrix4x4 transfrom,
-            Widget child
+            Key key = null,
+            Alignment alignment = null,
+            EdgeInsets padding = null,
+            Color color = null,
+            Decoration decoration = null,
+            Decoration forgroundDecoration = null,
+            double width = 0.0,
+            double height = 0.0,
+            BoxConstraints constraints = null,
+            EdgeInsets margin = null,
+//            Matrix4x4 transfrom = default(Matrix4x4),
+            Widget child = null
         ) : base(key) {
             this.alignment = alignment;
             this.foregroundDecoration = forgroundDecoration;
-            this.transform = transfrom;
+//            this.transform = transfrom;
             this.margin = margin;
             this.child = child;
             this.padding = padding;
@@ -73,7 +74,7 @@ namespace UIWidgets.widgets {
         public Decoration foregroundDecoration;
         public BoxConstraints constraints;
         public EdgeInsets margin;
-        public Matrix4x4 transform;
+//        public Matrix4x4 transform;
 
         EdgeInsets _paddingIncludingDecoration {
             get {
@@ -126,9 +127,9 @@ namespace UIWidgets.widgets {
                 current = new Padding(padding: margin, child: current);
             }
 
-            if (transform != null) {
-                current = new Transform(transform: transform, child: current);
-            }
+//            if (transform != null) {
+//                current = new Transform(transform: transform, child: current);
+//            }
 
             return current;
         }

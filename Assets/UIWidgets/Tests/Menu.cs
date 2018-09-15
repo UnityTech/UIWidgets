@@ -26,5 +26,10 @@ namespace UIWidgets.Tests {
         public static void renderEditable() {
             EditorWindow.GetWindow(typeof(RenderEditable));
         }
+        
+        [MenuItem("UIWidgetsTests/Widgets")]
+        public static void renderWidgets() {
+            EditorWindow.GetWindow(typeof(Widgets));
+        }
     }
 }

@@ -1,14 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UIWidgets.painting;
 using UIWidgets.foundation;
-using UIWidgets.rendering;
 using UIWidgets.ui;
-using UnityEngine;
-using UnityEngine.Assertions;
 using Color = UIWidgets.ui.Color;
-using Rect = UnityEngine.Rect;
 
 namespace UIWidgets.widgets {
     internal class ImageUtil {
@@ -19,8 +14,8 @@ namespace UIWidgets.widgets {
         }
     }
 
-    public class Image<T> : StatefulWidget {
-        public IImageProvider<System.Object> image;
+    public class Image : StatefulWidget {
+        public ImageProvider image;
         public double width;
         public double height;
         public Color color;
@@ -34,7 +29,7 @@ namespace UIWidgets.widgets {
 
         public Image(
             Key key,
-            ImageProvider<System.Object> image,
+            ImageProvider<object> image,
             double width,
             double height,
             Color color,
@@ -60,15 +55,15 @@ namespace UIWidgets.widgets {
         // Network Image
         public Image(
             string src,
-            Key key,
-            double width,
-            double height,
-            Color color,
-            BlendMode colorBlendMode,
-            BoxFit fit,
-            Alignment alignment,
-            ui.Rect centerSlice,
-            Dictionary<String, String> headers,
+            Key key = null,
+            double width = 0.0,
+            double height = 0.0,
+            Color color = null,
+            BlendMode colorBlendMode = BlendMode.None,
+            BoxFit fit = BoxFit.none,
+            Alignment alignment = null,
+            ui.Rect centerSlice = null,
+            Dictionary<String, String> headers = null,
             ImageRepeat repeat = ImageRepeat.noRepeat,
             bool gaplessPlayback = false,
             double scale = 1.0
@@ -86,11 +81,11 @@ namespace UIWidgets.widgets {
         }
 
         public override State createState() {
-            return new _ImageState<T>();
+            return new _ImageState();
         }
     }
 
-    public class _ImageState<T> : State {
+    public class _ImageState : State {
         ImageStream _imageStream;
         ImageInfo _imageInfo;
         bool _isListeningToStream = false;
@@ -104,7 +99,7 @@ namespace UIWidgets.widgets {
         }
 
         public override void didUpdateWidget(StatefulWidget oldWidget) {
-            if (((Image<T>) widget).image != ((Image<T>) oldWidget).image)
+            if (((Image) widget).image != ((Image) oldWidget).image)
                 _resolveImage();
         }
 
@@ -113,7 +108,7 @@ namespace UIWidgets.widgets {
 //        }
 
         void _resolveImage() {
-            var imageWidget = (Image<T>) widget;
+            var imageWidget = (Image) widget;
             ImageStream newStream =
                 imageWidget.image.resolve(ImageUtil.createLocalImageConfiguration(
                     context,
@@ -133,7 +128,7 @@ namespace UIWidgets.widgets {
             if (_isListeningToStream && _imageStream != null)
                 _imageStream.removeListener(_handleImageChanged);
 
-            if (!((Image<T>) widget).gaplessPlayback) {
+            if (!((Image) widget).gaplessPlayback) {
                 setState(() => { _imageInfo = null; });
 
                 _imageStream = newStream;
@@ -157,9 +152,9 @@ namespace UIWidgets.widgets {
         }
 
         public override Widget build(BuildContext context) {
-            var imageWidget = (Image<T>) widget;
+            var imageWidget = (Image) widget;
             RawImage image = new RawImage(
-                null, // todo
+                null, 
                 _imageInfo == null ? null : _imageInfo.image,
                 imageWidget.width,
                 imageWidget.height,

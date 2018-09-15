@@ -2,18 +2,16 @@ using System.Collections.Generic;
 using RSG;
 using System.Net;
 using System;
-using System.IO;
 using UIWidgets.lib.cache_manager;
 using UIWidgets.ui;
-using UnityEngine;
 
 namespace UIWidgets.painting {
-    public interface IImageProvider<out T> {
-        ImageStream resolve(ImageConfiguration configuration);
+    public abstract class ImageProvider {
+        public abstract ImageStream resolve(ImageConfiguration configuration);
     }
 
-    public abstract class ImageProvider<T> : IImageProvider<T> {
-        public ImageStream resolve(ImageConfiguration configuration) {
+    public abstract class ImageProvider<T> : ImageProvider {
+        public override ImageStream resolve(ImageConfiguration configuration) {
             ImageStream stream = new ImageStream();
             T obtainedKey;
             obtainedKey = obtainKey(configuration);
@@ -47,8 +45,8 @@ namespace UIWidgets.painting {
         }
 
         public override ImageStreamCompleter load(NetworkImage key) {
-//            return new OneFrameImageStreamCompleter(_loadAsync(key));
-            return new OneFrameImageStreamCompleter(_loadAsyncWithCache(key));
+            return new OneFrameImageStreamCompleter(_loadAsync(key));
+//            return new OneFrameImageStreamCompleter(_loadAsyncWithCache(key));
         }
 
         public static IPromise<ImageInfo> _loadAsync(NetworkImage key) {

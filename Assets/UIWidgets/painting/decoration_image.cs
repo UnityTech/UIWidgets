@@ -24,6 +24,11 @@ namespace UIWidgets.painting {
     }
 
     public static class DecorationImageUtil {
+        public static void paintImage(Canvas canvas, Rect rect, ui.Image image) {
+            canvas.drawImageRect(Rect.fromLTWH(0, 0, 100, 100), rect, new Paint(), image);
+        }
+        // todo refine logic below, no just draw in Rect(0, 0, 100, 100) for testing widgets
+        /*
         public static void paintImage(Canvas canvas, Rect rect, ui.Image image, BoxFit fit, Rect centerSlice,
             Alignment alignment = null,
             ImageRepeat repeat = ImageRepeat.noRepeat) {
@@ -93,7 +98,7 @@ namespace UIWidgets.painting {
 
             if (needSave)
                 canvas.restore();
-        }
+        }*/
 
         public static List<Rect> _generateImageTileRects(Rect outputRect, Rect fundamentalRect,
             ImageRepeat repeat) {

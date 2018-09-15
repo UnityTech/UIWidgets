@@ -5,12 +5,12 @@ using UIWidgets.rendering;
 using UIWidgets.ui;
 
 namespace UIWidgets.widgets {
-    interface WidgetsBindingObserver {
+    public interface WidgetsBindingObserver {
         void didChangeMetrics();
     }
 
-    abstract class WidgetsBinding : RendererBinding {
-        protected WidgetsBinding(Window window) : base(window) {
+    public class WidgetsBinding : RendererBinding {
+        public WidgetsBinding(Window window) : base(window) {
             this.buildOwner.onBuildScheduled = this._handleBuildScheduled;
             window.onLocaleChanged += this.handleLocaleChanged;
         }
@@ -19,14 +19,14 @@ namespace UIWidgets.widgets {
             get { return this._buildOwner; }
         }
 
-        readonly BuildOwner _buildOwner;
+        readonly BuildOwner _buildOwner = new BuildOwner();
 
         public Element renderViewElement {
             get { return this._renderViewElement; }
         }
 
         Element _renderViewElement;
-        
+
         public List<WidgetsBindingObserver> _observers = new List<WidgetsBindingObserver>();
 
         void addObserver(WidgetsBindingObserver observer) {
@@ -61,12 +61,14 @@ namespace UIWidgets.widgets {
             base.drawFrame();
             buildOwner.finalizeTree();
         }
-        
-        void attachRootWidget(Widget rootWidget) {
-            _renderViewElement = new RenderObjectToWidgetAdapter<RenderBox>(
+
+        public void attachRootWidget(Widget rootWidget) {
+            var _adapter = new RenderObjectToWidgetAdapter<RenderBox>(
                 container: renderView,
                 child: rootWidget
-            ).attachToRenderTree(buildOwner, _renderViewElement as RenderObjectToWidgetElement<RenderBox>);
+            );
+            _renderViewElement = _adapter.attachToRenderTree(buildOwner,
+                _renderViewElement as RenderObjectToWidgetElement<RenderBox>);
         }
     }
 
@@ -94,7 +96,8 @@ namespace UIWidgets.widgets {
         public void updateRenderObject(BuildContext context, RenderObject renderObject) {
         }
 
-        public RenderObjectToWidgetElement<T> attachToRenderTree(BuildOwner owner, RenderObjectToWidgetElement<T> element) {
+        public RenderObjectToWidgetElement<T> attachToRenderTree(BuildOwner owner,
+            RenderObjectToWidgetElement<T> element) {
             if (element == null) {
                 element = (RenderObjectToWidgetElement<T>) createElement();
                 element.assignOwner(owner);
@@ -183,6 +186,20 @@ namespace UIWidgets.widgets {
                 Widget error = ErrorWidget.builder(new UIWidgetsErrorDetails(e));
                 _child = updateChild(null, error, _rootChildSlot);
             }
+        }
+    }
+
+    public class WidgetsBindings {
+        public WidgetsBindings(Window window) {
+            this.window = window;
+            this.widgetsBinding = new WidgetsBinding(window);
+        }
+
+        public readonly Window window;
+        public readonly WidgetsBinding widgetsBinding;
+
+        public void attachRootWidget(Widget root) {
+            this.widgetsBinding.attachRootWidget(root);
         }
     }
 }

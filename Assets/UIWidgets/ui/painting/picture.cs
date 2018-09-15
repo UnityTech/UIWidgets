@@ -110,8 +110,10 @@ namespace UIWidgets.ui {
                 var drawTextBlob = (DrawTextBlob) drawCmd;
                 var bounds = drawTextBlob.textBlob.boundsInText.shift(new Offset(drawTextBlob.x, drawTextBlob.y));
                 this.addPaintBounds(bounds);
-            } else
-            {
+            } else if (drawCmd is DrawImageRect) {
+                var drawImageRect = (DrawImageRect) drawCmd;
+                this.addPaintBounds(drawImageRect.src);
+            } else {
                 throw new Exception("unknown drawCmd: " + drawCmd);
             }
         }
