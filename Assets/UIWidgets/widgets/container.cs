@@ -1,10 +1,6 @@
-using System;
-using System.Collections.Generic;
 using UIWidgets.foundation;
 using UIWidgets.rendering;
 using UIWidgets.painting;
-using UnityEngine;
-using Color = UIWidgets.ui.Color;
 
 namespace UIWidgets.widgets {
     public class DecoratedBox : SingleChildRenderObjectWidget {
@@ -43,7 +39,7 @@ namespace UIWidgets.widgets {
             Key key = null,
             Alignment alignment = null,
             EdgeInsets padding = null,
-            Color color = null,
+            ui.Color color = null,
             Decoration decoration = null,
             Decoration forgroundDecoration = null,
             double width = 0.0,

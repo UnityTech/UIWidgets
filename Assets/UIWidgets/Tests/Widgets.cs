@@ -27,6 +27,8 @@ namespace UIWidgets.Tests {
                 width: 200,
                 height: 200,
                 margin: EdgeInsets.all(30.0),
+                padding: EdgeInsets.all(15.0),
+                color: ui.Color.fromARGB(255, 244, 190, 85),
                 child: image
             );
         }
