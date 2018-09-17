@@ -1,12 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using UIWidgets.foundation;
 using UIWidgets.painting;
 using UIWidgets.rendering;
 using UIWidgets.ui;
 using UnityEngine;
-using UnityEngine.Assertions;
 using Color = UIWidgets.ui.Color;
 using Rect = UIWidgets.ui.Rect;
 
@@ -25,10 +21,6 @@ namespace UIWidgets.widgets {
         public static TextDirection of(BuildContext context) {
             Directionality widget = context.inheritFromWidgetOfExactType(typeof(Directionality)) as Directionality;
             return widget == null ? TextDirection.ltr : widget.textDirection;
-        }
-
-        public override Element createElement() {
-            throw new NotImplementedException();
         }
 
         public override bool updateShouldNotify(InheritedWidget oldWidget) {
@@ -220,10 +212,6 @@ namespace UIWidgets.widgets {
             this.repeat = repeat;
         }
 
-        public override Element createElement() {
-            throw new NotImplementedException();
-        }
-
         public override RenderObject createRenderObject(BuildContext context) {
             return new RenderImage(
                 this.image,
@@ -237,6 +225,17 @@ namespace UIWidgets.widgets {
                 this.alignment
             );
         }
+        
+        public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
+            ((RenderImage) renderObject).image = this.image;
+            ((RenderImage) renderObject).width = this.width;
+            ((RenderImage) renderObject).height = this.height;
+            ((RenderImage) renderObject).color = this.color;
+            ((RenderImage) renderObject).fit = this.fit;
+            ((RenderImage) renderObject).repeat = this.repeat;
+            ((RenderImage) renderObject).centerSlice = this.centerSlice;
+            ((RenderImage) renderObject).alignment = this.alignment;
+        } 
 
         public ui.Image image;
         public double width;

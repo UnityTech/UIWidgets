@@ -1,7 +1,5 @@
 using UIWidgets.ui;
 using UIWidgets.painting;
-using UnityEngine.Rendering;
-using BlendMode = UIWidgets.ui.BlendMode;
 
 namespace UIWidgets.rendering {
     class RenderImage : RenderBox {
@@ -180,6 +178,10 @@ namespace UIWidgets.rendering {
                 _image.height / _scale
             ));
         }
+        
+        public override void performLayout() {
+            this.size = _sizeForConstraints(constraints);
+        }
 
         public override void paint(PaintingContext context, Offset offset) {
             if (_image == null)
@@ -188,11 +190,11 @@ namespace UIWidgets.rendering {
             DecorationImageUtil.paintImage(
                 context.canvas,
                 offset & size,
-                _image,
-                _fit,
-                _centerSlice,
-                _resolvedAlignment,
-                _repeat
+                _image
+//                _fit,
+//                _centerSlice,
+//                _resolvedAlignment,
+//                _repeat
             );
         }
     }

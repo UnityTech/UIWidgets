@@ -28,6 +28,7 @@ namespace UIWidgets.ui {
     }
 
     public class DrawImageRect : DrawCmd {
+        public Paint paint;
         public Image image;
         public Rect src;
         public Rect dst;

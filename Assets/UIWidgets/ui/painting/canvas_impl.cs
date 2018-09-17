@@ -167,7 +167,11 @@ namespace UIWidgets.ui {
                 } else if (drawCmd is DrawTextBlob) {
                     var drawTextBlob = (DrawTextBlob) drawCmd;
                     this.drawTextBlob(drawTextBlob.textBlob, drawTextBlob.x, drawTextBlob.y);
-                } else {
+                } else if (drawCmd is DrawImageRect) {
+                    var drawImageProperties = (DrawImageRect) drawCmd;
+                    this.drawImageRect(drawImageProperties.src, drawImageProperties.dst, drawImageProperties.paint, drawImageProperties.image);
+                }
+                else {
                     throw new Exception("unknown drawCmd: " + drawCmd);
                 }
             }
