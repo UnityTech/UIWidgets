@@ -60,6 +60,31 @@ namespace UIWidgets.widgets {
             });
         }
 
+        public static bool debugCheckHasDirectionality(BuildContext context) {
+            D.assert(() => {
+                if (!(context.widget is Directionality) &&
+                    context.ancestorWidgetOfExactType(typeof(Directionality)) == null) {
+                    Element element = (Element) context;
+                    throw new UIWidgetsError(
+                        "No Directionality widget found.\n" +
+                        context.widget.GetType() + " widgets require a Directionality widget ancestor.\n" +
+                        "The specific widget that could not find a Directionality ancestor was:\n" +
+                        "  " + context.widget + "\n" +
+                        "The ownership chain for the affected widget is:\n" +
+                        "  " + element.debugGetCreatorChain(10) + "\n" +
+                        "Typically, the Directionality widget is introduced by the MaterialApp " +
+                        "or WidgetsApp widget at the top of your application widget tree. It " +
+                        "determines the ambient reading direction and is used, for example, to " +
+                        "determine how to lay out text, how to interpret \"start\" and \"end\" " +
+                        "values, and to resolve EdgeInsetsDirectional, " +
+                        "AlignmentDirectional, and other *Directional objects.");
+                }
+
+                return true;
+            });
+            return true;
+        }
+
         internal static UIWidgetsErrorDetails _debugReportException(
             string context,
             Exception exception,

@@ -1167,7 +1167,7 @@ namespace UIWidgets.widgets {
         public virtual void visitChildren(ElementVisitor visitor) {
         }
 
-        public void debugVisitOnstageChildren(ElementVisitor visitor) {
+        public virtual void debugVisitOnstageChildren(ElementVisitor visitor) {
             this.visitChildren(visitor);
         }
 
