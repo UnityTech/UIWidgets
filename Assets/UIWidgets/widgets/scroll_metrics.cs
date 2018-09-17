@@ -15,6 +15,22 @@ namespace UIWidgets.widgets {
     }
 
     public static class ScrollMetricsUtils {
+        public static ScrollMetrics copyWith(ScrollMetrics it,
+            double? minScrollExtent = null,
+            double? maxScrollExtent = null,
+            double? pixels = null,
+            double? viewportDimension = null,
+            AxisDirection? axisDirection = null
+        ) {
+            return new FixedScrollMetrics(
+                minScrollExtent: minScrollExtent ?? it.minScrollExtent,
+                maxScrollExtent: maxScrollExtent ?? it.maxScrollExtent,
+                pixels: pixels ?? it.pixels,
+                viewportDimension: viewportDimension ?? it.viewportDimension,
+                axisDirection: axisDirection ?? it.axisDirection
+            );
+        }
+
         public static Axis axis(this ScrollMetrics it) {
             return AxisUtils.axisDirectionToAxis(it.axisDirection);
         }

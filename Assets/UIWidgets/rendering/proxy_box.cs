@@ -475,6 +475,7 @@ namespace UIWidgets.rendering {
                 if (didNeedCompositing != alwaysNeedsCompositing) {
                     markNeedsCompositingBitsUpdate();
                 }
+
                 markNeedsPaint();
             }
         }
@@ -492,9 +493,40 @@ namespace UIWidgets.rendering {
                 context.paintChild(child, offset);
                 return;
             }
+
             D.assert(needsCompositing);
             context.pushOpacity(offset, _alpha, base.paint);
         }
-        
+    }
+
+    public class RenderIgnorePointer : RenderProxyBox {
+        public RenderIgnorePointer(
+            RenderBox child = null,
+            bool ignoring = true
+        ) : base(child) {
+            this._ignoring = ignoring;
+        }
+
+        public bool ignoring {
+            get { return this._ignoring; }
+            set {
+                if (value == this._ignoring) {
+                    return;
+                }
+
+                this._ignoring = value;
+            }
+        }
+
+        bool _ignoring;
+
+        public override bool hitTest(HitTestResult result, Offset position = null) {
+            return this.ignoring ? false : base.hitTest(result, position: position);
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new DiagnosticsProperty<bool>("ignoring", this.ignoring));
+        }
     }
 }

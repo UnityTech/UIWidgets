@@ -80,9 +80,18 @@ namespace UIWidgets.gestures {
                     }
                         break;
                     case PointerChange.move: {
+                        bool alreadyAdded = _pointers.ContainsKey(datum.device);
+                        if (!alreadyAdded) {
+                            break;
+                        }
                         D.assert(_pointers.ContainsKey(datum.device));
+                        
                         _PointerState state = _pointers[datum.device];
+                        if (!state.down) {
+                            break;
+                        }
                         D.assert(state.down);
+                        
                         Offset offset = position - state.lastPosition;
                         state.lastPosition = position;
                         yield return new PointerMoveEvent(
