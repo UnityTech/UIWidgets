@@ -708,8 +708,9 @@ namespace UIWidgets.widgets {
     }
 
     public class BuildOwner {
-        public BuildOwner(VoidCallback onBuildScheduled = null) {
+        public BuildOwner(Window window, VoidCallback onBuildScheduled = null) {
             this.onBuildScheduled = onBuildScheduled;
+            this.focusManager = new FocusManager(window);
         }
 
         public VoidCallback onBuildScheduled;
@@ -726,7 +727,7 @@ namespace UIWidgets.widgets {
             get { return this._dirtyElementsNeedsResorting != null; }
         }
 
-        public readonly FocusManager focusManager = new FocusManager();
+        public readonly FocusManager focusManager;
 
         public void scheduleBuildFor(Element element) {
             D.assert(element != null);

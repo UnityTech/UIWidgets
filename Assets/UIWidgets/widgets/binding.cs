@@ -13,13 +13,14 @@ namespace UIWidgets.widgets {
         public WidgetsBinding(Window window) : base(window) {
             this.buildOwner.onBuildScheduled = this._handleBuildScheduled;
             window.onLocaleChanged += this.handleLocaleChanged;
+            _buildOwner = new BuildOwner(window);
         }
 
         public BuildOwner buildOwner {
             get { return this._buildOwner; }
         }
 
-        readonly BuildOwner _buildOwner = new BuildOwner();
+        private readonly BuildOwner _buildOwner;
 
         public Element renderViewElement {
             get { return this._renderViewElement; }
