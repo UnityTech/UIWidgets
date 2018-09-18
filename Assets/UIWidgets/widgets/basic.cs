@@ -141,7 +141,6 @@ namespace UIWidgets.widgets {
         }
 
         public override RenderObject createRenderObject(BuildContext context) {
-            Debug.Log("a");
             return new RenderFlex(
                 direction: direction,
                 mainAxisAlignment: mainAxisAlignment,
