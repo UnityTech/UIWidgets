@@ -2812,9 +2812,9 @@ namespace UIWidgets.widgets {
             base.mount(parent, newSlot);
             this._children = new List<Element>(this.widget.children.Count);
             Element previousChild = null;
-            for (int i = 0; i < this._children.Count; i += 1) {
+            for (int i = 0; i < this._children.Capacity; i += 1) {
                 Element newChild = this.inflateWidget(this.widget.children[i], previousChild);
-                this._children[i] = newChild;
+                this._children.Add(newChild);
                 previousChild = newChild;
             }
         }
