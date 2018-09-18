@@ -1,0 +1,205 @@
+using System;
+using System.Collections.Generic;
+using RSG;
+using UIWidgets.animation;
+using UIWidgets.foundation;
+using UIWidgets.gestures;
+using UIWidgets.painting;
+using UIWidgets.physics;
+using UIWidgets.rendering;
+using UIWidgets.ui;
+
+namespace UIWidgets.widgets {
+    public class ScrollPositionWithSingleContext : ScrollPosition, ScrollActivityDelegate {
+        public ScrollPositionWithSingleContext(
+            ScrollPhysics physics = null,
+            ScrollContext context = null,
+            double? initialPixels = 0.0,
+            bool keepScrollOffset = true,
+            ScrollPosition oldPosition = null,
+            string debugLabel = null
+        ) : base(
+            physics: physics,
+            context: context,
+            keepScrollOffset: keepScrollOffset,
+            oldPosition: oldPosition,
+            debugLabel: debugLabel
+        ) {
+            if (this._pixels == null && initialPixels != null) {
+                this.correctPixels(initialPixels.Value);
+            }
+
+            if (this.activity == null) {
+                this.goIdle();
+            }
+
+            D.assert(this.activity != null);
+        }
+
+
+        double _heldPreviousVelocity = 0.0;
+
+        public override AxisDirection axisDirection {
+            get { return this.context.axisDirection; }
+        }
+
+        public override double setPixels(double newPixels) {
+            D.assert(this.activity.isScrolling);
+            return base.setPixels(newPixels);
+        }
+
+        protected override void absorb(ScrollPosition other) {
+            base.absorb(other);
+            if (!(other is ScrollPositionWithSingleContext)) {
+                this.goIdle();
+                return;
+            }
+
+            this.activity.updateDelegate(this);
+            ScrollPositionWithSingleContext typedOther = (ScrollPositionWithSingleContext) other;
+            this._userScrollDirection = typedOther._userScrollDirection;
+            D.assert(this._currentDrag == null);
+            if (typedOther._currentDrag != null) {
+                this._currentDrag = typedOther._currentDrag;
+                this._currentDrag.updateDelegate(this);
+                typedOther._currentDrag = null;
+            }
+        }
+
+        protected override void applyNewDimensions() {
+            base.applyNewDimensions();
+            this.context.setCanDrag(this.physics.shouldAcceptUserOffset(this));
+        }
+
+        public override void beginActivity(ScrollActivity newActivity) {
+            this._heldPreviousVelocity = 0.0;
+            if (newActivity == null) {
+                return;
+            }
+
+            D.assert(newActivity.del == this);
+            base.beginActivity(newActivity);
+            if (this._currentDrag != null) {
+                this._currentDrag.dispose();
+                this._currentDrag = null;
+            }
+
+            if (!this.activity.isScrolling) {
+                this.updateUserScrollDirection(ScrollDirection.idle);
+            }
+        }
+
+        public virtual void applyUserOffset(double delta) {
+            this.updateUserScrollDirection(delta > 0.0 ? ScrollDirection.forward : ScrollDirection.reverse);
+            this.setPixels(this.pixels - this.physics.applyPhysicsToUserOffset(this, delta));
+        }
+
+        public void goIdle() {
+            this.beginActivity(new IdleScrollActivity(this));
+        }
+
+        public void goBallistic(double velocity) {
+            D.assert(this._pixels != null);
+            Simulation simulation = this.physics.createBallisticSimulation(this, velocity);
+            if (simulation != null) {
+                this.beginActivity(new BallisticScrollActivity(this, simulation, this.context.vsync));
+            } else {
+                this.goIdle();
+            }
+        }
+
+        public override ScrollDirection userScrollDirection {
+            get { return this._userScrollDirection; }
+        }
+
+        ScrollDirection _userScrollDirection = ScrollDirection.idle;
+
+        protected void updateUserScrollDirection(ScrollDirection value) {
+            if (this.userScrollDirection == value) {
+                return;
+            }
+
+            this._userScrollDirection = value;
+            this.didUpdateScrollDirection(value);
+        }
+
+        public override IPromise animateTo(double to,
+            TimeSpan duration,
+            Curve curve
+        ) {
+            if (PhysicsUtils.nearEqual(to, this.pixels, this.physics.tolerance.distance)) {
+                this.jumpTo(to);
+                return Promise.Resolved();
+            }
+
+            DrivenScrollActivity activity = new DrivenScrollActivity(
+                this,
+                from: this.pixels,
+                to: to,
+                duration: duration,
+                curve: curve,
+                vsync: this.context.vsync
+            );
+            this.beginActivity(activity);
+            return activity.done;
+        }
+
+        public override void jumpTo(double value) {
+            this.goIdle();
+            if (this.pixels != value) {
+                double oldPixels = this.pixels;
+                this.forcePixels(value);
+                this.notifyListeners();
+                this.didStartScroll();
+                this.didUpdateScrollPositionBy(this.pixels - oldPixels);
+                this.didEndScroll();
+            }
+
+            this.goBallistic(0.0);
+        }
+
+        public override ScrollHoldController hold(VoidCallback holdCancelCallback) {
+            double previousVelocity = this.activity.velocity;
+            HoldScrollActivity holdActivity = new HoldScrollActivity(
+                del: this,
+                onHoldCanceled: holdCancelCallback
+            );
+            this.beginActivity(holdActivity);
+            this._heldPreviousVelocity = previousVelocity;
+            return holdActivity;
+        }
+
+        ScrollDragController _currentDrag;
+
+        public override Drag drag(DragStartDetails details, VoidCallback dragCancelCallback) {
+            ScrollDragController drag = new ScrollDragController(
+                del: this,
+                details: details,
+                onDragCanceled: dragCancelCallback,
+                carriedVelocity: this.physics.carriedMomentum(this._heldPreviousVelocity),
+                motionStartDistanceThreshold: this.physics.dragStartDistanceMotionThreshold
+            );
+            this.beginActivity(new DragScrollActivity(this, drag));
+            D.assert(this._currentDrag == null);
+            this._currentDrag = drag;
+            return drag;
+        }
+
+        public override void dispose() {
+            if (this._currentDrag != null) {
+                this._currentDrag.dispose();
+                this._currentDrag = null;
+            }
+
+            base.dispose();
+        }
+
+        protected override void debugFillDescription(List<String> description) {
+            base.debugFillDescription(description);
+            description.Add(this.context.GetType().ToString());
+            description.Add(this.physics.ToString());
+            description.Add(this.activity.ToString());
+            description.Add(this.userScrollDirection.ToString());
+        }
+    }
+}

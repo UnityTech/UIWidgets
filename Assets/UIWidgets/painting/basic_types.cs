@@ -1,6 +1,8 @@
 ﻿using System;
 using System.ComponentModel;
+using UIWidgets.foundation;
 using UIWidgets.ui;
+using UIWidgets.widgets;
 
 namespace UIWidgets.painting {
     public enum AxisDirection {
@@ -83,13 +85,30 @@ namespace UIWidgets.painting {
 
             throw new Exception("unknown axisDirection");
         }
+
+        public static AxisDirection getAxisDirectionFromAxisReverseAndDirectionality(
+            BuildContext context,
+            Axis axis,
+            bool reverse
+        ) {
+            switch (axis) {
+                case Axis.horizontal:
+                    D.assert(WidgetsD.debugCheckHasDirectionality(context));
+                    TextDirection textDirection = Directionality.of(context);
+                    AxisDirection axisDirection = textDirectionToAxisDirection(textDirection);
+                    return reverse ? flipAxisDirection(axisDirection) : axisDirection;
+                case Axis.vertical:
+                    return reverse ? AxisDirection.up : AxisDirection.down;
+            }
+
+            throw new Exception("unknown axisDirection");
+        }
     }
 
     /// The values in this enum are ordered such that they are in increasing order
     /// of cost. A value with index N implies all the values with index less than N.
     /// For example, [layout] (index 3) implies [paint] (2).
-    public enum RenderComparison
-    {
+    public enum RenderComparison {
         identical,
         metadata,
         paint,

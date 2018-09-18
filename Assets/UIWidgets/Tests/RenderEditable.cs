@@ -55,8 +55,8 @@ namespace UIWidgets.Tests
             public override void jumpTo(double pixels) {
             }
 
-            public override IPromise<object> animateTo(double to, TimeSpan duration, Curve curve) {
-                return Promise<object>.Resolved(null);
+            public override IPromise animateTo(double to, TimeSpan duration, Curve curve) {
+                return Promise.Resolved();
             }
 
             public override ScrollDirection userScrollDirection {

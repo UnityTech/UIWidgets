@@ -202,6 +202,12 @@ namespace UIWidgets.rendering {
 
         public List<RenderObject> _nodesNeedingLayout = new List<RenderObject>();
 
+        public bool debugDoingLayout {
+            get { return this._debugDoingLayout; }
+        }
+
+        bool _debugDoingLayout = false;
+
         public void flushLayout() {
             while (this._nodesNeedingLayout.Count > 0) {
                 var dirtyNodes = this._nodesNeedingLayout;
@@ -247,10 +253,10 @@ namespace UIWidgets.rendering {
     }
 
     public interface RenderObjectWithChildMixin {
-        bool debugValidateChild(RenderObject child);            
+        bool debugValidateChild(RenderObject child);
         RenderObject child { get; set; }
     }
-    
+
     public interface ContainerParentDataMixin<ChildType> where ChildType : RenderObject {
         ChildType previousSibling { get; set; }
         ChildType nextSibling { get; set; }

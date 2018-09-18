@@ -20,6 +20,7 @@ namespace UIWidgets.scheduler {
                 this._debugCreationStack = new StackTrace();
                 return true;
             });
+            D.assert(binding != null);
 
             this._binding = binding;
             this._onTick = onTick;

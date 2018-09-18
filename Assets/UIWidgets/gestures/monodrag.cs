@@ -195,7 +195,7 @@ namespace UIWidgets.gestures {
     }
 
     public class VerticalDragGestureRecognizer : DragGestureRecognizer {
-        public VerticalDragGestureRecognizer(GestureBinding binding, Object debugOwner = null)
+        public VerticalDragGestureRecognizer(GestureBinding binding = null, Object debugOwner = null)
             : base(binding: binding, debugOwner: debugOwner) {
         }
 
@@ -223,7 +223,7 @@ namespace UIWidgets.gestures {
     }
 
     public class HorizontalDragGestureRecognizer : DragGestureRecognizer {
-        public HorizontalDragGestureRecognizer(GestureBinding binding, Object debugOwner = null)
+        public HorizontalDragGestureRecognizer(GestureBinding binding = null, Object debugOwner = null)
             : base(binding: binding, debugOwner: debugOwner) {
         }
 
@@ -251,7 +251,7 @@ namespace UIWidgets.gestures {
     }
 
     public class PanGestureRecognizer : DragGestureRecognizer {
-        public PanGestureRecognizer(GestureBinding binding, Object debugOwner = null)
+        public PanGestureRecognizer(GestureBinding binding = null, Object debugOwner = null)
             : base(binding: binding, debugOwner: debugOwner) {
         }
 

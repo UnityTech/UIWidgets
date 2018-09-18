@@ -189,14 +189,14 @@ namespace UIWidgets.widgets {
             get { return this._currentElement == null ? null : this._currentElement.widget; }
         }
 
-        public State<StatefulWidget> currentState {
+        public State currentState {
             get {
                 Element element = this._currentElement;
                 if (element is StatefulElement) {
                     var statefulElement = (StatefulElement) element;
                     State state = statefulElement.state;
-                    if (state is State<StatefulWidget>) {
-                        return (State<StatefulWidget>) state;
+                    if (state is State) {
+                        return (State) state;
                     }
                 }
 
@@ -205,8 +205,8 @@ namespace UIWidgets.widgets {
         }
     }
 
-    public abstract class GlobalKey<T> : GlobalKey where T : State<StatefulWidget> {
-        public new static GlobalKey key(string debugLabel = null) {
+    public abstract class GlobalKey<T> : GlobalKey where T : State {
+        public new static GlobalKey<T> key(string debugLabel = null) {
             return new LabeledGlobalKey<T>(debugLabel);
         }
 
@@ -226,7 +226,7 @@ namespace UIWidgets.widgets {
         }
     }
 
-    public class LabeledGlobalKey<T> : GlobalKey<T> where T : State<StatefulWidget> {
+    public class LabeledGlobalKey<T> : GlobalKey<T> where T : State {
         public LabeledGlobalKey(string _debugLabel = null) {
             this._debugLabel = _debugLabel;
         }
@@ -243,7 +243,7 @@ namespace UIWidgets.widgets {
         }
     }
 
-    public class GlobalObjectKey<T> : GlobalKey<T>, IEquatable<GlobalObjectKey<T>> where T : State<StatefulWidget> {
+    public class GlobalObjectKey<T> : GlobalKey<T>, IEquatable<GlobalObjectKey<T>> where T : State {
         public GlobalObjectKey(object value) {
             this.value = value;
         }
@@ -1168,7 +1168,7 @@ namespace UIWidgets.widgets {
         public virtual void visitChildren(ElementVisitor visitor) {
         }
 
-        public void debugVisitOnstageChildren(ElementVisitor visitor) {
+        public virtual void debugVisitOnstageChildren(ElementVisitor visitor) {
             this.visitChildren(visitor);
         }
 

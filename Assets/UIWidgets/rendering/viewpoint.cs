@@ -44,12 +44,12 @@ namespace UIWidgets.rendering {
             AxisDirection axisDirection = AxisDirection.down,
             AxisDirection crossAxisDirection = AxisDirection.right,
             ViewportOffset offset = null,
-            double cacheExtent = RenderAbstractViewportUtils.defaultCacheExtent
+            double? cacheExtent = null
         ) {
             this._axisDirection = axisDirection;
             this._crossAxisDirection = crossAxisDirection;
             this._offset = offset;
-            this._cacheExtent = cacheExtent;
+            this._cacheExtent = cacheExtent ?? RenderAbstractViewportUtils.defaultCacheExtent;
         }
 
         public AxisDirection axisDirection {
@@ -407,7 +407,7 @@ namespace UIWidgets.rendering {
             double anchor = 0.0,
             List<RenderSliver> children = null,
             RenderSliver center = null,
-            double cacheExtent = RenderAbstractViewportUtils.defaultCacheExtent
+            double? cacheExtent = null
         ) : base(axisDirection, crossAxisDirection, offset, cacheExtent) {
             this.addAll(children);
             if (center == null && this.firstChild != null) {

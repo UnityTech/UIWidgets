@@ -601,6 +601,143 @@ namespace UIWidgets.foundation {
         }
     }
 
+    public abstract class _NumProperty<T> : DiagnosticsProperty<T> {
+        internal _NumProperty(string name,
+            T value,
+            string ifNull = null,
+            string unit = null,
+            bool showName = true,
+            Object defaultValue = null,
+            string tooltip = null,
+            DiagnosticLevel level = DiagnosticLevel.info
+        ) : base(
+            name,
+            value,
+            ifNull: ifNull,
+            showName: showName,
+            defaultValue: defaultValue,
+            tooltip: tooltip,
+            level: level
+        ) {
+            this.unit = unit;
+        }
+
+        internal _NumProperty(string name,
+            ComputePropertyValueCallback<T> computeValue,
+            string ifNull = null,
+            string unit = null,
+            bool showName = true,
+            object defaultValue = null,
+            string tooltip = null,
+            DiagnosticLevel level = DiagnosticLevel.info
+        ) : base(
+            name,
+            computeValue,
+            ifNull: ifNull,
+            showName: showName,
+            defaultValue: defaultValue,
+            tooltip: tooltip,
+            level: level
+        ) {
+            this.unit = unit;
+        }
+
+        public override Dictionary<string, object> toJsonMap() {
+            var json = base.toJsonMap();
+            if (this.unit != null) {
+                json["unit"] = this.unit;
+            }
+
+            json["numberToString"] = this.numberToString();
+            return json;
+        }
+
+        public readonly string unit;
+
+        protected abstract string numberToString();
+
+        protected override string valueToString(TextTreeConfiguration parentConfiguration = null) {
+            if (this.value == null) {
+                return "null";
+            }
+
+            return this.unit != null ? this.numberToString() + this.unit : this.numberToString();
+        }
+    }
+
+    public class DoubleProperty : _NumProperty<double?> {
+        public DoubleProperty(string name, double? value,
+            string ifNull = null,
+            string unit = null,
+            string tooltip = null,
+            object defaultValue = null,
+            bool showName = true,
+            DiagnosticLevel level = DiagnosticLevel.info
+        ) : base(
+            name,
+            value,
+            ifNull: ifNull,
+            unit: unit,
+            tooltip: tooltip,
+            defaultValue: defaultValue,
+            showName: showName,
+            level: level
+        ) {
+        }
+
+        private DoubleProperty(
+            string name,
+            ComputePropertyValueCallback<double?> computeValue,
+            string ifNull = null,
+            bool showName = true,
+            string unit = null,
+            string tooltip = null,
+            object defaultValue = null,
+            DiagnosticLevel level = DiagnosticLevel.info
+        ) : base(
+            name,
+            computeValue,
+            showName: showName,
+            ifNull: ifNull,
+            unit: unit,
+            tooltip: tooltip,
+            defaultValue: defaultValue,
+            level: level
+        ) {
+        }
+
+        public static DoubleProperty lazy(
+            string name,
+            ComputePropertyValueCallback<double?> computeValue,
+            string ifNull = null,
+            bool showName = true,
+            string unit = null,
+            string tooltip = null,
+            object defaultValue = null,
+            DiagnosticLevel level = DiagnosticLevel.info
+        ) {
+            return new DoubleProperty(
+                name,
+                computeValue,
+                showName: showName,
+                ifNull: ifNull,
+                unit: unit,
+                tooltip: tooltip,
+                defaultValue: defaultValue,
+                level: level
+            );
+        }
+
+        protected override string numberToString() {
+            if (this.value != null) {
+                return this.value.Value.ToString("F1");
+            }
+
+            return "null";
+        }
+    }
+
+
     public class FlagProperty : DiagnosticsProperty<bool> {
         public FlagProperty(String name,
             bool value,
@@ -892,7 +1029,7 @@ namespace UIWidgets.foundation {
             this.missingIfNull = missingIfNull;
         }
 
-        private DiagnosticsProperty(
+        internal DiagnosticsProperty(
             string name,
             ComputePropertyValueCallback<T> computeValue,
             string description = null,

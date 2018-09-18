@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UIWidgets.foundation;
 using UIWidgets.painting;
 using UIWidgets.rendering;
@@ -147,7 +148,7 @@ namespace UIWidgets.widgets {
         public Offset origin;
         public Alignment alignment;
         public bool transformHitTests;
-        
+
         public override RenderObject createRenderObject(BuildContext context) {
             return new RenderTransform(
                 transform: transform,
@@ -225,7 +226,7 @@ namespace UIWidgets.widgets {
                 this.alignment
             );
         }
-        
+
         public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
             ((RenderImage) renderObject).image = this.image;
             ((RenderImage) renderObject).width = this.width;
@@ -235,7 +236,7 @@ namespace UIWidgets.widgets {
             ((RenderImage) renderObject).repeat = this.repeat;
             ((RenderImage) renderObject).centerSlice = this.centerSlice;
             ((RenderImage) renderObject).alignment = this.alignment;
-        } 
+        }
 
         public ui.Image image;
         public double width;
@@ -247,5 +248,105 @@ namespace UIWidgets.widgets {
         public Alignment alignment;
         public ImageRepeat repeat;
         public Rect centerSlice;
+    }
+
+    public class Listener : SingleChildRenderObjectWidget {
+        public Listener(
+            Key key = null,
+            PointerDownEventListener onPointerDown = null,
+            PointerMoveEventListener onPointerMove = null,
+            PointerUpEventListener onPointerUp = null,
+            PointerCancelEventListener onPointerCancel = null,
+            HitTestBehavior behavior = HitTestBehavior.deferToChild,
+            Widget child = null
+        ) : base(key: key, child: child) {
+            this.onPointerDown = onPointerDown;
+            this.onPointerMove = onPointerMove;
+            this.onPointerUp = onPointerUp;
+            this.onPointerCancel = onPointerCancel;
+            this.behavior = behavior;
+        }
+
+        public readonly PointerDownEventListener onPointerDown;
+
+        public readonly PointerMoveEventListener onPointerMove;
+
+        public readonly PointerUpEventListener onPointerUp;
+
+        public readonly PointerCancelEventListener onPointerCancel;
+
+        public readonly HitTestBehavior behavior;
+
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderPointerListener(
+                onPointerDown: this.onPointerDown,
+                onPointerMove: this.onPointerMove,
+                onPointerUp: this.onPointerUp,
+                onPointerCancel: this.onPointerCancel,
+                behavior: this.behavior
+            );
+        }
+
+        public override void updateRenderObject(BuildContext context, RenderObject renderObjectRaw) {
+            var renderObject = (RenderPointerListener) renderObjectRaw;
+            renderObject.onPointerDown = this.onPointerDown;
+            renderObject.onPointerMove = this.onPointerMove;
+            renderObject.onPointerUp = this.onPointerUp;
+            renderObject.onPointerCancel = this.onPointerCancel;
+            renderObject.behavior = this.behavior;
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            List<string> listeners = new List<string>();
+            if (this.onPointerDown != null) {
+                listeners.Add("down");
+            }
+
+            if (this.onPointerMove != null) {
+                listeners.Add("move");
+            }
+
+            if (this.onPointerUp != null) {
+                listeners.Add("up");
+            }
+
+            if (this.onPointerCancel != null) {
+                listeners.Add("cancel");
+            }
+
+            properties.add(new EnumerableProperty<string>("listeners", listeners, ifEmpty: "<none>"));
+            properties.add(new EnumProperty<HitTestBehavior>("behavior", this.behavior));
+        }
+    }
+
+
+    public class IgnorePointer : SingleChildRenderObjectWidget {
+        public IgnorePointer(
+            Key key = null,
+            bool ignoring = true,
+            Widget child = null
+        ) : base(key: key, child: child) {
+            this.ignoring = ignoring;
+        }
+
+        public readonly bool ignoring;
+
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderIgnorePointer(
+                ignoring: this.ignoring
+            );
+        }
+
+        public override
+            void updateRenderObject(BuildContext context, RenderObject renderObjectRaw) {
+            var renderObject = (RenderIgnorePointer) renderObjectRaw;
+            renderObject.ignoring = this.ignoring;
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new DiagnosticsProperty<bool>("ignoring", this.ignoring));
+        }
     }
 }
