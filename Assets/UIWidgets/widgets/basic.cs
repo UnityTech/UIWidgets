@@ -197,6 +197,36 @@ namespace UIWidgets.widgets {
         }
     }
 
+    public class SliverPadding : SingleChildRenderObjectWidget {
+        public SliverPadding(
+            Key key = null,
+            EdgeInsets padding = null,
+            Widget sliver = null
+        ) : base(key: key, child: sliver) {
+            D.assert(padding != null);
+            this.padding = padding;
+        }
+
+        public readonly EdgeInsets padding;
+
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderSliverPadding(
+                padding: this.padding
+            );
+        }
+
+        public override void updateRenderObject(BuildContext context, RenderObject renderObjectRaw) {
+            var renderObject = (RenderSliverPadding) renderObjectRaw;
+            renderObject.padding = this.padding;
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new DiagnosticsProperty<EdgeInsets>("padding", this.padding));
+        }
+    }
+
+
     public class RawImage : LeafRenderObjectWidget {
         public RawImage(Key key, ui.Image image, double width, double height, double scale, Color color,
             BlendMode colorBlendMode, BoxFit fit, Rect centerSlice, Alignment alignment = null,
@@ -320,6 +350,29 @@ namespace UIWidgets.widgets {
         }
     }
 
+    public class RepaintBoundary : SingleChildRenderObjectWidget {
+        public RepaintBoundary(Key key = null, Widget child = null) : base(key: key, child: child) {
+        }
+
+        public static RepaintBoundary wrap(Widget child, int childIndex) {
+            D.assert(child != null);
+            Key key = child.key != null ? (Key) new ValueKey<Key>(child.key) : new ValueKey<int>(childIndex);
+            return new RepaintBoundary(key: key, child: child);
+        }
+
+        public static List<RepaintBoundary> wrapAll(List<Widget> widgets) {
+            List<RepaintBoundary> result = new List<RepaintBoundary>(widgets.Count);
+            for (int i = 0; i < result.Count; ++i) {
+                result[i] = RepaintBoundary.wrap(widgets[i], i);
+            }
+
+            return result;
+        }
+
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderRepaintBoundary();
+        }
+    }
 
     public class IgnorePointer : SingleChildRenderObjectWidget {
         public IgnorePointer(

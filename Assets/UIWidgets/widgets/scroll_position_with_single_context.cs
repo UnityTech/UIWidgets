@@ -149,7 +149,7 @@ namespace UIWidgets.widgets {
             if (this.pixels != value) {
                 double oldPixels = this.pixels;
                 this.forcePixels(value);
-                this.notifyListeners();
+                // this.notifyListeners(); already in forcePixels, no need here.
                 this.didStartScroll();
                 this.didUpdateScrollPositionBy(this.pixels - oldPixels);
                 this.didEndScroll();

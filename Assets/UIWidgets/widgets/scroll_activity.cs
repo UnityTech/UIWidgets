@@ -335,7 +335,7 @@ namespace UIWidgets.widgets {
             new ScrollEndNotification(
                 metrics: metrics,
                 context: context,
-                dragDetails: lastDetails is DragEndDetails ? (DragEndDetails) lastDetails : null
+                dragDetails: lastDetails as DragEndDetails
             ).dispatch(context);
         }
 

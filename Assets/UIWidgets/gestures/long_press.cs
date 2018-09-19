@@ -2,8 +2,8 @@ namespace UIWidgets.gestures {
     public delegate void GestureLongPressCallback();
 
     public class LongPressGestureRecognizer : PrimaryPointerGestureRecognizer {
-        public LongPressGestureRecognizer(GestureBinding binding = null, object debugOwner = null) :
-            base(binding: binding, deadline: Constants.kLongPressTimeout, debugOwner: debugOwner) {
+        public LongPressGestureRecognizer(object debugOwner = null) :
+            base(deadline: Constants.kLongPressTimeout, debugOwner: debugOwner) {
         }
 
         public GestureLongPressCallback onLongPress;

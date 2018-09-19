@@ -11,14 +11,14 @@ namespace UIWidgets.rendering {
 
         void removeChild(RenderBox child);
 
-        double estimateMaxScrollOffset(
+        double? estimateMaxScrollOffset(
             SliverConstraints constraints,
             int firstIndex = 0,
             int lastIndex = 0,
             double leadingScrollOffset = 0,
             double trailingScrollOffset = 0);
 
-        int childCount { get; }
+        int? childCount { get; }
 
         void didAdoptChild(RenderBox child);
 
@@ -27,6 +27,8 @@ namespace UIWidgets.rendering {
         void didStartLayout();
 
         void didFinishLayout();
+        
+        bool debugAssertChildListLocked();
     }
 
     public class SliverMultiBoxAdaptorParentData : ContainerParentDataMixinSliverLogicalParentData<RenderBox> {

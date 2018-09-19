@@ -15,8 +15,8 @@ namespace UIWidgets.gestures {
     public delegate void GestureDragCancelCallback();
 
     public abstract class DragGestureRecognizer : OneSequenceGestureRecognizer {
-        public DragGestureRecognizer(GestureBinding binding, object debugOwner = null)
-            : base(binding: binding, debugOwner: debugOwner) {
+        public DragGestureRecognizer(object debugOwner = null)
+            : base(debugOwner: debugOwner) {
         }
 
         public GestureDragDownCallback onDown;
@@ -195,8 +195,8 @@ namespace UIWidgets.gestures {
     }
 
     public class VerticalDragGestureRecognizer : DragGestureRecognizer {
-        public VerticalDragGestureRecognizer(GestureBinding binding = null, Object debugOwner = null)
-            : base(binding: binding, debugOwner: debugOwner) {
+        public VerticalDragGestureRecognizer(Object debugOwner = null)
+            : base(debugOwner: debugOwner) {
         }
 
         protected override bool _isFlingGesture(VelocityEstimate estimate) {
@@ -223,8 +223,8 @@ namespace UIWidgets.gestures {
     }
 
     public class HorizontalDragGestureRecognizer : DragGestureRecognizer {
-        public HorizontalDragGestureRecognizer(GestureBinding binding = null, Object debugOwner = null)
-            : base(binding: binding, debugOwner: debugOwner) {
+        public HorizontalDragGestureRecognizer(Object debugOwner = null)
+            : base(debugOwner: debugOwner) {
         }
 
         protected override bool _isFlingGesture(VelocityEstimate estimate) {
@@ -251,8 +251,8 @@ namespace UIWidgets.gestures {
     }
 
     public class PanGestureRecognizer : DragGestureRecognizer {
-        public PanGestureRecognizer(GestureBinding binding = null, Object debugOwner = null)
-            : base(binding: binding, debugOwner: debugOwner) {
+        public PanGestureRecognizer(Object debugOwner = null)
+            : base(debugOwner: debugOwner) {
         }
 
         protected override bool _isFlingGesture(VelocityEstimate estimate) {

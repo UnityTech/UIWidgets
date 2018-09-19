@@ -5,7 +5,11 @@ using UIWidgets.scheduler;
 
 namespace UIWidgets.widgets {
     public class TickerMode : InheritedWidget {
-        public TickerMode(Key key = null, bool enabled = true, Widget child = null) : base(key, child) {
+        public TickerMode(
+            Key key = null,
+            bool enabled = true,
+            Widget child = null)
+            : base(key, child) {
             this.enabled = enabled;
         }
 
@@ -28,8 +32,6 @@ namespace UIWidgets.widgets {
     }
 
     public abstract class SingleTickerProviderStateMixin<T> : State<T>, TickerProvider where T : StatefulWidget {
-        public SchedulerBinding schedulerBinding { get; set; }
-
         Ticker _ticker;
 
         public Ticker createTicker(TickerCallback onTick) {
@@ -46,7 +48,7 @@ namespace UIWidgets.widgets {
                     "mixing in a SingleTickerProviderStateMixin, use a regular TickerProviderStateMixin."
                 );
             });
-            this._ticker = new Ticker(this.schedulerBinding, onTick, debugLabel: "created by " + this);
+            this._ticker = new Ticker(onTick, debugLabel: "created by " + this);
             return this._ticker;
         }
 
@@ -83,9 +85,9 @@ namespace UIWidgets.widgets {
             if (this._ticker != null) {
                 if (this._ticker.isActive && this._ticker.muted) {
                     tickerDescription = "active but muted";
-                } else if (_ticker.isActive) {
+                } else if (this._ticker.isActive) {
                     tickerDescription = "active";
-                } else if (_ticker.muted) {
+                } else if (this._ticker.muted) {
                     tickerDescription = "inactive and muted";
                 } else {
                     tickerDescription = "inactive";
@@ -98,13 +100,11 @@ namespace UIWidgets.widgets {
     }
 
     public abstract class TickerProviderStateMixin<T> : State<T>, TickerProvider where T : StatefulWidget {
-        public SchedulerBinding schedulerBinding { get; set; }
-
         HashSet<Ticker> _tickers;
 
         public Ticker createTicker(TickerCallback onTick) {
             this._tickers = this._tickers ?? new HashSet<Ticker>();
-            var result = new _WidgetTicker<T>(this.schedulerBinding, onTick, this, debugLabel: "created by " + this);
+            var result = new _WidgetTicker<T>(onTick, this, debugLabel: "created by " + this);
             this._tickers.Add(result);
             return result;
         }
@@ -163,11 +163,10 @@ namespace UIWidgets.widgets {
 
     class _WidgetTicker<T> : Ticker where T : StatefulWidget {
         internal _WidgetTicker(
-            SchedulerBinding binding,
             TickerCallback onTick,
             TickerProviderStateMixin<T> creator,
             string debugLabel = null) :
-            base(binding: binding, onTick: onTick, debugLabel: debugLabel) {
+            base(onTick: onTick, debugLabel: debugLabel) {
             this._creator = creator;
         }
 

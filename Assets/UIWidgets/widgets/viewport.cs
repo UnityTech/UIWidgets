@@ -18,9 +18,7 @@ namespace UIWidgets.widgets {
             List<Widget> slivers = null
         ) : base(key: key, children: slivers) {
             D.assert(offset != null);
-            slivers = slivers ?? new List<Widget>();
-            D.assert(slivers != null);
-            D.assert(center == null || slivers.Count(child => child.key == center) == 1);
+            D.assert(center == null || this.children.Count(child => child.key == center) == 1);
 
             this.axisDirection = axisDirection;
             this.crossAxisDirection = crossAxisDirection;
@@ -166,8 +164,8 @@ namespace UIWidgets.widgets {
         public override RenderObject createRenderObject(BuildContext context) {
             return new RenderShrinkWrappingViewport(
                 axisDirection: this.axisDirection,
-                crossAxisDirection:
-                this.crossAxisDirection ?? Viewport.getDefaultCrossAxisDirection(context, this.axisDirection),
+                crossAxisDirection: this.crossAxisDirection
+                                    ?? Viewport.getDefaultCrossAxisDirection(context, this.axisDirection),
                 offset: this.offset
             );
         }
@@ -175,9 +173,8 @@ namespace UIWidgets.widgets {
         public override void updateRenderObject(BuildContext context, RenderObject renderObjectRaw) {
             var renderObject = (RenderShrinkWrappingViewport) renderObjectRaw;
             renderObject.axisDirection = this.axisDirection;
-
-            renderObject.crossAxisDirection =
-                this.crossAxisDirection ?? Viewport.getDefaultCrossAxisDirection(context, this.axisDirection);
+            renderObject.crossAxisDirection = this.crossAxisDirection 
+                                              ?? Viewport.getDefaultCrossAxisDirection(context, this.axisDirection);
             renderObject.offset = this.offset;
         }
 

@@ -11,18 +11,14 @@ namespace UIWidgets.scheduler {
 
     public interface TickerProvider {
         Ticker createTicker(TickerCallback onTick);
-        SchedulerBinding schedulerBinding { get; }
     }
 
     public class Ticker {
-        public Ticker(SchedulerBinding binding, TickerCallback onTick, string debugLabel = null) {
+        public Ticker(TickerCallback onTick, string debugLabel = null) {
             D.assert(() => {
                 this._debugCreationStack = new StackTrace();
                 return true;
             });
-            D.assert(binding != null);
-
-            this._binding = binding;
             this._onTick = onTick;
             this.debugLabel = debugLabel;
         }

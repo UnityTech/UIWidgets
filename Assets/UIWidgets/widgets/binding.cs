@@ -10,9 +10,14 @@ namespace UIWidgets.widgets {
     }
 
     public class WidgetsBinding : RendererBinding {
-        public WidgetsBinding(Window window) : base(window) {
+        public static new WidgetsBinding instance {
+            get { return (WidgetsBinding) RendererBinding.instance; }
+            set { RendererBinding.instance = value; }
+        }
+        
+        public WidgetsBinding() {
             this.buildOwner.onBuildScheduled = this._handleBuildScheduled;
-            window.onLocaleChanged += this.handleLocaleChanged;
+            Window.instance.onLocaleChanged += this.handleLocaleChanged;
         }
 
         public BuildOwner buildOwner {
@@ -186,20 +191,6 @@ namespace UIWidgets.widgets {
                 Widget error = ErrorWidget.builder(new UIWidgetsErrorDetails(e));
                 _child = updateChild(null, error, _rootChildSlot);
             }
-        }
-    }
-
-    public class WidgetsBindings {
-        public WidgetsBindings(Window window) {
-            this.window = window;
-            this.widgetsBinding = new WidgetsBinding(window);
-        }
-
-        public readonly Window window;
-        public readonly WidgetsBinding widgetsBinding;
-
-        public void attachRootWidget(Widget root) {
-            this.widgetsBinding.attachRootWidget(root);
         }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UIWidgets.foundation;
 using UIWidgets.painting;
@@ -40,8 +41,8 @@ namespace UIWidgets.widgets {
         public readonly double? cacheExtent;
 
         protected AxisDirection getDirection(BuildContext context) {
-            return AxisUtils.getAxisDirectionFromAxisReverseAndDirectionality(context, this.scrollDirection,
-                this.reverse);
+            return AxisUtils.getAxisDirectionFromAxisReverseAndDirectionality(
+                context, this.scrollDirection, this.reverse);
         }
 
         protected abstract List<Widget> buildSlivers(BuildContext context);
@@ -101,6 +102,37 @@ namespace UIWidgets.widgets {
         }
     }
 
+    public class CustomScrollView : ScrollView {
+        public CustomScrollView(
+            Key key = null,
+            Axis scrollDirection = Axis.vertical,
+            bool reverse = false,
+            ScrollController controller = null,
+            bool? primary = null,
+            ScrollPhysics physics = null,
+            bool shrinkWrap = false,
+            double? cacheExtent = null,
+            List<Widget> slivers = null
+        ) : base(
+            key: key,
+            scrollDirection: scrollDirection,
+            reverse: reverse,
+            controller: controller,
+            primary: primary,
+            physics: physics,
+            shrinkWrap: shrinkWrap,
+            cacheExtent: cacheExtent
+        ) {
+            this.slivers = slivers ?? new List<Widget>();
+        }
+
+        public readonly List<Widget> slivers;
+
+        protected override List<Widget> buildSlivers(BuildContext context) {
+            return this.slivers;
+        }
+    }
+
     public abstract class BoxScrollView : ScrollView {
         public BoxScrollView(
             Key key = null,
@@ -130,33 +162,9 @@ namespace UIWidgets.widgets {
         protected override List<Widget> buildSlivers(BuildContext context) {
             Widget sliver = this.buildChildLayout(context);
 
-            EdgeInsets effectivePadding = this.padding;
-            if (this.padding == null) {
-//      final MediaQueryData mediaQuery = MediaQuery.of(context, nullOk: true);
-//      if (mediaQuery != null) {
-//        // Automatically pad sliver with padding from MediaQuery.
-//        final EdgeInsets mediaQueryHorizontalPadding =
-//            mediaQuery.padding.copyWith(top: 0.0, bottom: 0.0);
-//        final EdgeInsets mediaQueryVerticalPadding =
-//            mediaQuery.padding.copyWith(left: 0.0, right: 0.0);
-//        // Consume the main axis padding with SliverPadding.
-//        effectivePadding = scrollDirection == Axis.vertical
-//            ? mediaQueryVerticalPadding
-//            : mediaQueryHorizontalPadding;
-//        // Leave behind the cross axis padding.
-//        sliver = new MediaQuery(
-//          data: mediaQuery.copyWith(
-//            padding: scrollDirection == Axis.vertical
-//                ? mediaQueryHorizontalPadding
-//                : mediaQueryVerticalPadding,
-//          ),
-//          child: sliver,
-//        );
-//      }
-            }
-
+            EdgeInsets effectivePadding = this.padding; // no need to check MediaQuery for now.
             if (effectivePadding != null) {
-//          sliver = new SliverPadding(padding: effectivePadding, sliver: sliver);
+                sliver = new SliverPadding(padding: effectivePadding, sliver: sliver);
             }
 
             return new List<Widget> {sliver};
@@ -167,6 +175,262 @@ namespace UIWidgets.widgets {
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             properties.add(new DiagnosticsProperty<EdgeInsets>("padding", this.padding,
+                defaultValue: Diagnostics.kNullDefaultValue));
+        }
+    }
+
+    public class ListView : BoxScrollView {
+        public ListView(
+            Key key = null,
+            Axis scrollDirection = Axis.vertical,
+            bool reverse = false,
+            ScrollController controller = null,
+            bool? primary = null,
+            ScrollPhysics physics = null,
+            bool shrinkWrap = false,
+            EdgeInsets padding = null,
+            double? itemExtent = null,
+            bool addAutomaticKeepAlives = true,
+            bool addRepaintBoundaries = true,
+            double? cacheExtent = null,
+            List<Widget> children = null
+        ) : base(
+            key: key,
+            scrollDirection: scrollDirection,
+            reverse: reverse,
+            controller: controller,
+            primary: primary,
+            physics: physics,
+            shrinkWrap: shrinkWrap,
+            padding: padding,
+            cacheExtent: cacheExtent
+        ) {
+            this.itemExtent = itemExtent;
+            this.childrenDelegate = new SliverChildListDelegate(
+                children,
+                addAutomaticKeepAlives: addAutomaticKeepAlives,
+                addRepaintBoundaries: addRepaintBoundaries
+            );
+        }
+
+        private ListView(
+            Key key = null,
+            Axis scrollDirection = Axis.vertical,
+            bool reverse = false,
+            ScrollController controller = null,
+            bool? primary = null,
+            ScrollPhysics physics = null,
+            bool shrinkWrap = false,
+            EdgeInsets padding = null,
+            double? itemExtent = null,
+            IndexedWidgetBuilder itemBuilder = null,
+            int? itemCount = null,
+            bool addAutomaticKeepAlives = true,
+            bool addRepaintBoundaries = true,
+            double? cacheExtent = null
+        ) : base(key: key,
+            scrollDirection: scrollDirection,
+            reverse: reverse,
+            controller: controller,
+            primary: primary,
+            physics: physics,
+            shrinkWrap: shrinkWrap,
+            padding: padding,
+            cacheExtent: cacheExtent
+        ) {
+            this.itemExtent = itemExtent;
+            this.childrenDelegate = new SliverChildBuilderDelegate(
+                itemBuilder,
+                childCount: itemCount,
+                addAutomaticKeepAlives: addAutomaticKeepAlives,
+                addRepaintBoundaries: addRepaintBoundaries
+            );
+        }
+
+        public static ListView builder(
+            Key key = null,
+            Axis scrollDirection = Axis.vertical,
+            bool reverse = false,
+            ScrollController controller = null,
+            bool? primary = null,
+            ScrollPhysics physics = null,
+            bool shrinkWrap = false,
+            EdgeInsets padding = null,
+            double? itemExtent = null,
+            IndexedWidgetBuilder itemBuilder = null,
+            int? itemCount = null,
+            bool addAutomaticKeepAlives = true,
+            bool addRepaintBoundaries = true,
+            double? cacheExtent = null
+        ) {
+            return new ListView(
+                key,
+                scrollDirection,
+                reverse,
+                controller,
+                primary,
+                physics,
+                shrinkWrap,
+                padding,
+                itemExtent,
+                itemBuilder,
+                itemCount,
+                addAutomaticKeepAlives,
+                addRepaintBoundaries
+            );
+        }
+
+
+        private ListView(
+            Key key = null,
+            Axis scrollDirection = Axis.vertical,
+            bool reverse = false,
+            ScrollController controller = null,
+            bool? primary = null,
+            ScrollPhysics physics = null,
+            bool shrinkWrap = false,
+            EdgeInsets padding = null,
+            IndexedWidgetBuilder itemBuilder = null,
+            IndexedWidgetBuilder separatorBuilder = null,
+            int itemCount = 0,
+            bool addAutomaticKeepAlives = true,
+            bool addRepaintBoundaries = true,
+            double? cacheExtent = null
+        ) : base(
+            key: key,
+            scrollDirection: scrollDirection,
+            reverse: reverse,
+            controller: controller,
+            primary: primary,
+            physics: physics,
+            shrinkWrap: shrinkWrap,
+            padding: padding,
+            cacheExtent: cacheExtent
+        ) {
+            D.assert(itemBuilder != null);
+            D.assert(separatorBuilder != null);
+            D.assert(itemCount >= 0);
+            this.itemExtent = null;
+            this.childrenDelegate = new SliverChildBuilderDelegate(
+                (context, index) => {
+                    int itemIndex = index / 2;
+                    return index % 2 == 0
+                        ? itemBuilder(context, itemIndex)
+                        : separatorBuilder(context, itemIndex);
+                },
+                childCount: Math.Max(0, itemCount * 2 - 1),
+                addAutomaticKeepAlives: addAutomaticKeepAlives,
+                addRepaintBoundaries: addRepaintBoundaries
+            );
+        }
+
+        public static ListView seperated(
+            Key key = null,
+            Axis scrollDirection = Axis.vertical,
+            bool reverse = false,
+            ScrollController controller = null,
+            bool? primary = null,
+            ScrollPhysics physics = null,
+            bool shrinkWrap = false,
+            EdgeInsets padding = null,
+            IndexedWidgetBuilder itemBuilder = null,
+            IndexedWidgetBuilder separatorBuilder = null,
+            int itemCount = 0,
+            bool addAutomaticKeepAlives = true,
+            bool addRepaintBoundaries = true,
+            double? cacheExtent = null
+        ) {
+            return new ListView(
+                key,
+                scrollDirection,
+                reverse,
+                controller,
+                primary,
+                physics,
+                shrinkWrap,
+                padding,
+                itemBuilder,
+                separatorBuilder,
+                itemCount,
+                addAutomaticKeepAlives,
+                addRepaintBoundaries,
+                cacheExtent
+            );
+        }
+
+        private ListView(
+            Key key = null,
+            Axis scrollDirection = Axis.vertical,
+            bool reverse = false,
+            ScrollController controller = null,
+            bool? primary = null,
+            ScrollPhysics physics = null,
+            bool shrinkWrap = false,
+            EdgeInsets padding = null,
+            double? itemExtent = null,
+            SliverChildDelegate childrenDelegate = null,
+            double? cacheExtent = null
+        ) : base(
+            key: key,
+            scrollDirection: scrollDirection,
+            reverse: reverse,
+            controller: controller,
+            primary: primary,
+            physics: physics,
+            shrinkWrap: shrinkWrap,
+            padding: padding,
+            cacheExtent: cacheExtent
+        ) {
+            D.assert(childrenDelegate != null);
+            this.itemExtent = itemExtent;
+            this.childrenDelegate = childrenDelegate;
+        }
+
+        public static ListView custom(
+            Key key = null,
+            Axis scrollDirection = Axis.vertical,
+            bool reverse = false,
+            ScrollController controller = null,
+            bool? primary = null,
+            ScrollPhysics physics = null,
+            bool shrinkWrap = false,
+            EdgeInsets padding = null,
+            double? itemExtent = null,
+            SliverChildDelegate childrenDelegate = null,
+            double? cacheExtent = null
+        ) {
+            return new ListView(
+                key,
+                scrollDirection,
+                reverse,
+                controller,
+                primary,
+                physics,
+                shrinkWrap,
+                padding,
+                itemExtent,
+                childrenDelegate,
+                cacheExtent);
+        }
+
+        public readonly double? itemExtent;
+
+        public readonly SliverChildDelegate childrenDelegate;
+
+        protected override Widget buildChildLayout(BuildContext context) {
+            if (this.itemExtent != null) {
+                return new SliverFixedExtentList(
+                    del: this.childrenDelegate,
+                    itemExtent: this.itemExtent.Value
+                );
+            }
+
+            return new SliverList(del: this.childrenDelegate);
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new DoubleProperty("itemExtent", this.itemExtent,
                 defaultValue: Diagnostics.kNullDefaultValue));
         }
     }

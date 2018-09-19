@@ -3,12 +3,12 @@ using UIWidgets.ui;
 
 namespace UIWidgets.rendering {
     public abstract class RenderSliverFixedExtentBoxAdaptor : RenderSliverMultiBoxAdaptor {
-        RenderSliverFixedExtentBoxAdaptor(
+        protected RenderSliverFixedExtentBoxAdaptor(
             RenderSliverBoxChildManager childManager = null
         ) : base(childManager: childManager) {
         }
 
-        public abstract double itemExtent { get; }
+        public abstract double itemExtent { get; set; }
 
         public double indexToLayoutOffset(double itemExtent, int index) {
             return itemExtent * index;
@@ -22,7 +22,7 @@ namespace UIWidgets.rendering {
             return itemExtent > 0.0 ? Math.Max(0, (int) Math.Ceiling(scrollOffset / itemExtent) - 1) : 0;
         }
 
-        public double estimateMaxScrollOffset(SliverConstraints constraints,
+        public double? estimateMaxScrollOffset(SliverConstraints constraints,
             int firstIndex = 0,
             int lastIndex = 0,
             double leadingScrollOffset = 0.0,
@@ -38,7 +38,7 @@ namespace UIWidgets.rendering {
         }
 
         public double computeMaxScrollOffset(SliverConstraints constraints, double itemExtent) {
-            return this.childManager.childCount * itemExtent;
+            return this.childManager.childCount.Value * itemExtent;
         }
 
 
@@ -133,7 +133,7 @@ namespace UIWidgets.rendering {
                 lastIndex: lastIndex,
                 leadingScrollOffset: leadingScrollOffset,
                 trailingScrollOffset: trailingScrollOffset
-            );
+            ).Value;
 
             double paintExtent = this.calculatePaintOffset(
                 this.constraints,
@@ -166,5 +166,28 @@ namespace UIWidgets.rendering {
 
             this.childManager.didFinishLayout();
         }
+    }
+
+    public class RenderSliverFixedExtentList : RenderSliverFixedExtentBoxAdaptor {
+        public RenderSliverFixedExtentList(
+            RenderSliverBoxChildManager childManager = null,
+            double itemExtent = 0.0
+        ) : base(childManager: childManager) {
+            this._itemExtent = itemExtent;
+        }
+
+        public override double itemExtent {
+            get { return this._itemExtent; }
+            set {
+                if (this._itemExtent == value) {
+                    return;
+                }
+
+                this._itemExtent = value;
+                this.markNeedsLayout();
+            }
+        }
+
+        double _itemExtent;
     }
 }

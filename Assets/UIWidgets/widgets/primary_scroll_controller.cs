@@ -8,6 +8,7 @@ namespace UIWidgets.widgets {
             Widget child = null
         ) : base(key: key, child: child) {
             D.assert(controller != null);
+            this.controller = controller;
         }
 
         private PrimaryScrollController(

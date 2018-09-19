@@ -77,11 +77,6 @@ namespace UIWidgets.gestures {
 
     public class GestureArenaManager {
         readonly Dictionary<int, _GestureArena> _arenas = new Dictionary<int, _GestureArena>();
-        readonly Window _window;
-
-        public GestureArenaManager(Window window) {
-            this._window = window;
-        }
 
         public GestureArenaEntry add(int pointer, GestureArenaMember member) {
             _GestureArena state = this._arenas.putIfAbsent(pointer, () => {
@@ -189,7 +184,7 @@ namespace UIWidgets.gestures {
             D.assert(!state.isOpen);
 
             if (state.members.Count == 1) {
-                this._window.scheduleMicrotask(() => this._resolveByDefault(pointer, state));
+                Window.instance.scheduleMicrotask(() => this._resolveByDefault(pointer, state));
             } else if (state.members.isEmpty()) {
                 this._arenas.Remove(pointer);
                 D.assert(this._debugLogDiagnostic(pointer, "Arena empty."));

@@ -1189,7 +1189,7 @@ namespace UIWidgets.widgets {
             this.visitChildren(visitor);
         }
 
-        protected Element updateChild(Element child, Widget newWidget, object newSlot) {
+        protected virtual Element updateChild(Element child, Widget newWidget, object newSlot) {
             D.assert(() => {
                 if (newWidget != null && newWidget.key is GlobalKey) {
                     GlobalKey key = (GlobalKey) newWidget.key;
@@ -2340,7 +2340,9 @@ namespace UIWidgets.widgets {
         internal readonly Dictionary<Element, object> _dependents = new Dictionary<Element, object>();
 
         internal override void _updateInheritance() {
-            Dictionary<Type, InheritedElement> incomingWidgets = this._parent == null ? null : this._inheritedWidgets;
+            Dictionary<Type, InheritedElement> incomingWidgets =
+                this._parent == null ? null : this._parent._inheritedWidgets;
+            
             if (incomingWidgets != null) {
                 this._inheritedWidgets = new Dictionary<Type, InheritedElement>(incomingWidgets);
             } else {
