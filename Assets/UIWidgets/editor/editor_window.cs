@@ -95,10 +95,6 @@ namespace UIWidgets.editor {
         }
 
         public void Update() {
-            if (_textInput != null)
-            {
-                _textInput.Update();
-            }
             this.flushMicrotasks();
 
             this._timerProvider.update();

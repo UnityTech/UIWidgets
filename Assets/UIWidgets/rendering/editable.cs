@@ -568,6 +568,11 @@ namespace UIWidgets.rendering
                 }
             }
 
+            if (_hasFocus) {
+                var caretOffset = _textPainter.getOffsetForCaret(_selection.extendPos, Rect.fromLTWH(0, 0, 1, preferredLineHeight));
+                var caretRec = _caretPrototype.shift(caretOffset + effectiveOffset);
+                Input.compositionCursorPos = new Vector2((float)caretRec.left, (float)caretRec.bottom);
+            }
             _textPainter.paint(context.canvas, effectiveOffset);
         }
         

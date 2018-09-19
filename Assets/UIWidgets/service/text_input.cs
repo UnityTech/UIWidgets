@@ -94,6 +94,32 @@ namespace UIWidgets.service
             offset = Math.Min(offset, text.Length);
             return this.copyWith(selection: TextSelection.collapsed(offset));
         }
+
+        public TextEditingValue compose(string composeText)
+        {
+            D.assert(string.IsNullOrEmpty(composeText));
+            var composeStart = composing == TextRange.empty ? selection.start : composing.start;
+            var lastComposeEnd =composing == TextRange.empty ? selection.end : composing.end;
+            var newText = text.Substring(0, composeStart) + composeText + text.Substring(lastComposeEnd);
+            var componseEnd = composeStart + composeText.Length;
+            return new TextEditingValue(
+                text: newText, selection: TextSelection.collapsed(componseEnd),
+                composing: new TextRange(composeStart, componseEnd)
+            );
+        }
+
+        public TextEditingValue clearCompose()
+        {
+            if (composing == TextRange.empty)
+            {
+                return this;
+            }
+            return new TextEditingValue(
+                text: text.Substring(0, composing.start) + text.Substring(composing.end), 
+                selection: TextSelection.collapsed(composing.start),
+                composing: TextRange.empty
+            );
+        }
         
         public static readonly TextEditingValue empty = new TextEditingValue();
 
@@ -173,12 +199,19 @@ namespace UIWidgets.service
             _textInput._value = value;
         }
 
+        public void setCompositionCursorPos(double x, double y)
+        {
+            D.assert(attached);
+            _textInput.setCompositionCursorPos(x, y);
+        }
+        
         public void close()
         {
             if (attached)
             {
                 _textInput._currentConnection = null;
                 _textInput._value = null;
+                Input.imeCompositionMode = IMECompositionMode.Auto;
             }
             D.assert(!attached);
         }
@@ -195,12 +228,14 @@ namespace UIWidgets.service
         internal TextEditingValue _value;
         private List<char> inputValue = new List<char>();
         static Dictionary<Event, TextEditOp> s_Keyactions;
+        private string _lastCompositionString;
         
         public TextInputConnection attach(TextInputClient client)
         {
             D.assert(client != null);
             var connection = new TextInputConnection(client, this);
             _currentConnection = connection;
+            Input.imeCompositionMode = IMECompositionMode.On;
             return connection;
         }
 
@@ -215,32 +250,31 @@ namespace UIWidgets.service
             if (currentEvent.type == EventType.KeyDown)
             {
                 bool handled = handleKeyEvent(currentEvent);
-                if (!handled && currentEvent.keyCode == KeyCode.None)
+                if (!handled)
                 {
-                    inputValue.Add(currentEvent.character);
+                    if (currentEvent.keyCode == KeyCode.None)
+                    {
+                        _value = _value.clearCompose().insert(new string(currentEvent.character, 1));
+                        _currentConnection._client.updateEditingValue(_value);
+                    }
                 }
                 currentEvent.Use();
             }
+            
+            if (!string.IsNullOrEmpty(Input.compositionString) && _lastCompositionString != Input.compositionString)
+            {
+                _value = _value.compose(Input.compositionString);
+                _currentConnection._client.updateEditingValue(_value);
+            }
+
+            _lastCompositionString = Input.compositionString;
         }
 
-        public void Update()
+        public void setCompositionCursorPos(double x, double y)
         {
-            if (_currentConnection == null)
-            {
-                return;
-            }
-
-            if (inputValue.Count == 0)
-            {
-                return;
-            }
-
-            _value = _value.insert(new string(inputValue.ToArray()));
-            //_value = _value.copyWith(text: _value.text + new string(inputValue.ToArray()));
-            _currentConnection._client.updateEditingValue(_value);
-            inputValue.Clear();
+            Input.compositionCursorPos = new Vector2((float)x, (float)y);
         }
-        
+
         private bool handleKeyEvent(Event e)
         {
             initKeyActions();
