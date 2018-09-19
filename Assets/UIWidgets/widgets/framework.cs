@@ -178,7 +178,12 @@ namespace UIWidgets.widgets {
         }
 
         internal Element _currentElement {
-            get { return _registry[this]; }
+            get
+            {
+                Element result;
+                _registry.TryGetValue(this, out result);
+                return result;
+            }
         }
 
         public BuildContext currentContext {
@@ -2035,6 +2040,7 @@ namespace UIWidgets.widgets {
                 D.assert(_child != null);
             }
             catch (Exception e) {
+                Debug.LogError(e);
                 built = ErrorWidget.builder(WidgetsD._debugReportException("building " + this, e));
                 this._child = this.updateChild(null, built, this.slot);
             }

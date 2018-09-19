@@ -210,11 +210,11 @@ namespace UIWidgets.painting
         {
             Debug.Assert(text != null, "TextPainter.text must be set to a non-null value before using the TextPainter.");
             Debug.Assert(textDirection != null, "TextPainter.textDirection must be set to a non-null value before using the TextPainter.");
-            if (_needsLayout && minWidth == _lastMaxWidth && maxWidth == _lastMaxWidth)
+            if (!_needsLayout && minWidth == _lastMaxWidth && maxWidth == _lastMaxWidth)
             {
                 return;
             }
-
+            
             _needsLayout = false;
             if (_paragraph == null)
             {
@@ -264,10 +264,6 @@ namespace UIWidgets.painting
         {
             D.assert(!_needsLayout);
             var results =  _paragraph.getRectsForRange(selection.start, selection.end);
-            if (results.Count > 0)
-            {
-                Debug.Log(string.Format(" getBoxesForSelection {0}", results[0]));
-            }
             return results;
         }
         

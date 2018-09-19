@@ -158,7 +158,7 @@ namespace UIWidgets.Tests
 
             flexbox.add(flexItemBox(
                 new rendering.RenderEditable(span, TextDirection.ltr, 
-                    new _FixedViewportOffset(0.0), new ValueNotifier<bool>(true), this.rendererBindings.rendererBinding,
+                    new _FixedViewportOffset(0.0), new ValueNotifier<bool>(true),
                     onSelectionChanged: selectionChanged, cursorColor: Color.fromARGB(255, 0, 0, 0), 
                     maxLines: 100,
                     selectionColor: Color.fromARGB(255, 255, 0, 0))
@@ -171,7 +171,7 @@ namespace UIWidgets.Tests
                 }, style:new painting.TextStyle(height:1.0));
             flexbox.add(flexItemBox(
                 new rendering.RenderEditable(span, TextDirection.ltr, 
-                    new _FixedViewportOffset(0.0), new ValueNotifier<bool>(true), this.rendererBindings.rendererBinding,
+                    new _FixedViewportOffset(0.0), new ValueNotifier<bool>(true),
                     onSelectionChanged: selectionChanged, cursorColor: Color.fromARGB(255, 0, 0, 0), 
                     maxLines: 100,
                     selectionColor: Color.fromARGB(255, 255, 0, 0))
@@ -184,7 +184,7 @@ namespace UIWidgets.Tests
                 }, style:new painting.TextStyle(height:1.0));
             flexbox.add(flexItemBox(
                 new rendering.RenderEditable(span, TextDirection.ltr, 
-                    new _FixedViewportOffset(0.0), new ValueNotifier<bool>(true), this.rendererBindings.rendererBinding,
+                    new _FixedViewportOffset(0.0), new ValueNotifier<bool>(true),
                     onSelectionChanged: selectionChanged, cursorColor: Color.fromARGB(255, 0, 0, 0), 
                     selectionColor: Color.fromARGB(255, 255, 0, 0))
             , width:300));

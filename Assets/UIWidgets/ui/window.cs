@@ -1,5 +1,6 @@
 ﻿using System;
 using UIWidgets.async;
+using UIWidgets.service;
 
 namespace UIWidgets.ui {
     public delegate void VoidCallback();
@@ -69,5 +70,7 @@ namespace UIWidgets.ui {
         public Timer run(Action callback) {
             return this.run(TimeSpan.Zero, callback);
         }
+
+        public abstract TextInput textInput { get; }
     }
 }

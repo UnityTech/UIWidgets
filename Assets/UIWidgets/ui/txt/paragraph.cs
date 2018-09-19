@@ -554,8 +554,8 @@ namespace UIWidgets.ui
 
                 for (;;)
                 {
-                    var run = _runs.getRun(runIndex);
-                    if (run.start < run.end && run.start < line.end && run.end > line.start)
+                    var run = runIndex < _runs.size ? _runs.getRun(runIndex) : null;
+                    if (run != null && run.start < run.end && run.start < line.end && run.end > line.start)
                     {
                         var font = FontManager.instance.getOrCreate(run.style.safeFontFamily, run.style.UnityFontSize);
                         var ascent = font.ascent * (run.style.height??1.0);

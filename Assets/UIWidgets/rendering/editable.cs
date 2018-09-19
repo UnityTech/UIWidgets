@@ -48,7 +48,7 @@ namespace UIWidgets.rendering
 
     public class RenderEditable : RenderBox
     {
-        public static readonly string obscuringCharacter = "•";
+        public static readonly char obscuringCharacter = '•';
         private static readonly double _kCaretGap = 1.0;
         private static readonly double _kCaretHeightOffset = 2.0;
         private static readonly double _kCaretWidth = 1.0;
@@ -64,9 +64,9 @@ namespace UIWidgets.rendering
         private bool _obscureText;
         private TapGestureRecognizer _tap;
         private DoubleTapGestureRecognizer _doubleTap;
-        private bool ignorePointer;
-        private SelectionChangedHandler onSelectionChanged;
-        private CaretChangedHandler onCaretChanged;
+        public bool ignorePointer;
+        public SelectionChangedHandler onSelectionChanged;
+        public CaretChangedHandler onCaretChanged;
         private Rect _lastCaretRect;
         private double? _textLayoutLastWidth;
         private List<TextBox> _selectionRects;
@@ -76,7 +76,6 @@ namespace UIWidgets.rendering
 
         public RenderEditable(TextSpan text, TextDirection textDirection, ViewportOffset offset,
             ValueNotifier<bool> showCursor,
-            GestureBinding binding,
             TextAlign textAlign = TextAlign.left, double textScaleFactor = 1.0, Color cursorColor = null,
             bool? hasFocus = null, int maxLines = 1, Color selectionColor = null,
             TextSelection selection = null, bool obscureText = false, SelectionChangedHandler onSelectionChanged = null,
@@ -99,11 +98,11 @@ namespace UIWidgets.rendering
             D.assert(_showCursor != null);
             D.assert(!_showCursor.value || cursorColor != null);
 
-            _tap = new TapGestureRecognizer(binding, this);
-            _doubleTap = new DoubleTapGestureRecognizer(binding, this);
-            _tap.onTapDown = this._handleTapDown;
-            _tap.onTap = this._handleTap;
-            _doubleTap.onDoubleTap = this._handleDoubleTap;
+//            _tap = new TapGestureRecognizer(owner.binding, this);
+//            _doubleTap = new DoubleTapGestureRecognizer(owner.binding, this);
+//            _tap.onTapDown = this._handleTapDown;
+//            _tap.onTap = this._handleTap;
+//            _doubleTap.onDoubleTap = this._handleDoubleTap;
         }
 
         public bool obscureText
@@ -216,7 +215,7 @@ namespace UIWidgets.rendering
                     return;
                 }
 
-                hasFocus = value;
+                _hasFocus = value;
                 markNeedsSemanticsUpdate();
             }
         }
@@ -344,12 +343,21 @@ namespace UIWidgets.rendering
         public override void attach(object ownerObject)
         {
             base.attach(ownerObject);
+            _tap = new TapGestureRecognizer(owner.binding, this);
+            _doubleTap = new DoubleTapGestureRecognizer(owner.binding, this);
+            _tap.onTapDown = this._handleTapDown;
+            _tap.onTap = this._handleTap;
+            _doubleTap.onDoubleTap = this._handleDoubleTap;
             _offset.addListener(markNeedsLayout);
             _showCursor.addListener(markNeedsPaint);
         }
 
         public override void detach()
         {
+            _tap.dispose();
+            _tap = null;
+            _doubleTap.dispose();
+            _doubleTap = null;
             _offset.removeListener(markNeedsLayout);
             _showCursor.removeListener(markNeedsPaint);
             base.detach();
@@ -542,7 +550,6 @@ namespace UIWidgets.rendering
             
             foreach (var box in _selectionRects)
             {
-                Debug.Log(string.Format("draw box {0}", box.toRect().shift(effectiveOffset)));
                 canvas.drawRect(box.toRect().shift(effectiveOffset), BorderWidth.zero, BorderRadius.zero, paint);
             }
         }
@@ -640,7 +647,7 @@ namespace UIWidgets.rendering
             {
                 return TextSelection.fromPosition(position);
             }
-            return new TextSelection(baseOffset: word.start, extendOffset: word.end);
+            return new TextSelection(baseOffset: word.start, extentOffset: word.end);
         }
         
         private bool _isMultiline

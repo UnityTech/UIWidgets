@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using UIWidgets.async;
 using UIWidgets.flow;
+using UIWidgets.service;
 using UIWidgets.ui;
 using UnityEditor;
 using UnityEngine;
@@ -29,6 +30,7 @@ namespace UIWidgets.editor {
         readonly DateTime _epoch = new DateTime(Stopwatch.GetTimestamp());
         readonly MicrotaskQueue _microtaskQueue = new MicrotaskQueue();
         readonly TimerProvider _timerProvider = new TimerProvider();
+        readonly TextInput _textInput = new TextInput();
 
         public void OnGUI() {
             var evt = Event.current;
@@ -85,9 +87,18 @@ namespace UIWidgets.editor {
                     }));
                 }
             }
+
+            if (_textInput != null)
+            {
+                _textInput.OnGUI();
+            }
         }
 
         public void Update() {
+            if (_textInput != null)
+            {
+                _textInput.Update();
+            }
             this.flushMicrotasks();
 
             this._timerProvider.update();
@@ -140,6 +151,11 @@ namespace UIWidgets.editor {
 
         public override Timer run(TimeSpan duration, Action callback) {
             return this._timerProvider.run(duration, callback);
+        }
+
+        public override TextInput textInput
+        {
+            get { return _textInput; }
         }
     }
 }

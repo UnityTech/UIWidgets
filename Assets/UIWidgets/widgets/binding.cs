@@ -11,9 +11,9 @@ namespace UIWidgets.widgets {
 
     public class WidgetsBinding : RendererBinding {
         public WidgetsBinding(Window window) : base(window) {
+            _buildOwner = new BuildOwner(window);
             this.buildOwner.onBuildScheduled = this._handleBuildScheduled;
             window.onLocaleChanged += this.handleLocaleChanged;
-            _buildOwner = new BuildOwner(window);
         }
 
         public BuildOwner buildOwner {
