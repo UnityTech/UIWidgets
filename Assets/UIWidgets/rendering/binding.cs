@@ -13,7 +13,6 @@ namespace UIWidgets.rendering {
         
         public RendererBinding() {
             this._pipelineOwner = new PipelineOwner(
-                binding: this,
                 onNeedVisualUpdate: this.ensureVisualUpdate
             );
 

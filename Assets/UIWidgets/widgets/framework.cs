@@ -178,7 +178,11 @@ namespace UIWidgets.widgets {
         }
 
         internal Element _currentElement {
-            get { return _registry[this]; }
+            get {
+                Element result;
+                _registry.TryGetValue(this, out result);
+                return result;
+            }
         }
 
         public BuildContext currentContext {
@@ -277,7 +281,7 @@ namespace UIWidgets.widgets {
 
         public override string ToString() {
             String selfType = this.GetType().ToString();
-            string suffix = "<State<StatefulWidget>>";
+            string suffix = "`1[UIWidgets.widgets.State]";
             if (selfType.EndsWith(suffix)) {
                 selfType = selfType.Substring(0, selfType.Length - suffix.Length);
             }
@@ -1671,7 +1675,10 @@ namespace UIWidgets.widgets {
 
         public virtual InheritedWidget inheritFromWidgetOfExactType(Type targetType, object aspect = null) {
             D.assert(this._debugCheckStateIsActiveForAncestorLookup());
-            InheritedElement ancestor = this._inheritedWidgets == null ? null : this._inheritedWidgets[targetType];
+            InheritedElement ancestor = null;
+            if (this._inheritedWidgets != null) {
+                this._inheritedWidgets.TryGetValue(targetType, out ancestor);
+            }
             if (ancestor != null) {
                 return this.inheritFromElement(ancestor, aspect: aspect);
             }
@@ -1682,7 +1689,10 @@ namespace UIWidgets.widgets {
 
         public virtual InheritedElement ancestorInheritedElementForWidgetOfExactType(Type targetType) {
             D.assert(this._debugCheckStateIsActiveForAncestorLookup());
-            InheritedElement ancestor = this._inheritedWidgets == null ? null : this._inheritedWidgets[targetType];
+            InheritedElement ancestor = null;
+            if (this._inheritedWidgets != null) {
+                this._inheritedWidgets.TryGetValue(targetType, out ancestor);
+            }
             return ancestor;
         }
 
@@ -2425,7 +2435,7 @@ namespace UIWidgets.widgets {
         }
 
         ParentDataElement<RenderObjectWidget> _findAncestorParentDataElement() {
-            Element ancestor = _parent;
+            Element ancestor = this._parent;
             while (ancestor != null && !(ancestor is RenderObjectElement)) {
                 var element = ancestor as ParentDataElement<RenderObjectWidget>;
                 if (element != null) {

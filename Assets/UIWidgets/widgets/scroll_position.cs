@@ -349,8 +349,8 @@ namespace UIWidgets.widgets {
             }
 
             base.debugFillDescription(description);
-            description.Add(string.Format("range: {0:F1}..{1:F1}", this.minScrollExtent, this.maxScrollExtent));
-            description.Add(string.Format("viewport: {0:F1}", this.viewportDimension));
+            description.Add(string.Format("range: {0:F1}..{1:F1}", this._minScrollExtent, this._maxScrollExtent));
+            description.Add(string.Format("viewport: {0:F1}", this._viewportDimension));
         }
     }
 }
