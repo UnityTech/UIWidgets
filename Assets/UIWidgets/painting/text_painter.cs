@@ -307,7 +307,7 @@ namespace UIWidgets.painting
                     ); // direction doesn't matter, text is just a space
                     if (text != null && text.style != null)
                     {
-                        builder.pushStyle(text.style.getTextStyle(textScaleFactor));
+                        builder.pushStyle(text.style);
                     }
 
                     builder.addText(" ");

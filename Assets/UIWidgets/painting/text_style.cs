@@ -7,7 +7,7 @@ using UIWidgets.ui;
 
 namespace UIWidgets.painting
 {
-    public class TextStyle : Diagnosticable, IEquatable<TextStyle>
+    public class TextStyle : Diagnosticable, IEquatable<TextStyle>, ParagraphBuilder.ITextStyleProvider
     {
         public static readonly double _defaultFontSize = 14.0;
         public readonly bool inherit;
@@ -54,20 +54,37 @@ namespace UIWidgets.painting
             this.background = background;
         }
 
-        public ui.TextStyle getTextStyle(double textScaleFactor = 1.0)
+        public  ui.TextStyle getTextStyle(ui.TextStyle currentStyle = null)
         {
+            if (currentStyle != null)
+            {
+                return new ui.TextStyle(
+                    color:  color??currentStyle.color,
+                    fontSize: fontSize??currentStyle.fontSize,
+                    fontWeight: fontWeight??currentStyle.fontWeight,
+                    fontStyle: fontStyle??currentStyle.fontStyle,
+                    letterSpacing: letterSpacing??currentStyle.letterSpacing,
+                    wordSpacing: wordSpacing??currentStyle.wordSpacing,
+                    textBaseline: textBaseline??currentStyle.textBaseline,
+                    height: height??currentStyle.height,
+                    decoration: decoration??currentStyle.decoration,
+                    decorationColor: decorationColor??currentStyle.decorationColor,
+                    fontFamily: fontFamily??currentStyle.fontFamily,
+                    background: background??currentStyle.background
+                );
+            }
+            
             return new ui.TextStyle(
-                color: color,
-                decoration: decoration,
-                decorationColor: decorationColor,
-                decorationStyle: decorationStyle,
+                color:  color,
+                fontSize: fontSize,
                 fontWeight: fontWeight,
                 fontStyle: fontStyle,
-                fontSize: fontSize == null ? null : fontSize * textScaleFactor,
                 letterSpacing: letterSpacing,
                 wordSpacing: wordSpacing,
                 textBaseline: textBaseline,
                 height: height,
+                decoration: decoration,
+                decorationColor: decorationColor,
                 fontFamily: fontFamily,
                 background: background
             );

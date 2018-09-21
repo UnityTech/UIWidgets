@@ -76,68 +76,32 @@ namespace UIWidgets.ui
 
     public class TextStyle : IEquatable<TextStyle>
     {
-        public static readonly string defaultFontFamily = "Helvetica";
-        public static readonly double defaultFontSize = 14.0;
-        public static readonly FontWeight defaultFontWeight = FontWeight.w400;
-        public static readonly FontStyle defaultFontStyle = FontStyle.normal;
-        public static readonly Color defaultColor = Color.fromARGB(255, 0, 0, 0);
-        public readonly Color color;
-        public readonly double? fontSize;
-        public readonly FontWeight? fontWeight;
-        public readonly FontStyle? fontStyle;
-        public readonly double? letterSpacing;
-        public readonly double? wordSpacing;
-        public readonly TextBaseline? textBaseline;
-        public readonly double? height;
-        public readonly TextDecoration decoration;
+        public readonly Color color = Color.fromARGB(255, 0, 0, 0);
+        public readonly double fontSize = 14.0;
+        public readonly FontWeight fontWeight = FontWeight.w400;
+        public readonly FontStyle fontStyle = FontStyle.normal;
+        public readonly double letterSpacing = 0.0;
+        public readonly double wordSpacing = 0.0;
+        public readonly TextBaseline textBaseline = TextBaseline.alphabetic;
+        public readonly double height = 1.0;
+        public readonly TextDecoration decoration = TextDecoration.none;
         public readonly Color decorationColor;
-        public readonly TextDecorationStyle? decorationStyle;
-        public readonly string fontFamily;
+        public readonly TextDecorationStyle decorationStyle = TextDecorationStyle.solid;
+        public readonly string fontFamily = "Helvetica";
         public readonly Paint background;
-
-        public FontStyle fontStyleOrDefault
-        {
-            get { return fontStyle ?? defaultFontStyle; }
-        }
-
-        public string fontFamilyOrDefault
-        {
-            get { return fontFamily ?? defaultFontFamily; }
-        }
-
-        public double fontSizeOrDefault
-        {
-            get { return fontSize ?? defaultFontSize; }
-        }
         
-        public Color colorOrDefault
-        {
-            get { return color ?? defaultColor; }
-        }
-
-        public TextDecorationStyle decorationStyleOrDefault
-        {
-            get { return decorationStyle ?? TextDecorationStyle.solid; }
-        }
-
-        
-        public FontWeight safeFontWeight
-        {
-            get { return fontWeight ?? defaultFontWeight; }
-        }
-
         public UnityEngine.Color UnityColor
         {
-            get { return (color ?? defaultColor).toColor(); }
+            get { return color.toColor(); }
         }
 
         public UnityEngine.FontStyle UnityFontStyle
         {
             get
             {
-                if (fontStyleOrDefault == FontStyle.italic)
+                if (fontStyle == FontStyle.italic)
                 {
-                    if (safeFontWeight == FontWeight.w700)
+                    if (fontWeight == FontWeight.w700)
                     {
                         return UnityEngine.FontStyle.BoldAndItalic;
                     }
@@ -146,7 +110,7 @@ namespace UIWidgets.ui
                         return UnityEngine.FontStyle.Italic;
                     }
                 }
-                else if (safeFontWeight == FontWeight.w700)
+                else if (fontWeight == FontWeight.w700)
                 {
                     return UnityEngine.FontStyle.Bold;
                 }
@@ -157,29 +121,8 @@ namespace UIWidgets.ui
 
         public int UnityFontSize
         {
-            get { return (int) fontSizeOrDefault; }
+            get { return (int) fontSize; }
         }
-
-        public TextStyle merge(TextStyle style)
-        {
-            var ret = new TextStyle(
-                color: style.color ?? color,
-                fontSize: style.fontSize ?? fontSize,
-                fontWeight: style.fontWeight ?? fontWeight,
-                fontStyle: style.fontStyle ?? fontStyle,
-                letterSpacing: style.letterSpacing ?? letterSpacing,
-                textBaseline: style.textBaseline ?? textBaseline,
-                height: style.height ?? height,
-                decoration: style.decoration ?? decoration,
-                decorationColor: style.decorationColor ?? decorationColor,
-                decorationStyle: style.decorationStyle ?? decorationStyle,
-                background: style.background ?? background,
-                fontFamily: style.fontFamily ?? fontFamily
-            );
-
-            return ret;
-        }
-
 
         public bool Equals(TextStyle other)
         {
@@ -231,26 +174,28 @@ namespace UIWidgets.ui
             return !Equals(left, right);
         }
 
-        public TextStyle(Color color = null, double? fontSize = default(double?),
-            FontWeight? fontWeight = default(FontWeight?),
-            FontStyle? fontStyle = default(FontStyle?), double? letterSpacing = default(double?),
-            double? wordSpacing = default(double?), TextBaseline? textBaseline = default(TextBaseline?),
-            double? height = default(double?), TextDecoration decoration = null, Color decorationColor = null,
-            TextDecorationStyle? decorationStyle = null, string fontFamily = null, Paint background = null)
+        
+        public TextStyle(Color color = null, double? fontSize = null,
+            FontWeight? fontWeight = null, FontStyle? fontStyle = null, double? letterSpacing = null,
+            double? wordSpacing = null, TextBaseline? textBaseline = null, double? height= null, 
+            TextDecoration decoration = null, TextDecorationStyle? decorationStyle = null, Color decorationColor = null, string fontFamily = null,
+            Paint background = null
+        )
         {
-            this.color = color;
-            this.fontSize = fontSize;
-            this.fontWeight = fontWeight;
-            this.fontStyle = fontStyle;
-            this.letterSpacing = letterSpacing;
-            this.wordSpacing = wordSpacing;
-            this.textBaseline = textBaseline;
-            this.height = height;
-            this.decoration = decoration;
-            this.fontFamily = fontFamily;
-            this.decorationStyle = decorationStyle;
-            this.decorationColor = decorationColor;
-            this.background = background;
+            this.color = color ?? this.color;
+            this.fontSize = fontSize ?? this.fontSize;
+            this.fontWeight = fontWeight ?? this.fontWeight;
+            this.fontStyle = fontStyle ?? this.fontStyle;
+            this.letterSpacing = letterSpacing ?? this.letterSpacing;
+            this.wordSpacing = wordSpacing ?? this.wordSpacing;
+            this.fontSize = fontSize ?? this.fontSize;
+            this.textBaseline = textBaseline ?? this.textBaseline;
+            this.height = height ?? this.height;
+            this.decoration = decoration ?? this.decoration;
+            this.decorationStyle = decorationStyle ?? this.decorationStyle;
+            this.decorationColor = decorationColor ?? this.decorationColor;
+            this.fontFamily = fontFamily ?? this.fontFamily;
+            this.background = background ?? this.background; 
         }
     }
 

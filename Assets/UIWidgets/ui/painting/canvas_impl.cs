@@ -305,7 +305,7 @@ namespace UIWidgets.ui {
         public void drawTextBlob(TextBlob textBlob, double x, double y)
         {
             var mesh = MeshGenrator.generateMesh(textBlob, x, y);
-            var font = FontManager.instance.getOrCreate(textBlob.style.fontFamilyOrDefault, textBlob.style.UnityFontSize);
+            var font = FontManager.instance.getOrCreate(textBlob.style.fontFamily, textBlob.style.UnityFontSize);
             prepareGL(font.material);
             font.material.SetPass(0);
             Graphics.DrawMeshNow(mesh, Matrix4x4.identity);

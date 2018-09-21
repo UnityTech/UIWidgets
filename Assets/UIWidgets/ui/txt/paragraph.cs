@@ -562,7 +562,7 @@ namespace UIWidgets.ui
                 var run = _runs.getRun(i);
                 if (run.start < run.end)
                 {
-                    var font = FontManager.instance.getOrCreate(run.style.fontFamilyOrDefault, run.style.UnityFontSize);
+                    var font = FontManager.instance.getOrCreate(run.style.fontFamily, run.style.UnityFontSize);
                     font.RequestCharactersInTexture(_text.Substring(run.start, run.end - run.start), 0, 
                         run.style.UnityFontStyle);
                 } 
@@ -587,10 +587,10 @@ namespace UIWidgets.ui
                     var run = runIndex < _runs.size ? _runs.getRun(runIndex) : null;
                     if (run != null && run.start < run.end && run.start < line.end && run.end > line.start)
                     {
-                        var font = FontManager.instance.getOrCreate(run.style.fontFamilyOrDefault, run.style.UnityFontSize);
+                        var font = FontManager.instance.getOrCreate(run.style.fontFamily, run.style.UnityFontSize);
                         var metrics = FontMetrics.fromFont(font, run.style.height);
-                        var ascent = font.ascent * (run.style.height??1.0);
-                        var descent = (font.lineHeight - font.ascent) * (run.style.height??1.0);
+                        var ascent = font.ascent * (run.style.height);
+                        var descent = (font.lineHeight - font.ascent) * (run.style.height);
                         if (metrics.ascent > maxAscent)
                         {
                             maxAscent = metrics.ascent;
@@ -779,7 +779,7 @@ namespace UIWidgets.ui
             var paint = new Paint();
             if (record.style.decorationColor == null)
             {
-                paint.color = record.style.colorOrDefault;
+                paint.color = record.style.color;
             }
             else
             {
@@ -789,14 +789,14 @@ namespace UIWidgets.ui
             
             var width = record.runWidth;
             var metrics = record.metrics;
-            double underLineThickness = metrics.underlineThickness ?? (record.style.fontSizeOrDefault / 14.0);
+            double underLineThickness = metrics.underlineThickness ?? (record.style.fontSize / 14.0);
             paint.strokeWidth = underLineThickness;
             var recordOffset = baseOffset + record.offset;
             var x = recordOffset.dx;
             var y = recordOffset.dy;
             
             int decorationCount = 1;
-            switch (record.style.decorationStyleOrDefault)
+            switch (record.style.decorationStyle)
             {
                    case TextDecorationStyle.doubleLine:
                        decorationCount = 2;
