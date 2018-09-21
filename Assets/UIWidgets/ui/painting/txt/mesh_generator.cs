@@ -8,7 +8,7 @@ namespace UIWidgets.ui.painting.txt
         public static Mesh generateMesh(TextBlob textBlob, double x, double y)
         {
             var style = textBlob.style;
-            var font = FontManager.instance.getOrCreate(style.safeFontFamily, style.UnityFontSize);
+            var font = FontManager.instance.getOrCreate(style.fontFamilyOrDefault, style.UnityFontSize);
             var length = textBlob.end - textBlob.start;
             var vertices = new Vector3[length * 4];
             var triangles = new int[length * 6];

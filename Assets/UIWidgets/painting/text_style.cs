@@ -7,7 +7,7 @@ using UIWidgets.ui;
 
 namespace UIWidgets.painting
 {
-    public class TextStyle : Diagnosticable
+    public class TextStyle : Diagnosticable, IEquatable<TextStyle>
     {
         public static readonly double _defaultFontSize = 14.0;
         public readonly bool inherit;
@@ -20,16 +20,21 @@ namespace UIWidgets.painting
         public readonly TextBaseline? textBaseline;
         public readonly double? height;
         public readonly TextDecoration decoration;
+        public readonly Color decorationColor;
+        public readonly TextDecorationStyle? decorationStyle;
+        public readonly Paint background;
         public readonly string fontFamily;
         public readonly string debugLabel;
-       
+
         const string _kDefaultDebugLabel = "unknown";
 
 
         public TextStyle(bool inherit = true, Color color = null, double? fontSize = null,
             FontWeight? fontWeight = null,
             FontStyle? fontStyle = null, double? letterSpacing = null, double? wordSpacing = null,
-            TextBaseline? textBaseline = null, double? height = null, TextDecoration decoration = null,
+            TextBaseline? textBaseline = null, double? height = null, Paint background = null,
+            TextDecoration decoration = null,
+            Color decorationColor = null, TextDecorationStyle? decorationStyle = null,
             string fontFamily = null, string debugLabel = null)
         {
             this.inherit = inherit;
@@ -42,8 +47,11 @@ namespace UIWidgets.painting
             this.textBaseline = textBaseline;
             this.height = height;
             this.decoration = decoration;
+            this.decorationColor = decorationColor;
+            this.decorationStyle = decorationStyle;
             this.fontFamily = fontFamily;
             this.debugLabel = debugLabel;
+            this.background = background;
         }
 
         public ui.TextStyle getTextStyle(double textScaleFactor = 1.0)
@@ -51,6 +59,8 @@ namespace UIWidgets.painting
             return new ui.TextStyle(
                 color: color,
                 decoration: decoration,
+                decorationColor: decorationColor,
+                decorationStyle: decorationStyle,
                 fontWeight: fontWeight,
                 fontStyle: fontStyle,
                 fontSize: fontSize == null ? null : fontSize * textScaleFactor,
@@ -58,7 +68,8 @@ namespace UIWidgets.painting
                 wordSpacing: wordSpacing,
                 textBaseline: textBaseline,
                 height: height,
-                fontFamily: fontFamily
+                fontFamily: fontFamily,
+                background: background
             );
         }
 
@@ -68,12 +79,13 @@ namespace UIWidgets.painting
                                          || fontSize != other.fontSize || fontWeight != other.fontWeight
                                          || fontStyle != other.fontStyle || letterSpacing != other.letterSpacing
                                          || wordSpacing != other.wordSpacing || textBaseline != other.textBaseline
-                                         || height != other.height)
+                                         || height != other.height || background != other.background)
             {
                 return RenderComparison.layout;
             }
 
-            if (color != other.color || decoration != other.decoration)
+            if (color != other.color || decoration != other.decoration || decorationColor != other.decorationColor
+                || decorationStyle != other.decorationStyle)
             {
                 return RenderComparison.paint;
             }
@@ -102,14 +114,16 @@ namespace UIWidgets.painting
             {
                 return other;
             }
-            
+
             string mergedDebugLabel = null;
             D.assert(() =>
             {
                 if (other.debugLabel != null || debugLabel != null)
                 {
-                    mergedDebugLabel = string.Format("({0}).merge({1})", debugLabel??_kDefaultDebugLabel, other.debugLabel ?? _kDefaultDebugLabel);
+                    mergedDebugLabel = string.Format("({0}).merge({1})", debugLabel ?? _kDefaultDebugLabel,
+                        other.debugLabel ?? _kDefaultDebugLabel);
                 }
+
                 return true;
             });
 
@@ -124,6 +138,8 @@ namespace UIWidgets.painting
                 textBaseline: other.textBaseline,
                 height: other.height,
                 decoration: other.decoration,
+                decorationColor: other.decorationColor,
+                decorationStyle: other.decorationStyle,
                 debugLabel: mergedDebugLabel
             );
         }
@@ -140,17 +156,20 @@ namespace UIWidgets.painting
             Paint background = null,
             TextDecoration decoration = null,
             Color decorationColor = null,
+            TextDecorationStyle? decorationStyle = null,
             string debugLabel = null)
         {
             string newDebugLabel = null;
-            D.assert(() => {
+            D.assert(() =>
+            {
                 if (this.debugLabel != null)
                 {
                     newDebugLabel = debugLabel ?? string.Format("({0}).copyWith", this.debugLabel);
-                }  
+                }
+
                 return true;
             });
-            
+
             return new TextStyle(
                 inherit: inherit,
                 color: color ?? this.color,
@@ -163,6 +182,9 @@ namespace UIWidgets.painting
                 textBaseline: textBaseline ?? this.textBaseline,
                 height: height ?? this.height,
                 decoration: decoration ?? this.decoration,
+                decorationColor: decorationColor ?? this.decorationColor,
+                decorationStyle: decorationStyle ?? this.decorationStyle,
+                background: background ?? this.background,
                 debugLabel: newDebugLabel
             );
         }
@@ -200,9 +222,22 @@ namespace UIWidgets.painting
             styles.Add(new DiagnosticsProperty<double?>("wordSpacing", wordSpacing, defaultValue: null));
             styles.Add(new EnumProperty<TextBaseline?>("baseline", textBaseline, defaultValue: null));
             styles.Add(new DiagnosticsProperty<double?>("height", height, defaultValue: null));
+            styles.Add(new StringProperty("background", background == null ? null : background.ToString(), defaultValue: null, quoted: false));
             if (decoration != null)
             {
-                List<String> decorationDescription = new List<String>();
+                List<string> decorationDescription = new List<string>();
+                if (decorationStyle != null)
+                {
+                    decorationDescription.Add(decorationStyle.ToString());
+                }
+                
+                styles.Add(new DiagnosticsProperty<Color>("decorationColor", decorationColor, defaultValue: null, 
+                    level: DiagnosticLevel.fine));
+                if (decorationColor != null)
+                {
+                    decorationDescription.Add(decorationColor.ToString());
+                }
+                
                 styles.Add(new DiagnosticsProperty<TextDecoration>("decoration", decoration, defaultValue: null,
                     level: DiagnosticLevel.hidden));
                 if (decoration != null)
@@ -222,6 +257,64 @@ namespace UIWidgets.painting
             if (!styleSpecified)
                 properties.add(new FlagProperty("inherit", value: inherit, ifTrue: "<all styles inherited>",
                     ifFalse: "<no style specified>"));
+        }
+
+        public bool Equals(TextStyle other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return inherit == other.inherit && Equals(color, other.color) && fontSize.Equals(other.fontSize) &&
+                   fontWeight == other.fontWeight && fontStyle == other.fontStyle &&
+                   letterSpacing.Equals(other.letterSpacing) && wordSpacing.Equals(other.wordSpacing) &&
+                   textBaseline == other.textBaseline && height.Equals(other.height) &&
+                   Equals(decoration, other.decoration) && Equals(decorationColor, other.decorationColor) &&
+                   decorationStyle == other.decorationStyle && Equals(background, other.background) &&
+                   string.Equals(fontFamily, other.fontFamily);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((TextStyle) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hashCode = inherit.GetHashCode();
+                hashCode = (hashCode * 397) ^ (color != null ? color.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ fontSize.GetHashCode();
+                hashCode = (hashCode * 397) ^ fontWeight.GetHashCode();
+                hashCode = (hashCode * 397) ^ fontStyle.GetHashCode();
+                hashCode = (hashCode * 397) ^ letterSpacing.GetHashCode();
+                hashCode = (hashCode * 397) ^ wordSpacing.GetHashCode();
+                hashCode = (hashCode * 397) ^ textBaseline.GetHashCode();
+                hashCode = (hashCode * 397) ^ height.GetHashCode();
+                hashCode = (hashCode * 397) ^ (decoration != null ? decoration.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (decorationColor != null ? decorationColor.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ decorationStyle.GetHashCode();
+                hashCode = (hashCode * 397) ^ (background != null ? background.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (fontFamily != null ? fontFamily.GetHashCode() : 0);
+                return hashCode;
+            }
+        }
+
+        public static bool operator ==(TextStyle left, TextStyle right)
+        {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(TextStyle left, TextStyle right)
+        {
+            return !Equals(left, right);
+        }
+
+        public override string toStringShort()
+        {
+            return this.GetType().FullName;
         }
     }
 }

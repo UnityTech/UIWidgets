@@ -117,11 +117,17 @@ namespace UIWidgets.ui {
         public static bool operator !=(Color a, Color b) {
             return !(a == b);
         }
+
+        public override string ToString()
+        {
+            return string.Format("Color(0x{0:X8})", value);
+        }
     }
 
     public class Paint {
         public Color color;
         public double blurSigma;
+        public double strokeWidth = 1;
     }
 
     public static class Conversions {

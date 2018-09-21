@@ -64,5 +64,12 @@ namespace UIWidgets.ui {
         public double y;
     }
 
+    public class DrawLine : DrawCmd
+    {
+        public Offset from;
+        public Offset to;
+        public Paint paint;
+    }
+
 }
 
