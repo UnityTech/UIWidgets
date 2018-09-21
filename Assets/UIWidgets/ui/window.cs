@@ -1,5 +1,6 @@
 ﻿using System;
 using UIWidgets.async;
+using UIWidgets.service;
 using UIWidgets.foundation;
 
 namespace UIWidgets.ui {
@@ -89,5 +90,7 @@ namespace UIWidgets.ui {
         public Timer run(Action callback) {
             return this.run(TimeSpan.Zero, callback);
         }
+
+        public abstract TextInput textInput { get; }
     }
 }

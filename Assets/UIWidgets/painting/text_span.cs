@@ -32,7 +32,7 @@ namespace UIWidgets.painting
             var hasTyle = style != null;
             if (hasTyle)
             {
-                builder.pushStyle(style.getTextStyle(textScaleFactor));
+                builder.pushStyle(style);
             }
             if (!string.IsNullOrEmpty(text))
             {

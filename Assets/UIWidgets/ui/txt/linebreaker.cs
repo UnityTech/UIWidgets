@@ -53,7 +53,7 @@ namespace UIWidgets.ui
             {
                 runIterator.nextTo(charIndex);
                 var run = runIterator.run;
-                var font = FontManager.instance.getOrCreate(run.style.safeFontFamily, run.style.UnityFontSize);
+                var font = FontManager.instance.getOrCreate(run.style.fontFamily, run.style.UnityFontSize);
 
                 var style = run.style;
                 var charInfo = new CharacterInfo();

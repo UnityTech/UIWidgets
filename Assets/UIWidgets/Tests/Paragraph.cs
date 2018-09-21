@@ -26,6 +26,7 @@ namespace UIWidgets.Tests
                 this.textHeight,
                 this.textOverflow,
                 this.textAlign,
+                this.textDecoration,
             };
             this._optionStrings = this._options.Select(x => x.Method.Name).ToArray();
             this._selected = 0;
@@ -128,6 +129,35 @@ namespace UIWidgets.Tests
                     })));
         }
         
+        RenderBox textDecoration()
+        {
+            return box(
+                new RenderParagraph(new TextSpan(style: new painting.TextStyle(height:1.2), text: "", children:
+                    new List<TextSpan>()
+                    {
+                        new TextSpan(style: new painting.TextStyle(color: Color.fromARGB(255, 255, 0, 0), 
+                                decoration: TextDecoration.underline), 
+                            text: "Real-time 3D revolution\n"),
+                        new TextSpan(style: new painting.TextStyle(color: Color.fromARGB(255, 255, 0, 0), 
+                                decoration: TextDecoration.underline, decorationStyle: TextDecorationStyle.doubleLine), 
+                            text: "Double line Real-time 3D revolution\n"),
+                        new TextSpan(style: new painting.TextStyle(color: Color.fromARGB(255, 255, 0, 0), 
+                                decoration: TextDecoration.underline, fontSize: 24), 
+                            text: "Real-time 3D revolution\n"),
+                        new TextSpan(style: new painting.TextStyle(color: Color.fromARGB(255, 255, 0, 0), 
+                                decoration: TextDecoration.overline), 
+                            text: "Over line Real-time 3D revolution\n"),
+                        new TextSpan(style: new painting.TextStyle(color: Color.fromARGB(255, 255, 0, 0), 
+                                decoration: TextDecoration.overline, decorationStyle: TextDecorationStyle.doubleLine), 
+                            text: "Over line Real-time 3D revolution\n"),
+                        new TextSpan(style: new painting.TextStyle(color: Color.fromARGB(255, 255, 0, 0), 
+                                decoration: TextDecoration.lineThrough), 
+                            text: "Line through Real-time 3D revolution\n"),
+                        new TextSpan(style: new painting.TextStyle(color: Color.fromARGB(255, 255, 0, 0), 
+                                decoration: TextDecoration.lineThrough, decorationColor:Color.fromARGB(255, 0, 255, 0)), 
+                            text: "Color Line through Real-time 3D revolution\n"),
+                    })), width: 400);
+        }
         
         RenderBox textAlign()
         {

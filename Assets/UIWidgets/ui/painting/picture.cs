@@ -73,7 +73,39 @@ namespace UIWidgets.ui {
                     this._isInLayer,
                     null
                 ));
-            } else if (drawCmd is DrawSaveLayer) {
+            } else if (drawCmd is DrawLine)
+            {
+                var drawLine = (DrawLine) drawCmd;
+                Offset vect = drawLine.to - drawLine.from;
+                var distance = vect.distance;
+                if (distance > 0)
+                {
+                    var halfWidth = drawLine.paint.strokeWidth * 0.5;
+                    var diff = vect / distance * halfWidth;
+                    diff = new Offset(diff.dy, -diff.dx);
+                    var offsets = new Offset[]
+                    {
+                        drawLine.from + diff,
+                        drawLine.from - diff,
+                        drawLine.to + diff,
+                        drawLine.to - diff,
+                    };
+
+                    var minX = offsets[0].dx;
+                    var maxX = offsets[0].dx;
+                    var minY = offsets[0].dy;
+                    var maxY = offsets[0].dy;
+                    for (int i = 1; i < offsets.Length; i++)
+                    {
+                        minX = Math.Min(minX, offsets[i].dx);
+                        maxX = Math.Max(maxX, offsets[i].dx);
+                        minY = Math.Min(minY, offsets[i].dy);
+                        maxY = Math.Min(maxY, offsets[i].dy);
+                    }
+                    this.addPaintBounds(Rect.fromLTRB(minX, minY, maxX, maxY));
+                }
+            }
+            else if (drawCmd is DrawSaveLayer) {
                 this.stack.Push(new CanvasRec(
                     this._transform,
                     this._clipRect,

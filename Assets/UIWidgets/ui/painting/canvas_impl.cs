@@ -128,6 +128,10 @@ namespace UIWidgets.ui {
                 else if (drawCmd is DrawRect) {
                     var drawRect = (DrawRect) drawCmd;
                     this.drawRect(drawRect.rect, drawRect.borderWidth, drawRect.borderRadius, drawRect.paint);
+                } else if (drawCmd is DrawLine)
+                {
+                    var drawLine = (DrawLine) drawCmd;
+                    this.drawLine(drawLine.from, drawLine.to, drawLine.paint);
                 }
                 else if (drawCmd is DrawRectShadow) {
                     var drawRectShadow = (DrawRectShadow) drawCmd;
@@ -188,6 +192,36 @@ namespace UIWidgets.ui {
                 Texture2D _texture = new Texture2D(0, 0);
                 _texture.LoadImage(image.rawData);
                 Graphics.DrawTexture(dst.toRect(), _texture);
+            }
+        }
+
+        public void drawLine(Offset from, Offset to, Paint paint)
+        {
+            var color = paint.color;
+            Offset vect = to - from;
+            var distance = vect.distance;
+            
+            if (color.alpha > 0 && distance > 0)
+            {
+                var halfWidth = paint.strokeWidth * 0.5;
+                var diff = vect / distance * halfWidth;
+                diff = new Offset(diff.dy, -diff.dx);
+                this.prepareGL(CanvasImpl.linesMat);
+                CanvasImpl.linesMat.SetPass(0);
+                var points = new[]
+                {
+                    (from + diff).toVector(),
+                    (from - diff).toVector(),
+                    (to - diff).toVector(),
+                    (to + diff).toVector(),
+                };
+                GL.Begin(GL.QUADS);
+                GL.Color(color.toColor());
+                for (int i = 0; i < points.Length; ++i)
+                {
+                    GL.Vertex(points[i]);
+                }
+                GL.End();
             }
         }
 
@@ -271,7 +305,7 @@ namespace UIWidgets.ui {
         public void drawTextBlob(TextBlob textBlob, double x, double y)
         {
             var mesh = MeshGenrator.generateMesh(textBlob, x, y);
-            var font = FontManager.instance.getOrCreate(textBlob.style.safeFontFamily, textBlob.style.UnityFontSize);
+            var font = FontManager.instance.getOrCreate(textBlob.style.fontFamily, textBlob.style.UnityFontSize);
             prepareGL(font.material);
             font.material.SetPass(0);
             Graphics.DrawMeshNow(mesh, Matrix4x4.identity);
@@ -334,11 +368,6 @@ namespace UIWidgets.ui {
 
             GL.MultMatrix(this._transform);
         }
-//
-//        private double PixelRound(double v)
-//        {
-//            return Math.Floor(v * EditorGUIUtility.pixelsPerPoint)  EditorGUIUtility.pixelsPerPoint;
-//        }
 
         private class ClipRec {
             public ClipRec(Matrix4x4 transform, Rect rect = null, RRect rrect = null) {

@@ -11,6 +11,11 @@ namespace UIWidgets.ui
         private List<int>  _styleStack = new List<int>();
         private int _paragraph_style_index;
   
+        public interface ITextStyleProvider
+        {
+            TextStyle getTextStyle(TextStyle current = null);
+        }
+
         public ParagraphBuilder(ParagraphStyle style)
         {
             setParagraphStyle(style);
@@ -25,10 +30,17 @@ namespace UIWidgets.ui
             return paragraph;
         }
 
+        public void pushStyle(ITextStyleProvider style)
+        {
+            var newStyle = style.getTextStyle(peekStyle());
+            var styleIndex = _runs.addStyle(newStyle);
+            _styleStack.Add(styleIndex);
+            _runs.startRun(styleIndex, _text.Length);
+        }
+        
         public void pushStyle(TextStyle style)
         {
-            var newStyle = peekStyle().merge(style);
-            var styleIndex = _runs.addStyle(newStyle);
+            var styleIndex = _runs.addStyle(style);
             _styleStack.Add(styleIndex);
             _runs.startRun(styleIndex, _text.Length);
         }

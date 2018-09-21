@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 using UIWidgets.foundation;
 using UIWidgets.ui;
 using UIWidgets.widgets;

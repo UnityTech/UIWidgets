@@ -1383,7 +1383,7 @@ namespace UIWidgets.foundation {
             return result.ToString();
         }
 
-        string toStringDeep(
+        public string toStringDeep(
             String prefixLineOne = "",
             String prefixOtherLines = null,
             DiagnosticLevel minLevel = DiagnosticLevel.debug

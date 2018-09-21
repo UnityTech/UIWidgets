@@ -22,7 +22,6 @@ namespace UIWidgets.ui
                 return founded;
             }
             
-            Debug.Log(string.Format("Create new Font names={0}, size={1}", names, fontSize));
             var newFont = Font.CreateDynamicFontFromOSFont(names,
                 fontSize);
             _fonts.Add(newFont);

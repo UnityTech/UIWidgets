@@ -3,6 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 
 namespace UIWidgets.foundation {
+    
+    public delegate void ValueChanged<T>(T value);
+
     public delegate IEnumerable<T> EnumerableFilter<T>(IEnumerable<T> input);
 
     public static class CollectionUtils {
