@@ -58,7 +58,7 @@ namespace UIWidgets.Tests
             this.windowAdapter.attachRootWidget(root);
             this.titleContent = new GUIContent("EditableTextWiget");
         }
-
+        
         void OnDestroy() {
             this.windowAdapter = null;
         }

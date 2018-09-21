@@ -210,7 +210,7 @@ namespace UIWidgets.painting
         {
             Debug.Assert(text != null, "TextPainter.text must be set to a non-null value before using the TextPainter.");
             Debug.Assert(textDirection != null, "TextPainter.textDirection must be set to a non-null value before using the TextPainter.");
-            if (!_needsLayout && minWidth == _lastMaxWidth && maxWidth == _lastMaxWidth)
+            if (!_needsLayout && minWidth == _lastMinWidth && maxWidth == _lastMaxWidth)
             {
                 return;
             }

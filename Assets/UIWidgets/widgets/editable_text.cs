@@ -491,6 +491,7 @@ namespace UIWidgets.widgets
             this.maxLines = maxLines;
             this.selectionColor = selectionColor;
             this.textScaleFactor = textScaleFactor;
+            this.textAlign = textAlign;
             this.textDirection = textDirection;
             this.obscureText = obscureText;
             this.autocorrect = autocorrect;
@@ -520,7 +521,7 @@ namespace UIWidgets.widgets
                 ignorePointer: rendererIgnoresPointer          
             ); 
         }   
-        
+
         public override void updateRenderObject(BuildContext context, RenderObject renderObject)
         {
             var edit = (RenderEditable) renderObject;

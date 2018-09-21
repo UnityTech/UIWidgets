@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using UIWidgets.painting;
 using UIWidgets.ui.txt;
 using UnityEngine;
 

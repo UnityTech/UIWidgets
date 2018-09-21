@@ -97,7 +97,7 @@ namespace UIWidgets.service
 
         public TextEditingValue compose(string composeText)
         {
-            D.assert(string.IsNullOrEmpty(composeText));
+            D.assert(!string.IsNullOrEmpty(composeText));
             var composeStart = composing == TextRange.empty ? selection.start : composing.start;
             var lastComposeEnd =composing == TextRange.empty ? selection.end : composing.end;
             var newText = text.Substring(0, composeStart) + composeText + text.Substring(lastComposeEnd);
@@ -297,8 +297,6 @@ namespace UIWidgets.service
         
         TextEditingValue performOperation(TextEditOp operation)
         {
-            // m_RevealCursor = true;
-            TextEditingValue newValue = null;
             switch (operation)
             {
                 case TextEditOp.MoveLeft:
