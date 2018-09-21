@@ -499,6 +499,17 @@ namespace UIWidgets.rendering {
         }
     }
 
+    public class RenderRepaintBoundary : RenderProxyBox {
+        public RenderRepaintBoundary(
+            RenderBox child = null
+        ) : base(child) {
+        }
+
+        public override bool isRepaintBoundary {
+            get { return true; }
+        }
+    }
+
     public class RenderIgnorePointer : RenderProxyBox {
         public RenderIgnorePointer(
             RenderBox child = null,

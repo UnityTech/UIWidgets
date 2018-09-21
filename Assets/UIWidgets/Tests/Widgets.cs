@@ -8,8 +8,6 @@ namespace UIWidgets.Tests {
     public class Widgets : EditorWindow {
         private WindowAdapter windowAdapter;
 
-        private WidgetsBindings widgetsBindings;
-
         private PaintingBinding paintingBinding;
 
         private Widget root;
@@ -49,15 +47,11 @@ namespace UIWidgets.Tests {
             this.paintingBinding = new PaintingBinding(null);
             paintingBinding.initInstances();
             this.windowAdapter = new WindowAdapter(this);
-            this.widgetsBindings = new WidgetsBindings(windowAdapter);
-            if (widgetsBindings != null) {
-                widgetsBindings.attachRootWidget(root);
-            }
+            this.windowAdapter.attachRootWidget(root);
         }
 
         void OnDestroy() {
             this.windowAdapter = null;
-            this.widgetsBindings = null;
         }
     }
 }

@@ -9,12 +9,9 @@ namespace UIWidgets.gestures {
     public delegate T RecognizerCallback<T>();
 
     public abstract class GestureRecognizer : DiagnosticableTree, GestureArenaMember {
-        protected GestureRecognizer(GestureBinding binding = null, object debugOwner = null) {
-            this._binding = binding;
+        protected GestureRecognizer(object debugOwner = null) {
             this.debugOwner = debugOwner;
         }
-
-        protected readonly GestureBinding _binding;
 
         public readonly object debugOwner;
 
@@ -72,8 +69,7 @@ namespace UIWidgets.gestures {
     }
 
     public abstract class OneSequenceGestureRecognizer : GestureRecognizer {
-        protected OneSequenceGestureRecognizer(
-            GestureBinding binding = null, object debugOwner = null) : base(binding, debugOwner) {
+        protected OneSequenceGestureRecognizer(object debugOwner = null) : base(debugOwner) {
         }
 
         readonly Dictionary<int, GestureArenaEntry> _entries = new Dictionary<int, GestureArenaEntry>();
@@ -101,7 +97,7 @@ namespace UIWidgets.gestures {
         public override void dispose() {
             this.resolve(GestureDisposition.rejected);
             foreach (int pointer in this._trackedPointers) {
-                this._binding.pointerRouter.removeRoute(pointer, this.handleEvent);
+                GestureBinding.instance.pointerRouter.removeRoute(pointer, this.handleEvent);
             }
 
             this._trackedPointers.Clear();
@@ -127,11 +123,11 @@ namespace UIWidgets.gestures {
                 return this._team.add(pointer, this);
             }
 
-            return this._binding.gestureArena.add(pointer, this);
+            return GestureBinding.instance.gestureArena.add(pointer, this);
         }
 
         protected void startTrackingPointer(int pointer) {
-            this._binding.pointerRouter.addRoute(pointer, this.handleEvent);
+            GestureBinding.instance.pointerRouter.addRoute(pointer, this.handleEvent);
             this._trackedPointers.Add(pointer);
             D.assert(!this._entries.ContainsKey(pointer));
             this._entries[pointer] = this._addPointerToArena(pointer);
@@ -139,7 +135,7 @@ namespace UIWidgets.gestures {
 
         protected void stopTrackingPointer(int pointer) {
             if (this._trackedPointers.Contains(pointer)) {
-                this._binding.pointerRouter.removeRoute(pointer, this.handleEvent);
+                GestureBinding.instance.pointerRouter.removeRoute(pointer, this.handleEvent);
                 this._trackedPointers.Remove(pointer);
                 if (this._trackedPointers.isEmpty()) {
                     this.didStopTrackingLastPointer(pointer);
@@ -163,9 +159,8 @@ namespace UIWidgets.gestures {
     public abstract class PrimaryPointerGestureRecognizer : OneSequenceGestureRecognizer {
         protected PrimaryPointerGestureRecognizer(
             TimeSpan? deadline = null,
-            GestureBinding binding = null,
             object debugOwner = null
-        ) : base(binding: binding, debugOwner: debugOwner) {
+        ) : base(debugOwner: debugOwner) {
             this.deadline = deadline;
         }
 
@@ -186,7 +181,7 @@ namespace UIWidgets.gestures {
                 this.primaryPointer = evt.pointer;
                 this.initialPosition = evt.position;
                 if (this.deadline != null) {
-                    this._timer = this._binding.window.run(this.deadline.Value, this.didExceedDeadline);
+                    this._timer = Window.instance.run(this.deadline.Value, this.didExceedDeadline);
                 }
             }
         }

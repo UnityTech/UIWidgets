@@ -4,7 +4,9 @@ using System.Diagnostics;
 using UIWidgets.async;
 using UIWidgets.flow;
 using UIWidgets.service;
+using UIWidgets.rendering;
 using UIWidgets.ui;
+using UIWidgets.widgets;
 using UnityEditor;
 using UnityEngine;
 using Rect = UnityEngine.Rect;
@@ -12,20 +14,31 @@ using Rect = UnityEngine.Rect;
 namespace UIWidgets.editor {
     public class WindowAdapter : Window {
         public WindowAdapter(EditorWindow editorWindow) {
-            this.editorWindow = editorWindow;
-            this.editorWindow.wantsMouseMove = false;
-            this.editorWindow.wantsMouseEnterLeaveWindow = false;
+            this._editorWindow = editorWindow;
+            this._editorWindow.wantsMouseMove = false;
+            this._editorWindow.wantsMouseEnterLeaveWindow = false;
 
             this._devicePixelRatio = EditorGUIUtility.pixelsPerPoint;
 
             this._lastPosition = editorWindow.position;
             this._physicalSize = new Size(
-                this._lastPosition.width * EditorGUIUtility.pixelsPerPoint, 
+                this._lastPosition.width * EditorGUIUtility.pixelsPerPoint,
                 this._lastPosition.height * EditorGUIUtility.pixelsPerPoint);
+
+
+            Window.instance = this;
+            try {
+                this._binding = new WidgetsBinding();
+            }
+            finally {
+                Window.instance = null;
+            }
         }
 
-        public readonly EditorWindow editorWindow;
-        
+        readonly EditorWindow _editorWindow;
+
+        readonly WidgetsBinding _binding;
+
         Rect _lastPosition;
         readonly DateTime _epoch = new DateTime(Stopwatch.GetTimestamp());
         readonly MicrotaskQueue _microtaskQueue = new MicrotaskQueue();
@@ -33,6 +46,19 @@ namespace UIWidgets.editor {
         readonly TextInput _textInput = new TextInput();
 
         public void OnGUI() {
+            Window.instance = this;
+            WidgetsBinding.instance = this._binding;
+
+            try {
+                this.doOnGUI();
+            }
+            finally {
+                Window.instance = null;
+                WidgetsBinding.instance = null;
+            }
+        }
+
+        private void doOnGUI() {
             var evt = Event.current;
 
             if (evt.type == EventType.Repaint) {
@@ -95,6 +121,19 @@ namespace UIWidgets.editor {
         }
 
         public void Update() {
+            Window.instance = this;
+            WidgetsBinding.instance = this._binding;
+
+            try {
+                this.doUpdate();
+            }
+            finally {
+                Window.instance = null;
+                WidgetsBinding.instance = null;
+            }
+        }
+
+        private void doUpdate() {
             this.flushMicrotasks();
 
             this._timerProvider.update();
@@ -104,13 +143,13 @@ namespace UIWidgets.editor {
                 dirty = true;
             }
 
-            if (this._lastPosition != this.editorWindow.position) {
+            if (this._lastPosition != this._editorWindow.position) {
                 dirty = true;
             }
 
             if (dirty) {
                 this._devicePixelRatio = EditorGUIUtility.pixelsPerPoint;
-                this._lastPosition = this.editorWindow.position;
+                this._lastPosition = this._editorWindow.position;
                 this._physicalSize = new Size(
                     this._lastPosition.width * EditorGUIUtility.pixelsPerPoint,
                     this._lastPosition.height * EditorGUIUtility.pixelsPerPoint);
@@ -122,8 +161,8 @@ namespace UIWidgets.editor {
         }
 
         public override void scheduleFrame() {
-            if (this.editorWindow != null) {
-                this.editorWindow.Repaint();
+            if (this._editorWindow != null) {
+                this._editorWindow.Repaint();
             }
         }
 
@@ -147,6 +186,32 @@ namespace UIWidgets.editor {
 
         public override Timer run(TimeSpan duration, Action callback) {
             return this._timerProvider.run(duration, callback);
+        }
+
+        public void attachRootRenderBox(RenderBox root) {
+            Window.instance = this;
+            WidgetsBinding.instance = this._binding;
+
+            try {
+                this._binding.renderView.child = root;
+            }
+            finally {
+                Window.instance = null;
+                WidgetsBinding.instance = null;
+            }
+        }
+
+        public void attachRootWidget(Widget root) {
+            Window.instance = this;
+            WidgetsBinding.instance = this._binding;
+
+            try {
+                this._binding.attachRootWidget(root);
+            }
+            finally {
+                Window.instance = null;
+                WidgetsBinding.instance = null;
+            }
         }
 
         public override TextInput textInput

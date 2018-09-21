@@ -58,7 +58,10 @@ namespace UIWidgets.widgets {
         double? _maxScrollExtent;
 
         public override double pixels {
-            get { return this._pixels.Value; }
+            get {
+                D.assert(this._pixels != null);
+                return this._pixels ?? 0.0;
+            }
         }
 
         internal double? _pixels;
@@ -100,7 +103,7 @@ namespace UIWidgets.widgets {
 
         public virtual double setPixels(double newPixels) {
             D.assert(this._pixels != null);
-            D.assert(this.context.vsync.schedulerBinding.schedulerPhase <= SchedulerPhase.transientCallbacks);
+            D.assert(SchedulerBinding.instance.schedulerPhase <= SchedulerPhase.transientCallbacks);
             if (newPixels != this.pixels) {
                 double overscroll = this.applyBoundaryConditions(newPixels);
                 D.assert(() => {
@@ -120,7 +123,7 @@ namespace UIWidgets.widgets {
 
                 double oldPixels = this.pixels;
                 this._pixels = newPixels - overscroll;
-                if (this._pixels != oldPixels) {
+                if (this.pixels != oldPixels) {
                     this.notifyListeners();
                     this.didUpdateScrollPositionBy(this.pixels - oldPixels);
                 }
@@ -346,8 +349,8 @@ namespace UIWidgets.widgets {
             }
 
             base.debugFillDescription(description);
-            description.Add(string.Format("range: {0:F1}..{1:F1}", this.minScrollExtent, this.maxScrollExtent));
-            description.Add(string.Format("viewport: {0:F1}", this.viewportDimension));
+            description.Add(string.Format("range: {0:F1}..{1:F1}", this._minScrollExtent, this._maxScrollExtent));
+            description.Add(string.Format("viewport: {0:F1}", this._viewportDimension));
         }
     }
 }

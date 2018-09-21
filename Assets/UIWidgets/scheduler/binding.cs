@@ -52,15 +52,29 @@ namespace UIWidgets.scheduler {
     }
 
     public class SchedulerBinding {
-        public SchedulerBinding(Window window) {
-            D.assert(window != null);
-            this.window = window;
-
-            window.onBeginFrame += this._handleBeginFrame;
-            window.onDrawFrame += this._handleDrawFrame;
+        public static SchedulerBinding instance {
+            get {
+                D.assert(_instance != null, "Binding.instance is null");
+                return _instance;
+            }
+            
+            set {
+                if (value == null) {
+                    D.assert(_instance != null, "Binding.instance is already cleared.");
+                    _instance = null;
+                } else {
+                    D.assert(_instance == null, "Binding.instance is already assigned.");
+                    _instance = value;
+                }
+            }
         }
 
-        public readonly Window window;
+        static SchedulerBinding _instance;
+        
+        public SchedulerBinding() {
+            Window.instance.onBeginFrame += this._handleBeginFrame;
+            Window.instance.onDrawFrame += this._handleDrawFrame;
+        }
 
         public double timeDilation {
             get { return this._timeDilation; }
@@ -164,7 +178,7 @@ namespace UIWidgets.scheduler {
                 return true;
             });
 
-            this.window.scheduleFrame();
+            Window.instance.scheduleFrame();
             this._hasScheduledFrame = true;
         }
 
@@ -181,7 +195,7 @@ namespace UIWidgets.scheduler {
                 return true;
             });
 
-            this.window.scheduleFrame();
+            Window.instance.scheduleFrame();
             this._hasScheduledFrame = true;
         }
 

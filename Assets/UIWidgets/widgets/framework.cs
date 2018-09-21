@@ -178,8 +178,7 @@ namespace UIWidgets.widgets {
         }
 
         internal Element _currentElement {
-            get
-            {
+            get {
                 Element result;
                 _registry.TryGetValue(this, out result);
                 return result;
@@ -282,7 +281,7 @@ namespace UIWidgets.widgets {
 
         public override string ToString() {
             String selfType = this.GetType().ToString();
-            string suffix = "<State<StatefulWidget>>";
+            string suffix = "`1[UIWidgets.widgets.State]";
             if (selfType.EndsWith(suffix)) {
                 selfType = selfType.Substring(0, selfType.Length - suffix.Length);
             }
@@ -1195,7 +1194,7 @@ namespace UIWidgets.widgets {
             this.visitChildren(visitor);
         }
 
-        protected Element updateChild(Element child, Widget newWidget, object newSlot) {
+        protected virtual Element updateChild(Element child, Widget newWidget, object newSlot) {
             D.assert(() => {
                 if (newWidget != null && newWidget.key is GlobalKey) {
                     GlobalKey key = (GlobalKey) newWidget.key;
@@ -1677,7 +1676,10 @@ namespace UIWidgets.widgets {
 
         public virtual InheritedWidget inheritFromWidgetOfExactType(Type targetType, object aspect = null) {
             D.assert(this._debugCheckStateIsActiveForAncestorLookup());
-            InheritedElement ancestor = this._inheritedWidgets == null ? null : this._inheritedWidgets[targetType];
+            InheritedElement ancestor = null;
+            if (this._inheritedWidgets != null) {
+                this._inheritedWidgets.TryGetValue(targetType, out ancestor);
+            }
             if (ancestor != null) {
                 return this.inheritFromElement(ancestor, aspect: aspect);
             }
@@ -1688,7 +1690,10 @@ namespace UIWidgets.widgets {
 
         public virtual InheritedElement ancestorInheritedElementForWidgetOfExactType(Type targetType) {
             D.assert(this._debugCheckStateIsActiveForAncestorLookup());
-            InheritedElement ancestor = this._inheritedWidgets == null ? null : this._inheritedWidgets[targetType];
+            InheritedElement ancestor = null;
+            if (this._inheritedWidgets != null) {
+                this._inheritedWidgets.TryGetValue(targetType, out ancestor);
+            }
             return ancestor;
         }
 
@@ -2347,7 +2352,9 @@ namespace UIWidgets.widgets {
         internal readonly Dictionary<Element, object> _dependents = new Dictionary<Element, object>();
 
         internal override void _updateInheritance() {
-            Dictionary<Type, InheritedElement> incomingWidgets = this._parent == null ? null : this._inheritedWidgets;
+            Dictionary<Type, InheritedElement> incomingWidgets =
+                this._parent == null ? null : this._parent._inheritedWidgets;
+            
             if (incomingWidgets != null) {
                 this._inheritedWidgets = new Dictionary<Type, InheritedElement>(incomingWidgets);
             } else {
@@ -2430,7 +2437,7 @@ namespace UIWidgets.widgets {
         }
 
         ParentDataElement<RenderObjectWidget> _findAncestorParentDataElement() {
-            Element ancestor = _parent;
+            Element ancestor = this._parent;
             while (ancestor != null && !(ancestor is RenderObjectElement)) {
                 var element = ancestor as ParentDataElement<RenderObjectWidget>;
                 if (element != null) {

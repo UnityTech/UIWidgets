@@ -47,7 +47,7 @@ namespace UIWidgets.widgets {
 
             D.assert(this.behavior != null);
             return this.behavior.GetType() != oldWidget.behavior.GetType()
-                   || (this.behavior != oldWidget.behavior && this.behavior.shouldNotify(oldWidget.behavior));
+                   || this.behavior != oldWidget.behavior && this.behavior.shouldNotify(oldWidget.behavior);
         }
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {

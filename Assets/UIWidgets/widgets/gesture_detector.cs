@@ -325,7 +325,7 @@ namespace UIWidgets.widgets {
                 D.assert(gestures[type] != null);
                 D.assert(gestures[type]._debugAssertTypeMatches(type));
                 D.assert(!this._recognizers.ContainsKey(type));
-                this._recognizers[type] = oldRecognizers[type] ?? gestures[type].constructorRaw();
+                this._recognizers[type] = oldRecognizers.ContainsKey(type) ? oldRecognizers[type] : gestures[type].constructorRaw();
                 D.assert(this._recognizers[type].GetType() == type,
                     "GestureRecognizerFactory of type " + type + " created a GestureRecognizer of type " +
                     this._recognizers[type].GetType() +

@@ -5,9 +5,9 @@ using UnityEngine;
 
 namespace UIWidgets.rendering {
     public class RenderSliverPadding : RenderObjectWithChildMixinRenderSliver<RenderSliver> {
-        RenderSliverPadding(
-            EdgeInsets padding,
-            RenderSliver child
+        public RenderSliverPadding(
+            EdgeInsets padding = null,
+            RenderSliver child = null
         ) {
             this._padding = padding;
             this.child = child;

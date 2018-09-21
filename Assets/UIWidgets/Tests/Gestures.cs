@@ -29,8 +29,6 @@ namespace UIWidgets.Tests {
 
         private WindowAdapter windowAdapter;
 
-        private RendererBindings rendererBindings;
-
         [NonSerialized] private bool hasInvoked = false;
 
         void OnGUI() {
@@ -40,7 +38,9 @@ namespace UIWidgets.Tests {
                 this.hasInvoked = true;
 
                 var renderBox = this._options[this._selected]();
-                this.rendererBindings.setRoot(renderBox);
+                if (this.windowAdapter != null) {
+                    this.windowAdapter.attachRootRenderBox(renderBox);
+                }
             }
 
             if (this.windowAdapter != null) {
@@ -56,21 +56,19 @@ namespace UIWidgets.Tests {
 
         private void OnEnable() {
             this.windowAdapter = new WindowAdapter(this);
-            this.rendererBindings = new RendererBindings(this.windowAdapter);
 
-            this._tapRecognizer = new TapGestureRecognizer(this.rendererBindings.rendererBinding);
+            this._tapRecognizer = new TapGestureRecognizer();
             this._tapRecognizer.onTap = () => { Debug.Log("tap"); };
 
-            this._panRecognizer = new PanGestureRecognizer(this.rendererBindings.rendererBinding);
+            this._panRecognizer = new PanGestureRecognizer();
             this._panRecognizer.onUpdate = (details) => { Debug.Log("onUpdate " + details); };
 
-            this._doubleTapGesture = new DoubleTapGestureRecognizer(this.rendererBindings.rendererBinding);
+            this._doubleTapGesture = new DoubleTapGestureRecognizer();
             this._doubleTapGesture.onDoubleTap = () => { Debug.Log("onDoubleTap"); };
         }
 
         void OnDestroy() {
             this.windowAdapter = null;
-            this.rendererBindings = null;
         }
 
         TapGestureRecognizer _tapRecognizer;

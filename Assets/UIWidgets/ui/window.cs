@@ -1,6 +1,7 @@
 ﻿using System;
 using UIWidgets.async;
 using UIWidgets.service;
+using UIWidgets.foundation;
 
 namespace UIWidgets.ui {
     public delegate void VoidCallback();
@@ -10,6 +11,25 @@ namespace UIWidgets.ui {
     public delegate void PointerDataPacketCallback(PointerDataPacket packet);
 
     public abstract class Window {
+        public static Window instance {
+            get {
+                D.assert(_instance != null, "Window.instance is null");
+                return _instance;
+            }
+            
+            set {
+                if (value == null) {
+                    D.assert(_instance != null, "Window.instance is already cleared.");
+                    _instance = null;
+                } else {
+                    D.assert(_instance == null, "Window.instance is already assigned.");
+                    _instance = value;
+                }
+            }
+        }
+
+        static Window _instance;
+        
         public double devicePixelRatio {
             get { return this._devicePixelRatio; }
         }

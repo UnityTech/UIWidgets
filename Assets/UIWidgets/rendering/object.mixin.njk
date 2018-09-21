@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace UIWidgets.rendering {
 {% macro RenderObjectWithChildMixin(with) %}
-    public abstract class RenderObjectWithChildMixin{{with}}<ChildType> : {{with}}, RenderObjectWithChildMixin where ChildType : RenderObject {
+    public abstract class RenderObjectWithChildMixin{{with}}<ChildType> : {{with}}, RenderObjectWithChildMixin<ChildType>, RenderObjectWithChildMixin where ChildType : RenderObject {
         internal ChildType _child;
 
         public ChildType child {

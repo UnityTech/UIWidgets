@@ -8,6 +8,7 @@ using UIWidgets.gestures;
 using UIWidgets.painting;
 using UIWidgets.rendering;
 using UIWidgets.scheduler;
+using UIWidgets.ui;
 
 namespace UIWidgets.widgets {
     public delegate Widget ViewportBuilder(BuildContext context, ViewportOffset position);
@@ -102,6 +103,7 @@ namespace UIWidgets.widgets {
         }
 
         public readonly ScrollableState scrollable;
+
         public readonly ScrollPosition position;
 
         public override bool updateShouldNotify(InheritedWidget old) {
@@ -110,8 +112,6 @@ namespace UIWidgets.widgets {
     }
 
     public class ScrollableState : TickerProviderStateMixin<Scrollable>, ScrollContext {
-        public SchedulerBinding schedulerBinding { get; set; }
-
         public ScrollPosition position {
             get { return this._position; }
         }
@@ -140,17 +140,15 @@ namespace UIWidgets.widgets {
                     controller.detach(oldPosition);
                 }
 
-                this.schedulerBinding.window.scheduleMicrotask(oldPosition.dispose);
+                Window.instance.scheduleMicrotask(oldPosition.dispose);
             }
 
-            if (controller != null) {
-                this._position = controller.createScrollPosition(this._physics, this, oldPosition);
-            }
-
+            this._position = controller == null
+                ? null
+                : controller.createScrollPosition(this._physics, this, oldPosition);
             this._position = this._position
                              ?? new ScrollPositionWithSingleContext(physics: this._physics, context: this,
                                  oldPosition: oldPosition);
-
             D.assert(this.position != null);
             if (controller != null) {
                 controller.attach(this.position);
@@ -182,7 +180,7 @@ namespace UIWidgets.widgets {
                 }
             } while (newPhysics != null || oldPhysics != null);
 
-            Type controllerType = widget.controller == null ? null : widget.controller.GetType();
+            Type controllerType = this.widget.controller == null ? null : this.widget.controller.GetType();
             Type oldControllerType = oldWidget.controller == null ? null : oldWidget.controller.GetType();
             return controllerType != oldControllerType;
         }
@@ -215,8 +213,8 @@ namespace UIWidgets.widgets {
             base.dispose();
         }
 
-        GlobalKey<RawGestureDetectorState> _gestureDetectorKey = GlobalKey<RawGestureDetectorState>.key();
-        GlobalKey _ignorePointerKey = GlobalKey.key();
+        readonly GlobalKey<RawGestureDetectorState> _gestureDetectorKey = GlobalKey<RawGestureDetectorState>.key();
+        readonly GlobalKey _ignorePointerKey = GlobalKey.key();
 
         Dictionary<Type, GestureRecognizerFactory> _gestureRecognizers =
             new Dictionary<Type, GestureRecognizerFactory>();

@@ -10,114 +10,171 @@ namespace UIWidgets.widgets {
     }
 
     public class WidgetsBinding : RendererBinding {
-        public WidgetsBinding(Window window) : base(window) {
-            _buildOwner = new BuildOwner(window);
+        public static new WidgetsBinding instance {
+            get { return (WidgetsBinding) RendererBinding.instance; }
+            set { RendererBinding.instance = value; }
+        }
+
+        public WidgetsBinding() {
             this.buildOwner.onBuildScheduled = this._handleBuildScheduled;
-            window.onLocaleChanged += this.handleLocaleChanged;
+            Window.instance.onLocaleChanged += this.handleLocaleChanged;
         }
 
         public BuildOwner buildOwner {
             get { return this._buildOwner; }
         }
 
-        private readonly BuildOwner _buildOwner;
+        private readonly BuildOwner _buildOwner = new BuildOwner();
 
-        public Element renderViewElement {
-            get { return this._renderViewElement; }
+        public FocusManager focusManager {
+            get { return this._buildOwner.focusManager; }
         }
 
-        Element _renderViewElement;
+        readonly List<WidgetsBindingObserver> _observers = new List<WidgetsBindingObserver>();
 
-        public List<WidgetsBindingObserver> _observers = new List<WidgetsBindingObserver>();
+        public void addObserver(WidgetsBindingObserver observer) {
+            this._observers.Add(observer);
+        }
 
-        void addObserver(WidgetsBindingObserver observer) {
-            _observers.Add(observer);
+        public bool removeObserver(WidgetsBindingObserver observer) {
+            return this._observers.Remove(observer);
         }
 
         protected override void handleMetricsChanged() {
             base.handleMetricsChanged();
-            foreach (WidgetsBindingObserver observer in _observers) {
+            foreach (WidgetsBindingObserver observer in this._observers) {
                 observer.didChangeMetrics();
             }
         }
 
-        bool removeObserver(WidgetsBindingObserver observer) {
-            return _observers.Remove(observer);
+        void handleLocaleChanged() {
+            // todo
+            // dispatchLocaleChanged(window.locale);
         }
 
         void _handleBuildScheduled() {
-            ensureVisualUpdate();
+            D.assert(() => {
+                if (this.debugBuildingDirtyElements) {
+                    throw new UIWidgetsError(
+                        "Build scheduled during frame.\n" +
+                        "While the widget tree was being built, laid out, and painted, " +
+                        "a new frame was scheduled to rebuild the widget tree. " +
+                        "This might be because setState() was called from a layout or " +
+                        "paint callback. " +
+                        "If a change is needed to the widget tree, it should be applied " +
+                        "as the tree is being built. Scheduling a change for the subsequent " +
+                        "frame instead results in an interface that lags behind by one frame. " +
+                        "If this was done to make your build dependent on a size measured at " +
+                        "layout time, consider using a LayoutBuilder, CustomSingleChildLayout, " +
+                        "or CustomMultiChildLayout. If, on the other hand, the one frame delay " +
+                        "is the desired effect, for example because this is an " +
+                        "animation, consider scheduling the frame in a post-frame callback " +
+                        "using SchedulerBinding.addPostFrameCallback or " +
+                        "using an AnimationController to trigger the animation."
+                    );
+                }
+
+                return true;
+            });
+
+            this.ensureVisualUpdate();
         }
 
-        void handleLocaleChanged() {
-            // todo
-//            dispatchLocaleChanged(window.locale);
-        }
+        protected bool debugBuildingDirtyElements = false;
 
         protected override void drawFrame() {
-            if (renderViewElement != null) {
-                buildOwner.buildScope(renderViewElement);
-            }
+            D.assert(!this.debugBuildingDirtyElements);
+            D.assert(() => {
+                this.debugBuildingDirtyElements = true;
+                return true;
+            });
+            try {
+                if (this.renderViewElement != null) {
+                    this.buildOwner.buildScope(this.renderViewElement);
+                }
 
-            base.drawFrame();
-            buildOwner.finalizeTree();
+                base.drawFrame();
+                this.buildOwner.finalizeTree();
+            }
+            finally {
+                D.assert(() => {
+                    this.debugBuildingDirtyElements = false;
+                    return true;
+                });
+            }
         }
 
+        public RenderObjectToWidgetElement<RenderBox> renderViewElement {
+            get { return this._renderViewElement; }
+        }
+
+        RenderObjectToWidgetElement<RenderBox> _renderViewElement;
+
         public void attachRootWidget(Widget rootWidget) {
-            var _adapter = new RenderObjectToWidgetAdapter<RenderBox>(
-                container: renderView,
+            this._renderViewElement = new RenderObjectToWidgetAdapter<RenderBox>(
+                container: this.renderView,
+                debugShortDescription: "[root]",
                 child: rootWidget
-            );
-            _renderViewElement = _adapter.attachToRenderTree(buildOwner,
-                _renderViewElement as RenderObjectToWidgetElement<RenderBox>);
+            ).attachToRenderTree(this.buildOwner, this._renderViewElement);
         }
     }
 
     public class RenderObjectToWidgetAdapter<T> : RenderObjectWidget where T : RenderObject {
-        public RenderObjectToWidgetAdapter(Widget child, RenderObjectWithChildMixinRenderObject<T> container) : base(
-            new GlobalObjectKey<State<StatefulWidget>>(container)) {
+        public RenderObjectToWidgetAdapter(
+            Widget child = null,
+            RenderObjectWithChildMixin<T> container = null,
+            string debugShortDescription = null
+        ) : base(
+            new GlobalObjectKey<State>(container)) {
             this.child = child;
             this.container = container;
+            this.debugShortDescription = debugShortDescription;
         }
 
-        public Widget child;
+        public readonly Widget child;
 
-        public RenderObjectWithChildMixinRenderObject<T> container;
+        public readonly RenderObjectWithChildMixin<T> container;
 
-        public string debugShortDescription;
+        public readonly string debugShortDescription;
 
         public override Element createElement() {
             return new RenderObjectToWidgetElement<T>(this);
         }
 
         public override RenderObject createRenderObject(BuildContext context) {
-            return container;
+            return (RenderObject) this.container;
         }
 
-        public void updateRenderObject(BuildContext context, RenderObject renderObject) {
+        public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
         }
 
         public RenderObjectToWidgetElement<T> attachToRenderTree(BuildOwner owner,
             RenderObjectToWidgetElement<T> element) {
             if (element == null) {
-                element = (RenderObjectToWidgetElement<T>) createElement();
-                element.assignOwner(owner);
+                owner.lockState(() => {
+                    element = (RenderObjectToWidgetElement<T>) this.createElement();
+                    D.assert(element != null);
+                    element.assignOwner(owner);
+                });
                 owner.buildScope(element, () => { element.mount(null, null); });
-            }
-            else {
+            } else {
                 element._newWidget = this;
                 element.markNeedsBuild();
             }
 
             return element;
         }
+
+        public override string toStringShort() {
+            return this.debugShortDescription ?? base.toStringShort();
+        }
     }
 
     public class RenderObjectToWidgetElement<T> : RootRenderObjectElement where T : RenderObject {
-        public RenderObjectToWidgetElement(RenderObjectWidget widget) : base(widget) {
+        public RenderObjectToWidgetElement(RenderObjectToWidgetAdapter<T> widget) : base(widget) {
         }
 
-        public RenderObjectToWidgetAdapter<T> widget {
+        public new RenderObjectToWidgetAdapter<T> widget {
             get { return (RenderObjectToWidgetAdapter<T>) base.widget; }
         }
 
@@ -125,48 +182,68 @@ namespace UIWidgets.widgets {
 
         static readonly object _rootChildSlot = new object();
 
-        public Widget _newWidget;
-
-        public new RenderObjectWithChildMixin renderObject {
-            get { return base.renderObject as RenderObjectWithChildMixin; }
-        }
-
         public override void visitChildren(ElementVisitor visitor) {
-            if (_child != null)
-                visitor(_child);
+            if (this._child != null) {
+                visitor(this._child);
+            }
         }
 
         protected override void forgetChild(Element child) {
-            D.assert(child == _child);
-            _child = null;
+            D.assert(child == this._child);
+            this._child = null;
         }
 
         public override void mount(Element parent, object newSlot) {
             D.assert(parent == null);
             base.mount(parent, newSlot);
-            _rebuild();
+            this._rebuild();
         }
 
         public override void update(Widget newWidget) {
             base.update(newWidget);
-            D.assert(widget == newWidget);
-            _rebuild();
+            D.assert(this.widget == newWidget);
+            this._rebuild();
         }
 
+        internal Widget _newWidget;
+
         protected override void performRebuild() {
-            if (_newWidget != null) {
-                Widget newWidget = _newWidget;
-                _newWidget = null;
-                update(newWidget);
+            if (this._newWidget != null) {
+                Widget newWidget = this._newWidget;
+                this._newWidget = null;
+                this.update(newWidget);
             }
 
             base.performRebuild();
-            D.assert(_newWidget == null);
+            D.assert(this._newWidget == null);
+        }
+
+        void _rebuild() {
+            try {
+                this._child = this.updateChild(this._child, this.widget.child, _rootChildSlot);
+                // allow 
+            }
+            catch (Exception ex) {
+                var details = new UIWidgetsErrorDetails(
+                    exception: ex,
+                    library: "widgets library",
+                    context: "attaching to the render tree"
+                );
+                UIWidgetsError.reportError(details);
+
+                Widget error = ErrorWidget.builder(details);
+                this._child = this.updateChild(null, error, _rootChildSlot);
+            }
+        }
+
+        public new RenderObjectWithChildMixin<T> renderObject {
+            get { return (RenderObjectWithChildMixin<T>) base.renderObject; }
         }
 
         protected override void insertChildRenderObject(RenderObject child, object slot) {
             D.assert(slot == _rootChildSlot);
-            renderObject.child = child;
+            D.assert(this.renderObject.debugValidateChild(child));
+            this.renderObject.child = (T) child;
         }
 
         protected override void moveChildRenderObject(RenderObject child, object slot) {
@@ -174,33 +251,8 @@ namespace UIWidgets.widgets {
         }
 
         protected override void removeChildRenderObject(RenderObject child) {
-            D.assert(renderObject.child == child);
-            renderObject.child = null;
-        }
-
-        void _rebuild() {
-            try {
-                _child = updateChild(_child, widget.child, _rootChildSlot);
-                D.assert(_child != null);
-            }
-            catch (Exception e) {
-                Widget error = ErrorWidget.builder(new UIWidgetsErrorDetails(e));
-                _child = updateChild(null, error, _rootChildSlot);
-            }
-        }
-    }
-
-    public class WidgetsBindings {
-        public WidgetsBindings(Window window) {
-            this.window = window;
-            this.widgetsBinding = new WidgetsBinding(window);
-        }
-
-        public readonly Window window;
-        public readonly WidgetsBinding widgetsBinding;
-
-        public void attachRootWidget(Widget root) {
-            this.widgetsBinding.attachRootWidget(root);
+            D.assert(this.renderObject.child == child);
+            this.renderObject.child = null;
         }
     }
 }

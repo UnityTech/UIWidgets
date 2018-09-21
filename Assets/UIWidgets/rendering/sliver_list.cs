@@ -2,7 +2,7 @@ using System;
 
 namespace UIWidgets.rendering {
     public class RenderSliverList : RenderSliverMultiBoxAdaptor {
-        RenderSliverList(
+        public RenderSliverList(
             RenderSliverBoxChildManager childManager = null
         ) : base(childManager: childManager) {
         }
@@ -160,7 +160,7 @@ namespace UIWidgets.rendering {
                     lastIndex: this.indexOf(this.lastChild),
                     leadingScrollOffset: this.childScrollOffset(this.firstChild),
                     trailingScrollOffset: endScrollOffset
-                );
+                ).Value;
             }
 
             double paintExtent = this.calculatePaintOffset(

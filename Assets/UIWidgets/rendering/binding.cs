@@ -6,13 +6,17 @@ using UIWidgets.ui;
 
 namespace UIWidgets.rendering {
     public class RendererBinding : GestureBinding {
-        public RendererBinding(Window window) : base(window) {
+        public static new RendererBinding instance {
+            get { return (RendererBinding) GestureBinding.instance; }
+            set { GestureBinding.instance = value; }
+        }
+        
+        public RendererBinding() {
             this._pipelineOwner = new PipelineOwner(
-                binding: this,
                 onNeedVisualUpdate: this.ensureVisualUpdate
             );
 
-            window.onMetricsChanged += this.handleMetricsChanged;
+            Window.instance.onMetricsChanged += this.handleMetricsChanged;
             this.initRenderView();
             D.assert(this.renderView != null);
             this.addPersistentFrameCallback(this._handlePersistentFrameCallback);
@@ -41,9 +45,9 @@ namespace UIWidgets.rendering {
         }
 
         protected virtual ViewConfiguration createViewConfiguration() {
-            var devicePixelRatio = this.window.devicePixelRatio;
+            var devicePixelRatio = Window.instance.devicePixelRatio;
             return new ViewConfiguration(
-                size: this.window.physicalSize / devicePixelRatio,
+                size: Window.instance.physicalSize / devicePixelRatio,
                 devicePixelRatio: devicePixelRatio
             );
         }
@@ -63,20 +67,6 @@ namespace UIWidgets.rendering {
             D.assert(this.renderView != null);
             this.renderView.hitTest(result, position: position);
             base.hitTest(result, position);
-        }
-    }
-
-    public class RendererBindings {
-        public RendererBindings(Window window) {
-            this.window = window;
-            this.rendererBinding = new RendererBinding(window);
-        }
-
-        public readonly Window window;
-        public readonly RendererBinding rendererBinding;
-
-        public void setRoot(RenderBox root) {
-            this.rendererBinding.renderView.child = root;
         }
     }
 }

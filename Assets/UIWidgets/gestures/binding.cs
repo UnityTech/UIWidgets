@@ -7,16 +7,21 @@ using UnityEngine;
 
 namespace UIWidgets.gestures {
     public class GestureBinding : SchedulerBinding, HitTestable, HitTestDispatcher, HitTestTarget {
-        public GestureBinding(Window window) : base(window) {
-            this.window.onPointerEvent += this._handlePointerDataPacket;
+        public static new GestureBinding instance {
+            get { return (GestureBinding) SchedulerBinding.instance; }
+            set { SchedulerBinding.instance = value; }
+        }
 
-            this.gestureArena = new GestureArenaManager(window);
+        public GestureBinding() {
+            Window.instance.onPointerEvent += this._handlePointerDataPacket;
+
+            this.gestureArena = new GestureArenaManager();
         }
 
         readonly Queue<PointerEvent> _pendingPointerEvents = new Queue<PointerEvent>();
         
         void _handlePointerDataPacket(PointerDataPacket packet) {
-            foreach (var pointerEvent in PointerEventConverter.expand(packet.data, this.window.devicePixelRatio)) {
+            foreach (var pointerEvent in PointerEventConverter.expand(packet.data, Window.instance.devicePixelRatio)) {
                 this._pendingPointerEvents.Enqueue(pointerEvent);
             }
 
@@ -25,7 +30,7 @@ namespace UIWidgets.gestures {
 
         public void cancelPointer(int pointer) {
             if (this._pendingPointerEvents.isEmpty()) {
-                this.window.scheduleMicrotask(this._flushPointerEventQueue);
+                Window.instance.scheduleMicrotask(this._flushPointerEventQueue);
             }
 
             this._pendingPointerEvents.Enqueue(

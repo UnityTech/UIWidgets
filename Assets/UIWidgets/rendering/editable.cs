@@ -103,6 +103,11 @@ namespace UIWidgets.rendering
 //            _tap.onTapDown = this._handleTapDown;
 //            _tap.onTap = this._handleTap;
 //            _doubleTap.onDoubleTap = this._handleDoubleTap;
+            _tap = new TapGestureRecognizer(this);
+            _doubleTap = new DoubleTapGestureRecognizer(this);
+            _tap.onTapDown = this._handleTapDown;
+            _tap.onTap = this._handleTap;
+            _doubleTap.onDoubleTap = this._handleDoubleTap;
         }
 
         public bool obscureText

@@ -111,7 +111,7 @@ namespace UIWidgets.rendering {
             var builder = new SceneBuilder();
             this.layer.addToScene(builder, Offset.zero);
             var scene = builder.build();
-            this.owner.binding.window.render(scene);
+            Window.instance.render(scene);
         }
 
         public override Rect paintBounds {
