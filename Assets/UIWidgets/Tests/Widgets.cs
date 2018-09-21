@@ -12,8 +12,6 @@ namespace UIWidgets.Tests {
     public class Widgets : EditorWindow {
         private WindowAdapter windowAdapter;
 
-        private WidgetsBindings widgetsBindings;
-
         private PaintingBinding paintingBinding;
 
         private readonly Func<Widget>[] _options;
@@ -44,9 +42,7 @@ namespace UIWidgets.Tests {
 
                 var rootWidget = this._options[this._selected]();
                 
-                if (widgetsBindings != null) {
-                    widgetsBindings.attachRootWidget(rootWidget);
-                }
+                this.windowAdapter.attachRootWidget(rootWidget);
             }
 
             if (this.windowAdapter != null) {
@@ -64,12 +60,10 @@ namespace UIWidgets.Tests {
             this.paintingBinding = new PaintingBinding(null);
             paintingBinding.initInstances();
             this.windowAdapter = new WindowAdapter(this);
-            this.widgetsBindings = new WidgetsBindings(windowAdapter);
         }
 
         void OnDestroy() {
             this.windowAdapter = null;
-            this.widgetsBindings = null;
         }
 
         Widget flexRow() {

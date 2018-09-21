@@ -10,10 +10,8 @@ namespace UIWidgets.gestures {
 
     class _TapTracker {
         internal _TapTracker(
-            GestureBinding binding = null,
             PointerDownEvent evt = null,
             GestureArenaEntry entry = null) {
-            this._binding = binding;
             this.pointer = evt.pointer;
             this._initialPosition = evt.position;
             this.entry = entry;
@@ -22,21 +20,20 @@ namespace UIWidgets.gestures {
         public readonly int pointer;
         public readonly GestureArenaEntry entry;
         readonly Offset _initialPosition;
-        readonly GestureBinding _binding;
 
         bool _isTrackingPointer = false;
 
         public void startTrackingPointer(PointerRoute route) {
             if (!this._isTrackingPointer) {
                 this._isTrackingPointer = true;
-                this._binding.pointerRouter.addRoute(this.pointer, route);
+                GestureBinding.instance.pointerRouter.addRoute(this.pointer, route);
             }
         }
 
         public void stopTrackingPointer(PointerRoute route) {
             if (this._isTrackingPointer) {
                 this._isTrackingPointer = false;
-                this._binding.pointerRouter.removeRoute(this.pointer, route);
+                GestureBinding.instance.pointerRouter.removeRoute(this.pointer, route);
             }
         }
 
@@ -47,9 +44,8 @@ namespace UIWidgets.gestures {
     }
 
     public class DoubleTapGestureRecognizer : GestureRecognizer {
-        public DoubleTapGestureRecognizer(
-            GestureBinding binding = null, object debugOwner = null)
-            : base(binding: binding, debugOwner: debugOwner) {
+        public DoubleTapGestureRecognizer(object debugOwner = null)
+            : base(debugOwner: debugOwner) {
         }
 
         public GestureDoubleTapCallback onDoubleTap;
@@ -66,9 +62,8 @@ namespace UIWidgets.gestures {
 
             this._stopDoubleTapTimer();
             _TapTracker tracker = new _TapTracker(
-                binding: this._binding,
                 evt: evt,
-                entry: this._binding.gestureArena.add(evt.pointer, this)
+                entry: GestureBinding.instance.gestureArena.add(evt.pointer, this)
             );
             this._trackers[evt.pointer] = tracker;
             tracker.startTrackingPointer(this._handleEvent);
@@ -131,7 +126,7 @@ namespace UIWidgets.gestures {
                 _TapTracker tracker = this._firstTap;
                 this._firstTap = null;
                 this._reject(tracker);
-                this._binding.gestureArena.release(tracker.pointer);
+                GestureBinding.instance.gestureArena.release(tracker.pointer);
             }
 
             this._clearTrackers();
@@ -139,7 +134,7 @@ namespace UIWidgets.gestures {
 
         void _registerFirstTap(_TapTracker tracker) {
             this._startDoubleTapTimer();
-            this._binding.gestureArena.hold(tracker.pointer);
+            GestureBinding.instance.gestureArena.hold(tracker.pointer);
             this._freezeTracker(tracker);
             this._trackers.Remove(tracker.pointer);
             this._clearTrackers();
@@ -173,7 +168,7 @@ namespace UIWidgets.gestures {
         void _startDoubleTapTimer() {
             this._doubleTapTimer =
                 this._doubleTapTimer
-                ?? this._binding.window.run(Constants.kDoubleTapTimeout, this._reset);
+                ?? Window.instance.run(Constants.kDoubleTapTimeout, this._reset);
         }
 
         void _stopDoubleTapTimer() {

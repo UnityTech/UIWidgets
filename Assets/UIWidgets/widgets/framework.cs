@@ -178,7 +178,11 @@ namespace UIWidgets.widgets {
         }
 
         internal Element _currentElement {
-            get { return _registry[this]; }
+            get {
+                Element result;
+                _registry.TryGetValue(this, out result);
+                return result;
+            }
         }
 
         public BuildContext currentContext {
@@ -189,14 +193,14 @@ namespace UIWidgets.widgets {
             get { return this._currentElement == null ? null : this._currentElement.widget; }
         }
 
-        public State<StatefulWidget> currentState {
+        public State currentState {
             get {
                 Element element = this._currentElement;
                 if (element is StatefulElement) {
                     var statefulElement = (StatefulElement) element;
                     State state = statefulElement.state;
-                    if (state is State<StatefulWidget>) {
-                        return (State<StatefulWidget>) state;
+                    if (state is State) {
+                        return (State) state;
                     }
                 }
 
@@ -205,8 +209,8 @@ namespace UIWidgets.widgets {
         }
     }
 
-    public abstract class GlobalKey<T> : GlobalKey where T : State<StatefulWidget> {
-        public new static GlobalKey key(string debugLabel = null) {
+    public abstract class GlobalKey<T> : GlobalKey where T : State {
+        public new static GlobalKey<T> key(string debugLabel = null) {
             return new LabeledGlobalKey<T>(debugLabel);
         }
 
@@ -226,7 +230,7 @@ namespace UIWidgets.widgets {
         }
     }
 
-    public class LabeledGlobalKey<T> : GlobalKey<T> where T : State<StatefulWidget> {
+    public class LabeledGlobalKey<T> : GlobalKey<T> where T : State {
         public LabeledGlobalKey(string _debugLabel = null) {
             this._debugLabel = _debugLabel;
         }
@@ -243,7 +247,7 @@ namespace UIWidgets.widgets {
         }
     }
 
-    public class GlobalObjectKey<T> : GlobalKey<T>, IEquatable<GlobalObjectKey<T>> where T : State<StatefulWidget> {
+    public class GlobalObjectKey<T> : GlobalKey<T>, IEquatable<GlobalObjectKey<T>> where T : State {
         public GlobalObjectKey(object value) {
             this.value = value;
         }
@@ -277,7 +281,7 @@ namespace UIWidgets.widgets {
 
         public override string ToString() {
             String selfType = this.GetType().ToString();
-            string suffix = "<State<StatefulWidget>>";
+            string suffix = "`1[UIWidgets.widgets.State]";
             if (selfType.EndsWith(suffix)) {
                 selfType = selfType.Substring(0, selfType.Length - suffix.Length);
             }
@@ -1167,7 +1171,7 @@ namespace UIWidgets.widgets {
         public virtual void visitChildren(ElementVisitor visitor) {
         }
 
-        public void debugVisitOnstageChildren(ElementVisitor visitor) {
+        public virtual void debugVisitOnstageChildren(ElementVisitor visitor) {
             this.visitChildren(visitor);
         }
 
@@ -1189,7 +1193,7 @@ namespace UIWidgets.widgets {
             this.visitChildren(visitor);
         }
 
-        protected Element updateChild(Element child, Widget newWidget, object newSlot) {
+        protected virtual Element updateChild(Element child, Widget newWidget, object newSlot) {
             D.assert(() => {
                 if (newWidget != null && newWidget.key is GlobalKey) {
                     GlobalKey key = (GlobalKey) newWidget.key;
@@ -1671,7 +1675,10 @@ namespace UIWidgets.widgets {
 
         public virtual InheritedWidget inheritFromWidgetOfExactType(Type targetType, object aspect = null) {
             D.assert(this._debugCheckStateIsActiveForAncestorLookup());
-            InheritedElement ancestor = this._inheritedWidgets == null ? null : this._inheritedWidgets[targetType];
+            InheritedElement ancestor = null;
+            if (this._inheritedWidgets != null) {
+                this._inheritedWidgets.TryGetValue(targetType, out ancestor);
+            }
             if (ancestor != null) {
                 return this.inheritFromElement(ancestor, aspect: aspect);
             }
@@ -1682,7 +1689,10 @@ namespace UIWidgets.widgets {
 
         public virtual InheritedElement ancestorInheritedElementForWidgetOfExactType(Type targetType) {
             D.assert(this._debugCheckStateIsActiveForAncestorLookup());
-            InheritedElement ancestor = this._inheritedWidgets == null ? null : this._inheritedWidgets[targetType];
+            InheritedElement ancestor = null;
+            if (this._inheritedWidgets != null) {
+                this._inheritedWidgets.TryGetValue(targetType, out ancestor);
+            }
             return ancestor;
         }
 
@@ -2340,7 +2350,9 @@ namespace UIWidgets.widgets {
         internal readonly Dictionary<Element, object> _dependents = new Dictionary<Element, object>();
 
         internal override void _updateInheritance() {
-            Dictionary<Type, InheritedElement> incomingWidgets = this._parent == null ? null : this._inheritedWidgets;
+            Dictionary<Type, InheritedElement> incomingWidgets =
+                this._parent == null ? null : this._parent._inheritedWidgets;
+            
             if (incomingWidgets != null) {
                 this._inheritedWidgets = new Dictionary<Type, InheritedElement>(incomingWidgets);
             } else {
@@ -2423,7 +2435,7 @@ namespace UIWidgets.widgets {
         }
 
         ParentDataElement<RenderObjectWidget> _findAncestorParentDataElement() {
-            Element ancestor = _parent;
+            Element ancestor = this._parent;
             while (ancestor != null && !(ancestor is RenderObjectElement)) {
                 var element = ancestor as ParentDataElement<RenderObjectWidget>;
                 if (element != null) {

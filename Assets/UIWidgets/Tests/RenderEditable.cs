@@ -10,10 +10,8 @@ using UIWidgets.painting;
 using UIWidgets.rendering;
 using UIWidgets.service;
 using UIWidgets.ui;
-using UnityEditor;
 using UnityEngine;
 using Color = UIWidgets.ui.Color;
-using FontStyle = UIWidgets.ui.FontStyle;
 
 namespace UIWidgets.Tests
 {
@@ -55,8 +53,8 @@ namespace UIWidgets.Tests
             public override void jumpTo(double pixels) {
             }
 
-            public override IPromise<object> animateTo(double to, TimeSpan duration, Curve curve) {
-                return Promise<object>.Resolved(null);
+            public override IPromise animateTo(double to, TimeSpan duration, Curve curve) {
+                return Promise.Resolved();
             }
 
             public override ScrollDirection userScrollDirection {
@@ -79,8 +77,6 @@ namespace UIWidgets.Tests
 
         private WindowAdapter windowAdapter;
 
-        private RendererBindings rendererBindings;
-
         [NonSerialized] private bool hasInvoked = false;
 
         void OnGUI() {
@@ -90,7 +86,9 @@ namespace UIWidgets.Tests
                 this.hasInvoked = true;
 
                 var renderBox = this._options[this._selected]();
-                this.rendererBindings.setRoot(renderBox);
+                if (this.windowAdapter != null) {
+                    this.windowAdapter.attachRootRenderBox(renderBox);
+                }
             }
 
             if (this.windowAdapter != null) {
@@ -106,12 +104,10 @@ namespace UIWidgets.Tests
 
         private void OnEnable() {
             this.windowAdapter = new WindowAdapter(this);
-            this.rendererBindings = new RendererBindings(this.windowAdapter);
         }
 
         void OnDestroy() {
             this.windowAdapter = null;
-            this.rendererBindings = null;
         }
 
         private RenderBox box(RenderBox p, int width = 400, int height = 400)
@@ -158,7 +154,7 @@ namespace UIWidgets.Tests
 
             flexbox.add(flexItemBox(
                 new rendering.RenderEditable(span, TextDirection.ltr, 
-                    new _FixedViewportOffset(0.0), new ValueNotifier<bool>(true), this.rendererBindings.rendererBinding,
+                    new _FixedViewportOffset(0.0), new ValueNotifier<bool>(true),
                     onSelectionChanged: selectionChanged, cursorColor: Color.fromARGB(255, 0, 0, 0), 
                     maxLines: 100,
                     selectionColor: Color.fromARGB(255, 255, 0, 0))
@@ -171,7 +167,7 @@ namespace UIWidgets.Tests
                 }, style:new painting.TextStyle(height:1.0));
             flexbox.add(flexItemBox(
                 new rendering.RenderEditable(span, TextDirection.ltr, 
-                    new _FixedViewportOffset(0.0), new ValueNotifier<bool>(true), this.rendererBindings.rendererBinding,
+                    new _FixedViewportOffset(0.0), new ValueNotifier<bool>(true),
                     onSelectionChanged: selectionChanged, cursorColor: Color.fromARGB(255, 0, 0, 0), 
                     maxLines: 100,
                     selectionColor: Color.fromARGB(255, 255, 0, 0))
@@ -184,7 +180,7 @@ namespace UIWidgets.Tests
                 }, style:new painting.TextStyle(height:1.0));
             flexbox.add(flexItemBox(
                 new rendering.RenderEditable(span, TextDirection.ltr, 
-                    new _FixedViewportOffset(0.0), new ValueNotifier<bool>(true), this.rendererBindings.rendererBinding,
+                    new _FixedViewportOffset(0.0), new ValueNotifier<bool>(true),
                     onSelectionChanged: selectionChanged, cursorColor: Color.fromARGB(255, 0, 0, 0), 
                     selectionColor: Color.fromARGB(255, 255, 0, 0))
             , width:300));

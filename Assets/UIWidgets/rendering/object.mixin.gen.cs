@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace UIWidgets.rendering {
 
-    public abstract class RenderObjectWithChildMixinRenderObject<ChildType> : RenderObject, RenderObjectWithChildMixin where ChildType : RenderObject {
+    public abstract class RenderObjectWithChildMixinRenderObject<ChildType> : RenderObject, RenderObjectWithChildMixin<ChildType>, RenderObjectWithChildMixin where ChildType : RenderObject {
         internal ChildType _child;
 
         public ChildType child {
@@ -81,7 +81,7 @@ namespace UIWidgets.rendering {
     }
 
 
-    public abstract class RenderObjectWithChildMixinRenderBox<ChildType> : RenderBox, RenderObjectWithChildMixin where ChildType : RenderObject {
+    public abstract class RenderObjectWithChildMixinRenderBox<ChildType> : RenderBox, RenderObjectWithChildMixin<ChildType>, RenderObjectWithChildMixin where ChildType : RenderObject {
         internal ChildType _child;
 
         public ChildType child {
@@ -156,7 +156,7 @@ namespace UIWidgets.rendering {
     }
 
 
-    public abstract class RenderObjectWithChildMixinRenderSliver<ChildType> : RenderSliver, RenderObjectWithChildMixin where ChildType : RenderObject {
+    public abstract class RenderObjectWithChildMixinRenderSliver<ChildType> : RenderSliver, RenderObjectWithChildMixin<ChildType>, RenderObjectWithChildMixin where ChildType : RenderObject {
         internal ChildType _child;
 
         public ChildType child {

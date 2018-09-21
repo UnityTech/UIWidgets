@@ -265,7 +265,7 @@ namespace UIWidgets.widgets {
         public Offset origin;
         public Alignment alignment;
         public bool transformHitTests;
-        
+
         public override RenderObject createRenderObject(BuildContext context) {
             return new RenderTransform(
                 transform: transform,
@@ -313,6 +313,36 @@ namespace UIWidgets.widgets {
             );
         }
     }
+
+    public class SliverPadding : SingleChildRenderObjectWidget {
+        public SliverPadding(
+            Key key = null,
+            EdgeInsets padding = null,
+            Widget sliver = null
+        ) : base(key: key, child: sliver) {
+            D.assert(padding != null);
+            this.padding = padding;
+        }
+
+        public readonly EdgeInsets padding;
+
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderSliverPadding(
+                padding: this.padding
+            );
+        }
+
+        public override void updateRenderObject(BuildContext context, RenderObject renderObjectRaw) {
+            var renderObject = (RenderSliverPadding) renderObjectRaw;
+            renderObject.padding = this.padding;
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new DiagnosticsProperty<EdgeInsets>("padding", this.padding));
+        }
+    }
+
 
     public class RawImage : LeafRenderObjectWidget {
         public RawImage(Key key, ui.Image image, double width, double height, double scale, Color color,
@@ -365,5 +395,128 @@ namespace UIWidgets.widgets {
         public Alignment alignment;
         public ImageRepeat repeat;
         public Rect centerSlice;
+    }
+
+    public class Listener : SingleChildRenderObjectWidget {
+        public Listener(
+            Key key = null,
+            PointerDownEventListener onPointerDown = null,
+            PointerMoveEventListener onPointerMove = null,
+            PointerUpEventListener onPointerUp = null,
+            PointerCancelEventListener onPointerCancel = null,
+            HitTestBehavior behavior = HitTestBehavior.deferToChild,
+            Widget child = null
+        ) : base(key: key, child: child) {
+            this.onPointerDown = onPointerDown;
+            this.onPointerMove = onPointerMove;
+            this.onPointerUp = onPointerUp;
+            this.onPointerCancel = onPointerCancel;
+            this.behavior = behavior;
+        }
+
+        public readonly PointerDownEventListener onPointerDown;
+
+        public readonly PointerMoveEventListener onPointerMove;
+
+        public readonly PointerUpEventListener onPointerUp;
+
+        public readonly PointerCancelEventListener onPointerCancel;
+
+        public readonly HitTestBehavior behavior;
+
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderPointerListener(
+                onPointerDown: this.onPointerDown,
+                onPointerMove: this.onPointerMove,
+                onPointerUp: this.onPointerUp,
+                onPointerCancel: this.onPointerCancel,
+                behavior: this.behavior
+            );
+        }
+
+        public override void updateRenderObject(BuildContext context, RenderObject renderObjectRaw) {
+            var renderObject = (RenderPointerListener) renderObjectRaw;
+            renderObject.onPointerDown = this.onPointerDown;
+            renderObject.onPointerMove = this.onPointerMove;
+            renderObject.onPointerUp = this.onPointerUp;
+            renderObject.onPointerCancel = this.onPointerCancel;
+            renderObject.behavior = this.behavior;
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            List<string> listeners = new List<string>();
+            if (this.onPointerDown != null) {
+                listeners.Add("down");
+            }
+
+            if (this.onPointerMove != null) {
+                listeners.Add("move");
+            }
+
+            if (this.onPointerUp != null) {
+                listeners.Add("up");
+            }
+
+            if (this.onPointerCancel != null) {
+                listeners.Add("cancel");
+            }
+
+            properties.add(new EnumerableProperty<string>("listeners", listeners, ifEmpty: "<none>"));
+            properties.add(new EnumProperty<HitTestBehavior>("behavior", this.behavior));
+        }
+    }
+
+    public class RepaintBoundary : SingleChildRenderObjectWidget {
+        public RepaintBoundary(Key key = null, Widget child = null) : base(key: key, child: child) {
+        }
+
+        public static RepaintBoundary wrap(Widget child, int childIndex) {
+            D.assert(child != null);
+            Key key = child.key != null ? (Key) new ValueKey<Key>(child.key) : new ValueKey<int>(childIndex);
+            return new RepaintBoundary(key: key, child: child);
+        }
+
+        public static List<RepaintBoundary> wrapAll(List<Widget> widgets) {
+            List<RepaintBoundary> result = new List<RepaintBoundary>(widgets.Count);
+            for (int i = 0; i < result.Count; ++i) {
+                result[i] = RepaintBoundary.wrap(widgets[i], i);
+            }
+
+            return result;
+        }
+
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderRepaintBoundary();
+        }
+    }
+
+    public class IgnorePointer : SingleChildRenderObjectWidget {
+        public IgnorePointer(
+            Key key = null,
+            bool ignoring = true,
+            Widget child = null
+        ) : base(key: key, child: child) {
+            this.ignoring = ignoring;
+        }
+
+        public readonly bool ignoring;
+
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderIgnorePointer(
+                ignoring: this.ignoring
+            );
+        }
+
+        public override
+            void updateRenderObject(BuildContext context, RenderObject renderObjectRaw) {
+            var renderObject = (RenderIgnorePointer) renderObjectRaw;
+            renderObject.ignoring = this.ignoring;
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new DiagnosticsProperty<bool>("ignoring", this.ignoring));
+        }
     }
 }

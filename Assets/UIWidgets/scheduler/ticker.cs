@@ -11,22 +11,17 @@ namespace UIWidgets.scheduler {
 
     public interface TickerProvider {
         Ticker createTicker(TickerCallback onTick);
-        SchedulerBinding schedulerBinding { get; }
     }
 
     public class Ticker {
-        public Ticker(SchedulerBinding binding, TickerCallback onTick, string debugLabel = null) {
+        public Ticker(TickerCallback onTick, string debugLabel = null) {
             D.assert(() => {
                 this._debugCreationStack = new StackTrace();
                 return true;
             });
-
-            this._binding = binding;
             this._onTick = onTick;
             this.debugLabel = debugLabel;
         }
-
-        readonly SchedulerBinding _binding;
 
         TickerFutureImpl _future;
 
@@ -58,11 +53,11 @@ namespace UIWidgets.scheduler {
                     return false;
                 }
 
-                if (this._binding.framesEnabled) {
+                if (SchedulerBinding.instance.framesEnabled) {
                     return true;
                 }
 
-                if (this._binding.schedulerPhase != SchedulerPhase.idle) {
+                if (SchedulerBinding.instance.schedulerPhase != SchedulerPhase.idle) {
                     return true;
                 }
 
@@ -93,9 +88,9 @@ namespace UIWidgets.scheduler {
                 this.scheduleTick();
             }
 
-            if (this._binding.schedulerPhase > SchedulerPhase.idle &&
-                this._binding.schedulerPhase < SchedulerPhase.postFrameCallbacks) {
-                this._startTime = this._binding.currentFrameTimeStamp;
+            if (SchedulerBinding.instance.schedulerPhase > SchedulerPhase.idle &&
+                SchedulerBinding.instance.schedulerPhase < SchedulerPhase.postFrameCallbacks) {
+                this._startTime = SchedulerBinding.instance.currentFrameTimeStamp;
             }
 
             return this._future;
@@ -148,12 +143,12 @@ namespace UIWidgets.scheduler {
         protected void scheduleTick(bool rescheduling = false) {
             D.assert(!this.scheduled);
             D.assert(this.shouldScheduleTick);
-            this._animationId = this._binding.scheduleFrameCallback(this._tick, rescheduling: rescheduling);
+            this._animationId = SchedulerBinding.instance.scheduleFrameCallback(this._tick, rescheduling: rescheduling);
         }
 
         protected void unscheduleTick() {
             if (this.scheduled) {
-                this._binding.cancelFrameCallbackWithId(this._animationId.Value);
+                SchedulerBinding.instance.cancelFrameCallbackWithId(this._animationId.Value);
                 this._animationId = null;
             }
 

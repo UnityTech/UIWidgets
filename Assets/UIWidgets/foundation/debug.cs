@@ -17,17 +17,17 @@ namespace UIWidgets.foundation {
 
         public static bool debugPrintGestureArenaDiagnostics = true;
 
-        public static bool debugPrintHitTestResults = true;
+        public static bool debugPrintHitTestResults = false;
         
         public static bool debugPaintPointersEnabled = false;
         
-        public static bool debugPrintRecognizerCallbacksTrace = true;
+        public static bool debugPrintRecognizerCallbacksTrace = false;
         
-        public static bool debugPrintBeginFrameBanner = true;
+        public static bool debugPrintBeginFrameBanner = false;
 
-        public static bool debugPrintEndFrameBanner = true;
+        public static bool debugPrintEndFrameBanner = false;
         
-        public static bool debugPrintScheduleFrameStacks = true;
+        public static bool debugPrintScheduleFrameStacks = false;
     }
 
     [Serializable]

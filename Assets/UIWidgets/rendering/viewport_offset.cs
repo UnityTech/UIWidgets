@@ -46,7 +46,7 @@ namespace UIWidgets.rendering {
         public abstract void correctBy(double correction);
         public abstract void jumpTo(double pixels);
 
-        public abstract IPromise<object> animateTo(double to, TimeSpan duration, Curve curve);
+        public abstract IPromise animateTo(double to, TimeSpan duration, Curve curve);
 
         public abstract ScrollDirection userScrollDirection { get; }
 
@@ -93,8 +93,8 @@ namespace UIWidgets.rendering {
         public override void jumpTo(double pixels) {
         }
 
-        public override IPromise<object> animateTo(double to, TimeSpan duration, Curve curve) {
-            return Promise<object>.Resolved(null);
+        public override IPromise animateTo(double to, TimeSpan duration, Curve curve) {
+            return Promise.Resolved();
         }
 
         public override ScrollDirection userScrollDirection {

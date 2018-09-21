@@ -35,8 +35,6 @@ namespace UIWidgets.Tests
 
         private WindowAdapter windowAdapter;
 
-        private RendererBindings rendererBindings;
-
         [NonSerialized] private bool hasInvoked = false;
 
         void OnGUI() {
@@ -46,7 +44,9 @@ namespace UIWidgets.Tests
                 this.hasInvoked = true;
 
                 var renderBox = this._options[this._selected]();
-                this.rendererBindings.setRoot(renderBox);
+                if (this.windowAdapter != null) {
+                    this.windowAdapter.attachRootRenderBox(renderBox);
+                }
             }
 
             if (this.windowAdapter != null) {
@@ -62,12 +62,10 @@ namespace UIWidgets.Tests
 
         private void OnEnable() {
             this.windowAdapter = new WindowAdapter(this);
-            this.rendererBindings = new RendererBindings(this.windowAdapter);
         }
 
         void OnDestroy() {
             this.windowAdapter = null;
-            this.rendererBindings = null;
         }
 
         RenderBox none() {

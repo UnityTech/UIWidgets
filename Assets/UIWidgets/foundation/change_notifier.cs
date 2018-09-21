@@ -65,7 +65,7 @@ namespace UIWidgets.foundation {
             this._listeners = null;
         }
 
-        protected void notifyListeners() {
+        protected virtual void notifyListeners() {
             D.assert(this._debugAssertNotDisposed());
             if (this._listeners != null) {
                 var localListeners = new List<VoidCallback>(this._listeners);

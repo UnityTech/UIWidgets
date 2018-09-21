@@ -27,8 +27,8 @@ namespace UIWidgets.gestures {
     public delegate void GestureTapCancelCallback();
 
     public class TapGestureRecognizer : PrimaryPointerGestureRecognizer {
-        public TapGestureRecognizer(GestureBinding binding, object debugOwner = null)
-            : base(deadline: Constants.kPressTimeout, binding: binding, debugOwner: debugOwner) {
+        public TapGestureRecognizer(object debugOwner = null)
+            : base(deadline: Constants.kPressTimeout, debugOwner: debugOwner) {
         }
 
         public GestureTapDownCallback onTapDown;

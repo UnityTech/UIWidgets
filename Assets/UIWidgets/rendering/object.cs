@@ -164,13 +164,9 @@ namespace UIWidgets.rendering {
 
     public class PipelineOwner {
         public PipelineOwner(
-            RendererBinding binding = null,
             VoidCallback onNeedVisualUpdate = null) {
-            this.binding = binding;
             this.onNeedVisualUpdate = onNeedVisualUpdate;
         }
-
-        public readonly RendererBinding binding;
 
         public readonly VoidCallback onNeedVisualUpdate;
 
@@ -202,16 +198,35 @@ namespace UIWidgets.rendering {
 
         public List<RenderObject> _nodesNeedingLayout = new List<RenderObject>();
 
+        public bool debugDoingLayout {
+            get { return this._debugDoingLayout; }
+        }
+
+        bool _debugDoingLayout = false;
+
         public void flushLayout() {
-            while (this._nodesNeedingLayout.Count > 0) {
-                var dirtyNodes = this._nodesNeedingLayout;
-                this._nodesNeedingLayout = new List<RenderObject>();
-                dirtyNodes.Sort((a, b) => a.depth - b.depth);
-                foreach (var node in dirtyNodes) {
-                    if (node._needsLayout && node.owner == this) {
-                        node._layoutWithoutResize();
+            D.assert(() => {
+                this._debugDoingLayout = true;
+                return true;
+            });
+
+            try {
+                while (this._nodesNeedingLayout.Count > 0) {
+                    var dirtyNodes = this._nodesNeedingLayout;
+                    this._nodesNeedingLayout = new List<RenderObject>();
+                    dirtyNodes.Sort((a, b) => a.depth - b.depth);
+                    foreach (var node in dirtyNodes) {
+                        if (node._needsLayout && node.owner == this) {
+                            node._layoutWithoutResize();
+                        }
                     }
                 }
+            }
+            finally {
+                D.assert(() => {
+                    this._debugDoingLayout = false;
+                    return true;
+                });
             }
         }
 
@@ -247,10 +262,15 @@ namespace UIWidgets.rendering {
     }
 
     public interface RenderObjectWithChildMixin {
-        bool debugValidateChild(RenderObject child);            
+        bool debugValidateChild(RenderObject child);
         RenderObject child { get; set; }
     }
-    
+
+    public interface RenderObjectWithChildMixin<ChildType> : RenderObjectWithChildMixin
+        where ChildType : RenderObject {
+        new ChildType child { get; set; }
+    }
+
     public interface ContainerParentDataMixin<ChildType> where ChildType : RenderObject {
         ChildType previousSibling { get; set; }
         ChildType nextSibling { get; set; }

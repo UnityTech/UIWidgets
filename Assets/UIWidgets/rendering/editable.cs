@@ -76,7 +76,6 @@ namespace UIWidgets.rendering
 
         public RenderEditable(TextSpan text, TextDirection textDirection, ViewportOffset offset,
             ValueNotifier<bool> showCursor,
-            GestureBinding binding,
             TextAlign textAlign = TextAlign.left, double textScaleFactor = 1.0, Color cursorColor = null,
             bool? hasFocus = null, int maxLines = 1, Color selectionColor = null,
             TextSelection selection = null, bool obscureText = false, SelectionChangedHandler onSelectionChanged = null,
@@ -99,8 +98,8 @@ namespace UIWidgets.rendering
             D.assert(_showCursor != null);
             D.assert(!_showCursor.value || cursorColor != null);
 
-            _tap = new TapGestureRecognizer(binding, this);
-            _doubleTap = new DoubleTapGestureRecognizer(binding, this);
+            _tap = new TapGestureRecognizer(this);
+            _doubleTap = new DoubleTapGestureRecognizer(this);
             _tap.onTapDown = this._handleTapDown;
             _tap.onTap = this._handleTap;
             _doubleTap.onDoubleTap = this._handleDoubleTap;
