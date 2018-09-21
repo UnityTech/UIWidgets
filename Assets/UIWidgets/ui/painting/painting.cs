@@ -169,15 +169,15 @@ namespace UIWidgets.ui {
         }
     }
 
-    public class ColorFilter {
-        public ColorFilter(Color color, BlendMode blendMode) {
-            _color = color;
-            _blendMode = blendMode;
-        }
-
-        Color _color;
-        BlendMode _blendMode;
-    }
+//    public class ColorFilter {
+//        public ColorFilter(Color color, BlendMode blendMode) {
+//            _color = color;
+//            _blendMode = blendMode;
+//        }
+//
+//        Color _color;
+//        BlendMode _blendMode;
+//    }
 
     public enum BlendMode {
         None = 0, // explicitly assign zero to make it more clear
