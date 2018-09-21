@@ -2,14 +2,13 @@
 using UIWidgets.painting;
 using UIWidgets.widgets;
 using UnityEditor;
+using UnityEngine;
 using Color = UIWidgets.ui.Color;
 namespace UIWidgets.Tests
 {
     public class EditableTextWiget: EditorWindow
     {
         private WindowAdapter windowAdapter;
-
-        private WidgetsBindings widgetsBindings;
 
         private PaintingBinding paintingBinding;
 
@@ -48,8 +47,7 @@ namespace UIWidgets.Tests
                 padding: EdgeInsets.all(15.0),
                 color: ui.Color.fromARGB(255, 244, 190, 85),
                 child: new EditableText(
-                    maxLines: 100,
-                    textInput: windowAdapter.textInput,
+                    maxLines: 100, 
                     controller: new TextEditingController("click to edit"),
                     focusNode: new FocusNode(), 
                     style: new TextStyle(),
@@ -57,15 +55,12 @@ namespace UIWidgets.Tests
                     cursorColor: Color.fromARGB(255, 0, 0, 0)
                 )
             );
-            this.widgetsBindings = new WidgetsBindings(windowAdapter);
-            if (widgetsBindings != null) {
-                widgetsBindings.attachRootWidget(root);
-            }
+            this.windowAdapter.attachRootWidget(root);
+            this.titleContent = new GUIContent("EditableTextWiget");
         }
 
         void OnDestroy() {
             this.windowAdapter = null;
-            this.widgetsBindings = null;
         }
     }
 }

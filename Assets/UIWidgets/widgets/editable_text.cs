@@ -73,7 +73,6 @@ namespace UIWidgets.widgets
 
     public class EditableText : StatefulWidget
     {
-        public readonly TextInput textInput;
         public readonly TextEditingController controller;
 
         public readonly FocusNode focusNode;
@@ -107,7 +106,7 @@ namespace UIWidgets.widgets
 
         public readonly bool rendererIgnoresPointer;
 
-        public EditableText(TextInput textInput, TextEditingController controller, FocusNode focusNode, TextStyle style,
+        public EditableText(TextEditingController controller, FocusNode focusNode, TextStyle style,
             Color cursorColor, bool obscureText = false, bool autocorrect = false,
             TextAlign textAlign = TextAlign.left, TextDirection? textDirection = null,
             double textScaleFactor = 1.0, int maxLines = 1,
@@ -120,8 +119,6 @@ namespace UIWidgets.widgets
             D.assert(focusNode != null);
             D.assert(style != null);
             D.assert(cursorColor != null);
-            D.assert(textInput != null);
-            this.textInput = textInput;
             this.controller = controller;
             this.focusNode = focusNode;
             this.obscureText = obscureText;
@@ -271,7 +268,7 @@ namespace UIWidgets.widgets
             if (!_hasInputConnection) {
                 TextEditingValue localValue = _value;
                 _lastKnownRemoteTextEditingValue = localValue;
-                _textInputConnection = widget.textInput.attach(this);
+                _textInputConnection = Window.instance.textInput.attach(this);
                 _textInputConnection.setEditingState(localValue);
             }
         }

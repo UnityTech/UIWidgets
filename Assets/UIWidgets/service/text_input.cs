@@ -226,7 +226,6 @@ namespace UIWidgets.service
     {
         internal TextInputConnection _currentConnection;
         internal TextEditingValue _value;
-        private List<char> inputValue = new List<char>();
         static Dictionary<Event, TextEditOp> s_Keyactions;
         private string _lastCompositionString;
         

@@ -712,9 +712,8 @@ namespace UIWidgets.widgets {
     }
 
     public class BuildOwner {
-        public BuildOwner(Window window, VoidCallback onBuildScheduled = null) {
+        public BuildOwner(VoidCallback onBuildScheduled = null) {
             this.onBuildScheduled = onBuildScheduled;
-            this.focusManager = new FocusManager(window);
         }
 
         public VoidCallback onBuildScheduled;
@@ -731,7 +730,7 @@ namespace UIWidgets.widgets {
             get { return this._dirtyElementsNeedsResorting != null; }
         }
 
-        public readonly FocusManager focusManager;
+        public readonly FocusManager focusManager = new FocusManager();
 
         public void scheduleBuildFor(Element element) {
             D.assert(element != null);
@@ -2045,7 +2044,6 @@ namespace UIWidgets.widgets {
                 D.assert(_child != null);
             }
             catch (Exception e) {
-                Debug.LogError(e);
                 built = ErrorWidget.builder(WidgetsD._debugReportException("building " + this, e));
                 this._child = this.updateChild(null, built, this.slot);
             }

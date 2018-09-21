@@ -321,15 +321,13 @@ namespace UIWidgets.widgets
 
     public class FocusManager
     {
-        public FocusManager(Window window)
+        public FocusManager()
         {
             rootScope._manager = this;
-            this.window = window;
             D.assert(rootScope._firstChild == null);  
             D.assert(rootScope._lastChild == null);
         }
 
-        public readonly Window window;
         public readonly FocusScopeNode rootScope = new FocusScopeNode();
         internal FocusNode _currentFocus;
         
@@ -349,7 +347,7 @@ namespace UIWidgets.widgets
             }
 
             _haveScheduledUpdate = true;
-            window.scheduleMicrotask(_update);   
+            Window.instance.scheduleMicrotask(_update);
         }
 
         

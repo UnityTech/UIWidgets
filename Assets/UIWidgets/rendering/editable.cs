@@ -98,11 +98,6 @@ namespace UIWidgets.rendering
             D.assert(_showCursor != null);
             D.assert(!_showCursor.value || cursorColor != null);
 
-//            _tap = new TapGestureRecognizer(owner.binding, this);
-//            _doubleTap = new DoubleTapGestureRecognizer(owner.binding, this);
-//            _tap.onTapDown = this._handleTapDown;
-//            _tap.onTap = this._handleTap;
-//            _doubleTap.onDoubleTap = this._handleDoubleTap;
             _tap = new TapGestureRecognizer(this);
             _doubleTap = new DoubleTapGestureRecognizer(this);
             _tap.onTapDown = this._handleTapDown;
@@ -348,21 +343,12 @@ namespace UIWidgets.rendering
         public override void attach(object ownerObject)
         {
             base.attach(ownerObject);
-            _tap = new TapGestureRecognizer(owner.binding, this);
-            _doubleTap = new DoubleTapGestureRecognizer(owner.binding, this);
-            _tap.onTapDown = this._handleTapDown;
-            _tap.onTap = this._handleTap;
-            _doubleTap.onDoubleTap = this._handleDoubleTap;
             _offset.addListener(markNeedsLayout);
             _showCursor.addListener(markNeedsPaint);
         }
 
         public override void detach()
         {
-            _tap.dispose();
-            _tap = null;
-            _doubleTap.dispose();
-            _doubleTap = null;
             _offset.removeListener(markNeedsLayout);
             _showCursor.removeListener(markNeedsPaint);
             base.detach();
