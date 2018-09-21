@@ -88,7 +88,7 @@ namespace UIWidgets.rendering {
 
         public override double computeMaxIntrinsicWidth(double height) {
             if (this._additionalConstraints.hasBoundedWidth && this._additionalConstraints.hasTightWidth) {
-                return this._additionalConstraints.maxWidth;
+                return this._additionalConstraints.minWidth;
             }
 
             double width = base.computeMaxIntrinsicWidth(height);

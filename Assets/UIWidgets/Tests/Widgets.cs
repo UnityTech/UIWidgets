@@ -127,7 +127,8 @@ namespace UIWidgets.Tests {
             var image = new widgets.Image(
                 "https://tse3.mm.bing.net/th?id=OIP.XOAIpvR1kh-CzISe_Nj9GgHaHs&pid=Api",
                 width: 100,
-                height: 100
+                height: 100,
+                repeat: ImageRepeat.repeatX
             );
             var container = new widgets.Container(
                 width: 200,
