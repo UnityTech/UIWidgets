@@ -226,6 +226,67 @@ namespace UIWidgets.widgets {
         }
     }
 
+    public class RichText : LeafRenderObjectWidget
+    {
+        public RichText(TextSpan text, Key key = null, 
+            TextAlign textAlign = TextAlign.left, TextDirection? textDirection = null,
+            bool softWrap = true, TextOverflow overflow = TextOverflow.clip, double textScaleFactor = 1.0,
+            int maxLines = 0): base(key)
+        {
+            D.assert(text != null);
+            this.text = text;
+            this.textAlign = textAlign;
+            this.textDirection = textDirection;
+            this.softWrap = softWrap;
+            this.overflow = overflow;
+            this.textScaleFactor = textScaleFactor;
+            this.maxLines = maxLines;
+        }
+        
+        
+         public override RenderObject createRenderObject(BuildContext context) {
+            D.assert(textDirection != null || WidgetsD.debugCheckHasDirectionality(context));
+            return new RenderParagraph(text,
+                textAlign: textAlign,
+                textDirection: textDirection ?? Directionality.of(context),
+                softWrap: softWrap,
+                overflow: overflow,
+                textScaleFactor: textScaleFactor,
+                maxLines: maxLines
+            );
+        }
+        
+        public override void updateRenderObject(BuildContext context, RenderObject r) {
+            D.assert(textDirection != null || WidgetsD.debugCheckHasDirectionality(context));
+            var renderObject = (RenderParagraph) (r);
+            renderObject.text = text;
+            renderObject.textAlign = textAlign;
+            renderObject.textDirection = textDirection ?? Directionality.of(context);
+            renderObject.softWrap = softWrap;
+            renderObject.overflow = overflow;
+            renderObject.textScaleFactor = textScaleFactor;
+            renderObject.maxLines = maxLines;
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new EnumProperty<TextAlign>("textAlign", textAlign, defaultValue: TextAlign.left));
+            properties.add(new EnumProperty<TextDirection?>("textDirection", textDirection, defaultValue: null));
+            properties.add(new FlagProperty("softWrap", value: softWrap, ifTrue: "wrapping at box width", ifFalse: "no wrapping except at line break characters", showName: true));
+            properties.add(new EnumProperty<TextOverflow>("overflow", overflow, defaultValue: TextOverflow.clip));
+            properties.add(new DoubleProperty("textScaleFactor", textScaleFactor, defaultValue: 1.0));
+            properties.add(new IntProperty("maxLines", maxLines, ifNull: "unlimited"));
+            properties.add(new StringProperty("text", text.toPlainText()));
+        }
+        
+        public readonly TextSpan text;
+        public readonly  TextAlign textAlign;
+        public readonly  TextDirection? textDirection;
+        public readonly  bool softWrap;
+        public readonly  TextOverflow overflow;
+        public readonly  double textScaleFactor;
+        public readonly  int maxLines;
+    }
 
     public class RawImage : LeafRenderObjectWidget {
         public RawImage(Key key, ui.Image image, double width, double height, double scale, Color color,
@@ -400,6 +461,22 @@ namespace UIWidgets.widgets {
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             properties.add(new DiagnosticsProperty<bool>("ignoring", this.ignoring));
+        }
+    }
+
+    public class Builder : StatelessWidget
+    {
+        public Builder(WidgetBuilder builder, Key key = null) : base(key)
+        {
+            D.assert(builder != null);
+            this.builder = builder;
+        }
+
+        public readonly WidgetBuilder builder;
+
+        public override Widget build(BuildContext context)
+        {
+            return builder(context);
         }
     }
 }

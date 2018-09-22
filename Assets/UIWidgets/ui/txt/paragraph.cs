@@ -639,7 +639,7 @@ namespace UIWidgets.ui
                     _alphabeticBaseline = maxAscent;
                     _ideographicBaseline = maxAscent; // todo Properly implement ideographic_baseline
                 }
-                lastDescent = maxDescent;
+                
                 yOffset = Utils.PixelCorrectRound(yOffset + maxAscent + lastDescent);
                 foreach (var record in linePaintRecords)
                 {
@@ -649,12 +649,13 @@ namespace UIWidgets.ui
                 
                 for (var charIndex = line.start; charIndex < line.end; charIndex++)
                 {
-                    _characterPositions[charIndex].y = yOffset;
+                     _characterPositions[charIndex].y = yOffset;
                 }
                
                 _lineHeights.Add((_lineHeights.Count == 0 ? 0 : _lineHeights[_lineHeights.Count - 1]) + 
                                  Math.Round(maxAscent + maxDescent));
                 _lineBaseLines.Add(yOffset);
+                lastDescent = maxDescent;
             }
         }
         

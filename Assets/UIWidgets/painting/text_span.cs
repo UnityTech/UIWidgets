@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using UIWidgets.foundation;
 using UIWidgets.ui;
 using UnityEditor;
 using UnityEngine.Assertions;
@@ -12,7 +13,7 @@ namespace UIWidgets.painting
     {
         
     }
-    public class TextSpan: IEquatable<TextSpan>
+    public class TextSpan: DiagnosticableTree, IEquatable<TextSpan>
     {
         public delegate bool Visitor(TextSpan span);
         public readonly TextStyle style;
@@ -99,7 +100,7 @@ namespace UIWidgets.painting
             return result;
         }
 
-        string toPlainText()
+        public string toPlainText()
         {
             var sb = new StringBuilder();
             visitTextSpan((span) =>
@@ -250,6 +251,26 @@ namespace UIWidgets.painting
             }
 
             return left.SequenceEqual(right);
+        }
+        
+        
+        public override List<DiagnosticsNode> debugDescribeChildren() {
+            if (children == null)
+            {
+                return new List<DiagnosticsNode>();
+            }
+
+            return children.Select((child) =>
+            {
+                if (child != null)
+                {
+                    return child.toDiagnosticsNode();
+                }
+                else
+                {
+                    return DiagnosticsNode.message("<null child>");
+                }
+            }).ToList();
         }
     }
 }

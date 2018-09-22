@@ -737,6 +737,33 @@ namespace UIWidgets.foundation {
         }
     }
 
+    public class IntProperty : _NumProperty<int?> {
+   
+    public IntProperty(String name, int? value, 
+        string ifNull = null,
+        bool showName = true,
+        string unit = null,
+            object defaultValue = null,
+        DiagnosticLevel level =  DiagnosticLevel.info
+    ) :base(name,
+        value,
+        ifNull: ifNull,
+        unit: unit,
+        defaultValue: defaultValue,
+        showName: showName,
+        level: level){
+    }
+
+    protected override string numberToString()
+    {
+        if (value == null)
+        {
+            return "null";
+        }
+        return value.ToString();
+    }
+}
+
 
     public class FlagProperty : DiagnosticsProperty<bool> {
         public FlagProperty(String name,
