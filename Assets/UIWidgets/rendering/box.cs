@@ -1,14 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using UIWidgets.foundation;
 using UIWidgets.gestures;
 using UIWidgets.painting;
 using UIWidgets.ui;
 using UnityEngine;
 using Rect = UIWidgets.ui.Rect;
+using Color = UIWidgets.ui.Color;
 
 namespace UIWidgets.rendering {
-    public class BoxConstraints : Constraints {
+    class _DebugSize : Size {
+        internal _DebugSize(Size source, RenderBox _owner, bool _canBeUsedByParent) :
+            base(source.width, source.height) {
+            this._owner = _owner;
+            this._canBeUsedByParent = _canBeUsedByParent;
+        }
+
+        internal readonly RenderBox _owner;
+        internal readonly bool _canBeUsedByParent;
+    }
+
+    public class BoxConstraints : Constraints, IEquatable<BoxConstraints> {
         public BoxConstraints(
             double minWidth = 0.0,
             double maxWidth = double.PositiveInfinity,
@@ -67,6 +81,15 @@ namespace UIWidgets.rendering {
             );
         }
 
+        public static BoxConstraints loose(Size size) {
+            return new BoxConstraints(
+                minWidth: 0,
+                maxWidth: size.width,
+                minHeight: 0,
+                maxHeight: size.height
+            );
+        }
+
         public static BoxConstraints expand(
             double? width = null,
             double? height = null
@@ -94,6 +117,8 @@ namespace UIWidgets.rendering {
         }
 
         public BoxConstraints deflate(EdgeInsets edges) {
+            D.assert(edges != null);
+            D.assert(this.debugAssertIsValid());
             double horizontal = edges.horizontal;
             double vertical = edges.vertical;
             double deflatedMinWidth = Math.Max(0.0, this.minWidth - horizontal);
@@ -107,6 +132,7 @@ namespace UIWidgets.rendering {
         }
 
         public BoxConstraints loosen() {
+            D.assert(this.debugAssertIsValid());
             return new BoxConstraints(
                 minWidth: 0.0,
                 maxWidth: this.maxWidth,
@@ -117,22 +143,10 @@ namespace UIWidgets.rendering {
 
         public BoxConstraints enforce(BoxConstraints constraints) {
             return new BoxConstraints(
-                minWidth: Mathf.Clamp(
-                    (float) this.minWidth,
-                    (float) constraints.minWidth,
-                    (float) constraints.maxWidth),
-                maxWidth: Mathf.Clamp(
-                    (float) this.maxWidth,
-                    (float) constraints.minWidth,
-                    (float) constraints.maxWidth),
-                minHeight: Mathf.Clamp(
-                    (float) this.minHeight,
-                    (float) constraints.minHeight,
-                    (float) constraints.maxHeight),
-                maxHeight: Mathf.Clamp(
-                    (float) this.maxHeight,
-                    (float) constraints.minHeight,
-                    (float) constraints.maxHeight)
+                minWidth: this.minWidth.clamp(constraints.minWidth, constraints.maxWidth),
+                maxWidth: this.maxWidth.clamp(constraints.minWidth, constraints.maxWidth),
+                minHeight: this.minHeight.clamp(constraints.minHeight, constraints.maxHeight),
+                maxHeight: this.maxHeight.clamp(constraints.minHeight, constraints.maxHeight)
             );
         }
 
@@ -141,18 +155,10 @@ namespace UIWidgets.rendering {
             double? height = null
         ) {
             return new BoxConstraints(
-                minWidth: width == null
-                    ? this.minWidth
-                    : Mathf.Clamp((float) width.Value, (float) this.minWidth, (float) this.maxWidth),
-                maxWidth: width == null
-                    ? this.maxWidth
-                    : Mathf.Clamp((float) width.Value, (float) this.minWidth, (float) this.maxWidth),
-                minHeight: height == null
-                    ? this.minHeight
-                    : Mathf.Clamp((float) height.Value, (float) this.minHeight, (float) this.maxHeight),
-                maxHeight: height == null
-                    ? this.maxHeight
-                    : Mathf.Clamp((float) height.Value, (float) this.minHeight, (float) this.maxHeight)
+                minWidth: width == null ? this.minWidth : width.Value.clamp(this.minWidth, this.maxWidth),
+                maxWidth: width == null ? this.maxWidth : width.Value.clamp(this.minWidth, this.maxWidth),
+                minHeight: height == null ? this.minHeight : height.Value.clamp(this.minHeight, this.maxHeight),
+                maxHeight: height == null ? this.maxHeight : height.Value.clamp(this.minHeight, this.maxHeight)
             );
         }
 
@@ -176,15 +182,35 @@ namespace UIWidgets.rendering {
         }
 
         public double constrainWidth(double width = double.PositiveInfinity) {
-            return Mathf.Clamp((float) width, (float) this.minWidth, (float) this.maxWidth);
+            D.assert(this.debugAssertIsValid());
+            return width.clamp(this.minWidth, this.maxWidth);
         }
 
         public double constrainHeight(double height = double.PositiveInfinity) {
-            return Mathf.Clamp((float) height, (float) this.minHeight, (float) this.maxHeight);
+            D.assert(this.debugAssertIsValid());
+            return height.clamp(this.minHeight, this.maxHeight);
+        }
+
+        Size _debugPropagateDebugSize(Size size, Size result) {
+            D.assert(() => {
+                if (size is _DebugSize) {
+                    result = new _DebugSize(result,
+                        ((_DebugSize) size)._owner, ((_DebugSize) size)._canBeUsedByParent);
+                }
+
+                return true;
+            });
+            return result;
         }
 
         public Size constrain(Size size) {
-            return new Size(this.constrainWidth(size.width), this.constrainHeight(size.height));
+            var result = new Size(this.constrainWidth(size.width), this.constrainHeight(size.height));
+            D.assert(() => {
+                result = this._debugPropagateDebugSize(size, result);
+                return true;
+            });
+
+            return result;
         }
 
         public Size constrainDimensions(double width, double height) {
@@ -193,12 +219,18 @@ namespace UIWidgets.rendering {
 
         public Size constrainSizeAndAttemptToPreserveAspectRatio(Size size) {
             if (this.isTight) {
-                Size result = this.smallest;
-                return result;
+                Size result1 = this.smallest;
+                D.assert(() => {
+                    result1 = this._debugPropagateDebugSize(size, result1);
+                    return true;
+                });
+                return result1;
             }
 
             double width = size.width;
             double height = size.height;
+            D.assert(width > 0.0);
+            D.assert(height > 0.0);
             double aspectRatio = width / height;
 
             if (width > this.maxWidth) {
@@ -221,7 +253,12 @@ namespace UIWidgets.rendering {
                 width = height * aspectRatio;
             }
 
-            return new Size(this.constrainWidth(width), this.constrainHeight(height));
+            var result = new Size(this.constrainWidth(width), this.constrainHeight(height));
+            D.assert(() => {
+                result = this._debugPropagateDebugSize(size, result);
+                return true;
+            });
+            return result;
         }
 
         public Size biggest {
@@ -261,8 +298,36 @@ namespace UIWidgets.rendering {
         }
 
         public bool isSatisfiedBy(Size size) {
+            D.assert(this.debugAssertIsValid());
             return this.minWidth <= size.width && size.width <= this.maxWidth &&
                    this.minHeight <= size.height && size.height <= this.maxHeight;
+        }
+
+        public static BoxConstraints operator *(BoxConstraints it, double factor) {
+            return new BoxConstraints(
+                minWidth: it.minWidth * factor,
+                maxWidth: it.maxWidth * factor,
+                minHeight: it.minHeight * factor,
+                maxHeight: it.maxHeight * factor
+            );
+        }
+
+        public static BoxConstraints operator /(BoxConstraints it, double factor) {
+            return new BoxConstraints(
+                minWidth: it.minWidth / factor,
+                maxWidth: it.maxWidth / factor,
+                minHeight: it.minHeight / factor,
+                maxHeight: it.maxHeight / factor
+            );
+        }
+
+        public static BoxConstraints operator %(BoxConstraints it, double value) {
+            return new BoxConstraints(
+                minWidth: it.minWidth % value,
+                maxWidth: it.maxWidth % value,
+                minHeight: it.minHeight % value,
+                maxHeight: it.maxHeight % value
+            );
         }
 
         public override bool isNormalized {
@@ -272,6 +337,106 @@ namespace UIWidgets.rendering {
                        this.minHeight >= 0.0 &&
                        this.minHeight <= this.maxHeight;
             }
+        }
+
+        public override bool debugAssertIsValid(
+            bool isAppliedConstraint = false,
+            InformationCollector informationCollector = null
+        ) {
+            D.assert(() => {
+                var throwError = new Action<string>(message => {
+                    var information = new StringBuilder();
+                    if (informationCollector != null) {
+                        informationCollector(information);
+                    }
+
+                    throw new UIWidgetsError(string.Format(
+                        "{0}\n{1}The offending constraints were:\n  {2}",
+                        message, information, this));
+                });
+
+                if (this.minWidth.isNaN() ||
+                    this.maxWidth.isNaN() ||
+                    this.minHeight.isNaN() ||
+                    this.maxHeight.isNaN()) {
+                    var affectedFieldsList = new List<String>();
+                    if (this.minWidth.isNaN()) {
+                        affectedFieldsList.Add("minWidth");
+                    }
+
+                    if (this.maxWidth.isNaN()) {
+                        affectedFieldsList.Add("maxWidth");
+                    }
+
+                    if (this.minHeight.isNaN()) {
+                        affectedFieldsList.Add("minHeight");
+                    }
+
+                    if (this.maxHeight.isNaN()) {
+                        affectedFieldsList.Add("maxHeight");
+                    }
+
+                    D.assert(affectedFieldsList.isNotEmpty());
+                    if (affectedFieldsList.Count > 1) {
+                        var last = affectedFieldsList.Last();
+                        affectedFieldsList.RemoveAt(affectedFieldsList.Count - 1);
+                        affectedFieldsList.Add("and " + last);
+                    }
+
+                    string whichFields;
+                    if (affectedFieldsList.Count > 2) {
+                        whichFields = string.Join(", ", affectedFieldsList.ToArray());
+                    } else if (affectedFieldsList.Count == 2) {
+                        whichFields = string.Join(" ", affectedFieldsList.ToArray());
+                    } else {
+                        whichFields = affectedFieldsList.Single();
+                    }
+
+                    throwError("BoxConstraints has NaN values in " + whichFields + ".");
+                }
+
+                if (this.minWidth < 0.0 && this.minHeight < 0.0) {
+                    throwError("BoxConstraints has both a negative minimum width and a negative minimum height.");
+                }
+
+                if (this.minWidth < 0.0) {
+                    throwError("BoxConstraints has a negative minimum width.");
+                }
+
+                if (this.minHeight < 0.0) {
+                    throwError("BoxConstraints has a negative minimum height.");
+                }
+
+                if (this.maxWidth < this.minWidth && this.maxHeight < this.minHeight) {
+                    throwError("BoxConstraints has both width and height constraints non-normalized.");
+                }
+
+                if (this.maxWidth < this.minWidth) {
+                    throwError("BoxConstraints has non-normalized width constraints.");
+                }
+
+                if (this.maxHeight < this.minHeight) {
+                    throwError("BoxConstraints has non-normalized height constraints.");
+                }
+
+                if (isAppliedConstraint) {
+                    if (this.minWidth.isInfinite() && this.minHeight.isInfinite()) {
+                        throwError("BoxConstraints forces an infinite width and infinite height.");
+                    }
+
+                    if (this.minWidth.isInfinite()) {
+                        throwError("BoxConstraints forces an infinite width.");
+                    }
+
+                    if (this.minHeight.isInfinite()) {
+                        throwError("BoxConstraints forces an infinite height.");
+                    }
+                }
+
+                D.assert(this.isNormalized);
+                return true;
+            });
+            return this.isNormalized;
         }
 
         public BoxConstraints normalize() {
@@ -290,7 +455,9 @@ namespace UIWidgets.rendering {
             );
         }
 
-        protected bool Equals(BoxConstraints other) {
+        public bool Equals(BoxConstraints other) {
+            if (object.ReferenceEquals(null, other)) return false;
+            if (object.ReferenceEquals(this, other)) return true;
             return this.minWidth.Equals(other.minWidth)
                    && this.maxWidth.Equals(other.maxWidth)
                    && this.minHeight.Equals(other.minHeight)
@@ -314,12 +481,37 @@ namespace UIWidgets.rendering {
             }
         }
 
-        public static bool operator ==(BoxConstraints a, BoxConstraints b) {
-            return object.Equals(a, b);
+        public static bool operator ==(BoxConstraints left, BoxConstraints right) {
+            return object.Equals(left, right);
         }
 
-        public static bool operator !=(BoxConstraints a, BoxConstraints b) {
-            return !(a == b);
+        public static bool operator !=(BoxConstraints left, BoxConstraints right) {
+            return !object.Equals(left, right);
+        }
+
+        public override string ToString() {
+            string annotation = this.isNormalized ? "" : "; NOT NORMALIZED";
+            if (this.minWidth == double.PositiveInfinity &&
+                this.minHeight == double.PositiveInfinity) {
+                return "BoxConstraints(biggest" + annotation + ")";
+            }
+
+            if (this.minWidth == 0 && this.maxWidth == double.PositiveInfinity &&
+                this.minHeight == 0 && this.maxHeight == double.PositiveInfinity) {
+                return "BoxConstraints(unconstrained" + annotation + ")";
+            }
+
+            var describe = new Func<double, double, string, string>((min, max, dim) => {
+                if (min == max) {
+                    return dim + "=" + min.ToString("F1");
+                }
+
+                return min.ToString("F1") + "<=" + dim + "<=" + max.ToString("F1");
+            });
+
+            string width = describe(this.minWidth, this.maxWidth, "w");
+            string height = describe(this.minHeight, this.maxHeight, "h");
+            return "BoxConstraints(" + width + ", " + height + annotation + ")";
         }
     }
 
@@ -344,17 +536,21 @@ namespace UIWidgets.rendering {
 
     public class BoxParentData : ParentData {
         public Offset offset = Offset.zero;
+
+        public override string ToString() {
+            return "offset=" + this.offset;
+        }
     }
 
-    public enum _IntrinsicDimension {
+    enum _IntrinsicDimension {
         minWidth,
         maxWidth,
         minHeight,
         maxHeight
     }
 
-    public class _IntrinsicDimensionsCacheEntry : IEquatable<_IntrinsicDimensionsCacheEntry> {
-        public _IntrinsicDimensionsCacheEntry(_IntrinsicDimension dimension, double argument) {
+    class _IntrinsicDimensionsCacheEntry : IEquatable<_IntrinsicDimensionsCacheEntry> {
+        internal _IntrinsicDimensionsCacheEntry(_IntrinsicDimension dimension, double argument) {
             this.dimension = dimension;
             this.argument = argument;
         }
@@ -386,7 +582,7 @@ namespace UIWidgets.rendering {
         }
 
         public static bool operator !=(_IntrinsicDimensionsCacheEntry a, _IntrinsicDimensionsCacheEntry b) {
-            return !(a == b);
+            return !object.Equals(a, b);
         }
     }
 
@@ -397,55 +593,119 @@ namespace UIWidgets.rendering {
             }
         }
 
-        public Dictionary<_IntrinsicDimensionsCacheEntry, double> _cachedIntrinsicDimensions;
+        Dictionary<_IntrinsicDimensionsCacheEntry, double> _cachedIntrinsicDimensions;
 
-        public double _computeIntrinsicDimension(_IntrinsicDimension dimension, double argument,
+        double _computeIntrinsicDimension(_IntrinsicDimension dimension, double argument,
             Func<double, double> computer) {
-            if (this._cachedIntrinsicDimensions == null) {
-                this._cachedIntrinsicDimensions = new Dictionary<_IntrinsicDimensionsCacheEntry, double>();
+            D.assert(RenderObject.debugCheckingIntrinsics || !this.debugDoingThisResize);
+            bool shouldCache = true;
+            D.assert(() => {
+                if (RenderObject.debugCheckingIntrinsics) {
+                    shouldCache = false;
+                }
+
+                return true;
+            });
+
+            if (shouldCache) {
+                this._cachedIntrinsicDimensions =
+                    this._cachedIntrinsicDimensions
+                    ?? new Dictionary<_IntrinsicDimensionsCacheEntry, double>();
+                return this._cachedIntrinsicDimensions.putIfAbsent(
+                    new _IntrinsicDimensionsCacheEntry(dimension, argument),
+                    () => computer(argument));
             }
 
-            var key = new _IntrinsicDimensionsCacheEntry(dimension, argument);
-
-            double result;
-            if (this._cachedIntrinsicDimensions.TryGetValue(key, out result)) {
-                return result;
-            }
-
-            return this._cachedIntrinsicDimensions[key] = computer(argument);
+            return computer(argument);
         }
 
         public double getMinIntrinsicWidth(double height) {
+            D.assert(() => {
+                if (height < 0.0) {
+                    throw new UIWidgetsError(
+                        "The height argument to getMinIntrinsicWidth was negative.\n" +
+                        "The argument to getMinIntrinsicWidth must not be negative. " +
+                        "If you perform computations on another height before passing it to " +
+                        "getMinIntrinsicWidth, consider using math.max() or double.clamp() " +
+                        "to force the value into the valid range."
+                    );
+                }
+
+                return true;
+            });
+
             return this._computeIntrinsicDimension(_IntrinsicDimension.minWidth, height, this.computeMinIntrinsicWidth);
         }
 
-        public virtual double computeMinIntrinsicWidth(double height) {
+        protected virtual double computeMinIntrinsicWidth(double height) {
             return 0.0;
         }
 
         public double getMaxIntrinsicWidth(double height) {
+            D.assert(() => {
+                if (height < 0.0) {
+                    throw new UIWidgetsError(
+                        "The height argument to getMaxIntrinsicWidth was negative.\n" +
+                        "The argument to getMaxIntrinsicWidth must not be negative. " +
+                        "If you perform computations on another height before passing it to " +
+                        "getMaxIntrinsicWidth, consider using math.max() or double.clamp() " +
+                        "to force the value into the valid range."
+                    );
+                }
+
+                return true;
+            });
+
             return this._computeIntrinsicDimension(_IntrinsicDimension.maxWidth, height, this.computeMaxIntrinsicWidth);
         }
 
-        public virtual double computeMaxIntrinsicWidth(double height) {
+        protected virtual double computeMaxIntrinsicWidth(double height) {
             return 0.0;
         }
 
         public double getMinIntrinsicHeight(double width) {
+            D.assert(() => {
+                if (width < 0.0) {
+                    throw new UIWidgetsError(
+                        "The width argument to getMinIntrinsicHeight was negative.\n" +
+                        "The argument to getMinIntrinsicHeight must not be negative. " +
+                        "If you perform computations on another width before passing it to " +
+                        "getMinIntrinsicHeight, consider using math.max() or double.clamp() " +
+                        "to force the value into the valid range."
+                    );
+                }
+
+                return true;
+            });
+
             return this._computeIntrinsicDimension(_IntrinsicDimension.minHeight, width,
                 this.computeMinIntrinsicHeight);
         }
 
-        public virtual double computeMinIntrinsicHeight(double width) {
+        protected virtual double computeMinIntrinsicHeight(double width) {
             return 0.0;
         }
 
         public double getMaxIntrinsicHeight(double width) {
+            D.assert(() => {
+                if (width < 0.0) {
+                    throw new UIWidgetsError(
+                        "The width argument to getMaxIntrinsicHeight was negative.\n" +
+                        "The argument to getMaxIntrinsicHeight must not be negative. " +
+                        "If you perform computations on another width before passing it to " +
+                        "getMaxIntrinsicHeight, consider using math.max() or double.clamp() " +
+                        "to force the value into the valid range."
+                    );
+                }
+
+                return true;
+            });
+
             return this._computeIntrinsicDimension(_IntrinsicDimension.maxHeight, width,
                 this.computeMaxIntrinsicHeight);
         }
 
-        public virtual double computeMaxIntrinsicHeight(double width) {
+        protected virtual double computeMaxIntrinsicHeight(double width) {
             return 0.0;
         }
 
@@ -454,16 +714,171 @@ namespace UIWidgets.rendering {
         }
 
         public Size size {
-            get { return this._size; }
-            set { this._size = value; }
+            get {
+                D.assert(this.hasSize, "RenderBox was not laid out: " + this);
+                D.assert(() => {
+                    if (this._size is _DebugSize) {
+                        _DebugSize _size = (_DebugSize) this._size;
+                        D.assert(_size._owner == this);
+                        if (RenderObject.debugActiveLayout != null) {
+                            D.assert(this.debugDoingThisResize || this.debugDoingThisLayout ||
+                                     (RenderObject.debugActiveLayout == this.parent && _size._canBeUsedByParent));
+                        }
+
+                        D.assert(_size == this._size);
+                    }
+
+                    return true;
+                });
+
+                return this._size;
+            }
+            set {
+                D.assert(!(this.debugDoingThisResize && this.debugDoingThisLayout));
+                D.assert(this.sizedByParent || !this.debugDoingThisResize);
+                D.assert(() => {
+                    if ((this.sizedByParent && this.debugDoingThisResize) ||
+                        (!this.sizedByParent && this.debugDoingThisLayout)) {
+                        return true;
+                    }
+
+                    D.assert(!this.debugDoingThisResize);
+
+                    string contract = "", violation = "", hint = "";
+                    if (this.debugDoingThisLayout) {
+                        D.assert(this.sizedByParent);
+                        violation = "It appears that the size setter was called from performLayout().";
+                        hint = "";
+                    } else {
+                        violation =
+                            "The size setter was called from outside layout (neither performResize() nor performLayout() were being run for this object).";
+                        if (this.owner != null && this.owner.debugDoingLayout) {
+                            hint =
+                                "Only the object itself can set its size. It is a contract violation for other objects to set it.";
+                        }
+                    }
+
+                    if (this.sizedByParent) {
+                        contract =
+                            "Because this RenderBox has sizedByParent set to true, it must set its size in performResize().";
+                    } else {
+                        contract =
+                            "Because this RenderBox has sizedByParent set to false, it must set its size in performLayout().";
+                    }
+
+                    throw new UIWidgetsError(
+                        "RenderBox size setter called incorrectly.\n" +
+                        violation + "\n" +
+                        hint + "\n" +
+                        contract + "\n" +
+                        "The RenderBox in question is:\n" +
+                        "  " + this
+                    );
+                });
+                D.assert(() => {
+                    value = this.debugAdoptSize(value);
+                    return true;
+                });
+
+                this._size = value;
+
+                D.assert(() => {
+                    this.debugAssertDoesMeetConstraints();
+                    return true;
+                });
+            }
         }
 
-        public Size _size;
+        Size _size;
 
-        public Dictionary<TextBaseline, double?> _cachedBaselines;
+        public Size debugAdoptSize(Size valueRaw) {
+            Size result = valueRaw;
+            D.assert(() => {
+                if (valueRaw is _DebugSize) {
+                    var value = (_DebugSize) valueRaw;
+                    if (value._owner != this) {
+                        if (value._owner.parent != this) {
+                            throw new UIWidgetsError(
+                                "The size property was assigned a size inappropriately.\n" +
+                                "The following render object:\n" +
+                                "  " + this + "\n" +
+                                "...was assigned a size obtained from:\n" +
+                                "  " + value._owner + "\n" +
+                                "However, this second render object is not, or is no longer, a " +
+                                "child of the first, and it is therefore a violation of the " +
+                                "RenderBox layout protocol to use that size in the layout of the " +
+                                "first render object.\n" +
+                                "If the size was obtained at a time where it was valid to read " +
+                                "the size (because the second render object above was a child " +
+                                "of the first at the time), then it should be adopted using " +
+                                "debugAdoptSize at that time.\n" +
+                                "If the size comes from a grandchild or a render object from an " +
+                                "entirely different part of the render tree, then there is no " +
+                                "way to be notified when the size changes and therefore attempts " +
+                                "to read that size are almost certainly a source of bugs. A different " +
+                                "approach should be used."
+                            );
+                        }
+
+                        if (!value._canBeUsedByParent) {
+                            throw new UIWidgetsError(
+                                "A child\"s size was used without setting parentUsesSize.\n" +
+                                "The following render object:\n" +
+                                "  " + this + "\n" +
+                                "...was assigned a size obtained from its child:\n" +
+                                "  " + value._owner + "\n" +
+                                "However, when the child was laid out, the parentUsesSize argument " +
+                                "was not set or set to false. Subsequently this transpired to be " +
+                                "inaccurate: the size was nonetheless used by the parent.\n" +
+                                "It is important to tell the framework if the size will be used or not " +
+                                "as several important performance optimizations can be made if the " +
+                                "size will not be used by the parent."
+                            );
+                        }
+                    }
+                }
+
+                result = new _DebugSize(valueRaw, this, this.debugCanParentUseSize);
+                return true;
+            });
+            return result;
+        }
+
+        protected override void debugResetSize() {
+            size = size;
+        }
+
+        Dictionary<TextBaseline, double?> _cachedBaselines;
+        static bool _debugDoingBaseline = false;
+
+        static bool _debugSetDoingBaseline(bool value) {
+            _debugDoingBaseline = value;
+            return true;
+        }
 
         public double? getDistanceToBaseline(TextBaseline baseline, bool onlyReal = false) {
+            D.assert(!_debugDoingBaseline,
+                "Please see the documentation for computeDistanceToActualBaseline for the required calling conventions of this method.");
+            D.assert(!this.debugNeedsLayout);
+            D.assert(() => {
+                RenderObject parent = (RenderObject) this.parent;
+                if (this.owner.debugDoingLayout) {
+                    return (RenderObject.debugActiveLayout == parent) && parent.debugDoingThisLayout;
+                }
+
+                if (this.owner.debugDoingPaint) {
+                    return ((RenderObject.debugActivePaint == parent) && parent.debugDoingThisPaint) ||
+                           ((RenderObject.debugActivePaint == this) && this.debugDoingThisPaint);
+                }
+
+                D.assert(parent == this.parent);
+                return false;
+            });
+
+            D.assert(_debugSetDoingBaseline(true));
             double? result = this.getDistanceToActualBaseline(baseline);
+            D.assert(_debugSetDoingBaseline(false));
+
             if (result == null && !onlyReal) {
                 return this.size.height;
             }
@@ -471,20 +886,18 @@ namespace UIWidgets.rendering {
             return result;
         }
 
-        public double? getDistanceToActualBaseline(TextBaseline baseline) {
-            if (this._cachedBaselines == null) {
-                this._cachedBaselines = new Dictionary<TextBaseline, double?>();
-            }
+        public virtual double? getDistanceToActualBaseline(TextBaseline baseline) {
+            D.assert(_debugDoingBaseline,
+                "Please see the documentation for computeDistanceToActualBaseline for the required calling conventions of this method.");
 
-            double? result;
-            if (this._cachedBaselines.TryGetValue(baseline, out result)) {
-                return result;
-            }
-
-            return this._cachedBaselines[baseline] = this.computeDistanceToActualBaseline(baseline);
+            this._cachedBaselines = this._cachedBaselines ?? new Dictionary<TextBaseline, double?>();
+            return this._cachedBaselines.putIfAbsent(baseline, () => this.computeDistanceToActualBaseline(baseline));
         }
 
-        public virtual double? computeDistanceToActualBaseline(TextBaseline baseline) {
+        protected virtual double? computeDistanceToActualBaseline(TextBaseline baseline) {
+            D.assert(_debugDoingBaseline,
+                "Please see the documentation for computeDistanceToActualBaseline for the required calling conventions of this method.");
+
             return null;
         }
 
@@ -492,9 +905,149 @@ namespace UIWidgets.rendering {
             get { return (BoxConstraints) base.constraints; }
         }
 
+        protected override void debugAssertDoesMeetConstraints() {
+            D.assert(this.constraints != null);
+            D.assert(() => {
+                if (!this.hasSize) {
+                    D.assert(!this.debugNeedsLayout);
+                    string contract = "";
+                    if (this.sizedByParent) {
+                        contract =
+                            "Because this RenderBox has sizedByParent set to true, it must set its size in performResize().\n";
+                    } else {
+                        contract =
+                            "Because this RenderBox has sizedByParent set to false, it must set its size in performLayout().\n";
+                    }
+
+                    throw new UIWidgetsError(
+                        "RenderBox did not set its size during layout.\n" +
+                        contract +
+                        "It appears that this did not happen; layout completed, but the size property is still null.\n" +
+                        "The RenderBox in question is:\n" +
+                        "  " + this);
+                }
+
+                if (!this._size.isFinite) {
+                    var information = new StringBuilder();
+                    if (!this.constraints.hasBoundedWidth) {
+                        RenderBox node = this;
+                        while (!node.constraints.hasBoundedWidth && node.parent is RenderBox) {
+                            node = (RenderBox) node.parent;
+                        }
+
+                        information.AppendLine("The nearest ancestor providing an unbounded width constraint is:");
+                        information.Append("  ");
+                        information.AppendLine(node.toStringShallow(joiner: "\n  "));
+                    }
+
+                    if (!this.constraints.hasBoundedHeight) {
+                        RenderBox node = this;
+                        while (!node.constraints.hasBoundedHeight && node.parent is RenderBox) {
+                            node = (RenderBox) node.parent;
+                        }
+
+                        information.AppendLine("The nearest ancestor providing an unbounded height constraint is:");
+                        information.Append("  ");
+                        information.AppendLine(node.toStringShallow(joiner: "\n  "));
+                    }
+
+                    throw new UIWidgetsError(
+                        this.GetType() + " object was given an infinite size during layout.\n" +
+                        "This probably means that it is a render object that tries to be " +
+                        "as big as possible, but it was put inside another render object " +
+                        "that allows its children to pick their own size.\n" +
+                        information +
+                        "The constraints that applied to the " + this.GetType() + " were:\n" +
+                        "  " + this.constraints + "\n" +
+                        "The exact size it was given was:\n" +
+                        "  " + this._size
+                    );
+                }
+
+                if (!this.constraints.isSatisfiedBy(this._size)) {
+                    throw new UIWidgetsError(
+                        this.GetType() + " does not meet its constraints.\n" +
+                        "Constraints: " + this.constraints + "\n" +
+                        "Size: " + this._size + "\n" +
+                        "If you are not writing your own RenderBox subclass, then this is not " +
+                        "your fault."
+                    );
+                }
+
+                if (D.debugCheckIntrinsicSizes) {
+                    D.assert(!RenderObject.debugCheckingIntrinsics);
+                    RenderObject.debugCheckingIntrinsics = true;
+                    var failures = new StringBuilder();
+                    int failureCount = 0;
+
+                    var testIntrinsic = new Func<Func<double, double>, string, double, double>(
+                        (function, name, constraint) => {
+                            double result = function(constraint);
+                            if (result < 0) {
+                                failures.AppendLine(" * " + name + "(" + constraint + ") returned a negative value: " +
+                                                    result);
+                                failureCount += 1;
+                            }
+
+                            if (!result.isFinite()) {
+                                failures.AppendLine(" * " + name + "(" + constraint +
+                                                    ") returned a non-finite value: " + result);
+                                failureCount += 1;
+                            }
+
+                            return result;
+                        });
+
+                    var testIntrinsicsForValues =
+                        new Action<Func<double, double>, Func<double, double>, string, double>(
+                            (getMin, getMax, name, constraint) => {
+                                double min = testIntrinsic(getMin, "getMinIntrinsic" + name, constraint);
+                                double max = testIntrinsic(getMax, "getMaxIntrinsic" + name, constraint);
+                                if (min > max) {
+                                    failures.AppendLine(
+                                        " * getMinIntrinsic" + name + "(" + constraint + ") returned a larger value (" +
+                                        min +
+                                        ") than getMaxIntrinsic" + name + "(" + constraint + ") (" + max + ")");
+                                    failureCount += 1;
+                                }
+                            });
+
+                    testIntrinsicsForValues(this.getMinIntrinsicWidth, this.getMaxIntrinsicWidth, "Width",
+                        double.PositiveInfinity);
+                    testIntrinsicsForValues(this.getMinIntrinsicHeight, this.getMaxIntrinsicHeight, "Height",
+                        double.PositiveInfinity);
+
+                    if (this.constraints.hasBoundedWidth) {
+                        testIntrinsicsForValues(this.getMinIntrinsicWidth, this.getMaxIntrinsicWidth, "Width",
+                            this.constraints.maxWidth);
+                    }
+
+                    if (this.constraints.hasBoundedHeight) {
+                        testIntrinsicsForValues(this.getMinIntrinsicHeight, this.getMaxIntrinsicHeight, "Height",
+                            this.constraints.maxHeight);
+                    }
+
+                    RenderObject.debugCheckingIntrinsics = false;
+                    if (failures.Length > 0) {
+                        D.assert(failureCount > 0);
+                        throw new UIWidgetsError(
+                            "The intrinsic dimension methods of the " + this.GetType() +
+                            " class returned values that violate the intrinsic protocol contract.\n" +
+                            "The following failures was detected:\n" +
+                            failures +
+                            "If you are not writing your own RenderBox subclass, then this is not\n" +
+                            "your fault."
+                        );
+                    }
+                }
+
+                return true;
+            });
+        }
+
         public override void markNeedsLayout() {
-            if (this._cachedBaselines != null && this._cachedBaselines.Count > 0 ||
-                this._cachedIntrinsicDimensions != null && this._cachedIntrinsicDimensions.Count > 0) {
+            if (this._cachedBaselines != null && this._cachedBaselines.isNotEmpty() ||
+                this._cachedIntrinsicDimensions != null && this._cachedIntrinsicDimensions.isNotEmpty()) {
                 if (this._cachedBaselines != null) {
                     this._cachedBaselines.Clear();
                 }
@@ -513,17 +1066,52 @@ namespace UIWidgets.rendering {
         }
 
 
-        public override void performResize() {
+        protected override void performResize() {
             this.size = this.constraints.smallest;
+            D.assert(this.size.isFinite);
         }
 
-        public override void performLayout() {
+        protected override void performLayout() {
+            D.assert(() => {
+                if (!this.sizedByParent) {
+                    throw new UIWidgetsError(
+                        this.GetType() + " did not implement performLayout().\n" +
+                        "RenderBox subclasses need to either override performLayout() to " +
+                        "set a size and lay out any children, or, set sizedByParent to true " +
+                        "so that performResize() sizes the render object."
+                    );
+                }
+
+                return true;
+            });
         }
 
         public virtual bool hitTest(HitTestResult result, Offset position) {
             D.assert(() => {
                 if (!this.hasSize) {
-                    throw new Exception("has no size during hitTest");
+                    if (this.debugNeedsLayout) {
+                        throw new UIWidgetsError(
+                            "Cannot hit test a render box that has never been laid out.\n" +
+                            "The hitTest() method was called on this RenderBox:\n" +
+                            "  " + this + "\n" +
+                            "Unfortunately, this object\"s geometry is not known at this time, " +
+                            "probably because it has never been laid out. " +
+                            "This means it cannot be accurately hit-tested. If you are trying " +
+                            "to perform a hit test during the layout phase itself, make sure " +
+                            "you only hit test nodes that have completed layout (e.g. the node\"s " +
+                            "children, after their layout() method has been called)."
+                        );
+                    }
+
+                    throw new UIWidgetsError(
+                        "Cannot hit test a render box with no size.\n" +
+                        "The hitTest() method was called on this RenderBox:\n" +
+                        "  " + this + "\n" +
+                        "Although this node is not marked as needing layout, " +
+                        "its size is not set. A RenderBox object must have an " +
+                        "explicit size before it can be hit-tested. Make sure " +
+                        "that the RenderBox in question sets its size during layout."
+                    );
                 }
 
                 return true;
@@ -548,6 +1136,29 @@ namespace UIWidgets.rendering {
         }
 
         public override void applyPaintTransform(RenderObject child, ref Matrix4x4 transform) {
+            D.assert(child != null);
+            D.assert(child.parent == this);
+            D.assert(() => {
+                if (!(child.parentData is BoxParentData)) {
+                    throw new UIWidgetsError(
+                        this.GetType() + " does not implement applyPaintTransform.\n" +
+                        "The following " + this.GetType() + " object:\n" +
+                        "  " + this.toStringShallow() + "\n" +
+                        "...did not use a BoxParentData class for the parentData field of the following child:\n" +
+                        "  " + child.toStringShallow() + "\n" +
+                        "The " + this.GetType() + " class inherits from RenderBox. " +
+                        "The default applyPaintTransform implementation provided by RenderBox assumes that the " +
+                        "children all use BoxParentData objects for their parentData field. " +
+                        "Since " + this.GetType() +
+                        " does not in fact use that ParentData class for its children, it must " +
+                        "provide an implementation of applyPaintTransform that supports the specific ParentData " +
+                        "subclass used by its children (which apparently is " + child.parentData.GetType() + ")."
+                    );
+                }
+
+                return true;
+            });
+
             var childParentData = (BoxParentData) child.parentData;
             var offset = childParentData.offset;
             transform = Matrix4x4.Translate(offset.toVector()) * transform;
@@ -555,6 +1166,10 @@ namespace UIWidgets.rendering {
 
         public Offset globalToLocal(Offset point, RenderObject ancestor = null) {
             var transform = this.getTransformTo(ancestor);
+            if (transform.determinant == 0) {
+                return Offset.zero;
+            }
+
             transform = transform.inverse;
             return MatrixUtils.transformPoint(transform, point);
         }
@@ -566,24 +1181,99 @@ namespace UIWidgets.rendering {
         public override Rect paintBounds {
             get { return Offset.zero & this.size; }
         }
-        
+
         int _debugActivePointers = 0;
-        
+
         protected bool debugHandleEvent(PointerEvent evt, HitTestEntry entry) {
-            D.assert(()  =>{
+            D.assert(() => {
                 if (D.debugPaintPointersEnabled) {
                     if (evt is PointerDownEvent) {
                         this._debugActivePointers += 1;
                     } else if (evt is PointerUpEvent || evt is PointerCancelEvent) {
                         this._debugActivePointers -= 1;
                     }
+
                     this.markNeedsPaint();
                 }
+
                 return true;
             });
             return true;
         }
-        
+
+        public override void debugPaint(PaintingContext context, Offset offset) {
+            D.assert(() => {
+                if (D.debugPaintSizeEnabled) {
+                    this.debugPaintSize(context, offset);
+                }
+
+                if (D.debugPaintBaselinesEnabled) {
+                    this.debugPaintBaselines(context, offset);
+                }
+
+                if (D.debugPaintPointersEnabled) {
+                    this.debugPaintPointers(context, offset);
+                }
+
+                return true;
+            });
+        }
+
+        protected virtual void debugPaintSize(PaintingContext context, Offset offset) {
+            D.assert(() => {
+                var paint = new Paint {
+                    color = new Color(0xFF00FFFF),
+                };
+
+                context.canvas.drawRect((offset & this.size).deflate(0.5),
+                    BorderWidth.all(1), BorderRadius.zero, paint);
+                return true;
+            });
+        }
+
+        protected virtual void debugPaintBaselines(PaintingContext context, Offset offset) {
+            D.assert(() => {
+//                final Paint paint = Paint()
+//                    ..style = PaintingStyle.stroke
+//                    ..strokeWidth = 0.25;
+//                Path path;
+//                // ideographic baseline
+//                final double baselineI = getDistanceToBaseline(TextBaseline.ideographic, onlyReal: true);
+//                if (baselineI != null) {
+//                    paint.color =  const Color (0xFFFFD000);
+//                    path = Path();
+//                    path.moveTo(offset.dx, offset.dy + baselineI);
+//                    path.lineTo(offset.dx + size.width, offset.dy + baselineI);
+//                    context.canvas.drawPath(path, paint);
+//                }
+//
+//                // alphabetic baseline
+//                final double baselineA = getDistanceToBaseline(TextBaseline.alphabetic, onlyReal: true);
+//                if (baselineA != null) {
+//                    paint.color =  const Color (0xFF00FF00);
+//                    path = Path();
+//                    path.moveTo(offset.dx, offset.dy + baselineA);
+//                    path.lineTo(offset.dx + size.width, offset.dy + baselineA);
+//                    context.canvas.drawPath(path, paint);
+//                }
+
+                return true;
+            });
+        }
+
+        protected virtual void debugPaintPointers(PaintingContext context, Offset offset) {
+            D.assert(() => {
+                if (this._debugActivePointers > 0) {
+                    var paint = new Paint {
+                        color = new Color(0x00BBBB | ((0x04000000 * this.depth) & 0xFF000000)),
+                    };
+                    context.canvas.drawRect(offset & this.size, BorderWidth.zero, BorderRadius.zero, paint);
+                }
+
+                return true;
+            });
+        }
+
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             properties.add(new DiagnosticsProperty<Size>("size", this._size, missingIfNull: true));
@@ -596,6 +1286,8 @@ namespace UIWidgets.rendering {
         where ChildType : RenderBox
         where ParentDataType : ContainerParentDataMixinBoxParentData<ChildType> {
         public double? defaultComputeDistanceToFirstActualBaseline(TextBaseline baseline) {
+            D.assert(!this.debugNeedsLayout);
+
             var child = this.firstChild;
             while (child != null) {
                 var childParentData = (ParentDataType) child.parentData;
@@ -611,6 +1303,8 @@ namespace UIWidgets.rendering {
         }
 
         public double? defaultComputeDistanceToHighestActualBaseline(TextBaseline baseline) {
+            D.assert(!this.debugNeedsLayout);
+
             double? result = null;
             var child = this.firstChild;
             while (child != null) {
@@ -629,6 +1323,20 @@ namespace UIWidgets.rendering {
             }
 
             return result;
+        }
+
+        public bool defaultHitTestChildren(HitTestResult result, Offset position = null) {
+            ChildType child = this.lastChild;
+            while (child != null) {
+                ParentDataType childParentData = (ParentDataType) child.parentData;
+                if (child.hitTest(result, position: position - childParentData.offset)) {
+                    return true;
+                }
+
+                child = childParentData.previousSibling;
+            }
+
+            return false;
         }
 
         public void defaultPaint(PaintingContext context, Offset offset) {

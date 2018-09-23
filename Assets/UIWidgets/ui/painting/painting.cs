@@ -119,6 +119,13 @@ namespace UIWidgets.ui {
         }
     }
 
+    public enum Clip {
+        none,
+        hardEdge,
+        antiAlias,
+        antiAliasWithSaveLayer,
+    }
+
     public class Paint {
         public Color color;
         public double blurSigma;

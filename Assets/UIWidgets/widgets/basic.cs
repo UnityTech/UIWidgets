@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UIWidgets.foundation;
 using UIWidgets.painting;
 using UIWidgets.rendering;
@@ -84,11 +85,11 @@ namespace UIWidgets.widgets {
         public BoxConstraints constraints;
 
         public override RenderObject createRenderObject(BuildContext context) {
-            return new RenderConstrainedBox(additionalConstraints: constraints);
+            return new RenderConstrainedBox(additionalConstraints: this.constraints);
         }
 
         public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
-            ((RenderConstrainedBox) renderObject)._additionalConstraints = constraints;
+            ((RenderConstrainedBox) renderObject).additionalConstraints = this.constraints;
         }
     }
 
@@ -154,7 +155,6 @@ namespace UIWidgets.widgets {
                 transform: transform,
                 origin: origin,
                 alignment: alignment,
-                textDirection: Directionality.of(context),
                 transformHitTests: transformHitTests
             );
         }
@@ -163,7 +163,6 @@ namespace UIWidgets.widgets {
             ((RenderTransform) renderObject).transform = transform;
             ((RenderTransform) renderObject).origin = origin;
             ((RenderTransform) renderObject).alignment = alignment;
-            ((RenderTransform) renderObject).textDirection = Directionality.of(context);
             ((RenderTransform) renderObject).transformHitTests = transformHitTests;
         }
     }
@@ -361,7 +360,7 @@ namespace UIWidgets.widgets {
         }
 
         public static List<RepaintBoundary> wrapAll(List<Widget> widgets) {
-            List<RepaintBoundary> result = new List<RepaintBoundary>(widgets.Count);
+            List<RepaintBoundary> result = Enumerable.Repeat((RepaintBoundary) null, widgets.Count).ToList();
             for (int i = 0; i < result.Count; ++i) {
                 result[i] = RepaintBoundary.wrap(widgets[i], i);
             }

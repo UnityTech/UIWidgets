@@ -1,16 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using UIWidgets.animation;
+using UIWidgets.foundation;
+using UIWidgets.gestures;
 using UIWidgets.painting;
 using UIWidgets.ui;
 using UnityEngine;
+using Canvas = UIWidgets.ui.Canvas;
 using Rect = UIWidgets.ui.Rect;
+using Color = UIWidgets.ui.Color;
 
 namespace UIWidgets.rendering {
     public interface RenderAbstractViewport {
         RevealedOffset getOffsetToReveal(RenderObject target, double alignment, Rect rect = null);
+        RenderObject parent { get; }
     }
 
-    public static class RenderAbstractViewportUtils {
+    public static class RenderViewportUtils {
         public static RenderAbstractViewport of(RenderObject obj) {
             while (obj != null) {
                 if (obj is RenderAbstractViewport) {
@@ -27,13 +33,20 @@ namespace UIWidgets.rendering {
     }
 
     public class RevealedOffset {
-        public RevealedOffset(double offset, Rect rect) {
+        public RevealedOffset(
+            double offset,
+            Rect rect) {
+            D.assert(rect != null);
             this.offset = offset;
             this.rect = rect;
         }
 
         public readonly double offset;
         public readonly Rect rect;
+
+        public override string ToString() {
+            return string.Format("{0}(offset: {1}, rect: {2})", this.GetType(), this.offset, this.rect);
+        }
     }
 
     public abstract class RenderViewportBase<ParentDataClass> :
@@ -44,12 +57,21 @@ namespace UIWidgets.rendering {
             AxisDirection axisDirection = AxisDirection.down,
             AxisDirection crossAxisDirection = AxisDirection.right,
             ViewportOffset offset = null,
-            double? cacheExtent = null
+            double cacheExtent = RenderViewportUtils.defaultCacheExtent
         ) {
+            D.assert(offset != null);
+            D.assert(AxisUtils.axisDirectionToAxis(axisDirection) != AxisUtils.axisDirectionToAxis(crossAxisDirection));
+
             this._axisDirection = axisDirection;
             this._crossAxisDirection = crossAxisDirection;
             this._offset = offset;
-            this._cacheExtent = cacheExtent ?? RenderAbstractViewportUtils.defaultCacheExtent;
+            this._cacheExtent = cacheExtent;
+        }
+        
+        public new RenderObject parent {
+            get {
+                return (RenderObject) base.parent;
+            }
         }
 
         public AxisDirection axisDirection {
@@ -64,7 +86,7 @@ namespace UIWidgets.rendering {
             }
         }
 
-        public AxisDirection _axisDirection;
+        AxisDirection _axisDirection;
 
         public AxisDirection crossAxisDirection {
             get { return this._crossAxisDirection; }
@@ -78,7 +100,7 @@ namespace UIWidgets.rendering {
             }
         }
 
-        public AxisDirection _crossAxisDirection;
+        AxisDirection _crossAxisDirection;
 
         public Axis axis {
             get { return AxisUtils.axisDirectionToAxis(this.axisDirection); }
@@ -87,7 +109,8 @@ namespace UIWidgets.rendering {
         public ViewportOffset offset {
             get { return this._offset; }
             set {
-                if (object.Equals(value, this._offset)) {
+                D.assert(value != null);
+                if (value == this._offset) {
                     return;
                 }
 
@@ -104,7 +127,7 @@ namespace UIWidgets.rendering {
             }
         }
 
-        public ViewportOffset _offset;
+        ViewportOffset _offset;
 
         public double cacheExtent {
             get { return this._cacheExtent; }
@@ -118,7 +141,7 @@ namespace UIWidgets.rendering {
             }
         }
 
-        public double _cacheExtent;
+        double _cacheExtent;
 
         public override void attach(object owner) {
             base.attach(owner);
@@ -130,19 +153,42 @@ namespace UIWidgets.rendering {
             base.detach();
         }
 
-        public override double computeMinIntrinsicWidth(double height) {
+        protected virtual bool debugThrowIfNotCheckingIntrinsics() {
+            D.assert(() => {
+                if (!RenderObject.debugCheckingIntrinsics) {
+                    D.assert(!(this is RenderShrinkWrappingViewport));
+                    throw new UIWidgetsError(
+                        this.GetType() + " does not support returning intrinsic dimensions.\n" +
+                        "Calculating the intrinsic dimensions would require instantiating every child of " +
+                        "the viewport, which defeats the point of viewports being lazy.\n" +
+                        "If you are merely trying to shrink-wrap the viewport in the main axis direction, " +
+                        "consider a RenderShrinkWrappingViewport render object (ShrinkWrappingViewport widget), " +
+                        "which achieves that effect without implementing the intrinsic dimension API."
+                    );
+                }
+
+                return true;
+            });
+            return true;
+        }
+
+        protected override double computeMinIntrinsicWidth(double height) {
+            D.assert(this.debugThrowIfNotCheckingIntrinsics());
             return 0.0;
         }
 
-        public override double computeMaxIntrinsicWidth(double height) {
+        protected override double computeMaxIntrinsicWidth(double height) {
+            D.assert(this.debugThrowIfNotCheckingIntrinsics());
             return 0.0;
         }
 
-        public override double computeMinIntrinsicHeight(double width) {
+        protected override double computeMinIntrinsicHeight(double width) {
+            D.assert(this.debugThrowIfNotCheckingIntrinsics());
             return 0.0;
         }
 
-        public override double computeMaxIntrinsicHeight(double width) {
+        protected override double computeMaxIntrinsicHeight(double width) {
+            D.assert(this.debugThrowIfNotCheckingIntrinsics());
             return 0.0;
         }
 
@@ -150,7 +196,7 @@ namespace UIWidgets.rendering {
             get { return true; }
         }
 
-        public double layoutChildSequence(
+        protected double layoutChildSequence(
             RenderSliver child,
             double scrollOffset,
             double overlap,
@@ -163,18 +209,25 @@ namespace UIWidgets.rendering {
             double remainingCacheExtent,
             double cacheOrigin
         ) {
-            double initialLayoutOffset = layoutOffset;
+            D.assert(scrollOffset.isFinite());
+            D.assert(scrollOffset >= 0.0);
 
+            double initialLayoutOffset = layoutOffset;
             ScrollDirection adjustedUserScrollDirection =
                 GrowthDirectionUtils.applyGrowthDirectionToScrollDirection(
                     this.offset.userScrollDirection, growthDirection);
-
             double maxPaintOffset = layoutOffset + overlap;
 
             while (child != null) {
                 double sliverScrollOffset = scrollOffset <= 0.0 ? 0.0 : scrollOffset;
+
                 double correctedCacheOrigin = Math.Max(cacheOrigin, -sliverScrollOffset);
                 double cacheExtentCorrection = cacheOrigin - correctedCacheOrigin;
+
+                D.assert(sliverScrollOffset >= correctedCacheOrigin.abs());
+                D.assert(correctedCacheOrigin <= 0.0);
+                D.assert(sliverScrollOffset >= 0.0);
+                D.assert(cacheExtentCorrection <= 0.0);
 
                 child.layout(new SliverConstraints(
                     axisDirection: this.axisDirection,
@@ -191,9 +244,10 @@ namespace UIWidgets.rendering {
                 ), parentUsesSize: true);
 
                 var childLayoutGeometry = child.geometry;
+                D.assert(childLayoutGeometry.debugAssertIsValid());
 
-                if (childLayoutGeometry.scrollOffsetCorrection != 0.0) {
-                    return childLayoutGeometry.scrollOffsetCorrection;
+                if (childLayoutGeometry.scrollOffsetCorrection != null) {
+                    return childLayoutGeometry.scrollOffsetCorrection.Value;
                 }
 
                 double effectiveLayoutOffset = layoutOffset + childLayoutGeometry.paintOrigin;
@@ -221,6 +275,39 @@ namespace UIWidgets.rendering {
             return 0.0;
         }
 
+        public override Rect describeApproximatePaintClip(RenderObject childRaw) {
+            RenderSliver child = (RenderSliver) childRaw;
+
+            Rect viewportClip = Offset.zero & this.size;
+            if (child.constraints.overlap == 0.0) {
+                return viewportClip;
+            }
+
+            double left = viewportClip.left;
+            double right = viewportClip.right;
+            double top = viewportClip.top;
+            double bottom = viewportClip.bottom;
+            double startOfOverlap = child.constraints.viewportMainAxisExtent - child.constraints.remainingPaintExtent;
+            double overlapCorrection = startOfOverlap + child.constraints.overlap;
+            switch (GrowthDirectionUtils.applyGrowthDirectionToAxisDirection(
+                this.axisDirection, child.constraints.growthDirection)) {
+                case AxisDirection.down:
+                    top += overlapCorrection;
+                    break;
+                case AxisDirection.up:
+                    bottom -= overlapCorrection;
+                    break;
+                case AxisDirection.right:
+                    left += overlapCorrection;
+                    break;
+                case AxisDirection.left:
+                    right -= overlapCorrection;
+                    break;
+            }
+
+            return Rect.fromLTRB(left, top, right, bottom);
+        }
+
         public override void paint(PaintingContext context, Offset offset) {
             if (this.firstChild == null) {
                 return;
@@ -241,6 +328,65 @@ namespace UIWidgets.rendering {
             }
         }
 
+        protected override void debugPaintSize(PaintingContext context, Offset offset) {
+            D.assert(() => {
+                base.debugPaintSize(context, offset);
+
+                Paint paint = new Paint {
+                    color = new Color(0xFF00FF00)
+                };
+
+                Canvas canvas = context.canvas;
+                RenderSliver child = this.firstChild;
+                while (child != null) {
+                    Size size = null;
+                    switch (this.axis) {
+                        case Axis.vertical:
+                            size = new Size(child.constraints.crossAxisExtent, child.geometry.layoutExtent);
+                            break;
+                        case Axis.horizontal:
+                            size = new Size(child.geometry.layoutExtent, child.constraints.crossAxisExtent);
+                            break;
+                    }
+
+                    D.assert(size != null);
+                    canvas.drawRect(((offset + this.paintOffsetOf(child)) & size).deflate(0.5),
+                        BorderWidth.all(1), BorderRadius.zero, paint);
+                    child = this.childAfter(child);
+                }
+
+                return true;
+            });
+        }
+
+        protected override bool hitTestChildren(HitTestResult result, Offset position = null) {
+            D.assert(position != null);
+
+            double mainAxisPosition = 0, crossAxisPosition = 0;
+            switch (this.axis) {
+                case Axis.vertical:
+                    mainAxisPosition = position.dy;
+                    crossAxisPosition = position.dx;
+                    break;
+                case Axis.horizontal:
+                    mainAxisPosition = position.dx;
+                    crossAxisPosition = position.dy;
+                    break;
+            }
+
+            foreach (RenderSliver child in this.childrenInHitTestOrder) {
+                if (child.geometry.visible && child.hitTest(
+                        result,
+                        mainAxisPosition: this.computeChildMainAxisPosition(child, mainAxisPosition),
+                        crossAxisPosition: crossAxisPosition
+                    )) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public RevealedOffset getOffsetToReveal(RenderObject target, double alignment, Rect rect = null) {
             double leadingScrollOffset = 0.0;
             double targetMainAxisExtent = 0.0;
@@ -256,6 +402,11 @@ namespace UIWidgets.rendering {
                 while (pivot.parent is RenderBox) {
                     pivot = (RenderBox) pivot.parent;
                 }
+
+                D.assert(pivot.parent != null);
+                D.assert(pivot.parent != this);
+                D.assert(pivot != this);
+                D.assert(pivot.parent is RenderSliver);
 
                 RenderSliver pivotParent = (RenderSliver) pivot.parent;
 
@@ -319,6 +470,9 @@ namespace UIWidgets.rendering {
                 child = parent;
             }
 
+            D.assert(child.parent == this);
+            D.assert(child is RenderSliver);
+
             RenderSliver sliver = (RenderSliver) child;
             double extentOfPinnedSlivers = this.maxScrollObstructionExtentBefore(sliver);
             leadingScrollOffset = this.scrollOffsetOf(sliver, leadingScrollOffset);
@@ -365,8 +519,12 @@ namespace UIWidgets.rendering {
             return new RevealedOffset(offset: targetOffset, rect: targetRect);
         }
 
-        public Offset computeAbsolutePaintOffset(RenderSliver child, double layoutOffset,
+        protected Offset computeAbsolutePaintOffset(RenderSliver child, double layoutOffset,
             GrowthDirection growthDirection) {
+            D.assert(this.hasSize);
+            D.assert(child != null);
+            D.assert(child.geometry != null);
+
             switch (GrowthDirectionUtils.applyGrowthDirectionToAxisDirection(this.axisDirection, growthDirection)) {
                 case AxisDirection.up:
                     return new Offset(0.0, this.size.height - (layoutOffset + child.geometry.paintExtent));
@@ -381,21 +539,136 @@ namespace UIWidgets.rendering {
             return null;
         }
 
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new EnumProperty<AxisDirection>("axisDirection", this.axisDirection));
+            properties.add(new EnumProperty<AxisDirection>("crossAxisDirection", this.crossAxisDirection));
+            properties.add(new DiagnosticsProperty<ViewportOffset>("offset", this.offset));
+        }
 
-        public abstract bool hasVisualOverflow { get; }
+        public override List<DiagnosticsNode> debugDescribeChildren() {
+            var children = new List<DiagnosticsNode>();
+            RenderSliver child = this.firstChild;
+            if (child == null) {
+                return children;
+            }
 
-        public abstract void updateOutOfBandData(GrowthDirection growthDirection, SliverGeometry childLayoutGeometry);
+            int count = this.indexOfFirstChild;
+            while (true) {
+                children.Add(child.toDiagnosticsNode(name: this.labelForChild(count)));
+                if (child == this.lastChild)
+                    break;
+                count += 1;
+                child = this.childAfter(child);
+            }
 
-        public abstract void updateChildLayoutOffset(RenderSliver child, double layoutOffset,
+            return children;
+        }
+
+
+        protected abstract bool hasVisualOverflow { get; }
+
+        protected abstract void
+            updateOutOfBandData(GrowthDirection growthDirection, SliverGeometry childLayoutGeometry);
+
+        protected abstract void updateChildLayoutOffset(RenderSliver child, double layoutOffset,
             GrowthDirection growthDirection);
 
-        public abstract Offset paintOffsetOf(RenderSliver child);
+        protected abstract Offset paintOffsetOf(RenderSliver child);
 
-        public abstract double scrollOffsetOf(RenderSliver child, double scrollOffsetWithinChild);
+        protected abstract double scrollOffsetOf(RenderSliver child, double scrollOffsetWithinChild);
 
-        public abstract double maxScrollObstructionExtentBefore(RenderSliver child);
+        protected abstract double maxScrollObstructionExtentBefore(RenderSliver child);
 
-        public abstract IEnumerable<RenderSliver> childrenInPaintOrder { get; }
+        protected abstract double computeChildMainAxisPosition(RenderSliver child, double parentMainAxisPosition);
+
+        protected abstract int indexOfFirstChild { get; }
+
+        protected abstract string labelForChild(int index);
+
+        protected abstract IEnumerable<RenderSliver> childrenInPaintOrder { get; }
+
+        protected abstract IEnumerable<RenderSliver> childrenInHitTestOrder { get; }
+
+        public override void showOnScreen(
+            RenderObject descendant,
+            Rect rect,
+            TimeSpan? duration = null,
+            Curve curve = null
+        ) {
+            duration = duration ?? TimeSpan.Zero;
+            curve = curve ?? Curves.ease;
+
+            if (!this.offset.allowImplicitScrolling) {
+                base.showOnScreen(
+                    descendant: descendant,
+                    rect: rect,
+                    duration: duration,
+                    curve: curve
+                );
+                return;
+            }
+
+            Rect newRect = showInViewport(
+                descendant: descendant,
+                viewport: this,
+                offset: this.offset,
+                rect: rect,
+                duration: duration,
+                curve: curve
+            );
+            base.showOnScreen(
+                rect: newRect,
+                duration: duration,
+                curve: curve
+            );
+        }
+
+        public static Rect showInViewport(
+            RenderObject descendant = null,
+            Rect rect = null,
+            RenderAbstractViewport viewport = null,
+            ViewportOffset offset = null,
+            TimeSpan? duration = null,
+            Curve curve = null
+        ) {
+            duration = duration ?? TimeSpan.Zero;
+            curve = curve ?? Curves.ease;
+            D.assert(viewport != null);
+            D.assert(offset != null);
+            if (descendant == null) {
+                return rect;
+            }
+
+            RevealedOffset leadingEdgeOffset = viewport.getOffsetToReveal(descendant, 0.0, rect: rect);
+            RevealedOffset trailingEdgeOffset = viewport.getOffsetToReveal(descendant, 1.0, rect: rect);
+            double currentOffset = offset.pixels;
+
+
+            RevealedOffset targetOffset = null;
+            if (leadingEdgeOffset.offset < trailingEdgeOffset.offset) {
+                double leadingEdgeDiff = (offset.pixels - leadingEdgeOffset.offset).abs();
+                double trailingEdgeDiff = (offset.pixels - trailingEdgeOffset.offset).abs();
+                targetOffset = leadingEdgeDiff < trailingEdgeDiff ? leadingEdgeOffset : trailingEdgeOffset;
+            } else if (currentOffset > leadingEdgeOffset.offset) {
+                targetOffset = leadingEdgeOffset;
+            } else if (currentOffset < trailingEdgeOffset.offset) {
+                targetOffset = trailingEdgeOffset;
+            } else {
+                var transform = descendant.getTransformTo(viewport.parent);
+                return MatrixUtils.transformRect(transform, rect ?? descendant.paintBounds);
+            }
+
+            D.assert(targetOffset != null);
+
+            if (duration == TimeSpan.Zero) {
+                offset.jumpTo(targetOffset.offset);
+            } else {
+                offset.animateTo(targetOffset.offset, duration: duration.Value, curve: curve);
+            }
+
+            return targetOffset.rect;
+        }
     }
 
 
@@ -407,9 +680,14 @@ namespace UIWidgets.rendering {
             double anchor = 0.0,
             List<RenderSliver> children = null,
             RenderSliver center = null,
-            double? cacheExtent = null
+            double cacheExtent = RenderViewportUtils.defaultCacheExtent
         ) : base(axisDirection, crossAxisDirection, offset, cacheExtent) {
+            D.assert(anchor >= 0.0 && anchor <= 1.0);
+            this._anchor = anchor;
+            this._center = center;
+
             this.addAll(children);
+
             if (center == null && this.firstChild != null) {
                 this._center = this.firstChild;
             }
@@ -424,7 +702,9 @@ namespace UIWidgets.rendering {
         public double anchor {
             get { return this._anchor; }
             set {
-                if (value != this._anchor) {
+                D.assert(value >= 0.0 && value <= 1.0);
+
+                if (value == this._anchor) {
                     return;
                 }
 
@@ -449,11 +729,76 @@ namespace UIWidgets.rendering {
 
         public RenderSliver _center;
 
-        public override bool sizedByParent {
+        protected override bool sizedByParent {
             get { return true; }
         }
 
-        public override void performResize() {
+        protected override void performResize() {
+            D.assert(() => {
+                if (!this.constraints.hasBoundedHeight || !this.constraints.hasBoundedWidth) {
+                    switch (this.axis) {
+                        case Axis.vertical:
+                            if (!this.constraints.hasBoundedHeight) {
+                                throw new UIWidgetsError(
+                                    "Vertical viewport was given unbounded height.\n" +
+                                    "Viewports expand in the scrolling direction to fill their container." +
+                                    "In this case, a vertical viewport was given an unlimited amount of " +
+                                    "vertical space in which to expand. This situation typically happens " +
+                                    "when a scrollable widget is nested inside another scrollable widget.\n" +
+                                    "If this widget is always nested in a scrollable widget there " +
+                                    "is no need to use a viewport because there will always be enough " +
+                                    "vertical space for the children. In this case, consider using a " +
+                                    "Column instead. Otherwise, consider using the \"shrinkWrap\" property " +
+                                    "(or a ShrinkWrappingViewport) to size the height of the viewport " +
+                                    "to the sum of the heights of its children."
+                                );
+                            }
+
+                            if (!this.constraints.hasBoundedWidth) {
+                                throw new UIWidgetsError(
+                                    "Vertical viewport was given unbounded width.\n" +
+                                    "Viewports expand in the cross axis to fill their container and " +
+                                    "constrain their children to match their extent in the cross axis. " +
+                                    "In this case, a vertical viewport was given an unlimited amount of " +
+                                    "horizontal space in which to expand."
+                                );
+                            }
+
+                            break;
+                        case Axis.horizontal:
+                            if (!this.constraints.hasBoundedWidth) {
+                                throw new UIWidgetsError(
+                                    "Horizontal viewport was given unbounded width.\n" +
+                                    "Viewports expand in the scrolling direction to fill their container." +
+                                    "In this case, a horizontal viewport was given an unlimited amount of " +
+                                    "horizontal space in which to expand. This situation typically happens " +
+                                    "when a scrollable widget is nested inside another scrollable widget.\n" +
+                                    "If this widget is always nested in a scrollable widget there " +
+                                    "is no need to use a viewport because there will always be enough " +
+                                    "horizontal space for the children. In this case, consider using a " +
+                                    "Row instead. Otherwise, consider using the \"shrinkWrap\" property " +
+                                    "(or a ShrinkWrappingViewport) to size the width of the viewport " +
+                                    "to the sum of the widths of its children."
+                                );
+                            }
+
+                            if (!this.constraints.hasBoundedHeight) {
+                                throw new UIWidgetsError(
+                                    "Horizontal viewport was given unbounded height.\n" +
+                                    "Viewports expand in the cross axis to fill their container and " +
+                                    "constrain their children to match their extent in the cross axis. " +
+                                    "In this case, a horizontal viewport was given an unlimited amount of " +
+                                    "vertical space in which to expand."
+                                );
+                            }
+
+                            break;
+                    }
+                }
+
+                return true;
+            });
+
             this.size = this.constraints.biggest;
 
             switch (this.axis) {
@@ -466,14 +811,15 @@ namespace UIWidgets.rendering {
             }
         }
 
-        public const int _maxLayoutCycles = 10;
+        const int _maxLayoutCycles = 10;
 
-        public double _minScrollExtent;
-        public double _maxScrollExtent;
-        public bool _hasVisualOverflow = false;
+        double _minScrollExtent;
+        double _maxScrollExtent;
+        bool _hasVisualOverflow = false;
 
-        public override void performLayout() {
+        protected override void performLayout() {
             if (this.center == null) {
+                D.assert(this.firstChild == null);
                 this._minScrollExtent = 0.0;
                 this._maxScrollExtent = 0.0;
                 this._hasVisualOverflow = false;
@@ -511,10 +857,42 @@ namespace UIWidgets.rendering {
                 }
 
                 count += 1;
-            } while (count < RenderViewport._maxLayoutCycles);
+            } while (count < _maxLayoutCycles);
+
+            D.assert(() => {
+                if (count >= _maxLayoutCycles) {
+                    D.assert(count != 1);
+                    throw new UIWidgetsError(
+                        "A RenderViewport exceeded its maximum number of layout cycles.\n" +
+                        "RenderViewport render objects, during layout, can retry if either their " +
+                        "slivers or their ViewportOffset decide that the offset should be corrected " +
+                        "to take into account information collected during that layout.\n" +
+                        "In the case of this RenderViewport object, however, this happened $count " +
+                        "times and still there was no consensus on the scroll offset. This usually " +
+                        "indicates a bug. Specifically, it means that one of the following three " +
+                        "problems is being experienced by the RenderViewport object:\n" +
+                        " * One of the RenderSliver children or the ViewportOffset have a bug such" +
+                        " that they always think that they need to correct the offset regardless.\n" +
+                        " * Some combination of the RenderSliver children and the ViewportOffset" +
+                        " have a bad interaction such that one applies a correction then another" +
+                        " applies a reverse correction, leading to an infinite loop of corrections.\n" +
+                        " * There is a pathological case that would eventually resolve, but it is" +
+                        " so complicated that it cannot be resolved in any reasonable number of" +
+                        " layout passes."
+                    );
+                }
+
+                return true;
+            });
         }
 
-        public double _attemptLayout(double mainAxisExtent, double crossAxisExtent, double correctedOffset) {
+        double _attemptLayout(double mainAxisExtent, double crossAxisExtent, double correctedOffset) {
+            D.assert(!mainAxisExtent.isNaN());
+            D.assert(mainAxisExtent >= 0.0);
+            D.assert(crossAxisExtent.isFinite());
+            D.assert(crossAxisExtent >= 0.0);
+            D.assert(correctedOffset.isFinite());
+
             this._minScrollExtent = 0.0;
             this._maxScrollExtent = 0.0;
             this._hasVisualOverflow = false;
@@ -565,11 +943,12 @@ namespace UIWidgets.rendering {
             );
         }
 
-        public override bool hasVisualOverflow {
+        protected override bool hasVisualOverflow {
             get { return this._hasVisualOverflow; }
         }
 
-        public override void updateOutOfBandData(GrowthDirection growthDirection, SliverGeometry childLayoutGeometry) {
+        protected override void
+            updateOutOfBandData(GrowthDirection growthDirection, SliverGeometry childLayoutGeometry) {
             switch (growthDirection) {
                 case GrowthDirection.forward:
                     this._maxScrollExtent += childLayoutGeometry.scrollExtent;
@@ -584,18 +963,20 @@ namespace UIWidgets.rendering {
             }
         }
 
-        public override void updateChildLayoutOffset(RenderSliver child, double layoutOffset,
+        protected override void updateChildLayoutOffset(RenderSliver child, double layoutOffset,
             GrowthDirection growthDirection) {
             var childParentData = (SliverPhysicalParentData) child.parentData;
             childParentData.paintOffset = this.computeAbsolutePaintOffset(child, layoutOffset, growthDirection);
         }
 
-        public override Offset paintOffsetOf(RenderSliver child) {
+        protected override Offset paintOffsetOf(RenderSliver child) {
             var childParentData = (SliverPhysicalParentData) child.parentData;
             return childParentData.paintOffset;
         }
 
-        public override double scrollOffsetOf(RenderSliver child, double scrollOffsetWithinChild) {
+        protected override double scrollOffsetOf(RenderSliver child, double scrollOffsetWithinChild) {
+            D.assert(child.parent == this);
+
             GrowthDirection growthDirection = child.constraints.growthDirection;
             switch (growthDirection) {
                 case GrowthDirection.forward: {
@@ -620,10 +1001,13 @@ namespace UIWidgets.rendering {
                 }
             }
 
+            D.assert(false);
             return 0.0;
         }
 
-        public override double maxScrollObstructionExtentBefore(RenderSliver child) {
+        protected override double maxScrollObstructionExtentBefore(RenderSliver child) {
+            D.assert(child.parent == this);
+
             GrowthDirection growthDirection = child.constraints.growthDirection;
             switch (growthDirection) {
                 case GrowthDirection.forward: {
@@ -648,15 +1032,62 @@ namespace UIWidgets.rendering {
                 }
             }
 
+            D.assert(false);
             return 0.0;
         }
 
         public override void applyPaintTransform(RenderObject child, ref Matrix4x4 transform) {
+            D.assert(child != null);
+
             var childParentData = (SliverPhysicalParentData) child.parentData;
             childParentData.applyPaintTransform(ref transform);
         }
 
-        public override IEnumerable<RenderSliver> childrenInPaintOrder {
+        protected override double computeChildMainAxisPosition(RenderSliver child, double parentMainAxisPosition) {
+            D.assert(child != null);
+            D.assert(child.constraints != null);
+            SliverPhysicalParentData childParentData = (SliverPhysicalParentData) child.parentData;
+            switch (GrowthDirectionUtils.applyGrowthDirectionToAxisDirection(child.constraints.axisDirection,
+                child.constraints.growthDirection)) {
+                case AxisDirection.down:
+                    return parentMainAxisPosition - childParentData.paintOffset.dy;
+                case AxisDirection.right:
+                    return parentMainAxisPosition - childParentData.paintOffset.dx;
+                case AxisDirection.up:
+                    return child.geometry.paintExtent - (parentMainAxisPosition - childParentData.paintOffset.dy);
+                case AxisDirection.left:
+                    return child.geometry.paintExtent - (parentMainAxisPosition - childParentData.paintOffset.dx);
+            }
+
+            D.assert(false);
+            return 0.0;
+        }
+
+        protected override int indexOfFirstChild {
+            get {
+                D.assert(this.center != null);
+                D.assert(this.center.parent == this);
+                D.assert(this.firstChild != null);
+                int count = 0;
+                RenderSliver child = this.center;
+                while (child != this.firstChild) {
+                    count -= 1;
+                    child = this.childBefore(child);
+                }
+
+                return count;
+            }
+        }
+
+        protected override string labelForChild(int index) {
+            if (index == 0) {
+                return "center child";
+            }
+
+            return "child " + index;
+        }
+
+        protected override IEnumerable<RenderSliver> childrenInPaintOrder {
             get {
                 if (this.firstChild == null) {
                     yield break;
@@ -679,6 +1110,31 @@ namespace UIWidgets.rendering {
                 }
             }
         }
+
+        protected override IEnumerable<RenderSliver> childrenInHitTestOrder {
+            get {
+                if (this.firstChild == null) {
+                    yield break;
+                }
+
+                RenderSliver child = this.center;
+                while (child != null) {
+                    yield return child;
+                    child = this.childAfter(child);
+                }
+
+                child = this.childBefore(this.center);
+                while (child != null) {
+                    yield return child;
+                    child = this.childBefore(child);
+                }
+            }
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new DoubleProperty("anchor", this.anchor));
+        }
     }
 
     public class RenderShrinkWrappingViewport : RenderViewportBase<SliverLogicalContainerParentData> {
@@ -700,17 +1156,37 @@ namespace UIWidgets.rendering {
             }
         }
 
-        public double _maxScrollExtent = 0.0;
-        public double _shrinkWrapExtent = 0.0;
-        public bool _hasVisualOverflow = false;
+        protected override bool debugThrowIfNotCheckingIntrinsics() {
+            D.assert(() => {
+                if (!RenderObject.debugCheckingIntrinsics) {
+                    throw new UIWidgetsError(
+                        this.GetType() + " does not support returning intrinsic dimensions.\n" +
+                        "Calculating the intrinsic dimensions would require instantiating every child of " +
+                        "the viewport, which defeats the point of viewports being lazy.\n" +
+                        "If you are merely trying to shrink-wrap the viewport in the main axis direction, " +
+                        "you should be able to achieve that effect by just giving the viewport loose " +
+                        "constraints, without needing to measure its intrinsic dimensions."
+                    );
+                }
 
-        public override void performLayout() {
+                return true;
+            });
+            return true;
+        }
+
+        double _maxScrollExtent = 0.0;
+        double _shrinkWrapExtent = 0.0;
+        bool _hasVisualOverflow = false;
+
+        protected override void performLayout() {
             if (this.firstChild == null) {
                 switch (this.axis) {
                     case Axis.vertical:
+                        D.assert(this.constraints.hasBoundedWidth);
                         this.size = new Size(this.constraints.maxWidth, this.constraints.minHeight);
                         break;
                     case Axis.horizontal:
+                        D.assert(this.constraints.hasBoundedHeight);
                         this.size = new Size(this.constraints.minWidth, this.constraints.maxHeight);
                         break;
                 }
@@ -727,10 +1203,12 @@ namespace UIWidgets.rendering {
             double crossAxisExtent = 0.0;
             switch (this.axis) {
                 case Axis.vertical:
+                    D.assert(this.constraints.hasBoundedWidth);
                     mainAxisExtent = this.constraints.maxHeight;
                     crossAxisExtent = this.constraints.maxWidth;
                     break;
                 case Axis.horizontal:
+                    D.assert(this.constraints.hasBoundedHeight);
                     mainAxisExtent = this.constraints.maxWidth;
                     crossAxisExtent = this.constraints.maxHeight;
                     break;
@@ -770,10 +1248,17 @@ namespace UIWidgets.rendering {
             }
         }
 
-        public double _attemptLayout(double mainAxisExtent, double crossAxisExtent, double correctedOffset) {
+        double _attemptLayout(double mainAxisExtent, double crossAxisExtent, double correctedOffset) {
+            D.assert(!mainAxisExtent.isNaN());
+            D.assert(mainAxisExtent >= 0.0);
+            D.assert(crossAxisExtent.isFinite());
+            D.assert(crossAxisExtent >= 0.0);
+            D.assert(correctedOffset.isFinite());
+
             this._maxScrollExtent = 0.0;
             this._shrinkWrapExtent = 0.0;
             this._hasVisualOverflow = false;
+
             return this.layoutChildSequence(
                 child: this.firstChild,
                 scrollOffset: Math.Max(0.0, correctedOffset),
@@ -789,11 +1274,14 @@ namespace UIWidgets.rendering {
             );
         }
 
-        public override bool hasVisualOverflow {
+        protected override bool hasVisualOverflow {
             get { return this._hasVisualOverflow; }
         }
 
-        public override void updateOutOfBandData(GrowthDirection growthDirection, SliverGeometry childLayoutGeometry) {
+        protected override void
+            updateOutOfBandData(GrowthDirection growthDirection, SliverGeometry childLayoutGeometry) {
+            D.assert(growthDirection == GrowthDirection.forward);
+
             this._maxScrollExtent += childLayoutGeometry.scrollExtent;
             if (childLayoutGeometry.hasVisualOverflow) {
                 this._hasVisualOverflow = true;
@@ -802,18 +1290,23 @@ namespace UIWidgets.rendering {
             this._shrinkWrapExtent += childLayoutGeometry.maxPaintExtent;
         }
 
-        public override void updateChildLayoutOffset(RenderSliver child, double layoutOffset,
+        protected override void updateChildLayoutOffset(RenderSliver child, double layoutOffset,
             GrowthDirection growthDirection) {
+            D.assert(growthDirection == GrowthDirection.forward);
+
             var childParentData = (SliverLogicalParentData) child.parentData;
             childParentData.layoutOffset = layoutOffset;
         }
 
-        public override Offset paintOffsetOf(RenderSliver child) {
+        protected override Offset paintOffsetOf(RenderSliver child) {
             var childParentData = (SliverLogicalParentData) child.parentData;
             return this.computeAbsolutePaintOffset(child, childParentData.layoutOffset, GrowthDirection.forward);
         }
 
-        public override double scrollOffsetOf(RenderSliver child, double scrollOffsetWithinChild) {
+        protected override double scrollOffsetOf(RenderSliver child, double scrollOffsetWithinChild) {
+            D.assert(child.parent == this);
+            D.assert(child.constraints.growthDirection == GrowthDirection.forward);
+
             double scrollOffsetToChild = 0.0;
             RenderSliver current = this.firstChild;
             while (current != child) {
@@ -824,7 +1317,10 @@ namespace UIWidgets.rendering {
             return scrollOffsetToChild + scrollOffsetWithinChild;
         }
 
-        public override double maxScrollObstructionExtentBefore(RenderSliver child) {
+        protected override double maxScrollObstructionExtentBefore(RenderSliver child) {
+            D.assert(child.parent == this);
+            D.assert(child.constraints.growthDirection == GrowthDirection.forward);
+
             double pinnedExtent = 0.0;
             RenderSliver current = this.firstChild;
             while (current != child) {
@@ -836,16 +1332,57 @@ namespace UIWidgets.rendering {
         }
 
         public override void applyPaintTransform(RenderObject child, ref Matrix4x4 transform) {
+            D.assert(child != null);
+
             Offset offset = this.paintOffsetOf((RenderSliver) child);
             transform = Matrix4x4.Translate(offset.toVector()) * transform;
         }
 
-        public override IEnumerable<RenderSliver> childrenInPaintOrder {
+        protected override double computeChildMainAxisPosition(RenderSliver child, double parentMainAxisPosition) {
+            D.assert(child != null);
+            D.assert(child.constraints != null);
+            D.assert(this.hasSize);
+            SliverLogicalParentData childParentData = (SliverLogicalParentData) child.parentData;
+            switch (GrowthDirectionUtils.applyGrowthDirectionToAxisDirection(
+                child.constraints.axisDirection, child.constraints.growthDirection)) {
+                case AxisDirection.down:
+                case AxisDirection.right:
+                    return parentMainAxisPosition - childParentData.layoutOffset;
+                case AxisDirection.up:
+                    return (this.size.height - parentMainAxisPosition) - childParentData.layoutOffset;
+                case AxisDirection.left:
+                    return (this.size.width - parentMainAxisPosition) - childParentData.layoutOffset;
+            }
+
+            D.assert(false);
+            return 0.0;
+        }
+
+        protected override int indexOfFirstChild {
+            get { return 0; }
+        }
+
+        protected override string labelForChild(int index) {
+            return "child " + index;
+        }
+
+
+        protected override IEnumerable<RenderSliver> childrenInPaintOrder {
             get {
                 RenderSliver child = this.firstChild;
                 while (child != null) {
                     yield return child;
                     child = this.childAfter(child);
+                }
+            }
+        }
+
+        protected override IEnumerable<RenderSliver> childrenInHitTestOrder {
+            get {
+                RenderSliver child = this.lastChild;
+                while (child != null) {
+                    yield return child;
+                    child = this.childBefore(child);
                 }
             }
         }

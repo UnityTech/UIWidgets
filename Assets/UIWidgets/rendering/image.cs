@@ -179,7 +179,7 @@ namespace UIWidgets.rendering {
             ));
         }
         
-        public override void performLayout() {
+        protected override void performLayout() {
             this.size = _sizeForConstraints(constraints);
         }
 

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using UIWidgets.ui;
 
 namespace UIWidgets.foundation {
     public enum DiagnosticLevel {
@@ -665,6 +666,29 @@ namespace UIWidgets.foundation {
         }
     }
 
+    public class IntProperty : _NumProperty<int> {
+        public IntProperty(String name, int value,
+            String ifNull = null,
+            bool showName = true,
+            String unit = null,
+            Object defaultValue = null,
+            DiagnosticLevel level = DiagnosticLevel.info
+        ) : base(
+            name,
+            value,
+            ifNull: ifNull,
+            showName: showName,
+            unit: unit,
+            defaultValue: defaultValue,
+            level: level
+        ) {
+        }
+
+        protected override String numberToString() {
+            return this.value.ToString();
+        }
+    }
+
     public class DoubleProperty : _NumProperty<double?> {
         public DoubleProperty(string name, double? value,
             string ifNull = null,
@@ -737,6 +761,40 @@ namespace UIWidgets.foundation {
         }
     }
 
+    public class PercentProperty : DoubleProperty {
+        public PercentProperty(string name, double fraction,
+            string ifNull = null,
+            bool showName = true,
+            string tooltip = null,
+            string unit = null,
+            DiagnosticLevel level = DiagnosticLevel.info
+        ) : base(
+            name,
+            fraction,
+            ifNull: ifNull,
+            showName: showName,
+            tooltip: tooltip,
+            unit: unit,
+            level: level
+        ) {
+        }
+
+        protected override string valueToString(TextTreeConfiguration parentConfiguration = null) {
+            if (this.value == null) {
+                return "null";
+            }
+
+            return this.unit != null ? this.numberToString() + " " + this.unit : this.numberToString();
+        }
+
+        protected override string numberToString() {
+            if (this.value == null) {
+                return "null";
+            }
+
+            return (this.value.Value.clamp(0.0, 1.0) * 100).ToString("F1") + "%";
+        }
+    }
 
     public class FlagProperty : DiagnosticsProperty<bool> {
         public FlagProperty(String name,
@@ -1135,7 +1193,7 @@ namespace UIWidgets.foundation {
         ) {
             var v = this.value;
             var tree = v as DiagnosticableTree;
-            return tree != null ? tree.toStringShort() : v.ToString();
+            return tree != null ? tree.toStringShort() : v != null ? v.ToString() : "null";
         }
 
         public override string toDescription(
@@ -1368,7 +1426,7 @@ namespace UIWidgets.foundation {
         protected DiagnosticableTree() {
         }
 
-        public string toStringShallow(
+        public virtual string toStringShallow(
             String joiner = ", ",
             DiagnosticLevel minLevel = DiagnosticLevel.debug
         ) {
@@ -1383,7 +1441,7 @@ namespace UIWidgets.foundation {
             return result.ToString();
         }
 
-        string toStringDeep(
+        public virtual string toStringDeep(
             String prefixLineOne = "",
             String prefixOtherLines = null,
             DiagnosticLevel minLevel = DiagnosticLevel.debug

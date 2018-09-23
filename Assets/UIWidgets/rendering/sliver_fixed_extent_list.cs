@@ -1,4 +1,5 @@
 using System;
+using UIWidgets.foundation;
 using UIWidgets.ui;
 
 namespace UIWidgets.rendering {
@@ -10,19 +11,19 @@ namespace UIWidgets.rendering {
 
         public abstract double itemExtent { get; set; }
 
-        public double indexToLayoutOffset(double itemExtent, int index) {
+        protected double indexToLayoutOffset(double itemExtent, int index) {
             return itemExtent * index;
         }
 
-        public int getMinChildIndexForScrollOffset(double scrollOffset, double itemExtent) {
+        protected int getMinChildIndexForScrollOffset(double scrollOffset, double itemExtent) {
             return itemExtent > 0.0 ? Math.Max(0, (int) (scrollOffset / itemExtent)) : 0;
         }
 
-        public int getMaxChildIndexForScrollOffset(double scrollOffset, double itemExtent) {
+        protected int getMaxChildIndexForScrollOffset(double scrollOffset, double itemExtent) {
             return itemExtent > 0.0 ? Math.Max(0, (int) Math.Ceiling(scrollOffset / itemExtent) - 1) : 0;
         }
 
-        public double? estimateMaxScrollOffset(SliverConstraints constraints,
+        protected double estimateMaxScrollOffset(SliverConstraints constraints,
             int firstIndex = 0,
             int lastIndex = 0,
             double leadingScrollOffset = 0.0,
@@ -37,19 +38,20 @@ namespace UIWidgets.rendering {
             );
         }
 
-        public double computeMaxScrollOffset(SliverConstraints constraints, double itemExtent) {
+        protected double computeMaxScrollOffset(SliverConstraints constraints, double itemExtent) {
             return this.childManager.childCount.Value * itemExtent;
         }
 
-
-        public override void performLayout() {
+        protected override void performLayout() {
             this.childManager.didStartLayout();
             this.childManager.setDidUnderflow(false);
 
             double itemExtent = this.itemExtent;
 
             double scrollOffset = this.constraints.scrollOffset + this.constraints.cacheOrigin;
+            D.assert(scrollOffset >= 0.0);
             double remainingExtent = this.constraints.remainingCacheExtent;
+            D.assert(remainingExtent >= 0.0);
             double targetEndScrollOffset = scrollOffset + remainingExtent;
 
             BoxConstraints childConstraints = this.constraints.asBoxConstraints(
@@ -58,7 +60,7 @@ namespace UIWidgets.rendering {
             );
 
             int firstIndex = this.getMinChildIndexForScrollOffset(scrollOffset, itemExtent);
-            int? targetLastIndex = !double.IsInfinity(targetEndScrollOffset)
+            int? targetLastIndex = targetEndScrollOffset.isFinite()
                 ? this.getMaxChildIndexForScrollOffset(targetEndScrollOffset, itemExtent)
                 : (int?) null;
 
@@ -97,6 +99,7 @@ namespace UIWidgets.rendering {
 
                 var childParentData = (SliverMultiBoxAdaptorParentData) child.parentData;
                 childParentData.layoutOffset = this.indexToLayoutOffset(itemExtent, index);
+                D.assert(childParentData.index == index);
                 trailingChildWithLayout = trailingChildWithLayout ?? child;
             }
 
@@ -119,6 +122,7 @@ namespace UIWidgets.rendering {
                 }
 
                 trailingChildWithLayout = child;
+                D.assert(child != null);
                 var childParentData = (SliverMultiBoxAdaptorParentData) child.parentData;
                 childParentData.layoutOffset = this.indexToLayoutOffset(itemExtent, childParentData.index);
             }
@@ -127,13 +131,19 @@ namespace UIWidgets.rendering {
             double leadingScrollOffset = this.indexToLayoutOffset(itemExtent, firstIndex);
             double trailingScrollOffset = this.indexToLayoutOffset(itemExtent, lastIndex + 1);
 
+            D.assert(firstIndex == 0 || this.childScrollOffset(firstChild) <= scrollOffset);
+            D.assert(this.debugAssertChildListIsNonEmptyAndContiguous());
+            D.assert(this.indexOf(firstChild) == firstIndex);
+            D.assert(targetLastIndex == null || lastIndex <= targetLastIndex);
+
+
             double estimatedMaxScrollOffset = this.estimateMaxScrollOffset(
                 this.constraints,
                 firstIndex: firstIndex,
                 lastIndex: lastIndex,
                 leadingScrollOffset: leadingScrollOffset,
                 trailingScrollOffset: trailingScrollOffset
-            ).Value;
+            );
 
             double paintExtent = this.calculatePaintOffset(
                 this.constraints,
@@ -160,6 +170,7 @@ namespace UIWidgets.rendering {
                 hasVisualOverflow: (targetLastIndexForPaint != null && lastIndex >= targetLastIndexForPaint)
                                    || this.constraints.scrollOffset > 0.0
             );
+
             if (estimatedMaxScrollOffset == trailingScrollOffset) {
                 this.childManager.setDidUnderflow(true);
             }

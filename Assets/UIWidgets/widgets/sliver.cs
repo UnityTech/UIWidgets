@@ -58,12 +58,11 @@ namespace UIWidgets.widgets {
             bool addRepaintBoundaries = true
         ) {
             D.assert(builder != null);
-            this.builder = build;
+            this.builder = builder;
             this.childCount = childCount;
             this.addAutomaticKeepAlives = addAutomaticKeepAlives;
             this.addRepaintBoundaries = addRepaintBoundaries;
         }
-
 
         public readonly IndexedWidgetBuilder builder;
 
@@ -298,7 +297,8 @@ namespace UIWidgets.widgets {
                 Element newChild;
                 try {
                     this._currentlyUpdatingChildIndex = index;
-                    newChild = this.updateChild(this._childElements[index], this._build(index), index);
+                    this._childElements.TryGetValue(index, out newChild);
+                    newChild = this.updateChild(newChild, this._build(index), index);
                 }
                 finally {
                     this._currentlyUpdatingChildIndex = null;
@@ -319,9 +319,9 @@ namespace UIWidgets.widgets {
             }
 
             Element newChild = base.updateChild(child, newWidget, newSlot);
+            
             SliverMultiBoxAdaptorParentData newParentData = null;
-
-            if (child != null && child.renderObject != null) {
+            if (newChild != null && newChild.renderObject != null) {
                 newParentData = (SliverMultiBoxAdaptorParentData) newChild.renderObject.parentData;
             }
 
@@ -374,7 +374,7 @@ namespace UIWidgets.widgets {
             return trailingScrollOffset + averageExtent * remainingCount;
         }
 
-        public double? estimateMaxScrollOffset(SliverConstraints constraints,
+        public double estimateMaxScrollOffset(SliverConstraints constraints,
             int firstIndex = 0,
             int lastIndex = 0,
             double leadingScrollOffset = 0,

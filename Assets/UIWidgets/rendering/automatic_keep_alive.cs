@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UIWidgets.foundation;
 using UIWidgets.scheduler;
@@ -11,6 +10,7 @@ namespace UIWidgets.rendering {
             Key key = null,
             Widget child = null
         ) : base(key: key) {
+            this.child = child;
         }
 
         public readonly Widget child;

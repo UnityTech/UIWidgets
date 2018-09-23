@@ -2499,7 +2499,7 @@ namespace UIWidgets.widgets {
 
             var newChildren = oldChildren.Count == newWidgets.Count
                 ? oldChildren
-                : new List<Element>(newWidgets.Count);
+                : Enumerable.Repeat((Element) null, newWidgets.Count).ToList();
 
             Element previousChild = null;
 
@@ -2822,7 +2822,7 @@ namespace UIWidgets.widgets {
 
         public override void mount(Element parent, object newSlot) {
             base.mount(parent, newSlot);
-            this._children = new List<Element>(this.widget.children.Count);
+            this._children = Enumerable.Repeat((Element) null, this.widget.children.Count).ToList();
             Element previousChild = null;
             for (int i = 0; i < this._children.Count; i += 1) {
                 Element newChild = this.inflateWidget(this.widget.children[i], previousChild);

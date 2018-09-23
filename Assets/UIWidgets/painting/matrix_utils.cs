@@ -1,4 +1,5 @@
 ﻿using System;
+using UIWidgets.foundation;
 using UIWidgets.ui;
 using UnityEngine;
 using Rect = UIWidgets.ui.Rect;
@@ -12,9 +13,7 @@ namespace UIWidgets.painting {
         }
 
         public static Rect transformRect(Matrix4x4 transform, Offset[] points, out bool isRect) {
-            if (points == null || points.Length != 4) {
-                throw new Exception("expected 4 points");
-            }
+            D.assert(points != null && points.Length == 4, "expected 4 points");
 
             var topLeft = MatrixUtils.transformPoint(transform, points[0]);
             var topRight = MatrixUtils.transformPoint(transform, points[1]);
@@ -48,6 +47,38 @@ namespace UIWidgets.painting {
         public static Rect transformRect(Matrix4x4 transform, Rect rect) {
             bool isRect;
             return MatrixUtils.transformRect(transform, rect, out isRect);
+        }
+
+        public static Rect inverseTransformRect(Matrix4x4 transform, Rect rect) {
+            D.assert(rect != null);
+            D.assert(transform.determinant != 0.0);
+
+            if (transform.isIdentity) {
+                return rect;
+            }
+
+            transform = transform.inverse;
+            return MatrixUtils.transformRect(transform, rect);
+        }
+        
+        public static Offset getAsTranslation(ref Matrix4x4 transform) {
+            if (transform.m00 == 1.0 &&
+                transform.m10 == 0.0 &&
+                transform.m20 == 0.0 &&
+                transform.m30 == 0.0 &&
+                transform.m01 == 0.0 &&
+                transform.m11 == 1.0 &&
+                transform.m21 == 0.0 &&
+                transform.m31 == 0.0 &&
+                transform.m02 == 0.0 &&
+                transform.m12 == 0.0 &&
+                transform.m22 == 1.0 &&
+                transform.m32 == 0.0 &&
+                transform.m23 == 0.0 &&
+                transform.m33 == 1.0) {
+                return new Offset(transform.m03, transform.m13);
+            }
+            return null;
         }
     }
 }

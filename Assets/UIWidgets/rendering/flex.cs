@@ -244,7 +244,7 @@ namespace UIWidgets.rendering {
             }
         }
 
-        public override double computeMinIntrinsicWidth(double height) {
+        protected override double computeMinIntrinsicWidth(double height) {
             return this._getIntrinsicSize(
                 sizingDirection: Axis.horizontal,
                 extent: height,
@@ -252,7 +252,7 @@ namespace UIWidgets.rendering {
             );
         }
 
-        public override double computeMaxIntrinsicWidth(double height) {
+        protected override double computeMaxIntrinsicWidth(double height) {
             return this._getIntrinsicSize(
                 sizingDirection: Axis.horizontal,
                 extent: height,
@@ -260,7 +260,7 @@ namespace UIWidgets.rendering {
             );
         }
 
-        public override double computeMinIntrinsicHeight(double width) {
+        protected override double computeMinIntrinsicHeight(double width) {
             return this._getIntrinsicSize(
                 sizingDirection: Axis.vertical,
                 extent: width,
@@ -268,7 +268,7 @@ namespace UIWidgets.rendering {
             );
         }
 
-        public override double computeMaxIntrinsicHeight(double width) {
+        protected override double computeMaxIntrinsicHeight(double width) {
             return this._getIntrinsicSize(
                 sizingDirection: Axis.vertical,
                 extent: width,
@@ -276,7 +276,7 @@ namespace UIWidgets.rendering {
             );
         }
 
-        public override double? computeDistanceToActualBaseline(TextBaseline baseline) {
+        protected override double? computeDistanceToActualBaseline(TextBaseline baseline) {
             if (this._direction == Axis.horizontal) {
                 return this.defaultComputeDistanceToHighestActualBaseline(baseline);
             }
@@ -316,7 +316,7 @@ namespace UIWidgets.rendering {
             return 0;
         }
 
-        public override void performLayout() {
+        protected override void performLayout() {
             int totalFlex = 0;
             int totalChildren = 0;
             double maxMainSize = this._direction == Axis.horizontal

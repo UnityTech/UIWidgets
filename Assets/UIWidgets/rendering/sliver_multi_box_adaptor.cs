@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UIWidgets.foundation;
+using UIWidgets.gestures;
 using UIWidgets.painting;
 using UIWidgets.ui;
 using UnityEngine;
@@ -11,7 +12,7 @@ namespace UIWidgets.rendering {
 
         void removeChild(RenderBox child);
 
-        double? estimateMaxScrollOffset(
+        double estimateMaxScrollOffset(
             SliverConstraints constraints,
             int firstIndex = 0,
             int lastIndex = 0,
@@ -27,7 +28,7 @@ namespace UIWidgets.rendering {
         void didStartLayout();
 
         void didFinishLayout();
-        
+
         bool debugAssertChildListLocked();
     }
 
@@ -36,7 +37,12 @@ namespace UIWidgets.rendering {
 
         public bool keepAlive = false;
 
-        public bool _keptAlive = false;
+        internal bool _keptAlive = false;
+
+        public override string ToString() {
+            return string.Format(
+                "index={0}; {1}{2}", this.index, this.keepAlive ? "keeyAlive; " : "", base.ToString());
+        }
     }
 
     public abstract class RenderSliverMultiBoxAdaptor
@@ -44,6 +50,7 @@ namespace UIWidgets.rendering {
         public RenderSliverMultiBoxAdaptor(
             RenderSliverBoxChildManager childManager = null
         ) {
+            D.assert(childManager != null);
             this._childManager = childManager;
         }
 
@@ -53,13 +60,13 @@ namespace UIWidgets.rendering {
             }
         }
 
-        public RenderSliverBoxChildManager childManager {
+        protected RenderSliverBoxChildManager childManager {
             get { return this._childManager; }
         }
 
-        public RenderSliverBoxChildManager _childManager;
+        readonly RenderSliverBoxChildManager _childManager;
 
-        public readonly Dictionary<int, RenderBox> _keepAliveBucket = new Dictionary<int, RenderBox>();
+        readonly Dictionary<int, RenderBox> _keepAliveBucket = new Dictionary<int, RenderBox>();
 
         protected override void adoptChild(AbstractNodeMixinDiagnosticableTree childNode) {
             base.adoptChild(childNode);
@@ -70,8 +77,24 @@ namespace UIWidgets.rendering {
             }
         }
 
+        bool _debugAssertChildListLocked() {
+            return this.childManager.debugAssertChildListLocked();
+        }
+
         public override void insert(RenderBox child, RenderBox after = null) {
             base.insert(child, after: after);
+            D.assert(this.firstChild != null);
+            D.assert(() => {
+                int index = this.indexOf(this.firstChild);
+                RenderBox childAfter = this.childAfter(this.firstChild);
+                while (childAfter != null) {
+                    D.assert(this.indexOf(childAfter) > index);
+                    index = this.indexOf(childAfter);
+                    childAfter = this.childAfter(childAfter);
+                }
+
+                return true;
+            });
         }
 
         public override void remove(RenderBox child) {
@@ -81,6 +104,7 @@ namespace UIWidgets.rendering {
                 return;
             }
 
+            D.assert(this._keepAliveBucket[childParentData.index] == child);
             this._keepAliveBucket.Remove(childParentData.index);
             this.dropChild(child);
         }
@@ -96,11 +120,13 @@ namespace UIWidgets.rendering {
         }
 
         void _createOrObtainChild(int index, RenderBox after = null) {
-            this.invokeLayoutCallback<SliverConstraints>((SliverConstraints constraints) => {
+            this.invokeLayoutCallback<SliverConstraints>(constraints => {
+                D.assert(constraints == this.constraints);
                 if (this._keepAliveBucket.ContainsKey(index)) {
                     RenderBox child = this._keepAliveBucket[index];
                     this._keepAliveBucket.Remove(index);
                     var childParentData = (SliverMultiBoxAdaptorParentData) child.parentData;
+                    D.assert(childParentData._keptAlive);
                     this.dropChild(child);
                     child.parentData = childParentData;
                     this.insert(child, after: after);
@@ -114,13 +140,16 @@ namespace UIWidgets.rendering {
         public void _destroyOrCacheChild(RenderBox child) {
             var childParentData = (SliverMultiBoxAdaptorParentData) child.parentData;
             if (childParentData.keepAlive) {
+                D.assert(!childParentData._keptAlive);
                 this.remove(child);
                 this._keepAliveBucket[childParentData.index] = child;
                 child.parentData = childParentData;
                 base.adoptChild(child);
                 childParentData._keptAlive = true;
             } else {
+                D.assert(child.parent == this);
                 this._childManager.removeChild(child);
+                D.assert(child.parent == null);
             }
         }
 
@@ -153,9 +182,15 @@ namespace UIWidgets.rendering {
             }
         }
 
-        public bool addInitialChild(int index = 0, double layoutOffset = 0.0) {
+        protected bool addInitialChild(int index = 0, double layoutOffset = 0.0) {
+            D.assert(this._debugAssertChildListLocked());
+            D.assert(this.firstChild == null);
+
             this._createOrObtainChild(index, after: null);
             if (this.firstChild != null) {
+                D.assert(this.firstChild == this.lastChild);
+                D.assert(this.indexOf(this.firstChild) == index);
+
                 var firstChildParentData = (SliverMultiBoxAdaptorParentData) this.firstChild.parentData;
                 firstChildParentData.layoutOffset = layoutOffset;
                 return true;
@@ -165,7 +200,9 @@ namespace UIWidgets.rendering {
             return false;
         }
 
-        public RenderBox insertAndLayoutLeadingChild(BoxConstraints childConstraints, bool parentUsesSize = false) {
+        protected RenderBox insertAndLayoutLeadingChild(BoxConstraints childConstraints, bool parentUsesSize = false) {
+            D.assert(this._debugAssertChildListLocked());
+
             int index = this.indexOf(this.firstChild) - 1;
             this._createOrObtainChild(index, after: null);
             if (this.indexOf(this.firstChild) == index) {
@@ -177,11 +214,14 @@ namespace UIWidgets.rendering {
             return null;
         }
 
-        public RenderBox insertAndLayoutChild(
+        protected RenderBox insertAndLayoutChild(
             BoxConstraints childConstraints,
             RenderBox after = null,
             bool parentUsesSize = false
         ) {
+            D.assert(this._debugAssertChildListLocked());
+            D.assert(after != null);
+
             int index = this.indexOf(after) + 1;
             this._createOrObtainChild(index, after: after);
             RenderBox child = this.childAfter(after);
@@ -194,8 +234,11 @@ namespace UIWidgets.rendering {
             return null;
         }
 
-        public void collectGarbage(int leadingGarbage, int trailingGarbage) {
-            this.invokeLayoutCallback<SliverConstraints>((SliverConstraints constraints) => {
+        protected void collectGarbage(int leadingGarbage, int trailingGarbage) {
+            D.assert(this._debugAssertChildListLocked());
+            D.assert(this.childCount >= leadingGarbage + trailingGarbage);
+
+            this.invokeLayoutCallback<SliverConstraints>(constraints => {
                 while (leadingGarbage > 0) {
                     this._destroyOrCacheChild(this.firstChild);
                     leadingGarbage -= 1;
@@ -206,19 +249,28 @@ namespace UIWidgets.rendering {
                     trailingGarbage -= 1;
                 }
 
-                this._keepAliveBucket.Values.Where((RenderBox child) => {
+                this._keepAliveBucket.Values.Where(child => {
                     var childParentData = (SliverMultiBoxAdaptorParentData) child.parentData;
                     return !childParentData.keepAlive;
                 }).ToList().ForEach(this._childManager.removeChild);
+
+                D.assert(this._keepAliveBucket.Values.Where(child => {
+                    var childParentData = (SliverMultiBoxAdaptorParentData) child.parentData;
+                    return !childParentData.keepAlive;
+                }).ToList().isEmpty());
             });
         }
 
         public int indexOf(RenderBox child) {
+            D.assert(child != null);
             var childParentData = (SliverMultiBoxAdaptorParentData) child.parentData;
             return childParentData.index;
         }
 
-        public double paintExtentOf(RenderBox child) {
+        protected double paintExtentOf(RenderBox child) {
+            D.assert(child != null);
+            D.assert(child.hasSize);
+
             switch (this.constraints.axis) {
                 case Axis.horizontal:
                     return child.size.width;
@@ -229,11 +281,29 @@ namespace UIWidgets.rendering {
             return 0.0;
         }
 
+        protected override bool hitTestChildren(HitTestResult result, double mainAxisPosition = 0.0,
+            double crossAxisPosition = 0.0) {
+            RenderBox child = this.lastChild;
+            while (child != null) {
+                if (this.hitTestBoxChild(result, child, mainAxisPosition: mainAxisPosition,
+                    crossAxisPosition: crossAxisPosition)) {
+                    return true;
+                }
+
+                child = this.childBefore(child);
+            }
+
+            return false;
+        }
+
         public override double childMainAxisPosition(RenderObject child) {
             return this.childScrollOffset(child) - this.constraints.scrollOffset;
         }
 
         public override double childScrollOffset(RenderObject child) {
+            D.assert(child != null);
+            D.assert(child.parent == this);
+
             var childParentData = (SliverMultiBoxAdaptorParentData) child.parentData;
             return childParentData.layoutOffset;
         }
@@ -296,6 +366,59 @@ namespace UIWidgets.rendering {
 
                 child = this.childAfter(child);
             }
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(DiagnosticsNode.message(this.firstChild != null
+                ? "currently live children: " + this.indexOf(this.firstChild) + " to " + this.indexOf(this.lastChild)
+                : "no children current live"));
+        }
+
+        public bool debugAssertChildListIsNonEmptyAndContiguous() {
+            D.assert(() => {
+                D.assert(this.firstChild != null);
+                int index = this.indexOf(this.firstChild);
+                RenderBox child = this.childAfter(this.firstChild);
+                while (child != null) {
+                    index += 1;
+                    D.assert(this.indexOf(child) == index);
+                    child = this.childAfter(child);
+                }
+
+                return true;
+            });
+            return true;
+        }
+
+        public override List<DiagnosticsNode> debugDescribeChildren() {
+            var children = new List<DiagnosticsNode>();
+            if (this.firstChild != null) {
+                RenderBox child = this.firstChild;
+                while (true) {
+                    var childParentData = (SliverMultiBoxAdaptorParentData) child.parentData;
+                    children.Add(child.toDiagnosticsNode(name: "child with index " + childParentData.index));
+                    if (child == this.lastChild) {
+                        break;
+                    }
+
+                    child = childParentData.nextSibling;
+                }
+            }
+
+            if (this._keepAliveBucket.isNotEmpty()) {
+                List<int> indices = this._keepAliveBucket.Keys.ToList();
+                indices.Sort();
+
+                foreach (int index in indices) {
+                    children.Add(this._keepAliveBucket[index].toDiagnosticsNode(
+                        name: "child with index " + index + " (kept alive offstage)",
+                        style: DiagnosticsTreeStyle.offstage
+                    ));
+                }
+            }
+
+            return children;
         }
     }
 }

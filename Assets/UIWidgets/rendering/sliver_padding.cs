@@ -1,7 +1,10 @@
 using System;
+using UIWidgets.foundation;
+using UIWidgets.gestures;
 using UIWidgets.painting;
 using UIWidgets.ui;
 using UnityEngine;
+using Rect = UIWidgets.ui.Rect;
 
 namespace UIWidgets.rendering {
     public class RenderSliverPadding : RenderObjectWithChildMixinRenderSliver<RenderSliver> {
@@ -9,6 +12,9 @@ namespace UIWidgets.rendering {
             EdgeInsets padding = null,
             RenderSliver child = null
         ) {
+            D.assert(padding != null);
+            D.assert(padding.isNonNegative);
+
             this._padding = padding;
             this.child = child;
         }
@@ -16,6 +22,8 @@ namespace UIWidgets.rendering {
         public EdgeInsets padding {
             get { return this._padding; }
             set {
+                D.assert(value != null);
+                D.assert(value.isNonNegative);
                 if (this._padding == value) {
                     return;
                 }
@@ -25,10 +33,12 @@ namespace UIWidgets.rendering {
             }
         }
 
-        public EdgeInsets _padding;
+        EdgeInsets _padding;
 
         public double beforePadding {
             get {
+                D.assert(this.constraints != null);
+
                 switch (GrowthDirectionUtils.applyGrowthDirectionToAxisDirection(
                     this.constraints.axisDirection, this.constraints.growthDirection)) {
                     case AxisDirection.up:
@@ -47,6 +57,8 @@ namespace UIWidgets.rendering {
 
         public double afterPadding {
             get {
+                D.assert(this.constraints != null);
+
                 switch (GrowthDirectionUtils.applyGrowthDirectionToAxisDirection(
                     this.constraints.axisDirection, this.constraints.growthDirection)) {
                     case AxisDirection.up:
@@ -64,11 +76,17 @@ namespace UIWidgets.rendering {
         }
 
         public double mainAxisPadding {
-            get { return this._padding.along(this.constraints.axis); }
+            get {
+                D.assert(this.constraints != null);
+
+                return this._padding.along(this.constraints.axis);
+            }
         }
 
         public double crossAxisPadding {
             get {
+                D.assert(this.constraints != null);
+
                 switch (this.constraints.axis) {
                     case Axis.horizontal:
                         return this._padding.vertical;
@@ -76,6 +94,7 @@ namespace UIWidgets.rendering {
                         return this._padding.horizontal;
                 }
 
+                D.assert(false);
                 return 0.0;
             }
         }
@@ -86,7 +105,7 @@ namespace UIWidgets.rendering {
             }
         }
 
-        public override void performLayout() {
+        protected override void performLayout() {
             double beforePadding = this.beforePadding;
             double afterPadding = this.afterPadding;
             double mainAxisPadding = this.mainAxisPadding;
@@ -115,7 +134,7 @@ namespace UIWidgets.rendering {
             );
 
             SliverGeometry childLayoutGeometry = this.child.geometry;
-            if (childLayoutGeometry.scrollOffsetCorrection != 0.0) {
+            if (childLayoutGeometry.scrollOffsetCorrection != null) {
                 this.geometry = new SliverGeometry(
                     scrollOffsetCorrection: childLayoutGeometry.scrollOffsetCorrection
                 );
@@ -193,13 +212,37 @@ namespace UIWidgets.rendering {
                         this._padding.top);
                     break;
             }
+
+            D.assert(childParentData.paintOffset != null);
+            D.assert(beforePadding == this.beforePadding);
+            D.assert(afterPadding == this.afterPadding);
+            D.assert(mainAxisPadding == this.mainAxisPadding);
+            D.assert(crossAxisPadding == this.crossAxisPadding);
+        }
+
+        protected override bool hitTestChildren(HitTestResult result, double mainAxisPosition = 0.0,
+            double crossAxisPosition = 0.0) {
+            if (this.child != null && this.child.geometry.hitTestExtent > 0.0) {
+                return this.child.hitTest(result,
+                    mainAxisPosition: mainAxisPosition - this.childMainAxisPosition(this.child),
+                    crossAxisPosition: crossAxisPosition - this.childCrossAxisPosition(this.child));
+            }
+
+            return false;
         }
 
         public override double childMainAxisPosition(RenderObject child) {
+            D.assert(child != null);
+            D.assert(child == this.child);
+
             return this.calculatePaintOffset(this.constraints, from: 0.0, to: this.beforePadding);
         }
 
         public override double childCrossAxisPosition(RenderObject child) {
+            D.assert(child != null);
+            D.assert(child == this.child);
+            D.assert(this.constraints != null);
+
             switch (GrowthDirectionUtils.applyGrowthDirectionToAxisDirection(
                 this.constraints.axisDirection, this.constraints.growthDirection)) {
                 case AxisDirection.up:
@@ -214,10 +257,15 @@ namespace UIWidgets.rendering {
         }
 
         public override double childScrollOffset(RenderObject child) {
+            D.assert(child.parent == this);
+
             return this.beforePadding;
         }
 
         public override void applyPaintTransform(RenderObject child, ref Matrix4x4 transform) {
+            D.assert(child != null);
+            D.assert(child == this.child);
+
             var childParentData = (SliverPhysicalParentData) child.parentData;
             childParentData.applyPaintTransform(ref transform);
         }
@@ -227,6 +275,36 @@ namespace UIWidgets.rendering {
                 var childParentData = (SliverPhysicalParentData) this.child.parentData;
                 context.paintChild(this.child, offset + childParentData.paintOffset);
             }
+        }
+
+        public override void debugPaint(PaintingContext context, Offset offset) {
+            base.debugPaint(context, offset);
+            D.assert(() => {
+                if (D.debugPaintSizeEnabled) {
+                    Size parentSize = this.getAbsoluteSizeRelativeToOrigin();
+                    Rect outerRect = offset & parentSize;
+                    Size childSize = null;
+                    Rect innerRect = null;
+                    if (this.child != null) {
+                        childSize = this.child.getAbsoluteSizeRelativeToOrigin();
+                        var childParentData = (SliverPhysicalParentData) this.child.parentData;
+                        innerRect = (offset + childParentData.paintOffset) & childSize;
+                        D.assert(innerRect.top >= outerRect.top);
+                        D.assert(innerRect.left >= outerRect.left);
+                        D.assert(innerRect.right <= outerRect.right);
+                        D.assert(innerRect.bottom <= outerRect.bottom);
+                    }
+
+                    D.debugPaintPadding(context.canvas, outerRect, innerRect);
+                }
+
+                return true;
+            });
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new DiagnosticsProperty<EdgeInsets>("padding", this.padding));
         }
     }
 }

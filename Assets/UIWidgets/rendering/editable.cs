@@ -401,25 +401,25 @@ namespace UIWidgets.rendering
             return Rect.fromLTWH(0.0, 0.0, _kCaretWidth, preferredLineHeight).shift(caretOffset + _paintOffset);
         }
         
-        public override double computeMinIntrinsicWidth(double height) {
+        protected override double computeMinIntrinsicWidth(double height) {
             _layoutText(double.PositiveInfinity);
             return _textPainter.minIntrinsicWidth;
         }
         
-        public override double computeMaxIntrinsicWidth(double height) {
+        protected override double computeMaxIntrinsicWidth(double height) {
             _layoutText(double.PositiveInfinity);
             return _textPainter.maxIntrinsicWidth;
         }
 
-        public override double computeMinIntrinsicHeight(double width) {
+        protected override double computeMinIntrinsicHeight(double width) {
             return _preferredHeight(width);
         }
 
-        public override double computeMaxIntrinsicHeight(double width) {
+        protected override double computeMaxIntrinsicHeight(double width) {
             return _preferredHeight(width);
         }
 
-        public override double? computeDistanceToActualBaseline(TextBaseline baseline) {
+        protected override double? computeDistanceToActualBaseline(TextBaseline baseline) {
             _layoutText(constraints.maxWidth);
             return _textPainter.computeDistanceToActualBaseline(baseline);
         }
@@ -463,7 +463,7 @@ namespace UIWidgets.rendering
         }
         
         
-        public override void performLayout() {
+        protected override void performLayout() {
             _layoutText(constraints.maxWidth);
             _caretPrototype = Rect.fromLTWH(0.0, _kCaretHeightOffset, _kCaretWidth,
                 preferredLineHeight - 2.0 * _kCaretHeightOffset);

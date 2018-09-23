@@ -9,7 +9,7 @@ namespace UIWidgets.rendering {
             this.child = child;
         }
 
-        public override double computeMinIntrinsicWidth(double height) {
+        protected override double computeMinIntrinsicWidth(double height) {
             if (this.child != null) {
                 return this.child.getMinIntrinsicWidth(height);
             }
@@ -17,7 +17,7 @@ namespace UIWidgets.rendering {
             return 0.0;
         }
 
-        public override double computeMaxIntrinsicWidth(double height) {
+        protected override double computeMaxIntrinsicWidth(double height) {
             if (this.child != null) {
                 return this.child.getMaxIntrinsicWidth(height);
             }
@@ -25,7 +25,7 @@ namespace UIWidgets.rendering {
             return 0.0;
         }
 
-        public override double computeMinIntrinsicHeight(double width) {
+        protected override double computeMinIntrinsicHeight(double width) {
             if (this.child != null) {
                 return this.child.getMinIntrinsicHeight(width);
             }
@@ -33,7 +33,7 @@ namespace UIWidgets.rendering {
             return 0.0;
         }
 
-        public override double computeMaxIntrinsicHeight(double width) {
+        protected override double computeMaxIntrinsicHeight(double width) {
             if (this.child != null) {
                 return this.child.getMaxIntrinsicHeight(width);
             }
@@ -41,7 +41,7 @@ namespace UIWidgets.rendering {
             return 0.0;
         }
 
-        public override double? computeDistanceToActualBaseline(TextBaseline baseline) {
+        protected override double? computeDistanceToActualBaseline(TextBaseline baseline) {
             double? result;
 
             if (this.child != null) {
@@ -103,7 +103,7 @@ namespace UIWidgets.rendering {
         public EdgeInsets _padding;
 
 
-        public override double computeMinIntrinsicWidth(double height) {
+        protected override double computeMinIntrinsicWidth(double height) {
             if (this.child != null) {
                 return this.child.getMinIntrinsicWidth(Math.Max(0.0, height - this._padding.vertical)) +
                        this._padding.horizontal;
@@ -112,7 +112,7 @@ namespace UIWidgets.rendering {
             return this._padding.horizontal;
         }
 
-        public override double computeMaxIntrinsicWidth(double height) {
+        protected override double computeMaxIntrinsicWidth(double height) {
             if (this.child != null) {
                 return this.child.getMaxIntrinsicWidth(Math.Max(0.0, height - this._padding.vertical)) +
                        this._padding.horizontal;
@@ -121,7 +121,7 @@ namespace UIWidgets.rendering {
             return this._padding.horizontal;
         }
 
-        public override double computeMinIntrinsicHeight(double width) {
+        protected override double computeMinIntrinsicHeight(double width) {
             if (this.child != null) {
                 return this.child.getMinIntrinsicHeight(Math.Max(0.0, width - this._padding.horizontal)) +
                        this._padding.vertical;
@@ -130,7 +130,7 @@ namespace UIWidgets.rendering {
             return this._padding.vertical;
         }
 
-        public override double computeMaxIntrinsicHeight(double width) {
+        protected override double computeMaxIntrinsicHeight(double width) {
             if (this.child != null) {
                 return this.child.getMaxIntrinsicHeight(Math.Max(0.0, width - this._padding.horizontal)) +
                        this._padding.vertical;
@@ -139,7 +139,7 @@ namespace UIWidgets.rendering {
             return this._padding.vertical;
         }
 
-        public override void performLayout() {
+        protected override void performLayout() {
             if (this.child == null) {
                 this.size = this.constraints.constrain(this._padding.inflateSize(Size.zero));
                 return;
@@ -221,7 +221,7 @@ namespace UIWidgets.rendering {
 
         public double? _heightFactor;
 
-        public override void performLayout() {
+        protected override void performLayout() {
             bool shrinkWrapWidth = this._widthFactor != null || double.IsPositiveInfinity(this.constraints.maxWidth);
             bool shrinkWrapHeight = this._heightFactor != null || double.IsPositiveInfinity(this.constraints.maxHeight);
 
@@ -319,15 +319,15 @@ namespace UIWidgets.rendering {
             );
         }
 
-        public override bool sizedByParent {
+        protected override bool sizedByParent {
             get { return true; }
         }
 
-        public override void performResize() {
+        protected override void performResize() {
             this.size = this.constraints.biggest;
         }
 
-        public override void performLayout() {
+        protected override void performLayout() {
             if (this.child != null) {
                 this.child.layout(this._getInnerConstraints(this.constraints), parentUsesSize: true);
                 this.alignChild();
@@ -362,7 +362,7 @@ namespace UIWidgets.rendering {
         public Rect _overflowChildRect = Rect.zero;
         public bool _isOverflowing = false;
 
-        public override void performLayout() {
+        protected override void performLayout() {
             if (this.child != null) {
                 BoxConstraints childConstraints = null;
                 if (this.constrainedAxis != null) {
@@ -435,23 +435,23 @@ namespace UIWidgets.rendering {
 
         public Size _requestedSize;
 
-        public override double computeMinIntrinsicWidth(double height) {
+        protected override double computeMinIntrinsicWidth(double height) {
             return this._requestedSize.width;
         }
 
-        public override double computeMaxIntrinsicWidth(double height) {
+        protected override double computeMaxIntrinsicWidth(double height) {
             return this._requestedSize.width;
         }
 
-        public override double computeMinIntrinsicHeight(double width) {
+        protected override double computeMinIntrinsicHeight(double width) {
             return this._requestedSize.height;
         }
 
-        public override double computeMaxIntrinsicHeight(double width) {
+        protected override double computeMaxIntrinsicHeight(double width) {
             return this._requestedSize.height;
         }
 
-        public override double? computeDistanceToActualBaseline(TextBaseline baseline) {
+        protected override double? computeDistanceToActualBaseline(TextBaseline baseline) {
             if (this.child != null) {
                 return this.child.getDistanceToActualBaseline(baseline);
             }
@@ -459,7 +459,7 @@ namespace UIWidgets.rendering {
             return base.computeDistanceToActualBaseline(baseline);
         }
 
-        public override void performLayout() {
+        protected override void performLayout() {
             this.size = this.constraints.constrain(this._requestedSize);
             if (this.child != null) {
                 this.child.layout(this.constraints);
@@ -532,7 +532,7 @@ namespace UIWidgets.rendering {
             );
         }
 
-        public override double computeMinIntrinsicWidth(double height) {
+        protected override double computeMinIntrinsicWidth(double height) {
             double result;
             if (this.child == null) {
                 result = base.computeMinIntrinsicWidth(height);
@@ -543,7 +543,7 @@ namespace UIWidgets.rendering {
             return result / (this._widthFactor ?? 1.0);
         }
 
-        public override double computeMaxIntrinsicWidth(double height) {
+        protected override double computeMaxIntrinsicWidth(double height) {
             double result;
             if (this.child == null) {
                 result = base.computeMaxIntrinsicWidth(height);
@@ -554,7 +554,7 @@ namespace UIWidgets.rendering {
             return result / (this._widthFactor ?? 1.0);
         }
 
-        public override double computeMinIntrinsicHeight(double width) {
+        protected override double computeMinIntrinsicHeight(double width) {
             double result;
             if (this.child == null) {
                 result = base.computeMinIntrinsicHeight(width);
@@ -565,7 +565,7 @@ namespace UIWidgets.rendering {
             return result / (this._heightFactor ?? 1.0);
         }
 
-        public override double computeMaxIntrinsicHeight(double width) {
+        protected override double computeMaxIntrinsicHeight(double width) {
             double result;
             if (this.child == null) {
                 result = base.computeMaxIntrinsicHeight(width);
@@ -576,7 +576,7 @@ namespace UIWidgets.rendering {
             return result / (this._heightFactor ?? 1.0);
         }
 
-        public override void performLayout() {
+        protected override void performLayout() {
             if (this.child != null) {
                 this.child.layout(this._getInnerConstraints(this.constraints), parentUsesSize: true);
                 this.size = this.constraints.constrain(this.child.size);
@@ -627,7 +627,7 @@ namespace UIWidgets.rendering {
 
         public TextBaseline _baselineType;
 
-        public override void performLayout() {
+        protected override void performLayout() {
             if (this.child != null) {
                 this.child.layout(this.constraints.loosen(), parentUsesSize: true);
                 double? childBaseline = this.child.getDistanceToBaseline(this.baselineType);

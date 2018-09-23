@@ -31,5 +31,10 @@ namespace UIWidgets.Tests {
         public static void renderWidgets() {
             EditorWindow.GetWindow(typeof(Widgets));
         }
+        
+        [MenuItem("UIWidgetsTests/ScrollViews")]
+        public static void renderScrollViews() {
+            EditorWindow.GetWindow(typeof(ScrollViews));
+        }
     }
 }

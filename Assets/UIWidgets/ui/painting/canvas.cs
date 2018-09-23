@@ -22,9 +22,11 @@ namespace UIWidgets.ui {
 
         void restore();
 
-        void clipRect(Rect rect);
+        int getSaveCount();
 
-        void clipRRect(RRect rrect);
+        void clipRect(Rect rect, bool doAntiAlias = true);
+
+        void clipRRect(RRect rrect, bool doAntiAlias = true);
 
         void drawTextBlob(TextBlob textBlob, double x, double y);
     }
@@ -34,7 +36,9 @@ namespace UIWidgets.ui {
             this._recorder = recorder;
         }
 
-        private readonly PictureRecorder _recorder;
+        readonly PictureRecorder _recorder;
+        
+        int _saveCount = 1;
 
         public void drawPloygon4(Offset[] points, Paint paint) {
             this._recorder.addDrawCmd(new DrawPloygon4 {
@@ -66,8 +70,7 @@ namespace UIWidgets.ui {
         }
 
         public void drawImageRect(Rect src, Rect dst, Paint paint, Image image) {
-            this._recorder.addDrawCmd(new DrawImageRect
-            {
+            this._recorder.addDrawCmd(new DrawImageRect {
                 paint = paint,
                 image = image,
                 src = src,
@@ -82,11 +85,13 @@ namespace UIWidgets.ui {
         }
 
         public void save() {
+            this._saveCount++;
             this._recorder.addDrawCmd(new DrawSave {
             });
         }
 
         public void saveLayer(Rect rect, Paint paint) {
+            this._saveCount++;
             this._recorder.addDrawCmd(new DrawSaveLayer {
                 rect = rect,
                 paint = paint,
@@ -94,24 +99,28 @@ namespace UIWidgets.ui {
         }
 
         public void restore() {
+            this._saveCount--;
             this._recorder.addDrawCmd(new DrawRestore {
             });
         }
 
-        public void clipRect(Rect rect) {
+        public int getSaveCount() {
+            return this._saveCount;
+        }
+
+        public void clipRect(Rect rect, bool doAntiAlias = true) {
             this._recorder.addDrawCmd(new DrawClipRect {
                 rect = rect,
             });
         }
 
-        public void clipRRect(RRect rrect) {
+        public void clipRRect(RRect rrect, bool doAntiAlias = true) {
             this._recorder.addDrawCmd(new DrawClipRRect {
                 rrect = rrect,
             });
         }
 
-        public void drawTextBlob(TextBlob textBlob, double x, double y)
-        {
+        public void drawTextBlob(TextBlob textBlob, double x, double y) {
             this._recorder.addDrawCmd(new DrawTextBlob() {
                 textBlob = textBlob,
                 x = x,

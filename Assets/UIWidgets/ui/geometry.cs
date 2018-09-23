@@ -30,10 +30,18 @@ namespace UIWidgets.ui {
             return Math.Sign(value);
         }
 
+        public static bool isInfinite(this double it) {
+            return double.IsInfinity(it);
+        }
+
         public static bool isFinite(this double it) {
             return !double.IsInfinity(it);
         }
 
+        public static bool isNaN(this double it) {
+            return double.IsNaN(it);
+        }
+        
         public static double lerpDouble(double a, double b, double t) {
             return a + (b - a) * t;
         }
@@ -41,7 +49,7 @@ namespace UIWidgets.ui {
         public static int round(this double value) {
             return (int) Math.Round(value);
         }
-        
+
         public static int floor(this double value) {
             return (int) Math.Floor(value);
         }
@@ -373,6 +381,10 @@ namespace UIWidgets.ui {
 
         public Rect inflate(double delta) {
             return Rect.fromLTRB(this.left - delta, this.top - delta, this.right + delta, this.bottom + delta);
+        }
+
+        public Rect deflate(double delta) {
+            return this.inflate(-delta);
         }
 
         public Rect intersect(Rect other) {
