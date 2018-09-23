@@ -93,6 +93,123 @@ namespace UIWidgets.widgets {
         }
     }
 
+    public abstract class Flex : MultiChildRenderObjectWidget {
+        public Flex(
+            Axis direction,
+            TextDirection? textDirection,
+            TextBaseline? textBaseline,
+            Key key = null,
+            MainAxisAlignment mainAxisAlignment = MainAxisAlignment.start,
+            MainAxisSize mainAxisSize = MainAxisSize.max,
+            CrossAxisAlignment crossAxisAlignment = CrossAxisAlignment.center,
+            VerticalDirection verticalDirection = VerticalDirection.down,
+            List<Widget> children = null
+        ) : base(key, children) {
+            this.direction = direction;
+            this.mainAxisAlignment = mainAxisAlignment;
+            this.mainAxisSize = mainAxisSize;
+            this.crossAxisAlignment = crossAxisAlignment;
+            this.textDirection = textDirection;
+            this.verticalDirection = verticalDirection;
+            this.textBaseline = textBaseline;
+        }
+
+        public Axis direction;
+        public MainAxisAlignment mainAxisAlignment;
+        public MainAxisSize mainAxisSize;
+        public CrossAxisAlignment crossAxisAlignment;
+        public TextDirection? textDirection;
+        public VerticalDirection verticalDirection;
+        public TextBaseline? textBaseline;
+
+        private bool _needTextDirection {
+            get {
+                D.assert(direction != null);
+                switch (direction) {
+                    case Axis.horizontal:
+                        return true;
+                    case Axis.vertical:
+                        return (this.crossAxisAlignment == CrossAxisAlignment.start ||
+                                this.crossAxisAlignment == CrossAxisAlignment.end);
+                }
+
+                return false;
+            }
+        }
+
+        public TextDirection getEffectiveTextDirection(BuildContext context) {
+            return textDirection ?? (_needTextDirection ? Directionality.of(context) : TextDirection.ltr);
+        }
+
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderFlex(
+                direction: direction,
+                mainAxisAlignment: mainAxisAlignment,
+                mainAxisSize: mainAxisSize,
+                crossAxisAlignment: crossAxisAlignment,
+                textDirection: getEffectiveTextDirection(context),
+                verticalDirection: verticalDirection,
+                textBaseline: textBaseline ?? TextBaseline.alphabetic
+            );
+        }
+
+        public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
+            ((RenderFlex) renderObject).direction = this.direction;
+            ((RenderFlex) renderObject).mainAxisAlignment = this.mainAxisAlignment;
+            ((RenderFlex) renderObject).mainAxisSize = this.mainAxisSize;
+            ((RenderFlex) renderObject).crossAxisAlignment = this.crossAxisAlignment;
+            ((RenderFlex) renderObject).textDirection = this.textDirection ?? TextDirection.ltr;
+            ((RenderFlex) renderObject).verticalDirection = this.verticalDirection;
+            ((RenderFlex) renderObject).textBaseline = this.textBaseline ?? TextBaseline.alphabetic;
+        }
+    }
+
+    public class Row : Flex {
+        public Row(
+            TextDirection? textDirection,
+            TextBaseline? textBaseline,
+            Key key = null,
+            MainAxisAlignment mainAxisAlignment = MainAxisAlignment.start,
+            MainAxisSize mainAxisSize = MainAxisSize.max,
+            CrossAxisAlignment crossAxisAlignment = CrossAxisAlignment.center,
+            VerticalDirection verticalDirection = VerticalDirection.down,
+            List<Widget> children = null
+        ) : base(
+            children: children,
+            key: key,
+            direction: Axis.horizontal,
+            textDirection: textDirection,
+            textBaseline: textBaseline,
+            mainAxisAlignment: mainAxisAlignment,
+            mainAxisSize: mainAxisSize,
+            crossAxisAlignment: crossAxisAlignment,
+            verticalDirection: verticalDirection
+        ) {}
+    }
+    
+    public class Column : Flex {
+        public Column(
+            TextDirection? textDirection,
+            TextBaseline? textBaseline,
+            Key key = null,
+            MainAxisAlignment mainAxisAlignment = MainAxisAlignment.start,
+            MainAxisSize mainAxisSize = MainAxisSize.max,
+            CrossAxisAlignment crossAxisAlignment = CrossAxisAlignment.center,
+            VerticalDirection verticalDirection = VerticalDirection.down,
+            List<Widget> children = null
+        ) : base(
+            children: children,
+            key: key,
+            direction: Axis.vertical,
+            textDirection: textDirection,
+            textBaseline: textBaseline,
+            mainAxisAlignment: mainAxisAlignment,
+            mainAxisSize: mainAxisSize,
+            crossAxisAlignment: crossAxisAlignment,
+            verticalDirection: verticalDirection
+        ) {}
+    }
+
     public class Padding : SingleChildRenderObjectWidget {
         public Padding(
             EdgeInsets padding,

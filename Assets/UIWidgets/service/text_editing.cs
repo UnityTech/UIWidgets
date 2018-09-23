@@ -100,16 +100,16 @@ namespace UIWidgets.service
     public class TextSelection : TextRange, IEquatable<TextSelection>
     {
         public readonly int baseOffset;
-        public readonly int extendOffset;
+        public readonly int extentOffset;
         public readonly TextAffinity affinity;
         public readonly bool isDirectional;
 
-        public TextSelection(int baseOffset, int extendOffset, TextAffinity affinity = TextAffinity.downstream,
-            bool isDirectional = false):base(baseOffset < extendOffset ? baseOffset: extendOffset, 
-            baseOffset < extendOffset ? extendOffset : baseOffset )
+        public TextSelection(int baseOffset, int extentOffset, TextAffinity affinity = TextAffinity.downstream,
+            bool isDirectional = false):base(baseOffset < extentOffset ? baseOffset: extentOffset, 
+            baseOffset < extentOffset ? extentOffset : baseOffset )
         {
             this.baseOffset = baseOffset;
-            this.extendOffset = extendOffset;
+            this.extentOffset = extentOffset;
             this.affinity = affinity;
             this.isDirectional = isDirectional;
         }
@@ -136,7 +136,7 @@ namespace UIWidgets.service
         {
             get
             {
-                return new TextPosition(offset: extendOffset, affinity: affinity);
+                return new TextPosition(offset: extentOffset, affinity: affinity);
             }
         }
 
@@ -144,7 +144,7 @@ namespace UIWidgets.service
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return baseOffset == other.baseOffset && extendOffset == other.extendOffset && 
+            return baseOffset == other.baseOffset && extentOffset == other.extentOffset && 
                    affinity == other.affinity && isDirectional == other.isDirectional;
         }
 
@@ -160,9 +160,9 @@ namespace UIWidgets.service
         {
             unchecked
             {
-                int hashCode = 0;
+                var hashCode = base.GetHashCode();
                 hashCode = (hashCode * 397) ^ baseOffset;
-                hashCode = (hashCode * 397) ^ extendOffset;
+                hashCode = (hashCode * 397) ^ extentOffset;
                 hashCode = (hashCode * 397) ^ (int) affinity;
                 hashCode = (hashCode * 397) ^ isDirectional.GetHashCode();
                 return hashCode;
@@ -179,13 +179,18 @@ namespace UIWidgets.service
             return !Equals(left, right);
         }
 
-        public TextSelection copyWith(int? baseOffset = null, int? extendOffset = null, TextAffinity? affinity = null,
+        public TextSelection copyWith(int? baseOffset = null, int? extentOffset = null, TextAffinity? affinity = null,
             bool? isDirectional = null)
         {
             return new TextSelection(
-                baseOffset??this.baseOffset, extendOffset??this.extendOffset, affinity??this.affinity,
+                baseOffset??this.baseOffset, extentOffset??this.extentOffset, affinity??this.affinity,
                 isDirectional??this.isDirectional
                 );
+        }
+
+        public override string ToString()
+        {
+            return string.Format("{0}, BaseOffset: {1}, ExtentOffset: {2}, Affinity: {3}, IsDirectional: {4}", base.ToString(), baseOffset, extentOffset, affinity, isDirectional);
         }
     }
 }

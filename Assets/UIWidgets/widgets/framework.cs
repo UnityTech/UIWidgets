@@ -2824,9 +2824,9 @@ namespace UIWidgets.widgets {
             base.mount(parent, newSlot);
             this._children = Enumerable.Repeat((Element) null, this.widget.children.Count).ToList();
             Element previousChild = null;
-            for (int i = 0; i < this._children.Count; i += 1) {
+            for (int i = 0; i < this._children.Capacity; i += 1) {
                 Element newChild = this.inflateWidget(this.widget.children[i], previousChild);
-                this._children[i] = newChild;
+                this._children.Add(newChild);
                 previousChild = newChild;
             }
         }

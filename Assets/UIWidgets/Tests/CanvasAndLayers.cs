@@ -30,6 +30,7 @@ namespace UIWidgets.Tests {
                 this.clipRect,
                 this.clipRRect,
                 this.saveLayer,
+                this.drawLine,
             };
             this._optionStrings = this._options.Select(x => x.Method.Name).ToArray();
             this._selected = 0;
@@ -88,6 +89,44 @@ namespace UIWidgets.Tests {
             canvas.drawPloygon4(
                 new[] {new Offset(10, 150), new Offset(10, 160), new Offset(140, 120), new Offset(110, 180)},
                 paint);
+        }
+        
+        void drawLine() {
+            var canvas = new CanvasImpl();
+
+            var paint = new Paint {
+                color = new Color(0xFFFF0000),
+            };
+
+            canvas.drawLine(
+                new Offset(10, 20),
+                new Offset(50, 20),
+                paint);
+            
+            canvas.drawLine(
+                new Offset(10, 10),
+                new Offset(100, 100),
+                paint);
+            
+            
+            canvas.drawLine(
+                new Offset(10, 10),
+                new Offset(10, 50),
+                paint);
+
+            canvas.drawLine(
+                new Offset(40, 10),
+                new Offset(90, 10),
+                paint);
+            
+            var widthPaint = new Paint {
+                color = new Color(0xFFFF0000),
+                strokeWidth = 4,
+            };
+            canvas.drawLine(
+                new Offset(40, 20),
+                new Offset(120, 190),
+                widthPaint);
         }
 
         void drawRect() {

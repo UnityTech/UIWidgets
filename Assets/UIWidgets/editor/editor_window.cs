@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using UIWidgets.async;
 using UIWidgets.flow;
+using UIWidgets.service;
 using UIWidgets.rendering;
 using UIWidgets.ui;
 using UIWidgets.widgets;
@@ -42,6 +43,7 @@ namespace UIWidgets.editor {
         readonly DateTime _epoch = new DateTime(Stopwatch.GetTimestamp());
         readonly MicrotaskQueue _microtaskQueue = new MicrotaskQueue();
         readonly TimerProvider _timerProvider = new TimerProvider();
+        readonly TextInput _textInput = new TextInput();
 
         public void OnGUI() {
             Window.instance = this;
@@ -110,6 +112,11 @@ namespace UIWidgets.editor {
                         pointerData
                     }));
                 }
+            }
+
+            if (_textInput != null)
+            {
+                _textInput.OnGUI();
             }
         }
 
@@ -205,6 +212,11 @@ namespace UIWidgets.editor {
                 Window.instance = null;
                 WidgetsBinding.instance = null;
             }
+        }
+
+        public override TextInput textInput
+        {
+            get { return _textInput; }
         }
     }
 }

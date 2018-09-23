@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using UIWidgets.painting;
 using UIWidgets.ui.txt;
 using UnityEngine;
 
@@ -49,11 +48,35 @@ namespace UIWidgets.ui
     {
         public readonly double ascent;
         public readonly double descent;
+        public readonly double? underlineThickness;
+        public readonly double? underlinePosition;
+        public readonly double? strikeoutPosition;
+        public readonly double? fxHeight;
 
-        public FontMetrics(double ascent, double descent)
+        public FontMetrics(double ascent, double descent,
+            double? underlineThickness = null, double? underlinePosition = null, double? strikeoutPosition = null, 
+            double? fxHeight = null)
         {
             this.ascent = ascent;
             this.descent = descent;
+            this.underlineThickness = underlineThickness;
+            this.underlinePosition = underlinePosition;
+            this.strikeoutPosition = strikeoutPosition;
+            this.fxHeight = fxHeight;
+        }
+
+        public static FontMetrics fromFont(Font font, double? height)
+        {
+            var ascent = font.ascent * (height??1.0);
+            var descent = (font.lineHeight - font.ascent) * (height??1.0);
+            double? fxHeight = null;
+            font.RequestCharactersInTexture("x");
+            CharacterInfo charInfo;
+            if (font.GetCharacterInfo('x', out charInfo))
+            {
+                fxHeight = charInfo.glyphHeight;
+            }
+            return new FontMetrics(ascent, descent, fxHeight: fxHeight); 
         }
     }
 
@@ -217,6 +240,8 @@ namespace UIWidgets.ui
         private double _width;
 
         public const char CHAR_NBSP = '\u00A0';
+        private const double kDoubleDecorationSpacing = 3.0;
+
         public static bool isWordSpace(char ch)
         {
             return ch == ' ' || ch == CHAR_NBSP;
@@ -269,9 +294,11 @@ namespace UIWidgets.ui
 
         public void paint(Canvas canvas, double x, double y)
         {
+            var baseOffset = new Offset(x, y);
             foreach (var paintRecord in _paintRecords)
             {
                 canvas.drawTextBlob(paintRecord.text, x, y);
+                paintDecorations(canvas, paintRecord, baseOffset);
             }
         }
         
@@ -534,7 +561,7 @@ namespace UIWidgets.ui
                 var run = _runs.getRun(i);
                 if (run.start < run.end)
                 {
-                    var font = FontManager.instance.getOrCreate(run.style.safeFontFamily, run.style.UnityFontSize);
+                    var font = FontManager.instance.getOrCreate(run.style.fontFamily, run.style.UnityFontSize);
                     font.RequestCharactersInTexture(_text.Substring(run.start, run.end - run.start), 0, 
                         run.style.UnityFontStyle);
                 } 
@@ -546,27 +573,30 @@ namespace UIWidgets.ui
             double yOffset = 0;
             var runIndex = 0;
             double lastDescent = 0.0f;
+            var linePaintRecords = new List<PaintRecord>();
+            
             for (int lineNumber = 0; lineNumber < lineLimits; lineNumber++)
             {
                 var line = _lineRanges[lineNumber];
                 double maxAscent = 0.0f;
                 double maxDescent = 0.0f;
-
+                linePaintRecords.Clear();
                 for (;;)
                 {
-                    var run = _runs.getRun(runIndex);
-                    if (run.start < run.end && run.start < line.end && run.end > line.start)
+                    var run = runIndex < _runs.size ? _runs.getRun(runIndex) : null;
+                    if (run != null && run.start < run.end && run.start < line.end && run.end > line.start)
                     {
-                        var font = FontManager.instance.getOrCreate(run.style.safeFontFamily, run.style.UnityFontSize);
-                        var ascent = font.ascent * (run.style.height??1.0);
-                        var descent = (font.lineHeight - font.ascent) * (run.style.height??1.0);
-                        if (ascent > maxAscent)
+                        var font = FontManager.instance.getOrCreate(run.style.fontFamily, run.style.UnityFontSize);
+                        var metrics = FontMetrics.fromFont(font, run.style.height);
+                        var ascent = font.ascent * (run.style.height);
+                        var descent = (font.lineHeight - font.ascent) * (run.style.height);
+                        if (metrics.ascent > maxAscent)
                         {
-                            maxAscent = ascent;
+                            maxAscent = metrics.ascent;
                         }
-                        if (descent > maxDescent)
+                        if (metrics.descent > maxDescent)
                         {
-                            maxDescent = descent;
+                            maxDescent = metrics.descent;
                         }
 
                         int start = Math.Max(run.start, line.start);
@@ -579,11 +609,13 @@ namespace UIWidgets.ui
                                 _characterPositions[end - 1].x + _characterWidths[end - 1] -
                                 _characterPositions[start].x,
                                 descent);
-                            _paintRecords.Add(new PaintRecord(run.style, new TextBlob(
-                                    _text, start, end, _characterPositions, run.style, bounds), 
+                            
+                            linePaintRecords.Add(new PaintRecord(run.style, new Offset(_characterPositions[start].x, yOffset)
+                                , new TextBlob(
+                                    _text, start, end, _characterPositions, run.style, bounds), metrics, 
                                 lineNumber, width));
                             _codeUnitRuns.Add(new CodeUnitRun(
-                                new IndexRange(start, end), lineNumber, new FontMetrics(ascent, descent), TextDirection.ltr));
+                                new IndexRange(start, end), lineNumber, metrics, TextDirection.ltr));
                         }
                     }
 
@@ -609,6 +641,12 @@ namespace UIWidgets.ui
                 }
                 lastDescent = maxDescent;
                 yOffset = Utils.PixelCorrectRound(yOffset + maxAscent + lastDescent);
+                foreach (var record in linePaintRecords)
+                {
+                    record.offset = new Offset(record.offset.dx, yOffset);
+                }
+                _paintRecords.AddRange(linePaintRecords);
+                
                 for (var charIndex = line.start; charIndex < line.end; charIndex++)
                 {
                     _characterPositions[charIndex].y = yOffset;
@@ -728,6 +766,71 @@ namespace UIWidgets.ui
             }
 
             return words;
+        }
+
+        private void paintDecorations(Canvas canvas, PaintRecord record, Offset baseOffset)
+        {
+            if (record.style.decoration == null || record.style.decoration == TextDecoration.none)
+            {
+                return;
+            }
+
+            var paint = new Paint();
+            if (record.style.decorationColor == null)
+            {
+                paint.color = record.style.color;
+            }
+            else
+            {
+                paint.color = record.style.decorationColor;
+            }
+            
+            
+            var width = record.runWidth;
+            var metrics = record.metrics;
+            double underLineThickness = metrics.underlineThickness ?? (record.style.fontSize / 14.0);
+            paint.strokeWidth = underLineThickness;
+            var recordOffset = baseOffset + record.offset;
+            var x = recordOffset.dx;
+            var y = recordOffset.dy;
+            
+            int decorationCount = 1;
+            switch (record.style.decorationStyle)
+            {
+                   case TextDecorationStyle.doubleLine:
+                       decorationCount = 2;
+                       break;
+            }
+
+
+            var decoration = record.style.decoration;
+            for (int i = 0; i < decorationCount; i++)
+            {
+                double yOffset = i * underLineThickness * kDoubleDecorationSpacing;
+                double yOffsetOriginal = yOffset;
+                if (decoration != null && decoration.contains(TextDecoration.underline))
+                {
+                    // underline
+                    yOffset += metrics.underlinePosition ?? underLineThickness;
+                    canvas.drawLine(new Offset(x, y + yOffset), new Offset(x + width, y + yOffset), paint);
+                    yOffset = yOffsetOriginal;
+                }
+
+                if (decoration != null && decoration.contains(TextDecoration.overline))
+                {
+                    yOffset -= metrics.ascent;
+                    canvas.drawLine(new Offset(x, y + yOffset), new Offset(x + width, y + yOffset), paint);
+                    yOffset = yOffsetOriginal;
+                }
+
+                if (decoration != null && decoration.contains(TextDecoration.lineThrough))
+                {
+                    yOffset += (decorationCount - 1.0) * underLineThickness * kDoubleDecorationSpacing / -2.0;
+                    yOffset += metrics.strikeoutPosition ?? (metrics.fxHeight??0) / -2.0;
+                    canvas.drawLine(new Offset(x, y + yOffset), new Offset(x + width, y + yOffset), paint);
+                    yOffset = yOffsetOriginal;
+                }
+            }
         }
         
     }

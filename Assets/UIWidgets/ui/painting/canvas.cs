@@ -14,6 +14,8 @@ namespace UIWidgets.ui {
 
         void drawImageRect(Rect src, Rect dst, Paint paint, Image image);
 
+        void drawLine(Offset from, Offset to, Paint paint);
+
         void concat(Matrix4x4 transform);
 
         void save();
@@ -75,6 +77,16 @@ namespace UIWidgets.ui {
                 image = image,
                 src = src,
                 dst = dst,
+            });
+        }
+
+        public void drawLine(Offset from, Offset to, Paint paint)
+        {
+            this._recorder.addDrawCmd(new DrawLine
+            {
+                from = from,
+                to = to,
+                paint = paint,
             });
         }
 

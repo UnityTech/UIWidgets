@@ -48,7 +48,7 @@ namespace UIWidgets.rendering
 
     public class RenderEditable : RenderBox
     {
-        public static readonly string obscuringCharacter = "•";
+        public static readonly char obscuringCharacter = '•';
         private static readonly double _kCaretGap = 1.0;
         private static readonly double _kCaretHeightOffset = 2.0;
         private static readonly double _kCaretWidth = 1.0;
@@ -64,9 +64,9 @@ namespace UIWidgets.rendering
         private bool _obscureText;
         private TapGestureRecognizer _tap;
         private DoubleTapGestureRecognizer _doubleTap;
-        private bool ignorePointer;
-        private SelectionChangedHandler onSelectionChanged;
-        private CaretChangedHandler onCaretChanged;
+        public bool ignorePointer;
+        public SelectionChangedHandler onSelectionChanged;
+        public CaretChangedHandler onCaretChanged;
         private Rect _lastCaretRect;
         private double? _textLayoutLastWidth;
         private List<TextBox> _selectionRects;
@@ -215,7 +215,7 @@ namespace UIWidgets.rendering
                     return;
                 }
 
-                hasFocus = value;
+                _hasFocus = value;
                 markNeedsSemanticsUpdate();
             }
         }
@@ -541,7 +541,6 @@ namespace UIWidgets.rendering
             
             foreach (var box in _selectionRects)
             {
-                Debug.Log(string.Format("draw box {0}", box.toRect().shift(effectiveOffset)));
                 canvas.drawRect(box.toRect().shift(effectiveOffset), BorderWidth.zero, BorderRadius.zero, paint);
             }
         }
@@ -560,6 +559,11 @@ namespace UIWidgets.rendering
                 }
             }
 
+            if (_hasFocus) {
+                var caretOffset = _textPainter.getOffsetForCaret(_selection.extendPos, Rect.fromLTWH(0, 0, 1, preferredLineHeight));
+                var caretRec = _caretPrototype.shift(caretOffset + effectiveOffset);
+                Input.compositionCursorPos = new Vector2((float)caretRec.left, (float)caretRec.bottom);
+            }
             _textPainter.paint(context.canvas, effectiveOffset);
         }
         
@@ -639,7 +643,7 @@ namespace UIWidgets.rendering
             {
                 return TextSelection.fromPosition(position);
             }
-            return new TextSelection(baseOffset: word.start, extendOffset: word.end);
+            return new TextSelection(baseOffset: word.start, extentOffset: word.end);
         }
         
         private bool _isMultiline

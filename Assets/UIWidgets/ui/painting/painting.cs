@@ -117,6 +117,11 @@ namespace UIWidgets.ui {
         public static bool operator !=(Color a, Color b) {
             return !(a == b);
         }
+
+        public override string ToString()
+        {
+            return string.Format("Color(0x{0:X8})", value);
+        }
     }
 
     public enum Clip {
@@ -129,6 +134,7 @@ namespace UIWidgets.ui {
     public class Paint {
         public Color color;
         public double blurSigma;
+        public double strokeWidth = 1;
     }
 
     public static class Conversions {
@@ -170,15 +176,15 @@ namespace UIWidgets.ui {
         }
     }
 
-    public class ColorFilter {
-        public ColorFilter(Color color, BlendMode blendMode) {
-            _color = color;
-            _blendMode = blendMode;
-        }
-
-        Color _color;
-        BlendMode _blendMode;
-    }
+//    public class ColorFilter {
+//        public ColorFilter(Color color, BlendMode blendMode) {
+//            _color = color;
+//            _blendMode = blendMode;
+//        }
+//
+//        Color _color;
+//        BlendMode _blendMode;
+//    }
 
     public enum BlendMode {
         None = 0, // explicitly assign zero to make it more clear
