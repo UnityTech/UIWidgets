@@ -175,55 +175,82 @@ namespace UIWidgets.Tests {
         const double headerHeight = 80.0;
 
         double _offsetY = 0.0;
-
+        int _index = -1;
+        
         Widget _buildHeader(BuildContext context) {
             return new Container(
                 padding: EdgeInsets.only(left: 16.0, right: 8.0),
                 height: headerHeight - _offsetY,
-                child: new Flex(
-                    direction: Axis.horizontal,
+                child: new Row(
                     children: new List<Widget> {
-                        new Row(
-                            children: new List<Widget> {
-                                new Text(
-                                    "Today",
-                                    style: new TextStyle(
-                                        fontSize: (34.0 / headerHeight) * (headerHeight - _offsetY),
-                                        color: CLColors.white
-                                    )
-                                ),
-
-                                new CustomButton(
-                                    padding: EdgeInsets.all(8.0),
-                                    child: new Icon(
-                                        Icons.notifications,
-                                        size: 28.0,
-                                        color: CLColors.icon2
-                                    )
-                                ),
-                                new CustomButton(
-                                    padding: EdgeInsets.all(8.0),
-                                    child: new Icon(
-                                        Icons.account_circle,
-                                        size: 28.0,
-                                        color: CLColors.icon2
-                                    )
+                        new Flexible(
+                            flex: 1,
+                            fit: FlexFit.tight,
+                            child: new Text(
+                                "Today",
+                                style: new TextStyle(
+                                    fontSize: (34.0 / headerHeight) * (headerHeight - _offsetY),
+                                    color: CLColors.white
                                 )
-                            }
+                            )),
+                        new CustomButton(
+                            padding: EdgeInsets.only(8.0, 0.0, 8.0, 0.0),
+                            child: new Icon(
+                                Icons.notifications,
+                                size: 18.0,
+                                color: CLColors.icon2
+                            )
+                        ),
+                        new CustomButton(
+                            padding: EdgeInsets.only(8.0, 0.0, 16.0, 0.0),
+                            child: new Icon(
+                                Icons.account_circle,
+                                size: 18.0,
+                                color: CLColors.icon2
+                            )
                         )
                     }
                 )
             );
         }
         
-        
+        bool _onNotification(ScrollNotification notification, BuildContext context) {
+            double pixels = notification.metrics.pixels;
+            if (pixels >= 0.0) {
+                if (pixels <= headerHeight) {
+                    setState(() => {
+                        _offsetY = pixels / 2.0;
+                    });
+                }
+            } else {
+                if (_offsetY != 0.0) {
+                    setState(() => {
+                        _offsetY = 0.0;
+                    });
+                }
+            }
+            return true;
+        }
+
 
         Widget _buildContentList(BuildContext context) {
             return new NotificationListener<ScrollNotification>(
                 onNotification: (ScrollNotification notification) => {
+                    _onNotification(notification, context);
                     return true;
                 },
-                child: new Container()
+                child: new Flexible(
+                    child: ListView.builder(
+                        itemCount: 20,
+                        itemExtent: 100,
+                        physics: new AlwaysScrollableScrollPhysics(),
+                        itemBuilder: (BuildContext context1, int index) => {
+                            return new Container(
+                                color: Color.fromARGB(255, (index * 10) % 256, (index * 10) % 256, (index * 10) % 256)
+                            );
+                        }
+                    )
+                )
             );
         }
 

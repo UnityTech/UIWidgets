@@ -305,6 +305,50 @@ namespace UIWidgets.widgets {
         }
     }
 
+    public class Flexible : ParentDataWidget {
+        public Flexible(
+            Key key = null,
+            int flex = 1,
+            FlexFit fit = FlexFit.loose,
+            Widget child = null
+        ) : base(key: key, child: child) {
+            this.flex = flex;
+            this.fit = fit;
+        }
+
+        public readonly int flex;
+
+        public readonly FlexFit fit;
+
+        public override void applyParentData(RenderObject renderObject) {
+            D.assert(renderObject.parentData is FlexParentData);
+            FlexParentData parentData = (FlexParentData) renderObject.parentData;
+            bool needsLayout = false;
+
+            if (parentData.flex != this.flex) {
+                parentData.flex = this.flex;
+                needsLayout = true;
+            }
+
+            if (parentData.fit != this.fit) {
+                parentData.fit = this.fit;
+                needsLayout = true;
+            }
+
+            if (needsLayout) {
+                var targetParent = renderObject.parent;
+                if (targetParent is RenderObject) {
+                    ((RenderObject) targetParent).markNeedsLayout();
+                }
+            }
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new IntProperty("flex", this.flex));
+        }
+    }
+
     public class Padding : SingleChildRenderObjectWidget {
         public Padding(
             Key key = null,

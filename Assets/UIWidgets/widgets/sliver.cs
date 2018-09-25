@@ -483,7 +483,7 @@ namespace UIWidgets.widgets {
         }
     }
 
-    public class KeepAlive : ParentDataWidget<SliverMultiBoxAdaptorWidget> {
+    public class KeepAlive : ParentDataWidget{
         public KeepAlive(
             Key key = null,
             bool keepAlive = true,

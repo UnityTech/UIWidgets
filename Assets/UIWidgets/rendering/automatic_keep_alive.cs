@@ -60,12 +60,12 @@ namespace UIWidgets.rendering {
             handle.addListener(this._handles[handle]);
             if (!this._keepingAlive) {
                 this._keepingAlive = true;
-                ParentDataElement<SliverMultiBoxAdaptorWidget> childElement = this._getChildElement();
+                ParentDataElement childElement = this._getChildElement();
                 if (childElement != null) {
                     this._updateParentDataOfChild(childElement);
                 } else {
                     SchedulerBinding.instance.addPostFrameCallback(timeStamp => {
-                        ParentDataElement<SliverMultiBoxAdaptorWidget> childElement1 = this._getChildElement();
+                        ParentDataElement childElement1 = this._getChildElement();
                         D.assert(childElement1 != null);
                         this._updateParentDataOfChild(childElement1);
                     });
@@ -75,17 +75,17 @@ namespace UIWidgets.rendering {
             return false;
         }
 
-        ParentDataElement<SliverMultiBoxAdaptorWidget> _getChildElement() {
+        ParentDataElement _getChildElement() {
             Element element = (Element) this.context;
             Element childElement = null;
             element.visitChildren((Element child) => { childElement = child; });
 
-            D.assert(childElement == null || childElement is ParentDataElement<SliverMultiBoxAdaptorWidget>);
-            return (ParentDataElement<SliverMultiBoxAdaptorWidget>) childElement;
+            D.assert(childElement == null || childElement is ParentDataElement);
+            return (ParentDataElement) childElement;
         }
 
-        void _updateParentDataOfChild(ParentDataElement<SliverMultiBoxAdaptorWidget> childElement) {
-            childElement.applyWidgetOutOfTurn((ParentDataWidget<SliverMultiBoxAdaptorWidget>) this.build(this.context));
+        void _updateParentDataOfChild(ParentDataElement childElement) {
+            childElement.applyWidgetOutOfTurn((ParentDataWidget) this.build(this.context));
         }
 
         VoidCallback _createCallback(Listenable handle) {
