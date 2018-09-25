@@ -5,7 +5,6 @@ using UIWidgets.rendering;
 using UIWidgets.ui;
 using TextStyle = UIWidgets.painting.TextStyle;
 
-
 namespace UIWidgets.widgets
 {
     public class DefaultTextStyle : InheritedWidget
@@ -34,7 +33,7 @@ namespace UIWidgets.widgets
             bool? softWrap, TextOverflow? overflow, int? maxLines, Widget child)
         {
             D.assert(child != null);
-            return new Builder((context =>
+            return new Builder(builder: (context =>
             {
                 var parent = DefaultTextStyle.of(context);
                 return new DefaultTextStyle(
@@ -146,7 +145,6 @@ namespace UIWidgets.widgets
 
             return new RichText(
                 textAlign: textAlign ?? defaultTextStyle.textAlign,
-                textDirection: textDirection,
                 softWrap: softWrap ?? defaultTextStyle.softWrap,
                 overflow: overflow ?? defaultTextStyle.overflow,
                 textScaleFactor: textScaleFactor ?? 1.0, // MediaQuery.textScaleFactorOf(context), todo
