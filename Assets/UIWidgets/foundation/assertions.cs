@@ -123,7 +123,7 @@ namespace UIWidgets.foundation {
             if (_errorCount == 0 || forceReport) {
                 Debug.LogError(details.ToString());
             } else {
-                Debug.LogWarning("Another exception was thrown: " + details.exceptionAsString());
+                Debug.LogWarning("Another exception was thrown: " + details);
             }
 
             _errorCount += 1;

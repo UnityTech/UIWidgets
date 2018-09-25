@@ -13,7 +13,7 @@ namespace UIWidgets.rendering {
             }
         }
 
-        public override double computeMinIntrinsicWidth(double height) {
+        protected override double computeMinIntrinsicWidth(double height) {
             if (this.child != null) {
                 return this.child.getMinIntrinsicWidth(height);
             }
@@ -21,7 +21,7 @@ namespace UIWidgets.rendering {
             return 0.0;
         }
 
-        public override double computeMaxIntrinsicWidth(double height) {
+        protected override double computeMaxIntrinsicWidth(double height) {
             if (this.child != null) {
                 return this.child.getMaxIntrinsicWidth(height);
             }
@@ -29,7 +29,7 @@ namespace UIWidgets.rendering {
             return 0.0;
         }
 
-        public override double computeMinIntrinsicHeight(double width) {
+        protected override double computeMinIntrinsicHeight(double width) {
             if (this.child != null) {
                 return this.child.getMinIntrinsicHeight(width);
             }
@@ -37,7 +37,7 @@ namespace UIWidgets.rendering {
             return 0.0;
         }
 
-        public override double computeMaxIntrinsicHeight(double width) {
+        protected override double computeMaxIntrinsicHeight(double width) {
             if (this.child != null) {
                 return this.child.getMaxIntrinsicHeight(width);
             }
@@ -45,7 +45,7 @@ namespace UIWidgets.rendering {
             return 0.0;
         }
 
-        public override double? computeDistanceToActualBaseline(TextBaseline baseline) {
+        protected override double? computeDistanceToActualBaseline(TextBaseline baseline) {
             if (this.child != null) {
                 return this.child.getDistanceToActualBaseline(baseline);
             }
@@ -53,13 +53,21 @@ namespace UIWidgets.rendering {
             return base.computeDistanceToActualBaseline(baseline);
         }
 
-        public override void performLayout() {
+        protected override void performLayout() {
             if (this.child != null) {
                 this.child.layout(this.constraints, parentUsesSize: true);
                 this.size = this.child.size;
             } else {
                 this.performResize();
             }
+        }
+
+        protected override bool hitTestChildren(HitTestResult result, Offset position = null) {
+            if (this.child != null) {
+                return this.child.hitTest(result, position);
+            }
+
+            return false;
         }
 
         public override void applyPaintTransform(RenderObject child, ref Matrix4x4 transform) {
@@ -69,14 +77,6 @@ namespace UIWidgets.rendering {
             if (this.child != null) {
                 context.paintChild(this.child, offset);
             }
-        }
-        
-        protected override bool hitTestChildren(HitTestResult result, Offset position = null) {
-            if (this.child != null) {
-                return this.child.hitTest(result, position);
-            }
-
-            return false;
         }
     }
 

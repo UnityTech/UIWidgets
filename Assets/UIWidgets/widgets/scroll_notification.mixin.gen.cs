@@ -6,7 +6,7 @@ namespace UIWidgets.widgets {
  
     public abstract class ViewportNotificationMixinNotification : Notification {
         public int depth {
-            get { return _depth; }
+            get { return this._depth; }
         }
 
         int _depth = 0;
@@ -30,7 +30,7 @@ namespace UIWidgets.widgets {
  
     public abstract class ViewportNotificationMixinLayoutChangedNotification : LayoutChangedNotification {
         public int depth {
-            get { return _depth; }
+            get { return this._depth; }
         }
 
         int _depth = 0;

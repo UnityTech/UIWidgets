@@ -10,11 +10,11 @@ namespace UIWidgets.ui {
             this._layerBuilder.pushTransform(matrix);
         }
 
-        public void pushClipRect(Rect rect) {
+        public void pushClipRect(Rect rect, Clip clipBehavior = Clip.hardEdge) {
             this._layerBuilder.pushClipRect(rect);
         }
 
-        public void pushClipRRect(RRect rrect) {
+        public void pushClipRRect(RRect rrect, Clip clipBehavior = Clip.antiAlias) {
             this._layerBuilder.pushClipRRect(rrect);
         }
 
@@ -26,7 +26,8 @@ namespace UIWidgets.ui {
             this._layerBuilder.pop();
         }
 
-        public void addPicture(Offset offset, Picture picture) {
+        public void addPicture(Offset offset, Picture picture,
+            bool isComplexHint = false, bool willChangeHint = false) {
             this._layerBuilder.addPicture(offset, picture);
         }
 
@@ -44,6 +45,9 @@ namespace UIWidgets.ui {
 
         public Layer takeLayer() {
             return this._rootLayer;
+        }
+
+        public void dispose() {
         }
     }
 }

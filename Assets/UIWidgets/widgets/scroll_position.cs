@@ -237,7 +237,7 @@ namespace UIWidgets.widgets {
             Curve curve = null
         ) {
             D.assert(renderObject.attached);
-            RenderAbstractViewport viewport = RenderAbstractViewportUtils.of(renderObject);
+            RenderAbstractViewport viewport = RenderViewportUtils.of(renderObject);
             D.assert(viewport != null);
 
             double target = viewport.getOffsetToReveal(renderObject, alignment).offset.clamp(

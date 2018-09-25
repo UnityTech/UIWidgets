@@ -1,5 +1,8 @@
 using UIWidgets.ui;
 using UIWidgets.painting;
+using UnityEngine;
+using Color = UIWidgets.ui.Color;
+using Rect = UIWidgets.ui.Rect;
 
 namespace UIWidgets.rendering {
     class RenderImage : RenderBox {
@@ -167,8 +170,7 @@ namespace UIWidgets.rendering {
             constraints = BoxConstraints.tightFor(
                 _width,
                 _height
-            );
-            constraints = constraints.enforce(constraints);
+            ).enforce(constraints);
 
             if (_image == null)
                 return constraints.smallest;
@@ -179,7 +181,7 @@ namespace UIWidgets.rendering {
             ));
         }
         
-        public override void performLayout() {
+        protected override void performLayout() {
             this.size = _sizeForConstraints(constraints);
         }
 
@@ -190,11 +192,11 @@ namespace UIWidgets.rendering {
             DecorationImageUtil.paintImage(
                 context.canvas,
                 offset & size,
-                _image
-//                _fit,
-//                _centerSlice,
-//                _resolvedAlignment,
-//                _repeat
+                _image,
+                _fit,
+                _centerSlice,
+                _resolvedAlignment,
+                _repeat
             );
         }
     }

@@ -5,7 +5,7 @@ namespace UIWidgets.widgets {
 {% macro ViewportNotificationMixin(with) %} 
     public abstract class ViewportNotificationMixin{{with}} : {{with}} {
         public int depth {
-            get { return _depth; }
+            get { return this._depth; }
         }
 
         int _depth = 0;

@@ -168,12 +168,12 @@ namespace UIWidgets.rendering
             get { return _textPainter.size; }
         }
 
-        public override double computeMinIntrinsicWidth(double height) {
+        protected override double computeMinIntrinsicWidth(double height) {
             _layoutText();
             return _textPainter.minIntrinsicWidth;
         }
         
-        public override double computeMaxIntrinsicWidth(double height) {
+        protected override double computeMaxIntrinsicWidth(double height) {
             _layoutText();
             return _textPainter.maxIntrinsicWidth;
         }
@@ -183,21 +183,21 @@ namespace UIWidgets.rendering
             return _textPainter.height;
         }
 
-        public override double  computeMinIntrinsicHeight(double width) {
+        protected override double  computeMinIntrinsicHeight(double width) {
             return _computeIntrinsicHeight(width);
         }
 
-        public override double  computeMaxIntrinsicHeight(double width) {
+        protected override double  computeMaxIntrinsicHeight(double width) {
             return _computeIntrinsicHeight(width);
         }
 
-        public override double?  computeDistanceToActualBaseline(TextBaseline baseline) {
+        protected override double?  computeDistanceToActualBaseline(TextBaseline baseline) {
             _layoutTextWithConstraints(constraints);
             return _textPainter.computeDistanceToActualBaseline(baseline);
         }
         
         
-        public override void performLayout() {
+        protected override void performLayout() {
             _layoutTextWithConstraints(constraints);
             var textSize = _textPainter.size;
             var didOverflowHeight = _textPainter.didExceedMaxLines;

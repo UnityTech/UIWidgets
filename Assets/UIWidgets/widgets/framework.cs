@@ -474,36 +474,33 @@ namespace UIWidgets.widgets {
         public readonly Widget child;
     }
 
-    public abstract class ParentDataWidget<T> : ProxyWidget where T : RenderObjectWidget {
+    public abstract class ParentDataWidget : ProxyWidget {
         public ParentDataWidget(Key key = null, Widget child = null)
             : base(key: key, child: child) {
         }
 
         public override Element createElement() {
-            return new ParentDataElement<T>(this);
+            return new ParentDataElement(this);
         }
 
         public virtual bool debugIsValidAncestor(RenderObjectWidget ancestor) {
-            D.assert(typeof(T) != typeof(RenderObjectWidget));
-            return ancestor is T;
+            return ancestor is RenderObjectWidget;
         }
 
         public virtual string debugDescribeInvalidAncestorChain(
             String description = null, String ownershipChain = null, bool foundValidAncestor = false,
             IEnumerable<Widget> badAncestors = null
         ) {
-            D.assert(typeof(T) != typeof(RenderObjectWidget));
-
             String result;
             if (!foundValidAncestor) {
                 result = string.Format("{0} widgets must be placed inside {1} widgets.\n" +
-                                       "{2} has no {1} ancestor at all.\n", this.GetType(), typeof(T), description);
+                                       "{2} has no {1} ancestor at all.\n", this.GetType(), typeof(RenderObjectWidget), description);
             } else {
                 D.assert(badAncestors != null);
                 D.assert(badAncestors.Any());
                 result = string.Format("{0} widgets must be placed directly inside {1} widgets.\n" +
                                        "{2} has a {1} ancestor, but there are other widgets between them:\n",
-                    this.GetType(), typeof(T), description);
+                    this.GetType(), typeof(RenderObjectWidget), description);
 
                 foreach (Widget ancestor in badAncestors) {
                     if (ancestor.GetType() == this.GetType()) {
@@ -514,7 +511,7 @@ namespace UIWidgets.widgets {
                     }
                 }
 
-                result += "These widgets cannot come between a " + this.GetType() + " and its " + typeof(T) + ".\n";
+                result += "These widgets cannot come between a " + this.GetType() + " and its " + typeof(RenderObjectWidget) + ".\n";
             }
 
             result += "The ownership chain for the parent of the offending "
@@ -2271,12 +2268,12 @@ namespace UIWidgets.widgets {
         public abstract void notifyClients(ProxyWidget oldWidget);
     }
 
-    public class ParentDataElement<T> : ProxyElement where T : RenderObjectWidget {
-        public ParentDataElement(ParentDataWidget<T> widget) : base(widget) {
+    public class ParentDataElement : ProxyElement {
+        public ParentDataElement(ParentDataWidget widget) : base(widget) {
         }
 
-        public new ParentDataWidget<T> widget {
-            get { return (ParentDataWidget<T>) base.widget; }
+        public new ParentDataWidget widget {
+            get { return (ParentDataWidget) base.widget; }
         }
 
         public override void mount(Element parent, object newSlot) {
@@ -2284,7 +2281,7 @@ namespace UIWidgets.widgets {
                 var badAncestors = new List<Widget>();
                 Element ancestor = parent;
                 while (ancestor != null) {
-                    if (ancestor is ParentDataElement<RenderObjectWidget>) {
+                    if (ancestor is ParentDataElement) {
                         badAncestors.Add(ancestor.widget);
                     } else if (ancestor is RenderObjectElement) {
                         if (this.widget.debugIsValidAncestor(((RenderObjectElement) ancestor).widget)) {
@@ -2314,20 +2311,20 @@ namespace UIWidgets.widgets {
             base.mount(parent, newSlot);
         }
 
-        void _applyParentData(ParentDataWidget<T> widget) {
+        void _applyParentData(ParentDataWidget widget) {
             ElementVisitor applyParentDataToChild = null;
             applyParentDataToChild = child => {
                 if (child is RenderObjectElement) {
                     ((RenderObjectElement) child)._updateParentData(widget);
                 } else {
-                    D.assert(!(child is ParentDataElement<RenderObjectWidget>));
+                    D.assert(!(child is ParentDataElement));
                     child.visitChildren(applyParentDataToChild);
                 }
             };
             this.visitChildren(applyParentDataToChild);
         }
 
-        public void applyWidgetOutOfTurn(ParentDataWidget<T> newWidget) {
+        public void applyWidgetOutOfTurn(ParentDataWidget newWidget) {
             D.assert(newWidget != null);
             D.assert(newWidget.debugCanApplyOutOfTurn());
             D.assert(newWidget.child == this.widget.child);
@@ -2434,10 +2431,10 @@ namespace UIWidgets.widgets {
             return ancestor as RenderObjectElement;
         }
 
-        ParentDataElement<RenderObjectWidget> _findAncestorParentDataElement() {
+        ParentDataElement _findAncestorParentDataElement() {
             Element ancestor = this._parent;
             while (ancestor != null && !(ancestor is RenderObjectElement)) {
-                var element = ancestor as ParentDataElement<RenderObjectWidget>;
+                var element = ancestor as ParentDataElement;
                 if (element != null) {
                     return element;
                 }
@@ -2499,7 +2496,7 @@ namespace UIWidgets.widgets {
 
             var newChildren = oldChildren.Count == newWidgets.Count
                 ? oldChildren
-                : new List<Element>(newWidgets.Count);
+                : Enumerable.Repeat((Element) null, newWidgets.Count).ToList();
 
             Element previousChild = null;
 
@@ -2626,7 +2623,7 @@ namespace UIWidgets.widgets {
             this.widget.didUnmountRenderObject(this.renderObject);
         }
 
-        internal void _updateParentData<T>(ParentDataWidget<T> parentData) where T : RenderObjectWidget {
+        internal void _updateParentData(ParentDataWidget parentData) {
             parentData.applyParentData(this.renderObject);
         }
 
@@ -2645,7 +2642,7 @@ namespace UIWidgets.widgets {
                 this._ancestorRenderObjectElement.insertChildRenderObject(this.renderObject, newSlot);
             }
 
-            ParentDataElement<RenderObjectWidget> parentDataElement = this._findAncestorParentDataElement();
+            ParentDataElement parentDataElement = this._findAncestorParentDataElement();
             if (parentDataElement != null) {
                 this._updateParentData(parentDataElement.widget);
             }
@@ -2822,7 +2819,7 @@ namespace UIWidgets.widgets {
 
         public override void mount(Element parent, object newSlot) {
             base.mount(parent, newSlot);
-            this._children = new List<Element>(this.widget.children.Count);
+            this._children = Enumerable.Repeat((Element) null, this.widget.children.Count).ToList();
             Element previousChild = null;
             for (int i = 0; i < this._children.Count; i += 1) {
                 Element newChild = this.inflateWidget(this.widget.children[i], previousChild);

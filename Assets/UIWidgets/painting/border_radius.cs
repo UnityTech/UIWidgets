@@ -83,6 +83,10 @@ namespace UIWidgets.painting {
             return new BorderWidth(top, right, bottom, left);
         }
 
+        public static BorderWidth all(double width) {
+            return BorderWidth.only(width, width, width, width);
+        }
+
         public static readonly BorderWidth zero = BorderWidth.only();
 
         public readonly double top;

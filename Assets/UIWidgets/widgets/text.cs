@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UIWidgets.foundation;
 using UIWidgets.painting;
 using UIWidgets.rendering;

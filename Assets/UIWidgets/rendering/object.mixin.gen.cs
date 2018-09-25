@@ -7,27 +7,6 @@ using UnityEngine;
 namespace UIWidgets.rendering {
 
     public abstract class RenderObjectWithChildMixinRenderObject<ChildType> : RenderObject, RenderObjectWithChildMixin<ChildType>, RenderObjectWithChildMixin where ChildType : RenderObject {
-        internal ChildType _child;
-
-        public ChildType child {
-            get { return this._child; }
-            set {
-                if (this._child != null) {
-                    this.dropChild(this._child);
-                }
-
-                this._child = value;
-                if (this._child != null) {
-                    this.adoptChild(this._child);
-                }
-            }
-        }
-
-        RenderObject RenderObjectWithChildMixin.child {
-            get { return this.child; }
-            set { this.child = (ChildType) value; }
-        }
-
         public bool debugValidateChild(RenderObject child) {
             D.assert(() => {
                 if (!(child is ChildType)) {
@@ -51,6 +30,27 @@ namespace UIWidgets.rendering {
                 return true;
             });
             return true;
+        }
+
+        internal ChildType _child;
+
+        public ChildType child {
+            get { return this._child; }
+            set {
+                if (this._child != null) {
+                    this.dropChild(this._child);
+                }
+
+                this._child = value;
+                if (this._child != null) {
+                    this.adoptChild(this._child);
+                }
+            }
+        }
+
+        RenderObject RenderObjectWithChildMixin.child {
+            get { return this.child; }
+            set { this.child = (ChildType) value; }
         }
 
         public override void attach(object owner) {
@@ -77,32 +77,17 @@ namespace UIWidgets.rendering {
             if (this._child != null) {
                 visitor(this._child);
             }
+        }
+
+        public override List<DiagnosticsNode> debugDescribeChildren() {
+            return this.child != null
+                ? new List<DiagnosticsNode>{this.child.toDiagnosticsNode(name: "child")}
+                : new List<DiagnosticsNode>();
         }
     }
 
 
     public abstract class RenderObjectWithChildMixinRenderBox<ChildType> : RenderBox, RenderObjectWithChildMixin<ChildType>, RenderObjectWithChildMixin where ChildType : RenderObject {
-        internal ChildType _child;
-
-        public ChildType child {
-            get { return this._child; }
-            set {
-                if (this._child != null) {
-                    this.dropChild(this._child);
-                }
-
-                this._child = value;
-                if (this._child != null) {
-                    this.adoptChild(this._child);
-                }
-            }
-        }
-
-        RenderObject RenderObjectWithChildMixin.child {
-            get { return this.child; }
-            set { this.child = (ChildType) value; }
-        }
-
         public bool debugValidateChild(RenderObject child) {
             D.assert(() => {
                 if (!(child is ChildType)) {
@@ -126,6 +111,27 @@ namespace UIWidgets.rendering {
                 return true;
             });
             return true;
+        }
+
+        internal ChildType _child;
+
+        public ChildType child {
+            get { return this._child; }
+            set {
+                if (this._child != null) {
+                    this.dropChild(this._child);
+                }
+
+                this._child = value;
+                if (this._child != null) {
+                    this.adoptChild(this._child);
+                }
+            }
+        }
+
+        RenderObject RenderObjectWithChildMixin.child {
+            get { return this.child; }
+            set { this.child = (ChildType) value; }
         }
 
         public override void attach(object owner) {
@@ -152,32 +158,17 @@ namespace UIWidgets.rendering {
             if (this._child != null) {
                 visitor(this._child);
             }
+        }
+
+        public override List<DiagnosticsNode> debugDescribeChildren() {
+            return this.child != null
+                ? new List<DiagnosticsNode>{this.child.toDiagnosticsNode(name: "child")}
+                : new List<DiagnosticsNode>();
         }
     }
 
 
     public abstract class RenderObjectWithChildMixinRenderSliver<ChildType> : RenderSliver, RenderObjectWithChildMixin<ChildType>, RenderObjectWithChildMixin where ChildType : RenderObject {
-        internal ChildType _child;
-
-        public ChildType child {
-            get { return this._child; }
-            set {
-                if (this._child != null) {
-                    this.dropChild(this._child);
-                }
-
-                this._child = value;
-                if (this._child != null) {
-                    this.adoptChild(this._child);
-                }
-            }
-        }
-
-        RenderObject RenderObjectWithChildMixin.child {
-            get { return this.child; }
-            set { this.child = (ChildType) value; }
-        }
-
         public bool debugValidateChild(RenderObject child) {
             D.assert(() => {
                 if (!(child is ChildType)) {
@@ -201,6 +192,27 @@ namespace UIWidgets.rendering {
                 return true;
             });
             return true;
+        }
+
+        internal ChildType _child;
+
+        public ChildType child {
+            get { return this._child; }
+            set {
+                if (this._child != null) {
+                    this.dropChild(this._child);
+                }
+
+                this._child = value;
+                if (this._child != null) {
+                    this.adoptChild(this._child);
+                }
+            }
+        }
+
+        RenderObject RenderObjectWithChildMixin.child {
+            get { return this.child; }
+            set { this.child = (ChildType) value; }
         }
 
         public override void attach(object owner) {
@@ -227,6 +239,12 @@ namespace UIWidgets.rendering {
             if (this._child != null) {
                 visitor(this._child);
             }
+        }
+
+        public override List<DiagnosticsNode> debugDescribeChildren() {
+            return this.child != null
+                ? new List<DiagnosticsNode>{this.child.toDiagnosticsNode(name: "child")}
+                : new List<DiagnosticsNode>();
         }
     }
 
@@ -240,18 +258,21 @@ namespace UIWidgets.rendering {
         public override void detach() {
             base.detach();
 
-            if (this.previousSibling != null) {
-                var previousSiblingParentData = (ContainerParentDataMixin<ChildType>) this.previousSibling.parentData;
-                previousSiblingParentData.nextSibling = this.nextSibling;
-            }
+            D.assert(this.previousSibling == null);
+            D.assert(this.nextSibling == null);
 
-            if (this.nextSibling != null) {
-                var nextSiblingParentData = (ContainerParentDataMixin<ChildType>) this.nextSibling.parentData;
-                nextSiblingParentData.previousSibling = this.previousSibling;
-            }
+            // if (this.previousSibling != null) {
+            //     var previousSiblingParentData = (ContainerParentDataMixin<ChildType>) this.previousSibling.parentData;
+            //     previousSiblingParentData.nextSibling = this.nextSibling;
+            // }
 
-            this.previousSibling = null;
-            this.nextSibling = null;
+            // if (this.nextSibling != null) {
+            //     var nextSiblingParentData = (ContainerParentDataMixin<ChildType>) this.nextSibling.parentData;
+            //     nextSiblingParentData.previousSibling = this.previousSibling;
+            // }
+
+            // this.previousSibling = null;
+            // this.nextSibling = null;
         }
     }
 
@@ -265,18 +286,21 @@ namespace UIWidgets.rendering {
         public override void detach() {
             base.detach();
 
-            if (this.previousSibling != null) {
-                var previousSiblingParentData = (ContainerParentDataMixin<ChildType>) this.previousSibling.parentData;
-                previousSiblingParentData.nextSibling = this.nextSibling;
-            }
+            D.assert(this.previousSibling == null);
+            D.assert(this.nextSibling == null);
 
-            if (this.nextSibling != null) {
-                var nextSiblingParentData = (ContainerParentDataMixin<ChildType>) this.nextSibling.parentData;
-                nextSiblingParentData.previousSibling = this.previousSibling;
-            }
+            // if (this.previousSibling != null) {
+            //     var previousSiblingParentData = (ContainerParentDataMixin<ChildType>) this.previousSibling.parentData;
+            //     previousSiblingParentData.nextSibling = this.nextSibling;
+            // }
 
-            this.previousSibling = null;
-            this.nextSibling = null;
+            // if (this.nextSibling != null) {
+            //     var nextSiblingParentData = (ContainerParentDataMixin<ChildType>) this.nextSibling.parentData;
+            //     nextSiblingParentData.previousSibling = this.previousSibling;
+            // }
+
+            // this.previousSibling = null;
+            // this.nextSibling = null;
         }
     }
 
@@ -290,18 +314,21 @@ namespace UIWidgets.rendering {
         public override void detach() {
             base.detach();
 
-            if (this.previousSibling != null) {
-                var previousSiblingParentData = (ContainerParentDataMixin<ChildType>) this.previousSibling.parentData;
-                previousSiblingParentData.nextSibling = this.nextSibling;
-            }
+            D.assert(this.previousSibling == null);
+            D.assert(this.nextSibling == null);
 
-            if (this.nextSibling != null) {
-                var nextSiblingParentData = (ContainerParentDataMixin<ChildType>) this.nextSibling.parentData;
-                nextSiblingParentData.previousSibling = this.previousSibling;
-            }
+            // if (this.previousSibling != null) {
+            //     var previousSiblingParentData = (ContainerParentDataMixin<ChildType>) this.previousSibling.parentData;
+            //     previousSiblingParentData.nextSibling = this.nextSibling;
+            // }
 
-            this.previousSibling = null;
-            this.nextSibling = null;
+            // if (this.nextSibling != null) {
+            //     var nextSiblingParentData = (ContainerParentDataMixin<ChildType>) this.nextSibling.parentData;
+            //     nextSiblingParentData.previousSibling = this.previousSibling;
+            // }
+
+            // this.previousSibling = null;
+            // this.nextSibling = null;
         }
     }
 
@@ -315,18 +342,21 @@ namespace UIWidgets.rendering {
         public override void detach() {
             base.detach();
 
-            if (this.previousSibling != null) {
-                var previousSiblingParentData = (ContainerParentDataMixin<ChildType>) this.previousSibling.parentData;
-                previousSiblingParentData.nextSibling = this.nextSibling;
-            }
+            D.assert(this.previousSibling == null);
+            D.assert(this.nextSibling == null);
 
-            if (this.nextSibling != null) {
-                var nextSiblingParentData = (ContainerParentDataMixin<ChildType>) this.nextSibling.parentData;
-                nextSiblingParentData.previousSibling = this.previousSibling;
-            }
+            // if (this.previousSibling != null) {
+            //     var previousSiblingParentData = (ContainerParentDataMixin<ChildType>) this.previousSibling.parentData;
+            //     previousSiblingParentData.nextSibling = this.nextSibling;
+            // }
 
-            this.previousSibling = null;
-            this.nextSibling = null;
+            // if (this.nextSibling != null) {
+            //     var nextSiblingParentData = (ContainerParentDataMixin<ChildType>) this.nextSibling.parentData;
+            //     nextSiblingParentData.previousSibling = this.previousSibling;
+            // }
+
+            // this.previousSibling = null;
+            // this.nextSibling = null;
         }
     }
 
@@ -930,7 +960,6 @@ namespace UIWidgets.rendering {
             return this.childAfter((ChildType) child);
         }
     }
-
 
 
 }

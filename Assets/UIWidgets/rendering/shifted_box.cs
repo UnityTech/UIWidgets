@@ -1,4 +1,5 @@
 ﻿using System;
+using UIWidgets.foundation;
 using UIWidgets.gestures;
 using UIWidgets.painting;
 using UIWidgets.ui;
@@ -9,7 +10,7 @@ namespace UIWidgets.rendering {
             this.child = child;
         }
 
-        public override double computeMinIntrinsicWidth(double height) {
+        protected override double computeMinIntrinsicWidth(double height) {
             if (this.child != null) {
                 return this.child.getMinIntrinsicWidth(height);
             }
@@ -17,7 +18,7 @@ namespace UIWidgets.rendering {
             return 0.0;
         }
 
-        public override double computeMaxIntrinsicWidth(double height) {
+        protected override double computeMaxIntrinsicWidth(double height) {
             if (this.child != null) {
                 return this.child.getMaxIntrinsicWidth(height);
             }
@@ -25,7 +26,7 @@ namespace UIWidgets.rendering {
             return 0.0;
         }
 
-        public override double computeMinIntrinsicHeight(double width) {
+        protected override double computeMinIntrinsicHeight(double width) {
             if (this.child != null) {
                 return this.child.getMinIntrinsicHeight(width);
             }
@@ -33,7 +34,7 @@ namespace UIWidgets.rendering {
             return 0.0;
         }
 
-        public override double computeMaxIntrinsicHeight(double width) {
+        protected override double computeMaxIntrinsicHeight(double width) {
             if (this.child != null) {
                 return this.child.getMaxIntrinsicHeight(width);
             }
@@ -41,10 +42,12 @@ namespace UIWidgets.rendering {
             return 0.0;
         }
 
-        public override double? computeDistanceToActualBaseline(TextBaseline baseline) {
+        protected override double? computeDistanceToActualBaseline(TextBaseline baseline) {
             double? result;
 
             if (this.child != null) {
+                D.assert(!this.debugNeedsLayout);
+
                 result = this.child.getDistanceToActualBaseline(baseline);
                 if (result != null) {
                     var childParentData = (BoxParentData) this.child.parentData;
@@ -64,18 +67,12 @@ namespace UIWidgets.rendering {
             }
         }
 
-        protected override bool hitTestChildren(HitTestResult result, Offset position = null)
-        {
-            if (child != null)
-            {
-                var childParentData = child.parentData as BoxParentData;
-                if (childParentData != null)
-                {
-                    position = position - childParentData.offset;
-                }
-
-                return child.hitTest(result, position);
+        protected override bool hitTestChildren(HitTestResult result, Offset position = null) {
+            if (this.child != null) {
+                var childParentData = (BoxParentData) this.child.parentData;
+                return this.child.hitTest(result, position - childParentData.offset);
             }
+
             return false;
         }
     }
@@ -85,12 +82,18 @@ namespace UIWidgets.rendering {
             EdgeInsets padding = null,
             RenderBox child = null
         ) : base(child) {
+            D.assert(padding != null);
+            D.assert(padding.isNonNegative);
+                
             this._padding = padding;
         }
 
         public EdgeInsets padding {
             get { return this._padding; }
             set {
+                D.assert(value != null);
+                D.assert(value.isNonNegative);
+                
                 if (this._padding == value) {
                     return;
                 }
@@ -100,10 +103,9 @@ namespace UIWidgets.rendering {
             }
         }
 
-        public EdgeInsets _padding;
+        EdgeInsets _padding;
 
-
-        public override double computeMinIntrinsicWidth(double height) {
+        protected override double computeMinIntrinsicWidth(double height) {
             if (this.child != null) {
                 return this.child.getMinIntrinsicWidth(Math.Max(0.0, height - this._padding.vertical)) +
                        this._padding.horizontal;
@@ -112,7 +114,7 @@ namespace UIWidgets.rendering {
             return this._padding.horizontal;
         }
 
-        public override double computeMaxIntrinsicWidth(double height) {
+        protected override double computeMaxIntrinsicWidth(double height) {
             if (this.child != null) {
                 return this.child.getMaxIntrinsicWidth(Math.Max(0.0, height - this._padding.vertical)) +
                        this._padding.horizontal;
@@ -121,7 +123,7 @@ namespace UIWidgets.rendering {
             return this._padding.horizontal;
         }
 
-        public override double computeMinIntrinsicHeight(double width) {
+        protected override double computeMinIntrinsicHeight(double width) {
             if (this.child != null) {
                 return this.child.getMinIntrinsicHeight(Math.Max(0.0, width - this._padding.horizontal)) +
                        this._padding.vertical;
@@ -130,7 +132,7 @@ namespace UIWidgets.rendering {
             return this._padding.vertical;
         }
 
-        public override double computeMaxIntrinsicHeight(double width) {
+        protected override double computeMaxIntrinsicHeight(double width) {
             if (this.child != null) {
                 return this.child.getMaxIntrinsicHeight(Math.Max(0.0, width - this._padding.horizontal)) +
                        this._padding.vertical;
@@ -139,7 +141,7 @@ namespace UIWidgets.rendering {
             return this._padding.vertical;
         }
 
-        public override void performLayout() {
+        protected override void performLayout() {
             if (this.child == null) {
                 this.size = this.constraints.constrain(this._padding.inflateSize(Size.zero));
                 return;
@@ -151,6 +153,20 @@ namespace UIWidgets.rendering {
             var childParentData = (BoxParentData) this.child.parentData;
             childParentData.offset = this._padding.topLeft;
             this.size = this.constraints.constrain(this._padding.inflateSize(this.child.size));
+        }
+        
+        protected override void debugPaintSize(PaintingContext context, Offset offset) {
+            base.debugPaintSize(context, offset);
+            D.assert(() => {
+                Rect outerRect = offset & size;
+                D.debugPaintPadding(context.canvas, outerRect, this.child != null ? this._padding.deflateRect(outerRect) : null);
+                return true;
+            });
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new DiagnosticsProperty<EdgeInsets>("padding", this.padding));
         }
     }
 
@@ -165,6 +181,7 @@ namespace UIWidgets.rendering {
         public Alignment alignment {
             get { return this._alignment; }
             set {
+                D.assert(value != null);
                 if (this._alignment == value) {
                     return;
                 }
@@ -174,11 +191,21 @@ namespace UIWidgets.rendering {
             }
         }
 
-        public Alignment _alignment;
+        Alignment _alignment;
 
         protected void alignChild() {
+            D.assert(this.child != null);
+            D.assert(!this.child.debugNeedsLayout);
+            D.assert(this.child.hasSize);
+            D.assert(this.hasSize);
+
             var childParentData = (BoxParentData) this.child.parentData;
             childParentData.offset = this._alignment.alongOffset(this.size - this.child.size);
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new DiagnosticsProperty<Alignment>("alignment", this.alignment));
         }
     }
 
@@ -189,6 +216,9 @@ namespace UIWidgets.rendering {
             double? heightFactor = null,
             Alignment alignment = null
         ) : base(alignment, child) {
+            D.assert(widthFactor == null || widthFactor >= 0.0);
+            D.assert(heightFactor == null || heightFactor >= 0.0);
+
             this._widthFactor = widthFactor;
             this._heightFactor = heightFactor;
         }
@@ -196,6 +226,7 @@ namespace UIWidgets.rendering {
         public double? widthFactor {
             get { return this._widthFactor; }
             set {
+                D.assert(value == null || value >= 0.0);
                 if (this._widthFactor == value) {
                     return;
                 }
@@ -205,11 +236,12 @@ namespace UIWidgets.rendering {
             }
         }
 
-        public double? _widthFactor;
+        double? _widthFactor;
 
         public double? heightFactor {
             get { return this._heightFactor; }
             set {
+                D.assert(value == null || value >= 0.0);
                 if (this._heightFactor == value) {
                     return;
                 }
@@ -219,9 +251,9 @@ namespace UIWidgets.rendering {
             }
         }
 
-        public double? _heightFactor;
+        double? _heightFactor;
 
-        public override void performLayout() {
+        protected override void performLayout() {
             bool shrinkWrapWidth = this._widthFactor != null || double.IsPositiveInfinity(this.constraints.maxWidth);
             bool shrinkWrapHeight = this._heightFactor != null || double.IsPositiveInfinity(this.constraints.maxHeight);
 
@@ -236,6 +268,70 @@ namespace UIWidgets.rendering {
                     shrinkWrapWidth ? 0.0 : double.PositiveInfinity,
                     shrinkWrapHeight ? 0.0 : double.PositiveInfinity));
             }
+        }
+
+        protected override void debugPaintSize(PaintingContext context, Offset offset) {
+            base.debugPaintSize(context, offset);
+            D.assert(() => {
+                Paint paint;
+                if (this.child != null && !this.child.size.isEmpty) {
+//        Path path;
+//        paint = Paint()
+//          ..style = PaintingStyle.stroke
+//          ..strokeWidth = 1.0
+//          ..color = const Color(0xFFFFFF00);
+//        path = Path();
+//        final BoxParentData childParentData = child.parentData;
+//        if (childParentData.offset.dy > 0.0) {
+//          // vertical alignment arrows
+//          final double headSize = math.min(childParentData.offset.dy * 0.2, 10.0);
+//          path
+//            ..moveTo(offset.dx + size.width / 2.0, offset.dy)
+//            ..relativeLineTo(0.0, childParentData.offset.dy - headSize)
+//            ..relativeLineTo(headSize, 0.0)
+//            ..relativeLineTo(-headSize, headSize)
+//            ..relativeLineTo(-headSize, -headSize)
+//            ..relativeLineTo(headSize, 0.0)
+//            ..moveTo(offset.dx + size.width / 2.0, offset.dy + size.height)
+//            ..relativeLineTo(0.0, -childParentData.offset.dy + headSize)
+//            ..relativeLineTo(headSize, 0.0)
+//            ..relativeLineTo(-headSize, -headSize)
+//            ..relativeLineTo(-headSize, headSize)
+//            ..relativeLineTo(headSize, 0.0);
+//          context.canvas.drawPath(path, paint);
+//            }
+//            if (childParentData.offset.dx > 0.0) {
+//              // horizontal alignment arrows
+//              final double headSize = math.min(childParentData.offset.dx * 0.2, 10.0);
+//              path
+//                ..moveTo(offset.dx, offset.dy + size.height / 2.0)
+//                ..relativeLineTo(childParentData.offset.dx - headSize, 0.0)
+//                ..relativeLineTo(0.0, headSize)
+//                ..relativeLineTo(headSize, -headSize)
+//                ..relativeLineTo(-headSize, -headSize)
+//                ..relativeLineTo(0.0, headSize)
+//                ..moveTo(offset.dx + size.width, offset.dy + size.height / 2.0)
+//                ..relativeLineTo(-childParentData.offset.dx + headSize, 0.0)
+//                ..relativeLineTo(0.0, headSize)
+//                ..relativeLineTo(-headSize, -headSize)
+//                ..relativeLineTo(headSize, -headSize)
+//                ..relativeLineTo(0.0, headSize);
+//              context.canvas.drawPath(path, paint);
+//            }
+                } else {
+//        paint = Paint()
+//          ..color = const Color(0x90909090);
+//        context.canvas.drawRect(offset & size, paint);
+                }
+
+                return true;
+            });
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new DoubleProperty("widthFactor", this._widthFactor, ifNull: "expand"));
+            properties.add(new DoubleProperty("heightFactor", this._heightFactor, ifNull: "expand"));
         }
     }
 
@@ -319,15 +415,15 @@ namespace UIWidgets.rendering {
             );
         }
 
-        public override bool sizedByParent {
+        protected override bool sizedByParent {
             get { return true; }
         }
 
-        public override void performResize() {
+        protected override void performResize() {
             this.size = this.constraints.biggest;
         }
 
-        public override void performLayout() {
+        protected override void performLayout() {
             if (this.child != null) {
                 this.child.layout(this._getInnerConstraints(this.constraints), parentUsesSize: true);
                 this.alignChild();
@@ -362,7 +458,7 @@ namespace UIWidgets.rendering {
         public Rect _overflowChildRect = Rect.zero;
         public bool _isOverflowing = false;
 
-        public override void performLayout() {
+        protected override void performLayout() {
             if (this.child != null) {
                 BoxConstraints childConstraints = null;
                 if (this.constrainedAxis != null) {
@@ -435,23 +531,23 @@ namespace UIWidgets.rendering {
 
         public Size _requestedSize;
 
-        public override double computeMinIntrinsicWidth(double height) {
+        protected override double computeMinIntrinsicWidth(double height) {
             return this._requestedSize.width;
         }
 
-        public override double computeMaxIntrinsicWidth(double height) {
+        protected override double computeMaxIntrinsicWidth(double height) {
             return this._requestedSize.width;
         }
 
-        public override double computeMinIntrinsicHeight(double width) {
+        protected override double computeMinIntrinsicHeight(double width) {
             return this._requestedSize.height;
         }
 
-        public override double computeMaxIntrinsicHeight(double width) {
+        protected override double computeMaxIntrinsicHeight(double width) {
             return this._requestedSize.height;
         }
 
-        public override double? computeDistanceToActualBaseline(TextBaseline baseline) {
+        protected override double? computeDistanceToActualBaseline(TextBaseline baseline) {
             if (this.child != null) {
                 return this.child.getDistanceToActualBaseline(baseline);
             }
@@ -459,7 +555,7 @@ namespace UIWidgets.rendering {
             return base.computeDistanceToActualBaseline(baseline);
         }
 
-        public override void performLayout() {
+        protected override void performLayout() {
             this.size = this.constraints.constrain(this._requestedSize);
             if (this.child != null) {
                 this.child.layout(this.constraints);
@@ -532,7 +628,7 @@ namespace UIWidgets.rendering {
             );
         }
 
-        public override double computeMinIntrinsicWidth(double height) {
+        protected override double computeMinIntrinsicWidth(double height) {
             double result;
             if (this.child == null) {
                 result = base.computeMinIntrinsicWidth(height);
@@ -543,7 +639,7 @@ namespace UIWidgets.rendering {
             return result / (this._widthFactor ?? 1.0);
         }
 
-        public override double computeMaxIntrinsicWidth(double height) {
+        protected override double computeMaxIntrinsicWidth(double height) {
             double result;
             if (this.child == null) {
                 result = base.computeMaxIntrinsicWidth(height);
@@ -554,7 +650,7 @@ namespace UIWidgets.rendering {
             return result / (this._widthFactor ?? 1.0);
         }
 
-        public override double computeMinIntrinsicHeight(double width) {
+        protected override double computeMinIntrinsicHeight(double width) {
             double result;
             if (this.child == null) {
                 result = base.computeMinIntrinsicHeight(width);
@@ -565,7 +661,7 @@ namespace UIWidgets.rendering {
             return result / (this._heightFactor ?? 1.0);
         }
 
-        public override double computeMaxIntrinsicHeight(double width) {
+        protected override double computeMaxIntrinsicHeight(double width) {
             double result;
             if (this.child == null) {
                 result = base.computeMaxIntrinsicHeight(width);
@@ -576,7 +672,7 @@ namespace UIWidgets.rendering {
             return result / (this._heightFactor ?? 1.0);
         }
 
-        public override void performLayout() {
+        protected override void performLayout() {
             if (this.child != null) {
                 this.child.layout(this._getInnerConstraints(this.constraints), parentUsesSize: true);
                 this.size = this.constraints.constrain(this.child.size);
@@ -627,7 +723,7 @@ namespace UIWidgets.rendering {
 
         public TextBaseline _baselineType;
 
-        public override void performLayout() {
+        protected override void performLayout() {
             if (this.child != null) {
                 this.child.layout(this.constraints.loosen(), parentUsesSize: true);
                 double? childBaseline = this.child.getDistanceToBaseline(this.baselineType);

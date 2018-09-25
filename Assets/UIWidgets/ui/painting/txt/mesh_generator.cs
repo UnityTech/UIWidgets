@@ -1,4 +1,5 @@
 ﻿using UIWidgets.ui.txt;
+using UnityEditor;
 using UnityEngine;
 
 namespace UIWidgets.ui.painting.txt
@@ -14,10 +15,11 @@ namespace UIWidgets.ui.painting.txt
             var triangles = new int[length * 6];
             var uv = new Vector2[length * 4]; 
             var text = textBlob.text;
-            
+            var scale = EditorGUIUtility.pixelsPerPoint;
+            var fontSizeToLoad = (int)scale * style.UnityFontSize;
             var offset = new Vector3((float)Utils.PixelCorrectRound(x), (float)Utils.PixelCorrectRound(y), 0);
             font.RequestCharactersInTexture(textBlob.text.Substring(textBlob.start, textBlob.end - textBlob.start), 
-                style.UnityFontSize, style.UnityFontStyle);
+                fontSizeToLoad, style.UnityFontStyle);
             for (int charIndex = 0; charIndex < length; ++charIndex)
             {
                 var ch = text[charIndex + textBlob.start];
@@ -37,15 +39,19 @@ namespace UIWidgets.ui.painting.txt
                 }
                 else
                 {
-                    font.GetCharacterInfo(ch, out charInfo, style.UnityFontSize, style.UnityFontStyle);
-                    vertices[4 * charIndex + 0] = offset + new Vector3((float)(position.x + charInfo.minX), 
-                                                      (float)(position.y - charInfo.maxY), 0);
-                    vertices[4 * charIndex + 1] = offset + new Vector3((float)(position.x + charInfo.maxX), 
-                                                      (float)(position.y - charInfo.maxY), 0);
+                    font.GetCharacterInfo(ch, out charInfo, fontSizeToLoad, style.UnityFontStyle);
+                    var minX = charInfo.minX / scale;
+                    var maxX = charInfo.maxX / scale;
+                    var minY = charInfo.minY / scale;
+                    var maxY = charInfo.maxY / scale;
+                    vertices[4 * charIndex + 0] = offset + new Vector3((float)(position.x + minX), 
+                                                      (float)(position.y - maxY), 0);
+                    vertices[4 * charIndex + 1] = offset + new Vector3((float)(position.x + maxX), 
+                                                      (float)(position.y - maxY), 0);
                     vertices[4 * charIndex + 2] = offset + new Vector3(
-                                                      (float)(position.x + charInfo.maxX), (float)(position.y - charInfo.minY), 0);
+                                                      (float)(position.x + maxX), (float)(position.y - minY), 0);
                     vertices[4 * charIndex + 3] = offset + new Vector3(
-                                                      (float)(position.x + charInfo.minX), (float)(position.y - charInfo.minY), 0);
+                                                      (float)(position.x + minX), (float)(position.y - minY), 0);
                     
                     uv[4 * charIndex + 0] = charInfo.uvTopLeft;
                     uv[4 * charIndex + 1] = charInfo.uvTopRight;

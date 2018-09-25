@@ -188,10 +188,8 @@ namespace UIWidgets.ui {
         }
 
         public void drawImageRect(Rect src, Rect dst, Paint paint, Image image) {
-            if (image != null) {
-                Texture2D _texture = new Texture2D(0, 0);
-                _texture.LoadImage(image.rawData);
-                Graphics.DrawTexture(dst.toRect(), _texture);
+            if (image != null && image.texture != null) {
+                Graphics.DrawTexture(dst.toRect(), image.texture);
             }
         }
 
@@ -286,7 +284,11 @@ namespace UIWidgets.ui {
             }
         }
 
-        public void clipRect(Rect rect) {
+        public int getSaveCount() {
+            return this._stack.Count + 1;
+        }
+
+        public void clipRect(Rect rect, bool doAntiAlias = true) {
             if (rect.isInfinite) {
                 return;
             }
@@ -294,7 +296,7 @@ namespace UIWidgets.ui {
             this.pushClipRect(rect, this._transform);
         }
 
-        public void clipRRect(RRect rect) {
+        public void clipRRect(RRect rect, bool doAntiAlias = true) {
             if (rect.isInfinite) {
                 return;
             }

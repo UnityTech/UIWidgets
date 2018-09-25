@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UIWidgets.foundation;
 using UIWidgets.painting;
 using UIWidgets.rendering;
@@ -48,29 +49,112 @@ namespace UIWidgets.widgets {
     public class LimitedBox : SingleChildRenderObjectWidget {
         public LimitedBox(
             Key key = null,
-            Widget child = null,
             double maxWidth = double.MaxValue,
-            double maxHeight = double.MaxValue
+            double maxHeight = double.MaxValue,
+            Widget child = null
         ) : base(key, child) {
+            D.assert(maxWidth >= 0.0);
+            D.assert(maxHeight >= 0.0);
+
             this.maxHeight = maxHeight;
             this.maxWidth = maxWidth;
         }
 
-        public double maxWidth;
-        public double maxHeight;
+        public readonly double maxWidth;
+        public readonly double maxHeight;
 
         public override RenderObject createRenderObject(BuildContext context) {
             return new RenderLimitedBox(
-                maxWidth: maxWidth,
-                maxHeight: maxHeight
+                maxWidth: this.maxWidth,
+                maxHeight: this.maxHeight
             );
         }
 
-        public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
-            ((RenderLimitedBox) renderObject).maxWidth = maxWidth;
-            ((RenderLimitedBox) renderObject).maxHeight = maxHeight;
+        public override void updateRenderObject(BuildContext context, RenderObject renderObjectRaw) {
+            var renderObject = (RenderLimitedBox) renderObjectRaw;
+            renderObject.maxWidth = this.maxWidth;
+            renderObject.maxHeight = this.maxHeight;
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new DoubleProperty("maxWidth", this.maxWidth, defaultValue: double.PositiveInfinity));
+            properties.add(new DoubleProperty("maxHeight", this.maxHeight, defaultValue: double.PositiveInfinity));
         }
     }
+
+    public class SizedBox : SingleChildRenderObjectWidget {
+        public SizedBox(Key key = null, double? width = null, double? height = null, Widget child = null)
+            : base(key: key, child: child) {
+            this.width = width;
+            this.height = height;
+        }
+
+        public static SizedBox expand(Key key = null, Widget child = null) {
+            return new SizedBox(key, double.PositiveInfinity, double.PositiveInfinity, child);
+        }
+
+        public static SizedBox shrink(Key key = null, Widget child = null) {
+            return new SizedBox(key, 0, 0, child);
+        }
+
+        public static SizedBox fromSize(Key key = null, Widget child = null, Size size = null) {
+            return new SizedBox(key,
+                size == null ? (double?) null : size.width,
+                size == null ? (double?) null : size.height, child);
+        }
+
+        public readonly double? width;
+
+        public readonly double? height;
+
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderConstrainedBox(
+                additionalConstraints: this._additionalConstraints
+            );
+        }
+
+        BoxConstraints _additionalConstraints {
+            get { return BoxConstraints.tightFor(width: this.width, height: this.height); }
+        }
+
+        public override void updateRenderObject(BuildContext context, RenderObject renderObjectRaw) {
+            var renderObject = (RenderConstrainedBox) renderObjectRaw;
+            renderObject.additionalConstraints = this._additionalConstraints;
+        }
+
+        public override string toStringShort() {
+            string type;
+            if (this.width == double.PositiveInfinity && this.height == double.PositiveInfinity) {
+                type = this.GetType() + "expand";
+            } else if (this.width == 0.0 && this.height == 0.0) {
+                type = this.GetType() + "shrink";
+            } else {
+                type = this.GetType() + "";
+            }
+
+            return this.key == null ? type : type + "-" + this.key;
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            DiagnosticLevel level;
+            if ((this.width == double.PositiveInfinity && this.height == double.PositiveInfinity) ||
+                (this.width == 0.0 && this.height == 0.0)) {
+                level = DiagnosticLevel.hidden;
+            } else {
+                level = DiagnosticLevel.info;
+            }
+
+            properties.add(new DoubleProperty("width", this.width,
+                defaultValue: Diagnostics.kNullDefaultValue,
+                level: level));
+            properties.add(new DoubleProperty("height", this.height,
+                defaultValue: Diagnostics.kNullDefaultValue,
+                level: level));
+        }
+    }
+
 
     public class ConstrainedBox : SingleChildRenderObjectWidget {
         public ConstrainedBox(
@@ -78,122 +162,391 @@ namespace UIWidgets.widgets {
             BoxConstraints constraints = null,
             Widget child = null
         ) : base(key, child) {
+            D.assert(constraints != null);
+            D.assert(constraints.debugAssertIsValid());
+
             this.constraints = constraints;
         }
 
-        public BoxConstraints constraints;
+        public readonly BoxConstraints constraints;
 
         public override RenderObject createRenderObject(BuildContext context) {
-            return new RenderConstrainedBox(additionalConstraints: constraints);
+            return new RenderConstrainedBox(additionalConstraints: this.constraints);
+        }
+
+        public override void updateRenderObject(BuildContext context, RenderObject renderObjectRaw) {
+            var renderObject = (RenderConstrainedBox) renderObjectRaw;
+            renderObject.additionalConstraints = this.constraints;
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new DiagnosticsProperty<BoxConstraints>("constraints",
+                this.constraints, showName: false));
+        }
+    }
+
+    public class Flex : MultiChildRenderObjectWidget {
+        public Flex(
+            Axis direction = Axis.vertical,
+            TextDirection? textDirection = null,
+            TextBaseline? textBaseline = null,
+            Key key = null,
+            MainAxisAlignment mainAxisAlignment = MainAxisAlignment.start,
+            MainAxisSize mainAxisSize = MainAxisSize.max,
+            CrossAxisAlignment crossAxisAlignment = CrossAxisAlignment.center,
+            VerticalDirection verticalDirection = VerticalDirection.down,
+            List<Widget> children = null
+        ) : base(key, children) {
+            this.direction = direction;
+            this.mainAxisAlignment = mainAxisAlignment;
+            this.mainAxisSize = mainAxisSize;
+            this.crossAxisAlignment = crossAxisAlignment;
+            this.textDirection = textDirection;
+            this.verticalDirection = verticalDirection;
+            this.textBaseline = textBaseline;
+        }
+
+        public Axis direction;
+        public MainAxisAlignment mainAxisAlignment;
+        public MainAxisSize mainAxisSize;
+        public CrossAxisAlignment crossAxisAlignment;
+        public TextDirection? textDirection;
+        public VerticalDirection verticalDirection;
+        public TextBaseline? textBaseline;
+
+        private bool _needTextDirection {
+            get {
+                D.assert(direction != null);
+                switch (direction) {
+                    case Axis.horizontal:
+                        return true;
+                    case Axis.vertical:
+                        return (this.crossAxisAlignment == CrossAxisAlignment.start ||
+                                this.crossAxisAlignment == CrossAxisAlignment.end);
+                }
+
+                return false;
+            }
+        }
+
+        public TextDirection getEffectiveTextDirection(BuildContext context) {
+            return textDirection ?? (_needTextDirection ? Directionality.of(context) : TextDirection.ltr);
+        }
+
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderFlex(
+                direction: direction,
+                mainAxisAlignment: mainAxisAlignment,
+                mainAxisSize: mainAxisSize,
+                crossAxisAlignment: crossAxisAlignment,
+                textDirection: getEffectiveTextDirection(context),
+                verticalDirection: verticalDirection,
+                textBaseline: textBaseline ?? TextBaseline.alphabetic
+            );
         }
 
         public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
-            ((RenderConstrainedBox) renderObject)._additionalConstraints = constraints;
+            ((RenderFlex) renderObject).direction = this.direction;
+            ((RenderFlex) renderObject).mainAxisAlignment = this.mainAxisAlignment;
+            ((RenderFlex) renderObject).mainAxisSize = this.mainAxisSize;
+            ((RenderFlex) renderObject).crossAxisAlignment = this.crossAxisAlignment;
+            ((RenderFlex) renderObject).textDirection = this.textDirection ?? TextDirection.ltr;
+            ((RenderFlex) renderObject).verticalDirection = this.verticalDirection;
+            ((RenderFlex) renderObject).textBaseline = this.textBaseline ?? TextBaseline.alphabetic;
+        }
+    }
+
+    public class Row : Flex {
+        public Row(
+            TextDirection? textDirection = null,
+            TextBaseline? textBaseline = null,
+            Key key = null,
+            MainAxisAlignment mainAxisAlignment = MainAxisAlignment.start,
+            MainAxisSize mainAxisSize = MainAxisSize.max,
+            CrossAxisAlignment crossAxisAlignment = CrossAxisAlignment.center,
+            VerticalDirection verticalDirection = VerticalDirection.down,
+            List<Widget> children = null
+        ) : base(
+            children: children,
+            key: key,
+            direction: Axis.horizontal,
+            textDirection: textDirection,
+            textBaseline: textBaseline,
+            mainAxisAlignment: mainAxisAlignment,
+            mainAxisSize: mainAxisSize,
+            crossAxisAlignment: crossAxisAlignment,
+            verticalDirection: verticalDirection
+        ) {
+        }
+    }
+
+    public class Column : Flex {
+        public Column(
+            TextDirection? textDirection = null,
+            TextBaseline? textBaseline = null,
+            Key key = null,
+            MainAxisAlignment mainAxisAlignment = MainAxisAlignment.start,
+            MainAxisSize mainAxisSize = MainAxisSize.max,
+            CrossAxisAlignment crossAxisAlignment = CrossAxisAlignment.center,
+            VerticalDirection verticalDirection = VerticalDirection.down,
+            List<Widget> children = null
+        ) : base(
+            children: children,
+            key: key,
+            direction: Axis.vertical,
+            textDirection: textDirection,
+            textBaseline: textBaseline,
+            mainAxisAlignment: mainAxisAlignment,
+            mainAxisSize: mainAxisSize,
+            crossAxisAlignment: crossAxisAlignment,
+            verticalDirection: verticalDirection
+        ) {
+        }
+    }
+
+    public class Flexible : ParentDataWidget {
+        public Flexible(
+            Key key = null,
+            int flex = 1,
+            FlexFit fit = FlexFit.loose,
+            Widget child = null
+        ) : base(key: key, child: child) {
+            this.flex = flex;
+            this.fit = fit;
+        }
+
+        public readonly int flex;
+
+        public readonly FlexFit fit;
+
+        public override void applyParentData(RenderObject renderObject) {
+            D.assert(renderObject.parentData is FlexParentData);
+            FlexParentData parentData = (FlexParentData) renderObject.parentData;
+            bool needsLayout = false;
+
+            if (parentData.flex != this.flex) {
+                parentData.flex = this.flex;
+                needsLayout = true;
+            }
+
+            if (parentData.fit != this.fit) {
+                parentData.fit = this.fit;
+                needsLayout = true;
+            }
+
+            if (needsLayout) {
+                var targetParent = renderObject.parent;
+                if (targetParent is RenderObject) {
+                    ((RenderObject) targetParent).markNeedsLayout();
+                }
+            }
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new IntProperty("flex", this.flex));
         }
     }
 
     public class Padding : SingleChildRenderObjectWidget {
         public Padding(
-            EdgeInsets padding,
             Key key = null,
+            EdgeInsets padding = null,
             Widget child = null
         ) : base(key, child) {
+            D.assert(padding != null);
             this.padding = padding;
         }
 
-        public EdgeInsets padding;
+        public readonly EdgeInsets padding;
 
         public override RenderObject createRenderObject(BuildContext context) {
             return new RenderPadding(
-                padding: padding
+                padding: this.padding
             );
         }
 
-        public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
-            ((RenderPadding) renderObject).padding = padding;
+        public override void updateRenderObject(BuildContext context, RenderObject renderObjectRaw) {
+            var renderObject = (RenderPadding) renderObjectRaw;
+            renderObject.padding = this.padding;
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new DiagnosticsProperty<EdgeInsets>("padding", this.padding));
         }
     }
 
     public class Transform : SingleChildRenderObjectWidget {
         public Transform(
-            Matrix4x4 transform,
+            Key key = null,
+            Matrix4x4? transform = null,
             Offset origin = null,
             Alignment alignment = null,
-            bool transformHitTests = false,
-            Key key = null,
+            bool transformHitTests = true,
             Widget child = null
         ) : base(key, child) {
-            this.alignment = alignment ?? Alignment.center;
+            D.assert(transform != null);
+            this.transform = transform.Value;
             this.origin = origin;
+            this.alignment = alignment;
             this.transformHitTests = transformHitTests;
-            this.transform = transform;
         }
 
-        // scale
-        public Transform(
-            double scale,
-            Offset origin,
-            Alignment alignment,
-            bool transformHitTests = false,
+        private Transform(
             Key key = null,
-            Widget child = null
-        ) : base(key, child) {
-            this.alignment = alignment ?? Alignment.center;
+            Offset origin = null,
+            Alignment alignment = null,
+            bool transformHitTests = true,
+            Widget child = null,
+            double degree = 0.0
+        ) : base(key: key, child: child) {
+            this.transform = Matrix4x4.Rotate(Quaternion.Euler(0, 0, (float) degree));
             this.origin = origin;
+            this.alignment = alignment;
             this.transformHitTests = transformHitTests;
-            this.transform = Matrix4x4.Scale(new Vector3((float) scale, (float) scale, (float) 1.0));
         }
 
-        public Matrix4x4 transform;
-        public Offset origin;
-        public Alignment alignment;
-        public bool transformHitTests;
+        public static Transform rotate(
+            Key key = null,
+            double degree = 0.0,
+            Offset origin = null,
+            Alignment alignment = null,
+            bool transformHitTests = true,
+            Widget child = null
+        ) {
+            return new Transform(key, origin, alignment, transformHitTests, child, degree);
+        }
+
+        private Transform(
+            Key key = null,
+            Offset offset = null,
+            bool transformHitTests = true,
+            Widget child = null
+        ) : base(key: key, child: child) {
+            D.assert(offset != null);
+            this.transform = Matrix4x4.Translate(new Vector3((float) offset.dx, (float) offset.dy, 0.0f));
+            this.origin = null;
+            this.alignment = null;
+            this.transformHitTests = transformHitTests;
+        }
+
+        public static Transform translate(
+            Key key = null,
+            Offset offset = null,
+            bool transformHitTests = true,
+            Widget child = null
+        ) {
+            return new Transform(key, offset, transformHitTests, child);
+        }
+
+        private Transform(
+            Key key = null,
+            double scale = 1.0,
+            Offset origin = null,
+            Alignment alignment = null,
+            bool transformHitTests = true,
+            Widget child = null
+        ) : base(key: key, child: child) {
+            this.transform = Matrix4x4.Scale(new Vector3((float) scale, (float) scale, 1.0f));
+            this.origin = origin;
+            this.alignment = alignment;
+            this.transformHitTests = transformHitTests;
+        }
+
+        public static Transform scale(
+            Key key = null,
+            double scale = 1.0,
+            Offset origin = null,
+            Alignment alignment = null,
+            bool transformHitTests = true,
+            Widget child = null
+        ) {
+            return new Transform(key, scale, origin, alignment, transformHitTests, child);
+        }
+
+        public readonly Matrix4x4 transform;
+        public readonly Offset origin;
+        public readonly Alignment alignment;
+        public readonly bool transformHitTests;
 
         public override RenderObject createRenderObject(BuildContext context) {
             return new RenderTransform(
-                transform: transform,
-                origin: origin,
-                alignment: alignment,
-                textDirection: Directionality.of(context),
-                transformHitTests: transformHitTests
+                transform: this.transform,
+                origin: this.origin,
+                alignment: this.alignment,
+                transformHitTests: this.transformHitTests
             );
         }
 
-        public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
-            ((RenderTransform) renderObject).transform = transform;
-            ((RenderTransform) renderObject).origin = origin;
-            ((RenderTransform) renderObject).alignment = alignment;
-            ((RenderTransform) renderObject).textDirection = Directionality.of(context);
-            ((RenderTransform) renderObject).transformHitTests = transformHitTests;
+        public override void updateRenderObject(BuildContext context, RenderObject renderObjectRaw) {
+            var renderObject = (RenderTransform) renderObjectRaw;
+            renderObject.transform = this.transform;
+            renderObject.origin = this.origin;
+            renderObject.alignment = this.alignment;
+            renderObject.transformHitTests = this.transformHitTests;
         }
     }
 
-
     public class Align : SingleChildRenderObjectWidget {
         public Align(
-            double widthFactor = 0.0,
-            double heightFactor = 0.0,
             Key key = null,
-            Widget child = null,
-            Alignment alignment = null
+            Alignment alignment = null,
+            double? widthFactor = null,
+            double? heightFactor = null,
+            Widget child = null
         ) : base(key, child) {
+            D.assert(widthFactor == null || widthFactor >= 0.0);
+            D.assert(heightFactor == null || heightFactor >= 0.0);
+
             this.alignment = alignment ?? Alignment.center;
             this.widthFactor = widthFactor;
             this.heightFactor = heightFactor;
         }
 
-        public Alignment alignment;
+        public readonly Alignment alignment;
 
-        public double widthFactor;
+        public readonly double? widthFactor;
 
-        public double heightFactor;
+        public readonly double? heightFactor;
 
         public override RenderObject createRenderObject(BuildContext context) {
             return new RenderPositionedBox(
-                alignment: alignment,
-                widthFactor: widthFactor,
-                heightFactor: heightFactor
+                alignment: this.alignment,
+                widthFactor: this.widthFactor,
+                heightFactor: this.heightFactor
             );
+        }
+
+        public override void updateRenderObject(BuildContext context, RenderObject renderObjectRaw) {
+            var renderObject = (RenderPositionedBox) renderObjectRaw;
+            renderObject.alignment = this.alignment;
+            renderObject.widthFactor = this.widthFactor;
+            renderObject.heightFactor = this.heightFactor;
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new DiagnosticsProperty<Alignment>("alignment", this.alignment));
+            properties.add(new DoubleProperty("widthFactor",
+                this.widthFactor, defaultValue: Diagnostics.kNullDefaultValue));
+            properties.add(new DoubleProperty("heightFactor",
+                this.heightFactor, defaultValue: Diagnostics.kNullDefaultValue));
+        }
+    }
+
+    public class Center : Align {
+        public Center(
+            Key key = null,
+            double? widthFactor = null,
+            double? heightFactor = null,
+            Widget child = null)
+            : base(
+                key: key,
+                widthFactor: widthFactor,
+                heightFactor: heightFactor,
+                child: child) {
         }
     }
 
@@ -226,66 +579,65 @@ namespace UIWidgets.widgets {
         }
     }
 
-    public class RichText : LeafRenderObjectWidget
-    {
-        public RichText(TextSpan text, Key key = null, 
-            TextAlign textAlign = TextAlign.left, TextDirection? textDirection = null,
-            bool softWrap = true, TextOverflow overflow = TextOverflow.clip, double textScaleFactor = 1.0,
-            int maxLines = 0): base(key)
-        {
+    public class RichText : LeafRenderObjectWidget {
+        public RichText(
+            Key key = null,
+            TextSpan text = null,
+            TextAlign textAlign = TextAlign.left,
+            bool softWrap = true,
+            TextOverflow overflow = TextOverflow.clip,
+            double textScaleFactor = 1.0,
+            int? maxLines = null
+        ) : base(key: key) {
             D.assert(text != null);
+            D.assert(maxLines == null || maxLines > 0);
+
             this.text = text;
             this.textAlign = textAlign;
-            this.textDirection = textDirection;
             this.softWrap = softWrap;
             this.overflow = overflow;
             this.textScaleFactor = textScaleFactor;
             this.maxLines = maxLines;
         }
-        
-        
-         public override RenderObject createRenderObject(BuildContext context) {
-            D.assert(textDirection != null || WidgetsD.debugCheckHasDirectionality(context));
-            return new RenderParagraph(text,
-                textAlign: textAlign,
-                textDirection: textDirection ?? Directionality.of(context),
-                softWrap: softWrap,
-                overflow: overflow,
-                textScaleFactor: textScaleFactor,
-                maxLines: maxLines
+
+        public readonly TextSpan text;
+        public readonly TextAlign textAlign;
+        public readonly bool softWrap;
+        public readonly TextOverflow overflow;
+        public readonly double textScaleFactor;
+        public readonly int? maxLines;
+
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderParagraph(
+                this.text,
+                textAlign: this.textAlign,
+                softWrap: this.softWrap,
+                overflow: this.overflow,
+                textScaleFactor: this.textScaleFactor,
+                maxLines: this.maxLines ?? 0 // todo: maxLines should be nullable.
             );
         }
-        
-        public override void updateRenderObject(BuildContext context, RenderObject r) {
-            D.assert(textDirection != null || WidgetsD.debugCheckHasDirectionality(context));
-            var renderObject = (RenderParagraph) (r);
-            renderObject.text = text;
-            renderObject.textAlign = textAlign;
-            renderObject.textDirection = textDirection ?? Directionality.of(context);
-            renderObject.softWrap = softWrap;
-            renderObject.overflow = overflow;
-            renderObject.textScaleFactor = textScaleFactor;
-            renderObject.maxLines = maxLines;
+
+        public override void updateRenderObject(BuildContext context, RenderObject renderObjectRaw) {
+            var renderObject = (RenderParagraph) renderObjectRaw;
+            renderObject.text = this.text;
+            renderObject.textAlign = this.textAlign;
+            renderObject.softWrap = this.softWrap;
+            renderObject.overflow = this.overflow;
+            renderObject.textScaleFactor = this.textScaleFactor;
+            renderObject.maxLines = this.maxLines ?? 0; // todo: maxLines should be nullable.
         }
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
-            properties.add(new EnumProperty<TextAlign>("textAlign", textAlign, defaultValue: TextAlign.left));
-            properties.add(new EnumProperty<TextDirection?>("textDirection", textDirection, defaultValue: null));
-            properties.add(new FlagProperty("softWrap", value: softWrap, ifTrue: "wrapping at box width", ifFalse: "no wrapping except at line break characters", showName: true));
-            properties.add(new EnumProperty<TextOverflow>("overflow", overflow, defaultValue: TextOverflow.clip));
-            properties.add(new DoubleProperty("textScaleFactor", textScaleFactor, defaultValue: 1.0));
-            properties.add(new IntProperty("maxLines", maxLines, ifNull: "unlimited"));
-            properties.add(new StringProperty("text", text.toPlainText()));
+            properties.add(new EnumProperty<TextAlign>("textAlign", this.textAlign, defaultValue: TextAlign.left));
+            properties.add(new FlagProperty("softWrap", value: this.softWrap, ifTrue: "wrapping at box width",
+                ifFalse: "no wrapping except at line break characters", showName: true));
+            properties.add(new EnumProperty<TextOverflow>("overflow", this.overflow, defaultValue: TextOverflow.clip));
+            properties.add(new DoubleProperty("textScaleFactor", this.textScaleFactor, defaultValue: 1.0));
+            properties.add(new IntProperty("maxLines", this.maxLines, ifNull: "unlimited"));
+            properties.add(new StringProperty("text", this.text.toPlainText()));
         }
-        
-        public readonly TextSpan text;
-        public readonly  TextAlign textAlign;
-        public readonly  TextDirection? textDirection;
-        public readonly  bool softWrap;
-        public readonly  TextOverflow overflow;
-        public readonly  double textScaleFactor;
-        public readonly  int maxLines;
     }
 
     public class RawImage : LeafRenderObjectWidget {
@@ -422,7 +774,7 @@ namespace UIWidgets.widgets {
         }
 
         public static List<RepaintBoundary> wrapAll(List<Widget> widgets) {
-            List<RepaintBoundary> result = new List<RepaintBoundary>(widgets.Count);
+            List<RepaintBoundary> result = Enumerable.Repeat((RepaintBoundary) null, widgets.Count).ToList();
             for (int i = 0; i < result.Count; ++i) {
                 result[i] = RepaintBoundary.wrap(widgets[i], i);
             }
@@ -464,19 +816,19 @@ namespace UIWidgets.widgets {
         }
     }
 
-    public class Builder : StatelessWidget
-    {
-        public Builder(WidgetBuilder builder, Key key = null) : base(key)
-        {
+    public class Builder : StatelessWidget {
+        public Builder(
+            Key key = null,
+            WidgetBuilder builder = null
+        ) : base(key: key) {
             D.assert(builder != null);
             this.builder = builder;
         }
 
         public readonly WidgetBuilder builder;
 
-        public override Widget build(BuildContext context)
-        {
-            return builder(context);
+        public override Widget build(BuildContext context) {
+            return this.builder(context);
         }
     }
 }

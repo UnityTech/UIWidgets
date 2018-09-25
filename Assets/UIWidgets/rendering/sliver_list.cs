@@ -1,4 +1,5 @@
 using System;
+using UIWidgets.foundation;
 
 namespace UIWidgets.rendering {
     public class RenderSliverList : RenderSliverMultiBoxAdaptor {
@@ -7,12 +8,14 @@ namespace UIWidgets.rendering {
         ) : base(childManager: childManager) {
         }
 
-        public override void performLayout() {
+        protected override void performLayout() {
             this.childManager.didStartLayout();
             this.childManager.setDidUnderflow(false);
 
             double scrollOffset = this.constraints.scrollOffset + this.constraints.cacheOrigin;
+            D.assert(scrollOffset >= 0.0);
             double remainingExtent = this.constraints.remainingCacheExtent;
+            D.assert(remainingExtent >= 0.0);
             double targetEndScrollOffset = scrollOffset + remainingExtent;
             BoxConstraints childConstraints = this.constraints.asBoxConstraints();
             int leadingGarbage = 0;
@@ -55,7 +58,8 @@ namespace UIWidgets.rendering {
                     if (firstChildScrollOffset < 0.0) {
                         double correction = 0.0;
                         while (earliestUsefulChild != null) {
-                            correction += this.paintExtentOf(firstChild);
+                            D.assert(this.firstChild == earliestUsefulChild);
+                            correction += this.paintExtentOf(this.firstChild);
                             earliestUsefulChild =
                                 this.insertAndLayoutLeadingChild(childConstraints, parentUsesSize: true);
                         }
@@ -69,11 +73,15 @@ namespace UIWidgets.rendering {
                     } else {
                         var childParentData = (SliverMultiBoxAdaptorParentData) earliestUsefulChild.parentData;
                         childParentData.layoutOffset = firstChildScrollOffset;
+                        D.assert(earliestUsefulChild == this.firstChild);
                         leadingChildWithLayout = earliestUsefulChild;
                         trailingChildWithLayout = trailingChildWithLayout ?? earliestUsefulChild;
                     }
                 }
             }
+
+            D.assert(earliestUsefulChild == this.firstChild);
+            D.assert(this.childScrollOffset(earliestUsefulChild) <= scrollOffset);
 
             if (leadingChildWithLayout == null) {
                 earliestUsefulChild.layout(childConstraints, parentUsesSize: true);
@@ -87,6 +95,7 @@ namespace UIWidgets.rendering {
             double endScrollOffset = this.childScrollOffset(child) + this.paintExtentOf(child);
 
             Func<bool> advance = () => {
+                D.assert(child != null);
                 if (child == trailingChildWithLayout) {
                     inLayoutRange = false;
                 }
@@ -99,7 +108,7 @@ namespace UIWidgets.rendering {
                 index += 1;
                 if (!inLayoutRange) {
                     if (child == null || this.indexOf(child) != index) {
-                        child = insertAndLayoutChild(childConstraints,
+                        child = this.insertAndLayoutChild(childConstraints,
                             after: trailingChildWithLayout,
                             parentUsesSize: true
                         );
@@ -113,8 +122,10 @@ namespace UIWidgets.rendering {
                     trailingChildWithLayout = child;
                 }
 
+                D.assert(child != null);
                 var childParentData = (SliverMultiBoxAdaptorParentData) child.parentData;
                 childParentData.layoutOffset = endScrollOffset;
+                D.assert(childParentData.index == index);
                 endScrollOffset = this.childScrollOffset(child) + this.paintExtentOf(child);
                 return true;
             };
@@ -122,7 +133,11 @@ namespace UIWidgets.rendering {
             while (endScrollOffset < scrollOffset) {
                 leadingGarbage += 1;
                 if (!advance()) {
+                    D.assert(leadingGarbage == this.childCount);
+                    D.assert(child == null);
+
                     this.collectGarbage(leadingGarbage - 1, 0);
+                    D.assert(this.firstChild == this.lastChild);
                     double extent = this.childScrollOffset(this.lastChild) + this.paintExtentOf(this.lastChild);
                     this.geometry = new SliverGeometry(
                         scrollExtent: extent,
@@ -150,7 +165,9 @@ namespace UIWidgets.rendering {
 
             this.collectGarbage(leadingGarbage, trailingGarbage);
 
-            double estimatedMaxScrollOffset;
+            D.assert(this.debugAssertChildListIsNonEmptyAndContiguous());
+
+            double? estimatedMaxScrollOffset;
             if (reachedEnd) {
                 estimatedMaxScrollOffset = endScrollOffset;
             } else {
@@ -160,7 +177,9 @@ namespace UIWidgets.rendering {
                     lastIndex: this.indexOf(this.lastChild),
                     leadingScrollOffset: this.childScrollOffset(this.firstChild),
                     trailingScrollOffset: endScrollOffset
-                ).Value;
+                );
+
+                D.assert(estimatedMaxScrollOffset >= endScrollOffset - this.childScrollOffset(this.firstChild));
             }
 
             double paintExtent = this.calculatePaintOffset(
@@ -176,10 +195,10 @@ namespace UIWidgets.rendering {
             double targetEndScrollOffsetForPaint =
                 this.constraints.scrollOffset + this.constraints.remainingPaintExtent;
             this.geometry = new SliverGeometry(
-                scrollExtent: estimatedMaxScrollOffset,
+                scrollExtent: estimatedMaxScrollOffset.Value,
                 paintExtent: paintExtent,
                 cacheExtent: cacheExtent,
-                maxPaintExtent: estimatedMaxScrollOffset,
+                maxPaintExtent: estimatedMaxScrollOffset.Value,
                 hasVisualOverflow: endScrollOffset > targetEndScrollOffsetForPaint ||
                                    this.constraints.scrollOffset > 0.0
             );

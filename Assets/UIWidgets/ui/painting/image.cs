@@ -1,20 +1,38 @@
-using System;
-using System.Collections.Generic;
-using UIWidgets.painting;
 using UnityEngine;
 
 namespace UIWidgets.ui
 {
     public class Image
     {
-        public Image(byte[] raw, int height = 100, int width = 100) {
-            this.rawData = raw;
-            this.height = height;
-            this.width = width;
+        public Image(byte[] raw) {
+            rawData = raw;
         }
 
         public byte[] rawData;
-        public int height;
-        public int width;
+        public int height {
+            get {
+                return texture != null ? texture.height : 0;
+            }
+        }
+
+        public int width {
+            get {
+                return texture != null ? texture.width : 0;
+            }
+        }
+
+        public Texture2D texture {
+            get {
+                if (_texture == null && rawData.Length != 0) {
+                    _texture = new Texture2D(2, 2);
+                    _texture.LoadImage(rawData);
+                }
+
+                return _texture;
+            }
+        }
+
+
+        private Texture2D _texture;
     }
 }

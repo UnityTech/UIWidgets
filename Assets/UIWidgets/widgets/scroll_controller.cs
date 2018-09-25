@@ -56,7 +56,7 @@ namespace UIWidgets.widgets {
             Curve curve
         ) {
             D.assert(this._positions.isNotEmpty(), "ScrollController not attached to any scroll views.");
-            List<IPromise> animations = new List<IPromise>(this._positions.Count);
+            List<IPromise> animations = Enumerable.Repeat((IPromise) null, this._positions.Count).ToList();
             for (int i = 0; i < this._positions.Count; i += 1) {
                 animations[i] = this._positions[i].animateTo(to, duration: duration, curve: curve);
             }

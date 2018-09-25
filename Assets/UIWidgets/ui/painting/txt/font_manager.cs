@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using UIWidgets.foundation;
 using UnityEngine;
 
 namespace UIWidgets.ui
@@ -21,9 +22,15 @@ namespace UIWidgets.ui
             {
                 return founded;
             }
-            
-            var newFont = Font.CreateDynamicFontFromOSFont(names,
-                fontSize);
+
+            if (names.SequenceEqual(new string[] {"MaterialIcons"})) {
+                var font = Resources.Load<Font>("MaterialIcons-Regular");
+                D.assert(font != null);
+                _fonts.Add(font);
+                return font;
+            }
+
+            var newFont = Font.CreateDynamicFontFromOSFont(names, fontSize);
             _fonts.Add(newFont);
             return newFont;
         }

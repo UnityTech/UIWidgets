@@ -64,7 +64,7 @@ namespace UIWidgets.widgets {
                                     Viewport.getDefaultCrossAxisDirection(context, this.axisDirection),
                 anchor: this.anchor,
                 offset: this.offset,
-                cacheExtent: this.cacheExtent
+                cacheExtent: this.cacheExtent ?? RenderViewportUtils.defaultCacheExtent
             );
         }
 
@@ -75,7 +75,7 @@ namespace UIWidgets.widgets {
                                               Viewport.getDefaultCrossAxisDirection(context, this.axisDirection);
             renderObject.anchor = this.anchor;
             renderObject.offset = this.offset;
-            renderObject.cacheExtent = this.cacheExtent ?? RenderAbstractViewportUtils.defaultCacheExtent;
+            renderObject.cacheExtent = this.cacheExtent ?? RenderViewportUtils.defaultCacheExtent;
         }
 
         public override Element createElement() {
