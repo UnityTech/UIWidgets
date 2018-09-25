@@ -224,7 +224,7 @@ namespace UIWidgets.painting
             }
 
             _lastMinWidth = minWidth;
-            _lastMaxWidth = minWidth;
+            _lastMaxWidth = maxWidth;
             _paragraph.layout(new ParagraphConstraints(maxWidth));
   
             if (minWidth != maxWidth)

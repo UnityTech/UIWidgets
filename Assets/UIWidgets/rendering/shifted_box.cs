@@ -1,4 +1,5 @@
 ﻿using System;
+using UIWidgets.foundation;
 using UIWidgets.gestures;
 using UIWidgets.painting;
 using UIWidgets.ui;
@@ -45,6 +46,8 @@ namespace UIWidgets.rendering {
             double? result;
 
             if (this.child != null) {
+                D.assert(!this.debugNeedsLayout);
+
                 result = this.child.getDistanceToActualBaseline(baseline);
                 if (result != null) {
                     var childParentData = (BoxParentData) this.child.parentData;
@@ -64,18 +67,12 @@ namespace UIWidgets.rendering {
             }
         }
 
-        protected override bool hitTestChildren(HitTestResult result, Offset position = null)
-        {
-            if (child != null)
-            {
-                var childParentData = child.parentData as BoxParentData;
-                if (childParentData != null)
-                {
-                    position = position - childParentData.offset;
-                }
-
-                return child.hitTest(result, position);
+        protected override bool hitTestChildren(HitTestResult result, Offset position = null) {
+            if (this.child != null) {
+                var childParentData = (BoxParentData) this.child.parentData;
+                return this.child.hitTest(result, position - childParentData.offset);
             }
+
             return false;
         }
     }
@@ -85,12 +82,18 @@ namespace UIWidgets.rendering {
             EdgeInsets padding = null,
             RenderBox child = null
         ) : base(child) {
+            D.assert(padding != null);
+            D.assert(padding.isNonNegative);
+                
             this._padding = padding;
         }
 
         public EdgeInsets padding {
             get { return this._padding; }
             set {
+                D.assert(value != null);
+                D.assert(value.isNonNegative);
+                
                 if (this._padding == value) {
                     return;
                 }
@@ -100,8 +103,7 @@ namespace UIWidgets.rendering {
             }
         }
 
-        public EdgeInsets _padding;
-
+        EdgeInsets _padding;
 
         protected override double computeMinIntrinsicWidth(double height) {
             if (this.child != null) {
@@ -152,6 +154,20 @@ namespace UIWidgets.rendering {
             childParentData.offset = this._padding.topLeft;
             this.size = this.constraints.constrain(this._padding.inflateSize(this.child.size));
         }
+        
+        protected override void debugPaintSize(PaintingContext context, Offset offset) {
+            base.debugPaintSize(context, offset);
+            D.assert(() => {
+                Rect outerRect = offset & size;
+                D.debugPaintPadding(context.canvas, outerRect, this.child != null ? this._padding.deflateRect(outerRect) : null);
+                return true;
+            });
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new DiagnosticsProperty<EdgeInsets>("padding", this.padding));
+        }
     }
 
     public abstract class RenderAligningShiftedBox : RenderShiftedBox {
@@ -165,6 +181,7 @@ namespace UIWidgets.rendering {
         public Alignment alignment {
             get { return this._alignment; }
             set {
+                D.assert(value != null);
                 if (this._alignment == value) {
                     return;
                 }
@@ -174,11 +191,21 @@ namespace UIWidgets.rendering {
             }
         }
 
-        public Alignment _alignment;
+        Alignment _alignment;
 
         protected void alignChild() {
+            D.assert(this.child != null);
+            D.assert(!this.child.debugNeedsLayout);
+            D.assert(this.child.hasSize);
+            D.assert(this.hasSize);
+
             var childParentData = (BoxParentData) this.child.parentData;
             childParentData.offset = this._alignment.alongOffset(this.size - this.child.size);
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new DiagnosticsProperty<Alignment>("alignment", this.alignment));
         }
     }
 
@@ -189,6 +216,9 @@ namespace UIWidgets.rendering {
             double? heightFactor = null,
             Alignment alignment = null
         ) : base(alignment, child) {
+            D.assert(widthFactor == null || widthFactor >= 0.0);
+            D.assert(heightFactor == null || heightFactor >= 0.0);
+
             this._widthFactor = widthFactor;
             this._heightFactor = heightFactor;
         }
@@ -196,6 +226,7 @@ namespace UIWidgets.rendering {
         public double? widthFactor {
             get { return this._widthFactor; }
             set {
+                D.assert(value == null || value >= 0.0);
                 if (this._widthFactor == value) {
                     return;
                 }
@@ -205,11 +236,12 @@ namespace UIWidgets.rendering {
             }
         }
 
-        public double? _widthFactor;
+        double? _widthFactor;
 
         public double? heightFactor {
             get { return this._heightFactor; }
             set {
+                D.assert(value == null || value >= 0.0);
                 if (this._heightFactor == value) {
                     return;
                 }
@@ -219,7 +251,7 @@ namespace UIWidgets.rendering {
             }
         }
 
-        public double? _heightFactor;
+        double? _heightFactor;
 
         protected override void performLayout() {
             bool shrinkWrapWidth = this._widthFactor != null || double.IsPositiveInfinity(this.constraints.maxWidth);
@@ -236,6 +268,70 @@ namespace UIWidgets.rendering {
                     shrinkWrapWidth ? 0.0 : double.PositiveInfinity,
                     shrinkWrapHeight ? 0.0 : double.PositiveInfinity));
             }
+        }
+
+        protected override void debugPaintSize(PaintingContext context, Offset offset) {
+            base.debugPaintSize(context, offset);
+            D.assert(() => {
+                Paint paint;
+                if (this.child != null && !this.child.size.isEmpty) {
+//        Path path;
+//        paint = Paint()
+//          ..style = PaintingStyle.stroke
+//          ..strokeWidth = 1.0
+//          ..color = const Color(0xFFFFFF00);
+//        path = Path();
+//        final BoxParentData childParentData = child.parentData;
+//        if (childParentData.offset.dy > 0.0) {
+//          // vertical alignment arrows
+//          final double headSize = math.min(childParentData.offset.dy * 0.2, 10.0);
+//          path
+//            ..moveTo(offset.dx + size.width / 2.0, offset.dy)
+//            ..relativeLineTo(0.0, childParentData.offset.dy - headSize)
+//            ..relativeLineTo(headSize, 0.0)
+//            ..relativeLineTo(-headSize, headSize)
+//            ..relativeLineTo(-headSize, -headSize)
+//            ..relativeLineTo(headSize, 0.0)
+//            ..moveTo(offset.dx + size.width / 2.0, offset.dy + size.height)
+//            ..relativeLineTo(0.0, -childParentData.offset.dy + headSize)
+//            ..relativeLineTo(headSize, 0.0)
+//            ..relativeLineTo(-headSize, -headSize)
+//            ..relativeLineTo(-headSize, headSize)
+//            ..relativeLineTo(headSize, 0.0);
+//          context.canvas.drawPath(path, paint);
+//            }
+//            if (childParentData.offset.dx > 0.0) {
+//              // horizontal alignment arrows
+//              final double headSize = math.min(childParentData.offset.dx * 0.2, 10.0);
+//              path
+//                ..moveTo(offset.dx, offset.dy + size.height / 2.0)
+//                ..relativeLineTo(childParentData.offset.dx - headSize, 0.0)
+//                ..relativeLineTo(0.0, headSize)
+//                ..relativeLineTo(headSize, -headSize)
+//                ..relativeLineTo(-headSize, -headSize)
+//                ..relativeLineTo(0.0, headSize)
+//                ..moveTo(offset.dx + size.width, offset.dy + size.height / 2.0)
+//                ..relativeLineTo(-childParentData.offset.dx + headSize, 0.0)
+//                ..relativeLineTo(0.0, headSize)
+//                ..relativeLineTo(-headSize, -headSize)
+//                ..relativeLineTo(headSize, -headSize)
+//                ..relativeLineTo(0.0, headSize);
+//              context.canvas.drawPath(path, paint);
+//            }
+                } else {
+//        paint = Paint()
+//          ..color = const Color(0x90909090);
+//        context.canvas.drawRect(offset & size, paint);
+                }
+
+                return true;
+            });
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new DoubleProperty("widthFactor", this._widthFactor, ifNull: "expand"));
+            properties.add(new DoubleProperty("heightFactor", this._heightFactor, ifNull: "expand"));
         }
     }
 

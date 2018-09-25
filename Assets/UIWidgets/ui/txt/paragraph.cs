@@ -587,6 +587,8 @@ namespace UIWidgets.ui
                     if (run != null && run.start < run.end && run.start < line.end && run.end > line.start)
                     {
                         var font = FontManager.instance.getOrCreate(run.style.fontFamily, run.style.UnityFontSize);
+                        var styleHeight = (double) run.style.UnityFontSize / font.fontSize;
+                        run.style.height = styleHeight;
                         var metrics = FontMetrics.fromFont(font, run.style.height);
                         var ascent = font.ascent * (run.style.height);
                         var descent = (font.lineHeight - font.ascent) * (run.style.height);

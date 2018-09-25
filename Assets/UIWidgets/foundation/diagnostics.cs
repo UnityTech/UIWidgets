@@ -666,8 +666,8 @@ namespace UIWidgets.foundation {
         }
     }
 
-    public class IntProperty : _NumProperty<int> {
-        public IntProperty(String name, int value,
+    public class IntProperty : _NumProperty<int?> {
+        public IntProperty(String name, int? value,
             String ifNull = null,
             bool showName = true,
             String unit = null,
@@ -685,7 +685,11 @@ namespace UIWidgets.foundation {
         }
 
         protected override String numberToString() {
-            return this.value.ToString();
+            if (this.value == null) {
+                return "null";
+            }
+
+            return this.value.Value.ToString();
         }
     }
 

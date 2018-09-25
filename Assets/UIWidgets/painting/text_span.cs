@@ -99,7 +99,7 @@ namespace UIWidgets.painting
             return result;
         }
 
-        string toPlainText()
+        public string toPlainText()
         {
             var sb = new StringBuilder();
             visitTextSpan((span) =>

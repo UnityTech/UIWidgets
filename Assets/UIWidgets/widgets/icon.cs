@@ -1,0 +1,59 @@
+using UIWidgets.foundation;
+using UIWidgets.painting;
+using UIWidgets.ui;
+using TextStyle = UIWidgets.painting.TextStyle;
+
+namespace UIWidgets.widgets {
+    public class Icon : StatelessWidget {
+        public Icon(IconData icon,
+            Key key = null,
+            double? size = null,
+            Color color = null
+        ) : base(key: key) {
+            this.icon = icon;
+            this.size = size;
+            this.color = color;
+        }
+
+        public readonly IconData icon;
+
+        public readonly double? size;
+
+        public readonly Color color;
+
+        public override Widget build(BuildContext context) {
+            IconThemeData iconTheme = IconTheme.of(context);
+            double iconSize = this.size ?? iconTheme.size.Value;
+
+            if (this.icon == null) {
+                return new SizedBox(width: iconSize, height: iconSize);
+            }
+
+            double iconOpacity = iconTheme.opacity.Value;
+            Color iconColor = this.color ?? iconTheme.color;
+            if (iconOpacity != 1.0) {
+                iconColor = iconColor.withOpacity(iconColor.opacity * iconOpacity);
+            }
+
+            Widget iconWidget = new RichText(
+                text: new TextSpan(
+                    text: new string(new[] {(char) this.icon.codePoint}),
+                    style: new TextStyle(
+                        inherit: false,
+                        color: iconColor,
+                        fontSize: iconSize,
+                        fontFamily: this.icon.fontFamily
+                    )
+                )
+            );
+
+            return new SizedBox(
+                width: iconSize,
+                height: iconSize,
+                child: new Center(
+                    child: iconWidget
+                )
+            );
+        }
+    }
+}

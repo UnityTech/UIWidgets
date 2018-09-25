@@ -83,7 +83,7 @@ namespace UIWidgets.ui
         public readonly double letterSpacing = 0.0;
         public readonly double wordSpacing = 0.0;
         public readonly TextBaseline textBaseline = TextBaseline.alphabetic;
-        public readonly double height = 1.0;
+        public double height = 1.0;
         public readonly TextDecoration decoration = TextDecoration.none;
         public readonly Color decorationColor;
         public readonly TextDecorationStyle decorationStyle = TextDecorationStyle.solid;

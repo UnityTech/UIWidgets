@@ -1,92 +1,129 @@
 using UIWidgets.foundation;
 using UIWidgets.rendering;
 using UIWidgets.painting;
+using UnityEngine;
+using Color = UIWidgets.ui.Color;
 
 namespace UIWidgets.widgets {
     public class DecoratedBox : SingleChildRenderObjectWidget {
         public DecoratedBox(
-            Decoration decoration,
-            Widget child,
             Key key = null,
-            DecorationPosition position = DecorationPosition.background
+            Decoration decoration = null,
+            DecorationPosition position = DecorationPosition.background,
+            Widget child = null
         ) : base(key, child) {
+            D.assert(decoration != null);
             this.position = position;
             this.decoration = decoration;
         }
 
-        public Decoration decoration;
+        public readonly Decoration decoration;
 
-        public DecorationPosition position;
+        public readonly DecorationPosition position;
 
         public override RenderObject createRenderObject(BuildContext context) {
             return new RenderDecoratedBox(
-                decoration: decoration,
-                position: position,
+                decoration: this.decoration,
+                position: this.position,
                 configuration: ImageUtil.createLocalImageConfiguration(context)
             );
         }
 
-        public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
-            ((RenderDecoratedBox) renderObject).decoration = decoration;
-            ((RenderDecoratedBox) renderObject).configuration = ImageUtil.createLocalImageConfiguration(context);
-            ((RenderDecoratedBox) renderObject).position = position;
+        public override void updateRenderObject(BuildContext context, RenderObject renderObjectRaw) {
+            var renderObject = (RenderDecoratedBox) renderObjectRaw;
+            renderObject.decoration = this.decoration;
+            renderObject.configuration = ImageUtil.createLocalImageConfiguration(context);
+            renderObject.position = this.position;
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            string label = "decoration";
+            switch (this.position) {
+                case DecorationPosition.background:
+                    label = "bg";
+                    break;
+                case DecorationPosition.foreground:
+                    label = "fg";
+                    break;
+            }
+
+            properties.add(new EnumProperty<DecorationPosition>(
+                "position", this.position, level: DiagnosticLevel.hidden));
+            properties.add(new DiagnosticsProperty<Decoration>(
+                label,
+                this.decoration,
+                ifNull: "no decoration",
+                showName: this.decoration != null
+            ));
         }
     }
 
     public class Container : StatelessWidget {
-        // todo transform
         public Container(
             Key key = null,
             Alignment alignment = null,
             EdgeInsets padding = null,
-            ui.Color color = null,
+            Color color = null,
             Decoration decoration = null,
             Decoration forgroundDecoration = null,
-            double width = 0.0,
-            double height = 0.0,
+            double? width = null,
+            double? height = null,
             BoxConstraints constraints = null,
             EdgeInsets margin = null,
-//            Matrix4x4 transfrom = default(Matrix4x4),
+            Matrix4x4? transfrom = null,
             Widget child = null
         ) : base(key) {
+            D.assert(margin == null || margin.isNonNegative);
+            D.assert(padding == null || padding.isNonNegative);
+            D.assert(decoration == null || decoration.debugAssertIsValid());
+            D.assert(constraints == null || constraints.debugAssertIsValid());
+            D.assert(color == null || decoration == null,
+                "Cannot provide both a color and a decoration\n" +
+                "The color argument is just a shorthand for \"decoration: new BoxDecoration(color: color)\"."
+            );
+
             this.alignment = alignment;
-            this.foregroundDecoration = forgroundDecoration;
-//            this.transform = transfrom;
-            this.margin = margin;
-            this.child = child;
             this.padding = padding;
+            this.foregroundDecoration = forgroundDecoration;
+            this.margin = margin;
+            this.transform = transfrom;
+            this.child = child;
 
             this.decoration = decoration ?? (color != null ? new BoxDecoration(color) : null);
-            this.constraints = (width != 0.0 || height != 0.0)
-                ? ((constraints == null ? null : constraints.tighten(width, height))
-                   ?? BoxConstraints.tightFor(width, height))
+            this.constraints = (width != null || height != null)
+                ? (constraints != null ? constraints.tighten(width, height) : BoxConstraints.tightFor(width, height))
                 : constraints;
         }
 
-        public Widget child;
-        public Alignment alignment;
-        public EdgeInsets padding;
-        public Decoration decoration;
-        public Decoration foregroundDecoration;
-        public BoxConstraints constraints;
-        public EdgeInsets margin;
-//        public Matrix4x4 transform;
+        public readonly Widget child;
+        public readonly Alignment alignment;
+        public readonly EdgeInsets padding;
+        public readonly Decoration decoration;
+        public readonly Decoration foregroundDecoration;
+        public readonly BoxConstraints constraints;
+        public readonly EdgeInsets margin;
+        public readonly Matrix4x4? transform;
 
         EdgeInsets _paddingIncludingDecoration {
             get {
-                if (decoration == null || decoration.padding == null)
-                    return padding;
-                EdgeInsets decorationPadding = decoration.padding;
-                if (padding == null)
+                if (this.decoration == null || this.decoration.padding == null) {
+                    return this.padding;
+                }
+
+                EdgeInsets decorationPadding = this.decoration.padding;
+                if (this.padding == null) {
                     return decorationPadding;
-                return padding.add(decorationPadding);
+                }
+
+                return this.padding.add(decorationPadding);
             }
         }
 
         public override Widget build(BuildContext context) {
-            Widget current = child;
+            Widget current = this.child;
 
-            if (child == null && (constraints == null || !constraints.isTight)) {
+            if (this.child == null && (this.constraints == null || !this.constraints.isTight)) {
                 current = new LimitedBox(
                     maxWidth: 0.0,
                     maxHeight: 0.0,
@@ -94,40 +131,58 @@ namespace UIWidgets.widgets {
                 );
             }
 
-            if (alignment != null) {
-                current = new Align(alignment: alignment, child: current);
+            if (this.alignment != null) {
+                current = new Align(alignment: this.alignment, child: current);
             }
 
-            EdgeInsets effetivePadding = _paddingIncludingDecoration;
+            EdgeInsets effetivePadding = this._paddingIncludingDecoration;
             if (effetivePadding != null) {
                 current = new Padding(padding: effetivePadding, child: current);
             }
 
-            if (decoration != null) {
-                current = new DecoratedBox(decoration: decoration, child: current);
+            if (this.decoration != null) {
+                current = new DecoratedBox(decoration: this.decoration, child: current);
             }
 
-            if (foregroundDecoration != null) {
+            if (this.foregroundDecoration != null) {
                 current = new DecoratedBox(
-                    decoration: decoration,
+                    decoration: this.foregroundDecoration,
                     position: DecorationPosition.foreground,
                     child: current
                 );
             }
 
-            if (constraints != null) {
-                current = new ConstrainedBox(constraints: constraints, child: current);
+            if (this.constraints != null) {
+                current = new ConstrainedBox(constraints: this.constraints, child: current);
             }
 
-            if (margin != null) {
-                current = new Padding(padding: margin, child: current);
+            if (this.margin != null) {
+                current = new Padding(padding: this.margin, child: current);
             }
 
-//            if (transform != null) {
-//                current = new Transform(transform: transform, child: current);
-//            }
+            if (this.transform != null) {
+                current = new Transform(transform: this.transform.Value, child: current);
+            }
 
             return current;
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new DiagnosticsProperty<Alignment>("alignment",
+                this.alignment, showName: false, defaultValue: Diagnostics.kNullDefaultValue));
+            properties.add(new DiagnosticsProperty<EdgeInsets>("padding",
+                this.padding, defaultValue: Diagnostics.kNullDefaultValue));
+            properties.add(new DiagnosticsProperty<Decoration>("bg",
+                this.decoration, defaultValue: Diagnostics.kNullDefaultValue));
+            properties.add(new DiagnosticsProperty<Decoration>("fg",
+                this.foregroundDecoration, defaultValue: Diagnostics.kNullDefaultValue));
+            properties.add(new DiagnosticsProperty<BoxConstraints>("constraints",
+                this.constraints, defaultValue: Diagnostics.kNullDefaultValue));
+            properties.add(new DiagnosticsProperty<EdgeInsets>("margin",
+                this.margin, defaultValue: Diagnostics.kNullDefaultValue));
+            properties.add(ObjectFlagProperty<Matrix4x4?>.has("transform",
+                this.transform));
         }
     }
 }
