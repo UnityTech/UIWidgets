@@ -90,7 +90,7 @@ namespace UIWidgets.widgets
     {
         public Text(string data, Key key = null, TextStyle style = null,
             TextAlign? textAlign = null, bool? softWrap = null,
-            TextOverflow? overflow = null, double? textScaleFactor = null) : base(key)
+            TextOverflow? overflow = null, double? textScaleFactor = null, int? maxLines = null) : base(key)
         {
             D.assert(data != null);
             this.textSpan = null;
@@ -100,11 +100,12 @@ namespace UIWidgets.widgets
             this.softWrap = softWrap;
             this.overflow = overflow;
             this.textScaleFactor = textScaleFactor;
+            this.maxLines = maxLines;
         }
 
         public Text(TextSpan textSpan, Key key = null, TextStyle style = null,
             TextAlign? textAlign = null, bool? softWrap = null,
-            TextOverflow? overflow = null, double? textScaleFactor = null) : base(key)
+            TextOverflow? overflow = null, double? textScaleFactor = null, int? maxLines = null) : base(key)
         {
             D.assert(textSpan != null);
             this.textSpan = textSpan;
@@ -114,6 +115,7 @@ namespace UIWidgets.widgets
             this.softWrap = softWrap;
             this.overflow = overflow;
             this.textScaleFactor = textScaleFactor;
+            this.maxLines = maxLines;
         }
 
         public readonly string data;
