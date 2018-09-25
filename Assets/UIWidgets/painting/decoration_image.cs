@@ -32,7 +32,7 @@ namespace UIWidgets.painting {
             Rect rect,
             ui.Image image,
 //            ColorFilter colorFileter,
-            BoxFit fit,
+            BoxFit? fit,
             Rect centerSlice,
             Alignment alignment = null,
             ImageRepeat repeat = ImageRepeat.noRepeat
@@ -53,8 +53,10 @@ namespace UIWidgets.painting {
                 inputSize -= sliceBorder;
             }
 
-            fit = centerSlice == null ? BoxFit.scaleDown : BoxFit.fill;
-            FittedSizes fittedSizes = FittedSizes.applyBoxFit(fit, inputSize, outputSize);
+            if (fit == null) {
+                fit = centerSlice == null ? BoxFit.scaleDown : BoxFit.fill;
+            }
+            FittedSizes fittedSizes = FittedSizes.applyBoxFit(fit.Value, inputSize, outputSize);
             Size sourceSize = fittedSizes.source;
             Size destinationSize = fittedSizes.destination;
             if (centerSlice != null) {
