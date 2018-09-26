@@ -46,8 +46,8 @@ namespace UIWidgets.painting {
         }
 
         public override ImageStreamCompleter load(NetworkImage key) {
-//            return new OneFrameImageStreamCompleter(_loadAsync(key));
-            return new OneFrameImageStreamCompleter(_loadAsyncWithCache(key));
+            return new OneFrameImageStreamCompleter(_loadAsync(key));
+//            return new OneFrameImageStreamCompleter(_loadAsyncWithCache(key));
         }
 
         public static IPromise<ImageInfo> _loadAsync(NetworkImage key) {
