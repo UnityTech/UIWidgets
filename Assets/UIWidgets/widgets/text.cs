@@ -5,36 +5,51 @@ using UIWidgets.rendering;
 using UIWidgets.ui;
 using TextStyle = UIWidgets.painting.TextStyle;
 
-namespace UIWidgets.widgets
-{
-    public class DefaultTextStyle : InheritedWidget
-    {
-        public DefaultTextStyle(TextStyle style, Widget child,
-            TextAlign textAlign, int maxLines = 0,
+namespace UIWidgets.widgets {
+    public class DefaultTextStyle : InheritedWidget {
+        public DefaultTextStyle(
+            Key key = null,
+            TextStyle style = null,
+            TextAlign? textAlign = null,
             bool softWrap = true,
-            TextOverflow overflow = TextOverflow.clip, Key key = null) : base(key, child)
-        {
+            TextOverflow overflow = TextOverflow.clip,
+            int? maxLines = null,
+            Widget child = null
+        ) : base(key, child) {
             D.assert(style != null);
+            D.assert(maxLines == null || maxLines > 0);
             D.assert(child != null);
+            
             this.style = style;
             this.textAlign = textAlign;
             this.softWrap = softWrap;
-            this.maxLines = maxLines;
             this.overflow = overflow;
+            this.maxLines = maxLines;
         }
 
-        public static DefaultTextStyle fallback()
-        {
-            return new DefaultTextStyle(new TextStyle(), null, TextAlign.left, 0, true,
-                TextOverflow.clip, null);
+        private DefaultTextStyle() {
+            this.style = new TextStyle();
+            this.textAlign = null;
+            this.softWrap = true;
+            this.overflow = TextOverflow.clip;
+            this.maxLines = null;
         }
 
-        public static Widget merge(Key key, TextStyle style, TextAlign? textAlign,
-            bool? softWrap, TextOverflow? overflow, int? maxLines, Widget child)
-        {
+        public static DefaultTextStyle fallback() {
+            return new DefaultTextStyle();
+        }
+
+        public static Widget merge(
+            Key key = null,
+            TextStyle style = null,
+            TextAlign? textAlign = null,
+            bool? softWrap = null,
+            TextOverflow? overflow = null,
+            int? maxLines = null,
+            Widget child = null
+        ) {
             D.assert(child != null);
-            return new Builder(builder: (context =>
-            {
+            return new Builder(builder: (context => {
                 var parent = DefaultTextStyle.of(context);
                 return new DefaultTextStyle(
                     key: key,
@@ -49,49 +64,51 @@ namespace UIWidgets.widgets
         }
 
         public readonly TextStyle style;
-        public readonly TextAlign textAlign;
+        public readonly TextAlign? textAlign;
         public readonly bool softWrap;
         public readonly TextOverflow overflow;
-        public readonly int maxLines;
+        public readonly int? maxLines;
 
-        public static DefaultTextStyle of(BuildContext context)
-        {
+        public static DefaultTextStyle of(BuildContext context) {
             var inherit = (DefaultTextStyle) context.inheritFromWidgetOfExactType(typeof(DefaultTextStyle));
             return inherit ?? DefaultTextStyle.fallback();
         }
 
-        public override bool updateShouldNotify(InheritedWidget w)
-        {
+        public override bool updateShouldNotify(InheritedWidget w) {
             var oldWidget = (DefaultTextStyle) w;
-            return style != oldWidget.style ||
-                   textAlign != oldWidget.textAlign ||
-                   softWrap != oldWidget.softWrap ||
-                   overflow != oldWidget.overflow ||
-                   maxLines != oldWidget.maxLines;
+            return this.style != oldWidget.style ||
+                   this.textAlign != oldWidget.textAlign ||
+                   this.softWrap != oldWidget.softWrap ||
+                   this.overflow != oldWidget.overflow ||
+                   this.maxLines != oldWidget.maxLines;
         }
 
-        public override void debugFillProperties(DiagnosticPropertiesBuilder properties)
-        {
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
-            if (style != null)
-            {
-                style.debugFillProperties(properties);
+            if (this.style != null) {
+                this.style.debugFillProperties(properties);
             }
 
-            properties.add(new EnumProperty<TextAlign>("textAlign", textAlign, defaultValue: null));
-            properties.add(new FlagProperty("softWrap", value: softWrap, ifTrue: "wrapping at box width",
+            properties.add(new EnumProperty<TextAlign?>("textAlign", this.textAlign,
+                defaultValue: Diagnostics.kNullDefaultValue));
+            properties.add(new FlagProperty("softWrap", value: this.softWrap, ifTrue: "wrapping at box width",
                 ifFalse: "no wrapping except at line break characters", showName: true));
-            properties.add(new EnumProperty<TextOverflow>("overflow", overflow, defaultValue: null));
-            properties.add(new IntProperty("maxLines", maxLines, defaultValue: null));
+            properties.add(new EnumProperty<TextOverflow>("overflow", this.overflow,
+                defaultValue: Diagnostics.kNullDefaultValue));
+            properties.add(new IntProperty("maxLines", this.maxLines,
+                defaultValue: Diagnostics.kNullDefaultValue));
         }
     }
 
-    public class Text : StatelessWidget
-    {
-        public Text(string data, Key key = null, TextStyle style = null,
-            TextAlign? textAlign = null, bool? softWrap = null,
-            TextOverflow? overflow = null, double? textScaleFactor = null, int? maxLines = null) : base(key)
-        {
+    public class Text : StatelessWidget {
+        public Text(string data,
+            Key key = null, 
+            TextStyle style = null,
+            TextAlign? textAlign = null, 
+            bool? softWrap = null,
+            TextOverflow? overflow = null,
+            double? textScaleFactor = null,
+            int? maxLines = null) : base(key) {
             D.assert(data != null);
             this.textSpan = null;
             this.data = data;
@@ -103,10 +120,14 @@ namespace UIWidgets.widgets
             this.maxLines = maxLines;
         }
 
-        public Text(TextSpan textSpan, Key key = null, TextStyle style = null,
-            TextAlign? textAlign = null, bool? softWrap = null,
-            TextOverflow? overflow = null, double? textScaleFactor = null, int? maxLines = null) : base(key)
-        {
+        private Text(TextSpan textSpan, 
+            Key key = null, 
+            TextStyle style = null,
+            TextAlign? textAlign = null,
+            bool? softWrap = null,
+            TextOverflow? overflow = null,
+            double? textScaleFactor = null, 
+            int? maxLines = null) : base(key) {
             D.assert(textSpan != null);
             this.textSpan = textSpan;
             this.data = null;
@@ -118,6 +139,24 @@ namespace UIWidgets.widgets
             this.maxLines = maxLines;
         }
 
+        public static Text rich(TextSpan textSpan,
+            Key key = null,
+            TextStyle style = null,
+            TextAlign? textAlign = null,
+            bool? softWrap = null,
+            TextOverflow? overflow = null,
+            double? textScaleFactor = null,
+            int? maxLines = null) {
+            return new Text(
+                textSpan, key,
+                style,
+                textAlign,
+                softWrap,
+                overflow,
+                textScaleFactor,
+                maxLines);
+        }
+
         public readonly string data;
 
         public readonly TextSpan textSpan;
@@ -125,8 +164,6 @@ namespace UIWidgets.widgets
         public readonly TextStyle style;
 
         public readonly TextAlign? textAlign;
-
-        public readonly TextDirection? textDirection;
 
         public readonly bool? softWrap;
 
@@ -136,51 +173,47 @@ namespace UIWidgets.widgets
 
         public readonly int? maxLines;
 
-        public override Widget build(BuildContext context)
-        {
+        public override Widget build(BuildContext context) {
             DefaultTextStyle defaultTextStyle = DefaultTextStyle.of(context);
-            TextStyle effectiveTextStyle = style;
-            if (style == null || style.inherit)
-            {
-                effectiveTextStyle = defaultTextStyle.style.merge(style);
+            TextStyle effectiveTextStyle = this.style;
+            if (this.style == null || this.style.inherit) {
+                effectiveTextStyle = defaultTextStyle.style.merge(this.style);
             }
 
             return new RichText(
-                textAlign: textAlign ?? defaultTextStyle.textAlign,
-                softWrap: softWrap ?? defaultTextStyle.softWrap,
-                overflow: overflow ?? defaultTextStyle.overflow,
-                textScaleFactor: textScaleFactor ?? 1.0, // MediaQuery.textScaleFactorOf(context), todo
-                maxLines: maxLines ?? defaultTextStyle.maxLines,
+                textAlign: this.textAlign ?? defaultTextStyle.textAlign ??  TextAlign.left,
+                softWrap: this.softWrap ?? defaultTextStyle.softWrap,
+                overflow: this.overflow ?? defaultTextStyle.overflow,
+                textScaleFactor: this.textScaleFactor ?? 1.0, // MediaQuery.textScaleFactorOf(context), todo
+                maxLines: this.maxLines ?? defaultTextStyle.maxLines,
                 text: new TextSpan(
                     style: effectiveTextStyle,
-                    text: data,
-                    children: textSpan != null ? new List<TextSpan>() {textSpan} : null
+                    text: this.data,
+                    children: this.textSpan != null ? new List<TextSpan> {this.textSpan} : null
                 )
             );
         }
 
-
-        public override void debugFillProperties(DiagnosticPropertiesBuilder properties)
-        {
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
-            properties.add(new StringProperty("data", data, showName: false));
-            if (textSpan != null)
-            {
-                properties.add(textSpan.toDiagnosticsNode(name: "textSpan", style: DiagnosticsTreeStyle.transition));
+            properties.add(new StringProperty("data", this.data, showName: false));
+            if (this.textSpan != null) {
+                properties.add(this.textSpan.toDiagnosticsNode(name: "textSpan", style: DiagnosticsTreeStyle.transition));
             }
 
-            if (style != null)
-            {
-                style.debugFillProperties(properties);
+            if (this.style != null) {
+                this.style.debugFillProperties(properties);
             }
 
-            properties.add(new EnumProperty<TextAlign?>("textAlign", textAlign, defaultValue: null));
-            properties.add(new EnumProperty<TextDirection?>("textDirection", textDirection, defaultValue: null));
-            properties.add(new FlagProperty("softWrap", value: softWrap ?? false, ifTrue: "wrapping at box width",
-                ifFalse: "no wrapping except at line break characters", showName: true)); // todo ObjectFlagProperty
-            properties.add(new EnumProperty<TextOverflow?>("overflow", overflow, defaultValue: null));
-            properties.add(new DoubleProperty("textScaleFactor", textScaleFactor, defaultValue: null));
-            properties.add(new IntProperty("maxLines", maxLines, defaultValue: null));
+            properties.add(new EnumProperty<TextAlign?>("textAlign", this.textAlign,
+                defaultValue: Diagnostics.kNullDefaultValue));
+            properties.add(new FlagProperty("softWrap", value: this.softWrap, ifTrue: "wrapping at box width",
+                ifFalse: "no wrapping except at line break characters", showName: true));
+            properties.add(new EnumProperty<TextOverflow?>("overflow", this.overflow,
+                defaultValue: Diagnostics.kNullDefaultValue));
+            properties.add(new DoubleProperty("textScaleFactor", this.textScaleFactor,
+                defaultValue: Diagnostics.kNullDefaultValue));
+            properties.add(new IntProperty("maxLines", this.maxLines, defaultValue: Diagnostics.kNullDefaultValue));
         }
     }
 }

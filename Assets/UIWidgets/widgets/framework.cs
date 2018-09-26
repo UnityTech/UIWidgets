@@ -479,28 +479,56 @@ namespace UIWidgets.widgets {
             : base(key: key, child: child) {
         }
 
+        public abstract bool debugIsValidAncestor(RenderObjectWidget ancestor);
+
+        public abstract string debugDescribeInvalidAncestorChain(
+            string description = null,
+            string ownershipChain = null,
+            bool foundValidAncestor = false,
+            IEnumerable<Widget> badAncestors = null
+        );
+
+        public abstract void applyParentData(RenderObject renderObject);
+
+        public virtual bool debugCanApplyOutOfTurn() {
+            return false;
+        }
+    }
+
+    public abstract class ParentDataWidget<T> : ParentDataWidget where T : RenderObjectWidget {
+        public ParentDataWidget(Key key = null, Widget child = null)
+            : base(key: key, child: child) {
+        }
+
         public override Element createElement() {
             return new ParentDataElement(this);
         }
 
-        public virtual bool debugIsValidAncestor(RenderObjectWidget ancestor) {
-            return ancestor is RenderObjectWidget;
+        public override bool debugIsValidAncestor(RenderObjectWidget ancestor) {
+            D.assert(typeof(T) != typeof(RenderObjectWidget));            
+            return ancestor is T;
         }
 
-        public virtual string debugDescribeInvalidAncestorChain(
-            String description = null, String ownershipChain = null, bool foundValidAncestor = false,
+        public override string debugDescribeInvalidAncestorChain(
+            string description = null,
+            string ownershipChain = null,
+            bool foundValidAncestor = false,
             IEnumerable<Widget> badAncestors = null
         ) {
-            String result;
+            D.assert(typeof(T) != typeof(RenderObjectWidget));            
+
+            string result;
             if (!foundValidAncestor) {
-                result = string.Format("{0} widgets must be placed inside {1} widgets.\n" +
-                                       "{2} has no {1} ancestor at all.\n", this.GetType(), typeof(RenderObjectWidget), description);
+                result = string.Format(
+                    "{0} widgets must be placed inside {1} widgets.\n" +
+                                       "{2} has no {1} ancestor at all.\n", this.GetType(), typeof(T), description);
             } else {
                 D.assert(badAncestors != null);
                 D.assert(badAncestors.Any());
-                result = string.Format("{0} widgets must be placed directly inside {1} widgets.\n" +
+                result = string.Format(
+                    "{0} widgets must be placed directly inside {1} widgets.\n" +
                                        "{2} has a {1} ancestor, but there are other widgets between them:\n",
-                    this.GetType(), typeof(RenderObjectWidget), description);
+                    this.GetType(), typeof(T), description);
 
                 foreach (Widget ancestor in badAncestors) {
                     if (ancestor.GetType() == this.GetType()) {
@@ -511,21 +539,14 @@ namespace UIWidgets.widgets {
                     }
                 }
 
-                result += "These widgets cannot come between a " + this.GetType() + " and its " + typeof(RenderObjectWidget) + ".\n";
+                result += "These widgets cannot come between a " + this.GetType() + " and its " + typeof(T) + ".\n";
             }
 
             result += "The ownership chain for the parent of the offending "
                       + this.GetType() + " was:\n  " + ownershipChain;
             return result;
         }
-
-        public abstract void applyParentData(RenderObject renderObject);
-
-        public virtual bool debugCanApplyOutOfTurn() {
-            return false;
-        }
     }
-
 
     public abstract class InheritedWidget : ProxyWidget {
         protected InheritedWidget(Key key = null, Widget child = null) : base(key, child) {

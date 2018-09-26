@@ -176,7 +176,7 @@ namespace UIWidgets.Tests {
 
         double _offsetY = 0.0;
         int _index = -1;
-        
+
         Widget _buildHeader(BuildContext context) {
             return new Container(
                 padding: EdgeInsets.only(left: 16.0, right: 8.0),
@@ -213,22 +213,19 @@ namespace UIWidgets.Tests {
                 )
             );
         }
-        
+
         bool _onNotification(ScrollNotification notification, BuildContext context) {
             double pixels = notification.metrics.pixels;
             if (pixels >= 0.0) {
                 if (pixels <= headerHeight) {
-                    setState(() => {
-                        _offsetY = pixels / 2.0;
-                    });
+                    setState(() => { _offsetY = pixels / 2.0; });
                 }
             } else {
                 if (_offsetY != 0.0) {
-                    setState(() => {
-                        _offsetY = 0.0;
-                    });
+                    setState(() => { _offsetY = 0.0; });
                 }
             }
+
             return true;
         }
 

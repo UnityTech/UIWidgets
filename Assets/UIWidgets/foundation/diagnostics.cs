@@ -800,9 +800,9 @@ namespace UIWidgets.foundation {
         }
     }
 
-    public class FlagProperty : DiagnosticsProperty<bool> {
-        public FlagProperty(String name,
-            bool value,
+    public class FlagProperty : DiagnosticsProperty<bool?> {
+        public FlagProperty(string name,
+            bool? value,
             string ifTrue = null,
             string ifFalse = null,
             bool showName = false,
@@ -835,11 +835,11 @@ namespace UIWidgets.foundation {
         public readonly string ifFalse;
 
         protected override string valueToString(TextTreeConfiguration parentConfiguration = null) {
-            if (this.value) {
+            if (this.value == true) {
                 if (this.ifTrue != null) {
                     return this.ifTrue;
                 }
-            } else if (!this.value) {
+            } else if (this.value == false) {
                 if (this.ifFalse != null) {
                     return this.ifFalse;
                 }
@@ -850,7 +850,7 @@ namespace UIWidgets.foundation {
 
         public override bool showName {
             get {
-                if (this.value && this.ifTrue == null || !this.value == false && this.ifFalse == null) {
+                if (this.value == null || this.value == true && this.ifTrue == null || this.value == false && this.ifFalse == null) {
                     return true;
                 }
 
@@ -860,13 +860,13 @@ namespace UIWidgets.foundation {
 
         public override DiagnosticLevel level {
             get {
-                if (this.value) {
+                if (this.value == true) {
                     if (this.ifTrue == null) {
                         return DiagnosticLevel.hidden;
                     }
                 }
 
-                if (!this.value) {
+                if (this.value == false) {
                     if (this.ifFalse == null) {
                         return DiagnosticLevel.hidden;
                     }
@@ -1561,7 +1561,8 @@ namespace UIWidgets.foundation {
         );
 
         internal static readonly _NoDefaultValue kNoDefaultValue = new _NoDefaultValue();
-        internal static readonly _NullDefaultValue kNullDefaultValue = new _NullDefaultValue();
+        
+        public static readonly object kNullDefaultValue = new _NullDefaultValue();
 
         public static string shortHash(object o) {
             return (o.GetHashCode() & 0xFFFFF).ToString("X").PadLeft(5, '0');
