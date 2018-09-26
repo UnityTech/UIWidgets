@@ -259,7 +259,7 @@ namespace UIWidgets.painting
 
             return null;
         }
-
+        
         public List<TextBox> getBoxesForSelection(TextSelection selection)
         {
             D.assert(!_needsLayout);
@@ -279,7 +279,77 @@ namespace UIWidgets.painting
             var range = _paragraph.getWordBoundary(position.offset);
             return new TextRange(range.start, range.end);
         }
+        
+        public TextPosition getPositionVerticalMove(TextPosition position, int move)
+        {
+            D.assert(!_needsLayout);
+            var offset = getOffsetForCaret(position, Rect.zero);
+            var line = _paragraph.getLine(position);
+            var targetLineStart = _paragraph.getLineStart(line + move);
+            var newLineOffset = getOffsetForCaret(targetLineStart, Rect.zero);
+            return getPositionForOffset(new Offset(offset.dx, newLineOffset.dy));
+        }
 
+        public int getLineIndex(TextPosition position)
+        {
+            D.assert(!_needsLayout);
+            return _paragraph.getLine(position);
+        }
+
+        public TextPosition getLineStartPosition(int line)
+        {
+            D.assert(!_needsLayout);
+            return _paragraph.getLineStart(line);
+        }
+        
+        public TextPosition getLineEndPosition(int line)
+        {
+            D.assert(!_needsLayout);
+            return _paragraph.getLineEnd(line);
+        }
+
+        public TextPosition getWordRight(TextPosition position)
+        {
+            D.assert(!_needsLayout);
+            var offset = position.offset;
+            while(true)
+            {
+                var range = _paragraph.getWordBoundary(offset);
+                if (range.end == range.start)
+                {
+                    break;
+                }
+                if (!char.IsWhiteSpace((char)(text.codeUnitAt(range.start)??0)))
+                {
+                    return new TextPosition(range.end);
+                }
+                offset = range.end;
+            }
+            
+            return new TextPosition(offset);
+        }
+        
+        public TextPosition getWordLeft(TextPosition position)
+        {
+            D.assert(!_needsLayout);
+            var offset = Math.Max(position.offset - 1, 0);
+            while(true)
+            {
+                var range = _paragraph.getWordBoundary(offset);
+                if (!char.IsWhiteSpace((char)(text.codeUnitAt(range.start)??0)))
+                {
+                    return new TextPosition(range.start);
+                }
+                offset = Math.Max(range.start - 1, 0);
+                if (offset == 0)
+                {
+                    break;
+                }
+            }
+            
+            return new TextPosition(offset);
+        }
+        
         private ParagraphStyle _createParagraphStyle(TextDirection defaultTextDirection = TextDirection.ltr)
         {
             if (_text.style == null)

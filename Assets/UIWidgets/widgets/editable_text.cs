@@ -243,6 +243,81 @@ namespace UIWidgets.widgets
             _formatAndSetValue(value);
         }
 
+        public TextEditingValue getValueForOperation(TextEditOp operation)
+        {
+            TextPosition newPosition = null;
+            switch (operation)
+            {
+                    case TextEditOp.MoveLeft:
+                    return _value.moveLeft();
+                case TextEditOp.MoveRight:
+                    return _value.moveRight();
+                case TextEditOp.MoveUp:             
+                    newPosition = this.renderEditable.getPositionUp(new TextPosition(_value.selection.start, _value.selection.affinity));
+                    return _value.copyWith(selection: TextSelection.fromPosition(newPosition));
+               case TextEditOp.MoveDown:
+                   newPosition = this.renderEditable.getPositionDown(new TextPosition(_value.selection.start, _value.selection.affinity));
+                   return _value.copyWith(selection: TextSelection.fromPosition(newPosition));
+                case TextEditOp.MoveLineStart:      
+                    newPosition = this.renderEditable.getLineStartPosition(new TextPosition(_value.selection.start, _value.selection.affinity));
+                    return _value.copyWith(selection: TextSelection.fromPosition(newPosition));
+                case TextEditOp.MoveLineEnd:      
+                    newPosition = this.renderEditable.getLineEndPosition(new TextPosition(_value.selection.start, _value.selection.affinity));
+                    return _value.copyWith(selection: TextSelection.fromPosition(newPosition));
+               case TextEditOp.MoveWordRight:      
+                   newPosition = this.renderEditable.getWordRight(new TextPosition(_value.selection.start));
+                   return _value.copyWith(selection: TextSelection.fromPosition(newPosition));
+                case TextEditOp.MoveWordLeft:      
+                    newPosition = this.renderEditable.getWordLeft(new TextPosition(_value.selection.start));
+                    return _value.copyWith(selection: TextSelection.fromPosition(newPosition));
+//                case TextEditOp.MoveToStartOfNextWord:      MoveToStartOfNextWord(); break;
+//                case TextEditOp.MoveToEndOfPreviousWord:        MoveToEndOfPreviousWord(); break;
+
+                case TextEditOp.MoveTextStart:
+                    return _value.copyWith(selection: TextSelection.collapsed(0));
+                case TextEditOp.MoveTextEnd:        
+                    return _value.copyWith(selection: TextSelection.collapsed(_value.text.Length));
+//                case TextEditOp.MoveParagraphForward:   MoveParagraphForward(); break;
+//                case TextEditOp.MoveParagraphBackward:  MoveParagraphBackward(); break;
+//                case TextEditOp.MoveGraphicalLineStart: MoveGraphicalLineStart(); break;
+//                case TextEditOp.MoveGraphicalLineEnd: MoveGraphicalLineEnd(); break;
+                  case TextEditOp.SelectLeft:
+                      return _value.extendLeft();
+                  case TextEditOp.SelectRight:
+                      return _value.extendRight();
+                  case TextEditOp.SelectUp:           
+                      newPosition = this.renderEditable.getPositionUp(_value.selection.extendPos);
+                      return _value.copyWith(selection: _value.selection.copyWith(extentOffset: newPosition.offset));
+                  case TextEditOp.SelectDown:        
+                      newPosition = this.renderEditable.getPositionDown(_value.selection.extendPos);
+                      return _value.copyWith(selection: _value.selection.copyWith(extentOffset: newPosition.offset));
+                  case TextEditOp.SelectWordRight:        
+                      newPosition = this.renderEditable.getWordRight(_value.selection.extendPos);
+                      return _value.copyWith(selection: _value.selection.copyWith(extentOffset: newPosition.offset));
+                  case TextEditOp.SelectWordLeft:     
+                      newPosition = this.renderEditable.getWordLeft(_value.selection.extendPos);
+                      return _value.copyWith(selection: _value.selection.copyWith(extentOffset: newPosition.offset));
+//                case TextEditOp.SelectToEndOfPreviousWord:  SelectToEndOfPreviousWord(); break;
+//                case TextEditOp.SelectToStartOfNextWord:    SelectToStartOfNextWord(); break;
+//
+                 case TextEditOp.SelectTextStart:        
+                     return _value.copyWith(selection: _value.selection.copyWith(extentOffset: 0));
+               case TextEditOp.SelectTextEnd:      
+                   return _value.copyWith(selection: _value.selection.copyWith(extentOffset: _value.text.Length));
+//                case TextEditOp.ExpandSelectGraphicalLineStart: ExpandSelectGraphicalLineStart(); break;
+//                case TextEditOp.ExpandSelectGraphicalLineEnd: ExpandSelectGraphicalLineEnd(); break;
+//                case TextEditOp.SelectParagraphForward:     SelectParagraphForward(); break;
+//                case TextEditOp.SelectParagraphBackward:    SelectParagraphBackward(); break;
+//                case TextEditOp.SelectGraphicalLineStart: SelectGraphicalLineStart(); break;
+//                case TextEditOp.SelectGraphicalLineEnd: SelectGraphicalLineEnd(); break;
+                 case TextEditOp.Delete: return _value.deleteSelection(false);
+                case TextEditOp.Backspace:
+                    return _value.deleteSelection();
+            }
+
+            return _value;
+        }
+
         void _updateRemoteEditingValueIfNeeded()
         {
             if (!_hasInputConnection)

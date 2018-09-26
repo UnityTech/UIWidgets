@@ -41,16 +41,25 @@ namespace UIWidgets.service
             );
         }
 
-        public TextEditingValue deleteSelection()
+        public TextEditingValue deleteSelection(bool backDelete = true)
         {
             if (selection.isCollapsed)
             {
-                if (selection.start == 0)
+                if (backDelete)
+                {
+                    if (selection.start == 0)
+                    {
+                        return this;
+                    }
+                    return this.copyWith(text: text.Substring(0, selection.start - 1) + selection.textAfter(this.text), 
+                        selection: TextSelection.collapsed(selection.start - 1));
+                }
+
+                if (selection.start >= text.Length)
                 {
                     return this;
                 }
-                return this.copyWith(text: text.Substring(0, selection.start - 1) + selection.textAfter(this.text), 
-                    selection: TextSelection.collapsed(selection.start - 1));
+                return this.copyWith(text: text.Substring(0, selection.start) + text.Substring(selection.start + 1));
             }
             else
             {
@@ -168,6 +177,8 @@ namespace UIWidgets.service
     public interface TextInputClient
     {
         void updateEditingValue(TextEditingValue value);
+
+        TextEditingValue getValueForOperation(TextEditOp operation);
         // void performAction(TextInputAction action);
     }
    
@@ -282,7 +293,7 @@ namespace UIWidgets.service
             if (s_Keyactions.ContainsKey(e))
             {
                 TextEditOp op = s_Keyactions[e];
-                var newValue = performOperation(op);
+                var newValue =_currentConnection._client.getValueForOperation(op);
                 if (_value != newValue)
                 {
                     _value = newValue;
@@ -488,7 +499,7 @@ namespace UIWidgets.service
         }
     }
     
-    internal enum TextEditOp
+    public enum TextEditOp
     {
         MoveLeft,
         MoveRight,
