@@ -36,5 +36,15 @@ namespace UIWidgets.Tests {
         public static void renderScrollViews() {
             EditorWindow.GetWindow(typeof(ScrollViews));
         }
+        
+        [MenuItem("UIWidgetsTests/Show SceneViewTests")]
+        public static void showSceneView() {
+            SceneViewTests.show();
+        }
+        
+        [MenuItem("UIWidgetsTests/Hide SceneViewTests")]
+        public static void hideSceneView() {
+            SceneViewTests.hide();
+        }
     }
 }

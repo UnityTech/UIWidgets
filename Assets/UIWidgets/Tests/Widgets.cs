@@ -51,7 +51,7 @@ namespace UIWidgets.Tests {
             // if local image test
             if (selected == 0) {
                 localImagePath = EditorGUILayout.TextField(localImagePath);
-                
+
                 if (this._selected != selected) {
                     this._selected = selected;
                     this.windowAdapter.attachRootWidget(null);
@@ -246,8 +246,7 @@ namespace UIWidgets.Tests {
                 if (pixels <= headerHeight) {
                     setState(() => { _offsetY = pixels / 2.0; });
                 }
-            }
-            else {
+            } else {
                 if (_offsetY != 0.0) {
                     setState(() => { _offsetY = 0.0; });
                 }
@@ -283,11 +282,11 @@ namespace UIWidgets.Tests {
                 color: CLColors.background1,
                 child: new Container(
                     color: CLColors.background1,
-                    child: new Column(
-                        children: new List<Widget> {
-                            this._buildHeader(context),
+                child: new Column(
+                    children: new List<Widget> {
+                        this._buildHeader(context),
                             this._buildContentList(context)
-                        }
+                    }
                     )
                 )
             );
