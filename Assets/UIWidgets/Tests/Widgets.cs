@@ -206,6 +206,7 @@ namespace UIWidgets.Tests {
         Widget _buildHeader(BuildContext context) {
             return new Container(
                 padding: EdgeInsets.only(left: 16.0, right: 8.0),
+                color: CLColors.blue,
                 height: headerHeight - _offsetY,
                 child: new Row(
                     children: new List<Widget> {
@@ -263,15 +264,19 @@ namespace UIWidgets.Tests {
                     return true;
                 },
                 child: new Flexible(
-                    child: ListView.builder(
-                        itemCount: 20,
-                        itemExtent: 100,
-                        physics: new AlwaysScrollableScrollPhysics(),
-                        itemBuilder: (BuildContext context1, int index) => {
-                            return new Container(
-                                color: Color.fromARGB(255, (index * 10) % 256, (index * 10) % 256, (index * 10) % 256)
-                            );
-                        }
+                    child: new Container(
+                        color: CLColors.green,
+                        child: ListView.builder(
+                            itemCount: 20,
+                            itemExtent: 100,
+                            physics: new AlwaysScrollableScrollPhysics(),
+                            itemBuilder: (BuildContext context1, int index) => {
+                                return new Container(
+                                    color: Color.fromARGB(255, (index * 10) % 256, (index * 20) % 256,
+                                        (index * 30) % 256)
+                                );
+                            }
+                        )
                     )
                 )
             );
@@ -282,11 +287,11 @@ namespace UIWidgets.Tests {
                 color: CLColors.background1,
                 child: new Container(
                     color: CLColors.background1,
-                child: new Column(
-                    children: new List<Widget> {
-                        this._buildHeader(context),
+                    child: new Column(
+                        children: new List<Widget> {
+                            this._buildHeader(context),
                             this._buildContentList(context)
-                    }
+                        }
                     )
                 )
             );

@@ -51,6 +51,7 @@ namespace UIWidgets.ui {
         private ClipRec _clipRec;
         private LayerRec _layerRec;
         private Stack<CanvasRec> _stack;
+        private RenderTexture _defaultTexture;
 
         private Stack<CanvasRec> stack {
             get { return this._stack ?? (this._stack = new Stack<CanvasRec>()); }
@@ -61,6 +62,8 @@ namespace UIWidgets.ui {
                 1.0f / EditorGUIUtility.pixelsPerPoint,
                 1.0f / EditorGUIUtility.pixelsPerPoint,
                 1.0f));
+
+            this._defaultTexture = RenderTexture.active;
         }
 
         public void drawPloygon4(Offset[] points, Paint paint) {
@@ -88,7 +91,6 @@ namespace UIWidgets.ui {
                 GL.End();
             }
         }
-        
 
         public void drawRect(Rect rect, BorderWidth borderWidth, BorderRadius borderRadius, Paint paint) {
             this.prepareGL(CanvasImpl.guiRoundedRectMat);
@@ -247,6 +249,7 @@ namespace UIWidgets.ui {
                 RenderTextureFormat.ARGB32, RenderTextureReadWrite.sRGB);
 
             RenderTexture.active = texture;
+
             GL.PushMatrix();
             GL.LoadPixelMatrix((float) bounds.left, (float) bounds.right, (float) bounds.bottom, (float) bounds.top);
             GL.Clear(true, true, new UnityEngine.Color(0, 0, 0, 0));
@@ -270,7 +273,9 @@ namespace UIWidgets.ui {
             this._layerRec = state.layerRec;
 
             if (layerRec != this._layerRec) {
-                RenderTexture.active = this._layerRec != null ? this._layerRec.texture : null;
+                var targetTexture = this._layerRec != null ? this._layerRec.texture : this._defaultTexture;
+                RenderTexture.active = targetTexture;
+
                 GL.PopMatrix();
 
                 this.prepareGL(CanvasImpl.guiTextureClipMat);

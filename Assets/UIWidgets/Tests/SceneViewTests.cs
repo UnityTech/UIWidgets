@@ -88,18 +88,7 @@ namespace UIWidgets.Tests {
         }
         
         public static Widget eventsPage() { 
-            return new Container(
-                color: CLColors.primary,
-                margin: EdgeInsets.all(50),
-                child:new Text(
-                    "Today",
-                    style: new TextStyle(
-                        fontSize: 34,
-                        color: CLColors.white
-                    )
-                )
-            );
-            //return new EventsWaterfallScreen();
+            return new EventsWaterfallScreen();
         }
         
         public static RenderBox flex() {
