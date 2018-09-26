@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using RSG;
 using System.Net;
 using System;
+using System.IO;
 using UIWidgets.lib.cache_manager;
 using UIWidgets.ui;
 
@@ -45,8 +46,8 @@ namespace UIWidgets.painting {
         }
 
         public override ImageStreamCompleter load(NetworkImage key) {
-            return new OneFrameImageStreamCompleter(_loadAsync(key));
-//            return new OneFrameImageStreamCompleter(_loadAsyncWithCache(key));
+//            return new OneFrameImageStreamCompleter(_loadAsync(key));
+            return new OneFrameImageStreamCompleter(_loadAsyncWithCache(key));
         }
 
         public static IPromise<ImageInfo> _loadAsync(NetworkImage key) {
@@ -98,6 +99,58 @@ namespace UIWidgets.painting {
         public override int GetHashCode() {
             unchecked {
                 var hashCode = this.url.GetHashCode();
+                hashCode = (hashCode * 397) ^ this.scale.GetHashCode();
+                return hashCode;
+            }
+        }
+    }
+
+    public class FileImage : ImageProvider<FileImage> {
+        public FileImage(string path, double scale = 1.0) {
+            this.path = path;
+            this.scale = scale;
+        }
+
+        public string path;
+        public double scale;
+        
+        
+        public override FileImage obtainKey(ImageConfiguration configuration) {
+            return this;
+        }
+        
+        public override ImageStreamCompleter load(FileImage key) {
+            return new OneFrameImageStreamCompleter(_loadAsync(key));
+        }
+
+        
+        public static IPromise<ImageInfo> _loadAsync(FileImage key) {
+            var promise = new Promise<ImageInfo>();
+            var bytes = File.ReadAllBytes(key.path);
+            var imageInfo = new ImageInfo(new ui.Image(
+                bytes
+            ));
+            promise.Resolve(imageInfo);
+            return promise;
+        }
+        
+        public override string ToString() {
+            return "FileImage with Path: " + this.path;
+        }
+
+        public bool Equals(FileImage other) {
+            return this.path.Equals(other.path) && this.scale.Equals(other.scale);
+        }
+
+        public override bool Equals(object obj) {
+            if (object.ReferenceEquals(null, obj)) return false;
+            if (object.ReferenceEquals(this, obj)) return true;
+            return obj is FileImage && this.Equals((FileImage) obj);
+        }
+
+        public override int GetHashCode() {
+            unchecked {
+                var hashCode = this.path.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.scale.GetHashCode();
                 return hashCode;
             }
