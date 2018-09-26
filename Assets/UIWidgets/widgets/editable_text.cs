@@ -165,9 +165,9 @@ namespace UIWidgets.widgets
             {
                 style.debugFillProperties(properties);
             }
-            properties.add(new EnumProperty<TextAlign>("textAlign", textAlign, defaultValue: null));
-            properties.add(new EnumProperty<TextDirection?>("textDirection", textDirection, defaultValue: null));
-            properties.add(new DiagnosticsProperty<double>("textScaleFactor", textScaleFactor, defaultValue: null));
+            properties.add(new EnumProperty<TextAlign>("textAlign", textAlign, defaultValue: Diagnostics.kNullDefaultValue));
+            properties.add(new EnumProperty<TextDirection?>("textDirection", textDirection, defaultValue: Diagnostics.kNullDefaultValue));
+            properties.add(new DiagnosticsProperty<double>("textScaleFactor", textScaleFactor, defaultValue: Diagnostics.kNullDefaultValue));
             properties.add(new DiagnosticsProperty<int>("maxLines", maxLines, defaultValue: 1));
             properties.add(new DiagnosticsProperty<bool>("autofocus", autofocus, defaultValue: false));
         }
