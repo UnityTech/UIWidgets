@@ -27,6 +27,10 @@ namespace UIWidgets.ui
         
         public IndexRange findWordRange(int index)
         {
+            if (index >= _text.Length)
+            {
+                return new IndexRange(0, 0);
+            }
             var t = classifyChar(index);
             int start = index;
             for (int i = index; i >= 0; --i)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UIWidgets.foundation;
 using UIWidgets.ui.txt;
 using UnityEngine;
 
@@ -352,7 +353,6 @@ namespace UIWidgets.ui
                             _characterPositions, line.start, line.endExcludingWhitespace);
                     }
                 }
-                
             }
             
             computeWidthMetrics(maxWordWidth);
@@ -391,7 +391,6 @@ namespace UIWidgets.ui
                 double top = baseLine - run.fontMetrics.ascent;
                 double bottom = baseLine + run.fontMetrics.descent;
 
-                // double left, right;
                 var from = Math.Max(start, run.codeUnits.start);
                 var to = Math.Min(end, run.codeUnits.end);
                 if (from < to)
@@ -494,10 +493,49 @@ namespace UIWidgets.ui
                 return new PositionWithAffinity(index, TextAffinity.downstream);
             } else
             {
-                return new PositionWithAffinity(index, TextAffinity.upstream);
+                return new PositionWithAffinity(index + 1, TextAffinity.upstream);
             }
         }
 
+        public int getLine(TextPosition position)
+        {
+            D.assert(!_needsLayout);
+            if (position.offset < 0)
+            {
+                return 0;
+            }
+
+            var offset = position.offset;
+            if (position.affinity == TextAffinity.upstream && offset > 0)
+            {
+                offset = _isUtf16Surrogate(_text[offset - 1]) ? offset - 2 : offset - 1;
+            }
+            
+            var lineCount = getLineCount();
+            for (int lineIndex = 0; lineIndex < getLineCount(); ++lineIndex)
+            {
+                var line = _lineRanges[lineIndex];
+                if (offset >= line.start && offset <= line.end)
+                {
+                    return lineIndex;
+                }
+            }
+
+            return Math.Max(lineCount - 1, 0);
+        }
+
+        public TextPosition getLineStart(int lineIndex)
+        {
+            lineIndex = Math.Min(getLineCount() - 1, Math.Max(lineIndex, 0));
+            return new TextPosition(_lineRanges[lineIndex].start);
+        }
+        
+        public TextPosition getLineEnd(int lineIndex)
+        {
+            lineIndex = Math.Min(getLineCount() - 1, Math.Max(lineIndex, 0));
+            return new TextPosition(_lineRanges[lineIndex].end);
+        }
+        
         public IndexRange getWordBoundary(int offset)
         {
             WordSeparate s = new WordSeparate(_text);
@@ -514,7 +552,11 @@ namespace UIWidgets.ui
                 }
             }
         }
-        
+
+        public int getLineCount()
+        {
+            return _lineHeights.Count;
+        }
 
         private void computeWidthMetrics(double maxWordWidth)
         {
@@ -834,6 +876,11 @@ namespace UIWidgets.ui
                     yOffset = yOffsetOriginal;
                 }
             }
+        }
+        
+        private static bool _isUtf16Surrogate(int value)
+        {
+            return (value & 0xF800) == 0xD800;
         }
         
     }
