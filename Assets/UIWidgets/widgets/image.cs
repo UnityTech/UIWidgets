@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UIWidgets.painting;
 using UIWidgets.foundation;
 using UIWidgets.ui;
+using UnityEngine;
 using Color = UIWidgets.ui.Color;
 
 namespace UIWidgets.widgets {
@@ -29,7 +30,7 @@ namespace UIWidgets.widgets {
 
         public Image(
             Key key,
-            ImageProvider<object> image,
+            ImageProvider image,
             double width,
             double height,
             Color color,
@@ -52,8 +53,7 @@ namespace UIWidgets.widgets {
             this.gaplessPlayback = gaplessPlayback;
         }
 
-        // Network Image
-        public Image(
+        public static Image network(
             string src,
             Key key = null,
             double width = 0.0,
@@ -67,17 +67,51 @@ namespace UIWidgets.widgets {
             ImageRepeat repeat = ImageRepeat.noRepeat,
             bool gaplessPlayback = false,
             double scale = 1.0
-        ) : base(key) {
-            this.image = new NetworkImage(src, headers, scale);
-            this.width = width;
-            this.height = height;
-            this.color = color;
-            this.colorBlendMode = colorBlendMode;
-            this.fit = fit;
-            this.alignment = alignment;
-            this.centerSlice = centerSlice;
-            this.repeat = repeat;
-            this.gaplessPlayback = gaplessPlayback;
+        ) {
+            var networkImage = new NetworkImage(src, headers, scale);
+            return new Image(
+                key,
+                networkImage,
+                width,
+                height,
+                color,
+                colorBlendMode,
+                fit,
+                centerSlice,
+                alignment,
+                repeat,
+                gaplessPlayback
+            );
+        }
+
+        public static Image file(
+            string path,
+            Key key = null,
+            double width = 0.0,
+            double height = 0.0,
+            Color color = null,
+            BlendMode colorBlendMode = BlendMode.None,
+            BoxFit fit = BoxFit.none,
+            Alignment alignment = null,
+            ui.Rect centerSlice = null,
+            ImageRepeat repeat = ImageRepeat.noRepeat,
+            bool gaplessPlayback = false,
+            double scale = 1.0
+        ) {
+            var fileImage = new FileImage(path, scale);
+            return new Image(
+                key,
+                fileImage,
+                width,
+                height,
+                color,
+                colorBlendMode,
+                fit,
+                centerSlice,
+                alignment,
+                repeat,
+                gaplessPlayback
+            );
         }
 
         public override State createState() {

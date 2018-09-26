@@ -11,6 +11,7 @@ using UIWidgets.foundation;
 using UIWidgets.gestures;
 using UIWidgets.ui;
 using Color = UIWidgets.ui.Color;
+using Image = UIWidgets.ui.Image;
 using TextStyle = UIWidgets.painting.TextStyle;
 
 namespace UIWidgets.Tests {
@@ -25,10 +26,13 @@ namespace UIWidgets.Tests {
 
         private int _selected;
 
+        private string localImagePath;
+
         [NonSerialized] private bool hasInvoked = false;
 
         Widgets() {
             this._options = new Func<Widget>[] {
+                this.localImage,
                 this.container,
                 this.flexRow,
                 this.flexColumn,
@@ -43,7 +47,21 @@ namespace UIWidgets.Tests {
 
         void OnGUI() {
             var selected = EditorGUILayout.Popup("test case", this._selected, this._optionStrings);
-            if (selected != this._selected || !this.hasInvoked) {
+
+            // if local image test
+            if (selected == 0) {
+                localImagePath = EditorGUILayout.TextField(localImagePath);
+                
+                if (this._selected != selected) {
+                    this._selected = selected;
+                    this.windowAdapter.attachRootWidget(null);
+                }
+
+                if (GUILayout.Button("load")) {
+                    var rootWidget = this._options[this._selected]();
+                    this.windowAdapter.attachRootWidget(rootWidget);
+                }
+            } else if (selected != this._selected || !this.hasInvoked) {
                 this._selected = selected;
                 this.hasInvoked = true;
 
@@ -73,8 +91,16 @@ namespace UIWidgets.Tests {
             this.windowAdapter = null;
         }
 
+        Widget localImage() {
+            var image = widgets.Image.file(
+                localImagePath
+            );
+
+            return image;
+        }
+
         Widget flexRow() {
-            var image = new widgets.Image(
+            var image = widgets.Image.network(
                 "https://tse3.mm.bing.net/th?id=OIP.XOAIpvR1kh-CzISe_Nj9GgHaHs&pid=Api",
                 width: 100,
                 height: 100
@@ -100,7 +126,7 @@ namespace UIWidgets.Tests {
         }
 
         Widget flexColumn() {
-            var image = new widgets.Image(
+            var image = widgets.Image.network(
                 "https://tse3.mm.bing.net/th?id=OIP.XOAIpvR1kh-CzISe_Nj9GgHaHs&pid=Api",
                 width: 100,
                 height: 100
@@ -125,7 +151,7 @@ namespace UIWidgets.Tests {
         }
 
         Widget container() {
-            var image = new widgets.Image(
+            var image = widgets.Image.network(
                 "https://tse3.mm.bing.net/th?id=OIP.XOAIpvR1kh-CzISe_Nj9GgHaHs&pid=Api",
                 width: 100,
                 height: 100,
@@ -220,7 +246,8 @@ namespace UIWidgets.Tests {
                 if (pixels <= headerHeight) {
                     setState(() => { _offsetY = pixels / 2.0; });
                 }
-            } else {
+            }
+            else {
                 if (_offsetY != 0.0) {
                     setState(() => { _offsetY = 0.0; });
                 }
