@@ -310,7 +310,19 @@ namespace UIWidgets.ui {
             var font = FontManager.instance.getOrCreate(textBlob.style.fontFamily, textBlob.style.UnityFontSize);
             prepareGL(font.material);
             font.material.SetPass(0);
+            Matrix4x4 cameraMat = Matrix4x4.identity;
+           
+            if (Camera.current != null)  // draw mesh will use camera matrix, set to identity before draw mesh
+            {
+                cameraMat = Camera.current.worldToCameraMatrix;
+                Camera.current.worldToCameraMatrix = Matrix4x4.identity;;
+            }
+            
             Graphics.DrawMeshNow(mesh, Matrix4x4.identity);
+            if (Camera.current != null)
+            {
+                Camera.current.worldToCameraMatrix = cameraMat;
+            }
         }
 
         private void pushClipRect(Rect clipRect, Matrix4x4 transform) {
