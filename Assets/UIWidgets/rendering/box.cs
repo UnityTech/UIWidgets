@@ -48,15 +48,6 @@ namespace UIWidgets.rendering {
             );
         }
 
-        public static BoxConstraints tightFor(double width, double height) {
-            return new BoxConstraints(
-                width,
-                width,
-                height,
-                height
-            );
-        }
-
         public static BoxConstraints tightFor(
             double? width = null,
             double? height = null

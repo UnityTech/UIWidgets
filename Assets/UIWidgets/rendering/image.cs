@@ -7,13 +7,13 @@ using Rect = UIWidgets.ui.Rect;
 namespace UIWidgets.rendering {
     class RenderImage : RenderBox {
         public RenderImage(ui.Image image,
-            double width,
-            double height,
             Color color,
             ui.BlendMode colorBlendMode,
             BoxFit fit,
             ImageRepeat repeat,
             Rect centerSlice,
+            double? width,
+            double? height,
             Alignment alignment = null,
             double scale = 1.0
         ) {
@@ -56,9 +56,9 @@ namespace UIWidgets.rendering {
             }
         }
 
-        private double _width;
+        private double? _width;
 
-        public double width {
+        public double? width {
             get { return _width; }
             set {
                 if (value == _width)
@@ -68,9 +68,9 @@ namespace UIWidgets.rendering {
             }
         }
 
-        private double _height;
+        private double? _height;
 
-        public double height {
+        public double? height {
             get { return _height; }
             set {
                 if (value == _height)

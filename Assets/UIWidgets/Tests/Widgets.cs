@@ -9,6 +9,7 @@ using System;
 using System.Linq;
 using UIWidgets.foundation;
 using UIWidgets.gestures;
+using UIWidgets.ui;
 using Color = UIWidgets.ui.Color;
 using TextStyle = UIWidgets.painting.TextStyle;
 
@@ -236,146 +237,270 @@ namespace UIWidgets.Tests {
                 height: headerHeight,
                 color: CLColors.header,
                 child: new Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: new List<Widget> {
-                        new Flexible(
-                            flex: 1,
-                            fit: FlexFit.tight,
+                        new Container(
                             child: new Text(
-                                "所有资源",
+                                "All Assets",
                                 style: new TextStyle(
                                     fontSize: 16,
                                     color: CLColors.white
                                 )
-                            )),
+                            )
+                        ),
                         new CustomButton(
-                            padding: EdgeInsets.only(8.0, 0.0, 8.0, 0.0),
+                            padding: EdgeInsets.only(4.0, 0.0, 16.0, 0.0),
                             child: new Icon(
                                 Icons.notifications,
                                 size: 18.0,
                                 color: CLColors.icon2
                             )
                         ),
-                        new CustomButton(
-                            padding: EdgeInsets.only(8.0, 0.0, 16.0, 0.0),
-                            child: new Icon(
-                                Icons.account_circle,
-                                size: 18.0,
-                                color: CLColors.icon2
+                        new widgets.Container(
+                            decoration: new BoxDecoration(
+                                color: CLColors.white,
+                                borderRadius: BorderRadius.all(3)
+                            ),
+                            color: CLColors.white,
+                            width: 320,
+                            height: 36,
+                            padding: EdgeInsets.all(10.0),
+                            margin: EdgeInsets.only(right: 4),
+                            child: new EditableText(
+                                maxLines: 1,
+                                controller: new TextEditingController("Type here to search assets"),
+                                focusNode: new FocusNode(),
+                                style: new TextStyle(
+                                    fontSize: 16
+                                ),
+                                selectionColor: Color.fromARGB(255, 255, 0, 0),
+                                cursorColor: Color.fromARGB(255, 0, 0, 0)
                             )
-                        )
-                    }
-                )
-            );
-        }
-
-        Widget _buildBanner(BuildContext context) {
-            return new Container(
-                height: 300,
-                child: new Stack(
-                    fit: StackFit.expand,
-                    children: new List<Widget> {
-                        widgets.Image.file(
-                            "/Users/gewentao/Desktop/uiwidgets_banner.jpg",
-                            fit: BoxFit.fitHeight
+                        ),
+                        new CustomButton(
+                            backgroundColor: CLColors.background4,
+                            child: new Icon(
+                                Icons.notifications,
+                                size: 18.0,
+                                color: CLColors.white
+                            )
+                        ),
+                        new Container(
+                            margin: EdgeInsets.only(right: 10),
+                            child: new Text(
+                                "Learn Game Development",
+                                style: new TextStyle(
+                                    fontSize: 12,
+                                    color: CLColors.white
+                                )
+                            )
+                        ),
+                        new Container(
+                            decoration: new BoxDecoration(
+                                border: Border.all(
+                                    color: CLColors.white)
+                            ),
+                            margin: EdgeInsets.only(right: 10),
+                            padding: EdgeInsets.all(4),
+                            child: new Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: new List<Widget> {
+                                    new Text(
+                                        "Plus/Pro",
+                                        style: new TextStyle(
+                                            fontSize: 11,
+                                            color: CLColors.white
+                                        )
+                                    )
+                                }
+                            )
+                        ),
+                        new Container(
+                            margin: EdgeInsets.only(right: 10),
+                            child: new Text(
+                                "Impressive New Assets",
+                                style: new TextStyle(
+                                    fontSize: 12,
+                                    color: CLColors.white
+                                )
+                            )
+                        ),
+                        new Container(
+                            child: new Text(
+                                "Shop On Old Store",
+                                style: new TextStyle(
+                                    fontSize: 12,
+                                    color: CLColors.white
+                                )
+                            )
                         ),
                     }
                 )
             );
         }
 
-        Widget _buildTopAssetsRow(BuildContext context, string title) {
-            return new Container(margin: EdgeInsets.only(left: 98, right: 98), child: new Column(
-                children: new List<Widget> {
-                    new Container(
-                        height: 98,
-//                        color: Color.fromARGB(255, 0, 255, 0),
-                        child: new Row(
-                            children: new List<Widget> {
-                                new Flexible(
-                                    flex: 1,
-                                    fit: FlexFit.tight,
-                                    child: new Text(
-                                        title,
-                                        style: new TextStyle(
-                                            fontSize: 24,
-                                            color: CLColors.blue
-//                                            color: CLColors.black
-                                        )
-                                    )),
-                                new Flexible(
-                                    flex: 1,
-                                    fit: FlexFit.tight,
-                                    child: new Text(
-                                        "See More",
-                                        style: new TextStyle(
-                                            fontSize: 16,
-                                            color: CLColors.text4
-                                        )
-                                    ))
-                            })
-                    ),
-                    new Row(
-                        children: new List<Widget> {
-                            new AssetCard(
-                                "AI Template",
-                                "INVECTOR",
-                                45.0,
-                                36.0,
-                                true,
-                                "https://d2ujflorbtfzji.cloudfront.net/key-image/46dc65c1-f605-4ccb-97e0-3d60b28cfdfe.jpg"
-                            ),
-                            new AssetCard(
-                                "AI Template",
-                                "INVECTOR",
-                                45.0,
-                                36.0,
-                                true,
-                                "https://d2ujflorbtfzji.cloudfront.net/key-image/46dc65c1-f605-4ccb-97e0-3d60b28cfdfe.jpg"
-                            ),
-                            new AssetCard(
-                                "AI Template",
-                                "INVECTOR",
-                                45.0,
-                                36.0,
-                                true,
-                                "https://d2ujflorbtfzji.cloudfront.net/key-image/46dc65c1-f605-4ccb-97e0-3d60b28cfdfe.jpg"
-                            ),
-                            new AssetCard(
-                                "AI Template",
-                                "INVECTOR",
-                                45.0,
-                                36.0,
-                                true,
-                                "https://d2ujflorbtfzji.cloudfront.net/key-image/46dc65c1-f605-4ccb-97e0-3d60b28cfdfe.jpg"
-                            ),
-                            new AssetCard(
-                                "AI Template",
-                                "INVECTOR",
-                                45.0,
-                                36.0,
-                                true,
-                                "https://d2ujflorbtfzji.cloudfront.net/key-image/46dc65c1-f605-4ccb-97e0-3d60b28cfdfe.jpg"
-                            ),
-                            new AssetCard(
-                                "AI Template",
-                                "INVECTOR",
-                                45.0,
-                                36.0,
-                                true,
-                                "https://d2ujflorbtfzji.cloudfront.net/key-image/46dc65c1-f605-4ccb-97e0-3d60b28cfdfe.jpg"
-                            ),
-                            new AssetCard(
-                                "AI Template",
-                                "INVECTOR",
-                                45.0,
-                                36.0,
-                                true,
-                                "https://d2ujflorbtfzji.cloudfront.net/key-image/46dc65c1-f605-4ccb-97e0-3d60b28cfdfe.jpg"
+        Widget _buildFooter(BuildContext context) {
+            return new Container(
+                color: CLColors.header,
+                margin: EdgeInsets.only(top: 50),
+                height: 90,
+                child: new Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: new List<Widget> {
+                        new Container(
+                            margin: EdgeInsets.only(right: 10),
+                            child: new Text(
+                                "Copyright © 2018 Unity Technologies",
+                                style: new TextStyle(
+                                    fontSize: 12,
+                                    color: CLColors.text9
+                                )
                             )
-                        }
+                        ),
+                        new Container(
+                            margin: EdgeInsets.only(right: 10),
+                            child: new Text(
+                                "All prices are exclusive of tax",
+                                style: new TextStyle(
+                                    fontSize: 12,
+                                    color: CLColors.text9
+                                )
+                            )
+                        ),
+                        new Container(
+                            margin: EdgeInsets.only(right: 10),
+                            child: new Text(
+                                "Terms of Service and EULA",
+                                style: new TextStyle(
+                                    fontSize: 12,
+                                    color: CLColors.text10
+                                )
+                            )
+                        ),
+                        new Container(
+                            child: new Text(
+                                "Cookies",
+                                style: new TextStyle(
+                                    fontSize: 12,
+                                    color: CLColors.text10
+                                )
+                            )
+                        ),
+                    }
+                )
+            );
+        }
+
+        Widget _buildBanner(BuildContext context) {
+            return new Container(child:
+                new Container(
+                    height: 450,
+                    color: CLColors.white,
+                    child: widgets.Image.network(
+                        "https://d2ujflorbtfzji.cloudfront.net/banner/38942865-28db-482b-80c5-17809473f3c6.jpg",
+                        fit: BoxFit.cover
                     )
-                }
-            ));
+                )
+            );
+        }
+
+        Widget _buildTopAssetsRow(BuildContext context, string title) {
+            return new Container(
+                margin: EdgeInsets.only(left: 98),
+                child: new Column(
+                    children: new List<Widget> {
+                        new Container(
+                            child: new Container(
+                                margin: EdgeInsets.only(top: 50, bottom: 20),
+                                child: new Row(
+                                    crossAxisAlignment: CrossAxisAlignment.baseline,
+                                    children: new List<Widget> {
+                                        new Container(
+                                            child: new Text(
+                                                title,
+                                                style: new TextStyle(
+                                                    fontSize: 24,
+                                                    color: CLColors.black
+                                                )
+                                            )
+                                        ),
+                                        new Container(
+                                            margin: EdgeInsets.only(left: 15),
+                                            child:
+                                            new Text(
+                                                "See More",
+                                                style: new TextStyle(
+                                                    fontSize: 16,
+                                                    color: CLColors.text4
+                                                )
+                                            )
+                                        )
+                                    })
+                            )
+                        ),
+                        new Row(
+                            children: new List<Widget> {
+                                new AssetCard(
+                                    "AI Template",
+                                    "INVECTOR",
+                                    45.0,
+                                    36.0,
+                                    true,
+                                    "https://d2ujflorbtfzji.cloudfront.net/key-image/46dc65c1-f605-4ccb-97e0-3d60b28cfdfe.jpg"
+                                ),
+                                new AssetCard(
+                                    "AI Template",
+                                    "INVECTOR",
+                                    45.0,
+                                    36.0,
+                                    false,
+                                    "https://d2ujflorbtfzji.cloudfront.net/key-image/46dc65c1-f605-4ccb-97e0-3d60b28cfdfe.jpg"
+                                ),
+                                new AssetCard(
+                                    "AI Template",
+                                    "INVECTOR",
+                                    45.0,
+                                    36.0,
+                                    true,
+                                    "https://d2ujflorbtfzji.cloudfront.net/key-image/46dc65c1-f605-4ccb-97e0-3d60b28cfdfe.jpg"
+                                ),
+                                new AssetCard(
+                                    "AI Template",
+                                    "INVECTOR",
+                                    45.0,
+                                    36.0,
+                                    false,
+                                    "https://d2ujflorbtfzji.cloudfront.net/key-image/46dc65c1-f605-4ccb-97e0-3d60b28cfdfe.jpg"
+                                ),
+                                new AssetCard(
+                                    "AI Template",
+                                    "INVECTOR",
+                                    45.0,
+                                    36.0,
+                                    true,
+                                    "https://d2ujflorbtfzji.cloudfront.net/key-image/46dc65c1-f605-4ccb-97e0-3d60b28cfdfe.jpg"
+                                ),
+                                new AssetCard(
+                                    "AI Template",
+                                    "INVECTOR",
+                                    45.0,
+                                    36.0,
+                                    false,
+                                    "https://d2ujflorbtfzji.cloudfront.net/key-image/46dc65c1-f605-4ccb-97e0-3d60b28cfdfe.jpg"
+                                ),
+                                new AssetCard(
+                                    "AI Template",
+                                    "INVECTOR",
+                                    45.0,
+                                    36.0,
+                                    false,
+                                    "https://d2ujflorbtfzji.cloudfront.net/key-image/46dc65c1-f605-4ccb-97e0-3d60b28cfdfe.jpg"
+                                )
+                            }
+                        )
+                    }
+                ));
         }
 
         bool _onNotification(ScrollNotification notification, BuildContext context) {
@@ -392,10 +517,12 @@ namespace UIWidgets.Tests {
                     child: new ListView(
                         physics: new AlwaysScrollableScrollPhysics(),
                         children: new List<Widget> {
+                            _buildBanner(context),
                             _buildTopAssetsRow(context, "Recommanded For You"),
                             _buildTopAssetsRow(context, "Beach Day"),
                             _buildTopAssetsRow(context, "Top Free Packages"),
-                            _buildTopAssetsRow(context, "Top Paid Packages")
+                            _buildTopAssetsRow(context, "Top Paid Packages"),
+                            _buildFooter(context)
                         }
                     )
                 )
@@ -404,14 +531,13 @@ namespace UIWidgets.Tests {
 
         public override Widget build(BuildContext context) {
             var container = new Container(
-                color: CLColors.white,
+                color: CLColors.background3,
                 child: new Container(
-                    color: CLColors.white,
+                    color: CLColors.background3,
                     child: new Column(
                         children: new List<Widget> {
                             this._buildHeader(context),
-                            this._buildBanner(context),
-                            this._buildContentList(context)
+                            this._buildContentList(context),
                         }
                     )
                 )
@@ -447,9 +573,9 @@ namespace UIWidgets.Tests {
         public override Widget build(BuildContext context) {
             var card = new Container(
                 margin: EdgeInsets.only(right: 45),
-                color: CLColors.background1,
+                color: CLColors.white,
                 child: new Container(
-                    color: CLColors.background1,
+                    color: CLColors.white,
                     child: new Column(
                         children: new List<Widget> {
                             new Container(
@@ -463,8 +589,90 @@ namespace UIWidgets.Tests {
                             new Container(
                                 width: 200,
                                 height: 86,
-                                padding: EdgeInsets.fromLTRB(14, 10, 14, 8),
-                                color: Color.fromARGB(255, 255, 0, 0)
+                                padding: EdgeInsets.fromLTRB(14, 12, 14, 8),
+                                child: new Column(
+                                    crossAxisAlignment: CrossAxisAlignment.baseline,
+                                    children: new List<Widget> {
+                                        new Container(
+                                            height: 18,
+                                            padding: EdgeInsets.only(top: 3),
+                                            child:
+                                            new Text(
+                                                category,
+                                                style: new TextStyle(
+                                                    fontSize: 11,
+                                                    color: CLColors.text5
+                                                )
+                                            )
+                                        ),
+                                        new Container(
+                                            height: 20,
+                                            padding: EdgeInsets.only(top: 2),
+                                            child:
+                                            new Text(
+                                                name,
+                                                style: new TextStyle(
+                                                    fontSize: 14,
+                                                    color: CLColors.text6
+                                                )
+                                            )
+                                        ),
+                                        new Container(
+                                            height: 22,
+                                            padding: EdgeInsets.only(top: 4),
+                                            child: new Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: new List<Widget> {
+                                                    new Container(
+                                                        child: new Row(
+                                                            children: new List<Widget> {
+                                                                new Container(
+                                                                    margin: EdgeInsets.only(right: 10),
+                                                                    child: new Text(
+                                                                        "$" + this.price,
+                                                                        style: new TextStyle(
+                                                                            fontSize: 14,
+                                                                            color: CLColors.text7,
+                                                                            decoration: TextDecoration.lineThrough
+                                                                        )
+                                                                    )
+                                                                ),
+                                                                new Container(
+                                                                    child: new Text(
+                                                                        "$" + this.priceDiscount,
+                                                                        style: new TextStyle(
+                                                                            fontSize: 14,
+                                                                            color: CLColors.text8
+                                                                        )
+                                                                    )
+                                                                )
+                                                            })
+                                                    ),
+                                                    showBadge
+                                                        ? new Container(
+                                                            width: 80,
+                                                            height: 18,
+                                                            color: CLColors.black,
+                                                            child: new Row(
+                                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                                crossAxisAlignment: CrossAxisAlignment.center,
+                                                                children: new List<Widget> {
+                                                                    new Text(
+                                                                        "Plus/Pro",
+                                                                        style: new TextStyle(
+                                                                            fontSize: 11,
+                                                                            color: CLColors.white
+                                                                        )
+                                                                    )
+                                                                }
+                                                            )
+                                                        )
+                                                        : new Container()
+                                                }
+                                            )
+                                        )
+                                    }
+                                )
                             )
                         }
                     )
@@ -492,7 +700,7 @@ namespace UIWidgets.Tests {
         Widget _buildHeader(BuildContext context) {
             return new Container(
                 padding: EdgeInsets.only(left: 16.0, right: 8.0),
-              //  color: CLColors.blue,
+                //  color: CLColors.blue,
                 height: headerHeight - _offsetY,
                 child: new Row(
                     children: new List<Widget> {
@@ -533,7 +741,8 @@ namespace UIWidgets.Tests {
                 if (pixels <= headerHeight) {
                     setState(() => { _offsetY = pixels / 2.0; });
                 }
-            } else {
+            }
+            else {
                 if (_offsetY != 0.0) {
                     setState(() => { _offsetY = 0.0; });
                 }
@@ -551,7 +760,7 @@ namespace UIWidgets.Tests {
                 },
                 child: new Flexible(
                     child: new Container(
-                      //  color: CLColors.green,
+                        //  color: CLColors.green,
                         child: ListView.builder(
                             itemCount: 20,
                             itemExtent: 100,
@@ -570,9 +779,9 @@ namespace UIWidgets.Tests {
 
         public override Widget build(BuildContext context) {
             var container = new Container(
-              //  color: CLColors.background1,
+                //  color: CLColors.background1,
                 child: new Container(
-                  //  color: CLColors.background1,
+                    //  color: CLColors.background1,
                     child: new Column(
                         children: new List<Widget> {
                             this._buildHeader(context),
@@ -627,12 +836,20 @@ namespace UIWidgets.Tests {
         public static readonly Color secondary2 = new Color(0xFFF0513C);
         public static readonly Color background1 = new Color(0xFF292929);
         public static readonly Color background2 = new Color(0xFF383838);
+        public static readonly Color background3 = new Color(0xFFF5F5F5);
+        public static readonly Color background4 = new Color(0xFF00BCD4);
         public static readonly Color icon1 = new Color(0xFFFFFFFF);
         public static readonly Color icon2 = new Color(0xFFA4A4A4);
         public static readonly Color text1 = new Color(0xFFFFFFFF);
         public static readonly Color text2 = new Color(0xFFD8D8D8);
         public static readonly Color text3 = new Color(0xFF959595);
         public static readonly Color text4 = new Color(0xFF002835);
+        public static readonly Color text5 = new Color(0xFF9E9E9E);
+        public static readonly Color text6 = new Color(0xFF002835);
+        public static readonly Color text7 = new Color(0xFF5A5A5B);
+        public static readonly Color text8 = new Color(0xFF239988);
+        public static readonly Color text9 = new Color(0xFFB3B5B6);
+        public static readonly Color text10 = new Color(0xFF00BCD4);
         public static readonly Color dividingLine1 = new Color(0xFF666666);
         public static readonly Color dividingLine2 = new Color(0xFF404040);
 
