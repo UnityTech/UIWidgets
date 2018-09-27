@@ -179,7 +179,6 @@ namespace UIWidgets.rendering {
         bool _hasVisualOverflow = false;
 
         public override void setupParentData(RenderObject child) {
-            Debug.Log(child);
             if (!(child.parentData is StackParentData)) {
                 child.parentData = new StackParentData();
             }
