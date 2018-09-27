@@ -322,8 +322,8 @@ namespace UIWidgets.ui {
                 cameraMat = Camera.current.worldToCameraMatrix;
                 Camera.current.worldToCameraMatrix = Matrix4x4.identity;
             }
-            
-            Graphics.DrawMeshNow(mesh, Matrix4x4.identity);
+
+            Graphics.DrawMeshNow(mesh, this._transform);
             if (Camera.current != null)
             {
                 Camera.current.worldToCameraMatrix = cameraMat;

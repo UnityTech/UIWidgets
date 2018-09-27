@@ -239,7 +239,7 @@ namespace UIWidgets.ui {
         }
 
         public static Offset operator -(Size a, Size b) {
-            return new Offset(a.width - b.width, a.height - b.width);
+            return new Offset(a.width - b.width, a.height - b.height);
         }
 
         public static Size operator *(Size a, double operand) {

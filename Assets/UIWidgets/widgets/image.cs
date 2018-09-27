@@ -17,8 +17,8 @@ namespace UIWidgets.widgets {
 
     public class Image : StatefulWidget {
         public ImageProvider image;
-        public double width;
-        public double height;
+        public double? width;
+        public double? height;
         public Color color;
         public BoxFit fit;
         public Alignment alignment;
@@ -31,13 +31,13 @@ namespace UIWidgets.widgets {
         public Image(
             Key key,
             ImageProvider image,
-            double width,
-            double height,
             Color color,
             BlendMode colorBlendMode,
             BoxFit fit,
             ui.Rect centerSlice,
             Alignment alignment,
+            double? width = null,
+            double? height = null,
             ImageRepeat repeat = ImageRepeat.noRepeat,
             bool gaplessPlayback = false
         ) : base(key) {
@@ -56,8 +56,8 @@ namespace UIWidgets.widgets {
         public static Image network(
             string src,
             Key key = null,
-            double width = 0.0,
-            double height = 0.0,
+            double? width = null,
+            double? height = null,
             Color color = null,
             BlendMode colorBlendMode = BlendMode.None,
             BoxFit fit = BoxFit.none,
@@ -72,13 +72,13 @@ namespace UIWidgets.widgets {
             return new Image(
                 key,
                 networkImage,
-                width,
-                height,
                 color,
                 colorBlendMode,
                 fit,
                 centerSlice,
                 alignment,
+                width,
+                height,
                 repeat,
                 gaplessPlayback
             );
@@ -87,8 +87,8 @@ namespace UIWidgets.widgets {
         public static Image file(
             string path,
             Key key = null,
-            double width = 0.0,
-            double height = 0.0,
+            double? width = null,
+            double? height = null,
             Color color = null,
             BlendMode colorBlendMode = BlendMode.None,
             BoxFit fit = BoxFit.none,
@@ -102,13 +102,13 @@ namespace UIWidgets.widgets {
             return new Image(
                 key,
                 fileImage,
-                width,
-                height,
                 color,
                 colorBlendMode,
                 fit,
                 centerSlice,
                 alignment,
+                width,
+                height,
                 repeat,
                 gaplessPlayback
             );
@@ -146,7 +146,9 @@ namespace UIWidgets.widgets {
             ImageStream newStream =
                 imageWidget.image.resolve(ImageUtil.createLocalImageConfiguration(
                     context,
-                    size: new Size(imageWidget.width, imageWidget.height)
+                    size: imageWidget.width != null && imageWidget.height != null
+                        ? new Size(imageWidget.width.Value, imageWidget.height.Value)
+                        : null
                 ));
             _updateSourceStream(newStream);
         }
@@ -188,15 +190,15 @@ namespace UIWidgets.widgets {
         public override Widget build(BuildContext context) {
             var imageWidget = (Image) widget;
             RawImage image = new RawImage(
-                null, 
+                null,
                 _imageInfo == null ? null : _imageInfo.image,
-                imageWidget.width,
-                imageWidget.height,
                 _imageInfo == null ? 1.0 : _imageInfo.scale,
                 imageWidget.color,
                 imageWidget.colorBlendMode,
                 imageWidget.fit,
                 imageWidget.centerSlice,
+                imageWidget.width,
+                imageWidget.height,
                 imageWidget.alignment,
                 imageWidget.repeat
             );
