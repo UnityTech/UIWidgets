@@ -249,9 +249,9 @@ namespace UIWidgets.Tests {
                             )
                         ),
                         new CustomButton(
-                            padding: EdgeInsets.only(4.0, 0.0, 16.0, 0.0),
+                            padding: EdgeInsets.only(0.0, 0.0, 16.0, 0.0),
                             child: new Icon(
-                                Icons.notifications,
+                                Icons.keyboard_arrow_down,
                                 size: 18.0,
                                 color: CLColors.icon2
                             )
@@ -277,12 +277,26 @@ namespace UIWidgets.Tests {
                                 cursorColor: Color.fromARGB(255, 0, 0, 0)
                             )
                         ),
-                        new CustomButton(
-                            backgroundColor: CLColors.background4,
-                            child: new Icon(
-                                Icons.notifications,
-                                size: 18.0,
-                                color: CLColors.white
+                        new Container(
+                            decoration: new BoxDecoration(
+                                color: CLColors.background4,
+                                borderRadius: BorderRadius.all(2)
+                            ),
+                            width: 36,
+                            height: 36,
+                            child: new Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: new List<Widget> {
+                                    new CustomButton(
+                                        padding: EdgeInsets.only(-8.0, 0.0, 8.0, 0.0),
+                                        child: new Icon(
+                                            Icons.search,
+                                            size: 18.0,
+                                            color: CLColors.white
+                                        )
+                                    )
+                                }
                             )
                         ),
                         new Container(
@@ -393,15 +407,13 @@ namespace UIWidgets.Tests {
         }
 
         Widget _buildBanner(BuildContext context) {
-            return new Container(child:
-                new Container(
+            return new Container(
                     height: 450,
                     color: CLColors.white,
                     child: widgets.Image.network(
                         "https://d2ujflorbtfzji.cloudfront.net/banner/38942865-28db-482b-80c5-17809473f3c6.jpg",
                         fit: BoxFit.cover
                     )
-                )
             );
         }
 
@@ -786,6 +798,8 @@ namespace UIWidgets.Tests {
     public static class Icons {
         public static readonly IconData notifications = new IconData(0xe7f4, fontFamily: "MaterialIcons");
         public static readonly IconData account_circle = new IconData(0xe853, fontFamily: "MaterialIcons");
+        public static readonly IconData search = new IconData(0xe8b6, fontFamily: "MaterialIcons");
+        public static readonly IconData keyboard_arrow_down = new IconData(0xe313, fontFamily: "MaterialIcons");
     }
 
     public static class CLColors {
