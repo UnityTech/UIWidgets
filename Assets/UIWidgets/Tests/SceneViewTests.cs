@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Reflection;
 using UIWidgets.editor;
 using UIWidgets.painting;
 using UIWidgets.rendering;
@@ -11,6 +12,7 @@ using Color = UIWidgets.ui.Color;
 namespace UIWidgets.Tests {
     public class SceneViewTests {
         public static void show() {
+            onPreSceneGUIDelegate += OnPreSceneGUI;
             SceneView.onSceneGUIDelegate += OnSceneGUI;
             EditorApplication.update += Update;
             
@@ -27,9 +29,26 @@ namespace UIWidgets.Tests {
         }
 
         public static void hide() {
+            onPreSceneGUIDelegate -= OnPreSceneGUI;
             SceneView.onSceneGUIDelegate -= OnSceneGUI;
             EditorApplication.update -= Update;
             SceneView.RepaintAll();
+        }
+
+        public static SceneView.OnSceneFunc onPreSceneGUIDelegate {
+            get {
+                var field = typeof(SceneView).GetField("onPreSceneGUIDelegate",
+                    BindingFlags.Static | BindingFlags.NonPublic);
+
+                return (SceneView.OnSceneFunc) field.GetValue(null);
+            }
+
+            set {
+                var field = typeof(SceneView).GetField("onPreSceneGUIDelegate",
+                    BindingFlags.Static | BindingFlags.NonPublic);
+
+                field.SetValue(null, value);
+            }
         }
 
         private static Func<Widget>[] _options;
@@ -40,8 +59,14 @@ namespace UIWidgets.Tests {
         
         [NonSerialized] private static bool hasInvoked = false;
 
+        private static EventType _lastEventType; 
+        
+        private static void OnPreSceneGUI(SceneView sceneView) {
+            _lastEventType = Event.current.rawType;
+        }
+        
         private static void OnSceneGUI(SceneView sceneView) {
-            HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Passive));
+            //HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Passive));
             Handles.BeginGUI();
             
             if (windowAdapter == null) {
@@ -59,7 +84,13 @@ namespace UIWidgets.Tests {
                 windowAdapter.attachRootWidget(widget);
             }
 
-            windowAdapter.OnGUI();
+            if (Event.current.type == EventType.Used) {
+                Event.current.type = SceneViewTests._lastEventType;
+                windowAdapter.OnGUI();
+                Event.current.type = EventType.Used;
+            } else {
+                windowAdapter.OnGUI();
+            }
 
             Handles.EndGUI();
         }

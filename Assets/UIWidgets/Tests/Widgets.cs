@@ -206,7 +206,7 @@ namespace UIWidgets.Tests {
         Widget _buildHeader(BuildContext context) {
             return new Container(
                 padding: EdgeInsets.only(left: 16.0, right: 8.0),
-                color: CLColors.blue,
+              //  color: CLColors.blue,
                 height: headerHeight - _offsetY,
                 child: new Row(
                     children: new List<Widget> {
@@ -265,7 +265,7 @@ namespace UIWidgets.Tests {
                 },
                 child: new Flexible(
                     child: new Container(
-                        color: CLColors.green,
+                      //  color: CLColors.green,
                         child: ListView.builder(
                             itemCount: 20,
                             itemExtent: 100,
@@ -284,9 +284,9 @@ namespace UIWidgets.Tests {
 
         public override Widget build(BuildContext context) {
             var container = new Container(
-                color: CLColors.background1,
+              //  color: CLColors.background1,
                 child: new Container(
-                    color: CLColors.background1,
+                  //  color: CLColors.background1,
                     child: new Column(
                         children: new List<Widget> {
                             this._buildHeader(context),
