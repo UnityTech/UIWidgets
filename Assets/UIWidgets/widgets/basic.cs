@@ -5,7 +5,6 @@ using UIWidgets.painting;
 using UIWidgets.rendering;
 using UIWidgets.ui;
 using UnityEngine;
-using UnityEngine.Experimental.UIElements.StyleEnums;
 using Color = UIWidgets.ui.Color;
 using Overflow = UIWidgets.rendering.Overflow;
 using Rect = UIWidgets.ui.Rect;

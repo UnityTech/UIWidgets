@@ -330,8 +330,7 @@ namespace UIWidgets.rendering {
                 size = new Size(width, height);
                 D.assert(size.width == constraints.constrainWidth(width));
                 D.assert(size.height == constraints.constrainHeight(height));
-            }
-            else {
+            } else {
                 size = constraints.biggest;
             }
 
@@ -341,8 +340,7 @@ namespace UIWidgets.rendering {
 
                 if (!childParentData.isPositioned) {
                     childParentData.offset = _resolvedAlignment.alongOffset(size - child.size);
-                }
-                else {
+                } else {
                     BoxConstraints childConstraints = new BoxConstraints();
 
                     if (childParentData.left != null && childParentData.right != null)
