@@ -191,7 +191,16 @@ namespace UIWidgets.ui {
 
         public void drawImageRect(Rect src, Rect dst, Paint paint, Image image) {
             if (image != null && image.texture != null) {
-                Graphics.DrawTexture(dst.toRect(), image.texture);
+                // convert src rect to Unity rect in normalized coordinates with (0,0) in the bottom-left corner.
+                var textureHeight = image.texture.height;
+                var textureWidth = image.texture.width;
+                var srcRect = new UnityEngine.Rect(
+                    (float) (src.left / textureWidth), 
+                    (float) ((textureHeight - src.bottom) / textureHeight),
+                    (float) (src.width / textureWidth), 
+                    (float) (src.height / textureHeight)
+                );
+                Graphics.DrawTexture(dst.toRect(), image.texture, srcRect, 0, 0 ,0 ,0);
             }
         }
 
