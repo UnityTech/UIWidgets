@@ -286,7 +286,7 @@ namespace UIWidgets.Tests {
                             )
                         ),
                         new Container(
-                            margin: EdgeInsets.only(right: 10),
+                            margin: EdgeInsets.only(left: 16, right: 16),
                             child: new Text(
                                 "Learn Game Development",
                                 style: new TextStyle(
@@ -300,7 +300,7 @@ namespace UIWidgets.Tests {
                                 border: Border.all(
                                     color: CLColors.white)
                             ),
-                            margin: EdgeInsets.only(right: 10),
+                            margin: EdgeInsets.only(right: 16),
                             padding: EdgeInsets.all(4),
                             child: new Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -317,7 +317,7 @@ namespace UIWidgets.Tests {
                             )
                         ),
                         new Container(
-                            margin: EdgeInsets.only(right: 10),
+                            margin: EdgeInsets.only(right: 16),
                             child: new Text(
                                 "Impressive New Assets",
                                 style: new TextStyle(
