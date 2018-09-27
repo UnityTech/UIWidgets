@@ -9,9 +9,7 @@ using System;
 using System.Linq;
 using UIWidgets.foundation;
 using UIWidgets.gestures;
-using UIWidgets.ui;
 using Color = UIWidgets.ui.Color;
-using Image = UIWidgets.ui.Image;
 using TextStyle = UIWidgets.painting.TextStyle;
 
 namespace UIWidgets.Tests {
@@ -38,6 +36,7 @@ namespace UIWidgets.Tests {
                 this.flexColumn,
                 this.containerSimple,
                 this.eventsPage,
+                this.asPage,
                 this.stack
             };
             this._optionStrings = this._options.Select(x => x.Method.Name).ToArray();
@@ -212,6 +211,267 @@ namespace UIWidgets.Tests {
         Widget eventsPage() {
             return new EventsWaterfallScreen();
         }
+
+        Widget asPage() {
+            return new AsScreen();
+        }
+    }
+
+
+    public class AsScreen : StatefulWidget {
+        public AsScreen(Key key = null) : base(key) {
+        }
+
+        public override State createState() {
+            return new _AsScreenState();
+        }
+    }
+
+    class _AsScreenState : State<AsScreen> {
+        const double headerHeight = 50.0;
+
+        Widget _buildHeader(BuildContext context) {
+            return new Container(
+                padding: EdgeInsets.only(left: 16.0, right: 8.0),
+                height: headerHeight,
+                color: CLColors.header,
+                child: new Row(
+                    children: new List<Widget> {
+                        new Flexible(
+                            flex: 1,
+                            fit: FlexFit.tight,
+                            child: new Text(
+                                "所有资源",
+                                style: new TextStyle(
+                                    fontSize: 16,
+                                    color: CLColors.white
+                                )
+                            )),
+                        new CustomButton(
+                            padding: EdgeInsets.only(8.0, 0.0, 8.0, 0.0),
+                            child: new Icon(
+                                Icons.notifications,
+                                size: 18.0,
+                                color: CLColors.icon2
+                            )
+                        ),
+                        new CustomButton(
+                            padding: EdgeInsets.only(8.0, 0.0, 16.0, 0.0),
+                            child: new Icon(
+                                Icons.account_circle,
+                                size: 18.0,
+                                color: CLColors.icon2
+                            )
+                        )
+                    }
+                )
+            );
+        }
+
+        Widget _buildBanner(BuildContext context) {
+            return new Container(
+                height: 300,
+                child: new Stack(
+                    fit: StackFit.expand,
+                    children: new List<Widget> {
+                        widgets.Image.file(
+                            "/Users/gewentao/Desktop/uiwidgets_banner.jpg",
+                            fit: BoxFit.fitHeight
+                        ),
+                    }
+                )
+            );
+        }
+
+        Widget _buildTopAssetsRow(BuildContext context, string title) {
+            return new Container(margin: EdgeInsets.only(left: 98, right: 98), child: new Column(
+                children: new List<Widget> {
+                    new Container(
+                        height: 98,
+//                        color: Color.fromARGB(255, 0, 255, 0),
+                        child: new Row(
+                            children: new List<Widget> {
+                                new Flexible(
+                                    flex: 1,
+                                    fit: FlexFit.tight,
+                                    child: new Text(
+                                        title,
+                                        style: new TextStyle(
+                                            fontSize: 24,
+                                            color: CLColors.blue
+//                                            color: CLColors.black
+                                        )
+                                    )),
+                                new Flexible(
+                                    flex: 1,
+                                    fit: FlexFit.tight,
+                                    child: new Text(
+                                        "See More",
+                                        style: new TextStyle(
+                                            fontSize: 16,
+                                            color: CLColors.text4
+                                        )
+                                    ))
+                            })
+                    ),
+                    new Row(
+                        children: new List<Widget> {
+                            new AssetCard(
+                                "AI Template",
+                                "INVECTOR",
+                                45.0,
+                                36.0,
+                                true,
+                                "https://d2ujflorbtfzji.cloudfront.net/key-image/46dc65c1-f605-4ccb-97e0-3d60b28cfdfe.jpg"
+                            ),
+                            new AssetCard(
+                                "AI Template",
+                                "INVECTOR",
+                                45.0,
+                                36.0,
+                                true,
+                                "https://d2ujflorbtfzji.cloudfront.net/key-image/46dc65c1-f605-4ccb-97e0-3d60b28cfdfe.jpg"
+                            ),
+                            new AssetCard(
+                                "AI Template",
+                                "INVECTOR",
+                                45.0,
+                                36.0,
+                                true,
+                                "https://d2ujflorbtfzji.cloudfront.net/key-image/46dc65c1-f605-4ccb-97e0-3d60b28cfdfe.jpg"
+                            ),
+                            new AssetCard(
+                                "AI Template",
+                                "INVECTOR",
+                                45.0,
+                                36.0,
+                                true,
+                                "https://d2ujflorbtfzji.cloudfront.net/key-image/46dc65c1-f605-4ccb-97e0-3d60b28cfdfe.jpg"
+                            ),
+                            new AssetCard(
+                                "AI Template",
+                                "INVECTOR",
+                                45.0,
+                                36.0,
+                                true,
+                                "https://d2ujflorbtfzji.cloudfront.net/key-image/46dc65c1-f605-4ccb-97e0-3d60b28cfdfe.jpg"
+                            ),
+                            new AssetCard(
+                                "AI Template",
+                                "INVECTOR",
+                                45.0,
+                                36.0,
+                                true,
+                                "https://d2ujflorbtfzji.cloudfront.net/key-image/46dc65c1-f605-4ccb-97e0-3d60b28cfdfe.jpg"
+                            ),
+                            new AssetCard(
+                                "AI Template",
+                                "INVECTOR",
+                                45.0,
+                                36.0,
+                                true,
+                                "https://d2ujflorbtfzji.cloudfront.net/key-image/46dc65c1-f605-4ccb-97e0-3d60b28cfdfe.jpg"
+                            )
+                        }
+                    )
+                }
+            ));
+        }
+
+        bool _onNotification(ScrollNotification notification, BuildContext context) {
+            return true;
+        }
+
+        Widget _buildContentList(BuildContext context) {
+            return new NotificationListener<ScrollNotification>(
+                onNotification: (ScrollNotification notification) => {
+                    _onNotification(notification, context);
+                    return true;
+                },
+                child: new Flexible(
+                    child: new ListView(
+                        physics: new AlwaysScrollableScrollPhysics(),
+                        children: new List<Widget> {
+                            _buildTopAssetsRow(context, "Recommanded For You"),
+                            _buildTopAssetsRow(context, "Beach Day"),
+                            _buildTopAssetsRow(context, "Top Free Packages"),
+                            _buildTopAssetsRow(context, "Top Paid Packages")
+                        }
+                    )
+                )
+            );
+        }
+
+        public override Widget build(BuildContext context) {
+            var container = new Container(
+                color: CLColors.white,
+                child: new Container(
+                    color: CLColors.white,
+                    child: new Column(
+                        children: new List<Widget> {
+                            this._buildHeader(context),
+                            this._buildBanner(context),
+                            this._buildContentList(context)
+                        }
+                    )
+                )
+            );
+            return container;
+        }
+    }
+
+    public class AssetCard : StatelessWidget {
+        public AssetCard(
+            string name,
+            string category,
+            double price,
+            double priceDiscount,
+            bool showBadge,
+            string imageSrc
+        ) {
+            this.name = name;
+            this.category = category;
+            this.price = price;
+            this.priceDiscount = priceDiscount;
+            this.showBadge = showBadge;
+            this.imageSrc = imageSrc;
+        }
+
+        public string name;
+        public string category;
+        public double price;
+        public double priceDiscount;
+        public bool showBadge;
+        public string imageSrc;
+
+        public override Widget build(BuildContext context) {
+            var card = new Container(
+                margin: EdgeInsets.only(right: 45),
+                color: CLColors.background1,
+                child: new Container(
+                    color: CLColors.background1,
+                    child: new Column(
+                        children: new List<Widget> {
+                            new Container(
+                                width: 200,
+                                height: 124,
+                                child: widgets.Image.network(
+                                    this.imageSrc,
+                                    fit: BoxFit.fill
+                                )
+                            ),
+                            new Container(
+                                width: 200,
+                                height: 86,
+                                padding: EdgeInsets.fromLTRB(14, 10, 14, 8),
+                                color: Color.fromARGB(255, 255, 0, 0)
+                            )
+                        }
+                    )
+                )
+            );
+            return card;
+        }
     }
 
     public class EventsWaterfallScreen : StatefulWidget {
@@ -368,6 +628,7 @@ namespace UIWidgets.Tests {
         public static readonly Color text1 = new Color(0xFFFFFFFF);
         public static readonly Color text2 = new Color(0xFFD8D8D8);
         public static readonly Color text3 = new Color(0xFF959595);
+        public static readonly Color text4 = new Color(0xFF002835);
         public static readonly Color dividingLine1 = new Color(0xFF666666);
         public static readonly Color dividingLine2 = new Color(0xFF404040);
 
@@ -377,5 +638,7 @@ namespace UIWidgets.Tests {
         public static readonly Color red = new Color(0xFFFF0000);
         public static readonly Color green = new Color(0xFF00FF00);
         public static readonly Color blue = new Color(0xFF0000FF);
+
+        public static readonly Color header = new Color(0xFF060B0C);
     }
 }

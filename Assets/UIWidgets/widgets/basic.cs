@@ -128,9 +128,11 @@ namespace UIWidgets.widgets {
             string type;
             if (this.width == double.PositiveInfinity && this.height == double.PositiveInfinity) {
                 type = this.GetType() + "expand";
-            } else if (this.width == 0.0 && this.height == 0.0) {
+            }
+            else if (this.width == 0.0 && this.height == 0.0) {
                 type = this.GetType() + "shrink";
-            } else {
+            }
+            else {
                 type = this.GetType() + "";
             }
 
@@ -275,7 +277,7 @@ namespace UIWidgets.widgets {
         }
 
         public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
-            ((RenderAspectRatio)renderObject).aspectRatio = aspectRatio;
+            ((RenderAspectRatio) renderObject).aspectRatio = aspectRatio;
         }
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
@@ -303,8 +305,8 @@ namespace UIWidgets.widgets {
         public TextDirection? textDirection;
         public StackFit fit;
         public rendering.Overflow overflow;
-        
-        
+
+
         public override RenderObject createRenderObject(BuildContext context) {
             return new RenderStack(
                 textDirection: textDirection ?? Directionality.of(context),
@@ -313,7 +315,7 @@ namespace UIWidgets.widgets {
                 overflow: overflow
             );
         }
-        
+
         public override void updateRenderObject(BuildContext context, RenderObject renderObjectRaw) {
             var renderObject = (RenderStack) renderObjectRaw;
             renderObject.alignment = this.alignment;
@@ -321,7 +323,7 @@ namespace UIWidgets.widgets {
             renderObject.fit = this.fit;
             renderObject.overflow = this.overflow;
         }
-        
+
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             properties.add(new DiagnosticsProperty<AlignmentDirectional>("alignment", alignment));
@@ -714,9 +716,19 @@ namespace UIWidgets.widgets {
     }
 
     public class RawImage : LeafRenderObjectWidget {
-        public RawImage(Key key, ui.Image image, double width, double height, double scale, Color color,
-            BlendMode colorBlendMode, BoxFit fit, Rect centerSlice, Alignment alignment = null,
-            ImageRepeat repeat = ImageRepeat.noRepeat) : base(key) {
+        public RawImage(
+            Key key,
+            ui.Image image,
+            double scale,
+            Color color,
+            BlendMode colorBlendMode,
+            BoxFit fit,
+            Rect centerSlice,
+            double? width = null,
+            double? height = null,
+            Alignment alignment = null,
+            ImageRepeat repeat = ImageRepeat.noRepeat
+        ) : base(key) {
             this.image = image;
             this.width = width;
             this.height = height;
@@ -732,13 +744,13 @@ namespace UIWidgets.widgets {
         public override RenderObject createRenderObject(BuildContext context) {
             return new RenderImage(
                 this.image,
-                this.width,
-                this.height,
                 this.color,
                 this.blendMode,
                 this.fit,
                 this.repeat,
                 this.centerSlice,
+                this.width,
+                this.height,
                 this.alignment
             );
         }
@@ -755,8 +767,8 @@ namespace UIWidgets.widgets {
         }
 
         public ui.Image image;
-        public double width;
-        public double height;
+        public double? width;
+        public double? height;
         public double scale;
         public Color color;
         public BlendMode blendMode;
