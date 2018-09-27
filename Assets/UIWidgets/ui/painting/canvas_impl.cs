@@ -320,13 +320,14 @@ namespace UIWidgets.ui {
             if (Camera.current != null)  // draw mesh will use camera matrix, set to identity before draw mesh
             {
                 cameraMat = Camera.current.worldToCameraMatrix;
-                Camera.current.worldToCameraMatrix = Matrix4x4.identity;;
+                Camera.current.worldToCameraMatrix = Matrix4x4.identity;
             }
             
             Graphics.DrawMeshNow(mesh, Matrix4x4.identity);
             if (Camera.current != null)
             {
                 Camera.current.worldToCameraMatrix = cameraMat;
+                Camera.current.ResetWorldToCameraMatrix();
             }
         }
 
