@@ -24,7 +24,7 @@ namespace UIWidgets.widgets {
             get { return this._buildOwner; }
         }
 
-        private readonly BuildOwner _buildOwner = new BuildOwner();
+        readonly BuildOwner _buildOwner = new BuildOwner();
 
         public FocusManager focusManager {
             get { return this._buildOwner.focusManager; }

@@ -492,6 +492,7 @@ namespace UIWidgets.Tests {
         Widget _buildHeader(BuildContext context) {
             return new Container(
                 padding: EdgeInsets.only(left: 16.0, right: 8.0),
+              //  color: CLColors.blue,
                 height: headerHeight - _offsetY,
                 child: new Row(
                     children: new List<Widget> {
@@ -532,8 +533,7 @@ namespace UIWidgets.Tests {
                 if (pixels <= headerHeight) {
                     setState(() => { _offsetY = pixels / 2.0; });
                 }
-            }
-            else {
+            } else {
                 if (_offsetY != 0.0) {
                     setState(() => { _offsetY = 0.0; });
                 }
@@ -550,15 +550,19 @@ namespace UIWidgets.Tests {
                     return true;
                 },
                 child: new Flexible(
-                    child: ListView.builder(
-                        itemCount: 20,
-                        itemExtent: 100,
-                        physics: new AlwaysScrollableScrollPhysics(),
-                        itemBuilder: (BuildContext context1, int index) => {
-                            return new Container(
-                                color: Color.fromARGB(255, (index * 10) % 256, (index * 10) % 256, (index * 10) % 256)
-                            );
-                        }
+                    child: new Container(
+                      //  color: CLColors.green,
+                        child: ListView.builder(
+                            itemCount: 20,
+                            itemExtent: 100,
+                            physics: new AlwaysScrollableScrollPhysics(),
+                            itemBuilder: (BuildContext context1, int index) => {
+                                return new Container(
+                                    color: Color.fromARGB(255, (index * 10) % 256, (index * 20) % 256,
+                                        (index * 30) % 256)
+                                );
+                            }
+                        )
                     )
                 )
             );
@@ -566,9 +570,9 @@ namespace UIWidgets.Tests {
 
         public override Widget build(BuildContext context) {
             var container = new Container(
-                color: CLColors.background1,
+              //  color: CLColors.background1,
                 child: new Container(
-                    color: CLColors.background1,
+                  //  color: CLColors.background1,
                     child: new Column(
                         children: new List<Widget> {
                             this._buildHeader(context),

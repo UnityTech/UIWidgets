@@ -14,9 +14,9 @@ using Rect = UnityEngine.Rect;
 namespace UIWidgets.editor {
     public class WindowAdapter : Window {
         public WindowAdapter(EditorWindow editorWindow) {
-            this._editorWindow = editorWindow;
-            this._editorWindow.wantsMouseMove = false;
-            this._editorWindow.wantsMouseEnterLeaveWindow = false;
+            this.editorWindow = editorWindow;
+            this.editorWindow.wantsMouseMove = false;
+            this.editorWindow.wantsMouseEnterLeaveWindow = false;
 
             this._devicePixelRatio = EditorGUIUtility.pixelsPerPoint;
 
@@ -35,7 +35,7 @@ namespace UIWidgets.editor {
             }
         }
 
-        readonly EditorWindow _editorWindow;
+        public readonly EditorWindow editorWindow;
 
         readonly WidgetsBinding _binding;
 
@@ -143,13 +143,13 @@ namespace UIWidgets.editor {
                 dirty = true;
             }
 
-            if (this._lastPosition != this._editorWindow.position) {
+            if (this._lastPosition != this.editorWindow.position) {
                 dirty = true;
             }
 
             if (dirty) {
                 this._devicePixelRatio = EditorGUIUtility.pixelsPerPoint;
-                this._lastPosition = this._editorWindow.position;
+                this._lastPosition = this.editorWindow.position;
                 this._physicalSize = new Size(
                     this._lastPosition.width * EditorGUIUtility.pixelsPerPoint,
                     this._lastPosition.height * EditorGUIUtility.pixelsPerPoint);
@@ -161,8 +161,8 @@ namespace UIWidgets.editor {
         }
 
         public override void scheduleFrame() {
-            if (this._editorWindow != null) {
-                this._editorWindow.Repaint();
+            if (this.editorWindow != null) {
+                this.editorWindow.Repaint();
             }
         }
 

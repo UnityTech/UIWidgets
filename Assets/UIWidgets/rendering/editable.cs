@@ -400,7 +400,37 @@ namespace UIWidgets.rendering
             var caretOffset = _textPainter.getOffsetForCaret(caretPosition, _caretPrototype);
             return Rect.fromLTWH(0.0, 0.0, _kCaretWidth, preferredLineHeight).shift(caretOffset + _paintOffset);
         }
+
+        public TextPosition getPositionDown(TextPosition position)
+        {
+            return _textPainter.getPositionVerticalMove(position, 1);
+        }
         
+        public TextPosition getPositionUp(TextPosition position)
+        {
+            return _textPainter.getPositionVerticalMove(position, -1);
+        }
+        
+        public TextPosition getLineStartPosition(TextPosition position)
+        {
+            return _textPainter.getLineStartPosition(_textPainter.getLineIndex(position));
+        }
+        
+        public TextPosition getLineEndPosition(TextPosition position)
+        {
+            return _textPainter.getLineEndPosition(_textPainter.getLineIndex(position));
+        }
+        
+        public TextPosition getWordRight(TextPosition position)
+        {
+            return _textPainter.getWordRight(position);
+        } 
+        
+        public TextPosition getWordLeft(TextPosition position)
+        {
+            return _textPainter.getWordLeft(position);
+        } 
+
         protected override double computeMinIntrinsicWidth(double height) {
             _layoutText(double.PositiveInfinity);
             return _textPainter.minIntrinsicWidth;

@@ -8,10 +8,7 @@ namespace UIWidgets.ui
 {
     public enum FontStyle
     {
-        /// Use the upright glyphs
         normal,
-
-        /// Use glyphs designed for slanting
         italic,
     }
 
@@ -23,19 +20,9 @@ namespace UIWidgets.ui
 
     public enum TextAlign
     {
-        /// Align the text on the left edge of the container.
         left,
-
-        /// Align the text on the right edge of the container.
         right,
-
-        /// Align the text in the center of the container.
         center,
-
-        /// Stretch lines of text that end with a soft line break to fill the width of
-        /// the container.
-        ///
-        /// Lines that end with hard line breaks are aligned towards the [start] edge.
         justify,
     }
 

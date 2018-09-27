@@ -14,7 +14,9 @@ namespace UIWidgets.ui
         
         public Font getOrCreate(string[] names, int fontSize)
         {
+            _fonts = _fonts.FindAll((font) => font != null); // filter out destoryed fonts
             var founded = _fonts.Find((font) =>
+                
                 (
                 font.fontSize == fontSize &&
                     (names == font.fontNames || (names != null && names.SequenceEqual(font.fontNames)))));

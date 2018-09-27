@@ -380,7 +380,7 @@ namespace UIWidgets.widgets {
         }
     }
 
-    public class Flexible : ParentDataWidget {
+    public class Flexible : ParentDataWidget<Flex> {
         public Flexible(
             Key key = null,
             int flex = 1,

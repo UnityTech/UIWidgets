@@ -211,9 +211,9 @@ namespace UIWidgets.painting
             base.debugFillProperties(properties);
 
             List<DiagnosticsNode> styles = new List<DiagnosticsNode>();
-            styles.Add(new DiagnosticsProperty<Color>("color", color, defaultValue: null));
-            styles.Add(new StringProperty("family", fontFamily, defaultValue: null, quoted: false));
-            styles.Add(new DiagnosticsProperty<double?>("size", fontSize, defaultValue: null));
+            styles.Add(new DiagnosticsProperty<Color>("color", color, defaultValue: Diagnostics.kNullDefaultValue));
+            styles.Add(new StringProperty("family", fontFamily, defaultValue: Diagnostics.kNullDefaultValue, quoted: false));
+            styles.Add(new DiagnosticsProperty<double?>("size", fontSize, defaultValue: Diagnostics.kNullDefaultValue));
             string weightDescription = "";
             if (fontWeight != null)
             {
@@ -232,14 +232,14 @@ namespace UIWidgets.painting
                 "weight",
                 fontWeight,
                 description: weightDescription,
-                defaultValue: null
+                defaultValue: Diagnostics.kNullDefaultValue
             ));
-            styles.Add(new EnumProperty<FontStyle?>("style", fontStyle, defaultValue: null));
-            styles.Add(new DiagnosticsProperty<double?>("letterSpacing", letterSpacing, defaultValue: null));
-            styles.Add(new DiagnosticsProperty<double?>("wordSpacing", wordSpacing, defaultValue: null));
-            styles.Add(new EnumProperty<TextBaseline?>("baseline", textBaseline, defaultValue: null));
-            styles.Add(new DiagnosticsProperty<double?>("height", height, defaultValue: null));
-            styles.Add(new StringProperty("background", background == null ? null : background.ToString(), defaultValue: null, quoted: false));
+            styles.Add(new EnumProperty<FontStyle?>("style", fontStyle, defaultValue: Diagnostics.kNullDefaultValue));
+            styles.Add(new DiagnosticsProperty<double?>("letterSpacing", letterSpacing, defaultValue: Diagnostics.kNullDefaultValue));
+            styles.Add(new DiagnosticsProperty<double?>("wordSpacing", wordSpacing, defaultValue: Diagnostics.kNullDefaultValue));
+            styles.Add(new EnumProperty<TextBaseline?>("baseline", textBaseline, defaultValue: Diagnostics.kNullDefaultValue));
+            styles.Add(new DiagnosticsProperty<double?>("height", height, defaultValue: Diagnostics.kNullDefaultValue));
+            styles.Add(new StringProperty("background", background == null ? null : background.ToString(), defaultValue: Diagnostics.kNullDefaultValue, quoted: false));
             if (decoration != null)
             {
                 List<string> decorationDescription = new List<string>();
@@ -248,14 +248,14 @@ namespace UIWidgets.painting
                     decorationDescription.Add(decorationStyle.ToString());
                 }
                 
-                styles.Add(new DiagnosticsProperty<Color>("decorationColor", decorationColor, defaultValue: null, 
+                styles.Add(new DiagnosticsProperty<Color>("decorationColor", decorationColor, defaultValue: Diagnostics.kNullDefaultValue, 
                     level: DiagnosticLevel.fine));
                 if (decorationColor != null)
                 {
                     decorationDescription.Add(decorationColor.ToString());
                 }
                 
-                styles.Add(new DiagnosticsProperty<TextDecoration>("decoration", decoration, defaultValue: null,
+                styles.Add(new DiagnosticsProperty<TextDecoration>("decoration", decoration, defaultValue: Diagnostics.kNullDefaultValue,
                     level: DiagnosticLevel.hidden));
                 if (decoration != null)
                     decorationDescription.Add("$decoration");
