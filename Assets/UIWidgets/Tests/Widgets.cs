@@ -406,6 +406,14 @@ namespace UIWidgets.Tests {
         }
 
         Widget _buildTopAssetsRow(BuildContext context, string title) {
+            var testCard = new AssetCard(
+                "AI Template",
+                "INVECTOR",
+                45.0,
+                36.0,
+                true,
+                "https://d2ujflorbtfzji.cloudfront.net/key-image/46dc65c1-f605-4ccb-97e0-3d60b28cfdfe.jpg"
+            );
             return new Container(
                 margin: EdgeInsets.only(left: 98),
                 child: new Column(
@@ -441,62 +449,12 @@ namespace UIWidgets.Tests {
                         ),
                         new Row(
                             children: new List<Widget> {
-                                new AssetCard(
-                                    "AI Template",
-                                    "INVECTOR",
-                                    45.0,
-                                    36.0,
-                                    true,
-                                    "https://d2ujflorbtfzji.cloudfront.net/key-image/46dc65c1-f605-4ccb-97e0-3d60b28cfdfe.jpg"
-                                ),
-                                new AssetCard(
-                                    "AI Template",
-                                    "INVECTOR",
-                                    45.0,
-                                    36.0,
-                                    false,
-                                    "https://d2ujflorbtfzji.cloudfront.net/key-image/46dc65c1-f605-4ccb-97e0-3d60b28cfdfe.jpg"
-                                ),
-                                new AssetCard(
-                                    "AI Template",
-                                    "INVECTOR",
-                                    45.0,
-                                    36.0,
-                                    true,
-                                    "https://d2ujflorbtfzji.cloudfront.net/key-image/46dc65c1-f605-4ccb-97e0-3d60b28cfdfe.jpg"
-                                ),
-                                new AssetCard(
-                                    "AI Template",
-                                    "INVECTOR",
-                                    45.0,
-                                    36.0,
-                                    false,
-                                    "https://d2ujflorbtfzji.cloudfront.net/key-image/46dc65c1-f605-4ccb-97e0-3d60b28cfdfe.jpg"
-                                ),
-                                new AssetCard(
-                                    "AI Template",
-                                    "INVECTOR",
-                                    45.0,
-                                    36.0,
-                                    true,
-                                    "https://d2ujflorbtfzji.cloudfront.net/key-image/46dc65c1-f605-4ccb-97e0-3d60b28cfdfe.jpg"
-                                ),
-                                new AssetCard(
-                                    "AI Template",
-                                    "INVECTOR",
-                                    45.0,
-                                    36.0,
-                                    false,
-                                    "https://d2ujflorbtfzji.cloudfront.net/key-image/46dc65c1-f605-4ccb-97e0-3d60b28cfdfe.jpg"
-                                ),
-                                new AssetCard(
-                                    "AI Template",
-                                    "INVECTOR",
-                                    45.0,
-                                    36.0,
-                                    false,
-                                    "https://d2ujflorbtfzji.cloudfront.net/key-image/46dc65c1-f605-4ccb-97e0-3d60b28cfdfe.jpg"
-                                )
+                                testCard,
+                                testCard,
+                                testCard,
+                                testCard,
+                                testCard,
+                                testCard
                             }
                         )
                     }
