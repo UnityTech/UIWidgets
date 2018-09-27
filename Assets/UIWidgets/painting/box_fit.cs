@@ -44,14 +44,11 @@ namespace UIWidgets.painting {
                 case BoxFit.cover:
                     if (outputSize.width / outputSize.height > inputSize.width / inputSize.height) {
                         sourceSize = new Size(inputSize.width, inputSize.width * outputSize.height / outputSize.width);
+                    } else {
+                        sourceSize = new Size(inputSize.height * outputSize.width / outputSize.height, inputSize.height);
                     }
-                    else {
-                        sourceSize = new Size(inputSize.height * outputSize.width / outputSize.height,
-                            inputSize.height);
-                    }
-
                     destinationSize = outputSize;
-                    break;
+                    break; 
                 case BoxFit.fitWidth:
                     sourceSize = new Size(inputSize.width, inputSize.width * outputSize.height / outputSize.width);
                     destinationSize = new Size(outputSize.width,
