@@ -38,6 +38,7 @@ namespace UIWidgets.Tests {
                 this.flexColumn,
                 this.containerSimple,
                 this.eventsPage,
+                this.stack
             };
             this._optionStrings = this._options.Select(x => x.Method.Name).ToArray();
             this._selected = 0;
@@ -51,7 +52,7 @@ namespace UIWidgets.Tests {
             // if local image test
             if (selected == 0) {
                 localImagePath = EditorGUILayout.TextField(localImagePath);
-                
+
                 if (this._selected != selected) {
                     this._selected = selected;
                     this.windowAdapter.attachRootWidget(null);
@@ -61,7 +62,8 @@ namespace UIWidgets.Tests {
                     var rootWidget = this._options[this._selected]();
                     this.windowAdapter.attachRootWidget(rootWidget);
                 }
-            } else if (selected != this._selected || !this.hasInvoked) {
+            }
+            else if (selected != this._selected || !this.hasInvoked) {
                 this._selected = selected;
                 this.hasInvoked = true;
 
@@ -89,6 +91,30 @@ namespace UIWidgets.Tests {
 
         void OnDestroy() {
             this.windowAdapter = null;
+        }
+
+        Widget stack() {
+            var image = new widgets.Container(
+                width: 150,
+                height: 150,
+                child: widgets.Image.network(
+                    "https://tse3.mm.bing.net/th?id=OIP.XOAIpvR1kh-CzISe_Nj9GgHaHs&pid=Api",
+                    width: 100,
+                    height: 100
+                )
+            );
+            var text = new widgets.Container(
+                width: 150,
+                height: 150,
+                child: new Text("TTTTTTTTTTTTTTTTEST")
+            );
+            List<Widget> rowImages = new List<Widget>();
+            rowImages.Add(image);
+            rowImages.Add(text);
+            return new Stack(
+                children: rowImages,
+                alignment: AlignmentDirectional.center
+            );
         }
 
         Widget localImage() {

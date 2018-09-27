@@ -241,6 +241,109 @@ namespace UIWidgets.rendering {
         }
     }
 
+    public class RenderAspectRatio : RenderProxyBox {
+        public RenderAspectRatio(double aspectRatio, RenderBox child = null) : base(child) {
+            this._aspectRatio = aspectRatio;
+        }
+
+        public double aspectRatio {
+            get { return _aspectRatio; }
+            set {
+                if (_aspectRatio == value) {
+                    return;
+                }
+
+                _aspectRatio = value;
+                markNeedsLayout();
+            }
+        }
+
+        private double _aspectRatio;
+
+
+        protected override double computeMinIntrinsicWidth(double height) {
+            if (!double.IsInfinity(height))
+                return height * _aspectRatio;
+            if (child != null)
+                return child.getMinIntrinsicWidth(height);
+            return 0.0;
+        }
+
+        protected override double computeMaxIntrinsicWidth(double height) {
+            if (!double.IsInfinity(height))
+                return height * _aspectRatio;
+            if (child != null) {
+                return child.getMaxIntrinsicWidth(height);
+            }
+
+            return 0.0;
+        }
+
+        protected override double computeMinIntrinsicHeight(double width) {
+            if (!double.IsInfinity(width))
+                return width / _aspectRatio;
+            if (child != null) {
+                return child.getMinIntrinsicHeight(width);
+            }
+
+            return 0.0;
+        }
+
+        protected override double computeMaxIntrinsicHeight(double width) {
+            if (!double.IsInfinity(width))
+                return width / _aspectRatio;
+            if (child != null) {
+                return child.getMaxIntrinsicHeight(width);
+            }
+
+            return 0.0;
+        }
+
+        Size _applyAspectRatio(BoxConstraints constraints) {
+            D.assert(constraints.debugAssertIsValid());
+            if (constraints.isTight) {
+                return constraints.smallest;
+            }
+
+            double width = constraints.maxWidth;
+            double height = width / _aspectRatio;
+
+            if (width > constraints.maxWidth) {
+                width = constraints.maxWidth;
+                height = width / _aspectRatio;
+            }
+
+            if (height > constraints.maxHeight) {
+                height = constraints.maxHeight;
+                width = height * _aspectRatio;
+            }
+
+            if (width < constraints.minWidth) {
+                width = constraints.minWidth;
+                height = width / _aspectRatio;
+            }
+
+            if (height < constraints.minHeight) {
+                height = constraints.minHeight;
+                width = height * _aspectRatio;
+            }
+
+            return constraints.constrain(new Size(width, height));
+        }
+
+        protected override void performLayout() {
+            size = _applyAspectRatio(constraints);
+            if (child != null) {
+                child.layout(BoxConstraints.tight(size));
+            }
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new DoubleProperty("aspectRatio", aspectRatio));
+        }
+    }
+
     public class RenderOpacity : RenderProxyBox {
         public RenderOpacity(double opacity = 1.0, RenderBox child = null) : base(child) {
             D.assert(opacity >= 0.0 && opacity <= 1.0);

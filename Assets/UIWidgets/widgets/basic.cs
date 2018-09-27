@@ -5,7 +5,9 @@ using UIWidgets.painting;
 using UIWidgets.rendering;
 using UIWidgets.ui;
 using UnityEngine;
+using UnityEngine.Experimental.UIElements.StyleEnums;
 using Color = UIWidgets.ui.Color;
+using Overflow = UIWidgets.rendering.Overflow;
 using Rect = UIWidgets.ui.Rect;
 
 namespace UIWidgets.widgets {
@@ -142,7 +144,8 @@ namespace UIWidgets.widgets {
             if ((this.width == double.PositiveInfinity && this.height == double.PositiveInfinity) ||
                 (this.width == 0.0 && this.height == 0.0)) {
                 level = DiagnosticLevel.hidden;
-            } else {
+            }
+            else {
                 level = DiagnosticLevel.info;
             }
 
@@ -254,6 +257,77 @@ namespace UIWidgets.widgets {
             ((RenderFlex) renderObject).textDirection = this.textDirection ?? TextDirection.ltr;
             ((RenderFlex) renderObject).verticalDirection = this.verticalDirection;
             ((RenderFlex) renderObject).textBaseline = this.textBaseline ?? TextBaseline.alphabetic;
+        }
+    }
+
+    public class AspectRatio : SingleChildRenderObjectWidget {
+        public AspectRatio(
+            Key key = null,
+            double aspectRatio = 1.0,
+            Widget child = null
+        ) : base(key: key, child: child) {
+            this.aspectRatio = aspectRatio;
+        }
+
+        public readonly double aspectRatio;
+
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderAspectRatio(aspectRatio: aspectRatio);
+        }
+
+        public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
+            ((RenderAspectRatio)renderObject).aspectRatio = aspectRatio;
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new DoubleProperty("aspectRatio", aspectRatio));
+        }
+    }
+
+    public class Stack : MultiChildRenderObjectWidget {
+        public Stack(
+            Key key = null,
+            AlignmentDirectional alignment = null,
+            TextDirection? textDirection = null,
+            StackFit fit = StackFit.loose,
+            Overflow overflow = Overflow.clip,
+            List<Widget> children = null
+        ) : base(key: key, children: children) {
+            this.alignment = alignment ?? AlignmentDirectional.bottomStart;
+            this.textDirection = textDirection;
+            this.fit = fit;
+            this.overflow = overflow;
+        }
+
+        public AlignmentDirectional alignment;
+        public TextDirection? textDirection;
+        public StackFit fit;
+        public rendering.Overflow overflow;
+        
+        
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderStack(
+                textDirection: textDirection ?? Directionality.of(context),
+                alignment: alignment,
+                fit: fit,
+                overflow: overflow
+            );
+        }
+        
+        public override void updateRenderObject(BuildContext context, RenderObject renderObjectRaw) {
+            var renderObject = (RenderStack) renderObjectRaw;
+            renderObject.alignment = this.alignment;
+            renderObject.textDirection = this.textDirection ?? TextDirection.ltr;
+            renderObject.fit = this.fit;
+            renderObject.overflow = this.overflow;
+        }
+        
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new DiagnosticsProperty<AlignmentDirectional>("alignment", alignment));
+            properties.add(new EnumProperty<StackFit>("fit", fit));
+            properties.add(new EnumProperty<Overflow>("overflow", overflow));
         }
     }
 

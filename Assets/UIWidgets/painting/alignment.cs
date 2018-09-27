@@ -109,4 +109,68 @@ namespace UIWidgets.painting {
             return !(a == b);
         }
     }
+
+    public class AlignmentDirectional : IEquatable<AlignmentDirectional>  {
+        public AlignmentDirectional(double start, double y) {
+            this.start = start;
+            this.y = y;
+        }
+
+        public double start;
+        public double y;
+        
+        public static readonly AlignmentDirectional topStart = new AlignmentDirectional(-1.0, -1.0);
+        public static readonly AlignmentDirectional topCenter = new AlignmentDirectional(0.0, -1.0);
+        public static readonly AlignmentDirectional topEnd = new AlignmentDirectional(1.0, -1.0);
+        public static readonly AlignmentDirectional centerStart = new AlignmentDirectional(-1.0, 0.0);
+        public static readonly AlignmentDirectional center = new AlignmentDirectional(0.0, 0.0);
+        public static readonly AlignmentDirectional centerEnd = new AlignmentDirectional(1.0, 0.0);
+        public static readonly AlignmentDirectional bottomStart = new AlignmentDirectional(-1.0, 1.0);
+        public static readonly AlignmentDirectional bottomCenter = new AlignmentDirectional(0.0, 1.0);
+        public static readonly AlignmentDirectional bottomEnd = new AlignmentDirectional(1.0, 1.0);
+        
+        public AlignmentDirectional add(AlignmentDirectional other) {
+            return this + other;
+        }
+
+        public static AlignmentDirectional operator -(AlignmentDirectional a, AlignmentDirectional b) {
+            return new AlignmentDirectional(a.start - b.start, a.y - b.y);
+        }
+
+        public static AlignmentDirectional operator +(AlignmentDirectional a, AlignmentDirectional b) {
+            return new AlignmentDirectional(a.start + b.start, a.y + b.y);
+        }
+
+        public static AlignmentDirectional operator -(AlignmentDirectional a) {
+            return new AlignmentDirectional(-a.start, -a.y);
+        }
+
+        public static AlignmentDirectional operator *(AlignmentDirectional a, double b) {
+            return new AlignmentDirectional(a.start * b, a.y * b);
+        }
+
+        public static AlignmentDirectional operator /(AlignmentDirectional a, double b) {
+            return new AlignmentDirectional(a.start / b, a.y / b);
+        }
+
+        public static AlignmentDirectional operator %(AlignmentDirectional a, double b) {
+            return new AlignmentDirectional(a.start % b, a.y % b);
+        }
+
+        public bool Equals(AlignmentDirectional other) {
+            if (object.ReferenceEquals(null, other)) return false;
+            if (object.ReferenceEquals(this, other)) return true;
+            return this.start.Equals(other.start) && this.y.Equals(other.y);
+        }
+        
+        public Alignment resolve(TextDirection direction) {
+            switch (direction) {
+                case TextDirection.rtl:
+                    return new Alignment(-start, y);
+                case TextDirection.ltr:
+                    return new Alignment(start, y);
+            }
+            return null;
+        }
+    }
 }
