@@ -261,7 +261,6 @@ namespace UIWidgets.Tests {
                                 color: CLColors.white,
                                 borderRadius: BorderRadius.all(3)
                             ),
-                            color: CLColors.white,
                             width: 320,
                             height: 36,
                             padding: EdgeInsets.all(10.0),
@@ -289,7 +288,7 @@ namespace UIWidgets.Tests {
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: new List<Widget> {
                                     new CustomButton(
-                                        padding: EdgeInsets.only(-8.0, 0.0, 8.0, 0.0),
+                                        padding: EdgeInsets.only(8.0, 0.0, 8.0, 0.0),
                                         child: new Icon(
                                             Icons.search,
                                             size: 18.0,
@@ -312,7 +311,8 @@ namespace UIWidgets.Tests {
                         new Container(
                             decoration: new BoxDecoration(
                                 border: Border.all(
-                                    color: CLColors.white)
+                                    color: CLColors.white
+                                )
                             ),
                             margin: EdgeInsets.only(right: 16),
                             padding: EdgeInsets.all(4),
@@ -408,12 +408,12 @@ namespace UIWidgets.Tests {
 
         Widget _buildBanner(BuildContext context) {
             return new Container(
-                    height: 450,
-                    color: CLColors.white,
-                    child: widgets.Image.network(
-                        "https://d2ujflorbtfzji.cloudfront.net/banner/5c57178c-4be6-4903-953b-85125bfb7154.jpg",
-                        fit: BoxFit.cover
-                    )
+                height: 450,
+                color: CLColors.white,
+                child: widgets.Image.network(
+                    "https://d2ujflorbtfzji.cloudfront.net/banner/5c57178c-4be6-4903-953b-85125bfb7154.jpg",
+                    fit: BoxFit.cover
+                )
             );
         }
 
