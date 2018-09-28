@@ -255,7 +255,6 @@ namespace UIWidgets.widgets
 
         public TextEditingValue getValueForOperation(TextEditOp operation)
         {
-            Debug.Log(string.Format("operation {0}", operation));
             TextPosition newPosition = null;
             TextPosition newExtend = null;
             TextEditingValue newValue = null;
