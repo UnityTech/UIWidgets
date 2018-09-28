@@ -187,7 +187,7 @@ namespace UIWidgets.ui
             
         }
         
-        class LineRange
+        public class LineRange
         {
             public LineRange(int start, int end, int endExcludingWhitespace, int endIncludingNewLine, bool hardBreak)
             {
@@ -444,6 +444,18 @@ namespace UIWidgets.ui
             return result;
         }
 
+        public TextBox getNextLineStartRect()
+        {
+            if (_text.Length == 0 || _text[_text.Length - 1] != '\n')
+            {
+                return null;
+            }
+            var lineNumber = getLineCount() - 1;
+            var top = (lineNumber > 0) ? _lineHeights[lineNumber - 1] : 0;
+            var bottom = _lineHeights[lineNumber];
+            return TextBox.fromLTBD(0, top, 0, bottom, TextDirection.ltr);
+        }
+
         public PositionWithAffinity getGlyphPositionAtCoordinate(double dx, double dy)
         {
             if (_lineHeights.Count == 0)
@@ -515,7 +527,7 @@ namespace UIWidgets.ui
             for (int lineIndex = 0; lineIndex < getLineCount(); ++lineIndex)
             {
                 var line = _lineRanges[lineIndex];
-                if (offset >= line.start && offset <= line.end)
+                if ((offset >= line.start && offset < line.endIncludingNewLine))
                 {
                     return lineIndex;
                 }
@@ -524,16 +536,9 @@ namespace UIWidgets.ui
             return Math.Max(lineCount - 1, 0);
         }
 
-        public TextPosition getLineStart(int lineIndex)
+        public LineRange getLineRange(int lineIndex)
         {
-            lineIndex = Math.Min(getLineCount() - 1, Math.Max(lineIndex, 0));
-            return new TextPosition(_lineRanges[lineIndex].start);
-        }
-        
-        public TextPosition getLineEnd(int lineIndex)
-        {
-            lineIndex = Math.Min(getLineCount() - 1, Math.Max(lineIndex, 0));
-            return new TextPosition(_lineRanges[lineIndex].end);
+            return _lineRanges[lineIndex];
         }
         
         public IndexRange getWordBoundary(int offset)
@@ -725,7 +730,8 @@ namespace UIWidgets.ui
                 var blockSize = blockEnd - blockStart;
                 if (blockSize == 0)
                 {
-                    _lineRanges.Add(new LineRange(blockStart, blockEnd, blockEnd, blockEnd + 1, true));
+                    _lineRanges.Add(new LineRange(blockStart, blockEnd, blockEnd, 
+                        blockEnd < _text.Length ? blockEnd + 1: blockEnd, true));
                     _lineWidths.Add(0);
                     continue;
                 }
@@ -743,7 +749,8 @@ namespace UIWidgets.ui
                         nonSpaceEnd--;
                     }
                     
-                    _lineRanges.Add(new LineRange(line.start, end, nonSpaceEnd, end + 1, end == blockEnd));
+                    _lineRanges.Add(new LineRange(line.start, end, nonSpaceEnd, 
+                        end == blockEnd && end < _text.Length ? end + 1 : end, end == blockEnd));
                     _lineWidths.Add(line.width);
                 }
             }
