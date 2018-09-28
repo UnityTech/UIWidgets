@@ -20,7 +20,17 @@ namespace UIWidgets.Tests
         public static void renderWidgets() {
             EditorWindow.GetWindow(typeof(EditableTextWiget));
         }
-        
+
+        private string txt = "Hello\n" +
+                             "This is useful when you need to check if a certain key has been pressed - possibly with modifiers. The syntax for the key string\n" +
+                             "asfsd \n" +
+                             "P1:\n" +
+                             "This is useful when you need to check if a certain key has been pressed - possibly with modifiers.The syntax for the key st\n" +
+                             "\n" +
+                             "\n" +
+                             "\n" +
+                             "\n" +
+                             " sfsafd";
         EditableTextWiget() {
         }
 
@@ -48,7 +58,7 @@ namespace UIWidgets.Tests
                 color: ui.Color.fromARGB(255, 244, 190, 85),
                 child: new EditableText(
                     maxLines: 100, 
-                    controller: new TextEditingController("click to edit"),
+                    controller: new TextEditingController(txt),
                     focusNode: new FocusNode(), 
                     style: new TextStyle(),
                     selectionColor: Color.fromARGB(255, 255, 0, 0),

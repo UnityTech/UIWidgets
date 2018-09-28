@@ -119,7 +119,7 @@ namespace UIWidgets.painting
             }
 
             var offset = 0;
-            var result = -1;
+            int? result = null;
             visitTextSpan(span =>
             {
                 if (index - offset < span.text.Length)

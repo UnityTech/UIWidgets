@@ -247,6 +247,19 @@ namespace UIWidgets.painting
         {
             D.assert(!_needsLayout);
             var offset = position.offset;
+            if (offset > 0)
+            {
+                var prevCodeUnit = _text.codeUnitAt(offset);
+                if (prevCodeUnit == null) // out of upper bounds
+                {
+                    var rectNextLine = _paragraph.getNextLineStartRect();
+                    if (rectNextLine != null)
+                    {
+                        return new Offset(rectNextLine.start, rectNextLine.top);
+                    }
+                }
+            }
+            
             switch (position.affinity)
             {
                     case TextAffinity.upstream:
@@ -258,6 +271,17 @@ namespace UIWidgets.painting
             }
 
             return null;
+        }
+
+        public Paragraph.LineRange getLineRange(int lineNumber)
+        {
+            D.assert(!_needsLayout);
+            return _paragraph.getLineRange(lineNumber);
+        }
+        
+        public Paragraph.LineRange getLineRange(TextPosition textPosition)
+        {
+            return getLineRange(getLineIndex(textPosition));
         }
         
         public List<TextBox> getBoxesForSelection(TextSelection selection)
@@ -284,9 +308,9 @@ namespace UIWidgets.painting
         {
             D.assert(!_needsLayout);
             var offset = getOffsetForCaret(position, Rect.zero);
-            var line = _paragraph.getLine(position);
-            var targetLineStart = _paragraph.getLineStart(line + move);
-            var newLineOffset = getOffsetForCaret(targetLineStart, Rect.zero);
+            var lineIndex = Math.Min(Math.Max(_paragraph.getLine(position) + move, 0), _paragraph.getLineCount());
+            var targetLineStart = _paragraph.getLineRange(lineIndex).start;
+            var newLineOffset = getOffsetForCaret(new TextPosition(targetLineStart), Rect.zero);
             return getPositionForOffset(new Offset(offset.dx, newLineOffset.dy));
         }
 
@@ -296,16 +320,10 @@ namespace UIWidgets.painting
             return _paragraph.getLine(position);
         }
 
-        public TextPosition getLineStartPosition(int line)
+        public int getLineCount()
         {
             D.assert(!_needsLayout);
-            return _paragraph.getLineStart(line);
-        }
-        
-        public TextPosition getLineEndPosition(int line)
-        {
-            D.assert(!_needsLayout);
-            return _paragraph.getLineEnd(line);
+            return _paragraph.getLineCount();
         }
 
         public TextPosition getWordRight(TextPosition position)
@@ -326,7 +344,7 @@ namespace UIWidgets.painting
                 offset = range.end;
             }
             
-            return new TextPosition(offset);
+            return new TextPosition(offset, position.affinity);
         }
         
         public TextPosition getWordLeft(TextPosition position)
@@ -347,7 +365,7 @@ namespace UIWidgets.painting
                 }
             }
             
-            return new TextPosition(offset);
+            return new TextPosition(offset, position.affinity);
         }
         
         private ParagraphStyle _createParagraphStyle(TextDirection defaultTextDirection = TextDirection.ltr)

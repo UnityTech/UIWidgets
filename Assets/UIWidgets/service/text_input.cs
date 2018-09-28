@@ -101,7 +101,7 @@ namespace UIWidgets.service
             int offset = selection.baseOffset + move;
             offset = Math.Max(0, offset);
             offset = Math.Min(offset, text.Length);
-            return this.copyWith(selection: TextSelection.collapsed(offset));
+            return this.copyWith(selection: TextSelection.collapsed(offset, affinity: selection.affinity));
         }
 
         public TextEditingValue compose(string composeText)

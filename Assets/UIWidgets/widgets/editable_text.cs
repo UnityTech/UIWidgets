@@ -154,8 +154,9 @@ namespace UIWidgets.widgets
         {
             return new EditableTextState();
         }
-        
-        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties)
+        {
             base.debugFillProperties(properties);
             properties.add(new DiagnosticsProperty<TextEditingController>("controller", controller));
             properties.add(new DiagnosticsProperty<FocusNode>("focusNode", focusNode));
@@ -165,27 +166,31 @@ namespace UIWidgets.widgets
             {
                 style.debugFillProperties(properties);
             }
-            properties.add(new EnumProperty<TextAlign>("textAlign", textAlign, defaultValue: Diagnostics.kNullDefaultValue));
-            properties.add(new EnumProperty<TextDirection?>("textDirection", textDirection, defaultValue: Diagnostics.kNullDefaultValue));
-            properties.add(new DiagnosticsProperty<double>("textScaleFactor", textScaleFactor, defaultValue: Diagnostics.kNullDefaultValue));
+
+            properties.add(new EnumProperty<TextAlign>("textAlign", textAlign,
+                defaultValue: Diagnostics.kNullDefaultValue));
+            properties.add(new EnumProperty<TextDirection?>("textDirection", textDirection,
+                defaultValue: Diagnostics.kNullDefaultValue));
+            properties.add(new DiagnosticsProperty<double>("textScaleFactor", textScaleFactor,
+                defaultValue: Diagnostics.kNullDefaultValue));
             properties.add(new DiagnosticsProperty<int>("maxLines", maxLines, defaultValue: 1));
             properties.add(new DiagnosticsProperty<bool>("autofocus", autofocus, defaultValue: false));
         }
     }
 
-    public class EditableTextState: State<EditableText>, TextInputClient
+    public class EditableTextState : State<EditableText>, TextInputClient
     {
-        
         const int _kObscureShowLatestCharCursorTicks = 3;
         private ValueNotifier<bool> _showCursor = new ValueNotifier<bool>(true); // todo
         private GlobalKey _editableKey = GlobalKey.key();
         private bool _didAutoFocus = false;
-        
+
         TextInputConnection _textInputConnection;
         private int _obscureShowCharTicksPending = 0;
         private int _obscureLatestCharIndex;
-        
+
         bool _textChangedSinceLastCaretUpdate = false;
+
         public override void initState()
         {
             base.initState();
@@ -213,7 +218,9 @@ namespace UIWidgets.widgets
                 widget.controller.addListener(_didChangeTextEditingValue);
                 _updateRemoteEditingValueIfNeeded();
             }
-            if (widget.focusNode != oldWidget.focusNode) {
+
+            if (widget.focusNode != oldWidget.focusNode)
+            {
                 oldWidget.focusNode.removeListener(_handleFocusChanged);
                 widget.focusNode.addListener(_handleFocusChanged);
             }
@@ -227,13 +234,16 @@ namespace UIWidgets.widgets
             widget.focusNode.removeListener(_handleFocusChanged);
             base.dispose();
         }
-        
+
         TextEditingValue _lastKnownRemoteTextEditingValue;
-        
-        public void updateEditingValue(TextEditingValue value) {
-            if (value.text != _value.text) {
+
+        public void updateEditingValue(TextEditingValue value)
+        {
+            if (value.text != _value.text)
+            {
                 // _hideSelectionOverlayIfNeeded();
-                if (widget.obscureText && value.text.Length == _value.text.Length + 1) {
+                if (widget.obscureText && value.text.Length == _value.text.Length + 1)
+                {
                     _obscureShowCharTicksPending = _kObscureShowLatestCharCursorTicks;
                     _obscureLatestCharIndex = _value.selection.baseOffset;
                 }
@@ -246,73 +256,136 @@ namespace UIWidgets.widgets
         public TextEditingValue getValueForOperation(TextEditOp operation)
         {
             TextPosition newPosition = null;
+            TextPosition newExtend = null;
+            TextEditingValue newValue = null;
+            TextSelection newSelection = null;
+            TextPosition startPos = new TextPosition(_value.selection.start, _value.selection.affinity);
             switch (operation)
             {
-                    case TextEditOp.MoveLeft:
-                    return _value.moveLeft();
+                case TextEditOp.MoveLeft:
+                    newValue = _value.moveLeft();
+                    break;
                 case TextEditOp.MoveRight:
-                    return _value.moveRight();
-                case TextEditOp.MoveUp:             
-                    newPosition = this.renderEditable.getPositionUp(new TextPosition(_value.selection.start, _value.selection.affinity));
-                    return _value.copyWith(selection: TextSelection.fromPosition(newPosition));
-               case TextEditOp.MoveDown:
-                   newPosition = this.renderEditable.getPositionDown(new TextPosition(_value.selection.start, _value.selection.affinity));
-                   return _value.copyWith(selection: TextSelection.fromPosition(newPosition));
-                case TextEditOp.MoveLineStart:      
-                    newPosition = this.renderEditable.getLineStartPosition(new TextPosition(_value.selection.start, _value.selection.affinity));
-                    return _value.copyWith(selection: TextSelection.fromPosition(newPosition));
-                case TextEditOp.MoveLineEnd:      
-                    newPosition = this.renderEditable.getLineEndPosition(new TextPosition(_value.selection.start, _value.selection.affinity));
-                    return _value.copyWith(selection: TextSelection.fromPosition(newPosition));
-               case TextEditOp.MoveWordRight:      
-                   newPosition = this.renderEditable.getWordRight(new TextPosition(_value.selection.start));
-                   return _value.copyWith(selection: TextSelection.fromPosition(newPosition));
-                case TextEditOp.MoveWordLeft:      
-                    newPosition = this.renderEditable.getWordLeft(new TextPosition(_value.selection.start));
-                    return _value.copyWith(selection: TextSelection.fromPosition(newPosition));
+                    newValue = _value.moveRight();
+                    break;
+                case TextEditOp.MoveUp:
+                    newPosition = this.renderEditable.getPositionUp(startPos);
+                    break;
+                case TextEditOp.MoveDown:
+                    newPosition = this.renderEditable.getPositionDown(startPos);
+                    break;
+                case TextEditOp.MoveLineStart:
+                    newPosition = this.renderEditable.getParagraphStart(startPos, TextAffinity.downstream);
+                    break;
+                case TextEditOp.MoveLineEnd:
+                    newPosition = this.renderEditable.getParagraphEnd(startPos, TextAffinity.upstream);
+                    break;
+                case TextEditOp.MoveWordRight:
+                    newPosition = this.renderEditable.getWordRight(startPos);
+                    break;
+                case TextEditOp.MoveWordLeft:
+                    newPosition = this.renderEditable.getWordLeft(startPos);
+                    break;
 //                case TextEditOp.MoveToStartOfNextWord:      MoveToStartOfNextWord(); break;
 //                case TextEditOp.MoveToEndOfPreviousWord:        MoveToEndOfPreviousWord(); break;
-
                 case TextEditOp.MoveTextStart:
-                    return _value.copyWith(selection: TextSelection.collapsed(0));
-                case TextEditOp.MoveTextEnd:        
-                    return _value.copyWith(selection: TextSelection.collapsed(_value.text.Length));
-//                case TextEditOp.MoveParagraphForward:   MoveParagraphForward(); break;
-//                case TextEditOp.MoveParagraphBackward:  MoveParagraphBackward(); break;
-//                case TextEditOp.MoveGraphicalLineStart: MoveGraphicalLineStart(); break;
-//                case TextEditOp.MoveGraphicalLineEnd: MoveGraphicalLineEnd(); break;
-                  case TextEditOp.SelectLeft:
-                      return _value.extendLeft();
-                  case TextEditOp.SelectRight:
-                      return _value.extendRight();
-                  case TextEditOp.SelectUp:           
-                      newPosition = this.renderEditable.getPositionUp(_value.selection.extendPos);
-                      return _value.copyWith(selection: _value.selection.copyWith(extentOffset: newPosition.offset));
-                  case TextEditOp.SelectDown:        
-                      newPosition = this.renderEditable.getPositionDown(_value.selection.extendPos);
-                      return _value.copyWith(selection: _value.selection.copyWith(extentOffset: newPosition.offset));
-                  case TextEditOp.SelectWordRight:        
-                      newPosition = this.renderEditable.getWordRight(_value.selection.extendPos);
-                      return _value.copyWith(selection: _value.selection.copyWith(extentOffset: newPosition.offset));
-                  case TextEditOp.SelectWordLeft:     
-                      newPosition = this.renderEditable.getWordLeft(_value.selection.extendPos);
-                      return _value.copyWith(selection: _value.selection.copyWith(extentOffset: newPosition.offset));
+                    newPosition = new TextPosition(0);
+                    break;
+                case TextEditOp.MoveTextEnd:
+                    newPosition = new TextPosition(_value.text.Length);
+                    break;
+                case TextEditOp.MoveParagraphForward:
+                    newPosition = this.renderEditable.getParagraphForward(startPos);
+                    break;
+                case TextEditOp.MoveParagraphBackward:
+                    newPosition = this.renderEditable.getParagraphBackward(startPos);
+                    break;
+                case TextEditOp.MoveGraphicalLineStart:
+                    newPosition = this.renderEditable.getLineStartPosition(startPos, TextAffinity.downstream);
+                    break;
+                case TextEditOp.MoveGraphicalLineEnd:
+                    newPosition = this.renderEditable.getLineEndPosition(startPos, TextAffinity.upstream);
+                    break;
+                case TextEditOp.SelectLeft:
+                    newValue = _value.extendLeft();
+                    break;
+                case TextEditOp.SelectRight:
+                    newValue = _value.extendRight();
+                    break;
+                case TextEditOp.SelectUp:
+                    newExtend = this.renderEditable.getPositionUp(_value.selection.extendPos);
+                    break;
+                case TextEditOp.SelectDown:
+                    newExtend = this.renderEditable.getPositionDown(_value.selection.extendPos);
+                    break;
+                case TextEditOp.SelectWordRight:
+                    newExtend = this.renderEditable.getWordRight(_value.selection.extendPos);
+                    break;
+                case TextEditOp.SelectWordLeft:
+                    newExtend = this.renderEditable.getWordLeft(_value.selection.extendPos);
+                    break;
 //                case TextEditOp.SelectToEndOfPreviousWord:  SelectToEndOfPreviousWord(); break;
 //                case TextEditOp.SelectToStartOfNextWord:    SelectToStartOfNextWord(); break;
 //
-                 case TextEditOp.SelectTextStart:        
-                     return _value.copyWith(selection: _value.selection.copyWith(extentOffset: 0));
-               case TextEditOp.SelectTextEnd:      
-                   return _value.copyWith(selection: _value.selection.copyWith(extentOffset: _value.text.Length));
-//                case TextEditOp.ExpandSelectGraphicalLineStart: ExpandSelectGraphicalLineStart(); break;
-//                case TextEditOp.ExpandSelectGraphicalLineEnd: ExpandSelectGraphicalLineEnd(); break;
-//                case TextEditOp.SelectParagraphForward:     SelectParagraphForward(); break;
-//                case TextEditOp.SelectParagraphBackward:    SelectParagraphBackward(); break;
-//                case TextEditOp.SelectGraphicalLineStart: SelectGraphicalLineStart(); break;
-//                case TextEditOp.SelectGraphicalLineEnd: SelectGraphicalLineEnd(); break;
-                 case TextEditOp.Delete: return _value.deleteSelection(false);
+                case TextEditOp.SelectTextStart:
+                    newExtend = new TextPosition(0);
+                    break;
+                case TextEditOp.SelectTextEnd:
+                    newExtend = new TextPosition(_value.text.Length);
+                    break;
+               case TextEditOp.ExpandSelectGraphicalLineStart:
+                   if (_value.selection.isCollapsed || !this.renderEditable.isLineEndOrStart(_value.selection.start))
+                   {
+                       newSelection = new TextSelection(this.renderEditable.getLineStartPosition(startPos).offset, 
+                           _value.selection.end, _value.selection.affinity);
+                   }
+                  
+                   break;
+                case TextEditOp.ExpandSelectGraphicalLineEnd:
+                    if (_value.selection.isCollapsed || !this.renderEditable.isLineEndOrStart(_value.selection.end))
+                    {
+                        newSelection = new TextSelection(_value.selection.start, 
+                            this.renderEditable.getLineEndPosition(_value.selection.endPos).offset,
+                            _value.selection.affinity);
+                    }
+                    break;
+                case TextEditOp.SelectParagraphForward:
+                    newExtend = this.renderEditable.getParagraphForward(_value.selection.extendPos);
+                    break;
+                case TextEditOp.SelectParagraphBackward:
+                    newExtend = this.renderEditable.getParagraphBackward(_value.selection.extendPos);
+                    break;
+                case TextEditOp.SelectGraphicalLineStart:
+                    newExtend = this.renderEditable.getLineStartPosition(_value.selection.extendPos);
+                    break;
+                case TextEditOp.SelectGraphicalLineEnd:
+                    newExtend = this.renderEditable.getLineEndPosition(startPos);
+                    break;
+                case TextEditOp.Delete:
+                    newValue = _value.deleteSelection(false);
+                    break;
                 case TextEditOp.Backspace:
-                    return _value.deleteSelection();
+                    newValue = _value.deleteSelection();
+                    break;
+                case TextEditOp.SelectAll:
+                    newSelection = _value.selection.copyWith(baseOffset: 0, extentOffset: _value.text.Length);
+                    break;
+            }
+
+            if (newPosition != null)
+            {
+                return _value.copyWith(selection: TextSelection.fromPosition(newPosition));
+            }
+            else if (newExtend != null)
+            {
+                return _value.copyWith(selection: _value.selection.copyWith(extentOffset: newExtend.offset));
+            } else if (newSelection != null)
+            {
+                return _value.copyWith(selection: newSelection);
+            }
+            else if (newValue != null)
+            {
+                return newValue;
             }
 
             return _value;
@@ -332,15 +405,14 @@ namespace UIWidgets.widgets
 
         bool _hasInputConnection
         {
-            get
-            {
-                return  _textInputConnection != null && _textInputConnection.attached;
-            }
+            get { return _textInputConnection != null && _textInputConnection.attached; }
         }
-       
 
-        void _openInputConnection() {
-            if (!_hasInputConnection) {
+
+        void _openInputConnection()
+        {
+            if (!_hasInputConnection)
+            {
                 TextEditingValue localValue = _value;
                 _lastKnownRemoteTextEditingValue = localValue;
                 _textInputConnection = Window.instance.textInput.attach(this);
@@ -348,18 +420,24 @@ namespace UIWidgets.widgets
             }
         }
 
-        void _closeInputConnectionIfNeeded() {
-            if (_hasInputConnection) {
+        void _closeInputConnectionIfNeeded()
+        {
+            if (_hasInputConnection)
+            {
                 _textInputConnection.close();
                 _textInputConnection = null;
                 _lastKnownRemoteTextEditingValue = null;
             }
         }
 
-        void _openOrCloseInputConnectionIfNeeded() {
-            if (_hasFocus && widget.focusNode.consumeKeyboardToken()) {
+        void _openOrCloseInputConnectionIfNeeded()
+        {
+            if (_hasFocus && widget.focusNode.consumeKeyboardToken())
+            {
                 _openInputConnection();
-            } else if (!_hasFocus) {
+            }
+            else if (!_hasFocus)
+            {
                 _closeInputConnectionIfNeeded();
                 widget.controller.clearComposing();
             }
@@ -376,20 +454,24 @@ namespace UIWidgets.widgets
                 FocusScope.of(context).requestFocus(widget.focusNode);
             }
         }
-        
-        private void _handleSelectionChanged(TextSelection selection, RenderEditable renderObject, SelectionChangedCause cause) {
+
+        private void _handleSelectionChanged(TextSelection selection, RenderEditable renderObject,
+            SelectionChangedCause cause)
+        {
             widget.controller.selection = selection;
             requestKeyboard();
-            
+
             if (widget.onSelectionChanged != null)
             {
                 widget.onSelectionChanged(selection, cause);
             }
         }
 
-        void _handleCaretChanged(Rect caretRect) {
-            if (_textChangedSinceLastCaretUpdate) {
-                _textChangedSinceLastCaretUpdate = false; 
+        void _handleCaretChanged(Rect caretRect)
+        {
+            if (_textChangedSinceLastCaretUpdate)
+            {
+                _textChangedSinceLastCaretUpdate = false;
 //                scheduleMicrotask(() { // todo
 //                    _scrollController.animateTo(
 //                        _getScrollOffsetForCaret(caretRect),
@@ -399,32 +481,35 @@ namespace UIWidgets.widgets
 //                });
             }
         }
-        private void _formatAndSetValue(TextEditingValue value) {
+
+        private void _formatAndSetValue(TextEditingValue value)
+        {
             var textChanged = (_value == null ? null : _value.text) != (value == null ? null : value.text);
-            if (widget.inputFormatters != null && widget.inputFormatters.isNotEmpty()) {
+            if (widget.inputFormatters != null && widget.inputFormatters.isNotEmpty())
+            {
                 foreach (var formatter in widget.inputFormatters)
                 {
                     value = formatter.formatEditUpdate(_value, value);
                 }
+
                 _value = value;
                 _updateRemoteEditingValueIfNeeded();
-            } else {
+            }
+            else
+            {
                 _value = value;
             }
 
             if (textChanged && widget.onChanged != null)
             {
-                widget.onChanged(value.text);    
+                widget.onChanged(value.text);
             }
         }
-        
+
         private TextEditingValue _value
         {
             get { return widget.controller.value; }
-            set
-            {
-                widget.controller.value = value;
-            }
+            set { widget.controller.value = value; }
         }
 
         private bool _hasFocus
@@ -434,22 +519,25 @@ namespace UIWidgets.widgets
 
         private bool _isMultiline
         {
-            get { return widget.maxLines !=  1; }
+            get { return widget.maxLines != 1; }
         }
 
         private void _didChangeTextEditingValue()
         {
             _updateRemoteEditingValueIfNeeded();
             _textChangedSinceLastCaretUpdate = true;
-            setState(() => {});
+            setState(() => { });
         }
 
         private void _handleFocusChanged()
         {
             _openOrCloseInputConnectionIfNeeded();
-            if (!_hasFocus) {
+            if (!_hasFocus)
+            {
                 _value = new TextEditingValue(text: _value.text);
-            } else if (!_value.selection.isValid) {
+            }
+            else if (!_value.selection.isValid)
+            {
                 widget.controller.selection = TextSelection.collapsed(offset: _value.text.Length);
             }
         }
@@ -460,18 +548,19 @@ namespace UIWidgets.widgets
             get
             {
                 TextDirection? result = widget.textDirection ?? Directionality.of(context);
-                D.assert(result != null, 
-                    string.Format("{0} created without a textDirection and with no ambient Directionality.", GetType().FullName));
+                D.assert(result != null,
+                    string.Format("{0} created without a textDirection and with no ambient Directionality.",
+                        GetType().FullName));
                 return result;
             }
         }
 
         public RenderEditable renderEditable
         {
-            get { return (RenderEditable)_editableKey.currentContext.findRenderObject(); }
+            get { return (RenderEditable) _editableKey.currentContext.findRenderObject(); }
         }
 
-        public override  Widget build(BuildContext context)
+        public override Widget build(BuildContext context)
         {
             FocusScope.of(context).reparentIfNeeded(widget.focusNode);
             // todo base.build(context);  See AutomaticKeepAliveClientMixin.
@@ -493,15 +582,16 @@ namespace UIWidgets.widgets
                 onSelectionChanged: _handleSelectionChanged,
                 onCaretChanged: _handleCaretChanged,
                 rendererIgnoresPointer: widget.rendererIgnoresPointer
-                );
-            
+            );
         }
-        
-        public TextSpan buildTextSpan() {
-            if (!widget.obscureText && _value.composing.isValid) {
+
+        public TextSpan buildTextSpan()
+        {
+            if (!widget.obscureText && _value.composing.isValid)
+            {
                 TextStyle composingStyle = widget.style.merge(
-                        new TextStyle(decoration: TextDecoration.underline)
-                    );
+                    new TextStyle(decoration: TextDecoration.underline)
+                );
 
                 return new TextSpan(
                     style: widget.style,
@@ -517,17 +607,18 @@ namespace UIWidgets.widgets
             }
 
             var text = _value.text;
-            if (widget.obscureText) {
+            if (widget.obscureText)
+            {
                 text = new string(RenderEditable.obscuringCharacter, text.Length);
                 int o =
                     _obscureShowCharTicksPending > 0 ? _obscureLatestCharIndex : -1;
                 if (o >= 0 && o < text.Length)
                     text = text.Substring(0, o) + _value.text.Substring(o, 1) + text.Substring(o + 1);
             }
+
             return new TextSpan(style: widget.style, text: text);
         }
     }
-
 
 
     internal class _Editable : LeafRenderObjectWidget
@@ -557,7 +648,6 @@ namespace UIWidgets.widgets
             bool autocorrect = false, ViewportOffset offset = null, SelectionChangedHandler onSelectionChanged = null,
             CaretChangedHandler onCaretChanged = null, bool rendererIgnoresPointer = false, Key key = null) : base(key)
         {
-            
             this.textSpan = textSpan;
             this.value = value;
             this.cursorColor = cursorColor;
@@ -580,7 +670,7 @@ namespace UIWidgets.widgets
         {
             return new RenderEditable(
                 text: textSpan,
-                textDirection: textDirection??TextDirection.ltr,
+                textDirection: textDirection ?? TextDirection.ltr,
                 offset: offset,
                 showCursor: showCursor,
                 cursorColor: cursorColor,
@@ -589,13 +679,13 @@ namespace UIWidgets.widgets
                 selectionColor: selectionColor,
                 textScaleFactor: textScaleFactor,
                 textAlign: textAlign,
-                selection: value.selection, 
+                selection: value.selection,
                 obscureText: obscureText,
                 onSelectionChanged: onSelectionChanged,
                 onCaretChanged: onCaretChanged,
-                ignorePointer: rendererIgnoresPointer          
-            ); 
-        }   
+                ignorePointer: rendererIgnoresPointer
+            );
+        }
 
         public override void updateRenderObject(BuildContext context, RenderObject renderObject)
         {
@@ -614,50 +704,61 @@ namespace UIWidgets.widgets
             edit.onSelectionChanged = onSelectionChanged;
             edit.onCaretChanged = onCaretChanged;
             edit.ignorePointer = rendererIgnoresPointer;
-            edit.obscureText = obscureText;     
+            edit.obscureText = obscureText;
         }
     }
-    
-    
-    class _FixedViewportOffset : ViewportOffset {
-        internal _FixedViewportOffset(double _pixels) {
+
+
+    class _FixedViewportOffset : ViewportOffset
+    {
+        internal _FixedViewportOffset(double _pixels)
+        {
             this._pixels = _pixels;
         }
 
-        internal new static _FixedViewportOffset zero() {
+        internal new static _FixedViewportOffset zero()
+        {
             return new _FixedViewportOffset(0.0);
         }
 
         double _pixels;
 
-        public override double pixels {
+        public override double pixels
+        {
             get { return this._pixels; }
         }
 
-        public override bool applyViewportDimension(double viewportDimension) {
+        public override bool applyViewportDimension(double viewportDimension)
+        {
             return true;
         }
 
-        public override bool applyContentDimensions(double minScrollExtent, double maxScrollExtent) {
+        public override bool applyContentDimensions(double minScrollExtent, double maxScrollExtent)
+        {
             return true;
         }
 
-        public override void correctBy(double correction) {
+        public override void correctBy(double correction)
+        {
             this._pixels += correction;
         }
 
-        public override void jumpTo(double pixels) {
+        public override void jumpTo(double pixels)
+        {
         }
 
-        public override IPromise animateTo(double to, TimeSpan duration, Curve curve) {
+        public override IPromise animateTo(double to, TimeSpan duration, Curve curve)
+        {
             return Promise.Resolved();
         }
 
-        public override ScrollDirection userScrollDirection {
+        public override ScrollDirection userScrollDirection
+        {
             get { return ScrollDirection.idle; }
         }
 
-        public override bool allowImplicitScrolling {
+        public override bool allowImplicitScrolling
+        {
             get { return false; }
         }
     }
