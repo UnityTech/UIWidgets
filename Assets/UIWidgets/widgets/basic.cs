@@ -766,16 +766,16 @@ namespace UIWidgets.widgets {
             ((RenderImage) renderObject).alignment = this.alignment;
         }
 
-        public ui.Image image;
-        public double? width;
-        public double? height;
-        public double scale;
-        public Color color;
-        public BlendMode blendMode;
-        public BoxFit fit;
-        public Alignment alignment;
-        public ImageRepeat repeat;
-        public Rect centerSlice;
+        public readonly ui.Image image;
+        public readonly double? width;
+        public readonly double? height;
+        public readonly double scale;
+        public readonly Color color;
+        public readonly BlendMode blendMode;
+        public readonly BoxFit fit;
+        public readonly Alignment alignment;
+        public readonly ImageRepeat repeat;
+        public readonly Rect centerSlice;
     }
 
     public class Listener : SingleChildRenderObjectWidget {

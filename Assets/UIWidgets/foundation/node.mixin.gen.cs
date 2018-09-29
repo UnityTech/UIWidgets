@@ -1,6 +1,9 @@
+using System;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+
 namespace UIWidgets.foundation {
 
- 
 
 
     public class AbstractNode  {
@@ -80,7 +83,6 @@ namespace UIWidgets.foundation {
     }
 
 
- 
 
 
     public class AbstractNodeMixinDiagnosticableTree  : DiagnosticableTree {
@@ -156,6 +158,67 @@ namespace UIWidgets.foundation {
             if (this.attached) {
                 child.detach();
             }
+        }
+    }
+
+
+
+
+   public abstract class CanonicalMixinDiagnosticableTree : DiagnosticableTree {
+        _DependencyList _dependencyList;
+
+        _DependencyList _getDependencyList() {
+            if (this._dependencyList == null) {
+                this._dependencyList = new _DependencyList(this.GetType(), this);
+            }
+
+            return this._dependencyList;
+        }
+        
+        CanonicalMixinDiagnosticableTree _canonical;
+
+        CanonicalMixinDiagnosticableTree _getCanonical() {
+            if (this._canonical != null) {
+                return this._canonical;
+            }
+
+            var weakReference = _canonicalObjects.putIfAbsent(this._getDependencyList(), () => {
+                return new WeakReference(this);
+            });
+            if (weakReference.Target == null) {
+                weakReference.Target = this;
+            }
+
+            return this._canonical = (CanonicalMixinDiagnosticableTree) weakReference.Target;
+        }
+
+        ~CanonicalMixinDiagnosticableTree() {
+            if (this == this._canonical) {
+                _canonicalObjects.Remove(this._dependencyList);
+            }
+        }
+        
+        static readonly Dictionary<_DependencyList, WeakReference> _canonicalObjects =
+            new Dictionary<_DependencyList, WeakReference>();
+        
+        public override bool Equals(object obj) {
+            if (object.ReferenceEquals(null, obj)) {
+                return false;
+            }
+
+            if (object.ReferenceEquals(this, obj)) {
+                return true;
+            }
+
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
+
+            return object.ReferenceEquals(this._getCanonical(), ((CanonicalMixinDiagnosticableTree) obj)._getCanonical());
+        }
+        
+        public override int GetHashCode() {
+            return RuntimeHelpers.GetHashCode(this._getCanonical());
         }
     }
 

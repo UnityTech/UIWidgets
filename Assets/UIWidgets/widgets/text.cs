@@ -36,8 +36,10 @@ namespace UIWidgets.widgets {
         }
 
         public static DefaultTextStyle fallback() {
-            return new DefaultTextStyle();
+            return _fallback;
         }
+        
+        static readonly DefaultTextStyle _fallback = new DefaultTextStyle();
 
         public static Widget merge(
             Key key = null,

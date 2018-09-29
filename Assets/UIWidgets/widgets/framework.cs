@@ -300,7 +300,7 @@ namespace UIWidgets.widgets {
         }
     }
 
-    public abstract class Widget : DiagnosticableTree {
+    public abstract class Widget : CanonicalMixinDiagnosticableTree {
         protected Widget(Key key = null) {
             this.key = key;
         }
@@ -505,7 +505,7 @@ namespace UIWidgets.widgets {
         }
 
         public override bool debugIsValidAncestor(RenderObjectWidget ancestor) {
-            D.assert(typeof(T) != typeof(RenderObjectWidget));            
+            D.assert(typeof(T) != typeof(RenderObjectWidget));
             return ancestor is T;
         }
 
@@ -515,19 +515,19 @@ namespace UIWidgets.widgets {
             bool foundValidAncestor = false,
             IEnumerable<Widget> badAncestors = null
         ) {
-            D.assert(typeof(T) != typeof(RenderObjectWidget));            
+            D.assert(typeof(T) != typeof(RenderObjectWidget));
 
             string result;
             if (!foundValidAncestor) {
                 result = string.Format(
                     "{0} widgets must be placed inside {1} widgets.\n" +
-                                       "{2} has no {1} ancestor at all.\n", this.GetType(), typeof(T), description);
+                    "{2} has no {1} ancestor at all.\n", this.GetType(), typeof(T), description);
             } else {
                 D.assert(badAncestors != null);
                 D.assert(badAncestors.Any());
                 result = string.Format(
                     "{0} widgets must be placed directly inside {1} widgets.\n" +
-                                       "{2} has a {1} ancestor, but there are other widgets between them:\n",
+                    "{2} has a {1} ancestor, but there are other widgets between them:\n",
                     this.GetType(), typeof(T), description);
 
                 foreach (Widget ancestor in badAncestors) {
@@ -1230,7 +1230,7 @@ namespace UIWidgets.widgets {
             }
 
             if (child != null) {
-                if (child.widget == newWidget) {
+                if (object.Equals(child.widget, newWidget)) {
                     if (!object.Equals(child.slot, newSlot)) {
                         this.updateSlotForChild(child, newSlot);
                     }
@@ -1697,6 +1697,7 @@ namespace UIWidgets.widgets {
             if (this._inheritedWidgets != null) {
                 this._inheritedWidgets.TryGetValue(targetType, out ancestor);
             }
+
             if (ancestor != null) {
                 return this.inheritFromElement(ancestor, aspect: aspect);
             }
@@ -1711,6 +1712,7 @@ namespace UIWidgets.widgets {
             if (this._inheritedWidgets != null) {
                 this._inheritedWidgets.TryGetValue(targetType, out ancestor);
             }
+
             return ancestor;
         }
 
@@ -2370,7 +2372,7 @@ namespace UIWidgets.widgets {
         internal override void _updateInheritance() {
             Dictionary<Type, InheritedElement> incomingWidgets =
                 this._parent == null ? null : this._parent._inheritedWidgets;
-            
+
             if (incomingWidgets != null) {
                 this._inheritedWidgets = new Dictionary<Type, InheritedElement>(incomingWidgets);
             } else {

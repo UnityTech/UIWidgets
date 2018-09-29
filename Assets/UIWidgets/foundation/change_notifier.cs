@@ -21,7 +21,7 @@ namespace UIWidgets.foundation {
         T value { get; }
     }
 
-    public class ChangeNotifier : Listenable, IDisposable {
+    public class ChangeNotifier : Listenable {
         ObserverList<VoidCallback> _listeners = new ObserverList<VoidCallback>();
 
         bool _debugAssertNotDisposed() {
@@ -54,10 +54,6 @@ namespace UIWidgets.foundation {
         public void removeListener(VoidCallback listener) {
             D.assert(this._debugAssertNotDisposed());
             this._listeners.Remove(listener);
-        }
-
-        public void Dispose() {
-            this.dispose();
         }
 
         public virtual void dispose() {
