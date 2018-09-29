@@ -799,10 +799,10 @@ namespace UIWidgets.Tests {
     }
 
     public static class Icons {
-        public static readonly IconData notifications = new IconData(0xe7f4, fontFamily: "MaterialIcons");
-        public static readonly IconData account_circle = new IconData(0xe853, fontFamily: "MaterialIcons");
-        public static readonly IconData search = new IconData(0xe8b6, fontFamily: "MaterialIcons");
-        public static readonly IconData keyboard_arrow_down = new IconData(0xe313, fontFamily: "MaterialIcons");
+        public static readonly IconData notifications = new IconData(0xe7f4, fontFamily: "Material Icons");
+        public static readonly IconData account_circle = new IconData(0xe853, fontFamily: "Material Icons");
+        public static readonly IconData search = new IconData(0xe8b6, fontFamily: "Material Icons");
+        public static readonly IconData keyboard_arrow_down = new IconData(0xe313, fontFamily: "Material Icons");
     }
 
     public static class CLColors {

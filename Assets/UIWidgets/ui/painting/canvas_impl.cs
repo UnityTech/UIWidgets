@@ -320,8 +320,8 @@ namespace UIWidgets.ui {
 
         public void drawTextBlob(TextBlob textBlob, double x, double y)
         {
-            var mesh = MeshGenrator.generateMesh(textBlob, x, y);
-            var font = FontManager.instance.getOrCreate(textBlob.style.fontFamily, textBlob.style.UnityFontSize);
+            var mesh = MeshGenrator.generateMesh(textBlob);
+            var font = FontManager.instance.getOrCreate(textBlob.style.fontFamily).font;
             prepareGL(font.material);
             font.material.SetPass(0);
             Matrix4x4 cameraMat = Matrix4x4.identity;
@@ -332,7 +332,11 @@ namespace UIWidgets.ui {
                 Camera.current.worldToCameraMatrix = Matrix4x4.identity;
             }
 
-            Graphics.DrawMeshNow(mesh, this._transform);
+            var textBlobOffset = textBlob.positions[textBlob.start];
+            
+            Graphics.DrawMeshNow(mesh, this._transform * Matrix4x4.Translate(
+                                           new Vector3((float) Utils.PixelCorrectRound(x + textBlobOffset.x), 
+                                               (float) Utils.PixelCorrectRound(y + textBlobOffset.y), 0)));        
             if (Camera.current != null)
             {
                 Camera.current.worldToCameraMatrix = cameraMat;

@@ -5,41 +5,78 @@ using UnityEngine;
 
 namespace UIWidgets.ui
 {
-    
+    public class FontInfo
+    {
+        public readonly Font font;
+        private int _textureVersion;
+
+        public FontInfo(Font font)
+        {
+            this.font = font;
+            this._textureVersion = 0;
+        }
+
+        public int textureVersion
+        {
+            get { return _textureVersion; }
+        }
+
+        public void onTextureRebuilt()
+        {
+            _textureVersion++;
+        }
+    }
+
     public class FontManager
     {
-        private List<Font> _fonts = new List<Font>();
-        
+        private List<FontInfo> _fonts = new List<FontInfo>();
+        private static readonly int defaultFontSize = 14;
+
         public static readonly FontManager instance = new FontManager();
-        
-        public Font getOrCreate(string[] names, int fontSize)
+
+        private FontManager()
         {
-            _fonts = _fonts.FindAll((font) => font != null); // filter out destoryed fonts
-            var founded = _fonts.Find((font) =>
-                
-                (
-                font.fontSize == fontSize &&
-                    (names == font.fontNames || (names != null && names.SequenceEqual(font.fontNames)))));
+            Font.textureRebuilt += this.onFontTextureRebuilt;
+        }
+
+        public FontInfo getOrCreate(string[] names)
+        {
+            _fonts = _fonts.FindAll((info) => info.font != null); // filter out destoryed fonts
+            var founded = _fonts.Find((info) =>
+                ( (names == info.font.fontNames || (names != null &&
+                                                      names.SequenceEqual(info.font.fontNames)))));
             if (founded != null)
             {
                 return founded;
             }
 
-            if (names.SequenceEqual(new string[] {"MaterialIcons"})) {
+            if (names.SequenceEqual(new string[] {"Material Icons"}))
+            {
                 var font = Resources.Load<Font>("MaterialIcons-Regular");
                 D.assert(font != null);
-                _fonts.Add(font);
-                return font;
+                var fontInfo = new FontInfo(font);
+                _fonts.Add(fontInfo);
+                return fontInfo;
             }
 
-            var newFont = Font.CreateDynamicFontFromOSFont(names, fontSize);
+            var newFont = new FontInfo(Font.CreateDynamicFontFromOSFont(names, defaultFontSize));
             _fonts.Add(newFont);
             return newFont;
         }
 
-        public Font getOrCreate(string name, int fontSize)
+        public FontInfo getOrCreate(string name)
         {
-            return getOrCreate(new []{name}, fontSize);
+            return getOrCreate(new[] {name});
+        }
+
+        private void onFontTextureRebuilt(Font font)
+        {
+            var id = font.GetInstanceID();
+            var entry = _fonts.Find((f) => f.font != null && f.font.GetInstanceID() == id);
+            if (entry != null)
+            {
+                entry.onTextureRebuilt();
+            }
         }
     }
 }

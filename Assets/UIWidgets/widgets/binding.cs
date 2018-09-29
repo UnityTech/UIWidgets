@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UIWidgets.foundation;
 using UIWidgets.rendering;
 using UIWidgets.ui;
+using UIWidgets.ui.painting.txt;
 
 namespace UIWidgets.widgets {
     public interface WidgetsBindingObserver {
@@ -18,6 +19,10 @@ namespace UIWidgets.widgets {
         public WidgetsBinding() {
             this.buildOwner.onBuildScheduled = this._handleBuildScheduled;
             Window.instance.onLocaleChanged += this.handleLocaleChanged;
+            this.addPersistentFrameCallback((duration) =>
+            {
+                MeshGenrator.tickNextFrame();
+            });
         }
 
         public BuildOwner buildOwner {
