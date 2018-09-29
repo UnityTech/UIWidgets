@@ -359,7 +359,7 @@ namespace UIWidgets.ui
         w700, // bold
     }
 
-    public class TextPosition
+    public class TextPosition: IEquatable<TextPosition>
     {
         public readonly int offset;
         public readonly TextAffinity affinity;
@@ -375,8 +375,10 @@ namespace UIWidgets.ui
             return string.Format("Offset: {0}, Affinity: {1}", offset, affinity);
         }
 
-        protected bool Equals(TextPosition other)
+        public bool Equals(TextPosition other)
         {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
             return offset == other.offset && affinity == other.affinity;
         }
 
@@ -394,6 +396,16 @@ namespace UIWidgets.ui
             {
                 return (offset * 397) ^ (int) affinity;
             }
+        }
+
+        public static bool operator ==(TextPosition left, TextPosition right)
+        {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(TextPosition left, TextPosition right)
+        {
+            return !Equals(left, right);
         }
     }
 

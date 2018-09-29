@@ -140,6 +140,22 @@ namespace UIWidgets.service
             }
         }
 
+        public TextPosition startPos
+        {
+            get
+            {
+                return new TextPosition(offset: start, affinity: affinity); 
+            }
+        }
+        
+        public TextPosition endPos
+        {
+            get
+            {
+                return new TextPosition(offset: end, affinity: affinity); 
+            }
+        }
+        
         public bool Equals(TextSelection other)
         {
             if (ReferenceEquals(null, other)) return false;

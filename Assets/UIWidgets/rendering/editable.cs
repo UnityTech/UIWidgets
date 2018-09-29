@@ -411,14 +411,31 @@ namespace UIWidgets.rendering
             return _textPainter.getPositionVerticalMove(position, -1);
         }
         
-        public TextPosition getLineStartPosition(TextPosition position)
+        public TextPosition getLineStartPosition(TextPosition position, TextAffinity? affinity = null)
         {
-            return _textPainter.getLineStartPosition(_textPainter.getLineIndex(position));
+            var line = _textPainter.getLineRange(position);
+            return new TextPosition(offset:line.start, affinity:affinity??position.affinity);
+        }
+
+        public bool isLineEndOrStart(int offset)
+        {
+            int lineCount = _textPainter.getLineCount();
+            for (int i = 0; i < lineCount; i++)
+            {
+                var line = _textPainter.getLineRange(i);
+                if (line.start == offset || line.endIncludingNewLine == offset)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
         
-        public TextPosition getLineEndPosition(TextPosition position)
+        public TextPosition getLineEndPosition(TextPosition position, TextAffinity? affinity = null)
         {
-            return _textPainter.getLineEndPosition(_textPainter.getLineIndex(position));
+            var line = _textPainter.getLineRange(position);
+            return new TextPosition(offset:line.endIncludingNewLine, affinity:affinity??position.affinity);
         }
         
         public TextPosition getWordRight(TextPosition position)
@@ -431,6 +448,92 @@ namespace UIWidgets.rendering
             return _textPainter.getWordLeft(position);
         } 
 
+        public TextPosition getParagraphStart(TextPosition position, TextAffinity? affinity = null)
+        {
+            D.assert(!_needsLayout);
+            int lineIndex = _textPainter.getLineIndex(position);
+            while (lineIndex - 1 >= 0)
+            {
+                var preLine = _textPainter.getLineRange(lineIndex - 1);
+                if (preLine.hardBreak)
+                {
+                    break;
+                }
+
+                lineIndex--;
+            }
+
+            var line = _textPainter.getLineRange(lineIndex);
+            return new TextPosition(offset:line.start, affinity:affinity??position.affinity);
+        } 
+        
+        public TextPosition getParagraphEnd(TextPosition position, TextAffinity? affinity = null)
+        {
+            D.assert(!_needsLayout);
+            int lineIndex = _textPainter.getLineIndex(position);
+            int maxLine = _textPainter.getLineCount();
+            while (lineIndex < maxLine)
+            {
+                var line = _textPainter.getLineRange(lineIndex);
+                if (line.hardBreak)
+                {
+                    break;
+                }
+                lineIndex++;
+            }
+            return new TextPosition(offset:_textPainter.getLineRange(lineIndex).endIncludingNewLine, 
+                affinity:affinity??position.affinity);
+        }
+
+        public TextPosition getParagraphForward(TextPosition position, TextAffinity? affinity = null)
+        {
+            var lineCount = _textPainter.getLineCount();
+            Paragraph.LineRange line = null;
+            for (int i = 0; i < lineCount; ++i)
+            {
+                line = _textPainter.getLineRange(i);
+                if (!line.hardBreak)
+                {
+                    continue;
+                }
+                if (line.end > position.offset)
+                {
+                    break;
+                } 
+            }
+
+            if (line == null)
+            {
+                return new TextPosition(position.offset, affinity??position.affinity);
+            }
+            return new TextPosition(line.end, affinity??position.affinity);
+        }
+        
+        
+        public TextPosition getParagraphBackward(TextPosition position, TextAffinity? affinity = null)
+        {
+            var lineCount = _textPainter.getLineCount();
+            Paragraph.LineRange line = null;
+            for (int i = lineCount - 1; i >= 0; --i)
+            {
+                line = _textPainter.getLineRange(i);
+                if (i != 0 && !_textPainter.getLineRange(i - 1).hardBreak)
+                {
+                    continue;
+                }
+                if (line.start < position.offset)
+                {
+                    break;
+                } 
+            }
+
+            if (line == null)
+            {
+                return new TextPosition(position.offset, affinity??position.affinity);
+            }
+            return new TextPosition(line.start, affinity??position.affinity);
+        }
+        
         protected override double computeMinIntrinsicWidth(double height) {
             _layoutText(double.PositiveInfinity);
             return _textPainter.minIntrinsicWidth;
