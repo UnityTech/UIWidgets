@@ -66,14 +66,14 @@ namespace UIWidgets.ui
             this.fxHeight = fxHeight;
         }
 
-        public static FontMetrics fromFont(Font font, double? height)
+        public static FontMetrics fromFont(Font font, int fontSize, double? height)
         {
-            var ascent = font.ascent * (height??1.0);
-            var descent = (font.lineHeight - font.ascent) * (height??1.0);
+            var ascent = font.ascent * (height??1.0) * fontSize / font.fontSize;
+            var descent = (font.lineHeight - font.ascent) * (height??1.0) * fontSize / font.fontSize;
             double? fxHeight = null;
-            font.RequestCharactersInTexture("x");
+            font.RequestCharactersInTexture("x", fontSize);
             CharacterInfo charInfo;
-            if (font.GetCharacterInfo('x', out charInfo))
+            if (font.GetCharacterInfo('x', out charInfo, fontSize))
             {
                 fxHeight = charInfo.glyphHeight;
             }
@@ -607,8 +607,8 @@ namespace UIWidgets.ui
                 var run = _runs.getRun(i);
                 if (run.start < run.end)
                 {
-                    var font = FontManager.instance.getOrCreate(run.style.fontFamily, run.style.UnityFontSize);
-                    font.RequestCharactersInTexture(_text.Substring(run.start, run.end - run.start), 0, 
+                    var font = FontManager.instance.getOrCreate(run.style.fontFamily).font;
+                    font.RequestCharactersInTexture(_text.Substring(run.start, run.end - run.start), run.style.UnityFontSize, 
                         run.style.UnityFontStyle);
                 } 
             }
@@ -632,12 +632,8 @@ namespace UIWidgets.ui
                     var run = runIndex < _runs.size ? _runs.getRun(runIndex) : null;
                     if (run != null && run.start < run.end && run.start < line.end && run.end > line.start)
                     {
-                        var font = FontManager.instance.getOrCreate(run.style.fontFamily, run.style.UnityFontSize);
-                        var styleHeight = (double) run.style.UnityFontSize / font.fontSize;
-                        run.style.height = styleHeight;
-                        var metrics = FontMetrics.fromFont(font, run.style.height);
-                        var ascent = font.ascent * (run.style.height);
-                        var descent = (font.lineHeight - font.ascent) * (run.style.height);
+                        var font = FontManager.instance.getOrCreate(run.style.fontFamily).font;
+                        var metrics = FontMetrics.fromFont(font, run.style.UnityFontSize, run.style.height);
                         if (metrics.ascent > maxAscent)
                         {
                             maxAscent = metrics.ascent;
@@ -653,10 +649,10 @@ namespace UIWidgets.ui
                                     _characterPositions[start].x;
                         if (end > start)
                         {
-                            var bounds = Rect.fromLTWH(0, -ascent,
+                            var bounds = Rect.fromLTWH(0, -metrics.ascent,
                                 _characterPositions[end - 1].x + _characterWidths[end - 1] -
                                 _characterPositions[start].x,
-                                descent);
+                                metrics.descent);
                             
                             linePaintRecords.Add(new PaintRecord(run.style, new Offset(_characterPositions[start].x, yOffset)
                                 , new TextBlob(
