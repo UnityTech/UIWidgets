@@ -395,8 +395,8 @@ namespace UIWidgets.rendering {
     }
 
     public class TransformLayer : OffsetLayer {
-        public TransformLayer(Matrix4x4 transform = default(Matrix4x4), Offset offset = null) : base(offset) {
-            this._transform = transform;
+        public TransformLayer(Matrix4x4? transform = null, Offset offset = null) : base(offset) {
+            this._transform = transform ?? Matrix4x4.identity;
         }
 
         public Matrix4x4 transform {

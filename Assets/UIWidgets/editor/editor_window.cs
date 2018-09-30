@@ -25,7 +25,6 @@ namespace UIWidgets.editor {
                 this._lastPosition.width * EditorGUIUtility.pixelsPerPoint,
                 this._lastPosition.height * EditorGUIUtility.pixelsPerPoint);
 
-
             instance = this;
             try {
                 this._binding = new WidgetsBinding();
@@ -181,7 +180,7 @@ namespace UIWidgets.editor {
                 canvas = new CanvasImpl()
             };
             layer.paint(paintContext);
-            
+
             this._rasterCache.sweepAfterFrame();
         }
 

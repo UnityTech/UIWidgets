@@ -59,11 +59,7 @@ namespace UIWidgets.ui {
         }
 
         public CanvasImpl() {
-            this._transform = Matrix4x4.Scale(new Vector3(
-                1.0f / EditorGUIUtility.pixelsPerPoint,
-                1.0f / EditorGUIUtility.pixelsPerPoint,
-                1.0f));
-
+            this._transform = Matrix4x4.identity;
             this._defaultTexture = RenderTexture.active;
         }
 
@@ -140,7 +136,7 @@ namespace UIWidgets.ui {
                     var drawPicture = (DrawPicture) drawCmd;
                     this.drawPicture(drawPicture.picture);
                 } else if (drawCmd is DrawConcat) {
-                    var drawConcat = (DrawConcat) drawCmd; 
+                    var drawConcat = (DrawConcat) drawCmd;
                     this.concat(drawConcat.transform);
                 } else if (drawCmd is DrawSetMatrix) {
                     var drawSetMatrix = (DrawSetMatrix) drawCmd;
@@ -330,8 +326,7 @@ namespace UIWidgets.ui {
             this.pushClipRRect(rect, this._transform);
         }
 
-        public void drawTextBlob(TextBlob textBlob, Offset offset)
-        {
+        public void drawTextBlob(TextBlob textBlob, Offset offset) {
             var mesh = MeshGenrator.generateMesh(textBlob);
             var font = FontManager.instance.getOrCreate(textBlob.style.fontFamily).font;
             prepareGL(font.material);
@@ -345,7 +340,7 @@ namespace UIWidgets.ui {
             }
 
             var textBlobOffset = textBlob.positions[textBlob.start];
-            
+
             Graphics.DrawMeshNow(mesh, this._transform * Matrix4x4.Translate(
                                            new Vector3((float) Utils.PixelCorrectRound(offset.dx + textBlobOffset.x),
                                                (float) Utils.PixelCorrectRound(offset.dy + textBlobOffset.y), 0)));

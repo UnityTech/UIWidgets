@@ -20,8 +20,7 @@ namespace UIWidgets.rendering {
         public readonly double devicePixelRatio;
 
         public Matrix4x4 toMatrix() {
-            return Matrix4x4.Scale(new Vector3(
-                (float) this.devicePixelRatio, (float) this.devicePixelRatio, 1));
+            return Matrix4x4.identity;
         }
 
         public override string ToString() {
