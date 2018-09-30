@@ -272,7 +272,7 @@ namespace UIWidgets.rendering {
                     new TransformLayer(effectiveTransform),
                     painter,
                     offset,
-                    childPaintBounds: MatrixUtils.inverseTransformRect(effectiveTransform, this.estimatedBounds)
+                    childPaintBounds: effectiveTransform.inverseTransformRect(this.estimatedBounds)
                 );
             } else {
                 this.canvas.save();

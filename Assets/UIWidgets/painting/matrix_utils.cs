@@ -6,19 +6,19 @@ using Rect = UIWidgets.ui.Rect;
 
 namespace UIWidgets.painting {
     public static class MatrixUtils {
-        public static Offset transformPoint(Matrix4x4 transform, Offset point) {
+        public static Offset transformPoint(this Matrix4x4 transform, Offset point) {
             var position3 = new Vector3((float) point.dx, (float) point.dy, 0);
             var transformed3 = transform.MultiplyPoint(position3);
             return new Offset(transformed3.x, transformed3.y);
         }
 
-        public static Rect transformRect(Matrix4x4 transform, Offset[] points, out bool isRect) {
+        public static Rect transformRect(this Matrix4x4 transform, Offset[] points, out bool isRect) {
             D.assert(points != null && points.Length == 4, "expected 4 points");
 
-            var topLeft = MatrixUtils.transformPoint(transform, points[0]);
-            var topRight = MatrixUtils.transformPoint(transform, points[1]);
-            var bottomLeft = MatrixUtils.transformPoint(transform, points[2]);
-            var bottomRight = MatrixUtils.transformPoint(transform, points[3]);
+            var topLeft = transform.transformPoint(points[0]);
+            var topRight = transform.transformPoint(points[1]);
+            var bottomLeft = transform.transformPoint(points[2]);
+            var bottomRight = transform.transformPoint(points[3]);
 
             isRect = topLeft.dy == topRight.dy
                      && topRight.dx == bottomRight.dx
@@ -33,23 +33,23 @@ namespace UIWidgets.painting {
             return Rect.fromLTRB(left, top, right, bottom);
         }
 
-        public static Rect transformRect(Matrix4x4 transform, Rect rect, out bool isRect) {
-            return MatrixUtils.transformRect(transform,
+        public static Rect transformRect(this Matrix4x4 transform, Rect rect, out bool isRect) {
+            return transform.transformRect(
                 new[] {rect.topLeft, rect.topRight, rect.bottomLeft, rect.bottomRight},
                 out isRect);
         }
 
-        public static Rect transformRect(Matrix4x4 transform, Offset[] points) {
+        public static Rect transformRect(this Matrix4x4 transform, Offset[] points) {
             bool isRect;
-            return MatrixUtils.transformRect(transform, points, out isRect);
+            return transform.transformRect(points, out isRect);
         }
 
-        public static Rect transformRect(Matrix4x4 transform, Rect rect) {
+        public static Rect transformRect(this Matrix4x4 transform, Rect rect) {
             bool isRect;
-            return MatrixUtils.transformRect(transform, rect, out isRect);
+            return transform.transformRect(rect, out isRect);
         }
 
-        public static Rect inverseTransformRect(Matrix4x4 transform, Rect rect) {
+        public static Rect inverseTransformRect(this Matrix4x4 transform, Rect rect) {
             D.assert(rect != null);
             D.assert(transform.determinant != 0.0);
 
@@ -57,11 +57,11 @@ namespace UIWidgets.painting {
                 return rect;
             }
 
-            transform = transform.inverse;
-            return MatrixUtils.transformRect(transform, rect);
+            var inverse = transform.inverse;
+            return inverse.transformRect(rect);
         }
-        
-        public static Offset getAsTranslation(ref Matrix4x4 transform) {
+
+        public static Offset getAsTranslation(this Matrix4x4 transform) {
             if (transform.m00 == 1.0 &&
                 transform.m10 == 0.0 &&
                 transform.m20 == 0.0 &&
@@ -78,7 +78,12 @@ namespace UIWidgets.painting {
                 transform.m33 == 1.0) {
                 return new Offset(transform.m03, transform.m13);
             }
+
             return null;
+        }
+
+        public static bool isPerspective(this Matrix4x4 transform) {
+            return transform[3, 0] != 0 || transform[3, 1] != 0 || transform[3, 2] != 0 || transform[3, 3] != 1;
         }
     }
 }

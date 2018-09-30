@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UIWidgets.foundation;
 using UIWidgets.painting;
 using UIWidgets.ui;
 using Matrix4x4 = UnityEngine.Matrix4x4;
@@ -45,7 +46,12 @@ namespace UIWidgets.flow {
         }
 
         public void pushTransform(Matrix4x4 matrix) {
-            Rect cullRect = MatrixUtils.transformRect(matrix.inverse, this._cullRects.Peek());
+            D.assert(matrix.determinant != 0.0);
+
+            Rect cullRect = Rect.largest;
+            if (!matrix.isPerspective()) {
+                cullRect = matrix.inverse.transformRect(this._cullRects.Peek());
+            }
 
             var layer = new TransformLayer();
             layer.transform = matrix;
@@ -61,10 +67,10 @@ namespace UIWidgets.flow {
 
             this.pushLayer(layer, cullRect);
         }
-        
+
         public void pushClipRRect(RRect clipRRect) {
             Rect cullRect = clipRRect.outerRect.intersect(this._cullRects.Peek());
-            
+
             var layer = new ClipRRectLayer();
             layer.clipRRect = clipRRect;
 
@@ -78,7 +84,7 @@ namespace UIWidgets.flow {
             this.pushLayer(layer, this._cullRects.Peek());
         }
 
-        public void addPicture(Offset offset, Picture picture) {
+        public void addPicture(Offset offset, Picture picture, bool isComplex, bool willChange) {
             if (this._currentLayer == null) {
                 return;
             }
@@ -93,6 +99,8 @@ namespace UIWidgets.flow {
             var layer = new PictureLayer();
             layer.offset = offset;
             layer.picture = picture;
+            layer.isComplex = isComplex;
+            layer.willChange = willChange;
             this._currentLayer.add(layer);
         }
     }

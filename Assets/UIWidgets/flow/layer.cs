@@ -4,6 +4,7 @@ using Canvas = UIWidgets.ui.Canvas;
 
 namespace UIWidgets.flow {
     public class PrerollContext {
+        public RasterCache rasterCache;
     }
 
     public class PaintContext {

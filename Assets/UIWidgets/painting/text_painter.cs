@@ -240,7 +240,7 @@ namespace UIWidgets.painting
         public void paint(Canvas canvas, Offset offset)
         {
             Debug.Assert(!_needsLayout);
-            _paragraph.paint(canvas, offset.dx, offset.dy);
+            _paragraph.paint(canvas, offset);
         }
 
         public Offset getOffsetForCaret(TextPosition position, Rect caretPrototype)

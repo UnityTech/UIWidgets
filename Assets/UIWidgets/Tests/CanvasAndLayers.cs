@@ -238,10 +238,10 @@ namespace UIWidgets.Tests {
             };
 
             canvas.drawImageRect(
+                _stream.completer._currentImgae.image,
                 Rect.fromLTWH(150, 50, 250, 250),
                 Rect.fromLTWH(150, 50, 250, 250),
-                paint,
-                _stream.completer._currentImgae.image
+                paint
             );
         }
 

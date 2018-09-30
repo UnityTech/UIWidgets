@@ -670,7 +670,7 @@ namespace UIWidgets.rendering {
                     return false;
                 }
 
-                position = MatrixUtils.transformPoint(transform.inverse, position);
+                position = transform.inverse.transformPoint(position);
             }
 
             return base.hitTestChildren(result, position: position);
@@ -679,7 +679,7 @@ namespace UIWidgets.rendering {
         public override void paint(PaintingContext context, Offset offset) {
             if (this.child != null) {
                 var transform = this._effectiveTransform;
-                Offset childOffset = MatrixUtils.getAsTranslation(ref transform);
+                Offset childOffset = transform.getAsTranslation();
                 if (childOffset == null) {
                     context.pushTransform(this.needsCompositing, offset, transform, base.paint);
                 } else {

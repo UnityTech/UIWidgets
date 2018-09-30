@@ -28,7 +28,7 @@ namespace UIWidgets.ui {
 
         public void addPicture(Offset offset, Picture picture,
             bool isComplexHint = false, bool willChangeHint = false) {
-            this._layerBuilder.addPicture(offset, picture);
+            this._layerBuilder.addPicture(offset, picture, isComplexHint, willChangeHint);
         }
 
         public Scene build() {

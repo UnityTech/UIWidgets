@@ -293,13 +293,12 @@ namespace UIWidgets.ui
             get { return _didExceedMaxLines; }
         }
 
-        public void paint(Canvas canvas, double x, double y)
+        public void paint(Canvas canvas, Offset offset)
         {
-            var baseOffset = new Offset(x, y);
             foreach (var paintRecord in _paintRecords)
             {
-                canvas.drawTextBlob(paintRecord.text, x, y);
-                paintDecorations(canvas, paintRecord, baseOffset);
+                canvas.drawTextBlob(paintRecord.text, offset);
+                paintDecorations(canvas, paintRecord, offset);
             }
         }
         

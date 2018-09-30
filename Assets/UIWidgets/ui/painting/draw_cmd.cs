@@ -31,11 +31,15 @@ namespace UIWidgets.ui {
         public Paint paint;
         public Image image;
         public Rect src;
-        public Rect dst;
+        public Rect dest;
     }
 
     public class DrawConcat : DrawCmd {
         public Matrix4x4 transform;
+    }
+    
+    public class DrawSetMatrix : DrawCmd {
+        public Matrix4x4 matrix;
     }
 
     public class DrawSave : DrawCmd {
@@ -60,8 +64,7 @@ namespace UIWidgets.ui {
     public class DrawTextBlob : DrawCmd
     {
         public TextBlob textBlob;
-        public double x;
-        public double y;
+        public Offset offset;
     }
 
     public class DrawLine : DrawCmd

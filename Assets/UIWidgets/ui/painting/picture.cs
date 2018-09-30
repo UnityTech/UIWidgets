@@ -140,11 +140,11 @@ namespace UIWidgets.ui {
             } else if (drawCmd is DrawTextBlob)
             {
                 var drawTextBlob = (DrawTextBlob) drawCmd;
-                var bounds = drawTextBlob.textBlob.boundsInText.shift(new Offset(drawTextBlob.x, drawTextBlob.y));
+                var bounds = drawTextBlob.textBlob.boundsInText.shift(drawTextBlob.offset);
                 this.addPaintBounds(bounds);
             } else if (drawCmd is DrawImageRect) {
                 var drawImageRect = (DrawImageRect) drawCmd;
-                this.addPaintBounds(drawImageRect.src);
+                this.addPaintBounds(drawImageRect.dest);
             } else {
                 throw new Exception("unknown drawCmd: " + drawCmd);
             }
@@ -159,7 +159,7 @@ namespace UIWidgets.ui {
                 throw new Exception("already a clipRec, considering using saveLayer.");
             }
  
-            this._clipRect = MatrixUtils.transformRect(this._transform, rect);
+            this._clipRect = this._transform.transformRect(rect);
         }
 
         private void addPaintBounds(Rect paintBounds) {
@@ -167,7 +167,7 @@ namespace UIWidgets.ui {
                 return;
             }
 
-            paintBounds = MatrixUtils.transformRect(this._transform, paintBounds);
+            paintBounds = this._transform.transformRect(paintBounds);
             if (this._clipRect != null) {
                 paintBounds = paintBounds.intersect(this._clipRect);
             }
@@ -178,7 +178,7 @@ namespace UIWidgets.ui {
         }
 
         private void addPaintBounds(Offset[] points) {
-            var paintBounds = MatrixUtils.transformRect(this._transform, points);
+            var paintBounds = this._transform.transformRect(points);
             if (this._clipRect != null) {
                 paintBounds = paintBounds.intersect(this._clipRect);
             }

@@ -411,7 +411,7 @@ namespace UIWidgets.rendering {
                 RenderSliver pivotParent = (RenderSliver) pivot.parent;
 
                 transform = targetBox.getTransformTo(pivot);
-                Rect bounds = MatrixUtils.transformRect(transform, rect);
+                Rect bounds = transform.transformRect(rect);
 
                 double offset = 0.0;
 
@@ -499,7 +499,7 @@ namespace UIWidgets.rendering {
 
             transform = target.getTransformTo(this);
             this.applyPaintTransform(child, ref transform);
-            Rect targetRect = MatrixUtils.transformRect(transform, rect);
+            Rect targetRect = transform.transformRect(rect);
 
             switch (this.axisDirection) {
                 case AxisDirection.down:
@@ -656,7 +656,7 @@ namespace UIWidgets.rendering {
                 targetOffset = trailingEdgeOffset;
             } else {
                 var transform = descendant.getTransformTo(viewport.parent);
-                return MatrixUtils.transformRect(transform, rect ?? descendant.paintBounds);
+                return transform.transformRect(rect ?? descendant.paintBounds);
             }
 
             D.assert(targetOffset != null);

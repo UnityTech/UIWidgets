@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UIWidgets.foundation;
 using UIWidgets.painting;
 using UIWidgets.ui.painting.txt;
 using UIWidgets.ui.txt;
@@ -14,32 +15,32 @@ namespace UIWidgets.ui {
                 throw new Exception("UIWidgets/2D Handles Lines not found");
             }
 
-            CanvasImpl.linesMat = new Material(shader);
-            CanvasImpl.linesMat.hideFlags = HideFlags.HideAndDontSave;
+            linesMat = new Material(shader);
+            linesMat.hideFlags = HideFlags.HideAndDontSave;
 
             shader = Shader.Find("UIWidgets/GUIRoundedRect");
             if (shader == null) {
                 throw new Exception("UIWidgets/GUIRoundedRect not found");
             }
 
-            CanvasImpl.guiRoundedRectMat = new Material(shader);
-            CanvasImpl.guiRoundedRectMat.hideFlags = HideFlags.HideAndDontSave;
+            guiRoundedRectMat = new Material(shader);
+            guiRoundedRectMat.hideFlags = HideFlags.HideAndDontSave;
 
             shader = Shader.Find("UIWidgets/GUITextureClip");
             if (shader == null) {
                 throw new Exception("UIWidgets/GUITextureClip not found");
             }
 
-            CanvasImpl.guiTextureClipMat = new Material(shader);
-            CanvasImpl.guiTextureClipMat.hideFlags = HideFlags.HideAndDontSave;
+            guiTextureClipMat = new Material(shader);
+            guiTextureClipMat.hideFlags = HideFlags.HideAndDontSave;
 
             shader = Shader.Find("UIWidgets/ShadowRect");
             if (shader == null) {
                 throw new Exception("UIWidgets/ShadowRect not found");
             }
 
-            CanvasImpl.shadowRectMat = new Material(shader);
-            CanvasImpl.shadowRectMat.hideFlags = HideFlags.HideAndDontSave;
+            shadowRectMat = new Material(shader);
+            shadowRectMat.hideFlags = HideFlags.HideAndDontSave;
         }
 
         private static readonly Material linesMat;
@@ -74,8 +75,8 @@ namespace UIWidgets.ui {
                     verts[i] = points[i].toVector();
                 }
 
-                this.prepareGL(CanvasImpl.linesMat);
-                CanvasImpl.linesMat.SetPass(0);
+                this.prepareGL(linesMat);
+                linesMat.SetPass(0);
 
                 GL.Begin(GL.TRIANGLES);
                 GL.Color(color.toColor());
@@ -93,27 +94,27 @@ namespace UIWidgets.ui {
         }
 
         public void drawRect(Rect rect, BorderWidth borderWidth, BorderRadius borderRadius, Paint paint) {
-            this.prepareGL(CanvasImpl.guiRoundedRectMat);
+            this.prepareGL(guiRoundedRectMat);
 
-            CanvasImpl.guiRoundedRectMat.SetFloatArray("UIWidgets_BorderWidth",
+            guiRoundedRectMat.SetFloatArray("UIWidgets_BorderWidth",
                 borderWidth == null ? new[] {0f, 0f, 0f, 0f} : borderWidth.toFloatArray());
-            CanvasImpl.guiRoundedRectMat.SetFloatArray("UIWidgets_CornerRadius",
+            guiRoundedRectMat.SetFloatArray("UIWidgets_CornerRadius",
                 borderRadius == null ? new[] {0f, 0f, 0f, 0f} : borderRadius.toFloatArray());
 
             Graphics.DrawTexture(rect.toRect(), EditorGUIUtility.whiteTexture,
                 new UnityEngine.Rect(0.0f, 0.0f, 1f, 1f), 0, 0, 0, 0,
-                paint.color.toColor(), CanvasImpl.guiRoundedRectMat);
+                paint.color.toColor(), guiRoundedRectMat);
         }
-        
+
 
         public void drawRectShadow(Rect rect, Paint paint) {
-            this.prepareGL(CanvasImpl.shadowRectMat);
+            this.prepareGL(shadowRectMat);
 
-            CanvasImpl.shadowRectMat.SetFloat("UIWidgets_sigma", (float) paint.blurSigma);
+            shadowRectMat.SetFloat("UIWidgets_sigma", (float) paint.blurSigma);
 
             Graphics.DrawTexture(rect.toRect(), EditorGUIUtility.whiteTexture,
                 new UnityEngine.Rect(0.0f, 0.0f, 1f, 1f), 0, 0, 0, 0,
-                paint.color.toColor(), CanvasImpl.shadowRectMat);
+                paint.color.toColor(), shadowRectMat);
         }
 
         public void drawPicture(Picture picture) {
@@ -126,58 +127,51 @@ namespace UIWidgets.ui {
                 if (drawCmd is DrawPloygon4) {
                     var drawPloygon4 = (DrawPloygon4) drawCmd;
                     this.drawPloygon4(drawPloygon4.points, drawPloygon4.paint);
-                }
-                else if (drawCmd is DrawRect) {
+                } else if (drawCmd is DrawRect) {
                     var drawRect = (DrawRect) drawCmd;
                     this.drawRect(drawRect.rect, drawRect.borderWidth, drawRect.borderRadius, drawRect.paint);
-                } else if (drawCmd is DrawLine)
-                {
+                } else if (drawCmd is DrawLine) {
                     var drawLine = (DrawLine) drawCmd;
                     this.drawLine(drawLine.from, drawLine.to, drawLine.paint);
-                }
-                else if (drawCmd is DrawRectShadow) {
+                } else if (drawCmd is DrawRectShadow) {
                     var drawRectShadow = (DrawRectShadow) drawCmd;
                     this.drawRectShadow(drawRectShadow.rect, drawRectShadow.paint);
-                }
-                else if (drawCmd is DrawPicture) {
+                } else if (drawCmd is DrawPicture) {
                     var drawPicture = (DrawPicture) drawCmd;
                     this.drawPicture(drawPicture.picture);
-                }
-                else if (drawCmd is DrawConcat) {
-                    this.concat(((DrawConcat) drawCmd).transform);
-                }
-                else if (drawCmd is DrawSave) {
+                } else if (drawCmd is DrawConcat) {
+                    var drawConcat = (DrawConcat) drawCmd; 
+                    this.concat(drawConcat.transform);
+                } else if (drawCmd is DrawSetMatrix) {
+                    var drawSetMatrix = (DrawSetMatrix) drawCmd;
+                    this.setMatrix(drawSetMatrix.matrix);
+                } else if (drawCmd is DrawSave) {
                     saveCount++;
                     this.save();
-                }
-                else if (drawCmd is DrawSaveLayer) {
+                } else if (drawCmd is DrawSaveLayer) {
                     saveCount++;
                     var drawSaveLayer = (DrawSaveLayer) drawCmd;
                     this.saveLayer(drawSaveLayer.rect, drawSaveLayer.paint);
-                }
-                else if (drawCmd is DrawRestore) {
+                } else if (drawCmd is DrawRestore) {
                     saveCount--;
                     if (saveCount < 0) {
                         throw new Exception("unmatched save/restore in picture");
                     }
 
                     this.restore();
-                }
-                else if (drawCmd is DrawClipRect) {
+                } else if (drawCmd is DrawClipRect) {
                     var drawClipRect = (DrawClipRect) drawCmd;
                     this.clipRect(drawClipRect.rect);
-                }
-                else if (drawCmd is DrawClipRRect) {
+                } else if (drawCmd is DrawClipRRect) {
                     var drawClipRRect = (DrawClipRRect) drawCmd;
                     this.clipRRect(drawClipRRect.rrect);
                 } else if (drawCmd is DrawTextBlob) {
                     var drawTextBlob = (DrawTextBlob) drawCmd;
-                    this.drawTextBlob(drawTextBlob.textBlob, drawTextBlob.x, drawTextBlob.y);
+                    this.drawTextBlob(drawTextBlob.textBlob, drawTextBlob.offset);
                 } else if (drawCmd is DrawImageRect) {
-                    var drawImageProperties = (DrawImageRect) drawCmd;
-                    this.drawImageRect(drawImageProperties.src, drawImageProperties.dst, drawImageProperties.paint, drawImageProperties.image);
-                }
-                else {
+                    var drawImageRect = (DrawImageRect) drawCmd;
+                    this.drawImageRect(drawImageRect.image, drawImageRect.dest, drawImageRect.src, drawImageRect.paint);
+                } else {
                     throw new Exception("unknown drawCmd: " + drawCmd);
                 }
             }
@@ -189,36 +183,44 @@ namespace UIWidgets.ui {
             this.restore();
         }
 
-        public void drawImageRect(Rect src, Rect dst, Paint paint, Image image) {
-            if (image != null && image.texture != null) {
+        public void drawImageRect(Image image, Rect dest, Rect src = null, Paint paint = null) {
+            D.assert(image != null);
+            D.assert(dest != null);
+
+            if (image.texture != null) {
                 // convert src rect to Unity rect in normalized coordinates with (0,0) in the bottom-left corner.
                 var textureHeight = image.texture.height;
                 var textureWidth = image.texture.width;
-                var srcRect = new UnityEngine.Rect(
-                    (float) (src.left / textureWidth), 
-                    (float) ((textureHeight - src.bottom) / textureHeight),
-                    (float) (src.width / textureWidth), 
-                    (float) (src.height / textureHeight)
-                );
-                Graphics.DrawTexture(dst.toRect(), image.texture, srcRect, 0, 0 ,0 ,0);
+                var srcRect = src == null
+                    ? new UnityEngine.Rect(0, 0, 1, 1)
+                    : new UnityEngine.Rect(
+                        (float) (src.left / textureWidth),
+                        (float) ((textureHeight - src.bottom) / textureHeight),
+                        (float) (src.width / textureWidth),
+                        (float) (src.height / textureHeight)
+                    );
+
+                this.prepareGL(guiTextureClipMat);
+
+                Graphics.DrawTexture(dest.toRect(), image.texture,
+                    srcRect, 0, 0, 0, 0,
+                    paint != null && paint.color != null ? paint.color.toColor() : UnityEngine.Color.white,
+                    guiTextureClipMat);
             }
         }
 
-        public void drawLine(Offset from, Offset to, Paint paint)
-        {
+        public void drawLine(Offset from, Offset to, Paint paint) {
             var color = paint.color;
             Offset vect = to - from;
             var distance = vect.distance;
-            
-            if (color.alpha > 0 && distance > 0)
-            {
+
+            if (color.alpha > 0 && distance > 0) {
                 var halfWidth = paint.strokeWidth * 0.5;
                 var diff = vect / distance * halfWidth;
                 diff = new Offset(diff.dy, -diff.dx);
-                this.prepareGL(CanvasImpl.linesMat);
-                CanvasImpl.linesMat.SetPass(0);
-                var points = new[]
-                {
+                this.prepareGL(linesMat);
+                linesMat.SetPass(0);
+                var points = new[] {
                     (from + diff).toVector(),
                     (from - diff).toVector(),
                     (to - diff).toVector(),
@@ -226,16 +228,24 @@ namespace UIWidgets.ui {
                 };
                 GL.Begin(GL.QUADS);
                 GL.Color(color.toColor());
-                for (int i = 0; i < points.Length; ++i)
-                {
+                for (int i = 0; i < points.Length; ++i) {
                     GL.Vertex(points[i]);
                 }
+
                 GL.End();
             }
         }
 
         public void concat(Matrix4x4 transform) {
             this._transform = transform * this._transform;
+        }
+
+        public void setMatrix(Matrix4x4 matrix) {
+            this._transform = matrix;
+        }
+
+        public Matrix4x4 getMatrix() {
+            return this._transform;
         }
 
         public void save() {
@@ -250,8 +260,10 @@ namespace UIWidgets.ui {
         public void saveLayer(Rect bounds, Paint paint) {
             this.save();
 
-            var textureWidth = (int) Math.Round(bounds.width * EditorGUIUtility.pixelsPerPoint);
-            var textureHeight = (int) Math.Round(bounds.height * EditorGUIUtility.pixelsPerPoint);
+            bounds = bounds.roundOut();
+
+            var textureWidth = (int) Math.Ceiling(bounds.width * EditorGUIUtility.pixelsPerPoint);
+            var textureHeight = (int) Math.Ceiling(bounds.height * EditorGUIUtility.pixelsPerPoint);
 
             var texture = RenderTexture.GetTemporary(
                 textureWidth, textureHeight, 32,
@@ -287,11 +299,11 @@ namespace UIWidgets.ui {
 
                 GL.PopMatrix();
 
-                this.prepareGL(CanvasImpl.guiTextureClipMat);
+                this.prepareGL(guiTextureClipMat);
 
                 Graphics.DrawTexture(layerRec.bounds.toRect(), layerRec.texture,
                     new UnityEngine.Rect(0.0f, 0.0f, 1f, 1f), 0, 0, 0, 0,
-                    layerRec.paint.color.toColor(), CanvasImpl.guiTextureClipMat);
+                    layerRec.paint.color.toColor(), guiTextureClipMat);
 
                 RenderTexture.ReleaseTemporary(layerRec.texture);
                 layerRec.texture = null;
@@ -318,23 +330,21 @@ namespace UIWidgets.ui {
             this.pushClipRRect(rect, this._transform);
         }
 
-        public void drawTextBlob(TextBlob textBlob, double x, double y)
-        {
-            var mesh = MeshGenrator.generateMesh(textBlob, x, y);
+        public void drawTextBlob(TextBlob textBlob, Offset offset) {
+            var mesh = MeshGenrator.generateMesh(textBlob, offset.dx, offset.dy);
             var font = FontManager.instance.getOrCreate(textBlob.style.fontFamily, textBlob.style.UnityFontSize);
             prepareGL(font.material);
             font.material.SetPass(0);
             Matrix4x4 cameraMat = Matrix4x4.identity;
-           
-            if (Camera.current != null)  // draw mesh will use camera matrix, set to identity before draw mesh
+
+            if (Camera.current != null) // draw mesh will use camera matrix, set to identity before draw mesh
             {
                 cameraMat = Camera.current.worldToCameraMatrix;
                 Camera.current.worldToCameraMatrix = Matrix4x4.identity;
             }
 
             Graphics.DrawMeshNow(mesh, this._transform);
-            if (Camera.current != null)
-            {
+            if (Camera.current != null) {
                 Camera.current.worldToCameraMatrix = cameraMat;
                 Camera.current.ResetWorldToCameraMatrix();
             }
@@ -367,8 +377,7 @@ namespace UIWidgets.ui {
                         (float) rect.width,
                         (float) rect.height));
                     mat.SetVector("UIWidgets_GUIClipRectRadius", new Vector4(0, 0, 0, 0));
-                }
-                else {
+                } else {
                     var rrect = this._clipRec.rrect;
                     var rect = rrect.outerRect;
                     mat.SetVector("UIWidgets_GUIClipRect", new Vector4(
@@ -383,8 +392,7 @@ namespace UIWidgets.ui {
                             (float) rrect.brRadius,
                             (float) rrect.blRadius));
                 }
-            }
-            else {
+            } else {
                 mat.SetMatrix("UIWidgets_GUIClipMatrix", Matrix4x4.identity);
                 var rect = Rect.largest;
                 mat.SetVector("UIWidgets_GUIClipRect", new Vector4(

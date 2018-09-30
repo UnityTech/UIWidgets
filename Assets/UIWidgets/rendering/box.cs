@@ -1162,11 +1162,11 @@ namespace UIWidgets.rendering {
             }
 
             transform = transform.inverse;
-            return MatrixUtils.transformPoint(transform, point);
+            return transform.transformPoint(point);
         }
 
         public Offset localToGlobal(Offset point, RenderObject ancestor = null) {
-            return MatrixUtils.transformPoint(this.getTransformTo(ancestor), point);
+            return this.getTransformTo(ancestor).transformPoint(point);
         }
 
         public override Rect paintBounds {

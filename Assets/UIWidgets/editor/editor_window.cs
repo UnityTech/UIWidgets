@@ -26,18 +26,22 @@ namespace UIWidgets.editor {
                 this._lastPosition.height * EditorGUIUtility.pixelsPerPoint);
 
 
-            Window.instance = this;
+            instance = this;
             try {
                 this._binding = new WidgetsBinding();
             }
             finally {
-                Window.instance = null;
+                instance = null;
             }
+
+            this._rasterCache = new RasterCache();
         }
 
         public readonly EditorWindow editorWindow;
 
         readonly WidgetsBinding _binding;
+
+        readonly RasterCache _rasterCache;
 
         Rect _lastPosition;
         readonly DateTime _epoch = new DateTime(Stopwatch.GetTimestamp());
@@ -46,14 +50,14 @@ namespace UIWidgets.editor {
         readonly TextInput _textInput = new TextInput();
 
         public void OnGUI() {
-            Window.instance = this;
+            instance = this;
             WidgetsBinding.instance = this._binding;
 
             try {
                 this.doOnGUI();
             }
             finally {
-                Window.instance = null;
+                instance = null;
                 WidgetsBinding.instance = null;
             }
         }
@@ -114,8 +118,7 @@ namespace UIWidgets.editor {
                 }
             }
 
-            if (_textInput != null)
-            {
+            if (_textInput != null) {
                 _textInput.OnGUI();
             }
         }
@@ -169,11 +172,17 @@ namespace UIWidgets.editor {
         public override void render(Scene scene) {
             var layer = scene.takeLayer();
 
-            var prerollContext = new PrerollContext();
+            var prerollContext = new PrerollContext {
+                rasterCache = this._rasterCache
+            };
             layer.preroll(prerollContext, Matrix4x4.identity);
 
-            var paintContext = new PaintContext {canvas = new CanvasImpl()};
+            var paintContext = new PaintContext {
+                canvas = new CanvasImpl()
+            };
             layer.paint(paintContext);
+            
+            this._rasterCache.sweepAfterFrame();
         }
 
         public override void scheduleMicrotask(Action callback) {
@@ -214,8 +223,7 @@ namespace UIWidgets.editor {
             }
         }
 
-        public override TextInput textInput
-        {
+        public override TextInput textInput {
             get { return _textInput; }
         }
     }

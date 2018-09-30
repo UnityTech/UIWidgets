@@ -16,7 +16,7 @@ namespace UIWidgets.flow {
             Rect childPaintBounds = Rect.zero;
             this.prerollChildren(context, childMatrix, ref childPaintBounds);
 
-            childPaintBounds = MatrixUtils.transformRect(this._tranform, childPaintBounds);
+            childPaintBounds = this._tranform.transformRect(childPaintBounds);
             this.paintBounds = childPaintBounds;
         }
 

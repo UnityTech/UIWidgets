@@ -1,26 +1,32 @@
-﻿using UIWidgets.painting;
+﻿using System;
+using UIWidgets.foundation;
+using UIWidgets.painting;
 using UIWidgets.ui.txt;
 using UnityEngine;
 
 namespace UIWidgets.ui {
     public interface Canvas {
-        void drawPloygon4(Offset[] points, Paint paint);
+        void drawPloygon4(Offset[] points, Paint paint = null);
 
-        void drawRect(Rect rect, BorderWidth borderWidth, BorderRadius borderRadius, Paint paint);
+        void drawRect(Rect rect, BorderWidth borderWidth = null, BorderRadius borderRadius = null, Paint paint = null);
 
-        void drawRectShadow(Rect rect, Paint paint);
+        void drawRectShadow(Rect rect, Paint paint = null);
 
         void drawPicture(Picture picture);
 
-        void drawImageRect(Rect src, Rect dst, Paint paint, Image image);
+        void drawImageRect(Image image, Rect dest, Rect src = null, Paint paint = null);
 
-        void drawLine(Offset from, Offset to, Paint paint);
+        void drawLine(Offset from, Offset to, Paint paint = null);
 
         void concat(Matrix4x4 transform);
 
+        void setMatrix(Matrix4x4 matrix);
+
+        Matrix4x4 getMatrix();
+
         void save();
 
-        void saveLayer(Rect rect, Paint paint);
+        void saveLayer(Rect rect, Paint paint = null);
 
         void restore();
 
@@ -30,7 +36,7 @@ namespace UIWidgets.ui {
 
         void clipRRect(RRect rrect, bool doAntiAlias = true);
 
-        void drawTextBlob(TextBlob textBlob, double x, double y);
+        void drawTextBlob(TextBlob textBlob, Offset offset);
     }
 
     public class RecorderCanvas : Canvas {
@@ -39,7 +45,7 @@ namespace UIWidgets.ui {
         }
 
         readonly PictureRecorder _recorder;
-        
+
         int _saveCount = 1;
 
         public void drawPloygon4(Offset[] points, Paint paint) {
@@ -71,19 +77,17 @@ namespace UIWidgets.ui {
             });
         }
 
-        public void drawImageRect(Rect src, Rect dst, Paint paint, Image image) {
+        public void drawImageRect(Image image, Rect dest, Rect src, Paint paint) {
             this._recorder.addDrawCmd(new DrawImageRect {
-                paint = paint,
                 image = image,
+                dest = dest,
                 src = src,
-                dst = dst,
+                paint = paint,
             });
         }
 
-        public void drawLine(Offset from, Offset to, Paint paint)
-        {
-            this._recorder.addDrawCmd(new DrawLine
-            {
+        public void drawLine(Offset from, Offset to, Paint paint) {
+            this._recorder.addDrawCmd(new DrawLine {
                 from = from,
                 to = to,
                 paint = paint,
@@ -94,6 +98,16 @@ namespace UIWidgets.ui {
             this._recorder.addDrawCmd(new DrawConcat {
                 transform = transform,
             });
+        }
+
+        public void setMatrix(Matrix4x4 matrix) {
+            this._recorder.addDrawCmd(new DrawSetMatrix {
+                matrix =  matrix,
+            });
+        }
+
+        public Matrix4x4 getMatrix() {
+            throw new Exception("not available in recorder");            
         }
 
         public void save() {
@@ -132,11 +146,10 @@ namespace UIWidgets.ui {
             });
         }
 
-        public void drawTextBlob(TextBlob textBlob, double x, double y) {
-            this._recorder.addDrawCmd(new DrawTextBlob() {
+        public void drawTextBlob(TextBlob textBlob, Offset offset) {
+            this._recorder.addDrawCmd(new DrawTextBlob {
                 textBlob = textBlob,
-                x = x,
-                y = y,
+                offset = offset
             });
         }
     }

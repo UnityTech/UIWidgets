@@ -417,7 +417,6 @@ namespace UIWidgets.ui {
             return true;
         }
 
-
         public double shortestSide {
             get { return Math.Min(Math.Abs(this.width), Math.Abs(this.height)); }
         }
@@ -468,6 +467,12 @@ namespace UIWidgets.ui {
 
         public bool contains(Rect rect) {
             return this.contains(rect.topLeft) && this.contains(rect.bottomRight);
+        }
+
+        public Rect roundOut() {
+            return Rect.fromLTRB(
+                Math.Floor(this.left), Math.Floor(this.top),
+                Math.Ceiling(this.right), Math.Ceiling(this.bottom)); 
         }
 
         public static Rect lerp(Rect a, Rect b, double t) {
