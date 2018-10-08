@@ -5,6 +5,8 @@ using System;
 using System.IO;
 using UIWidgets.lib.cache_manager;
 using UIWidgets.ui;
+using UnityEditor;
+using UnityEngine;
 
 namespace UIWidgets.painting {
     public abstract class ImageProvider {
@@ -126,9 +128,9 @@ namespace UIWidgets.painting {
         
         public static IPromise<ImageInfo> _loadAsync(FileImage key) {
             var promise = new Promise<ImageInfo>();
-            var bytes = File.ReadAllBytes(key.path);
+            Texture2D texture = (Texture2D) AssetDatabase.LoadAssetAtPath(key.path, typeof(Texture2D));
             var imageInfo = new ImageInfo(new ui.Image(
-                bytes
+                texture: texture
             ));
             promise.Resolve(imageInfo);
             return promise;
