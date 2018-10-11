@@ -308,7 +308,7 @@ namespace UIWidgets.painting
         {
             D.assert(!_needsLayout);
             var offset = getOffsetForCaret(position, Rect.zero);
-            var lineIndex = Math.Min(Math.Max(_paragraph.getLine(position) + move, 0), _paragraph.getLineCount());
+            var lineIndex = Math.Min(Math.Max(_paragraph.getLine(position) + move, 0), _paragraph.getLineCount() - 1);
             var targetLineStart = _paragraph.getLineRange(lineIndex).start;
             var newLineOffset = getOffsetForCaret(new TextPosition(targetLineStart), Rect.zero);
             return getPositionForOffset(new Offset(offset.dx, newLineOffset.dy));
