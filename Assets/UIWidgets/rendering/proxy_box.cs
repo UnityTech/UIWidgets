@@ -485,6 +485,10 @@ namespace UIWidgets.rendering {
             this.markNeedsPaint();
         }
 
+        protected override bool hitTestSelf(Offset position) {
+            return _decoration.hitTest(size, position);
+        }
+        
         public override void paint(PaintingContext context, Offset offset) {
             this._painter = this._painter ?? this._decoration.createBoxPainter(this.markNeedsPaint);
             var filledConfiguration = this.configuration.copyWith(size: this.size);

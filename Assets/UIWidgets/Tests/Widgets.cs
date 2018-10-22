@@ -90,6 +90,7 @@ namespace UIWidgets.Tests {
         }
 
         void OnDestroy() {
+            this.windowAdapter.Destory();
             this.windowAdapter = null;
         }
 
@@ -214,7 +215,8 @@ namespace UIWidgets.Tests {
         }
 
         Widget asPage() {
-            return new AsScreen();
+            //return new AsScreen();
+            return new WidgetInspector(null, new AsScreen(), null);
         }
     }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UIWidgets.painting;
 using UIWidgets.ui;
 using UIWidgets.foundation;
+using UIWidgets.gestures;
 using UnityEngine;
 using Rect = UIWidgets.ui.Rect;
 
@@ -393,6 +394,10 @@ namespace UIWidgets.rendering {
             }
         }
 
+        protected override bool hitTestChildren(HitTestResult result, Offset position = null) {
+            return defaultHitTestChildren(result, position: position);
+        }
+        
         public void paintStack(PaintingContext context, Offset offset) {
             defaultPaint(context, offset);
         }

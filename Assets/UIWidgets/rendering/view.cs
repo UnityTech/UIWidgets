@@ -1,6 +1,7 @@
 ﻿using System;
 using UIWidgets.foundation;
 using UIWidgets.gestures;
+using UIWidgets.painting;
 using UIWidgets.ui;
 using UnityEngine;
 using Rect = UIWidgets.ui.Rect;
@@ -138,6 +139,14 @@ namespace UIWidgets.rendering {
             get { return Offset.zero & (this.size * this.configuration.devicePixelRatio); }
         }
 
+        public override Rect semanticBounds {
+            get
+            {
+                D.assert(_rootTransform != null);
+                return MatrixUtils.transformRect(_rootTransform, Offset.zero & size);
+            }
+        }
+        
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             D.assert(() => {
                 properties.add(DiagnosticsNode.message("debug mode enabled"));
