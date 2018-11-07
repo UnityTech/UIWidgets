@@ -253,8 +253,11 @@ namespace UIWidgets.editor {
             this._microtaskQueue.flushMicrotasks();
         }
 
-        public override Timer run(TimeSpan duration, Action callback) {
-            return this._timerProvider.run(duration, callback);
+        public override Timer run(TimeSpan duration, Action callback, bool periodic = false)
+        {
+            return periodic
+                ? this._timerProvider.periodic(duration, callback)
+                : this._timerProvider.run(duration, callback);
         }
 
         public void attachRootRenderBox(RenderBox root) {
