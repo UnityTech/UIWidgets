@@ -904,6 +904,9 @@ namespace UIWidgets.widgets {
             PointerMoveEventListener onPointerMove = null,
             PointerUpEventListener onPointerUp = null,
             PointerCancelEventListener onPointerCancel = null,
+            PointerHoverEventListener onPointerHover = null,
+            PointerLeaveEventListener onPointerLeave = null,
+            PointerEnterEventListener onPointerEnter = null,
             HitTestBehavior behavior = HitTestBehavior.deferToChild,
             Widget child = null
         ) : base(key: key, child: child) {
@@ -911,6 +914,9 @@ namespace UIWidgets.widgets {
             this.onPointerMove = onPointerMove;
             this.onPointerUp = onPointerUp;
             this.onPointerCancel = onPointerCancel;
+            this.onPointerHover = onPointerHover;
+            this.onPointerLeave = onPointerLeave;
+            this.onPointerEnter = onPointerEnter;
             this.behavior = behavior;
         }
 
@@ -921,6 +927,12 @@ namespace UIWidgets.widgets {
         public readonly PointerUpEventListener onPointerUp;
 
         public readonly PointerCancelEventListener onPointerCancel;
+        
+        public readonly PointerHoverEventListener onPointerHover;
+
+        public readonly PointerEnterEventListener  onPointerEnter;
+
+        public readonly PointerLeaveEventListener  onPointerLeave;
 
         public readonly HitTestBehavior behavior;
 
@@ -930,6 +942,9 @@ namespace UIWidgets.widgets {
                 onPointerMove: this.onPointerMove,
                 onPointerUp: this.onPointerUp,
                 onPointerCancel: this.onPointerCancel,
+                onPointerEnter: this.onPointerEnter,
+                onPointerLeave: this.onPointerLeave,
+                onPointerHover: this.onPointerHover,
                 behavior: this.behavior
             );
         }
@@ -940,6 +955,9 @@ namespace UIWidgets.widgets {
             renderObject.onPointerMove = this.onPointerMove;
             renderObject.onPointerUp = this.onPointerUp;
             renderObject.onPointerCancel = this.onPointerCancel;
+            renderObject.onPointerEnter = this.onPointerEnter;
+            renderObject.onPointerHover = this.onPointerHover;
+            renderObject.onPointerLeave = this.onPointerLeave;
             renderObject.behavior = this.behavior;
         }
 
@@ -961,7 +979,18 @@ namespace UIWidgets.widgets {
             if (this.onPointerCancel != null) {
                 listeners.Add("cancel");
             }
+            
+            if (this.onPointerEnter != null) {
+                listeners.Add("enter");
+            }
 
+            if (this.onPointerHover != null) {
+                listeners.Add("hover");
+            }
+
+            if (this.onPointerLeave != null) {
+                listeners.Add("leave");
+            }
             properties.add(new EnumerableProperty<string>("listeners", listeners, ifEmpty: "<none>"));
             properties.add(new EnumProperty<HitTestBehavior>("behavior", this.behavior));
         }

@@ -26,8 +26,8 @@ namespace UIWidgets.editor {
         {
             this._alive = true;
             this.editorWindow = editorWindow;
-            this.editorWindow.wantsMouseMove = false;
-            this.editorWindow.wantsMouseEnterLeaveWindow = false;
+            this.editorWindow.wantsMouseMove = true;
+            this.editorWindow.wantsMouseEnterLeaveWindow = true;
 
             this._devicePixelRatio = EditorGUIUtility.pixelsPerPoint;
 
@@ -164,6 +164,16 @@ namespace UIWidgets.editor {
                     pointerData = new PointerData(
                         timeStamp: DateTime.Now,
                         change: PointerChange.move,
+                        kind: PointerDeviceKind.mouse,
+                        device: evt.button,
+                        physicalX: evt.mousePosition.x * this._devicePixelRatio,
+                        physicalY: evt.mousePosition.y * this._devicePixelRatio
+                    );
+                } else if (evt.type == EventType.MouseMove)
+                {
+                    pointerData = new PointerData(
+                        timeStamp: DateTime.Now,
+                        change: PointerChange.hover,
                         kind: PointerDeviceKind.mouse,
                         device: evt.button,
                         physicalX: evt.mousePosition.x * this._devicePixelRatio,

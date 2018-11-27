@@ -712,6 +712,12 @@ namespace UIWidgets.rendering {
     public delegate void PointerUpEventListener(PointerUpEvent evt);
 
     public delegate void PointerCancelEventListener(PointerCancelEvent evt);
+    
+    public delegate void PointerHoverEventListener(PointerHoverEvent evt);
+    
+    public delegate void PointerEnterEventListener(PointerEnterEvent evt);
+    
+    public delegate void PointerLeaveEventListener(PointerLeaveEvent evt);
 
     public class RenderPointerListener : RenderProxyBoxWithHitTestBehavior {
         public RenderPointerListener(
@@ -719,6 +725,9 @@ namespace UIWidgets.rendering {
             PointerMoveEventListener onPointerMove = null,
             PointerUpEventListener onPointerUp = null,
             PointerCancelEventListener onPointerCancel = null,
+            PointerHoverEventListener onPointerHover = null,
+            PointerLeaveEventListener onPointerLeave = null,
+            PointerEnterEventListener onPointerEnter = null,
             HitTestBehavior behavior = HitTestBehavior.deferToChild,
             RenderBox child = null
         ) : base(behavior: behavior, child: child) {
@@ -726,6 +735,9 @@ namespace UIWidgets.rendering {
             this.onPointerMove = onPointerMove;
             this.onPointerUp = onPointerUp;
             this.onPointerCancel = onPointerCancel;
+            this.onPointerHover = onPointerHover;
+            this.onPointerLeave = onPointerLeave;
+            this.onPointerEnter = onPointerEnter;
         }
 
         public PointerDownEventListener onPointerDown;
@@ -736,10 +748,16 @@ namespace UIWidgets.rendering {
 
         public PointerCancelEventListener onPointerCancel;
 
+        public PointerHoverEventListener onPointerHover;
+        
+        public PointerLeaveEventListener onPointerLeave;
+        
+        public PointerEnterEventListener onPointerEnter;
+
         protected override void performResize() {
             this.size = this.constraints.biggest;
-        }
-
+        }    
+        
         public override void handleEvent(PointerEvent evt, HitTestEntry entry) {
             D.assert(this.debugHandleEvent(evt, entry));
 
@@ -762,6 +780,24 @@ namespace UIWidgets.rendering {
                 this.onPointerCancel((PointerCancelEvent) evt);
                 return;
             }
+
+            if (this.onPointerHover != null && evt is PointerHoverEvent)
+            {
+                this.onPointerHover((PointerHoverEvent) evt);
+                return;
+            }
+            
+            if (this.onPointerLeave != null && evt is PointerLeaveEvent)
+            {
+                this.onPointerLeave((PointerLeaveEvent) evt);
+                return;
+            }
+            
+            if (this.onPointerEnter != null && evt is PointerEnterEvent)
+            {
+                this.onPointerEnter((PointerEnterEvent) evt);
+                return;
+            }
         }
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
@@ -775,6 +811,12 @@ namespace UIWidgets.rendering {
                 listeners.Add("up");
             if (this.onPointerCancel != null)
                 listeners.Add("cancel");
+            if (this.onPointerHover != null)
+                listeners.Add("hover");
+            if (this.onPointerEnter != null)
+                listeners.Add("enter");
+            if (this.onPointerLeave != null)
+                listeners.Add("leave");
             if (listeners.isEmpty()) {
                 listeners.Add("<none>");
             }
