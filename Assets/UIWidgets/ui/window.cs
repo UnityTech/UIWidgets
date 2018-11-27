@@ -85,7 +85,7 @@ namespace UIWidgets.ui {
 
         public abstract void flushMicrotasks();
 
-        public abstract Timer run(TimeSpan duration, Action callback);
+        public abstract Timer run(TimeSpan duration, Action callback, bool periodic = false);
 
         public Timer run(Action callback) {
             return this.run(TimeSpan.Zero, callback);

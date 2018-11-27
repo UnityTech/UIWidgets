@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using UIWidgets.foundation;
 using UIWidgets.painting;
 using UIWidgets.ui;
 using UnityEngine;
@@ -195,8 +197,13 @@ namespace UIWidgets.rendering
             _layoutTextWithConstraints(constraints);
             return _textPainter.computeDistanceToActualBaseline(baseline);
         }
-        
-        
+
+
+        protected override bool hitTestSelf(Offset position)
+        {
+            return true;
+        }
+
         protected override void performLayout() {
             _layoutTextWithConstraints(constraints);
             var textSize = _textPainter.size;
@@ -230,6 +237,25 @@ namespace UIWidgets.rendering
         
         private void _layoutTextWithConstraints(BoxConstraints constraints) {
             _layoutText(minWidth: constraints.minWidth, maxWidth: constraints.maxWidth);
+        }
+
+        public override List<DiagnosticsNode> debugDescribeChildren()
+        {
+            return new List<DiagnosticsNode>
+            {
+                text.toDiagnosticsNode(name: "text", style: DiagnosticsTreeStyle.transition)
+            };
+        }
+        
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new EnumProperty<TextAlign>("textAlign", textAlign));
+            properties.add(new EnumProperty<TextDirection?>("textDirection", textDirection));
+            properties.add(new FlagProperty("softWrap", value: softWrap, ifTrue: "wrapping at box width", 
+                ifFalse: "no wrapping except at line break characters", showName: true));
+            properties.add(new EnumProperty<TextOverflow>("overflow", overflow));
+            properties.add(new DoubleProperty("textScaleFactor", textScaleFactor, defaultValue: 1.0));
+            properties.add(new IntProperty("maxLines", maxLines, ifNull: "unlimited"));
         }
     }
 }

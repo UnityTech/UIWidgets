@@ -1255,6 +1255,8 @@ namespace UIWidgets.rendering {
             return null;
         }
 
+        public abstract Rect semanticBounds { get; }
+
         public virtual void handleEvent(PointerEvent evt, HitTestEntry entry) {
         }
 

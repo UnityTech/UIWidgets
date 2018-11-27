@@ -11,12 +11,23 @@ using UnityEditor;
 using UnityEngine;
 using Rect = UnityEngine.Rect;
 
-namespace UIWidgets.editor {
+namespace UIWidgets.editor {  
+    
     public class WindowAdapter : Window {
-        public WindowAdapter(EditorWindow editorWindow) {
+        
+        private static List<WindowAdapter> _windowAdapters = new List<WindowAdapter>();
+        private bool _alive;
+        public static IEnumerable<WindowAdapter> windowAdapters
+        {
+            get { return _windowAdapters; }
+        }
+
+        public WindowAdapter(EditorWindow editorWindow)
+        {
+            this._alive = true;
             this.editorWindow = editorWindow;
-            this.editorWindow.wantsMouseMove = false;
-            this.editorWindow.wantsMouseEnterLeaveWindow = false;
+            this.editorWindow.wantsMouseMove = true;
+            this.editorWindow.wantsMouseEnterLeaveWindow = true;
 
             this._devicePixelRatio = EditorGUIUtility.pixelsPerPoint;
 
@@ -32,11 +43,33 @@ namespace UIWidgets.editor {
             finally {
                 instance = null;
             }
-
             this._rasterCache = new RasterCache();
+            _windowAdapters.Add(this);
         }
 
+        public bool alive
+        {
+            get { return _alive; }
+        }
+        
+        public void Destory()
+        {
+            var index = _windowAdapters.FindIndex(w => w == this);
+            if (index >= 0)
+            {
+                _windowAdapters.RemoveAt(index);
+            }
+
+            this._alive = false;
+        }
+        
         public readonly EditorWindow editorWindow;
+
+        public WidgetInspectorService widgetInspectorService
+        {
+            get { return _binding.widgetInspectorService; }
+        }
+        
 
         readonly WidgetsBinding _binding;
 
@@ -54,6 +87,34 @@ namespace UIWidgets.editor {
 
             try {
                 this.doOnGUI();
+            }
+            finally {
+                instance = null;
+                WidgetsBinding.instance = null;
+            }
+        }
+
+        public void WithBinding(Action fn)
+        {
+            instance = this;
+            WidgetsBinding.instance = this._binding;
+            try
+            {
+                fn();
+            }
+            finally {
+                instance = null;
+                WidgetsBinding.instance = null;
+            }
+        }
+        
+        public T WithBindingFunc<T>(Func<T> fn)
+        {
+            instance = this;
+            WidgetsBinding.instance = this._binding;
+            try
+            {
+                return fn();
             }
             finally {
                 instance = null;
@@ -103,6 +164,16 @@ namespace UIWidgets.editor {
                     pointerData = new PointerData(
                         timeStamp: DateTime.Now,
                         change: PointerChange.move,
+                        kind: PointerDeviceKind.mouse,
+                        device: evt.button,
+                        physicalX: evt.mousePosition.x * this._devicePixelRatio,
+                        physicalY: evt.mousePosition.y * this._devicePixelRatio
+                    );
+                } else if (evt.type == EventType.MouseMove)
+                {
+                    pointerData = new PointerData(
+                        timeStamp: DateTime.Now,
+                        change: PointerChange.hover,
                         kind: PointerDeviceKind.mouse,
                         device: evt.button,
                         physicalX: evt.mousePosition.x * this._devicePixelRatio,
@@ -192,8 +263,11 @@ namespace UIWidgets.editor {
             this._microtaskQueue.flushMicrotasks();
         }
 
-        public override Timer run(TimeSpan duration, Action callback) {
-            return this._timerProvider.run(duration, callback);
+        public override Timer run(TimeSpan duration, Action callback, bool periodic = false)
+        {
+            return periodic
+                ? this._timerProvider.periodic(duration, callback)
+                : this._timerProvider.run(duration, callback);
         }
 
         public void attachRootRenderBox(RenderBox root) {

@@ -66,6 +66,9 @@ namespace UIWidgets.ui {
                 this.addPaintBounds(drawPicture.picture.paintBounds);
             } else if (drawCmd is DrawConcat) {
                 this._transform = ((DrawConcat) drawCmd).transform * this._transform;
+            } else if (drawCmd is DrawSetMatrix)
+            {
+                this._transform = ((DrawSetMatrix) drawCmd).matrix;
             } else if (drawCmd is DrawSave) {
                 this.stack.Push(new CanvasRec(
                     this._transform,

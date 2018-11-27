@@ -324,6 +324,7 @@ namespace UIWidgets.rendering
                 {
                     _showCursor.removeListener(markNeedsPaint);
                 }
+
                 _showCursor = value;
                 if (attached)
                 {
@@ -371,7 +372,7 @@ namespace UIWidgets.rendering
             {
                 var caretOffset = _textPainter.getOffsetForCaret(selection.extendPos, _caretPrototype);
                 var start = new Offset(0.0, preferredLineHeight) + caretOffset + paintOffset;
-                return new List<TextSelectionPoint>{new TextSelectionPoint(start, null)};
+                return new List<TextSelectionPoint> {new TextSelectionPoint(start, null)};
             }
             else
             {
@@ -380,10 +381,10 @@ namespace UIWidgets.rendering
                 var last = boxes.Count - 1;
                 var end = new Offset(boxes[last].end, boxes[last].bottom) + paintOffset;
                 return new List<TextSelectionPoint>
-                    {
-                        new TextSelectionPoint(start, boxes[0].direction),
-                        new TextSelectionPoint(end, boxes[last].direction),
-                    };
+                {
+                    new TextSelectionPoint(start, boxes[0].direction),
+                    new TextSelectionPoint(end, boxes[last].direction),
+                };
             }
         }
 
@@ -405,16 +406,16 @@ namespace UIWidgets.rendering
         {
             return _textPainter.getPositionVerticalMove(position, 1);
         }
-        
+
         public TextPosition getPositionUp(TextPosition position)
         {
             return _textPainter.getPositionVerticalMove(position, -1);
         }
-        
+
         public TextPosition getLineStartPosition(TextPosition position, TextAffinity? affinity = null)
         {
             var line = _textPainter.getLineRange(position);
-            return new TextPosition(offset:line.start, affinity:affinity??position.affinity);
+            return new TextPosition(offset: line.start, affinity: affinity ?? position.affinity);
         }
 
         public bool isLineEndOrStart(int offset)
@@ -431,22 +432,22 @@ namespace UIWidgets.rendering
 
             return false;
         }
-        
+
         public TextPosition getLineEndPosition(TextPosition position, TextAffinity? affinity = null)
         {
             var line = _textPainter.getLineRange(position);
-            return new TextPosition(offset:line.endIncludingNewLine, affinity:affinity??position.affinity);
+            return new TextPosition(offset: line.endIncludingNewLine, affinity: affinity ?? position.affinity);
         }
-        
+
         public TextPosition getWordRight(TextPosition position)
         {
             return _textPainter.getWordRight(position);
-        } 
-        
+        }
+
         public TextPosition getWordLeft(TextPosition position)
         {
             return _textPainter.getWordLeft(position);
-        } 
+        }
 
         public TextPosition getParagraphStart(TextPosition position, TextAffinity? affinity = null)
         {
@@ -464,9 +465,9 @@ namespace UIWidgets.rendering
             }
 
             var line = _textPainter.getLineRange(lineIndex);
-            return new TextPosition(offset:line.start, affinity:affinity??position.affinity);
-        } 
-        
+            return new TextPosition(offset: line.start, affinity: affinity ?? position.affinity);
+        }
+
         public TextPosition getParagraphEnd(TextPosition position, TextAffinity? affinity = null)
         {
             D.assert(!_needsLayout);
@@ -479,10 +480,12 @@ namespace UIWidgets.rendering
                 {
                     break;
                 }
+
                 lineIndex++;
             }
-            return new TextPosition(offset:_textPainter.getLineRange(lineIndex).endIncludingNewLine, 
-                affinity:affinity??position.affinity);
+
+            return new TextPosition(offset: _textPainter.getLineRange(lineIndex).endIncludingNewLine,
+                affinity: affinity ?? position.affinity);
         }
 
         public TextPosition getParagraphForward(TextPosition position, TextAffinity? affinity = null)
@@ -496,20 +499,22 @@ namespace UIWidgets.rendering
                 {
                     continue;
                 }
+
                 if (line.end > position.offset)
                 {
                     break;
-                } 
+                }
             }
 
             if (line == null)
             {
-                return new TextPosition(position.offset, affinity??position.affinity);
+                return new TextPosition(position.offset, affinity ?? position.affinity);
             }
-            return new TextPosition(line.end, affinity??position.affinity);
+
+            return new TextPosition(line.end, affinity ?? position.affinity);
         }
-        
-        
+
+
         public TextPosition getParagraphBackward(TextPosition position, TextAffinity? affinity = null)
         {
             var lineCount = _textPainter.getLineCount();
@@ -521,49 +526,58 @@ namespace UIWidgets.rendering
                 {
                     continue;
                 }
+
                 if (line.start < position.offset)
                 {
                     break;
-                } 
+                }
             }
 
             if (line == null)
             {
-                return new TextPosition(position.offset, affinity??position.affinity);
+                return new TextPosition(position.offset, affinity ?? position.affinity);
             }
-            return new TextPosition(line.start, affinity??position.affinity);
+
+            return new TextPosition(line.start, affinity ?? position.affinity);
         }
-        
-        protected override double computeMinIntrinsicWidth(double height) {
+
+        protected override double computeMinIntrinsicWidth(double height)
+        {
             _layoutText(double.PositiveInfinity);
             return _textPainter.minIntrinsicWidth;
         }
-        
-        protected override double computeMaxIntrinsicWidth(double height) {
+
+        protected override double computeMaxIntrinsicWidth(double height)
+        {
             _layoutText(double.PositiveInfinity);
             return _textPainter.maxIntrinsicWidth;
         }
 
-        protected override double computeMinIntrinsicHeight(double width) {
+        protected override double computeMinIntrinsicHeight(double width)
+        {
             return _preferredHeight(width);
         }
 
-        protected override double computeMaxIntrinsicHeight(double width) {
+        protected override double computeMaxIntrinsicHeight(double width)
+        {
             return _preferredHeight(width);
         }
 
-        protected override double? computeDistanceToActualBaseline(TextBaseline baseline) {
+        protected override double? computeDistanceToActualBaseline(TextBaseline baseline)
+        {
             _layoutText(constraints.maxWidth);
             return _textPainter.computeDistanceToActualBaseline(baseline);
         }
-        
-        public override void handleEvent(PointerEvent evt, HitTestEntry entry) {
+
+        public override void handleEvent(PointerEvent evt, HitTestEntry entry)
+        {
             if (ignorePointer)
                 return;
             D.assert(debugHandleEvent(evt, entry));
-            if (evt is PointerDownEvent && onSelectionChanged != null) {
-                _tap.addPointer((PointerDownEvent)evt);
-                _doubleTap.addPointer((PointerDownEvent)evt);
+            if (evt is PointerDownEvent && onSelectionChanged != null)
+            {
+                _tap.addPointer((PointerDownEvent) evt);
+                _doubleTap.addPointer((PointerDownEvent) evt);
                 // todo long press
             }
         }
@@ -583,7 +597,7 @@ namespace UIWidgets.rendering
                 onSelectionChanged(TextSelection.fromPosition(position), this, SelectionChangedCause.tap);
             }
         }
-        
+
         public void handleDoubleTap()
         {
             _layoutText(constraints.maxWidth);
@@ -594,9 +608,10 @@ namespace UIWidgets.rendering
                 onSelectionChanged(_selectWordAtOffset(position), this, SelectionChangedCause.doubleTap);
             }
         }
-        
-        
-        protected override void performLayout() {
+
+
+        protected override void performLayout()
+        {
             _layoutText(constraints.maxWidth);
             _caretPrototype = Rect.fromLTWH(0.0, _kCaretHeightOffset, _kCaretWidth,
                 preferredLineHeight - 2.0 * _kCaretHeightOffset);
@@ -623,7 +638,7 @@ namespace UIWidgets.rendering
                 _paintContents(context, offset);
             }
         }
-        
+
         protected override bool hitTestSelf(Offset position)
         {
             return true;
@@ -636,18 +651,7 @@ namespace UIWidgets.rendering
         }
 
         // describeSemanticsConfiguration todo
-        
-        
-        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-            base.debugFillProperties(properties);
-            properties.add(new DiagnosticsProperty<Color>("cursorColor", cursorColor));
-            properties.add(new DiagnosticsProperty<ValueNotifier<bool>>("showCursor", showCursor));
-            properties.add(new DiagnosticsProperty<int>("maxLines", maxLines));
-            properties.add(new DiagnosticsProperty<Color>("selectionColor", selectionColor));
-            properties.add(new DiagnosticsProperty<double>("textScaleFactor", textScaleFactor));
-            properties.add(new DiagnosticsProperty<TextSelection>("selection", selection));
-            properties.add(new DiagnosticsProperty<ViewportOffset>("offset", offset));
-        }
+
 
         private void _paintCaret(Canvas canvas, Offset effectiveOffset)
         {
@@ -671,7 +675,7 @@ namespace UIWidgets.rendering
             D.assert(_textLayoutLastWidth == constraints.maxWidth);
             D.assert(_selectionRects != null);
             var paint = new Paint() {color = _selectionColor};
-            
+
             foreach (var box in _selectionRects)
             {
                 canvas.drawRect(box.toRect().shift(effectiveOffset), BorderWidth.zero, BorderRadius.zero, paint);
@@ -682,24 +686,31 @@ namespace UIWidgets.rendering
         {
             D.assert(_textLayoutLastWidth == constraints.maxWidth);
             var effectiveOffset = offset + _paintOffset;
-            
-            if (_selection != null) {
-                if (_selection.isCollapsed && _showCursor.value && cursorColor != null) {
+
+            if (_selection != null)
+            {
+                if (_selection.isCollapsed && _showCursor.value && cursorColor != null)
+                {
                     _paintCaret(context.canvas, effectiveOffset);
-                } else if (!_selection.isCollapsed && _selectionColor != null) {
-                    _selectionRects = _selectionRects??_textPainter.getBoxesForSelection(_selection);
+                }
+                else if (!_selection.isCollapsed && _selectionColor != null)
+                {
+                    _selectionRects = _selectionRects ?? _textPainter.getBoxesForSelection(_selection);
                     _paintSelection(context.canvas, effectiveOffset);
                 }
             }
 
-            if (_hasFocus) {
-                var caretOffset = _textPainter.getOffsetForCaret(_selection.extendPos, Rect.fromLTWH(0, 0, 1, preferredLineHeight));
+            if (_hasFocus)
+            {
+                var caretOffset =
+                    _textPainter.getOffsetForCaret(_selection.extendPos, Rect.fromLTWH(0, 0, 1, preferredLineHeight));
                 var caretRec = _caretPrototype.shift(caretOffset + effectiveOffset);
-                Input.compositionCursorPos = new Vector2((float)caretRec.left, (float)caretRec.bottom);
+                Input.compositionCursorPos = new Vector2((float) caretRec.left, (float) caretRec.bottom);
             }
+
             _textPainter.paint(context.canvas, effectiveOffset);
         }
-        
+
         private void _handleSetSelection(TextSelection selection)
         {
             onSelectionChanged(selection, this, SelectionChangedCause.keyboard);
@@ -749,7 +760,7 @@ namespace UIWidgets.rendering
 
                 return preferredLineHeight * lines;
             }
-            
+
             _layoutText(width);
             return Math.Max(preferredLineHeight, _textPainter.height);
         }
@@ -776,9 +787,10 @@ namespace UIWidgets.rendering
             {
                 return TextSelection.fromPosition(position);
             }
+
             return new TextSelection(baseOffset: word.start, extentOffset: word.end);
         }
-        
+
         private bool _isMultiline
         {
             get { return _maxLines != 1; }
@@ -834,6 +846,30 @@ namespace UIWidgets.rendering
             }
 
             return 0.0;
+        }
+
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties)
+        {
+            base.debugFillProperties(properties);
+            properties.add(new DiagnosticsProperty<Color>("cursorColor", cursorColor));
+            properties.add(new DiagnosticsProperty<ValueNotifier<bool>>("showCursor", showCursor));
+            properties.add(new DiagnosticsProperty<int>("maxLines", maxLines));
+            properties.add(new DiagnosticsProperty<Color>("selectionColor", selectionColor));
+            properties.add(new DiagnosticsProperty<double>("textScaleFactor", textScaleFactor));
+            properties.add(new DiagnosticsProperty<TextSelection>("selection", selection));
+            properties.add(new DiagnosticsProperty<ViewportOffset>("offset", offset));
+        }
+
+        public override List<DiagnosticsNode> debugDescribeChildren()
+        {
+            return new List<DiagnosticsNode>
+            {
+                text.toDiagnosticsNode(
+                    name: "text",
+                    style: DiagnosticsTreeStyle.transition
+                ),
+            };
         }
     }
 }

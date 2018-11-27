@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UIWidgets.foundation;
+using UIWidgets.gestures;
 using UIWidgets.ui;
 using UnityEditor;
 using UnityEngine.Assertions;
@@ -19,7 +20,7 @@ namespace UIWidgets.painting
         public readonly TextStyle style;
         public readonly string text;
         public readonly List<TextSpan> children;
-        public readonly GestureMock recognizer;
+        public readonly GestureRecognizer recognizer;
 
         public TextSpan(string text = "", TextStyle style = null, List<TextSpan> children = null)
         {
@@ -253,7 +254,29 @@ namespace UIWidgets.painting
             return left.SequenceEqual(right);
         }
         
-        
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.defaultDiagnosticsTreeStyle = DiagnosticsTreeStyle.whitespace;
+            // Properties on style are added as if they were properties directly on
+            // this TextSpan.
+            if (style != null)
+            {
+                style.debugFillProperties(properties);
+            }    
+
+            properties.add(new DiagnosticsProperty<GestureRecognizer>(
+                "recognizer", recognizer,
+                description: recognizer == null ? "" : recognizer.GetType().FullName,
+                defaultValue: Diagnostics.kNullDefaultValue
+            ));
+
+            properties.add(new StringProperty("text", text, showName: false, defaultValue: Diagnostics.kNullDefaultValue));
+            if (style == null && text == null && children == null)
+            {
+                properties.add(DiagnosticsNode.message("(empty)"));                
+            }
+        }
+
         public override List<DiagnosticsNode> debugDescribeChildren() {
             if (children == null)
             {

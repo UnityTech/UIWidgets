@@ -107,6 +107,7 @@ namespace UIWidgets.Tests
         }
 
         void OnDestroy() {
+            this.windowAdapter.Destory();
             this.windowAdapter = null;
         }
 

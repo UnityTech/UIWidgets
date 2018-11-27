@@ -3,15 +3,14 @@ using System.Collections.Generic;
 using RSG;
 using UIWidgets.animation;
 using UIWidgets.foundation;
-using UIWidgets.gestures;
 using UIWidgets.painting;
 using UIWidgets.rendering;
 using UIWidgets.service;
 using UIWidgets.ui;
-using UnityEngine;
 using Color = UIWidgets.ui.Color;
 using Rect = UIWidgets.ui.Rect;
 using TextStyle = UIWidgets.painting.TextStyle;
+using Timer = UIWidgets.async.Timer; 
 
 namespace UIWidgets.widgets
 {
@@ -181,7 +180,9 @@ namespace UIWidgets.widgets
     public class EditableTextState : State<EditableText>, TextInputClient
     {
         const int _kObscureShowLatestCharCursorTicks = 3;
-        private ValueNotifier<bool> _showCursor = new ValueNotifier<bool>(true); // todo
+        private static TimeSpan _kCursorBlinkHalfPeriod = TimeSpan.FromMilliseconds(500);
+        private Timer _cursorTimer;
+        private ValueNotifier<bool> _showCursor = new ValueNotifier<bool>(true);
         private GlobalKey _editableKey = GlobalKey.key();
         private bool _didAutoFocus = false;
 
@@ -231,6 +232,8 @@ namespace UIWidgets.widgets
             widget.controller.removeListener(_didChangeTextEditingValue);
             _closeInputConnectionIfNeeded();
             D.assert(!_hasInputConnection);
+            _stopCursorTimer();
+            D.assert(_cursorTimer == null);
             widget.focusNode.removeListener(_handleFocusChanged);
             base.dispose();
         }
@@ -506,6 +509,49 @@ namespace UIWidgets.widgets
             }
         }
 
+        public bool cursorCurrentlyVisible
+        {
+            get { return _showCursor.value; }
+        }
+
+        public TimeSpan cursorBlinkInterval
+        {
+            get { return _kCursorBlinkHalfPeriod; }
+        }
+        
+        private void _cursorTick() {
+            _showCursor.value = !_showCursor.value;
+            if (_obscureShowCharTicksPending > 0) {
+                setState(() => { _obscureShowCharTicksPending--;});
+            }
+        }
+
+        private void _startCursorTimer() {
+            _showCursor.value = true;
+            _cursorTimer = Window.instance.run(_kCursorBlinkHalfPeriod, _cursorTick, periodic:true);
+        }
+        
+        private void _stopCursorTimer() {
+            if (_cursorTimer != null)
+            {
+                _cursorTimer.cancel();    
+            }
+            _cursorTimer = null;
+            _showCursor.value = false;
+            _obscureShowCharTicksPending = 0;
+        }
+        
+        private void _startOrStopCursorTimerIfNeeded() {
+            if (_cursorTimer == null && _hasFocus && _value.selection.isCollapsed)
+            {
+                _startCursorTimer();
+            }
+            else if (_cursorTimer != null && (!_hasFocus || !_value.selection.isCollapsed))
+            {
+                _stopCursorTimer();
+            }
+        }
+        
         private TextEditingValue _value
         {
             get { return widget.controller.value; }
@@ -525,6 +571,7 @@ namespace UIWidgets.widgets
         private void _didChangeTextEditingValue()
         {
             _updateRemoteEditingValueIfNeeded();
+            _startOrStopCursorTimerIfNeeded();
             _textChangedSinceLastCaretUpdate = true;
             setState(() => { });
         }
@@ -532,6 +579,7 @@ namespace UIWidgets.widgets
         private void _handleFocusChanged()
         {
             _openOrCloseInputConnectionIfNeeded();
+            _startOrStopCursorTimerIfNeeded();
             if (!_hasFocus)
             {
                 _value = new TextEditingValue(text: _value.text);
