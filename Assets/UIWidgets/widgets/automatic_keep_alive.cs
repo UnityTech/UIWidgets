@@ -4,7 +4,7 @@ using UIWidgets.scheduler;
 using UIWidgets.ui;
 using UIWidgets.widgets;
 
-namespace UIWidgets.rendering {
+namespace UIWidgets.widgets {
     public class AutomaticKeepAlive : StatefulWidget {
         public AutomaticKeepAlive(
             Key key = null,

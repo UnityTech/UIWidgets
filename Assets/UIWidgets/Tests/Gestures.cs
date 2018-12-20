@@ -55,7 +55,7 @@ namespace UIWidgets.Tests {
         }
 
         private void OnEnable() {
-            this.windowAdapter = new WindowAdapter(this);
+            this.windowAdapter = new EditorWindowAdapter(this);
 
             this._tapRecognizer = new TapGestureRecognizer();
             this._tapRecognizer.onTap = () => { Debug.Log("tap"); };

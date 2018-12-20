@@ -97,7 +97,7 @@ namespace UIWidgets.ui {
             guiRoundedRectMat.SetFloatArray("UIWidgets_CornerRadius",
                 borderRadius == null ? new[] {0f, 0f, 0f, 0f} : borderRadius.toFloatArray());
 
-            Graphics.DrawTexture(rect.toRect(), EditorGUIUtility.whiteTexture,
+            Graphics.DrawTexture(rect.toRect(), Texture2D.whiteTexture,
                 new UnityEngine.Rect(0.0f, 0.0f, 1f, 1f), 0, 0, 0, 0,
                 paint.color.toColor(), guiRoundedRectMat);
         }
@@ -108,7 +108,7 @@ namespace UIWidgets.ui {
 
             shadowRectMat.SetFloat("UIWidgets_sigma", (float) paint.blurSigma);
 
-            Graphics.DrawTexture(rect.toRect(), EditorGUIUtility.whiteTexture,
+            Graphics.DrawTexture(rect.toRect(), Texture2D.whiteTexture,
                 new UnityEngine.Rect(0.0f, 0.0f, 1f, 1f), 0, 0, 0, 0,
                 paint.color.toColor(), shadowRectMat);
         }

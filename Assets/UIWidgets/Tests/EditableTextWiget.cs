@@ -49,7 +49,7 @@ namespace UIWidgets.Tests
         private void OnEnable() {
             this.paintingBinding = new PaintingBinding(null);
             paintingBinding.initInstances();
-            this.windowAdapter = new WindowAdapter(this);
+            this.windowAdapter = new EditorWindowAdapter(this);
             this.root = new widgets.Container(
                 width: 200,
                 height: 200,

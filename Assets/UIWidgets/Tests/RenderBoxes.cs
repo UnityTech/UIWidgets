@@ -58,7 +58,7 @@ namespace UIWidgets.Tests {
         }
 
         private void OnEnable() {
-            this.windowAdapter = new WindowAdapter(this);
+            this.windowAdapter = new EditorWindowAdapter(this);
         }
 
         void OnDestroy() {

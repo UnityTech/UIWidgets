@@ -70,9 +70,9 @@ namespace UIWidgets.Tests {
             Handles.BeginGUI();
             
             if (windowAdapter == null) {
-                windowAdapter = new WindowAdapter(sceneView);
+                windowAdapter = new EditorWindowAdapter(sceneView);
             } else if (windowAdapter != null && windowAdapter.editorWindow != sceneView) {
-                windowAdapter = new WindowAdapter(sceneView);
+                windowAdapter = new EditorWindowAdapter(sceneView);
             }
             
             var selected = EditorGUILayout.Popup("test case", _selected, _optionStrings);
@@ -101,7 +101,7 @@ namespace UIWidgets.Tests {
             }
         }
 
-        private static WindowAdapter windowAdapter;
+        private static EditorWindowAdapter windowAdapter;
 
         public static Widget none() {
             return null;
