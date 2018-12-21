@@ -1,4 +1,5 @@
 ﻿#if UNITY_EDITOR
+using UIWidgets.ui;
 using UnityEditor;
 using UnityEngine;
 using Rect = UnityEngine.Rect;
@@ -32,6 +33,12 @@ namespace UIWidgets.editor {
         {
             devicePixelRatio = EditorGUIUtility.pixelsPerPoint;
             position = this.editorWindow.position;
+        }
+
+        protected override Vector2d convertPointerPosition(Vector2 postion)
+        {
+            return new Vector2d(postion.x * this._devicePixelRatio,
+                postion.y * this._devicePixelRatio);
         }
     }
 

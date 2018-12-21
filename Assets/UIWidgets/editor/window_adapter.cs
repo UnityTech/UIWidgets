@@ -8,6 +8,7 @@ using UIWidgets.service;
 using UIWidgets.ui;
 using UIWidgets.widgets;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 using Rect = UnityEngine.Rect;
 
 namespace UIWidgets.editor
@@ -68,7 +69,6 @@ namespace UIWidgets.editor
         {
             get { return null; }
         }
-
         readonly WidgetsBinding _binding;
 
         readonly RasterCache _rasterCache;
@@ -92,26 +92,19 @@ namespace UIWidgets.editor
             }
         }
 
-        public void Paint()
+        public void PostPointerEvent(List<PointerData> data)
         {
-            instance = this;
-            WidgetsBinding.instance = this._binding;
-
-            try {
-                if (this.onBeginFrame != null) {
-                    this.onBeginFrame(new DateTime(Stopwatch.GetTimestamp()) - this._epoch);
-                }
-                this.flushMicrotasks();
-                if (this.onDrawFrame != null) {
-                    this.onDrawFrame();
-                }
-            }
-            finally {
-                instance = null;
-                WidgetsBinding.instance = null;
-            }
+            WithBinding(() =>
+            {
+                this.onPointerEvent(new PointerDataPacket(data));
+            });
         }
-
+        
+        public void PostPointerEvent(PointerData data)
+        {
+            PostPointerEvent(new List<PointerData>(){data});
+        }
+        
         public void WithBinding(Action fn)
         {
             instance = this;
@@ -153,49 +146,54 @@ namespace UIWidgets.editor
                 if (this.onDrawFrame != null) {
                     this.onDrawFrame();
                 }
-
                 return;
             }
 
             if (this.onPointerEvent != null) {
                 PointerData pointerData = null;
-
+                
                 if (evt.type == EventType.MouseDown) {
-                    pointerData = new PointerData(
-                        timeStamp: DateTime.Now,
-                        change: PointerChange.down,
-                        kind: PointerDeviceKind.mouse,
-                        device: evt.button,
-                        physicalX: evt.mousePosition.x * this._devicePixelRatio,
-                        physicalY: evt.mousePosition.y * this._devicePixelRatio
-                    );
+                   
+                        var pysicalPos = convertPointerPosition(evt.mousePosition);
+                        Debug.Log("clicked");
+                        pointerData = new PointerData(
+                            timeStamp: DateTime.Now,
+                            change: PointerChange.down,
+                            kind: PointerDeviceKind.mouse,
+                            device: evt.button,
+                            physicalX: pysicalPos.x,
+                            physicalY: pysicalPos.y
+                        );            
                 } else if (evt.type == EventType.MouseUp || evt.rawType == EventType.MouseUp) {
+                    var pysicalPos = convertPointerPosition(evt.mousePosition);
                     pointerData = new PointerData(
                         timeStamp: DateTime.Now,
                         change: PointerChange.up,
                         kind: PointerDeviceKind.mouse,
                         device: evt.button,
-                        physicalX: evt.mousePosition.x * this._devicePixelRatio,
-                        physicalY: evt.mousePosition.y * this._devicePixelRatio
+                        physicalX: pysicalPos.x,
+                        physicalY: pysicalPos.y
                     );
                 } else if (evt.type == EventType.MouseDrag) {
+                    var pysicalPos = convertPointerPosition(evt.mousePosition);
                     pointerData = new PointerData(
                         timeStamp: DateTime.Now,
                         change: PointerChange.move,
                         kind: PointerDeviceKind.mouse,
                         device: evt.button,
-                        physicalX: evt.mousePosition.x * this._devicePixelRatio,
-                        physicalY: evt.mousePosition.y * this._devicePixelRatio
+                        physicalX: pysicalPos.x,
+                        physicalY: pysicalPos.y
                     );
                 } else if (evt.type == EventType.MouseMove)
                 {
+                    var pysicalPos = convertPointerPosition(evt.mousePosition);
                     pointerData = new PointerData(
                         timeStamp: DateTime.Now,
                         change: PointerChange.hover,
                         kind: PointerDeviceKind.mouse,
                         device: evt.button,
-                        physicalX: evt.mousePosition.x * this._devicePixelRatio,
-                        physicalY: evt.mousePosition.y * this._devicePixelRatio
+                        physicalX: pysicalPos.x,
+                        physicalY: pysicalPos.y
                     );
                 }
 
@@ -225,6 +223,8 @@ namespace UIWidgets.editor
         }
 
         protected abstract void getWindowMetrics(out double  devicePixelRatio , out Rect position);
+
+        protected abstract Vector2d convertPointerPosition(Vector2 postion);
         
         private void doUpdate() {
             this.flushMicrotasks();

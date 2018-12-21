@@ -1,9 +1,11 @@
-﻿using UIWidgets.editor;
+﻿using System;
+using UIWidgets.editor;
 using UIWidgets.painting;
+using UIWidgets.ui;
 using UIWidgets.widgets;
 using UnityEditor;
 using UnityEngine;
-using Color = UIWidgets.ui.Color;
+using Rect = UnityEngine.Rect;
 
 namespace UIWidgets.engine
 {
@@ -25,19 +27,24 @@ namespace UIWidgets.engine
             {
                 this._paintingBinding = new PaintingBinding(null);
                 _paintingBinding.initInstances();
-                _windowAdapter = new CanvasWindowAdapter(new Rect(0, 0, _canvasWidth, _canvasHeight), EditorGUIUtility.pixelsPerPoint);
-                _windowAdapter.attachRootWidget(new AsScreen());
+                _windowAdapter = new CanvasWindowAdapter(new Rect(0, 0, _canvasWidth, _canvasHeight), 
+                    EditorGUIUtility.pixelsPerPoint, this.transform);
+                _windowAdapter.attachRootWidget(getWidget());
             }
 
             setupMeshRenderer();
+            var boxColider = gameObject.AddComponent(typeof(BoxCollider)) as BoxCollider;
+            boxColider.size = new Vector3(1, 1, 0.00001f); // very thin box
+        }
+
+        protected virtual Widget getWidget()
+        {
+            return new AsScreen();
         }
 
         private  void setupMeshRenderer()
         {
-            var meshRenderer = GetComponent<MeshRenderer>();
-
-            
-            meshRenderer = gameObject.AddComponent(typeof(MeshRenderer)) as MeshRenderer;
+            var meshRenderer = gameObject.AddComponent(typeof(MeshRenderer)) as MeshRenderer;
             var shader = Shader.Find("UI/Default"); // todo
             var material = new Material(shader);
             meshRenderer.material = material;
@@ -47,6 +54,7 @@ namespace UIWidgets.engine
             var mesh = new Mesh();
             meshFilter.mesh = mesh;
     
+            
             var vertices = new Vector3[4];
 
             float minX = -0.5f;
@@ -77,7 +85,6 @@ namespace UIWidgets.engine
             uv[1] = new Vector2(1, 0);
             uv[2] = new Vector2(0, 1);
             uv[3] = new Vector2(1, 1);
-    
             mesh.uv = uv;
         }
 
@@ -90,6 +97,7 @@ namespace UIWidgets.engine
             }
             Destroy(GetComponent<MeshRenderer>());
             Destroy(GetComponent<MeshFilter>());
+            Destroy(GetComponent<BoxCollider>());
         }
         
         private void Update() {
@@ -112,6 +120,7 @@ namespace UIWidgets.engine
             }
             _renderTexture = new RenderTexture(_canvasWidth, _canvasHeight, 24);
         }
+
         
         private void OnGUI()
         {
@@ -142,10 +151,128 @@ namespace UIWidgets.engine
                 return;
            
             }
-            if (this._windowAdapter != null) {
-                this._windowAdapter.OnGUI();
+            if (Event.current.type == EventType.KeyDown || Event.current.type == EventType.KeyUp)
+            {
+                if (this._windowAdapter != null) {
+                    this._windowAdapter.OnGUI();
+                }
+            }
+        }
+
+        void OnMouseEnter()
+        {
+            var pos = convertPosition(Input.mousePosition);
+            this._windowAdapter.PostPointerEvent(new PointerData(
+                timeStamp: DateTime.Now,
+                change: PointerChange.hover,
+                kind: PointerDeviceKind.mouse,
+                device: getMouseButtonDown(),
+                physicalX: pos.x,
+                physicalY: pos.y
+            ));
+        }
+
+        void OnMouseExit()
+        {
+            var pos = convertPosition(Input.mousePosition);
+            this._windowAdapter.PostPointerEvent(new PointerData(
+                timeStamp: DateTime.Now,
+                change: PointerChange.hover,
+                kind: PointerDeviceKind.mouse,
+                device: getMouseButtonDown(),
+                physicalX: pos.x,
+                physicalY: pos.y
+            ));
+        }
+        
+        void OnMouseOver()
+        {
+            var pos = convertPosition(Input.mousePosition);
+            this._windowAdapter.PostPointerEvent(new PointerData(
+                timeStamp: DateTime.Now,
+                change: PointerChange.hover,
+                kind: PointerDeviceKind.mouse,
+                device: getMouseButtonDown(),
+                physicalX: pos.x,
+                physicalY: pos.y
+            ));
+        }
+
+        void OnMouseDown()
+        {
+            var pos = convertPosition(Input.mousePosition);
+            this._windowAdapter.PostPointerEvent(new PointerData(
+                    timeStamp: DateTime.Now,
+                    change: PointerChange.down,
+                    kind: PointerDeviceKind.mouse,
+                    device: getMouseButtonDown(),
+                    physicalX: pos.x,
+                    physicalY: pos.y
+                ));
+        }
+
+        void OnMouseUp()
+        {
+            var pos = convertPosition(Input.mousePosition);
+            this._windowAdapter.PostPointerEvent(new PointerData(
+                timeStamp: DateTime.Now,
+                change: PointerChange.up,
+                kind: PointerDeviceKind.mouse,
+                device: getMouseButtonDown(),
+                physicalX: pos.x,
+                physicalY: pos.y
+            ));
+        }
+
+        void OnMouseDrag()
+        {
+            var pos = convertPosition(Input.mousePosition);
+            this._windowAdapter.PostPointerEvent(new PointerData(
+                timeStamp: DateTime.Now,
+                change: PointerChange.move,
+                kind: PointerDeviceKind.mouse,
+                device: getMouseButtonDown(),
+                physicalX: pos.x,
+                physicalY: pos.y
+            ));
+        }
+        
+        Vector2d convertPosition(Vector2 mousePos)
+        {
+            var cam = Camera.main;
+            var plan = new Plane(transform.TransformDirection(0, 0, 1), transform.TransformPoint(0, 0, 0));
+            var ray = cam.ScreenPointToRay(new Vector3(mousePos.x, mousePos.y, 0));
+            float enter;
+            Vector3 hitPoint;
+            if (plan.Raycast(ray, out enter))
+            {
+                hitPoint = ray.GetPoint(enter);
+            }
+            else
+            {
+                ray.direction = -ray.direction;
+                plan.Raycast(ray, out enter);
+                hitPoint = ray.GetPoint(enter);
             }
             
+            var localPoint = transform.InverseTransformPoint(hitPoint);
+            return new Vector2d(
+                (localPoint.x + 0.5) * _canvasWidth * EditorGUIUtility.pixelsPerPoint,
+                (-localPoint.y + 0.5) * _canvasHeight * EditorGUIUtility.pixelsPerPoint
+            );
+        }
+
+        private int getMouseButtonDown()
+        {
+            for (int key = 0; key < 3; key++)
+            {
+                if (Input.GetMouseButton(key))
+                {
+                    return key;
+                }
+            }
+
+            return 0;
         }
     }
 }

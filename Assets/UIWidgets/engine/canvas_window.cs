@@ -1,11 +1,16 @@
-﻿using UnityEngine;
-namespace UIWidgets.editor
+﻿using System;
+using UIWidgets.editor;
+using UIWidgets.ui;
+using UnityEngine;
+using Rect = UnityEngine.Rect;
+
+namespace UIWidgets.engine
 {
     public class CanvasWindowAdapter : WindowAdapter
     {
         private Rect _position;
         private double __devicePixelRatio;
-        public CanvasWindowAdapter(Rect position, double devicePixelRatio): base(position, devicePixelRatio)
+        public CanvasWindowAdapter(Rect position, double devicePixelRatio, Transform tranform): base(position, devicePixelRatio)
         {
             this._position = position;
             this.__devicePixelRatio = devicePixelRatio;
@@ -19,6 +24,11 @@ namespace UIWidgets.editor
         {
             devicePixelRatio = this.__devicePixelRatio;
             position = this._position;
+        }
+
+        protected override Vector2d convertPointerPosition(Vector2 postion)
+        {
+            throw new NotImplementedException("pointer event should not be handled by this class");
         }
     }
 
