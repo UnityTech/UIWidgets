@@ -10,16 +10,26 @@ namespace UIWidgets.engine
     {
         private Rect _position;
         private double __devicePixelRatio;
-        public CanvasWindowAdapter(Rect position, double devicePixelRatio, Transform tranform): base(position, devicePixelRatio)
+        private GameObject gameObject;
+        public CanvasWindowAdapter(Rect position, double devicePixelRatio, GameObject gameObject): base(position, devicePixelRatio)
         {
             this._position = position;
             this.__devicePixelRatio = devicePixelRatio;
+            this.gameObject = gameObject;
         }
 
         public override void scheduleFrame()
         {
         }
 
+        public override GUIContent titleContent
+        {
+            get
+            {
+                return new GUIContent(gameObject.name);
+            }
+        }
+        
         protected override void getWindowMetrics(out double devicePixelRatio, out Rect position)
         {
             devicePixelRatio = this.__devicePixelRatio;

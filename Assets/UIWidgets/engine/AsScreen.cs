@@ -9,8 +9,6 @@ using TextStyle = UIWidgets.painting.TextStyle;
 
 namespace UIWidgets.engine
 {
-
-
     public class AsScreen : StatefulWidget
     {
         public AsScreen(Key key = null) : base(key)

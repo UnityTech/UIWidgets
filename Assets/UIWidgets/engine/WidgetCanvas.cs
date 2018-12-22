@@ -9,8 +9,10 @@ using Rect = UnityEngine.Rect;
 
 namespace UIWidgets.engine
 {
+    
     public class WidgetCanvas: MonoBehaviour
     {
+        
         [SerializeField]
         private int _canvasWidth = 1000;
         
@@ -27,9 +29,10 @@ namespace UIWidgets.engine
             {
                 this._paintingBinding = new PaintingBinding(null);
                 _paintingBinding.initInstances();
-                _windowAdapter = new CanvasWindowAdapter(new Rect(0, 0, _canvasWidth, _canvasHeight), 
-                    EditorGUIUtility.pixelsPerPoint, this.transform);
-                _windowAdapter.attachRootWidget(getWidget());
+                _windowAdapter = new CanvasWindowAdapter(new Rect(0, 0, getCanvasWidth(), getCanvasHeight()), 
+                    EditorGUIUtility.pixelsPerPoint, gameObject);
+                var root = new WidgetsApp(null, getWidget());
+                _windowAdapter.attachRootWidget(root);
             }
 
             setupMeshRenderer();
@@ -109,7 +112,7 @@ namespace UIWidgets.engine
         private void ensureRenderTexture()
         {
             if (_renderTexture != null && _renderTexture.IsCreated() &&
-                _renderTexture.width == _canvasWidth && _renderTexture.height == _canvasHeight)
+                _renderTexture.width == getCanvasWidth() && _renderTexture.height == getCanvasHeight())
             {
                 return;
             }
@@ -118,18 +121,20 @@ namespace UIWidgets.engine
             {
                 _renderTexture.Release();
             }
-            _renderTexture = new RenderTexture(_canvasWidth, _canvasHeight, 24);
+            _renderTexture = new RenderTexture(getCanvasWidth(), getCanvasHeight(), 24);
         }
 
         
         private void OnGUI()
         {
+            var effectiveWidth = getCanvasWidth();
+            var effectiveHeight = getCanvasHeight();
             if (Event.current.type == EventType.Repaint)
             {
                 GL.PushMatrix();
                 GL.LoadIdentity();
-                Matrix4x4 m =Matrix4x4.Scale(new Vector3(2.0f / _canvasWidth, -2.0f / _canvasHeight, 1.0f))
-                             * Matrix4x4.Translate(new Vector3(-_canvasWidth / 2.0f, -_canvasHeight / 2.0f, 0));
+                Matrix4x4 m =Matrix4x4.Scale(new Vector3(2.0f / effectiveWidth, -2.0f / effectiveHeight, 1.0f))
+                             * Matrix4x4.Translate(new Vector3(-effectiveWidth / 2.0f, -effectiveHeight / 2.0f, 0));
                 GL.LoadProjectionMatrix(m);
 
                 ensureRenderTexture();
@@ -200,6 +205,8 @@ namespace UIWidgets.engine
 
         void OnMouseDown()
         {
+            int x = Screen.width;
+            int y = Screen.height;
             var pos = convertPosition(Input.mousePosition);
             this._windowAdapter.PostPointerEvent(new PointerData(
                     timeStamp: DateTime.Now,
@@ -254,11 +261,11 @@ namespace UIWidgets.engine
                 plan.Raycast(ray, out enter);
                 hitPoint = ray.GetPoint(enter);
             }
-            
+
             var localPoint = transform.InverseTransformPoint(hitPoint);
             return new Vector2d(
-                (localPoint.x + 0.5) * _canvasWidth * EditorGUIUtility.pixelsPerPoint,
-                (-localPoint.y + 0.5) * _canvasHeight * EditorGUIUtility.pixelsPerPoint
+                (localPoint.x + 0.5) * getCanvasWidth() * _windowAdapter.devicePixelRatio,
+                (-localPoint.y + 0.5) * getCanvasHeight() * _windowAdapter.devicePixelRatio
             );
         }
 
@@ -273,6 +280,16 @@ namespace UIWidgets.engine
             }
 
             return 0;
+        }
+
+        private int getCanvasWidth()
+        {
+            return _canvasWidth;
+        }
+        
+        private int getCanvasHeight()
+        {
+            return _canvasHeight;
         }
     }
 }
