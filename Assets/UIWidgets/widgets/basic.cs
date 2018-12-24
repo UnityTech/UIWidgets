@@ -930,9 +930,9 @@ namespace UIWidgets.widgets {
         
         public readonly PointerHoverEventListener onPointerHover;
 
-        public readonly PointerEnterEventListener  onPointerEnter;
+        public readonly PointerEnterEventListener onPointerEnter;
 
-        public readonly PointerLeaveEventListener  onPointerLeave;
+        public readonly PointerLeaveEventListener onPointerLeave;
 
         public readonly HitTestBehavior behavior;
 

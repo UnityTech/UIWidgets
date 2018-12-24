@@ -94,7 +94,7 @@ namespace UIWidgets.painting {
                     fittedSizes.source, Offset.zero & inputSize
                 );
                 foreach (Rect tileRect in _generateImageTileRects(rect, destinationRect, repeat)) {
-                    //canvas.drawImageRect(image, tileRect, sourceRect, paint);
+                    canvas.drawImageRect(image.texture, sourceRect, tileRect, paint);
                 }
             }
             else {

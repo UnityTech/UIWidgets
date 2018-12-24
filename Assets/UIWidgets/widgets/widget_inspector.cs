@@ -981,19 +981,19 @@ namespace UIWidgets.widgets
             Size size = state.overlayRect.size;
             
             var fillPaint = new Paint(){color = _kHighlightedRenderObjectFillColor};
-            var borderPaint =  new Paint(){color = _kHighlightedRenderObjectBorderColor};
+            var borderPaint =  new Paint(){color = _kHighlightedRenderObjectBorderColor, style = PaintingStyle.stroke, strokeWidth = 1};
             Rect selectedPaintRect = state.selected.rect.deflate(0.5);
             canvas.save();
-            canvas.setMatrix(state.selected.transform);
-            canvas.drawRect(selectedPaintRect, null, null, fillPaint);
-            canvas.drawRect(selectedPaintRect, BorderWidth.all(1), null, borderPaint);
+            canvas.setMatrix(state.selected.transform.toMatrix3());
+            canvas.drawRect(selectedPaintRect, fillPaint);
+            canvas.drawRect(selectedPaintRect, borderPaint);
             canvas.restore();
 
             foreach (var transformedRect in state.candidates)
             {
                 canvas.save();
-                canvas.setMatrix(transformedRect.transform);
-                canvas.drawRect(transformedRect.rect.deflate(0.5), BorderWidth.all(1), null, borderPaint);
+                canvas.setMatrix(transformedRect.transform.toMatrix3());
+                canvas.drawRect(transformedRect.rect.deflate(0.5), borderPaint);
                 canvas.restore();
             }
            

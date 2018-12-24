@@ -78,12 +78,9 @@ namespace UIWidgets.ui {
 
     public class Scene : IDisposable {
         public Scene(Layer rootLayer) {
-            this._rootLayer = rootLayer;
             this._layerTree = new LayerTree();
             this._layerTree.rootLayer = rootLayer;
         }
-
-        readonly Layer _rootLayer;
 
         readonly LayerTree _layerTree;
 

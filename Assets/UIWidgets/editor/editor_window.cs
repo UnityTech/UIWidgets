@@ -149,6 +149,18 @@ namespace UIWidgets.editor {
             }
         }
 
+        public void WithBinding(Action fn) {
+            using (this.getScope()) {
+                fn();
+            }
+        }
+        
+        public T WithBindingFunc<T>(Func<T> fn) {
+            using (this.getScope()) {
+                return fn();
+            }
+        }
+        
         public void OnGUI() {
             using (this.getScope()) {
                 bool dirty = false;
