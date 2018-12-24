@@ -59,6 +59,15 @@ namespace UIWidgets.painting {
             }
         }
 
+        public bool isSameWidth {
+            get {
+                var topWidth = this.top.width;
+                return this.right.width == topWidth
+                       && this.bottom.width == topWidth
+                       && this.left.width == topWidth;
+            }
+        }
+
         public Border add(Border other) {
             if (BorderSide.canMerge(this.top, other.top) &&
                 BorderSide.canMerge(this.right, other.right) &&
@@ -71,71 +80,110 @@ namespace UIWidgets.painting {
         }
 
         public void paint(Canvas canvas, Rect rect, BorderRadius borderRadius = null) {
-            var paint = new Paint();
+            if (this.isSameColor && this.isSameWidth) {
+                if (borderRadius == null) {
+                    var width = this.top.width;
+                    var paint = new Paint {
+                        color = this.top.color,
+                        strokeWidth = width,
+                        style = PaintingStyle.stroke
+                    };
 
-            if (this.isSameColor) {
-                paint.color = this.top.color;
+                    canvas.drawRect(rect.deflate(width / 2), paint);
+                    return;
+                }
 
-                canvas.drawRect(rect,
-                    BorderWidth.only(this.top.width, this.right.width, this.bottom.width, this.left.width),
-                    borderRadius, paint);
+                var outer = borderRadius.toRRect(rect);
+                if (this.top.width == 0) {
+                    var paint = new Paint {
+                        color = this.top.color,
+                        style = PaintingStyle.stroke
+                    };
 
+                    canvas.drawRRect(outer, paint);
+                    return;
+                }
+
+                {
+                    var inner = outer.deflate(this.top.width);
+                    var paint = new Paint {
+                        color = this.top.color,
+                    };
+
+                    canvas.drawDRRect(outer, inner, paint);
+                }
                 return;
             }
 
-            if (borderRadius != null) {
-                canvas.save();
-                canvas.clipRRect(RRect.fromRectAndCorners(rect,
-                    borderRadius.topLeft, borderRadius.topRight,
-                    borderRadius.bottomRight, borderRadius.bottomLeft));
-            }
+            D.assert(borderRadius == null, "A borderRadius can only be given for uniform borders.");
 
-            if (this.top.width > 0) {
-                paint.color = this.top.color;
-                var points = new Offset[] {
-                    new Offset(rect.left, rect.top),
-                    new Offset(rect.right, rect.top),
-                    new Offset(rect.right - this.right.width, rect.top + this.top.width),
-                    new Offset(rect.left + this.right.width, rect.top + this.top.width),
+
+            {
+                var paint = new Paint {
+                    color = this.top.color,
                 };
-                canvas.drawPloygon4(points, paint);
+                var path = new Path();
+                path.moveTo(rect.left, rect.top);
+                path.lineTo(rect.right, rect.top);
+                if (this.top.width == 0) {
+                    paint.style = PaintingStyle.stroke;
+                } else {
+                    path.lineTo(rect.right - this.right.width, rect.top + this.top.width);
+                    path.lineTo(rect.left + this.right.width, rect.top + this.top.width);
+                }
+                
+                canvas.drawPath(path, paint);
             }
-
-            if (this.right.width > 0) {
-                paint.color = this.right.color;
-                var points = new Offset[] {
-                    new Offset(rect.right, rect.top),
-                    new Offset(rect.right, rect.bottom),
-                    new Offset(rect.right - this.right.width, rect.bottom - this.bottom.width),
-                    new Offset(rect.right - this.right.width, rect.top + this.top.width),
+            
+            {
+                var paint = new Paint {
+                    color = this.right.color,
                 };
-                canvas.drawPloygon4(points, paint);
+                var path = new Path();
+                path.moveTo(rect.right, rect.top);
+                path.lineTo(rect.right, rect.bottom);
+                if (this.right.width == 0) {
+                    paint.style = PaintingStyle.stroke;
+                } else {
+                    path.lineTo(rect.right - this.right.width, rect.bottom - this.bottom.width);
+                    path.lineTo(rect.right - this.right.width, rect.top + this.top.width);
+                }
+                
+                canvas.drawPath(path, paint);
             }
 
-            if (this.bottom.width > 0) {
-                paint.color = this.bottom.color;
-                var points = new Offset[] {
-                    new Offset(rect.right, rect.bottom),
-                    new Offset(rect.left, rect.bottom),
-                    new Offset(rect.left + this.left.width, rect.bottom - this.bottom.width),
-                    new Offset(rect.right - this.right.width, rect.bottom - this.bottom.width),
+            {
+                var paint = new Paint {
+                    color = this.bottom.color,
                 };
-                canvas.drawPloygon4(points, paint);
+                var path = new Path();
+                path.moveTo(rect.right, rect.bottom);
+                path.lineTo(rect.left, rect.bottom);
+                if (this.bottom.width == 0) {
+                    paint.style = PaintingStyle.stroke;
+                } else {
+                    path.lineTo(rect.left + this.left.width, rect.bottom - this.bottom.width);
+                    path.lineTo(rect.right - this.right.width, rect.bottom - this.bottom.width);
+                }
+                
+                canvas.drawPath(path, paint);
             }
-
-            if (this.left.width > 0) {
-                paint.color = this.left.color;
-                var points = new Offset[] {
-                    new Offset(rect.left, rect.bottom),
-                    new Offset(rect.left, rect.top),
-                    new Offset(rect.left + this.left.width, rect.top + this.top.width),
-                    new Offset(rect.left + this.left.width, rect.bottom - this.bottom.width),
+            
+            {
+                var paint = new Paint {
+                    color = this.left.color,
                 };
-                canvas.drawPloygon4(points, paint);
-            }
-
-            if (borderRadius != null) {
-                canvas.restore();
+                var path = new Path();
+                path.moveTo(rect.left, rect.bottom);
+                path.lineTo(rect.left, rect.top);
+                if (this.left.width == 0) {
+                    paint.style = PaintingStyle.stroke;
+                } else {
+                    path.lineTo(rect.left + this.left.width, rect.top + this.top.width);
+                    path.lineTo(rect.left + this.left.width, rect.bottom - this.bottom.width);
+                }
+                
+                canvas.drawPath(path, paint);
             }
         }
 

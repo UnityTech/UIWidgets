@@ -1,4 +1,5 @@
 using System;
+using UIWidgets.ui;
 
 namespace UIWidgets.painting {
     public class BorderRadius : IEquatable<BorderRadius> {
@@ -38,6 +39,16 @@ namespace UIWidgets.painting {
         public readonly double bottomRight;
         public readonly double bottomLeft;
 
+        public RRect toRRect(Rect rect) {
+            return RRect.fromRectAndCorners(
+                rect,
+                topLeft: this.topLeft,
+                topRight: this.topRight,
+                bottomLeft: this.bottomLeft,
+                bottomRight: this.bottomRight
+            );
+        }
+        
         public bool Equals(BorderRadius other) {
             if (object.ReferenceEquals(null, other)) return false;
             if (object.ReferenceEquals(this, other)) return true;

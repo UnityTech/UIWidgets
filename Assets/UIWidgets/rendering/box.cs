@@ -1216,8 +1216,8 @@ namespace UIWidgets.rendering {
                     color = new Color(0xFF00FFFF),
                 };
 
-                context.canvas.drawRect((offset & this.size).deflate(0.5),
-                    BorderWidth.all(1), BorderRadius.zero, paint);
+//                context.canvas.drawRect((offset & this.size).deflate(0.5),
+//                    BorderWidth.all(1), BorderRadius.zero, paint);
                 return true;
             });
         }
@@ -1258,7 +1258,7 @@ namespace UIWidgets.rendering {
                     var paint = new Paint {
                         color = new Color(0x00BBBB | ((0x04000000 * this.depth) & 0xFF000000)),
                     };
-                    context.canvas.drawRect(offset & this.size, BorderWidth.zero, BorderRadius.zero, paint);
+//                    context.canvas.drawRect(offset & this.size, BorderWidth.zero, BorderRadius.zero, paint);
                 }
 
                 return true;

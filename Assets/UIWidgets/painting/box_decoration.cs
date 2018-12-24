@@ -99,6 +99,7 @@ namespace UIWidgets.painting {
         public Paint _getBackgroundPaint(Rect rect) {
             if (this._cachedBackgroundPaint == null) {
                 var paint = new Paint();
+                
                 if (this._decoration.color != null) {
                     paint.color = this._decoration.color;
                 }
@@ -110,7 +111,11 @@ namespace UIWidgets.painting {
         }
 
         public void _paintBox(Canvas canvas, Rect rect, Paint paint) {
-            canvas.drawRect(rect, null, this._decoration.borderRadius, paint);
+            if (this._decoration.borderRadius == null) {
+                canvas.drawRect(rect, paint);
+            } else {
+                canvas.drawRRect(this._decoration.borderRadius.toRRect(rect), paint);
+            }
         }
 
         public void _paintShadows(Canvas canvas, Rect rect) {
@@ -121,14 +126,14 @@ namespace UIWidgets.painting {
             foreach (BoxShadow boxShadow in this._decoration.boxShadow) {
                 Paint paint = boxShadow.toPaint();
                 Rect bounds = rect.shift(boxShadow.offset).inflate(boxShadow.spreadRadius);
-                canvas.drawRectShadow(bounds, paint);
+//                canvas.drawRectShadow(bounds, paint);
             }
         }
 
         public void _paintBackgroundColor(Canvas canvas, Rect rect) {
             if (this._decoration.color != null || this._decoration.gradient != null) {
                 var paint = this._getBackgroundPaint(rect);
-                canvas.drawRect(rect, null, this._decoration.borderRadius, paint);
+                this._paintBox(canvas, rect, paint);
             }
         }
 

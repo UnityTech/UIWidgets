@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UIWidgets.foundation;
 
 namespace UIWidgets.ui.txt
 {
@@ -7,7 +6,7 @@ namespace UIWidgets.ui.txt
     {
         public TextBlob(string text, int start, int end, Vector2d[] positions, TextStyle style, Rect bounds)
         {
-            Debug.Assert(start < end);
+            D.assert(start < end);
             this.text = text;
             this.start = start;
             this.end = end;

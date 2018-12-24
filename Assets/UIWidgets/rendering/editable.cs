@@ -655,7 +655,7 @@ namespace UIWidgets.rendering
             var caretOffset = _textPainter.getOffsetForCaret(_selection.extendPos, _caretPrototype);
             var paint = new Paint() {color = _cursorColor};
             var caretRec = _caretPrototype.shift(caretOffset + effectiveOffset);
-            canvas.drawRect(caretRec, BorderWidth.zero, BorderRadius.zero, paint);
+            canvas.drawRect(caretRec, paint);
             if (!caretRec.Equals(_lastCaretRect))
             {
                 _lastCaretRect = caretRec;
@@ -674,7 +674,7 @@ namespace UIWidgets.rendering
             
             foreach (var box in _selectionRects)
             {
-                canvas.drawRect(box.toRect().shift(effectiveOffset), BorderWidth.zero, BorderRadius.zero, paint);
+                canvas.drawRect(box.toRect().shift(effectiveOffset), paint);
             }
         }
 

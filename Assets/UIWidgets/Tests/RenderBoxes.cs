@@ -40,28 +40,23 @@ namespace UIWidgets.Tests {
                 this.hasInvoked = true;
 
                 var renderBox = this._options[this._selected]();
-                if (this.windowAdapter != null) {
-                    this.windowAdapter.attachRootRenderBox(renderBox);
-                }
+                this.windowAdapter.attachRootRenderBox(renderBox);
             }
 
-            if (this.windowAdapter != null) {
-                this.windowAdapter.OnGUI();
-            }
-
+            this.windowAdapter.OnGUI();
         }
 
         void Update() {
-            if (this.windowAdapter != null) {
-                this.windowAdapter.Update();
-            }
+            this.windowAdapter.Update();
         }
 
         private void OnEnable() {
             this.windowAdapter = new WindowAdapter(this);
+            this.windowAdapter.OnEnable();
         }
 
-        void OnDestroy() {
+        void OnDisable() {
+            this.windowAdapter.OnDisable();
             this.windowAdapter = null;
         }
 
@@ -77,7 +72,7 @@ namespace UIWidgets.Tests {
                 maxHeight: 100,
                 child: new RenderDecoratedBox(
                     decoration: new BoxDecoration(
-                        color: new Color(0xFFFFFFFF),
+                        color: new Color(0xFFFF00FF),
                         borderRadius: BorderRadius.all(3),
                         boxShadow: new List<BoxShadow> {
                             new BoxShadow(

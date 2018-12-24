@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using UIWidgets.painting;
+using System.Linq;
+using UIWidgets.foundation;
 using UnityEngine;
 
 namespace UIWidgets.ui {
@@ -15,191 +16,209 @@ namespace UIWidgets.ui {
     }
 
     public class PictureRecorder {
-        private readonly List<DrawCmd> _drawCmds = new List<DrawCmd>();
+        readonly List<DrawCmd> _drawCmds = new List<DrawCmd>();
 
-        private Matrix4x4 _transform;
-        private Rect _clipRect;
-        private bool _isInLayer;
-        private Rect _paintBounds;
-
-        private Stack<CanvasRec> _stack;
+        readonly List<CanvasState> _states = new List<CanvasState>();
 
         public PictureRecorder() {
-            this._transform = Matrix4x4.identity;
-            this._clipRect = null;
-            this._isInLayer = false;
-            this._paintBounds = null;
+            this._states.Add(new CanvasState {
+                xform = Matrix3.I(),
+                scissor = null,
+                saveLayer = false,
+                layerOffset = null,
+                paintBounds = Rect.zero,
+            });
         }
 
-        private Stack<CanvasRec> stack {
-            get { return this._stack ?? (this._stack = new Stack<CanvasRec>()); }
+        CanvasState _getState() {
+            D.assert(this._states.Count > 0);
+            return this._states.Last();
         }
 
         public Picture endRecording() {
-            if (this._stack != null && this._stack.Count > 0) {
+            if (this._states.Count > 1) {
                 throw new Exception("unmatched save/restore commands");
             }
 
-            return new Picture(this._drawCmds, this._paintBounds);
+            var state = this._getState();
+            return new Picture(this._drawCmds, state.paintBounds);
         }
 
         public void addDrawCmd(DrawCmd drawCmd) {
             this._drawCmds.Add(drawCmd);
 
-            if (drawCmd is DrawPloygon4) {
-                var drawPloygon4 = (DrawPloygon4) drawCmd;
-                if (drawPloygon4.paint.color.alpha > 0) {
-                    this.addPaintBounds(drawPloygon4.points);
-                }
-            } else if (drawCmd is DrawRect) {
-                var drawRect = (DrawRect) drawCmd;
-                if (drawRect.paint.color.alpha > 0) {
-                    this.addPaintBounds(drawRect.rect);
-                }
-            } else if (drawCmd is DrawRectShadow) {
-                var drawRectShadow = (DrawRectShadow) drawCmd;
-                if (drawRectShadow.paint.color.alpha > 0) {
-                    this.addPaintBounds(drawRectShadow.rect);
-                }
-            } else if (drawCmd is DrawPicture) {
-                var drawPicture = (DrawPicture) drawCmd;
-                this.addPaintBounds(drawPicture.picture.paintBounds);
-            } else if (drawCmd is DrawConcat) {
-                this._transform = ((DrawConcat) drawCmd).transform * this._transform;
-            } else if (drawCmd is DrawSave) {
-                this.stack.Push(new CanvasRec(
-                    this._transform,
-                    this._clipRect,
-                    this._isInLayer,
-                    null
-                ));
-            } else if (drawCmd is DrawLine)
-            {
-                var drawLine = (DrawLine) drawCmd;
-                Offset vect = drawLine.to - drawLine.from;
-                var distance = vect.distance;
-                if (distance > 0)
-                {
-                    var halfWidth = drawLine.paint.strokeWidth * 0.5;
-                    var diff = vect / distance * halfWidth;
-                    diff = new Offset(diff.dy, -diff.dx);
-                    var offsets = new Offset[]
-                    {
-                        drawLine.from + diff,
-                        drawLine.from - diff,
-                        drawLine.to + diff,
-                        drawLine.to - diff,
-                    };
-
-                    var minX = offsets[0].dx;
-                    var maxX = offsets[0].dx;
-                    var minY = offsets[0].dy;
-                    var maxY = offsets[0].dy;
-                    for (int i = 1; i < offsets.Length; i++)
-                    {
-                        minX = Math.Min(minX, offsets[i].dx);
-                        maxX = Math.Max(maxX, offsets[i].dx);
-                        minY = Math.Min(minY, offsets[i].dy);
-                        maxY = Math.Min(maxY, offsets[i].dy);
-                    }
-                    this.addPaintBounds(Rect.fromLTRB(minX, minY, maxX, maxY));
-                }
-            }
-            else if (drawCmd is DrawSaveLayer) {
-                this.stack.Push(new CanvasRec(
-                    this._transform,
-                    this._clipRect,
-                    this._isInLayer,
-                    this._paintBounds
-                ));
-
+            if (drawCmd is DrawSave) {
+                this._states.Add(this._getState().copy());
+            } else if (drawCmd is DrawSaveLayer) {
                 var drawSaveLayer = (DrawSaveLayer) drawCmd;
-                this._transform = Matrix4x4.identity;
-                this._clipRect = drawSaveLayer.rect;
-                this._isInLayer = true;
-                this._paintBounds = null;
+
+                this._states.Add(new CanvasState {
+                    xform = Matrix3.I(),
+                    scissor = drawSaveLayer.rect.shift(-drawSaveLayer.rect.topLeft),
+                    saveLayer = true,
+                    layerOffset = drawSaveLayer.rect.topLeft,
+                    paintBounds = Rect.zero,
+                });
             } else if (drawCmd is DrawRestore) {
-                var isLayer = this._isInLayer;
+                var stateToRestore = this._getState();
+                this._states.RemoveAt(this._states.Count - 1);
+                var state = this._getState();
 
-                var state = this._stack.Pop();
-                this._transform = state.transform;
-                this._clipRect = state.clipRect;
-                this._isInLayer = state.isInLayer;
-
-                if (isLayer) {
-                    var paintBounds = this._paintBounds;
-                    this._paintBounds = state.paintBounds;
-                    this.addPaintBounds(paintBounds);
+                if (!stateToRestore.saveLayer) {
+                    state.paintBounds = stateToRestore.paintBounds;
+                } else {
+                    var paintBounds = stateToRestore.paintBounds.shift(stateToRestore.layerOffset);
+                    paintBounds = state.xform.mapRect(paintBounds);
+                    this._addPaintBounds(paintBounds);
                 }
+            } else if (drawCmd is DrawTranslate) {
+                var drawTranslate = (DrawTranslate) drawCmd;
+                var state = this._getState();
+                state.xform.preTranslate((float) drawTranslate.dx, (float) drawTranslate.dy);
+            } else if (drawCmd is DrawScale) {
+                var drawScale = (DrawScale) drawCmd;
+                var state = this._getState();
+                state.xform.preScale((float) drawScale.sx, (float) (drawScale.sy ?? drawScale.sx));
+            } else if (drawCmd is DrawRotate) {
+                var drawRotate = (DrawRotate) drawCmd;
+                var state = this._getState();
+                if (drawRotate.offset == null) {
+                    state.xform.preRotate((float) drawRotate.radians * Mathf.PI);
+                } else {
+                    state.xform.preRotate((float) drawRotate.radians * Mathf.PI,
+                        (float) drawRotate.offset.dx,
+                        (float) drawRotate.offset.dy);
+                }
+            } else if (drawCmd is DrawSkew) {
+                var drawSkew = (DrawSkew) drawCmd;
+                var state = this._getState();
+                state.xform.preSkew((float) drawSkew.sx, (float) drawSkew.sy);
+            } else if (drawCmd is DrawConcat) {
+                var drawConcat = (DrawConcat) drawCmd;
+                var state = this._getState();
+                state.xform.preConcat(drawConcat.matrix);
+            } else if (drawCmd is DrawResetMatrix) {
+                var state = this._getState();
+                state.xform.reset();
+            } else if (drawCmd is DrawSetMatrix) {
+                var drawSetMatrix = (DrawSetMatrix) drawCmd;
+                var state = this._getState();
+                state.xform = new Matrix3(drawSetMatrix.matrix);
             } else if (drawCmd is DrawClipRect) {
                 var drawClipRect = (DrawClipRect) drawCmd;
-                this.addClipRect(drawClipRect.rect);
+                var state = this._getState();
+
+                var rect = state.xform.mapRect(drawClipRect.rect);
+                state.scissor = state.scissor == null ? rect : state.scissor.intersect(rect);
             } else if (drawCmd is DrawClipRRect) {
                 var drawClipRRect = (DrawClipRRect) drawCmd;
-                this.addClipRect(drawClipRRect.rrect.outerRect);
-            } else if (drawCmd is DrawTextBlob)
-            {
-                var drawTextBlob = (DrawTextBlob) drawCmd;
-                var bounds = drawTextBlob.textBlob.boundsInText.shift(drawTextBlob.offset);
-                this.addPaintBounds(bounds);
+                var state = this._getState();
+
+                var rect = state.xform.mapRect(drawClipRRect.rrect.outerRect);
+                state.scissor = state.scissor == null ? rect : state.scissor.intersect(rect);
+            } else if (drawCmd is DrawClipPath) {
+                var drawClipPath = (DrawClipPath) drawCmd;
+                var state = this._getState();
+
+                bool convex;
+                var rect = drawClipPath.path.flatten(
+                    XformUtils.fromMatrix3(state.xform), (float) Window.instance.devicePixelRatio
+                ).getFillMesh(out convex).getBounds();
+                state.scissor = state.scissor == null ? rect : state.scissor.intersect(rect);
+            } else if (drawCmd is DrawPath) {
+                var drawPath = (DrawPath) drawCmd;
+                var state = this._getState();
+                var xform = XformUtils.fromMatrix3(state.xform);
+                var path = drawPath.path;
+                var paint = drawPath.paint;
+                var devicePixelRatio = (float) Window.instance.devicePixelRatio;
+
+                Mesh mesh;
+                if (paint.style == PaintingStyle.fill) {
+                    var cache = path.flatten(xform, devicePixelRatio);
+
+                    bool convex;
+                    mesh = cache.getFillMesh(out convex);
+                } else {
+                    float scale = XformUtils.getAverageScale(xform);
+                    float strokeWidth = ((float) paint.strokeWidth * scale).clamp(0, 200.0f);
+                    float fringeWidth = 1 / devicePixelRatio;
+
+                    if (strokeWidth < fringeWidth) {
+                        strokeWidth = fringeWidth;
+                    }
+
+                    var cache = path.flatten(xform, devicePixelRatio);
+                    mesh = cache.getStrokeMesh(
+                        strokeWidth * 0.5f,
+                        paint.strokeCap,
+                        paint.strokeJoin,
+                        (float) paint.strokeMiterLimit);
+                }
+
+                this._addPaintBounds(mesh.getBounds());
+            } else if (drawCmd is DrawImage) {
+                var drawImage = (DrawImage) drawCmd;
+                var state = this._getState();
+                var rect = Rect.fromLTWH(drawImage.offset.dx, drawImage.offset.dy,
+                    drawImage.image.width, drawImage.image.height);
+                rect = state.xform.mapRect(rect);
+                this._addPaintBounds(rect);
             } else if (drawCmd is DrawImageRect) {
                 var drawImageRect = (DrawImageRect) drawCmd;
-                this.addPaintBounds(drawImageRect.dest);
+                var state = this._getState();
+                var rect = state.xform.mapRect(drawImageRect.dst);
+                this._addPaintBounds(rect);
+            } else if (drawCmd is DrawImageNine) {
+                var drawImageNine = (DrawImageNine) drawCmd;
+                var state = this._getState();
+                var rect = state.xform.mapRect(drawImageNine.dst);
+                this._addPaintBounds(rect);
+            } else if (drawCmd is DrawPicture) {
+                var drawPicture = (DrawPicture) drawCmd;
+                var state = this._getState();
+                var rect = state.xform.mapRect(drawPicture.picture.paintBounds);
+                this._addPaintBounds(rect);
+            } else if (drawCmd is DrawTextBlob) {
+                var drawTextBlob = (DrawTextBlob) drawCmd;
+                var state = this._getState();
+                var rect = drawTextBlob.textBlob.boundsInText.shift(drawTextBlob.offset);
+                rect = state.xform.mapRect(rect);
+                this._addPaintBounds(rect);
             } else {
                 throw new Exception("unknown drawCmd: " + drawCmd);
             }
         }
 
-        private void addClipRect(Rect rect) {
-            if (rect.isInfinite) {
-                return;
+        void _addPaintBounds(Rect paintBounds) {
+            var state = this._getState();
+            if (state.scissor != null) {
+                paintBounds = paintBounds.intersect(state.scissor);
             }
 
-            if (this._clipRect != null) {
-                throw new Exception("already a clipRec, considering using saveLayer.");
+            if (state.paintBounds.isEmpty) {
+                state.paintBounds = paintBounds;
+            } else {
+                state.paintBounds = state.paintBounds.expandToInclude(paintBounds);
             }
- 
-            this._clipRect = this._transform.transformRect(rect);
         }
 
-        private void addPaintBounds(Rect paintBounds) {
-            if (paintBounds == null) {
-                return;
+        class CanvasState {
+            public Matrix3 xform;
+            public Rect scissor;
+            public bool saveLayer;
+            public Offset layerOffset;
+            public Rect paintBounds;
+
+            public CanvasState copy() {
+                return new CanvasState {
+                    xform = this.xform,
+                    scissor = this.scissor,
+                    saveLayer = false,
+                    layerOffset = null,
+                    paintBounds = this.paintBounds,
+                };
             }
-
-            paintBounds = this._transform.transformRect(paintBounds);
-            if (this._clipRect != null) {
-                paintBounds = paintBounds.intersect(this._clipRect);
-            }
-
-            this._paintBounds = this._paintBounds == null
-                ? paintBounds
-                : this._paintBounds.expandToInclude(paintBounds);
-        }
-
-        private void addPaintBounds(Offset[] points) {
-            var paintBounds = this._transform.transformRect(points);
-            if (this._clipRect != null) {
-                paintBounds = paintBounds.intersect(this._clipRect);
-            }
-
-            this._paintBounds = this._paintBounds == null
-                ? paintBounds
-                : this._paintBounds.expandToInclude(paintBounds);
-        }
-
-        private class CanvasRec {
-            public CanvasRec(Matrix4x4 transform, Rect clipRect, bool isInLayer, Rect paintBounds) {
-                this.transform = transform;
-                this.clipRect = clipRect;
-                this.isInLayer = isInLayer;
-                this.paintBounds = paintBounds;
-            }
-
-            public readonly Matrix4x4 transform;
-            public readonly Rect clipRect;
-            public readonly bool isInLayer;
-            public readonly Rect paintBounds;
         }
     }
 }

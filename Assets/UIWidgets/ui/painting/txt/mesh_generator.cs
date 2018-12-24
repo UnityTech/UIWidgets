@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using UIWidgets.ui.txt;
-using UnityEditor;
 using UnityEngine;
 
 namespace UIWidgets.ui.painting.txt
 {
+    // TODO: probably we don't need this cache.
     public class MeshKey : IEquatable<MeshKey>
     {
         public readonly string text;
@@ -116,7 +116,7 @@ namespace UIWidgets.ui.painting.txt
             get { return _frameCount; }
         }
         
-        public static long MeshCount
+        public static int meshCount
         {
             get { return _meshes.Count; }
         }
@@ -131,7 +131,7 @@ namespace UIWidgets.ui.painting.txt
             }
         }
         
-        public static Mesh generateMesh(TextBlob textBlob)
+        public static Mesh generateMesh(TextBlob textBlob, float[] xform, float devicePixelRatio)
         {
             var style = textBlob.style;
             var fontInfo = FontManager.instance.getOrCreate(style.fontFamily);
@@ -139,92 +139,60 @@ namespace UIWidgets.ui.painting.txt
             var length = textBlob.end - textBlob.start;
 
             var text = textBlob.text;
-            var scale = EditorGUIUtility.pixelsPerPoint;
-            var fontSizeToLoad = (int) scale * style.UnityFontSize;
+            var scale = XformUtils.getAverageScale(xform) * devicePixelRatio;
+            var fontSizeToLoad = Mathf.CeilToInt( style.UnityFontSize * scale);
             var subText = textBlob.text.Substring(textBlob.start, textBlob.end - textBlob.start);
-            font.RequestCharactersInTexture(subText,
-                fontSizeToLoad, style.UnityFontStyle);
+            font.RequestCharactersInTexture(subText, fontSizeToLoad, style.UnityFontStyle);
 
-            MeshInfo meshInfo;
-            var key = new MeshKey(subText, font.GetInstanceID(),
-                fontInfo.textureVersion,
-                style.UnityFontSize, style.UnityFontStyle, scale, style.UnityColor);
+            var vertices = new List<Vector3>(length * 4);
+            var triangles = new List<int>(length * 6);
+            var uv = new List<Vector2>(length * 4);
+            Mesh mesh = new Mesh();
 
-            Mesh mesh = null;
-            _meshes.TryGetValue(key, out meshInfo);
-            if (meshInfo != null)
-            {
-                mesh = meshInfo.mesh;
-                meshInfo.touch();
-            }
-            if (mesh != null)
-            {
-                return mesh;
-            }
-
-            var vertices = new Vector3[length * 4];
-            var triangles = new int[length * 6];
-            var uv = new Vector2[length * 4];
-            mesh = new Mesh();
-            _meshes[key] = new MeshInfo(key, mesh);
-            
-            for (int charIndex = 0; charIndex < length; ++charIndex)
-            {
+            for (int charIndex = 0; charIndex < length; ++charIndex) {
                 var ch = text[charIndex + textBlob.start];
                 // first char as origin for mesh position 
-                var position = textBlob.positions[charIndex + textBlob.start] - textBlob.positions[textBlob.start];
-                if (Paragraph.isWordSpace(ch) || Paragraph.isLineEndSpace(ch) || ch == '\t')
-                {
-                    vertices[4 * charIndex + 0] = vertices[4 * charIndex + 1] =
-                        vertices[4 * charIndex + 2] = vertices[4 * charIndex + 3] = Vector3.zero;
-                    uv[4 * charIndex + 0] = Vector2.zero;
-                    uv[4 * charIndex + 1] = Vector2.zero;
-                    uv[4 * charIndex + 2] = Vector2.zero;
-                    uv[4 * charIndex + 3] = Vector2.zero;
-                }
-                else
-                {
-                    CharacterInfo charInfo;
-                    font.GetCharacterInfo(ch, out charInfo, fontSizeToLoad, style.UnityFontStyle);
-                    var minX = charInfo.minX / scale;
-                    var maxX = charInfo.maxX / scale;
-                    var minY = charInfo.minY / scale;
-                    var maxY = charInfo.maxY / scale;
-                    vertices[4 * charIndex + 0] = new Vector3((float) (position.x + minX),
-                        (float) (position.y - maxY), 0);
-                    vertices[4 * charIndex + 1] = new Vector3((float) (position.x + maxX),
-                        (float) (position.y - maxY), 0);
-                    vertices[4 * charIndex + 2] = new Vector3(
-                        (float) (position.x + maxX), (float) (position.y - minY), 0);
-                    vertices[4 * charIndex + 3] = new Vector3(
-                        (float) (position.x + minX), (float) (position.y - minY), 0);
-
-
-                    uv[4 * charIndex + 0] = charInfo.uvTopLeft;
-                    uv[4 * charIndex + 1] = charInfo.uvTopRight;
-                    uv[4 * charIndex + 2] = charInfo.uvBottomRight;
-                    uv[4 * charIndex + 3] = charInfo.uvBottomLeft;
+                var position = textBlob.positions[charIndex + textBlob.start];
+                if (Paragraph.isWordSpace(ch) || Paragraph.isLineEndSpace(ch) || ch == '\t') {
+                    continue;
                 }
 
-                triangles[6 * charIndex + 0] = 4 * charIndex + 0;
-                triangles[6 * charIndex + 1] = 4 * charIndex + 1;
-                triangles[6 * charIndex + 2] = 4 * charIndex + 2;
 
-                triangles[6 * charIndex + 3] = 4 * charIndex + 0;
-                triangles[6 * charIndex + 4] = 4 * charIndex + 2;
-                triangles[6 * charIndex + 5] = 4 * charIndex + 3;
+                CharacterInfo charInfo;
+                font.GetCharacterInfo(ch, out charInfo, fontSizeToLoad, style.UnityFontStyle);
+                var minX = charInfo.minX / scale;
+                var maxX = charInfo.maxX / scale;
+                var minY = charInfo.minY / scale;
+                var maxY = charInfo.maxY / scale;
+
+                var baseIndex = vertices.Count;
+
+                float x, y;
+                PathUtils.transformPoint(out x, out y, xform, (float) (position.x + minX), (float) (position.y - maxY));
+                vertices.Add(new Vector3(x, y, 0));
+                PathUtils.transformPoint(out x, out y, xform, (float) (position.x + maxX), (float) (position.y - maxY));
+                vertices.Add(new Vector3(x, y, 0));
+                PathUtils.transformPoint(out x, out y, xform, (float) (position.x + maxX), (float) (position.y - minY));
+                vertices.Add(new Vector3(x, y, 0));
+                PathUtils.transformPoint(out x, out y, xform, (float) (position.x + minX), (float) (position.y - minY));
+                vertices.Add(new Vector3(x, y, 0));
+
+                triangles.Add(baseIndex);
+                triangles.Add(baseIndex + 1);
+                triangles.Add(baseIndex + 2);
+                triangles.Add(baseIndex);
+                triangles.Add(baseIndex + 2);
+                triangles.Add(baseIndex + 3);
+
+                uv.Add(charInfo.uvTopLeft);
+                uv.Add(charInfo.uvTopRight);
+                uv.Add(charInfo.uvBottomRight);
+                uv.Add(charInfo.uvBottomLeft);
             }
 
-            var colors = new UnityEngine.Color[vertices.Length];
-            for (var i = 0; i < colors.Length; i++)
-            {
-                colors[i] = style.UnityColor;
-            }
-
-            mesh.vertices = vertices;
-            mesh.triangles = triangles;
-            mesh.colors = colors;
-            mesh.uv = uv;
+            mesh.SetVertices(vertices);
+            mesh.SetIndices(triangles.ToArray(), MeshTopology.Triangles, 0);
+            mesh.SetUVs(0, uv);
             return mesh;
         }
     }

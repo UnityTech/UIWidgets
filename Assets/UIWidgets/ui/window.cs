@@ -29,7 +29,7 @@ namespace UIWidgets.ui {
         }
 
         static Window _instance;
-        
+
         public double devicePixelRatio {
             get { return this._devicePixelRatio; }
         }
@@ -77,7 +77,7 @@ namespace UIWidgets.ui {
 
         PointerDataPacketCallback _onPointerEvent;
 
-        public abstract void scheduleFrame();
+        public abstract void scheduleFrame(bool regenerateLayerTree = true);
 
         public abstract void render(Scene scene);
 
@@ -92,5 +92,7 @@ namespace UIWidgets.ui {
         }
 
         public abstract TextInput textInput { get; }
+
+        public abstract IDisposable getScope();
     }
 }

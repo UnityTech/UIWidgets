@@ -211,13 +211,13 @@ namespace UIWidgets.widgets {
             this.textBaseline = textBaseline;
         }
 
-        public Axis direction;
-        public MainAxisAlignment mainAxisAlignment;
-        public MainAxisSize mainAxisSize;
-        public CrossAxisAlignment crossAxisAlignment;
-        public TextDirection? textDirection;
-        public VerticalDirection verticalDirection;
-        public TextBaseline? textBaseline;
+        public readonly Axis direction;
+        public readonly MainAxisAlignment mainAxisAlignment;
+        public readonly MainAxisSize mainAxisSize;
+        public readonly CrossAxisAlignment crossAxisAlignment;
+        public readonly TextDirection? textDirection;
+        public readonly VerticalDirection verticalDirection;
+        public readonly TextBaseline? textBaseline;
 
         private bool _needTextDirection {
             get {

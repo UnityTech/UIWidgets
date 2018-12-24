@@ -104,7 +104,7 @@ namespace UIWidgets.rendering {
 
         public override void addToScene(SceneBuilder builder, Offset layerOffset) {
             builder.addPicture(layerOffset, this.picture,
-                isComplexHint: this.isComplexHint, willChangeHint: this.willChangeHint);
+                isComplex: this.isComplexHint, willChange: this.willChangeHint);
         }
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
@@ -332,7 +332,7 @@ namespace UIWidgets.rendering {
             });
 
             if (enabled) {
-                builder.pushClipRect(this.clipRect.shift(layerOffset), clipBehavior: this.clipBehavior);
+                builder.pushClipRect(this.clipRect.shift(layerOffset));
             }
 
             this.addChildrenToScene(builder, layerOffset);
@@ -378,7 +378,7 @@ namespace UIWidgets.rendering {
             });
 
             if (enabled) {
-                builder.pushClipRRect(this.clipRRect.shift(layerOffset), clipBehavior: this.clipBehavior);
+                builder.pushClipRRect(this.clipRRect.shift(layerOffset));
             }
 
             this.addChildrenToScene(builder, layerOffset);

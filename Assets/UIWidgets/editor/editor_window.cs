@@ -2,62 +2,154 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using UIWidgets.async;
-using UIWidgets.flow;
+using UIWidgets.foundation;
 using UIWidgets.service;
 using UIWidgets.rendering;
 using UIWidgets.ui;
 using UIWidgets.widgets;
 using UnityEditor;
 using UnityEngine;
-using Rect = UnityEngine.Rect;
 
 namespace UIWidgets.editor {
+    public abstract class UIWidgetsEditorWindow : EditorWindow {
+        WindowAdapter _windowAdapter;
+
+        void OnEnable() {
+            if (this._windowAdapter == null) {
+                this._windowAdapter = new WindowAdapter(this);
+            }
+
+            this._windowAdapter.OnEnable();
+
+            var rootRenderBox = this.rootRenderBox();
+            if (rootRenderBox != null) {
+                this._windowAdapter.attachRootRenderBox(rootRenderBox);
+                return;
+            }
+
+            this._windowAdapter.attachRootWidget(this.rootWidget());
+        }
+
+        void OnDisable() {
+            this._windowAdapter.OnDisable();
+        }
+
+        void OnGUI() {
+            this._windowAdapter.OnGUI();
+        }
+
+        void Update() {
+            this._windowAdapter.Update();
+        }
+
+        protected virtual RenderBox rootRenderBox() {
+            return null;
+        }
+
+        protected abstract Widget rootWidget();
+    }
+
     public class WindowAdapter : Window {
         public WindowAdapter(EditorWindow editorWindow) {
             this.editorWindow = editorWindow;
             this.editorWindow.wantsMouseMove = false;
             this.editorWindow.wantsMouseEnterLeaveWindow = false;
-
-            this._devicePixelRatio = EditorGUIUtility.pixelsPerPoint;
-
-            this._lastPosition = editorWindow.position;
-            this._physicalSize = new Size(
-                this._lastPosition.width * EditorGUIUtility.pixelsPerPoint,
-                this._lastPosition.height * EditorGUIUtility.pixelsPerPoint);
-
-            instance = this;
-            try {
-                this._binding = new WidgetsBinding();
-            }
-            finally {
-                instance = null;
-            }
-
-            this._rasterCache = new RasterCache();
         }
 
         public readonly EditorWindow editorWindow;
 
-        readonly WidgetsBinding _binding;
+        WidgetsBinding _binding;
+        float _lastWindowWidth;
+        float _lastWindowHeight;
 
-        readonly RasterCache _rasterCache;
-
-        Rect _lastPosition;
         readonly DateTime _epoch = new DateTime(Stopwatch.GetTimestamp());
         readonly MicrotaskQueue _microtaskQueue = new MicrotaskQueue();
         readonly TimerProvider _timerProvider = new TimerProvider();
         readonly TextInput _textInput = new TextInput();
+        readonly Rasterizer _rasterizer = new Rasterizer();
 
-        public void OnGUI() {
+        bool _regenerateLayerTree;
+        Surface _surface;
+
+        public void OnEnable() {
+            this._devicePixelRatio = EditorGUIUtility.pixelsPerPoint;
+            this._lastWindowWidth = this.editorWindow.position.width;
+            this._lastWindowHeight = this.editorWindow.position.height;
+            this._physicalSize = new Size(
+                this._lastWindowWidth * this._devicePixelRatio,
+                this._lastWindowHeight * this._devicePixelRatio);
+
+            D.assert(this._surface == null);
+            this._surface = new EditorWindowSurface();
+
+            this._rasterizer.setup(this._surface);
+        }
+
+        public void OnDisable() {
+            this._rasterizer.teardown();
+
+            D.assert(this._surface != null);
+            this._surface.Dispose();
+            this._surface = null;
+        }
+
+        public override IDisposable getScope() {
             instance = this;
+            if (this._binding == null) {
+                this._binding = new WidgetsBinding();
+            }
+
             WidgetsBinding.instance = this._binding;
 
-            try {
-                this.doOnGUI();
-            }
-            finally {
+            return new WindowDisposable();
+        }
+
+        class WindowDisposable : IDisposable {
+            public void Dispose() {
                 instance = null;
                 WidgetsBinding.instance = null;
+            }
+        }
+
+        public void OnGUI() {
+            using (this.getScope()) {
+                bool dirty = false;
+
+                if (this._devicePixelRatio != EditorGUIUtility.pixelsPerPoint) {
+                    dirty = true;
+                }
+
+                if (this._lastWindowWidth != this.editorWindow.position.width
+                    || this._lastWindowHeight != this.editorWindow.position.height) {
+                    dirty = true;
+                }
+
+                if (dirty) {
+                    this._devicePixelRatio = EditorGUIUtility.pixelsPerPoint;
+                    this._lastWindowWidth = this.editorWindow.position.width;
+                    this._lastWindowHeight = this.editorWindow.position.height;
+                    this._physicalSize = new Size(
+                        this._lastWindowWidth * this._devicePixelRatio,
+                        this._lastWindowHeight * this._devicePixelRatio);
+
+                    if (this.onMetricsChanged != null) {
+                        this.onMetricsChanged();
+                    }
+                }
+
+                this.doOnGUI();
+            }
+        }
+
+        void _beginFrame() {
+            if (this.onBeginFrame != null) {
+                this.onBeginFrame(new DateTime(Stopwatch.GetTimestamp()) - this._epoch);
+            }
+
+            this.flushMicrotasks();
+
+            if (this.onDrawFrame != null) {
+                this.onDrawFrame();
             }
         }
 
@@ -65,14 +157,11 @@ namespace UIWidgets.editor {
             var evt = Event.current;
 
             if (evt.type == EventType.Repaint) {
-                if (this.onBeginFrame != null) {
-                    this.onBeginFrame(new DateTime(Stopwatch.GetTimestamp()) - this._epoch);
-                }
-
-                this.flushMicrotasks();
-
-                if (this.onDrawFrame != null) {
-                    this.onDrawFrame();
+                if (this._regenerateLayerTree) {
+                    this._regenerateLayerTree = false;
+                    this._beginFrame();
+                } else {
+                    this._rasterizer.drawLastLayerTree();
                 }
 
                 return;
@@ -123,65 +212,41 @@ namespace UIWidgets.editor {
         }
 
         public void Update() {
-            Window.instance = this;
-            WidgetsBinding.instance = this._binding;
-
-            try {
+            Timer.update();
+            
+            using (this.getScope()) {
                 this.doUpdate();
-            }
-            finally {
-                Window.instance = null;
-                WidgetsBinding.instance = null;
             }
         }
 
         private void doUpdate() {
             this.flushMicrotasks();
-
             this._timerProvider.update();
-
-            bool dirty = false;
-            if (this._devicePixelRatio != EditorGUIUtility.pixelsPerPoint) {
-                dirty = true;
-            }
-
-            if (this._lastPosition != this.editorWindow.position) {
-                dirty = true;
-            }
-
-            if (dirty) {
-                this._devicePixelRatio = EditorGUIUtility.pixelsPerPoint;
-                this._lastPosition = this.editorWindow.position;
-                this._physicalSize = new Size(
-                    this._lastPosition.width * EditorGUIUtility.pixelsPerPoint,
-                    this._lastPosition.height * EditorGUIUtility.pixelsPerPoint);
-
-                if (this.onMetricsChanged != null) {
-                    this.onMetricsChanged();
-                }
-            }
         }
 
-        public override void scheduleFrame() {
+        public override void scheduleFrame(bool regenerateLayerTree = true) {
+            if (regenerateLayerTree) {
+                this._regenerateLayerTree = true;
+            }
+
             if (this.editorWindow != null) {
                 this.editorWindow.Repaint();
             }
         }
 
         public override void render(Scene scene) {
-            var layer = scene.takeLayer();
+            var layerTree = scene.takeLayerTree();
+            if (layerTree == null) {
+                return;
+            }
 
-            var prerollContext = new PrerollContext {
-                rasterCache = this._rasterCache
-            };
-            layer.preroll(prerollContext, Matrix4x4.identity);
+            if (this._physicalSize.isEmpty) {
+                return;
+            }
 
-            var paintContext = new PaintContext {
-                canvas = new CanvasImpl()
-            };
-            layer.paint(paintContext);
-
-            this._rasterCache.sweepAfterFrame();
+            layerTree.frameSize = this._physicalSize;
+            layerTree.devicePixelRatio = this._devicePixelRatio;
+            this._rasterizer.draw(layerTree);
         }
 
         public override void scheduleMicrotask(Action callback) {
@@ -197,28 +262,14 @@ namespace UIWidgets.editor {
         }
 
         public void attachRootRenderBox(RenderBox root) {
-            Window.instance = this;
-            WidgetsBinding.instance = this._binding;
-
-            try {
+            using (this.getScope()) {
                 this._binding.renderView.child = root;
-            }
-            finally {
-                Window.instance = null;
-                WidgetsBinding.instance = null;
             }
         }
 
         public void attachRootWidget(Widget root) {
-            Window.instance = this;
-            WidgetsBinding.instance = this._binding;
-
-            try {
+            using (this.getScope()) {
                 this._binding.attachRootWidget(root);
-            }
-            finally {
-                Window.instance = null;
-                WidgetsBinding.instance = null;
             }
         }
 

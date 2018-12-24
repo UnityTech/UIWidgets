@@ -72,24 +72,22 @@ namespace UIWidgets.Tests {
                 this.windowAdapter.attachRootWidget(rootWidget);
             }
 
-            if (this.windowAdapter != null) {
-                this.windowAdapter.OnGUI();
-            }
+            this.windowAdapter.OnGUI();
         }
 
         private void Update() {
-            if (this.windowAdapter != null) {
-                this.windowAdapter.Update();
-            }
+            this.windowAdapter.Update();
         }
 
         private void OnEnable() {
             this.paintingBinding = new PaintingBinding(null);
             paintingBinding.initInstances();
             this.windowAdapter = new WindowAdapter(this);
+            this.windowAdapter.OnEnable();
         }
 
-        void OnDestroy() {
+        void OnDisable() {
+            this.windowAdapter.OnDisable();
             this.windowAdapter = null;
         }
 

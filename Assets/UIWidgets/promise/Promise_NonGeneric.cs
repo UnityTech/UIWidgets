@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using RSG.Exceptions;
-using UIWidgets.ui;
 
 namespace RSG
 {
@@ -552,9 +551,7 @@ namespace RSG
                 PendingPromises.Remove(this);
             }
 
-            Window.instance.scheduleMicrotask(() => {
-                InvokeRejectHandlers(ex);
-            });
+            InvokeRejectHandlers(ex);
         }
 
 
@@ -579,9 +576,7 @@ namespace RSG
                 PendingPromises.Remove(this);
             }
 
-            Window.instance.scheduleMicrotask(() => {
-                InvokeResolveHandlers();                
-            });
+            InvokeResolveHandlers();                
         }
 
 

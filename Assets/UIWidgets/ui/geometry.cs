@@ -12,6 +12,16 @@ namespace UIWidgets.ui {
             return value;
         }
 
+        public static float clamp(this float value, float min, float max) {
+            if (value < min) {
+                value = min;
+            } else if (value > max) {
+                value = max;
+            }
+
+            return value;
+        }
+        
         public static int clamp(this int value, int min, int max) {
             if (value < min) {
                 value = min;
@@ -41,7 +51,7 @@ namespace UIWidgets.ui {
         public static bool isNaN(this double it) {
             return double.IsNaN(it);
         }
-        
+
         public static double lerpDouble(double a, double b, double t) {
             return a + (b - a) * t;
         }
@@ -379,6 +389,13 @@ namespace UIWidgets.ui {
                 this.bottom + translateY);
         }
 
+        public Rect scale(double scaleX, double? scaleY = null) {
+            scaleY = scaleY ?? scaleX;
+            return Rect.fromLTRB(
+                this.left * scaleX, this.top * scaleY.Value,
+                this.right * scaleX, this.bottom * scaleY.Value);
+        }
+
         public Rect inflate(double delta) {
             return Rect.fromLTRB(this.left - delta, this.top - delta, this.right + delta, this.bottom + delta);
         }
@@ -469,10 +486,16 @@ namespace UIWidgets.ui {
             return this.contains(rect.topLeft) && this.contains(rect.bottomRight);
         }
 
+        public Rect round() {
+            return Rect.fromLTRB(
+                Math.Round(this.left), Math.Round(this.top),
+                Math.Round(this.right), Math.Round(this.bottom));
+        }
+
         public Rect roundOut() {
             return Rect.fromLTRB(
                 Math.Floor(this.left), Math.Floor(this.top),
-                Math.Ceiling(this.right), Math.Ceiling(this.bottom)); 
+                Math.Ceiling(this.right), Math.Ceiling(this.bottom));
         }
 
         public static Rect lerp(Rect a, Rect b, double t) {
@@ -525,7 +548,112 @@ namespace UIWidgets.ui {
             return "Rect.fromLTRB(" + this.left.ToString("0.0") + ", " + this.top.ToString("0.0") + ", " +
                    this.right.ToString("0.0") + ", " + this.bottom.ToString("0.0") + ")";
         }
+
+        public static bool operator ==(Rect left, Rect right) {
+            return object.Equals(left, right);
+        }
+
+        public static bool operator !=(Rect left, Rect right) {
+            return !object.Equals(left, right);
+        }
     }
+    
+     public class Radius : IEquatable<Radius> {
+        private Radius(double x, double y) {
+            this.x = x;
+            this.y = y;
+        }
+
+        public static Radius circular(double radius) {
+            return elliptical(radius, radius);
+        }
+
+        public static Radius elliptical(double x, double y) {
+            return new Radius(x, y);
+        }
+
+        public readonly double x;
+        public readonly double y;
+
+        public static readonly Radius zero = Radius.circular(0.0);
+
+        public static Radius operator -(Radius a) {
+            return elliptical(-a.x, -a.y);
+        }
+
+        public static Radius operator -(Radius a, Radius b) {
+            return elliptical(a.x - b.x, a.y - b.y);
+        }
+
+        public static Radius operator +(Radius a, Radius b) {
+            return elliptical(a.x + b.x, a.y + b.y);
+        }
+
+        public static Radius operator *(Radius a, Radius b) {
+            return elliptical(a.x * b.x, a.y * b.y);
+        }
+
+        public static Radius operator /(Radius a, Radius b) {
+            return elliptical(a.x / b.x, a.y / b.y);
+        }
+
+        public static Radius operator %(Radius a, Radius b) {
+            return elliptical(a.x % b.x, a.y % b.y);
+        }
+
+        public static Radius lerp(Radius a, Radius b, double t) {
+            if (a == null && b == null) {
+                return null;
+            }
+
+            if (a == null) {
+                return elliptical(b.x * t, b.y * t);
+            }
+
+            if (b == null) {
+                double k = 1.0 - t;
+                return elliptical(a.x * k, a.y * k);
+            }
+
+            return elliptical(
+                MathUtils.lerpDouble(a.x, b.x, t),
+                MathUtils.lerpDouble(a.y, b.y, t)
+            );
+        }
+
+        public bool Equals(Radius other) {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return this.x.Equals(other.x) && this.y.Equals(other.y);
+        }
+
+        public override bool Equals(object obj) {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return this.Equals((Radius) obj);
+        }
+
+        public override int GetHashCode() {
+            unchecked {
+                return (this.x.GetHashCode() * 397) ^ this.y.GetHashCode();
+            }
+        }
+
+        public static bool operator ==(Radius left, Radius right) {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(Radius left, Radius right) {
+            return !Equals(left, right);
+        }
+
+        public override string ToString() {
+            return this.x == this.y
+                ? string.Format("Radius.circular({0:F1})", this.x)
+                : string.Format("Radius.elliptical({0:F1}, ${1:F1})", this.x, this.y);
+        }
+     }
 
     public class RRect : IEquatable<RRect> {
         private RRect(double left, double top, double right, double bottom,
@@ -542,9 +670,14 @@ namespace UIWidgets.ui {
 
         public static RRect fromLTRBAndRadius(
             double left, double top, double right, double bottom,
-            double radius) {
+            double radius = 0) {
             return new RRect(left, top, right, bottom,
                 radius, radius, radius, radius);
+        }
+
+        public static RRect fromRect(Rect rect) {
+            return new RRect(rect.left, rect.top, rect.right, rect.bottom,
+                0, 0, 0, 0);
         }
 
         public static RRect fromRectAndRadius(Rect rect, double radius) {
@@ -743,6 +876,57 @@ namespace UIWidgets.ui {
 
         public Offset center {
             get { return new Offset(this.left + this.width / 2.0, this.top + this.height / 2.0); }
+        }
+
+        public bool contains(Rect rect) {
+            if (!this.outerRect.contains(rect)) {
+                return false;
+            }
+
+            if (this.isRect) {
+                return true;
+            }
+
+            return this.checkCornerContainment(rect.left, rect.top) &&
+                   this.checkCornerContainment(rect.right, rect.top) &&
+                   this.checkCornerContainment(rect.right, rect.bottom) &&
+                   this.checkCornerContainment(rect.left, rect.bottom);
+        }
+
+        bool checkCornerContainment(double x, double y) {
+            double radius;
+
+            if (x < this.left + this.tlRadius &&
+                y < this.top + this.tlRadius) {
+                x -= this.left + this.tlRadius;
+                y -= this.top + this.tlRadius;
+                radius = this.tlRadius;
+            } else if (x < this.left + this.blRadius &&
+                       y > this.bottom - this.blRadius) {
+                x -= this.left + this.blRadius;
+                y -= this.bottom - this.blRadius;
+                radius = this.blRadius;
+            } else if (x > this.right - this.trRadius &&
+                       y < this.top + this.trRadius) {
+                x -= this.right - this.trRadius;
+                y -= this.bottom - this.blRadius;
+                radius = this.trRadius;
+            } else if (x > this.right - this.brRadius &&
+                       y > this.bottom - this.brRadius) {
+                x -= this.right - this.brRadius;
+                y -= this.bottom - this.brRadius;
+                radius = this.brRadius;
+            } else {
+                return true;
+            }
+
+            // A point is in an ellipse (in standard position) if:
+            //      x^2     y^2
+            //     ----- + ----- <= 1
+            //      a^2     b^2
+            // or :
+            //     b^2*x^2 + a^2*y^2 <= (ab)^2
+            return x * x + y * y <= radius * radius;
         }
 
         public bool Equals(RRect other) {

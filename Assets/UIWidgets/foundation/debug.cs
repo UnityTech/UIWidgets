@@ -72,7 +72,7 @@ namespace UIWidgets.foundation {
                         new Color(0xFF0090FF));
                     Paint paint = new Paint();
                     paint.color = new Color(0x90909090);
-                    canvas.drawRect(outerRect, BorderWidth.zero, BorderRadius.zero, paint);
+//                    canvas.drawRect(outerRect, BorderWidth.zero, BorderRadius.zero, paint);
                 }
 
                 return true;

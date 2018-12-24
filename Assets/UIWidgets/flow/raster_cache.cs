@@ -1,45 +1,46 @@
 using System;
 using System.Collections.Generic;
 using UIWidgets.foundation;
-using UIWidgets.painting;
 using UIWidgets.ui;
-using UnityEditor;
 using UnityEngine;
 using Canvas = UIWidgets.ui.Canvas;
+using Object = UnityEngine.Object;
 using Rect = UIWidgets.ui.Rect;
 
 namespace UIWidgets.flow {
     public class RasterCacheResult {
-        public RasterCacheResult(Image image, Rect bounds) {
-            D.assert(image != null);
-            D.assert(bounds != null);
+        public RasterCacheResult(Texture texture, Rect logicalRect, float devicePixelRatio) {
+            D.assert(texture != null);
+            D.assert(logicalRect != null);
 
-            this.image = image;
-            this.bounds = bounds;
+            this.texture = texture;
+            this.logicalRect = logicalRect;
+            this.devicePixelRatio = devicePixelRatio;
         }
 
-        public readonly Image image;
+        public readonly Texture texture;
 
-        public readonly Rect bounds;
+        public readonly Rect logicalRect;
+
+        public readonly float devicePixelRatio;
 
         public void draw(Canvas canvas) {
-            var bounds = canvas.getMatrix().transformRect(this.bounds).roundOut();
+            var bounds = canvas.getTotalMatrix().mapRect(this.logicalRect);
 
             D.assert(() => {
-                var textureWidth = (int) Math.Ceiling(
-                    bounds.width * EditorGUIUtility.pixelsPerPoint); // todo: use window.pixelsPerPoint;
-                var textureHeight = (int) Math.Ceiling(
-                    bounds.height * EditorGUIUtility.pixelsPerPoint);
+                var textureWidth = Mathf.CeilToInt((float) bounds.width * this.devicePixelRatio);
+                var textureHeight = Mathf.CeilToInt((float) bounds.height * this.devicePixelRatio);
 
-                D.assert(this.image.width == textureWidth);
-                D.assert(this.image.height == textureHeight);
+                D.assert(this.texture.width == textureWidth);
+                D.assert(this.texture.height == textureHeight);
                 return true;
             });
 
+            
             canvas.save();
             try {
-                canvas.setMatrix(Matrix4x4.identity);
-                canvas.drawImageRect(this.image, bounds);
+                canvas.resetMatrix();
+                canvas.drawImage(this.texture, bounds.topLeft, new Paint());
             }
             finally {
                 canvas.restore();
@@ -48,25 +49,33 @@ namespace UIWidgets.flow {
     }
 
     class _RasterCacheKey : IEquatable<_RasterCacheKey> {
-        internal _RasterCacheKey(Picture picture, ref Matrix4x4 matrix) {
+        internal _RasterCacheKey(Picture picture, Matrix3 matrix, float devicePixelRatio) {
             D.assert(picture != null);
+            D.assert(matrix != null);
             this.picture = picture;
-            this.matrix = matrix;
-            this.matrix.m03 = this.matrix.m03 - (int) this.matrix.m03; // x
-            this.matrix.m13 = this.matrix.m13 - (int) this.matrix.m13; // y
-            
-            D.assert(this.matrix.m03 == 0);
-            D.assert(this.matrix.m13 == 0);
+            this.matrix = new Matrix3(matrix);
+            var x = this.matrix[6] * devicePixelRatio;
+            var y = this.matrix[7] * devicePixelRatio;
+
+            this.matrix[6] = (x - (int) x) / devicePixelRatio; // x
+            this.matrix[7] = (y - (int) y) / devicePixelRatio; // y
+            D.assert(this.matrix[6] == 0);
+            D.assert(this.matrix[7] == 0);
+            this.devicePixelRatio = devicePixelRatio;
         }
 
         public readonly Picture picture;
 
-        public readonly Matrix4x4 matrix;
+        public readonly Matrix3 matrix;
+
+        public readonly float devicePixelRatio;
 
         public bool Equals(_RasterCacheKey other) {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return this.picture.Equals(other.picture) && this.matrix.Equals(other.matrix);
+            return Equals(this.picture, other.picture) &&
+                   Equals(this.matrix, other.matrix) &&
+                   this.devicePixelRatio.Equals(other.devicePixelRatio);
         }
 
         public override bool Equals(object obj) {
@@ -78,7 +87,10 @@ namespace UIWidgets.flow {
 
         public override int GetHashCode() {
             unchecked {
-                return (this.picture.GetHashCode() * 397) ^ this.matrix.GetHashCode();
+                var hashCode = (this.picture != null ? this.picture.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (this.matrix != null ? this.matrix.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ this.devicePixelRatio.GetHashCode();
+                return hashCode;
             }
         }
 
@@ -108,7 +120,7 @@ namespace UIWidgets.flow {
         readonly Dictionary<_RasterCacheKey, _RasterCacheEntry> _cache;
 
         public RasterCacheResult getPrerolledImage(
-            Picture picture, ref Matrix4x4 transform, bool isComplex, bool willChange) {
+            Picture picture, Matrix3 transform, float devicePixelRatio, bool isComplex, bool willChange) {
             if (this.threshold == 0) {
                 return null;
             }
@@ -117,11 +129,11 @@ namespace UIWidgets.flow {
                 return null;
             }
 
-            if (transform.m33 == 0 || transform.determinant == 0) {
+            if (!transform.invert(null)) {
                 return null;
             }
 
-            _RasterCacheKey cacheKey = new _RasterCacheKey(picture, ref transform);
+            _RasterCacheKey cacheKey = new _RasterCacheKey(picture, transform, devicePixelRatio);
 
             var entry = this._cache.putIfAbsent(cacheKey, () => new _RasterCacheEntry());
 
@@ -133,7 +145,7 @@ namespace UIWidgets.flow {
             }
 
             if (entry.image == null) {
-                entry.image = this._rasterizePicture(picture, ref transform);
+                entry.image = this._rasterizePicture(picture, transform, devicePixelRatio);
             }
 
             return entry.image;
@@ -173,41 +185,27 @@ namespace UIWidgets.flow {
             return true;
         }
 
-        RasterCacheResult _rasterizePicture(Picture picture, ref Matrix4x4 transform) {
-            var bounds = transform.transformRect(picture.paintBounds).roundOut();
+        RasterCacheResult _rasterizePicture(Picture picture, Matrix3 transform, float devicePixelRatio) {
+            var bounds = transform.mapRect(picture.paintBounds);
 
-            var textureWidth = (int) Math.Ceiling(
-                bounds.width * EditorGUIUtility.pixelsPerPoint); // todo: use window.pixelsPerPoint;
-            var textureHeight = (int) Math.Ceiling(
-                bounds.height * EditorGUIUtility.pixelsPerPoint);
+            var desc = new RenderTextureDescriptor(
+                Mathf.CeilToInt((float) (bounds.width * devicePixelRatio)),
+                Mathf.CeilToInt((float) (bounds.height * devicePixelRatio)),
+                RenderTextureFormat.Default, 24) {
+                msaaSamples = QualitySettings.antiAliasing,
+                useMipMap = false,
+                autoGenerateMips = false,
+            };
 
-            var texture = RenderTexture.GetTemporary(
-                textureWidth, textureHeight, 32,
-                RenderTextureFormat.ARGB32, RenderTextureReadWrite.sRGB);
+            var renderTexture = new RenderTexture(desc);
+            
+            var canvas = new CommandBufferCanvas(renderTexture, devicePixelRatio);
+            canvas.translate((float) -bounds.left, (float) -bounds.top);
+            canvas.concat(transform);
+            canvas.drawPicture(picture);
+            canvas.flush();
 
-            var oldTexture = RenderTexture.active;
-            RenderTexture.active = texture;
-
-            GL.PushMatrix();
-            GL.LoadPixelMatrix((float) bounds.left, (float) bounds.right, (float) bounds.bottom, (float) bounds.top);
-            GL.Clear(true, true, new UnityEngine.Color(0, 0, 0, 0));
-
-            try {
-                var canvas = new CanvasImpl();
-                canvas.concat(transform);
-                canvas.drawPicture(picture);
-
-                Texture2D tex = new Texture2D(textureWidth, textureHeight, TextureFormat.ARGB32, false);
-                tex.ReadPixels(new UnityEngine.Rect(0, 0, textureWidth, textureHeight), 0, 0, false);
-                tex.Apply();
-
-                return new RasterCacheResult(new Image(texture: tex), picture.paintBounds);
-            }
-            finally {
-                GL.PopMatrix();
-                RenderTexture.active = oldTexture;
-                RenderTexture.ReleaseTemporary(texture);
-            }
+            return new RasterCacheResult(renderTexture, bounds, devicePixelRatio);
         }
 
         public void sweepAfterFrame() {
@@ -222,10 +220,18 @@ namespace UIWidgets.flow {
 
             foreach (var entry in dead) {
                 this._cache.Remove(entry.Key);
+                if (entry.Value.image != null) {
+                    Object.DestroyImmediate(entry.Value.image.texture);
+                }
             }
         }
 
         public void clear() {
+            foreach (var entry in this._cache) {
+                if (entry.Value.image != null) {
+                    Object.DestroyImmediate(entry.Value.image.texture);
+                }
+            }
             this._cache.Clear();
         }
     }

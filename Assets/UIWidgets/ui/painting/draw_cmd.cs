@@ -1,45 +1,8 @@
-﻿using UIWidgets.painting;
-using UIWidgets.ui.txt;
+﻿using UIWidgets.ui.txt;
 using UnityEngine;
 
 namespace UIWidgets.ui {
-    public interface DrawCmd {
-    }
-
-    public class DrawPloygon4 : DrawCmd {
-        public Offset[] points;
-        public Paint paint;
-    }
-
-    public class DrawRect : DrawCmd {
-        public Rect rect;
-        public BorderWidth borderWidth;
-        public BorderRadius borderRadius;
-        public Paint paint;
-    }
-
-    public class DrawRectShadow : DrawCmd {
-        public Rect rect;
-        public Paint paint;
-    }
-
-    public class DrawPicture : DrawCmd {
-        public Picture picture;
-    }
-
-    public class DrawImageRect : DrawCmd {
-        public Paint paint;
-        public Image image;
-        public Rect src;
-        public Rect dest;
-    }
-
-    public class DrawConcat : DrawCmd {
-        public Matrix4x4 transform;
-    }
-    
-    public class DrawSetMatrix : DrawCmd {
-        public Matrix4x4 matrix;
+    public abstract class DrawCmd {
     }
 
     public class DrawSave : DrawCmd {
@@ -53,6 +16,37 @@ namespace UIWidgets.ui {
     public class DrawRestore : DrawCmd {
     }
 
+    public class DrawTranslate : DrawCmd {
+        public double dx;
+        public double dy;
+    }
+
+    public class DrawScale : DrawCmd {
+        public double sx;
+        public double? sy;
+    }
+
+    public class DrawRotate : DrawCmd {
+        public double radians;
+        public Offset offset;
+    }
+
+    public class DrawSkew : DrawCmd {
+        public double sx;
+        public double sy;
+    }
+
+    public class DrawConcat : DrawCmd {
+        public Matrix3 matrix;
+    }
+
+    public class DrawResetMatrix : DrawCmd {
+    }
+
+    public class DrawSetMatrix : DrawCmd {
+        public Matrix3 matrix;
+    }
+
     public class DrawClipRect : DrawCmd {
         public Rect rect;
     }
@@ -60,19 +54,44 @@ namespace UIWidgets.ui {
     public class DrawClipRRect : DrawCmd {
         public RRect rrect;
     }
-    
-    public class DrawTextBlob : DrawCmd
-    {
-        public TextBlob textBlob;
-        public Offset offset;
+
+    public class DrawClipPath : DrawCmd {
+        public Path path;
     }
 
-    public class DrawLine : DrawCmd
-    {
-        public Offset from;
-        public Offset to;
+    public class DrawPath : DrawCmd {
+        public Path path;
         public Paint paint;
     }
 
-}
+    public class DrawImage : DrawCmd {
+        public Texture image;
+        public Offset offset;
+        public Paint paint;
+    }
 
+    public class DrawImageRect : DrawCmd {
+        public Texture image;
+        public Rect src;
+        public Rect dst;
+        public Paint paint;
+    }
+
+    public class DrawImageNine : DrawCmd {
+        public Texture image;
+        public Rect src;
+        public Rect center;
+        public Rect dst;
+        public Paint paint;
+    }
+
+    public class DrawPicture : DrawCmd {
+        public Picture picture;
+    }
+
+    public class DrawTextBlob : DrawCmd {
+        public TextBlob textBlob;
+        public Offset offset;
+        public Paint paint;
+    }
+}

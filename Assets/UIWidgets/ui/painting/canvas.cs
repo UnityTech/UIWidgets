@@ -1,42 +1,74 @@
 ﻿using System;
-using UIWidgets.foundation;
-using UIWidgets.painting;
 using UIWidgets.ui.txt;
 using UnityEngine;
 
 namespace UIWidgets.ui {
     public interface Canvas {
-        void drawPloygon4(Offset[] points, Paint paint = null);
-
-        void drawRect(Rect rect, BorderWidth borderWidth = null, BorderRadius borderRadius = null, Paint paint = null);
-
-        void drawRectShadow(Rect rect, Paint paint = null);
-
-        void drawPicture(Picture picture);
-
-        void drawImageRect(Image image, Rect dest, Rect src = null, Paint paint = null);
-
-        void drawLine(Offset from, Offset to, Paint paint = null);
-
-        void concat(Matrix4x4 transform);
-
-        void setMatrix(Matrix4x4 matrix);
-
-        Matrix4x4 getMatrix();
-
         void save();
 
-        void saveLayer(Rect rect, Paint paint = null);
+        void saveLayer(Rect bounds, Paint paint = null);
 
         void restore();
 
         int getSaveCount();
 
-        void clipRect(Rect rect, bool doAntiAlias = true);
+        void translate(double dx, double dy);
 
-        void clipRRect(RRect rrect, bool doAntiAlias = true);
+        void scale(double sx, double? sy = null);
 
-        void drawTextBlob(TextBlob textBlob, Offset offset);
+        void rotate(double radians, Offset offset = null);
+
+        void skew(double sx, double sy);
+
+        void concat(Matrix3 matrix);
+
+        Matrix3 getTotalMatrix();
+
+        void resetMatrix();
+
+        void setMatrix(Matrix3 matrix);
+
+        float getDevicePixelRatio();
+
+        void clipRect(Rect rect);
+
+        void clipRRect(RRect rrect);
+
+        void clipPath(Path path);
+
+        void drawLine(Offset from, Offset to, Paint paint);
+
+        void drawRect(Rect rect, Paint paint);
+
+        void drawRRect(RRect rect, Paint paint);
+
+        void drawDRRect(RRect outer, RRect inner, Paint paint);
+
+        void drawOval(Rect rect, Paint paint);
+
+        void drawCircle(Offset c, double radius, Paint paint);
+
+        void drawArc(Rect rect, double startAngle, double sweepAngle, bool useCenter, Paint paint);
+
+        void drawPath(Path path, Paint paint);
+
+        void drawImage(Texture image, Offset offset, Paint paint);
+
+        void drawImageRect(Texture image, Rect dst, Paint paint);
+
+        void drawImageRect(Texture image, Rect src, Rect dst, Paint paint);
+
+        void drawImageNine(Texture image, Rect center, Rect dst, Paint paint);
+
+        void drawImageNine(Texture image, Rect src, Rect center, Rect dst, Paint paint);
+
+        void drawPicture(Picture picture);
+
+        void drawTextBlob(TextBlob textBlob, Offset offset, Paint paint);
+
+        void flush();
+
+        void reset();
     }
 
     public class RecorderCanvas : Canvas {
@@ -47,68 +79,6 @@ namespace UIWidgets.ui {
         readonly PictureRecorder _recorder;
 
         int _saveCount = 1;
-
-        public void drawPloygon4(Offset[] points, Paint paint) {
-            this._recorder.addDrawCmd(new DrawPloygon4 {
-                points = points,
-                paint = paint,
-            });
-        }
-
-        public void drawRect(Rect rect, BorderWidth borderWidth, BorderRadius borderRadius, Paint paint) {
-            this._recorder.addDrawCmd(new DrawRect {
-                rect = rect,
-                borderWidth = borderWidth,
-                borderRadius = borderRadius,
-                paint = paint,
-            });
-        }
-
-        public void drawRectShadow(Rect rect, Paint paint) {
-            this._recorder.addDrawCmd(new DrawRectShadow {
-                rect = rect,
-                paint = paint,
-            });
-        }
-
-        public void drawPicture(Picture picture) {
-            this._recorder.addDrawCmd(new DrawPicture {
-                picture = picture,
-            });
-        }
-
-        public void drawImageRect(Image image, Rect dest, Rect src, Paint paint) {
-            this._recorder.addDrawCmd(new DrawImageRect {
-                image = image,
-                dest = dest,
-                src = src,
-                paint = paint,
-            });
-        }
-
-        public void drawLine(Offset from, Offset to, Paint paint) {
-            this._recorder.addDrawCmd(new DrawLine {
-                from = from,
-                to = to,
-                paint = paint,
-            });
-        }
-
-        public void concat(Matrix4x4 transform) {
-            this._recorder.addDrawCmd(new DrawConcat {
-                transform = transform,
-            });
-        }
-
-        public void setMatrix(Matrix4x4 matrix) {
-            this._recorder.addDrawCmd(new DrawSetMatrix {
-                matrix =  matrix,
-            });
-        }
-
-        public Matrix4x4 getMatrix() {
-            throw new Exception("not available in recorder");            
-        }
 
         public void save() {
             this._saveCount++;
@@ -134,23 +104,222 @@ namespace UIWidgets.ui {
             return this._saveCount;
         }
 
-        public void clipRect(Rect rect, bool doAntiAlias = true) {
+        public void translate(double dx, double dy) {
+            this._recorder.addDrawCmd(new DrawTranslate {
+                dx = dx,
+                dy = dy,
+            });
+        }
+
+        public void scale(double sx, double? sy = null) {
+            this._recorder.addDrawCmd(new DrawScale {
+                sx = sx,
+                sy = sy,
+            });
+        }
+
+        public void rotate(double radians, Offset offset = null) {
+            this._recorder.addDrawCmd(new DrawRotate {
+                radians = radians,
+                offset = offset,
+            });
+        }
+
+        public void skew(double sx, double sy) {
+            this._recorder.addDrawCmd(new DrawSkew {
+                sx = sx,
+                sy = sy,
+            });
+        }
+
+        public void concat(Matrix3 matrix) {
+            this._recorder.addDrawCmd(new DrawConcat {
+                matrix = matrix,
+            });
+        }
+
+        public Matrix3 getTotalMatrix() {
+            throw new Exception("not available in recorder");
+        }
+
+        public void resetMatrix() {
+            this._recorder.addDrawCmd(new DrawResetMatrix {
+            });
+        }
+
+        public void setMatrix(Matrix3 matrix) {
+            this._recorder.addDrawCmd(new DrawSetMatrix {
+                matrix = matrix,
+            });
+        }
+
+        public float getDevicePixelRatio() {
+            throw new Exception("not available in recorder");
+        }
+
+        public void clipRect(Rect rect) {
             this._recorder.addDrawCmd(new DrawClipRect {
                 rect = rect,
             });
         }
 
-        public void clipRRect(RRect rrect, bool doAntiAlias = true) {
+        public void clipRRect(RRect rrect) {
             this._recorder.addDrawCmd(new DrawClipRRect {
                 rrect = rrect,
             });
         }
 
-        public void drawTextBlob(TextBlob textBlob, Offset offset) {
+        public void clipPath(Path path) {
+            this._recorder.addDrawCmd(new DrawClipPath {
+                path = path,
+            });
+        }
+
+        public void drawLine(Offset from, Offset to, Paint paint) {
+            var path = new Path();
+            path.moveTo(from.dx, from.dy);
+            path.lineTo(to.dx, to.dy);
+            
+            this._recorder.addDrawCmd(new DrawPath {
+                path = path,
+                paint = paint,
+            });
+        }
+
+        public void drawRect(Rect rect, Paint paint) {
+            var path = new Path();
+            path.addRect(rect);
+            
+            this._recorder.addDrawCmd(new DrawPath {
+                path = path,
+                paint = paint,
+            });
+        }
+
+        public void drawRRect(RRect rrect, Paint paint) {
+            var path = new Path();
+            path.addRRect(rrect);
+            this._recorder.addDrawCmd(new DrawPath {
+                path = path,
+                paint = paint,
+            });
+        }
+
+        public void drawDRRect(RRect outer, RRect inner, Paint paint) {
+            var path = new Path();
+            path.addRRect(outer);
+            path.addRRect(inner);
+            path.winding(PathWinding.clockwise);
+            
+            this._recorder.addDrawCmd(new DrawPath {
+                path = path,
+                paint = paint,
+            });
+        }
+
+        public void drawOval(Rect rect, Paint paint) {
+            var w = rect.width / 2;
+            var h = rect.height / 2;
+            var path = new Path();
+            path.addEllipse(rect.left + w, rect.top + h, w, h);
+
+            this._recorder.addDrawCmd(new DrawPath {
+                path = path,
+                paint = paint,
+            });
+        }
+
+        public void drawCircle(Offset c, double radius, Paint paint) {
+            var path = new Path();
+            path.addCircle(c.dx, c.dy, radius);
+
+            this._recorder.addDrawCmd(new DrawPath {
+                path = path,
+                paint = paint,
+            });
+        }
+
+        public void drawArc(Rect rect, double startAngle, double sweepAngle, bool useCenter, Paint paint) {
+            var path = new Path();
+            //path.(c.dx, c.dy, radius);
+
+            this._recorder.addDrawCmd(new DrawPath {
+                path = path,
+                paint = paint,
+            });
+        }
+
+        public void drawPath(Path path, Paint paint) {
+            this._recorder.addDrawCmd(new DrawPath {
+                path = path,
+                paint = paint,
+            });
+        }
+
+        public void drawImage(Texture image, Offset offset, Paint paint) {
+            this._recorder.addDrawCmd(new DrawImage {
+                image = image,
+                offset = offset,
+                paint = paint,
+            });
+        }
+
+        public void drawImageRect(Texture image, Rect dst, Paint paint) {
+            this._recorder.addDrawCmd(new DrawImageRect {
+                image = image,
+                dst = dst,
+                paint = paint,
+            });
+        }
+
+        public void drawImageRect(Texture image, Rect src, Rect dst, Paint paint) {
+            this._recorder.addDrawCmd(new DrawImageRect {
+                image = image,
+                src = src,
+                dst = dst,
+                paint = paint,
+            });
+        }
+
+        public void drawImageNine(Texture image, Rect center, Rect dst, Paint paint) {
+            this._recorder.addDrawCmd(new DrawImageNine {
+                image = image,
+                center = center,
+                dst = dst,
+                paint = paint,
+            });
+        }
+
+        public void drawImageNine(Texture image, Rect src, Rect center, Rect dst, Paint paint) {
+            this._recorder.addDrawCmd(new DrawImageNine {
+                image = image,
+                src = src,
+                center = center,
+                dst = dst,
+                paint = paint,
+            });
+        }
+
+        public void drawPicture(Picture picture) {
+            this._recorder.addDrawCmd(new DrawPicture {
+                picture = picture,
+            });
+        }
+
+        public void drawTextBlob(TextBlob textBlob, Offset offset, Paint paint) {
             this._recorder.addDrawCmd(new DrawTextBlob {
                 textBlob = textBlob,
-                offset = offset
+                offset = offset,
+                paint = paint,
             });
+        }
+
+        public void flush() {
+            throw new Exception("not available in recorder");
+        }
+        
+        public void reset() {
+            throw new Exception("not available in recorder");
         }
     }
 }

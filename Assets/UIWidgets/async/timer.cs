@@ -1,9 +1,24 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace UIWidgets.async {
     public abstract class Timer {
         public abstract void cancel();
+
+        static readonly TimerProvider _globalTimerProvider = new TimerProvider();
+        
+        public static Timer run(TimeSpan duration, Action callback) {
+            return _globalTimerProvider.run(duration, callback);
+        }
+
+        public static Timer run(Action callback) {
+            return run(TimeSpan.Zero, callback);
+        }
+
+        internal static void update() {
+            _globalTimerProvider.update();
+        }
     }
 
     public class TimerProvider {
@@ -15,7 +30,10 @@ namespace UIWidgets.async {
 
         public Timer run(TimeSpan duration, Action callback) {
             var timer = new TimerImpl(DateTime.Now + duration, callback);
-            this._queue.enqueue(timer);
+
+            lock (this._queue) {
+                this._queue.enqueue(timer);
+            }
 
             return timer;
         }
@@ -23,8 +41,16 @@ namespace UIWidgets.async {
         public void update() {
             var now = DateTime.Now;
 
-            while (this._queue.count > 0 && this._queue.peek().deadline <= now) {
-                var timer = this._queue.dequeue();
+            var timers = new List<TimerImpl>();
+
+            lock (this._queue) {
+                while (this._queue.count > 0 && this._queue.peek().deadline <= now) {
+                    var timer = this._queue.dequeue();
+                    timers.Add(timer);
+                }
+            }
+
+            foreach (var timer in timers) {
                 timer.invoke();
             }
         }

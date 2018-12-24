@@ -1,10 +1,12 @@
-﻿using UnityEngine;
+﻿using UIWidgets.ui;
+using UnityEngine;
 using Rect = UIWidgets.ui.Rect;
 using Canvas = UIWidgets.ui.Canvas;
 
 namespace UIWidgets.flow {
     public class PrerollContext {
         public RasterCache rasterCache;
+        public float devicePixelRatio;
     }
 
     public class PaintContext {
@@ -30,7 +32,7 @@ namespace UIWidgets.flow {
             get { return !this._paintBounds.isEmpty; }
         }
 
-        public virtual void preroll(PrerollContext context, Matrix4x4 matrix) {
+        public virtual void preroll(PrerollContext context, Matrix3 matrix) {
         }
 
         public abstract void paint(PaintContext context);
