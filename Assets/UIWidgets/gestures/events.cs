@@ -68,6 +68,60 @@ namespace UIWidgets.gestures {
         }
     }
 
+    public class PointerHoverEvent : PointerEvent
+    {
+        public PointerHoverEvent(
+            DateTime timeStamp,
+            int pointer = 0,
+            PointerDeviceKind kind = PointerDeviceKind.mouse,
+            int device = 0,
+            Offset position = null)
+            : base(
+                timeStamp,
+                pointer: pointer,
+                kind: kind,
+                device: device,
+                position: position,
+                down: false) {
+        }
+    }
+    
+    public class PointerEnterEvent : PointerEvent
+    {
+        public PointerEnterEvent(
+            DateTime timeStamp,
+            int pointer = 0,
+            PointerDeviceKind kind = PointerDeviceKind.mouse,
+            int device = 0,
+            Offset position = null)
+            : base(
+                timeStamp,
+                pointer: pointer,
+                kind: kind,
+                device: device,
+                position: position,
+                down: false) {
+        }
+    }
+    
+    public class PointerLeaveEvent : PointerEvent
+    {
+        public PointerLeaveEvent(
+            DateTime timeStamp,
+            int pointer = 0,
+            PointerDeviceKind kind = PointerDeviceKind.mouse,
+            int device = 0,
+            Offset position = null)
+            : base(
+                timeStamp,
+                pointer: pointer,
+                kind: kind,
+                device: device,
+                position: position,
+                down: false) {
+        }
+    }
+
     public class PointerDownEvent : PointerEvent {
         public PointerDownEvent(
             DateTime timeStamp,

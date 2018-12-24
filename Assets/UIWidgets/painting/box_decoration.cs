@@ -43,7 +43,7 @@ namespace UIWidgets.painting {
         public override BoxPainter createBoxPainter(VoidCallback onChanged = null) {
             return new _BoxDecorationPainter(this, onChanged);
         }
-
+    
         public bool Equals(BoxDecoration other) {
             if (object.ReferenceEquals(null, other)) return false;
             if (object.ReferenceEquals(this, other)) return true;

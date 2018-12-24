@@ -29,7 +29,7 @@ namespace UIWidgets.Tests {
 
         [NonSerialized] private bool hasInvoked = false;
 
-        Widgets() {
+        public Widgets() {
             this._options = new Func<Widget>[] {
                 this.localImage,
                 this.container,
@@ -38,7 +38,8 @@ namespace UIWidgets.Tests {
                 this.containerSimple,
                 this.eventsPage,
                 this.asPage,
-                this.stack
+                this.stack,
+                this.mouseHover
             };
             this._optionStrings = this._options.Select(x => x.Method.Name).ToArray();
             this._selected = 0;
@@ -212,7 +213,12 @@ namespace UIWidgets.Tests {
         }
 
         Widget asPage() {
-            return new AsScreen();
+            return new WidgetsApp(null, new AsScreen());
+        }
+
+        Widget mouseHover()
+        {
+            return new WidgetsApp(null, new MouseHoverWidget(null));
         }
     }
 
@@ -242,7 +248,7 @@ namespace UIWidgets.Tests {
                                 "All Assets",
                                 style: new TextStyle(
                                     fontSize: 16,
-                                    color: CLColors.white
+                                    color: Color.fromARGB(100, 255, 255, 0)
                                 )
                             )
                         ),
@@ -747,7 +753,7 @@ namespace UIWidgets.Tests {
                 )
             );
         }
-
+        
         public override Widget build(BuildContext context) {
             var container = new Container(
                 //  color: CLColors.background1,

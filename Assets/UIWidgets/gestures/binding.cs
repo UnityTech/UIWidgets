@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UIWidgets.foundation;
+using UIWidgets.rendering;
 using UIWidgets.scheduler;
 using UIWidgets.ui;
 using UnityEngine;
@@ -48,8 +49,15 @@ namespace UIWidgets.gestures {
         public readonly GestureArenaManager gestureArena;
 
         public readonly Dictionary<int, HitTestResult> _hitTests = new Dictionary<int, HitTestResult>();
+        
+        public readonly HashSet<HitTestTarget> lastMoveTargets = new HashSet<HitTestTarget>();
 
         void _handlePointerEvent(PointerEvent evt) {
+            if (evt is PointerHoverEvent || evt is PointerMoveEvent)
+            {
+                this._handlePointerHoverEvent(evt);
+            }
+            
             HitTestResult result;
             if (evt is PointerDownEvent) {
                 D.assert(!this._hitTests.ContainsKey(evt.pointer));
@@ -76,6 +84,47 @@ namespace UIWidgets.gestures {
             if (result != null) {
                 this.dispatchEvent(evt, result);
             }
+        }
+
+        void _handlePointerHoverEvent(PointerEvent evt)
+        {
+            HitTestResult result = new HitTestResult();
+            this.hitTest(result, evt.position);
+                
+            // enter event
+            foreach (var hitTestEntry in result.path)
+            {
+                if (lastMoveTargets.Contains(hitTestEntry.target))
+                {
+                    hitTestEntry.target.handleEvent(evt, hitTestEntry);
+                    lastMoveTargets.Remove(hitTestEntry.target);
+                }
+                else
+                {
+                    hitTestEntry.target.handleEvent(new PointerEnterEvent(
+                        timeStamp:evt.timeStamp,
+                        pointer:evt.pointer,
+                        device:evt.device,
+                        kind:evt.kind
+                    ), hitTestEntry);
+                }
+            }
+            foreach (var lastMoveTarget in lastMoveTargets)
+            {
+                lastMoveTarget.handleEvent(new PointerLeaveEvent(
+                    timeStamp:evt.timeStamp,
+                    pointer:evt.pointer,
+                    device:evt.device,
+                    kind:evt.kind
+                ), null);
+            }
+            lastMoveTargets.Clear();
+            foreach (var hitTestEntry in result.path)
+            {
+                lastMoveTargets.Add(hitTestEntry.target);
+            }
+
+            this.dispatchEvent(evt, result);
         }
 
         public virtual void hitTest(HitTestResult result, Offset position) {

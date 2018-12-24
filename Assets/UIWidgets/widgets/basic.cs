@@ -301,10 +301,10 @@ namespace UIWidgets.widgets {
             this.overflow = overflow;
         }
 
-        public AlignmentDirectional alignment;
-        public TextDirection? textDirection;
-        public StackFit fit;
-        public rendering.Overflow overflow;
+        public readonly AlignmentDirectional alignment;
+        public readonly TextDirection? textDirection;
+        public readonly StackFit fit;
+        public readonly rendering.Overflow overflow;
 
 
         public override RenderObject createRenderObject(BuildContext context) {
@@ -329,6 +329,125 @@ namespace UIWidgets.widgets {
             properties.add(new DiagnosticsProperty<AlignmentDirectional>("alignment", alignment));
             properties.add(new EnumProperty<StackFit>("fit", fit));
             properties.add(new EnumProperty<Overflow>("overflow", overflow));
+        }
+    }
+
+    public class Positioned : ParentDataWidget<Stack>
+    {
+        public Positioned(Widget child, Key key = null,  double? left = null, double? top = null, 
+            double? right = null, double? bottom = null, double? width = null, double? height = null) : base(key, child)
+        {
+            D.assert(left == null || right == null || width == null);
+            D.assert(top == null || bottom == null || height == null);
+            this.left = left;
+            this.top = top;
+            this.right = right;
+            this.bottom = bottom;
+            this.width = width;
+            this.height = height;
+        }
+
+        public static Positioned fromRect(Rect rect, Widget child, Key key = null)
+        {
+            return new Positioned(child, key: key, left: rect.left,
+                top: rect.top, width: rect.width, height: rect.height);
+        }
+        
+        public static Positioned fromRelativeRect(Rect rect, Widget child, Key key = null)
+        {
+            return new Positioned(child, key: key, left: rect.left,
+                top: rect.top, right: rect.right, bottom: rect.bottom);
+        }
+           
+        public static Positioned fill(Widget child, Key key = null)
+        {
+            return new Positioned(child, key: key, left: 0.0,
+                top: 0.0, right: 0.0, bottom: 0.0);
+        }
+        
+        public static Positioned directional(Widget child, TextDirection textDirection, Key key = null, 
+            double? start = null, double? top = null, 
+            double? end = null, double? bottom = null, double? width = null, double? height = null) 
+        {
+            D.assert(textDirection != null);
+            double? left = null;
+            double? right = null;
+            switch (textDirection)
+            {
+                    case TextDirection.rtl:
+                           left = end;
+                           right = start;
+                           break;
+                         case TextDirection.ltr:
+                           left = start;
+                           right = end;
+                           break; 
+            }
+            return new Positioned(child, key:key, left: left, top: top, right: right, bottom: bottom, width: width, height: height);
+        }
+
+        public readonly double? left;
+
+        public readonly double? top;
+
+        public readonly double? right;
+        
+        public readonly double? bottom;
+
+        public readonly double? width;
+
+        public readonly double? height;
+        
+        public override void applyParentData(RenderObject renderObject) {
+            D.assert(renderObject.parentData is StackParentData);
+            StackParentData parentData = (StackParentData) renderObject.parentData;
+            bool needsLayout = false;
+
+            if (parentData.left != left) {
+                parentData.left = left;
+                needsLayout = true;
+            }
+
+            if (parentData.top != top) {
+                parentData.top = top;
+                needsLayout = true;
+            }
+
+            if (parentData.right != right) {
+                parentData.right = right;
+                needsLayout = true;
+            }
+
+            if (parentData.bottom != bottom) {
+                parentData.bottom = bottom;
+                needsLayout = true;
+            }
+
+            if (parentData.width != width) {
+                parentData.width = width;
+                needsLayout = true;
+            }
+
+            if (parentData.height != height) {
+                parentData.height = height;
+                needsLayout = true;
+            }
+
+            if (needsLayout) {
+                var targetParent = renderObject.parent;
+                if (targetParent is RenderObject)
+                    ((RenderObject)targetParent).markNeedsLayout();
+            }
+        }
+        
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new DoubleProperty("left", left, defaultValue: null));
+            properties.add(new DoubleProperty("top", top, defaultValue: null));
+            properties.add(new DoubleProperty("right", right, defaultValue: null));
+            properties.add(new DoubleProperty("bottom", bottom, defaultValue: null));
+            properties.add(new DoubleProperty("width", width, defaultValue: null));
+            properties.add(new DoubleProperty("height", height, defaultValue: null));
         }
     }
 
@@ -785,6 +904,9 @@ namespace UIWidgets.widgets {
             PointerMoveEventListener onPointerMove = null,
             PointerUpEventListener onPointerUp = null,
             PointerCancelEventListener onPointerCancel = null,
+            PointerHoverEventListener onPointerHover = null,
+            PointerLeaveEventListener onPointerLeave = null,
+            PointerEnterEventListener onPointerEnter = null,
             HitTestBehavior behavior = HitTestBehavior.deferToChild,
             Widget child = null
         ) : base(key: key, child: child) {
@@ -792,6 +914,9 @@ namespace UIWidgets.widgets {
             this.onPointerMove = onPointerMove;
             this.onPointerUp = onPointerUp;
             this.onPointerCancel = onPointerCancel;
+            this.onPointerHover = onPointerHover;
+            this.onPointerLeave = onPointerLeave;
+            this.onPointerEnter = onPointerEnter;
             this.behavior = behavior;
         }
 
@@ -802,6 +927,12 @@ namespace UIWidgets.widgets {
         public readonly PointerUpEventListener onPointerUp;
 
         public readonly PointerCancelEventListener onPointerCancel;
+        
+        public readonly PointerHoverEventListener onPointerHover;
+
+        public readonly PointerEnterEventListener  onPointerEnter;
+
+        public readonly PointerLeaveEventListener  onPointerLeave;
 
         public readonly HitTestBehavior behavior;
 
@@ -811,6 +942,9 @@ namespace UIWidgets.widgets {
                 onPointerMove: this.onPointerMove,
                 onPointerUp: this.onPointerUp,
                 onPointerCancel: this.onPointerCancel,
+                onPointerEnter: this.onPointerEnter,
+                onPointerLeave: this.onPointerLeave,
+                onPointerHover: this.onPointerHover,
                 behavior: this.behavior
             );
         }
@@ -821,6 +955,9 @@ namespace UIWidgets.widgets {
             renderObject.onPointerMove = this.onPointerMove;
             renderObject.onPointerUp = this.onPointerUp;
             renderObject.onPointerCancel = this.onPointerCancel;
+            renderObject.onPointerEnter = this.onPointerEnter;
+            renderObject.onPointerHover = this.onPointerHover;
+            renderObject.onPointerLeave = this.onPointerLeave;
             renderObject.behavior = this.behavior;
         }
 
@@ -842,7 +979,18 @@ namespace UIWidgets.widgets {
             if (this.onPointerCancel != null) {
                 listeners.Add("cancel");
             }
+            
+            if (this.onPointerEnter != null) {
+                listeners.Add("enter");
+            }
 
+            if (this.onPointerHover != null) {
+                listeners.Add("hover");
+            }
+
+            if (this.onPointerLeave != null) {
+                listeners.Add("leave");
+            }
             properties.add(new EnumerableProperty<string>("listeners", listeners, ifEmpty: "<none>"));
             properties.add(new EnumProperty<HitTestBehavior>("behavior", this.behavior));
         }

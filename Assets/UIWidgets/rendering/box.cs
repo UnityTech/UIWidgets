@@ -834,7 +834,12 @@ namespace UIWidgets.rendering {
             });
             return result;
         }
-
+        
+        public override Rect semanticBounds
+        {
+            get { return Offset.zero & size; }
+        }
+        
         protected override void debugResetSize() {
             size = size;
         }

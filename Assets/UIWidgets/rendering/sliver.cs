@@ -542,6 +542,10 @@ namespace UIWidgets.rendering {
                 return null;
             }
         }
+        
+        public override Rect semanticBounds {
+            get { return paintBounds; }
+        }
 
         protected override void debugResetSize() {
         }

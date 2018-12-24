@@ -19,6 +19,7 @@ namespace UIWidgets.widgets {
         public WidgetsBinding() {
             this.buildOwner.onBuildScheduled = this._handleBuildScheduled;
             Window.instance.onLocaleChanged += this.handleLocaleChanged;
+            this.widgetInspectorService = new WidgetInspectorService(this);
             this.addPersistentFrameCallback((duration) => {
                 MeshGenrator.tickNextFrame();
             });
@@ -44,6 +45,8 @@ namespace UIWidgets.widgets {
             return this._observers.Remove(observer);
         }
 
+        public readonly WidgetInspectorService widgetInspectorService;
+        
         protected override void handleMetricsChanged() {
             base.handleMetricsChanged();
             foreach (WidgetsBindingObserver observer in this._observers) {

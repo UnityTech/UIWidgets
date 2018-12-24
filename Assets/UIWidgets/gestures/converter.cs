@@ -104,6 +104,17 @@ namespace UIWidgets.gestures {
                         );
                     }
                         break;
+
+                    case PointerChange.hover:
+                    {
+                        yield return new PointerHoverEvent(
+                            timeStamp: timeStamp,
+                            kind: kind,
+                            device: datum.device,
+                            position: position
+                            );
+                        break;
+                    }
                     case PointerChange.up:
                     case PointerChange.cancel: {
                         D.assert(_pointers.ContainsKey(datum.device));

@@ -50,14 +50,30 @@ namespace UIWidgets.editor {
     }
 
     public class WindowAdapter : Window {
-        public WindowAdapter(EditorWindow editorWindow) {
+        
+        static readonly List<WindowAdapter> _windowAdapters = new List<WindowAdapter>();
+        public static IEnumerable<WindowAdapter> windowAdapters {
+            get { return _windowAdapters; }
+        }
+
+        public WindowAdapter(EditorWindow editorWindow)
+        {
             this.editorWindow = editorWindow;
-            this.editorWindow.wantsMouseMove = false;
-            this.editorWindow.wantsMouseEnterLeaveWindow = false;
+            this.editorWindow.wantsMouseMove = true;
+            this.editorWindow.wantsMouseEnterLeaveWindow = true;
+
         }
 
         public readonly EditorWindow editorWindow;
 
+        public WidgetInspectorService widgetInspectorService
+        {
+            get {
+                D.assert(this._binding != null);
+                return this._binding.widgetInspectorService;
+            }
+        }
+        
         WidgetsBinding _binding;
         float _lastWindowWidth;
         float _lastWindowHeight;
@@ -70,6 +86,13 @@ namespace UIWidgets.editor {
 
         bool _regenerateLayerTree;
         Surface _surface;
+        
+        bool _alive;
+
+        public bool alive
+        {
+            get { return this._alive; }
+        }
 
         public void OnEnable() {
             this._devicePixelRatio = EditorGUIUtility.pixelsPerPoint;
@@ -83,9 +106,15 @@ namespace UIWidgets.editor {
             this._surface = new EditorWindowSurface();
 
             this._rasterizer.setup(this._surface);
+            
+            _windowAdapters.Add(this);
+            this._alive = true;
         }
 
         public void OnDisable() {
+            _windowAdapters.Remove(this);
+            this._alive = false;
+            
             this._rasterizer.teardown();
 
             D.assert(this._surface != null);
@@ -101,12 +130,21 @@ namespace UIWidgets.editor {
 
             WidgetsBinding.instance = this._binding;
 
-            return new WindowDisposable();
+            return new WindowDisposable(this);
         }
 
         class WindowDisposable : IDisposable {
+            readonly WindowAdapter _window;
+
+            public WindowDisposable(WindowAdapter window) {
+                this._window = window;
+            }
+            
             public void Dispose() {
+                D.assert(instance == this._window);
                 instance = null;
+                
+                D.assert(WidgetsBinding.instance == this._window._binding);
                 WidgetsBinding.instance = null;
             }
         }
@@ -137,7 +175,7 @@ namespace UIWidgets.editor {
                     }
                 }
 
-                this.doOnGUI();
+                this._doOnGUI();
             }
         }
 
@@ -153,7 +191,7 @@ namespace UIWidgets.editor {
             }
         }
 
-        private void doOnGUI() {
+        void _doOnGUI() {
             var evt = Event.current;
 
             if (evt.type == EventType.Repaint) {
@@ -192,6 +230,15 @@ namespace UIWidgets.editor {
                     pointerData = new PointerData(
                         timeStamp: DateTime.Now,
                         change: PointerChange.move,
+                        kind: PointerDeviceKind.mouse,
+                        device: evt.button,
+                        physicalX: evt.mousePosition.x * this._devicePixelRatio,
+                        physicalY: evt.mousePosition.y * this._devicePixelRatio
+                    );
+                } else if (evt.type == EventType.MouseMove) {
+                    pointerData = new PointerData(
+                        timeStamp: DateTime.Now,
+                        change: PointerChange.hover,
                         kind: PointerDeviceKind.mouse,
                         device: evt.button,
                         physicalX: evt.mousePosition.x * this._devicePixelRatio,
@@ -257,8 +304,10 @@ namespace UIWidgets.editor {
             this._microtaskQueue.flushMicrotasks();
         }
 
-        public override Timer run(TimeSpan duration, Action callback) {
-            return this._timerProvider.run(duration, callback);
+        public override Timer run(TimeSpan duration, Action callback, bool periodic = false) {
+            return periodic
+                ? this._timerProvider.periodic(duration, callback)
+                : this._timerProvider.run(duration, callback);
         }
 
         public void attachRootRenderBox(RenderBox root) {
@@ -274,7 +323,7 @@ namespace UIWidgets.editor {
         }
 
         public override TextInput textInput {
-            get { return _textInput; }
+            get { return this._textInput; }
         }
     }
 }

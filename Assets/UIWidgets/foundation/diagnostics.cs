@@ -309,11 +309,11 @@ namespace UIWidgets.foundation {
                 {"name", this.name},
                 {"showSeparator", this.showSeparator},
                 {"description", this.toDescription()},
-                {"level", this.level.ToString()},
+                {"level",  Convert.ToString(this.level)},
                 {"showName", this.showName},
                 {"emptyBodyDescription", this.emptyBodyDescription},
-                {"style", this.style.ToString()},
-                {"valueToString", this.valueObject.ToString()},
+                {"style",  Convert.ToString(this.style)},
+                {"valueToString", Convert.ToString(valueObject)},
                 {"type", this.GetType().ToString()},
                 {"hasChildren", this.getChildren().isNotEmpty()}
             };
@@ -598,7 +598,7 @@ namespace UIWidgets.foundation {
                 return "\"" + text + "\"";
             }
 
-            return text;
+            return text ?? "null";
         }
     }
 
@@ -1052,7 +1052,7 @@ namespace UIWidgets.foundation {
     }
 
     public delegate T ComputePropertyValueCallback<T>();
-
+    
     public class DiagnosticsProperty<T> : DiagnosticsNode {
         public DiagnosticsProperty(
             string name,
@@ -1162,7 +1162,7 @@ namespace UIWidgets.foundation {
         public override Dictionary<string, object> toJsonMap() {
             var json = base.toJsonMap();
             if (this.defaultValue != Diagnostics.kNoDefaultValue) {
-                json["defaultValue"] = this.defaultValue == null ? "null" : this.defaultValue.ToString();
+                json["defaultValue"] =  Convert.ToString(this.defaultValue);
             }
 
             if (this.ifEmpty != null) {
@@ -1184,7 +1184,7 @@ namespace UIWidgets.foundation {
 
             json["propertyType"] = this.propertyType.ToString();
             json["valueToString"] = this.valueToString();
-            json["defaultLevel"] = this._defaultLevel.ToString();
+            json["defaultLevel"] =  Convert.ToString(this._defaultLevel);
             if (typeof(Diagnosticable).IsAssignableFrom(typeof(T))) {
                 json["isDiagnosticableValue"] = true;
             }
