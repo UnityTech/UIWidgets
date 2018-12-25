@@ -106,7 +106,7 @@ namespace UIWidgets.ui
         public int addStyle(TextStyle style)
         {
             var styleIndex = styles.Count;
-            styles.Add( style);
+            styles.Add(style);
             return styleIndex;
 
         }

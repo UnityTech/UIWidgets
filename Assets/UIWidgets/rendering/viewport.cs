@@ -350,8 +350,8 @@ namespace UIWidgets.rendering {
                     }
 
                     D.assert(size != null);
-                    canvas.drawRect(((offset + this.paintOffsetOf(child)) & size).deflate(0.5),
-                        BorderWidth.all(1), BorderRadius.zero, paint);
+//                    canvas.drawRect(((offset + this.paintOffsetOf(child)) & size).deflate(0.5),
+//                        BorderWidth.all(1), BorderRadius.zero, paint);
                     child = this.childAfter(child);
                 }
 

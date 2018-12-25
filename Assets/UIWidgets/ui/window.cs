@@ -30,31 +30,6 @@ namespace UIWidgets.ui {
 
         static Window _instance;
 
-        private bool _focus = false;
-
-        public bool focus
-        {
-            set
-            {
-                var preFocuse = this._focus;
-                this._focus = value;
-                if (preFocuse != _focus)
-                {
-                    var lastInstance = instance;
-                    try
-                    {
-                        instance = this;
-                    }
-                    finally
-                    {
-                        lastInstance = instance;
-                    }
-                    // todo notify focus change
-                }
-            }
-            get { return this._focus; }
-        }
-        
         public double devicePixelRatio {
             get { return this._devicePixelRatio; }
         }
@@ -102,7 +77,7 @@ namespace UIWidgets.ui {
 
         PointerDataPacketCallback _onPointerEvent;
 
-        public abstract void scheduleFrame();
+        public abstract void scheduleFrame(bool regenerateLayerTree = true);
 
         public abstract void render(Scene scene);
 
@@ -117,5 +92,7 @@ namespace UIWidgets.ui {
         }
 
         public abstract TextInput textInput { get; }
+
+        public abstract IDisposable getScope();
     }
 }

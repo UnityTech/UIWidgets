@@ -15,13 +15,13 @@ namespace UIWidgets.flow {
             this._layers.Add(layer);
         }
 
-        public override void preroll(PrerollContext context, Matrix4x4 matrix) {
+        public override void preroll(PrerollContext context, Matrix3 matrix) {
             Rect childPaintBounds = Rect.zero;
             this.prerollChildren(context, matrix, ref childPaintBounds);
             this.paintBounds = childPaintBounds;
         }
 
-        protected void prerollChildren(PrerollContext context, Matrix4x4 childMatrix, ref Rect childPaintBounds) {
+        protected void prerollChildren(PrerollContext context, Matrix3 childMatrix, ref Rect childPaintBounds) {
             foreach (var layer in this._layers) {
                 layer.preroll(context, childMatrix);
                 childPaintBounds = childPaintBounds.expandToInclude(layer.paintBounds);

@@ -276,7 +276,7 @@ namespace UIWidgets.rendering {
                 );
             } else {
                 this.canvas.save();
-                this.canvas.concat(effectiveTransform);
+                this.canvas.concat(effectiveTransform.toMatrix3());
                 painter(this, offset);
                 this.canvas.restore();
             }

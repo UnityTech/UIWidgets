@@ -29,15 +29,15 @@ namespace UIWidgets.flow {
 
         private RasterCacheResult _rasterCacheResult;
 
-        public override void preroll(PrerollContext context, Matrix4x4 matrix) {
+        public override void preroll(PrerollContext context, Matrix3 matrix) {
             if (context.rasterCache != null) {
-                Matrix4x4 ctm = matrix;
-                ctm = Matrix4x4.Translate(this._offset.toVector()) * ctm;
-                ctm.m03 = Mathf.Round(ctm.m03);
-                ctm.m13 = Mathf.Round(ctm.m13);
+                Matrix3 ctm = Matrix3.makeTrans((float) this._offset.dx, (float) this._offset.dy);
+                ctm.preConcat(matrix);                
+                ctm[6] = ctm[6].alignToPixel(context.devicePixelRatio);
+                ctm[7] = ctm[7].alignToPixel(context.devicePixelRatio);
 
                 this._rasterCacheResult = context.rasterCache.getPrerolledImage(
-                    this._picture, ref ctm, this._isComplex, this._willChange);
+                    this._picture, ctm, context.devicePixelRatio, this._isComplex, this._willChange);
             } else {
                 this._rasterCacheResult = null;
             }
@@ -50,10 +50,13 @@ namespace UIWidgets.flow {
             var canvas = context.canvas;
 
             canvas.save();
-            canvas.concat(Matrix4x4.Translate(this._offset.toVector()));
-            var matrix = canvas.getMatrix();
-            matrix.m03 = Mathf.Round(matrix.m03);
-            matrix.m13 = Mathf.Round(matrix.m13);
+            canvas.translate(this._offset.dx, this._offset.dy);
+
+            // align to pixel
+            var matrix = canvas.getTotalMatrix();
+            var devicePixelRatio = context.canvas.getDevicePixelRatio();
+            matrix[6] = matrix[6].alignToPixel(devicePixelRatio);
+            matrix[7] = matrix[7].alignToPixel(devicePixelRatio);
             canvas.setMatrix(matrix);
 
             try {

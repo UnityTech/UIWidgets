@@ -11,7 +11,7 @@ namespace UIWidgets.flow {
             set { this._clipRRect = value; }
         }
 
-        public override void preroll(PrerollContext context, Matrix4x4 matrix) {
+        public override void preroll(PrerollContext context, Matrix3 matrix) {
             var childPaintBounds = Rect.zero;
             this.prerollChildren(context, matrix, ref childPaintBounds);
             childPaintBounds = childPaintBounds.intersect(this._clipRRect.outerRect);
@@ -26,13 +26,11 @@ namespace UIWidgets.flow {
 
             canvas.save();
             canvas.clipRRect(this._clipRRect);
-            var paint = new Paint {color = new Color(0xFFFFFFFF)};
-            canvas.saveLayer(this.paintBounds, paint);
+
             try {
                 this.paintChildren(context);
             }
             finally {
-                canvas.restore();
                 canvas.restore();
             }
         }

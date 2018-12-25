@@ -70,7 +70,7 @@ namespace UIWidgets.scheduler {
         }
 
         static SchedulerBinding _instance;
-        
+
         public SchedulerBinding() {
             Window.instance.onBeginFrame += this._handleBeginFrame;
             Window.instance.onDrawFrame += this._handleDrawFrame;

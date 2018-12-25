@@ -77,12 +77,12 @@ namespace UIWidgets.ui
         public readonly string fontFamily = "Helvetica";
         public readonly Paint background;
         
-        public UnityEngine.Color UnityColor
+        internal UnityEngine.Color UnityColor
         {
             get { return color.toColor(); }
         }
 
-        public UnityEngine.FontStyle UnityFontStyle
+        internal UnityEngine.FontStyle UnityFontStyle
         {
             get
             {
@@ -106,7 +106,7 @@ namespace UIWidgets.ui
             }
         }
 
-        public int UnityFontSize
+        internal int UnityFontSize
         {
             get { return (int) fontSize; }
         }

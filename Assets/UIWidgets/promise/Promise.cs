@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using RSG.Exceptions;
-using UIWidgets.ui;
 
 namespace RSG
 {
@@ -794,15 +793,11 @@ namespace RSG
         {
             if (CurState == PromiseState.Resolved)
             {
-                Window.instance.scheduleMicrotask(() => {
-                    InvokeHandler(resolveHandler, resultPromise, resolveValue);
-                });
+                InvokeHandler(resolveHandler, resultPromise, resolveValue);
             }
             else if (CurState == PromiseState.Rejected)
             {
-                Window.instance.scheduleMicrotask(() => {
-                    InvokeHandler(rejectHandler, resultPromise, rejectionException);
-                });
+                InvokeHandler(rejectHandler, resultPromise, rejectionException);
             }
             else
             {

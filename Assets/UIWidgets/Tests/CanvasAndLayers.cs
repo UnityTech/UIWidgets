@@ -1,24 +1,50 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using UIWidgets.editor;
 using UIWidgets.painting;
 using UIWidgets.ui;
 using UnityEditor;
+using UnityEditor.Experimental.UIElements;
 using UnityEngine;
+using UnityEngine.Rendering;
+using BlendMode = UIWidgets.ui.BlendMode;
 using Color = UIWidgets.ui.Color;
+using Gradient = UIWidgets.ui.Gradient;
+using Random = System.Random;
 using Rect = UIWidgets.ui.Rect;
 
 namespace UIWidgets.Tests {
     public class CanvasAndLayers : EditorWindow {
+        static Material _guiTextureMat;
+
+        internal static Material _getGUITextureMat() {
+            if (_guiTextureMat) {
+                return _guiTextureMat;
+            }
+
+            var guiTextureShader = Shader.Find("UIWidgets/GUITexture");
+            if (guiTextureShader == null) {
+                throw new Exception("UIWidgets/GUITexture not found");
+            }
+
+            _guiTextureMat = new Material(guiTextureShader);
+            return _guiTextureMat;
+        }
+
         private readonly Action[] _options;
 
         private readonly string[] _optionStrings;
 
         private int _selected;
 
-        private PaintingBinding paintingBinding;
+        private PaintingBinding _paintingBinding;
 
         private ImageStream _stream;
+
+        private RenderTexture _renderTexture;
+
+        private WindowAdapter _windowAdapter;
 
         CanvasAndLayers() {
             this._options = new Action[] {
@@ -36,6 +62,7 @@ namespace UIWidgets.Tests {
             this._selected = 0;
 
             this.titleContent = new GUIContent("CanvasAndLayers");
+            this.SetAntiAliasing(4);
         }
 
         void OnGUI() {
@@ -58,14 +85,51 @@ namespace UIWidgets.Tests {
                 }
             }
 
+            this._windowAdapter.OnGUI();
+
             if (Event.current.type == EventType.Repaint) {
+                this.createRenderTexture();
+
+                Window.instance = this._windowAdapter;
+
                 this._options[this._selected]();
+
+                Window.instance = null;
+
+                Graphics.DrawTexture(new UnityEngine.Rect(0, 0, this.position.width, this.position.height),
+                    this._renderTexture,  _getGUITextureMat());
             }
         }
 
+        void Update() {
+            this._windowAdapter.Update();
+        }
+
         private void OnEnable() {
-            this.paintingBinding = new PaintingBinding(null);
-            paintingBinding.initInstances();
+            this._windowAdapter = new WindowAdapter(this);
+            this._windowAdapter.OnEnable();
+
+            this._paintingBinding = new PaintingBinding(this._windowAdapter);
+            this._paintingBinding.initInstances();
+        }
+
+        void createRenderTexture() {
+            var width = (int) (this.position.width * EditorGUIUtility.pixelsPerPoint);
+            var height = (int) (this.position.height * EditorGUIUtility.pixelsPerPoint);
+            if (this._renderTexture == null ||
+                this._renderTexture.width != width ||
+                this._renderTexture.height != height) {
+                var desc = new RenderTextureDescriptor(
+                    width,
+                    height,
+                    RenderTextureFormat.Default, 24) {
+                    msaaSamples = QualitySettings.antiAliasing,
+                    useMipMap = false,
+                    autoGenerateMips = false,
+                };
+
+                this._renderTexture = RenderTexture.GetTemporary(desc);
+            }
         }
 
         private void LoadImage(string url) {
@@ -76,39 +140,46 @@ namespace UIWidgets.Tests {
         }
 
         void drawPloygon4() {
-            var canvas = new CanvasImpl();
+            var canvas = new CommandBufferCanvas(this._renderTexture, (float) Window.instance.devicePixelRatio);
 
             var paint = new Paint {
                 color = new Color(0xFFFF0000),
             };
 
-            canvas.drawPloygon4(
-                new[] {new Offset(10, 10), new Offset(10, 110), new Offset(110, 110), new Offset(110, 10)},
+            canvas.drawRect(
+                Rect.fromLTRB(10, 10, 110, 110),
                 paint);
 
-            canvas.drawPloygon4(
-                new[] {new Offset(10, 150), new Offset(10, 160), new Offset(140, 120), new Offset(110, 180)},
-                paint);
+            var path = new Path();
+            path.moveTo(10, 150);
+            path.lineTo(10, 160);
+            path.lineTo(140, 120);
+            path.lineTo(110, 180);
+            path.close();
+
+            canvas.drawPath(path, paint);
+            canvas.flush();
         }
-        
+
         void drawLine() {
-            var canvas = new CanvasImpl();
+            var canvas = new CommandBufferCanvas(this._renderTexture, (float) Window.instance.devicePixelRatio);
 
             var paint = new Paint {
                 color = new Color(0xFFFF0000),
+                style = PaintingStyle.stroke,
+                strokeWidth = 10,
             };
 
             canvas.drawLine(
                 new Offset(10, 20),
                 new Offset(50, 20),
                 paint);
-            
+
             canvas.drawLine(
                 new Offset(10, 10),
                 new Offset(100, 100),
                 paint);
-            
-            
+
             canvas.drawLine(
                 new Offset(10, 10),
                 new Offset(10, 50),
@@ -118,67 +189,71 @@ namespace UIWidgets.Tests {
                 new Offset(40, 10),
                 new Offset(90, 10),
                 paint);
-            
+
             var widthPaint = new Paint {
                 color = new Color(0xFFFF0000),
                 strokeWidth = 4,
             };
+
             canvas.drawLine(
                 new Offset(40, 20),
                 new Offset(120, 190),
                 widthPaint);
+
+            canvas.flush();
         }
 
         void drawRect() {
-            var canvas = new CanvasImpl();
+            var canvas = new CommandBufferCanvas(this._renderTexture, (float) Window.instance.devicePixelRatio);
 
             var paint = new Paint {
                 color = new Color(0xFFFF0000),
             };
 
-            canvas.drawRect(
-                Rect.fromLTWH(10, 10, 100, 100),
-                BorderWidth.only(2, 4, 6, 8),
-                BorderRadius.only(0, 4, 8, 16),
-                paint);
+            canvas.rotate(15 * Mathf.PI / 180);
+            var rect = Rect.fromLTWH(10, 10, 100, 100);
+            var rrect = RRect.fromRectAndCorners(rect, 0, 4, 8, 16);
+
+            canvas.drawRRect(rrect, paint);
 
             paint = new Paint {
                 color = new Color(0xFF00FF00),
             };
 
-            canvas.drawRect(
-                Rect.fromLTWH(10, 150, 100, 100),
-                BorderWidth.only(),
-                BorderRadius.only(0, 4, 8, 16),
-                paint);
+            rect = Rect.fromLTWH(10, 150, 100, 100);
+            rrect = RRect.fromRectAndCorners(rect, 0, 4, 8, 16);
+            canvas.drawRRect(rrect, paint);
 
-            canvas.drawRect(
-                Rect.fromLTWH(150, 150, 100, 100),
-                BorderWidth.only(10, 12, 14, 16),
-                BorderRadius.only(),
-                paint);
+            rect = Rect.fromLTWH(150, 150, 100, 100);
+            rrect = RRect.fromRectAndCorners(rect, 10, 12, 14, 16);
+            var rect1 = Rect.fromLTWH(160, 160, 80, 80);
+            var rrect1 = RRect.fromRectAndCorners(rect1, 5, 6, 7, 8);
+
+            canvas.drawDRRect(rrect, rrect1, paint);
+
+            canvas.flush();
         }
 
         void drawRectShadow() {
-            var canvas = new CanvasImpl();
-
-            var paint = new Paint {
-                color = new Color(0xFF00FF00),
-                blurSigma = 3.0,
-            };
-
-            canvas.drawRectShadow(
-                Rect.fromLTWH(10, 10, 100, 100),
-                paint);
-
-            paint = new Paint {
-                color = new Color(0xFFFFFF00),
-                blurSigma = 2.0,
-            };
-
-            canvas.drawRectShadow(
-                Rect.fromLTWH(10, 150, 100, 100),
-                paint);
+//            var canvas = new CanvasImpl();
+//
+//            var paint = new Paint {
+//                color = new Color(0xFF00FF00),
+//                blurSigma = 3.0,
+//            };
+//
+//            canvas.drawRectShadow(
+//                Rect.fromLTWH(10, 10, 100, 100),
+//                paint);
+//
+//            paint = new Paint {
+//                color = new Color(0xFFFFFF00),
+//                blurSigma = 2.0,
+//            };
+//
+//            canvas.drawRectShadow(
+//                Rect.fromLTWH(10, 150, 100, 100),
+//                paint);
         }
 
         void drawPicture() {
@@ -189,41 +264,45 @@ namespace UIWidgets.Tests {
                 color = new Color(0xFFFF0000),
             };
 
-            canvas.drawPloygon4(
-                new[] {new Offset(10, 10), new Offset(10, 110), new Offset(90, 110), new Offset(110, 10)},
-                paint);
+            var path = new Path();
+            path.moveTo(10, 10);
+            path.lineTo(10, 110);
+            path.lineTo(90, 110);
+            path.lineTo(100, 10);
+            path.close();
+            canvas.drawPath(path, paint);
 
             paint = new Paint {
                 color = new Color(0xFFFFFF00),
             };
 
-            canvas.drawRect(
-                Rect.fromLTWH(10, 150, 100, 100),
-                BorderWidth.only(2, 4, 6, 8),
-                BorderRadius.only(0, 4, 8, 16),
-                paint);
+            var rect = Rect.fromLTWH(10, 150, 100, 100);
+            var rrect = RRect.fromRectAndCorners(rect, 0, 4, 8, 16);
+            var rect1 = Rect.fromLTWH(18, 152, 88, 92);
+            var rrect1 = RRect.fromRectAndCorners(rect1, 0, 4, 8, 16);
 
-            canvas.concat(Matrix4x4.Translate(new Vector2(-150, -150)));
-            canvas.concat(Matrix4x4.Rotate(Quaternion.Euler(0, 0, -45)));
-            canvas.concat(Matrix4x4.Translate(new Vector2(150, 150)));
+            canvas.drawDRRect(rrect, rrect1, paint);
+
+            canvas.rotate(-45 * Mathf.PI / 180, new Offset(150, 150));
 
             paint = new Paint {
                 color = new Color(0xFF00FFFF),
                 blurSigma = 3,
             };
-            canvas.drawRectShadow(
+            canvas.drawRect(
                 Rect.fromLTWH(150, 150, 110, 120),
                 paint);
 
             var picture = pictureRecorder.endRecording();
             Debug.Log("picture.paintBounds: " + picture.paintBounds);
 
-            var editorCanvas = new CanvasImpl();
+            var editorCanvas = new CommandBufferCanvas(this._renderTexture, (float) Window.instance.devicePixelRatio);
             editorCanvas.drawPicture(picture);
 
-            editorCanvas.concat(Matrix4x4.Rotate(Quaternion.Euler(0, 0, -15)));
-            editorCanvas.concat(Matrix4x4.Translate(new Vector2(100, 100)));
+            editorCanvas.rotate(-15 * Mathf.PI / 180);
+            editorCanvas.translate(100, 100);
             editorCanvas.drawPicture(picture);
+            editorCanvas.flush();
         }
 
         void drawImageRect() {
@@ -231,18 +310,18 @@ namespace UIWidgets.Tests {
                 return;
             }
 
-            var canvas = new CanvasImpl();
+            var canvas = new CommandBufferCanvas(this._renderTexture, (float) Window.instance.devicePixelRatio);
 
             var paint = new Paint {
-                color = new Color(0xFFFF0000),
+                color = new Color(0x7FFF0000),
             };
 
             canvas.drawImageRect(
-                _stream.completer._currentImgae.image,
-                Rect.fromLTWH(150, 50, 250, 250),
-                Rect.fromLTWH(150, 50, 250, 250),
+                _stream.completer._currentImgae.image.texture,
+                Rect.fromLTWH(100, 50, 250, 250),
                 paint
             );
+            canvas.flush();
         }
 
         void clipRect() {
@@ -253,45 +332,51 @@ namespace UIWidgets.Tests {
                 color = new Color(0xFFFF0000),
             };
 
-            canvas.drawPloygon4(
-                new[] {new Offset(10, 10), new Offset(10, 110), new Offset(90, 110), new Offset(110, 10)},
-                paint);
+            var path = new Path();
+            path.moveTo(10, 10);
+            path.lineTo(10, 110);
+            path.lineTo(90, 110);
+            path.lineTo(110, 10);
+            path.close();
+
+            canvas.drawPath(path, paint);
 
             paint = new Paint {
                 color = new Color(0xFFFFFF00),
             };
 
-            canvas.drawRect(
-                Rect.fromLTWH(10, 150, 100, 100),
-                BorderWidth.only(2, 4, 6, 8),
-                BorderRadius.only(0, 4, 8, 16),
-                paint);
+            var rect = Rect.fromLTWH(10, 150, 100, 100);
+            var rrect = RRect.fromRectAndCorners(rect, 0, 4, 8, 16);
+            var rect1 = Rect.fromLTWH(18, 152, 88, 92);
+            var rrect1 = RRect.fromRectAndCorners(rect1, 0, 4, 8, 16);
+            canvas.drawDRRect(rrect, rrect1, paint);
 
-            canvas.concat(Matrix4x4.Translate(new Vector2(-150, -150)));
-            canvas.concat(Matrix4x4.Rotate(Quaternion.Euler(0, 0, -45)));
-            canvas.concat(Matrix4x4.Translate(new Vector2(150, 150)));
+            canvas.rotate(-45 * Mathf.PI / 180.0, new Offset(150, 150));
 
-            paint = new Paint {
-                color = new Color(0xFF00FFFF),
-                blurSigma = 3,
-            };
-            canvas.drawRectShadow(
-                Rect.fromLTWH(150, 150, 110, 120),
-                paint);
+//            paint = new Paint {
+//                color = new Color(0xFF00FFFF),
+//                blurSigma = 3,
+//            };
+//            canvas.drawRectShadow(
+//                Rect.fromLTWH(150, 150, 110, 120),
+//                paint);
 
             var picture = pictureRecorder.endRecording();
             Debug.Log("picture.paintBounds: " + picture.paintBounds);
 
-            var editorCanvas = new CanvasImpl();
-            editorCanvas.concat(Matrix4x4.Rotate(Quaternion.Euler(0, 0, -5)));
+            var editorCanvas = new CommandBufferCanvas(this._renderTexture, (float) Window.instance.devicePixelRatio);
+            editorCanvas.rotate(-5 * Mathf.PI / 180);
             editorCanvas.clipRect(Rect.fromLTWH(25, 15, 250, 250));
-            editorCanvas.concat(Matrix4x4.Rotate(Quaternion.Euler(0, 0, 5)));
+            editorCanvas.rotate(5 * Mathf.PI / 180);
 
             editorCanvas.drawPicture(picture);
 
-            editorCanvas.concat(Matrix4x4.Rotate(Quaternion.Euler(0, 0, -15)));
-            editorCanvas.concat(Matrix4x4.Translate(new Vector2(100, 100)));
+            editorCanvas.rotate(-15 * Mathf.PI / 180);
+            editorCanvas.translate(100, 100);
+
             editorCanvas.drawPicture(picture);
+
+            editorCanvas.flush();
         }
 
         void clipRRect() {
@@ -302,45 +387,51 @@ namespace UIWidgets.Tests {
                 color = new Color(0xFFFF0000),
             };
 
-            canvas.drawPloygon4(
-                new[] {new Offset(10, 10), new Offset(10, 110), new Offset(90, 110), new Offset(110, 10)},
-                paint);
+            var path = new Path();
+            path.moveTo(10, 10);
+            path.lineTo(10, 110);
+            path.lineTo(90, 110);
+            path.lineTo(110, 10);
+            path.close();
+
+            canvas.drawPath(path, paint);
 
             paint = new Paint {
                 color = new Color(0xFFFFFF00),
             };
 
-            canvas.drawRect(
-                Rect.fromLTWH(10, 150, 100, 100),
-                BorderWidth.only(2, 4, 6, 8),
-                BorderRadius.only(0, 4, 8, 16),
-                paint);
+            var rect = Rect.fromLTWH(10, 150, 100, 100);
+            var rrect = RRect.fromRectAndCorners(rect, 0, 4, 8, 16);
+            var rect1 = Rect.fromLTWH(18, 152, 88, 92);
+            var rrect1 = RRect.fromRectAndCorners(rect1, 0, 4, 8, 16);
+            canvas.drawDRRect(rrect, rrect1, paint);
 
-            canvas.concat(Matrix4x4.Translate(new Vector2(-150, -150)));
-            canvas.concat(Matrix4x4.Rotate(Quaternion.Euler(0, 0, -45)));
-            canvas.concat(Matrix4x4.Translate(new Vector2(150, 150)));
+            canvas.rotate(-45 * Mathf.PI / 180.0, new Offset(150, 150));
 
-            paint = new Paint {
-                color = new Color(0xFF00FFFF),
-                blurSigma = 3,
-            };
-            canvas.drawRectShadow(
-                Rect.fromLTWH(150, 150, 110, 120),
-                paint);
+//            paint = new Paint {
+//                color = new Color(0xFF00FFFF),
+//                blurSigma = 3,
+//            };
+//            canvas.drawRectShadow(
+//                Rect.fromLTWH(150, 150, 110, 120),
+//                paint);
 
             var picture = pictureRecorder.endRecording();
             Debug.Log("picture.paintBounds: " + picture.paintBounds);
 
-            var editorCanvas = new CanvasImpl();
-            editorCanvas.concat(Matrix4x4.Rotate(Quaternion.Euler(0, 0, -5)));
+            var editorCanvas = new CommandBufferCanvas(this._renderTexture, (float) Window.instance.devicePixelRatio);
+            editorCanvas.rotate(-5 * Mathf.PI / 180);
             editorCanvas.clipRRect(RRect.fromRectAndRadius(Rect.fromLTWH(25, 15, 250, 250), 50));
-            editorCanvas.concat(Matrix4x4.Rotate(Quaternion.Euler(0, 0, 5)));
+            editorCanvas.rotate(5 * Mathf.PI / 180);
 
             editorCanvas.drawPicture(picture);
 
-            editorCanvas.concat(Matrix4x4.Rotate(Quaternion.Euler(0, 0, -15)));
-            editorCanvas.concat(Matrix4x4.Translate(new Vector2(100, 100)));
+            editorCanvas.rotate(-15 * Mathf.PI / 180);
+            editorCanvas.translate(100, 100);
+
             editorCanvas.drawPicture(picture);
+
+            editorCanvas.flush();
         }
 
         void saveLayer() {
@@ -351,47 +442,50 @@ namespace UIWidgets.Tests {
                 color = new Color(0xFFFF0000),
             };
 
-            canvas.drawPloygon4(
-                new[] {new Offset(10, 10), new Offset(10, 110), new Offset(90, 110), new Offset(110, 10)},
-                paint);
+            var path = new Path();
+            path.moveTo(10, 10);
+            path.lineTo(10, 110);
+            path.lineTo(90, 110);
+            path.lineTo(110, 10);
+            path.close();
+
+            canvas.drawPath(path, paint);
 
             paint = new Paint {
                 color = new Color(0xFFFFFF00),
             };
 
-            canvas.drawRect(
-                Rect.fromLTWH(10, 150, 100, 100),
-                BorderWidth.only(2, 4, 6, 8),
-                BorderRadius.only(0, 4, 8, 16),
-                paint);
+            var rect = Rect.fromLTWH(10, 150, 100, 100);
+            var rrect = RRect.fromRectAndCorners(rect, 0, 4, 8, 16);
+            var rect1 = Rect.fromLTWH(18, 152, 88, 92);
+            var rrect1 = RRect.fromRectAndCorners(rect1, 0, 4, 8, 16);
+            canvas.drawDRRect(rrect, rrect1, paint);
 
-            canvas.concat(Matrix4x4.Translate(new Vector2(-150, -150)));
-            canvas.concat(Matrix4x4.Rotate(Quaternion.Euler(0, 0, -45)));
-            canvas.concat(Matrix4x4.Translate(new Vector2(150, 150)));
+            canvas.rotate(-45 * Mathf.PI / 180.0, new Offset(150, 150));
 
-            canvas.clipRRect(RRect.fromRectAndRadius(Rect.fromLTWH(180, 150, 60, 120), 40));
-            paint = new Paint {
-                color = new Color(0xFF00FFFF),
-                blurSigma = 3,
-            };
-            canvas.drawRectShadow(
-                Rect.fromLTWH(150, 150, 110, 120),
-                paint);
+//            paint = new Paint {
+//                color = new Color(0xFF00FFFF),
+//                blurSigma = 3,
+//            };
+//            canvas.drawRectShadow(
+//                Rect.fromLTWH(150, 150, 110, 120),
+//                paint);
 
             var picture = pictureRecorder.endRecording();
+            Debug.Log("picture.paintBounds: " + picture.paintBounds);
 
-            var editorCanvas = new CanvasImpl();
-            editorCanvas.concat(Matrix4x4.Rotate(Quaternion.Euler(0, 0, -5)));
-            editorCanvas.clipRRect(RRect.fromRectAndRadius(Rect.fromLTWH(25, 15, 250, 250), 50));
-            editorCanvas.concat(Matrix4x4.Rotate(Quaternion.Euler(0, 0, 5)));
+            var editorCanvas = new CommandBufferCanvas(this._renderTexture, (float) Window.instance.devicePixelRatio);
 
             editorCanvas.saveLayer(picture.paintBounds, new Paint {color = new Color(0x7FFFFFFF)});
             editorCanvas.drawPicture(picture);
-
-            editorCanvas.concat(Matrix4x4.Rotate(Quaternion.Euler(0, 0, -15)));
-            editorCanvas.concat(Matrix4x4.Translate(new Vector2(100, 100)));
+            editorCanvas.restore();            
+           
+            editorCanvas.translate(150, 0);
+            editorCanvas.saveLayer(picture.paintBounds, new Paint {color = new Color(0xFFFFFFFF)});
             editorCanvas.drawPicture(picture);
-            editorCanvas.restore();
+            editorCanvas.restore();            
+
+            editorCanvas.flush();
         }
     }
 }

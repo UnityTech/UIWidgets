@@ -31,7 +31,7 @@ namespace UIWidgets.painting {
         public Paint toPaint() {
             return new Paint {
                 color = this.color,
-                blurSigma = this.blurSigma
+                //blurSigma = this.blurSigma
             };
         }
 

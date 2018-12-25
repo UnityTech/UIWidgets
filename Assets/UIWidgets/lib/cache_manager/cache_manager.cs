@@ -8,6 +8,7 @@ using System.Linq;
 using UnityEngine;
 using System.Net;
 using Mono.Data.Sqlite;
+using UIWidgets.async;
 using UIWidgets.painting;
 
 namespace UIWidgets.lib.cache_manager {
@@ -152,11 +153,11 @@ namespace UIWidgets.lib.cache_manager {
 
                             stream.Close();
                             localStream.Close();
-                            promise.Resolve(meta);
+                            Timer.run(() => { promise.Resolve(meta); });
                         }
                     } else if (statusCode == 304) {
                         meta.setDataFromHeaders(headerDict);
-                        promise.Resolve(meta);
+                        Timer.run(() => { promise.Resolve(meta); });
                     }
                 }, null);
             }

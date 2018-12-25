@@ -36,12 +36,12 @@ namespace UIWidgets.painting {
         }
 
         public void clipRRectAndPaint(RRect rrect, Clip clipBehavior, Rect bounds, Action painter) {
-            this._clipAndPaint(doAntiAias => this.canvas.clipRRect(rrect, doAntiAlias: doAntiAias),
+            this._clipAndPaint(doAntiAias => this.canvas.clipRRect(rrect),
                 clipBehavior, bounds, painter);
         }
 
         public void clipRectAndPaint(Rect rect, Clip clipBehavior, Rect bounds, Action painter) {
-            this._clipAndPaint(doAntiAias => this.canvas.clipRect(rect, doAntiAlias: doAntiAias),
+            this._clipAndPaint(doAntiAias => this.canvas.clipRect(rect),
                 clipBehavior, bounds, painter);
         }
     }

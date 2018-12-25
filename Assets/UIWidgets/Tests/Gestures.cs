@@ -43,19 +43,16 @@ namespace UIWidgets.Tests {
                 }
             }
 
-            if (this.windowAdapter != null) {
-                this.windowAdapter.OnGUI();
-            }
+            this.windowAdapter.OnGUI();
         }
 
         void Update() {
-            if (this.windowAdapter != null) {
-                this.windowAdapter.Update();
-            }
+            this.windowAdapter.Update();
         }
 
         private void OnEnable() {
-            this.windowAdapter = new EditorWindowAdapter(this);
+            this.windowAdapter = new WindowAdapter(this);
+            this.windowAdapter.OnEnable();
 
             this._tapRecognizer = new TapGestureRecognizer();
             this._tapRecognizer.onTap = () => { Debug.Log("tap"); };
@@ -67,8 +64,8 @@ namespace UIWidgets.Tests {
             this._doubleTapGesture.onDoubleTap = () => { Debug.Log("onDoubleTap"); };
         }
 
-        void OnDestroy() {
-            this.windowAdapter.Destory();
+        void OnDisable() {
+            this.windowAdapter.OnDisable();
             this.windowAdapter = null;
         }
 

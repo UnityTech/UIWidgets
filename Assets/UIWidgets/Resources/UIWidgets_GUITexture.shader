@@ -1,8 +1,6 @@
-Shader "UIWidgets/GUITextureClip"
+Shader "UIWidgets/GUITexture"
 {
-    Properties {
-        _MainTex ("Texture", Any) = "white" {}
-    }
+    Properties { _MainTex ("Texture", any) = "" {} }
 
     CGINCLUDE
     #pragma vertex vert
@@ -22,48 +20,36 @@ Shader "UIWidgets/GUITextureClip"
         float4 vertex : SV_POSITION;
         fixed4 color : COLOR;
         float2 texcoord : TEXCOORD0;
-        float2 clipUV : TEXCOORD1;
         UNITY_VERTEX_OUTPUT_STEREO
     };
 
     sampler2D _MainTex;
+
     uniform float4 _MainTex_ST;
-    uniform bool _ManualTex2SRGB;
-    
-    #include "UIWidgets_CG.cginc"
-    
-    v2f vert (appdata_t v) {
+
+    v2f vert (appdata_t v)
+    {
         v2f o;
         UNITY_SETUP_INSTANCE_ID(v);
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
         o.vertex = UnityObjectToClipPos(v.vertex);
-        float3 eyePos = UnityObjectToViewPos(v.vertex);
-        o.clipUV = mul(UIWidgets_GUIClipMatrix, float4(eyePos.xy, 0, 1.0));
         o.color = v.color;
-        o.texcoord = TRANSFORM_TEX(v.texcoord, _MainTex);
+        o.texcoord = TRANSFORM_TEX(v.texcoord,_MainTex);
         return o;
     }
 
-    fixed4 frag (v2f i) : SV_Target {
-        fixed4 colTex = tex2D(_MainTex, i.texcoord);
-        if (_ManualTex2SRGB) {
-            colTex.rgb = LinearToGammaSpace(colTex.rgb);
-        }
-        fixed4 col = colTex * i.color;
-        
-        float pixelScale = 1.0f / abs(ddx(i.clipUV.x));
-        col.a *= getClipAlpha(i.clipUV, pixelScale);
-
-        return col;
+    fixed4 frag (v2f i) : SV_Target
+    {
+        return 2.0f * tex2D(_MainTex, i.texcoord) * i.color;
     }
     ENDCG
 
     SubShader {
 
-        Tags { "ForceSupported" = "True" }
+        Tags { "RenderType"="Overlay" }
 
         Lighting Off
-        Blend SrcAlpha OneMinusSrcAlpha, One One
+        Blend One OneMinusSrcAlpha, One OneMinusSrcAlpha
         Cull Off
         ZWrite Off
         ZTest Always
@@ -76,10 +62,10 @@ Shader "UIWidgets/GUITextureClip"
 
     SubShader {
 
-        Tags { "ForceSupported" = "True" }
+        Tags { "RenderType"="Overlay" }
 
         Lighting Off
-        Blend SrcAlpha OneMinusSrcAlpha
+        Blend One OneMinusSrcAlpha
         Cull Off
         ZWrite Off
         ZTest Always
@@ -89,4 +75,6 @@ Shader "UIWidgets/GUITextureClip"
             ENDCG
         }
     }
+
+    Fallback off
 }

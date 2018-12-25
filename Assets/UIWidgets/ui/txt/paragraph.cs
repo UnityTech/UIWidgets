@@ -204,16 +204,6 @@ namespace UIWidgets.ui
             public readonly int endIncludingNewLine;
             public readonly bool hardBreak;
         }
-        
-        private static readonly Shader textShader;
-        
-        static Paragraph() {
-    
-            textShader = Shader.Find("UIWidgets/Text Shader");
-            if (textShader == null) {
-                throw new Exception("UIWidgets/Text Shader Lines not found");
-            }
-        }
 
         private bool _needsLayout = true;
 
@@ -295,9 +285,11 @@ namespace UIWidgets.ui
 
         public void paint(Canvas canvas, Offset offset)
         {
-            foreach (var paintRecord in _paintRecords)
-            {
-                canvas.drawTextBlob(paintRecord.text, offset);
+            foreach (var paintRecord in _paintRecords) {
+                var paint = new Paint {
+                    color = paintRecord.style.color,
+                };
+                canvas.drawTextBlob(paintRecord.text, offset, paint);
                 paintDecorations(canvas, paintRecord, offset);
             }
         }
@@ -652,7 +644,7 @@ namespace UIWidgets.ui
                             var bounds = Rect.fromLTWH(0, -metrics.ascent,
                                 _characterPositions[end - 1].x + _characterWidths[end - 1] -
                                 _characterPositions[start].x,
-                                metrics.descent);
+                                metrics.ascent + metrics.descent);
                             
                             linePaintRecords.Add(new PaintRecord(run.style, new Offset(_characterPositions[start].x, yOffset)
                                 , new TextBlob(
@@ -836,6 +828,7 @@ namespace UIWidgets.ui
             var width = record.runWidth;
             var metrics = record.metrics;
             double underLineThickness = metrics.underlineThickness ?? (record.style.fontSize / 14.0);
+            paint.style = PaintingStyle.stroke;
             paint.strokeWidth = underLineThickness;
             var recordOffset = baseOffset + record.offset;
             var x = recordOffset.dx;

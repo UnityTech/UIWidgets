@@ -10,7 +10,7 @@ namespace UIWidgets.debugger
 
     public class InspectorService
     {
-        public readonly  WindowAdapter window;
+        public readonly WindowAdapter window;
 
         public SelectionChanged selectionChanged;
 

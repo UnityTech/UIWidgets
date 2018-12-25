@@ -121,9 +121,9 @@ namespace UIWidgets.rendering {
         public void compositeFrame() {
             var builder = new SceneBuilder();
             this.layer.addToScene(builder, Offset.zero);
-            var scene = builder.build();
-            Window.instance.render(scene);
-            scene.dispose();
+            using (var scene = builder.build()) {
+                Window.instance.render(scene);
+            }
 
             D.assert(() => {
 //                if (D.debugRepaintRainbowEnabled || D.debugRepaintTextRainbowEnabled) {

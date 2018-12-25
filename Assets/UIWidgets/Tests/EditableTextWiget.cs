@@ -16,7 +16,7 @@ namespace UIWidgets.Tests
 
         private Widget image;
 
-        [MenuItem("UIWidgetsTests/EditableTextWiget")]
+        [MenuItem("UIWidgetsTests/EditableTextWidget")]
         public static void renderWidgets() {
             EditorWindow.GetWindow(typeof(EditableTextWiget));
         }
@@ -35,21 +35,18 @@ namespace UIWidgets.Tests
         }
 
         void OnGUI() {
-            if (this.windowAdapter != null) {
-                this.windowAdapter.OnGUI();
-            }
+            this.windowAdapter.OnGUI();
         }
 
         private void Update() {
-            if (this.windowAdapter != null) {
-                this.windowAdapter.Update();
-            }
+            this.windowAdapter.Update();
         }
 
         private void OnEnable() {
             this.paintingBinding = new PaintingBinding(null);
             paintingBinding.initInstances();
-            this.windowAdapter = new EditorWindowAdapter(this);
+            this.windowAdapter = new WindowAdapter(this);
+            this.windowAdapter.OnEnable();
             this.root = new widgets.Container(
                 width: 200,
                 height: 200,
@@ -66,11 +63,11 @@ namespace UIWidgets.Tests
                 )
             );
             this.windowAdapter.attachRootWidget(root);
-            this.titleContent = new GUIContent("EditableTextWiget");
+            this.titleContent = new GUIContent("EditableTextWidget");
         }
         
-        void OnDestroy() {
-            this.windowAdapter.Destory();
+        void OnDisable() {
+            this.windowAdapter.OnDisable();
             this.windowAdapter = null;
         }
     }

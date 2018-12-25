@@ -5,6 +5,24 @@ using UnityEngine;
 namespace UIWidgets.async {
     public abstract class Timer {
         public abstract void cancel();
+
+        static readonly TimerProvider _globalTimerProvider = new TimerProvider();
+        
+        public static Timer run(TimeSpan duration, Action callback) {
+            return _globalTimerProvider.run(duration, callback);
+        }
+
+        public static Timer run(Action callback) {
+            return run(TimeSpan.Zero, callback);
+        }
+        
+        public static Timer periodic(TimeSpan duration, Action callback) {
+            return _globalTimerProvider.periodic(duration, callback);
+        }
+
+        internal static void update() {
+            _globalTimerProvider.update();
+        }
     }
 
     public class TimerProvider {
@@ -16,40 +34,57 @@ namespace UIWidgets.async {
 
         public Timer run(TimeSpan duration, Action callback) {
             var timer = new TimerImpl(duration, callback);
-            this._queue.enqueue(timer);
+
+            lock (this._queue) {
+                this._queue.enqueue(timer);
+            }
 
             return timer;
         }
 
-        public Timer periodic(TimeSpan duration, Action callback)
-        {
+        public Timer periodic(TimeSpan duration, Action callback) {
             var timer = new TimerImpl(duration, callback, periodic: true);
-            this._queue.enqueue(timer);
+
+            lock (this._queue) {
+                this._queue.enqueue(timer);
+            }
 
             return timer;
         }
         
         public void update() {
             var now = DateTime.Now;
+            
+            List<TimerImpl> timers = null;
             List<TimerImpl> appendList = null;
-            while (this._queue.count > 0 && this._queue.peek().deadline <= now) {
-                var timer = this._queue.dequeue();
-                timer.invoke();
-                if (timer.periodic && !timer.done)
-                {
-                    if (appendList == null)
-                    {
-                        appendList = new List<TimerImpl>();
+            
+            lock (this._queue) {
+                while (this._queue.count > 0 && this._queue.peek().deadline <= now) {
+                    var timer = this._queue.dequeue();
+                    if (timers == null) {
+                        timers = new List<TimerImpl>();
                     }
-                    appendList.Add(timer);
+                    timers.Add(timer);
                 }
             }
 
-            if (appendList != null)
-            {
-                foreach (var timer in appendList)
-                {
-                    this._queue.enqueue(timer);
+            if (timers != null) {
+                foreach (var timer in timers) {
+                    timer.invoke();
+                    if (timer.periodic && !timer.done) {
+                        if (appendList == null) {
+                            appendList = new List<TimerImpl>();
+                        }
+                        appendList.Add(timer);
+                    }
+                }
+            }
+
+            if (appendList != null) {
+                lock (this._queue) {
+                    foreach (var timer in appendList) {
+                        this._queue.enqueue(timer);
+                    }
                 }
             }
         }
@@ -67,9 +102,8 @@ namespace UIWidgets.async {
                 this._callback = callback;
                 this.periodic = periodic;
                 this._done = false;
-                if (periodic)
-                {
-                    internval = duration;
+                if (periodic) {
+                    this.internval = duration;
                 }
             }
 
@@ -105,9 +139,8 @@ namespace UIWidgets.async {
                     Debug.LogError("Error to execute timer callback: " + ex);
                 }
 
-                if (periodic)
-                {
-                    this._deadline = now + internval;
+                if (this.periodic) {
+                    this._deadline = now + this.internval;
                 }
             }
 

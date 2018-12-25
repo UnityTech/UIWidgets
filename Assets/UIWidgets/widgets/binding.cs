@@ -19,9 +19,8 @@ namespace UIWidgets.widgets {
         public WidgetsBinding() {
             this.buildOwner.onBuildScheduled = this._handleBuildScheduled;
             Window.instance.onLocaleChanged += this.handleLocaleChanged;
-            widgetInspectorService = new WidgetInspectorService(this);
-            this.addPersistentFrameCallback((duration) =>
-            {
+            this.widgetInspectorService = new WidgetInspectorService(this);
+            this.addPersistentFrameCallback((duration) => {
                 MeshGenrator.tickNextFrame();
             });
         }

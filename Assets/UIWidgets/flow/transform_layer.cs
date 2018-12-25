@@ -1,22 +1,20 @@
-﻿using UIWidgets.painting;
-using UIWidgets.ui;
-using Matrix4x4 = UnityEngine.Matrix4x4;
+﻿using UIWidgets.ui;
 
 namespace UIWidgets.flow {
     public class TransformLayer : ContainerLayer {
-        private Matrix4x4 _tranform;
+        private Matrix3 _tranform;
 
-        public Matrix4x4 transform {
+        public Matrix3 transform {
             set { this._tranform = value; }
         }
 
-        public override void preroll(PrerollContext context, Matrix4x4 matrix) {
-            var childMatrix = this._tranform * matrix;
+        public override void preroll(PrerollContext context, Matrix3 matrix) {
+            var childMatrix = Matrix3.concat(this._tranform, matrix);
 
             Rect childPaintBounds = Rect.zero;
             this.prerollChildren(context, childMatrix, ref childPaintBounds);
 
-            childPaintBounds = this._tranform.transformRect(childPaintBounds);
+            childPaintBounds = this._tranform.mapRect(childPaintBounds);
             this.paintBounds = childPaintBounds;
         }
 
