@@ -29,8 +29,7 @@ namespace UIWidgets.engine
             {
                 this._paintingBinding = new PaintingBinding(null);
                 _paintingBinding.initInstances();
-                _windowAdapter = new CanvasWindowAdapter(new Rect(0, 0, getCanvasWidth(), getCanvasHeight()), 
-                    EditorGUIUtility.pixelsPerPoint, gameObject);
+                _windowAdapter = new CanvasWindowAdapter(this);
                 var root = new WidgetsApp(null, getWidget());
                 _windowAdapter.attachRootWidget(root);
             }
@@ -290,6 +289,31 @@ namespace UIWidgets.engine
         private int getCanvasHeight()
         {
             return _canvasHeight;
+        }
+
+        public Vector2 size
+        {
+            get
+            {
+                return new Vector2(_canvasWidth, _canvasHeight);
+            }
+        }
+
+        public double devicePixelRatio
+        {
+            get { return 1; }
+        }
+        
+        public void scheduleFrame()
+        {
+        }
+
+        public GUIContent titleContent
+        {
+            get
+            {
+                return new GUIContent(gameObject.name);
+            }
         }
     }
 }

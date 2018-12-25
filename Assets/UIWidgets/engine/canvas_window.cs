@@ -2,43 +2,40 @@
 using UIWidgets.editor;
 using UIWidgets.ui;
 using UnityEngine;
+using UIWidgets.ui;
+using UnityEditor;
+using UnityEngine;
 using Rect = UnityEngine.Rect;
 
 namespace UIWidgets.engine
 {
+
     public class CanvasWindowAdapter : WindowAdapter
     {
         private Rect _position;
         private double __devicePixelRatio;
-        private GameObject gameObject;
-        public CanvasWindowAdapter(Rect position, double devicePixelRatio, GameObject gameObject): base(position, devicePixelRatio)
+        private WidgetCanvas canvas;
+        public CanvasWindowAdapter(WidgetCanvas canvas)
         {
-            this._position = position;
-            this.__devicePixelRatio = devicePixelRatio;
-            this.gameObject = gameObject;
-        }
-
-        public override void scheduleFrame()
-        {
+            this.canvas = canvas;
         }
 
         public override GUIContent titleContent
         {
             get
             {
-                return new GUIContent(gameObject.name);
+                return new GUIContent(canvas.gameObject.name);
             }
         }
-        
-        protected override void getWindowMetrics(out double devicePixelRatio, out Rect position)
+
+        protected override double queryDevicePixelRatio()
         {
-            devicePixelRatio = this.__devicePixelRatio;
-            position = this._position;
+            return canvas.devicePixelRatio;
         }
 
-        protected override Vector2d convertPointerPosition(Vector2 postion)
+        protected override Vector2 queryWindowSize()
         {
-            throw new NotImplementedException("pointer event should not be handled by this class");
+            return canvas.size;
         }
     }
 

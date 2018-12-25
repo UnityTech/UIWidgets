@@ -15,6 +15,7 @@ using Random = System.Random;
 using Rect = UIWidgets.ui.Rect;
 
 namespace UIWidgets.Tests {
+
     public class CanvasAndLayers : EditorWindow {
         static Material _guiTextureMat;
 
@@ -106,7 +107,7 @@ namespace UIWidgets.Tests {
         }
 
         private void OnEnable() {
-            this._windowAdapter = new WindowAdapter(this);
+            this._windowAdapter = new EditorWindowAdapter(this);
             this._windowAdapter.OnEnable();
 
             this._paintingBinding = new PaintingBinding(this._windowAdapter);

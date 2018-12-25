@@ -7,16 +7,24 @@ using UIWidgets.service;
 using UIWidgets.rendering;
 using UIWidgets.ui;
 using UIWidgets.widgets;
-using UnityEditor;
 using UnityEngine;
 
 namespace UIWidgets.editor {
+
+#if UNITY_EDITOR
+
+    using UnityEditor;
     public abstract class UIWidgetsEditorWindow : EditorWindow {
         WindowAdapter _windowAdapter;
-
+        public UIWidgetsEditorWindow()
+        {
+            wantsMouseMove = true;
+            wantsMouseEnterLeaveWindow = true;
+        }
+        
         void OnEnable() {
             if (this._windowAdapter == null) {
-                this._windowAdapter = new WindowAdapter(this);
+                this._windowAdapter = new EditorWindowAdapter(this);
             }
 
             this._windowAdapter.OnEnable();
@@ -47,24 +55,65 @@ namespace UIWidgets.editor {
         }
 
         protected abstract Widget rootWidget();
+
+        public Vector2 size
+        {
+            get
+            {
+                return position.size;
+            }
+        }
+
+        public double devicePixelRatio
+        {
+            get { return EditorGUIUtility.pixelsPerPoint; }
+        }
+
+        public void scheduleFrame()
+        {
+            Repaint();
+        }
     }
 
-    public class WindowAdapter : Window {
+    public class EditorWindowAdapter : WindowAdapter
+    {
+
+        public readonly EditorWindow editorWindow;
+
+        public EditorWindowAdapter(EditorWindow editorWindow)
+        {
+            this.editorWindow = editorWindow;
+        }
+        
+        public override void scheduleFrame(bool regenerateLayerTree = true) {
+            base.scheduleFrame(regenerateLayerTree);
+            editorWindow.Repaint();
+        }
+
+        public override GUIContent titleContent
+        {
+            get { return editorWindow.titleContent; }
+        }
+        
+        protected override double queryDevicePixelRatio()
+        {
+            return EditorGUIUtility.pixelsPerPoint;
+        }
+
+        protected override Vector2 queryWindowSize()
+        {
+            return editorWindow.position.size;
+        }
+    }
+
+#endif
+    
+    public abstract class WindowAdapter : Window {
         
         static readonly List<WindowAdapter> _windowAdapters = new List<WindowAdapter>();
         public static IEnumerable<WindowAdapter> windowAdapters {
             get { return _windowAdapters; }
         }
-
-        public WindowAdapter(EditorWindow editorWindow)
-        {
-            this.editorWindow = editorWindow;
-            this.editorWindow.wantsMouseMove = true;
-            this.editorWindow.wantsMouseEnterLeaveWindow = true;
-
-        }
-
-        public readonly EditorWindow editorWindow;
 
         public WidgetInspectorService widgetInspectorService
         {
@@ -88,6 +137,7 @@ namespace UIWidgets.editor {
         Surface _surface;
         
         bool _alive;
+        
 
         public bool alive
         {
@@ -95,9 +145,10 @@ namespace UIWidgets.editor {
         }
 
         public void OnEnable() {
-            this._devicePixelRatio = EditorGUIUtility.pixelsPerPoint;
-            this._lastWindowWidth = this.editorWindow.position.width;
-            this._lastWindowHeight = this.editorWindow.position.height;
+            this._devicePixelRatio = queryDevicePixelRatio();
+            var size = queryWindowSize();
+            this._lastWindowWidth = size.x;
+            this._lastWindowHeight =size.y;
             this._physicalSize = new Size(
                 this._lastWindowWidth * this._devicePixelRatio,
                 this._lastWindowHeight * this._devicePixelRatio);
@@ -149,6 +200,19 @@ namespace UIWidgets.editor {
             }
         }
 
+        public void PostPointerEvent(List<PointerData> data)
+        {
+            WithBinding(() =>
+            {
+                this.onPointerEvent(new PointerDataPacket(data));
+            });
+        }
+        
+        public void PostPointerEvent(PointerData data)
+        {
+            PostPointerEvent(new List<PointerData>(){data});
+        }
+        
         public void WithBinding(Action fn) {
             using (this.getScope()) {
                 fn();
@@ -169,15 +233,16 @@ namespace UIWidgets.editor {
                     dirty = true;
                 }
 
-                if (this._lastWindowWidth != this.editorWindow.position.width
-                    || this._lastWindowHeight != this.editorWindow.position.height) {
+                var size = queryWindowSize();
+                if (this._lastWindowWidth != size.x
+                    || this._lastWindowHeight != size.y) {
                     dirty = true;
                 }
 
                 if (dirty) {
-                    this._devicePixelRatio = EditorGUIUtility.pixelsPerPoint;
-                    this._lastWindowWidth = this.editorWindow.position.width;
-                    this._lastWindowHeight = this.editorWindow.position.height;
+                    this._devicePixelRatio = queryDevicePixelRatio();
+                    this._lastWindowWidth = size.x;
+                    this._lastWindowHeight = size.y;
                     this._physicalSize = new Size(
                         this._lastWindowWidth * this._devicePixelRatio,
                         this._lastWindowHeight * this._devicePixelRatio);
@@ -191,6 +256,15 @@ namespace UIWidgets.editor {
             }
         }
 
+        public virtual GUIContent titleContent
+        {
+            get { return null; }
+        }
+        
+        protected abstract double queryDevicePixelRatio();
+        protected abstract Vector2 queryWindowSize();
+        
+        
         void _beginFrame() {
             if (this.onBeginFrame != null) {
                 this.onBeginFrame(new DateTime(Stopwatch.GetTimestamp()) - this._epoch);
@@ -286,10 +360,6 @@ namespace UIWidgets.editor {
         public override void scheduleFrame(bool regenerateLayerTree = true) {
             if (regenerateLayerTree) {
                 this._regenerateLayerTree = true;
-            }
-
-            if (this.editorWindow != null) {
-                this.editorWindow.Repaint();
             }
         }
 

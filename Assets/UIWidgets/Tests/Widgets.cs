@@ -14,6 +14,7 @@ using Color = UIWidgets.ui.Color;
 using TextStyle = UIWidgets.painting.TextStyle;
 
 namespace UIWidgets.Tests {
+    
     public class Widgets : EditorWindow {
         private WindowAdapter windowAdapter;
 
@@ -29,7 +30,10 @@ namespace UIWidgets.Tests {
 
         [NonSerialized] private bool hasInvoked = false;
 
-        public Widgets() {
+        public Widgets()
+        {
+            this.wantsMouseEnterLeaveWindow = true;
+            this.wantsMouseMove = true;
             this._options = new Func<Widget>[] {
                 this.localImage,
                 this.container,
@@ -83,7 +87,7 @@ namespace UIWidgets.Tests {
         private void OnEnable() {
             this.paintingBinding = new PaintingBinding(null);
             paintingBinding.initInstances();
-            this.windowAdapter = new WindowAdapter(this);
+            this.windowAdapter = new EditorWindowAdapter(this);
             this.windowAdapter.OnEnable();
         }
 
