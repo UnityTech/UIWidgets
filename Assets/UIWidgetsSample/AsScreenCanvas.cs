@@ -1,15 +1,23 @@
 ﻿using System.Collections.Generic;
+using UIWidgets.engine;
 using UIWidgets.foundation;
-using UIWidgets.gestures;
 using UIWidgets.painting;
 using UIWidgets.rendering;
 using UIWidgets.ui;
 using UIWidgets.widgets;
+using Image = UIWidgets.widgets.Image;
 using TextStyle = UIWidgets.painting.TextStyle;
 
-namespace UIWidgets.engine
+namespace UIWidgetsSample
 {
-    public class AsScreen : StatefulWidget
+    public class AsScreenCanvas : WidgetCanvas
+    {
+        protected override Widget getWidget()
+        {
+            return new AsScreen();
+        }
+
+        public class AsScreen : StatefulWidget
     {
         public AsScreen(Key key = null) : base(key)
         {
@@ -52,7 +60,7 @@ namespace UIWidgets.engine
                                 color: CLColors.icon2
                             )
                         ),
-                        new widgets.Container(
+                        new Container(
                             decoration: new BoxDecoration(
                                 color: CLColors.white,
                                 borderRadius: BorderRadius.all(3)
@@ -211,7 +219,7 @@ namespace UIWidgets.engine
             return new Container(
                 height: 450,
                 color: CLColors.white,
-                child: widgets.Image.network(
+                child: Image.network(
                     "https://d2ujflorbtfzji.cloudfront.net/banner/5c57178c-4be6-4903-953b-85125bfb7154.jpg",
                     fit: BoxFit.cover
                 )
@@ -368,7 +376,7 @@ namespace UIWidgets.engine
                                 ),
                                 width: 200,
                                 height: 124,
-                                child: widgets.Image.network(
+                                child: Image.network(
                                     this.imageSrc,
                                     fit: BoxFit.fill
                                 )
@@ -491,7 +499,6 @@ namespace UIWidgets.engine
         const double headerHeight = 80.0;
 
         double _offsetY = 0.0;
-        int _index = -1;
 
         Widget _buildHeader(BuildContext context)
         {
@@ -550,7 +557,6 @@ namespace UIWidgets.engine
                     setState(() => { _offsetY = 0.0; });
                 }
             }
-
             return true;
         }
 
@@ -602,40 +608,6 @@ namespace UIWidgets.engine
         }
     }
 
-    public class CustomButton : StatelessWidget
-    {
-        public CustomButton(
-            Key key = null,
-            GestureTapCallback onPressed = null,
-            EdgeInsets padding = null,
-            Color backgroundColor = null,
-            Widget child = null
-        ) : base(key: key)
-        {
-            this.onPressed = onPressed;
-            this.padding = padding ?? EdgeInsets.all(8.0);
-            this.backgroundColor = backgroundColor ?? CLColors.transparent;
-            this.child = child;
-        }
-
-        public readonly GestureTapCallback onPressed;
-        public readonly EdgeInsets padding;
-        public readonly Widget child;
-        public readonly Color backgroundColor;
-
-        public override Widget build(BuildContext context)
-        {
-            return new GestureDetector(
-                onTap: this.onPressed,
-                child: new Container(
-                    padding: this.padding,
-                    color: this.backgroundColor,
-                    child: this.child
-                )
-            );
-        }
-    }
-
     public static class Icons
     {
         public static readonly IconData notifications = new IconData(0xe7f4, fontFamily: "Material Icons");
@@ -677,4 +649,5 @@ namespace UIWidgets.engine
 
         public static readonly Color header = new Color(0xFF060B0C);
     }
+}
 }

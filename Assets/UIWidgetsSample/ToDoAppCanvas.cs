@@ -42,7 +42,7 @@ namespace UIWidgetsSample
             {
                 this.onPressed = onPressed;
                 this.padding = padding ?? EdgeInsets.all(8.0);
-                this.backgroundColor = backgroundColor ?? CLColors.transparent;
+                this.backgroundColor = backgroundColor ?? AsScreenCanvas.CLColors.transparent;
                 this.child = child;
             }
 
@@ -134,22 +134,19 @@ namespace UIWidgetsSample
                         height: 1.5
                         )
                     ); });
-                /*return new Flexible(   todo use scroll list
+                return new Flexible(
                     child: new ListView(
                         physics: new AlwaysScrollableScrollPhysics(),
                         children: children.ToList()
                     )
-                );*/
-                return new Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: children.ToList());
+                );
             }
 
             public override Widget build(BuildContext context)
             {
                 var container = new Container(
                     padding: EdgeInsets.all(10),
-                    decoration: new BoxDecoration(border:Border.all(color: Color.fromARGB(255, 255, 0, 0), width: 5),
+                    decoration: new BoxDecoration(color:new Color(0x7F000000), border:Border.all(color: Color.fromARGB(255, 255, 0, 0), width: 5),
                         borderRadius: BorderRadius.all(2)),
                     child: new Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -178,7 +175,7 @@ namespace UIWidgetsSample
         {
             this.onPressed = onPressed;
             this.padding = padding ?? EdgeInsets.all(8.0);
-            this.backgroundColor = backgroundColor ?? CLColors.transparent;
+            this.backgroundColor = backgroundColor ?? AsScreenCanvas.CLColors.transparent;
             this.child = child;
         }
 

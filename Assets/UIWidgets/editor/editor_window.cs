@@ -55,24 +55,6 @@ namespace UIWidgets.editor {
         }
 
         protected abstract Widget rootWidget();
-
-        public Vector2 size
-        {
-            get
-            {
-                return position.size;
-            }
-        }
-
-        public double devicePixelRatio
-        {
-            get { return EditorGUIUtility.pixelsPerPoint; }
-        }
-
-        public void scheduleFrame()
-        {
-            Repaint();
-        }
     }
 
     public class EditorWindowAdapter : WindowAdapter
@@ -154,10 +136,9 @@ namespace UIWidgets.editor {
                 this._lastWindowHeight * this._devicePixelRatio);
 
             D.assert(this._surface == null);
-            this._surface = new EditorWindowSurface();
+            this._surface = createSurface();
 
             this._rasterizer.setup(this._surface);
-            
             _windowAdapters.Add(this);
             this._alive = true;
         }
@@ -229,7 +210,7 @@ namespace UIWidgets.editor {
             using (this.getScope()) {
                 bool dirty = false;
 
-                if (this._devicePixelRatio != EditorGUIUtility.pixelsPerPoint) {
+                if (this._devicePixelRatio != queryDevicePixelRatio()) {
                     dirty = true;
                 }
 
@@ -263,6 +244,11 @@ namespace UIWidgets.editor {
         
         protected abstract double queryDevicePixelRatio();
         protected abstract Vector2 queryWindowSize();
+
+        protected virtual Surface createSurface()
+        {
+            return new EditorWindowSurface();
+        }
         
         
         void _beginFrame() {

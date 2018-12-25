@@ -270,7 +270,7 @@ namespace UIWidgets.widgets {
 
                 for (int index = firstIndex; index <= lastIndex; ++index) {
                     this._currentlyUpdatingChildIndex = index;
-                    Element newChild = this.updateChild(this._childElements[index], this._build(index), index);
+                    Element newChild = this.updateChild(this._childElements.getOrDefault(index), this._build(index), index);
                     if (newChild != null) {
                         this._childElements[index] = newChild;
                         this._currentBeforeChild = (RenderBox) newChild.renderObject;

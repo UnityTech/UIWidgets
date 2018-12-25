@@ -51,5 +51,12 @@ namespace UIWidgets.foundation {
         public static bool isNotEmpty(this string it) {
             return !string.IsNullOrEmpty(it);
         }
+        
+        public static TValue getOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> it, TKey key)
+        {
+            TValue v;
+            it.TryGetValue(key, out v);
+            return v;
+        }
     }
 }
