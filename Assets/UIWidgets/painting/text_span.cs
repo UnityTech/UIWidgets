@@ -5,7 +5,6 @@ using System.Text;
 using UIWidgets.foundation;
 using UIWidgets.gestures;
 using UIWidgets.ui;
-using UnityEditor;
 using UnityEngine.Assertions;
 
 namespace UIWidgets.painting

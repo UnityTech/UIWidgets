@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿#if UNITY_EDITOR
+using System.Collections.Generic;
 using System.Linq;
 using RSG.Promises;
 using UIWidgets.editor;
@@ -63,7 +64,7 @@ namespace UIWidgets.debugger
         private void DoSelectDropDown()
         {
             var currentWindow = m_InspectorService == null ? null : m_InspectorService.window;
-            var selectTitle = currentWindow != null ? currentWindow.editorWindow.titleContent :  new GUIContent("<Please Select>");
+            var selectTitle = currentWindow != null ? currentWindow.titleContent :  new GUIContent("<Please Select>");
             if (GUILayout.Button(selectTitle, EditorStyles.toolbarDropDown))
             {
                 var windows = new List<WindowAdapter>(WindowAdapter.windowAdapters.Where(w =>
@@ -79,7 +80,7 @@ namespace UIWidgets.debugger
                 labels[0] = new GUIContent("none");
                 for (int i = 0; i < windows.Count; i++)
                 {
-                    labels[i + 1] = windows[i].editorWindow.titleContent;
+                    labels[i + 1] = windows[i].titleContent;
                     if (windows[i] == currentWindow)
                     {
                         selectedIndex = i + 1;
@@ -180,3 +181,4 @@ namespace UIWidgets.debugger
      }
     
 }
+#endif

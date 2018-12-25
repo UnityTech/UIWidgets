@@ -60,7 +60,8 @@ namespace UIWidgets.editor {
 
     public class EditorWindowSurface : Surface {
         static Material _guiTextureMat;
-
+        public delegate void DrawToTargetFunc(Rect screenRect, Texture texture, Material mat);
+        
         internal static Material _getGUITextureMat() {
             if (_guiTextureMat) {
                 return _guiTextureMat;
@@ -76,8 +77,10 @@ namespace UIWidgets.editor {
         }
 
         GrSurface _surface;
-
-        public EditorWindowSurface() {
+        private DrawToTargetFunc _drawToTargetFunc;
+        public EditorWindowSurface(DrawToTargetFunc drawToTargetFunc = null)
+        {
+            this._drawToTargetFunc = drawToTargetFunc;
         }
 
         public SurfaceFrame acquireFrame(Size size, double devicePixelRatio) {
@@ -94,7 +97,7 @@ namespace UIWidgets.editor {
             }
         }
 
-        bool _presentSurface(Canvas canvas) {
+        protected bool _presentSurface(Canvas canvas) {
             if (canvas == null) {
                 return false;
             }
@@ -106,7 +109,14 @@ namespace UIWidgets.editor {
                 (float) (this._surface.size.width / this._surface.devicePixelRatio),
                 (float) (this._surface.size.height / this._surface.devicePixelRatio));
 
-            Graphics.DrawTexture(screenRect, this._surface.getRenderTexture(), _getGUITextureMat());
+            if (_drawToTargetFunc == null)
+            {
+                Graphics.DrawTexture(screenRect, this._surface.getRenderTexture(), _getGUITextureMat());
+            }
+            else
+            {
+                _drawToTargetFunc(screenRect, this._surface.getRenderTexture(), _getGUITextureMat());
+            }
             return true;
         }
 

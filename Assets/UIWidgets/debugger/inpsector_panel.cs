@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if UNITY_EDITOR
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UIWidgets.foundation;
@@ -307,3 +308,4 @@ namespace UIWidgets.debugger
         public float splitOffset;
     }
 }
+#endif

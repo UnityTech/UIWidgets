@@ -1,5 +1,4 @@
 ﻿using System;
-using UnityEditor;
 
 namespace UIWidgets.ui
 {
@@ -7,7 +6,7 @@ namespace UIWidgets.ui
     {
         public static double PixelCorrectRound(double v)
         {
-            return Math.Round(v * EditorGUIUtility.pixelsPerPoint) / EditorGUIUtility.pixelsPerPoint;
+            return Math.Round(v * Window.instance.devicePixelRatio) / Window.instance.devicePixelRatio;
         }
     }
 }

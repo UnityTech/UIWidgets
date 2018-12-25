@@ -1,252 +1,48 @@
-using UIWidgets.painting;
-using UIWidgets.editor;
-using UIWidgets.widgets;
-using System.Collections.Generic;
-using UIWidgets.rendering;
-using UnityEditor;
-using UnityEngine;
-using System;
-using System.Linq;
+﻿using System.Collections.Generic;
+using UIWidgets.engine;
 using UIWidgets.foundation;
-using UIWidgets.gestures;
+using UIWidgets.painting;
+using UIWidgets.rendering;
 using UIWidgets.ui;
-using Color = UIWidgets.ui.Color;
+using UIWidgets.widgets;
+using Image = UIWidgets.widgets.Image;
 using TextStyle = UIWidgets.painting.TextStyle;
 
-namespace UIWidgets.Tests {
-    
-    public class Widgets : EditorWindow {
-        private WindowAdapter windowAdapter;
-
-        private PaintingBinding paintingBinding;
-
-        private readonly Func<Widget>[] _options;
-
-        private readonly string[] _optionStrings;
-
-        private int _selected;
-
-        private string localImagePath;
-
-        [NonSerialized] private bool hasInvoked = false;
-
-        public Widgets()
+namespace UIWidgetsSample
+{
+    public class AsScreenCanvas : WidgetCanvas
+    {
+        protected override Widget getWidget()
         {
-            this.wantsMouseEnterLeaveWindow = true;
-            this.wantsMouseMove = true;
-            this._options = new Func<Widget>[] {
-                this.localImage,
-                this.container,
-                this.flexRow,
-                this.flexColumn,
-                this.containerSimple,
-                this.eventsPage,
-                this.asPage,
-                this.stack,
-                this.mouseHover
-            };
-            this._optionStrings = this._options.Select(x => x.Method.Name).ToArray();
-            this._selected = 0;
-
-            this.titleContent = new GUIContent("Widgets Test");
+            return new AsScreen();
         }
 
-        void OnGUI() {
-            var selected = EditorGUILayout.Popup("test case", this._selected, this._optionStrings);
-
-            // if local image test
-            if (selected == 0) {
-                localImagePath = EditorGUILayout.TextField(localImagePath);
-
-                if (this._selected != selected) {
-                    this._selected = selected;
-                    this.windowAdapter.attachRootWidget(null);
-                }
-
-                if (GUILayout.Button("load")) {
-                    var rootWidget = this._options[this._selected]();
-                    this.windowAdapter.attachRootWidget(rootWidget);
-                }
-            }
-            else if (selected != this._selected || !this.hasInvoked) {
-                this._selected = selected;
-                this.hasInvoked = true;
-
-                var rootWidget = this._options[this._selected]();
-
-                this.windowAdapter.attachRootWidget(rootWidget);
-            }
-
-            this.windowAdapter.OnGUI();
-        }
-
-        private void Update() {
-            this.windowAdapter.Update();
-        }
-
-        private void OnEnable() {
-            this.paintingBinding = new PaintingBinding(null);
-            paintingBinding.initInstances();
-            this.windowAdapter = new EditorWindowAdapter(this);
-            this.windowAdapter.OnEnable();
-        }
-
-        void OnDisable() {
-            this.windowAdapter.OnDisable();
-            this.windowAdapter = null;
-        }
-
-        Widget stack() {
-            var image = new widgets.Container(
-                width: 150,
-                height: 150,
-                child: widgets.Image.network(
-                    "https://tse3.mm.bing.net/th?id=OIP.XOAIpvR1kh-CzISe_Nj9GgHaHs&pid=Api",
-                    width: 100,
-                    height: 100
-                )
-            );
-            var text = new widgets.Container(
-                width: 150,
-                height: 150,
-                child: new Text("TTTTTTTTTTTTTTTTEST")
-            );
-            List<Widget> rowImages = new List<Widget>();
-            rowImages.Add(image);
-            rowImages.Add(text);
-            return new Stack(
-                children: rowImages,
-                alignment: AlignmentDirectional.center
-            );
-        }
-
-        Widget localImage() {
-            var image = widgets.Image.file(
-                localImagePath
-            );
-
-            return image;
-        }
-
-        Widget flexRow() {
-            var image = widgets.Image.network(
-                "https://tse3.mm.bing.net/th?id=OIP.XOAIpvR1kh-CzISe_Nj9GgHaHs&pid=Api",
-                width: 100,
-                height: 100
-            );
-            List<Widget> rowImages = new List<Widget>();
-            rowImages.Add(image);
-            rowImages.Add(image);
-            rowImages.Add(image);
-            rowImages.Add(image);
-
-            var row = new widgets.Row(
-                textDirection: null,
-                textBaseline: null,
-                key: null,
-                mainAxisAlignment: MainAxisAlignment.start,
-                mainAxisSize: MainAxisSize.max,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                verticalDirection: VerticalDirection.down,
-                children: rowImages
-            );
-
-            return row;
-        }
-
-        Widget flexColumn() {
-            var image = widgets.Image.network(
-                "https://tse3.mm.bing.net/th?id=OIP.XOAIpvR1kh-CzISe_Nj9GgHaHs&pid=Api",
-                width: 100,
-                height: 100
-            );
-            List<Widget> columnImages = new List<Widget>();
-            columnImages.Add(image);
-            columnImages.Add(image);
-            columnImages.Add(image);
-
-            var column = new widgets.Column(
-                textDirection: null,
-                textBaseline: null,
-                key: null,
-                mainAxisAlignment: MainAxisAlignment.start,
-                mainAxisSize: MainAxisSize.max,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                verticalDirection: VerticalDirection.down,
-                children: columnImages
-            );
-
-            return column;
-        }
-
-        Widget container() {
-            var image = widgets.Image.network(
-                "https://tse3.mm.bing.net/th?id=OIP.XOAIpvR1kh-CzISe_Nj9GgHaHs&pid=Api",
-                width: 100,
-                height: 100,
-                repeat: ImageRepeat.repeatX
-            );
-            var container = new widgets.Container(
-                width: 200,
-                height: 200,
-                margin: EdgeInsets.all(30.0),
-                padding: EdgeInsets.all(15.0),
-                color: ui.Color.fromARGB(255, 244, 190, 85),
-                child: image
-            );
-
-            return container;
-        }
-
-        Widget containerSimple() {
-            var container = new Container(
-                alignment: Alignment.centerRight,
-                color: ui.Color.fromARGB(255, 244, 190, 85),
-                child: new Container(
-                    width: 120,
-                    height: 120,
-                    color: ui.Color.fromARGB(255, 255, 0, 85)
-                )
-            );
-
-            return container;
-        }
-
-        Widget eventsPage() {
-            return new EventsWaterfallScreen();
-        }
-
-        Widget asPage() {
-            return new WidgetsApp(null, new AsScreen());
-        }
-
-        Widget mouseHover()
+        public class AsScreen : StatefulWidget
+    {
+        public AsScreen(Key key = null) : base(key)
         {
-            return new WidgetsApp(null, new MouseHoverWidget(null));
-        }
-    }
-
-
-    public class AsScreen : StatefulWidget {
-        public AsScreen(Key key = null) : base(key) {
         }
 
-        public override State createState() {
+        public override State createState()
+        {
             return new _AsScreenState();
         }
     }
 
-    class _AsScreenState : State<AsScreen> {
+    class _AsScreenState : State<AsScreen>
+    {
         const double headerHeight = 50.0;
 
-        Widget _buildHeader(BuildContext context) {
+        Widget _buildHeader(BuildContext context)
+        {
             return new Container(
                 padding: EdgeInsets.only(left: 16.0, right: 8.0),
                 height: headerHeight,
                 color: CLColors.header,
                 child: new Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: new List<Widget> {
+                    children: new List<Widget>
+                    {
                         new Container(
                             child: new Text(
                                 "All Assets",
@@ -264,7 +60,7 @@ namespace UIWidgets.Tests {
                                 color: CLColors.icon2
                             )
                         ),
-                        new widgets.Container(
+                        new Container(
                             decoration: new BoxDecoration(
                                 color: CLColors.white,
                                 borderRadius: BorderRadius.all(3)
@@ -294,7 +90,8 @@ namespace UIWidgets.Tests {
                             child: new Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.center,
-                                children: new List<Widget> {
+                                children: new List<Widget>
+                                {
                                     new CustomButton(
                                         padding: EdgeInsets.only(8.0, 0.0, 8.0, 0.0),
                                         child: new Icon(
@@ -327,7 +124,8 @@ namespace UIWidgets.Tests {
                             child: new Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.center,
-                                children: new List<Widget> {
+                                children: new List<Widget>
+                                {
                                     new Text(
                                         "Plus/Pro",
                                         style: new TextStyle(
@@ -362,14 +160,16 @@ namespace UIWidgets.Tests {
             );
         }
 
-        Widget _buildFooter(BuildContext context) {
+        Widget _buildFooter(BuildContext context)
+        {
             return new Container(
                 color: CLColors.header,
                 margin: EdgeInsets.only(top: 50),
                 height: 90,
                 child: new Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: new List<Widget> {
+                    children: new List<Widget>
+                    {
                         new Container(
                             margin: EdgeInsets.only(right: 10),
                             child: new Text(
@@ -414,18 +214,20 @@ namespace UIWidgets.Tests {
             );
         }
 
-        Widget _buildBanner(BuildContext context) {
+        Widget _buildBanner(BuildContext context)
+        {
             return new Container(
                 height: 450,
                 color: CLColors.white,
-                child: widgets.Image.network(
+                child: Image.network(
                     "https://d2ujflorbtfzji.cloudfront.net/banner/5c57178c-4be6-4903-953b-85125bfb7154.jpg",
                     fit: BoxFit.cover
                 )
             );
         }
 
-        Widget _buildTopAssetsRow(BuildContext context, string title) {
+        Widget _buildTopAssetsRow(BuildContext context, string title)
+        {
             var testCard = new AssetCard(
                 "AI Template",
                 "INVECTOR",
@@ -437,13 +239,15 @@ namespace UIWidgets.Tests {
             return new Container(
                 margin: EdgeInsets.only(left: 98),
                 child: new Column(
-                    children: new List<Widget> {
+                    children: new List<Widget>
+                    {
                         new Container(
                             child: new Container(
                                 margin: EdgeInsets.only(top: 50, bottom: 20),
                                 child: new Row(
                                     crossAxisAlignment: CrossAxisAlignment.baseline,
-                                    children: new List<Widget> {
+                                    children: new List<Widget>
+                                    {
                                         new Container(
                                             child: new Text(
                                                 title,
@@ -468,7 +272,8 @@ namespace UIWidgets.Tests {
                             )
                         ),
                         new Row(
-                            children: new List<Widget> {
+                            children: new List<Widget>
+                            {
                                 testCard,
                                 testCard,
                                 testCard,
@@ -481,20 +286,24 @@ namespace UIWidgets.Tests {
                 ));
         }
 
-        bool _onNotification(ScrollNotification notification, BuildContext context) {
+        bool _onNotification(ScrollNotification notification, BuildContext context)
+        {
             return true;
         }
 
-        Widget _buildContentList(BuildContext context) {
+        Widget _buildContentList(BuildContext context)
+        {
             return new NotificationListener<ScrollNotification>(
-                onNotification: (ScrollNotification notification) => {
+                onNotification: (ScrollNotification notification) =>
+                {
                     _onNotification(notification, context);
                     return true;
                 },
                 child: new Flexible(
                     child: new ListView(
                         physics: new AlwaysScrollableScrollPhysics(),
-                        children: new List<Widget> {
+                        children: new List<Widget>
+                        {
                             _buildBanner(context),
                             _buildTopAssetsRow(context, "Recommanded For You"),
                             _buildTopAssetsRow(context, "Beach Day"),
@@ -507,13 +316,15 @@ namespace UIWidgets.Tests {
             );
         }
 
-        public override Widget build(BuildContext context) {
+        public override Widget build(BuildContext context)
+        {
             var container = new Container(
                 color: CLColors.background3,
                 child: new Container(
                     color: CLColors.background3,
                     child: new Column(
-                        children: new List<Widget> {
+                        children: new List<Widget>
+                        {
                             this._buildHeader(context),
                             this._buildContentList(context),
                         }
@@ -524,7 +335,8 @@ namespace UIWidgets.Tests {
         }
     }
 
-    public class AssetCard : StatelessWidget {
+    public class AssetCard : StatelessWidget
+    {
         public AssetCard(
             string name,
             string category,
@@ -532,7 +344,8 @@ namespace UIWidgets.Tests {
             double priceDiscount,
             bool showBadge,
             string imageSrc
-        ) {
+        )
+        {
             this.name = name;
             this.category = category;
             this.price = price;
@@ -548,12 +361,14 @@ namespace UIWidgets.Tests {
         public bool showBadge;
         public string imageSrc;
 
-        public override Widget build(BuildContext context) {
+        public override Widget build(BuildContext context)
+        {
             var card = new Container(
                 margin: EdgeInsets.only(right: 45),
                 child: new Container(
                     child: new Column(
-                        children: new List<Widget> {
+                        children: new List<Widget>
+                        {
                             new Container(
                                 decoration: new BoxDecoration(
                                     color: CLColors.white,
@@ -561,7 +376,7 @@ namespace UIWidgets.Tests {
                                 ),
                                 width: 200,
                                 height: 124,
-                                child: widgets.Image.network(
+                                child: Image.network(
                                     this.imageSrc,
                                     fit: BoxFit.fill
                                 )
@@ -573,7 +388,8 @@ namespace UIWidgets.Tests {
                                 padding: EdgeInsets.fromLTRB(14, 12, 14, 8),
                                 child: new Column(
                                     crossAxisAlignment: CrossAxisAlignment.baseline,
-                                    children: new List<Widget> {
+                                    children: new List<Widget>
+                                    {
                                         new Container(
                                             height: 18,
                                             padding: EdgeInsets.only(top: 3),
@@ -603,10 +419,12 @@ namespace UIWidgets.Tests {
                                             padding: EdgeInsets.only(top: 4),
                                             child: new Row(
                                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                children: new List<Widget> {
+                                                children: new List<Widget>
+                                                {
                                                     new Container(
                                                         child: new Row(
-                                                            children: new List<Widget> {
+                                                            children: new List<Widget>
+                                                            {
                                                                 new Container(
                                                                     margin: EdgeInsets.only(right: 10),
                                                                     child: new Text(
@@ -637,7 +455,8 @@ namespace UIWidgets.Tests {
                                                             child: new Row(
                                                                 mainAxisAlignment: MainAxisAlignment.center,
                                                                 crossAxisAlignment: CrossAxisAlignment.center,
-                                                                children: new List<Widget> {
+                                                                children: new List<Widget>
+                                                                {
                                                                     new Text(
                                                                         "Plus/Pro",
                                                                         style: new TextStyle(
@@ -663,28 +482,33 @@ namespace UIWidgets.Tests {
         }
     }
 
-    public class EventsWaterfallScreen : StatefulWidget {
-        public EventsWaterfallScreen(Key key = null) : base(key: key) {
+    public class EventsWaterfallScreen : StatefulWidget
+    {
+        public EventsWaterfallScreen(Key key = null) : base(key: key)
+        {
         }
 
-        public override State createState() {
+        public override State createState()
+        {
             return new _EventsWaterfallScreenState();
         }
     }
 
-    class _EventsWaterfallScreenState : State<EventsWaterfallScreen> {
+    class _EventsWaterfallScreenState : State<EventsWaterfallScreen>
+    {
         const double headerHeight = 80.0;
 
         double _offsetY = 0.0;
-        int _index = -1;
 
-        Widget _buildHeader(BuildContext context) {
+        Widget _buildHeader(BuildContext context)
+        {
             return new Container(
                 padding: EdgeInsets.only(left: 16.0, right: 8.0),
                 //  color: CLColors.blue,
                 height: headerHeight - _offsetY,
                 child: new Row(
-                    children: new List<Widget> {
+                    children: new List<Widget>
+                    {
                         new Flexible(
                             flex: 1,
                             fit: FlexFit.tight,
@@ -716,26 +540,32 @@ namespace UIWidgets.Tests {
             );
         }
 
-        bool _onNotification(ScrollNotification notification, BuildContext context) {
+        bool _onNotification(ScrollNotification notification, BuildContext context)
+        {
             double pixels = notification.metrics.pixels;
-            if (pixels >= 0.0) {
-                if (pixels <= headerHeight) {
+            if (pixels >= 0.0)
+            {
+                if (pixels <= headerHeight)
+                {
                     setState(() => { _offsetY = pixels / 2.0; });
                 }
             }
-            else {
-                if (_offsetY != 0.0) {
+            else
+            {
+                if (_offsetY != 0.0)
+                {
                     setState(() => { _offsetY = 0.0; });
                 }
             }
-
             return true;
         }
 
 
-        Widget _buildContentList(BuildContext context) {
+        Widget _buildContentList(BuildContext context)
+        {
             return new NotificationListener<ScrollNotification>(
-                onNotification: (ScrollNotification notification) => {
+                onNotification: (ScrollNotification notification) =>
+                {
                     _onNotification(notification, context);
                     return true;
                 },
@@ -746,7 +576,8 @@ namespace UIWidgets.Tests {
                             itemCount: 20,
                             itemExtent: 100,
                             physics: new AlwaysScrollableScrollPhysics(),
-                            itemBuilder: (BuildContext context1, int index) => {
+                            itemBuilder: (BuildContext context1, int index) =>
+                            {
                                 return new Container(
                                     color: Color.fromARGB(255, (index * 10) % 256, (index * 20) % 256,
                                         (index * 30) % 256)
@@ -757,14 +588,16 @@ namespace UIWidgets.Tests {
                 )
             );
         }
-        
-        public override Widget build(BuildContext context) {
+
+        public override Widget build(BuildContext context)
+        {
             var container = new Container(
                 //  color: CLColors.background1,
                 child: new Container(
                     //  color: CLColors.background1,
                     child: new Column(
-                        children: new List<Widget> {
+                        children: new List<Widget>
+                        {
                             this._buildHeader(context),
                             this._buildContentList(context)
                         }
@@ -775,45 +608,16 @@ namespace UIWidgets.Tests {
         }
     }
 
-    public class CustomButton : StatelessWidget {
-        public CustomButton(
-            Key key = null,
-            GestureTapCallback onPressed = null,
-            EdgeInsets padding = null,
-            Color backgroundColor = null,
-            Widget child = null
-        ) : base(key: key) {
-            this.onPressed = onPressed;
-            this.padding = padding ?? EdgeInsets.all(8.0);
-            this.backgroundColor = backgroundColor ?? CLColors.transparent;
-            this.child = child;
-        }
-
-        public readonly GestureTapCallback onPressed;
-        public readonly EdgeInsets padding;
-        public readonly Widget child;
-        public readonly Color backgroundColor;
-
-        public override Widget build(BuildContext context) {
-            return new GestureDetector(
-                onTap: this.onPressed,
-                child: new Container(
-                    padding: this.padding,
-                    color: this.backgroundColor,
-                    child: this.child
-                )
-            );
-        }
-    }
-
-    public static class Icons {
+    public static class Icons
+    {
         public static readonly IconData notifications = new IconData(0xe7f4, fontFamily: "Material Icons");
         public static readonly IconData account_circle = new IconData(0xe853, fontFamily: "Material Icons");
         public static readonly IconData search = new IconData(0xe8b6, fontFamily: "Material Icons");
         public static readonly IconData keyboard_arrow_down = new IconData(0xe313, fontFamily: "Material Icons");
     }
 
-    public static class CLColors {
+    public static class CLColors
+    {
         public static readonly Color primary = new Color(0xFFE91E63);
         public static readonly Color secondary1 = new Color(0xFF00BCD4);
         public static readonly Color secondary2 = new Color(0xFFF0513C);
@@ -845,4 +649,5 @@ namespace UIWidgets.Tests {
 
         public static readonly Color header = new Color(0xFF060B0C);
     }
+}
 }

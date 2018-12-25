@@ -177,7 +177,7 @@ namespace UIWidgets.widgets
         }
     }
 
-    public class EditableTextState : State<EditableText>, TextInputClient
+    public class EditableTextState : AutomaticKeepAliveClientMixin<EditableText>, TextInputClient
     {
         const int _kObscureShowLatestCharCursorTicks = 3;
         private static TimeSpan _kCursorBlinkHalfPeriod = TimeSpan.FromMilliseconds(500);
@@ -185,12 +185,18 @@ namespace UIWidgets.widgets
         private ValueNotifier<bool> _showCursor = new ValueNotifier<bool>(true);
         private GlobalKey _editableKey = GlobalKey.key();
         private bool _didAutoFocus = false;
+        public ScrollController _scrollController = new ScrollController();
 
         TextInputConnection _textInputConnection;
         private int _obscureShowCharTicksPending = 0;
         private int _obscureLatestCharIndex;
 
         bool _textChangedSinceLastCaretUpdate = false;
+
+        protected override bool wantKeepAlive
+        {
+            get { return widget.focusNode.hasFocus; }
+        }
 
         public override void initState()
         {
@@ -224,6 +230,7 @@ namespace UIWidgets.widgets
             {
                 oldWidget.focusNode.removeListener(_handleFocusChanged);
                 widget.focusNode.addListener(_handleFocusChanged);
+                updateKeepAlive();
             }
         }
 
@@ -588,6 +595,8 @@ namespace UIWidgets.widgets
             {
                 widget.controller.selection = TextSelection.collapsed(offset: _value.text.Length);
             }
+
+            updateKeepAlive();
         }
 
 
@@ -611,7 +620,12 @@ namespace UIWidgets.widgets
         public override Widget build(BuildContext context)
         {
             FocusScope.of(context).reparentIfNeeded(widget.focusNode);
-            // todo base.build(context);  See AutomaticKeepAliveClientMixin.
+            base.build(context); // See AutomaticKeepAliveClientMixin.
+            
+//            return new Scrollable(
+//                axisDirection: _isMultiline ? AxisDirection.down : AxisDirection.right
+//                // controller: _sc
+//            );
             return new _Editable(
                 key: _editableKey,
                 textSpan: buildTextSpan(),
