@@ -1,0 +1,14 @@
+{
+    "name": "Unity.UIWidgets.Editor.EditorTests",
+    "references": [
+        "Unity.UIWidgets.Editor",
+        "Unity.UIWidgets"
+    ],
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": []
+}

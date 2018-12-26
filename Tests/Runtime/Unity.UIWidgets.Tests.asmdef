@@ -1,0 +1,11 @@
+{
+    "name": "Unity.UIWidgets.Tests",
+    "references": [
+        "Unity.UIWidgets"
+    ],
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": []
+}

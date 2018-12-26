@@ -1,0 +1,10 @@
+{
+    "name": "Unity.UIWidgets.Editor",
+    "references": [
+      "Unity.UIWidgets"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": []
+}
