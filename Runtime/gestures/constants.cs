@@ -1,6 +1,6 @@
 using System;
 
-namespace UIWidgets.gestures {
+namespace Unity.UIWidgets.gestures {
     public static class Constants {
         public const double kTouchSlop = 18.0;
         

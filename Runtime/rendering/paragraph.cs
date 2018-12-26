@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using UIWidgets.foundation;
-using UIWidgets.painting;
-using UIWidgets.ui;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.painting;
+using Unity.UIWidgets.ui;
 using UnityEngine;
 
-namespace UIWidgets.rendering
+namespace Unity.UIWidgets.rendering
 {
     public enum TextOverflow {
         /// Clip the overflowing text to fix its container.

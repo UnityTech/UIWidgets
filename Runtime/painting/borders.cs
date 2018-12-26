@@ -1,7 +1,7 @@
 ﻿using System;
-using UIWidgets.ui;
+using Unity.UIWidgets.ui;
 
-namespace UIWidgets.painting {
+namespace Unity.UIWidgets.painting {
     public class BorderSide : IEquatable<BorderSide> {
         public BorderSide(
             Color color = null,

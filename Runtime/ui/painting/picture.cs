@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using UIWidgets.foundation;
+using Unity.UIWidgets.foundation;
 using UnityEngine;
 
-namespace UIWidgets.ui {
+namespace Unity.UIWidgets.ui {
     public class Picture {
         public Picture(List<DrawCmd> drawCmds, Rect paintBounds) {
             this.drawCmds = drawCmds;

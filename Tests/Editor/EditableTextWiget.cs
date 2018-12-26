@@ -1,9 +1,9 @@
-﻿using UIWidgets.editor;
-using UIWidgets.painting;
-using UIWidgets.widgets;
+﻿using Unity.UIWidgets.editor;
+using Unity.UIWidgets.painting;
+using Unity.UIWidgets.widgets;
 using UnityEditor;
 using UnityEngine;
-using Color = UIWidgets.ui.Color;
+using Color = Unity.UIWidgets.ui.Color;
 namespace UIWidgets.Tests
 {
     public class EditableTextWiget: EditorWindow

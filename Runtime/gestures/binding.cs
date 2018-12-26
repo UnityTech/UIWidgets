@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
-using UIWidgets.foundation;
-using UIWidgets.rendering;
-using UIWidgets.scheduler;
-using UIWidgets.ui;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.rendering;
+using Unity.UIWidgets.scheduler;
+using Unity.UIWidgets.ui;
 using UnityEngine;
 
-namespace UIWidgets.gestures {
+namespace Unity.UIWidgets.gestures {
     public class GestureBinding : SchedulerBinding, HitTestable, HitTestDispatcher, HitTestTarget {
         public static new GestureBinding instance {
             get { return (GestureBinding) SchedulerBinding.instance; }

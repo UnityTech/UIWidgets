@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UIWidgets.foundation;
-using UIWidgets.gestures;
-using UIWidgets.rendering;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.gestures;
+using Unity.UIWidgets.rendering;
 
-namespace UIWidgets.widgets {
+namespace Unity.UIWidgets.widgets {
     public abstract class GestureRecognizerFactory {
         public abstract GestureRecognizer constructorRaw();
 

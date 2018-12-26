@@ -1,10 +1,10 @@
-using UIWidgets.ui;
-using UIWidgets.painting;
+using Unity.UIWidgets.ui;
+using Unity.UIWidgets.painting;
 using UnityEngine;
-using Color = UIWidgets.ui.Color;
-using Rect = UIWidgets.ui.Rect;
+using Color = Unity.UIWidgets.ui.Color;
+using Rect = Unity.UIWidgets.ui.Rect;
 
-namespace UIWidgets.rendering {
+namespace Unity.UIWidgets.rendering {
     class RenderImage : RenderBox {
         public RenderImage(ui.Image image,
             Color color,

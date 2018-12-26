@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using UIWidgets.foundation;
+using Unity.UIWidgets.foundation;
 using UnityEngine;
 
-namespace UIWidgets.async {
+namespace Unity.UIWidgets.async {
     public class MicrotaskQueue {
         private Queue<Action> _queue = new Queue<Action>();
 

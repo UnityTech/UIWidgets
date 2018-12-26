@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
-using UIWidgets.foundation;
-using UIWidgets.ui;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.ui;
 
-namespace UIWidgets.gestures {
+namespace Unity.UIWidgets.gestures {
     public interface HitTestable {
         void hitTest(HitTestResult result, Offset position);
     }

@@ -1,7 +1,7 @@
-using UIWidgets.foundation;
-using UIWidgets.ui;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.ui;
 
-namespace UIWidgets.physics {
+namespace Unity.UIWidgets.physics {
     public class ClampedSimulation : Simulation {
         public ClampedSimulation(Simulation simulation,
             double xMin = double.NegativeInfinity,

@@ -1,7 +1,7 @@
 using System;
-using UIWidgets.painting;
+using Unity.UIWidgets.painting;
 
-namespace UIWidgets.widgets {
+namespace Unity.UIWidgets.widgets {
     public interface ScrollMetrics {
         double minScrollExtent { get; }
 

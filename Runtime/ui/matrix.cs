@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using UIWidgets.foundation;
+using Unity.UIWidgets.foundation;
 using UnityEngine;
 
-namespace UIWidgets.ui {
+namespace Unity.UIWidgets.ui {
     public class Matrix3 : IEquatable<Matrix3> {
         public static Matrix3 makeScale(float sx, float sy) {
             var m = new Matrix3();

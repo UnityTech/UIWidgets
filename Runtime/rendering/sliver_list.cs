@@ -1,7 +1,7 @@
 using System;
-using UIWidgets.foundation;
+using Unity.UIWidgets.foundation;
 
-namespace UIWidgets.rendering {
+namespace Unity.UIWidgets.rendering {
     public class RenderSliverList : RenderSliverMultiBoxAdaptor {
         public RenderSliverList(
             RenderSliverBoxChildManager childManager = null

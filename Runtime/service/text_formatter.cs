@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Text.RegularExpressions;
-using UIWidgets.foundation;
+using Unity.UIWidgets.foundation;
 
-namespace UIWidgets.service
+namespace Unity.UIWidgets.service
 {
     public abstract class TextInputFormatter
     {

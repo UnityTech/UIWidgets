@@ -1,18 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using RSG;
-using UIWidgets.animation;
-using UIWidgets.foundation;
-using UIWidgets.painting;
-using UIWidgets.rendering;
-using UIWidgets.service;
-using UIWidgets.ui;
-using Color = UIWidgets.ui.Color;
-using Rect = UIWidgets.ui.Rect;
-using TextStyle = UIWidgets.painting.TextStyle;
-using Timer = UIWidgets.async.Timer; 
+using Unity.UIWidgets.animation;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.painting;
+using Unity.UIWidgets.rendering;
+using Unity.UIWidgets.service;
+using Unity.UIWidgets.ui;
+using Color = Unity.UIWidgets.ui.Color;
+using Rect = Unity.UIWidgets.ui.Rect;
+using TextStyle = Unity.UIWidgets.painting.TextStyle;
+using Timer = Unity.UIWidgets.async.Timer; 
 
-namespace UIWidgets.widgets
+namespace Unity.UIWidgets.widgets
 {
     public delegate void SelectionChangedCallback(TextSelection selection, SelectionChangedCause cause);
 

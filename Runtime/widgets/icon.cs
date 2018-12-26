@@ -1,9 +1,9 @@
-using UIWidgets.foundation;
-using UIWidgets.painting;
-using UIWidgets.ui;
-using TextStyle = UIWidgets.painting.TextStyle;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.painting;
+using Unity.UIWidgets.ui;
+using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
-namespace UIWidgets.widgets {
+namespace Unity.UIWidgets.widgets {
     public class Icon : StatelessWidget {
         public Icon(IconData icon,
             Key key = null,

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using UIWidgets.rendering;
+using Unity.UIWidgets.rendering;
 
-namespace UIWidgets.widgets {
+namespace Unity.UIWidgets.widgets {
 
  
     public abstract class ViewportNotificationMixinNotification : Notification {

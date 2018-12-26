@@ -1,7 +1,7 @@
-using UIWidgets.painting;
-using UIWidgets.scheduler;
+using Unity.UIWidgets.painting;
+using Unity.UIWidgets.scheduler;
 
-namespace UIWidgets.widgets {
+namespace Unity.UIWidgets.widgets {
     public interface ScrollContext {
         BuildContext notificationContext { get; }
 

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Object = System.Object;
 
-namespace UIWidgets.painting {
+namespace Unity.UIWidgets.painting {
     public class ImageCache {
         private const int _kDefaultSize = 1000;
         private const int _kDefaultSizeBytes = 20 << 20; // 20 MiB

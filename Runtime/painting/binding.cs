@@ -1,6 +1,6 @@
-using UIWidgets.ui;
+using Unity.UIWidgets.ui;
 
-namespace UIWidgets.painting {
+namespace Unity.UIWidgets.painting {
     public class PaintingBinding {
 
         public PaintingBinding(Window window) {

@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using UIWidgets.foundation;
-using UIWidgets.ui;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.ui;
 
-namespace UIWidgets.widgets
+namespace Unity.UIWidgets.widgets
 {
     public class FocusNode : ChangeNotifier {
         internal FocusScopeNode _parent;

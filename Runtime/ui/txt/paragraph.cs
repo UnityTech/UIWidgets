@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using UIWidgets.foundation;
-using UIWidgets.ui.txt;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.ui.txt;
 using UnityEngine;
 
-namespace UIWidgets.ui
+namespace Unity.UIWidgets.ui
 {
     
     public struct Vector2d

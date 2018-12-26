@@ -1,6 +1,6 @@
-using UIWidgets.foundation;
+using Unity.UIWidgets.foundation;
 
-namespace UIWidgets.widgets {
+namespace Unity.UIWidgets.widgets {
     public class PrimaryScrollController : InheritedWidget {
         public PrimaryScrollController(
             Key key = null,

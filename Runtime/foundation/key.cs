@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace UIWidgets.foundation {
+namespace Unity.UIWidgets.foundation {
     public abstract class Key {
         protected Key() {
         }

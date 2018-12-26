@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using RSG.Promises;
-using UIWidgets.async;
-using UIWidgets.foundation;
-using UIWidgets.ui;
+using Unity.UIWidgets.async;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.ui;
 
-namespace UIWidgets.gestures {
+namespace Unity.UIWidgets.gestures {
     public delegate void GestureDoubleTapCallback();
 
     class _TapTracker {

@@ -1,8 +1,8 @@
 using System;
-using UIWidgets.editor;
-using UIWidgets.ui;
+using Unity.UIWidgets.editor;
+using Unity.UIWidgets.ui;
 
-namespace UIWidgets.flow {
+namespace Unity.UIWidgets.flow {
     public class CompositorContext {
         public class ScopedFrame : IDisposable {
             readonly CompositorContext _context;

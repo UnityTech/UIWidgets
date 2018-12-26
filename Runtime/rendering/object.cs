@@ -1,15 +1,15 @@
 using System;
 using System.Collections.Generic;
-using UIWidgets.animation;
-using UIWidgets.foundation;
-using UIWidgets.gestures;
-using UIWidgets.painting;
-using UIWidgets.ui;
+using Unity.UIWidgets.animation;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.gestures;
+using Unity.UIWidgets.painting;
+using Unity.UIWidgets.ui;
 using UnityEngine;
-using Canvas = UIWidgets.ui.Canvas;
-using Rect = UIWidgets.ui.Rect;
+using Canvas = Unity.UIWidgets.ui.Canvas;
+using Rect = Unity.UIWidgets.ui.Rect;
 
-namespace UIWidgets.rendering {
+namespace Unity.UIWidgets.rendering {
     public class ParentData {
         public virtual void detach() {
         }

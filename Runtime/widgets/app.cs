@@ -1,12 +1,12 @@
 ﻿using System;
-using UIWidgets.foundation;
-using UIWidgets.gestures;
-using UIWidgets.painting;
-using UIWidgets.ui;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.gestures;
+using Unity.UIWidgets.painting;
+using Unity.UIWidgets.ui;
 using UnityEngine;
-using Color = UIWidgets.ui.Color;
+using Color = Unity.UIWidgets.ui.Color;
 
-namespace UIWidgets.widgets
+namespace Unity.UIWidgets.widgets
 {
     public class WidgetsApp : StatefulWidget
     {

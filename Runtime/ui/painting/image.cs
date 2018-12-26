@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace UIWidgets.ui {
+namespace Unity.UIWidgets.ui {
     public class Image {
         public Image(byte[] raw = null, Texture2D texture = null) {
             this.rawData = raw ?? new byte[0];

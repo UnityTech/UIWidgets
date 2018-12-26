@@ -1,12 +1,12 @@
 ﻿using System;
-using UIWidgets.foundation;
-using UIWidgets.gestures;
-using UIWidgets.painting;
-using UIWidgets.ui;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.gestures;
+using Unity.UIWidgets.painting;
+using Unity.UIWidgets.ui;
 using UnityEngine;
-using Rect = UIWidgets.ui.Rect;
+using Rect = Unity.UIWidgets.ui.Rect;
 
-namespace UIWidgets.rendering {
+namespace Unity.UIWidgets.rendering {
     public class ViewConfiguration {
         public ViewConfiguration(
             Size size = null,

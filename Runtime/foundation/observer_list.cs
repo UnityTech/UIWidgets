@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 
-namespace UIWidgets.foundation {
+namespace Unity.UIWidgets.foundation {
     public class ObserverList<T> : ICollection<T> {
         public readonly List<T> _list = new List<T>();
         public bool _isDirty = false;

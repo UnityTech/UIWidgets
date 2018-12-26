@@ -1,7 +1,7 @@
-﻿using UIWidgets.ui;
+﻿using Unity.UIWidgets.ui;
 using UnityEngine;
 
-namespace UIWidgets.flow {
+namespace Unity.UIWidgets.flow {
     public class PictureLayer : Layer {
         private Offset _offset;
 

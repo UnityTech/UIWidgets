@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using UIWidgets.foundation;
-using UIWidgets.service;
-using UIWidgets.ui;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.service;
+using Unity.UIWidgets.ui;
 using UnityEngine;
-using Canvas = UIWidgets.ui.Canvas;
-using Rect = UIWidgets.ui.Rect;
+using Canvas = Unity.UIWidgets.ui.Canvas;
+using Rect = Unity.UIWidgets.ui.Rect;
 
-namespace UIWidgets.painting
+namespace Unity.UIWidgets.painting
 {
     public class TextPainter
     {

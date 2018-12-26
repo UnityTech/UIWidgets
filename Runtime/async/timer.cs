@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace UIWidgets.async {
+namespace Unity.UIWidgets.async {
     public abstract class Timer {
         public abstract void cancel();
 

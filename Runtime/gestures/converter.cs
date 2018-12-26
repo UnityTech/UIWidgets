@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using UIWidgets.foundation;
-using UIWidgets.ui;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.ui;
 
-namespace UIWidgets.gestures {
+namespace Unity.UIWidgets.gestures {
     class _PointerState {
         public _PointerState(Offset lastPosition) {
             this.lastPosition = lastPosition ?? Offset.zero;

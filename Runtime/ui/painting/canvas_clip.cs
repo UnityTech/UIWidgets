@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
-using UIWidgets.foundation;
+using Unity.UIWidgets.foundation;
 using UnityEngine;
 
-namespace UIWidgets.ui {
+namespace Unity.UIWidgets.ui {
     internal class ClipElement {
         public readonly int saveCount;
         public readonly Mesh mesh;

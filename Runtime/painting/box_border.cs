@@ -1,10 +1,10 @@
 using System;
 using System.Runtime.CompilerServices;
-using UIWidgets.foundation;
-using UIWidgets.ui;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.ui;
 using UnityEditor;
 
-namespace UIWidgets.painting {
+namespace Unity.UIWidgets.painting {
     public class Border : IEquatable<Border> {
         public Border(
             BorderSide top = null,

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using UIWidgets.ui;
+using Unity.UIWidgets.ui;
 using UnityEngine;
 
-namespace UIWidgets.foundation {
+namespace Unity.UIWidgets.foundation {
     public interface Listenable {
         void addListener(VoidCallback listener);
 

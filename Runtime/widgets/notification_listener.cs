@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using UIWidgets.foundation;
+using Unity.UIWidgets.foundation;
 
-namespace UIWidgets.widgets {
+namespace Unity.UIWidgets.widgets {
     public delegate bool NotificationListenerCallback<T>(T notification) where T : Notification;
 
     public abstract class Notification {

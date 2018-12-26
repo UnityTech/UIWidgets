@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using UIWidgets.foundation;
-using UIWidgets.scheduler;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.scheduler;
 
-namespace UIWidgets.widgets {
+namespace Unity.UIWidgets.widgets {
     public class TickerMode : InheritedWidget {
         public TickerMode(
             Key key = null,

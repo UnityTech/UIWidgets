@@ -1,8 +1,8 @@
 using System;
-using UIWidgets.foundation;
-using UIWidgets.ui;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.ui;
 
-namespace UIWidgets.widgets {
+namespace Unity.UIWidgets.widgets {
     public class IconThemeData : Diagnosticable, IEquatable<IconThemeData> {
         public IconThemeData(
             Color color = null,

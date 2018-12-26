@@ -1,4 +1,4 @@
-namespace UIWidgets.gestures {
+namespace Unity.UIWidgets.gestures {
     public delegate void GestureLongPressCallback();
 
     public class LongPressGestureRecognizer : PrimaryPointerGestureRecognizer {

@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using UIWidgets.editor;
-using UIWidgets.painting;
-using UIWidgets.rendering;
-using UIWidgets.ui;
+using Unity.UIWidgets.editor;
+using Unity.UIWidgets.painting;
+using Unity.UIWidgets.rendering;
+using Unity.UIWidgets.ui;
 using UnityEditor;
 using UnityEngine;
-using Color = UIWidgets.ui.Color;
+using Color = Unity.UIWidgets.ui.Color;
 
 namespace UIWidgets.Tests {
     public class RenderBoxes : EditorWindow {

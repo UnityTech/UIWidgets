@@ -1,7 +1,7 @@
 using System;
-using UIWidgets.foundation;
+using Unity.UIWidgets.foundation;
 
-namespace UIWidgets.physics {
+namespace Unity.UIWidgets.physics {
     public class SpringDescription {
         public SpringDescription(
             double mass,

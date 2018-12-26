@@ -3,10 +3,10 @@ using RSG;
 using System.Net;
 using System;
 using System.IO;
-using UIWidgets.lib.cache_manager;
-using UIWidgets.ui;
+using Unity.UIWidgets.lib.cache_manager;
+using Unity.UIWidgets.ui;
 
-namespace UIWidgets.painting {
+namespace Unity.UIWidgets.painting {
     public abstract class ImageProvider {
         public abstract ImageStream resolve(ImageConfiguration configuration);
     }

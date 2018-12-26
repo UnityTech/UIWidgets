@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using UIWidgets.ui;
+using Unity.UIWidgets.ui;
 using Matrix4x4 = UnityEngine.Matrix4x4;
 
-namespace UIWidgets.flow {
+namespace Unity.UIWidgets.flow {
     public abstract class ContainerLayer : Layer {
         private readonly List<Layer> _layers = new List<Layer>();
 

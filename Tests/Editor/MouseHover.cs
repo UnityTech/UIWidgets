@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
-using UIWidgets.foundation;
-using UIWidgets.painting;
-using UIWidgets.rendering;
-using UIWidgets.widgets;
-using Color = UIWidgets.ui.Color;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.painting;
+using Unity.UIWidgets.rendering;
+using Unity.UIWidgets.widgets;
+using Color = Unity.UIWidgets.ui.Color;
 
 namespace UIWidgets.Tests
 {

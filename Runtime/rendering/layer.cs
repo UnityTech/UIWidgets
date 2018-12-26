@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
-using UIWidgets.foundation;
-using UIWidgets.ui;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.ui;
 using UnityEngine;
-using Rect = UIWidgets.ui.Rect;
+using Rect = Unity.UIWidgets.ui.Rect;
 
-namespace UIWidgets.rendering {
+namespace Unity.UIWidgets.rendering {
     public abstract class Layer : AbstractNodeMixinDiagnosticableTree {
         public new ContainerLayer parent {
             get { return (ContainerLayer) base.parent; }

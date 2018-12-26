@@ -1,9 +1,9 @@
 using System;
 using System.Diagnostics;
-using UIWidgets.painting;
-using UIWidgets.ui;
+using Unity.UIWidgets.painting;
+using Unity.UIWidgets.ui;
 
-namespace UIWidgets.foundation {
+namespace Unity.UIWidgets.foundation {
     public static class D {
         [Conditional("UIWidgets_DEBUG")]
         public static void assert(Func<bool> result, string message = null) {

@@ -1,8 +1,8 @@
 using System;
-using UIWidgets.flow;
-using UIWidgets.foundation;
+using Unity.UIWidgets.flow;
+using Unity.UIWidgets.foundation;
 
-namespace UIWidgets.editor {
+namespace Unity.UIWidgets.editor {
     public class Rasterizer {
         Surface _surface;
         CompositorContext _compositorContext;

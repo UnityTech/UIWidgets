@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace UIWidgets.flow {
+namespace Unity.UIWidgets.flow {
     public class MatrixDecomposition {
         public MatrixDecomposition(Matrix4x4 matrix) {
             if (matrix[3, 3] == 0) {

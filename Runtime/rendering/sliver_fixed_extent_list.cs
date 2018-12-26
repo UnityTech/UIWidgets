@@ -1,8 +1,8 @@
 using System;
-using UIWidgets.foundation;
-using UIWidgets.ui;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.ui;
 
-namespace UIWidgets.rendering {
+namespace Unity.UIWidgets.rendering {
     public abstract class RenderSliverFixedExtentBoxAdaptor : RenderSliverMultiBoxAdaptor {
         protected RenderSliverFixedExtentBoxAdaptor(
             RenderSliverBoxChildManager childManager = null

@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using UIWidgets.foundation;
-using UIWidgets.gestures;
-using UIWidgets.painting;
-using UIWidgets.rendering;
-using UIWidgets.scheduler;
-using UIWidgets.ui;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.gestures;
+using Unity.UIWidgets.painting;
+using Unity.UIWidgets.rendering;
+using Unity.UIWidgets.scheduler;
+using Unity.UIWidgets.ui;
 using UnityEngine;
-using Color = UIWidgets.ui.Color;
-using Rect = UIWidgets.ui.Rect;
+using Color = Unity.UIWidgets.ui.Color;
+using Rect = Unity.UIWidgets.ui.Rect;
 
-namespace UIWidgets.widgets
+namespace Unity.UIWidgets.widgets
 {
     public delegate Widget InspectorSelectButtonBuilder(BuildContext context, VoidCallback onPressed);
     internal class _SerializeConfig

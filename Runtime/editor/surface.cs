@@ -1,12 +1,12 @@
 using System;
-using UIWidgets.foundation;
-using UIWidgets.ui;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.ui;
 using UnityEngine;
-using Canvas = UIWidgets.ui.Canvas;
+using Canvas = Unity.UIWidgets.ui.Canvas;
 using Object = UnityEngine.Object;
 using Rect = UnityEngine.Rect;
 
-namespace UIWidgets.editor {
+namespace Unity.UIWidgets.editor {
     public delegate bool SubmitCallback(SurfaceFrame surfaceFrame, Canvas canvas);
 
     public class SurfaceFrame : IDisposable {

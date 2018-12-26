@@ -1,8 +1,8 @@
 using System;
-using UIWidgets.foundation;
-using UIWidgets.ui;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.ui;
 
-namespace UIWidgets.animation {
+namespace Unity.UIWidgets.animation {
     class _AlwaysCompleteAnimation : Animation<double> {
         internal _AlwaysCompleteAnimation() {
         }

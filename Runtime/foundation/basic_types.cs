@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace UIWidgets.foundation {
+namespace Unity.UIWidgets.foundation {
     
     public delegate void ValueChanged<T>(T value);
 

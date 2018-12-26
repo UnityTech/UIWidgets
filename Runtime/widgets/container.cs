@@ -1,10 +1,10 @@
-using UIWidgets.foundation;
-using UIWidgets.rendering;
-using UIWidgets.painting;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.rendering;
+using Unity.UIWidgets.painting;
 using UnityEngine;
-using Color = UIWidgets.ui.Color;
+using Color = Unity.UIWidgets.ui.Color;
 
-namespace UIWidgets.widgets {
+namespace Unity.UIWidgets.widgets {
     public class DecoratedBox : SingleChildRenderObjectWidget {
         public DecoratedBox(
             Key key = null,

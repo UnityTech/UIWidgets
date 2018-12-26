@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace UIWidgets.ui {
+namespace Unity.UIWidgets.ui {
     public enum PointerChange {
         cancel,
         add,

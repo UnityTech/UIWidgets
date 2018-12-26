@@ -1,6 +1,6 @@
-﻿using UIWidgets.ui;
+﻿using Unity.UIWidgets.ui;
 
-namespace UIWidgets.flow {
+namespace Unity.UIWidgets.flow {
     public class OpacityLayer : ContainerLayer {
         private int _alpha;
 

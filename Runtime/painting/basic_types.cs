@@ -1,9 +1,9 @@
 ﻿using System;
-using UIWidgets.foundation;
-using UIWidgets.ui;
-using UIWidgets.widgets;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.ui;
+using Unity.UIWidgets.widgets;
 
-namespace UIWidgets.painting {
+namespace Unity.UIWidgets.painting {
     public enum AxisDirection {
         up,
         right,

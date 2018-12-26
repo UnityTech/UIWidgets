@@ -1,9 +1,9 @@
 ﻿using System;
-using UIWidgets.async;
-using UIWidgets.service;
-using UIWidgets.foundation;
+using Unity.UIWidgets.async;
+using Unity.UIWidgets.service;
+using Unity.UIWidgets.foundation;
 
-namespace UIWidgets.ui {
+namespace Unity.UIWidgets.ui {
     public delegate void VoidCallback();
 
     public delegate void FrameCallback(TimeSpan duration);

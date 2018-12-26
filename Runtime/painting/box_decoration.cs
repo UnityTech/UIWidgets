@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
-using UIWidgets.foundation;
-using UIWidgets.ui;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.ui;
 using UnityEditor;
 
-namespace UIWidgets.painting {
+namespace Unity.UIWidgets.painting {
     public class BoxDecoration : Decoration, IEquatable<BoxDecoration> {
         public BoxDecoration(
             Color color = null,

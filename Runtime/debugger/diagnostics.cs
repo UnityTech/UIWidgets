@@ -2,10 +2,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UIWidgets.foundation;
-using UIWidgets.ui;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.ui;
 
-namespace UIWidgets.debugger
+namespace Unity.UIWidgets.debugger
 {
     public class DiagnosticsNode : IEquatable<DiagnosticsNode>
     {

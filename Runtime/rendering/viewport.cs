@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using UIWidgets.animation;
-using UIWidgets.foundation;
-using UIWidgets.gestures;
-using UIWidgets.painting;
-using UIWidgets.ui;
+using Unity.UIWidgets.animation;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.gestures;
+using Unity.UIWidgets.painting;
+using Unity.UIWidgets.ui;
 using UnityEngine;
-using Canvas = UIWidgets.ui.Canvas;
-using Rect = UIWidgets.ui.Rect;
-using Color = UIWidgets.ui.Color;
+using Canvas = Unity.UIWidgets.ui.Canvas;
+using Rect = Unity.UIWidgets.ui.Rect;
+using Color = Unity.UIWidgets.ui.Color;
 
-namespace UIWidgets.rendering {
+namespace Unity.UIWidgets.rendering {
     public interface RenderAbstractViewport {
         RevealedOffset getOffsetToReveal(RenderObject target, double alignment, Rect rect = null);
         RenderObject parent { get; }

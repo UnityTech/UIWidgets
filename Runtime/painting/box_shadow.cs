@@ -1,7 +1,7 @@
 using System;
-using UIWidgets.ui;
+using Unity.UIWidgets.ui;
 
-namespace UIWidgets.painting {
+namespace Unity.UIWidgets.painting {
     public class BoxShadow : IEquatable<BoxShadow> {
         public BoxShadow(
             Color color = null,

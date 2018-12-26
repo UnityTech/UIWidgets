@@ -1,7 +1,7 @@
-using UIWidgets.ui;
+using Unity.UIWidgets.ui;
 using System;
 
-namespace UIWidgets.painting {
+namespace Unity.UIWidgets.painting {
     public enum BoxFit {
         fill,
         contain,

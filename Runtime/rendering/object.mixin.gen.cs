@@ -1,10 +1,10 @@
 // AUTO-GENERATED, DO NOT EDIT BY HAND
 
 using System.Collections.Generic;
-using UIWidgets.foundation;
+using Unity.UIWidgets.foundation;
 using UnityEngine;
 
-namespace UIWidgets.rendering {
+namespace Unity.UIWidgets.rendering {
 
     public abstract class RenderObjectWithChildMixinRenderObject<ChildType> : RenderObject, RenderObjectWithChildMixin<ChildType>, RenderObjectWithChildMixin where ChildType : RenderObject {
         public bool debugValidateChild(RenderObject child) {

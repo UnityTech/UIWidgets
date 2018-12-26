@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
-using UIWidgets.painting;
-using UIWidgets.foundation;
-using UIWidgets.ui;
+using Unity.UIWidgets.painting;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.ui;
 using UnityEngine;
-using Color = UIWidgets.ui.Color;
+using Color = Unity.UIWidgets.ui.Color;
 
-namespace UIWidgets.widgets {
+namespace Unity.UIWidgets.widgets {
     internal class ImageUtil {
         public static ImageConfiguration createLocalImageConfiguration(BuildContext context, Size size = null) {
             return new ImageConfiguration(

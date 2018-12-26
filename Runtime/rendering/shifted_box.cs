@@ -1,10 +1,10 @@
 ﻿using System;
-using UIWidgets.foundation;
-using UIWidgets.gestures;
-using UIWidgets.painting;
-using UIWidgets.ui;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.gestures;
+using Unity.UIWidgets.painting;
+using Unity.UIWidgets.ui;
 
-namespace UIWidgets.rendering {
+namespace Unity.UIWidgets.rendering {
     public abstract class RenderShiftedBox : RenderObjectWithChildMixinRenderBox<RenderBox> {
         protected RenderShiftedBox(RenderBox child) {
             this.child = child;

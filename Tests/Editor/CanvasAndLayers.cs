@@ -1,18 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using UIWidgets.editor;
-using UIWidgets.painting;
-using UIWidgets.ui;
+using Unity.UIWidgets.editor;
+using Unity.UIWidgets.painting;
+using Unity.UIWidgets.ui;
 using UnityEditor;
 using UnityEditor.Experimental.UIElements;
 using UnityEngine;
 using UnityEngine.Rendering;
-using BlendMode = UIWidgets.ui.BlendMode;
-using Color = UIWidgets.ui.Color;
-using Gradient = UIWidgets.ui.Gradient;
+using BlendMode = Unity.UIWidgets.ui.BlendMode;
+using Color = Unity.UIWidgets.ui.Color;
+using Gradient = Unity.UIWidgets.ui.Gradient;
 using Random = System.Random;
-using Rect = UIWidgets.ui.Rect;
+using Rect = Unity.UIWidgets.ui.Rect;
 
 namespace UIWidgets.Tests {
 

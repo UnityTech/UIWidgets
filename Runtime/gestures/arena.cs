@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using UIWidgets.foundation;
-using UIWidgets.ui;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.ui;
 using UnityEngine;
 
-namespace UIWidgets.gestures {
+namespace Unity.UIWidgets.gestures {
     public enum GestureDisposition {
         accepted,
         rejected,

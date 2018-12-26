@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using RSG;
-using UIWidgets.animation;
-using UIWidgets.foundation;
+using Unity.UIWidgets.animation;
+using Unity.UIWidgets.foundation;
 
-namespace UIWidgets.rendering {
+namespace Unity.UIWidgets.rendering {
     public enum ScrollDirection {
         idle,
         forward,

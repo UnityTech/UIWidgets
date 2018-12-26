@@ -1,10 +1,10 @@
 using System;
-using UIWidgets.foundation;
-using UIWidgets.gestures;
-using UIWidgets.physics;
-using UIWidgets.ui;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.gestures;
+using Unity.UIWidgets.physics;
+using Unity.UIWidgets.ui;
 
-namespace UIWidgets.widgets {
+namespace Unity.UIWidgets.widgets {
     public class ScrollPhysics {
         public ScrollPhysics(ScrollPhysics parent) {
             this.parent = parent;

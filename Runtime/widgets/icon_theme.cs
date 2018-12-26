@@ -1,6 +1,6 @@
-using UIWidgets.foundation;
+using Unity.UIWidgets.foundation;
 
-namespace UIWidgets.widgets {
+namespace Unity.UIWidgets.widgets {
     public class IconTheme : InheritedWidget {
         public IconTheme(
             Key key = null,

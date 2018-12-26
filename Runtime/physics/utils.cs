@@ -1,6 +1,6 @@
-using UIWidgets.foundation;
+using Unity.UIWidgets.foundation;
 
-namespace UIWidgets.physics {
+namespace Unity.UIWidgets.physics {
     public class PhysicsUtils {
         public static bool nearEqual(double? a, double? b, double epsilon) {
             D.assert(epsilon >= 0.0);

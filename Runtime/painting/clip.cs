@@ -1,8 +1,8 @@
 using System;
-using UIWidgets.foundation;
-using UIWidgets.ui;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.ui;
 
-namespace UIWidgets.painting {
+namespace Unity.UIWidgets.painting {
     public abstract class ClipContext {
         public abstract Canvas canvas { get; }
 

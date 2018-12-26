@@ -1,9 +1,9 @@
-﻿using UIWidgets.ui;
+﻿using Unity.UIWidgets.ui;
 using UnityEngine;
-using Rect = UIWidgets.ui.Rect;
-using Canvas = UIWidgets.ui.Canvas;
+using Rect = Unity.UIWidgets.ui.Rect;
+using Canvas = Unity.UIWidgets.ui.Canvas;
 
-namespace UIWidgets.flow {
+namespace Unity.UIWidgets.flow {
     public class PrerollContext {
         public RasterCache rasterCache;
         public float devicePixelRatio;

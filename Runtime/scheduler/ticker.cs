@@ -3,10 +3,10 @@ using System.Diagnostics;
 using System.Text;
 using RSG;
 using RSG.Promises;
-using UIWidgets.foundation;
-using UIWidgets.ui;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.ui;
 
-namespace UIWidgets.scheduler {
+namespace Unity.UIWidgets.scheduler {
     public delegate void TickerCallback(TimeSpan elapsed);
 
     public interface TickerProvider {

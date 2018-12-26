@@ -1,15 +1,15 @@
 using System.Collections.Generic;
 using System.Linq;
-using UIWidgets.foundation;
-using UIWidgets.painting;
-using UIWidgets.rendering;
-using UIWidgets.ui;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.painting;
+using Unity.UIWidgets.rendering;
+using Unity.UIWidgets.ui;
 using UnityEngine;
-using Color = UIWidgets.ui.Color;
-using Overflow = UIWidgets.rendering.Overflow;
-using Rect = UIWidgets.ui.Rect;
+using Color = Unity.UIWidgets.ui.Color;
+using Overflow = Unity.UIWidgets.rendering.Overflow;
+using Rect = Unity.UIWidgets.ui.Rect;
 
-namespace UIWidgets.widgets {
+namespace Unity.UIWidgets.widgets {
     public class Directionality : InheritedWidget {
         public Directionality(
             Widget child,

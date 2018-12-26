@@ -2,12 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using UIWidgets.foundation;
+using Unity.UIWidgets.foundation;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 
-namespace UIWidgets.debugger
+namespace Unity.UIWidgets.debugger
 {
     public class InspectorTreeView : TreeView
     {

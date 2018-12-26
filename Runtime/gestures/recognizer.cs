@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
-using UIWidgets.async;
-using UIWidgets.foundation;
-using UIWidgets.ui;
+using Unity.UIWidgets.async;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.ui;
 using UnityEngine;
 
-namespace UIWidgets.gestures {
+namespace Unity.UIWidgets.gestures {
     public delegate T RecognizerCallback<T>();
 
     public abstract class GestureRecognizer : DiagnosticableTree, GestureArenaMember {

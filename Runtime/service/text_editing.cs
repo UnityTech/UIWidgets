@@ -1,8 +1,8 @@
 ﻿using System;
-using UIWidgets.foundation;
-using UIWidgets.ui;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.ui;
 
-namespace UIWidgets.service
+namespace Unity.UIWidgets.service
 {
     public class TextRange: IEquatable<TextRange>
     {

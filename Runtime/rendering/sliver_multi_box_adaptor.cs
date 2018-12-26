@@ -1,12 +1,12 @@
 using System.Collections.Generic;
 using System.Linq;
-using UIWidgets.foundation;
-using UIWidgets.gestures;
-using UIWidgets.painting;
-using UIWidgets.ui;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.gestures;
+using Unity.UIWidgets.painting;
+using Unity.UIWidgets.ui;
 using UnityEngine;
 
-namespace UIWidgets.rendering {
+namespace Unity.UIWidgets.rendering {
     public interface RenderSliverBoxChildManager {
         void createChild(int index, RenderBox after = null);
 

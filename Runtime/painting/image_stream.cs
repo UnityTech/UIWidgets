@@ -1,12 +1,12 @@
 using RSG;
-using UIWidgets.ui;
+using Unity.UIWidgets.ui;
 using UnityEngine;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace UIWidgets.painting {
+namespace Unity.UIWidgets.painting {
     public delegate void ImageListener(ImageInfo image, bool synchronousCall);
 
     public delegate void ImageErrorListerner(System.Object exception, string stackTrack);

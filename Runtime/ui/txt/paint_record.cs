@@ -1,6 +1,6 @@
-﻿using UIWidgets.ui.txt;
+﻿using Unity.UIWidgets.ui.txt;
 
-namespace UIWidgets.ui
+namespace Unity.UIWidgets.ui
 {
     public class PaintRecord
     {

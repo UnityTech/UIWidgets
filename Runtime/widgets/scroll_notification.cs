@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using UIWidgets.gestures;
-using UIWidgets.rendering;
+using Unity.UIWidgets.gestures;
+using Unity.UIWidgets.rendering;
 
-namespace UIWidgets.widgets {
+namespace Unity.UIWidgets.widgets {
     public abstract class ScrollNotification : ViewportNotificationMixinLayoutChangedNotification {
         protected ScrollNotification(
             ScrollMetrics metrics = null,

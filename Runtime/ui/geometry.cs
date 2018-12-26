@@ -1,6 +1,6 @@
 using System;
 
-namespace UIWidgets.ui {
+namespace Unity.UIWidgets.ui {
     public static class MathUtils {
         public static double clamp(this double value, double min, double max) {
             if (value < min) {

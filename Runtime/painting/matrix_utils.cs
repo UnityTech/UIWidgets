@@ -1,10 +1,10 @@
 ﻿using System;
-using UIWidgets.foundation;
-using UIWidgets.ui;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.ui;
 using UnityEngine;
-using Rect = UIWidgets.ui.Rect;
+using Rect = Unity.UIWidgets.ui.Rect;
 
-namespace UIWidgets.painting {
+namespace Unity.UIWidgets.painting {
     public static class MatrixUtils {
         public static Offset transformPoint(this Matrix4x4 transform, Offset point) {
             var position3 = new Vector3((float) point.dx, (float) point.dy, 0);

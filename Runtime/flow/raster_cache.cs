@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
-using UIWidgets.foundation;
-using UIWidgets.ui;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.ui;
 using UnityEngine;
-using Canvas = UIWidgets.ui.Canvas;
+using Canvas = Unity.UIWidgets.ui.Canvas;
 using Object = UnityEngine.Object;
-using Rect = UIWidgets.ui.Rect;
+using Rect = Unity.UIWidgets.ui.Rect;
 
-namespace UIWidgets.flow {
+namespace Unity.UIWidgets.flow {
     public class RasterCacheResult {
         public RasterCacheResult(Texture texture, Rect logicalRect, float devicePixelRatio) {
             D.assert(texture != null);

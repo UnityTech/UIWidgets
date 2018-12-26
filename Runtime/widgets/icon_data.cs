@@ -1,6 +1,6 @@
 using System;
 
-namespace UIWidgets.widgets {
+namespace Unity.UIWidgets.widgets {
     public class IconData : IEquatable<IconData> {
         public IconData(
             int codePoint,

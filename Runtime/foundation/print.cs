@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-namespace UIWidgets.foundation {
+namespace Unity.UIWidgets.foundation {
     enum _WordWrapParseMode {
         inSpace,
         inWord,

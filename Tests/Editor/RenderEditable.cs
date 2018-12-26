@@ -3,15 +3,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using RSG;
-using UIWidgets.animation;
-using UIWidgets.editor;
-using UIWidgets.foundation;
-using UIWidgets.painting;
-using UIWidgets.rendering;
-using UIWidgets.service;
-using UIWidgets.ui;
+using Unity.UIWidgets.animation;
+using Unity.UIWidgets.editor;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.painting;
+using Unity.UIWidgets.rendering;
+using Unity.UIWidgets.service;
+using Unity.UIWidgets.ui;
 using UnityEngine;
-using Color = UIWidgets.ui.Color;
+using Color = Unity.UIWidgets.ui.Color;
 
 namespace UIWidgets.Tests
 {

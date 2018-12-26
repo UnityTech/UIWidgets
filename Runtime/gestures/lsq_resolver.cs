@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UIWidgets.foundation;
+using Unity.UIWidgets.foundation;
 
-namespace UIWidgets.gestures {
+namespace Unity.UIWidgets.gestures {
     class _Vector {
         internal _Vector(int size) {
             this._offset = 0;

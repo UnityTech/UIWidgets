@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using UIWidgets.painting;
-using UIWidgets.ui;
-using UIWidgets.foundation;
-using UIWidgets.gestures;
+using Unity.UIWidgets.painting;
+using Unity.UIWidgets.ui;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.gestures;
 using UnityEngine;
-using Rect = UIWidgets.ui.Rect;
+using Rect = Unity.UIWidgets.ui.Rect;
 
-namespace UIWidgets.rendering {
+namespace Unity.UIWidgets.rendering {
     public class RelativeRect : IEquatable<RelativeRect> {
         private RelativeRect(double left, double top, double right, double bottom) {
             this.left = left;

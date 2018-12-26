@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using RSG;
-using UIWidgets.animation;
-using UIWidgets.foundation;
-using UIWidgets.ui;
+using Unity.UIWidgets.animation;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.ui;
 
-namespace UIWidgets.widgets {
+namespace Unity.UIWidgets.widgets {
     public class ScrollController : ChangeNotifier {
         public ScrollController(
             double initialScrollOffset = 0.0,

@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
-using UIWidgets.foundation;
-using UIWidgets.rendering;
-using UIWidgets.ui;
-using UIWidgets.ui.painting.txt;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.rendering;
+using Unity.UIWidgets.ui;
+using Unity.UIWidgets.ui.painting.txt;
 
-namespace UIWidgets.widgets {
+namespace Unity.UIWidgets.widgets {
     public interface WidgetsBindingObserver {
         void didChangeMetrics();
     }

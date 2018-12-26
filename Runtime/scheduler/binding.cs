@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using RSG.Promises;
-using UIWidgets.foundation;
-using UIWidgets.ui;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.ui;
 using Debug = UnityEngine.Debug;
 
-namespace UIWidgets.scheduler {
+namespace Unity.UIWidgets.scheduler {
     class _FrameCallbackEntry {
         internal _FrameCallbackEntry(FrameCallback callback, bool rescheduling = false) {
             this.callback = callback;

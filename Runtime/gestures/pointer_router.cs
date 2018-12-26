@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using UIWidgets.foundation;
+using Unity.UIWidgets.foundation;
 using UnityEngine;
 
-namespace UIWidgets.gestures {
+namespace Unity.UIWidgets.gestures {
     public delegate void PointerRoute(PointerEvent evt);
 
     public class PointerRouter {

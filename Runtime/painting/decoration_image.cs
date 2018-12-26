@@ -1,11 +1,11 @@
 using System;
-using UIWidgets.ui;
+using Unity.UIWidgets.ui;
 using System.Collections.Generic;
 using UnityEngine;
-using Canvas = UIWidgets.ui.Canvas;
-using Rect = UIWidgets.ui.Rect;
+using Canvas = Unity.UIWidgets.ui.Canvas;
+using Rect = Unity.UIWidgets.ui.Rect;
 
-namespace UIWidgets.painting {
+namespace Unity.UIWidgets.painting {
     /// How to paint any portions of a box not covered by an image.
     public enum ImageRepeat {
         /// Repeat the image in both the x and y directions until the box is filled.

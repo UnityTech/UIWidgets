@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace UIWidgets.ui
+namespace Unity.UIWidgets.ui
 {
     internal class Utils
     {

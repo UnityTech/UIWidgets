@@ -1,8 +1,8 @@
 using System;
-using UIWidgets.foundation;
-using UIWidgets.ui;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.ui;
 
-namespace UIWidgets.physics {
+namespace Unity.UIWidgets.physics {
     public class FrictionSimulation : Simulation {
         public FrictionSimulation(
             double drag, double position, double velocity,

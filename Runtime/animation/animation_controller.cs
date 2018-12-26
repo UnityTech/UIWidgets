@@ -1,10 +1,10 @@
 using System;
-using UIWidgets.foundation;
-using UIWidgets.physics;
-using UIWidgets.scheduler;
-using UIWidgets.ui;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.physics;
+using Unity.UIWidgets.scheduler;
+using Unity.UIWidgets.ui;
 
-namespace UIWidgets.animation {
+namespace Unity.UIWidgets.animation {
     enum _AnimationDirection {
         forward,
         reverse,

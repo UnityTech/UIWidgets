@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace UIWidgets.ui
+namespace Unity.UIWidgets.ui
 {
     public class StyledRuns
     {

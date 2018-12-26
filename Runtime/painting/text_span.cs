@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using UIWidgets.foundation;
-using UIWidgets.gestures;
-using UIWidgets.ui;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.gestures;
+using Unity.UIWidgets.ui;
 using UnityEngine.Assertions;
 
-namespace UIWidgets.painting
+namespace Unity.UIWidgets.painting
 {
     public class GestureMock
     {

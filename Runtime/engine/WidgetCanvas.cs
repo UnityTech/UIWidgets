@@ -1,15 +1,15 @@
 ﻿using System;
-using UIWidgets.editor;
-using UIWidgets.painting;
-using UIWidgets.ui;
-using UIWidgets.widgets;
+using Unity.UIWidgets.editor;
+using Unity.UIWidgets.painting;
+using Unity.UIWidgets.ui;
+using Unity.UIWidgets.widgets;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Image = UnityEngine.UI.Image;
 using Rect = UnityEngine.Rect;
 
-namespace UIWidgets.engine
+namespace Unity.UIWidgets.engine
 {
     public class UIWidgetWindowAdapter : WindowAdapter
     {

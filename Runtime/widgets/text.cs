@@ -1,11 +1,11 @@
 using System.Collections.Generic;
-using UIWidgets.foundation;
-using UIWidgets.painting;
-using UIWidgets.rendering;
-using UIWidgets.ui;
-using TextStyle = UIWidgets.painting.TextStyle;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.painting;
+using Unity.UIWidgets.rendering;
+using Unity.UIWidgets.ui;
+using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
-namespace UIWidgets.widgets {
+namespace Unity.UIWidgets.widgets {
     public class DefaultTextStyle : InheritedWidget {
         public DefaultTextStyle(
             Key key = null,

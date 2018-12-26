@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UIWidgets.foundation;
+using Unity.UIWidgets.foundation;
 
-namespace UIWidgets.widgets {
+namespace Unity.UIWidgets.widgets {
     public interface PageStorageKey {
     }
 

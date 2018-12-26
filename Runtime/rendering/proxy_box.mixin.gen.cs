@@ -1,8 +1,8 @@
-﻿using UIWidgets.ui;
-using UIWidgets.gestures;
+﻿using Unity.UIWidgets.ui;
+using Unity.UIWidgets.gestures;
 using UnityEngine;
 
-namespace UIWidgets.rendering {
+namespace Unity.UIWidgets.rendering {
 
 
 

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Debug = UnityEngine.Debug;
 
-namespace UIWidgets.foundation {
+namespace Unity.UIWidgets.foundation {
     public delegate void UIWidgetsExceptionHandler(UIWidgetsErrorDetails details);
 
     public delegate void InformationCollector(StringBuilder information);

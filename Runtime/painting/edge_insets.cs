@@ -1,7 +1,7 @@
 using System;
-using UIWidgets.ui;
+using Unity.UIWidgets.ui;
 
-namespace UIWidgets.painting {
+namespace Unity.UIWidgets.painting {
     public class EdgeInsets : IEquatable<EdgeInsets> {
         private EdgeInsets(double left, double top, double right, double bottom) {
             this.left = left;

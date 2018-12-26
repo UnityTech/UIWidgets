@@ -8,10 +8,10 @@ using System.Linq;
 using UnityEngine;
 using System.Net;
 using Mono.Data.Sqlite;
-using UIWidgets.async;
-using UIWidgets.painting;
+using Unity.UIWidgets.async;
+using Unity.UIWidgets.painting;
 
-namespace UIWidgets.lib.cache_manager {
+namespace Unity.UIWidgets.lib.cache_manager {
     public class CacheManager {
         private readonly string _keyCacheData = "lib_cached_image_data";
         private readonly string _keyCacheCleanDate = "lib_cached_image_data_last_clean";

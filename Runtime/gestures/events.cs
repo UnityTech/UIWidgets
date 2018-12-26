@@ -1,7 +1,7 @@
 using System;
-using UIWidgets.ui;
+using Unity.UIWidgets.ui;
 
-namespace UIWidgets.gestures {
+namespace Unity.UIWidgets.gestures {
     public abstract class PointerEvent {
         public PointerEvent(
             DateTime timeStamp,

@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using UIWidgets.foundation;
-using UIWidgets.ui.painting.txt;
-using UIWidgets.ui.txt;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.ui.painting.txt;
+using Unity.UIWidgets.ui.txt;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Object = UnityEngine.Object;
 
-namespace UIWidgets.ui {
+namespace Unity.UIWidgets.ui {
     public class CommandBufferCanvas : Canvas {
         readonly RenderTexture _renderTexture;
         readonly float _fringeWidth;

@@ -1,4 +1,4 @@
-namespace UIWidgets.physics {
+namespace Unity.UIWidgets.physics {
     public abstract class Simulation {
         protected Simulation(Tolerance tolerance = null) {
             this.tolerance = tolerance ?? Tolerance.defaultTolerance;

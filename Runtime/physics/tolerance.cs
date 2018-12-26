@@ -1,4 +1,4 @@
-namespace UIWidgets.physics {
+namespace Unity.UIWidgets.physics {
     public class Tolerance {
         public Tolerance(
             double distance = _epsilonDefault,

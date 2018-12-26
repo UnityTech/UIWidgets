@@ -3,7 +3,7 @@ using System;
 using System.IO;
 using UnityEngine;
 
-namespace UIWidgets.lib.cache_manager {
+namespace Unity.UIWidgets.lib.cache_manager {
     public class CacheMeta {
         private static readonly string _directory = Application.persistentDataPath;
         public string relativePath = null;

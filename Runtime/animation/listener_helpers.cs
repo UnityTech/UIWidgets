@@ -1,2 +1,2 @@
-namespace UIWidgets.animation {
+namespace Unity.UIWidgets.animation {
 }

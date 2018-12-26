@@ -1,6 +1,6 @@
-﻿using UIWidgets.foundation;
+﻿using Unity.UIWidgets.foundation;
 
-namespace UIWidgets.ui.txt
+namespace Unity.UIWidgets.ui.txt
 {
     public class TextBlob
     {

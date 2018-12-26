@@ -1,8 +1,8 @@
 ﻿using System;
-using UIWidgets.ui.txt;
+using Unity.UIWidgets.ui.txt;
 using UnityEngine;
 
-namespace UIWidgets.ui {
+namespace Unity.UIWidgets.ui {
     public interface Canvas {
         void save();
 

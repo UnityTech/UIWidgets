@@ -1,9 +1,9 @@
-﻿using UIWidgets.ui;
+﻿using Unity.UIWidgets.ui;
 using UnityEngine;
-using Rect = UIWidgets.ui.Rect;
-using Color = UIWidgets.ui.Color;
+using Rect = Unity.UIWidgets.ui.Rect;
+using Color = Unity.UIWidgets.ui.Color;
 
-namespace UIWidgets.flow {
+namespace Unity.UIWidgets.flow {
     public class ClipRRectLayer : ContainerLayer {
         private RRect _clipRRect;
 

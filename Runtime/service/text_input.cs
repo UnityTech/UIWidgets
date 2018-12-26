@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using UIWidgets.foundation;
+using Unity.UIWidgets.foundation;
 using UnityEngine;
 
-namespace UIWidgets.service
+namespace Unity.UIWidgets.service
 {
     public class TextEditingValue:IEquatable<TextEditingValue>
     {

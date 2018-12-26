@@ -1,7 +1,7 @@
 using System;
-using UIWidgets.ui;
+using Unity.UIWidgets.ui;
 
-namespace UIWidgets.painting {
+namespace Unity.UIWidgets.painting {
     public class Alignment : IEquatable<Alignment> {
         public Alignment(double x, double y) {
             this.x = x;

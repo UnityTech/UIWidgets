@@ -1,17 +1,17 @@
-using UIWidgets.painting;
-using UIWidgets.editor;
-using UIWidgets.widgets;
+using Unity.UIWidgets.painting;
+using Unity.UIWidgets.editor;
+using Unity.UIWidgets.widgets;
 using System.Collections.Generic;
-using UIWidgets.rendering;
+using Unity.UIWidgets.rendering;
 using UnityEditor;
 using UnityEngine;
 using System;
 using System.Linq;
-using UIWidgets.foundation;
-using UIWidgets.gestures;
-using UIWidgets.ui;
-using Color = UIWidgets.ui.Color;
-using TextStyle = UIWidgets.painting.TextStyle;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.gestures;
+using Unity.UIWidgets.ui;
+using Color = Unity.UIWidgets.ui.Color;
+using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace UIWidgets.Tests {
     

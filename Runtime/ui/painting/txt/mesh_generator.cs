@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using UIWidgets.ui.txt;
+using Unity.UIWidgets.ui.txt;
 using UnityEngine;
 
-namespace UIWidgets.ui.painting.txt
+namespace Unity.UIWidgets.ui.painting.txt
 {
     // TODO: probably we don't need this cache.
     public class MeshKey : IEquatable<MeshKey>

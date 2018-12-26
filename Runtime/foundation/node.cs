@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace UIWidgets.foundation {
+namespace Unity.UIWidgets.foundation {
     class _DependencyList : IEquatable<_DependencyList> {
         internal _DependencyList(Type type, object target) {
             D.assert(type != null);

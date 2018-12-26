@@ -1,13 +1,13 @@
 using System;
 using System.Linq;
 using System.Reflection;
-using UIWidgets.editor;
-using UIWidgets.painting;
-using UIWidgets.rendering;
-using UIWidgets.widgets;
+using Unity.UIWidgets.editor;
+using Unity.UIWidgets.painting;
+using Unity.UIWidgets.rendering;
+using Unity.UIWidgets.widgets;
 using UnityEditor;
 using UnityEngine;
-using Color = UIWidgets.ui.Color;
+using Color = Unity.UIWidgets.ui.Color;
 
 namespace UIWidgets.Tests {
     public class SceneViewTests {

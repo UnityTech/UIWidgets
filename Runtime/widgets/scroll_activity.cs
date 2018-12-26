@@ -1,14 +1,14 @@
 using System;
 using RSG;
-using UIWidgets.animation;
-using UIWidgets.foundation;
-using UIWidgets.gestures;
-using UIWidgets.painting;
-using UIWidgets.physics;
-using UIWidgets.scheduler;
-using UIWidgets.ui;
+using Unity.UIWidgets.animation;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.gestures;
+using Unity.UIWidgets.painting;
+using Unity.UIWidgets.physics;
+using Unity.UIWidgets.scheduler;
+using Unity.UIWidgets.ui;
 
-namespace UIWidgets.widgets {
+namespace Unity.UIWidgets.widgets {
     public interface ScrollActivityDelegate {
         AxisDirection axisDirection { get; }
 

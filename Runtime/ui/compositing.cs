@@ -1,8 +1,8 @@
 ﻿using System;
-using UIWidgets.flow;
+using Unity.UIWidgets.flow;
 using UnityEngine;
 
-namespace UIWidgets.ui {
+namespace Unity.UIWidgets.ui {
     public class SceneBuilder {
         private ContainerLayer _rootLayer;
         private ContainerLayer _currentLayer;

@@ -1,7 +1,7 @@
-using UIWidgets.foundation;
-using UIWidgets.ui;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.ui;
 
-namespace UIWidgets.painting {
+namespace Unity.UIWidgets.painting {
     public abstract class Decoration : Diagnosticable {
         protected Decoration() {
         }

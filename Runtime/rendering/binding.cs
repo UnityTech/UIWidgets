@@ -1,10 +1,10 @@
 ﻿using System;
-using UIWidgets.foundation;
-using UIWidgets.gestures;
-using UIWidgets.scheduler;
-using UIWidgets.ui;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.gestures;
+using Unity.UIWidgets.scheduler;
+using Unity.UIWidgets.ui;
 
-namespace UIWidgets.rendering {
+namespace Unity.UIWidgets.rendering {
     public class RendererBinding : GestureBinding {
         public static new RendererBinding instance {
             get { return (RendererBinding) GestureBinding.instance; }

@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using UIWidgets.ui;
+using Unity.UIWidgets.ui;
 
-namespace UIWidgets.foundation {
+namespace Unity.UIWidgets.foundation {
     public enum DiagnosticLevel {
         hidden,
         fine,

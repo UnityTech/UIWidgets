@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using UnityEngine;
 
-namespace UIWidgets.debugger
+namespace Unity.UIWidgets.debugger
 {
     public class InspectorObjectGroupManager : Singleton<InspectorObjectGroupManager>
     {

@@ -1,8 +1,8 @@
 using System;
-using UIWidgets.foundation;
-using UIWidgets.ui;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.ui;
 
-namespace UIWidgets.gestures {
+namespace Unity.UIWidgets.gestures {
     public class DragDownDetails {
         public DragDownDetails(
             Offset globalPosition = null

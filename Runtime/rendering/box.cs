@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using UIWidgets.foundation;
-using UIWidgets.gestures;
-using UIWidgets.painting;
-using UIWidgets.ui;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.gestures;
+using Unity.UIWidgets.painting;
+using Unity.UIWidgets.ui;
 using UnityEngine;
-using Rect = UIWidgets.ui.Rect;
-using Color = UIWidgets.ui.Color;
+using Rect = Unity.UIWidgets.ui.Rect;
+using Color = Unity.UIWidgets.ui.Color;
 
-namespace UIWidgets.rendering {
+namespace Unity.UIWidgets.rendering {
     class _DebugSize : Size {
         internal _DebugSize(Size source, RenderBox _owner, bool _canBeUsedByParent) :
             base(source.width, source.height) {

@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
-using UIWidgets.foundation;
-using UIWidgets.rendering;
-using UIWidgets.ui;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.rendering;
+using Unity.UIWidgets.ui;
 using UnityEngine;
 
-namespace UIWidgets.widgets {
+namespace Unity.UIWidgets.widgets {
     public class UniqueKey : LocalKey {
         public UniqueKey() {
         }

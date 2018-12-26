@@ -1,2 +1,2 @@
-namespace UIWidgets.foundation {
+namespace Unity.UIWidgets.foundation {
 }

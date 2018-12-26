@@ -1,7 +1,7 @@
-﻿using UIWidgets.ui;
-using Rect = UIWidgets.ui.Rect;
+﻿using Unity.UIWidgets.ui;
+using Rect = Unity.UIWidgets.ui.Rect;
 
-namespace UIWidgets.flow {
+namespace Unity.UIWidgets.flow {
     public class ClipRectLayer : ContainerLayer {
         private Rect _clipRect;
 

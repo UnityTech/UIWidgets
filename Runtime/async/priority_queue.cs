@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace UIWidgets.async {
+namespace Unity.UIWidgets.async {
     public class PriorityQueue<T> where T : IComparable<T> {
         private readonly List<T> _data;
 

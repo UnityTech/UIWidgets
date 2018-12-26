@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using UIWidgets.foundation;
+using Unity.UIWidgets.foundation;
 
-namespace UIWidgets.widgets {
+namespace Unity.UIWidgets.widgets {
     public static class WidgetsD {
         public static bool debugPrintRebuildDirtyWidgets = false;
 

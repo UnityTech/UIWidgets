@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using RSG.Promises;
-using UIWidgets.editor;
-using UIWidgets.widgets;
+using Unity.UIWidgets.editor;
+using Unity.UIWidgets.widgets;
 using UnityEditor;
 using UnityEngine;
 
-namespace UIWidgets.debugger
+namespace Unity.UIWidgets.debugger
 {
     public class WidgetsInpsectorWindow: EditorWindow
     {

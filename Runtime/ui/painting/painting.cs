@@ -1,8 +1,8 @@
 ﻿using System;
-using UIWidgets.painting;
+using Unity.UIWidgets.painting;
 using UnityEngine;
 
-namespace UIWidgets.ui {
+namespace Unity.UIWidgets.ui {
     public class Color : IEquatable<Color> {
         public Color(long value) {
             this.value = value & 0xFFFFFFFF;

@@ -1,7 +1,7 @@
-using UIWidgets.foundation;
-using UIWidgets.painting;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.painting;
 
-namespace UIWidgets.widgets {
+namespace Unity.UIWidgets.widgets {
     public class ScrollBehavior {
         public Widget buildViewportChrome(BuildContext context, Widget child, AxisDirection axisDirection) {
             return child;

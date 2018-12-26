@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using UIWidgets.foundation;
+using Unity.UIWidgets.foundation;
 
-namespace UIWidgets.gestures {
+namespace Unity.UIWidgets.gestures {
     class _CombiningGestureArenaEntry : GestureArenaEntry {
         public _CombiningGestureArenaEntry(_CombiningGestureArenaMember _combiner, GestureArenaMember _member) {
             this._combiner = _combiner;

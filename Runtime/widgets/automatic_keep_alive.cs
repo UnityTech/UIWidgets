@@ -1,10 +1,10 @@
 using System.Collections.Generic;
-using UIWidgets.foundation;
-using UIWidgets.scheduler;
-using UIWidgets.ui;
-using UIWidgets.widgets;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.scheduler;
+using Unity.UIWidgets.ui;
+using Unity.UIWidgets.widgets;
 
-namespace UIWidgets.widgets {
+namespace Unity.UIWidgets.widgets {
     public class AutomaticKeepAlive : StatefulWidget {
         public AutomaticKeepAlive(
             Key key = null,

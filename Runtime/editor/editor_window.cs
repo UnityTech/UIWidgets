@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using UIWidgets.async;
-using UIWidgets.foundation;
-using UIWidgets.service;
-using UIWidgets.rendering;
-using UIWidgets.ui;
-using UIWidgets.widgets;
+using Unity.UIWidgets.async;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.service;
+using Unity.UIWidgets.rendering;
+using Unity.UIWidgets.ui;
+using Unity.UIWidgets.widgets;
 using UnityEngine;
 
-namespace UIWidgets.editor {
+namespace Unity.UIWidgets.editor {
 
 #if UNITY_EDITOR
 
