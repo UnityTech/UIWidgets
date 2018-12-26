@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
-using UIWidgets.engine;
-using UIWidgets.foundation;
-using UIWidgets.painting;
-using UIWidgets.rendering;
-using UIWidgets.ui;
-using UIWidgets.widgets;
-using Image = UIWidgets.widgets.Image;
-using TextStyle = UIWidgets.painting.TextStyle;
+using Unity.UIWidgets.engine;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.painting;
+using Unity.UIWidgets.rendering;
+using Unity.UIWidgets.ui;
+using Unity.UIWidgets.widgets;
+using Image = Unity.UIWidgets.widgets.Image;
+using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace UIWidgetsSample
 {

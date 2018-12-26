@@ -6,6 +6,7 @@
 
 namespace Unity.UIWidgets
 {
+
     /// <summary>
     /// Provide a general description of the public class.
     /// </summary>

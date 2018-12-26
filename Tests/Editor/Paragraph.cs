@@ -7,6 +7,8 @@ using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
 using UnityEditor;
 using UnityEngine;
+
+using painting = Unity.UIWidgets.painting;
 using Color = Unity.UIWidgets.ui.Color;
 using FontStyle = Unity.UIWidgets.ui.FontStyle;
 
@@ -120,7 +122,7 @@ namespace UIWidgets.Tests {
                             text: "FontSize 14"),
                     })));
         }
-
+        
         RenderBox textDecoration() {
             return box(
                 new RenderParagraph(new TextSpan(style: new painting.TextStyle(height: 1.2), text: "", children:

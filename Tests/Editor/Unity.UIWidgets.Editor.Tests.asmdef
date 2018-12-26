@@ -1,5 +1,5 @@
 {
-    "name": "Unity.UIWidgets.Editor.EditorTests",
+    "name": "Unity.UIWidgets.Editor.Tests",
     "references": [
         "Unity.UIWidgets.Editor",
         "Unity.UIWidgets"

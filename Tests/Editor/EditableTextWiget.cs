@@ -47,12 +47,12 @@ namespace UIWidgets.Tests
             paintingBinding.initInstances();
             this.windowAdapter = new EditorWindowAdapter(this);
             this.windowAdapter.OnEnable();
-            this.root = new widgets.Container(
+            this.root = new Container(
                 width: 200,
                 height: 200,
                 margin: EdgeInsets.all(30.0),
                 padding: EdgeInsets.all(15.0),
-                color: ui.Color.fromARGB(255, 244, 190, 85),
+                color: Color.fromARGB(255, 244, 190, 85),
                 child: new EditableText(
                     maxLines: 100, 
                     controller: new TextEditingController(txt),

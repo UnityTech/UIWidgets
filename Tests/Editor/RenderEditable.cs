@@ -12,6 +12,8 @@ using Unity.UIWidgets.service;
 using Unity.UIWidgets.ui;
 using UnityEngine;
 using Color = Unity.UIWidgets.ui.Color;
+using rendering = Unity.UIWidgets.rendering;
+using painting = Unity.UIWidgets.painting;
 
 namespace UIWidgets.Tests
 {

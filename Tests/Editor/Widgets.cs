@@ -10,6 +10,9 @@ using System.Linq;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.ui;
+
+using ui = Unity.UIWidgets.ui;
+using widgets = Unity.UIWidgets.widgets;
 using Color = Unity.UIWidgets.ui.Color;
 using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
@@ -32,6 +35,7 @@ namespace UIWidgets.Tests {
 
         public Widgets()
         {
+            
             this.wantsMouseEnterLeaveWindow = true;
             this.wantsMouseMove = true;
             this._options = new Func<Widget>[] {

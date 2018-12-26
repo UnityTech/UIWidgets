@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using UIWidgets.engine;
-using UIWidgets.foundation;
-using UIWidgets.gestures;
-using UIWidgets.painting;
-using UIWidgets.rendering;
-using UIWidgets.ui;
-using UIWidgets.widgets;
-using TextStyle = UIWidgets.painting.TextStyle;
+using Unity.UIWidgets.engine;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.gestures;
+using Unity.UIWidgets.painting;
+using Unity.UIWidgets.rendering;
+using Unity.UIWidgets.ui;
+using Unity.UIWidgets.widgets;
+using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace UIWidgetsSample
 {
