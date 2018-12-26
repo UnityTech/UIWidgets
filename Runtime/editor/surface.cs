@@ -164,10 +164,14 @@ namespace Unity.UIWidgets.editor {
             var desc = new RenderTextureDescriptor(
                 (int) this.size.width, (int) this.size.height,
                 RenderTextureFormat.Default, 24) {
-                msaaSamples = QualitySettings.antiAliasing,
                 useMipMap = false,
                 autoGenerateMips = false,
             };
+
+            if (QualitySettings.antiAliasing != 0)
+            {
+                desc.msaaSamples = QualitySettings.antiAliasing;
+            }
 
             this._renderTexture = new RenderTexture(desc);
         }
