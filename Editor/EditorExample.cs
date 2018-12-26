@@ -4,7 +4,7 @@
 //
 // -----------------------------------------------------------------------------
 
-namespace UnityEditor.Unity.UIWidgets
+namespace Unity.UIWidgets.Editor
 {
     /// <summary>
     /// Provide a general description of the public class.
