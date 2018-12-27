@@ -182,7 +182,7 @@ namespace Unity.UIWidgets.widgets
         const int _kObscureShowLatestCharCursorTicks = 3;
         private static TimeSpan _kCursorBlinkHalfPeriod = TimeSpan.FromMilliseconds(500);
         private Timer _cursorTimer;
-        private ValueNotifier<bool> _showCursor = new ValueNotifier<bool>(true);
+        private ValueNotifier<bool> _showCursor = new ValueNotifier<bool>(false);
         private GlobalKey _editableKey = GlobalKey.key();
         private bool _didAutoFocus = false;
         public ScrollController _scrollController = new ScrollController();
