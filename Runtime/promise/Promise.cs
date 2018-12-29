@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using RSG.Exceptions;
+using Unity.UIWidgets.ui;
 
 namespace RSG
 {
@@ -791,16 +792,17 @@ namespace RSG
         /// </summary>
         private void ActionHandlers(IRejectable resultPromise, Action<PromisedT> resolveHandler, Action<Exception> rejectHandler)
         {
-            if (CurState == PromiseState.Resolved)
-            {
-                InvokeHandler(resolveHandler, resultPromise, resolveValue);
+            if (CurState == PromiseState.Resolved) {
+                Window.instance.scheduleMicrotask(() => {
+                    InvokeHandler(resolveHandler, resultPromise, resolveValue);
+                });
             }
-            else if (CurState == PromiseState.Rejected)
-            {
-                InvokeHandler(rejectHandler, resultPromise, rejectionException);
+            else if (CurState == PromiseState.Rejected) {
+                Window.instance.scheduleMicrotask(() => {
+                    InvokeHandler(rejectHandler, resultPromise, rejectionException);
+                });
             }
-            else
-            {
+            else {
                 AddResolveHandler(resolveHandler, resultPromise);
                 AddRejectHandler(rejectHandler, resultPromise);
             }
