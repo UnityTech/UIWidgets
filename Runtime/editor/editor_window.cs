@@ -206,7 +206,7 @@ namespace Unity.UIWidgets.editor {
             }
         }
         
-        public void OnGUI() {
+        public virtual void OnGUI() {
             using (this.getScope()) {
                 bool dirty = false;
 
