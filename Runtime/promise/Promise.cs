@@ -435,7 +435,9 @@ namespace RSG
                 Promise.PendingPromises.Remove(this);
             }
 
-            InvokeRejectHandlers(ex);
+            Window.instance.scheduleMicrotask(() => {
+                InvokeRejectHandlers(ex);
+            });
         }
 
         /// <summary>
@@ -460,7 +462,9 @@ namespace RSG
                 Promise.PendingPromises.Remove(this);
             }
 
-            InvokeResolveHandlers(value);
+            Window.instance.scheduleMicrotask(() => {
+                InvokeResolveHandlers(value);
+            });
         }
 
         /// <summary>
