@@ -7,12 +7,14 @@ using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
+using Color = Unity.UIWidgets.ui.Color;
 using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace UIWidgetsSample
 {
     public class ToDoAppCanvas : WidgetCanvas
     {
+        
         public class ToDoListApp : StatefulWidget
         {
             public ToDoListApp(Key key = null) : base(key)
@@ -75,7 +77,19 @@ namespace UIWidgetsSample
             private List<ToDoItem> items = new List<ToDoItem>();
             private int nextId = 0;
             private TextEditingController controller = new TextEditingController("");
+            private FocusNode _focusNode;
 
+            public override void initState() {
+                base.initState();
+                _focusNode = new FocusNode();
+            }
+
+            public override void dispose()
+            {
+                _focusNode.dispose();
+                base.dispose();
+            }
+            
             private Widget title()
             {
                 return new Text("ToDo App", textAlign: TextAlign.center, 
@@ -96,7 +110,7 @@ namespace UIWidgetsSample
                                 padding: EdgeInsets.fromLTRB(8, 0, 8, 0),
                                 child: new EditableText(maxLines: 1,
                                     controller: controller,
-                                   
+                                    autofocus: true,
                                     focusNode: new FocusNode(),
                                     style: new TextStyle(
                                         fontSize: 18,
@@ -154,6 +168,7 @@ namespace UIWidgetsSample
                         {
                             title(),
                             textInput(),
+                      //      textInput(),
                             contents(),
                         }
                     )

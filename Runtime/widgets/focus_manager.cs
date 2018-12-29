@@ -327,17 +327,21 @@ namespace Unity.UIWidgets.widgets
             D.assert(rootScope._firstChild == null);  
             D.assert(rootScope._lastChild == null);
         }
-
-        public readonly FocusScopeNode rootScope = new FocusScopeNode();
-        internal FocusNode _currentFocus;
         
+        public readonly FocusScopeNode rootScope = new FocusScopeNode();
+
+        public FocusNode currentFocus
+        {
+            get { return _currentFocus; }
+        }
+        
+        internal FocusNode _currentFocus;
         
         internal void _willDisposeFocusNode(FocusNode node) {
             D.assert(node != null);
             if (_currentFocus == node)
                 _currentFocus = null;
         }
-        
         
         bool _haveScheduledUpdate = false;
         internal void _markNeedsUpdate() {
@@ -350,7 +354,6 @@ namespace Unity.UIWidgets.widgets
             Window.instance.scheduleMicrotask(_update);
         }
 
-        
         internal FocusNode _findNextFocus() {
             FocusScopeNode scope = rootScope;
             while (scope._firstChild != null)

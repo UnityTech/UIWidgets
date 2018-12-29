@@ -6,7 +6,6 @@ using Unity.UIWidgets.widgets;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using Image = UnityEngine.UI.Image;
 using Rect = UnityEngine.Rect;
 
 namespace Unity.UIWidgets.engine
@@ -95,6 +94,10 @@ namespace Unity.UIWidgets.engine
 
         private void Update()
         {
+            if (EventSystem.current != null && EventSystem.current.currentSelectedGameObject != gameObject)
+            {
+                unfocusIfNeeded();
+            }
             if (_mouseEntered && (_lastMouseMove.x != Input.mousePosition.x || _lastMouseMove.y != Input.mousePosition.y))
             {
                 this.OnMouseOver();
@@ -106,7 +109,6 @@ namespace Unity.UIWidgets.engine
                 this._windowAdapter.Update();
             }
         }
-
 
         private void OnGUI()
         {
@@ -153,6 +155,7 @@ namespace Unity.UIWidgets.engine
 
         public void OnPointerDown(PointerEventData eventData)
         {
+            EventSystem.current.SetSelectedGameObject(gameObject, eventData);
             var position = getPointPosition(eventData);
             this._windowAdapter.PostPointerEvent(new PointerData(
                 timeStamp: DateTime.Now,
@@ -246,6 +249,18 @@ namespace Unity.UIWidgets.engine
                 physicalX: position.x,
                 physicalY: position.y
             ));
+        }
+
+        private void unfocusIfNeeded()
+        {
+            using (_windowAdapter.getScope())
+            {
+                var focusNode = WidgetsBinding.instance.focusManager.currentFocus;
+                if (focusNode != null)
+                {
+                    focusNode.unfocus();
+                }
+            }
         }
     }
 }
