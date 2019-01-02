@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using UIWidgets.foundation;
-using UIWidgets.ui;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.ui;
 
-namespace UIWidgets.animation {
+namespace Unity.UIWidgets.animation {
 {% macro AnimationLazyListenerMixin(with) %} 
     public abstract class AnimationLazyListenerMixin{{with | safe}} : {{with | safe}} {
         int _listenerCounter = 0;

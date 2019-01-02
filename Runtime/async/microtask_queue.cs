@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Unity.UIWidgets.async {
     public class MicrotaskQueue {
-        private Queue<Action> _queue = new Queue<Action>();
+        readonly Queue<Action> _queue = new Queue<Action>();
 
         public void scheduleMicrotask(Action action) {
             this._queue.Enqueue(action);

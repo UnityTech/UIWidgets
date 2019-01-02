@@ -1131,7 +1131,7 @@ namespace RSG
         /// </summary>
         public static IPromise Resolved()
         {
-            var promise = new Promise();
+            var promise = new Promise(isSync: true);
             promise.Resolve();
             return promise;
         }

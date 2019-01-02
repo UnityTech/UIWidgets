@@ -1,5 +1,4 @@
 ﻿using Unity.UIWidgets.ui.txt;
-using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
     public abstract class DrawCmd {
@@ -65,20 +64,20 @@ namespace Unity.UIWidgets.ui {
     }
 
     public class DrawImage : DrawCmd {
-        public Texture image;
+        public Image image;
         public Offset offset;
         public Paint paint;
     }
 
     public class DrawImageRect : DrawCmd {
-        public Texture image;
+        public Image image;
         public Rect src;
         public Rect dst;
         public Paint paint;
     }
 
     public class DrawImageNine : DrawCmd {
-        public Texture image;
+        public Image image;
         public Rect src;
         public Rect center;
         public Rect dst;

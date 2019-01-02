@@ -1,6 +1,5 @@
 ﻿using System;
 using Unity.UIWidgets.ui.txt;
-using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
     public interface Canvas {
@@ -52,15 +51,15 @@ namespace Unity.UIWidgets.ui {
 
         void drawPath(Path path, Paint paint);
 
-        void drawImage(Texture image, Offset offset, Paint paint);
+        void drawImage(Image image, Offset offset, Paint paint);
 
-        void drawImageRect(Texture image, Rect dst, Paint paint);
+        void drawImageRect(Image image, Rect dst, Paint paint);
 
-        void drawImageRect(Texture image, Rect src, Rect dst, Paint paint);
+        void drawImageRect(Image image, Rect src, Rect dst, Paint paint);
 
-        void drawImageNine(Texture image, Rect center, Rect dst, Paint paint);
+        void drawImageNine(Image image, Rect center, Rect dst, Paint paint);
 
-        void drawImageNine(Texture image, Rect src, Rect center, Rect dst, Paint paint);
+        void drawImageNine(Image image, Rect src, Rect center, Rect dst, Paint paint);
 
         void drawPicture(Picture picture);
 
@@ -256,7 +255,7 @@ namespace Unity.UIWidgets.ui {
             });
         }
 
-        public void drawImage(Texture image, Offset offset, Paint paint) {
+        public void drawImage(Image image, Offset offset, Paint paint) {
             this._recorder.addDrawCmd(new DrawImage {
                 image = image,
                 offset = offset,
@@ -264,7 +263,7 @@ namespace Unity.UIWidgets.ui {
             });
         }
 
-        public void drawImageRect(Texture image, Rect dst, Paint paint) {
+        public void drawImageRect(Image image, Rect dst, Paint paint) {
             this._recorder.addDrawCmd(new DrawImageRect {
                 image = image,
                 dst = dst,
@@ -272,7 +271,7 @@ namespace Unity.UIWidgets.ui {
             });
         }
 
-        public void drawImageRect(Texture image, Rect src, Rect dst, Paint paint) {
+        public void drawImageRect(Image image, Rect src, Rect dst, Paint paint) {
             this._recorder.addDrawCmd(new DrawImageRect {
                 image = image,
                 src = src,
@@ -281,7 +280,7 @@ namespace Unity.UIWidgets.ui {
             });
         }
 
-        public void drawImageNine(Texture image, Rect center, Rect dst, Paint paint) {
+        public void drawImageNine(Image image, Rect center, Rect dst, Paint paint) {
             this._recorder.addDrawCmd(new DrawImageNine {
                 image = image,
                 center = center,
@@ -290,7 +289,7 @@ namespace Unity.UIWidgets.ui {
             });
         }
 
-        public void drawImageNine(Texture image, Rect src, Rect center, Rect dst, Paint paint) {
+        public void drawImageNine(Image image, Rect src, Rect center, Rect dst, Paint paint) {
             this._recorder.addDrawCmd(new DrawImageNine {
                 image = image,
                 src = src,

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using Unity.UIWidgets.async;
 
 namespace Unity.UIWidgets.foundation {
 
@@ -182,9 +183,7 @@ namespace Unity.UIWidgets.foundation {
                 return this._canonical;
             }
 
-            var weakReference = _canonicalObjects.putIfAbsent(this._getDependencyList(), () => {
-                return new WeakReference(this);
-            });
+            var weakReference = _canonicalObjects.putIfAbsent(this._getDependencyList(), () => new WeakReference(this));
             if (weakReference.Target == null) {
                 weakReference.Target = this;
             }
@@ -193,8 +192,11 @@ namespace Unity.UIWidgets.foundation {
         }
 
         ~CanonicalMixinDiagnosticableTree() {
-            if (this == this._canonical) {
-                _canonicalObjects.Remove(this._dependencyList);
+            if (object.ReferenceEquals(this, this._canonical)) {
+                var dependencyList = this._dependencyList;
+                if (dependencyList != null) {
+                    Timer.runInMain(() => { _canonicalObjects.Remove(dependencyList); });
+                }
             }
         }
         

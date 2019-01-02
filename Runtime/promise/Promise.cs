@@ -1003,7 +1003,7 @@ namespace RSG
         /// </summary>
         public static IPromise<PromisedT> Resolved(PromisedT promisedValue)
         {
-            var promise = new Promise<PromisedT>();
+            var promise = new Promise<PromisedT>(isSync: true);
             promise.Resolve(promisedValue);
             return promise;
         }

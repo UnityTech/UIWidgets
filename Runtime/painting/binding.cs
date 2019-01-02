@@ -1,32 +1,29 @@
-using Unity.UIWidgets.ui;
+using Unity.UIWidgets.gestures;
 
 namespace Unity.UIWidgets.painting {
-    public class PaintingBinding {
-
-        public PaintingBinding(Window window) {
-            this._window = window;
-        }
-        
-        private static PaintingBinding _instance;
-        public readonly Window _window;
-
-        public static PaintingBinding instance {
-            get { return _instance; }
+    public class PaintingBinding : GestureBinding {
+        public static new PaintingBinding instance {
+            get { return (PaintingBinding) GestureBinding.instance; }
+            set { GestureBinding.instance = value; }
         }
 
-        private ImageCache _imageCache;
+        public PaintingBinding() {
+        }
+
+        ImageCache _imageCache;
 
         public ImageCache imageCache {
-            get { return _imageCache; }
+            get {
+                if (this._imageCache == null) {
+                    this._imageCache = this.createImageCache();
+                }
+
+                return this._imageCache;
+            }
         }
 
-        public ImageCache createImageCache() {
+        protected virtual ImageCache createImageCache() {
             return new ImageCache();
-        }
-
-        public void initInstances() {
-            _instance = this;
-            _imageCache = createImageCache();
         }
     }
 }

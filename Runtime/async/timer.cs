@@ -1,27 +1,51 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+
+#endif
 
 namespace Unity.UIWidgets.async {
     public abstract class Timer {
         public abstract void cancel();
 
-        static readonly TimerProvider _globalTimerProvider = new TimerProvider();
-        
-        public static Timer run(TimeSpan duration, Action callback) {
-            return _globalTimerProvider.run(duration, callback);
+        public static double timeSinceStartup {
+            get {
+#if UNITY_EDITOR
+                return EditorApplication.timeSinceStartup;
+#else
+                return Time.realtimeSinceStartup;
+#endif
+            }
         }
 
-        public static Timer run(Action callback) {
-            return run(TimeSpan.Zero, callback);
-        }
-        
-        public static Timer periodic(TimeSpan duration, Action callback) {
-            return _globalTimerProvider.periodic(duration, callback);
+        public static TimeSpan timespanSinceStartup => TimeSpan.FromSeconds(timeSinceStartup);
+
+        static readonly List<Action> _callbacks = new List<Action>();
+
+        public static void runInMain(Action callback) {
+            lock (_callbacks) {
+                _callbacks.Add(callback);
+            }
         }
 
         internal static void update() {
-            _globalTimerProvider.update();
+            Action[] callbacks;
+
+            lock (_callbacks) {
+                callbacks = _callbacks.ToArray();
+                _callbacks.Clear();
+            }
+
+            foreach (var callback in callbacks) {
+                try {
+                    callback();
+                }
+                catch (Exception ex) {
+                    Debug.LogError("Error to execute runInMain callback: " + ex);
+                }
+            }
         }
     }
 
@@ -35,37 +59,30 @@ namespace Unity.UIWidgets.async {
         public Timer run(TimeSpan duration, Action callback) {
             var timer = new TimerImpl(duration, callback);
 
-            lock (this._queue) {
-                this._queue.enqueue(timer);
-            }
-
+            this._queue.enqueue(timer);
             return timer;
         }
 
         public Timer periodic(TimeSpan duration, Action callback) {
             var timer = new TimerImpl(duration, callback, periodic: true);
 
-            lock (this._queue) {
-                this._queue.enqueue(timer);
-            }
-
+            this._queue.enqueue(timer);
             return timer;
         }
-        
+
         public void update() {
-            var now = DateTime.Now;
-            
+            var now = Timer.timeSinceStartup;
+
             List<TimerImpl> timers = null;
             List<TimerImpl> appendList = null;
-            
-            lock (this._queue) {
-                while (this._queue.count > 0 && this._queue.peek().deadline <= now) {
-                    var timer = this._queue.dequeue();
-                    if (timers == null) {
-                        timers = new List<TimerImpl>();
-                    }
-                    timers.Add(timer);
+
+            while (this._queue.count > 0 && this._queue.peek().deadline <= now) {
+                var timer = this._queue.dequeue();
+                if (timers == null) {
+                    timers = new List<TimerImpl>();
                 }
+
+                timers.Add(timer);
             }
 
             if (timers != null) {
@@ -75,6 +92,7 @@ namespace Unity.UIWidgets.async {
                         if (appendList == null) {
                             appendList = new List<TimerImpl>();
                         }
+
                         appendList.Add(timer);
                     }
                 }
@@ -88,17 +106,17 @@ namespace Unity.UIWidgets.async {
                 }
             }
         }
-        
+
 
         private class TimerImpl : Timer, IComparable<TimerImpl> {
             public readonly bool periodic;
             public readonly TimeSpan internval;
-            private DateTime _deadline;
+            private double _deadline;
             private readonly Action _callback;
             private bool _done;
-           
+
             public TimerImpl(TimeSpan duration, Action callback, bool periodic = false) {
-                this._deadline = DateTime.Now + duration;
+                this._deadline = Timer.timeSinceStartup + duration.TotalSeconds;
                 this._callback = callback;
                 this.periodic = periodic;
                 this._done = false;
@@ -107,29 +125,22 @@ namespace Unity.UIWidgets.async {
                 }
             }
 
-            public DateTime deadline
-            {
-                get { return _deadline; }
-            }
-            
+            public double deadline => this._deadline;
+
             public override void cancel() {
                 this._done = true;
             }
 
-            public bool done
-            {
-                get { return _done; }
-            }
-            
+            public bool done => this._done;
+
             public void invoke() {
                 if (this._done) {
                     return;
                 }
 
-                DateTime now = DateTime.Now;
-                if (!periodic)
-                {
-                    this._done = true;    
+                var now = Timer.timeSinceStartup;
+                if (!this.periodic) {
+                    this._done = true;
                 }
 
                 try {
@@ -140,7 +151,7 @@ namespace Unity.UIWidgets.async {
                 }
 
                 if (this.periodic) {
-                    this._deadline = now + this.internval;
+                    this._deadline = now + this.internval.TotalSeconds;
                 }
             }
 

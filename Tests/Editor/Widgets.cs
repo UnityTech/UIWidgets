@@ -21,8 +21,6 @@ namespace UIWidgets.Tests {
     public class Widgets : EditorWindow {
         private WindowAdapter windowAdapter;
 
-        private PaintingBinding paintingBinding;
-
         private readonly Func<Widget>[] _options;
 
         private readonly string[] _optionStrings;
@@ -89,8 +87,6 @@ namespace UIWidgets.Tests {
         }
 
         private void OnEnable() {
-            this.paintingBinding = new PaintingBinding(null);
-            paintingBinding.initInstances();
             this.windowAdapter = new EditorWindowAdapter(this);
             this.windowAdapter.OnEnable();
         }
@@ -126,7 +122,8 @@ namespace UIWidgets.Tests {
 
         Widget localImage() {
             var image = widgets.Image.file(
-                localImagePath
+                localImagePath,
+                filterMode: FilterMode.Bilinear
             );
 
             return image;
