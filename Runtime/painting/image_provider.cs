@@ -186,6 +186,104 @@ namespace Unity.UIWidgets.painting {
         protected abstract IPromise<T> obtainKey(ImageConfiguration configuration);
     }
 
+    public class AssetBundleImageKey : IEquatable<AssetBundleImageKey> {
+
+        public AssetBundleImageKey(
+            AssetBundle bundle,
+            string name,
+            double scale
+        ) {
+            D.assert(bundle != null);
+            D.assert(name != null);
+            D.assert(scale >= 0.0);
+
+            this.bundle = bundle;
+            this.name = name;
+            this.scale = scale;
+        }
+
+        public readonly AssetBundle bundle;
+
+        public readonly string name;
+
+        public readonly double scale;
+
+        public bool Equals(AssetBundleImageKey other) {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return Equals(this.bundle, other.bundle) && string.Equals(this.name, other.name) &&
+                   this.scale.Equals(other.scale);
+        }
+
+        public override bool Equals(object obj) {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return this.Equals((AssetBundleImageKey) obj);
+        }
+
+        public override int GetHashCode() {
+            unchecked {
+                var hashCode = (this.bundle != null ? this.bundle.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (this.name != null ? this.name.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ this.scale.GetHashCode();
+                return hashCode;
+            }
+        }
+
+        public static bool operator ==(AssetBundleImageKey left, AssetBundleImageKey right) {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(AssetBundleImageKey left, AssetBundleImageKey right) {
+            return !Equals(left, right);
+        }
+
+        public override string ToString() {
+            return $"{this.GetType()}(bundle: {this.bundle}, name: \"{this.name}\", scale: {this.scale})";
+        }
+    }
+
+    public abstract class AssetBundleImageProvider : ImageProvider<AssetBundleImageKey> {
+        protected AssetBundleImageProvider() {
+        }
+
+        protected override ImageStreamCompleter load(AssetBundleImageKey key) {
+            return new MultiFrameImageStreamCompleter(
+                codec: this._loadAsync(key),
+                scale: key.scale,
+                informationCollector: information => {
+                    information.AppendLine($"Image provider: {this}");
+                    information.Append($"Image key: {key}");
+                }
+            );
+        }
+
+        protected virtual IPromise<Codec> _loadAsync(AssetBundleImageKey key) {
+            var coroutine = Window.instance.startCoroutine(this._loadAssetAsync(key));
+            return coroutine.promise.Then(result => {
+                if (result == null) {
+                    if (key.bundle == null) {
+                        throw new Exception($"Unable to find asset \"{key.name}\" from Resources folder");
+                    }
+
+                    throw new Exception($"Unable to find asset \"{key.name}\" from asset bundle \"{key.bundle}\"");
+                }
+
+                return CodecUtils.getCodec((Texture2D) result);
+            });
+        }
+
+        IEnumerator _loadAssetAsync(AssetBundleImageKey key) {
+            if (key.bundle == null) {
+                yield return Resources.LoadAsync<Texture2D>(key.name);
+                yield break;
+            }
+
+            yield return key.bundle.LoadAssetAsync(key.name);
+        }
+    }
+
     public class NetworkImage : ImageProvider<NetworkImage>, IEquatable<NetworkImage> {
         public NetworkImage(string url,
             double scale = 1.0,
@@ -234,6 +332,12 @@ namespace Unity.UIWidgets.painting {
 
             if (uri.LocalPath.EndsWith(".gif")) {
                 using (var www = UnityWebRequest.Get(uri)) {
+                    if (this.headers != null) {
+                        foreach (var header in this.headers) {
+                            www.SetRequestHeader(header.Key, header.Value);
+                        }
+                    }
+
                     yield return www.SendWebRequest();
 
                     if (www.isNetworkError || www.isHttpError) {
@@ -248,6 +352,12 @@ namespace Unity.UIWidgets.painting {
             }
 
             using (var www = UnityWebRequestTexture.GetTexture(uri)) {
+                if (this.headers != null) {
+                    foreach (var header in this.headers) {
+                        www.SetRequestHeader(header.Key, header.Value);
+                    }
+                }
+
                 yield return www.SendWebRequest();
 
                 if (www.isNetworkError || www.isHttpError) {
@@ -445,6 +555,69 @@ namespace Unity.UIWidgets.painting {
 
         public override string ToString() {
             return $"{this.GetType()}({Diagnostics.describeIdentity(this.bytes)}), scale: {this.scale}";
+        }
+    }
+
+    public class ExactAssetImage : AssetBundleImageProvider, IEquatable<ExactAssetImage> {
+
+        public ExactAssetImage(
+            string assetName,
+            double scale = 1.0,
+            AssetBundle bundle = null
+        ) {
+            D.assert(assetName != null);
+            this.assetName = assetName;
+            this.scale = scale;
+            this.bundle = bundle;
+        }
+
+        public readonly string assetName;
+
+        public readonly double scale;
+
+        public readonly AssetBundle bundle;
+
+        protected override IPromise<AssetBundleImageKey> obtainKey(ImageConfiguration configuration) {
+            return Promise<AssetBundleImageKey>.Resolved(new AssetBundleImageKey(
+                bundle: this.bundle ? this.bundle : configuration.bundle,
+                name: this.assetName,
+                scale: this.scale
+            ));
+        }
+
+        public bool Equals(ExactAssetImage other) {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return string.Equals(this.assetName, other.assetName) && this.scale.Equals(other.scale) &&
+                   Equals(this.bundle, other.bundle);
+        }
+
+        public override bool Equals(object obj) {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return this.Equals((ExactAssetImage) obj);
+        }
+
+        public override int GetHashCode() {
+            unchecked {
+                var hashCode = (this.assetName != null ? this.assetName.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ this.scale.GetHashCode();
+                hashCode = (hashCode * 397) ^ (this.bundle != null ? this.bundle.GetHashCode() : 0);
+                return hashCode;
+            }
+        }
+
+        public static bool operator ==(ExactAssetImage left, ExactAssetImage right) {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(ExactAssetImage left, ExactAssetImage right) {
+            return !Equals(left, right);
+        }
+
+        public override string ToString() {
+            return $"{this.GetType()}(name: \"{this.assetName}\", scale: {this.scale}, bundle: {this.bundle})";
         }
     }
 }
