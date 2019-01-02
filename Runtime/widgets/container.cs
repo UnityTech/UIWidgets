@@ -25,14 +25,14 @@ namespace Unity.UIWidgets.widgets {
             return new RenderDecoratedBox(
                 decoration: this.decoration,
                 position: this.position,
-                configuration: ImageUtil.createLocalImageConfiguration(context)
+                configuration: ImageUtils.createLocalImageConfiguration(context)
             );
         }
 
         public override void updateRenderObject(BuildContext context, RenderObject renderObjectRaw) {
             var renderObject = (RenderDecoratedBox) renderObjectRaw;
             renderObject.decoration = this.decoration;
-            renderObject.configuration = ImageUtil.createLocalImageConfiguration(context);
+            renderObject.configuration = ImageUtils.createLocalImageConfiguration(context);
             renderObject.position = this.position;
         }
 

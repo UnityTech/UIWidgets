@@ -4,7 +4,7 @@ using Unity.UIWidgets.ui;
 namespace Unity.UIWidgets.gestures {
     public abstract class PointerEvent {
         public PointerEvent(
-            DateTime timeStamp,
+            TimeSpan timeStamp,
             int pointer = 0,
             PointerDeviceKind kind = PointerDeviceKind.mouse,
             int device = 0,
@@ -23,7 +23,7 @@ namespace Unity.UIWidgets.gestures {
             this.synthesized = synthesized;
         }
 
-        public readonly DateTime timeStamp;
+        public readonly TimeSpan timeStamp;
 
         public readonly int pointer;
 
@@ -42,7 +42,7 @@ namespace Unity.UIWidgets.gestures {
 
     public class PointerAddedEvent : PointerEvent {
         public PointerAddedEvent(
-            DateTime timeStamp,
+            TimeSpan timeStamp,
             PointerDeviceKind kind = PointerDeviceKind.touch,
             int device = 0,
             Offset position = null
@@ -57,7 +57,7 @@ namespace Unity.UIWidgets.gestures {
 
     public class PointerRemovedEvent : PointerEvent {
         public PointerRemovedEvent(
-            DateTime timeStamp,
+            TimeSpan timeStamp,
             PointerDeviceKind kind = PointerDeviceKind.touch,
             int device = 0
         ) : base(
@@ -71,7 +71,7 @@ namespace Unity.UIWidgets.gestures {
     public class PointerHoverEvent : PointerEvent
     {
         public PointerHoverEvent(
-            DateTime timeStamp,
+            TimeSpan timeStamp,
             int pointer = 0,
             PointerDeviceKind kind = PointerDeviceKind.mouse,
             int device = 0,
@@ -89,7 +89,7 @@ namespace Unity.UIWidgets.gestures {
     public class PointerEnterEvent : PointerEvent
     {
         public PointerEnterEvent(
-            DateTime timeStamp,
+            TimeSpan timeStamp,
             int pointer = 0,
             PointerDeviceKind kind = PointerDeviceKind.mouse,
             int device = 0,
@@ -107,7 +107,7 @@ namespace Unity.UIWidgets.gestures {
     public class PointerLeaveEvent : PointerEvent
     {
         public PointerLeaveEvent(
-            DateTime timeStamp,
+            TimeSpan timeStamp,
             int pointer = 0,
             PointerDeviceKind kind = PointerDeviceKind.mouse,
             int device = 0,
@@ -124,7 +124,7 @@ namespace Unity.UIWidgets.gestures {
 
     public class PointerDownEvent : PointerEvent {
         public PointerDownEvent(
-            DateTime timeStamp,
+            TimeSpan timeStamp,
             int pointer = 0,
             PointerDeviceKind kind = PointerDeviceKind.mouse,
             int device = 0,
@@ -141,7 +141,7 @@ namespace Unity.UIWidgets.gestures {
 
     public class PointerMoveEvent : PointerEvent {
         public PointerMoveEvent(
-            DateTime timeStamp,
+            TimeSpan timeStamp,
             int pointer = 0,
             PointerDeviceKind kind = PointerDeviceKind.mouse,
             int device = 0,
@@ -162,7 +162,7 @@ namespace Unity.UIWidgets.gestures {
 
     public class PointerUpEvent : PointerEvent {
         public PointerUpEvent(
-            DateTime timeStamp,
+            TimeSpan timeStamp,
             int pointer = 0,
             PointerDeviceKind kind = PointerDeviceKind.mouse,
             int device = 0,
@@ -179,7 +179,7 @@ namespace Unity.UIWidgets.gestures {
 
     public class PointerCancelEvent : PointerEvent {
         public PointerCancelEvent(
-            DateTime timeStamp,
+            TimeSpan timeStamp,
             int pointer = 0,
             PointerDeviceKind kind = PointerDeviceKind.mouse,
             int device = 0,

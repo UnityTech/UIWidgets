@@ -836,53 +836,32 @@ namespace Unity.UIWidgets.widgets {
 
     public class RawImage : LeafRenderObjectWidget {
         public RawImage(
-            Key key,
-            ui.Image image,
-            double scale,
-            Color color,
-            BlendMode colorBlendMode,
-            BoxFit fit,
-            Rect centerSlice,
+            Key key = null,
+            ui.Image image = null,
             double? width = null,
             double? height = null,
+            double scale = 1.0,
+            Color color = null,
+            BlendMode colorBlendMode = BlendMode.srcIn,
+            BoxFit? fit = null,
             Alignment alignment = null,
-            ImageRepeat repeat = ImageRepeat.noRepeat
+            ImageRepeat repeat = ImageRepeat.noRepeat,
+            Rect centerSlice = null,
+            bool invertColors = false,
+            FilterMode filterMode = FilterMode.Point
         ) : base(key) {
             this.image = image;
             this.width = width;
             this.height = height;
             this.scale = scale;
             this.color = color;
-            this.blendMode = colorBlendMode;
-            this.centerSlice = centerSlice;
+            this.colorBlendMode = colorBlendMode;
             this.fit = fit;
-            this.alignment = alignment == null ? Alignment.center : alignment;
+            this.alignment = alignment ?? Alignment.center;
             this.repeat = repeat;
-        }
-
-        public override RenderObject createRenderObject(BuildContext context) {
-            return new RenderImage(
-                this.image,
-                this.color,
-                this.blendMode,
-                this.fit,
-                this.repeat,
-                this.centerSlice,
-                this.width,
-                this.height,
-                this.alignment
-            );
-        }
-
-        public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
-            ((RenderImage) renderObject).image = this.image;
-            ((RenderImage) renderObject).width = this.width;
-            ((RenderImage) renderObject).height = this.height;
-            ((RenderImage) renderObject).color = this.color;
-            ((RenderImage) renderObject).fit = this.fit;
-            ((RenderImage) renderObject).repeat = this.repeat;
-            ((RenderImage) renderObject).centerSlice = this.centerSlice;
-            ((RenderImage) renderObject).alignment = this.alignment;
+            this.centerSlice = centerSlice;
+            this.invertColors = invertColors;
+            this.filterMode = filterMode;
         }
 
         public readonly ui.Image image;
@@ -890,11 +869,91 @@ namespace Unity.UIWidgets.widgets {
         public readonly double? height;
         public readonly double scale;
         public readonly Color color;
-        public readonly BlendMode blendMode;
-        public readonly BoxFit fit;
+        public readonly FilterMode filterMode;
+        public readonly BlendMode colorBlendMode;
+        public readonly BoxFit? fit;
         public readonly Alignment alignment;
         public readonly ImageRepeat repeat;
         public readonly Rect centerSlice;
+        public readonly bool invertColors;
+
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderImage(
+                image: this.image,
+                width: this.width,
+                height: this.height,
+                scale: this.scale,
+                color: this.color,
+                colorBlendMode: this.colorBlendMode,
+                fit: this.fit,
+                alignment: this.alignment,
+                repeat: this.repeat,
+                centerSlice: this.centerSlice,
+                invertColors: this.invertColors,
+                filterMode: this.filterMode
+            );
+        }
+
+        public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
+            var renderImage = (RenderImage) renderObject;
+            
+            renderImage.image = this.image;
+            renderImage.width = this.width;
+            renderImage.height = this.height;
+            renderImage.scale = this.scale;
+            renderImage.color = this.color;
+            renderImage.colorBlendMode = this.colorBlendMode;
+            renderImage.alignment = this.alignment;
+            renderImage.fit = this.fit;
+            renderImage.repeat = this.repeat;
+            renderImage.centerSlice = this.centerSlice;
+            renderImage.invertColors = this.invertColors;
+            renderImage.filterMode = this.filterMode;
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new DiagnosticsProperty<ui.Image>("image", this.image));
+            properties.add(new DoubleProperty("width", this.width, defaultValue: Diagnostics.kNullDefaultValue));
+            properties.add(new DoubleProperty("height", this.height, defaultValue: Diagnostics.kNullDefaultValue));
+            properties.add(new DoubleProperty("scale", this.scale, defaultValue: 1.0));
+            properties.add(new DiagnosticsProperty<Color>("color", this.color,
+                defaultValue: Diagnostics.kNullDefaultValue));
+            properties.add(new EnumProperty<BlendMode>("colorBlendMode", this.colorBlendMode,
+                defaultValue: Diagnostics.kNullDefaultValue));
+            properties.add(new EnumProperty<BoxFit?>("fit", this.fit, defaultValue: Diagnostics.kNullDefaultValue));
+            properties.add(new DiagnosticsProperty<Alignment>("alignment", this.alignment,
+                defaultValue: Diagnostics.kNullDefaultValue));
+            properties.add(new EnumProperty<ImageRepeat>("repeat", this.repeat, defaultValue: ImageRepeat.noRepeat));
+            properties.add(new DiagnosticsProperty<Rect>("centerSlice", this.centerSlice,
+                defaultValue: Diagnostics.kNullDefaultValue));
+            properties.add(new DiagnosticsProperty<bool>("invertColors", this.invertColors));
+            properties.add(new EnumProperty<FilterMode>("filterMode", this.filterMode));
+        }
+    }
+
+    public class DefaultAssetBundle : InheritedWidget {
+        public DefaultAssetBundle(
+            Key key = null,
+            AssetBundle bundle = null,
+            Widget child = null
+        ) : base(key: key, child: child) {
+            D.assert(bundle != null);
+            D.assert(child != null);
+            this.bundle = bundle;
+        }
+
+        public readonly AssetBundle bundle;
+
+        public static AssetBundle of(BuildContext context) {
+            DefaultAssetBundle result =
+                (DefaultAssetBundle) context.inheritFromWidgetOfExactType(typeof(DefaultAssetBundle));
+            return result?.bundle;
+        }
+
+        public override bool updateShouldNotify(InheritedWidget oldWidget) {
+            return this.bundle != ((DefaultAssetBundle) oldWidget).bundle;
+        }
     }
 
     public class Listener : SingleChildRenderObjectWidget {

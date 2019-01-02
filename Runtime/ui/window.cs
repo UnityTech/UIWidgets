@@ -16,7 +16,7 @@ namespace Unity.UIWidgets.ui {
                 D.assert(_instance != null, "Window.instance is null");
                 return _instance;
             }
-            
+
             set {
                 if (value == null) {
                     D.assert(_instance != null, "Window.instance is already cleared.");
@@ -69,7 +69,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         VoidCallback _onDrawFrame;
-
+        
         public PointerDataPacketCallback onPointerEvent {
             get { return this._onPointerEvent; }
             set { this._onPointerEvent = value; }
@@ -86,13 +86,69 @@ namespace Unity.UIWidgets.ui {
         public abstract void flushMicrotasks();
 
         public abstract Timer run(TimeSpan duration, Action callback, bool periodic = false);
-
+        
         public Timer run(Action callback) {
             return this.run(TimeSpan.Zero, callback);
         }
 
+        public abstract IDisposable onUpdate(VoidCallback callback);
+
         public abstract TextInput textInput { get; }
 
         public abstract IDisposable getScope();
+    }
+
+
+    public class Locale : IEquatable<Locale> {
+        public Locale(string languageCode, string countryCode = null) {
+            D.assert(languageCode != null);
+            this._languageCode = languageCode;
+            this._countryCode = countryCode;
+        }
+
+        readonly string _languageCode;
+
+        public string languageCode => this._languageCode;
+
+        readonly string _countryCode;
+
+        public string countryCode => this._countryCode;
+
+        public bool Equals(Locale other) {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return string.Equals(this._languageCode, other._languageCode) &&
+                   string.Equals(this._countryCode, other._countryCode);
+        }
+
+        public override bool Equals(object obj) {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return this.Equals((Locale) obj);
+        }
+
+        public override int GetHashCode() {
+            unchecked {
+                return ((this._languageCode != null ? this._languageCode.GetHashCode() : 0) * 397) ^
+                       (this._countryCode != null ? this._countryCode.GetHashCode() : 0);
+            }
+        }
+
+        public static bool operator ==(Locale left, Locale right) {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(Locale left, Locale right) {
+            return !Equals(left, right);
+        }
+
+        public override string ToString() {
+            if (this.countryCode == null) {
+                return this.languageCode;
+            }
+
+            return $"{this.languageCode}_{this.countryCode}";
+        }
     }
 }

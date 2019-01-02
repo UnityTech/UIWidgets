@@ -1,209 +1,333 @@
 using System;
 using System.Collections.Generic;
+using RSG;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
 using UnityEngine;
 using Color = Unity.UIWidgets.ui.Color;
+using Rect = Unity.UIWidgets.ui.Rect;
 
 namespace Unity.UIWidgets.widgets {
-    internal class ImageUtil {
+    public class ImageUtils {
         public static ImageConfiguration createLocalImageConfiguration(BuildContext context, Size size = null) {
             return new ImageConfiguration(
-                size: size
+                bundle: DefaultAssetBundle.of(context),
+                //TODO: add MediaQuery & Localizations.
+                //devicePixelRatio: MediaQuery.of(context, nullOk: true)?.devicePixelRatio ?? 1.0,
+                //locale: Localizations.localeOf(context, nullOk: true),
+                size: size,
+                platform: Application.platform
             );
+        }
+
+        public IPromise precacheImage(
+            ImageProvider provider,
+            BuildContext context,
+            Size size = null,
+            ImageErrorListener onError = null
+        ) {
+            ImageConfiguration config = createLocalImageConfiguration(context, size: size);
+            var completer = new Promise();
+            ImageStream stream = provider.resolve(config);
+
+            void listener(ImageInfo image, bool sync) {
+                completer.Resolve();
+            }
+
+            void errorListener(Exception exception) {
+                completer.Resolve();
+                if (onError != null) {
+                    onError(exception);
+                } else {
+                    UIWidgetsError.reportError(new UIWidgetsErrorDetails(
+                        context: "image failed to precache",
+                        library: "image resource service",
+                        exception: exception,
+                        silent: true
+                    ));
+                }
+            }
+
+            stream.addListener(listener, onError: errorListener);
+            completer.Then(() => { stream.removeListener(listener); });
+            return completer;
         }
     }
 
     public class Image : StatefulWidget {
-        public ImageProvider image;
-        public double? width;
-        public double? height;
-        public Color color;
-        public BoxFit fit;
-        public Alignment alignment;
-        public BlendMode colorBlendMode;
-        public ImageRepeat repeat;
-        public ui.Rect centerSlice;
-
-        public bool gaplessPlayback;
-
         public Image(
-            Key key,
-            ImageProvider image,
-            Color color,
-            BlendMode colorBlendMode,
-            BoxFit fit,
-            ui.Rect centerSlice,
-            Alignment alignment,
+            Key key = null,
+            ImageProvider image = null,
             double? width = null,
             double? height = null,
+            Color color = null,
+            BlendMode colorBlendMode = BlendMode.srcIn,
+            BoxFit? fit = null,
+            Alignment alignment = null,
             ImageRepeat repeat = ImageRepeat.noRepeat,
-            bool gaplessPlayback = false
+            Rect centerSlice = null,
+            bool gaplessPlayback = false,
+            FilterMode filterMode = FilterMode.Point
         ) : base(key) {
+            D.assert(image != null);
             this.image = image;
             this.width = width;
             this.height = height;
             this.color = color;
             this.colorBlendMode = colorBlendMode;
             this.fit = fit;
-            this.alignment = alignment == null ? Alignment.center : alignment;
+            this.alignment = alignment ?? Alignment.center;
             this.repeat = repeat;
             this.centerSlice = centerSlice;
             this.gaplessPlayback = gaplessPlayback;
+            this.filterMode = filterMode;
         }
 
         public static Image network(
             string src,
             Key key = null,
+            double scale = 1.0,
             double? width = null,
             double? height = null,
             Color color = null,
-            BlendMode colorBlendMode = BlendMode.srcOver,
-            BoxFit fit = BoxFit.none,
+            BlendMode colorBlendMode = BlendMode.srcIn,
+            BoxFit? fit = null,
             Alignment alignment = null,
-            ui.Rect centerSlice = null,
-            Dictionary<String, String> headers = null,
             ImageRepeat repeat = ImageRepeat.noRepeat,
+            Rect centerSlice = null,
             bool gaplessPlayback = false,
-            double scale = 1.0
+            FilterMode filterMode = FilterMode.Point,
+            IDictionary<String, String> headers = null
         ) {
-            var networkImage = new NetworkImage(src, headers, scale);
+            var networkImage = new NetworkImage(src, scale, headers);
             return new Image(
                 key,
                 networkImage,
+                width,
+                height,
                 color,
                 colorBlendMode,
                 fit,
-                centerSlice,
                 alignment,
-                width,
-                height,
                 repeat,
-                gaplessPlayback
+                centerSlice,
+                gaplessPlayback,
+                filterMode
             );
         }
 
         public static Image file(
-            string path,
+            string file,
             Key key = null,
+            double scale = 1.0,
             double? width = null,
             double? height = null,
             Color color = null,
-            BlendMode colorBlendMode = BlendMode.srcOver,
-            BoxFit fit = BoxFit.none,
+            BlendMode colorBlendMode = BlendMode.srcIn,
+            BoxFit? fit = null,
             Alignment alignment = null,
-            ui.Rect centerSlice = null,
             ImageRepeat repeat = ImageRepeat.noRepeat,
+            Rect centerSlice = null,
             bool gaplessPlayback = false,
-            double scale = 1.0
+            FilterMode filterMode = FilterMode.Point
         ) {
-            var fileImage = new FileImage(path, scale);
+            var fileImage = new FileImage(file, scale);
             return new Image(
                 key,
                 fileImage,
+                width,
+                height,
                 color,
                 colorBlendMode,
                 fit,
-                centerSlice,
                 alignment,
-                width,
-                height,
                 repeat,
-                gaplessPlayback
+                centerSlice,
+                gaplessPlayback,
+                filterMode
             );
         }
+
+        public static Image memory(
+            byte[] bytes,
+            Key key = null,
+            double scale = 1.0,
+            double? width = null,
+            double? height = null,
+            Color color = null,
+            BlendMode colorBlendMode = BlendMode.srcIn,
+            BoxFit? fit = null,
+            Alignment alignment = null,
+            ImageRepeat repeat = ImageRepeat.noRepeat,
+            Rect centerSlice = null,
+            bool gaplessPlayback = false,
+            FilterMode filterMode = FilterMode.Point
+        ) {
+            var memoryImage = new MemoryImage(bytes, scale);
+            return new Image(
+                key,
+                memoryImage,
+                width,
+                height,
+                color,
+                colorBlendMode,
+                fit,
+                alignment,
+                repeat,
+                centerSlice,
+                gaplessPlayback,
+                filterMode
+            );
+        }
+
+        public readonly ImageProvider image;
+        public readonly double? width;
+        public readonly double? height;
+        public readonly Color color;
+        public readonly FilterMode filterMode;
+        public readonly BlendMode colorBlendMode;
+        public readonly BoxFit? fit;
+        public readonly Alignment alignment;
+        public readonly ImageRepeat repeat;
+        public readonly Rect centerSlice;
+        public readonly bool gaplessPlayback;
 
         public override State createState() {
             return new _ImageState();
         }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+
+            properties.add(new DiagnosticsProperty<ImageProvider>("image", this.image));
+            properties.add(new DoubleProperty("width", this.width, defaultValue: Diagnostics.kNullDefaultValue));
+            properties.add(new DoubleProperty("height", this.height, defaultValue: Diagnostics.kNullDefaultValue));
+            properties.add(new DiagnosticsProperty<Color>("color", this.color,
+                defaultValue: Diagnostics.kNullDefaultValue));
+            properties.add(new EnumProperty<BlendMode>("colorBlendMode", this.colorBlendMode,
+                defaultValue: Diagnostics.kNullDefaultValue));
+            properties.add(new EnumProperty<BoxFit?>("fit", this.fit, defaultValue: Diagnostics.kNullDefaultValue));
+            properties.add(new DiagnosticsProperty<Alignment>("alignment", this.alignment,
+                defaultValue: Diagnostics.kNullDefaultValue));
+            properties.add(new EnumProperty<ImageRepeat>("repeat", this.repeat, defaultValue: ImageRepeat.noRepeat));
+            properties.add(new DiagnosticsProperty<Rect>("centerSlice", this.centerSlice,
+                defaultValue: Diagnostics.kNullDefaultValue));
+            properties.add(new EnumProperty<FilterMode>("filterMode", this.filterMode, Diagnostics.kNullDefaultValue));
+        }
     }
 
-    public class _ImageState : State {
+    public class _ImageState : State<Image> {
         ImageStream _imageStream;
         ImageInfo _imageInfo;
         bool _isListeningToStream = false;
+        bool _invertColors;
 
         public override void didChangeDependencies() {
-            _resolveImage();
-            if (TickerMode.of(context))
-                _listenToStream();
-            else
-                _stopListeningToStream();
+            this._invertColors = false;
+
+            this._resolveImage();
+
+            if (TickerMode.of(this.context)) {
+                this._listenToStream();
+            } else {
+                this._stopListeningToStream();
+            }
+
+            base.didChangeDependencies();
         }
 
         public override void didUpdateWidget(StatefulWidget oldWidget) {
-            if (((Image) widget).image != ((Image) oldWidget).image)
-                _resolveImage();
+            base.didUpdateWidget(oldWidget);
+
+            if (this.widget.image != ((Image) oldWidget).image) {
+                this._resolveImage();
+            }
         }
 
-//        public override void reassemble() {
-//            _resolveImage(); // in case the image cache was flushed
-//        }
-
         void _resolveImage() {
-            var imageWidget = (Image) widget;
             ImageStream newStream =
-                imageWidget.image.resolve(ImageUtil.createLocalImageConfiguration(
-                    context,
-                    size: imageWidget.width != null && imageWidget.height != null
-                        ? new Size(imageWidget.width.Value, imageWidget.height.Value)
+                this.widget.image.resolve(ImageUtils.createLocalImageConfiguration(
+                    this.context,
+                    size: this.widget.width != null && this.widget.height != null
+                        ? new Size(this.widget.width.Value, this.widget.height.Value)
                         : null
                 ));
-            _updateSourceStream(newStream);
+            D.assert(newStream != null);
+            this._updateSourceStream(newStream);
         }
 
         void _handleImageChanged(ImageInfo imageInfo, bool synchronousCall) {
-            setState(() => { _imageInfo = imageInfo; });
+            this.setState(() => { this._imageInfo = imageInfo; });
         }
 
         void _updateSourceStream(ImageStream newStream) {
-            if ((_imageStream == null ? null : _imageStream.key) == (newStream == null ? null : newStream.key))
+            if (this._imageStream?.key == newStream?.key) {
                 return;
+            }
 
-            if (_isListeningToStream && _imageStream != null)
-                _imageStream.removeListener(_handleImageChanged);
+            if (this._isListeningToStream) {
+                this._imageStream.removeListener(this._handleImageChanged);
+            }
 
-            if (!((Image) widget).gaplessPlayback) {
-                setState(() => { _imageInfo = null; });
+            if (!this.widget.gaplessPlayback) {
+                this.setState(() => { this._imageInfo = null; });
+            }
 
-                _imageStream = newStream;
-                if (_isListeningToStream && _imageStream != null)
-                    _imageStream.addListener(_handleImageChanged);
+            this._imageStream = newStream;
+            if (this._isListeningToStream) {
+                this._imageStream.addListener(this._handleImageChanged);
             }
         }
 
         void _listenToStream() {
-            if (_isListeningToStream)
+            if (this._isListeningToStream) {
                 return;
-            _imageStream.addListener(_handleImageChanged);
-            _isListeningToStream = true;
+            }
+
+            this._imageStream.addListener(this._handleImageChanged);
+            this._isListeningToStream = true;
         }
 
         void _stopListeningToStream() {
-            if (!_isListeningToStream)
+            if (!this._isListeningToStream) {
                 return;
-            _imageStream.removeListener(_handleImageChanged);
-            _isListeningToStream = false;
+            }
+
+            this._imageStream.removeListener(this._handleImageChanged);
+            this._isListeningToStream = false;
         }
 
+        public override void dispose() {
+            D.assert(this._imageStream != null);
+            this._stopListeningToStream();
+            base.dispose();
+        }
+
+
         public override Widget build(BuildContext context) {
-            var imageWidget = (Image) widget;
             RawImage image = new RawImage(
-                null,
-                _imageInfo == null ? null : _imageInfo.image,
-                _imageInfo == null ? 1.0 : _imageInfo.scale,
-                imageWidget.color,
-                imageWidget.colorBlendMode,
-                imageWidget.fit,
-                imageWidget.centerSlice,
-                imageWidget.width,
-                imageWidget.height,
-                imageWidget.alignment,
-                imageWidget.repeat
+                image: this._imageInfo?.image,
+                width: this.widget.width,
+                height: this.widget.height,
+                scale: this._imageInfo?.scale ?? 1.0,
+                color: this.widget.color,
+                colorBlendMode: this.widget.colorBlendMode,
+                fit: this.widget.fit,
+                alignment: this.widget.alignment,
+                repeat: this.widget.repeat,
+                centerSlice: this.widget.centerSlice,
+                invertColors: this._invertColors,
+                filterMode: this.widget.filterMode
             );
 
             return image;
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder description) {
+            base.debugFillProperties(description);
+            description.add(new DiagnosticsProperty<ImageStream>("stream", this._imageStream));
+            description.add(new DiagnosticsProperty<ImageInfo>("pixels", this._imageInfo));
         }
     }
 }

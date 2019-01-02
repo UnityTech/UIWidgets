@@ -178,9 +178,8 @@ namespace Unity.UIWidgets.editor {
 
         public void Dispose() {
             D.assert(this._renderTexture);
-            Object.DestroyImmediate(this._renderTexture);
-            this._renderTexture = null;
-
+            this._renderTexture = ObjectUtils.SafeDestroy(this._renderTexture);
+            
             D.assert(this._canvas != null);
             this._canvas = null;
         }

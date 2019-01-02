@@ -10,8 +10,6 @@ namespace UIWidgets.Tests
     {
         private WindowAdapter windowAdapter;
 
-        private PaintingBinding paintingBinding;
-
         private Widget root;
 
         private Widget image;
@@ -43,8 +41,6 @@ namespace UIWidgets.Tests
         }
 
         private void OnEnable() {
-            this.paintingBinding = new PaintingBinding(null);
-            paintingBinding.initInstances();
             this.windowAdapter = new EditorWindowAdapter(this);
             this.windowAdapter.OnEnable();
             this.root = new Container(

@@ -1,12 +1,25 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Unity.UIWidgets.foundation {
     
     public delegate void ValueChanged<T>(T value);
 
     public delegate IEnumerable<T> EnumerableFilter<T>(IEnumerable<T> input);
+
+    public static class ObjectUtils {
+        public static T SafeDestroy<T>(T obj) where T : Object {
+            if (Application.isEditor) {
+                Object.DestroyImmediate(obj);
+            } else {
+                Object.Destroy(obj);
+            }
+
+            return null;
+        }
+    }
 
     public static class CollectionUtils {
         public static V putIfAbsent<K, V>(this IDictionary<K, V> it, K key, Func<V> ifAbsent) {

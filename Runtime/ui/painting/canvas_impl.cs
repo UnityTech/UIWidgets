@@ -474,8 +474,8 @@ namespace Unity.UIWidgets.ui {
             }
         }
 
-        public void drawImage(Texture image, Offset offset, Paint paint) {
-            D.assert(image);
+        public void drawImage(Image image, Offset offset, Paint paint) {
+            D.assert(image != null);
             D.assert(offset != null);
             D.assert(paint != null);
 
@@ -571,12 +571,12 @@ namespace Unity.UIWidgets.ui {
             return properties;
         }
 
-        public void drawImageRect(Texture image, Rect dst, Paint paint) {
+        public void drawImageRect(Image image, Rect dst, Paint paint) {
             this.drawImageRect(image, null, dst, paint);
         }
 
-        public void drawImageRect(Texture image, Rect src, Rect dst, Paint paint) {
-            D.assert(image);
+        public void drawImageRect(Image image, Rect src, Rect dst, Paint paint) {
+            D.assert(image != null);
             D.assert(dst != null);
             D.assert(paint != null);
 
@@ -620,22 +620,23 @@ namespace Unity.UIWidgets.ui {
             }
 
             var mat = this._getMat(paint);
-            var properties = this._getMatPropsForImage(image, paint);
+            var properties = this._getMatPropsForImage(image.texture, paint);
             var isRT = image is RenderTexture;
             this._getLayer().draws.Add(new RenderDraw {
                 mesh = mesh,
                 pass = isRT ? CanvasShaderPass.texrtPass0 : CanvasShaderPass.texPass0,
                 material = mat,
+                image = image, // to keep a reference to avoid GC.
                 properties = properties,
             });
         }
 
-        public void drawImageNine(Texture image, Rect center, Rect dst, Paint paint) {
+        public void drawImageNine(Image image, Rect center, Rect dst, Paint paint) {
             this.drawImageNine(image, null, center, dst, paint);
         }
 
-        public void drawImageNine(Texture image, Rect src, Rect center, Rect dst, Paint paint) {
-            D.assert(image);
+        public void drawImageNine(Image image, Rect src, Rect center, Rect dst, Paint paint) {
+            D.assert(image != null);
             D.assert(center != null);
             D.assert(dst != null);
             D.assert(paint != null);
@@ -746,11 +747,12 @@ namespace Unity.UIWidgets.ui {
             }
 
             var mat = this._getMat(paint);
-            var properties = this._getMatPropsForImage(image, paint);
+            var properties = this._getMatPropsForImage(image.texture, paint);
             this._getLayer().draws.Add(new RenderDraw {
                 mesh = mesh,
                 pass = CanvasShaderPass.texPass0,
                 material = mat,
+                image = image, // to keep a reference to avoid GC.
                 properties = properties,
             });
         }
@@ -988,6 +990,7 @@ namespace Unity.UIWidgets.ui {
             public MaterialPropertyBlock properties;
             public RenderLayer layer;
             public Material material;
+            public Image image; // just to keep a reference to avoid GC.
 
             public void onExecute(CommandBuffer cmdBuf) {
                 if (this.layer != null) {
@@ -1001,7 +1004,7 @@ namespace Unity.UIWidgets.ui {
             }
 
             public void onDestroy() {
-                Object.DestroyImmediate(this.mesh);
+                this.mesh = ObjectUtils.SafeDestroy(this.mesh);
             }
         }
 

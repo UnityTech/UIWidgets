@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.UIWidgets.async;
 using Unity.UIWidgets.foundation;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
@@ -25,7 +26,7 @@ namespace Unity.UIWidgets.debugger
         private List<DiagnosticsNode> m_Properties;
         private InspectorInstanceRef m_SelectedNodeRef;
         private bool m_VisibleToUser;
-        private DateTime m_LastPropertyRefresh = DateTime.MinValue;
+        private TimeSpan m_LastPropertyRefresh = TimeSpan.Zero;
         private float m_SplitOffset = -1;
 
 
@@ -179,9 +180,9 @@ namespace Unity.UIWidgets.debugger
             updateDetailTree();
 
             if (treeType == WidgetTreeType.Render &&
-                DateTime.Now - m_LastPropertyRefresh > TimeSpan.FromMilliseconds(200))
+                Timer.timespanSinceStartup - m_LastPropertyRefresh > TimeSpan.FromMilliseconds(200))
             {
-                m_LastPropertyRefresh = DateTime.Now;
+                m_LastPropertyRefresh = Timer.timespanSinceStartup;
                 m_Properties = m_SelectedNodeRef == null
                     ? new List<DiagnosticsNode>()
                     : m_InspectorService.getProperties(m_SelectedNodeRef, m_GroupName);

@@ -19,7 +19,7 @@ namespace Unity.UIWidgets.ui {
 
     public class PointerData {
         public PointerData(
-            DateTime timeStamp,
+            TimeSpan timeStamp,
             PointerChange change,
             PointerDeviceKind kind,
             int device,
@@ -33,7 +33,7 @@ namespace Unity.UIWidgets.ui {
             this.physicalY = physicalY;
         }
 
-        public readonly DateTime timeStamp;
+        public readonly TimeSpan timeStamp;
         public PointerChange change;
         public PointerDeviceKind kind;
         public int device;
