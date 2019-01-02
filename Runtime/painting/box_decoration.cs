@@ -81,6 +81,17 @@ namespace Unity.UIWidgets.painting {
         public static bool operator !=(BoxDecoration a, BoxDecoration b) {
             return !(a == b);
         }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.emptyBodyDescription = "<no decorations specified>";
+            properties.add(new DiagnosticsProperty<Color>("color", color, defaultValue: null));
+            properties.add(new DiagnosticsProperty<DecorationImage>("image", image, defaultValue: null));
+            properties.add(new DiagnosticsProperty<Border>("border", border, defaultValue: null));
+            properties.add(new DiagnosticsProperty<BorderRadius>("borderRadius", borderRadius, defaultValue: null));
+            //properties.add(new IterableProperty<BoxShadow>("boxShadow", boxShadow, defaultValue: null, style: DiagnosticsTreeStyle.whitespace));
+            properties.add(new DiagnosticsProperty<Gradient>("gradient", gradient, defaultValue: null));
+        }
     }
 
 

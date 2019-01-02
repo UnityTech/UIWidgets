@@ -28,6 +28,12 @@ namespace Unity.UIWidgets.ui {
             }
         }
 
+        public static bool hasInstance {
+            get {
+                return _instance != null;
+            }
+        }
+
         static Window _instance;
 
         public double devicePixelRatio {

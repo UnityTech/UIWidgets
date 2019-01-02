@@ -1,0 +1,5 @@
+{
+	"displayName":"Redux Sample",
+	"description": "Sample usage of Redux & UIWidgets",
+	"createSeparatePackage": false
+}

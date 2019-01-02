@@ -221,12 +221,12 @@ namespace UIWidgets.Tests {
         }
 
         Widget asPage() {
-            return new WidgetsApp(null, new AsScreen());
+            return new WidgetsApp(null, new AsScreen(), windowAdapter);
         }
 
         Widget mouseHover()
         {
-            return new WidgetsApp(null, new MouseHoverWidget(null));
+            return new WidgetsApp(null, new MouseHoverWidget(null), windowAdapter);
         }
     }
 

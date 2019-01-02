@@ -82,7 +82,7 @@ namespace Unity.UIWidgets.engine
             }
             
             _windowAdapter.OnEnable();
-            var root = new WidgetsApp(null, getWidget());
+            var root = new WidgetsApp(null, getWidget(), _windowAdapter);
             _windowAdapter.attachRootWidget(root);
             
             _lastMouseMove = Input.mousePosition;
