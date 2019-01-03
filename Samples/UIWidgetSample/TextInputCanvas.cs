@@ -100,9 +100,10 @@ namespace UIWidgetsSample
                     {
                         new SizedBox(width:100, child: new Text("Description")),
                         new Flexible(child: new Container(
+                            height: 200,
                             decoration: new BoxDecoration(border: Border.all(new Color(0xFF000000), 1)),
                             padding: EdgeInsets.fromLTRB(8, 0, 8, 0),
-                            child: new EditableText(maxLines: 1,
+                            child: new EditableText(maxLines: 200,
                                 controller: descController,
                                 focusNode: new FocusNode(),
                                 style: new TextStyle(

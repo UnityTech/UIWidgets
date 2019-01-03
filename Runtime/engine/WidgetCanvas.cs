@@ -14,10 +14,30 @@ namespace Unity.UIWidgets.engine
     public class UIWidgetWindowAdapter : WindowAdapter
     {
         private WidgetCanvas _widgetCanvas;
+        private bool _needsPaint;
 
+        public override void scheduleFrame(bool regenerateLayerTree = true) {
+            base.scheduleFrame(regenerateLayerTree);
+            _needsPaint = true;
+        }
+        
         public UIWidgetWindowAdapter(WidgetCanvas widgetCanvas)
         {
             this._widgetCanvas = widgetCanvas;
+        }
+
+        public override void OnGUI()
+        {
+            if (Event.current.type == EventType.Repaint)
+            {
+                if (!_needsPaint)
+                {
+                    return;
+                }
+
+                _needsPaint = false;
+            }
+            base.OnGUI();
         }
 
         protected override Surface createSurface()
@@ -60,7 +80,7 @@ namespace Unity.UIWidgets.engine
             }
             
             _windowAdapter.OnEnable();
-            var root = new WidgetsApp(null, getWidget());
+            var root = new WidgetsApp(null, getWidget(), _windowAdapter);
             _windowAdapter.attachRootWidget(root);
             
             _lastMouseMove = Input.mousePosition;

@@ -5,6 +5,7 @@ using Unity.UIWidgets.animation;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
+using Unity.UIWidgets.scheduler;
 using Unity.UIWidgets.service;
 using Unity.UIWidgets.ui;
 using Color = Unity.UIWidgets.ui.Color;
@@ -112,12 +113,14 @@ namespace Unity.UIWidgets.widgets
             bool autofocus = false, Color selectionColor = null, ValueChanged<string> onChanged = null,
             ValueChanged<string> onSubmitted = null, SelectionChangedCallback onSelectionChanged = null,
             List<TextInputFormatter> inputFormatters = null, bool rendererIgnoresPointer = false,
+            EdgeInsets scrollPadding = null,
             Key key = null) : base(key)
         {
             D.assert(controller != null);
             D.assert(focusNode != null);
             D.assert(style != null);
             D.assert(cursorColor != null);
+            this.scrollPadding = scrollPadding ?? EdgeInsets.all(20.0);
             this.controller = controller;
             this.focusNode = focusNode;
             this.obscureText = obscureText;
@@ -148,6 +151,8 @@ namespace Unity.UIWidgets.widgets
                 this.inputFormatters = inputFormatters;
             }
         }
+        
+        public readonly EdgeInsets scrollPadding;
 
         public override State createState()
         {
@@ -412,7 +417,30 @@ namespace Unity.UIWidgets.widgets
             _textInputConnection.setEditingState(localValue);
         }
 
+        // Calculate the new scroll offset so the cursor remains visible.
+        double _getScrollOffsetForCaret(Rect caretRect)
+        {
+            double caretStart = _isMultiline ? caretRect.top : caretRect.left;
+            double caretEnd = _isMultiline ? caretRect.bottom : caretRect.right;
+            double scrollOffset = _scrollController.offset;
+            double viewportExtent = _scrollController.position.viewportDimension;
+            if (caretStart < 0.0)
+            {
+                scrollOffset += caretStart;
+            } else if (caretEnd >= viewportExtent)
+            {
+                scrollOffset += caretEnd - viewportExtent;
+            }
 
+            return scrollOffset;
+        }
+
+        // Calculates where the `caretRect` would be if `_scrollController.offset` is set to `scrollOffset`.
+        Rect _getCaretRectAtScrollOffset(Rect caretRect, double scrollOffset) {
+            double offsetDiff = _scrollController.offset - scrollOffset;
+            return _isMultiline ? caretRect.translate(0.0, offsetDiff) : caretRect.translate(offsetDiff, 0.0);
+        }
+        
         bool _hasInputConnection
         {
             get { return _textInputConnection != null && _textInputConnection.attached; }
@@ -477,21 +505,59 @@ namespace Unity.UIWidgets.widgets
             }
         }
 
+        Rect _currentCaretRect;
         void _handleCaretChanged(Rect caretRect)
         {
+            _currentCaretRect = caretRect;
+            // If the caret location has changed due to an update to the text or
+            // selection, then scroll the caret into view.
             if (_textChangedSinceLastCaretUpdate)
             {
                 _textChangedSinceLastCaretUpdate = false;
-//                scheduleMicrotask(() { // todo
-//                    _scrollController.animateTo(
-//                        _getScrollOffsetForCaret(caretRect),
-//                        curve: Curves.fastOutSlowIn,
-//                        duration: const Duration(milliseconds: 50),
-//                        );
-//                });
+                _showCaretOnScreen();
             }
         }
 
+        // Animation configuration for scrolling the caret back on screen.
+        static readonly TimeSpan _caretAnimationDuration = TimeSpan.FromMilliseconds(100);
+        static readonly Curve _caretAnimationCurve = Curves.fastOutSlowIn;
+        bool _showCaretOnScreenScheduled = false;
+        
+        void _showCaretOnScreen()
+        {
+            if (_showCaretOnScreenScheduled)
+            {
+                return;
+            }
+
+            _showCaretOnScreenScheduled = true;
+            SchedulerBinding.instance.addPostFrameCallback(_ =>
+            {
+                _showCaretOnScreenScheduled = false;
+                if (_currentCaretRect == null || !_scrollController.hasClients)
+                {
+                    return;
+                }
+                double scrollOffsetForCaret =  _getScrollOffsetForCaret(_currentCaretRect);
+                _scrollController.animateTo(scrollOffsetForCaret, duration: _caretAnimationDuration,
+                    curve: _caretAnimationCurve);
+                
+                Rect newCaretRect = _getCaretRectAtScrollOffset(_currentCaretRect, scrollOffsetForCaret);
+                // Enlarge newCaretRect by scrollPadding to ensure that caret is not positioned directly at the edge after scrolling.
+                Rect inflatedRect = Rect.fromLTRB(
+                    newCaretRect.left - widget.scrollPadding.left,
+                    newCaretRect.top - widget.scrollPadding.top,
+                    newCaretRect.right + widget.scrollPadding.right,
+                    newCaretRect.bottom + widget.scrollPadding.bottom
+                );
+                _editableKey.currentContext.findRenderObject().showOnScreen(
+                    rect: inflatedRect,
+                    duration: _caretAnimationDuration,
+                    curve: _caretAnimationCurve
+                );
+            });
+        }
+        
         private void _formatAndSetValue(TextEditingValue value)
         {
             var textChanged = (_value == null ? null : _value.text) != (value == null ? null : value.text);
@@ -622,29 +688,32 @@ namespace Unity.UIWidgets.widgets
             FocusScope.of(context).reparentIfNeeded(widget.focusNode);
             base.build(context); // See AutomaticKeepAliveClientMixin.
             
-//            return new Scrollable(
-//                axisDirection: _isMultiline ? AxisDirection.down : AxisDirection.right
-//                // controller: _sc
-//            );
-            return new _Editable(
-                key: _editableKey,
-                textSpan: buildTextSpan(),
-                value: _value,
-                cursorColor: widget.cursorColor,
-                showCursor: _showCursor,
-                hasFocus: _hasFocus,
-                maxLines: widget.maxLines,
-                selectionColor: widget.selectionColor,
-                textScaleFactor: 1.0, // todo widget.textScaleFactor ?? MediaQuery.textScaleFactorOf(context),
-                textAlign: widget.textAlign,
-                textDirection: _textDirection,
-                obscureText: widget.obscureText,
-                autocorrect: widget.autocorrect,
-                offset: new _FixedViewportOffset(0.0),
-                onSelectionChanged: _handleSelectionChanged,
-                onCaretChanged: _handleCaretChanged,
-                rendererIgnoresPointer: widget.rendererIgnoresPointer
-            );
+            return new Scrollable(
+                axisDirection: _isMultiline ? AxisDirection.down : AxisDirection.right,
+                controller: _scrollController,
+                physics: new ClampingScrollPhysics(),
+                viewportBuilder: (BuildContext _context, ViewportOffset offset) =>
+                    new _Editable(
+                        key: _editableKey,
+                        textSpan: buildTextSpan(),
+                        value: _value,
+                        cursorColor: widget.cursorColor,
+                        showCursor: _showCursor,
+                        hasFocus: _hasFocus,
+                        maxLines: widget.maxLines,
+                        selectionColor: widget.selectionColor,
+                        textScaleFactor: Window.instance.devicePixelRatio, // todo widget.textScaleFactor ?? MediaQuery.textScaleFactorOf(context),
+                        textAlign: widget.textAlign,
+                        textDirection: _textDirection,
+                        obscureText: widget.obscureText,
+                        autocorrect: widget.autocorrect,
+                        offset: offset,
+                        onSelectionChanged: _handleSelectionChanged,
+                        onCaretChanged: _handleCaretChanged,
+                        rendererIgnoresPointer: widget.rendererIgnoresPointer
+                    )
+                
+                );
         }
 
         public TextSpan buildTextSpan()
@@ -767,61 +836,6 @@ namespace Unity.UIWidgets.widgets
             edit.onCaretChanged = onCaretChanged;
             edit.ignorePointer = rendererIgnoresPointer;
             edit.obscureText = obscureText;
-        }
-    }
-
-
-    class _FixedViewportOffset : ViewportOffset
-    {
-        internal _FixedViewportOffset(double _pixels)
-        {
-            this._pixels = _pixels;
-        }
-
-        internal new static _FixedViewportOffset zero()
-        {
-            return new _FixedViewportOffset(0.0);
-        }
-
-        double _pixels;
-
-        public override double pixels
-        {
-            get { return this._pixels; }
-        }
-
-        public override bool applyViewportDimension(double viewportDimension)
-        {
-            return true;
-        }
-
-        public override bool applyContentDimensions(double minScrollExtent, double maxScrollExtent)
-        {
-            return true;
-        }
-
-        public override void correctBy(double correction)
-        {
-            this._pixels += correction;
-        }
-
-        public override void jumpTo(double pixels)
-        {
-        }
-
-        public override IPromise animateTo(double to, TimeSpan duration, Curve curve)
-        {
-            return Promise.Resolved();
-        }
-
-        public override ScrollDirection userScrollDirection
-        {
-            get { return ScrollDirection.idle; }
-        }
-
-        public override bool allowImplicitScrolling
-        {
-            get { return false; }
         }
     }
 }
