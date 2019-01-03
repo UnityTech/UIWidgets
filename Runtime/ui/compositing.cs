@@ -29,9 +29,9 @@ namespace Unity.UIWidgets.ui {
             this._currentLayer = layer;
         }
 
-        public void pushTransform(Matrix4x4 matrix) {
+        public void pushTransform(Matrix3 matrix) {
             var layer = new TransformLayer();
-            layer.transform = matrix.toMatrix3();
+            layer.transform = matrix;
             this._pushLayer(layer);
         }
 

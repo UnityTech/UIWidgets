@@ -20,8 +20,8 @@ namespace Unity.UIWidgets.rendering {
 
         public readonly double devicePixelRatio;
 
-        public Matrix4x4 toMatrix() {
-            return Matrix4x4.identity;
+        public Matrix3 toMatrix() {
+            return Matrix3.identity;
         }
 
         public override string ToString() {
@@ -68,7 +68,7 @@ namespace Unity.UIWidgets.rendering {
             this.owner.requestVisualUpdate();
         }
 
-        Matrix4x4 _rootTransform;
+        Matrix3 _rootTransform;
 
         public Layer _updateMatricesAndCreateNewRootLayer() {
             this._rootTransform = this.configuration.toMatrix();
@@ -113,7 +113,7 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
-        public override void applyPaintTransform(RenderObject child, ref Matrix4x4 transform) {
+        public override void applyPaintTransform(RenderObject child, ref Matrix3 transform) {
             transform *= this._rootTransform;
             base.applyPaintTransform(child, ref transform);
         }
@@ -143,7 +143,8 @@ namespace Unity.UIWidgets.rendering {
             get
             {
                 D.assert(_rootTransform != null);
-                return MatrixUtils.transformRect(_rootTransform, Offset.zero & size);
+                return _rootTransform.transformRect(Offset.zero & size);
+                //return MatrixUtils.transformRect(_rootTransform, Offset.zero & size);
             }
         }
         

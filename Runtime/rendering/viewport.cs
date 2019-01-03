@@ -393,7 +393,7 @@ namespace Unity.UIWidgets.rendering {
             RenderObject descendant;
             rect = rect ?? target.paintBounds;
 
-            Matrix4x4 transform;
+            Matrix3 transform;
 
             if (target is RenderBox) {
                 RenderBox targetBox = (RenderBox) target;
@@ -1036,7 +1036,7 @@ namespace Unity.UIWidgets.rendering {
             return 0.0;
         }
 
-        public override void applyPaintTransform(RenderObject child, ref Matrix4x4 transform) {
+        public override void applyPaintTransform(RenderObject child, ref Matrix3 transform) {
             D.assert(child != null);
 
             var childParentData = (SliverPhysicalParentData) child.parentData;
@@ -1331,11 +1331,11 @@ namespace Unity.UIWidgets.rendering {
             return pinnedExtent;
         }
 
-        public override void applyPaintTransform(RenderObject child, ref Matrix4x4 transform) {
+        public override void applyPaintTransform(RenderObject child, ref Matrix3 transform) {
             D.assert(child != null);
 
             Offset offset = this.paintOffsetOf((RenderSliver) child);
-            transform = Matrix4x4.Translate(offset.toVector()) * transform;
+            transform = Matrix3.makeTrans(offset.toVector()) * transform;
         }
 
         protected override double computeChildMainAxisPosition(RenderSliver child, double parentMainAxisPosition) {

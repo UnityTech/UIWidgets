@@ -454,8 +454,8 @@ namespace Unity.UIWidgets.rendering {
     public class SliverPhysicalParentData : ParentData {
         public Offset paintOffset = Offset.zero;
 
-        public void applyPaintTransform(ref Matrix4x4 transform) {
-            transform = Matrix4x4.Translate(this.paintOffset.toVector()) * transform;
+        public void applyPaintTransform(ref Matrix3 transform) {
+            transform = Matrix3.makeTrans(this.paintOffset.toVector()) * transform;
         }
 
         public override string ToString() {
@@ -638,7 +638,7 @@ namespace Unity.UIWidgets.rendering {
             return 0.0;
         }
 
-        public override void applyPaintTransform(RenderObject child, ref Matrix4x4 transform) {
+        public override void applyPaintTransform(RenderObject child, ref Matrix3 transform) {
             D.assert(() => { throw new UIWidgetsError(this.GetType() + " does not implement applyPaintTransform."); });
         }
 
@@ -828,7 +828,7 @@ namespace Unity.UIWidgets.rendering {
         }
 
         public static void applyPaintTransformForBoxChild(this RenderSliver it, RenderBox child,
-            ref Matrix4x4 transform) {
+            ref Matrix3 transform) {
             bool rightWayUp = _getRightWayUp(it.constraints);
             double delta = it.childMainAxisPosition(child);
             double crossAxisDelta = it.childCrossAxisPosition(child);
@@ -838,14 +838,14 @@ namespace Unity.UIWidgets.rendering {
                         delta = it.geometry.paintExtent - child.size.width - delta;
                     }
 
-                    transform = Matrix4x4.Translate(new Vector2((float) delta, (float) crossAxisDelta)) * transform;
+                    transform = Matrix3.makeTrans(new Vector2((float) delta, (float) crossAxisDelta)) * transform;
                     break;
                 case Axis.vertical:
                     if (!rightWayUp) {
                         delta = it.geometry.paintExtent - child.size.height - delta;
                     }
 
-                    transform = Matrix4x4.Translate(new Vector2((float) crossAxisDelta, (float) delta)) * transform;
+                    transform = Matrix3.makeTrans(new Vector2((float) crossAxisDelta, (float) delta)) * transform;
                     break;
             }
         }
@@ -900,7 +900,7 @@ namespace Unity.UIWidgets.rendering {
             return -this.constraints.scrollOffset;
         }
 
-        public override void applyPaintTransform(RenderObject child, ref Matrix4x4 transform) {
+        public override void applyPaintTransform(RenderObject child, ref Matrix3 transform) {
             D.assert(child != null);
             D.assert(child == this.child);
 

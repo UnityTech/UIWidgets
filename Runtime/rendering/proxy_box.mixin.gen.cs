@@ -70,7 +70,7 @@ namespace Unity.UIWidgets.rendering {
             return false;
         }
 
-        public override void applyPaintTransform(RenderObject child, ref Matrix4x4 transform) {
+        public override void applyPaintTransform(RenderObject child, ref Matrix3 transform) {
         }
 
         public override void paint(PaintingContext context, Offset offset) {

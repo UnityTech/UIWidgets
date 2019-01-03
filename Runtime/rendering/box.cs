@@ -1131,7 +1131,7 @@ namespace Unity.UIWidgets.rendering {
             return false;
         }
 
-        public override void applyPaintTransform(RenderObject child, ref Matrix4x4 transform) {
+        public override void applyPaintTransform(RenderObject child, ref Matrix3 transform) {
             D.assert(child != null);
             D.assert(child.parent == this);
             D.assert(() => {
@@ -1157,7 +1157,7 @@ namespace Unity.UIWidgets.rendering {
 
             var childParentData = (BoxParentData) child.parentData;
             var offset = childParentData.offset;
-            transform = Matrix4x4.Translate(offset.toVector()) * transform;
+            transform = Matrix3.makeTrans(offset.toVector()) * transform;
         }
 
         public Offset globalToLocal(Offset point, RenderObject ancestor = null) {

@@ -502,12 +502,13 @@ namespace Unity.UIWidgets.widgets
             List<RenderObject> edgeHits,
             Offset position,
             RenderObject renderObject,
-        Matrix4x4 transform
+        Matrix3 transform
             ) {
             var hit = false;
 
-            Matrix4x4 inverse = transform.inverse;
-            var localPosition = MatrixUtils.transformPoint(inverse, position);
+            Matrix3 inverse = transform.inverse;
+            //var localPosition = MatrixUtils.transformPoint(inverse, position);
+            var localPosition = inverse.transformPoint(position);
             
             List<DiagnosticsNode> children = renderObject.debugDescribeChildren();
             for (int i = children.Count - 1; i >= 0; --i)
@@ -525,7 +526,7 @@ namespace Unity.UIWidgets.widgets
                     continue;
                 }
 
-                Matrix4x4 childTransform = transform;
+                var childTransform = transform;
                 renderObject.applyPaintTransform(child, ref childTransform);
                 if (_hitTestHelper(hits, edgeHits, position, child, childTransform))
                 {
@@ -820,7 +821,7 @@ namespace Unity.UIWidgets.widgets
     class _TransformedRect:IEquatable<_TransformedRect>
     {
         public readonly Rect rect;
-        public readonly  Matrix4x4 transform;
+        public readonly  Matrix3 transform;
 
         public _TransformedRect(RenderObject obj)
         {
@@ -984,7 +985,7 @@ namespace Unity.UIWidgets.widgets
             var borderPaint =  new Paint(){color = _kHighlightedRenderObjectBorderColor, style = PaintingStyle.stroke, strokeWidth = 1};
             Rect selectedPaintRect = state.selected.rect.deflate(0.5);
             canvas.save();
-            canvas.setMatrix(state.selected.transform.toMatrix3());
+            canvas.setMatrix(state.selected.transform);
             canvas.drawRect(selectedPaintRect, fillPaint);
             canvas.drawRect(selectedPaintRect, borderPaint);
             canvas.restore();
@@ -992,7 +993,7 @@ namespace Unity.UIWidgets.widgets
             foreach (var transformedRect in state.candidates)
             {
                 canvas.save();
-                canvas.setMatrix(transformedRect.transform.toMatrix3());
+                canvas.setMatrix(transformedRect.transform);
                 canvas.drawRect(transformedRect.rect.deflate(0.5), borderPaint);
                 canvas.restore();
             }

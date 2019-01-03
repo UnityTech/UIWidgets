@@ -61,7 +61,8 @@ namespace Unity.UIWidgets.painting {
             return inverse.transformRect(rect);
         }
 
-        public static Offset getAsTranslation(this Matrix4x4 transform) {
+        public static Offset getAsTranslation(this Matrix4x4 transform)
+        {
             if (transform.m00 == 1.0 &&
                 transform.m10 == 0.0 &&
                 transform.m20 == 0.0 &&
