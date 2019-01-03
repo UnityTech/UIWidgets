@@ -1,14 +1,14 @@
 ﻿using System;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
-using Unity.UIWidgets.scheduler;
+using Unity.UIWidgets.painting;
 using Unity.UIWidgets.ui;
 
 namespace Unity.UIWidgets.rendering {
-    public class RendererBinding : GestureBinding {
+    public class RendererBinding : PaintingBinding {
         public static new RendererBinding instance {
-            get { return (RendererBinding) GestureBinding.instance; }
-            set { GestureBinding.instance = value; }
+            get { return (RendererBinding) PaintingBinding.instance; }
+            set { PaintingBinding.instance = value; }
         }
         
         public RendererBinding() {

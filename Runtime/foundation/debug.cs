@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Linq;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.ui;
 
@@ -83,6 +84,16 @@ namespace Unity.UIWidgets.foundation {
     [Serializable]
     public class AssertionError : Exception {
         public AssertionError(string message) : base(message) {
+        }
+
+        public override string StackTrace {
+            get {
+                var stackTrace = base.StackTrace;
+                var lines = stackTrace.Split('\n');
+                var strippedLines = lines.Skip(1);
+
+                return string.Join("\n", strippedLines);
+            }
         }
     }
 }

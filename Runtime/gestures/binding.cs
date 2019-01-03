@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Unity.UIWidgets.async;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.scheduler;
@@ -35,7 +36,7 @@ namespace Unity.UIWidgets.gestures {
             }
 
             this._pendingPointerEvents.Enqueue(
-                new PointerCancelEvent(timeStamp: DateTime.Now, pointer: pointer));
+                new PointerCancelEvent(timeStamp: Timer.timespanSinceStartup, pointer: pointer));
         }
 
         void _flushPointerEventQueue() {

@@ -38,7 +38,7 @@ namespace Unity.UIWidgets.gestures {
         _DragState _state = _DragState.ready;
         Offset _initialPosition;
         protected Offset _pendingDragOffset;
-        DateTime _lastPendingEventTimestamp;
+        TimeSpan _lastPendingEventTimestamp;
 
         protected abstract bool _isFlingGesture(VelocityEstimate estimate);
         protected abstract Offset _getDeltaForDetails(Offset delta);
@@ -108,7 +108,7 @@ namespace Unity.UIWidgets.gestures {
                 Offset delta = this._pendingDragOffset;
                 var timestamp = this._lastPendingEventTimestamp;
                 this._pendingDragOffset = Offset.zero;
-                this._lastPendingEventTimestamp = default(DateTime);
+                this._lastPendingEventTimestamp = default(TimeSpan);
                 if (this.onStart != null) {
                     this.invokeCallback<object>("onStart", () => {
                         this.onStart(new DragStartDetails(

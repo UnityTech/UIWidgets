@@ -4,21 +4,20 @@ using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
 using UnityEngine;
 using Canvas = Unity.UIWidgets.ui.Canvas;
-using Object = UnityEngine.Object;
 using Rect = Unity.UIWidgets.ui.Rect;
 
 namespace Unity.UIWidgets.flow {
     public class RasterCacheResult {
-        public RasterCacheResult(Texture texture, Rect logicalRect, float devicePixelRatio) {
-            D.assert(texture != null);
+        public RasterCacheResult(Image image, Rect logicalRect, float devicePixelRatio) {
+            D.assert(image != null);
             D.assert(logicalRect != null);
 
-            this.texture = texture;
+            this.image = image;
             this.logicalRect = logicalRect;
             this.devicePixelRatio = devicePixelRatio;
         }
 
-        public readonly Texture texture;
+        public readonly Image image;
 
         public readonly Rect logicalRect;
 
@@ -31,8 +30,8 @@ namespace Unity.UIWidgets.flow {
                 var textureWidth = Mathf.CeilToInt((float) bounds.width * this.devicePixelRatio);
                 var textureHeight = Mathf.CeilToInt((float) bounds.height * this.devicePixelRatio);
 
-                D.assert(this.texture.width == textureWidth);
-                D.assert(this.texture.height == textureHeight);
+                D.assert(this.image.width == textureWidth);
+                D.assert(this.image.height == textureHeight);
                 return true;
             });
 
@@ -40,7 +39,7 @@ namespace Unity.UIWidgets.flow {
             canvas.save();
             try {
                 canvas.resetMatrix();
-                canvas.drawImage(this.texture, bounds.topLeft, new Paint());
+                canvas.drawImage(this.image, bounds.topLeft, new Paint());
             }
             finally {
                 canvas.restore();
@@ -205,7 +204,7 @@ namespace Unity.UIWidgets.flow {
             canvas.drawPicture(picture);
             canvas.flush();
 
-            return new RasterCacheResult(renderTexture, bounds, devicePixelRatio);
+            return new RasterCacheResult(new Image(renderTexture), bounds, devicePixelRatio);
         }
 
         public void sweepAfterFrame() {
@@ -221,7 +220,7 @@ namespace Unity.UIWidgets.flow {
             foreach (var entry in dead) {
                 this._cache.Remove(entry.Key);
                 if (entry.Value.image != null) {
-                    Object.DestroyImmediate(entry.Value.image.texture);
+                    entry.Value.image.image.Dispose();
                 }
             }
         }
@@ -229,7 +228,7 @@ namespace Unity.UIWidgets.flow {
         public void clear() {
             foreach (var entry in this._cache) {
                 if (entry.Value.image != null) {
-                    Object.DestroyImmediate(entry.Value.image.texture);
+                    entry.Value.image.image.Dispose();
                 }
             }
             this._cache.Clear();

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using RSG.Exceptions;
 using Unity.UIWidgets.ui;
+using UnityEngine;
 
 namespace RSG
 {
@@ -340,9 +341,11 @@ namespace RSG
         /// Tracks the current state of the promise.
         /// </summary>
         public PromiseState CurState { get; private set; }
+        
+        public bool IsSync { get; }
 
-        public Promise()
-        {
+        public Promise(bool isSync = false) {
+            this.IsSync = isSync;
             this.CurState = PromiseState.Pending;
             this.id = NextId();
             if (EnablePromiseTracking)
@@ -351,8 +354,8 @@ namespace RSG
             }
         }
 
-        public Promise(Action<Action, Action<Exception>> resolver)
-        {
+        public Promise(Action<Action, Action<Exception>> resolver, bool isSync = false) {
+            this.IsSync = isSync;
             this.CurState = PromiseState.Pending;
             this.id = NextId();
             if (EnablePromiseTracking)
@@ -499,6 +502,8 @@ namespace RSG
             if (rejectHandlers != null)
             {
                 rejectHandlers.Each(handler => InvokeRejectHandler(handler.callback, handler.rejectable, ex));
+            } else {
+                PropagateUnhandledException(this, ex);
             }
 
             ClearHandlers();
@@ -531,15 +536,22 @@ namespace RSG
         /// <summary>
         /// Reject the promise with an exception.
         /// </summary>
-        public void Reject(Exception ex)
-        {
+        public void Reject(Exception ex) {
+            if (IsSync) {
+                RejectSync(ex);
+            } else {
+                Window.instance.run(() => RejectSync(ex));
+            }
+        }
+
+        public void RejectSync(Exception ex) {
 //            Argument.NotNull(() => ex);
 
-            if (CurState != PromiseState.Pending)
-            {
+            if (CurState != PromiseState.Pending) {
                 throw new PromiseStateException(
-                    "Attempt to reject a promise that is already in state: " + CurState 
-                    + ", a promise can only be rejected when it is still in state: " 
+                    "Attempt to reject a promise that is already in state: "
+                    + CurState
+                    + ", a promise can only be rejected when it is still in state: "
                     + PromiseState.Pending
                 );
             }
@@ -547,41 +559,42 @@ namespace RSG
             rejectionException = ex;
             CurState = PromiseState.Rejected;
 
-            if (EnablePromiseTracking)
-            {
+            if (EnablePromiseTracking) {
                 PendingPromises.Remove(this);
             }
 
-            Window.instance.scheduleMicrotask(() => {
-                InvokeRejectHandlers(ex);
-            });
+            InvokeRejectHandlers(ex);
         }
 
 
         /// <summary>
         /// Resolve the promise with a particular value.
         /// </summary>
-        public void Resolve()
-        {
-            if (CurState != PromiseState.Pending)
-            {
+        public void Resolve() {
+            if (IsSync) {
+                ResolveSync();
+            } else {
+                Window.instance.run(() => ResolveSync());
+            }
+        }
+
+        public void ResolveSync() {
+            if (CurState != PromiseState.Pending) {
                 throw new PromiseStateException(
-                    "Attempt to resolve a promise that is already in state: " + CurState 
-                    + ", a promise can only be resolved when it is still in state: " 
+                    "Attempt to resolve a promise that is already in state: "
+                    + CurState
+                    + ", a promise can only be resolved when it is still in state: "
                     + PromiseState.Pending
                 );
             }
 
             CurState = PromiseState.Resolved;
 
-            if (EnablePromiseTracking)
-            {
+            if (EnablePromiseTracking) {
                 PendingPromises.Remove(this);
             }
 
-            Window.instance.scheduleMicrotask(() => {
-                InvokeResolveHandlers();
-            });
+            InvokeResolveHandlers();
         }
 
 
@@ -653,7 +666,7 @@ namespace RSG
         {
 //            Argument.NotNull(() => onRejected);
 
-            var resultPromise = new Promise();
+            var resultPromise = new Promise(isSync: true);
             resultPromise.WithName(Name);
 
             Action resolveHandler = () => resultPromise.Resolve();
@@ -791,7 +804,7 @@ namespace RSG
         /// </summary>
         public IPromise Then(Func<IPromise> onResolved, Action<Exception> onRejected, Action<float> onProgress)
         {
-            var resultPromise = new Promise();
+            var resultPromise = new Promise(isSync: true);
             resultPromise.WithName(Name);
 
             Action resolveHandler = () =>
@@ -835,7 +848,7 @@ namespace RSG
         /// </summary>
         public IPromise Then(Action onResolved, Action<Exception> onRejected, Action<float> onProgress)
         {
-            var resultPromise = new Promise();
+            var resultPromise = new Promise(isSync: true);
             resultPromise.WithName(Name);
 
             Action resolveHandler = () =>
@@ -875,14 +888,10 @@ namespace RSG
         private void ActionHandlers(IRejectable resultPromise, Action resolveHandler, Action<Exception> rejectHandler)
         {
             if (CurState == PromiseState.Resolved) {
-                Window.instance.scheduleMicrotask(() => {
-                    InvokeResolveHandler(resolveHandler, resultPromise);
-                });
+                InvokeResolveHandler(resolveHandler, resultPromise);
             }
             else if (CurState == PromiseState.Rejected) {
-                Window.instance.scheduleMicrotask(() => {
-                    InvokeRejectHandler(rejectHandler, resultPromise, rejectionException);
-                });
+                InvokeRejectHandler(rejectHandler, resultPromise, rejectionException);
             }
             else
             {
@@ -945,7 +954,7 @@ namespace RSG
             }
 
             var remainingCount = promisesArray.Length;
-            var resultPromise = new Promise();
+            var resultPromise = new Promise(isSync: true);
             resultPromise.WithName("All");
             var progress = new float[remainingCount];
 
@@ -1011,7 +1020,7 @@ namespace RSG
         /// </summary>
         public static IPromise Sequence(IEnumerable<Func<IPromise>> fns)
         {
-            var promise = new Promise();
+            var promise = new Promise(isSync: true);
 
             int count = 0;
 
@@ -1083,7 +1092,7 @@ namespace RSG
                 throw new InvalidOperationException("At least 1 input promise must be provided for Race");
             }
 
-            var resultPromise = new Promise();
+            var resultPromise = new Promise(isSync: true);
             resultPromise.WithName("Race");
 
             var progress = new float[promisesArray.Length];
@@ -1122,7 +1131,7 @@ namespace RSG
         /// </summary>
         public static IPromise Resolved()
         {
-            var promise = new Promise();
+            var promise = new Promise(isSync: true);
             promise.Resolve();
             return promise;
         }
@@ -1141,7 +1150,7 @@ namespace RSG
 
         public IPromise Finally(Action onComplete)
         {
-            var promise = new Promise();
+            var promise = new Promise(isSync: true);
             promise.WithName(Name);
 
             this.Then(() => promise.Resolve());
@@ -1159,7 +1168,7 @@ namespace RSG
 
         public IPromise ContinueWith(Func<IPromise> onComplete)
         {
-            var promise = new Promise();
+            var promise = new Promise(isSync: true);
             promise.WithName(Name);
 
             this.Then(() => promise.Resolve());
@@ -1170,7 +1179,7 @@ namespace RSG
 
         public IPromise<ConvertedT> ContinueWith<ConvertedT>(Func<IPromise<ConvertedT>> onComplete)
         {
-            var promise = new Promise();
+            var promise = new Promise(isSync: true);
             promise.WithName(Name);
 
             this.Then(() => promise.Resolve());
@@ -1196,6 +1205,8 @@ namespace RSG
             if (unhandlerException != null)
             {
                 unhandlerException(sender, new ExceptionEventArgs(ex));
+            } else {
+                Debug.LogWarning("Unhandled Exception from " + sender + ": " + ex);
             }
         }
     }

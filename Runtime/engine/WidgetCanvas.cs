@@ -1,4 +1,5 @@
 ﻿using System;
+using Unity.UIWidgets.async;
 using Unity.UIWidgets.editor;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.ui;
@@ -65,7 +66,6 @@ namespace Unity.UIWidgets.engine
         IPointerEnterHandler, IPointerExitHandler
     {
         private WindowAdapter _windowAdapter;
-        private PaintingBinding _paintingBinding;
         private Texture _texture;
         private Vector2 _lastMouseMove;
         private bool _mouseEntered;
@@ -76,8 +76,6 @@ namespace Unity.UIWidgets.engine
 
             if (_windowAdapter == null)
             {
-                this._paintingBinding = new PaintingBinding(null);
-                _paintingBinding.initInstances();
                 _windowAdapter = new UIWidgetWindowAdapter(this);
             }
             
@@ -148,11 +146,9 @@ namespace Unity.UIWidgets.engine
 
         private void OnMouseOver()
         {
-           
             var pos = getPointPosition(Input.mousePosition);
-            // Debug.Log(string.Format("mouse move {0} {1}", pos.x, pos.y));
             this._windowAdapter.PostPointerEvent(new PointerData(
-                timeStamp: DateTime.Now,
+                timeStamp: Timer.timespanSinceStartup,
                 change: PointerChange.hover,
                 kind: PointerDeviceKind.mouse,
                 device: getMouseButtonDown(),
@@ -178,7 +174,7 @@ namespace Unity.UIWidgets.engine
             EventSystem.current.SetSelectedGameObject(gameObject, eventData);
             var position = getPointPosition(eventData);
             this._windowAdapter.PostPointerEvent(new PointerData(
-                timeStamp: DateTime.Now,
+                timeStamp: Timer.timespanSinceStartup,
                 change: PointerChange.down,
                 kind: PointerDeviceKind.mouse,
                 device: (int) eventData.button,
@@ -191,7 +187,7 @@ namespace Unity.UIWidgets.engine
         {
             var position = getPointPosition(eventData);
             this._windowAdapter.PostPointerEvent(new PointerData(
-                timeStamp: DateTime.Now,
+                timeStamp: Timer.timespanSinceStartup,
                 change: PointerChange.up,
                 kind: PointerDeviceKind.mouse,
                 device: (int) eventData.button,
@@ -233,7 +229,7 @@ namespace Unity.UIWidgets.engine
         {
             var position = getPointPosition(eventData);
             this._windowAdapter.PostPointerEvent(new PointerData(
-                timeStamp: DateTime.Now,
+                timeStamp: Timer.timespanSinceStartup,
                 change: PointerChange.move,
                 kind: PointerDeviceKind.mouse,
                 device: (int) eventData.button,
@@ -248,7 +244,7 @@ namespace Unity.UIWidgets.engine
             _lastMouseMove = eventData.position;
             var position = getPointPosition(eventData);
             this._windowAdapter.PostPointerEvent(new PointerData(
-                timeStamp: DateTime.Now,
+                timeStamp: Timer.timespanSinceStartup,
                 change: PointerChange.hover,
                 kind: PointerDeviceKind.mouse,
                 device: (int) eventData.button,
@@ -262,7 +258,7 @@ namespace Unity.UIWidgets.engine
             _mouseEntered = false;
             var position = getPointPosition(eventData);
             this._windowAdapter.PostPointerEvent(new PointerData(
-                timeStamp: DateTime.Now,
+                timeStamp: Timer.timespanSinceStartup,
                 change: PointerChange.hover,
                 kind: PointerDeviceKind.mouse,
                 device: (int) eventData.button,

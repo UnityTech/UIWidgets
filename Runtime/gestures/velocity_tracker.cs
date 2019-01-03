@@ -105,7 +105,7 @@ namespace Unity.UIWidgets.gestures {
     }
 
     class _PointAtTime {
-        internal _PointAtTime(Offset point, DateTime time) {
+        internal _PointAtTime(Offset point, TimeSpan time) {
             D.assert(point != null);
             this.point = point;
             this.time = time;
@@ -113,7 +113,7 @@ namespace Unity.UIWidgets.gestures {
 
         public readonly Offset point;
 
-        public readonly DateTime time;
+        public readonly TimeSpan time;
 
         public override string ToString() {
             return string.Format("_PointAtTime({0} at {1})", this.point, this.time);
@@ -129,7 +129,7 @@ namespace Unity.UIWidgets.gestures {
         readonly List<_PointAtTime> _samples = Enumerable.Repeat<_PointAtTime>(null, _historySize).ToList();
         int _index = 0;
 
-        public void addPosition(DateTime time, Offset position) {
+        public void addPosition(TimeSpan time, Offset position) {
             this._index += 1;
             if (this._index == _historySize) {
                 this._index = 0;

@@ -1,23 +1,15 @@
-using System;
 using Unity.UIWidgets.ui;
 using System.Collections.Generic;
+using Unity.UIWidgets.foundation;
 using UnityEngine;
 using Canvas = Unity.UIWidgets.ui.Canvas;
 using Rect = Unity.UIWidgets.ui.Rect;
 
 namespace Unity.UIWidgets.painting {
-    /// How to paint any portions of a box not covered by an image.
     public enum ImageRepeat {
-        /// Repeat the image in both the x and y directions until the box is filled.
         repeat,
-
-        /// Repeat the image in the x direction until the box is filled horizontally.
         repeatX,
-
-        /// Repeat the image in the y direction until the box is filled vertically.
         repeatY,
-
-        /// Leave uncovered portions of the box transparent.
         noRepeat,
     }
 
@@ -26,21 +18,29 @@ namespace Unity.UIWidgets.painting {
         }
     }
 
-    public static class DecorationImageUtil {
+    public static class ImageUtils {
         public static void paintImage(
-            Canvas canvas,
-            Rect rect,
-            ui.Image image,
-//            ColorFilter colorFileter,
-            BoxFit? fit,
-            Rect centerSlice,
+            Canvas canvas = null,
+            Rect rect = null,
+            Image image = null,
+            double scale = 1.0,
+            ColorFilter colorFilter = null,
+            BoxFit? fit = null,
             Alignment alignment = null,
-            ImageRepeat repeat = ImageRepeat.noRepeat
-//            bool flipHorizontally = false
+            Rect centerSlice = null,
+            ImageRepeat repeat = ImageRepeat.noRepeat,
+            bool invertColors = false,
+            FilterMode filterMode = FilterMode.Point
         ) {
-            if (rect.isEmpty)
-                return;
+            D.assert(canvas != null);
+            D.assert(rect != null);
+            D.assert(image != null);
             alignment = alignment ?? Alignment.center;
+
+            if (rect.isEmpty) {
+                return;
+            }
+
             Size outputSize = rect.size;
             Size inputSize = new Size(image.width, image.height);
             Offset sliceBorder = null;
@@ -53,29 +53,29 @@ namespace Unity.UIWidgets.painting {
                 inputSize -= sliceBorder;
             }
 
-            if (fit == null) {
-                fit = centerSlice == null ? BoxFit.scaleDown : BoxFit.fill;
-            }
-            FittedSizes fittedSizes = FittedSizes.applyBoxFit(fit.Value, inputSize, outputSize);
-            Size sourceSize = fittedSizes.source;
+            fit = fit ?? (centerSlice == null ? BoxFit.scaleDown : BoxFit.fill);
+            D.assert(centerSlice == null || (fit != BoxFit.none && fit != BoxFit.cover));
+            FittedSizes fittedSizes = FittedSizes.applyBoxFit(fit.Value, inputSize / scale, outputSize);
+            Size sourceSize = fittedSizes.source * scale;
             Size destinationSize = fittedSizes.destination;
             if (centerSlice != null) {
                 outputSize += sliceBorder;
                 destinationSize += sliceBorder;
+                D.assert(sourceSize == inputSize,
+                    "centerSlice was used with a BoxFit that does not guarantee that the image is fully visible.");
             }
 
             if (repeat != ImageRepeat.noRepeat && destinationSize == outputSize) {
                 repeat = ImageRepeat.noRepeat;
             }
 
-            Paint paint = new Paint(); // ..isAntiAlias = false;
-//            if (colorFilter != null)
-//                paint.colorFilter = colorFilter;
+            Paint paint = new Paint();
+            if (colorFilter != null) {
+                paint.colorFilter = colorFilter;
+            }
+
             if (sourceSize != destinationSize) {
-                // Use the "low" quality setting to scale the image, which corresponds to
-                // bilinear interpolation, rather than the default "none" which corresponds
-                // to nearest-neighbor.
-//                paint.filterQuality = FilterQuality.low;
+                paint.filterMode = filterMode;
             }
 
             double halfWidthDelta = (outputSize.width - destinationSize.width) / 2.0;
@@ -85,35 +85,37 @@ namespace Unity.UIWidgets.painting {
             Offset destinationPosition = rect.topLeft.translate(dx, dy);
             Rect destinationRect = destinationPosition & destinationSize;
             bool needSave = repeat != ImageRepeat.noRepeat;
-            if (needSave)
+            if (needSave) {
                 canvas.save();
-            if (repeat != ImageRepeat.noRepeat)
+            }
+
+            if (repeat != ImageRepeat.noRepeat) {
                 canvas.clipRect(rect);
+            }
+
             if (centerSlice == null) {
                 Rect sourceRect = alignment.inscribe(
                     fittedSizes.source, Offset.zero & inputSize
                 );
                 foreach (Rect tileRect in _generateImageTileRects(rect, destinationRect, repeat)) {
-                    canvas.drawImageRect(image.texture, sourceRect, tileRect, paint);
+                    canvas.drawImageRect(image, sourceRect, tileRect, paint);
                 }
-            }
-            else {
-                // todo
+            } else {
                 foreach (Rect tileRect in _generateImageTileRects(rect, destinationRect, repeat)) {
-//                canvas.drawImageNine(image, centerSlice, tileRect, paint);
+                    canvas.drawImageNine(image, centerSlice, tileRect, paint);
                 }
             }
 
-            if (needSave)
+            if (needSave) {
                 canvas.restore();
+            }
         }
 
-        public static List<Rect> _generateImageTileRects(Rect outputRect, Rect fundamentalRect,
+        static IEnumerable<Rect> _generateImageTileRects(Rect outputRect, Rect fundamentalRect,
             ImageRepeat repeat) {
-            List<Rect> tileRects = new List<Rect>();
             if (repeat == ImageRepeat.noRepeat) {
-                tileRects.Add(fundamentalRect);
-                return tileRects;
+                yield return fundamentalRect;
+                yield break;
             }
 
             int startX = 0;
@@ -124,21 +126,19 @@ namespace Unity.UIWidgets.painting {
             double strideY = fundamentalRect.height;
 
             if (repeat == ImageRepeat.repeat || repeat == ImageRepeat.repeatX) {
-                startX = (int) Math.Floor((outputRect.left - fundamentalRect.left) / strideX);
-                stopX = (int) Math.Ceiling((outputRect.right - fundamentalRect.right) / strideX);
+                startX = ((outputRect.left - fundamentalRect.left) / strideX).floor();
+                stopX = ((outputRect.right - fundamentalRect.right) / strideX).ceil();
             }
 
             if (repeat == ImageRepeat.repeat || repeat == ImageRepeat.repeatY) {
-                startY = (int) Math.Floor((outputRect.top - fundamentalRect.top) / strideY);
-                stopY = (int) Math.Ceiling((outputRect.bottom - fundamentalRect.bottom) / strideY);
+                startY = ((outputRect.top - fundamentalRect.top) / strideY).floor();
+                stopY = ((outputRect.bottom - fundamentalRect.bottom) / strideY).ceil();
             }
 
             for (int i = startX; i <= stopX; ++i) {
                 for (int j = startY; j <= stopY; ++j)
-                    tileRects.Add(fundamentalRect.shift(new Offset(i * strideX, j * strideY)));
+                    yield return fundamentalRect.shift(new Offset(i * strideX, j * strideY));
             }
-
-            return tileRects;
         }
     }
 }

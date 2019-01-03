@@ -20,12 +20,12 @@ namespace Unity.UIWidgets.gestures {
     public delegate void GestureDragDownCallback(DragDownDetails details);
 
     public class DragStartDetails {
-        public DragStartDetails(DateTime sourceTimeStamp, Offset globalPosition = null) {
+        public DragStartDetails(TimeSpan sourceTimeStamp, Offset globalPosition = null) {
             this.sourceTimeStamp = sourceTimeStamp;
             this.globalPosition = globalPosition ?? Offset.zero;
         }
 
-        public readonly DateTime sourceTimeStamp;
+        public readonly TimeSpan sourceTimeStamp;
 
         public readonly Offset globalPosition;
 
@@ -38,7 +38,7 @@ namespace Unity.UIWidgets.gestures {
 
     public class DragUpdateDetails {
         public DragUpdateDetails(
-            DateTime sourceTimeStamp,
+            TimeSpan sourceTimeStamp,
             Offset delta = null,
             double? primaryDelta = null,
             Offset globalPosition = null) {
@@ -51,7 +51,7 @@ namespace Unity.UIWidgets.gestures {
                      || primaryDelta == this.delta.dy && this.delta.dx == 0.0);
         }
 
-        public readonly DateTime sourceTimeStamp;
+        public readonly TimeSpan sourceTimeStamp;
 
         public readonly Offset delta;
 

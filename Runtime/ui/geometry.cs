@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
     public static class MathUtils {
@@ -62,6 +63,22 @@ namespace Unity.UIWidgets.ui {
 
         public static int floor(this double value) {
             return (int) Math.Floor(value);
+        }
+        
+        public static int ceil(this double value) {
+            return (int) Math.Ceiling(value);
+        }
+
+        public static int round(this float value) {
+            return Mathf.RoundToInt(value);
+        }
+
+        public static int floor(this float value) {
+            return Mathf.FloorToInt(value);
+        }
+
+        public static int ceil(this float value) {
+            return Mathf.CeilToInt(value);
         }
     }
 

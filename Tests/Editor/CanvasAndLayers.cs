@@ -39,8 +39,6 @@ namespace UIWidgets.Tests {
 
         private int _selected;
 
-        private PaintingBinding _paintingBinding;
-
         private ImageStream _stream;
 
         private RenderTexture _renderTexture;
@@ -68,21 +66,22 @@ namespace UIWidgets.Tests {
 
         void OnGUI() {
             this._selected = EditorGUILayout.Popup("test case", this._selected, this._optionStrings);
+            if (this._selected == 3) {
+                using (this._windowAdapter.getScope()) {
+                    if (GUI.Button(new UnityEngine.Rect(20, 50, 100, 20), "Image 1")) {
+                        LoadImage(
+                            "http://a.hiphotos.baidu.com/image/h%3D300/sign=10b374237f0e0cf3bff748fb3a47f23d/adaf2edda3cc7cd90df1ede83401213fb80e9127.jpg");
+                    }
 
-            if (_selected == 3) {
-                if (GUI.Button(new UnityEngine.Rect(20, 50, 100, 20), "Image 1")) {
-                    LoadImage(
-                        "http://a.hiphotos.baidu.com/image/h%3D300/sign=10b374237f0e0cf3bff748fb3a47f23d/adaf2edda3cc7cd90df1ede83401213fb80e9127.jpg");
-                }
+                    if (GUI.Button(new UnityEngine.Rect(20, 150, 100, 20), "Image 2")) {
+                        LoadImage(
+                            "http://a.hiphotos.baidu.com/image/pic/item/cf1b9d16fdfaaf519b4aa960875494eef11f7a47.jpg");
+                    }
 
-                if (GUI.Button(new UnityEngine.Rect(20, 150, 100, 20), "Image 2")) {
-                    LoadImage(
-                        "http://a.hiphotos.baidu.com/image/pic/item/cf1b9d16fdfaaf519b4aa960875494eef11f7a47.jpg");
-                }
-
-                if (GUI.Button(new UnityEngine.Rect(20, 250, 100, 20), "Image 3")) {
-                    LoadImage(
-                        "http://a.hiphotos.baidu.com/image/pic/item/2f738bd4b31c8701c1e721dd2a7f9e2f0708ffbc.jpg");
+                    if (GUI.Button(new UnityEngine.Rect(20, 250, 100, 20), "Image 3")) {
+                        LoadImage(
+                            "http://a.hiphotos.baidu.com/image/pic/item/2f738bd4b31c8701c1e721dd2a7f9e2f0708ffbc.jpg");
+                    }
                 }
             }
 
@@ -109,9 +108,6 @@ namespace UIWidgets.Tests {
         private void OnEnable() {
             this._windowAdapter = new EditorWindowAdapter(this);
             this._windowAdapter.OnEnable();
-
-            this._paintingBinding = new PaintingBinding(this._windowAdapter);
-            this._paintingBinding.initInstances();
         }
 
         void createRenderTexture() {
@@ -135,7 +131,7 @@ namespace UIWidgets.Tests {
 
         private void LoadImage(string url) {
             Dictionary<string, string> headers = new Dictionary<string, string>();
-            NetworkImage networkImage = new NetworkImage(url, headers);
+            NetworkImage networkImage = new NetworkImage(url, headers: headers);
             ImageConfiguration imageConfig = new ImageConfiguration();
             _stream = networkImage.resolve(imageConfig);
         }
@@ -307,7 +303,7 @@ namespace UIWidgets.Tests {
         }
 
         void drawImageRect() {
-            if (_stream == null || _stream.completer == null || _stream.completer._currentImgae == null) {
+            if (_stream == null || _stream.completer == null || _stream.completer.currentImage == null) {
                 return;
             }
 
@@ -318,7 +314,7 @@ namespace UIWidgets.Tests {
             };
 
             canvas.drawImageRect(
-                _stream.completer._currentImgae.image.texture,
+                _stream.completer.currentImage.image,
                 Rect.fromLTWH(100, 50, 250, 250),
                 paint
             );

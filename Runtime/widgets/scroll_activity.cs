@@ -173,7 +173,7 @@ namespace Unity.UIWidgets.widgets {
 
         public readonly double? motionStartDistanceThreshold;
 
-        DateTime _lastNonStationaryTimestamp;
+        TimeSpan _lastNonStationaryTimestamp;
 
         bool _retainMomentum;
 
@@ -194,7 +194,7 @@ namespace Unity.UIWidgets.widgets {
             this._del = value;
         }
 
-        void _maybeLoseMomentum(double offset, DateTime? timestamp) {
+        void _maybeLoseMomentum(double offset, TimeSpan? timestamp) {
             if (this._retainMomentum &&
                 offset == 0.0 &&
                 (timestamp == null ||
@@ -203,7 +203,7 @@ namespace Unity.UIWidgets.widgets {
             }
         }
 
-        double _adjustForScrollStartThreshold(double offset, DateTime? timestamp) {
+        double _adjustForScrollStartThreshold(double offset, TimeSpan? timestamp) {
             if (timestamp == null) {
                 return offset;
             }

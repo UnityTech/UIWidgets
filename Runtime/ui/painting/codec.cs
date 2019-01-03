@@ -1,0 +1,63 @@
+using System;
+using RSG;
+using Unity.UIWidgets.foundation;
+using UnityEngine;
+
+namespace Unity.UIWidgets.ui {
+    public class FrameInfo {
+        public Image image;
+        public TimeSpan duration;
+    }
+
+    public interface Codec : IDisposable {
+        int frameCount { get; }
+        int repetitionCount { get; }
+        IPromise<FrameInfo> getNextFrame();
+    }
+
+    public class ImageCodec : Codec {
+        Image _image;
+
+        public ImageCodec(Image image) {
+            D.assert(image != null);
+            this._image = image;
+        }
+
+        public int frameCount => 1;
+
+        public int repetitionCount => 0;
+
+        public IPromise<FrameInfo> getNextFrame() {
+            D.assert(this._image != null);
+
+            return Promise<FrameInfo>.Resolved(new FrameInfo {
+                duration = TimeSpan.Zero,
+                image = this._image
+            });
+        }
+
+        public void Dispose() {
+            if (this._image != null) {
+                this._image.Dispose();
+                this._image = null;
+            }
+        }
+    }
+
+
+    public static class CodecUtils {
+        public static IPromise<Codec> getCodec(byte[] bytes) {
+            if (GifCodec.isGif(bytes)) {
+                return Promise<Codec>.Resolved(new GifCodec(bytes));
+            }
+
+            var texture = new Texture2D(2, 2);
+            texture.LoadImage(bytes);
+            return Promise<Codec>.Resolved(new ImageCodec(new Image(texture)));
+        }
+
+        public static IPromise<Codec> getCodec(Texture2D texture) {
+            return Promise<Codec>.Resolved(new ImageCodec(new Image(texture)));
+        }
+    }
+}

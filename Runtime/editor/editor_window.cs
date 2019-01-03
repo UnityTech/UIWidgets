@@ -109,9 +109,10 @@ namespace Unity.UIWidgets.editor {
         float _lastWindowWidth;
         float _lastWindowHeight;
 
-        readonly DateTime _epoch = new DateTime(Stopwatch.GetTimestamp());
+        readonly TimeSpan _epoch = new TimeSpan(Stopwatch.GetTimestamp());
         readonly MicrotaskQueue _microtaskQueue = new MicrotaskQueue();
         readonly TimerProvider _timerProvider = new TimerProvider();
+        readonly WindowCallbacks _windowCallbacks = new WindowCallbacks();
         readonly TextInput _textInput = new TextInput();
         readonly Rasterizer _rasterizer = new Rasterizer();
 
@@ -120,7 +121,6 @@ namespace Unity.UIWidgets.editor {
         
         bool _alive;
         
-
         public bool alive
         {
             get { return this._alive; }
@@ -253,7 +253,7 @@ namespace Unity.UIWidgets.editor {
         
         void _beginFrame() {
             if (this.onBeginFrame != null) {
-                this.onBeginFrame(new DateTime(Stopwatch.GetTimestamp()) - this._epoch);
+                this.onBeginFrame(new TimeSpan(Stopwatch.GetTimestamp()) - this._epoch);
             }
 
             this.flushMicrotasks();
@@ -282,7 +282,7 @@ namespace Unity.UIWidgets.editor {
 
                 if (evt.type == EventType.MouseDown) {
                     pointerData = new PointerData(
-                        timeStamp: DateTime.Now,
+                        timeStamp: Timer.timespanSinceStartup,
                         change: PointerChange.down,
                         kind: PointerDeviceKind.mouse,
                         device: evt.button,
@@ -291,7 +291,7 @@ namespace Unity.UIWidgets.editor {
                     );
                 } else if (evt.type == EventType.MouseUp || evt.rawType == EventType.MouseUp) {
                     pointerData = new PointerData(
-                        timeStamp: DateTime.Now,
+                        timeStamp: Timer.timespanSinceStartup,
                         change: PointerChange.up,
                         kind: PointerDeviceKind.mouse,
                         device: evt.button,
@@ -300,7 +300,7 @@ namespace Unity.UIWidgets.editor {
                     );
                 } else if (evt.type == EventType.MouseDrag) {
                     pointerData = new PointerData(
-                        timeStamp: DateTime.Now,
+                        timeStamp: Timer.timespanSinceStartup,
                         change: PointerChange.move,
                         kind: PointerDeviceKind.mouse,
                         device: evt.button,
@@ -309,7 +309,7 @@ namespace Unity.UIWidgets.editor {
                     );
                 } else if (evt.type == EventType.MouseMove) {
                     pointerData = new PointerData(
-                        timeStamp: DateTime.Now,
+                        timeStamp: Timer.timespanSinceStartup,
                         change: PointerChange.hover,
                         kind: PointerDeviceKind.mouse,
                         device: evt.button,
@@ -334,12 +334,13 @@ namespace Unity.UIWidgets.editor {
             Timer.update();
             
             using (this.getScope()) {
-                this.doUpdate();
+                this._doUpdate();
             }
         }
 
-        private void doUpdate() {
+        void _doUpdate() {
             this.flushMicrotasks();
+            this._windowCallbacks.update();
             this._timerProvider.update();
         }
 
@@ -376,6 +377,10 @@ namespace Unity.UIWidgets.editor {
             return periodic
                 ? this._timerProvider.periodic(duration, callback)
                 : this._timerProvider.run(duration, callback);
+        }
+
+        public override IDisposable onUpdate(VoidCallback callback) {
+            return this._windowCallbacks.onUpdate(callback);
         }
 
         public void attachRootRenderBox(RenderBox root) {
