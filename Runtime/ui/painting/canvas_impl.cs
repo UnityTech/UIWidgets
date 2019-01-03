@@ -621,7 +621,7 @@ namespace Unity.UIWidgets.ui {
 
             var mat = this._getMat(paint);
             var properties = this._getMatPropsForImage(image.texture, paint);
-            var isRT = image is RenderTexture;
+            var isRT = image.texture is RenderTexture;
             this._getLayer().draws.Add(new RenderDraw {
                 mesh = mesh,
                 pass = isRT ? CanvasShaderPass.texrtPass0 : CanvasShaderPass.texPass0,

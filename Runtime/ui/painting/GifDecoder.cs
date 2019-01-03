@@ -435,7 +435,7 @@ namespace Unity.UIWidgets.ui {
                     int r = c[j++] & 0xff;
                     int g = c[j++] & 0xff;
                     int b = c[j++] & 0xff;
-                    tab[i++] = (int) (0xff000000 | (r << 16) | (g << 8) | b);
+                    tab[i++] = (int) (0xff000000 | ((uint) r << 16) | ((uint) g << 8) | (uint) b);
                 }
             }
 
