@@ -667,8 +667,6 @@ namespace Unity.UIWidgets.widgets {
 
         public override RenderObject createRenderObject(BuildContext context)
         {
-
-            Debug.Log("create render object");
             return new RenderTransform(
                 transform: this.transform,
                 origin: this.origin,
