@@ -59,14 +59,19 @@ namespace UIWidgets.Tests {
             // if local image test
             if (selected == 0) {
                 localImagePath = EditorGUILayout.TextField(localImagePath);
-
+                
                 if (this._selected != selected) {
                     this._selected = selected;
                     this.windowAdapter.attachRootWidget(null);
                 }
 
-                if (GUILayout.Button("load")) {
+                if (GUILayout.Button("loadLocal")) {
                     var rootWidget = this._options[this._selected]();
+                    this.windowAdapter.attachRootWidget(rootWidget);
+                }
+                
+                if (GUILayout.Button("loadAsset")) {
+                    var rootWidget = this.loadAsset();
                     this.windowAdapter.attachRootWidget(rootWidget);
                 }
             }
@@ -122,6 +127,15 @@ namespace UIWidgets.Tests {
 
         Widget localImage() {
             var image = widgets.Image.file(
+                localImagePath,
+                filterMode: FilterMode.Bilinear
+            );
+
+            return image;
+        }
+
+        Widget loadAsset() {
+            var image = widgets.Image.asset(
                 localImagePath,
                 filterMode: FilterMode.Bilinear
             );

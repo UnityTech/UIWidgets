@@ -56,8 +56,8 @@ namespace Unity.UIWidgets.ui {
             return Promise<Codec>.Resolved(new ImageCodec(new Image(texture)));
         }
 
-        public static IPromise<Codec> getCodec(Texture2D texture) {
-            return Promise<Codec>.Resolved(new ImageCodec(new Image(texture)));
+        public static IPromise<Codec> getCodec(Image image) {
+            return Promise<Codec>.Resolved(new ImageCodec(image));
         }
     }
 }

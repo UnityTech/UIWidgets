@@ -148,6 +148,42 @@ namespace Unity.UIWidgets.widgets {
                 filterMode
             );
         }
+        
+        public static Image asset(
+            string name,
+            Key key = null,
+            AssetBundle bundle = null,
+            double? scale = null,
+            double? width = null,
+            double? height = null,
+            Color color = null,
+            BlendMode colorBlendMode = BlendMode.srcIn,
+            BoxFit? fit = null,
+            Alignment alignment = null,
+            ImageRepeat repeat = ImageRepeat.noRepeat,
+            Rect centerSlice = null,
+            bool gaplessPlayback = false,
+            FilterMode filterMode = FilterMode.Point
+        ) {
+            var image = scale != null
+                ? (AssetBundleImageProvider) new ExactAssetImage(name, bundle: bundle, scale: scale.Value)
+                : new AssetImage(name, bundle: bundle);
+            
+            return new Image(
+                key,
+                image,
+                width,
+                height,
+                color,
+                colorBlendMode,
+                fit,
+                alignment,
+                repeat,
+                centerSlice,
+                gaplessPlayback,
+                filterMode
+            );
+        }
 
         public static Image memory(
             byte[] bytes,

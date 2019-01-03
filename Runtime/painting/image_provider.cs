@@ -193,7 +193,6 @@ namespace Unity.UIWidgets.painting {
             string name,
             double scale
         ) {
-            D.assert(bundle != null);
             D.assert(name != null);
             D.assert(scale >= 0.0);
 
@@ -259,7 +258,7 @@ namespace Unity.UIWidgets.painting {
             );
         }
 
-        protected virtual IPromise<Codec> _loadAsync(AssetBundleImageKey key) {
+        IPromise<Codec> _loadAsync(AssetBundleImageKey key) {
             var coroutine = Window.instance.startCoroutine(this._loadAssetAsync(key));
             return coroutine.promise.Then(result => {
                 if (result == null) {
@@ -270,17 +269,32 @@ namespace Unity.UIWidgets.painting {
                     throw new Exception($"Unable to find asset \"{key.name}\" from asset bundle \"{key.bundle}\"");
                 }
 
-                return CodecUtils.getCodec((Texture2D) result);
+                if (result is Texture2D texture) {
+                    return CodecUtils.getCodec(new Image(texture, isAsset: true, bundle: key.bundle));
+                } else if (result is TextAsset text) {
+                    var bytes = text.bytes;
+                    if (key.bundle == null) {
+                        Resources.UnloadAsset(text);
+                    } else {
+                        key.bundle.Unload(text);
+                    }
+                    return CodecUtils.getCodec(bytes);
+                } else {
+                    throw new Exception($"Unknown type for asset \"{key.name}\": \"{result.GetType()}\"");
+                }
             });
         }
 
         IEnumerator _loadAssetAsync(AssetBundleImageKey key) {
             if (key.bundle == null) {
-                yield return Resources.LoadAsync<Texture2D>(key.name);
-                yield break;
+                ResourceRequest request = Resources.LoadAsync(key.name);
+                yield return request;
+                yield return request.asset;
+            } else {
+                AssetBundleRequest request = key.bundle.LoadAssetAsync(key.name);
+                yield return request;
+                yield return request.asset;
             }
-
-            yield return key.bundle.LoadAssetAsync(key.name);
         }
     }
 
@@ -322,7 +336,7 @@ namespace Unity.UIWidgets.painting {
                     return CodecUtils.getCodec(bytes);
                 }
 
-                return CodecUtils.getCodec((Texture2D) obj);
+                return CodecUtils.getCodec(new Image((Texture2D) obj));
             });
         }
 
@@ -431,7 +445,7 @@ namespace Unity.UIWidgets.painting {
                     return CodecUtils.getCodec(bytes);
                 }
 
-                return CodecUtils.getCodec((Texture2D) obj);
+                return CodecUtils.getCodec(new Image((Texture2D) obj));
             });
         }
 
@@ -559,7 +573,6 @@ namespace Unity.UIWidgets.painting {
     }
 
     public class ExactAssetImage : AssetBundleImageProvider, IEquatable<ExactAssetImage> {
-
         public ExactAssetImage(
             string assetName,
             double scale = 1.0,

@@ -260,6 +260,8 @@ namespace Unity.UIWidgets.ui {
         public PaintShader shader = null;
 
         public double blurSigma;
+
+        public bool invertColors;
     }
 
     public static class Conversions {

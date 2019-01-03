@@ -6,11 +6,18 @@ using UnityEngine;
 namespace Unity.UIWidgets.ui {
     public class Image : IEquatable<Image>, IDisposable {
         Texture _texture;
-        readonly bool _isOwner;
+        readonly bool _noDispose;
+        readonly bool _isAsset;
+        AssetBundle _bundle;
 
-        public Image(Texture texture, bool isOwner = true) {
+        public Image(Texture texture, bool noDispose = false, bool isAsset = false, AssetBundle bundle = null) {
+            D.assert(!noDispose || !isAsset && bundle == null);
+            D.assert(isAsset || bundle == null);
+
             this._texture = texture;
-            this._isOwner = isOwner;
+            this._noDispose = noDispose;
+            this._isAsset = isAsset;
+            this._bundle = bundle;
         }
 
         public int width => this._texture != null ? this._texture.width : 0;
@@ -20,12 +27,34 @@ namespace Unity.UIWidgets.ui {
         public Texture texture => this._texture;
 
         ~Image() {
-            Timer.runInMain(this._dispose);
+            this._dispose();
         }
 
         void _dispose() {
-            if (this._isOwner) {
-                this._texture = ObjectUtils.SafeDestroy(this._texture);
+            if (this._noDispose) {
+                this._texture = null;
+                return;
+            }
+
+            if (this._isAsset) {
+                var t = this._texture;
+                this._texture = null;
+                var b = this._bundle;
+                this._bundle = null;
+
+                if (b == null) {
+                    // make sure no ref back to this in finalizer
+                    Timer.runInMain(() => { Resources.UnloadAsset(t); });
+                } else {
+                    // make sure no ref back to this in finalizer
+                    Timer.runInMain(() => { b.Unload(t); });
+                }
+            } else {
+                var t = this._texture;
+                this._texture = null;
+
+                // make sure no ref back to this in finalizer
+                Timer.runInMain(() => { ObjectUtils.SafeDestroy(t); });
             }
         }
 

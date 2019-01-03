@@ -73,10 +73,10 @@ namespace Unity.UIWidgets.painting {
             if (colorFilter != null) {
                 paint.colorFilter = colorFilter;
             }
-
             if (sourceSize != destinationSize) {
                 paint.filterMode = filterMode;
             }
+            paint.invertColors = invertColors;
 
             double halfWidthDelta = (outputSize.width - destinationSize.width) / 2.0;
             double halfHeightDelta = (outputSize.height - destinationSize.height) / 2.0;
@@ -95,7 +95,7 @@ namespace Unity.UIWidgets.painting {
 
             if (centerSlice == null) {
                 Rect sourceRect = alignment.inscribe(
-                    fittedSizes.source, Offset.zero & inputSize
+                    sourceSize, Offset.zero & inputSize
                 );
                 foreach (Rect tileRect in _generateImageTileRects(rect, destinationRect, repeat)) {
                     canvas.drawImageRect(image, sourceRect, tileRect, paint);
