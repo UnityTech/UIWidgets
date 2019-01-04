@@ -20,24 +20,24 @@ namespace Unity.UIWidgets.engine
             base.scheduleFrame(regenerateLayerTree);
             _needsPaint = true;
         }
-        
+
         public UIWidgetWindowAdapter(WidgetCanvas widgetCanvas)
         {
             this._widgetCanvas = widgetCanvas;
         }
 
-        public override void OnGUI()
+
+        public override void OnGUI(Event evt)
         {
-            if (Event.current.type == EventType.Repaint)
+            if (evt.type == EventType.Repaint)
             {
                 if (!_needsPaint)
                 {
                     return;
                 }
-
                 _needsPaint = false;
             }
-            base.OnGUI();
+            base.OnGUI(evt);
         }
 
         protected override Surface createSurface()
@@ -82,7 +82,6 @@ namespace Unity.UIWidgets.engine
             _windowAdapter.OnEnable();
             var root = new WidgetsApp(null, getWidget(), _windowAdapter);
             _windowAdapter.attachRootWidget(root);
-            
             _lastMouseMove = Input.mousePosition;
         }
 
@@ -126,21 +125,14 @@ namespace Unity.UIWidgets.engine
             {
                 this._windowAdapter.Update();
             }
+            this._windowAdapter.OnGUI(new Event() {type=EventType.Repaint});
         }
 
-        private void OnGUI()
+         private void OnGUI()
         {
-            if (Event.current.type == EventType.Repaint)
-            {
-                this._windowAdapter.OnGUI();
-            }
-
             if (Event.current.type == EventType.KeyDown || Event.current.type == EventType.KeyUp)
             {
-                if (this._windowAdapter != null)
-                {
-                    this._windowAdapter.OnGUI();
-                }
+                this._windowAdapter.OnGUI(Event.current);
             }
         }
 
