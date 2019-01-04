@@ -582,7 +582,7 @@ namespace Unity.UIWidgets.widgets {
             Widget child = null
         ) : base(key, child) {
             D.assert(transform != null);
-            this.transform = transform.Value;
+            this.transform = transform.Value();
             this.origin = origin;
             this.alignment = alignment;
             this.transformHitTests = transformHitTests;
@@ -596,7 +596,7 @@ namespace Unity.UIWidgets.widgets {
             Widget child = null,
             double degree = 0.0
         ) : base(key: key, child: child) {
-            this.transform = Matrix3.makeRotate((float) degree);
+            this.transform = MatrixUtils.makeRotate((float) degree);
             this.origin = origin;
             this.alignment = alignment;
             this.transformHitTests = transformHitTests;
@@ -620,7 +620,7 @@ namespace Unity.UIWidgets.widgets {
             Widget child = null
         ) : base(key: key, child: child) {
             D.assert(offset != null);
-            this.transform = Matrix3.makeTrans(new Vector2((float) offset.dx, (float) offset.dy));
+            this.transform = MatrixUtils.makeTrans(new Vector2((float) offset.dx, (float) offset.dy));
             this.origin = null;
             this.alignment = null;
             this.transformHitTests = transformHitTests;

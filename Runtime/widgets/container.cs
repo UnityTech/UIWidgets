@@ -162,7 +162,7 @@ namespace Unity.UIWidgets.widgets {
             }
 
             if (this.transform != null) {
-                current = new Transform(transform: this.transform.Value, child: current);
+                current = new Transform(transform: this.transform.Value(), child: current);
             }
 
             return current;

@@ -506,7 +506,7 @@ namespace Unity.UIWidgets.widgets
             ) {
             var hit = false;
 
-            Matrix3 inverse = transform.inverse;
+            Matrix3 inverse = transform.inverse();
             //var localPosition = MatrixUtils.transformPoint(inverse, position);
             var localPosition = inverse.transformPoint(position);
             

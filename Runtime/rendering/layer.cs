@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
+using Unity.UIWidgets.painting;
 using UnityEngine;
 using Rect = Unity.UIWidgets.ui.Rect;
 
@@ -396,7 +397,7 @@ namespace Unity.UIWidgets.rendering {
 
     public class TransformLayer : OffsetLayer {
         public TransformLayer(Matrix3 transform = null, Offset offset = null) : base(offset) {
-            this._transform = transform ?? Matrix3.identity;
+            this._transform = transform ?? Matrix3.I();
         }
 
         public Matrix3 transform {
@@ -413,7 +414,7 @@ namespace Unity.UIWidgets.rendering {
             var totalOffset = this.offset + layerOffset;
             if (totalOffset != Offset.zero) {
                 this._lastEffectiveTransform =
-                    Matrix3.makeTrans(totalOffset.toVector()) * this._lastEffectiveTransform;
+                    MatrixUtils.makeTrans(totalOffset.toVector()) * this._lastEffectiveTransform;
             }
 
             builder.pushTransform(this._lastEffectiveTransform);

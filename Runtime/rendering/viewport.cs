@@ -1335,7 +1335,7 @@ namespace Unity.UIWidgets.rendering {
             D.assert(child != null);
 
             Offset offset = this.paintOffsetOf((RenderSliver) child);
-            transform = Matrix3.makeTrans(offset.toVector()) * transform;
+            transform = MatrixUtils.makeTrans(offset.toVector()) * transform;
         }
 
         protected override double computeChildMainAxisPosition(RenderSliver child, double parentMainAxisPosition) {

@@ -21,7 +21,7 @@ namespace Unity.UIWidgets.rendering {
         public readonly double devicePixelRatio;
 
         public Matrix3 toMatrix() {
-            return Matrix3.identity;
+            return Matrix3.I();
         }
 
         public override string ToString() {
@@ -144,7 +144,6 @@ namespace Unity.UIWidgets.rendering {
             {
                 D.assert(_rootTransform != null);
                 return _rootTransform.transformRect(Offset.zero & size);
-                //return MatrixUtils.transformRect(_rootTransform, Offset.zero & size);
             }
         }
         

@@ -264,8 +264,8 @@ namespace Unity.UIWidgets.rendering {
 
         public void pushTransform(bool needsCompositing, Offset offset, Matrix3 transform,
             PaintingContextCallback painter) {
-            var effectiveTransform = Matrix3.makeTrans(offset.toVector())
-                                     * transform * Matrix3.makeTrans(-offset.toVector());
+            var effectiveTransform = MatrixUtils.makeTrans(offset.toVector())
+                                     * transform * MatrixUtils.makeTrans(-offset.toVector());
 
             if (needsCompositing) {
                 this.pushLayer(
@@ -1243,11 +1243,10 @@ namespace Unity.UIWidgets.rendering {
                 renderers.Add(renderer);
             }
 
-            var transform = Matrix3.identity;
+            var transform = Matrix3.I();
             for (int index = renderers.Count - 1; index > 0; index -= 1) {
                 renderers[index].applyPaintTransform(renderers[index - 1], ref transform);
             }
-
             return transform;
         }
 

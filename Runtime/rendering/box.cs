@@ -1157,7 +1157,7 @@ namespace Unity.UIWidgets.rendering {
 
             var childParentData = (BoxParentData) child.parentData;
             var offset = childParentData.offset;
-            transform = Matrix3.makeTrans(offset.toVector()) * transform;
+            transform = MatrixUtils.makeTrans(offset.toVector()) * transform;
         }
 
         public Offset globalToLocal(Offset point, RenderObject ancestor = null) {
@@ -1166,7 +1166,7 @@ namespace Unity.UIWidgets.rendering {
                 return Offset.zero;
             }
 
-            transform = transform.inverse;
+            transform = transform.inverse();
             return transform.transformPoint(point);
         }
 

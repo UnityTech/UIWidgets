@@ -599,7 +599,7 @@ namespace Unity.UIWidgets.rendering {
         Matrix3 _transform;
 
         public void setIdentity() {
-            this._transform = Matrix3.identity;
+            this._transform = Matrix3.I();
             this.markNeedsPaint();
         }
 
@@ -612,12 +612,12 @@ namespace Unity.UIWidgets.rendering {
         }
 
         public void rotateZ(double degrees) {
-            this._transform = Matrix3.makeRotate((float) degrees) * this._transform;
+            this._transform = MatrixUtils.makeRotate((float) degrees) * this._transform;
             this.markNeedsPaint();
         }
 
         public void translate(double x, double y = 0.0, double z = 0.0) {
-            this._transform = Matrix3.makeTrans((float)x, (float)y) * this._transform;
+            this._transform = MatrixUtils.makeTrans((float)x, (float)y) * this._transform;
             this.markNeedsPaint();
         }
 
@@ -633,27 +633,27 @@ namespace Unity.UIWidgets.rendering {
                     return this._transform;
                 }
 
-                var result = Matrix3.identity;
+                var result = Matrix3.I();
                 if (this._origin != null) {
-                    result = Matrix3.makeTrans(new Vector2((float) this._origin.dx, (float) this._origin.dy)) *
+                    result = MatrixUtils.makeTrans(new Vector2((float) this._origin.dx, (float) this._origin.dy)) *
                              result;
                 }
 
                 Offset translation = null;
                 if (resolvedAlignment != null) {
                     translation = resolvedAlignment.alongSize(this.size);
-                    result = Matrix3.makeTrans(new Vector2((float) translation.dx, (float) translation.dy)) * result;
+                    result = MatrixUtils.makeTrans(new Vector2((float) translation.dx, (float) translation.dy)) * result;
                 }
 
                 result = this._transform * result;
 
                 if (resolvedAlignment != null) {
-                    result = Matrix3.makeTrans(new Vector2((float) -translation.dx, (float) -translation.dy)) *
+                    result = MatrixUtils.makeTrans(new Vector2((float) -translation.dx, (float) -translation.dy)) *
                              result;
                 }
 
                 if (this._origin != null) {
-                    result = Matrix3.makeTrans(new Vector2((float) -this._origin.dx, (float) -this._origin.dy)) *
+                    result = MatrixUtils.makeTrans(new Vector2((float) -this._origin.dx, (float) -this._origin.dy)) *
                              result;
                 }
 
@@ -672,7 +672,7 @@ namespace Unity.UIWidgets.rendering {
                     return false;
                 }
 
-                position = transform.inverse.transformPoint(position);
+                position = transform.inverse().transformPoint(position);
             }
 
             return base.hitTestChildren(result, position: position);

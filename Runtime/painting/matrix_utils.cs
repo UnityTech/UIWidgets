@@ -6,6 +6,76 @@ using Rect = Unity.UIWidgets.ui.Rect;
 
 namespace Unity.UIWidgets.painting {
     public static class MatrixUtils {
+
+        public static Matrix3 makeRotate(float degree)
+        {
+            var m = Matrix3.I();
+            m.setRotate(degree);
+            return m;
+        }
+
+        public static Matrix3 makeTrans(Vector2 vector)
+        {
+            var m = Matrix3.I();
+            m.setTranslate(vector.x, vector.y);
+            return m;
+        }
+        
+        public static Matrix3 makeTrans(float dx, float dy)
+        {
+            var m = Matrix3.I();
+            m.setTranslate(dx, dy);
+            return m;
+        }
+
+        public static Matrix3 Value(this Matrix3 matrix3)
+        {
+            var m = Matrix3.I();
+            m.copyFrom(matrix3);
+            return m;
+        }
+
+        public static Matrix3 inverse(this Matrix3 matrix3)
+        {
+            var m = Matrix3.I();
+            var invertable = matrix3.invert(m);
+            D.assert(invertable);
+            return m;
+        }
+
+        public static Rect inverseTransformRect(this Matrix3 matrix3, Rect rect)
+        {
+            D.assert(rect != null);
+            D.assert(matrix3.determinant != 0.0);
+
+            if (matrix3.isIdentity()) {
+                return rect;
+            }
+
+            var inverse = matrix3.inverse();
+            return inverse.transformRect(rect);
+        }
+
+        public static Offset transformPoint(this Matrix3 matrix3, Offset point)
+        {
+            return matrix3.mapXY((float)point.dx, (float)point.dy);
+        }
+        
+        
+        public static Rect transformRect(this Matrix3 matrix3, Rect rect)
+        {
+            return matrix3.mapRect(rect);
+        }
+        
+        
+        public static Offset getAsTranslation(this Matrix3 matrix3)
+        {
+            if (matrix3.isTranslate()) return matrix3.mapXY(0, 0);
+            return null;
+        }
+
+
+
         public static Offset transformPoint(this Matrix4x4 transform, Offset point) {
             var position3 = new Vector3((float) point.dx, (float) point.dy, 0);
             var transformed3 = transform.MultiplyPoint(position3);
