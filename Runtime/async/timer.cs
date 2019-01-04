@@ -7,9 +7,13 @@ using UnityEditor;
 #endif
 
 namespace Unity.UIWidgets.async {
-    public abstract class Timer {
+    public abstract class Timer : IDisposable {
         public abstract void cancel();
-
+        
+        public void Dispose() {
+            this.cancel();
+        }
+        
         public static double timeSinceStartup {
             get {
 #if UNITY_EDITOR
@@ -50,7 +54,7 @@ namespace Unity.UIWidgets.async {
     }
 
     public class TimerProvider {
-        private readonly PriorityQueue<TimerImpl> _queue;
+        readonly PriorityQueue<TimerImpl> _queue;
 
         public TimerProvider() {
             this._queue = new PriorityQueue<TimerImpl>();
@@ -70,7 +74,7 @@ namespace Unity.UIWidgets.async {
             return timer;
         }
 
-        public void update() {
+        public void update(Action flushMicroTasks = null) {
             var now = Timer.timeSinceStartup;
 
             List<TimerImpl> timers = null;
@@ -87,6 +91,10 @@ namespace Unity.UIWidgets.async {
 
             if (timers != null) {
                 foreach (var timer in timers) {
+                    if (flushMicroTasks != null) {
+                        flushMicroTasks();
+                    }
+
                     timer.invoke();
                     if (timer.periodic && !timer.done) {
                         if (appendList == null) {
@@ -99,14 +107,11 @@ namespace Unity.UIWidgets.async {
             }
 
             if (appendList != null) {
-                lock (this._queue) {
-                    foreach (var timer in appendList) {
-                        this._queue.enqueue(timer);
-                    }
+                foreach (var timer in appendList) {
+                    this._queue.enqueue(timer);
                 }
             }
         }
-
 
         private class TimerImpl : Timer, IComparable<TimerImpl> {
             public readonly bool periodic;

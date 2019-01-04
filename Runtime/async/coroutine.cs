@@ -36,7 +36,7 @@ namespace Unity.UIWidgets.async {
             if (isBackground && BackgroundCallbacks.getInstance() != null) {
                 this._unhook = BackgroundCallbacks.getInstance().addCallback(this._moveNext);
             } else {
-                this._unhook = this._window.onUpdate(this._moveNext);
+                this._unhook = this._window.run(TimeSpan.Zero, this._moveNext, periodic: true);
             }
 
             this._isBackground = isBackground;
@@ -217,47 +217,6 @@ namespace Unity.UIWidgets.async {
 
         public UIWidgetsWaitForSeconds(float time) {
             this.waitTime = time;
-        }
-    }
-
-    internal class WindowCallbacks {
-        readonly LinkedList<VoidCallback> _callbackList;
-        readonly Window _window;
-
-        public WindowCallbacks() {
-            this._callbackList = new LinkedList<VoidCallback>();
-        }
-
-        public void update() {
-            var callbackList = this._callbackList.ToArray();
-            foreach (var callback in callbackList) {
-                try {
-                    callback();
-                }
-                catch (Exception ex) {
-                    Debug.LogError("Failed to execute callback in WindowCallbacks: " + ex);
-                }
-            }
-        }
-
-        public IDisposable onUpdate(VoidCallback callback) {
-            var node = this._callbackList.AddLast(callback);
-
-            return new _CallbackDisposable(this, node);
-        }
-
-        class _CallbackDisposable : IDisposable {
-            readonly WindowCallbacks _parent;
-            readonly LinkedListNode<VoidCallback> _node;
-
-            public _CallbackDisposable(WindowCallbacks parent, LinkedListNode<VoidCallback> node) {
-                this._parent = parent;
-                this._node = node;
-            }
-
-            public void Dispose() {
-                this._parent._callbackList.Remove(this._node);
-            }
         }
     }
 
