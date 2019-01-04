@@ -1,109 +1,126 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.ui;
-using UnityEngine;
 using Color = Unity.UIWidgets.ui.Color;
 
-namespace Unity.UIWidgets.widgets
-{
-    public class WidgetsApp : StatefulWidget
-    {
-
-        public readonly Widget child;
-
+namespace Unity.UIWidgets.widgets {
+    public class WidgetsApp : StatefulWidget {
         public readonly Window window;
-        
-        public WidgetsApp(Key key, Widget child, Window window) : base(key)
-        {
-            D.assert(window != null);
-            this.child = child;
-            this.window = window;
-        }
-       
 
-        public override State createState()
-        {
+        public readonly Widget home;
+
+        public WidgetsApp(
+            Key key = null,
+            Window window = null,
+            Widget home = null
+        ) : base(key) {
+            D.assert(window != null);
+            this.window = window;
+            this.home = home;
+        }
+
+        public override State createState() {
             return new _WidgetsAppState();
         }
     }
 
     public class WindowProvider : InheritedWidget {
-        readonly Window _window;
-
-         public WindowProvider(Window window, Widget child, Key key = null) : base(key: key, child: child) {
+        public WindowProvider(Key key = null, Window window = null, Widget child = null) :
+            base(key: key, child: child) {
             D.assert(window != null);
-            _window = window;
+            this.window = window;
         }
 
+        public readonly Window window;
+
         public static Window of(BuildContext context) {
-            WindowProvider provider = context.inheritFromWidgetOfExactType(typeof(WindowProvider)) as WindowProvider;
+            WindowProvider provider = (WindowProvider) context.inheritFromWidgetOfExactType(typeof(WindowProvider));
             if (provider == null) {
                 throw new UIWidgetsError("WindowProvider is missing");
             }
-            return provider._window;
+
+            return provider.window;
         }
+
         public override bool updateShouldNotify(InheritedWidget oldWidget) {
-            D.assert(_window == ((WindowProvider)oldWidget)._window);
+            D.assert(this.window == ((WindowProvider) oldWidget).window);
             return false;
         }
     }
 
-    class _WidgetsAppState : State<WidgetsApp>
-    {
-        
+    class _WidgetsAppState : State<WidgetsApp>, WidgetsBindingObserver {
         public override void initState() {
             base.initState();
-            D.assert(() =>
-            {
+            D.assert(() => {
                 WidgetInspectorService.instance.inspectorShowCallback += inspectorShowChanged;
                 return true;
             });
+            
+            WidgetsBinding.instance.addObserver(this);
         }
 
         public override void dispose() {
+            WidgetsBinding.instance.removeObserver(this);
             
-            D.assert(() =>
-            {
+            D.assert(() => {
                 WidgetInspectorService.instance.inspectorShowCallback -= inspectorShowChanged;
                 return true;
             });
             base.dispose();
         }
 
-        private void inspectorShowChanged()
-        {
-            setState(() => {});
+        private void inspectorShowChanged() {
+            this.setState();
         }
-        
-        public override Widget build(BuildContext context)
-        {
-            Widget result = widget.child;
-            result = new WindowProvider(widget.window, result);
-            D.assert(() =>
-            {
-                if (WidgetInspectorService.instance.debugShowInspector)
-                {
-                    result = new WidgetInspector(null, result, _InspectorSelectButtonBuilder);
+
+        public void didChangeMetrics() {
+            this.setState();
+        }
+
+        public void didChangeTextScaleFactor() {
+            this.setState();
+        }
+
+        public void didChangeLocales(List<Locale> locale) {
+            // TODO: support locales.
+        }
+
+        public override Widget build(BuildContext context) {
+            Widget result = this.widget.home;
+
+            D.assert(() => {
+                if (WidgetInspectorService.instance.debugShowInspector) {
+                    result = new WidgetInspector(null, result, this._InspectorSelectButtonBuilder);
                 }
+
                 return true;
             });
+
+            result = new WindowProvider(
+                window: this.widget.window,
+                child: result
+            );
+
+            result = new MediaQuery(
+                data: MediaQueryData.fromWindow(this.widget.window),
+                child: result
+            );
+
             return result;
         }
 
-        private Widget _InspectorSelectButtonBuilder(BuildContext context, VoidCallback onPressed)
-        {
+        private Widget _InspectorSelectButtonBuilder(BuildContext context, VoidCallback onPressed) {
             return new _InspectorSelectButton(onPressed: onPressed);
         }
     }
-    
+
     class _InspectorSelectButton : StatelessWidget {
         public _InspectorSelectButton(
             VoidCallback onPressed,
             Key key = null
-        ) : base(key: key)
-        {
+        ) : base(key: key) {
             this.onPressed = () => onPressed();
         }
 

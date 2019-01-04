@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Unity.UIWidgets.async;
 using Unity.UIWidgets.service;
 using Unity.UIWidgets.foundation;
@@ -10,98 +11,28 @@ namespace Unity.UIWidgets.ui {
 
     public delegate void PointerDataPacketCallback(PointerDataPacket packet);
 
-    public abstract class Window {
-        public static Window instance {
-            get {
-                D.assert(_instance != null, "Window.instance is null");
-                return _instance;
-            }
-
-            set {
-                if (value == null) {
-                    D.assert(_instance != null, "Window.instance is already cleared.");
-                    _instance = null;
-                } else {
-                    D.assert(_instance == null, "Window.instance is already assigned.");
-                    _instance = value;
-                }
-            }
+    public class WindowPadding {
+        public WindowPadding(double left, double top, double right, double bottom) {
+            this.left = left;
+            this.top = top;
+            this.right = right;
+            this.bottom = bottom;
         }
 
-        public static bool hasInstance {
-            get {
-                return _instance != null;
-            }
+        public readonly double left;
+
+        public readonly double top;
+
+        public readonly double right;
+
+        public readonly double bottom;
+
+        public static WindowPadding zero = new WindowPadding(left: 0.0, top: 0.0, right: 0.0, bottom: 0.0);
+
+        public override string ToString() {
+            return $"{this.GetType()}(left: {this.left}, top: {this.top}, right: {this.right}, bottom: {this.bottom})";
         }
-
-        static Window _instance;
-
-        public double devicePixelRatio {
-            get { return this._devicePixelRatio; }
-        }
-
-        protected double _devicePixelRatio = 1.0;
-
-        public Size physicalSize {
-            get { return this._physicalSize; }
-        }
-
-        protected Size _physicalSize = Size.zero;
-
-        public VoidCallback onMetricsChanged {
-            get { return this._onMetricsChanged; }
-            set { this._onMetricsChanged = value; }
-        }
-
-        VoidCallback _onMetricsChanged;
-
-        public VoidCallback onLocaleChanged {
-            get { return this._onLocaleChanged; }
-            set { this._onLocaleChanged = value; }
-        }
-
-        private VoidCallback _onLocaleChanged;
-
-        public FrameCallback onBeginFrame {
-            get { return this._onBeginFrame; }
-            set { this._onBeginFrame = value; }
-        }
-
-        FrameCallback _onBeginFrame;
-
-        public VoidCallback onDrawFrame {
-            get { return this._onDrawFrame; }
-            set { this._onDrawFrame = value; }
-        }
-
-        VoidCallback _onDrawFrame;
-        
-        public PointerDataPacketCallback onPointerEvent {
-            get { return this._onPointerEvent; }
-            set { this._onPointerEvent = value; }
-        }
-
-        PointerDataPacketCallback _onPointerEvent;
-
-        public abstract void scheduleFrame(bool regenerateLayerTree = true);
-
-        public abstract void render(Scene scene);
-
-        public abstract void scheduleMicrotask(Action callback);
-
-        public abstract void flushMicrotasks();
-
-        public abstract Timer run(TimeSpan duration, Action callback, bool periodic = false);
-        
-        public Timer run(Action callback) {
-            return this.run(TimeSpan.Zero, callback);
-        }
-
-        public abstract TextInput textInput { get; }
-
-        public abstract IDisposable getScope();
     }
-
 
     public class Locale : IEquatable<Locale> {
         public Locale(string languageCode, string countryCode = null) {
@@ -155,4 +86,118 @@ namespace Unity.UIWidgets.ui {
             return $"{this.languageCode}_{this.countryCode}";
         }
     }
+
+    public abstract class Window {
+        public static Window instance {
+            get {
+                D.assert(_instance != null, "Window.instance is null");
+                return _instance;
+            }
+
+            set {
+                if (value == null) {
+                    D.assert(_instance != null, "Window.instance is already cleared.");
+                    _instance = null;
+                } else {
+                    D.assert(_instance == null, "Window.instance is already assigned.");
+                    _instance = value;
+                }
+            }
+        }
+
+        public static bool hasInstance {
+            get { return _instance != null; }
+        }
+
+        static Window _instance;
+
+        public double devicePixelRatio => this._devicePixelRatio;
+        protected double _devicePixelRatio = 1.0;
+
+        public Size physicalSize => this._physicalSize;
+        protected Size _physicalSize = Size.zero;
+
+        public WindowPadding viewInsets => this._viewInsets;
+        protected WindowPadding _viewInsets = WindowPadding.zero;
+        
+        public WindowPadding padding => this._padding;
+        protected WindowPadding _padding = WindowPadding.zero;
+
+        public VoidCallback onMetricsChanged {
+            get { return this._onMetricsChanged; }
+            set { this._onMetricsChanged = value; }
+        }
+
+        VoidCallback _onMetricsChanged;
+
+        public Locale locale {
+            get {
+                if (this._locales != null && this._locales.isNotEmpty()) {
+                    return this._locales[0];
+                }
+
+                return null;
+            }
+        }
+
+        public List<Locale> locales => this._locales;
+        protected List<Locale> _locales;
+
+        public VoidCallback onLocaleChanged {
+            get { return this._onLocaleChanged; }
+            set { this._onLocaleChanged = value; }
+        }
+
+        private VoidCallback _onLocaleChanged;
+
+        public double textScaleFactor => this._textScaleFactor;
+        protected double _textScaleFactor = 1.0;
+        
+        public VoidCallback onTextScaleFactorChanged {
+            get { return this._onTextScaleFactorChanged; }
+            set { this._onTextScaleFactorChanged = value; }
+        }
+
+        VoidCallback _onTextScaleFactorChanged;
+    
+        public FrameCallback onBeginFrame {
+            get { return this._onBeginFrame; }
+            set { this._onBeginFrame = value; }
+        }
+
+        FrameCallback _onBeginFrame;
+
+        public VoidCallback onDrawFrame {
+            get { return this._onDrawFrame; }
+            set { this._onDrawFrame = value; }
+        }
+
+        VoidCallback _onDrawFrame;
+
+        public PointerDataPacketCallback onPointerEvent {
+            get { return this._onPointerEvent; }
+            set { this._onPointerEvent = value; }
+        }
+
+        PointerDataPacketCallback _onPointerEvent;
+
+        public abstract void scheduleFrame(bool regenerateLayerTree = true);
+
+        public abstract void render(Scene scene);
+
+        public abstract void scheduleMicrotask(Action callback);
+
+        public abstract void flushMicrotasks();
+
+        public abstract Timer run(TimeSpan duration, Action callback, bool periodic = false);
+
+        public Timer run(Action callback) {
+            return this.run(TimeSpan.Zero, callback);
+        }
+
+        public abstract TextInput textInput { get; }
+
+        public abstract IDisposable getScope();
+    }
+
 }

@@ -8,6 +8,10 @@ using Unity.UIWidgets.ui.painting.txt;
 namespace Unity.UIWidgets.widgets {
     public interface WidgetsBindingObserver {
         void didChangeMetrics();
+
+        void didChangeTextScaleFactor();
+
+        void didChangeLocales(List<Locale> locale);
     }
 
     public class WidgetsBinding : RendererBinding {
@@ -53,10 +57,22 @@ namespace Unity.UIWidgets.widgets {
                 observer.didChangeMetrics();
             }
         }
+        
+        protected override void handleTextScaleFactorChanged() {
+            base.handleTextScaleFactorChanged();
+            foreach (WidgetsBindingObserver observer in this._observers) {
+                observer.didChangeTextScaleFactor();
+            }
+        }        
 
-        void handleLocaleChanged() {
-            // todo
-            // dispatchLocaleChanged(window.locale);
+        protected virtual void handleLocaleChanged() {
+            this.dispatchLocalesChanged(Window.instance.locales);
+        }
+        
+        protected virtual void dispatchLocalesChanged(List<Locale> locales) {
+            foreach (WidgetsBindingObserver observer in this._observers) {
+                observer.didChangeLocales(locales);
+            }
         }
 
         void _handleBuildScheduled() {

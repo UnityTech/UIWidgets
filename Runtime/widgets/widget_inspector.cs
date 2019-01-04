@@ -659,9 +659,13 @@ namespace Unity.UIWidgets.widgets
             return new Stack(children: children);
         }
 
-        public void didChangeMetrics()
-        {
-            throw new NotImplementedException();
+        public void didChangeMetrics() {
+        }
+
+        public void didChangeTextScaleFactor() {
+        }
+
+        public void didChangeLocales(List<Locale> locale) {
         }
 
         private void _selectionChangedCallback()
