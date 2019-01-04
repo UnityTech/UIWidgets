@@ -197,6 +197,7 @@ namespace Unity.UIWidgets.flow {
             };
 
             var renderTexture = new RenderTexture(desc);
+            renderTexture.hideFlags = HideFlags.HideAndDontSave;
             
             var canvas = new CommandBufferCanvas(renderTexture, devicePixelRatio);
             canvas.translate((float) -bounds.left, (float) -bounds.top);

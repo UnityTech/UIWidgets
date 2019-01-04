@@ -52,6 +52,7 @@ namespace Unity.UIWidgets.ui {
             }
 
             var texture = new Texture2D(2, 2);
+            texture.hideFlags = HideFlags.HideAndDontSave;
             texture.LoadImage(bytes);
             return Promise<Codec>.Resolved(new ImageCodec(new Image(texture)));
         }

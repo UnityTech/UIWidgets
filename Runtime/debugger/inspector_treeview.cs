@@ -224,8 +224,12 @@ namespace Unity.UIWidgets.debugger
 
         public static int GetIntProperty(Dictionary<string, object> properties, string name)
         {
-            object val;
-            properties.TryGetValue(name, out val);
+            object val = null;
+
+            if (properties != null) {
+                properties.TryGetValue(name, out val);
+            }
+
             if (val == null)
             {
                 return -1;

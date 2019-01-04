@@ -74,6 +74,10 @@ namespace UIWidgets.Tests {
                     var rootWidget = this.loadAsset();
                     this.windowAdapter.attachRootWidget(rootWidget);
                 }
+                
+                if (GUILayout.Button("UnloadUnusedAssets")) {
+                    Resources.UnloadUnusedAssets();
+                }
             }
             else if (selected != this._selected || !this.hasInvoked) {
                 this._selected = selected;

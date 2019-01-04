@@ -128,6 +128,7 @@ namespace Unity.UIWidgets.ui {
                 }
 
                 var tex = new Texture2D(this._width, this._height, TextureFormat.BGRA32, false);
+                tex.hideFlags = HideFlags.HideAndDontSave;
                 tex.LoadRawTextureData(frameData.gifFrame.bytes);
                 tex.Apply();
 

@@ -30,6 +30,7 @@ namespace UIWidgets.Tests {
             }
 
             _guiTextureMat = new Material(guiTextureShader);
+            _guiTextureMat.hideFlags = HideFlags.HideAndDontSave;
             return _guiTextureMat;
         }
 
