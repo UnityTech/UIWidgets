@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
+using Unity.UIWidgets.painting;
 using UnityEngine;
 using Rect = Unity.UIWidgets.ui.Rect;
 
@@ -259,7 +260,7 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
-        public virtual void applyTransform(Layer child, ref Matrix4x4 transform) {
+        public virtual void applyTransform(Layer child, ref Matrix3 transform) {
             D.assert(child != null);
         }
 
@@ -395,17 +396,17 @@ namespace Unity.UIWidgets.rendering {
     }
 
     public class TransformLayer : OffsetLayer {
-        public TransformLayer(Matrix4x4? transform = null, Offset offset = null) : base(offset) {
-            this._transform = transform ?? Matrix4x4.identity;
+        public TransformLayer(Matrix3 transform = null, Offset offset = null) : base(offset) {
+            this._transform = transform ?? Matrix3.I();
         }
 
-        public Matrix4x4 transform {
+        public Matrix3 transform {
             get { return this._transform; }
             set { this._transform = value; }
         }
 
-        Matrix4x4 _transform;
-        Matrix4x4 _lastEffectiveTransform;
+        Matrix3 _transform;
+        Matrix3 _lastEffectiveTransform;
 
         public override void addToScene(SceneBuilder builder, Offset layerOffset) {
             this._lastEffectiveTransform = this.transform;
@@ -413,7 +414,7 @@ namespace Unity.UIWidgets.rendering {
             var totalOffset = this.offset + layerOffset;
             if (totalOffset != Offset.zero) {
                 this._lastEffectiveTransform =
-                    Matrix4x4.Translate(totalOffset.toVector()) * this._lastEffectiveTransform;
+                    Matrix3.makeTrans(totalOffset) * this._lastEffectiveTransform;
             }
 
             builder.pushTransform(this._lastEffectiveTransform);
@@ -421,14 +422,14 @@ namespace Unity.UIWidgets.rendering {
             builder.pop();
         }
 
-        public override void applyTransform(Layer child, ref Matrix4x4 transform) {
+        public override void applyTransform(Layer child, ref Matrix3 transform) {
             D.assert(child != null);
             transform = transform * this._lastEffectiveTransform;
         }
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
-            properties.add(new DiagnosticsProperty<Matrix4x4>("transform", this.transform));
+            properties.add(new DiagnosticsProperty<Matrix3>("transform", this.transform));
         }
     }
 

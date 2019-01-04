@@ -262,21 +262,26 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
-        public void pushTransform(bool needsCompositing, Offset offset, Matrix4x4 transform,
+        public void pushTransform(bool needsCompositing, Offset offset, Matrix3 transform,
             PaintingContextCallback painter) {
-            var effectiveTransform = Matrix4x4.Translate(offset.toVector())
-                                     * transform * Matrix4x4.Translate(-offset.toVector());
+            var effectiveTransform = Matrix3.makeTrans(offset)
+                                     * transform * Matrix3.makeTrans(-offset);
 
-            if (needsCompositing) {
+            if (needsCompositing)
+            {
+                var inverse = Matrix3.I();
+                var invertible = effectiveTransform.invert(inverse);
+                D.assert(invertible);
+                
                 this.pushLayer(
                     new TransformLayer(effectiveTransform),
                     painter,
                     offset,
-                    childPaintBounds: effectiveTransform.inverseTransformRect(this.estimatedBounds)
+                    childPaintBounds: inverse.mapRect(this.estimatedBounds)
                 );
             } else {
                 this.canvas.save();
-                this.canvas.concat(effectiveTransform.toMatrix3());
+                this.canvas.concat(effectiveTransform);
                 painter(this, offset);
                 this.canvas.restore();
             }
@@ -1223,11 +1228,11 @@ namespace Unity.UIWidgets.rendering {
         public virtual void paint(PaintingContext context, Offset offset) {
         }
 
-        public virtual void applyPaintTransform(RenderObject child, ref Matrix4x4 transform) {
+        public virtual void applyPaintTransform(RenderObject child, ref Matrix3 transform) {
             D.assert(child.parent == this);
         }
 
-        public Matrix4x4 getTransformTo(RenderObject ancestor) {
+        public Matrix3 getTransformTo(RenderObject ancestor) {
             D.assert(this.attached);
 
             if (ancestor == null) {
@@ -1243,11 +1248,10 @@ namespace Unity.UIWidgets.rendering {
                 renderers.Add(renderer);
             }
 
-            var transform = Matrix4x4.identity;
+            var transform = Matrix3.I();
             for (int index = renderers.Count - 1; index > 0; index -= 1) {
                 renderers[index].applyPaintTransform(renderers[index - 1], ref transform);
             }
-
             return transform;
         }
 

@@ -543,7 +543,7 @@ namespace Unity.UIWidgets.rendering {
 
     public class RenderTransform : RenderProxyBox {
         public RenderTransform(
-            Matrix4x4 transform,
+            Matrix3 transform,
             Offset origin = null,
             Alignment alignment = null,
             bool transformHitTests = true,
@@ -585,7 +585,7 @@ namespace Unity.UIWidgets.rendering {
 
         public bool transformHitTests;
 
-        public Matrix4x4 transform {
+        public Matrix3 transform {
             set {
                 if (this._transform == value) {
                     return;
@@ -596,66 +596,64 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
-        Matrix4x4 _transform;
+        Matrix3 _transform;
 
         public void setIdentity() {
-            this._transform = Matrix4x4.identity;
+            this._transform = Matrix3.I();
             this.markNeedsPaint();
         }
 
         public void rotateX(double degrees) {
-            this._transform = Matrix4x4.Rotate(Quaternion.Euler((float) degrees, 0, 0)) * this._transform;
-            this.markNeedsPaint();
+            //2D, do nothing
         }
 
         public void rotateY(double degrees) {
-            this._transform = Matrix4x4.Rotate(Quaternion.Euler(0, (float) degrees, 0)) * this._transform;
-            this.markNeedsPaint();
+            //2D, do nothing
         }
 
         public void rotateZ(double degrees) {
-            this._transform = Matrix4x4.Rotate(Quaternion.Euler(0, 0, (float) degrees)) * this._transform;
+            this._transform = Matrix3.makeRotate((float) degrees) * this._transform;
             this.markNeedsPaint();
         }
 
         public void translate(double x, double y = 0.0, double z = 0.0) {
-            this._transform = Matrix4x4.Translate(new Vector3((float) x, (float) y, (float) z)) * this._transform;
+            this._transform = Matrix3.makeTrans((float)x, (float)y) * this._transform;
             this.markNeedsPaint();
         }
 
         public void scale(double x, double y, double z) {
-            this._transform = Matrix4x4.Scale(new Vector3((float) x, (float) y, (float) z)) * this._transform;
+            this._transform = Matrix3.makeScale((float) x, (float) y) * this._transform;
             this.markNeedsPaint();
         }
 
-        Matrix4x4 _effectiveTransform {
+        Matrix3 _effectiveTransform {
             get {
                 Alignment resolvedAlignment = this.alignment;
                 if (this._origin == null && resolvedAlignment == null) {
                     return this._transform;
                 }
 
-                var result = Matrix4x4.identity;
+                var result = Matrix3.I();
                 if (this._origin != null) {
-                    result = Matrix4x4.Translate(new Vector2((float) this._origin.dx, (float) this._origin.dy)) *
+                    result = Matrix3.makeTrans((float) this._origin.dx, (float) this._origin.dy) *
                              result;
                 }
 
                 Offset translation = null;
                 if (resolvedAlignment != null) {
                     translation = resolvedAlignment.alongSize(this.size);
-                    result = Matrix4x4.Translate(new Vector2((float) translation.dx, (float) translation.dy)) * result;
+                    result = Matrix3.makeTrans((float) translation.dx, (float) translation.dy) * result;
                 }
 
                 result = this._transform * result;
 
                 if (resolvedAlignment != null) {
-                    result = Matrix4x4.Translate(new Vector2((float) -translation.dx, (float) -translation.dy)) *
+                    result = Matrix3.makeTrans((float) -translation.dx, (float) -translation.dy) *
                              result;
                 }
 
                 if (this._origin != null) {
-                    result = Matrix4x4.Translate(new Vector2((float) -this._origin.dx, (float) -this._origin.dy)) *
+                    result = Matrix3.makeTrans((float) -this._origin.dx, (float) -this._origin.dy) *
                              result;
                 }
 
@@ -666,24 +664,29 @@ namespace Unity.UIWidgets.rendering {
         public override bool hitTest(HitTestResult result, Offset position = null) {
             return this.hitTestChildren(result, position: position);
         }
-
+        
         protected override bool hitTestChildren(HitTestResult result, Offset position = null) {
             if (this.transformHitTests) {
                 var transform = this._effectiveTransform;
-                if (transform.determinant == 0) {
+                var inverse = Matrix3.I();
+                var invertible = transform.invert(inverse);
+                
+                if (!invertible) {
                     return false;
                 }
 
-                position = transform.inverse.transformPoint(position);
+                position = inverse.mapPoint(position);
             }
 
             return base.hitTestChildren(result, position: position);
         }
 
         public override void paint(PaintingContext context, Offset offset) {
-            if (this.child != null) {
+            if (this.child != null)
+            {
                 var transform = this._effectiveTransform;
                 Offset childOffset = transform.getAsTranslation();
+                
                 if (childOffset == null) {
                     context.pushTransform(this.needsCompositing, offset, transform, base.paint);
                 } else {
@@ -692,13 +695,13 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
-        public override void applyPaintTransform(RenderObject child, ref Matrix4x4 transform) {
+        public override void applyPaintTransform(RenderObject child, ref Matrix3 transform) {
             transform = this._effectiveTransform * transform;
         }
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
-            properties.add(new DiagnosticsProperty<Matrix4x4>("transform matrix", this._transform));
+            properties.add(new DiagnosticsProperty<Matrix3>("transform matrix", this._transform));
             properties.add(new DiagnosticsProperty<Offset>("origin", this.origin));
             properties.add(new DiagnosticsProperty<Alignment>("alignment", this.alignment));
             properties.add(new DiagnosticsProperty<bool>("transformHitTests", this.transformHitTests));

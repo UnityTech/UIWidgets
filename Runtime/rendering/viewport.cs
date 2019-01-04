@@ -393,7 +393,7 @@ namespace Unity.UIWidgets.rendering {
             RenderObject descendant;
             rect = rect ?? target.paintBounds;
 
-            Matrix4x4 transform;
+            Matrix3 transform;
 
             if (target is RenderBox) {
                 RenderBox targetBox = (RenderBox) target;
@@ -411,7 +411,7 @@ namespace Unity.UIWidgets.rendering {
                 RenderSliver pivotParent = (RenderSliver) pivot.parent;
 
                 transform = targetBox.getTransformTo(pivot);
-                Rect bounds = transform.transformRect(rect);
+                Rect bounds = transform.mapRect(rect);
 
                 double offset = 0.0;
 
@@ -499,7 +499,7 @@ namespace Unity.UIWidgets.rendering {
 
             transform = target.getTransformTo(this);
             this.applyPaintTransform(child, ref transform);
-            Rect targetRect = transform.transformRect(rect);
+            Rect targetRect = transform.mapRect(rect);
 
             switch (this.axisDirection) {
                 case AxisDirection.down:
@@ -656,7 +656,7 @@ namespace Unity.UIWidgets.rendering {
                 targetOffset = trailingEdgeOffset;
             } else {
                 var transform = descendant.getTransformTo(viewport.parent);
-                return transform.transformRect(rect ?? descendant.paintBounds);
+                return transform.mapRect(rect ?? descendant.paintBounds);
             }
 
             D.assert(targetOffset != null);
@@ -1036,7 +1036,7 @@ namespace Unity.UIWidgets.rendering {
             return 0.0;
         }
 
-        public override void applyPaintTransform(RenderObject child, ref Matrix4x4 transform) {
+        public override void applyPaintTransform(RenderObject child, ref Matrix3 transform) {
             D.assert(child != null);
 
             var childParentData = (SliverPhysicalParentData) child.parentData;
@@ -1331,11 +1331,11 @@ namespace Unity.UIWidgets.rendering {
             return pinnedExtent;
         }
 
-        public override void applyPaintTransform(RenderObject child, ref Matrix4x4 transform) {
+        public override void applyPaintTransform(RenderObject child, ref Matrix3 transform) {
             D.assert(child != null);
 
             Offset offset = this.paintOffsetOf((RenderSliver) child);
-            transform = Matrix4x4.Translate(offset.toVector()) * transform;
+            transform = Matrix3.makeTrans(offset) * transform;
         }
 
         protected override double computeChildMainAxisPosition(RenderSliver child, double parentMainAxisPosition) {

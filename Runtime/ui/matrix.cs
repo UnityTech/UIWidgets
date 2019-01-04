@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.painting;
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
@@ -20,6 +21,20 @@ namespace Unity.UIWidgets.ui {
         public static Matrix3 makeTrans(float dx, float dy) {
             var m = new Matrix3();
             m.setTranslate(dx, dy);
+            return m;
+        }
+        
+        public static Matrix3 makeRotate(float degree)
+        {
+            var m = new Matrix3();
+            m.setRotate(degree);
+            return m;
+        }
+
+        public static Matrix3 makeTrans(Offset offset)
+        {
+            var m = new Matrix3();
+            m.setTranslate((float)offset.dx, (float)offset.dy);
             return m;
         }
 
@@ -1258,6 +1273,22 @@ namespace Unity.UIWidgets.ui {
 
                 return hash;
             }
+        }
+        
+        public static Matrix3 operator *(Matrix3 a, Matrix3 b)
+        {
+            return concat(a, b);
+        }
+
+        public override string ToString()
+        {
+            return "Matrix3(" + string.Join(",", Array.ConvertAll(fMat, i => i.ToString())) + ")";
+        }
+        
+        
+        public Offset mapPoint(Offset point)
+        {
+            return this.mapXY((float)point.dx, (float)point.dy);
         }
     }
 

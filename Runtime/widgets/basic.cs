@@ -575,14 +575,14 @@ namespace Unity.UIWidgets.widgets {
     public class Transform : SingleChildRenderObjectWidget {
         public Transform(
             Key key = null,
-            Matrix4x4? transform = null,
+            Matrix3 transform = null,
             Offset origin = null,
             Alignment alignment = null,
             bool transformHitTests = true,
             Widget child = null
         ) : base(key, child) {
             D.assert(transform != null);
-            this.transform = transform.Value;
+            this.transform = new Matrix3(transform);
             this.origin = origin;
             this.alignment = alignment;
             this.transformHitTests = transformHitTests;
@@ -596,7 +596,7 @@ namespace Unity.UIWidgets.widgets {
             Widget child = null,
             double degree = 0.0
         ) : base(key: key, child: child) {
-            this.transform = Matrix4x4.Rotate(Quaternion.Euler(0, 0, (float) degree));
+            this.transform = Matrix3.makeRotate((float) degree);
             this.origin = origin;
             this.alignment = alignment;
             this.transformHitTests = transformHitTests;
@@ -620,7 +620,7 @@ namespace Unity.UIWidgets.widgets {
             Widget child = null
         ) : base(key: key, child: child) {
             D.assert(offset != null);
-            this.transform = Matrix4x4.Translate(new Vector3((float) offset.dx, (float) offset.dy, 0.0f));
+            this.transform = Matrix3.makeTrans((float) offset.dx, (float) offset.dy);
             this.origin = null;
             this.alignment = null;
             this.transformHitTests = transformHitTests;
@@ -643,7 +643,7 @@ namespace Unity.UIWidgets.widgets {
             bool transformHitTests = true,
             Widget child = null
         ) : base(key: key, child: child) {
-            this.transform = Matrix4x4.Scale(new Vector3((float) scale, (float) scale, 1.0f));
+            this.transform = Matrix3.makeScale((float) scale, (float) scale);
             this.origin = origin;
             this.alignment = alignment;
             this.transformHitTests = transformHitTests;
@@ -660,12 +660,13 @@ namespace Unity.UIWidgets.widgets {
             return new Transform(key, scale, origin, alignment, transformHitTests, child);
         }
 
-        public readonly Matrix4x4 transform;
+        public readonly Matrix3 transform;
         public readonly Offset origin;
         public readonly Alignment alignment;
         public readonly bool transformHitTests;
 
-        public override RenderObject createRenderObject(BuildContext context) {
+        public override RenderObject createRenderObject(BuildContext context)
+        {
             return new RenderTransform(
                 transform: this.transform,
                 origin: this.origin,
