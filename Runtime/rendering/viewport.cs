@@ -411,7 +411,7 @@ namespace Unity.UIWidgets.rendering {
                 RenderSliver pivotParent = (RenderSliver) pivot.parent;
 
                 transform = targetBox.getTransformTo(pivot);
-                Rect bounds = transform.transformRect(rect);
+                Rect bounds = transform.mapRect(rect);
 
                 double offset = 0.0;
 
@@ -499,7 +499,7 @@ namespace Unity.UIWidgets.rendering {
 
             transform = target.getTransformTo(this);
             this.applyPaintTransform(child, ref transform);
-            Rect targetRect = transform.transformRect(rect);
+            Rect targetRect = transform.mapRect(rect);
 
             switch (this.axisDirection) {
                 case AxisDirection.down:
@@ -656,7 +656,7 @@ namespace Unity.UIWidgets.rendering {
                 targetOffset = trailingEdgeOffset;
             } else {
                 var transform = descendant.getTransformTo(viewport.parent);
-                return transform.transformRect(rect ?? descendant.paintBounds);
+                return transform.mapRect(rect ?? descendant.paintBounds);
             }
 
             D.assert(targetOffset != null);
@@ -1335,7 +1335,7 @@ namespace Unity.UIWidgets.rendering {
             D.assert(child != null);
 
             Offset offset = this.paintOffsetOf((RenderSliver) child);
-            transform = MatrixUtils.makeTrans(offset.toVector()) * transform;
+            transform = Matrix3.makeTrans(offset.toVector()) * transform;
         }
 
         protected override double computeChildMainAxisPosition(RenderSliver child, double parentMainAxisPosition) {

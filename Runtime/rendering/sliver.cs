@@ -455,7 +455,7 @@ namespace Unity.UIWidgets.rendering {
         public Offset paintOffset = Offset.zero;
 
         public void applyPaintTransform(ref Matrix3 transform) {
-            transform = MatrixUtils.makeTrans(this.paintOffset.toVector()) * transform;
+            transform = Matrix3.makeTrans(this.paintOffset.toVector()) * transform;
         }
 
         public override string ToString() {
@@ -838,14 +838,14 @@ namespace Unity.UIWidgets.rendering {
                         delta = it.geometry.paintExtent - child.size.width - delta;
                     }
 
-                    transform = MatrixUtils.makeTrans(new Vector2((float) delta, (float) crossAxisDelta)) * transform;
+                    transform = Matrix3.makeTrans(new Vector2((float) delta, (float) crossAxisDelta)) * transform;
                     break;
                 case Axis.vertical:
                     if (!rightWayUp) {
                         delta = it.geometry.paintExtent - child.size.height - delta;
                     }
 
-                    transform = MatrixUtils.makeTrans(new Vector2((float) crossAxisDelta, (float) delta)) * transform;
+                    transform = Matrix3.makeTrans(new Vector2((float) crossAxisDelta, (float) delta)) * transform;
                     break;
             }
         }

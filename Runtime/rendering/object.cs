@@ -264,15 +264,15 @@ namespace Unity.UIWidgets.rendering {
 
         public void pushTransform(bool needsCompositing, Offset offset, Matrix3 transform,
             PaintingContextCallback painter) {
-            var effectiveTransform = MatrixUtils.makeTrans(offset.toVector())
-                                     * transform * MatrixUtils.makeTrans(-offset.toVector());
+            var effectiveTransform = Matrix3.makeTrans(offset.toVector())
+                                     * transform * Matrix3.makeTrans(-offset.toVector());
 
             if (needsCompositing) {
                 this.pushLayer(
                     new TransformLayer(effectiveTransform),
                     painter,
                     offset,
-                    childPaintBounds: effectiveTransform.inverseTransformRect(this.estimatedBounds)
+                    childPaintBounds: effectiveTransform.inverse().mapRect(this.estimatedBounds)
                 );
             } else {
                 this.canvas.save();

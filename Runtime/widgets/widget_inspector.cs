@@ -506,9 +506,13 @@ namespace Unity.UIWidgets.widgets
             ) {
             var hit = false;
 
+            if (!transform.invertable())
+            {
+                return false;
+            }
+
             Matrix3 inverse = transform.inverse();
-            //var localPosition = MatrixUtils.transformPoint(inverse, position);
-            var localPosition = inverse.transformPoint(position);
+            var localPosition = inverse.mapPoint(position);
             
             List<DiagnosticsNode> children = renderObject.debugDescribeChildren();
             for (int i = children.Count - 1; i >= 0; --i)

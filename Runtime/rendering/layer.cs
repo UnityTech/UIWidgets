@@ -414,7 +414,7 @@ namespace Unity.UIWidgets.rendering {
             var totalOffset = this.offset + layerOffset;
             if (totalOffset != Offset.zero) {
                 this._lastEffectiveTransform =
-                    MatrixUtils.makeTrans(totalOffset.toVector()) * this._lastEffectiveTransform;
+                    Matrix3.makeTrans(totalOffset.toVector()) * this._lastEffectiveTransform;
             }
 
             builder.pushTransform(this._lastEffectiveTransform);

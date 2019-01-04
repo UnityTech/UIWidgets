@@ -1157,21 +1157,21 @@ namespace Unity.UIWidgets.rendering {
 
             var childParentData = (BoxParentData) child.parentData;
             var offset = childParentData.offset;
-            transform = MatrixUtils.makeTrans(offset.toVector()) * transform;
+            transform = Matrix3.makeTrans(offset.toVector()) * transform;
         }
 
         public Offset globalToLocal(Offset point, RenderObject ancestor = null) {
             var transform = this.getTransformTo(ancestor);
-            if (transform.determinant == 0) {
+            if (!transform.invertable()) {
                 return Offset.zero;
             }
 
             transform = transform.inverse();
-            return transform.transformPoint(point);
+            return transform.mapPoint(point);
         }
 
         public Offset localToGlobal(Offset point, RenderObject ancestor = null) {
-            return this.getTransformTo(ancestor).transformPoint(point);
+            return this.getTransformTo(ancestor).mapPoint(point);
         }
 
         public override Rect paintBounds {

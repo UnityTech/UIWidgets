@@ -23,6 +23,20 @@ namespace Unity.UIWidgets.ui {
             m.setTranslate(dx, dy);
             return m;
         }
+        
+        public static Matrix3 makeRotate(float degree)
+        {
+            var m = new Matrix3();
+            m.setRotate(degree);
+            return m;
+        }
+
+        public static Matrix3 makeTrans(Vector2 vector)
+        {
+            var m = new Matrix3();
+            m.setTranslate(vector.x, vector.y);
+            return m;
+        }
 
         public static Matrix3 makeAll(
             float scaleX, float skewX, float transX,
@@ -1271,16 +1285,25 @@ namespace Unity.UIWidgets.ui {
             return "Matrix3(" + string.Join(",", Array.ConvertAll(fMat, i => i.ToString())) + ")";
         }
 
-        public float determinant
+        public bool invertable()
         {
-            get
-            {
-                TypeMask mask = this.getType();
-                int isPersp = (int) (mask & TypeMask.kPerspective_Mask);
-                double invDet = ScalarUtils.inv_determinant(fMat, isPersp);
-                D.assert(invDet != 0);
-                return (float)(1.0 / invDet);
-            }
+            var mask = this.getType();
+            var isPersp = (int) (mask & TypeMask.kPerspective_Mask);
+            var invDet = ScalarUtils.inv_determinant(fMat, isPersp);
+            return invDet != 0;
+        }
+        
+        public Matrix3 inverse()
+        {
+            var m = new Matrix3();
+            var invertable = this.invert(m);
+            D.assert(invertable);
+            return m;
+        }
+        
+        public Offset mapPoint(Offset point)
+        {
+            return this.mapXY((float)point.dx, (float)point.dy);
         }
     }
 

@@ -143,7 +143,7 @@ namespace Unity.UIWidgets.rendering {
             get
             {
                 D.assert(_rootTransform != null);
-                return _rootTransform.transformRect(Offset.zero & size);
+                return _rootTransform.mapRect(Offset.zero & size);
             }
         }
         
