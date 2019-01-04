@@ -112,7 +112,6 @@ namespace Unity.UIWidgets.editor {
         readonly TimeSpan _epoch = new TimeSpan(Stopwatch.GetTimestamp());
         readonly MicrotaskQueue _microtaskQueue = new MicrotaskQueue();
         readonly TimerProvider _timerProvider = new TimerProvider();
-        readonly WindowCallbacks _windowCallbacks = new WindowCallbacks();
         readonly TextInput _textInput = new TextInput();
         readonly Rasterizer _rasterizer = new Rasterizer();
 
@@ -334,14 +333,9 @@ namespace Unity.UIWidgets.editor {
             Timer.update();
             
             using (this.getScope()) {
-                this._doUpdate();
+                this._timerProvider.update(this.flushMicrotasks);
+                this.flushMicrotasks();
             }
-        }
-
-        void _doUpdate() {
-            this.flushMicrotasks();
-            this._windowCallbacks.update();
-            this._timerProvider.update();
         }
 
         public override void scheduleFrame(bool regenerateLayerTree = true) {
@@ -377,10 +371,6 @@ namespace Unity.UIWidgets.editor {
             return periodic
                 ? this._timerProvider.periodic(duration, callback)
                 : this._timerProvider.run(duration, callback);
-        }
-
-        public override IDisposable onUpdate(VoidCallback callback) {
-            return this._windowCallbacks.onUpdate(callback);
         }
 
         public void attachRootRenderBox(RenderBox root) {

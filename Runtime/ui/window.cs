@@ -97,8 +97,6 @@ namespace Unity.UIWidgets.ui {
             return this.run(TimeSpan.Zero, callback);
         }
 
-        public abstract IDisposable onUpdate(VoidCallback callback);
-
         public abstract TextInput textInput { get; }
 
         public abstract IDisposable getScope();
