@@ -69,10 +69,13 @@ namespace Unity.UIWidgets.engine
         private Texture _texture;
         private Vector2 _lastMouseMove;
         private bool _mouseEntered;
-
+        private static Event _repaintEvent;
         protected override void OnEnable()
         {
             base.OnEnable();
+            if (_repaintEvent == null) {
+                _repaintEvent = new Event() { type = EventType.Repaint };
+            }
 
             if (_windowAdapter == null)
             {
@@ -125,7 +128,7 @@ namespace Unity.UIWidgets.engine
             {
                 this._windowAdapter.Update();
             }
-            this._windowAdapter.OnGUI(new Event() {type=EventType.Repaint});
+            this._windowAdapter.OnGUI(_repaintEvent);
         }
 
          private void OnGUI()
