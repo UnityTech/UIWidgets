@@ -16,12 +16,11 @@ namespace Unity.UIWidgets.editor {
     using UnityEditor;
     public abstract class UIWidgetsEditorWindow : EditorWindow {
         WindowAdapter _windowAdapter;
-        public UIWidgetsEditorWindow()
-        {
+        public UIWidgetsEditorWindow() {
             wantsMouseMove = true;
             wantsMouseEnterLeaveWindow = true;
         }
-        
+
         void OnEnable() {
             if (this._windowAdapter == null) {
                 this._windowAdapter = new EditorWindowAdapter(this);
@@ -43,7 +42,7 @@ namespace Unity.UIWidgets.editor {
         }
 
         void OnGUI() {
-            this._windowAdapter.OnGUI();
+            this._windowAdapter.OnGUI(Event.current);
         }
 
         void Update() {
@@ -57,54 +56,48 @@ namespace Unity.UIWidgets.editor {
         protected abstract Widget rootWidget();
     }
 
-    public class EditorWindowAdapter : WindowAdapter
-    {
+    public class EditorWindowAdapter : WindowAdapter {
 
         public readonly EditorWindow editorWindow;
 
-        public EditorWindowAdapter(EditorWindow editorWindow)
-        {
+        public EditorWindowAdapter(EditorWindow editorWindow) {
             this.editorWindow = editorWindow;
         }
-        
+
         public override void scheduleFrame(bool regenerateLayerTree = true) {
             base.scheduleFrame(regenerateLayerTree);
             editorWindow.Repaint();
         }
 
-        public override GUIContent titleContent
-        {
+        public override GUIContent titleContent {
             get { return editorWindow.titleContent; }
         }
-        
-        protected override double queryDevicePixelRatio()
-        {
+
+        protected override double queryDevicePixelRatio() {
             return EditorGUIUtility.pixelsPerPoint;
         }
 
-        protected override Vector2 queryWindowSize()
-        {
+        protected override Vector2 queryWindowSize() {
             return editorWindow.position.size;
         }
     }
 
 #endif
-    
+
     public abstract class WindowAdapter : Window {
-        
+
         static readonly List<WindowAdapter> _windowAdapters = new List<WindowAdapter>();
         public static IEnumerable<WindowAdapter> windowAdapters {
             get { return _windowAdapters; }
         }
 
-        public WidgetInspectorService widgetInspectorService
-        {
+        public WidgetInspectorService widgetInspectorService {
             get {
                 D.assert(this._binding != null);
                 return this._binding.widgetInspectorService;
             }
         }
-        
+
         WidgetsBinding _binding;
         float _lastWindowWidth;
         float _lastWindowHeight;
@@ -117,11 +110,10 @@ namespace Unity.UIWidgets.editor {
 
         bool _regenerateLayerTree;
         Surface _surface;
-        
+
         bool _alive;
-        
-        public bool alive
-        {
+
+        public bool alive {
             get { return this._alive; }
         }
 
@@ -129,7 +121,7 @@ namespace Unity.UIWidgets.editor {
             this._devicePixelRatio = queryDevicePixelRatio();
             var size = queryWindowSize();
             this._lastWindowWidth = size.x;
-            this._lastWindowHeight =size.y;
+            this._lastWindowHeight = size.y;
             this._physicalSize = new Size(
                 this._lastWindowWidth * this._devicePixelRatio,
                 this._lastWindowHeight * this._devicePixelRatio);
@@ -145,7 +137,7 @@ namespace Unity.UIWidgets.editor {
         public void OnDisable() {
             _windowAdapters.Remove(this);
             this._alive = false;
-            
+
             this._rasterizer.teardown();
 
             D.assert(this._surface != null);
@@ -170,42 +162,40 @@ namespace Unity.UIWidgets.editor {
             public WindowDisposable(WindowAdapter window) {
                 this._window = window;
             }
-            
+
             public void Dispose() {
                 D.assert(instance == this._window);
                 instance = null;
-                
+
                 D.assert(WidgetsBinding.instance == this._window._binding);
                 WidgetsBinding.instance = null;
             }
         }
 
-        public void PostPointerEvent(List<PointerData> data)
-        {
-            WithBinding(() =>
-            {
+        public void PostPointerEvent(List<PointerData> data) {
+            WithBinding(() => {
                 this.onPointerEvent(new PointerDataPacket(data));
             });
         }
-        
-        public void PostPointerEvent(PointerData data)
-        {
-            PostPointerEvent(new List<PointerData>(){data});
+
+        public void PostPointerEvent(PointerData data) {
+            PostPointerEvent(new List<PointerData>() { data });
         }
-        
+
         public void WithBinding(Action fn) {
             using (this.getScope()) {
                 fn();
             }
         }
-        
+
         public T WithBindingFunc<T>(Func<T> fn) {
             using (this.getScope()) {
                 return fn();
             }
         }
-        
-        public virtual void OnGUI() {
+
+        public virtual void OnGUI(Event evt = null) {
+            evt = evt??Event.current;
             using (this.getScope()) {
                 bool dirty = false;
 
@@ -232,24 +222,22 @@ namespace Unity.UIWidgets.editor {
                     }
                 }
 
-                this._doOnGUI();
+                this._doOnGUI(evt);
             }
         }
 
-        public virtual GUIContent titleContent
-        {
+        public virtual GUIContent titleContent {
             get { return null; }
         }
-        
+
         protected abstract double queryDevicePixelRatio();
         protected abstract Vector2 queryWindowSize();
 
-        protected virtual Surface createSurface()
-        {
+        protected virtual Surface createSurface() {
             return new EditorWindowSurface();
         }
-        
-        
+
+
         void _beginFrame() {
             if (this.onBeginFrame != null) {
                 this.onBeginFrame(new TimeSpan(Stopwatch.GetTimestamp()) - this._epoch);
@@ -262,8 +250,7 @@ namespace Unity.UIWidgets.editor {
             }
         }
 
-        void _doOnGUI() {
-            var evt = Event.current;
+        void _doOnGUI(Event evt) {
 
             if (evt.type == EventType.Repaint) {
                 if (this._regenerateLayerTree) {
@@ -272,7 +259,6 @@ namespace Unity.UIWidgets.editor {
                 } else {
                     this._rasterizer.drawLastLayerTree();
                 }
-
                 return;
             }
 
@@ -331,7 +317,7 @@ namespace Unity.UIWidgets.editor {
 
         public void Update() {
             Timer.update();
-            
+
             using (this.getScope()) {
                 this._timerProvider.update(this.flushMicrotasks);
                 this.flushMicrotasks();
