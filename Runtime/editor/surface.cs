@@ -73,6 +73,7 @@ namespace Unity.UIWidgets.editor {
             }
 
             _guiTextureMat = new Material(guiTextureShader);
+            _guiTextureMat.hideFlags = HideFlags.HideAndDontSave;
             return _guiTextureMat;
         }
 
@@ -123,7 +124,8 @@ namespace Unity.UIWidgets.editor {
         void _createOrUpdateRenderTexture(Size size, double devicePixelRatio) {
             if (this._surface != null
                 && this._surface.size == size
-                && this._surface.devicePixelRatio == devicePixelRatio) {
+                && this._surface.devicePixelRatio == devicePixelRatio
+                && this._surface.getRenderTexture() != null) {
                 return;
             }
 
@@ -174,14 +176,18 @@ namespace Unity.UIWidgets.editor {
             }
 
             this._renderTexture = new RenderTexture(desc);
+            this._renderTexture.hideFlags = HideFlags.HideAndDontSave;
         }
 
         public void Dispose() {
-            D.assert(this._renderTexture);
-            this._renderTexture = ObjectUtils.SafeDestroy(this._renderTexture);
-            
-            D.assert(this._canvas != null);
-            this._canvas = null;
+            if (this._renderTexture) {
+                this._renderTexture = ObjectUtils.SafeDestroy(this._renderTexture);
+            }
+
+            if (this._canvas != null) {
+                this._canvas.reset();
+                this._canvas = null;
+            }
         }
     }
 }

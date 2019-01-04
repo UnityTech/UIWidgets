@@ -509,6 +509,7 @@ namespace Unity.UIWidgets.ui {
             }
 
             mat = new Material(canvasShader);
+            mat.hideFlags = HideFlags.HideAndDontSave;
             _materials[op] = mat;
 
             if (op == BlendMode.srcOver) {
@@ -886,19 +887,34 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void reset() {
+            foreach (var layer in this._layers) {
+                this._clearLayer(layer);
+            }
+
             this._saveCount = 0;
 
-            var bounds = Rect.fromLTWH(0, 0,
-                this._renderTexture.width / this._devicePixelRatio,
-                this._renderTexture.height / this._devicePixelRatio);
-            this._layers.Clear();
-            this._layers.Add(
-                new RenderLayer {
+            RenderLayer firstLayer;
+            if (this._layers.Count == 0) {
+                var bounds = Rect.fromLTWH(0, 0,
+                    this._renderTexture.width / this._devicePixelRatio,
+                    this._renderTexture.height / this._devicePixelRatio);
+                firstLayer = new RenderLayer {
                     width = this._renderTexture.width,
                     height = this._renderTexture.height,
                     layerBounds = bounds,
-                }
-            );
+                };
+            } else {
+                D.assert(this._layers.Count > 0);
+                firstLayer = this._layers[0];
+                firstLayer = new RenderLayer {
+                    width = firstLayer.width,
+                    height = firstLayer.height,
+                    layerBounds = firstLayer.layerBounds,
+                };
+            }
+
+            this._layers.Clear();
+            this._layers.Add(firstLayer);
         }
 
         void _drawLayer(RenderLayer layer, CommandBuffer cmdBuf) {
