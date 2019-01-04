@@ -506,12 +506,12 @@ namespace Unity.UIWidgets.widgets
             ) {
             var hit = false;
 
-            if (!transform.invertable())
+            var inverse = Matrix3.I();
+            var invertible = transform.invert(inverse);
+            if (!invertible)
             {
                 return false;
             }
-
-            Matrix3 inverse = transform.inverse();
             var localPosition = inverse.mapPoint(position);
             
             List<DiagnosticsNode> children = renderObject.debugDescribeChildren();

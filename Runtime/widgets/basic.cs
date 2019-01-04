@@ -620,7 +620,7 @@ namespace Unity.UIWidgets.widgets {
             Widget child = null
         ) : base(key: key, child: child) {
             D.assert(offset != null);
-            this.transform = Matrix3.makeTrans(new Vector2((float) offset.dx, (float) offset.dy));
+            this.transform = Matrix3.makeTrans((float) offset.dx, (float) offset.dy);
             this.origin = null;
             this.alignment = null;
             this.transformHitTests = transformHitTests;

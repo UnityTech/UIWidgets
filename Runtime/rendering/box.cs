@@ -1157,17 +1157,16 @@ namespace Unity.UIWidgets.rendering {
 
             var childParentData = (BoxParentData) child.parentData;
             var offset = childParentData.offset;
-            transform = Matrix3.makeTrans(offset.toVector()) * transform;
+            transform = Matrix3.makeTrans(offset) * transform;
         }
 
         public Offset globalToLocal(Offset point, RenderObject ancestor = null) {
             var transform = this.getTransformTo(ancestor);
-            if (!transform.invertable()) {
-                return Offset.zero;
-            }
 
-            transform = transform.inverse();
-            return transform.mapPoint(point);
+            var inverse = Matrix3.I();
+            var invertible = transform.invert(inverse);
+            return invertible ? inverse.mapPoint(point) : Offset.zero;
+
         }
 
         public Offset localToGlobal(Offset point, RenderObject ancestor = null) {

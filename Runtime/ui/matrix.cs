@@ -31,10 +31,10 @@ namespace Unity.UIWidgets.ui {
             return m;
         }
 
-        public static Matrix3 makeTrans(Vector2 vector)
+        public static Matrix3 makeTrans(Offset offset)
         {
             var m = new Matrix3();
-            m.setTranslate(vector.x, vector.y);
+            m.setTranslate((float)offset.dx, (float)offset.dy);
             return m;
         }
 
@@ -1284,22 +1284,7 @@ namespace Unity.UIWidgets.ui {
         {
             return "Matrix3(" + string.Join(",", Array.ConvertAll(fMat, i => i.ToString())) + ")";
         }
-
-        public bool invertable()
-        {
-            var mask = this.getType();
-            var isPersp = (int) (mask & TypeMask.kPerspective_Mask);
-            var invDet = ScalarUtils.inv_determinant(fMat, isPersp);
-            return invDet != 0;
-        }
         
-        public Matrix3 inverse()
-        {
-            var m = new Matrix3();
-            var invertable = this.invert(m);
-            D.assert(invertable);
-            return m;
-        }
         
         public Offset mapPoint(Offset point)
         {
