@@ -62,17 +62,17 @@ namespace UIWidgets.Tests {
                 
                 if (this._selected != selected) {
                     this._selected = selected;
-                    this.windowAdapter.attachRootWidget(null);
+                    this._attachRootWidget(null);
                 }
 
                 if (GUILayout.Button("loadLocal")) {
                     var rootWidget = this._options[this._selected]();
-                    this.windowAdapter.attachRootWidget(rootWidget);
+                    this._attachRootWidget(rootWidget);
                 }
                 
                 if (GUILayout.Button("loadAsset")) {
                     var rootWidget = this.loadAsset();
-                    this.windowAdapter.attachRootWidget(rootWidget);
+                    this._attachRootWidget(rootWidget);
                 }
                 
                 if (GUILayout.Button("UnloadUnusedAssets")) {
@@ -85,10 +85,14 @@ namespace UIWidgets.Tests {
 
                 var rootWidget = this._options[this._selected]();
 
-                this.windowAdapter.attachRootWidget(rootWidget);
+                this._attachRootWidget(rootWidget);
             }
 
             this.windowAdapter.OnGUI();
+        }
+
+        void _attachRootWidget(Widget widget) {
+            this.windowAdapter.attachRootWidget(new WidgetsApp(window: this.windowAdapter, home: widget));
         }
 
         private void Update() {
@@ -236,12 +240,11 @@ namespace UIWidgets.Tests {
         }
 
         Widget asPage() {
-            return new WidgetsApp(null, new AsScreen(), windowAdapter);
+            return new WidgetsApp(home: new AsScreen(), window: this.windowAdapter);
         }
 
-        Widget mouseHover()
-        {
-            return new WidgetsApp(null, new MouseHoverWidget(null), windowAdapter);
+        Widget mouseHover() {
+            return new WidgetsApp(home: new MouseHoverWidget(), window: this.windowAdapter);
         }
     }
 

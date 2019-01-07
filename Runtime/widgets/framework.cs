@@ -384,9 +384,7 @@ namespace Unity.UIWidgets.widgets {
         public virtual void didUpdateWidget(StatefulWidget oldWidget) {
         }
 
-        protected void setState(VoidCallback fn) {
-            D.assert(fn != null);
-
+        protected void setState(VoidCallback fn = null) {
             D.assert(() => {
                 if (this._debugLifecycleState == _StateLifecycle.defunct) {
                     throw new UIWidgetsError(
@@ -419,7 +417,10 @@ namespace Unity.UIWidgets.widgets {
                 return true;
             });
 
-            fn();
+            if (fn != null) {
+                fn();
+            }
+            
             this._element.markNeedsBuild();
         }
 
@@ -2283,12 +2284,16 @@ namespace Unity.UIWidgets.widgets {
             D.assert(this.widget != newWidget);
             base.update(newWidget);
             D.assert(this.widget == newWidget);
-            this.notifyClients(oldWidget);
+            this.updated(oldWidget);
             this._dirty = true;
             this.rebuild();
         }
+        
+        protected virtual void updated(ProxyWidget oldWidget) {
+            this.notifyClients(oldWidget);
+        }
 
-        public abstract void notifyClients(ProxyWidget oldWidget);
+        protected abstract void notifyClients(ProxyWidget oldWidget);
     }
 
     public class ParentDataElement : ProxyElement {
@@ -2354,7 +2359,7 @@ namespace Unity.UIWidgets.widgets {
             this._applyParentData(newWidget);
         }
 
-        public override void notifyClients(ProxyWidget oldWidget) {
+        protected override void notifyClients(ProxyWidget oldWidget) {
             this._applyParentData(this.widget);
         }
     }
@@ -2395,6 +2400,13 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public void setDependencies(Element dependent, object value) {
+            object existing;
+            if (this._dependents.TryGetValue(dependent, out existing)) {
+                if (object.Equals(existing, value)) {
+                    return;
+                }
+            }
+
             this._dependents[dependent] = value;
         }
 
@@ -2405,13 +2417,15 @@ namespace Unity.UIWidgets.widgets {
         public void notifyDependent(InheritedWidget oldWidget, Element dependent) {
             dependent.didChangeDependencies();
         }
-
-        public override void notifyClients(ProxyWidget oldWidgetRaw) {
-            var oldWidget = (InheritedWidget) oldWidgetRaw;
-
-            if (!this.widget.updateShouldNotify(oldWidget)) {
-                return;
+        
+        protected override void updated(ProxyWidget oldWidget) {
+            if (this.widget.updateShouldNotify((InheritedWidget) oldWidget)) {
+                base.updated(oldWidget);
             }
+        }
+
+        protected override void notifyClients(ProxyWidget oldWidgetRaw) {
+            var oldWidget = (InheritedWidget) oldWidgetRaw;
 
             D.assert(this._debugCheckOwnerBuildTargetExists("notifyClients"));
             foreach (Element dependent in this._dependents.Keys) {

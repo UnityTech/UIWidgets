@@ -13,8 +13,7 @@ namespace Unity.UIWidgets.widgets {
         public static ImageConfiguration createLocalImageConfiguration(BuildContext context, Size size = null) {
             return new ImageConfiguration(
                 bundle: DefaultAssetBundle.of(context),
-                //TODO: add MediaQuery & Localizations.
-                //devicePixelRatio: MediaQuery.of(context, nullOk: true)?.devicePixelRatio ?? 1.0,
+                devicePixelRatio: MediaQuery.of(context, nullOk: true)?.devicePixelRatio ?? 1.0,
                 //locale: Localizations.localeOf(context, nullOk: true),
                 size: size,
                 platform: Application.platform

@@ -17,6 +17,7 @@ namespace Unity.UIWidgets.rendering {
             );
 
             Window.instance.onMetricsChanged += this.handleMetricsChanged;
+            Window.instance.onTextScaleFactorChanged += this.handleTextScaleFactorChanged;
             this.initRenderView();
             D.assert(this.renderView != null);
             this.addPersistentFrameCallback(this._handlePersistentFrameCallback);
@@ -42,6 +43,9 @@ namespace Unity.UIWidgets.rendering {
         protected virtual void handleMetricsChanged() {
             this.renderView.configuration = this.createViewConfiguration();
             this.scheduleForcedFrame();
+        }
+
+        protected virtual void handleTextScaleFactorChanged() {
         }
 
         protected virtual ViewConfiguration createViewConfiguration() {

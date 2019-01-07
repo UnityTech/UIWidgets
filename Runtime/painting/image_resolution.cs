@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using RSG;
 using Unity.UIWidgets.async;
 using Unity.UIWidgets.foundation;
@@ -20,14 +21,26 @@ namespace Unity.UIWidgets.painting {
         public readonly string assetName;
         public readonly AssetBundle bundle;
 
+        readonly Dictionary<ImageConfiguration, AssetBundleImageKey> _cache =
+            new Dictionary<ImageConfiguration, AssetBundleImageKey>();
+
         protected override
             IPromise<AssetBundleImageKey> obtainKey(ImageConfiguration configuration) {
+
+            AssetBundleImageKey key;
+            if (this._cache.TryGetValue(configuration, out key)) {
+                return Promise<AssetBundleImageKey>.Resolved(key);
+            }
+            
             AssetBundle chosenBundle = this.bundle ? this.bundle : configuration.bundle;
             var devicePixelRatio = configuration.devicePixelRatio ?? Window.instance.devicePixelRatio;
             var coroutine = Window.instance.startCoroutine(this._loadAssetAsync(chosenBundle, devicePixelRatio));
             return coroutine.promise.Then(result => {
                 D.assert(result != null);
-                return (AssetBundleImageKey) result;
+
+                key = (AssetBundleImageKey) result;
+                this._cache[configuration] = key;
+                return key;
             });
         }
 
@@ -50,7 +63,13 @@ namespace Unity.UIWidgets.painting {
                     asset = request.asset;
                 }
 
-                if (asset != null) {
+                if (asset != null) {                    
+                    if (bundle == null) {
+                        Resources.UnloadAsset(asset);
+                    } else {
+                        bundle.Unload(asset);
+                    }
+                    
                     yield return new AssetBundleImageKey(
                         bundle,
                         assetName,

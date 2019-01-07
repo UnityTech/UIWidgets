@@ -1,12 +1,12 @@
-﻿using System;
-using Unity.UIWidgets.async;
+﻿using Unity.UIWidgets.async;
 using Unity.UIWidgets.editor;
-using Unity.UIWidgets.painting;
+using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using RawImage = UnityEngine.UI.RawImage;
 using Rect = UnityEngine.Rect;
 
 namespace Unity.UIWidgets.engine
@@ -62,54 +62,46 @@ namespace Unity.UIWidgets.engine
     }
 
     [RequireComponent(typeof(RectTransform))]
-    public abstract class WidgetCanvas : MaskableGraphic, IPointerDownHandler, IPointerUpHandler, IDragHandler,
+    public abstract class WidgetCanvas : RawImage, IPointerDownHandler, IPointerUpHandler, IDragHandler,
         IPointerEnterHandler, IPointerExitHandler
     {
+        private static Event _repaintEvent;
+        
         private WindowAdapter _windowAdapter;
         private Texture _texture;
         private Vector2 _lastMouseMove;
         private bool _mouseEntered;
-        private static Event _repaintEvent;
+        
         protected override void OnEnable()
         {
             base.OnEnable();
+
             if (_repaintEvent == null) {
-                _repaintEvent = new Event() { type = EventType.Repaint };
+                _repaintEvent = new Event {type = EventType.Repaint};
             }
 
-            if (_windowAdapter == null)
-            {
-                _windowAdapter = new UIWidgetWindowAdapter(this);
-            }
+            D.assert(this._windowAdapter == null);
+            _windowAdapter = new UIWidgetWindowAdapter(this);
             
             _windowAdapter.OnEnable();
-            var root = new WidgetsApp(null, getWidget(), _windowAdapter);
+            var root = new WidgetsApp(home: getWidget(), window: _windowAdapter);
             _windowAdapter.attachRootWidget(root);
             _lastMouseMove = Input.mousePosition;
         }
 
-        private void OnDisable()
+        protected override void OnDisable()
         {
+            D.assert(this._windowAdapter != null);
             this._windowAdapter.OnDisable();
+            this._windowAdapter = null;
             base.OnDisable();
         }
 
         protected abstract Widget getWidget();
 
-        public override Texture mainTexture
-        {
-            get { return _texture; }
-        }
-
-        internal void applyRenderTexture(Rect screenRect, Texture texture, Material mat)
-        {
-            _texture = texture;
-            SetMaterialDirty();
-        }
-
-        private void OnDestroy()
-        {
-            base.OnDestroy();
+        internal void applyRenderTexture(Rect screenRect, Texture texture, Material mat) {
+            this.texture = texture;
+            this.material = mat;
         }
 
         private void Update()
@@ -124,14 +116,13 @@ namespace Unity.UIWidgets.engine
             }
 
             _lastMouseMove = Input.mousePosition;
-            if (this._windowAdapter != null)
-            {
-                this._windowAdapter.Update();
-            }
+            
+            D.assert(this._windowAdapter != null);
+            this._windowAdapter.Update();
             this._windowAdapter.OnGUI(_repaintEvent);
         }
 
-         private void OnGUI()
+        private void OnGUI()
         {
             if (Event.current.type == EventType.KeyDown || Event.current.type == EventType.KeyUp)
             {
@@ -203,7 +194,6 @@ namespace Unity.UIWidgets.engine
 
         public Vector2 getPointPosition(Vector2 position)
         { 
-            // Debug.Log("mouse posse " + position.x + " " + position.y);
             Vector2 localPoint;
             Camera eventCamera = null;
 

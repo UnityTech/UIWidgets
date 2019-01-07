@@ -75,6 +75,15 @@ namespace Unity.UIWidgets.painting {
             return new EdgeInsets(horizontal, vertical, horizontal, vertical);
         }
 
+        public static EdgeInsets fromWindowPadding(WindowPadding padding, double devicePixelRatio) {
+            return new EdgeInsets(
+                left: padding.left / devicePixelRatio,
+                top: padding.top / devicePixelRatio,
+                right: padding.right / devicePixelRatio,
+                bottom: padding.bottom / devicePixelRatio
+            );
+        }
+
         public static readonly EdgeInsets zero = EdgeInsets.only();
 
         public Offset topLeft {

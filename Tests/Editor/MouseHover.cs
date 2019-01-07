@@ -9,7 +9,7 @@ namespace UIWidgets.Tests
 {
     public class MouseHoverWidget:StatefulWidget
     {
-        public MouseHoverWidget(Key key) : base(key)
+        public MouseHoverWidget(Key key = null) : base(key)
         {
         }
 
