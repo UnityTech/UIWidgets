@@ -37,7 +37,13 @@ Shader "UIWidgets/canvas"
         v2f o;
         o.ftcoord = v.tcoord;
         o.fpos = v.vertex;
+        
+    #if UNITY_UV_STARTS_AT_TOP
         o.vertex = float4(2.0 * v.vertex.x / _viewSize.x - 1.0, 2.0 * v.vertex.y / _viewSize.y - 1.0, 0, 1);
+    #else
+        o.vertex = float4(2.0 * v.vertex.x / _viewSize.x - 1.0, 1.0 - 2.0 * v.vertex.y / _viewSize.y, 0, 1);
+    #endif
+
         return o;
     }
     

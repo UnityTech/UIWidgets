@@ -60,6 +60,8 @@ namespace Unity.UIWidgets.editor {
 
     public class EditorWindowSurface : Surface {
         static Material _guiTextureMat;
+        static Material _uiDefaultMat;
+
         public delegate void DrawToTargetFunc(Rect screenRect, Texture texture, Material mat);
         
         internal static Material _getGUITextureMat() {
@@ -76,6 +78,22 @@ namespace Unity.UIWidgets.editor {
             _guiTextureMat.hideFlags = HideFlags.HideAndDontSave;
             return _guiTextureMat;
         }
+        
+        internal static Material _getUIDefaultMat() {
+            if (_uiDefaultMat) {
+                return _uiDefaultMat;
+            }
+
+            var uiDefaultShader = Shader.Find("UIWidgets/UIDefault");
+            if (uiDefaultShader == null) {
+                throw new Exception("UIWidgets/UIDefault not found");
+            }
+
+            _uiDefaultMat = new Material(uiDefaultShader);
+            _uiDefaultMat.hideFlags = HideFlags.HideAndDontSave;
+            return _uiDefaultMat;
+        }
+
 
         GrSurface _surface;
         private DrawToTargetFunc _drawToTargetFunc;
@@ -110,13 +128,10 @@ namespace Unity.UIWidgets.editor {
                 (float) (this._surface.size.width / this._surface.devicePixelRatio),
                 (float) (this._surface.size.height / this._surface.devicePixelRatio));
 
-            if (_drawToTargetFunc == null)
-            {
+            if (this._drawToTargetFunc == null) {
                 Graphics.DrawTexture(screenRect, this._surface.getRenderTexture(), _getGUITextureMat());
-            }
-            else
-            {
-                _drawToTargetFunc(screenRect, this._surface.getRenderTexture(), _getGUITextureMat());
+            } else {
+                this._drawToTargetFunc(screenRect, this._surface.getRenderTexture(), _getUIDefaultMat());
             }
             return true;
         }
