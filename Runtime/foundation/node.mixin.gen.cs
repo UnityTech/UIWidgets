@@ -195,7 +195,7 @@ namespace Unity.UIWidgets.foundation {
             if (object.ReferenceEquals(this, this._canonical)) {
                 var dependencyList = this._dependencyList;
                 if (dependencyList != null) {
-                    Timer.runInMain(() => { _canonicalObjects.Remove(dependencyList); });
+                    Timer.runInMainFromFinalizer(() => { _canonicalObjects.Remove(dependencyList); });
                 }
             }
         }

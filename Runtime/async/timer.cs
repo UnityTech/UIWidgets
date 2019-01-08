@@ -9,11 +9,11 @@ using UnityEditor;
 namespace Unity.UIWidgets.async {
     public abstract class Timer : IDisposable {
         public abstract void cancel();
-        
+
         public void Dispose() {
             this.cancel();
         }
-        
+
         public static double timeSinceStartup {
             get {
 #if UNITY_EDITOR
@@ -26,20 +26,28 @@ namespace Unity.UIWidgets.async {
 
         public static TimeSpan timespanSinceStartup => TimeSpan.FromSeconds(timeSinceStartup);
 
-        static readonly List<Action> _callbacks = new List<Action>();
-
+        static readonly object _syncObj = new object();
+        
+        static LinkedList<Action> _callbacks = new LinkedList<Action>();
+   
+        internal static void runInMainFromFinalizer(Action callback) {
+            lock (_syncObj) {
+                _callbacks.AddLast(callback);
+            }
+        }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+        
         public static void runInMain(Action callback) {
-            lock (_callbacks) {
-                _callbacks.Add(callback);
+            lock (_syncObj) {
+                _callbacks.AddLast(callback);
             }
         }
 
         internal static void update() {
-            Action[] callbacks;
+            LinkedList<Action> callbacks;
 
-            lock (_callbacks) {
-                callbacks = _callbacks.ToArray();
-                _callbacks.Clear();
+            lock (_syncObj) {
+                callbacks = _callbacks;
+                _callbacks = new LinkedList<Action>();
             }
 
             foreach (var callback in callbacks) {

@@ -27,12 +27,13 @@ namespace Unity.UIWidgets.ui {
         public Texture texture => this._texture;
 
         ~Image() {
-            this._dispose();
+            this._dispose(true);
         }
 
-        void _dispose() {
+        void _dispose(bool finalizer) {
             if (this._noDispose) {
                 this._texture = null;
+                this._bundle = null;
                 return;
             }
 
@@ -43,23 +44,35 @@ namespace Unity.UIWidgets.ui {
                 this._bundle = null;
 
                 if (b == null) {
-                    // make sure no ref back to this in finalizer
-                    Timer.runInMain(() => { Resources.UnloadAsset(t); });
+                    if (finalizer) {
+                        // make sure no ref back to this in finalizer
+                        Timer.runInMainFromFinalizer(() => { Resources.UnloadAsset(t); });
+                    } else {
+                        Resources.UnloadAsset(t);
+                    }
                 } else {
-                    // make sure no ref back to this in finalizer
-                    Timer.runInMain(() => { b.Unload(t); });
+                    if (finalizer) {
+                        // make sure no ref back to this in finalizer
+                        Timer.runInMainFromFinalizer(() => { b.Unload(t); });
+                    } else {
+                        b.Unload(t); 
+                    }
                 }
             } else {
                 var t = this._texture;
                 this._texture = null;
 
-                // make sure no ref back to this in finalizer
-                Timer.runInMain(() => { ObjectUtils.SafeDestroy(t); });
+                if (finalizer) {
+                    // make sure no ref back to this in finalizer
+                    Timer.runInMainFromFinalizer(() => { ObjectUtils.SafeDestroy(t); });
+                } else {
+                    ObjectUtils.SafeDestroy(t);
+                }
             }
         }
 
         public void Dispose() {
-            this._dispose();
+            this._dispose(false);
             GC.SuppressFinalize(this);
         }
 

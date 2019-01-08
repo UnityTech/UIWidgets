@@ -191,10 +191,13 @@ namespace Unity.UIWidgets.flow {
                 Mathf.CeilToInt((float) (bounds.width * devicePixelRatio)),
                 Mathf.CeilToInt((float) (bounds.height * devicePixelRatio)),
                 RenderTextureFormat.Default, 24) {
-                msaaSamples = QualitySettings.antiAliasing,
                 useMipMap = false,
                 autoGenerateMips = false,
             };
+
+            if (QualitySettings.antiAliasing != 0) {
+                desc.msaaSamples = QualitySettings.antiAliasing;
+            }
 
             var renderTexture = new RenderTexture(desc);
             renderTexture.hideFlags = HideFlags.HideAndDontSave;
