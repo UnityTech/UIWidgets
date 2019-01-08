@@ -3,125 +3,107 @@ using System.Linq;
 using Unity.UIWidgets.editor;
 using Unity.UIWidgets.widgets;
 
-namespace Unity.UIWidgets.debugger
-{
-
+namespace Unity.UIWidgets.debugger {
     public delegate void SelectionChanged();
 
-    public class InspectorService
-    {
+    public class InspectorService {
         public readonly WindowAdapter window;
 
         public SelectionChanged selectionChanged;
 
-        private readonly WidgetInspectorService _widgetInspectorService;
+        readonly WidgetInspectorService _widgetInspectorService;
 
-        public InspectorService(WindowAdapter window)
-        {
+        public InspectorService(WindowAdapter window) {
             this.window = window;
-            _widgetInspectorService = window.widgetInspectorService;
-            _widgetInspectorService.developerInspect += this.developerInspect; // todo dispose
+            this._widgetInspectorService = window.widgetInspectorService;
+            this._widgetInspectorService.developerInspect += this.developerInspect; // todo dispose
         }
 
-        public bool active
-        {
-            get { return window.alive; }
+        public bool active {
+            get { return this.window.alive; }
         }
 
-        public void close()
-        {
-            setShowInspect(false);
-            _widgetInspectorService.developerInspect -= this.developerInspect;
+        public void close() {
+            this.setShowInspect(false);
+            this._widgetInspectorService.developerInspect -= this.developerInspect;
         }
 
-        public DiagnosticsNode getRootWidgetSummaryTree(string groupName)
-        {
-            return toNode(window.WithBindingFunc(() =>_widgetInspectorService.getRootWidgetSummaryTree(groupName)));
-        }
-        
-        public DiagnosticsNode getRootWidget(string groupName)
-        {
-            return toNode(window.WithBindingFunc(() => _widgetInspectorService.getRootWidget(groupName)));
-        }
-        
-        public DiagnosticsNode getRootRenderObject(string groupName)
-        {
-            return toNode(window.WithBindingFunc(() =>_widgetInspectorService.getRootRenderObject(groupName)));
-        }
-        
-        public DiagnosticsNode getDetailsSubtree(InspectorInstanceRef instanceRef, string groupName)
-        {
-            return toNode(window.WithBindingFunc(()=> _widgetInspectorService.getDetailsSubtree(instanceRef.id, groupName)));
+        public DiagnosticsNode getRootWidgetSummaryTree(string groupName) {
+            return this.toNode(this.window.withBindingFunc(() =>
+                this._widgetInspectorService.getRootWidgetSummaryTree(groupName)));
         }
 
-        public DiagnosticsNode getSelection(DiagnosticsNode previousSelection, WidgetTreeType treeType, bool localOnly, string groupName)
-        {
+        public DiagnosticsNode getRootWidget(string groupName) {
+            return this.toNode(this.window.withBindingFunc(() =>
+                this._widgetInspectorService.getRootWidget(groupName)));
+        }
+
+        public DiagnosticsNode getRootRenderObject(string groupName) {
+            return this.toNode(this.window.withBindingFunc(() =>
+                this._widgetInspectorService.getRootRenderObject(groupName)));
+        }
+
+        public DiagnosticsNode getDetailsSubtree(InspectorInstanceRef instanceRef, string groupName) {
+            return this.toNode(this.window.withBindingFunc(() =>
+                this._widgetInspectorService.getDetailsSubtree(instanceRef.id, groupName)));
+        }
+
+        public DiagnosticsNode getSelection(DiagnosticsNode previousSelection, WidgetTreeType treeType, bool localOnly,
+            string groupName) {
             InspectorInstanceRef previousSelectionRef =
                 previousSelection == null ? null : previousSelection.diagnosticRef;
             string previousSelectionId = previousSelectionRef == null ? null : previousSelectionRef.id;
             DiagnosticsNode result = null;
 
-            window.WithBinding(() =>
-            {
-                switch (treeType)
-                {
+            this.window.withBinding(() => {
+                switch (treeType) {
                     case WidgetTreeType.Widget:
                         result = localOnly
-                            ? toNode(_widgetInspectorService.getSelectedSummaryWidget(previousSelectionId, groupName))
-                            : toNode(_widgetInspectorService.getSelectedWidget(previousSelectionId, groupName));
+                            ? this.toNode(
+                                this._widgetInspectorService.getSelectedSummaryWidget(previousSelectionId, groupName))
+                            : this.toNode(
+                                this._widgetInspectorService.getSelectedWidget(previousSelectionId, groupName));
                         break;
                     case WidgetTreeType.Render:
-                        result = toNode(
-                            _widgetInspectorService.getSelectedRenderObject(previousSelectionId, groupName));
+                        result = this.toNode(
+                            this._widgetInspectorService.getSelectedRenderObject(previousSelectionId, groupName));
                         break;
-                }               
+                }
             });
- 
 
-            if (result != null && result.diagnosticRef == previousSelectionRef)
-            {
+
+            if (result != null && result.diagnosticRef == previousSelectionRef) {
                 return previousSelection;
-            }
-            else
-            {
+            } else {
                 return result;
             }
         }
 
-        public bool setSelection(InspectorInstanceRef inspectorInstanceRef, string groupName)
-        {
-            return window.WithBindingFunc(() => _widgetInspectorService.setSelectionById(inspectorInstanceRef.id, groupName));
+        public bool setSelection(InspectorInstanceRef inspectorInstanceRef, string groupName) {
+            return this.window.withBindingFunc(() =>
+                this._widgetInspectorService.setSelectionById(inspectorInstanceRef.id, groupName));
         }
 
-        public void setShowInspect(bool show)
-        {
-            window.WithBinding(() =>
-            {
-                _widgetInspectorService.debugShowInspector = show;
-            });
-        }
-        
-        public bool getShowInspect()
-        {
-            return window.WithBindingFunc(() => _widgetInspectorService.debugShowInspector);
+        public void setShowInspect(bool show) {
+            this.window.withBinding(() => { this._widgetInspectorService.debugShowInspector = show; });
         }
 
-        public List<DiagnosticsNode> getProperties(InspectorInstanceRef inspectorInstanceRef, string groupName)
-        {
-            var list = window.WithBindingFunc(() =>
-                _widgetInspectorService.getProperties(inspectorInstanceRef.id, groupName));
-            return list.Select(json => toNode(json, isProperty: true)).ToList();
+        public bool getShowInspect() {
+            return this.window.withBindingFunc(() => this._widgetInspectorService.debugShowInspector);
         }
 
-        public void disposeGroup(string groupName)
-        {
-            window.WithBinding(() => _widgetInspectorService.disposeGroup(groupName));
+        public List<DiagnosticsNode> getProperties(InspectorInstanceRef inspectorInstanceRef, string groupName) {
+            var list = this.window.withBindingFunc(() =>
+                this._widgetInspectorService.getProperties(inspectorInstanceRef.id, groupName));
+            return list.Select(json => this.toNode(json, isProperty: true)).ToList();
         }
 
-        private DiagnosticsNode toNode(Dictionary<string, object> json, bool isProperty = false)
-        {
-            if (json == null)
-            {
+        public void disposeGroup(string groupName) {
+            this.window.withBinding(() => this._widgetInspectorService.disposeGroup(groupName));
+        }
+
+        DiagnosticsNode toNode(Dictionary<string, object> json, bool isProperty = false) {
+            if (json == null) {
                 return null;
             }
 
@@ -129,17 +111,14 @@ namespace Unity.UIWidgets.debugger
         }
 
 
-        private void developerInspect()
-        {
-            if (selectionChanged != null)
-            {
-                selectionChanged();
+        void developerInspect() {
+            if (this.selectionChanged != null) {
+                this.selectionChanged();
             }
         }
     }
 
-    public enum WidgetTreeType
-    {
+    public enum WidgetTreeType {
         Widget,
         Render
     }

@@ -5,10 +5,6 @@ using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.ui;
-using UnityEngine;
-using Canvas = Unity.UIWidgets.ui.Canvas;
-using Rect = Unity.UIWidgets.ui.Rect;
-using Color = Unity.UIWidgets.ui.Color;
 
 namespace Unity.UIWidgets.rendering {
     public interface RenderAbstractViewport {
@@ -45,7 +41,7 @@ namespace Unity.UIWidgets.rendering {
         public readonly Rect rect;
 
         public override string ToString() {
-            return string.Format("{0}(offset: {1}, rect: {2})", this.GetType(), this.offset, this.rect);
+            return $"{this.GetType()}(offset: {this.offset}, rect: {this.rect})";
         }
     }
 
@@ -67,11 +63,9 @@ namespace Unity.UIWidgets.rendering {
             this._offset = offset;
             this._cacheExtent = cacheExtent;
         }
-        
+
         public new RenderObject parent {
-            get {
-                return (RenderObject) base.parent;
-            }
+            get { return (RenderObject) base.parent; }
         }
 
         public AxisDirection axisDirection {
@@ -155,7 +149,7 @@ namespace Unity.UIWidgets.rendering {
 
         protected virtual bool debugThrowIfNotCheckingIntrinsics() {
             D.assert(() => {
-                if (!RenderObject.debugCheckingIntrinsics) {
+                if (!debugCheckingIntrinsics) {
                     D.assert(!(this is RenderShrinkWrappingViewport));
                     throw new UIWidgetsError(
                         this.GetType() + " does not support returning intrinsic dimensions.\n" +
@@ -556,8 +550,9 @@ namespace Unity.UIWidgets.rendering {
             int count = this.indexOfFirstChild;
             while (true) {
                 children.Add(child.toDiagnosticsNode(name: this.labelForChild(count)));
-                if (child == this.lastChild)
+                if (child == this.lastChild) {
                     break;
+                }
                 count += 1;
                 child = this.childAfter(child);
             }
@@ -852,8 +847,9 @@ namespace Unity.UIWidgets.rendering {
                     if (this.offset.applyContentDimensions(
                         Math.Min(0.0, this._minScrollExtent + mainAxisExtent * this.anchor),
                         Math.Max(0.0, this._maxScrollExtent - mainAxisExtent * (1.0 - this.anchor))
-                    ))
+                    )) {
                         break;
+                    }
                 }
 
                 count += 1;
@@ -1158,7 +1154,7 @@ namespace Unity.UIWidgets.rendering {
 
         protected override bool debugThrowIfNotCheckingIntrinsics() {
             D.assert(() => {
-                if (!RenderObject.debugCheckingIntrinsics) {
+                if (!debugCheckingIntrinsics) {
                     throw new UIWidgetsError(
                         this.GetType() + " does not support returning intrinsic dimensions.\n" +
                         "Calculating the intrinsic dimensions would require instantiating every child of " +

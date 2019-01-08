@@ -7,15 +7,10 @@ using Unity.UIWidgets.ui;
 using UnityEditor;
 using UnityEditor.Experimental.UIElements;
 using UnityEngine;
-using UnityEngine.Rendering;
-using BlendMode = Unity.UIWidgets.ui.BlendMode;
 using Color = Unity.UIWidgets.ui.Color;
-using Gradient = Unity.UIWidgets.ui.Gradient;
-using Random = System.Random;
-using Rect = Unity.UIWidgets.ui.Rect;
+using Rect = UnityEngine.Rect;
 
 namespace UIWidgets.Tests {
-
     public class CanvasAndLayers : EditorWindow {
         static Material _guiTextureMat;
 
@@ -34,17 +29,17 @@ namespace UIWidgets.Tests {
             return _guiTextureMat;
         }
 
-        private readonly Action[] _options;
+        readonly Action[] _options;
 
-        private readonly string[] _optionStrings;
+        readonly string[] _optionStrings;
 
-        private int _selected;
+        int _selected;
 
-        private ImageStream _stream;
+        ImageStream _stream;
 
-        private RenderTexture _renderTexture;
+        RenderTexture _renderTexture;
 
-        private WindowAdapter _windowAdapter;
+        WindowAdapter _windowAdapter;
 
         CanvasAndLayers() {
             this._options = new Action[] {
@@ -69,18 +64,18 @@ namespace UIWidgets.Tests {
             this._selected = EditorGUILayout.Popup("test case", this._selected, this._optionStrings);
             if (this._selected == 3) {
                 using (this._windowAdapter.getScope()) {
-                    if (GUI.Button(new UnityEngine.Rect(20, 50, 100, 20), "Image 1")) {
-                        LoadImage(
+                    if (GUI.Button(new Rect(20, 50, 100, 20), "Image 1")) {
+                        this.LoadImage(
                             "http://a.hiphotos.baidu.com/image/h%3D300/sign=10b374237f0e0cf3bff748fb3a47f23d/adaf2edda3cc7cd90df1ede83401213fb80e9127.jpg");
                     }
 
-                    if (GUI.Button(new UnityEngine.Rect(20, 150, 100, 20), "Image 2")) {
-                        LoadImage(
+                    if (GUI.Button(new Rect(20, 150, 100, 20), "Image 2")) {
+                        this.LoadImage(
                             "http://a.hiphotos.baidu.com/image/pic/item/cf1b9d16fdfaaf519b4aa960875494eef11f7a47.jpg");
                     }
 
-                    if (GUI.Button(new UnityEngine.Rect(20, 250, 100, 20), "Image 3")) {
-                        LoadImage(
+                    if (GUI.Button(new Rect(20, 250, 100, 20), "Image 3")) {
+                        this.LoadImage(
                             "http://a.hiphotos.baidu.com/image/pic/item/2f738bd4b31c8701c1e721dd2a7f9e2f0708ffbc.jpg");
                     }
                 }
@@ -97,8 +92,8 @@ namespace UIWidgets.Tests {
 
                 Window.instance = null;
 
-                Graphics.DrawTexture(new UnityEngine.Rect(0, 0, this.position.width, this.position.height),
-                    this._renderTexture,  _getGUITextureMat());
+                Graphics.DrawTexture(new Rect(0, 0, this.position.width, this.position.height),
+                    this._renderTexture, _getGUITextureMat());
             }
         }
 
@@ -106,7 +101,7 @@ namespace UIWidgets.Tests {
             this._windowAdapter.Update();
         }
 
-        private void OnEnable() {
+        void OnEnable() {
             this._windowAdapter = new EditorWindowAdapter(this);
             this._windowAdapter.OnEnable();
         }
@@ -130,11 +125,11 @@ namespace UIWidgets.Tests {
             }
         }
 
-        private void LoadImage(string url) {
+        void LoadImage(string url) {
             Dictionary<string, string> headers = new Dictionary<string, string>();
             NetworkImage networkImage = new NetworkImage(url, headers: headers);
             ImageConfiguration imageConfig = new ImageConfiguration();
-            _stream = networkImage.resolve(imageConfig);
+            this._stream = networkImage.resolve(imageConfig);
         }
 
         void drawPloygon4() {
@@ -145,7 +140,7 @@ namespace UIWidgets.Tests {
             };
 
             canvas.drawRect(
-                Rect.fromLTRB(10, 10, 110, 110),
+                Unity.UIWidgets.ui.Rect.fromLTRB(10, 10, 110, 110),
                 paint);
 
             var path = new Path();
@@ -209,7 +204,7 @@ namespace UIWidgets.Tests {
             };
 
             canvas.rotate(15 * Mathf.PI / 180);
-            var rect = Rect.fromLTWH(10, 10, 100, 100);
+            var rect = Unity.UIWidgets.ui.Rect.fromLTWH(10, 10, 100, 100);
             var rrect = RRect.fromRectAndCorners(rect, 0, 4, 8, 16);
 
             canvas.drawRRect(rrect, paint);
@@ -218,13 +213,13 @@ namespace UIWidgets.Tests {
                 color = new Color(0xFF00FF00),
             };
 
-            rect = Rect.fromLTWH(10, 150, 100, 100);
+            rect = Unity.UIWidgets.ui.Rect.fromLTWH(10, 150, 100, 100);
             rrect = RRect.fromRectAndCorners(rect, 0, 4, 8, 16);
             canvas.drawRRect(rrect, paint);
 
-            rect = Rect.fromLTWH(150, 150, 100, 100);
+            rect = Unity.UIWidgets.ui.Rect.fromLTWH(150, 150, 100, 100);
             rrect = RRect.fromRectAndCorners(rect, 10, 12, 14, 16);
-            var rect1 = Rect.fromLTWH(160, 160, 80, 80);
+            var rect1 = Unity.UIWidgets.ui.Rect.fromLTWH(160, 160, 80, 80);
             var rrect1 = RRect.fromRectAndCorners(rect1, 5, 6, 7, 8);
 
             canvas.drawDRRect(rrect, rrect1, paint);
@@ -274,9 +269,9 @@ namespace UIWidgets.Tests {
                 color = new Color(0xFFFFFF00),
             };
 
-            var rect = Rect.fromLTWH(10, 150, 100, 100);
+            var rect = Unity.UIWidgets.ui.Rect.fromLTWH(10, 150, 100, 100);
             var rrect = RRect.fromRectAndCorners(rect, 0, 4, 8, 16);
-            var rect1 = Rect.fromLTWH(18, 152, 88, 92);
+            var rect1 = Unity.UIWidgets.ui.Rect.fromLTWH(18, 152, 88, 92);
             var rrect1 = RRect.fromRectAndCorners(rect1, 0, 4, 8, 16);
 
             canvas.drawDRRect(rrect, rrect1, paint);
@@ -288,7 +283,7 @@ namespace UIWidgets.Tests {
                 blurSigma = 3,
             };
             canvas.drawRect(
-                Rect.fromLTWH(150, 150, 110, 120),
+                Unity.UIWidgets.ui.Rect.fromLTWH(150, 150, 110, 120),
                 paint);
 
             var picture = pictureRecorder.endRecording();
@@ -304,7 +299,7 @@ namespace UIWidgets.Tests {
         }
 
         void drawImageRect() {
-            if (_stream == null || _stream.completer == null || _stream.completer.currentImage == null) {
+            if (this._stream == null || this._stream.completer == null || this._stream.completer.currentImage == null) {
                 return;
             }
 
@@ -314,9 +309,8 @@ namespace UIWidgets.Tests {
                 color = new Color(0x7FFF0000),
             };
 
-            canvas.drawImageRect(
-                _stream.completer.currentImage.image,
-                Rect.fromLTWH(100, 50, 250, 250),
+            canvas.drawImageRect(this._stream.completer.currentImage.image,
+                Unity.UIWidgets.ui.Rect.fromLTWH(100, 50, 250, 250),
                 paint
             );
             canvas.flush();
@@ -343,9 +337,9 @@ namespace UIWidgets.Tests {
                 color = new Color(0xFFFFFF00),
             };
 
-            var rect = Rect.fromLTWH(10, 150, 100, 100);
+            var rect = Unity.UIWidgets.ui.Rect.fromLTWH(10, 150, 100, 100);
             var rrect = RRect.fromRectAndCorners(rect, 0, 4, 8, 16);
-            var rect1 = Rect.fromLTWH(18, 152, 88, 92);
+            var rect1 = Unity.UIWidgets.ui.Rect.fromLTWH(18, 152, 88, 92);
             var rrect1 = RRect.fromRectAndCorners(rect1, 0, 4, 8, 16);
             canvas.drawDRRect(rrect, rrect1, paint);
 
@@ -364,7 +358,7 @@ namespace UIWidgets.Tests {
 
             var editorCanvas = new CommandBufferCanvas(this._renderTexture, (float) Window.instance.devicePixelRatio);
             editorCanvas.rotate(-5 * Mathf.PI / 180);
-            editorCanvas.clipRect(Rect.fromLTWH(25, 15, 250, 250));
+            editorCanvas.clipRect(Unity.UIWidgets.ui.Rect.fromLTWH(25, 15, 250, 250));
             editorCanvas.rotate(5 * Mathf.PI / 180);
 
             editorCanvas.drawPicture(picture);
@@ -398,9 +392,9 @@ namespace UIWidgets.Tests {
                 color = new Color(0xFFFFFF00),
             };
 
-            var rect = Rect.fromLTWH(10, 150, 100, 100);
+            var rect = Unity.UIWidgets.ui.Rect.fromLTWH(10, 150, 100, 100);
             var rrect = RRect.fromRectAndCorners(rect, 0, 4, 8, 16);
-            var rect1 = Rect.fromLTWH(18, 152, 88, 92);
+            var rect1 = Unity.UIWidgets.ui.Rect.fromLTWH(18, 152, 88, 92);
             var rrect1 = RRect.fromRectAndCorners(rect1, 0, 4, 8, 16);
             canvas.drawDRRect(rrect, rrect1, paint);
 
@@ -419,7 +413,7 @@ namespace UIWidgets.Tests {
 
             var editorCanvas = new CommandBufferCanvas(this._renderTexture, (float) Window.instance.devicePixelRatio);
             editorCanvas.rotate(-5 * Mathf.PI / 180);
-            editorCanvas.clipRRect(RRect.fromRectAndRadius(Rect.fromLTWH(25, 15, 250, 250), 50));
+            editorCanvas.clipRRect(RRect.fromRectAndRadius(Unity.UIWidgets.ui.Rect.fromLTWH(25, 15, 250, 250), 50));
             editorCanvas.rotate(5 * Mathf.PI / 180);
 
             editorCanvas.drawPicture(picture);
@@ -453,9 +447,9 @@ namespace UIWidgets.Tests {
                 color = new Color(0xFFFFFF00),
             };
 
-            var rect = Rect.fromLTWH(10, 150, 100, 100);
+            var rect = Unity.UIWidgets.ui.Rect.fromLTWH(10, 150, 100, 100);
             var rrect = RRect.fromRectAndCorners(rect, 0, 4, 8, 16);
-            var rect1 = Rect.fromLTWH(18, 152, 88, 92);
+            var rect1 = Unity.UIWidgets.ui.Rect.fromLTWH(18, 152, 88, 92);
             var rrect1 = RRect.fromRectAndCorners(rect1, 0, 4, 8, 16);
             canvas.drawDRRect(rrect, rrect1, paint);
 
@@ -476,12 +470,12 @@ namespace UIWidgets.Tests {
 
             editorCanvas.saveLayer(picture.paintBounds, new Paint {color = new Color(0x7FFFFFFF)});
             editorCanvas.drawPicture(picture);
-            editorCanvas.restore();            
-           
+            editorCanvas.restore();
+
             editorCanvas.translate(150, 0);
             editorCanvas.saveLayer(picture.paintBounds, new Paint {color = new Color(0xFFFFFFFF)});
             editorCanvas.drawPicture(picture);
-            editorCanvas.restore();            
+            editorCanvas.restore();
 
             editorCanvas.flush();
         }

@@ -213,7 +213,7 @@ namespace Unity.UIWidgets.widgets {
             );
         }
 
-        private ListView(
+        ListView(
             Key key = null,
             Axis scrollDirection = Axis.vertical,
             bool reverse = false,
@@ -281,7 +281,7 @@ namespace Unity.UIWidgets.widgets {
         }
 
 
-        private ListView(
+        ListView(
             Key key = null,
             Axis scrollDirection = Axis.vertical,
             bool reverse = false,
@@ -358,7 +358,7 @@ namespace Unity.UIWidgets.widgets {
             );
         }
 
-        private ListView(
+        ListView(
             Key key = null,
             Axis scrollDirection = Axis.vertical,
             bool reverse = false,

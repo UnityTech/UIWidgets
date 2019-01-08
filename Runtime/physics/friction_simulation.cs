@@ -21,7 +21,7 @@ namespace Unity.UIWidgets.physics {
             D.assert((endPosition - startPosition).sign() == startVelocity.sign());
 
             return new FrictionSimulation(
-                FrictionSimulation._dragFor(startPosition, endPosition, startVelocity, endVelocity),
+                _dragFor(startPosition, endPosition, startVelocity, endVelocity),
                 startPosition,
                 startVelocity,
                 tolerance: new Tolerance(velocity: endVelocity.abs())

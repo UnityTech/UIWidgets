@@ -2,7 +2,7 @@
 
 namespace Unity.UIWidgets.flow {
     public class TransformLayer : ContainerLayer {
-        private Matrix3 _tranform;
+        Matrix3 _tranform;
 
         public Matrix3 transform {
             set { this._tranform = value; }
@@ -25,8 +25,7 @@ namespace Unity.UIWidgets.flow {
             try {
                 canvas.concat(this._tranform);
                 this.paintChildren(context);
-            }
-            finally {
+            } finally {
                 canvas.restore();
             }
         }

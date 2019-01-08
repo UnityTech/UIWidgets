@@ -58,7 +58,7 @@ namespace Unity.UIWidgets.rendering {
 
        public bool defaultHitTestChildren(HitTestResult result, Offset position) {
             // the x, y parameters have the top left of the node's box as the origin
-            ChildType child = lastChild;
+            ChildType child = this.lastChild;
             while (child != null)
             {
                 ParentDataType childParentData = (ParentDataType) child.parentData;

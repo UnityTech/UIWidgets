@@ -2,55 +2,49 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Unity.UIWidgets.ui
-{
-    public class LineBreaker
-    {
-        public class LineInfo
-        {
+namespace Unity.UIWidgets.ui {
+    public class LineBreaker {
+        public class LineInfo {
             public int start;
             public double width;
         }
-        
-        private StyledRuns _runs;
-        
+
+        StyledRuns _runs;
+
         public Vector2d[] _characterPositions;
         public double[] _characterWidth;
-        private string _text;
-        private double _width;
-        private int _lineStart;
-        private int _wordStart;
-        private int _spaceCount = 0;
-        private int tabCount = 4;
-        private double _lineLength;
+        string _text;
+        double _width;
+        int _lineStart;
+        int _wordStart;
+        int _spaceCount = 0;
+        int tabCount = 4;
+        double _lineLength;
 
-        private List<LineInfo> _lines;
+        List<LineInfo> _lines;
 
-        public void setup(string text, StyledRuns runs, double width, Vector2d[] characterPositions, double[] characterWidth)
-        {
-            _text = text;
-            _runs = runs;
-            _characterPositions = characterPositions;
-            _characterWidth = characterWidth;
-            _width = width;
+        public void setup(string text, StyledRuns runs, double width, Vector2d[] characterPositions,
+            double[] characterWidth) {
+            this._text = text;
+            this._runs = runs;
+            this._characterPositions = characterPositions;
+            this._characterWidth = characterWidth;
+            this._width = width;
         }
-        
-        public List<LineInfo> getLines()
-        {
-            return _lines;
+
+        public List<LineInfo> getLines() {
+            return this._lines;
         }
-   
-        public void doBreak(int blockStart, int blockEnd)
-        {
-            _lines = new List<LineInfo>();
-            _lineStart = blockStart;
-            _wordStart = blockStart;
-            _spaceCount = 0;
-            
+
+        public void doBreak(int blockStart, int blockEnd) {
+            this._lines = new List<LineInfo>();
+            this._lineStart = blockStart;
+            this._wordStart = blockStart;
+            this._spaceCount = 0;
+
             double offsetX = 0.0;
-            var runIterator = _runs.iterator();
-            for (var charIndex = blockStart; charIndex < blockEnd; charIndex++)
-            {
+            var runIterator = this._runs.iterator();
+            for (var charIndex = blockStart; charIndex < blockEnd; charIndex++) {
                 runIterator.nextTo(charIndex);
                 var run = runIterator.run;
                 var font = FontManager.instance.getOrCreate(run.style.fontFamily).font;
@@ -58,94 +52,74 @@ namespace Unity.UIWidgets.ui
                 var style = run.style;
                 var charInfo = new CharacterInfo();
 
-                if (_text[charIndex] == '\t')
-                {
-                    _spaceCount++;
+                if (this._text[charIndex] == '\t') {
+                    this._spaceCount++;
 
                     font.GetCharacterInfo(' ', out charInfo,
                         style.UnityFontSize, style.UnityFontStyle);
-                    double tabSize = charInfo.advance * tabCount;
+                    double tabSize = charInfo.advance * this.tabCount;
                     var newX = Math.Floor(((offsetX / tabSize) + 1) * tabSize);
-                    if (newX > _width && _lineStart != charIndex)
-                    {
-                        _characterWidth[charIndex] = tabSize;
-                        makeLine(charIndex, charIndex);
+                    if (newX > this._width && this._lineStart != charIndex) {
+                        this._characterWidth[charIndex] = tabSize;
+                        this.makeLine(charIndex, charIndex);
+                    } else {
+                        this._characterWidth[charIndex] = newX - offsetX;
+                        this._characterPositions[charIndex].x = offsetX;
                     }
-                    else
-                    {
-                        _characterWidth[charIndex] = newX - offsetX;
-                        _characterPositions[charIndex].x = offsetX;
-                    }
-                    offsetX = _characterPositions[charIndex].x + _characterWidth[charIndex];
-                }
-                else if (_text[charIndex] == ' ')
-                {
-                    font.GetCharacterInfo(_text[charIndex], out charInfo, style.UnityFontSize, run.style.UnityFontStyle);
-                    _spaceCount++;
-                    _characterPositions[charIndex].x = offsetX;
-                    _characterWidth[charIndex] = charInfo.advance;
-                    offsetX = _characterPositions[charIndex].x + _characterWidth[charIndex];
-                    // todo no wrap in space ?
-                }
-                else
-                {
-                    font.GetCharacterInfo(_text[charIndex], out charInfo, style.UnityFontSize,
+                    offsetX = this._characterPositions[charIndex].x + this._characterWidth[charIndex];
+                } else if (this._text[charIndex] == ' ') {
+                    font.GetCharacterInfo(this._text[charIndex], out charInfo, style.UnityFontSize,
                         run.style.UnityFontStyle);
-                    if (_spaceCount > 0 || blockStart == charIndex)
-                    {
-                        _wordStart = charIndex;
+                    this._spaceCount++;
+                    this._characterPositions[charIndex].x = offsetX;
+                    this._characterWidth[charIndex] = charInfo.advance;
+                    offsetX = this._characterPositions[charIndex].x + this._characterWidth[charIndex];
+                    // todo no wrap in space ?
+                } else {
+                    font.GetCharacterInfo(this._text[charIndex], out charInfo, style.UnityFontSize,
+                        run.style.UnityFontStyle);
+                    if (this._spaceCount > 0 || blockStart == charIndex) {
+                        this._wordStart = charIndex;
                     }
 
-                    _characterPositions[charIndex].x = offsetX;
-                    _characterWidth[charIndex] = charInfo.advance;
-                    
-                    if (offsetX + charInfo.advance > _width && _lineStart != charIndex)
-                    {
-                        if (_lineStart == _wordStart)
-                        {    
-                            makeLine(charIndex, charIndex);
-                            _wordStart = charIndex;
-                        }
-                        else
-                        {
-                            makeLine(_wordStart, charIndex);
+                    this._characterPositions[charIndex].x = offsetX;
+                    this._characterWidth[charIndex] = charInfo.advance;
+
+                    if (offsetX + charInfo.advance > this._width && this._lineStart != charIndex) {
+                        if (this._lineStart == this._wordStart) {
+                            this.makeLine(charIndex, charIndex);
+                            this._wordStart = charIndex;
+                        } else {
+                            this.makeLine(this._wordStart, charIndex);
                         }
                     }
 
-                    offsetX = _characterPositions[charIndex].x + _characterWidth[charIndex];
-                    _spaceCount = 0;
+                    offsetX = this._characterPositions[charIndex].x + this._characterWidth[charIndex];
+                    this._spaceCount = 0;
                 }
-
-
             }
 
-            makeLine(blockEnd, blockEnd);
+            this.makeLine(blockEnd, blockEnd);
         }
 
 
-        private void makeLine(int end, int last)
-        {
-            Debug.Assert(_lineStart < end);
+        void makeLine(int end, int last) {
+            Debug.Assert(this._lineStart < end);
             Debug.Assert(end <= last);
-            _lines.Add(new LineInfo()
-            {
-                start =  _lineStart,
-                width = _characterPositions[end - 1].x + _characterWidth[end - 1],
+            this._lines.Add(new LineInfo() {
+                start = this._lineStart,
+                width = this._characterPositions[end - 1].x + this._characterWidth[end - 1],
             });
-            _lineStart = end;
+            this._lineStart = end;
 
-            if (end >= _characterPositions.Length)
-            {
+            if (end >= this._characterPositions.Length) {
                 return;
             }
-            var offset = new Vector2d(-_characterPositions[end].x, 0);
-            _characterPositions[end].x = 0;
-            if (end < last)
-            {
-                Paragraph.offsetCharacters(offset,
-                    _characterPositions, end + 1, last + 1);
+            var offset = new Vector2d(-this._characterPositions[end].x, 0);
+            this._characterPositions[end].x = 0;
+            if (end < last) {
+                Paragraph.offsetCharacters(offset, this._characterPositions, end + 1, last + 1);
             }
         }
-        
     }
 }

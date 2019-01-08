@@ -14,7 +14,7 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public override string ToString() {
-            return string.Format("[#{0}]", Diagnostics.shortHash(this));
+            return $"[#{Diagnostics.shortHash(this)}]";
         }
     }
 
@@ -26,15 +26,25 @@ namespace Unity.UIWidgets.widgets {
         public readonly object value;
 
         public bool Equals(ObjectKey other) {
-            if (object.ReferenceEquals(null, other)) return false;
-            if (object.ReferenceEquals(this, other)) return true;
-            return object.ReferenceEquals(this.value, other.value);
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
+            return ReferenceEquals(this.value, other.value);
         }
 
         public override bool Equals(object obj) {
-            if (object.ReferenceEquals(null, obj)) return false;
-            if (object.ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
             return this.Equals((ObjectKey) obj);
         }
 
@@ -43,19 +53,19 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public static bool operator ==(ObjectKey left, ObjectKey right) {
-            return object.Equals(left, right);
+            return Equals(left, right);
         }
 
         public static bool operator !=(ObjectKey left, ObjectKey right) {
-            return !object.Equals(left, right);
+            return !Equals(left, right);
         }
 
         public override string ToString() {
             if (this.GetType() == typeof(ObjectKey)) {
-                return string.Format("[{0}]", Diagnostics.describeIdentity(this.value));
+                return $"[{Diagnostics.describeIdentity(this.value)}]";
             }
 
-            return string.Format("[{0} {1}]", this.GetType(), Diagnostics.describeIdentity(this.value));
+            return $"[{this.GetType()} {Diagnostics.describeIdentity(this.value)}]";
         }
     }
 
@@ -114,23 +124,17 @@ namespace Unity.UIWidgets.widgets {
                     string newer = parent.ToString();
                     if (older != newer) {
                         throw new UIWidgetsError(
-                            string.Format(
-                                "Multiple widgets used the same GlobalKey.\n" +
-                                "The key {0} was used by multiple widgets. The parents of those widgets were:\n" +
-                                "- {1}\n" +
-                                "- {2}\n" +
-                                "A GlobalKey can only be specified on one widget at a time in the widget tree.",
-                                this, older, newer));
+                            "Multiple widgets used the same GlobalKey.\n" +
+                            $"The key {this} was used by multiple widgets. The parents of those widgets were:\n" +
+                            $"- {older}\n" + $"- {newer}\n" +
+                            "A GlobalKey can only be specified on one widget at a time in the widget tree.");
                     }
 
                     throw new UIWidgetsError(
-                        string.Format(
-                            "Multiple widgets used the same GlobalKey.\n" +
-                            "The key {0} was used by multiple widgets. The parents of those widgets were " +
-                            "different widgets that both had the following description:\n" +
-                            "  {1}\n" +
-                            "A GlobalKey can only be specified on one widget at a time in the widget tree.",
-                            this, newer));
+                        "Multiple widgets used the same GlobalKey.\n" +
+                        $"The key {this} was used by multiple widgets. The parents of those widgets were " +
+                        "different widgets that both had the following description:\n" + $"  {newer}\n" +
+                        "A GlobalKey can only be specified on one widget at a time in the widget tree.");
                 }
 
                 _debugReservations[this] = parent;
@@ -163,7 +167,7 @@ namespace Unity.UIWidgets.widgets {
                     buffer.AppendLine("Multiple widgets used the same GlobalKey.\n");
                     foreach (GlobalKey key in duplicates.Keys) {
                         HashSet<Element> elements = duplicates[key];
-                        buffer.AppendLine(string.Format("The key {0} was used by {1} widgets:", key, elements.Count));
+                        buffer.AppendLine($"The key {key} was used by {elements.Count} widgets:");
                         foreach (Element element in elements) {
                             buffer.AppendLine("- " + element);
                         }
@@ -240,10 +244,10 @@ namespace Unity.UIWidgets.widgets {
         public override string ToString() {
             string label = this._debugLabel != null ? " " + this._debugLabel : "";
             if (this.GetType() == typeof(LabeledGlobalKey<T>)) {
-                return string.Format("[GlobalKey#{0}{1}]", Diagnostics.shortHash(this), label);
+                return $"[GlobalKey#{Diagnostics.shortHash(this)}{label}]";
             }
 
-            return string.Format("[{0}{1}]", Diagnostics.describeIdentity(this), label);
+            return $"[{Diagnostics.describeIdentity(this)}{label}]";
         }
     }
 
@@ -255,15 +259,25 @@ namespace Unity.UIWidgets.widgets {
         public readonly object value;
 
         public bool Equals(GlobalObjectKey<T> other) {
-            if (object.ReferenceEquals(null, other)) return false;
-            if (object.ReferenceEquals(this, other)) return true;
-            return object.ReferenceEquals(this.value, other.value);
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
+            return ReferenceEquals(this.value, other.value);
         }
 
         public override bool Equals(object obj) {
-            if (object.ReferenceEquals(null, obj)) return false;
-            if (object.ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
             return this.Equals((GlobalObjectKey<T>) obj);
         }
 
@@ -272,21 +286,21 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public static bool operator ==(GlobalObjectKey<T> left, GlobalObjectKey<T> right) {
-            return object.Equals(left, right);
+            return Equals(left, right);
         }
 
         public static bool operator !=(GlobalObjectKey<T> left, GlobalObjectKey<T> right) {
-            return !object.Equals(left, right);
+            return !Equals(left, right);
         }
 
         public override string ToString() {
-            String selfType = this.GetType().ToString();
+            string selfType = this.GetType().ToString();
             string suffix = "`1[UIWidgets.widgets.State]";
             if (selfType.EndsWith(suffix)) {
                 selfType = selfType.Substring(0, selfType.Length - suffix.Length);
             }
 
-            return string.Format("[{0} {1}]", selfType, Diagnostics.describeIdentity(this.value));
+            return $"[{selfType} {Diagnostics.describeIdentity(this.value)}]";
         }
     }
 
@@ -319,7 +333,7 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public static bool canUpdate(Widget oldWidget, Widget newWidget) {
-            return oldWidget.GetType() == newWidget.GetType() && object.Equals(oldWidget.key, newWidget.key);
+            return oldWidget.GetType() == newWidget.GetType() && Equals(oldWidget.key, newWidget.key);
         }
     }
 
@@ -420,7 +434,7 @@ namespace Unity.UIWidgets.widgets {
             if (fn != null) {
                 fn();
             }
-            
+
             this._element.markNeedsBuild();
         }
 
@@ -533,10 +547,10 @@ namespace Unity.UIWidgets.widgets {
 
                 foreach (Widget ancestor in badAncestors) {
                     if (ancestor.GetType() == this.GetType()) {
-                        result += string.Format("- {0} (this is a different {1} than the one with the problem)\n",
-                            ancestor, this.GetType());
+                        result +=
+                            $"- {ancestor} (this is a different {this.GetType()} than the one with the problem)\n";
                     } else {
-                        result += string.Format("- {0}\n", ancestor);
+                        result += $"- {ancestor}\n";
                     }
                 }
 
@@ -650,8 +664,7 @@ namespace Unity.UIWidgets.widgets {
             try {
                 elements.Reverse();
                 elements.ForEach(this._unmount);
-            }
-            finally {
+            } finally {
                 D.assert(this._elements.isEmpty());
                 this._locked = false;
             }
@@ -839,8 +852,7 @@ namespace Unity.UIWidgets.widgets {
 
             try {
                 callback();
-            }
-            finally {
+            } finally {
                 D.assert(() => {
                     this._debugStateLockLevel -= 1;
                     return true;
@@ -885,13 +897,12 @@ namespace Unity.UIWidgets.widgets {
 
                     try {
                         callback();
-                    }
-                    finally {
+                    } finally {
                         D.assert(() => {
                             context._debugSetAllowIgnoredCallsToMarkNeedsBuild(false);
                             D.assert(this._debugCurrentBuildTarget == context);
                             this._debugCurrentBuildTarget = debugPreviousBuildTarget;
-                            _debugElementWasRebuilt(context);
+                            this._debugElementWasRebuilt(context);
                             return true;
                         });
                     }
@@ -909,8 +920,7 @@ namespace Unity.UIWidgets.widgets {
 
                     try {
                         this._dirtyElements[index].rebuild();
-                    }
-                    catch (Exception ex) {
+                    } catch (Exception ex) {
                         WidgetsD._debugReportException(
                             "while rebuilding dirty elements", ex,
                             informationCollector: (information) => {
@@ -944,8 +954,7 @@ namespace Unity.UIWidgets.widgets {
 
                     return true;
                 });
-            }
-            finally {
+            } finally {
                 foreach (Element element in this._dirtyElements) {
                     D.assert(element._inDirtyList);
                     element._inDirtyList = false;
@@ -973,18 +982,18 @@ namespace Unity.UIWidgets.widgets {
         Dictionary<Element, HashSet<GlobalKey>> _debugElementsThatWillNeedToBeRebuiltDueToGlobalKeyShenanigans;
 
         internal void _debugTrackElementThatWillNeedToBeRebuiltDueToGlobalKeyShenanigans(Element node, GlobalKey key) {
-            _debugElementsThatWillNeedToBeRebuiltDueToGlobalKeyShenanigans =
-                _debugElementsThatWillNeedToBeRebuiltDueToGlobalKeyShenanigans ??
+            this._debugElementsThatWillNeedToBeRebuiltDueToGlobalKeyShenanigans =
+                this._debugElementsThatWillNeedToBeRebuiltDueToGlobalKeyShenanigans ??
                 new Dictionary<Element, HashSet<GlobalKey>>();
 
-            var keys = _debugElementsThatWillNeedToBeRebuiltDueToGlobalKeyShenanigans
+            var keys = this._debugElementsThatWillNeedToBeRebuiltDueToGlobalKeyShenanigans
                 .putIfAbsent(node, () => new HashSet<GlobalKey>());
             keys.Add(key);
         }
 
         internal void _debugElementWasRebuilt(Element node) {
-            if (_debugElementsThatWillNeedToBeRebuiltDueToGlobalKeyShenanigans != null) {
-                _debugElementsThatWillNeedToBeRebuiltDueToGlobalKeyShenanigans.Remove(node);
+            if (this._debugElementsThatWillNeedToBeRebuiltDueToGlobalKeyShenanigans != null) {
+                this._debugElementsThatWillNeedToBeRebuiltDueToGlobalKeyShenanigans.Remove(node);
             }
         }
 
@@ -995,14 +1004,15 @@ namespace Unity.UIWidgets.widgets {
                 D.assert(() => {
                     try {
                         GlobalKey._debugVerifyIllFatedPopulation();
-                        if (_debugElementsThatWillNeedToBeRebuiltDueToGlobalKeyShenanigans != null &&
-                            _debugElementsThatWillNeedToBeRebuiltDueToGlobalKeyShenanigans.isNotEmpty()) {
+                        if (this._debugElementsThatWillNeedToBeRebuiltDueToGlobalKeyShenanigans != null &&
+                            this._debugElementsThatWillNeedToBeRebuiltDueToGlobalKeyShenanigans.isNotEmpty()) {
                             var keys = new HashSet<GlobalKey>();
-                            foreach (Element element in _debugElementsThatWillNeedToBeRebuiltDueToGlobalKeyShenanigans
+                            foreach (Element element in this
+                                ._debugElementsThatWillNeedToBeRebuiltDueToGlobalKeyShenanigans
                                 .Keys) {
                                 if (element._debugLifecycleState != _ElementLifecycle.defunct) {
                                     keys.UnionWith(
-                                        _debugElementsThatWillNeedToBeRebuiltDueToGlobalKeyShenanigans[element]);
+                                        this._debugElementsThatWillNeedToBeRebuiltDueToGlobalKeyShenanigans[element]);
                                 }
                             }
 
@@ -1016,7 +1026,7 @@ namespace Unity.UIWidgets.widgets {
                                     }
                                 }
 
-                                var keyLabels = new List<String>();
+                                var keyLabels = new List<string>();
                                 foreach (var entry in keyStringCount) {
                                     var key = entry.Key;
                                     var count = entry.Value;
@@ -1024,13 +1034,11 @@ namespace Unity.UIWidgets.widgets {
                                         keyLabels.Add(key);
                                     } else {
                                         keyLabels.Add(
-                                            string.Format(
-                                                "{0} ({1} different affected keys had this toString representation)",
-                                                key, count));
+                                            $"{key} ({count} different affected keys had this toString representation)");
                                     }
                                 }
 
-                                var elements = _debugElementsThatWillNeedToBeRebuiltDueToGlobalKeyShenanigans.Keys;
+                                var elements = this._debugElementsThatWillNeedToBeRebuiltDueToGlobalKeyShenanigans.Keys;
                                 var elementStringCount = new Dictionary<string, int>();
                                 foreach (string element in elements.Select(element => element.ToString())) {
                                     if (elementStringCount.ContainsKey(element)) {
@@ -1049,9 +1057,7 @@ namespace Unity.UIWidgets.widgets {
                                         elementLabels.Add(element);
                                     } else {
                                         elementLabels.Add(
-                                            string.Format(
-                                                "{0} ({1} different affected elements had this toString representation)",
-                                                element, count));
+                                            $"{element} ({count} different affected elements had this toString representation)");
                                     }
                                 }
 
@@ -1074,17 +1080,15 @@ namespace Unity.UIWidgets.widgets {
                                 );
                             }
                         }
-                    }
-                    finally {
-                        if (_debugElementsThatWillNeedToBeRebuiltDueToGlobalKeyShenanigans != null) {
-                            _debugElementsThatWillNeedToBeRebuiltDueToGlobalKeyShenanigans.Clear();
+                    } finally {
+                        if (this._debugElementsThatWillNeedToBeRebuiltDueToGlobalKeyShenanigans != null) {
+                            this._debugElementsThatWillNeedToBeRebuiltDueToGlobalKeyShenanigans.Clear();
                         }
                     }
 
                     return true;
                 });
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 WidgetsD._debugReportException("while finalizing the widget tree", ex);
             }
         }
@@ -1099,7 +1103,7 @@ namespace Unity.UIWidgets.widgets {
         internal Element _parent;
 
         public override bool Equals(object obj) {
-            return object.ReferenceEquals(this, obj);
+            return ReferenceEquals(this, obj);
         }
 
         static int _nextHashCode = 1;
@@ -1231,8 +1235,8 @@ namespace Unity.UIWidgets.widgets {
             }
 
             if (child != null) {
-                if (object.Equals(child.widget, newWidget)) {
-                    if (!object.Equals(child.slot, newSlot)) {
+                if (Equals(child.widget, newWidget)) {
+                    if (!Equals(child.slot, newSlot)) {
                         this.updateSlotForChild(child, newSlot);
                     }
 
@@ -1240,7 +1244,7 @@ namespace Unity.UIWidgets.widgets {
                 }
 
                 if (Widget.canUpdate(child.widget, newWidget)) {
-                    if (!object.Equals(child.slot, newSlot)) {
+                    if (!Equals(child.slot, newSlot)) {
                         this.updateSlotForChild(child, newSlot);
                     }
 
@@ -1368,15 +1372,12 @@ namespace Unity.UIWidgets.widgets {
                 D.assert(() => {
                     if (parent == this) {
                         throw new UIWidgetsError(
-                            string.Format(
-                                "A GlobalKey was used multiple times inside one widget\"s child list.\n" +
-                                "The offending GlobalKey was: {0}\n" +
-                                "The parent of the widgets with that key was:\n  {1}\n" +
-                                "The first child to get instantiated with that key became:\n  {2}\n" +
-                                "The second child that was to be instantiated with that key was:\n  {3}\n" +
-                                "A GlobalKey can only be specified on one widget at a time in the widget tree.",
-                                key, parent, element, this.widget
-                            ));
+                            "A GlobalKey was used multiple times inside one widget\"s child list.\n" +
+                            $"The offending GlobalKey was: {key}\n" +
+                            $"The parent of the widgets with that key was:\n  {parent}\n" +
+                            $"The first child to get instantiated with that key became:\n  {element}\n" +
+                            $"The second child that was to be instantiated with that key was:\n  {this.widget}\n" +
+                            "A GlobalKey can only be specified on one widget at a time in the widget tree.");
                     }
 
                     parent.owner._debugTrackElementThatWillNeedToBeRebuiltDueToGlobalKeyShenanigans(
@@ -1428,8 +1429,9 @@ namespace Unity.UIWidgets.widgets {
             D.assert(newChild._parent == null);
             D.assert(() => {
                 Element node = this;
-                while (node._parent != null)
+                while (node._parent != null) {
                     node = node._parent;
+                }
                 D.assert(node != newChild);
                 return true;
             });
@@ -1754,8 +1756,9 @@ namespace Unity.UIWidgets.widgets {
             StatefulElement statefulAncestor = null;
             while (ancestor != null) {
                 var element = ancestor as StatefulElement;
-                if (element != null && matcher.check(element.state))
+                if (element != null && matcher.check(element.state)) {
                     statefulAncestor = element;
+                }
                 ancestor = ancestor._parent;
             }
 
@@ -1767,8 +1770,9 @@ namespace Unity.UIWidgets.widgets {
             Element ancestor = this._parent;
             while (ancestor != null) {
                 var element = ancestor as RenderObjectElement;
-                if (element != null && matcher.check(ancestor.renderObject))
+                if (element != null && matcher.check(ancestor.renderObject)) {
                     break;
+                }
                 ancestor = ancestor._parent;
             }
 
@@ -2002,8 +2006,7 @@ namespace Unity.UIWidgets.widgets {
         static string _stringify(Exception exception) {
             try {
                 return exception.ToString();
-            }
-            catch {
+            } catch {
             }
 
             return "Error";
@@ -2051,20 +2054,17 @@ namespace Unity.UIWidgets.widgets {
             try {
                 built = this.build();
                 WidgetsD.debugWidgetBuilderValue(this.widget, built);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 built = ErrorWidget.builder(WidgetsD._debugReportException("building " + this, e));
-            }
-            finally {
+            } finally {
                 this._dirty = false;
                 D.assert(this._debugSetAllowIgnoredCallsToMarkNeedsBuild(false));
             }
 
             try {
                 this._child = this.updateChild(this._child, built, this.slot);
-                D.assert(_child != null);
-            }
-            catch (Exception e) {
+                D.assert(this._child != null);
+            } catch (Exception e) {
                 built = ErrorWidget.builder(WidgetsD._debugReportException("building " + this, e));
                 this._child = this.updateChild(null, built, this.slot);
             }
@@ -2079,7 +2079,7 @@ namespace Unity.UIWidgets.widgets {
         }
 
         protected override void forgetChild(Element child) {
-            D.assert(child == _child);
+            D.assert(child == this._child);
             this._child = null;
         }
     }
@@ -2145,8 +2145,7 @@ namespace Unity.UIWidgets.widgets {
             try {
                 this._debugSetAllowIgnoredCallsToMarkNeedsBuild(true);
                 this._state.initState();
-            }
-            finally {
+            } finally {
                 this._debugSetAllowIgnoredCallsToMarkNeedsBuild(false);
             }
 
@@ -2172,8 +2171,7 @@ namespace Unity.UIWidgets.widgets {
             try {
                 this._debugSetAllowIgnoredCallsToMarkNeedsBuild(true);
                 this._state.didUpdateWidget(oldWidget);
-            }
-            finally {
+            } finally {
                 this._debugSetAllowIgnoredCallsToMarkNeedsBuild(false);
             }
 
@@ -2288,7 +2286,7 @@ namespace Unity.UIWidgets.widgets {
             this._dirty = true;
             this.rebuild();
         }
-        
+
         protected virtual void updated(ProxyWidget oldWidget) {
             this.notifyClients(oldWidget);
         }
@@ -2402,7 +2400,7 @@ namespace Unity.UIWidgets.widgets {
         public void setDependencies(Element dependent, object value) {
             object existing;
             if (this._dependents.TryGetValue(dependent, out existing)) {
-                if (object.Equals(existing, value)) {
+                if (Equals(existing, value)) {
                     return;
                 }
             }
@@ -2417,7 +2415,7 @@ namespace Unity.UIWidgets.widgets {
         public void notifyDependent(InheritedWidget oldWidget, Element dependent) {
             dependent.didChangeDependencies();
         }
-        
+
         protected override void updated(ProxyWidget oldWidget) {
             if (this.widget.updateShouldNotify((InheritedWidget) oldWidget)) {
                 base.updated(oldWidget);

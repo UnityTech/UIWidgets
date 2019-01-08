@@ -93,7 +93,7 @@ namespace Unity.UIWidgets.gestures {
         public override void rejectGesture(int pointer) {
             _TapTracker tracker;
             this._trackers.TryGetValue(pointer, out tracker);
-            
+
             if (tracker == null &&
                 this._firstTap != null &&
                 this._firstTap.pointer == pointer) {

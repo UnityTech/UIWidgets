@@ -1,10 +1,6 @@
-﻿using System;
-using Unity.UIWidgets.foundation;
+﻿using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
-using Unity.UIWidgets.painting;
 using Unity.UIWidgets.ui;
-using UnityEngine;
-using Rect = Unity.UIWidgets.ui.Rect;
 
 namespace Unity.UIWidgets.rendering {
     public class ViewConfiguration {
@@ -25,7 +21,7 @@ namespace Unity.UIWidgets.rendering {
         }
 
         public override string ToString() {
-            return string.Format("${0} at ${1}x", this.size, this.devicePixelRatio);
+            return $"${this.size} at ${this.devicePixelRatio}x";
         }
     }
 
@@ -140,13 +136,12 @@ namespace Unity.UIWidgets.rendering {
         }
 
         public override Rect semanticBounds {
-            get
-            {
-                D.assert(_rootTransform != null);
-                return _rootTransform.mapRect(Offset.zero & size);
+            get {
+                D.assert(this._rootTransform != null);
+                return this._rootTransform.mapRect(Offset.zero & this.size);
             }
         }
-        
+
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             D.assert(() => {
                 properties.add(DiagnosticsNode.message("debug mode enabled"));

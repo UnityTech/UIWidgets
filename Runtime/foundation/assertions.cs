@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Debug = UnityEngine.Debug;
+using UnityEngine;
 
 namespace Unity.UIWidgets.foundation {
     public delegate void UIWidgetsExceptionHandler(UIWidgetsErrorDetails details);
@@ -14,7 +14,7 @@ namespace Unity.UIWidgets.foundation {
             Exception exception = null,
             string library = "UIWidgets framework",
             string context = null,
-            EnumerableFilter<String> stackFilter = null,
+            EnumerableFilter<string> stackFilter = null,
             InformationCollector informationCollector = null,
             bool silent = false
         ) {
@@ -29,7 +29,7 @@ namespace Unity.UIWidgets.foundation {
         public readonly Exception exception;
         public readonly string library;
         public readonly string context;
-        public readonly EnumerableFilter<String> stackFilter;
+        public readonly EnumerableFilter<string> stackFilter;
         public readonly InformationCollector informationCollector;
         public readonly bool silent;
 

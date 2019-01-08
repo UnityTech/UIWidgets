@@ -7,178 +7,146 @@ using Unity.UIWidgets.widgets;
 using UnityEditor;
 using UnityEngine;
 
-namespace Unity.UIWidgets.debugger
-{
-    public class WidgetsInpsectorWindow: EditorWindow
-    {
-        
-        private InspectorService m_InspectorService;
-        private bool m_ShowInspect;
-        private readonly List<InspectorPanel> m_Panels = new List<InspectorPanel>();
-        private int m_PanelIndex = 0;
-        [SerializeField]
-        private List<PanelState> m_PanelStates = new List<PanelState>();
-        
+namespace Unity.UIWidgets.debugger {
+    public class WidgetsInpsectorWindow : EditorWindow {
+        InspectorService m_InspectorService;
+        bool m_ShowInspect;
+        readonly List<InspectorPanel> m_Panels = new List<InspectorPanel>();
+        int m_PanelIndex = 0;
+        [SerializeField] List<PanelState> m_PanelStates = new List<PanelState>();
+
         [MenuItem("Window/Analysis/UIWidgets Inspector")]
-        public static void Init()
-        {
-            WidgetsInpsectorWindow window = (WidgetsInpsectorWindow)EditorWindow.GetWindow(typeof(WidgetsInpsectorWindow));
+        public static void Init() {
+            WidgetsInpsectorWindow window =
+                (WidgetsInpsectorWindow) GetWindow(typeof(WidgetsInpsectorWindow));
             window.Show();
         }
 
-        private void OnGUI()
-        {
+        void OnGUI() {
             EditorGUILayout.BeginHorizontal(EditorStyles.toolbar, GUILayout.ExpandWidth(true));
-            DoSelectDropDown();
-            if (m_InspectorService != null)
-            {
+            this.DoSelectDropDown();
+            if (this.m_InspectorService != null) {
                 EditorGUI.BeginChangeCheck();
-                var newShowInspect = GUILayout.Toggle(this.m_ShowInspect, new GUIContent("Inspect Element"), EditorStyles.toolbarButton);
-                if (EditorGUI.EndChangeCheck())
-                {
-                    m_InspectorService.setShowInspect(newShowInspect);
+                var newShowInspect = GUILayout.Toggle(this.m_ShowInspect, new GUIContent("Inspect Element"),
+                    EditorStyles.toolbarButton);
+                if (EditorGUI.EndChangeCheck()) {
+                    this.m_InspectorService.setShowInspect(newShowInspect);
                 }
             }
             EditorGUILayout.EndHorizontal();
-            
+
             EditorGUILayout.Space();
-          
-            if (m_InspectorService != null)
-            {
+
+            if (this.m_InspectorService != null) {
                 EditorGUILayout.BeginHorizontal(EditorStyles.toolbar, GUILayout.ExpandWidth(false));
-                m_Panels.Each((pannel, index) =>
-                {
-                    if (GUILayout.Toggle(m_PanelIndex == index, pannel.title, EditorStyles.toolbarButton,
-                        GUILayout.ExpandWidth(false), GUILayout.Width(100)))
-                    {
-                        m_PanelIndex = index;
+                this.m_Panels.Each((pannel, index) => {
+                    if (GUILayout.Toggle(this.m_PanelIndex == index, pannel.title, EditorStyles.toolbarButton,
+                        GUILayout.ExpandWidth(false), GUILayout.Width(100))) {
+                        this.m_PanelIndex = index;
                     }
                 });
                 EditorGUILayout.EndHorizontal();
 
-                m_Panels[m_PanelIndex].OnGUI();
+                this.m_Panels[this.m_PanelIndex].OnGUI();
             }
-           
         }
-        
-        private void DoSelectDropDown()
-        {
-            var currentWindow = m_InspectorService == null ? null : m_InspectorService.window;
-            var selectTitle = currentWindow != null ? currentWindow.titleContent :  new GUIContent("<Please Select>");
-            if (GUILayout.Button(selectTitle, EditorStyles.toolbarDropDown))
-            {
-                var windows = new List<WindowAdapter>(WindowAdapter.windowAdapters.Where(w =>
-                {
-                    return w.WithBindingFunc(() => WidgetsBinding.instance.renderViewElement != null);
+
+        void DoSelectDropDown() {
+            var currentWindow = this.m_InspectorService == null ? null : this.m_InspectorService.window;
+            var selectTitle = currentWindow != null ? currentWindow.titleContent : new GUIContent("<Please Select>");
+            if (GUILayout.Button(selectTitle, EditorStyles.toolbarDropDown)) {
+                var windows = new List<WindowAdapter>(WindowAdapter.windowAdapters.Where(w => {
+                    return w.withBindingFunc(() => WidgetsBinding.instance.renderViewElement != null);
                 }));
-                Rect rect = EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight, EditorStyles.toolbarDropDown);
+                Rect rect = EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight,
+                    EditorStyles.toolbarDropDown);
                 var menuPos = EditorGUI.IndentedRect(rect);
                 menuPos.y += EditorGUIUtility.singleLineHeight / 2;
-                
+
                 int selectedIndex = 0;
                 var labels = new GUIContent[windows.Count + 1];
                 labels[0] = new GUIContent("none");
-                for (int i = 0; i < windows.Count; i++)
-                {
+                for (int i = 0; i < windows.Count; i++) {
                     labels[i + 1] = windows[i].titleContent;
-                    if (windows[i] == currentWindow)
-                    {
+                    if (windows[i] == currentWindow) {
                         selectedIndex = i + 1;
                     }
                 }
-                EditorUtility.DisplayCustomMenu(menuPos, labels, selectedIndex, (data, options, selected) =>
-                {
-                    if (selected > 0)
-                    {
+                EditorUtility.DisplayCustomMenu(menuPos, labels, selectedIndex, (data, options, selected) => {
+                    if (selected > 0) {
                         var selectedWindow = windows[selected - 1];
-                        if (selectedWindow != currentWindow)
-                        {
-                            inspect(selectedWindow);
+                        if (selectedWindow != currentWindow) {
+                            this.inspect(selectedWindow);
                         }
-                    }
-                    else
-                    {
-                        if (m_InspectorService != null)
-                        {
-                            closeInspect();
+                    } else {
+                        if (this.m_InspectorService != null) {
+                            this.closeInspect();
                         }
                     }
                 }, null);
             }
         }
 
-        private void inspect(WindowAdapter window)
-        {
-            if (m_InspectorService != null) // stop previous inspect
+        void inspect(WindowAdapter window) {
+            if (this.m_InspectorService != null) // stop previous inspect
             {
-                closeInspect();
+                this.closeInspect();
             }
 
-            m_InspectorService = new InspectorService(window);
-            m_PanelIndex = 0;
+            this.m_InspectorService = new InspectorService(window);
+            this.m_PanelIndex = 0;
 
-            var state = m_PanelStates.Find((s) => s.treeType == WidgetTreeType.Widget);
-            m_Panels.Add(new InspectorPanel(this, WidgetTreeType.Widget, m_InspectorService, 
-                state == null ? (float?)null : state.splitOffset));
-            
-            state = m_PanelStates.Find((s) => s.treeType == WidgetTreeType.Render);
-            m_Panels.Add(new InspectorPanel(this, WidgetTreeType.Render, m_InspectorService,
-                state == null ? (float?)null : state.splitOffset));
+            var state = this.m_PanelStates.Find((s) => s.treeType == WidgetTreeType.Widget);
+            this.m_Panels.Add(new InspectorPanel(this, WidgetTreeType.Widget, this.m_InspectorService,
+                state == null ? (float?) null : state.splitOffset));
+
+            state = this.m_PanelStates.Find((s) => s.treeType == WidgetTreeType.Render);
+            this.m_Panels.Add(new InspectorPanel(this, WidgetTreeType.Render, this.m_InspectorService,
+                state == null ? (float?) null : state.splitOffset));
         }
 
-        private void closeInspect()
-        {
-            if (m_InspectorService == null)
-            {
+        void closeInspect() {
+            if (this.m_InspectorService == null) {
                 return;
             }
-            m_InspectorService.close();
-            m_InspectorService = null;
-            foreach (var panel in m_Panels)
-            {
+            this.m_InspectorService.close();
+            this.m_InspectorService = null;
+            foreach (var panel in this.m_Panels) {
                 panel.Close();
             }
-            m_Panels.Clear();
-            m_ShowInspect = false;
+            this.m_Panels.Clear();
+            this.m_ShowInspect = false;
         }
 
-        private void Update()
-        {
-            if (m_InspectorService != null && !m_InspectorService.active)
-            {
-                closeInspect();
-                Repaint();
+        void Update() {
+            if (this.m_InspectorService != null && !this.m_InspectorService.active) {
+                this.closeInspect();
+                this.Repaint();
             }
 
             bool showInspect = false;
-            if (m_InspectorService != null)
-            {
-                showInspect = m_InspectorService.getShowInspect();
+            if (this.m_InspectorService != null) {
+                showInspect = this.m_InspectorService.getShowInspect();
             }
-            if (showInspect != this.m_ShowInspect)
-            {
-                Repaint();
+            if (showInspect != this.m_ShowInspect) {
+                this.Repaint();
             }
-            m_ShowInspect = showInspect;
+            this.m_ShowInspect = showInspect;
 
-            for (int i = 0; i < m_Panels.Count; i++)
-            {
-                m_Panels[i].visibleToUser = m_PanelIndex == i;
-                m_Panels[i].Update();
+            for (int i = 0; i < this.m_Panels.Count; i++) {
+                this.m_Panels[i].visibleToUser = this.m_PanelIndex == i;
+                this.m_Panels[i].Update();
             }
 
-            if (m_Panels.Count > 0)
-            {
-                m_PanelStates = m_Panels.Select(p => p.PanelState).ToList();
+            if (this.m_Panels.Count > 0) {
+                this.m_PanelStates = this.m_Panels.Select(p => p.PanelState).ToList();
             }
         }
-        
-        
-        void OnDestroy()
-        {
-            closeInspect();
+
+
+        void OnDestroy() {
+            this.closeInspect();
         }
-     }
-    
+    }
 }
 #endif

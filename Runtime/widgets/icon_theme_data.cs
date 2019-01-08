@@ -59,17 +59,27 @@ namespace Unity.UIWidgets.widgets {
 
 
         public bool Equals(IconThemeData other) {
-            if (object.ReferenceEquals(null, other)) return false;
-            if (object.ReferenceEquals(this, other)) return true;
-            return object.Equals(this.color, other.color) &&
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
+            return Equals(this.color, other.color) &&
                    this._opacity.Equals(other._opacity) &&
                    this.size.Equals(other.size);
         }
 
         public override bool Equals(object obj) {
-            if (object.ReferenceEquals(null, obj)) return false;
-            if (object.ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
             return this.Equals((IconThemeData) obj);
         }
 
@@ -83,11 +93,11 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public static bool operator ==(IconThemeData left, IconThemeData right) {
-            return object.Equals(left, right);
+            return Equals(left, right);
         }
 
         public static bool operator !=(IconThemeData left, IconThemeData right) {
-            return !object.Equals(left, right);
+            return !Equals(left, right);
         }
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {

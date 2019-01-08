@@ -25,7 +25,7 @@ namespace Unity.UIWidgets.painting {
         }
 
         public double blurSigma {
-            get { return BoxShadow.convertRadiusToSigma(this.blurRadius); }
+            get { return convertRadiusToSigma(this.blurRadius); }
         }
 
         public Paint toPaint() {
@@ -36,18 +36,28 @@ namespace Unity.UIWidgets.painting {
         }
 
         public bool Equals(BoxShadow other) {
-            if (object.ReferenceEquals(null, other)) return false;
-            if (object.ReferenceEquals(this, other)) return true;
-            return object.Equals(this.color, other.color)
-                   && object.Equals(this.offset, other.offset)
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
+            return Equals(this.color, other.color)
+                   && Equals(this.offset, other.offset)
                    && this.blurRadius.Equals(other.blurRadius)
                    && this.spreadRadius.Equals(other.spreadRadius);
         }
 
         public override bool Equals(object obj) {
-            if (object.ReferenceEquals(null, obj)) return false;
-            if (object.ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
             return this.Equals((BoxShadow) obj);
         }
 
@@ -62,7 +72,7 @@ namespace Unity.UIWidgets.painting {
         }
 
         public static bool operator ==(BoxShadow a, BoxShadow b) {
-            return object.Equals(a, b);
+            return Equals(a, b);
         }
 
         public static bool operator !=(BoxShadow a, BoxShadow b) {

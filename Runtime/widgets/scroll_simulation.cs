@@ -33,14 +33,16 @@ namespace Unity.UIWidgets.widgets {
                     this._springTime = this._frictionSimulation.timeAtX(trailingExtent);
                     this._springSimulation = this._overscrollSimulation(
                         trailingExtent,
-                        Math.Min(this._frictionSimulation.dx(this._springTime), maxSpringTransferVelocity)
+                        Math.Min(this._frictionSimulation.dx(this._springTime),
+                            maxSpringTransferVelocity)
                     );
                     D.assert(this._springTime.isFinite());
                 } else if (velocity < 0.0 && finalX < leadingExtent) {
                     this._springTime = this._frictionSimulation.timeAtX(leadingExtent);
                     this._springSimulation = this._underscrollSimulation(
                         leadingExtent,
-                        Math.Min(this._frictionSimulation.dx(this._springTime), maxSpringTransferVelocity)
+                        Math.Min(this._frictionSimulation.dx(this._springTime),
+                            maxSpringTransferVelocity)
                     );
                     D.assert(this._springTime.isFinite());
                 } else {
@@ -97,8 +99,7 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public override string ToString() {
-            return string.Format("{0}(leadingExtent: {1}, trailingExtent: {2})",
-                this.GetType(), this.leadingExtent, this.trailingExtent);
+            return $"{this.GetType()}(leadingExtent: {this.leadingExtent}, trailingExtent: {this.trailingExtent})";
         }
     }
 
@@ -109,7 +110,8 @@ namespace Unity.UIWidgets.widgets {
             double friction = 0.015,
             Tolerance tolerance = null
         ) : base(tolerance: tolerance) {
-            D.assert(_flingVelocityPenetration(0.0) == _initialVelocityPenetration);
+            D.assert(_flingVelocityPenetration(0.0) ==
+                     _initialVelocityPenetration);
             this.position = position;
             this.velocity = velocity;
             this.friction = friction;
@@ -154,12 +156,14 @@ namespace Unity.UIWidgets.widgets {
 
         public override double x(double time) {
             double t = (time / this._duration).clamp(0.0, 1.0);
-            return this.position + this._distance * _flingDistancePenetration(t) * this.velocity.sign();
+            return this.position + this._distance * _flingDistancePenetration(t) *
+                   this.velocity.sign();
         }
 
         public override double dx(double time) {
             double t = (time / this._duration).clamp(0.0, 1.0);
-            return this._distance * _flingVelocityPenetration(t) * this.velocity.sign() / this._duration;
+            return this._distance * _flingVelocityPenetration(t) * this.velocity.sign() /
+                   this._duration;
         }
 
         public override bool isDone(double time) {

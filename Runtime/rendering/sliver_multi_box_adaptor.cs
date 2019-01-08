@@ -4,7 +4,6 @@ using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.ui;
-using UnityEngine;
 
 namespace Unity.UIWidgets.rendering {
     public interface RenderSliverBoxChildManager {
@@ -40,8 +39,7 @@ namespace Unity.UIWidgets.rendering {
         internal bool _keptAlive = false;
 
         public override string ToString() {
-            return string.Format(
-                "index={0}; {1}{2}", this.index, this.keepAlive ? "keeyAlive; " : "", base.ToString());
+            return $"index={this.index}; {(this.keepAlive ? "keeyAlive; " : "")}{base.ToString()}";
         }
     }
 

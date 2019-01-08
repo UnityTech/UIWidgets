@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using Unity.UIWidgets.async;
-using Unity.UIWidgets.service;
 using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.service;
 
 namespace Unity.UIWidgets.ui {
     public delegate void VoidCallback();
@@ -43,23 +43,37 @@ namespace Unity.UIWidgets.ui {
 
         readonly string _languageCode;
 
-        public string languageCode => this._languageCode;
+        public string languageCode {
+            get { return this._languageCode; }
+        }
 
         readonly string _countryCode;
 
-        public string countryCode => this._countryCode;
+        public string countryCode {
+            get { return this._countryCode; }
+        }
 
         public bool Equals(Locale other) {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
             return string.Equals(this._languageCode, other._languageCode) &&
                    string.Equals(this._countryCode, other._countryCode);
         }
 
         public override bool Equals(object obj) {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
             return this.Equals((Locale) obj);
         }
 
@@ -111,16 +125,28 @@ namespace Unity.UIWidgets.ui {
 
         static Window _instance;
 
-        public double devicePixelRatio => this._devicePixelRatio;
+        public double devicePixelRatio {
+            get { return this._devicePixelRatio; }
+        }
+
         protected double _devicePixelRatio = 1.0;
 
-        public Size physicalSize => this._physicalSize;
+        public Size physicalSize {
+            get { return this._physicalSize; }
+        }
+
         protected Size _physicalSize = Size.zero;
 
-        public WindowPadding viewInsets => this._viewInsets;
+        public WindowPadding viewInsets {
+            get { return this._viewInsets; }
+        }
+
         protected WindowPadding _viewInsets = WindowPadding.zero;
-        
-        public WindowPadding padding => this._padding;
+
+        public WindowPadding padding {
+            get { return this._padding; }
+        }
+
         protected WindowPadding _padding = WindowPadding.zero;
 
         public VoidCallback onMetricsChanged {
@@ -140,7 +166,10 @@ namespace Unity.UIWidgets.ui {
             }
         }
 
-        public List<Locale> locales => this._locales;
+        public List<Locale> locales {
+            get { return this._locales; }
+        }
+
         protected List<Locale> _locales;
 
         public VoidCallback onLocaleChanged {
@@ -148,18 +177,21 @@ namespace Unity.UIWidgets.ui {
             set { this._onLocaleChanged = value; }
         }
 
-        private VoidCallback _onLocaleChanged;
+        VoidCallback _onLocaleChanged;
 
-        public double textScaleFactor => this._textScaleFactor;
+        public double textScaleFactor {
+            get { return this._textScaleFactor; }
+        }
+
         protected double _textScaleFactor = 1.0;
-        
+
         public VoidCallback onTextScaleFactorChanged {
             get { return this._onTextScaleFactorChanged; }
             set { this._onTextScaleFactorChanged = value; }
         }
 
         VoidCallback _onTextScaleFactorChanged;
-    
+
         public FrameCallback onBeginFrame {
             get { return this._onBeginFrame; }
             set { this._onBeginFrame = value; }
@@ -199,5 +231,4 @@ namespace Unity.UIWidgets.ui {
 
         public abstract IDisposable getScope();
     }
-
 }

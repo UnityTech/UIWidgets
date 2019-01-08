@@ -38,15 +38,25 @@ namespace Unity.UIWidgets.painting {
         }
 
         public bool Equals(BorderSide other) {
-            if (object.ReferenceEquals(null, other)) return false;
-            if (object.ReferenceEquals(this, other)) return true;
-            return object.Equals(this.color, other.color) && this.width.Equals(other.width);
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
+            return Equals(this.color, other.color) && this.width.Equals(other.width);
         }
 
         public override bool Equals(object obj) {
-            if (object.ReferenceEquals(null, obj)) return false;
-            if (object.ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
             return this.Equals((BorderSide) obj);
         }
 
@@ -57,7 +67,7 @@ namespace Unity.UIWidgets.painting {
         }
 
         public static bool operator ==(BorderSide lhs, BorderSide rhs) {
-            return object.Equals(lhs, rhs);
+            return Equals(lhs, rhs);
         }
 
         public static bool operator !=(BorderSide lhs, BorderSide rhs) {

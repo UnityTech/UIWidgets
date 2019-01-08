@@ -69,8 +69,9 @@ namespace Unity.UIWidgets.widgets {
 
         public readonly bool boldText;
 
-        public Orientation orientation =>
-            this.size.width > this.size.height ? Orientation.landscape : Orientation.portrait;
+        public Orientation orientation {
+            get { return this.size.width > this.size.height ? Orientation.landscape : Orientation.portrait; }
+        }
 
         public MediaQueryData copyWith(
             Size size = null,
@@ -157,19 +158,31 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public bool Equals(MediaQueryData other) {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
             return Equals(this.size, other.size) && this.devicePixelRatio.Equals(other.devicePixelRatio) &&
-                   this.textScaleFactor.Equals(other.textScaleFactor) && Equals(this.viewInsets, other.viewInsets) &&
-                   Equals(this.padding, other.padding) && this.alwaysUse24HourFormat == other.alwaysUse24HourFormat &&
+                   this.textScaleFactor.Equals(other.textScaleFactor) &&
+                   Equals(this.viewInsets, other.viewInsets) &&
+                   Equals(this.padding, other.padding) &&
+                   this.alwaysUse24HourFormat == other.alwaysUse24HourFormat &&
                    this.accessibleNavigation == other.accessibleNavigation && this.invertColors == other.invertColors &&
                    this.disableAnimations == other.disableAnimations && this.boldText == other.boldText;
         }
 
         public override bool Equals(object obj) {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
             return this.Equals((MediaQueryData) obj);
         }
 
@@ -236,7 +249,7 @@ namespace Unity.UIWidgets.widgets {
             D.assert(context != null);
             return new MediaQuery(
                 key: key,
-                data: MediaQuery.of(context).removePadding(
+                data: of(context).removePadding(
                     removeLeft: removeLeft,
                     removeTop: removeTop,
                     removeRight: removeRight,
@@ -258,7 +271,7 @@ namespace Unity.UIWidgets.widgets {
             D.assert(context != null);
             return new MediaQuery(
                 key: key,
-                data: MediaQuery.of(context).removeViewInsets(
+                data: of(context).removeViewInsets(
                     removeLeft: removeLeft,
                     removeTop: removeTop,
                     removeRight: removeRight,
@@ -292,15 +305,16 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public static double textScaleFactorOf(BuildContext context) {
-            return MediaQuery.of(context, nullOk: true)?.textScaleFactor ?? 1.0;
+            return of(context, nullOk: true)?.textScaleFactor ?? 1.0;
         }
 
         static bool boldTextOverride(BuildContext context) {
-            return MediaQuery.of(context, nullOk: true)?.boldText ?? false;
+            return of(context, nullOk: true)?.boldText ?? false;
         }
 
-        public override bool updateShouldNotify(InheritedWidget oldWidget) =>
-            this.data != ((MediaQuery) oldWidget).data;
+        public override bool updateShouldNotify(InheritedWidget oldWidget) {
+            return this.data != ((MediaQuery) oldWidget).data;
+        }
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);

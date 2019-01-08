@@ -65,7 +65,7 @@ namespace Unity.UIWidgets.widgets {
             curve = curve ?? Curves.ease;
             List<IPromise> futures = new List<IPromise>();
 
-            ScrollableState scrollable = Scrollable.of(context);
+            ScrollableState scrollable = of(context);
             while (scrollable != null) {
                 futures.Add(scrollable.position.ensureVisible(
                     context.findRenderObject(),
@@ -74,7 +74,7 @@ namespace Unity.UIWidgets.widgets {
                     curve: curve
                 ));
                 context = scrollable.context;
-                scrollable = Scrollable.of(context);
+                scrollable = of(context);
             }
 
             if (futures.isEmpty() || duration == TimeSpan.Zero) {

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Unity.UIWidgets.ui;
-using UnityEngine;
 
 namespace Unity.UIWidgets.foundation {
     public interface Listenable {
@@ -70,8 +69,7 @@ namespace Unity.UIWidgets.foundation {
                         if (this._listeners.Contains(listener)) {
                             listener();
                         }
-                    }
-                    catch (Exception ex) {
+                    } catch (Exception ex) {
                         UIWidgetsError.reportError(new UIWidgetsErrorDetails(
                             exception: ex,
                             library: "foundation library",
@@ -123,7 +121,7 @@ namespace Unity.UIWidgets.foundation {
         public T value {
             get { return this._value; }
             set {
-                if (object.Equals(value, this._value)) {
+                if (Equals(value, this._value)) {
                     return;
                 }
 

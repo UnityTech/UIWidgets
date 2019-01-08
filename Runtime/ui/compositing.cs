@@ -1,11 +1,10 @@
 ﻿using System;
 using Unity.UIWidgets.flow;
-using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
     public class SceneBuilder {
-        private ContainerLayer _rootLayer;
-        private ContainerLayer _currentLayer;
+        ContainerLayer _rootLayer;
+        ContainerLayer _currentLayer;
 
         public SceneBuilder() {
         }
@@ -14,7 +13,7 @@ namespace Unity.UIWidgets.ui {
             return new Scene(this._rootLayer);
         }
 
-        private void _pushLayer(ContainerLayer layer) {
+        void _pushLayer(ContainerLayer layer) {
             if (this._rootLayer == null) {
                 this._rootLayer = layer;
                 this._currentLayer = layer;

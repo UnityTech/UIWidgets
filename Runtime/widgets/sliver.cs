@@ -33,18 +33,16 @@ namespace Unity.UIWidgets.widgets {
         public override string ToString() {
             var description = new List<string>();
             this.debugFillDescription(description);
-            return string.Format("{0}({1})", Diagnostics.describeIdentity(this),
-                string.Join(", ", description.ToArray()));
+            return $"{Diagnostics.describeIdentity(this)}({string.Join(", ", description.ToArray())})";
         }
 
-        protected virtual void debugFillDescription(List<String> description) {
+        protected virtual void debugFillDescription(List<string> description) {
             try {
                 var children = this.estimatedChildCount;
                 if (children != null) {
                     description.Add("estimated child count: " + children);
                 }
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 description.Add("estimated child count: EXCEPTION (" + ex.GetType() + ")");
             }
         }
@@ -270,7 +268,8 @@ namespace Unity.UIWidgets.widgets {
 
                 for (int index = firstIndex; index <= lastIndex; ++index) {
                     this._currentlyUpdatingChildIndex = index;
-                    Element newChild = this.updateChild(this._childElements.getOrDefault(index), this._build(index), index);
+                    Element newChild = this.updateChild(this._childElements.getOrDefault(index), this._build(index),
+                        index);
                     if (newChild != null) {
                         this._childElements[index] = newChild;
                         this._currentBeforeChild = (RenderBox) newChild.renderObject;
@@ -278,8 +277,7 @@ namespace Unity.UIWidgets.widgets {
                         this._childElements.Remove(index);
                     }
                 }
-            }
-            finally {
+            } finally {
                 this._currentlyUpdatingChildIndex = null;
             }
         }
@@ -299,8 +297,7 @@ namespace Unity.UIWidgets.widgets {
                     this._currentlyUpdatingChildIndex = index;
                     this._childElements.TryGetValue(index, out newChild);
                     newChild = this.updateChild(newChild, this._build(index), index);
-                }
-                finally {
+                } finally {
                     this._currentlyUpdatingChildIndex = null;
                 }
 
@@ -319,7 +316,7 @@ namespace Unity.UIWidgets.widgets {
             }
 
             Element newChild = base.updateChild(child, newWidget, newSlot);
-            
+
             SliverMultiBoxAdaptorParentData newParentData = null;
             if (newChild != null && newChild.renderObject != null) {
                 newParentData = (SliverMultiBoxAdaptorParentData) newChild.renderObject.parentData;
@@ -349,8 +346,7 @@ namespace Unity.UIWidgets.widgets {
                     this._currentlyUpdatingChildIndex = index;
                     Element result = this.updateChild(this._childElements[index], null, index);
                     D.assert(result == null);
-                }
-                finally {
+                } finally {
                     this._currentlyUpdatingChildIndex = null;
                 }
 
@@ -366,8 +362,9 @@ namespace Unity.UIWidgets.widgets {
             double trailingScrollOffset,
             int childCount
         ) {
-            if (lastIndex == childCount - 1)
+            if (lastIndex == childCount - 1) {
                 return trailingScrollOffset;
+            }
             int reifiedCount = lastIndex - firstIndex + 1;
             double averageExtent = (trailingScrollOffset - leadingScrollOffset) / reifiedCount;
             int remainingCount = childCount - lastIndex - 1;

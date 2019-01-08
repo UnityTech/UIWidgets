@@ -6,9 +6,6 @@ using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.ui;
-using UnityEngine;
-using Rect = Unity.UIWidgets.ui.Rect;
-using Color = Unity.UIWidgets.ui.Color;
 
 namespace Unity.UIWidgets.rendering {
     class _DebugSize : Size {
@@ -341,16 +338,14 @@ namespace Unity.UIWidgets.rendering {
                         informationCollector(information);
                     }
 
-                    throw new UIWidgetsError(string.Format(
-                        "{0}\n{1}The offending constraints were:\n  {2}",
-                        message, information, this));
+                    throw new UIWidgetsError($"{message}\n{information}The offending constraints were:\n  {this}");
                 });
 
                 if (this.minWidth.isNaN() ||
                     this.maxWidth.isNaN() ||
                     this.minHeight.isNaN() ||
                     this.maxHeight.isNaN()) {
-                    var affectedFieldsList = new List<String>();
+                    var affectedFieldsList = new List<string>();
                     if (this.minWidth.isNaN()) {
                         affectedFieldsList.Add("minWidth");
                     }
@@ -447,8 +442,12 @@ namespace Unity.UIWidgets.rendering {
         }
 
         public bool Equals(BoxConstraints other) {
-            if (object.ReferenceEquals(null, other)) return false;
-            if (object.ReferenceEquals(this, other)) return true;
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
             return this.minWidth.Equals(other.minWidth)
                    && this.maxWidth.Equals(other.maxWidth)
                    && this.minHeight.Equals(other.minHeight)
@@ -456,9 +455,15 @@ namespace Unity.UIWidgets.rendering {
         }
 
         public override bool Equals(object obj) {
-            if (object.ReferenceEquals(null, obj)) return false;
-            if (object.ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
             return this.Equals((BoxConstraints) obj);
         }
 
@@ -473,11 +478,11 @@ namespace Unity.UIWidgets.rendering {
         }
 
         public static bool operator ==(BoxConstraints left, BoxConstraints right) {
-            return object.Equals(left, right);
+            return Equals(left, right);
         }
 
         public static bool operator !=(BoxConstraints left, BoxConstraints right) {
-            return !object.Equals(left, right);
+            return !Equals(left, right);
         }
 
         public override string ToString() {
@@ -520,8 +525,7 @@ namespace Unity.UIWidgets.rendering {
         public readonly Offset localPosition;
 
         public override string ToString() {
-            return string.Format("{0}@{1}",
-                Diagnostics.describeIdentity(this.target), this.localPosition);
+            return $"{Diagnostics.describeIdentity(this.target)}@{this.localPosition}";
         }
     }
 
@@ -550,15 +554,25 @@ namespace Unity.UIWidgets.rendering {
         public readonly double argument;
 
         public bool Equals(_IntrinsicDimensionsCacheEntry other) {
-            if (object.ReferenceEquals(null, other)) return false;
-            if (object.ReferenceEquals(this, other)) return true;
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
             return this.dimension == other.dimension && this.argument.Equals(other.argument);
         }
 
         public override bool Equals(object obj) {
-            if (object.ReferenceEquals(null, obj)) return false;
-            if (object.ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
             return this.Equals((_IntrinsicDimensionsCacheEntry) obj);
         }
 
@@ -569,11 +583,11 @@ namespace Unity.UIWidgets.rendering {
         }
 
         public static bool operator ==(_IntrinsicDimensionsCacheEntry a, _IntrinsicDimensionsCacheEntry b) {
-            return object.Equals(a, b);
+            return Equals(a, b);
         }
 
         public static bool operator !=(_IntrinsicDimensionsCacheEntry a, _IntrinsicDimensionsCacheEntry b) {
-            return !object.Equals(a, b);
+            return !Equals(a, b);
         }
     }
 
@@ -588,10 +602,10 @@ namespace Unity.UIWidgets.rendering {
 
         double _computeIntrinsicDimension(_IntrinsicDimension dimension, double argument,
             Func<double, double> computer) {
-            D.assert(RenderObject.debugCheckingIntrinsics || !this.debugDoingThisResize);
+            D.assert(debugCheckingIntrinsics || !this.debugDoingThisResize);
             bool shouldCache = true;
             D.assert(() => {
-                if (RenderObject.debugCheckingIntrinsics) {
+                if (debugCheckingIntrinsics) {
                     shouldCache = false;
                 }
 
@@ -711,9 +725,9 @@ namespace Unity.UIWidgets.rendering {
                     if (this._size is _DebugSize) {
                         _DebugSize _size = (_DebugSize) this._size;
                         D.assert(_size._owner == this);
-                        if (RenderObject.debugActiveLayout != null) {
+                        if (debugActiveLayout != null) {
                             D.assert(this.debugDoingThisResize || this.debugDoingThisLayout ||
-                                     (RenderObject.debugActiveLayout == this.parent && _size._canBeUsedByParent));
+                                     (debugActiveLayout == this.parent && _size._canBeUsedByParent));
                         }
 
                         D.assert(_size == this._size);
@@ -834,14 +848,13 @@ namespace Unity.UIWidgets.rendering {
             });
             return result;
         }
-        
-        public override Rect semanticBounds
-        {
-            get { return Offset.zero & size; }
+
+        public override Rect semanticBounds {
+            get { return Offset.zero & this.size; }
         }
-        
+
         protected override void debugResetSize() {
-            size = size;
+            this.size = this.size;
         }
 
         Dictionary<TextBaseline, double?> _cachedBaselines;
@@ -859,12 +872,12 @@ namespace Unity.UIWidgets.rendering {
             D.assert(() => {
                 RenderObject parent = (RenderObject) this.parent;
                 if (this.owner.debugDoingLayout) {
-                    return (RenderObject.debugActiveLayout == parent) && parent.debugDoingThisLayout;
+                    return (debugActiveLayout == parent) && parent.debugDoingThisLayout;
                 }
 
                 if (this.owner.debugDoingPaint) {
-                    return ((RenderObject.debugActivePaint == parent) && parent.debugDoingThisPaint) ||
-                           ((RenderObject.debugActivePaint == this) && this.debugDoingThisPaint);
+                    return ((debugActivePaint == parent) && parent.debugDoingThisPaint) ||
+                           ((debugActivePaint == this) && this.debugDoingThisPaint);
                 }
 
                 D.assert(parent == this.parent);
@@ -971,8 +984,8 @@ namespace Unity.UIWidgets.rendering {
                 }
 
                 if (D.debugCheckIntrinsicSizes) {
-                    D.assert(!RenderObject.debugCheckingIntrinsics);
-                    RenderObject.debugCheckingIntrinsics = true;
+                    D.assert(!debugCheckingIntrinsics);
+                    debugCheckingIntrinsics = true;
                     var failures = new StringBuilder();
                     int failureCount = 0;
 
@@ -1023,7 +1036,7 @@ namespace Unity.UIWidgets.rendering {
                             this.constraints.maxHeight);
                     }
 
-                    RenderObject.debugCheckingIntrinsics = false;
+                    debugCheckingIntrinsics = false;
                     if (failures.Length > 0) {
                         D.assert(failureCount > 0);
                         throw new UIWidgetsError(
@@ -1166,7 +1179,6 @@ namespace Unity.UIWidgets.rendering {
             var inverse = Matrix3.I();
             var invertible = transform.invert(inverse);
             return invertible ? inverse.mapPoint(point) : Offset.zero;
-
         }
 
         public Offset localToGlobal(Offset point, RenderObject ancestor = null) {

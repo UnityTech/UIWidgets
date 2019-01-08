@@ -6,11 +6,11 @@ using Unity.UIWidgets.ui;
 
 namespace Unity.UIWidgets.rendering {
     public class RendererBinding : PaintingBinding {
-        public static new RendererBinding instance {
+        public new static RendererBinding instance {
             get { return (RendererBinding) PaintingBinding.instance; }
             set { PaintingBinding.instance = value; }
         }
-        
+
         public RendererBinding() {
             this._pipelineOwner = new PipelineOwner(
                 onNeedVisualUpdate: this.ensureVisualUpdate

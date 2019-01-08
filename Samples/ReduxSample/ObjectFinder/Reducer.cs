@@ -1,11 +1,9 @@
-
 using System;
 using System.Collections.Generic;
 
 namespace Unity.UIWidgets.Sample.Redux.ObjectFinder {
-
     [Serializable]
-    public class GameObjectInfo{
+    public class GameObjectInfo {
         public int id;
         public string name;
     }
@@ -16,9 +14,10 @@ namespace Unity.UIWidgets.Sample.Redux.ObjectFinder {
 
         public FinderAppState() {
             this.selected = 0;
-            objects = new List<GameObjectInfo>();
+            this.objects = new List<GameObjectInfo>();
         }
     }
+
     public class SearchAction {
         public string keyword;
     }
@@ -37,7 +36,7 @@ namespace Unity.UIWidgets.Sample.Redux.ObjectFinder {
     public class ObjectFinderReducer {
         public static FinderAppState Reduce(FinderAppState state, object action) {
             if (action is SearchResultAction) {
-                var resultAction = (SearchResultAction)action;
+                var resultAction = (SearchResultAction) action;
                 var selected = state.selected;
                 if (selected != null) {
                     var obj = resultAction.results.Find(o => o.id == selected);
@@ -53,7 +52,7 @@ namespace Unity.UIWidgets.Sample.Redux.ObjectFinder {
             if (action is SelectObjectAction) {
                 return new FinderAppState() {
                     objects = state.objects,
-                    selected = ((SelectObjectAction)action).id,
+                    selected = ((SelectObjectAction) action).id,
                 };
             }
             return state;

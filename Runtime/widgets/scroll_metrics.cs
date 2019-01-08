@@ -84,8 +84,7 @@ namespace Unity.UIWidgets.widgets {
         public AxisDirection axisDirection { get; private set; }
 
         public override string ToString() {
-            return string.Format("{0}({1:F1})..[{2:F1}]..{3:F1})",
-                this.GetType(), this.extentBefore(), this.extentInside(), this.extentAfter());
+            return $"{this.GetType()}({this.extentBefore():F1})..[{this.extentInside():F1}]..{this.extentAfter():F1})";
         }
     }
 }

@@ -24,18 +24,20 @@ namespace Unity.UIWidgets.async {
             }
         }
 
-        public static TimeSpan timespanSinceStartup => TimeSpan.FromSeconds(timeSinceStartup);
+        public static TimeSpan timespanSinceStartup {
+            get { return TimeSpan.FromSeconds(timeSinceStartup); }
+        }
 
         static readonly object _syncObj = new object();
-        
+
         static LinkedList<Action> _callbacks = new LinkedList<Action>();
-   
+
         internal static void runInMainFromFinalizer(Action callback) {
             lock (_syncObj) {
                 _callbacks.AddLast(callback);
             }
-        }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
-        
+        }
+
         public static void runInMain(Action callback) {
             lock (_syncObj) {
                 _callbacks.AddLast(callback);
@@ -53,8 +55,7 @@ namespace Unity.UIWidgets.async {
             foreach (var callback in callbacks) {
                 try {
                     callback();
-                }
-                catch (Exception ex) {
+                } catch (Exception ex) {
                     Debug.LogError("Error to execute runInMain callback: " + ex);
                 }
             }
@@ -121,15 +122,15 @@ namespace Unity.UIWidgets.async {
             }
         }
 
-        private class TimerImpl : Timer, IComparable<TimerImpl> {
+        class TimerImpl : Timer, IComparable<TimerImpl> {
             public readonly bool periodic;
             public readonly TimeSpan internval;
-            private double _deadline;
-            private readonly Action _callback;
-            private bool _done;
+            double _deadline;
+            readonly Action _callback;
+            bool _done;
 
             public TimerImpl(TimeSpan duration, Action callback, bool periodic = false) {
-                this._deadline = Timer.timeSinceStartup + duration.TotalSeconds;
+                this._deadline = timeSinceStartup + duration.TotalSeconds;
                 this._callback = callback;
                 this.periodic = periodic;
                 this._done = false;
@@ -138,28 +139,31 @@ namespace Unity.UIWidgets.async {
                 }
             }
 
-            public double deadline => this._deadline;
+            public double deadline {
+                get { return this._deadline; }
+            }
 
             public override void cancel() {
                 this._done = true;
             }
 
-            public bool done => this._done;
+            public bool done {
+                get { return this._done; }
+            }
 
             public void invoke() {
                 if (this._done) {
                     return;
                 }
 
-                var now = Timer.timeSinceStartup;
+                var now = timeSinceStartup;
                 if (!this.periodic) {
                     this._done = true;
                 }
 
                 try {
                     this._callback();
-                }
-                catch (Exception ex) {
+                } catch (Exception ex) {
                     Debug.LogError("Error to execute timer callback: " + ex);
                 }
 

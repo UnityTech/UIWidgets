@@ -1,7 +1,4 @@
 ﻿using Unity.UIWidgets.ui;
-using UnityEngine;
-using Rect = Unity.UIWidgets.ui.Rect;
-using Canvas = Unity.UIWidgets.ui.Canvas;
 
 namespace Unity.UIWidgets.flow {
     public class PrerollContext {
@@ -14,14 +11,14 @@ namespace Unity.UIWidgets.flow {
     }
 
     public abstract class Layer {
-        private ContainerLayer _parent;
+        ContainerLayer _parent;
 
         public ContainerLayer parent {
             get { return this._parent; }
             set { this._parent = value; }
         }
 
-        private Rect _paintBounds = Rect.zero;
+        Rect _paintBounds = Rect.zero;
 
         public Rect paintBounds {
             get { return this._paintBounds; }

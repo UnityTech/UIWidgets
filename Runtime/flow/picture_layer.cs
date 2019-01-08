@@ -1,38 +1,37 @@
 ﻿using Unity.UIWidgets.ui;
-using UnityEngine;
 
 namespace Unity.UIWidgets.flow {
     public class PictureLayer : Layer {
-        private Offset _offset;
+        Offset _offset;
 
         public Offset offset {
             set { this._offset = value; }
         }
 
-        private Picture _picture;
+        Picture _picture;
 
         public Picture picture {
             set { this._picture = value; }
         }
 
-        private bool _isComplex = false;
+        bool _isComplex = false;
 
         public bool isComplex {
             set { this._isComplex = value; }
         }
 
-        private bool _willChange = false;
+        bool _willChange = false;
 
         public bool willChange {
             set { this._willChange = value; }
         }
 
-        private RasterCacheResult _rasterCacheResult;
+        RasterCacheResult _rasterCacheResult;
 
         public override void preroll(PrerollContext context, Matrix3 matrix) {
             if (context.rasterCache != null) {
                 Matrix3 ctm = Matrix3.makeTrans((float) this._offset.dx, (float) this._offset.dy);
-                ctm.preConcat(matrix);                
+                ctm.preConcat(matrix);
                 ctm[6] = ctm[6].alignToPixel(context.devicePixelRatio);
                 ctm[7] = ctm[7].alignToPixel(context.devicePixelRatio);
 
@@ -65,8 +64,7 @@ namespace Unity.UIWidgets.flow {
                 } else {
                     canvas.drawPicture(this._picture);
                 }
-            }
-            finally {
+            } finally {
                 canvas.restore();
             }
         }

@@ -23,9 +23,13 @@ namespace Unity.UIWidgets.ui {
             this._image = image;
         }
 
-        public int frameCount => 1;
+        public int frameCount {
+            get { return 1; }
+        }
 
-        public int repetitionCount => 0;
+        public int repetitionCount {
+            get { return 0; }
+        }
 
         public IPromise<FrameInfo> getNextFrame() {
             D.assert(this._image != null);

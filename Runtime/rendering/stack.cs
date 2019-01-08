@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using Unity.UIWidgets.painting;
-using Unity.UIWidgets.ui;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
-using UnityEngine;
-using Rect = Unity.UIWidgets.ui.Rect;
+using Unity.UIWidgets.painting;
+using Unity.UIWidgets.ui;
 
 namespace Unity.UIWidgets.rendering {
     public class RelativeRect : IEquatable<RelativeRect> {
-        private RelativeRect(double left, double top, double right, double bottom) {
+        RelativeRect(double left, double top, double right, double bottom) {
             this.left = left;
             this.top = top;
             this.right = right;
@@ -34,7 +32,7 @@ namespace Unity.UIWidgets.rendering {
         }
 
         public static RelativeRect fromRect(Rect rect, Rect container) {
-            return RelativeRect.fromLTRB(
+            return fromLTRB(
                 rect.left - container.left,
                 rect.top - container.top,
                 container.right - rect.right,
@@ -42,14 +40,14 @@ namespace Unity.UIWidgets.rendering {
             );
         }
 
-        public static readonly RelativeRect fill = RelativeRect.fromLTRB(0.0, 0.0, 0.0, 0.0);
+        public static readonly RelativeRect fill = fromLTRB(0.0, 0.0, 0.0, 0.0);
 
         public bool hasInsets {
             get { return this.left > 0.0 || this.top > 0.0 || this.right > 0.0 || this.bottom > 0.0; }
         }
 
         public RelativeRect shift(Offset offset) {
-            return RelativeRect.fromLTRB(
+            return fromLTRB(
                 this.left + offset.dx,
                 this.top + offset.dy,
                 this.right - offset.dx,
@@ -57,7 +55,7 @@ namespace Unity.UIWidgets.rendering {
         }
 
         public RelativeRect inflate(double delta) {
-            return RelativeRect.fromLTRB(
+            return fromLTRB(
                 this.left - delta,
                 this.top - delta,
                 this.right - delta,
@@ -69,7 +67,7 @@ namespace Unity.UIWidgets.rendering {
         }
 
         public RelativeRect intersect(RelativeRect other) {
-            return RelativeRect.fromLTRB(
+            return fromLTRB(
                 Math.Max(this.left, other.left),
                 Math.Max(this.top, other.top),
                 Math.Max(this.right, other.right),
@@ -94,8 +92,12 @@ namespace Unity.UIWidgets.rendering {
         }
 
         public bool Equals(RelativeRect other) {
-            if (object.ReferenceEquals(null, other)) return false;
-            if (object.ReferenceEquals(this, other)) return true;
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
             return this.left.Equals(other.left)
                    && this.top.Equals(other.top)
                    && this.right.Equals(other.right)
@@ -103,9 +105,15 @@ namespace Unity.UIWidgets.rendering {
         }
 
         public override bool Equals(object obj) {
-            if (object.ReferenceEquals(null, obj)) return false;
-            if (object.ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
             return this.Equals((RelativeRect) obj);
         }
 
@@ -120,7 +128,7 @@ namespace Unity.UIWidgets.rendering {
         }
 
         public static bool operator ==(RelativeRect a, RelativeRect b) {
-            return object.Equals(a, b);
+            return Equals(a, b);
         }
 
         public static bool operator !=(RelativeRect a, RelativeRect b) {
@@ -137,16 +145,21 @@ namespace Unity.UIWidgets.rendering {
         public double? height;
 
         public bool isPositioned {
-            get { return top != null || right != null || bottom != null || left != null || width != null || height != null; }
+            get {
+                return this.top != null || this.right != null || this.bottom != null || this.left != null ||
+                       this.width != null || this.height != null;
+            }
         }
 
-        private RelativeRect rect {
-            get { return RelativeRect.fromLTRB(left ?? 0.0, top ?? 0.0, right ?? 0.0, bottom ?? 0.0); }
+        RelativeRect rect {
+            get {
+                return RelativeRect.fromLTRB(this.left ?? 0.0, this.top ?? 0.0, this.right ?? 0.0, this.bottom ?? 0.0);
+            }
             set {
-                top = value.top;
-                right = value.right;
-                bottom = value.bottom;
-                left = value.left;
+                this.top = value.top;
+                this.right = value.right;
+                this.bottom = value.bottom;
+                this.left = value.left;
             }
         }
     }
@@ -174,7 +187,7 @@ namespace Unity.UIWidgets.rendering {
             this._textDirection = textDirection ?? TextDirection.ltr;
             this._fit = fit ?? StackFit.loose;
             this._overflow = overflow ?? Overflow.clip;
-            addAll(children);
+            this.addAll(children);
         }
 
         bool _hasVisualOverflow = false;
@@ -188,61 +201,66 @@ namespace Unity.UIWidgets.rendering {
         Alignment _resolvedAlignment;
 
         void _resolve() {
-            if (_resolvedAlignment != null)
+            if (this._resolvedAlignment != null) {
                 return;
-            _resolvedAlignment = alignment.resolve(textDirection);
+            }
+            this._resolvedAlignment = this.alignment.resolve(this.textDirection);
         }
 
         void _markNeedResolution() {
-            _resolvedAlignment = null;
-            markNeedsLayout();
+            this._resolvedAlignment = null;
+            this.markNeedsLayout();
         }
 
-        private AlignmentDirectional _alignment;
+        AlignmentDirectional _alignment;
 
         public AlignmentDirectional alignment {
-            get { return _alignment; }
+            get { return this._alignment; }
             set {
-                if (_alignment == value)
+                if (this._alignment == value) {
                     return;
-                _alignment = value;
-                _markNeedResolution();
+                }
+                this._alignment = value;
+                this._markNeedResolution();
             }
         }
 
-        private TextDirection _textDirection;
+        TextDirection _textDirection;
 
         public TextDirection textDirection {
-            get { return _textDirection; }
+            get { return this._textDirection; }
             set {
-                if (_textDirection == value)
+                if (this._textDirection == value) {
                     return;
-                _textDirection = value;
-                _markNeedResolution();
+                }
+                this._textDirection = value;
+                this._markNeedResolution();
             }
         }
 
-        private StackFit _fit;
+        StackFit _fit;
 
         public StackFit fit {
-            get { return _fit; }
+            get { return this._fit; }
             set {
-                if (_fit == value)
+                if (this._fit == value) {
                     return;
-                _fit = value;
-                markNeedsLayout();
+                }
+                this._fit = value;
+                this.markNeedsLayout();
             }
         }
 
-        private Overflow _overflow;
+        Overflow _overflow;
 
         public Overflow overflow {
-            get { return _overflow; }
+            get { return this._overflow; }
             set {
-                if (_overflow == value)
+                if (this._overflow == value) {
                     return;
-                _overflow = value;
-                markNeedsPaint();
+                }
+                this._overflow = value;
+                this.markNeedsPaint();
             }
         }
 
@@ -250,66 +268,69 @@ namespace Unity.UIWidgets.rendering {
 
         double _getIntrinsicDimension(mainChildSizeGetter getter) {
             double extent = 0.0;
-            RenderBox child = firstChild;
+            RenderBox child = this.firstChild;
             while (child != null) {
                 StackParentData childParentData = (StackParentData) child.parentData;
-                if (!childParentData.isPositioned)
+                if (!childParentData.isPositioned) {
                     extent = Math.Max(extent, getter(child));
+                }
                 D.assert(child.parentData == childParentData);
-                if (childParentData != null) child = childParentData.nextSibling;
+                if (childParentData != null) {
+                    child = childParentData.nextSibling;
+                }
             }
 
             return extent;
         }
 
         protected override double computeMinIntrinsicWidth(double height) {
-            return _getIntrinsicDimension((RenderBox child) => child.getMinIntrinsicWidth(height));
+            return this._getIntrinsicDimension((RenderBox child) => child.getMinIntrinsicWidth(height));
         }
 
         protected override double computeMaxIntrinsicWidth(double height) {
-            return _getIntrinsicDimension((RenderBox child) => child.getMaxIntrinsicWidth(height));
+            return this._getIntrinsicDimension((RenderBox child) => child.getMaxIntrinsicWidth(height));
         }
 
         protected override double computeMinIntrinsicHeight(double width) {
-            return _getIntrinsicDimension((RenderBox child) => child.getMinIntrinsicHeight(width));
+            return this._getIntrinsicDimension((RenderBox child) => child.getMinIntrinsicHeight(width));
         }
 
         protected override double computeMaxIntrinsicHeight(double width) {
-            return _getIntrinsicDimension((RenderBox child) => child.getMaxIntrinsicHeight(width));
+            return this._getIntrinsicDimension((RenderBox child) => child.getMaxIntrinsicHeight(width));
         }
 
         protected override double? computeDistanceToActualBaseline(TextBaseline baseline) {
-            return defaultComputeDistanceToHighestActualBaseline(baseline);
+            return this.defaultComputeDistanceToHighestActualBaseline(baseline);
         }
 
         protected override void performLayout() {
-            _resolve();
-            D.assert(_resolvedAlignment != null);
-            _hasVisualOverflow = false;
+            this._resolve();
+            D.assert(this._resolvedAlignment != null);
+            this._hasVisualOverflow = false;
             bool hasNonPositionedChildren = false;
-            if (childCount == 0) {
-                size = constraints.biggest;
+            if (this.childCount == 0) {
+                this.size = this.constraints.biggest;
                 return;
             }
 
-            double width = constraints.minWidth;
-            double height = constraints.minHeight;
+            double width = this.constraints.minWidth;
+            double height = this.constraints.minHeight;
 
             BoxConstraints nonPositionedConstraints = null;
-            switch (fit) {
+            switch (this.fit) {
                 case StackFit.loose:
-                    nonPositionedConstraints = constraints.loosen();
+                    nonPositionedConstraints = this.constraints.loosen();
                     break;
                 case StackFit.expand:
-                    nonPositionedConstraints = BoxConstraints.tight(constraints.biggest);
+                    nonPositionedConstraints = BoxConstraints.tight(this.constraints.biggest);
                     break;
                 case StackFit.passthrough:
-                    nonPositionedConstraints = constraints;
+                    nonPositionedConstraints = this.constraints;
                     break;
             }
 
 
-            RenderBox child = firstChild;
+            RenderBox child = this.firstChild;
             while (child != null) {
                 StackParentData childParentData = (StackParentData) child.parentData;
 
@@ -327,64 +348,65 @@ namespace Unity.UIWidgets.rendering {
             }
 
             if (hasNonPositionedChildren) {
-                size = new Size(width, height);
-                D.assert(size.width == constraints.constrainWidth(width));
-                D.assert(size.height == constraints.constrainHeight(height));
+                this.size = new Size(width, height);
+                D.assert(this.size.width == this.constraints.constrainWidth(width));
+                D.assert(this.size.height == this.constraints.constrainHeight(height));
             } else {
-                size = constraints.biggest;
+                this.size = this.constraints.biggest;
             }
 
-            child = firstChild;
+            child = this.firstChild;
             while (child != null) {
                 StackParentData childParentData = (StackParentData) child.parentData;
 
                 if (!childParentData.isPositioned) {
-                    childParentData.offset = _resolvedAlignment.alongOffset(size - child.size);
+                    childParentData.offset = this._resolvedAlignment.alongOffset(this.size - child.size);
                 } else {
                     BoxConstraints childConstraints = new BoxConstraints();
 
-                    if (childParentData.left != null && childParentData.right != null)
-                        childConstraints =
-                            childConstraints.tighten(width: size.width - childParentData.right - childParentData.left);
-                    else if (childParentData.width != null)
-                        childConstraints = childConstraints.tighten(width: childParentData.width);
-
-                    if (childParentData.top != null && childParentData.bottom != null)
+                    if (childParentData.left != null && childParentData.right != null) {
                         childConstraints =
                             childConstraints.tighten(
-                                height: size.height - childParentData.bottom - childParentData.top);
-                    else if (childParentData.height != null)
+                                width: this.size.width - childParentData.right - childParentData.left);
+                    } else if (childParentData.width != null) {
+                        childConstraints = childConstraints.tighten(width: childParentData.width);
+                    }
+
+                    if (childParentData.top != null && childParentData.bottom != null) {
+                        childConstraints =
+                            childConstraints.tighten(
+                                height: this.size.height - childParentData.bottom - childParentData.top);
+                    } else if (childParentData.height != null) {
                         childConstraints = childConstraints.tighten(height: childParentData.height);
+                    }
 
                     child.layout(childConstraints, parentUsesSize: true);
 
                     double x;
                     if (childParentData.left != null) {
                         x = childParentData.left.Value;
-                    }
-                    else if (childParentData.right != null) {
-                        x = size.width - childParentData.right.Value - child.size.width;
-                    }
-                    else {
-                        x = _resolvedAlignment.alongOffset(size - child.size).dx;
+                    } else if (childParentData.right != null) {
+                        x = this.size.width - childParentData.right.Value - child.size.width;
+                    } else {
+                        x = this._resolvedAlignment.alongOffset(this.size - child.size).dx;
                     }
 
-                    if (x < 0.0 || x + child.size.width > size.width)
-                        _hasVisualOverflow = true;
+                    if (x < 0.0 || x + child.size.width > this.size.width) {
+                        this._hasVisualOverflow = true;
+                    }
 
                     double y;
                     if (childParentData.top != null) {
                         y = childParentData.top.Value;
-                    }
-                    else if (childParentData.bottom != null) {
-                        y = size.height - childParentData.bottom.Value - child.size.height;
-                    }
-                    else {
-                        y = _resolvedAlignment.alongOffset(size - child.size).dy;
+                    } else if (childParentData.bottom != null) {
+                        y = this.size.height - childParentData.bottom.Value - child.size.height;
+                    } else {
+                        y = this._resolvedAlignment.alongOffset(this.size - child.size).dy;
                     }
 
-                    if (y < 0.0 || y + child.size.height > size.height)
-                        _hasVisualOverflow = true;
+                    if (y < 0.0 || y + child.size.height > this.size.height) {
+                        this._hasVisualOverflow = true;
+                    }
 
                     childParentData.offset = new Offset(x, y);
                 }
@@ -395,30 +417,30 @@ namespace Unity.UIWidgets.rendering {
         }
 
         protected override bool hitTestChildren(HitTestResult result, Offset position = null) {
-            return defaultHitTestChildren(result, position: position);
+            return this.defaultHitTestChildren(result, position: position);
         }
-        
+
         public void paintStack(PaintingContext context, Offset offset) {
-            defaultPaint(context, offset);
+            this.defaultPaint(context, offset);
         }
-        
+
         public override void paint(PaintingContext context, Offset offset) {
-            if (_overflow == Overflow.clip && _hasVisualOverflow) {
-                context.pushClipRect(needsCompositing, offset, Offset.zero & size, paintStack);
+            if (this._overflow == Overflow.clip && this._hasVisualOverflow) {
+                context.pushClipRect(this.needsCompositing, offset, Offset.zero & this.size, this.paintStack);
             } else {
-                paintStack(context, offset);
+                this.paintStack(context, offset);
             }
         }
 
         public override Rect describeApproximatePaintClip(RenderObject childRaw) {
-            return _hasVisualOverflow ? Offset.zero & size : null;
+            return this._hasVisualOverflow ? Offset.zero & this.size : null;
         }
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
-            properties.add(new DiagnosticsProperty<AlignmentDirectional>("alignment", alignment));
-            properties.add(new EnumProperty<StackFit>("fit", fit));
-            properties.add(new EnumProperty<Overflow>("overflow", overflow));
+            properties.add(new DiagnosticsProperty<AlignmentDirectional>("alignment", this.alignment));
+            properties.add(new EnumProperty<StackFit>("fit", this.fit));
+            properties.add(new EnumProperty<Overflow>("overflow", this.overflow));
         }
     }
 }

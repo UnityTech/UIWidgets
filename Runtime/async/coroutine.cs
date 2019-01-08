@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using RSG;
 using Unity.UIWidgets.foundation;
@@ -10,7 +9,7 @@ using UnityEngine;
 
 namespace Unity.UIWidgets.async {
     public class UIWidgetsCoroutine {
-        _WaitforSecondsProcessor _waitProcessor;
+        _WaitForSecondsProcessor _waitProcessor;
         _WaitForCoroutineProcessor _waitForCoroutine;
         _WaitForAsyncOPProcessor _waitForAsyncOPProcessor;
 
@@ -24,7 +23,10 @@ namespace Unity.UIWidgets.async {
         internal bool isDone;
 
         readonly Promise<object> _promise = new Promise<object>();
-        public IPromise<object> promise => this._promise;
+
+        public IPromise<object> promise {
+            get { return this._promise; }
+        }
 
         internal UIWidgetsCoroutine(IEnumerator routine, Window window, bool isBackground = false) {
             D.assert(routine != null);
@@ -63,8 +65,7 @@ namespace Unity.UIWidgets.async {
             bool hasNext;
             try {
                 hasNext = this._processIEnumeratorRecursive(this._routine);
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 this.stop(ex);
                 return;
             }
@@ -131,7 +132,7 @@ namespace Unity.UIWidgets.async {
         }
     }
 
-    struct _WaitforSecondsProcessor {
+    struct _WaitForSecondsProcessor {
         UIWidgetsWaitForSeconds _current;
         double _targetTime;
 
@@ -220,17 +221,16 @@ namespace Unity.UIWidgets.async {
         }
     }
 
-    internal class BackgroundCallbacks : IDisposable {
+    class BackgroundCallbacks : IDisposable {
         static BackgroundCallbacks _instance;
 
         public static BackgroundCallbacks getInstance() {
 #if UNITY_WEBGL
-            return null;   
+            return null;
 #endif
             if (_instance == null) {
                 _instance = new BackgroundCallbacks(2);
             }
-
             return _instance;
         }
 
@@ -286,8 +286,7 @@ namespace Unity.UIWidgets.async {
 
                 try {
                     callbackNode.callback();
-                }
-                catch (Exception ex) {
+                } catch (Exception ex) {
                     Debug.LogError("Failed to execute callback in BackgroundCallbacks: " + ex);
                 }
 

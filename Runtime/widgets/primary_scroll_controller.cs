@@ -11,7 +11,7 @@ namespace Unity.UIWidgets.widgets {
             this.controller = controller;
         }
 
-        private PrimaryScrollController(
+        PrimaryScrollController(
             Key key = null,
             Widget child = null
         ) : base(key: key, child: child) {

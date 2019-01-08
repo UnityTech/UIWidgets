@@ -27,7 +27,7 @@ namespace Unity.UIWidgets.widgets {
         public override string ToString() {
             var description = new List<string>();
             this.debugFillDescription(description);
-            return string.Format("{0}({1})", this.GetType(), string.Join(", ", description.ToArray()));
+            return $"{this.GetType()}({string.Join(", ", description.ToArray())})";
         }
 
         protected virtual void debugFillDescription(List<string> description) {

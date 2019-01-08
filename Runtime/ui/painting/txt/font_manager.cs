@@ -4,9 +4,9 @@ using Unity.UIWidgets.foundation;
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
-    internal class FontInfo {
+    class FontInfo {
         public readonly Font font;
-        private int _textureVersion;
+        int _textureVersion;
 
         public FontInfo(Font font) {
             this.font = font;
@@ -14,26 +14,26 @@ namespace Unity.UIWidgets.ui {
         }
 
         public int textureVersion {
-            get { return _textureVersion; }
+            get { return this._textureVersion; }
         }
 
         public void onTextureRebuilt() {
-            _textureVersion++;
+            this._textureVersion++;
         }
     }
 
     public class FontManager {
-        private List<FontInfo> _fonts = new List<FontInfo>();
-        private static readonly int defaultFontSize = 14;
+        List<FontInfo> _fonts = new List<FontInfo>();
+        static readonly int defaultFontSize = 14;
 
         public static readonly FontManager instance = new FontManager();
 
-        private FontManager() {
+        FontManager() {
             Font.textureRebuilt += this.onFontTextureRebuilt;
         }
 
         public bool addFont(Font font) {
-            var entry = _fonts.Find(f => f.font == font);
+            var entry = this._fonts.Find(f => f.font == font);
             if (entry != null) {
                 return false;
             }
@@ -42,13 +42,13 @@ namespace Unity.UIWidgets.ui {
             font.hideFlags = HideFlags.DontSave & ~HideFlags.DontSaveInBuild;
 
             var fontInfo = new FontInfo(font);
-            _fonts.Add(fontInfo);
+            this._fonts.Add(fontInfo);
             return true;
         }
 
         internal FontInfo getOrCreate(string[] names) {
-            _fonts = _fonts.FindAll(info => info.font != null); // filter out destroyed fonts
-            var founded = _fonts.Find(info =>
+            this._fonts = this._fonts.FindAll(info => info.font != null); // filter out destroyed fonts
+            var founded = this._fonts.Find(info =>
                 names == info.font.fontNames ||
                 names != null && names.SequenceEqual(info.font.fontNames));
             if (founded != null) {
@@ -61,16 +61,16 @@ namespace Unity.UIWidgets.ui {
             osFont.material.mainTexture.hideFlags = HideFlags.DontSave;
 
             var newFont = new FontInfo(osFont);
-            _fonts.Add(newFont);
+            this._fonts.Add(newFont);
             return newFont;
         }
 
         internal FontInfo getOrCreate(string name) {
-            return getOrCreate(new[] {name});
+            return this.getOrCreate(new[] {name});
         }
 
-        private void onFontTextureRebuilt(Font font) {
-            var entry = _fonts.Find(f => f.font == font);
+        void onFontTextureRebuilt(Font font) {
+            var entry = this._fonts.Find(f => f.font == font);
             if (entry != null) {
                 entry.onTextureRebuilt();
             }

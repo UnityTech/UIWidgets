@@ -3,8 +3,6 @@ using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.ui;
-using UnityEngine;
-using Color = Unity.UIWidgets.ui.Color;
 
 namespace Unity.UIWidgets.rendering {
     public class RenderProxyBox : RenderProxyBoxMixinRenderObjectWithChildMixinRenderBox<RenderBox> {
@@ -247,53 +245,58 @@ namespace Unity.UIWidgets.rendering {
         }
 
         public double aspectRatio {
-            get { return _aspectRatio; }
+            get { return this._aspectRatio; }
             set {
-                if (_aspectRatio == value) {
+                if (this._aspectRatio == value) {
                     return;
                 }
 
-                _aspectRatio = value;
-                markNeedsLayout();
+                this._aspectRatio = value;
+                this.markNeedsLayout();
             }
         }
 
-        private double _aspectRatio;
+        double _aspectRatio;
 
 
         protected override double computeMinIntrinsicWidth(double height) {
-            if (!double.IsInfinity(height))
-                return height * _aspectRatio;
-            if (child != null)
-                return child.getMinIntrinsicWidth(height);
+            if (!double.IsInfinity(height)) {
+                return height * this._aspectRatio;
+            }
+            if (this.child != null) {
+                return this.child.getMinIntrinsicWidth(height);
+            }
             return 0.0;
         }
 
         protected override double computeMaxIntrinsicWidth(double height) {
-            if (!double.IsInfinity(height))
-                return height * _aspectRatio;
-            if (child != null) {
-                return child.getMaxIntrinsicWidth(height);
+            if (!double.IsInfinity(height)) {
+                return height * this._aspectRatio;
+            }
+            if (this.child != null) {
+                return this.child.getMaxIntrinsicWidth(height);
             }
 
             return 0.0;
         }
 
         protected override double computeMinIntrinsicHeight(double width) {
-            if (!double.IsInfinity(width))
-                return width / _aspectRatio;
-            if (child != null) {
-                return child.getMinIntrinsicHeight(width);
+            if (!double.IsInfinity(width)) {
+                return width / this._aspectRatio;
+            }
+            if (this.child != null) {
+                return this.child.getMinIntrinsicHeight(width);
             }
 
             return 0.0;
         }
 
         protected override double computeMaxIntrinsicHeight(double width) {
-            if (!double.IsInfinity(width))
-                return width / _aspectRatio;
-            if (child != null) {
-                return child.getMaxIntrinsicHeight(width);
+            if (!double.IsInfinity(width)) {
+                return width / this._aspectRatio;
+            }
+            if (this.child != null) {
+                return this.child.getMaxIntrinsicHeight(width);
             }
 
             return 0.0;
@@ -306,41 +309,41 @@ namespace Unity.UIWidgets.rendering {
             }
 
             double width = constraints.maxWidth;
-            double height = width / _aspectRatio;
+            double height = width / this._aspectRatio;
 
             if (width > constraints.maxWidth) {
                 width = constraints.maxWidth;
-                height = width / _aspectRatio;
+                height = width / this._aspectRatio;
             }
 
             if (height > constraints.maxHeight) {
                 height = constraints.maxHeight;
-                width = height * _aspectRatio;
+                width = height * this._aspectRatio;
             }
 
             if (width < constraints.minWidth) {
                 width = constraints.minWidth;
-                height = width / _aspectRatio;
+                height = width / this._aspectRatio;
             }
 
             if (height < constraints.minHeight) {
                 height = constraints.minHeight;
-                width = height * _aspectRatio;
+                width = height * this._aspectRatio;
             }
 
             return constraints.constrain(new Size(width, height));
         }
 
         protected override void performLayout() {
-            size = _applyAspectRatio(constraints);
-            if (child != null) {
-                child.layout(BoxConstraints.tight(size));
+            this.size = this._applyAspectRatio(this.constraints);
+            if (this.child != null) {
+                this.child.layout(BoxConstraints.tight(this.size));
             }
         }
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
-            properties.add(new DoubleProperty("aspectRatio", aspectRatio));
+            properties.add(new DoubleProperty("aspectRatio", this.aspectRatio));
         }
     }
 
@@ -486,9 +489,9 @@ namespace Unity.UIWidgets.rendering {
         }
 
         protected override bool hitTestSelf(Offset position) {
-            return _decoration.hitTest(size, position);
+            return this._decoration.hitTest(this.size, position);
         }
-        
+
         public override void paint(PaintingContext context, Offset offset) {
             this._painter = this._painter ?? this._decoration.createBoxPainter(this.markNeedsPaint);
             var filledConfiguration = this.configuration.copyWith(size: this.size);
@@ -617,7 +620,7 @@ namespace Unity.UIWidgets.rendering {
         }
 
         public void translate(double x, double y = 0.0, double z = 0.0) {
-            this._transform = Matrix3.makeTrans((float)x, (float)y) * this._transform;
+            this._transform = Matrix3.makeTrans((float) x, (float) y) * this._transform;
             this.markNeedsPaint();
         }
 
@@ -664,13 +667,13 @@ namespace Unity.UIWidgets.rendering {
         public override bool hitTest(HitTestResult result, Offset position = null) {
             return this.hitTestChildren(result, position: position);
         }
-        
+
         protected override bool hitTestChildren(HitTestResult result, Offset position = null) {
             if (this.transformHitTests) {
                 var transform = this._effectiveTransform;
                 var inverse = Matrix3.I();
                 var invertible = transform.invert(inverse);
-                
+
                 if (!invertible) {
                     return false;
                 }
@@ -682,11 +685,10 @@ namespace Unity.UIWidgets.rendering {
         }
 
         public override void paint(PaintingContext context, Offset offset) {
-            if (this.child != null)
-            {
+            if (this.child != null) {
                 var transform = this._effectiveTransform;
                 Offset childOffset = transform.getAsTranslation();
-                
+
                 if (childOffset == null) {
                     context.pushTransform(this.needsCompositing, offset, transform, base.paint);
                 } else {
@@ -715,11 +717,11 @@ namespace Unity.UIWidgets.rendering {
     public delegate void PointerUpEventListener(PointerUpEvent evt);
 
     public delegate void PointerCancelEventListener(PointerCancelEvent evt);
-    
+
     public delegate void PointerHoverEventListener(PointerHoverEvent evt);
-    
+
     public delegate void PointerEnterEventListener(PointerEnterEvent evt);
-    
+
     public delegate void PointerLeaveEventListener(PointerLeaveEvent evt);
 
     public class RenderPointerListener : RenderProxyBoxWithHitTestBehavior {
@@ -752,15 +754,15 @@ namespace Unity.UIWidgets.rendering {
         public PointerCancelEventListener onPointerCancel;
 
         public PointerHoverEventListener onPointerHover;
-        
+
         public PointerLeaveEventListener onPointerLeave;
-        
+
         public PointerEnterEventListener onPointerEnter;
 
         protected override void performResize() {
             this.size = this.constraints.biggest;
-        }    
-        
+        }
+
         public override void handleEvent(PointerEvent evt, HitTestEntry entry) {
             D.assert(this.debugHandleEvent(evt, entry));
 
@@ -784,20 +786,17 @@ namespace Unity.UIWidgets.rendering {
                 return;
             }
 
-            if (this.onPointerHover != null && evt is PointerHoverEvent)
-            {
+            if (this.onPointerHover != null && evt is PointerHoverEvent) {
                 this.onPointerHover((PointerHoverEvent) evt);
                 return;
             }
-            
-            if (this.onPointerLeave != null && evt is PointerLeaveEvent)
-            {
+
+            if (this.onPointerLeave != null && evt is PointerLeaveEvent) {
                 this.onPointerLeave((PointerLeaveEvent) evt);
                 return;
             }
-            
-            if (this.onPointerEnter != null && evt is PointerEnterEvent)
-            {
+
+            if (this.onPointerEnter != null && evt is PointerEnterEvent) {
                 this.onPointerEnter((PointerEnterEvent) evt);
                 return;
             }
@@ -806,20 +805,27 @@ namespace Unity.UIWidgets.rendering {
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             var listeners = new List<string>();
-            if (this.onPointerDown != null)
+            if (this.onPointerDown != null) {
                 listeners.Add("down");
-            if (this.onPointerMove != null)
+            }
+            if (this.onPointerMove != null) {
                 listeners.Add("move");
-            if (this.onPointerUp != null)
+            }
+            if (this.onPointerUp != null) {
                 listeners.Add("up");
-            if (this.onPointerCancel != null)
+            }
+            if (this.onPointerCancel != null) {
                 listeners.Add("cancel");
-            if (this.onPointerHover != null)
+            }
+            if (this.onPointerHover != null) {
                 listeners.Add("hover");
-            if (this.onPointerEnter != null)
+            }
+            if (this.onPointerEnter != null) {
                 listeners.Add("enter");
-            if (this.onPointerLeave != null)
+            }
+            if (this.onPointerLeave != null) {
                 listeners.Add("leave");
+            }
             if (listeners.isEmpty()) {
                 listeners.Add("<none>");
             }
@@ -900,7 +906,8 @@ namespace Unity.UIWidgets.rendering {
                     }
 
                     properties.add(new PercentProperty("metrics", fraction, unit: "useful",
-                        tooltip: this.debugSymmetricPaintCount + " bad vs " + this.debugAsymmetricPaintCount + " good"));
+                        tooltip: this.debugSymmetricPaintCount + " bad vs " + this.debugAsymmetricPaintCount +
+                                 " good"));
                     properties.add(new MessageProperty("diagnosis", diagnosis));
                 }
 

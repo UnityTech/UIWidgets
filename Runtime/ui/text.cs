@@ -1,68 +1,63 @@
 ﻿using System;
-using System.Collections.Generic;
-using JetBrains.Annotations;
-using Unity.UIWidgets.foundation;
-using UnityEngine;
 
-namespace Unity.UIWidgets.ui
-{
-    public enum FontStyle
-    {
+namespace Unity.UIWidgets.ui {
+    public enum FontStyle {
         normal,
         italic,
     }
 
-    public enum TextBaseline
-    {
+    public enum TextBaseline {
         alphabetic,
         ideographic,
     }
 
-    public enum TextAlign
-    {
+    public enum TextAlign {
         left,
         right,
         center,
         justify,
     }
 
-    public class ParagraphConstraints : IEquatable<ParagraphConstraints>
-    {
+    public class ParagraphConstraints : IEquatable<ParagraphConstraints> {
         public readonly double width;
 
-        public ParagraphConstraints(double width)
-        {
+        public ParagraphConstraints(double width) {
             this.width = width;
         }
 
-        public bool Equals(ParagraphConstraints other)
-        {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
-            return width.Equals(other.width);
+        public bool Equals(ParagraphConstraints other) {
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
+            return this.width.Equals(other.width);
         }
 
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((ParagraphConstraints) obj);
+        public override bool Equals(object obj) {
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
+            return this.Equals((ParagraphConstraints) obj);
         }
 
-        public override int GetHashCode()
-        {
-            return width.GetHashCode();
+        public override int GetHashCode() {
+            return this.width.GetHashCode();
         }
 
-        public override string ToString()
-        {
-            return string.Format("Width: {0}", width);
+        public override string ToString() {
+            return $"Width: {this.width}";
         }
     }
 
-    public class TextStyle : IEquatable<TextStyle>
-    {
+    public class TextStyle : IEquatable<TextStyle> {
         public readonly Color color = Color.fromARGB(255, 0, 0, 0);
         public readonly double fontSize = 14.0;
         public readonly FontWeight fontWeight = FontWeight.w400;
@@ -76,29 +71,20 @@ namespace Unity.UIWidgets.ui
         public readonly TextDecorationStyle decorationStyle = TextDecorationStyle.solid;
         public readonly string fontFamily = "Helvetica";
         public readonly Paint background;
-        
-        internal UnityEngine.Color UnityColor
-        {
-            get { return color.toColor(); }
+
+        internal UnityEngine.Color UnityColor {
+            get { return this.color.toColor(); }
         }
 
-        internal UnityEngine.FontStyle UnityFontStyle
-        {
-            get
-            {
-                if (fontStyle == FontStyle.italic)
-                {
-                    if (fontWeight == FontWeight.w700)
-                    {
+        internal UnityEngine.FontStyle UnityFontStyle {
+            get {
+                if (this.fontStyle == FontStyle.italic) {
+                    if (this.fontWeight == FontWeight.w700) {
                         return UnityEngine.FontStyle.BoldAndItalic;
-                    }
-                    else
-                    {
+                    } else {
                         return UnityEngine.FontStyle.Italic;
                     }
-                }
-                else if (fontWeight == FontWeight.w700)
-                {
+                } else if (this.fontWeight == FontWeight.w700) {
                     return UnityEngine.FontStyle.Bold;
                 }
 
@@ -106,69 +92,74 @@ namespace Unity.UIWidgets.ui
             }
         }
 
-        internal int UnityFontSize
-        {
-            get { return (int) fontSize; }
+        internal int UnityFontSize {
+            get { return (int) this.fontSize; }
         }
 
-        public bool Equals(TextStyle other)
-        {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
-            return Equals(color, other.color) && fontSize.Equals(other.fontSize) && fontWeight == other.fontWeight &&
-                   fontStyle == other.fontStyle && letterSpacing.Equals(other.letterSpacing) &&
-                   wordSpacing.Equals(other.wordSpacing) && textBaseline == other.textBaseline &&
-                   height.Equals(other.height) && Equals(decoration, other.decoration) &&
-                   Equals(decorationColor, other.decorationColor) && decorationStyle == other.decorationStyle &&
-                   string.Equals(fontFamily, other.fontFamily);
+        public bool Equals(TextStyle other) {
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
+            return Equals(this.color, other.color) && this.fontSize.Equals(other.fontSize) &&
+                   this.fontWeight == other.fontWeight && this.fontStyle == other.fontStyle &&
+                   this.letterSpacing.Equals(other.letterSpacing) && this.wordSpacing.Equals(other.wordSpacing) &&
+                   this.textBaseline == other.textBaseline && this.height.Equals(other.height) &&
+                   Equals(this.decoration, other.decoration) &&
+                   Equals(this.decorationColor, other.decorationColor) &&
+                   this.decorationStyle == other.decorationStyle &&
+                   string.Equals(this.fontFamily, other.fontFamily);
         }
 
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((TextStyle) obj);
+        public override bool Equals(object obj) {
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
+            return this.Equals((TextStyle) obj);
         }
 
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                var hashCode = (color != null ? color.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ fontSize.GetHashCode();
-                hashCode = (hashCode * 397) ^ fontWeight.GetHashCode();
-                hashCode = (hashCode * 397) ^ fontStyle.GetHashCode();
-                hashCode = (hashCode * 397) ^ letterSpacing.GetHashCode();
-                hashCode = (hashCode * 397) ^ wordSpacing.GetHashCode();
-                hashCode = (hashCode * 397) ^ textBaseline.GetHashCode();
-                hashCode = (hashCode * 397) ^ height.GetHashCode();
-                hashCode = (hashCode * 397) ^ (decoration != null ? decoration.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (decorationColor != null ? decorationColor.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ decorationStyle.GetHashCode();
-                hashCode = (hashCode * 397) ^ (fontFamily != null ? fontFamily.GetHashCode() : 0);
+        public override int GetHashCode() {
+            unchecked {
+                var hashCode = (this.color != null ? this.color.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ this.fontSize.GetHashCode();
+                hashCode = (hashCode * 397) ^ this.fontWeight.GetHashCode();
+                hashCode = (hashCode * 397) ^ this.fontStyle.GetHashCode();
+                hashCode = (hashCode * 397) ^ this.letterSpacing.GetHashCode();
+                hashCode = (hashCode * 397) ^ this.wordSpacing.GetHashCode();
+                hashCode = (hashCode * 397) ^ this.textBaseline.GetHashCode();
+                hashCode = (hashCode * 397) ^ this.height.GetHashCode();
+                hashCode = (hashCode * 397) ^ (this.decoration != null ? this.decoration.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (this.decorationColor != null ? this.decorationColor.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ this.decorationStyle.GetHashCode();
+                hashCode = (hashCode * 397) ^ (this.fontFamily != null ? this.fontFamily.GetHashCode() : 0);
                 return hashCode;
             }
         }
 
-        public static bool operator ==(TextStyle left, TextStyle right)
-        {
+        public static bool operator ==(TextStyle left, TextStyle right) {
             return Equals(left, right);
         }
 
-        public static bool operator !=(TextStyle left, TextStyle right)
-        {
+        public static bool operator !=(TextStyle left, TextStyle right) {
             return !Equals(left, right);
         }
 
-        
+
         public TextStyle(Color color = null, double? fontSize = null,
             FontWeight? fontWeight = null, FontStyle? fontStyle = null, double? letterSpacing = null,
-            double? wordSpacing = null, TextBaseline? textBaseline = null, double? height= null, 
-            TextDecoration decoration = null, TextDecorationStyle? decorationStyle = null, Color decorationColor = null, string fontFamily = null,
+            double? wordSpacing = null, TextBaseline? textBaseline = null, double? height = null,
+            TextDecoration decoration = null, TextDecorationStyle? decorationStyle = null, Color decorationColor = null,
+            string fontFamily = null,
             Paint background = null
-        )
-        {
+        ) {
             this.color = color ?? this.color;
             this.fontSize = fontSize ?? this.fontSize;
             this.fontWeight = fontWeight ?? this.fontWeight;
@@ -182,12 +173,11 @@ namespace Unity.UIWidgets.ui
             this.decorationStyle = decorationStyle ?? this.decorationStyle;
             this.decorationColor = decorationColor ?? this.decorationColor;
             this.fontFamily = fontFamily ?? this.fontFamily;
-            this.background = background ?? this.background; 
+            this.background = background ?? this.background;
         }
     }
 
-    public class ParagraphStyle : IEquatable<ParagraphStyle>
-    {
+    public class ParagraphStyle : IEquatable<ParagraphStyle> {
         public ParagraphStyle(TextAlign? textAlign = null,
             TextDirection? textDirection = null,
             FontWeight? fontWeight = null,
@@ -196,8 +186,7 @@ namespace Unity.UIWidgets.ui
             double? fontSize = null,
             string fontFamily = null,
             double? lineHeight = null, // todo  
-            string ellipsis = null)
-        {
+            string ellipsis = null) {
             this.textAlign = textAlign;
             this.textDirection = textDirection;
             this.fontWeight = fontWeight;
@@ -209,65 +198,68 @@ namespace Unity.UIWidgets.ui
             this.ellipsis = ellipsis;
         }
 
-        public bool Equals(ParagraphStyle other)
-        {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
-            return textAlign == other.textAlign && textDirection == other.textDirection &&
-                   fontWeight == other.fontWeight && fontStyle == other.fontStyle && maxLines == other.maxLines &&
-                   fontSize.Equals(other.fontSize) && string.Equals(fontFamily, other.fontFamily) &&
-                   lineHeight.Equals(other.lineHeight) && string.Equals(ellipsis, other.ellipsis);
+        public bool Equals(ParagraphStyle other) {
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
+            return this.textAlign == other.textAlign && this.textDirection == other.textDirection &&
+                   this.fontWeight == other.fontWeight && this.fontStyle == other.fontStyle &&
+                   this.maxLines == other.maxLines && this.fontSize.Equals(other.fontSize) &&
+                   string.Equals(this.fontFamily, other.fontFamily) && this.lineHeight.Equals(other.lineHeight) &&
+                   string.Equals(this.ellipsis, other.ellipsis);
         }
 
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((ParagraphStyle) obj);
+        public override bool Equals(object obj) {
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
+            return this.Equals((ParagraphStyle) obj);
         }
 
-        public static bool operator ==(ParagraphStyle a, ParagraphStyle b)
-        {
+        public static bool operator ==(ParagraphStyle a, ParagraphStyle b) {
             return Equals(a, b);
         }
 
-        public static bool operator !=(ParagraphStyle a, ParagraphStyle b)
-        {
+        public static bool operator !=(ParagraphStyle a, ParagraphStyle b) {
             return !(a == b);
         }
 
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                var hashCode = textAlign.GetHashCode();
-                hashCode = (hashCode * 397) ^ textDirection.GetHashCode();
-                hashCode = (hashCode * 397) ^ fontWeight.GetHashCode();
-                hashCode = (hashCode * 397) ^ fontStyle.GetHashCode();
-                hashCode = (hashCode * 397) ^ maxLines.GetHashCode();
-                hashCode = (hashCode * 397) ^ fontSize.GetHashCode();
-                hashCode = (hashCode * 397) ^ (fontFamily != null ? fontFamily.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ lineHeight.GetHashCode();
-                hashCode = (hashCode * 397) ^ (ellipsis != null ? ellipsis.GetHashCode() : 0);
+        public override int GetHashCode() {
+            unchecked {
+                var hashCode = this.textAlign.GetHashCode();
+                hashCode = (hashCode * 397) ^ this.textDirection.GetHashCode();
+                hashCode = (hashCode * 397) ^ this.fontWeight.GetHashCode();
+                hashCode = (hashCode * 397) ^ this.fontStyle.GetHashCode();
+                hashCode = (hashCode * 397) ^ this.maxLines.GetHashCode();
+                hashCode = (hashCode * 397) ^ this.fontSize.GetHashCode();
+                hashCode = (hashCode * 397) ^ (this.fontFamily != null ? this.fontFamily.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ this.lineHeight.GetHashCode();
+                hashCode = (hashCode * 397) ^ (this.ellipsis != null ? this.ellipsis.GetHashCode() : 0);
                 return hashCode;
             }
         }
 
-        public TextStyle getTextStyle()
-        {
+        public TextStyle getTextStyle() {
             return new TextStyle(
-                fontWeight: fontWeight,
-                fontStyle: fontStyle,
-                fontFamily: fontFamily,
-                fontSize: fontSize,
-                height: lineHeight
+                fontWeight: this.fontWeight,
+                fontStyle: this.fontStyle,
+                fontFamily: this.fontFamily,
+                fontSize: this.fontSize,
+                height: this.lineHeight
             );
         }
 
-        public TextAlign TextAlign
-        {
-            get { return textAlign ?? TextAlign.left; }
+        public TextAlign TextAlign {
+            get { return this.textAlign ?? TextAlign.left; }
         }
 
         public readonly TextAlign? textAlign;
@@ -281,42 +273,45 @@ namespace Unity.UIWidgets.ui
         public readonly string ellipsis;
     }
 
-    public enum TextDecorationStyle
-    {
+    public enum TextDecorationStyle {
         solid,
         doubleLine,
     }
 
-    public class TextDecoration : IEquatable<TextDecoration>
-    {
-        public bool Equals(TextDecoration other)
-        {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
-            return mask == other.mask;
+    public class TextDecoration : IEquatable<TextDecoration> {
+        public bool Equals(TextDecoration other) {
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
+            return this.mask == other.mask;
         }
 
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((TextDecoration) obj);
+        public override bool Equals(object obj) {
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
+            return this.Equals((TextDecoration) obj);
         }
 
-        public override int GetHashCode()
-        {
-            return mask;
+        public override int GetHashCode() {
+            return this.mask;
         }
 
 
-        public static bool operator ==(TextDecoration a, TextDecoration b)
-        {
+        public static bool operator ==(TextDecoration a, TextDecoration b) {
             return Equals(a, b);
         }
 
-        public static bool operator !=(TextDecoration a, TextDecoration b)
-        {
+        public static bool operator !=(TextDecoration a, TextDecoration b) {
             return !(a == b);
         }
 
@@ -330,87 +325,82 @@ namespace Unity.UIWidgets.ui
 
         public readonly int mask;
 
-        public TextDecoration(int mask)
-        {
+        public TextDecoration(int mask) {
             this.mask = mask;
         }
 
-        public bool contains(TextDecoration other)
-        {
-            return (mask | other.mask) == mask;
+        public bool contains(TextDecoration other) {
+            return (this.mask | other.mask) == this.mask;
         }
     }
 
-    public enum TextDirection
-    {
+    public enum TextDirection {
         rtl,
         ltr,
     }
 
-    public enum TextAffinity
-    {
+    public enum TextAffinity {
         upstream,
         downstream,
     }
 
-    public enum FontWeight
-    {
+    public enum FontWeight {
         w400, // normal
         w700, // bold
     }
 
-    public class TextPosition: IEquatable<TextPosition>
-    {
+    public class TextPosition : IEquatable<TextPosition> {
         public readonly int offset;
         public readonly TextAffinity affinity;
 
-        public TextPosition(int offset, TextAffinity affinity = TextAffinity.downstream)
-        {
+        public TextPosition(int offset, TextAffinity affinity = TextAffinity.downstream) {
             this.offset = offset;
             this.affinity = affinity;
         }
 
-        public override string ToString()
-        {
-            return string.Format("Offset: {0}, Affinity: {1}", offset, affinity);
+        public override string ToString() {
+            return $"Offset: {this.offset}, Affinity: {this.affinity}";
         }
 
-        public bool Equals(TextPosition other)
-        {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
-            return offset == other.offset && affinity == other.affinity;
+        public bool Equals(TextPosition other) {
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
+            return this.offset == other.offset && this.affinity == other.affinity;
         }
 
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((TextPosition) obj);
+        public override bool Equals(object obj) {
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
+            return this.Equals((TextPosition) obj);
         }
 
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                return (offset * 397) ^ (int) affinity;
+        public override int GetHashCode() {
+            unchecked {
+                return (this.offset * 397) ^ (int) this.affinity;
             }
         }
 
-        public static bool operator ==(TextPosition left, TextPosition right)
-        {
+        public static bool operator ==(TextPosition left, TextPosition right) {
             return Equals(left, right);
         }
 
-        public static bool operator !=(TextPosition left, TextPosition right)
-        {
+        public static bool operator !=(TextPosition left, TextPosition right) {
             return !Equals(left, right);
         }
     }
 
-    public class TextBox : IEquatable<TextBox>
-    {
+    public class TextBox : IEquatable<TextBox> {
         public readonly double left;
 
         public readonly double top;
@@ -421,8 +411,7 @@ namespace Unity.UIWidgets.ui
 
         public readonly TextDirection direction;
 
-        private TextBox(double left, double top, double right, double bottom, TextDirection direction)
-        {
+        TextBox(double left, double top, double right, double bottom, TextDirection direction) {
             this.left = left;
             this.top = top;
             this.right = right;
@@ -430,68 +419,67 @@ namespace Unity.UIWidgets.ui
             this.direction = direction;
         }
 
-        public static TextBox fromLTBD(double left, double top, double right, double bottom, TextDirection direction)
-        {
+        public static TextBox fromLTBD(double left, double top, double right, double bottom, TextDirection direction) {
             return new TextBox(left, top, right, bottom, direction);
         }
 
-        public Rect toRect()
-        {
-            return Rect.fromLTRB(left, top, right, bottom);
+        public Rect toRect() {
+            return Rect.fromLTRB(this.left, this.top, this.right, this.bottom);
         }
 
-        public double start
-        {
-            get { return direction == TextDirection.ltr ? left : right; }
+        public double start {
+            get { return this.direction == TextDirection.ltr ? this.left : this.right; }
         }
 
-        public double end
-        {
-            get { return direction == TextDirection.ltr ? right : left; }
+        public double end {
+            get { return this.direction == TextDirection.ltr ? this.right : this.left; }
         }
 
-        public bool Equals(TextBox other)
-        {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
-            return left.Equals(other.left) && top.Equals(other.top) && right.Equals(other.right) &&
-                   bottom.Equals(other.bottom) && direction == other.direction;
+        public bool Equals(TextBox other) {
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
+            return this.left.Equals(other.left) && this.top.Equals(other.top) && this.right.Equals(other.right) &&
+                   this.bottom.Equals(other.bottom) && this.direction == other.direction;
         }
 
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((TextBox) obj);
+        public override bool Equals(object obj) {
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
+            return this.Equals((TextBox) obj);
         }
 
-        public override string ToString()
-        {
-            return string.Format("Left: {0}, Top: {1}, Right: {2}, Bottom: {3}, Direction: {4}", left, top, right,
-                bottom, direction);
+        public override string ToString() {
+            return
+                $"Left: {this.left}, Top: {this.top}, Right: {this.right}, Bottom: {this.bottom}, Direction: {this.direction}";
         }
 
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                var hashCode = left.GetHashCode();
-                hashCode = (hashCode * 397) ^ top.GetHashCode();
-                hashCode = (hashCode * 397) ^ right.GetHashCode();
-                hashCode = (hashCode * 397) ^ bottom.GetHashCode();
-                hashCode = (hashCode * 397) ^ (int) direction;
+        public override int GetHashCode() {
+            unchecked {
+                var hashCode = this.left.GetHashCode();
+                hashCode = (hashCode * 397) ^ this.top.GetHashCode();
+                hashCode = (hashCode * 397) ^ this.right.GetHashCode();
+                hashCode = (hashCode * 397) ^ this.bottom.GetHashCode();
+                hashCode = (hashCode * 397) ^ (int) this.direction;
                 return hashCode;
             }
         }
 
-        public static bool operator ==(TextBox left, TextBox right)
-        {
+        public static bool operator ==(TextBox left, TextBox right) {
             return Equals(left, right);
         }
 
-        public static bool operator !=(TextBox left, TextBox right)
-        {
+        public static bool operator !=(TextBox left, TextBox right) {
             return !Equals(left, right);
         }
     }

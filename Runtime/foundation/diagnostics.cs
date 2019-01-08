@@ -309,11 +309,11 @@ namespace Unity.UIWidgets.foundation {
                 {"name", this.name},
                 {"showSeparator", this.showSeparator},
                 {"description", this.toDescription()},
-                {"level",  Convert.ToString(this.level)},
+                {"level", Convert.ToString(this.level)},
                 {"showName", this.showName},
                 {"emptyBodyDescription", this.emptyBodyDescription},
-                {"style",  Convert.ToString(this.style)},
-                {"valueToString", Convert.ToString(valueObject)},
+                {"style", Convert.ToString(this.style)},
+                {"valueToString", Convert.ToString(this.valueObject)},
                 {"type", this.GetType().ToString()},
                 {"hasChildren", this.getChildren().isNotEmpty()}
             };
@@ -496,8 +496,9 @@ namespace Unity.UIWidgets.foundation {
                 config.addBlankLineIfNoChildren &&
                 builder.hasMultipleLines) {
                 string prefix = prefixChildren.TrimEnd();
-                if (prefix.isNotEmpty())
+                if (prefix.isNotEmpty()) {
                     builder.writeRaw(prefix + config.lineBreak);
+                }
             }
 
             if (children.isNotEmpty() && config.showChildren) {
@@ -546,7 +547,7 @@ namespace Unity.UIWidgets.foundation {
     }
 
     public class MessageProperty : DiagnosticsProperty<object> {
-        public MessageProperty(String name, String message,
+        public MessageProperty(string name, string message,
             DiagnosticLevel level = DiagnosticLevel.info
         ) : base(name, null, description: message, level: level) {
             D.assert(name != null);
@@ -608,7 +609,7 @@ namespace Unity.UIWidgets.foundation {
             string ifNull = null,
             string unit = null,
             bool showName = true,
-            Object defaultValue = null,
+            object defaultValue = null,
             string tooltip = null,
             DiagnosticLevel level = DiagnosticLevel.info
         ) : base(
@@ -667,11 +668,11 @@ namespace Unity.UIWidgets.foundation {
     }
 
     public class IntProperty : _NumProperty<int?> {
-        public IntProperty(String name, int? value,
-            String ifNull = null,
+        public IntProperty(string name, int? value,
+            string ifNull = null,
             bool showName = true,
-            String unit = null,
-            Object defaultValue = null,
+            string unit = null,
+            object defaultValue = null,
             DiagnosticLevel level = DiagnosticLevel.info
         ) : base(
             name,
@@ -684,7 +685,7 @@ namespace Unity.UIWidgets.foundation {
         ) {
         }
 
-        protected override String numberToString() {
+        protected override string numberToString() {
             if (this.value == null) {
                 return "null";
             }
@@ -713,7 +714,7 @@ namespace Unity.UIWidgets.foundation {
         ) {
         }
 
-        private DoubleProperty(
+        DoubleProperty(
             string name,
             ComputePropertyValueCallback<double?> computeValue,
             string ifNull = null,
@@ -850,7 +851,8 @@ namespace Unity.UIWidgets.foundation {
 
         public override bool showName {
             get {
-                if (this.value == null || this.value == true && this.ifTrue == null || this.value == false && this.ifFalse == null) {
+                if (this.value == null || this.value == true && this.ifTrue == null ||
+                    this.value == false && this.ifFalse == null) {
                     return true;
                 }
 
@@ -940,8 +942,8 @@ namespace Unity.UIWidgets.foundation {
 
 
     public class EnumProperty<T> : DiagnosticsProperty<T> {
-        public EnumProperty(String name, T value,
-            Object defaultValue = null,
+        public EnumProperty(string name, T value,
+            object defaultValue = null,
             DiagnosticLevel level = DiagnosticLevel.info
         ) : base(
             name,
@@ -961,9 +963,9 @@ namespace Unity.UIWidgets.foundation {
     }
 
     public class ObjectFlagProperty<T> : DiagnosticsProperty<T> {
-        public ObjectFlagProperty(String name, T value,
+        public ObjectFlagProperty(string name, T value,
             string ifPresent = null,
-            String ifNull = null,
+            string ifNull = null,
             bool showName = false,
             DiagnosticLevel level = DiagnosticLevel.info
         ) : base(
@@ -976,8 +978,8 @@ namespace Unity.UIWidgets.foundation {
             D.assert(ifPresent != null || ifNull != null);
         }
 
-        private ObjectFlagProperty(
-            String name,
+        ObjectFlagProperty(
+            string name,
             T value,
             DiagnosticLevel level = DiagnosticLevel.info
         ) : base(
@@ -991,7 +993,7 @@ namespace Unity.UIWidgets.foundation {
         }
 
         public static ObjectFlagProperty<T> has(
-            String name,
+            string name,
             T value,
             DiagnosticLevel level = DiagnosticLevel.info
         ) {
@@ -1041,7 +1043,7 @@ namespace Unity.UIWidgets.foundation {
             }
         }
 
-        public override Dictionary<String, Object> toJsonMap() {
+        public override Dictionary<string, object> toJsonMap() {
             var json = base.toJsonMap();
             if (this.ifPresent != null) {
                 json["ifPresent"] = this.ifPresent;
@@ -1052,7 +1054,7 @@ namespace Unity.UIWidgets.foundation {
     }
 
     public delegate T ComputePropertyValueCallback<T>();
-    
+
     public class DiagnosticsProperty<T> : DiagnosticsNode {
         public DiagnosticsProperty(
             string name,
@@ -1162,7 +1164,7 @@ namespace Unity.UIWidgets.foundation {
         public override Dictionary<string, object> toJsonMap() {
             var json = base.toJsonMap();
             if (this.defaultValue != Diagnostics.kNoDefaultValue) {
-                json["defaultValue"] =  Convert.ToString(this.defaultValue);
+                json["defaultValue"] = Convert.ToString(this.defaultValue);
             }
 
             if (this.ifEmpty != null) {
@@ -1184,7 +1186,7 @@ namespace Unity.UIWidgets.foundation {
 
             json["propertyType"] = this.propertyType.ToString();
             json["valueToString"] = this.valueToString();
-            json["defaultLevel"] =  Convert.ToString(this._defaultLevel);
+            json["defaultLevel"] = Convert.ToString(this._defaultLevel);
             if (typeof(Diagnosticable).IsAssignableFrom(typeof(T))) {
                 json["isDiagnosticableValue"] = true;
             }
@@ -1267,8 +1269,7 @@ namespace Unity.UIWidgets.foundation {
             this._valueComputed = true;
             try {
                 this._value = this._computeValue();
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 this._exception = ex;
                 this._value = default(T);
             }
@@ -1291,7 +1292,7 @@ namespace Unity.UIWidgets.foundation {
                     return DiagnosticLevel.warning;
                 }
 
-                if (this.defaultValue != Diagnostics.kNoDefaultValue && object.Equals(this.value, this.defaultValue)) {
+                if (this.defaultValue != Diagnostics.kNoDefaultValue && Equals(this.value, this.defaultValue)) {
                     return DiagnosticLevel.fine;
                 }
 
@@ -1312,7 +1313,7 @@ namespace Unity.UIWidgets.foundation {
 
     public class DiagnosticableNode<T> : DiagnosticsNode where T : Diagnosticable {
         public DiagnosticableNode(
-            String name = null,
+            string name = null,
             T value = null,
             DiagnosticsTreeStyle? style = null
         ) : base(name: name, style: style) {
@@ -1360,7 +1361,7 @@ namespace Unity.UIWidgets.foundation {
             return new List<DiagnosticsNode>();
         }
 
-        public override String toDescription(
+        public override string toDescription(
             TextTreeConfiguration parentConfiguration = null
         ) {
             return this._value.toStringShort();
@@ -1415,7 +1416,7 @@ namespace Unity.UIWidgets.foundation {
         }
 
         public virtual DiagnosticsNode toDiagnosticsNode(
-            String name = null,
+            string name = null,
             DiagnosticsTreeStyle style = DiagnosticsTreeStyle.sparse) {
             return new DiagnosticableNode<Diagnosticable>(
                 name: name, value: this, style: style
@@ -1431,7 +1432,7 @@ namespace Unity.UIWidgets.foundation {
         }
 
         public virtual string toStringShallow(
-            String joiner = ", ",
+            string joiner = ", ",
             DiagnosticLevel minLevel = DiagnosticLevel.debug
         ) {
             var result = new StringBuilder();
@@ -1446,8 +1447,8 @@ namespace Unity.UIWidgets.foundation {
         }
 
         public virtual string toStringDeep(
-            String prefixLineOne = "",
-            String prefixOtherLines = null,
+            string prefixLineOne = "",
+            string prefixOtherLines = null,
             DiagnosticLevel minLevel = DiagnosticLevel.debug
         ) {
             return this.toDiagnosticsNode().toStringDeep(
@@ -1461,7 +1462,7 @@ namespace Unity.UIWidgets.foundation {
         }
 
         public override DiagnosticsNode toDiagnosticsNode(
-            String name = null,
+            string name = null,
             DiagnosticsTreeStyle style = DiagnosticsTreeStyle.sparse) {
             return new _DiagnosticableTreeNode(
                 name: name,
@@ -1561,7 +1562,7 @@ namespace Unity.UIWidgets.foundation {
         );
 
         internal static readonly _NoDefaultValue kNoDefaultValue = new _NoDefaultValue();
-        
+
         public static readonly object kNullDefaultValue = new _NullDefaultValue();
 
         public static string shortHash(object o) {
@@ -1569,7 +1570,7 @@ namespace Unity.UIWidgets.foundation {
         }
 
         public static string describeIdentity(object o) {
-            return string.Format("{0}#{1}", o.GetType(), Diagnostics.shortHash(o));
+            return $"{o.GetType()}#{shortHash(o)}";
         }
     }
 }

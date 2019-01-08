@@ -1,8 +1,8 @@
-using System.Collections.Generic;
-using RSG;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Text;
+using RSG;
 using Unity.UIWidgets.async;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
@@ -54,17 +54,27 @@ namespace Unity.UIWidgets.painting {
         public static readonly ImageConfiguration empty = new ImageConfiguration();
 
         public bool Equals(ImageConfiguration other) {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
             return Equals(this.bundle, other.bundle) && this.devicePixelRatio.Equals(other.devicePixelRatio) &&
                    Equals(this.locale, other.locale) && Equals(this.size, other.size) &&
                    this.platform == other.platform;
         }
 
         public override bool Equals(object obj) {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
             return this.Equals((ImageConfiguration) obj);
         }
 
@@ -187,7 +197,6 @@ namespace Unity.UIWidgets.painting {
     }
 
     public class AssetBundleImageKey : IEquatable<AssetBundleImageKey> {
-
         public AssetBundleImageKey(
             AssetBundle bundle,
             string name,
@@ -208,16 +217,26 @@ namespace Unity.UIWidgets.painting {
         public readonly double scale;
 
         public bool Equals(AssetBundleImageKey other) {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
             return Equals(this.bundle, other.bundle) && string.Equals(this.name, other.name) &&
                    this.scale.Equals(other.scale);
         }
 
         public override bool Equals(object obj) {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
             return this.Equals((AssetBundleImageKey) obj);
         }
 
@@ -384,15 +403,25 @@ namespace Unity.UIWidgets.painting {
         }
 
         public bool Equals(NetworkImage other) {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
             return string.Equals(this.url, other.url) && this.scale.Equals(other.scale);
         }
 
         public override bool Equals(object obj) {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
             return this.Equals((NetworkImage) obj);
         }
 
@@ -433,9 +462,7 @@ namespace Unity.UIWidgets.painting {
         protected override ImageStreamCompleter load(FileImage key) {
             return new MultiFrameImageStreamCompleter(this._loadAsync(key),
                 scale: key.scale,
-                informationCollector: information => {
-                information.AppendLine($"Path: {this.file}");
-            });
+                informationCollector: information => { information.AppendLine($"Path: {this.file}"); });
         }
 
         IPromise<Codec> _loadAsync(FileImage key) {
@@ -464,10 +491,10 @@ namespace Unity.UIWidgets.painting {
                     var data = www.downloadHandler.data;
                     yield return data;
                 }
-                
+
                 yield break;
             }
-            
+
             using (var www = UnityWebRequestTexture.GetTexture(uri)) {
                 yield return www.SendWebRequest();
 
@@ -481,15 +508,25 @@ namespace Unity.UIWidgets.painting {
         }
 
         public bool Equals(FileImage other) {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
             return string.Equals(this.file, other.file) && this.scale.Equals(other.scale);
         }
 
         public override bool Equals(object obj) {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
             return this.Equals((FileImage) obj);
         }
 
@@ -513,17 +550,16 @@ namespace Unity.UIWidgets.painting {
     }
 
     public class MemoryImage : ImageProvider<MemoryImage>, IEquatable<MemoryImage> {
-
         public MemoryImage(byte[] bytes, double scale = 1.0) {
             D.assert(bytes != null);
             this.bytes = bytes;
             this.scale = scale;
         }
-        
+
         public readonly byte[] bytes;
 
         public readonly double scale;
-        
+
         protected override IPromise<MemoryImage> obtainKey(ImageConfiguration configuration) {
             return Promise<MemoryImage>.Resolved(this);
         }
@@ -533,7 +569,7 @@ namespace Unity.UIWidgets.painting {
                 this._loadAsync(key),
                 scale: key.scale);
         }
-        
+
         IPromise<Codec> _loadAsync(MemoryImage key) {
             D.assert(key == this);
 
@@ -541,15 +577,25 @@ namespace Unity.UIWidgets.painting {
         }
 
         public bool Equals(MemoryImage other) {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
             return Equals(this.bytes, other.bytes) && this.scale.Equals(other.scale);
         }
 
         public override bool Equals(object obj) {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
             return this.Equals((MemoryImage) obj);
         }
 
@@ -599,16 +645,26 @@ namespace Unity.UIWidgets.painting {
         }
 
         public bool Equals(ExactAssetImage other) {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
             return string.Equals(this.assetName, other.assetName) && this.scale.Equals(other.scale) &&
                    Equals(this.bundle, other.bundle);
         }
 
         public override bool Equals(object obj) {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
             return this.Equals((ExactAssetImage) obj);
         }
 

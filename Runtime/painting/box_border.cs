@@ -1,8 +1,6 @@
 using System;
-using System.Runtime.CompilerServices;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
-using UnityEditor;
 
 namespace Unity.UIWidgets.painting {
     public class Border : IEquatable<Border> {
@@ -73,7 +71,7 @@ namespace Unity.UIWidgets.painting {
                 BorderSide.canMerge(this.right, other.right) &&
                 BorderSide.canMerge(this.bottom, other.bottom) &&
                 BorderSide.canMerge(this.left, other.left)) {
-                return Border.merge(this, other);
+                return merge(this, other);
             }
 
             return null;
@@ -131,10 +129,10 @@ namespace Unity.UIWidgets.painting {
                     path.lineTo(rect.right - this.right.width, rect.top + this.top.width);
                     path.lineTo(rect.left + this.right.width, rect.top + this.top.width);
                 }
-                
+
                 canvas.drawPath(path, paint);
             }
-            
+
             {
                 var paint = new Paint {
                     color = this.right.color,
@@ -148,7 +146,7 @@ namespace Unity.UIWidgets.painting {
                     path.lineTo(rect.right - this.right.width, rect.bottom - this.bottom.width);
                     path.lineTo(rect.right - this.right.width, rect.top + this.top.width);
                 }
-                
+
                 canvas.drawPath(path, paint);
             }
 
@@ -165,10 +163,10 @@ namespace Unity.UIWidgets.painting {
                     path.lineTo(rect.left + this.left.width, rect.bottom - this.bottom.width);
                     path.lineTo(rect.right - this.right.width, rect.bottom - this.bottom.width);
                 }
-                
+
                 canvas.drawPath(path, paint);
             }
-            
+
             {
                 var paint = new Paint {
                     color = this.left.color,
@@ -182,24 +180,34 @@ namespace Unity.UIWidgets.painting {
                     path.lineTo(rect.left + this.left.width, rect.top + this.top.width);
                     path.lineTo(rect.left + this.left.width, rect.bottom - this.bottom.width);
                 }
-                
+
                 canvas.drawPath(path, paint);
             }
         }
 
         public bool Equals(Border other) {
-            if (object.ReferenceEquals(null, other)) return false;
-            if (object.ReferenceEquals(this, other)) return true;
-            return object.Equals(this.top, other.top)
-                   && object.Equals(this.right, other.right)
-                   && object.Equals(this.bottom, other.bottom)
-                   && object.Equals(this.left, other.left);
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
+            return Equals(this.top, other.top)
+                   && Equals(this.right, other.right)
+                   && Equals(this.bottom, other.bottom)
+                   && Equals(this.left, other.left);
         }
 
         public override bool Equals(object obj) {
-            if (object.ReferenceEquals(null, obj)) return false;
-            if (object.ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
             return this.Equals((Border) obj);
         }
 

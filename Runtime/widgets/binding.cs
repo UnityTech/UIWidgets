@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
-using Unity.UIWidgets.ui.painting.txt;
 
 namespace Unity.UIWidgets.widgets {
     public interface WidgetsBindingObserver {
@@ -15,7 +14,7 @@ namespace Unity.UIWidgets.widgets {
     }
 
     public class WidgetsBinding : RendererBinding {
-        public static new WidgetsBinding instance {
+        public new static WidgetsBinding instance {
             get { return (WidgetsBinding) RendererBinding.instance; }
             set { RendererBinding.instance = value; }
         }
@@ -24,9 +23,7 @@ namespace Unity.UIWidgets.widgets {
             this.buildOwner.onBuildScheduled = this._handleBuildScheduled;
             Window.instance.onLocaleChanged += this.handleLocaleChanged;
             this.widgetInspectorService = new WidgetInspectorService(this);
-            this.addPersistentFrameCallback((duration) => {
-                MeshGenrator.tickNextFrame();
-            });
+            this.addPersistentFrameCallback((duration) => { MeshGenrator.tickNextFrame(); });
         }
 
         public BuildOwner buildOwner {
@@ -50,25 +47,25 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public readonly WidgetInspectorService widgetInspectorService;
-        
+
         protected override void handleMetricsChanged() {
             base.handleMetricsChanged();
             foreach (WidgetsBindingObserver observer in this._observers) {
                 observer.didChangeMetrics();
             }
         }
-        
+
         protected override void handleTextScaleFactorChanged() {
             base.handleTextScaleFactorChanged();
             foreach (WidgetsBindingObserver observer in this._observers) {
                 observer.didChangeTextScaleFactor();
             }
-        }        
+        }
 
         protected virtual void handleLocaleChanged() {
             this.dispatchLocalesChanged(Window.instance.locales);
         }
-        
+
         protected virtual void dispatchLocalesChanged(List<Locale> locales) {
             foreach (WidgetsBindingObserver observer in this._observers) {
                 observer.didChangeLocales(locales);
@@ -118,8 +115,7 @@ namespace Unity.UIWidgets.widgets {
 
                 base.drawFrame();
                 this.buildOwner.finalizeTree();
-            }
-            finally {
+            } finally {
                 D.assert(() => {
                     this.debugBuildingDirtyElements = false;
                     return true;
@@ -243,10 +239,10 @@ namespace Unity.UIWidgets.widgets {
 
         void _rebuild() {
             try {
-                this._child = this.updateChild(this._child, this.widget.child, _rootChildSlot);
+                this._child = this.updateChild(this._child, this.widget.child,
+                    _rootChildSlot);
                 // allow 
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 var details = new UIWidgetsErrorDetails(
                     exception: ex,
                     library: "widgets library",

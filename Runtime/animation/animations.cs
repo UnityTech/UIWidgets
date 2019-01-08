@@ -91,7 +91,7 @@ namespace Unity.UIWidgets.animation {
         }
 
         public override string toStringDetails() {
-            return string.Format("{0} {1}; paused", base.toStringDetails(), this.value);
+            return $"{base.toStringDetails()} {this.value}; paused";
         }
     }
 
@@ -194,10 +194,10 @@ namespace Unity.UIWidgets.animation {
 
         public override string ToString() {
             if (this.parent == null) {
-                return string.Format("{0}(null; {1} {2:F3}", this.GetType(), this.toStringDetails(), this.value);
+                return $"{this.GetType()}(null; {this.toStringDetails()} {this.value:F3}";
             }
 
-            return string.Format("{0}\u27A9{1}", this.parent, this.GetType());
+            return $"{this.parent}\u27A9{this.GetType()}";
         }
     }
 
@@ -365,12 +365,12 @@ namespace Unity.UIWidgets.animation {
     public class TrainHoppingAnimation :
         AnimationLocalStatusListenersMixinAnimationLocalListenersMixinAnimationEagerListenerMixinAnimation<double> {
         public TrainHoppingAnimation(
-            Animation<double> _currentTrain = null,
-            Animation<double> _nextTrain = null,
+            Animation<double> currentTrain = null,
+            Animation<double> nextTrain = null,
             VoidCallback onSwitchedTrain = null) {
-            D.assert(_currentTrain != null);
-            this._currentTrain = _currentTrain;
-            this._nextTrain = _nextTrain;
+            D.assert(currentTrain != null);
+            this._currentTrain = currentTrain;
+            this._nextTrain = nextTrain;
             this.onSwitchedTrain = onSwitchedTrain;
 
             if (this._nextTrain != null) {
@@ -479,10 +479,10 @@ namespace Unity.UIWidgets.animation {
 
         public override string ToString() {
             if (this._nextTrain != null) {
-                return string.Format("{0}\u27A9{1}(next: {2})", this.currentTrain, this.GetType(), this._nextTrain);
+                return $"{this.currentTrain}\u27A9{this.GetType()}(next: {this._nextTrain})";
             }
 
-            return string.Format("{0}\u27A9{1}(no next)", this.currentTrain, this.GetType());
+            return $"{this.currentTrain}\u27A9{this.GetType()}(no next)";
         }
     }
 
@@ -518,14 +518,15 @@ namespace Unity.UIWidgets.animation {
 
         public override AnimationStatus status {
             get {
-                if (this.next.status == AnimationStatus.forward || this.next.status == AnimationStatus.reverse)
+                if (this.next.status == AnimationStatus.forward || this.next.status == AnimationStatus.reverse) {
                     return this.next.status;
+                }
                 return this.first.status;
             }
         }
 
         public override string ToString() {
-            return string.Format("{0}({1}, {2})", this.GetType(), this.first, this.next);
+            return $"{this.GetType()}({this.first}, {this.next})";
         }
 
         AnimationStatus _lastStatus;
@@ -540,7 +541,7 @@ namespace Unity.UIWidgets.animation {
         T _lastValue;
 
         void _maybeNotifyListeners() {
-            if (object.Equals(this.value, this._lastValue)) {
+            if (Equals(this.value, this._lastValue)) {
                 this._lastValue = this.value;
                 this.notifyListeners();
             }

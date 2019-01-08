@@ -84,7 +84,7 @@ namespace Unity.UIWidgets.rendering {
         ) : base(child) {
             D.assert(padding != null);
             D.assert(padding.isNonNegative);
-                
+
             this._padding = padding;
         }
 
@@ -93,7 +93,7 @@ namespace Unity.UIWidgets.rendering {
             set {
                 D.assert(value != null);
                 D.assert(value.isNonNegative);
-                
+
                 if (this._padding == value) {
                     return;
                 }
@@ -154,12 +154,13 @@ namespace Unity.UIWidgets.rendering {
             childParentData.offset = this._padding.topLeft;
             this.size = this.constraints.constrain(this._padding.inflateSize(this.child.size));
         }
-        
+
         protected override void debugPaintSize(PaintingContext context, Offset offset) {
             base.debugPaintSize(context, offset);
             D.assert(() => {
-                Rect outerRect = offset & size;
-                D.debugPaintPadding(context.canvas, outerRect, this.child != null ? this._padding.deflateRect(outerRect) : null);
+                Rect outerRect = offset & this.size;
+                D.debugPaintPadding(context.canvas, outerRect,
+                    this.child != null ? this._padding.deflateRect(outerRect) : null);
                 return true;
             });
         }
@@ -481,7 +482,7 @@ namespace Unity.UIWidgets.rendering {
                 this.child.layout(childConstraints, parentUsesSize: true);
                 this.size = this.constraints.constrain(this.child.size);
                 this.alignChild();
-                var childParentData = (BoxParentData) child.parentData;
+                var childParentData = (BoxParentData) this.child.parentData;
                 this._overflowContainerRect = Offset.zero & this.size;
                 this._overflowChildRect = childParentData.offset & this.child.size;
             } else {
@@ -729,7 +730,7 @@ namespace Unity.UIWidgets.rendering {
                 double? childBaseline = this.child.getDistanceToBaseline(this.baselineType);
                 double actualBaseline = this.baseline;
                 double top = actualBaseline - childBaseline.Value;
-                var childParentData = (BoxParentData) child.parentData;
+                var childParentData = (BoxParentData) this.child.parentData;
                 childParentData.offset = new Offset(0.0, top);
                 Size childSize = this.child.size;
                 this.size = this.constraints.constrain(new Size(childSize.width, top + childSize.height));

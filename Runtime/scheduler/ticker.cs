@@ -191,7 +191,7 @@ namespace Unity.UIWidgets.scheduler {
             });
         }
 
-        public readonly String debugLabel;
+        public readonly string debugLabel;
 
         StackTrace _debugCreationStack;
 

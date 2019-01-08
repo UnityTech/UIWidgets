@@ -39,7 +39,7 @@ namespace Unity.UIWidgets.animation {
         }
 
         public override string ToString() {
-            return string.Format("{0}({1})", this.GetType(), this.count);
+            return $"{this.GetType()}({this.count})";
         }
     }
 
@@ -77,10 +77,10 @@ namespace Unity.UIWidgets.animation {
 
         public override string ToString() {
             if (!(this.curve is _Linear)) {
-                return string.Format("{0}({1}\u22EF{2}\u27A9{3}", this.GetType(), this.begin, this.end, this.curve);
+                return $"{this.GetType()}({this.begin}\u22EF{this.end}\u27A9{this.curve}";
             }
 
-            return string.Format("{0}({1}\u22EF{2})", this.GetType(), this.begin, this.end);
+            return $"{this.GetType()}({this.begin}\u22EF{this.end})";
         }
     }
 
@@ -147,7 +147,7 @@ namespace Unity.UIWidgets.animation {
         }
 
         public override string ToString() {
-            return string.Format("{0}({1:F2}, {2:F2}, {3:F2}, {4:F2})", this.GetType(), this.a, this.b, this.c, this.d);
+            return $"{this.GetType()}({this.a:F2}, {this.b:F2}, {this.c:F2}, {this.d:F2})";
         }
     }
 
@@ -164,7 +164,7 @@ namespace Unity.UIWidgets.animation {
         }
 
         public override string ToString() {
-            return string.Format("{0}({1})", this.GetType(), this.curve);
+            return $"{this.GetType()}({this.curve})";
         }
     }
 
@@ -227,8 +227,8 @@ namespace Unity.UIWidgets.animation {
             return -Math.Pow(2.0, 10.0 * t) * Math.Sin((t - s) * (Math.PI * 2.0) / this.period);
         }
 
-        public override String ToString() {
-            return string.Format("{0}({1})", this.GetType(), this.period);
+        public override string ToString() {
+            return $"{this.GetType()}({this.period})";
         }
     }
 
@@ -245,8 +245,8 @@ namespace Unity.UIWidgets.animation {
             return Math.Pow(2.0, -10.0 * t) * Math.Sin((t - s) * (Math.PI * 2.0) / this.period) + 1.0;
         }
 
-        public override String ToString() {
-            return string.Format("{0}({1})", this.GetType(), this.period);
+        public override string ToString() {
+            return $"{this.GetType()}({this.period})";
         }
     }
 
@@ -268,8 +268,8 @@ namespace Unity.UIWidgets.animation {
             }
         }
 
-        public override String ToString() {
-            return string.Format("{0}({1})", this.GetType(), this.period);
+        public override string ToString() {
+            return $"{this.GetType()}({this.period})";
         }
     }
 

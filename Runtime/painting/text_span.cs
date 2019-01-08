@@ -7,89 +7,67 @@ using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.ui;
 using UnityEngine.Assertions;
 
-namespace Unity.UIWidgets.painting
-{
-    public class GestureMock
-    {
-        
-    }
-    public class TextSpan: DiagnosticableTree, IEquatable<TextSpan>
-    {
+namespace Unity.UIWidgets.painting {
+    public class TextSpan : DiagnosticableTree, IEquatable<TextSpan> {
         public delegate bool Visitor(TextSpan span);
+
         public readonly TextStyle style;
         public readonly string text;
         public readonly List<TextSpan> children;
         public readonly GestureRecognizer recognizer;
 
-        public TextSpan(string text = "", TextStyle style = null, List<TextSpan> children = null)
-        {
+        public TextSpan(string text = "", TextStyle style = null, List<TextSpan> children = null) {
             this.text = text;
             this.style = style;
             this.children = children;
         }
-        
-        public void build(ParagraphBuilder builder, double textScaleFactor = 1.0)
-        {
-            var hasTyle = style != null;
-            if (hasTyle)
-            {
-                builder.pushStyle(style);
+
+        public void build(ParagraphBuilder builder, double textScaleFactor = 1.0) {
+            var hasTyle = this.style != null;
+            if (hasTyle) {
+                builder.pushStyle(this.style);
             }
-            if (!string.IsNullOrEmpty(text))
-            {
-                builder.addText(text);
+            if (!string.IsNullOrEmpty(this.text)) {
+                builder.addText(this.text);
             }
-            if (children != null)
-            {
-                foreach (var child in children)
-                {
+            if (this.children != null) {
+                foreach (var child in this.children) {
                     Assert.IsNotNull(child);
                     child.build(builder, textScaleFactor);
                 }
             }
 
-            if (hasTyle)
-            {
+            if (hasTyle) {
                 builder.pop();
             }
         }
 
-        bool visitTextSpan(Visitor visitor)
-        {
-            if (!string.IsNullOrEmpty(text))
-            {
-                if (!visitor.Invoke(this))
-                {
+        bool visitTextSpan(Visitor visitor) {
+            if (!string.IsNullOrEmpty(this.text)) {
+                if (!visitor.Invoke(this)) {
                     return false;
                 }
             }
-            if (children != null)
-            {
-                foreach (var child in children)
-                {
-                    if (!child.visitTextSpan(visitor))
-                    {
+            if (this.children != null) {
+                foreach (var child in this.children) {
+                    if (!child.visitTextSpan(visitor)) {
                         return false;
                     }
                 }
-               
             }
             return true;
         }
 
-        TextSpan getSpanForPosition(TextPosition position)
-        {
+        TextSpan getSpanForPosition(TextPosition position) {
             var offset = 0;
             var targetOffset = position.offset;
             var affinity = position.affinity;
             TextSpan result = null;
-            visitTextSpan((span) =>
-            {
+            this.visitTextSpan((span) => {
                 var endOffset = offset + span.text.Length;
                 if ((targetOffset == offset && affinity == TextAffinity.downstream) ||
                     (targetOffset > offset && targetOffset < endOffset) ||
-                    (targetOffset == endOffset && affinity == TextAffinity.upstream))
-                {
+                    (targetOffset == endOffset && affinity == TextAffinity.upstream)) {
                     result = span;
                     return false;
                 }
@@ -100,30 +78,24 @@ namespace Unity.UIWidgets.painting
             return result;
         }
 
-        public string toPlainText()
-        {
+        public string toPlainText() {
             var sb = new StringBuilder();
-            visitTextSpan((span) =>
-            {
+            this.visitTextSpan((span) => {
                 sb.Append(span.text);
                 return true;
             });
             return sb.ToString();
         }
 
-        public int? codeUnitAt(int index)
-        {
-            if (index < 0)
-            {
+        public int? codeUnitAt(int index) {
+            if (index < 0) {
                 return null;
             }
 
             var offset = 0;
             int? result = null;
-            visitTextSpan(span =>
-            {
-                if (index - offset < span.text.Length)
-                {
+            this.visitTextSpan(span => {
+                if (index - offset < span.text.Length) {
                     result = span.text[index - offset];
                     return false;
                 }
@@ -134,50 +106,40 @@ namespace Unity.UIWidgets.painting
             return result;
         }
 
-        public RenderComparison compareTo(TextSpan other)
-        {
-            if (Equals(other))
-            {
+        public RenderComparison compareTo(TextSpan other) {
+            if (this.Equals(other)) {
                 return RenderComparison.identical;
             }
 
-            if (other.text != text 
-                || ((children == null) != (other.children == null))
-                || (children != null && other.children != null && children.Count != other.children.Count)
-                || ((style == null) != (other.style != null))
-            )
-            {
+            if (other.text != this.text
+                || ((this.children == null) != (other.children == null))
+                || (this.children != null && other.children != null && this.children.Count != other.children.Count)
+                || ((this.style == null) != (other.style != null))
+            ) {
                 return RenderComparison.layout;
             }
 
-            RenderComparison result = Equals(recognizer, other.recognizer)
+            RenderComparison result = Equals(this.recognizer, other.recognizer)
                 ? RenderComparison.identical
                 : RenderComparison.metadata;
-            if (style != null)
-            {
-                var candidate = style.compareTo(other.style);
-                if (candidate > result)
-                {
+            if (this.style != null) {
+                var candidate = this.style.compareTo(other.style);
+                if (candidate > result) {
                     result = candidate;
                 }
 
-                if (result == RenderComparison.layout)
-                {
+                if (result == RenderComparison.layout) {
                     return result;
                 }
             }
 
-            if (children != null)
-            {
-                for (var index = 0; index < children.Count; index++)
-                {
-                    var candidate = children[index].compareTo(other.children[index]);
-                    if (candidate > result)
-                    {
+            if (this.children != null) {
+                for (var index = 0; index < this.children.Count; index++) {
+                    var candidate = this.children[index].compareTo(other.children[index]);
+                    if (candidate > result) {
                         result = candidate;
                     }
-                    if (result == RenderComparison.layout)
-                    {
+                    if (result == RenderComparison.layout) {
                         return result;
                     }
                 }
@@ -186,50 +148,52 @@ namespace Unity.UIWidgets.painting
             return result;
         }
 
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((TextSpan) obj);
+        public override bool Equals(object obj) {
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
+            return this.Equals((TextSpan) obj);
         }
 
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                var hashCode = (style != null ? style.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (text != null ? text.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (childHash());
+        public override int GetHashCode() {
+            unchecked {
+                var hashCode = (this.style != null ? this.style.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (this.text != null ? this.text.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (this.childHash());
                 return hashCode;
             }
         }
 
-        public bool Equals(TextSpan other)
-        {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
-            return Equals(style, other.style) && string.Equals(text, other.text) && childEquals(children, other.children);
+        public bool Equals(TextSpan other) {
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
+            return Equals(this.style, other.style) && string.Equals(this.text, other.text) &&
+                   childEquals(this.children, other.children);
         }
-        
-        public static bool operator ==(TextSpan left, TextSpan right)
-        {
+
+        public static bool operator ==(TextSpan left, TextSpan right) {
             return Equals(left, right);
         }
 
-        public static bool operator !=(TextSpan left, TextSpan right)
-        {
+        public static bool operator !=(TextSpan left, TextSpan right) {
             return !Equals(left, right);
         }
-        private int childHash()
-        {
-            unchecked
-            {
+
+        int childHash() {
+            unchecked {
                 var hashCode = 0;
-                if (children != null)
-                {
-                    foreach (var child in children)
-                    {
+                if (this.children != null) {
+                    foreach (var child in this.children) {
                         hashCode = (hashCode * 397) ^ (child != null ? child.GetHashCode() : 0);
                     }
                 }
@@ -238,58 +202,49 @@ namespace Unity.UIWidgets.painting
             }
         }
 
-        private static bool childEquals(List<TextSpan> left, List<TextSpan> right)
-        {
-            if (ReferenceEquals(left, right))
-            {
+        static bool childEquals(List<TextSpan> left, List<TextSpan> right) {
+            if (ReferenceEquals(left, right)) {
                 return true;
             }
 
-            if (left == null || right == null)
-            {
+            if (left == null || right == null) {
                 return false;
             }
 
             return left.SequenceEqual(right);
         }
-        
+
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             properties.defaultDiagnosticsTreeStyle = DiagnosticsTreeStyle.whitespace;
             // Properties on style are added as if they were properties directly on
             // this TextSpan.
-            if (style != null)
-            {
-                style.debugFillProperties(properties);
-            }    
+            if (this.style != null) {
+                this.style.debugFillProperties(properties);
+            }
 
             properties.add(new DiagnosticsProperty<GestureRecognizer>(
-                "recognizer", recognizer,
-                description: recognizer == null ? "" : recognizer.GetType().FullName,
+                "recognizer", this.recognizer,
+                description: this.recognizer == null ? "" : this.recognizer.GetType().FullName,
                 defaultValue: Diagnostics.kNullDefaultValue
             ));
 
-            properties.add(new StringProperty("text", text, showName: false, defaultValue: Diagnostics.kNullDefaultValue));
-            if (style == null && text == null && children == null)
-            {
-                properties.add(DiagnosticsNode.message("(empty)"));                
+            properties.add(new StringProperty("text", this.text, showName: false,
+                defaultValue: Diagnostics.kNullDefaultValue));
+            if (this.style == null && this.text == null && this.children == null) {
+                properties.add(DiagnosticsNode.message("(empty)"));
             }
         }
 
         public override List<DiagnosticsNode> debugDescribeChildren() {
-            if (children == null)
-            {
+            if (this.children == null) {
                 return new List<DiagnosticsNode>();
             }
 
-            return children.Select((child) =>
-            {
-                if (child != null)
-                {
+            return this.children.Select((child) => {
+                if (child != null) {
                     return child.toDiagnosticsNode();
-                }
-                else
-                {
+                } else {
                     return DiagnosticsNode.message("<null child>");
                 }
             }).ToList();

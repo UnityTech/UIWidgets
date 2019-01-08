@@ -26,12 +26,11 @@ namespace Unity.UIWidgets.painting {
 
         protected override
             IPromise<AssetBundleImageKey> obtainKey(ImageConfiguration configuration) {
-
             AssetBundleImageKey key;
             if (this._cache.TryGetValue(configuration, out key)) {
                 return Promise<AssetBundleImageKey>.Resolved(key);
             }
-            
+
             AssetBundle chosenBundle = this.bundle ? this.bundle : configuration.bundle;
             var devicePixelRatio = configuration.devicePixelRatio ?? Window.instance.devicePixelRatio;
             var coroutine = Window.instance.startCoroutine(this._loadAssetAsync(chosenBundle, devicePixelRatio));
@@ -63,13 +62,13 @@ namespace Unity.UIWidgets.painting {
                     asset = request.asset;
                 }
 
-                if (asset != null) {                    
+                if (asset != null) {
                     if (bundle == null) {
                         Resources.UnloadAsset(asset);
                     } else {
                         bundle.Unload(asset);
                     }
-                    
+
                     yield return new AssetBundleImageKey(
                         bundle,
                         assetName,
@@ -78,7 +77,7 @@ namespace Unity.UIWidgets.painting {
                     yield break;
                 }
             }
-            
+
             yield return new AssetBundleImageKey(
                 bundle,
                 this.assetName,
@@ -87,21 +86,32 @@ namespace Unity.UIWidgets.painting {
         }
 
         public bool Equals(AssetImage other) {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
             return string.Equals(this.assetName, other.assetName) && Equals(this.bundle, other.bundle);
         }
 
         public override bool Equals(object obj) {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
             return this.Equals((AssetImage) obj);
         }
 
         public override int GetHashCode() {
             unchecked {
-                return ((this.assetName != null ? this.assetName.GetHashCode() : 0) * 397) ^ (this.bundle != null ? this.bundle.GetHashCode() : 0);
+                return ((this.assetName != null ? this.assetName.GetHashCode() : 0) * 397) ^
+                       (this.bundle != null ? this.bundle.GetHashCode() : 0);
             }
         }
 

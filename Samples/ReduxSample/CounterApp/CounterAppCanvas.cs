@@ -6,9 +6,9 @@ using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
+using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace Unity.UIWidgets.Sample.Redux {
-
     public class CounterAppCanvas : WidgetCanvas {
         protected override Widget getWidget() {
             return new CounterApp();
@@ -31,9 +31,9 @@ namespace Unity.UIWidgets.Sample.Redux {
 
     public class CounterApp : StatelessWidget {
         public override Widget build(BuildContext context) {
-            var store = new Store<CouterState>(reduce, new CouterState(), ReduxLogging.Create<CouterState>());
-            return new StoreProvider<CouterState>(store, createWidget());
-
+            var store = new Store<CouterState>(reduce, new CouterState(),
+                ReduxLogging.Create<CouterState>());
+            return new StoreProvider<CouterState>(store, this.createWidget());
         }
 
         public static CouterState reduce(CouterState state, object action) {
@@ -44,39 +44,37 @@ namespace Unity.UIWidgets.Sample.Redux {
             return new CouterState(inc.amount + state.count);
         }
 
-        private Widget createWidget() {
+        Widget createWidget() {
             return new Container(
                 height: 200.0,
                 padding: EdgeInsets.all(10),
-                    decoration: new BoxDecoration(
-                        color: new ui.Color(0xFF7F7F7F),
-                        border: Border.all(color: ui.Color.fromARGB(255, 255, 0, 0), width: 5),
-                        borderRadius: BorderRadius.all(2)),
+                decoration: new BoxDecoration(
+                    color: new Color(0xFF7F7F7F),
+                    border: Border.all(color: Color.fromARGB(255, 255, 0, 0), width: 5),
+                    borderRadius: BorderRadius.all(2)),
                 child: new Column(
-                    children: new List<Widget>(){
+                    children: new List<Widget>() {
                         new StoreConnector<CouterState, string>(
-                            converter: (state, dispatch) => string.Format("Count:{0}", state.count),
-                            builder: (context, countText) => new Text(countText, style: new painting.TextStyle(
+                            converter: (state, dispatch) => $"Count:{state.count}",
+                            builder: (context, countText) => new Text(countText, style: new TextStyle(
                                 fontSize: 20, fontWeight: FontWeight.w700
                             ))
                         ),
                         new StoreConnector<CouterState, Action>(
-                            converter: (state, dispatch) => () => {dispatch(new CounterIncAction() {amount = 1});},
-                            builder: (context, onPress) =>  new CustomButton(
+                            converter: (state, dispatch) => () => { dispatch(new CounterIncAction() {amount = 1}); },
+                            builder: (context, onPress) => new CustomButton(
                                 backgroundColor: Color.fromARGB(255, 0, 204, 204),
                                 padding: EdgeInsets.all(10),
-                                child: new Text("Add", style: new painting.TextStyle(
+                                child: new Text("Add", style: new TextStyle(
                                     fontSize: 16, color: Color.fromARGB(255, 255, 255, 255)
-                            )), onPressed: () =>
-                            {
-                                onPress();
-                            })
+                                )), onPressed: () => { onPress(); })
                         ),
                     }
                 )
             );
         }
     }
+
     public class CustomButton : StatelessWidget {
         public CustomButton(
             Key key = null,

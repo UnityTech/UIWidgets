@@ -182,17 +182,14 @@ namespace Unity.UIWidgets.widgets {
                 double delta = value - this.pixels;
                 if (result.abs() > delta.abs()) {
                     throw new UIWidgetsError(
-                        string.Format(
-                            "{0}.applyBoundaryConditions returned invalid overscroll value.\n" +
-                            "The method was called to consider a change from {1} to {2}, which is a " +
-                            "delta of {3:F1} units. However, it returned an overscroll of " +
-                            "${4:F1} units, which has a greater magnitude than the delta. " +
-                            "The applyBoundaryConditions method is only supposed to reduce the possible range " +
-                            "of movement, not increase it.\n" +
-                            "The scroll extents are {5} .. {6}, and the " +
-                            "viewport dimension is {7}.",
-                            this.physics.GetType(), this.pixels, value, delta, result,
-                            this.minScrollExtent, this.maxScrollExtent, this.viewportDimension));
+                        $"{this.physics.GetType()}.applyBoundaryConditions returned invalid overscroll value.\n" +
+                        $"The method was called to consider a change from {this.pixels} to {value}, which is a " +
+                        $"delta of {delta:F1} units. However, it returned an overscroll of " +
+                        $"${result:F1} units, which has a greater magnitude than the delta. " +
+                        "The applyBoundaryConditions method is only supposed to reduce the possible range " +
+                        "of movement, not increase it.\n" +
+                        $"The scroll extents are {this.minScrollExtent} .. {this.maxScrollExtent}, and the " +
+                        $"viewport dimension is {this.viewportDimension}.");
                 }
 
                 return true;
@@ -343,14 +340,14 @@ namespace Unity.UIWidgets.widgets {
             base.dispose();
         }
 
-        protected override void debugFillDescription(List<String> description) {
+        protected override void debugFillDescription(List<string> description) {
             if (this.debugLabel != null) {
                 description.Add(this.debugLabel);
             }
 
             base.debugFillDescription(description);
-            description.Add(string.Format("range: {0:F1}..{1:F1}", this._minScrollExtent, this._maxScrollExtent));
-            description.Add(string.Format("viewport: {0:F1}", this._viewportDimension));
+            description.Add($"range: {this._minScrollExtent:F1}..{this._maxScrollExtent:F1}");
+            description.Add($"viewport: {this._viewportDimension:F1}");
         }
     }
 }

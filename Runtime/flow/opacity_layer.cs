@@ -2,7 +2,7 @@
 
 namespace Unity.UIWidgets.flow {
     public class OpacityLayer : ContainerLayer {
-        private int _alpha;
+        int _alpha;
 
         public int alpha {
             set { this._alpha = value; }
@@ -15,8 +15,7 @@ namespace Unity.UIWidgets.flow {
             canvas.saveLayer(this.paintBounds, paint);
             try {
                 this.paintChildren(context);
-            }
-            finally {
+            } finally {
                 canvas.restore();
             }
         }

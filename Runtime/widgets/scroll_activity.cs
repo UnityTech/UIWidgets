@@ -129,8 +129,9 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public override void dispose() {
-            if (this.onHoldCanceled != null)
+            if (this.onHoldCanceled != null) {
                 this.onHoldCanceled();
+            }
             base.dispose();
         }
     }
@@ -198,7 +199,8 @@ namespace Unity.UIWidgets.widgets {
             if (this._retainMomentum &&
                 offset == 0.0 &&
                 (timestamp == null ||
-                 timestamp - this._lastNonStationaryTimestamp > momentumRetainStationaryDurationThreshold)) {
+                 timestamp - this._lastNonStationaryTimestamp >
+                 momentumRetainStationaryDurationThreshold)) {
                 this._retainMomentum = false;
             }
         }
@@ -211,7 +213,8 @@ namespace Unity.UIWidgets.widgets {
             if (offset == 0.0) {
                 if (this.motionStartDistanceThreshold != null &&
                     this._offsetSinceLastStop == null &&
-                    timestamp - this._lastNonStationaryTimestamp > motionStoppedDurationThreshold) {
+                    timestamp - this._lastNonStationaryTimestamp >
+                    motionStoppedDurationThreshold) {
                     this._offsetSinceLastStop = 0.0;
                 }
 
@@ -357,7 +360,7 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public override string ToString() {
-            return string.Format("{0}({1})", Diagnostics.describeIdentity(this), this._controller);
+            return $"{Diagnostics.describeIdentity(this)}({this._controller})";
         }
     }
 
@@ -426,7 +429,7 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public override string ToString() {
-            return string.Format("{0}({1})", Diagnostics.describeIdentity(this), this._controller);
+            return $"{Diagnostics.describeIdentity(this)}({this._controller})";
         }
     }
 
@@ -497,7 +500,7 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public override string ToString() {
-            return string.Format("{0}({1})", Diagnostics.describeIdentity(this), this._controller);
+            return $"{Diagnostics.describeIdentity(this)}({this._controller})";
         }
     }
 }

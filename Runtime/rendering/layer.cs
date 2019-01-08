@@ -1,9 +1,6 @@
 ﻿using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
-using Unity.UIWidgets.painting;
-using UnityEngine;
-using Rect = Unity.UIWidgets.ui.Rect;
 
 namespace Unity.UIWidgets.rendering {
     public abstract class Layer : AbstractNodeMixinDiagnosticableTree {
@@ -49,8 +46,9 @@ namespace Unity.UIWidgets.rendering {
 
             D.assert(() => {
                 Layer node = this;
-                while (node.parent != null)
+                while (node.parent != null) {
                     node = node.parent;
+                }
                 D.assert(node != newLayer);
                 return true;
             });
@@ -179,8 +177,9 @@ namespace Unity.UIWidgets.rendering {
             D.assert(child.previousSibling == null);
             D.assert(() => {
                 Layer node = this;
-                while (node.parent != null)
+                while (node.parent != null) {
                     node = node.parent;
+                }
                 D.assert(node != child);
                 return true;
             });

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Unity.UIWidgets.async {
     public class PriorityQueue<T> where T : IComparable<T> {
-        private readonly List<T> _data;
+        readonly List<T> _data;
 
         public PriorityQueue() {
             this._data = new List<T>();

@@ -72,8 +72,7 @@ namespace Unity.UIWidgets.animation {
                     if (this._listeners.Contains(listener)) {
                         listener();
                     }
-                }
-                catch (Exception exception) {
+                } catch (Exception exception) {
                     UIWidgetsError.reportError(new UIWidgetsErrorDetails(
                         exception: exception,
                         library: "animation library",
@@ -110,8 +109,7 @@ namespace Unity.UIWidgets.animation {
                     if (this._listeners.Contains(listener)) {
                         listener();
                     }
-                }
-                catch (Exception exception) {
+                } catch (Exception exception) {
                     UIWidgetsError.reportError(new UIWidgetsErrorDetails(
                         exception: exception,
                         library: "animation library",
@@ -149,8 +147,7 @@ namespace Unity.UIWidgets.animation {
                     if (this._statusListeners.Contains(listener)) {
                         listener(status);
                     }
-                }
-                catch (Exception exception) {
+                } catch (Exception exception) {
                     UIWidgetsError.reportError(new UIWidgetsErrorDetails(
                         exception: exception,
                         library: "animation library",
@@ -187,8 +184,7 @@ namespace Unity.UIWidgets.animation {
                     if (this._statusListeners.Contains(listener)) {
                         listener(status);
                     }
-                }
-                catch (Exception exception) {
+                } catch (Exception exception) {
                     UIWidgetsError.reportError(new UIWidgetsErrorDetails(
                         exception: exception,
                         library: "animation library",
@@ -225,8 +221,7 @@ namespace Unity.UIWidgets.animation {
                     if (this._statusListeners.Contains(listener)) {
                         listener(status);
                     }
-                }
-                catch (Exception exception) {
+                } catch (Exception exception) {
                     UIWidgetsError.reportError(new UIWidgetsErrorDetails(
                         exception: exception,
                         library: "animation library",

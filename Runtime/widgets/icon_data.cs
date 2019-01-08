@@ -15,16 +15,26 @@ namespace Unity.UIWidgets.widgets {
         public readonly string fontFamily;
 
         public bool Equals(IconData other) {
-            if (object.ReferenceEquals(null, other)) return false;
-            if (object.ReferenceEquals(this, other)) return true;
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
             return this.codePoint == other.codePoint &&
                    string.Equals(this.fontFamily, other.fontFamily);
         }
 
         public override bool Equals(object obj) {
-            if (object.ReferenceEquals(null, obj)) return false;
-            if (object.ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
             return this.Equals((IconData) obj);
         }
 
@@ -35,11 +45,11 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public static bool operator ==(IconData left, IconData right) {
-            return object.Equals(left, right);
+            return Equals(left, right);
         }
 
         public static bool operator !=(IconData left, IconData right) {
-            return !object.Equals(left, right);
+            return !Equals(left, right);
         }
 
         public override string ToString() {
