@@ -15,7 +15,7 @@
 1. Use JetBrains Rider
 
 2. Open File -> Settings Repository....
-Specify Upstream URL as "https://gitlab.cds.internal.unity3d.com/upm-packages/ui-widgets/idea-settings"
+Specify Upstream URL as "git@gitlab.cds.internal.unity3d.com:upm-packages/ui-widgets/idea-settings.git"
 and click "Overwrite Local" or "Merge".
 
 REF: https://www.jetbrains.com/help/idea/sharing-your-ide-settings.html#settings-repository
