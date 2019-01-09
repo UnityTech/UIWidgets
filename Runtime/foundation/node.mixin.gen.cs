@@ -57,8 +57,9 @@ namespace Unity.UIWidgets.foundation {
             D.assert(child._parent == null);
             D.assert(() => {
                 var node = this;
-                while (node.parent != null)
+                while (node.parent != null) {
                     node = node.parent;
+                }
                 D.assert(node != child); // indicates we are about to create a cycle
                 return true;
             });
@@ -136,8 +137,9 @@ namespace Unity.UIWidgets.foundation {
             D.assert(child._parent == null);
             D.assert(() => {
                 var node = this;
-                while (node.parent != null)
+                while (node.parent != null) {
                     node = node.parent;
+                }
                 D.assert(node != child); // indicates we are about to create a cycle
                 return true;
             });

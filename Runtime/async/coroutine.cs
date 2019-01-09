@@ -54,7 +54,7 @@ namespace Unity.UIWidgets.async {
                 this.isDone = true;
                 this.lastResult = null;
                 if (this._isBackground) {
-                    Timer.runInMain(() => { this._window.run(() => { this._promise.Reject(lastError); }); });
+                    this._window.runInMain(() => { this._promise.Reject(lastError); });
                 } else {
                     this._promise.Reject(lastError);
                 }
@@ -76,7 +76,7 @@ namespace Unity.UIWidgets.async {
                 this.isDone = true;
                 D.assert(this.lastError == null);
                 if (this._isBackground) {
-                    Timer.runInMain(() => { this._window.run(() => { this._promise.Resolve(this.lastResult); }); });
+                    this._window.runInMain(() => { this._promise.Resolve(this.lastResult); });
                 } else {
                     this._promise.Resolve(this.lastResult);
                 }

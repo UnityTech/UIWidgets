@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Unity.UIWidgets.foundation;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -32,13 +33,7 @@ namespace Unity.UIWidgets.async {
 
         static LinkedList<Action> _callbacks = new LinkedList<Action>();
 
-        internal static void runInMainFromFinalizer(Action callback) {
-            lock (_syncObj) {
-                _callbacks.AddLast(callback);
-            }
-        }
-
-        public static void runInMain(Action callback) {
+        public static void runInMainFromFinalizer(Action callback) {
             lock (_syncObj) {
                 _callbacks.AddLast(callback);
             }
@@ -48,6 +43,10 @@ namespace Unity.UIWidgets.async {
             LinkedList<Action> callbacks;
 
             lock (_syncObj) {
+                if (_callbacks.isEmpty()) {
+                    return;
+                }
+
                 callbacks = _callbacks;
                 _callbacks = new LinkedList<Action>();
             }
@@ -69,17 +68,30 @@ namespace Unity.UIWidgets.async {
             this._queue = new PriorityQueue<TimerImpl>();
         }
 
+        public Timer runInMain(Action callback) {
+            var timer = new TimerImpl(callback);
+
+            lock (this._queue) {
+                this._queue.enqueue(timer);
+            }
+            return timer;
+        }
+        
         public Timer run(TimeSpan duration, Action callback) {
             var timer = new TimerImpl(duration, callback);
 
-            this._queue.enqueue(timer);
+            lock (this._queue) {
+                this._queue.enqueue(timer);
+            }
             return timer;
         }
 
         public Timer periodic(TimeSpan duration, Action callback) {
             var timer = new TimerImpl(duration, callback, periodic: true);
 
-            this._queue.enqueue(timer);
+            lock (this._queue) {
+                this._queue.enqueue(timer);
+            }
             return timer;
         }
 
@@ -89,13 +101,15 @@ namespace Unity.UIWidgets.async {
             List<TimerImpl> timers = null;
             List<TimerImpl> appendList = null;
 
-            while (this._queue.count > 0 && this._queue.peek().deadline <= now) {
-                var timer = this._queue.dequeue();
-                if (timers == null) {
-                    timers = new List<TimerImpl>();
-                }
+            lock (this._queue) {
+                while (this._queue.count > 0 && this._queue.peek().deadline <= now) {
+                    var timer = this._queue.dequeue();
+                    if (timers == null) {
+                        timers = new List<TimerImpl>();
+                    }
 
-                timers.Add(timer);
+                    timers.Add(timer);
+                }
             }
 
             if (timers != null) {
@@ -116,27 +130,37 @@ namespace Unity.UIWidgets.async {
             }
 
             if (appendList != null) {
-                foreach (var timer in appendList) {
-                    this._queue.enqueue(timer);
+                lock (this._queue) {
+                    foreach (var timer in appendList) {
+                        this._queue.enqueue(timer);
+                    }                    
                 }
             }
         }
 
         class TimerImpl : Timer, IComparable<TimerImpl> {
-            public readonly bool periodic;
-            public readonly TimeSpan internval;
             double _deadline;
             readonly Action _callback;
             bool _done;
 
+            public readonly bool periodic;
+            readonly TimeSpan _interval;
+
             public TimerImpl(TimeSpan duration, Action callback, bool periodic = false) {
                 this._deadline = timeSinceStartup + duration.TotalSeconds;
                 this._callback = callback;
-                this.periodic = periodic;
                 this._done = false;
+
+                this.periodic = periodic;
                 if (periodic) {
-                    this.internval = duration;
+                    this._interval = duration;
                 }
+            }
+            
+            public TimerImpl(Action callback) {
+                this._deadline = 0;
+                this._callback = callback;
+                this._done = false;
             }
 
             public double deadline {
@@ -168,7 +192,7 @@ namespace Unity.UIWidgets.async {
                 }
 
                 if (this.periodic) {
-                    this._deadline = now + this.internval.TotalSeconds;
+                    this._deadline = now + this._interval.TotalSeconds;
                 }
             }
 

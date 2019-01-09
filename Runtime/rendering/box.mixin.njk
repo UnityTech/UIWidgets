@@ -62,8 +62,9 @@ namespace Unity.UIWidgets.rendering {
             while (child != null)
             {
                 ParentDataType childParentData = (ParentDataType) child.parentData;
-                if (child.hitTest(result, position: position - childParentData.offset))
+                if (child.hitTest(result, position: position - childParentData.offset)) {
                     return true;
+                }
                 child = childParentData.previousSibling;
             }
             return false;

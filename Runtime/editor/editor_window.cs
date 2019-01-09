@@ -354,6 +354,10 @@ namespace Unity.UIWidgets.editor {
                 : this._timerProvider.run(duration, callback);
         }
 
+        public override Timer runInMain(Action callback) {
+            return this._timerProvider.runInMain(callback);
+        }
+
         public void attachRootRenderBox(RenderBox root) {
             using (this.getScope()) {
                 this._binding.renderView.child = root;
