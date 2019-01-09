@@ -1100,6 +1100,36 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
+    public class AbsorbPointer : SingleChildRenderObjectWidget {
+
+        public AbsorbPointer(
+            Key key = null,
+            bool absorbing = true,
+            Widget child = null
+        ) : base(key: key, child: child) {
+        
+        }
+    
+        public readonly bool absorbing;
+    
+     
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderAbsorbPointer(
+                absorbing: absorbing
+            );
+        }
+    
+        public override void updateRenderObject(BuildContext context, RenderObject renderObject)
+        {
+            ((RenderAbsorbPointer) renderObject).absorbing = absorbing;
+        }
+    
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new DiagnosticsProperty<bool>("absorbing", absorbing));
+        }
+    }
+
     public class Builder : StatelessWidget {
         public Builder(
             Key key = null,

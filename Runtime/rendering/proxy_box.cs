@@ -946,4 +946,38 @@ namespace Unity.UIWidgets.rendering {
             properties.add(new DiagnosticsProperty<bool>("ignoring", this.ignoring));
         }
     }
+    
+    public class RenderAbsorbPointer : RenderProxyBox {
+          
+        public RenderAbsorbPointer(
+            RenderBox child = null,
+            bool absorbing = true
+          ) : base(child)
+          {
+              _absorbing = absorbing;
+            }
+
+
+        public bool absorbing
+        {
+            get { return _absorbing; }
+            set
+            {
+                _absorbing = value;
+            }
+        }
+        bool _absorbing;
+     
+        public override bool hitTest(HitTestResult result, Offset position) {
+            return absorbing
+                ? size.contains(position)
+                : base.hitTest(result, position: position);
+        }
+    
+     
+      public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+        base.debugFillProperties(properties);
+        properties.add(new DiagnosticsProperty<bool>("absorbing", absorbing));
+      }
+    }
 }
