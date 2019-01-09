@@ -60,14 +60,16 @@ namespace Unity.UIWidgets.foundation {
                                 addPrefix = true;
                             }
 
-                            if (lastWordEnd >= message.Length)
+                            if (lastWordEnd >= message.Length) {
                                 yield break;
+                            }
                             // just yield returned a line
                             if (lastWordEnd == index) {
                                 // we broke at current position
                                 // eat all the spaces, then set our start point
-                                while ((index < message.Length) && (message[index] == ' '))
+                                while ((index < message.Length) && (message[index] == ' ')) {
                                     index += 1;
+                                }
                                 start = index;
                                 mode = _WordWrapParseMode.inWord;
                             } else {

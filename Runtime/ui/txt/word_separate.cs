@@ -1,44 +1,31 @@
-﻿using System;
-
-namespace Unity.UIWidgets.ui
-{
-    public class WordSeparate
-    {
-        
-        enum Direction
-        {
+﻿namespace Unity.UIWidgets.ui {
+    public class WordSeparate {
+        enum Direction {
             Forward,
             Backward,
         }
-        
-        enum characterType
-        {
+
+        enum characterType {
             LetterLike,
             Symbol,
             WhiteSpace
         }
 
-        private string _text;
+        string _text;
 
-        public WordSeparate(string text)
-        {
+        public WordSeparate(string text) {
             this._text = text;
         }
-        
-        public IndexRange findWordRange(int index)
-        {
-            if (index >= _text.Length)
-            {
+
+        public IndexRange findWordRange(int index) {
+            if (index >= this._text.Length) {
                 return new IndexRange(0, 0);
             }
-            var t = classifyChar(index);
+            var t = this.classifyChar(index);
             int start = index;
-            for (int i = index; i >= 0; --i)
-            {
-                if (!char.IsLowSurrogate(_text[start]))
-                {
-                    if (classifyChar(i) != t)
-                    {
+            for (int i = index; i >= 0; --i) {
+                if (!char.IsLowSurrogate(this._text[start])) {
+                    if (this.classifyChar(i) != t) {
                         break;
                     }
                     start = i;
@@ -46,12 +33,9 @@ namespace Unity.UIWidgets.ui
             }
 
             int end = index;
-            for (int i = index; i < _text.Length; ++i)
-            {
-                if (!char.IsLowSurrogate(_text[i]))
-                {
-                    if (classifyChar(i) != t)
-                    {
+            for (int i = index; i < this._text.Length; ++i) {
+                if (!char.IsLowSurrogate(this._text[i])) {
+                    if (this.classifyChar(i) != t) {
                         break;
                     }
                     end = i;
@@ -60,15 +44,15 @@ namespace Unity.UIWidgets.ui
             return new IndexRange(start, end + 1);
         }
 
-        
-        private characterType classifyChar(int index)
-        {
-            if (char.IsWhiteSpace(_text, index))
+
+        characterType classifyChar(int index) {
+            if (char.IsWhiteSpace(this._text, index)) {
                 return characterType.WhiteSpace;
-            if (char.IsLetterOrDigit(_text, index) || _text[index] == '\'')
+            }
+            if (char.IsLetterOrDigit(this._text, index) || this._text[index] == '\'') {
                 return characterType.LetterLike;
+            }
             return characterType.Symbol;
         }
-
     }
 }

@@ -98,11 +98,12 @@ namespace Unity.UIWidgets.gestures {
 
         void _checkDown() {
             if (!this._sentTapDown) {
-                if (this.onTapDown != null)
+                if (this.onTapDown != null) {
                     this.invokeCallback<object>("onTapDown", () => {
                         this.onTapDown(new TapDownDetails(globalPosition: this.initialPosition));
                         return null;
                     });
+                }
                 this._sentTapDown = true;
             }
         }
@@ -114,11 +115,12 @@ namespace Unity.UIWidgets.gestures {
                     return;
                 }
 
-                if (this.onTapUp != null)
+                if (this.onTapUp != null) {
                     this.invokeCallback<object>("onTapUp", () => {
                         this.onTapUp(new TapUpDetails(globalPosition: this._finalPosition));
                         return null;
                     });
+                }
                 if (this.onTap != null) {
                     this.invokeCallback<object>("onTap", () => {
                         this.onTap();
@@ -145,9 +147,9 @@ namespace Unity.UIWidgets.gestures {
             properties.add(new FlagProperty("wonArenaForPrimaryPointer",
                 value: this._wonArenaForPrimaryPointer,
                 ifTrue: "won arena"));
-            properties.add(new DiagnosticsProperty<Offset>("finalPosition", 
+            properties.add(new DiagnosticsProperty<Offset>("finalPosition",
                 this._finalPosition, defaultValue: Diagnostics.kNullDefaultValue));
-            properties.add(new FlagProperty("sentTapDown", 
+            properties.add(new FlagProperty("sentTapDown",
                 value: this._sentTapDown, ifTrue: "sent tap down"));
         }
     }

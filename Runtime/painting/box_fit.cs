@@ -1,5 +1,5 @@
-using Unity.UIWidgets.ui;
 using System;
+using Unity.UIWidgets.ui;
 
 namespace Unity.UIWidgets.painting {
     public enum BoxFit {
@@ -23,8 +23,9 @@ namespace Unity.UIWidgets.painting {
 
         public static FittedSizes applyBoxFit(BoxFit fit, Size inputSize, Size outputSize) {
             if (inputSize.height <= 0.0 || inputSize.width <= 0.0 || outputSize.height <= 0.0 ||
-                outputSize.width <= 0.0)
+                outputSize.width <= 0.0) {
                 return new FittedSizes(Size.zero, Size.zero);
+            }
             Size sourceSize = null;
             Size destinationSize = null;
             switch (fit) {
@@ -34,21 +35,23 @@ namespace Unity.UIWidgets.painting {
                     break;
                 case BoxFit.contain:
                     sourceSize = inputSize;
-                    if (outputSize.width / outputSize.height > sourceSize.width / sourceSize.height)
+                    if (outputSize.width / outputSize.height > sourceSize.width / sourceSize.height) {
                         destinationSize = new Size(sourceSize.width * outputSize.height / sourceSize.height,
                             outputSize.height);
-                    else
+                    } else {
                         destinationSize = new Size(outputSize.width,
                             sourceSize.height * outputSize.width / sourceSize.width);
+                    }
                     break;
                 case BoxFit.cover:
                     if (outputSize.width / outputSize.height > inputSize.width / inputSize.height) {
                         sourceSize = new Size(inputSize.width, inputSize.width * outputSize.height / outputSize.width);
                     } else {
-                        sourceSize = new Size(inputSize.height * outputSize.width / outputSize.height, inputSize.height);
+                        sourceSize = new Size(inputSize.height * outputSize.width / outputSize.height,
+                            inputSize.height);
                     }
                     destinationSize = outputSize;
-                    break; 
+                    break;
                 case BoxFit.fitWidth:
                     sourceSize = new Size(inputSize.width, inputSize.width * outputSize.height / outputSize.width);
                     destinationSize = new Size(outputSize.width,
@@ -68,10 +71,12 @@ namespace Unity.UIWidgets.painting {
                     sourceSize = inputSize;
                     destinationSize = inputSize;
                     double aspectRatio = inputSize.width / inputSize.height;
-                    if (destinationSize.height > outputSize.height)
+                    if (destinationSize.height > outputSize.height) {
                         destinationSize = new Size(outputSize.height * aspectRatio, outputSize.height);
-                    if (destinationSize.width > outputSize.width)
+                    }
+                    if (destinationSize.width > outputSize.width) {
                         destinationSize = new Size(outputSize.width, outputSize.width / aspectRatio);
+                    }
                     break;
             }
 

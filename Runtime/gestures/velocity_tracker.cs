@@ -46,15 +46,25 @@ namespace Unity.UIWidgets.gestures {
         }
 
         public bool Equals(Velocity other) {
-            if (object.ReferenceEquals(null, other)) return false;
-            if (object.ReferenceEquals(this, other)) return true;
-            return object.Equals(this.pixelsPerSecond, other.pixelsPerSecond);
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
+            return Equals(this.pixelsPerSecond, other.pixelsPerSecond);
         }
 
         public override bool Equals(object obj) {
-            if (object.ReferenceEquals(null, obj)) return false;
-            if (object.ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
             return this.Equals((Velocity) obj);
         }
 
@@ -63,15 +73,15 @@ namespace Unity.UIWidgets.gestures {
         }
 
         public static bool operator ==(Velocity left, Velocity right) {
-            return object.Equals(left, right);
+            return Equals(left, right);
         }
 
         public static bool operator !=(Velocity left, Velocity right) {
-            return !object.Equals(left, right);
+            return !Equals(left, right);
         }
 
         public override string ToString() {
-            return string.Format("Velocity({0:F1}, {1:F1})", this.pixelsPerSecond.dx, this.pixelsPerSecond.dy);
+            return $"Velocity({this.pixelsPerSecond.dx:F1}, {this.pixelsPerSecond.dy:F1})";
         }
     }
 
@@ -99,8 +109,8 @@ namespace Unity.UIWidgets.gestures {
         public readonly Offset offset;
 
         public override string ToString() {
-            return string.Format("VelocityEstimate({0:F1}, {1:F1}; offset: {2}, duration: {3}, confidence: {4:F1})",
-                this.pixelsPerSecond.dx, this.pixelsPerSecond.dy, this.offset, this.duration, this.confidence);
+            return
+                $"VelocityEstimate({this.pixelsPerSecond.dx:F1}, {this.pixelsPerSecond.dy:F1}; offset: {this.offset}, duration: {this.duration}, confidence: {this.confidence:F1})";
         }
     }
 
@@ -116,7 +126,7 @@ namespace Unity.UIWidgets.gestures {
         public readonly TimeSpan time;
 
         public override string ToString() {
-            return string.Format("_PointAtTime({0} at {1})", this.point, this.time);
+            return $"_PointAtTime({this.point} at {this.time})";
         }
     }
 
@@ -126,7 +136,9 @@ namespace Unity.UIWidgets.gestures {
         const int _horizonMilliseconds = 100;
         const int _minSampleSize = 3;
 
-        readonly List<_PointAtTime> _samples = Enumerable.Repeat<_PointAtTime>(null, _historySize).ToList();
+        readonly List<_PointAtTime> _samples =
+            Enumerable.Repeat<_PointAtTime>(null, _historySize).ToList();
+
         int _index = 0;
 
         public void addPosition(TimeSpan time, Offset position) {
@@ -156,13 +168,15 @@ namespace Unity.UIWidgets.gestures {
 
             do {
                 _PointAtTime sample = this._samples[index];
-                if (sample == null)
+                if (sample == null) {
                     break;
+                }
 
                 double age = (newestSample.time - sample.time).TotalMilliseconds;
                 double delta = Math.Abs((sample.time - previousSample.time).TotalMilliseconds);
                 previousSample = sample;
-                if (age > _horizonMilliseconds || delta > _assumePointerMoveStoppedMilliseconds) {
+                if (age > _horizonMilliseconds ||
+                    delta > _assumePointerMoveStoppedMilliseconds) {
                     break;
                 }
 

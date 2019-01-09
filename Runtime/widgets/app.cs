@@ -3,7 +3,7 @@ using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.ui;
-using Color = Unity.UIWidgets.ui.Color;
+using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace Unity.UIWidgets.widgets {
     public class WidgetsApp : StatefulWidget {
@@ -54,24 +54,24 @@ namespace Unity.UIWidgets.widgets {
         public override void initState() {
             base.initState();
             D.assert(() => {
-                WidgetInspectorService.instance.inspectorShowCallback += inspectorShowChanged;
+                WidgetInspectorService.instance.inspectorShowCallback += this.inspectorShowChanged;
                 return true;
             });
-            
+
             WidgetsBinding.instance.addObserver(this);
         }
 
         public override void dispose() {
             WidgetsBinding.instance.removeObserver(this);
-            
+
             D.assert(() => {
-                WidgetInspectorService.instance.inspectorShowCallback -= inspectorShowChanged;
+                WidgetInspectorService.instance.inspectorShowCallback -= this.inspectorShowChanged;
                 return true;
             });
             base.dispose();
         }
 
-        private void inspectorShowChanged() {
+        void inspectorShowChanged() {
             this.setState();
         }
 
@@ -111,7 +111,7 @@ namespace Unity.UIWidgets.widgets {
             return result;
         }
 
-        private Widget _InspectorSelectButtonBuilder(BuildContext context, VoidCallback onPressed) {
+        Widget _InspectorSelectButtonBuilder(BuildContext context, VoidCallback onPressed) {
             return new _InspectorSelectButton(onPressed: onPressed);
         }
     }
@@ -132,7 +132,7 @@ namespace Unity.UIWidgets.widgets {
                 child: new Container(
                     color: Color.fromARGB(255, 0, 0, 255),
                     padding: EdgeInsets.all(10),
-                    child: new Text("Select", style: new painting.TextStyle(color: Color.fromARGB(255, 255, 255, 255)))
+                    child: new Text("Select", style: new TextStyle(color: Color.fromARGB(255, 255, 255, 255)))
                 )
             );
         }

@@ -2,11 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Unity.UIWidgets.foundation;
-using Unity.UIWidgets.ui.painting.txt;
-using Unity.UIWidgets.ui.txt;
 using UnityEngine;
 using UnityEngine.Rendering;
-using Object = UnityEngine.Object;
 
 namespace Unity.UIWidgets.ui {
     public class CommandBufferCanvas : Canvas {
@@ -845,13 +842,13 @@ namespace Unity.UIWidgets.ui {
             var xform = new float[6];
             XformUtils.transformTranslate(xform, (float) offset.dx, (float) offset.dy);
             XformUtils.transformPremultiply(xform, state.xform);
-            
+
             var mesh = MeshGenrator.generateMesh(textBlob, xform, this._devicePixelRatio);
 
             if (!this._applyClip(mesh.getBounds())) {
                 return;
             }
-            
+
             var mat = this._getMat(paint);
             var font = FontManager.instance.getOrCreate(textBlob.style.fontFamily).font;
             var properties = this._getMatPropsForImage(font.material.mainTexture, paint);
@@ -882,7 +879,7 @@ namespace Unity.UIWidgets.ui {
                 this._drawLayer(layer, cmdBuf);
                 Graphics.ExecuteCommandBuffer(cmdBuf);
             }
-            
+
             this._clearLayer(layer);
         }
 
@@ -953,7 +950,7 @@ namespace Unity.UIWidgets.ui {
                 draw.onDestroy();
             }
             layer.draws.Clear();
-            
+
             foreach (var subLayer in layer.layers) {
                 this._clearLayer(subLayer);
             }
@@ -971,7 +968,7 @@ namespace Unity.UIWidgets.ui {
             return layer.lastClipGenId != clipGenId || layer.lastClipBounds != clipBounds;
         }
 
-        private class State {
+        class State {
             public float[] xform = {1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f};
 
             public State copy() {
@@ -981,7 +978,7 @@ namespace Unity.UIWidgets.ui {
             }
         }
 
-        private class RenderLayer {
+        class RenderLayer {
             public int rtID;
             public int width;
             public int height;
@@ -995,12 +992,12 @@ namespace Unity.UIWidgets.ui {
             public Rect lastClipBounds;
         }
 
-        private interface RenderCmd {
+        interface RenderCmd {
             void onExecute(CommandBuffer cmdBuf);
             void onDestroy();
         }
 
-        private class RenderDraw : RenderCmd {
+        class RenderDraw : RenderCmd {
             public Mesh mesh;
             public int pass;
             public MaterialPropertyBlock properties;
@@ -1024,19 +1021,19 @@ namespace Unity.UIWidgets.ui {
             }
         }
 
-        private class RenderScissor : RenderCmd {
+        class RenderScissor : RenderCmd {
             public Rect deviceScissor;
 
             public void onExecute(CommandBuffer cmdBuf) {
                 cmdBuf.EnableScissorRect(this.deviceScissor.toRect());
             }
-            
+
             public void onDestroy() {
             }
         }
     }
 
-    internal static class CanvasShaderPass {
+    static class CanvasShaderPass {
         public const int fillPass0 = 0;
         public const int fillPass1 = 1;
         public const int convexFill = 2;
@@ -1050,7 +1047,7 @@ namespace Unity.UIWidgets.ui {
         public const int texfontPass0 = 10;
     }
 
-    internal static class XformUtils {
+    static class XformUtils {
         public static void transformIdentity(float[] t) {
             t[0] = 1.0f;
             t[1] = 0.0f;

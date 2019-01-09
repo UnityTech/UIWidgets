@@ -25,20 +25,29 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public override string ToString() {
-            return string.Format("StorageEntryIdentifier({0})",
-                string.Join(":", this.keys.Select(x => x.ToString()).ToArray()));
+            return $"StorageEntryIdentifier({string.Join(":", this.keys.Select(x => x.ToString()).ToArray())})";
         }
 
         public bool Equals(_StorageEntryIdentifier other) {
-            if (object.ReferenceEquals(null, other)) return false;
-            if (object.ReferenceEquals(this, other)) return true;
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
             return this.keys.SequenceEqual(other.keys);
         }
 
         public override bool Equals(object obj) {
-            if (object.ReferenceEquals(null, obj)) return false;
-            if (object.ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
             return this.Equals((_StorageEntryIdentifier) obj);
         }
 
@@ -56,11 +65,11 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public static bool operator ==(_StorageEntryIdentifier left, _StorageEntryIdentifier right) {
-            return object.Equals(left, right);
+            return Equals(left, right);
         }
 
         public static bool operator !=(_StorageEntryIdentifier left, _StorageEntryIdentifier right) {
-            return !object.Equals(left, right);
+            return !Equals(left, right);
         }
     }
 

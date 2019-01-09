@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
-using UnityEditor;
 
 namespace Unity.UIWidgets.painting {
     public class BoxDecoration : Decoration, IEquatable<BoxDecoration> {
@@ -43,22 +42,32 @@ namespace Unity.UIWidgets.painting {
         public override BoxPainter createBoxPainter(VoidCallback onChanged = null) {
             return new _BoxDecorationPainter(this, onChanged);
         }
-    
+
         public bool Equals(BoxDecoration other) {
-            if (object.ReferenceEquals(null, other)) return false;
-            if (object.ReferenceEquals(this, other)) return true;
-            return object.Equals(this.color, other.color)
-                   && object.Equals(this.image, other.image)
-                   && object.Equals(this.border, other.border)
-                   && object.Equals(this.borderRadius, other.borderRadius)
-                   && object.Equals(this.boxShadow, other.boxShadow)
-                   && object.Equals(this.gradient, other.gradient);
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
+            return Equals(this.color, other.color)
+                   && Equals(this.image, other.image)
+                   && Equals(this.border, other.border)
+                   && Equals(this.borderRadius, other.borderRadius)
+                   && Equals(this.boxShadow, other.boxShadow)
+                   && Equals(this.gradient, other.gradient);
         }
 
         public override bool Equals(object obj) {
-            if (object.ReferenceEquals(null, obj)) return false;
-            if (object.ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
             return this.Equals((BoxDecoration) obj);
         }
 
@@ -75,7 +84,7 @@ namespace Unity.UIWidgets.painting {
         }
 
         public static bool operator ==(BoxDecoration a, BoxDecoration b) {
-            return object.Equals(a, b);
+            return Equals(a, b);
         }
 
         public static bool operator !=(BoxDecoration a, BoxDecoration b) {
@@ -85,12 +94,13 @@ namespace Unity.UIWidgets.painting {
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             properties.emptyBodyDescription = "<no decorations specified>";
-            properties.add(new DiagnosticsProperty<Color>("color", color, defaultValue: null));
-            properties.add(new DiagnosticsProperty<DecorationImage>("image", image, defaultValue: null));
-            properties.add(new DiagnosticsProperty<Border>("border", border, defaultValue: null));
-            properties.add(new DiagnosticsProperty<BorderRadius>("borderRadius", borderRadius, defaultValue: null));
+            properties.add(new DiagnosticsProperty<Color>("color", this.color, defaultValue: null));
+            properties.add(new DiagnosticsProperty<DecorationImage>("image", this.image, defaultValue: null));
+            properties.add(new DiagnosticsProperty<Border>("border", this.border, defaultValue: null));
+            properties.add(
+                new DiagnosticsProperty<BorderRadius>("borderRadius", this.borderRadius, defaultValue: null));
             //properties.add(new IterableProperty<BoxShadow>("boxShadow", boxShadow, defaultValue: null, style: DiagnosticsTreeStyle.whitespace));
-            properties.add(new DiagnosticsProperty<Gradient>("gradient", gradient, defaultValue: null));
+            properties.add(new DiagnosticsProperty<Gradient>("gradient", this.gradient, defaultValue: null));
         }
     }
 
@@ -110,7 +120,7 @@ namespace Unity.UIWidgets.painting {
         public Paint _getBackgroundPaint(Rect rect) {
             if (this._cachedBackgroundPaint == null) {
                 var paint = new Paint();
-                
+
                 if (this._decoration.color != null) {
                     paint.color = this._decoration.color;
                 }

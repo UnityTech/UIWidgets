@@ -3,7 +3,7 @@ using Unity.UIWidgets.ui;
 
 namespace Unity.UIWidgets.flow {
     public abstract class ContainerLayer : Layer {
-        private readonly List<Layer> _layers = new List<Layer>();
+        readonly List<Layer> _layers = new List<Layer>();
 
         public List<Layer> layers {
             get { return this._layers; }

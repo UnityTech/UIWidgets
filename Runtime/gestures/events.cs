@@ -68,8 +68,7 @@ namespace Unity.UIWidgets.gestures {
         }
     }
 
-    public class PointerHoverEvent : PointerEvent
-    {
+    public class PointerHoverEvent : PointerEvent {
         public PointerHoverEvent(
             TimeSpan timeStamp,
             int pointer = 0,
@@ -85,9 +84,8 @@ namespace Unity.UIWidgets.gestures {
                 down: false) {
         }
     }
-    
-    public class PointerEnterEvent : PointerEvent
-    {
+
+    public class PointerEnterEvent : PointerEvent {
         public PointerEnterEvent(
             TimeSpan timeStamp,
             int pointer = 0,
@@ -103,9 +101,8 @@ namespace Unity.UIWidgets.gestures {
                 down: false) {
         }
     }
-    
-    public class PointerLeaveEvent : PointerEvent
-    {
+
+    public class PointerLeaveEvent : PointerEvent {
         public PointerLeaveEvent(
             TimeSpan timeStamp,
             int pointer = 0,

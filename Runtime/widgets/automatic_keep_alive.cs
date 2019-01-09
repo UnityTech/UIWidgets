@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.scheduler;
 using Unity.UIWidgets.ui;
-using Unity.UIWidgets.widgets;
 
 namespace Unity.UIWidgets.widgets {
     public class AutomaticKeepAlive : StatefulWidget {
@@ -44,8 +43,9 @@ namespace Unity.UIWidgets.widgets {
 
         public override void dispose() {
             if (this._handles != null) {
-                foreach (Listenable handle in this._handles.Keys)
+                foreach (Listenable handle in this._handles.Keys) {
                     handle.removeListener(this._handles[handle]);
+                }
             }
 
             base.dispose();
@@ -172,11 +172,13 @@ namespace Unity.UIWidgets.widgets {
 
         protected void updateKeepAlive() {
             if (this.wantKeepAlive) {
-                if (this._keepAliveHandle == null)
+                if (this._keepAliveHandle == null) {
                     this._ensureKeepAlive();
+                }
             } else {
-                if (this._keepAliveHandle != null)
+                if (this._keepAliveHandle != null) {
                     this._releaseKeepAlive();
+                }
             }
         }
 

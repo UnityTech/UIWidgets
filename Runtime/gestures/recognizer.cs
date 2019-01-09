@@ -41,8 +41,7 @@ namespace Unity.UIWidgets.gestures {
                 });
 
                 result = callback();
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 UIWidgetsError.reportError(new UIWidgetsErrorDetails(
                     exception: ex,
                     library: "gesture",

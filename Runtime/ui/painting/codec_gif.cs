@@ -6,7 +6,6 @@ using RSG;
 using Unity.UIWidgets.async;
 using Unity.UIWidgets.foundation;
 using UnityEngine;
-using Timer = Unity.UIWidgets.async.Timer;
 
 namespace Unity.UIWidgets.ui {
     public class GifCodec : Codec {
@@ -93,9 +92,13 @@ namespace Unity.UIWidgets.ui {
             this._isDone = true;
         }
 
-        public int frameCount => this._frameCount;
+        public int frameCount {
+            get { return this._frameCount; }
+        }
 
-        public int repetitionCount => this._repetitionCount - 1;
+        public int repetitionCount {
+            get { return this._repetitionCount - 1; }
+        }
 
 
         void _nextFrame() {

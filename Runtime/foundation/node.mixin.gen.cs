@@ -192,10 +192,10 @@ namespace Unity.UIWidgets.foundation {
         }
 
         ~CanonicalMixinDiagnosticableTree() {
-            if (object.ReferenceEquals(this, this._canonical)) {
+            if (ReferenceEquals(this, this._canonical)) {
                 var dependencyList = this._dependencyList;
                 if (dependencyList != null) {
-                    Timer.runInMain(() => { _canonicalObjects.Remove(dependencyList); });
+                    Timer.runInMainFromFinalizer(() => { _canonicalObjects.Remove(dependencyList); });
                 }
             }
         }
@@ -204,11 +204,11 @@ namespace Unity.UIWidgets.foundation {
             new Dictionary<_DependencyList, WeakReference>();
         
         public override bool Equals(object obj) {
-            if (object.ReferenceEquals(null, obj)) {
+            if (ReferenceEquals(null, obj)) {
                 return false;
             }
 
-            if (object.ReferenceEquals(this, obj)) {
+            if (ReferenceEquals(this, obj)) {
                 return true;
             }
 
@@ -216,7 +216,7 @@ namespace Unity.UIWidgets.foundation {
                 return false;
             }
 
-            return object.ReferenceEquals(this._getCanonical(), ((CanonicalMixinDiagnosticableTree) obj)._getCanonical());
+            return ReferenceEquals(this._getCanonical(), ((CanonicalMixinDiagnosticableTree) obj)._getCanonical());
         }
         
         public override int GetHashCode() {

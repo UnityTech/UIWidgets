@@ -2,14 +2,13 @@ using System;
 using System.Collections.Generic;
 using Unity.UIWidgets.async;
 using Unity.UIWidgets.foundation;
-using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.scheduler;
 using Unity.UIWidgets.ui;
 using UnityEngine;
 
 namespace Unity.UIWidgets.gestures {
     public class GestureBinding : SchedulerBinding, HitTestable, HitTestDispatcher, HitTestTarget {
-        public static new GestureBinding instance {
+        public new static GestureBinding instance {
             get { return (GestureBinding) SchedulerBinding.instance; }
             set { SchedulerBinding.instance = value; }
         }
@@ -21,7 +20,7 @@ namespace Unity.UIWidgets.gestures {
         }
 
         readonly Queue<PointerEvent> _pendingPointerEvents = new Queue<PointerEvent>();
-        
+
         void _handlePointerDataPacket(PointerDataPacket packet) {
             foreach (var pointerEvent in PointerEventConverter.expand(packet.data, Window.instance.devicePixelRatio)) {
                 this._pendingPointerEvents.Enqueue(pointerEvent);
@@ -50,21 +49,20 @@ namespace Unity.UIWidgets.gestures {
         public readonly GestureArenaManager gestureArena;
 
         public readonly Dictionary<int, HitTestResult> _hitTests = new Dictionary<int, HitTestResult>();
-        
+
         public readonly HashSet<HitTestTarget> lastMoveTargets = new HashSet<HitTestTarget>();
 
         void _handlePointerEvent(PointerEvent evt) {
-            if (evt is PointerHoverEvent || evt is PointerMoveEvent)
-            {
+            if (evt is PointerHoverEvent || evt is PointerMoveEvent) {
                 this._handlePointerHoverEvent(evt);
             }
-            
+
             HitTestResult result;
             if (evt is PointerDownEvent) {
                 D.assert(!this._hitTests.ContainsKey(evt.pointer));
                 result = new HitTestResult();
                 this.hitTest(result, evt.position);
-                
+
                 this._hitTests[evt.pointer] = result;
                 D.assert(() => {
                     if (D.debugPrintHitTestResults) {
@@ -87,42 +85,35 @@ namespace Unity.UIWidgets.gestures {
             }
         }
 
-        void _handlePointerHoverEvent(PointerEvent evt)
-        {
+        void _handlePointerHoverEvent(PointerEvent evt) {
             HitTestResult result = new HitTestResult();
             this.hitTest(result, evt.position);
-                
+
             // enter event
-            foreach (var hitTestEntry in result.path)
-            {
-                if (lastMoveTargets.Contains(hitTestEntry.target))
-                {
+            foreach (var hitTestEntry in result.path) {
+                if (this.lastMoveTargets.Contains(hitTestEntry.target)) {
                     hitTestEntry.target.handleEvent(evt, hitTestEntry);
-                    lastMoveTargets.Remove(hitTestEntry.target);
-                }
-                else
-                {
+                    this.lastMoveTargets.Remove(hitTestEntry.target);
+                } else {
                     hitTestEntry.target.handleEvent(new PointerEnterEvent(
-                        timeStamp:evt.timeStamp,
-                        pointer:evt.pointer,
-                        device:evt.device,
-                        kind:evt.kind
+                        timeStamp: evt.timeStamp,
+                        pointer: evt.pointer,
+                        device: evt.device,
+                        kind: evt.kind
                     ), hitTestEntry);
                 }
             }
-            foreach (var lastMoveTarget in lastMoveTargets)
-            {
+            foreach (var lastMoveTarget in this.lastMoveTargets) {
                 lastMoveTarget.handleEvent(new PointerLeaveEvent(
-                    timeStamp:evt.timeStamp,
-                    pointer:evt.pointer,
-                    device:evt.device,
-                    kind:evt.kind
+                    timeStamp: evt.timeStamp,
+                    pointer: evt.pointer,
+                    device: evt.device,
+                    kind: evt.kind
                 ), null);
             }
-            lastMoveTargets.Clear();
-            foreach (var hitTestEntry in result.path)
-            {
-                lastMoveTargets.Add(hitTestEntry.target);
+            this.lastMoveTargets.Clear();
+            foreach (var hitTestEntry in result.path) {
+                this.lastMoveTargets.Add(hitTestEntry.target);
             }
 
             this.dispatchEvent(evt, result);
@@ -136,8 +127,7 @@ namespace Unity.UIWidgets.gestures {
             foreach (HitTestEntry entry in result.path) {
                 try {
                     entry.target.handleEvent(evt, entry);
-                }
-                catch (Exception ex) {
+                } catch (Exception ex) {
                     Debug.LogError("Error while dispatching a pointer event: " + ex);
                 }
             }

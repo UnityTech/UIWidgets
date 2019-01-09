@@ -1,9 +1,8 @@
 ﻿using Unity.UIWidgets.ui;
-using Rect = Unity.UIWidgets.ui.Rect;
 
 namespace Unity.UIWidgets.flow {
     public class ClipRectLayer : ContainerLayer {
-        private Rect _clipRect;
+        Rect _clipRect;
 
         public Rect clipRect {
             set { this._clipRect = value; }
@@ -27,8 +26,7 @@ namespace Unity.UIWidgets.flow {
 
             try {
                 this.paintChildren(context);
-            }
-            finally {
+            } finally {
                 canvas.restore();
             }
         }

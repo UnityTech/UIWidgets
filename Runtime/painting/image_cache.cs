@@ -16,7 +16,7 @@ namespace Unity.UIWidgets.painting {
         int _maximumSize = _kDefaultSize;
 
         public int maximumSize {
-            get => this._maximumSize;
+            get { return this._maximumSize; }
             set {
                 D.assert(value >= 0);
                 if (value == this._maximumSize) {
@@ -32,7 +32,9 @@ namespace Unity.UIWidgets.painting {
             }
         }
 
-        public int currentSize => this._cache.Count;
+        public int currentSize {
+            get { return this._cache.Count; }
+        }
 
         int _maximumSizeBytes = _kDefaultSizeBytes;
 
@@ -55,7 +57,9 @@ namespace Unity.UIWidgets.painting {
 
         int _currentSizeBytes;
 
-        public int currentSizeBytes => this._currentSizeBytes;
+        public int currentSizeBytes {
+            get { return this._currentSizeBytes; }
+        }
 
         public void clear() {
             this._cache.Clear();
@@ -100,11 +104,11 @@ namespace Unity.UIWidgets.painting {
                 ImageListener listener = null;
                 listener = (info, syncCall) => {
                     result.removeListener(listener);
-                    
+
                     D.assert(this._pendingImages.ContainsKey(key));
                     this._pendingImages.Remove(key);
 
-                    int imageSize = info?.image == null ? 0 : info.image.width & info.image.height * 4;
+                    int imageSize = info?.image == null ? 0 : info.image.width & (info.image.height * 4);
                     _CachedImage cachedImage = new _CachedImage {
                         completer = result,
                         sizeBytes = imageSize,

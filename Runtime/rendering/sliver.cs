@@ -4,9 +4,6 @@ using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.ui;
-using UnityEngine;
-using Canvas = Unity.UIWidgets.ui.Canvas;
-using Rect = Unity.UIWidgets.ui.Rect;
 
 namespace Unity.UIWidgets.rendering {
     public enum GrowthDirection {
@@ -200,9 +197,8 @@ namespace Unity.UIWidgets.rendering {
                         informationCollector(information);
                     }
 
-                    throw new UIWidgetsError(string.Format(
-                        "{0} is not valid: {1}\n{2}The offending constraints were: \n  {3}",
-                        this.GetType(), message, information, this));
+                    throw new UIWidgetsError(
+                        $"{this.GetType()} is not valid: {message}\n{information}The offending constraints were: \n  {this}");
                 });
 
                 verify(this.scrollOffset >= 0.0, "The \"scrollOffset\" is negative.");
@@ -223,8 +219,12 @@ namespace Unity.UIWidgets.rendering {
         }
 
         public bool Equals(SliverConstraints other) {
-            if (object.ReferenceEquals(null, other)) return false;
-            if (object.ReferenceEquals(this, other)) return true;
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
             return this.axisDirection == other.axisDirection
                    && this.growthDirection == other.growthDirection
                    && this.userScrollDirection == other.userScrollDirection
@@ -239,9 +239,15 @@ namespace Unity.UIWidgets.rendering {
         }
 
         public override bool Equals(object obj) {
-            if (object.ReferenceEquals(null, obj)) return false;
-            if (object.ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
             return this.Equals((SliverConstraints) obj);
         }
 
@@ -263,23 +269,19 @@ namespace Unity.UIWidgets.rendering {
         }
 
         public static bool operator ==(SliverConstraints left, SliverConstraints right) {
-            return object.Equals(left, right);
+            return Equals(left, right);
         }
 
         public static bool operator !=(SliverConstraints left, SliverConstraints right) {
-            return !object.Equals(left, right);
+            return !Equals(left, right);
         }
 
-        public override String ToString() {
-            return string.Format(
-                "SliverConstraints({0}， {1}， {2}， scrollOffset: {3:F1}, remainingPaintExtent: {4:F1}, " +
-                "{5}crossAxisExtent: {6:F1}, crossAxisDirection: {7}, " +
-                "viewportMainAxisExtent: {8:F1}, remainingCacheExtent: {9:F1} " +
-                "cacheOrigin: {10:F1})", this.axisDirection, this.growthDirection, this.userScrollDirection,
-                this.scrollOffset, this.remainingCacheExtent,
-                this.overlap != 0.0 ? "overlap: " + this.overlap.ToString("F1") + ", " : "",
-                this.crossAxisExtent, this.crossAxisDirection,
-                this.viewportMainAxisExtent, this.remainingCacheExtent, this.cacheOrigin);
+        public override string ToString() {
+            return
+                $"SliverConstraints({this.axisDirection}， {this.growthDirection}， {this.userScrollDirection}， scrollOffset: {this.scrollOffset:F1}, remainingPaintExtent: {this.remainingCacheExtent:F1}, " +
+                $"{(this.overlap != 0.0 ? "overlap: " + this.overlap.ToString("F1") + ", " : "")}crossAxisExtent: {this.crossAxisExtent:F1}, crossAxisDirection: {this.crossAxisDirection}, " +
+                $"viewportMainAxisExtent: {this.viewportMainAxisExtent:F1}, remainingCacheExtent: {this.remainingCacheExtent:F1} " +
+                $"cacheOrigin: {this.cacheOrigin:F1})";
         }
     }
 
@@ -328,7 +330,7 @@ namespace Unity.UIWidgets.rendering {
 
         internal static string _debugCompareFloats(string labelA, double valueA, string labelB, double valueB) {
             if (valueA.ToString("F1") != valueB.ToString("F1")) {
-                return string.Format("The {0} is {1:F1}, but the {2} is {3:F1}. ", labelA, valueA, labelB, valueB);
+                return $"The {labelA} is {valueA:F1}, but the {labelB} is {valueB:F1}. ";
             }
 
             return string.Format(
@@ -341,15 +343,15 @@ namespace Unity.UIWidgets.rendering {
         public bool debugAssertIsValid(InformationCollector informationCollector = null) {
             D.assert(() => {
                 var verify = new Action<bool, string>((bool check, string message) => {
-                    if (check)
+                    if (check) {
                         return;
+                    }
                     var information = new StringBuilder();
                     if (informationCollector != null) {
                         informationCollector(information);
                     }
 
-                    throw new UIWidgetsError(string.Format("{0} is not valid: {1}\n{2}", this.GetType(), message,
-                        information));
+                    throw new UIWidgetsError($"{this.GetType()} is not valid: {message}\n{information}");
                 });
 
                 verify(this.scrollExtent >= 0.0, "The \"scrollExtent\" is negative.");
@@ -359,14 +361,16 @@ namespace Unity.UIWidgets.rendering {
                 if (this.layoutExtent > this.paintExtent) {
                     verify(false,
                         "The \"layoutExtent\" exceeds the \"paintExtent\".\n" +
-                        _debugCompareFloats("paintExtent", paintExtent, "layoutExtent", layoutExtent)
+                        _debugCompareFloats("paintExtent", this.paintExtent, "layoutExtent",
+                            this.layoutExtent)
                     );
                 }
 
                 if (this.maxPaintExtent < this.paintExtent) {
                     verify(false,
                         "The \"maxPaintExtent\" is less than the \"paintExtent\".\n" +
-                        _debugCompareFloats("maxPaintExtent", this.maxPaintExtent, "paintExtent", this.paintExtent) +
+                        _debugCompareFloats("maxPaintExtent", this.maxPaintExtent, "paintExtent",
+                            this.paintExtent) +
                         "By definition, a sliver can\"t paint more than the maximum that it can paint!"
                     );
                 }
@@ -434,8 +438,7 @@ namespace Unity.UIWidgets.rendering {
         public readonly double crossAxisPosition;
 
         public override string ToString() {
-            return string.Format("{0}@(mainAix: {1}, crossAix: {2})", this.target.GetType(), this.mainAxisPosition,
-                this.crossAxisPosition);
+            return $"{this.target.GetType()}@(mainAix: {this.mainAxisPosition}, crossAix: {this.crossAxisPosition})";
         }
     }
 
@@ -542,9 +545,9 @@ namespace Unity.UIWidgets.rendering {
                 return null;
             }
         }
-        
+
         public override Rect semanticBounds {
-            get { return paintBounds; }
+            get { return this.paintBounds; }
         }
 
         protected override void debugResetSize() {
@@ -720,7 +723,7 @@ namespace Unity.UIWidgets.rendering {
 //          padding * 0.5,
 //          paint,
 //        );
-                    switch (constraints.axis) {
+                    switch (this.constraints.axis) {
                         case Axis.vertical:
 //            canvas.drawLine(
 //              offset,

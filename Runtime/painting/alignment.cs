@@ -83,15 +83,25 @@ namespace Unity.UIWidgets.painting {
         }
 
         public bool Equals(Alignment other) {
-            if (object.ReferenceEquals(null, other)) return false;
-            if (object.ReferenceEquals(this, other)) return true;
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
             return this.x.Equals(other.x) && this.y.Equals(other.y);
         }
 
         public override bool Equals(object obj) {
-            if (object.ReferenceEquals(null, obj)) return false;
-            if (object.ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
             return this.Equals((Alignment) obj);
         }
 
@@ -102,7 +112,7 @@ namespace Unity.UIWidgets.painting {
         }
 
         public static bool operator ==(Alignment a, Alignment b) {
-            return object.Equals(a, b);
+            return Equals(a, b);
         }
 
         public static bool operator !=(Alignment a, Alignment b) {
@@ -110,7 +120,7 @@ namespace Unity.UIWidgets.painting {
         }
     }
 
-    public class AlignmentDirectional : IEquatable<AlignmentDirectional>  {
+    public class AlignmentDirectional : IEquatable<AlignmentDirectional> {
         public AlignmentDirectional(double start, double y) {
             this.start = start;
             this.y = y;
@@ -118,7 +128,7 @@ namespace Unity.UIWidgets.painting {
 
         public double start;
         public double y;
-        
+
         public static readonly AlignmentDirectional topStart = new AlignmentDirectional(-1.0, -1.0);
         public static readonly AlignmentDirectional topCenter = new AlignmentDirectional(0.0, -1.0);
         public static readonly AlignmentDirectional topEnd = new AlignmentDirectional(1.0, -1.0);
@@ -128,7 +138,7 @@ namespace Unity.UIWidgets.painting {
         public static readonly AlignmentDirectional bottomStart = new AlignmentDirectional(-1.0, 1.0);
         public static readonly AlignmentDirectional bottomCenter = new AlignmentDirectional(0.0, 1.0);
         public static readonly AlignmentDirectional bottomEnd = new AlignmentDirectional(1.0, 1.0);
-        
+
         public AlignmentDirectional add(AlignmentDirectional other) {
             return this + other;
         }
@@ -158,17 +168,21 @@ namespace Unity.UIWidgets.painting {
         }
 
         public bool Equals(AlignmentDirectional other) {
-            if (object.ReferenceEquals(null, other)) return false;
-            if (object.ReferenceEquals(this, other)) return true;
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
             return this.start.Equals(other.start) && this.y.Equals(other.y);
         }
-        
+
         public Alignment resolve(TextDirection direction) {
             switch (direction) {
                 case TextDirection.rtl:
-                    return new Alignment(-start, y);
+                    return new Alignment(-this.start, this.y);
                 case TextDirection.ltr:
-                    return new Alignment(start, y);
+                    return new Alignment(this.start, this.y);
             }
             return null;
         }

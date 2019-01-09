@@ -1,14 +1,13 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
-using Unity.UIWidgets.painting;
 using Unity.UIWidgets.ui;
 
 namespace Unity.UIWidgets.foundation {
     public static class D {
         [Conditional("UIWidgets_DEBUG")]
         public static void assert(Func<bool> result, string message = null) {
-            D.assert(result(), message);
+            assert(result(), message);
         }
 
         [Conditional("UIWidgets_DEBUG")]
@@ -39,19 +38,19 @@ namespace Unity.UIWidgets.foundation {
         public static bool debugRepaintRainbowEnabled = false;
 
         public static bool debugPaintLayerBordersEnabled = false;
-        
+
         public static bool debugPrintMarkNeedsLayoutStacks = false;
-        
+
         public static bool debugPrintLayouts = false;
-        
+
         public static bool debugDisableClipLayers = false;
 
         public static bool debugDisableOpacityLayers = false;
 
         public static bool debugPrintMarkNeedsPaintStacks = false;
-        
+
         public static bool debugCheckIntrinsicSizes = false;
-        
+
         // public static Color debugCurrentRepaintColor = Color.fromfromAHSV(0.4, 60.0, 1.0, 1.0);;
 
         public static void _debugDrawDoubleRect(Canvas canvas, Rect outerRect, Rect innerRect, Color color) {
@@ -65,7 +64,7 @@ namespace Unity.UIWidgets.foundation {
         }
 
         public static void debugPaintPadding(Canvas canvas, Rect outerRect, Rect innerRect, double outlineWidth = 2.0) {
-            D.assert(() => {
+            assert(() => {
                 if (innerRect != null && !innerRect.isEmpty) {
                     _debugDrawDoubleRect(canvas, outerRect, innerRect, new Color(0x900090FF));
                 } else {

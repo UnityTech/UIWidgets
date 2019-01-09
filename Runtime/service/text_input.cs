@@ -1,115 +1,97 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using Unity.UIWidgets.foundation;
 using UnityEngine;
 
-namespace Unity.UIWidgets.service
-{
-    public class TextEditingValue:IEquatable<TextEditingValue>
-    {
+namespace Unity.UIWidgets.service {
+    public class TextEditingValue : IEquatable<TextEditingValue> {
         public readonly string text;
         public readonly TextSelection selection;
         public readonly TextRange composing;
 
-        public TextEditingValue(string text = "", TextSelection selection = null, TextRange composing = null)
-        {
+        public TextEditingValue(string text = "", TextSelection selection = null, TextRange composing = null) {
             this.text = text;
             this.selection = selection ?? TextSelection.collapsed(-1);
             this.composing = composing ?? TextRange.empty;
         }
 
-        public TextEditingValue copyWith(string text = null, TextSelection selection = null, TextRange composing = null)
-        {
+        public TextEditingValue copyWith(string text = null, TextSelection selection = null,
+            TextRange composing = null) {
             return new TextEditingValue(
-                text??this.text, selection??this.selection, composing??this.composing
-                );
-        }
-        
-        public TextEditingValue insert(string text)
-        {
-            string newText;
-            TextSelection newSelection;
-            if (string.IsNullOrEmpty(text))
-            {
-                return this;
-            }
-            newText = selection.textBefore(this.text) + text + selection.textAfter(this.text);
-            newSelection = TextSelection.collapsed(selection.start + text.Length);   
-            return new TextEditingValue(
-                text: newText, selection: newSelection,composing:TextRange.empty
+                text ?? this.text, selection ?? this.selection, composing ?? this.composing
             );
         }
 
-        public TextEditingValue deleteSelection(bool backDelete = true)
-        {
-            if (selection.isCollapsed)
-            {
-                if (backDelete)
-                {
-                    if (selection.start == 0)
-                    {
+        public TextEditingValue insert(string text) {
+            string newText;
+            TextSelection newSelection;
+            if (string.IsNullOrEmpty(text)) {
+                return this;
+            }
+            newText = this.selection.textBefore(this.text) + text + this.selection.textAfter(this.text);
+            newSelection = TextSelection.collapsed(this.selection.start + text.Length);
+            return new TextEditingValue(
+                text: newText, selection: newSelection, composing: TextRange.empty
+            );
+        }
+
+        public TextEditingValue deleteSelection(bool backDelete = true) {
+            if (this.selection.isCollapsed) {
+                if (backDelete) {
+                    if (this.selection.start == 0) {
                         return this;
                     }
-                    return this.copyWith(text: text.Substring(0, selection.start - 1) + selection.textAfter(this.text), 
-                        selection: TextSelection.collapsed(selection.start - 1));
+                    return this.copyWith(
+                        text: this.text.Substring(0, this.selection.start - 1) + this.selection.textAfter(this.text),
+                        selection: TextSelection.collapsed(this.selection.start - 1));
                 }
 
-                if (selection.start >= text.Length)
-                {
+                if (this.selection.start >= this.text.Length) {
                     return this;
                 }
-                return this.copyWith(text: text.Substring(0, selection.start) + text.Substring(selection.start + 1));
+                return this.copyWith(text: this.text.Substring(0, this.selection.start) +
+                                           this.text.Substring(this.selection.start + 1));
+            } else {
+                var newText = this.selection.textBefore(this.text) + this.selection.textAfter(this.text);
+                return this.copyWith(text: newText, selection: TextSelection.collapsed(this.selection.start));
             }
-            else
-            {
-                var newText = selection.textBefore(this.text) + selection.textAfter(this.text);
-                return this.copyWith(text: newText, selection: TextSelection.collapsed(selection.start));
-            }
         }
 
-        public TextEditingValue moveLeft()
-        {
-            return moveSelection(-1);
+        public TextEditingValue moveLeft() {
+            return this.moveSelection(-1);
         }
 
-        public TextEditingValue moveRight()
-        {
-            return moveSelection(1);
-        }
-        
-        public TextEditingValue extendLeft()
-        {
-            return moveExtent(-1);
+        public TextEditingValue moveRight() {
+            return this.moveSelection(1);
         }
 
-        public TextEditingValue extendRight()
-        {
-            return moveExtent(1);
+        public TextEditingValue extendLeft() {
+            return this.moveExtent(-1);
         }
 
-        public TextEditingValue moveExtent(int move)
-        {
-            int offset = selection.extentOffset + move;
+        public TextEditingValue extendRight() {
+            return this.moveExtent(1);
+        }
+
+        public TextEditingValue moveExtent(int move) {
+            int offset = this.selection.extentOffset + move;
             offset = Math.Max(0, offset);
-            offset = Math.Min(offset, text.Length);
-            return this.copyWith(selection: selection.copyWith(extentOffset: offset));
-        }
-        
-        public TextEditingValue moveSelection(int move)
-        {
-            int offset = selection.baseOffset + move;
-            offset = Math.Max(0, offset);
-            offset = Math.Min(offset, text.Length);
-            return this.copyWith(selection: TextSelection.collapsed(offset, affinity: selection.affinity));
+            offset = Math.Min(offset, this.text.Length);
+            return this.copyWith(selection: this.selection.copyWith(extentOffset: offset));
         }
 
-        public TextEditingValue compose(string composeText)
-        {
+        public TextEditingValue moveSelection(int move) {
+            int offset = this.selection.baseOffset + move;
+            offset = Math.Max(0, offset);
+            offset = Math.Min(offset, this.text.Length);
+            return this.copyWith(selection: TextSelection.collapsed(offset, affinity: this.selection.affinity));
+        }
+
+        public TextEditingValue compose(string composeText) {
             D.assert(!string.IsNullOrEmpty(composeText));
-            var composeStart = composing == TextRange.empty ? selection.start : composing.start;
-            var lastComposeEnd =composing == TextRange.empty ? selection.end : composing.end;
-            var newText = text.Substring(0, composeStart) + composeText + text.Substring(lastComposeEnd);
+            var composeStart = this.composing == TextRange.empty ? this.selection.start : this.composing.start;
+            var lastComposeEnd = this.composing == TextRange.empty ? this.selection.end : this.composing.end;
+            var newText = this.text.Substring(0, composeStart) + composeText + this.text.Substring(lastComposeEnd);
             var componseEnd = composeStart + composeText.Length;
             return new TextEditingValue(
                 text: newText, selection: TextSelection.collapsed(componseEnd),
@@ -117,187 +99,169 @@ namespace Unity.UIWidgets.service
             );
         }
 
-        public TextEditingValue clearCompose()
-        {
-            if (composing == TextRange.empty)
-            {
+        public TextEditingValue clearCompose() {
+            if (this.composing == TextRange.empty) {
                 return this;
             }
             return new TextEditingValue(
-                text: text.Substring(0, composing.start) + text.Substring(composing.end), 
-                selection: TextSelection.collapsed(composing.start),
+                text: this.text.Substring(0, this.composing.start) + this.text.Substring(this.composing.end),
+                selection: TextSelection.collapsed(this.composing.start),
                 composing: TextRange.empty
             );
         }
-        
+
         public static readonly TextEditingValue empty = new TextEditingValue();
 
-        public bool Equals(TextEditingValue other)
-        {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
-            return string.Equals(text, other.text) && Equals(selection, other.selection) && Equals(composing, other.composing);
+        public bool Equals(TextEditingValue other) {
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
+            return string.Equals(this.text, other.text) && Equals(this.selection, other.selection) &&
+                   Equals(this.composing, other.composing);
         }
 
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((TextEditingValue) obj);
+        public override bool Equals(object obj) {
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
+            return this.Equals((TextEditingValue) obj);
         }
 
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                var hashCode = (text != null ? text.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (selection != null ? selection.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (composing != null ? composing.GetHashCode() : 0);
+        public override int GetHashCode() {
+            unchecked {
+                var hashCode = (this.text != null ? this.text.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (this.selection != null ? this.selection.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (this.composing != null ? this.composing.GetHashCode() : 0);
                 return hashCode;
             }
         }
 
-        public static bool operator ==(TextEditingValue left, TextEditingValue right)
-        {
+        public static bool operator ==(TextEditingValue left, TextEditingValue right) {
             return Equals(left, right);
         }
 
-        public static bool operator !=(TextEditingValue left, TextEditingValue right)
-        {
+        public static bool operator !=(TextEditingValue left, TextEditingValue right) {
             return !Equals(left, right);
         }
 
-        public override string ToString()
-        {
-            return string.Format("Text: {0}, Selection: {1}, Composing: {2}", text, selection, composing);
+        public override string ToString() {
+            return $"Text: {this.text}, Selection: {this.selection}, Composing: {this.composing}";
         }
     }
 
-    public interface TextInputClient
-    {
+    public interface TextInputClient {
         void updateEditingValue(TextEditingValue value);
 
         TextEditingValue getValueForOperation(TextEditOp operation);
         // void performAction(TextInputAction action);
     }
-   
+
     public enum TextInputAction {
         done,
         newline,
     }
 
-    public class TextInputConnection
-    {
-        
-        internal TextInputConnection(TextInputClient client, TextInput textInput)
-        {
+    public class TextInputConnection {
+        internal TextInputConnection(TextInputClient client, TextInput textInput) {
             D.assert(client != null);
             D.assert(textInput != null);
-            _client = client;
-            _textInput = textInput;
-            _id = _nextId++;
+            this._client = client;
+            this._textInput = textInput;
+            this._id = _nextId++;
         }
 
-        public bool attached
-        {
-            get { return _textInput._currentConnection == this; }
+        public bool attached {
+            get { return this._textInput._currentConnection == this; }
         }
 
-        public void setEditingState(TextEditingValue value)
-        {
-            D.assert(attached);
-            _textInput._value = value;
+        public void setEditingState(TextEditingValue value) {
+            D.assert(this.attached);
+            this._textInput._value = value;
         }
 
-        public void setCompositionCursorPos(double x, double y)
-        {
-            D.assert(attached);
-            _textInput.setCompositionCursorPos(x, y);
+        public void setCompositionCursorPos(double x, double y) {
+            D.assert(this.attached);
+            this._textInput.setCompositionCursorPos(x, y);
         }
-        
-        public void close()
-        {
-            if (attached)
-            {
-                _textInput._currentConnection = null;
-                _textInput._value = null;
+
+        public void close() {
+            if (this.attached) {
+                this._textInput._currentConnection = null;
+                this._textInput._value = null;
                 Input.imeCompositionMode = IMECompositionMode.Auto;
             }
-            D.assert(!attached);
+            D.assert(!this.attached);
         }
-        
-        private static int _nextId = 1;
+
+        static int _nextId = 1;
         internal readonly int _id;
         internal readonly TextInputClient _client;
         internal readonly TextInput _textInput;
     }
 
-    public class TextInput
-    {
+    public class TextInput {
         internal TextInputConnection _currentConnection;
         internal TextEditingValue _value;
         static Dictionary<Event, TextEditOp> s_Keyactions;
-        private string _lastCompositionString;
-        
-        public TextInputConnection attach(TextInputClient client)
-        {
+        string _lastCompositionString;
+
+        public TextInputConnection attach(TextInputClient client) {
             D.assert(client != null);
             var connection = new TextInputConnection(client, this);
-            _currentConnection = connection;
+            this._currentConnection = connection;
             Input.imeCompositionMode = IMECompositionMode.On;
             return connection;
         }
 
-        public void OnGUI()
-        {
-            if (_currentConnection == null)
-            {
+        public void OnGUI() {
+            if (this._currentConnection == null) {
                 return;
             }
 
             var currentEvent = Event.current;
-            if (currentEvent.type == EventType.KeyDown)
-            {
-                bool handled = handleKeyEvent(currentEvent);
-                if (!handled)
-                {
-                    if (currentEvent.keyCode == KeyCode.None)
-                    {
-                        _value = _value.clearCompose().insert(new string(currentEvent.character, 1));
-                        _currentConnection._client.updateEditingValue(_value);
+            if (currentEvent.type == EventType.KeyDown) {
+                bool handled = this.handleKeyEvent(currentEvent);
+                if (!handled) {
+                    if (currentEvent.keyCode == KeyCode.None) {
+                        this._value = this._value.clearCompose().insert(new string(currentEvent.character, 1));
+                        this._currentConnection._client.updateEditingValue(this._value);
                     }
                 }
                 currentEvent.Use();
             }
-            
-            if (!string.IsNullOrEmpty(Input.compositionString) && _lastCompositionString != Input.compositionString)
-            {
-                _value = _value.compose(Input.compositionString);
-                _currentConnection._client.updateEditingValue(_value);
+
+            if (!string.IsNullOrEmpty(Input.compositionString) &&
+                this._lastCompositionString != Input.compositionString) {
+                this._value = this._value.compose(Input.compositionString);
+                this._currentConnection._client.updateEditingValue(this._value);
             }
 
-            _lastCompositionString = Input.compositionString;
+            this._lastCompositionString = Input.compositionString;
         }
 
-        public void setCompositionCursorPos(double x, double y)
-        {
-            Input.compositionCursorPos = new Vector2((float)x, (float)y);
+        public void setCompositionCursorPos(double x, double y) {
+            Input.compositionCursorPos = new Vector2((float) x, (float) y);
         }
 
-        private bool handleKeyEvent(Event e)
-        {
+        bool handleKeyEvent(Event e) {
             initKeyActions();
             EventModifiers m = e.modifiers;
             e.modifiers &= ~EventModifiers.CapsLock;
-            if (s_Keyactions.ContainsKey(e))
-            {
+            if (s_Keyactions.ContainsKey(e)) {
                 TextEditOp op = s_Keyactions[e];
-                var newValue =_currentConnection._client.getValueForOperation(op);
-                if (_value != newValue)
-                {
-                    _value = newValue;
-                    _currentConnection._client.updateEditingValue(_value);
+                var newValue = this._currentConnection._client.getValueForOperation(op);
+                if (this._value != newValue) {
+                    this._value = newValue;
+                    this._currentConnection._client.updateEditingValue(this._value);
                 }
                 e.modifiers = m;
                 return true;
@@ -305,15 +269,13 @@ namespace Unity.UIWidgets.service
             e.modifiers = m;
             return false;
         }
-        
-        TextEditingValue performOperation(TextEditOp operation)
-        {
-            switch (operation)
-            {
+
+        TextEditingValue performOperation(TextEditOp operation) {
+            switch (operation) {
                 case TextEditOp.MoveLeft:
-                    return _value.moveLeft();
+                    return this._value.moveLeft();
                 case TextEditOp.MoveRight:
-                    return _value.moveRight();
+                    return this._value.moveRight();
 //                case TextEditOp.MoveUp:             MoveUp(); break;
 //                case TextEditOp.MoveDown:           MoveDown(); break;
 //                case TextEditOp.MoveLineStart:      MoveLineStart(); break;
@@ -328,10 +290,10 @@ namespace Unity.UIWidgets.service
 //                case TextEditOp.MoveParagraphBackward:  MoveParagraphBackward(); break;
 //                case TextEditOp.MoveGraphicalLineStart: MoveGraphicalLineStart(); break;
 //                case TextEditOp.MoveGraphicalLineEnd: MoveGraphicalLineEnd(); break;
-                  case TextEditOp.SelectLeft:
-                      return _value.extendLeft();
-                  case TextEditOp.SelectRight:
-                      return _value.extendRight();
+                case TextEditOp.SelectLeft:
+                    return this._value.extendLeft();
+                case TextEditOp.SelectRight:
+                    return this._value.extendRight();
 //                case TextEditOp.SelectUp:           SelectUp(); break;
 //                case TextEditOp.SelectDown:         SelectDown(); break;
 //                case TextEditOp.SelectWordRight:        SelectWordRight(); break;
@@ -349,9 +311,9 @@ namespace Unity.UIWidgets.service
 //                case TextEditOp.SelectGraphicalLineEnd: SelectGraphicalLineEnd(); break;
 //                case TextEditOp.Delete:                             return Delete();
                 case TextEditOp.Backspace:
-                    return _value.deleteSelection();
-                    // _value.composing
-                    // _value = _value.
+                    return this._value.deleteSelection();
+                // _value.composing
+                // _value = _value.
 //                case TextEditOp.Cut:                                    return Cut();
 //                case TextEditOp.Copy:                               Copy(); break;
 //                case TextEditOp.Paste:                              return Paste();
@@ -365,14 +327,14 @@ namespace Unity.UIWidgets.service
                     break;
             }
 
-            return _value;
+            return this._value;
         }
-        
-        
-        static void initKeyActions()
-        {
-            if (s_Keyactions != null)
+
+
+        static void initKeyActions() {
+            if (s_Keyactions != null) {
                 return;
+            }
             s_Keyactions = new Dictionary<Event, TextEditOp>();
 
             // key mappings shared by the platforms
@@ -391,8 +353,7 @@ namespace Unity.UIWidgets.service
             mapKey("#backspace", TextEditOp.Backspace);
 
             // OSX is the special case for input shortcuts
-            if (SystemInfo.operatingSystemFamily == OperatingSystemFamily.MacOSX)
-            {
+            if (SystemInfo.operatingSystemFamily == OperatingSystemFamily.MacOSX) {
                 // Keyboard mappings for mac
                 // TODO     mapKey ("home", TextEditOp.ScrollStart);
                 // TODO     mapKey ("end", TextEditOp.ScrollEnd);
@@ -450,9 +411,7 @@ namespace Unity.UIWidgets.service
                 mapKey("&delete", TextEditOp.DeleteWordForward);
                 mapKey("&backspace", TextEditOp.DeleteWordBack);
                 mapKey("%backspace", TextEditOp.DeleteLineBack);
-            }
-            else
-            {
+            } else {
                 // Windows/Linux keymappings
                 mapKey("home", TextEditOp.MoveGraphicalLineStart);
                 mapKey("end", TextEditOp.MoveGraphicalLineEnd);
@@ -492,15 +451,13 @@ namespace Unity.UIWidgets.service
                 mapKey("#insert", TextEditOp.Paste);
             }
         }
-        
-        static void mapKey(string key, TextEditOp action)
-        {
+
+        static void mapKey(string key, TextEditOp action) {
             s_Keyactions[Event.KeyboardEvent(key)] = action;
         }
     }
-    
-    public enum TextEditOp
-    {
+
+    public enum TextEditOp {
         MoveLeft,
         MoveRight,
         MoveUp,

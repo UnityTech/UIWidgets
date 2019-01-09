@@ -5,8 +5,7 @@ using Unity.UIWidgets.painting;
 using Unity.UIWidgets.ui;
 using UnityEngine;
 
-namespace Unity.UIWidgets.rendering
-{
+namespace Unity.UIWidgets.rendering {
     public enum TextOverflow {
         /// Clip the overflowing text to fix its container.
         clip,
@@ -18,244 +17,212 @@ namespace Unity.UIWidgets.rendering
         ellipsis,
     }
 
-    
-    public class RenderParagraph: RenderBox
-    {
-        
-        private static readonly string _kEllipsis = "\u2026";
-        
-        private bool _softWrap;
 
-        private TextOverflow _overflow;
-        private readonly TextPainter _textPainter;
-        private bool _hasVisualOverflow = false;
-        
-        public RenderParagraph(TextSpan text, 
+    public class RenderParagraph : RenderBox {
+        static readonly string _kEllipsis = "\u2026";
+
+        bool _softWrap;
+
+        TextOverflow _overflow;
+        readonly TextPainter _textPainter;
+        bool _hasVisualOverflow = false;
+
+        public RenderParagraph(TextSpan text,
             TextAlign textAlign = TextAlign.left,
             TextDirection textDirection = TextDirection.ltr,
             bool softWrap = true,
             TextOverflow overflow = TextOverflow.clip,
             double textScaleFactor = 1.0,
             int maxLines = 0
-            )
-        {
-            _softWrap = softWrap;
-            _overflow = overflow;
-            _textPainter = new TextPainter(
+        ) {
+            this._softWrap = softWrap;
+            this._overflow = overflow;
+            this._textPainter = new TextPainter(
                 text,
                 textAlign,
                 textDirection,
                 textScaleFactor,
                 maxLines,
                 overflow == TextOverflow.ellipsis ? _kEllipsis : ""
-                );
+            );
         }
 
-        public TextSpan text
-        {
-            get
-            {
-                return _textPainter.text;
-            }
+        public TextSpan text {
+            get { return this._textPainter.text; }
 
-            set
-            {
+            set {
                 Debug.Assert(value != null);
-                switch (_textPainter.text.compareTo(value))
-                {
-                        case RenderComparison.identical:
-                        case RenderComparison.metadata:
-                            return;
-                        case RenderComparison.paint:
-                            _textPainter.text = value;
-                            markNeedsPaint();
-                            break;
-                        case RenderComparison.layout:
-                            _textPainter.text = value;
-                            markNeedsLayout();
-                            break;
+                switch (this._textPainter.text.compareTo(value)) {
+                    case RenderComparison.identical:
+                    case RenderComparison.metadata:
+                        return;
+                    case RenderComparison.paint:
+                        this._textPainter.text = value;
+                        this.markNeedsPaint();
+                        break;
+                    case RenderComparison.layout:
+                        this._textPainter.text = value;
+                        this.markNeedsLayout();
+                        break;
                 }
             }
         }
 
-        public TextAlign textAlign
-        {
-            get { return _textPainter.textAlign; }
-            set
-            {
-                if (_textPainter.textAlign == value)
-                {
+        public TextAlign textAlign {
+            get { return this._textPainter.textAlign; }
+            set {
+                if (this._textPainter.textAlign == value) {
                     return;
                 }
-                _textPainter.textAlign = value;
-                markNeedsPaint();
+                this._textPainter.textAlign = value;
+                this.markNeedsPaint();
             }
         }
 
-        public TextDirection? textDirection
-        {
-            get { return _textPainter.textDirection; }
-            set
-            {
-                if (_textPainter.textDirection == value)
-                {
+        public TextDirection? textDirection {
+            get { return this._textPainter.textDirection; }
+            set {
+                if (this._textPainter.textDirection == value) {
                     return;
                 }
-                _textPainter.textDirection = textDirection;
-                markNeedsLayout();
+                this._textPainter.textDirection = this.textDirection;
+                this.markNeedsLayout();
             }
         }
-        
-        public bool softWrap
-        {
-            get { return _softWrap; }
-            set
-            {
-                if (_softWrap == value)
-                {
+
+        public bool softWrap {
+            get { return this._softWrap; }
+            set {
+                if (this._softWrap == value) {
                     return;
                 }
-                _softWrap = value;
-                markNeedsLayout();
+                this._softWrap = value;
+                this.markNeedsLayout();
             }
         }
-        
-        public TextOverflow overflow
-        {
-            get { return _overflow; }
-            set
-            {
-                if (_overflow == value)
-                {
+
+        public TextOverflow overflow {
+            get { return this._overflow; }
+            set {
+                if (this._overflow == value) {
                     return;
                 }
-                _overflow = value;
-                _textPainter.ellipsis = value == TextOverflow.ellipsis ? _kEllipsis : null;
+                this._overflow = value;
+                this._textPainter.ellipsis = value == TextOverflow.ellipsis ? _kEllipsis : null;
                 // _textPainter.e
-                markNeedsLayout();
-            }
-        }
-        
-        public double textScaleFactor
-        {
-            get { return _textPainter.textScaleFactor; }
-            set
-            {
-                if (Math.Abs(_textPainter.textScaleFactor - value) < 0.00000001)
-                {
-                    return;
-                }
-                _textPainter.textScaleFactor = value;
-                markNeedsLayout();
+                this.markNeedsLayout();
             }
         }
 
-        public int maxLines
-        {
-            get { return _textPainter.maxLines; }
-            set
-            {
-                if (_textPainter.maxLines == value)
-                {
+        public double textScaleFactor {
+            get { return this._textPainter.textScaleFactor; }
+            set {
+                if (Math.Abs(this._textPainter.textScaleFactor - value) < 0.00000001) {
+                    return;
+                }
+                this._textPainter.textScaleFactor = value;
+                this.markNeedsLayout();
+            }
+        }
+
+        public int maxLines {
+            get { return this._textPainter.maxLines; }
+            set {
+                if (this._textPainter.maxLines == value) {
                     return;
                 }
 
-                _textPainter.maxLines = value;
-                markNeedsLayout();
+                this._textPainter.maxLines = value;
+                this.markNeedsLayout();
             }
         }
 
-        public Size textSize
-        {
-            get { return _textPainter.size; }
+        public Size textSize {
+            get { return this._textPainter.size; }
         }
 
         protected override double computeMinIntrinsicWidth(double height) {
-            _layoutText();
-            return _textPainter.minIntrinsicWidth;
+            this._layoutText();
+            return this._textPainter.minIntrinsicWidth;
         }
-        
+
         protected override double computeMaxIntrinsicWidth(double height) {
-            _layoutText();
-            return _textPainter.maxIntrinsicWidth;
+            this._layoutText();
+            return this._textPainter.maxIntrinsicWidth;
         }
-        
+
         double _computeIntrinsicHeight(double width) {
-            _layoutText(minWidth: width, maxWidth: width);
-            return _textPainter.height;
+            this._layoutText(minWidth: width, maxWidth: width);
+            return this._textPainter.height;
         }
 
-        protected override double  computeMinIntrinsicHeight(double width) {
-            return _computeIntrinsicHeight(width);
+        protected override double computeMinIntrinsicHeight(double width) {
+            return this._computeIntrinsicHeight(width);
         }
 
-        protected override double  computeMaxIntrinsicHeight(double width) {
-            return _computeIntrinsicHeight(width);
+        protected override double computeMaxIntrinsicHeight(double width) {
+            return this._computeIntrinsicHeight(width);
         }
 
-        protected override double?  computeDistanceToActualBaseline(TextBaseline baseline) {
-            _layoutTextWithConstraints(constraints);
-            return _textPainter.computeDistanceToActualBaseline(baseline);
+        protected override double? computeDistanceToActualBaseline(TextBaseline baseline) {
+            this._layoutTextWithConstraints(this.constraints);
+            return this._textPainter.computeDistanceToActualBaseline(baseline);
         }
 
 
-        protected override bool hitTestSelf(Offset position)
-        {
+        protected override bool hitTestSelf(Offset position) {
             return true;
         }
 
         protected override void performLayout() {
-            _layoutTextWithConstraints(constraints);
-            var textSize = _textPainter.size;
-            var didOverflowHeight = _textPainter.didExceedMaxLines;
-            size = constraints.constrain(textSize);
-            
-            var didOverflowWidth = size.width < textSize.width;
-            _hasVisualOverflow = didOverflowWidth || didOverflowHeight;
+            this._layoutTextWithConstraints(this.constraints);
+            var textSize = this._textPainter.size;
+            var didOverflowHeight = this._textPainter.didExceedMaxLines;
+            this.size = this.constraints.constrain(textSize);
+
+            var didOverflowWidth = this.size.width < textSize.width;
+            this._hasVisualOverflow = didOverflowWidth || didOverflowHeight;
         }
- 
+
         public override void paint(PaintingContext context, Offset offset) {
-            _layoutTextWithConstraints(constraints);
+            this._layoutTextWithConstraints(this.constraints);
             var canvas = context.canvas;
-            
-            if (_hasVisualOverflow) {
-                var bounds = offset & size;
+
+            if (this._hasVisualOverflow) {
+                var bounds = offset & this.size;
                 canvas.save();
                 canvas.clipRect(bounds);
             }
-            _textPainter.paint(canvas, offset);
-            if (_hasVisualOverflow) {
+            this._textPainter.paint(canvas, offset);
+            if (this._hasVisualOverflow) {
                 canvas.restore();
             }
         }
-        
-        private void _layoutText(double minWidth = 0.0, double maxWidth = double.PositiveInfinity)
-        {
-            var widthMatters = softWrap || overflow == TextOverflow.ellipsis;
-            _textPainter.layout(minWidth, widthMatters ? maxWidth : double.PositiveInfinity);
-        }
-        
-        private void _layoutTextWithConstraints(BoxConstraints constraints) {
-            _layoutText(minWidth: constraints.minWidth, maxWidth: constraints.maxWidth);
+
+        void _layoutText(double minWidth = 0.0, double maxWidth = double.PositiveInfinity) {
+            var widthMatters = this.softWrap || this.overflow == TextOverflow.ellipsis;
+            this._textPainter.layout(minWidth, widthMatters ? maxWidth : double.PositiveInfinity);
         }
 
-        public override List<DiagnosticsNode> debugDescribeChildren()
-        {
-            return new List<DiagnosticsNode>
-            {
-                text.toDiagnosticsNode(name: "text", style: DiagnosticsTreeStyle.transition)
+        void _layoutTextWithConstraints(BoxConstraints constraints) {
+            this._layoutText(minWidth: constraints.minWidth, maxWidth: constraints.maxWidth);
+        }
+
+        public override List<DiagnosticsNode> debugDescribeChildren() {
+            return new List<DiagnosticsNode> {
+                this.text.toDiagnosticsNode(name: "text", style: DiagnosticsTreeStyle.transition)
             };
         }
-        
+
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
-            properties.add(new EnumProperty<TextAlign>("textAlign", textAlign));
-            properties.add(new EnumProperty<TextDirection?>("textDirection", textDirection));
-            properties.add(new FlagProperty("softWrap", value: softWrap, ifTrue: "wrapping at box width", 
+            properties.add(new EnumProperty<TextAlign>("textAlign", this.textAlign));
+            properties.add(new EnumProperty<TextDirection?>("textDirection", this.textDirection));
+            properties.add(new FlagProperty("softWrap", value: this.softWrap, ifTrue: "wrapping at box width",
                 ifFalse: "no wrapping except at line break characters", showName: true));
-            properties.add(new EnumProperty<TextOverflow>("overflow", overflow));
-            properties.add(new DoubleProperty("textScaleFactor", textScaleFactor, defaultValue: 1.0));
-            properties.add(new IntProperty("maxLines", maxLines, ifNull: "unlimited"));
+            properties.add(new EnumProperty<TextOverflow>("overflow", this.overflow));
+            properties.add(new DoubleProperty("textScaleFactor", this.textScaleFactor, defaultValue: 1.0));
+            properties.add(new IntProperty("maxLines", this.maxLines, ifNull: "unlimited"));
         }
     }
 }

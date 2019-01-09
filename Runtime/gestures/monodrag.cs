@@ -169,7 +169,7 @@ namespace Unity.UIWidgets.gestures {
                         ));
                         return null;
                     }, debugReport: () =>
-                        string.Format("{0}; fling at {1}.", estimate, velocity));
+                        $"{estimate}; fling at {velocity}.");
                 } else {
                     this.invokeCallback<object>("onEnd", () => {
                             this.onEnd(new DragEndDetails(
@@ -195,7 +195,7 @@ namespace Unity.UIWidgets.gestures {
     }
 
     public class VerticalDragGestureRecognizer : DragGestureRecognizer {
-        public VerticalDragGestureRecognizer(Object debugOwner = null)
+        public VerticalDragGestureRecognizer(object debugOwner = null)
             : base(debugOwner: debugOwner) {
         }
 
@@ -223,7 +223,7 @@ namespace Unity.UIWidgets.gestures {
     }
 
     public class HorizontalDragGestureRecognizer : DragGestureRecognizer {
-        public HorizontalDragGestureRecognizer(Object debugOwner = null)
+        public HorizontalDragGestureRecognizer(object debugOwner = null)
             : base(debugOwner: debugOwner) {
         }
 
@@ -251,7 +251,7 @@ namespace Unity.UIWidgets.gestures {
     }
 
     public class PanGestureRecognizer : DragGestureRecognizer {
-        public PanGestureRecognizer(Object debugOwner = null)
+        public PanGestureRecognizer(object debugOwner = null)
             : base(debugOwner: debugOwner) {
         }
 

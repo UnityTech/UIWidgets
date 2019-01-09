@@ -1,5 +1,4 @@
 using Unity.UIWidgets.ui;
-using UnityEngine;
 
 namespace Unity.UIWidgets.flow {
     public class LayerTree {
@@ -18,7 +17,7 @@ namespace Unity.UIWidgets.flow {
         }
 
         double _devicePixelRatio;
-        
+
         public double devicePixelRatio {
             get { return this._devicePixelRatio; }
             set { this._devicePixelRatio = value; }

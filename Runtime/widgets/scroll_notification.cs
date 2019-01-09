@@ -39,8 +39,9 @@ namespace Unity.UIWidgets.widgets {
 
         protected override void debugFillDescription(List<string> description) {
             base.debugFillDescription(description);
-            if (this.dragDetails != null)
+            if (this.dragDetails != null) {
                 description.Add(this.dragDetails.ToString());
+            }
         }
     }
 
@@ -61,7 +62,7 @@ namespace Unity.UIWidgets.widgets {
 
         protected override void debugFillDescription(List<string> description) {
             base.debugFillDescription(description);
-            description.Add(string.Format("scrollDelta: {0}", this.scrollDelta));
+            description.Add($"scrollDelta: {this.scrollDelta}");
             if (this.dragDetails != null) {
                 description.Add(this.dragDetails.ToString());
             }
@@ -89,8 +90,8 @@ namespace Unity.UIWidgets.widgets {
 
         protected override void debugFillDescription(List<string> description) {
             base.debugFillDescription(description);
-            description.Add(string.Format("overscroll: {0:F1}", this.overscroll));
-            description.Add(string.Format("velocity: {0:F1}", this.velocity));
+            description.Add($"overscroll: {this.overscroll:F1}");
+            description.Add($"velocity: {this.velocity:F1}");
             if (this.dragDetails != null) {
                 description.Add(this.dragDetails.ToString());
             }
@@ -131,7 +132,7 @@ namespace Unity.UIWidgets.widgets {
 
         protected override void debugFillDescription(List<string> description) {
             base.debugFillDescription(description);
-            description.Add(string.Format("direction: {0}", this.direction));
+            description.Add($"direction: {this.direction}");
         }
     }
 

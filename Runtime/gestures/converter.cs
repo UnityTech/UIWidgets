@@ -17,8 +17,8 @@ namespace Unity.UIWidgets.gestures {
         static int _pointerCount = 0;
 
         public void startNewPointer() {
-            _PointerState._pointerCount += 1;
-            this._pointer = _PointerState._pointerCount;
+            _pointerCount += 1;
+            this._pointer = _pointerCount;
         }
 
         public bool down {
@@ -40,8 +40,7 @@ namespace Unity.UIWidgets.gestures {
         public Offset lastPosition;
 
         public override string ToString() {
-            return string.Format("_PointerState(pointer: {0}, down: {1}, lastPosition: {2})",
-                this.pointer, this.down, this.lastPosition);
+            return $"_PointerState(pointer: {this.pointer}, down: {this.down}, lastPosition: {this.lastPosition})";
         }
     }
 
@@ -85,13 +84,13 @@ namespace Unity.UIWidgets.gestures {
                             break;
                         }
                         D.assert(_pointers.ContainsKey(datum.device));
-                        
+
                         _PointerState state = _pointers[datum.device];
                         if (!state.down) {
                             break;
                         }
                         D.assert(state.down);
-                        
+
                         Offset offset = position - state.lastPosition;
                         state.lastPosition = position;
                         yield return new PointerMoveEvent(
@@ -105,14 +104,13 @@ namespace Unity.UIWidgets.gestures {
                     }
                         break;
 
-                    case PointerChange.hover:
-                    {
+                    case PointerChange.hover: {
                         yield return new PointerHoverEvent(
                             timeStamp: timeStamp,
                             kind: kind,
                             device: datum.device,
                             position: position
-                            );
+                        );
                         break;
                     }
                     case PointerChange.up:

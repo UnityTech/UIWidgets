@@ -131,9 +131,9 @@ namespace Unity.UIWidgets.rendering {
             double leadingScrollOffset = this.indexToLayoutOffset(itemExtent, firstIndex);
             double trailingScrollOffset = this.indexToLayoutOffset(itemExtent, lastIndex + 1);
 
-            D.assert(firstIndex == 0 || this.childScrollOffset(firstChild) <= scrollOffset);
+            D.assert(firstIndex == 0 || this.childScrollOffset(this.firstChild) <= scrollOffset);
             D.assert(this.debugAssertChildListIsNonEmptyAndContiguous());
-            D.assert(this.indexOf(firstChild) == firstIndex);
+            D.assert(this.indexOf(this.firstChild) == firstIndex);
             D.assert(targetLastIndex == null || lastIndex <= targetLastIndex);
 
 

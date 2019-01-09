@@ -48,10 +48,8 @@ namespace Unity.UIWidgets.gestures {
         }
 
         public override string ToString() {
-            return string.Format("HitTestResult({0})",
-                this._path.isEmpty()
-                    ? "<empty path>"
-                    : string.Join(", ", this._path.Select(x => x.ToString()).ToArray()));
+            return
+                $"HitTestResult({(this._path.isEmpty() ? "<empty path>" : string.Join(", ", this._path.Select(x => x.ToString()).ToArray()))})";
         }
     }
 }

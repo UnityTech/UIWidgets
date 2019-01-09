@@ -35,13 +35,12 @@ namespace Unity.UIWidgets.flow {
                 return true;
             });
 
-            
+
             canvas.save();
             try {
                 canvas.resetMatrix();
                 canvas.drawImage(this.image, bounds.topLeft, new Paint());
-            }
-            finally {
+            } finally {
                 canvas.restore();
             }
         }
@@ -70,17 +69,27 @@ namespace Unity.UIWidgets.flow {
         public readonly float devicePixelRatio;
 
         public bool Equals(_RasterCacheKey other) {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
             return Equals(this.picture, other.picture) &&
                    Equals(this.matrix, other.matrix) &&
                    this.devicePixelRatio.Equals(other.devicePixelRatio);
         }
 
         public override bool Equals(object obj) {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
             return this.Equals((_RasterCacheKey) obj);
         }
 
@@ -191,14 +200,17 @@ namespace Unity.UIWidgets.flow {
                 Mathf.CeilToInt((float) (bounds.width * devicePixelRatio)),
                 Mathf.CeilToInt((float) (bounds.height * devicePixelRatio)),
                 RenderTextureFormat.Default, 24) {
-                msaaSamples = QualitySettings.antiAliasing,
                 useMipMap = false,
                 autoGenerateMips = false,
             };
 
+            if (QualitySettings.antiAliasing != 0) {
+                desc.msaaSamples = QualitySettings.antiAliasing;
+            }
+
             var renderTexture = new RenderTexture(desc);
             renderTexture.hideFlags = HideFlags.HideAndDontSave;
-            
+
             var canvas = new CommandBufferCanvas(renderTexture, devicePixelRatio);
             canvas.translate((float) -bounds.left, (float) -bounds.top);
             canvas.concat(transform);

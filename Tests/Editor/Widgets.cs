@@ -1,39 +1,34 @@
-using Unity.UIWidgets.painting;
-using Unity.UIWidgets.editor;
-using Unity.UIWidgets.widgets;
-using System.Collections.Generic;
-using Unity.UIWidgets.rendering;
-using UnityEditor;
-using UnityEngine;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using Unity.UIWidgets.editor;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
+using Unity.UIWidgets.painting;
+using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
-
-using ui = Unity.UIWidgets.ui;
-using widgets = Unity.UIWidgets.widgets;
+using Unity.UIWidgets.widgets;
+using UnityEditor;
+using UnityEngine;
 using Color = Unity.UIWidgets.ui.Color;
+using Image = Unity.UIWidgets.widgets.Image;
 using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace UIWidgets.Tests {
-    
     public class Widgets : EditorWindow {
-        private WindowAdapter windowAdapter;
+        WindowAdapter windowAdapter;
 
-        private readonly Func<Widget>[] _options;
+        readonly Func<Widget>[] _options;
 
-        private readonly string[] _optionStrings;
+        readonly string[] _optionStrings;
 
-        private int _selected;
+        int _selected;
 
-        private string localImagePath;
+        string localImagePath;
 
-        [NonSerialized] private bool hasInvoked = false;
+        [NonSerialized] bool hasInvoked = false;
 
-        public Widgets()
-        {
-            
+        public Widgets() {
             this.wantsMouseEnterLeaveWindow = true;
             this.wantsMouseMove = true;
             this._options = new Func<Widget>[] {
@@ -58,8 +53,8 @@ namespace UIWidgets.Tests {
 
             // if local image test
             if (selected == 0) {
-                localImagePath = EditorGUILayout.TextField(localImagePath);
-                
+                this.localImagePath = EditorGUILayout.TextField(this.localImagePath);
+
                 if (this._selected != selected) {
                     this._selected = selected;
                     this._attachRootWidget(null);
@@ -69,17 +64,16 @@ namespace UIWidgets.Tests {
                     var rootWidget = this._options[this._selected]();
                     this._attachRootWidget(rootWidget);
                 }
-                
+
                 if (GUILayout.Button("loadAsset")) {
                     var rootWidget = this.loadAsset();
                     this._attachRootWidget(rootWidget);
                 }
-                
+
                 if (GUILayout.Button("UnloadUnusedAssets")) {
                     Resources.UnloadUnusedAssets();
                 }
-            }
-            else if (selected != this._selected || !this.hasInvoked) {
+            } else if (selected != this._selected || !this.hasInvoked) {
                 this._selected = selected;
                 this.hasInvoked = true;
 
@@ -95,11 +89,11 @@ namespace UIWidgets.Tests {
             this.windowAdapter.attachRootWidget(new WidgetsApp(window: this.windowAdapter, home: widget));
         }
 
-        private void Update() {
+        void Update() {
             this.windowAdapter.Update();
         }
 
-        private void OnEnable() {
+        void OnEnable() {
             this.windowAdapter = new EditorWindowAdapter(this);
             this.windowAdapter.OnEnable();
         }
@@ -110,16 +104,16 @@ namespace UIWidgets.Tests {
         }
 
         Widget stack() {
-            var image = new widgets.Container(
+            var image = new Container(
                 width: 150,
                 height: 150,
-                child: widgets.Image.network(
+                child: Image.network(
                     "https://tse3.mm.bing.net/th?id=OIP.XOAIpvR1kh-CzISe_Nj9GgHaHs&pid=Api",
                     width: 100,
                     height: 100
                 )
             );
-            var text = new widgets.Container(
+            var text = new Container(
                 width: 150,
                 height: 150,
                 child: new Text("TTTTTTTTTTTTTTTTEST")
@@ -134,8 +128,7 @@ namespace UIWidgets.Tests {
         }
 
         Widget localImage() {
-            var image = widgets.Image.file(
-                localImagePath,
+            var image = Image.file(this.localImagePath,
                 filterMode: FilterMode.Bilinear
             );
 
@@ -143,8 +136,7 @@ namespace UIWidgets.Tests {
         }
 
         Widget loadAsset() {
-            var image = widgets.Image.asset(
-                localImagePath,
+            var image = Image.asset(this.localImagePath,
                 filterMode: FilterMode.Bilinear
             );
 
@@ -152,7 +144,7 @@ namespace UIWidgets.Tests {
         }
 
         Widget flexRow() {
-            var image = widgets.Image.network(
+            var image = Image.network(
                 "https://tse3.mm.bing.net/th?id=OIP.XOAIpvR1kh-CzISe_Nj9GgHaHs&pid=Api",
                 width: 100,
                 height: 100
@@ -163,7 +155,7 @@ namespace UIWidgets.Tests {
             rowImages.Add(image);
             rowImages.Add(image);
 
-            var row = new widgets.Row(
+            var row = new Row(
                 textDirection: null,
                 textBaseline: null,
                 key: null,
@@ -178,7 +170,7 @@ namespace UIWidgets.Tests {
         }
 
         Widget flexColumn() {
-            var image = widgets.Image.network(
+            var image = Image.network(
                 "https://tse3.mm.bing.net/th?id=OIP.XOAIpvR1kh-CzISe_Nj9GgHaHs&pid=Api",
                 width: 100,
                 height: 100
@@ -188,7 +180,7 @@ namespace UIWidgets.Tests {
             columnImages.Add(image);
             columnImages.Add(image);
 
-            var column = new widgets.Column(
+            var column = new Column(
                 textDirection: null,
                 textBaseline: null,
                 key: null,
@@ -203,18 +195,18 @@ namespace UIWidgets.Tests {
         }
 
         Widget container() {
-            var image = widgets.Image.network(
+            var image = Image.network(
                 "https://tse3.mm.bing.net/th?id=OIP.XOAIpvR1kh-CzISe_Nj9GgHaHs&pid=Api",
                 width: 100,
                 height: 100,
                 repeat: ImageRepeat.repeatX
             );
-            var container = new widgets.Container(
+            var container = new Container(
                 width: 200,
                 height: 200,
                 margin: EdgeInsets.all(30.0),
                 padding: EdgeInsets.all(15.0),
-                color: ui.Color.fromARGB(255, 244, 190, 85),
+                color: Color.fromARGB(255, 244, 190, 85),
                 child: image
             );
 
@@ -224,11 +216,11 @@ namespace UIWidgets.Tests {
         Widget containerSimple() {
             var container = new Container(
                 alignment: Alignment.centerRight,
-                color: ui.Color.fromARGB(255, 244, 190, 85),
+                color: Color.fromARGB(255, 244, 190, 85),
                 child: new Container(
                     width: 120,
                     height: 120,
-                    color: ui.Color.fromARGB(255, 255, 0, 85)
+                    color: Color.fromARGB(255, 255, 0, 85)
                 )
             );
 
@@ -286,7 +278,7 @@ namespace UIWidgets.Tests {
                                 color: CLColors.icon2
                             )
                         ),
-                        new widgets.Container(
+                        new Container(
                             decoration: new BoxDecoration(
                                 color: CLColors.white,
                                 borderRadius: BorderRadius.all(3)
@@ -440,7 +432,7 @@ namespace UIWidgets.Tests {
             return new Container(
                 height: 450,
                 color: CLColors.white,
-                child: widgets.Image.network(
+                child: Image.network(
                     "https://d2ujflorbtfzji.cloudfront.net/banner/5c57178c-4be6-4903-953b-85125bfb7154.jpg",
                     fit: BoxFit.cover
                 )
@@ -510,19 +502,19 @@ namespace UIWidgets.Tests {
         Widget _buildContentList(BuildContext context) {
             return new NotificationListener<ScrollNotification>(
                 onNotification: (ScrollNotification notification) => {
-                    _onNotification(notification, context);
+                    this._onNotification(notification, context);
                     return true;
                 },
                 child: new Flexible(
                     child: new ListView(
                         physics: new AlwaysScrollableScrollPhysics(),
                         children: new List<Widget> {
-                            _buildBanner(context),
-                            _buildTopAssetsRow(context, "Recommanded For You"),
-                            _buildTopAssetsRow(context, "Beach Day"),
-                            _buildTopAssetsRow(context, "Top Free Packages"),
-                            _buildTopAssetsRow(context, "Top Paid Packages"),
-                            _buildFooter(context)
+                            this._buildBanner(context),
+                            this._buildTopAssetsRow(context, "Recommanded For You"),
+                            this._buildTopAssetsRow(context, "Beach Day"),
+                            this._buildTopAssetsRow(context, "Top Free Packages"),
+                            this._buildTopAssetsRow(context, "Top Paid Packages"),
+                            this._buildFooter(context)
                         }
                     )
                 )
@@ -583,7 +575,7 @@ namespace UIWidgets.Tests {
                                 ),
                                 width: 200,
                                 height: 124,
-                                child: widgets.Image.network(
+                                child: Image.network(
                                     this.imageSrc,
                                     fit: BoxFit.fill
                                 )
@@ -600,8 +592,7 @@ namespace UIWidgets.Tests {
                                             height: 18,
                                             padding: EdgeInsets.only(top: 3),
                                             child:
-                                            new Text(
-                                                category,
+                                            new Text(this.category,
                                                 style: new TextStyle(
                                                     fontSize: 11,
                                                     color: CLColors.text5
@@ -612,8 +603,7 @@ namespace UIWidgets.Tests {
                                             height: 20,
                                             padding: EdgeInsets.only(top: 2),
                                             child:
-                                            new Text(
-                                                name,
+                                            new Text(this.name,
                                                 style: new TextStyle(
                                                     fontSize: 14,
                                                     color: CLColors.text6
@@ -651,7 +641,7 @@ namespace UIWidgets.Tests {
                                                                 )
                                                             })
                                                     ),
-                                                    showBadge
+                                                    this.showBadge
                                                         ? new Container(
                                                             width: 80,
                                                             height: 18,
@@ -704,7 +694,7 @@ namespace UIWidgets.Tests {
             return new Container(
                 padding: EdgeInsets.only(left: 16.0, right: 8.0),
                 //  color: CLColors.blue,
-                height: headerHeight - _offsetY,
+                height: headerHeight - this._offsetY,
                 child: new Row(
                     children: new List<Widget> {
                         new Flexible(
@@ -713,7 +703,8 @@ namespace UIWidgets.Tests {
                             child: new Text(
                                 "Today",
                                 style: new TextStyle(
-                                    fontSize: (34.0 / headerHeight) * (headerHeight - _offsetY),
+                                    fontSize: (34.0 / headerHeight) *
+                                              (headerHeight - this._offsetY),
                                     color: CLColors.white
                                 )
                             )),
@@ -742,12 +733,11 @@ namespace UIWidgets.Tests {
             double pixels = notification.metrics.pixels;
             if (pixels >= 0.0) {
                 if (pixels <= headerHeight) {
-                    setState(() => { _offsetY = pixels / 2.0; });
+                    this.setState(() => { this._offsetY = pixels / 2.0; });
                 }
-            }
-            else {
-                if (_offsetY != 0.0) {
-                    setState(() => { _offsetY = 0.0; });
+            } else {
+                if (this._offsetY != 0.0) {
+                    this.setState(() => { this._offsetY = 0.0; });
                 }
             }
 
@@ -758,7 +748,7 @@ namespace UIWidgets.Tests {
         Widget _buildContentList(BuildContext context) {
             return new NotificationListener<ScrollNotification>(
                 onNotification: (ScrollNotification notification) => {
-                    _onNotification(notification, context);
+                    this._onNotification(notification, context);
                     return true;
                 },
                 child: new Flexible(
@@ -779,7 +769,7 @@ namespace UIWidgets.Tests {
                 )
             );
         }
-        
+
         public override Widget build(BuildContext context) {
             var container = new Container(
                 //  color: CLColors.background1,

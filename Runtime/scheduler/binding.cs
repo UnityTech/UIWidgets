@@ -15,7 +15,7 @@ namespace Unity.UIWidgets.scheduler {
             D.assert(() => {
                 if (rescheduling) {
                     D.assert(() => {
-                        if (_FrameCallbackEntry.debugCurrentCallbackStack == null) {
+                        if (debugCurrentCallbackStack == null) {
                             throw new UIWidgetsError(
                                 "scheduleFrameCallback called with rescheduling true, but no callback is in scope.\n" +
                                 "The \"rescheduling\" argument should only be set to true if the " +
@@ -28,7 +28,7 @@ namespace Unity.UIWidgets.scheduler {
 
                         return true;
                     });
-                    this.debugStack = _FrameCallbackEntry.debugCurrentCallbackStack;
+                    this.debugStack = debugCurrentCallbackStack;
                 } else {
                     this.debugStack = new StackTrace(2, true);
                 }
@@ -57,7 +57,7 @@ namespace Unity.UIWidgets.scheduler {
                 D.assert(_instance != null, "Binding.instance is null");
                 return _instance;
             }
-            
+
             set {
                 if (value == null) {
                     D.assert(_instance != null, "Binding.instance is already cleared.");
@@ -249,15 +249,14 @@ namespace Unity.UIWidgets.scheduler {
                 if (D.debugPrintBeginFrameBanner || D.debugPrintEndFrameBanner) {
                     var frameTimeStampDescription = new StringBuilder();
                     if (rawTimeStamp != null) {
-                        SchedulerBinding._debugDescribeTimeStamp(
+                        _debugDescribeTimeStamp(
                             this._currentFrameTimeStamp.Value, frameTimeStampDescription);
                     } else {
                         frameTimeStampDescription.Append("(warm-up frame)");
                     }
 
-                    this._debugBanner = string.Format("▄▄▄▄▄▄▄▄ Frame {0}   {1} ▄▄▄▄▄▄▄▄",
-                        this._profileFrameNumber.ToString().PadRight(7),
-                        frameTimeStampDescription.ToString().PadLeft(18));
+                    this._debugBanner =
+                        $"▄▄▄▄▄▄▄▄ Frame {this._profileFrameNumber.ToString().PadRight(7)}   {frameTimeStampDescription.ToString().PadLeft(18)} ▄▄▄▄▄▄▄▄";
                     if (D.debugPrintBeginFrameBanner) {
                         Debug.Log(this._debugBanner);
                     }
@@ -281,8 +280,7 @@ namespace Unity.UIWidgets.scheduler {
                 }
 
                 this._removedIds.Clear();
-            }
-            finally {
+            } finally {
                 this._schedulerPhase = SchedulerPhase.midFrameMicrotasks;
             }
         }
@@ -303,8 +301,7 @@ namespace Unity.UIWidgets.scheduler {
                 foreach (FrameCallback callback in localPostFrameCallbacks) {
                     this._invokeFrameCallback(callback, this._currentFrameTimeStamp.Value);
                 }
-            }
-            finally {
+            } finally {
                 this._schedulerPhase = SchedulerPhase.idle;
                 D.assert(() => {
                     if (D.debugPrintEndFrameBanner) {
@@ -355,8 +352,7 @@ namespace Unity.UIWidgets.scheduler {
 
             try {
                 callback(timeStamp);
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 UIWidgetsError.reportError(new UIWidgetsErrorDetails(
                     exception: ex,
                     library: "scheduler library",

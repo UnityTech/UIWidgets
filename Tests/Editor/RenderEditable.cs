@@ -1,5 +1,4 @@
-﻿using UnityEditor;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using RSG;
@@ -10,20 +9,18 @@ using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.service;
 using Unity.UIWidgets.ui;
+using UnityEditor;
 using UnityEngine;
 using Color = Unity.UIWidgets.ui.Color;
-using rendering = Unity.UIWidgets.rendering;
-using painting = Unity.UIWidgets.painting;
+using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
-namespace UIWidgets.Tests
-{
-    public class RenderEditable: EditorWindow
-    {
-        private readonly Func<RenderBox>[] _options;
+namespace UIWidgets.Tests {
+    public class RenderEditable : EditorWindow {
+        readonly Func<RenderBox>[] _options;
 
-        private readonly string[] _optionStrings;
+        readonly string[] _optionStrings;
 
-        private int _selected;
+        int _selected;
 
         class _FixedViewportOffset : ViewportOffset {
             internal _FixedViewportOffset(double _pixels) {
@@ -67,7 +64,7 @@ namespace UIWidgets.Tests
                 get { return false; }
             }
         }
-        
+
         RenderEditable() {
             this._options = new Func<RenderBox>[] {
                 this.textEditable,
@@ -77,9 +74,9 @@ namespace UIWidgets.Tests
             this.titleContent = new GUIContent("RenderEditable");
         }
 
-        private WindowAdapter windowAdapter;
+        WindowAdapter windowAdapter;
 
-        [NonSerialized] private bool hasInvoked = false;
+        [NonSerialized] bool hasInvoked = false;
 
         void OnGUI() {
             var selected = EditorGUILayout.Popup("test case", this._selected, this._optionStrings);
@@ -98,7 +95,7 @@ namespace UIWidgets.Tests
             this.windowAdapter.Update();
         }
 
-        private void OnEnable() {
+        void OnEnable() {
             this.windowAdapter = new EditorWindowAdapter(this);
             this.windowAdapter.OnEnable();
         }
@@ -108,21 +105,19 @@ namespace UIWidgets.Tests
             this.windowAdapter = null;
         }
 
-        private RenderBox box(RenderBox p, int width = 400, int height = 400)
-        {
+        RenderBox box(RenderBox p, int width = 400, int height = 400) {
             return new RenderConstrainedOverflowBox(
-                minWidth: width,
-                maxWidth: width,
-                minHeight: height,
-                maxHeight: height,
-                alignment: Alignment.center,
-                child: p
+                    minWidth: width,
+                    maxWidth: width,
+                    minHeight: height,
+                    maxHeight: height,
+                    alignment: Alignment.center,
+                    child: p
                 )
                 ;
         }
-        
-        private RenderBox flexItemBox(RenderBox p, int width = 200, int height = 100)
-        {
+
+        RenderBox flexItemBox(RenderBox p, int width = 200, int height = 100) {
             return new RenderConstrainedBox(
                 additionalConstraints: new BoxConstraints(minWidth: width, maxWidth: width, minHeight: height,
                     maxHeight: height),
@@ -136,62 +131,60 @@ namespace UIWidgets.Tests
                     )
                 ));
         }
-        
-        RenderBox textEditable()
-        {
+
+        RenderBox textEditable() {
             var span = new TextSpan("", children:
-                new List<TextSpan>
-                {
-                    new TextSpan("Word Wrap:The ascent of the font is the distance from the baseline to the top line of the font, as defined in the font's original data file.", null),
-                }, style:new painting.TextStyle(height:1.0));
-            
+                new List<TextSpan> {
+                    new TextSpan(
+                        "Word Wrap:The ascent of the font is the distance from the baseline to the top line of the font, as defined in the font's original data file.",
+                        null),
+                }, style: new TextStyle(height: 1.0));
+
             var flexbox = new RenderFlex(
                 direction: Axis.vertical,
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 crossAxisAlignment: CrossAxisAlignment.center);
 
-            flexbox.add(flexItemBox(
-                new rendering.RenderEditable(span, TextDirection.ltr, 
+            flexbox.add(this.flexItemBox(
+                new Unity.UIWidgets.rendering.RenderEditable(span, TextDirection.ltr,
                     new _FixedViewportOffset(0.0), new ValueNotifier<bool>(true),
-                    onSelectionChanged: selectionChanged, cursorColor: Color.fromARGB(255, 0, 0, 0), 
+                    onSelectionChanged: this.selectionChanged, cursorColor: Color.fromARGB(255, 0, 0, 0),
                     maxLines: 100,
                     selectionColor: Color.fromARGB(255, 255, 0, 0))
             ));
-            
+
             span = new TextSpan("", children:
-                new List<TextSpan>
-                {
-                    new TextSpan("Hard Break:The ascent of the font is the distance\nfrom the baseline to the top \nline of the font,\nas defined in", null),
-                }, style:new painting.TextStyle(height:1.0));
-            flexbox.add(flexItemBox(
-                new rendering.RenderEditable(span, TextDirection.ltr, 
+                new List<TextSpan> {
+                    new TextSpan(
+                        "Hard Break:The ascent of the font is the distance\nfrom the baseline to the top \nline of the font,\nas defined in",
+                        null),
+                }, style: new TextStyle(height: 1.0));
+            flexbox.add(this.flexItemBox(
+                new Unity.UIWidgets.rendering.RenderEditable(span, TextDirection.ltr,
                     new _FixedViewportOffset(0.0), new ValueNotifier<bool>(true),
-                    onSelectionChanged: selectionChanged, cursorColor: Color.fromARGB(255, 0, 0, 0), 
+                    onSelectionChanged: this.selectionChanged, cursorColor: Color.fromARGB(255, 0, 0, 0),
                     maxLines: 100,
                     selectionColor: Color.fromARGB(255, 255, 0, 0))
             ));
-            
+
             span = new TextSpan("", children:
-                new List<TextSpan>
-                {
+                new List<TextSpan> {
                     new TextSpan("Single Line:How to create mixin", null),
-                }, style:new painting.TextStyle(height:1.0));
-            flexbox.add(flexItemBox(
-                new rendering.RenderEditable(span, TextDirection.ltr, 
+                }, style: new TextStyle(height: 1.0));
+            flexbox.add(this.flexItemBox(
+                new Unity.UIWidgets.rendering.RenderEditable(span, TextDirection.ltr,
                     new _FixedViewportOffset(0.0), new ValueNotifier<bool>(true),
-                    onSelectionChanged: selectionChanged, cursorColor: Color.fromARGB(255, 0, 0, 0), 
+                    onSelectionChanged: this.selectionChanged, cursorColor: Color.fromARGB(255, 0, 0, 0),
                     selectionColor: Color.fromARGB(255, 255, 0, 0))
-            , width:300));
+                , width: 300));
             return flexbox;
         }
-        
 
-        private void selectionChanged(TextSelection selection, rendering.RenderEditable renderObject,
-            SelectionChangedCause cause)
-        {
-            Debug.Log(string.Format("selection {0}", selection));
+
+        void selectionChanged(TextSelection selection, Unity.UIWidgets.rendering.RenderEditable renderObject,
+            SelectionChangedCause cause) {
+            Debug.Log($"selection {selection}");
             renderObject.selection = selection;
         }
-        
     }
 }

@@ -1,161 +1,125 @@
 ﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
 
-namespace Unity.UIWidgets.ui
-{
-    public class StyledRuns
-    {
-        private readonly  List<TextStyle> styles = new List<TextStyle>();
-        private readonly List<IndexedRun> runs = new List<IndexedRun>();
+namespace Unity.UIWidgets.ui {
+    public class StyledRuns {
+        readonly List<TextStyle> styles = new List<TextStyle>();
+        readonly List<IndexedRun> runs = new List<IndexedRun>();
 
-        public class RunIterator
-        {
-            private int _charIndex;
-            private int _runIndex;
-            private StyledRuns _runs;
+        public class RunIterator {
+            int _charIndex;
+            int _runIndex;
+            StyledRuns _runs;
 
-            public void nextTo(int index)
-            {
-                if (_charIndex > index)
-                {
+            public void nextTo(int index) {
+                if (this._charIndex > index) {
                     throw new ArgumentException("can to move back");
                 }
-                _charIndex = index;
-                while (_runIndex < _runs.size)
-                {
-                    var run = _runs.getRun(_runIndex);
-                    if (run.start <= _charIndex && _charIndex < run.end)
-                    {
+                this._charIndex = index;
+                while (this._runIndex < this._runs.size) {
+                    var run = this._runs.getRun(this._runIndex);
+                    if (run.start <= this._charIndex && this._charIndex < run.end) {
                         break;
                     }
-                    _runIndex++;
+                    this._runIndex++;
                 }
             }
 
-            public Run run
-            {
-                get { return _runs.getRun(_runIndex); }
-            }
-            
-            public int charIndex
-            {
-                get { return _charIndex; }
+            public Run run {
+                get { return this._runs.getRun(this._runIndex); }
             }
 
-            public int runIndex
-            {
-                get { return _runIndex; }
+            public int charIndex {
+                get { return this._charIndex; }
             }
 
-            public bool end
-            {
-                get
-                {
-                    return runIndex >= _runs.size;
-                }
+            public int runIndex {
+                get { return this._runIndex; }
             }
 
-            internal RunIterator(StyledRuns runs)
-            {
-                _charIndex = 0;
-                _runIndex = 0;
-                _runs = runs;
+            public bool end {
+                get { return this.runIndex >= this._runs.size; }
             }
-            
-            
+
+            internal RunIterator(StyledRuns runs) {
+                this._charIndex = 0;
+                this._runIndex = 0;
+                this._runs = runs;
+            }
         }
-        public class Run
-        {
+
+        public class Run {
             public readonly TextStyle style;
             public readonly int start;
             public readonly int end;
 
-            public Run(TextStyle style, int start, int end)
-            {
+            public Run(TextStyle style, int start, int end) {
                 this.style = style;
                 this.start = start;
                 this.end = end;
             }
         }
-        
-        public class IndexedRun
-        {
+
+        public class IndexedRun {
             public readonly int styleIndex = 0;
             public readonly int start;
             public int end;
 
-            public IndexedRun(int styleIndex, int start, int end)
-            {
+            public IndexedRun(int styleIndex, int start, int end) {
                 this.styleIndex = styleIndex;
                 this.start = start;
                 this.end = end;
             }
         }
-        
-        public StyledRuns()
-        {
-        }
-        
-        public StyledRuns(StyledRuns other)
-        {
-            styles = new List<TextStyle>(other.styles);
-            runs = new List<IndexedRun>(other.runs);
+
+        public StyledRuns() {
         }
 
-        public int addStyle(TextStyle style)
-        {
-            var styleIndex = styles.Count;
-            styles.Add(style);
+        public StyledRuns(StyledRuns other) {
+            this.styles = new List<TextStyle>(other.styles);
+            this.runs = new List<IndexedRun>(other.runs);
+        }
+
+        public int addStyle(TextStyle style) {
+            var styleIndex = this.styles.Count;
+            this.styles.Add(style);
             return styleIndex;
-
         }
 
-        public TextStyle getStyle(int index)
-        {
-            return styles[index];
+        public TextStyle getStyle(int index) {
+            return this.styles[index];
         }
 
-        public void startRun(int styleIndex, int start)
-        {
-            endRunIfNeeded(start);
-            runs.Add(new IndexedRun(styleIndex, start, start));
-            
+        public void startRun(int styleIndex, int start) {
+            this.endRunIfNeeded(start);
+            this.runs.Add(new IndexedRun(styleIndex, start, start));
         }
 
-        public void endRunIfNeeded(int end)
-        {
-            var lastIndex = runs.Count - 1;
-            if (lastIndex < 0)
-            {
+        public void endRunIfNeeded(int end) {
+            var lastIndex = this.runs.Count - 1;
+            if (lastIndex < 0) {
                 return;
             }
 
-            var run = runs[lastIndex];
-            if (run.start == end)
-            {
-                runs.RemoveAt(lastIndex);
-            }
-            else
-            {
+            var run = this.runs[lastIndex];
+            if (run.start == end) {
+                this.runs.RemoveAt(lastIndex);
+            } else {
                 run.end = end;
             }
         }
 
-        public Run getRun(int index)
-        {
-            var run = runs[index];
-            return new Run(styles[run.styleIndex], run.start, run.end);
+        public Run getRun(int index) {
+            var run = this.runs[index];
+            return new Run(this.styles[run.styleIndex], run.start, run.end);
         }
 
-        public RunIterator iterator()
-        {
+        public RunIterator iterator() {
             return new RunIterator(this);
         }
-        
-        public int size
-        {
-            get { return runs.Count; }
+
+        public int size {
+            get { return this.runs.Count; }
         }
     }
 }

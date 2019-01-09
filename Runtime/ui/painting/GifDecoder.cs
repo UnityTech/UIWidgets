@@ -84,17 +84,29 @@ namespace Unity.UIWidgets.ui {
             public int delay;
         }
 
-        public int frameWidth => this._width;
+        public int frameWidth {
+            get { return this._width; }
+        }
 
-        public int frameHeight => this._height;
+        public int frameHeight {
+            get { return this._height; }
+        }
 
-        public GifFrame currentFrame => this._currentFrame;
+        public GifFrame currentFrame {
+            get { return this._currentFrame; }
+        }
 
-        public int frameCount => this._frameCount;
+        public int frameCount {
+            get { return this._frameCount; }
+        }
 
-        public int loopCount => this._loopCount;
+        public int loopCount {
+            get { return this._loopCount; }
+        }
 
-        public bool done => this._done;
+        public bool done {
+            get { return this._done; }
+        }
 
         void _setPixels() {
             // fill in starting image contents based on last image's dispose code
@@ -281,8 +293,9 @@ namespace Unity.UIWidgets.ui {
 
                     //  Interpret the code
 
-                    if ((code > available) || (code == end_of_information))
+                    if ((code > available) || (code == end_of_information)) {
                         break;
+                    }
                     if (code == clear) {
                         //  Reset decoder.
                         code_size = data_size + 1;
@@ -369,8 +382,7 @@ namespace Unity.UIWidgets.ui {
             int curByte = 0;
             try {
                 curByte = this._inStream.ReadByte();
-            }
-            catch (IOException) {
+            } catch (IOException) {
                 this._status = STATUS_FORMAT_ERROR;
             }
 
@@ -396,8 +408,7 @@ namespace Unity.UIWidgets.ui {
 
                         n += count;
                     }
-                }
-                catch (IOException) {
+                } catch (IOException) {
                 }
 
                 if (n < this._blockSize) {
@@ -421,8 +432,7 @@ namespace Unity.UIWidgets.ui {
             int n = 0;
             try {
                 n = this._inStream.Read(c, 0, c.Length);
-            }
-            catch (IOException) {
+            } catch (IOException) {
             }
 
             if (n < nbytes) {
@@ -471,7 +481,7 @@ namespace Unity.UIWidgets.ui {
                                     appBuilder.Append((char) this._block[i]);
                                 }
 
-                                String app = appBuilder.ToString();
+                                string app = appBuilder.ToString();
                                 if (app.Equals("NETSCAPE2.0")) {
                                     this._readNetscapeExt();
                                 } else {

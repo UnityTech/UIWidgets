@@ -39,8 +39,7 @@ namespace Unity.UIWidgets.gestures {
         void _dispatch(PointerEvent evt, PointerRoute route) {
             try {
                 route(evt);
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 Debug.LogError("Error while routing a pointer event: " + ex);
             }
         }

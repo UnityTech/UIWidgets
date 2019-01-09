@@ -10,7 +10,7 @@ namespace Unity.UIWidgets.foundation {
             this._type = type;
 
             var fields = _getTypeFields(type);
-            
+
             this._list = new List<object>(fields.Length);
             foreach (var field in fields) {
                 this._list.Add(field.GetValue(target));
@@ -46,7 +46,7 @@ namespace Unity.UIWidgets.foundation {
 
             return fields;
         }
-        
+
         static bool _sequenceEquals(IList list1, IList list2) {
             if (list1 == null && list2 == null) {
                 return true;
@@ -69,7 +69,7 @@ namespace Unity.UIWidgets.foundation {
                         return false;
                     }
                 } else {
-                    if (!object.Equals(item1, item2)) {
+                    if (!Equals(item1, item2)) {
                         return false;
                     }
                 }
@@ -79,15 +79,25 @@ namespace Unity.UIWidgets.foundation {
         }
 
         public bool Equals(_DependencyList other) {
-            if (object.ReferenceEquals(null, other)) return false;
-            if (object.ReferenceEquals(this, other)) return true;
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
             return this._type == other._type && _sequenceEquals(this._list, other._list);
         }
 
         public override bool Equals(object obj) {
-            if (object.ReferenceEquals(null, obj)) return false;
-            if (object.ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
             return this.Equals((_DependencyList) obj);
         }
 
@@ -118,11 +128,11 @@ namespace Unity.UIWidgets.foundation {
         }
 
         public static bool operator ==(_DependencyList left, _DependencyList right) {
-            return object.Equals(left, right);
+            return Equals(left, right);
         }
 
         public static bool operator !=(_DependencyList left, _DependencyList right) {
-            return !object.Equals(left, right);
+            return !Equals(left, right);
         }
     }
 }

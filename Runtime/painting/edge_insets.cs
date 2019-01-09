@@ -3,7 +3,7 @@ using Unity.UIWidgets.ui;
 
 namespace Unity.UIWidgets.painting {
     public class EdgeInsets : IEquatable<EdgeInsets> {
-        private EdgeInsets(double left, double top, double right, double bottom) {
+        EdgeInsets(double left, double top, double right, double bottom) {
             this.left = left;
             this.right = right;
             this.top = top;
@@ -48,7 +48,7 @@ namespace Unity.UIWidgets.painting {
         }
 
         public EdgeInsets flipped {
-            get { return EdgeInsets.fromLTRB(this.right, this.bottom, this.left, this.top); }
+            get { return fromLTRB(this.right, this.bottom, this.left, this.top); }
         }
 
         public Size inflateSize(Size size) {
@@ -84,7 +84,7 @@ namespace Unity.UIWidgets.painting {
             );
         }
 
-        public static readonly EdgeInsets zero = EdgeInsets.only();
+        public static readonly EdgeInsets zero = only();
 
         public Offset topLeft {
             get { return new Offset(this.left, this.top); }
@@ -115,7 +115,7 @@ namespace Unity.UIWidgets.painting {
         }
 
         public EdgeInsets subtract(EdgeInsets other) {
-            return EdgeInsets.fromLTRB(
+            return fromLTRB(
                 this.left - other.left,
                 this.top - other.top,
                 this.right - other.right,
@@ -124,7 +124,7 @@ namespace Unity.UIWidgets.painting {
         }
 
         public EdgeInsets add(EdgeInsets other) {
-            return EdgeInsets.fromLTRB(
+            return fromLTRB(
                 this.left + other.left,
                 this.top + other.top,
                 this.right + other.right,
@@ -133,7 +133,7 @@ namespace Unity.UIWidgets.painting {
         }
 
         public static EdgeInsets operator -(EdgeInsets a, EdgeInsets b) {
-            return EdgeInsets.fromLTRB(
+            return fromLTRB(
                 a.left - b.left,
                 a.top - b.top,
                 a.right - b.right,
@@ -142,7 +142,7 @@ namespace Unity.UIWidgets.painting {
         }
 
         public static EdgeInsets operator +(EdgeInsets a, EdgeInsets b) {
-            return EdgeInsets.fromLTRB(
+            return fromLTRB(
                 a.left + b.left,
                 a.top + b.top,
                 a.right + b.right,
@@ -151,7 +151,7 @@ namespace Unity.UIWidgets.painting {
         }
 
         public static EdgeInsets operator -(EdgeInsets a) {
-            return EdgeInsets.fromLTRB(
+            return fromLTRB(
                 -a.left,
                 -a.top,
                 -a.right,
@@ -160,7 +160,7 @@ namespace Unity.UIWidgets.painting {
         }
 
         public static EdgeInsets operator *(EdgeInsets a, double b) {
-            return EdgeInsets.fromLTRB(
+            return fromLTRB(
                 a.left * b,
                 a.top * b,
                 a.right * b,
@@ -169,7 +169,7 @@ namespace Unity.UIWidgets.painting {
         }
 
         public static EdgeInsets operator /(EdgeInsets a, double b) {
-            return EdgeInsets.fromLTRB(
+            return fromLTRB(
                 a.left / b,
                 a.top / b,
                 a.right / b,
@@ -178,7 +178,7 @@ namespace Unity.UIWidgets.painting {
         }
 
         public static EdgeInsets operator %(EdgeInsets a, double b) {
-            return EdgeInsets.fromLTRB(
+            return fromLTRB(
                 a.left % b,
                 a.top % b,
                 a.right % b,
@@ -192,7 +192,7 @@ namespace Unity.UIWidgets.painting {
             double? right = null,
             double? bottom = null
         ) {
-            return EdgeInsets.only(
+            return only(
                 left: left ?? this.left,
                 top: top ?? this.top,
                 right: right ?? this.right,
@@ -201,8 +201,12 @@ namespace Unity.UIWidgets.painting {
         }
 
         public bool Equals(EdgeInsets other) {
-            if (object.ReferenceEquals(null, other)) return false;
-            if (object.ReferenceEquals(this, other)) return true;
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
             return this.left.Equals(other.left)
                    && this.right.Equals(other.right)
                    && this.top.Equals(other.top)
@@ -210,9 +214,15 @@ namespace Unity.UIWidgets.painting {
         }
 
         public override bool Equals(object obj) {
-            if (object.ReferenceEquals(null, obj)) return false;
-            if (object.ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
             return this.Equals((EdgeInsets) obj);
         }
 
@@ -227,7 +237,7 @@ namespace Unity.UIWidgets.painting {
         }
 
         public static bool operator ==(EdgeInsets a, EdgeInsets b) {
-            return object.Equals(a, b);
+            return Equals(a, b);
         }
 
         public static bool operator !=(EdgeInsets a, EdgeInsets b) {

@@ -3,7 +3,6 @@ using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
 using UnityEngine;
 using Canvas = Unity.UIWidgets.ui.Canvas;
-using Object = UnityEngine.Object;
 using Rect = UnityEngine.Rect;
 
 namespace Unity.UIWidgets.editor {
@@ -63,7 +62,7 @@ namespace Unity.UIWidgets.editor {
         static Material _uiDefaultMat;
 
         public delegate void DrawToTargetFunc(Rect screenRect, Texture texture, Material mat);
-        
+
         internal static Material _getGUITextureMat() {
             if (_guiTextureMat) {
                 return _guiTextureMat;
@@ -78,7 +77,7 @@ namespace Unity.UIWidgets.editor {
             _guiTextureMat.hideFlags = HideFlags.HideAndDontSave;
             return _guiTextureMat;
         }
-        
+
         internal static Material _getUIDefaultMat() {
             if (_uiDefaultMat) {
                 return _uiDefaultMat;
@@ -96,9 +95,9 @@ namespace Unity.UIWidgets.editor {
 
 
         GrSurface _surface;
-        private DrawToTargetFunc _drawToTargetFunc;
-        public EditorWindowSurface(DrawToTargetFunc drawToTargetFunc = null)
-        {
+        DrawToTargetFunc _drawToTargetFunc;
+
+        public EditorWindowSurface(DrawToTargetFunc drawToTargetFunc = null) {
             this._drawToTargetFunc = drawToTargetFunc;
         }
 
@@ -129,9 +128,11 @@ namespace Unity.UIWidgets.editor {
                 (float) (this._surface.size.height / this._surface.devicePixelRatio));
 
             if (this._drawToTargetFunc == null) {
-                Graphics.DrawTexture(screenRect, this._surface.getRenderTexture(), _getGUITextureMat());
+                Graphics.DrawTexture(screenRect, this._surface.getRenderTexture(),
+                    _getGUITextureMat());
             } else {
-                this._drawToTargetFunc(screenRect, this._surface.getRenderTexture(), _getUIDefaultMat());
+                this._drawToTargetFunc(screenRect, this._surface.getRenderTexture(),
+                    _getUIDefaultMat());
             }
             return true;
         }
@@ -185,8 +186,7 @@ namespace Unity.UIWidgets.editor {
                 autoGenerateMips = false,
             };
 
-            if (QualitySettings.antiAliasing != 0)
-            {
+            if (QualitySettings.antiAliasing != 0) {
                 desc.msaaSamples = QualitySettings.antiAliasing;
             }
 

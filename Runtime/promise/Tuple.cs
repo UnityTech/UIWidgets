@@ -55,8 +55,8 @@ namespace RSG {
     /// <typeparam name="T2">The type of the tuple's second component.</typeparam>
     public class Tuple<T1, T2> {
         internal Tuple(T1 item1, T2 item2) {
-            Item1 = item1;
-            Item2 = item2;
+            this.Item1 = item1;
+            this.Item2 = item2;
         }
 
         /// <summary>
@@ -78,9 +78,9 @@ namespace RSG {
     /// <typeparam name="T3">The type of the tuple's third component.</typeparam>
     public class Tuple<T1, T2, T3> {
         internal Tuple(T1 item1, T2 item2, T3 item3) {
-            Item1 = item1;
-            Item2 = item2;
-            Item3 = item3;
+            this.Item1 = item1;
+            this.Item2 = item2;
+            this.Item3 = item3;
         }
 
         /// <summary>
@@ -108,10 +108,10 @@ namespace RSG {
     /// <typeparam name="T4">The type of the tuple's fourth component.</typeparam>
     public class Tuple<T1, T2, T3, T4> {
         internal Tuple(T1 item1, T2 item2, T3 item3, T4 item4) {
-            Item1 = item1;
-            Item2 = item2;
-            Item3 = item3;
-            Item4 = item4;
+            this.Item1 = item1;
+            this.Item2 = item2;
+            this.Item3 = item3;
+            this.Item4 = item4;
         }
 
         /// <summary>

@@ -1,6 +1,6 @@
-using Unity.UIWidgets.ui;
 using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.ui;
 using UnityEngine;
 using Canvas = Unity.UIWidgets.ui.Canvas;
 using Rect = Unity.UIWidgets.ui.Rect;
@@ -136,8 +136,9 @@ namespace Unity.UIWidgets.painting {
             }
 
             for (int i = startX; i <= stopX; ++i) {
-                for (int j = startY; j <= stopY; ++j)
+                for (int j = startY; j <= stopY; ++j) {
                     yield return fundamentalRect.shift(new Offset(i * strideX, j * strideY));
+                }
             }
         }
     }

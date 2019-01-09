@@ -469,7 +469,7 @@ namespace Unity.UIWidgets.rendering {
             double remainingSpace = Math.Max(0.0, actualSizeDelta);
             double leadingSpace = 0.0;
             double betweenSpace = 0.0;
-            bool flipMainAxis = !RenderFlex._startIsTopLeft(this.direction, this.textDirection, this.verticalDirection);
+            bool flipMainAxis = !_startIsTopLeft(this.direction, this.textDirection, this.verticalDirection);
             switch (this._mainAxisAlignment) {
                 case MainAxisAlignment.start:
                     leadingSpace = 0.0;
@@ -507,7 +507,7 @@ namespace Unity.UIWidgets.rendering {
                     case CrossAxisAlignment.start:
                     case CrossAxisAlignment.end:
                         childCrossPosition =
-                            RenderFlex._startIsTopLeft(
+                            _startIsTopLeft(
                                 AxisUtils.flipAxis(this.direction), this.textDirection, this.verticalDirection)
                             == (this._crossAxisAlignment == CrossAxisAlignment.start)
                                 ? 0.0
@@ -554,7 +554,7 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
-        private static bool _startIsTopLeft(Axis direction, TextDirection textDirection,
+        static bool _startIsTopLeft(Axis direction, TextDirection textDirection,
             VerticalDirection verticalDirection) {
             switch (direction) {
                 case Axis.horizontal:
@@ -586,14 +586,15 @@ namespace Unity.UIWidgets.rendering {
                 return;
             }
 
-            if (this.size.isEmpty)
+            if (this.size.isEmpty) {
                 return;
+            }
 
             context.pushClipRect(this.needsCompositing, offset, Offset.zero & this.size, this.defaultPaint);
         }
 
-        protected override bool  hitTestChildren(HitTestResult result, Offset position = null) {
-            return defaultHitTestChildren(result, position: position);
+        protected override bool hitTestChildren(HitTestResult result, Offset position = null) {
+            return this.defaultHitTestChildren(result, position: position);
         }
     }
 }

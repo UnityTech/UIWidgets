@@ -33,7 +33,7 @@ namespace Unity.UIWidgets.animation {
         }
 
         public override string ToString() {
-            return string.Format("{0}({1})", Diagnostics.describeIdentity(this), this.toStringDetails());
+            return $"{Diagnostics.describeIdentity(this)}({this.toStringDetails()})";
         }
 
         public virtual string toStringDetails() {

@@ -4,7 +4,7 @@ using Unity.UIWidgets.foundation;
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
-    internal class ClipElement {
+    class ClipElement {
         public readonly int saveCount;
         public readonly Mesh mesh;
         public readonly bool convex;
@@ -126,7 +126,7 @@ namespace Unity.UIWidgets.ui {
         }
     }
 
-    internal class ClipStack {
+    class ClipStack {
         static uint _genId = wideOpenGenID;
 
         public static uint getNextGenID() {
@@ -214,7 +214,7 @@ namespace Unity.UIWidgets.ui {
         }
     }
 
-    internal class ReducedClip {
+    class ReducedClip {
         public readonly Rect scissor;
         public readonly List<ClipElement> maskElements = new List<ClipElement>();
 

@@ -3,78 +3,75 @@ using System.Linq;
 using Unity.UIWidgets.foundation;
 using UnityEngine;
 
-namespace Unity.UIWidgets.ui
-{
-    public class FontInfo
-    {
+namespace Unity.UIWidgets.ui {
+    class FontInfo {
         public readonly Font font;
-        private int _textureVersion;
+        int _textureVersion;
 
-        public FontInfo(Font font)
-        {
+        public FontInfo(Font font) {
             this.font = font;
             this._textureVersion = 0;
         }
 
-        public int textureVersion
-        {
-            get { return _textureVersion; }
+        public int textureVersion {
+            get { return this._textureVersion; }
         }
 
-        public void onTextureRebuilt()
-        {
-            _textureVersion++;
+        public void onTextureRebuilt() {
+            this._textureVersion++;
         }
     }
 
-    public class FontManager
-    {
-        private List<FontInfo> _fonts = new List<FontInfo>();
-        private static readonly int defaultFontSize = 14;
+    public class FontManager {
+        List<FontInfo> _fonts = new List<FontInfo>();
+        static readonly int defaultFontSize = 14;
 
         public static readonly FontManager instance = new FontManager();
 
-        private FontManager()
-        {
+        FontManager() {
             Font.textureRebuilt += this.onFontTextureRebuilt;
         }
 
-        public FontInfo getOrCreate(string[] names)
-        {
-            _fonts = _fonts.FindAll((info) => info.font != null); // filter out destoryed fonts
-            var founded = _fonts.Find((info) =>
-                ( (names == info.font.fontNames || (names != null &&
-                                                      names.SequenceEqual(info.font.fontNames)))));
-            if (founded != null)
-            {
+        public bool addFont(Font font) {
+            var entry = this._fonts.Find(f => f.font == font);
+            if (entry != null) {
+                return false;
+            }
+
+            D.assert(font != null);
+            font.hideFlags = HideFlags.DontSave & ~HideFlags.DontSaveInBuild;
+
+            var fontInfo = new FontInfo(font);
+            this._fonts.Add(fontInfo);
+            return true;
+        }
+
+        internal FontInfo getOrCreate(string[] names) {
+            this._fonts = this._fonts.FindAll(info => info.font != null); // filter out destroyed fonts
+            var founded = this._fonts.Find(info =>
+                names == info.font.fontNames ||
+                names != null && names.SequenceEqual(info.font.fontNames));
+            if (founded != null) {
                 return founded;
             }
 
-            if (names.SequenceEqual(new string[] {"Material Icons"}))
-            {
-                var font = Resources.Load<Font>("MaterialIcons-Regular");
-                D.assert(font != null);
-                var fontInfo = new FontInfo(font);
-                _fonts.Add(fontInfo);
-                return fontInfo;
-            }
+            var osFont = Font.CreateDynamicFontFromOSFont(names, defaultFontSize);
+            osFont.hideFlags = HideFlags.DontSave;
+            osFont.material.hideFlags = HideFlags.DontSave;
+            osFont.material.mainTexture.hideFlags = HideFlags.DontSave;
 
-            var newFont = new FontInfo(Font.CreateDynamicFontFromOSFont(names, defaultFontSize));
-            _fonts.Add(newFont);
+            var newFont = new FontInfo(osFont);
+            this._fonts.Add(newFont);
             return newFont;
         }
 
-        public FontInfo getOrCreate(string name)
-        {
-            return getOrCreate(new[] {name});
+        internal FontInfo getOrCreate(string name) {
+            return this.getOrCreate(new[] {name});
         }
 
-        private void onFontTextureRebuilt(Font font)
-        {
-            var id = font.GetInstanceID();
-            var entry = _fonts.Find((f) => f.font != null && f.font.GetInstanceID() == id);
-            if (entry != null)
-            {
+        void onFontTextureRebuilt(Font font) {
+            var entry = this._fonts.Find(f => f.font == font);
+            if (entry != null) {
                 entry.onTextureRebuilt();
             }
         }

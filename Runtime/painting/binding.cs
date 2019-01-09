@@ -2,7 +2,7 @@ using Unity.UIWidgets.gestures;
 
 namespace Unity.UIWidgets.painting {
     public class PaintingBinding : GestureBinding {
-        public static new PaintingBinding instance {
+        public new static PaintingBinding instance {
             get { return (PaintingBinding) GestureBinding.instance; }
             set { GestureBinding.instance = value; }
         }

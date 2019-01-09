@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.UIWidgets.ui.txt;
 using UnityEngine;
 
-namespace Unity.UIWidgets.ui.painting.txt
-{
+namespace Unity.UIWidgets.ui {
     // TODO: probably we don't need this cache.
-    public class MeshKey : IEquatable<MeshKey>
-    {
+    public class MeshKey : IEquatable<MeshKey> {
         public readonly string text;
         public readonly int fontId;
         public readonly int textureVersion;
@@ -18,8 +15,7 @@ namespace Unity.UIWidgets.ui.painting.txt
         public readonly UnityEngine.Color color;
 
         public MeshKey(string text, int fontId, int textureVersion, int fontSize,
-            UnityEngine.FontStyle fontStyle, float pixelPerPoint, UnityEngine.Color color)
-        {
+            UnityEngine.FontStyle fontStyle, float pixelPerPoint, UnityEngine.Color color) {
             this.text = text;
             this.fontId = fontId;
             this.textureVersion = textureVersion;
@@ -29,110 +25,103 @@ namespace Unity.UIWidgets.ui.painting.txt
             this.color = color;
         }
 
-        public bool Equals(MeshKey other)
-        {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
-            return string.Equals(text, other.text) && fontId == other.fontId &&
-                   textureVersion == other.textureVersion && fontSize == other.fontSize &&
-                   fontStyle == other.fontStyle && pixelPerPoint.Equals(other.pixelPerPoint) &&
-                   color.Equals(other.color);
+        public bool Equals(MeshKey other) {
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
+            return string.Equals(this.text, other.text) && this.fontId == other.fontId &&
+                   this.textureVersion == other.textureVersion && this.fontSize == other.fontSize &&
+                   this.fontStyle == other.fontStyle && this.pixelPerPoint.Equals(other.pixelPerPoint) &&
+                   this.color.Equals(other.color);
         }
 
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((MeshKey) obj);
+        public override bool Equals(object obj) {
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
+            return this.Equals((MeshKey) obj);
         }
 
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                var hashCode = (text != null ? text.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ fontId;
-                hashCode = (hashCode * 397) ^ textureVersion;
-                hashCode = (hashCode * 397) ^ fontSize;
-                hashCode = (hashCode * 397) ^ (int) fontStyle;
-                hashCode = (hashCode * 397) ^ pixelPerPoint.GetHashCode();
-                hashCode = (hashCode * 397) ^ color.GetHashCode();
+        public override int GetHashCode() {
+            unchecked {
+                var hashCode = (this.text != null ? this.text.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ this.fontId;
+                hashCode = (hashCode * 397) ^ this.textureVersion;
+                hashCode = (hashCode * 397) ^ this.fontSize;
+                hashCode = (hashCode * 397) ^ (int) this.fontStyle;
+                hashCode = (hashCode * 397) ^ this.pixelPerPoint.GetHashCode();
+                hashCode = (hashCode * 397) ^ this.color.GetHashCode();
                 return hashCode;
             }
         }
 
-        public static bool operator ==(MeshKey left, MeshKey right)
-        {
+        public static bool operator ==(MeshKey left, MeshKey right) {
             return Equals(left, right);
         }
 
-        public static bool operator !=(MeshKey left, MeshKey right)
-        {
+        public static bool operator !=(MeshKey left, MeshKey right) {
             return !Equals(left, right);
         }
 
-        public override string ToString()
-        {
-            return string.Format(
-                "Text: {0}, FontId: {1}, TextureVersion: {2}, FontSize: {3}, FontStyle: {4}, PixelPerPoint: {5}, Color: {6}",
-                text, fontId, textureVersion, fontSize, fontStyle, pixelPerPoint, color);
+        public override string ToString() {
+            return
+                $"Text: {this.text}, FontId: {this.fontId}, TextureVersion: {this.textureVersion}, FontSize: {this.fontSize}, FontStyle: {this.fontStyle}, PixelPerPoint: {this.pixelPerPoint}, Color: {this.color}";
         }
     }
 
-    public class MeshInfo
-    {
+    public class MeshInfo {
         public readonly Mesh mesh;
         public readonly MeshKey key;
         public long _timeToLive;
 
-        public MeshInfo(MeshKey key, Mesh mesh, int timeToLive = 5)
-        {
+        public MeshInfo(MeshKey key, Mesh mesh, int timeToLive = 5) {
             this.mesh = mesh;
             this.key = key;
             this.touch(timeToLive);
         }
 
-        public long timeToLive
-        {
-            get { return _timeToLive; }
+        public long timeToLive {
+            get { return this._timeToLive; }
         }
 
-        public void touch(long timeTolive = 5)
-        {
+        public void touch(long timeTolive = 5) {
             this._timeToLive = timeTolive + MeshGenrator.frameCount;
         }
     }
-    
 
-    public static class MeshGenrator
-    {
-        private static Dictionary<MeshKey, MeshInfo> _meshes = new Dictionary<MeshKey, MeshInfo>();
 
-        private static long _frameCount = 0;
+    public static class MeshGenrator {
+        static Dictionary<MeshKey, MeshInfo> _meshes = new Dictionary<MeshKey, MeshInfo>();
 
-        public static long frameCount
-        {
+        static long _frameCount = 0;
+
+        public static long frameCount {
             get { return _frameCount; }
         }
-        
-        public static int meshCount
-        {
+
+        public static int meshCount {
             get { return _meshes.Count; }
         }
 
-        public static void tickNextFrame()
-        {
+        public static void tickNextFrame() {
             _frameCount++;
-            var keysToRemove = _meshes.Values.Where(info => info.timeToLive < _frameCount).Select(info => info.key).ToList();
-            foreach (var key in keysToRemove)
-            {
+            var keysToRemove = _meshes.Values.Where(info => info.timeToLive < _frameCount)
+                .Select(info => info.key).ToList();
+            foreach (var key in keysToRemove) {
                 _meshes.Remove(key);
             }
         }
-        
-        public static Mesh generateMesh(TextBlob textBlob, float[] xform, float devicePixelRatio)
-        {
+
+        public static Mesh generateMesh(TextBlob textBlob, float[] xform, float devicePixelRatio) {
             var style = textBlob.style;
             var fontInfo = FontManager.instance.getOrCreate(style.fontFamily);
             var font = fontInfo.font;
@@ -140,7 +129,7 @@ namespace Unity.UIWidgets.ui.painting.txt
 
             var text = textBlob.text;
             var scale = XformUtils.getAverageScale(xform) * devicePixelRatio;
-            var fontSizeToLoad = Mathf.CeilToInt( style.UnityFontSize * scale);
+            var fontSizeToLoad = Mathf.CeilToInt(style.UnityFontSize * scale);
             var subText = textBlob.text.Substring(textBlob.start, textBlob.end - textBlob.start);
             font.RequestCharactersInTexture(subText, fontSizeToLoad, style.UnityFontStyle);
 

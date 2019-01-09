@@ -29,8 +29,7 @@ namespace Unity.UIWidgets.physics {
         public readonly double damping;
 
         public override string ToString() {
-            return string.Format("{0}(mass {1:F1}, stiffness: {2:F1}, damping: {3:F1})",
-                this.GetType(), this.mass, this.stiffness, this.damping);
+            return $"{this.GetType()}(mass {this.mass:F1}, stiffness: {this.stiffness:F1}, damping: {this.damping:F1})";
         }
     }
 
@@ -73,7 +72,7 @@ namespace Unity.UIWidgets.physics {
         }
 
         public override string ToString() {
-            return string.Format("{0}(end: {1}, {2}", this.GetType(), this._endPosition, this.type);
+            return $"{this.GetType()}(end: {this._endPosition}, {this.type}";
         }
     }
 
@@ -129,7 +128,7 @@ namespace Unity.UIWidgets.physics {
             return new _CriticalSolution(r, c1, c2);
         }
 
-        private _CriticalSolution(
+        _CriticalSolution(
             double r, double c1, double c2
         ) {
             this._r = r;
@@ -167,7 +166,7 @@ namespace Unity.UIWidgets.physics {
             return new _OverdampedSolution(r1, r2, c1, c2);
         }
 
-        private _OverdampedSolution(
+        _OverdampedSolution(
             double r1, double r2, double c1, double c2
         ) {
             this._r1 = r1;
@@ -207,7 +206,7 @@ namespace Unity.UIWidgets.physics {
             return new _UnderdampedSolution(w, r, c1, c2);
         }
 
-        private _UnderdampedSolution(
+        _UnderdampedSolution(
             double w, double r, double c1, double c2
         ) {
             this._w = w;

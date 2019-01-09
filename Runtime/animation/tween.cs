@@ -17,9 +17,9 @@ namespace Unity.UIWidgets.animation {
     }
 
     class _AnimatedEvaluation<T> : AnimationWithParentMixin<double, T> {
-        internal _AnimatedEvaluation(Animation<double> _parent, Animatable<T> _evaluatable) {
+        internal _AnimatedEvaluation(Animation<double> parent, Animatable<T> evaluatable) {
             this._parent = parent;
-            this._evaluatable = _evaluatable;
+            this._evaluatable = evaluatable;
         }
 
         public override Animation<double> parent {
@@ -35,7 +35,7 @@ namespace Unity.UIWidgets.animation {
         }
 
         public override string ToString() {
-            return string.Format("{0}\u27A9{1}\u27A9{2}", this.parent, this._evaluatable, this.value);
+            return $"{this.parent}\u27A9{this._evaluatable}\u27A9{this.value}";
         }
 
         public override string toStringDetails() {
@@ -45,9 +45,9 @@ namespace Unity.UIWidgets.animation {
 
 
     class _ChainedEvaluation<T> : Animatable<T> {
-        internal _ChainedEvaluation(Animatable<double> _parent, Animatable<T> _evaluatable) {
-            this._parent = _parent;
-            this._evaluatable = _evaluatable;
+        internal _ChainedEvaluation(Animatable<double> parent, Animatable<T> evaluatable) {
+            this._parent = parent;
+            this._evaluatable = evaluatable;
         }
 
         readonly Animatable<double> _parent;
@@ -60,7 +60,7 @@ namespace Unity.UIWidgets.animation {
         }
 
         public override string ToString() {
-            return string.Format("{0}\u27A9{1}", this._parent, this._evaluatable);
+            return $"{this._parent}\u27A9{this._evaluatable}";
         }
     }
 
@@ -93,20 +93,30 @@ namespace Unity.UIWidgets.animation {
         }
 
         public override string ToString() {
-            return string.Format("{0}({1} \u2192 {2})", this.GetType(), this.begin, this.end);
+            return $"{this.GetType()}({this.begin} \u2192 {this.end})";
         }
 
         public bool Equals(Tween<T> other) {
-            if (object.ReferenceEquals(null, other)) return false;
-            if (object.ReferenceEquals(this, other)) return true;
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
             return EqualityComparer<T>.Default.Equals(this.begin, other.begin) &&
                    EqualityComparer<T>.Default.Equals(this.end, other.end);
         }
 
         public override bool Equals(object obj) {
-            if (object.ReferenceEquals(null, obj)) return false;
-            if (object.ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
             return this.Equals((Tween<T>) obj);
         }
 
@@ -118,16 +128,17 @@ namespace Unity.UIWidgets.animation {
         }
 
         public static bool operator ==(Tween<T> left, Tween<T> right) {
-            return object.Equals(left, right);
+            return Equals(left, right);
         }
 
         public static bool operator !=(Tween<T> left, Tween<T> right) {
-            return !object.Equals(left, right);
+            return !Equals(left, right);
         }
     }
 
     public class ReverseTween<T> : Tween<T> {
         public ReverseTween(Tween<T> parent) : base(begin: parent.end, end: parent.begin) {
+            this.parent = parent;
         }
 
         public readonly Tween<T> parent;
@@ -210,7 +221,7 @@ namespace Unity.UIWidgets.animation {
         }
 
         public override string ToString() {
-            return string.Format("{0}(curve: {1})", this.GetType(), this.curve);
+            return $"{this.GetType()}(curve: {this.curve})";
         }
     }
 }

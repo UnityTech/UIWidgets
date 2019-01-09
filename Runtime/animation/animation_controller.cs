@@ -33,7 +33,7 @@ namespace Unity.UIWidgets.animation {
             this._internalSetValue(value ?? lowerBound);
         }
 
-        private AnimationController(
+        AnimationController(
             double value = 0.0,
             TimeSpan? duration = null,
             string debugLabel = null,
@@ -76,7 +76,7 @@ namespace Unity.UIWidgets.animation {
 
         public void resync(TickerProvider vsync) {
             Ticker oldTicker = this._ticker;
-            this._ticker = vsync.createTicker(_tick);
+            this._ticker = vsync.createTicker(this._tick);
             this._ticker.absorbTicker(oldTicker);
         }
 
@@ -257,7 +257,8 @@ namespace Unity.UIWidgets.animation {
             double target = velocity < 0.0
                 ? this.lowerBound - _kFlingTolerance.distance
                 : this.upperBound + _kFlingTolerance.distance;
-            Simulation simulation = new SpringSimulation(_kFlingSpringDescription, this.value, target, velocity);
+            Simulation simulation = new SpringSimulation(_kFlingSpringDescription, this.value,
+                target, velocity);
             simulation.tolerance = _kFlingTolerance;
             return this.animateWith(simulation);
         }
@@ -335,7 +336,7 @@ namespace Unity.UIWidgets.animation {
             string paused = this.isAnimating ? "" : "; paused";
             string ticker = this._ticker == null ? "; DISPOSED" : (this._ticker.muted ? "; silenced" : "");
             string label = this.debugLabel == null ? "" : "; for " + this.debugLabel;
-            string more = string.Format("{0} {1:F3}", base.toStringDetails(), this.value);
+            string more = $"{base.toStringDetails()} {this.value:F3}";
             return more + paused + ticker + label;
         }
 
@@ -353,10 +354,10 @@ namespace Unity.UIWidgets.animation {
 
 
     class _InterpolationSimulation : Simulation {
-        internal _InterpolationSimulation(double _begin, double _end, TimeSpan duration, Curve _curve) {
-            this._begin = _begin;
-            this._end = _end;
-            this._curve = _curve;
+        internal _InterpolationSimulation(double begin, double end, TimeSpan duration, Curve curve) {
+            this._begin = begin;
+            this._end = end;
+            this._curve = curve;
 
             D.assert(duration.Ticks > 0);
             this._durationInSeconds = (double) duration.Ticks / TimeSpan.TicksPerSecond;
@@ -390,24 +391,24 @@ namespace Unity.UIWidgets.animation {
 
     class _RepeatingSimulation : Simulation {
         internal _RepeatingSimulation(double min, double max, TimeSpan period) {
-            this.min = min;
-            this.max = max;
+            this._min = min;
+            this._max = max;
             this._periodInSeconds = (double) period.Ticks / TimeSpan.TicksPerSecond;
             D.assert(this._periodInSeconds > 0.0);
         }
 
-        readonly double min;
-        readonly double max;
+        readonly double _min;
+        readonly double _max;
         readonly double _periodInSeconds;
 
         public override double x(double timeInSeconds) {
             D.assert(timeInSeconds >= 0.0);
             double t = (timeInSeconds / this._periodInSeconds) % 1.0;
-            return MathUtils.lerpDouble(this.min, this.max, t);
+            return MathUtils.lerpDouble(this._min, this._max, t);
         }
 
         public override double dx(double timeInSeconds) {
-            return (this.max - this.min) / this._periodInSeconds;
+            return (this._max - this._min) / this._periodInSeconds;
         }
 
         public override bool isDone(double timeInSeconds) {

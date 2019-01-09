@@ -20,19 +20,26 @@ namespace Unity.UIWidgets.ui {
             this._bundle = bundle;
         }
 
-        public int width => this._texture != null ? this._texture.width : 0;
-
-        public int height => this._texture != null ? this._texture.height : 0;
-
-        public Texture texture => this._texture;
-
-        ~Image() {
-            this._dispose();
+        public int width {
+            get { return this._texture != null ? this._texture.width : 0; }
         }
 
-        void _dispose() {
+        public int height {
+            get { return this._texture != null ? this._texture.height : 0; }
+        }
+
+        public Texture texture {
+            get { return this._texture; }
+        }
+
+        ~Image() {
+            this._dispose(true);
+        }
+
+        void _dispose(bool finalizer) {
             if (this._noDispose) {
                 this._texture = null;
+                this._bundle = null;
                 return;
             }
 
@@ -43,36 +50,58 @@ namespace Unity.UIWidgets.ui {
                 this._bundle = null;
 
                 if (b == null) {
-                    // make sure no ref back to this in finalizer
-                    Timer.runInMain(() => { Resources.UnloadAsset(t); });
+                    if (finalizer) {
+                        // make sure no ref back to this in finalizer
+                        Timer.runInMainFromFinalizer(() => { Resources.UnloadAsset(t); });
+                    } else {
+                        Resources.UnloadAsset(t);
+                    }
                 } else {
-                    // make sure no ref back to this in finalizer
-                    Timer.runInMain(() => { b.Unload(t); });
+                    if (finalizer) {
+                        // make sure no ref back to this in finalizer
+                        Timer.runInMainFromFinalizer(() => { b.Unload(t); });
+                    } else {
+                        b.Unload(t);
+                    }
                 }
             } else {
                 var t = this._texture;
                 this._texture = null;
 
-                // make sure no ref back to this in finalizer
-                Timer.runInMain(() => { ObjectUtils.SafeDestroy(t); });
+                if (finalizer) {
+                    // make sure no ref back to this in finalizer
+                    Timer.runInMainFromFinalizer(() => { ObjectUtils.SafeDestroy(t); });
+                } else {
+                    ObjectUtils.SafeDestroy(t);
+                }
             }
         }
 
         public void Dispose() {
-            this._dispose();
+            this._dispose(false);
             GC.SuppressFinalize(this);
         }
 
         public bool Equals(Image other) {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
             return Equals(this._texture, other._texture);
         }
 
         public override bool Equals(object obj) {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
             return this.Equals((Image) obj);
         }
 

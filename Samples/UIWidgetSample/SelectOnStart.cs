@@ -1,13 +1,10 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace UIWidgetsSample
-{
-    public class SelectOnStart: MonoBehaviour
-    {
-        private void Start()
-        {
-            EventSystem.current.SetSelectedGameObject(gameObject);
+namespace UIWidgetsSample {
+    public class SelectOnStart : MonoBehaviour {
+        void Start() {
+            EventSystem.current.SetSelectedGameObject(this.gameObject);
         }
     }
 }

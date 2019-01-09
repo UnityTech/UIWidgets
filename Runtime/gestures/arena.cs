@@ -55,7 +55,7 @@ namespace Unity.UIWidgets.gestures {
             } else {
                 buffer.Append(string.Join(", ", this.members.Select(
                     member => member == this.eagerWinner
-                        ? string.Format("{0} (eager winner)", member)
+                        ? $"{member} (eager winner)"
                         : member.ToString()).ToArray()));
             }
 
@@ -86,7 +86,7 @@ namespace Unity.UIWidgets.gestures {
 
             state.add(member);
 
-            D.assert(this._debugLogDiagnostic(pointer, string.Format("Adding: {0}", member)));
+            D.assert(this._debugLogDiagnostic(pointer, $"Adding: {member}"));
             return new GestureArenaEntry(this, pointer, member);
         }
 
@@ -118,7 +118,7 @@ namespace Unity.UIWidgets.gestures {
             this._arenas.Remove(pointer);
             if (state.members.isNotEmpty()) {
                 D.assert(this._debugLogDiagnostic(
-                    pointer, string.Format("Winner: {0}", state.members.First())));
+                    pointer, $"Winner: {state.members.First()}"));
 
                 state.members.First().acceptGesture(pointer);
                 for (int i = 1; i < state.members.Count; i++) {
@@ -157,9 +157,7 @@ namespace Unity.UIWidgets.gestures {
             }
 
             D.assert(this._debugLogDiagnostic(pointer,
-                string.Format("{0}: {1}",
-                    disposition == GestureDisposition.accepted ? "Accepting" : "Rejecting",
-                    member)));
+                $"{(disposition == GestureDisposition.accepted ? "Accepting" : "Rejecting")}: {member}"));
 
             D.assert(state.members.Contains(member));
             if (disposition == GestureDisposition.rejected) {
@@ -173,7 +171,7 @@ namespace Unity.UIWidgets.gestures {
                     state.eagerWinner = state.eagerWinner ?? member;
                 } else {
                     D.assert(this._debugLogDiagnostic(pointer,
-                        string.Format("Self-declared winner: {0}", member)));
+                        $"Self-declared winner: {member}"));
                     this._resolveInFavorOf(pointer, state, member);
                 }
             }
@@ -190,7 +188,7 @@ namespace Unity.UIWidgets.gestures {
                 D.assert(this._debugLogDiagnostic(pointer, "Arena empty."));
             } else if (state.eagerWinner != null) {
                 D.assert(this._debugLogDiagnostic(pointer,
-                    string.Format("Eager winner: {0}", state.eagerWinner)));
+                    $"Eager winner: {state.eagerWinner}"));
                 this._resolveInFavorOf(pointer, state, state.eagerWinner);
             }
         }
@@ -206,7 +204,7 @@ namespace Unity.UIWidgets.gestures {
             D.assert(members.Count == 1);
             this._arenas.Remove(pointer);
             D.assert(this._debugLogDiagnostic(pointer,
-                string.Format("Default winner: {0}", state.members.First())));
+                $"Default winner: {state.members.First()}"));
             state.members.First().acceptGesture(pointer);
         }
 
@@ -234,7 +232,7 @@ namespace Unity.UIWidgets.gestures {
                     Debug.LogFormat("Gesture arena {0} ❙ {1}{2}",
                         pointer.ToString().PadRight(4),
                         message,
-                        count != null ? string.Format(" with {0} member{1}.", count, s) : "");
+                        count != null ? $" with {count} member{s}." : "");
                 }
 
                 return true;

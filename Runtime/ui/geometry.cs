@@ -22,7 +22,7 @@ namespace Unity.UIWidgets.ui {
 
             return value;
         }
-        
+
         public static int clamp(this int value, int min, int max) {
             if (value < min) {
                 value = min;
@@ -64,7 +64,7 @@ namespace Unity.UIWidgets.ui {
         public static int floor(this double value) {
             return (int) Math.Floor(value);
         }
-        
+
         public static int ceil(this double value) {
             return (int) Math.Ceiling(value);
         }
@@ -117,7 +117,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public static bool operator ==(OffsetBase a, OffsetBase b) {
-            return object.Equals(a, b);
+            return Equals(a, b);
         }
 
         public static bool operator !=(OffsetBase a, OffsetBase b) {
@@ -129,7 +129,9 @@ namespace Unity.UIWidgets.ui {
         }
 
         public override bool Equals(object obj) {
-            if (object.ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
             return obj is OffsetBase && this.Equals((OffsetBase) obj);
         }
 
@@ -204,7 +206,9 @@ namespace Unity.UIWidgets.ui {
         }
 
         public override bool Equals(object obj) {
-            if (object.ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
             return obj is Offset && this.Equals((Offset) obj);
         }
 
@@ -310,7 +314,9 @@ namespace Unity.UIWidgets.ui {
         }
 
         public override bool Equals(object obj) {
-            if (object.ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
             return obj is Size && this.Equals((Size) obj);
         }
 
@@ -324,7 +330,7 @@ namespace Unity.UIWidgets.ui {
     }
 
     public class Rect : IEquatable<Rect> {
-        private Rect(double left, double top, double right, double bottom) {
+        Rect(double left, double top, double right, double bottom) {
             this.left = left;
             this.top = top;
             this.right = right;
@@ -377,7 +383,7 @@ namespace Unity.UIWidgets.ui {
         public const double _giantScalar = 1.0E+9;
 
         public static readonly Rect largest =
-            Rect.fromLTRB(-Rect._giantScalar, -Rect._giantScalar, Rect._giantScalar, Rect._giantScalar);
+            fromLTRB(-_giantScalar, -_giantScalar, _giantScalar, _giantScalar);
 
         public bool isInfinite {
             get {
@@ -397,24 +403,24 @@ namespace Unity.UIWidgets.ui {
         }
 
         public Rect shift(Offset offset) {
-            return Rect.fromLTRB(this.left + offset.dx, this.top + offset.dy, this.right + offset.dx,
+            return fromLTRB(this.left + offset.dx, this.top + offset.dy, this.right + offset.dx,
                 this.bottom + offset.dy);
         }
 
         public Rect translate(double translateX, double translateY) {
-            return Rect.fromLTRB(this.left + translateX, this.top + translateY, this.right + translateX,
+            return fromLTRB(this.left + translateX, this.top + translateY, this.right + translateX,
                 this.bottom + translateY);
         }
 
         public Rect scale(double scaleX, double? scaleY = null) {
             scaleY = scaleY ?? scaleX;
-            return Rect.fromLTRB(
+            return fromLTRB(
                 this.left * scaleX, this.top * scaleY.Value,
                 this.right * scaleX, this.bottom * scaleY.Value);
         }
 
         public Rect inflate(double delta) {
-            return Rect.fromLTRB(this.left - delta, this.top - delta, this.right + delta, this.bottom + delta);
+            return fromLTRB(this.left - delta, this.top - delta, this.right + delta, this.bottom + delta);
         }
 
         public Rect deflate(double delta) {
@@ -422,7 +428,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public Rect intersect(Rect other) {
-            return Rect.fromLTRB(
+            return fromLTRB(
                 Math.Max(this.left, other.left),
                 Math.Max(this.top, other.top),
                 Math.Min(this.right, other.right),
@@ -431,7 +437,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public Rect expandToInclude(Rect other) {
-            return Rect.fromLTRB(
+            return fromLTRB(
                 Math.Min(this.left, other.left),
                 Math.Min(this.top, other.top),
                 Math.Max(this.right, other.right),
@@ -504,13 +510,13 @@ namespace Unity.UIWidgets.ui {
         }
 
         public Rect round() {
-            return Rect.fromLTRB(
+            return fromLTRB(
                 Math.Round(this.left), Math.Round(this.top),
                 Math.Round(this.right), Math.Round(this.bottom));
         }
 
         public Rect roundOut() {
-            return Rect.fromLTRB(
+            return fromLTRB(
                 Math.Floor(this.left), Math.Floor(this.top),
                 Math.Ceiling(this.right), Math.Ceiling(this.bottom));
         }
@@ -521,15 +527,15 @@ namespace Unity.UIWidgets.ui {
             }
 
             if (a == null) {
-                return Rect.fromLTRB(b.left * t, b.top * t, b.right * t, b.bottom * t);
+                return fromLTRB(b.left * t, b.top * t, b.right * t, b.bottom * t);
             }
 
             if (b == null) {
                 double k = 1.0 - t;
-                return Rect.fromLTRB(a.left * k, a.top * k, a.right * k, a.bottom * k);
+                return fromLTRB(a.left * k, a.top * k, a.right * k, a.bottom * k);
             }
 
-            return Rect.fromLTRB(
+            return fromLTRB(
                 MathUtils.lerpDouble(a.left, b.left, t),
                 MathUtils.lerpDouble(a.top, b.top, t),
                 MathUtils.lerpDouble(a.right, b.right, t),
@@ -538,16 +544,26 @@ namespace Unity.UIWidgets.ui {
         }
 
         public bool Equals(Rect other) {
-            if (object.ReferenceEquals(null, other)) return false;
-            if (object.ReferenceEquals(this, other)) return true;
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
             return this.left.Equals(other.left) && this.top.Equals(other.top) && this.right.Equals(other.right) &&
                    this.bottom.Equals(other.bottom);
         }
 
         public override bool Equals(object obj) {
-            if (object.ReferenceEquals(null, obj)) return false;
-            if (object.ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
             return this.Equals((Rect) obj);
         }
 
@@ -561,22 +577,22 @@ namespace Unity.UIWidgets.ui {
             }
         }
 
-        public override String ToString() {
+        public override string ToString() {
             return "Rect.fromLTRB(" + this.left.ToString("0.0") + ", " + this.top.ToString("0.0") + ", " +
                    this.right.ToString("0.0") + ", " + this.bottom.ToString("0.0") + ")";
         }
 
         public static bool operator ==(Rect left, Rect right) {
-            return object.Equals(left, right);
+            return Equals(left, right);
         }
 
         public static bool operator !=(Rect left, Rect right) {
-            return !object.Equals(left, right);
+            return !Equals(left, right);
         }
     }
-    
-     public class Radius : IEquatable<Radius> {
-        private Radius(double x, double y) {
+
+    public class Radius : IEquatable<Radius> {
+        Radius(double x, double y) {
             this.x = x;
             this.y = y;
         }
@@ -592,7 +608,7 @@ namespace Unity.UIWidgets.ui {
         public readonly double x;
         public readonly double y;
 
-        public static readonly Radius zero = Radius.circular(0.0);
+        public static readonly Radius zero = circular(0.0);
 
         public static Radius operator -(Radius a) {
             return elliptical(-a.x, -a.y);
@@ -639,15 +655,25 @@ namespace Unity.UIWidgets.ui {
         }
 
         public bool Equals(Radius other) {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
             return this.x.Equals(other.x) && this.y.Equals(other.y);
         }
 
         public override bool Equals(object obj) {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
             return this.Equals((Radius) obj);
         }
 
@@ -667,13 +693,13 @@ namespace Unity.UIWidgets.ui {
 
         public override string ToString() {
             return this.x == this.y
-                ? string.Format("Radius.circular({0:F1})", this.x)
-                : string.Format("Radius.elliptical({0:F1}, ${1:F1})", this.x, this.y);
+                ? $"Radius.circular({this.x:F1})"
+                : $"Radius.elliptical({this.x:F1}, ${this.y:F1})";
         }
-     }
+    }
 
     public class RRect : IEquatable<RRect> {
-        private RRect(double left, double top, double right, double bottom,
+        RRect(double left, double top, double right, double bottom,
             double tlRadius, double trRadius, double brRadius, double blRadius) {
             this.left = left;
             this.top = top;
@@ -729,7 +755,7 @@ namespace Unity.UIWidgets.ui {
         public readonly double blRadius;
 
         public RRect shift(Offset offset) {
-            return RRect.fromLTRBAndCorners(
+            return fromLTRBAndCorners(
                 this.left + offset.dx,
                 this.top + offset.dy,
                 this.right + offset.dx,
@@ -742,7 +768,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public RRect inflate(double delta) {
-            return RRect.fromLTRBAndCorners(
+            return fromLTRBAndCorners(
                 this.left - delta,
                 this.top - delta,
                 this.right + delta,
@@ -838,10 +864,10 @@ namespace Unity.UIWidgets.ui {
 
         public bool isFinite {
             get {
-                return !Double.IsInfinity(this.left)
-                       && !Double.IsInfinity(this.top)
-                       && !Double.IsInfinity(this.right)
-                       && !Double.IsInfinity(this.bottom);
+                return !double.IsInfinity(this.left)
+                       && !double.IsInfinity(this.top)
+                       && !double.IsInfinity(this.right)
+                       && !double.IsInfinity(this.bottom);
             }
         }
 
@@ -947,8 +973,12 @@ namespace Unity.UIWidgets.ui {
         }
 
         public bool Equals(RRect other) {
-            if (object.ReferenceEquals(null, other)) return false;
-            if (object.ReferenceEquals(this, other)) return true;
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
             return this.left.Equals(other.left)
                    && this.top.Equals(other.top)
                    && this.right.Equals(other.right)
@@ -960,9 +990,15 @@ namespace Unity.UIWidgets.ui {
         }
 
         public override bool Equals(object obj) {
-            if (object.ReferenceEquals(null, obj)) return false;
-            if (object.ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
             return this.Equals((RRect) obj);
         }
 
@@ -981,7 +1017,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public static bool operator ==(RRect a, RRect b) {
-            return object.Equals(a, b);
+            return Equals(a, b);
         }
 
         public static bool operator !=(RRect a, RRect b) {

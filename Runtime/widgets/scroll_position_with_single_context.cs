@@ -194,7 +194,7 @@ namespace Unity.UIWidgets.widgets {
             base.dispose();
         }
 
-        protected override void debugFillDescription(List<String> description) {
+        protected override void debugFillDescription(List<string> description) {
             base.debugFillDescription(description);
             description.Add(this.context.GetType().ToString());
             description.Add(this.physics.ToString());

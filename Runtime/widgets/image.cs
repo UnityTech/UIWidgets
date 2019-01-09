@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using RSG;
-using Unity.UIWidgets.painting;
 using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.painting;
 using Unity.UIWidgets.ui;
 using UnityEngine;
 using Color = Unity.UIWidgets.ui.Color;
@@ -97,7 +97,7 @@ namespace Unity.UIWidgets.widgets {
             Rect centerSlice = null,
             bool gaplessPlayback = false,
             FilterMode filterMode = FilterMode.Point,
-            IDictionary<String, String> headers = null
+            IDictionary<string, string> headers = null
         ) {
             var networkImage = new NetworkImage(src, scale, headers);
             return new Image(
@@ -147,7 +147,7 @@ namespace Unity.UIWidgets.widgets {
                 filterMode
             );
         }
-        
+
         public static Image asset(
             string name,
             Key key = null,
@@ -167,7 +167,7 @@ namespace Unity.UIWidgets.widgets {
             var image = scale != null
                 ? (AssetBundleImageProvider) new ExactAssetImage(name, bundle: bundle, scale: scale.Value)
                 : new AssetImage(name, bundle: bundle);
-            
+
             return new Image(
                 key,
                 image,

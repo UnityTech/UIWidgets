@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.scheduler;
@@ -81,7 +80,7 @@ namespace Unity.UIWidgets.widgets {
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
-            String tickerDescription = null;
+            string tickerDescription = null;
             if (this._ticker != null) {
                 if (this._ticker.isActive && this._ticker.muted) {
                     tickerDescription = "active but muted";

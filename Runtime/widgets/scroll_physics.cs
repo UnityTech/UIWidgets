@@ -49,7 +49,7 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public virtual Simulation createBallisticSimulation(ScrollMetrics position, double velocity) {
-            if (parent == null) {
+            if (this.parent == null) {
                 return null;
             }
 
@@ -65,7 +65,7 @@ namespace Unity.UIWidgets.widgets {
         public virtual SpringDescription spring {
             get {
                 if (this.parent == null) {
-                    return ScrollPhysics._kDefaultSpring;
+                    return _kDefaultSpring;
                 }
 
                 return this.parent.spring ?? _kDefaultSpring;
@@ -142,10 +142,10 @@ namespace Unity.UIWidgets.widgets {
 
         public override string ToString() {
             if (this.parent == null) {
-                return string.Format("{0}", this.GetType());
+                return $"{this.GetType()}";
             }
 
-            return string.Format("{0} -> {1}", this.GetType(), this.parent);
+            return $"{this.GetType()} -> {this.parent}";
         }
     }
 
@@ -206,7 +206,7 @@ namespace Unity.UIWidgets.widgets {
             Tolerance tolerance = this.tolerance;
             if (velocity.abs() >= tolerance.velocity || position.outOfRange()) {
                 return new BouncingScrollSimulation(
-                    spring: spring,
+                    spring: this.spring,
                     position: position.pixels,
                     velocity: velocity * 0.91,
                     leadingExtent: position.minScrollExtent,
@@ -244,17 +244,13 @@ namespace Unity.UIWidgets.widgets {
             D.assert(() => {
                 if (value == position.pixels) {
                     throw new UIWidgetsError(
-                        string.Format(
-                            "{0}.applyBoundaryConditions() was called redundantly.\n" +
-                            "The proposed new position, {1}, is exactly equal to the current position of the " +
-                            "given {2}, {3}.\n" +
-                            "The applyBoundaryConditions method should only be called when the value is " +
-                            "going to actually change the pixels, otherwise it is redundant.\n" +
-                            "The physics object in question was:\n" +
-                            "  {4}\n" +
-                            "The position object in question was:\n" +
-                            "  {5}\n",
-                            this.GetType(), value, position.GetType(), position.pixels, this, position));
+                        $"{this.GetType()}.applyBoundaryConditions() was called redundantly.\n" +
+                        $"The proposed new position, {value}, is exactly equal to the current position of the " +
+                        $"given {position.GetType()}, {position.pixels}.\n" +
+                        "The applyBoundaryConditions method should only be called when the value is " +
+                        "going to actually change the pixels, otherwise it is redundant.\n" +
+                        "The physics object in question was:\n" + $"  {this}\n" +
+                        "The position object in question was:\n" + $"  {position}\n");
                 }
 
                 return true;

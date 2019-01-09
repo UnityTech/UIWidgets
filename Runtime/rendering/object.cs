@@ -22,7 +22,7 @@ namespace Unity.UIWidgets.rendering {
     public delegate void PaintingContextCallback(PaintingContext context, Offset offset);
 
     public class PaintingContext : ClipContext {
-        private PaintingContext(
+        PaintingContext(
             ContainerLayer containerLayer = null,
             Rect estimatedBounds = null
         ) {
@@ -267,12 +267,11 @@ namespace Unity.UIWidgets.rendering {
             var effectiveTransform = Matrix3.makeTrans(offset)
                                      * transform * Matrix3.makeTrans(-offset);
 
-            if (needsCompositing)
-            {
+            if (needsCompositing) {
                 var inverse = Matrix3.I();
                 var invertible = effectiveTransform.invert(inverse);
                 D.assert(invertible);
-                
+
                 this.pushLayer(
                     new TransformLayer(effectiveTransform),
                     painter,
@@ -292,8 +291,8 @@ namespace Unity.UIWidgets.rendering {
         }
 
         public override string ToString() {
-            return string.Format("{0}#{1}(layer: {2}, canvas bounds: {3}",
-                this.GetType(), this.GetHashCode(), this._containerLayer, this.estimatedBounds);
+            return
+                $"{this.GetType()}#{this.GetHashCode()}(layer: {this._containerLayer}, canvas bounds: {this.estimatedBounds}";
         }
     }
 
@@ -374,8 +373,7 @@ namespace Unity.UIWidgets.rendering {
                         }
                     }
                 }
-            }
-            finally {
+            } finally {
                 D.assert(() => {
                     this._debugDoingLayout = false;
                     return true;
@@ -395,8 +393,7 @@ namespace Unity.UIWidgets.rendering {
             });
             try {
                 callback();
-            }
-            finally {
+            } finally {
                 D.assert(() => {
                     this._debugAllowMutationsToDirtySubtrees = oldState;
                     return true;
@@ -445,8 +442,7 @@ namespace Unity.UIWidgets.rendering {
                         }
                     }
                 }
-            }
-            finally {
+            } finally {
                 D.assert(() => {
                     this._debugDoingPaint = false;
                     return true;
@@ -500,7 +496,7 @@ namespace Unity.UIWidgets.rendering {
 
         public object debugCreator;
 
-        void _debugReportException(String method, Exception exception) {
+        void _debugReportException(string method, Exception exception) {
             UIWidgetsError.reportError(new UIWidgetsErrorDetailsForRendering(
                 exception: exception,
                 library: "rendering library",
@@ -510,7 +506,7 @@ namespace Unity.UIWidgets.rendering {
                     information.AppendLine(
                         "The following RenderObject was being processed when the exception was fired:");
                     information.AppendLine("  " + this.toStringShallow(joiner: "\n  "));
-                    var descendants = new List<String>();
+                    var descendants = new List<string>();
                     const int maxDepth = 5;
                     int depth = 0;
                     const int maxLines = 25;
@@ -730,7 +726,7 @@ namespace Unity.UIWidgets.rendering {
 
         public void scheduleInitialLayout() {
             D.assert(this.attached);
-            D.assert(!(parent is RenderObject));
+            D.assert(!(this.parent is RenderObject));
             D.assert(!this.owner._debugDoingLayout);
             D.assert(this._relayoutBoundary == null);
 
@@ -761,8 +757,7 @@ namespace Unity.UIWidgets.rendering {
 
             try {
                 this.performLayout();
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 this._debugReportException("performLayout", ex);
             }
 
@@ -822,7 +817,7 @@ namespace Unity.UIWidgets.rendering {
                 return true;
             });
 
-            if (!this._needsLayout && object.Equals(constraints, this._constraints) &&
+            if (!this._needsLayout && Equals(constraints, this._constraints) &&
                 relayoutBoundary == this._relayoutBoundary) {
                 D.assert(() => {
                     this._debugDoingThisResize = this.sizedByParent;
@@ -866,8 +861,7 @@ namespace Unity.UIWidgets.rendering {
                         this.debugAssertDoesMeetConstraints();
                         return true;
                     });
-                }
-                catch (Exception ex) {
+                } catch (Exception ex) {
                     this._debugReportException("performResize", ex);
                 }
 
@@ -891,8 +885,7 @@ namespace Unity.UIWidgets.rendering {
                     this.debugAssertDoesMeetConstraints();
                     return true;
                 });
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 this._debugReportException("performLayout", ex);
             }
 
@@ -926,8 +919,7 @@ namespace Unity.UIWidgets.rendering {
             this._doingThisLayoutWithCallback = true;
             try {
                 this.owner._enableMutationsToDirtySubtrees(() => { callback((T) this.constraints); });
-            }
-            finally {
+            } finally {
                 this._doingThisLayoutWithCallback = false;
             }
         }
@@ -1207,8 +1199,7 @@ namespace Unity.UIWidgets.rendering {
                 this.paint(context, offset);
                 D.assert(!this._needsLayout);
                 D.assert(!this._needsPaint);
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 this._debugReportException("paint", ex);
             }
 
@@ -1265,7 +1256,7 @@ namespace Unity.UIWidgets.rendering {
         }
 
         public override string toStringShort() {
-            String header = Diagnostics.describeIdentity(this);
+            string header = Diagnostics.describeIdentity(this);
             if (this._relayoutBoundary != null && this._relayoutBoundary != this) {
                 int count = 1;
                 RenderObject target = (RenderObject) this.parent;
@@ -1297,8 +1288,8 @@ namespace Unity.UIWidgets.rendering {
         }
 
         public override string toStringDeep(
-            String prefixLineOne = "",
-            String prefixOtherLines = "",
+            string prefixLineOne = "",
+            string prefixOtherLines = "",
             DiagnosticLevel minLevel = DiagnosticLevel.debug
         ) {
             RenderObject debugPreviousActiveLayout = null;
@@ -1320,7 +1311,7 @@ namespace Unity.UIWidgets.rendering {
         }
 
         public override string toStringShallow(
-            String joiner = "; ",
+            string joiner = ", ",
             DiagnosticLevel minLevel = DiagnosticLevel.debug
         ) {
             RenderObject debugPreviousActiveLayout = null;

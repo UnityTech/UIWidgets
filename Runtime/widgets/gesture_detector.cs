@@ -325,7 +325,9 @@ namespace Unity.UIWidgets.widgets {
                 D.assert(gestures[type] != null);
                 D.assert(gestures[type]._debugAssertTypeMatches(type));
                 D.assert(!this._recognizers.ContainsKey(type));
-                this._recognizers[type] = oldRecognizers.ContainsKey(type) ? oldRecognizers[type] : gestures[type].constructorRaw();
+                this._recognizers[type] = oldRecognizers.ContainsKey(type)
+                    ? oldRecognizers[type]
+                    : gestures[type].constructorRaw();
                 D.assert(this._recognizers[type].GetType() == type,
                     "GestureRecognizerFactory of type " + type + " created a GestureRecognizer of type " +
                     this._recognizers[type].GetType() +
@@ -366,7 +368,7 @@ namespace Unity.UIWidgets.widgets {
             if (this._recognizers == null) {
                 properties.add(DiagnosticsNode.message("DISPOSED"));
             } else {
-                List<String> gestures = this._recognizers.Values.Select(recognizer => recognizer.debugDescription)
+                List<string> gestures = this._recognizers.Values.Select(recognizer => recognizer.debugDescription)
                     .ToList();
                 properties.add(new EnumerableProperty<string>("gestures", gestures, ifEmpty: "<none>"));
                 properties.add(new EnumerableProperty<GestureRecognizer>("recognizers", this._recognizers.Values,

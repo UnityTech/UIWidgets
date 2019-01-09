@@ -6,7 +6,6 @@ using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
 using UnityEngine;
 using Color = Unity.UIWidgets.ui.Color;
-using Overflow = Unity.UIWidgets.rendering.Overflow;
 using Rect = Unity.UIWidgets.ui.Rect;
 
 namespace Unity.UIWidgets.widgets {
@@ -27,7 +26,7 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public override bool updateShouldNotify(InheritedWidget oldWidget) {
-            return textDirection != ((Directionality) oldWidget).textDirection;
+            return this.textDirection != ((Directionality) oldWidget).textDirection;
         }
     }
 
@@ -39,11 +38,11 @@ namespace Unity.UIWidgets.widgets {
         public double opacity;
 
         public override RenderObject createRenderObject(BuildContext context) {
-            return new RenderOpacity(opacity: opacity);
+            return new RenderOpacity(opacity: this.opacity);
         }
 
         public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
-            ((RenderOpacity) renderObject).opacity = opacity;
+            ((RenderOpacity) renderObject).opacity = this.opacity;
         }
     }
 
@@ -128,11 +127,9 @@ namespace Unity.UIWidgets.widgets {
             string type;
             if (this.width == double.PositiveInfinity && this.height == double.PositiveInfinity) {
                 type = this.GetType() + "expand";
-            }
-            else if (this.width == 0.0 && this.height == 0.0) {
+            } else if (this.width == 0.0 && this.height == 0.0) {
                 type = this.GetType() + "shrink";
-            }
-            else {
+            } else {
                 type = this.GetType() + "";
             }
 
@@ -145,8 +142,7 @@ namespace Unity.UIWidgets.widgets {
             if ((this.width == double.PositiveInfinity && this.height == double.PositiveInfinity) ||
                 (this.width == 0.0 && this.height == 0.0)) {
                 level = DiagnosticLevel.hidden;
-            }
-            else {
+            } else {
                 level = DiagnosticLevel.info;
             }
 
@@ -219,10 +215,10 @@ namespace Unity.UIWidgets.widgets {
         public readonly VerticalDirection verticalDirection;
         public readonly TextBaseline? textBaseline;
 
-        private bool _needTextDirection {
+        bool _needTextDirection {
             get {
-                D.assert(direction != null);
-                switch (direction) {
+                D.assert(this.direction != null);
+                switch (this.direction) {
                     case Axis.horizontal:
                         return true;
                     case Axis.vertical:
@@ -235,18 +231,18 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public TextDirection getEffectiveTextDirection(BuildContext context) {
-            return textDirection ?? (_needTextDirection ? Directionality.of(context) : TextDirection.ltr);
+            return this.textDirection ?? (this._needTextDirection ? Directionality.of(context) : TextDirection.ltr);
         }
 
         public override RenderObject createRenderObject(BuildContext context) {
             return new RenderFlex(
-                direction: direction,
-                mainAxisAlignment: mainAxisAlignment,
-                mainAxisSize: mainAxisSize,
-                crossAxisAlignment: crossAxisAlignment,
-                textDirection: getEffectiveTextDirection(context),
-                verticalDirection: verticalDirection,
-                textBaseline: textBaseline ?? TextBaseline.alphabetic
+                direction: this.direction,
+                mainAxisAlignment: this.mainAxisAlignment,
+                mainAxisSize: this.mainAxisSize,
+                crossAxisAlignment: this.crossAxisAlignment,
+                textDirection: this.getEffectiveTextDirection(context),
+                verticalDirection: this.verticalDirection,
+                textBaseline: this.textBaseline ?? TextBaseline.alphabetic
             );
         }
 
@@ -273,16 +269,16 @@ namespace Unity.UIWidgets.widgets {
         public readonly double aspectRatio;
 
         public override RenderObject createRenderObject(BuildContext context) {
-            return new RenderAspectRatio(aspectRatio: aspectRatio);
+            return new RenderAspectRatio(aspectRatio: this.aspectRatio);
         }
 
         public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
-            ((RenderAspectRatio) renderObject).aspectRatio = aspectRatio;
+            ((RenderAspectRatio) renderObject).aspectRatio = this.aspectRatio;
         }
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
-            properties.add(new DoubleProperty("aspectRatio", aspectRatio));
+            properties.add(new DoubleProperty("aspectRatio", this.aspectRatio));
         }
     }
 
@@ -304,15 +300,15 @@ namespace Unity.UIWidgets.widgets {
         public readonly AlignmentDirectional alignment;
         public readonly TextDirection? textDirection;
         public readonly StackFit fit;
-        public readonly rendering.Overflow overflow;
+        public readonly Overflow overflow;
 
 
         public override RenderObject createRenderObject(BuildContext context) {
             return new RenderStack(
-                textDirection: textDirection ?? Directionality.of(context),
-                alignment: alignment,
-                fit: fit,
-                overflow: overflow
+                textDirection: this.textDirection ?? Directionality.of(context),
+                alignment: this.alignment,
+                fit: this.fit,
+                overflow: this.overflow
             );
         }
 
@@ -326,17 +322,16 @@ namespace Unity.UIWidgets.widgets {
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
-            properties.add(new DiagnosticsProperty<AlignmentDirectional>("alignment", alignment));
-            properties.add(new EnumProperty<StackFit>("fit", fit));
-            properties.add(new EnumProperty<Overflow>("overflow", overflow));
+            properties.add(new DiagnosticsProperty<AlignmentDirectional>("alignment", this.alignment));
+            properties.add(new EnumProperty<StackFit>("fit", this.fit));
+            properties.add(new EnumProperty<Overflow>("overflow", this.overflow));
         }
     }
 
-    public class Positioned : ParentDataWidget<Stack>
-    {
-        public Positioned(Widget child, Key key = null,  double? left = null, double? top = null, 
-            double? right = null, double? bottom = null, double? width = null, double? height = null) : base(key, child)
-        {
+    public class Positioned : ParentDataWidget<Stack> {
+        public Positioned(Widget child, Key key = null, double? left = null, double? top = null,
+            double? right = null, double? bottom = null, double? width = null, double? height = null) :
+            base(key, child) {
             D.assert(left == null || right == null || width == null);
             D.assert(top == null || bottom == null || height == null);
             this.left = left;
@@ -347,43 +342,39 @@ namespace Unity.UIWidgets.widgets {
             this.height = height;
         }
 
-        public static Positioned fromRect(Rect rect, Widget child, Key key = null)
-        {
+        public static Positioned fromRect(Rect rect, Widget child, Key key = null) {
             return new Positioned(child, key: key, left: rect.left,
                 top: rect.top, width: rect.width, height: rect.height);
         }
-        
-        public static Positioned fromRelativeRect(Rect rect, Widget child, Key key = null)
-        {
+
+        public static Positioned fromRelativeRect(Rect rect, Widget child, Key key = null) {
             return new Positioned(child, key: key, left: rect.left,
                 top: rect.top, right: rect.right, bottom: rect.bottom);
         }
-           
-        public static Positioned fill(Widget child, Key key = null)
-        {
+
+        public static Positioned fill(Widget child, Key key = null) {
             return new Positioned(child, key: key, left: 0.0,
                 top: 0.0, right: 0.0, bottom: 0.0);
         }
-        
-        public static Positioned directional(Widget child, TextDirection textDirection, Key key = null, 
-            double? start = null, double? top = null, 
-            double? end = null, double? bottom = null, double? width = null, double? height = null) 
-        {
+
+        public static Positioned directional(Widget child, TextDirection textDirection, Key key = null,
+            double? start = null, double? top = null,
+            double? end = null, double? bottom = null, double? width = null, double? height = null) {
             D.assert(textDirection != null);
             double? left = null;
             double? right = null;
-            switch (textDirection)
-            {
-                    case TextDirection.rtl:
-                           left = end;
-                           right = start;
-                           break;
-                         case TextDirection.ltr:
-                           left = start;
-                           right = end;
-                           break; 
+            switch (textDirection) {
+                case TextDirection.rtl:
+                    left = end;
+                    right = start;
+                    break;
+                case TextDirection.ltr:
+                    left = start;
+                    right = end;
+                    break;
             }
-            return new Positioned(child, key:key, left: left, top: top, right: right, bottom: bottom, width: width, height: height);
+            return new Positioned(child, key: key, left: left, top: top, right: right, bottom: bottom, width: width,
+                height: height);
         }
 
         public readonly double? left;
@@ -391,63 +382,64 @@ namespace Unity.UIWidgets.widgets {
         public readonly double? top;
 
         public readonly double? right;
-        
+
         public readonly double? bottom;
 
         public readonly double? width;
 
         public readonly double? height;
-        
+
         public override void applyParentData(RenderObject renderObject) {
             D.assert(renderObject.parentData is StackParentData);
             StackParentData parentData = (StackParentData) renderObject.parentData;
             bool needsLayout = false;
 
-            if (parentData.left != left) {
-                parentData.left = left;
+            if (parentData.left != this.left) {
+                parentData.left = this.left;
                 needsLayout = true;
             }
 
-            if (parentData.top != top) {
-                parentData.top = top;
+            if (parentData.top != this.top) {
+                parentData.top = this.top;
                 needsLayout = true;
             }
 
-            if (parentData.right != right) {
-                parentData.right = right;
+            if (parentData.right != this.right) {
+                parentData.right = this.right;
                 needsLayout = true;
             }
 
-            if (parentData.bottom != bottom) {
-                parentData.bottom = bottom;
+            if (parentData.bottom != this.bottom) {
+                parentData.bottom = this.bottom;
                 needsLayout = true;
             }
 
-            if (parentData.width != width) {
-                parentData.width = width;
+            if (parentData.width != this.width) {
+                parentData.width = this.width;
                 needsLayout = true;
             }
 
-            if (parentData.height != height) {
-                parentData.height = height;
+            if (parentData.height != this.height) {
+                parentData.height = this.height;
                 needsLayout = true;
             }
 
             if (needsLayout) {
                 var targetParent = renderObject.parent;
-                if (targetParent is RenderObject)
-                    ((RenderObject)targetParent).markNeedsLayout();
+                if (targetParent is RenderObject) {
+                    ((RenderObject) targetParent).markNeedsLayout();
+                }
             }
         }
-        
+
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
-            properties.add(new DoubleProperty("left", left, defaultValue: null));
-            properties.add(new DoubleProperty("top", top, defaultValue: null));
-            properties.add(new DoubleProperty("right", right, defaultValue: null));
-            properties.add(new DoubleProperty("bottom", bottom, defaultValue: null));
-            properties.add(new DoubleProperty("width", width, defaultValue: null));
-            properties.add(new DoubleProperty("height", height, defaultValue: null));
+            properties.add(new DoubleProperty("left", this.left, defaultValue: null));
+            properties.add(new DoubleProperty("top", this.top, defaultValue: null));
+            properties.add(new DoubleProperty("right", this.right, defaultValue: null));
+            properties.add(new DoubleProperty("bottom", this.bottom, defaultValue: null));
+            properties.add(new DoubleProperty("width", this.width, defaultValue: null));
+            properties.add(new DoubleProperty("height", this.height, defaultValue: null));
         }
     }
 
@@ -588,7 +580,7 @@ namespace Unity.UIWidgets.widgets {
             this.transformHitTests = transformHitTests;
         }
 
-        private Transform(
+        Transform(
             Key key = null,
             Offset origin = null,
             Alignment alignment = null,
@@ -613,7 +605,7 @@ namespace Unity.UIWidgets.widgets {
             return new Transform(key, origin, alignment, transformHitTests, child, degree);
         }
 
-        private Transform(
+        Transform(
             Key key = null,
             Offset offset = null,
             bool transformHitTests = true,
@@ -635,7 +627,7 @@ namespace Unity.UIWidgets.widgets {
             return new Transform(key, offset, transformHitTests, child);
         }
 
-        private Transform(
+        Transform(
             Key key = null,
             double scale = 1.0,
             Offset origin = null,
@@ -665,8 +657,7 @@ namespace Unity.UIWidgets.widgets {
         public readonly Alignment alignment;
         public readonly bool transformHitTests;
 
-        public override RenderObject createRenderObject(BuildContext context)
-        {
+        public override RenderObject createRenderObject(BuildContext context) {
             return new RenderTransform(
                 transform: this.transform,
                 origin: this.origin,
@@ -897,7 +888,7 @@ namespace Unity.UIWidgets.widgets {
 
         public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
             var renderImage = (RenderImage) renderObject;
-            
+
             renderImage.image = this.image;
             renderImage.width = this.width;
             renderImage.height = this.height;
@@ -987,7 +978,7 @@ namespace Unity.UIWidgets.widgets {
         public readonly PointerUpEventListener onPointerUp;
 
         public readonly PointerCancelEventListener onPointerCancel;
-        
+
         public readonly PointerHoverEventListener onPointerHover;
 
         public readonly PointerEnterEventListener onPointerEnter;
@@ -1039,7 +1030,7 @@ namespace Unity.UIWidgets.widgets {
             if (this.onPointerCancel != null) {
                 listeners.Add("cancel");
             }
-            
+
             if (this.onPointerEnter != null) {
                 listeners.Add("enter");
             }
@@ -1069,7 +1060,7 @@ namespace Unity.UIWidgets.widgets {
         public static List<RepaintBoundary> wrapAll(List<Widget> widgets) {
             List<RepaintBoundary> result = Enumerable.Repeat((RepaintBoundary) null, widgets.Count).ToList();
             for (int i = 0; i < result.Count; ++i) {
-                result[i] = RepaintBoundary.wrap(widgets[i], i);
+                result[i] = wrap(widgets[i], i);
             }
 
             return result;

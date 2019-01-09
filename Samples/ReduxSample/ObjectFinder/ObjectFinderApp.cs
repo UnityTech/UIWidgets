@@ -1,36 +1,32 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
 using Unity.UIWidgets.engine;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
-using UnityEngine;
+using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace Unity.UIWidgets.Sample.Redux.ObjectFinder {
-
     public class ObjectFinderApp : WidgetCanvas {
         public ObjectFinderApp() {
         }
 
         protected override Widget getWidget() {
-            return new StoreProvider<FinderAppState>(StoreProvider.store, createWidget());
+            return new StoreProvider<FinderAppState>(StoreProvider.store, this.createWidget());
         }
 
-        private Widget createWidget() {
+        Widget createWidget() {
             return new StoreConnector<FinderAppState, ObjectFinderAppWidgetModel>(
                 (context, viewModel) => new ObjectFinderAppWidget(
-                    viewModel,
-                    gameObject.name
+                    viewModel, this.gameObject.name
                 ),
                 (state, dispacher) => new ObjectFinderAppWidgetModel() {
                     objects = state.objects,
                     selected = state.selected,
-                    doSearch = (text) => dispacher(new SearchAction() { keyword = text }),
-                    onSelect = (id) => dispacher(new SelectObjectAction() { id = id })
+                    doSearch = (text) => dispacher(new SearchAction() {keyword = text}),
+                    onSelect = (id) => dispacher(new SelectObjectAction() {id = id})
                 }
             );
         }
@@ -70,72 +66,73 @@ namespace Unity.UIWidgets.Sample.Redux.ObjectFinder {
     }
 
     public class _ObjectFinderAppWidgetState : State<ObjectFinderAppWidget> {
-        private TextEditingController _controller;
+        TextEditingController _controller;
 
-        private FocusNode _focusNode;
+        FocusNode _focusNode;
 
         public override void initState() {
             base.initState();
-            _controller = new TextEditingController("");
-            _focusNode = new FocusNode();
-            if (widget.doSearch != null) {
+            this._controller = new TextEditingController("");
+            this._focusNode = new FocusNode();
+            if (this.widget.doSearch != null) {
                 //scheduler.SchedulerBinding.instance.scheduleFrameCallback
-                Window.instance.scheduleMicrotask(() => widget.doSearch(""));
+                Window.instance.scheduleMicrotask(() => this.widget.doSearch(""));
             }
-            _controller.addListener(this.textChange);
+            this._controller.addListener(this.textChange);
         }
 
         public override void dispose() {
-            _focusNode.dispose();
-            _controller.removeListener(this.textChange);
+            this._focusNode.dispose();
+            this._controller.removeListener(this.textChange);
             base.dispose();
         }
 
         public override Widget build(BuildContext context) {
             return new Container(
                 padding: EdgeInsets.all(10),
-                    decoration: new BoxDecoration(color: new ui.Color(0x4FFFFFFF), border: Border.all(color: ui.Color.fromARGB(255, 255, 0, 0), width: 5),
-                        borderRadius: BorderRadius.all(2)),
+                decoration: new BoxDecoration(color: new Color(0x4FFFFFFF),
+                    border: Border.all(color: Color.fromARGB(255, 255, 0, 0), width: 5),
+                    borderRadius: BorderRadius.all(2)),
                 child: new Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: new List<Widget>(){
-                        _buildTitle(),
-                        _buildSearchInput(),
-                        _buildResultCount(),
-                        _buildResults(),
+                    children: new List<Widget>() {
+                        this._buildTitle(),
+                        this._buildSearchInput(),
+                        this._buildResultCount(),
+                        this._buildResults(),
                     }
                 )
             );
         }
 
-        private void textChange() {
-            if (widget.doSearch != null) {
-                widget.doSearch(_controller.text);
+        void textChange() {
+            if (this.widget.doSearch != null) {
+                this.widget.doSearch(this._controller.text);
             }
         }
 
         Widget _buildTitle() {
-            return new Text(widget.title, textAlign: TextAlign.center,
-                    style: new painting.TextStyle(fontSize: 20, height: 1.5));
+            return new Text(this.widget.title, textAlign: TextAlign.center,
+                style: new TextStyle(fontSize: 20, height: 1.5));
         }
 
         Widget _buildSearchInput() {
             return new Row(
-                children: new List<Widget>{
+                children: new List<Widget> {
                     new Text("Search:"),
                     new Flexible(child:
                         new Container(
                             margin: EdgeInsets.only(left: 8),
-                            decoration: new BoxDecoration(border: Border.all(new ui.Color(0xFF000000), 1)),
+                            decoration: new BoxDecoration(border: Border.all(new Color(0xFF000000), 1)),
                             padding: EdgeInsets.only(left: 8, right: 8),
                             child: new EditableText(
-                            controller: _controller,
-                                    focusNode: _focusNode,
-                                    style: new painting.TextStyle(
-                                        fontSize: 18,
-                                        height: 1.5f
-                                    ),
-                                    cursorColor: ui.Color.fromARGB(255, 0, 0, 0)
+                                controller: this._controller,
+                                focusNode: this._focusNode,
+                                style: new TextStyle(
+                                    fontSize: 18,
+                                    height: 1.5f
+                                ),
+                                cursorColor: Color.fromARGB(255, 0, 0, 0)
                             )
                         )
                     )
@@ -144,29 +141,27 @@ namespace Unity.UIWidgets.Sample.Redux.ObjectFinder {
         }
 
         Widget _buildResultItem(GameObjectInfo obj) {
-            return new GestureDetector(child: 
+            return new GestureDetector(child:
                 new Container(
                     key: new ValueKey<int>(obj.id),
                     child: new Text(obj.name),
                     padding: EdgeInsets.all(8),
-                    color: widget.selected == obj.id ? new ui.Color(0xFFFF0000) : null
+                    color: this.widget.selected == obj.id ? new Color(0xFFFF0000) : null
                 ), onTap: () => {
-                if (widget.onSelect != null) {
-                    widget.onSelect(obj.id);
-                }
-            });
+                    if (this.widget.onSelect != null) {
+                        this.widget.onSelect(obj.id);
+                    }
+                });
         }
 
         Widget _buildResultCount() {
-            return new Text(string.Format("Total Results:{0}", widget.objectInfos.Count), 
-                style: new painting.TextStyle(height: 3.0, fontSize: 12));
+            return new Text($"Total Results:{this.widget.objectInfos.Count}",
+                style: new TextStyle(height: 3.0, fontSize: 12));
         }
 
         Widget _buildResults() {
             List<Widget> rows = new List<Widget>();
-            widget.objectInfos.ForEach(obj => {
-                rows.Add(_buildResultItem(obj));
-            });
+            this.widget.objectInfos.ForEach(obj => { rows.Add(this._buildResultItem(obj)); });
             return new Flexible(
                 child: new ListView(
                     children: rows,
@@ -174,5 +169,4 @@ namespace Unity.UIWidgets.Sample.Redux.ObjectFinder {
             );
         }
     }
-
 }

@@ -47,7 +47,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public Color withAlpha(int a) {
-            return Color.fromARGB(a, this.red, this.green, this.blue);
+            return fromARGB(a, this.red, this.green, this.blue);
         }
 
         public Color withOpacity(double opacity) {
@@ -55,15 +55,15 @@ namespace Unity.UIWidgets.ui {
         }
 
         public Color withRed(int r) {
-            return Color.fromARGB(this.alpha, r, this.green, this.blue);
+            return fromARGB(this.alpha, r, this.green, this.blue);
         }
 
         public Color withGreen(int g) {
-            return Color.fromARGB(this.alpha, this.red, g, this.blue);
+            return fromARGB(this.alpha, this.red, g, this.blue);
         }
 
         public Color withBlue(int b) {
-            return Color.fromARGB(this.alpha, this.red, this.green, b);
+            return fromARGB(this.alpha, this.red, this.green, b);
         }
 
         public static Color lerp(Color a, Color b, double t) {
@@ -79,7 +79,7 @@ namespace Unity.UIWidgets.ui {
                 return a._scaleAlpha(1.0 - t);
             }
 
-            return Color.fromARGB(
+            return fromARGB(
                 ((int) MathUtils.lerpDouble(a.alpha, b.alpha, t)).clamp(0, 255),
                 ((int) MathUtils.lerpDouble(a.red, b.red, t)).clamp(0, 255),
                 ((int) MathUtils.lerpDouble(a.green, b.green, t)).clamp(0, 255),
@@ -88,15 +88,25 @@ namespace Unity.UIWidgets.ui {
         }
 
         public bool Equals(Color other) {
-            if (object.ReferenceEquals(null, other)) return false;
-            if (object.ReferenceEquals(this, other)) return true;
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
             return this.value == other.value;
         }
 
         public override bool Equals(object obj) {
-            if (object.ReferenceEquals(null, obj)) return false;
-            if (object.ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
             return this.Equals((Color) obj);
         }
 
@@ -105,7 +115,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public static bool operator ==(Color a, Color b) {
-            return object.ReferenceEquals(a, null) ? object.ReferenceEquals(b, null) : a.Equals(b);
+            return ReferenceEquals(a, null) ? ReferenceEquals(b, null) : a.Equals(b);
         }
 
         public static bool operator !=(Color a, Color b) {
@@ -113,7 +123,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public override string ToString() {
-            return string.Format("Color(0x{0:X8})", this.value);
+            return $"Color(0x{this.value:X8})";
         }
     }
 
@@ -328,11 +338,11 @@ namespace Unity.UIWidgets.ui {
             result[14] = matrix3[8];
             return result;
         }
-        
+
         public static float alignToPixel(this float v, float devicePixelRatio) {
             return Mathf.Round(v * devicePixelRatio) / devicePixelRatio;
         }
-        
+
         internal static Color _scaleAlpha(this Color a, double factor) {
             return a.withAlpha((a.alpha * factor).round().clamp(0, 255));
         }

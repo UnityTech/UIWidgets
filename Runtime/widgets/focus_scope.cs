@@ -1,77 +1,64 @@
 ﻿using Unity.UIWidgets.foundation;
 
-namespace Unity.UIWidgets.widgets
-{
-    
-    class _FocusScopeMarker: InheritedWidget {
-        
-        public _FocusScopeMarker( FocusScopeNode node, Widget child, Key key = null) : base(key, child)
-        {
+namespace Unity.UIWidgets.widgets {
+    class _FocusScopeMarker : InheritedWidget {
+        public _FocusScopeMarker(FocusScopeNode node, Widget child, Key key = null) : base(key, child) {
             D.assert(node != null);
             this.node = node;
         }
 
         public readonly FocusScopeNode node;
 
-        public override bool updateShouldNotify(InheritedWidget oldWidget)
-        {
-            return node != ((_FocusScopeMarker)oldWidget).node;
+        public override bool updateShouldNotify(InheritedWidget oldWidget) {
+            return this.node != ((_FocusScopeMarker) oldWidget).node;
         }
     }
 
-    public class FocusScope : StatefulWidget
-    {
-        public FocusScope(FocusScopeNode node, Widget child, Key key = null, bool autofocus = false) : base(key)
-        {
+    public class FocusScope : StatefulWidget {
+        public FocusScope(FocusScopeNode node, Widget child, Key key = null, bool autofocus = false) : base(key) {
             this.node = node;
             this.child = child;
             this.autofocus = autofocus;
         }
 
         public readonly FocusScopeNode node;
-        
+
         public readonly bool autofocus;
-        
+
         public readonly Widget child;
-        
+
         public static FocusScopeNode of(BuildContext context) {
-            var scope = (_FocusScopeMarker)context.inheritFromWidgetOfExactType(typeof(_FocusScopeMarker));
-            if (scope != null && scope.node != null)
-            {
+            var scope = (_FocusScopeMarker) context.inheritFromWidgetOfExactType(typeof(_FocusScopeMarker));
+            if (scope != null && scope.node != null) {
                 return scope.node;
             }
             return context.owner.focusManager.rootScope;
         }
-        
-        public override State createState()
-        {
+
+        public override State createState() {
             return new _FocusScopeState();
         }
     }
 
-    class _FocusScopeState : State<FocusScope>
-    {
-        private bool _didAutofocus = false;
-        
-        public override void didChangeDependencies()
-        {
+    class _FocusScopeState : State<FocusScope> {
+        bool _didAutofocus = false;
+
+        public override void didChangeDependencies() {
             base.didChangeDependencies();
-            if (!_didAutofocus && widget.autofocus)
-            {
-                FocusScope.of(context).setFirstFocus(widget.node);
-                _didAutofocus = true;
+            if (!this._didAutofocus && this.widget.autofocus) {
+                FocusScope.of(this.context).setFirstFocus(this.widget.node);
+                this._didAutofocus = true;
             }
         }
 
         public override void dispose() {
-            widget.node.detach();
+            this.widget.node.detach();
             base.dispose();
         }
 
-        public override Widget build(BuildContext context)
-        {
-            FocusScope.of(context).reparentScopeIfNeeded(widget.node);
-            return new _FocusScopeMarker(node:widget.node, child:widget.child);
+        public override Widget build(BuildContext context) {
+            FocusScope.of(context).reparentScopeIfNeeded(this.widget.node);
+            return new _FocusScopeMarker(node: this.widget.node, child: this.widget.child);
         }
     }
 }

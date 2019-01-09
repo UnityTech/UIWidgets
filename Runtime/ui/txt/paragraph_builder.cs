@@ -1,88 +1,73 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 
-namespace Unity.UIWidgets.ui
-{
-    public class ParagraphBuilder
-    {
-        private StringBuilder _text = new StringBuilder();
-        private ParagraphStyle _paragraphStyle;
-        private StyledRuns _runs = new StyledRuns();
-        private List<int>  _styleStack = new List<int>();
-        private int _paragraph_style_index;
-  
-        public interface ITextStyleProvider
-        {
+namespace Unity.UIWidgets.ui {
+    public class ParagraphBuilder {
+        StringBuilder _text = new StringBuilder();
+        ParagraphStyle _paragraphStyle;
+        StyledRuns _runs = new StyledRuns();
+        List<int> _styleStack = new List<int>();
+        int _paragraph_style_index;
+
+        public interface ITextStyleProvider {
             TextStyle getTextStyle(TextStyle current = null);
         }
 
-        public ParagraphBuilder(ParagraphStyle style)
-        {
-            setParagraphStyle(style);
+        public ParagraphBuilder(ParagraphStyle style) {
+            this.setParagraphStyle(style);
         }
-        
-        public Paragraph build()
-        {
-            _runs.endRunIfNeeded(_text.Length);
+
+        public Paragraph build() {
+            this._runs.endRunIfNeeded(this._text.Length);
             var paragraph = new Paragraph();
-            paragraph.setText(_text.ToString(), _runs);
-            paragraph.setParagraphStyle(_paragraphStyle);
+            paragraph.setText(this._text.ToString(), this._runs);
+            paragraph.setParagraphStyle(this._paragraphStyle);
             return paragraph;
         }
 
-        public void pushStyle(ITextStyleProvider style)
-        {
-            var newStyle = style.getTextStyle(peekStyle());
-            var styleIndex = _runs.addStyle(newStyle);
-            _styleStack.Add(styleIndex);
-            _runs.startRun(styleIndex, _text.Length);
-        }
-        
-        public void pushStyle(TextStyle style)
-        {
-            var styleIndex = _runs.addStyle(style);
-            _styleStack.Add(styleIndex);
-            _runs.startRun(styleIndex, _text.Length);
+        public void pushStyle(ITextStyleProvider style) {
+            var newStyle = style.getTextStyle(this.peekStyle());
+            var styleIndex = this._runs.addStyle(newStyle);
+            this._styleStack.Add(styleIndex);
+            this._runs.startRun(styleIndex, this._text.Length);
         }
 
-        public void pop()
-        {
-            var lastIndex = _styleStack.Count - 1;
-            if (lastIndex < 0)
-            {
+        public void pushStyle(TextStyle style) {
+            var styleIndex = this._runs.addStyle(style);
+            this._styleStack.Add(styleIndex);
+            this._runs.startRun(styleIndex, this._text.Length);
+        }
+
+        public void pop() {
+            var lastIndex = this._styleStack.Count - 1;
+            if (lastIndex < 0) {
                 return;
             }
-            _styleStack.RemoveAt(lastIndex);
-            _runs.startRun(peekStyleIndex(), _text.Length);
+            this._styleStack.RemoveAt(lastIndex);
+            this._runs.startRun(this.peekStyleIndex(), this._text.Length);
         }
-        
-        public void addText(string text)
-        {
+
+        public void addText(string text) {
             this._text.Append(text);
         }
 
-        public TextStyle peekStyle()
-        {
-            return _runs.getStyle(peekStyleIndex());
-        }
-        
-        
-        public int peekStyleIndex() {
-            int count = _styleStack.Count;
-            if (count > 0)
-            {
-                return _styleStack[count - 1];
-            }
-            return _paragraph_style_index;
+        public TextStyle peekStyle() {
+            return this._runs.getStyle(this.peekStyleIndex());
         }
 
-        private void setParagraphStyle(ParagraphStyle style)
-        {
-            _paragraphStyle = style;
-            _paragraph_style_index = _runs.addStyle(style.getTextStyle());
-            _runs.startRun(_paragraph_style_index, _text.Length);
+
+        public int peekStyleIndex() {
+            int count = this._styleStack.Count;
+            if (count > 0) {
+                return this._styleStack[count - 1];
+            }
+            return this._paragraph_style_index;
         }
-        
-        
+
+        void setParagraphStyle(ParagraphStyle style) {
+            this._paragraphStyle = style;
+            this._paragraph_style_index = this._runs.addStyle(style.getTextStyle());
+            this._runs.startRun(this._paragraph_style_index, this._text.Length);
+        }
     }
 }

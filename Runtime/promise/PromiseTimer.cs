@@ -13,14 +13,14 @@ namespace RSG {
         /// Create the exception with description
         /// </summary>
         /// <param name="message">Exception description</param>
-        public PromiseCancelledException(String message) : base(message) {
+        public PromiseCancelledException(string message) : base(message) {
         }
     }
 
     /// <summary>
     /// A class that wraps a pending promise with it's predicate and time data
     /// </summary>
-    internal class PredicateWait {
+    class PredicateWait {
         /// <summary>
         /// Predicate for resolving the promise
         /// </summary>
@@ -98,30 +98,30 @@ namespace RSG {
         /// <summary>
         /// The current running total for time that this PromiseTimer has run for
         /// </summary>
-        private float curTime;
+        float curTime;
 
         /// <summary>
         /// The current running total for the amount of frames the PromiseTimer has run for
         /// </summary>
-        private int curFrame;
+        int curFrame;
 
         /// <summary>
         /// Currently pending promises
         /// </summary>
-        private readonly LinkedList<PredicateWait> waiting = new LinkedList<PredicateWait>();
+        readonly LinkedList<PredicateWait> waiting = new LinkedList<PredicateWait>();
 
         /// <summary>
         /// Resolve the returned promise once the time has elapsed
         /// </summary>
         public IPromise WaitFor(float seconds) {
-            return WaitUntil(t => t.elapsedTime >= seconds);
+            return this.WaitUntil(t => t.elapsedTime >= seconds);
         }
 
         /// <summary>
         /// Resolve the returned promise once the predicate evaluates to false
         /// </summary>
         public IPromise WaitWhile(Func<TimeData, bool> predicate) {
-            return WaitUntil(t => !predicate(t));
+            return this.WaitUntil(t => !predicate(t));
         }
 
         /// <summary>
@@ -131,33 +131,33 @@ namespace RSG {
             var promise = new Promise();
 
             var wait = new PredicateWait() {
-                timeStarted = curTime,
+                timeStarted = this.curTime,
                 pendingPromise = promise,
                 timeData = new TimeData(),
                 predicate = predicate,
-                frameStarted = curFrame
+                frameStarted = this.curFrame
             };
 
-            waiting.AddLast(wait);
+            this.waiting.AddLast(wait);
 
             return promise;
         }
 
         public bool Cancel(IPromise promise) {
-            var node = FindInWaiting(promise);
+            var node = this.FindInWaiting(promise);
 
             if (node == null) {
                 return false;
             }
 
             node.Value.pendingPromise.Reject(new PromiseCancelledException("Promise was cancelled by user."));
-            waiting.Remove(node);
+            this.waiting.Remove(node);
 
             return true;
         }
 
         LinkedListNode<PredicateWait> FindInWaiting(IPromise promise) {
-            for (var node = waiting.First; node != null; node = node.Next) {
+            for (var node = this.waiting.First; node != null; node = node.Next) {
                 if (node.Value.pendingPromise.Id.Equals(promise.Id)) {
                     return node;
                 }
@@ -170,36 +170,34 @@ namespace RSG {
         /// Update all pending promises. Must be called for the promises to progress and resolve at all.
         /// </summary>
         public void Update(float deltaTime) {
-            curTime += deltaTime;
-            curFrame += 1;
+            this.curTime += deltaTime;
+            this.curFrame += 1;
 
-            var node = waiting.First;
+            var node = this.waiting.First;
             while (node != null) {
                 var wait = node.Value;
 
-                var newElapsedTime = curTime - wait.timeStarted;
+                var newElapsedTime = this.curTime - wait.timeStarted;
                 wait.timeData.deltaTime = newElapsedTime - wait.timeData.elapsedTime;
                 wait.timeData.elapsedTime = newElapsedTime;
-                var newElapsedUpdates = curFrame - wait.frameStarted;
+                var newElapsedUpdates = this.curFrame - wait.frameStarted;
                 wait.timeData.elapsedUpdates = newElapsedUpdates;
 
                 bool result;
                 try {
                     result = wait.predicate(wait.timeData);
-                }
-                catch (Exception ex) {
+                } catch (Exception ex) {
                     wait.pendingPromise.Reject(ex);
 
-                    node = RemoveNode(node);
+                    node = this.RemoveNode(node);
                     continue;
                 }
 
                 if (result) {
                     wait.pendingPromise.Resolve();
 
-                    node = RemoveNode(node);
-                }
-                else {
+                    node = this.RemoveNode(node);
+                } else {
                     node = node.Next;
                 }
             }
@@ -208,11 +206,11 @@ namespace RSG {
         /// <summary>
         /// Removes the provided node and returns the next node in the list.
         /// </summary>
-        private LinkedListNode<PredicateWait> RemoveNode(LinkedListNode<PredicateWait> node) {
+        LinkedListNode<PredicateWait> RemoveNode(LinkedListNode<PredicateWait> node) {
             var currentNode = node;
             node = node.Next;
 
-            waiting.Remove(currentNode);
+            this.waiting.Remove(currentNode);
 
             return node;
         }

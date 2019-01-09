@@ -61,7 +61,7 @@ namespace Unity.UIWidgets.widgets {
             return new RenderViewport(
                 axisDirection: this.axisDirection,
                 crossAxisDirection: this.crossAxisDirection ??
-                                    Viewport.getDefaultCrossAxisDirection(context, this.axisDirection),
+                                    getDefaultCrossAxisDirection(context, this.axisDirection),
                 anchor: this.anchor,
                 offset: this.offset,
                 cacheExtent: this.cacheExtent ?? RenderViewportUtils.defaultCacheExtent
@@ -72,7 +72,7 @@ namespace Unity.UIWidgets.widgets {
             var renderObject = (RenderViewport) renderObjectRaw;
             renderObject.axisDirection = this.axisDirection;
             renderObject.crossAxisDirection = this.crossAxisDirection ??
-                                              Viewport.getDefaultCrossAxisDirection(context, this.axisDirection);
+                                              getDefaultCrossAxisDirection(context, this.axisDirection);
             renderObject.anchor = this.anchor;
             renderObject.offset = this.offset;
             renderObject.cacheExtent = this.cacheExtent ?? RenderViewportUtils.defaultCacheExtent;
@@ -173,7 +173,7 @@ namespace Unity.UIWidgets.widgets {
         public override void updateRenderObject(BuildContext context, RenderObject renderObjectRaw) {
             var renderObject = (RenderShrinkWrappingViewport) renderObjectRaw;
             renderObject.axisDirection = this.axisDirection;
-            renderObject.crossAxisDirection = this.crossAxisDirection 
+            renderObject.crossAxisDirection = this.crossAxisDirection
                                               ?? Viewport.getDefaultCrossAxisDirection(context, this.axisDirection);
             renderObject.offset = this.offset;
         }

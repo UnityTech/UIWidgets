@@ -1,12 +1,11 @@
-using RSG;
-using Unity.UIWidgets.ui;
-using UnityEngine;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using RSG;
 using Unity.UIWidgets.async;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.scheduler;
+using Unity.UIWidgets.ui;
 
 namespace Unity.UIWidgets.painting {
     public class ImageInfo : IEquatable<ImageInfo> {
@@ -21,15 +20,25 @@ namespace Unity.UIWidgets.painting {
         public readonly double scale;
 
         public bool Equals(ImageInfo other) {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
             return Equals(this.image, other.image) && this.scale.Equals(other.scale);
         }
 
         public override bool Equals(object obj) {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
             return this.Equals((ImageInfo) obj);
         }
 
@@ -56,7 +65,7 @@ namespace Unity.UIWidgets.painting {
 
     public delegate void ImageErrorListener(Exception exception);
 
-    internal class _ImageListenerPair {
+    class _ImageListenerPair {
         public ImageListener listener;
         public ImageErrorListener errorListener;
     }
@@ -66,7 +75,10 @@ namespace Unity.UIWidgets.painting {
         }
 
         ImageStreamCompleter _completer;
-        public ImageStreamCompleter completer => this._completer;
+
+        public ImageStreamCompleter completer {
+            get { return this._completer; }
+        }
 
         List<_ImageListenerPair> _listeners;
 
@@ -114,7 +126,9 @@ namespace Unity.UIWidgets.painting {
             }
         }
 
-        public object key => this._completer != null ? (object) this._completer : this;
+        public object key {
+            get { return this._completer != null ? (object) this._completer : this; }
+        }
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
@@ -146,8 +160,7 @@ namespace Unity.UIWidgets.painting {
             if (this.currentImage != null) {
                 try {
                     listener(this.currentImage, true);
-                }
-                catch (Exception ex) {
+                } catch (Exception ex) {
                     this.reportError(
                         context: "by a synchronously-called image listener",
                         exception: ex
@@ -158,8 +171,7 @@ namespace Unity.UIWidgets.painting {
             if (this.currentError != null && onError != null) {
                 try {
                     onError(this.currentError.exception);
-                }
-                catch (Exception ex) {
+                } catch (Exception ex) {
                     UIWidgetsError.reportError(
                         new UIWidgetsErrorDetails(
                             exception: ex,
@@ -190,8 +202,7 @@ namespace Unity.UIWidgets.painting {
             foreach (var listener in localListeners) {
                 try {
                     listener(image, false);
-                }
-                catch (Exception ex) {
+                } catch (Exception ex) {
                     this.reportError(
                         context: "by an image listener",
                         exception: ex
@@ -221,8 +232,7 @@ namespace Unity.UIWidgets.painting {
                 foreach (var errorListener in localErrorListeners) {
                     try {
                         errorListener(exception);
-                    }
-                    catch (Exception ex) {
+                    } catch (Exception ex) {
                         UIWidgetsError.reportError(
                             new UIWidgetsErrorDetails(
                                 context: "by an image error listener",
@@ -252,9 +262,7 @@ namespace Unity.UIWidgets.painting {
             InformationCollector informationCollector = null) {
             D.assert(image != null);
 
-            image.Then(result => {
-                this.setImage(result);
-            }).Catch(err => {
+            image.Then(result => { this.setImage(result); }).Catch(err => {
                 this.reportError(
                     context: "resolving a single-frame image stream",
                     exception: err,
@@ -366,7 +374,9 @@ namespace Unity.UIWidgets.painting {
             this._framesEmitted += 1;
         }
 
-        bool _hasActiveListeners => this._listeners.isNotEmpty();
+        bool _hasActiveListeners {
+            get { return this._listeners.isNotEmpty(); }
+        }
 
         public override void addListener(ImageListener listener, ImageErrorListener onError = null) {
             if (!this._hasActiveListeners && this._codec != null) {

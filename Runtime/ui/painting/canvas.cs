@@ -1,5 +1,4 @@
 ﻿using System;
-using Unity.UIWidgets.ui.txt;
 
 namespace Unity.UIWidgets.ui {
     public interface Canvas {
@@ -178,7 +177,7 @@ namespace Unity.UIWidgets.ui {
             var path = new Path();
             path.moveTo(from.dx, from.dy);
             path.lineTo(to.dx, to.dy);
-            
+
             this._recorder.addDrawCmd(new DrawPath {
                 path = path,
                 paint = paint,
@@ -188,7 +187,7 @@ namespace Unity.UIWidgets.ui {
         public void drawRect(Rect rect, Paint paint) {
             var path = new Path();
             path.addRect(rect);
-            
+
             this._recorder.addDrawCmd(new DrawPath {
                 path = path,
                 paint = paint,
@@ -209,7 +208,7 @@ namespace Unity.UIWidgets.ui {
             path.addRRect(outer);
             path.addRRect(inner);
             path.winding(PathWinding.clockwise);
-            
+
             this._recorder.addDrawCmd(new DrawPath {
                 path = path,
                 paint = paint,
@@ -316,7 +315,7 @@ namespace Unity.UIWidgets.ui {
         public void flush() {
             throw new Exception("not available in recorder");
         }
-        
+
         public void reset() {
             throw new Exception("not available in recorder");
         }

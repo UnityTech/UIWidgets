@@ -15,9 +15,9 @@ namespace UIWidgets.Tests {
             onPreSceneGUIDelegate += OnPreSceneGUI;
             SceneView.onSceneGUIDelegate += OnSceneGUI;
             EditorApplication.update += Update;
-            
+
             SceneView.RepaintAll();
-            
+
             _options = new Func<Widget>[] {
                 none,
                 listView,
@@ -25,7 +25,6 @@ namespace UIWidgets.Tests {
             };
             _optionStrings = _options.Select(x => x.Method.Name).ToArray();
             _selected = 0;
-
         }
 
         public static void hide() {
@@ -51,30 +50,30 @@ namespace UIWidgets.Tests {
             }
         }
 
-        private static Func<Widget>[] _options;
-        
-        private static string[] _optionStrings;
+        static Func<Widget>[] _options;
 
-        private static int _selected;
-        
-        [NonSerialized] private static bool hasInvoked = false;
+        static string[] _optionStrings;
 
-        private static EventType _lastEventType; 
-        
-        private static void OnPreSceneGUI(SceneView sceneView) {
+        static int _selected;
+
+        [NonSerialized] static bool hasInvoked = false;
+
+        static EventType _lastEventType;
+
+        static void OnPreSceneGUI(SceneView sceneView) {
             _lastEventType = Event.current.rawType;
         }
-        
-        private static void OnSceneGUI(SceneView sceneView) {
+
+        static void OnSceneGUI(SceneView sceneView) {
             //HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Passive));
             Handles.BeginGUI();
-            
+
             if (windowAdapter == null) {
                 windowAdapter = new EditorWindowAdapter(sceneView);
             } else if (windowAdapter != null && windowAdapter.editorWindow != sceneView) {
                 windowAdapter = new EditorWindowAdapter(sceneView);
             }
-            
+
             var selected = EditorGUILayout.Popup("test case", _selected, _optionStrings);
             if (selected != _selected || !hasInvoked) {
                 _selected = selected;
@@ -85,7 +84,7 @@ namespace UIWidgets.Tests {
             }
 
             if (Event.current.type == EventType.Used) {
-                Event.current.type = SceneViewTests._lastEventType;
+                Event.current.type = _lastEventType;
                 windowAdapter.OnGUI();
                 Event.current.type = EventType.Used;
             } else {
@@ -95,18 +94,18 @@ namespace UIWidgets.Tests {
             Handles.EndGUI();
         }
 
-        private static void Update() {
+        static void Update() {
             if (windowAdapter != null) {
                 windowAdapter.Update();
             }
         }
 
-        private static EditorWindowAdapter windowAdapter;
+        static EditorWindowAdapter windowAdapter;
 
         public static Widget none() {
             return null;
         }
-        
+
         public static Widget listView() {
             return ListView.builder(
                 itemExtent: 20.0,
@@ -117,11 +116,11 @@ namespace UIWidgets.Tests {
                 }
             );
         }
-        
-        public static Widget eventsPage() { 
+
+        public static Widget eventsPage() {
             return new EventsWaterfallScreen();
         }
-        
+
         public static RenderBox flex() {
             var flexbox = new RenderFlex(
                 direction: Axis.horizontal,

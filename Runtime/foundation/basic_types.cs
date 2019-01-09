@@ -4,7 +4,6 @@ using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace Unity.UIWidgets.foundation {
-    
     public delegate void ValueChanged<T>(T value);
 
     public delegate IEnumerable<T> EnumerableFilter<T>(IEnumerable<T> input);
@@ -64,9 +63,8 @@ namespace Unity.UIWidgets.foundation {
         public static bool isNotEmpty(this string it) {
             return !string.IsNullOrEmpty(it);
         }
-        
-        public static TValue getOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> it, TKey key)
-        {
+
+        public static TValue getOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> it, TKey key) {
             TValue v;
             it.TryGetValue(key, out v);
             return v;

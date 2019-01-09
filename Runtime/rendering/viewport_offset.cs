@@ -58,7 +58,7 @@ namespace Unity.UIWidgets.rendering {
             return Diagnostics.describeIdentity(this) + "(" + string.Join(", ", description.ToArray()) + ")";
         }
 
-        protected virtual void debugFillDescription(List<String> description) {
+        protected virtual void debugFillDescription(List<string> description) {
             description.Add("offset: " + this.pixels.ToString("F1"));
         }
     }

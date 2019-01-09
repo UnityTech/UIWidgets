@@ -24,15 +24,25 @@ namespace Unity.UIWidgets.foundation {
         public readonly T value;
 
         public bool Equals(ValueKey<T> other) {
-            if (object.ReferenceEquals(null, other)) return false;
-            if (object.ReferenceEquals(this, other)) return true;
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
             return EqualityComparer<T>.Default.Equals(this.value, other.value);
         }
 
         public override bool Equals(object obj) {
-            if (object.ReferenceEquals(null, obj)) return false;
-            if (object.ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
             return this.Equals((ValueKey<T>) obj);
         }
 
@@ -41,21 +51,21 @@ namespace Unity.UIWidgets.foundation {
         }
 
         public static bool operator ==(ValueKey<T> left, ValueKey<T> right) {
-            return object.Equals(left, right);
+            return Equals(left, right);
         }
 
         public static bool operator !=(ValueKey<T> left, ValueKey<T> right) {
-            return !object.Equals(left, right);
+            return !Equals(left, right);
         }
 
         public override string ToString() {
             string valueString = typeof(T) == typeof(string) ? "<\'" + this.value + "\'>" : "<" + this.value + ">";
 
             if (this.GetType() == typeof(ValueKey<T>)) {
-                return string.Format("[{0}]", valueString);
+                return $"[{valueString}]";
             }
 
-            return string.Format("[{0} {1}]", this.GetType(), valueString);
+            return $"[{this.GetType()} {valueString}]";
         }
     }
 }

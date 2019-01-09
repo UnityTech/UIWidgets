@@ -1,13 +1,8 @@
-﻿using Unity.UIWidgets.ui.txt;
-
-namespace Unity.UIWidgets.ui
-{
-    public class PaintRecord
-    {
-        public PaintRecord(TextStyle style,  Offset offset, TextBlob _text,
+﻿namespace Unity.UIWidgets.ui {
+    public class PaintRecord {
+        public PaintRecord(TextStyle style, Offset offset, TextBlob _text,
             FontMetrics metrics,
-            int line, double runWidth)
-        {
+            int line, double runWidth) {
             this._style = style;
             this._text = _text;
             this._line = line;
@@ -16,43 +11,36 @@ namespace Unity.UIWidgets.ui
             this._offset = offset;
         }
 
-        public TextBlob text
-        {
-            get { return _text; }
+        public TextBlob text {
+            get { return this._text; }
         }
 
-        public TextStyle style
-        {
-            get { return _style; }
+        public TextStyle style {
+            get { return this._style; }
         }
 
-        public int line
-        {
-            get { return _line; }
+        public int line {
+            get { return this._line; }
         }
 
-        public double runWidth
-        {
-            get { return _runWidth; }
+        public double runWidth {
+            get { return this._runWidth; }
         }
 
-        public Offset offset
-        {
-            get { return _offset; }
-            set { _offset = value; }
+        public Offset offset {
+            get { return this._offset; }
+            set { this._offset = value; }
         }
 
-        public FontMetrics metrics
-        {
-            get { return _metrics; }
+        public FontMetrics metrics {
+            get { return this._metrics; }
         }
 
-        private  TextStyle _style;
-        private TextBlob _text;
-        private int _line;
-        private double _runWidth;
-        private Offset _offset;
-        private FontMetrics _metrics;
-
+        TextStyle _style;
+        TextBlob _text;
+        int _line;
+        double _runWidth;
+        Offset _offset;
+        FontMetrics _metrics;
     }
 }

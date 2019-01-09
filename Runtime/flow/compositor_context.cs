@@ -1,5 +1,4 @@
 using System;
-using Unity.UIWidgets.editor;
 using Unity.UIWidgets.ui;
 
 namespace Unity.UIWidgets.flow {
@@ -55,7 +54,7 @@ namespace Unity.UIWidgets.flow {
         public RasterCache rasterCache() {
             return this._rasterCache;
         }
-        
+
         void _beginFrame(ScopedFrame frame) {
         }
 

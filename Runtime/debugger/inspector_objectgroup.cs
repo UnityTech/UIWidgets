@@ -1,65 +1,51 @@
 ﻿using System.Diagnostics;
 using UnityEngine;
 
-namespace Unity.UIWidgets.debugger
-{
-    public class InspectorObjectGroupManager : Singleton<InspectorObjectGroupManager>
-    {
-        [SerializeField]
-        private int m_NextId = 0;
+namespace Unity.UIWidgets.debugger {
+    public class InspectorObjectGroupManager : Singleton<InspectorObjectGroupManager> {
+        [SerializeField] int m_NextId = 0;
 
-        public string nextGroupName(string name)
-        {
-            return string.Format("pid{0}_{1}_{2}", Process.GetCurrentProcess().Id, name, m_NextId++);
+        public string nextGroupName(string name) {
+            return $"pid{Process.GetCurrentProcess().Id}_{name}_{this.m_NextId++}";
         }
-        
     }
-    public class Singleton<T>: ScriptableObject where T : ScriptableObject
-    {
-        private static T m_Instance;
-        private static bool m_CreateNonSingletonInstance;
-        private bool m_IsNonSingletonInstance;
-        
-        public static T Instance
-        {
-            get
-            {
-                if (m_Instance == null)
-                    m_Instance = ScriptableObject.CreateInstance<T>();
+
+    public class Singleton<T> : ScriptableObject where T : ScriptableObject {
+        static T m_Instance;
+        static bool m_CreateNonSingletonInstance;
+        bool m_IsNonSingletonInstance;
+
+        public static T Instance {
+            get {
+                if (m_Instance == null) {
+                    m_Instance = CreateInstance<T>();
+                }
                 return m_Instance;
             }
         }
-        
-        
-        private void OnEnable()
-        {
-            if (Singleton<T>.m_CreateNonSingletonInstance)
-            {
+
+
+        void OnEnable() {
+            if (m_CreateNonSingletonInstance) {
                 this.m_IsNonSingletonInstance = true;
                 this.Initialize();
-            }
-            else if (this.m_IsNonSingletonInstance)
-                Object.DestroyImmediate((Object) this);
-            else if (m_Instance == null)
-            {
+            } else if (this.m_IsNonSingletonInstance) {
+                DestroyImmediate((Object) this);
+            } else if (m_Instance == null) {
                 m_Instance = this as T;
                 this.Initialize();
-            }
-            else
-            {
-                Object.DestroyImmediate((Object) this);
+            } else {
+                DestroyImmediate((Object) this);
             }
         }
 
-        protected virtual void Initialize()
-        {
+        protected virtual void Initialize() {
         }
 
-        public static T Create()
-        {
-            Singleton<T>.m_CreateNonSingletonInstance = true;
-            var instance = ScriptableObject.CreateInstance<T>();
-            Singleton<T>.m_CreateNonSingletonInstance = false;
+        public static T Create() {
+            m_CreateNonSingletonInstance = true;
+            var instance = CreateInstance<T>();
+            m_CreateNonSingletonInstance = false;
             return (T) instance;
         }
     }

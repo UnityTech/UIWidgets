@@ -197,14 +197,14 @@ namespace Unity.UIWidgets.ui {
     }
 
     [Flags]
-    internal enum PointFlags {
+    enum PointFlags {
         corner = 0x01,
         left = 0x02,
         bevel = 0x04,
         innerBevel = 0x08,
     }
 
-    internal class PathPoint {
+    class PathPoint {
         public float x, y;
         public float dx, dy;
         public float len;
@@ -212,7 +212,7 @@ namespace Unity.UIWidgets.ui {
         public PointFlags flags;
     }
 
-    internal enum PathCommand {
+    enum PathCommand {
         moveTo,
         lineTo,
         bezierTo,
@@ -220,7 +220,7 @@ namespace Unity.UIWidgets.ui {
         winding,
     }
 
-    internal class PathPath {
+    class PathPath {
         public int first;
         public int count;
         public bool closed;
@@ -232,7 +232,7 @@ namespace Unity.UIWidgets.ui {
         public bool convex;
     }
 
-    internal class PathCache {
+    class PathCache {
         readonly float[] _xform;
         readonly float _devicePixelRatio;
         readonly float _distTol;
@@ -753,7 +753,7 @@ namespace Unity.UIWidgets.ui {
     }
 
 
-    internal static class PathUtils {
+    static class PathUtils {
         public static bool ptEquals(float x1, float y1, float x2, float y2, float tol) {
             float dx = x2 - x1;
             float dy = y2 - y1;

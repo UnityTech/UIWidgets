@@ -109,8 +109,7 @@ namespace Unity.UIWidgets.widgets {
         public override string ToString() {
             List<string> description = new List<string>();
             this.debugFillDescription(description);
-            return string.Format("{0}({1})", Diagnostics.describeIdentity(this),
-                string.Join(", ", description.ToArray()));
+            return $"{Diagnostics.describeIdentity(this)}({string.Join(", ", description.ToArray())})";
         }
 
         protected virtual void debugFillDescription(List<string> description) {
@@ -119,13 +118,13 @@ namespace Unity.UIWidgets.widgets {
             }
 
             if (this.initialScrollOffset != 0.0) {
-                description.Add(string.Format("initialScrollOffset: {0:F1}, ", this.initialScrollOffset));
+                description.Add($"initialScrollOffset: {this.initialScrollOffset:F1}, ");
             }
 
             if (this._positions.isEmpty()) {
                 description.Add("no clients");
             } else if (this._positions.Count == 1) {
-                description.Add(string.Format("one client, offset {0:F1}", this.offset));
+                description.Add($"one client, offset {this.offset:F1}");
             } else {
                 description.Add(this._positions.Count + " clients");
             }
@@ -136,7 +135,7 @@ namespace Unity.UIWidgets.widgets {
         public TrackingScrollController(
             double initialScrollOffset = 0.0,
             bool keepScrollOffset = true,
-            String debugLabel = null
+            string debugLabel = null
         ) : base(initialScrollOffset: initialScrollOffset,
             keepScrollOffset: keepScrollOffset,
             debugLabel: debugLabel) {

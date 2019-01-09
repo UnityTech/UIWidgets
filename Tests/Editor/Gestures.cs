@@ -11,11 +11,11 @@ using Color = Unity.UIWidgets.ui.Color;
 
 namespace UIWidgets.Tests {
     public class Gestures : EditorWindow {
-        private readonly Func<RenderBox>[] _options;
+        readonly Func<RenderBox>[] _options;
 
-        private readonly string[] _optionStrings;
+        readonly string[] _optionStrings;
 
-        private int _selected;
+        int _selected;
 
         Gestures() {
             this._options = new Func<RenderBox>[] {
@@ -27,9 +27,9 @@ namespace UIWidgets.Tests {
             this.titleContent = new GUIContent("Gestures");
         }
 
-        private WindowAdapter windowAdapter;
+        WindowAdapter windowAdapter;
 
-        [NonSerialized] private bool hasInvoked = false;
+        [NonSerialized] bool hasInvoked = false;
 
         void OnGUI() {
             var selected = EditorGUILayout.Popup("test case", this._selected, this._optionStrings);
@@ -50,7 +50,7 @@ namespace UIWidgets.Tests {
             this.windowAdapter.Update();
         }
 
-        private void OnEnable() {
+        void OnEnable() {
             this.windowAdapter = new EditorWindowAdapter(this);
             this.windowAdapter.OnEnable();
 
