@@ -81,7 +81,7 @@ namespace Unity.UIWidgets.ui {
                     frame = this._frames[i];
                 }
 
-                Timer.runInMain(() => { window.run(() => { frame.Resolve(frameData); }); });
+                window.runInMain(() => { frame.Resolve(frameData); });
 
                 i++;
             }

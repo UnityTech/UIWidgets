@@ -227,6 +227,8 @@ namespace Unity.UIWidgets.ui {
             return this.run(TimeSpan.Zero, callback);
         }
 
+        public abstract Timer runInMain(Action callback);
+
         public abstract TextInput textInput { get; }
 
         public abstract IDisposable getScope();
