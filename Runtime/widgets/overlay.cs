@@ -11,8 +11,9 @@ namespace Unity.UIWidgets.widgets
         public OverlayEntry(WidgetBuilder builder = null, bool opaque = false, bool maintainState = false)
         {
             D.assert(builder != null);
-            _opaque = opaque;
-            _maintainState = maintainState;
+            this._opaque = opaque;
+            this._maintainState = maintainState;
+            this.builder = builder;
         }
 
         public readonly WidgetBuilder builder;
@@ -21,17 +22,17 @@ namespace Unity.UIWidgets.widgets
 
         public bool opaque
         {
-            get { return _opaque; }
+            get { return this._opaque; }
             set
             {
-                if (_opaque == value)
+                if (this._opaque == value)
                 {
                     return;
                 }
 
-                _opaque = value;
-                D.assert(_overlay != null);
-                _overlay._didChangeEntryOpacity();
+                this._opaque = value;
+                D.assert(this._overlay != null);
+                this._overlay._didChangeEntryOpacity();
             }
         }
 
@@ -39,17 +40,17 @@ namespace Unity.UIWidgets.widgets
 
         public bool maintainState
         {
-            get { return _maintainState; }
+            get { return this._maintainState; }
             set
             {
-                if (_maintainState == value)
+                if (this._maintainState == value)
                 {
                     return;
                 }
 
-                _maintainState = value;
-                D.assert(_overlay != null);
-                _overlay._didChangeEntryOpacity();
+                this._maintainState = value;
+                D.assert(this._overlay != null);
+                this._overlay._didChangeEntryOpacity();
             }
         }
 
@@ -59,9 +60,9 @@ namespace Unity.UIWidgets.widgets
 
         public void remove()
         {
-            D.assert(_overlay != null);
-            OverlayState overlay = _overlay;
-            _overlay = null;
+            D.assert(this._overlay != null);
+            OverlayState overlay = this._overlay;
+            this._overlay = null;
             if (SchedulerBinding.instance.schedulerPhase == SchedulerPhase.persistentCallbacks)
             {
                 SchedulerBinding.instance.addPostFrameCallback((duration) => { overlay._remove(this); });
@@ -74,12 +75,12 @@ namespace Unity.UIWidgets.widgets
 
         public void markNeedsBuild()
         {
-            _key.currentState?._markNeedsBuild();
+            this._key.currentState?._markNeedsBuild();
         }
 
         public override string ToString()
         {
-            return $"{Diagnostics.describeIdentity(this)}(opaque: {opaque}; maintainState: {maintainState})";
+            return $"{Diagnostics.describeIdentity(this)}(opaque: {this.opaque}; maintainState: {this.maintainState})";
         }
     }
 
@@ -89,6 +90,7 @@ namespace Unity.UIWidgets.widgets
         internal _OverlayEntry(OverlayEntry entry) : base(key: entry._key)
         {
             D.assert(entry != null);
+            this.entry = entry;
         }
 
         public readonly OverlayEntry entry;
@@ -103,12 +105,12 @@ namespace Unity.UIWidgets.widgets
     {
         public override Widget build(BuildContext context)
         {
-            return widget.entry.builder(context);
+            return this.widget.entry.builder(context);
         }
 
         internal void _markNeedsBuild()
         {
-            setState(() =>
+            this.setState(() =>
             {
                 /* the state that changed is in the builder */
             });
@@ -163,24 +165,24 @@ namespace Unity.UIWidgets.widgets
         public override void initState()
         {
             base.initState();
-            insertAll(widget.initialEntries);
+            this.insertAll(this.widget.initialEntries);
         }
 
         public void insert(OverlayEntry entry, OverlayEntry above = null)
         {
             D.assert(entry._overlay == null);
-            D.assert(above == null || (above._overlay == this && _entries.Contains(above)));
+            D.assert(above == null || (above._overlay == this && this._entries.Contains(above)));
             entry._overlay = this;
-            setState(() =>
+            this.setState(() =>
             {
-                int index = above == null ? _entries.Count : _entries.IndexOf(above) + 1;
-                _entries.Insert(index, entry);
+                int index = above == null ? this._entries.Count : this._entries.IndexOf(above) + 1;
+                this._entries.Insert(index, entry);
             });
         }
 
         public void insertAll(ICollection<OverlayEntry> entries, OverlayEntry above = null)
         {
-            D.assert(above == null || (above._overlay == this && _entries.Contains(above)));
+            D.assert(above == null || (above._overlay == this && this._entries.Contains(above)));
             if (entries.isEmpty())
                 return;
             foreach (OverlayEntry entry in entries)
@@ -189,19 +191,19 @@ namespace Unity.UIWidgets.widgets
                 entry._overlay = this;
             }
 
-            setState(() =>
+            this.setState(() =>
             {
-                int index = above == null ? _entries.Count : _entries.IndexOf(above) + 1;
-                _entries.InsertRange(index, entries);
+                int index = above == null ? this._entries.Count : this._entries.IndexOf(above) + 1;
+                this._entries.InsertRange(index, entries);
             });
         }
 
         internal void _remove(OverlayEntry entry)
         {
-            if (mounted)
+            if (this.mounted)
             {
-                _entries.Remove(entry);
-                setState(() =>
+                this._entries.Remove(entry);
+                this.setState(() =>
                 {
                     /* entry was removed */
                 });
@@ -211,13 +213,13 @@ namespace Unity.UIWidgets.widgets
         public bool debugIsVisible(OverlayEntry entry)
         {
             bool result = false;
-            D.assert(_entries.Contains(entry));
+            D.assert(this._entries.Contains(entry));
             D.assert(() =>
             {
-                for (int i = _entries.Count - 1; i > 0; i -= 1)
+                for (int i = this._entries.Count - 1; i > 0; i -= 1)
                 {
                     // todo why not including 0?
-                    OverlayEntry candidate = _entries[i];
+                    OverlayEntry candidate = this._entries[i];
                     if (candidate == entry)
                     {
                         result = true;
@@ -235,7 +237,7 @@ namespace Unity.UIWidgets.widgets
 
         internal void _didChangeEntryOpacity()
         {
-            setState(() => { });
+            this.setState(() => { });
         }
 
         public override Widget build(BuildContext context)
@@ -243,9 +245,9 @@ namespace Unity.UIWidgets.widgets
             var onstageChildren = new List<Widget>();
             var offstageChildren = new List<Widget>();
             var onstage = true;
-            for (var i = _entries.Count - 1; i >= 0; i -= 1)
+            for (var i = this._entries.Count - 1; i >= 0; i -= 1)
             {
-                var entry = _entries[i];
+                var entry = this._entries[i];
                 if (onstage)
                 {
                     onstageChildren.Add(new _OverlayEntry(entry));
@@ -322,16 +324,16 @@ namespace Unity.UIWidgets.widgets
 
         protected override void insertChildRenderObject(RenderObject child, object slot)
         {
-            D.assert(renderObject.debugValidateChild(child));
+            D.assert(this.renderObject.debugValidateChild(child));
             if (slot == _onstageSlot)
             {
                 D.assert(child is RenderStack);
-                renderObject.child = (RenderStack) child;
+                this.renderObject.child = (RenderStack) child;
             }
             else
             {
                 D.assert(slot == null || slot is Element);
-                renderObject.insert((RenderBox) child, after: (RenderBox) ((Element) slot)?.renderObject);
+                this.renderObject.insert((RenderBox) child, after: (RenderBox) ((Element) slot)?.renderObject);
             }
         }
 
@@ -339,79 +341,79 @@ namespace Unity.UIWidgets.widgets
         {
             if (slot == _onstageSlot)
             {
-                renderObject.remove((RenderBox) child);
+                this.renderObject.remove((RenderBox) child);
                 D.assert(child is RenderStack);
-                renderObject.child = (RenderStack) child;
+                this.renderObject.child = (RenderStack) child;
             }
             else
             {
                 D.assert(slot == null || slot is Element);
-                if (renderObject.child == child)
+                if (this.renderObject.child == child)
                 {
-                    renderObject.child = null;
-                    renderObject.insert((RenderBox) child, after: (RenderBox) ((Element) slot)?.renderObject);
+                    this.renderObject.child = null;
+                    this.renderObject.insert((RenderBox) child, after: (RenderBox) ((Element) slot)?.renderObject);
                 }
                 else
                 {
-                    renderObject.move((RenderBox) child, after: (RenderBox) ((Element) slot)?.renderObject);
+                    this.renderObject.move((RenderBox) child, after: (RenderBox) ((Element) slot)?.renderObject);
                 }
             }
         }
 
         protected override void removeChildRenderObject(RenderObject child)
         {
-            if (renderObject.child == child)
+            if (this.renderObject.child == child)
             {
-                renderObject.child = null;
+                this.renderObject.child = null;
             }
             else
             {
-                renderObject.remove((RenderBox) child);
+                this.renderObject.remove((RenderBox) child);
             }
         }
 
         public override void visitChildren(ElementVisitor visitor)
         {
-            if (_onstage != null)
-                visitor(_onstage);
-            foreach (var child in _offstage)
+            if (this._onstage != null)
+                visitor(this._onstage);
+            foreach (var child in this._offstage)
             {
-                if (!_forgottenOffstageChildren.Contains(child))
+                if (!this._forgottenOffstageChildren.Contains(child))
                     visitor(child);
             }
         }
 
         public override void debugVisitOnstageChildren(ElementVisitor visitor)
         {
-            if (_onstage != null)
-                visitor(_onstage);
+            if (this._onstage != null)
+                visitor(this._onstage);
         }
 
 
         protected override void forgetChild(Element child)
         {
-            if (child == _onstage)
+            if (child == this._onstage)
             {
-                _onstage = null;
+                this._onstage = null;
             }
             else
             {
-                D.assert(_offstage.Contains(child));
-                D.assert(!_forgottenOffstageChildren.Contains(child));
-                _forgottenOffstageChildren.Add(child);
+                D.assert(this._offstage.Contains(child));
+                D.assert(!this._forgottenOffstageChildren.Contains(child));
+                this._forgottenOffstageChildren.Add(child);
             }
         }
 
         public override void mount(Element parent, object newSlot)
         {
             base.mount(parent, newSlot);
-            _onstage = updateChild(_onstage, widget.onstage, _onstageSlot);
-            _offstage = new List<Element>(widget.offstage.Count);
+            this._onstage = this.updateChild(this._onstage, this.widget.onstage, _onstageSlot);
+            this._offstage = new List<Element>(this.widget.offstage.Count);
             Element previousChild = null;
-            for (int i = 0; i < _offstage.Count; i += 1)
+            for (int i = 0; i < this._offstage.Count; i += 1)
             {
-                var newChild = inflateWidget(widget.offstage[i], previousChild);
-                _offstage[i] = newChild;
+                var newChild = this.inflateWidget(this.widget.offstage[i], previousChild);
+                this._offstage[i] = newChild;
                 previousChild = newChild;
             }
         }
@@ -419,10 +421,10 @@ namespace Unity.UIWidgets.widgets
         public override void update(Widget newWidget)
         {
             base.update(newWidget);
-            D.assert(Equals(widget, newWidget));
-            _onstage = updateChild(_onstage, widget.onstage, _onstageSlot);
-            _offstage = updateChildren(_offstage, widget.offstage, forgottenChildren: _forgottenOffstageChildren);
-            _forgottenOffstageChildren.Clear();
+            D.assert(Equals(this.widget, newWidget));
+            this._onstage = this.updateChild(this._onstage, this.widget.onstage, _onstageSlot);
+            this._offstage = this.updateChildren(this._offstage, this.widget.offstage, forgottenChildren: this._forgottenOffstageChildren);
+            this._forgottenOffstageChildren.Clear();
         }
     }
 
@@ -437,15 +439,14 @@ namespace Unity.UIWidgets.widgets
 
         public override void redepthChildren()
         {
-            if (child != null)
-                redepthChild(child);
+            if (this.child != null) this.redepthChild(this.child);
             base.redepthChildren();
         }
 
         public override void visitChildren(RenderObjectVisitor visitor)
         {
-            if (child != null)
-                visitor(child);
+            if (this.child != null)
+                visitor(this.child);
             base.visitChildren(visitor);
         }
 
@@ -453,12 +454,12 @@ namespace Unity.UIWidgets.widgets
         {
             var children = new List<DiagnosticsNode>();
 
-            if (child != null)
-                children.Add(child.toDiagnosticsNode(name: "onstage"));
+            if (this.child != null)
+                children.Add(this.child.toDiagnosticsNode(name: "onstage"));
 
-            if (firstChild != null)
+            if (this.firstChild != null)
             {
-                var child = firstChild;
+                var child = this.firstChild;
 
                 int count = 1;
                 while (true)
@@ -469,7 +470,7 @@ namespace Unity.UIWidgets.widgets
                             style: DiagnosticsTreeStyle.offstage
                         )
                     );
-                    if (child == lastChild)
+                    if (child == this.lastChild)
                         break;
                     var childParentData = (StackParentData) child.parentData;
                     child = childParentData.nextSibling;

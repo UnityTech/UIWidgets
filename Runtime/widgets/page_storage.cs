@@ -128,9 +128,9 @@ namespace Unity.UIWidgets.widgets {
 
     public class PageStorage : StatelessWidget {
         public PageStorage(
-            Key key,
-            PageStorageBucket bucket,
-            Widget child
+            Key key = null,
+            PageStorageBucket bucket = null,
+            Widget child = null
         ) : base(key: key) {
             D.assert(bucket != null);
             this.bucket = bucket;

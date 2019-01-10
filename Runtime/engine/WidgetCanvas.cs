@@ -1,4 +1,5 @@
-﻿using Unity.UIWidgets.async;
+﻿using System.Collections.Generic;
+using Unity.UIWidgets.async;
 using Unity.UIWidgets.editor;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
@@ -72,11 +73,32 @@ namespace Unity.UIWidgets.engine {
             this._windowAdapter = new UIWidgetWindowAdapter(this);
 
             this._windowAdapter.OnEnable();
-            var root = new WidgetsApp(home: this.getWidget(), window: this._windowAdapter);
+            var root = new WidgetsApp(home: this.getWidget(),
+                window: this._windowAdapter,
+                routes: this.routes,
+                pageRouteBuilder: this.pageRouteBuilder,
+                onGenerateRoute: this.onGenerateRoute,
+                onUnknownRoute: this.onUnknownRoute);
+            
+                  
             this._windowAdapter.attachRootWidget(root);
             this._lastMouseMove = Input.mousePosition;
         }
 
+        protected virtual Dictionary<string, WidgetBuilder> routes => null;
+
+        protected virtual string initialRoute => null;
+        protected virtual RouteFactory onGenerateRoute => null;
+        
+        protected virtual RouteFactory onUnknownRoute => null;
+        
+        protected virtual PageRouteFactory pageRouteBuilder => (RouteSettings settings, WidgetBuilder builder) =>
+            new PageRouteBuilder(
+                settings: settings,
+                pageBuilder: (BuildContext context, Unity.UIWidgets.animation.Animation<double> animation, 
+                    Unity.UIWidgets.animation.Animation<double> secondaryAnimation) => builder(context)
+            );
+        
         protected override void OnDisable() {
             D.assert(this._windowAdapter != null);
             this._windowAdapter.OnDisable();
@@ -84,7 +106,9 @@ namespace Unity.UIWidgets.engine {
             base.OnDisable();
         }
 
-        protected abstract Widget getWidget();
+        protected virtual Widget getWidget() {
+            return null;
+        }
 
         internal void applyRenderTexture(Rect screenRect, Texture texture, Material mat) {
             this.texture = texture;

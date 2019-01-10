@@ -78,7 +78,7 @@ namespace Unity.UIWidgets.widgets {
             D.assert(child != this);
             D.assert(child != this._firstChild);
             D.assert(child != this._lastChild);
-            D.assert(child == null);
+            D.assert(child._parent == null);
             D.assert(child._manager == null);
             D.assert(child._nextSibling == null);
             D.assert(child._previousSibling == null);

@@ -257,6 +257,39 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
+    public class Offstage : SingleChildRenderObjectWidget {
+        public Offstage(Key key = null, bool offstage = true, Widget child = null):base(key: key, child: child) {
+            this.offstage = offstage;
+        }
+
+        public readonly bool offstage;
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderOffstage(offstage: this.offstage);
+        }
+        
+        public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
+            ((RenderOffstage)renderObject).offstage = this.offstage;
+        }
+        
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new DiagnosticsProperty<bool>("offstage", this.offstage));
+        }
+        
+        public override Element createElement() => new _OffstageElement(this);
+    }
+    
+    class _OffstageElement: SingleChildRenderObjectElement {
+        internal _OffstageElement(Offstage widget) : base(widget) {}
+
+        new Offstage widget => (Offstage) base.widget;
+
+        public override void debugVisitOnstageChildren(ElementVisitor visitor) {
+            if (!this.widget.offstage)
+                base.debugVisitOnstageChildren(visitor);
+        }
+    }
+    
     public class AspectRatio : SingleChildRenderObjectWidget {
         public AspectRatio(
             Key key = null,
@@ -360,7 +393,6 @@ namespace Unity.UIWidgets.widgets {
         public static Positioned directional(Widget child, TextDirection textDirection, Key key = null,
             double? start = null, double? top = null,
             double? end = null, double? bottom = null, double? width = null, double? height = null) {
-            D.assert(textDirection != null);
             double? left = null;
             double? right = null;
             switch (textDirection) {
@@ -675,6 +707,29 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
+    public class FractionalTranslation : SingleChildRenderObjectWidget {
+        public FractionalTranslation(Key key = null, Offset translation = null,
+            bool transformHitTests = true, Widget child = null) : base(key: key, child: child) {
+            this.translation = translation;
+            this.transformHitTests = transformHitTests;
+        }   
+        
+        public readonly Offset translation;
+        public readonly bool transformHitTests;
+        
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderFractionalTranslation(
+                translation: this.translation,
+                transformHitTests: this.transformHitTests
+            );
+        }
+        
+        public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
+            ((RenderFractionalTranslation)renderObject).translation = this.translation;
+            ((RenderFractionalTranslation)renderObject).transformHitTests = this.transformHitTests;
+        }
+    }
+    
     public class Align : SingleChildRenderObjectWidget {
         public Align(
             Key key = null,
@@ -1115,18 +1170,18 @@ namespace Unity.UIWidgets.widgets {
      
         public override RenderObject createRenderObject(BuildContext context) {
             return new RenderAbsorbPointer(
-                absorbing: absorbing
+                absorbing: this.absorbing
             );
         }
     
         public override void updateRenderObject(BuildContext context, RenderObject renderObject)
         {
-            ((RenderAbsorbPointer) renderObject).absorbing = absorbing;
+            ((RenderAbsorbPointer) renderObject).absorbing = this.absorbing;
         }
     
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
-            properties.add(new DiagnosticsProperty<bool>("absorbing", absorbing));
+            properties.add(new DiagnosticsProperty<bool>("absorbing", this.absorbing));
         }
     }
 

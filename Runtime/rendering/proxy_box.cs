@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Unity.UIWidgets.animation;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.painting;
@@ -360,7 +361,7 @@ namespace Unity.UIWidgets.rendering {
 
         int _alpha;
 
-        static int _getAlphaFromOpacity(double opacity) {
+        internal static int _getAlphaFromOpacity(double opacity) {
             return (opacity * 255).round();
         }
 
@@ -407,6 +408,81 @@ namespace Unity.UIWidgets.rendering {
             base.debugFillProperties(properties);
             properties.add(new DoubleProperty("opacity", this.opacity));
         }
+    }
+
+    public class RenderAnimatedOpacity : RenderProxyBox {
+
+        public RenderAnimatedOpacity(
+            Animation<double> opacity = null,
+                RenderBox child = null
+        ) : base(child) {
+            D.assert(opacity != null);
+            this.opacity = opacity;
+        }
+
+
+        int _alpha;
+        
+        protected override bool alwaysNeedsCompositing => this.child != null && this._currentlyNeedsCompositing;
+        bool _currentlyNeedsCompositing;
+        
+        Animation<double> _opacity;
+        public Animation<double>  opacity {
+            get => this._opacity;
+            set {
+                D.assert(value != null);
+                if (this._opacity == value)
+                    return;
+                if (this.attached && this._opacity != null)
+                    this._opacity.removeListener(this._updateOpacity);
+                this._opacity = value;
+                if (this.attached)
+                    this._opacity.addListener(this._updateOpacity);
+                this._updateOpacity();
+            }
+        }
+        
+        
+        public override void attach(object owner) {
+            base.attach(owner);
+            this._opacity.addListener(this._updateOpacity);
+            this._updateOpacity(); // in case it changed while we weren't listening
+        }
+
+        public override void detach() {
+            this._opacity.removeListener(this._updateOpacity);
+            base.detach();
+        }
+
+        public void _updateOpacity() {
+            var oldAlpha = this._alpha;
+            this._alpha = RenderOpacity._getAlphaFromOpacity(this._opacity.value.clamp(0.0, 1.0));
+            if (oldAlpha != this._alpha) {
+                bool didNeedCompositing = this._currentlyNeedsCompositing;
+                this._currentlyNeedsCompositing = this._alpha > 0 &&this. _alpha < 255;
+                if (this.child != null && didNeedCompositing != this._currentlyNeedsCompositing)
+                    this.markNeedsCompositingBitsUpdate();
+                this.markNeedsPaint();
+            }
+        }
+        
+        public override void paint(PaintingContext context, Offset offset) {
+            if (this.child != null) {
+                if (this._alpha == 0)
+                    return;
+                if (this._alpha == 255) {
+                    context.paintChild(this.child, offset);
+                    return;
+                }
+                D.assert(this.needsCompositing);
+                context.pushOpacity(offset, this._alpha, base.paint);
+            }
+        }
+        
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new DiagnosticsProperty<Animation<double>>("opacity", this.opacity));
+         }
     }
 
     public enum DecorationPosition {
@@ -707,6 +783,71 @@ namespace Unity.UIWidgets.rendering {
         }
     }
 
+    public class RenderFractionalTranslation : RenderProxyBox {
+
+        public RenderFractionalTranslation(
+            Offset translation = null,
+            bool transformHitTests = true,
+            RenderBox child = null
+        ) : base(child: child) {
+            D.assert(translation != null);
+            this._translation = translation;
+            this.transformHitTests = transformHitTests;
+        }
+
+        public Offset translation {
+            get => this._translation;
+
+            set {
+                D.assert(value != null);
+                if (this._translation == value)
+                    return;
+                this._translation = value;
+                this.markNeedsPaint();
+            }
+        }
+        Offset _translation;
+
+        public override bool hitTest(HitTestResult result, Offset position) {
+            return this.hitTestChildren(result, position: position);
+        }
+        
+        public bool transformHitTests;
+        
+        protected override bool hitTestChildren(HitTestResult result, Offset position) {
+            D.assert(!this.debugNeedsLayout);
+            if (this.transformHitTests) {
+                position = new Offset(
+                    position.dx - this.translation.dx * this.size.width,
+                    position.dy - this.translation.dy * this.size.height
+                );
+            }
+            return base.hitTestChildren(result, position: position);
+        }
+        
+        public override void paint(PaintingContext context, Offset offset) {
+            D.assert(!this.debugNeedsLayout);
+            if (this.child != null) {
+                base.paint(context, new Offset(
+                    offset.dx + this.translation.dx * this.size.width,
+                    offset.dy + this.translation.dy * this.size.height
+                ));
+            }
+        }
+        
+       public override void applyPaintTransform(RenderObject child, ref Matrix3 transform) {
+            transform = Matrix3.makeTrans((float)(this.translation.dx * this.size.width), 
+                            (float)(this.translation.dy * this.size.height)) * transform;
+
+       }
+       
+       public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+           base.debugFillProperties(properties);
+           properties.add(new DiagnosticsProperty<Offset>("translation", this.translation));
+           properties.add(new DiagnosticsProperty<bool>("transformHitTests", this.transformHitTests));
+       }
+    }
+
     public delegate void PointerDownEventListener(PointerDownEvent evt);
 
     public delegate void PointerMoveEventListener(PointerMoveEvent evt);
@@ -946,6 +1087,101 @@ namespace Unity.UIWidgets.rendering {
             properties.add(new DiagnosticsProperty<bool>("ignoring", this.ignoring));
         }
     }
+
+    public class RenderOffstage : RenderProxyBox {
+        public RenderOffstage(bool offstage = true,
+            RenderBox child = null): base(child) {
+            this._offstage = offstage;
+        }
+
+        public bool offstage {
+            get => this._offstage;
+
+            set {
+                if (value == this._offstage) {
+                    return;
+                }
+
+                this._offstage = value;
+                this.markNeedsLayoutForSizedByParentChange();
+            }
+        }
+        bool _offstage;
+        
+        protected override double computeMinIntrinsicWidth(double height) {
+            if (this.offstage)
+                return 0.0;
+            return base.computeMinIntrinsicWidth(height);
+        }
+        
+        
+        protected override double computeMaxIntrinsicWidth(double height) {
+            if (this.offstage)
+                return 0.0;
+            return base.computeMaxIntrinsicWidth(height);
+        }
+
+        protected override double computeMinIntrinsicHeight(double width) {
+            if (this.offstage)
+                return 0.0;
+            return base.computeMinIntrinsicHeight(width);
+        }
+
+        protected override double computeMaxIntrinsicHeight(double width) {
+            if (this.offstage)
+                return 0.0;
+            return base.computeMaxIntrinsicHeight(width);
+        }
+
+        protected override double? computeDistanceToActualBaseline(TextBaseline baseline) {
+            if (this.offstage)
+                return null;
+            return base.computeDistanceToActualBaseline(baseline);
+        }
+
+        protected override bool sizedByParent => this.offstage;
+
+        protected override void performResize() {
+            D.assert(this.offstage);
+            this.size = this.constraints.smallest;
+        }
+
+        protected override void performLayout() {
+            if (this.offstage) {
+                this.child?.layout(this.constraints);
+            } else {
+                base.performLayout();
+            }
+        }
+
+        public override bool hitTest(HitTestResult result, Offset position) {
+            return !this.offstage && base.hitTest(result, position: position);
+        }
+    
+        public override void paint(PaintingContext context, Offset offset) {
+            if (this.offstage)
+                return;
+            base.paint(context, offset);
+        }
+    
+    
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new DiagnosticsProperty<bool>("offstage", this.offstage));
+        }
+    
+    
+        public override List<DiagnosticsNode> debugDescribeChildren() {
+            if (this.child == null)
+                return new List<DiagnosticsNode>();
+            return new List<DiagnosticsNode> {
+                this.child.toDiagnosticsNode(
+                    name: "child",
+                    style: this.offstage ? DiagnosticsTreeStyle.offstage : DiagnosticsTreeStyle.sparse
+                ),
+            };
+        }
+    }
     
     public class RenderAbsorbPointer : RenderProxyBox {
           
@@ -954,30 +1190,30 @@ namespace Unity.UIWidgets.rendering {
             bool absorbing = true
           ) : base(child)
           {
-              _absorbing = absorbing;
+              this._absorbing = absorbing;
             }
 
 
         public bool absorbing
         {
-            get { return _absorbing; }
+            get { return this._absorbing; }
             set
             {
-                _absorbing = value;
+                this._absorbing = value;
             }
         }
         bool _absorbing;
      
         public override bool hitTest(HitTestResult result, Offset position) {
-            return absorbing
-                ? size.contains(position)
+            return this.absorbing
+                ? this.size.contains(position)
                 : base.hitTest(result, position: position);
         }
     
      
       public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
         base.debugFillProperties(properties);
-        properties.add(new DiagnosticsProperty<bool>("absorbing", absorbing));
+        properties.add(new DiagnosticsProperty<bool>("absorbing", this.absorbing));
       }
     }
 }

@@ -26,12 +26,7 @@ namespace UIWidgetsSample {
         }
 
         class _TextInputSampleState : State<TextInputSample> {
-            public class ToDoItem {
-                public int id;
-                public string content;
-            }
-
-            int nextId = 0;
+            
             TextEditingController titleController = new TextEditingController("");
             TextEditingController descController = new TextEditingController("");
             FocusNode _titleFocusNode;
