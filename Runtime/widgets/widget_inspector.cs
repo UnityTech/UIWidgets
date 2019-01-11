@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using RSG;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.rendering;
@@ -578,6 +579,14 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public void didChangeLocales(List<Locale> locale) {
+        }
+
+        public IPromise<bool> didPopRoute() {
+            return Promise<bool>.Resolved(false);
+        }
+
+        public IPromise<bool> didPushRoute(string route) {
+            return Promise<bool>.Resolved(false);
         }
 
         void _selectionChangedCallback() {

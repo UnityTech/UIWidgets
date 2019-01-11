@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using RSG;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
@@ -11,6 +12,10 @@ namespace Unity.UIWidgets.widgets {
         void didChangeTextScaleFactor();
 
         void didChangeLocales(List<Locale> locale);
+
+        IPromise<bool> didPopRoute();
+        
+        IPromise<bool> didPushRoute(string route);
     }
 
     public class WidgetsBinding : RendererBinding {

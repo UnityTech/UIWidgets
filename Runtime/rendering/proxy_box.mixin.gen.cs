@@ -81,4 +81,8 @@ namespace Unity.UIWidgets.rendering {
     }
 
 
+    public abstract class RenderProxyBoxMixinRenderObjectWithChildMixinRenderBoxRenderStack: 
+        RenderProxyBoxMixinRenderObjectWithChildMixinRenderBox<RenderStack> {
+    }
+
 }

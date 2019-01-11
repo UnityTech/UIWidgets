@@ -202,6 +202,15 @@ namespace Unity.UIWidgets.animation {
         }
     }
 
+    public class OffsetTween : Tween<Offset> {
+        public OffsetTween(Offset begin, Offset end) : base(begin: begin, end: end) {
+        }
+
+        public override Offset lerp(double t) {
+            return (this.begin + (this.end - this.begin) * t);
+        }
+    }
+    
     public class CurveTween : Animatable<double> {
         public CurveTween(Curve curve = null) {
             D.assert(curve != null);
