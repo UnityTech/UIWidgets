@@ -123,7 +123,7 @@ namespace Unity.UIWidgets.ui {
                 bool convex;
                 var rect = drawClipPath.path.flatten(
                     XformUtils.fromMatrix3(state.xform), (float) Window.instance.devicePixelRatio
-                ).getFillMesh(out convex).getBounds();
+                ).getFillMesh(out convex).bounds;
                 state.scissor = state.scissor == null ? rect : state.scissor.intersect(rect);
             } else if (drawCmd is DrawPath) {
                 var drawPath = (DrawPath) drawCmd;
@@ -133,7 +133,7 @@ namespace Unity.UIWidgets.ui {
                 var paint = drawPath.paint;
                 var devicePixelRatio = (float) Window.instance.devicePixelRatio;
 
-                Mesh mesh;
+                MeshMesh mesh;
                 if (paint.style == PaintingStyle.fill) {
                     var cache = path.flatten(xform, devicePixelRatio);
 
@@ -156,7 +156,7 @@ namespace Unity.UIWidgets.ui {
                         (float) paint.strokeMiterLimit);
                 }
 
-                this._addPaintBounds(mesh.getBounds());
+                this._addPaintBounds(mesh.bounds);
             } else if (drawCmd is DrawImage) {
                 var drawImage = (DrawImage) drawCmd;
                 var state = this._getState();

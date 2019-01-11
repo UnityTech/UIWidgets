@@ -6,7 +6,7 @@ using UnityEngine;
 namespace Unity.UIWidgets.ui {
     class ClipElement {
         public readonly int saveCount;
-        public readonly Mesh mesh;
+        public readonly MeshMesh mesh;
         public readonly bool convex;
         public readonly bool isRect;
         public Rect rect { get; private set; }
@@ -22,7 +22,7 @@ namespace Unity.UIWidgets.ui {
             this.mesh = pathCache.getFillMesh(out this.convex);
 
             var vertices = this.mesh.vertices;
-            if (this.convex && vertices.Length == 4 &&
+            if (this.convex && vertices.Count == 4 &&
                 (Mathf.Abs(vertices[0].x - vertices[1].x) < 1e-6 && Mathf.Abs(vertices[1].y - vertices[2].y) < 1e-6 &&
                  Mathf.Abs(vertices[2].x - vertices[3].x) < 1e-6 && Mathf.Abs(vertices[3].y - vertices[0].y) < 1e-6 ||
                  Mathf.Abs(vertices[0].y - vertices[1].y) < 1e-6 && Mathf.Abs(vertices[1].x - vertices[2].x) < 1e-6 &&
@@ -61,7 +61,7 @@ namespace Unity.UIWidgets.ui {
                     this._isIntersectionOfRects = true;
                 }
             } else {
-                this._bound = this.mesh.getBounds();
+                this._bound = this.mesh.bounds;
             }
 
             if (prior != null) {
@@ -94,13 +94,13 @@ namespace Unity.UIWidgets.ui {
         }
 
         bool _convexContains(float x, float y) {
-            if (this.mesh.vertexCount <= 2) {
+            if (this.mesh.vertices.Count <= 2) {
                 return false;
             }
 
-            for (var i = 0; i < this.mesh.vertexCount; i++) {
+            for (var i = 0; i < this.mesh.vertices.Count; i++) {
                 var p0 = this.mesh.vertices[i];
-                var p1 = this.mesh.vertices[i == this.mesh.vertexCount - 1 ? 0 : i + 1];
+                var p1 = this.mesh.vertices[i == this.mesh.vertices.Count - 1 ? 0 : i + 1];
 
                 if (PathUtils.triarea2(p0.x, p0.y, p1.x, p1.y, x, y) < 0.0f) {
                     return false;

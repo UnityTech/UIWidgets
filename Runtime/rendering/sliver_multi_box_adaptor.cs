@@ -306,8 +306,8 @@ namespace Unity.UIWidgets.rendering {
             return childParentData.layoutOffset;
         }
 
-        public override void applyPaintTransform(RenderObject child, ref Matrix3 transform) {
-            this.applyPaintTransformForBoxChild((RenderBox) child, ref transform);
+        public override void applyPaintTransform(RenderObject child, Matrix3 transform) {
+            this.applyPaintTransformForBoxChild((RenderBox) child, transform);
         }
 
         public override void paint(PaintingContext context, Offset offset) {

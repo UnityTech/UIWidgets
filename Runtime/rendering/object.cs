@@ -264,8 +264,9 @@ namespace Unity.UIWidgets.rendering {
 
         public void pushTransform(bool needsCompositing, Offset offset, Matrix3 transform,
             PaintingContextCallback painter) {
-            var effectiveTransform = Matrix3.makeTrans(offset)
-                                     * transform * Matrix3.makeTrans(-offset);
+            var effectiveTransform = Matrix3.makeTrans((float) offset.dx, (float) offset.dy);
+            effectiveTransform.preConcat(transform);
+            effectiveTransform.preTranslate((float) -offset.dx, (float) -offset.dy);
 
             if (needsCompositing) {
                 var inverse = Matrix3.I();
@@ -1219,7 +1220,7 @@ namespace Unity.UIWidgets.rendering {
         public virtual void paint(PaintingContext context, Offset offset) {
         }
 
-        public virtual void applyPaintTransform(RenderObject child, ref Matrix3 transform) {
+        public virtual void applyPaintTransform(RenderObject child, Matrix3 transform) {
             D.assert(child.parent == this);
         }
 
@@ -1241,7 +1242,7 @@ namespace Unity.UIWidgets.rendering {
 
             var transform = Matrix3.I();
             for (int index = renderers.Count - 1; index > 0; index -= 1) {
-                renderers[index].applyPaintTransform(renderers[index - 1], ref transform);
+                renderers[index].applyPaintTransform(renderers[index - 1], transform);
             }
             return transform;
         }

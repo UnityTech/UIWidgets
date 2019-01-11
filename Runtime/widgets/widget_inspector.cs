@@ -452,8 +452,8 @@ namespace Unity.UIWidgets.widgets {
                     continue;
                 }
 
-                var childTransform = transform;
-                renderObject.applyPaintTransform(child, ref childTransform);
+                var childTransform = new Matrix3(transform);
+                renderObject.applyPaintTransform(child, childTransform);
                 if (this._hitTestHelper(hits, edgeHits, position, child, childTransform)) {
                     hit = true;
                 }

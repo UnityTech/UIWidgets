@@ -4,25 +4,22 @@ using System.Linq;
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
-    // TODO: probably we don't need this cache.
-    public class MeshKey : IEquatable<MeshKey> {
+    class MeshKey : IEquatable<MeshKey> {
         public readonly string text;
         public readonly int fontId;
         public readonly int textureVersion;
-        public readonly int fontSize;
+        public readonly int fontSizeToLoad;
         public readonly UnityEngine.FontStyle fontStyle;
-        public readonly float pixelPerPoint;
-        public readonly UnityEngine.Color color;
+        public readonly float scale;
 
-        public MeshKey(string text, int fontId, int textureVersion, int fontSize,
-            UnityEngine.FontStyle fontStyle, float pixelPerPoint, UnityEngine.Color color) {
+        public MeshKey(string text, int fontId, int textureVersion, int fontSizeToLoad,
+            UnityEngine.FontStyle fontStyle, float scale) {
             this.text = text;
             this.fontId = fontId;
             this.textureVersion = textureVersion;
-            this.fontSize = fontSize;
+            this.fontSizeToLoad = fontSizeToLoad;
             this.fontStyle = fontStyle;
-            this.pixelPerPoint = pixelPerPoint;
-            this.color = color;
+            this.scale = scale;
         }
 
         public bool Equals(MeshKey other) {
@@ -33,9 +30,8 @@ namespace Unity.UIWidgets.ui {
                 return true;
             }
             return string.Equals(this.text, other.text) && this.fontId == other.fontId &&
-                   this.textureVersion == other.textureVersion && this.fontSize == other.fontSize &&
-                   this.fontStyle == other.fontStyle && this.pixelPerPoint.Equals(other.pixelPerPoint) &&
-                   this.color.Equals(other.color);
+                   this.textureVersion == other.textureVersion && this.fontSizeToLoad == other.fontSizeToLoad &&
+                   this.fontStyle == other.fontStyle && this.scale.Equals(other.scale);
         }
 
         public override bool Equals(object obj) {
@@ -56,10 +52,9 @@ namespace Unity.UIWidgets.ui {
                 var hashCode = (this.text != null ? this.text.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ this.fontId;
                 hashCode = (hashCode * 397) ^ this.textureVersion;
-                hashCode = (hashCode * 397) ^ this.fontSize;
+                hashCode = (hashCode * 397) ^ this.fontSizeToLoad;
                 hashCode = (hashCode * 397) ^ (int) this.fontStyle;
-                hashCode = (hashCode * 397) ^ this.pixelPerPoint.GetHashCode();
-                hashCode = (hashCode * 397) ^ this.color.GetHashCode();
+                hashCode = (hashCode * 397) ^ this.scale.GetHashCode();
                 return hashCode;
             }
         }
@@ -74,16 +69,21 @@ namespace Unity.UIWidgets.ui {
 
         public override string ToString() {
             return
-                $"Text: {this.text}, FontId: {this.fontId}, TextureVersion: {this.textureVersion}, FontSize: {this.fontSize}, FontStyle: {this.fontStyle}, PixelPerPoint: {this.pixelPerPoint}, Color: {this.color}";
+                $"MeshKey(text: {this.text}, " +
+                $"fontId: {this.fontId}, " +
+                $"textureVersion: {this.textureVersion}, " +
+                $"fontSizeToLoad: {this.fontSizeToLoad}, " +
+                $"fontStyle: {this.fontStyle}, " +
+                $"scale: {this.scale})";
         }
     }
 
-    public class MeshInfo {
-        public readonly Mesh mesh;
+    class MeshInfo {
         public readonly MeshKey key;
-        public long _timeToLive;
+        public readonly MeshMesh mesh;
+        long _timeToLive;
 
-        public MeshInfo(MeshKey key, Mesh mesh, int timeToLive = 5) {
+        public MeshInfo(MeshKey key, MeshMesh mesh, int timeToLive = 5) {
             this.mesh = mesh;
             this.key = key;
             this.touch(timeToLive);
@@ -94,13 +94,13 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void touch(long timeTolive = 5) {
-            this._timeToLive = timeTolive + MeshGenrator.frameCount;
+            this._timeToLive = timeTolive + MeshGenerator.frameCount;
         }
     }
 
 
-    public static class MeshGenrator {
-        static Dictionary<MeshKey, MeshInfo> _meshes = new Dictionary<MeshKey, MeshInfo>();
+    static class MeshGenerator {
+        static readonly Dictionary<MeshKey, MeshInfo> _meshes = new Dictionary<MeshKey, MeshInfo>();
 
         static long _frameCount = 0;
 
@@ -121,23 +121,29 @@ namespace Unity.UIWidgets.ui {
             }
         }
 
-        public static Mesh generateMesh(TextBlob textBlob, float[] xform, float devicePixelRatio) {
+        public static MeshMesh generateMesh(TextBlob textBlob, float scale) {
             var style = textBlob.style;
             var fontInfo = FontManager.instance.getOrCreate(style.fontFamily);
             var font = fontInfo.font;
             var length = textBlob.end - textBlob.start;
 
             var text = textBlob.text;
-            var scale = XformUtils.getAverageScale(xform) * devicePixelRatio;
             var fontSizeToLoad = Mathf.CeilToInt(style.UnityFontSize * scale);
             var subText = textBlob.text.Substring(textBlob.start, textBlob.end - textBlob.start);
             font.RequestCharactersInTexture(subText, fontSizeToLoad, style.UnityFontStyle);
+            
+            var key = new MeshKey(subText, font.GetInstanceID(), fontInfo.textureVersion, fontSizeToLoad,
+                style.UnityFontStyle, scale);
+
+            _meshes.TryGetValue(key, out var meshInfo);
+            if (meshInfo != null) {
+                meshInfo.touch();
+                return meshInfo.mesh;
+            }
 
             var vertices = new List<Vector3>(length * 4);
             var triangles = new List<int>(length * 6);
             var uv = new List<Vector2>(length * 4);
-            Mesh mesh = new Mesh();
-
             for (int charIndex = 0; charIndex < length; ++charIndex) {
                 var ch = text[charIndex + textBlob.start];
                 // first char as origin for mesh position 
@@ -156,15 +162,10 @@ namespace Unity.UIWidgets.ui {
 
                 var baseIndex = vertices.Count;
 
-                float x, y;
-                PathUtils.transformPoint(out x, out y, xform, (float) (position.x + minX), (float) (position.y - maxY));
-                vertices.Add(new Vector3(x, y, 0));
-                PathUtils.transformPoint(out x, out y, xform, (float) (position.x + maxX), (float) (position.y - maxY));
-                vertices.Add(new Vector3(x, y, 0));
-                PathUtils.transformPoint(out x, out y, xform, (float) (position.x + maxX), (float) (position.y - minY));
-                vertices.Add(new Vector3(x, y, 0));
-                PathUtils.transformPoint(out x, out y, xform, (float) (position.x + minX), (float) (position.y - minY));
-                vertices.Add(new Vector3(x, y, 0));
+                vertices.Add(new Vector3((float) (position.x + minX), (float) (position.y - maxY), 0));
+                vertices.Add(new Vector3((float) (position.x + maxX), (float) (position.y - maxY), 0));
+                vertices.Add(new Vector3((float) (position.x + maxX), (float) (position.y - minY), 0));
+                vertices.Add(new Vector3((float) (position.x + minX), (float) (position.y - minY), 0));
 
                 triangles.Add(baseIndex);
                 triangles.Add(baseIndex + 1);
@@ -179,9 +180,10 @@ namespace Unity.UIWidgets.ui {
                 uv.Add(charInfo.uvBottomLeft);
             }
 
-            mesh.SetVertices(vertices);
-            mesh.SetIndices(triangles.ToArray(), MeshTopology.Triangles, 0);
-            mesh.SetUVs(0, uv);
+             
+            MeshMesh mesh = new MeshMesh(vertices, triangles, uv);
+            _meshes[key] = new MeshInfo(key, mesh);
+            
             return mesh;
         }
     }

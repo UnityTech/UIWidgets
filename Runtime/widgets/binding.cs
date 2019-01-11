@@ -23,7 +23,10 @@ namespace Unity.UIWidgets.widgets {
             this.buildOwner.onBuildScheduled = this._handleBuildScheduled;
             Window.instance.onLocaleChanged += this.handleLocaleChanged;
             this.widgetInspectorService = new WidgetInspectorService(this);
-            this.addPersistentFrameCallback((duration) => { MeshGenrator.tickNextFrame(); });
+            this.addPersistentFrameCallback((duration) => {
+                MeshGenerator.tickNextFrame();
+                TessellationGenerator.tickNextFrame();
+            });
         }
 
         public BuildOwner buildOwner {

@@ -23,7 +23,7 @@ namespace Unity.UIWidgets.ui {
     }
 
     public class FontManager {
-        List<FontInfo> _fonts = new List<FontInfo>();
+        readonly List<FontInfo> _fonts = new List<FontInfo>();
         static readonly int defaultFontSize = 14;
 
         public static readonly FontManager instance = new FontManager();
@@ -46,16 +46,14 @@ namespace Unity.UIWidgets.ui {
             return true;
         }
 
-        internal FontInfo getOrCreate(string[] names) {
-            this._fonts = this._fonts.FindAll(info => info.font != null); // filter out destroyed fonts
+        internal FontInfo getOrCreate(string name) {
             var founded = this._fonts.Find(info =>
-                names == info.font.fontNames ||
-                names != null && names.SequenceEqual(info.font.fontNames));
+                info.font && info.font.fontNames.Contains(name));            
             if (founded != null) {
                 return founded;
             }
 
-            var osFont = Font.CreateDynamicFontFromOSFont(names, defaultFontSize);
+            var osFont = Font.CreateDynamicFontFromOSFont(name, defaultFontSize);
             osFont.hideFlags = HideFlags.DontSave;
             osFont.material.hideFlags = HideFlags.DontSave;
             osFont.material.mainTexture.hideFlags = HideFlags.DontSave;
@@ -63,10 +61,6 @@ namespace Unity.UIWidgets.ui {
             var newFont = new FontInfo(osFont);
             this._fonts.Add(newFont);
             return newFont;
-        }
-
-        internal FontInfo getOrCreate(string name) {
-            return this.getOrCreate(new[] {name});
         }
 
         void onFontTextureRebuilt(Font font) {

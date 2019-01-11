@@ -52,13 +52,13 @@ namespace Unity.UIWidgets.flow {
             D.assert(matrix != null);
             this.picture = picture;
             this.matrix = new Matrix3(matrix);
-            var x = this.matrix[6] * devicePixelRatio;
-            var y = this.matrix[7] * devicePixelRatio;
+            var x = this.matrix[2] * devicePixelRatio;
+            var y = this.matrix[5] * devicePixelRatio;
 
-            this.matrix[6] = (x - (int) x) / devicePixelRatio; // x
-            this.matrix[7] = (y - (int) y) / devicePixelRatio; // y
-            D.assert(this.matrix[6] == 0);
-            D.assert(this.matrix[7] == 0);
+            this.matrix[2] = (x - (int) x) / devicePixelRatio; // x
+            this.matrix[5] = (y - (int) y) / devicePixelRatio; // y
+            D.assert(this.matrix[2] == 0);
+            D.assert(this.matrix[5] == 0);
             this.devicePixelRatio = devicePixelRatio;
         }
 
@@ -127,6 +127,12 @@ namespace Unity.UIWidgets.flow {
 
         readonly Dictionary<_RasterCacheKey, _RasterCacheEntry> _cache;
 
+        MeshPool _meshPool;
+
+        public MeshPool meshPool {
+            set { this._meshPool = value; }
+        }
+
         public RasterCacheResult getPrerolledImage(
             Picture picture, Matrix3 transform, float devicePixelRatio, bool isComplex, bool willChange) {
             if (this.threshold == 0) {
@@ -153,7 +159,8 @@ namespace Unity.UIWidgets.flow {
             }
 
             if (entry.image == null) {
-                entry.image = this._rasterizePicture(picture, transform, devicePixelRatio);
+                D.assert(this._meshPool != null);
+                entry.image = this._rasterizePicture(picture, transform, devicePixelRatio, this._meshPool);
             }
 
             return entry.image;
@@ -193,7 +200,7 @@ namespace Unity.UIWidgets.flow {
             return true;
         }
 
-        RasterCacheResult _rasterizePicture(Picture picture, Matrix3 transform, float devicePixelRatio) {
+        RasterCacheResult _rasterizePicture(Picture picture, Matrix3 transform, float devicePixelRatio, MeshPool meshPool) {
             var bounds = transform.mapRect(picture.paintBounds);
 
             var desc = new RenderTextureDescriptor(
@@ -211,13 +218,13 @@ namespace Unity.UIWidgets.flow {
             var renderTexture = new RenderTexture(desc);
             renderTexture.hideFlags = HideFlags.HideAndDontSave;
 
-            var canvas = new CommandBufferCanvas(renderTexture, devicePixelRatio);
+            var canvas = new CommandBufferCanvas(renderTexture, devicePixelRatio, meshPool);
             canvas.translate((float) -bounds.left, (float) -bounds.top);
             canvas.concat(transform);
             canvas.drawPicture(picture);
             canvas.flush();
 
-            return new RasterCacheResult(new Image(renderTexture), bounds, devicePixelRatio);
+            return new RasterCacheResult(new Image(renderTexture), picture.paintBounds, devicePixelRatio);
         }
 
         public void sweepAfterFrame() {

@@ -10,15 +10,43 @@ namespace Unity.UIWidgets.ui {
         readonly RenderTexture _renderTexture;
         readonly float _fringeWidth;
         readonly float _devicePixelRatio;
+        readonly MeshPool _meshPool;
         readonly List<RenderLayer> _layers = new List<RenderLayer>();
         int _saveCount;
+        
+        static readonly List<int> _imageTriangles = new List<int>(12) {
+            0, 1, 2, 0, 2, 1,
+            0, 2, 3, 0, 3, 2,
+        };
+        
+        static readonly List<int> _imageNineTriangles = new List<int>(12 * 9) {
+                0, 4, 1, 1, 4, 5,
+                0, 1, 4, 1, 5, 4,
+                1, 5, 2, 2, 5, 6,
+                1, 2, 5, 2, 6, 5,
+                2, 6, 3, 3, 6, 7,
+                2, 3, 6, 3, 7, 6,
+                4, 8, 5, 5, 8, 9,
+                4, 5, 8, 5, 9, 8,
+                5, 9, 6, 6, 9, 10,
+                5, 6, 9, 6, 10, 9,
+                6, 10, 7, 7, 10, 11,
+                6, 7, 10, 7, 11, 10,
+                8, 12, 9, 9, 12, 13,
+                8, 9, 12, 9, 13, 12,
+                9, 13, 10, 10, 13, 14,
+                9, 10, 13, 10, 14, 13,
+                10, 14, 11, 11, 14, 15,
+                10, 11, 14, 11, 15, 14,
+        };
 
-        public CommandBufferCanvas(RenderTexture renderTexture, float devicePixelRatio) {
+        public CommandBufferCanvas(RenderTexture renderTexture, float devicePixelRatio, MeshPool meshPool) {
             D.assert(renderTexture);
 
             this._renderTexture = renderTexture;
             this._fringeWidth = 1.0f / devicePixelRatio;
             this._devicePixelRatio = devicePixelRatio;
+            this._meshPool = meshPool;
 
             this.reset();
         }
@@ -114,16 +142,10 @@ namespace Unity.UIWidgets.ui {
                 (float) bounds.right, (float) bounds.top);
             vertices.Add(new Vector2(x, y));
             uv.Add(new Vector2(uvx1, uvy0));
+            
+            var mesh = new MeshMesh(vertices, _imageTriangles, uv);
 
-            var mesh = new Mesh();
-            mesh.SetVertices(vertices);
-            mesh.SetUVs(0, uv);
-            mesh.SetIndices(new[] {
-                0, 1, 2, 0, 2, 1,
-                0, 2, 3, 0, 3, 2,
-            }, MeshTopology.Triangles, 0);
-
-            if (!this._applyClip(mesh.getBounds())) {
+            if (!this._applyClip(mesh.bounds)) {
                 return;
             }
 
@@ -358,7 +380,7 @@ namespace Unity.UIWidgets.ui {
                 var properties = new MaterialPropertyBlock();
                 properties.SetVector("_viewSize", this._getViewSize());
 
-                var boundsMesh = reducedClip.scissor.getBoundsMesh();
+                var boundsMesh = new MeshMesh(reducedClip.scissor);
                 this._getLayer().draws.Add(new RenderDraw {
                     mesh = boundsMesh,
                     pass = CanvasShaderPass.stencilClear,
@@ -400,7 +422,7 @@ namespace Unity.UIWidgets.ui {
                 bool convex;
                 var mesh = cache.getFillMesh(out convex);
 
-                if (!this._applyClip(mesh.getBounds())) {
+                if (!this._applyClip(mesh.bounds)) {
                     return;
                 }
 
@@ -421,7 +443,7 @@ namespace Unity.UIWidgets.ui {
                         properties = properties,
                     });
                     this._getLayer().draws.Add(new RenderDraw {
-                        mesh = mesh.getBoundsMesh(),
+                        mesh = mesh.boundsMesh,
                         pass = CanvasShaderPass.fillPass1,
                         material = mat,
                         properties = properties,
@@ -450,7 +472,7 @@ namespace Unity.UIWidgets.ui {
                     paint.strokeJoin,
                     (float) paint.strokeMiterLimit);
 
-                if (!this._applyClip(mesh.getBounds())) {
+                if (!this._applyClip(mesh.bounds)) {
                     return;
                 }
 
@@ -605,15 +627,8 @@ namespace Unity.UIWidgets.ui {
             vertices.Add(new Vector2(x, y));
             uv.Add(new Vector2(uvx1, uvy0));
 
-            var mesh = new Mesh();
-            mesh.SetVertices(vertices);
-            mesh.SetUVs(0, uv);
-            mesh.SetIndices(new[] {
-                0, 1, 2, 0, 2, 1,
-                0, 2, 3, 0, 3, 2,
-            }, MeshTopology.Triangles, 0);
-
-            if (!this._applyClip(mesh.getBounds())) {
+            var mesh = new MeshMesh(vertices, _imageTriangles, uv);
+            if (!this._applyClip(mesh.bounds)) {
                 return;
             }
 
@@ -716,31 +731,8 @@ namespace Unity.UIWidgets.ui {
             vertices.Add(new Vector2(x, y));
             uv.Add(new Vector2(tx3, ty3));
 
-            var mesh = new Mesh();
-            mesh.SetVertices(vertices);
-            mesh.SetUVs(0, uv);
-            mesh.SetIndices(new[] {
-                0, 4, 1, 1, 4, 5,
-                0, 1, 4, 1, 5, 4,
-                1, 5, 2, 2, 5, 6,
-                1, 2, 5, 2, 6, 5,
-                2, 6, 3, 3, 6, 7,
-                2, 3, 6, 3, 7, 6,
-                4, 8, 5, 5, 8, 9,
-                4, 5, 8, 5, 9, 8,
-                5, 9, 6, 6, 9, 10,
-                5, 6, 9, 6, 10, 9,
-                6, 10, 7, 7, 10, 11,
-                6, 7, 10, 7, 11, 10,
-                8, 12, 9, 9, 12, 13,
-                8, 9, 12, 9, 13, 12,
-                9, 13, 10, 10, 13, 14,
-                9, 10, 13, 10, 14, 13,
-                10, 14, 11, 11, 14, 15,
-                10, 11, 14, 11, 15, 14,
-            }, MeshTopology.Triangles, 0);
-
-            if (!this._applyClip(mesh.getBounds())) {
+            var mesh = new MeshMesh(vertices, _imageNineTriangles, uv);
+            if (!this._applyClip(mesh.bounds)) {
                 return;
             }
 
@@ -841,11 +833,12 @@ namespace Unity.UIWidgets.ui {
 
             var xform = new float[6];
             XformUtils.transformTranslate(xform, (float) offset.dx, (float) offset.dy);
-            XformUtils.transformPremultiply(xform, state.xform);
+            XformUtils.transformMultiply(xform, state.xform); // xform = state.xform * xform
 
-            var mesh = MeshGenrator.generateMesh(textBlob, xform, this._devicePixelRatio);
+            var scale = XformUtils.getAverageScale(xform) * this._devicePixelRatio;            
+            var mesh = MeshGenerator.generateMesh(textBlob, scale).transform(xform);
 
-            if (!this._applyClip(mesh.getBounds())) {
+            if (!this._applyClip(mesh.bounds)) {
                 return;
             }
 
@@ -913,7 +906,7 @@ namespace Unity.UIWidgets.ui {
             this._layers.Clear();
             this._layers.Add(firstLayer);
         }
-
+        
         void _drawLayer(RenderLayer layer, CommandBuffer cmdBuf) {
             foreach (var subLayer in layer.layers) {
                 cmdBuf.GetTemporaryRT(subLayer.rtID, new RenderTextureDescriptor(
@@ -937,7 +930,7 @@ namespace Unity.UIWidgets.ui {
             }
 
             foreach (var draw in layer.draws) {
-                draw.onExecute(cmdBuf);
+                draw.onExecute(this, cmdBuf);
             }
 
             foreach (var subLayer in layer.layers) {
@@ -947,7 +940,7 @@ namespace Unity.UIWidgets.ui {
 
         void _clearLayer(RenderLayer layer) {
             foreach (var draw in layer.draws) {
-                draw.onDestroy();
+                draw.onDestroy(this);
             }
             layer.draws.Clear();
 
@@ -993,42 +986,57 @@ namespace Unity.UIWidgets.ui {
         }
 
         interface RenderCmd {
-            void onExecute(CommandBuffer cmdBuf);
-            void onDestroy();
+            void onExecute(CommandBufferCanvas canvas, CommandBuffer cmdBuf);
+            void onDestroy(CommandBufferCanvas canvas);
         }
 
         class RenderDraw : RenderCmd {
-            public Mesh mesh;
+            public MeshMesh mesh;
             public int pass;
             public MaterialPropertyBlock properties;
             public RenderLayer layer;
             public Material material;
             public Image image; // just to keep a reference to avoid GC.
+            public Mesh meshObj;
 
-            public void onExecute(CommandBuffer cmdBuf) {
+            public void onExecute(CommandBufferCanvas canvas, CommandBuffer cmdBuf) {
                 if (this.layer != null) {
                     cmdBuf.SetGlobalTexture("_tex", this.layer.rtID);
                 }
 
-                cmdBuf.DrawMesh(this.mesh, Matrix4x4.identity, this.material, 0, this.pass, this.properties);
+                if (!this.meshObj) {
+                    this.meshObj = canvas._meshPool.getMesh();
+                    
+                    // clear triangles first in order to bypass validation in SetVertices.
+                    this.meshObj.SetTriangles((int[]) null, 0, false);
+                    
+                    this.meshObj.SetVertices(this.mesh.vertices);
+                    this.meshObj.SetTriangles(this.mesh.triangles, 0, false);
+                    this.meshObj.SetUVs(0, this.mesh.uv);
+                }
+
+                cmdBuf.DrawMesh(this.meshObj, Matrix4x4.identity, this.material, 0, this.pass, this.properties);
                 if (this.layer != null) {
                     cmdBuf.SetGlobalTexture("_tex", BuiltinRenderTextureType.None);
                 }
             }
 
-            public void onDestroy() {
-                this.mesh = ObjectUtils.SafeDestroy(this.mesh);
+            public void onDestroy(CommandBufferCanvas canvas) {
+                if (this.meshObj) {
+                    canvas._meshPool.returnMesh(this.meshObj);
+                    this.meshObj = null;
+                }
             }
         }
 
         class RenderScissor : RenderCmd {
             public Rect deviceScissor;
 
-            public void onExecute(CommandBuffer cmdBuf) {
+            public void onExecute(CommandBufferCanvas canvas, CommandBuffer cmdBuf) {
                 cmdBuf.EnableScissorRect(this.deviceScissor.toRect());
             }
 
-            public void onDestroy() {
+            public void onDestroy(CommandBufferCanvas canvas) {
             }
         }
     }
@@ -1094,6 +1102,8 @@ namespace Unity.UIWidgets.ui {
             t[5] = 0.0f;
         }
 
+        
+        // t = s * t;
         public static void transformMultiply(float[] t, float[] s) {
             float t0 = t[0] * s[0] + t[1] * s[2];
             float t2 = t[2] * s[0] + t[3] * s[2];

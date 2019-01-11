@@ -198,7 +198,7 @@ namespace Unity.UIWidgets.widgets {
             base.debugFillDescription(description);
             description.Add(this.context.GetType().ToString());
             description.Add(this.physics.ToString());
-            description.Add(this.activity.ToString());
+            description.Add(this.activity?.ToString());
             description.Add(this.userScrollDirection.ToString());
         }
     }

@@ -35,7 +35,7 @@ namespace Unity.UIWidgets.ui {
                         i += 3;
                         break;
                     case PathCommand.bezierTo:
-                        this._cache.tesselateBezier(
+                        this._cache.tessellateBezier(
                             this._commands[i + 1], this._commands[i + 2],
                             this._commands[i + 3], this._commands[i + 4],
                             this._commands[i + 5], this._commands[i + 6], PointFlags.corner);
@@ -238,14 +238,14 @@ namespace Unity.UIWidgets.ui {
         readonly float _distTol;
         readonly float _tessTol;
 
-        internal readonly List<PathPath> _paths = new List<PathPath>();
-        internal readonly List<PathPoint> _points = new List<PathPoint>();
-        internal readonly List<Vector3> _vertices = new List<Vector3>();
+        readonly List<PathPath> _paths = new List<PathPath>();
+        readonly List<PathPoint> _points = new List<PathPoint>();
+        readonly List<Vector3> _vertices = new List<Vector3>();
 
-        Mesh _fillMesh;
+        MeshMesh _fillMesh;
         bool _fillConvex;
 
-        Mesh _strokeMesh;
+        MeshMesh _strokeMesh;
         float _strokeWidth;
         StrokeCap _lineCap;
         StrokeJoin _lineJoin;
@@ -286,10 +286,10 @@ namespace Unity.UIWidgets.ui {
         public void addPoint(float x, float y, PointFlags flags) {
             PathUtils.transformPoint(out x, out y, this._xform, x, y);
 
-            this._addPoint(x, y, flags);
+            this._addPoint(new PathPoint{x = x, y = y, flags = flags});
         }
 
-        void _addPoint(float x, float y, PointFlags flags) {
+        void _addPoint(PathPoint point) {
             if (this._paths.Count == 0) {
                 this.addPath();
             }
@@ -297,17 +297,17 @@ namespace Unity.UIWidgets.ui {
             var path = this._paths.Last();
             if (path.count > 0) {
                 var pt = this._points.Last();
-                if (PathUtils.ptEquals(pt.x, pt.y, x, y, this._distTol)) {
-                    pt.flags |= flags;
+                if (PathUtils.ptEquals(pt.x, pt.y, point.x, point.y, this._distTol)) {
+                    pt.flags |= point.flags;
                     return;
                 }
             }
 
-            this._points.Add(new PathPoint {x = x, y = y, flags = flags});
+            this._points.Add(point);
             path.count++;
         }
 
-        public void tesselateBezier(
+        public void tessellateBezier(
             float x2, float y2,
             float x3, float y3, float x4, float y4,
             PointFlags flags) {
@@ -325,46 +325,11 @@ namespace Unity.UIWidgets.ui {
             PathUtils.transformPoint(out x3, out y3, this._xform, x3, y3);
             PathUtils.transformPoint(out x4, out y4, this._xform, x4, y4);
 
-            this._tesselateBezier(x1, y1, x2, y2, x3, y3, x4, y4, 0, flags);
-        }
-
-        void _tesselateBezier(
-            float x1, float y1, float x2, float y2,
-            float x3, float y3, float x4, float y4,
-            int level, PointFlags flags) {
-            if (level > 10) {
-                return;
+            var points = TessellationGenerator.tessellateBezier(x1, y1, x2, y2, x3, y3, x4, y4, this._tessTol);
+            points[points.Count - 1].flags = flags;
+            foreach (var point in points) {
+                this._addPoint(point);
             }
-
-            float x12, y12, x23, y23, x34, y34, x123, y123, x234, y234, x1234, y1234;
-            float dx, dy, d2, d3;
-
-            x12 = (x1 + x2) * 0.5f;
-            y12 = (y1 + y2) * 0.5f;
-            x23 = (x2 + x3) * 0.5f;
-            y23 = (y2 + y3) * 0.5f;
-            x34 = (x3 + x4) * 0.5f;
-            y34 = (y3 + y4) * 0.5f;
-            x123 = (x12 + x23) * 0.5f;
-            y123 = (y12 + y23) * 0.5f;
-
-            dx = x4 - x1;
-            dy = y4 - y1;
-            d2 = Mathf.Abs((x2 - x4) * dy - (y2 - y4) * dx);
-            d3 = Mathf.Abs((x3 - x4) * dy - (y3 - y4) * dx);
-
-            if ((d2 + d3) * (d2 + d3) < this._tessTol * (dx * dx + dy * dy)) {
-                this._addPoint(x4, y4, flags);
-                return;
-            }
-
-            x234 = (x23 + x34) * 0.5f;
-            y234 = (y23 + y34) * 0.5f;
-            x1234 = (x123 + x234) * 0.5f;
-            y1234 = (y123 + y234) * 0.5f;
-
-            this._tesselateBezier(x1, y1, x12, y12, x123, y123, x1234, y1234, level + 1, 0);
-            this._tesselateBezier(x1234, y1234, x234, y234, x34, y34, x4, y4, level + 1, flags);
         }
 
         public void closePath() {
@@ -463,17 +428,13 @@ namespace Unity.UIWidgets.ui {
             }
         }
 
-        public Mesh getFillMesh(out bool convex) {
-            if (this._fillMesh) {
+        public MeshMesh getFillMesh(out bool convex) {
+            if (this._fillMesh != null) {
                 convex = this._fillConvex;
                 return this._fillMesh;
             }
 
             this._expandFill();
-
-            var mesh = new Mesh();
-            this._fillMesh = mesh;
-            mesh.SetVertices(this._vertices);
 
             var cindices = 0;
             for (var i = 0; i < this._paths.Count; i++) {
@@ -488,9 +449,7 @@ namespace Unity.UIWidgets.ui {
                 }
             }
 
-            var indices = new int[cindices];
-            var k = 0;
-
+            var indices = new List<int>(cindices);
             for (var i = 0; i < this._paths.Count; i++) {
                 var path = this._paths[i];
                 if (path.count <= 2) {
@@ -499,16 +458,18 @@ namespace Unity.UIWidgets.ui {
 
                 if (path.nfill > 0) {
                     for (var j = 2; j < path.nfill; j++) {
-                        indices[k++] = path.ifill;
-                        indices[k++] = path.ifill + j;
-                        indices[k++] = path.ifill + j - 1;
+                        indices.Add(path.ifill);
+                        indices.Add(path.ifill + j);
+                        indices.Add(path.ifill + j - 1);
                     }
                 }
             }
 
-            D.assert(k == cindices);
-            mesh.SetIndices(indices, MeshTopology.Triangles, 0);
-
+            D.assert(indices.Count == cindices);
+            
+            var mesh = new MeshMesh(this._vertices, indices);
+            this._fillMesh = mesh;
+            
             this._fillConvex = false;
             for (var i = 0; i < this._paths.Count; i++) {
                 var path = this._paths[i];
@@ -531,7 +492,7 @@ namespace Unity.UIWidgets.ui {
             }
 
             convex = this._fillConvex;
-            return mesh;
+            return this._fillMesh;
         }
 
         void _calculateJoins(float w, StrokeJoin lineJoin, float miterLimit) {
@@ -689,8 +650,8 @@ namespace Unity.UIWidgets.ui {
             }
         }
 
-        public Mesh getStrokeMesh(float strokeWidth, StrokeCap lineCap, StrokeJoin lineJoin, float miterLimit) {
-            if (this._strokeMesh &&
+        public MeshMesh getStrokeMesh(float strokeWidth, StrokeCap lineCap, StrokeJoin lineJoin, float miterLimit) {
+            if (this._strokeMesh != null &&
                 this._strokeWidth == strokeWidth &&
                 this._lineCap == lineCap &&
                 this._lineJoin == lineJoin &&
@@ -699,14 +660,6 @@ namespace Unity.UIWidgets.ui {
             }
 
             this._expandStroke(strokeWidth, lineCap, lineJoin, miterLimit);
-
-            var mesh = new Mesh();
-            this._strokeMesh = mesh;
-            this._strokeWidth = strokeWidth;
-            this._lineCap = lineCap;
-            this._lineJoin = lineJoin;
-            this._miterLimit = miterLimit;
-            mesh.SetVertices(this._vertices);
 
             var cindices = 0;
             for (var i = 0; i < this._paths.Count; i++) {
@@ -721,9 +674,7 @@ namespace Unity.UIWidgets.ui {
                 }
             }
 
-            var indices = new int[cindices];
-            var k = 0;
-
+            var indices = new List<int>(cindices);
             for (var i = 0; i < this._paths.Count; i++) {
                 var path = this._paths[i];
                 if (path.count <= 1) {
@@ -733,22 +684,26 @@ namespace Unity.UIWidgets.ui {
                 if (path.nstroke > 0) {
                     for (var j = 2; j < path.nstroke; j++) {
                         if ((j & 1) == 0) {
-                            indices[k++] = path.istroke + j - 1;
-                            indices[k++] = path.istroke + j - 2;
-                            indices[k++] = path.istroke + j;
+                            indices.Add(path.istroke + j - 1);
+                            indices.Add(path.istroke + j - 2);
+                            indices.Add(path.istroke + j);
                         } else {
-                            indices[k++] = path.istroke + j - 2;
-                            indices[k++] = path.istroke + j - 1;
-                            indices[k++] = path.istroke + j;
+                            indices.Add(path.istroke + j - 2);
+                            indices.Add(path.istroke + j - 1);
+                            indices.Add(path.istroke + j);
                         }
                     }
                 }
             }
 
-            D.assert(k == cindices);
+            D.assert(indices.Count == cindices);
 
-            mesh.SetIndices(indices, MeshTopology.Triangles, 0);
-            return mesh;
+            this._strokeMesh = new MeshMesh(this._vertices, indices);
+            this._strokeWidth = strokeWidth;
+            this._lineCap = lineCap;
+            this._lineJoin = lineJoin;
+            this._miterLimit = miterLimit;
+            return this._strokeMesh;
         }
     }
 
@@ -1016,48 +971,114 @@ namespace Unity.UIWidgets.ui {
                 dst.Add(new Vector2(rx1, ry1));
             }
         }
+    }
 
-        public static Rect getBounds(this Mesh mesh) {
-            var bounds = mesh.bounds;
-            var min = bounds.min;
-            var size = bounds.size;
-            return Rect.fromLTWH(min.x, min.y, size.x, size.y);
+    class MeshMesh {
+        public readonly List<Vector3> vertices;
+        public readonly List<int> triangles;
+        public readonly List<Vector2> uv;
+        public readonly Rect bounds;
+
+        MeshMesh _boundsMesh;
+        static readonly List<int> _boundsTriangles = new List<int>(6) {0, 2, 1, 1, 2, 3};
+
+        public MeshMesh boundsMesh {
+            get {
+                if (this._boundsMesh != null) {
+                    return this._boundsMesh;
+                }
+
+                this._boundsMesh = new MeshMesh(this.bounds);
+                return this._boundsMesh;
+            }
         }
 
-        public static Mesh getBoundsMesh(this Mesh mesh) {
-            var bounds = mesh.bounds;
-            var boundsMesh = new Mesh();
+        public MeshMesh(Rect rect) {
+            this.vertices = new List<Vector3>(4) {
+                new Vector3((float) rect.right, (float) rect.bottom),
+                new Vector3((float) rect.right, (float) rect.top),
+                new Vector3((float) rect.left, (float) rect.bottom),
+                new Vector3((float) rect.left, (float) rect.top)
+            };
 
-            var min = bounds.min;
-            var max = bounds.max;
-
-            var vertices = new List<Vector3>(4);
-            vertices.Add(new Vector2(max.x, max.y));
-            vertices.Add(new Vector2(max.x, min.y));
-            vertices.Add(new Vector2(min.x, max.y));
-            vertices.Add(new Vector2(min.x, min.y));
-            boundsMesh.SetVertices(vertices);
-
-            var indices = new[] {0, 2, 1, 1, 2, 3};
-            boundsMesh.SetIndices(indices, MeshTopology.Triangles, 0);
-
-            return boundsMesh;
+            this.triangles = _boundsTriangles;
+            this.bounds = rect;
+            this._boundsMesh = this;
         }
 
-        public static Mesh getBoundsMesh(this Rect rect) {
-            var boundsMesh = new Mesh();
+        public MeshMesh(List<Vector3> vertices, List<int> triangles, List<Vector2> uv = null) {
+            D.assert(vertices != null);
+            D.assert(vertices.Count > 0);
+            D.assert(triangles != null);
+            D.assert(triangles.Count > 0);
+            D.assert(uv == null || uv.Count == vertices.Count);
 
-            var vertices = new List<Vector3>(4);
-            vertices.Add(new Vector2((float) rect.right, (float) rect.bottom));
-            vertices.Add(new Vector2((float) rect.right, (float) rect.top));
-            vertices.Add(new Vector2((float) rect.left, (float) rect.bottom));
-            vertices.Add(new Vector2((float) rect.left, (float) rect.top));
-            boundsMesh.SetVertices(vertices);
+            this.vertices = vertices;
+            this.triangles = triangles;
+            this.uv = uv;
+            
+            double minX = vertices[0].x;
+            double maxX = vertices[0].x;
+            double minY = vertices[0].y;
+            double maxY = vertices[0].y;
 
-            var indices = new[] {0, 2, 1, 1, 2, 3};
-            boundsMesh.SetIndices(indices, MeshTopology.Triangles, 0);
+            for (int i = 1; i < vertices.Count; i++) {
+                var vertex = vertices[i];
+                if (vertex.x < minX) {
+                    minX = vertex.x;
+                }
+                if (vertex.x > maxX) {
+                    maxX = vertex.x;
+                }
+                if (vertex.y < minY) {
+                    minY = vertex.y;
+                }
+                if (vertex.y > maxY) {
+                    maxY = vertex.y;
+                }
+            }
 
-            return boundsMesh;
+            this.bounds = Rect.fromLTRB(minX, minY, maxX, maxY);
+        }
+
+        public MeshMesh transform(float[] xform) {
+            var transVertices = new List<Vector3>(this.vertices.Count);
+
+            foreach (var vertex in this.vertices) {
+                float x, y;
+                PathUtils.transformPoint(out x, out y, xform, vertex.x, vertex.y);
+                transVertices.Add(new Vector3(x, y));
+            }
+            
+            return new MeshMesh(transVertices, this.triangles, this.uv);
+        }
+    }
+
+    public class MeshPool : IDisposable {
+        readonly Queue<Mesh> _pool = new Queue<Mesh>();
+
+        public Mesh getMesh() {
+            if (this._pool.Count > 0) {
+                var mesh = this._pool.Dequeue();
+                D.assert(mesh);
+                return mesh;
+            } else {
+                var mesh = new Mesh();
+                mesh.hideFlags = HideFlags.HideAndDontSave;
+                return mesh;
+            }
+        }
+
+        public void returnMesh(Mesh mesh) {
+            D.assert(mesh.hideFlags == HideFlags.HideAndDontSave);
+            this._pool.Enqueue(mesh);
+        }
+
+        public void Dispose() {
+            foreach (var mesh in this._pool) {
+                ObjectUtils.SafeDestroy(mesh);
+            }
+            this._pool.Clear();
         }
     }
 }

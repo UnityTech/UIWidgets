@@ -615,17 +615,17 @@ namespace Unity.UIWidgets.rendering {
         }
 
         public void rotateZ(double degrees) {
-            this._transform = Matrix3.makeRotate((float) degrees) * this._transform;
+            this._transform.preRotate((float)degrees);
             this.markNeedsPaint();
         }
 
         public void translate(double x, double y = 0.0, double z = 0.0) {
-            this._transform = Matrix3.makeTrans((float) x, (float) y) * this._transform;
+            this._transform.preTranslate((float) x, (float) y);
             this.markNeedsPaint();
         }
 
         public void scale(double x, double y, double z) {
-            this._transform = Matrix3.makeScale((float) x, (float) y) * this._transform;
+            this._transform.preScale((float) x, (float) y);
             this.markNeedsPaint();
         }
 
@@ -638,26 +638,23 @@ namespace Unity.UIWidgets.rendering {
 
                 var result = Matrix3.I();
                 if (this._origin != null) {
-                    result = Matrix3.makeTrans((float) this._origin.dx, (float) this._origin.dy) *
-                             result;
+                    result.preTranslate((float) this._origin.dx, (float) this._origin.dy);
                 }
 
                 Offset translation = null;
                 if (resolvedAlignment != null) {
-                    translation = resolvedAlignment.alongSize(this.size);
-                    result = Matrix3.makeTrans((float) translation.dx, (float) translation.dy) * result;
+                    translation = resolvedAlignment.alongSize(this.size);                    
+                    result.preTranslate((float) translation.dx, (float) translation.dy);
                 }
 
-                result = this._transform * result;
+                result.preConcat(this._transform);
 
                 if (resolvedAlignment != null) {
-                    result = Matrix3.makeTrans((float) -translation.dx, (float) -translation.dy) *
-                             result;
+                    result.preTranslate((float) -translation.dx, (float) -translation.dy);
                 }
 
                 if (this._origin != null) {
-                    result = Matrix3.makeTrans((float) -this._origin.dx, (float) -this._origin.dy) *
-                             result;
+                    result.preTranslate((float) -this._origin.dx, (float) -this._origin.dy);
                 }
 
                 return result;
@@ -697,8 +694,8 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
-        public override void applyPaintTransform(RenderObject child, ref Matrix3 transform) {
-            transform = this._effectiveTransform * transform;
+        public override void applyPaintTransform(RenderObject child, Matrix3 transform) {
+            transform.preConcat(this._effectiveTransform);
         }
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
