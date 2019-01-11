@@ -317,28 +317,6 @@ namespace Unity.UIWidgets.ui {
             };
         }
 
-        public static Matrix3 toMatrix3(this Matrix4x4 matrix4x4) {
-            return Matrix3.makeAll(
-                matrix4x4[0], matrix4x4[4], matrix4x4[12],
-                matrix4x4[1], matrix4x4[5], matrix4x4[13],
-                matrix4x4[3], matrix4x4[7], matrix4x4[15]
-            );
-        }
-
-        public static Matrix4x4 toMatrix4x4(this Matrix3 matrix3) {
-            var result = Matrix4x4.identity;
-            result[0] = matrix3[0];
-            result[1] = matrix3[1];
-            result[3] = matrix3[2];
-            result[4] = matrix3[3];
-            result[5] = matrix3[4];
-            result[7] = matrix3[5];
-            result[12] = matrix3[6];
-            result[13] = matrix3[7];
-            result[14] = matrix3[8];
-            return result;
-        }
-
         public static float alignToPixel(this float v, float devicePixelRatio) {
             return Mathf.Round(v * devicePixelRatio) / devicePixelRatio;
         }

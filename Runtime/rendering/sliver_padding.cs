@@ -260,12 +260,12 @@ namespace Unity.UIWidgets.rendering {
             return this.beforePadding;
         }
 
-        public override void applyPaintTransform(RenderObject child, ref Matrix3 transform) {
+        public override void applyPaintTransform(RenderObject child, Matrix3 transform) {
             D.assert(child != null);
             D.assert(child == this.child);
 
             var childParentData = (SliverPhysicalParentData) child.parentData;
-            childParentData.applyPaintTransform(ref transform);
+            childParentData.applyPaintTransform(transform);
         }
 
         public override void paint(PaintingContext context, Offset offset) {

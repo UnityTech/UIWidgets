@@ -492,7 +492,7 @@ namespace Unity.UIWidgets.rendering {
             double offsetDifference = this.offset.pixels - targetOffset;
 
             transform = target.getTransformTo(this);
-            this.applyPaintTransform(child, ref transform);
+            this.applyPaintTransform(child, transform);
             Rect targetRect = transform.mapRect(rect);
 
             switch (this.axisDirection) {
@@ -1032,11 +1032,11 @@ namespace Unity.UIWidgets.rendering {
             return 0.0;
         }
 
-        public override void applyPaintTransform(RenderObject child, ref Matrix3 transform) {
+        public override void applyPaintTransform(RenderObject child, Matrix3 transform) {
             D.assert(child != null);
 
             var childParentData = (SliverPhysicalParentData) child.parentData;
-            childParentData.applyPaintTransform(ref transform);
+            childParentData.applyPaintTransform(transform);
         }
 
         protected override double computeChildMainAxisPosition(RenderSliver child, double parentMainAxisPosition) {
@@ -1327,11 +1327,11 @@ namespace Unity.UIWidgets.rendering {
             return pinnedExtent;
         }
 
-        public override void applyPaintTransform(RenderObject child, ref Matrix3 transform) {
+        public override void applyPaintTransform(RenderObject child, Matrix3 transform) {
             D.assert(child != null);
 
             Offset offset = this.paintOffsetOf((RenderSliver) child);
-            transform = Matrix3.makeTrans(offset) * transform;
+            transform.preTranslate((float) offset.dx, (float) offset.dy);
         }
 
         protected override double computeChildMainAxisPosition(RenderSliver child, double parentMainAxisPosition) {

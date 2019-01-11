@@ -109,9 +109,9 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
-        public override void applyPaintTransform(RenderObject child, ref Matrix3 transform) {
-            transform *= this._rootTransform;
-            base.applyPaintTransform(child, ref transform);
+        public override void applyPaintTransform(RenderObject child, Matrix3 transform) {
+            transform.preConcat(this._rootTransform);
+            base.applyPaintTransform(child, transform);
         }
 
         public void compositeFrame() {

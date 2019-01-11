@@ -15,7 +15,7 @@ namespace Unity.UIWidgets.editor {
 
         public void setup(Surface surface) {
             this._surface = surface;
-            this._compositorContext.onGrContextCreated();
+            this._compositorContext.onGrContextCreated(this._surface);
         }
 
         public void teardown() {
@@ -69,7 +69,7 @@ namespace Unity.UIWidgets.editor {
             var canvas = frame.getCanvas();
 
             using (var compositorFrame = this._compositorContext.acquireFrame(canvas)) {
-                if (compositorFrame != null && compositorFrame.raster(layerTree, false)) {
+                if (compositorFrame != null && compositorFrame.raster(layerTree, true)) {
                     frame.submit();
                     this._fireNextFrameCallbackIfPresent();
                     return true;

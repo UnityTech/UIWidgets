@@ -55,6 +55,8 @@ namespace Unity.UIWidgets.editor {
 
     public interface Surface : IDisposable {
         SurfaceFrame acquireFrame(Size size, double devicePixelRatio);
+
+        MeshPool getMeshPool();
     }
 
     public class EditorWindowSurface : Surface {
@@ -95,7 +97,8 @@ namespace Unity.UIWidgets.editor {
 
 
         GrSurface _surface;
-        DrawToTargetFunc _drawToTargetFunc;
+        readonly DrawToTargetFunc _drawToTargetFunc;
+        MeshPool _meshPool = new MeshPool();
 
         public EditorWindowSurface(DrawToTargetFunc drawToTargetFunc = null) {
             this._drawToTargetFunc = drawToTargetFunc;
@@ -108,10 +111,19 @@ namespace Unity.UIWidgets.editor {
                 (frame, canvas) => this._presentSurface(canvas));
         }
 
+        public MeshPool getMeshPool() {
+            return this._meshPool;
+        }
+        
         public void Dispose() {
             if (this._surface != null) {
                 this._surface.Dispose();
                 this._surface = null;
+            }
+
+            if (this._meshPool != null) {
+                this._meshPool.Dispose();
+                this._meshPool = null;
             }
         }
 
@@ -150,7 +162,7 @@ namespace Unity.UIWidgets.editor {
                 this._surface = null;
             }
 
-            this._surface = new GrSurface(size, devicePixelRatio);
+            this._surface = new GrSurface(size, devicePixelRatio, this._meshPool);
         }
     }
 
@@ -159,9 +171,11 @@ namespace Unity.UIWidgets.editor {
 
         public readonly double devicePixelRatio;
 
+        readonly MeshPool _meshPool;
+
         RenderTexture _renderTexture;
 
-        Canvas _canvas;
+        CommandBufferCanvas _canvas;
 
         public RenderTexture getRenderTexture() {
             return this._renderTexture;
@@ -169,13 +183,14 @@ namespace Unity.UIWidgets.editor {
 
         public Canvas getCanvas() {
             if (this._canvas == null) {
-                this._canvas = new CommandBufferCanvas(this._renderTexture, (float) this.devicePixelRatio);
+                this._canvas = new CommandBufferCanvas(
+                    this._renderTexture, (float) this.devicePixelRatio, this._meshPool);
             }
 
             return this._canvas;
         }
 
-        public GrSurface(Size size, double devicePixelRatio) {
+        public GrSurface(Size size, double devicePixelRatio, MeshPool meshPool) {
             this.size = size;
             this.devicePixelRatio = devicePixelRatio;
 
@@ -192,6 +207,8 @@ namespace Unity.UIWidgets.editor {
 
             this._renderTexture = new RenderTexture(desc);
             this._renderTexture.hideFlags = HideFlags.HideAndDontSave;
+
+            this._meshPool = meshPool;
         }
 
         public void Dispose() {

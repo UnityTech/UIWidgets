@@ -30,10 +30,10 @@ namespace Unity.UIWidgets.flow {
 
         public override void preroll(PrerollContext context, Matrix3 matrix) {
             if (context.rasterCache != null) {
-                Matrix3 ctm = Matrix3.makeTrans((float) this._offset.dx, (float) this._offset.dy);
-                ctm.preConcat(matrix);
-                ctm[6] = ctm[6].alignToPixel(context.devicePixelRatio);
-                ctm[7] = ctm[7].alignToPixel(context.devicePixelRatio);
+                Matrix3 ctm = new Matrix3(matrix);
+                ctm.postTranslate((float) this._offset.dx, (float) this._offset.dy);
+                ctm[2] = ctm[2].alignToPixel(context.devicePixelRatio);
+                ctm[5] = ctm[5].alignToPixel(context.devicePixelRatio);
 
                 this._rasterCacheResult = context.rasterCache.getPrerolledImage(
                     this._picture, ctm, context.devicePixelRatio, this._isComplex, this._willChange);
@@ -54,8 +54,8 @@ namespace Unity.UIWidgets.flow {
             // align to pixel
             var matrix = canvas.getTotalMatrix();
             var devicePixelRatio = context.canvas.getDevicePixelRatio();
-            matrix[6] = matrix[6].alignToPixel(devicePixelRatio);
-            matrix[7] = matrix[7].alignToPixel(devicePixelRatio);
+            matrix[2] = matrix[2].alignToPixel(devicePixelRatio);
+            matrix[5] = matrix[5].alignToPixel(devicePixelRatio);
             canvas.setMatrix(matrix);
 
             try {

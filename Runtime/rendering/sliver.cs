@@ -457,8 +457,8 @@ namespace Unity.UIWidgets.rendering {
     public class SliverPhysicalParentData : ParentData {
         public Offset paintOffset = Offset.zero;
 
-        public void applyPaintTransform(ref Matrix3 transform) {
-            transform = Matrix3.makeTrans(this.paintOffset) * transform;
+        public void applyPaintTransform(Matrix3 transform) {
+            transform.preTranslate((float) this.paintOffset.dx, (float) this.paintOffset.dy);
         }
 
         public override string ToString() {
@@ -641,7 +641,7 @@ namespace Unity.UIWidgets.rendering {
             return 0.0;
         }
 
-        public override void applyPaintTransform(RenderObject child, ref Matrix3 transform) {
+        public override void applyPaintTransform(RenderObject child, Matrix3 transform) {
             D.assert(() => { throw new UIWidgetsError(this.GetType() + " does not implement applyPaintTransform."); });
         }
 
@@ -831,7 +831,7 @@ namespace Unity.UIWidgets.rendering {
         }
 
         public static void applyPaintTransformForBoxChild(this RenderSliver it, RenderBox child,
-            ref Matrix3 transform) {
+            Matrix3 transform) {
             bool rightWayUp = _getRightWayUp(it.constraints);
             double delta = it.childMainAxisPosition(child);
             double crossAxisDelta = it.childCrossAxisPosition(child);
@@ -841,14 +841,14 @@ namespace Unity.UIWidgets.rendering {
                         delta = it.geometry.paintExtent - child.size.width - delta;
                     }
 
-                    transform = Matrix3.makeTrans((float) delta, (float) crossAxisDelta) * transform;
+                    transform.preTranslate((float) delta, (float) crossAxisDelta);
                     break;
                 case Axis.vertical:
                     if (!rightWayUp) {
                         delta = it.geometry.paintExtent - child.size.height - delta;
                     }
 
-                    transform = Matrix3.makeTrans((float) crossAxisDelta, (float) delta) * transform;
+                    transform.preTranslate((float) crossAxisDelta, (float) delta);
                     break;
             }
         }
@@ -903,12 +903,12 @@ namespace Unity.UIWidgets.rendering {
             return -this.constraints.scrollOffset;
         }
 
-        public override void applyPaintTransform(RenderObject child, ref Matrix3 transform) {
+        public override void applyPaintTransform(RenderObject child, Matrix3 transform) {
             D.assert(child != null);
             D.assert(child == this.child);
 
             var childParentData = (SliverPhysicalParentData) child.parentData;
-            childParentData.applyPaintTransform(ref transform);
+            childParentData.applyPaintTransform(transform);
         }
 
         public override void paint(PaintingContext context, Offset offset) {

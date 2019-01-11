@@ -259,7 +259,7 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
-        public virtual void applyTransform(Layer child, ref Matrix3 transform) {
+        public virtual void applyTransform(Layer child, Matrix3 transform) {
             D.assert(child != null);
         }
 
@@ -408,12 +408,12 @@ namespace Unity.UIWidgets.rendering {
         Matrix3 _lastEffectiveTransform;
 
         public override void addToScene(SceneBuilder builder, Offset layerOffset) {
-            this._lastEffectiveTransform = this.transform;
+            this._lastEffectiveTransform = this._transform;
 
             var totalOffset = this.offset + layerOffset;
             if (totalOffset != Offset.zero) {
-                this._lastEffectiveTransform =
-                    Matrix3.makeTrans(totalOffset) * this._lastEffectiveTransform;
+                this._lastEffectiveTransform = Matrix3.makeTrans((float) totalOffset.dx, (float) totalOffset.dy);
+                this._lastEffectiveTransform.preConcat(this._transform);
             }
 
             builder.pushTransform(this._lastEffectiveTransform);
@@ -421,9 +421,9 @@ namespace Unity.UIWidgets.rendering {
             builder.pop();
         }
 
-        public override void applyTransform(Layer child, ref Matrix3 transform) {
+        public override void applyTransform(Layer child, Matrix3 transform) {
             D.assert(child != null);
-            transform = transform * this._lastEffectiveTransform;
+            transform.preConcat(this._lastEffectiveTransform);
         }
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {

@@ -1,4 +1,5 @@
 using System;
+using Unity.UIWidgets.editor;
 using Unity.UIWidgets.ui;
 
 namespace Unity.UIWidgets.flow {
@@ -43,8 +44,9 @@ namespace Unity.UIWidgets.flow {
             return new ScopedFrame(this, canvas);
         }
 
-        public void onGrContextCreated() {
+        public void onGrContextCreated(Surface surface) {
             this._rasterCache.clear();
+            this._rasterCache.meshPool = surface.getMeshPool();
         }
 
         public void onGrContextDestroyed() {

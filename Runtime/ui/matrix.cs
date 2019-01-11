@@ -28,6 +28,12 @@ namespace Unity.UIWidgets.ui {
             return m;
         }
 
+        public static Matrix3 makeRotate(float degree, float px, float py) {
+            var m = new Matrix3();
+            m.setRotate(degree, px, py);
+            return m;
+        }
+
         public static Matrix3 makeTrans(Offset offset) {
             var m = new Matrix3();
             m.setTranslate((float) offset.dx, (float) offset.dy);
@@ -692,8 +698,8 @@ namespace Unity.UIWidgets.ui {
                 for (int i = 1; i < 4; ++i) {
                     minX = Math.Min(minX, points[i].dx);
                     minY = Math.Min(minY, points[i].dy);
-                    maxX = Math.Min(maxX, points[i].dx);
-                    maxY = Math.Min(maxY, points[i].dy);
+                    maxX = Math.Max(maxX, points[i].dx);
+                    maxY = Math.Max(maxY, points[i].dy);
                 }
 
                 dst = Rect.fromLTRB(minX, minY, maxX, maxY);
@@ -1298,10 +1304,6 @@ namespace Unity.UIWidgets.ui {
 
                 return hash;
             }
-        }
-
-        public static Matrix3 operator *(Matrix3 a, Matrix3 b) {
-            return concat(a, b);
         }
 
         public override string ToString() {

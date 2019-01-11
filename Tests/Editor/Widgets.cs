@@ -13,6 +13,7 @@ using UnityEngine;
 using Color = Unity.UIWidgets.ui.Color;
 using Image = Unity.UIWidgets.widgets.Image;
 using TextStyle = Unity.UIWidgets.painting.TextStyle;
+using Transform = Unity.UIWidgets.widgets.Transform;
 
 namespace UIWidgets.Tests {
     public class Widgets : EditorWindow {
@@ -254,7 +255,7 @@ namespace UIWidgets.Tests {
         const double headerHeight = 50.0;
 
         Widget _buildHeader(BuildContext context) {
-            return new Container(
+            var container = new Container(
                 padding: EdgeInsets.only(left: 16.0, right: 8.0),
                 height: headerHeight,
                 color: CLColors.header,
@@ -374,6 +375,8 @@ namespace UIWidgets.Tests {
                     }
                 )
             );
+
+            return container;
         }
 
         Widget _buildFooter(BuildContext context) {
@@ -522,15 +525,23 @@ namespace UIWidgets.Tests {
         }
 
         public override Widget build(BuildContext context) {
+            var mediaQueryData = MediaQuery.of(context);
+            var px = mediaQueryData.size.width / 2;
+            var py = mediaQueryData.size.width / 2;
+            
             var container = new Container(
                 color: CLColors.background3,
                 child: new Container(
                     color: CLColors.background3,
-                    child: new Column(
-                        children: new List<Widget> {
-                            this._buildHeader(context),
-                            this._buildContentList(context),
-                        }
+                    child: new Transform(
+                        transform: Matrix3.makeRotate(0, (float) px, (float) py),
+                        child:
+                        new Column(
+                            children: new List<Widget> {
+                                this._buildHeader(context),
+                                this._buildContentList(context),
+                            }
+                        )
                     )
                 )
             );
@@ -555,12 +566,12 @@ namespace UIWidgets.Tests {
             this.imageSrc = imageSrc;
         }
 
-        public string name;
-        public string category;
-        public double price;
-        public double priceDiscount;
-        public bool showBadge;
-        public string imageSrc;
+        public readonly string name;
+        public readonly string category;
+        public readonly double price;
+        public readonly double priceDiscount;
+        public readonly bool showBadge;
+        public readonly string imageSrc;
 
         public override Widget build(BuildContext context) {
             var card = new Container(
