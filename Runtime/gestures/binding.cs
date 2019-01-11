@@ -53,7 +53,7 @@ namespace Unity.UIWidgets.gestures {
         public readonly HashSet<HitTestTarget> lastMoveTargets = new HashSet<HitTestTarget>();
 
         void _handlePointerEvent(PointerEvent evt) {
-            if (evt is PointerHoverEvent || evt is PointerMoveEvent) {
+            if (evt is PointerHoverEvent) {
                 this._handlePointerHoverEvent(evt);
             }
 

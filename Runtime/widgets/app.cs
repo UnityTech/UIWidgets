@@ -21,6 +21,7 @@ namespace Unity.UIWidgets.widgets {
         public readonly RouteFactory onUnknownRoute;
         public readonly PageRouteFactory pageRouteBuilder;
         public readonly Dictionary<string, WidgetBuilder> routes;
+        public readonly TextStyle textStyle;
         public readonly Window window;
 
         public WidgetsApp(
@@ -34,6 +35,7 @@ namespace Unity.UIWidgets.widgets {
             Dictionary<string, WidgetBuilder> routes = null,
             TransitionBuilder builder = null,
             Window window = null,
+            TextStyle textStyle = null,
             Widget home = null
         ) : base(key) {
             D.assert(window != null);
@@ -47,6 +49,7 @@ namespace Unity.UIWidgets.widgets {
             this.navigatorObservers = navigatorObservers ?? new List<NavigatorObserver>();
             this.initialRoute = initialRoute;
             this.builder = builder;
+            this.textStyle = textStyle;
 
             D.assert(
                 home == null ||
@@ -248,6 +251,13 @@ namespace Unity.UIWidgets.widgets {
             else {
                 D.assert(navigator != null);
                 result = navigator;
+            }
+            
+            if (this.widget.textStyle != null) {
+                result = new DefaultTextStyle(
+                    style: this.widget.textStyle,
+                    child: result
+                );
             }
 
             D.assert(() => {

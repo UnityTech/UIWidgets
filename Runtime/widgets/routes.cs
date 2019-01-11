@@ -746,8 +746,43 @@ namespace Unity.UIWidgets.widgets {
             Animation<double> secondaryAnimation) {
             return this._pageBuilder(context, animation, secondaryAnimation);
         }
+        
+        public override Widget buildTransitions(BuildContext context, Animation<double> animation, 
+            Animation<double> secondaryAnimation, Widget child) {
+            if (this._transitionBuilder == null) {
+                return new FadeTransition(
+                    opacity: new CurvedAnimation(
+                        parent: animation,
+                        curve: Curves.linear
+                    ),
+                    child: child);
+            }
+            return this._transitionBuilder(context, animation, secondaryAnimation, child);
+        }
     }
 
+    public static class DialogUtils {
+        public static Promise<object> showGeneralDialog(
+            BuildContext context = null,
+            RoutePageBuilder pageBuilder = null,
+            bool barrierDismissible = false,
+            string barrierLabel = null,
+            Color barrierColor = null,
+            TimeSpan? transitionDuration = null,
+            RouteTransitionsBuilder transitionBuilder = null
+            ) {
+            D.assert(pageBuilder != null);
+            D.assert(!barrierDismissible || barrierLabel != null);
+            return Navigator.of(context, rootNavigator: true).push(new _DialogRoute(
+                pageBuilder: pageBuilder,
+                barrierDismissible: barrierDismissible,
+                barrierLabel: barrierLabel,
+                barrierColor: barrierColor,
+                transitionDuration: transitionDuration,
+                transitionBuilder: transitionBuilder
+            ));
+        }
+    }
 
     public delegate Widget RoutePageBuilder(BuildContext context, Animation<double> animation,
         Animation<double> secondaryAnimation);

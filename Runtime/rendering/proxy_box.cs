@@ -365,6 +365,7 @@ namespace Unity.UIWidgets.rendering {
             return (opacity * 255).round();
         }
 
+        double _opacity;
         public double opacity {
             get { return this._opacity; }
             set {
@@ -385,8 +386,6 @@ namespace Unity.UIWidgets.rendering {
                 this.markNeedsPaint();
             }
         }
-
-        double _opacity;
 
         public override void paint(PaintingContext context, Offset offset) {
             if (this.child != null) {
@@ -835,9 +834,9 @@ namespace Unity.UIWidgets.rendering {
             }
         }
         
-       public override void applyPaintTransform(RenderObject child, ref Matrix3 transform) {
-            transform = Matrix3.makeTrans((float)(this.translation.dx * this.size.width), 
-                            (float)(this.translation.dy * this.size.height)) * transform;
+       public override void applyPaintTransform(RenderObject child, Matrix3 transform) {
+            transform.preTranslate((float)(this.translation.dx * this.size.width), 
+                            (float)(this.translation.dy * this.size.height));
 
        }
        

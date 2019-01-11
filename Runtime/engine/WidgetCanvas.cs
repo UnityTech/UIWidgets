@@ -73,9 +73,11 @@ namespace Unity.UIWidgets.engine {
             this._windowAdapter = new UIWidgetWindowAdapter(this);
 
             this._windowAdapter.OnEnable();
-            var root = new WidgetsApp(home: this.getWidget(),
+            var root = new WidgetsApp(
+                home: this.getWidget(),
                 window: this._windowAdapter,
                 routes: this.routes,
+                textStyle: this.textStyle,
                 pageRouteBuilder: this.pageRouteBuilder,
                 onGenerateRoute: this.onGenerateRoute,
                 onUnknownRoute: this.onUnknownRoute);
@@ -91,6 +93,8 @@ namespace Unity.UIWidgets.engine {
         protected virtual RouteFactory onGenerateRoute => null;
         
         protected virtual RouteFactory onUnknownRoute => null;
+
+        protected virtual painting.TextStyle textStyle => null;
         
         protected virtual PageRouteFactory pageRouteBuilder => (RouteSettings settings, WidgetBuilder builder) =>
             new PageRouteBuilder(
@@ -121,7 +125,7 @@ namespace Unity.UIWidgets.engine {
             }
             if (this._mouseEntered && (this._lastMouseMove.x != Input.mousePosition.x ||
                                        this._lastMouseMove.y != Input.mousePosition.y)) {
-                this.OnMouseOver();
+                this.handleMouseMove();
             }
 
             this._lastMouseMove = Input.mousePosition;
@@ -137,7 +141,7 @@ namespace Unity.UIWidgets.engine {
             }
         }
 
-        void OnMouseOver() {
+        void handleMouseMove() {
             var pos = this.getPointPosition(Input.mousePosition);
             this._windowAdapter.postPointerEvent(new PointerData(
                 timeStamp: Timer.timespanSinceStartup,
