@@ -1184,6 +1184,39 @@ namespace Unity.UIWidgets.widgets {
             properties.add(new DiagnosticsProperty<bool>("absorbing", this.absorbing));
         }
     }
+    
+    public class MetaData : SingleChildRenderObjectWidget {
+        public MetaData(
+            object metaData,
+            Key key = null,
+            HitTestBehavior behavior = HitTestBehavior.deferToChild,
+            Widget child = null) : base(key: key, child: child) {
+            this.metaData = metaData;
+            this.behavior = behavior;
+        }
+
+        public readonly object metaData;
+
+        public readonly HitTestBehavior behavior;
+
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderMetaData(
+                metaData: this.metaData,
+                behavior: this.behavior);
+        }
+
+        public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
+            var renderObj = (RenderMetaData) renderObject;
+            renderObj.metaData = this.metaData;
+            renderObj.behavior = this.behavior;
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new EnumProperty<HitTestBehavior>("behavior", this.behavior));
+            properties.add(new DiagnosticsProperty<object>("metaData", this.metaData));
+        }
+    }
 
     public class Builder : StatelessWidget {
         public Builder(

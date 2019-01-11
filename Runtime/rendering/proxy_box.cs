@@ -1215,4 +1215,21 @@ namespace Unity.UIWidgets.rendering {
         properties.add(new DiagnosticsProperty<bool>("absorbing", this.absorbing));
       }
     }
+    
+    public class RenderMetaData : RenderProxyBoxWithHitTestBehavior {
+        public RenderMetaData(
+            object metaData,
+            HitTestBehavior behavior = HitTestBehavior.deferToChild,
+            RenderBox child = null
+        ) : base(behavior, child) {
+            this.metaData = metaData;
+        }
+        
+        public object metaData;
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new DiagnosticsProperty<object>("metaData", this.metaData));
+        }
+    }
 }
