@@ -15,7 +15,6 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public override Widget build(BuildContext context) {
-
             return new GestureDetector(
                 onTapDown: details => {
                     if (this.dismissible)
@@ -38,7 +37,7 @@ namespace Unity.UIWidgets.widgets {
             this.dismissible = dismissible;
         }
 
-        public Animation<Color> color => (Animation<Color>)this.listenable;
+        public Animation<Color> color => (Animation<Color>) this.listenable;
 
         protected internal override Widget build(BuildContext context) {
             return new ModalBarrier(color: this.color?.value, dismissible: this.dismissible);

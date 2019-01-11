@@ -390,7 +390,7 @@ namespace Unity.UIWidgets.widgets {
 
                     return true;
                 });
-                
+
                 route = this.widget.onUnknownRoute(settings);
                 D.assert(() => {
                     if (route == null)
@@ -405,6 +405,7 @@ namespace Unity.UIWidgets.widgets {
                     return true;
                 });
             }
+
             return route;
         }
 

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using RSG;
 using Unity.UIWidgets.animation;
 using Unity.UIWidgets.foundation;
@@ -50,9 +49,7 @@ namespace Unity.UIWidgets.widgets {
         ) : base(settings) {
         }
 
-        public IPromise<object> completed {
-            get { return this._transitionCompleter; }
-        }
+        public IPromise<object> completed => this._transitionCompleter;
 
         internal readonly Promise<object> _transitionCompleter = new Promise<object>();
 
@@ -63,15 +60,11 @@ namespace Unity.UIWidgets.widgets {
 
         protected override bool finishedWhenPopped => this.controller.status == AnimationStatus.dismissed;
 
-        public virtual Animation<double> animation {
-            get { return this._animation; }
-        }
+        public virtual Animation<double> animation => this._animation;
 
         internal Animation<double> _animation;
 
-        public AnimationController controller {
-            get { return this._controller; }
-        }
+        public AnimationController controller => this._controller;
 
         internal AnimationController _controller;
 
@@ -124,9 +117,7 @@ namespace Unity.UIWidgets.widgets {
             this.changedInternalState();
         }
 
-        public virtual Animation<double> secondaryAnimation {
-            get { return this._secondaryAnimation; }
-        }
+        public virtual Animation<double> secondaryAnimation => this._secondaryAnimation;
 
         readonly ProxyAnimation _secondaryAnimation = new ProxyAnimation(Animations.kAlwaysDismissedAnimation);
 
@@ -217,9 +208,13 @@ namespace Unity.UIWidgets.widgets {
         }
 
 
-        public virtual bool canTransitionTo(TransitionRoute nextRoute) => true;
+        public virtual bool canTransitionTo(TransitionRoute nextRoute) {
+            return true;
+        }
 
-        public virtual bool canTransitionFrom(TransitionRoute previousRoute) => true;
+        public virtual bool canTransitionFrom(TransitionRoute previousRoute) {
+            return true;
+        }
 
         protected internal override void dispose() {
             D.assert(!this._transitionCompleter.isCompleted, $"Cannot dispose a {this.GetType()} twice.");
@@ -337,7 +332,8 @@ namespace Unity.UIWidgets.widgets {
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder description) {
             base.debugFillProperties(description);
-            description.add(new FlagProperty("isCurrent", value: this.isCurrent, ifTrue: "active", ifFalse: "inactive"));
+            description.add(new FlagProperty("isCurrent", value: this.isCurrent, ifTrue: "active",
+                ifFalse: "inactive"));
             description.add(new FlagProperty("canPop", value: this.canPop, ifTrue: "can pop"));
         }
     }
@@ -445,18 +441,13 @@ namespace Unity.UIWidgets.widgets {
         }
 
         protected virtual void setState(VoidCallback fn) {
-            if (this._scopeKey.currentState != null) {
+            if (this._scopeKey.currentState != null)
                 this._scopeKey.currentState._routeSetState(fn);
-            }
-            else {
-                // The route isn't currently visible, so we don't have to call its setState
-                // method, but we do still need to call the fn callback, otherwise the state
-                // in the route won't be updated!
+            else
                 fn();
-            }
         }
 
-        public RoutePredicate withName(String name) {
+        public RoutePredicate withName(string name) {
             return (Route route) => !route.willHandlePopInternally
                                     && route is ModalRoute
                                     && route.settings.name == name;
@@ -509,7 +500,8 @@ namespace Unity.UIWidgets.widgets {
                     return;
                 this.setState(() => { this._offstage = value; });
                 this._animationProxy.parent = this._offstage ? Animations.kAlwaysCompleteAnimation : base.animation;
-                this._secondaryAnimationProxy.parent = this._offstage ? Animations.kAlwaysDismissedAnimation : base.secondaryAnimation;
+                this._secondaryAnimationProxy.parent =
+                    this._offstage ? Animations.kAlwaysDismissedAnimation : base.secondaryAnimation;
             }
         }
 
@@ -533,19 +525,15 @@ namespace Unity.UIWidgets.widgets {
             Promise<RoutePopDisposition> result = new Promise<RoutePopDisposition>();
             Action<int> fn = null;
             fn = (int index) => {
-                if (index < callbacks.Count) {
+                if (index < callbacks.Count)
                     callbacks[index]().Then((pop) => {
-                        if (!pop) {
+                        if (!pop)
                             result.Resolve(RoutePopDisposition.doNotPop);
-                        }
-                        else {
+                        else
                             fn(index + 1);
-                        }
                     });
-                }
-                else {
+                else
                     base.willPop().Then((pop) => result.Resolve(pop));
-                }
             };
             fn(0);
             return result;
@@ -613,7 +601,8 @@ namespace Unity.UIWidgets.widgets {
             }
 
             return new IgnorePointer(
-                ignoring: this.animation.status == AnimationStatus.reverse || this.animation.status == AnimationStatus.dismissed,
+                ignoring: this.animation.status == AnimationStatus.reverse ||
+                          this.animation.status == AnimationStatus.dismissed,
                 child: barrier
             );
         }
@@ -622,10 +611,10 @@ namespace Unity.UIWidgets.widgets {
 
         Widget _buildModalScope(BuildContext context) {
             return this._modalScopeCache = this._modalScopeCache ?? new _ModalScope(
-                                          key: this._scopeKey,
-                                          route: this
-                                          // _ModalScope calls buildTransitions() and buildChild(), defined above
-                                      );
+                                               key: this._scopeKey,
+                                               route: this
+                                               // _ModalScope calls buildTransitions() and buildChild(), defined above
+                                           );
         }
 
         public override ICollection<OverlayEntry> createOverlayEntries() {
@@ -641,7 +630,7 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
-    abstract class PopupRoute : ModalRoute {
+    internal abstract class PopupRoute : ModalRoute {
         protected PopupRoute(
             RouteSettings settings = null
         ) : base(settings: settings) {
@@ -659,9 +648,7 @@ namespace Unity.UIWidgets.widgets {
             D.assert(routeAware != null);
             D.assert(route != null);
             HashSet<RouteAware> subscribers = this._listeners.putIfAbsent(route, () => new HashSet<RouteAware>());
-            if (subscribers.Add(routeAware)) {
-                routeAware.didPush();
-            }
+            if (subscribers.Add(routeAware)) routeAware.didPush();
         }
 
         public void unsubscribe(RouteAware routeAware) {
@@ -676,19 +663,15 @@ namespace Unity.UIWidgets.widgets {
             if (route is R && previousRoute is R) {
                 var previousSubscribers = this._listeners.getOrDefault((R) previousRoute);
 
-                if (previousSubscribers != null) {
-                    foreach (RouteAware routeAware in previousSubscribers) {
+                if (previousSubscribers != null)
+                    foreach (RouteAware routeAware in previousSubscribers)
                         routeAware.didPopNext();
-                    }
-                }
 
                 var subscribers = this._listeners.getOrDefault((R) route);
 
-                if (subscribers != null) {
-                    foreach (RouteAware routeAware in subscribers) {
+                if (subscribers != null)
+                    foreach (RouteAware routeAware in subscribers)
                         routeAware.didPop();
-                    }
-                }
             }
         }
 
@@ -696,11 +679,9 @@ namespace Unity.UIWidgets.widgets {
             if (route is R && previousRoute is R) {
                 var previousSubscribers = this._listeners.getOrDefault((R) previousRoute);
 
-                if (previousSubscribers != null) {
-                    foreach (RouteAware routeAware in previousSubscribers) {
+                if (previousSubscribers != null)
+                    foreach (RouteAware routeAware in previousSubscribers)
                         routeAware.didPushNext();
-                    }
-                }
             }
         }
     }
@@ -746,17 +727,17 @@ namespace Unity.UIWidgets.widgets {
             Animation<double> secondaryAnimation) {
             return this._pageBuilder(context, animation, secondaryAnimation);
         }
-        
-        public override Widget buildTransitions(BuildContext context, Animation<double> animation, 
+
+        public override Widget buildTransitions(BuildContext context, Animation<double> animation,
             Animation<double> secondaryAnimation, Widget child) {
-            if (this._transitionBuilder == null) {
+            if (this._transitionBuilder == null)
                 return new FadeTransition(
                     opacity: new CurvedAnimation(
                         parent: animation,
                         curve: Curves.linear
                     ),
                     child: child);
-            }
+
             return this._transitionBuilder(context, animation, secondaryAnimation, child);
         }
     }
@@ -770,7 +751,7 @@ namespace Unity.UIWidgets.widgets {
             Color barrierColor = null,
             TimeSpan? transitionDuration = null,
             RouteTransitionsBuilder transitionBuilder = null
-            ) {
+        ) {
             D.assert(pageBuilder != null);
             D.assert(!barrierDismissible || barrierLabel != null);
             return Navigator.of(context, rootNavigator: true).push(new _DialogRoute(

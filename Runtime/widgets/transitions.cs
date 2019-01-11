@@ -53,29 +53,27 @@ namespace Unity.UIWidgets.widgets {
             return this.widget.build(context);
         }
     }
-    
-    public class SlideTransition : AnimatedWidget {
 
+    public class SlideTransition : AnimatedWidget {
         public SlideTransition(Key key = null,
             Animation<Offset> position = null,
             bool transformHitTests = true,
             TextDirection? textDirection = null,
-            Widget child = null): base(key: key, listenable: position) {
-            
+            Widget child = null) : base(key: key, listenable: position) {
             D.assert(position != null);
             this.transformHitTests = transformHitTests;
             this.textDirection = textDirection;
             this.child = child;
         }
 
-        public Animation<Offset> position => (Animation<Offset>)this.listenable;
-        
+        public Animation<Offset> position => (Animation<Offset>) this.listenable;
+
         public readonly TextDirection? textDirection;
-        
+
         public readonly bool transformHitTests;
 
         public readonly Widget child;
-        
+
         protected internal override Widget build(BuildContext context) {
             var offset = this.position.value;
             if (this.textDirection == TextDirection.rtl)
@@ -90,12 +88,12 @@ namespace Unity.UIWidgets.widgets {
 
     public class FadeTransition : SingleChildRenderObjectWidget {
         public FadeTransition(Key key = null, Animation<double> opacity = null,
-            Widget child = null): base(key: key, child: child) {
+            Widget child = null) : base(key: key, child: child) {
             this.opacity = opacity;
         }
-        
+
         public readonly Animation<double> opacity;
-        
+
         public override RenderObject createRenderObject(BuildContext context) {
             return new RenderAnimatedOpacity(
                 opacity: this.opacity

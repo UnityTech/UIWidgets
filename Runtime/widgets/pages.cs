@@ -4,7 +4,6 @@ using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
 
 namespace Unity.UIWidgets.widgets {
-    
     public abstract class PageRoute : ModalRoute {
         public readonly bool fullscreenDialog;
 
@@ -51,7 +50,7 @@ namespace Unity.UIWidgets.widgets {
             D.assert(pageBuilder != null);
             this.opaque = opaque;
             this.pageBuilder = pageBuilder;
-            this.transitionsBuilder = transitionsBuilder??this._defaultTransitionsBuilder;
+            this.transitionsBuilder = transitionsBuilder ?? this._defaultTransitionsBuilder;
             this.transitionDuration = transitionDuration ?? TimeSpan.FromMilliseconds(300);
             this.barrierColor = barrierColor;
             this.maintainState = maintainState;
@@ -71,11 +70,11 @@ namespace Unity.UIWidgets.widgets {
 
         public override bool maintainState { get; }
 
-        Widget _defaultTransitionsBuilder(BuildContext context, Animation<double> 
+        Widget _defaultTransitionsBuilder(BuildContext context, Animation<double>
             animation, Animation<double> secondaryAnimation, Widget child) {
             return child;
         }
-        
+
         public override Widget buildPage(BuildContext context, Animation<double> animation,
             Animation<double> secondaryAnimation) {
             return this.pageBuilder(context, animation, secondaryAnimation);
