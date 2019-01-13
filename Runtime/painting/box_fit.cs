@@ -18,14 +18,17 @@ namespace Unity.UIWidgets.painting {
             this.destination = destination;
         }
 
-        public Size source;
-        public Size destination;
+        public readonly Size source;
+        public readonly Size destination;
 
         public static FittedSizes applyBoxFit(BoxFit fit, Size inputSize, Size outputSize) {
-            if (inputSize.height <= 0.0 || inputSize.width <= 0.0 || outputSize.height <= 0.0 ||
-                outputSize.width <= 0.0) {
+            if (inputSize.height <= 0.0
+                || inputSize.width <= 0.0
+                || outputSize.height <= 0.0
+                || outputSize.width <= 0.0) {
                 return new FittedSizes(Size.zero, Size.zero);
             }
+
             Size sourceSize = null;
             Size destinationSize = null;
             switch (fit) {

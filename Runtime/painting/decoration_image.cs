@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
@@ -13,8 +14,179 @@ namespace Unity.UIWidgets.painting {
         noRepeat,
     }
 
-    public class DecorationImage {
-        public DecorationImage() {
+    public class DecorationImage : IEquatable<DecorationImage> {
+        public DecorationImage(
+            ImageProvider image = null,
+            ColorFilter colorFilter = null,
+            BoxFit? fit = null,
+            Alignment alignment = null,
+            Rect centerSlice = null,
+            ImageRepeat repeat = ImageRepeat.noRepeat
+        ) {
+            D.assert(image != null);
+            this.image = image;
+            this.colorFilter = colorFilter;
+            this.fit = fit;
+            this.alignment = alignment ?? Alignment.center;
+            this.centerSlice = centerSlice;
+            this.repeat = repeat;
+        }
+
+        public readonly ImageProvider image;
+        public readonly ColorFilter colorFilter;
+        public readonly BoxFit? fit;
+        public readonly Alignment alignment;
+        public readonly Rect centerSlice;
+        public readonly ImageRepeat repeat;
+        
+        public DecorationImagePainter createPainter(VoidCallback onChanged) {
+            D.assert(onChanged != null);
+            return new DecorationImagePainter(this, onChanged);
+        }
+        
+        public bool Equals(DecorationImage other) {
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
+            return Equals(this.image, other.image) && Equals(this.colorFilter, other.colorFilter) &&
+                   this.fit == other.fit && Equals(this.alignment, other.alignment) &&
+                   Equals(this.centerSlice, other.centerSlice) && this.repeat == other.repeat;
+        }
+
+        public override bool Equals(object obj) {
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
+            return this.Equals((DecorationImage) obj);
+        }
+
+        public override int GetHashCode() {
+            unchecked {
+                var hashCode = (this.image != null ? this.image.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (this.colorFilter != null ? this.colorFilter.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ this.fit.GetHashCode();
+                hashCode = (hashCode * 397) ^ (this.alignment != null ? this.alignment.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (this.centerSlice != null ? this.centerSlice.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (int) this.repeat;
+                return hashCode;
+            }
+        }
+
+        public static bool operator ==(DecorationImage left, DecorationImage right) {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(DecorationImage left, DecorationImage right) {
+            return !Equals(left, right);
+        }
+
+        public override string ToString() {
+            var properties = new List<string>();
+            properties.Add($"{this.image}");
+
+            if (this.colorFilter != null) {
+                properties.Add($"{this.colorFilter}");
+            }
+
+            if (this.fit != null &&
+                !(this.fit == BoxFit.fill && this.centerSlice != null) &&
+                !(this.fit == BoxFit.scaleDown && this.centerSlice == null)) {
+                properties.Add($"{this.fit}");
+            }
+
+            properties.Add($"{this.alignment}");
+
+            if (this.centerSlice != null) {
+                properties.Add($"centerSlice: {this.centerSlice}");
+            }
+
+            if (this.repeat != ImageRepeat.noRepeat) {
+                properties.Add($"{this.repeat}");
+            }
+
+            return $"{this.GetType()}({string.Join(", ", properties)})";
+        }
+    }
+
+    public class DecorationImagePainter : IDisposable {
+        internal DecorationImagePainter(DecorationImage details, VoidCallback onChanged) {
+            D.assert(details != null);
+            this._details = details;
+            this._onChanged = onChanged;
+        }
+
+        readonly DecorationImage _details;
+
+        readonly VoidCallback _onChanged;
+
+        ImageStream _imageStream;
+
+        ImageInfo _image;
+
+        public void paint(Canvas canvas, Rect rect, Path clipPath, ImageConfiguration configuration) {
+            D.assert(canvas != null);
+            D.assert(rect != null);
+            D.assert(configuration != null);
+
+            ImageStream newImageStream = this._details.image.resolve(configuration);
+            if (newImageStream.key != this._imageStream?.key) {
+                this._imageStream?.removeListener(this._imageListener);
+                this._imageStream = newImageStream;
+                this._imageStream.addListener(this._imageListener);
+            }
+            if (this._image == null) {
+                return;
+            }
+
+            if (clipPath != null) {
+                canvas.save();
+                canvas.clipPath(clipPath);
+            }
+
+            ImageUtils.paintImage(
+                canvas: canvas,
+                rect: rect,
+                image: this._image.image,
+                scale: this._image.scale,
+                colorFilter: this._details.colorFilter,
+                fit: this._details.fit,
+                alignment: this._details.alignment,
+                centerSlice: this._details.centerSlice,
+                repeat: this._details.repeat
+            );
+
+            if (clipPath != null) {
+                canvas.restore();
+            }
+        }
+
+        void _imageListener(ImageInfo value, bool synchronousCall) {
+            if (this._image == value) {
+                return;
+            }
+            this._image = value;
+
+            D.assert(this._onChanged != null);
+            if (!synchronousCall) {
+                this._onChanged();
+            }
+        }
+
+        public void Dispose() {
+            this._imageStream?.removeListener(this._imageListener);
+        }
+
+        public override string ToString() {
+            return $"{this.GetType()}(stream: {this._imageStream}, image: {this._image}) for {this._details}";
         }
     }
 

@@ -22,10 +22,6 @@ namespace Unity.UIWidgets.painting {
         public static readonly Alignment bottomCenter = new Alignment(0.0, 1.0);
         public static readonly Alignment bottomRight = new Alignment(1.0, 1.0);
 
-        public Alignment add(Alignment other) {
-            return this + other;
-        }
-
         public static Alignment operator -(Alignment a, Alignment b) {
             return new Alignment(a.x - b.x, a.y - b.y);
         }
@@ -82,6 +78,19 @@ namespace Unity.UIWidgets.painting {
             );
         }
 
+        public static Alignment lerp(Alignment a, Alignment b, double t) {
+            if (a == null && b == null) {
+                return null;
+            }
+            if (a == null) {
+                return new Alignment(MathUtils.lerpDouble(0.0, b.x, t), MathUtils.lerpDouble(0.0, b.y, t));
+            }
+            if (b == null) {
+                return new Alignment(MathUtils.lerpDouble(a.x, 0.0, t), MathUtils.lerpDouble(a.y, 0.0, t));
+            }
+            return new Alignment(MathUtils.lerpDouble(a.x, b.x, t), MathUtils.lerpDouble(a.y, b.y, t));
+        }
+
         public bool Equals(Alignment other) {
             if (ReferenceEquals(null, other)) {
                 return false;
@@ -118,73 +127,36 @@ namespace Unity.UIWidgets.painting {
         public static bool operator !=(Alignment a, Alignment b) {
             return !(a == b);
         }
-    }
 
-    public class AlignmentDirectional : IEquatable<AlignmentDirectional> {
-        public AlignmentDirectional(double start, double y) {
-            this.start = start;
-            this.y = y;
-        }
-
-        public double start;
-        public double y;
-
-        public static readonly AlignmentDirectional topStart = new AlignmentDirectional(-1.0, -1.0);
-        public static readonly AlignmentDirectional topCenter = new AlignmentDirectional(0.0, -1.0);
-        public static readonly AlignmentDirectional topEnd = new AlignmentDirectional(1.0, -1.0);
-        public static readonly AlignmentDirectional centerStart = new AlignmentDirectional(-1.0, 0.0);
-        public static readonly AlignmentDirectional center = new AlignmentDirectional(0.0, 0.0);
-        public static readonly AlignmentDirectional centerEnd = new AlignmentDirectional(1.0, 0.0);
-        public static readonly AlignmentDirectional bottomStart = new AlignmentDirectional(-1.0, 1.0);
-        public static readonly AlignmentDirectional bottomCenter = new AlignmentDirectional(0.0, 1.0);
-        public static readonly AlignmentDirectional bottomEnd = new AlignmentDirectional(1.0, 1.0);
-
-        public AlignmentDirectional add(AlignmentDirectional other) {
-            return this + other;
-        }
-
-        public static AlignmentDirectional operator -(AlignmentDirectional a, AlignmentDirectional b) {
-            return new AlignmentDirectional(a.start - b.start, a.y - b.y);
-        }
-
-        public static AlignmentDirectional operator +(AlignmentDirectional a, AlignmentDirectional b) {
-            return new AlignmentDirectional(a.start + b.start, a.y + b.y);
-        }
-
-        public static AlignmentDirectional operator -(AlignmentDirectional a) {
-            return new AlignmentDirectional(-a.start, -a.y);
-        }
-
-        public static AlignmentDirectional operator *(AlignmentDirectional a, double b) {
-            return new AlignmentDirectional(a.start * b, a.y * b);
-        }
-
-        public static AlignmentDirectional operator /(AlignmentDirectional a, double b) {
-            return new AlignmentDirectional(a.start / b, a.y / b);
-        }
-
-        public static AlignmentDirectional operator %(AlignmentDirectional a, double b) {
-            return new AlignmentDirectional(a.start % b, a.y % b);
-        }
-
-        public bool Equals(AlignmentDirectional other) {
-            if (ReferenceEquals(null, other)) {
-                return false;
+        public override string ToString() {
+            if (this.x == -1.0 && this.y == -1.0) {
+                return "topLeft";
             }
-            if (ReferenceEquals(this, other)) {
-                return true;
+            if (this.x == 0.0 && this.y == -1.0) {
+                return "topCenter";
             }
-            return this.start.Equals(other.start) && this.y.Equals(other.y);
-        }
-
-        public Alignment resolve(TextDirection direction) {
-            switch (direction) {
-                case TextDirection.rtl:
-                    return new Alignment(-this.start, this.y);
-                case TextDirection.ltr:
-                    return new Alignment(this.start, this.y);
+            if (this.x == 1.0 && this.y == -1.0) {
+                return "topRight";
             }
-            return null;
+            if (this.x == -1.0 && this.y == 0.0) {
+                return "centerLeft";
+            }
+            if (this.x == 0.0 && this.y == 0.0) {
+                return "center";
+            }
+            if (this.x == 1.0 && this.y == 0.0) {
+                return "centerRight";
+            }
+            if (this.x == -1.0 && this.y == 1.0) {
+                return "bottomLeft";
+            }
+            if (this.x == 0.0 && this.y == 1.0) {
+                return "bottomCenter";
+            }
+            if (this.x == 1.0 && this.y == 1.0) {
+                return "bottomRight";
+            }
+            return $"Alignment({this.x:F1}, {this.y:F1})";
         }
     }
 }

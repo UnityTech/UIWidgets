@@ -7,6 +7,12 @@ namespace Unity.UIWidgets.ui {
         public Color(long value) {
             this.value = value & 0xFFFFFFFF;
         }
+        
+        public static readonly Color clear = new Color(0x00000000);
+
+        public static readonly Color black = new Color(0xFF000000);
+
+        public static readonly Color white = new Color(0xFFFFFFFF);
 
         public static Color fromARGB(int a, int r, int g, int b) {
             return new Color(
@@ -291,30 +297,6 @@ namespace Unity.UIWidgets.ui {
 
         public static UnityEngine.Rect toRect(this Rect rect) {
             return new UnityEngine.Rect((float) rect.left, (float) rect.top, (float) rect.width, (float) rect.height);
-        }
-
-        public static Vector4 toVector(this BorderWidth borderWidth) {
-            return new Vector4((float) borderWidth.left, (float) borderWidth.top, (float) borderWidth.right,
-                (float) borderWidth.bottom);
-        }
-
-        public static float[] toFloatArray(this BorderWidth borderWidth) {
-            return new[] {
-                (float) borderWidth.left, (float) borderWidth.top,
-                (float) borderWidth.right, (float) borderWidth.bottom
-            };
-        }
-
-        public static Vector4 toVector(this BorderRadius borderRadius) {
-            return new Vector4((float) borderRadius.topLeft, (float) borderRadius.topRight,
-                (float) borderRadius.bottomRight, (float) borderRadius.bottomLeft);
-        }
-
-        public static float[] toFloatArray(this BorderRadius borderRadius) {
-            return new[] {
-                (float) borderRadius.topLeft, (float) borderRadius.topRight,
-                (float) borderRadius.bottomRight, (float) borderRadius.bottomLeft
-            };
         }
 
         public static float alignToPixel(this float v, float devicePixelRatio) {

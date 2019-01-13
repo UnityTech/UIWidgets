@@ -85,7 +85,7 @@ namespace UIWidgets.Tests {
 
             this._windowAdapter.OnGUI();
 
-            if (Event.current.type == EventType.Repaint) {
+            if (Event.current.type == EventType.Repaint || Event.current.type == EventType.MouseDown) {
                 this.createRenderTexture();
 
                 Window.instance = this._windowAdapter;
@@ -147,16 +147,31 @@ namespace UIWidgets.Tests {
                 color = new Color(0xFFFF0000),
             };
 
-            canvas.drawRect(
-                Unity.UIWidgets.ui.Rect.fromLTRB(10, 10, 110, 110),
-                paint);
+//            canvas.drawRect(
+//                Unity.UIWidgets.ui.Rect.fromLTRB(10, 10, 110, 110),
+//                paint);
 
             var path = new Path();
             path.moveTo(10, 150);
             path.lineTo(10, 160);
             path.lineTo(140, 120);
             path.lineTo(110, 180);
+            path.winding(PathWinding.clockwise);
             path.close();
+            path.addRect(Unity.UIWidgets.ui.Rect.fromLTWH(0, 100, 100, 100));
+            path.addRect(Unity.UIWidgets.ui.Rect.fromLTWH(200, 0, 100, 100));
+            path.addRRect(RRect.fromRectAndRadius(Unity.UIWidgets.ui.Rect.fromLTWH(150, 100, 30, 30), 10));
+            path.addOval(Unity.UIWidgets.ui.Rect.fromLTWH(150, 50, 100, 100));
+            path.winding(PathWinding.clockwise);
+
+            if (Event.current.type == EventType.MouseDown) {
+                var pos = new Offset(
+                    Event.current.mousePosition.x,
+                    Event.current.mousePosition.y
+                );
+                
+                Debug.Log(pos + ": " + path.contains(pos));
+            }
 
             canvas.drawPath(path, paint);
             canvas.flush();

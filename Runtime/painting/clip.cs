@@ -35,6 +35,11 @@ namespace Unity.UIWidgets.painting {
             this.canvas.restore();
         }
 
+        public void clipPathAndPaint(Path path, Clip clipBehavior, Rect bounds, Action painter) {
+            this._clipAndPaint((bool doAntiAias) => this.canvas.clipPath(path),
+                clipBehavior, bounds, painter);
+        }
+
         public void clipRRectAndPaint(RRect rrect, Clip clipBehavior, Rect bounds, Action painter) {
             this._clipAndPaint(doAntiAias => this.canvas.clipRRect(rrect),
                 clipBehavior, bounds, painter);

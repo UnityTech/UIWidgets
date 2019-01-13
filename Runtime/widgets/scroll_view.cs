@@ -41,7 +41,7 @@ namespace Unity.UIWidgets.widgets {
         public readonly double? cacheExtent;
 
         protected AxisDirection getDirection(BuildContext context) {
-            return AxisUtils.getAxisDirectionFromAxisReverseAndDirectionality(
+            return LayoutUtils.getAxisDirectionFromAxisReverseAndDirectionality(
                 context, this.scrollDirection, this.reverse);
         }
 
