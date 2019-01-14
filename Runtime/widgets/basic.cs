@@ -47,6 +47,55 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
+    public class CustomPaint : SingleChildRenderObjectWidget {
+
+        public CustomPaint(
+            Key key = null,
+            CustomPainter painter = null,
+            CustomPainter foregroundPainter = null,
+            Size size = null,
+            bool isComplex = false,
+            bool willChange = false,
+            Widget child = null
+        ) : base(key: key, child: child) {
+            size = size ?? Size.zero;
+            this.size = size;
+            this.painter = painter;
+            this.foregroundPainter = foregroundPainter;
+            this.isComplex = isComplex;
+            this.willChange = willChange;
+        }
+
+        public readonly CustomPainter painter;
+        public readonly CustomPainter foregroundPainter;
+        public readonly Size size;
+        public readonly bool isComplex;
+        public readonly bool willChange;
+        
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderCustomPaint(
+                painter: this.painter,
+                foregroundPainter: this.foregroundPainter,
+                preferredSize: this.size,
+                isComplex: this.isComplex,
+                willChange: this.willChange
+            );
+        }
+        
+        public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
+            ((RenderCustomPaint) renderObject).painter = this.painter;
+            ((RenderCustomPaint) renderObject).foregroundPainter = this.foregroundPainter;
+            ((RenderCustomPaint) renderObject).preferredSize = this.size;
+            ((RenderCustomPaint) renderObject).isComplex = this.isComplex;
+            ((RenderCustomPaint)renderObject).willChange = this.willChange;
+        }
+
+        public override void didUnmountRenderObject(RenderObject renderObject) {
+            ((RenderCustomPaint)renderObject).painter = null;
+            ((RenderCustomPaint)renderObject).foregroundPainter = null;
+        }
+    }
+
     public class LimitedBox : SingleChildRenderObjectWidget {
         public LimitedBox(
             Key key = null,
