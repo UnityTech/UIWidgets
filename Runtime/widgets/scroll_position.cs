@@ -59,7 +59,7 @@ namespace Unity.UIWidgets.widgets {
 
         public override double pixels {
             get {
-                D.assert(this._pixels != null);
+                //D.assert(this._pixels != null);
                 return this._pixels ?? 0.0;
             }
         }
@@ -67,7 +67,7 @@ namespace Unity.UIWidgets.widgets {
         internal double? _pixels;
 
         public double viewportDimension {
-            get { return this._viewportDimension.Value; }
+            get { return this._viewportDimension??0.0; }
         }
 
         double? _viewportDimension;
@@ -157,14 +157,14 @@ namespace Unity.UIWidgets.widgets {
             this.notifyListeners();
         }
 
-        protected void saveScrollOffset() {
+        protected virtual void saveScrollOffset() {
             var pageStorage = PageStorage.of(this.context.storageContext);
             if (pageStorage != null) {
                 pageStorage.writeState(this.context.storageContext, this.pixels);
             }
         }
 
-        protected void restoreScrollOffset() {
+        protected virtual void restoreScrollOffset() {
             if (this._pixels == null) {
                 var pageStorage = PageStorage.of(this.context.storageContext);
                 if (pageStorage != null) {

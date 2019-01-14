@@ -219,6 +219,26 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
+    public class SliverFillViewport: SliverMultiBoxAdaptorWidget {
+        
+        public SliverFillViewport(
+            Key key = null, SliverChildDelegate del = null,
+            double viewportFraction = 1.0): base(key: key, del: del) {
+            D.assert(viewportFraction > 0.0);
+            this.viewportFraction = viewportFraction;
+        }
+    
+        public readonly double viewportFraction;
+    
+        public override RenderObject createRenderObject(BuildContext context) {
+            SliverMultiBoxAdaptorElement element = (SliverMultiBoxAdaptorElement)context;
+            return new RenderSliverFillViewport(childManager: element, viewportFraction: viewportFraction);
+        }
+    
+        public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
+            ((RenderSliverFillViewport)renderObject).viewportFraction = viewportFraction;
+        }
+    }
 
     public class SliverMultiBoxAdaptorElement : RenderObjectElement, RenderSliverBoxChildManager {
         public SliverMultiBoxAdaptorElement(SliverMultiBoxAdaptorWidget widget) : base(widget) {

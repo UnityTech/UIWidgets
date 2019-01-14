@@ -11,19 +11,19 @@ namespace Unity.UIWidgets.rendering {
 
         public abstract double itemExtent { get; set; }
 
-        protected double indexToLayoutOffset(double itemExtent, int index) {
+        protected  virtual double indexToLayoutOffset(double itemExtent, int index) {
             return itemExtent * index;
         }
 
-        protected int getMinChildIndexForScrollOffset(double scrollOffset, double itemExtent) {
+        protected virtual int getMinChildIndexForScrollOffset(double scrollOffset, double itemExtent) {
             return itemExtent > 0.0 ? Math.Max(0, (int) (scrollOffset / itemExtent)) : 0;
         }
 
-        protected int getMaxChildIndexForScrollOffset(double scrollOffset, double itemExtent) {
+        protected virtual int getMaxChildIndexForScrollOffset(double scrollOffset, double itemExtent) {
             return itemExtent > 0.0 ? Math.Max(0, (int) Math.Ceiling(scrollOffset / itemExtent) - 1) : 0;
         }
 
-        protected double estimateMaxScrollOffset(SliverConstraints constraints,
+        protected virtual double estimateMaxScrollOffset(SliverConstraints constraints,
             int firstIndex = 0,
             int lastIndex = 0,
             double leadingScrollOffset = 0.0,
