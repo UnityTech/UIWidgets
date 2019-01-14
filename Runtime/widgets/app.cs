@@ -267,6 +267,7 @@ namespace Unity.UIWidgets.widgets {
                 return true;
             });
 
+            result = new Directionality(child: result, TextDirection.ltr);
             result = new WindowProvider(
                 window: this.widget.window,
                 child: result

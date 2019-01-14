@@ -19,7 +19,7 @@ namespace Unity.UIWidgets.widgets {
             this.textDirection = textDirection;
         }
 
-        public TextDirection textDirection;
+        public readonly TextDirection textDirection;
 
         public static TextDirection of(BuildContext context) {
             Directionality widget = context.inheritFromWidgetOfExactType(typeof(Directionality)) as Directionality;
@@ -36,7 +36,7 @@ namespace Unity.UIWidgets.widgets {
             this.opacity = opacity;
         }
 
-        public double opacity;
+        public readonly double opacity;
 
         public override RenderObject createRenderObject(BuildContext context) {
             return new RenderOpacity(opacity: this.opacity);
@@ -784,6 +784,57 @@ namespace Unity.UIWidgets.widgets {
                 widthFactor: widthFactor,
                 heightFactor: heightFactor,
                 child: child) {
+        }
+    }
+
+    public class LayoutId : ParentDataWidget<CustomMultiChildLayout> {
+        public LayoutId(
+            Key key = null,
+            object id = null,
+            Widget child = null
+        ) : base(key: key ?? new ValueKey<object>(id), child: child) {
+            D.assert(child != null);
+            D.assert(id != null);
+            this.id = id;
+        }
+
+        public readonly object id;
+
+        public override void applyParentData(RenderObject renderObject) {
+            D.assert(renderObject.parentData is MultiChildLayoutParentData);
+            MultiChildLayoutParentData parentData = (MultiChildLayoutParentData) renderObject.parentData;
+            if (parentData.id != this.id) {
+                parentData.id = this.id;
+                var targetParent = renderObject.parent;
+                if (targetParent is RenderObject)
+                    ((RenderObject) targetParent).markNeedsLayout();
+            }
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new DiagnosticsProperty<object>("id", this.id));
+        }
+    }
+
+    public class CustomMultiChildLayout : MultiChildRenderObjectWidget {
+        public CustomMultiChildLayout(
+            Key key = null,
+            MultiChildLayoutDelegate layoutDelegate = null,
+            List<Widget> children = null
+        ) : base(key: key, children: children ?? new List<Widget>()) {
+            D.assert(layoutDelegate != null);
+            this.layoutDelegate = layoutDelegate;
+        }
+
+        public readonly MultiChildLayoutDelegate layoutDelegate;
+
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderCustomMultiChildLayoutBox(layoutDelegate: this.layoutDelegate);
+        }
+
+        public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
+            ((RenderCustomMultiChildLayoutBox) renderObject).layoutDelegate = this.layoutDelegate;
         }
     }
 
