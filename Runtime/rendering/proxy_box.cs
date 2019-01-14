@@ -513,7 +513,7 @@ namespace Unity.UIWidgets.rendering {
                 }
 
                 if (this._painter != null) {
-                    this._painter.dispose();
+                    this._painter.Dispose();
                     this._painter = null;
                 }
 
@@ -555,7 +555,7 @@ namespace Unity.UIWidgets.rendering {
 
         public override void detach() {
             if (this._painter != null) {
-                this._painter.dispose();
+                this._painter.Dispose();
                 this._painter = null;
             }
 

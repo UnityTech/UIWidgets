@@ -40,7 +40,7 @@ namespace Unity.UIWidgets.painting {
                     return this.vertical;
             }
 
-            throw new InvalidOperationException();
+            throw new Exception("unknown axis");
         }
 
         public Size collapsedSize {
@@ -186,6 +186,24 @@ namespace Unity.UIWidgets.painting {
             );
         }
 
+        public static EdgeInsets lerp(EdgeInsets a, EdgeInsets b, double t) {
+            if (a == null && b == null) {
+                return null;
+            }
+            if (a == null) {
+                return b * t;
+            }
+            if (b == null) {
+                return a * (1.0 - t);
+            }
+            return EdgeInsets.fromLTRB(
+                MathUtils.lerpDouble(a.left, b.left, t),
+                MathUtils.lerpDouble(a.top, b.top, t),
+                MathUtils.lerpDouble(a.right, b.right, t),
+                MathUtils.lerpDouble(a.bottom, b.bottom, t)
+            );
+        }
+
         public EdgeInsets copyWith(
             double? left = null,
             double? top = null,
@@ -242,6 +260,19 @@ namespace Unity.UIWidgets.painting {
 
         public static bool operator !=(EdgeInsets a, EdgeInsets b) {
             return !(a == b);
+        }
+
+        public override string ToString() {
+            if (this.left == 0.0 && this.right == 0.0 && this.top == 0.0 && this.bottom == 0.0) {
+                return "EdgeInsets.zero";
+            }
+            if (this.left == this.right && this.right == this.top && this.top == this.bottom) {
+                return $"EdgeInsets.all({this.left:F1})";
+            }
+            return $"EdgeInsets({this.left:F1}, " +
+                   $"{this.top:F1}, " +
+                   $"{this.right:F1}, " +
+                   $"{this.bottom:F1})";
         }
     }
 }

@@ -1,51 +1,152 @@
 using System;
+using System.Text;
 using Unity.UIWidgets.ui;
 
 namespace Unity.UIWidgets.painting {
     public class BorderRadius : IEquatable<BorderRadius> {
         BorderRadius(
-            double topLeft,
-            double topRight,
-            double bottomRight,
-            double bottomLeft) {
-            this.topLeft = topLeft;
-            this.topRight = topRight;
-            this.bottomRight = bottomRight;
-            this.bottomLeft = bottomLeft;
+            Radius topLeft,
+            Radius topRight,
+            Radius bottomRight,
+            Radius bottomLeft) {
+            this.topLeft = topLeft ?? Radius.zero;
+            this.topRight = topRight ?? Radius.zero;
+            this.bottomRight = bottomRight ?? Radius.zero;
+            this.bottomLeft = bottomLeft ?? Radius.zero;
         }
 
+        public static BorderRadius all(Radius radius) {
+            return only(radius, radius, radius, radius);
+        }
+        
         public static BorderRadius all(double radius) {
             return only(radius, radius, radius, radius);
         }
 
-        public static BorderRadius vertical(double top, double bottom) {
+        public static BorderRadius circular(double radius) {
+            return BorderRadius.all(Radius.circular(radius));
+        }
+
+        public static BorderRadius vertical(Radius top = null, Radius bottom = null) {
+            return only(top, top, bottom, bottom);
+        }
+        
+        public static BorderRadius vertical(double? top = null, double? bottom = null) {
             return only(top, top, bottom, bottom);
         }
 
-        public static BorderRadius horizontal(double left, double right) {
+        public static BorderRadius horizontal(Radius left = null, Radius right = null) {
+            return only(left, right, right, left);
+        }
+        
+        public static BorderRadius horizontal(double? left = null, double? right = null) {
             return only(left, right, right, left);
         }
 
         public static BorderRadius only(
-            double topLeft = 0.0, double topRight = 0.0,
-            double bottomRight = 0.0, double bottomLeft = 0.0) {
+            Radius topLeft = null, Radius topRight = null,
+            Radius bottomRight = null, Radius bottomLeft = null) {
             return new BorderRadius(topLeft, topRight, bottomRight, bottomLeft);
         }
+        
+        public static BorderRadius only(
+            double? topLeft = null, double? topRight = null,
+            double? bottomRight = null, double? bottomLeft = null) {
+            var tlRadius = topLeft != null ? Radius.circular(topLeft.Value) : null;
+            var trRadius = topRight != null ? Radius.circular(topRight.Value) : null;
+            var brRadius = bottomRight != null ? Radius.circular(bottomRight.Value) : null;
+            var blRadius = bottomLeft != null ? Radius.circular(bottomLeft.Value) : null;
+            
+            return new BorderRadius(tlRadius, trRadius, brRadius, blRadius);
+        }
 
-        public static readonly BorderRadius zero = all(0);
+        public static readonly BorderRadius zero = all(Radius.zero);
 
-        public readonly double topLeft;
-        public readonly double topRight;
-        public readonly double bottomRight;
-        public readonly double bottomLeft;
+        public readonly Radius topLeft;
+        public readonly Radius topRight;
+        public readonly Radius bottomRight;
+        public readonly Radius bottomLeft;
 
         public RRect toRRect(Rect rect) {
             return RRect.fromRectAndCorners(
                 rect,
                 topLeft: this.topLeft,
                 topRight: this.topRight,
-                bottomLeft: this.bottomLeft,
-                bottomRight: this.bottomRight
+                bottomRight: this.bottomRight,
+                bottomLeft: this.bottomLeft
+            );
+        }
+
+        public static BorderRadius operator -(BorderRadius it, BorderRadius other) {
+            return BorderRadius.only(
+                topLeft: it.topLeft - other.topLeft,
+                topRight: it.topRight - other.topRight,
+                bottomLeft: it.bottomLeft - other.bottomLeft,
+                bottomRight: it.bottomRight - other.bottomRight
+            );
+        }
+
+        public static BorderRadius operator +(BorderRadius it, BorderRadius other) {
+            return BorderRadius.only(
+                topLeft: it.topLeft + other.topLeft,
+                topRight: it.topRight + other.topRight,
+                bottomLeft: it.bottomLeft + other.bottomLeft,
+                bottomRight: it.bottomRight + other.bottomRight
+            );
+        }
+
+        public static BorderRadius operator -(BorderRadius it) {
+            return BorderRadius.only(
+                topLeft: -it.topLeft,
+                topRight: -it.topRight,
+                bottomLeft: -it.bottomLeft,
+                bottomRight: -it.bottomRight
+            );
+        }
+
+        public static BorderRadius operator *(BorderRadius it, double other) {
+            return BorderRadius.only(
+                topLeft: it.topLeft * other,
+                topRight: it.topRight * other,
+                bottomLeft: it.bottomLeft * other,
+                bottomRight: it.bottomRight * other
+            );
+        }
+
+        public static BorderRadius operator /(BorderRadius it, double other) {
+            return BorderRadius.only(
+                topLeft: it.topLeft / other,
+                topRight: it.topRight / other,
+                bottomLeft: it.bottomLeft / other,
+                bottomRight: it.bottomRight / other
+            );
+        }
+
+        public static BorderRadius operator %(BorderRadius it, double other) {
+            return BorderRadius.only(
+                topLeft: it.topLeft % other,
+                topRight: it.topRight % other,
+                bottomLeft: it.bottomLeft % other,
+                bottomRight: it.bottomRight % other
+            );
+        }
+
+        public static BorderRadius lerp(BorderRadius a, BorderRadius b, double t) {
+            if (a == null && b == null) {
+                return null;
+            }
+            if (a == null) {
+                return b * t;
+            }
+            if (b == null) {
+                return a * (1.0 - t);
+            }
+
+            return BorderRadius.only(
+                topLeft: Radius.lerp(a.topLeft, b.topLeft, t),
+                topRight: Radius.lerp(a.topRight, b.topRight, t),
+                bottomLeft: Radius.lerp(a.bottomLeft, b.bottomLeft, t),
+                bottomRight: Radius.lerp(a.bottomRight, b.bottomRight, t)
             );
         }
 
@@ -84,71 +185,55 @@ namespace Unity.UIWidgets.painting {
                 return hashCode;
             }
         }
-    }
 
-    public class BorderWidth : IEquatable<BorderWidth> {
-        BorderWidth(
-            double top,
-            double right,
-            double bottom,
-            double left) {
-            this.top = top;
-            this.right = right;
-            this.bottom = bottom;
-            this.left = left;
-        }
-
-        public static BorderWidth only(
-            double top = 0, double right = 0,
-            double bottom = 0, double left = 0) {
-            return new BorderWidth(top, right, bottom, left);
-        }
-
-        public static BorderWidth all(double width) {
-            return only(width, width, width, width);
-        }
-
-        public static readonly BorderWidth zero = only();
-
-        public readonly double top;
-        public readonly double right;
-        public readonly double bottom;
-        public readonly double left;
-
-        public bool Equals(BorderWidth other) {
-            if (ReferenceEquals(null, other)) {
-                return false;
+        public override string ToString() {
+            string visual = null;
+            if (this.topLeft == this.topRight &&
+                this.topRight == this.bottomLeft &&
+                this.bottomLeft == this.bottomRight) {
+                if (this.topLeft != Radius.zero) {
+                    if (this.topLeft.x == this.topLeft.y) {
+                        visual = $"BorderRadius.circular({this.topLeft.x:F1})";
+                    } else {
+                        visual = $"BorderRadius.all({this.topLeft})";
+                    }
+                }
+            } else {
+                var result = new StringBuilder();
+                result.Append("BorderRadius.only(");
+                bool comma = false;
+                if (this.topLeft != Radius.zero) {
+                    result.Append($"topLeft: {this.topLeft}");
+                    comma = true;
+                }
+                if (this.topRight != Radius.zero) {
+                    if (comma) {
+                        result.Append(", ");
+                    }
+                    result.Append($"topRight: {this.topRight}");
+                    comma = true;
+                }
+                if (this.bottomLeft != Radius.zero) {
+                    if (comma) {
+                        result.Append(", ");
+                    }
+                    result.Append($"bottomLeft: {this.bottomLeft}");
+                    comma = true;
+                }
+                if (this.bottomRight != Radius.zero) {
+                    if (comma) {
+                        result.Append(", ");
+                    }
+                    result.Append($"bottomRight: {this.bottomRight}");
+                }
+                result.Append(")");
+                visual = result.ToString();
             }
-            if (ReferenceEquals(this, other)) {
-                return true;
-            }
-            return this.top.Equals(other.top)
-                   && this.right.Equals(other.right)
-                   && this.bottom.Equals(other.bottom)
-                   && this.left.Equals(other.left);
-        }
 
-        public override bool Equals(object obj) {
-            if (ReferenceEquals(null, obj)) {
-                return false;
+            if (visual != null) {
+                return visual;
             }
-            if (ReferenceEquals(this, obj)) {
-                return true;
-            }
-            if (obj.GetType() != this.GetType()) {
-                return false;
-            }
-            return this.Equals((BorderWidth) obj);
-        }
-
-        public override int GetHashCode() {
-            unchecked {
-                var hashCode = this.top.GetHashCode();
-                hashCode = (hashCode * 397) ^ this.right.GetHashCode();
-                hashCode = (hashCode * 397) ^ this.bottom.GetHashCode();
-                hashCode = (hashCode * 397) ^ this.left.GetHashCode();
-                return hashCode;
-            }
+            return "BorderRadius.zero";
         }
     }
 }

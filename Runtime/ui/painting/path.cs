@@ -11,6 +11,8 @@ namespace Unity.UIWidgets.ui {
         readonly List<float> _commands = new List<float>();
         float _commandx;
         float _commandy;
+        float _minX, _minY;
+        float _maxX, _maxY;
 
         PathCache _cache;
 
@@ -59,25 +61,69 @@ namespace Unity.UIWidgets.ui {
             return this._cache;
         }
 
-        public void reset() {
+        public Path() {
+            this._reset();
+        }
+
+        void _reset() {
             this._commands.Clear();
             this._commandx = 0;
             this._commandy = 0;
+            this._minX = float.MaxValue;
+            this._minY = float.MaxValue;
+            this._maxX = float.MinValue;
+            this._maxY = float.MinValue;
             this._cache = null;
         }
 
-        void _appendCommands(float[] vals) {
-            if (vals.Length == 1 && (PathCommand) vals[vals.Length - 1] == PathCommand.close) {
-                // last command is close
-            } else if (vals.Length == 2 && (PathCommand) vals[vals.Length - 2] == PathCommand.winding) {
-                // last command is winding
-            } else {
-                D.assert(vals.Length >= 2);
-                this._commandx = vals[vals.Length - 2];
-                this._commandy = vals[vals.Length - 1];
+        void _expandBounds(float x, float y) {
+            this._minX = Mathf.Min(this._minX, x);
+            this._minY = Mathf.Min(this._minY, y);
+            this._maxX = Mathf.Max(this._maxX, x);
+            this._maxY = Mathf.Max(this._maxY, y);
+        }
+
+        public Rect getBounds() {
+            if (this._minX >= this._maxX || this._minY >= this._maxY) {
+                return null;
             }
 
-            this._commands.AddRange(vals);
+            return Rect.fromLTRB(this._minX, this._minY, this._maxX, this._maxY);
+        }
+
+        void _appendCommands(float[] commands) {
+            var i = 0;
+            while (i < commands.Length) {
+                var cmd = (PathCommand) commands[i];
+                switch (cmd) {
+                    case PathCommand.moveTo:
+                    case PathCommand.lineTo:
+                        this._expandBounds(commands[i + 1], commands[i + 2]);
+                        this._commandx = commands[i + 1];
+                        this._commandy = commands[i + 2];
+                        i += 3;
+                        break;
+                    case PathCommand.bezierTo:
+                        this._expandBounds(commands[i + 1], commands[i + 2]);
+                        this._expandBounds(commands[i + 3], commands[i + 4]);
+                        this._expandBounds(commands[i + 5], commands[i + 6]);
+                        this._commandx = commands[i + 5];
+                        this._commandy = commands[i + 6];
+                        i += 7;
+                        break;
+                    case PathCommand.close:
+                        i++;
+                        break;
+                    case PathCommand.winding:
+                        i += 2;
+                        break;
+                    default:
+                        D.assert(false, "unknown cmd: " + cmd);
+                        break;
+                }
+            }
+
+            this._commands.AddRange(commands);
             this._cache = null;
         }
 
@@ -142,14 +188,17 @@ namespace Unity.UIWidgets.ui {
             float h = (float) rrect.height;
             float halfw = Mathf.Abs(w) * 0.5f;
             float halfh = Mathf.Abs(h) * 0.5f;
-            float rxBL = Mathf.Min((float) rrect.blRadius, halfw) * Mathf.Sign(w);
-            float ryBL = Mathf.Min((float) rrect.blRadius, halfh) * Mathf.Sign(h);
-            float rxBR = Mathf.Min((float) rrect.brRadius, halfw) * Mathf.Sign(w);
-            float ryBR = Mathf.Min((float) rrect.brRadius, halfh) * Mathf.Sign(h);
-            float rxTR = Mathf.Min((float) rrect.trRadius, halfw) * Mathf.Sign(w);
-            float ryTR = Mathf.Min((float) rrect.trRadius, halfh) * Mathf.Sign(h);
-            float rxTL = Mathf.Min((float) rrect.tlRadius, halfw) * Mathf.Sign(w);
-            float ryTL = Mathf.Min((float) rrect.tlRadius, halfh) * Mathf.Sign(h);
+            float signW = Mathf.Sign(w);
+            float signH = Mathf.Sign(h);
+
+            float rxBL = Mathf.Min((float) rrect.blRadiusX, halfw) * signW;
+            float ryBL = Mathf.Min((float) rrect.blRadiusY, halfh) * signH;
+            float rxBR = Mathf.Min((float) rrect.brRadiusX, halfw) * signW;
+            float ryBR = Mathf.Min((float) rrect.brRadiusY, halfh) * signH;
+            float rxTR = Mathf.Min((float) rrect.trRadiusX, halfw) * signW;
+            float ryTR = Mathf.Min((float) rrect.trRadiusY, halfh) * signH;
+            float rxTL = Mathf.Min((float) rrect.tlRadiusX, halfw) * signW;
+            float ryTL = Mathf.Min((float) rrect.tlRadiusY, halfh) * signH;
             float x = (float) rrect.left;
             float y = (float) rrect.top;
 
@@ -189,11 +238,523 @@ namespace Unity.UIWidgets.ui {
         public void addCircle(double cx, double cy, double r) {
             this.addEllipse(cx, cy, r, r);
         }
+
+        public void addOval(Rect oval) {
+            D.assert(oval != null);
+            var center = oval.center;
+            this.addEllipse(center.dx, center.dy, oval.width / 2, oval.height / 2);
+        }
+
+        public void addPolygon(IList<Offset> points, bool close) {
+            D.assert(points != null);
+            if (points.Count == 0) {
+                return;
+            }
+
+            var commands = new List<float>();
+            commands.Add((float) PathCommand.moveTo);
+            commands.Add((float) points[0].dx);
+            commands.Add((float) points[0].dy);
+
+            for (int i = 1; i < points.Count; i++) {
+                var point = points[i];
+                commands.Add((float) PathCommand.lineTo);
+                commands.Add((float) point.dx);
+                commands.Add((float) point.dy);
+            }
+
+            if (close) {
+                commands.Add((float) PathCommand.close);
+            }
+
+            this._appendCommands(commands.ToArray());
+        }
+
+        public void addPath(Path path, Offset offset) {
+            D.assert(path != null);
+
+            var commands = new List<float>();
+
+            var i = 0;
+            while (i < path._commands.Count) {
+                var cmd = (PathCommand) path._commands[i];
+                switch (cmd) {
+                    case PathCommand.moveTo:
+                    case PathCommand.lineTo:
+                        commands.Add(path._commands[i]);
+                        commands.Add(path._commands[i + 1] + (float) offset.dx);
+                        commands.Add(path._commands[i + 2] + (float) offset.dy);
+                        i += 3;
+                        break;
+                    case PathCommand.bezierTo:
+                        commands.Add(path._commands[i]);
+                        commands.Add(path._commands[i + 1] + (float) offset.dx);
+                        commands.Add(path._commands[i + 2] + (float) offset.dy);
+                        commands.Add(path._commands[i + 3] + (float) offset.dx);
+                        commands.Add(path._commands[i + 4] + (float) offset.dy);
+                        commands.Add(path._commands[i + 5] + (float) offset.dx);
+                        commands.Add(path._commands[i + 6] + (float) offset.dy);
+                        i += 7;
+                        break;
+                    case PathCommand.close:
+                        commands.Add(path._commands[i]);
+                        i++;
+                        break;
+                    case PathCommand.winding:
+                        commands.Add(path._commands[i]);
+                        commands.Add(path._commands[i + 1]);
+                        i += 2;
+                        break;
+                    default:
+                        D.assert(false, "unknown cmd: " + cmd);
+                        break;
+                }
+            }
+
+            this._appendCommands(commands.ToArray());
+        }
+
+        public bool contains(Offset point) {
+            var bounds = this.getBounds();
+            if (bounds == null) {
+                return false;
+            }
+
+            if (!bounds.containsInclusive(point)) {
+                return false;
+            }
+
+            float x = (float) point.dx;
+            float y = (float) point.dy;
+
+            float lastMoveToX = 0;
+            float lastMoveToY = 0;
+            float commandx = 0;
+            float commandy = 0;
+            PathWinding winding = PathWinding.counterClockwise;
+
+            var totalW = 0;
+            var w = 0;
+            var i = 0;
+            while (i < this._commands.Count) {
+                var cmd = (PathCommand) this._commands[i];
+                switch (cmd) {
+                    case PathCommand.moveTo:
+                        if (lastMoveToX != commandx || lastMoveToY != commandy) {
+                            w += windingLine(
+                                commandx, commandy,
+                                lastMoveToX, lastMoveToY,
+                                x, y);
+                        }
+
+                        if (w != 0) {
+                            totalW += winding == PathWinding.counterClockwise ? w : -w;
+                            w = 0;
+                        }
+
+                        lastMoveToX = commandx = this._commands[i + 1];
+                        lastMoveToY = commandy = this._commands[i + 2];
+                        winding = PathWinding.counterClockwise;
+                        i += 3;
+                        break;
+                    case PathCommand.lineTo:
+                        w += windingLine(
+                            commandx, commandy,
+                            this._commands[i + 1], this._commands[i + 2],
+                            x, y);
+                        commandx = this._commands[i + 1];
+                        commandy = this._commands[i + 2];
+                        i += 3;
+                        break;
+                    case PathCommand.bezierTo:
+                        w += windingCubic(
+                            commandx, commandy,
+                            this._commands[i + 1], this._commands[i + 2],
+                            this._commands[i + 3], this._commands[i + 4],
+                            this._commands[i + 5], this._commands[i + 6],
+                            x, y);
+                        commandx = this._commands[i + 5];
+                        commandy = this._commands[i + 6];
+                        i += 7;
+                        break;
+                    case PathCommand.close:
+                        i++;
+                        break;
+                    case PathCommand.winding:
+                        winding = (PathWinding) this._commands[i + 1];
+                        i += 2;
+                        break;
+                    default:
+                        D.assert(false, "unknown cmd: " + cmd);
+                        break;
+                }
+            }
+
+            if (lastMoveToX != commandx || lastMoveToY != commandy) {
+                w += windingLine(
+                    commandx, commandy,
+                    lastMoveToX, lastMoveToY,
+                    x, y);
+            }
+
+            if (w != 0) {
+                totalW += winding == PathWinding.counterClockwise ? w : -w;
+                w = 0;
+            }
+
+            return totalW != 0;
+        }
+
+        static int windingLine(float x0, float y0, float x1, float y1, float x, float y) {
+            if (y0 == y1) {
+                return 0;
+            }
+
+            int dir = 1; // down. y0 < y1
+            float minY = y0;
+            float maxY = y1;
+
+            if (y0 > y1) {
+                dir = -1;
+                minY = y1;
+                maxY = y0;
+            }
+
+            if (y < minY || y >= maxY) {
+                return 0;
+            }
+
+            float cross = (x1 - x0) * (y - y0) - (x - x0) * (y1 - y0);
+            if (cross == 0) {
+                return 0;
+            }
+
+            if (cross.sign() == dir) {
+                return 0;
+            }
+
+            return dir;
+        }
+
+        static int windingCubic(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4,
+            float x, float y) {
+
+            Offset[] src = {
+                new Offset(x1, y1),
+                new Offset(x2, y2),
+                new Offset(x3, y3),
+                new Offset(x4, y4),
+            };
+            
+            Offset[] dst = new Offset[10];
+            int n = _chopCubicAtYExtrema(src, dst);
+            
+            int w = 0;
+            for (int i = 0; i <= n; ++i) {
+                w += _winding_mono_cubic(dst, i * 3, x, y);
+            }
+            return w;
+        }
+
+        static int _winding_mono_cubic(Offset[] pts, int ptsBase, float x, float y) {
+            float y0 = (float) pts[ptsBase + 0].dy;
+            float y3 = (float) pts[ptsBase + 3].dy;
+
+            if (y0 == y3) {
+                return 0;
+            }
+
+            int dir = 1; // down. y0 < y3
+            float minY = y0;
+            float maxY = y3;
+
+            if (y0 > y3) {
+                dir = -1;
+                minY = y3;
+                maxY = y0;
+            }
+
+            if (y < minY || y >= maxY) {
+                return 0;
+            }
+
+            // quickreject or quickaccept
+            float minX = float.MaxValue, maxX = float.MinValue;
+            for (int i = 0; i < 4; i++) {
+                var dx = (float) pts[ptsBase + i].dx;
+                if (dx < minX) {
+                    minX = dx;
+                }
+                if (dx > maxX) {
+                    maxX = dx;
+                }
+            }
+
+            if (x < minX) {
+                return 0;
+            }
+            if (x > maxX) {
+                return dir;
+            }
+
+            // compute the actual x(t) value
+            float t;
+            if (!_chopMonoAtY(pts, ptsBase, y, out t)) {
+                return 0;
+            }
+
+            float xt = _eval_cubic_pts(
+                (float) pts[ptsBase + 0].dx,
+                (float) pts[ptsBase + 1].dx,
+                (float) pts[ptsBase + 2].dx,
+                (float) pts[ptsBase + 3].dx, t);
+
+            return xt < x ? dir : 0;
+        }
+
+        static float _eval_cubic_pts(float c0, float c1, float c2, float c3,
+            float t) {
+            float A = c3 + 3*(c1 - c2) - c0;
+            float B = 3*(c2 - c1 - c1 + c0);
+            float C = 3*(c1 - c0);
+            float D = c0;
+            return _poly_eval(A, B, C, D, t);
+        }
+        
+        static float _poly_eval(float A, float B, float C, float D, float t) {
+            return ((A * t + B) * t + C) * t + D;
+        }
+        
+        static bool _chopMonoAtY(Offset[] pts, int ptsBase, float y, out float t) {
+            float[] ycrv = {
+                (float) pts[ptsBase + 0].dy - y,
+                (float) pts[ptsBase + 1].dy - y,
+                (float) pts[ptsBase + 2].dy - y,
+                (float) pts[ptsBase + 3].dy - y
+            };
+
+            // NEWTON_RAPHSON Quadratic convergence, typically <= 3 iterations.
+            // Initial guess.
+            // is not only monotonic but degenerate.
+            float t1 = ycrv[0] / (ycrv[0] - ycrv[3]);
+
+            // Newton's iterations.
+            const float tol = 1f / 16384; // This leaves 2 fixed noise bits.
+            float t0;
+            const int maxiters = 5;
+            int iters = 0;
+            bool converged;
+            do {
+                t0 = t1;
+                float y01 = MathUtils.lerpFloat(ycrv[0], ycrv[1], t0);
+                float y12 = MathUtils.lerpFloat(ycrv[1], ycrv[2], t0);
+                float y23 = MathUtils.lerpFloat(ycrv[2], ycrv[3], t0);
+                float y012 = MathUtils.lerpFloat(y01, y12, t0);
+                float y123 = MathUtils.lerpFloat(y12, y23, t0);
+                float y0123 = MathUtils.lerpFloat(y012, y123, t0);
+                float yder = (y123 - y012) * 3;
+                t1 -= y0123 / yder;
+                converged = (t1 - t0).abs() <= tol; // NaN-safe
+                ++iters;
+            } while (!converged && (iters < maxiters));
+            t = t1;
+
+            // The result might be valid, even if outside of the range [0, 1], but
+            // we never evaluate a Bezier outside this interval, so we return false.
+            if (t1 < 0 || t1 > 1) {
+                return false;
+            }
+
+            return converged;
+        }
+
+        static void _flatten_double_cubic_extrema(Offset[] dst, int dstBase) {
+            var dy = dst[dstBase + 3].dy;
+            dst[dstBase + 2] = new Offset(dst[dstBase + 2].dx, dy);
+            dst[dstBase + 4] = new Offset(dst[dstBase + 4].dx, dy);
+        }
+
+        static int _chopCubicAtYExtrema(Offset[] src, Offset[] dst) {
+            D.assert(src != null && src.Length == 4);
+            D.assert(dst != null && dst.Length == 10);
+
+            float[] tValues = new float[2];
+            int roots = _findCubicExtrema(
+                (float) src[0].dy, (float) src[1].dy, (float) src[2].dy, (float) src[3].dy,
+                tValues);
+
+            _chopCubicAt(src, dst, tValues, roots);
+            if (dst != null && roots > 0) {
+                // we do some cleanup to ensure our Y extrema are flat
+                _flatten_double_cubic_extrema(dst, 0);
+                if (roots == 2) {
+                    _flatten_double_cubic_extrema(dst, 3);
+                }
+            }
+            return roots;
+        }
+
+        static void _chopCubicAt(Offset[] src, int srcBase, Offset[] dst, int dstBase, float t) {
+            D.assert(src != null && (src.Length == 4 || src.Length == 10));
+            D.assert(dst != null && dst.Length == 10);
+
+            D.assert(t > 0 && t < 1);
+
+            var p0 = src[srcBase + 0];
+            var p1 = src[srcBase + 1];
+            var p2 = src[srcBase + 2];
+            var p3 = src[srcBase + 3];
+
+            var ab = Offset.lerp(p0, p1, t);
+            var bc = Offset.lerp(p1, p2, t);
+            var cd = Offset.lerp(p2, p3, t);
+            var abc = Offset.lerp(ab, bc, t);
+            var bcd = Offset.lerp(bc, cd, t);
+            var abcd = Offset.lerp(abc, bcd, t);
+
+            dst[dstBase + 0] = p0;
+            dst[dstBase + 1] = ab;
+            dst[dstBase + 2] = abc;
+            dst[dstBase + 3] = abcd;
+            dst[dstBase + 4] = bcd;
+            dst[dstBase + 5] = cd;
+            dst[dstBase + 6] = p3;
+        }
+
+        static void _chopCubicAt(Offset[] src, Offset[] dst, float[] tValues, int roots) {
+            D.assert(src != null && src.Length == 4);
+            D.assert(dst != null && dst.Length == 10);
+
+            D.assert(() => {
+                for (int i = 0; i < roots - 1; i++) {
+                    D.assert(0 < tValues[i] && tValues[i] < 1);
+                    D.assert(0 < tValues[i + 1] && tValues[i + 1] < 1);
+                    D.assert(tValues[i] < tValues[i + 1]);
+                }
+                return true;
+            });
+
+            if (dst != null) {
+                if (roots == 0) {
+                    dst[0] = src[0];
+                    dst[1] = src[1];
+                    dst[2] = src[2];
+                    dst[3] = src[3];
+                } else {
+                    float t = tValues[0];
+
+                    int srcBase = 0;
+                    int dstBase = 0;
+                    for (int i = 0; i < roots; i++) {
+                        _chopCubicAt(src, srcBase, dst, dstBase, t);
+                        if (i == roots - 1) {
+                            break;
+                        }
+
+                        dstBase += 3;
+                        src = dst;
+                        srcBase = dstBase;
+
+                        // watch out in case the renormalized t isn't in range
+                        if (_valid_unit_divide(tValues[i + 1] - tValues[i], 1 - tValues[i], out t) == 0) {
+                            // if we can't, just create a degenerate cubic
+                            dst[dstBase + 4] = dst[dstBase + 5] = dst[dstBase + 6] = src[srcBase + 3];
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        /** Cubic'(t) = At^2 + Bt + C, where
+            A = 3(-a + 3(b - c) + d)
+            B = 6(a - 2b + c)
+            C = 3(b - a)
+            Solve for t, keeping only those that fit between 0 < t < 1
+        */
+        static int _findCubicExtrema(float a, float b, float c, float d, float[] tValues) {
+            // we divide A,B,C by 3 to simplify
+            float A = d - a + 3 * (b - c);
+            float B = 2 * (a - b - b + c);
+            float C = b - a;
+
+            return _findUnitQuadRoots(A, B, C, tValues);
+        }
+
+        static int _valid_unit_divide(float numer, float denom, out float ratio) {
+            ratio = 0;
+            
+            if (numer < 0) {
+                numer = -numer;
+                denom = -denom;
+            }
+
+            if (denom == 0 || numer == 0 || numer >= denom) {
+                return 0;
+            }
+
+            float r = numer / denom;
+            if (float.IsNaN(r)) {
+                return 0;
+            }
+            D.assert(r >= 0 && r < 1, $"numer {numer}, denom {denom}, r {r}");
+            if (r == 0) {
+                // catch underflow if numer <<<< denom
+                return 0;
+            }
+
+            ratio = r;
+            return 1;
+        }
+
+        // Just returns its argument, but makes it easy to set a break-point to know when
+        // _findUnitQuadRoots is going to return 0 (an error).
+        static int _return_check_zero(int value) {
+            if (value == 0) {
+                return 0;
+            }
+            return value;
+        }
+
+        static int _findUnitQuadRoots(float A, float B, float C, float[] roots) {
+            if (A == 0) {
+                return _return_check_zero(_valid_unit_divide(-C, B, out roots[0]));
+            }
+
+            int r = 0;
+
+            // use doubles so we don't overflow temporarily trying to compute R
+            double dr = (double) B * B - 4 * (double) A * C;
+            if (dr < 0) {
+                return _return_check_zero(0);
+            }
+            dr = Math.Sqrt(dr);
+            float R = (float) dr;
+
+            if (float.IsInfinity(R)) {
+                return _return_check_zero(0);
+            }
+
+            float Q = (B < 0) ? -(B - R) / 2 : -(B + R) / 2;
+            r += _valid_unit_divide(Q, A, out roots[r]);
+            r += _valid_unit_divide(C, Q, out roots[r]);
+            if (r == 2) {
+                if (roots[0] > roots[1]) {
+                    float tmp = roots[0];
+                    roots[0] = roots[1];
+                    roots[1] = tmp;
+                } else if (roots[0] == roots[1]) {
+                    // nearly-equal?
+                    r -= 1; // skip the double root
+                }
+            }
+            return _return_check_zero(r);
+        }
     }
 
     public enum PathWinding {
-        counterClockwise = 1,
-        clockwise = 2,
+        counterClockwise = 1, // which just means the order as the input is.
+        clockwise = 2, // which just means the reversed order.
     }
 
     [Flags]
@@ -286,7 +847,7 @@ namespace Unity.UIWidgets.ui {
         public void addPoint(float x, float y, PointFlags flags) {
             PathUtils.transformPoint(out x, out y, this._xform, x, y);
 
-            this._addPoint(new PathPoint{x = x, y = y, flags = flags});
+            this._addPoint(new PathPoint {x = x, y = y, flags = flags});
         }
 
         void _addPoint(PathPoint point) {
@@ -368,9 +929,7 @@ namespace Unity.UIWidgets.ui {
                 }
 
                 if (path.count > 2) {
-                    var area = PathUtils.polyArea(this._points, path.first, path.count);
-                    if (path.winding == PathWinding.counterClockwise && area < 0.0f ||
-                        path.winding == PathWinding.clockwise && area > 0.0f) {
+                    if (path.winding == PathWinding.clockwise) {
                         PathUtils.polyReverse(this._points, path.first, path.count);
                     }
                 }
@@ -466,10 +1025,10 @@ namespace Unity.UIWidgets.ui {
             }
 
             D.assert(indices.Count == cindices);
-            
+
             var mesh = new MeshMesh(this._vertices, indices);
             this._fillMesh = mesh;
-            
+
             this._fillConvex = false;
             for (var i = 0; i < this._paths.Count; i++) {
                 var path = this._paths[i];
@@ -1016,7 +1575,7 @@ namespace Unity.UIWidgets.ui {
             this.vertices = vertices;
             this.triangles = triangles;
             this.uv = uv;
-            
+
             double minX = vertices[0].x;
             double maxX = vertices[0].x;
             double minY = vertices[0].y;
@@ -1049,7 +1608,7 @@ namespace Unity.UIWidgets.ui {
                 PathUtils.transformPoint(out x, out y, xform, vertex.x, vertex.y);
                 transVertices.Add(new Vector3(x, y));
             }
-            
+
             return new MeshMesh(transVertices, this.triangles, this.uv);
         }
     }

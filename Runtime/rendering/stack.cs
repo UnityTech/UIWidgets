@@ -178,13 +178,11 @@ namespace Unity.UIWidgets.rendering {
     public class RenderStack : RenderBoxContainerDefaultsMixinContainerRenderObjectMixinRenderBox<RenderBox,
         StackParentData> {
         public RenderStack(
-            TextDirection? textDirection,
             StackFit? fit,
             Overflow? overflow,
             List<RenderBox> children = null,
-            AlignmentDirectional alignment = null) {
-            this._alignment = alignment ?? AlignmentDirectional.topStart;
-            this._textDirection = textDirection ?? TextDirection.ltr;
+            Alignment alignment = null) {
+            this._alignment = alignment ?? Alignment.topLeft;
             this._fit = fit ?? StackFit.loose;
             this._overflow = overflow ?? Overflow.clip;
             this.addAll(children);
@@ -198,43 +196,16 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
-        Alignment _resolvedAlignment;
+        Alignment _alignment;
 
-        void _resolve() {
-            if (this._resolvedAlignment != null) {
-                return;
-            }
-            this._resolvedAlignment = this.alignment.resolve(this.textDirection);
-        }
-
-        void _markNeedResolution() {
-            this._resolvedAlignment = null;
-            this.markNeedsLayout();
-        }
-
-        AlignmentDirectional _alignment;
-
-        public AlignmentDirectional alignment {
+        public Alignment alignment {
             get { return this._alignment; }
             set {
                 if (this._alignment == value) {
                     return;
                 }
                 this._alignment = value;
-                this._markNeedResolution();
-            }
-        }
-
-        TextDirection _textDirection;
-
-        public TextDirection textDirection {
-            get { return this._textDirection; }
-            set {
-                if (this._textDirection == value) {
-                    return;
-                }
-                this._textDirection = value;
-                this._markNeedResolution();
+                this.markNeedsLayout();
             }
         }
 
@@ -304,8 +275,6 @@ namespace Unity.UIWidgets.rendering {
         }
 
         protected override void performLayout() {
-            this._resolve();
-            D.assert(this._resolvedAlignment != null);
             this._hasVisualOverflow = false;
             bool hasNonPositionedChildren = false;
             if (this.childCount == 0) {
@@ -360,7 +329,7 @@ namespace Unity.UIWidgets.rendering {
                 StackParentData childParentData = (StackParentData) child.parentData;
 
                 if (!childParentData.isPositioned) {
-                    childParentData.offset = this._resolvedAlignment.alongOffset(this.size - child.size);
+                    childParentData.offset = this._alignment.alongOffset(this.size - child.size);
                 } else {
                     BoxConstraints childConstraints = new BoxConstraints();
 
@@ -388,7 +357,7 @@ namespace Unity.UIWidgets.rendering {
                     } else if (childParentData.right != null) {
                         x = this.size.width - childParentData.right.Value - child.size.width;
                     } else {
-                        x = this._resolvedAlignment.alongOffset(this.size - child.size).dx;
+                        x = this._alignment.alongOffset(this.size - child.size).dx;
                     }
 
                     if (x < 0.0 || x + child.size.width > this.size.width) {
@@ -401,7 +370,7 @@ namespace Unity.UIWidgets.rendering {
                     } else if (childParentData.bottom != null) {
                         y = this.size.height - childParentData.bottom.Value - child.size.height;
                     } else {
-                        y = this._resolvedAlignment.alongOffset(this.size - child.size).dy;
+                        y = this._alignment.alongOffset(this.size - child.size).dy;
                     }
 
                     if (y < 0.0 || y + child.size.height > this.size.height) {
@@ -438,7 +407,7 @@ namespace Unity.UIWidgets.rendering {
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
-            properties.add(new DiagnosticsProperty<AlignmentDirectional>("alignment", this.alignment));
+            properties.add(new DiagnosticsProperty<Alignment>("alignment", this.alignment));
             properties.add(new EnumProperty<StackFit>("fit", this.fit));
             properties.add(new EnumProperty<Overflow>("overflow", this.overflow));
         }

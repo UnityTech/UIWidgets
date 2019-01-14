@@ -1,14 +1,12 @@
 ﻿using System;
-using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
-using Unity.UIWidgets.widgets;
 
 namespace Unity.UIWidgets.painting {
-    public enum AxisDirection {
-        up,
-        right,
-        down,
-        left,
+    public enum RenderComparison {
+        identical,
+        metadata,
+        paint,
+        layout,
     }
 
     public enum Axis {
@@ -19,6 +17,13 @@ namespace Unity.UIWidgets.painting {
     public enum VerticalDirection {
         up,
         down,
+    }
+
+    public enum AxisDirection {
+        up,
+        right,
+        down,
+        left,
     }
 
     public static class AxisUtils {
@@ -84,33 +89,5 @@ namespace Unity.UIWidgets.painting {
 
             throw new Exception("unknown axisDirection");
         }
-
-        public static AxisDirection getAxisDirectionFromAxisReverseAndDirectionality(
-            BuildContext context,
-            Axis axis,
-            bool reverse
-        ) {
-            switch (axis) {
-                case Axis.horizontal:
-                    D.assert(WidgetsD.debugCheckHasDirectionality(context));
-                    TextDirection textDirection = Directionality.of(context);
-                    AxisDirection axisDirection = textDirectionToAxisDirection(textDirection);
-                    return reverse ? flipAxisDirection(axisDirection) : axisDirection;
-                case Axis.vertical:
-                    return reverse ? AxisDirection.up : AxisDirection.down;
-            }
-
-            throw new Exception("unknown axisDirection");
-        }
-    }
-
-    /// The values in this enum are ordered such that they are in increasing order
-    /// of cost. A value with index N implies all the values with index less than N.
-    /// For example, [layout] (index 3) implies [paint] (2).
-    public enum RenderComparison {
-        identical,
-        metadata,
-        paint,
-        layout,
     }
 }

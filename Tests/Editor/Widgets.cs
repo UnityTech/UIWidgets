@@ -124,7 +124,7 @@ namespace UIWidgets.Tests {
             rowImages.Add(text);
             return new Stack(
                 children: rowImages,
-                alignment: AlignmentDirectional.center
+                alignment: Alignment.center
             );
         }
 
@@ -534,7 +534,7 @@ namespace UIWidgets.Tests {
                 child: new Container(
                     color: CLColors.background3,
                     child: new Transform(
-                        transform: Matrix3.makeRotate(0, (float) px, (float) py),
+                        transform: Matrix3.makeRotate(45, (float) px, (float) py),
                         child:
                         new Column(
                             children: new List<Widget> {

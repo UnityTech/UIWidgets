@@ -1,9 +1,15 @@
 using System;
+using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
 
 namespace Unity.UIWidgets.painting {
-    public class Border : IEquatable<Border> {
+    public enum BoxShape {
+        rectangle,
+        circle,
+    }
+
+    public class Border : ShapeBorder, IEquatable<Border> {
         public Border(
             BorderSide top = null,
             BorderSide right = null,
@@ -16,20 +22,23 @@ namespace Unity.UIWidgets.painting {
             this.left = left ?? BorderSide.none;
         }
 
-        public readonly BorderSide top;
-        public readonly BorderSide right;
-        public readonly BorderSide bottom;
-        public readonly BorderSide left;
-
         public static Border all(
             Color color = null,
-            double width = 1.0
+            double width = 1.0,
+            BorderStyle style = BorderStyle.solid
         ) {
-            BorderSide side = new BorderSide(color: color, width: width);
+            BorderSide side = new BorderSide(color: color, width: width, style: style);
             return new Border(top: side, right: side, bottom: side, left: side);
         }
 
         public static Border merge(Border a, Border b) {
+            D.assert(a != null);
+            D.assert(b != null);
+            D.assert(BorderSide.canMerge(a.top, b.top));
+            D.assert(BorderSide.canMerge(a.right, b.right));
+            D.assert(BorderSide.canMerge(a.bottom, b.bottom));
+            D.assert(BorderSide.canMerge(a.left, b.left));
+
             return new Border(
                 top: BorderSide.merge(a.top, b.top),
                 right: BorderSide.merge(a.right, b.right),
@@ -38,7 +47,12 @@ namespace Unity.UIWidgets.painting {
             );
         }
 
-        public EdgeInsets dimensions {
+        public readonly BorderSide top;
+        public readonly BorderSide right;
+        public readonly BorderSide bottom;
+        public readonly BorderSide left;
+
+        public override EdgeInsets dimensions {
             get {
                 return EdgeInsets.fromLTRB(
                     this.left.width,
@@ -46,6 +60,10 @@ namespace Unity.UIWidgets.painting {
                     this.right.width,
                     this.bottom.width);
             }
+        }
+
+        public bool isUniform {
+            get { return this.isSameColor && this.isSameWidth && this.isSameStyle; }
         }
 
         public bool isSameColor {
@@ -66,123 +84,154 @@ namespace Unity.UIWidgets.painting {
             }
         }
 
-        public Border add(Border other) {
-            if (BorderSide.canMerge(this.top, other.top) &&
-                BorderSide.canMerge(this.right, other.right) &&
-                BorderSide.canMerge(this.bottom, other.bottom) &&
-                BorderSide.canMerge(this.left, other.left)) {
-                return merge(this, other);
+        public bool isSameStyle {
+            get {
+                var topStyle = this.top.style;
+                return this.right.style == topStyle
+                       && this.bottom.style == topStyle
+                       && this.left.style == topStyle;
+            }
+        }
+
+        public override ShapeBorder add(ShapeBorder other, bool reversed = false) {
+            if (!(other is Border border)) {
+                return null;
+            }
+
+            if (BorderSide.canMerge(this.top, border.top) &&
+                BorderSide.canMerge(this.right, border.right) &&
+                BorderSide.canMerge(this.bottom, border.bottom) &&
+                BorderSide.canMerge(this.left, border.left)) {
+                return merge(this, border);
             }
 
             return null;
         }
 
-        public void paint(Canvas canvas, Rect rect, BorderRadius borderRadius = null) {
-            if (this.isSameColor && this.isSameWidth) {
-                if (borderRadius == null) {
-                    var width = this.top.width;
-                    var paint = new Paint {
-                        color = this.top.color,
-                        strokeWidth = width,
-                        style = PaintingStyle.stroke
-                    };
+        public override ShapeBorder scale(double t) {
+            return new Border(
+                top: this.top.scale(t),
+                right: this.right.scale(t),
+                bottom: this.bottom.scale(t),
+                left: this.left.scale(t)
+            );
+        }
 
-                    canvas.drawRect(rect.deflate(width / 2), paint);
-                    return;
+        public override ShapeBorder lerpFrom(ShapeBorder a, double t) {
+            if (a is Border border) {
+                return Border.lerp(border, this, t);
+            }
+
+            return base.lerpFrom(a, t);
+        }
+
+        public override ShapeBorder lerpTo(ShapeBorder b, double t) {
+            if (b is Border border) {
+                return Border.lerp(this, border, t);
+            }
+            return base.lerpTo(b, t);
+        }
+
+        public static Border lerp(Border a, Border b, double t) {
+            if (a == null && b == null) {
+                return null;
+            }
+            if (a == null) {
+                return (Border) b.scale(t);
+            }
+            if (b == null) {
+                return (Border) a.scale(1.0 - t);
+            }
+
+            return new Border(
+                top: BorderSide.lerp(a.top, b.top, t),
+                right: BorderSide.lerp(a.right, b.right, t),
+                bottom: BorderSide.lerp(a.bottom, b.bottom, t),
+                left: BorderSide.lerp(a.left, b.left, t)
+            );
+        }
+
+        public override void paint(Canvas canvas, Rect rect) {
+            this.paint(canvas, rect, BoxShape.rectangle, null);
+        }
+
+        public void paint(Canvas canvas, Rect rect,
+            BoxShape shape = BoxShape.rectangle,
+            BorderRadius borderRadius = null) {
+            if (this.isUniform) {
+                switch (this.top.style) {
+                    case BorderStyle.none:
+                        return;
+                    case BorderStyle.solid:
+                        switch (shape) {
+                            case BoxShape.circle:
+                                D.assert(borderRadius == null,
+                                    "A borderRadius can only be given for rectangular boxes.");
+                                _paintUniformBorderWithCircle(canvas, rect, this.top);
+                                break;
+                            case BoxShape.rectangle:
+                                if (borderRadius != null) {
+                                    _paintUniformBorderWithRadius(canvas, rect, this.top, borderRadius);
+                                } else {
+                                    _paintUniformBorderWithRectangle(canvas, rect, this.top);
+                                }
+                                break;
+                        }
+                        return;
                 }
-
-                var outer = borderRadius.toRRect(rect);
-                if (this.top.width == 0) {
-                    var paint = new Paint {
-                        color = this.top.color,
-                        style = PaintingStyle.stroke
-                    };
-
-                    canvas.drawRRect(outer, paint);
-                    return;
-                }
-
-                {
-                    var inner = outer.deflate(this.top.width);
-                    var paint = new Paint {
-                        color = this.top.color,
-                    };
-
-                    canvas.drawDRRect(outer, inner, paint);
-                }
-                return;
             }
 
             D.assert(borderRadius == null, "A borderRadius can only be given for uniform borders.");
+            D.assert(shape == BoxShape.rectangle, "A border can only be drawn as a circle if it is uniform.");
 
+            BorderUtils.paintBorder(canvas, rect,
+                top: this.top, right: this.right, bottom: this.bottom, left: this.left);
+        }
 
-            {
-                var paint = new Paint {
-                    color = this.top.color,
-                };
-                var path = new Path();
-                path.moveTo(rect.left, rect.top);
-                path.lineTo(rect.right, rect.top);
-                if (this.top.width == 0) {
-                    paint.style = PaintingStyle.stroke;
-                } else {
-                    path.lineTo(rect.right - this.right.width, rect.top + this.top.width);
-                    path.lineTo(rect.left + this.right.width, rect.top + this.top.width);
-                }
+        public override Path getInnerPath(Rect rect) {
+            var path = new Path();
+            path.addRect(this.dimensions.deflateRect(rect));
+            return path;
+        }
 
-                canvas.drawPath(path, paint);
+        public override Path getOuterPath(Rect rect) {
+            var path = new Path();
+            path.addRect(rect);
+            return path;
+        }
+
+        static void _paintUniformBorderWithRadius(Canvas canvas, Rect rect, BorderSide side,
+            BorderRadius borderRadius) {
+            D.assert(side.style != BorderStyle.none);
+            Paint paint = new Paint {
+                color = side.color,
+            };
+
+            RRect outer = borderRadius.toRRect(rect);
+            double width = side.width;
+            if (width == 0.0) {
+                paint.style = PaintingStyle.stroke;
+                paint.strokeWidth = 0.0;
+                canvas.drawRRect(outer, paint);
+            } else {
+                RRect inner = outer.deflate(width);
+                canvas.drawDRRect(outer, inner, paint);
             }
+        }
 
-            {
-                var paint = new Paint {
-                    color = this.right.color,
-                };
-                var path = new Path();
-                path.moveTo(rect.right, rect.top);
-                path.lineTo(rect.right, rect.bottom);
-                if (this.right.width == 0) {
-                    paint.style = PaintingStyle.stroke;
-                } else {
-                    path.lineTo(rect.right - this.right.width, rect.bottom - this.bottom.width);
-                    path.lineTo(rect.right - this.right.width, rect.top + this.top.width);
-                }
+        static void _paintUniformBorderWithCircle(Canvas canvas, Rect rect, BorderSide side) {
+            D.assert(side.style != BorderStyle.none);
+            double width = side.width;
+            Paint paint = side.toPaint();
+            double radius = (rect.shortestSide - width) / 2.0;
+            canvas.drawCircle(rect.center, radius, paint);
+        }
 
-                canvas.drawPath(path, paint);
-            }
-
-            {
-                var paint = new Paint {
-                    color = this.bottom.color,
-                };
-                var path = new Path();
-                path.moveTo(rect.right, rect.bottom);
-                path.lineTo(rect.left, rect.bottom);
-                if (this.bottom.width == 0) {
-                    paint.style = PaintingStyle.stroke;
-                } else {
-                    path.lineTo(rect.left + this.left.width, rect.bottom - this.bottom.width);
-                    path.lineTo(rect.right - this.right.width, rect.bottom - this.bottom.width);
-                }
-
-                canvas.drawPath(path, paint);
-            }
-
-            {
-                var paint = new Paint {
-                    color = this.left.color,
-                };
-                var path = new Path();
-                path.moveTo(rect.left, rect.bottom);
-                path.lineTo(rect.left, rect.top);
-                if (this.left.width == 0) {
-                    paint.style = PaintingStyle.stroke;
-                } else {
-                    path.lineTo(rect.left + this.left.width, rect.top + this.top.width);
-                    path.lineTo(rect.left + this.left.width, rect.bottom - this.bottom.width);
-                }
-
-                canvas.drawPath(path, paint);
-            }
+        static void _paintUniformBorderWithRectangle(Canvas canvas, Rect rect, BorderSide side) {
+            D.assert(side.style != BorderStyle.none);
+            double width = side.width;
+            Paint paint = side.toPaint();
+            canvas.drawRect(rect.deflate(width / 2.0), paint);
         }
 
         public bool Equals(Border other) {
@@ -219,6 +268,28 @@ namespace Unity.UIWidgets.painting {
                 hashCode = (hashCode * 397) ^ (this.left != null ? this.left.GetHashCode() : 0);
                 return hashCode;
             }
+        }
+
+        public override string ToString() {
+            if (this.isUniform) {
+                return $"{this.GetType()}.all({this.top})";
+            }
+
+            List<string> arguments = new List<string>();
+            if (this.top != BorderSide.none) {
+                arguments.Add($"top: {this.top}");
+            }
+            if (this.right != BorderSide.none) {
+                arguments.Add($"right: {this.right}");
+            }
+            if (this.bottom != BorderSide.none) {
+                arguments.Add($"bottom: {this.bottom}");
+            }
+            if (this.left != BorderSide.none) {
+                arguments.Add($"left: {this.left}");
+            }
+
+            return $"{this.GetType()}({string.Join(", ", arguments)})";
         }
     }
 }

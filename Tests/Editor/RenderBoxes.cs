@@ -19,8 +19,8 @@ namespace UIWidgets.Tests {
 
         RenderBoxes() {
             this._options = new Func<RenderBox>[] {
-                this.none,
                 this.decoratedBox,
+                this.decoratedShape,
                 this.flex,
             };
             this._optionStrings = this._options.Select(x => x.Method.Name).ToArray();
@@ -73,7 +73,7 @@ namespace UIWidgets.Tests {
                 child: new RenderDecoratedBox(
                     decoration: new BoxDecoration(
                         color: new Color(0xFFFF00FF),
-                        borderRadius: BorderRadius.all(3),
+                        borderRadius: BorderRadius.all(15),
                         boxShadow: new List<BoxShadow> {
                             new BoxShadow(
                                 color: new Color(0xFFFF00FF),
@@ -81,12 +81,40 @@ namespace UIWidgets.Tests {
                                 blurRadius: 3.0,
                                 spreadRadius: 10
                             )
-                        }
+                        },
+                        image: new DecorationImage(
+                            image: new NetworkImage(
+                                url: "https://sg.fiverrcdn.com/photos/4665137/original/39322-140411095619534.jpg?1424268945"
+                            ),
+                            fit: BoxFit.cover)
                     )
                 )
             );
         }
 
+        RenderBox decoratedShape() {
+            return new RenderConstrainedOverflowBox(
+                minWidth: 100,
+                maxWidth: 100,
+                minHeight: 100,
+                maxHeight: 100,
+                child: new RenderDecoratedBox(
+                    decoration: new ShapeDecoration(
+                        color: new Color(0xFFFF00FF),
+                        shape: new BeveledRectangleBorder(
+                            new BorderSide(width: 5, color: Color.white),
+                            BorderRadius.circular(5)),
+                        image: new DecorationImage(
+                            image: new NetworkImage(
+                                url: "https://sg.fiverrcdn.com/photos/4665137/original/39322-140411095619534.jpg?1424268945"
+                            ),
+                            fit: BoxFit.cover)
+                    )
+                )
+            );
+        }
+
+        
         RenderBox flex() {
             var flexbox = new RenderFlex(
                 direction: Axis.horizontal,

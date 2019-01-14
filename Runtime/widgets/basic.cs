@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.UIWidgets.foundation;
@@ -318,27 +319,23 @@ namespace Unity.UIWidgets.widgets {
     public class Stack : MultiChildRenderObjectWidget {
         public Stack(
             Key key = null,
-            AlignmentDirectional alignment = null,
-            TextDirection? textDirection = null,
+            Alignment alignment = null,
             StackFit fit = StackFit.loose,
             Overflow overflow = Overflow.clip,
             List<Widget> children = null
         ) : base(key: key, children: children) {
-            this.alignment = alignment ?? AlignmentDirectional.bottomStart;
-            this.textDirection = textDirection;
+            this.alignment = alignment ?? Alignment.bottomLeft;
             this.fit = fit;
             this.overflow = overflow;
         }
 
-        public readonly AlignmentDirectional alignment;
-        public readonly TextDirection? textDirection;
+        public readonly Alignment alignment;
         public readonly StackFit fit;
         public readonly Overflow overflow;
 
 
         public override RenderObject createRenderObject(BuildContext context) {
             return new RenderStack(
-                textDirection: this.textDirection ?? Directionality.of(context),
                 alignment: this.alignment,
                 fit: this.fit,
                 overflow: this.overflow
@@ -348,14 +345,13 @@ namespace Unity.UIWidgets.widgets {
         public override void updateRenderObject(BuildContext context, RenderObject renderObjectRaw) {
             var renderObject = (RenderStack) renderObjectRaw;
             renderObject.alignment = this.alignment;
-            renderObject.textDirection = this.textDirection ?? TextDirection.ltr;
             renderObject.fit = this.fit;
             renderObject.overflow = this.overflow;
         }
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
-            properties.add(new DiagnosticsProperty<AlignmentDirectional>("alignment", this.alignment));
+            properties.add(new DiagnosticsProperty<Alignment>("alignment", this.alignment));
             properties.add(new EnumProperty<StackFit>("fit", this.fit));
             properties.add(new EnumProperty<Overflow>("overflow", this.overflow));
         }
@@ -788,6 +784,26 @@ namespace Unity.UIWidgets.widgets {
                 widthFactor: widthFactor,
                 heightFactor: heightFactor,
                 child: child) {
+        }
+    }
+
+    public static class LayoutUtils {
+        public static AxisDirection getAxisDirectionFromAxisReverseAndDirectionality(
+            BuildContext context,
+            Axis axis,
+            bool reverse
+        ) {
+            switch (axis) {
+                case Axis.horizontal:
+                    D.assert(WidgetsD.debugCheckHasDirectionality(context));
+                    TextDirection textDirection = Directionality.of(context);
+                    AxisDirection axisDirection = AxisUtils.textDirectionToAxisDirection(textDirection);
+                    return reverse ? AxisUtils.flipAxisDirection(axisDirection) : axisDirection;
+                case Axis.vertical:
+                    return reverse ? AxisDirection.up : AxisDirection.down;
+            }
+
+            throw new Exception("unknown axisDirection");
         }
     }
 

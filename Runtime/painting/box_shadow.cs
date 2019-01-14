@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Unity.UIWidgets.ui;
 
 namespace Unity.UIWidgets.painting {
@@ -9,7 +10,7 @@ namespace Unity.UIWidgets.painting {
             double blurRadius = 0.0,
             double spreadRadius = 0.0
         ) {
-            this.color = color ?? new Color(0xFF000000);
+            this.color = color ?? Color.black;
             this.offset = offset ?? Offset.zero;
             this.blurRadius = blurRadius;
             this.spreadRadius = spreadRadius;
@@ -31,8 +32,57 @@ namespace Unity.UIWidgets.painting {
         public Paint toPaint() {
             return new Paint {
                 color = this.color,
-                //blurSigma = this.blurSigma
+                //blurSigma = this.blurSigma, TODO
             };
+        }
+
+        public BoxShadow scale(double factor) {
+            return new BoxShadow(
+                color: this.color,
+                offset: this.offset * factor,
+                blurRadius: this.blurRadius * factor,
+                spreadRadius: this.spreadRadius * factor
+            );
+        }
+
+        public static BoxShadow lerp(BoxShadow a, BoxShadow b, double t) {
+            if (a == null && b == null) {
+                return null;
+            }
+            if (a == null) {
+                return b.scale(t);
+            }
+            if (b == null) {
+                return a.scale(1.0 - t);
+            }
+
+            return new BoxShadow(
+                color: Color.lerp(a.color, b.color, t),
+                offset: Offset.lerp(a.offset, b.offset, t),
+                blurRadius: MathUtils.lerpDouble(a.blurRadius, b.blurRadius, t),
+                spreadRadius: MathUtils.lerpDouble(a.spreadRadius, b.spreadRadius, t)
+            );
+        }
+
+        public static List<BoxShadow> lerpList(List<BoxShadow> a, List<BoxShadow> b, double t) {
+            if (a == null && b == null) {
+                return null;
+            }
+
+            a = a ?? new List<BoxShadow>();
+            b = b ?? new List<BoxShadow>();
+            List<BoxShadow> result = new List<BoxShadow>();
+            int commonLength = Math.Min(a.Count, b.Count);
+            for (int i = 0; i < commonLength; i += 1) {
+                result.Add(BoxShadow.lerp(a[i], b[i], t));
+            }
+            for (int i = commonLength; i < a.Count; i += 1) {
+                result.Add(a[i].scale(1.0 - t));
+            }
+            for (int i = commonLength; i < b.Count; i += 1) {
+                result.Add(b[i].scale(t));
+            }
+            return result;
         }
 
         public bool Equals(BoxShadow other) {
@@ -77,6 +127,10 @@ namespace Unity.UIWidgets.painting {
 
         public static bool operator !=(BoxShadow a, BoxShadow b) {
             return !(a == b);
+        }
+
+        public override string ToString() {
+            return $"BoxShadow({this.color}, {this.offset}, {this.blurRadius}, {this.spreadRadius})";
         }
     }
 }

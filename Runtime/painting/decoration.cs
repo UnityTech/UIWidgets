@@ -1,3 +1,4 @@
+using System;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
 
@@ -22,6 +23,35 @@ namespace Unity.UIWidgets.painting {
             get { return false; }
         }
 
+        public virtual Decoration lerpFrom(Decoration a, double t) {
+            return null;
+        }
+
+        public virtual Decoration lerpTo(Decoration b, double t) {
+            return null;
+        }
+
+        public static Decoration lerp(Decoration a, Decoration b, double t) {
+            if (a == null && b == null) {
+                return null;
+            }
+            if (a == null) {
+                return b.lerpFrom(null, t) ?? b;
+            }
+            if (b == null) {
+                return a.lerpTo(null, t) ?? a;
+            }
+            if (t == 0.0) {
+                return a;
+            }
+            if (t == 1.0) {
+                return b;
+            }
+            return b.lerpFrom(a, t)
+                   ?? a.lerpTo(b, t)
+                   ?? (t < 0.5 ? (a.lerpTo(null, t * 2.0) ?? a) : (b.lerpFrom(null, (t - 0.5) * 2.0) ?? b));
+        }
+
         public virtual bool hitTest(Size size, Offset position) {
             return true;
         }
@@ -29,7 +59,7 @@ namespace Unity.UIWidgets.painting {
         public abstract BoxPainter createBoxPainter(VoidCallback onChanged = null);
     }
 
-    public abstract class BoxPainter {
+    public abstract class BoxPainter : IDisposable {
         protected BoxPainter(VoidCallback onChanged = null) {
             this.onChanged = onChanged;
         }
@@ -38,7 +68,7 @@ namespace Unity.UIWidgets.painting {
 
         public abstract void paint(Canvas canvas, Offset offset, ImageConfiguration configuration);
 
-        public virtual void dispose() {
+        public virtual void Dispose() {
         }
     }
 }
