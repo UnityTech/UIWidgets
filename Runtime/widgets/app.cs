@@ -62,7 +62,7 @@ namespace Unity.UIWidgets.widgets {
             D.assert(
                 builder != null ||
                 home != null ||
-                routes.ContainsKey(Navigator.defaultRouteName) ||
+                this.routes.ContainsKey(Navigator.defaultRouteName) ||
                 onGenerateRoute != null ||
                 onUnknownRoute != null,
                 "Either the home property must be specified, " +

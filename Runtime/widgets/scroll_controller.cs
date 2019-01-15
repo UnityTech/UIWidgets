@@ -28,7 +28,7 @@ namespace Unity.UIWidgets.widgets {
 
         public readonly string debugLabel;
 
-        public IEnumerable<ScrollPosition> positions {
+        public ICollection<ScrollPosition> positions {
             get { return this._positions; }
         }
 
@@ -91,7 +91,7 @@ namespace Unity.UIWidgets.widgets {
             base.dispose();
         }
 
-        public ScrollPosition createScrollPosition(
+        public virtual ScrollPosition createScrollPosition(
             ScrollPhysics physics,
             ScrollContext context,
             ScrollPosition oldPosition
