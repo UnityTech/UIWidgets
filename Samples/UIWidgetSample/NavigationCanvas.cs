@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using Unity.UIWidgets.animation;
 using Unity.UIWidgets.engine;
 using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.painting;
+using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
 using Color = Unity.UIWidgets.ui.Color;
@@ -33,36 +35,40 @@ namespace UIWidgetsSample {
                     )
             );
     }
+
+
     
     class HomeScreen : StatelessWidget {
         public override Widget build(BuildContext context) {
-            return new Container(
-                color: new Color(0xFF888888),
-                child: new Center(child: new CustomButton(onPressed: () => {
-                        Navigator.pushName(context, "/detail");
-                    }, child: new Text("Go to Detail"))
-                ));
-
+            return new NavigationPage(
+                body:new Container(
+                    color: new Color(0xFF888888),
+                    child: new Center(child: new CustomButton(onPressed: () => {
+                            Navigator.pushName(context, "/detail");
+                        }, child: new Text("Go to Detail"))
+                    )),
+                title: "Home"
+                );
         }
     }
     
     class DetailScreen : StatelessWidget {
         public override Widget build(BuildContext context) {
-            return new Container(
-                color: new Color(0xFF1389FD),
-             
-                child: new Center(
-                    child: new Column(
-                        children: new List<Widget>() {
-                            new CustomButton(onPressed: () => {
-                                Navigator.pop(context);
-                            }, child: new Text("Back")),
-                            new CustomButton(onPressed: () => {
-                                _Dialog.showDialog(context, builder: (BuildContext c) => new Dialog());
-                            }, child: new Text("Show Dialog"))
-                        }
-                    )
-            ));
+            return new NavigationPage(
+                body: new Container(
+                    color: new Color(0xFF1389FD),
+                    child: new Center(
+                        child: new Column(
+                            children: new List<Widget>() {
+                                new CustomButton(onPressed: () => { Navigator.pop(context); }, child: new Text("Back")),
+                                new CustomButton(
+                                    onPressed: () => {
+                                        _Dialog.showDialog(context, builder: (BuildContext c) => new Dialog());
+                                    }, child: new Text("Show Dialog"))
+                            }
+                        )
+                    )),
+                title: "Detail");
         }
     }
     
@@ -110,6 +116,41 @@ namespace UIWidgetsSample {
                     child: this.child
                 )
             );
+        }
+    }
+    
+    class NavigationPage: StatelessWidget {
+        public readonly Widget body;
+        public readonly string title;
+
+        public NavigationPage(Widget body = null, string title = null) {
+            this.title = title;
+            this.body = body;
+        }
+        
+        public override Widget build(BuildContext context) {
+            Widget back = null;
+            if (Navigator.of(context).canPop()) {
+                back = new CustomButton(onPressed: () => { Navigator.pop(context); }, 
+                    child: new Text("Go Back"));
+                back = new Column(mainAxisAlignment: MainAxisAlignment.center, children: new List<Widget>(){back});
+            }
+            
+           
+            return new Container(
+                child: new Column(
+                    children: new List<Widget>() {
+                        new ConstrainedBox(constraints: new BoxConstraints(maxHeight:80), 
+                            child:new DecoratedBox(
+                                decoration: new BoxDecoration(color: new Color(0XFFE1ECF4)),
+                                child:new NavigationToolbar(leading: back, 
+                                middle: new Text(this.title, textAlign: TextAlign.center))))
+                        ,
+                        new Flexible(child:this.body)
+                        }
+                    )
+                );
+
         }
     }
 

@@ -19,7 +19,7 @@ namespace Unity.UIWidgets.widgets {
             this.textDirection = textDirection;
         }
 
-        public TextDirection textDirection;
+        public readonly TextDirection textDirection;
 
         public static TextDirection of(BuildContext context) {
             Directionality widget = context.inheritFromWidgetOfExactType(typeof(Directionality)) as Directionality;
@@ -36,7 +36,7 @@ namespace Unity.UIWidgets.widgets {
             this.opacity = opacity;
         }
 
-        public double opacity;
+        public readonly double opacity;
 
         public override RenderObject createRenderObject(BuildContext context) {
             return new RenderOpacity(opacity: this.opacity);
@@ -44,6 +44,55 @@ namespace Unity.UIWidgets.widgets {
 
         public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
             ((RenderOpacity) renderObject).opacity = this.opacity;
+        }
+    }
+
+    public class CustomPaint : SingleChildRenderObjectWidget {
+
+        public CustomPaint(
+            Key key = null,
+            CustomPainter painter = null,
+            CustomPainter foregroundPainter = null,
+            Size size = null,
+            bool isComplex = false,
+            bool willChange = false,
+            Widget child = null
+        ) : base(key: key, child: child) {
+            size = size ?? Size.zero;
+            this.size = size;
+            this.painter = painter;
+            this.foregroundPainter = foregroundPainter;
+            this.isComplex = isComplex;
+            this.willChange = willChange;
+        }
+
+        public readonly CustomPainter painter;
+        public readonly CustomPainter foregroundPainter;
+        public readonly Size size;
+        public readonly bool isComplex;
+        public readonly bool willChange;
+        
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderCustomPaint(
+                painter: this.painter,
+                foregroundPainter: this.foregroundPainter,
+                preferredSize: this.size,
+                isComplex: this.isComplex,
+                willChange: this.willChange
+            );
+        }
+        
+        public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
+            ((RenderCustomPaint) renderObject).painter = this.painter;
+            ((RenderCustomPaint) renderObject).foregroundPainter = this.foregroundPainter;
+            ((RenderCustomPaint) renderObject).preferredSize = this.size;
+            ((RenderCustomPaint) renderObject).isComplex = this.isComplex;
+            ((RenderCustomPaint)renderObject).willChange = this.willChange;
+        }
+
+        public override void didUnmountRenderObject(RenderObject renderObject) {
+            ((RenderCustomPaint)renderObject).painter = null;
+            ((RenderCustomPaint)renderObject).foregroundPainter = null;
         }
     }
 
@@ -784,6 +833,57 @@ namespace Unity.UIWidgets.widgets {
                 widthFactor: widthFactor,
                 heightFactor: heightFactor,
                 child: child) {
+        }
+    }
+
+    public class LayoutId : ParentDataWidget<CustomMultiChildLayout> {
+        public LayoutId(
+            Key key = null,
+            object id = null,
+            Widget child = null
+        ) : base(key: key ?? new ValueKey<object>(id), child: child) {
+            D.assert(child != null);
+            D.assert(id != null);
+            this.id = id;
+        }
+
+        public readonly object id;
+
+        public override void applyParentData(RenderObject renderObject) {
+            D.assert(renderObject.parentData is MultiChildLayoutParentData);
+            MultiChildLayoutParentData parentData = (MultiChildLayoutParentData) renderObject.parentData;
+            if (parentData.id != this.id) {
+                parentData.id = this.id;
+                var targetParent = renderObject.parent;
+                if (targetParent is RenderObject)
+                    ((RenderObject) targetParent).markNeedsLayout();
+            }
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new DiagnosticsProperty<object>("id", this.id));
+        }
+    }
+
+    public class CustomMultiChildLayout : MultiChildRenderObjectWidget {
+        public CustomMultiChildLayout(
+            Key key = null,
+            MultiChildLayoutDelegate layoutDelegate = null,
+            List<Widget> children = null
+        ) : base(key: key, children: children ?? new List<Widget>()) {
+            D.assert(layoutDelegate != null);
+            this.layoutDelegate = layoutDelegate;
+        }
+
+        public readonly MultiChildLayoutDelegate layoutDelegate;
+
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderCustomMultiChildLayoutBox(layoutDelegate: this.layoutDelegate);
+        }
+
+        public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
+            ((RenderCustomMultiChildLayoutBox) renderObject).layoutDelegate = this.layoutDelegate;
         }
     }
 
