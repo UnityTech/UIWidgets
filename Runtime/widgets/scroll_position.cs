@@ -71,7 +71,7 @@ namespace Unity.UIWidgets.widgets {
         internal double? _pixels;
 
         public double viewportDimension {
-            get { return this._viewportDimension??0.0; }
+            get { return this._viewportDimension.Value; }
         }
 
         double? _viewportDimension;

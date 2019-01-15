@@ -232,11 +232,11 @@ namespace Unity.UIWidgets.widgets {
     
         public override RenderObject createRenderObject(BuildContext context) {
             SliverMultiBoxAdaptorElement element = (SliverMultiBoxAdaptorElement)context;
-            return new RenderSliverFillViewport(childManager: element, viewportFraction: viewportFraction);
+            return new RenderSliverFillViewport(childManager: element, viewportFraction: this.viewportFraction);
         }
     
         public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
-            ((RenderSliverFillViewport)renderObject).viewportFraction = viewportFraction;
+            ((RenderSliverFillViewport)renderObject).viewportFraction = this.viewportFraction;
         }
     }
 
