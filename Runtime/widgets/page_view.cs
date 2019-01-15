@@ -160,8 +160,12 @@ namespace Unity.UIWidgets.widgets {
             return page * this.viewportDimension * this.viewportFraction;
         }
 
-        public double page => this.getPageFromPixels(this.pixels.clamp(this.minScrollExtent, this.maxScrollExtent),
-            this.viewportDimension);
+        public double page {
+            get {
+                return this.getPageFromPixels(this.pixels.clamp(this.minScrollExtent, this.maxScrollExtent),
+                    this.viewportDimension);
+            }
+        }
 
         protected override void saveScrollOffset() {
             PageStorage.of(this.context.storageContext)?.writeState(this.context.storageContext,
@@ -176,10 +180,13 @@ namespace Unity.UIWidgets.widgets {
         public override bool applyViewportDimension(double viewportDimension) {
             double oldViewportDimensions = this.viewportDimension;
             bool result = base.applyViewportDimension(viewportDimension);
-            double oldPixels = this.pixels;
+            double? oldPixels = null;
+            if (this.hasPixles) {
+                oldPixels = this.pixels;
+            }
             double page = (oldPixels == null || oldViewportDimensions == 0.0)
                 ? this._pageToUseOnStartup
-                : this.getPageFromPixels(oldPixels, oldViewportDimensions);
+                : this.getPageFromPixels(oldPixels.Value, oldViewportDimensions);
             double newPixels = this.getPixelsFromPage(page);
             if (newPixels != oldPixels) {
                 this.correctPixels(newPixels);

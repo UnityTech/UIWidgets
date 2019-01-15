@@ -59,9 +59,13 @@ namespace Unity.UIWidgets.widgets {
 
         public override double pixels {
             get {
-                //D.assert(this._pixels != null);
+                D.assert(this._pixels != null);
                 return this._pixels ?? 0.0;
             }
+        }
+
+        public bool hasPixles {
+            get { return this._pixels != null; }
         }
 
         internal double? _pixels;
