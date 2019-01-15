@@ -28,9 +28,9 @@ namespace Unity.UIWidgets.widgets {
     public class Draggable<T> : StatefulWidget {
         public Draggable(
             T data,
-            Widget child,
-            Widget feedback,
             Key key = null,
+            Widget child = null,
+            Widget feedback = null,
             Axis? axis = null,
             Widget childWhenDragging = null,
             Offset feedbackOffset = null,
@@ -109,14 +109,12 @@ namespace Unity.UIWidgets.widgets {
 
 
     public class LongPressDraggable<T> : Draggable<T> {
-        readonly bool hapticFeedbackOnStart;
-
         public LongPressDraggable(
             T data,
-            Widget child,
-            Widget feedback,
-            Axis? axis = null,
             Key key = null,
+            Widget child = null,
+            Widget feedback = null,
+            Axis? axis = null,
             Widget childWhenDragging = null,
             Offset feedbackOffset = null,
             DragAnchor dragAnchor = DragAnchor.child,
@@ -124,8 +122,7 @@ namespace Unity.UIWidgets.widgets {
             VoidCallback onDragStarted = null,
             DraggableCanceledCallback onDraggableCanceled = null,
             DragEndCallback onDragEnd = null,
-            VoidCallback onDragCompleted = null,
-            bool hapticFeedbackOnStart = true
+            VoidCallback onDragCompleted = null
         ) : base(
             key: key,
             child: child,
@@ -141,17 +138,13 @@ namespace Unity.UIWidgets.widgets {
             onDragEnd: onDragEnd,
             onDragCompleted: onDragCompleted
         ) {
-            this.hapticFeedbackOnStart = hapticFeedbackOnStart;
+            
         }
 
         public override GestureRecognizer createRecognizer(GestureMultiDragStartCallback onStart) {
             return new DelayedMultiDragGestureRecognizer(Constants.kLongPressTimeout) {
                 onStart = (Offset position) => {
                     Drag result = onStart(position);
-                    if (result != null && this.hapticFeedbackOnStart) {
-                        //HapticFeedback.selectionClick();
-                    }
-
                     return result;
                 }
             };
@@ -260,9 +253,9 @@ namespace Unity.UIWidgets.widgets {
 
     public class DraggableDetails {
         public DraggableDetails(
-            Velocity velocity,
-            Offset offset,
-            bool wasAccepted = false
+            bool wasAccepted = false,
+            Velocity velocity = null,
+            Offset offset = null
         ) {
             D.assert(velocity != null);
             D.assert(offset != null);
@@ -271,35 +264,36 @@ namespace Unity.UIWidgets.widgets {
             this.offset = offset;
         }
 
-        public bool wasAccepted;
+        public readonly bool wasAccepted;
 
-        public Velocity velocity;
+        public readonly Velocity velocity;
 
-        public Offset offset;
+        public readonly Offset offset;
     }
 
 
     public class DragTarget<T> : StatefulWidget {
         public DragTarget(
-            DragTargetBuilder<T> builder,
             Key key = null,
+            DragTargetBuilder<T> builder = null,
             DragTargetWillAccept<T> onWillAccept = null,
             DragTargetAccept<T> onAccept = null,
             DragTargetLeave<T> onLeave = null
         ) : base(key) {
+            D.assert(builder != null);
             this.builder = builder;
             this.onWillAccept = onWillAccept;
             this.onAccept = onAccept;
             this.onLeave = onLeave;
         }
 
-        public DragTargetBuilder<T> builder;
+        public readonly DragTargetBuilder<T> builder;
 
-        public DragTargetWillAccept<T> onWillAccept;
+        public readonly DragTargetWillAccept<T> onWillAccept;
 
-        public DragTargetAccept<T> onAccept;
+        public readonly DragTargetAccept<T> onAccept;
 
-        public DragTargetLeave<T> onLeave;
+        public readonly DragTargetLeave<T> onLeave;
 
         public override State createState() {
             return new _DragTargetState<T>();
@@ -415,11 +409,11 @@ namespace Unity.UIWidgets.widgets {
 
         readonly List<_DragTargetState<T>> _enteredTargets = new List<_DragTargetState<T>>();
 
-        OverlayEntry _entry;
-
-        Offset _lastOffset;
-
         Offset _position;
+        
+        Offset _lastOffset;
+        
+        OverlayEntry _entry;
 
         public void update(DragUpdateDetails details) {
             this._position += this._restrictAxis(details.delta);

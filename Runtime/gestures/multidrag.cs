@@ -15,7 +15,6 @@ namespace Unity.UIWidgets.gestures {
             this.initialPosition = initialPosition;
         }
 
-
         public readonly Offset initialPosition;
 
         readonly VelocityTracker _velocityTracker = new VelocityTracker();
@@ -146,7 +145,6 @@ namespace Unity.UIWidgets.gestures {
 
         public override void addPointer(PointerDownEvent pEvent) {
             D.assert(this._pointers != null);
-            D.assert(pEvent.pointer != null);
             D.assert(pEvent.position != null);
             D.assert(!this._pointers.ContainsKey(pEvent.pointer));
 
@@ -160,7 +158,6 @@ namespace Unity.UIWidgets.gestures {
 
         void _handleEvent(PointerEvent pEvent) {
             D.assert(this._pointers != null);
-            D.assert(pEvent.pointer != null);
             D.assert(pEvent.timeStamp != null);
             D.assert(pEvent.position != null);
             D.assert(this._pointers.ContainsKey(pEvent.pointer));
