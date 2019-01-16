@@ -198,7 +198,6 @@ namespace Unity.UIWidgets.engine {
             var pixelRatio = this.pixelRatio;
             localPoint.x = (float)((localPoint.x - this.rectTransform.rect.min.x) * pixelRatio);
             localPoint.y = (float)((this.rectTransform.rect.max.y - localPoint.y) * pixelRatio);
-           // Debug.Log();
             return localPoint;
         }
 
