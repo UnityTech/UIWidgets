@@ -317,6 +317,28 @@ namespace Unity.UIWidgets.rendering {
                 maxHeight: it.maxHeight % value
             );
         }
+        
+        public static BoxConstraints lerp(BoxConstraints a, BoxConstraints b, double t) {
+            D.assert(t != null);
+            if (a == null && b == null)
+                return null;
+            if (a == null)
+                return b * t;
+            if (b == null)
+                return a * (1.0 - t);
+            D.assert(a.debugAssertIsValid());
+            D.assert(b.debugAssertIsValid());
+            D.assert((a.minWidth == double.PositiveInfinity && b.minWidth == double.PositiveInfinity), "Cannot interpolate between finite constraints and unbounded constraints.");
+            D.assert((a.maxWidth == double.PositiveInfinity && b.maxWidth == double.PositiveInfinity), "Cannot interpolate between finite constraints and unbounded constraints.");
+            D.assert((a.minHeight == double.PositiveInfinity && b.minHeight == double.PositiveInfinity), "Cannot interpolate between finite constraints and unbounded constraints.");
+            D.assert((a.maxHeight == double.PositiveInfinity && b.maxHeight == double.PositiveInfinity), "Cannot interpolate between finite constraints and unbounded constraints.");
+            return new BoxConstraints(
+                minWidth: a.minWidth == double.PositiveInfinity ? MathUtils.lerpDouble(a.minWidth, b.minWidth, t) : double.PositiveInfinity,
+                maxWidth: a.maxWidth == double.PositiveInfinity ? MathUtils.lerpDouble(a.maxWidth, b.maxWidth, t) : double.PositiveInfinity,
+                minHeight: a.minHeight == double.PositiveInfinity ? MathUtils.lerpDouble(a.minHeight, b.minHeight, t) : double.PositiveInfinity,
+                maxHeight: a.maxHeight == double.PositiveInfinity ? MathUtils.lerpDouble(a.maxHeight, b.maxHeight, t) : double.PositiveInfinity
+            );
+        }
 
         public override bool isNormalized {
             get {
