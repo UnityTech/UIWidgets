@@ -1,0 +1,72 @@
+##########################################
+####                                  ####
+#### EditorConfig for JetBrains Rider ####
+####                                  ####
+####              by Project UIWidget ####
+####                                  ####
+##########################################
+
+################# How to #################
+# 
+# (1) Code Cleanup
+#
+# Prepare: Preferences -> Manage Layers ->
+# add a layer from UIWidgetCleanupPlugin.
+# DotSettings to your personal layer
+#
+# Whenever want to clean-up, use 
+# Menu -> Code -> Code Cleanup -> UIWidget
+# -> OK
+#
+#
+# (2) Code Inspect
+# Preferences -> Editor -> Inspection
+# Settings -> select "Read settings from 
+# editorconfig..."
+#
+############################################
+
+
+#### !!!! EditorConfig Starts Here !!!! #####
+root = true
+
+# For CSharp Only
+[*.cs]
+
+################
+# Code Cleanup #
+################
+
+# indents (4 spaces)
+indent_style=space
+indent_size=4
+
+
+# no requirement for converting type declaration to var
+csharp_for_built_in_types=can_use_either
+csharp_for_other_types=can_use_either
+csharp_for_simple_types=can_use_either
+
+
+# use this.{} for all instance members
+csharp_instance_members_qualify_members=all
+
+
+# all braces start at the end of a line
+csharp_brace_style=end_of_line
+
+
+# don't use 'private' whenever possible
+csharp_default_private_modifier=implicit
+
+
+# not requirement for converting named arguments into positioned arguments whenever possible
+csharp_arguments_named=named
+
+
+###################
+# CODE INSPECTION #
+###################
+
+# use this.{} for all instance members
+resharper_arrange_this_qualifier_highlighting=error
