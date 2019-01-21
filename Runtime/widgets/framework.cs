@@ -2589,7 +2589,7 @@ namespace Unity.UIWidgets.widgets {
                 if (haveOldChildren) {
                     Key key = newWidget.key;
                     if (key != null) {
-                        oldChild = oldKeyedChildren[key];
+                        oldChild = oldKeyedChildren.getOrDefault(key);
                         if (oldChild != null) {
                             if (Widget.canUpdate(oldChild.widget, newWidget)) {
                                 oldKeyedChildren.Remove(key);

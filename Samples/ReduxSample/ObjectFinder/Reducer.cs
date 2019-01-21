@@ -38,7 +38,7 @@ namespace Unity.UIWidgets.Sample.Redux.ObjectFinder {
             if (action is SearchResultAction) {
                 var resultAction = (SearchResultAction) action;
                 var selected = state.selected;
-                if (selected != null) {
+                if (selected != 0) {
                     var obj = resultAction.results.Find(o => o.id == selected);
                     if (obj == null) {
                         selected = 0;

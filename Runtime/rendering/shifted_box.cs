@@ -685,6 +685,104 @@ namespace Unity.UIWidgets.rendering {
         }
     }
 
+    public abstract class SingleChildLayoutDelegate {
+        public SingleChildLayoutDelegate(Listenable _relayout = null) {
+            this._relayout = _relayout;
+        }
+
+        public readonly Listenable _relayout;
+
+        public virtual Size getSize(BoxConstraints constraints) => constraints.biggest;
+
+        public virtual BoxConstraints getConstraintsForChild(BoxConstraints constraints) => constraints;
+
+        public virtual Offset getPositionForChild(Size size, Size childSize) => Offset.zero;
+
+        public abstract bool shouldRelayout(SingleChildLayoutDelegate oldDelegate);
+    }
+
+    public class RenderCustomSingleChildLayoutBox : RenderShiftedBox {
+        public RenderCustomSingleChildLayoutBox(RenderBox child = null,
+            SingleChildLayoutDelegate layoutDelegate = null) : base(child) {
+            D.assert(layoutDelegate != null);
+            this._delegate = layoutDelegate;
+        }
+
+        public SingleChildLayoutDelegate layoutDelegate {
+            get => this._delegate;
+            set {
+                var newDelegate = value;
+                D.assert(newDelegate != null);
+                if (this._delegate == newDelegate)
+                    return;
+                SingleChildLayoutDelegate oldDelegate = this._delegate;
+                if (newDelegate.GetType() != oldDelegate.GetType() || newDelegate.shouldRelayout(oldDelegate)) this.markNeedsLayout();
+                this._delegate = newDelegate;
+                if (this.attached) {
+                    oldDelegate?._relayout?.removeListener(this.markNeedsLayout);
+                    newDelegate?._relayout?.addListener(this.markNeedsLayout);
+                }
+            }
+        }
+
+        SingleChildLayoutDelegate _delegate;
+
+        public override void attach(object owner) {
+            base.attach(owner);
+            this._delegate?._relayout?.addListener(this.markNeedsLayout);
+        }
+
+        public override void detach() {
+            this._delegate?._relayout?.removeListener(this.markNeedsLayout);
+            base.detach();
+        }
+
+        Size _getSize(BoxConstraints constraints) {
+            return constraints.constrain(this._delegate.getSize(constraints));
+        }
+
+
+        protected override double computeMinIntrinsicWidth(double height) {
+            double width = this._getSize(BoxConstraints.tightForFinite(height: height)).width;
+            if (width.isFinite())
+                return width;
+            return 0.0;
+        }
+
+        protected override double computeMaxIntrinsicWidth(double height) {
+            double width = this._getSize(BoxConstraints.tightForFinite(height: height)).width;
+            if (width.isFinite())
+                return width;
+            return 0.0;
+        }
+
+        protected override double computeMinIntrinsicHeight(double width) {
+            double height = this._getSize(BoxConstraints.tightForFinite(width: width)).height;
+            if (height.isFinite())
+                return height;
+            return 0.0;
+        }
+
+        protected override double computeMaxIntrinsicHeight(double width) {
+            double height = this._getSize(BoxConstraints.tightForFinite(width: width)).height;
+            if (height.isFinite())
+                return height;
+            return 0.0;
+        }
+
+        protected override void performLayout() {
+            this.size = this._getSize(this.constraints);
+            if (this.child != null) {
+                BoxConstraints childConstraints = this.layoutDelegate.getConstraintsForChild(this.constraints);
+                D.assert(childConstraints.debugAssertIsValid(isAppliedConstraint: true));
+                this.child.layout(childConstraints, parentUsesSize: !childConstraints.isTight);
+                BoxParentData childParentData = (BoxParentData)this.child.parentData;
+                childParentData.offset = this.layoutDelegate.getPositionForChild(this.size,
+                    childConstraints.isTight ? childConstraints.smallest : this.child.size);
+            }
+        }
+    }
+    
     public class RenderBaseline : RenderShiftedBox {
         public RenderBaseline(
             RenderBox child = null,

@@ -5,7 +5,7 @@ using Unity.UIWidgets.ui;
 
 namespace Unity.UIWidgets.widgets {
     public abstract class CustomPainter : Listenable {
-        public CustomPainter(Listenable repaint) {
+        public CustomPainter(Listenable repaint = null) {
             this._repaint = repaint;
         }
 
@@ -24,7 +24,7 @@ namespace Unity.UIWidgets.widgets {
         public abstract bool shouldRepaint(CustomPainter oldDelegate);
 
         public virtual bool hitTest(Offset position) {
-            return false;
+            return true;
         }
 
         public override string ToString() {

@@ -3,6 +3,7 @@ using System.Linq;
 using Unity.UIWidgets.engine;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
+using Unity.UIWidgets.material;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
@@ -93,6 +94,7 @@ namespace UIWidgetsSample {
                                 padding: EdgeInsets.fromLTRB(8, 0, 8, 0),
                                 child: new EditableText(maxLines: 1,
                                     controller: this.controller,
+                                    selectionControls: MaterialUtils.materialTextSelectionControls,
                                     autofocus: true,
                                     focusNode: new FocusNode(),
                                     style: new TextStyle(

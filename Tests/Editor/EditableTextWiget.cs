@@ -1,4 +1,5 @@
 ﻿using Unity.UIWidgets.editor;
+using Unity.UIWidgets.material;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.widgets;
 using UnityEditor;
@@ -52,6 +53,7 @@ namespace UIWidgets.Tests {
                 color: Color.fromARGB(255, 244, 190, 85),
                 child: new EditableText(
                     maxLines: 100,
+                    selectionControls: MaterialUtils.materialTextSelectionControls,
                     controller: new TextEditingController(this.txt),
                     focusNode: new FocusNode(),
                     style: new TextStyle(),
