@@ -84,7 +84,7 @@ namespace Unity.UIWidgets.debugger {
                 }
                 xoffset += iconSize;
             }
-            this.labelGUI(xoffset, rect, node.description);
+            this.labelGUI(xoffset, rect, node.description.Replace("\n", " "));
         }
 
         protected override void SelectionChanged(IList<int> selectedIds) {

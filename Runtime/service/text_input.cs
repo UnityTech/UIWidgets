@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.ui;
 using UnityEngine;
 
 namespace Unity.UIWidgets.service {
@@ -156,6 +157,14 @@ namespace Unity.UIWidgets.service {
         public override string ToString() {
             return $"Text: {this.text}, Selection: {this.selection}, Composing: {this.composing}";
         }
+    }
+
+    public interface TextSelectionDelegate {
+        TextEditingValue textEditingValue { get; set; }
+
+        void hideToolbar();
+
+        void bringIntoView(TextPosition textPosition);
     }
 
     public interface TextInputClient {

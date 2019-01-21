@@ -1,8 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Unity.UIWidgets.engine;
 using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.material;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
+using Unity.UIWidgets.service;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
 using TextStyle = Unity.UIWidgets.painting.TextStyle;
@@ -45,8 +48,8 @@ namespace UIWidgetsSample {
             }
 
             Widget title() {
-                return new Text(this.widget.title ?? "", textAlign: TextAlign.center,
-                    style: new TextStyle(fontSize: 24, fontWeight: FontWeight.w700));
+                return new Container(child:new Text(this.widget.title ?? "", textAlign: TextAlign.center,
+                    style: new TextStyle(fontSize: 24, fontWeight: FontWeight.w700)), margin:EdgeInsets.only(bottom:20));
             }
 
             Widget titleInput() {
@@ -59,6 +62,7 @@ namespace UIWidgetsSample {
                             padding: EdgeInsets.fromLTRB(8, 0, 8, 0),
                             child: new EditableText(maxLines: 1,
                                 controller: this.titleController,
+                                selectionControls: MaterialUtils.materialTextSelectionControls,
                                 autofocus: true,
                                 focusNode: new FocusNode(),
                                 style: new TextStyle(
@@ -86,6 +90,7 @@ namespace UIWidgetsSample {
                                 padding: EdgeInsets.fromLTRB(8, 0, 8, 0),
                                 child: new EditableText(maxLines: 200,
                                     controller: this.descController,
+                                    selectionControls: MaterialUtils.materialTextSelectionControls,
                                     focusNode: new FocusNode(),
                                     style: new TextStyle(
                                         fontSize: 18,
@@ -118,4 +123,6 @@ namespace UIWidgetsSample {
             }
         }
     }
+    
+
 }

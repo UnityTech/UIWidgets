@@ -221,7 +221,7 @@ namespace Unity.UIWidgets.rendering {
             this.appendLayer(layer);
         }
 
-        void pushLayer(ContainerLayer childLayer, PaintingContextCallback painter, Offset offset,
+        public void pushLayer(ContainerLayer childLayer, PaintingContextCallback painter, Offset offset,
             Rect childPaintBounds = null) {
             D.assert(!childLayer.attached);
             D.assert(childLayer.parent == null);

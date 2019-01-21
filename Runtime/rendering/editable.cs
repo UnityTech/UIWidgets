@@ -57,6 +57,7 @@ namespace Unity.UIWidgets.rendering {
         TextSelection _selection;
         bool _obscureText;
         TapGestureRecognizer _tap;
+        LongPressGestureRecognizer _longPress;
         DoubleTapGestureRecognizer _doubleTap;
         public bool ignorePointer;
         public SelectionChangedHandler onSelectionChanged;
@@ -96,6 +97,8 @@ namespace Unity.UIWidgets.rendering {
             this._tap.onTapDown = this._handleTapDown;
             this._tap.onTap = this._handleTap;
             this._doubleTap.onDoubleTap = this._handleDoubleTap;
+            this._longPress = new LongPressGestureRecognizer(debugOwner: this);
+            this._longPress.onLongPress = this._handleLongPress;
         }
 
         public bool obscureText {
@@ -333,7 +336,7 @@ namespace Unity.UIWidgets.rendering {
         public TextPosition getPositionForPoint(Offset globalPosition) {
             this._layoutText(this.constraints.maxWidth);
             globalPosition -= this._paintOffset;
-            return this._textPainter.getPositionForOffset(globalPosition);
+            return this._textPainter.getPositionForOffset(this.globalToLocal(globalPosition));
         }
 
         public Rect getLocalRectForCaret(TextPosition caretPosition) {
@@ -488,7 +491,7 @@ namespace Unity.UIWidgets.rendering {
             if (evt is PointerDownEvent && this.onSelectionChanged != null) {
                 this._tap.addPointer((PointerDownEvent) evt);
                 this._doubleTap.addPointer((PointerDownEvent) evt);
-                // todo long press
+                this._longPress.addPointer((PointerDownEvent) evt);
             }
         }
 
@@ -505,16 +508,25 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
-        public void handleDoubleTap() {
+        public void handleDoubleTap(DoubleTapDetails details) {
+            this._lastTapDownPosition = details.firstGlobalPosition - this._paintOffset;
+            this.selectWord(cause: SelectionChangedCause.doubleTap);
+        }
+
+        public void handleLongPress() {
+            this.selectWord(cause: SelectionChangedCause.longPress);
+        }
+
+        void selectWord(SelectionChangedCause? cause = null) {
             this._layoutText(this.constraints.maxWidth);
             D.assert(this._lastTapDownPosition != null);
             if (this.onSelectionChanged != null) {
-                var position = this._textPainter.getPositionForOffset(this.globalToLocal(this._lastTapDownPosition));
-                this.onSelectionChanged(this._selectWordAtOffset(position), this, SelectionChangedCause.doubleTap);
+                TextPosition position =
+                    this._textPainter.getPositionForOffset(this.globalToLocal(this._lastTapDownPosition));
+                this.onSelectionChanged(this._selectWordAtOffset(position), this, cause.Value);
             }
         }
-
-
+        
         protected override void performLayout() {
             this._layoutText(this.constraints.maxWidth);
             this._caretPrototype = Rect.fromLTWH(0.0, _kCaretHeightOffset, _kCaretWidth,
@@ -615,9 +627,14 @@ namespace Unity.UIWidgets.rendering {
             this.handleTap();
         }
 
-        void _handleDoubleTap() {
+        void _handleDoubleTap(DoubleTapDetails details) {
             D.assert(!this.ignorePointer);
-            this.handleDoubleTap();
+            this.handleDoubleTap(details);
+        }
+
+        void _handleLongPress() {
+            D.assert(!this.ignorePointer);
+            this.handleLongPress();
         }
 
         void markNeedsSemanticsUpdate() {

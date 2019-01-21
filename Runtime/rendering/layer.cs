@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.painting;
 using Unity.UIWidgets.ui;
+using Unity.UIWidgets.widgets;
 
 namespace Unity.UIWidgets.rendering {
     public abstract class Layer : AbstractNodeMixinDiagnosticableTree {
@@ -49,6 +51,7 @@ namespace Unity.UIWidgets.rendering {
                 while (node.parent != null) {
                     node = node.parent;
                 }
+
                 D.assert(node != newLayer);
                 return true;
             });
@@ -180,6 +183,7 @@ namespace Unity.UIWidgets.rendering {
                 while (node.parent != null) {
                     node = node.parent;
                 }
+
                 D.assert(node != child);
                 return true;
             });
@@ -207,14 +211,16 @@ namespace Unity.UIWidgets.rendering {
             if (child._previousSibling == null) {
                 D.assert(this.firstChild == child);
                 this._firstChild = child.nextSibling;
-            } else {
+            }
+            else {
                 child._previousSibling._nextSibling = child.nextSibling;
             }
 
             if (child._nextSibling == null) {
                 D.assert(this.lastChild == child);
                 this._lastChild = child.previousSibling;
-            } else {
+            }
+            else {
                 child._nextSibling._previousSibling = child.previousSibling;
             }
 
@@ -460,4 +466,192 @@ namespace Unity.UIWidgets.rendering {
             properties.add(new IntProperty("alpha", this.alpha));
         }
     }
+
+    public class LayerLink {
+        public LeaderLayer leader => this._leader;
+        internal LeaderLayer _leader;
+
+        public override string ToString() {
+            return $"{Diagnostics.describeIdentity(this)}({(this._leader != null ? "<linked>" : "<dangling>")})";
+        }
+    }
+
+    public class LeaderLayer : ContainerLayer {
+        public readonly LayerLink link;
+        public Offset offset;
+
+        public LeaderLayer(LayerLink link, Offset offset = null) {
+            D.assert(link != null);
+            offset = offset ?? Offset.zero;
+            this.link = link;
+            this.offset = offset;
+        }
+
+        public override void attach(object owner) {
+            base.attach(owner);
+            D.assert(this.link.leader == null);
+            this._lastOffset = null;
+            this.link._leader = this;
+        }
+
+        public override void detach() {
+            D.assert(this.link.leader == this);
+            this.link._leader = null;
+            this._lastOffset = null;
+            base.detach();
+        }
+
+        internal Offset _lastOffset;
+
+        public override void addToScene(SceneBuilder builder, Offset layerOffset) {
+            D.assert(this.offset != null);
+            this._lastOffset = this.offset + layerOffset;
+            if (this._lastOffset != Offset.zero)
+                builder.pushTransform(Matrix3.makeTrans(this._lastOffset));
+            this.addChildrenToScene(builder, Offset.zero);
+            if (this._lastOffset != Offset.zero)
+                builder.pop();
+        }
+
+        public override void applyTransform(Layer child, Matrix3 transform) {
+            D.assert(this._lastOffset != null);
+            if (this._lastOffset != Offset.zero)
+                transform.preTranslate((float)this._lastOffset.dx, (float)this._lastOffset.dy);
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new DiagnosticsProperty<Offset>("offset", this.offset));
+            properties.add(new DiagnosticsProperty<LayerLink>("link", this.link));
+        }
+
+    }
+
+    public class FollowerLayer : ContainerLayer {
+
+        public FollowerLayer(
+            LayerLink link = null,
+            bool showWhenUnlinked = true,
+            Offset unlinkedOffset = null,
+            Offset linkedOffset = null
+        ) {
+            D.assert(link != null);
+            this.link = link;
+            this.showWhenUnlinked = showWhenUnlinked;
+            this.unlinkedOffset = unlinkedOffset;
+            this.linkedOffset = linkedOffset;
+        }
+        
+        public readonly LayerLink link;
+        public readonly bool showWhenUnlinked;
+        public readonly Offset unlinkedOffset;
+        public readonly Offset linkedOffset;
+
+        Offset _lastOffset;
+        Matrix3 _lastTransform;
+        Matrix3 _invertedTransform;
+        
+        public Matrix3 getLastTransform() {
+            if (this._lastTransform == null)
+                return null;
+            Matrix3 result = Matrix3.makeTrans((float)-this._lastOffset.dx, (float)-this._lastOffset.dy);
+            result.preConcat(this._lastTransform);
+            return result;
+        }
+
+        Matrix3 _collectTransformForLayerChain(List<ContainerLayer> layers) {
+            Matrix3 result = Matrix3.I();
+            for (int index = layers.Count - 1; index > 0; index -= 1)
+                layers[index].applyTransform(layers[index - 1], result);
+            return result;
+        }
+
+        void _establishTransform() {
+            D.assert(this.link != null);
+            this._lastTransform = null;
+            if (this.link._leader == null) {
+                return;
+            }
+            
+            D.assert(this.link.leader.owner == this.owner, 
+                "Linked LeaderLayer anchor is not in the same layer tree as the FollowerLayer.");
+            D.assert(this.link.leader._lastOffset != null, "LeaderLayer anchor must come before FollowerLayer in paint order, but the reverse was true.");
+            
+            HashSet<Layer> ancestors = new HashSet<Layer>();
+            Layer ancestor = this.parent;
+            while (ancestor != null) {
+                ancestors.Add(ancestor);
+                ancestor = ancestor.parent;
+            }
+            
+            ContainerLayer layer = this.link.leader;
+            List<ContainerLayer> forwardLayers = new List<ContainerLayer> {null, layer};
+            do {
+                layer = layer.parent;
+                forwardLayers.Add(layer);
+            } while (!ancestors.Contains(layer));
+            ancestor = layer;
+
+            layer = this;
+            List<ContainerLayer> inverseLayers = new List<ContainerLayer>();
+            do {
+                layer = layer.parent;
+                inverseLayers.Add(layer);
+            } while (layer != ancestor);
+
+            Matrix3 forwardTransform = this._collectTransformForLayerChain(forwardLayers);
+            Matrix3 inverseTransform = this._collectTransformForLayerChain(inverseLayers);
+            var inverse = Matrix3.I();
+            var invertible = inverseTransform.invert(inverseTransform);
+            if (!invertible) {
+                return;
+            }
+
+            inverseTransform = inverse;
+            inverseTransform.preConcat(forwardTransform);
+            inverseTransform.preTranslate((float)this.linkedOffset.dx, (float)this.linkedOffset.dy);
+            this._lastTransform = inverseTransform;
+        }
+        
+        public override void addToScene(SceneBuilder builder, Offset layerOffset) {
+            D.assert(this.link != null);
+            if (this.link.leader == null && !this.showWhenUnlinked) {
+                this._lastTransform = null;
+                this._lastOffset = null;
+                return;
+            }
+            
+            this._establishTransform();
+            if (this._lastTransform != null) {
+                builder.pushTransform(this._lastTransform);
+                this.addChildrenToScene(builder, Offset.zero);
+                builder.pop();
+                this._lastOffset = this.unlinkedOffset + layerOffset;
+            }
+            else {
+                this._lastOffset = null;
+                var matrix = Matrix3.makeTrans((float)this.unlinkedOffset.dx, (float)this.unlinkedOffset.dy);
+                builder.pushTransform(matrix);
+                this.addChildrenToScene(builder, Offset.zero);
+                builder.pop();
+            }
+        }
+
+        public override void applyTransform(Layer child, Matrix3 transform) {
+            D.assert(child != null);
+            D.assert(transform != null);
+            if (this._lastTransform != null) {
+                transform.preConcat(this._lastTransform);
+            } else {
+                transform.preConcat(Matrix3.makeTrans((float)this.unlinkedOffset.dx, (float)this.unlinkedOffset.dy));
+            }
+        }
+        
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new DiagnosticsProperty<LayerLink>("link", this.link));
+            properties.add(new TransformProperty("transform", this.getLastTransform(), defaultValue: null));
+        } 
+    }
+
 }
