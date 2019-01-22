@@ -8,6 +8,7 @@ using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
+using Color = Unity.UIWidgets.ui.Color;
 using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace UIWidgetsSample {
@@ -94,6 +95,10 @@ namespace UIWidgetsSample {
                                 padding: EdgeInsets.fromLTRB(8, 0, 8, 0),
                                 child: new EditableText(maxLines: 1,
                                     controller: this.controller,
+                                    onSubmitted: (text) => {
+                                        this.controller.clear();
+                                        this._addItem(text);
+                                    },
                                     selectionControls: MaterialUtils.materialTextSelectionControls,
                                     autofocus: true,
                                     focusNode: new FocusNode(),
@@ -111,16 +116,21 @@ namespace UIWidgetsSample {
                                 child: new Text("Add", style: new TextStyle(
                                     fontSize: 20, color: Color.fromARGB(255, 255, 255, 255), fontWeight: FontWeight.w700
                                 )), onPressed: () => {
-                                    this.setState(() => {
-                                        if (this.controller.text != "") {
-                                            this.items.Add(new ToDoItem()
-                                                {id = this.nextId++, content = this.controller.text});
-                                        }
-                                    });
+                                   this._addItem();
                                 })
                         }
                     )
                 );
+            }
+
+            void _addItem(string text = null) {
+                this.setState(() => {
+                     text = text ?? this.controller.text;
+                    if (text != "") {
+                        this.items.Add(new ToDoItem()
+                            {id = this.nextId++, content = text});
+                    }
+                });
             }
 
             Widget contents() {
