@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
 using UnityEngine;
@@ -169,15 +168,76 @@ namespace Unity.UIWidgets.service {
 
     public interface TextInputClient {
         void updateEditingValue(TextEditingValue value);
-
-        TextEditingValue getValueForOperation(TextEditOp operation);
-        // void performAction(TextInputAction action);
+        
+        void performAction(TextInputAction action);
     }
 
     public enum TextInputAction {
+        none,
+        unspecified,
         done,
+        go,
+        search,
+        send,
+        next,
+        previous,
+        continueAction,
+        join,
+        route,
+        emergencyCall,
         newline,
+        moveLeft,
+        moveRight,
+        moveUp,
+        moveDown,
+        moveLineStart,
+        moveLineEnd,
+        moveTextStart,
+        moveTextEnd,
+        movePageUp,
+        movePageDown,
+        moveGraphicalLineStart,
+        moveGraphicalLineEnd,
+        moveWordLeft,
+        moveWordRight,
+        moveParagraphForward,
+        moveParagraphBackward,
+        moveToStartOfNextWord,
+        moveToEndOfPreviousWord,
+        selectLeft,
+        selectRight,
+        selectUp,
+        selectDown,
+        selectTextStart,
+        selectTextEnd,
+        selectPageUp,
+        selectPageDown,
+        expandSelectGraphicalLineStart,
+        expandSelectGraphicalLineEnd,
+        selectGraphicalLineStart,
+        selectGraphicalLineEnd,
+        selectWordLeft,
+        selectWordRight,
+        selectToEndOfPreviousWord,
+        selectToStartOfNextWord,
+        selectParagraphBackward,
+        selectParagraphForward,
+        delete,
+        backspace,
+        deleteWordBack,
+        deleteWordForward,
+        deleteLineBack,
+        cut,
+        copy,
+        paste,
+        selectAll,
+        selectNone,
+        scrollStart,
+        scrollEnd,
+        scrollPageUp,
+        scrollPageDown,
     }
+    // text client
 
     public class TextInputConnection {
         internal TextInputConnection(TextInputClient client, TextInput textInput) {
@@ -220,7 +280,6 @@ namespace Unity.UIWidgets.service {
     public class TextInput {
         internal TextInputConnection _currentConnection;
         internal TextEditingValue _value;
-        static Dictionary<Event, TextEditOp> s_Keyactions;
         string _lastCompositionString;
 
         public TextInputConnection attach(TextInputClient client) {
@@ -238,11 +297,15 @@ namespace Unity.UIWidgets.service {
 
             var currentEvent = Event.current;
             if (currentEvent.type == EventType.KeyDown) {
-                bool handled = this.handleKeyEvent(currentEvent);
-                if (!handled) {
+                var action = TextInputUtils.getInputAction(currentEvent);
+                if (action != null) {
+                    this._performAction(this._currentConnection._id, action.Value);
+                }
+
+                if (action == null || action == TextInputAction.newline) {
                     if (currentEvent.keyCode == KeyCode.None) {
                         this._value = this._value.clearCompose().insert(new string(currentEvent.character, 1));
-                        this._currentConnection._client.updateEditingValue(this._value);
+                        this._updateEditingState(this._currentConnection._id, this._value);
                     }
                 }
                 currentEvent.Use();
@@ -251,7 +314,7 @@ namespace Unity.UIWidgets.service {
             if (!string.IsNullOrEmpty(Input.compositionString) &&
                 this._lastCompositionString != Input.compositionString) {
                 this._value = this._value.compose(Input.compositionString);
-                this._currentConnection._client.updateEditingValue(this._value);
+                this._updateEditingState(this._currentConnection._id, this._value);
             }
 
             this._lastCompositionString = Input.compositionString;
@@ -261,261 +324,35 @@ namespace Unity.UIWidgets.service {
             Input.compositionCursorPos = new Vector2((float) x, (float) y);
         }
 
-        bool handleKeyEvent(Event e) {
-            initKeyActions();
-            EventModifiers m = e.modifiers;
-            e.modifiers &= ~EventModifiers.CapsLock;
-            if (s_Keyactions.ContainsKey(e)) {
-                TextEditOp op = s_Keyactions[e];
-                var newValue = this._currentConnection._client.getValueForOperation(op);
-                if (this._value != newValue) {
-                    this._value = newValue;
-                    this._currentConnection._client.updateEditingValue(this._value);
+        void _updateEditingState(int client, TextEditingValue value) {        
+            Window.instance.run(() => {
+                if (this._currentConnection == null) {
+                    return;
                 }
-                e.modifiers = m;
-                return true;
-            }
-            e.modifiers = m;
-            return false;
+
+                if (client != this._currentConnection._id) {
+                    return;
+                }
+                
+                this._currentConnection._client.updateEditingValue(value);
+            });
         }
 
-        TextEditingValue performOperation(TextEditOp operation) {
-            switch (operation) {
-                case TextEditOp.MoveLeft:
-                    return this._value.moveLeft();
-                case TextEditOp.MoveRight:
-                    return this._value.moveRight();
-//                case TextEditOp.MoveUp:             MoveUp(); break;
-//                case TextEditOp.MoveDown:           MoveDown(); break;
-//                case TextEditOp.MoveLineStart:      MoveLineStart(); break;
-//                case TextEditOp.MoveLineEnd:        MoveLineEnd(); break;
-//                case TextEditOp.MoveWordRight:      MoveWordRight(); break;
-//                case TextEditOp.MoveToStartOfNextWord:      MoveToStartOfNextWord(); break;
-//                case TextEditOp.MoveToEndOfPreviousWord:        MoveToEndOfPreviousWord(); break;
-//                case TextEditOp.MoveWordLeft:       MoveWordLeft(); break;
-//                case TextEditOp.MoveTextStart:      MoveTextStart(); break;
-//                case TextEditOp.MoveTextEnd:        MoveTextEnd(); break;
-//                case TextEditOp.MoveParagraphForward:   MoveParagraphForward(); break;
-//                case TextEditOp.MoveParagraphBackward:  MoveParagraphBackward(); break;
-//                case TextEditOp.MoveGraphicalLineStart: MoveGraphicalLineStart(); break;
-//                case TextEditOp.MoveGraphicalLineEnd: MoveGraphicalLineEnd(); break;
-                case TextEditOp.SelectLeft:
-                    return this._value.extendLeft();
-                case TextEditOp.SelectRight:
-                    return this._value.extendRight();
-//                case TextEditOp.SelectUp:           SelectUp(); break;
-//                case TextEditOp.SelectDown:         SelectDown(); break;
-//                case TextEditOp.SelectWordRight:        SelectWordRight(); break;
-//                case TextEditOp.SelectWordLeft:     SelectWordLeft(); break;
-//                case TextEditOp.SelectToEndOfPreviousWord:  SelectToEndOfPreviousWord(); break;
-//                case TextEditOp.SelectToStartOfNextWord:    SelectToStartOfNextWord(); break;
-//
-//                case TextEditOp.SelectTextStart:        SelectTextStart(); break;
-//                case TextEditOp.SelectTextEnd:      SelectTextEnd(); break;
-//                case TextEditOp.ExpandSelectGraphicalLineStart: ExpandSelectGraphicalLineStart(); break;
-//                case TextEditOp.ExpandSelectGraphicalLineEnd: ExpandSelectGraphicalLineEnd(); break;
-//                case TextEditOp.SelectParagraphForward:     SelectParagraphForward(); break;
-//                case TextEditOp.SelectParagraphBackward:    SelectParagraphBackward(); break;
-//                case TextEditOp.SelectGraphicalLineStart: SelectGraphicalLineStart(); break;
-//                case TextEditOp.SelectGraphicalLineEnd: SelectGraphicalLineEnd(); break;
-//                case TextEditOp.Delete:                             return Delete();
-                case TextEditOp.Backspace:
-                    return this._value.deleteSelection();
-                // _value.composing
-                // _value = _value.
-//                case TextEditOp.Cut:                                    return Cut();
-//                case TextEditOp.Copy:                               Copy(); break;
-//                case TextEditOp.Paste:                              return Paste();
-//                case TextEditOp.SelectAll:                          SelectAll(); break;
-//                case TextEditOp.SelectNone:                     SelectNone(); break;
-//                case TextEditOp.DeleteWordBack: return DeleteWordBack(); // break; // The uncoditional return makes the "break;" issue a warning about unreachable code
-//                case TextEditOp.DeleteLineBack: return DeleteLineBack();
-//                case TextEditOp.DeleteWordForward: return DeleteWordForward(); // break; // The uncoditional return makes the "break;" issue a warning about unreachable code
-                default:
-                    Debug.Log("Unimplemented: " + operation);
-                    break;
-            }
+        void _performAction(int client, TextInputAction action) {
+            Window.instance.run(() => {
+                if (this._currentConnection == null) {
+                    return;
+                }
 
-            return this._value;
+                if (client != this._currentConnection._id) {
+                    return;
+                }
+                
+                this._currentConnection._client.performAction(action);
+            }); 
         }
 
-
-        static void initKeyActions() {
-            if (s_Keyactions != null) {
-                return;
-            }
-            s_Keyactions = new Dictionary<Event, TextEditOp>();
-
-            // key mappings shared by the platforms
-            mapKey("left", TextEditOp.MoveLeft);
-            mapKey("right", TextEditOp.MoveRight);
-            mapKey("up", TextEditOp.MoveUp);
-            mapKey("down", TextEditOp.MoveDown);
-
-            mapKey("#left", TextEditOp.SelectLeft);
-            mapKey("#right", TextEditOp.SelectRight);
-            mapKey("#up", TextEditOp.SelectUp);
-            mapKey("#down", TextEditOp.SelectDown);
-
-            mapKey("delete", TextEditOp.Delete);
-            mapKey("backspace", TextEditOp.Backspace);
-            mapKey("#backspace", TextEditOp.Backspace);
-
-            // OSX is the special case for input shortcuts
-            if (SystemInfo.operatingSystemFamily == OperatingSystemFamily.MacOSX) {
-                // Keyboard mappings for mac
-                // TODO     mapKey ("home", TextEditOp.ScrollStart);
-                // TODO     mapKey ("end", TextEditOp.ScrollEnd);
-                // TODO     mapKey ("page up", TextEditOp.ScrollPageUp);
-                // TODO     mapKey ("page down", TextEditOp.ScrollPageDown);
-
-                mapKey("^left", TextEditOp.MoveGraphicalLineStart);
-                mapKey("^right", TextEditOp.MoveGraphicalLineEnd);
-                // TODO     mapKey ("^up", TextEditOp.ScrollPageUp);
-                // TODO     mapKey ("^down", TextEditOp.ScrollPageDown);
-
-                mapKey("&left", TextEditOp.MoveWordLeft);
-                mapKey("&right", TextEditOp.MoveWordRight);
-                mapKey("&up", TextEditOp.MoveParagraphBackward);
-                mapKey("&down", TextEditOp.MoveParagraphForward);
-
-                mapKey("%left", TextEditOp.MoveGraphicalLineStart);
-                mapKey("%right", TextEditOp.MoveGraphicalLineEnd);
-                mapKey("%up", TextEditOp.MoveTextStart);
-                mapKey("%down", TextEditOp.MoveTextEnd);
-
-                mapKey("#home", TextEditOp.SelectTextStart);
-                mapKey("#end", TextEditOp.SelectTextEnd);
-                // TODO         mapKey ("#page up", TextEditOp.SelectPageUp);
-                // TODO         mapKey ("#page down", TextEditOp.SelectPageDown);
-
-                mapKey("#^left", TextEditOp.ExpandSelectGraphicalLineStart);
-                mapKey("#^right", TextEditOp.ExpandSelectGraphicalLineEnd);
-                mapKey("#^up", TextEditOp.SelectParagraphBackward);
-                mapKey("#^down", TextEditOp.SelectParagraphForward);
-
-                mapKey("#&left", TextEditOp.SelectWordLeft);
-                mapKey("#&right", TextEditOp.SelectWordRight);
-                mapKey("#&up", TextEditOp.SelectParagraphBackward);
-                mapKey("#&down", TextEditOp.SelectParagraphForward);
-
-                mapKey("#%left", TextEditOp.ExpandSelectGraphicalLineStart);
-                mapKey("#%right", TextEditOp.ExpandSelectGraphicalLineEnd);
-                mapKey("#%up", TextEditOp.SelectTextStart);
-                mapKey("#%down", TextEditOp.SelectTextEnd);
-
-                mapKey("%a", TextEditOp.SelectAll);
-                mapKey("%x", TextEditOp.Cut);
-                mapKey("%c", TextEditOp.Copy);
-                mapKey("%v", TextEditOp.Paste);
-
-                // emacs-like keybindings
-                mapKey("^d", TextEditOp.Delete);
-                mapKey("^h", TextEditOp.Backspace);
-                mapKey("^b", TextEditOp.MoveLeft);
-                mapKey("^f", TextEditOp.MoveRight);
-                mapKey("^a", TextEditOp.MoveLineStart);
-                mapKey("^e", TextEditOp.MoveLineEnd);
-
-                mapKey("&delete", TextEditOp.DeleteWordForward);
-                mapKey("&backspace", TextEditOp.DeleteWordBack);
-                mapKey("%backspace", TextEditOp.DeleteLineBack);
-            } else {
-                // Windows/Linux keymappings
-                mapKey("home", TextEditOp.MoveGraphicalLineStart);
-                mapKey("end", TextEditOp.MoveGraphicalLineEnd);
-                // TODO     mapKey ("page up", TextEditOp.MovePageUp);
-                // TODO     mapKey ("page down", TextEditOp.MovePageDown);
-
-                mapKey("%left", TextEditOp.MoveWordLeft);
-                mapKey("%right", TextEditOp.MoveWordRight);
-                mapKey("%up", TextEditOp.MoveParagraphBackward);
-                mapKey("%down", TextEditOp.MoveParagraphForward);
-
-                mapKey("^left", TextEditOp.MoveToEndOfPreviousWord);
-                mapKey("^right", TextEditOp.MoveToStartOfNextWord);
-                mapKey("^up", TextEditOp.MoveParagraphBackward);
-                mapKey("^down", TextEditOp.MoveParagraphForward);
-
-                mapKey("#^left", TextEditOp.SelectToEndOfPreviousWord);
-                mapKey("#^right", TextEditOp.SelectToStartOfNextWord);
-                mapKey("#^up", TextEditOp.SelectParagraphBackward);
-                mapKey("#^down", TextEditOp.SelectParagraphForward);
-
-                mapKey("#home", TextEditOp.SelectGraphicalLineStart);
-                mapKey("#end", TextEditOp.SelectGraphicalLineEnd);
-                // TODO         mapKey ("#page up", TextEditOp.SelectPageUp);
-                // TODO         mapKey ("#page down", TextEditOp.SelectPageDown);
-
-                mapKey("^delete", TextEditOp.DeleteWordForward);
-                mapKey("^backspace", TextEditOp.DeleteWordBack);
-                mapKey("%backspace", TextEditOp.DeleteLineBack);
-
-                mapKey("^a", TextEditOp.SelectAll);
-                mapKey("^x", TextEditOp.Cut);
-                mapKey("^c", TextEditOp.Copy);
-                mapKey("^v", TextEditOp.Paste);
-                mapKey("#delete", TextEditOp.Cut);
-                mapKey("^insert", TextEditOp.Copy);
-                mapKey("#insert", TextEditOp.Paste);
-            }
-        }
-
-        static void mapKey(string key, TextEditOp action) {
-            s_Keyactions[Event.KeyboardEvent(key)] = action;
-        }
     }
 
-    public enum TextEditOp {
-        MoveLeft,
-        MoveRight,
-        MoveUp,
-        MoveDown,
-        MoveLineStart,
-        MoveLineEnd,
-        MoveTextStart,
-        MoveTextEnd,
-        MovePageUp,
-        MovePageDown,
-        MoveGraphicalLineStart,
-        MoveGraphicalLineEnd,
-        MoveWordLeft,
-        MoveWordRight,
-        MoveParagraphForward,
-        MoveParagraphBackward,
-        MoveToStartOfNextWord,
-        MoveToEndOfPreviousWord,
-        SelectLeft,
-        SelectRight,
-        SelectUp,
-        SelectDown,
-        SelectTextStart,
-        SelectTextEnd,
-        SelectPageUp,
-        SelectPageDown,
-        ExpandSelectGraphicalLineStart,
-        ExpandSelectGraphicalLineEnd,
-        SelectGraphicalLineStart,
-        SelectGraphicalLineEnd,
-        SelectWordLeft,
-        SelectWordRight,
-        SelectToEndOfPreviousWord,
-        SelectToStartOfNextWord,
-        SelectParagraphBackward,
-        SelectParagraphForward,
-        Delete,
-        Backspace,
-        DeleteWordBack,
-        DeleteWordForward,
-        DeleteLineBack,
-        Cut,
-        Copy,
-        Paste,
-        SelectAll,
-        SelectNone,
-        ScrollStart,
-        ScrollEnd,
-        ScrollPageUp,
-        ScrollPageDown,
-    }
+   
 }
