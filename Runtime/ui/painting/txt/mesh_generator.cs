@@ -132,14 +132,16 @@ namespace Unity.UIWidgets.ui {
             var subText = textBlob.text.Substring(textBlob.start, textBlob.end - textBlob.start);
             font.RequestCharactersInTexture(subText, fontSizeToLoad, style.UnityFontStyle);
             
+            /*
             var key = new MeshKey(subText, font.GetInstanceID(), fontInfo.textureVersion, fontSizeToLoad,
                 style.UnityFontStyle, scale);
 
+            
             _meshes.TryGetValue(key, out var meshInfo);
             if (meshInfo != null) {
                 meshInfo.touch();
                 return meshInfo.mesh;
-            }
+            }*/
 
             var vertices = new List<Vector3>(length * 4);
             var triangles = new List<int>(length * 6);
@@ -182,7 +184,7 @@ namespace Unity.UIWidgets.ui {
 
              
             MeshMesh mesh = new MeshMesh(vertices, triangles, uv);
-            _meshes[key] = new MeshInfo(key, mesh);
+            // _meshes[key] = new MeshInfo(key, mesh);
             
             return mesh;
         }
