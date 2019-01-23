@@ -69,7 +69,7 @@ namespace Unity.UIWidgets.material {
 
         public static Color white = new Color(0xFFFFFFFF);
 
-        public static Color while70 = new Color(0xB3FFFFFF);
+        public static Color white70 = new Color(0xB3FFFFFF);
 
         public static Color white54 = new Color(0x8AFFFFFF);
 

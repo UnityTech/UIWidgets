@@ -612,6 +612,125 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
+    public class PhysicalModel : SingleChildRenderObjectWidget {
+        public PhysicalModel(
+            Key key = null,
+            BoxShape shape = BoxShape.rectangle,
+            Clip clipBehavior = Clip.none,
+            BorderRadius borderRadius = null,
+            double elevation = 0.0,
+            Color color = null,
+            Color shadowColor = null,
+            Widget child = null) : base(key: key, child: child) {
+            D.assert(shape != null);
+            D.assert(color != null);
+            
+            this.shape = shape;
+            this.clipBehavior = clipBehavior;
+            this.borderRadius = borderRadius;
+            this.elevation = elevation;
+            this.color = color;
+            this.shadowColor = shadowColor ?? new Color(0xFF000000);
+        }
+
+        public readonly BoxShape shape;
+
+        public readonly Clip clipBehavior;
+
+        public readonly BorderRadius borderRadius;
+
+        public readonly double elevation;
+
+        public readonly Color color;
+
+        public readonly Color shadowColor;
+
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderPhysicalModel(
+                shape: this.shape,
+                clipBehavior: this.clipBehavior,
+                borderRadius: this.borderRadius,
+                elevation: this.elevation,
+                color: this.color,
+                shadowColor: this.shadowColor);
+        }
+
+        public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
+            RenderPhysicalModel _renderObject = (RenderPhysicalModel) renderObject;
+            _renderObject.shape = this.shape;
+            _renderObject.borderRadius = this.borderRadius;
+            _renderObject.elevation = this.elevation;
+            _renderObject.color = this.color;
+            _renderObject.shadowColor = this.shadowColor;
+        }
+        
+        
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new EnumProperty<BoxShape>("shape", this.shape));
+            properties.add(new DiagnosticsProperty<BorderRadius>("borderRadius", this.borderRadius));
+            properties.add(new DoubleProperty("elevation", this.elevation));
+            properties.add(new DiagnosticsProperty<Color>("color", this.color));
+            properties.add(new DiagnosticsProperty<Color>("shadowColor", this.shadowColor));
+        }
+    }
+
+
+    public class PhysicalShape : SingleChildRenderObjectWidget {
+        public PhysicalShape(
+        Key key = null,
+        CustomClipper<Path> clipper = null,
+        Clip clipBehavior = Clip.none,
+        double elevation = 0.0,
+        Color color = null,
+        Color shadowColor = null,
+        Widget child = null) : base(key : key, child: child){
+            D.assert(clipper != null);
+            D.assert(color != null);
+            this.clipper = clipper;
+            this.clipBehavior = clipBehavior;
+            this.elevation = elevation;
+            this.color = color;
+            this.shadowColor = shadowColor ?? new Color(0xFF000000);
+        }
+
+        public readonly CustomClipper<Path> clipper;
+
+        public readonly Clip clipBehavior;
+
+        public readonly double elevation;
+
+        public readonly Color color;
+
+        public readonly Color shadowColor;
+
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderPhysicalShape(
+                clipper: this.clipper,
+                clipBehavior: this.clipBehavior,
+                elevation: this.elevation,
+                color: this.color,
+                shadowColor: this.shadowColor);
+        }
+
+        public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
+            RenderPhysicalShape _renderObject = (RenderPhysicalShape) renderObject;
+            _renderObject.clipper = this.clipper;
+            _renderObject.elevation = this.elevation;
+            _renderObject.color = this.color;
+            _renderObject.shadowColor = this.shadowColor;
+        }
+        
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new DiagnosticsProperty<CustomClipper<Path>>("clipper", this.clipper));
+            properties.add(new DoubleProperty("elevation", this.elevation));
+            properties.add(new DiagnosticsProperty<Color>("color", this.color));
+            properties.add(new DiagnosticsProperty<Color>("shadowColor", this.shadowColor));
+        }
+    }
+    
+
     public class Padding : SingleChildRenderObjectWidget {
         public Padding(
             Key key = null,

@@ -1,0 +1,497 @@
+using System.Collections.Generic;
+using Unity.UIWidgets.painting;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.ui;
+using Unity.UIWidgets.rendering;
+using Unity.UIWidgets.scheduler;
+using Unity.UIWidgets.widgets;
+using System;
+using Unity.UIWidgets.animation;
+using TextStyle = Unity.UIWidgets.painting.TextStyle;
+
+
+namespace Unity.UIWidgets.material {
+    
+    public delegate Rect RectCallback();
+
+    public enum MaterialType {
+        canvas,
+        card,
+        circle,
+        button,
+        transparency
+    }
+    
+
+    public interface MaterialInkController {
+
+        Color color { get; set; }
+
+        TickerProvider vsync { get; }
+
+        void addInkFeature(InkFeature feature);
+
+        void markNeedsPaint();
+    }
+
+
+    public class Material : StatefulWidget {
+        public Material(
+            Key key = null,
+            MaterialType type = MaterialType.canvas,
+            double elevation = 0.0,
+            Color color = null,
+            Color shadowColor = null,
+            TextStyle textStyle = null,
+            BorderRadius borderRadius = null,
+            ShapeBorder shape = null,
+            Clip clipBehavior = Clip.none,
+            TimeSpan? animationDuration = null,
+            Widget child = null
+            ) : base(key: key) {
+            D.assert(type != null);
+            D.assert(elevation != null);            
+            D.assert(!(shape != null && borderRadius != null));
+            D.assert(type != MaterialType.circle && (borderRadius != null || shape != null));
+            D.assert(clipBehavior != null);
+            
+            this.type = type;
+            this.elevation = elevation;
+            this.color = color;
+            this.shadowColor = shadowColor ?? new Color(0xFF000000);
+            this.textStyle = textStyle;
+            this.borderRadius = borderRadius;
+            this.shape = shape;
+            this.clipBehavior = clipBehavior;
+            this.animationDuration = animationDuration ?? Constants.kThemeChangeDuration;
+            this.child = child;
+        }
+        
+
+        public readonly Widget child;
+
+        public readonly MaterialType type;
+
+        public readonly double elevation;
+
+        public readonly Color color;
+
+        public readonly Color shadowColor;
+
+        public readonly TextStyle textStyle;
+
+        public readonly ShapeBorder shape;
+
+        public readonly Clip clipBehavior;
+
+        public readonly TimeSpan animationDuration;
+
+        public readonly BorderRadius borderRadius;
+
+        
+        public static MaterialInkController of(BuildContext context) {
+            _RenderInkFeatures result = (_RenderInkFeatures) context.ancestorRenderObjectOfType(new TypeMatcher<_RenderInkFeatures>());
+            return result;
+        }
+        
+        public override State createState() => new _MaterialState();
+
+        
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new EnumProperty<MaterialType>("type", this.type));
+            properties.add(new DoubleProperty("elevation", this.elevation, defaultValue: 0.0));
+            properties.add(new DiagnosticsProperty<Color>("color", this.color, defaultValue: null));
+            properties.add(new DiagnosticsProperty<Color>("shadowColor", this.shadowColor, defaultValue: new Color(0xFF000000)));
+            this.textStyle?.debugFillProperties(properties);
+            properties.add(new DiagnosticsProperty<ShapeBorder>("shape", this.shape, defaultValue: null));
+            properties.add(new EnumProperty<BorderRadius>("borderRadius", this.borderRadius, defaultValue: null));
+        }
+
+        public static double defaultSplashRadius = 35.0;
+    }
+
+
+    class _MaterialState : TickerProviderStateMixin<Material> {
+        readonly GlobalKey _inkFeatureRenderer = GlobalKey.key(debugLabel:"ink renderer");
+
+        Color _getBackgroundColor(BuildContext context) {
+            if (this.widget.color != null)
+                return this.widget.color;
+            switch (this.widget.type) {
+                case MaterialType.canvas:
+                    return Theme.of(context).canvasColor;
+                case MaterialType.card:
+                    return Theme.of(context).cardColor;
+                default:
+                    return null;
+            }
+        }
+
+        public override Widget build(BuildContext context) {
+            Color backgroundColor = this._getBackgroundColor(context);
+            D.assert(backgroundColor != null || this.widget.type == MaterialType.transparency);
+            Widget contents = this.widget.child;
+            if (contents != null) {
+                contents = new AnimatedDefaultTextStyle(
+                    style: this.widget.textStyle ?? Theme.of(context).textTheme.body1,
+                    duration: this.widget.animationDuration,
+                    child: contents
+                );
+            }
+
+            contents = new NotificationListener<LayoutChangedNotification>(
+                onNotification: (LayoutChangedNotification notification) => {
+                    _RenderInkFeatures renderer = (_RenderInkFeatures) this._inkFeatureRenderer.currentContext.findRenderObject();
+                    renderer._didChangeLayout();
+                    return true;
+                },
+                child: new _InkFeatures(
+                    key: this._inkFeatureRenderer,
+                    color: backgroundColor,
+                    child: contents,
+                    vsync: this
+                    )
+            );
+
+            if (this.widget.type == MaterialType.canvas && this.widget.shape == null &&
+                this.widget.borderRadius == null) {
+                return new AnimatedPhysicalModel(
+                    curve: Curves.fastOutSlowIn,
+                    duration: this.widget.animationDuration,
+                    shape: BoxShape.rectangle,
+                    clipBehavior: this.widget.clipBehavior,
+                    borderRadius: BorderRadius.zero,
+                    elevation: this.widget.elevation,
+                    color: backgroundColor,
+                    shadowColor: this.widget.shadowColor,
+                    animateColor: false,
+                    child: contents
+                );
+            }
+
+            ShapeBorder shape = this._getShape();
+
+            if (this.widget.type == MaterialType.transparency) {
+                D.assert(false, "material widget is not completely implemented yet.");
+                return null;
+//                return this._transparentInterior(
+//                    shape: shape,
+//                    clipBehavior: this.widget.clipBehavior,
+//                    contents: contents);
+            }
+
+            return new _MaterialInterior(
+                curve: Curves.fastOutSlowIn,
+                duration: this.widget.animationDuration,
+                shape: shape,
+                clipBehavior: this.widget.clipBehavior,
+                elevation: this.widget.elevation,
+                color: backgroundColor,
+                shadowColor: this.widget.shadowColor,
+                child: contents
+            );
+        }
+
+
+        ShapeBorder _getShape() {
+            if (this.widget.shape != null)
+                return this.widget.shape;
+            if (this.widget.borderRadius != null)
+                return new RoundedRectangleBorder(borderRadius: this.widget.borderRadius);
+            switch (this.widget.type) {
+                case MaterialType.canvas:
+                case MaterialType.transparency:
+                    return new RoundedRectangleBorder();
+                case MaterialType.card:
+                case MaterialType.button:
+                    return new RoundedRectangleBorder(
+                        borderRadius: this.widget.borderRadius ?? MaterialUtils.kMaterialEdges[this.widget.type]);
+                case MaterialType.circle:
+                    return new CircleBorder();
+            }
+            return new RoundedRectangleBorder();
+        }
+    }
+
+
+    public class _RenderInkFeatures : RenderProxyBox, MaterialInkController {
+        public _RenderInkFeatures(
+            RenderBox child = null,
+            TickerProvider vsync = null,
+            Color color = null) : base(child: child) {
+            D.assert(vsync != null);
+            this._vsync = vsync;
+            this._color = color;
+        }
+
+        public TickerProvider vsync {
+            get { return this._vsync; }
+        }
+
+        readonly TickerProvider _vsync;
+
+        public Color color {
+            get { return this._color; }
+            set { this._color = value; }
+        }
+
+        Color _color;
+
+        List<InkFeature> _inkFeatures;
+
+        public void addInkFeature(InkFeature feature) {
+            D.assert(!feature._debugDisposed);
+            D.assert(feature._controller == this);
+            this._inkFeatures = this._inkFeatures ?? new List<InkFeature>();
+            D.assert(!this._inkFeatures.Contains(feature));
+            this._inkFeatures.Add(feature);
+            this.markNeedsPaint();
+        }
+
+        public void _removeFeature(InkFeature feature) {
+            D.assert(this._inkFeatures != null);
+            this._inkFeatures.Remove(feature);
+            this.markNeedsPaint();
+        }
+
+        public void _didChangeLayout() {
+            if (this._inkFeatures != null && this._inkFeatures.isNotEmpty())
+                this.markNeedsPaint();
+        }
+
+        protected override bool hitTestSelf(Offset position) => true;
+
+        public override void paint(PaintingContext context, Offset offset) {
+            if (this._inkFeatures != null && this._inkFeatures.isNotEmpty()) {
+                Canvas canvas = context.canvas;
+                canvas.save();
+                canvas.translate(offset.dx, offset.dy);
+                canvas.clipRect(Offset.zero & this.size);
+                foreach (InkFeature inkFeature in this._inkFeatures)
+                    inkFeature._paint(canvas);
+                canvas.restore();
+            }
+            base.paint(context, offset);
+        }
+    }
+
+
+    public class _InkFeatures : SingleChildRenderObjectWidget {
+        public _InkFeatures(
+            Key key = null,
+            Color color = null,
+            TickerProvider vsync = null,
+            Widget child = null) : base(key: key, child: child) {
+            D.assert(vsync != null);
+            this.color = color;
+            this.vsync = vsync;
+        }
+
+        public readonly Color color;
+
+        public readonly TickerProvider vsync;
+
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new _RenderInkFeatures(
+                color: this.color,
+                vsync: this.vsync);
+        }
+
+        public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
+            _RenderInkFeatures _renderObject = (_RenderInkFeatures) renderObject;
+            _renderObject.color = this.color;
+            D.assert(this.vsync == _renderObject.vsync);
+        }
+    }
+
+    public abstract class InkFeature {
+        public InkFeature(
+            MaterialInkController controller = null,
+            RenderBox referenceBox = null,
+            VoidCallback onRemoved = null) {
+            D.assert(controller != null);
+            D.assert(referenceBox != null);
+            this._controller = (_RenderInkFeatures)controller;
+            this.referenceBox = referenceBox;
+            this.onRemoved = onRemoved;
+        }
+
+        public MaterialInkController controller {
+            get { return this._controller;  }
+        }
+
+        public _RenderInkFeatures _controller;
+
+        public readonly RenderBox referenceBox;
+
+        public readonly VoidCallback onRemoved;
+
+        public bool _debugDisposed = false;
+
+        public virtual void dispose() {
+            D.assert(!this._debugDisposed);
+            D.assert(() => {
+                this._debugDisposed = true;
+                return true;
+            });
+            this._controller._removeFeature(this);
+            if (this.onRemoved != null)
+                this.onRemoved();
+        }
+
+        public void _paint(Canvas canvas) {
+            D.assert(this.referenceBox.attached);
+            D.assert(!this._debugDisposed);
+
+            List<RenderObject> descendants = new List<RenderObject> { this.referenceBox };
+            RenderObject node = this.referenceBox;
+            while (node != this._controller) {
+                node = (RenderObject)node.parent;
+                D.assert(node != null);
+                descendants.Add(node);
+            }
+            
+            Matrix3 transform = Matrix3.I();
+            D.assert(descendants.Count >= 2);
+            for(int index = descendants.Count - 1; index > 0; index -= 1)
+                descendants[index].applyPaintTransform(descendants[index - 1], transform);
+            this.paintFeature(canvas, transform);
+        }
+
+        protected abstract void paintFeature(Canvas canvas, Matrix3 transform);
+
+        public string toString() => this.GetType() + "";
+    }
+    
+    public class ShapeBorderTween : Tween<ShapeBorder> {
+        public ShapeBorderTween(
+            ShapeBorder begin = null,
+            ShapeBorder end = null) : base(begin: begin, end: end) {}
+
+        public override ShapeBorder lerp(double t) {
+            return ShapeBorder.lerp(this.begin, this.end, t);
+        }
+    }
+
+    public class _MaterialInterior : ImplicitlyAnimatedWidget {
+        public _MaterialInterior(
+        Key key = null,
+        Widget child = null,
+        ShapeBorder shape = null,
+        Clip clipBehavior = Clip.none,
+        double? elevation = null,
+        Color color = null,
+        Color shadowColor = null,
+        Curve curve = null,
+        TimeSpan? duration = null
+            ) : base(key : key, curve : curve ?? Curves.linear, duration : duration){
+            D.assert(child != null);
+            D.assert(shape != null);
+            D.assert(elevation != null);
+            D.assert(color != null);
+            D.assert(shadowColor != null);
+            D.assert(duration != null);
+            this.child = child;
+            this.shape = shape;
+            this.clipBehavior = clipBehavior;
+            this.elevation = elevation ?? 0.0;
+            this.color = color;
+            this.shadowColor = shadowColor;
+        }
+
+        public readonly Widget child;
+
+        public readonly ShapeBorder shape;
+
+        public readonly Clip clipBehavior;
+
+        public readonly double elevation;
+
+        public readonly Color color;
+
+        public readonly Color shadowColor;
+
+        public override State createState() => new _MaterialInteriorState();
+        
+        
+        public override void debugFillProperties(DiagnosticPropertiesBuilder description) {
+            base.debugFillProperties(description);
+            description.add(new DiagnosticsProperty<ShapeBorder>("shape", this.shape));
+            description.add(new DoubleProperty("elevation", this.elevation));
+            description.add(new DiagnosticsProperty<Color>("color", this.color));
+            description.add(new DiagnosticsProperty<Color>("shadowColor", this.shadowColor));
+        }
+    }
+
+    public class _MaterialInteriorState : AnimatedWidgetBaseState<_MaterialInterior> {
+        DoubleTween _elevation;
+        ColorTween _shadowColor;
+        ShapeBorderTween _border;
+
+        protected override void forEachTween(ITweenVisitor visitor) {
+            this._elevation = (DoubleTween) visitor.visit(this, this._elevation, this.widget.elevation,
+                (double value) => new DoubleTween(begin: value, end: value));
+            this._shadowColor = (ColorTween) visitor.visit(this, this._shadowColor, this.widget.shadowColor,
+                (Color value) => new ColorTween(begin: value));
+            this._border = (ShapeBorderTween) visitor.visit(this, this._border, this.widget.shape,
+                (ShapeBorder value) => new ShapeBorderTween(begin: value));
+        }
+
+        public override Widget build(BuildContext context) {
+            ShapeBorder shape = this._border.evaluate(this.animation);
+            return new PhysicalShape(
+                child : new _ShapeBorderPaint(
+                    child : this.widget.child,
+                    shape: shape),
+                clipper: new ShapeBorderClipper(
+                    shape: shape),
+                clipBehavior: this.widget.clipBehavior,
+                elevation: this._elevation.evaluate(this.animation),
+                color: this.widget.color,
+                shadowColor: this._shadowColor.evaluate(this.animation)
+            );
+        }
+    }
+
+    class _ShapeBorderPaint : StatelessWidget {
+        public _ShapeBorderPaint(
+            Widget child = null,
+            ShapeBorder shape = null) {
+            D.assert(child != null);
+            D.assert(shape != null);
+            this.child = child;
+            this.shape = shape;
+        }
+
+        public readonly Widget child;
+
+        public readonly ShapeBorder shape;
+
+        public override Widget build(BuildContext context) {
+            return new CustomPaint(
+                child :this.child,
+                foregroundPainter: new _ShapeBorderPainter(this.shape));
+        }
+    }
+
+    class _ShapeBorderPainter : CustomPainter {
+        public _ShapeBorderPainter (
+            ShapeBorder border = null,
+            Listenable repaint = null) : base(repaint) {
+            this.border = border;
+        }
+
+        public readonly ShapeBorder border;
+
+
+        public override void paint(Canvas canvas, Size size) {
+            this.border.paint(canvas, Offset.zero & size);
+        }
+
+        public override bool shouldRepaint(CustomPainter oldDelegate) {
+            _ShapeBorderPainter _oldDelegate = (_ShapeBorderPainter) oldDelegate;
+            return _oldDelegate.border != this.border;
+        }
+    }
+}

@@ -57,6 +57,14 @@ namespace Unity.UIWidgets.widgets {
 
         public readonly double? size;
 
+        public static IconThemeData lerp(IconThemeData a, IconThemeData b, double t) {
+            D.assert(t != null);
+            return new IconThemeData(
+                color: Color.lerp(a.color, b.color, t),
+                opacity: MathUtils.lerpDouble(a.opacity ?? 1.0, b.opacity ?? 1.0, t),
+                size: MathUtils.lerpDouble(a.size ?? 24.0, b.size ?? 24.0, t));
+        }
+
 
         public bool Equals(IconThemeData other) {
             if (ReferenceEquals(null, other)) {

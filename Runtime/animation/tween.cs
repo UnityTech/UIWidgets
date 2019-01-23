@@ -65,7 +65,7 @@ namespace Unity.UIWidgets.animation {
     }
 
     public abstract class Tween<T> : Animatable<T>, IEquatable<Tween<T>> {
-        protected Tween(T begin, T end) {
+        public Tween(T begin, T end) {
             D.assert(begin != null);
             D.assert(end != null);
 
@@ -73,9 +73,9 @@ namespace Unity.UIWidgets.animation {
             this.end = end;
         }
 
-        public readonly T begin;
+        public T begin;
 
-        public readonly T end;
+        public T end;
 
         public abstract T lerp(double t);
 
@@ -185,7 +185,7 @@ namespace Unity.UIWidgets.animation {
     }
 
     public class DoubleTween : Tween<double> {
-        public DoubleTween(int begin, int end) : base(begin: begin, end: end) {
+        public DoubleTween(double begin, double end) : base(begin: begin, end: end) {
         }
 
         public override double lerp(double t) {

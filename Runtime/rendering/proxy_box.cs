@@ -1,9 +1,17 @@
 ﻿using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Unity.UIWidgets.animation;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.ui;
+using UnityEditor.Rendering;
+using UnityEngine;
+using Canvas = Unity.UIWidgets.ui.Canvas;
+using Color = Unity.UIWidgets.ui.Color;
+using Gradient = Unity.UIWidgets.ui.Gradient;
+using Rect = Unity.UIWidgets.ui.Rect;
+using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace Unity.UIWidgets.rendering {
     public class RenderProxyBox : RenderProxyBoxMixinRenderObjectWithChildMixinRenderBox<RenderBox> {
@@ -482,6 +490,406 @@ namespace Unity.UIWidgets.rendering {
             base.debugFillProperties(properties);
             properties.add(new DiagnosticsProperty<Animation<double>>("opacity", this.opacity));
          }
+    }
+
+
+    public abstract class CustomClipper<T> {
+        public CustomClipper(Listenable reclip = null) {
+            this._reclip = reclip;
+        }
+
+        public readonly Listenable _reclip;
+
+        public abstract T getClip(Size size);
+
+        public Rect getApproximateClipRect(Size size) => Offset.zero & size;
+
+        public abstract bool shouldReclip(CustomClipper<T> oldClipper);
+
+        public string toString() => this.GetType() + "";
+    }
+
+    public class ShapeBorderClipper : CustomClipper<Path> {
+        public ShapeBorderClipper(
+            ShapeBorder shape = null) {
+            D.assert(shape != null);
+            this.shape = shape;
+        }
+
+        public readonly ShapeBorder shape;
+
+        public override Path getClip(Size size) {
+            return this.shape.getOuterPath(Offset.zero & size);
+        }
+
+        public override bool shouldReclip(CustomClipper<Path> oldClipper) {
+            if (oldClipper.GetType() != this.GetType())
+                return true;
+            ShapeBorderClipper typedOldClipper = (ShapeBorderClipper)oldClipper;
+            return typedOldClipper.shape != this.shape;
+        }
+    }
+
+    public abstract class _RenderCustomClip<T> : RenderProxyBox where T : class{
+        protected _RenderCustomClip(
+            RenderBox child = null,
+            CustomClipper<T> clipper = null,
+            Clip clipBehavior = Clip.antiAlias) : base(child: child) {
+            D.assert(clipBehavior != null);
+            this.clipBehavior = clipBehavior;
+            this._clipper = clipper;
+        }
+
+        public CustomClipper<T> clipper {
+            get { return this._clipper; }
+            set {
+                if (this._clipper == value)
+                    return;
+
+                CustomClipper<T> oldClipper = this._clipper;
+                this._clipper = value;
+                D.assert(value != null || oldClipper != null);
+                if (value == null || oldClipper == null ||
+                    value.GetType() != oldClipper.GetType() ||
+                    value.shouldReclip(oldClipper)) {
+                    this._markNeedsClip();
+                }
+
+                if (this.attached) {
+                    oldClipper?._reclip?.removeListener(this._markNeedsClip);
+                    value?._reclip?.addListener(this._markNeedsClip);
+                }
+            }
+        }
+
+        protected CustomClipper<T> _clipper;
+
+        public override void attach(object owner) {
+            base.attach(owner);
+            this._clipper?._reclip?.addListener(this._markNeedsClip);
+        }
+
+        public override void detach() {
+            this._clipper?._reclip?.removeListener(this._markNeedsClip);
+            base.detach();
+        }
+
+        protected void _markNeedsClip() {
+            this._clip = null;
+            this.markNeedsPaint();
+        }
+
+        protected abstract T _defaultClip { get; }
+        protected T _clip;
+
+        protected Clip clipBehavior;
+
+        protected override void performLayout() {
+            Size oldSize = this.hasSize ? this.size : null;
+            base.performLayout();
+            if (oldSize != this.size)
+                this._clip = null;
+        }
+
+        protected void _updateClip() {
+            this._clip = this._clip ?? this._clipper?.getClip(this.size) ?? this._defaultClip;
+        }
+
+        public override Rect describeApproximatePaintClip(RenderObject child) {
+            return this._clipper?.getApproximateClipRect(this.size) ?? Offset.zero & this.size;
+        }
+
+        Paint _debugPaint;
+        TextPainter _debugText;
+
+        protected override void debugPaintSize(PaintingContext context, Offset offset) {
+            base.debugPaintSize(context, offset);
+            D.assert(() => {
+//                this._debugPaint = this._debugPaint ?? new Paint();
+//                this._debugPaint.shader = Gradient.linear(
+//                    new Offset(0.0, 0.0),
+//                    new Offset(10.0, 10.0),
+//                    new Color(0x00000000),
+//                    new Color(0xFFFF00FF),
+//                    TileMode.repeated);
+//                this._debugPaint.strokeWidth = 2.0;
+//                this._debugPaint.style = PaintingStyle.stroke;
+//                this._debugText = this._debugText ?? new TextPainter(
+//                                      text: new TextSpan(
+//                                          text: "x",
+//                                          style: new TextStyle(
+//                                              color: new Color(0xFFFF00FF),
+//                                              fontSize: 14.0)
+//                                          ),
+//                                            textDirection: TextDirection.ltr);
+//                this._debugText.layout();
+                return true;
+            });
+        }
+    }
+
+    public abstract class _RenderPhysicalModelBase<T> : _RenderCustomClip<T> where T : class{
+        public _RenderPhysicalModelBase(
+            RenderBox child = null,
+            double? elevation = null,
+            Color color = null,
+            Color shadowColor = null,
+            Clip clipBehavior = Clip.none,
+            CustomClipper<T> clipper = null
+        ) : base(child: child, clipBehavior: clipBehavior, clipper: clipper) {
+            D.assert(elevation != null);
+            D.assert(color != null);
+            D.assert(shadowColor != null);
+            D.assert(clipBehavior != null);
+            this._elevation = elevation ?? 0.0;
+            this._color = color;
+            this._shadowColor = shadowColor;
+        }
+
+        public double elevation {
+            get { return this._elevation;  }
+            set {
+                D.assert(value != null);
+                if (this.elevation == value)
+                    return;
+                bool didNeedCompositing = this.alwaysNeedsCompositing;
+                this._elevation = value;
+                if (didNeedCompositing != this.alwaysNeedsCompositing)
+                    this.markNeedsCompositingBitsUpdate();
+                this.markNeedsPaint();
+            }
+        }
+
+        double _elevation;
+
+        public Color shadowColor {
+            get { return this._shadowColor;  }
+            set {
+                D.assert(value != null);
+                if (this.shadowColor == value)
+                    return;
+                this._shadowColor = value;
+                this.markNeedsPaint();
+            }
+        }
+
+        Color _shadowColor;
+
+        public Color color {
+            get { return this._color; }
+            set {
+                D.assert(value != null);
+                if (this.color == value)
+                    return;
+                this._color = value;
+                this.markNeedsPaint();
+            }
+        }
+
+        Color _color;
+
+        public static Paint _transparentPaint {
+            get {
+                Paint paint = new Paint();
+                paint.color = new Color(0x00000000);
+                return paint;
+            }
+        }
+
+        protected override bool alwaysNeedsCompositing {
+            get { return this._elevation != 0.0; }
+        }
+        
+        public override void  debugFillProperties(DiagnosticPropertiesBuilder description) {
+            base.debugFillProperties(description);
+            description.add(new DoubleProperty("elevation", this.elevation));
+            description.add(new DiagnosticsProperty<Color>("color", this.color));
+            description.add(new DiagnosticsProperty<Color>("shadowColor", this.shadowColor));
+        }
+    }
+
+    public class RenderPhysicalModel : _RenderPhysicalModelBase<RRect> {
+        public RenderPhysicalModel(
+            RenderBox child = null,
+            BoxShape shape = BoxShape.rectangle,
+            Clip clipBehavior = Clip.none,
+            BorderRadius borderRadius = null,
+            double elevation = 0.0,
+            Color color = null,
+            Color shadowColor = null
+        ) : base(clipBehavior: clipBehavior, child: child, elevation: elevation, color: color,
+            shadowColor: shadowColor ?? new Color(0xFF000000)) {
+            D.assert(shape != null);
+            D.assert(clipBehavior != null);
+            D.assert(color != null);
+            this._shape = shape;
+            this._borderRadius = borderRadius;
+        }
+
+        public BoxShape shape {
+            get { return this._shape; }
+            set {
+                D.assert(value != null);
+                if (this.shape == value)
+                    return;
+                this._shape = value;
+                this._markNeedsClip();
+            }
+        }
+
+        BoxShape _shape;
+
+        public BorderRadius borderRadius {
+            get { return this._borderRadius; }
+            set {
+                if (this.borderRadius == value)
+                    return;
+                this._borderRadius = value;
+                this._markNeedsClip();
+            }
+        }
+        
+        BorderRadius _borderRadius;
+
+        protected override RRect _defaultClip {
+            get {
+                D.assert(this.hasSize);
+                D.assert(this._shape != null);
+                switch (this._shape) {
+                    case BoxShape.rectangle:
+                        return (this.borderRadius ?? BorderRadius.zero).toRRect(Offset.zero & this.size);
+                    case BoxShape.circle:
+                        Rect rect = Offset.zero & this.size;
+                        return RRect.fromRectXY(rect, rect.width / 2, rect.height / 2);
+                }
+
+                return null;
+            }
+        }
+
+        public override bool hitTest(HitTestResult result, Offset position = null) {
+            if (this._clipper != null) {
+                this._updateClip();
+                D.assert(this._clip != null);
+                if (!this._clip.contains(position))
+                    return false;
+            }
+            return base.hitTest(result, position: position);
+        }
+
+        //todo:xingwei.zhu: implementation shadow + compositeLayer
+        public override void paint(PaintingContext context, Offset offset) {
+            if (this.child != null) {
+                this._updateClip();
+                RRect offsetRRect = this._clip.shift(offset);
+                Rect offsetBounds = offsetRRect.outerRect;
+                Path offsetRRectAsPath = new Path();
+                offsetRRectAsPath.addRRect(offsetRRect);
+
+                Canvas canvas = context.canvas;
+                if (this.elevation != 0.0) {
+                    //draw Shadow
+                    /*canvas.drawRect(
+                        offsetBounds.inflate(20.0),
+                        _RenderPhysicalModelBase<RRect>._transparentPaint
+                    );
+                    canvas.drawShadow(
+                        offsetRRectAsPath,
+                        this.shadowColor,
+                        this.elevation,
+                        this.color.alpha != 0xFF
+                    );*/
+                }
+
+                Paint paint = new Paint();
+                paint.color = this.color;
+                canvas.drawRRect(offsetRRect, paint);
+                context.clipRRectAndPaint(offsetRRect, this.clipBehavior, offsetBounds, () => base.paint(context, offset));
+                D.assert(context.canvas == canvas, "canvas changed even though needsCompositing was false");
+            }
+        }
+        
+        public override void debugFillProperties(DiagnosticPropertiesBuilder description) {
+            base.debugFillProperties(description);
+            description.add(new DiagnosticsProperty<BoxShape>("shape", this.shape));
+            description.add(new DiagnosticsProperty<BorderRadius>("borderRadius", this.borderRadius));
+        }
+    }
+
+
+    public class RenderPhysicalShape : _RenderPhysicalModelBase<Path> {
+        public RenderPhysicalShape(
+            RenderBox child = null,
+            CustomClipper<Path> clipper = null,
+            Clip clipBehavior = Clip.none,
+            double elevation = 0.0,
+            Color color = null,
+            Color shadowColor = null
+        ): base(child: child,
+            elevation = elevation,
+            color: color,
+            shadowColor: shadowColor ?? new Color(0xFF000000),
+            clipper: clipper,
+            clipBehavior: clipBehavior) {
+            D.assert(clipper != null);
+            D.assert(color != null);
+        }
+        
+        protected override Path _defaultClip {
+            get {
+                Path path = new Path();
+                path.addRect(Offset.zero & this.size);
+                return path;
+            }
+        }
+        
+        public override bool hitTest(HitTestResult result, Offset position = null) {
+            if (this._clipper != null) {
+                this._updateClip();
+                D.assert(this._clip != null);
+                if (!this._clip.contains(position))
+                    return false;
+            }
+
+            return base.hitTest(result, position: position);
+        }
+
+        //todo:xingwei.zhu: implementation shadow + compositeLayer + Path.shift
+        public override void paint(PaintingContext context, Offset offset) {
+            if (this.child != null) {
+                this._updateClip();
+                Rect offsetBounds = offset & this.size;
+                //Path offsetPath = this._clip.shift(offset);
+                Path offsetPath = this._clip;
+                bool paintShadows = true;
+                Canvas canvas = context.canvas;
+//                if (this.elevation != 0.0 && paintShadows) {
+//                    canvas.drawRect(
+//                        offsetBounds.inflate(20.0),
+//                        _RenderPhysicalModelBase<Path>._transparentPaint
+//                    );
+//                    canvas.drawShadow(
+//                        offsetPath,
+//                        this.shadowColor,
+//                        this.elevation,
+//                        this.color.alpha != 0xFF,
+//                    );
+//                }
+                Paint paint = new Paint();
+                paint.color = this.color;
+                paint.style = PaintingStyle.fill;
+                canvas.drawPath(offsetPath, paint);
+                context.clipPathAndPaint(offsetPath, this.clipBehavior,
+                    offsetBounds, () => base.paint(context, offset));
+                D.assert(context.canvas == canvas, "canvas changed even though needsCompositing was false");
+            }
+        }
+        
+        
+        public override void debugFillProperties(DiagnosticPropertiesBuilder description) {
+            base.debugFillProperties(description);
+            description.add(new DiagnosticsProperty<CustomClipper<Path>>("clipper", this.clipper));
+        }
     }
 
     public enum DecorationPosition {
