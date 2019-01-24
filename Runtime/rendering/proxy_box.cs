@@ -843,13 +843,13 @@ namespace Unity.UIWidgets.rendering {
             return base.hitTest(result, position: position);
         }
 
-        //todo:xingwei.zhu: implementation shadow + compositeLayer + Path.shift
+        //todo:xingwei.zhu: implementation shadow + compositeLayer
         public override void paint(PaintingContext context, Offset offset) {
             if (this.child != null) {
                 this._updateClip();
                 Rect offsetBounds = offset & this.size;
-                //Path offsetPath = this._clip.shift(offset);
-                Path offsetPath = this._clip;
+                Path offsetPath = new Path();
+                offsetPath.addPath(this._clip, offset);
 
                 Canvas canvas = context.canvas;
 //                if (this.elevation != 0.0 && paintShadows) {
