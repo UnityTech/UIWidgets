@@ -1,7 +1,7 @@
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.service;
+using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
-using Color = Unity.UIWidgets.ui.Color;
 
 namespace Unity.UIWidgets.material {
     public enum MaterialTapTargetSize {
@@ -63,16 +63,19 @@ namespace Unity.UIWidgets.material {
             primaryColorLight = primaryColorLight ?? (isDark ? Colors.grey[500] : primarySwatch[100]);
             primaryColorDark = primaryColorDark ?? (isDark ? Colors.black : primarySwatch[700]);
             bool primaryIsDark = primaryColorBrightness == Brightness.dark;
+            toggleableActiveColor = toggleableActiveColor ??
+                                    (isDark ? Colors.tealAccent[200] : (accentColor ?? primarySwatch[600]));
 
             accentColor = accentColor ?? (isDark ? Colors.tealAccent[200] : primarySwatch[500]);
             accentColorBrightness = accentColorBrightness ?? estimateBrightnessForColor(accentColor);
             bool accentIsDark = accentColorBrightness == Brightness.dark;
-            
+
             canvasColor = canvasColor ?? (isDark ? Colors.grey[850] : Colors.grey[50]);
             scaffoldBackgroundColor = scaffoldBackgroundColor ?? canvasColor;
             bottomAppBarColor = bottomAppBarColor ?? (isDark ? Colors.grey[800] : Colors.white);
             cardColor = cardColor ?? (isDark ? Colors.grey[800] : Colors.white);
             dividerColor = dividerColor ?? (isDark ? new Color(0x1FFFFFFF) : new Color(0x1F000000));
+
             colorScheme = colorScheme ?? ColorScheme.fromSwatch(
                               primarySwatch: primarySwatch,
                               primaryColorDark: primaryColorDark,
@@ -81,14 +84,6 @@ namespace Unity.UIWidgets.material {
                               backgroundColor: backgroundColor,
                               errorColor: errorColor,
                               brightness: brightness);
-            highlightColor = highlightColor ??
-                             (isDark
-                                 ? ThemeDataUtils._kDarkThemeHighlightColor
-                                 : ThemeDataUtils._kLightThemeHighlightColor);
-            splashColor = splashColor ??
-                          (isDark
-                              ? ThemeDataUtils._kDarkThemeSplashColor
-                              : ThemeDataUtils._kLightThemeSplashColor);
 
             splashFactory = splashFactory ?? InkSplash.splashFactory;
             selectedRowColor = selectedRowColor ?? Colors.grey[100];
@@ -98,20 +93,24 @@ namespace Unity.UIWidgets.material {
             cursorColor = cursorColor ?? Color.fromRGBO(66, 133, 244, 1.0);
             textSelectionHandleColor =
                 textSelectionHandleColor ?? (isDark ? Colors.tealAccent[400] : primarySwatch[300]);
+
             backgroundColor = backgroundColor ?? (isDark ? Colors.grey[700] : primarySwatch[200]);
             dialogBackgroundColor = dialogBackgroundColor ?? (isDark ? Colors.grey[800] : Colors.white);
             indicatorColor = indicatorColor ?? (accentColor == primaryColor ? Colors.white : accentColor);
             hintColor = hintColor ?? (isDark ? new Color(0x80FFFFFF) : new Color(0x8A000000));
             errorColor = errorColor ?? Colors.red[700];
-            iconTheme = iconTheme ??
-                        (isDark ? new IconThemeData(color: Colors.white) : new IconThemeData(color: Colors.black87));
+
             primaryIconTheme = primaryIconTheme ??
-                               (isDark
+                               (primaryIsDark
                                    ? new IconThemeData(color: Colors.white)
                                    : new IconThemeData(color: Colors.black));
-            accentIconTheme = accentIconTheme ?? (isDark
+            accentIconTheme = accentIconTheme ??
+                              (accentIsDark
                                   ? new IconThemeData(color: Colors.white)
                                   : new IconThemeData(color: Colors.black));
+            iconTheme = iconTheme ??
+                        (isDark ? new IconThemeData(color: Colors.white) : new IconThemeData(color: Colors.black87));
+
             typography = typography ?? new Typography();
             TextTheme defaultTextTheme = isDark ? typography.white : typography.black;
             textTheme = defaultTextTheme.merge(textTheme);
@@ -125,7 +124,7 @@ namespace Unity.UIWidgets.material {
                 primaryTextTheme = primaryTextTheme.apply(fontFamily: fontFamily);
                 accentTextTheme = accentTextTheme.apply(fontFamily: fontFamily);
             }
-            
+
             buttonColor = buttonColor ?? (isDark ? primarySwatch[600] : Colors.grey[300]);
             buttonTheme = buttonTheme ?? new ButtonThemeData(
                               colorScheme: colorScheme,
@@ -135,8 +134,14 @@ namespace Unity.UIWidgets.material {
                               splashColor: splashColor,
                               materialTapTargetSize: materialTapTargetSize);
             disabledColor = disabledColor ?? (isDark ? Colors.white30 : Colors.black38);
-            toggleableActiveColor = toggleableActiveColor ??
-                                    (isDark ? Colors.tealAccent[200] : (accentColor ?? primarySwatch[600]));
+            highlightColor = highlightColor ??
+                             (isDark
+                                 ? ThemeDataUtils._kDarkThemeHighlightColor
+                                 : ThemeDataUtils._kLightThemeHighlightColor);
+            splashColor = splashColor ??
+                          (isDark
+                              ? ThemeDataUtils._kDarkThemeSplashColor
+                              : ThemeDataUtils._kLightThemeSplashColor);
 
             D.assert(brightness != null);
             D.assert(primaryColor != null);
@@ -156,7 +161,8 @@ namespace Unity.UIWidgets.material {
             D.assert(selectedRowColor != null);
             D.assert(unselectedWidgetColor != null);
             D.assert(disabledColor != null);
-            D.assert(buttonColor != null);
+            D.assert(toggleableActiveColor != null);
+            D.assert(buttonTheme != null);
             D.assert(secondaryHeaderColor != null);
             D.assert(textSelectionColor != null);
             D.assert(cursorColor != null);
@@ -166,26 +172,26 @@ namespace Unity.UIWidgets.material {
             D.assert(indicatorColor != null);
             D.assert(hintColor != null);
             D.assert(errorColor != null);
-            D.assert(toggleableActiveColor != null);
-            D.assert(buttonTheme != null);
-            D.assert(iconTheme != null);
-            D.assert(primaryIconTheme != null);
-            D.assert(accentIconTheme != null);
             D.assert(textTheme != null);
             D.assert(primaryTextTheme != null);
             D.assert(accentTextTheme != null);
-            D.assert(colorScheme != null);
+            D.assert(iconTheme != null);
+            D.assert(primaryIconTheme != null);
+            D.assert(accentIconTheme != null);
             D.assert(materialTapTargetSize != null);
+            D.assert(colorScheme != null);
             D.assert(typography != null);
+
+            D.assert(buttonColor != null);
 
             this.brightness = brightness ?? Brightness.light;
             this.primaryColor = primaryColor;
             this.primaryColorBrightness = primaryColorBrightness ?? Brightness.light;
             this.primaryColorLight = primaryColorLight;
             this.primaryColorDark = primaryColorDark;
+            this.canvasColor = canvasColor;
             this.accentColor = accentColor;
             this.accentColorBrightness = accentColorBrightness ?? Brightness.light;
-            this.canvasColor = canvasColor;
             this.scaffoldBackgroundColor = scaffoldBackgroundColor;
             this.bottomAppBarColor = bottomAppBarColor;
             this.cardColor = cardColor;
@@ -208,17 +214,16 @@ namespace Unity.UIWidgets.material {
             this.hintColor = hintColor;
             this.errorColor = errorColor;
             this.toggleableActiveColor = toggleableActiveColor;
-            this.iconTheme = iconTheme;
-            this.primaryIconTheme = primaryIconTheme;
-            this.accentIconTheme = accentIconTheme;
             this.textTheme = textTheme;
             this.primaryTextTheme = primaryTextTheme;
             this.accentTextTheme = accentTextTheme;
+            this.iconTheme = iconTheme;
+            this.primaryIconTheme = primaryIconTheme;
+            this.accentIconTheme = accentIconTheme;
             this.materialTapTargetSize = materialTapTargetSize ?? MaterialTapTargetSize.padded;
             this.colorScheme = colorScheme;
             this.typography = typography;
         }
-
 
         public static ThemeData raw(
             Brightness? brightness,
@@ -226,9 +231,9 @@ namespace Unity.UIWidgets.material {
             Brightness? primaryColorBrightness,
             Color primaryColorLight,
             Color primaryColorDark,
+            Color canvasColor,
             Color accentColor,
             Brightness? accentColorBrightness,
-            Color canvasColor,
             Color scaffoldBackgroundColor,
             Color bottomAppBarColor,
             Color cardColor,
@@ -250,10 +255,10 @@ namespace Unity.UIWidgets.material {
             Color indicatorColor,
             Color hintColor,
             Color errorColor,
+            Color toggleableActiveColor,
             TextTheme textTheme,
             TextTheme primaryTextTheme,
             TextTheme accentTextTheme,
-            Color toggleableActiveColor,
             IconThemeData iconTheme,
             IconThemeData primaryIconTheme,
             IconThemeData accentIconTheme,
@@ -261,6 +266,47 @@ namespace Unity.UIWidgets.material {
             ColorScheme colorScheme,
             Typography typography
         ) {
+            D.assert(brightness != null);
+            D.assert(primaryColor != null);
+            D.assert(primaryColorBrightness != null);
+            D.assert(primaryColorLight != null);
+            D.assert(primaryColorDark != null);
+            D.assert(accentColor != null);
+            D.assert(accentColorBrightness != null);
+            D.assert(canvasColor != null);
+            D.assert(scaffoldBackgroundColor != null);
+            D.assert(bottomAppBarColor != null);
+            D.assert(cardColor != null);
+            D.assert(dividerColor != null);
+            D.assert(highlightColor != null);
+            D.assert(splashColor != null);
+            D.assert(splashFactory != null);
+            D.assert(selectedRowColor != null);
+            D.assert(unselectedWidgetColor != null);
+            D.assert(disabledColor != null);
+            D.assert(toggleableActiveColor != null);
+            D.assert(buttonTheme != null);
+            D.assert(secondaryHeaderColor != null);
+            D.assert(textSelectionColor != null);
+            D.assert(cursorColor != null);
+            D.assert(textSelectionHandleColor != null);
+            D.assert(backgroundColor != null);
+            D.assert(dialogBackgroundColor != null);
+            D.assert(indicatorColor != null);
+            D.assert(hintColor != null);
+            D.assert(errorColor != null);
+            D.assert(textTheme != null);
+            D.assert(primaryTextTheme != null);
+            D.assert(accentTextTheme != null);
+            D.assert(iconTheme != null);
+            D.assert(primaryIconTheme != null);
+            D.assert(accentIconTheme != null);
+            D.assert(materialTapTargetSize != null);
+            D.assert(colorScheme != null);
+            D.assert(typography != null);
+
+            D.assert(buttonColor != null);
+
             return new ThemeData(
                 brightness: brightness,
                 primaryColor: primaryColor,
@@ -307,7 +353,7 @@ namespace Unity.UIWidgets.material {
 
         public static ThemeData dark() => new ThemeData(brightness: Brightness.dark);
 
-        public static ThemeData fallback() => ThemeData.light();
+        public static ThemeData fallback() => light();
 
 
         public readonly Brightness brightness;
@@ -320,11 +366,11 @@ namespace Unity.UIWidgets.material {
 
         public readonly Color primaryColorDark;
 
+        public readonly Color canvasColor;
+
         public readonly Color accentColor;
 
         public readonly Brightness accentColorBrightness;
-
-        public readonly Color canvasColor;
 
         public readonly Color scaffoldBackgroundColor;
 
@@ -418,10 +464,10 @@ namespace Unity.UIWidgets.material {
             Color indicatorColor,
             Color hintColor,
             Color errorColor,
+            Color toggleableActiveColor,
             TextTheme textTheme,
             TextTheme primaryTextTheme,
             TextTheme accentTextTheme,
-            Color toggleableActiveColor,
             IconThemeData iconTheme,
             IconThemeData primaryIconTheme,
             IconThemeData accentIconTheme,
@@ -429,7 +475,7 @@ namespace Unity.UIWidgets.material {
             ColorScheme colorScheme,
             Typography typography
         ) {
-            return ThemeData.raw(
+            return raw(
                 brightness: brightness ?? this.brightness,
                 primaryColor: primaryColor ?? this.primaryColor,
                 primaryColorBrightness: primaryColorBrightness ?? this.primaryColorBrightness,
@@ -448,7 +494,7 @@ namespace Unity.UIWidgets.material {
                 selectedRowColor: selectedRowColor ?? this.selectedRowColor,
                 unselectedWidgetColor: unselectedWidgetColor ?? this.unselectedWidgetColor,
                 disabledColor: disabledColor ?? this.disabledColor,
-                buttonTheme : buttonTheme ?? this.buttonTheme,
+                buttonTheme: buttonTheme ?? this.buttonTheme,
                 buttonColor: buttonColor ?? this.buttonColor,
                 secondaryHeaderColor: secondaryHeaderColor ?? this.secondaryHeaderColor,
                 textSelectionColor: textSelectionColor ?? this.textSelectionColor,
@@ -459,15 +505,15 @@ namespace Unity.UIWidgets.material {
                 indicatorColor: indicatorColor ?? this.indicatorColor,
                 hintColor: hintColor ?? this.hintColor,
                 errorColor: errorColor ?? this.errorColor,
+                toggleableActiveColor: toggleableActiveColor ?? this.toggleableActiveColor,
                 textTheme: textTheme ?? this.textTheme,
                 primaryTextTheme: primaryTextTheme ?? this.primaryTextTheme,
                 accentTextTheme: accentTextTheme ?? this.accentTextTheme,
-                toggleableActiveColor: toggleableActiveColor ?? this.toggleableActiveColor,
                 iconTheme: iconTheme ?? this.iconTheme,
                 primaryIconTheme: primaryIconTheme ?? this.primaryIconTheme,
                 accentIconTheme: accentIconTheme ?? this.accentIconTheme,
                 materialTapTargetSize: materialTapTargetSize ?? this.materialTapTargetSize,
-                colorScheme : colorScheme ?? this.colorScheme,
+                colorScheme: colorScheme ?? this.colorScheme,
                 typography: typography ?? this.typography
             );
         }
@@ -482,15 +528,17 @@ namespace Unity.UIWidgets.material {
         }
 
         public static ThemeData lerp(ThemeData a, ThemeData b, double t) {
-            return ThemeData.raw(
+            D.assert(a != null);
+            D.assert(b != null);
+            return raw(
                 brightness: t < 0.5 ? a.brightness : b.brightness,
                 primaryColor: Color.lerp(a.primaryColor, b.primaryColor, t),
                 primaryColorBrightness: t < 0.5 ? a.primaryColorBrightness : b.primaryColorBrightness,
                 primaryColorLight: Color.lerp(a.primaryColorLight, b.primaryColorLight, t),
                 primaryColorDark: Color.lerp(a.primaryColorDark, b.primaryColorDark, t),
+                canvasColor: Color.lerp(a.canvasColor, b.canvasColor, t),
                 accentColor: Color.lerp(a.accentColor, b.accentColor, t),
                 accentColorBrightness: t < 0.5 ? a.accentColorBrightness : b.accentColorBrightness,
-                canvasColor: Color.lerp(a.canvasColor, b.canvasColor, t),
                 scaffoldBackgroundColor: Color.lerp(a.scaffoldBackgroundColor, b.scaffoldBackgroundColor, t),
                 bottomAppBarColor: Color.lerp(a.bottomAppBarColor, b.bottomAppBarColor, t),
                 cardColor: Color.lerp(a.cardColor, b.cardColor, t),
@@ -512,14 +560,14 @@ namespace Unity.UIWidgets.material {
                 indicatorColor: Color.lerp(a.indicatorColor, b.indicatorColor, t),
                 hintColor: Color.lerp(a.hintColor, b.hintColor, t),
                 errorColor: Color.lerp(a.errorColor, b.errorColor, t),
+                toggleableActiveColor: Color.lerp(a.toggleableActiveColor, b.toggleableActiveColor, t),
                 textTheme: TextTheme.lerp(a.textTheme, b.textTheme, t),
                 primaryTextTheme: TextTheme.lerp(a.primaryTextTheme, b.primaryTextTheme, t),
                 accentTextTheme: TextTheme.lerp(a.accentTextTheme, b.accentTextTheme, t),
-                toggleableActiveColor: Color.lerp(a.toggleableActiveColor, b.toggleableActiveColor, t),
                 iconTheme: IconThemeData.lerp(a.iconTheme, b.iconTheme, t),
                 primaryIconTheme: IconThemeData.lerp(a.primaryIconTheme, b.primaryIconTheme, t),
                 accentIconTheme: IconThemeData.lerp(a.accentIconTheme, b.accentIconTheme, t),
-                materialTapTargetSize: t < 0.5? a.materialTapTargetSize : b.materialTapTargetSize,
+                materialTapTargetSize: t < 0.5 ? a.materialTapTargetSize : b.materialTapTargetSize,
                 colorScheme: ColorScheme.lerp(a.colorScheme, b.colorScheme, t),
                 typography: Typography.lerp(a.typography, b.typography, t)
             );
@@ -548,7 +596,7 @@ namespace Unity.UIWidgets.material {
                    other.dividerColor == this.dividerColor &&
                    other.highlightColor == this.highlightColor &&
                    other.splashColor == this.splashColor &&
-                   other.splashFactory == this.splashFactory && 
+                   other.splashFactory == this.splashFactory &&
                    other.selectedRowColor == this.selectedRowColor &&
                    other.unselectedWidgetColor == this.unselectedWidgetColor &&
                    other.disabledColor == this.disabledColor &&
@@ -606,9 +654,9 @@ namespace Unity.UIWidgets.material {
                 hashCode = (hashCode * 397) ^ this.primaryColorBrightness.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.primaryColorLight.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.primaryColorDark.GetHashCode();
+                hashCode = (hashCode * 397) ^ this.canvasColor.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.accentColor.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.accentColorBrightness.GetHashCode();
-                hashCode = (hashCode * 397) ^ this.canvasColor.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.scaffoldBackgroundColor.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.bottomAppBarColor.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.cardColor.GetHashCode();
@@ -630,10 +678,10 @@ namespace Unity.UIWidgets.material {
                 hashCode = (hashCode * 397) ^ this.indicatorColor.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.hintColor.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.errorColor.GetHashCode();
+                hashCode = (hashCode * 397) ^ this.toggleableActiveColor.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.textTheme.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.primaryTextTheme.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.accentTextTheme.GetHashCode();
-                hashCode = (hashCode * 397) ^ this.toggleableActiveColor.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.iconTheme.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.primaryIconTheme.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.accentIconTheme.GetHashCode();
@@ -646,7 +694,7 @@ namespace Unity.UIWidgets.material {
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
-            ThemeData defaultData = ThemeData.fallback();
+            ThemeData defaultData = fallback();
             properties.add(new EnumProperty<Brightness>("brightness", this.brightness,
                 defaultValue: defaultData.brightness));
             properties.add(new DiagnosticsProperty<Color>("primaryColor", this.primaryColor,
@@ -706,9 +754,12 @@ namespace Unity.UIWidgets.material {
             properties.add(new DiagnosticsProperty<IconThemeData>("iconTheme", this.iconTheme));
             properties.add(new DiagnosticsProperty<IconThemeData>("primaryIconTheme", this.primaryIconTheme));
             properties.add(new DiagnosticsProperty<IconThemeData>("accentIconTheme", this.accentIconTheme));
-            properties.add(new DiagnosticsProperty<MaterialTapTargetSize>("materialTapTargetSize", this.materialTapTargetSize));
-            properties.add(new DiagnosticsProperty<ColorScheme>("colorScheme", this.colorScheme, defaultValue: defaultData.colorScheme));
-            properties.add(new DiagnosticsProperty<Typography>("typography", this.typography, defaultValue: defaultData.typography));
+            properties.add(
+                new DiagnosticsProperty<MaterialTapTargetSize>("materialTapTargetSize", this.materialTapTargetSize));
+            properties.add(new DiagnosticsProperty<ColorScheme>("colorScheme", this.colorScheme,
+                defaultValue: defaultData.colorScheme));
+            properties.add(new DiagnosticsProperty<Typography>("typography", this.typography,
+                defaultValue: defaultData.typography));
         }
     }
 }

@@ -1,5 +1,4 @@
 using System;
-using System.Runtime.CompilerServices;
 using Unity.UIWidgets.animation;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.painting;
@@ -23,6 +22,10 @@ namespace Unity.UIWidgets.material {
             double? radius = null,
             VoidCallback onRemoved = null
         ) {
+            D.assert(controller != null);
+            D.assert(referenceBox != null);
+            D.assert(position != null);
+            D.assert(color != null);
             return new InkSplash(
                 controller: controller,
                 referenceBox: referenceBox,
@@ -48,7 +51,8 @@ namespace Unity.UIWidgets.material {
             BorderRadius borderRadius = null,
             ShapeBorder customBorder = null,
             double? radius = null,
-            VoidCallback onRemoved = null) : base(
+            VoidCallback onRemoved = null
+        ) : base(
             controller: controller,
             referenceBox: referenceBox,
             color: color,
@@ -62,9 +66,10 @@ namespace Unity.UIWidgets.material {
                 radius ?? InkSplashUtils._getTargetRadius(referenceBox, containedInkWell, rectCallback, position);
             this._clipCallback = InkSplashUtils._getClipCallback(referenceBox, containedInkWell, rectCallback);
             this._repositionToReferenceBox = !containedInkWell;
+
             D.assert(this._borderRadius != null);
-            this._radiusController = new AnimationController(duration:
-                InkSplashUtils._kUnconfirmedSplashDuration,
+            this._radiusController = new AnimationController(
+                duration: InkSplashUtils._kUnconfirmedSplashDuration,
                 vsync: controller.vsync);
             this._radiusController.addListener(controller.markNeedsPaint);
             this._radiusController.forward();
@@ -72,15 +77,15 @@ namespace Unity.UIWidgets.material {
                 begin: InkSplashUtils._kSplashInitialSize,
                 end: this._targetRadius));
 
-            this._alphaController = new AnimationController(duration:
-                InkSplashUtils._kSplashFadeDuration,
+            this._alphaController = new AnimationController(
+                duration: InkSplashUtils._kSplashFadeDuration,
                 vsync: controller.vsync);
             this._alphaController.addListener(controller.markNeedsPaint);
             this._alphaController.addStatusListener(this._handleAlphaStatusChanged);
             this._alpha = this._alphaController.drive(new IntTween(
                 begin: color.alpha,
                 end: 0));
-            
+
             controller.addInkFeature(this);
         }
 
@@ -101,7 +106,7 @@ namespace Unity.UIWidgets.material {
 
         Animation<int> _alpha;
         AnimationController _alphaController;
-        
+
         public static InteractiveInkFeatureFactory splashFactory = new _InkSplashFactory();
 
         public override void confirm() {
@@ -128,8 +133,7 @@ namespace Unity.UIWidgets.material {
         }
 
         protected override void paintFeature(Canvas canvas, Matrix3 transform) {
-            Paint paint = new Paint();
-            paint.color = this.color.withAlpha(this._alpha.value);
+            Paint paint = new Paint {color = this.color.withAlpha(this._alpha.value)};
             Offset center = this._position;
             if (this._repositionToReferenceBox)
                 center = Offset.lerp(center, this.referenceBox.size.center(Offset.zero), this._radiusController.value);
@@ -159,11 +163,10 @@ namespace Unity.UIWidgets.material {
                     canvas.clipRect(rect);
                 }
             }
-            
+
             //todo xingwei.zhu: remove this condition when drawCircle bug fixed (when radius.value == 0)
             if (this._radius.value != 0)
                 canvas.drawCircle(center, this._radius.value, paint);
-            
             canvas.restore();
         }
     }

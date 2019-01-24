@@ -1,6 +1,4 @@
 ﻿using System;
-using Unity.UIWidgets.painting;
-using UnityEditor.OSXStandalone;
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
@@ -8,7 +6,7 @@ namespace Unity.UIWidgets.ui {
         public Color(long value) {
             this.value = value & 0xFFFFFFFF;
         }
-        
+
         public static readonly Color clear = new Color(0x00000000);
 
         public static readonly Color black = new Color(0xFF000000);
@@ -111,9 +109,11 @@ namespace Unity.UIWidgets.ui {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return this.value == other.value;
         }
 
@@ -121,12 +121,15 @@ namespace Unity.UIWidgets.ui {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((Color) obj);
         }
 
@@ -206,7 +209,8 @@ namespace Unity.UIWidgets.ui {
             if (d > 0.0001f) {
                 dx /= d;
                 dy /= d;
-            } else {
+            }
+            else {
                 dx = 0;
                 dy = 1;
             }

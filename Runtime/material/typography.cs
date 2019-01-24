@@ -1,7 +1,6 @@
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
 using TextStyle = Unity.UIWidgets.painting.TextStyle;
-using UnityEngine;
 
 namespace Unity.UIWidgets.material {
     public enum ScriptCategory {
@@ -51,8 +50,7 @@ namespace Unity.UIWidgets.material {
 
         public readonly TextTheme tall;
 
-        public TextTheme geometryThemeFor(ScriptCategory? category) {
-            D.assert(category != null);
+        public TextTheme geometryThemeFor(ScriptCategory category) {
             switch (category) {
                 case ScriptCategory.englishLike:
                     return this.englishLike;
@@ -123,12 +121,12 @@ namespace Unity.UIWidgets.material {
             return this.Equals((Typography) obj);
         }
 
-        public static bool operator ==(Typography a, Typography b) {
-            return ReferenceEquals(a, null) ? ReferenceEquals(b, null) : a.Equals(b);
+        public static bool operator ==(Typography left, Typography right) {
+            return Equals(left, right);
         }
 
-        public static bool operator !=(Typography a, Typography b) {
-            return !(a == b);
+        public static bool operator !=(Typography left, Typography right) {
+            return !Equals(left, right);
         }
 
         public override int GetHashCode() {
@@ -156,7 +154,7 @@ namespace Unity.UIWidgets.material {
             properties.add(new DiagnosticsProperty<TextTheme>("tall", this.tall, defaultValue: defaultTypography.tall));
         }
 
-        public static TextTheme blackMountainView = new TextTheme(
+        public static readonly TextTheme blackMountainView = new TextTheme(
             display4: new TextStyle(debugLabel: "blackMountainView display4", fontFamily: "Roboto", inherit: true,
                 color: Colors.black54, decoration: TextDecoration.none),
             display3: new TextStyle(debugLabel: "blackMountainView display3", fontFamily: "Roboto", inherit: true,
@@ -185,7 +183,7 @@ namespace Unity.UIWidgets.material {
                 color: Colors.black, decoration: TextDecoration.none)
         );
 
-        public static TextTheme whiteMountainView = new TextTheme(
+        public static readonly TextTheme whiteMountainView = new TextTheme(
             display4: new TextStyle(debugLabel: "whiteMountainView display4", fontFamily: "Roboto", inherit: true,
                 color: Colors.white70, decoration: TextDecoration.none),
             display3: new TextStyle(debugLabel: "whiteMountainView display3", fontFamily: "Roboto", inherit: true,
@@ -214,7 +212,7 @@ namespace Unity.UIWidgets.material {
                 color: Colors.white, decoration: TextDecoration.none)
         );
 
-        public static TextTheme blackCupertino = new TextTheme(
+        public static readonly TextTheme blackCupertino = new TextTheme(
             display4: new TextStyle(debugLabel: "blackCupertino display4", fontFamily: ".SF UI Display", inherit: true,
                 color: Colors.black54, decoration: TextDecoration.none),
             display3: new TextStyle(debugLabel: "blackCupertino display3", fontFamily: ".SF UI Display", inherit: true,
@@ -243,7 +241,7 @@ namespace Unity.UIWidgets.material {
                 color: Colors.black, decoration: TextDecoration.none)
         );
 
-        public static TextTheme whiteCupertino = new TextTheme(
+        public static readonly TextTheme whiteCupertino = new TextTheme(
             display4: new TextStyle(debugLabel: "whiteCupertino display4", fontFamily: ".SF UI Display", inherit: true,
                 color: Colors.white70, decoration: TextDecoration.none),
             display3: new TextStyle(debugLabel: "whiteCupertino display3", fontFamily: ".SF UI Display", inherit: true,
@@ -273,7 +271,7 @@ namespace Unity.UIWidgets.material {
         );
 
 
-        public static TextTheme englishLike2014 = new TextTheme(
+        public static readonly TextTheme englishLike2014 = new TextTheme(
             display4: new TextStyle(debugLabel: "englishLike display4 2014", inherit: false, fontSize: 112.0,
                 fontWeight: FontWeight.w400, textBaseline: TextBaseline.alphabetic),
             display3: new TextStyle(debugLabel: "englishLike display3 2014", inherit: false, fontSize: 56.0,
@@ -302,7 +300,7 @@ namespace Unity.UIWidgets.material {
                 fontWeight: FontWeight.w400, textBaseline: TextBaseline.alphabetic, letterSpacing: 1.5)
         );
 
-        public static TextTheme englishLike2018 = new TextTheme(
+        public static readonly TextTheme englishLike2018 = new TextTheme(
             display4: new TextStyle(debugLabel: "englishLike display4 2018", fontSize: 96.0,
                 fontWeight: FontWeight.w400, textBaseline: TextBaseline.alphabetic, letterSpacing: -1.5),
             display3: new TextStyle(debugLabel: "englishLike display3 2018", fontSize: 60.0,
@@ -331,7 +329,7 @@ namespace Unity.UIWidgets.material {
                 fontWeight: FontWeight.w400, textBaseline: TextBaseline.alphabetic, letterSpacing: 1.5)
         );
 
-        public static TextTheme dense2014 = new TextTheme(
+        public static readonly TextTheme dense2014 = new TextTheme(
             display4: new TextStyle(debugLabel: "dense display4 2014", inherit: false, fontSize: 112.0,
                 fontWeight: FontWeight.w400, textBaseline: TextBaseline.ideographic),
             display3: new TextStyle(debugLabel: "dense display3 2014", inherit: false, fontSize: 56.0,
@@ -360,7 +358,7 @@ namespace Unity.UIWidgets.material {
                 fontWeight: FontWeight.w400, textBaseline: TextBaseline.ideographic)
         );
 
-        public static TextTheme dense2018 = new TextTheme(
+        public static readonly TextTheme dense2018 = new TextTheme(
             display4: new TextStyle(debugLabel: "dense display4 2018", fontSize: 96.0, fontWeight: FontWeight.w400,
                 textBaseline: TextBaseline.ideographic),
             display3: new TextStyle(debugLabel: "dense display3 2018", fontSize: 60.0, fontWeight: FontWeight.w400,
@@ -390,7 +388,7 @@ namespace Unity.UIWidgets.material {
         );
 
 
-        public static TextTheme tall2014 = new TextTheme(
+        public static readonly TextTheme tall2014 = new TextTheme(
             display4: new TextStyle(debugLabel: "tall display4 2014", inherit: false, fontSize: 112.0,
                 fontWeight: FontWeight.w400, textBaseline: TextBaseline.alphabetic),
             display3: new TextStyle(debugLabel: "tall display3 2014", inherit: false, fontSize: 56.0,
@@ -419,7 +417,7 @@ namespace Unity.UIWidgets.material {
                 fontWeight: FontWeight.w400, textBaseline: TextBaseline.alphabetic)
         );
 
-        public static TextTheme tall2018 = new TextTheme(
+        public static readonly TextTheme tall2018 = new TextTheme(
             display4: new TextStyle(debugLabel: "tall display4 2018", fontSize: 96.0, fontWeight: FontWeight.w400,
                 textBaseline: TextBaseline.alphabetic),
             display3: new TextStyle(debugLabel: "tall display3 2018", fontSize: 60.0, fontWeight: FontWeight.w400,
@@ -438,9 +436,9 @@ namespace Unity.UIWidgets.material {
                 textBaseline: TextBaseline.alphabetic),
             body1: new TextStyle(debugLabel: "tall body1 2018", fontSize: 15.0, fontWeight: FontWeight.w400,
                 textBaseline: TextBaseline.alphabetic),
-            caption: new TextStyle(debugLabel: "tall caption 2018", fontSize: 13.0, fontWeight: FontWeight.w400,
-                textBaseline: TextBaseline.alphabetic),
             button: new TextStyle(debugLabel: "tall button 2018", fontSize: 15.0, fontWeight: FontWeight.w700,
+                textBaseline: TextBaseline.alphabetic),
+            caption: new TextStyle(debugLabel: "tall caption 2018", fontSize: 13.0, fontWeight: FontWeight.w400,
                 textBaseline: TextBaseline.alphabetic),
             subtitle: new TextStyle(debugLabel: "tall subtitle 2018", fontSize: 15.0, fontWeight: FontWeight.w400,
                 textBaseline: TextBaseline.alphabetic),

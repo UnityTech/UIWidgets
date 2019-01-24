@@ -48,7 +48,6 @@ namespace Unity.UIWidgets.widgets {
     }
 
     public class CustomPaint : SingleChildRenderObjectWidget {
-
         public CustomPaint(
             Key key = null,
             CustomPainter painter = null,
@@ -71,7 +70,7 @@ namespace Unity.UIWidgets.widgets {
         public readonly Size size;
         public readonly bool isComplex;
         public readonly bool willChange;
-        
+
         public override RenderObject createRenderObject(BuildContext context) {
             return new RenderCustomPaint(
                 painter: this.painter,
@@ -81,18 +80,18 @@ namespace Unity.UIWidgets.widgets {
                 willChange: this.willChange
             );
         }
-        
+
         public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
             ((RenderCustomPaint) renderObject).painter = this.painter;
             ((RenderCustomPaint) renderObject).foregroundPainter = this.foregroundPainter;
             ((RenderCustomPaint) renderObject).preferredSize = this.size;
             ((RenderCustomPaint) renderObject).isComplex = this.isComplex;
-            ((RenderCustomPaint)renderObject).willChange = this.willChange;
+            ((RenderCustomPaint) renderObject).willChange = this.willChange;
         }
 
         public override void didUnmountRenderObject(RenderObject renderObject) {
-            ((RenderCustomPaint)renderObject).painter = null;
-            ((RenderCustomPaint)renderObject).foregroundPainter = null;
+            ((RenderCustomPaint) renderObject).painter = null;
+            ((RenderCustomPaint) renderObject).foregroundPainter = null;
         }
     }
 
@@ -177,9 +176,11 @@ namespace Unity.UIWidgets.widgets {
             string type;
             if (this.width == double.PositiveInfinity && this.height == double.PositiveInfinity) {
                 type = this.GetType() + "expand";
-            } else if (this.width == 0.0 && this.height == 0.0) {
+            }
+            else if (this.width == 0.0 && this.height == 0.0) {
                 type = this.GetType() + "shrink";
-            } else {
+            }
+            else {
                 type = this.GetType() + "";
             }
 
@@ -192,7 +193,8 @@ namespace Unity.UIWidgets.widgets {
             if ((this.width == double.PositiveInfinity && this.height == double.PositiveInfinity) ||
                 (this.width == 0.0 && this.height == 0.0)) {
                 level = DiagnosticLevel.hidden;
-            } else {
+            }
+            else {
                 level = DiagnosticLevel.info;
             }
 
@@ -308,29 +310,31 @@ namespace Unity.UIWidgets.widgets {
     }
 
     public class Offstage : SingleChildRenderObjectWidget {
-        public Offstage(Key key = null, bool offstage = true, Widget child = null):base(key: key, child: child) {
+        public Offstage(Key key = null, bool offstage = true, Widget child = null) : base(key: key, child: child) {
             this.offstage = offstage;
         }
 
         public readonly bool offstage;
+
         public override RenderObject createRenderObject(BuildContext context) {
             return new RenderOffstage(offstage: this.offstage);
         }
-        
+
         public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
-            ((RenderOffstage)renderObject).offstage = this.offstage;
+            ((RenderOffstage) renderObject).offstage = this.offstage;
         }
-        
+
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             properties.add(new DiagnosticsProperty<bool>("offstage", this.offstage));
         }
-        
+
         public override Element createElement() => new _OffstageElement(this);
     }
-    
-    class _OffstageElement: SingleChildRenderObjectElement {
-        internal _OffstageElement(Offstage widget) : base(widget) {}
+
+    class _OffstageElement : SingleChildRenderObjectElement {
+        internal _OffstageElement(Offstage widget) : base(widget) {
+        }
 
         new Offstage widget => (Offstage) base.widget;
 
@@ -339,7 +343,7 @@ namespace Unity.UIWidgets.widgets {
                 base.debugVisitOnstageChildren(visitor);
         }
     }
-    
+
     public class AspectRatio : SingleChildRenderObjectWidget {
         public AspectRatio(
             Key key = null,
@@ -450,6 +454,7 @@ namespace Unity.UIWidgets.widgets {
                     right = end;
                     break;
             }
+
             return new Positioned(child, key: key, left: left, top: top, right: right, bottom: bottom, width: width,
                 height: height);
         }
@@ -622,9 +627,8 @@ namespace Unity.UIWidgets.widgets {
             Color color = null,
             Color shadowColor = null,
             Widget child = null) : base(key: key, child: child) {
-            D.assert(shape != null);
             D.assert(color != null);
-            
+
             this.shape = shape;
             this.clipBehavior = clipBehavior;
             this.borderRadius = borderRadius;
@@ -663,8 +667,8 @@ namespace Unity.UIWidgets.widgets {
             _renderObject.color = this.color;
             _renderObject.shadowColor = this.shadowColor;
         }
-        
-        
+
+
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             properties.add(new EnumProperty<BoxShape>("shape", this.shape));
@@ -678,13 +682,13 @@ namespace Unity.UIWidgets.widgets {
 
     public class PhysicalShape : SingleChildRenderObjectWidget {
         public PhysicalShape(
-        Key key = null,
-        CustomClipper<Path> clipper = null,
-        Clip clipBehavior = Clip.none,
-        double elevation = 0.0,
-        Color color = null,
-        Color shadowColor = null,
-        Widget child = null) : base(key : key, child: child){
+            Key key = null,
+            CustomClipper<Path> clipper = null,
+            Clip clipBehavior = Clip.none,
+            double elevation = 0.0,
+            Color color = null,
+            Color shadowColor = null,
+            Widget child = null) : base(key: key, child: child) {
             D.assert(clipper != null);
             D.assert(color != null);
             this.clipper = clipper;
@@ -720,7 +724,7 @@ namespace Unity.UIWidgets.widgets {
             _renderObject.color = this.color;
             _renderObject.shadowColor = this.shadowColor;
         }
-        
+
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             properties.add(new DiagnosticsProperty<CustomClipper<Path>>("clipper", this.clipper));
@@ -729,7 +733,7 @@ namespace Unity.UIWidgets.widgets {
             properties.add(new DiagnosticsProperty<Color>("shadowColor", this.shadowColor));
         }
     }
-    
+
 
     public class Padding : SingleChildRenderObjectWidget {
         public Padding(
@@ -876,24 +880,24 @@ namespace Unity.UIWidgets.widgets {
             bool transformHitTests = true, Widget child = null) : base(key: key, child: child) {
             this.translation = translation;
             this.transformHitTests = transformHitTests;
-        }   
-        
+        }
+
         public readonly Offset translation;
         public readonly bool transformHitTests;
-        
+
         public override RenderObject createRenderObject(BuildContext context) {
             return new RenderFractionalTranslation(
                 translation: this.translation,
                 transformHitTests: this.transformHitTests
             );
         }
-        
+
         public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
-            ((RenderFractionalTranslation)renderObject).translation = this.translation;
-            ((RenderFractionalTranslation)renderObject).transformHitTests = this.transformHitTests;
+            ((RenderFractionalTranslation) renderObject).translation = this.translation;
+            ((RenderFractionalTranslation) renderObject).transformHitTests = this.transformHitTests;
         }
     }
-    
+
     public class Align : SingleChildRenderObjectWidget {
         public Align(
             Key key = null,
@@ -1332,6 +1336,7 @@ namespace Unity.UIWidgets.widgets {
             if (this.onPointerLeave != null) {
                 listeners.Add("leave");
             }
+
             properties.add(new EnumerableProperty<string>("listeners", listeners, ifEmpty: "<none>"));
             properties.add(new EnumProperty<HitTestBehavior>("behavior", this.behavior));
         }
@@ -1391,35 +1396,32 @@ namespace Unity.UIWidgets.widgets {
     }
 
     public class AbsorbPointer : SingleChildRenderObjectWidget {
-
         public AbsorbPointer(
             Key key = null,
             bool absorbing = true,
             Widget child = null
         ) : base(key: key, child: child) {
-        
         }
-    
+
         public readonly bool absorbing;
-    
-     
+
+
         public override RenderObject createRenderObject(BuildContext context) {
             return new RenderAbsorbPointer(
                 absorbing: this.absorbing
             );
         }
-    
-        public override void updateRenderObject(BuildContext context, RenderObject renderObject)
-        {
+
+        public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
             ((RenderAbsorbPointer) renderObject).absorbing = this.absorbing;
         }
-    
+
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             properties.add(new DiagnosticsProperty<bool>("absorbing", this.absorbing));
         }
     }
-    
+
     public class MetaData : SingleChildRenderObjectWidget {
         public MetaData(
             object metaData,

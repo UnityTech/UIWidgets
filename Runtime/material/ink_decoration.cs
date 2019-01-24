@@ -1,9 +1,8 @@
-using System.Runtime.InteropServices.WindowsRuntime;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
-using Unity.UIWidgets.widgets;
 using Unity.UIWidgets.ui;
+using Unity.UIWidgets.widgets;
 using ImageUtils = Unity.UIWidgets.widgets.ImageUtils;
 
 namespace Unity.UIWidgets.material {
@@ -44,11 +43,11 @@ namespace Unity.UIWidgets.material {
         ) {
             D.assert(padding == null || padding.isNonNegative);
             D.assert(image != null);
-            D.assert(repeat != null);
 
             alignment = alignment ?? Alignment.center;
             Decoration decoration = new BoxDecoration(
-                image: new DecorationImage(image,
+                image: new DecorationImage(
+                    image: image,
                     colorFilter: colorFilter,
                     fit: fit,
                     alignment: alignment,
@@ -81,13 +80,13 @@ namespace Unity.UIWidgets.material {
                 if (this.decoration == null || this.decoration.padding == null)
                     return this.padding;
                 EdgeInsets decorationPadding = this.decoration.padding;
-                if (this.padding == null) {
+                if (this.padding == null)
                     return decorationPadding;
-                }
+
                 return this.padding.add(decorationPadding);
             }
         }
-        
+
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             properties.add(new DiagnosticsProperty<EdgeInsets>("padding", this.padding, defaultValue: null));
@@ -111,14 +110,15 @@ namespace Unity.UIWidgets.material {
             base.deactivate();
         }
 
-        public Widget _build(BuildContext context, BoxConstraints contraints) {
+        public Widget _build(BuildContext context, BoxConstraints constraints) {
             if (this._ink == null) {
                 this._ink = new InkDecoration(
-                decoration: this.widget.decoration,
+                    decoration: this.widget.decoration,
                     configuration: ImageUtils.createLocalImageConfiguration(context),
                     controller: Material.of(context),
-                    referenceBox: (RenderBox)context.findRenderObject(),
-                    onRemoved: this._handleRemoved);
+                    referenceBox: (RenderBox) context.findRenderObject(),
+                    onRemoved: this._handleRemoved
+                );
             }
             else {
                 this._ink.decoration = this.widget.decoration;
@@ -138,7 +138,8 @@ namespace Unity.UIWidgets.material {
         public override Widget build(BuildContext context) {
             D.assert(MaterialDebug.debugCheckHasMaterial(context));
             Widget result = new LayoutBuilder(
-            builder: this._build);
+                builder: this._build
+            );
             if (this.widget.width != null || this.widget.height != null) {
                 result = new SizedBox(
                     width: this.widget.width,
@@ -163,6 +164,7 @@ namespace Unity.UIWidgets.material {
             D.assert(decoration != null);
             D.assert(controller != null);
             D.assert(referenceBox != null);
+            this._configuration = configuration;
             this.decoration = decoration;
             this.controller.addInkFeature(this);
         }
@@ -180,6 +182,7 @@ namespace Unity.UIWidgets.material {
                 this.controller.markNeedsPaint();
             }
         }
+
         Decoration _decoration;
 
         public ImageConfiguration configuration {
@@ -192,12 +195,13 @@ namespace Unity.UIWidgets.material {
                 this.controller.markNeedsPaint();
             }
         }
+
         ImageConfiguration _configuration;
 
         void _handleChanged() {
             this.controller.markNeedsPaint();
         }
-        
+
         public override void dispose() {
             this._painter?.Dispose();
             base.dispose();

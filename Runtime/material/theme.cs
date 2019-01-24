@@ -4,7 +4,6 @@ using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.widgets;
 
 namespace Unity.UIWidgets.material {
-
     public class Theme : StatelessWidget {
         public Theme(
             Key key = null,
@@ -36,7 +35,7 @@ namespace Unity.UIWidgets.material {
                 return inheritedTheme.theme.data;
             }
 
-            //todo:xingwei.zhu: materialLocalizations
+            //todo:xingwei.zhu: material Localizations
             return inheritedTheme?.theme?.data ?? _kFallbackTheme;
         }
 
@@ -113,8 +112,9 @@ namespace Unity.UIWidgets.material {
     class _AnimatedThemeState : AnimatedWidgetBaseState<AnimatedTheme> {
         ThemeDataTween _data;
 
-        protected override void forEachTween(ITweenVisitor visitor) {    
-            this._data = (ThemeDataTween) visitor.visit<ThemeData, AnimatedTheme>(this, this._data, this.widget.data, (ThemeData value) => new ThemeDataTween(begin: value));
+        protected override void forEachTween(ITweenVisitor visitor) {
+            this._data = (ThemeDataTween) visitor.visit(this, this._data, this.widget.data,
+                (ThemeData value) => new ThemeDataTween(begin: value));
         }
 
         public override Widget build(BuildContext context) {
@@ -124,11 +124,11 @@ namespace Unity.UIWidgets.material {
                 data: this._data.evaluate(this.animation)
             );
         }
-        
+
         public override void debugFillProperties(DiagnosticPropertiesBuilder description) {
             base.debugFillProperties(description);
-            description.add(new DiagnosticsProperty<ThemeDataTween>("data", this._data, showName: false, defaultValue: null));
+            description.add(
+                new DiagnosticsProperty<ThemeDataTween>("data", this._data, showName: false, defaultValue: null));
         }
     }
-
 }

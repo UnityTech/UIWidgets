@@ -1,5 +1,4 @@
 using Unity.UIWidgets.foundation;
-using Unity.UIWidgets.painting;
 using Unity.UIWidgets.ui;
 using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
@@ -64,19 +63,19 @@ namespace Unity.UIWidgets.material {
 
 
         public TextTheme copyWith(
-            TextStyle display4,
-            TextStyle display3,
-            TextStyle display2,
-            TextStyle display1,
-            TextStyle headline,
-            TextStyle title,
-            TextStyle subhead,
-            TextStyle body2,
-            TextStyle body1,
-            TextStyle caption,
-            TextStyle button,
-            TextStyle subtitle,
-            TextStyle overline
+            TextStyle display4 = null,
+            TextStyle display3 = null,
+            TextStyle display2 = null,
+            TextStyle display1 = null,
+            TextStyle headline = null,
+            TextStyle title = null,
+            TextStyle subhead = null,
+            TextStyle body2 = null,
+            TextStyle body1 = null,
+            TextStyle caption = null,
+            TextStyle button = null,
+            TextStyle subtitle = null,
+            TextStyle overline = null
         ) {
             return new TextTheme(
                 display4: display4 ?? this.display4,
@@ -246,7 +245,7 @@ namespace Unity.UIWidgets.material {
                 )
             );
         }
-        
+
         public static TextTheme lerp(TextTheme a, TextTheme b, double t) {
             D.assert(a != null);
             D.assert(b != null);
@@ -267,14 +266,16 @@ namespace Unity.UIWidgets.material {
                 overline: TextStyle.lerp(a.overline, b.overline, t)
             );
         }
-        
+
         public bool Equals(TextTheme other) {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return this.display4 == other.display4
                    && this.display3 == other.display3
                    && this.display2 == other.display2
@@ -294,23 +295,26 @@ namespace Unity.UIWidgets.material {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((TextTheme) obj);
         }
 
-        public static bool operator ==(TextTheme a, TextTheme b) {
-            return ReferenceEquals(a, null) ? ReferenceEquals(b, null) : a.Equals(b);
+        public static bool operator ==(TextTheme left, TextTheme right) {
+            return Equals(left, right);
         }
 
-        public static bool operator !=(TextTheme a, TextTheme b) {
-            return !(a == b);
+        public static bool operator !=(TextTheme left, TextTheme right) {
+            return !Equals(left, right);
         }
-        
+
         public override int GetHashCode() {
             unchecked {
                 var hashCode = this.display4.GetHashCode();
@@ -329,23 +333,33 @@ namespace Unity.UIWidgets.material {
                 return hashCode;
             }
         }
-        
+
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             TextTheme defaultTheme = new Typography().black;
-            properties.add(new DiagnosticsProperty<TextStyle>("display4", this.display4, defaultValue: defaultTheme.display4));
-            properties.add(new DiagnosticsProperty<TextStyle>("display3", this.display3, defaultValue: defaultTheme.display3));
-            properties.add(new DiagnosticsProperty<TextStyle>("display2", this.display2, defaultValue: defaultTheme.display2));
-            properties.add(new DiagnosticsProperty<TextStyle>("display1", this.display1, defaultValue: defaultTheme.display1));
-            properties.add(new DiagnosticsProperty<TextStyle>("headline", this.headline, defaultValue: defaultTheme.headline));
+            properties.add(new DiagnosticsProperty<TextStyle>("display4", this.display4,
+                defaultValue: defaultTheme.display4));
+            properties.add(new DiagnosticsProperty<TextStyle>("display3", this.display3,
+                defaultValue: defaultTheme.display3));
+            properties.add(new DiagnosticsProperty<TextStyle>("display2", this.display2,
+                defaultValue: defaultTheme.display2));
+            properties.add(new DiagnosticsProperty<TextStyle>("display1", this.display1,
+                defaultValue: defaultTheme.display1));
+            properties.add(new DiagnosticsProperty<TextStyle>("headline", this.headline,
+                defaultValue: defaultTheme.headline));
             properties.add(new DiagnosticsProperty<TextStyle>("title", this.title, defaultValue: defaultTheme.title));
-            properties.add(new DiagnosticsProperty<TextStyle>("subhead", this.subhead, defaultValue: defaultTheme.subhead));
+            properties.add(
+                new DiagnosticsProperty<TextStyle>("subhead", this.subhead, defaultValue: defaultTheme.subhead));
             properties.add(new DiagnosticsProperty<TextStyle>("body2", this.body2, defaultValue: defaultTheme.body2));
             properties.add(new DiagnosticsProperty<TextStyle>("body1", this.body1, defaultValue: defaultTheme.body1));
-            properties.add(new DiagnosticsProperty<TextStyle>("caption", this.caption, defaultValue: defaultTheme.caption));
-            properties.add(new DiagnosticsProperty<TextStyle>("button", this.button, defaultValue: defaultTheme.button));
-            properties.add(new DiagnosticsProperty<TextStyle>("subtitle)", this.subtitle, defaultValue: defaultTheme.subtitle));
-            properties.add(new DiagnosticsProperty<TextStyle>("overline", this.overline, defaultValue: defaultTheme.overline));
+            properties.add(
+                new DiagnosticsProperty<TextStyle>("caption", this.caption, defaultValue: defaultTheme.caption));
+            properties.add(
+                new DiagnosticsProperty<TextStyle>("button", this.button, defaultValue: defaultTheme.button));
+            properties.add(new DiagnosticsProperty<TextStyle>("subtitle)", this.subtitle,
+                defaultValue: defaultTheme.subtitle));
+            properties.add(new DiagnosticsProperty<TextStyle>("overline", this.overline,
+                defaultValue: defaultTheme.overline));
         }
     }
 }

@@ -4,12 +4,10 @@ using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
 
 namespace Unity.UIWidgets.widgets {
-
     public delegate Widget LayoutWidgetBuilder(BuildContext context, BoxConstraints constraints);
 
 
     class LayoutBuilder : RenderObjectWidget {
-
         public LayoutBuilder(
             Key key = null,
             LayoutWidgetBuilder builder = null) : base(key: key) {
@@ -26,7 +24,8 @@ namespace Unity.UIWidgets.widgets {
 
     class _LayoutBuilderElement : RenderObjectElement {
         public _LayoutBuilderElement(
-            LayoutBuilder widget) : base(widget){}
+            LayoutBuilder widget) : base(widget) {
+        }
 
         new LayoutBuilder widget => (LayoutBuilder) base.widget;
 
@@ -81,7 +80,7 @@ namespace Unity.UIWidgets.widgets {
         }
 
         protected override void insertChildRenderObject(RenderObject child, object slot) {
-            _RenderLayoutBuilder renderObject = (_RenderLayoutBuilder) this.renderObject;
+            _RenderLayoutBuilder renderObject = this.renderObject;
             D.assert(slot == null);
             D.assert(renderObject.debugValidateChild(child));
             renderObject.child = (RenderBox) child;
@@ -93,7 +92,7 @@ namespace Unity.UIWidgets.widgets {
         }
 
         protected override void removeChildRenderObject(RenderObject child) {
-            _RenderLayoutBuilder renderObject = (_RenderLayoutBuilder) this.renderObject;
+            _RenderLayoutBuilder renderObject = this.renderObject;
             D.assert(renderObject.child == child);
             renderObject.child = null;
             D.assert(renderObject == this.renderObject);
@@ -108,7 +107,7 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public LayoutCallback<BoxConstraints> callback {
-            get { return this._callback;  }
+            get { return this._callback; }
             set {
                 if (value == this._callback)
                     return;
@@ -116,17 +115,19 @@ namespace Unity.UIWidgets.widgets {
                 this.markNeedsLayout();
             }
         }
+
         LayoutCallback<BoxConstraints> _callback;
 
         bool _debugThrowIfNotCheckingIntrinsics() {
             D.assert(() => {
-                if (!RenderObject.debugCheckingIntrinsics) {
+                if (!debugCheckingIntrinsics) {
                     throw new UIWidgetsError(
                         "LayoutBuilder does not support returning intrinsic dimensions.\n" +
-                    "Calculating the intrinsic dimensions would require running the layout " +
-                    "callback speculatively, which might mutate the live render object tree."
+                        "Calculating the intrinsic dimensions would require running the layout " +
+                        "callback speculatively, which might mutate the live render object tree."
                     );
                 }
+
                 return true;
             });
             return true;
@@ -136,7 +137,7 @@ namespace Unity.UIWidgets.widgets {
             D.assert(this._debugThrowIfNotCheckingIntrinsics());
             return 0.0;
         }
-        
+
         protected override double computeMaxIntrinsicWidth(double height) {
             D.assert(this._debugThrowIfNotCheckingIntrinsics());
             return 0.0;

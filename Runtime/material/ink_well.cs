@@ -1,15 +1,12 @@
+using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
-using Color = Unity.UIWidgets.ui.Color;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
 namespace Unity.UIWidgets.material {
-
     public abstract class InteractiveInkFeature : InkFeature {
         public InteractiveInkFeature(
             MaterialInkController controller = null,
@@ -22,17 +19,17 @@ namespace Unity.UIWidgets.material {
             this._color = color;
         }
 
-        public virtual void confirm() {}
-        
-        public virtual void cancel() {}
+        public virtual void confirm() {
+        }
+
+        public virtual void cancel() {
+        }
 
         public Color color {
             get { return this._color; }
             set {
-                if (value == this._color) {
+                if (value == this._color)
                     return;
-                }
-
                 this._color = value;
                 this.controller.markNeedsPaint();
             }
@@ -42,19 +39,20 @@ namespace Unity.UIWidgets.material {
     }
 
     public abstract class InteractiveInkFeatureFactory {
-        public InteractiveInkFeatureFactory() {}
+        public InteractiveInkFeatureFactory() {
+        }
 
         public abstract InteractiveInkFeature create(
-        MaterialInkController controller = null,
-        RenderBox referenceBox = null,
-        Offset position = null,
-        Color color = null,
-        bool containedInkWell = false,
-        RectCallback rectCallback = null,
-        BorderRadius borderRadius = null,
-        ShapeBorder customBorder = null,
-        double? radius = null,
-        VoidCallback onRemoved = null);
+            MaterialInkController controller = null,
+            RenderBox referenceBox = null,
+            Offset position = null,
+            Color color = null,
+            bool containedInkWell = false,
+            RectCallback rectCallback = null,
+            BorderRadius borderRadius = null,
+            ShapeBorder customBorder = null,
+            double? radius = null,
+            VoidCallback onRemoved = null);
     }
 
 
@@ -64,7 +62,7 @@ namespace Unity.UIWidgets.material {
             Widget child = null,
             GestureTapCallback onTap = null,
             GestureTapDownCallback onTapDown = null,
-            GestureTapCancelCallback onTapCancel = null,
+            GestureTapCallback onTapCancel = null,
             GestureTapCallback onDoubleTap = null,
             GestureLongPressCallback onLongPress = null,
             ValueChanged<bool> onHighlightChanged = null,
@@ -94,12 +92,12 @@ namespace Unity.UIWidgets.material {
         }
 
         public readonly Widget child;
-    
+
         public readonly GestureTapCallback onTap;
 
         public readonly GestureTapDownCallback onTapDown;
 
-        public readonly GestureTapCancelCallback onTapCancel;
+        public readonly GestureTapCallback onTapCancel;
 
         public readonly GestureTapCallback onDoubleTap;
 
@@ -132,8 +130,8 @@ namespace Unity.UIWidgets.material {
         }
 
         public override State createState() => new _InkResponseState<InkResponse>();
-        
-        
+
+
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             List<string> gestures = new List<string>();
@@ -148,7 +146,8 @@ namespace Unity.UIWidgets.material {
             if (this.onTapCancel != null)
                 gestures.Add("tap cancel");
             properties.add(new EnumerableProperty<string>("gestures", gestures, ifEmpty: "<none>"));
-            properties.add(new DiagnosticsProperty<bool>("containedInkWell", this.containedInkWell, level: DiagnosticLevel.fine));
+            properties.add(new DiagnosticsProperty<bool>("containedInkWell", this.containedInkWell,
+                level: DiagnosticLevel.fine));
             properties.add(new DiagnosticsProperty<BoxShape>(
                 "highlightShape",
                 this.highlightShape,
@@ -164,16 +163,15 @@ namespace Unity.UIWidgets.material {
         InteractiveInkFeature _currentSplash;
         InkHighlight _lastHighlight;
 
-        protected override bool wantKeepAlive {
-            get { return this._lastHighlight != null || (this._splashes != null && this._splashes.isNotEmpty()); }
-        }
+        protected override bool wantKeepAlive =>
+            this._lastHighlight != null || (this._splashes != null && this._splashes.isNotEmpty());
 
         public void updateHighlight(bool value) {
             if (value == (this._lastHighlight != null && this._lastHighlight.active))
                 return;
             if (value) {
                 if (this._lastHighlight == null) {
-                    RenderBox referenceBox = (RenderBox)this.context.findRenderObject();
+                    RenderBox referenceBox = (RenderBox) this.context.findRenderObject();
                     this._lastHighlight = new InkHighlight(
                         controller: Material.of(this.context),
                         referenceBox: referenceBox,
@@ -192,6 +190,7 @@ namespace Unity.UIWidgets.material {
             else {
                 this._lastHighlight.deactivate();
             }
+
             D.assert(value == (this._lastHighlight != null && this._lastHighlight.active));
             if (this.widget.onHighlightChanged != null)
                 this.widget.onHighlightChanged(value);
@@ -213,17 +212,16 @@ namespace Unity.UIWidgets.material {
             ShapeBorder customBorder = this.widget.customBorder;
 
             InteractiveInkFeature splash = null;
-            
-            VoidCallback onRemoved = () => {
+
+            void OnRemoved() {
                 if (this._splashes != null) {
                     D.assert(this._splashes.Contains(splash));
                     this._splashes.Remove(splash);
-                    if (this._currentSplash == splash)
-                        this._currentSplash = null;
+                    if (this._currentSplash == splash) this._currentSplash = null;
                     this.updateKeepAlive();
                 }
-            };
-            
+            }
+
             splash = (this.widget.splashFactory ?? Theme.of(this.context).splashFactory).create(
                 controller: inkController,
                 referenceBox: referenceBox,
@@ -234,7 +232,7 @@ namespace Unity.UIWidgets.material {
                 radius: this.widget.radius,
                 borderRadius: borderRadius,
                 customBorder: customBorder,
-                onRemoved: onRemoved);
+                onRemoved: OnRemoved);
 
             return splash;
         }
@@ -248,6 +246,7 @@ namespace Unity.UIWidgets.material {
             if (this.widget.onTapDown != null) {
                 this.widget.onTapDown(details);
             }
+
             this.updateKeepAlive();
             this.updateHighlight(true);
         }
@@ -267,6 +266,7 @@ namespace Unity.UIWidgets.material {
             if (this.widget.onTapCancel != null) {
                 this.widget.onTapCancel();
             }
+
             this.updateHighlight(false);
         }
 
@@ -294,6 +294,7 @@ namespace Unity.UIWidgets.material {
                     splash.dispose();
                 this._currentSplash = null;
             }
+
             D.assert(this._currentSplash == null);
             this._lastHighlight?.dispose();
             this._lastHighlight = null;
@@ -312,11 +313,13 @@ namespace Unity.UIWidgets.material {
                            this.widget.onLongPress != null;
 
             return new GestureDetector(
-                onTapDown: enabled? (GestureTapDownCallback)this._handleTapDown : null,
-                onTap: enabled? (GestureTapCallback)(() => this._handleTap(context)) : null,
-                onTapCancel: enabled? (GestureTapCancelCallback)this._handleTapCancel : null,
-                onDoubleTap: this.widget.onDoubleTap != null ? (GestureDoubleTapCallback)this._handleDoubleTap : null,
-                onLongPress: this.widget.onLongPress != null ? (GestureLongPressCallback)(() => this._handleLongPress(context)) : null,
+                onTapDown: enabled ? (GestureTapDownCallback) this._handleTapDown : null,
+                onTap: enabled ? (GestureTapCallback) (() => this._handleTap(context)) : null,
+                onTapCancel: enabled ? (GestureTapCancelCallback) this._handleTapCancel : null,
+                onDoubleTap: this.widget.onDoubleTap != null ? (GestureDoubleTapCallback) this._handleDoubleTap : null,
+                onLongPress: this.widget.onLongPress != null
+                    ? (GestureLongPressCallback) (() => this._handleLongPress(context))
+                    : null,
                 behavior: HitTestBehavior.opaque,
                 child: this.widget.child
             );
@@ -340,13 +343,14 @@ namespace Unity.UIWidgets.material {
             double? radius = null,
             BorderRadius borderRadius = null,
             ShapeBorder customBorder = null
-        ) : base(key: key,
+        ) : base(
+            key: key,
             child: child,
             onTap: onTap,
             onDoubleTap: onDoubleTap,
             onLongPress: onLongPress,
             onTapDown: onTapDown,
-            onTapCancel: onTapCancel,
+            onTapCancel: () => onTapCancel(),
             onHighlightChanged: onHighlightChanged,
             containedInkWell: true,
             highlightColor: highlightColor,
@@ -354,6 +358,7 @@ namespace Unity.UIWidgets.material {
             splashFactory: splashFactory,
             radius: radius,
             borderRadius: borderRadius,
-            customBorder: customBorder){}
+            customBorder: customBorder) {
+        }
     }
 }

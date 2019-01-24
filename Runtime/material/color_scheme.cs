@@ -30,7 +30,6 @@ namespace Unity.UIWidgets.material {
             D.assert(onSurface != null);
             D.assert(onBackground != null);
             D.assert(onError != null);
-            D.assert(brightness != null);
 
             this.primary = primary;
             this.primaryVariant = primaryVariant;
@@ -64,7 +63,7 @@ namespace Unity.UIWidgets.material {
         ) {
             primary = primary ?? new Color(0xFF6200EE);
             primaryVariant = primaryVariant ?? new Color(0xFF3700B3);
-            secondary = secondary ?? new Color(0xFF03AC6);
+            secondary = secondary ?? new Color(0xFF03DAC6);
             secondaryVariant = secondaryVariant ?? new Color(0xFF018786);
             surface = surface ?? Colors.white;
             background = background ?? Colors.white;
@@ -145,6 +144,7 @@ namespace Unity.UIWidgets.material {
             Color backgroundColor = null,
             Color errorColor = null,
             Brightness? brightness = Brightness.light) {
+            D.assert(brightness != null);
             primarySwatch = primarySwatch ?? Colors.blue;
 
             bool isDark = brightness == Brightness.dark;
@@ -213,7 +213,6 @@ namespace Unity.UIWidgets.material {
             Color onBackground = null,
             Color onError = null,
             Brightness? brightness = null) {
-            
             return new ColorScheme(
                 primary: primary ?? this.primary,
                 primaryVariant: primaryVariant ?? this.primaryVariant,
@@ -230,7 +229,7 @@ namespace Unity.UIWidgets.material {
                 brightness: brightness ?? this.brightness
             );
         }
-        
+
         public static ColorScheme lerp(ColorScheme a, ColorScheme b, double t) {
             return new ColorScheme(
                 primary: Color.lerp(a.primary, b.primary, t),
@@ -248,8 +247,8 @@ namespace Unity.UIWidgets.material {
                 brightness: t < 0.5 ? a.brightness : b.brightness
             );
         }
-        
-        
+
+
         public bool Equals(ColorScheme other) {
             if (ReferenceEquals(null, other)) {
                 return false;
@@ -316,23 +315,35 @@ namespace Unity.UIWidgets.material {
                 return hashCode;
             }
         }
-        
+
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
-            ColorScheme defaultScheme = ColorScheme.light();
-            properties.add(new DiagnosticsProperty<Color>("primary", this.primary, defaultValue: defaultScheme.primary));
-            properties.add(new DiagnosticsProperty<Color>("primaryVariant", this.primaryVariant, defaultValue: defaultScheme.primaryVariant));
-            properties.add(new DiagnosticsProperty<Color>("secondary", this.secondary, defaultValue: defaultScheme.secondary));
-            properties.add(new DiagnosticsProperty<Color>("secondaryVariant", this.secondaryVariant, defaultValue: defaultScheme.secondaryVariant));
-            properties.add(new DiagnosticsProperty<Color>("surface", this.surface, defaultValue: defaultScheme.surface));
-            properties.add(new DiagnosticsProperty<Color>("background", this.background, defaultValue: defaultScheme.background));
+            ColorScheme defaultScheme = light();
+            properties.add(new DiagnosticsProperty<Color>("primary", this.primary,
+                defaultValue: defaultScheme.primary));
+            properties.add(new DiagnosticsProperty<Color>("primaryVariant", this.primaryVariant,
+                defaultValue: defaultScheme.primaryVariant));
+            properties.add(new DiagnosticsProperty<Color>("secondary", this.secondary,
+                defaultValue: defaultScheme.secondary));
+            properties.add(new DiagnosticsProperty<Color>("secondaryVariant", this.secondaryVariant,
+                defaultValue: defaultScheme.secondaryVariant));
+            properties.add(new DiagnosticsProperty<Color>("surface", this.surface,
+                defaultValue: defaultScheme.surface));
+            properties.add(new DiagnosticsProperty<Color>("background", this.background,
+                defaultValue: defaultScheme.background));
             properties.add(new DiagnosticsProperty<Color>("error", this.error, defaultValue: defaultScheme.error));
-            properties.add(new DiagnosticsProperty<Color>("onPrimary", this.onPrimary, defaultValue: defaultScheme.onPrimary));
-            properties.add(new DiagnosticsProperty<Color>("onSecondary", this.onSecondary, defaultValue: defaultScheme.onSecondary));
-            properties.add(new DiagnosticsProperty<Color>("onSurface", this.onSurface, defaultValue: defaultScheme.onSurface));
-            properties.add(new DiagnosticsProperty<Color>("onBackground", this.onBackground, defaultValue: defaultScheme.onBackground));
-            properties.add(new DiagnosticsProperty<Color>("onError", this.onError, defaultValue: defaultScheme.onError));
-            properties.add(new DiagnosticsProperty<Brightness>("brightness", this.brightness, defaultValue: defaultScheme.brightness));
+            properties.add(new DiagnosticsProperty<Color>("onPrimary", this.onPrimary,
+                defaultValue: defaultScheme.onPrimary));
+            properties.add(new DiagnosticsProperty<Color>("onSecondary", this.onSecondary,
+                defaultValue: defaultScheme.onSecondary));
+            properties.add(new DiagnosticsProperty<Color>("onSurface", this.onSurface,
+                defaultValue: defaultScheme.onSurface));
+            properties.add(new DiagnosticsProperty<Color>("onBackground", this.onBackground,
+                defaultValue: defaultScheme.onBackground));
+            properties.add(new DiagnosticsProperty<Color>("onError", this.onError,
+                defaultValue: defaultScheme.onError));
+            properties.add(new DiagnosticsProperty<Brightness>("brightness", this.brightness,
+                defaultValue: defaultScheme.brightness));
         }
     }
 }

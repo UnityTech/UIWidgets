@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Unity.UIWidgets.foundation;
-using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.ui;
 
 namespace Unity.UIWidgets.painting {
@@ -120,7 +119,7 @@ namespace Unity.UIWidgets.painting {
             TextDecoration decoration = null,
             Color decorationColor = null,
             TextDecorationStyle? decorationStyle = null,
-            String fontFamily = null,
+            string fontFamily = null,
             double fontSizeFactor = 1.0,
             double fontSizeDelta = 0.0,
             int fontWeightDelta = 0,
@@ -131,22 +130,13 @@ namespace Unity.UIWidgets.painting {
             double heightFactor = 1.0,
             double heightDelta = 0.0
         ) {
-            D.assert(fontSizeFactor != null);
-            D.assert(fontSizeDelta != null);
             D.assert(this.fontSize != null || (fontSizeFactor == 1.0 && fontSizeDelta == 0.0));
-            D.assert(fontWeightDelta != null);
             D.assert(this.fontWeight != null || fontWeightDelta == 0.0);
-            D.assert(letterSpacingFactor != null);
-            D.assert(letterSpacingDelta != null);
             D.assert(this.letterSpacing != null || (letterSpacingFactor == 1.0 && letterSpacingDelta == 0.0));
-            D.assert(wordSpacingFactor != null);
-            D.assert(wordSpacingDelta != null);
             D.assert(this.wordSpacing != null || (wordSpacingFactor == 1.0 && wordSpacingDelta == 0.0));
-            D.assert(heightFactor != null);
-            D.assert(heightDelta != null);
             D.assert(heightFactor != null || (heightFactor == 1.0 && heightDelta == 0.0));
 
-            String modifiedDebugLabel = "";
+            string modifiedDebugLabel = "";
             D.assert(() => {
                 if (this.debugLabel != null)
                     modifiedDebugLabel = this.debugLabel + ".apply";
@@ -278,10 +268,10 @@ namespace Unity.UIWidgets.painting {
                     wordSpacing: t < 0.5 ? null : b.wordSpacing,
                     textBaseline: t < 0.5 ? null : b.textBaseline,
                     height: t < 0.5 ? null : b.height,
+                    background: t < 0.5 ? null : b.background,
                     decoration: t < 0.5 ? null : b.decoration,
                     decorationColor: Color.lerp(null, b.decorationColor, t),
                     decorationStyle: t < 0.5 ? null : b.decorationStyle,
-                    background: t < 0.5 ? null : b.background,
                     debugLabel: lerpDebugLabel
                 );
             }
@@ -298,10 +288,10 @@ namespace Unity.UIWidgets.painting {
                     wordSpacing: t < 0.5 ? a.wordSpacing : null,
                     textBaseline: t < 0.5 ? a.textBaseline : null,
                     height: t < 0.5 ? a.height : null,
+                    background: t < 0.5 ? a.background : null,
                     decoration: t < 0.5 ? a.decoration : null,
                     decorationColor: Color.lerp(a.decorationColor, null, t),
                     decorationStyle: t < 0.5 ? a.decorationStyle : null,
-                    background: t < 0.5 ? a.background : null,
                     debugLabel: lerpDebugLabel
                 );
             }
@@ -319,10 +309,10 @@ namespace Unity.UIWidgets.painting {
                     b.wordSpacing ?? a.wordSpacing, t),
                 textBaseline: t < 0.5 ? a.textBaseline : b.textBaseline,
                 height: MathUtils.lerpNullableDouble(a.height ?? b.height, b.height ?? a.height, t),
+                background: t < 0.5 ? a.background : b.background,
                 decoration: t < 0.5 ? a.decoration : b.decoration,
                 decorationColor: Color.lerp(a.decorationColor, b.decorationColor, t),
                 decorationStyle: t < 0.5 ? a.decorationStyle : b.decorationStyle,
-                background: t < 0.5 ? a.background : b.background,
                 debugLabel: lerpDebugLabel
             );
         }

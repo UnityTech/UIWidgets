@@ -1,17 +1,15 @@
+using System;
 using System.Collections.Generic;
-using Unity.UIWidgets.painting;
+using Unity.UIWidgets.animation;
 using Unity.UIWidgets.foundation;
-using Unity.UIWidgets.ui;
+using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.scheduler;
+using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
-using System;
-using Unity.UIWidgets.animation;
 using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
-
 namespace Unity.UIWidgets.material {
-    
     public delegate Rect RectCallback();
 
     public enum MaterialType {
@@ -21,10 +19,9 @@ namespace Unity.UIWidgets.material {
         button,
         transparency
     }
-    
+
 
     public interface MaterialInkController {
-
         Color color { get; set; }
 
         TickerProvider vsync { get; }
@@ -48,13 +45,10 @@ namespace Unity.UIWidgets.material {
             Clip clipBehavior = Clip.none,
             TimeSpan? animationDuration = null,
             Widget child = null
-            ) : base(key: key) {
-            D.assert(type != null);
-            D.assert(elevation != null);            
+        ) : base(key: key) {
             D.assert(!(shape != null && borderRadius != null));
-            D.assert(type != MaterialType.circle && (borderRadius != null || shape != null));
-            D.assert(clipBehavior != null);
-            
+            D.assert(!(type == MaterialType.circle && (borderRadius != null || shape != null)));
+
             this.type = type;
             this.elevation = elevation;
             this.color = color;
@@ -66,7 +60,6 @@ namespace Unity.UIWidgets.material {
             this.animationDuration = animationDuration ?? Constants.kThemeChangeDuration;
             this.child = child;
         }
-        
 
         public readonly Widget child;
 
@@ -88,32 +81,34 @@ namespace Unity.UIWidgets.material {
 
         public readonly BorderRadius borderRadius;
 
-        
+
         public static MaterialInkController of(BuildContext context) {
-            _RenderInkFeatures result = (_RenderInkFeatures) context.ancestorRenderObjectOfType(new TypeMatcher<_RenderInkFeatures>());
+            _RenderInkFeatures result =
+                (_RenderInkFeatures) context.ancestorRenderObjectOfType(new TypeMatcher<_RenderInkFeatures>());
             return result;
         }
-        
+
         public override State createState() => new _MaterialState();
 
-        
+
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             properties.add(new EnumProperty<MaterialType>("type", this.type));
             properties.add(new DoubleProperty("elevation", this.elevation, defaultValue: 0.0));
             properties.add(new DiagnosticsProperty<Color>("color", this.color, defaultValue: null));
-            properties.add(new DiagnosticsProperty<Color>("shadowColor", this.shadowColor, defaultValue: new Color(0xFF000000)));
+            properties.add(new DiagnosticsProperty<Color>("shadowColor", this.shadowColor,
+                defaultValue: new Color(0xFF000000)));
             this.textStyle?.debugFillProperties(properties);
             properties.add(new DiagnosticsProperty<ShapeBorder>("shape", this.shape, defaultValue: null));
             properties.add(new EnumProperty<BorderRadius>("borderRadius", this.borderRadius, defaultValue: null));
         }
 
-        public static double defaultSplashRadius = 35.0;
+        public const double defaultSplashRadius = 35.0;
     }
 
 
     class _MaterialState : TickerProviderStateMixin<Material> {
-        readonly GlobalKey _inkFeatureRenderer = GlobalKey.key(debugLabel:"ink renderer");
+        readonly GlobalKey _inkFeatureRenderer = GlobalKey.key(debugLabel: "ink renderer");
 
         Color _getBackgroundColor(BuildContext context) {
             if (this.widget.color != null)
@@ -142,7 +137,8 @@ namespace Unity.UIWidgets.material {
 
             contents = new NotificationListener<LayoutChangedNotification>(
                 onNotification: (LayoutChangedNotification notification) => {
-                    _RenderInkFeatures renderer = (_RenderInkFeatures) this._inkFeatureRenderer.currentContext.findRenderObject();
+                    _RenderInkFeatures renderer =
+                        (_RenderInkFeatures) this._inkFeatureRenderer.currentContext.findRenderObject();
                     renderer._didChangeLayout();
                     return true;
                 },
@@ -151,7 +147,7 @@ namespace Unity.UIWidgets.material {
                     color: backgroundColor,
                     child: contents,
                     vsync: this
-                    )
+                )
             );
 
             if (this.widget.type == MaterialType.canvas && this.widget.shape == null &&
@@ -172,6 +168,7 @@ namespace Unity.UIWidgets.material {
 
             ShapeBorder shape = this._getShape();
 
+            //todo xingwei.zhu: add support for transparentInterior Material
             if (this.widget.type == MaterialType.transparency) {
                 D.assert(false, "material widget is not completely implemented yet.");
                 return null;
@@ -210,6 +207,7 @@ namespace Unity.UIWidgets.material {
                 case MaterialType.circle:
                     return new CircleBorder();
             }
+
             return new RoundedRectangleBorder();
         }
     }
@@ -272,6 +270,7 @@ namespace Unity.UIWidgets.material {
                     inkFeature._paint(canvas);
                 canvas.restore();
             }
+
             base.paint(context, offset);
         }
     }
@@ -312,15 +311,12 @@ namespace Unity.UIWidgets.material {
             VoidCallback onRemoved = null) {
             D.assert(controller != null);
             D.assert(referenceBox != null);
-            this._controller = (_RenderInkFeatures)controller;
+            this._controller = (_RenderInkFeatures) controller;
             this.referenceBox = referenceBox;
             this.onRemoved = onRemoved;
         }
 
-        public MaterialInkController controller {
-            get { return this._controller;  }
-        }
-
+        public MaterialInkController controller => this._controller;
         public _RenderInkFeatures _controller;
 
         public readonly RenderBox referenceBox;
@@ -344,17 +340,17 @@ namespace Unity.UIWidgets.material {
             D.assert(this.referenceBox.attached);
             D.assert(!this._debugDisposed);
 
-            List<RenderObject> descendants = new List<RenderObject> { this.referenceBox };
+            List<RenderObject> descendants = new List<RenderObject> {this.referenceBox};
             RenderObject node = this.referenceBox;
             while (node != this._controller) {
-                node = (RenderObject)node.parent;
+                node = (RenderObject) node.parent;
                 D.assert(node != null);
                 descendants.Add(node);
             }
-            
+
             Matrix3 transform = Matrix3.I();
             D.assert(descendants.Count >= 2);
-            for(int index = descendants.Count - 1; index > 0; index -= 1)
+            for (int index = descendants.Count - 1; index > 0; index -= 1)
                 descendants[index].applyPaintTransform(descendants[index - 1], transform);
             this.paintFeature(canvas, transform);
         }
@@ -363,11 +359,12 @@ namespace Unity.UIWidgets.material {
 
         public string toString() => this.GetType() + "";
     }
-    
+
     public class ShapeBorderTween : Tween<ShapeBorder> {
         public ShapeBorderTween(
             ShapeBorder begin = null,
-            ShapeBorder end = null) : base(begin: begin, end: end) {}
+            ShapeBorder end = null) : base(begin: begin, end: end) {
+        }
 
         public override ShapeBorder lerp(double t) {
             return ShapeBorder.lerp(this.begin, this.end, t);
@@ -376,16 +373,16 @@ namespace Unity.UIWidgets.material {
 
     public class _MaterialInterior : ImplicitlyAnimatedWidget {
         public _MaterialInterior(
-        Key key = null,
-        Widget child = null,
-        ShapeBorder shape = null,
-        Clip clipBehavior = Clip.none,
-        double? elevation = null,
-        Color color = null,
-        Color shadowColor = null,
-        Curve curve = null,
-        TimeSpan? duration = null
-            ) : base(key : key, curve : curve ?? Curves.linear, duration : duration){
+            Key key = null,
+            Widget child = null,
+            ShapeBorder shape = null,
+            Clip clipBehavior = Clip.none,
+            double? elevation = null,
+            Color color = null,
+            Color shadowColor = null,
+            Curve curve = null,
+            TimeSpan? duration = null
+        ) : base(key: key, curve: curve ?? Curves.linear, duration: duration) {
             D.assert(child != null);
             D.assert(shape != null);
             D.assert(elevation != null);
@@ -413,8 +410,8 @@ namespace Unity.UIWidgets.material {
         public readonly Color shadowColor;
 
         public override State createState() => new _MaterialInteriorState();
-        
-        
+
+
         public override void debugFillProperties(DiagnosticPropertiesBuilder description) {
             base.debugFillProperties(description);
             description.add(new DiagnosticsProperty<ShapeBorder>("shape", this.shape));
@@ -441,8 +438,8 @@ namespace Unity.UIWidgets.material {
         public override Widget build(BuildContext context) {
             ShapeBorder shape = this._border.evaluate(this.animation);
             return new PhysicalShape(
-                child : new _ShapeBorderPaint(
-                    child : this.widget.child,
+                child: new _ShapeBorderPaint(
+                    child: this.widget.child,
                     shape: shape),
                 clipper: new ShapeBorderClipper(
                     shape: shape),
@@ -470,15 +467,13 @@ namespace Unity.UIWidgets.material {
 
         public override Widget build(BuildContext context) {
             return new CustomPaint(
-                child :this.child,
+                child: this.child,
                 foregroundPainter: new _ShapeBorderPainter(this.shape));
         }
     }
 
     class _ShapeBorderPainter : CustomPainter {
-        public _ShapeBorderPainter (
-            ShapeBorder border = null,
-            Listenable repaint = null) : base(repaint) {
+        public _ShapeBorderPainter(ShapeBorder border = null) : base(null) {
             this.border = border;
         }
 

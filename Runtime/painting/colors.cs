@@ -1,29 +1,24 @@
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using Unity.UIWidgets.ui;
-using UnityEngine.WSA;
 
 namespace Unity.UIWidgets.painting {
-
     public class ColorSwatch<T> : Color {
         public ColorSwatch(
             long primary,
-            Dictionary<T, Color> swatch = null) : base(value: primary) {
+            Dictionary<T, Color> swatch) : base(primary) {
             this._swatch = swatch;
         }
 
         protected readonly Dictionary<T, Color> _swatch;
 
-        public Color this[T index] {
-            get { return this._swatch[index]; }
-            set { this._swatch[index] = value; }
-        }
-        
-        
+        public Color this[T index] => this._swatch[index];
+
+
         public bool Equals(ColorSwatch<T> other) {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
@@ -35,12 +30,15 @@ namespace Unity.UIWidgets.painting {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((ColorSwatch<T>) obj);
         }
 
@@ -51,10 +49,10 @@ namespace Unity.UIWidgets.painting {
         public static bool operator !=(ColorSwatch<T> left, ColorSwatch<T> right) {
             return !Equals(left, right);
         }
-        
+
         public override int GetHashCode() {
             unchecked {
-                var hashCode = (int)this.value;
+                var hashCode = (int) this.value;
                 hashCode = (hashCode * 397) ^ this._swatch.GetHashCode();
                 return hashCode;
             }
@@ -62,5 +60,4 @@ namespace Unity.UIWidgets.painting {
 
         public override string ToString() => this.GetType() + "(primary value: " + base.ToString() + ")";
     }
-
 }

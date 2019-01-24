@@ -1,11 +1,10 @@
-using System.Collections.Generic;
 using Unity.UIWidgets.engine;
 using Unity.UIWidgets.foundation;
-using Unity.UIWidgets.rendering;
-using Unity.UIWidgets.ui;
-using Unity.UIWidgets.widgets;
 using Unity.UIWidgets.material;
-using Unity.UIWidgets.painting;
+using Unity.UIWidgets.widgets;
+using UnityEngine;
+using Color = Unity.UIWidgets.ui.Color;
+using Material = Unity.UIWidgets.material.Material;
 
 namespace UIWidgetsSample {
     public class MaterialCanvas : WidgetCanvas {
@@ -30,20 +29,20 @@ namespace UIWidgetsSample {
                 return new MaterialWidgetState();
             }
         }
-        
+
         // test-case: material button 
         class MaterialWidgetState : State<MaterialWidget> {
             public override Widget build(BuildContext context) {
                 return new Material(
-                    child : new Center(
-                        child : new Container(
-                            width: 30,
-                            height : 30,
+                    child: new Center(
                         child: new MaterialButton(
                             color: Colors.blue,
-                            splashColor: new Color(0xFFFF0011),
-                            highlightColor: new Color(0x88000011),
-                            onPressed : () => { }))));
+                            //splashColor: new Color(0xFFFF0011),
+                            //highlightColor: new Color(0x88FF0011),
+                            onPressed: () => { Debug.Log("pressed here");}
+                        )
+                    )
+                );
             }
         }
 

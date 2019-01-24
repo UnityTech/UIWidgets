@@ -1,13 +1,11 @@
 using System.Collections.Generic;
-using JetBrains.Annotations;
 using Unity.UIWidgets.ui;
 
 namespace Unity.UIWidgets.service {
-
-    public enum DeviceOrientation {       
+    public enum DeviceOrientation {
         potraitUp,
-        landscapeLeft,       
-        portraitDown,        
+        landscapeLeft,
+        portraitDown,
         landscapeRight
     }
 
@@ -28,12 +26,12 @@ namespace Unity.UIWidgets.service {
 
     public enum SystemUiOverlay {
         top,
-        bottom,
+        bottom
     }
 
     public enum Brightness {
         dark,
-        light,
+        light
     }
 
     public class SystemUiOverlayStyle {
@@ -64,27 +62,27 @@ namespace Unity.UIWidgets.service {
         public readonly Brightness? statusBarBrightness;
 
         public readonly Brightness? statusBarIconBrightness;
-        
-        public static SystemUiOverlayStyle light = new SystemUiOverlayStyle(
+
+        public static readonly SystemUiOverlayStyle light = new SystemUiOverlayStyle(
             systemNavigationBarColor: new Color(0xFF000000),
             systemNavigationBarDividerColor: null,
             statusBarColor: null,
             systemNavigationBarIconBrightness: Brightness.light,
             statusBarIconBrightness: Brightness.light,
             statusBarBrightness: Brightness.dark
-            );
-        
-        public static SystemUiOverlayStyle dark = new SystemUiOverlayStyle(
+        );
+
+        public static readonly SystemUiOverlayStyle dark = new SystemUiOverlayStyle(
             systemNavigationBarColor: new Color(0xFF000000),
             systemNavigationBarDividerColor: null,
             statusBarColor: null,
             systemNavigationBarIconBrightness: Brightness.light,
             statusBarIconBrightness: Brightness.dark,
             statusBarBrightness: Brightness.light
-            );
+        );
 
         public Dictionary<string, object> _toMap() {
-            return new Dictionary<string, object>() {
+            return new Dictionary<string, object> {
                 {"systemNavigationBarColor", this.systemNavigationBarColor?.value},
                 {"systemNavigationBarDividerColor", this.systemNavigationBarDividerColor?.value},
                 {"statusBarColor", this.statusBarColor?.value},
@@ -97,44 +95,75 @@ namespace Unity.UIWidgets.service {
         public string toString() => this._toMap().ToString();
 
         public SystemUiOverlayStyle copyWith(
-            [CanBeNull] Color systemNavigationBarColor,
-            [CanBeNull] Color systemNavigationBarDividerColor,
-            [CanBeNull] Color statusBarColor,
-            Brightness? statusBarBrightness,
-            Brightness? statusBarIconBrightness,
-            Brightness? systemNavigationBarIconBrightness
+            Color systemNavigationBarColor = null,
+            Color systemNavigationBarDividerColor = null,
+            Color statusBarColor = null,
+            Brightness? statusBarBrightness = null,
+            Brightness? statusBarIconBrightness = null,
+            Brightness? systemNavigationBarIconBrightness = null
         ) {
             return new SystemUiOverlayStyle(
                 systemNavigationBarColor: systemNavigationBarColor ?? this.systemNavigationBarColor,
-                systemNavigationBarDividerColor: systemNavigationBarDividerColor ?? this.systemNavigationBarDividerColor,
+                systemNavigationBarDividerColor:
+                systemNavigationBarDividerColor ?? this.systemNavigationBarDividerColor,
                 statusBarColor: statusBarColor ?? this.statusBarColor,
                 statusBarIconBrightness: statusBarIconBrightness ?? this.statusBarIconBrightness,
                 statusBarBrightness: statusBarBrightness ?? this.statusBarBrightness,
-                systemNavigationBarIconBrightness: systemNavigationBarIconBrightness ?? this.systemNavigationBarIconBrightness
-                );
+                systemNavigationBarIconBrightness: systemNavigationBarIconBrightness ??
+                                                   this.systemNavigationBarIconBrightness
+            );
         }
 
         public int GetHashCode() {
-            var hashCode = this.systemNavigationBarColor == null ? 0 : this.systemNavigationBarColor.GetHashCode();
-            hashCode = (hashCode * 397) ^ (this.systemNavigationBarDividerColor == null ? 0 : this.systemNavigationBarDividerColor.GetHashCode());
-            hashCode = (hashCode * 397) ^ (this.statusBarColor == null ? 0 : this.statusBarColor.GetHashCode());
-            hashCode = (hashCode * 397) ^ (this.statusBarBrightness == null ? 0 : this.statusBarBrightness.GetHashCode());
-            hashCode = (hashCode * 397) ^ (this.statusBarIconBrightness == null ? 0 : this.statusBarIconBrightness.GetHashCode());
-            hashCode = (hashCode * 397) ^ (this.systemNavigationBarIconBrightness == null ? 0 : this.systemNavigationBarIconBrightness.GetHashCode());
+            var hashCode = this.systemNavigationBarColor.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.systemNavigationBarDividerColor.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.statusBarColor.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.statusBarBrightness.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.statusBarIconBrightness.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.systemNavigationBarIconBrightness.GetHashCode();
             return hashCode;
         }
 
-        public static bool operator ==(SystemUiOverlayStyle a, SystemUiOverlayStyle b) {
-            return a.systemNavigationBarColor == b.systemNavigationBarColor &&
-                   a.systemNavigationBarDividerColor == b.systemNavigationBarDividerColor &&
-                   a.statusBarColor == b.statusBarColor &&
-                   a.statusBarIconBrightness == b.statusBarIconBrightness &&
-                   a.statusBarBrightness == b.statusBarIconBrightness &&
-                   a.systemNavigationBarIconBrightness == b.systemNavigationBarIconBrightness;
+
+        public bool Equals(SystemUiOverlayStyle other) {
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
+
+            return other.systemNavigationBarColor == this.systemNavigationBarColor &&
+                   other.systemNavigationBarDividerColor == this.systemNavigationBarDividerColor &&
+                   other.statusBarColor == this.statusBarColor &&
+                   other.statusBarIconBrightness == this.statusBarIconBrightness &&
+                   other.statusBarBrightness == this.statusBarIconBrightness &&
+                   other.systemNavigationBarIconBrightness == this.systemNavigationBarIconBrightness;
         }
 
-        public static bool operator !=(SystemUiOverlayStyle a, SystemUiOverlayStyle b) {
-            return !(a == b);
+        public override bool Equals(object obj) {
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
+
+            return this.Equals((SystemUiOverlayStyle) obj);
+        }
+
+        public static bool operator ==(SystemUiOverlayStyle left, SystemUiOverlayStyle right) {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(SystemUiOverlayStyle left, SystemUiOverlayStyle right) {
+            return !Equals(left, right);
         }
     }
 }

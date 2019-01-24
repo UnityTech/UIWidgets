@@ -317,9 +317,8 @@ namespace Unity.UIWidgets.rendering {
                 maxHeight: it.maxHeight % value
             );
         }
-        
+
         public static BoxConstraints lerp(BoxConstraints a, BoxConstraints b, double t) {
-            D.assert(t != null);
             if (a == null && b == null)
                 return null;
             if (a == null)
@@ -328,15 +327,35 @@ namespace Unity.UIWidgets.rendering {
                 return a * (1.0 - t);
             D.assert(a.debugAssertIsValid());
             D.assert(b.debugAssertIsValid());
-            D.assert((a.minWidth == double.PositiveInfinity && b.minWidth == double.PositiveInfinity), "Cannot interpolate between finite constraints and unbounded constraints.");
-            D.assert((a.maxWidth == double.PositiveInfinity && b.maxWidth == double.PositiveInfinity), "Cannot interpolate between finite constraints and unbounded constraints.");
-            D.assert((a.minHeight == double.PositiveInfinity && b.minHeight == double.PositiveInfinity), "Cannot interpolate between finite constraints and unbounded constraints.");
-            D.assert((a.maxHeight == double.PositiveInfinity && b.maxHeight == double.PositiveInfinity), "Cannot interpolate between finite constraints and unbounded constraints.");
+            D.assert(
+                (a.minWidth.isFinite() && b.minWidth.isFinite()) ||
+                (a.minWidth == double.PositiveInfinity && b.minWidth == double.PositiveInfinity),
+                "Cannot interpolate between finite constraints and unbounded constraints.");
+            D.assert(
+                (a.maxWidth.isFinite() && b.maxWidth.isFinite()) ||
+                (a.maxWidth == double.PositiveInfinity && b.maxWidth == double.PositiveInfinity),
+                "Cannot interpolate between finite constraints and unbounded constraints.");
+            D.assert(
+                (a.minHeight.isFinite() && b.minHeight.isFinite()) ||
+                (a.minHeight == double.PositiveInfinity && b.minHeight == double.PositiveInfinity),
+                "Cannot interpolate between finite constraints and unbounded constraints.");
+            D.assert(
+                (a.maxHeight.isFinite() && b.maxHeight.isFinite()) ||
+                (a.maxHeight == double.PositiveInfinity && b.maxHeight == double.PositiveInfinity),
+                "Cannot interpolate between finite constraints and unbounded constraints.");
             return new BoxConstraints(
-                minWidth: a.minWidth == double.PositiveInfinity ? MathUtils.lerpDouble(a.minWidth, b.minWidth, t) : double.PositiveInfinity,
-                maxWidth: a.maxWidth == double.PositiveInfinity ? MathUtils.lerpDouble(a.maxWidth, b.maxWidth, t) : double.PositiveInfinity,
-                minHeight: a.minHeight == double.PositiveInfinity ? MathUtils.lerpDouble(a.minHeight, b.minHeight, t) : double.PositiveInfinity,
-                maxHeight: a.maxHeight == double.PositiveInfinity ? MathUtils.lerpDouble(a.maxHeight, b.maxHeight, t) : double.PositiveInfinity
+                minWidth: a.minWidth.isFinite()
+                    ? MathUtils.lerpDouble(a.minWidth, b.minWidth, t)
+                    : double.PositiveInfinity,
+                maxWidth: a.maxWidth.isFinite()
+                    ? MathUtils.lerpDouble(a.maxWidth, b.maxWidth, t)
+                    : double.PositiveInfinity,
+                minHeight: a.minHeight.isFinite()
+                    ? MathUtils.lerpDouble(a.minHeight, b.minHeight, t)
+                    : double.PositiveInfinity,
+                maxHeight: a.maxHeight.isFinite()
+                    ? MathUtils.lerpDouble(a.maxHeight, b.maxHeight, t)
+                    : double.PositiveInfinity
             );
         }
 
@@ -394,9 +413,11 @@ namespace Unity.UIWidgets.rendering {
                     string whichFields;
                     if (affectedFieldsList.Count > 2) {
                         whichFields = string.Join(", ", affectedFieldsList.ToArray());
-                    } else if (affectedFieldsList.Count == 2) {
+                    }
+                    else if (affectedFieldsList.Count == 2) {
                         whichFields = string.Join(" ", affectedFieldsList.ToArray());
-                    } else {
+                    }
+                    else {
                         whichFields = affectedFieldsList.Single();
                     }
 
@@ -467,9 +488,11 @@ namespace Unity.UIWidgets.rendering {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return this.minWidth.Equals(other.minWidth)
                    && this.maxWidth.Equals(other.maxWidth)
                    && this.minHeight.Equals(other.minHeight)
@@ -480,12 +503,15 @@ namespace Unity.UIWidgets.rendering {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((BoxConstraints) obj);
         }
 
@@ -579,9 +605,11 @@ namespace Unity.UIWidgets.rendering {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return this.dimension == other.dimension && this.argument.Equals(other.argument);
         }
 
@@ -589,12 +617,15 @@ namespace Unity.UIWidgets.rendering {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((_IntrinsicDimensionsCacheEntry) obj);
         }
 
@@ -776,7 +807,8 @@ namespace Unity.UIWidgets.rendering {
                         D.assert(this.sizedByParent);
                         violation = "It appears that the size setter was called from performLayout().";
                         hint = "";
-                    } else {
+                    }
+                    else {
                         violation =
                             "The size setter was called from outside layout (neither performResize() nor performLayout() were being run for this object).";
                         if (this.owner != null && this.owner.debugDoingLayout) {
@@ -788,7 +820,8 @@ namespace Unity.UIWidgets.rendering {
                     if (this.sizedByParent) {
                         contract =
                             "Because this RenderBox has sizedByParent set to true, it must set its size in performResize().";
-                    } else {
+                    }
+                    else {
                         contract =
                             "Because this RenderBox has sizedByParent set to false, it must set its size in performLayout().";
                     }
@@ -945,7 +978,8 @@ namespace Unity.UIWidgets.rendering {
                     if (this.sizedByParent) {
                         contract =
                             "Because this RenderBox has sizedByParent set to true, it must set its size in performResize().\n";
-                    } else {
+                    }
+                    else {
                         contract =
                             "Because this RenderBox has sizedByParent set to false, it must set its size in performLayout().\n";
                     }
@@ -1218,7 +1252,8 @@ namespace Unity.UIWidgets.rendering {
                 if (D.debugPaintPointersEnabled) {
                     if (evt is PointerDownEvent) {
                         this._debugActivePointers += 1;
-                    } else if (evt is PointerUpEvent || evt is PointerCancelEvent) {
+                    }
+                    else if (evt is PointerUpEvent || evt is PointerCancelEvent) {
                         this._debugActivePointers -= 1;
                     }
 
@@ -1343,7 +1378,8 @@ namespace Unity.UIWidgets.rendering {
                     candidate += childParentData.offset.dy;
                     if (result != null) {
                         result = Math.Min(result.Value, candidate.Value);
-                    } else {
+                    }
+                    else {
                         result = candidate;
                     }
                 }

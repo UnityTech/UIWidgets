@@ -1,57 +1,49 @@
 using System;
-using System.Linq.Expressions;
-using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.animation;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.painting;
+using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
-using UnityEngine.Experimental.PlayerLoop;
-using Random = UnityEngine.Random;
 using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
-
 namespace Unity.UIWidgets.widgets {
-    
     public class BoxConstraintsTween : Tween<BoxConstraints> {
         public BoxConstraintsTween(
             BoxConstraints begin = null,
             BoxConstraints end = null
         ) : base(begin: begin, end: end) {
         }
-        
+
         public override BoxConstraints lerp(double t) => BoxConstraints.lerp(this.begin, this.end, t);
-    }
-
-    public class TextStyleTween : Tween<TextStyle> {
-        public TextStyleTween(
-        TextStyle begin = null,
-        TextStyle end = null) : base(begin: begin, end: end) {}
-
-        public override TextStyle lerp(double t) => TextStyle.lerp(this.begin, this.end, t);
     }
 
     public class BorderRadiusTween : Tween<BorderRadius> {
         public BorderRadiusTween(
-        BorderRadius begin = null,
-        BorderRadius end = null) : base(begin: begin, end: end) {}
+            BorderRadius begin = null,
+            BorderRadius end = null) : base(begin: begin, end: end) {
+        }
 
         public override BorderRadius lerp(double t) => BorderRadius.lerp(this.begin, this.end, t);
     }
 
+    public class TextStyleTween : Tween<TextStyle> {
+        public TextStyleTween(
+            TextStyle begin = null,
+            TextStyle end = null) : base(begin: begin, end: end) {
+        }
+
+        public override TextStyle lerp(double t) => TextStyle.lerp(this.begin, this.end, t);
+    }
+
 
     public abstract class ImplicitlyAnimatedWidget : StatefulWidget {
-
         public ImplicitlyAnimatedWidget(
             Key key = null,
             Curve curve = null,
             TimeSpan? duration = null
         ) : base(key: key) {
-            if (curve == null) {
-                curve = Curves.linear;
-            }
-            D.assert(curve != null);
             D.assert(duration != null);
-            this.curve = curve;
+            this.curve = curve ?? Curves.linear;
             this.duration = duration ?? TimeSpan.Zero;
         }
 
@@ -61,22 +53,22 @@ namespace Unity.UIWidgets.widgets {
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
-            properties.add(new IntProperty("duration", (int)this.duration.TotalMilliseconds, unit: "ms"));
+            properties.add(new IntProperty("duration", (int) this.duration.TotalMilliseconds, unit: "ms"));
         }
     }
 
 
     public delegate Tween<T> TweenConstructor<T>(T targetValue);
 
-    
     public interface ITweenVisitor {
         Tween<T> visit<T, T2>(ImplicitlyAnimatedWidgetState<T2> state, Tween<T> tween, T targetValue,
             TweenConstructor<T> constructor) where T2 : ImplicitlyAnimatedWidget;
     }
 
     public class TweenVisitorUpdateTween : ITweenVisitor {
-        public Tween<T> visit<T, T2>(ImplicitlyAnimatedWidgetState<T2> state, Tween<T> tween, T targetValue, TweenConstructor<T> constructor) 
-            where T2 : ImplicitlyAnimatedWidget{
+        public Tween<T> visit<T, T2>(ImplicitlyAnimatedWidgetState<T2> state, Tween<T> tween, T targetValue,
+            TweenConstructor<T> constructor)
+            where T2 : ImplicitlyAnimatedWidget {
             state._updateTween(tween, targetValue);
             return tween;
         }
@@ -88,12 +80,12 @@ namespace Unity.UIWidgets.widgets {
         public TweenVisitorCheckStartAnimation() {
             this.shouldStartAnimation = false;
         }
-        
-        public Tween<T> visit<T, T2>(ImplicitlyAnimatedWidgetState<T2> state, Tween<T> tween, T targetValue, TweenConstructor<T> constructor) 
-            where T2 : ImplicitlyAnimatedWidget{
-            
+
+        public Tween<T> visit<T, T2>(ImplicitlyAnimatedWidgetState<T2> state, Tween<T> tween, T targetValue,
+            TweenConstructor<T> constructor)
+            where T2 : ImplicitlyAnimatedWidget {
             if (targetValue != null) {
-                tween = tween == null ? constructor(targetValue) : tween;
+                tween = tween ?? constructor(targetValue);
                 if (state._shouldAnimateTween(tween, targetValue))
                     this.shouldStartAnimation = true;
             }
@@ -108,15 +100,12 @@ namespace Unity.UIWidgets.widgets {
 
     public abstract class ImplicitlyAnimatedWidgetState<T> : SingleTickerProviderStateMixin<T>
         where T : ImplicitlyAnimatedWidget {
+        protected AnimationController controller => this._controller;
 
-        protected AnimationController controller {
-            get { return this._controller; }
-        }
         AnimationController _controller;
 
-        public Animation<double> animation {
-            get { return this._animation; }
-        }
+        public Animation<double> animation => this._animation;
+
         Animation<double> _animation;
 
         public override void initState() {
@@ -125,7 +114,7 @@ namespace Unity.UIWidgets.widgets {
                 duration: this.widget.duration,
                 debugLabel: "{" + this.widget.toStringShort() + "}",
                 vsync: this
-                );
+            );
             this._updateCurve();
             this._constructTweens();
             this.didUpdateTweens();
@@ -133,10 +122,10 @@ namespace Unity.UIWidgets.widgets {
 
         public override void didUpdateWidget(StatefulWidget oldWidget) {
             base.didUpdateWidget(oldWidget);
-            
-            if (this.widget.curve != ((ImplicitlyAnimatedWidget)oldWidget).curve) {
+
+            if (this.widget.curve != ((ImplicitlyAnimatedWidget) oldWidget).curve)
                 this._updateCurve();
-            }
+
             this._controller.duration = this.widget.duration;
             if (this._constructTweens()) {
                 var visitor = new TweenVisitorUpdateTween();
@@ -160,7 +149,7 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public bool _shouldAnimateTween<T2>(Tween<T2> tween, T2 targetValue) {
-            return !targetValue.Equals(tween.end); //(tween.end ?? tween.begin);
+            return !targetValue.Equals(tween.end == null ? tween.begin : tween.end);
         }
 
         public void _updateTween<T2>(Tween<T2> tween, T2 targetValue) {
@@ -173,20 +162,19 @@ namespace Unity.UIWidgets.widgets {
 
         bool _constructTweens() {
             var visitor = new TweenVisitorCheckStartAnimation();
-            
             this.forEachTween(visitor);
             return visitor.shouldStartAnimation;
         }
 
         protected abstract void forEachTween(ITweenVisitor visitor);
 
-        protected virtual void didUpdateTweens() {}
+        protected virtual void didUpdateTweens() {
+        }
     }
 
 
     public abstract class AnimatedWidgetBaseState<T> : ImplicitlyAnimatedWidgetState<T>
         where T : ImplicitlyAnimatedWidget {
-
         public override void initState() {
             base.initState();
             this.controller.addListener(this._handleAnimationChanged);
@@ -208,10 +196,10 @@ namespace Unity.UIWidgets.widgets {
             int? maxLines = null,
             Curve curve = null,
             TimeSpan? duration = null
-            ) : base(key : key, curve: curve ?? Curves.linear, duration: duration) {
+        ) : base(key: key, curve: curve ?? Curves.linear, duration: duration) {
+            D.assert(duration != null);
             D.assert(style != null);
             D.assert(child != null);
-            D.assert(softWrap != null);
             D.assert(maxLines == null || maxLines > 0);
             this.child = child;
             this.style = style;
@@ -234,12 +222,14 @@ namespace Unity.UIWidgets.widgets {
         public readonly int? maxLines;
 
         public override State createState() => new _AnimatedDefaultTextStyleState();
-        
+
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             this.style?.debugFillProperties(properties);
-            properties.add(new EnumProperty<TextAlign>("textAlign", this.textAlign ?? TextAlign.center, defaultValue: null));
-            properties.add(new FlagProperty("softWrap", value: this.softWrap, ifTrue: "wrapping at box width", ifFalse: "no wrapping except at line break characters", showName: true));
+            properties.add(new EnumProperty<TextAlign>("textAlign", this.textAlign ?? TextAlign.center,
+                defaultValue: null));
+            properties.add(new FlagProperty("softWrap", value: this.softWrap, ifTrue: "wrapping at box width",
+                ifFalse: "no wrapping except at line break characters", showName: true));
             properties.add(new EnumProperty<TextOverflow>("overflow", this.overflow, defaultValue: null));
             properties.add(new IntProperty("maxLines", this.maxLines, defaultValue: null));
         }
@@ -256,8 +246,8 @@ namespace Unity.UIWidgets.widgets {
 
         public override Widget build(BuildContext context) {
             return new DefaultTextStyle(
-            style: this._style.evaluate(this.animation),
-            textAlign: this.widget.textAlign,
+                style: this._style.evaluate(this.animation),
+                textAlign: this.widget.textAlign,
                 softWrap: this.widget.softWrap,
                 overflow: this.widget.overflow,
                 maxLines: this.widget.maxLines,
@@ -281,20 +271,16 @@ namespace Unity.UIWidgets.widgets {
             Curve curve = null,
             TimeSpan? duration = null
         ) : base(key: key, curve: curve ?? Curves.linear, duration: duration) {
-            borderRadius = borderRadius ?? BorderRadius.zero;
             D.assert(child != null);
             D.assert(shape != null);
-            D.assert(clipBehavior != null);
             D.assert(elevation != null);
             D.assert(color != null);
             D.assert(shadowColor != null);
-            D.assert(animateColor != null);
-            D.assert(animateShadowColor != null);
             D.assert(duration != null);
             this.child = child;
             this.shape = shape ?? BoxShape.circle;
             this.clipBehavior = clipBehavior;
-            this.borderRadius = borderRadius;
+            this.borderRadius = borderRadius ?? BorderRadius.zero;
             this.elevation = elevation ?? 0.0;
             this.color = color;
             this.animateColor = animateColor;
@@ -321,7 +307,7 @@ namespace Unity.UIWidgets.widgets {
         public readonly bool animateShadowColor;
 
         public override State createState() => new _AnimatedPhysicalModelState();
-        
+
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             properties.add(new EnumProperty<BoxShape>("shape", this.shape));
@@ -341,7 +327,7 @@ namespace Unity.UIWidgets.widgets {
         ColorTween _shadowColor;
 
         protected override void forEachTween(ITweenVisitor visitor) {
-            this._borderRadius = (BorderRadiusTween)visitor.visit(this, this._borderRadius, this.widget.borderRadius,
+            this._borderRadius = (BorderRadiusTween) visitor.visit(this, this._borderRadius, this.widget.borderRadius,
                 (BorderRadius value) => new BorderRadiusTween(begin: value));
             this._elevation = (DoubleTween) visitor.visit(this, this._elevation, this.widget.elevation,
                 (double value) => new DoubleTween(begin: value, end: value));
@@ -353,13 +339,15 @@ namespace Unity.UIWidgets.widgets {
 
         public override Widget build(BuildContext context) {
             return new PhysicalModel(
-            child: this.widget.child,
+                child: this.widget.child,
                 shape: this.widget.shape,
                 clipBehavior: this.widget.clipBehavior,
-                borderRadius: this.widget.borderRadius,
-                elevation: this.widget.elevation,
+                borderRadius: this._borderRadius.evaluate(this.animation),
+                elevation: this._elevation.evaluate(this.animation),
                 color: this.widget.animateColor ? this._color.evaluate(this.animation) : this.widget.color,
-                shadowColor: this.widget.animateShadowColor ? this._shadowColor.evaluate(this.animation) : this.widget.shadowColor);
+                shadowColor: this.widget.animateShadowColor
+                    ? this._shadowColor.evaluate(this.animation)
+                    : this.widget.shadowColor);
         }
     }
 }

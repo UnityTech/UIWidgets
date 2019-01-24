@@ -65,7 +65,7 @@ namespace Unity.UIWidgets.animation {
     }
 
     public abstract class Tween<T> : Animatable<T>, IEquatable<Tween<T>> {
-        public Tween(T begin, T end) {
+        protected Tween(T begin, T end) {
             D.assert(begin != null);
             D.assert(end != null);
 
@@ -100,9 +100,11 @@ namespace Unity.UIWidgets.animation {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return EqualityComparer<T>.Default.Equals(this.begin, other.begin) &&
                    EqualityComparer<T>.Default.Equals(this.end, other.end);
         }
@@ -111,12 +113,15 @@ namespace Unity.UIWidgets.animation {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((Tween<T>) obj);
         }
 
@@ -210,7 +215,7 @@ namespace Unity.UIWidgets.animation {
             return (this.begin + (this.end - this.begin) * t);
         }
     }
-    
+
     public class CurveTween : Animatable<double> {
         public CurveTween(Curve curve = null) {
             D.assert(curve != null);

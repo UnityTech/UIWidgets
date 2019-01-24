@@ -1,12 +1,10 @@
-using Unity.UIWidgets.painting;
-using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.animation;
 using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.painting;
+using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
-using Color = Unity.UIWidgets.ui.Color;
 
 namespace Unity.UIWidgets.material {
-
     public class InkHighlight : InteractiveInkFeature {
         public InkHighlight(
             MaterialInkController controller = null,
@@ -28,6 +26,7 @@ namespace Unity.UIWidgets.material {
             this._borderRadius = borderRadius ?? BorderRadius.zero;
             this._customBorder = customBorder;
             this._rectCallback = rectCallback;
+            
             this._alphaController = new AnimationController(
                 duration: InkHighlightUtils._kHighlightFadeDuration,
                 vsync: controller.vsync);
@@ -37,7 +36,7 @@ namespace Unity.UIWidgets.material {
 
             this._alpha = this._alphaController.drive(new IntTween(
                 begin: 0, end: color.alpha));
-            
+
             this.controller.addInkFeature(this);
         }
 
@@ -52,10 +51,7 @@ namespace Unity.UIWidgets.material {
         Animation<int> _alpha;
         AnimationController _alphaController;
 
-        public bool active {
-            get { return this._active; }
-        }
-
+        public bool active => this._active;
         bool _active = true;
 
         public void activate() {
@@ -111,8 +107,7 @@ namespace Unity.UIWidgets.material {
         }
 
         protected override void paintFeature(Canvas canvas, Matrix3 transform) {
-            Paint paint = new Paint();
-            paint.color = this.color.withAlpha(this._alpha.value);
+            Paint paint = new Paint {color = this.color.withAlpha(this._alpha.value)};
             Offset originOffset = transform.getAsTranslation();
             Rect rect = this._rectCallback != null ? this._rectCallback() : Offset.zero & this.referenceBox.size;
             if (originOffset == null) {

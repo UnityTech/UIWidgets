@@ -2,17 +2,16 @@ using System;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
-using Unity.UIWidgets.widgets;
 using Unity.UIWidgets.ui;
+using Unity.UIWidgets.widgets;
 using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace Unity.UIWidgets.material {
-    
     public class RawMaterialButton : StatefulWidget {
         public RawMaterialButton(
             Key key = null,
             VoidCallback onPressed = null,
-            ValueChanged<bool> onHighlightChanged = null, 
+            ValueChanged<bool> onHighlightChanged = null,
             TextStyle textStyle = null,
             Color fillColor = null,
             Color highlightColor = null,
@@ -51,7 +50,7 @@ namespace Unity.UIWidgets.material {
             this.materialTapTargetSize = _materialTapTargetSize;
             this.child = child;
         }
-        
+
         public readonly VoidCallback onPressed;
 
         public readonly ValueChanged<bool> onHighlightChanged;
@@ -106,7 +105,7 @@ namespace Unity.UIWidgets.material {
             double elevation = this.widget.enabled
                 ? (this._highlight ? this.widget.highlightElevation : this.widget.elevation)
                 : this.widget.disabledElevation;
-            
+
             Widget result = new ConstrainedBox(
                 constraints: this.widget.constraints,
                 child: new Material(
@@ -131,15 +130,13 @@ namespace Unity.UIWidgets.material {
                                     widthFactor: 1.0,
                                     heightFactor: 1.0,
                                     child: this.widget.child)
-                                )
                             )
                         )
                     )
-                );
+                )
+            );
 
             return result;
         }
     }
-    
-    
 }

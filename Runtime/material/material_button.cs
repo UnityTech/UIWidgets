@@ -1,5 +1,4 @@
 using System;
-using System.Runtime.CompilerServices;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.service;
@@ -7,32 +6,31 @@ using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
 
 namespace Unity.UIWidgets.material {
-
     public class MaterialButton : StatelessWidget {
         public MaterialButton(
-        Key key = null,
-        VoidCallback onPressed = null,
-        ValueChanged<bool> onHighlightChanged = null,
-        ButtonTextTheme? textTheme = null,
-        Color textColor = null,
-        Color disabledTextColor = null,
-        Color color = null,
-        Color disabledColor = null,
-        Color highlightColor = null,
-        Color splashColor = null,
-        Brightness? colorBrightness = null,
-        double? elevation = null,
-        double? highlightElevation = null,
-        double? disabledElevation = null,
-        EdgeInsets padding = null,
-        ShapeBorder shape = null,
-        Clip clipBehavior = Clip.none,
-        MaterialTapTargetSize? materialTapTargetSize = null,
-        TimeSpan? animationDuration = null,
-        double? minWidth = null,
-        double? height = null,
-        Widget child = null
-        ) : base(key : key) {
+            Key key = null,
+            VoidCallback onPressed = null,
+            ValueChanged<bool> onHighlightChanged = null,
+            ButtonTextTheme? textTheme = null,
+            Color textColor = null,
+            Color disabledTextColor = null,
+            Color color = null,
+            Color disabledColor = null,
+            Color highlightColor = null,
+            Color splashColor = null,
+            Brightness? colorBrightness = null,
+            double? elevation = null,
+            double? highlightElevation = null,
+            double? disabledElevation = null,
+            EdgeInsets padding = null,
+            ShapeBorder shape = null,
+            Clip clipBehavior = Clip.none,
+            MaterialTapTargetSize? materialTapTargetSize = null,
+            TimeSpan? animationDuration = null,
+            double? minWidth = null,
+            double? height = null,
+            Widget child = null
+        ) : base(key: key) {
             D.assert(onPressed != null);
             this.onPressed = onPressed;
             this.onHighlightChanged = onHighlightChanged;
@@ -84,7 +82,7 @@ namespace Unity.UIWidgets.material {
         public readonly Brightness? colorBrightness;
 
         public readonly Widget child;
-        
+
         public bool enabled => this.onPressed != null;
 
         public readonly EdgeInsets padding;
@@ -123,8 +121,8 @@ namespace Unity.UIWidgets.material {
                 child: this.child,
                 materialTapTargetSize: this.materialTapTargetSize ?? theme.materialTapTargetSize);
         }
-        
-        
+
+
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             properties.add(new FlagProperty("enabled", value: this.enabled, ifFalse: "disabled"));
