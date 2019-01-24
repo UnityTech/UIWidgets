@@ -20,7 +20,7 @@ namespace Unity.UIWidgets.material {
         public static readonly TimeSpan kThemeAnimationDuration = new TimeSpan(0, 0, 0, 0, 200);
     }
 
-    public static class MaterialUtils {
+    public static class MaterialConstantsUtils {
         public static readonly Dictionary<MaterialType, BorderRadius> kMaterialEdges =
             new Dictionary<MaterialType, BorderRadius> {
                 {MaterialType.canvas, null},

@@ -203,7 +203,7 @@ namespace Unity.UIWidgets.material {
                 case MaterialType.card:
                 case MaterialType.button:
                     return new RoundedRectangleBorder(
-                        borderRadius: this.widget.borderRadius ?? MaterialUtils.kMaterialEdges[this.widget.type]);
+                        borderRadius: this.widget.borderRadius ?? MaterialConstantsUtils.kMaterialEdges[this.widget.type]);
                 case MaterialType.circle:
                     return new CircleBorder();
             }

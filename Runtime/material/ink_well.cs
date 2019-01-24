@@ -316,7 +316,7 @@ namespace Unity.UIWidgets.material {
                 onTapDown: enabled ? (GestureTapDownCallback) this._handleTapDown : null,
                 onTap: enabled ? (GestureTapCallback) (() => this._handleTap(context)) : null,
                 onTapCancel: enabled ? (GestureTapCancelCallback) this._handleTapCancel : null,
-                onDoubleTap: this.widget.onDoubleTap != null ? (GestureDoubleTapCallback) this._handleDoubleTap : null,
+                onDoubleTap: this.widget.onDoubleTap != null ? (GestureDoubleTapCallback) (details => this._handleDoubleTap()) : null,
                 onLongPress: this.widget.onLongPress != null
                     ? (GestureLongPressCallback) (() => this._handleLongPress(context))
                     : null,
