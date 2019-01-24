@@ -20,8 +20,19 @@ namespace Unity.UIWidgets.widgets {
             double? maxScrollExtent = null,
             double? pixels = null,
             double? viewportDimension = null,
-            AxisDirection? axisDirection = null
+            AxisDirection? axisDirection = null,
+            double? viewportFraction = null
         ) {
+            if (it is IPageMetrics) {
+                return new PageMetrics(
+                    minScrollExtent: minScrollExtent ?? it.minScrollExtent,
+                    maxScrollExtent: maxScrollExtent ?? it.maxScrollExtent,
+                    pixels: pixels ?? it.pixels,
+                    viewportDimension: viewportDimension ?? it.viewportDimension,
+                    axisDirection: axisDirection ?? it.axisDirection,
+                    viewportFraction: viewportFraction ?? ((IPageMetrics) it).viewportFraction
+                );
+            }
             return new FixedScrollMetrics(
                 minScrollExtent: minScrollExtent ?? it.minScrollExtent,
                 maxScrollExtent: maxScrollExtent ?? it.maxScrollExtent,

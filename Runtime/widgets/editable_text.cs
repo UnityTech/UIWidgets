@@ -80,8 +80,11 @@ namespace Unity.UIWidgets.widgets {
         public readonly bool autofocus;
 
         public readonly Color selectionColor;
+        
+        public readonly TextSelectionControls selectionControls;
 
         public readonly ValueChanged<string> onChanged;
+        public readonly VoidCallback onEditingComplete;
         public readonly ValueChanged<string> onSubmitted;
 
         public readonly SelectionChangedCallback onSelectionChanged;
@@ -94,7 +97,8 @@ namespace Unity.UIWidgets.widgets {
             Color cursorColor, bool obscureText = false, bool autocorrect = false,
             TextAlign textAlign = TextAlign.left, TextDirection? textDirection = null,
             double textScaleFactor = 1.0, int maxLines = 1,
-            bool autofocus = false, Color selectionColor = null, ValueChanged<string> onChanged = null,
+            bool autofocus = false, Color selectionColor = null, TextSelectionControls selectionControls = null,
+            ValueChanged<string> onChanged = null, VoidCallback onEditingComplete = null,
             ValueChanged<string> onSubmitted = null, SelectionChangedCallback onSelectionChanged = null,
             List<TextInputFormatter> inputFormatters = null, bool rendererIgnoresPointer = false,
             EdgeInsets scrollPadding = null,
@@ -119,7 +123,9 @@ namespace Unity.UIWidgets.widgets {
             this.onChanged = onChanged;
             this.onSubmitted = onSubmitted;
             this.onSelectionChanged = onSelectionChanged;
+            this.onEditingComplete = onEditingComplete;
             this.rendererIgnoresPointer = rendererIgnoresPointer;
+            this.selectionControls = selectionControls;
             if (maxLines == 1) {
                 this.inputFormatters = new List<TextInputFormatter>();
                 this.inputFormatters.Add(BlacklistingTextInputFormatter.singleLineFormatter);
@@ -158,16 +164,18 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
-    public class EditableTextState : AutomaticKeepAliveClientMixin<EditableText>, TextInputClient {
+    public class EditableTextState : AutomaticKeepAliveClientMixin<EditableText>, TextInputClient, TextSelectionDelegate {
         const int _kObscureShowLatestCharCursorTicks = 3;
         static TimeSpan _kCursorBlinkHalfPeriod = TimeSpan.FromMilliseconds(500);
         Timer _cursorTimer;
         ValueNotifier<bool> _showCursor = new ValueNotifier<bool>(false);
         GlobalKey _editableKey = GlobalKey.key();
+        LayerLink _layerLink = new LayerLink();
         bool _didAutoFocus = false;
         public ScrollController _scrollController = new ScrollController();
 
         TextInputConnection _textInputConnection;
+        TextSelectionOverlay _selectionOverlay;
         int _obscureShowCharTicksPending = 0;
         int _obscureLatestCharIndex;
 
@@ -181,6 +189,7 @@ namespace Unity.UIWidgets.widgets {
             base.initState();
             this.widget.controller.addListener(this._didChangeTextEditingValue);
             this.widget.focusNode.addListener(this._handleFocusChanged);
+            this._scrollController.addListener(() => { this._selectionOverlay?.updateForScroll(); });
         }
 
         public override void didChangeDependencies() {
@@ -213,6 +222,8 @@ namespace Unity.UIWidgets.widgets {
             D.assert(!this._hasInputConnection);
             this._stopCursorTimer();
             D.assert(this._cursorTimer == null);
+            this._selectionOverlay?.dispose();
+            this._selectionOverlay = null;
             this.widget.focusNode.removeListener(this._handleFocusChanged);
             base.dispose();
         }
@@ -221,7 +232,8 @@ namespace Unity.UIWidgets.widgets {
 
         public void updateEditingValue(TextEditingValue value) {
             if (value.text != this._value.text) {
-                // _hideSelectionOverlayIfNeeded();
+                this._hideSelectionOverlayIfNeeded();
+                this._showCaretOnScreen();
                 if (this.widget.obscureText && value.text.Length == this._value.text.Length + 1) {
                     this._obscureShowCharTicksPending = _kObscureShowLatestCharCursorTicks;
                     this._obscureLatestCharIndex = this._value.selection.baseOffset;
@@ -232,85 +244,85 @@ namespace Unity.UIWidgets.widgets {
             this._formatAndSetValue(value);
         }
 
-        public TextEditingValue getValueForOperation(TextEditOp operation) {
+        public TextEditingValue getValueForAction(TextInputAction operation) {
             TextPosition newPosition = null;
             TextPosition newExtend = null;
             TextEditingValue newValue = null;
             TextSelection newSelection = null;
             TextPosition startPos = new TextPosition(this._value.selection.start, this._value.selection.affinity);
             switch (operation) {
-                case TextEditOp.MoveLeft:
+                case TextInputAction.moveLeft:
                     newValue = this._value.moveLeft();
                     break;
-                case TextEditOp.MoveRight:
+                case TextInputAction.moveRight:
                     newValue = this._value.moveRight();
                     break;
-                case TextEditOp.MoveUp:
+                case TextInputAction.moveUp:
                     newPosition = this.renderEditable.getPositionUp(startPos);
                     break;
-                case TextEditOp.MoveDown:
+                case TextInputAction.moveDown:
                     newPosition = this.renderEditable.getPositionDown(startPos);
                     break;
-                case TextEditOp.MoveLineStart:
+                case TextInputAction.moveLineStart:
                     newPosition = this.renderEditable.getParagraphStart(startPos, TextAffinity.downstream);
                     break;
-                case TextEditOp.MoveLineEnd:
+                case TextInputAction.moveLineEnd:
                     newPosition = this.renderEditable.getParagraphEnd(startPos, TextAffinity.upstream);
                     break;
-                case TextEditOp.MoveWordRight:
+                case TextInputAction.moveWordRight:
                     newPosition = this.renderEditable.getWordRight(startPos);
                     break;
-                case TextEditOp.MoveWordLeft:
+                case TextInputAction.moveWordLeft:
                     newPosition = this.renderEditable.getWordLeft(startPos);
                     break;
-//                case TextEditOp.MoveToStartOfNextWord:      MoveToStartOfNextWord(); break;
-//                case TextEditOp.MoveToEndOfPreviousWord:        MoveToEndOfPreviousWord(); break;
-                case TextEditOp.MoveTextStart:
+//                case TextInputAction.MoveToStartOfNextWord:      MoveToStartOfNextWord(); break;
+//                case TextInputAction.MoveToEndOfPreviousWord:        MoveToEndOfPreviousWord(); break;
+                case TextInputAction.moveTextStart:
                     newPosition = new TextPosition(0);
                     break;
-                case TextEditOp.MoveTextEnd:
+                case TextInputAction.moveTextEnd:
                     newPosition = new TextPosition(this._value.text.Length);
                     break;
-                case TextEditOp.MoveParagraphForward:
+                case TextInputAction.moveParagraphForward:
                     newPosition = this.renderEditable.getParagraphForward(startPos);
                     break;
-                case TextEditOp.MoveParagraphBackward:
+                case TextInputAction.moveParagraphBackward:
                     newPosition = this.renderEditable.getParagraphBackward(startPos);
                     break;
-                case TextEditOp.MoveGraphicalLineStart:
+                case TextInputAction.moveGraphicalLineStart:
                     newPosition = this.renderEditable.getLineStartPosition(startPos, TextAffinity.downstream);
                     break;
-                case TextEditOp.MoveGraphicalLineEnd:
+                case TextInputAction.moveGraphicalLineEnd:
                     newPosition = this.renderEditable.getLineEndPosition(startPos, TextAffinity.upstream);
                     break;
-                case TextEditOp.SelectLeft:
+                case TextInputAction.selectLeft:
                     newValue = this._value.extendLeft();
                     break;
-                case TextEditOp.SelectRight:
+                case TextInputAction.selectRight:
                     newValue = this._value.extendRight();
                     break;
-                case TextEditOp.SelectUp:
+                case TextInputAction.selectUp:
                     newExtend = this.renderEditable.getPositionUp(this._value.selection.extendPos);
                     break;
-                case TextEditOp.SelectDown:
+                case TextInputAction.selectDown:
                     newExtend = this.renderEditable.getPositionDown(this._value.selection.extendPos);
                     break;
-                case TextEditOp.SelectWordRight:
+                case TextInputAction.selectWordRight:
                     newExtend = this.renderEditable.getWordRight(this._value.selection.extendPos);
                     break;
-                case TextEditOp.SelectWordLeft:
+                case TextInputAction.selectWordLeft:
                     newExtend = this.renderEditable.getWordLeft(this._value.selection.extendPos);
                     break;
-//                case TextEditOp.SelectToEndOfPreviousWord:  SelectToEndOfPreviousWord(); break;
-//                case TextEditOp.SelectToStartOfNextWord:    SelectToStartOfNextWord(); break;
+//                case TextInputAction.SelectToEndOfPreviousWord:  SelectToEndOfPreviousWord(); break;
+//                case TextInputAction.SelectToStartOfNextWord:    SelectToStartOfNextWord(); break;
 //
-                case TextEditOp.SelectTextStart:
+                case TextInputAction.selectTextStart:
                     newExtend = new TextPosition(0);
                     break;
-                case TextEditOp.SelectTextEnd:
+                case TextInputAction.selectTextEnd:
                     newExtend = new TextPosition(this._value.text.Length);
                     break;
-                case TextEditOp.ExpandSelectGraphicalLineStart:
+                case TextInputAction.expandSelectGraphicalLineStart:
                     if (this._value.selection.isCollapsed ||
                         !this.renderEditable.isLineEndOrStart(this._value.selection.start)) {
                         newSelection = new TextSelection(this.renderEditable.getLineStartPosition(startPos).offset,
@@ -318,7 +330,7 @@ namespace Unity.UIWidgets.widgets {
                     }
 
                     break;
-                case TextEditOp.ExpandSelectGraphicalLineEnd:
+                case TextInputAction.expandSelectGraphicalLineEnd:
                     if (this._value.selection.isCollapsed ||
                         !this.renderEditable.isLineEndOrStart(this._value.selection.end)) {
                         newSelection = new TextSelection(this._value.selection.start,
@@ -326,25 +338,25 @@ namespace Unity.UIWidgets.widgets {
                             this._value.selection.affinity);
                     }
                     break;
-                case TextEditOp.SelectParagraphForward:
+                case TextInputAction.selectParagraphForward:
                     newExtend = this.renderEditable.getParagraphForward(this._value.selection.extendPos);
                     break;
-                case TextEditOp.SelectParagraphBackward:
+                case TextInputAction.selectParagraphBackward:
                     newExtend = this.renderEditable.getParagraphBackward(this._value.selection.extendPos);
                     break;
-                case TextEditOp.SelectGraphicalLineStart:
+                case TextInputAction.selectGraphicalLineStart:
                     newExtend = this.renderEditable.getLineStartPosition(this._value.selection.extendPos);
                     break;
-                case TextEditOp.SelectGraphicalLineEnd:
+                case TextInputAction.selectGraphicalLineEnd:
                     newExtend = this.renderEditable.getLineEndPosition(startPos);
                     break;
-                case TextEditOp.Delete:
+                case TextInputAction.delete:
                     newValue = this._value.deleteSelection(false);
                     break;
-                case TextEditOp.Backspace:
+                case TextInputAction.backspace:
                     newValue = this._value.deleteSelection();
                     break;
-                case TextEditOp.SelectAll:
+                case TextInputAction.selectAll:
                     newSelection = this._value.selection.copyWith(baseOffset: 0, extentOffset: this._value.text.Length);
                     break;
             }
@@ -362,6 +374,47 @@ namespace Unity.UIWidgets.widgets {
             return this._value;
         }
 
+        public void performAction(TextInputAction action) {
+            TextEditingValue newValue;
+            switch (action) {
+                case TextInputAction.newline:
+                    if (this.widget.maxLines == 1) this._finalizeEditing(true);
+                    break;
+                case TextInputAction.done:
+                case TextInputAction.go:
+                case TextInputAction.send:
+                case TextInputAction.search:
+                    this._finalizeEditing(true);
+                    break;
+                case TextInputAction.next:
+                case TextInputAction.previous:
+                case TextInputAction.continueAction:
+                case TextInputAction.join:
+                case TextInputAction.route:
+                case TextInputAction.emergencyCall:
+                    this._finalizeEditing(false);
+                    break;
+                default:
+                    newValue = this.getValueForAction(action);
+                    if (newValue != this.textEditingValue) {
+                        this.textEditingValue = newValue;
+                    }
+
+                    break;
+            }
+        }
+        
+        void _finalizeEditing(bool shouldUnfocus) {
+            if (this.widget.onEditingComplete != null) {
+                this.widget.onEditingComplete();
+            } else {
+                this.widget.controller.clearComposing();
+                if (shouldUnfocus) this.widget.focusNode.unfocus();
+            }
+
+            if (this.widget.onSubmitted != null) this.widget.onSubmitted(this._value.text);
+        }
+        
         void _updateRemoteEditingValueIfNeeded() {
             if (!this._hasInputConnection) {
                 return;
@@ -374,6 +427,7 @@ namespace Unity.UIWidgets.widgets {
             this._textInputConnection.setEditingState(localValue);
         }
 
+        
         // Calculate the new scroll offset so the cursor remains visible.
         double _getScrollOffsetForCaret(Rect caretRect) {
             double caretStart = this._isMultiline ? caretRect.top : caretRect.left;
@@ -434,11 +488,45 @@ namespace Unity.UIWidgets.widgets {
             }
         }
 
+        void _hideSelectionOverlayIfNeeded() {
+            this._selectionOverlay?.hide();
+            this._selectionOverlay = null;
+        }
+
+        void _updateOrDisposeSelectionOverlayIfNeeded() {
+            if (this._selectionOverlay != null) {
+                if (this._hasFocus) {
+                    this._selectionOverlay.update(this._value);
+                } else {
+                    this._selectionOverlay.dispose();
+                    this._selectionOverlay = null;
+                }
+            }
+        }
+
+        
         void _handleSelectionChanged(TextSelection selection, RenderEditable renderObject,
             SelectionChangedCause cause) {
             this.widget.controller.selection = selection;
             this.requestKeyboard();
 
+            this._hideSelectionOverlayIfNeeded();
+
+            if (this.widget.selectionControls != null) {
+                this._selectionOverlay = new TextSelectionOverlay(
+                    context: this.context,
+                    value: this._value,
+                    debugRequiredFor: this.widget,
+                    layerLink: this._layerLink,
+                    renderObject: renderObject,
+                    selectionControls: this.widget.selectionControls,
+                    selectionDelegate: this
+                    );
+                bool longPress = cause == SelectionChangedCause.longPress;
+                if (cause != SelectionChangedCause.keyboard && (this._value.text.isNotEmpty() || longPress)) this._selectionOverlay.showHandles();
+                if (longPress || cause == SelectionChangedCause.doubleTap) this._selectionOverlay.showToolbar();
+            }
+            
             if (this.widget.onSelectionChanged != null) {
                 this.widget.onSelectionChanged(selection, cause);
             }
@@ -565,6 +653,7 @@ namespace Unity.UIWidgets.widgets {
         void _didChangeTextEditingValue() {
             this._updateRemoteEditingValueIfNeeded();
             this._startOrStopCursorTimerIfNeeded();
+            this._updateOrDisposeSelectionOverlayIfNeeded();
             this._textChangedSinceLastCaretUpdate = true;
             this.setState(() => { });
         }
@@ -572,6 +661,7 @@ namespace Unity.UIWidgets.widgets {
         void _handleFocusChanged() {
             this._openOrCloseInputConnectionIfNeeded();
             this._startOrStopCursorTimerIfNeeded();
+            this._updateOrDisposeSelectionOverlayIfNeeded();
             if (!this._hasFocus) {
                 this._value = new TextEditingValue(text: this._value.text);
             } else if (!this._value.selection.isValid) {
@@ -595,6 +685,22 @@ namespace Unity.UIWidgets.widgets {
             get { return (RenderEditable) this._editableKey.currentContext.findRenderObject(); }
         }
 
+        public TextEditingValue textEditingValue {
+            get { return this._value; }
+            set {
+                this._selectionOverlay?.update(value);
+                this._formatAndSetValue(value);
+            }
+        }
+
+        public void bringIntoView(TextPosition position) {
+            this._scrollController.jumpTo(this._getScrollOffsetForCaret(this.renderEditable.getLocalRectForCaret(position)));
+        }
+
+        public void hideToolbar() {
+            this._selectionOverlay?.hide();
+        }
+
         public override Widget build(BuildContext context) {
             FocusScope.of(context).reparentIfNeeded(this.widget.focusNode);
             base.build(context); // See AutomaticKeepAliveClientMixin.
@@ -604,26 +710,30 @@ namespace Unity.UIWidgets.widgets {
                 controller: this._scrollController,
                 physics: new ClampingScrollPhysics(),
                 viewportBuilder: (BuildContext _context, ViewportOffset offset) =>
-                    new _Editable(
-                        key: this._editableKey,
-                        textSpan: this.buildTextSpan(),
-                        value: this._value,
-                        cursorColor: this.widget.cursorColor,
-                        showCursor: this._showCursor,
-                        hasFocus: this._hasFocus,
-                        maxLines: this.widget.maxLines,
-                        selectionColor: this.widget.selectionColor,
-                        textScaleFactor: Window.instance
-                            .devicePixelRatio, // todo widget.textScaleFactor ?? MediaQuery.textScaleFactorOf(context),
-                        textAlign: this.widget.textAlign,
-                        textDirection: this._textDirection,
-                        obscureText: this.widget.obscureText,
-                        autocorrect: this.widget.autocorrect,
-                        offset: offset,
-                        onSelectionChanged: this._handleSelectionChanged,
-                        onCaretChanged: this._handleCaretChanged,
-                        rendererIgnoresPointer: this.widget.rendererIgnoresPointer
+                    new CompositedTransformTarget(
+                        link: this._layerLink,
+                        child: new _Editable(
+                            key: this._editableKey,
+                            textSpan: this.buildTextSpan(),
+                            value: this._value,
+                            cursorColor: this.widget.cursorColor,
+                            showCursor: this._showCursor,
+                            hasFocus: this._hasFocus,
+                            maxLines: this.widget.maxLines,
+                            selectionColor: this.widget.selectionColor,
+                            textScaleFactor: Window.instance
+                                .devicePixelRatio, // todo widget.textScaleFactor ?? MediaQuery.textScaleFactorOf(context),
+                            textAlign: this.widget.textAlign,
+                            textDirection: this._textDirection,
+                            obscureText: this.widget.obscureText,
+                            autocorrect: this.widget.autocorrect,
+                            offset: offset,
+                            onSelectionChanged: this._handleSelectionChanged,
+                            onCaretChanged: this._handleCaretChanged,
+                            rendererIgnoresPointer: this.widget.rendererIgnoresPointer
+                        )
                     )
+                    
             );
         }
 

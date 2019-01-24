@@ -6,8 +6,17 @@ using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
 
 namespace Unity.UIWidgets.gestures {
-    public delegate void GestureDoubleTapCallback();
+    
+    public delegate void GestureDoubleTapCallback(DoubleTapDetails details);
+    
+    public class DoubleTapDetails {
+        public DoubleTapDetails(Offset firstGlobalPosition = null) {
+            this.firstGlobalPosition = firstGlobalPosition ?? Offset.zero;
+        }
 
+        public readonly Offset firstGlobalPosition; 
+    }
+    
     class _TapTracker {
         internal _TapTracker(
             PointerDownEvent evt = null,
@@ -19,7 +28,7 @@ namespace Unity.UIWidgets.gestures {
 
         public readonly int pointer;
         public readonly GestureArenaEntry entry;
-        readonly Offset _initialPosition;
+        internal readonly Offset _initialPosition;
 
         bool _isTrackingPointer = false;
 
@@ -42,6 +51,7 @@ namespace Unity.UIWidgets.gestures {
             return offset.distance <= tolerance;
         }
     }
+
 
     public class DoubleTapGestureRecognizer : GestureRecognizer {
         public DoubleTapGestureRecognizer(object debugOwner = null)
@@ -142,13 +152,14 @@ namespace Unity.UIWidgets.gestures {
         }
 
         void _registerSecondTap(_TapTracker tracker) {
+            var initialPosition = tracker._initialPosition;
             this._firstTap.entry.resolve(GestureDisposition.accepted);
             tracker.entry.resolve(GestureDisposition.accepted);
             this._freezeTracker(tracker);
             this._trackers.Remove(tracker.pointer);
             if (this.onDoubleTap != null) {
                 this.invokeCallback<object>("onDoubleTap", () => {
-                    this.onDoubleTap();
+                    this.onDoubleTap(new DoubleTapDetails(initialPosition));
                     return null;
                 });
             }

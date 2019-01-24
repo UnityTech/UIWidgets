@@ -1640,4 +1640,146 @@ namespace Unity.UIWidgets.rendering {
             properties.add(new DiagnosticsProperty<object>("metaData", this.metaData));
         }
     }
+
+    public class RenderLeaderLayer : RenderProxyBox {
+
+        public RenderLeaderLayer(
+            LayerLink link = null,
+            RenderBox child = null
+        ) : base(child:child) {
+            D.assert(link != null);
+            this.link = link;
+        }
+        
+        public LayerLink link {
+            get => this._link;
+            set {
+                D.assert(value != null);
+                if (this._link == value)
+                    return;
+                this._link = value;
+                this.markNeedsPaint();
+            }
+        }
+        LayerLink _link;
+
+        protected override bool alwaysNeedsCompositing => true;
+        
+        public override void paint(PaintingContext context, Offset offset) {
+            context.pushLayer(new LeaderLayer(link: this.link, offset: offset), base.paint, Offset.zero);
+        }
+        
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new DiagnosticsProperty<LayerLink>("link", this.link));
+        }
+    }
+
+    
+    class RenderFollowerLayer : RenderProxyBox {
+        
+        public RenderFollowerLayer(LayerLink link,
+            bool showWhenUnlinked = true,
+                Offset offset = null,
+            RenderBox child = null
+        ): base(child) {
+            this.link = link;
+            this.showWhenUnlinked = showWhenUnlinked;
+            this.offset = offset;
+        }
+        
+    public LayerLink link {
+            get => this._link;
+            set {
+                D.assert(value != null);
+                if (this._link == value)
+                    return;
+                this._link = value;
+                this.markNeedsPaint();
+            }
+        }
+        LayerLink _link;
+        
+        public bool showWhenUnlinked {
+            get => this._showWhenUnlinked;
+            set {
+                if (this._showWhenUnlinked == value)
+                    return;
+                this._showWhenUnlinked = value;
+                this.markNeedsPaint();
+            }
+        }
+        bool _showWhenUnlinked;
+        
+        public Offset offset {
+            get => this._offset;
+            set {
+                D.assert(value != null);
+                if (this._offset == value)
+                    return;
+                this._offset = value;
+                this.markNeedsPaint();
+            }
+        }
+        Offset _offset;
+
+        public override void detach() {
+            this._layer = null;
+            base.detach();
+        }
+        
+        protected override bool alwaysNeedsCompositing => true;
+        
+        new FollowerLayer _layer;
+        
+        Matrix3 getCurrentTransform() {
+            return this._layer?.getLastTransform() ?? Matrix3.I();
+        }
+        
+        public override bool hitTest(HitTestResult result, Offset position) {
+            return this.hitTestChildren(result, position: position);
+        }
+        
+        protected override bool hitTestChildren(HitTestResult result, Offset position) {
+            Matrix3 inverse = Matrix3.I();
+            if (!this.getCurrentTransform().invert(inverse)) {
+                return false;
+            }
+
+            position = inverse.mapPoint(position);
+            return base.hitTestChildren(result, position: position);
+        }
+
+        public override void paint(PaintingContext context, Offset offset) {
+            this._layer = new FollowerLayer(
+                link: this.link,
+                showWhenUnlinked: this.showWhenUnlinked,
+                linkedOffset: this.offset,
+                unlinkedOffset: offset
+            );
+            context.pushLayer(this._layer,
+                base.paint,
+                Offset.zero,
+                childPaintBounds: Rect.fromLTRB(
+                    double.NegativeInfinity,
+                    double.NegativeInfinity,
+                    double.PositiveInfinity,
+                    double.PositiveInfinity
+                )
+            );
+        }
+
+        public override void applyPaintTransform(RenderObject child, Matrix3 transform) {
+            transform.preConcat(this.getCurrentTransform());
+        }
+        
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new DiagnosticsProperty<LayerLink>("link", this.link));
+            properties.add(new DiagnosticsProperty<bool>("showWhenUnlinked", this.showWhenUnlinked));
+            properties.add(new DiagnosticsProperty<Offset>("offset", this.offset));
+            properties.add(new TransformProperty("current transform matrix", this.getCurrentTransform()));
+        }
+    }
+
 }

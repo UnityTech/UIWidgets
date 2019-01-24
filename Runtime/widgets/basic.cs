@@ -269,7 +269,6 @@ namespace Unity.UIWidgets.widgets {
 
         bool _needTextDirection {
             get {
-                D.assert(this.direction != null);
                 switch (this.direction) {
                     case Axis.horizontal:
                         return true;
@@ -875,6 +874,62 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
+    public class CompositedTransformTarget : SingleChildRenderObjectWidget {
+        public CompositedTransformTarget(
+            Key key = null,
+            LayerLink link = null,
+            Widget child = null
+        ) : base(key: key, child: child) {
+            D.assert(link != null);
+            this.link = link;
+        }
+
+        public readonly LayerLink link;
+
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderLeaderLayer(
+                link: this.link
+            );
+        }
+
+        public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
+            ((RenderLeaderLayer) renderObject).link = this.link;
+        }
+    }
+
+    public class CompositedTransformFollower : SingleChildRenderObjectWidget {
+        public CompositedTransformFollower(
+            Key key = null,
+            LayerLink link = null,
+            bool showWhenUnlinked = true,
+            Offset offset = null,
+            Widget child = null
+        ) : base(key: key, child: child) {
+            D.assert(link != null);
+            this.showWhenUnlinked = showWhenUnlinked;
+            this.offset = offset ?? Offset.zero;
+            this.link = link;
+        }
+
+        public readonly LayerLink link;
+        public readonly bool showWhenUnlinked;
+        public readonly Offset offset;
+
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderFollowerLayer(
+                link: this.link,
+                showWhenUnlinked: this.showWhenUnlinked,
+                offset: this.offset
+            );
+        }
+
+        public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
+            ((RenderFollowerLayer) renderObject).link = this.link;
+            ((RenderFollowerLayer) renderObject).showWhenUnlinked = this.showWhenUnlinked;
+            ((RenderFollowerLayer) renderObject).offset = this.offset;
+        }
+    }
+    
     public class FractionalTranslation : SingleChildRenderObjectWidget {
         public FractionalTranslation(Key key = null, Offset translation = null,
             bool transformHitTests = true, Widget child = null) : base(key: key, child: child) {
@@ -956,6 +1011,24 @@ namespace Unity.UIWidgets.widgets {
                 widthFactor: widthFactor,
                 heightFactor: heightFactor,
                 child: child) {
+        }
+    }
+    
+    public class CustomSingleChildLayout : SingleChildRenderObjectWidget {
+        public CustomSingleChildLayout(Key key = null, 
+            SingleChildLayoutDelegate layoutDelegate = null, Widget child = null):base(key:key, child:child) {
+            D.assert(layoutDelegate != null);
+            this.layoutDelegate = layoutDelegate;
+        }
+        
+        public readonly SingleChildLayoutDelegate layoutDelegate;
+        
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderCustomSingleChildLayoutBox(layoutDelegate: this.layoutDelegate);
+        }
+
+        public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
+            ((RenderCustomSingleChildLayoutBox)renderObject).layoutDelegate = this.layoutDelegate;
         }
     }
 

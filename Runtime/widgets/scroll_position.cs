@@ -64,6 +64,10 @@ namespace Unity.UIWidgets.widgets {
             }
         }
 
+        public bool hasPixles {
+            get { return this._pixels != null; }
+        }
+
         internal double? _pixels;
 
         public double viewportDimension {
@@ -157,14 +161,14 @@ namespace Unity.UIWidgets.widgets {
             this.notifyListeners();
         }
 
-        protected void saveScrollOffset() {
+        protected virtual void saveScrollOffset() {
             var pageStorage = PageStorage.of(this.context.storageContext);
             if (pageStorage != null) {
                 pageStorage.writeState(this.context.storageContext, this.pixels);
             }
         }
 
-        protected void restoreScrollOffset() {
+        protected virtual void restoreScrollOffset() {
             if (this._pixels == null) {
                 var pageStorage = PageStorage.of(this.context.storageContext);
                 if (pageStorage != null) {

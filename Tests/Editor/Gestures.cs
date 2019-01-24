@@ -61,7 +61,7 @@ namespace UIWidgets.Tests {
             this._panRecognizer.onUpdate = (details) => { Debug.Log("onUpdate " + details); };
 
             this._doubleTapGesture = new DoubleTapGestureRecognizer();
-            this._doubleTapGesture.onDoubleTap = () => { Debug.Log("onDoubleTap"); };
+            this._doubleTapGesture.onDoubleTap = (detail) => { Debug.Log("onDoubleTap"); };
         }
 
         void OnDisable() {
