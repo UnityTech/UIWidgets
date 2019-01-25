@@ -249,7 +249,6 @@ namespace Unity.UIWidgets.material {
         public static TextTheme lerp(TextTheme a, TextTheme b, double t) {
             D.assert(a != null);
             D.assert(b != null);
-            D.assert(t != null);
             return new TextTheme(
                 display4: TextStyle.lerp(a.display4, b.display4, t),
                 display3: TextStyle.lerp(a.display3, b.display3, t),

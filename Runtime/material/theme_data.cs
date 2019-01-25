@@ -262,7 +262,7 @@ namespace Unity.UIWidgets.material {
             IconThemeData iconTheme,
             IconThemeData primaryIconTheme,
             IconThemeData accentIconTheme,
-            MaterialTapTargetSize materialTapTargetSize,
+            MaterialTapTargetSize? materialTapTargetSize,
             ColorScheme colorScheme,
             Typography typography
         ) {

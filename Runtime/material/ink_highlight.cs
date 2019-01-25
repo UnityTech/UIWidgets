@@ -75,7 +75,6 @@ namespace Unity.UIWidgets.material {
         }
 
         void _paintHighlight(Canvas canvas, Rect rect, Paint paint) {
-            D.assert(this._shape != null);
             canvas.save();
             if (this._customBorder != null) {
                 canvas.clipPath(this._customBorder.getOuterPath(rect));
