@@ -121,8 +121,9 @@ namespace Unity.UIWidgets.material {
         }
 
         void _handleAlphaStatusChanged(AnimationStatus status) {
-            if (status == AnimationStatus.completed)
+            if (status == AnimationStatus.completed) {
                 this.dispose();
+            }
         }
 
         public override void dispose() {
@@ -135,8 +136,10 @@ namespace Unity.UIWidgets.material {
         protected override void paintFeature(Canvas canvas, Matrix3 transform) {
             Paint paint = new Paint {color = this.color.withAlpha(this._alpha.value)};
             Offset center = this._position;
-            if (this._repositionToReferenceBox)
+            if (this._repositionToReferenceBox) {
                 center = Offset.lerp(center, this.referenceBox.size.center(Offset.zero), this._radiusController.value);
+            }
+
             Offset originOffset = transform.getAsTranslation();
             canvas.save();
             if (originOffset == null) {
@@ -165,8 +168,10 @@ namespace Unity.UIWidgets.material {
             }
 
             //todo xingwei.zhu: remove this condition when drawCircle bug fixed (when radius.value == 0)
-            if (this._radius.value != 0)
+            if (this._radius.value != 0) {
                 canvas.drawCircle(center, this._radius.value, paint);
+            }
+
             canvas.restore();
         }
     }

@@ -51,8 +51,10 @@ namespace Unity.UIWidgets.material {
                 return rectCallback;
             }
 
-            if (containedInkWell)
+            if (containedInkWell) {
                 return () => Offset.zero & referenceBox.size;
+            }
+
             return null;
         }
 

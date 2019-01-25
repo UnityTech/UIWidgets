@@ -28,8 +28,10 @@ namespace Unity.UIWidgets.material {
         public Color color {
             get { return this._color; }
             set {
-                if (value == this._color)
+                if (value == this._color) {
                     return;
+                }
+
                 this._color = value;
                 this.controller.markNeedsPaint();
             }
@@ -121,7 +123,9 @@ namespace Unity.UIWidgets.material {
 
         public readonly InteractiveInkFeatureFactory splashFactory;
 
-        public virtual RectCallback getRectCallback(RenderBox referenceBox) => null;
+        public virtual RectCallback getRectCallback(RenderBox referenceBox) {
+            return null;
+        }
 
 
         public virtual bool debugCheckContext(BuildContext context) {
@@ -129,22 +133,34 @@ namespace Unity.UIWidgets.material {
             return true;
         }
 
-        public override State createState() => new _InkResponseState<InkResponse>();
+        public override State createState() {
+            return new _InkResponseState<InkResponse>();
+        }
 
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             List<string> gestures = new List<string>();
-            if (this.onTap != null)
+            if (this.onTap != null) {
                 gestures.Add("tap");
-            if (this.onDoubleTap != null)
+            }
+
+            if (this.onDoubleTap != null) {
                 gestures.Add("double tap");
-            if (this.onLongPress != null)
+            }
+
+            if (this.onLongPress != null) {
                 gestures.Add("long press");
-            if (this.onTapDown != null)
+            }
+
+            if (this.onTapDown != null) {
                 gestures.Add("tap down");
-            if (this.onTapCancel != null)
+            }
+
+            if (this.onTapCancel != null) {
                 gestures.Add("tap cancel");
+            }
+
             properties.add(new EnumerableProperty<string>("gestures", gestures, ifEmpty: "<none>"));
             properties.add(new DiagnosticsProperty<bool>("containedInkWell", this.containedInkWell,
                 level: DiagnosticLevel.fine));
@@ -163,12 +179,15 @@ namespace Unity.UIWidgets.material {
         InteractiveInkFeature _currentSplash;
         InkHighlight _lastHighlight;
 
-        protected override bool wantKeepAlive =>
-            this._lastHighlight != null || (this._splashes != null && this._splashes.isNotEmpty());
+        protected override bool wantKeepAlive {
+            get { return this._lastHighlight != null || (this._splashes != null && this._splashes.isNotEmpty()); }
+        }
 
         public void updateHighlight(bool value) {
-            if (value == (this._lastHighlight != null && this._lastHighlight.active))
+            if (value == (this._lastHighlight != null && this._lastHighlight.active)) {
                 return;
+            }
+
             if (value) {
                 if (this._lastHighlight == null) {
                     RenderBox referenceBox = (RenderBox) this.context.findRenderObject();
@@ -192,8 +211,9 @@ namespace Unity.UIWidgets.material {
             }
 
             D.assert(value == (this._lastHighlight != null && this._lastHighlight.active));
-            if (this.widget.onHighlightChanged != null)
+            if (this.widget.onHighlightChanged != null) {
                 this.widget.onHighlightChanged(value);
+            }
         }
 
         void _handleInkHighlightRemoval() {
@@ -217,7 +237,10 @@ namespace Unity.UIWidgets.material {
                 if (this._splashes != null) {
                     D.assert(this._splashes.Contains(splash));
                     this._splashes.Remove(splash);
-                    if (this._currentSplash == splash) this._currentSplash = null;
+                    if (this._currentSplash == splash) {
+                        this._currentSplash = null;
+                    }
+
                     this.updateKeepAlive();
                 }
             }
@@ -290,8 +313,10 @@ namespace Unity.UIWidgets.material {
             if (this._splashes != null) {
                 HashSet<InteractiveInkFeature> splashes = this._splashes;
                 this._splashes = null;
-                foreach (InteractiveInkFeature splash in splashes)
+                foreach (InteractiveInkFeature splash in splashes) {
                     splash.dispose();
+                }
+
                 this._currentSplash = null;
             }
 
@@ -305,10 +330,14 @@ namespace Unity.UIWidgets.material {
             D.assert(this.widget.debugCheckContext(context));
             base.build(context);
             ThemeData themeData = Theme.of(context);
-            if (this._lastHighlight != null)
+            if (this._lastHighlight != null) {
                 this._lastHighlight.color = this.widget.highlightColor ?? themeData.highlightColor;
-            if (this._currentSplash != null)
+            }
+
+            if (this._currentSplash != null) {
                 this._currentSplash.color = this.widget.splashColor ?? themeData.splashColor;
+            }
+
             bool enabled = this.widget.onTap != null || this.widget.onDoubleTap != null ||
                            this.widget.onLongPress != null;
 
@@ -316,7 +345,9 @@ namespace Unity.UIWidgets.material {
                 onTapDown: enabled ? (GestureTapDownCallback) this._handleTapDown : null,
                 onTap: enabled ? (GestureTapCallback) (() => this._handleTap(context)) : null,
                 onTapCancel: enabled ? (GestureTapCancelCallback) this._handleTapCancel : null,
-                onDoubleTap: this.widget.onDoubleTap != null ? (GestureDoubleTapCallback) (details => this._handleDoubleTap()) : null,
+                onDoubleTap: this.widget.onDoubleTap != null
+                    ? (GestureDoubleTapCallback) (details => this._handleDoubleTap())
+                    : null,
                 onLongPress: this.widget.onLongPress != null
                     ? (GestureLongPressCallback) (() => this._handleLongPress(context))
                     : null,

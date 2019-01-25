@@ -95,8 +95,10 @@ namespace Unity.UIWidgets.material {
         }
 
         public TextTheme merge(TextTheme other) {
-            if (other == null)
+            if (other == null) {
                 return this;
+            }
+
             return this.copyWith(
                 display4: this.display4?.merge(other.display4) ?? other.display4,
                 display3: this.display3?.merge(other.display3) ?? other.display3,

@@ -170,7 +170,9 @@ namespace Unity.UIWidgets.material {
         }
 
 
-        static Brightness _brightnessFor(Color color) => ThemeData.estimateBrightnessForColor(color);
+        static Brightness _brightnessFor(Color color) {
+            return ThemeData.estimateBrightnessForColor(color);
+        }
 
 
         public readonly Color primary;

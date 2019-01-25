@@ -32,8 +32,9 @@ namespace Unity.UIWidgets.material {
                     });
                     if (ancestors.isNotEmpty()) {
                         message += "The ancestors of this widget were:";
-                        foreach (Widget ancestor in ancestors)
+                        foreach (Widget ancestor in ancestors) {
                             message += "\n  $ancestor";
+                        }
                     }
                     else {
                         message += "This widget is the root of the tree, so it has no " +

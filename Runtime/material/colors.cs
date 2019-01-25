@@ -6,27 +6,48 @@ namespace Unity.UIWidgets.material {
     public class MaterialColor : ColorSwatch<int> {
         public MaterialColor(
             long primary,
-            Dictionary<int, Color> swatch) : base(primary: primary, swatch: swatch) {}
+            Dictionary<int, Color> swatch) : base(primary: primary, swatch: swatch) {
+        }
 
-        public Color shade50 => this[50];
+        public Color shade50 {
+            get { return this[50]; }
+        }
 
-        public Color shade100 => this[100];
+        public Color shade100 {
+            get { return this[100]; }
+        }
 
-        public Color shade200 => this[200];
+        public Color shade200 {
+            get { return this[200]; }
+        }
 
-        public Color shade300 => this[300];
+        public Color shade300 {
+            get { return this[300]; }
+        }
 
-        public Color shade400 => this[400];
+        public Color shade400 {
+            get { return this[400]; }
+        }
 
-        public Color shade500 => this[500];
+        public Color shade500 {
+            get { return this[500]; }
+        }
 
-        public Color shade600 => this[600];
+        public Color shade600 {
+            get { return this[600]; }
+        }
 
-        public Color shade700 => this[700];
+        public Color shade700 {
+            get { return this[700]; }
+        }
 
-        public Color shade800 => this[800];
+        public Color shade800 {
+            get { return this[800]; }
+        }
 
-        public Color shade900 => this[900];
+        public Color shade900 {
+            get { return this[900]; }
+        }
     }
 
 
@@ -36,15 +57,25 @@ namespace Unity.UIWidgets.material {
             Dictionary<int, Color> swatch) : base(primary: primary, swatch: swatch) {
         }
 
-        public Color shade50 => this[50];
+        public Color shade50 {
+            get { return this[50]; }
+        }
 
-        public Color shade100 => this[100];
+        public Color shade100 {
+            get { return this[100]; }
+        }
 
-        public Color shade200 => this[200];
+        public Color shade200 {
+            get { return this[200]; }
+        }
 
-        public Color shade400 => this[400];
+        public Color shade400 {
+            get { return this[400]; }
+        }
 
-        public Color shade700 => this[700];
+        public Color shade700 {
+            get { return this[700]; }
+        }
     }
 
 
@@ -204,7 +235,7 @@ namespace Unity.UIWidgets.material {
         public static readonly MaterialColor indigo = new MaterialColor(
             _indigoPrimaryValue,
             new Dictionary<int, Color> {
-                {50, new Color(0xFFE8EAF6)}, 
+                {50, new Color(0xFFE8EAF6)},
                 {100, new Color(0xFFC5CAE9)},
                 {200, new Color(0xFF9FA8DA)},
                 {300, new Color(0xFF7986CB)},
