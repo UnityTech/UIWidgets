@@ -4,6 +4,7 @@ using System.Linq;
 using Unity.UIWidgets.editor;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
+using Unity.UIWidgets.material;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
@@ -87,7 +88,13 @@ namespace UIWidgets.Tests {
         }
 
         void _attachRootWidget(Widget widget) {
-            this.windowAdapter.attachRootWidget(new WidgetsApp(window: this.windowAdapter, home: widget));
+            this.windowAdapter.attachRootWidget(new WidgetsApp(window: this.windowAdapter, home: widget,
+                pageRouteBuilder: (RouteSettings settings, WidgetBuilder builder) =>
+                    new PageRouteBuilder(
+                        settings: settings,
+                        pageBuilder: (BuildContext context, Unity.UIWidgets.animation.Animation<double> animation, 
+                            Unity.UIWidgets.animation.Animation<double> secondaryAnimation) => builder(context)
+                    )));
         }
 
         void Update() {
@@ -233,11 +240,11 @@ namespace UIWidgets.Tests {
         }
 
         Widget asPage() {
-            return new WidgetsApp(home: new AsScreen(), window: this.windowAdapter);
+            return new AsScreen();
         }
 
         Widget mouseHover() {
-            return new WidgetsApp(home: new MouseHoverWidget(), window: this.windowAdapter);
+            return new MouseHoverWidget();
         }
     }
 
@@ -290,6 +297,7 @@ namespace UIWidgets.Tests {
                             margin: EdgeInsets.only(right: 4),
                             child: new EditableText(
                                 maxLines: 1,
+                                selectionControls: MaterialUtils.materialTextSelectionControls,
                                 controller: new TextEditingController("Type here to search assets"),
                                 focusNode: new FocusNode(),
                                 style: new TextStyle(

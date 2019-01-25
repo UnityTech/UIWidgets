@@ -132,6 +132,7 @@ namespace Unity.UIWidgets.widgets {
                 oldPosition: oldPosition
             ) {
             D.assert(viewportFraction > 0.0);
+            this.initialPage = initialPage;
             this._viewportFraction = viewportFraction;
             this._pageToUseOnStartup = initialPage;
         }

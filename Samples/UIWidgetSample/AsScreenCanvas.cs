@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Unity.UIWidgets.engine;
 using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.material;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
@@ -62,6 +63,7 @@ namespace UIWidgetsSample {
                                 margin: EdgeInsets.only(right: 4),
                                 child: new EditableText(
                                     maxLines: 1,
+                                    selectionControls: MaterialUtils.materialTextSelectionControls,
                                     controller: new TextEditingController("Type here to search assets"),
                                     focusNode: new FocusNode(),
                                     style: new TextStyle(

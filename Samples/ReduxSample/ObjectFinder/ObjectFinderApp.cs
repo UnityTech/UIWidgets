@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Unity.UIWidgets.engine;
 using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.material;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
@@ -126,6 +127,7 @@ namespace Unity.UIWidgets.Sample.Redux.ObjectFinder {
                             decoration: new BoxDecoration(border: Border.all(new Color(0xFF000000), 1)),
                             padding: EdgeInsets.only(left: 8, right: 8),
                             child: new EditableText(
+                                selectionControls: MaterialUtils.materialTextSelectionControls,
                                 controller: this._controller,
                                 focusNode: this._focusNode,
                                 style: new TextStyle(
