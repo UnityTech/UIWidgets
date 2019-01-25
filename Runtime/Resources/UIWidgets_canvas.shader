@@ -6,15 +6,19 @@ Shader "UIWidgets/canvas"
     }
 
     CGINCLUDE
-    float2 _viewSize;
+    float4 _viewport;
     float4x4 _paintMat;
-    float4 _innerCol;
-    float4 _outerCol;
+    half4 _innerCol;
+    half4 _outerCol;
     float2 _extent;
     float _radius;
     float _feather;
     sampler2D _tex;
     
+    half2 _mf_imgInc; // _mf stands for mask filter
+    int _mf_radius;
+    half _mf_kernel[25];
+        
     struct appdata_t {
         float4 vertex : POSITION;
         float2 tcoord : TEXCOORD0;
@@ -38,10 +42,13 @@ Shader "UIWidgets/canvas"
         o.ftcoord = v.tcoord;
         o.fpos = v.vertex;
         
+        float x = v.vertex.x - _viewport.x;
+        float y = v.vertex.y - _viewport.y;
+        
     #if UNITY_UV_STARTS_AT_TOP
-        o.vertex = float4(2.0 * v.vertex.x / _viewSize.x - 1.0, 2.0 * v.vertex.y / _viewSize.y - 1.0, 0, 1);
+        o.vertex = float4(2.0 * x / _viewport.z - 1.0, 2.0 * y / _viewport.w - 1.0, 0, 1);
     #else
-        o.vertex = float4(2.0 * v.vertex.x / _viewSize.x - 1.0, 1.0 - 2.0 * v.vertex.y / _viewSize.y, 0, 1);
+        o.vertex = float4(2.0 * x / _viewport.z - 1.0, 1.0 - 2.0 * y / _viewport.w, 0, 1);
     #endif
 
         return o;
@@ -50,32 +57,47 @@ Shader "UIWidgets/canvas"
     fixed4 frag (v2f i) : SV_Target {
         float2 pt = (mul(_paintMat, float3(i.fpos, 1.0))).xy;
         float d = clamp((sdroundrect(pt, _extent, _radius) + _feather * 0.5) / _feather, 0.0, 1.0);
-        float4 color = lerp(_innerCol, _outerCol, d);
+        half4 color = lerp(_innerCol, _outerCol, d);
         return color;
     }
     
     fixed4 frag_stencil (v2f i) : SV_Target {
-        return float4(0, 0, 0, 0);
+        return half4(0, 0, 0, 0);
     }
     
     fixed4 frag_tex (v2f i) : SV_Target {
-        float4 color = tex2D(_tex, i.ftcoord);
+        half4 color = tex2D(_tex, i.ftcoord);
         color = color * _innerCol; // tint color
-        color = float4(color.xyz * color.w, color.w);
+        color = half4(color.xyz * color.w, color.w);
         return color;
     }    
     
     fixed4 frag_texrt (v2f i) : SV_Target {
-         float4 color = tex2D(_tex, i.ftcoord);
+         half4 color = tex2D(_tex, i.ftcoord);
          color = color * _innerCol; // tint color
-         color = float4(color.xyz * _innerCol.w, color.w);
+         color = half4(color.xyz * _innerCol.w, color.w);
          return color;
     }
     
     fixed4 frag_texfont (v2f i) : SV_Target {
-         float4 color = tex2D(_tex, i.ftcoord);
-         color = float4(1, 1, 1, color.w) * _innerCol; // tint color
-         color = float4(color.xyz * color.w, color.w);
+         half4 color = tex2D(_tex, i.ftcoord);
+         color = half4(1, 1, 1, color.w) * _innerCol; // tint color
+         color = half4(color.xyz * color.w, color.w);
+         return color;
+    }
+    
+    fixed4 frag_mf (v2f i) : SV_Target {
+         half4 color = half4(0, 0, 0, 0);
+         
+         float2 coord = i.ftcoord - _mf_radius * _mf_imgInc;
+         int width = _mf_radius * 2 + 1;
+         for (int i = 0; i < width; i++) {
+            color += tex2D(_tex, coord) * _mf_kernel[i];
+            coord += _mf_imgInc;
+         }
+    
+         color = color * _innerCol; // tint color
+         color = half4(color.xyz * _innerCol.w, color.w);
          return color;
     }
     
@@ -225,6 +247,12 @@ Shader "UIWidgets/canvas"
 
             CGPROGRAM
             #pragma fragment frag_texfont
+            ENDCG
+        }
+        
+        Pass { // 11, mask filter 
+            CGPROGRAM
+            #pragma fragment frag_mf
             ENDCG
         }
     }

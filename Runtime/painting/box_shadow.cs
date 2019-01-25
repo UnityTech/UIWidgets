@@ -32,7 +32,7 @@ namespace Unity.UIWidgets.painting {
         public Paint toPaint() {
             return new Paint {
                 color = this.color,
-                //blurSigma = this.blurSigma, TODO
+                maskFilter = MaskFilter.blur(BlurStyle.normal, this.blurSigma)
             };
         }
 
