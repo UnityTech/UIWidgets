@@ -64,6 +64,15 @@ namespace Unity.UIWidgets.ui {
         public static double lerpDouble(double a, double b, double t) {
             return a + (b - a) * t;
         }
+
+        public static double? lerpNullableDouble(double? a, double? b, double t) {
+            if (a == null && b == null) {
+                return null;
+            }
+            a = a ?? b;
+            b = b ?? a;
+            return (double) a + ((double) b - (double) a) * t;
+        }
         
         public static float lerpFloat(float a, float b, float t) {
             return a + (b - a) * t;
