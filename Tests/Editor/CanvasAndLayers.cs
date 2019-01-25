@@ -208,6 +208,7 @@ namespace UIWidgets.Tests {
 
             var widthPaint = new Paint {
                 color = new Color(0xFFFF0000),
+                style = PaintingStyle.stroke,
                 strokeWidth = 4,
             };
 
@@ -251,25 +252,32 @@ namespace UIWidgets.Tests {
         }
 
         void drawRectShadow() {
-//            var canvas = new CanvasImpl();
-//
-//            var paint = new Paint {
-//                color = new Color(0xFF00FF00),
-//                blurSigma = 3.0,
-//            };
-//
-//            canvas.drawRectShadow(
-//                Rect.fromLTWH(10, 10, 100, 100),
-//                paint);
-//
-//            paint = new Paint {
-//                color = new Color(0xFFFFFF00),
-//                blurSigma = 2.0,
-//            };
-//
-//            canvas.drawRectShadow(
-//                Rect.fromLTWH(10, 150, 100, 100),
-//                paint);
+            var canvas = new CommandBufferCanvas(this._renderTexture, (float) Window.instance.devicePixelRatio, this._meshPool);
+
+            var paint = new Paint {
+                color = new Color(0xFF00FF00),
+                maskFilter = MaskFilter.blur(BlurStyle.normal, 3),
+            };
+            
+            canvas.clipRect(Unity.UIWidgets.ui.Rect.fromLTWH(25, 25, 300, 300));
+                
+            canvas.rotate(-Math.PI/8.0);
+            
+
+            canvas.drawRect(
+                Unity.UIWidgets.ui.Rect.fromLTWH(10, 10, 100, 100),
+                paint);
+
+            paint = new Paint {
+                color = new Color(0xFFFFFF00),
+                maskFilter = MaskFilter.blur(BlurStyle.normal, 15),
+            };
+
+            canvas.drawRect(
+                Unity.UIWidgets.ui.Rect.fromLTWH(10, 150, 200, 200),
+                paint);
+            
+            canvas.flush();
         }
 
         void drawPicture() {
@@ -303,7 +311,7 @@ namespace UIWidgets.Tests {
 
             paint = new Paint {
                 color = new Color(0xFF00FFFF),
-                blurSigma = 3,
+                maskFilter = MaskFilter.blur(BlurStyle.normal, 3),
             };
             canvas.drawRect(
                 Unity.UIWidgets.ui.Rect.fromLTWH(150, 150, 110, 120),

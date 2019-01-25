@@ -1567,37 +1567,41 @@ namespace Unity.UIWidgets.ui {
 
         public MeshMesh(List<Vector3> vertices, List<int> triangles, List<Vector2> uv = null) {
             D.assert(vertices != null);
-            D.assert(vertices.Count > 0);
+            D.assert(vertices.Count >= 0);
             D.assert(triangles != null);
-            D.assert(triangles.Count > 0);
+            D.assert(triangles.Count >= 0);
             D.assert(uv == null || uv.Count == vertices.Count);
 
             this.vertices = vertices;
             this.triangles = triangles;
             this.uv = uv;
 
-            double minX = vertices[0].x;
-            double maxX = vertices[0].x;
-            double minY = vertices[0].y;
-            double maxY = vertices[0].y;
+            if (vertices.Count > 0) {
+                double minX = vertices[0].x;
+                double maxX = vertices[0].x;
+                double minY = vertices[0].y;
+                double maxY = vertices[0].y;
 
-            for (int i = 1; i < vertices.Count; i++) {
-                var vertex = vertices[i];
-                if (vertex.x < minX) {
-                    minX = vertex.x;
+                for (int i = 1; i < vertices.Count; i++) {
+                    var vertex = vertices[i];
+                    if (vertex.x < minX) {
+                        minX = vertex.x;
+                    }
+                    if (vertex.x > maxX) {
+                        maxX = vertex.x;
+                    }
+                    if (vertex.y < minY) {
+                        minY = vertex.y;
+                    }
+                    if (vertex.y > maxY) {
+                        maxY = vertex.y;
+                    }
                 }
-                if (vertex.x > maxX) {
-                    maxX = vertex.x;
-                }
-                if (vertex.y < minY) {
-                    minY = vertex.y;
-                }
-                if (vertex.y > maxY) {
-                    maxY = vertex.y;
-                }
+
+                this.bounds = Rect.fromLTRB(minX, minY, maxX, maxY);
+            } else {
+                this.bounds = Rect.zero;
             }
-
-            this.bounds = Rect.fromLTRB(minX, minY, maxX, maxY);
         }
 
         public MeshMesh transform(float[] xform) {

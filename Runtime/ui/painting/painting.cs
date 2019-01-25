@@ -1,4 +1,5 @@
 ﻿using System;
+using Unity.UIWidgets.foundation;
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
@@ -174,9 +175,123 @@ namespace Unity.UIWidgets.ui {
         bevel,
     }
 
-    public class ColorFilter {
-        public Color color;
-        public BlendMode blendMode;
+    public enum BlurStyle {
+        normal, // only normal for now.
+        solid,
+        outer,
+        inner,
+    }
+
+    public class MaskFilter : IEquatable<MaskFilter> {
+        MaskFilter(BlurStyle style, double sigma) {
+            this.style = style;
+            this.sigma = sigma;
+        }
+
+        public static MaskFilter blur(BlurStyle style, double sigma) {
+            return new MaskFilter(style, sigma);
+        }
+
+        public readonly BlurStyle style;
+        public readonly double sigma;
+
+        public bool Equals(MaskFilter other) {
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
+            return this.style == other.style && this.sigma.Equals(other.sigma);
+        }
+
+        public override bool Equals(object obj) {
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
+            return this.Equals((MaskFilter) obj);
+        }
+
+        public override int GetHashCode() {
+            unchecked {
+                return ((int) this.style * 397) ^ this.sigma.GetHashCode();
+            }
+        }
+
+        public static bool operator ==(MaskFilter left, MaskFilter right) {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(MaskFilter left, MaskFilter right) {
+            return !Equals(left, right);
+        }
+
+        public override string ToString() {
+            return $"MaskFilter.blur(${this.style}, ${this.sigma:F1})";
+        }
+    }
+
+    public class ColorFilter : IEquatable<ColorFilter> {
+        ColorFilter(Color color, BlendMode blendMode) {
+            D.assert(color != null);
+            this.color = color;
+            this.blendMode = blendMode;
+        }
+
+        public static ColorFilter mode(Color color, BlendMode blendMode) {
+            return new ColorFilter(color, blendMode);
+        }
+
+        public readonly Color color;
+
+        public readonly BlendMode blendMode;
+
+        public bool Equals(ColorFilter other) {
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
+            return Equals(this.color, other.color) && this.blendMode == other.blendMode;
+        }
+
+        public override bool Equals(object obj) {
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
+            return this.Equals((ColorFilter) obj);
+        }
+
+        public override int GetHashCode() {
+            unchecked {
+                return ((this.color != null ? this.color.GetHashCode() : 0) * 397) ^ (int) this.blendMode;
+            }
+        }
+
+        public static bool operator ==(ColorFilter left, ColorFilter right) {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(ColorFilter left, ColorFilter right) {
+            return !Equals(left, right);
+        }
+
+        public override string ToString() {
+            return $"ColorFilter({this.color}, {this.blendMode})";
+        }
     }
 
     public enum TileMode {
@@ -291,11 +406,41 @@ namespace Unity.UIWidgets.ui {
 
         public ColorFilter colorFilter = null;
 
+        public MaskFilter maskFilter = null;
+
         public PaintShader shader = null;
 
-        public double blurSigma;
-
         public bool invertColors;
+
+        public Paint() {
+        }
+
+        public Paint(Paint paint) {
+            D.assert(paint != null);
+
+            this.color = paint.color;
+            this.blendMode = paint.blendMode;
+            this.style = paint.style;
+            this.strokeWidth = paint.strokeWidth;
+            this.strokeCap = paint.strokeCap;
+            this.strokeJoin = paint.strokeJoin;
+            this.strokeMiterLimit = paint.strokeMiterLimit;
+            this.filterMode = paint.filterMode;
+            this.colorFilter = paint.colorFilter;
+            this.maskFilter = paint.maskFilter;
+            this.shader = paint.shader;
+            this.invertColors = paint.invertColors;
+        }
+
+        public static Paint shapeOnly(Paint paint) {
+            return new Paint {
+                style = paint.style,
+                strokeWidth = paint.strokeWidth,
+                strokeCap = paint.strokeCap,
+                strokeJoin = paint.strokeJoin,
+                strokeMiterLimit = paint.strokeMiterLimit,
+            };
+        }
     }
 
     public static class Conversions {

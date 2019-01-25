@@ -185,6 +185,14 @@ namespace Unity.UIWidgets.painting {
                 return hashCode;
             }
         }
+        
+        public static bool operator ==(BorderRadius a, BorderRadius b) {
+            return Equals(a, b);
+        }
+
+        public static bool operator !=(BorderRadius a, BorderRadius b) {
+            return !Equals(a, b);
+        }
 
         public override string ToString() {
             string visual = null;
