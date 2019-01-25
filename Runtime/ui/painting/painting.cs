@@ -1,5 +1,4 @@
 ﻿using System;
-using Unity.UIWidgets.painting;
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
@@ -7,7 +6,7 @@ namespace Unity.UIWidgets.ui {
         public Color(long value) {
             this.value = value & 0xFFFFFFFF;
         }
-        
+
         public static readonly Color clear = new Color(0x00000000);
 
         public static readonly Color black = new Color(0xFF000000);
@@ -72,6 +71,19 @@ namespace Unity.UIWidgets.ui {
             return fromARGB(this.alpha, this.red, this.green, b);
         }
 
+        static double _linearizeColorComponent(double component) {
+            if (component <= 0.03928)
+                return component / 12.92;
+            return Math.Pow((component + 0.055) / 1.055, 2.4);
+        }
+
+        public double computeLuminance() {
+            double R = _linearizeColorComponent(this.red / 0xFF);
+            double G = _linearizeColorComponent(this.green / 0xFF);
+            double B = _linearizeColorComponent(this.blue / 0xFF);
+            return 0.2126 * R + 0.7152 * G + 0.0722 * B;
+        }
+
         public static Color lerp(Color a, Color b, double t) {
             if (a == null && b == null) {
                 return null;
@@ -97,9 +109,11 @@ namespace Unity.UIWidgets.ui {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return this.value == other.value;
         }
 
@@ -107,12 +121,15 @@ namespace Unity.UIWidgets.ui {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((Color) obj);
         }
 
@@ -192,7 +209,8 @@ namespace Unity.UIWidgets.ui {
             if (d > 0.0001f) {
                 dx /= d;
                 dy /= d;
-            } else {
+            }
+            else {
                 dx = 0;
                 dy = 1;
             }

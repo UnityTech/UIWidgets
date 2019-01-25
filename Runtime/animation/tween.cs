@@ -73,9 +73,9 @@ namespace Unity.UIWidgets.animation {
             this.end = end;
         }
 
-        public readonly T begin;
+        public T begin;
 
-        public readonly T end;
+        public T end;
 
         public abstract T lerp(double t);
 
@@ -100,9 +100,11 @@ namespace Unity.UIWidgets.animation {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return EqualityComparer<T>.Default.Equals(this.begin, other.begin) &&
                    EqualityComparer<T>.Default.Equals(this.end, other.end);
         }
@@ -111,12 +113,15 @@ namespace Unity.UIWidgets.animation {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((Tween<T>) obj);
         }
 
@@ -185,7 +190,7 @@ namespace Unity.UIWidgets.animation {
     }
 
     public class DoubleTween : Tween<double> {
-        public DoubleTween(int begin, int end) : base(begin: begin, end: end) {
+        public DoubleTween(double begin, double end) : base(begin: begin, end: end) {
         }
 
         public override double lerp(double t) {
@@ -210,7 +215,7 @@ namespace Unity.UIWidgets.animation {
             return (this.begin + (this.end - this.begin) * t);
         }
     }
-    
+
     public class CurveTween : Animatable<double> {
         public CurveTween(Curve curve = null) {
             D.assert(curve != null);

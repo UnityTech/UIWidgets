@@ -58,6 +58,7 @@ csharp_brace_style=end_of_line
 
 # don't use 'private' whenever possible
 csharp_default_private_modifier=implicit
+csharp_default_internal_modifier=implicit
 
 
 # not requirement for converting named arguments into positioned arguments whenever possible

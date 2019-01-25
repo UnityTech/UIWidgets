@@ -57,14 +57,23 @@ namespace Unity.UIWidgets.widgets {
 
         public readonly double? size;
 
+        public static IconThemeData lerp(IconThemeData a, IconThemeData b, double t) {
+            return new IconThemeData(
+                color: Color.lerp(a.color, b.color, t),
+                opacity: MathUtils.lerpNullableDouble(a.opacity, b.opacity, t),
+                size: MathUtils.lerpNullableDouble(a.size, b.size, t));
+        }
+
 
         public bool Equals(IconThemeData other) {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return Equals(this.color, other.color) &&
                    this._opacity.Equals(other._opacity) &&
                    this.size.Equals(other.size);
@@ -74,12 +83,15 @@ namespace Unity.UIWidgets.widgets {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((IconThemeData) obj);
         }
 
