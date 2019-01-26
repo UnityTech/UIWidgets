@@ -407,7 +407,7 @@ namespace Unity.UIWidgets.rendering {
                         "example, a RenderSliver cannot be the child of a RenderBox because " +
                         "a RenderSliver does not understand the RenderBox layout protocol.\n" +
                         "\n" +
-                        "The " + this.GetType() + " that expected a $ChildType child was created by:\n" +
+                        "The " + this.GetType() + " that expected a " + typeof(ChildType) + " child was created by:\n" +
                         "  " + this.debugCreator + "\n" +
                         "\n" +
                         "The " + child.GetType() + " that did not match the expected child type " +
@@ -706,7 +706,7 @@ namespace Unity.UIWidgets.rendering {
                         "example, a RenderSliver cannot be the child of a RenderBox because " +
                         "a RenderSliver does not understand the RenderBox layout protocol.\n" +
                         "\n" +
-                        "The " + this.GetType() + " that expected a $ChildType child was created by:\n" +
+                        "The " + this.GetType() + " that expected a " + typeof(ChildType) + " child was created by:\n" +
                         "  " + this.debugCreator + "\n" +
                         "\n" +
                         "The " + child.GetType() + " that did not match the expected child type " +
@@ -1005,7 +1005,7 @@ namespace Unity.UIWidgets.rendering {
                         "example, a RenderSliver cannot be the child of a RenderBox because " +
                         "a RenderSliver does not understand the RenderBox layout protocol.\n" +
                         "\n" +
-                        "The " + this.GetType() + " that expected a $ChildType child was created by:\n" +
+                        "The " + this.GetType() + " that expected a " + typeof(ChildType) + " child was created by:\n" +
                         "  " + this.debugCreator + "\n" +
                         "\n" +
                         "The " + child.GetType() + " that did not match the expected child type " +
