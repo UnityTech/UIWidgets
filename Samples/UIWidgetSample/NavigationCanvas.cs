@@ -7,51 +7,60 @@ using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
-using Color = Unity.UIWidgets.ui.Color;
 using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace UIWidgetsSample {
-    
     public class NavigationCanvas : WidgetCanvas {
-        
-        protected override string initialRoute => "/";
+        protected override string initialRoute {
+            get { return "/"; }
+        }
 
-        protected override Dictionary<string, WidgetBuilder> routes => new Dictionary<string, WidgetBuilder> {
-            {"/", (context) => new HomeScreen()},
-            {"/detail", (context) => new DetailScreen()}
-        };
-        
-        protected override TextStyle textStyle => new TextStyle(fontSize: 24);
-        
-        protected override PageRouteFactory pageRouteBuilder => (RouteSettings settings, WidgetBuilder builder) =>
-            new PageRouteBuilder(
-                settings: settings,
-                pageBuilder: (BuildContext context, Unity.UIWidgets.animation.Animation<double> animation, 
-                    Unity.UIWidgets.animation.Animation<double> secondaryAnimation) => builder(context),
-                transitionsBuilder: (BuildContext context, Animation<double> 
-                    animation, Animation<double> secondaryAnimation, Widget child) => new _FadeUpwardsPageTransition(
-                        routeAnimation: animation,
-                        child: child
-                    )
-            );
+        protected override Dictionary<string, WidgetBuilder> routes {
+            get {
+                return new Dictionary<string, WidgetBuilder> {
+                    {"/", (context) => new HomeScreen()},
+                    {"/detail", (context) => new DetailScreen()}
+                };
+            }
+        }
+
+        protected override TextStyle textStyle {
+            get { return new TextStyle(fontSize: 24); }
+        }
+
+        protected override PageRouteFactory pageRouteBuilder {
+            get {
+                return (RouteSettings settings, WidgetBuilder builder) =>
+                    new PageRouteBuilder(
+                        settings: settings,
+                        pageBuilder: (BuildContext context, Animation<double> animation,
+                            Animation<double> secondaryAnimation) => builder(context),
+                        transitionsBuilder: (BuildContext context, Animation<double>
+                                animation, Animation<double> secondaryAnimation, Widget child) =>
+                            new _FadeUpwardsPageTransition(
+                                routeAnimation: animation,
+                                child: child
+                            )
+                    );
+            }
+        }
     }
 
 
-    
     class HomeScreen : StatelessWidget {
         public override Widget build(BuildContext context) {
             return new NavigationPage(
-                body:new Container(
+                body: new Container(
                     color: new Color(0xFF888888),
-                    child: new Center(child: new CustomButton(onPressed: () => {
-                            Navigator.pushName(context, "/detail");
-                        }, child: new Text("Go to Detail"))
+                    child: new Center(
+                        child: new CustomButton(onPressed: () => { Navigator.pushName(context, "/detail"); },
+                            child: new Text("Go to Detail"))
                     )),
                 title: "Home"
-                );
+            );
         }
     }
-    
+
     class DetailScreen : StatelessWidget {
         public override Widget build(BuildContext context) {
             return new NavigationPage(
@@ -71,10 +80,10 @@ namespace UIWidgetsSample {
                 title: "Detail");
         }
     }
-    
+
     class Dialog : StatelessWidget {
         public override Widget build(BuildContext context) {
-            return new Center(child:new Container(
+            return new Center(child: new Container(
                 color: new Color(0xFFFF0000),
                 width: 100,
                 height: 80,
@@ -85,12 +94,11 @@ namespace UIWidgetsSample {
     }
 
     class _FadeUpwardsPageTransition : StatelessWidget {
-
         internal _FadeUpwardsPageTransition(
             Key key = null,
             Animation<double> routeAnimation = null, // The route's linear 0.0 - 1.0 animation.
             Widget child = null
-        ) :base(key: key) {
+        ) : base(key: key) {
             this._positionAnimation = _bottomUpTween.chain(_fastOutSlowInTween).animate(routeAnimation);
             this._opacityAnimation = _easeInTween.animate(routeAnimation);
             this.child = child;
@@ -100,14 +108,14 @@ namespace UIWidgetsSample {
             begin: new Offset(0.0, 0.25),
             end: Offset.zero
         );
-        
+
         static Animatable<double> _fastOutSlowInTween = new CurveTween(curve: Curves.fastOutSlowIn);
         static Animatable<double> _easeInTween = new CurveTween(curve: Curves.easeIn);
-        
+
         readonly Animation<Offset> _positionAnimation;
         readonly Animation<double> _opacityAnimation;
         public readonly Widget child;
-        
+
         public override Widget build(BuildContext context) {
             return new SlideTransition(
                 position: this._positionAnimation,
@@ -118,8 +126,8 @@ namespace UIWidgetsSample {
             );
         }
     }
-    
-    class NavigationPage: StatelessWidget {
+
+    class NavigationPage : StatelessWidget {
         public readonly Widget body;
         public readonly string title;
 
@@ -127,30 +135,28 @@ namespace UIWidgetsSample {
             this.title = title;
             this.body = body;
         }
-        
+
         public override Widget build(BuildContext context) {
             Widget back = null;
             if (Navigator.of(context).canPop()) {
-                back = new CustomButton(onPressed: () => { Navigator.pop(context); }, 
+                back = new CustomButton(onPressed: () => { Navigator.pop(context); },
                     child: new Text("Go Back"));
-                back = new Column(mainAxisAlignment: MainAxisAlignment.center, children: new List<Widget>(){back});
+                back = new Column(mainAxisAlignment: MainAxisAlignment.center, children: new List<Widget>() {back});
             }
-            
-           
+
+
             return new Container(
                 child: new Column(
                     children: new List<Widget>() {
-                        new ConstrainedBox(constraints: new BoxConstraints(maxHeight:80), 
-                            child:new DecoratedBox(
+                        new ConstrainedBox(constraints: new BoxConstraints(maxHeight: 80),
+                            child: new DecoratedBox(
                                 decoration: new BoxDecoration(color: new Color(0XFFE1ECF4)),
-                                child:new NavigationToolbar(leading: back, 
-                                middle: new Text(this.title, textAlign: TextAlign.center))))
-                        ,
-                        new Flexible(child:this.body)
-                        }
-                    )
-                );
-
+                                child: new NavigationToolbar(leading: back,
+                                    middle: new Text(this.title, textAlign: TextAlign.center)))),
+                        new Flexible(child: this.body)
+                    }
+                )
+            );
         }
     }
 

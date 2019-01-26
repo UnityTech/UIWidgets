@@ -12,7 +12,8 @@ namespace Unity.UIWidgets.Sample.Redux.ObjectFinder {
             var selectedId = StoreProvider.store.state.selected;
             if (selectedId == this.GetInstanceID()) {
                 this.GetComponent<MeshRenderer>().material.color = new Color(1.0f, 0, 0, 1.0f);
-            } else {
+            }
+            else {
                 this.GetComponent<MeshRenderer>().material.color = new Color(1.0f, 1.0f, 1.0f, 1.0f);
             }
         }

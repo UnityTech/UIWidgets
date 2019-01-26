@@ -19,6 +19,7 @@ namespace Unity.UIWidgets.Sample.Redux {
             if (provider == null) {
                 throw new UIWidgetsError("StoreProvider is missing");
             }
+
             return provider._store;
         }
 
@@ -120,6 +121,7 @@ namespace Unity.UIWidgets.Sample.Redux {
                 oldStore.stateChanged -= this._handleStateChanged;
                 this._init();
             }
+
             base.didUpdateWidget(oldWidget);
         }
 
@@ -131,7 +133,8 @@ namespace Unity.UIWidgets.Sample.Redux {
         void _handleStateChanged(State state) {
             if (Window.hasInstance) {
                 this._innerStateChanged(state);
-            } else {
+            }
+            else {
                 using (WindowProvider.of(this.context).getScope()) {
                     this._innerStateChanged(state);
                 }
@@ -145,7 +148,8 @@ namespace Unity.UIWidgets.Sample.Redux {
                 if (!this.widget.shouldRebuild(preValue, this.latestValue)) {
                     return;
                 }
-            } else if (this.widget.distinct) {
+            }
+            else if (this.widget.distinct) {
                 if (Equals(preValue, this.latestValue)) {
                     return;
                 }

@@ -41,6 +41,7 @@ namespace Unity.UIWidgets.Sample.Redux {
             if (inc == null) {
                 return state;
             }
+
             return new CouterState(inc.amount + state.count);
         }
 

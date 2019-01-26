@@ -79,6 +79,7 @@ namespace Unity.UIWidgets.Sample.Redux.ObjectFinder {
                 //scheduler.SchedulerBinding.instance.scheduleFrameCallback
                 Window.instance.scheduleMicrotask(() => this.widget.doSearch(""));
             }
+
             this._controller.addListener(this.textChange);
         }
 

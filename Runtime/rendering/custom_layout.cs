@@ -24,17 +24,19 @@ namespace Unity.UIWidgets.rendering {
         public Size layoutChild(object childId, BoxConstraints constraints) {
             RenderBox child = this._idToChild[childId];
             D.assert(() => {
-                if (child == null)
+                if (child == null) {
                     throw new UIWidgetsError(
                         $"The {this} custom multichild layout delegate tried to lay out a non-existent child.\n" +
                         $"There is no child with the id \"{childId}\"."
                     );
+                }
 
-                if (!this._debugChildrenNeedingLayout.Remove(child))
+                if (!this._debugChildrenNeedingLayout.Remove(child)) {
                     throw new UIWidgetsError(
                         $"The $this custom multichild layout delegate tried to lay out the child with id \"{childId}\" more than once.\n" +
                         "Each child must be laid out exactly once."
                     );
+                }
 
                 try {
                     D.assert(constraints.debugAssertIsValid(isAppliedConstraint: true));
@@ -57,16 +59,18 @@ namespace Unity.UIWidgets.rendering {
         public void positionChild(object childId, Offset offset) {
             RenderBox child = this._idToChild[childId];
             D.assert(() => {
-                if (child == null)
+                if (child == null) {
                     throw new UIWidgetsError(
                         $"The {this} custom multichild layout delegate tried to position out a non-existent child:\n" +
                         $"There is no child with the id \"{childId}\"."
                     );
+                }
 
-                if (offset == null)
+                if (offset == null) {
                     throw new UIWidgetsError(
                         $"The {this} custom multichild layout delegate provided a null position for the child with id \"{childId}\"."
                     );
+                }
 
                 return true;
             });
@@ -96,12 +100,13 @@ namespace Unity.UIWidgets.rendering {
                 while (child != null) {
                     MultiChildLayoutParentData childParentData = (MultiChildLayoutParentData) child.parentData;
                     D.assert(() => {
-                        if (childParentData.id == null)
+                        if (childParentData.id == null) {
                             throw new UIWidgetsError(
                                 "The following child has no ID:\n" +
                                 $"  {child}\n" +
                                 "Every child of a RenderCustomMultiChildLayoutBox must have an ID in its parent data."
                             );
+                        }
 
                         return true;
                     });
@@ -116,18 +121,20 @@ namespace Unity.UIWidgets.rendering {
                 this.performLayout(size);
                 D.assert(() => {
                     if (this._debugChildrenNeedingLayout.isNotEmpty()) {
-                        if (this._debugChildrenNeedingLayout.Count > 1)
+                        if (this._debugChildrenNeedingLayout.Count > 1) {
                             throw new UIWidgetsError(
                                 $"The $this custom multichild layout delegate forgot to lay out the following children:\n" +
                                 $"  {string.Join("\n  ", this._debugChildrenNeedingLayout.Select(this._debugDescribeChild))}\n" +
                                 "Each child must be laid out exactly once."
                             );
-                        else
+                        }
+                        else {
                             throw new UIWidgetsError(
                                 $"The $this custom multichild layout delegate forgot to lay out the following child:\n" +
                                 $"  {this._debugDescribeChild(this._debugChildrenNeedingLayout.First())}\n" +
                                 "Each child must be laid out exactly once."
                             );
+                        }
                     }
 
                     return true;
@@ -170,18 +177,23 @@ namespace Unity.UIWidgets.rendering {
         }
 
         public override void setupParentData(RenderObject child) {
-            if (!(child.parentData is MultiChildLayoutParentData))
+            if (!(child.parentData is MultiChildLayoutParentData)) {
                 child.parentData = new MultiChildLayoutParentData();
+            }
         }
 
         public MultiChildLayoutDelegate layoutDelegate {
-            get => this._delegate;
+            get { return this._delegate; }
             set {
                 D.assert(value != null);
-                if (this._delegate == value)
+                if (this._delegate == value) {
                     return;
-                if (value.GetType() != this._delegate.GetType() || value.shouldRelayout(this._delegate))
+                }
+
+                if (value.GetType() != this._delegate.GetType() || value.shouldRelayout(this._delegate)) {
                     this.markNeedsLayout();
+                }
+
                 this._delegate = value;
             }
         }
@@ -196,29 +208,37 @@ namespace Unity.UIWidgets.rendering {
 
         protected override double computeMinIntrinsicWidth(double height) {
             double width = this._getSize(BoxConstraints.tightForFinite(height: height)).width;
-            if (width.isFinite())
+            if (width.isFinite()) {
                 return width;
+            }
+
             return 0.0;
         }
 
         protected override double computeMaxIntrinsicWidth(double height) {
             double width = this._getSize(BoxConstraints.tightForFinite(height: height)).width;
-            if (width.isFinite())
+            if (width.isFinite()) {
                 return width;
+            }
+
             return 0.0;
         }
 
         protected override double computeMinIntrinsicHeight(double width) {
             double height = this._getSize(BoxConstraints.tightForFinite(width: width)).height;
-            if (height.isFinite())
+            if (height.isFinite()) {
                 return height;
+            }
+
             return 0.0;
         }
 
         protected override double computeMaxIntrinsicHeight(double width) {
             double height = this._getSize(BoxConstraints.tightForFinite(width: width)).height;
-            if (height.isFinite())
+            if (height.isFinite()) {
                 return height;
+            }
+
             return 0.0;
         }
 

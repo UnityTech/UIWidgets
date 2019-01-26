@@ -4,14 +4,12 @@ using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
 
 namespace UIWidgetsSample {
-    
-    public class CustomPaintCanvas: WidgetCanvas {
-
+    public class CustomPaintCanvas : WidgetCanvas {
         protected override Widget getWidget() {
             return new CustomPaint(
                 child: new Container(width: 300, height: 300, color: new Color(0XFFFFFFFF)),
                 foregroundPainter: new GridPainter(null)
-                );
+            );
         }
     }
 
@@ -30,36 +28,37 @@ namespace UIWidgetsSample {
                 canvas.drawLine(new Offset(0, offsetY), new Offset(size.width, offsetY),
                     paint);
             }
+
             for (int i = 1; i < numGrid; i++) {
                 double offsetx = size.width * i / numGrid;
                 canvas.drawLine(new Offset(offsetx, 0), new Offset(offsetx, size.height),
                     paint);
             }
-            
-            
+
+
             // draw a arrow line
             canvas.save();
             canvas.rotate(0.4);
             canvas.scale(2, 2);
             canvas.translate(50, 50);
             canvas.drawLine(new Offset(0, 0), new Offset(100, 0),
-                new Paint(){
+                new Paint() {
                     color = new Color(0xFFFF0000),
                     strokeWidth = 2,
                     style = PaintingStyle.stroke
                 });
-             var path  = new Path();
-             var arrowPaint = new Paint() {
-                 color = new Color(0xFFFF0000),
-                 style = PaintingStyle.fill
-             };
-             path.moveTo(100, 0);
-             path.lineTo(100, 5);
-             path.lineTo(120, 0);
-             path.lineTo(100, -5);
-             path.close();
-             canvas.drawPath(path, arrowPaint);
-             canvas.restore();
+            var path = new Path();
+            var arrowPaint = new Paint() {
+                color = new Color(0xFFFF0000),
+                style = PaintingStyle.fill
+            };
+            path.moveTo(100, 0);
+            path.lineTo(100, 5);
+            path.lineTo(120, 0);
+            path.lineTo(100, -5);
+            path.close();
+            canvas.drawPath(path, arrowPaint);
+            canvas.restore();
         }
 
         public override bool shouldRepaint(CustomPainter oldDelegate) {

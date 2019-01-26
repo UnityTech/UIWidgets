@@ -7,6 +7,7 @@ namespace Unity.UIWidgets.Sample.Redux.ObjectFinder {
                 if (_store != null) {
                     return _store;
                 }
+
                 var middlewares = new Middleware<FinderAppState>[] {
                     ReduxLogging.Create<FinderAppState>(),
                     GameFinderMiddleware.Create(),

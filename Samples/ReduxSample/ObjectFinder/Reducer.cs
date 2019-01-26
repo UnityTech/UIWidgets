@@ -44,17 +44,20 @@ namespace Unity.UIWidgets.Sample.Redux.ObjectFinder {
                         selected = 0;
                     }
                 }
+
                 return new FinderAppState() {
                     objects = resultAction.results,
                     selected = state.selected,
                 };
             }
+
             if (action is SelectObjectAction) {
                 return new FinderAppState() {
                     objects = state.objects,
                     selected = ((SelectObjectAction) action).id,
                 };
             }
+
             return state;
         }
     }
