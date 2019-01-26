@@ -39,7 +39,7 @@ namespace UIWidgetsSample {
                             color: Colors.blue,
                             splashColor: new Color(0xFFFF0011),
                             highlightColor: new Color(0x88FF0011),
-                            onPressed: () => { Debug.Log("pressed here");}
+                            onPressed: () => { Debug.Log("pressed here"); }
                         )
                     )
                 );

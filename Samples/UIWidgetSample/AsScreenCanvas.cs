@@ -509,11 +509,13 @@ namespace UIWidgetsSample {
                     if (pixels <= headerHeight) {
                         this.setState(() => { this._offsetY = pixels / 2.0; });
                     }
-                } else {
+                }
+                else {
                     if (this._offsetY != 0.0) {
                         this.setState(() => { this._offsetY = 0.0; });
                     }
                 }
+
                 return true;
             }
 

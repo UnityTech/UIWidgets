@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Unity.UIWidgets.engine;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.material;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
-using Unity.UIWidgets.service;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
 using TextStyle = Unity.UIWidgets.painting.TextStyle;
@@ -29,7 +27,6 @@ namespace UIWidgetsSample {
         }
 
         class _TextInputSampleState : State<TextInputSample> {
-            
             TextEditingController titleController = new TextEditingController("");
             TextEditingController descController = new TextEditingController("");
             FocusNode _titleFocusNode;
@@ -48,8 +45,9 @@ namespace UIWidgetsSample {
             }
 
             Widget title() {
-                return new Container(child:new Text(this.widget.title ?? "", textAlign: TextAlign.center,
-                    style: new TextStyle(fontSize: 24, fontWeight: FontWeight.w700)), margin:EdgeInsets.only(bottom:20));
+                return new Container(child: new Text(this.widget.title ?? "", textAlign: TextAlign.center,
+                        style: new TextStyle(fontSize: 24, fontWeight: FontWeight.w700)),
+                    margin: EdgeInsets.only(bottom: 20));
             }
 
             Widget titleInput() {
@@ -123,6 +121,4 @@ namespace UIWidgetsSample {
             }
         }
     }
-    
-
 }
