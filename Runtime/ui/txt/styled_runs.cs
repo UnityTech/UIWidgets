@@ -15,12 +15,14 @@ namespace Unity.UIWidgets.ui {
                 if (this._charIndex > index) {
                     throw new ArgumentException("can to move back");
                 }
+
                 this._charIndex = index;
                 while (this._runIndex < this._runs.size) {
                     var run = this._runs.getRun(this._runIndex);
                     if (run.start <= this._charIndex && this._charIndex < run.end) {
                         break;
                     }
+
                     this._runIndex++;
                 }
             }
@@ -104,7 +106,8 @@ namespace Unity.UIWidgets.ui {
             var run = this.runs[lastIndex];
             if (run.start == end) {
                 this.runs.RemoveAt(lastIndex);
-            } else {
+            }
+            else {
                 run.end = end;
             }
         }

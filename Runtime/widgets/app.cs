@@ -4,7 +4,6 @@ using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.ui;
-using Color = Unity.UIWidgets.ui.Color;
 using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace Unity.UIWidgets.widgets {
@@ -39,7 +38,7 @@ namespace Unity.UIWidgets.widgets {
             Widget home = null
         ) : base(key) {
             D.assert(window != null);
-            routes = routes??new Dictionary<string, WidgetBuilder>();
+            routes = routes ?? new Dictionary<string, WidgetBuilder>();
             this.window = window;
             this.home = home;
             this.navigatorKey = navigatorKey;
@@ -58,7 +57,7 @@ namespace Unity.UIWidgets.widgets {
                 "If the home property is specified, the routes table " +
                 "cannot include an entry for \" / \", since it would be redundant."
             );
-                
+
             D.assert(
                 builder != null ||
                 home != null ||
@@ -73,7 +72,7 @@ namespace Unity.UIWidgets.widgets {
                 "because otherwise there is nothing to fall back on if the " +
                 "app is started with an intent that specifies an unknown route."
             );
-            
+
             D.assert(
                 builder != null ||
                 onGenerateRoute != null ||
@@ -100,7 +99,9 @@ namespace Unity.UIWidgets.widgets {
 
         public static Window of(BuildContext context) {
             var provider = (WindowProvider) context.inheritFromWidgetOfExactType(typeof(WindowProvider));
-            if (provider == null) throw new UIWidgetsError("WindowProvider is missing");
+            if (provider == null) {
+                throw new UIWidgetsError("WindowProvider is missing");
+            }
 
             return provider.window;
         }
@@ -111,22 +112,26 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
-    internal class _WidgetsAppState : State<WidgetsApp>, WidgetsBindingObserver {
+    class _WidgetsAppState : State<WidgetsApp>, WidgetsBindingObserver {
         GlobalKey<NavigatorState> _navigator;
 
         public IPromise<bool> didPopRoute() {
             D.assert(this.mounted);
             var navigator = this._navigator?.currentState;
-            if (navigator == null)
+            if (navigator == null) {
                 return Promise<bool>.Resolved(false);
+            }
+
             return navigator.maybePop();
         }
 
         public IPromise<bool> didPushRoute(string route) {
             D.assert(this.mounted);
             var navigator = this._navigator?.currentState;
-            if (navigator == null)
+            if (navigator == null) {
                 return Promise<bool>.Resolved(false);
+            }
+
             navigator.pushNamed(route);
             return Promise<bool>.Resolved(true);
         }
@@ -156,7 +161,9 @@ namespace Unity.UIWidgets.widgets {
 
         public override void didUpdateWidget(StatefulWidget oldWidget) {
             base.didUpdateWidget(oldWidget);
-            if (this.widget.navigatorKey != ((WidgetsApp) oldWidget).navigatorKey) this._updateNavigator();
+            if (this.widget.navigatorKey != ((WidgetsApp) oldWidget).navigatorKey) {
+                this._updateNavigator();
+            }
         }
 
         public override void dispose() {
@@ -192,14 +199,16 @@ namespace Unity.UIWidgets.widgets {
                 return route;
             }
 
-            if (this.widget.onGenerateRoute != null)
+            if (this.widget.onGenerateRoute != null) {
                 return this.widget.onGenerateRoute(settings);
+            }
+
             return null;
         }
 
         Route _onUnknownRoute(RouteSettings settings) {
             D.assert(() => {
-                if (this.widget.onUnknownRoute == null)
+                if (this.widget.onUnknownRoute == null) {
                     throw new UIWidgetsError(
                         $"Could not find a generator for route {settings} in the {this.GetType()}.\n" +
                         $"Generators for routes are searched for in the following order:\n" +
@@ -211,17 +220,21 @@ namespace Unity.UIWidgets.widgets {
                         " 4. Finally if all else fails onUnknownRoute is called.\n" +
                         "Unfortunately, onUnknownRoute was not set."
                     );
+                }
+
                 return true;
             });
             var result = this.widget.onUnknownRoute(settings);
             D.assert(() => {
-                if (result == null)
+                if (result == null) {
                     throw new UIWidgetsError(
                         "The onUnknownRoute callback returned null.\n" +
                         "When the $runtimeType requested the route $settings from its " +
                         "onUnknownRoute callback, the callback returned null. Such callbacks " +
                         "must never return null."
                     );
+                }
+
                 return true;
             });
             return result;
@@ -233,7 +246,7 @@ namespace Unity.UIWidgets.widgets {
 
         public override Widget build(BuildContext context) {
             Widget navigator = null;
-            if (this._navigator != null)
+            if (this._navigator != null) {
                 navigator = new Navigator(
                     key: this._navigator,
                     initialRoute: this.widget.initialRoute ?? Navigator.defaultRouteName,
@@ -241,6 +254,7 @@ namespace Unity.UIWidgets.widgets {
                     onUnknownRoute: this._onUnknownRoute,
                     observers: this.widget.navigatorObservers
                 );
+            }
 
 
             Widget result;
@@ -253,7 +267,7 @@ namespace Unity.UIWidgets.widgets {
                 D.assert(navigator != null);
                 result = navigator;
             }
-            
+
             if (this.widget.textStyle != null) {
                 result = new DefaultTextStyle(
                     style: this.widget.textStyle,
@@ -262,8 +276,9 @@ namespace Unity.UIWidgets.widgets {
             }
 
             D.assert(() => {
-                if (WidgetInspectorService.instance.debugShowInspector)
+                if (WidgetInspectorService.instance.debugShowInspector) {
                     result = new WidgetInspector(null, result, this._InspectorSelectButtonBuilder);
+                }
 
                 return true;
             });
@@ -287,7 +302,7 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
-    internal class _InspectorSelectButton : StatelessWidget {
+    class _InspectorSelectButton : StatelessWidget {
         public readonly GestureTapCallback onPressed;
 
         public _InspectorSelectButton(

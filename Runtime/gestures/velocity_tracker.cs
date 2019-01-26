@@ -49,9 +49,11 @@ namespace Unity.UIWidgets.gestures {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return Equals(this.pixelsPerSecond, other.pixelsPerSecond);
         }
 
@@ -59,12 +61,15 @@ namespace Unity.UIWidgets.gestures {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((Velocity) obj);
         }
 

@@ -114,9 +114,11 @@ namespace Unity.UIWidgets.animation {
             this._value = newValue.clamp(this.lowerBound, this.upperBound);
             if (this._value == this.lowerBound) {
                 this._status = AnimationStatus.dismissed;
-            } else if (this._value == this.upperBound) {
+            }
+            else if (this._value == this.upperBound) {
                 this._status = AnimationStatus.completed;
-            } else {
+            }
+            else {
                 this._status = (this._direction == _AnimationDirection.forward)
                     ? AnimationStatus.forward
                     : AnimationStatus.reverse;
@@ -208,7 +210,8 @@ namespace Unity.UIWidgets.animation {
                 double range = this.upperBound - this.lowerBound;
                 double remainingFraction = range.isFinite() ? (target - this._value).abs() / range : 1.0;
                 simulationDuration = TimeSpan.FromTicks((long) (this.duration.Value.Ticks * remainingFraction));
-            } else if (target == this.value) {
+            }
+            else if (target == this.value) {
                 simulationDuration = TimeSpan.Zero;
             }
 
@@ -372,9 +375,11 @@ namespace Unity.UIWidgets.animation {
             double t = (timeInSeconds / this._durationInSeconds).clamp(0.0, 1.0);
             if (t == 0.0) {
                 return this._begin;
-            } else if (t == 1.0) {
+            }
+            else if (t == 1.0) {
                 return this._end;
-            } else {
+            }
+            else {
                 return this._begin + (this._end - this._begin) * this._curve.transform(t);
             }
         }

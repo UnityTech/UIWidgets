@@ -231,7 +231,8 @@ namespace Unity.UIWidgets.widgets {
 
             if (!canDrag) {
                 this._gestureRecognizers = new Dictionary<Type, GestureRecognizerFactory>();
-            } else {
+            }
+            else {
                 switch (this.widget.axis) {
                     case Axis.vertical:
                         this._gestureRecognizers = new Dictionary<Type, GestureRecognizerFactory>();

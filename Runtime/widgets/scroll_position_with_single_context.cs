@@ -103,7 +103,8 @@ namespace Unity.UIWidgets.widgets {
             Simulation simulation = this.physics.createBallisticSimulation(this, velocity);
             if (simulation != null) {
                 this.beginActivity(new BallisticScrollActivity(this, simulation, this.context.vsync));
-            } else {
+            }
+            else {
                 this.goIdle();
             }
         }

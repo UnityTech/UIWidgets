@@ -190,13 +190,16 @@ namespace Unity.UIWidgets.painting {
             if (a == null && b == null) {
                 return null;
             }
+
             if (a == null) {
                 return b * t;
             }
+
             if (b == null) {
                 return a * (1.0 - t);
             }
-            return EdgeInsets.fromLTRB(
+
+            return fromLTRB(
                 MathUtils.lerpDouble(a.left, b.left, t),
                 MathUtils.lerpDouble(a.top, b.top, t),
                 MathUtils.lerpDouble(a.right, b.right, t),
@@ -222,9 +225,11 @@ namespace Unity.UIWidgets.painting {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return this.left.Equals(other.left)
                    && this.right.Equals(other.right)
                    && this.top.Equals(other.top)
@@ -235,12 +240,15 @@ namespace Unity.UIWidgets.painting {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((EdgeInsets) obj);
         }
 
@@ -266,9 +274,11 @@ namespace Unity.UIWidgets.painting {
             if (this.left == 0.0 && this.right == 0.0 && this.top == 0.0 && this.bottom == 0.0) {
                 return "EdgeInsets.zero";
             }
+
             if (this.left == this.right && this.right == this.top && this.top == this.bottom) {
                 return $"EdgeInsets.all({this.left:F1})";
             }
+
             return $"EdgeInsets({this.left:F1}, " +
                    $"{this.top:F1}, " +
                    $"{this.right:F1}, " +

@@ -91,7 +91,8 @@ namespace Unity.UIWidgets.widgets {
             properties.add(new DiagnosticsProperty<ViewportOffset>("offset", this.offset));
             if (this.center != null) {
                 properties.add(new DiagnosticsProperty<Key>("center", this.center));
-            } else if (this.children.isNotEmpty() && this.children.First().key != null) {
+            }
+            else if (this.children.isNotEmpty() && this.children.First().key != null) {
                 properties.add(new DiagnosticsProperty<Key>("center", this.children.First().key, tooltip: "implicit"));
             }
         }
@@ -124,9 +125,11 @@ namespace Unity.UIWidgets.widgets {
             if (this.widget.center != null) {
                 this.renderObject.center = (RenderSliver) this.children.Single(
                     element => element.widget.key == this.widget.center).renderObject;
-            } else if (this.children.Any()) {
+            }
+            else if (this.children.Any()) {
                 this.renderObject.center = (RenderSliver) this.children.First().renderObject;
-            } else {
+            }
+            else {
                 this.renderObject.center = null;
             }
         }

@@ -73,8 +73,10 @@ namespace Unity.UIWidgets.ui {
         }
 
         static double _linearizeColorComponent(double component) {
-            if (component <= 0.03928)
+            if (component <= 0.03928) {
                 return component / 12.92;
+            }
+
             return Math.Pow((component + 0.055) / 1.055, 2.4);
         }
 
@@ -199,9 +201,11 @@ namespace Unity.UIWidgets.ui {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return this.style == other.style && this.sigma.Equals(other.sigma);
         }
 
@@ -209,12 +213,15 @@ namespace Unity.UIWidgets.ui {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((MaskFilter) obj);
         }
 
@@ -256,9 +263,11 @@ namespace Unity.UIWidgets.ui {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return Equals(this.color, other.color) && this.blendMode == other.blendMode;
         }
 
@@ -266,12 +275,15 @@ namespace Unity.UIWidgets.ui {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((ColorFilter) obj);
         }
 

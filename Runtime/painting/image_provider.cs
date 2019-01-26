@@ -57,9 +57,11 @@ namespace Unity.UIWidgets.painting {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return Equals(this.bundle, other.bundle) && this.devicePixelRatio.Equals(other.devicePixelRatio) &&
                    Equals(this.locale, other.locale) && Equals(this.size, other.size) &&
                    this.platform == other.platform;
@@ -69,12 +71,15 @@ namespace Unity.UIWidgets.painting {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((ImageConfiguration) obj);
         }
 
@@ -220,9 +225,11 @@ namespace Unity.UIWidgets.painting {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return Equals(this.bundle, other.bundle) && string.Equals(this.name, other.name) &&
                    this.scale.Equals(other.scale);
         }
@@ -231,12 +238,15 @@ namespace Unity.UIWidgets.painting {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((AssetBundleImageKey) obj);
         }
 
@@ -290,15 +300,19 @@ namespace Unity.UIWidgets.painting {
 
                 if (result is Texture2D texture) {
                     return CodecUtils.getCodec(new Image(texture, isAsset: true, bundle: key.bundle));
-                } else if (result is TextAsset text) {
+                }
+                else if (result is TextAsset text) {
                     var bytes = text.bytes;
                     if (key.bundle == null) {
                         Resources.UnloadAsset(text);
-                    } else {
+                    }
+                    else {
                         key.bundle.Unload(text);
                     }
+
                     return CodecUtils.getCodec(bytes);
-                } else {
+                }
+                else {
                     throw new Exception($"Unknown type for asset \"{key.name}\": \"{result.GetType()}\"");
                 }
             });
@@ -309,7 +323,8 @@ namespace Unity.UIWidgets.painting {
                 ResourceRequest request = Resources.LoadAsync(key.name);
                 yield return request;
                 yield return request.asset;
-            } else {
+            }
+            else {
                 AssetBundleRequest request = key.bundle.LoadAssetAsync(key.name);
                 yield return request;
                 yield return request.asset;
@@ -406,9 +421,11 @@ namespace Unity.UIWidgets.painting {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return string.Equals(this.url, other.url) && this.scale.Equals(other.scale);
         }
 
@@ -416,12 +433,15 @@ namespace Unity.UIWidgets.painting {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((NetworkImage) obj);
         }
 
@@ -511,9 +531,11 @@ namespace Unity.UIWidgets.painting {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return string.Equals(this.file, other.file) && this.scale.Equals(other.scale);
         }
 
@@ -521,12 +543,15 @@ namespace Unity.UIWidgets.painting {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((FileImage) obj);
         }
 
@@ -580,9 +605,11 @@ namespace Unity.UIWidgets.painting {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return Equals(this.bytes, other.bytes) && this.scale.Equals(other.scale);
         }
 
@@ -590,12 +617,15 @@ namespace Unity.UIWidgets.painting {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((MemoryImage) obj);
         }
 
@@ -648,9 +678,11 @@ namespace Unity.UIWidgets.painting {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return string.Equals(this.assetName, other.assetName) && this.scale.Equals(other.scale) &&
                    Equals(this.bundle, other.bundle);
         }
@@ -659,12 +691,15 @@ namespace Unity.UIWidgets.painting {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((ExactAssetImage) obj);
         }
 

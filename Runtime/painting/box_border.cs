@@ -119,7 +119,7 @@ namespace Unity.UIWidgets.painting {
 
         public override ShapeBorder lerpFrom(ShapeBorder a, double t) {
             if (a is Border border) {
-                return Border.lerp(border, this, t);
+                return lerp(border, this, t);
             }
 
             return base.lerpFrom(a, t);
@@ -127,8 +127,9 @@ namespace Unity.UIWidgets.painting {
 
         public override ShapeBorder lerpTo(ShapeBorder b, double t) {
             if (b is Border border) {
-                return Border.lerp(this, border, t);
+                return lerp(this, border, t);
             }
+
             return base.lerpTo(b, t);
         }
 
@@ -136,9 +137,11 @@ namespace Unity.UIWidgets.painting {
             if (a == null && b == null) {
                 return null;
             }
+
             if (a == null) {
                 return (Border) b.scale(t);
             }
+
             if (b == null) {
                 return (Border) a.scale(1.0 - t);
             }
@@ -172,11 +175,14 @@ namespace Unity.UIWidgets.painting {
                             case BoxShape.rectangle:
                                 if (borderRadius != null) {
                                     _paintUniformBorderWithRadius(canvas, rect, this.top, borderRadius);
-                                } else {
+                                }
+                                else {
                                     _paintUniformBorderWithRectangle(canvas, rect, this.top);
                                 }
+
                                 break;
                         }
+
                         return;
                 }
             }
@@ -213,7 +219,8 @@ namespace Unity.UIWidgets.painting {
                 paint.style = PaintingStyle.stroke;
                 paint.strokeWidth = 0.0;
                 canvas.drawRRect(outer, paint);
-            } else {
+            }
+            else {
                 RRect inner = outer.deflate(width);
                 canvas.drawDRRect(outer, inner, paint);
             }
@@ -238,9 +245,11 @@ namespace Unity.UIWidgets.painting {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return Equals(this.top, other.top)
                    && Equals(this.right, other.right)
                    && Equals(this.bottom, other.bottom)
@@ -251,12 +260,15 @@ namespace Unity.UIWidgets.painting {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((Border) obj);
         }
 
@@ -279,12 +291,15 @@ namespace Unity.UIWidgets.painting {
             if (this.top != BorderSide.none) {
                 arguments.Add($"top: {this.top}");
             }
+
             if (this.right != BorderSide.none) {
                 arguments.Add($"right: {this.right}");
             }
+
             if (this.bottom != BorderSide.none) {
                 arguments.Add($"bottom: {this.bottom}");
             }
+
             if (this.left != BorderSide.none) {
                 arguments.Add($"left: {this.left}");
             }

@@ -29,9 +29,11 @@ namespace Unity.UIWidgets.ui {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return this.width.Equals(other.width);
         }
 
@@ -39,12 +41,15 @@ namespace Unity.UIWidgets.ui {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((ParagraphConstraints) obj);
         }
 
@@ -89,10 +94,12 @@ namespace Unity.UIWidgets.ui {
                 if (this.fontStyle == FontStyle.italic) {
                     if (this.fontWeight == FontWeight.w700) {
                         return UnityEngine.FontStyle.BoldAndItalic;
-                    } else {
+                    }
+                    else {
                         return UnityEngine.FontStyle.Italic;
                     }
-                } else if (this.fontWeight == FontWeight.w700) {
+                }
+                else if (this.fontWeight == FontWeight.w700) {
                     return UnityEngine.FontStyle.Bold;
                 }
 
@@ -108,9 +115,11 @@ namespace Unity.UIWidgets.ui {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return Equals(this.color, other.color) && this.fontSize.Equals(other.fontSize) &&
                    this.fontWeight == other.fontWeight && this.fontStyle == other.fontStyle &&
                    this.letterSpacing.Equals(other.letterSpacing) && this.wordSpacing.Equals(other.wordSpacing) &&
@@ -125,12 +134,15 @@ namespace Unity.UIWidgets.ui {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((TextStyle) obj);
         }
 
@@ -210,9 +222,11 @@ namespace Unity.UIWidgets.ui {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return this.textAlign == other.textAlign && this.textDirection == other.textDirection &&
                    this.fontWeight == other.fontWeight && this.fontStyle == other.fontStyle &&
                    this.maxLines == other.maxLines && this.fontSize.Equals(other.fontSize) &&
@@ -224,12 +238,15 @@ namespace Unity.UIWidgets.ui {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((ParagraphStyle) obj);
         }
 
@@ -291,9 +308,11 @@ namespace Unity.UIWidgets.ui {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return this.mask == other.mask;
         }
 
@@ -301,12 +320,15 @@ namespace Unity.UIWidgets.ui {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((TextDecoration) obj);
         }
 
@@ -374,9 +396,11 @@ namespace Unity.UIWidgets.ui {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return this.offset == other.offset && this.affinity == other.affinity;
         }
 
@@ -384,12 +408,15 @@ namespace Unity.UIWidgets.ui {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((TextPosition) obj);
         }
 
@@ -447,9 +474,11 @@ namespace Unity.UIWidgets.ui {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return this.left.Equals(other.left) && this.top.Equals(other.top) && this.right.Equals(other.right) &&
                    this.bottom.Equals(other.bottom) && this.direction == other.direction;
         }
@@ -458,12 +487,15 @@ namespace Unity.UIWidgets.ui {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((TextBox) obj);
         }
 

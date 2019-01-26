@@ -161,9 +161,11 @@ namespace Unity.UIWidgets.widgets {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return Equals(this.size, other.size) && this.devicePixelRatio.Equals(other.devicePixelRatio) &&
                    this.textScaleFactor.Equals(other.textScaleFactor) &&
                    Equals(this.viewInsets, other.viewInsets) &&
@@ -177,12 +179,15 @@ namespace Unity.UIWidgets.widgets {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((MediaQueryData) obj);
         }
 

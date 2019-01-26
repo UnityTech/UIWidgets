@@ -15,6 +15,7 @@ namespace Unity.UIWidgets.widgets {
                 if (this._manager != null) {
                     node = this._manager._currentFocus;
                 }
+
                 return node == this;
             }
         }
@@ -32,6 +33,7 @@ namespace Unity.UIWidgets.widgets {
             if (this._parent != null) {
                 this._parent._resignFocus(this);
             }
+
             D.assert(this._parent == null);
             D.assert(this._manager == null);
         }
@@ -44,6 +46,7 @@ namespace Unity.UIWidgets.widgets {
             if (this._parent != null) {
                 this._parent._resignFocus(this);
             }
+
             D.assert(this._parent == null);
             D.assert(this._manager == null);
             base.dispose();
@@ -87,6 +90,7 @@ namespace Unity.UIWidgets.widgets {
                 while (node._parent != null) {
                     node = node._parent;
                 }
+
                 D.assert(node != child);
                 return true;
             });
@@ -95,6 +99,7 @@ namespace Unity.UIWidgets.widgets {
             if (this._firstChild != null) {
                 this._firstChild._previousSibling = child;
             }
+
             this._firstChild = child;
             this._lastChild = this._lastChild ?? child;
             child._updateManager(this._manager);
@@ -106,6 +111,7 @@ namespace Unity.UIWidgets.widgets {
                 if (child._manager == manager) {
                     return;
                 }
+
                 child._manager = manager;
                 // We don't proactively null out the manager for FocusNodes because the
                 // manager holds the currently active focus node until the end of the
@@ -113,6 +119,7 @@ namespace Unity.UIWidgets.widgets {
                 if (manager != null && child._focus != null) {
                     child._focus._manager = manager;
                 }
+
                 child._visitChildren(update);
             };
             update(this);
@@ -152,14 +159,16 @@ namespace Unity.UIWidgets.widgets {
             if (child._previousSibling == null) {
                 D.assert(this._firstChild == child);
                 this._firstChild = child._nextSibling;
-            } else {
+            }
+            else {
                 child._previousSibling._nextSibling = child._nextSibling;
             }
 
             if (child._nextSibling == null) {
                 D.assert(this._lastChild == child);
                 this._lastChild = child._previousSibling;
-            } else {
+            }
+            else {
                 child._nextSibling._previousSibling = child._previousSibling;
             }
 
@@ -202,6 +211,7 @@ namespace Unity.UIWidgets.widgets {
             if (node._parent == null || node._parent == this) {
                 return;
             }
+
             node.unfocus();
             D.assert(node._parent == null);
             if (this._focus == null) {
@@ -238,6 +248,7 @@ namespace Unity.UIWidgets.widgets {
             if (this._firstChild == child) {
                 return;
             }
+
             child.detach();
             this._prepend(child);
             D.assert(child._parent == this);
@@ -249,9 +260,11 @@ namespace Unity.UIWidgets.widgets {
             if (child._parent == null || child._parent == this) {
                 return;
             }
+
             if (child.isFirstFocus) {
                 this.setFirstFocus(child);
-            } else {
+            }
+            else {
                 child.detach();
             }
         }
@@ -261,6 +274,7 @@ namespace Unity.UIWidgets.widgets {
             if (this._parent != null) {
                 this._parent._remove(this);
             }
+
             D.assert(this._parent == null);
         }
 
@@ -281,10 +295,12 @@ namespace Unity.UIWidgets.widgets {
                     if (child == this._lastChild) {
                         break;
                     }
+
                     child = child._nextSibling;
                     count += 1;
                 }
             }
+
             return children;
         }
     }
@@ -327,6 +343,7 @@ namespace Unity.UIWidgets.widgets {
             while (scope._firstChild != null) {
                 scope = scope._firstChild;
             }
+
             return scope._focus;
         }
 
@@ -336,6 +353,7 @@ namespace Unity.UIWidgets.widgets {
             if (this._currentFocus == nextFocus) {
                 return;
             }
+
             var previousFocus = this._currentFocus;
             this._currentFocus = nextFocus;
             if (previousFocus != null) {

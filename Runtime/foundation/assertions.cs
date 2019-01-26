@@ -59,7 +59,8 @@ namespace Unity.UIWidgets.foundation {
                     if (this.context.isNotEmpty()) {
                         buffer.Append(", ");
                     }
-                } else {
+                }
+                else {
                     buffer.Append("Exception ");
                 }
 
@@ -68,7 +69,8 @@ namespace Unity.UIWidgets.foundation {
                 }
 
                 buffer.Append(". ");
-            } else {
+            }
+            else {
                 buffer.Append("An error was caught. ");
             }
 
@@ -81,7 +83,8 @@ namespace Unity.UIWidgets.foundation {
                 IEnumerable<string> stackLines = this.exception.StackTrace.TrimEnd().Split('\n');
                 if (this.stackFilter != null) {
                     stackLines = this.stackFilter(stackLines);
-                } else {
+                }
+                else {
                     stackLines = UIWidgetsError.defaultStackFilter(stackLines);
                 }
 
@@ -122,7 +125,8 @@ namespace Unity.UIWidgets.foundation {
 
             if (_errorCount == 0 || forceReport) {
                 Debug.LogError(details.ToString());
-            } else {
+            }
+            else {
                 Debug.LogWarning("Another exception was thrown: " + details);
             }
 

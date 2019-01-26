@@ -32,9 +32,11 @@ namespace Unity.UIWidgets.widgets {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return this.keys.SequenceEqual(other.keys);
         }
 
@@ -42,12 +44,15 @@ namespace Unity.UIWidgets.widgets {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((_StorageEntryIdentifier) obj);
         }
 
@@ -103,7 +108,8 @@ namespace Unity.UIWidgets.widgets {
             this._storage = this._storage ?? new Dictionary<object, object>();
             if (identifier != null) {
                 this._storage[identifier] = data;
-            } else {
+            }
+            else {
                 _StorageEntryIdentifier contextIdentifier = this._computeIdentifier(context);
                 if (contextIdentifier.isNotEmpty) {
                     this._storage[contextIdentifier] = data;

@@ -53,7 +53,8 @@ namespace Unity.UIWidgets.rendering {
                     var childParentData = (BoxParentData) this.child.parentData;
                     result += childParentData.offset.dy;
                 }
-            } else {
+            }
+            else {
                 result = base.computeDistanceToActualBaseline(baseline);
             }
 
@@ -264,7 +265,8 @@ namespace Unity.UIWidgets.rendering {
                     shrinkWrapWidth ? this.child.size.width * (this._widthFactor ?? 1.0) : double.PositiveInfinity,
                     shrinkWrapHeight ? this.child.size.height * (this._heightFactor ?? 1.0) : double.PositiveInfinity));
                 this.alignChild();
-            } else {
+            }
+            else {
                 this.size = this.constraints.constrain(new Size(
                     shrinkWrapWidth ? 0.0 : double.PositiveInfinity,
                     shrinkWrapHeight ? 0.0 : double.PositiveInfinity));
@@ -319,7 +321,8 @@ namespace Unity.UIWidgets.rendering {
 //                ..relativeLineTo(0.0, headSize);
 //              context.canvas.drawPath(path, paint);
 //            }
-                } else {
+                }
+                else {
 //        paint = Paint()
 //          ..color = const Color(0x90909090);
 //        context.canvas.drawRect(offset & size, paint);
@@ -475,7 +478,8 @@ namespace Unity.UIWidgets.rendering {
                                 minHeight: this.constraints.minHeight);
                             break;
                     }
-                } else {
+                }
+                else {
                     childConstraints = new BoxConstraints();
                 }
 
@@ -485,7 +489,8 @@ namespace Unity.UIWidgets.rendering {
                 var childParentData = (BoxParentData) this.child.parentData;
                 this._overflowContainerRect = Offset.zero & this.size;
                 this._overflowChildRect = childParentData.offset & this.child.size;
-            } else {
+            }
+            else {
                 this.size = this.constraints.smallest;
                 this._overflowContainerRect = Rect.zero;
                 this._overflowChildRect = Rect.zero;
@@ -633,7 +638,8 @@ namespace Unity.UIWidgets.rendering {
             double result;
             if (this.child == null) {
                 result = base.computeMinIntrinsicWidth(height);
-            } else {
+            }
+            else {
                 result = this.child.getMinIntrinsicWidth(height * (this._heightFactor ?? 1.0));
             }
 
@@ -644,7 +650,8 @@ namespace Unity.UIWidgets.rendering {
             double result;
             if (this.child == null) {
                 result = base.computeMaxIntrinsicWidth(height);
-            } else {
+            }
+            else {
                 result = this.child.getMaxIntrinsicWidth(height * (this._heightFactor ?? 1.0));
             }
 
@@ -655,7 +662,8 @@ namespace Unity.UIWidgets.rendering {
             double result;
             if (this.child == null) {
                 result = base.computeMinIntrinsicHeight(width);
-            } else {
+            }
+            else {
                 result = this.child.getMinIntrinsicHeight(width * (this._widthFactor ?? 1.0));
             }
 
@@ -666,7 +674,8 @@ namespace Unity.UIWidgets.rendering {
             double result;
             if (this.child == null) {
                 result = base.computeMaxIntrinsicHeight(width);
-            } else {
+            }
+            else {
                 result = this.child.getMaxIntrinsicHeight(width * (this._widthFactor ?? 1.0));
             }
 
@@ -678,7 +687,8 @@ namespace Unity.UIWidgets.rendering {
                 this.child.layout(this._getInnerConstraints(this.constraints), parentUsesSize: true);
                 this.size = this.constraints.constrain(this.child.size);
                 this.alignChild();
-            } else {
+            }
+            else {
                 this.size = this.constraints.constrain(
                     this._getInnerConstraints(this.constraints).constrain(Size.zero));
             }
@@ -692,11 +702,17 @@ namespace Unity.UIWidgets.rendering {
 
         public readonly Listenable _relayout;
 
-        public virtual Size getSize(BoxConstraints constraints) => constraints.biggest;
+        public virtual Size getSize(BoxConstraints constraints) {
+            return constraints.biggest;
+        }
 
-        public virtual BoxConstraints getConstraintsForChild(BoxConstraints constraints) => constraints;
+        public virtual BoxConstraints getConstraintsForChild(BoxConstraints constraints) {
+            return constraints;
+        }
 
-        public virtual Offset getPositionForChild(Size size, Size childSize) => Offset.zero;
+        public virtual Offset getPositionForChild(Size size, Size childSize) {
+            return Offset.zero;
+        }
 
         public abstract bool shouldRelayout(SingleChildLayoutDelegate oldDelegate);
     }
@@ -709,14 +725,19 @@ namespace Unity.UIWidgets.rendering {
         }
 
         public SingleChildLayoutDelegate layoutDelegate {
-            get => this._delegate;
+            get { return this._delegate; }
             set {
                 var newDelegate = value;
                 D.assert(newDelegate != null);
-                if (this._delegate == newDelegate)
+                if (this._delegate == newDelegate) {
                     return;
+                }
+
                 SingleChildLayoutDelegate oldDelegate = this._delegate;
-                if (newDelegate.GetType() != oldDelegate.GetType() || newDelegate.shouldRelayout(oldDelegate)) this.markNeedsLayout();
+                if (newDelegate.GetType() != oldDelegate.GetType() || newDelegate.shouldRelayout(oldDelegate)) {
+                    this.markNeedsLayout();
+                }
+
                 this._delegate = newDelegate;
                 if (this.attached) {
                     oldDelegate?._relayout?.removeListener(this.markNeedsLayout);
@@ -744,29 +765,37 @@ namespace Unity.UIWidgets.rendering {
 
         protected override double computeMinIntrinsicWidth(double height) {
             double width = this._getSize(BoxConstraints.tightForFinite(height: height)).width;
-            if (width.isFinite())
+            if (width.isFinite()) {
                 return width;
+            }
+
             return 0.0;
         }
 
         protected override double computeMaxIntrinsicWidth(double height) {
             double width = this._getSize(BoxConstraints.tightForFinite(height: height)).width;
-            if (width.isFinite())
+            if (width.isFinite()) {
                 return width;
+            }
+
             return 0.0;
         }
 
         protected override double computeMinIntrinsicHeight(double width) {
             double height = this._getSize(BoxConstraints.tightForFinite(width: width)).height;
-            if (height.isFinite())
+            if (height.isFinite()) {
                 return height;
+            }
+
             return 0.0;
         }
 
         protected override double computeMaxIntrinsicHeight(double width) {
             double height = this._getSize(BoxConstraints.tightForFinite(width: width)).height;
-            if (height.isFinite())
+            if (height.isFinite()) {
                 return height;
+            }
+
             return 0.0;
         }
 
@@ -776,13 +805,13 @@ namespace Unity.UIWidgets.rendering {
                 BoxConstraints childConstraints = this.layoutDelegate.getConstraintsForChild(this.constraints);
                 D.assert(childConstraints.debugAssertIsValid(isAppliedConstraint: true));
                 this.child.layout(childConstraints, parentUsesSize: !childConstraints.isTight);
-                BoxParentData childParentData = (BoxParentData)this.child.parentData;
+                BoxParentData childParentData = (BoxParentData) this.child.parentData;
                 childParentData.offset = this.layoutDelegate.getPositionForChild(this.size,
                     childConstraints.isTight ? childConstraints.smallest : this.child.size);
             }
         }
     }
-    
+
     public class RenderBaseline : RenderShiftedBox {
         public RenderBaseline(
             RenderBox child = null,
@@ -832,7 +861,8 @@ namespace Unity.UIWidgets.rendering {
                 childParentData.offset = new Offset(0.0, top);
                 Size childSize = this.child.size;
                 this.size = this.constraints.constrain(new Size(childSize.width, top + childSize.height));
-            } else {
+            }
+            else {
                 this.performResize();
             }
         }

@@ -4,8 +4,8 @@ using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
-using Unity.UIWidgets.utils;
 using Unity.UIWidgets.ui;
+using Unity.UIWidgets.utils;
 
 namespace Unity.UIWidgets.widgets {
     public delegate bool DragTargetWillAccept<T>(T data);
@@ -50,8 +50,10 @@ namespace Unity.UIWidgets.widgets {
             this.data = data;
             this.axis = axis;
             this.childWhenDragging = childWhenDragging;
-            if (feedbackOffset == null)
+            if (feedbackOffset == null) {
                 feedbackOffset = Offset.zero;
+            }
+
             this.feedbackOffset = feedbackOffset;
             this.dragAnchor = dragAnchor;
             this.affinity = affinity;
@@ -138,7 +140,6 @@ namespace Unity.UIWidgets.widgets {
             onDragEnd: onDragEnd,
             onDragCompleted: onDragCompleted
         ) {
-            
         }
 
         public override GestureRecognizer createRecognizer(GestureMultiDragStartCallback onStart) {
@@ -166,8 +167,10 @@ namespace Unity.UIWidgets.widgets {
         int _activeCount;
 
         void _disposeRecognizerIfInactive() {
-            if (this._activeCount > 0)
+            if (this._activeCount > 0) {
                 return;
+            }
+
             this._recognizer.dispose();
             this._recognizer = null;
         }
@@ -175,17 +178,21 @@ namespace Unity.UIWidgets.widgets {
 
         void _routePointer(PointerEvent pEvent) {
             if (this.widget.maxSimultaneousDrags != null &&
-                this._activeCount >= this.widget.maxSimultaneousDrags)
+                this._activeCount >= this.widget.maxSimultaneousDrags) {
                 return;
+            }
 
-            if (pEvent is PointerDownEvent)
+            if (pEvent is PointerDownEvent) {
                 this._recognizer.addPointer((PointerDownEvent) pEvent);
+            }
         }
 
         _DragAvatar<T> _startDrag(Offset position) {
             if (this.widget.maxSimultaneousDrags != null &&
-                this._activeCount >= this.widget.maxSimultaneousDrags)
+                this._activeCount >= this.widget.maxSimultaneousDrags) {
                 return null;
+            }
+
             var dragStartPoint = Offset.zero;
             switch (this.widget.dragAnchor) {
                 case DragAnchor.child:
@@ -216,21 +223,27 @@ namespace Unity.UIWidgets.widgets {
                         this._disposeRecognizerIfInactive();
                     }
 
-                    if (this.mounted && this.widget.onDragEnd != null)
+                    if (this.mounted && this.widget.onDragEnd != null) {
                         this.widget.onDragEnd(new DraggableDetails(
                             wasAccepted: wasAccepted,
                             velocity: velocity,
                             offset: offset
                         ));
+                    }
 
-                    if (wasAccepted && this.widget.onDragCompleted != null)
+                    if (wasAccepted && this.widget.onDragCompleted != null) {
                         this.widget.onDragCompleted();
-                    if (!wasAccepted && this.widget.onDraggableCanceled != null)
+                    }
+
+                    if (!wasAccepted && this.widget.onDraggableCanceled != null) {
                         this.widget.onDraggableCanceled(velocity, offset);
+                    }
                 }
             );
-            if (this.widget.onDragStarted != null)
+            if (this.widget.onDragStarted != null) {
                 this.widget.onDragStarted();
+            }
+
             return avatar;
         }
 
@@ -240,11 +253,13 @@ namespace Unity.UIWidgets.widgets {
                            this._activeCount < this.widget.maxSimultaneousDrags;
 
             bool showChild = this._activeCount == 0 || this.widget.childWhenDragging == null;
-            if (canDrag)
+            if (canDrag) {
                 return new Listener(
                     onPointerDown: this._routePointer,
                     child: showChild ? this.widget.child : this.widget.childWhenDragging
                 );
+            }
+
             return new Listener(
                 child: showChild ? this.widget.child : this.widget.childWhenDragging);
         }
@@ -319,23 +334,29 @@ namespace Unity.UIWidgets.widgets {
 
         public void didLeave(_DragAvatar<T> avatar) {
             D.assert(this._candidateAvatars.Contains(avatar) || this._rejectedAvatars.Contains(avatar));
-            if (!this.mounted)
+            if (!this.mounted) {
                 return;
+            }
+
             this.setState(() => {
                 this._candidateAvatars.Remove(avatar);
                 this._rejectedAvatars.Remove(avatar);
             });
-            if (this.widget.onLeave != null)
+            if (this.widget.onLeave != null) {
                 this.widget.onLeave(avatar.data);
+            }
         }
 
         public void didDrop(_DragAvatar<T> avatar) {
             D.assert(this._candidateAvatars.Contains(avatar));
-            if (!this.mounted)
+            if (!this.mounted) {
                 return;
+            }
+
             this.setState(() => { this._candidateAvatars.Remove(avatar); });
-            if (this.widget.onAccept != null)
+            if (this.widget.onAccept != null) {
                 this.widget.onAccept(avatar.data);
+            }
         }
 
         public override Widget build(BuildContext context) {
@@ -368,12 +389,17 @@ namespace Unity.UIWidgets.widgets {
             Offset feedbackOffset = null,
             _OnDragEnd onDragEnd = null
         ) {
-            if (initialPosition == null)
+            if (initialPosition == null) {
                 initialPosition = Offset.zero;
-            if (dragStartPoint == null)
+            }
+
+            if (dragStartPoint == null) {
                 dragStartPoint = Offset.zero;
-            if (feedbackOffset == null)
+            }
+
+            if (feedbackOffset == null) {
                 feedbackOffset = Offset.zero;
+            }
 
             D.assert(overlayState != null);
             this.overlayState = overlayState;
@@ -410,9 +436,9 @@ namespace Unity.UIWidgets.widgets {
         readonly List<_DragTargetState<T>> _enteredTargets = new List<_DragTargetState<T>>();
 
         Offset _position;
-        
+
         Offset _lastOffset;
-        
+
         OverlayEntry _entry;
 
         public void update(DragUpdateDetails details) {
@@ -450,8 +476,9 @@ namespace Unity.UIWidgets.widgets {
                 }
             }
 
-            if (listsMatch)
+            if (listsMatch) {
                 return;
+            }
 
             this._leaveAllEntered();
 
@@ -470,19 +497,23 @@ namespace Unity.UIWidgets.widgets {
         List<_DragTargetState<T>> _getDragTargets(List<HitTestEntry> path) {
             List<_DragTargetState<T>> ret = new List<_DragTargetState<T>>();
 
-            foreach (HitTestEntry entry in path)
+            foreach (HitTestEntry entry in path) {
                 if (entry.target is RenderMetaData) {
                     RenderMetaData renderMetaData = (RenderMetaData) entry.target;
-                    if (renderMetaData.metaData is _DragTargetState<T>)
+                    if (renderMetaData.metaData is _DragTargetState<T>) {
                         ret.Add((_DragTargetState<T>) renderMetaData.metaData);
+                    }
                 }
+            }
 
             return ret;
         }
 
         void _leaveAllEntered() {
-            for (int i = 0; i < this._enteredTargets.Count; i++)
+            for (int i = 0; i < this._enteredTargets.Count; i++) {
                 this._enteredTargets[i].didLeave(this);
+            }
+
             this._enteredTargets.Clear();
         }
 
@@ -499,8 +530,9 @@ namespace Unity.UIWidgets.widgets {
             this._entry.remove();
             this._entry = null;
 
-            if (this.onDragEnd != null)
+            if (this.onDragEnd != null) {
                 this.onDragEnd(velocity == null ? Velocity.zero : velocity, this._lastOffset, wasAccepted);
+            }
         }
 
         public Widget _build(BuildContext context) {

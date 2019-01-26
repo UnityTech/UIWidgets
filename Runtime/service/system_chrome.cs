@@ -92,7 +92,9 @@ namespace Unity.UIWidgets.service {
             };
         }
 
-        public string toString() => this._toMap().ToString();
+        public string toString() {
+            return this._toMap().ToString();
+        }
 
         public SystemUiOverlayStyle copyWith(
             Color systemNavigationBarColor = null,

@@ -114,7 +114,7 @@ namespace Unity.UIWidgets.editor {
         public MeshPool getMeshPool() {
             return this._meshPool;
         }
-        
+
         public void Dispose() {
             if (this._surface != null) {
                 this._surface.Dispose();
@@ -142,10 +142,12 @@ namespace Unity.UIWidgets.editor {
             if (this._drawToTargetFunc == null) {
                 Graphics.DrawTexture(screenRect, this._surface.getRenderTexture(),
                     _getGUITextureMat());
-            } else {
+            }
+            else {
                 this._drawToTargetFunc(screenRect, this._surface.getRenderTexture(),
                     _getUIDefaultMat());
             }
+
             return true;
         }
 

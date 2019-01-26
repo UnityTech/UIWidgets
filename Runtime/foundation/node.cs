@@ -68,7 +68,8 @@ namespace Unity.UIWidgets.foundation {
                     if (!_sequenceEquals((IList) item1, (IList) item2)) {
                         return false;
                     }
-                } else {
+                }
+                else {
                     if (!Equals(item1, item2)) {
                         return false;
                     }
@@ -82,9 +83,11 @@ namespace Unity.UIWidgets.foundation {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return this._type == other._type && _sequenceEquals(this._list, other._list);
         }
 
@@ -92,12 +95,15 @@ namespace Unity.UIWidgets.foundation {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((_DependencyList) obj);
         }
 
@@ -112,7 +118,8 @@ namespace Unity.UIWidgets.foundation {
                     var item = list[i];
                     if (item is IList) {
                         hashCode = (hashCode * 397) ^ _sequenceHashCode((IList) item);
-                    } else {
+                    }
+                    else {
                         hashCode = (hashCode * 397) ^ (item == null ? 0 : item.GetHashCode());
                     }
                 }

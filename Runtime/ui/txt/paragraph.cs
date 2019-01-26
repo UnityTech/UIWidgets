@@ -64,6 +64,7 @@ namespace Unity.UIWidgets.ui {
             if (font.GetCharacterInfo('x', out charInfo, fontSize)) {
                 fxHeight = charInfo.glyphHeight;
             }
+
             return new FontMetrics(ascent, descent, fxHeight: fxHeight);
         }
     }
@@ -93,6 +94,7 @@ namespace Unity.UIWidgets.ui {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             return obj is IndexRange && this.Equals((IndexRange) obj);
         }
 
@@ -137,6 +139,7 @@ namespace Unity.UIWidgets.ui {
                 if (ReferenceEquals(null, obj)) {
                     return false;
                 }
+
                 return obj is Range<T> && this.Equals((Range<T>) obj);
             }
 
@@ -286,7 +289,8 @@ namespace Unity.UIWidgets.ui {
                 if (this._paragraphStyle.TextAlign == TextAlign.justify && !this._lineRanges[lineNumber].hardBreak
                                                                         && lineNumber != lineLimits - 1) {
                     this.justifyLine(lineNumber, words);
-                } else if (line.endExcludingWhitespace > line.start) {
+                }
+                else if (line.endExcludingWhitespace > line.start) {
                     Debug.Assert(!isLineEndSpace(this._text[line.endExcludingWhitespace - 1]));
                     var lineTotalAdvance = this._characterPositions[line.endExcludingWhitespace - 1].x +
                                            this._characterWidths[line.endExcludingWhitespace - 1];
@@ -378,6 +382,7 @@ namespace Unity.UIWidgets.ui {
             if (this._text.Length == 0 || this._text[this._text.Length - 1] != '\n') {
                 return null;
             }
+
             var lineNumber = this.getLineCount() - 1;
             var top = (lineNumber > 0) ? this._lineHeights[lineNumber - 1] : 0;
             var bottom = this._lineHeights[lineNumber];
@@ -423,7 +428,8 @@ namespace Unity.UIWidgets.ui {
             if ((direction == TextDirection.ltr && dx < glyphCenter) ||
                 (direction == TextDirection.rtl && dx >= glyphCenter)) {
                 return new PositionWithAffinity(index, TextAffinity.downstream);
-            } else {
+            }
+            else {
                 return new PositionWithAffinity(index + 1, TextAffinity.upstream);
             }
         }
@@ -486,7 +492,8 @@ namespace Unity.UIWidgets.ui {
             if (this._paragraphStyle.maxLines == 1 || (((this._paragraphStyle.maxLines ?? 0) == 0) &&
                                                        !string.IsNullOrEmpty(this._paragraphStyle.ellipsis))) {
                 this._minIntrinsicWidth = this._maxIntrinsicWidth;
-            } else {
+            }
+            else {
                 this._minIntrinsicWidth = Math.Min(maxWordWidth, this._maxIntrinsicWidth);
             }
         }
@@ -533,6 +540,7 @@ namespace Unity.UIWidgets.ui {
                         if (metrics.ascent > maxAscent) {
                             maxAscent = metrics.ascent;
                         }
+
                         if (metrics.descent > maxDescent) {
                             maxDescent = metrics.descent;
                         }
@@ -563,7 +571,8 @@ namespace Unity.UIWidgets.ui {
 
                     if (run.end < line.end) {
                         runIndex++;
-                    } else {
+                    }
+                    else {
                         break;
                     }
                 }
@@ -577,6 +586,7 @@ namespace Unity.UIWidgets.ui {
                 foreach (var record in linePaintRecords) {
                     record.offset = new Offset(record.offset.dx, yOffset);
                 }
+
                 this._paintRecords.AddRange(linePaintRecords);
 
                 for (var charIndex = line.start; charIndex < line.end; charIndex++) {
@@ -598,6 +608,7 @@ namespace Unity.UIWidgets.ui {
                     newLinePositions.Add(i);
                 }
             }
+
             newLinePositions.Add(this._text.Length);
 
             var lineBreaker = new LineBreaker();
@@ -642,9 +653,11 @@ namespace Unity.UIWidgets.ui {
             var align = this._paragraphStyle.TextAlign;
             if (align == TextAlign.right) {
                 return this._width - lineTotalAdvance;
-            } else if (align == TextAlign.center) {
+            }
+            else if (align == TextAlign.center) {
                 return Utils.PixelCorrectRound((this._width - lineTotalAdvance) / 2);
-            } else {
+            }
+            else {
                 return 0;
             }
         }
@@ -677,11 +690,13 @@ namespace Unity.UIWidgets.ui {
                 if (!inWord && !isSpace) {
                     wordStart = i;
                     inWord = true;
-                } else if (inWord && isSpace) {
+                }
+                else if (inWord && isSpace) {
                     words.Add(new Range<int>(wordStart, i));
                     inWord = false;
                 }
             }
+
             if (inWord) {
                 words.Add(new Range<int>(wordStart, end));
             }
@@ -697,7 +712,8 @@ namespace Unity.UIWidgets.ui {
             var paint = new Paint();
             if (record.style.decorationColor == null) {
                 paint.color = record.style.color;
-            } else {
+            }
+            else {
                 paint.color = record.style.decorationColor;
             }
 

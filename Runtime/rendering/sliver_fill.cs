@@ -15,24 +15,28 @@ namespace Unity.UIWidgets.rendering {
         }
 
         public override double itemExtent {
-            get => this.constraints.viewportMainAxisExtent * this.viewportFraction;
-            set {}
+            get { return this.constraints.viewportMainAxisExtent * this.viewportFraction; }
+            set { }
         }
 
         double _viewportFraction;
 
         public double viewportFraction {
-            get => this._viewportFraction;
+            get { return this._viewportFraction; }
             set {
-                if (this._viewportFraction == value)
+                if (this._viewportFraction == value) {
                     return;
+                }
+
                 this._viewportFraction = value;
                 this.markNeedsLayout();
             }
         }
 
 
-        double _padding => (1.0 - this.viewportFraction) * this.constraints.viewportMainAxisExtent * 0.5;
+        double _padding {
+            get { return (1.0 - this.viewportFraction) * this.constraints.viewportMainAxisExtent * 0.5; }
+        }
 
         protected override double indexToLayoutOffset(double itemExtent, int index) {
             return this._padding + base.indexToLayoutOffset(itemExtent, index);
@@ -71,9 +75,11 @@ namespace Unity.UIWidgets.rendering {
 
         protected override void performLayout() {
             double extent = this.constraints.remainingPaintExtent - Math.Min(this.constraints.overlap, 0.0);
-            if (this.child != null)
+            if (this.child != null) {
                 this.child.layout(this.constraints.asBoxConstraints(minExtent: extent, maxExtent: extent),
                     parentUsesSize: true);
+            }
+
             double paintedChildSize = this.calculatePaintOffset(this.constraints, from: 0.0, to: extent);
             Debug.Log("size" + paintedChildSize);
             D.assert(paintedChildSize.isFinite());
@@ -85,7 +91,9 @@ namespace Unity.UIWidgets.rendering {
                 hasVisualOverflow: extent > this.constraints.remainingPaintExtent ||
                                    this.constraints.scrollOffset > 0.0
             );
-            if (this.child != null) this.setChildParentData(this.child, this.constraints, this.geometry);
+            if (this.child != null) {
+                this.setChildParentData(this.child, this.constraints, this.geometry);
+            }
         }
     }
 }

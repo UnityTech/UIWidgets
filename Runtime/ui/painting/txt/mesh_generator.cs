@@ -26,9 +26,11 @@ namespace Unity.UIWidgets.ui {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return string.Equals(this.text, other.text) && this.fontId == other.fontId &&
                    this.textureVersion == other.textureVersion && this.fontSizeToLoad == other.fontSizeToLoad &&
                    this.fontStyle == other.fontStyle && this.scale.Equals(other.scale);
@@ -38,12 +40,15 @@ namespace Unity.UIWidgets.ui {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((MeshKey) obj);
         }
 
@@ -131,7 +136,7 @@ namespace Unity.UIWidgets.ui {
             var fontSizeToLoad = Mathf.CeilToInt(style.UnityFontSize * scale);
             var subText = textBlob.text.Substring(textBlob.start, textBlob.end - textBlob.start);
             font.RequestCharactersInTexture(subText, fontSizeToLoad, style.UnityFontStyle);
-            
+
             var key = new MeshKey(subText, font.GetInstanceID(), fontInfo.textureVersion, fontSizeToLoad,
                 style.UnityFontStyle, scale);
 
@@ -180,10 +185,10 @@ namespace Unity.UIWidgets.ui {
                 uv.Add(charInfo.uvBottomLeft);
             }
 
-             
+
             MeshMesh mesh = new MeshMesh(vertices, triangles, uv);
             _meshes[key] = new MeshInfo(key, mesh);
-            
+
             return mesh;
         }
     }

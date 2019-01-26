@@ -33,7 +33,8 @@ namespace Unity.UIWidgets.foundation {
             if (this._isDirty) {
                 if (this._set == null) {
                     this._set = new HashSet<T>(this._list);
-                } else {
+                }
+                else {
                     this._set.Clear();
                     this._set.UnionWith(this._list);
                 }

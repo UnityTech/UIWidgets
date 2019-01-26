@@ -33,7 +33,8 @@ namespace Unity.UIWidgets.ui {
                 var maxy = Mathf.Max(vertices[0].y, vertices[1].y, vertices[2].y, vertices[3].y);
                 this.isRect = true;
                 this.rect = Rect.fromLTRB(minx, miny, maxx, maxy);
-            } else {
+            }
+            else {
                 this.isRect = false;
                 this.rect = null;
             }
@@ -60,7 +61,8 @@ namespace Unity.UIWidgets.ui {
                 if (prior == null || prior.isIntersectionOfRects()) {
                     this._isIntersectionOfRects = true;
                 }
-            } else {
+            }
+            else {
                 this._bound = this.mesh.bounds;
             }
 

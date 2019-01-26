@@ -11,7 +11,9 @@ namespace Unity.UIWidgets.painting {
 
         protected readonly Dictionary<T, Color> _swatch;
 
-        public Color this[T index] => this._swatch[index];
+        public Color this[T index] {
+            get { return this._swatch[index]; }
+        }
 
 
         public bool Equals(ColorSwatch<T> other) {
@@ -58,6 +60,8 @@ namespace Unity.UIWidgets.painting {
             }
         }
 
-        public override string ToString() => this.GetType() + "(primary value: " + base.ToString() + ")";
+        public override string ToString() {
+            return this.GetType() + "(primary value: " + base.ToString() + ")";
+        }
     }
 }

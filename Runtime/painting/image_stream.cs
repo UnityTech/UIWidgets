@@ -23,9 +23,11 @@ namespace Unity.UIWidgets.painting {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return Equals(this.image, other.image) && this.scale.Equals(other.scale);
         }
 
@@ -33,12 +35,15 @@ namespace Unity.UIWidgets.painting {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((ImageInfo) obj);
         }
 
@@ -160,7 +165,8 @@ namespace Unity.UIWidgets.painting {
             if (this.currentImage != null) {
                 try {
                     listener(this.currentImage, true);
-                } catch (Exception ex) {
+                }
+                catch (Exception ex) {
                     this.reportError(
                         context: "by a synchronously-called image listener",
                         exception: ex
@@ -171,7 +177,8 @@ namespace Unity.UIWidgets.painting {
             if (this.currentError != null && onError != null) {
                 try {
                     onError(this.currentError.exception);
-                } catch (Exception ex) {
+                }
+                catch (Exception ex) {
                     UIWidgetsError.reportError(
                         new UIWidgetsErrorDetails(
                             exception: ex,
@@ -202,7 +209,8 @@ namespace Unity.UIWidgets.painting {
             foreach (var listener in localListeners) {
                 try {
                     listener(image, false);
-                } catch (Exception ex) {
+                }
+                catch (Exception ex) {
                     this.reportError(
                         context: "by an image listener",
                         exception: ex
@@ -228,11 +236,13 @@ namespace Unity.UIWidgets.painting {
 
             if (localErrorListeners.isEmpty()) {
                 UIWidgetsError.reportError(this.currentError);
-            } else {
+            }
+            else {
                 foreach (var errorListener in localErrorListeners) {
                     try {
                         errorListener(exception);
-                    } catch (Exception ex) {
+                    }
+                    catch (Exception ex) {
                         UIWidgetsError.reportError(
                             new UIWidgetsErrorDetails(
                                 context: "by an image error listener",

@@ -27,9 +27,11 @@ namespace Unity.UIWidgets.painting {
             if (hasTyle) {
                 builder.pushStyle(this.style);
             }
+
             if (!string.IsNullOrEmpty(this.text)) {
                 builder.addText(this.text);
             }
+
             if (this.children != null) {
                 foreach (var child in this.children) {
                     Assert.IsNotNull(child);
@@ -48,6 +50,7 @@ namespace Unity.UIWidgets.painting {
                     return false;
                 }
             }
+
             if (this.children != null) {
                 foreach (var child in this.children) {
                     if (!child.visitTextSpan(visitor)) {
@@ -55,6 +58,7 @@ namespace Unity.UIWidgets.painting {
                     }
                 }
             }
+
             return true;
         }
 
@@ -139,6 +143,7 @@ namespace Unity.UIWidgets.painting {
                     if (candidate > result) {
                         result = candidate;
                     }
+
                     if (result == RenderComparison.layout) {
                         return result;
                     }
@@ -152,12 +157,15 @@ namespace Unity.UIWidgets.painting {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((TextSpan) obj);
         }
 
@@ -174,9 +182,11 @@ namespace Unity.UIWidgets.painting {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return Equals(this.style, other.style) && string.Equals(this.text, other.text) &&
                    childEquals(this.children, other.children);
         }
@@ -244,7 +254,8 @@ namespace Unity.UIWidgets.painting {
             return this.children.Select((child) => {
                 if (child != null) {
                     return child.toDiagnosticsNode();
-                } else {
+                }
+                else {
                     return DiagnosticsNode.message("<null child>");
                 }
             }).ToList();

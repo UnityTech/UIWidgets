@@ -57,7 +57,8 @@ namespace Unity.UIWidgets.service {
             TextSelection manipulatedSelection = null;
             if (selectionStartIndex < 0 || selectionEndIndex < 0) {
                 manipulatedText = substringManipulation(value.text);
-            } else {
+            }
+            else {
                 var beforeSelection = substringManipulation(
                     value.text.Substring(0, selectionStartIndex)
                 );
@@ -73,7 +74,8 @@ namespace Unity.UIWidgets.service {
                         baseOffset: beforeSelection.Length + inSelection.Length,
                         extentOffset: beforeSelection.Length
                     );
-                } else {
+                }
+                else {
                     manipulatedSelection = value.selection.copyWith(
                         baseOffset: beforeSelection.Length,
                         extentOffset: beforeSelection.Length + inSelection.Length

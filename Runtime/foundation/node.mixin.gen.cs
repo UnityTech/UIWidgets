@@ -4,10 +4,7 @@ using System.Runtime.CompilerServices;
 using Unity.UIWidgets.async;
 
 namespace Unity.UIWidgets.foundation {
-
-
-
-    public class AbstractNode  {
+    public class AbstractNode {
         public int depth {
             get { return this._depth; }
         }
@@ -60,6 +57,7 @@ namespace Unity.UIWidgets.foundation {
                 while (node.parent != null) {
                     node = node.parent;
                 }
+
                 D.assert(node != child); // indicates we are about to create a cycle
                 return true;
             });
@@ -85,9 +83,7 @@ namespace Unity.UIWidgets.foundation {
     }
 
 
-
-
-    public class AbstractNodeMixinDiagnosticableTree  : DiagnosticableTree {
+    public class AbstractNodeMixinDiagnosticableTree : DiagnosticableTree {
         public int depth {
             get { return this._depth; }
         }
@@ -140,6 +136,7 @@ namespace Unity.UIWidgets.foundation {
                 while (node.parent != null) {
                     node = node.parent;
                 }
+
                 D.assert(node != child); // indicates we are about to create a cycle
                 return true;
             });
@@ -165,9 +162,7 @@ namespace Unity.UIWidgets.foundation {
     }
 
 
-
-
-   public abstract class CanonicalMixinDiagnosticableTree : DiagnosticableTree {
+    public abstract class CanonicalMixinDiagnosticableTree : DiagnosticableTree {
         _DependencyList _dependencyList;
 
         _DependencyList _getDependencyList() {
@@ -177,7 +172,7 @@ namespace Unity.UIWidgets.foundation {
 
             return this._dependencyList;
         }
-        
+
         CanonicalMixinDiagnosticableTree _canonical;
 
         CanonicalMixinDiagnosticableTree _getCanonical() {
@@ -201,10 +196,10 @@ namespace Unity.UIWidgets.foundation {
                 }
             }
         }
-        
+
         static readonly Dictionary<_DependencyList, WeakReference> _canonicalObjects =
             new Dictionary<_DependencyList, WeakReference>();
-        
+
         public override bool Equals(object obj) {
             if (ReferenceEquals(null, obj)) {
                 return false;
@@ -220,11 +215,9 @@ namespace Unity.UIWidgets.foundation {
 
             return ReferenceEquals(this._getCanonical(), ((CanonicalMixinDiagnosticableTree) obj)._getCanonical());
         }
-        
+
         public override int GetHashCode() {
             return RuntimeHelpers.GetHashCode(this._getCanonical());
         }
     }
-
-
 }

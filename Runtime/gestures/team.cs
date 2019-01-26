@@ -85,7 +85,8 @@ namespace Unity.UIWidgets.gestures {
                 if (this._members.isEmpty()) {
                     this._entry.resolve(disposition);
                 }
-            } else {
+            }
+            else {
                 this._winner = this._winner ?? this._owner.captain ?? member;
                 this._entry.resolve(disposition);
             }

@@ -49,9 +49,11 @@ namespace Unity.UIWidgets.painting {
             if (a == null && b == null) {
                 return null;
             }
+
             if (a == null) {
                 return b.scale(t);
             }
+
             if (b == null) {
                 return a.scale(1.0 - t);
             }
@@ -74,14 +76,17 @@ namespace Unity.UIWidgets.painting {
             List<BoxShadow> result = new List<BoxShadow>();
             int commonLength = Math.Min(a.Count, b.Count);
             for (int i = 0; i < commonLength; i += 1) {
-                result.Add(BoxShadow.lerp(a[i], b[i], t));
+                result.Add(lerp(a[i], b[i], t));
             }
+
             for (int i = commonLength; i < a.Count; i += 1) {
                 result.Add(a[i].scale(1.0 - t));
             }
+
             for (int i = commonLength; i < b.Count; i += 1) {
                 result.Add(b[i].scale(t));
             }
+
             return result;
         }
 
@@ -89,9 +94,11 @@ namespace Unity.UIWidgets.painting {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return Equals(this.color, other.color)
                    && Equals(this.offset, other.offset)
                    && this.blurRadius.Equals(other.blurRadius)
@@ -102,12 +109,15 @@ namespace Unity.UIWidgets.painting {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((BoxShadow) obj);
         }
 

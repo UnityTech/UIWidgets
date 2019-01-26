@@ -17,9 +17,13 @@ namespace Unity.UIWidgets.widgets {
 
         public readonly LayoutWidgetBuilder builder;
 
-        public override Element createElement() => new _LayoutBuilderElement(this);
+        public override Element createElement() {
+            return new _LayoutBuilderElement(this);
+        }
 
-        public override RenderObject createRenderObject(BuildContext context) => new _RenderLayoutBuilder();
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new _RenderLayoutBuilder();
+        }
     }
 
     class _LayoutBuilderElement : RenderObjectElement {
@@ -27,15 +31,20 @@ namespace Unity.UIWidgets.widgets {
             LayoutBuilder widget) : base(widget) {
         }
 
-        new LayoutBuilder widget => (LayoutBuilder) base.widget;
+        new LayoutBuilder widget {
+            get { return (LayoutBuilder) base.widget; }
+        }
 
-        new _RenderLayoutBuilder renderObject => (_RenderLayoutBuilder) base.renderObject;
+        new _RenderLayoutBuilder renderObject {
+            get { return (_RenderLayoutBuilder) base.renderObject; }
+        }
 
         Element _child;
 
         public override void visitChildren(ElementVisitor visitor) {
-            if (this._child != null)
+            if (this._child != null) {
                 visitor(this._child);
+            }
         }
 
         protected override void forgetChild(Element child) {
@@ -109,8 +118,10 @@ namespace Unity.UIWidgets.widgets {
         public LayoutCallback<BoxConstraints> callback {
             get { return this._callback; }
             set {
-                if (value == this._callback)
+                if (value == this._callback) {
                     return;
+                }
+
                 this._callback = value;
                 this.markNeedsLayout();
             }
@@ -170,8 +181,9 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public override void paint(PaintingContext context, Offset offset) {
-            if (this.child != null)
+            if (this.child != null) {
                 context.paintChild(this.child, offset);
+            }
         }
     }
 }

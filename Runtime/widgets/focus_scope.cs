@@ -32,6 +32,7 @@ namespace Unity.UIWidgets.widgets {
             if (scope != null && scope.node != null) {
                 return scope.node;
             }
+
             return context.owner.focusManager.rootScope;
         }
 

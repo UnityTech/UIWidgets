@@ -53,25 +53,30 @@ namespace Unity.UIWidgets.ui {
                     if (finalizer) {
                         // make sure no ref back to this in finalizer
                         Timer.runInMainFromFinalizer(() => { Resources.UnloadAsset(t); });
-                    } else {
+                    }
+                    else {
                         Resources.UnloadAsset(t);
                     }
-                } else {
+                }
+                else {
                     if (finalizer) {
                         // make sure no ref back to this in finalizer
                         Timer.runInMainFromFinalizer(() => { b.Unload(t); });
-                    } else {
+                    }
+                    else {
                         b.Unload(t);
                     }
                 }
-            } else {
+            }
+            else {
                 var t = this._texture;
                 this._texture = null;
 
                 if (finalizer) {
                     // make sure no ref back to this in finalizer
                     Timer.runInMainFromFinalizer(() => { ObjectUtils.SafeDestroy(t); });
-                } else {
+                }
+                else {
                     ObjectUtils.SafeDestroy(t);
                 }
             }
@@ -86,9 +91,11 @@ namespace Unity.UIWidgets.ui {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return Equals(this._texture, other._texture);
         }
 
@@ -96,12 +103,15 @@ namespace Unity.UIWidgets.ui {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((Image) obj);
         }
 

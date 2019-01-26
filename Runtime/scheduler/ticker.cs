@@ -35,7 +35,8 @@ namespace Unity.UIWidgets.scheduler {
                 this._muted = value;
                 if (value) {
                     this.unscheduleTick();
-                } else if (this.shouldScheduleTick) {
+                }
+                else if (this.shouldScheduleTick) {
                     this.scheduleTick();
                 }
             }
@@ -109,7 +110,8 @@ namespace Unity.UIWidgets.scheduler {
             this.unscheduleTick();
             if (canceled) {
                 localFuture._cancel(this);
-            } else {
+            }
+            else {
                 localFuture._complete();
             }
         }
@@ -265,7 +267,8 @@ namespace Unity.UIWidgets.scheduler {
                     if (this._completed != null) {
                         if (this._completed.Value) {
                             this._secondaryCompleter.Resolve();
-                        } else {
+                        }
+                        else {
                             this._secondaryCompleter.Reject(new TickerCanceled());
                         }
                     }

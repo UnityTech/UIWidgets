@@ -33,6 +33,7 @@ namespace Unity.UIWidgets.debugger {
                     this.m_InspectorService.setShowInspect(newShowInspect);
                 }
             }
+
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.Space();
@@ -72,13 +73,15 @@ namespace Unity.UIWidgets.debugger {
                         selectedIndex = i + 1;
                     }
                 }
+
                 EditorUtility.DisplayCustomMenu(menuPos, labels, selectedIndex, (data, options, selected) => {
                     if (selected > 0) {
                         var selectedWindow = windows[selected - 1];
                         if (selectedWindow != currentWindow) {
                             this.inspect(selectedWindow);
                         }
-                    } else {
+                    }
+                    else {
                         if (this.m_InspectorService != null) {
                             this.closeInspect();
                         }
@@ -109,11 +112,13 @@ namespace Unity.UIWidgets.debugger {
             if (this.m_InspectorService == null) {
                 return;
             }
+
             this.m_InspectorService.close();
             this.m_InspectorService = null;
             foreach (var panel in this.m_Panels) {
                 panel.Close();
             }
+
             this.m_Panels.Clear();
             this.m_ShowInspect = false;
         }
@@ -128,9 +133,11 @@ namespace Unity.UIWidgets.debugger {
             if (this.m_InspectorService != null) {
                 showInspect = this.m_InspectorService.getShowInspect();
             }
+
             if (showInspect != this.m_ShowInspect) {
                 this.Repaint();
             }
+
             this.m_ShowInspect = showInspect;
 
             for (int i = 0; i < this.m_Panels.Count; i++) {

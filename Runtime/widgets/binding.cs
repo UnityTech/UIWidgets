@@ -14,7 +14,7 @@ namespace Unity.UIWidgets.widgets {
         void didChangeLocales(List<Locale> locale);
 
         IPromise<bool> didPopRoute();
-        
+
         IPromise<bool> didPushRoute(string route);
     }
 
@@ -123,7 +123,8 @@ namespace Unity.UIWidgets.widgets {
 
                 base.drawFrame();
                 this.buildOwner.finalizeTree();
-            } finally {
+            }
+            finally {
                 D.assert(() => {
                     this.debugBuildingDirtyElements = false;
                     return true;
@@ -184,7 +185,8 @@ namespace Unity.UIWidgets.widgets {
                     element.assignOwner(owner);
                 });
                 owner.buildScope(element, () => { element.mount(null, null); });
-            } else {
+            }
+            else {
                 element._newWidget = this;
                 element.markNeedsBuild();
             }
@@ -250,7 +252,8 @@ namespace Unity.UIWidgets.widgets {
                 this._child = this.updateChild(this._child, this.widget.child,
                     _rootChildSlot);
                 // allow 
-            } catch (Exception ex) {
+            }
+            catch (Exception ex) {
                 var details = new UIWidgetsErrorDetails(
                     exception: ex,
                     library: "widgets library",

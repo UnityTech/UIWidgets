@@ -20,6 +20,7 @@ namespace Unity.UIWidgets.debugger {
                 if (m_Instance == null) {
                     m_Instance = CreateInstance<T>();
                 }
+
                 return m_Instance;
             }
         }
@@ -29,12 +30,15 @@ namespace Unity.UIWidgets.debugger {
             if (m_CreateNonSingletonInstance) {
                 this.m_IsNonSingletonInstance = true;
                 this.Initialize();
-            } else if (this.m_IsNonSingletonInstance) {
+            }
+            else if (this.m_IsNonSingletonInstance) {
                 DestroyImmediate((Object) this);
-            } else if (m_Instance == null) {
+            }
+            else if (m_Instance == null) {
                 m_Instance = this as T;
                 this.Initialize();
-            } else {
+            }
+            else {
                 DestroyImmediate((Object) this);
             }
         }

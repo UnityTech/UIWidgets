@@ -328,18 +328,23 @@ namespace Unity.UIWidgets.widgets {
             properties.add(new DiagnosticsProperty<bool>("offstage", this.offstage));
         }
 
-        public override Element createElement() => new _OffstageElement(this);
+        public override Element createElement() {
+            return new _OffstageElement(this);
+        }
     }
 
     class _OffstageElement : SingleChildRenderObjectElement {
         internal _OffstageElement(Offstage widget) : base(widget) {
         }
 
-        new Offstage widget => (Offstage) base.widget;
+        new Offstage widget {
+            get { return (Offstage) base.widget; }
+        }
 
         public override void debugVisitOnstageChildren(ElementVisitor visitor) {
-            if (!this.widget.offstage)
+            if (!this.widget.offstage) {
                 base.debugVisitOnstageChildren(visitor);
+            }
         }
     }
 
@@ -929,7 +934,7 @@ namespace Unity.UIWidgets.widgets {
             ((RenderFollowerLayer) renderObject).offset = this.offset;
         }
     }
-    
+
     public class FractionalTranslation : SingleChildRenderObjectWidget {
         public FractionalTranslation(Key key = null, Offset translation = null,
             bool transformHitTests = true, Widget child = null) : base(key: key, child: child) {
@@ -1013,22 +1018,22 @@ namespace Unity.UIWidgets.widgets {
                 child: child) {
         }
     }
-    
+
     public class CustomSingleChildLayout : SingleChildRenderObjectWidget {
-        public CustomSingleChildLayout(Key key = null, 
-            SingleChildLayoutDelegate layoutDelegate = null, Widget child = null):base(key:key, child:child) {
+        public CustomSingleChildLayout(Key key = null,
+            SingleChildLayoutDelegate layoutDelegate = null, Widget child = null) : base(key: key, child: child) {
             D.assert(layoutDelegate != null);
             this.layoutDelegate = layoutDelegate;
         }
-        
+
         public readonly SingleChildLayoutDelegate layoutDelegate;
-        
+
         public override RenderObject createRenderObject(BuildContext context) {
             return new RenderCustomSingleChildLayoutBox(layoutDelegate: this.layoutDelegate);
         }
 
         public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
-            ((RenderCustomSingleChildLayoutBox)renderObject).layoutDelegate = this.layoutDelegate;
+            ((RenderCustomSingleChildLayoutBox) renderObject).layoutDelegate = this.layoutDelegate;
         }
     }
 
@@ -1051,8 +1056,9 @@ namespace Unity.UIWidgets.widgets {
             if (parentData.id != this.id) {
                 parentData.id = this.id;
                 var targetParent = renderObject.parent;
-                if (targetParent is RenderObject)
+                if (targetParent is RenderObject) {
                     ((RenderObject) targetParent).markNeedsLayout();
+                }
             }
         }
 

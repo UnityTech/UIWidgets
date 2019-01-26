@@ -43,6 +43,7 @@ namespace Unity.UIWidgets.ui {
             if (lastIndex < 0) {
                 return;
             }
+
             this._styleStack.RemoveAt(lastIndex);
             this._runs.startRun(this.peekStyleIndex(), this._text.Length);
         }
@@ -61,6 +62,7 @@ namespace Unity.UIWidgets.ui {
             if (count > 0) {
                 return this._styleStack[count - 1];
             }
+
             return this._paragraph_style_index;
         }
 

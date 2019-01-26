@@ -27,9 +27,11 @@ namespace Unity.UIWidgets.foundation {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return EqualityComparer<T>.Default.Equals(this.value, other.value);
         }
 
@@ -37,12 +39,15 @@ namespace Unity.UIWidgets.foundation {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((ValueKey<T>) obj);
         }
 

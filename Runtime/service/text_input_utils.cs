@@ -2,15 +2,14 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace Unity.UIWidgets.service {
-    
     public class TextInputUtils {
-        
         static Dictionary<Event, TextInputAction> _keyToOperations;
 
         public static TextInputAction? getInputAction(Event evt) {
             if (_keyToOperations == null) {
                 initKeyToOperations();
             }
+
             EventModifiers m = evt.modifiers;
             evt.modifiers &= ~EventModifiers.CapsLock;
             TextInputAction result;
@@ -22,11 +21,12 @@ namespace Unity.UIWidgets.service {
 
             return null;
         }
-        
+
         public static void initKeyToOperations() {
             if (_keyToOperations != null) {
                 return;
             }
+
             _keyToOperations = new Dictionary<Event, TextInputAction>();
 
             // key mappings shared by the platforms
@@ -104,7 +104,8 @@ namespace Unity.UIWidgets.service {
                 mapKey("&delete", TextInputAction.deleteWordForward);
                 mapKey("&backspace", TextInputAction.deleteWordBack);
                 mapKey("%backspace", TextInputAction.deleteLineBack);
-            } else {
+            }
+            else {
                 // Windows/Linux keymappings
                 mapKey("home", TextInputAction.moveGraphicalLineStart);
                 mapKey("end", TextInputAction.moveGraphicalLineEnd);
@@ -143,9 +144,8 @@ namespace Unity.UIWidgets.service {
                 mapKey("^insert", TextInputAction.copy);
                 mapKey("#insert", TextInputAction.paste);
             }
-     
         }
-            
+
         static void mapKey(string key, TextInputAction action) {
             _keyToOperations[Event.KeyboardEvent(key)] = action;
         }

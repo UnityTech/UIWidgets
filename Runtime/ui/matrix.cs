@@ -298,7 +298,8 @@ namespace Unity.UIWidgets.ui {
                     this.fMat[kMPersp0] = this.fMat[kMPersp1] = 0;
 
                 this.setTypeMask((int) TypeMask.kTranslate_Mask | kRectStaysRect_Mask);
-            } else {
+            }
+            else {
                 this.reset();
             }
         }
@@ -306,7 +307,8 @@ namespace Unity.UIWidgets.ui {
         public void setScale(float sx, float sy, float px, float py) {
             if (1 == sx && 1 == sy) {
                 this.reset();
-            } else {
+            }
+            else {
                 this.setScaleTranslate(sx, sy, px - sx * px, py - sy * py);
             }
         }
@@ -314,7 +316,8 @@ namespace Unity.UIWidgets.ui {
         public void setScale(float sx, float sy) {
             if (1 == sx && 1 == sy) {
                 this.reset();
-            } else {
+            }
+            else {
                 this.fMat[kMScaleX] = sx;
                 this.fMat[kMScaleY] = sy;
                 this.fMat[kMPersp2] = 1;
@@ -418,14 +421,17 @@ namespace Unity.UIWidgets.ui {
 
             if (a.isTriviallyIdentity()) {
                 this.copyFrom(b);
-            } else if (b.isTriviallyIdentity()) {
+            }
+            else if (b.isTriviallyIdentity()) {
                 this.copyFrom(a);
-            } else if (only_scale_and_translate((int) aType | (int) bType)) {
+            }
+            else if (only_scale_and_translate((int) aType | (int) bType)) {
                 this.setScaleTranslate(a.fMat[kMScaleX] * b.fMat[kMScaleX],
                     a.fMat[kMScaleY] * b.fMat[kMScaleY],
                     a.fMat[kMScaleX] * b.fMat[kMTransX] + a.fMat[kMTransX],
                     a.fMat[kMScaleY] * b.fMat[kMTransY] + a.fMat[kMTransY]);
-            } else {
+            }
+            else {
                 Matrix3 tmp = new Matrix3();
 
                 if (((aType | bType) & TypeMask.kPerspective_Mask) != 0) {
@@ -440,7 +446,8 @@ namespace Unity.UIWidgets.ui {
                     tmp.fMat[kMPersp2] = rowcol3(a.fMat, 6, b.fMat, 2);
 
                     tmp.setTypeMask(kUnknown_Mask);
-                } else {
+                }
+                else {
                     tmp.fMat[kMScaleX] = muladdmul(a.fMat[kMScaleX],
                         b.fMat[kMScaleX],
                         a.fMat[kMSkewX],
@@ -452,9 +459,9 @@ namespace Unity.UIWidgets.ui {
                         b.fMat[kMScaleY]);
 
                     tmp.fMat[kMTransX] = muladdmul(a.fMat[kMScaleX],
-                                                     b.fMat[kMTransX],
-                                                     a.fMat[kMSkewX],
-                                                     b.fMat[kMTransY]) + a.fMat[kMTransX];
+                                             b.fMat[kMTransX],
+                                             a.fMat[kMSkewX],
+                                             b.fMat[kMTransY]) + a.fMat[kMTransX];
 
                     tmp.fMat[kMSkewY] = muladdmul(a.fMat[kMSkewY],
                         b.fMat[kMScaleX],
@@ -467,9 +474,9 @@ namespace Unity.UIWidgets.ui {
                         b.fMat[kMScaleY]);
 
                     tmp.fMat[kMTransY] = muladdmul(a.fMat[kMSkewY],
-                                                     b.fMat[kMTransX],
-                                                     a.fMat[kMScaleY],
-                                                     b.fMat[kMTransY]) + a.fMat[kMTransY];
+                                             b.fMat[kMTransX],
+                                             a.fMat[kMScaleY],
+                                             b.fMat[kMTransY]) + a.fMat[kMTransY];
 
                     tmp.fMat[kMPersp0] = 0;
                     tmp.fMat[kMPersp1] = 0;
@@ -487,12 +494,14 @@ namespace Unity.UIWidgets.ui {
             if (mask <= TypeMask.kTranslate_Mask) {
                 this.fMat[kMTransX] += dx;
                 this.fMat[kMTransY] += dy;
-            } else if ((mask & TypeMask.kPerspective_Mask) != 0) {
+            }
+            else if ((mask & TypeMask.kPerspective_Mask) != 0) {
                 var m = new Matrix3();
                 m.setTranslate(dx, dy);
                 this.preConcat(m);
                 return;
-            } else {
+            }
+            else {
                 this.fMat[kMTransX] += this.fMat[kMScaleX] * dx + this.fMat[kMSkewX] * dy;
                 this.fMat[kMTransY] += this.fMat[kMSkewY] * dx + this.fMat[kMScaleY] * dy;
             }
@@ -533,10 +542,11 @@ namespace Unity.UIWidgets.ui {
             //       what computeTypeMask() would produce (persp/skew always implies kScale).
             //       We should investigate whether these flag dependencies are truly needed.
             if (this.fMat[kMScaleX] == 1 && this.fMat[kMScaleY] == 1
-                                                 && (this.fTypeMask &
-                                                     (int) (TypeMask.kPerspective_Mask | TypeMask.kAffine_Mask)) == 0) {
+                                         && (this.fTypeMask &
+                                             (int) (TypeMask.kPerspective_Mask | TypeMask.kAffine_Mask)) == 0) {
                 this.clearTypeMask((int) TypeMask.kScale_Mask);
-            } else {
+            }
+            else {
                 this.orTypeMask((int) TypeMask.kScale_Mask);
             }
         }
@@ -578,7 +588,8 @@ namespace Unity.UIWidgets.ui {
                 var m = new Matrix3();
                 m.setTranslate(dx, dy);
                 this.postConcat(m);
-            } else {
+            }
+            else {
                 this.fMat[kMTransX] += dx;
                 this.fMat[kMTransY] += dy;
                 this.updateTranslateMask();
@@ -680,7 +691,8 @@ namespace Unity.UIWidgets.ui {
             if (this.isScaleTranslate()) {
                 this.mapRectScaleTranslate(out dst, src);
                 return true;
-            } else {
+            }
+            else {
                 var points = new[] {
                     new Offset(src.left, src.top),
                     new Offset(src.right, src.top),
@@ -870,7 +882,8 @@ namespace Unity.UIWidgets.ui {
                 dst[kMPersp2] =
                     ScalarUtils.scross_dscale(src[kMScaleX], src[kMScaleY], src[kMSkewX],
                         src[kMSkewY], invDet);
-            } else {
+            }
+            else {
                 // not perspective
                 dst[kMScaleX] = (float) (src[kMScaleY] * invDet);
                 dst[kMSkewX] = (float) (-src[kMSkewX] * invDet);
@@ -932,7 +945,8 @@ namespace Unity.UIWidgets.ui {
                 int ds1 = m01 & m10; // true if both are 1
 
                 mask |= (dp0 & ds1) << (int) TypeShift.kRectStaysRect_Shift;
-            } else {
+            }
+            else {
                 // Only test for scale explicitly if not affine, since affine sets the
                 // scale bit.
                 if (((m00 ^ kScalar1Int) | (m11 ^ kScalar1Int)) != 0) {
@@ -1009,7 +1023,8 @@ namespace Unity.UIWidgets.ui {
         void updateTranslateMask() {
             if ((this.fMat[kMTransX] != 0) | (this.fMat[kMTransY] != 0)) {
                 this.fTypeMask |= (int) TypeMask.kTranslate_Mask;
-            } else {
+            }
+            else {
                 this.fTypeMask &= ~(int) TypeMask.kTranslate_Mask;
             }
         }
@@ -1227,11 +1242,13 @@ namespace Unity.UIWidgets.ui {
                         inv.fMat[kMTransY] = -this.fMat[kMTransY] * invY;
 
                         inv.setTypeMask((int) mask | kRectStaysRect_Mask);
-                    } else {
+                    }
+                    else {
                         // translate only
                         inv.setTranslate(-this.fMat[kMTransX], -this.fMat[kMTransY]);
                     }
-                } else {
+                }
+                else {
                     // inv is nullptr, just check if we're invertible
                     if (this.fMat[kMScaleX] == 0 || this.fMat[kMScaleY] == 0) {
                         invertible = false;
@@ -1276,9 +1293,11 @@ namespace Unity.UIWidgets.ui {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return this == other;
         }
 
@@ -1286,12 +1305,15 @@ namespace Unity.UIWidgets.ui {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((Matrix3) obj);
         }
 
@@ -1421,7 +1443,8 @@ namespace Unity.UIWidgets.ui {
                       mat[Matrix3.kMTransX] *
                       dcross(mat[Matrix3.kMSkewY], mat[Matrix3.kMPersp1],
                           mat[Matrix3.kMScaleY], mat[Matrix3.kMPersp0]);
-            } else {
+            }
+            else {
                 det = dcross(mat[Matrix3.kMScaleX], mat[Matrix3.kMScaleY],
                     mat[Matrix3.kMSkewX], mat[Matrix3.kMSkewY]);
             }

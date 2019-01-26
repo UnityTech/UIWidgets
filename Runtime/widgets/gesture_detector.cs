@@ -367,7 +367,8 @@ namespace Unity.UIWidgets.widgets {
             base.debugFillProperties(properties);
             if (this._recognizers == null) {
                 properties.add(DiagnosticsNode.message("DISPOSED"));
-            } else {
+            }
+            else {
                 List<string> gestures = this._recognizers.Values.Select(recognizer => recognizer.debugDescription)
                     .ToList();
                 properties.add(new EnumerableProperty<string>("gestures", gestures, ifEmpty: "<none>"));
