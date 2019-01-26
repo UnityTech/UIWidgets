@@ -12,7 +12,8 @@ namespace Unity.UIWidgets.foundation {
         public static T SafeDestroy<T>(T obj) where T : Object {
             if (Application.isEditor) {
                 Object.DestroyImmediate(obj);
-            } else {
+            }
+            else {
                 Object.Destroy(obj);
             }
 
@@ -69,17 +70,16 @@ namespace Unity.UIWidgets.foundation {
             it.TryGetValue(key, out v);
             return v;
         }
-        
+
         public static T first<T>(this IList<T> it) {
             return it[0];
         }
-        
+
         public static T last<T>(this IList<T> it) {
             return it[it.Count - 1];
         }
 
-        public static T removeLast<T>(this IList<T> it)
-        {
+        public static T removeLast<T>(this IList<T> it) {
             var lastIndex = it.Count - 1;
             var result = it[lastIndex];
             it.RemoveAt(lastIndex);

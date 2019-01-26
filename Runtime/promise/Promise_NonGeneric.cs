@@ -352,7 +352,8 @@ namespace RSG {
 
             try {
                 resolver(this.Resolve, this.Reject);
-            } catch (Exception ex) {
+            }
+            catch (Exception ex) {
                 this.Reject(ex);
             }
         }
@@ -412,7 +413,8 @@ namespace RSG {
 
             try {
                 callback(value);
-            } catch (Exception ex) {
+            }
+            catch (Exception ex) {
                 rejectable.Reject(ex);
             }
         }
@@ -426,7 +428,8 @@ namespace RSG {
 
             try {
                 callback();
-            } catch (Exception ex) {
+            }
+            catch (Exception ex) {
                 rejectable.Reject(ex);
             }
         }
@@ -440,7 +443,8 @@ namespace RSG {
 
             try {
                 callback(progress);
-            } catch (Exception ex) {
+            }
+            catch (Exception ex) {
                 rejectable.Reject(ex);
             }
         }
@@ -462,7 +466,8 @@ namespace RSG {
 
             if (this.rejectHandlers != null) {
                 this.rejectHandlers.Each(handler => this.InvokeRejectHandler(handler.callback, handler.rejectable, ex));
-            } else {
+            }
+            else {
                 PropagateUnhandledException(this, ex);
             }
 
@@ -496,7 +501,8 @@ namespace RSG {
         public void Reject(Exception ex) {
             if (this.IsSync) {
                 this.RejectSync(ex);
-            } else {
+            }
+            else {
                 Window.instance.run(() => this.RejectSync(ex));
             }
         }
@@ -530,7 +536,8 @@ namespace RSG {
         public void Resolve() {
             if (this.IsSync) {
                 this.ResolveSync();
-            } else {
+            }
+            else {
                 Window.instance.run(() => this.ResolveSync());
             }
         }
@@ -625,7 +632,8 @@ namespace RSG {
                 try {
                     onRejected(ex);
                     resultPromise.Resolve();
-                } catch (Exception callbackException) {
+                }
+                catch (Exception callbackException) {
                     resultPromise.Reject(callbackException);
                 }
             };
@@ -718,7 +726,8 @@ namespace RSG {
                             chainedValue => resultPromise.Resolve(chainedValue),
                             callbackEx => resultPromise.Reject(callbackEx)
                         );
-                } catch (Exception callbackEx) {
+                }
+                catch (Exception callbackEx) {
                     resultPromise.Reject(callbackEx);
                 }
             };
@@ -747,7 +756,8 @@ namespace RSG {
                             () => resultPromise.Resolve(),
                             ex => resultPromise.Reject(ex)
                         );
-                } else {
+                }
+                else {
                     resultPromise.Resolve();
                 }
             };
@@ -807,9 +817,11 @@ namespace RSG {
         void ActionHandlers(IRejectable resultPromise, Action resolveHandler, Action<Exception> rejectHandler) {
             if (this.CurState == PromiseState.Resolved) {
                 this.InvokeResolveHandler(resolveHandler, resultPromise);
-            } else if (this.CurState == PromiseState.Rejected) {
+            }
+            else if (this.CurState == PromiseState.Rejected) {
                 this.InvokeRejectHandler(rejectHandler, resultPromise, this.rejectionException);
-            } else {
+            }
+            else {
                 this.AddResolveHandler(resolveHandler, resultPromise);
                 this.AddRejectHandler(rejectHandler, resultPromise);
             }
@@ -1042,7 +1054,8 @@ namespace RSG {
                 try {
                     onComplete();
                     promise.Reject(e);
-                } catch (Exception ne) {
+                }
+                catch (Exception ne) {
                     promise.Reject(ne);
                 }
             });
@@ -1074,6 +1087,7 @@ namespace RSG {
             if (onProgress != null) {
                 this.ProgressHandlers(this, onProgress);
             }
+
             return this;
         }
 
@@ -1083,7 +1097,8 @@ namespace RSG {
         internal static void PropagateUnhandledException(object sender, Exception ex) {
             if (unhandlerException != null) {
                 unhandlerException(sender, new ExceptionEventArgs(ex));
-            } else {
+            }
+            else {
                 Debug.LogWarning("Unhandled Exception from " + sender + ": " + ex);
             }
         }

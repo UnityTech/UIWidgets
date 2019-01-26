@@ -42,6 +42,7 @@ namespace Unity.UIWidgets.painting {
                 if (this._textScaleFactor == value) {
                     return;
                 }
+
                 this._textScaleFactor = value;
                 this._paragraph = null;
                 this._layoutTemplate = null;
@@ -169,6 +170,7 @@ namespace Unity.UIWidgets.painting {
                 case TextBaseline.ideographic:
                     return this._paragraph.ideographicBaseline;
             }
+
             return 0.0;
         }
 
@@ -286,9 +288,11 @@ namespace Unity.UIWidgets.painting {
                 if (range.end == range.start) {
                     break;
                 }
+
                 if (!char.IsWhiteSpace((char) (this.text.codeUnitAt(range.start) ?? 0))) {
                     return new TextPosition(range.end);
                 }
+
                 offset = range.end;
             }
 
@@ -303,6 +307,7 @@ namespace Unity.UIWidgets.painting {
                 if (!char.IsWhiteSpace((char) (this.text.codeUnitAt(range.start) ?? 0))) {
                     return new TextPosition(range.start);
                 }
+
                 offset = Math.Max(range.start - 1, 0);
                 if (offset == 0) {
                     break;
@@ -354,11 +359,13 @@ namespace Unity.UIWidgets.painting {
             if (prevCodeUnit == null) {
                 return null;
             }
+
             var prevRuneOffset = _isUtf16Surrogate((int) prevCodeUnit) ? offset - 2 : offset - 1;
             var boxes = this._paragraph.getRectsForRange(prevRuneOffset, offset);
             if (boxes.Count == 0) {
                 return null;
             }
+
             var box = boxes[0];
             var caretEnd = box.end;
             var dx = box.direction == TextDirection.rtl ? caretEnd : caretEnd - caretPrototype.width;
@@ -370,11 +377,13 @@ namespace Unity.UIWidgets.painting {
             if (nextCodeUnit == null) {
                 return null;
             }
+
             var nextRuneOffset = _isUtf16Surrogate((int) nextCodeUnit) ? offset + 2 : offset + 1;
             var boxes = this._paragraph.getRectsForRange(offset, nextRuneOffset);
             if (boxes.Count == 0) {
                 return null;
             }
+
             var box = boxes[0];
             var caretStart = box.start;
             var dx = box.direction == TextDirection.rtl ? caretStart - caretPrototype.width : caretStart;
@@ -395,8 +404,10 @@ namespace Unity.UIWidgets.painting {
                         if (this.textDirection == TextDirection.rtl) {
                             return new Offset(this.width, 0.0);
                         }
+
                         return Offset.zero;
                 }
+
                 return null;
             }
         }

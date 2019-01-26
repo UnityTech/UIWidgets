@@ -71,12 +71,15 @@ namespace Unity.UIWidgets.gestures {
 
                     return true;
                 });
-            } else if (evt is PointerUpEvent || evt is PointerCancelEvent) {
+            }
+            else if (evt is PointerUpEvent || evt is PointerCancelEvent) {
                 result = this._hitTests[evt.pointer];
                 this._hitTests.Remove(evt.pointer);
-            } else if (evt.down) {
+            }
+            else if (evt.down) {
                 result = this._hitTests[evt.pointer];
-            } else {
+            }
+            else {
                 return;
             }
 
@@ -94,7 +97,8 @@ namespace Unity.UIWidgets.gestures {
                 if (this.lastMoveTargets.Contains(hitTestEntry.target)) {
                     hitTestEntry.target.handleEvent(evt, hitTestEntry);
                     this.lastMoveTargets.Remove(hitTestEntry.target);
-                } else {
+                }
+                else {
                     hitTestEntry.target.handleEvent(new PointerEnterEvent(
                         timeStamp: evt.timeStamp,
                         pointer: evt.pointer,
@@ -103,6 +107,7 @@ namespace Unity.UIWidgets.gestures {
                     ), hitTestEntry);
                 }
             }
+
             foreach (var lastMoveTarget in this.lastMoveTargets) {
                 lastMoveTarget.handleEvent(new PointerLeaveEvent(
                     timeStamp: evt.timeStamp,
@@ -111,6 +116,7 @@ namespace Unity.UIWidgets.gestures {
                     kind: evt.kind
                 ), null);
             }
+
             this.lastMoveTargets.Clear();
             foreach (var hitTestEntry in result.path) {
                 this.lastMoveTargets.Add(hitTestEntry.target);
@@ -127,7 +133,8 @@ namespace Unity.UIWidgets.gestures {
             foreach (HitTestEntry entry in result.path) {
                 try {
                     entry.target.handleEvent(evt, entry);
-                } catch (Exception ex) {
+                }
+                catch (Exception ex) {
                     Debug.LogError("Error while dispatching a pointer event: " + ex);
                 }
             }
@@ -137,7 +144,8 @@ namespace Unity.UIWidgets.gestures {
             this.pointerRouter.route(evt);
             if (evt is PointerDownEvent) {
                 this.gestureArena.close(evt.pointer);
-            } else if (evt is PointerUpEvent) {
+            }
+            else if (evt is PointerUpEvent) {
                 this.gestureArena.sweep(evt.pointer);
             }
         }

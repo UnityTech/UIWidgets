@@ -48,7 +48,7 @@ namespace Unity.UIWidgets.ui {
 
         internal FontInfo getOrCreate(string name) {
             var founded = this._fonts.Find(info =>
-                info.font && info.font.fontNames.Contains(name));            
+                info.font && info.font.fontNames.Contains(name));
             if (founded != null) {
                 return founded;
             }

@@ -140,7 +140,8 @@ namespace Unity.UIWidgets.animation {
 
                 if (estimate < t) {
                     start = midpoint;
-                } else {
+                }
+                else {
                     end = midpoint;
                 }
             }
@@ -207,7 +208,8 @@ namespace Unity.UIWidgets.animation {
             D.assert(t >= 0.0 && t <= 1.0);
             if (t < 0.5) {
                 return (1.0 - Curves._bounce(1.0 - t)) * 0.5;
-            } else {
+            }
+            else {
                 return Curves._bounce(t * 2.0 - 1.0) * 0.5 + 0.5;
             }
         }
@@ -263,7 +265,8 @@ namespace Unity.UIWidgets.animation {
             t = 2.0 * t - 1.0;
             if (t < 0.0) {
                 return -0.5 * Math.Pow(2.0, 10.0 * t) * Math.Sin((t - s) * (Math.PI * 2.0) / this.period);
-            } else {
+            }
+            else {
                 return Math.Pow(2.0, -10.0 * t) * Math.Sin((t - s) * (Math.PI * 2.0) / this.period) * 0.5 + 1.0;
             }
         }
@@ -303,10 +306,12 @@ namespace Unity.UIWidgets.animation {
         internal static double _bounce(double t) {
             if (t < 1.0 / 2.75) {
                 return 7.5625 * t * t;
-            } else if (t < 2 / 2.75) {
+            }
+            else if (t < 2 / 2.75) {
                 t -= 1.5 / 2.75;
                 return 7.5625 * t * t + 0.75;
-            } else if (t < 2.5 / 2.75) {
+            }
+            else if (t < 2.5 / 2.75) {
                 t -= 2.25 / 2.75;
                 return 7.5625 * t * t + 0.9375;
             }

@@ -376,7 +376,8 @@ namespace Unity.UIWidgets.animation {
             if (this._nextTrain != null) {
                 if (this._currentTrain.value > this._nextTrain.value) {
                     this._mode = _TrainHoppingMode.maximize;
-                } else {
+                }
+                else {
                     this._mode = _TrainHoppingMode.minimize;
                     if (this._currentTrain.value == this._nextTrain.value) {
                         this._currentTrain = this._nextTrain;
@@ -521,6 +522,7 @@ namespace Unity.UIWidgets.animation {
                 if (this.next.status == AnimationStatus.forward || this.next.status == AnimationStatus.reverse) {
                     return this.next.status;
                 }
+
                 return this.first.status;
             }
         }

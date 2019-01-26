@@ -57,9 +57,11 @@ namespace Unity.UIWidgets.ui {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return string.Equals(this._languageCode, other._languageCode) &&
                    string.Equals(this._countryCode, other._countryCode);
         }
@@ -68,12 +70,15 @@ namespace Unity.UIWidgets.ui {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((Locale) obj);
         }
 
@@ -112,7 +117,8 @@ namespace Unity.UIWidgets.ui {
                 if (value == null) {
                     D.assert(_instance != null, "Window.instance is already cleared.");
                     _instance = null;
-                } else {
+                }
+                else {
                     D.assert(_instance == null, "Window.instance is already assigned.");
                     _instance = value;
                 }

@@ -56,7 +56,8 @@ namespace Unity.UIWidgets.painting {
                     ResourceRequest request = Resources.LoadAsync(assetName);
                     yield return request;
                     asset = request.asset;
-                } else {
+                }
+                else {
                     AssetBundleRequest request = bundle.LoadAssetAsync(assetName);
                     yield return request;
                     asset = request.asset;
@@ -65,7 +66,8 @@ namespace Unity.UIWidgets.painting {
                 if (asset != null) {
                     if (bundle == null) {
                         Resources.UnloadAsset(asset);
-                    } else {
+                    }
+                    else {
                         bundle.Unload(asset);
                     }
 
@@ -89,9 +91,11 @@ namespace Unity.UIWidgets.painting {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return string.Equals(this.assetName, other.assetName) && Equals(this.bundle, other.bundle);
         }
 
@@ -99,12 +103,15 @@ namespace Unity.UIWidgets.painting {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((AssetImage) obj);
         }
 

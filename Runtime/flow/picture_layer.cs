@@ -37,7 +37,8 @@ namespace Unity.UIWidgets.flow {
 
                 this._rasterCacheResult = context.rasterCache.getPrerolledImage(
                     this._picture, ctm, context.devicePixelRatio, this._isComplex, this._willChange);
-            } else {
+            }
+            else {
                 this._rasterCacheResult = null;
             }
 
@@ -61,10 +62,12 @@ namespace Unity.UIWidgets.flow {
             try {
                 if (this._rasterCacheResult != null) {
                     this._rasterCacheResult.draw(canvas);
-                } else {
+                }
+                else {
                     canvas.drawPicture(this._picture);
                 }
-            } finally {
+            }
+            finally {
                 canvas.restore();
             }
         }

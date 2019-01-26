@@ -28,6 +28,7 @@ namespace Unity.UIWidgets.service {
             if (string.IsNullOrEmpty(text)) {
                 return this;
             }
+
             newText = this.selection.textBefore(this.text) + text + this.selection.textAfter(this.text);
             newSelection = TextSelection.collapsed(this.selection.start + text.Length);
             return new TextEditingValue(
@@ -41,6 +42,7 @@ namespace Unity.UIWidgets.service {
                     if (this.selection.start == 0) {
                         return this;
                     }
+
                     return this.copyWith(
                         text: this.text.Substring(0, this.selection.start - 1) + this.selection.textAfter(this.text),
                         selection: TextSelection.collapsed(this.selection.start - 1));
@@ -49,9 +51,11 @@ namespace Unity.UIWidgets.service {
                 if (this.selection.start >= this.text.Length) {
                     return this;
                 }
+
                 return this.copyWith(text: this.text.Substring(0, this.selection.start) +
                                            this.text.Substring(this.selection.start + 1));
-            } else {
+            }
+            else {
                 var newText = this.selection.textBefore(this.text) + this.selection.textAfter(this.text);
                 return this.copyWith(text: newText, selection: TextSelection.collapsed(this.selection.start));
             }
@@ -103,6 +107,7 @@ namespace Unity.UIWidgets.service {
             if (this.composing == TextRange.empty) {
                 return this;
             }
+
             return new TextEditingValue(
                 text: this.text.Substring(0, this.composing.start) + this.text.Substring(this.composing.end),
                 selection: TextSelection.collapsed(this.composing.start),
@@ -116,9 +121,11 @@ namespace Unity.UIWidgets.service {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return string.Equals(this.text, other.text) && Equals(this.selection, other.selection) &&
                    Equals(this.composing, other.composing);
         }
@@ -127,12 +134,15 @@ namespace Unity.UIWidgets.service {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((TextEditingValue) obj);
         }
 
@@ -168,7 +178,7 @@ namespace Unity.UIWidgets.service {
 
     public interface TextInputClient {
         void updateEditingValue(TextEditingValue value);
-        
+
         void performAction(TextInputAction action);
     }
 
@@ -268,6 +278,7 @@ namespace Unity.UIWidgets.service {
                 this._textInput._value = null;
                 Input.imeCompositionMode = IMECompositionMode.Auto;
             }
+
             D.assert(!this.attached);
         }
 
@@ -308,6 +319,7 @@ namespace Unity.UIWidgets.service {
                         this._updateEditingState(this._currentConnection._id, this._value);
                     }
                 }
+
                 currentEvent.Use();
             }
 
@@ -324,7 +336,7 @@ namespace Unity.UIWidgets.service {
             Input.compositionCursorPos = new Vector2((float) x, (float) y);
         }
 
-        void _updateEditingState(int client, TextEditingValue value) {        
+        void _updateEditingState(int client, TextEditingValue value) {
             Window.instance.run(() => {
                 if (this._currentConnection == null) {
                     return;
@@ -333,7 +345,7 @@ namespace Unity.UIWidgets.service {
                 if (client != this._currentConnection._id) {
                     return;
                 }
-                
+
                 this._currentConnection._client.updateEditingValue(value);
             });
         }
@@ -347,12 +359,9 @@ namespace Unity.UIWidgets.service {
                 if (client != this._currentConnection._id) {
                     return;
                 }
-                
+
                 this._currentConnection._client.performAction(action);
-            }); 
+            });
         }
-
     }
-
-   
 }

@@ -52,7 +52,8 @@ namespace Unity.UIWidgets.gestures {
             StringBuilder buffer = new StringBuilder();
             if (this.members.isEmpty()) {
                 buffer.Append("<empty>");
-            } else {
+            }
+            else {
                 buffer.Append(string.Join(", ", this.members.Select(
                     member => member == this.eagerWinner
                         ? $"{member} (eager winner)"
@@ -166,10 +167,12 @@ namespace Unity.UIWidgets.gestures {
                 if (!state.isOpen) {
                     this._tryToResolveArena(pointer, state);
                 }
-            } else {
+            }
+            else {
                 if (state.isOpen) {
                     state.eagerWinner = state.eagerWinner ?? member;
-                } else {
+                }
+                else {
                     D.assert(this._debugLogDiagnostic(pointer,
                         $"Self-declared winner: {member}"));
                     this._resolveInFavorOf(pointer, state, member);
@@ -183,10 +186,12 @@ namespace Unity.UIWidgets.gestures {
 
             if (state.members.Count == 1) {
                 Window.instance.scheduleMicrotask(() => this._resolveByDefault(pointer, state));
-            } else if (state.members.isEmpty()) {
+            }
+            else if (state.members.isEmpty()) {
                 this._arenas.Remove(pointer);
                 D.assert(this._debugLogDiagnostic(pointer, "Arena empty."));
-            } else if (state.eagerWinner != null) {
+            }
+            else if (state.eagerWinner != null) {
                 D.assert(this._debugLogDiagnostic(pointer,
                     $"Eager winner: {state.eagerWinner}"));
                 this._resolveInFavorOf(pointer, state, state.eagerWinner);

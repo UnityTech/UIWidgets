@@ -41,7 +41,8 @@ namespace Unity.UIWidgets.gestures {
                 });
 
                 result = callback();
-            } catch (Exception ex) {
+            }
+            catch (Exception ex) {
                 UIWidgetsError.reportError(new UIWidgetsErrorDetails(
                     exception: ex,
                     library: "gesture",
@@ -191,7 +192,8 @@ namespace Unity.UIWidgets.gestures {
                 if (evt is PointerMoveEvent && this._getDistance(evt) > Constants.kTouchSlop) {
                     this.resolve(GestureDisposition.rejected);
                     this.stopTrackingPointer(this.primaryPointer);
-                } else {
+                }
+                else {
                     this.handlePrimaryPointer(evt);
                 }
             }

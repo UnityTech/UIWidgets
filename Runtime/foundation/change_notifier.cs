@@ -69,7 +69,8 @@ namespace Unity.UIWidgets.foundation {
                         if (this._listeners.Contains(listener)) {
                             listener();
                         }
-                    } catch (Exception ex) {
+                    }
+                    catch (Exception ex) {
                         UIWidgetsError.reportError(new UIWidgetsErrorDetails(
                             exception: ex,
                             library: "foundation library",

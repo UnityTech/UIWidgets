@@ -41,18 +41,22 @@ namespace Unity.UIWidgets.painting {
                     if (outputSize.width / outputSize.height > sourceSize.width / sourceSize.height) {
                         destinationSize = new Size(sourceSize.width * outputSize.height / sourceSize.height,
                             outputSize.height);
-                    } else {
+                    }
+                    else {
                         destinationSize = new Size(outputSize.width,
                             sourceSize.height * outputSize.width / sourceSize.width);
                     }
+
                     break;
                 case BoxFit.cover:
                     if (outputSize.width / outputSize.height > inputSize.width / inputSize.height) {
                         sourceSize = new Size(inputSize.width, inputSize.width * outputSize.height / outputSize.width);
-                    } else {
+                    }
+                    else {
                         sourceSize = new Size(inputSize.height * outputSize.width / outputSize.height,
                             inputSize.height);
                     }
+
                     destinationSize = outputSize;
                     break;
                 case BoxFit.fitWidth:
@@ -77,9 +81,11 @@ namespace Unity.UIWidgets.painting {
                     if (destinationSize.height > outputSize.height) {
                         destinationSize = new Size(outputSize.height * aspectRatio, outputSize.height);
                     }
+
                     if (destinationSize.width > outputSize.width) {
                         destinationSize = new Size(outputSize.width, outputSize.width / aspectRatio);
                     }
+
                     break;
             }
 

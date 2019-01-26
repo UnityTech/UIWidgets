@@ -21,6 +21,7 @@ namespace Unity.UIWidgets.painting {
             if (a is CircleBorder border) {
                 return new CircleBorder(side: BorderSide.lerp(border.side, this.side, t));
             }
+
             return base.lerpFrom(a, t);
         }
 
@@ -28,6 +29,7 @@ namespace Unity.UIWidgets.painting {
             if (b is CircleBorder border) {
                 return new CircleBorder(side: BorderSide.lerp(this.side, border.side, t));
             }
+
             return base.lerpTo(b, t);
         }
 
@@ -63,9 +65,11 @@ namespace Unity.UIWidgets.painting {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return Equals(this.side, other.side);
         }
 
@@ -73,12 +77,15 @@ namespace Unity.UIWidgets.painting {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((CircleBorder) obj);
         }
 

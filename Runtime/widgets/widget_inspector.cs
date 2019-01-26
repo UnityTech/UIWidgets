@@ -105,6 +105,7 @@ namespace Unity.UIWidgets.widgets {
             if (root == null) {
                 return null;
             }
+
             return this._nodeToJson(root,
                 new _SerializeConfig(groupName, summaryTree: false, subtreeDepth: 2, includeProperties: true));
         }
@@ -179,24 +180,29 @@ namespace Unity.UIWidgets.widgets {
                     if (ReferenceEquals(obj, this.selection.currentElement)) {
                         return false;
                     }
+
                     this.selection.currentElement = (Element) obj;
-                } else {
+                }
+                else {
                     if (obj == this.selection.current) {
                         return false;
                     }
+
                     this.selection.current = (RenderObject) obj;
                 }
 
                 if (this.selectionChangedCallback != null) {
                     if (WidgetsBinding.instance.schedulerPhase == SchedulerPhase.idle) {
                         this.selectionChangedCallback();
-                    } else {
+                    }
+                    else {
                         // todo schedule task ?
                         WidgetsBinding.instance.scheduleFrameCallback(
                             duration => { this.selectionChangedCallback(); }
                         );
                     }
                 }
+
                 return true;
             }
 
@@ -240,7 +246,8 @@ namespace Unity.UIWidgets.widgets {
                         {"blue", ((Color) value).blue},
                         {"alpha", ((Color) value).alpha},
                     };
-                } else if (value is IconData) {
+                }
+                else if (value is IconData) {
                     ret["valueProperties"] = new Dictionary<string, object> {
                         {"codePoint", ((IconData) value).codePoint}
                     };
@@ -268,7 +275,8 @@ namespace Unity.UIWidgets.widgets {
                     if (config.pathToInclude[0] == node.valueObject) {
                         return this._nodeToJson(node, _SerializeConfig.merge(config,
                             pathToInclude: config.pathToInclude.GetRange(1, config.pathToInclude.Count - 1)));
-                    } else {
+                    }
+                    else {
                         return this._nodeToJson(node, _SerializeConfig.merge(config));
                     }
                 }
@@ -293,10 +301,12 @@ namespace Unity.UIWidgets.widgets {
             foreach (var child in node.getChildren()) {
                 if (!config.summaryTree || this._shouldShowInSummaryTree(child)) {
                     children.Add(child);
-                } else {
+                }
+                else {
                     children.AddRange(this._getChildrenFiltered(child, config));
                 }
             }
+
             return children;
         }
 
@@ -336,7 +346,8 @@ namespace Unity.UIWidgets.widgets {
                 referenceData = new _InspectorReferenceData(obj);
                 this._idToReferenceData[id] = referenceData;
                 group.Add(referenceData);
-            } else {
+            }
+            else {
                 referenceData = this._idToReferenceData[id];
                 if (group.Add(referenceData)) {
                     referenceData.count += 1;
@@ -437,6 +448,7 @@ namespace Unity.UIWidgets.widgets {
             if (!invertible) {
                 return false;
             }
+
             var localPosition = inverse.mapPoint(position);
 
             List<DiagnosticsNode> children = renderObject.debugDescribeChildren();
@@ -447,6 +459,7 @@ namespace Unity.UIWidgets.widgets {
                     (!(diagnostics.valueObject is RenderObject))) {
                     continue;
                 }
+
                 RenderObject child = (RenderObject) diagnostics.valueObject;
                 Rect paintClip = renderObject.describeApproximatePaintClip(child);
                 if (paintClip != null && !paintClip.contains(localPosition)) {
@@ -471,6 +484,7 @@ namespace Unity.UIWidgets.widgets {
             if (hit) {
                 hits.Add(renderObject);
             }
+
             return hit;
         }
 
@@ -526,6 +540,7 @@ namespace Unity.UIWidgets.widgets {
             if (!this.isSelectMode) {
                 return;
             }
+
             if (this._lastPointerLocation != null) {
                 this._inspectAt(this._lastPointerLocation);
 
@@ -535,6 +550,7 @@ namespace Unity.UIWidgets.widgets {
                     }
                 }
             }
+
             this.setState(() => {
                 if (this.widget.selectButtonBuilder != null) {
                     this.isSelectMode = false;
@@ -568,6 +584,7 @@ namespace Unity.UIWidgets.widgets {
                     child: this.widget.selectButtonBuilder(context, this._handleEnableSelect)
                 ));
             }
+
             children.Add(new _InspectorOverlay(null, this.selection));
             return new Stack(children: children);
         }
@@ -603,6 +620,7 @@ namespace Unity.UIWidgets.widgets {
             if (bounds != null) {
                 size = bounds.size;
             }
+
             return size == null ? double.PositiveInfinity : size.width * size.height;
         }
     }
@@ -661,7 +679,8 @@ namespace Unity.UIWidgets.widgets {
             if (this._index < this.candidates.Count) {
                 this._current = this.candidates[this.index];
                 this._currentElement = ((_DebugCreator) this._current.debugCreator).element;
-            } else {
+            }
+            else {
                 this._current = null;
                 this._currentElement = null;
             }
@@ -740,9 +759,11 @@ namespace Unity.UIWidgets.widgets {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return Equals(this.rect, other.rect) && this.transform.Equals(other.transform);
         }
 
@@ -750,12 +771,15 @@ namespace Unity.UIWidgets.widgets {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((_TransformedRect) obj);
         }
 
@@ -794,28 +818,33 @@ namespace Unity.UIWidgets.widgets {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return Equals(this.overlayRect, other.overlayRect) && Equals(this.selected, other.selected)
-                                                                      && string.Equals(this.tooltip, other.tooltip) &&
-                                                                      this.textDirection == other.textDirection
-                                                                      && (this.candidates == other.candidates ||
-                                                                          (this.candidates != null &&
-                                                                           this.candidates.SequenceEqual(
-                                                                               other.candidates)));
+                                                               && string.Equals(this.tooltip, other.tooltip) &&
+                                                               this.textDirection == other.textDirection
+                                                               && (this.candidates == other.candidates ||
+                                                                   (this.candidates != null &&
+                                                                    this.candidates.SequenceEqual(
+                                                                        other.candidates)));
         }
 
         public override bool Equals(object obj) {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((_InspectorOverlayRenderState) obj);
         }
 
@@ -874,6 +903,7 @@ namespace Unity.UIWidgets.widgets {
                 if (candidate == selected || !candidate.attached) {
                     continue;
                 }
+
                 candidates.Add(new _TransformedRect(candidate));
             }
 
@@ -887,6 +917,7 @@ namespace Unity.UIWidgets.widgets {
                 this._lastState = state;
                 this._picture = this._buildPicture(state);
             }
+
             builder.addPicture(layerOffset, this._picture);
         }
 

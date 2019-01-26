@@ -319,12 +319,18 @@ namespace Unity.UIWidgets.rendering {
         }
 
         public static BoxConstraints lerp(BoxConstraints a, BoxConstraints b, double t) {
-            if (a == null && b == null)
+            if (a == null && b == null) {
                 return null;
-            if (a == null)
+            }
+
+            if (a == null) {
                 return b * t;
-            if (b == null)
+            }
+
+            if (b == null) {
                 return a * (1.0 - t);
+            }
+
             D.assert(a.debugAssertIsValid());
             D.assert(b.debugAssertIsValid());
             D.assert(

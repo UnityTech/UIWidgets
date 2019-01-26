@@ -33,6 +33,7 @@ namespace Unity.UIWidgets.widgets {
                     viewportFraction: viewportFraction ?? ((IPageMetrics) it).viewportFraction
                 );
             }
+
             return new FixedScrollMetrics(
                 minScrollExtent: minScrollExtent ?? it.minScrollExtent,
                 maxScrollExtent: maxScrollExtent ?? it.maxScrollExtent,

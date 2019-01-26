@@ -191,7 +191,8 @@ namespace Unity.UIWidgets.ui {
             if (inStream != null) {
                 this._inStream = inStream;
                 this._readHeader();
-            } else {
+            }
+            else {
                 this._status = STATUS_OPEN_ERROR;
             }
 
@@ -296,6 +297,7 @@ namespace Unity.UIWidgets.ui {
                     if ((code > available) || (code == end_of_information)) {
                         break;
                     }
+
                     if (code == clear) {
                         //  Reset decoder.
                         code_size = data_size + 1;
@@ -382,7 +384,8 @@ namespace Unity.UIWidgets.ui {
             int curByte = 0;
             try {
                 curByte = this._inStream.ReadByte();
-            } catch (IOException) {
+            }
+            catch (IOException) {
                 this._status = STATUS_FORMAT_ERROR;
             }
 
@@ -408,7 +411,8 @@ namespace Unity.UIWidgets.ui {
 
                         n += count;
                     }
-                } catch (IOException) {
+                }
+                catch (IOException) {
                 }
 
                 if (n < this._blockSize) {
@@ -432,12 +436,14 @@ namespace Unity.UIWidgets.ui {
             int n = 0;
             try {
                 n = this._inStream.Read(c, 0, c.Length);
-            } catch (IOException) {
+            }
+            catch (IOException) {
             }
 
             if (n < nbytes) {
                 this._status = STATUS_FORMAT_ERROR;
-            } else {
+            }
+            else {
                 tab = new int[256]; // max size to avoid bounds checks
                 int i = 0;
                 int j = 0;
@@ -484,7 +490,8 @@ namespace Unity.UIWidgets.ui {
                                 string app = appBuilder.ToString();
                                 if (app.Equals("NETSCAPE2.0")) {
                                     this._readNetscapeExt();
-                                } else {
+                                }
+                                else {
                                     this._skip(); // don't care
                                 }
 
@@ -572,7 +579,8 @@ namespace Unity.UIWidgets.ui {
             if (this._lctFlag) {
                 this._lct = this._readColorTable(this._lctSize); // read table
                 this._act = this._lct; // make local table active
-            } else {
+            }
+            else {
                 this._act = this._gct; // make global table active
                 if (this._bgIndex == this._transIndex) {
                     this._bgColor = 0;

@@ -55,7 +55,8 @@ namespace Unity.UIWidgets.foundation {
 
                             if (addPrefix) {
                                 yield return prefix + message.Substring(start, lastWordEnd.Value - start);
-                            } else {
+                            }
+                            else {
                                 yield return message.Substring(start, lastWordEnd.Value - start);
                                 addPrefix = true;
                             }
@@ -63,6 +64,7 @@ namespace Unity.UIWidgets.foundation {
                             if (lastWordEnd >= message.Length) {
                                 yield break;
                             }
+
                             // just yield returned a line
                             if (lastWordEnd == index) {
                                 // we broke at current position
@@ -70,9 +72,11 @@ namespace Unity.UIWidgets.foundation {
                                 while ((index < message.Length) && (message[index] == ' ')) {
                                     index += 1;
                                 }
+
                                 start = index;
                                 mode = _WordWrapParseMode.inWord;
-                            } else {
+                            }
+                            else {
                                 // we broke at the previous break point, and we"re at the start of a new one
                                 D.assert(lastWordStart > lastWordEnd);
                                 start = lastWordStart;
@@ -82,7 +86,8 @@ namespace Unity.UIWidgets.foundation {
                             startForLengthCalculations = start - prefix.Length;
                             D.assert(addPrefix);
                             lastWordEnd = null;
-                        } else {
+                        }
+                        else {
                             // save this break point, we"re not yet over the line width
                             lastWordEnd = index;
                             // skip to the end of this break point

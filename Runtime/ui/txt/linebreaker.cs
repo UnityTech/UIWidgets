@@ -62,12 +62,15 @@ namespace Unity.UIWidgets.ui {
                     if (newX > this._width && this._lineStart != charIndex) {
                         this._characterWidth[charIndex] = tabSize;
                         this.makeLine(charIndex, charIndex);
-                    } else {
+                    }
+                    else {
                         this._characterWidth[charIndex] = newX - offsetX;
                         this._characterPositions[charIndex].x = offsetX;
                     }
+
                     offsetX = this._characterPositions[charIndex].x + this._characterWidth[charIndex];
-                } else if (this._text[charIndex] == ' ') {
+                }
+                else if (this._text[charIndex] == ' ') {
                     font.GetCharacterInfo(this._text[charIndex], out charInfo, style.UnityFontSize,
                         run.style.UnityFontStyle);
                     this._spaceCount++;
@@ -75,7 +78,8 @@ namespace Unity.UIWidgets.ui {
                     this._characterWidth[charIndex] = charInfo.advance;
                     offsetX = this._characterPositions[charIndex].x + this._characterWidth[charIndex];
                     // todo no wrap in space ?
-                } else {
+                }
+                else {
                     font.GetCharacterInfo(this._text[charIndex], out charInfo, style.UnityFontSize,
                         run.style.UnityFontStyle);
                     if (this._spaceCount > 0 || blockStart == charIndex) {
@@ -89,7 +93,8 @@ namespace Unity.UIWidgets.ui {
                         if (this._lineStart == this._wordStart) {
                             this.makeLine(charIndex, charIndex);
                             this._wordStart = charIndex;
-                        } else {
+                        }
+                        else {
                             this.makeLine(this._wordStart, charIndex);
                         }
                     }
@@ -115,6 +120,7 @@ namespace Unity.UIWidgets.ui {
             if (end >= this._characterPositions.Length) {
                 return;
             }
+
             var offset = new Vector2d(-this._characterPositions[end].x, 0);
             this._characterPositions[end].x = 0;
             if (end < last) {

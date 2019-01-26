@@ -155,7 +155,8 @@ namespace Unity.UIWidgets.foundation {
             if (s == "\n") {
                 if (this._buffer.Length == 0) {
                     this._buffer.Append(this.prefixLineOne.TrimEnd());
-                } else if (this._atLineStart) {
+                }
+                else if (this._atLineStart) {
                     this._buffer.Append(this.prefixOtherLines.TrimEnd());
                     this._hasMultipleLines = true;
                 }
@@ -167,7 +168,8 @@ namespace Unity.UIWidgets.foundation {
 
             if (this._buffer.Length == 0) {
                 this._buffer.Append(this.prefixLineOne);
-            } else if (this._atLineStart) {
+            }
+            else if (this._atLineStart) {
                 this._buffer.Append(this.prefixOtherLines);
                 this._hasMultipleLines = true;
             }
@@ -398,7 +400,8 @@ namespace Unity.UIWidgets.foundation {
                 if (this.name.isNotEmpty() && this.showName) {
                     builder.write(this.name);
                 }
-            } else {
+            }
+            else {
                 if (this.name.isNotEmpty() && this.showName) {
                     builder.write(this.name);
                     if (this.showSeparator) {
@@ -465,7 +468,8 @@ namespace Unity.UIWidgets.foundation {
                 string message = property.toString(parentConfiguration: config, minLevel: minLevel);
                 if (!config.lineBreakProperties || message.Length < kWrapWidth) {
                     builder.write(message);
-                } else {
+                }
+                else {
                     var lines = message.Split('\n');
                     for (int j = 0; j < lines.Length; ++j) {
                         string line = lines[j];
@@ -524,7 +528,8 @@ namespace Unity.UIWidgets.foundation {
                         if (childConfig.footer.isNotEmpty()) {
                             builder.writeRaw(prefixChildren + childConfig.childLinkSpace + childConfig.footer);
                         }
-                    } else {
+                    }
+                    else {
                         TextTreeConfiguration nextChildStyle = this._childTextConfiguration(children[i + 1], config);
                         string childPrefixLineOne = prefixChildren + childConfig.prefixLineOne;
                         string childPrefixOtherLines =
@@ -840,7 +845,8 @@ namespace Unity.UIWidgets.foundation {
                 if (this.ifTrue != null) {
                     return this.ifTrue;
                 }
-            } else if (this.value == false) {
+            }
+            else if (this.value == false) {
                 if (this.ifFalse != null) {
                     return this.ifFalse;
                 }
@@ -1008,7 +1014,8 @@ namespace Unity.UIWidgets.foundation {
                 if (this.ifPresent != null) {
                     return this.ifPresent;
                 }
-            } else {
+            }
+            else {
                 if (this.ifNull != null) {
                     return this.ifNull;
                 }
@@ -1033,7 +1040,8 @@ namespace Unity.UIWidgets.foundation {
                     if (this.ifPresent == null) {
                         return DiagnosticLevel.hidden;
                     }
-                } else {
+                }
+                else {
                     if (this.ifNull == null) {
                         return DiagnosticLevel.hidden;
                     }
@@ -1269,7 +1277,8 @@ namespace Unity.UIWidgets.foundation {
             this._valueComputed = true;
             try {
                 this._value = this._computeValue();
-            } catch (Exception ex) {
+            }
+            catch (Exception ex) {
                 this._exception = ex;
                 this._value = default(T);
             }

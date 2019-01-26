@@ -138,8 +138,10 @@ namespace Unity.UIWidgets.painting {
 
             string modifiedDebugLabel = "";
             D.assert(() => {
-                if (this.debugLabel != null)
+                if (this.debugLabel != null) {
                     modifiedDebugLabel = this.debugLabel + ".apply";
+                }
+
                 return true;
             });
 

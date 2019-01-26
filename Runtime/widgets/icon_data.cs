@@ -18,9 +18,11 @@ namespace Unity.UIWidgets.widgets {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return this.codePoint == other.codePoint &&
                    string.Equals(this.fontFamily, other.fontFamily);
         }
@@ -29,12 +31,15 @@ namespace Unity.UIWidgets.widgets {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((IconData) obj);
         }
 

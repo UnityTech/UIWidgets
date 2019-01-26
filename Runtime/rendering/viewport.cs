@@ -248,7 +248,8 @@ namespace Unity.UIWidgets.rendering {
 
                 if (childLayoutGeometry.visible || scrollOffset > 0) {
                     this.updateChildLayoutOffset(child, effectiveLayoutOffset, growthDirection);
-                } else {
+                }
+                else {
                     this.updateChildLayoutOffset(child, -scrollOffset + initialLayoutOffset, growthDirection);
                 }
 
@@ -309,7 +310,8 @@ namespace Unity.UIWidgets.rendering {
 
             if (this.hasVisualOverflow) {
                 context.pushClipRect(this.needsCompositing, offset, Offset.zero & this.size, this._paintContents);
-            } else {
+            }
+            else {
                 this._paintContents(context, offset);
             }
         }
@@ -448,12 +450,14 @@ namespace Unity.UIWidgets.rendering {
                 }
 
                 descendant = pivot;
-            } else if (target is RenderSliver) {
+            }
+            else if (target is RenderSliver) {
                 RenderSliver targetSliver = (RenderSliver) target;
                 leadingScrollOffset = 0.0;
                 targetMainAxisExtent = targetSliver.geometry.scrollExtent;
                 descendant = targetSliver;
-            } else {
+            }
+            else {
                 return new RevealedOffset(offset: this.offset.pixels, rect: rect);
             }
 
@@ -553,6 +557,7 @@ namespace Unity.UIWidgets.rendering {
                 if (child == this.lastChild) {
                     break;
                 }
+
                 count += 1;
                 child = this.childAfter(child);
             }
@@ -645,11 +650,14 @@ namespace Unity.UIWidgets.rendering {
                 double leadingEdgeDiff = (offset.pixels - leadingEdgeOffset.offset).abs();
                 double trailingEdgeDiff = (offset.pixels - trailingEdgeOffset.offset).abs();
                 targetOffset = leadingEdgeDiff < trailingEdgeDiff ? leadingEdgeOffset : trailingEdgeOffset;
-            } else if (currentOffset > leadingEdgeOffset.offset) {
+            }
+            else if (currentOffset > leadingEdgeOffset.offset) {
                 targetOffset = leadingEdgeOffset;
-            } else if (currentOffset < trailingEdgeOffset.offset) {
+            }
+            else if (currentOffset < trailingEdgeOffset.offset) {
                 targetOffset = trailingEdgeOffset;
-            } else {
+            }
+            else {
                 var transform = descendant.getTransformTo(viewport.parent);
                 return transform.mapRect(rect ?? descendant.paintBounds);
             }
@@ -658,7 +666,8 @@ namespace Unity.UIWidgets.rendering {
 
             if (duration == TimeSpan.Zero) {
                 offset.jumpTo(targetOffset.offset);
-            } else {
+            }
+            else {
                 offset.animateTo(targetOffset.offset, duration: duration.Value, curve: curve);
             }
 
@@ -843,7 +852,8 @@ namespace Unity.UIWidgets.rendering {
                     this.offset.pixels + centerOffsetAdjustment);
                 if (correction != 0.0) {
                     this.offset.correctBy(correction);
-                } else {
+                }
+                else {
                     if (this.offset.applyContentDimensions(
                         Math.Min(0.0, this._minScrollExtent + mainAxisExtent * this.anchor),
                         Math.Max(0.0, this._maxScrollExtent - mainAxisExtent * (1.0 - this.anchor))
@@ -1215,7 +1225,8 @@ namespace Unity.UIWidgets.rendering {
                 var correction = this._attemptLayout(mainAxisExtent, crossAxisExtent, this.offset.pixels);
                 if (correction != 0.0) {
                     this.offset.correctBy(correction);
-                } else {
+                }
+                else {
                     switch (this.axis) {
                         case Axis.vertical:
                             effectiveExtent = this.constraints.constrainHeight(this._shrinkWrapExtent);

@@ -37,7 +37,8 @@ namespace Unity.UIWidgets.async {
 
             if (isBackground && BackgroundCallbacks.getInstance() != null) {
                 this._unhook = BackgroundCallbacks.getInstance().addCallback(this._moveNext);
-            } else {
+            }
+            else {
                 this._unhook = this._window.run(TimeSpan.Zero, this._moveNext, periodic: true);
             }
 
@@ -55,7 +56,8 @@ namespace Unity.UIWidgets.async {
                 this.lastResult = null;
                 if (this._isBackground) {
                     this._window.runInMain(() => { this._promise.Reject(lastError); });
-                } else {
+                }
+                else {
                     this._promise.Reject(lastError);
                 }
 
@@ -65,7 +67,8 @@ namespace Unity.UIWidgets.async {
             bool hasNext;
             try {
                 hasNext = this._processIEnumeratorRecursive(this._routine);
-            } catch (Exception ex) {
+            }
+            catch (Exception ex) {
                 this.stop(ex);
                 return;
             }
@@ -77,7 +80,8 @@ namespace Unity.UIWidgets.async {
                 D.assert(this.lastError == null);
                 if (this._isBackground) {
                     this._window.runInMain(() => { this._promise.Resolve(this.lastResult); });
-                } else {
+                }
+                else {
                     this._promise.Resolve(this.lastResult);
                 }
             }
@@ -231,6 +235,7 @@ namespace Unity.UIWidgets.async {
             if (_instance == null) {
                 _instance = new BackgroundCallbacks(2);
             }
+
             return _instance;
         }
 
@@ -286,7 +291,8 @@ namespace Unity.UIWidgets.async {
 
                 try {
                     callbackNode.callback();
-                } catch (Exception ex) {
+                }
+                catch (Exception ex) {
                     Debug.LogError("Failed to execute callback in BackgroundCallbacks: " + ex);
                 }
 

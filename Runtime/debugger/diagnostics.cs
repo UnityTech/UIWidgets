@@ -20,9 +20,11 @@ namespace Unity.UIWidgets.debugger {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return Equals(this.diagnosticRef, other.diagnosticRef);
         }
 
@@ -30,12 +32,15 @@ namespace Unity.UIWidgets.debugger {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((DiagnosticsNode) obj);
         }
 
@@ -300,6 +305,7 @@ namespace Unity.UIWidgets.debugger {
                         properties.Add(new DiagnosticsNode(v, true));
                     }
                 }
+
                 return properties;
             }
         }
@@ -316,9 +322,11 @@ namespace Unity.UIWidgets.debugger {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return string.Equals(this.id, other.id);
         }
 
@@ -326,12 +334,15 @@ namespace Unity.UIWidgets.debugger {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((InspectorInstanceRef) obj);
         }
 

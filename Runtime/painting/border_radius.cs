@@ -18,19 +18,19 @@ namespace Unity.UIWidgets.painting {
         public static BorderRadius all(Radius radius) {
             return only(radius, radius, radius, radius);
         }
-        
+
         public static BorderRadius all(double radius) {
             return only(radius, radius, radius, radius);
         }
 
         public static BorderRadius circular(double radius) {
-            return BorderRadius.all(Radius.circular(radius));
+            return all(Radius.circular(radius));
         }
 
         public static BorderRadius vertical(Radius top = null, Radius bottom = null) {
             return only(top, top, bottom, bottom);
         }
-        
+
         public static BorderRadius vertical(double? top = null, double? bottom = null) {
             return only(top, top, bottom, bottom);
         }
@@ -38,7 +38,7 @@ namespace Unity.UIWidgets.painting {
         public static BorderRadius horizontal(Radius left = null, Radius right = null) {
             return only(left, right, right, left);
         }
-        
+
         public static BorderRadius horizontal(double? left = null, double? right = null) {
             return only(left, right, right, left);
         }
@@ -48,7 +48,7 @@ namespace Unity.UIWidgets.painting {
             Radius bottomRight = null, Radius bottomLeft = null) {
             return new BorderRadius(topLeft, topRight, bottomRight, bottomLeft);
         }
-        
+
         public static BorderRadius only(
             double? topLeft = null, double? topRight = null,
             double? bottomRight = null, double? bottomLeft = null) {
@@ -56,7 +56,7 @@ namespace Unity.UIWidgets.painting {
             var trRadius = topRight != null ? Radius.circular(topRight.Value) : null;
             var brRadius = bottomRight != null ? Radius.circular(bottomRight.Value) : null;
             var blRadius = bottomLeft != null ? Radius.circular(bottomLeft.Value) : null;
-            
+
             return new BorderRadius(tlRadius, trRadius, brRadius, blRadius);
         }
 
@@ -78,7 +78,7 @@ namespace Unity.UIWidgets.painting {
         }
 
         public static BorderRadius operator -(BorderRadius it, BorderRadius other) {
-            return BorderRadius.only(
+            return only(
                 topLeft: it.topLeft - other.topLeft,
                 topRight: it.topRight - other.topRight,
                 bottomLeft: it.bottomLeft - other.bottomLeft,
@@ -87,7 +87,7 @@ namespace Unity.UIWidgets.painting {
         }
 
         public static BorderRadius operator +(BorderRadius it, BorderRadius other) {
-            return BorderRadius.only(
+            return only(
                 topLeft: it.topLeft + other.topLeft,
                 topRight: it.topRight + other.topRight,
                 bottomLeft: it.bottomLeft + other.bottomLeft,
@@ -96,7 +96,7 @@ namespace Unity.UIWidgets.painting {
         }
 
         public static BorderRadius operator -(BorderRadius it) {
-            return BorderRadius.only(
+            return only(
                 topLeft: -it.topLeft,
                 topRight: -it.topRight,
                 bottomLeft: -it.bottomLeft,
@@ -105,7 +105,7 @@ namespace Unity.UIWidgets.painting {
         }
 
         public static BorderRadius operator *(BorderRadius it, double other) {
-            return BorderRadius.only(
+            return only(
                 topLeft: it.topLeft * other,
                 topRight: it.topRight * other,
                 bottomLeft: it.bottomLeft * other,
@@ -114,7 +114,7 @@ namespace Unity.UIWidgets.painting {
         }
 
         public static BorderRadius operator /(BorderRadius it, double other) {
-            return BorderRadius.only(
+            return only(
                 topLeft: it.topLeft / other,
                 topRight: it.topRight / other,
                 bottomLeft: it.bottomLeft / other,
@@ -123,7 +123,7 @@ namespace Unity.UIWidgets.painting {
         }
 
         public static BorderRadius operator %(BorderRadius it, double other) {
-            return BorderRadius.only(
+            return only(
                 topLeft: it.topLeft % other,
                 topRight: it.topRight % other,
                 bottomLeft: it.bottomLeft % other,
@@ -135,14 +135,16 @@ namespace Unity.UIWidgets.painting {
             if (a == null && b == null) {
                 return null;
             }
+
             if (a == null) {
                 return b * t;
             }
+
             if (b == null) {
                 return a * (1.0 - t);
             }
 
-            return BorderRadius.only(
+            return only(
                 topLeft: Radius.lerp(a.topLeft, b.topLeft, t),
                 topRight: Radius.lerp(a.topRight, b.topRight, t),
                 bottomLeft: Radius.lerp(a.bottomLeft, b.bottomLeft, t),
@@ -154,9 +156,11 @@ namespace Unity.UIWidgets.painting {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return this.topLeft.Equals(other.topLeft)
                    && this.topRight.Equals(other.topRight)
                    && this.bottomRight.Equals(other.bottomRight)
@@ -167,12 +171,15 @@ namespace Unity.UIWidgets.painting {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((BorderRadius) obj);
         }
 
@@ -185,7 +192,7 @@ namespace Unity.UIWidgets.painting {
                 return hashCode;
             }
         }
-        
+
         public static bool operator ==(BorderRadius a, BorderRadius b) {
             return Equals(a, b);
         }
@@ -202,11 +209,13 @@ namespace Unity.UIWidgets.painting {
                 if (this.topLeft != Radius.zero) {
                     if (this.topLeft.x == this.topLeft.y) {
                         visual = $"BorderRadius.circular({this.topLeft.x:F1})";
-                    } else {
+                    }
+                    else {
                         visual = $"BorderRadius.all({this.topLeft})";
                     }
                 }
-            } else {
+            }
+            else {
                 var result = new StringBuilder();
                 result.Append("BorderRadius.only(");
                 bool comma = false;
@@ -214,26 +223,33 @@ namespace Unity.UIWidgets.painting {
                     result.Append($"topLeft: {this.topLeft}");
                     comma = true;
                 }
+
                 if (this.topRight != Radius.zero) {
                     if (comma) {
                         result.Append(", ");
                     }
+
                     result.Append($"topRight: {this.topRight}");
                     comma = true;
                 }
+
                 if (this.bottomLeft != Radius.zero) {
                     if (comma) {
                         result.Append(", ");
                     }
+
                     result.Append($"bottomLeft: {this.bottomLeft}");
                     comma = true;
                 }
+
                 if (this.bottomRight != Radius.zero) {
                     if (comma) {
                         result.Append(", ");
                     }
+
                     result.Append($"bottomRight: {this.bottomRight}");
                 }
+
                 result.Append(")");
                 visual = result.ToString();
             }
@@ -241,6 +257,7 @@ namespace Unity.UIWidgets.painting {
             if (visual != null) {
                 return visual;
             }
+
             return "BorderRadius.zero";
         }
     }

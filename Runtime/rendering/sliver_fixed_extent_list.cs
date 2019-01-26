@@ -11,7 +11,7 @@ namespace Unity.UIWidgets.rendering {
 
         public abstract double itemExtent { get; set; }
 
-        protected  virtual double indexToLayoutOffset(double itemExtent, int index) {
+        protected virtual double indexToLayoutOffset(double itemExtent, int index) {
             return itemExtent * index;
         }
 
@@ -71,7 +71,8 @@ namespace Unity.UIWidgets.rendering {
                 int trailingGarbage =
                     targetLastIndex == null ? 0 : (oldLastIndex - targetLastIndex.Value).clamp(0, this.childCount);
                 this.collectGarbage(leadingGarbage, trailingGarbage);
-            } else {
+            }
+            else {
                 this.collectGarbage(0, 0);
             }
 
@@ -117,7 +118,8 @@ namespace Unity.UIWidgets.rendering {
                     if (child == null) {
                         break;
                     }
-                } else {
+                }
+                else {
                     child.layout(childConstraints);
                 }
 

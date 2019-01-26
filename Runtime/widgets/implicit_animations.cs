@@ -14,7 +14,9 @@ namespace Unity.UIWidgets.widgets {
         ) : base(begin: begin, end: end) {
         }
 
-        public override BoxConstraints lerp(double t) => BoxConstraints.lerp(this.begin, this.end, t);
+        public override BoxConstraints lerp(double t) {
+            return BoxConstraints.lerp(this.begin, this.end, t);
+        }
     }
 
     public class BorderRadiusTween : Tween<BorderRadius> {
@@ -23,7 +25,9 @@ namespace Unity.UIWidgets.widgets {
             BorderRadius end = null) : base(begin: begin, end: end) {
         }
 
-        public override BorderRadius lerp(double t) => BorderRadius.lerp(this.begin, this.end, t);
+        public override BorderRadius lerp(double t) {
+            return BorderRadius.lerp(this.begin, this.end, t);
+        }
     }
 
     public class TextStyleTween : Tween<TextStyle> {
@@ -32,7 +36,9 @@ namespace Unity.UIWidgets.widgets {
             TextStyle end = null) : base(begin: begin, end: end) {
         }
 
-        public override TextStyle lerp(double t) => TextStyle.lerp(this.begin, this.end, t);
+        public override TextStyle lerp(double t) {
+            return TextStyle.lerp(this.begin, this.end, t);
+        }
     }
 
 
@@ -86,8 +92,9 @@ namespace Unity.UIWidgets.widgets {
             where T2 : ImplicitlyAnimatedWidget {
             if (targetValue != null) {
                 tween = tween ?? constructor(targetValue);
-                if (state._shouldAnimateTween(tween, targetValue))
+                if (state._shouldAnimateTween(tween, targetValue)) {
                     this.shouldStartAnimation = true;
+                }
             }
             else {
                 tween = null;
@@ -100,11 +107,15 @@ namespace Unity.UIWidgets.widgets {
 
     public abstract class ImplicitlyAnimatedWidgetState<T> : SingleTickerProviderStateMixin<T>
         where T : ImplicitlyAnimatedWidget {
-        protected AnimationController controller => this._controller;
+        protected AnimationController controller {
+            get { return this._controller; }
+        }
 
         AnimationController _controller;
 
-        public Animation<double> animation => this._animation;
+        public Animation<double> animation {
+            get { return this._animation; }
+        }
 
         Animation<double> _animation;
 
@@ -123,8 +134,9 @@ namespace Unity.UIWidgets.widgets {
         public override void didUpdateWidget(StatefulWidget oldWidget) {
             base.didUpdateWidget(oldWidget);
 
-            if (this.widget.curve != ((ImplicitlyAnimatedWidget) oldWidget).curve)
+            if (this.widget.curve != ((ImplicitlyAnimatedWidget) oldWidget).curve) {
                 this._updateCurve();
+            }
 
             this._controller.duration = this.widget.duration;
             if (this._constructTweens()) {
@@ -137,10 +149,12 @@ namespace Unity.UIWidgets.widgets {
         }
 
         void _updateCurve() {
-            if (this.widget.curve != null)
+            if (this.widget.curve != null) {
                 this._animation = new CurvedAnimation(parent: this._controller, curve: this.widget.curve);
-            else
+            }
+            else {
                 this._animation = this._controller;
+            }
         }
 
         public override void dispose() {
@@ -153,8 +167,9 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public void _updateTween<T2>(Tween<T2> tween, T2 targetValue) {
-            if (tween == null)
+            if (tween == null) {
                 return;
+            }
 
             tween.begin = tween.evaluate(this._animation);
             tween.end = targetValue;
@@ -221,7 +236,9 @@ namespace Unity.UIWidgets.widgets {
 
         public readonly int? maxLines;
 
-        public override State createState() => new _AnimatedDefaultTextStyleState();
+        public override State createState() {
+            return new _AnimatedDefaultTextStyleState();
+        }
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
@@ -306,7 +323,9 @@ namespace Unity.UIWidgets.widgets {
 
         public readonly bool animateShadowColor;
 
-        public override State createState() => new _AnimatedPhysicalModelState();
+        public override State createState() {
+            return new _AnimatedPhysicalModelState();
+        }
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);

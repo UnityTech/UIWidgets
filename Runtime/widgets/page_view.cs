@@ -10,7 +10,6 @@ using Unity.UIWidgets.ui;
 
 namespace Unity.UIWidgets.widgets {
     public class PageController : ScrollController {
-
         public PageController(
             int initialPage = 0,
             bool keepPage = true,
@@ -109,13 +108,19 @@ namespace Unity.UIWidgets.widgets {
 
         public readonly double _viewportFraction;
 
-        public double page => Math.Max(0.0, this.pixels.clamp(this.minScrollExtent, this.maxScrollExtent)) /
-                              Math.Max(1.0, this.viewportDimension * this.viewportFraction);
+        public double page {
+            get {
+                return Math.Max(0.0, this.pixels.clamp(this.minScrollExtent, this.maxScrollExtent)) /
+                       Math.Max(1.0, this.viewportDimension * this.viewportFraction);
+            }
+        }
 
-        public double viewportFraction => this._viewportFraction;
+        public double viewportFraction {
+            get { return this._viewportFraction; }
+        }
     }
 
-    internal class _PagePosition : ScrollPositionWithSingleContext, IPageMetrics {
+    class _PagePosition : ScrollPositionWithSingleContext, IPageMetrics {
         internal _PagePosition(
             ScrollPhysics physics = null,
             ScrollContext context = null,
@@ -141,10 +146,12 @@ namespace Unity.UIWidgets.widgets {
         double _pageToUseOnStartup;
 
         public double viewportFraction {
-            get => this._viewportFraction;
+            get { return this._viewportFraction; }
             set {
-                if (this._viewportFraction == value)
+                if (this._viewportFraction == value) {
                     return;
+                }
+
                 double oldPage = this.page;
                 this._viewportFraction = value;
                 this.forcePixels(this.getPixelsFromPage(oldPage));
@@ -175,7 +182,9 @@ namespace Unity.UIWidgets.widgets {
 
         protected override void restoreScrollOffset() {
             object value = PageStorage.of(this.context.storageContext)?.readState(this.context.storageContext);
-            if (value != null) this._pageToUseOnStartup = (double) value;
+            if (value != null) {
+                this._pageToUseOnStartup = (double) value;
+            }
         }
 
         public override bool applyViewportDimension(double viewportDimension) {
@@ -183,11 +192,13 @@ namespace Unity.UIWidgets.widgets {
             if (this.haveDimensions) {
                 oldViewportDimensions = this.viewportDimension;
             }
+
             bool result = base.applyViewportDimension(viewportDimension);
             double? oldPixels = null;
             if (this.hasPixles) {
                 oldPixels = this.pixels;
             }
+
             double page = (oldPixels == null || oldViewportDimensions == 0.0)
                 ? this._pageToUseOnStartup
                 : this.getPageFromPixels(oldPixels.Value, oldViewportDimensions);
@@ -210,38 +221,51 @@ namespace Unity.UIWidgets.widgets {
         }
 
         double _getPage(ScrollPosition position) {
-            if (position is _PagePosition)
+            if (position is _PagePosition) {
                 return ((_PagePosition) position).page;
+            }
+
             return position.pixels / position.viewportDimension;
         }
 
         double _getPixels(ScrollPosition position, double page) {
-            if (position is _PagePosition)
+            if (position is _PagePosition) {
                 return ((_PagePosition) position).getPixelsFromPage(page);
+            }
+
             return page * position.viewportDimension;
         }
 
         double _getTargetPixels(ScrollPosition position, Tolerance tolerance, double velocity) {
             double page = this._getPage(position);
-            if (velocity < -tolerance.velocity)
+            if (velocity < -tolerance.velocity) {
                 page -= 0.5;
-            else if (velocity > tolerance.velocity)
+            }
+            else if (velocity > tolerance.velocity) {
                 page += 0.5;
+            }
+
             return this._getPixels(position, page.round());
         }
 
         public override Simulation createBallisticSimulation(ScrollMetrics position, double velocity) {
             if ((velocity <= 0.0 && position.pixels <= position.minScrollExtent) ||
-                (velocity >= 0.0 && position.pixels >= position.maxScrollExtent))
+                (velocity >= 0.0 && position.pixels >= position.maxScrollExtent)) {
                 return base.createBallisticSimulation(position, velocity);
+            }
+
             Tolerance tolerance = this.tolerance;
             double target = this._getTargetPixels((ScrollPosition) position, tolerance, velocity);
-            if (target != position.pixels)
+            if (target != position.pixels) {
                 return new ScrollSpringSimulation(this.spring, position.pixels, target, velocity, tolerance: tolerance);
+            }
+
             return null;
         }
 
-        public override bool allowImplicitScrolling => false;
+        public override bool allowImplicitScrolling {
+            get { return false; }
+        }
     }
 
     public static class PageViewUtils {
@@ -270,12 +294,15 @@ namespace Unity.UIWidgets.widgets {
             this.pageSnapping = pageSnapping;
             this.onPageChanged = onPageChanged;
             this.controller = controller ?? PageViewUtils._defaultPageController;
-            if (itemBuilder != null)
+            if (itemBuilder != null) {
                 this.childrenDelegate = new SliverChildBuilderDelegate(itemBuilder, childCount: itemCount);
-            else if (childDelegate != null)
+            }
+            else if (childDelegate != null) {
                 this.childrenDelegate = childDelegate;
-            else
+            }
+            else {
                 this.childrenDelegate = new SliverChildListDelegate(children ?? new List<Widget>());
+            }
         }
 
         public readonly Axis scrollDirection;
@@ -297,7 +324,7 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
-    internal class _PageViewState : State<PageView> {
+    class _PageViewState : State<PageView> {
         int _lastReportedPage = 0;
 
         public override void initState() {

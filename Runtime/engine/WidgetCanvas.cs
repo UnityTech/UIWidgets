@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Unity.UIWidgets.animation;
 using Unity.UIWidgets.async;
 using Unity.UIWidgets.editor;
 using Unity.UIWidgets.foundation;
@@ -9,6 +10,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using RawImage = UnityEngine.UI.RawImage;
 using Rect = UnityEngine.Rect;
+using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace Unity.UIWidgets.engine {
     public class UIWidgetWindowAdapter : WindowAdapter {
@@ -30,8 +32,10 @@ namespace Unity.UIWidgets.engine {
                 if (!this._needsPaint) {
                     return;
                 }
+
                 this._needsPaint = false;
             }
+
             base.OnGUI(evt);
         }
 
@@ -81,8 +85,8 @@ namespace Unity.UIWidgets.engine {
                 pageRouteBuilder: this.pageRouteBuilder,
                 onGenerateRoute: this.onGenerateRoute,
                 onUnknownRoute: this.onUnknownRoute);
-            
-                  
+
+
             this._windowAdapter.attachRootWidget(root);
             this._lastMouseMove = Input.mousePosition;
         }
@@ -90,23 +94,38 @@ namespace Unity.UIWidgets.engine {
         public double pixelRatio {
             get { return this.canvas.scaleFactor; }
         }
-        
-        protected virtual Dictionary<string, WidgetBuilder> routes => null;
 
-        protected virtual string initialRoute => null;
-        protected virtual RouteFactory onGenerateRoute => null;
-        
-        protected virtual RouteFactory onUnknownRoute => null;
+        protected virtual Dictionary<string, WidgetBuilder> routes {
+            get { return null; }
+        }
 
-        protected virtual painting.TextStyle textStyle => null;
-        
-        protected virtual PageRouteFactory pageRouteBuilder => (RouteSettings settings, WidgetBuilder builder) =>
-            new PageRouteBuilder(
-                settings: settings,
-                pageBuilder: (BuildContext context, Unity.UIWidgets.animation.Animation<double> animation, 
-                    Unity.UIWidgets.animation.Animation<double> secondaryAnimation) => builder(context)
-            );
-        
+        protected virtual string initialRoute {
+            get { return null; }
+        }
+
+        protected virtual RouteFactory onGenerateRoute {
+            get { return null; }
+        }
+
+        protected virtual RouteFactory onUnknownRoute {
+            get { return null; }
+        }
+
+        protected virtual TextStyle textStyle {
+            get { return null; }
+        }
+
+        protected virtual PageRouteFactory pageRouteBuilder {
+            get {
+                return (RouteSettings settings, WidgetBuilder builder) =>
+                    new PageRouteBuilder(
+                        settings: settings,
+                        pageBuilder: (BuildContext context, Animation<double> animation,
+                            Animation<double> secondaryAnimation) => builder(context)
+                    );
+            }
+        }
+
         protected override void OnDisable() {
             D.assert(this._windowAdapter != null);
             this._windowAdapter.OnDisable();
@@ -127,6 +146,7 @@ namespace Unity.UIWidgets.engine {
             if (EventSystem.current != null && EventSystem.current.currentSelectedGameObject != this.gameObject) {
                 this.unfocusIfNeeded();
             }
+
             if (this._mouseEntered && (this._lastMouseMove.x != Input.mousePosition.x ||
                                        this._lastMouseMove.y != Input.mousePosition.y)) {
                 this.handleMouseMove();
@@ -163,6 +183,7 @@ namespace Unity.UIWidgets.engine {
                     return key;
                 }
             }
+
             return 0;
         }
 
@@ -196,8 +217,8 @@ namespace Unity.UIWidgets.engine {
             RectTransformUtility.ScreenPointToLocalPointInRectangle(this.rectTransform, eventData.position,
                 eventData.enterEventCamera, out localPoint);
             var pixelRatio = this.pixelRatio;
-            localPoint.x = (float)((localPoint.x - this.rectTransform.rect.min.x) * pixelRatio);
-            localPoint.y = (float)((this.rectTransform.rect.max.y - localPoint.y) * pixelRatio);
+            localPoint.x = (float) ((localPoint.x - this.rectTransform.rect.min.x) * pixelRatio);
+            localPoint.y = (float) ((this.rectTransform.rect.max.y - localPoint.y) * pixelRatio);
             return localPoint;
         }
 
@@ -212,8 +233,8 @@ namespace Unity.UIWidgets.engine {
 
             RectTransformUtility.ScreenPointToLocalPointInRectangle(this.rectTransform, position,
                 eventCamera, out localPoint);
-            localPoint.x = (float)((localPoint.x - this.rectTransform.rect.min.x) * this.pixelRatio);
-            localPoint.y = (float)((this.rectTransform.rect.max.y - localPoint.y) * this.pixelRatio);
+            localPoint.x = (float) ((localPoint.x - this.rectTransform.rect.min.x) * this.pixelRatio);
+            localPoint.y = (float) ((this.rectTransform.rect.max.y - localPoint.y) * this.pixelRatio);
             return localPoint;
         }
 

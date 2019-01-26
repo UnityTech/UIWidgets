@@ -15,7 +15,8 @@ namespace Unity.UIWidgets.flow {
             canvas.saveLayer(this.paintBounds, paint);
             try {
                 this.paintChildren(context);
-            } finally {
+            }
+            finally {
                 canvas.restore();
             }
         }

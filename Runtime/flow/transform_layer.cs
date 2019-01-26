@@ -25,7 +25,8 @@ namespace Unity.UIWidgets.flow {
             try {
                 canvas.concat(this._tranform);
                 this.paintChildren(context);
-            } finally {
+            }
+            finally {
                 canvas.restore();
             }
         }

@@ -61,6 +61,7 @@ namespace Unity.UIWidgets.ui {
                 if (gifDecoder.nextFrame() != GifDecoder.STATUS_OK) {
                     throw new Exception("Failed to decode gif.");
                 }
+
                 if (gifDecoder.done) {
                     break;
                 }
@@ -73,7 +74,8 @@ namespace Unity.UIWidgets.ui {
 
                 lock (this._frames) {
                     if (i < this._frames.Count) {
-                    } else {
+                    }
+                    else {
                         D.assert(this._frames.Count == i);
                         this._frames.Add(new Promise<FrameData>());
                     }
@@ -115,7 +117,8 @@ namespace Unity.UIWidgets.ui {
             lock (this._frames) {
                 if (this._frameIndex == this._frames.Count) {
                     this._frames.Add(new Promise<FrameData>());
-                } else {
+                }
+                else {
                     D.assert(this._frameIndex < this._frames.Count);
                 }
 

@@ -132,6 +132,7 @@ namespace Unity.UIWidgets.widgets {
             if (this.onHoldCanceled != null) {
                 this.onHoldCanceled();
             }
+
             base.dispose();
         }
     }
@@ -219,22 +220,26 @@ namespace Unity.UIWidgets.widgets {
                 }
 
                 return 0.0;
-            } else {
+            }
+            else {
                 if (this._offsetSinceLastStop == null) {
                     return offset;
-                } else {
+                }
+                else {
                     this._offsetSinceLastStop += offset;
                     if (this._offsetSinceLastStop.Value.abs() > this.motionStartDistanceThreshold) {
                         this._offsetSinceLastStop = null;
                         if (offset.abs() > _bigThresholdBreakDistance) {
                             return offset;
-                        } else {
+                        }
+                        else {
                             return Math.Min(
                                        this.motionStartDistanceThreshold.Value / 3.0,
                                        offset.abs()
                                    ) * offset.sign();
                         }
-                    } else {
+                    }
+                    else {
                         return 0.0;
                     }
                 }

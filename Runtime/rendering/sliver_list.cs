@@ -47,13 +47,15 @@ namespace Unity.UIWidgets.rendering {
                         leadingChildWithLayout = earliestUsefulChild;
                         trailingChildWithLayout = trailingChildWithLayout ?? earliestUsefulChild;
                         break;
-                    } else {
+                    }
+                    else {
                         this.geometry = new SliverGeometry(
                             scrollOffsetCorrection: -scrollOffset
                         );
                         return;
                     }
-                } else {
+                }
+                else {
                     double firstChildScrollOffset = earliestScrollOffset - this.paintExtentOf(this.firstChild);
                     if (firstChildScrollOffset < 0.0) {
                         double correction = 0.0;
@@ -70,7 +72,8 @@ namespace Unity.UIWidgets.rendering {
                         var childParentData = (SliverMultiBoxAdaptorParentData) this.firstChild.parentData;
                         childParentData.layoutOffset = 0.0;
                         return;
-                    } else {
+                    }
+                    else {
                         var childParentData = (SliverMultiBoxAdaptorParentData) earliestUsefulChild.parentData;
                         childParentData.layoutOffset = firstChildScrollOffset;
                         D.assert(earliestUsefulChild == this.firstChild);
@@ -115,7 +118,8 @@ namespace Unity.UIWidgets.rendering {
                         if (child == null) {
                             return false;
                         }
-                    } else {
+                    }
+                    else {
                         child.layout(childConstraints, parentUsesSize: true);
                     }
 
@@ -170,7 +174,8 @@ namespace Unity.UIWidgets.rendering {
             double? estimatedMaxScrollOffset;
             if (reachedEnd) {
                 estimatedMaxScrollOffset = endScrollOffset;
-            } else {
+            }
+            else {
                 estimatedMaxScrollOffset = this.childManager.estimateMaxScrollOffset(
                     this.constraints,
                     firstIndex: this.indexOf(this.firstChild),

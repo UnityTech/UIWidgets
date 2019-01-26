@@ -61,7 +61,8 @@ namespace Unity.UIWidgets.rendering {
             if (child._layer == null) {
                 D.assert(debugAlsoPaintedParent);
                 child._layer = new OffsetLayer();
-            } else {
+            }
+            else {
                 D.assert(debugAlsoPaintedParent || child._layer.attached);
                 child._layer.removeAllChildren();
             }
@@ -94,7 +95,8 @@ namespace Unity.UIWidgets.rendering {
             if (child.isRepaintBoundary) {
                 this.stopRecordingIfNeeded();
                 this._compositeChild(child, offset);
-            } else {
+            }
+            else {
                 child._paintWithContext(this, offset);
             }
         }
@@ -106,7 +108,8 @@ namespace Unity.UIWidgets.rendering {
 
             if (child._needsPaint) {
                 repaintCompositedChild(child, debugAlsoPaintedParent: true);
-            } else {
+            }
+            else {
                 D.assert(child._layer != null);
                 D.assert(() => {
                     child.debugRegisterRepaintBoundaryPaint(
@@ -137,7 +140,8 @@ namespace Unity.UIWidgets.rendering {
                         D.assert(this._currentLayer != null);
                         D.assert(this._recorder != null);
                         D.assert(this._canvas != null);
-                    } else {
+                    }
+                    else {
                         D.assert(this._currentLayer == null);
                         D.assert(this._recorder == null);
                         D.assert(this._canvas == null);
@@ -245,7 +249,8 @@ namespace Unity.UIWidgets.rendering {
             if (needsCompositing) {
                 this.pushLayer(new ClipRectLayer(offsetClipRect, clipBehavior: clipBehavior),
                     painter, offset, childPaintBounds: offsetClipRect);
-            } else {
+            }
+            else {
                 this.clipRectAndPaint(offsetClipRect, clipBehavior, offsetClipRect, () => painter(this, offset));
             }
         }
@@ -257,7 +262,8 @@ namespace Unity.UIWidgets.rendering {
             if (needsCompositing) {
                 this.pushLayer(new ClipRRectLayer(offsetClipRRect, clipBehavior: clipBehavior),
                     painter, offset, childPaintBounds: offsetBounds);
-            } else {
+            }
+            else {
                 this.clipRRectAndPaint(offsetClipRRect, clipBehavior, offsetBounds, () => painter(this, offset));
             }
         }
@@ -279,7 +285,8 @@ namespace Unity.UIWidgets.rendering {
                     offset,
                     childPaintBounds: inverse.mapRect(this.estimatedBounds)
                 );
-            } else {
+            }
+            else {
                 this.canvas.save();
                 this.canvas.concat(effectiveTransform);
                 painter(this, offset);
@@ -374,7 +381,8 @@ namespace Unity.UIWidgets.rendering {
                         }
                     }
                 }
-            } finally {
+            }
+            finally {
                 D.assert(() => {
                     this._debugDoingLayout = false;
                     return true;
@@ -394,7 +402,8 @@ namespace Unity.UIWidgets.rendering {
             });
             try {
                 callback();
-            } finally {
+            }
+            finally {
                 D.assert(() => {
                     this._debugAllowMutationsToDirtySubtrees = oldState;
                     return true;
@@ -438,12 +447,14 @@ namespace Unity.UIWidgets.rendering {
                     if (node._needsPaint && node.owner == this) {
                         if (node._layer.attached) {
                             PaintingContext.repaintCompositedChild(node);
-                        } else {
+                        }
+                        else {
                             node._skippedPaintingOnLayer();
                         }
                     }
                 }
-            } finally {
+            }
+            finally {
                 D.assert(() => {
                     this._debugDoingPaint = false;
                     return true;
@@ -522,7 +533,8 @@ namespace Unity.UIWidgets.rendering {
                             }
 
                             depth -= 1;
-                        } else if (lines == maxLines) {
+                        }
+                        else if (lines == maxLines) {
                             descendants.Add("  ...(descendants list truncated after " + lines + " lines)");
                         }
 
@@ -533,9 +545,11 @@ namespace Unity.UIWidgets.rendering {
                         information.AppendLine(
                             "This RenderObject had the following descendants (showing up to depth " +
                             maxDepth + "):");
-                    } else if (descendants.Count == 1) {
+                    }
+                    else if (descendants.Count == 1) {
                         information.AppendLine("This RenderObject had the following child:");
-                    } else {
+                    }
+                    else {
                         information.AppendLine("This RenderObject has no descendants.");
                     }
 
@@ -684,7 +698,8 @@ namespace Unity.UIWidgets.rendering {
             D.assert(this._relayoutBoundary != null);
             if (this._relayoutBoundary != this) {
                 this.markParentNeedsLayout();
-            } else {
+            }
+            else {
                 this._needsLayout = true;
                 if (this.owner != null) {
                     D.assert(() => {
@@ -707,7 +722,8 @@ namespace Unity.UIWidgets.rendering {
             RenderObject parent = (RenderObject) this.parent;
             if (!this._doingThisLayoutWithCallback) {
                 parent.markNeedsLayout();
-            } else {
+            }
+            else {
                 D.assert(parent._debugDoingThisLayout);
             }
         }
@@ -758,7 +774,8 @@ namespace Unity.UIWidgets.rendering {
 
             try {
                 this.performLayout();
-            } catch (Exception ex) {
+            }
+            catch (Exception ex) {
                 this._debugReportException("performLayout", ex);
             }
 
@@ -808,7 +825,8 @@ namespace Unity.UIWidgets.rendering {
             RenderObject relayoutBoundary;
             if (!parentUsesSize || this.sizedByParent || constraints.isTight || !(this.parent is RenderObject)) {
                 relayoutBoundary = this;
-            } else {
+            }
+            else {
                 RenderObject parent = (RenderObject) this.parent;
                 relayoutBoundary = parent._relayoutBoundary;
             }
@@ -862,7 +880,8 @@ namespace Unity.UIWidgets.rendering {
                         this.debugAssertDoesMeetConstraints();
                         return true;
                     });
-                } catch (Exception ex) {
+                }
+                catch (Exception ex) {
                     this._debugReportException("performResize", ex);
                 }
 
@@ -886,7 +905,8 @@ namespace Unity.UIWidgets.rendering {
                     this.debugAssertDoesMeetConstraints();
                     return true;
                 });
-            } catch (Exception ex) {
+            }
+            catch (Exception ex) {
                 this._debugReportException("performLayout", ex);
             }
 
@@ -920,7 +940,8 @@ namespace Unity.UIWidgets.rendering {
             this._doingThisLayoutWithCallback = true;
             try {
                 this.owner._enableMutationsToDirtySubtrees(() => { callback((T) this.constraints); });
-            } finally {
+            }
+            finally {
                 this._doingThisLayoutWithCallback = false;
             }
         }
@@ -1076,11 +1097,13 @@ namespace Unity.UIWidgets.rendering {
                     this.owner._nodesNeedingPaint.Add(this);
                     this.owner.requestVisualUpdate();
                 }
-            } else if (this.parent is RenderObject) {
+            }
+            else if (this.parent is RenderObject) {
                 D.assert(this._layer == null);
                 var parent = (RenderObject) this.parent;
                 parent.markNeedsPaint();
-            } else {
+            }
+            else {
                 D.assert(() => {
                     if (D.debugPrintMarkNeedsPaintStacks) {
                         Debug.Log("markNeedsPaint() called for " + this + " (root of render tree)");
@@ -1200,7 +1223,8 @@ namespace Unity.UIWidgets.rendering {
                 this.paint(context, offset);
                 D.assert(!this._needsLayout);
                 D.assert(!this._needsPaint);
-            } catch (Exception ex) {
+            }
+            catch (Exception ex) {
                 this._debugReportException("paint", ex);
             }
 
@@ -1244,6 +1268,7 @@ namespace Unity.UIWidgets.rendering {
             for (int index = renderers.Count - 1; index > 0; index -= 1) {
                 renderers[index].applyPaintTransform(renderers[index - 1], transform);
             }
+
             return transform;
         }
 

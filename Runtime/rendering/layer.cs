@@ -2,7 +2,6 @@
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.ui;
-using Unity.UIWidgets.widgets;
 
 namespace Unity.UIWidgets.rendering {
     public abstract class Layer : AbstractNodeMixinDiagnosticableTree {
@@ -468,7 +467,10 @@ namespace Unity.UIWidgets.rendering {
     }
 
     public class LayerLink {
-        public LeaderLayer leader => this._leader;
+        public LeaderLayer leader {
+            get { return this._leader; }
+        }
+
         internal LeaderLayer _leader;
 
         public override string ToString() {
@@ -506,17 +508,21 @@ namespace Unity.UIWidgets.rendering {
         public override void addToScene(SceneBuilder builder, Offset layerOffset) {
             D.assert(this.offset != null);
             this._lastOffset = this.offset + layerOffset;
-            if (this._lastOffset != Offset.zero)
+            if (this._lastOffset != Offset.zero) {
                 builder.pushTransform(Matrix3.makeTrans(this._lastOffset));
+            }
+
             this.addChildrenToScene(builder, Offset.zero);
-            if (this._lastOffset != Offset.zero)
+            if (this._lastOffset != Offset.zero) {
                 builder.pop();
+            }
         }
 
         public override void applyTransform(Layer child, Matrix3 transform) {
             D.assert(this._lastOffset != null);
-            if (this._lastOffset != Offset.zero)
-                transform.preTranslate((float)this._lastOffset.dx, (float)this._lastOffset.dy);
+            if (this._lastOffset != Offset.zero) {
+                transform.preTranslate((float) this._lastOffset.dx, (float) this._lastOffset.dy);
+            }
         }
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
@@ -524,11 +530,9 @@ namespace Unity.UIWidgets.rendering {
             properties.add(new DiagnosticsProperty<Offset>("offset", this.offset));
             properties.add(new DiagnosticsProperty<LayerLink>("link", this.link));
         }
-
     }
 
     public class FollowerLayer : ContainerLayer {
-
         public FollowerLayer(
             LayerLink link = null,
             bool showWhenUnlinked = true,
@@ -541,7 +545,7 @@ namespace Unity.UIWidgets.rendering {
             this.unlinkedOffset = unlinkedOffset;
             this.linkedOffset = linkedOffset;
         }
-        
+
         public readonly LayerLink link;
         public readonly bool showWhenUnlinked;
         public readonly Offset unlinkedOffset;
@@ -550,19 +554,23 @@ namespace Unity.UIWidgets.rendering {
         Offset _lastOffset;
         Matrix3 _lastTransform;
         Matrix3 _invertedTransform;
-        
+
         public Matrix3 getLastTransform() {
-            if (this._lastTransform == null)
+            if (this._lastTransform == null) {
                 return null;
-            Matrix3 result = Matrix3.makeTrans((float)-this._lastOffset.dx, (float)-this._lastOffset.dy);
+            }
+
+            Matrix3 result = Matrix3.makeTrans((float) -this._lastOffset.dx, (float) -this._lastOffset.dy);
             result.preConcat(this._lastTransform);
             return result;
         }
 
         Matrix3 _collectTransformForLayerChain(List<ContainerLayer> layers) {
             Matrix3 result = Matrix3.I();
-            for (int index = layers.Count - 1; index > 0; index -= 1)
+            for (int index = layers.Count - 1; index > 0; index -= 1) {
                 layers[index].applyTransform(layers[index - 1], result);
+            }
+
             return result;
         }
 
@@ -572,24 +580,26 @@ namespace Unity.UIWidgets.rendering {
             if (this.link._leader == null) {
                 return;
             }
-            
-            D.assert(this.link.leader.owner == this.owner, 
+
+            D.assert(this.link.leader.owner == this.owner,
                 "Linked LeaderLayer anchor is not in the same layer tree as the FollowerLayer.");
-            D.assert(this.link.leader._lastOffset != null, "LeaderLayer anchor must come before FollowerLayer in paint order, but the reverse was true.");
-            
+            D.assert(this.link.leader._lastOffset != null,
+                "LeaderLayer anchor must come before FollowerLayer in paint order, but the reverse was true.");
+
             HashSet<Layer> ancestors = new HashSet<Layer>();
             Layer ancestor = this.parent;
             while (ancestor != null) {
                 ancestors.Add(ancestor);
                 ancestor = ancestor.parent;
             }
-            
+
             ContainerLayer layer = this.link.leader;
             List<ContainerLayer> forwardLayers = new List<ContainerLayer> {null, layer};
             do {
                 layer = layer.parent;
                 forwardLayers.Add(layer);
             } while (!ancestors.Contains(layer));
+
             ancestor = layer;
 
             layer = this;
@@ -609,10 +619,10 @@ namespace Unity.UIWidgets.rendering {
 
             inverseTransform = inverse;
             inverseTransform.preConcat(forwardTransform);
-            inverseTransform.preTranslate((float)this.linkedOffset.dx, (float)this.linkedOffset.dy);
+            inverseTransform.preTranslate((float) this.linkedOffset.dx, (float) this.linkedOffset.dy);
             this._lastTransform = inverseTransform;
         }
-        
+
         public override void addToScene(SceneBuilder builder, Offset layerOffset) {
             D.assert(this.link != null);
             if (this.link.leader == null && !this.showWhenUnlinked) {
@@ -620,7 +630,7 @@ namespace Unity.UIWidgets.rendering {
                 this._lastOffset = null;
                 return;
             }
-            
+
             this._establishTransform();
             if (this._lastTransform != null) {
                 builder.pushTransform(this._lastTransform);
@@ -630,7 +640,7 @@ namespace Unity.UIWidgets.rendering {
             }
             else {
                 this._lastOffset = null;
-                var matrix = Matrix3.makeTrans((float)this.unlinkedOffset.dx, (float)this.unlinkedOffset.dy);
+                var matrix = Matrix3.makeTrans((float) this.unlinkedOffset.dx, (float) this.unlinkedOffset.dy);
                 builder.pushTransform(matrix);
                 this.addChildrenToScene(builder, Offset.zero);
                 builder.pop();
@@ -642,16 +652,16 @@ namespace Unity.UIWidgets.rendering {
             D.assert(transform != null);
             if (this._lastTransform != null) {
                 transform.preConcat(this._lastTransform);
-            } else {
-                transform.preConcat(Matrix3.makeTrans((float)this.unlinkedOffset.dx, (float)this.unlinkedOffset.dy));
+            }
+            else {
+                transform.preConcat(Matrix3.makeTrans((float) this.unlinkedOffset.dx, (float) this.unlinkedOffset.dy));
             }
         }
-        
+
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             properties.add(new DiagnosticsProperty<LayerLink>("link", this.link));
             properties.add(new TransformProperty("transform", this.getLastTransform(), defaultValue: null));
-        } 
+        }
     }
-
 }

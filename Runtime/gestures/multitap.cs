@@ -6,17 +6,16 @@ using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
 
 namespace Unity.UIWidgets.gestures {
-    
     public delegate void GestureDoubleTapCallback(DoubleTapDetails details);
-    
+
     public class DoubleTapDetails {
         public DoubleTapDetails(Offset firstGlobalPosition = null) {
             this.firstGlobalPosition = firstGlobalPosition ?? Offset.zero;
         }
 
-        public readonly Offset firstGlobalPosition; 
+        public readonly Offset firstGlobalPosition;
     }
-    
+
     class _TapTracker {
         internal _TapTracker(
             PointerDownEvent evt = null,
@@ -85,14 +84,17 @@ namespace Unity.UIWidgets.gestures {
             if (evt is PointerUpEvent) {
                 if (this._firstTap == null) {
                     this._registerFirstTap(tracker);
-                } else {
+                }
+                else {
                     this._registerSecondTap(tracker);
                 }
-            } else if (evt is PointerMoveEvent) {
+            }
+            else if (evt is PointerMoveEvent) {
                 if (!tracker.isWithinTolerance(evt, Constants.kDoubleTapTouchSlop)) {
                     this._reject(tracker);
                 }
-            } else if (evt is PointerCancelEvent) {
+            }
+            else if (evt is PointerCancelEvent) {
                 this._reject(tracker);
             }
         }

@@ -82,12 +82,15 @@ namespace Unity.UIWidgets.painting {
             if (a == null && b == null) {
                 return null;
             }
+
             if (a == null) {
                 return new Alignment(MathUtils.lerpDouble(0.0, b.x, t), MathUtils.lerpDouble(0.0, b.y, t));
             }
+
             if (b == null) {
                 return new Alignment(MathUtils.lerpDouble(a.x, 0.0, t), MathUtils.lerpDouble(a.y, 0.0, t));
             }
+
             return new Alignment(MathUtils.lerpDouble(a.x, b.x, t), MathUtils.lerpDouble(a.y, b.y, t));
         }
 
@@ -95,9 +98,11 @@ namespace Unity.UIWidgets.painting {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return this.x.Equals(other.x) && this.y.Equals(other.y);
         }
 
@@ -105,12 +110,15 @@ namespace Unity.UIWidgets.painting {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((Alignment) obj);
         }
 
@@ -132,30 +140,39 @@ namespace Unity.UIWidgets.painting {
             if (this.x == -1.0 && this.y == -1.0) {
                 return "topLeft";
             }
+
             if (this.x == 0.0 && this.y == -1.0) {
                 return "topCenter";
             }
+
             if (this.x == 1.0 && this.y == -1.0) {
                 return "topRight";
             }
+
             if (this.x == -1.0 && this.y == 0.0) {
                 return "centerLeft";
             }
+
             if (this.x == 0.0 && this.y == 0.0) {
                 return "center";
             }
+
             if (this.x == 1.0 && this.y == 0.0) {
                 return "centerRight";
             }
+
             if (this.x == -1.0 && this.y == 1.0) {
                 return "bottomLeft";
             }
+
             if (this.x == 0.0 && this.y == 1.0) {
                 return "bottomCenter";
             }
+
             if (this.x == 1.0 && this.y == 1.0) {
                 return "bottomRight";
             }
+
             return $"Alignment({this.x:F1}, {this.y:F1})";
         }
     }

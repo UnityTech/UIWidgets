@@ -27,14 +27,17 @@ namespace Unity.UIWidgets.widgets {
             D.assert(WidgetsD.debugCheckHasDirectionality(context));
             List<Widget> children = new List<Widget>();
 
-            if (this.leading != null)
+            if (this.leading != null) {
                 children.Add(new LayoutId(id: _ToolbarSlot.leading, child: this.leading));
+            }
 
-            if (this.middle != null)
+            if (this.middle != null) {
                 children.Add(new LayoutId(id: _ToolbarSlot.middle, child: this.middle));
+            }
 
-            if (this.trailing != null)
+            if (this.trailing != null) {
                 children.Add(new LayoutId(id: _ToolbarSlot.trailing, child: this.trailing));
+            }
 
             TextDirection textDirection = Directionality.of(context);
             return new CustomMultiChildLayout(
@@ -48,13 +51,13 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
-    internal enum _ToolbarSlot {
+    enum _ToolbarSlot {
         leading,
         middle,
         trailing,
     }
 
-    internal class _ToolbarLayout : MultiChildLayoutDelegate {
+    class _ToolbarLayout : MultiChildLayoutDelegate {
         public _ToolbarLayout(
             bool? centerMiddle = true,
             double? middleSpacing = null,
@@ -62,7 +65,7 @@ namespace Unity.UIWidgets.widgets {
         ) {
             D.assert(textDirection != null);
             D.assert(middleSpacing != null);
-            this.centerMiddle = centerMiddle??true;
+            this.centerMiddle = centerMiddle ?? true;
             this.middleSpacing = middleSpacing ?? 0.0;
             this.textDirection = textDirection ?? TextDirection.ltr;
         }
@@ -129,10 +132,12 @@ namespace Unity.UIWidgets.widgets {
                 // widgets, then align its left or right edge with the adjacent boundary.
                 if (this.centerMiddle) {
                     middleStart = (size.width - middleSize.width) / 2.0;
-                    if (middleStart + middleSize.width > size.width - trailingWidth)
+                    if (middleStart + middleSize.width > size.width - trailingWidth) {
                         middleStart = size.width - trailingWidth - middleSize.width;
-                    else if (middleStart < middleStartMargin)
+                    }
+                    else if (middleStart < middleStartMargin) {
                         middleStart = middleStartMargin;
+                    }
                 }
 
                 double middleX = 0.0;
