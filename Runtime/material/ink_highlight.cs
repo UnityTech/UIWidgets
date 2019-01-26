@@ -26,7 +26,7 @@ namespace Unity.UIWidgets.material {
             this._borderRadius = borderRadius ?? BorderRadius.zero;
             this._customBorder = customBorder;
             this._rectCallback = rectCallback;
-            
+
             this._alphaController = new AnimationController(
                 duration: InkHighlightUtils._kHighlightFadeDuration,
                 vsync: controller.vsync);
@@ -51,7 +51,10 @@ namespace Unity.UIWidgets.material {
         Animation<int> _alpha;
         AnimationController _alphaController;
 
-        public bool active => this._active;
+        public bool active {
+            get { return this._active; }
+        }
+
         bool _active = true;
 
         public void activate() {
@@ -65,8 +68,9 @@ namespace Unity.UIWidgets.material {
         }
 
         void _handleAlphaStatusChanged(AnimationStatus status) {
-            if (status == AnimationStatus.dismissed && !this._active)
+            if (status == AnimationStatus.dismissed && !this._active) {
                 this.dispose();
+            }
         }
 
         public override void dispose() {
@@ -75,7 +79,6 @@ namespace Unity.UIWidgets.material {
         }
 
         void _paintHighlight(Canvas canvas, Rect rect, Paint paint) {
-            D.assert(this._shape != null);
             canvas.save();
             if (this._customBorder != null) {
                 canvas.clipPath(this._customBorder.getOuterPath(rect));
@@ -103,6 +106,7 @@ namespace Unity.UIWidgets.material {
                     break;
                 }
             }
+
             canvas.restore();
         }
 

@@ -77,11 +77,14 @@ namespace Unity.UIWidgets.material {
 
         public EdgeInsets _paddingIncludingDecoration {
             get {
-                if (this.decoration == null || this.decoration.padding == null)
+                if (this.decoration == null || this.decoration.padding == null) {
                     return this.padding;
+                }
+
                 EdgeInsets decorationPadding = this.decoration.padding;
-                if (this.padding == null)
+                if (this.padding == null) {
                     return decorationPadding;
+                }
 
                 return this.padding.add(decorationPadding);
             }
@@ -93,7 +96,9 @@ namespace Unity.UIWidgets.material {
             properties.add(new DiagnosticsProperty<Decoration>("bg", this.decoration, defaultValue: null));
         }
 
-        public override State createState() => new _InkState();
+        public override State createState() {
+            return new _InkState();
+        }
     }
 
 
@@ -127,10 +132,11 @@ namespace Unity.UIWidgets.material {
 
             Widget current = this.widget.child;
             EdgeInsets effectivePadding = this.widget._paddingIncludingDecoration;
-            if (effectivePadding != null)
+            if (effectivePadding != null) {
                 current = new Padding(
                     padding: effectivePadding,
                     child: current);
+            }
 
             return current;
         }
@@ -174,8 +180,10 @@ namespace Unity.UIWidgets.material {
         public Decoration decoration {
             get { return this._decoration; }
             set {
-                if (value == this._decoration)
+                if (value == this._decoration) {
                     return;
+                }
+
                 this._decoration = value;
                 this._painter?.Dispose();
                 this._painter = this._decoration?.createBoxPainter(this._handleChanged);
@@ -189,8 +197,10 @@ namespace Unity.UIWidgets.material {
             get { return this._configuration; }
             set {
                 D.assert(value != null);
-                if (value == this._configuration)
+                if (value == this._configuration) {
                     return;
+                }
+
                 this._configuration = value;
                 this.controller.markNeedsPaint();
             }
@@ -208,8 +218,10 @@ namespace Unity.UIWidgets.material {
         }
 
         protected override void paintFeature(Canvas canvas, Matrix3 transform) {
-            if (this._painter == null)
+            if (this._painter == null) {
                 return;
+            }
+
             Offset originOffset = transform.getAsTranslation();
             ImageConfiguration sizedConfiguration = this.configuration.copyWith(
                 size: this.referenceBox.size);

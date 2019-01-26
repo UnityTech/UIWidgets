@@ -30,8 +30,10 @@ namespace Unity.UIWidgets.material {
             _InheritedTheme inheritedTheme =
                 (_InheritedTheme) context.inheritFromWidgetOfExactType(typeof(_InheritedTheme));
             if (shadowThemeOnly) {
-                if (inheritedTheme == null || inheritedTheme.theme.isMaterialAppTheme)
+                if (inheritedTheme == null || inheritedTheme.theme.isMaterialAppTheme) {
                     return null;
+                }
+
                 return inheritedTheme.theme.data;
             }
 
@@ -68,8 +70,9 @@ namespace Unity.UIWidgets.material {
 
         public readonly Theme theme;
 
-        public override bool updateShouldNotify(InheritedWidget old) =>
-            this.theme.data != ((_InheritedTheme) old).theme.data;
+        public override bool updateShouldNotify(InheritedWidget old) {
+            return this.theme.data != ((_InheritedTheme) old).theme.data;
+        }
     }
 
     class ThemeDataTween : Tween<ThemeData> {
@@ -79,7 +82,9 @@ namespace Unity.UIWidgets.material {
         ) : base(begin: begin, end: end) {
         }
 
-        public override ThemeData lerp(double t) => ThemeData.lerp(this.begin, this.end, t);
+        public override ThemeData lerp(double t) {
+            return ThemeData.lerp(this.begin, this.end, t);
+        }
     }
 
     class AnimatedTheme : ImplicitlyAnimatedWidget {
@@ -105,7 +110,9 @@ namespace Unity.UIWidgets.material {
 
         public readonly Widget child;
 
-        public override State createState() => new _AnimatedThemeState();
+        public override State createState() {
+            return new _AnimatedThemeState();
+        }
     }
 
 

@@ -95,8 +95,10 @@ namespace Unity.UIWidgets.material {
         }
 
         public TextTheme merge(TextTheme other) {
-            if (other == null)
+            if (other == null) {
                 return this;
+            }
+
             return this.copyWith(
                 display4: this.display4?.merge(other.display4) ?? other.display4,
                 display3: this.display3?.merge(other.display3) ?? other.display3,
@@ -249,7 +251,6 @@ namespace Unity.UIWidgets.material {
         public static TextTheme lerp(TextTheme a, TextTheme b, double t) {
             D.assert(a != null);
             D.assert(b != null);
-            D.assert(t != null);
             return new TextTheme(
                 display4: TextStyle.lerp(a.display4, b.display4, t),
                 display3: TextStyle.lerp(a.display3, b.display3, t),

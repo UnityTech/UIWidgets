@@ -88,7 +88,9 @@ namespace Unity.UIWidgets.material {
             return result;
         }
 
-        public override State createState() => new _MaterialState();
+        public override State createState() {
+            return new _MaterialState();
+        }
 
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
@@ -111,8 +113,10 @@ namespace Unity.UIWidgets.material {
         readonly GlobalKey _inkFeatureRenderer = GlobalKey.key(debugLabel: "ink renderer");
 
         Color _getBackgroundColor(BuildContext context) {
-            if (this.widget.color != null)
+            if (this.widget.color != null) {
                 return this.widget.color;
+            }
+
             switch (this.widget.type) {
                 case MaterialType.canvas:
                     return Theme.of(context).canvasColor;
@@ -192,10 +196,14 @@ namespace Unity.UIWidgets.material {
 
 
         ShapeBorder _getShape() {
-            if (this.widget.shape != null)
+            if (this.widget.shape != null) {
                 return this.widget.shape;
-            if (this.widget.borderRadius != null)
+            }
+
+            if (this.widget.borderRadius != null) {
                 return new RoundedRectangleBorder(borderRadius: this.widget.borderRadius);
+            }
+
             switch (this.widget.type) {
                 case MaterialType.canvas:
                 case MaterialType.transparency:
@@ -203,7 +211,8 @@ namespace Unity.UIWidgets.material {
                 case MaterialType.card:
                 case MaterialType.button:
                     return new RoundedRectangleBorder(
-                        borderRadius: this.widget.borderRadius ?? MaterialConstantsUtils.kMaterialEdges[this.widget.type]);
+                        borderRadius: this.widget.borderRadius ??
+                                      MaterialConstantsUtils.kMaterialEdges[this.widget.type]);
                 case MaterialType.circle:
                     return new CircleBorder();
             }
@@ -254,11 +263,14 @@ namespace Unity.UIWidgets.material {
         }
 
         public void _didChangeLayout() {
-            if (this._inkFeatures != null && this._inkFeatures.isNotEmpty())
+            if (this._inkFeatures != null && this._inkFeatures.isNotEmpty()) {
                 this.markNeedsPaint();
+            }
         }
 
-        protected override bool hitTestSelf(Offset position) => true;
+        protected override bool hitTestSelf(Offset position) {
+            return true;
+        }
 
         public override void paint(PaintingContext context, Offset offset) {
             if (this._inkFeatures != null && this._inkFeatures.isNotEmpty()) {
@@ -266,8 +278,10 @@ namespace Unity.UIWidgets.material {
                 canvas.save();
                 canvas.translate(offset.dx, offset.dy);
                 canvas.clipRect(Offset.zero & this.size);
-                foreach (InkFeature inkFeature in this._inkFeatures)
+                foreach (InkFeature inkFeature in this._inkFeatures) {
                     inkFeature._paint(canvas);
+                }
+
                 canvas.restore();
             }
 
@@ -316,7 +330,10 @@ namespace Unity.UIWidgets.material {
             this.onRemoved = onRemoved;
         }
 
-        public MaterialInkController controller => this._controller;
+        public MaterialInkController controller {
+            get { return this._controller; }
+        }
+
         public _RenderInkFeatures _controller;
 
         public readonly RenderBox referenceBox;
@@ -332,8 +349,9 @@ namespace Unity.UIWidgets.material {
                 return true;
             });
             this._controller._removeFeature(this);
-            if (this.onRemoved != null)
+            if (this.onRemoved != null) {
                 this.onRemoved();
+            }
         }
 
         public void _paint(Canvas canvas) {
@@ -350,14 +368,18 @@ namespace Unity.UIWidgets.material {
 
             Matrix3 transform = Matrix3.I();
             D.assert(descendants.Count >= 2);
-            for (int index = descendants.Count - 1; index > 0; index -= 1)
+            for (int index = descendants.Count - 1; index > 0; index -= 1) {
                 descendants[index].applyPaintTransform(descendants[index - 1], transform);
+            }
+
             this.paintFeature(canvas, transform);
         }
 
         protected abstract void paintFeature(Canvas canvas, Matrix3 transform);
 
-        public string toString() => this.GetType() + "";
+        public string toString() {
+            return this.GetType() + "";
+        }
     }
 
     public class ShapeBorderTween : Tween<ShapeBorder> {
@@ -409,7 +431,9 @@ namespace Unity.UIWidgets.material {
 
         public readonly Color shadowColor;
 
-        public override State createState() => new _MaterialInteriorState();
+        public override State createState() {
+            return new _MaterialInteriorState();
+        }
 
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder description) {

@@ -262,7 +262,7 @@ namespace Unity.UIWidgets.material {
             IconThemeData iconTheme,
             IconThemeData primaryIconTheme,
             IconThemeData accentIconTheme,
-            MaterialTapTargetSize materialTapTargetSize,
+            MaterialTapTargetSize? materialTapTargetSize,
             ColorScheme colorScheme,
             Typography typography
         ) {
@@ -349,11 +349,17 @@ namespace Unity.UIWidgets.material {
                 typography: typography);
         }
 
-        public static ThemeData light() => new ThemeData(brightness: Brightness.light);
+        public static ThemeData light() {
+            return new ThemeData(brightness: Brightness.light);
+        }
 
-        public static ThemeData dark() => new ThemeData(brightness: Brightness.dark);
+        public static ThemeData dark() {
+            return new ThemeData(brightness: Brightness.dark);
+        }
 
-        public static ThemeData fallback() => light();
+        public static ThemeData fallback() {
+            return light();
+        }
 
 
         public readonly Brightness brightness;
@@ -522,8 +528,10 @@ namespace Unity.UIWidgets.material {
         public static Brightness estimateBrightnessForColor(Color color) {
             double relativeLuminance = color.computeLuminance();
             double kThreshold = 0.15;
-            if ((relativeLuminance + 0.05) * (relativeLuminance + 0.05) > kThreshold)
+            if ((relativeLuminance + 0.05) * (relativeLuminance + 0.05) > kThreshold) {
                 return Brightness.light;
+            }
+
             return Brightness.dark;
         }
 

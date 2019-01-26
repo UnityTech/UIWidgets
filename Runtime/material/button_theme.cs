@@ -82,8 +82,9 @@ namespace Unity.UIWidgets.material {
             return buttonTheme;
         }
 
-        public override bool updateShouldNotify(InheritedWidget oldWidget) =>
-            this.data != ((ButtonTheme) oldWidget).data;
+        public override bool updateShouldNotify(InheritedWidget oldWidget) {
+            return this.data != ((ButtonTheme) oldWidget).data;
+        }
     }
 
 
@@ -138,8 +139,10 @@ namespace Unity.UIWidgets.material {
 
         public EdgeInsets padding {
             get {
-                if (this._padding != null)
+                if (this._padding != null) {
                     return this._padding;
+                }
+
                 switch (this.textTheme) {
                     case ButtonTextTheme.normal:
                     case ButtonTextTheme.accent:
@@ -157,8 +160,10 @@ namespace Unity.UIWidgets.material {
 
         public ShapeBorder shape {
             get {
-                if (this._shape != null)
+                if (this._shape != null) {
                     return this._shape;
+                }
+
                 switch (this.textTheme) {
                     case ButtonTextTheme.normal:
                     case ButtonTextTheme.accent:
@@ -205,25 +210,32 @@ namespace Unity.UIWidgets.material {
 
 
         Color getDisabledTextColor(MaterialButton button) {
-            if (button.disabledTextColor != null)
+            if (button.disabledTextColor != null) {
                 return button.disabledTextColor;
+            }
+
             return this._getDisabledColor(button);
         }
 
 
         Color getDisabledFillColor(MaterialButton button) {
-            if (button.disabledColor != null)
+            if (button.disabledColor != null) {
                 return button.disabledColor;
-            if (this._disabledColor != null)
+            }
+
+            if (this._disabledColor != null) {
                 return this._disabledColor;
+            }
+
             return this._getDisabledColor(button);
         }
 
 
         Color getFillColor(MaterialButton button) {
             Color fillColor = button.enabled ? button.color : button.disabledColor;
-            if (fillColor != null)
+            if (fillColor != null) {
                 return fillColor;
+            }
 
 //    todo xingwei.zhu: uncomment these when FlatButton & OutlineButton & RaisedButton are ready
 //            if (button is FlatButton || button is OutlineButton)
@@ -248,11 +260,13 @@ namespace Unity.UIWidgets.material {
         }
 
         public Color getTextColor(MaterialButton button) {
-            if (!button.enabled)
+            if (!button.enabled) {
                 return this.getDisabledTextColor(button);
+            }
 
-            if (button.textColor != null)
+            if (button.textColor != null) {
                 return button.textColor;
+            }
 
             switch (this.getTextTheme(button)) {
                 case ButtonTextTheme.normal:
@@ -264,8 +278,10 @@ namespace Unity.UIWidgets.material {
                     bool fillIsDark = fillColor != null
                         ? ThemeData.estimateBrightnessForColor(fillColor) == Brightness.dark
                         : this.getBrightness(button) == Brightness.dark;
-                    if (fillIsDark)
+                    if (fillIsDark) {
                         return Colors.white;
+                    }
+
 //    todo xingwei.zhu: uncomment these when FlatButton & OutlineButton are ready
 //                    if (button is FlatButton || button is OutlineButton)
 //                        return this.colorScheme.primary;
@@ -278,8 +294,9 @@ namespace Unity.UIWidgets.material {
         }
 
         public Color getSplashColor(MaterialButton button) {
-            if (button.splashColor != null)
+            if (button.splashColor != null) {
                 return button.splashColor;
+            }
 
 //    todo xingwei.zhu: uncomment these when FlatButton & OutlineButton & RaisedButton are ready
 //            if (this._splashColor != null && (button is RaisedButton || button is OutlineButton)) {
@@ -299,8 +316,9 @@ namespace Unity.UIWidgets.material {
         }
 
         public Color getHighlightColor(MaterialButton button) {
-            if (button.highlightColor != null)
+            if (button.highlightColor != null) {
                 return button.highlightColor;
+            }
 
             switch (this.getTextTheme(button)) {
                 case ButtonTextTheme.normal:
@@ -316,8 +334,10 @@ namespace Unity.UIWidgets.material {
 
 
         public double getElevation(MaterialButton button) {
-            if (button.elevation != null)
+            if (button.elevation != null) {
                 return button.elevation ?? 0.0;
+            }
+
 //    todo xingwei.zhu: uncomment these when FlatButton are ready            
 //            if (button is FlatButton)
 //                return 0.0;
@@ -326,8 +346,10 @@ namespace Unity.UIWidgets.material {
 
 
         public double getHighlightElevation(MaterialButton button) {
-            if (button.highlightElevation != null)
+            if (button.highlightElevation != null) {
                 return button.highlightElevation ?? 0.0;
+            }
+
 //    todo xingwei.zhu: uncomment these when FlatButton & OutlineButton are ready 
 //            if (button is FlatButton)
 //                return 0.0;
@@ -338,22 +360,26 @@ namespace Unity.UIWidgets.material {
 
 
         public double getDisabledElevation(MaterialButton button) {
-            if (button.disabledElevation != null)
+            if (button.disabledElevation != null) {
                 return button.disabledElevation ?? 0.0;
+            }
+
             return 0.0;
         }
 
 
         public EdgeInsets getPadding(MaterialButton button) {
-            if (button.padding != null)
+            if (button.padding != null) {
                 return button.padding;
+            }
 
 //    todo xingwei.zhu: uncomment these when MaterialButtonWithIconMixin are ready 
 //            if (button is MaterialButtonWithIconMixin)
 //                return const EdgeInsetsDirectional.only(start: 12.0, end: 16.0);
 
-            if (this._padding != null)
+            if (this._padding != null) {
                 return this._padding;
+            }
 
             switch (this.getTextTheme(button)) {
                 case ButtonTextTheme.normal:
@@ -376,7 +402,9 @@ namespace Unity.UIWidgets.material {
             return button.animationDuration ?? Constants.kThemeChangeDuration;
         }
 
-        public BoxConstraints getConstraints(MaterialButton button) => this.constraints;
+        public BoxConstraints getConstraints(MaterialButton button) {
+            return this.constraints;
+        }
 
 
         public MaterialTapTargetSize getMaterialTapTargetSize(MaterialButton button) {

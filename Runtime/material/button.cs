@@ -79,13 +79,17 @@ namespace Unity.UIWidgets.material {
 
         public readonly Widget child;
 
-        public bool enabled => this.onPressed != null;
+        public bool enabled {
+            get { return this.onPressed != null; }
+        }
 
         public readonly MaterialTapTargetSize materialTapTargetSize;
 
         public readonly Clip clipBehavior;
 
-        public override State createState() => new _RawMaterialButtonState();
+        public override State createState() {
+            return new _RawMaterialButtonState();
+        }
     }
 
 

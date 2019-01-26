@@ -83,7 +83,9 @@ namespace Unity.UIWidgets.material {
 
         public readonly Widget child;
 
-        public bool enabled => this.onPressed != null;
+        public bool enabled {
+            get { return this.onPressed != null; }
+        }
 
         public readonly EdgeInsets padding;
 

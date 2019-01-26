@@ -134,7 +134,7 @@ namespace Unity.UIWidgets.painting {
             D.assert(this.fontWeight != null || fontWeightDelta == 0.0);
             D.assert(this.letterSpacing != null || (letterSpacingFactor == 1.0 && letterSpacingDelta == 0.0));
             D.assert(this.wordSpacing != null || (wordSpacingFactor == 1.0 && wordSpacingDelta == 0.0));
-            D.assert(heightFactor != null || (heightFactor == 1.0 && heightDelta == 0.0));
+            D.assert(this.height != null || (heightFactor == 1.0 && heightDelta == 0.0));
 
             string modifiedDebugLabel = "";
             D.assert(() => {
@@ -243,7 +243,6 @@ namespace Unity.UIWidgets.painting {
         }
 
         public static TextStyle lerp(TextStyle a, TextStyle b, double t) {
-            D.assert(t != null);
             D.assert(a == null || b == null || a.inherit == b.inherit);
             if (a == null && b == null) {
                 return null;
