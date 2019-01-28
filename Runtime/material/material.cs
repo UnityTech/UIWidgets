@@ -508,7 +508,7 @@ namespace Unity.UIWidgets.material {
             this.border.paint(canvas, Offset.zero & size);
         }
 
-        public override bool shouldRepaint(CustomPainter oldDelegate) {
+        public override bool shouldRepaint(ICustomPainter oldDelegate) {
             _ShapeBorderPainter _oldDelegate = (_ShapeBorderPainter) oldDelegate;
             return _oldDelegate.border != this.border;
         }

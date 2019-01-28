@@ -119,7 +119,7 @@ namespace Unity.UIWidgets.material {
         }
 
 
-        public override bool shouldRepaint(CustomPainter oldPainter) {
+        public override bool shouldRepaint(ICustomPainter oldPainter) {
             return this.color != ((_TextSelectionHandlePainter) oldPainter).color;
         }
     }

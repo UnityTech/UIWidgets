@@ -76,4 +76,12 @@ namespace Unity.UIWidgets.material {
             return Math.Max(Math.Max(d1, d2), Math.Max(d3, d4)).ceil();
         }
     }
+
+    public static class ScrollbarUtils {
+        public static readonly TimeSpan _kScrollbarFadeDuration = TimeSpan.FromMilliseconds(300);
+        
+        public static readonly TimeSpan _kScrollbarTimeToFade = TimeSpan.FromMilliseconds(600);
+         
+        public const double _kScrollbarThickness = 6.0;
+    }
 }

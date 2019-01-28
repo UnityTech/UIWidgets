@@ -61,7 +61,7 @@ namespace UIWidgetsSample {
             canvas.restore();
         }
 
-        public override bool shouldRepaint(CustomPainter oldDelegate) {
+        public override bool shouldRepaint(ICustomPainter oldDelegate) {
             return false;
         }
     }

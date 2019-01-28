@@ -50,8 +50,8 @@ namespace Unity.UIWidgets.widgets {
     public class CustomPaint : SingleChildRenderObjectWidget {
         public CustomPaint(
             Key key = null,
-            CustomPainter painter = null,
-            CustomPainter foregroundPainter = null,
+            ICustomPainter painter = null,
+            ICustomPainter foregroundPainter = null,
             Size size = null,
             bool isComplex = false,
             bool willChange = false,
@@ -65,8 +65,8 @@ namespace Unity.UIWidgets.widgets {
             this.willChange = willChange;
         }
 
-        public readonly CustomPainter painter;
-        public readonly CustomPainter foregroundPainter;
+        public readonly ICustomPainter painter;
+        public readonly ICustomPainter foregroundPainter;
         public readonly Size size;
         public readonly bool isComplex;
         public readonly bool willChange;
