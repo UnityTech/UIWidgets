@@ -5,6 +5,7 @@ using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
 
+
 namespace Unity.UIWidgets.material {
     public static class ThemeDataUtils {
         public static readonly Color _kLightThemeHighlightColor = new Color(0x66BCBCBC);
@@ -74,6 +75,34 @@ namespace Unity.UIWidgets.material {
             double d3 = (position - bounds.bottomLeft(Offset.zero)).distance;
             double d4 = (position - bounds.bottomRight(Offset.zero)).distance;
             return Math.Max(Math.Max(d1, d2), Math.Max(d3, d4)).ceil();
+        }
+    }
+
+
+    public static class ArcUtils {
+        public const double _kOnAxisDelta = 2.0;
+
+        public static List<_Diagonal> _allDiagonals = new List<_Diagonal> {
+            new _Diagonal(_CornerId.topLeft, _CornerId.bottomRight),
+            new _Diagonal(_CornerId.bottomRight, _CornerId.topLeft),
+            new _Diagonal(_CornerId.topRight, _CornerId.bottomLeft),
+            new _Diagonal(_CornerId.bottomLeft, _CornerId.topRight)
+        };
+
+        public delegate double _KeyFunc<T>(T input);
+
+
+        public static T _maxBy<T>(List<T> input, _KeyFunc<T> keyFunc) {
+            T maxValue = default(T);
+            double? maxKey = null;
+            foreach (T value in input) {
+                double key = keyFunc(value);
+                if (maxKey == null || key > maxKey) {
+                    maxValue = value;
+                    maxKey = key;
+                }
+            }
+            return maxValue;
         }
     }
 }
