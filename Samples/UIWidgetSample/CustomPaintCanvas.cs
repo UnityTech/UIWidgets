@@ -13,7 +13,7 @@ namespace UIWidgetsSample {
         }
     }
 
-    public class GridPainter : CustomPainter {
+    public class GridPainter : AbstractCustomPainter {
         public GridPainter(Listenable repaint) : base(repaint) {
         }
 
@@ -61,7 +61,7 @@ namespace UIWidgetsSample {
             canvas.restore();
         }
 
-        public override bool shouldRepaint(ICustomPainter oldDelegate) {
+        public override bool shouldRepaint(CustomPainter oldDelegate) {
             return false;
         }
     }

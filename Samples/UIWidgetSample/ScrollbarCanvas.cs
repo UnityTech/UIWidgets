@@ -1,15 +1,12 @@
 using System.Collections.Generic;
 using Unity.UIWidgets.engine;
-using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.material;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
 
 namespace UIWidgetsSample {
-    
     public class ScrollbarCanvas : WidgetCanvas {
-
         protected override Widget getWidget() {
             return new Container(
                 decoration: new BoxDecoration(

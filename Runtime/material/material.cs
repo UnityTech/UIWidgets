@@ -496,7 +496,7 @@ namespace Unity.UIWidgets.material {
         }
     }
 
-    class _ShapeBorderPainter : CustomPainter {
+    class _ShapeBorderPainter : AbstractCustomPainter {
         public _ShapeBorderPainter(ShapeBorder border = null) : base(null) {
             this.border = border;
         }
@@ -508,7 +508,7 @@ namespace Unity.UIWidgets.material {
             this.border.paint(canvas, Offset.zero & size);
         }
 
-        public override bool shouldRepaint(ICustomPainter oldDelegate) {
+        public override bool shouldRepaint(CustomPainter oldDelegate) {
             _ShapeBorderPainter _oldDelegate = (_ShapeBorderPainter) oldDelegate;
             return _oldDelegate.border != this.border;
         }

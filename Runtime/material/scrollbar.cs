@@ -3,8 +3,6 @@ using Unity.UIWidgets.async;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
-using Color = Unity.UIWidgets.ui.Color;
-
 
 namespace Unity.UIWidgets.material {
     public class Scrollbar : StatefulWidget {
@@ -44,11 +42,11 @@ namespace Unity.UIWidgets.material {
 
         public override void didChangeDependencies() {
             base.didChangeDependencies();
-            
-            ThemeData theme = Theme.of(context);
+
+            ThemeData theme = Theme.of(this.context);
 
             this._themeColor = theme.highlightColor.withOpacity(1.0);
-            this._textDirection = Directionality.of(context);
+            this._textDirection = Directionality.of(this.context);
             this._materialPainter = this._BuildMaterialScrollbarPainter();
         }
 
@@ -66,15 +64,16 @@ namespace Unity.UIWidgets.material {
                 if (this._fadeoutAnimationController.status != AnimationStatus.forward) {
                     this._fadeoutAnimationController.forward();
                 }
-                
+
                 this._materialPainter.update(notification.metrics, notification.metrics.axisDirection);
                 this._fadeoutTimer?.cancel();
-                
+
                 this._fadeoutTimer = Window.instance.run(ScrollbarUtils._kScrollbarTimeToFade, () => {
-                    _fadeoutAnimationController.reverse();
-                    _fadeoutTimer = null;
+                    this._fadeoutAnimationController.reverse();
+                    this._fadeoutTimer = null;
                 });
             }
+
             return false;
         }
 
@@ -93,7 +92,7 @@ namespace Unity.UIWidgets.material {
                     child: new CustomPaint(
                         foregroundPainter: this._materialPainter,
                         child: new RepaintBoundary(
-                            child: widget.child
+                            child: this.widget.child
                         )
                     )
                 )
@@ -101,4 +100,3 @@ namespace Unity.UIWidgets.material {
         }
     }
 }
-

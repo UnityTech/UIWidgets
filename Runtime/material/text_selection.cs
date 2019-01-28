@@ -103,7 +103,7 @@ namespace Unity.UIWidgets.material {
         }
     }
 
-    class _TextSelectionHandlePainter : CustomPainter {
+    class _TextSelectionHandlePainter : AbstractCustomPainter {
         internal _TextSelectionHandlePainter(Color color) {
             this.color = color;
         }
@@ -119,7 +119,7 @@ namespace Unity.UIWidgets.material {
         }
 
 
-        public override bool shouldRepaint(ICustomPainter oldPainter) {
+        public override bool shouldRepaint(CustomPainter oldPainter) {
             return this.color != ((_TextSelectionHandlePainter) oldPainter).color;
         }
     }

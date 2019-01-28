@@ -5,7 +5,7 @@ using Unity.UIWidgets.painting;
 using Unity.UIWidgets.ui;
 
 namespace Unity.UIWidgets.widgets {
-    public class ScrollbarPainter : ChangeNotifier, ICustomPainter {
+    public class ScrollbarPainter : ChangeNotifier, CustomPainter {
         public ScrollbarPainter(
             Color color,
             TextDirection textDirection,
@@ -28,7 +28,7 @@ namespace Unity.UIWidgets.widgets {
             this.minOverscrollLength = minOverscrollLength;
             fadeoutOpacityAnimation.addListener(this.notifyListeners);
         }
-        
+
         const double _kMinThumbExtent = 18.0;
 
         public Color color;
@@ -41,8 +41,8 @@ namespace Unity.UIWidgets.widgets {
         public double minLength;
         public double minOverscrollLength;
 
-        private ScrollMetrics _lastMetrics;
-        private AxisDirection? _lastAxisDirection;
+        ScrollMetrics _lastMetrics;
+        AxisDirection? _lastAxisDirection;
 
         public void update(ScrollMetrics metrics, AxisDirection axisDirection) {
             this._lastMetrics = metrics;
@@ -50,7 +50,7 @@ namespace Unity.UIWidgets.widgets {
             this.notifyListeners();
         }
 
-        private Paint _paint {
+        Paint _paint {
             get {
                 var paint = new Paint();
                 paint.color = this.color.withOpacity(this.color.opacity * this.fadeoutOpacityAnimation.value);
@@ -58,9 +58,9 @@ namespace Unity.UIWidgets.widgets {
             }
         }
 
-        private double _getThumbX(Size size) {
+        double _getThumbX(Size size) {
             D.assert(this.textDirection != null);
-            switch (textDirection) {
+            switch (this.textDirection) {
                 case TextDirection.rtl:
                     return this.crossAxisMargin;
                 case TextDirection.ltr:
@@ -70,33 +70,33 @@ namespace Unity.UIWidgets.widgets {
             return 0;
         }
 
-        private void _paintVerticalThumb(Canvas canvas, Size size, double thumbOffset, double thumbExtent) {
-            Offset thumbOrigin = new Offset(_getThumbX(size), thumbOffset);
+        void _paintVerticalThumb(Canvas canvas, Size size, double thumbOffset, double thumbExtent) {
+            Offset thumbOrigin = new Offset(this._getThumbX(size), thumbOffset);
             Size thumbSize = new Size(this.thickness, thumbExtent);
             Rect thumbRect = thumbOrigin & thumbSize;
             if (this.radius == null) {
-                canvas.drawRect(thumbRect, _paint);
+                canvas.drawRect(thumbRect, this._paint);
             }
             else {
-                canvas.drawRRect(RRect.fromRectAndRadius(thumbRect, this.radius), _paint);
+                canvas.drawRRect(RRect.fromRectAndRadius(thumbRect, this.radius), this._paint);
             }
         }
 
-        private void _paintHorizontalThumb(Canvas canvas, Size size, double thumbOffset, double thumbExtent) {
+        void _paintHorizontalThumb(Canvas canvas, Size size, double thumbOffset, double thumbExtent) {
             Offset thumbOrigin = new Offset(thumbOffset, size.height - this.thickness);
             Size thumbSize = new Size(thumbExtent, this.thickness);
             Rect thumbRect = thumbOrigin & thumbSize;
             if (this.radius == null) {
-                canvas.drawRect(thumbRect, _paint);
+                canvas.drawRect(thumbRect, this._paint);
             }
             else {
-                canvas.drawRRect(RRect.fromRectAndRadius(thumbRect, this.radius), _paint);
+                canvas.drawRRect(RRect.fromRectAndRadius(thumbRect, this.radius), this._paint);
             }
         }
 
         public delegate void painterDelegate(Canvas canvas, Size size, double thumbOffset, double thumbExtent);
 
-        private void _paintThumb(
+        void _paintThumb(
             double before,
             double inside,
             double after,
@@ -149,21 +149,21 @@ namespace Unity.UIWidgets.widgets {
                 return;
             }
 
-            switch (_lastAxisDirection) {
+            switch (this._lastAxisDirection) {
                 case AxisDirection.down:
-                    _paintThumb(this._lastMetrics.extentBefore(), this._lastMetrics.extentInside(),
+                    this._paintThumb(this._lastMetrics.extentBefore(), this._lastMetrics.extentInside(),
                         this._lastMetrics.extentAfter(), size.height, canvas, size, this._paintVerticalThumb);
                     break;
                 case AxisDirection.up:
-                    _paintThumb(this._lastMetrics.extentAfter(), this._lastMetrics.extentInside(),
+                    this._paintThumb(this._lastMetrics.extentAfter(), this._lastMetrics.extentInside(),
                         this._lastMetrics.extentBefore(), size.height, canvas, size, this._paintVerticalThumb);
                     break;
                 case AxisDirection.right:
-                    _paintThumb(this._lastMetrics.extentBefore(), this._lastMetrics.extentInside(),
+                    this._paintThumb(this._lastMetrics.extentBefore(), this._lastMetrics.extentInside(),
                         this._lastMetrics.extentAfter(), size.width, canvas, size, this._paintHorizontalThumb);
                     break;
                 case AxisDirection.left:
-                    _paintThumb(this._lastMetrics.extentAfter(), this._lastMetrics.extentInside(),
+                    this._paintThumb(this._lastMetrics.extentAfter(), this._lastMetrics.extentInside(),
                         this._lastMetrics.extentBefore(), size.width, canvas, size, this._paintHorizontalThumb);
                     break;
             }
@@ -173,7 +173,7 @@ namespace Unity.UIWidgets.widgets {
             return false;
         }
 
-        public bool shouldRepaint(ICustomPainter oldRaw) {
+        public bool shouldRepaint(CustomPainter oldRaw) {
             if (oldRaw is ScrollbarPainter old) {
                 return this.color != old.color
                        || this.textDirection != old.textDirection
