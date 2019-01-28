@@ -4,8 +4,16 @@ using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
 
 namespace Unity.UIWidgets.widgets {
-    public abstract class CustomPainter : Listenable {
-        public CustomPainter(Listenable repaint = null) {
+    public interface CustomPainter : Listenable {
+        void paint(Canvas canvas, Size size);
+
+        bool shouldRepaint(CustomPainter oldDelegate);
+
+        bool hitTest(Offset position);
+    }
+
+    public abstract class AbstractCustomPainter : CustomPainter {
+        public AbstractCustomPainter(Listenable repaint = null) {
             this._repaint = repaint;
         }
 
