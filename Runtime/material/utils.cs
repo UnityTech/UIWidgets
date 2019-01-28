@@ -5,7 +5,6 @@ using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
 
-
 namespace Unity.UIWidgets.material {
     public static class ThemeDataUtils {
         public static readonly Color _kLightThemeHighlightColor = new Color(0x66BCBCBC);
@@ -76,6 +75,14 @@ namespace Unity.UIWidgets.material {
             double d4 = (position - bounds.bottomRight(Offset.zero)).distance;
             return Math.Max(Math.Max(d1, d2), Math.Max(d3, d4)).ceil();
         }
+    }
+
+    public static class ScrollbarUtils {
+        public static readonly TimeSpan _kScrollbarFadeDuration = TimeSpan.FromMilliseconds(300);
+
+        public static readonly TimeSpan _kScrollbarTimeToFade = TimeSpan.FromMilliseconds(600);
+
+        public const double _kScrollbarThickness = 6.0;
     }
 
 
