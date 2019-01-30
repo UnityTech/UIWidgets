@@ -21,13 +21,13 @@ namespace Unity.UIWidgets.painting {
         public readonly string assetName;
         public readonly AssetBundle bundle;
 
-        readonly Dictionary<ImageConfiguration, AssetBundleImageKey> _cache =
-            new Dictionary<ImageConfiguration, AssetBundleImageKey>();
 
         protected override
             IPromise<AssetBundleImageKey> obtainKey(ImageConfiguration configuration) {
+            AssetImageConfiguration assetConfig = new AssetImageConfiguration(configuration, this.assetName);
             AssetBundleImageKey key;
-            if (this._cache.TryGetValue(configuration, out key)) {
+            var cache = AssetBundleCache.instance.get(configuration.bundle);
+            if (cache.TryGetValue(assetConfig, out key)) {
                 return Promise<AssetBundleImageKey>.Resolved(key);
             }
 
@@ -38,7 +38,7 @@ namespace Unity.UIWidgets.painting {
                 D.assert(result != null);
 
                 key = (AssetBundleImageKey) result;
-                this._cache[configuration] = key;
+                cache[assetConfig] = key;
                 return key;
             });
         }
@@ -132,6 +132,78 @@ namespace Unity.UIWidgets.painting {
 
         public override string ToString() {
             return $"{this.GetType()}(bundle: {this.bundle}, name: \"{this.assetName}\")";
+        }
+    }
+
+    public class AssetImageConfiguration: IEquatable<AssetImageConfiguration> {
+        public ImageConfiguration configuration;
+        public string assetName;
+
+        public AssetImageConfiguration(ImageConfiguration configuration, string assetName) {
+            this.configuration = configuration;
+            this.assetName = assetName;
+        }
+        
+        public bool Equals(AssetImageConfiguration other) {
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
+
+            return Equals(this.configuration, other.configuration) && string.Equals(this.assetName, other.assetName);
+        }
+
+        public override bool Equals(object obj) {
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
+
+            return this.Equals((AssetImageConfiguration) obj);
+        }
+
+        public override int GetHashCode() {
+            unchecked {
+                return ((this.configuration != null ? this.configuration.GetHashCode() : 0) * 397) ^ (this.assetName != null ? this.assetName.GetHashCode() : 0);
+            }
+        }
+
+        public static bool operator ==(AssetImageConfiguration left, AssetImageConfiguration right) {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(AssetImageConfiguration left, AssetImageConfiguration right) {
+            return !Equals(left, right);
+        }
+    }
+    
+    public class AssetBundleCache {
+
+        static readonly AssetBundleCache _instance = new AssetBundleCache();
+
+        public static AssetBundleCache instance => _instance;
+        
+        readonly Dictionary<int, Dictionary<AssetImageConfiguration, AssetBundleImageKey>> _bundleCaches = 
+            new Dictionary<int, Dictionary<AssetImageConfiguration, AssetBundleImageKey>>();
+        public Dictionary<AssetImageConfiguration, AssetBundleImageKey> get(AssetBundle bundle) {
+            Dictionary<AssetImageConfiguration, AssetBundleImageKey> result;
+            int id = bundle == null ? 0 : bundle.GetInstanceID();
+            if (this._bundleCaches.TryGetValue(id, out result)) {
+                return result;
+            }
+            result = new Dictionary<AssetImageConfiguration, AssetBundleImageKey>();
+            this._bundleCaches[id] = result;
+            return result;
         }
     }
 }
