@@ -136,8 +136,8 @@ namespace Unity.UIWidgets.painting {
     }
 
     public class AssetImageConfiguration: IEquatable<AssetImageConfiguration> {
-        public ImageConfiguration configuration;
-        public string assetName;
+        public readonly ImageConfiguration configuration;
+        public readonly string assetName;
 
         public AssetImageConfiguration(ImageConfiguration configuration, string assetName) {
             this.configuration = configuration;
