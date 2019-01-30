@@ -16,7 +16,7 @@ namespace Unity.UIWidgets.painting {
         Paragraph _layoutTemplate;
         Paragraph _paragraph;
         bool _needsLayout = true;
-        int _maxLines;
+        int? _maxLines;
         string _ellipsis;
         double _lastMinWidth;
         double _lastMaxWidth;
@@ -25,7 +25,7 @@ namespace Unity.UIWidgets.painting {
             TextAlign textAlign = TextAlign.left,
             TextDirection textDirection = TextDirection.ltr,
             double textScaleFactor = 1.0,
-            int maxLines = 0,
+            int? maxLines = null,
             string ellipsis = "") {
             this._text = text;
             this._textAlign = textAlign;
@@ -120,7 +120,7 @@ namespace Unity.UIWidgets.painting {
             }
         }
 
-        public int maxLines {
+        public int? maxLines {
             get { return this._maxLines; }
             set {
                 if (this._maxLines == value) {

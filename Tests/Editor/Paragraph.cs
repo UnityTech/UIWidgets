@@ -68,7 +68,7 @@ namespace UIWidgets.Tests {
             return null;
         }
 
-        RenderBox box(RenderParagraph p, int width = 200, int height = 200) {
+        RenderBox box(RenderParagraph p, int width = 400, int height = 200) {
             return new RenderConstrainedOverflowBox(
                     minWidth: width,
                     maxWidth: width,
@@ -99,26 +99,8 @@ namespace UIWidgets.Tests {
             return this.box(
                 new RenderParagraph(new TextSpan("", children:
                     new List<TextSpan>() {
-                        new TextSpan("Real-time 3D revolutioni淡粉色的方式地方zes the animation pipeline ", null),
-                        new TextSpan(style: new TextStyle(color: Color.fromARGB(255, 255, 0, 0)),
-                            text: "for Disney Television Animation's “Baymax Dreams"),
-                        new TextSpan(" Unity Widgets"),
-                        new TextSpan(" Text"),
-                        new TextSpan("Real-time 3D revolutionizes the animation pipeline "),
-                        new TextSpan(style: new TextStyle(color: Color.fromARGB(125, 255, 0, 0)),
-                            text: "Transparent Red Text\n\n"),
-                        new TextSpan(style: new TextStyle(fontWeight: FontWeight.w700),
-                            text: "Bold Text Test Bold Textfs Test: FontWeight.w70\n\n"),
-                        new TextSpan(style: new TextStyle(fontStyle: FontStyle.italic),
-                            text: "This is FontStyle.italic Text This is FontStyle.italic Text\n\n"),
-                        new TextSpan(
-                            style: new TextStyle(fontStyle: FontStyle.italic, fontWeight: FontWeight.w700),
-                            text:
-                            "This is FontStyle.italic And 发撒放豆腐sad 发生的 Bold Text This is FontStyle.italic  And Bold  Text\n\n"),
-                        new TextSpan(style: new TextStyle(fontSize: 18),
-                            text: "FontSize 18: Get a named matrix value from the shader."),
-                        new TextSpan(style: new TextStyle(fontSize: 14),
-                            text: "FontSize 14"),
+                        new TextSpan("wei", new TextStyle(fontSize:14.0, color: new Color(0xffff0000))),
+                        
                     })));
         }
 

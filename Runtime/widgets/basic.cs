@@ -1044,7 +1044,7 @@ namespace Unity.UIWidgets.widgets {
                 softWrap: this.softWrap,
                 overflow: this.overflow,
                 textScaleFactor: this.textScaleFactor,
-                maxLines: this.maxLines ?? 0 // todo: maxLines should be nullable.
+                maxLines: this.maxLines
             );
         }
 

@@ -5,57 +5,30 @@ using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
     class MeshKey : IEquatable<MeshKey> {
-        public readonly string text;
-        public readonly int fontId;
-        public readonly int textureVersion;
-        public readonly int fontSizeToLoad;
-        public readonly UnityEngine.FontStyle fontStyle;
+        public readonly long textBlobId;
         public readonly float scale;
 
-        public MeshKey(string text, int fontId, int textureVersion, int fontSizeToLoad,
-            UnityEngine.FontStyle fontStyle, float scale) {
-            this.text = text;
-            this.fontId = fontId;
-            this.textureVersion = textureVersion;
-            this.fontSizeToLoad = fontSizeToLoad;
-            this.fontStyle = fontStyle;
+        public MeshKey(long textBlobId, float scale) {
+            this.textBlobId = textBlobId;
             this.scale = scale;
         }
-
+        
         public bool Equals(MeshKey other) {
-            if (ReferenceEquals(null, other)) {
-                return false;
-            }
-            if (ReferenceEquals(this, other)) {
-                return true;
-            }
-            return string.Equals(this.text, other.text) && this.fontId == other.fontId &&
-                   this.textureVersion == other.textureVersion && this.fontSizeToLoad == other.fontSizeToLoad &&
-                   this.fontStyle == other.fontStyle && this.scale.Equals(other.scale);
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return this.textBlobId == other.textBlobId && this.scale.Equals(other.scale);
         }
 
         public override bool Equals(object obj) {
-            if (ReferenceEquals(null, obj)) {
-                return false;
-            }
-            if (ReferenceEquals(this, obj)) {
-                return true;
-            }
-            if (obj.GetType() != this.GetType()) {
-                return false;
-            }
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
             return this.Equals((MeshKey) obj);
         }
 
         public override int GetHashCode() {
             unchecked {
-                var hashCode = (this.text != null ? this.text.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ this.fontId;
-                hashCode = (hashCode * 397) ^ this.textureVersion;
-                hashCode = (hashCode * 397) ^ this.fontSizeToLoad;
-                hashCode = (hashCode * 397) ^ (int) this.fontStyle;
-                hashCode = (hashCode * 397) ^ this.scale.GetHashCode();
-                return hashCode;
+                return (this.textBlobId.GetHashCode() * 397) ^ this.scale.GetHashCode();
             }
         }
 
@@ -68,24 +41,20 @@ namespace Unity.UIWidgets.ui {
         }
 
         public override string ToString() {
-            return
-                $"MeshKey(text: {this.text}, " +
-                $"fontId: {this.fontId}, " +
-                $"textureVersion: {this.textureVersion}, " +
-                $"fontSizeToLoad: {this.fontSizeToLoad}, " +
-                $"fontStyle: {this.fontStyle}, " +
-                $"scale: {this.scale})";
+            return $"{nameof(this.textBlobId)}: {this.textBlobId}, {nameof(this.scale)}: {this.scale}";
         }
     }
 
     class MeshInfo {
         public readonly MeshKey key;
+        public readonly long textureVersion;
         public readonly MeshMesh mesh;
         long _timeToLive;
 
-        public MeshInfo(MeshKey key, MeshMesh mesh, int timeToLive = 5) {
+        public MeshInfo(MeshKey key, MeshMesh mesh, long textureVersion, int timeToLive = 5) {
             this.mesh = mesh;
             this.key = key;
+            this.textureVersion = textureVersion;
             this.touch(timeToLive);
         }
 
@@ -124,39 +93,37 @@ namespace Unity.UIWidgets.ui {
         public static MeshMesh generateMesh(TextBlob textBlob, float scale) {
             var style = textBlob.style;
             var fontInfo = FontManager.instance.getOrCreate(style.fontFamily);
-            var font = fontInfo.font;
-            var length = textBlob.end - textBlob.start;
-
-            var text = textBlob.text;
-            var fontSizeToLoad = Mathf.CeilToInt(style.UnityFontSize * scale);
-            var subText = textBlob.text.Substring(textBlob.start, textBlob.end - textBlob.start);
-            font.RequestCharactersInTexture(subText, fontSizeToLoad, style.UnityFontStyle);
+            var key = new MeshKey(textBlob.instanceId, scale);
             
-            /*
-            var key = new MeshKey(subText, font.GetInstanceID(), fontInfo.textureVersion, fontSizeToLoad,
-                style.UnityFontStyle, scale);
-
-            
-            _meshes.TryGetValue(key, out var meshInfo);
-            if (meshInfo != null) {
+            /*_meshes.TryGetValue(key, out var meshInfo);
+            if (meshInfo != null && meshInfo.textureVersion == fontInfo.textureVersion) {
                 meshInfo.touch();
                 return meshInfo.mesh;
             }*/
+
+            var font = fontInfo.font;
+            var length = textBlob.textSize;
+            var text = textBlob.text;
+            var fontSizeToLoad = Mathf.CeilToInt(style.UnityFontSize * scale);
+            var subText = textBlob.text.Substring(textBlob.textOffset, textBlob.textSize);
+            font.RequestCharactersInTexture(subText, fontSizeToLoad, style.UnityFontStyle);
+
 
             var vertices = new List<Vector3>(length * 4);
             var triangles = new List<int>(length * 6);
             var uv = new List<Vector2>(length * 4);
             for (int charIndex = 0; charIndex < length; ++charIndex) {
-                var ch = text[charIndex + textBlob.start];
+                var ch = text[charIndex + textBlob.textOffset];
                 // first char as origin for mesh position 
-                var position = textBlob.positions[charIndex + textBlob.start];
-                if (Paragraph.isWordSpace(ch) || Paragraph.isLineEndSpace(ch) || ch == '\t') {
+                var position = textBlob.positions[charIndex];
+                if (LayoutUtils.isWordSpace(ch) || LayoutUtils.isLineEndSpace(ch) || ch == '\t') {
                     continue;
                 }
 
 
                 CharacterInfo charInfo;
                 font.GetCharacterInfo(ch, out charInfo, fontSizeToLoad, style.UnityFontStyle);
+            
                 var minX = charInfo.minX / scale;
                 var maxX = charInfo.maxX / scale;
                 var minY = charInfo.minY / scale;
@@ -169,6 +136,9 @@ namespace Unity.UIWidgets.ui {
                 vertices.Add(new Vector3((float) (position.x + maxX), (float) (position.y - minY), 0));
                 vertices.Add(new Vector3((float) (position.x + minX), (float) (position.y - minY), 0));
 
+                if (ch == 'w') {
+                    //Debug.Log($"{(float) (position.y - maxY)}  {(float) (position.y - minY)} {charInfo.minY},{charInfo.maxY} {position.y} {charInfo.uvTopLeft}");
+                }
                 triangles.Add(baseIndex);
                 triangles.Add(baseIndex + 1);
                 triangles.Add(baseIndex + 2);
@@ -182,9 +152,9 @@ namespace Unity.UIWidgets.ui {
                 uv.Add(charInfo.uvBottomLeft);
             }
 
-             
-            MeshMesh mesh = new MeshMesh(vertices, triangles, uv);
-            // _meshes[key] = new MeshInfo(key, mesh);
+
+            MeshMesh mesh = vertices.Count > 0 ? new MeshMesh(vertices, triangles, uv) : null;
+            _meshes[key] = new MeshInfo(key, mesh, fontInfo.textureVersion);
             
             return mesh;
         }

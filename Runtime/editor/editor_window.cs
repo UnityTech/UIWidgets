@@ -248,12 +248,7 @@ namespace Unity.UIWidgets.editor {
 
         void _doOnGUI(Event evt) {
             if (evt.type == EventType.Repaint) {
-                if (this._regenerateLayerTree) {
-                    this._regenerateLayerTree = false;
-                    this._beginFrame();
-                } else {
-                    this._rasterizer.drawLastLayerTree();
-                }
+                this._beginFrame();
                 return;
             }
 

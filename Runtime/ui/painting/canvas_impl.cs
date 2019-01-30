@@ -830,14 +830,18 @@ namespace Unity.UIWidgets.ui {
 
         public void drawTextBlob(TextBlob textBlob, Offset offset, Paint paint) {
             var state = this._getState();
-
             var xform = new float[6];
             XformUtils.transformTranslate(xform, (float) offset.dx, (float) offset.dy);
             XformUtils.transformMultiply(xform, state.xform); // xform = state.xform * xform
 
             var scale = XformUtils.getAverageScale(xform) * this._devicePixelRatio;            
-            var mesh = MeshGenerator.generateMesh(textBlob, scale).transform(xform);
-
+            var mesh = MeshGenerator.generateMesh(textBlob, scale)?.transform(xform);
+            /*if (textBlob.text == "Huawei") {
+                Debug.Log($"mesh: {mesh.vertices[12].y - mesh.vertices[0].y} {mesh.vertices[14].y - mesh.vertices[0].y}");
+            }*/
+            if (mesh == null) {
+                return;
+            }
             if (!this._applyClip(mesh.bounds)) {
                 return;
             }
@@ -1009,7 +1013,10 @@ namespace Unity.UIWidgets.ui {
                     
                     // clear triangles first in order to bypass validation in SetVertices.
                     this.meshObj.SetTriangles((int[]) null, 0, false);
-                    
+
+                    if (this.mesh.vertices.Count > 12) {
+                       // Debug.Log($"{this.mesh.vertices.Count}  {this.mesh.vertices[12].y - this.mesh.vertices[0].y}");
+                    }
                     this.meshObj.SetVertices(this.mesh.vertices);
                     this.meshObj.SetTriangles(this.mesh.triangles, 0, false);
                     this.meshObj.SetUVs(0, this.mesh.uv);
