@@ -61,7 +61,13 @@ namespace UIWidgets.Tests {
                     cursorColor: Color.fromARGB(255, 0, 0, 0)
                 )
             );
-            this.windowAdapter.attachRootWidget(this.root);
+            this.windowAdapter.attachRootWidget(new WidgetsApp(window: this.windowAdapter, home: this.root,
+                pageRouteBuilder: (RouteSettings settings, WidgetBuilder builder) =>
+                    new PageRouteBuilder(
+                        settings: settings,
+                        pageBuilder: (BuildContext context, Unity.UIWidgets.animation.Animation<double> animation, 
+                            Unity.UIWidgets.animation.Animation<double> secondaryAnimation) => builder(context)
+                    )));
             this.titleContent = new GUIContent("EditableTextWidget");
         }
 

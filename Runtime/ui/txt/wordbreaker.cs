@@ -1,10 +1,6 @@
-using System;
-
 namespace Unity.UIWidgets.ui {
-    
     public class WordBreaker {
-
-        public const uint U16_SURROGATE_OFFSET = ((0xd800<<10)+0xdc00-0x10000);
+        public const uint U16_SURROGATE_OFFSET = ((0xd800 << 10) + 0xdc00 - 0x10000);
         string _text;
         int _offset;
         int _size;
@@ -12,8 +8,8 @@ namespace Unity.UIWidgets.ui {
         int _last;
         int _scanOffset;
         bool _inEmailOrUrl;
-        
-        
+
+
         public int next() {
             this._last = this._current;
             this._detectEmailOrUrl();
@@ -23,6 +19,7 @@ namespace Unity.UIWidgets.ui {
             else {
                 this._current = this._findNextBreakNormal();
             }
+
             return this._current;
         }
 
@@ -35,11 +32,11 @@ namespace Unity.UIWidgets.ui {
             this._scanOffset = 0;
             this._inEmailOrUrl = false;
         }
-        
+
         public int current() {
             return this._current;
         }
-        
+
         public int wordStart() {
             if (this._inEmailOrUrl) {
                 return this._last;
@@ -55,6 +52,7 @@ namespace Unity.UIWidgets.ui {
 
                 result = ix;
             }
+
             return result;
         }
 
@@ -73,13 +71,14 @@ namespace Unity.UIWidgets.ui {
 
                 result = ix;
             }
+
             return result;
         }
 
         public int breakBadness() {
             return (this._inEmailOrUrl && this._current < this._scanOffset) ? 1 : 0;
         }
-        
+
         public void finish() {
             this._text = null;
         }
@@ -87,23 +86,24 @@ namespace Unity.UIWidgets.ui {
         int _findNextBreakInEmailOrUrl() {
             return 0;
         }
-        
+
         int _findNextBreakNormal() {
             if (this._current == this._size) {
                 return -1;
             }
+
             this._current++;
-            for (;this._current < this._size;++this._current) {
+            for (; this._current < this._size; ++this._current) {
                 char c = this._text[this._current + this._offset];
                 if (LayoutUtils.isWordSpace(c) || c == '\t') {
                     return this._current;
                 }
             }
+
             return this._current;
         }
-        
+
         void _detectEmailOrUrl() {
-            
         }
 
         static uint nextCode(string text, ref int index, int end) {
@@ -134,14 +134,14 @@ namespace Unity.UIWidgets.ui {
         public static bool isLeadSurrogate(uint c) {
             return ((c) & 0xfffffc00) == 0xd800;
         }
-        
-        
+
+
         public static bool isTrailSurrogate(uint c) {
             return ((c) & 0xfffffc00) == 0xdc00;
         }
 
         public static uint getSupplementary(uint lead, uint trail) {
-            return (char)(((uint) (lead) << 10) + (uint) (trail - U16_SURROGATE_OFFSET));
+            return (char) (((uint) (lead) << 10) + (uint) (trail - U16_SURROGATE_OFFSET));
         }
     }
 }

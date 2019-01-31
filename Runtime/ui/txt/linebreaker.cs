@@ -4,19 +4,17 @@ using System.Linq;
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
-
     public class TabStops {
-
         int _tabWidth = int.MaxValue;
 
         Font _font;
 
         int _fontSize;
-        
+
         const int kTabSpaceCount = 4;
-        
+
         List<int> _stops = new List<int>();
-        
+
         public void set(List<int> stops, int tabWidth) {
             this._stops.Clear();
             if (stops != null) {
@@ -34,7 +32,7 @@ namespace Unity.UIWidgets.ui {
             this._font = font;
             this._fontSize = size;
         }
-        
+
         public float nextTab(float widthSoFar) {
             for (int i = 0; i < this._stops.Count; i++) {
                 if (this._stops[i] > widthSoFar) {
@@ -45,15 +43,15 @@ namespace Unity.UIWidgets.ui {
             if (this._tabWidth == int.MaxValue) {
                 this._font.RequestCharactersInTexture(" ", this._fontSize);
                 CharacterInfo characterInfo;
-                this._font.GetCharacterInfo(' ' , out characterInfo, this._fontSize);
+                this._font.GetCharacterInfo(' ', out characterInfo, this._fontSize);
                 this._tabWidth = characterInfo.advance * kTabSpaceCount;
             }
 
             if (this._tabWidth == 0) {
                 return widthSoFar;
             }
-            
-            return (float)(Math.Floor(widthSoFar / this._tabWidth + 1) * this._tabWidth);
+
+            return (float) (Math.Floor(widthSoFar / this._tabWidth + 1) * this._tabWidth);
         }
     }
 
@@ -62,17 +60,16 @@ namespace Unity.UIWidgets.ui {
         public int pre;
         public double preBreak;
         public float penalty;
-        
+
         public double postBreak;
         public int preSpaceCount;
         public int postSpaceCount;
     }
 
     public class LineBreaker {
-
         const float ScoreInfty = float.MaxValue;
         const float ScoreDesperate = 1e10f;
-        
+
         string _textBuf;
         int _textOffset;
         int _textLength;
@@ -90,13 +87,14 @@ namespace Unity.UIWidgets.ui {
         TabStops _tabStops;
         int mFirstTabIndex;
         List<Candidate> _candidates = new List<Candidate>();
-        
+
         public int computeBreaks() {
             int nCand = this._candidates.Count;
             if (nCand > 0 && (nCand == 1 || this._lastBreak != nCand - 1)) {
                 var cand = this._candidates[this._candidates.Count - 1];
-                this._pushBreak(cand.offset, (float)(cand.postBreak - this._preBreak));
+                this._pushBreak(cand.offset, (float) (cand.postBreak - this._preBreak));
             }
+
             return this._breaks.Count;
         }
 
@@ -109,6 +107,7 @@ namespace Unity.UIWidgets.ui {
                 this._charWidths.AddRange(Enumerable.Repeat(0.0f, size - this._charWidths.Count));
             }
         }
+
         public void setText(string text, int textOffset, int textLength) {
             this._textBuf = text;
             this._textOffset = textOffset;
@@ -135,7 +134,7 @@ namespace Unity.UIWidgets.ui {
         public float addStyleRun(TextStyle style, int start, int end) {
             float width = 0.0f;
             if (style != null) {
-                width = Layout.measureText(this._width - this._preBreak, this._textBuf, 
+                width = Layout.measureText(this._width - this._preBreak, this._textBuf,
                     start + this._textOffset, end - start, style,
                     this._charWidths, start, this._tabStops);
             }
@@ -152,8 +151,8 @@ namespace Unity.UIWidgets.ui {
             for (int i = start; i < end; i++) {
                 char c = this._textBuf[i + this._textOffset];
                 if (c == '\t') {
-                    this._width = this._preBreak + this._tabStops.nextTab((float)(this._width - this._preBreak));
-                    if (this.mFirstTabIndex == Int32.MaxValue) {
+                    this._width = this._preBreak + this._tabStops.nextTab((float) (this._width - this._preBreak));
+                    if (this.mFirstTabIndex == int.MaxValue) {
                         this.mFirstTabIndex = i;
                     }
                 }
@@ -174,7 +173,7 @@ namespace Unity.UIWidgets.ui {
                     int wordStart = this._wordBreaker.wordStart();
                     int wordEnd = this._wordBreaker.wordEnd();
                     if (style != null || current == end || this._charWidths[current] > 0) {
-                        this._addWordBreak(current, this._width, postBreak, this._spaceCount, postSpaceCount, 0);   
+                        this._addWordBreak(current, this._width, postBreak, this._spaceCount, postSpaceCount, 0);
                     }
 
                     lastBreak = current;
@@ -182,6 +181,7 @@ namespace Unity.UIWidgets.ui {
                     current = this._wordBreaker.next();
                 }
             }
+
             return width;
         }
 
@@ -202,7 +202,8 @@ namespace Unity.UIWidgets.ui {
             this._tabStops = tabStops;
         }
 
-        void _addWordBreak(int offset, double preBreak, double postBreak, int preSpaceCount, int postSpaceCount, float penalty) {
+        void _addWordBreak(int offset, double preBreak, double postBreak, int preSpaceCount, int postSpaceCount,
+            float penalty) {
             Candidate cand = new Candidate();
             double width = this._candidates[this._candidates.Count - 1].preBreak;
             if (postBreak - width > this._lineWidth) {
@@ -219,11 +220,10 @@ namespace Unity.UIWidgets.ui {
                         cand.penalty = ScoreDesperate;
                         this._addCandidate(cand);
                         width += w;
-
                     }
                 }
             }
-            
+
             cand.offset = offset;
             cand.preBreak = preBreak;
             cand.postBreak = postBreak;
@@ -233,7 +233,6 @@ namespace Unity.UIWidgets.ui {
             this._addCandidate(cand);
         }
 
-        
 
         void _addCandidate(Candidate cand) {
             int candIndex = this._candidates.Count;
@@ -247,10 +246,10 @@ namespace Unity.UIWidgets.ui {
                 this._bestScore = cand.penalty;
             }
         }
-        
+
         void _pushGreedyBreak() {
             var bestCandidate = this._candidates[this._bestBreak];
-            this._pushBreak(bestCandidate.offset, (float)(bestCandidate.postBreak - this._preBreak));
+            this._pushBreak(bestCandidate.offset, (float) (bestCandidate.postBreak - this._preBreak));
             this._bestScore = ScoreInfty;
             this._lastBreak = this._bestBreak;
             this._preBreak = bestCandidate.preBreak;
@@ -260,6 +259,5 @@ namespace Unity.UIWidgets.ui {
             this._breaks.Add(offset);
             this._widths.Add(width);
         }
-        
     }
 }

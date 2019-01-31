@@ -89,6 +89,7 @@ namespace Unity.UIWidgets.rendering {
             this.onCaretChanged = onCaretChanged;
             this.onSelectionChanged = onSelectionChanged;
 
+            D.assert(this._maxLines == null || this._maxLines > 0);
             D.assert(this._showCursor != null);
             D.assert(!this._showCursor.value || cursorColor != null);
 
@@ -199,7 +200,7 @@ namespace Unity.UIWidgets.rendering {
         public int? maxLines {
             get { return this._maxLines; }
             set {
-                D.assert(value > 0);
+                D.assert(value == null || value > 0);
                 if (this._maxLines == value) {
                     return;
                 }

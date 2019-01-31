@@ -693,7 +693,7 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
-    abstract class PopupRoute : ModalRoute {
+    public abstract class PopupRoute : ModalRoute {
         protected PopupRoute(
             RouteSettings settings = null
         ) : base(settings: settings) {

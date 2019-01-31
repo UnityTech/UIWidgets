@@ -134,6 +134,7 @@ namespace Unity.UIWidgets.rendering {
         public int? maxLines {
             get { return this._textPainter.maxLines; }
             set {
+                D.assert(this.maxLines == null || this.maxLines > 0);
                 if (this._textPainter.maxLines == value) {
                     return;
                 }

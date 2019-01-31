@@ -21,6 +21,7 @@
             if (index >= this._text.Length) {
                 return new Range<int>(0, 0);
             }
+
             var t = this.classifyChar(index);
             int start = index;
             for (int i = index; i >= 0; --i) {
@@ -28,6 +29,7 @@
                     if (this.classifyChar(i) != t) {
                         break;
                     }
+
                     start = i;
                 }
             }
@@ -38,9 +40,11 @@
                     if (this.classifyChar(i) != t) {
                         break;
                     }
+
                     end = i;
                 }
             }
+
             return new Range<int>(start, end + 1);
         }
 
@@ -49,9 +53,11 @@
             if (char.IsWhiteSpace(this._text, index)) {
                 return characterType.WhiteSpace;
             }
+
             if (char.IsLetterOrDigit(this._text, index) || this._text[index] == '\'') {
                 return characterType.LetterLike;
             }
+
             return characterType.Symbol;
         }
     }

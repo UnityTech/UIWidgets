@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
-    
     public class Layout {
         int _start;
         int _count;
@@ -12,9 +11,9 @@ namespace Unity.UIWidgets.ui {
         Rect _bounds;
         string _text;
         TabStops _tabStops;
-        
-        
-        public static float measureText(double offset, string buf, int start, int count, TextStyle style, 
+
+
+        public static float measureText(double offset, string buf, int start, int count, TextStyle style,
             List<float> advances, int advanceOffset, TabStops tabStops) {
             Layout layout = new Layout();
             layout.setTabStops(tabStops);
@@ -25,7 +24,7 @@ namespace Unity.UIWidgets.ui {
                     advances[i + advanceOffset] = layoutAdv[i];
                 }
             }
-     
+
             return layout.getAdvance();
         }
 
@@ -56,18 +55,18 @@ namespace Unity.UIWidgets.ui {
                 else {
                     this._bounds = this._bounds.expandToInclude(rect);
                 }
-                
+
                 this._positions.Add(this._advance);
                 float advance = characterInfo.advance;
                 if (ch == '\t') {
-                    advance = this._tabStops.nextTab((float)(this._advance + offset)) - this._advance;
+                    advance = this._tabStops.nextTab((float) (this._advance + offset)) - this._advance;
                 }
+
                 this._advances.Add(advance);
                 this._advance += advance;
-                
             }
         }
-        
+
         public void setTabStops(TabStops tabStops) {
             this._tabStops = tabStops;
         }
@@ -87,7 +86,7 @@ namespace Unity.UIWidgets.ui {
         public float getX(int index) {
             return this._positions[index];
         }
-        
+
         public float getY(int index) {
             return 0;
         }

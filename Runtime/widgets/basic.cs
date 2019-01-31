@@ -1184,7 +1184,7 @@ namespace Unity.UIWidgets.widgets {
             renderObject.softWrap = this.softWrap;
             renderObject.overflow = this.overflow;
             renderObject.textScaleFactor = this.textScaleFactor;
-            renderObject.maxLines = this.maxLines ?? 0; // todo: maxLines should be nullable.
+            renderObject.maxLines = this.maxLines;
         }
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
