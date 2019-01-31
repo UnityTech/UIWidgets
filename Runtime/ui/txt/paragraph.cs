@@ -70,9 +70,9 @@ namespace Unity.UIWidgets.ui {
             this.fxHeight = fxHeight;
         }
 
-        public static FontMetrics fromFont(Font font, int fontSize, double? height) {
-            var ascent = -font.ascent * (height ?? 1.0) * fontSize / font.fontSize;
-            var descent = (font.lineHeight - font.ascent) * (height ?? 1.0) * fontSize / font.fontSize;
+        public static FontMetrics fromFont(Font font, int fontSize) {
+            var ascent = -font.ascent * fontSize / font.fontSize;
+            var descent = (font.lineHeight - font.ascent) * fontSize / font.fontSize;
             double? fxHeight = null;
             font.RequestCharactersInTexture("x", fontSize);
             CharacterInfo charInfo;
@@ -398,7 +398,7 @@ namespace Unity.UIWidgets.ui {
                     }
 
                     var font = FontManager.instance.getOrCreate(run.style.fontFamily).font;
-                    var metrics = FontMetrics.fromFont(font, run.style.UnityFontSize, run.style.height);
+                    var metrics = FontMetrics.fromFont(font, run.style.UnityFontSize);
                     paintRecords.Add(new PaintRecord(run.style, new Offset(runXOffset, 0),
                         builder.make(), metrics, lineNumber, layout.getAdvance()
                     ));
@@ -429,7 +429,7 @@ namespace Unity.UIWidgets.ui {
 
                 double maxLineSpacing = 0;
                 double maxDescent = 0;
-
+                
                 var updateLineMetrics = new Action<FontMetrics, TextStyle>((FontMetrics metrics, TextStyle style) => {
                     double lineSpacing = (lineNumber == 0)
                         ? -metrics.ascent  * style.height
@@ -453,7 +453,7 @@ namespace Unity.UIWidgets.ui {
                 if (paintRecords.Count == 0) {
                     var defaultStyle = this._paragraphStyle.getTextStyle();
                     var defaultFont = FontManager.instance.getOrCreate(defaultStyle.fontFamily).font;
-                    var metrics = FontMetrics.fromFont(defaultFont, defaultStyle.UnityFontSize, defaultStyle.height);
+                    var metrics = FontMetrics.fromFont(defaultFont, defaultStyle.UnityFontSize);
                     updateLineMetrics(metrics, defaultStyle);
 
                 }
@@ -514,9 +514,8 @@ namespace Unity.UIWidgets.ui {
                     continue;
                 }
 
-                var baseLine = this._lineBaseLines[run.lineNumber];
-                double top = baseLine + run.fontMetrics.ascent;
-                double bottom = baseLine + run.fontMetrics.descent;
+                double top = (run.lineNumber == 0) ? 0 : this._lineHeights[run.lineNumber -  1];
+                double bottom = this._lineHeights[run.lineNumber];
                 double left, right;
                 if (run.codeUnits.start >= start && run.codeUnits.end <= end) {
                     left = run.xPos.start;

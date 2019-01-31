@@ -95,11 +95,11 @@ namespace Unity.UIWidgets.ui {
             var fontInfo = FontManager.instance.getOrCreate(style.fontFamily);
             var key = new MeshKey(textBlob.instanceId, scale);
             
-            /*_meshes.TryGetValue(key, out var meshInfo);
+            _meshes.TryGetValue(key, out var meshInfo);
             if (meshInfo != null && meshInfo.textureVersion == fontInfo.textureVersion) {
                 meshInfo.touch();
                 return meshInfo.mesh;
-            }*/
+            }
 
             var font = fontInfo.font;
             var length = textBlob.textSize;
