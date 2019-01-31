@@ -17,9 +17,9 @@
             this._text = text;
         }
 
-        public IndexRange findWordRange(int index) {
+        public Range<int> findWordRange(int index) {
             if (index >= this._text.Length) {
-                return new IndexRange(0, 0);
+                return new Range<int>(0, 0);
             }
             var t = this.classifyChar(index);
             int start = index;
@@ -41,7 +41,7 @@
                     end = i;
                 }
             }
-            return new IndexRange(start, end + 1);
+            return new Range<int>(start, end + 1);
         }
 
 

@@ -120,7 +120,6 @@ namespace Unity.UIWidgets.ui {
                     continue;
                 }
 
-
                 CharacterInfo charInfo;
                 font.GetCharacterInfo(ch, out charInfo, fontSizeToLoad, style.UnityFontStyle);
             
@@ -136,9 +135,6 @@ namespace Unity.UIWidgets.ui {
                 vertices.Add(new Vector3((float) (position.x + maxX), (float) (position.y - minY), 0));
                 vertices.Add(new Vector3((float) (position.x + minX), (float) (position.y - minY), 0));
 
-                if (ch == 'w') {
-                    //Debug.Log($"{(float) (position.y - maxY)}  {(float) (position.y - minY)} {charInfo.minY},{charInfo.maxY} {position.y} {charInfo.uvTopLeft}");
-                }
                 triangles.Add(baseIndex);
                 triangles.Add(baseIndex + 1);
                 triangles.Add(baseIndex + 2);
@@ -152,6 +148,9 @@ namespace Unity.UIWidgets.ui {
                 uv.Add(charInfo.uvBottomLeft);
             }
 
+            if (vertices.Count == 0) {
+                return null;
+            }
 
             MeshMesh mesh = vertices.Count > 0 ? new MeshMesh(vertices, triangles, uv) : null;
             _meshes[key] = new MeshInfo(key, mesh, fontInfo.textureVersion);

@@ -2,13 +2,19 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.SocialPlatforms.Impl;
 
 namespace Unity.UIWidgets.ui {
 
     public class TabStops {
 
-        int _tabWidth;
+        int _tabWidth = int.MaxValue;
+
+        Font _font;
+
+        int _fontSize;
+        
+        const int kTabSpaceCount = 4;
+        
         List<int> _stops = new List<int>();
         
         public void set(List<int> stops, int tabWidth) {
@@ -19,12 +25,34 @@ namespace Unity.UIWidgets.ui {
 
             this._tabWidth = tabWidth;
         }
+
+        public void setFont(Font font, int size) {
+            if (this._font != font || this._fontSize != size) {
+                this._tabWidth = int.MaxValue;
+            }
+
+            this._font = font;
+            this._fontSize = size;
+        }
+        
         public float nextTab(float widthSoFar) {
             for (int i = 0; i < this._stops.Count; i++) {
                 if (this._stops[i] > widthSoFar) {
                     return this._stops[i];
                 }
             }
+
+            if (this._tabWidth == int.MaxValue) {
+                this._font.RequestCharactersInTexture(" ", this._fontSize);
+                CharacterInfo characterInfo;
+                this._font.GetCharacterInfo(' ' , out characterInfo, this._fontSize);
+                this._tabWidth = characterInfo.advance * kTabSpaceCount;
+            }
+
+            if (this._tabWidth == 0) {
+                return widthSoFar;
+            }
+            
             return (float)(Math.Floor(widthSoFar / this._tabWidth + 1) * this._tabWidth);
         }
     }
@@ -59,7 +87,7 @@ namespace Unity.UIWidgets.ui {
         int _bestBreak;
         float _bestScore;
         int _spaceCount;
-        TabStops _tabStops = new TabStops();
+        TabStops _tabStops;
         int mFirstTabIndex;
         List<Candidate> _candidates = new List<Candidate>();
         
@@ -107,10 +135,12 @@ namespace Unity.UIWidgets.ui {
         public float addStyleRun(TextStyle style, int start, int end) {
             float width = 0.0f;
             if (style != null) {
-                width = Layout.measureText(this._textBuf, start + this._textOffset, end - start, style,
-                    this._charWidths, start);
+                width = Layout.measureText(this._width - this._preBreak, this._textBuf, 
+                    start + this._textOffset, end - start, style,
+                    this._charWidths, start, this._tabStops);
             }
 
+            var font = FontManager.instance.getOrCreate(style.fontFamily).font;
             int current = this._wordBreaker.current();
             int afterWord = start;
             int lastBreak = start;
@@ -168,8 +198,8 @@ namespace Unity.UIWidgets.ui {
             return this._widths;
         }
 
-        public void setTabStops(List<int> stops, int tabWidth) {
-            this._tabStops.set(stops, tabWidth);
+        public void setTabStops(TabStops tabStops) {
+            this._tabStops = tabStops;
         }
 
         void _addWordBreak(int offset, double preBreak, double postBreak, int preSpaceCount, int postSpaceCount, float penalty) {

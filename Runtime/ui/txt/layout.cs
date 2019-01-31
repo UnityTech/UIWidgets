@@ -11,11 +11,14 @@ namespace Unity.UIWidgets.ui {
         float _advance;
         Rect _bounds;
         string _text;
+        TabStops _tabStops;
         
-        public static float measureText(string buf, int start, int count, TextStyle style, 
-            List<float> advances, int advanceOffset) {
+        
+        public static float measureText(double offset, string buf, int start, int count, TextStyle style, 
+            List<float> advances, int advanceOffset, TabStops tabStops) {
             Layout layout = new Layout();
-            layout.doLayout(buf, start, count, style);
+            layout.setTabStops(tabStops);
+            layout.doLayout(offset, buf, start, count, style);
             if (advances != null) {
                 var layoutAdv = layout.getAdvances();
                 for (int i = 0; i < count; i++) {
@@ -26,7 +29,7 @@ namespace Unity.UIWidgets.ui {
             return layout.getAdvance();
         }
 
-        public void doLayout(string text, int start, int count, TextStyle style) {
+        public void doLayout(double offset, string text, int start, int count, TextStyle style) {
             this._text = text;
             this._advances.Clear();
             this._positions.Clear();
@@ -55,10 +58,18 @@ namespace Unity.UIWidgets.ui {
                 }
                 
                 this._positions.Add(this._advance);
-                this._advances.Add(characterInfo.advance);
-                this._advance += characterInfo.advance;
+                float advance = characterInfo.advance;
+                if (ch == '\t') {
+                    advance = this._tabStops.nextTab((float)(this._advance + offset)) - this._advance;
+                }
+                this._advances.Add(advance);
+                this._advance += advance;
                 
             }
+        }
+        
+        public void setTabStops(TabStops tabStops) {
+            this._tabStops = tabStops;
         }
 
         public int nGlyphs() {

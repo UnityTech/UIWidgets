@@ -49,7 +49,7 @@ namespace Unity.UIWidgets.ui {
             while (result < this._current) {
                 int ix = result;
                 uint c = nextCode(this._text, ref ix, this._current);
-                if (!LayoutUtils.isLineEndSpace((char) c)) { // todo
+                if (!LayoutUtils.isLineEndSpace((char) c)) {
                     break;
                 }
 
@@ -66,8 +66,8 @@ namespace Unity.UIWidgets.ui {
             int result = this._current;
             while (result > this._last) {
                 int ix = result;
-                uint ch = preCode(_text, ref ix, this._last);
-                if (!LayoutUtils.isLineEndSpace((char) ch)) { // todo
+                uint ch = preCode(this._text, ref ix, this._last);
+                if (!LayoutUtils.isLineEndSpace((char) ch)) {
                     break;
                 }
 

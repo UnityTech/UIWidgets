@@ -185,6 +185,9 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void drawRect(Rect rect, Paint paint) {
+            if (rect.size.isEmpty) {
+                return;
+            }
             var path = new Path();
             path.addRect(rect);
 
