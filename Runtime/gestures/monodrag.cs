@@ -62,7 +62,8 @@ namespace Unity.UIWidgets.gestures {
                             return null;
                         });
                 }
-            } else if (this._state == _DragState.accepted) {
+            }
+            else if (this._state == _DragState.accepted) {
                 this.resolve(GestureDisposition.accepted);
             }
         }
@@ -90,7 +91,8 @@ namespace Unity.UIWidgets.gestures {
                             return null;
                         });
                     }
-                } else {
+                }
+                else {
                     this._pendingDragOffset += delta;
                     this._lastPendingEventTimestamp = evt.timeStamp;
                     if (this._hasSufficientPendingDragDeltaToAccept) {
@@ -170,7 +172,8 @@ namespace Unity.UIWidgets.gestures {
                         return null;
                     }, debugReport: () =>
                         $"{estimate}; fling at {velocity}.");
-                } else {
+                }
+                else {
                     this.invokeCallback<object>("onEnd", () => {
                             this.onEnd(new DragEndDetails(
                                 velocity: Velocity.zero,

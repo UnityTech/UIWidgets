@@ -38,7 +38,8 @@ namespace Unity.UIWidgets.widgets {
                 completer.Resolve();
                 if (onError != null) {
                     onError(exception);
-                } else {
+                }
+                else {
                     UIWidgetsError.reportError(new UIWidgetsErrorDetails(
                         context: "image failed to precache",
                         library: "image resource service",
@@ -265,7 +266,8 @@ namespace Unity.UIWidgets.widgets {
 
             if (TickerMode.of(this.context)) {
                 this._listenToStream();
-            } else {
+            }
+            else {
                 this._stopListeningToStream();
             }
 

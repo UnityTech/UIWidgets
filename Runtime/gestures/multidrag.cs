@@ -21,7 +21,9 @@ namespace Unity.UIWidgets.gestures {
 
         Drag _client;
 
-        public Offset pendingDelta => this._pendingDelta;
+        public Offset pendingDelta {
+            get { return this._pendingDelta; }
+        }
 
         public Offset _pendingDelta = Offset.zero;
 
@@ -42,8 +44,10 @@ namespace Unity.UIWidgets.gestures {
 
         public void _move(PointerMoveEvent pEvent) {
             D.assert(this._arenaEntry != null);
-            if (!pEvent.synthesized)
+            if (!pEvent.synthesized) {
                 this._velocityTracker.addPosition(pEvent.timeStamp, pEvent.position);
+            }
+
             if (this._client != null) {
                 D.assert(this.pendingDelta == null);
                 this._client.update(new DragUpdateDetails(
@@ -184,8 +188,10 @@ namespace Unity.UIWidgets.gestures {
         public override void acceptGesture(int pointer) {
             D.assert(this._pointers != null);
             T state = this._pointers[pointer];
-            if (state == null)
+            if (state == null) {
                 return;
+            }
+
             state.accepted((Offset initialPosition) => this._startDrag(initialPosition, pointer));
         }
 
@@ -195,12 +201,17 @@ namespace Unity.UIWidgets.gestures {
             D.assert(state != null);
             D.assert(state._pendingDelta != null);
             Drag drag = null;
-            if (this.onStart != null)
+            if (this.onStart != null) {
                 drag = this.invokeCallback("onStart", () => this.onStart(initialPosition));
-            if (drag != null)
+            }
+
+            if (drag != null) {
                 state._startDrag(drag);
-            else
+            }
+            else {
                 this._removeState(pointer);
+            }
+
             return drag;
         }
 
@@ -215,8 +226,10 @@ namespace Unity.UIWidgets.gestures {
         }
 
         void _removeState(int pointer) {
-            if (this._pointers == null)
+            if (this._pointers == null) {
                 return;
+            }
+
             D.assert(this._pointers.ContainsKey(pointer));
             GestureBinding.instance.pointerRouter.removeRoute(pointer, this._handleEvent);
             this._pointers[pointer].dispose();
@@ -239,8 +252,9 @@ namespace Unity.UIWidgets.gestures {
 
         public override void checkForResolutionAfterMove() {
             D.assert(this.pendingDelta != null);
-            if (this.pendingDelta.distance > Constants.kTouchSlop)
+            if (this.pendingDelta.distance > Constants.kTouchSlop) {
                 this.resolve(GestureDisposition.accepted);
+            }
         }
 
         public override void accepted(GestureMultiDragStartCallback starter) {
@@ -257,7 +271,9 @@ namespace Unity.UIWidgets.gestures {
             return new _ImmediatePointerState(pEvent.position);
         }
 
-        public override string debugDescription => "multidrag";
+        public override string debugDescription {
+            get { return "multidrag"; }
+        }
     }
 
     public class _HorizontalPointerState : MultiDragPointerState {
@@ -266,8 +282,9 @@ namespace Unity.UIWidgets.gestures {
 
         public override void checkForResolutionAfterMove() {
             D.assert(this.pendingDelta != null);
-            if (this.pendingDelta.dx.abs() > Constants.kTouchSlop)
+            if (this.pendingDelta.dx.abs() > Constants.kTouchSlop) {
                 this.resolve(GestureDisposition.accepted);
+            }
         }
 
         public override void accepted(GestureMultiDragStartCallback starter) {
@@ -283,7 +300,9 @@ namespace Unity.UIWidgets.gestures {
             return new _HorizontalPointerState(pEvent.position);
         }
 
-        public override string debugDescription => "horizontal multidrag";
+        public override string debugDescription {
+            get { return "horizontal multidrag"; }
+        }
     }
 
 
@@ -293,8 +312,9 @@ namespace Unity.UIWidgets.gestures {
 
         public override void checkForResolutionAfterMove() {
             D.assert(this.pendingDelta != null);
-            if (this.pendingDelta.dy.abs() > Constants.kTouchSlop)
+            if (this.pendingDelta.dy.abs() > Constants.kTouchSlop) {
                 this.resolve(GestureDisposition.accepted);
+            }
         }
 
         public override void accepted(GestureMultiDragStartCallback starter) {
@@ -311,7 +331,9 @@ namespace Unity.UIWidgets.gestures {
             return new _VerticalPointerState(pEvent.position);
         }
 
-        public override string debugDescription => "vertical multidrag";
+        public override string debugDescription {
+            get { return "vertical multidrag"; }
+        }
     }
 
     public class _DelayedPointerState : MultiDragPointerState {
@@ -349,10 +371,12 @@ namespace Unity.UIWidgets.gestures {
 
         public override void accepted(GestureMultiDragStartCallback starter) {
             D.assert(this._starter == null);
-            if (this._timer == null)
+            if (this._timer == null) {
                 starter(this.initialPosition);
-            else
+            }
+            else {
                 this._starter = starter;
+            }
         }
 
         public override void checkForResolutionAfterMove() {
@@ -379,8 +403,10 @@ namespace Unity.UIWidgets.gestures {
         public DelayedMultiDragGestureRecognizer(
             TimeSpan? delay = null,
             object debugOwner = null) : base(debugOwner: debugOwner) {
-            if (delay == null)
+            if (delay == null) {
                 delay = Constants.kLongPressTimeout;
+            }
+
             this.delay = delay;
         }
 
@@ -390,6 +416,8 @@ namespace Unity.UIWidgets.gestures {
             return new _DelayedPointerState(pEvent.position, this.delay);
         }
 
-        public override string debugDescription => "long multidrag";
+        public override string debugDescription {
+            get { return "long multidrag"; }
+        }
     }
 }

@@ -38,19 +38,21 @@ namespace Unity.UIWidgets.painting {
         public readonly Alignment alignment;
         public readonly Rect centerSlice;
         public readonly ImageRepeat repeat;
-        
+
         public DecorationImagePainter createPainter(VoidCallback onChanged) {
             D.assert(onChanged != null);
             return new DecorationImagePainter(this, onChanged);
         }
-        
+
         public bool Equals(DecorationImage other) {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return Equals(this.image, other.image) && Equals(this.colorFilter, other.colorFilter) &&
                    this.fit == other.fit && Equals(this.alignment, other.alignment) &&
                    Equals(this.centerSlice, other.centerSlice) && this.repeat == other.repeat;
@@ -60,12 +62,15 @@ namespace Unity.UIWidgets.painting {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((DecorationImage) obj);
         }
 
@@ -143,6 +148,7 @@ namespace Unity.UIWidgets.painting {
                 this._imageStream = newImageStream;
                 this._imageStream.addListener(this._imageListener);
             }
+
             if (this._image == null) {
                 return;
             }
@@ -173,6 +179,7 @@ namespace Unity.UIWidgets.painting {
             if (this._image == value) {
                 return;
             }
+
             this._image = value;
 
             D.assert(this._onChanged != null);
@@ -226,7 +233,8 @@ namespace Unity.UIWidgets.painting {
             }
 
             fit = fit ?? (centerSlice == null ? BoxFit.scaleDown : BoxFit.fill);
-            D.assert(centerSlice == null || (fit != BoxFit.none && fit != BoxFit.cover));
+            D.assert(centerSlice == null || (fit != BoxFit.none && fit != BoxFit.cover),
+                $"centerSlice was used with a BoxFit {fit} that is not supported.");
             FittedSizes fittedSizes = FittedSizes.applyBoxFit(fit.Value, inputSize / scale, outputSize);
             Size sourceSize = fittedSizes.source * scale;
             Size destinationSize = fittedSizes.destination;
@@ -234,7 +242,7 @@ namespace Unity.UIWidgets.painting {
                 outputSize += sliceBorder;
                 destinationSize += sliceBorder;
                 D.assert(sourceSize == inputSize,
-                    "centerSlice was used with a BoxFit that does not guarantee that the image is fully visible.");
+                    $"centerSlice was used with a BoxFit {fit} that does not guarantee that the image is fully visible.");
             }
 
             if (repeat != ImageRepeat.noRepeat && destinationSize == outputSize) {
@@ -245,9 +253,11 @@ namespace Unity.UIWidgets.painting {
             if (colorFilter != null) {
                 paint.colorFilter = colorFilter;
             }
+
             if (sourceSize != destinationSize) {
                 paint.filterMode = filterMode;
             }
+
             paint.invertColors = invertColors;
 
             double halfWidthDelta = (outputSize.width - destinationSize.width) / 2.0;
@@ -272,7 +282,8 @@ namespace Unity.UIWidgets.painting {
                 foreach (Rect tileRect in _generateImageTileRects(rect, destinationRect, repeat)) {
                     canvas.drawImageRect(image, sourceRect, tileRect, paint);
                 }
-            } else {
+            }
+            else {
                 foreach (Rect tileRect in _generateImageTileRects(rect, destinationRect, repeat)) {
                     canvas.drawImageNine(image, centerSlice, tileRect, paint);
                 }

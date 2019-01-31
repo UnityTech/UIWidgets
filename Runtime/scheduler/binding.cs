@@ -29,7 +29,8 @@ namespace Unity.UIWidgets.scheduler {
                         return true;
                     });
                     this.debugStack = debugCurrentCallbackStack;
-                } else {
+                }
+                else {
                     this.debugStack = new StackTrace(2, true);
                 }
 
@@ -62,7 +63,8 @@ namespace Unity.UIWidgets.scheduler {
                 if (value == null) {
                     D.assert(_instance != null, "Binding.instance is already cleared.");
                     _instance = null;
-                } else {
+                }
+                else {
                     D.assert(_instance == null, "Binding.instance is already assigned.");
                     _instance = value;
                 }
@@ -251,7 +253,8 @@ namespace Unity.UIWidgets.scheduler {
                     if (rawTimeStamp != null) {
                         _debugDescribeTimeStamp(
                             this._currentFrameTimeStamp.Value, frameTimeStampDescription);
-                    } else {
+                    }
+                    else {
                         frameTimeStampDescription.Append("(warm-up frame)");
                     }
 
@@ -280,7 +283,8 @@ namespace Unity.UIWidgets.scheduler {
                 }
 
                 this._removedIds.Clear();
-            } finally {
+            }
+            finally {
                 this._schedulerPhase = SchedulerPhase.midFrameMicrotasks;
             }
         }
@@ -301,7 +305,8 @@ namespace Unity.UIWidgets.scheduler {
                 foreach (FrameCallback callback in localPostFrameCallbacks) {
                     this._invokeFrameCallback(callback, this._currentFrameTimeStamp.Value);
                 }
-            } finally {
+            }
+            finally {
                 this._schedulerPhase = SchedulerPhase.idle;
                 D.assert(() => {
                     if (D.debugPrintEndFrameBanner) {
@@ -352,7 +357,8 @@ namespace Unity.UIWidgets.scheduler {
 
             try {
                 callback(timeStamp);
-            } catch (Exception ex) {
+            }
+            catch (Exception ex) {
                 UIWidgetsError.reportError(new UIWidgetsErrorDetails(
                     exception: ex,
                     library: "scheduler library",

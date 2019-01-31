@@ -1,5 +1,4 @@
 using System;
-using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
 
 namespace Unity.UIWidgets.painting {
@@ -35,6 +34,7 @@ namespace Unity.UIWidgets.painting {
                     borderRadius: BorderRadius.lerp(border.borderRadius, this.borderRadius, t)
                 );
             }
+
             if (a is CircleBorder circleBorder) {
                 return new _RoundedRectangleToCircleBorder(
                     side: BorderSide.lerp(circleBorder.side, this.side, t),
@@ -42,6 +42,7 @@ namespace Unity.UIWidgets.painting {
                     circleness: 1.0 - t
                 );
             }
+
             return base.lerpFrom(a, t);
         }
 
@@ -52,6 +53,7 @@ namespace Unity.UIWidgets.painting {
                     borderRadius: BorderRadius.lerp(this.borderRadius, border.borderRadius, t)
                 );
             }
+
             if (b is CircleBorder circleBorder) {
                 return new _RoundedRectangleToCircleBorder(
                     side: BorderSide.lerp(this.side, circleBorder.side, t),
@@ -59,6 +61,7 @@ namespace Unity.UIWidgets.painting {
                     circleness: t
                 );
             }
+
             return base.lerpTo(b, t);
         }
 
@@ -82,7 +85,8 @@ namespace Unity.UIWidgets.painting {
                     double width = this.side.width;
                     if (width == 0.0) {
                         canvas.drawRRect(this.borderRadius.toRRect(rect), this.side.toPaint());
-                    } else {
+                    }
+                    else {
                         RRect outer = this.borderRadius.toRRect(rect);
                         RRect inner = outer.deflate(width);
                         Paint paint = new Paint {
@@ -90,6 +94,7 @@ namespace Unity.UIWidgets.painting {
                         };
                         canvas.drawDRRect(outer, inner, paint);
                     }
+
                     break;
             }
         }
@@ -98,9 +103,11 @@ namespace Unity.UIWidgets.painting {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return Equals(this.side, other.side) && Equals(this.borderRadius, other.borderRadius);
         }
 
@@ -108,12 +115,15 @@ namespace Unity.UIWidgets.painting {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((RoundedRectangleBorder) obj);
         }
 
@@ -131,7 +141,7 @@ namespace Unity.UIWidgets.painting {
         public static bool operator !=(RoundedRectangleBorder left, RoundedRectangleBorder right) {
             return !Equals(left, right);
         }
-        
+
         public override string ToString() {
             return $"{this.GetType()}({this.side}, {this.borderRadius})";
         }
@@ -174,6 +184,7 @@ namespace Unity.UIWidgets.painting {
                     circleness: this.circleness * t
                 );
             }
+
             if (a is CircleBorder circleBorder) {
                 return new _RoundedRectangleToCircleBorder(
                     side: BorderSide.lerp(circleBorder.side, this.side, t),
@@ -181,6 +192,7 @@ namespace Unity.UIWidgets.painting {
                     circleness: this.circleness + (1.0 - this.circleness) * (1.0 - t)
                 );
             }
+
             if (a is _RoundedRectangleToCircleBorder border) {
                 return new _RoundedRectangleToCircleBorder(
                     side: BorderSide.lerp(border.side, this.side, t),
@@ -188,6 +200,7 @@ namespace Unity.UIWidgets.painting {
                     circleness: MathUtils.lerpDouble(border.circleness, this.circleness, t)
                 );
             }
+
             return base.lerpFrom(a, t);
         }
 
@@ -199,6 +212,7 @@ namespace Unity.UIWidgets.painting {
                     circleness: this.circleness * (1.0 - t)
                 );
             }
+
             if (b is CircleBorder circleBorder) {
                 return new _RoundedRectangleToCircleBorder(
                     side: BorderSide.lerp(this.side, circleBorder.side, t),
@@ -206,6 +220,7 @@ namespace Unity.UIWidgets.painting {
                     circleness: this.circleness + (1.0 - this.circleness) * t
                 );
             }
+
             if (b is _RoundedRectangleToCircleBorder border) {
                 return new _RoundedRectangleToCircleBorder(
                     side: BorderSide.lerp(this.side, border.side, t),
@@ -213,6 +228,7 @@ namespace Unity.UIWidgets.painting {
                     circleness: MathUtils.lerpDouble(this.circleness, border.circleness, t)
                 );
             }
+
             return base.lerpTo(b, t);
         }
 
@@ -229,7 +245,8 @@ namespace Unity.UIWidgets.painting {
                     rect.right,
                     rect.bottom - delta
                 );
-            } else {
+            }
+            else {
                 double delta = this.circleness * (rect.width - rect.height) / 2.0;
                 return Rect.fromLTRB(
                     rect.left + delta,
@@ -270,7 +287,8 @@ namespace Unity.UIWidgets.painting {
                     if (width == 0.0) {
                         canvas.drawRRect(this._adjustBorderRadius(rect).toRRect(this._adjustRect(rect)),
                             this.side.toPaint());
-                    } else {
+                    }
+                    else {
                         RRect outer = this._adjustBorderRadius(rect).toRRect(this._adjustRect(rect));
                         RRect inner = outer.deflate(width);
                         Paint paint = new Paint {
@@ -278,6 +296,7 @@ namespace Unity.UIWidgets.painting {
                         };
                         canvas.drawDRRect(outer, inner, paint);
                     }
+
                     break;
             }
         }
@@ -286,9 +305,11 @@ namespace Unity.UIWidgets.painting {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return Equals(this.side, other.side) && Equals(this.borderRadius, other.borderRadius) &&
                    this.circleness.Equals(other.circleness);
         }
@@ -297,12 +318,15 @@ namespace Unity.UIWidgets.painting {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((_RoundedRectangleToCircleBorder) obj);
         }
 

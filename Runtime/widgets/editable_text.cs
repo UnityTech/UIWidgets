@@ -80,7 +80,7 @@ namespace Unity.UIWidgets.widgets {
         public readonly bool autofocus;
 
         public readonly Color selectionColor;
-        
+
         public readonly TextSelectionControls selectionControls;
 
         public readonly ValueChanged<string> onChanged;
@@ -132,7 +132,8 @@ namespace Unity.UIWidgets.widgets {
                 if (inputFormatters != null) {
                     this.inputFormatters.AddRange(inputFormatters);
                 }
-            } else {
+            }
+            else {
                 this.inputFormatters = inputFormatters;
             }
         }
@@ -164,7 +165,8 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
-    public class EditableTextState : AutomaticKeepAliveClientMixin<EditableText>, TextInputClient, TextSelectionDelegate {
+    public class EditableTextState : AutomaticKeepAliveClientMixin<EditableText>, TextInputClient,
+        TextSelectionDelegate {
         const int _kObscureShowLatestCharCursorTicks = 3;
         static TimeSpan _kCursorBlinkHalfPeriod = TimeSpan.FromMilliseconds(500);
         Timer _cursorTimer;
@@ -337,6 +339,7 @@ namespace Unity.UIWidgets.widgets {
                             this.renderEditable.getLineEndPosition(this._value.selection.endPos).offset,
                             this._value.selection.affinity);
                     }
+
                     break;
                 case TextInputAction.selectParagraphForward:
                     newExtend = this.renderEditable.getParagraphForward(this._value.selection.extendPos);
@@ -363,11 +366,14 @@ namespace Unity.UIWidgets.widgets {
 
             if (newPosition != null) {
                 return this._value.copyWith(selection: TextSelection.fromPosition(newPosition));
-            } else if (newExtend != null) {
+            }
+            else if (newExtend != null) {
                 return this._value.copyWith(selection: this._value.selection.copyWith(extentOffset: newExtend.offset));
-            } else if (newSelection != null) {
+            }
+            else if (newSelection != null) {
                 return this._value.copyWith(selection: newSelection);
-            } else if (newValue != null) {
+            }
+            else if (newValue != null) {
                 return newValue;
             }
 
@@ -378,7 +384,10 @@ namespace Unity.UIWidgets.widgets {
             TextEditingValue newValue;
             switch (action) {
                 case TextInputAction.newline:
-                    if (this.widget.maxLines == 1) this._finalizeEditing(true);
+                    if (this.widget.maxLines == 1) {
+                        this._finalizeEditing(true);
+                    }
+
                     break;
                 case TextInputAction.done:
                 case TextInputAction.go:
@@ -403,31 +412,38 @@ namespace Unity.UIWidgets.widgets {
                     break;
             }
         }
-        
+
         void _finalizeEditing(bool shouldUnfocus) {
             if (this.widget.onEditingComplete != null) {
                 this.widget.onEditingComplete();
-            } else {
+            }
+            else {
                 this.widget.controller.clearComposing();
-                if (shouldUnfocus) this.widget.focusNode.unfocus();
+                if (shouldUnfocus) {
+                    this.widget.focusNode.unfocus();
+                }
             }
 
-            if (this.widget.onSubmitted != null) this.widget.onSubmitted(this._value.text);
+            if (this.widget.onSubmitted != null) {
+                this.widget.onSubmitted(this._value.text);
+            }
         }
-        
+
         void _updateRemoteEditingValueIfNeeded() {
             if (!this._hasInputConnection) {
                 return;
             }
+
             var localValue = this._value;
             if (localValue == this._lastKnownRemoteTextEditingValue) {
                 return;
             }
+
             this._lastKnownRemoteTextEditingValue = localValue;
             this._textInputConnection.setEditingState(localValue);
         }
 
-        
+
         // Calculate the new scroll offset so the cursor remains visible.
         double _getScrollOffsetForCaret(Rect caretRect) {
             double caretStart = this._isMultiline ? caretRect.top : caretRect.left;
@@ -436,7 +452,8 @@ namespace Unity.UIWidgets.widgets {
             double viewportExtent = this._scrollController.position.viewportDimension;
             if (caretStart < 0.0) {
                 scrollOffset += caretStart;
-            } else if (caretEnd >= viewportExtent) {
+            }
+            else if (caretEnd >= viewportExtent) {
                 scrollOffset += caretEnd - viewportExtent;
             }
 
@@ -474,7 +491,8 @@ namespace Unity.UIWidgets.widgets {
         void _openOrCloseInputConnectionIfNeeded() {
             if (this._hasFocus && this.widget.focusNode.consumeKeyboardToken()) {
                 this._openInputConnection();
-            } else if (!this._hasFocus) {
+            }
+            else if (!this._hasFocus) {
                 this._closeInputConnectionIfNeeded();
                 this.widget.controller.clearComposing();
             }
@@ -483,7 +501,8 @@ namespace Unity.UIWidgets.widgets {
         public void requestKeyboard() {
             if (this._hasFocus) {
                 this._openInputConnection();
-            } else {
+            }
+            else {
                 FocusScope.of(this.context).requestFocus(this.widget.focusNode);
             }
         }
@@ -497,14 +516,15 @@ namespace Unity.UIWidgets.widgets {
             if (this._selectionOverlay != null) {
                 if (this._hasFocus) {
                     this._selectionOverlay.update(this._value);
-                } else {
+                }
+                else {
                     this._selectionOverlay.dispose();
                     this._selectionOverlay = null;
                 }
             }
         }
 
-        
+
         void _handleSelectionChanged(TextSelection selection, RenderEditable renderObject,
             SelectionChangedCause cause) {
             this.widget.controller.selection = selection;
@@ -521,12 +541,17 @@ namespace Unity.UIWidgets.widgets {
                     renderObject: renderObject,
                     selectionControls: this.widget.selectionControls,
                     selectionDelegate: this
-                    );
+                );
                 bool longPress = cause == SelectionChangedCause.longPress;
-                if (cause != SelectionChangedCause.keyboard && (this._value.text.isNotEmpty() || longPress)) this._selectionOverlay.showHandles();
-                if (longPress || cause == SelectionChangedCause.doubleTap) this._selectionOverlay.showToolbar();
+                if (cause != SelectionChangedCause.keyboard && (this._value.text.isNotEmpty() || longPress)) {
+                    this._selectionOverlay.showHandles();
+                }
+
+                if (longPress || cause == SelectionChangedCause.doubleTap) {
+                    this._selectionOverlay.showToolbar();
+                }
             }
-            
+
             if (this.widget.onSelectionChanged != null) {
                 this.widget.onSelectionChanged(selection, cause);
             }
@@ -560,6 +585,7 @@ namespace Unity.UIWidgets.widgets {
                 if (this._currentCaretRect == null || !this._scrollController.hasClients) {
                     return;
                 }
+
                 double scrollOffsetForCaret = this._getScrollOffsetForCaret(this._currentCaretRect);
                 this._scrollController.animateTo(scrollOffsetForCaret,
                     duration: _caretAnimationDuration,
@@ -590,7 +616,8 @@ namespace Unity.UIWidgets.widgets {
 
                 this._value = value;
                 this._updateRemoteEditingValueIfNeeded();
-            } else {
+            }
+            else {
                 this._value = value;
             }
 
@@ -624,6 +651,7 @@ namespace Unity.UIWidgets.widgets {
             if (this._cursorTimer != null) {
                 this._cursorTimer.cancel();
             }
+
             this._cursorTimer = null;
             this._showCursor.value = false;
             this._obscureShowCharTicksPending = 0;
@@ -632,7 +660,8 @@ namespace Unity.UIWidgets.widgets {
         void _startOrStopCursorTimerIfNeeded() {
             if (this._cursorTimer == null && this._hasFocus && this._value.selection.isCollapsed) {
                 this._startCursorTimer();
-            } else if (this._cursorTimer != null && (!this._hasFocus || !this._value.selection.isCollapsed)) {
+            }
+            else if (this._cursorTimer != null && (!this._hasFocus || !this._value.selection.isCollapsed)) {
                 this._stopCursorTimer();
             }
         }
@@ -664,7 +693,8 @@ namespace Unity.UIWidgets.widgets {
             this._updateOrDisposeSelectionOverlayIfNeeded();
             if (!this._hasFocus) {
                 this._value = new TextEditingValue(text: this._value.text);
-            } else if (!this._value.selection.isValid) {
+            }
+            else if (!this._value.selection.isValid) {
                 this.widget.controller.selection = TextSelection.collapsed(offset: this._value.text.Length);
             }
 
@@ -694,7 +724,8 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public void bringIntoView(TextPosition position) {
-            this._scrollController.jumpTo(this._getScrollOffsetForCaret(this.renderEditable.getLocalRectForCaret(position)));
+            this._scrollController.jumpTo(
+                this._getScrollOffsetForCaret(this.renderEditable.getLocalRectForCaret(position)));
         }
 
         public void hideToolbar() {
@@ -733,7 +764,6 @@ namespace Unity.UIWidgets.widgets {
                             rendererIgnoresPointer: this.widget.rendererIgnoresPointer
                         )
                     )
-                    
             );
         }
 

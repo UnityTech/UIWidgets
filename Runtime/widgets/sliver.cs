@@ -42,7 +42,8 @@ namespace Unity.UIWidgets.widgets {
                 if (children != null) {
                     description.Add("estimated child count: " + children);
                 }
-            } catch (Exception ex) {
+            }
+            catch (Exception ex) {
                 description.Add("estimated child count: EXCEPTION (" + ex.GetType() + ")");
             }
         }
@@ -219,24 +220,23 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
-    public class SliverFillViewport: SliverMultiBoxAdaptorWidget {
-        
+    public class SliverFillViewport : SliverMultiBoxAdaptorWidget {
         public SliverFillViewport(
             Key key = null, SliverChildDelegate del = null,
-            double viewportFraction = 1.0): base(key: key, del: del) {
+            double viewportFraction = 1.0) : base(key: key, del: del) {
             D.assert(viewportFraction > 0.0);
             this.viewportFraction = viewportFraction;
         }
-    
+
         public readonly double viewportFraction;
-    
+
         public override RenderObject createRenderObject(BuildContext context) {
-            SliverMultiBoxAdaptorElement element = (SliverMultiBoxAdaptorElement)context;
+            SliverMultiBoxAdaptorElement element = (SliverMultiBoxAdaptorElement) context;
             return new RenderSliverFillViewport(childManager: element, viewportFraction: this.viewportFraction);
         }
-    
+
         public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
-            ((RenderSliverFillViewport)renderObject).viewportFraction = this.viewportFraction;
+            ((RenderSliverFillViewport) renderObject).viewportFraction = this.viewportFraction;
         }
     }
 
@@ -293,11 +293,13 @@ namespace Unity.UIWidgets.widgets {
                     if (newChild != null) {
                         this._childElements[index] = newChild;
                         this._currentBeforeChild = (RenderBox) newChild.renderObject;
-                    } else {
+                    }
+                    else {
                         this._childElements.Remove(index);
                     }
                 }
-            } finally {
+            }
+            finally {
                 this._currentlyUpdatingChildIndex = null;
             }
         }
@@ -317,13 +319,15 @@ namespace Unity.UIWidgets.widgets {
                     this._currentlyUpdatingChildIndex = index;
                     this._childElements.TryGetValue(index, out newChild);
                     newChild = this.updateChild(newChild, this._build(index), index);
-                } finally {
+                }
+                finally {
                     this._currentlyUpdatingChildIndex = null;
                 }
 
                 if (newChild != null) {
                     this._childElements[index] = newChild;
-                } else {
+                }
+                else {
                     this._childElements.Remove(index);
                 }
             });
@@ -366,7 +370,8 @@ namespace Unity.UIWidgets.widgets {
                     this._currentlyUpdatingChildIndex = index;
                     Element result = this.updateChild(this._childElements[index], null, index);
                     D.assert(result == null);
-                } finally {
+                }
+                finally {
                     this._currentlyUpdatingChildIndex = null;
                 }
 
@@ -385,6 +390,7 @@ namespace Unity.UIWidgets.widgets {
             if (lastIndex == childCount - 1) {
                 return trailingScrollOffset;
             }
+
             int reifiedCount = lastIndex - firstIndex + 1;
             double averageExtent = (trailingScrollOffset - leadingScrollOffset) / reifiedCount;
             int remainingCount = childCount - lastIndex - 1;

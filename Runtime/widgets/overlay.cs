@@ -18,9 +18,11 @@ namespace Unity.UIWidgets.widgets {
         bool _opaque;
 
         public bool opaque {
-            get => this._opaque;
+            get { return this._opaque; }
             set {
-                if (this._opaque == value) return;
+                if (this._opaque == value) {
+                    return;
+                }
 
                 this._opaque = value;
                 D.assert(this._overlay != null);
@@ -31,9 +33,11 @@ namespace Unity.UIWidgets.widgets {
         bool _maintainState;
 
         public bool maintainState {
-            get => this._maintainState;
+            get { return this._maintainState; }
             set {
-                if (this._maintainState == value) return;
+                if (this._maintainState == value) {
+                    return;
+                }
 
                 this._maintainState = value;
                 D.assert(this._overlay != null);
@@ -49,10 +53,12 @@ namespace Unity.UIWidgets.widgets {
             D.assert(this._overlay != null);
             OverlayState overlay = this._overlay;
             this._overlay = null;
-            if (SchedulerBinding.instance.schedulerPhase == SchedulerPhase.persistentCallbacks)
+            if (SchedulerBinding.instance.schedulerPhase == SchedulerPhase.persistentCallbacks) {
                 SchedulerBinding.instance.addPostFrameCallback((duration) => { overlay._remove(this); });
-            else
+            }
+            else {
                 overlay._remove(this);
+            }
         }
 
         public void markNeedsBuild() {
@@ -65,7 +71,7 @@ namespace Unity.UIWidgets.widgets {
     }
 
 
-    internal class _OverlayEntry : StatefulWidget {
+    class _OverlayEntry : StatefulWidget {
         internal _OverlayEntry(OverlayEntry entry) : base(key: entry._key) {
             D.assert(entry != null);
             this.entry = entry;
@@ -78,7 +84,7 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
-    internal class _OverlayEntryState : State<_OverlayEntry> {
+    class _OverlayEntryState : State<_OverlayEntry> {
         public override Widget build(BuildContext context) {
             return this.widget.entry.builder(context);
         }
@@ -145,8 +151,10 @@ namespace Unity.UIWidgets.widgets {
 
         public void insertAll(ICollection<OverlayEntry> entries, OverlayEntry above = null) {
             D.assert(above == null || (above._overlay == this && this._entries.Contains(above)));
-            if (entries.isEmpty())
+            if (entries.isEmpty()) {
                 return;
+            }
+
             foreach (OverlayEntry entry in entries) {
                 D.assert(entry._overlay == null);
                 entry._overlay = this;
@@ -179,8 +187,9 @@ namespace Unity.UIWidgets.widgets {
                         break;
                     }
 
-                    if (candidate.opaque)
+                    if (candidate.opaque) {
                         break;
+                    }
                 }
 
                 return true;
@@ -200,7 +209,9 @@ namespace Unity.UIWidgets.widgets {
                 var entry = this._entries[i];
                 if (onstage) {
                     onstageChildren.Add(new _OverlayEntry(entry));
-                    if (entry.opaque) onstage = false;
+                    if (entry.opaque) {
+                        onstage = false;
+                    }
                 }
                 else if (entry.maintainState) {
                     offstageChildren.Add(new TickerMode(enabled: false, child: new _OverlayEntry(entry)));
@@ -218,7 +229,7 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
-    internal class _Theatre : RenderObjectWidget {
+    class _Theatre : RenderObjectWidget {
         internal _Theatre(Stack onstage = null, List<Widget> offstage = null) {
             D.assert(offstage != null);
             D.assert(!offstage.Any((child) => child == null));
@@ -239,14 +250,18 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
-    internal class _TheatreElement : RenderObjectElement {
+    class _TheatreElement : RenderObjectElement {
         public _TheatreElement(RenderObjectWidget widget) : base(widget) {
             D.assert(!WidgetsD.debugChildrenHaveDuplicateKeys(widget, ((_Theatre) widget).offstage));
         }
 
-        public new _Theatre widget => (_Theatre) base.widget;
+        public new _Theatre widget {
+            get { return (_Theatre) base.widget; }
+        }
 
-        public new _RenderTheatre renderObject => (_RenderTheatre) base.renderObject;
+        public new _RenderTheatre renderObject {
+            get { return (_RenderTheatre) base.renderObject; }
+        }
 
         Element _onstage;
         static readonly object _onstageSlot = new object();
@@ -286,23 +301,30 @@ namespace Unity.UIWidgets.widgets {
         }
 
         protected override void removeChildRenderObject(RenderObject child) {
-            if (this.renderObject.child == child)
+            if (this.renderObject.child == child) {
                 this.renderObject.child = null;
-            else
+            }
+            else {
                 this.renderObject.remove((RenderBox) child);
+            }
         }
 
         public override void visitChildren(ElementVisitor visitor) {
-            if (this._onstage != null)
+            if (this._onstage != null) {
                 visitor(this._onstage);
-            foreach (var child in this._offstage)
-                if (!this._forgottenOffstageChildren.Contains(child))
+            }
+
+            foreach (var child in this._offstage) {
+                if (!this._forgottenOffstageChildren.Contains(child)) {
                     visitor(child);
+                }
+            }
         }
 
         public override void debugVisitOnstageChildren(ElementVisitor visitor) {
-            if (this._onstage != null)
+            if (this._onstage != null) {
                 visitor(this._onstage);
+            }
         }
 
 
@@ -339,30 +361,37 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
-    internal class _RenderTheatre :
+    class _RenderTheatre :
         ContainerRenderObjectMixinRenderProxyBoxMixinRenderObjectWithChildMixinRenderBoxRenderStack<
             RenderBox, StackParentData> {
         public override void setupParentData(RenderObject child) {
-            if (!(child.parentData is StackParentData))
+            if (!(child.parentData is StackParentData)) {
                 child.parentData = new StackParentData();
+            }
         }
 
         public override void redepthChildren() {
-            if (this.child != null) this.redepthChild(this.child);
+            if (this.child != null) {
+                this.redepthChild(this.child);
+            }
+
             base.redepthChildren();
         }
 
         public override void visitChildren(RenderObjectVisitor visitor) {
-            if (this.child != null)
+            if (this.child != null) {
                 visitor(this.child);
+            }
+
             base.visitChildren(visitor);
         }
 
         public override List<DiagnosticsNode> debugDescribeChildren() {
             var children = new List<DiagnosticsNode>();
 
-            if (this.child != null)
+            if (this.child != null) {
                 children.Add(this.child.toDiagnosticsNode(name: "onstage"));
+            }
 
             if (this.firstChild != null) {
                 var child = this.firstChild;
@@ -375,8 +404,10 @@ namespace Unity.UIWidgets.widgets {
                             style: DiagnosticsTreeStyle.offstage
                         )
                     );
-                    if (child == this.lastChild)
+                    if (child == this.lastChild) {
                         break;
+                    }
+
                     var childParentData = (StackParentData) child.parentData;
                     child = childParentData.nextSibling;
                     count += 1;

@@ -75,6 +75,7 @@ namespace Unity.UIWidgets.rendering {
                 if (this._textPainter.textAlign == value) {
                     return;
                 }
+
                 this._textPainter.textAlign = value;
                 this.markNeedsPaint();
             }
@@ -86,6 +87,7 @@ namespace Unity.UIWidgets.rendering {
                 if (this._textPainter.textDirection == value) {
                     return;
                 }
+
                 this._textPainter.textDirection = this.textDirection;
                 this.markNeedsLayout();
             }
@@ -97,6 +99,7 @@ namespace Unity.UIWidgets.rendering {
                 if (this._softWrap == value) {
                     return;
                 }
+
                 this._softWrap = value;
                 this.markNeedsLayout();
             }
@@ -108,6 +111,7 @@ namespace Unity.UIWidgets.rendering {
                 if (this._overflow == value) {
                     return;
                 }
+
                 this._overflow = value;
                 this._textPainter.ellipsis = value == TextOverflow.ellipsis ? _kEllipsis : null;
                 // _textPainter.e
@@ -121,6 +125,7 @@ namespace Unity.UIWidgets.rendering {
                 if (Math.Abs(this._textPainter.textScaleFactor - value) < 0.00000001) {
                     return;
                 }
+
                 this._textPainter.textScaleFactor = value;
                 this.markNeedsLayout();
             }
@@ -194,6 +199,7 @@ namespace Unity.UIWidgets.rendering {
                 canvas.save();
                 canvas.clipRect(bounds);
             }
+
             this._textPainter.paint(canvas, offset);
             if (this._hasVisualOverflow) {
                 canvas.restore();

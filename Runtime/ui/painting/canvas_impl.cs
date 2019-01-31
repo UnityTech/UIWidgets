@@ -13,31 +13,31 @@ namespace Unity.UIWidgets.ui {
         readonly MeshPool _meshPool;
         readonly List<RenderLayer> _layers = new List<RenderLayer>();
         int _saveCount;
-        
+
         static readonly List<int> _imageTriangles = new List<int>(12) {
             0, 1, 2, 0, 2, 1,
             0, 2, 3, 0, 3, 2,
         };
-        
+
         static readonly List<int> _imageNineTriangles = new List<int>(12 * 9) {
-                0, 4, 1, 1, 4, 5,
-                0, 1, 4, 1, 5, 4,
-                1, 5, 2, 2, 5, 6,
-                1, 2, 5, 2, 6, 5,
-                2, 6, 3, 3, 6, 7,
-                2, 3, 6, 3, 7, 6,
-                4, 8, 5, 5, 8, 9,
-                4, 5, 8, 5, 9, 8,
-                5, 9, 6, 6, 9, 10,
-                5, 6, 9, 6, 10, 9,
-                6, 10, 7, 7, 10, 11,
-                6, 7, 10, 7, 11, 10,
-                8, 12, 9, 9, 12, 13,
-                8, 9, 12, 9, 13, 12,
-                9, 13, 10, 10, 13, 14,
-                9, 10, 13, 10, 14, 13,
-                10, 14, 11, 11, 14, 15,
-                10, 11, 14, 11, 15, 14,
+            0, 4, 1, 1, 4, 5,
+            0, 1, 4, 1, 5, 4,
+            1, 5, 2, 2, 5, 6,
+            1, 2, 5, 2, 6, 5,
+            2, 6, 3, 3, 6, 7,
+            2, 3, 6, 3, 7, 6,
+            4, 8, 5, 5, 8, 9,
+            4, 5, 8, 5, 9, 8,
+            5, 9, 6, 6, 9, 10,
+            5, 6, 9, 6, 10, 9,
+            6, 10, 7, 7, 10, 11,
+            6, 7, 10, 7, 11, 10,
+            8, 12, 9, 9, 12, 13,
+            8, 9, 12, 9, 13, 12,
+            9, 13, 10, 10, 13, 14,
+            9, 10, 13, 10, 14, 13,
+            10, 14, 11, 11, 14, 15,
+            10, 11, 14, 11, 15, 14,
         };
 
         public CommandBufferCanvas(RenderTexture renderTexture, float devicePixelRatio, MeshPool meshPool) {
@@ -75,13 +75,25 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void saveLayer(Rect bounds, Paint paint) {
+            D.assert(bounds != null);
+            D.assert(bounds.width > 0);
+            D.assert(bounds.height > 0);
+            D.assert(paint != null);
+
             this._saveCount++;
 
             var state = this._getState();
             var textureWidth = Mathf.CeilToInt(
-                (float) bounds.width * XformUtils.getScaleX(state.xform) * this._devicePixelRatio);
+                (float) bounds.width *
+                XformUtils.getScaleX(state.xform) *
+                this._devicePixelRatio);
+            textureWidth = Mathf.Max(textureWidth, 1);
+
             var textureHeight = Mathf.CeilToInt(
-                (float) bounds.height * XformUtils.getScaleY(state.xform) * this._devicePixelRatio);
+                (float) bounds.height *
+                XformUtils.getScaleY(state.xform) *
+                this._devicePixelRatio);
+            textureHeight = Mathf.Max(textureHeight, 1);
 
             var parentLayer = this._getLayer();
             var layer = new RenderLayer {
@@ -97,9 +109,6 @@ namespace Unity.UIWidgets.ui {
 
             parentLayer.layers.Add(layer);
             this._layers.Add(layer);
-
-            state = this._getState();
-            XformUtils.transformTranslate(state.xform, (float) -bounds.left, (float) -bounds.top);
         }
 
         public void restore() {
@@ -119,10 +128,10 @@ namespace Unity.UIWidgets.ui {
             var vertices = new List<Vector3>(4);
             var uv = new List<Vector2>(4);
 
-            float uvx0 = 0.0f;
-            float uvx1 = 1.0f;
-            float uvy0 = 1.0f;
-            float uvy1 = 0.0f;
+            const float uvx0 = 0.0f;
+            const float uvx1 = 1.0f;
+            const float uvy0 = 1.0f;
+            const float uvy1 = 0.0f;
 
             float x, y;
             var bounds = layer.layerBounds;
@@ -142,7 +151,7 @@ namespace Unity.UIWidgets.ui {
                 (float) bounds.right, (float) bounds.top);
             vertices.Add(new Vector2(x, y));
             uv.Add(new Vector2(uvx1, uvy0));
-            
+
             var mesh = new MeshMesh(vertices, _imageTriangles, uv);
 
             if (!this._applyClip(mesh.bounds)) {
@@ -310,11 +319,9 @@ namespace Unity.UIWidgets.ui {
 
         MaterialPropertyBlock _getMatProps(Paint paint, float alpha = 1.0f) {
             var properties = new MaterialPropertyBlock();
-            properties.SetVector("_viewSize", this._getViewSize());
+            properties.SetVector("_viewport", this._getViewport());
 
-            if (paint.shader is Gradient) {
-                var gradient = (Gradient) paint.shader;
-
+            if (paint.shader is Gradient gradient) {
                 var innerCol = gradient.innerColor;
                 var outerCol = gradient.outerColor;
 
@@ -337,7 +344,8 @@ namespace Unity.UIWidgets.ui {
                 properties.SetVector("_extent", new Vector2(gradient.extent[0], gradient.extent[1]));
                 properties.SetFloat("_radius", gradient.radius);
                 properties.SetFloat("_feather", gradient.feather);
-            } else {
+            }
+            else {
                 var innerCol = paint.color;
                 var outerCol = paint.color;
 
@@ -359,7 +367,7 @@ namespace Unity.UIWidgets.ui {
 
         bool _applyClip(Rect queryBounds) {
             var layer = this._getLayer();
-            var layerBounds = Rect.fromLTRB(0, 0, layer.layerBounds.width, layer.layerBounds.height);
+            var layerBounds = layer.layerBounds;
             ReducedClip reducedClip = new ReducedClip(layer.clipStack, layerBounds, queryBounds);
             if (reducedClip.isEmpty()) {
                 return false;
@@ -367,18 +375,18 @@ namespace Unity.UIWidgets.ui {
 
             var scissor = reducedClip.scissor;
             var deviceScissor = Rect.fromLTRB(
-                scissor.left, layerBounds.height - scissor.bottom,
-                scissor.right, layerBounds.height - scissor.top
+                scissor.left - layerBounds.left, layerBounds.bottom - scissor.bottom,
+                scissor.right - layerBounds.left, layerBounds.bottom - scissor.top
             ).scale(layer.width / layerBounds.width, layer.height / layerBounds.height);
 
             layer.draws.Add(new RenderScissor {
-                deviceScissor = deviceScissor,
+                deviceScissor = deviceScissor.roundOut(),
             });
 
             if (this._mustRenderClip(reducedClip.maskGenID(), reducedClip.scissor)) {
                 var mat = this._getMat(null);
                 var properties = new MaterialPropertyBlock();
-                properties.SetVector("_viewSize", this._getViewSize());
+                properties.SetVector("_viewport", this._getViewport());
 
                 var boundsMesh = new MeshMesh(reducedClip.scissor);
                 this._getLayer().draws.Add(new RenderDraw {
@@ -411,7 +419,216 @@ namespace Unity.UIWidgets.ui {
             return true;
         }
 
-        public void drawPath(Path path, Paint paint) {
+        RenderLayer _createMaskLayer(Path path, Paint paint, RenderLayer parentLayer, Rect maskBounds) {
+            var textureWidth = Mathf.CeilToInt(
+                (float) maskBounds.width * this._devicePixelRatio);
+            textureWidth = Mathf.Max(1, textureWidth);
+
+            var textureHeight = Mathf.CeilToInt((float) maskBounds.height * this._devicePixelRatio);
+            textureHeight = Mathf.Max(1, textureHeight);
+
+            var maskLayer = new RenderLayer {
+                rtID = Shader.PropertyToID("_rtID_" + this._layers.Count + "_" + parentLayer.layers.Count),
+                width = textureWidth,
+                height = textureHeight,
+                layerBounds = maskBounds,
+            };
+
+            parentLayer.layers.Add(maskLayer);
+            this._layers.Add(maskLayer);
+
+            var parentState = parentLayer.states.Last();
+            var maskState = maskLayer.states.Last();
+            XformUtils.transformCopy(maskState.xform, parentState.xform);
+
+            var maskPaint = Paint.shapeOnly(paint);
+            this._drawPath(path, maskPaint);
+
+            var removed = this._layers.removeLast();
+            D.assert(removed == maskLayer);
+
+            return maskLayer;
+        }
+
+        RenderLayer _createBlurLayer(RenderLayer maskLayer, float sigma, RenderLayer parentLayer) {
+            sigma = BlurUtils.adjustSigma(sigma, out var scaleFactor, out var radius);
+
+            var textureWidth = Mathf.CeilToInt((float) maskLayer.width / scaleFactor);
+            textureWidth = Mathf.Max(1, textureWidth);
+
+            var textureHeight = Mathf.CeilToInt((float) maskLayer.height / scaleFactor);
+            textureHeight = Mathf.Max(1, textureHeight);
+
+            var blurXLayer = new RenderLayer {
+                rtID = Shader.PropertyToID("_rtID_" + this._layers.Count + "_" + parentLayer.layers.Count),
+                width = textureWidth,
+                height = textureHeight,
+                layerBounds = maskLayer.layerBounds,
+            };
+
+            parentLayer.layers.Add(blurXLayer);
+
+            var blurYLayer = new RenderLayer {
+                rtID = Shader.PropertyToID("_rtID_" + this._layers.Count + "_" + parentLayer.layers.Count),
+                width = textureWidth,
+                height = textureHeight,
+                layerBounds = maskLayer.layerBounds,
+            };
+
+            parentLayer.layers.Add(blurYLayer);
+
+            var vertices = new List<Vector3>(4);
+            var uv = new List<Vector2>(4);
+
+            const float uvx0 = 0.0f;
+            const float uvx1 = 1.0f;
+            const float uvy0 = 1.0f;
+            const float uvy1 = 0.0f;
+
+            vertices.Add(new Vector2((float) maskLayer.layerBounds.left, (float) maskLayer.layerBounds.top));
+            uv.Add(new Vector2(uvx0, uvy0));
+            vertices.Add(new Vector2((float) maskLayer.layerBounds.left, (float) maskLayer.layerBounds.bottom));
+            uv.Add(new Vector2(uvx0, uvy1));
+            vertices.Add(new Vector2((float) maskLayer.layerBounds.right, (float) maskLayer.layerBounds.bottom));
+            uv.Add(new Vector2(uvx1, uvy1));
+            vertices.Add(new Vector2((float) maskLayer.layerBounds.right, (float) maskLayer.layerBounds.top));
+            uv.Add(new Vector2(uvx1, uvy0));
+
+            var blurMesh = new MeshMesh(vertices, _imageTriangles, uv);
+
+            var emptyPaint = new Paint();
+
+            var kernel = BlurUtils.get1DGaussianKernel(sigma, radius);
+
+            this._layers.Add(blurXLayer);
+
+            {
+                var mat = this._getMat(emptyPaint);
+                var properties = this._getMatPropsForImage(null, emptyPaint);
+
+                properties.SetFloat("_mf_radius", radius);
+                properties.SetVector("_mf_imgInc", new Vector2(1f / textureWidth, 0));
+                properties.SetFloatArray("_mf_kernel", kernel);
+
+                blurXLayer.draws.Add(
+                    new RenderDraw {
+                        mesh = blurMesh,
+                        pass = CanvasShaderPass.mfPass0,
+                        material = mat,
+                        properties = properties,
+                        layer = maskLayer
+                    }
+                );
+            }
+
+
+            var removed = this._layers.removeLast();
+            D.assert(removed == blurXLayer);
+
+            this._layers.Add(blurYLayer);
+
+            {
+                var mat = this._getMat(emptyPaint);
+                var properties = this._getMatPropsForImage(null, emptyPaint);
+
+                properties.SetFloat("_mf_radius", radius);
+                properties.SetVector("_mf_imgInc", new Vector2(0, -1f / textureHeight));
+                properties.SetFloatArray("_mf_kernel", kernel);
+
+                blurYLayer.draws.Add(
+                    new RenderDraw {
+                        mesh = blurMesh,
+                        pass = CanvasShaderPass.mfPass0,
+                        material = mat,
+                        properties = properties,
+                        layer = blurXLayer
+                    }
+                );
+            }
+
+            removed = this._layers.removeLast();
+            D.assert(removed == blurYLayer);
+
+            return blurYLayer;
+        }
+
+        void _drawPathWithMaskFilter(Path path, Paint paint, MaskFilter maskFilter) {
+            var layer = this._getLayer();
+            var clipBounds = layer.layerBounds;
+
+            Rect stackBounds;
+            bool iior;
+            layer.clipStack.getBounds(out stackBounds, out iior);
+
+            if (stackBounds != null) {
+                clipBounds = clipBounds.intersect(stackBounds);
+            }
+
+            if (clipBounds.isEmpty) {
+                return;
+            }
+
+            var state = this._getState();
+            var cache = path.flatten(state.xform, this._devicePixelRatio);
+
+            bool convex;
+            var mesh = cache.getFillMesh(out convex);
+            var meshBounds = mesh.bounds;
+
+            float sigma = XformUtils.mapRadius(state.xform, (float) maskFilter.sigma);
+            if (sigma <= 0) {
+                return;
+            }
+
+            float sigma3 = 3 * sigma;
+            var maskBounds = meshBounds.inflate(sigma3);
+            maskBounds = maskBounds.intersect(clipBounds.inflate(sigma3));
+            if (maskBounds.isEmpty) {
+                return;
+            }
+
+            var maskLayer = this._createMaskLayer(path, paint, layer, maskBounds);
+
+            var blurLayer = this._createBlurLayer(maskLayer, sigma, layer);
+
+            var vertices = new List<Vector3>(4);
+            var uv = new List<Vector2>(4);
+
+            const float uvx0 = 0.0f;
+            const float uvx1 = 1.0f;
+            const float uvy0 = 1.0f;
+            const float uvy1 = 0.0f;
+
+            vertices.Add(new Vector2((float) maskBounds.left, (float) maskBounds.top));
+            uv.Add(new Vector2(uvx0, uvy0));
+            vertices.Add(new Vector2((float) maskBounds.left, (float) maskBounds.bottom));
+            uv.Add(new Vector2(uvx0, uvy1));
+            vertices.Add(new Vector2((float) maskBounds.right, (float) maskBounds.bottom));
+            uv.Add(new Vector2(uvx1, uvy1));
+            vertices.Add(new Vector2((float) maskBounds.right, (float) maskBounds.top));
+            uv.Add(new Vector2(uvx1, uvy0));
+
+            var blurMesh = new MeshMesh(vertices, _imageTriangles, uv);
+
+            if (!this._applyClip(blurMesh.bounds)) {
+                return;
+            }
+
+            var mat = this._getMat(paint);
+            var properties = this._getMatPropsForImage(null, paint);
+
+            layer.draws.Add(
+                new RenderDraw {
+                    mesh = blurMesh,
+                    pass = CanvasShaderPass.texrtPass0,
+                    material = mat,
+                    properties = properties,
+                    layer = blurLayer
+                }
+            );
+        }
+
+        void _drawPath(Path path, Paint paint) {
             D.assert(path != null);
             D.assert(paint != null);
 
@@ -435,7 +652,8 @@ namespace Unity.UIWidgets.ui {
                         material = mat,
                         properties = properties,
                     });
-                } else {
+                }
+                else {
                     this._getLayer().draws.Add(new RenderDraw {
                         mesh = mesh,
                         pass = CanvasShaderPass.fillPass0,
@@ -449,7 +667,8 @@ namespace Unity.UIWidgets.ui {
                         properties = properties,
                     });
                 }
-            } else {
+            }
+            else {
                 var state = this._getState();
                 float scale = XformUtils.getAverageScale(state.xform);
                 float strokeWidth = ((float) paint.strokeWidth * scale).clamp(0, 200.0f);
@@ -457,7 +676,8 @@ namespace Unity.UIWidgets.ui {
 
                 if (strokeWidth == 0) {
                     strokeWidth = this._fringeWidth;
-                } else if (strokeWidth < this._fringeWidth) {
+                }
+                else if (strokeWidth < this._fringeWidth) {
                     // If the stroke width is less than pixel size, use alpha to emulate coverage.
                     // Since coverage is area, scale by alpha*alpha.
                     alpha = (strokeWidth / this._fringeWidth).clamp(0.0f, 1.0f);
@@ -493,6 +713,18 @@ namespace Unity.UIWidgets.ui {
             }
         }
 
+        public void drawPath(Path path, Paint paint) {
+            D.assert(path != null);
+            D.assert(paint != null);
+
+            if (paint.maskFilter != null) {
+                this._drawPathWithMaskFilter(path, paint, paint.maskFilter);
+                return;
+            }
+
+            this._drawPath(path, paint);
+        }
+
         public void drawImage(Image image, Offset offset, Paint paint) {
             D.assert(image != null);
             D.assert(offset != null);
@@ -505,9 +737,13 @@ namespace Unity.UIWidgets.ui {
                 paint);
         }
 
-        Vector2 _getViewSize() {
+        Vector4 _getViewport() {
             var layer = this._getLayer();
-            return new Vector2((float) layer.layerBounds.width, (float) layer.layerBounds.height);
+            return new Vector4(
+                (float) layer.layerBounds.left,
+                (float) layer.layerBounds.top,
+                (float) layer.layerBounds.width,
+                (float) layer.layerBounds.height);
         }
 
         static Dictionary<BlendMode, Material> _materials = new Dictionary<BlendMode, Material>();
@@ -534,43 +770,56 @@ namespace Unity.UIWidgets.ui {
             if (op == BlendMode.srcOver) {
                 mat.SetInt(_srcBlend, (int) UnityEngine.Rendering.BlendMode.One);
                 mat.SetInt(_dstBlend, (int) UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
-            } else if (op == BlendMode.srcIn) {
+            }
+            else if (op == BlendMode.srcIn) {
                 mat.SetInt(_srcBlend, (int) UnityEngine.Rendering.BlendMode.DstAlpha);
                 mat.SetInt(_dstBlend, (int) UnityEngine.Rendering.BlendMode.Zero);
-            } else if (op == BlendMode.srcOut) {
+            }
+            else if (op == BlendMode.srcOut) {
                 mat.SetInt(_srcBlend, (int) UnityEngine.Rendering.BlendMode.OneMinusDstAlpha);
                 mat.SetInt(_dstBlend, (int) UnityEngine.Rendering.BlendMode.Zero);
-            } else if (op == BlendMode.srcATop) {
+            }
+            else if (op == BlendMode.srcATop) {
                 mat.SetInt(_srcBlend, (int) UnityEngine.Rendering.BlendMode.DstAlpha);
                 mat.SetInt(_dstBlend, (int) UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
-            } else if (op == BlendMode.dstOver) {
+            }
+            else if (op == BlendMode.dstOver) {
                 mat.SetInt(_srcBlend, (int) UnityEngine.Rendering.BlendMode.OneMinusDstAlpha);
                 mat.SetInt(_dstBlend, (int) UnityEngine.Rendering.BlendMode.One);
-            } else if (op == BlendMode.dstIn) {
+            }
+            else if (op == BlendMode.dstIn) {
                 mat.SetInt(_srcBlend, (int) UnityEngine.Rendering.BlendMode.Zero);
                 mat.SetInt(_dstBlend, (int) UnityEngine.Rendering.BlendMode.SrcAlpha);
-            } else if (op == BlendMode.dstOut) {
+            }
+            else if (op == BlendMode.dstOut) {
                 mat.SetInt(_srcBlend, (int) UnityEngine.Rendering.BlendMode.Zero);
                 mat.SetInt(_dstBlend, (int) UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
-            } else if (op == BlendMode.dstATop) {
+            }
+            else if (op == BlendMode.dstATop) {
                 mat.SetInt(_srcBlend, (int) UnityEngine.Rendering.BlendMode.OneMinusDstAlpha);
                 mat.SetInt(_dstBlend, (int) UnityEngine.Rendering.BlendMode.SrcAlpha);
-            } else if (op == BlendMode.plus) {
+            }
+            else if (op == BlendMode.plus) {
                 mat.SetInt(_srcBlend, (int) UnityEngine.Rendering.BlendMode.One);
                 mat.SetInt(_dstBlend, (int) UnityEngine.Rendering.BlendMode.One);
-            } else if (op == BlendMode.src) {
+            }
+            else if (op == BlendMode.src) {
                 mat.SetInt(_srcBlend, (int) UnityEngine.Rendering.BlendMode.One);
                 mat.SetInt(_dstBlend, (int) UnityEngine.Rendering.BlendMode.Zero);
-            } else if (op == BlendMode.dst) {
+            }
+            else if (op == BlendMode.dst) {
                 mat.SetInt(_srcBlend, (int) UnityEngine.Rendering.BlendMode.Zero);
                 mat.SetInt(_dstBlend, (int) UnityEngine.Rendering.BlendMode.One);
-            } else if (op == BlendMode.xor) {
+            }
+            else if (op == BlendMode.xor) {
                 mat.SetInt(_srcBlend, (int) UnityEngine.Rendering.BlendMode.OneMinusDstAlpha);
                 mat.SetInt(_dstBlend, (int) UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
-            } else if (op == BlendMode.clear) {
+            }
+            else if (op == BlendMode.clear) {
                 mat.SetInt(_srcBlend, (int) UnityEngine.Rendering.BlendMode.Zero);
                 mat.SetInt(_dstBlend, (int) UnityEngine.Rendering.BlendMode.Zero);
-            } else {
+            }
+            else {
                 Debug.LogWarning("Not supported BlendMode: " + op + ". Defaults to srcOver");
                 mat.SetInt(_srcBlend, (int) UnityEngine.Rendering.BlendMode.One);
                 mat.SetInt(_dstBlend, (int) UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
@@ -581,7 +830,7 @@ namespace Unity.UIWidgets.ui {
 
         MaterialPropertyBlock _getMatPropsForImage(Texture image, Paint paint) {
             var properties = new MaterialPropertyBlock();
-            properties.SetVector("_viewSize", this._getViewSize());
+            properties.SetVector("_viewport", this._getViewport());
             properties.SetVector("_innerCol", _color(paint.color));
             if (image != null) {
                 image.filterMode = paint.filterMode;
@@ -757,66 +1006,85 @@ namespace Unity.UIWidgets.ui {
                 if (drawCmd is DrawSave) {
                     saveCount++;
                     this.save();
-                } else if (drawCmd is DrawSaveLayer) {
+                }
+                else if (drawCmd is DrawSaveLayer) {
                     saveCount++;
                     var drawSaveLayer = (DrawSaveLayer) drawCmd;
                     this.saveLayer(drawSaveLayer.rect, drawSaveLayer.paint);
-                } else if (drawCmd is DrawRestore) {
+                }
+                else if (drawCmd is DrawRestore) {
                     saveCount--;
                     if (saveCount < 0) {
                         throw new Exception("unmatched save/restore in picture");
                     }
 
                     this.restore();
-                } else if (drawCmd is DrawTranslate) {
+                }
+                else if (drawCmd is DrawTranslate) {
                     var drawTranslate = (DrawTranslate) drawCmd;
                     this.translate(drawTranslate.dx, drawTranslate.dy);
-                } else if (drawCmd is DrawScale) {
+                }
+                else if (drawCmd is DrawScale) {
                     var drawScale = (DrawScale) drawCmd;
                     this.scale(drawScale.sx, drawScale.sy);
-                } else if (drawCmd is DrawRotate) {
+                }
+                else if (drawCmd is DrawRotate) {
                     var drawRotate = (DrawRotate) drawCmd;
                     this.rotate(drawRotate.radians, drawRotate.offset);
-                } else if (drawCmd is DrawSkew) {
+                }
+                else if (drawCmd is DrawSkew) {
                     var drawSkew = (DrawSkew) drawCmd;
                     this.skew(drawSkew.sx, drawSkew.sy);
-                } else if (drawCmd is DrawConcat) {
+                }
+                else if (drawCmd is DrawConcat) {
                     var drawConcat = (DrawConcat) drawCmd;
                     this.concat(drawConcat.matrix);
-                } else if (drawCmd is DrawResetMatrix) {
+                }
+                else if (drawCmd is DrawResetMatrix) {
                     this.resetMatrix();
-                } else if (drawCmd is DrawSetMatrix) {
+                }
+                else if (drawCmd is DrawSetMatrix) {
                     var drawSetMatrix = (DrawSetMatrix) drawCmd;
                     this.setMatrix(drawSetMatrix.matrix);
-                } else if (drawCmd is DrawClipRect) {
+                }
+                else if (drawCmd is DrawClipRect) {
                     var drawClipRect = (DrawClipRect) drawCmd;
                     this.clipRect(drawClipRect.rect);
-                } else if (drawCmd is DrawClipRRect) {
+                }
+                else if (drawCmd is DrawClipRRect) {
                     var drawClipRRect = (DrawClipRRect) drawCmd;
                     this.clipRRect(drawClipRRect.rrect);
-                } else if (drawCmd is DrawClipPath) {
+                }
+                else if (drawCmd is DrawClipPath) {
                     var drawClipPath = (DrawClipPath) drawCmd;
                     this.clipPath(drawClipPath.path);
-                } else if (drawCmd is DrawPath) {
+                }
+                else if (drawCmd is DrawPath) {
                     var drawPath = (DrawPath) drawCmd;
                     this.drawPath(drawPath.path, drawPath.paint);
-                } else if (drawCmd is DrawImage) {
+                }
+                else if (drawCmd is DrawImage) {
                     var drawImage = (DrawImage) drawCmd;
                     this.drawImage(drawImage.image, drawImage.offset, drawImage.paint);
-                } else if (drawCmd is DrawImageRect) {
+                }
+                else if (drawCmd is DrawImageRect) {
                     var drawImageRect = (DrawImageRect) drawCmd;
                     this.drawImageRect(drawImageRect.image, drawImageRect.src, drawImageRect.dst, drawImageRect.paint);
-                } else if (drawCmd is DrawImageNine) {
+                }
+                else if (drawCmd is DrawImageNine) {
                     var drawImageNine = (DrawImageNine) drawCmd;
                     this.drawImageNine(drawImageNine.image, drawImageNine.src, drawImageNine.center, drawImageNine.dst,
                         drawImageNine.paint);
-                } else if (drawCmd is DrawPicture) {
+                }
+                else if (drawCmd is DrawPicture) {
                     var drawPicture = (DrawPicture) drawCmd;
                     this.drawPicture(drawPicture.picture);
-                } else if (drawCmd is DrawTextBlob) {
+                }
+                else if (drawCmd is DrawTextBlob) {
                     var drawTextBlob = (DrawTextBlob) drawCmd;
                     this.drawTextBlob(drawTextBlob.textBlob, drawTextBlob.offset, drawTextBlob.paint);
-                } else {
+                }
+                else {
                     throw new Exception("unknown drawCmd: " + drawCmd);
                 }
             }
@@ -830,15 +1098,14 @@ namespace Unity.UIWidgets.ui {
 
         public void drawTextBlob(TextBlob textBlob, Offset offset, Paint paint) {
             var state = this._getState();
+
             var xform = new float[6];
             XformUtils.transformTranslate(xform, (float) offset.dx, (float) offset.dy);
             XformUtils.transformMultiply(xform, state.xform); // xform = state.xform * xform
 
             var scale = XformUtils.getAverageScale(xform) * this._devicePixelRatio;            
             var mesh = MeshGenerator.generateMesh(textBlob, scale)?.transform(xform);
-            /*if (textBlob.text == "Huawei") {
-                Debug.Log($"mesh: {mesh.vertices[12].y - mesh.vertices[0].y} {mesh.vertices[14].y - mesh.vertices[0].y}");
-            }*/
+
             if (mesh == null) {
                 return;
             }
@@ -897,7 +1164,8 @@ namespace Unity.UIWidgets.ui {
                     height = this._renderTexture.height,
                     layerBounds = bounds,
                 };
-            } else {
+            }
+            else {
                 D.assert(this._layers.Count > 0);
                 firstLayer = this._layers[0];
                 firstLayer = new RenderLayer {
@@ -910,7 +1178,7 @@ namespace Unity.UIWidgets.ui {
             this._layers.Clear();
             this._layers.Add(firstLayer);
         }
-        
+
         void _drawLayer(RenderLayer layer, CommandBuffer cmdBuf) {
             foreach (var subLayer in layer.layers) {
                 cmdBuf.GetTemporaryRT(subLayer.rtID, new RenderTextureDescriptor(
@@ -919,7 +1187,7 @@ namespace Unity.UIWidgets.ui {
                     msaaSamples = QualitySettings.antiAliasing,
                     useMipMap = false,
                     autoGenerateMips = false,
-                });
+                }, FilterMode.Bilinear);
                 this._drawLayer(subLayer, cmdBuf);
             }
 
@@ -927,7 +1195,8 @@ namespace Unity.UIWidgets.ui {
                 cmdBuf.SetRenderTarget(this._renderTexture,
                     RenderBufferLoadAction.DontCare, RenderBufferStoreAction.Store);
                 cmdBuf.ClearRenderTarget(true, true, UnityEngine.Color.clear);
-            } else {
+            }
+            else {
                 cmdBuf.SetRenderTarget(layer.rtID,
                     RenderBufferLoadAction.DontCare, RenderBufferStoreAction.Store);
                 cmdBuf.ClearRenderTarget(true, true, UnityEngine.Color.clear);
@@ -946,11 +1215,13 @@ namespace Unity.UIWidgets.ui {
             foreach (var draw in layer.draws) {
                 draw.onDestroy(this);
             }
+
             layer.draws.Clear();
 
             foreach (var subLayer in layer.layers) {
                 this._clearLayer(subLayer);
             }
+
             layer.layers.Clear();
         }
 
@@ -1010,13 +1281,10 @@ namespace Unity.UIWidgets.ui {
 
                 if (!this.meshObj) {
                     this.meshObj = canvas._meshPool.getMesh();
-                    
+
                     // clear triangles first in order to bypass validation in SetVertices.
                     this.meshObj.SetTriangles((int[]) null, 0, false);
 
-                    if (this.mesh.vertices.Count > 12) {
-                       // Debug.Log($"{this.mesh.vertices.Count}  {this.mesh.vertices[12].y - this.mesh.vertices[0].y}");
-                    }
                     this.meshObj.SetVertices(this.mesh.vertices);
                     this.meshObj.SetTriangles(this.mesh.triangles, 0, false);
                     this.meshObj.SetUVs(0, this.mesh.uv);
@@ -1060,9 +1328,19 @@ namespace Unity.UIWidgets.ui {
         public const int stencilIntersect0 = 8;
         public const int stencilIntersect1 = 9;
         public const int texfontPass0 = 10;
+        public const int mfPass0 = 11;
     }
 
     static class XformUtils {
+        public static void transformCopy(float[] t, float[] s) {
+            t[0] = s[0];
+            t[1] = s[1];
+            t[2] = s[2];
+            t[3] = s[3];
+            t[4] = s[4];
+            t[5] = s[5];
+        }
+
         public static void transformIdentity(float[] t) {
             t[0] = 1.0f;
             t[1] = 0.0f;
@@ -1109,7 +1387,6 @@ namespace Unity.UIWidgets.ui {
             t[5] = 0.0f;
         }
 
-        
         // t = s * t;
         public static void transformMultiply(float[] t, float[] s) {
             float t0 = t[0] * s[0] + t[1] * s[2];
@@ -1123,6 +1400,7 @@ namespace Unity.UIWidgets.ui {
             t[4] = t4;
         }
 
+        // t = t * s;
         public static void transformPremultiply(float[] t, float[] s) {
             float[] s2 = {s[0], s[1], s[2], s[3], s[4], s[5]};
             transformMultiply(s2, t);
@@ -1155,12 +1433,32 @@ namespace Unity.UIWidgets.ui {
             return (getScaleX(t) + getScaleY(t)) * 0.5f;
         }
 
+        public static float getMaxScale(float[] t) {
+            return Mathf.Max(getScaleX(t), getScaleY(t));
+        }
+
         public static float getScaleX(float[] t) {
             return Mathf.Sqrt(t[0] * t[0] + t[2] * t[2]);
         }
 
         public static float getScaleY(float[] t) {
             return Mathf.Sqrt(t[1] * t[1] + t[3] * t[3]);
+        }
+
+        public static float mapRadius(float[] t, float radius) {
+            // mapped point of (radius, 0) and (0, radius)
+            var x0 = radius * t[0] + t[4];
+            var y0 = radius * t[1] + t[5];
+            var x1 = radius * t[2] + t[4];
+            var y1 = radius * t[3] + t[5];
+
+            // geometric mean of len0 and len1.
+            return Mathf.Sqrt(Mathf.Sqrt((x0 * x0 + y0 * y0) * (x1 * x1 + y1 * y1)));
+        }
+
+        public static void transformPoint(out float dx, out float dy, float[] t, float sx, float sy) {
+            dx = sx * t[0] + sy * t[2] + t[4];
+            dy = sx * t[1] + sy * t[3] + t[5];
         }
 
         public static float[] fromMatrix3(Matrix3 matrix) {
@@ -1177,6 +1475,129 @@ namespace Unity.UIWidgets.ui {
                 xform[1], xform[3], xform[5],
                 0, 0, 1
             );
+        }
+    }
+
+    static class BlurUtils {
+        static readonly Dictionary<_GaussianKernelKey, float[]> _gaussianKernels
+            = new Dictionary<_GaussianKernelKey, float[]>();
+
+        public static float[] get1DGaussianKernel(float gaussianSigma, int radius) {
+            var width = 2 * radius + 1;
+            D.assert(width <= 25);
+
+            var key = new _GaussianKernelKey(gaussianSigma, radius);
+            return _gaussianKernels.putIfAbsent(key, () => {
+                var kernel = new float[25];
+                float twoSigmaSqrd = 2.0f * gaussianSigma * gaussianSigma;
+
+                if (ScalarUtils.ScalarNearlyZero(twoSigmaSqrd)) {
+                    for (int i = 0; i < width; ++i) {
+                        kernel[i] = 0.0f;
+                    }
+
+                    return kernel;
+                }
+
+                float denom = 1.0f / twoSigmaSqrd;
+
+                float sum = 0.0f;
+                for (int i = 0; i < width; ++i) {
+                    float x = i - radius;
+                    // Note that the constant term (1/(sqrt(2*pi*sigma^2)) of the Gaussian
+                    // is dropped here, since we renormalize the kernel below.
+                    kernel[i] = Mathf.Exp(-x * x * denom);
+                    sum += kernel[i];
+                }
+
+                // Normalize the kernel
+                float scale = 1.0f / sum;
+                for (int i = 0; i < width; ++i) {
+                    kernel[i] *= scale;
+                }
+
+                return kernel;
+            });
+        }
+
+        public static float adjustSigma(float sigma, out int scaleFactor, out int radius) {
+            scaleFactor = 1;
+
+            const int maxTextureSize = 16384;
+            const float MAX_BLUR_SIGMA = 4.0f;
+
+            while (sigma > MAX_BLUR_SIGMA) {
+                scaleFactor *= 2;
+                sigma *= 0.5f;
+
+                if (scaleFactor > maxTextureSize) {
+                    scaleFactor = maxTextureSize;
+                    sigma = MAX_BLUR_SIGMA;
+                }
+            }
+
+            radius = Mathf.CeilToInt(sigma * 3.0f);
+            D.assert(radius <= 3 * MAX_BLUR_SIGMA);
+            return sigma;
+        }
+
+        class _GaussianKernelKey : IEquatable<_GaussianKernelKey> {
+            public readonly float gaussianSigma;
+            public readonly int radius;
+
+            public _GaussianKernelKey(float gaussianSigma, int radius) {
+                this.gaussianSigma = gaussianSigma;
+                this.radius = radius;
+            }
+
+            public bool Equals(_GaussianKernelKey other) {
+                if (ReferenceEquals(null, other)) {
+                    return false;
+                }
+
+                if (ReferenceEquals(this, other)) {
+                    return true;
+                }
+
+                return this.gaussianSigma.Equals(other.gaussianSigma) &&
+                       this.radius == other.radius;
+            }
+
+            public override bool Equals(object obj) {
+                if (ReferenceEquals(null, obj)) {
+                    return false;
+                }
+
+                if (ReferenceEquals(this, obj)) {
+                    return true;
+                }
+
+                if (obj.GetType() != this.GetType()) {
+                    return false;
+                }
+
+                return this.Equals((_GaussianKernelKey) obj);
+            }
+
+            public override int GetHashCode() {
+                unchecked {
+                    var hashCode = this.gaussianSigma.GetHashCode();
+                    hashCode = (hashCode * 397) ^ this.radius;
+                    return hashCode;
+                }
+            }
+
+            public static bool operator ==(_GaussianKernelKey left, _GaussianKernelKey right) {
+                return Equals(left, right);
+            }
+
+            public static bool operator !=(_GaussianKernelKey left, _GaussianKernelKey right) {
+                return !Equals(left, right);
+            }
+
+            public override string ToString() {
+                return $"_GaussianKernelKey(gaussianSigma: {this.gaussianSigma:F1}, radius: {this.radius})";
+            }
         }
     }
 }

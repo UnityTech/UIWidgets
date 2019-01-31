@@ -40,7 +40,8 @@ namespace Unity.UIWidgets.flow {
             try {
                 canvas.resetMatrix();
                 canvas.drawImage(this.image, bounds.topLeft, new Paint());
-            } finally {
+            }
+            finally {
                 canvas.restore();
             }
         }
@@ -72,9 +73,11 @@ namespace Unity.UIWidgets.flow {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return Equals(this.picture, other.picture) &&
                    Equals(this.matrix, other.matrix) &&
                    this.devicePixelRatio.Equals(other.devicePixelRatio);
@@ -84,12 +87,15 @@ namespace Unity.UIWidgets.flow {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((_RasterCacheKey) obj);
         }
 
@@ -200,7 +206,8 @@ namespace Unity.UIWidgets.flow {
             return true;
         }
 
-        RasterCacheResult _rasterizePicture(Picture picture, Matrix3 transform, float devicePixelRatio, MeshPool meshPool) {
+        RasterCacheResult _rasterizePicture(Picture picture, Matrix3 transform, float devicePixelRatio,
+            MeshPool meshPool) {
             var bounds = transform.mapRect(picture.paintBounds);
 
             var desc = new RenderTextureDescriptor(
@@ -232,7 +239,8 @@ namespace Unity.UIWidgets.flow {
             foreach (var entry in this._cache) {
                 if (!entry.Value.usedThisFrame) {
                     dead.Add(entry);
-                } else {
+                }
+                else {
                     entry.Value.usedThisFrame = false;
                 }
             }
@@ -251,6 +259,7 @@ namespace Unity.UIWidgets.flow {
                     entry.Value.image.image.Dispose();
                 }
             }
+
             this._cache.Clear();
         }
     }

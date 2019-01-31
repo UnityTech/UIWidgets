@@ -63,7 +63,8 @@ namespace Unity.UIWidgets.widgets {
                 ParentDataElement childElement = this._getChildElement();
                 if (childElement != null) {
                     this._updateParentDataOfChild(childElement);
-                } else {
+                }
+                else {
                     SchedulerBinding.instance.addPostFrameCallback(timeStamp => {
                         ParentDataElement childElement1 = this._getChildElement();
                         D.assert(childElement1 != null);
@@ -106,7 +107,8 @@ namespace Unity.UIWidgets.widgets {
                 if (this._handles.isEmpty()) {
                     if (SchedulerBinding.instance.schedulerPhase < SchedulerPhase.persistentCallbacks) {
                         this.setState(() => { this._keepingAlive = false; });
-                    } else {
+                    }
+                    else {
                         this._keepingAlive = false;
                         Window.instance.scheduleMicrotask(() => {
                             if (this.mounted && this._handles.isEmpty()) {
@@ -175,7 +177,8 @@ namespace Unity.UIWidgets.widgets {
                 if (this._keepAliveHandle == null) {
                     this._ensureKeepAlive();
                 }
-            } else {
+            }
+            else {
                 if (this._keepAliveHandle != null) {
                     this._releaseKeepAlive();
                 }

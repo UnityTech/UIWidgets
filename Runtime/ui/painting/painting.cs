@@ -1,5 +1,5 @@
 ﻿using System;
-using Unity.UIWidgets.painting;
+using Unity.UIWidgets.foundation;
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
@@ -7,7 +7,7 @@ namespace Unity.UIWidgets.ui {
         public Color(long value) {
             this.value = value & 0xFFFFFFFF;
         }
-        
+
         public static readonly Color clear = new Color(0x00000000);
 
         public static readonly Color black = new Color(0xFF000000);
@@ -72,6 +72,21 @@ namespace Unity.UIWidgets.ui {
             return fromARGB(this.alpha, this.red, this.green, b);
         }
 
+        static double _linearizeColorComponent(double component) {
+            if (component <= 0.03928) {
+                return component / 12.92;
+            }
+
+            return Math.Pow((component + 0.055) / 1.055, 2.4);
+        }
+
+        public double computeLuminance() {
+            double R = _linearizeColorComponent(this.red / 0xFF);
+            double G = _linearizeColorComponent(this.green / 0xFF);
+            double B = _linearizeColorComponent(this.blue / 0xFF);
+            return 0.2126 * R + 0.7152 * G + 0.0722 * B;
+        }
+
         public static Color lerp(Color a, Color b, double t) {
             if (a == null && b == null) {
                 return null;
@@ -97,9 +112,11 @@ namespace Unity.UIWidgets.ui {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return this.value == other.value;
         }
 
@@ -107,12 +124,15 @@ namespace Unity.UIWidgets.ui {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((Color) obj);
         }
 
@@ -157,9 +177,133 @@ namespace Unity.UIWidgets.ui {
         bevel,
     }
 
-    public class ColorFilter {
-        public Color color;
-        public BlendMode blendMode;
+    public enum BlurStyle {
+        normal, // only normal for now.
+        solid,
+        outer,
+        inner,
+    }
+
+    public class MaskFilter : IEquatable<MaskFilter> {
+        MaskFilter(BlurStyle style, double sigma) {
+            this.style = style;
+            this.sigma = sigma;
+        }
+
+        public static MaskFilter blur(BlurStyle style, double sigma) {
+            return new MaskFilter(style, sigma);
+        }
+
+        public readonly BlurStyle style;
+        public readonly double sigma;
+
+        public bool Equals(MaskFilter other) {
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
+
+            return this.style == other.style && this.sigma.Equals(other.sigma);
+        }
+
+        public override bool Equals(object obj) {
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
+
+            return this.Equals((MaskFilter) obj);
+        }
+
+        public override int GetHashCode() {
+            unchecked {
+                return ((int) this.style * 397) ^ this.sigma.GetHashCode();
+            }
+        }
+
+        public static bool operator ==(MaskFilter left, MaskFilter right) {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(MaskFilter left, MaskFilter right) {
+            return !Equals(left, right);
+        }
+
+        public override string ToString() {
+            return $"MaskFilter.blur(${this.style}, ${this.sigma:F1})";
+        }
+    }
+
+    public class ColorFilter : IEquatable<ColorFilter> {
+        ColorFilter(Color color, BlendMode blendMode) {
+            D.assert(color != null);
+            this.color = color;
+            this.blendMode = blendMode;
+        }
+
+        public static ColorFilter mode(Color color, BlendMode blendMode) {
+            return new ColorFilter(color, blendMode);
+        }
+
+        public readonly Color color;
+
+        public readonly BlendMode blendMode;
+
+        public bool Equals(ColorFilter other) {
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
+
+            return Equals(this.color, other.color) && this.blendMode == other.blendMode;
+        }
+
+        public override bool Equals(object obj) {
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
+
+            return this.Equals((ColorFilter) obj);
+        }
+
+        public override int GetHashCode() {
+            unchecked {
+                return ((this.color != null ? this.color.GetHashCode() : 0) * 397) ^ (int) this.blendMode;
+            }
+        }
+
+        public static bool operator ==(ColorFilter left, ColorFilter right) {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(ColorFilter left, ColorFilter right) {
+            return !Equals(left, right);
+        }
+
+        public override string ToString() {
+            return $"ColorFilter({this.color}, {this.blendMode})";
+        }
     }
 
     public enum TileMode {
@@ -192,7 +336,8 @@ namespace Unity.UIWidgets.ui {
             if (d > 0.0001f) {
                 dx /= d;
                 dy /= d;
-            } else {
+            }
+            else {
                 dx = 0;
                 dy = 1;
             }
@@ -273,11 +418,41 @@ namespace Unity.UIWidgets.ui {
 
         public ColorFilter colorFilter = null;
 
+        public MaskFilter maskFilter = null;
+
         public PaintShader shader = null;
 
-        public double blurSigma;
-
         public bool invertColors;
+
+        public Paint() {
+        }
+
+        public Paint(Paint paint) {
+            D.assert(paint != null);
+
+            this.color = paint.color;
+            this.blendMode = paint.blendMode;
+            this.style = paint.style;
+            this.strokeWidth = paint.strokeWidth;
+            this.strokeCap = paint.strokeCap;
+            this.strokeJoin = paint.strokeJoin;
+            this.strokeMiterLimit = paint.strokeMiterLimit;
+            this.filterMode = paint.filterMode;
+            this.colorFilter = paint.colorFilter;
+            this.maskFilter = paint.maskFilter;
+            this.shader = paint.shader;
+            this.invertColors = paint.invertColors;
+        }
+
+        public static Paint shapeOnly(Paint paint) {
+            return new Paint {
+                style = paint.style,
+                strokeWidth = paint.strokeWidth,
+                strokeCap = paint.strokeCap,
+                strokeJoin = paint.strokeJoin,
+                strokeMiterLimit = paint.strokeMiterLimit,
+            };
+        }
     }
 
     public static class Conversions {

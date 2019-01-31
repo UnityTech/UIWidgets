@@ -29,9 +29,11 @@ namespace Unity.UIWidgets.widgets {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return ReferenceEquals(this.value, other.value);
         }
 
@@ -39,12 +41,15 @@ namespace Unity.UIWidgets.widgets {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((ObjectKey) obj);
         }
 
@@ -262,9 +267,11 @@ namespace Unity.UIWidgets.widgets {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return ReferenceEquals(this.value, other.value);
         }
 
@@ -272,12 +279,15 @@ namespace Unity.UIWidgets.widgets {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((GlobalObjectKey<T>) obj);
         }
 
@@ -537,7 +547,8 @@ namespace Unity.UIWidgets.widgets {
                 result = string.Format(
                     "{0} widgets must be placed inside {1} widgets.\n" +
                     "{2} has no {1} ancestor at all.\n", this.GetType(), typeof(T), description);
-            } else {
+            }
+            else {
                 D.assert(badAncestors != null);
                 D.assert(badAncestors.Any());
                 result = string.Format(
@@ -549,7 +560,8 @@ namespace Unity.UIWidgets.widgets {
                     if (ancestor.GetType() == this.GetType()) {
                         result +=
                             $"- {ancestor} (this is a different {this.GetType()} than the one with the problem)\n";
-                    } else {
+                    }
+                    else {
                         result += $"- {ancestor}\n";
                     }
                 }
@@ -664,7 +676,8 @@ namespace Unity.UIWidgets.widgets {
             try {
                 elements.Reverse();
                 elements.ForEach(this._unmount);
-            } finally {
+            }
+            finally {
                 D.assert(this._elements.isEmpty());
                 this._locked = false;
             }
@@ -852,7 +865,8 @@ namespace Unity.UIWidgets.widgets {
 
             try {
                 callback();
-            } finally {
+            }
+            finally {
                 D.assert(() => {
                     this._debugStateLockLevel -= 1;
                     return true;
@@ -897,7 +911,8 @@ namespace Unity.UIWidgets.widgets {
 
                     try {
                         callback();
-                    } finally {
+                    }
+                    finally {
                         D.assert(() => {
                             context._debugSetAllowIgnoredCallsToMarkNeedsBuild(false);
                             D.assert(this._debugCurrentBuildTarget == context);
@@ -920,7 +935,8 @@ namespace Unity.UIWidgets.widgets {
 
                     try {
                         this._dirtyElements[index].rebuild();
-                    } catch (Exception ex) {
+                    }
+                    catch (Exception ex) {
                         WidgetsD._debugReportException(
                             "while rebuilding dirty elements", ex,
                             informationCollector: (information) => {
@@ -954,7 +970,8 @@ namespace Unity.UIWidgets.widgets {
 
                     return true;
                 });
-            } finally {
+            }
+            finally {
                 foreach (Element element in this._dirtyElements) {
                     D.assert(element._inDirtyList);
                     element._inDirtyList = false;
@@ -1021,7 +1038,8 @@ namespace Unity.UIWidgets.widgets {
                                 foreach (string key in keys.Select(key => key.ToString())) {
                                     if (keyStringCount.ContainsKey(key)) {
                                         keyStringCount[key] += 1;
-                                    } else {
+                                    }
+                                    else {
                                         keyStringCount[key] = 1;
                                     }
                                 }
@@ -1032,7 +1050,8 @@ namespace Unity.UIWidgets.widgets {
                                     var count = entry.Value;
                                     if (count == 1) {
                                         keyLabels.Add(key);
-                                    } else {
+                                    }
+                                    else {
                                         keyLabels.Add(
                                             $"{key} ({count} different affected keys had this toString representation)");
                                     }
@@ -1043,7 +1062,8 @@ namespace Unity.UIWidgets.widgets {
                                 foreach (string element in elements.Select(element => element.ToString())) {
                                     if (elementStringCount.ContainsKey(element)) {
                                         elementStringCount[element] += 1;
-                                    } else {
+                                    }
+                                    else {
                                         elementStringCount[element] = 1;
                                     }
                                 }
@@ -1055,7 +1075,8 @@ namespace Unity.UIWidgets.widgets {
 
                                     if (count == 1) {
                                         elementLabels.Add(element);
-                                    } else {
+                                    }
+                                    else {
                                         elementLabels.Add(
                                             $"{element} ({count} different affected elements had this toString representation)");
                                     }
@@ -1080,7 +1101,8 @@ namespace Unity.UIWidgets.widgets {
                                 );
                             }
                         }
-                    } finally {
+                    }
+                    finally {
                         if (this._debugElementsThatWillNeedToBeRebuiltDueToGlobalKeyShenanigans != null) {
                             this._debugElementsThatWillNeedToBeRebuiltDueToGlobalKeyShenanigans.Clear();
                         }
@@ -1088,7 +1110,8 @@ namespace Unity.UIWidgets.widgets {
 
                     return true;
                 });
-            } catch (Exception ex) {
+            }
+            catch (Exception ex) {
                 WidgetsD._debugReportException("while finalizing the widget tree", ex);
             }
         }
@@ -1180,7 +1203,8 @@ namespace Unity.UIWidgets.widgets {
                     D.assert(result == null);
                     if (element is RenderObjectElement) {
                         result = element.renderObject;
-                    } else {
+                    }
+                    else {
                         element.visitChildren(visit);
                     }
                 };
@@ -1432,6 +1456,7 @@ namespace Unity.UIWidgets.widgets {
                 while (node._parent != null) {
                     node = node._parent;
                 }
+
                 D.assert(node != newChild);
                 return true;
             });
@@ -1759,6 +1784,7 @@ namespace Unity.UIWidgets.widgets {
                 if (element != null && matcher.check(element.state)) {
                     statefulAncestor = element;
                 }
+
                 ancestor = ancestor._parent;
             }
 
@@ -1773,6 +1799,7 @@ namespace Unity.UIWidgets.widgets {
                 if (element != null && matcher.check(ancestor.renderObject)) {
                     break;
                 }
+
                 ancestor = ancestor._parent;
             }
 
@@ -1868,7 +1895,8 @@ namespace Unity.UIWidgets.widgets {
             this.visitChildren(child => {
                 if (child != null) {
                     children.Add(child.toDiagnosticsNode());
-                } else {
+                }
+                else {
                     children.Add(DiagnosticsNode.message("<null child>"));
                 }
             });
@@ -1931,7 +1959,8 @@ namespace Unity.UIWidgets.widgets {
                     }
 
                     D.assert(this.dirty);
-                } else if (this.owner._debugStateLocked) {
+                }
+                else if (this.owner._debugStateLocked) {
                     D.assert(!this._debugAllowIgnoredCallsToMarkNeedsBuild);
                     throw new UIWidgetsError(
                         "setState() or markNeedsBuild() called when widget tree was locked.\n" +
@@ -1964,7 +1993,8 @@ namespace Unity.UIWidgets.widgets {
                     if (!this._debugBuiltOnce) {
                         Debug.Log("Building " + this);
                         this._debugBuiltOnce = true;
-                    } else {
+                    }
+                    else {
                         Debug.Log("Rebuilding " + this);
                     }
                 }
@@ -2006,7 +2036,8 @@ namespace Unity.UIWidgets.widgets {
         static string _stringify(Exception exception) {
             try {
                 return exception.ToString();
-            } catch {
+            }
+            catch {
             }
 
             return "Error";
@@ -2054,9 +2085,11 @@ namespace Unity.UIWidgets.widgets {
             try {
                 built = this.build();
                 WidgetsD.debugWidgetBuilderValue(this.widget, built);
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 built = ErrorWidget.builder(WidgetsD._debugReportException("building " + this, e));
-            } finally {
+            }
+            finally {
                 this._dirty = false;
                 D.assert(this._debugSetAllowIgnoredCallsToMarkNeedsBuild(false));
             }
@@ -2064,7 +2097,8 @@ namespace Unity.UIWidgets.widgets {
             try {
                 this._child = this.updateChild(this._child, built, this.slot);
                 D.assert(this._child != null);
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 built = ErrorWidget.builder(WidgetsD._debugReportException("building " + this, e));
                 this._child = this.updateChild(null, built, this.slot);
             }
@@ -2145,7 +2179,8 @@ namespace Unity.UIWidgets.widgets {
             try {
                 this._debugSetAllowIgnoredCallsToMarkNeedsBuild(true);
                 this._state.initState();
-            } finally {
+            }
+            finally {
                 this._debugSetAllowIgnoredCallsToMarkNeedsBuild(false);
             }
 
@@ -2171,7 +2206,8 @@ namespace Unity.UIWidgets.widgets {
             try {
                 this._debugSetAllowIgnoredCallsToMarkNeedsBuild(true);
                 this._state.didUpdateWidget(oldWidget);
-            } finally {
+            }
+            finally {
                 this._debugSetAllowIgnoredCallsToMarkNeedsBuild(false);
             }
 
@@ -2309,7 +2345,8 @@ namespace Unity.UIWidgets.widgets {
                 while (ancestor != null) {
                     if (ancestor is ParentDataElement) {
                         badAncestors.Add(ancestor.widget);
-                    } else if (ancestor is RenderObjectElement) {
+                    }
+                    else if (ancestor is RenderObjectElement) {
                         if (this.widget.debugIsValidAncestor(((RenderObjectElement) ancestor).widget)) {
                             break;
                         }
@@ -2342,7 +2379,8 @@ namespace Unity.UIWidgets.widgets {
             applyParentDataToChild = child => {
                 if (child is RenderObjectElement) {
                     ((RenderObjectElement) child)._updateParentData(widget);
-                } else {
+                }
+                else {
                     D.assert(!(child is ParentDataElement));
                     child.visitChildren(applyParentDataToChild);
                 }
@@ -2378,7 +2416,8 @@ namespace Unity.UIWidgets.widgets {
 
             if (incomingWidgets != null) {
                 this._inheritedWidgets = new Dictionary<Type, InheritedElement>(incomingWidgets);
-            } else {
+            }
+            else {
                 this._inheritedWidgets = new Dictionary<Type, InheritedElement>();
             }
 
@@ -2573,7 +2612,8 @@ namespace Unity.UIWidgets.widgets {
                     if (oldChild != null) {
                         if (oldChild.widget.key != null) {
                             oldKeyedChildren[oldChild.widget.key] = oldChild;
-                        } else {
+                        }
+                        else {
                             this.deactivateChild(oldChild);
                         }
                     }
@@ -2593,7 +2633,8 @@ namespace Unity.UIWidgets.widgets {
                         if (oldChild != null) {
                             if (Widget.canUpdate(oldChild.widget, newWidget)) {
                                 oldKeyedChildren.Remove(key);
-                            } else {
+                            }
+                            else {
                                 oldChild = null;
                             }
                         }

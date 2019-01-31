@@ -58,10 +58,29 @@ csharp_brace_style=end_of_line
 
 # don't use 'private' whenever possible
 csharp_default_private_modifier=implicit
+csharp_default_internal_modifier=implicit
 
 
 # not requirement for converting named arguments into positioned arguments whenever possible
 csharp_arguments_named=named
+
+# add braces whenever necessary
+csharp_braces_for_ifelse=required
+csharp_braces_for_for=required
+csharp_braces_for_foreach=required
+csharp_braces_for_while=required
+csharp_braces_for_dowhile=required
+csharp_braces_for_using=required
+csharp_braces_for_fixed=required
+csharp_braces_redundant=true
+
+
+# prefer block_body to expression_body
+csharp_method_or_operator_body=block_body
+csharp_local_function_body=block_body
+csharp_constructor_or_destructor_body=block_body
+csharp_accessor_owner_body=accessors_with_block_body
+
 
 
 ###################

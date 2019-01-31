@@ -107,6 +107,7 @@ namespace Unity.UIWidgets.rendering {
                 if (this._obscureText == value) {
                     return;
                 }
+
                 this._obscureText = value;
                 this.markNeedsSemanticsUpdate();
             }
@@ -321,7 +322,8 @@ namespace Unity.UIWidgets.rendering {
                 var caretOffset = this._textPainter.getOffsetForCaret(selection.extendPos, this._caretPrototype);
                 var start = new Offset(0.0, this.preferredLineHeight) + caretOffset + paintOffset;
                 return new List<TextSelectionPoint> {new TextSelectionPoint(start, null)};
-            } else {
+            }
+            else {
                 var boxes = this._textPainter.getBoxesForSelection(selection);
                 var start = new Offset(boxes[0].start, boxes[0].bottom) + paintOffset;
                 var last = boxes.Count - 1;
@@ -487,6 +489,7 @@ namespace Unity.UIWidgets.rendering {
             if (this.ignorePointer) {
                 return;
             }
+
             D.assert(this.debugHandleEvent(evt, entry));
             if (evt is PointerDownEvent && this.onSelectionChanged != null) {
                 this._tap.addPointer((PointerDownEvent) evt);
@@ -526,7 +529,7 @@ namespace Unity.UIWidgets.rendering {
                 this.onSelectionChanged(this._selectWordAtOffset(position), this, cause.Value);
             }
         }
-        
+
         protected override void performLayout() {
             this._layoutText(this.constraints.maxWidth);
             this._caretPrototype = Rect.fromLTWH(0.0, _kCaretHeightOffset, _kCaretWidth,
@@ -548,7 +551,8 @@ namespace Unity.UIWidgets.rendering {
             this._layoutText(this.constraints.maxWidth);
             if (this._hasVisualOverflow) {
                 context.pushClipRect(this.needsCompositing, offset, Offset.zero & this.size, this._paintContents);
-            } else {
+            }
+            else {
                 this._paintContents(context, offset);
             }
         }
@@ -596,7 +600,8 @@ namespace Unity.UIWidgets.rendering {
             if (this._selection != null) {
                 if (this._selection.isCollapsed && this._showCursor.value && this.cursorColor != null) {
                     this._paintCaret(context.canvas, effectiveOffset);
-                } else if (!this._selection.isCollapsed && this._selectionColor != null) {
+                }
+                else if (!this._selection.isCollapsed && this._selectionColor != null) {
                     this._selectionRects =
                         this._selectionRects ?? this._textPainter.getBoxesForSelection(this._selection);
                     this._paintSelection(context.canvas, effectiveOffset);

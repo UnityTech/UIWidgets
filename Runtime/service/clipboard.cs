@@ -28,7 +28,6 @@ namespace Unity.UIWidgets.service {
     }
 
     public class UnityGUIClipboard : Clipboard {
-
         protected override IPromise setClipboardData(ClipboardData data) {
             GUIUtility.systemCopyBuffer = data.text;
             return Promise.Resolved();

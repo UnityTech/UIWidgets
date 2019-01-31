@@ -37,6 +37,7 @@ namespace Unity.UIWidgets.gestures {
             for (int i = 0; i < a._length; i += 1) {
                 result += a[i] * b[i];
             }
+
             return result;
         }
 
@@ -126,6 +127,7 @@ namespace Unity.UIWidgets.gestures {
                 for (int h = 0; h < m; h += 1) {
                     q[j, h] = a[j, h];
                 }
+
                 for (int i = 0; i < j; i += 1) {
                     double dot = q.getRow(j) * q.getRow(i);
                     for (int h = 0; h < m; h += 1) {
@@ -143,6 +145,7 @@ namespace Unity.UIWidgets.gestures {
                 for (int h = 0; h < m; h += 1) {
                     q[j, h] = q[j, h] * inverseNorm;
                 }
+
                 for (int i = 0; i < n; i += 1) {
                     r[j, i] = i < j ? 0.0 : q.getRow(j) * a.getRow(i);
                 }
@@ -154,11 +157,13 @@ namespace Unity.UIWidgets.gestures {
             for (int h = 0; h < m; h += 1) {
                 wy[h] = this.y[h] * this.w[h];
             }
+
             for (int i = n - 1; i >= 0; i -= 1) {
                 result.coefficients[i] = q.getRow(i) * wy;
                 for (int j = n - 1; j > i; j -= 1) {
                     result.coefficients[i] -= r[i, j] * result.coefficients[j];
                 }
+
                 result.coefficients[i] /= r[i, i];
             }
 
@@ -171,6 +176,7 @@ namespace Unity.UIWidgets.gestures {
             for (int h = 0; h < m; h += 1) {
                 yMean += this.y[h];
             }
+
             yMean /= m;
 
             double sumSquaredError = 0.0;

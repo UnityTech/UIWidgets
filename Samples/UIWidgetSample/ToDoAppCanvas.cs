@@ -8,7 +8,6 @@ using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
-using Color = Unity.UIWidgets.ui.Color;
 using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace UIWidgetsSample {
@@ -115,9 +114,7 @@ namespace UIWidgetsSample {
                                 padding: EdgeInsets.all(10),
                                 child: new Text("Add", style: new TextStyle(
                                     fontSize: 20, color: Color.fromARGB(255, 255, 255, 255), fontWeight: FontWeight.w700
-                                )), onPressed: () => {
-                                   this._addItem();
-                                })
+                                )), onPressed: () => { this._addItem(); })
                         }
                     )
                 );
@@ -125,7 +122,7 @@ namespace UIWidgetsSample {
 
             void _addItem(string text = null) {
                 this.setState(() => {
-                     text = text ?? this.controller.text;
+                    text = text ?? this.controller.text;
                     if (text != "") {
                         this.items.Add(new ToDoItem()
                             {id = this.nextId++, content = text});

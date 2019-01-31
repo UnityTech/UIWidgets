@@ -438,21 +438,21 @@ namespace Unity.UIWidgets.ui {
 
         static int windingCubic(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4,
             float x, float y) {
-
             Offset[] src = {
                 new Offset(x1, y1),
                 new Offset(x2, y2),
                 new Offset(x3, y3),
                 new Offset(x4, y4),
             };
-            
+
             Offset[] dst = new Offset[10];
             int n = _chopCubicAtYExtrema(src, dst);
-            
+
             int w = 0;
             for (int i = 0; i <= n; ++i) {
                 w += _winding_mono_cubic(dst, i * 3, x, y);
             }
+
             return w;
         }
 
@@ -485,6 +485,7 @@ namespace Unity.UIWidgets.ui {
                 if (dx < minX) {
                     minX = dx;
                 }
+
                 if (dx > maxX) {
                     maxX = dx;
                 }
@@ -493,6 +494,7 @@ namespace Unity.UIWidgets.ui {
             if (x < minX) {
                 return 0;
             }
+
             if (x > maxX) {
                 return dir;
             }
@@ -514,17 +516,17 @@ namespace Unity.UIWidgets.ui {
 
         static float _eval_cubic_pts(float c0, float c1, float c2, float c3,
             float t) {
-            float A = c3 + 3*(c1 - c2) - c0;
-            float B = 3*(c2 - c1 - c1 + c0);
-            float C = 3*(c1 - c0);
+            float A = c3 + 3 * (c1 - c2) - c0;
+            float B = 3 * (c2 - c1 - c1 + c0);
+            float C = 3 * (c1 - c0);
             float D = c0;
             return _poly_eval(A, B, C, D, t);
         }
-        
+
         static float _poly_eval(float A, float B, float C, float D, float t) {
             return ((A * t + B) * t + C) * t + D;
         }
-        
+
         static bool _chopMonoAtY(Offset[] pts, int ptsBase, float y, out float t) {
             float[] ycrv = {
                 (float) pts[ptsBase + 0].dy - y,
@@ -557,6 +559,7 @@ namespace Unity.UIWidgets.ui {
                 converged = (t1 - t0).abs() <= tol; // NaN-safe
                 ++iters;
             } while (!converged && (iters < maxiters));
+
             t = t1;
 
             // The result might be valid, even if outside of the range [0, 1], but
@@ -591,6 +594,7 @@ namespace Unity.UIWidgets.ui {
                     _flatten_double_cubic_extrema(dst, 3);
                 }
             }
+
             return roots;
         }
 
@@ -631,6 +635,7 @@ namespace Unity.UIWidgets.ui {
                     D.assert(0 < tValues[i + 1] && tValues[i + 1] < 1);
                     D.assert(tValues[i] < tValues[i + 1]);
                 }
+
                 return true;
             });
 
@@ -640,7 +645,8 @@ namespace Unity.UIWidgets.ui {
                     dst[1] = src[1];
                     dst[2] = src[2];
                     dst[3] = src[3];
-                } else {
+                }
+                else {
                     float t = tValues[0];
 
                     int srcBase = 0;
@@ -683,7 +689,7 @@ namespace Unity.UIWidgets.ui {
 
         static int _valid_unit_divide(float numer, float denom, out float ratio) {
             ratio = 0;
-            
+
             if (numer < 0) {
                 numer = -numer;
                 denom = -denom;
@@ -697,6 +703,7 @@ namespace Unity.UIWidgets.ui {
             if (float.IsNaN(r)) {
                 return 0;
             }
+
             D.assert(r >= 0 && r < 1, $"numer {numer}, denom {denom}, r {r}");
             if (r == 0) {
                 // catch underflow if numer <<<< denom
@@ -713,6 +720,7 @@ namespace Unity.UIWidgets.ui {
             if (value == 0) {
                 return 0;
             }
+
             return value;
         }
 
@@ -728,6 +736,7 @@ namespace Unity.UIWidgets.ui {
             if (dr < 0) {
                 return _return_check_zero(0);
             }
+
             dr = Math.Sqrt(dr);
             float R = (float) dr;
 
@@ -743,11 +752,13 @@ namespace Unity.UIWidgets.ui {
                     float tmp = roots[0];
                     roots[0] = roots[1];
                     roots[1] = tmp;
-                } else if (roots[0] == roots[1]) {
+                }
+                else if (roots[0] == roots[1]) {
                     // nearly-equal?
                     r -= 1; // skip the double root
                 }
             }
+
             return _return_check_zero(r);
         }
     }
@@ -876,7 +887,8 @@ namespace Unity.UIWidgets.ui {
             if (this._points.Count == 0) {
                 x1 = 0;
                 y1 = 0;
-            } else {
+            }
+            else {
                 var pt = this._points.Last();
                 x1 = pt.x;
                 y1 = pt.y;
@@ -1150,7 +1162,8 @@ namespace Unity.UIWidgets.ui {
                     ip1 = path.first;
                     s = 0;
                     e = path.count;
-                } else {
+                }
+                else {
                     ip0 = path.first;
                     ip1 = path.first + 1;
                     s = 1;
@@ -1163,9 +1176,11 @@ namespace Unity.UIWidgets.ui {
                 if (!path.closed) {
                     if (lineCap == StrokeCap.butt) {
                         this._vertices.buttCapStart(p0, p0.dx, p0.dy, w, 0.0f);
-                    } else if (lineCap == StrokeCap.square) {
+                    }
+                    else if (lineCap == StrokeCap.square) {
                         this._vertices.buttCapStart(p0, p0.dx, p0.dy, w, w);
-                    } else {
+                    }
+                    else {
                         // round
                         this._vertices.roundCapStart(p0, p0.dx, p0.dy, w, ncap);
                     }
@@ -1178,10 +1193,12 @@ namespace Unity.UIWidgets.ui {
                     if ((p1.flags & (PointFlags.bevel | PointFlags.innerBevel)) != 0) {
                         if (lineJoin == StrokeJoin.round) {
                             this._vertices.roundJoin(p0, p1, w, w, ncap);
-                        } else {
+                        }
+                        else {
                             this._vertices.bevelJoin(p0, p1, w, w);
                         }
-                    } else {
+                    }
+                    else {
                         this._vertices.Add(new Vector2(p1.x + p1.dmx * w, p1.y + p1.dmy * w));
                         this._vertices.Add(new Vector2(p1.x - p1.dmx * w, p1.y - p1.dmy * w));
                     }
@@ -1194,13 +1211,16 @@ namespace Unity.UIWidgets.ui {
                     p1 = this._points[ip1];
                     if (lineCap == StrokeCap.butt) {
                         this._vertices.buttCapEnd(p1, p0.dx, p0.dy, w, 0.0f);
-                    } else if (lineCap == StrokeCap.square) {
+                    }
+                    else if (lineCap == StrokeCap.square) {
                         this._vertices.buttCapEnd(p1, p0.dx, p0.dy, w, w);
-                    } else {
+                    }
+                    else {
                         // round
                         this._vertices.roundCapEnd(p1, p0.dx, p0.dy, w, ncap);
                     }
-                } else {
+                }
+                else {
                     this._vertices.Add(this._vertices[path.istroke]);
                     this._vertices.Add(this._vertices[path.istroke + 1]);
                 }
@@ -1246,7 +1266,8 @@ namespace Unity.UIWidgets.ui {
                             indices.Add(path.istroke + j - 1);
                             indices.Add(path.istroke + j - 2);
                             indices.Add(path.istroke + j);
-                        } else {
+                        }
+                        else {
                             indices.Add(path.istroke + j - 2);
                             indices.Add(path.istroke + j - 1);
                             indices.Add(path.istroke + j);
@@ -1391,7 +1412,8 @@ namespace Unity.UIWidgets.ui {
                 y0 = p1.y - p0.dx * w;
                 x1 = p1.x + p1.dy * w;
                 y1 = p1.y - p1.dx * w;
-            } else {
+            }
+            else {
                 x0 = p1.x + p1.dmx * w;
                 y0 = p1.y + p1.dmy * w;
                 x1 = p1.x + p1.dmx * w;
@@ -1438,7 +1460,8 @@ namespace Unity.UIWidgets.ui {
 
                 dst.Add(new Vector2(lx1, ly1));
                 dst.Add(new Vector2(p1.x - dlx1 * rw, p1.y - dly1 * rw));
-            } else {
+            }
+            else {
                 float rx0, ry0, rx1, ry1;
                 chooseBevel((p1.flags & PointFlags.innerBevel) != 0, p0, p1, -rw,
                     out rx0, out ry0, out rx1, out ry1);
@@ -1490,7 +1513,8 @@ namespace Unity.UIWidgets.ui {
                     dst.Add(new Vector2(p1.x - dlx0 * rw, p1.y - dly0 * rw));
                     dst.Add(new Vector2(lx1, ly1));
                     dst.Add(new Vector2(p1.x - dlx1 * rw, p1.y - dly1 * rw));
-                } else {
+                }
+                else {
                     rx0 = p1.x - p1.dmx * rw;
                     ry0 = p1.y - p1.dmy * rw;
                     dst.Add(new Vector2(p1.x, p1.y));
@@ -1503,7 +1527,8 @@ namespace Unity.UIWidgets.ui {
 
                 dst.Add(new Vector2(lx1, ly1));
                 dst.Add(new Vector2(p1.x - dlx1 * rw, p1.y - dly1 * rw));
-            } else {
+            }
+            else {
                 chooseBevel((p1.flags & PointFlags.innerBevel) != 0, p0, p1, -rw,
                     out rx0, out ry0, out rx1, out ry1);
 
@@ -1515,7 +1540,8 @@ namespace Unity.UIWidgets.ui {
                     dst.Add(new Vector2(rx0, ry0));
                     dst.Add(new Vector2(p1.x + dlx1 * lw, p1.y + dly1 * lw));
                     dst.Add(new Vector2(rx1, ry1));
-                } else {
+                }
+                else {
                     lx0 = p1.x + p1.dmx * lw;
                     ly0 = p1.y + p1.dmy * lw;
                     dst.Add(new Vector2(p1.x + dlx0 * lw, p1.y + dly0 * lw));
@@ -1567,37 +1593,45 @@ namespace Unity.UIWidgets.ui {
 
         public MeshMesh(List<Vector3> vertices, List<int> triangles, List<Vector2> uv = null) {
             D.assert(vertices != null);
-            D.assert(vertices.Count > 0);
+            D.assert(vertices.Count >= 0);
             D.assert(triangles != null);
-            D.assert(triangles.Count > 0);
+            D.assert(triangles.Count >= 0);
             D.assert(uv == null || uv.Count == vertices.Count);
 
             this.vertices = vertices;
             this.triangles = triangles;
             this.uv = uv;
 
-            double minX = vertices[0].x;
-            double maxX = vertices[0].x;
-            double minY = vertices[0].y;
-            double maxY = vertices[0].y;
+            if (vertices.Count > 0) {
+                double minX = vertices[0].x;
+                double maxX = vertices[0].x;
+                double minY = vertices[0].y;
+                double maxY = vertices[0].y;
 
-            for (int i = 1; i < vertices.Count; i++) {
-                var vertex = vertices[i];
-                if (vertex.x < minX) {
-                    minX = vertex.x;
+                for (int i = 1; i < vertices.Count; i++) {
+                    var vertex = vertices[i];
+                    if (vertex.x < minX) {
+                        minX = vertex.x;
+                    }
+
+                    if (vertex.x > maxX) {
+                        maxX = vertex.x;
+                    }
+
+                    if (vertex.y < minY) {
+                        minY = vertex.y;
+                    }
+
+                    if (vertex.y > maxY) {
+                        maxY = vertex.y;
+                    }
                 }
-                if (vertex.x > maxX) {
-                    maxX = vertex.x;
-                }
-                if (vertex.y < minY) {
-                    minY = vertex.y;
-                }
-                if (vertex.y > maxY) {
-                    maxY = vertex.y;
-                }
+
+                this.bounds = Rect.fromLTRB(minX, minY, maxX, maxY);
             }
-
-            this.bounds = Rect.fromLTRB(minX, minY, maxX, maxY);
+            else {
+                this.bounds = Rect.zero;
+            }
         }
 
         public MeshMesh transform(float[] xform) {
@@ -1621,7 +1655,8 @@ namespace Unity.UIWidgets.ui {
                 var mesh = this._pool.Dequeue();
                 D.assert(mesh);
                 return mesh;
-            } else {
+            }
+            else {
                 var mesh = new Mesh();
                 mesh.hideFlags = HideFlags.HideAndDontSave;
                 return mesh;
@@ -1637,6 +1672,7 @@ namespace Unity.UIWidgets.ui {
             foreach (var mesh in this._pool) {
                 ObjectUtils.SafeDestroy(mesh);
             }
+
             this._pool.Clear();
         }
     }

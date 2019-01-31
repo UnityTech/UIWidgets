@@ -67,7 +67,8 @@ namespace Unity.UIWidgets.foundation {
             assert(() => {
                 if (innerRect != null && !innerRect.isEmpty) {
                     _debugDrawDoubleRect(canvas, outerRect, innerRect, new Color(0x900090FF));
-                } else {
+                }
+                else {
                     _debugDrawDoubleRect(canvas, innerRect.inflate(outlineWidth).intersect(outerRect), innerRect,
                         new Color(0xFF0090FF));
                     Paint paint = new Paint();

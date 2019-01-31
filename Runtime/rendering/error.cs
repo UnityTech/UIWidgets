@@ -9,6 +9,7 @@ namespace Unity.UIWidgets.rendering {
             if (message == "") {
                 return;
             }
+
             ParagraphBuilder builder = new ParagraphBuilder(paragraphStyle);
             builder.pushStyle(textStyle);
             builder.addText(

@@ -74,7 +74,8 @@ namespace Unity.UIWidgets.debugger {
 
             if (result != null && result.diagnosticRef == previousSelectionRef) {
                 return previousSelection;
-            } else {
+            }
+            else {
                 return result;
             }
         }

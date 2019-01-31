@@ -26,7 +26,8 @@ namespace Unity.UIWidgets.painting {
                 this._maximumSize = value;
                 if (this._maximumSize == 0) {
                     this.clear();
-                } else {
+                }
+                else {
                     this._checkCacheSize();
                 }
             }
@@ -49,7 +50,8 @@ namespace Unity.UIWidgets.painting {
                 this._maximumSizeBytes = value;
                 if (this._maximumSizeBytes == 0) {
                     this.clear();
-                } else {
+                }
+                else {
                     this._checkCacheSize();
                 }
             }

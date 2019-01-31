@@ -248,7 +248,14 @@ namespace Unity.UIWidgets.editor {
 
         void _doOnGUI(Event evt) {
             if (evt.type == EventType.Repaint) {
-                this._beginFrame();
+                if (this._regenerateLayerTree) {
+                    this._regenerateLayerTree = false;
+                    this._beginFrame();
+                }
+                else {
+                    this._rasterizer.drawLastLayerTree();
+                }
+
                 return;
             }
 
@@ -264,7 +271,8 @@ namespace Unity.UIWidgets.editor {
                         physicalX: evt.mousePosition.x * this._devicePixelRatio,
                         physicalY: evt.mousePosition.y * this._devicePixelRatio
                     );
-                } else if (evt.type == EventType.MouseUp || evt.rawType == EventType.MouseUp) {
+                }
+                else if (evt.type == EventType.MouseUp || evt.rawType == EventType.MouseUp) {
                     pointerData = new PointerData(
                         timeStamp: Timer.timespanSinceStartup,
                         change: PointerChange.up,
@@ -273,7 +281,8 @@ namespace Unity.UIWidgets.editor {
                         physicalX: evt.mousePosition.x * this._devicePixelRatio,
                         physicalY: evt.mousePosition.y * this._devicePixelRatio
                     );
-                } else if (evt.type == EventType.MouseDrag) {
+                }
+                else if (evt.type == EventType.MouseDrag) {
                     pointerData = new PointerData(
                         timeStamp: Timer.timespanSinceStartup,
                         change: PointerChange.move,
@@ -282,7 +291,8 @@ namespace Unity.UIWidgets.editor {
                         physicalX: evt.mousePosition.x * this._devicePixelRatio,
                         physicalY: evt.mousePosition.y * this._devicePixelRatio
                     );
-                } else if (evt.type == EventType.MouseMove) {
+                }
+                else if (evt.type == EventType.MouseMove) {
                     pointerData = new PointerData(
                         timeStamp: Timer.timespanSinceStartup,
                         change: PointerChange.hover,

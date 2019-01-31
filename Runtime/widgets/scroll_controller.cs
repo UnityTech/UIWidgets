@@ -123,9 +123,11 @@ namespace Unity.UIWidgets.widgets {
 
             if (this._positions.isEmpty()) {
                 description.Add("no clients");
-            } else if (this._positions.Count == 1) {
+            }
+            else if (this._positions.Count == 1) {
                 description.Add($"one client, offset {this.offset:F1}");
-            } else {
+            }
+            else {
                 description.Add(this._positions.Count + " clients");
             }
         }

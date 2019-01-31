@@ -49,7 +49,8 @@ namespace Unity.UIWidgets.gestures {
             if (evt is PointerUpEvent) {
                 this._finalPosition = evt.position;
                 this._checkUp();
-            } else if (evt is PointerCancelEvent) {
+            }
+            else if (evt is PointerCancelEvent) {
                 this._reset();
             }
         }
@@ -104,6 +105,7 @@ namespace Unity.UIWidgets.gestures {
                         return null;
                     });
                 }
+
                 this._sentTapDown = true;
             }
         }
@@ -121,6 +123,7 @@ namespace Unity.UIWidgets.gestures {
                         return null;
                     });
                 }
+
                 if (this.onTap != null) {
                     this.invokeCallback<object>("onTap", () => {
                         this.onTap();

@@ -67,6 +67,7 @@ namespace Unity.UIWidgets.gestures {
                             // a hover event to be here.
                             state.lastPosition = position;
                         }
+
                         state.startNewPointer();
                         state.setDown();
                         yield return new PointerDownEvent(
@@ -83,12 +84,14 @@ namespace Unity.UIWidgets.gestures {
                         if (!alreadyAdded) {
                             break;
                         }
+
                         D.assert(_pointers.ContainsKey(datum.device));
 
                         _PointerState state = _pointers[datum.device];
                         if (!state.down) {
                             break;
                         }
+
                         D.assert(state.down);
 
                         Offset offset = position - state.lastPosition;
@@ -142,7 +145,8 @@ namespace Unity.UIWidgets.gestures {
                                 device: datum.device,
                                 position: position
                             );
-                        } else {
+                        }
+                        else {
                             yield return new PointerCancelEvent(
                                 timeStamp: timeStamp,
                                 pointer: state.pointer,

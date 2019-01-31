@@ -28,9 +28,11 @@ namespace Unity.UIWidgets.ui {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return this.x2.Equals(other.x2) && this.y2.Equals(other.y2) && this.x3.Equals(other.x3) &&
                    this.y3.Equals(other.y3) && this.x4.Equals(other.x4) && this.y4.Equals(other.y4) &&
                    this.tessTol.Equals(other.tessTol);
@@ -40,12 +42,15 @@ namespace Unity.UIWidgets.ui {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((TessellationKey) obj);
         }
 
@@ -152,6 +157,7 @@ namespace Unity.UIWidgets.ui {
                     y = point.y + y1,
                 });
             }
+
             return pathPoints;
         }
 

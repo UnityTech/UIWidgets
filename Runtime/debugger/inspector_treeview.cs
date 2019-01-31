@@ -82,8 +82,10 @@ namespace Unity.UIWidgets.debugger {
                     var color = new Color(red / 255.0f, green / 255.0f, blue / 255.0f, alpha / 255.0f);
                     Util.DrawColorIcon(new Rect(xoffset, rect.yMin, rect.height, rect.height), color);
                 }
+
                 xoffset += iconSize;
             }
+
             this.labelGUI(xoffset, rect, node.description.Replace("\n", " "));
         }
 
@@ -162,7 +164,8 @@ namespace Unity.UIWidgets.debugger {
 
                 if (i + 1 < fields.Count) {
                     obj = fieldInfo.GetValue(obj);
-                } else {
+                }
+                else {
                     fieldInfo.SetValue(obj, value);
                 }
             }

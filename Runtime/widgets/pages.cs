@@ -11,9 +11,13 @@ namespace Unity.UIWidgets.widgets {
             this.fullscreenDialog = fullscreenDialog;
         }
 
-        public override bool opaque => false;
+        public override bool opaque {
+            get { return false; }
+        }
 
-        public override bool barrierDismissible => false;
+        public override bool barrierDismissible {
+            get { return false; }
+        }
 
         public override bool canTransitionTo(TransitionRoute nextRoute) {
             return nextRoute is PageRoute;
@@ -25,8 +29,10 @@ namespace Unity.UIWidgets.widgets {
 
         public override AnimationController createAnimationController() {
             var controller = base.createAnimationController();
-            if (this.settings.isInitialRoute)
+            if (this.settings.isInitialRoute) {
                 controller.setValue(1.0);
+            }
+
             return controller;
         }
     }

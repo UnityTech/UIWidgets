@@ -16,12 +16,12 @@ namespace Unity.UIWidgets.material {
             new _MaterialTextSelectionControls();
     }
 
-    internal static class _TextSelectionUtils {
+    static class _TextSelectionUtils {
         internal const double _kHandleSize = 22.0;
         internal const double _kToolbarScreenPadding = 8.0;
     }
 
-    internal class _TextSelectionToolbar : StatelessWidget {
+    class _TextSelectionToolbar : StatelessWidget {
         public _TextSelectionToolbar(Key key = null, Action handleCut = null,
             Action handleCopy = null, Action handlePaste = null, Action handleSelectAll = null) : base(key: key) {
             this.handleCut = handleCut;
@@ -59,7 +59,7 @@ namespace Unity.UIWidgets.material {
         }
     }
 
-    internal class _TextSelectionToolbarLayout : SingleChildLayoutDelegate {
+    class _TextSelectionToolbarLayout : SingleChildLayoutDelegate {
         internal _TextSelectionToolbarLayout(Size screenSize = null, Rect globalEditableRegion = null,
             Offset position = null) {
             this.screenSize = screenSize;
@@ -81,15 +81,19 @@ namespace Unity.UIWidgets.material {
             double x = globalPosition.dx - childSize.width / 2.0;
             double y = globalPosition.dy - childSize.height;
 
-            if (x < _TextSelectionUtils._kToolbarScreenPadding)
+            if (x < _TextSelectionUtils._kToolbarScreenPadding) {
                 x = _TextSelectionUtils._kToolbarScreenPadding;
-            else if (x + childSize.width > this.screenSize.width - _TextSelectionUtils._kToolbarScreenPadding)
+            }
+            else if (x + childSize.width > this.screenSize.width - _TextSelectionUtils._kToolbarScreenPadding) {
                 x = this.screenSize.width - childSize.width - _TextSelectionUtils._kToolbarScreenPadding;
+            }
 
-            if (y < _TextSelectionUtils._kToolbarScreenPadding)
+            if (y < _TextSelectionUtils._kToolbarScreenPadding) {
                 y = _TextSelectionUtils._kToolbarScreenPadding;
-            else if (y + childSize.height > this.screenSize.height - _TextSelectionUtils._kToolbarScreenPadding)
+            }
+            else if (y + childSize.height > this.screenSize.height - _TextSelectionUtils._kToolbarScreenPadding) {
                 y = this.screenSize.height - childSize.height - _TextSelectionUtils._kToolbarScreenPadding;
+            }
 
             return new Offset(x, y);
         }
@@ -99,7 +103,7 @@ namespace Unity.UIWidgets.material {
         }
     }
 
-    internal class _TextSelectionHandlePainter : CustomPainter {
+    class _TextSelectionHandlePainter : AbstractCustomPainter {
         internal _TextSelectionHandlePainter(Color color) {
             this.color = color;
         }
@@ -120,10 +124,12 @@ namespace Unity.UIWidgets.material {
         }
     }
 
-    internal class _MaterialTextSelectionControls : TextSelectionControls {
+    class _MaterialTextSelectionControls : TextSelectionControls {
         public override Size handleSize {
-            get => new Size(_TextSelectionUtils._kHandleSize,
-                _TextSelectionUtils._kHandleSize);
+            get {
+                return new Size(_TextSelectionUtils._kHandleSize,
+                    _TextSelectionUtils._kHandleSize);
+            }
         }
 
         public override Widget buildToolbar(BuildContext context, Rect globalEditableRegion, Offset position,

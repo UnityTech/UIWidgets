@@ -66,7 +66,9 @@ namespace Unity.UIWidgets.widgets {
             this.child = child;
         }
 
-        public Animation<Offset> position => (Animation<Offset>) this.listenable;
+        public Animation<Offset> position {
+            get { return (Animation<Offset>) this.listenable; }
+        }
 
         public readonly TextDirection? textDirection;
 
@@ -76,8 +78,10 @@ namespace Unity.UIWidgets.widgets {
 
         protected internal override Widget build(BuildContext context) {
             var offset = this.position.value;
-            if (this.textDirection == TextDirection.rtl)
+            if (this.textDirection == TextDirection.rtl) {
                 offset = new Offset(-offset.dx, offset.dy);
+            }
+
             return new FractionalTranslation(
                 translation: offset,
                 transformHitTests: this.transformHitTests,

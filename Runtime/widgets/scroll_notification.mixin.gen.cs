@@ -2,8 +2,6 @@ using System.Collections.Generic;
 using Unity.UIWidgets.rendering;
 
 namespace Unity.UIWidgets.widgets {
-
- 
     public abstract class ViewportNotificationMixinNotification : Notification {
         public int depth {
             get { return this._depth; }
@@ -27,7 +25,6 @@ namespace Unity.UIWidgets.widgets {
     }
 
 
- 
     public abstract class ViewportNotificationMixinLayoutChangedNotification : LayoutChangedNotification {
         public int depth {
             get { return this._depth; }
@@ -49,5 +46,4 @@ namespace Unity.UIWidgets.widgets {
                 this._depth, this._depth == 0 ? "local" : "remote"));
         }
     }
-
 }

@@ -52,9 +52,11 @@ namespace Unity.UIWidgets.service {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return this.start == other.start && this.end == other.end;
         }
 
@@ -62,12 +64,15 @@ namespace Unity.UIWidgets.service {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((TextRange) obj);
         }
 
@@ -133,9 +138,11 @@ namespace Unity.UIWidgets.service {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return this.baseOffset == other.baseOffset && this.extentOffset == other.extentOffset &&
                    this.affinity == other.affinity && this.isDirectional == other.isDirectional;
         }
@@ -144,12 +151,15 @@ namespace Unity.UIWidgets.service {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((TextSelection) obj);
         }
 

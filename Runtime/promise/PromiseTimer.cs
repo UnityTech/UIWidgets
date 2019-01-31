@@ -186,7 +186,8 @@ namespace RSG {
                 bool result;
                 try {
                     result = wait.predicate(wait.timeData);
-                } catch (Exception ex) {
+                }
+                catch (Exception ex) {
                     wait.pendingPromise.Reject(ex);
 
                     node = this.RemoveNode(node);
@@ -197,7 +198,8 @@ namespace RSG {
                     wait.pendingPromise.Resolve();
 
                     node = this.RemoveNode(node);
-                } else {
+                }
+                else {
                     node = node.Next;
                 }
             }

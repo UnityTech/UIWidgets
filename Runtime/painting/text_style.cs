@@ -113,6 +113,59 @@ namespace Unity.UIWidgets.painting {
             );
         }
 
+
+        public TextStyle apply(
+            Color color = null,
+            TextDecoration decoration = null,
+            Color decorationColor = null,
+            TextDecorationStyle? decorationStyle = null,
+            string fontFamily = null,
+            double fontSizeFactor = 1.0,
+            double fontSizeDelta = 0.0,
+            int fontWeightDelta = 0,
+            double letterSpacingFactor = 1.0,
+            double letterSpacingDelta = 0.0,
+            double wordSpacingFactor = 1.0,
+            double wordSpacingDelta = 0.0,
+            double heightFactor = 1.0,
+            double heightDelta = 0.0
+        ) {
+            D.assert(this.fontSize != null || (fontSizeFactor == 1.0 && fontSizeDelta == 0.0));
+            D.assert(this.fontWeight != null || fontWeightDelta == 0.0);
+            D.assert(this.letterSpacing != null || (letterSpacingFactor == 1.0 && letterSpacingDelta == 0.0));
+            D.assert(this.wordSpacing != null || (wordSpacingFactor == 1.0 && wordSpacingDelta == 0.0));
+            D.assert(this.height != null || (heightFactor == 1.0 && heightDelta == 0.0));
+
+            string modifiedDebugLabel = "";
+            D.assert(() => {
+                if (this.debugLabel != null) {
+                    modifiedDebugLabel = this.debugLabel + ".apply";
+                }
+
+                return true;
+            });
+
+            return new TextStyle(
+                inherit: this.inherit,
+                color: color ?? this.color,
+                fontFamily: fontFamily ?? this.fontFamily,
+                fontSize: this.fontSize == null ? null : this.fontSize * fontSizeFactor + fontSizeDelta,
+                fontWeight: this.fontWeight == null ? null : this.fontWeight,
+                fontStyle: this.fontStyle,
+                letterSpacing: this.letterSpacing == null
+                    ? null
+                    : this.letterSpacing * letterSpacingFactor + letterSpacingDelta,
+                wordSpacing: this.wordSpacing == null ? null : this.wordSpacing * wordSpacingFactor + wordSpacingDelta,
+                textBaseline: this.textBaseline,
+                height: this.height == null ? null : this.height * heightFactor + heightDelta,
+                background: this.background,
+                decoration: decoration ?? this.decoration,
+                decorationColor: decorationColor ?? this.decorationColor,
+                decorationStyle: decorationStyle ?? this.decorationStyle,
+                debugLabel: modifiedDebugLabel
+            );
+        }
+
         public TextStyle merge(TextStyle other) {
             if (other == null) {
                 return this;
@@ -149,13 +202,13 @@ namespace Unity.UIWidgets.painting {
             );
         }
 
-        public TextStyle copyWith(Color color,
-            string fontFamily,
-            double? fontSize,
-            FontWeight? fontWeight,
-            FontStyle? fontStyle,
-            double? letterSpacing,
-            double? wordSpacing,
+        public TextStyle copyWith(Color color = null,
+            string fontFamily = null,
+            double? fontSize = null,
+            FontWeight? fontWeight = null,
+            FontStyle? fontStyle = null,
+            double? letterSpacing = null,
+            double? wordSpacing = null,
             TextBaseline? textBaseline = null,
             double? height = null,
             Paint background = null,
@@ -188,6 +241,80 @@ namespace Unity.UIWidgets.painting {
                 decorationStyle: decorationStyle ?? this.decorationStyle,
                 background: background ?? this.background,
                 debugLabel: newDebugLabel
+            );
+        }
+
+        public static TextStyle lerp(TextStyle a, TextStyle b, double t) {
+            D.assert(a == null || b == null || a.inherit == b.inherit);
+            if (a == null && b == null) {
+                return null;
+            }
+
+            string lerpDebugLabel = "";
+            D.assert(() => {
+                lerpDebugLabel = "lerp" + (a?.debugLabel ?? _kDefaultDebugLabel) + "-" + t + "-" +
+                                 (b?.debugLabel ?? _kDefaultDebugLabel);
+                return true;
+            });
+
+            if (a == null) {
+                return new TextStyle(
+                    inherit: b.inherit,
+                    color: Color.lerp(null, b.color, t),
+                    fontFamily: t < 0.5 ? null : b.fontFamily,
+                    fontSize: t < 0.5 ? null : b.fontSize,
+                    fontWeight: t < 0.5 ? null : b.fontWeight,
+                    fontStyle: t < 0.5 ? null : b.fontStyle,
+                    letterSpacing: t < 0.5 ? null : b.letterSpacing,
+                    wordSpacing: t < 0.5 ? null : b.wordSpacing,
+                    textBaseline: t < 0.5 ? null : b.textBaseline,
+                    height: t < 0.5 ? null : b.height,
+                    background: t < 0.5 ? null : b.background,
+                    decoration: t < 0.5 ? null : b.decoration,
+                    decorationColor: Color.lerp(null, b.decorationColor, t),
+                    decorationStyle: t < 0.5 ? null : b.decorationStyle,
+                    debugLabel: lerpDebugLabel
+                );
+            }
+
+            if (b == null) {
+                return new TextStyle(
+                    inherit: a.inherit,
+                    color: Color.lerp(a.color, null, t),
+                    fontFamily: t < 0.5 ? a.fontFamily : null,
+                    fontSize: t < 0.5 ? a.fontSize : null,
+                    fontWeight: t < 0.5 ? a.fontWeight : null,
+                    fontStyle: t < 0.5 ? a.fontStyle : null,
+                    letterSpacing: t < 0.5 ? a.letterSpacing : null,
+                    wordSpacing: t < 0.5 ? a.wordSpacing : null,
+                    textBaseline: t < 0.5 ? a.textBaseline : null,
+                    height: t < 0.5 ? a.height : null,
+                    background: t < 0.5 ? a.background : null,
+                    decoration: t < 0.5 ? a.decoration : null,
+                    decorationColor: Color.lerp(a.decorationColor, null, t),
+                    decorationStyle: t < 0.5 ? a.decorationStyle : null,
+                    debugLabel: lerpDebugLabel
+                );
+            }
+
+            return new TextStyle(
+                inherit: b.inherit,
+                color: Color.lerp(a.color, b.color, t),
+                fontFamily: t < 0.5 ? a.fontFamily : b.fontFamily,
+                fontSize: MathUtils.lerpNullableDouble(a.fontSize ?? b.fontSize, b.fontSize ?? a.fontSize, t),
+                fontWeight: t < 0.5 ? a.fontWeight : b.fontWeight,
+                fontStyle: t < 0.5 ? a.fontStyle : b.fontStyle,
+                letterSpacing: MathUtils.lerpNullableDouble(a.letterSpacing ?? b.letterSpacing,
+                    b.letterSpacing ?? a.letterSpacing, t),
+                wordSpacing: MathUtils.lerpNullableDouble(a.wordSpacing ?? b.wordSpacing,
+                    b.wordSpacing ?? a.wordSpacing, t),
+                textBaseline: t < 0.5 ? a.textBaseline : b.textBaseline,
+                height: MathUtils.lerpNullableDouble(a.height ?? b.height, b.height ?? a.height, t),
+                background: t < 0.5 ? a.background : b.background,
+                decoration: t < 0.5 ? a.decoration : b.decoration,
+                decorationColor: Color.lerp(a.decorationColor, b.decorationColor, t),
+                decorationStyle: t < 0.5 ? a.decorationStyle : b.decorationStyle,
+                debugLabel: lerpDebugLabel
             );
         }
 
@@ -249,6 +376,7 @@ namespace Unity.UIWidgets.painting {
                 if (this.decoration != null) {
                     decorationDescription.Add("$decoration");
                 }
+
                 D.assert(decorationDescription.isNotEmpty);
                 styles.Add(new MessageProperty("decoration", string.Join(" ", decorationDescription.ToArray())));
             }
@@ -270,9 +398,11 @@ namespace Unity.UIWidgets.painting {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return this.inherit == other.inherit && Equals(this.color, other.color) &&
                    this.fontSize.Equals(other.fontSize) && this.fontWeight == other.fontWeight &&
                    this.fontStyle == other.fontStyle && this.letterSpacing.Equals(other.letterSpacing) &&
@@ -288,12 +418,15 @@ namespace Unity.UIWidgets.painting {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((TextStyle) obj);
         }
 

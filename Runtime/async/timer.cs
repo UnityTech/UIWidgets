@@ -54,7 +54,8 @@ namespace Unity.UIWidgets.async {
             foreach (var callback in callbacks) {
                 try {
                     callback();
-                } catch (Exception ex) {
+                }
+                catch (Exception ex) {
                     Debug.LogError("Error to execute runInMain callback: " + ex);
                 }
             }
@@ -74,15 +75,17 @@ namespace Unity.UIWidgets.async {
             lock (this._queue) {
                 this._queue.enqueue(timer);
             }
+
             return timer;
         }
-        
+
         public Timer run(TimeSpan duration, Action callback) {
             var timer = new TimerImpl(duration, callback);
 
             lock (this._queue) {
                 this._queue.enqueue(timer);
             }
+
             return timer;
         }
 
@@ -92,6 +95,7 @@ namespace Unity.UIWidgets.async {
             lock (this._queue) {
                 this._queue.enqueue(timer);
             }
+
             return timer;
         }
 
@@ -133,7 +137,7 @@ namespace Unity.UIWidgets.async {
                 lock (this._queue) {
                     foreach (var timer in appendList) {
                         this._queue.enqueue(timer);
-                    }                    
+                    }
                 }
             }
         }
@@ -156,7 +160,7 @@ namespace Unity.UIWidgets.async {
                     this._interval = duration;
                 }
             }
-            
+
             public TimerImpl(Action callback) {
                 this._deadline = 0;
                 this._callback = callback;
@@ -187,7 +191,8 @@ namespace Unity.UIWidgets.async {
 
                 try {
                     this._callback();
-                } catch (Exception ex) {
+                }
+                catch (Exception ex) {
                     Debug.LogError("Error to execute timer callback: " + ex);
                 }
 

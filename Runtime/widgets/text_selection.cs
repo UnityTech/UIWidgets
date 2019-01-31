@@ -15,7 +15,7 @@ namespace Unity.UIWidgets.widgets {
         collapsed,
     }
 
-    internal enum _TextSelectionHandlePosition {
+    enum _TextSelectionHandlePosition {
         start,
         end
     }
@@ -89,8 +89,8 @@ namespace Unity.UIWidgets.widgets {
                             offset: value.selection.start + data.text.Length
                         )
                     );
-
                 }
+
                 selectionDelegate.bringIntoView(selectionDelegate.textEditingValue.selection.extendPos);
                 selectionDelegate.hideToolbar();
             });
@@ -109,14 +109,12 @@ namespace Unity.UIWidgets.widgets {
     }
 
     public class TextSelectionOverlay {
-
         public TextSelectionOverlay(TextEditingValue value = null,
             BuildContext context = null, Widget debugRequiredFor = null,
             LayerLink layerLink = null,
             RenderEditable renderObject = null,
             TextSelectionControls selectionControls = null,
             TextSelectionDelegate selectionDelegate = null) {
-
             D.assert(value != null);
             D.assert(context != null);
             this.context = context;
@@ -131,7 +129,7 @@ namespace Unity.UIWidgets.widgets {
             this._handleController = new AnimationController(duration: _fadeDuration, vsync: overlay);
             this._toolbarController = new AnimationController(duration: _fadeDuration, vsync: overlay);
         }
-        
+
         public readonly BuildContext context;
         public readonly Widget debugRequiredFor;
         public readonly LayerLink layerLink;
@@ -143,8 +141,13 @@ namespace Unity.UIWidgets.widgets {
         AnimationController _handleController;
         AnimationController _toolbarController;
 
-        Animation<double> _handleOpacity => this._handleController.view;
-        Animation<double> _toolbarOpacity => this._toolbarController.view;
+        Animation<double> _handleOpacity {
+            get { return this._handleController.view; }
+        }
+
+        Animation<double> _toolbarOpacity {
+            get { return this._toolbarController.view; }
+        }
 
         TextEditingValue _value;
 
@@ -152,7 +155,9 @@ namespace Unity.UIWidgets.widgets {
 
         OverlayEntry _toolbar;
 
-        TextSelection _selection => this._value.selection;
+        TextSelection _selection {
+            get { return this._value.selection; }
+        }
 
         public void showHandles() {
             D.assert(this._handles == null);
@@ -174,8 +179,10 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public void update(TextEditingValue newValue) {
-            if (this._value == newValue)
+            if (this._value == newValue) {
                 return;
+            }
+
             this._value = newValue;
             if (SchedulerBinding.instance.schedulerPhase == SchedulerPhase.persistentCallbacks) {
                 SchedulerBinding.instance.addPostFrameCallback((duration) => this._markNeedsBuild());
@@ -198,10 +205,14 @@ namespace Unity.UIWidgets.widgets {
             this._toolbar?.markNeedsBuild();
         }
 
-        public bool handlesAreVisible => this._handles != null;
+        public bool handlesAreVisible {
+            get { return this._handles != null; }
+        }
 
 
-        public bool toolbarIsVisible => this._toolbar != null;
+        public bool toolbarIsVisible {
+            get { return this._toolbar != null; }
+        }
 
         public void hide() {
             if (this._handles != null) {
@@ -225,8 +236,9 @@ namespace Unity.UIWidgets.widgets {
 
         Widget _buildHandle(BuildContext context, _TextSelectionHandlePosition position) {
             if ((this._selection.isCollapsed && position == _TextSelectionHandlePosition.end) ||
-                this.selectionControls == null)
+                this.selectionControls == null) {
                 return new Container(); // hide the second handle when collapsed
+            }
 
             return new FadeTransition(
                 opacity: this._handleOpacity,
@@ -245,8 +257,9 @@ namespace Unity.UIWidgets.widgets {
         }
 
         Widget _buildToolbar(BuildContext context) {
-            if (this.selectionControls == null)
+            if (this.selectionControls == null) {
                 return new Container();
+            }
 
             // Find the horizontal midpoint, just above the selected text.
             List<TextSelectionPoint> endpoints = this.renderObject.getEndpointsForSelection(this._selection);
@@ -299,7 +312,7 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
-    internal class _TextSelectionHandleOverlay : StatefulWidget {
+    class _TextSelectionHandleOverlay : StatefulWidget {
         internal _TextSelectionHandleOverlay(
             Key key = null,
             TextSelection selection = null,
@@ -333,7 +346,7 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
-    internal class _TextSelectionHandleOverlayState : State<_TextSelectionHandleOverlay> {
+    class _TextSelectionHandleOverlayState : State<_TextSelectionHandleOverlay> {
         Offset _dragPosition;
 
         void _handleDragStart(DragStartDetails details) {
@@ -366,8 +379,9 @@ namespace Unity.UIWidgets.widgets {
                     break;
             }
 
-            if (newSelection.baseOffset >= newSelection.extentOffset)
+            if (newSelection.baseOffset >= newSelection.extentOffset) {
                 return; // don't allow order swapping.
+            }
 
             this.widget.onSelectionHandleChanged(newSelection);
         }
@@ -421,8 +435,9 @@ namespace Unity.UIWidgets.widgets {
             TextSelectionHandleType ltrType,
             TextSelectionHandleType rtlType
         ) {
-            if (this.widget.selection.isCollapsed)
+            if (this.widget.selection.isCollapsed) {
                 return TextSelectionHandleType.collapsed;
+            }
 
             D.assert(endpoint.direction != null);
             switch (endpoint.direction) {

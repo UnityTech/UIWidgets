@@ -70,8 +70,9 @@ namespace Unity.UIWidgets.painting {
             if (a == null) {
                 return this.scale(t);
             }
+
             if (a is BoxDecoration boxDecoration) {
-                return BoxDecoration.lerp(boxDecoration, this, t);
+                return lerp(boxDecoration, this, t);
             }
 
             return base.lerpFrom(a, t);
@@ -81,9 +82,11 @@ namespace Unity.UIWidgets.painting {
             if (b == null) {
                 return this.scale(1.0 - t);
             }
+
             if (b is BoxDecoration boxDecoration) {
-                return BoxDecoration.lerp(this, boxDecoration, t);
+                return lerp(this, boxDecoration, t);
             }
+
             return base.lerpTo(b, t);
         }
 
@@ -91,6 +94,7 @@ namespace Unity.UIWidgets.painting {
             if (a == null && b == null) {
                 return null;
             }
+
             if (a == null) {
                 return b.scale(t);
             }
@@ -98,9 +102,11 @@ namespace Unity.UIWidgets.painting {
             if (b == null) {
                 return a.scale(1.0 - t);
             }
+
             if (t == 0.0) {
                 return a;
             }
+
             if (t == 1.0) {
                 return b;
             }
@@ -121,9 +127,11 @@ namespace Unity.UIWidgets.painting {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return Equals(this.color, other.color) && Equals(this.image, other.image) &&
                    Equals(this.border, other.border) && Equals(this.borderRadius, other.borderRadius) &&
                    Equals(this.boxShadow, other.boxShadow) && Equals(this.gradient, other.gradient) &&
@@ -134,12 +142,15 @@ namespace Unity.UIWidgets.painting {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((BoxDecoration) obj);
         }
 
@@ -194,12 +205,14 @@ namespace Unity.UIWidgets.painting {
                         RRect bounds = this.borderRadius.toRRect(Offset.zero & size);
                         return bounds.contains(position);
                     }
+
                     return true;
                 case BoxShape.circle:
                     Offset center = size.center(Offset.zero);
                     double distance = (position - center).distance;
                     return distance <= Math.Min(size.width, size.height) / 2.0;
             }
+
             return false;
         }
 
@@ -232,9 +245,11 @@ namespace Unity.UIWidgets.painting {
                 if (this._decoration.backgroundBlendMode != null) {
                     paint.blendMode = this._decoration.backgroundBlendMode.Value;
                 }
+
                 if (this._decoration.color != null) {
                     paint.color = this._decoration.color;
                 }
+
                 if (this._decoration.gradient != null) {
                     //paint.shader = this._decoration.gradient.createShader(rect);
                     this._rectForCachedBackgroundPaint = rect;
@@ -257,9 +272,11 @@ namespace Unity.UIWidgets.painting {
                 case BoxShape.rectangle:
                     if (this._decoration.borderRadius == null) {
                         canvas.drawRect(rect, paint);
-                    } else {
+                    }
+                    else {
                         canvas.drawRRect(this._decoration.borderRadius.toRRect(rect), paint);
                     }
+
                     break;
             }
         }
@@ -302,8 +319,10 @@ namespace Unity.UIWidgets.painting {
                         clipPath = new Path();
                         clipPath.addRRect(this._decoration.borderRadius.toRRect(rect));
                     }
+
                     break;
             }
+
             this._imagePainter.paint(canvas, rect, clipPath, configuration);
         }
 

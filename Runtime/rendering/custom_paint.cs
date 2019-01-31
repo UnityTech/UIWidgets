@@ -4,8 +4,16 @@ using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
 
 namespace Unity.UIWidgets.widgets {
-    public abstract class CustomPainter : Listenable {
-        public CustomPainter(Listenable repaint = null) {
+    public interface CustomPainter : Listenable {
+        void paint(Canvas canvas, Size size);
+
+        bool shouldRepaint(CustomPainter oldDelegate);
+
+        bool hitTest(Offset position);
+    }
+
+    public abstract class AbstractCustomPainter : CustomPainter {
+        public AbstractCustomPainter(Listenable repaint = null) {
             this._repaint = repaint;
         }
 
@@ -33,7 +41,6 @@ namespace Unity.UIWidgets.widgets {
     }
 
     public class RenderCustomPaint : RenderProxyBox {
-
         public RenderCustomPaint(
             CustomPainter painter = null,
             CustomPainter foregroundPainter = null,
@@ -41,7 +48,7 @@ namespace Unity.UIWidgets.widgets {
             bool isComplex = false,
             bool willChange = false,
             RenderBox child = null
-        ): base(child) {
+        ) : base(child) {
             preferredSize = preferredSize ?? Size.zero;
             this.preferredSize = preferredSize;
             this._painter = painter;
@@ -49,14 +56,16 @@ namespace Unity.UIWidgets.widgets {
             this.isComplex = isComplex;
             this.willChange = willChange;
         }
-    
+
         CustomPainter _painter;
 
         public CustomPainter painter {
-            get => this._painter;
+            get { return this._painter; }
             set {
-                if (this._painter == value)
+                if (this._painter == value) {
                     return;
+                }
+
                 CustomPainter oldPainter = this._painter;
                 this._painter = value;
                 this._didUpdatePainter(this._painter, oldPainter);
@@ -66,10 +75,12 @@ namespace Unity.UIWidgets.widgets {
         CustomPainter _foregroundPainter;
 
         public CustomPainter foregroundPainter {
-            get => this._foregroundPainter;
+            get { return this._foregroundPainter; }
             set {
-                if (this._foregroundPainter == value)
+                if (this._foregroundPainter == value) {
                     return;
+                }
+
                 CustomPainter oldPainter = this._foregroundPainter;
                 this._foregroundPainter = value;
                 this._didUpdatePainter(this._foregroundPainter, oldPainter);
@@ -96,11 +107,13 @@ namespace Unity.UIWidgets.widgets {
         Size _preferredSize;
 
         public Size preferredSize {
-            get => this._preferredSize;
+            get { return this._preferredSize; }
             set {
                 D.assert(value != null);
-                if (this.preferredSize == value)
+                if (this.preferredSize == value) {
                     return;
+                }
+
                 this._preferredSize = value;
                 this.markNeedsLayout();
             }
@@ -123,8 +136,10 @@ namespace Unity.UIWidgets.widgets {
         }
 
         protected override bool hitTestChildren(HitTestResult result, Offset position) {
-            if (this._foregroundPainter != null && (this._foregroundPainter.hitTest(position)))
+            if (this._foregroundPainter != null && (this._foregroundPainter.hitTest(position))) {
                 return true;
+            }
+
             return base.hitTestChildren(result, position: position);
         }
 
@@ -144,12 +159,14 @@ namespace Unity.UIWidgets.widgets {
                 debugPreviousCanvasSaveCount = canvas.getSaveCount();
                 return true;
             });
-            if (offset != Offset.zero)
+            if (offset != Offset.zero) {
                 canvas.translate(offset.dx, offset.dy);
+            }
+
             painter.paint(canvas, this.size);
             D.assert(() => {
                 int debugNewCanvasSaveCount = canvas.getSaveCount();
-                if (debugNewCanvasSaveCount > debugPreviousCanvasSaveCount)
+                if (debugNewCanvasSaveCount > debugPreviousCanvasSaveCount) {
                     throw new UIWidgetsError(
                         $"{debugNewCanvasSaveCount - debugPreviousCanvasSaveCount} more " +
                         $"time{((debugNewCanvasSaveCount - debugPreviousCanvasSaveCount == 1) ? "" : "s")} " +
@@ -157,7 +174,9 @@ namespace Unity.UIWidgets.widgets {
                         "This leaves the canvas in an inconsistent state and will probably result in a broken display.\n" +
                         "You must pair each call to save()/saveLayer() with a later matching call to restore()."
                     );
-                if (debugNewCanvasSaveCount < debugPreviousCanvasSaveCount)
+                }
+
+                if (debugNewCanvasSaveCount < debugPreviousCanvasSaveCount) {
                     throw new UIWidgetsError(
                         $"The {painter} custom painter called canvas.restore() " +
                         $"{debugPreviousCanvasSaveCount - debugNewCanvasSaveCount} more " +
@@ -166,6 +185,8 @@ namespace Unity.UIWidgets.widgets {
                         "This leaves the canvas in an inconsistent state and will result in a broken display.\n" +
                         "You should only call restore() if you first called save() or saveLayer()."
                     );
+                }
+
                 return debugNewCanvasSaveCount == debugPreviousCanvasSaveCount;
             });
             canvas.restore();
@@ -185,10 +206,13 @@ namespace Unity.UIWidgets.widgets {
         }
 
         void _setRasterCacheHints(PaintingContext context) {
-            if (this.isComplex)
+            if (this.isComplex) {
                 context.setIsComplexHint();
-            if (this.willChange)
+            }
+
+            if (this.willChange) {
                 context.setWillChangeHint();
+            }
         }
     }
 }

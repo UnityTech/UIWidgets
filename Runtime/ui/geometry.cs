@@ -6,7 +6,8 @@ namespace Unity.UIWidgets.ui {
         public static double clamp(this double value, double min, double max) {
             if (value < min) {
                 value = min;
-            } else if (value > max) {
+            }
+            else if (value > max) {
                 value = max;
             }
 
@@ -16,7 +17,8 @@ namespace Unity.UIWidgets.ui {
         public static float clamp(this float value, float min, float max) {
             if (value < min) {
                 value = min;
-            } else if (value > max) {
+            }
+            else if (value > max) {
                 value = max;
             }
 
@@ -26,7 +28,8 @@ namespace Unity.UIWidgets.ui {
         public static int clamp(this int value, int min, int max) {
             if (value < min) {
                 value = min;
-            } else if (value > max) {
+            }
+            else if (value > max) {
                 value = max;
             }
 
@@ -40,7 +43,7 @@ namespace Unity.UIWidgets.ui {
         public static float abs(this float value) {
             return Mathf.Abs(value);
         }
-        
+
         public static int sign(this double value) {
             return Math.Sign(value);
         }
@@ -64,7 +67,17 @@ namespace Unity.UIWidgets.ui {
         public static double lerpDouble(double a, double b, double t) {
             return a + (b - a) * t;
         }
-        
+
+        public static double? lerpNullableDouble(double? a, double? b, double t) {
+            if (a == null && b == null) {
+                return null;
+            }
+
+            a = a ?? b;
+            b = b ?? a;
+            return (double) a + ((double) b - (double) a) * t;
+        }
+
         public static float lerpFloat(float a, float b, float t) {
             return a + (b - a) * t;
         }
@@ -132,9 +145,11 @@ namespace Unity.UIWidgets.ui {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return this._dx.Equals(other._dx) && this._dy.Equals(other._dy);
         }
 
@@ -142,12 +157,15 @@ namespace Unity.UIWidgets.ui {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((OffsetBase) obj);
         }
 
@@ -229,9 +247,11 @@ namespace Unity.UIWidgets.ui {
             if (a == null && b == null) {
                 return null;
             }
+
             if (a == null) {
                 return b * t;
             }
+
             if (b == null) {
                 return a * (1.0 - t);
             }
@@ -247,12 +267,15 @@ namespace Unity.UIWidgets.ui {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((Offset) obj);
         }
 
@@ -409,12 +432,15 @@ namespace Unity.UIWidgets.ui {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((Size) obj);
         }
 
@@ -612,7 +638,8 @@ namespace Unity.UIWidgets.ui {
         }
 
         public bool containsInclusive(Offset offset) {
-            return offset.dx >= this.left && offset.dx <= this.right && offset.dy >= this.top && offset.dy <= this.bottom;
+            return offset.dx >= this.left && offset.dx <= this.right && offset.dy >= this.top &&
+                   offset.dy <= this.bottom;
         }
 
         public bool contains(Rect rect) {
@@ -657,9 +684,11 @@ namespace Unity.UIWidgets.ui {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return this.left.Equals(other.left) && this.top.Equals(other.top) && this.right.Equals(other.right) &&
                    this.bottom.Equals(other.bottom);
         }
@@ -668,12 +697,15 @@ namespace Unity.UIWidgets.ui {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((Rect) obj);
         }
 
@@ -694,7 +726,7 @@ namespace Unity.UIWidgets.ui {
         public static bool operator !=(Rect left, Rect right) {
             return !Equals(left, right);
         }
-        
+
         public override string ToString() {
             return "Rect.fromLTRB(" + this.left.ToString("0.0") + ", " + this.top.ToString("0.0") + ", " +
                    this.right.ToString("0.0") + ", " + this.bottom.ToString("0.0") + ")";
@@ -743,7 +775,7 @@ namespace Unity.UIWidgets.ui {
         public static Radius operator *(Radius a, Radius b) {
             return elliptical(a.x * b.x, a.y * b.y);
         }
-        
+
         public static Radius operator *(Radius a, double b) {
             return elliptical(a.x * b, a.y * b);
         }
@@ -751,7 +783,7 @@ namespace Unity.UIWidgets.ui {
         public static Radius operator /(Radius a, Radius b) {
             return elliptical(a.x / b.x, a.y / b.y);
         }
-        
+
         public static Radius operator /(Radius a, double b) {
             return elliptical(a.x / b, a.y / b);
         }
@@ -759,7 +791,7 @@ namespace Unity.UIWidgets.ui {
         public static Radius operator %(Radius a, Radius b) {
             return elliptical(a.x % b.x, a.y % b.y);
         }
-        
+
         public static Radius operator %(Radius a, double b) {
             return elliptical(a.x % b, a.y % b);
         }
@@ -788,9 +820,11 @@ namespace Unity.UIWidgets.ui {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return this.x.Equals(other.x) && this.y.Equals(other.y);
         }
 
@@ -798,12 +832,15 @@ namespace Unity.UIWidgets.ui {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((Radius) obj);
         }
 
@@ -840,7 +877,7 @@ namespace Unity.UIWidgets.ui {
             this.brRadius = brRadius ?? Radius.zero;
             this.blRadius = blRadius ?? Radius.zero;
         }
-        
+
         RRect(double left, double top, double right, double bottom,
             double? tlRadius = null, double? trRadius = null, double? brRadius = null, double? blRadius = null) {
             this.left = left;
@@ -862,13 +899,13 @@ namespace Unity.UIWidgets.ui {
                 radius, radius, radius, radius);
         }
 
-        
+
         public static RRect fromLTRBR(
             double left, double top, double right, double bottom, Radius radius) {
             return new RRect(left, top, right, bottom,
                 radius, radius, radius, radius);
         }
-        
+
         public static RRect fromLTRBR(
             double left, double top, double right, double bottom, double radius) {
             var r = Radius.circular(radius);
@@ -890,23 +927,23 @@ namespace Unity.UIWidgets.ui {
             return new RRect(rect.left, rect.top, rect.right, rect.bottom,
                 radius, radius, radius, radius);
         }
-        
+
         public static RRect fromRectAndRadius(Rect rect, double radius) {
             var r = Radius.circular(radius);
             return new RRect(rect.left, rect.top, rect.right, rect.bottom,
                 r, r, r, r);
         }
-        
+
         public static RRect fromLTRBAndCorners(
             double left, double top, double right, double bottom,
             Radius topLeft = null, Radius topRight = null, Radius bottomRight = null, Radius bottomLeft = null) {
             return new RRect(left, top, right, bottom,
                 topLeft, topRight, bottomRight, bottomLeft);
         }
-        
+
         public static RRect fromLTRBAndCorners(
             double left, double top, double right, double bottom,
-            double? topLeft = null, double? topRight = null, double? bottomRight = null, double? bottomLeft = null) {            
+            double? topLeft = null, double? topRight = null, double? bottomRight = null, double? bottomLeft = null) {
             return new RRect(left, top, right, bottom,
                 topLeft, topRight, bottomRight, bottomLeft);
         }
@@ -938,6 +975,7 @@ namespace Unity.UIWidgets.ui {
         public double tlRadiusX {
             get { return this.tlRadius.x; }
         }
+
         public double tlRadiusY {
             get { return this.tlRadius.y; }
         }
@@ -945,6 +983,7 @@ namespace Unity.UIWidgets.ui {
         public double trRadiusX {
             get { return this.trRadius.x; }
         }
+
         public double trRadiusY {
             get { return this.trRadius.y; }
         }
@@ -952,6 +991,7 @@ namespace Unity.UIWidgets.ui {
         public double blRadiusX {
             get { return this.blRadius.x; }
         }
+
         public double blRadiusY {
             get { return this.blRadius.y; }
         }
@@ -959,12 +999,13 @@ namespace Unity.UIWidgets.ui {
         public double brRadiusX {
             get { return this.brRadius.x; }
         }
+
         public double brRadiusY {
             get { return this.brRadius.y; }
         }
-        
+
         public static readonly RRect zero = new RRect(0, 0, 0, 0, (Radius) null);
-        
+
         public RRect shift(Offset offset) {
             return fromLTRBAndCorners(
                 this.left + offset.dx,
@@ -1114,9 +1155,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public bool isCircle {
-            get {
-                return this.width == this.height && this.isEllipse;
-            }
+            get { return this.width == this.height && this.isEllipse; }
         }
 
         public double shortestSide {
@@ -1136,9 +1175,10 @@ namespace Unity.UIWidgets.ui {
             if (sum > limit && sum != 0.0) {
                 return Math.Min(min, limit / sum);
             }
+
             return min;
         }
-        
+
         RRect _scaled;
 
         void _scaleRadii() {
@@ -1155,7 +1195,8 @@ namespace Unity.UIWidgets.ui {
                         left: this.left, top: this.top, right: this.right, bottom: this.bottom,
                         topLeft: this.tlRadius * scale, topRight: this.trRadius * scale,
                         bottomRight: this.brRadius * scale, bottomLeft: this.blRadius * scale);
-                } else {
+                }
+                else {
                     this._scaled = this;
                 }
             }
@@ -1179,25 +1220,29 @@ namespace Unity.UIWidgets.ui {
                 y = point.dy - this.top - this._scaled.tlRadiusY;
                 radiusX = this._scaled.tlRadiusX;
                 radiusY = this._scaled.tlRadiusY;
-            } else if (point.dx > this.right - this._scaled.trRadiusX &&
-                       point.dy < this.top + this._scaled.trRadiusY) {
+            }
+            else if (point.dx > this.right - this._scaled.trRadiusX &&
+                     point.dy < this.top + this._scaled.trRadiusY) {
                 x = point.dx - this.right + this._scaled.trRadiusX;
                 y = point.dy - this.top - this._scaled.trRadiusY;
                 radiusX = this._scaled.trRadiusX;
                 radiusY = this._scaled.trRadiusY;
-            } else if (point.dx > this.right - this._scaled.brRadiusX &&
-                       point.dy > this.bottom - this._scaled.brRadiusY) {
+            }
+            else if (point.dx > this.right - this._scaled.brRadiusX &&
+                     point.dy > this.bottom - this._scaled.brRadiusY) {
                 x = point.dx - this.right + this._scaled.brRadiusX;
                 y = point.dy - this.bottom + this._scaled.brRadiusY;
                 radiusX = this._scaled.brRadiusX;
                 radiusY = this._scaled.brRadiusY;
-            } else if (point.dx < this.left + this._scaled.blRadiusX &&
-                       point.dy > this.bottom - this._scaled.blRadiusY) {
+            }
+            else if (point.dx < this.left + this._scaled.blRadiusX &&
+                     point.dy > this.bottom - this._scaled.blRadiusY) {
                 x = point.dx - this.left - this._scaled.blRadiusX;
                 y = point.dy - this.bottom + this._scaled.blRadiusY;
                 radiusX = this._scaled.blRadiusX;
                 radiusY = this._scaled.blRadiusY;
-            } else {
+            }
+            else {
                 return true;
             }
 
@@ -1214,8 +1259,9 @@ namespace Unity.UIWidgets.ui {
             if (a == null && b == null) {
                 return null;
             }
+
             if (a == null) {
-                return RRect.fromLTRBAndCorners(
+                return fromLTRBAndCorners(
                     b.left * t,
                     b.top * t,
                     b.right * t,
@@ -1226,9 +1272,10 @@ namespace Unity.UIWidgets.ui {
                     b.blRadius * t
                 );
             }
+
             if (b == null) {
                 double k = 1.0 - t;
-                return RRect.fromLTRBAndCorners(
+                return fromLTRBAndCorners(
                     a.left * k,
                     a.top * k,
                     a.right * k,
@@ -1239,7 +1286,7 @@ namespace Unity.UIWidgets.ui {
                     a.blRadius * k);
             }
 
-            return RRect.fromLTRBAndCorners(
+            return fromLTRBAndCorners(
                 MathUtils.lerpDouble(a.left, b.left, t),
                 MathUtils.lerpDouble(a.top, b.top, t),
                 MathUtils.lerpDouble(a.right, b.right, t),
@@ -1264,14 +1311,16 @@ namespace Unity.UIWidgets.ui {
                    this.contains(rect.bottomRight) &&
                    this.contains(rect.bottomLeft);
         }
-        
+
         public bool Equals(RRect other) {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return this.left.Equals(other.left)
                    && this.top.Equals(other.top)
                    && this.right.Equals(other.right)
@@ -1286,12 +1335,15 @@ namespace Unity.UIWidgets.ui {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((RRect) obj);
         }
 
@@ -1329,6 +1381,7 @@ namespace Unity.UIWidgets.ui {
                 if (this.tlRadius.x == this.tlRadius.y) {
                     return $"RRect.fromLTRBR({rect}, {this.tlRadius.x:F1})";
                 }
+
                 return $"RRect.fromLTRBXY($rect, {this.tlRadius.x:F1}, {this.tlRadius.y:F1})";
             }
 

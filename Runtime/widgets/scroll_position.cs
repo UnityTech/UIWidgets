@@ -288,7 +288,8 @@ namespace Unity.UIWidgets.widgets {
                 }
 
                 this._activity.dispose();
-            } else {
+            }
+            else {
                 oldIgnorePointer = false;
                 wasScrolling = false;
             }

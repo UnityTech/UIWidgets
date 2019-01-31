@@ -84,11 +84,14 @@ namespace Unity.UIWidgets.widgets {
             if (this._ticker != null) {
                 if (this._ticker.isActive && this._ticker.muted) {
                     tickerDescription = "active but muted";
-                } else if (this._ticker.isActive) {
+                }
+                else if (this._ticker.isActive) {
                     tickerDescription = "active";
-                } else if (this._ticker.muted) {
+                }
+                else if (this._ticker.muted) {
                     tickerDescription = "inactive and muted";
-                } else {
+                }
+                else {
                     tickerDescription = "inactive";
                 }
             }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.UIWidgets.foundation;
@@ -30,7 +29,7 @@ namespace Unity.UIWidgets.painting {
             bool bIsNone = b.style == BorderStyle.none && b.width == 0.0;
 
             if (aIsNone && bIsNone) {
-                return BorderSide.none;
+                return none;
             }
 
             if (aIsNone) {
@@ -114,13 +113,14 @@ namespace Unity.UIWidgets.painting {
             if (t == 0.0) {
                 return a;
             }
+
             if (t == 1.0) {
                 return b;
             }
 
             double width = MathUtils.lerpDouble(a.width, b.width, t);
             if (width < 0.0) {
-                return BorderSide.none;
+                return none;
             }
 
             if (a.style == b.style) {
@@ -140,6 +140,7 @@ namespace Unity.UIWidgets.painting {
                     colorA = a.color.withAlpha(0x00);
                     break;
             }
+
             switch (b.style) {
                 case BorderStyle.solid:
                     colorB = b.color;
@@ -148,6 +149,7 @@ namespace Unity.UIWidgets.painting {
                     colorB = b.color.withAlpha(0x00);
                     break;
             }
+
             return new BorderSide(
                 color: Color.lerp(colorA, colorB, t),
                 width: width,
@@ -159,9 +161,11 @@ namespace Unity.UIWidgets.painting {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return Equals(this.color, other.color) && this.width.Equals(other.width) && this.style == other.style;
         }
 
@@ -169,12 +173,15 @@ namespace Unity.UIWidgets.painting {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((BorderSide) obj);
         }
 
@@ -221,6 +228,7 @@ namespace Unity.UIWidgets.painting {
             if (a == null) {
                 return this.scale(t);
             }
+
             return null;
         }
 
@@ -228,6 +236,7 @@ namespace Unity.UIWidgets.painting {
             if (b == null) {
                 return this.scale(1.0 - t);
             }
+
             return null;
         }
 
@@ -289,14 +298,18 @@ namespace Unity.UIWidgets.painting {
             if (reversed) {
                 mergedBorders.AddRange(this.borders);
             }
+
             if (other is _CompoundBorder border) {
                 mergedBorders.AddRange(border.borders);
-            } else {
+            }
+            else {
                 mergedBorders.Add(other);
             }
+
             if (!reversed) {
                 mergedBorders.AddRange(this.borders);
             }
+
             return new _CompoundBorder(mergedBorders);
         }
 
@@ -307,11 +320,11 @@ namespace Unity.UIWidgets.painting {
         }
 
         public override ShapeBorder lerpFrom(ShapeBorder a, double t) {
-            return _CompoundBorder.lerp(a, this, t);
+            return lerp(a, this, t);
         }
 
         public override ShapeBorder lerpTo(ShapeBorder b, double t) {
-            return _CompoundBorder.lerp(this, b, t);
+            return lerp(this, b, t);
         }
 
         public new static _CompoundBorder lerp(ShapeBorder a, ShapeBorder b, double t) {
@@ -330,13 +343,16 @@ namespace Unity.UIWidgets.painting {
                         continue;
                     }
                 }
+
                 if (localB != null) {
                     results.Add(localB.scale(t));
                 }
+
                 if (localA != null) {
                     results.Add(localA.scale(1.0 - t));
                 }
             }
+
             return new _CompoundBorder(results);
         }
 
@@ -344,6 +360,7 @@ namespace Unity.UIWidgets.painting {
             for (int index = 0; index < this.borders.Count - 1; index += 1) {
                 rect = this.borders[index].dimensions.deflateRect(rect);
             }
+
             return this.borders.Last().getInnerPath(rect);
         }
 
@@ -362,6 +379,7 @@ namespace Unity.UIWidgets.painting {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
@@ -373,12 +391,15 @@ namespace Unity.UIWidgets.painting {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((_CompoundBorder) obj);
         }
 
@@ -426,11 +447,13 @@ namespace Unity.UIWidgets.painting {
                     path.lineTo(rect.right, rect.top);
                     if (top.width == 0.0) {
                         paint.style = PaintingStyle.stroke;
-                    } else {
+                    }
+                    else {
                         paint.style = PaintingStyle.fill;
                         path.lineTo(rect.right - right.width, rect.top + top.width);
                         path.lineTo(rect.left + left.width, rect.top + top.width);
                     }
+
                     canvas.drawPath(path, paint);
                     break;
                 case BorderStyle.none:
@@ -449,11 +472,13 @@ namespace Unity.UIWidgets.painting {
                     path.lineTo(rect.right, rect.bottom);
                     if (right.width == 0.0) {
                         paint.style = PaintingStyle.stroke;
-                    } else {
+                    }
+                    else {
                         paint.style = PaintingStyle.fill;
                         path.lineTo(rect.right - right.width, rect.bottom - bottom.width);
                         path.lineTo(rect.right - right.width, rect.top + top.width);
                     }
+
                     canvas.drawPath(path, paint);
                     break;
                 case BorderStyle.none:
@@ -472,11 +497,13 @@ namespace Unity.UIWidgets.painting {
                     path.lineTo(rect.left, rect.bottom);
                     if (bottom.width == 0.0) {
                         paint.style = PaintingStyle.stroke;
-                    } else {
+                    }
+                    else {
                         paint.style = PaintingStyle.fill;
                         path.lineTo(rect.left + left.width, rect.bottom - bottom.width);
                         path.lineTo(rect.right - right.width, rect.bottom - bottom.width);
                     }
+
                     canvas.drawPath(path, paint);
                     break;
                 case BorderStyle.none:
@@ -495,11 +522,13 @@ namespace Unity.UIWidgets.painting {
                     path.lineTo(rect.left, rect.top);
                     if (left.width == 0.0) {
                         paint.style = PaintingStyle.stroke;
-                    } else {
+                    }
+                    else {
                         paint.style = PaintingStyle.fill;
                         path.lineTo(rect.left + left.width, rect.top + top.width);
                         path.lineTo(rect.left + left.width, rect.bottom - bottom.width);
                     }
+
                     canvas.drawPath(path, paint);
                     break;
                 case BorderStyle.none:

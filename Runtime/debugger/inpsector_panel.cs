@@ -83,6 +83,7 @@ namespace Unity.UIWidgets.debugger {
                 var lastRect = GUILayoutUtility.GetLastRect();
                 var x = lastRect.height;
             }
+
             EditorGUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
 
             // splitter
@@ -114,7 +115,8 @@ namespace Unity.UIWidgets.debugger {
                         int blue = Util.GetIntProperty(properties, "blue");
                         var color = new Color(red / 255.0f, green / 255.0f, blue / 255.0f, alpha / 255.0f);
                         EditorGUILayout.ColorField(property.name, color, GUILayout.ExpandWidth(true));
-                    } else {
+                    }
+                    else {
                         EditorGUILayout.TextField(property.name, property.description);
                     }
                 }
@@ -197,9 +199,11 @@ namespace Unity.UIWidgets.debugger {
                 this.m_TreeView.CollapseAll();
                 if (item != null) {
                     this.m_TreeView.SetSelection(new List<int> {item.id}, TreeViewSelectionOptions.RevealAndFrame);
-                } else {
+                }
+                else {
                     this.m_TreeView.SetSelection(new List<int>());
                 }
+
                 this.m_TreeView.Repaint();
             }
         }
@@ -217,7 +221,8 @@ namespace Unity.UIWidgets.debugger {
             this.m_NeedDetailUpdate = false;
             if (this.m_SelectedNodeRef == null) {
                 this.m_DetailTreeView.node = null;
-            } else {
+            }
+            else {
                 this.m_DetailTreeView.node =
                     this.m_InspectorService.getDetailsSubtree(this.m_SelectedNodeRef, this.m_GroupName);
             }
