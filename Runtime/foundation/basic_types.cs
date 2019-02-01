@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -84,6 +85,44 @@ namespace Unity.UIWidgets.foundation {
             var result = it[lastIndex];
             it.RemoveAt(lastIndex);
             return result;
+        }
+
+        public static int hashList<T>(this IList<T> it) {
+            unchecked {
+                var hashCode = 0;
+                if (it != null) {
+                    foreach (var item in it) {
+                        hashCode = (hashCode * 397) ^ item.GetHashCode();
+                    }
+                }
+                return hashCode;
+            }
+        }
+        
+        public static bool equalsList<T>(this IList<T> it, IList<T> list) {
+            if (it == null && list == null) {
+                return true;
+            }
+
+            if (it == null || list == null) {
+                return false;
+            }
+
+            if (it.Count != list.Count) {
+                return false;
+            }
+
+            for (int i = it.Count - 1; i >= 0; --i) {
+                if (!Equals(it[i], list[i])) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+        
+        public static string toStringList<T>(this IList<T> it) {
+            return "{ " + string.Join(", ", it.Select(item => item.ToString())) + " }";
         }
     }
 }

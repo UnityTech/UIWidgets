@@ -239,6 +239,7 @@ namespace Unity.UIWidgets.ui {
         Image fillGradient(List<Color> colors, List<double> positions) {
             Texture2D tex = new Texture2D(this.resolution, 1, TextureFormat.RGBA32, false);
             tex.hideFlags = HideFlags.HideAndDontSave;
+            tex.wrapMode = TextureWrapMode.Clamp;
             
             var bytes = new byte[this.resolution * 4];
 

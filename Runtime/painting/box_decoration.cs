@@ -251,7 +251,7 @@ namespace Unity.UIWidgets.painting {
                 }
 
                 if (this._decoration.gradient != null) {
-                    //paint.shader = this._decoration.gradient.createShader(rect);
+                    paint.shader = this._decoration.gradient.createShader(rect);
                     this._rectForCachedBackgroundPaint = rect;
                 }
 
