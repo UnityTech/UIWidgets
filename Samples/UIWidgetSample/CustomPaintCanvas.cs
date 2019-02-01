@@ -13,7 +13,7 @@ namespace UIWidgetsSample {
         }
     }
 
-    public class GridPainter : CustomPainter {
+    public class GridPainter : AbstractCustomPainter {
         public GridPainter(Listenable repaint) : base(repaint) {
         }
 

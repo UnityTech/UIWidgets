@@ -50,7 +50,7 @@ namespace Unity.UIWidgets.rendering {
         TextPainter _textPainter;
         Color _cursorColor;
         bool _hasFocus;
-        int _maxLines;
+        int? _maxLines;
         Color _selectionColor;
         ViewportOffset _offset;
         ValueNotifier<bool> _showCursor;
@@ -72,7 +72,7 @@ namespace Unity.UIWidgets.rendering {
         public RenderEditable(TextSpan text, TextDirection textDirection, ViewportOffset offset,
             ValueNotifier<bool> showCursor,
             TextAlign textAlign = TextAlign.left, double textScaleFactor = 1.0, Color cursorColor = null,
-            bool? hasFocus = null, int maxLines = 1, Color selectionColor = null,
+            bool? hasFocus = null, int? maxLines = 1, Color selectionColor = null,
             TextSelection selection = null, bool obscureText = false, SelectionChangedHandler onSelectionChanged = null,
             CaretChangedHandler onCaretChanged = null, bool ignorePointer = false) {
             this._textPainter = new TextPainter(text: text, textAlign: textAlign, textDirection: textDirection,
@@ -89,6 +89,7 @@ namespace Unity.UIWidgets.rendering {
             this.onCaretChanged = onCaretChanged;
             this.onSelectionChanged = onSelectionChanged;
 
+            D.assert(this._maxLines == null || this._maxLines > 0);
             D.assert(this._showCursor != null);
             D.assert(!this._showCursor.value || cursorColor != null);
 
@@ -196,10 +197,10 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
-        public int maxLines {
+        public int? maxLines {
             get { return this._maxLines; }
             set {
-                D.assert(value > 0);
+                D.assert(value == null || value > 0);
                 if (this._maxLines == value) {
                     return;
                 }
@@ -647,8 +648,8 @@ namespace Unity.UIWidgets.rendering {
         }
 
         double _preferredHeight(double width) {
-            if (this.maxLines <= 0) {
-                return this.preferredLineHeight * this.maxLines;
+            if (this.maxLines != null) {
+                return this.preferredLineHeight * this.maxLines.Value;
             }
 
             if (double.IsInfinity(width)) {
@@ -741,7 +742,7 @@ namespace Unity.UIWidgets.rendering {
             base.debugFillProperties(properties);
             properties.add(new DiagnosticsProperty<Color>("cursorColor", this.cursorColor));
             properties.add(new DiagnosticsProperty<ValueNotifier<bool>>("showCursor", this.showCursor));
-            properties.add(new DiagnosticsProperty<int>("maxLines", this.maxLines));
+            properties.add(new DiagnosticsProperty<int?>("maxLines", this.maxLines));
             properties.add(new DiagnosticsProperty<Color>("selectionColor", this.selectionColor));
             properties.add(new DiagnosticsProperty<double>("textScaleFactor", this.textScaleFactor));
             properties.add(new DiagnosticsProperty<TextSelection>("selection", this.selection));

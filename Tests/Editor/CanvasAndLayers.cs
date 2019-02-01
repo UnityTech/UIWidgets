@@ -272,7 +272,7 @@ namespace UIWidgets.Tests {
                 new Vector2d(170, 0),
                 new Vector2d(180, 0),
                 new Vector2d(190, 0),
-            }, new TextStyle(), Unity.UIWidgets.ui.Rect.fromLTWH(0 ,0, 200, 50));
+            }, Unity.UIWidgets.ui.Rect.fromLTWH(0 ,0, 200, 50), new TextStyle());
             
             canvas.drawTextBlob(textBlob, new Offset(100, 100), paint);
             

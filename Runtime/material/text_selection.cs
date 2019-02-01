@@ -108,7 +108,7 @@ namespace Unity.UIWidgets.material {
         }
     }
 
-    class _TextSelectionHandlePainter : CustomPainter {
+    class _TextSelectionHandlePainter : AbstractCustomPainter {
         internal _TextSelectionHandlePainter(Color color) {
             this.color = color;
         }

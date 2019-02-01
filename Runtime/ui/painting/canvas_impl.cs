@@ -642,7 +642,10 @@ namespace Unity.UIWidgets.ui {
             
             var matrix = new Matrix3(state.matrix);
             matrix.preTranslate((float) offset.dx, (float) offset.dy);            
-            var mesh = MeshGenerator.generateMesh(textBlob, scale).transform(matrix);
+            var mesh = MeshGenerator.generateMesh(textBlob, scale)?.transform(matrix);
+            if (mesh == null) {
+                return;
+            }
             
             var font = FontManager.instance.getOrCreate(textBlob.style.fontFamily).font;
             var tex = font.material.mainTexture;

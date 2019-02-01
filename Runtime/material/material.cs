@@ -496,7 +496,7 @@ namespace Unity.UIWidgets.material {
         }
     }
 
-    class _ShapeBorderPainter : CustomPainter {
+    class _ShapeBorderPainter : AbstractCustomPainter {
         public _ShapeBorderPainter(ShapeBorder border = null) : base(null) {
             this.border = border;
         }
