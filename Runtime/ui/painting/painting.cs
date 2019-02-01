@@ -3,6 +3,24 @@ using Unity.UIWidgets.foundation;
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
+    class PaintingUtils {
+        internal static bool _offsetIsValid(Offset offset) {
+            D.assert(offset != null, "Offset argument was null.");
+            D.assert(!offset.dx.isNaN() && !offset.dy.isNaN(), "Offset argument contained a NaN value.");
+            return true;
+        }
+
+        internal static bool _radiusIsValid(Radius radius) {
+            D.assert(radius != null, "Radius argument was null.");
+            D.assert(!radius.x.isNaN() && !radius.y.isNaN(), "Radius argument contained a NaN value.");
+            return true;
+        }
+
+        internal static Color _scaleAlpha(Color a, double factor) {
+            return a.withAlpha((a.alpha * factor).round().clamp(0, 255));
+        }
+    }
+    
     public class Color : IEquatable<Color> {
         public Color(long value) {
             this.value = value & 0xFFFFFFFF;
@@ -306,97 +324,7 @@ namespace Unity.UIWidgets.ui {
         }
     }
 
-    public enum TileMode {
-        // todo: implement repeated, mirror.
-        clamp,
-        repeated,
-        mirror
-    }
-
-    public abstract class PaintShader {
-    }
-
-    public class Gradient : PaintShader {
-        internal float[] invXform;
-        internal float[] extent;
-        internal float radius;
-        internal float feather;
-        internal Color innerColor;
-        internal Color outerColor;
-
-        public static Gradient linear(
-            Offset from, Offset to,
-            Color color0, Color color1, TileMode tileMode = TileMode.clamp) {
-            const float large = 1e5f;
-
-            var dir = to - from;
-            var dx = (float) dir.dx;
-            var dy = (float) dir.dy;
-            var d = (float) dir.distance;
-            if (d > 0.0001f) {
-                dx /= d;
-                dy /= d;
-            }
-            else {
-                dx = 0;
-                dy = 1;
-            }
-
-            var xform = new[] {dy, -dx, dx, dy, (float) from.dx - dx * large, (float) from.dy - dy * large};
-            var invXform = new float[6];
-            XformUtils.transformInverse(invXform, xform);
-
-            return new Gradient {
-                invXform = invXform,
-                extent = new[] {large, large + d * 0.5f},
-                radius = 0.0f,
-                feather = Mathf.Max(1.0f, d),
-                innerColor = color0,
-                outerColor = color1
-            };
-        }
-
-        public static Gradient radial(
-            Offset center, double radius0, double radius1,
-            Color color0, Color color1, TileMode tileMode = TileMode.clamp) {
-            float r = (float) (radius0 + radius1) * 0.5f;
-            float f = (float) (radius1 - radius0);
-
-            var xform = new[] {1, 0, 0, 1, (float) center.dx, (float) center.dy};
-            var invXform = new float[6];
-            XformUtils.transformInverse(invXform, xform);
-
-            return new Gradient {
-                invXform = invXform,
-                extent = new[] {r, r},
-                radius = r,
-                feather = Mathf.Max(1.0f, f),
-                innerColor = color0,
-                outerColor = color1
-            };
-        }
-
-        public static Gradient box(
-            Rect rect, double radius, double feather,
-            Color color0, Color color1, TileMode tileMode = TileMode.clamp) {
-            var ext0 = (float) rect.width * 0.5f;
-            var ext1 = (float) rect.height * 0.5f;
-
-            var xform = new[] {1, 0, 0, 1, (float) rect.left + ext0, (float) rect.top + ext1};
-            var invXform = new float[6];
-            XformUtils.transformInverse(invXform, xform);
-
-            return new Gradient {
-                invXform = invXform,
-                extent = new[] {ext0, ext1},
-                radius = (float) radius,
-                feather = Mathf.Max(1.0f, (float) feather),
-                innerColor = color0,
-                outerColor = color1
-            };
-        }
-    }
-
+  
     public class Paint {
         static readonly Color _kColorDefault = new Color(0xFFFFFFFF);
 
@@ -422,7 +350,7 @@ namespace Unity.UIWidgets.ui {
 
         public PaintShader shader = null;
 
-        public bool invertColors;
+        public bool invertColors = false;
 
         public Paint() {
         }

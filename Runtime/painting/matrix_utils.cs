@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
+using UnityEngine;
 
 namespace Unity.UIWidgets.painting {
     public static class MatrixUtils {
@@ -20,6 +21,25 @@ namespace Unity.UIWidgets.painting {
 
             return result;
         }
+        
+        public static Matrix4x4 toMatrix4x4(this Matrix3 matrix3) {
+            var matrix = Matrix4x4.identity;
+
+            matrix[0, 0] = matrix3[0]; // row 0
+            matrix[0, 1] = matrix3[1];
+            matrix[0, 3] = matrix3[2];
+            
+            matrix[1, 0] = matrix3[3]; // row 1
+            matrix[1, 1] = matrix3[4];
+            matrix[1, 3] = matrix3[5];
+            
+            matrix[3, 0] = matrix3[6]; // row 2
+            matrix[3, 1] = matrix3[7];
+            matrix[3, 3] = matrix3[8];
+
+            return matrix;
+        }
+
     }
 
     public class TransformProperty : DiagnosticsProperty<Matrix3> {

@@ -23,7 +23,8 @@ namespace Unity.UIWidgets.ui {
     }
 
     public class FontManager {
-        readonly List<FontInfo> _fonts = new List<FontInfo>();
+        readonly Dictionary<string, FontInfo> _fonts = new Dictionary<string, FontInfo>();
+
         static readonly int defaultFontSize = 14;
 
         public static readonly FontManager instance = new FontManager();
@@ -32,25 +33,19 @@ namespace Unity.UIWidgets.ui {
             Font.textureRebuilt += this.onFontTextureRebuilt;
         }
 
-        public bool addFont(Font font) {
-            var entry = this._fonts.Find(f => f.font == font);
-            if (entry != null) {
-                return false;
-            }
-
+        public void addFont(Font font) {
             D.assert(font != null);
             font.hideFlags = HideFlags.DontSave & ~HideFlags.DontSaveInBuild;
 
             var fontInfo = new FontInfo(font);
-            this._fonts.Add(fontInfo);
-            return true;
+            foreach (var fontName in font.fontNames) {
+                this._fonts[fontName] = fontInfo;
+            }
         }
 
         internal FontInfo getOrCreate(string name) {
-            var founded = this._fonts.Find(info =>
-                info.font && info.font.fontNames.Contains(name));
-            if (founded != null) {
-                return founded;
+            if (this._fonts.TryGetValue(name, out var fontInfo)) {
+                return fontInfo;
             }
 
             var osFont = Font.CreateDynamicFontFromOSFont(name, defaultFontSize);
@@ -59,12 +54,14 @@ namespace Unity.UIWidgets.ui {
             osFont.material.mainTexture.hideFlags = HideFlags.DontSave;
 
             var newFont = new FontInfo(osFont);
-            this._fonts.Add(newFont);
+            foreach (var fontName in osFont.fontNames) {
+                this._fonts[fontName] = newFont;
+            }
             return newFont;
         }
 
         void onFontTextureRebuilt(Font font) {
-            var entry = this._fonts.Find(f => f.font == font);
+            var entry = this._fonts.Values.FirstOrDefault(f => f.font == font);
             if (entry != null) {
                 entry.onTextureRebuilt();
             }

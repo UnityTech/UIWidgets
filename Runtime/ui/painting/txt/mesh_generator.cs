@@ -186,7 +186,7 @@ namespace Unity.UIWidgets.ui {
             }
 
 
-            MeshMesh mesh = new MeshMesh(vertices, triangles, uv);
+            MeshMesh mesh = new MeshMesh(null, vertices, triangles, uv);
             _meshes[key] = new MeshInfo(key, mesh);
 
             return mesh;

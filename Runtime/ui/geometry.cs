@@ -211,8 +211,9 @@ namespace Unity.UIWidgets.ui {
         public static readonly Offset zero = new Offset(0.0, 0.0);
         public static readonly Offset infinite = new Offset(double.PositiveInfinity, double.PositiveInfinity);
 
-        public Offset scale(double scaleX, double scaleY) {
-            return new Offset(this.dx * scaleX, this.dy * scaleY);
+        public Offset scale(double scaleX, double? scaleY = null) {
+            scaleY = scaleY ?? scaleX;
+            return new Offset(this.dx * scaleX, this.dy * scaleY.Value);
         }
 
         public Offset translate(double translateX, double translateY) {
@@ -509,6 +510,8 @@ namespace Unity.UIWidgets.ui {
 
         public static readonly Rect zero = new Rect(0, 0, 0, 0);
 
+        public static readonly Rect one = new Rect(0, 0, 1, 1);
+
         public static readonly Rect infinity = new Rect(double.NegativeInfinity, double.NegativeInfinity,
             double.PositiveInfinity, double.PositiveInfinity);
 
@@ -656,6 +659,12 @@ namespace Unity.UIWidgets.ui {
             return fromLTRB(
                 Math.Floor(this.left), Math.Floor(this.top),
                 Math.Ceiling(this.right), Math.Ceiling(this.bottom));
+        }
+        
+        public Rect roundIn() {
+            return fromLTRB(
+                Math.Ceiling(this.left), Math.Ceiling(this.top),
+                Math.Floor(this.right), Math.Floor(this.bottom));
         }
 
         public static Rect lerp(Rect a, Rect b, double t) {
