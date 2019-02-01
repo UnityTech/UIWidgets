@@ -7,6 +7,11 @@ using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.service;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
+using UnityEngine;
+using Canvas = Unity.UIWidgets.ui.Canvas;
+using Color = Unity.UIWidgets.ui.Color;
+using Rect = Unity.UIWidgets.ui.Rect;
+using Transform = Unity.UIWidgets.widgets.Transform;
 
 
 // todo using material components: FlatButton & Material ...
@@ -177,14 +182,14 @@ namespace Unity.UIWidgets.material {
             switch (type) {
                 case TextSelectionHandleType.left: // points up-right
                     return new Transform(
-                        transform: Matrix3.makeRotate(90),
+                        transform: Matrix3.makeRotate(Mathf.PI / 2),
                         child: handle
                     );
                 case TextSelectionHandleType.right: // points up-left
                     return handle;
                 case TextSelectionHandleType.collapsed: // points up
                     return new Transform(
-                        transform: Matrix3.makeRotate(45),
+                        transform: Matrix3.makeRotate(Mathf.PI / 4),
                         child: handle
                     );
             }

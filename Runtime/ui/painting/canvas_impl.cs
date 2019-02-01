@@ -14,32 +14,6 @@ namespace Unity.UIWidgets.ui {
         readonly List<RenderLayer> _layers = new List<RenderLayer>();
         int _saveCount;
 
-        static readonly List<int> _imageTriangles = new List<int>(12) {
-            0, 1, 2, 0, 2, 1,
-            0, 2, 3, 0, 3, 2,
-        };
-
-        static readonly List<int> _imageNineTriangles = new List<int>(12 * 9) {
-            0, 4, 1, 1, 4, 5,
-            0, 1, 4, 1, 5, 4,
-            1, 5, 2, 2, 5, 6,
-            1, 2, 5, 2, 6, 5,
-            2, 6, 3, 3, 6, 7,
-            2, 3, 6, 3, 7, 6,
-            4, 8, 5, 5, 8, 9,
-            4, 5, 8, 5, 9, 8,
-            5, 9, 6, 6, 9, 10,
-            5, 6, 9, 6, 10, 9,
-            6, 10, 7, 7, 10, 11,
-            6, 7, 10, 7, 11, 10,
-            8, 12, 9, 9, 12, 13,
-            8, 9, 12, 9, 13, 12,
-            9, 13, 10, 10, 13, 14,
-            9, 10, 13, 10, 14, 13,
-            10, 14, 11, 11, 14, 15,
-            10, 11, 14, 11, 15, 14,
-        };
-
         public CommandBufferCanvas(RenderTexture renderTexture, float devicePixelRatio, MeshPool meshPool) {
             D.assert(renderTexture);
 
@@ -84,15 +58,11 @@ namespace Unity.UIWidgets.ui {
 
             var state = this._getState();
             var textureWidth = Mathf.CeilToInt(
-                (float) bounds.width *
-                XformUtils.getScaleX(state.xform) *
-                this._devicePixelRatio);
+                (float) bounds.width * state.scale * this._devicePixelRatio);
             textureWidth = Mathf.Max(textureWidth, 1);
 
             var textureHeight = Mathf.CeilToInt(
-                (float) bounds.height *
-                XformUtils.getScaleY(state.xform) *
-                this._devicePixelRatio);
+                (float) bounds.height * state.scale * this._devicePixelRatio);
             textureHeight = Mathf.Max(textureHeight, 1);
 
             var parentLayer = this._getLayer();
@@ -101,10 +71,7 @@ namespace Unity.UIWidgets.ui {
                 width = textureWidth,
                 height = textureHeight,
                 layerBounds = bounds,
-                layerPaint = new Paint {
-                    color = paint.color,
-                    blendMode = paint.blendMode,
-                }
+                layerPaint = paint,
             };
 
             parentLayer.layers.Add(layer);
@@ -125,111 +92,71 @@ namespace Unity.UIWidgets.ui {
             this._layers.RemoveAt(this._layers.Count - 1);
             var state = this._getState();
 
-            var vertices = new List<Vector3>(4);
-            var uv = new List<Vector2>(4);
-
-            const float uvx0 = 0.0f;
-            const float uvx1 = 1.0f;
-            const float uvy0 = 1.0f;
-            const float uvy1 = 0.0f;
-
-            float x, y;
-            var bounds = layer.layerBounds;
-            PathUtils.transformPoint(out x, out y, state.xform,
-                (float) bounds.left, (float) bounds.top);
-            vertices.Add(new Vector2(x, y));
-            uv.Add(new Vector2(uvx0, uvy0));
-            PathUtils.transformPoint(out x, out y, state.xform,
-                (float) bounds.left, (float) bounds.bottom);
-            vertices.Add(new Vector2(x, y));
-            uv.Add(new Vector2(uvx0, uvy1));
-            PathUtils.transformPoint(out x, out y, state.xform,
-                (float) bounds.right, (float) bounds.bottom);
-            vertices.Add(new Vector2(x, y));
-            uv.Add(new Vector2(uvx1, uvy1));
-            PathUtils.transformPoint(out x, out y, state.xform,
-                (float) bounds.right, (float) bounds.top);
-            vertices.Add(new Vector2(x, y));
-            uv.Add(new Vector2(uvx1, uvy0));
-
-            var mesh = new MeshMesh(vertices, _imageTriangles, uv);
+            var mesh = ImageMeshGenerator.imageMesh(state.matrix, Rect.one, layer.layerBounds);
 
             if (!this._applyClip(mesh.bounds)) {
                 return;
             }
 
-            var mat = this._getMat(layer.layerPaint);
-            var properties = this._getMatPropsForImage(null, layer.layerPaint);
-
-            this._getLayer().draws.Add(
-                new RenderDraw {
-                    mesh = mesh,
-                    pass = CanvasShaderPass.texrtPass0,
-                    material = mat,
-                    properties = properties,
-                    layer = layer
-                }
-            );
+            var renderDraw = CanvasShader.texRT(this._getLayer(), layer.layerPaint, mesh, layer);
+            this._getLayer().draws.Add(renderDraw);
         }
 
         public void translate(double dx, double dy) {
             var state = this._getState();
-            float[] t = new float[6];
-            XformUtils.transformTranslate(t, (float) dx, (float) dy);
-            XformUtils.transformPremultiply(state.xform, t);
+            var matrix = Matrix3.makeTrans((float) dx, (float) dy);
+            matrix.postConcat(state.matrix);
+            state.matrix = matrix;
         }
 
         public void scale(double sx, double? sy = null) {
             var state = this._getState();
-            float[] t = new float[6];
-            XformUtils.transformScale(t, (float) sx, (float) (sy ?? sx));
-            XformUtils.transformPremultiply(state.xform, t);
+            var matrix = Matrix3.makeScale((float) sx, (float) (sy ?? sx));
+            matrix.postConcat(state.matrix);
+            state.matrix = matrix;
         }
 
         public void rotate(double radians, Offset offset = null) {
             var state = this._getState();
-            float[] t = new float[6];
 
-            if (offset != null) {
-                XformUtils.transformTranslate(t, (float) -offset.dx, (float) -offset.dy);
-                XformUtils.transformPremultiply(state.xform, t);
-            }
-
-            XformUtils.transformRotate(t, (float) radians);
-            XformUtils.transformPremultiply(state.xform, t);
-
-            if (offset != null) {
-                XformUtils.transformTranslate(t, (float) offset.dx, (float) offset.dy);
-                XformUtils.transformPremultiply(state.xform, t);
+            if (offset == null) {
+                var matrix = Matrix3.makeRotate((float) radians);
+                matrix.postConcat(state.matrix);
+                state.matrix = matrix;
+            } else {
+                var matrix = Matrix3.makeRotate((float) radians, (float) offset.dx, (float) offset.dy);
+                matrix.postConcat(state.matrix);
+                state.matrix = matrix;
             }
         }
 
         public void skew(double sx, double sy) {
             var state = this._getState();
-            float[] t = new float[6];
-            XformUtils.transformSkew(t, (float) sx, (float) sy);
-            XformUtils.transformPremultiply(state.xform, t);
+            var matrix = Matrix3.makeSkew((float) sx, (float) sy);
+            matrix.postConcat(state.matrix);
+            state.matrix = matrix;
         }
 
         public void concat(Matrix3 matrix) {
             var state = this._getState();
-            float[] t = XformUtils.fromMatrix3(matrix);
-            XformUtils.transformPremultiply(state.xform, t);
+            matrix = new Matrix3(matrix);
+            matrix.postConcat(state.matrix);
+            state.matrix = matrix;
         }
 
         public Matrix3 getTotalMatrix() {
             var state = this._getState();
-            return XformUtils.toMatrix3(state.xform);
+            return state.matrix;
         }
 
         public void resetMatrix() {
             var state = this._getState();
-            XformUtils.transformIdentity(state.xform);
+            state.matrix = Matrix3.I();
         }
 
         public void setMatrix(Matrix3 matrix) {
             var state = this._getState();
-            state.xform = XformUtils.fromMatrix3(matrix);
+            state.matrix = new Matrix3(matrix);
         }
 
         public float getDevicePixelRatio() {
@@ -251,7 +178,7 @@ namespace Unity.UIWidgets.ui {
         public void clipPath(Path path) {
             var layer = this._getLayer();
             var state = this._getState();
-            layer.clipStack.clipPath(path, state.xform, this._devicePixelRatio);
+            layer.clipStack.clipPath(path, state.matrix, state.scale * this._devicePixelRatio);
         }
 
         public void drawLine(Offset from, Offset to, Paint paint) {
@@ -299,72 +226,6 @@ namespace Unity.UIWidgets.ui {
             //var path = new Path();
         }
 
-        static Vector4 _premulColor(Color c) {
-            return new Vector4(
-                c.red * c.alpha / (255f * 255f),
-                c.green * c.alpha / (255f * 255f),
-                c.blue * c.alpha / (255f * 255f),
-                c.alpha / 255f
-            );
-        }
-
-        static Vector4 _color(Color c) {
-            return new Vector4(
-                c.red / 255f,
-                c.green / 255f,
-                c.blue / 255f,
-                c.alpha / 255f
-            );
-        }
-
-        MaterialPropertyBlock _getMatProps(Paint paint, float alpha = 1.0f) {
-            var properties = new MaterialPropertyBlock();
-            properties.SetVector("_viewport", this._getViewport());
-
-            if (paint.shader is Gradient gradient) {
-                var innerCol = gradient.innerColor;
-                var outerCol = gradient.outerColor;
-
-                if (alpha != 1.0f) {
-                    innerCol = innerCol.withOpacity(innerCol.opacity * alpha);
-                    outerCol = outerCol.withOpacity(outerCol.opacity * alpha);
-                }
-
-                var matrix = Matrix4x4.zero;
-                matrix[0, 0] = gradient.invXform[0];
-                matrix[1, 0] = gradient.invXform[1];
-                matrix[0, 1] = gradient.invXform[2];
-                matrix[1, 1] = gradient.invXform[3];
-                matrix[0, 2] = gradient.invXform[4];
-                matrix[1, 2] = gradient.invXform[5];
-
-                properties.SetMatrix("_paintMat", matrix);
-                properties.SetVector("_innerCol", _premulColor(innerCol));
-                properties.SetVector("_outerCol", _premulColor(outerCol));
-                properties.SetVector("_extent", new Vector2(gradient.extent[0], gradient.extent[1]));
-                properties.SetFloat("_radius", gradient.radius);
-                properties.SetFloat("_feather", gradient.feather);
-            }
-            else {
-                var innerCol = paint.color;
-                var outerCol = paint.color;
-
-                if (alpha != 1.0f) {
-                    innerCol = innerCol.withOpacity(innerCol.opacity * alpha);
-                    outerCol = outerCol.withOpacity(outerCol.opacity * alpha);
-                }
-
-                properties.SetMatrix("_paintMat", Matrix4x4.identity);
-                properties.SetVector("_innerCol", _premulColor(innerCol));
-                properties.SetVector("_outerCol", _premulColor(outerCol));
-                properties.SetVector("_extent", new Vector2(0.0f, 0.0f));
-                properties.SetFloat("_radius", 0.0f);
-                properties.SetFloat("_feather", 1.0f);
-            }
-
-            return properties;
-        }
-
         bool _applyClip(Rect queryBounds) {
             var layer = this._getLayer();
             var layerBounds = layer.layerBounds;
@@ -374,43 +235,36 @@ namespace Unity.UIWidgets.ui {
             }
 
             var scissor = reducedClip.scissor;
-            var deviceScissor = Rect.fromLTRB(
-                scissor.left - layerBounds.left, layerBounds.bottom - scissor.bottom,
-                scissor.right - layerBounds.left, layerBounds.bottom - scissor.top
-            ).scale(layer.width / layerBounds.width, layer.height / layerBounds.height);
+            var physicalRect = Rect.fromLTRB(0, 0, layer.width, layer.height);
 
-            layer.draws.Add(new RenderScissor {
-                deviceScissor = deviceScissor.roundOut(),
-            });
+            if (scissor == layerBounds) {
+                layer.draws.Add(new RenderScissor {
+                    deviceScissor = physicalRect,
+                });
+            } else {
+                var deviceScissor = Rect.fromLTRB(
+                    scissor.left - layerBounds.left, layerBounds.bottom - scissor.bottom,
+                    scissor.right - layerBounds.left, layerBounds.bottom - scissor.top
+                ).scale(layer.width / layerBounds.width, layer.height / layerBounds.height);
+                deviceScissor = deviceScissor.roundIn();
+                deviceScissor = deviceScissor.intersect(physicalRect);
+
+                if (deviceScissor.isEmpty) {
+                    return false;
+                }
+                
+                layer.draws.Add(new RenderScissor {
+                    deviceScissor = deviceScissor,
+                });
+            }
 
             if (this._mustRenderClip(reducedClip.maskGenID(), reducedClip.scissor)) {
-                var mat = this._getMat(null);
-                var properties = new MaterialPropertyBlock();
-                properties.SetVector("_viewport", this._getViewport());
-
                 var boundsMesh = new MeshMesh(reducedClip.scissor);
-                this._getLayer().draws.Add(new RenderDraw {
-                    mesh = boundsMesh,
-                    pass = CanvasShaderPass.stencilClear,
-                    material = mat,
-                    properties = properties,
-                });
+                layer.draws.Add(CanvasShader.stencilClear(layer, boundsMesh));
 
-                for (var i = 0; i < reducedClip.maskElements.Count; i++) {
-                    var maskElement = reducedClip.maskElements[i];
-
-                    this._getLayer().draws.Add(new RenderDraw {
-                        mesh = maskElement.mesh,
-                        pass = CanvasShaderPass.stencilIntersect0,
-                        material = mat,
-                        properties = properties,
-                    });
-                    this._getLayer().draws.Add(new RenderDraw {
-                        mesh = boundsMesh,
-                        pass = CanvasShaderPass.stencilIntersect1,
-                        material = mat,
-                        properties = properties,
-                    });
+                foreach (var maskElement in reducedClip.maskElements) {
+                    layer.draws.Add(CanvasShader.stencil0(layer, maskElement.mesh));
+                    layer.draws.Add(CanvasShader.stencil1(layer, boundsMesh));
                 }
 
                 this._setLastClipGenId(reducedClip.maskGenID(), reducedClip.scissor);
@@ -419,9 +273,8 @@ namespace Unity.UIWidgets.ui {
             return true;
         }
 
-        RenderLayer _createMaskLayer(Path path, Paint paint, RenderLayer parentLayer, Rect maskBounds) {
-            var textureWidth = Mathf.CeilToInt(
-                (float) maskBounds.width * this._devicePixelRatio);
+        RenderLayer _createMaskLayer(RenderLayer parentLayer, Rect maskBounds, Action<Paint> drawCallback, Paint paint) {
+            var textureWidth = Mathf.CeilToInt((float) maskBounds.width * this._devicePixelRatio);
             textureWidth = Mathf.Max(1, textureWidth);
 
             var textureHeight = Mathf.CeilToInt((float) maskBounds.height * this._devicePixelRatio);
@@ -439,10 +292,9 @@ namespace Unity.UIWidgets.ui {
 
             var parentState = parentLayer.states.Last();
             var maskState = maskLayer.states.Last();
-            XformUtils.transformCopy(maskState.xform, parentState.xform);
+            maskState.matrix = parentState.matrix;
 
-            var maskPaint = Paint.shapeOnly(paint);
-            this._drawPath(path, maskPaint);
+            drawCallback(Paint.shapeOnly(paint));
 
             var removed = this._layers.removeLast();
             D.assert(removed == maskLayer);
@@ -477,82 +329,22 @@ namespace Unity.UIWidgets.ui {
 
             parentLayer.layers.Add(blurYLayer);
 
-            var vertices = new List<Vector3>(4);
-            var uv = new List<Vector2>(4);
-
-            const float uvx0 = 0.0f;
-            const float uvx1 = 1.0f;
-            const float uvy0 = 1.0f;
-            const float uvy1 = 0.0f;
-
-            vertices.Add(new Vector2((float) maskLayer.layerBounds.left, (float) maskLayer.layerBounds.top));
-            uv.Add(new Vector2(uvx0, uvy0));
-            vertices.Add(new Vector2((float) maskLayer.layerBounds.left, (float) maskLayer.layerBounds.bottom));
-            uv.Add(new Vector2(uvx0, uvy1));
-            vertices.Add(new Vector2((float) maskLayer.layerBounds.right, (float) maskLayer.layerBounds.bottom));
-            uv.Add(new Vector2(uvx1, uvy1));
-            vertices.Add(new Vector2((float) maskLayer.layerBounds.right, (float) maskLayer.layerBounds.top));
-            uv.Add(new Vector2(uvx1, uvy0));
-
-            var blurMesh = new MeshMesh(vertices, _imageTriangles, uv);
-
-            var emptyPaint = new Paint();
+            var blurMesh = ImageMeshGenerator.imageMesh(null, Rect.one, maskLayer.layerBounds);
 
             var kernel = BlurUtils.get1DGaussianKernel(sigma, radius);
 
-            this._layers.Add(blurXLayer);
+            blurXLayer.draws.Add(CanvasShader.maskFilter(
+                blurXLayer, blurMesh, maskLayer,
+                radius, new Vector2(1f / textureWidth, 0), kernel));
 
-            {
-                var mat = this._getMat(emptyPaint);
-                var properties = this._getMatPropsForImage(null, emptyPaint);
-
-                properties.SetFloat("_mf_radius", radius);
-                properties.SetVector("_mf_imgInc", new Vector2(1f / textureWidth, 0));
-                properties.SetFloatArray("_mf_kernel", kernel);
-
-                blurXLayer.draws.Add(
-                    new RenderDraw {
-                        mesh = blurMesh,
-                        pass = CanvasShaderPass.mfPass0,
-                        material = mat,
-                        properties = properties,
-                        layer = maskLayer
-                    }
-                );
-            }
-
-
-            var removed = this._layers.removeLast();
-            D.assert(removed == blurXLayer);
-
-            this._layers.Add(blurYLayer);
-
-            {
-                var mat = this._getMat(emptyPaint);
-                var properties = this._getMatPropsForImage(null, emptyPaint);
-
-                properties.SetFloat("_mf_radius", radius);
-                properties.SetVector("_mf_imgInc", new Vector2(0, -1f / textureHeight));
-                properties.SetFloatArray("_mf_kernel", kernel);
-
-                blurYLayer.draws.Add(
-                    new RenderDraw {
-                        mesh = blurMesh,
-                        pass = CanvasShaderPass.mfPass0,
-                        material = mat,
-                        properties = properties,
-                        layer = blurXLayer
-                    }
-                );
-            }
-
-            removed = this._layers.removeLast();
-            D.assert(removed == blurYLayer);
+            blurYLayer.draws.Add(CanvasShader.maskFilter(
+                blurYLayer, blurMesh, blurXLayer,
+                radius, new Vector2(0, -1f / textureHeight), kernel));
 
             return blurYLayer;
         }
 
-        void _drawPathWithMaskFilter(Path path, Paint paint, MaskFilter maskFilter) {
+        void _drawWithMaskFilter(Rect meshBounds, Action<Paint> drawAction, Paint paint, MaskFilter maskFilter) {
             var layer = this._getLayer();
             var clipBounds = layer.layerBounds;
 
@@ -569,13 +361,7 @@ namespace Unity.UIWidgets.ui {
             }
 
             var state = this._getState();
-            var cache = path.flatten(state.xform, this._devicePixelRatio);
-
-            bool convex;
-            var mesh = cache.getFillMesh(out convex);
-            var meshBounds = mesh.bounds;
-
-            float sigma = XformUtils.mapRadius(state.xform, (float) maskFilter.sigma);
+            float sigma = state.scale * (float) maskFilter.sigma;
             if (sigma <= 0) {
                 return;
             }
@@ -587,91 +373,54 @@ namespace Unity.UIWidgets.ui {
                 return;
             }
 
-            var maskLayer = this._createMaskLayer(path, paint, layer, maskBounds);
+            var maskLayer = this._createMaskLayer(layer, maskBounds, drawAction, paint);
 
             var blurLayer = this._createBlurLayer(maskLayer, sigma, layer);
 
-            var vertices = new List<Vector3>(4);
-            var uv = new List<Vector2>(4);
-
-            const float uvx0 = 0.0f;
-            const float uvx1 = 1.0f;
-            const float uvy0 = 1.0f;
-            const float uvy1 = 0.0f;
-
-            vertices.Add(new Vector2((float) maskBounds.left, (float) maskBounds.top));
-            uv.Add(new Vector2(uvx0, uvy0));
-            vertices.Add(new Vector2((float) maskBounds.left, (float) maskBounds.bottom));
-            uv.Add(new Vector2(uvx0, uvy1));
-            vertices.Add(new Vector2((float) maskBounds.right, (float) maskBounds.bottom));
-            uv.Add(new Vector2(uvx1, uvy1));
-            vertices.Add(new Vector2((float) maskBounds.right, (float) maskBounds.top));
-            uv.Add(new Vector2(uvx1, uvy0));
-
-            var blurMesh = new MeshMesh(vertices, _imageTriangles, uv);
-
+            var blurMesh = ImageMeshGenerator.imageMesh(null, Rect.one, maskBounds);
             if (!this._applyClip(blurMesh.bounds)) {
                 return;
             }
 
-            var mat = this._getMat(paint);
-            var properties = this._getMatPropsForImage(null, paint);
-
-            layer.draws.Add(
-                new RenderDraw {
-                    mesh = blurMesh,
-                    pass = CanvasShaderPass.texrtPass0,
-                    material = mat,
-                    properties = properties,
-                    layer = blurLayer
-                }
-            );
+            layer.draws.Add(CanvasShader.texRT(layer, paint, blurMesh, blurLayer));
         }
 
-        void _drawPath(Path path, Paint paint) {
+        public void drawPath(Path path, Paint paint) {
             D.assert(path != null);
             D.assert(paint != null);
-
+            
             if (paint.style == PaintingStyle.fill) {
                 var state = this._getState();
-                var cache = path.flatten(state.xform, this._devicePixelRatio);
+                var cache = path.flatten(state.scale * this._devicePixelRatio);
 
                 bool convex;
-                var mesh = cache.getFillMesh(out convex);
+                var mesh = cache.getFillMesh(out convex).transform(state.matrix);
+                
+                Action<Paint> drawMesh = (Paint p) => {
+                    if (!this._applyClip(mesh.bounds)) {
+                        return;
+                    }
 
-                if (!this._applyClip(mesh.bounds)) {
+                    var layer = this._getLayer();
+                    if (convex) {
+                        layer.draws.Add(CanvasShader.convexFill(layer, p, mesh));
+                    }
+                    else {
+                        layer.draws.Add(CanvasShader.fill0(layer, mesh));
+                        layer.draws.Add(CanvasShader.fill1(layer, p, mesh.boundsMesh));
+                    }
+                };
+
+                if (paint.maskFilter != null && paint.maskFilter.sigma != 0) {
+                    this._drawWithMaskFilter(mesh.bounds, drawMesh, paint, paint.maskFilter);
                     return;
                 }
-
-                var mat = this._getMat(paint);
-                var properties = this._getMatProps(paint);
-                if (convex) {
-                    this._getLayer().draws.Add(new RenderDraw {
-                        mesh = mesh,
-                        pass = CanvasShaderPass.convexFill,
-                        material = mat,
-                        properties = properties,
-                    });
-                }
-                else {
-                    this._getLayer().draws.Add(new RenderDraw {
-                        mesh = mesh,
-                        pass = CanvasShaderPass.fillPass0,
-                        material = mat,
-                        properties = properties,
-                    });
-                    this._getLayer().draws.Add(new RenderDraw {
-                        mesh = mesh.boundsMesh,
-                        pass = CanvasShaderPass.fillPass1,
-                        material = mat,
-                        properties = properties,
-                    });
-                }
+                
+                drawMesh(paint);
             }
             else {
                 var state = this._getState();
-                float scale = XformUtils.getAverageScale(state.xform);
-                float strokeWidth = ((float) paint.strokeWidth * scale).clamp(0, 200.0f);
+                float strokeWidth = ((float) paint.strokeWidth * state.scale).clamp(0, 200.0f);
                 float alpha = 1.0f;
 
                 if (strokeWidth == 0) {
@@ -685,44 +434,30 @@ namespace Unity.UIWidgets.ui {
                     strokeWidth = this._fringeWidth;
                 }
 
-                var cache = path.flatten(state.xform, this._devicePixelRatio);
+                var cache = path.flatten(state.scale * this._devicePixelRatio);
                 var mesh = cache.getStrokeMesh(
-                    strokeWidth * 0.5f,
+                    strokeWidth / state.scale * 0.5f,
                     paint.strokeCap,
                     paint.strokeJoin,
-                    (float) paint.strokeMiterLimit);
+                    (float) paint.strokeMiterLimit).transform(state.matrix);
 
-                if (!this._applyClip(mesh.bounds)) {
+                Action<Paint> drawMesh = (Paint p) => {
+                    if (!this._applyClip(mesh.bounds)) {
+                        return;
+                    }
+
+                    var layer = this._getLayer();
+                    layer.draws.Add(CanvasShader.stroke0(layer, p, alpha, mesh));
+                    layer.draws.Add(CanvasShader.stroke1(layer, mesh));
+                };
+                
+                if (paint.maskFilter != null && paint.maskFilter.sigma != 0) {
+                    this._drawWithMaskFilter(mesh.bounds, drawMesh, paint, paint.maskFilter);
                     return;
                 }
-
-                var mat = this._getMat(paint);
-                var properties = this._getMatProps(paint, alpha);
-                this._getLayer().draws.Add(new RenderDraw {
-                    mesh = mesh,
-                    pass = CanvasShaderPass.strokePass0,
-                    material = mat,
-                    properties = properties,
-                });
-                this._getLayer().draws.Add(new RenderDraw {
-                    mesh = mesh,
-                    pass = CanvasShaderPass.strokePass1,
-                    material = mat,
-                    properties = properties,
-                });
+                
+                drawMesh(paint);
             }
-        }
-
-        public void drawPath(Path path, Paint paint) {
-            D.assert(path != null);
-            D.assert(paint != null);
-
-            if (paint.maskFilter != null) {
-                this._drawPathWithMaskFilter(path, paint, paint.maskFilter);
-                return;
-            }
-
-            this._drawPath(path, paint);
         }
 
         public void drawImage(Image image, Offset offset, Paint paint) {
@@ -732,112 +467,11 @@ namespace Unity.UIWidgets.ui {
 
             this.drawImageRect(image,
                 null,
-                Rect.fromLTWH(offset.dx, offset.dy, image.width / this._devicePixelRatio,
+                Rect.fromLTWH(
+                    offset.dx, offset.dy,
+                    image.width / this._devicePixelRatio,
                     image.height / this._devicePixelRatio),
                 paint);
-        }
-
-        Vector4 _getViewport() {
-            var layer = this._getLayer();
-            return new Vector4(
-                (float) layer.layerBounds.left,
-                (float) layer.layerBounds.top,
-                (float) layer.layerBounds.width,
-                (float) layer.layerBounds.height);
-        }
-
-        static Dictionary<BlendMode, Material> _materials = new Dictionary<BlendMode, Material>();
-        static readonly int _srcBlend = Shader.PropertyToID("_SrcBlend");
-        static readonly int _dstBlend = Shader.PropertyToID("_DstBlend");
-
-        Material _getMat(Paint paint) {
-            var op = paint == null ? BlendMode.srcOver : paint.blendMode;
-
-            Material mat;
-            if (_materials.TryGetValue(op, out mat) && mat) {
-                return mat;
-            }
-
-            var canvasShader = Shader.Find("UIWidgets/canvas");
-            if (canvasShader == null) {
-                throw new Exception("UIWidgets/canvas not found");
-            }
-
-            mat = new Material(canvasShader);
-            mat.hideFlags = HideFlags.HideAndDontSave;
-            _materials[op] = mat;
-
-            if (op == BlendMode.srcOver) {
-                mat.SetInt(_srcBlend, (int) UnityEngine.Rendering.BlendMode.One);
-                mat.SetInt(_dstBlend, (int) UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
-            }
-            else if (op == BlendMode.srcIn) {
-                mat.SetInt(_srcBlend, (int) UnityEngine.Rendering.BlendMode.DstAlpha);
-                mat.SetInt(_dstBlend, (int) UnityEngine.Rendering.BlendMode.Zero);
-            }
-            else if (op == BlendMode.srcOut) {
-                mat.SetInt(_srcBlend, (int) UnityEngine.Rendering.BlendMode.OneMinusDstAlpha);
-                mat.SetInt(_dstBlend, (int) UnityEngine.Rendering.BlendMode.Zero);
-            }
-            else if (op == BlendMode.srcATop) {
-                mat.SetInt(_srcBlend, (int) UnityEngine.Rendering.BlendMode.DstAlpha);
-                mat.SetInt(_dstBlend, (int) UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
-            }
-            else if (op == BlendMode.dstOver) {
-                mat.SetInt(_srcBlend, (int) UnityEngine.Rendering.BlendMode.OneMinusDstAlpha);
-                mat.SetInt(_dstBlend, (int) UnityEngine.Rendering.BlendMode.One);
-            }
-            else if (op == BlendMode.dstIn) {
-                mat.SetInt(_srcBlend, (int) UnityEngine.Rendering.BlendMode.Zero);
-                mat.SetInt(_dstBlend, (int) UnityEngine.Rendering.BlendMode.SrcAlpha);
-            }
-            else if (op == BlendMode.dstOut) {
-                mat.SetInt(_srcBlend, (int) UnityEngine.Rendering.BlendMode.Zero);
-                mat.SetInt(_dstBlend, (int) UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
-            }
-            else if (op == BlendMode.dstATop) {
-                mat.SetInt(_srcBlend, (int) UnityEngine.Rendering.BlendMode.OneMinusDstAlpha);
-                mat.SetInt(_dstBlend, (int) UnityEngine.Rendering.BlendMode.SrcAlpha);
-            }
-            else if (op == BlendMode.plus) {
-                mat.SetInt(_srcBlend, (int) UnityEngine.Rendering.BlendMode.One);
-                mat.SetInt(_dstBlend, (int) UnityEngine.Rendering.BlendMode.One);
-            }
-            else if (op == BlendMode.src) {
-                mat.SetInt(_srcBlend, (int) UnityEngine.Rendering.BlendMode.One);
-                mat.SetInt(_dstBlend, (int) UnityEngine.Rendering.BlendMode.Zero);
-            }
-            else if (op == BlendMode.dst) {
-                mat.SetInt(_srcBlend, (int) UnityEngine.Rendering.BlendMode.Zero);
-                mat.SetInt(_dstBlend, (int) UnityEngine.Rendering.BlendMode.One);
-            }
-            else if (op == BlendMode.xor) {
-                mat.SetInt(_srcBlend, (int) UnityEngine.Rendering.BlendMode.OneMinusDstAlpha);
-                mat.SetInt(_dstBlend, (int) UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
-            }
-            else if (op == BlendMode.clear) {
-                mat.SetInt(_srcBlend, (int) UnityEngine.Rendering.BlendMode.Zero);
-                mat.SetInt(_dstBlend, (int) UnityEngine.Rendering.BlendMode.Zero);
-            }
-            else {
-                Debug.LogWarning("Not supported BlendMode: " + op + ". Defaults to srcOver");
-                mat.SetInt(_srcBlend, (int) UnityEngine.Rendering.BlendMode.One);
-                mat.SetInt(_dstBlend, (int) UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
-            }
-
-            return mat;
-        }
-
-        MaterialPropertyBlock _getMatPropsForImage(Texture image, Paint paint) {
-            var properties = new MaterialPropertyBlock();
-            properties.SetVector("_viewport", this._getViewport());
-            properties.SetVector("_innerCol", _color(paint.color));
-            if (image != null) {
-                image.filterMode = paint.filterMode;
-                properties.SetTexture("_tex", image);
-            }
-
-            return properties;
         }
 
         public void drawImageRect(Image image, Rect dst, Paint paint) {
@@ -850,47 +484,19 @@ namespace Unity.UIWidgets.ui {
             D.assert(paint != null);
 
             if (src == null) {
-                src = Rect.fromLTWH(0, 0, image.width, image.height);
+                src = Rect.one;
+            } else {
+                src = src.scale(1f / image.width, 1f / image.height);
             }
 
-            var vertices = new List<Vector3>(4);
-            var uv = new List<Vector2>(4);
-
-            float uvx0 = (float) src.left / image.width;
-            float uvx1 = (float) src.right / image.width;
-            float uvy0 = 1.0f - (float) src.top / image.height;
-            float uvy1 = 1.0f - (float) src.bottom / image.height;
-
             var state = this._getState();
-            float x, y;
-            PathUtils.transformPoint(out x, out y, state.xform, (float) dst.left, (float) dst.top);
-            vertices.Add(new Vector2(x, y));
-            uv.Add(new Vector2(uvx0, uvy0));
-            PathUtils.transformPoint(out x, out y, state.xform, (float) dst.left, (float) dst.bottom);
-            vertices.Add(new Vector2(x, y));
-            uv.Add(new Vector2(uvx0, uvy1));
-            PathUtils.transformPoint(out x, out y, state.xform, (float) dst.right, (float) dst.bottom);
-            vertices.Add(new Vector2(x, y));
-            uv.Add(new Vector2(uvx1, uvy1));
-            PathUtils.transformPoint(out x, out y, state.xform, (float) dst.right, (float) dst.top);
-            vertices.Add(new Vector2(x, y));
-            uv.Add(new Vector2(uvx1, uvy0));
-
-            var mesh = new MeshMesh(vertices, _imageTriangles, uv);
+            var mesh = ImageMeshGenerator.imageMesh(state.matrix, src, dst);
             if (!this._applyClip(mesh.bounds)) {
                 return;
             }
 
-            var mat = this._getMat(paint);
-            var properties = this._getMatPropsForImage(image.texture, paint);
-            var isRT = image.texture is RenderTexture;
-            this._getLayer().draws.Add(new RenderDraw {
-                mesh = mesh,
-                pass = isRT ? CanvasShaderPass.texrtPass0 : CanvasShaderPass.texPass0,
-                material = mat,
-                image = image, // to keep a reference to avoid GC.
-                properties = properties,
-            });
+            var layer = this._getLayer();
+            layer.draws.Add(CanvasShader.tex(layer, paint, mesh, image));
         }
 
         public void drawImageNine(Image image, Rect center, Rect dst, Paint paint) {
@@ -903,97 +509,26 @@ namespace Unity.UIWidgets.ui {
             D.assert(dst != null);
             D.assert(paint != null);
 
+            var scaleX = 1f / image.width;
+            var scaleY = 1f / image.height;
             if (src == null) {
-                src = Rect.fromLTWH(0, 0, image.width, image.height);
+                src = Rect.one;
+            } else {
+                src = src.scale(scaleX, scaleY);                
             }
 
-            float x0 = (float) dst.left;
-            float x3 = (float) dst.right;
-            float x1 = x0 + (float) center.left / this._devicePixelRatio;
-            float x2 = x3 - (float) (src.width - center.right) / this._devicePixelRatio;
-
-            float y0 = (float) dst.top;
-            float y3 = (float) dst.bottom;
-            float y1 = y0 + (float) center.top / this._devicePixelRatio;
-            float y2 = y3 - (float) (src.height - center.bottom) / this._devicePixelRatio;
-
-            float tx0 = (float) src.left / image.width;
-            float tx1 = (float) (src.left + center.left) / image.width;
-            float tx2 = (float) (src.left + center.right) / image.width;
-            float tx3 = (float) src.right / image.width;
-            float ty0 = 1 - (float) src.top / image.height;
-            float ty1 = 1 - (float) (src.top + center.top) / image.height;
-            float ty2 = 1 - (float) (src.top + center.bottom) / image.height;
-            float ty3 = 1 - (float) src.bottom / image.height;
-
-            var vertices = new List<Vector3>(16);
-            var uv = new List<Vector2>(16);
+            center = center.scale(scaleX, scaleY);
 
             var state = this._getState();
-            float x, y;
-            PathUtils.transformPoint(out x, out y, state.xform, x0, y0);
-            vertices.Add(new Vector2(x, y));
-            uv.Add(new Vector2(tx0, ty0));
-            PathUtils.transformPoint(out x, out y, state.xform, x1, y0);
-            vertices.Add(new Vector2(x, y));
-            uv.Add(new Vector2(tx1, ty0));
-            PathUtils.transformPoint(out x, out y, state.xform, x2, y0);
-            vertices.Add(new Vector2(x, y));
-            uv.Add(new Vector2(tx2, ty0));
-            PathUtils.transformPoint(out x, out y, state.xform, x3, y0);
-            vertices.Add(new Vector2(x, y));
-            uv.Add(new Vector2(tx3, ty0));
-            PathUtils.transformPoint(out x, out y, state.xform, x0, y1);
-            vertices.Add(new Vector2(x, y));
-            uv.Add(new Vector2(tx0, ty1));
-            PathUtils.transformPoint(out x, out y, state.xform, x1, y1);
-            vertices.Add(new Vector2(x, y));
-            uv.Add(new Vector2(tx1, ty1));
-            PathUtils.transformPoint(out x, out y, state.xform, x2, y1);
-            vertices.Add(new Vector2(x, y));
-            uv.Add(new Vector2(tx2, ty1));
-            PathUtils.transformPoint(out x, out y, state.xform, x3, y1);
-            vertices.Add(new Vector2(x, y));
-            uv.Add(new Vector2(tx3, ty1));
-            PathUtils.transformPoint(out x, out y, state.xform, x0, y2);
-            vertices.Add(new Vector2(x, y));
-            uv.Add(new Vector2(tx0, ty2));
-            PathUtils.transformPoint(out x, out y, state.xform, x1, y2);
-            vertices.Add(new Vector2(x, y));
-            uv.Add(new Vector2(tx1, ty2));
-            PathUtils.transformPoint(out x, out y, state.xform, x2, y2);
-            vertices.Add(new Vector2(x, y));
-            uv.Add(new Vector2(tx2, ty2));
-            PathUtils.transformPoint(out x, out y, state.xform, x3, y2);
-            vertices.Add(new Vector2(x, y));
-            uv.Add(new Vector2(tx3, ty2));
-            PathUtils.transformPoint(out x, out y, state.xform, x0, y3);
-            vertices.Add(new Vector2(x, y));
-            uv.Add(new Vector2(tx0, ty3));
-            PathUtils.transformPoint(out x, out y, state.xform, x1, y3);
-            vertices.Add(new Vector2(x, y));
-            uv.Add(new Vector2(tx1, ty3));
-            PathUtils.transformPoint(out x, out y, state.xform, x2, y3);
-            vertices.Add(new Vector2(x, y));
-            uv.Add(new Vector2(tx2, ty3));
-            PathUtils.transformPoint(out x, out y, state.xform, x3, y3);
-            vertices.Add(new Vector2(x, y));
-            uv.Add(new Vector2(tx3, ty3));
 
-            var mesh = new MeshMesh(vertices, _imageNineTriangles, uv);
+            var mesh = ImageMeshGenerator.imageNineMesh(state.matrix, src, center, dst);
+            
             if (!this._applyClip(mesh.bounds)) {
                 return;
             }
 
-            var mat = this._getMat(paint);
-            var properties = this._getMatPropsForImage(image.texture, paint);
-            this._getLayer().draws.Add(new RenderDraw {
-                mesh = mesh,
-                pass = CanvasShaderPass.texPass0,
-                material = mat,
-                image = image, // to keep a reference to avoid GC.
-                properties = properties,
-            });
+            var layer = this._getLayer();
+            layer.draws.Add(CanvasShader.tex(layer, paint, mesh, image));
         }
 
         public void drawPicture(Picture picture) {
@@ -1003,89 +538,90 @@ namespace Unity.UIWidgets.ui {
 
             var drawCmds = picture.drawCmds;
             foreach (var drawCmd in drawCmds) {
-                if (drawCmd is DrawSave) {
-                    saveCount++;
-                    this.save();
-                }
-                else if (drawCmd is DrawSaveLayer) {
-                    saveCount++;
-                    var drawSaveLayer = (DrawSaveLayer) drawCmd;
-                    this.saveLayer(drawSaveLayer.rect, drawSaveLayer.paint);
-                }
-                else if (drawCmd is DrawRestore) {
-                    saveCount--;
-                    if (saveCount < 0) {
-                        throw new Exception("unmatched save/restore in picture");
+                switch (drawCmd) {
+                    case DrawSave _:
+                        saveCount++;
+                        this.save();
+                        break;
+                    case DrawSaveLayer cmd: {
+                        saveCount++;
+                        this.saveLayer(cmd.rect, cmd.paint);
+                        break;
                     }
+                    case DrawRestore _: {
+                        saveCount--;
+                        if (saveCount < 0) {
+                            throw new Exception("unmatched save/restore in picture");
+                        }
 
-                    this.restore();
-                }
-                else if (drawCmd is DrawTranslate) {
-                    var drawTranslate = (DrawTranslate) drawCmd;
-                    this.translate(drawTranslate.dx, drawTranslate.dy);
-                }
-                else if (drawCmd is DrawScale) {
-                    var drawScale = (DrawScale) drawCmd;
-                    this.scale(drawScale.sx, drawScale.sy);
-                }
-                else if (drawCmd is DrawRotate) {
-                    var drawRotate = (DrawRotate) drawCmd;
-                    this.rotate(drawRotate.radians, drawRotate.offset);
-                }
-                else if (drawCmd is DrawSkew) {
-                    var drawSkew = (DrawSkew) drawCmd;
-                    this.skew(drawSkew.sx, drawSkew.sy);
-                }
-                else if (drawCmd is DrawConcat) {
-                    var drawConcat = (DrawConcat) drawCmd;
-                    this.concat(drawConcat.matrix);
-                }
-                else if (drawCmd is DrawResetMatrix) {
-                    this.resetMatrix();
-                }
-                else if (drawCmd is DrawSetMatrix) {
-                    var drawSetMatrix = (DrawSetMatrix) drawCmd;
-                    this.setMatrix(drawSetMatrix.matrix);
-                }
-                else if (drawCmd is DrawClipRect) {
-                    var drawClipRect = (DrawClipRect) drawCmd;
-                    this.clipRect(drawClipRect.rect);
-                }
-                else if (drawCmd is DrawClipRRect) {
-                    var drawClipRRect = (DrawClipRRect) drawCmd;
-                    this.clipRRect(drawClipRRect.rrect);
-                }
-                else if (drawCmd is DrawClipPath) {
-                    var drawClipPath = (DrawClipPath) drawCmd;
-                    this.clipPath(drawClipPath.path);
-                }
-                else if (drawCmd is DrawPath) {
-                    var drawPath = (DrawPath) drawCmd;
-                    this.drawPath(drawPath.path, drawPath.paint);
-                }
-                else if (drawCmd is DrawImage) {
-                    var drawImage = (DrawImage) drawCmd;
-                    this.drawImage(drawImage.image, drawImage.offset, drawImage.paint);
-                }
-                else if (drawCmd is DrawImageRect) {
-                    var drawImageRect = (DrawImageRect) drawCmd;
-                    this.drawImageRect(drawImageRect.image, drawImageRect.src, drawImageRect.dst, drawImageRect.paint);
-                }
-                else if (drawCmd is DrawImageNine) {
-                    var drawImageNine = (DrawImageNine) drawCmd;
-                    this.drawImageNine(drawImageNine.image, drawImageNine.src, drawImageNine.center, drawImageNine.dst,
-                        drawImageNine.paint);
-                }
-                else if (drawCmd is DrawPicture) {
-                    var drawPicture = (DrawPicture) drawCmd;
-                    this.drawPicture(drawPicture.picture);
-                }
-                else if (drawCmd is DrawTextBlob) {
-                    var drawTextBlob = (DrawTextBlob) drawCmd;
-                    this.drawTextBlob(drawTextBlob.textBlob, drawTextBlob.offset, drawTextBlob.paint);
-                }
-                else {
-                    throw new Exception("unknown drawCmd: " + drawCmd);
+                        this.restore();
+                        break;
+                    }
+                    case DrawTranslate cmd: {
+                        this.translate(cmd.dx, cmd.dy);
+                        break;
+                    }
+                    case DrawScale cmd: {
+                        this.scale(cmd.sx, cmd.sy);
+                        break;
+                    }
+                    case DrawRotate cmd: {
+                        this.rotate(cmd.radians, cmd.offset);
+                        break;
+                    }
+                    case DrawSkew cmd: {
+                        this.skew(cmd.sx, cmd.sy);
+                        break;
+                    }
+                    case DrawConcat cmd: {
+                        this.concat(cmd.matrix);
+                        break;
+                    }
+                    case DrawResetMatrix _:
+                        this.resetMatrix();
+                        break;
+                    case DrawSetMatrix cmd: {
+                        this.setMatrix(cmd.matrix);
+                        break;
+                    }
+                    case DrawClipRect cmd: {
+                        this.clipRect(cmd.rect);
+                        break;
+                    }
+                    case DrawClipRRect cmd: {
+                        this.clipRRect(cmd.rrect);
+                        break;
+                    }
+                    case DrawClipPath cmd: {
+                        this.clipPath(cmd.path);
+                        break;
+                    }
+                    case DrawPath cmd: {
+                        this.drawPath(cmd.path, cmd.paint);
+                        break;
+                    }
+                    case DrawImage cmd: {
+                        this.drawImage(cmd.image, cmd.offset, cmd.paint);
+                        break;
+                    }
+                    case DrawImageRect cmd: {
+                        this.drawImageRect(cmd.image, cmd.src, cmd.dst, cmd.paint);
+                        break;
+                    }
+                    case DrawImageNine cmd: {
+                        this.drawImageNine(cmd.image, cmd.src, cmd.center, cmd.dst, cmd.paint);
+                        break;
+                    }
+                    case DrawPicture cmd: {
+                        this.drawPicture(cmd.picture);
+                        break;
+                    }
+                    case DrawTextBlob cmd: {
+                        this.drawTextBlob(cmd.textBlob, cmd.offset, cmd.paint);
+                        break;
+                    }
+                    default:
+                        throw new Exception("unknown drawCmd: " + drawCmd);
                 }
             }
 
@@ -1097,31 +633,38 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void drawTextBlob(TextBlob textBlob, Offset offset, Paint paint) {
+            D.assert(textBlob != null);
+            D.assert(offset != null);
+            D.assert(paint != null);
+            
             var state = this._getState();
-
-            var xform = new float[6];
-            XformUtils.transformTranslate(xform, (float) offset.dx, (float) offset.dy);
-            XformUtils.transformMultiply(xform, state.xform); // xform = state.xform * xform
-
-            var scale = XformUtils.getAverageScale(xform) * this._devicePixelRatio;            
-            var mesh = MeshGenerator.generateMesh(textBlob, scale)?.transform(xform);
-
+            var scale = state.scale * this._devicePixelRatio;
+            
+            var matrix = new Matrix3(state.matrix);
+            matrix.preTranslate((float) offset.dx, (float) offset.dy);            
+            var mesh = MeshGenerator.generateMesh(textBlob, scale)?.transform(matrix);
             if (mesh == null) {
                 return;
             }
-            if (!this._applyClip(mesh.bounds)) {
+            
+            var font = FontManager.instance.getOrCreate(textBlob.style.fontFamily).font;
+            var tex = font.material.mainTexture;
+
+            Action<Paint> drawMesh = (Paint p) => {
+                if (!this._applyClip(mesh.bounds)) {
+                    return;
+                }
+
+                var layer = this._getLayer();
+                layer.draws.Add(CanvasShader.texAlpha(layer, p, mesh, tex));
+            };
+
+            if (paint.maskFilter != null && paint.maskFilter.sigma != 0) {
+                this._drawWithMaskFilter(mesh.bounds, drawMesh, paint, paint.maskFilter);
                 return;
             }
 
-            var mat = this._getMat(paint);
-            var font = FontManager.instance.getOrCreate(textBlob.style.fontFamily).font;
-            var properties = this._getMatPropsForImage(font.material.mainTexture, paint);
-            this._getLayer().draws.Add(new RenderDraw {
-                mesh = mesh,
-                pass = CanvasShaderPass.texfontPass0,
-                material = mat,
-                properties = properties,
-            });
+            drawMesh(paint);
         }
 
         public void flush() {
@@ -1202,8 +745,39 @@ namespace Unity.UIWidgets.ui {
                 cmdBuf.ClearRenderTarget(true, true, UnityEngine.Color.clear);
             }
 
-            foreach (var draw in layer.draws) {
-                draw.onExecute(this, cmdBuf);
+            foreach (var cmdObj in layer.draws) {
+                switch (cmdObj) {
+                    case RenderDraw cmd:
+                        if (cmd.layer != null) {
+                            cmdBuf.SetGlobalTexture(RenderDraw.texId, cmd.layer.rtID);
+                        }
+
+                        D.assert(cmd.meshObj == null);
+                        cmd.meshObj = this._meshPool.getMesh();
+                        cmd.meshObjCreated = true;
+
+                        // clear triangles first in order to bypass validation in SetVertices.
+                        cmd.meshObj.SetTriangles((int[]) null, 0, false);
+
+                        cmd.meshObj.SetVertices(cmd.mesh.vertices);
+                        cmd.meshObj.SetTriangles(cmd.mesh.triangles, 0, false);
+                        cmd.meshObj.SetUVs(0, cmd.mesh.uv);
+
+                        if (cmd.mesh.matrix == null) {
+                            cmd.properties.SetFloatArray(RenderDraw.matId, RenderDraw.idMat3.fMat);
+                        } else {
+                            cmd.properties.SetFloatArray(RenderDraw.matId, cmd.mesh.matrix.fMat);
+                        }
+
+                        cmdBuf.DrawMesh(cmd.meshObj, RenderDraw.idMat, cmd.material, 0, cmd.pass, cmd.properties);
+                        if (cmd.layer != null) {
+                            cmdBuf.SetGlobalTexture(RenderDraw.texId, BuiltinRenderTextureType.None);
+                        }
+                        break;
+                    case RenderScissor cmd:
+                        cmdBuf.EnableScissorRect(cmd.deviceScissor.toRect());
+                        break;
+                }
             }
 
             foreach (var subLayer in layer.layers) {
@@ -1212,8 +786,17 @@ namespace Unity.UIWidgets.ui {
         }
 
         void _clearLayer(RenderLayer layer) {
-            foreach (var draw in layer.draws) {
-                draw.onDestroy(this);
+            for (var index = 0; index < layer.draws.Count; index++) {
+                var cmdObj = layer.draws[index];
+                switch (cmdObj) {
+                    case RenderDraw cmd:
+                        if (cmd.meshObjCreated) {
+                            this._meshPool.returnMesh(cmd.meshObj);
+                            cmd.meshObj = null;
+                            cmd.meshObjCreated = false;
+                        }
+                        break;
+                }
             }
 
             layer.draws.Clear();
@@ -1236,36 +819,69 @@ namespace Unity.UIWidgets.ui {
             return layer.lastClipGenId != clipGenId || layer.lastClipBounds != clipBounds;
         }
 
-        class State {
-            public float[] xform = {1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f};
+        internal class State {
+            static readonly Matrix3 _id = Matrix3.I();
+            
+            Matrix3 _matrix;
+            float? _scale;
+
+            public State(Matrix3 matrix = null, float? scale = null) {
+                this._matrix = matrix ?? _id;
+                this._scale = scale;
+            }
+            
+            public Matrix3 matrix {
+                get { return this._matrix; }
+                set {
+                    this._matrix = value;
+                    this._scale = null;
+                }
+            }
+
+            public float scale {
+                get {
+                    if (this._scale == null) {
+                        this._scale = XformUtils.getScale(this._matrix);
+                    }
+                    return this._scale.Value;
+                }
+            }
 
             public State copy() {
-                return new State {
-                    xform = (float[]) this.xform.Clone(),
-                };
+                return new State(this._matrix, this._scale);
             }
         }
 
-        class RenderLayer {
+        internal class RenderLayer {
             public int rtID;
             public int width;
             public int height;
             public Rect layerBounds;
             public Paint layerPaint;
-            public readonly List<RenderCmd> draws = new List<RenderCmd>();
+            public readonly List<object> draws = new List<object>();
             public readonly List<RenderLayer> layers = new List<RenderLayer>();
             public readonly List<State> states = new List<State> {new State()};
             public readonly ClipStack clipStack = new ClipStack();
             public uint lastClipGenId;
             public Rect lastClipBounds;
+
+            Vector4? _viewport;
+
+            public Vector4 viewport {
+                get {
+                    if (!this._viewport.HasValue) {
+                        this._viewport = new Vector4(
+                            (float) this.layerBounds.left,
+                            (float) this.layerBounds.top,
+                            (float) this.layerBounds.width,
+                            (float) this.layerBounds.height);
+                    }
+                    return this._viewport.Value;
+                }
+            }
         }
 
-        interface RenderCmd {
-            void onExecute(CommandBufferCanvas canvas, CommandBuffer cmdBuf);
-            void onDestroy(CommandBufferCanvas canvas);
-        }
-
-        class RenderDraw : RenderCmd {
+        internal class RenderDraw {
             public MeshMesh mesh;
             public int pass;
             public MaterialPropertyBlock properties;
@@ -1273,208 +889,79 @@ namespace Unity.UIWidgets.ui {
             public Material material;
             public Image image; // just to keep a reference to avoid GC.
             public Mesh meshObj;
+            public bool meshObjCreated;
 
-            public void onExecute(CommandBufferCanvas canvas, CommandBuffer cmdBuf) {
-                if (this.layer != null) {
-                    cmdBuf.SetGlobalTexture("_tex", this.layer.rtID);
-                }
-
-                if (!this.meshObj) {
-                    this.meshObj = canvas._meshPool.getMesh();
-
-                    // clear triangles first in order to bypass validation in SetVertices.
-                    this.meshObj.SetTriangles((int[]) null, 0, false);
-
-                    this.meshObj.SetVertices(this.mesh.vertices);
-                    this.meshObj.SetTriangles(this.mesh.triangles, 0, false);
-                    this.meshObj.SetUVs(0, this.mesh.uv);
-                }
-
-                cmdBuf.DrawMesh(this.meshObj, Matrix4x4.identity, this.material, 0, this.pass, this.properties);
-                if (this.layer != null) {
-                    cmdBuf.SetGlobalTexture("_tex", BuiltinRenderTextureType.None);
-                }
-            }
-
-            public void onDestroy(CommandBufferCanvas canvas) {
-                if (this.meshObj) {
-                    canvas._meshPool.returnMesh(this.meshObj);
-                    this.meshObj = null;
-                }
-            }
+            public static readonly Matrix4x4 idMat = Matrix4x4.identity;
+            public static readonly Matrix3 idMat3 = Matrix3.I();
+            public static readonly int texId = Shader.PropertyToID("_tex");
+            public static readonly int matId = Shader.PropertyToID("_mat");
         }
 
-        class RenderScissor : RenderCmd {
+        internal class RenderScissor {
             public Rect deviceScissor;
-
-            public void onExecute(CommandBufferCanvas canvas, CommandBuffer cmdBuf) {
-                cmdBuf.EnableScissorRect(this.deviceScissor.toRect());
-            }
-
-            public void onDestroy(CommandBufferCanvas canvas) {
-            }
         }
     }
 
-    static class CanvasShaderPass {
-        public const int fillPass0 = 0;
-        public const int fillPass1 = 1;
-        public const int convexFill = 2;
-        public const int strokePass0 = 3;
-        public const int strokePass1 = 4;
-        public const int texPass0 = 5;
-        public const int texrtPass0 = 6;
-        public const int stencilClear = 7;
-        public const int stencilIntersect0 = 8;
-        public const int stencilIntersect1 = 9;
-        public const int texfontPass0 = 10;
-        public const int mfPass0 = 11;
-    }
 
     static class XformUtils {
-        public static void transformCopy(float[] t, float[] s) {
-            t[0] = s[0];
-            t[1] = s[1];
-            t[2] = s[2];
-            t[3] = s[3];
-            t[4] = s[4];
-            t[5] = s[5];
+        public static float getAverageScale(Matrix3 matrix) {
+            return (getScaleX(matrix) + getScaleY(matrix)) * 0.5f;
         }
 
-        public static void transformIdentity(float[] t) {
-            t[0] = 1.0f;
-            t[1] = 0.0f;
-            t[2] = 0.0f;
-            t[3] = 1.0f;
-            t[4] = 0.0f;
-            t[5] = 0.0f;
+        public static float getMaxScale(Matrix3 matrix) {
+            return Mathf.Max(getScaleX(matrix), getScaleY(matrix));
         }
 
-        public static void transformTranslate(float[] t, float tx, float ty) {
-            t[0] = 1.0f;
-            t[1] = 0.0f;
-            t[2] = 0.0f;
-            t[3] = 1.0f;
-            t[4] = tx;
-            t[5] = ty;
-        }
-
-        public static void transformScale(float[] t, float sx, float sy) {
-            t[0] = sx;
-            t[1] = 0.0f;
-            t[2] = 0.0f;
-            t[3] = sy;
-            t[4] = 0.0f;
-            t[5] = 0.0f;
-        }
-
-        public static void transformRotate(float[] t, float a) {
-            float cs = Mathf.Cos(a), sn = Mathf.Sin(a);
-            t[0] = cs;
-            t[1] = sn;
-            t[2] = -sn;
-            t[3] = cs;
-            t[4] = 0.0f;
-            t[5] = 0.0f;
-        }
-
-        public static void transformSkew(float[] t, float sx, float sy) {
-            t[0] = 1.0f;
-            t[1] = Mathf.Tan(sy);
-            t[2] = Mathf.Tan(sx);
-            t[3] = 1.0f;
-            t[4] = 0.0f;
-            t[5] = 0.0f;
-        }
-
-        // t = s * t;
-        public static void transformMultiply(float[] t, float[] s) {
-            float t0 = t[0] * s[0] + t[1] * s[2];
-            float t2 = t[2] * s[0] + t[3] * s[2];
-            float t4 = t[4] * s[0] + t[5] * s[2] + s[4];
-            t[1] = t[0] * s[1] + t[1] * s[3];
-            t[3] = t[2] * s[1] + t[3] * s[3];
-            t[5] = t[4] * s[1] + t[5] * s[3] + s[5];
-            t[0] = t0;
-            t[2] = t2;
-            t[4] = t4;
-        }
-
-        // t = t * s;
-        public static void transformPremultiply(float[] t, float[] s) {
-            float[] s2 = {s[0], s[1], s[2], s[3], s[4], s[5]};
-            transformMultiply(s2, t);
-            t[0] = s2[0];
-            t[1] = s2[1];
-            t[2] = s2[2];
-            t[3] = s2[3];
-            t[4] = s2[4];
-            t[5] = s2[5];
-        }
-
-        public static int transformInverse(float[] inv, float[] t) {
-            double det = (double) t[0] * t[3] - (double) t[2] * t[1];
-            if (det > -1e-6 && det < 1e-6) {
-                transformIdentity(inv);
-                return 0;
+        public static float getScaleX(Matrix3 matrix) {
+            // ignore perspective parameters for now.
+            if (matrix.isIdentity()) {
+                return 1.0f;
             }
 
-            double invdet = 1.0 / det;
-            inv[0] = (float) (t[3] * invdet);
-            inv[2] = (float) (-t[2] * invdet);
-            inv[4] = (float) (((double) t[2] * t[5] - (double) t[3] * t[4]) * invdet);
-            inv[1] = (float) (-t[1] * invdet);
-            inv[3] = (float) (t[0] * invdet);
-            inv[5] = (float) (((double) t[1] * t[4] - (double) t[0] * t[5]) * invdet);
-            return 1;
+            if (matrix.getSkewY() == 0) {
+                return matrix.getScaleX();
+            }
+            
+            var x = matrix.getScaleX();
+            var y = matrix.getSkewY();
+            
+            return Mathf.Sqrt(x * x + y * y);
         }
 
-        public static float getAverageScale(float[] t) {
-            return (getScaleX(t) + getScaleY(t)) * 0.5f;
+        public static float getScaleY(Matrix3 matrix) {
+            // ignore perspective parameters for now.
+            if (matrix.isIdentity()) {
+                return 1.0f;
+            }
+
+            if (matrix.getSkewX() == 0) {
+                return matrix.getScaleY();
+            }
+
+            var x = matrix.getSkewX();
+            var y = matrix.getScaleY();
+
+            return Mathf.Sqrt(x * x + y * y);
         }
 
-        public static float getMaxScale(float[] t) {
-            return Mathf.Max(getScaleX(t), getScaleY(t));
-        }
+        public static float getScale(Matrix3 matrix) {
+            var scaleX = getScaleX(matrix);
+            var scaleY = getScaleY(matrix);
 
-        public static float getScaleX(float[] t) {
-            return Mathf.Sqrt(t[0] * t[0] + t[2] * t[2]);
-        }
+            if (scaleX == 1.0) {
+                return scaleY;
+            }
 
-        public static float getScaleY(float[] t) {
-            return Mathf.Sqrt(t[1] * t[1] + t[3] * t[3]);
-        }
-
-        public static float mapRadius(float[] t, float radius) {
-            // mapped point of (radius, 0) and (0, radius)
-            var x0 = radius * t[0] + t[4];
-            var y0 = radius * t[1] + t[5];
-            var x1 = radius * t[2] + t[4];
-            var y1 = radius * t[3] + t[5];
+            if (scaleY == 1.0) {
+                return scaleX;
+            }
 
             // geometric mean of len0 and len1.
-            return Mathf.Sqrt(Mathf.Sqrt((x0 * x0 + y0 * y0) * (x1 * x1 + y1 * y1)));
+            return Mathf.Sqrt(scaleX * scaleY);
         }
-
-        public static void transformPoint(out float dx, out float dy, float[] t, float sx, float sy) {
-            dx = sx * t[0] + sy * t[2] + t[4];
-            dy = sx * t[1] + sy * t[3] + t[5];
-        }
-
-        public static float[] fromMatrix3(Matrix3 matrix) {
-            return new[] {
-                matrix.getScaleX(), matrix.getSkewY(),
-                matrix.getSkewX(), matrix.getScaleY(),
-                matrix.getTranslateX(), matrix.getTranslateY(),
-            };
-        }
-
-        public static Matrix3 toMatrix3(float[] xform) {
-            return Matrix3.makeAll(
-                xform[0], xform[2], xform[4],
-                xform[1], xform[3], xform[5],
-                0, 0, 1
-            );
+        
+        public static float mapRadius(Matrix3 matrix, float radius) {
+            return getScale(matrix) * radius;
         }
     }
 
@@ -1599,5 +1086,113 @@ namespace Unity.UIWidgets.ui {
                 return $"_GaussianKernelKey(gaussianSigma: {this.gaussianSigma:F1}, radius: {this.radius})";
             }
         }
+    }
+
+    static class ImageMeshGenerator {
+        static readonly List<int> _imageTriangles = new List<int>(12) {
+            0, 1, 2, 0, 2, 1,
+            0, 2, 3, 0, 3, 2,
+        };
+
+        static readonly List<int> _imageNineTriangles = new List<int>(12 * 9) {
+            0, 4, 1, 1, 4, 5,
+            0, 1, 4, 1, 5, 4,
+            1, 5, 2, 2, 5, 6,
+            1, 2, 5, 2, 6, 5,
+            2, 6, 3, 3, 6, 7,
+            2, 3, 6, 3, 7, 6,
+            4, 8, 5, 5, 8, 9,
+            4, 5, 8, 5, 9, 8,
+            5, 9, 6, 6, 9, 10,
+            5, 6, 9, 6, 10, 9,
+            6, 10, 7, 7, 10, 11,
+            6, 7, 10, 7, 11, 10,
+            8, 12, 9, 9, 12, 13,
+            8, 9, 12, 9, 13, 12,
+            9, 13, 10, 10, 13, 14,
+            9, 10, 13, 10, 14, 13,
+            10, 14, 11, 11, 14, 15,
+            10, 11, 14, 11, 15, 14,
+        };
+
+        public static MeshMesh imageMesh(Matrix3 matrix, Rect src, Rect dst) {
+            var vertices = new List<Vector3>(4);
+            var uv = new List<Vector2>(4);
+
+            float uvx0 = (float) src.left;
+            float uvx1 = (float) src.right;
+            float uvy0 = 1.0f - (float) src.top;
+            float uvy1 = 1.0f - (float) src.bottom;
+
+            vertices.Add(new Vector2((float) dst.left, (float) dst.top));
+            uv.Add(new Vector2(uvx0, uvy0));
+            vertices.Add(new Vector2((float) dst.left, (float) dst.bottom));
+            uv.Add(new Vector2(uvx0, uvy1));
+            vertices.Add(new Vector2((float) dst.right, (float) dst.bottom));
+            uv.Add(new Vector2(uvx1, uvy1));
+            vertices.Add(new Vector2((float) dst.right, (float) dst.top));
+            uv.Add(new Vector2(uvx1, uvy0));
+
+            return new MeshMesh(matrix, vertices, _imageTriangles, uv);
+        }
+
+        public static MeshMesh imageNineMesh(Matrix3 matrix, Rect src, Rect center, Rect dst) {
+            float x0 = (float) dst.left;
+            float x3 = (float) dst.right;
+            float x1 = x0 + (float) ((center.left - src.left) * dst.width);
+            float x2 = x3 - (float) ((src.right - center.right) * dst.width);
+
+            float y0 = (float) dst.top;
+            float y3 = (float) dst.bottom;
+            float y1 = y0 + (float) ((center.top - src.top) * dst.height);
+            float y2 = y3 - (float) ((src.bottom - center.bottom) * dst.height);
+
+            float tx0 = (float) src.left;
+            float tx1 = (float) center.left;
+            float tx2 = (float) center.right;
+            float tx3 = (float) src.right;
+            float ty0 = 1 - (float) src.top;
+            float ty1 = 1 - (float) center.top;
+            float ty2 = 1 - (float) center.bottom;
+            float ty3 = 1 - (float) src.bottom;
+
+            var vertices = new List<Vector3>(16);
+            var uv = new List<Vector2>(16);
+
+            vertices.Add(new Vector2(x0, y0));
+            uv.Add(new Vector2(tx0, ty0));
+            vertices.Add(new Vector2(x1, y0));
+            uv.Add(new Vector2(tx1, ty0));
+            vertices.Add(new Vector2(x2, y0));
+            uv.Add(new Vector2(tx2, ty0));
+            vertices.Add(new Vector2(x3, y0));
+            uv.Add(new Vector2(tx3, ty0));
+            vertices.Add(new Vector2(x0, y1));
+            uv.Add(new Vector2(tx0, ty1));
+            vertices.Add(new Vector2(x1, y1));
+            uv.Add(new Vector2(tx1, ty1));
+            vertices.Add(new Vector2(x2, y1));
+            uv.Add(new Vector2(tx2, ty1));
+            vertices.Add(new Vector2(x3, y1));
+            uv.Add(new Vector2(tx3, ty1));
+            vertices.Add(new Vector2(x0, y2));
+            uv.Add(new Vector2(tx0, ty2));
+            vertices.Add(new Vector2(x1, y2));
+            uv.Add(new Vector2(tx1, ty2));
+            vertices.Add(new Vector2(x2, y2));
+            uv.Add(new Vector2(tx2, ty2));
+            vertices.Add(new Vector2(x3, y2));
+            uv.Add(new Vector2(tx3, ty2));
+            vertices.Add(new Vector2(x0, y3));
+            uv.Add(new Vector2(tx0, ty3));
+            vertices.Add(new Vector2(x1, y3));
+            uv.Add(new Vector2(tx1, ty3));
+            vertices.Add(new Vector2(x2, y3));
+            uv.Add(new Vector2(tx2, ty3));
+            vertices.Add(new Vector2(x3, y3));
+            uv.Add(new Vector2(tx3, ty3));
+            
+            return new MeshMesh(matrix, vertices, _imageNineTriangles, uv);
+        }        
     }
 }

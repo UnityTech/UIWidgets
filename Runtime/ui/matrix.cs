@@ -22,21 +22,27 @@ namespace Unity.UIWidgets.ui {
             return m;
         }
 
-        public static Matrix3 makeRotate(float degree) {
+        public static Matrix3 makeRotate(float radians) {
             var m = new Matrix3();
-            m.setRotate(degree);
+            m.setRotate(radians);
             return m;
         }
 
-        public static Matrix3 makeRotate(float degree, float px, float py) {
+        public static Matrix3 makeRotate(float radians, float px, float py) {
             var m = new Matrix3();
-            m.setRotate(degree, px, py);
+            m.setRotate(radians, px, py);
             return m;
         }
 
         public static Matrix3 makeTrans(Offset offset) {
             var m = new Matrix3();
             m.setTranslate((float) offset.dx, (float) offset.dy);
+            return m;
+        }
+        
+        public static Matrix3 makeSkew(float dx, float dy) {
+            var m = new Matrix3();
+            m.setSkew(dx, dy);
             return m;
         }
 
@@ -329,15 +335,15 @@ namespace Unity.UIWidgets.ui {
             }
         }
 
-        public void setRotate(float degrees, float px, float py) {
+        public void setRotate(float radians, float px, float py) {
             float sinV, cosV;
-            sinV = ScalarUtils.ScalarSinCos(ScalarUtils.DegreesToRadians(degrees), out cosV);
+            sinV = ScalarUtils.ScalarSinCos(radians, out cosV);
             this.setSinCos(sinV, cosV, px, py);
         }
 
-        public void setRotate(float degrees) {
+        public void setRotate(float radians) {
             float sinV, cosV;
-            sinV = ScalarUtils.ScalarSinCos(ScalarUtils.DegreesToRadians(degrees), out cosV);
+            sinV = ScalarUtils.ScalarSinCos(radians, out cosV);
             this.setSinCos(sinV, cosV);
         }
 
@@ -551,15 +557,15 @@ namespace Unity.UIWidgets.ui {
             }
         }
 
-        public void preRotate(float degrees, float px, float py) {
+        public void preRotate(float radians, float px, float py) {
             var m = new Matrix3();
-            m.setRotate(degrees, px, py);
+            m.setRotate(radians, px, py);
             this.preConcat(m);
         }
 
-        public void preRotate(float degrees) {
+        public void preRotate(float radians) {
             var m = new Matrix3();
-            m.setRotate(degrees);
+            m.setRotate(radians);
             this.preConcat(m);
         }
 
@@ -616,15 +622,15 @@ namespace Unity.UIWidgets.ui {
             this.postConcat(m);
         }
 
-        public void postRotate(float degrees, float px, float py) {
+        public void postRotate(float radians, float px, float py) {
             var m = new Matrix3();
-            m.setRotate(degrees, px, py);
+            m.setRotate(radians, px, py);
             this.postConcat(m);
         }
 
-        public void postRotate(float degrees) {
+        public void postRotate(float radians) {
             var m = new Matrix3();
-            m.setRotate(degrees);
+            m.setRotate(radians);
             this.postConcat(m);
         }
 
@@ -834,7 +840,7 @@ namespace Unity.UIWidgets.ui {
              TypeMask.kPerspective_Mask) |
             kRectStaysRect_Mask;
 
-        readonly float[] fMat = new float[9];
+        internal readonly float[] fMat = new float[9];
         int fTypeMask = 0;
 
         Matrix3() {

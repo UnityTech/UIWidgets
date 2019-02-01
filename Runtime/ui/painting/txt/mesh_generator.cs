@@ -151,10 +151,10 @@ namespace Unity.UIWidgets.ui {
             if (vertices.Count == 0) {
                 return null;
             }
-
-            MeshMesh mesh = vertices.Count > 0 ? new MeshMesh(vertices, triangles, uv) : null;
-            _meshes[key] = new MeshInfo(key, mesh, fontInfo.textureVersion);
             
+            MeshMesh mesh = vertices.Count > 0 ? new MeshMesh(null, vertices, triangles, uv) : null;
+            _meshes[key] = new MeshInfo(key, mesh, fontInfo.textureVersion);
+
             return mesh;
         }
     }

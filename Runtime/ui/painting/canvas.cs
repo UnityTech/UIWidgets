@@ -88,7 +88,7 @@ namespace Unity.UIWidgets.ui {
             this._saveCount++;
             this._recorder.addDrawCmd(new DrawSaveLayer {
                 rect = rect,
-                paint = paint,
+                paint = new Paint(paint),
             });
         }
 
@@ -180,7 +180,7 @@ namespace Unity.UIWidgets.ui {
 
             this._recorder.addDrawCmd(new DrawPath {
                 path = path,
-                paint = paint,
+                paint = new Paint(paint),
             });
         }
 
@@ -193,7 +193,7 @@ namespace Unity.UIWidgets.ui {
 
             this._recorder.addDrawCmd(new DrawPath {
                 path = path,
-                paint = paint,
+                paint = new Paint(paint),
             });
         }
 
@@ -202,7 +202,7 @@ namespace Unity.UIWidgets.ui {
             path.addRRect(rrect);
             this._recorder.addDrawCmd(new DrawPath {
                 path = path,
-                paint = paint,
+                paint = new Paint(paint),
             });
         }
 
@@ -214,7 +214,7 @@ namespace Unity.UIWidgets.ui {
 
             this._recorder.addDrawCmd(new DrawPath {
                 path = path,
-                paint = paint,
+                paint = new Paint(paint),
             });
         }
 
@@ -226,7 +226,7 @@ namespace Unity.UIWidgets.ui {
 
             this._recorder.addDrawCmd(new DrawPath {
                 path = path,
-                paint = paint,
+                paint = new Paint(paint),
             });
         }
 
@@ -236,7 +236,7 @@ namespace Unity.UIWidgets.ui {
 
             this._recorder.addDrawCmd(new DrawPath {
                 path = path,
-                paint = paint,
+                paint = new Paint(paint),
             });
         }
 
@@ -246,14 +246,14 @@ namespace Unity.UIWidgets.ui {
 
             this._recorder.addDrawCmd(new DrawPath {
                 path = path,
-                paint = paint,
+                paint = new Paint(paint),
             });
         }
 
         public void drawPath(Path path, Paint paint) {
             this._recorder.addDrawCmd(new DrawPath {
                 path = path,
-                paint = paint,
+                paint = new Paint(paint),
             });
         }
 
@@ -261,7 +261,7 @@ namespace Unity.UIWidgets.ui {
             this._recorder.addDrawCmd(new DrawImage {
                 image = image,
                 offset = offset,
-                paint = paint,
+                paint = new Paint(paint),
             });
         }
 
@@ -269,7 +269,7 @@ namespace Unity.UIWidgets.ui {
             this._recorder.addDrawCmd(new DrawImageRect {
                 image = image,
                 dst = dst,
-                paint = paint,
+                paint = new Paint(paint),
             });
         }
 
@@ -278,7 +278,7 @@ namespace Unity.UIWidgets.ui {
                 image = image,
                 src = src,
                 dst = dst,
-                paint = paint,
+                paint = new Paint(paint),
             });
         }
 
@@ -287,7 +287,7 @@ namespace Unity.UIWidgets.ui {
                 image = image,
                 center = center,
                 dst = dst,
-                paint = paint,
+                paint = new Paint(paint),
             });
         }
 
@@ -297,7 +297,7 @@ namespace Unity.UIWidgets.ui {
                 src = src,
                 center = center,
                 dst = dst,
-                paint = paint,
+                paint = new Paint(paint),
             });
         }
 
@@ -311,7 +311,7 @@ namespace Unity.UIWidgets.ui {
             this._recorder.addDrawCmd(new DrawTextBlob {
                 textBlob = textBlob,
                 offset = offset,
-                paint = paint,
+                paint = new Paint(paint),
             });
         }
 
