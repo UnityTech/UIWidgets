@@ -1103,9 +1103,12 @@ namespace Unity.UIWidgets.ui {
             XformUtils.transformTranslate(xform, (float) offset.dx, (float) offset.dy);
             XformUtils.transformMultiply(xform, state.xform); // xform = state.xform * xform
 
-            var scale = XformUtils.getAverageScale(xform) * this._devicePixelRatio;
-            var mesh = MeshGenerator.generateMesh(textBlob, scale).transform(xform);
+            var scale = XformUtils.getAverageScale(xform) * this._devicePixelRatio;            
+            var mesh = MeshGenerator.generateMesh(textBlob, scale)?.transform(xform);
 
+            if (mesh == null) {
+                return;
+            }
             if (!this._applyClip(mesh.bounds)) {
                 return;
             }

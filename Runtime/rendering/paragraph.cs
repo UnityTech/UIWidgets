@@ -33,8 +33,9 @@ namespace Unity.UIWidgets.rendering {
             bool softWrap = true,
             TextOverflow overflow = TextOverflow.clip,
             double textScaleFactor = 1.0,
-            int maxLines = 0
+            int? maxLines = null
         ) {
+            D.assert(maxLines == null || maxLines > 0);
             this._softWrap = softWrap;
             this._overflow = overflow;
             this._textPainter = new TextPainter(
@@ -130,9 +131,10 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
-        public int maxLines {
+        public int? maxLines {
             get { return this._textPainter.maxLines; }
             set {
+                D.assert(this.maxLines == null || this.maxLines > 0);
                 if (this._textPainter.maxLines == value) {
                     return;
                 }

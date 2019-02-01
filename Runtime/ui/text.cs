@@ -296,6 +296,10 @@ namespace Unity.UIWidgets.ui {
         public readonly string fontFamily;
         public readonly double? lineHeight;
         public readonly string ellipsis;
+
+        public bool ellipsized() {
+            return !string.IsNullOrEmpty(this.ellipsis);
+        }
     }
 
     public enum TextDecorationStyle {
