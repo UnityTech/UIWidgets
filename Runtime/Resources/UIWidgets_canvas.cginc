@@ -48,9 +48,9 @@ half shader_gradient_layout(half2 pos) {
 
 half4 shader_gradient_colorize(half pt) {
     if (_tileMode == 0) { // clamp
-        if (pt <= 0.001) {
+        if (pt <= 0.0) {
             return _leftColor;
-        } else if (pt >= 0.999) {
+        } else if (pt >= 1.0) {
             return _rightColor;
         }
         
@@ -81,8 +81,8 @@ half2 shader_image_layout(half2 pos) {
 
 half4 shader_image_colorize(half2 pt) {
     if (_tileMode == 0) { // clamp
-        pt.x = clamp(pt.x, 0.001, 0.999);
-        pt.y = clamp(pt.y, 0.001, 0.999);
+        pt.x = clamp(pt.x, 0.0, 1.0);
+        pt.y = clamp(pt.y, 0.0, 1.0);
     } else if (_tileMode == 1) { // mirror
         pt.x = pt.x - 1;
         pt.x = pt.x - 2 * floor(pt.x * 0.5) - 1;
