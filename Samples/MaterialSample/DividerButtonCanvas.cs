@@ -58,36 +58,31 @@ namespace UIWidgetsSample {
                                     )
                                 ),
                                 new Divider(),
-                                new Container(
-                                    width: 100,
-                                    height: 50,
-                                    child: new FlatButton(
-                                        onPressed: () => {
-                                            setState(() => {
-                                                title = controller.text;
-                                            });
-                                        },
-                                        padding: EdgeInsets.all(5.0),
-                                        child: new Center(
-                                            child: new Text("Set Title")
+                                new ButtonBar(
+                                    children: new List<Widget> {
+                                        new FlatButton(
+                                            onPressed: () => {
+                                                setState(() => {
+                                                    title = controller.text;
+                                                });
+                                            },
+                                            padding: EdgeInsets.all(5.0),
+                                            child: new Center(
+                                                child: new Text("Set Title")
+                                            )
+                                        ),
+                                        new RaisedButton(
+                                            onPressed: () => {
+                                                setState(() => {
+                                                    subtitle = controller.text;
+                                                });
+                                            },
+                                            padding: EdgeInsets.all(5.0),
+                                            child: new Center(
+                                                child: new Text("Set Subtitle")
+                                            )
                                         )
-                                    )
-                                ),
-                                new Divider(),
-                                new Container(
-                                    width: 100,
-                                    height: 50,
-                                    child: new RaisedButton(
-                                        onPressed: () => {
-                                            setState(() => {
-                                                subtitle = controller.text;
-                                            });
-                                        },
-                                        padding: EdgeInsets.all(5.0),
-                                        child: new Center(
-                                            child: new Text("Set Subtitle")
-                                        )
-                                    )
+                                    }
                                 )
                             }
                         )
