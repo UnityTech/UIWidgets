@@ -92,45 +92,46 @@ namespace Unity.UIWidgets.ui {
             return this._genId;
         }
 
-        bool _convexContains(float x, float y) {
-            if (this.mesh.vertices.Count <= 2) {
-                return false;
-            }
-
-            if (this.mesh.matrix != null) {
-                if (this._invMat == null) {
-                    this._invMat = Matrix3.I();
-                    this.mesh.matrix.invert(this._invMat); // ignore if not invertible for now.
-                }
-                
-                var offset = this._invMat.mapXY(x, y);
-                x = (float) offset.dx;
-                y = (float) offset.dy;
-            }
-
-            for (var i = 0; i < this.mesh.vertices.Count; i++) {
-                var p0 = this.mesh.vertices[i];
-                var p1 = this.mesh.vertices[i == this.mesh.vertices.Count - 1 ? 0 : i + 1];
-
-                if (PathUtils.triarea2(p0.x, p0.y, p1.x, p1.y, x, y) < 0.0f) {
-                    return false;
-                }
-            }
-
-            return true;
-        }
+//        bool _convexContains(float x, float y) {
+//            if (this.mesh.vertices.Count <= 2) {
+//                return false;
+//            }
+//
+//            if (this.mesh.matrix != null) {
+//                if (this._invMat == null) {
+//                    this._invMat = Matrix3.I();
+//                    this.mesh.matrix.invert(this._invMat); // ignore if not invertible for now.
+//                }
+//                
+//                var offset = this._invMat.mapXY(x, y);
+//                x = (float) offset.dx;
+//                y = (float) offset.dy;
+//            }
+//
+//            for (var i = 0; i < this.mesh.vertices.Count; i++) {
+//                var p0 = this.mesh.vertices[i];
+//                var p1 = this.mesh.vertices[i == this.mesh.vertices.Count - 1 ? 0 : i + 1];
+//
+//                if (PathUtils.triarea2(p0.x, p0.y, p1.x, p1.y, x, y) < 0.0f) {
+//                    return false;
+//                }
+//            }
+//
+//            return true;
+//        }
 
         public bool contains(Rect rect) {
             if (this.isRect) {
                 return this.rect.contains(rect);
             }
 
-            if (this.convex) {
-                return this._convexContains((float) rect.left, (float) rect.top) &&
-                       this._convexContains((float) rect.left, (float) rect.bottom) &&
-                       this._convexContains((float) rect.right, (float) rect.top) &&
-                       this._convexContains((float) rect.right, (float) rect.bottom);
-            }
+//            this seems to be inefficient. disable it for now.
+//            if (this.convex) {
+//                return this._convexContains((float) rect.left, (float) rect.top) &&
+//                       this._convexContains((float) rect.left, (float) rect.bottom) &&
+//                       this._convexContains((float) rect.right, (float) rect.top) &&
+//                       this._convexContains((float) rect.right, (float) rect.bottom);
+//            }
 
             return false;
         }

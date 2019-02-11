@@ -700,13 +700,11 @@ namespace Unity.UIWidgets.ui {
             }
             else {
                 var points = new[] {
-                    new Offset(src.left, src.top),
-                    new Offset(src.right, src.top),
-                    new Offset(src.right, src.bottom),
-                    new Offset(src.left, src.bottom),
+                    this.mapXY((float) src.left, (float) src.top),
+                    this.mapXY((float) src.right, (float) src.top),
+                    this.mapXY((float) src.right, (float) src.bottom),
+                    this.mapXY((float) src.left, (float) src.bottom),
                 };
-
-                this.mapPoints(points);
 
                 var minX = points[0].dx;
                 var minY = points[0].dy;

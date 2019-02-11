@@ -1,6 +1,7 @@
 Shader "UIWidgets/canvas_fill0"
 {
     Properties {
+        _StencilComp("_StencilComp", Float) = 3 // - Equal, 8 - Always 
     }
    
     SubShader {
@@ -11,8 +12,8 @@ Shader "UIWidgets/canvas_fill0"
         ColorMask 0
         Stencil {
             Ref 128
-            CompFront Equal
-            CompBack Equal
+            CompFront [_StencilComp]
+            CompBack [_StencilComp]
             ReadMask 128
             WriteMask 127
             PassFront IncrWrap

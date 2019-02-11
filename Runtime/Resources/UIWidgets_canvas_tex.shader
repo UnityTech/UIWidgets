@@ -3,6 +3,7 @@ Shader "UIWidgets/canvas_tex"
     Properties {
        _SrcBlend("_SrcBlend", Int) = 1 // One
        _DstBlend("_DstBlend", Int) = 10 // OneMinusSrcAlpha
+       _StencilComp("_StencilComp", Float) = 3 // - Equal, 8 - Always 
     }
    
     SubShader {
@@ -12,7 +13,7 @@ Shader "UIWidgets/canvas_tex"
                 
         Stencil {
             Ref 128
-            Comp Equal
+            Comp [_StencilComp]
         }
 
         Pass { // 0, color

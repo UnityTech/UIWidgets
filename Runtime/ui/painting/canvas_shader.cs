@@ -1,29 +1,17 @@
 using System;
 using Unity.UIWidgets.painting;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace Unity.UIWidgets.ui {
-    class MaterialByBlendMode {
+
+    static class MaterialProps {
         static readonly int _srcBlend = Shader.PropertyToID("_SrcBlend");
         static readonly int _dstBlend = Shader.PropertyToID("_DstBlend");
+        static readonly int _stencilComp = Shader.PropertyToID("_StencilComp");
 
-        public MaterialByBlendMode(Shader shader) {
-            this._shader = shader;
-        }
-
-        readonly Shader _shader;
-        readonly Material[] _materials = new Material[30];
-
-        public Material getMaterial(BlendMode op) {
-            var mat = this._materials[(int) op];
-            if (mat) {
-                return mat;
-            }
-
-            mat = new Material(this._shader) {hideFlags = HideFlags.HideAndDontSave};
-            this._materials[(int) op] = mat;
-
-            if (op == BlendMode.srcOver) {
+        public static void set(Material mat, BlendMode op) {
+             if (op == BlendMode.srcOver) {
                 mat.SetInt(_srcBlend, (int) UnityEngine.Rendering.BlendMode.One);
                 mat.SetInt(_dstBlend, (int) UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
             } else if (op == BlendMode.srcIn) {
@@ -67,18 +55,90 @@ namespace Unity.UIWidgets.ui {
                 mat.SetInt(_srcBlend, (int) UnityEngine.Rendering.BlendMode.One);
                 mat.SetInt(_dstBlend, (int) UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
             }
+        }
 
+        public static void set(Material mat, CompareFunction op) {
+            mat.SetFloat(_stencilComp, (int) op);
+        }
+    }
+    
+    class MaterialByBlendMode {
+        public MaterialByBlendMode(Shader shader) {
+            this._shader = shader;
+        }
+
+        readonly Shader _shader;
+        readonly Material[] _materials = new Material[30];
+
+        public Material getMaterial(BlendMode op) {
+            var key = (int) op;
+            var mat = this._materials[key];
+            if (mat) {
+                return mat;
+            }
+
+            mat = new Material(this._shader) {hideFlags = HideFlags.HideAndDontSave};
+            MaterialProps.set(mat, op);
+            
+            this._materials[key] = mat;
+            return mat;
+        }
+    }
+    
+    class MaterialByStencilComp {
+        public MaterialByStencilComp(Shader shader) {
+            this._shader = shader;
+        }
+
+        readonly Shader _shader;
+        readonly Material[] _materials = new Material[2];
+
+        public Material getMaterial(bool ignoreClip) {
+            var key = ignoreClip ? 1 : 0;
+            var mat = this._materials[key];
+            if (mat) {
+                return mat;
+            }
+
+            mat = new Material(this._shader) {hideFlags = HideFlags.HideAndDontSave};
+            MaterialProps.set(mat, ignoreClip ? CompareFunction.Always : CompareFunction.Equal);
+            
+            this._materials[key] = mat;
             return mat;
         }
     }
 
+    class MaterialByBlendModeStencilComp {
+        public MaterialByBlendModeStencilComp(Shader shader) {
+            this._shader = shader;
+        }
+
+        readonly Shader _shader;
+        readonly Material[] _materials = new Material[30 * 2];
+
+        public Material getMaterial(BlendMode blend, bool ignoreClip) {
+            var key = (int) blend * 2 + (ignoreClip ? 1 : 0);
+            var mat = this._materials[key];
+            if (mat) {
+                return mat;
+            }
+
+            mat = new Material(this._shader) {hideFlags = HideFlags.HideAndDontSave};
+            MaterialProps.set(mat, blend);
+            MaterialProps.set(mat, ignoreClip ? CompareFunction.Always : CompareFunction.Equal);
+            
+            this._materials[key] = mat;
+            return mat;
+        }
+    }   
+
     static class CanvasShader {
-        static readonly MaterialByBlendMode _convexFillMat;
-        static readonly Material _fill0Mat;
+        static readonly MaterialByBlendModeStencilComp _convexFillMat;
+        static readonly MaterialByStencilComp _fill0Mat;
         static readonly MaterialByBlendMode _fill1Mat;
-        static readonly MaterialByBlendMode _stroke0Mat;
+        static readonly MaterialByBlendModeStencilComp _stroke0Mat;
         static readonly Material _stroke1Mat;
-        static readonly MaterialByBlendMode _texMat;
+        static readonly MaterialByBlendModeStencilComp _texMat;
         static readonly Material _stencilMat;
         static readonly Material _filterMat;
 
@@ -116,12 +176,12 @@ namespace Unity.UIWidgets.ui {
                 throw new Exception("UIWidgets/canvas_filter not found");
             }
 
-            _convexFillMat = new MaterialByBlendMode(convexFillShader);
-            _fill0Mat = new Material(fill0Shader) {hideFlags = HideFlags.HideAndDontSave};
+            _convexFillMat = new MaterialByBlendModeStencilComp(convexFillShader);
+            _fill0Mat = new MaterialByStencilComp(fill0Shader);
             _fill1Mat = new MaterialByBlendMode(fill1Shader);
-            _stroke0Mat = new MaterialByBlendMode(stroke0Shader);
+            _stroke0Mat = new MaterialByBlendModeStencilComp(stroke0Shader);
             _stroke1Mat = new Material(stroke1Shader) {hideFlags = HideFlags.HideAndDontSave};
-            _texMat = new MaterialByBlendMode(texShader);
+            _texMat = new MaterialByBlendModeStencilComp(texShader);
             _stencilMat = new Material(stencilShader) {hideFlags = HideFlags.HideAndDontSave};
             _filterMat = new Material(filterShader) {hideFlags = HideFlags.HideAndDontSave};
         }
@@ -188,7 +248,7 @@ namespace Unity.UIWidgets.ui {
             Vector4 viewport = layer.viewport;
             Matrix3 ctm = layer.states[layer.states.Count - 1].matrix;
 
-            var mat = _convexFillMat.getMaterial(paint.blendMode);
+            var mat = _convexFillMat.getMaterial(paint.blendMode, layer.ignoreClip);
             _getShaderPassAndProps(viewport, ctm, paint, 1.0f, out var pass, out var props);
 
             return new CommandBufferCanvas.RenderDraw {
@@ -201,7 +261,7 @@ namespace Unity.UIWidgets.ui {
 
         public static CommandBufferCanvas.RenderDraw fill0(CommandBufferCanvas.RenderLayer layer, MeshMesh mesh) {
             Vector4 viewport = layer.viewport;
-            var mat = _fill0Mat;
+            var mat = _fill0Mat.getMaterial(layer.ignoreClip);
 
             var pass = 0;
             var props = new MaterialPropertyBlock();
@@ -236,7 +296,7 @@ namespace Unity.UIWidgets.ui {
             Vector4 viewport = layer.viewport;
             Matrix3 ctm = layer.states[layer.states.Count - 1].matrix;
 
-            var mat = _stroke0Mat.getMaterial(paint.blendMode);
+            var mat = _stroke0Mat.getMaterial(paint.blendMode, layer.ignoreClip);
             _getShaderPassAndProps(viewport, ctm, paint, alpha, out var pass, out var props);
 
             return new CommandBufferCanvas.RenderDraw {
@@ -317,7 +377,7 @@ namespace Unity.UIWidgets.ui {
             Vector4 viewport = layer.viewport;
             Matrix3 ctm = layer.states[layer.states.Count - 1].matrix;
 
-            var mat = _texMat.getMaterial(paint.blendMode);
+            var mat = _texMat.getMaterial(paint.blendMode, layer.ignoreClip);
             _getShaderPassAndProps(viewport, ctm, paint, 1.0f, out var pass, out var props);
             props.SetTexture("_tex", image.texture);
             props.SetInt("_texMode", image.texture is RenderTexture ? 1 : 0); // pre alpha if RT else post alpha
@@ -337,7 +397,7 @@ namespace Unity.UIWidgets.ui {
             Matrix3 ctm = layer.states[layer.states.Count - 1].matrix;
 
 
-            var mat = _texMat.getMaterial(paint.blendMode);
+            var mat = _texMat.getMaterial(paint.blendMode, layer.ignoreClip);
             _getShaderPassAndProps(viewport, ctm, paint, 1.0f, out var pass, out var props);
             props.SetInt("_texMode", 1); // pre alpha
 
@@ -355,7 +415,7 @@ namespace Unity.UIWidgets.ui {
             Vector4 viewport = layer.viewport;
             Matrix3 ctm = layer.states[layer.states.Count - 1].matrix;
 
-            var mat = _texMat.getMaterial(paint.blendMode);
+            var mat = _texMat.getMaterial(paint.blendMode, layer.ignoreClip);
             _getShaderPassAndProps(viewport, ctm, paint, 1.0f, out var pass, out var props);
             props.SetTexture("_tex", tex);
             props.SetInt("_texMode", 2); // alpha only
