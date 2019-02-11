@@ -226,6 +226,17 @@ namespace Unity.UIWidgets.ui {
             //var path = new Path();
         }
 
+        void _tryAddScissor(RenderLayer layer, Rect scissor) {
+            if (scissor == layer.lastScissor) {
+                return;
+            }
+
+            layer.draws.Add(new RenderScissor {
+                deviceScissor = scissor,
+            });
+            layer.lastScissor = scissor;
+        }
+        
         bool _applyClip(Rect queryBounds) {
             var layer = this._getLayer();
             var layerBounds = layer.layerBounds;
@@ -238,9 +249,7 @@ namespace Unity.UIWidgets.ui {
             var physicalRect = Rect.fromLTRB(0, 0, layer.width, layer.height);
 
             if (scissor == layerBounds) {
-                layer.draws.Add(new RenderScissor {
-                    deviceScissor = physicalRect,
-                });
+                this._tryAddScissor(layer, null);
             } else {
                 var deviceScissor = Rect.fromLTRB(
                     scissor.left - layerBounds.left, layerBounds.bottom - scissor.bottom,
@@ -253,21 +262,26 @@ namespace Unity.UIWidgets.ui {
                     return false;
                 }
                 
-                layer.draws.Add(new RenderScissor {
-                    deviceScissor = deviceScissor,
-                });
+                this._tryAddScissor(layer, deviceScissor);
             }
 
-            if (this._mustRenderClip(reducedClip.maskGenID(), reducedClip.scissor)) {
-                var boundsMesh = new MeshMesh(reducedClip.scissor);
-                layer.draws.Add(CanvasShader.stencilClear(layer, boundsMesh));
+            var maskGenID = reducedClip.maskGenID();
+            if (this._mustRenderClip(maskGenID, reducedClip.scissor)) {
+                if (maskGenID == ClipStack.wideOpenGenID) {
+                    layer.ignoreClip = true;
+                } else {
+                    layer.ignoreClip = false;
 
-                foreach (var maskElement in reducedClip.maskElements) {
-                    layer.draws.Add(CanvasShader.stencil0(layer, maskElement.mesh));
-                    layer.draws.Add(CanvasShader.stencil1(layer, boundsMesh));
+                    var boundsMesh = new MeshMesh(reducedClip.scissor);
+                    layer.draws.Add(CanvasShader.stencilClear(layer, boundsMesh));
+
+                    foreach (var maskElement in reducedClip.maskElements) {
+                        layer.draws.Add(CanvasShader.stencil0(layer, maskElement.mesh));
+                        layer.draws.Add(CanvasShader.stencil1(layer, boundsMesh));
+                    }
                 }
 
-                this._setLastClipGenId(reducedClip.maskGenID(), reducedClip.scissor);
+                this._setLastClipGenId(maskGenID, reducedClip.scissor);
             }
 
             return true;
@@ -775,7 +789,11 @@ namespace Unity.UIWidgets.ui {
                         }
                         break;
                     case RenderScissor cmd:
-                        cmdBuf.EnableScissorRect(cmd.deviceScissor.toRect());
+                        if (cmd.deviceScissor == null) {
+                            cmdBuf.DisableScissorRect();
+                        } else {
+                            cmdBuf.EnableScissorRect(cmd.deviceScissor.toRect());
+                        }
                         break;
                 }
             }
@@ -816,6 +834,7 @@ namespace Unity.UIWidgets.ui {
 
         bool _mustRenderClip(uint clipGenId, Rect clipBounds) {
             var layer = this._getLayer();
+            
             return layer.lastClipGenId != clipGenId || layer.lastClipBounds != clipBounds;
         }
 
@@ -864,6 +883,8 @@ namespace Unity.UIWidgets.ui {
             public readonly ClipStack clipStack = new ClipStack();
             public uint lastClipGenId;
             public Rect lastClipBounds;
+            public Rect lastScissor;
+            public bool ignoreClip;
 
             Vector4? _viewport;
 
