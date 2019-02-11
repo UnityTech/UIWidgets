@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Unity.UIWidgets.animation;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.painting;
@@ -172,14 +173,11 @@ namespace Unity.UIWidgets.material {
 
             ShapeBorder shape = this._getShape();
 
-            //todo xingwei.zhu: add support for transparentInterior Material
             if (this.widget.type == MaterialType.transparency) {
-                D.assert(false, "material widget is not completely implemented yet.");
-                return null;
-//                return this._transparentInterior(
-//                    shape: shape,
-//                    clipBehavior: this.widget.clipBehavior,
-//                    contents: contents);
+                return _transparentInterior(
+                    shape: shape,
+                    clipBehavior: this.widget.clipBehavior,
+                    contents: contents);
             }
 
             return new _MaterialInterior(
@@ -192,6 +190,23 @@ namespace Unity.UIWidgets.material {
                 shadowColor: this.widget.shadowColor,
                 child: contents
             );
+        }
+
+
+        static Widget _transparentInterior(ShapeBorder shape, Clip clipBehavior, Widget contents) {
+            _ShapeBorderPaint child = new _ShapeBorderPaint(
+                child: contents,
+                shape: shape);
+
+            if (clipBehavior == Clip.none) {
+                return child;
+            }
+            
+            return new ClipPath(
+                child: child,
+                clipper: new ShapeBorderClipper(shape: shape),
+                clipBehavior: clipBehavior
+                );
         }
 
 
@@ -377,7 +392,7 @@ namespace Unity.UIWidgets.material {
 
         protected abstract void paintFeature(Canvas canvas, Matrix3 transform);
 
-        public string toString() {
+        public override string ToString() {
             return this.GetType() + "";
         }
     }

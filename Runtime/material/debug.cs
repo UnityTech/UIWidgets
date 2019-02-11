@@ -23,7 +23,7 @@ namespace Unity.UIWidgets.material {
 
                     message += "The specific widget that could not find a Material ancestor was:";
 
-                    message += context.widget.toString();
+                    message += context.widget.ToString();
                     List<Widget> ancestors = new List<Widget>();
 
                     context.visitAncestorElements((Element element) => {

@@ -169,7 +169,7 @@ namespace Unity.UIWidgets.material {
             return this._center + new Offset(x, y);
         }
 
-        public string toString() {
+        public override string ToString() {
             return this.GetType() + "(" + this.begin + "->" + this.end + "); center=" + this.center +
                    ", radius=" + this.radius + ", beginAngle=" + this.beginAngle + ", endAngle=" + this.endAngle;
         }
@@ -304,7 +304,7 @@ namespace Unity.UIWidgets.material {
             return Rect.fromPoints(this._beginArc.lerp(t), this._endArc.lerp(t));
         }
 
-        public string toString() {
+        public override string ToString() {
             return this.GetType() + "(" + this.begin + "->" + this.end + ")";
         }
     }
@@ -387,7 +387,7 @@ namespace Unity.UIWidgets.material {
                 height);
         }
 
-        public string toString() {
+        public override string ToString() {
             return this.GetType() + "(" + this.begin + "->" + this.end + "); centerArc=" + this.centerArc;
         }
     }

@@ -66,9 +66,6 @@ namespace Unity.UIWidgets.animation {
 
     public abstract class Tween<T> : Animatable<T>, IEquatable<Tween<T>> {
         protected Tween(T begin, T end) {
-            D.assert(begin != null);
-            D.assert(end != null);
-
             this.begin = begin;
             this.end = end;
         }
