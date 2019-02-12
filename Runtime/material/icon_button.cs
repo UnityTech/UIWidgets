@@ -10,8 +10,6 @@ namespace Unity.UIWidgets.material {
 
     public class IconButton : StatelessWidget {
 
-        const double _kMinButtonSize = 48.0;
-
         public IconButton(
             Key key = null,
             double iconSize = 24.0,
