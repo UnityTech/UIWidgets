@@ -5,14 +5,11 @@ using Unity.UIWidgets.ui;
 namespace Unity.UIWidgets.material {
 
     public class ShadowConstants {
-        public static Dictionary<int, List<BoxShadow>>
-            kElevationToShadow = _elevationToShadow; // to hide the literal from the docs
-
         public static Color _kKeyUmbraOpacity = new Color(0x33000000); // alpha = 0.2
         public static Color _kKeyPenumbraOpacity = new Color(0x24000000); // alpha = 0.14
         public static Color _kAmbientShadowOpacity = new Color(0x1F000000); // alpha = 0.12
 
-        static Dictionary<int, List<BoxShadow>> _elevationToShadow = new Dictionary<int, List<BoxShadow>> {
+        public static Dictionary<int, List<BoxShadow>> kElevationToShadow = new Dictionary<int, List<BoxShadow>> {
             {
                 1, new List<BoxShadow> {
                     new BoxShadow(offset: new Offset(0.0, 2.0), blurRadius: 1.0, spreadRadius: -1.0,

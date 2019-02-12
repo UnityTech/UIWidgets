@@ -9,16 +9,7 @@ using Material = Unity.UIWidgets.material.Material;
 namespace UIWidgetsSample {
     public class MaterialCanvas : WidgetCanvas {
         protected override Widget getWidget() {
-            return new MaterialApp();
-        }
-
-        class MaterialApp : StatefulWidget {
-            public MaterialApp(Key key = null) : base(key) {
-            }
-
-            public override State createState() {
-                return new MaterialWidgetState();
-            }
+            return new MaterialWidget();
         }
 
         class MaterialWidget : StatefulWidget {

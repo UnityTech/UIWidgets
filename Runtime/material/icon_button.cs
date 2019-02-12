@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.painting;
-using Unity.UIWidgets.gestures;
-using Unity.UIWidgets.service;
+using System;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
 
@@ -24,14 +21,20 @@ namespace Unity.UIWidgets.material {
             Color color = null,
             Color highlightColor = null,
             Color splashColor = null,
-            Color disabledColor = null,
+            Color disableColor = null,
             VoidCallback onPressed = null,
-            string tooltip = null
-        ) : base(key : key) {
+            string tooltip = null) : base(key: key) {
             D.assert(icon != null);
             this.iconSize = iconSize;
-            this.alignment = alignment ?? Alignment.center;
             this.padding = padding ?? EdgeInsets.all(8.0);
+            this.alignment = alignment ?? Alignment.center;
+            this.icon = icon;
+            this.color = color;
+            this.highlightColor = highlightColor;
+            this.splashColor = splashColor;
+            this.disabledColor = disableColor;
+            this.onPressed = onPressed;
+            this.tooltip = tooltip;
         }
 
         public readonly double iconSize;
@@ -55,53 +58,58 @@ namespace Unity.UIWidgets.material {
         public readonly string tooltip;
 
         public override Widget build(BuildContext context) {
-            MaterialDebug.debugCheckHasMaterial(context);
-            Color currentColor;
-            if (onPressed != null)
-                currentColor = color;
-            else
-                currentColor = disabledColor ?? Theme.of(context).disabledColor;
+            D.assert(MaterialDebug.debugCheckHasMaterial(context));
+            Color currentColor = null;
+            if (this.onPressed != null) {
+                currentColor = this.color;
+            }
+            else {
+                currentColor = this.disabledColor ?? Theme.of(context).disabledColor;
+            }
 
             Widget result = new ConstrainedBox(
-                constraints: new BoxConstraints(minWidth: _kMinButtonSize, minHeight: _kMinButtonSize),
+                constraints: new BoxConstraints(minWidth: IconButtonUtils._kMinButtonSize,
+                    minHeight: IconButtonUtils._kMinButtonSize),
                 child: new Padding(
-                  padding: padding,
-                  child: new SizedBox(
-                    height: iconSize,
-                    width: iconSize,
-                    child: new Align(
-                      alignment: alignment,
-                      child: IconTheme.merge(
-                        data: new IconThemeData(
-                          size: iconSize,
-                          color: currentColor
-                        ),
-                        child: icon
-                      )
+                    padding: this.padding,
+                    child: new SizedBox(
+                        height: this.iconSize,
+                        width: this.iconSize,
+                        child: new Align(
+                            alignment: this.alignment,
+                            child: IconTheme.merge(
+                                data: new IconThemeData(
+                                    size: this.iconSize,
+                                    color: currentColor),
+                                child: this.icon)
+                        )
                     )
-                  )
                 )
             );
 
+            if (this.tooltip != null) {
+                result = new Tooltip(
+                    message: this.tooltip,
+                    child: result);
+            }
+
             return new InkResponse(
-              onTap: (GestureTapCallback)(() => onPressed()),
-              child: result,
-              highlightColor: highlightColor ?? Theme.of(context).highlightColor,
-              splashColor: splashColor ?? Theme.of(context).splashColor,
-              radius: Math.Max(
-                Material.defaultSplashRadius,
-                (iconSize + Math.Min(padding.horizontal, padding.vertical)) * 0.7
-                // x 0.5 for diameter -> radius and + 40% overflow derived from other Material apps.
-              )
-        
+                onTap: () => this.onPressed(),
+                child: result,
+                highlightColor: this.highlightColor ?? Theme.of(context).highlightColor,
+                splashColor: this.splashColor ?? Theme.of(context).splashColor,
+                radius: Math.Max(
+                    Material.defaultSplashRadius,
+                    (this.iconSize + Math.Min(this.padding.horizontal, this.padding.vertical)) * 0.7)
             );
         }
 
+
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
-            properties.add(new DiagnosticsProperty<Widget>("icon", icon, showName: false));
-            properties.add(new ObjectFlagProperty<VoidCallback>("onPressed", onPressed, ifNull: "disabled"));
-            properties.add(new StringProperty("tooltip", tooltip, defaultValue: null, quoted: false));
+            properties.add(new DiagnosticsProperty<Widget>("icon", this.icon, showName: false));
+            properties.add(new ObjectFlagProperty<VoidCallback>("onPressed", this.onPressed, ifNull: "disabled"));
+            properties.add(new StringProperty("tooltip", this.tooltip, defaultValue: null, quoted: false));
         }
     }
 }

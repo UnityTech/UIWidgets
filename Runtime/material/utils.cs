@@ -137,7 +137,37 @@ namespace Unity.UIWidgets.material {
                     maxKey = key;
                 }
             }
+
             return maxValue;
         }
+    }
+
+    public static class ExpansionTileUtils {
+        public static TimeSpan _kExpand = new TimeSpan(0, 0, 0, 0, 200);
+    }
+
+    public static class ExpansionPanelUtils {
+        public const double _kPanelHeaderCollapsedHeight = 48.0;
+        public const double _kPanelHeaderExpandedHeight = 64.0;
+    }
+
+    public static class IconButtonUtils {
+        public const double _kMinButtonSize = 48.0;
+    }
+
+    public static class DrawerHeaderUtils {
+        public const double _kDrawerHeaderHeight = 160.0 + 1.0;
+    }
+
+    public static class DrawerUtils {
+        public const double _kWidth = 304.0;
+        public const double _kEdgeDragWidth = 20.0;
+        public const double _kMinFlingVelocity = 365.0;
+        public static TimeSpan _kBaseSettleDuration = new TimeSpan(0, 0, 0, 0, 246);
+    }
+
+    public static class TooltipUtils {
+        public static TimeSpan _kFadeDuration = new TimeSpan(0, 0, 0, 0, 200);
+        public static TimeSpan _kShowDuration = new TimeSpan(0, 0, 0, 0, 1500);
     }
 }

@@ -381,7 +381,11 @@ namespace Unity.UIWidgets.material {
             onDoubleTap: onDoubleTap,
             onLongPress: onLongPress,
             onTapDown: onTapDown,
-            onTapCancel: () => onTapCancel(),
+            onTapCancel: () => {
+                if (onTapCancel != null) {
+                    onTapCancel();
+                }
+            },
             onHighlightChanged: onHighlightChanged,
             containedInkWell: true,
             highlightColor: highlightColor,
