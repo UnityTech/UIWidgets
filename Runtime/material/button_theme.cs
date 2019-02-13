@@ -231,7 +231,7 @@ namespace Unity.UIWidgets.material {
         }
 
 
-        Color getFillColor(MaterialButton button) {
+        public Color getFillColor(MaterialButton button) {
             Color fillColor = button.enabled ? button.color : button.disabledColor;
             if (fillColor != null) {
                 return fillColor;

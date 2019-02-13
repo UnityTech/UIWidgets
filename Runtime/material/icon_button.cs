@@ -1,12 +1,15 @@
-using System;
+
+using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.painting;
-using Unity.UIWidgets.rendering;
+using System;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
 
 namespace Unity.UIWidgets.material {
+
     public class IconButton : StatelessWidget {
+
         public IconButton(
             Key key = null,
             double iconSize = 24.0,
