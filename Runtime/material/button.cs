@@ -26,7 +26,6 @@ namespace Unity.UIWidgets.material {
             Clip clipBehavior = Clip.none,
             MaterialTapTargetSize? materialTapTargetSize = null,
             Widget child = null) : base(key: key) {
-            D.assert(onPressed != null);
             MaterialTapTargetSize _materialTapTargetSize = materialTapTargetSize ?? MaterialTapTargetSize.padded;
             shape = shape ?? new RoundedRectangleBorder();
             padding = padding ?? EdgeInsets.zero;
@@ -124,7 +123,11 @@ namespace Unity.UIWidgets.material {
                         onHighlightChanged: this._handleHighlightChanged,
                         splashColor: this.widget.splashColor,
                         highlightColor: this.widget.highlightColor,
-                        onTap: () => this.widget.onPressed(),
+                        onTap: () => {
+                            if (this.widget.onPressed != null) {
+                                this.widget.onPressed();
+                            }
+                        },
                         customBorder: this.widget.shape,
                         child: IconTheme.merge(
                             data: new IconThemeData(color: this.widget.textStyle?.color),

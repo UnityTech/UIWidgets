@@ -317,7 +317,6 @@ namespace Unity.UIWidgets.widgets {
         }
 
         Offset _paintOffsetForPosition(double position) {
-            D.assert(this.axisDirection != null);
             switch (this.axisDirection) {
                 case AxisDirection.up:
                     return new Offset(0.0, position - this.child.size.height + this.size.height);

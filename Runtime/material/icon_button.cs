@@ -1,15 +1,12 @@
-
-using Unity.UIWidgets.rendering;
+using System;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.painting;
-using System;
+using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
 
 namespace Unity.UIWidgets.material {
-
     public class IconButton : StatelessWidget {
-
         public IconButton(
             Key key = null,
             double iconSize = 24.0,
@@ -93,7 +90,11 @@ namespace Unity.UIWidgets.material {
             }
 
             return new InkResponse(
-                onTap: () => this.onPressed(),
+                onTap: () => {
+                    if (this.onPressed != null) {
+                        this.onPressed();
+                    }
+                },
                 child: result,
                 highlightColor: this.highlightColor ?? Theme.of(context).highlightColor,
                 splashColor: this.splashColor ?? Theme.of(context).splashColor,

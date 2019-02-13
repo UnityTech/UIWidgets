@@ -1,8 +1,7 @@
-using System;
 using System.Collections.Generic;
-using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.painting;
+using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.service;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
@@ -23,7 +22,7 @@ namespace Unity.UIWidgets.material {
             Brightness? colorBrightness = null,
             EdgeInsets padding = null,
             ShapeBorder shape = null,
-            Clip clipBehavior = Clip.none,
+            Clip? clipBehavior = Clip.none,
             MaterialTapTargetSize? materialTapTargetSize = null,
             Widget child = null) : base(
             key: key,
@@ -37,17 +36,12 @@ namespace Unity.UIWidgets.material {
             highlightColor: highlightColor,
             splashColor: splashColor,
             colorBrightness: colorBrightness,
-            elevation: null,
-            highlightElevation: null,
-            disabledElevation: null,
             padding: padding,
             shape: shape,
             clipBehavior: clipBehavior,
             materialTapTargetSize: materialTapTargetSize,
-            animationDuration: null,
-            minWidth: null,
-            height: null,
-            child: child) {}
+            child: child) {
+        }
 
         public static FlatButton icon(
             Key key = null,
@@ -63,10 +57,13 @@ namespace Unity.UIWidgets.material {
             Brightness? colorBrightness = null,
             EdgeInsets padding = null,
             ShapeBorder shape = null,
-            Clip clipBehavior = Clip.none,
+            Clip? clipBehavior = null,
             MaterialTapTargetSize? materialTapTargetSize = null,
             Widget icon = null,
             Widget label = null) {
+            D.assert(icon != null);
+            D.assert(label != null);
+
             return new _FlatButtonWithIcon(
                 key: key,
                 onPressed: onPressed,
@@ -93,9 +90,9 @@ namespace Unity.UIWidgets.material {
             ButtonThemeData buttonTheme = ButtonTheme.of(context);
 
             return new RawMaterialButton(
-                onPressed: onPressed,
-                onHighlightChanged: onHighlightChanged,
-                clipBehavior: clipBehavior ?? Clip.none,
+                onPressed: this.onPressed,
+                onHighlightChanged: this.onHighlightChanged,
+                clipBehavior: this.clipBehavior ?? Clip.none,
                 fillColor: buttonTheme.getFillColor(this),
                 textStyle: theme.textTheme.button.copyWith(color: buttonTheme.getTextColor(this)),
                 highlightColor: buttonTheme.getHighlightColor(this),
@@ -108,28 +105,31 @@ namespace Unity.UIWidgets.material {
                 shape: buttonTheme.getShape(this),
                 animationDuration: buttonTheme.getAnimationDuration(this),
                 materialTapTargetSize: buttonTheme.getMaterialTapTargetSize(this),
-                child: child
+                child: this.child
             );
         }
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
-            properties.add(new ObjectFlagProperty<VoidCallback>("onPressed", onPressed, ifNull: "disabled"));
-            properties.add(new DiagnosticsProperty<ButtonTextTheme?>("textTheme", textTheme, defaultValue: null));
-            properties.add(new DiagnosticsProperty<Color>("textColor", textColor, defaultValue: null));
-            properties.add(new DiagnosticsProperty<Color>("disabledTextColor", disabledTextColor, defaultValue: null));
-            properties.add(new DiagnosticsProperty<Color>("color", color, defaultValue: null));
-            properties.add(new DiagnosticsProperty<Color>("disabledColor", disabledColor, defaultValue: null));
-            properties.add(new DiagnosticsProperty<Color>("highlightColor", highlightColor, defaultValue: null));
-            properties.add(new DiagnosticsProperty<Color>("splashColor", splashColor, defaultValue: null));
-            properties.add(new DiagnosticsProperty<Brightness?>("colorBrightness", colorBrightness, defaultValue: null));
-            properties.add(new DiagnosticsProperty<EdgeInsets>("padding", padding, defaultValue: null));
-            properties.add(new DiagnosticsProperty<ShapeBorder>("shape", shape, defaultValue: null));
-            properties.add(new DiagnosticsProperty<MaterialTapTargetSize?>("materialTapTargetSize", materialTapTargetSize, defaultValue: null));
+            properties.add(new ObjectFlagProperty<VoidCallback>("onPressed", this.onPressed, ifNull: "disabled"));
+            properties.add(new DiagnosticsProperty<ButtonTextTheme?>("textTheme", this.textTheme, defaultValue: null));
+            properties.add(new DiagnosticsProperty<Color>("textColor", this.textColor, defaultValue: null));
+            properties.add(new DiagnosticsProperty<Color>("disabledTextColor", this.disabledTextColor,
+                defaultValue: null));
+            properties.add(new DiagnosticsProperty<Color>("color", this.color, defaultValue: null));
+            properties.add(new DiagnosticsProperty<Color>("disabledColor", this.disabledColor, defaultValue: null));
+            properties.add(new DiagnosticsProperty<Color>("highlightColor", this.highlightColor, defaultValue: null));
+            properties.add(new DiagnosticsProperty<Color>("splashColor", this.splashColor, defaultValue: null));
+            properties.add(new DiagnosticsProperty<Brightness?>("colorBrightness", this.colorBrightness,
+                defaultValue: null));
+            properties.add(new DiagnosticsProperty<EdgeInsets>("padding", this.padding, defaultValue: null));
+            properties.add(new DiagnosticsProperty<ShapeBorder>("shape", this.shape, defaultValue: null));
+            properties.add(new DiagnosticsProperty<MaterialTapTargetSize?>("materialTapTargetSize",
+                this.materialTapTargetSize, defaultValue: null));
         }
     }
 
-    class _FlatButtonWithIcon : FlatButton {
+    class _FlatButtonWithIcon : FlatButton, MaterialButtonWithIconMixin {
         public _FlatButtonWithIcon(
             Key key = null,
             VoidCallback onPressed = null,
@@ -144,7 +144,7 @@ namespace Unity.UIWidgets.material {
             Brightness? colorBrightness = null,
             EdgeInsets padding = null,
             ShapeBorder shape = null,
-            Clip clipBehavior = Clip.none,
+            Clip? clipBehavior = null,
             MaterialTapTargetSize? materialTapTargetSize = null,
             Widget icon = null,
             Widget label = null) : base(

@@ -1,4 +1,3 @@
-using System;
 using Unity.UIWidgets.animation;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.painting;
@@ -59,6 +58,9 @@ namespace Unity.UIWidgets.material {
             onRemoved: onRemoved) {
             D.assert(controller != null);
             D.assert(referenceBox != null);
+            D.assert(color != null);
+            D.assert(position != null);
+
             this._position = position;
             this._borderRadius = borderRadius ?? BorderRadius.zero;
             this._customBorder = customBorder;
@@ -68,14 +70,14 @@ namespace Unity.UIWidgets.material {
 
             D.assert(this._borderRadius != null);
 
-            this._fadeInController = new AnimationController(duration: InkRippleUtils._kFadeInDuration, vsync: controller.vsync);
+            this._fadeInController =
+                new AnimationController(duration: InkRippleUtils._kFadeInDuration, vsync: controller.vsync);
             this._fadeInController.addListener(controller.markNeedsPaint);
             this._fadeInController.forward();
             this._fadeIn = this._fadeInController.drive(new IntTween(
-              begin: 0,
-              end: color.alpha
+                begin: 0,
+                end: color.alpha
             ));
-
 
             this._radiusController = new AnimationController(
                 duration: InkRippleUtils._kUnconfirmedRippleDuration,
@@ -83,8 +85,10 @@ namespace Unity.UIWidgets.material {
             this._radiusController.addListener(controller.markNeedsPaint);
             this._radiusController.forward();
             this._radius = this._radiusController.drive(new DoubleTween(
-                begin: this._targetRadius * 0.30,
-                end: this._targetRadius + 5.0).chain(_easeCurveTween));
+                    begin: this._targetRadius * 0.30,
+                    end: this._targetRadius + 5.0
+                ).chain(_easeCurveTween)
+            );
 
             this._fadeOutController = new AnimationController(
                 duration: InkRippleUtils._kFadeOutDuration,
@@ -92,8 +96,10 @@ namespace Unity.UIWidgets.material {
             this._fadeOutController.addListener(controller.markNeedsPaint);
             this._fadeOutController.addStatusListener(this._handleAlphaStatusChanged);
             this._fadeOut = this._fadeOutController.drive(new IntTween(
-                begin: color.alpha,
-                end: 0).chain(_fadeOutIntervalTween));
+                    begin: color.alpha,
+                    end: 0
+                ).chain(_fadeOutIntervalTween)
+            );
 
             controller.addInkFeature(this);
         }
@@ -117,23 +123,27 @@ namespace Unity.UIWidgets.material {
         Animation<int> _fadeOut;
         AnimationController _fadeOutController;
 
-        public static InteractiveInkFeatureFactory rippleFactory = new _InkRippleFactory();
+        public static InteractiveInkFeatureFactory splashFactory = new _InkRippleFactory();
 
-        static Animatable<double> _easeCurveTween = new CurveTween(curve: Curves.ease);
-        static Animatable<double> _fadeOutIntervalTween = new CurveTween(curve: new Interval(InkRippleUtils._kFadeOutIntervalStart, 1.0));
+        static readonly Animatable<double> _easeCurveTween = new CurveTween(curve: Curves.ease);
+
+        static readonly Animatable<double> _fadeOutIntervalTween =
+            new CurveTween(curve: new Interval(InkRippleUtils._kFadeOutIntervalStart, 1.0));
 
         public override void confirm() {
             this._radiusController.duration = InkRippleUtils._kRadiusDuration;
             this._radiusController.forward();
+            this._fadeInController.forward();
             this._fadeOutController.animateTo(1.0, duration: InkRippleUtils._kFadeOutDuration);
         }
 
         public override void cancel() {
-            _fadeInController.stop();
-            double fadeOutValue = 1.0 - _fadeInController.value;
-            _fadeOutController.setValue(fadeOutValue);
-            if (fadeOutValue < 1.0)
-                _fadeOutController.animateTo(1.0, duration: InkRippleUtils._kCancelDuration);
+            this._fadeInController.stop();
+            double fadeOutValue = 1.0 - this._fadeInController.value;
+            this._fadeOutController.setValue(fadeOutValue);
+            if (fadeOutValue < 1.0) {
+                this._fadeOutController.animateTo(1.0, duration: InkRippleUtils._kCancelDuration);
+            }
         }
 
         void _handleAlphaStatusChanged(AnimationStatus status) {
@@ -150,18 +160,19 @@ namespace Unity.UIWidgets.material {
         }
 
         protected override void paintFeature(Canvas canvas, Matrix3 transform) {
-            int alpha = _fadeInController.isAnimating ? _fadeIn.value : _fadeOut.value;
+            int alpha = this._fadeInController.isAnimating ? this._fadeIn.value : this._fadeOut.value;
             Paint paint = new Paint {color = this.color.withAlpha(alpha)};
             Offset center = Offset.lerp(
-              _position,
-              referenceBox.size.center(Offset.zero),
-              Curves.ease.transform(_radiusController.value)
+                this._position,
+                this.referenceBox.size.center(Offset.zero),
+                Curves.ease.transform(this._radiusController.value)
             );
-            Offset originOffset = MatrixUtils.getAsTranslation(transform);
+            Offset originOffset = transform.getAsTranslation();
             canvas.save();
             if (originOffset == null) {
                 canvas.concat(transform);
-            } else {
+            }
+            else {
                 canvas.translate(originOffset.dx, originOffset.dy);
             }
 
@@ -183,7 +194,7 @@ namespace Unity.UIWidgets.material {
                 }
             }
 
-            //todo xingwei.zhu: remove this condition when drawCircle bug fixed (when radius.value == 0)
+            //todo:xingwei.zhu: remove this condition when drawCircle bug fixed (when radius.value == 0)
             if (this._radius.value != 0) {
                 canvas.drawCircle(center, this._radius.value, paint);
             }

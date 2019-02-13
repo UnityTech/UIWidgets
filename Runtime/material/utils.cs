@@ -84,20 +84,24 @@ namespace Unity.UIWidgets.material {
         public static readonly TimeSpan _kFadeOutDuration = new TimeSpan(0, 0, 0, 0, 375);
         public static readonly TimeSpan _kCancelDuration = new TimeSpan(0, 0, 0, 0, 75);
 
-        // The fade out begins 225ms after the _fadeOutController starts. See confirm().
         public const double _kFadeOutIntervalStart = 225.0 / 375.0;
 
-        public static RectCallback _getClipCallback(RenderBox referenceBox, bool containedInkWell, RectCallback rectCallback) {
+        public static RectCallback _getClipCallback(RenderBox referenceBox, bool containedInkWell,
+            RectCallback rectCallback) {
             if (rectCallback != null) {
                 D.assert(containedInkWell);
                 return rectCallback;
             }
-            if (containedInkWell)
+
+            if (containedInkWell) {
                 return () => Offset.zero & referenceBox.size;
+            }
+
             return null;
         }
 
-        public static double _getTargetRadius(RenderBox referenceBox, bool containedInkWell, RectCallback rectCallback, Offset position) {
+        public static double _getTargetRadius(RenderBox referenceBox, bool containedInkWell, RectCallback rectCallback,
+            Offset position) {
             Size size = rectCallback != null ? rectCallback().size : referenceBox.size;
             double d1 = size.bottomRight(Offset.zero).distance;
             double d2 = (size.topRight(Offset.zero) - size.bottomLeft(Offset.zero)).distance;

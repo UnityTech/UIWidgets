@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.painting;
+using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.service;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
@@ -13,7 +13,7 @@ namespace Unity.UIWidgets.material {
             Key key = null,
             VoidCallback onPressed = null,
             ValueChanged<bool> onHighlightChanged = null,
-            ButtonTextTheme textTheme = ButtonTextTheme.normal,
+            ButtonTextTheme? textTheme = null,
             Color textColor = null,
             Color disabledTextColor = null,
             Color color = null,
@@ -26,10 +26,11 @@ namespace Unity.UIWidgets.material {
             double? disabledElevation = null,
             EdgeInsets padding = null,
             ShapeBorder shape = null,
-            Clip clipBehavior = Clip.none,
+            Clip? clipBehavior = Clip.none,
             MaterialTapTargetSize? materialTapTargetSize = null,
             TimeSpan? animationDuration = null,
-            Widget child = null) : base(
+            Widget child = null
+        ) : base(
             key: key,
             onPressed: onPressed,
             onHighlightChanged: onHighlightChanged,
@@ -50,7 +51,6 @@ namespace Unity.UIWidgets.material {
             materialTapTargetSize: materialTapTargetSize,
             animationDuration: animationDuration,
             child: child) {
-
             D.assert(elevation == null || elevation >= 0.0);
             D.assert(highlightElevation == null || highlightElevation >= 0.0);
             D.assert(disabledElevation == null || disabledElevation >= 0.0);
@@ -60,24 +60,27 @@ namespace Unity.UIWidgets.material {
             Key key = null,
             VoidCallback onPressed = null,
             ValueChanged<bool> onHighlightChanged = null,
-            ButtonTextTheme textTheme = ButtonTextTheme.normal,
+            ButtonTextTheme? textTheme = null,
             Color textColor = null,
             Color disabledTextColor = null,
             Color color = null,
             Color disabledColor = null,
             Color highlightColor = null,
             Color splashColor = null,
-            Brightness colorBrightness = Brightness.dark,
+            Brightness? colorBrightness = null,
             double? elevation = null,
             double? highlightElevation = null,
             double? disabledElevation = null,
             EdgeInsets padding = null,
             ShapeBorder shape = null,
-            Clip clipBehavior = Clip.none,
-            MaterialTapTargetSize materialTapTargetSize = MaterialTapTargetSize.padded,
+            Clip? clipBehavior = null,
+            MaterialTapTargetSize? materialTapTargetSize = null,
             TimeSpan? animationDuration = null,
             Widget icon = null,
             Widget label = null) {
+            D.assert(icon != null);
+            D.assert(label != null);
+
             return new _RaisedButtonWithIcon(
                 key: key,
                 onPressed: onPressed,
@@ -107,9 +110,9 @@ namespace Unity.UIWidgets.material {
             ButtonThemeData buttonTheme = ButtonTheme.of(context);
 
             return new RawMaterialButton(
-                onPressed: onPressed,
-                onHighlightChanged: onHighlightChanged,
-                clipBehavior: clipBehavior ?? Clip.none,
+                onPressed: this.onPressed,
+                onHighlightChanged: this.onHighlightChanged,
+                clipBehavior: this.clipBehavior ?? Clip.none,
                 fillColor: buttonTheme.getFillColor(this),
                 textStyle: theme.textTheme.button.copyWith(color: buttonTheme.getTextColor(this)),
                 highlightColor: buttonTheme.getHighlightColor(this),
@@ -122,53 +125,59 @@ namespace Unity.UIWidgets.material {
                 shape: buttonTheme.getShape(this),
                 animationDuration: buttonTheme.getAnimationDuration(this),
                 materialTapTargetSize: buttonTheme.getMaterialTapTargetSize(this),
-                child: child
+                child: this.child
             );
         }
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
-            properties.add(new ObjectFlagProperty<VoidCallback>("onPressed", onPressed, ifNull: "disabled"));
-            properties.add(new DiagnosticsProperty<ButtonTextTheme?>("textTheme", textTheme, defaultValue: null));
-            properties.add(new DiagnosticsProperty<Color>("textColor", textColor, defaultValue: null));
-            properties.add(new DiagnosticsProperty<Color>("disabledTextColor", disabledTextColor, defaultValue: null));
-            properties.add(new DiagnosticsProperty<Color>("color", color, defaultValue: null));
-            properties.add(new DiagnosticsProperty<Color>("disabledColor", disabledColor, defaultValue: null));
-            properties.add(new DiagnosticsProperty<Color>("highlightColor", highlightColor, defaultValue: null));
-            properties.add(new DiagnosticsProperty<Color>("splashColor", splashColor, defaultValue: null));
-            properties.add(new DiagnosticsProperty<Brightness?>("colorBrightness", colorBrightness, defaultValue: null));
-            properties.add(new DiagnosticsProperty<double?>("elevation", elevation, defaultValue: null));
-            properties.add(new DiagnosticsProperty<double?>("highlightElevation", highlightElevation, defaultValue: null));
-            properties.add(new DiagnosticsProperty<double?>("disabledElevation", disabledElevation, defaultValue: null));
-            properties.add(new DiagnosticsProperty<EdgeInsets>("padding", padding, defaultValue: null));
-            properties.add(new DiagnosticsProperty<ShapeBorder>("shape", shape, defaultValue: null));
-            properties.add(new DiagnosticsProperty<MaterialTapTargetSize?>("materialTapTargetSize", materialTapTargetSize, defaultValue: null));
+            properties.add(new ObjectFlagProperty<VoidCallback>("onPressed", this.onPressed, ifNull: "disabled"));
+            properties.add(new DiagnosticsProperty<ButtonTextTheme?>("textTheme", this.textTheme, defaultValue: null));
+            properties.add(new DiagnosticsProperty<Color>("textColor", this.textColor, defaultValue: null));
+            properties.add(new DiagnosticsProperty<Color>("disabledTextColor", this.disabledTextColor,
+                defaultValue: null));
+            properties.add(new DiagnosticsProperty<Color>("color", this.color, defaultValue: null));
+            properties.add(new DiagnosticsProperty<Color>("disabledColor", this.disabledColor, defaultValue: null));
+            properties.add(new DiagnosticsProperty<Color>("highlightColor", this.highlightColor, defaultValue: null));
+            properties.add(new DiagnosticsProperty<Color>("splashColor", this.splashColor, defaultValue: null));
+            properties.add(new DiagnosticsProperty<Brightness?>("colorBrightness", this.colorBrightness,
+                defaultValue: null));
+            properties.add(new DiagnosticsProperty<double?>("elevation", this.elevation, defaultValue: null));
+            properties.add(new DiagnosticsProperty<double?>("highlightElevation", this.highlightElevation,
+                defaultValue: null));
+            properties.add(new DiagnosticsProperty<double?>("disabledElevation", this.disabledElevation,
+                defaultValue: null));
+            properties.add(new DiagnosticsProperty<EdgeInsets>("padding", this.padding, defaultValue: null));
+            properties.add(new DiagnosticsProperty<ShapeBorder>("shape", this.shape, defaultValue: null));
+            properties.add(new DiagnosticsProperty<MaterialTapTargetSize?>("materialTapTargetSize",
+                this.materialTapTargetSize, defaultValue: null));
         }
     }
 
-    class _RaisedButtonWithIcon : RaisedButton {
+    class _RaisedButtonWithIcon : RaisedButton, MaterialButtonWithIconMixin {
         public _RaisedButtonWithIcon(
             Key key = null,
             VoidCallback onPressed = null,
             ValueChanged<bool> onHighlightChanged = null,
-            ButtonTextTheme textTheme = ButtonTextTheme.normal,
+            ButtonTextTheme? textTheme = null,
             Color textColor = null,
             Color disabledTextColor = null,
             Color color = null,
             Color disabledColor = null,
             Color highlightColor = null,
             Color splashColor = null,
-            Brightness colorBrightness = Brightness.dark,
+            Brightness? colorBrightness = null,
             double? elevation = null,
             double? highlightElevation = null,
             double? disabledElevation = null,
             EdgeInsets padding = null,
             ShapeBorder shape = null,
-            Clip clipBehavior = Clip.none,
-            MaterialTapTargetSize materialTapTargetSize = MaterialTapTargetSize.padded,
+            Clip? clipBehavior = Clip.none,
+            MaterialTapTargetSize? materialTapTargetSize = null,
             TimeSpan? animationDuration = null,
             Widget icon = null,
-            Widget label = null) : base(
+            Widget label = null
+        ) : base(
             key: key,
             onPressed: onPressed,
             onHighlightChanged: onHighlightChanged,
