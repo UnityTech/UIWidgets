@@ -104,6 +104,8 @@ namespace UIWidgets.Tests {
         void OnEnable() {
             this.windowAdapter = new EditorWindowAdapter(this);
             this.windowAdapter.OnEnable();
+            
+            FontManager.instance.addFont(Resources.Load<Font>("MaterialIcons-Regular"));
         }
 
         void OnDisable() {
@@ -214,8 +216,13 @@ namespace UIWidgets.Tests {
                 height: 200,
                 margin: EdgeInsets.all(30.0),
                 padding: EdgeInsets.all(15.0),
-                color: Color.fromARGB(255, 244, 190, 85),
-                child: image
+                child: image,
+                
+                decoration: new BoxDecoration(
+                    color: CLColors.white,
+                    borderRadius: BorderRadius.all(30),
+                    gradient: new LinearGradient(colors: new List<Color>{CLColors.blue, CLColors.red, CLColors.green})
+                )
             );
 
             return container;

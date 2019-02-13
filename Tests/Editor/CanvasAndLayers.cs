@@ -2,13 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using Unity.UIWidgets.editor;
+using Unity.UIWidgets.material;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.ui;
 using UnityEditor;
 using UnityEditor.Experimental.UIElements;
 using UnityEngine;
 using Color = Unity.UIWidgets.ui.Color;
+using Gradient = Unity.UIWidgets.ui.Gradient;
+using Material = UnityEngine.Material;
 using Rect = UnityEngine.Rect;
+using TextStyle = Unity.UIWidgets.ui.TextStyle;
 
 namespace UIWidgets.Tests {
     public class CanvasAndLayers : EditorWindow {
@@ -42,7 +46,9 @@ namespace UIWidgets.Tests {
         WindowAdapter _windowAdapter;
 
         MeshPool _meshPool;
-
+        
+        static Texture2D texture6;
+        
         CanvasAndLayers() {
             this._options = new Action[] {
                 this.drawPloygon4,
@@ -107,6 +113,8 @@ namespace UIWidgets.Tests {
             this._windowAdapter = new EditorWindowAdapter(this);
             this._windowAdapter.OnEnable();
             this._meshPool = new MeshPool();
+            
+            texture6 = Resources.Load<Texture2D>("6");
         }
 
         void OnDisable() {
@@ -145,11 +153,16 @@ namespace UIWidgets.Tests {
 
             var paint = new Paint {
                 color = new Color(0xFFFF0000),
+                shader = Gradient.linear(new Offset(80, 80), new Offset(180, 180), new List<Color>() {
+                    Colors.red, Colors.black, Colors.green
+                }, null, TileMode.clamp)
             };
 
 //            canvas.drawRect(
 //                Unity.UIWidgets.ui.Rect.fromLTRB(10, 10, 110, 110),
 //                paint);
+
+            canvas.rotate(Math.PI * 15 / 180);
 
             var path = new Path();
             path.moveTo(10, 150);
@@ -174,6 +187,27 @@ namespace UIWidgets.Tests {
             }
 
             canvas.drawPath(path, paint);
+            
+            canvas.translate(100, 100);
+
+            paint.shader = Gradient.radial(new Offset(80, 80), 100, new List<Color>() {
+                Colors.red, Colors.black, Colors.green
+            }, null, TileMode.clamp);
+            canvas.drawPath(path, paint);
+
+            
+            canvas.translate(100, 100);
+            paint.shader = Gradient.sweep(new Offset(120, 100), new List<Color>() {
+                Colors.red, Colors.black, Colors.green, Colors.red,
+            }, null, TileMode.clamp, 10 * Math.PI / 180, 135 * Math.PI / 180);
+            canvas.drawPath(path, paint);
+            
+
+            canvas.translate(100, 100);
+            //paint.maskFilter = MaskFilter.blur(BlurStyle.normal, 5);
+            paint.shader = new ImageShader(new Image(texture6, true), TileMode.mirror);
+            canvas.drawPath(path, paint);
+            
             canvas.flush();
         }
 
@@ -184,6 +218,9 @@ namespace UIWidgets.Tests {
                 color = new Color(0xFFFF0000),
                 style = PaintingStyle.stroke,
                 strokeWidth = 10,
+                shader = Gradient.linear(new Offset(10, 10), new Offset(180, 180), new List<Color>() {
+                    Colors.red, Colors.green, Colors.yellow
+                }, null, TileMode.clamp)
             };
 
             canvas.drawLine(
@@ -206,17 +243,49 @@ namespace UIWidgets.Tests {
                 new Offset(90, 10),
                 paint);
 
-            var widthPaint = new Paint {
-                color = new Color(0xFFFF0000),
-                style = PaintingStyle.stroke,
-                strokeWidth = 4,
-            };
-
+            paint.maskFilter = MaskFilter.blur(BlurStyle.normal, 1);                
+            paint.strokeWidth = 4;
+            
             canvas.drawLine(
                 new Offset(40, 20),
                 new Offset(120, 190),
-                widthPaint);
+                paint);            
+            
+            canvas.scale(3);
+            TextBlob textBlob = new TextBlob("This is a text blob", 0, 19, new Vector2d[] {
+                new Vector2d(10, 0),
+                new Vector2d(20, 0),
+                new Vector2d(30, 0),
+                new Vector2d(40, 0),
+                new Vector2d(50, 0),
+                new Vector2d(60, 0),
+                new Vector2d(70, 0),
+                new Vector2d(80, 0),
+                new Vector2d(90, 0),
+                new Vector2d(100, 0),
+                new Vector2d(110, 0),
+                new Vector2d(120, 0),
+                new Vector2d(130, 0),
+                new Vector2d(140, 0),
+                new Vector2d(150, 0),
+                new Vector2d(160, 0),
+                new Vector2d(170, 0),
+                new Vector2d(180, 0),
+                new Vector2d(190, 0),
+            }, Unity.UIWidgets.ui.Rect.fromLTWH(0 ,0, 200, 50), new TextStyle());
+            
+            canvas.drawTextBlob(textBlob, new Offset(100, 100), paint);
+            
+            canvas.drawLine(
+                new Offset(10, 30),
+                new Offset(10, 60),
+                new Paint() {style = PaintingStyle.stroke, strokeWidth = 0.1});
 
+            canvas.drawLine(
+                new Offset(20, 30),
+                new Offset(20, 60),
+                new Paint() {style = PaintingStyle.stroke, strokeWidth = 0.333});
+            
             canvas.flush();
         }
 
@@ -250,7 +319,7 @@ namespace UIWidgets.Tests {
 
             canvas.flush();
         }
-
+        
         void drawRectShadow() {
             var canvas = new CommandBufferCanvas(this._renderTexture, (float) Window.instance.devicePixelRatio, this._meshPool);
 
@@ -262,7 +331,6 @@ namespace UIWidgets.Tests {
             canvas.clipRect(Unity.UIWidgets.ui.Rect.fromLTWH(25, 25, 300, 300));
                 
             canvas.rotate(-Math.PI/8.0);
-            
 
             canvas.drawRect(
                 Unity.UIWidgets.ui.Rect.fromLTWH(10, 10, 100, 100),
@@ -270,13 +338,22 @@ namespace UIWidgets.Tests {
 
             paint = new Paint {
                 color = new Color(0xFFFFFF00),
-                maskFilter = MaskFilter.blur(BlurStyle.normal, 15),
+                maskFilter = MaskFilter.blur(BlurStyle.normal, 5),                
+                style = PaintingStyle.stroke,
+                strokeWidth = 55,
+                shader = Gradient.linear(new Offset(10, 10), new Offset(180, 180), new List<Color>() {
+                    Colors.red, Colors.green, Colors.yellow
+                }, null, TileMode.clamp)
             };
 
             canvas.drawRect(
                 Unity.UIWidgets.ui.Rect.fromLTWH(10, 150, 200, 200),
                 paint);
             
+            canvas.drawImage(new Image(texture6, true), 
+                new Offset(50, 150), 
+                paint);
+
             canvas.flush();
         }
 
@@ -337,7 +414,11 @@ namespace UIWidgets.Tests {
             var canvas = new CommandBufferCanvas(this._renderTexture, (float) Window.instance.devicePixelRatio, this._meshPool);
 
             var paint = new Paint {
-                color = new Color(0x7FFF0000),
+                // color = new Color(0x7FFF0000),
+                shader = Gradient.linear(new Offset(100, 100), new Offset(280, 280), new List<Color>() {
+                    Colors.red, Colors.black, Colors.green
+                }, null, TileMode.clamp)
+
             };
 
             canvas.drawImageRect(this._stream.completer.currentImage.image,

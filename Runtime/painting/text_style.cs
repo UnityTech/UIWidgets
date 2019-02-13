@@ -105,7 +105,7 @@ namespace Unity.UIWidgets.painting {
         }
 
         public ParagraphStyle getParagraphStyle(TextAlign textAlign,
-            TextDirection textDirection, string ellipsis, int maxLines, double textScaleFactor = 1.0) {
+            TextDirection textDirection, string ellipsis, int? maxLines, double textScaleFactor = 1.0) {
             return new ParagraphStyle(
                 textAlign, textDirection, this.fontWeight, this.fontStyle,
                 maxLines, (this.fontSize ?? _defaultFontSize) * textScaleFactor, this.fontFamily, this.height,

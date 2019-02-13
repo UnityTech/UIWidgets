@@ -14,25 +14,22 @@ namespace Unity.UIWidgets.ui {
         uint _genId;
         bool _isIntersectionOfRects;
         Rect _bound;
+        Matrix3 _invMat;
 
-        public ClipElement(int saveCount, Path path, float[] xform, float devicePixelRatio) {
+        public ClipElement(int saveCount, Path path, Matrix3 matrix, float scale) {
             this.saveCount = saveCount;
 
-            var pathCache = path.flatten(xform, devicePixelRatio);
-            this.mesh = pathCache.getFillMesh(out this.convex);
+            var pathCache = path.flatten(scale);
+            this.mesh = pathCache.getFillMesh(out this.convex).transform(matrix);
 
             var vertices = this.mesh.vertices;
-            if (this.convex && vertices.Count == 4 &&
+            if (this.convex && vertices.Count == 4 && matrix.rectStaysRect() &&
                 (Mathf.Abs(vertices[0].x - vertices[1].x) < 1e-6 && Mathf.Abs(vertices[1].y - vertices[2].y) < 1e-6 &&
                  Mathf.Abs(vertices[2].x - vertices[3].x) < 1e-6 && Mathf.Abs(vertices[3].y - vertices[0].y) < 1e-6 ||
                  Mathf.Abs(vertices[0].y - vertices[1].y) < 1e-6 && Mathf.Abs(vertices[1].x - vertices[2].x) < 1e-6 &&
                  Mathf.Abs(vertices[2].y - vertices[3].y) < 1e-6 && Mathf.Abs(vertices[3].x - vertices[0].x) < 1e-6)) {
-                var minx = Mathf.Min(vertices[0].x, vertices[1].x, vertices[2].x, vertices[3].x);
-                var miny = Mathf.Min(vertices[0].y, vertices[1].y, vertices[2].y, vertices[3].y);
-                var maxx = Mathf.Max(vertices[0].x, vertices[1].x, vertices[2].x, vertices[3].x);
-                var maxy = Mathf.Max(vertices[0].y, vertices[1].y, vertices[2].y, vertices[3].y);
                 this.isRect = true;
-                this.rect = Rect.fromLTRB(minx, miny, maxx, maxy);
+                this.rect = this.mesh.bounds;
             }
             else {
                 this.isRect = false;
@@ -95,34 +92,46 @@ namespace Unity.UIWidgets.ui {
             return this._genId;
         }
 
-        bool _convexContains(float x, float y) {
-            if (this.mesh.vertices.Count <= 2) {
-                return false;
-            }
-
-            for (var i = 0; i < this.mesh.vertices.Count; i++) {
-                var p0 = this.mesh.vertices[i];
-                var p1 = this.mesh.vertices[i == this.mesh.vertices.Count - 1 ? 0 : i + 1];
-
-                if (PathUtils.triarea2(p0.x, p0.y, p1.x, p1.y, x, y) < 0.0f) {
-                    return false;
-                }
-            }
-
-            return true;
-        }
+//        bool _convexContains(float x, float y) {
+//            if (this.mesh.vertices.Count <= 2) {
+//                return false;
+//            }
+//
+//            if (this.mesh.matrix != null) {
+//                if (this._invMat == null) {
+//                    this._invMat = Matrix3.I();
+//                    this.mesh.matrix.invert(this._invMat); // ignore if not invertible for now.
+//                }
+//                
+//                var offset = this._invMat.mapXY(x, y);
+//                x = (float) offset.dx;
+//                y = (float) offset.dy;
+//            }
+//
+//            for (var i = 0; i < this.mesh.vertices.Count; i++) {
+//                var p0 = this.mesh.vertices[i];
+//                var p1 = this.mesh.vertices[i == this.mesh.vertices.Count - 1 ? 0 : i + 1];
+//
+//                if (PathUtils.triarea2(p0.x, p0.y, p1.x, p1.y, x, y) < 0.0f) {
+//                    return false;
+//                }
+//            }
+//
+//            return true;
+//        }
 
         public bool contains(Rect rect) {
             if (this.isRect) {
                 return this.rect.contains(rect);
             }
 
-            if (this.convex) {
-                return this._convexContains((float) rect.left, (float) rect.top) &&
-                       this._convexContains((float) rect.left, (float) rect.bottom) &&
-                       this._convexContains((float) rect.right, (float) rect.top) &&
-                       this._convexContains((float) rect.right, (float) rect.bottom);
-            }
+//            this seems to be inefficient. disable it for now.
+//            if (this.convex) {
+//                return this._convexContains((float) rect.left, (float) rect.top) &&
+//                       this._convexContains((float) rect.left, (float) rect.bottom) &&
+//                       this._convexContains((float) rect.right, (float) rect.top) &&
+//                       this._convexContains((float) rect.right, (float) rect.bottom);
+//            }
 
             return false;
         }
@@ -165,8 +174,8 @@ namespace Unity.UIWidgets.ui {
             }
         }
 
-        public void clipPath(Path path, float[] xform, float devicePixelRatio) {
-            var element = new ClipElement(this._saveCount, path, xform, devicePixelRatio);
+        public void clipPath(Path path, Matrix3 matrix, float scale) {
+            var element = new ClipElement(this._saveCount, path, matrix, scale);
             this._pushElement(element);
         }
 

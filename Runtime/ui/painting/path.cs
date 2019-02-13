@@ -16,12 +16,12 @@ namespace Unity.UIWidgets.ui {
 
         PathCache _cache;
 
-        internal PathCache flatten(float[] xform, float devicePixelRatio) {
-            if (this._cache != null && this._cache.canReuse(xform, devicePixelRatio)) {
+        internal PathCache flatten(float scale) {
+            if (this._cache != null && this._cache.canReuse(scale)) {
                 return this._cache;
             }
 
-            this._cache = new PathCache(xform, devicePixelRatio);
+            this._cache = new PathCache(scale);
 
             var i = 0;
             while (i < this._commands.Count) {
@@ -805,8 +805,7 @@ namespace Unity.UIWidgets.ui {
     }
 
     class PathCache {
-        readonly float[] _xform;
-        readonly float _devicePixelRatio;
+        readonly float _scale;
         readonly float _distTol;
         readonly float _tessTol;
 
@@ -823,25 +822,14 @@ namespace Unity.UIWidgets.ui {
         StrokeJoin _lineJoin;
         float _miterLimit;
 
-        public PathCache(float[] xform, float devicePixelRatio) {
-            D.assert(xform != null && xform.Length == 6);
-
-            this._xform = xform;
-            this._devicePixelRatio = devicePixelRatio;
-            this._distTol = 0.01f / devicePixelRatio;
-            this._tessTol = 0.25f / devicePixelRatio;
+        public PathCache(float scale) {
+            this._scale = scale;
+            this._distTol = 0.01f / scale;
+            this._tessTol = 0.25f / scale;
         }
 
-        public bool canReuse(float[] xform, float devicePixelRatio) {
-            D.assert(xform != null && xform.Length == 6);
-
-            for (var i = 0; i < 6; ++i) {
-                if (this._xform[i] != xform[i]) {
-                    return false;
-                }
-            }
-
-            if (this._devicePixelRatio != devicePixelRatio) {
+        public bool canReuse(float scale) {
+            if (this._scale != scale) {
                 return false;
             }
 
@@ -856,8 +844,6 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void addPoint(float x, float y, PointFlags flags) {
-            PathUtils.transformPoint(out x, out y, this._xform, x, y);
-
             this._addPoint(new PathPoint {x = x, y = y, flags = flags});
         }
 
@@ -893,10 +879,6 @@ namespace Unity.UIWidgets.ui {
                 x1 = pt.x;
                 y1 = pt.y;
             }
-
-            PathUtils.transformPoint(out x2, out y2, this._xform, x2, y2);
-            PathUtils.transformPoint(out x3, out y3, this._xform, x3, y3);
-            PathUtils.transformPoint(out x4, out y4, this._xform, x4, y4);
 
             var points = TessellationGenerator.tessellateBezier(x1, y1, x2, y2, x3, y3, x4, y4, this._tessTol);
             points[points.Count - 1].flags = flags;
@@ -1038,7 +1020,7 @@ namespace Unity.UIWidgets.ui {
 
             D.assert(indices.Count == cindices);
 
-            var mesh = new MeshMesh(this._vertices, indices);
+            var mesh = new MeshMesh(null, this._vertices, indices);
             this._fillMesh = mesh;
 
             this._fillConvex = false;
@@ -1278,7 +1260,7 @@ namespace Unity.UIWidgets.ui {
 
             D.assert(indices.Count == cindices);
 
-            this._strokeMesh = new MeshMesh(this._vertices, indices);
+            this._strokeMesh = new MeshMesh(null, this._vertices, indices);
             this._strokeWidth = strokeWidth;
             this._lineCap = lineCap;
             this._lineJoin = lineJoin;
@@ -1562,18 +1544,32 @@ namespace Unity.UIWidgets.ui {
         public readonly List<Vector3> vertices;
         public readonly List<int> triangles;
         public readonly List<Vector2> uv;
-        public readonly Rect bounds;
+        public readonly Matrix3 matrix;
+        public readonly Rect rawBounds;
 
+        Rect _bounds;
+        public Rect bounds {
+            get {
+                if (this._bounds == null) {
+                    this._bounds = this.matrix != null ? this.matrix.mapRect(this.rawBounds) : this.rawBounds;
+                }
+
+                return this._bounds;
+            }
+        }
+        
+        
         MeshMesh _boundsMesh;
-        static readonly List<int> _boundsTriangles = new List<int>(6) {0, 2, 1, 1, 2, 3};
+        static readonly List<int> _boundsTriangles = new List<int>(6) {
+            0, 2, 1, 1, 2, 3
+        };
 
         public MeshMesh boundsMesh {
             get {
-                if (this._boundsMesh != null) {
-                    return this._boundsMesh;
+                if (this._boundsMesh == null) {
+                    this._boundsMesh = new MeshMesh(this.bounds);
                 }
 
-                this._boundsMesh = new MeshMesh(this.bounds);
                 return this._boundsMesh;
             }
         }
@@ -1587,63 +1583,61 @@ namespace Unity.UIWidgets.ui {
             };
 
             this.triangles = _boundsTriangles;
-            this.bounds = rect;
+            this.rawBounds = rect;
+
+            this._bounds = this.rawBounds;
             this._boundsMesh = this;
         }
 
-        public MeshMesh(List<Vector3> vertices, List<int> triangles, List<Vector2> uv = null) {
+        public MeshMesh(Matrix3 matrix, List<Vector3> vertices, List<int> triangles, List<Vector2> uv = null, Rect rawBounds = null) {
             D.assert(vertices != null);
             D.assert(vertices.Count >= 0);
             D.assert(triangles != null);
             D.assert(triangles.Count >= 0);
             D.assert(uv == null || uv.Count == vertices.Count);
 
+            this.matrix = matrix;
             this.vertices = vertices;
             this.triangles = triangles;
             this.uv = uv;
 
-            if (vertices.Count > 0) {
-                double minX = vertices[0].x;
-                double maxX = vertices[0].x;
-                double minY = vertices[0].y;
-                double maxY = vertices[0].y;
+            if (rawBounds == null) {
+                if (vertices.Count > 0) {
+                    double minX = vertices[0].x;
+                    double maxX = vertices[0].x;
+                    double minY = vertices[0].y;
+                    double maxY = vertices[0].y;
 
-                for (int i = 1; i < vertices.Count; i++) {
-                    var vertex = vertices[i];
-                    if (vertex.x < minX) {
-                        minX = vertex.x;
+                    for (int i = 1; i < vertices.Count; i++) {
+                        var vertex = vertices[i];
+                        if (vertex.x < minX) {
+                            minX = vertex.x;
+                        }
+
+                        if (vertex.x > maxX) {
+                            maxX = vertex.x;
+                        }
+
+                        if (vertex.y < minY) {
+                            minY = vertex.y;
+                        }
+
+                        if (vertex.y > maxY) {
+                            maxY = vertex.y;
+                        }
                     }
 
-                    if (vertex.x > maxX) {
-                        maxX = vertex.x;
-                    }
-
-                    if (vertex.y < minY) {
-                        minY = vertex.y;
-                    }
-
-                    if (vertex.y > maxY) {
-                        maxY = vertex.y;
-                    }
+                    rawBounds = Rect.fromLTRB(minX, minY, maxX, maxY);
+                } else {
+                    rawBounds = Rect.zero;
                 }
+            }
 
-                this.bounds = Rect.fromLTRB(minX, minY, maxX, maxY);
-            }
-            else {
-                this.bounds = Rect.zero;
-            }
+            this.rawBounds = rawBounds;
         }
 
-        public MeshMesh transform(float[] xform) {
-            var transVertices = new List<Vector3>(this.vertices.Count);
-
-            foreach (var vertex in this.vertices) {
-                float x, y;
-                PathUtils.transformPoint(out x, out y, xform, vertex.x, vertex.y);
-                transVertices.Add(new Vector3(x, y));
-            }
-
-            return new MeshMesh(transVertices, this.triangles, this.uv);
+        public MeshMesh transform(Matrix3 matrix) {
+            return new MeshMesh(matrix, this.vertices, this.triangles, this.uv, this.rawBounds);
         }
     }
 
@@ -1653,7 +1647,6 @@ namespace Unity.UIWidgets.ui {
         public Mesh getMesh() {
             if (this._pool.Count > 0) {
                 var mesh = this._pool.Dequeue();
-                D.assert(mesh);
                 return mesh;
             }
             else {
@@ -1664,6 +1657,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void returnMesh(Mesh mesh) {
+            D.assert(mesh != null);
             D.assert(mesh.hideFlags == HideFlags.HideAndDontSave);
             this._pool.Enqueue(mesh);
         }
