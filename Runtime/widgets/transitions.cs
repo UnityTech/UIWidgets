@@ -99,7 +99,8 @@ namespace Unity.UIWidgets.widgets {
             Animation<double> turns = null,
             Alignment alignment = null,
             Widget child = null) : base(key: key, listenable: turns) {
-            this.alignment = alignment;
+            D.assert(turns != null);
+            this.alignment = alignment ?? Alignment.center;
             this.child = child;
         }
 

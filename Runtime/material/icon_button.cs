@@ -20,6 +20,7 @@ namespace Unity.UIWidgets.material {
             VoidCallback onPressed = null,
             string tooltip = null) : base(key: key) {
             D.assert(icon != null);
+
             this.iconSize = iconSize;
             this.padding = padding ?? EdgeInsets.all(8.0);
             this.alignment = alignment ?? Alignment.center;
@@ -54,7 +55,7 @@ namespace Unity.UIWidgets.material {
 
         public override Widget build(BuildContext context) {
             D.assert(MaterialDebug.debugCheckHasMaterial(context));
-            Color currentColor = null;
+            Color currentColor;
             if (this.onPressed != null) {
                 currentColor = this.color;
             }

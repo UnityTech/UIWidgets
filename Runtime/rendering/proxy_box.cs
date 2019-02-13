@@ -656,7 +656,8 @@ namespace Unity.UIWidgets.rendering {
         public RenderClipRect(
             RenderBox child = null,
             CustomClipper<Rect> clipper = null,
-            Clip clipBehavior = Clip.antiAlias) : base(
+            Clip clipBehavior = Clip.antiAlias
+        ) : base(
             child: child,
             clipper: clipper,
             clipBehavior: clipBehavior) {
@@ -666,7 +667,7 @@ namespace Unity.UIWidgets.rendering {
             get { return Offset.zero & this.size; }
         }
 
-        public override bool hitTest(HitTestResult result, Offset position) {
+        public override bool hitTest(HitTestResult result, Offset position = null) {
             if (this._clipper != null) {
                 this._updateClip();
                 D.assert(this._clip != null);
@@ -710,7 +711,7 @@ namespace Unity.UIWidgets.rendering {
         ) : base(child: child, clipper: clipper, clipBehavior: clipBehavior) {
             D.assert(clipBehavior != Clip.none);
         }
-        
+
         protected override Path _defaultClip {
             get {
                 var path = new Path();
@@ -735,7 +736,7 @@ namespace Unity.UIWidgets.rendering {
         public override void paint(PaintingContext context, Offset offset) {
             if (this.child != null) {
                 this._updateClip();
-                //todo: xingwei.zhu pushClipPath()
+                //todo:xingwei.zhu pushClipPath()
 //                context.pushClipPath(this.needsCompositing, offset, Offset.zero & this.size,
 //                    this._clip, base.paint, clipBehavior: this.clipBehavior);
                 base.paint(context, offset);
@@ -1015,13 +1016,13 @@ namespace Unity.UIWidgets.rendering {
 //                        this.color.alpha != 0xFF,
 //                    );
 //                }
-                
+
                 if (this.needsCompositing) {
                     ContainerLayer container = new ContainerLayer();
                     context.pushLayer(container, base.paint, offset, childPaintBounds: offsetBounds);
                     return;
                 }
-                
+
                 Paint paint = new Paint {color = this.color, style = PaintingStyle.fill};
                 canvas.drawPath(offsetPath, paint);
                 context.clipPathAndPaint(offsetPath, this.clipBehavior,

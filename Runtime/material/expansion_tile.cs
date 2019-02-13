@@ -134,11 +134,12 @@ namespace Unity.UIWidgets.material {
                                 leading: this.widget.leading,
                                 title: new DefaultTextStyle(
                                     style: Theme.of(this.context).textTheme.subhead.copyWith(color: titleColor),
-                                    child: this.widget.title),
+                                    child: this.widget.title
+                                ),
                                 trailing: this.widget.trailing ?? new RotationTransition(
                                               turns: this._iconTurns,
-                                              //todo xingwei.zhu: add Icons.expand_more
-                                              child: null)
+                                              child: new Icon(Icons.expand_more)
+                                          )
                             )
                         ),
                         new ClipRect(
@@ -167,10 +168,7 @@ namespace Unity.UIWidgets.material {
             return new AnimatedBuilder(
                 animation: this._controller.view,
                 builder: this._buildChildren,
-                child: closed
-                    ? null
-                    : new Column(
-                        children: this.widget.children));
+                child: closed ? null : new Column(children: this.widget.children));
         }
     }
 }

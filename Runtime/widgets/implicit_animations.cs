@@ -62,7 +62,6 @@ namespace Unity.UIWidgets.widgets {
             Border end = null) : base(begin: begin, end: end) {
         }
 
-
         public override Border lerp(double t) {
             return Border.lerp(this.begin, this.end, t);
         }
@@ -75,7 +74,7 @@ namespace Unity.UIWidgets.widgets {
             Matrix3 end = null) : base(begin: begin, end: end) {
         }
 
-        //todo: xingwei.zhu implement full matrix3 lerp
+        //todo:xingwei.zhu implement full matrix3 lerp
         public override Matrix3 lerp(double t) {
             D.assert(this.begin != null);
             D.assert(this.end != null);
@@ -272,6 +271,7 @@ namespace Unity.UIWidgets.widgets {
             Curve curve = null,
             TimeSpan? duration = null
         ) : base(key: key, curve: curve ?? Curves.linear, duration: duration) {
+            D.assert(duration != null);
             D.assert(margin == null || margin.isNonNegative);
             D.assert(padding == null || padding.isNonNegative);
             D.assert(decoration == null || decoration.debugAssertIsValid());
@@ -534,8 +534,7 @@ namespace Unity.UIWidgets.widgets {
         ColorTween _shadowColor;
 
         protected override void forEachTween(ITweenVisitor visitor) {
-            this._borderRadius = (BorderRadiusTween) visitor.visit(this, this._borderRadius,
-                this.widget.borderRadius,
+            this._borderRadius = (BorderRadiusTween) visitor.visit(this, this._borderRadius, this.widget.borderRadius,
                 (BorderRadius value) => new BorderRadiusTween(begin: value));
             this._elevation = (DoubleTween) visitor.visit(this, this._elevation, this.widget.elevation,
                 (double value) => new DoubleTween(begin: value, end: value));

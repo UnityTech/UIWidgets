@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using Unity.UIWidgets.animation;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.painting;
@@ -193,7 +192,10 @@ namespace Unity.UIWidgets.material {
         }
 
 
-        static Widget _transparentInterior(ShapeBorder shape, Clip clipBehavior, Widget contents) {
+        static Widget _transparentInterior(
+            ShapeBorder shape = null,
+            Clip? clipBehavior = null,
+            Widget contents = null) {
             _ShapeBorderPaint child = new _ShapeBorderPaint(
                 child: contents,
                 shape: shape);
@@ -201,12 +203,12 @@ namespace Unity.UIWidgets.material {
             if (clipBehavior == Clip.none) {
                 return child;
             }
-            
+
             return new ClipPath(
                 child: child,
                 clipper: new ShapeBorderClipper(shape: shape),
-                clipBehavior: clipBehavior
-                );
+                clipBehavior: clipBehavior ?? Clip.none
+            );
         }
 
 

@@ -101,7 +101,8 @@ namespace Unity.UIWidgets.widgets {
             Key key = null,
             CustomClipper<Rect> clipper = null,
             Clip clipBehavior = Clip.hardEdge,
-            Widget child = null) : base(key: key, child: child) {
+            Widget child = null
+        ) : base(key: key, child: child) {
             this.clipper = clipper;
             this.clipBehavior = clipBehavior;
         }
@@ -130,6 +131,45 @@ namespace Unity.UIWidgets.widgets {
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             properties.add(new DiagnosticsProperty<CustomClipper<Rect>>("clipper", this.clipper, defaultValue: null));
+        }
+    }
+
+    public class ClipPath : SingleChildRenderObjectWidget {
+        public ClipPath(
+            Key key = null,
+            CustomClipper<Path> clipper = null,
+            Clip clipBehavior = Clip.antiAlias,
+            Widget child = null
+        ) : base(key: key, child: child) {
+            this.clipper = clipper;
+            this.clipBehavior = clipBehavior;
+        }
+
+        public readonly CustomClipper<Path> clipper;
+
+        public readonly Clip clipBehavior;
+
+
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderClipPath(clipper: this.clipper, clipBehavior: this.clipBehavior);
+        }
+
+
+        public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
+            RenderClipPath _renderObject = (RenderClipPath) renderObject;
+            _renderObject.clipper = this.clipper;
+        }
+
+
+        public override void didUnmountRenderObject(RenderObject renderObject) {
+            RenderClipPath _renderObject = (RenderClipPath) renderObject;
+            _renderObject.clipper = null;
+        }
+
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new DiagnosticsProperty<CustomClipper<Path>>("clipper", this.clipper, defaultValue: null));
         }
     }
 
@@ -417,7 +457,8 @@ namespace Unity.UIWidgets.widgets {
             Key key = null,
             Axis mainAxis = Axis.vertical,
             bool reverse = false,
-            List<Widget> children = null) : base(key: key, children: children ?? new List<Widget>()) {
+            List<Widget> children = null
+        ) : base(key: key, children: children ?? new List<Widget>()) {
             this.mainAxis = mainAxis;
             this.reverse = reverse;
         }
@@ -701,45 +742,6 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
-
-    public class ClipPath : SingleChildRenderObjectWidget {
-        public ClipPath(
-            Key key = null,
-            CustomClipper<Path> clipper = null,
-            Clip clipBehavior = Clip.antiAlias,
-            Widget child = null) : base(key: key, child: child) {
-
-            this.clipper = clipper;
-            this.clipBehavior = clipBehavior;
-        }
-
-        public readonly CustomClipper<Path> clipper;
-
-        public readonly Clip clipBehavior;
-
-
-        public override RenderObject createRenderObject(BuildContext context) {
-            return new RenderClipPath(clipper: this.clipper, clipBehavior: this.clipBehavior);
-        }
-
-        
-        public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
-            RenderClipPath _renderObject = (RenderClipPath) renderObject;
-            _renderObject.clipper = this.clipper;
-        }
-
-
-        public override void didUnmountRenderObject(RenderObject renderObject) {
-            RenderClipPath _renderObject = (RenderClipPath) renderObject;
-            _renderObject.clipper = null;
-        }
-
-
-        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-            base.debugFillProperties(properties);
-            properties.add(new DiagnosticsProperty<CustomClipper<Path>>("clipper", this.clipper, defaultValue: null));
-        }
-    }
 
     public class PhysicalModel : SingleChildRenderObjectWidget {
         public PhysicalModel(

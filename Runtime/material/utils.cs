@@ -89,7 +89,7 @@ namespace Unity.UIWidgets.material {
     public static class ArcUtils {
         public const double _kOnAxisDelta = 2.0;
 
-        public static List<_Diagonal> _allDiagonals = new List<_Diagonal> {
+        public static readonly List<_Diagonal> _allDiagonals = new List<_Diagonal> {
             new _Diagonal(_CornerId.topLeft, _CornerId.bottomRight),
             new _Diagonal(_CornerId.bottomRight, _CornerId.topLeft),
             new _Diagonal(_CornerId.topRight, _CornerId.bottomLeft),
@@ -115,7 +115,7 @@ namespace Unity.UIWidgets.material {
     }
 
     public static class ExpansionTileUtils {
-        public static TimeSpan _kExpand = new TimeSpan(0, 0, 0, 0, 200);
+        public static readonly TimeSpan _kExpand = new TimeSpan(0, 0, 0, 0, 200);
     }
 
     public static class ExpansionPanelUtils {
@@ -135,11 +135,11 @@ namespace Unity.UIWidgets.material {
         public const double _kWidth = 304.0;
         public const double _kEdgeDragWidth = 20.0;
         public const double _kMinFlingVelocity = 365.0;
-        public static TimeSpan _kBaseSettleDuration = new TimeSpan(0, 0, 0, 0, 246);
+        public static readonly TimeSpan _kBaseSettleDuration = new TimeSpan(0, 0, 0, 0, 246);
     }
 
     public static class TooltipUtils {
-        public static TimeSpan _kFadeDuration = new TimeSpan(0, 0, 0, 0, 200);
-        public static TimeSpan _kShowDuration = new TimeSpan(0, 0, 0, 0, 1500);
+        public static readonly TimeSpan _kFadeDuration = new TimeSpan(0, 0, 0, 0, 200);
+        public static readonly TimeSpan _kShowDuration = new TimeSpan(0, 0, 0, 0, 1500);
     }
 }

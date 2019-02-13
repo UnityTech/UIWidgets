@@ -145,6 +145,7 @@ namespace Unity.UIWidgets.material {
 
         public readonly bool selected;
 
+
         Color _iconColor(ThemeData theme, ListTileTheme tileTheme) {
             if (!this.enabled) {
                 return theme.disabledColor;
@@ -248,7 +249,8 @@ namespace Unity.UIWidgets.material {
             Widget titleText = new AnimatedDefaultTextStyle(
                 style: titleStyle,
                 duration: Constants.kThemeChangeDuration,
-                child: this.title ?? new SizedBox());
+                child: this.title ?? new SizedBox()
+            );
 
             Widget subtitleText = null;
             TextStyle subtitleStyle = null;
@@ -268,7 +270,8 @@ namespace Unity.UIWidgets.material {
             }
 
             EdgeInsets _defaultContentPadding = EdgeInsets.symmetric(horizontal: 16.0);
-            EdgeInsets resolvedContentPadding = _defaultContentPadding;
+            EdgeInsets resolvedContentPadding =
+                this.contentPadding ?? tileTheme?.contentPadding ?? _defaultContentPadding;
 
             return new InkWell(
                 onTap: this.enabled ? this.onTap : null,
@@ -286,7 +289,8 @@ namespace Unity.UIWidgets.material {
                         isThreeLine: this.isThreeLine,
                         titleBaselineType: titleStyle.textBaseline,
                         subtitleBaselineType: subtitleStyle?.textBaseline
-                    ))
+                    )
+                )
             );
         }
     }
@@ -344,7 +348,20 @@ namespace Unity.UIWidgets.material {
 
         public override RenderObject createRenderObject(BuildContext context) {
             return new _RenderListTile(
+                isThreeLine: this.isThreeLine,
+                isDense: this.isDense,
+                titleBaselineType: this.titleBaselineType,
+                subtitleBaselineType: this.subtitleBaselineType
             );
+        }
+
+
+        public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
+            _RenderListTile _renderObject = (_RenderListTile) renderObject;
+            _renderObject.isThreeLine = this.isThreeLine;
+            _renderObject.isDense = this.isDense;
+            _renderObject.titleBaselineType = this.titleBaselineType;
+            _renderObject.subtitleBaselineType = this.subtitleBaselineType;
         }
     }
 
@@ -356,11 +373,11 @@ namespace Unity.UIWidgets.material {
         readonly Dictionary<_ListTileSlot, Element> slotToChild = new Dictionary<_ListTileSlot, Element>();
         readonly Dictionary<Element, _ListTileSlot> childToSlot = new Dictionary<Element, _ListTileSlot>();
 
-        new public _ListTile widget {
+        public new _ListTile widget {
             get { return (_ListTile) base.widget; }
         }
 
-        new public _RenderListTile renderObject {
+        public new _RenderListTile renderObject {
             get { return (_RenderListTile) base.renderObject; }
         }
 
@@ -453,7 +470,7 @@ namespace Unity.UIWidgets.material {
             D.assert(child is RenderBox);
             D.assert(this.renderObject.childToSlot.Keys.Contains(child));
             _ListTileSlot slot = this.renderObject.childToSlot[(RenderBox) child];
-            this._updateRenderObject(null, this.renderObject.childToSlot[(RenderBox) child]);
+            this._updateRenderObject(null, slot);
             D.assert(!this.renderObject.childToSlot.Keys.Contains(child));
             D.assert(!this.renderObject.slotToChild.Keys.Contains(slot));
         }
@@ -473,11 +490,15 @@ namespace Unity.UIWidgets.material {
             D.assert(isDense != null);
             D.assert(isThreeLine != null);
             D.assert(titleBaselineType != null);
+            this._isDense = isDense ?? false;
+            this._isThreeLine = isThreeLine ?? false;
+            this._titleBaselineType = titleBaselineType ?? TextBaseline.alphabetic;
+            this._subtitleBaselineType = subtitleBaselineType;
         }
 
         const double _minLeadingWidth = 40.0;
 
-        const double _horizonalTitleGrap = 16.0;
+        const double _horizontalTitleGap = 16.0;
 
         const double _minVerticalPadding = 4.0;
 
@@ -579,7 +600,7 @@ namespace Unity.UIWidgets.material {
 
         bool _isThreeLine;
 
-        public TextBaseline titleBaseLineType {
+        public TextBaseline titleBaselineType {
             get { return this._titleBaselineType; }
             set {
                 if (this._titleBaselineType == value) {
@@ -593,7 +614,7 @@ namespace Unity.UIWidgets.material {
 
         TextBaseline _titleBaselineType;
 
-        public TextBaseline subtitleBaselineType {
+        public TextBaseline? subtitleBaselineType {
             get { return this._subtitleBaselineType; }
             set {
                 if (this._subtitleBaselineType == value) {
@@ -605,7 +626,7 @@ namespace Unity.UIWidgets.material {
             }
         }
 
-        TextBaseline _subtitleBaselineType;
+        TextBaseline? _subtitleBaselineType;
 
         public override void attach(object owner) {
             base.attach(owner);
@@ -663,7 +684,7 @@ namespace Unity.UIWidgets.material {
 
         protected override double computeMinIntrinsicWidth(double height) {
             double leadingWidth = this.leading != null
-                ? Math.Max(this.leading.getMinIntrinsicWidth(height), _minLeadingWidth) + _horizonalTitleGrap
+                ? Math.Max(this.leading.getMinIntrinsicWidth(height), _minLeadingWidth) + _horizontalTitleGap
                 : 0.0;
             return leadingWidth + Math.Max(_minWidth(this.title, height), _minWidth(this.subtitle, height)) +
                    _maxWidth(this.trailing, height);
@@ -671,7 +692,7 @@ namespace Unity.UIWidgets.material {
 
         protected override double computeMaxIntrinsicWidth(double height) {
             double leadingWidth = this.leading != null
-                ? Math.Max(this.leading.getMinIntrinsicWidth(height), _minLeadingWidth) + _horizonalTitleGrap
+                ? Math.Max(this.leading.getMaxIntrinsicWidth(height), _minLeadingWidth) + _horizontalTitleGap
                 : 0.0;
             return leadingWidth + Math.Max(_maxWidth(this.title, height), _maxWidth(this.subtitle, height)) +
                    _maxWidth(this.trailing, height);
@@ -741,9 +762,9 @@ namespace Unity.UIWidgets.material {
             Size leadingSize = _layoutBox(this.leading, looseConstraints);
             Size trailingSize = _layoutBox(this.trailing, looseConstraints);
 
-            double titleStart = hasLeading ? Math.Max(_minLeadingWidth, leadingSize.width) + _horizonalTitleGrap : 0.0;
+            double titleStart = hasLeading ? Math.Max(_minLeadingWidth, leadingSize.width) + _horizontalTitleGap : 0.0;
             BoxConstraints textConstraints = looseConstraints.tighten(
-                width: tileWidth - titleStart - (hasTrailing ? trailingSize.width + _horizonalTitleGrap : 0.0));
+                width: tileWidth - titleStart - (hasTrailing ? trailingSize.width + _horizontalTitleGap : 0.0));
             Size titleSize = _layoutBox(this.title, textConstraints);
             Size subtitleSize = _layoutBox(this.subtitle, textConstraints);
 
@@ -769,8 +790,10 @@ namespace Unity.UIWidgets.material {
                 titleY = (tileHeight - titleSize.height) / 2.0;
             }
             else {
-                titleY = titleBaseline - _boxBaseline(this.title, this.titleBaseLineType);
-                subtitleY = subtitleBaseline - _boxBaseline(this.subtitle, this.subtitleBaselineType);
+                D.assert(this.subtitleBaselineType != null);
+                titleY = titleBaseline - _boxBaseline(this.title, this.titleBaselineType);
+                subtitleY = subtitleBaseline -
+                            _boxBaseline(this.subtitle, this.subtitleBaselineType ?? TextBaseline.alphabetic);
                 tileHeight = this._defaultTileHeight;
 
                 double titleOverlap = titleY + titleSize.height - subtitleY;

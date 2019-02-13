@@ -17,7 +17,8 @@ namespace Unity.UIWidgets.material {
             EdgeInsets padding = null,
             double verticalOffset = 24.0,
             bool preferBelow = true,
-            Widget child = null) : base(key: key) {
+            Widget child = null
+        ) : base(key: key) {
             D.assert(message != null);
             this.message = message;
             this.height = height;
@@ -203,7 +204,8 @@ namespace Unity.UIWidgets.material {
             Animation<double> animation = null,
             Offset target = null,
             double? verticalOffset = null,
-            bool? preferBelow = null) : base(key: key) {
+            bool? preferBelow = null
+        ) : base(key: key) {
             this.message = message;
             this.height = height;
             this.padding = padding;

@@ -23,6 +23,7 @@ namespace Unity.UIWidgets.rendering {
         ) : base(child: child, alignment: alignment ?? Alignment.center) {
             D.assert(vsync != null);
             D.assert(duration != null);
+
             curve = curve ?? Curves.linear;
             this._vsync = vsync;
             this._controller = new AnimationController(
@@ -40,7 +41,7 @@ namespace Unity.UIWidgets.rendering {
 
         AnimationController _controller;
         CurvedAnimation _animation;
-        SizeTween _sizeTween = new SizeTween();
+        readonly SizeTween _sizeTween = new SizeTween();
         bool _hasVisualOverflow;
         double _lastValue;
 
@@ -178,7 +179,6 @@ namespace Unity.UIWidgets.rendering {
                 }
             }
         }
-
 
         void _layoutUnstable() {
             if (this._sizeTween.end != this.child.size) {

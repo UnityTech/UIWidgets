@@ -74,7 +74,8 @@ namespace Unity.UIWidgets.widgets {
                     new Positioned(
                         key: topChildKey,
                         child: topChild)
-                });
+                }
+            );
         }
 
         public override State createState() {
@@ -209,8 +210,7 @@ namespace Unity.UIWidgets.widgets {
                     duration: this.widget.duration,
                     curve: this.widget.sizeCurve,
                     vsync: this,
-                    child: this.widget.layoutBuilder(topChild, topKey, bottomChild, bottomKey
-                    )
+                    child: this.widget.layoutBuilder(topChild, topKey, bottomChild, bottomKey)
                 )
             );
         }

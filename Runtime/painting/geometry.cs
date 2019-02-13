@@ -18,8 +18,8 @@ namespace Unity.UIWidgets.painting {
 
             bool fitsBelow = target.dy + verticalOffset + childSize.height <= size.height - margin;
             bool fitsAbove = target.dy - verticalOffset - childSize.height >= margin;
-            bool tooltipBelow = (preferBelow ?? true) ? fitsBelow || !fitsAbove : !(fitsAbove || !fitsBelow);
-            double y = 0.0;
+            bool tooltipBelow = (preferBelow ?? true) ? (fitsBelow || !fitsAbove) : !(fitsAbove || !fitsBelow);
+            double y;
             if (tooltipBelow) {
                 y = Math.Min(target.dy + verticalOffset, size.height - margin);
             }
@@ -27,7 +27,7 @@ namespace Unity.UIWidgets.painting {
                 y = Math.Max(target.dy - verticalOffset - childSize.height, margin);
             }
 
-            double x = 0.0;
+            double x;
             if (size.width - margin * 2.0 < childSize.width) {
                 x = (size.width - childSize.width) / 2.0;
             }

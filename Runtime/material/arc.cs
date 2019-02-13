@@ -32,8 +32,12 @@ namespace Unity.UIWidgets.material {
                     this._center = new Offset(this.end.dx + this._radius * (this.begin.dx - this.end.dx).sign(),
                         this.end.dy);
                     if (this.begin.dx < this.end.dx) {
-                        this._beginAngle = sweepAngle();
+                        this._beginAngle = sweepAngle() * (this.begin.dy - this.end.dy).sign();
                         this._endAngle = 0.0;
+                    }
+                    else {
+                        this._beginAngle = Math.PI + sweepAngle() * (this.end.dy - this.begin.dy).sign();
+                        this._endAngle = Math.PI;
                     }
                 }
                 else {
@@ -69,7 +73,6 @@ namespace Unity.UIWidgets.material {
 
                 if (this._dirty) {
                     this._initialze();
-                    ;
                 }
 
                 return this._center;
@@ -126,7 +129,7 @@ namespace Unity.UIWidgets.material {
 
         double? _endAngle;
 
-        new public Offset begin {
+        public new Offset begin {
             get { return base.begin; }
             set {
                 if (value != base.begin) {
@@ -136,7 +139,7 @@ namespace Unity.UIWidgets.material {
             }
         }
 
-        new public Offset end {
+        public new Offset end {
             get { return base.end; }
             set {
                 if (value != base.end) {
@@ -235,7 +238,7 @@ namespace Unity.UIWidgets.material {
             return Offset.zero;
         }
 
-        MaterialPointArcTween beginArc {
+        public MaterialPointArcTween beginArc {
             get {
                 if (this.begin == null) {
                     return null;
@@ -243,7 +246,6 @@ namespace Unity.UIWidgets.material {
 
                 if (this._dirty) {
                     this._initialize();
-                    ;
                 }
 
                 return this._beginArc;
@@ -252,7 +254,7 @@ namespace Unity.UIWidgets.material {
 
         MaterialPointArcTween _beginArc;
 
-        MaterialPointArcTween endArc {
+        public MaterialPointArcTween endArc {
             get {
                 if (this.end == null) {
                     return null;
@@ -268,7 +270,7 @@ namespace Unity.UIWidgets.material {
 
         MaterialPointArcTween _endArc;
 
-        new public Rect begin {
+        public new Rect begin {
             get { return base.begin; }
             set {
                 if (value != base.begin) {
@@ -278,7 +280,7 @@ namespace Unity.UIWidgets.material {
             }
         }
 
-        new public Rect end {
+        public new Rect end {
             get { return base.end; }
             set {
                 if (value != base.end) {
@@ -343,7 +345,7 @@ namespace Unity.UIWidgets.material {
         MaterialPointArcTween _centerArc;
 
 
-        new public Rect begin {
+        public new Rect begin {
             get { return base.begin; }
             set {
                 if (value != base.begin) {
@@ -353,7 +355,7 @@ namespace Unity.UIWidgets.material {
             }
         }
 
-        new public Rect end {
+        public new Rect end {
             get { return base.end; }
             set {
                 if (value != base.end) {
@@ -366,7 +368,6 @@ namespace Unity.UIWidgets.material {
         public override Rect lerp(double t) {
             if (this._dirty) {
                 this._initialize();
-                ;
             }
 
             if (t == 0.0) {

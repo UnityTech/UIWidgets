@@ -9,7 +9,6 @@ namespace Unity.UIWidgets.rendering {
     public class ListBodyParentData : ContainerParentDataMixinBoxParentData<RenderBox> {
     }
 
-
     delegate double __ChildSizingFunction(RenderBox child);
 
 
@@ -101,8 +100,9 @@ namespace Unity.UIWidgets.rendering {
 
             double mainAxisExtent = 0.0;
             RenderBox child = this.firstChild;
-            BoxConstraints innerConstraints = null;
-            double position = 0.0;
+
+            BoxConstraints innerConstraints;
+            double position;
 
             switch (this.axisDirection) {
                 case AxisDirection.right:
@@ -219,6 +219,7 @@ namespace Unity.UIWidgets.rendering {
                     return this._getIntrinsicCrossAxis((RenderBox child) => child.getMinIntrinsicWidth(height));
             }
 
+            D.assert(false);
             return 0.0;
         }
 
@@ -231,6 +232,7 @@ namespace Unity.UIWidgets.rendering {
                     return this._getIntrinsicCrossAxis((RenderBox child) => child.getMaxIntrinsicWidth(height));
             }
 
+            D.assert(false);
             return 0.0;
         }
 
@@ -243,6 +245,7 @@ namespace Unity.UIWidgets.rendering {
                     return this._getIntrinsicCrossAxis((RenderBox child) => child.getMinIntrinsicHeight(width));
             }
 
+            D.assert(false);
             return 0.0;
         }
 
@@ -255,6 +258,7 @@ namespace Unity.UIWidgets.rendering {
                     return this._getIntrinsicCrossAxis((RenderBox child) => child.getMaxIntrinsicHeight(width));
             }
 
+            D.assert(false);
             return 0.0;
         }
 

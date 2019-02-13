@@ -120,7 +120,7 @@ namespace Unity.UIWidgets.material {
             this._children = new List<MergeableMaterialItem>();
             this._children.AddRange(this.widget.children);
 
-            for (int i = 0; i < this._children.Count; i += 1) {
+            for (int i = 0; i < this._children.Count; i++) {
                 if (this._children[i] is MaterialGap) {
                     this._initGap((MaterialGap) this._children[i]);
                     this._animationTuples[this._children[i].key].controller.setValue(1.0);
@@ -157,7 +157,7 @@ namespace Unity.UIWidgets.material {
         }
 
         public override void dispose() {
-            foreach (var child in this._children) {
+            foreach (MergeableMaterialItem child in this._children) {
                 if (child is MaterialGap) {
                     this._animationTuples[child.key].controller.dispose();
                 }
@@ -236,16 +236,16 @@ namespace Unity.UIWidgets.material {
         }
 
         public override void didUpdateWidget(StatefulWidget oldWidget) {
-            MergeableMaterial _oldWidget = (MergeableMaterial) oldWidget;
-            base.didUpdateWidget(_oldWidget);
+            base.didUpdateWidget(oldWidget);
 
+            MergeableMaterial _oldWidget = (MergeableMaterial) oldWidget;
             HashSet<LocalKey> oldKeys = new HashSet<LocalKey>();
-            foreach (var child in _oldWidget.children) {
+            foreach (MergeableMaterialItem child in _oldWidget.children) {
                 oldKeys.Add(child.key);
             }
 
             HashSet<LocalKey> newKeys = new HashSet<LocalKey>();
-            foreach (var child in this.widget.children) {
+            foreach (MergeableMaterialItem child in this.widget.children) {
                 newKeys.Add(child.key);
             }
 
@@ -431,17 +431,22 @@ namespace Unity.UIWidgets.material {
                      MaterialConstantsUtils.kMaterialEdges[MaterialType.card].bottomLeft);
             D.assert(MaterialConstantsUtils.kMaterialEdges[MaterialType.card].topLeft ==
                      MaterialConstantsUtils.kMaterialEdges[MaterialType.card].bottomRight);
+
             Radius cardRadius = MaterialConstantsUtils.kMaterialEdges[MaterialType.card].topLeft;
             Radius startRadius = Radius.zero;
             Radius endRadius = Radius.zero;
 
             if (index > 0 && this._children[index - 1] is MaterialGap) {
-                startRadius = Radius.lerp(Radius.zero, cardRadius,
+                startRadius = Radius.lerp(
+                    Radius.zero,
+                    cardRadius,
                     this._animationTuples[this._children[index - 1].key].startAnimation.value);
             }
 
             if (index < this._children.Count - 2 && this._children[index + 1] is MaterialGap) {
-                endRadius = Radius.lerp(Radius.zero, cardRadius,
+                endRadius = Radius.lerp(
+                    Radius.zero,
+                    cardRadius,
                     this._animationTuples[this._children[index + 1].key].endAnimation.value);
             }
 
@@ -485,7 +490,7 @@ namespace Unity.UIWidgets.material {
 
             List<Widget> widgets = new List<Widget>();
             List<Widget> slices = new List<Widget>();
-            int i = 0;
+            int i;
 
             for (i = 0; i < this._children.Count; i++) {
                 if (this._children[i] is MaterialGap) {
@@ -646,7 +651,8 @@ namespace Unity.UIWidgets.material {
             List<Widget> children = null,
             Axis mainAxis = Axis.vertical,
             List<MergeableMaterialItem> items = null,
-            List<BoxShadow> boxShadows = null) : base(children: children, mainAxis: mainAxis) {
+            List<BoxShadow> boxShadows = null
+        ) : base(children: children, mainAxis: mainAxis) {
             this.items = items;
             this.boxShadows = boxShadows;
         }
@@ -679,7 +685,8 @@ namespace Unity.UIWidgets.material {
         public _RenderMergeableMaterialListBody(
             List<RenderBox> children = null,
             AxisDirection axisDirection = AxisDirection.down,
-            List<BoxShadow> boxShadows = null) : base(children: children, axisDirection: axisDirection) {
+            List<BoxShadow> boxShadows = null
+        ) : base(children: children, axisDirection: axisDirection) {
             this.boxShadows = boxShadows;
         }
 

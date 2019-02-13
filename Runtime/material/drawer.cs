@@ -84,10 +84,8 @@ namespace Unity.UIWidgets.material {
             this.setState(() => { });
         }
 
-
         LocalHistoryEntry _historyEntry;
         readonly FocusScopeNode _focusScopeNode = new FocusScopeNode();
-
 
         void _ensureHistoryEntry() {
             if (this._historyEntry == null) {
@@ -170,7 +168,7 @@ namespace Unity.UIWidgets.material {
 
             this._controller.setValue(this._controller.value + delta);
 
-            bool opened = this._controller.value > 0.5 ? true : false;
+            bool opened = this._controller.value > 0.5;
             if (opened != this._previouslyOpened && this.widget.drawerCallback != null) {
                 this.widget.drawerCallback(opened);
             }
@@ -203,14 +201,14 @@ namespace Unity.UIWidgets.material {
             }
         }
 
-        void open() {
+        public void open() {
             this._controller.fling(velocity: 1.0);
             if (this.widget.drawerCallback != null) {
                 this.widget.drawerCallback(true);
             }
         }
 
-        void close() {
+        public void close() {
             this._controller.fling(velocity: -1.0);
             if (this.widget.drawerCallback != null) {
                 this.widget.drawerCallback(false);
@@ -274,6 +272,12 @@ namespace Unity.UIWidgets.material {
                     child: new RepaintBoundary(
                         child: new Stack(
                             children: new List<Widget> {
+                                new GestureDetector(
+                                    onTap: this.close,
+                                    child: new Container(
+                                        color: this._color.evaluate(this._controller)
+                                    )
+                                ),
                                 new Align(
                                     alignment: this._drawerOuterAlignment,
                                     child: new Align(

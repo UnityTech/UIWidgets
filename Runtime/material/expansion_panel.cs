@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.UIWidgets.animation;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.widgets;
-using UnityEngine.Networking;
 
 namespace Unity.UIWidgets.material {
     class _SaltedKey<S, V> : LocalKey {
@@ -129,7 +129,7 @@ namespace Unity.UIWidgets.material {
             List<ExpansionPanel> children = null,
             ExpansionPanelCallback expansionCallback = null,
             TimeSpan? animationDuration = null,
-            object initialOpenPanelValue = null) : base(key: key){
+            object initialOpenPanelValue = null) : base(key: key) {
             this.children = children ?? new List<ExpansionPanel>();
             this.expansionCallback = expansionCallback;
             this.animationDuration = animationDuration ?? Constants.kThemeChangeDuration;
@@ -143,9 +143,10 @@ namespace Unity.UIWidgets.material {
             ExpansionPanelCallback expansionCallback = null,
             TimeSpan? animationDuration = null,
             object initialOpenPanelValue = null) {
+            children = children ?? new List<ExpansionPanelRadio>();
             var radio = new ExpansionPanelList(
                 key: key,
-                children: new List<ExpansionPanel>(children),
+                children: children.Cast<ExpansionPanel>().ToList(),
                 expansionCallback: expansionCallback,
                 animationDuration: animationDuration,
                 initialOpenPanelValue: initialOpenPanelValue
@@ -159,7 +160,6 @@ namespace Unity.UIWidgets.material {
 
         public readonly TimeSpan animationDuration;
 
-        //todo xingwei.zhu: make them readonly
         public readonly bool _allowOnlyOnePanelOpen;
 
         public readonly object initialOpenPanelValue;
@@ -187,8 +187,8 @@ namespace Unity.UIWidgets.material {
         }
 
         public override void didUpdateWidget(StatefulWidget oldWidget) {
+            base.didUpdateWidget(oldWidget);
             ExpansionPanelList _oldWidget = (ExpansionPanelList) oldWidget;
-            base.didUpdateWidget(_oldWidget);
             if (this.widget._allowOnlyOnePanelOpen) {
                 D.assert(this._allIdentifierUnique(), "All object identifiers are not unique!");
                 foreach (ExpansionPanelRadio newChild in this.widget.children) {
@@ -268,7 +268,8 @@ namespace Unity.UIWidgets.material {
                                     constraints: new BoxConstraints(
                                         minHeight: ExpansionPanelUtils._kPanelHeaderCollapsedHeight),
                                     child: child.headerBuilder(
-                                        context, this._isChildExpanded(index))
+                                        context,
+                                        this._isChildExpanded(index))
                                 )
                             )
                         ),

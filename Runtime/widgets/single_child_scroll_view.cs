@@ -46,13 +46,13 @@ namespace Unity.UIWidgets.widgets {
         public readonly Widget child;
 
 
-        AxisDirection? _getDirection(BuildContext context) {
+        AxisDirection _getDirection(BuildContext context) {
             return AxisDirectionUtils.getAxisDirectionFromAxisReverseAndDirectionality(context, this.scrollDirection,
-                this.reverse);
+                       this.reverse) ?? AxisDirection.down;
         }
 
         public override Widget build(BuildContext context) {
-            AxisDirection axisDirection = this._getDirection(context) ?? AxisDirection.down;
+            AxisDirection axisDirection = this._getDirection(context);
             Widget contents = this.child;
             if (this.padding != null) {
                 contents = new Padding(
@@ -97,6 +97,7 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public readonly AxisDirection axisDirection;
+
         public readonly ViewportOffset offset;
 
 
@@ -223,6 +224,7 @@ namespace Unity.UIWidgets.widgets {
                         return this.size.height;
                 }
 
+                D.assert(false);
                 return 0.0;
             }
         }
@@ -248,6 +250,7 @@ namespace Unity.UIWidgets.widgets {
                         return Math.Max(0.0, this.child.size.height - this.size.height);
                 }
 
+                D.assert(false);
                 return 0.0;
             }
         }
@@ -367,7 +370,7 @@ namespace Unity.UIWidgets.widgets {
 
         protected override bool hitTestChildren(HitTestResult result, Offset position = null) {
             if (this.child != null) {
-                Offset transformed = position + -this._paintOffset;
+                Offset transformed = position + (-this._paintOffset);
                 return this.child.hitTest(result, position: transformed);
             }
 
@@ -390,7 +393,6 @@ namespace Unity.UIWidgets.widgets {
             double targetMainAxisExtent = 0.0;
             double mainAxisExtent = 0.0;
 
-            D.assert(this.axisDirection != null);
             switch (this.axisDirection) {
                 case AxisDirection.up:
                     mainAxisExtent = this.size.height;
@@ -420,8 +422,8 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public override void showOnScreen(
-            RenderObject descendant,
-            Rect rect,
+            RenderObject descendant = null,
+            Rect rect = null,
             TimeSpan? duration = null,
             Curve curve = null
         ) {

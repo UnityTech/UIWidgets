@@ -11,7 +11,8 @@ namespace Unity.UIWidgets.widgets {
             bool right = true,
             bool bottom = true,
             EdgeInsets mininum = null,
-            Widget child = null) : base(key: key) {
+            Widget child = null
+        ) : base(key: key) {
             D.assert(child != null);
             this.left = left;
             this.top = top;
