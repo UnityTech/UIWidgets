@@ -911,7 +911,7 @@ namespace Unity.UIWidgets.rendering {
             return base.hitTest(result, position: position);
         }
 
-        //todo:xingwei.zhu: implementation shadow + compositeLayer
+        //todo:xingwei.zhu: implementation shadow + compositeLayer (issue: no color when composite)
         public override void paint(PaintingContext context, Offset offset) {
             if (this.child != null) {
                 this._updateClip();
@@ -995,7 +995,7 @@ namespace Unity.UIWidgets.rendering {
             return base.hitTest(result, position: position);
         }
 
-        //todo:xingwei.zhu: implementation shadow + compositeLayer
+        //todo:xingwei.zhu: implementation shadow + compositeLayer (issue: no color when composite)
         public override void paint(PaintingContext context, Offset offset) {
             if (this.child != null) {
                 this._updateClip();

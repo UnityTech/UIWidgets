@@ -4,7 +4,7 @@ using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
 
 namespace Unity.UIWidgets.material {
-    class Card : StatelessWidget {
+    public class Card : StatelessWidget {
         public Card(
             Key key = null,
             Color color = null,
