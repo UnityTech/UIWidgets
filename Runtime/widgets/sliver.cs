@@ -8,14 +8,11 @@ using Unity.UIWidgets.ui;
 
 namespace Unity.UIWidgets.widgets {
     public abstract class SliverChildDelegate {
-        protected SliverChildDelegate() {
-        }
-
-        public abstract Widget build(BuildContext context, int index);
-
         public virtual int? estimatedChildCount {
             get { return null; }
         }
+
+        public abstract Widget build(BuildContext context, int index);
 
         public virtual double? estimateMaxScrollOffset(
             int firstIndex,
@@ -33,7 +30,7 @@ namespace Unity.UIWidgets.widgets {
 
         public override string ToString() {
             var description = new List<string>();
-            this.debugFillDescription(description);
+            this.debugFillDescription(description: description);
             return $"{Diagnostics.describeIdentity(this)}({string.Join(", ", description.ToArray())})";
         }
 
@@ -51,6 +48,14 @@ namespace Unity.UIWidgets.widgets {
     }
 
     public class SliverChildBuilderDelegate : SliverChildDelegate {
+        public readonly bool addAutomaticKeepAlives;
+
+        public readonly bool addRepaintBoundaries;
+
+        public readonly IndexedWidgetBuilder builder;
+
+        public readonly int? childCount;
+
         public SliverChildBuilderDelegate(
             IndexedWidgetBuilder builder,
             int? childCount = null,
@@ -64,27 +69,23 @@ namespace Unity.UIWidgets.widgets {
             this.addRepaintBoundaries = addRepaintBoundaries;
         }
 
-        public readonly IndexedWidgetBuilder builder;
-
-        public readonly int? childCount;
-
-        public readonly bool addAutomaticKeepAlives;
-
-        public readonly bool addRepaintBoundaries;
+        public override int? estimatedChildCount {
+            get { return this.childCount; }
+        }
 
         public override Widget build(BuildContext context, int index) {
             D.assert(this.builder != null);
-            if (index < 0 || (this.childCount != null && index >= this.childCount)) {
+            if (index < 0 || this.childCount != null && index >= this.childCount) {
                 return null;
             }
 
-            Widget child = this.builder(context, index);
+            Widget child = this.builder(context: context, index: index);
             if (child == null) {
                 return null;
             }
 
             if (this.addRepaintBoundaries) {
-                child = RepaintBoundary.wrap(child, index);
+                child = RepaintBoundary.wrap(child: child, childIndex: index);
             }
 
             if (this.addAutomaticKeepAlives) {
@@ -94,16 +95,18 @@ namespace Unity.UIWidgets.widgets {
             return child;
         }
 
-        public override int? estimatedChildCount {
-            get { return this.childCount; }
-        }
-
         public override bool shouldRebuild(SliverChildDelegate oldDelegate) {
             return true;
         }
     }
 
     public class SliverChildListDelegate : SliverChildDelegate {
+        public readonly bool addAutomaticKeepAlives;
+
+        public readonly bool addRepaintBoundaries;
+
+        public readonly List<Widget> children;
+
         public SliverChildListDelegate(
             List<Widget> children,
             bool addAutomaticKeepAlives = true,
@@ -115,11 +118,9 @@ namespace Unity.UIWidgets.widgets {
             this.addRepaintBoundaries = addRepaintBoundaries;
         }
 
-        public readonly bool addAutomaticKeepAlives;
-
-        public readonly bool addRepaintBoundaries;
-
-        public readonly List<Widget> children;
+        public override int? estimatedChildCount {
+            get { return this.children.Count; }
+        }
 
         public override Widget build(BuildContext context, int index) {
             D.assert(this.children != null);
@@ -127,10 +128,10 @@ namespace Unity.UIWidgets.widgets {
                 return null;
             }
 
-            Widget child = this.children[index];
+            Widget child = this.children[index: index];
             D.assert(child != null);
             if (this.addRepaintBoundaries) {
-                child = RepaintBoundary.wrap(child, index);
+                child = RepaintBoundary.wrap(child: child, childIndex: index);
             }
 
             if (this.addAutomaticKeepAlives) {
@@ -140,16 +141,14 @@ namespace Unity.UIWidgets.widgets {
             return child;
         }
 
-        public override int? estimatedChildCount {
-            get { return this.children.Count; }
-        }
-
         public override bool shouldRebuild(SliverChildDelegate oldDelegate) {
             return this.children != ((SliverChildListDelegate) oldDelegate).children;
         }
     }
 
     public abstract class SliverMultiBoxAdaptorWidget : RenderObjectWidget {
+        public readonly SliverChildDelegate del;
+
         protected SliverMultiBoxAdaptorWidget(
             Key key = null,
             SliverChildDelegate del = null
@@ -157,8 +156,6 @@ namespace Unity.UIWidgets.widgets {
             D.assert(del != null);
             this.del = del;
         }
-
-        public readonly SliverChildDelegate del;
 
         public override Element createElement() {
             return new SliverMultiBoxAdaptorElement(this);
@@ -173,16 +170,16 @@ namespace Unity.UIWidgets.widgets {
         ) {
             D.assert(lastIndex >= firstIndex);
             return this.del.estimateMaxScrollOffset(
-                firstIndex,
-                lastIndex,
-                leadingScrollOffset,
-                trailingScrollOffset
+                firstIndex: firstIndex,
+                lastIndex: lastIndex,
+                leadingScrollOffset: leadingScrollOffset,
+                trailingScrollOffset: trailingScrollOffset
             );
         }
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-            base.debugFillProperties(properties);
-            properties.add(new DiagnosticsProperty<SliverChildDelegate>("del", this.del));
+            base.debugFillProperties(properties: properties);
+            properties.add(new DiagnosticsProperty<SliverChildDelegate>("del", value: this.del));
         }
     }
 
@@ -200,6 +197,8 @@ namespace Unity.UIWidgets.widgets {
     }
 
     public class SliverFixedExtentList : SliverMultiBoxAdaptorWidget {
+        public readonly double itemExtent;
+
         public SliverFixedExtentList(
             Key key = null,
             SliverChildDelegate del = null,
@@ -207,8 +206,6 @@ namespace Unity.UIWidgets.widgets {
         ) : base(key: key, del: del) {
             this.itemExtent = itemExtent;
         }
-
-        public readonly double itemExtent;
 
         public override RenderObject createRenderObject(BuildContext context) {
             SliverMultiBoxAdaptorElement element = (SliverMultiBoxAdaptorElement) context;
@@ -222,14 +219,14 @@ namespace Unity.UIWidgets.widgets {
     }
 
     public class SliverFillViewport : SliverMultiBoxAdaptorWidget {
+        public readonly double viewportFraction;
+
         public SliverFillViewport(
             Key key = null, SliverChildDelegate del = null,
             double viewportFraction = 1.0) : base(key: key, del: del) {
             D.assert(viewportFraction > 0.0);
             this.viewportFraction = viewportFraction;
         }
-
-        public readonly double viewportFraction;
 
         public override RenderObject createRenderObject(BuildContext context) {
             SliverMultiBoxAdaptorElement element = (SliverMultiBoxAdaptorElement) context;
@@ -242,7 +239,17 @@ namespace Unity.UIWidgets.widgets {
     }
 
     public class SliverMultiBoxAdaptorElement : RenderObjectElement, RenderSliverBoxChildManager {
-        public SliverMultiBoxAdaptorElement(SliverMultiBoxAdaptorWidget widget) : base(widget) {
+        readonly SplayTree<int, Element> _childElements = new SplayTree<int, Element>();
+
+        readonly Dictionary<int, Widget> _childWidgets = new Dictionary<int, Widget>();
+
+        RenderBox _currentBeforeChild;
+
+        int? _currentlyUpdatingChildIndex;
+
+        bool _didUnderflow;
+
+        public SliverMultiBoxAdaptorElement(SliverMultiBoxAdaptorWidget widget) : base(widget: widget) {
         }
 
         public new SliverMultiBoxAdaptorWidget widget {
@@ -253,22 +260,119 @@ namespace Unity.UIWidgets.widgets {
             get { return (RenderSliverMultiBoxAdaptor) base.renderObject; }
         }
 
+        public void createChild(int index, RenderBox after = null) {
+            D.assert(this._currentlyUpdatingChildIndex == null);
+            this.owner.buildScope(this, () => {
+                bool insertFirst = after == null;
+                D.assert(insertFirst || this._childElements[index - 1] != null);
+                this._currentBeforeChild = insertFirst ? null : (RenderBox) this._childElements[index - 1].renderObject;
+                Element newChild;
+                try {
+                    this._currentlyUpdatingChildIndex = index;
+                    this._childElements.TryGetValue(key: index, value: out newChild);
+                    newChild = this.updateChild(child: newChild, this._build(index: index), newSlot: index);
+                }
+                finally {
+                    this._currentlyUpdatingChildIndex = null;
+                }
+
+                if (newChild != null) {
+                    this._childElements[key: index] = newChild;
+                }
+                else {
+                    this._childElements.Remove(key: index);
+                }
+            });
+        }
+
+        public void removeChild(RenderBox child) {
+            int index = this.renderObject.indexOf(child: child);
+            D.assert(this._currentlyUpdatingChildIndex == null);
+            D.assert(index >= 0);
+            this.owner.buildScope(this, () => {
+                D.assert(this._childElements.ContainsKey(key: index));
+                try {
+                    this._currentlyUpdatingChildIndex = index;
+                    Element result = this.updateChild(this._childElements[key: index], null, newSlot: index);
+                    D.assert(result == null);
+                }
+                finally {
+                    this._currentlyUpdatingChildIndex = null;
+                }
+
+                this._childElements.Remove(key: index);
+                D.assert(!this._childElements.ContainsKey(key: index));
+            });
+        }
+
+        public double estimateMaxScrollOffset(SliverConstraints constraints,
+            int firstIndex = 0,
+            int lastIndex = 0,
+            double leadingScrollOffset = 0,
+            double trailingScrollOffset = 0
+        ) {
+            int? childCount = this.childCount;
+            if (childCount == null) {
+                return double.PositiveInfinity;
+            }
+
+            return this.widget.estimateMaxScrollOffset(
+                       constraints: constraints,
+                       firstIndex: firstIndex,
+                       lastIndex: lastIndex,
+                       leadingScrollOffset: leadingScrollOffset,
+                       trailingScrollOffset: trailingScrollOffset
+                   ) ?? _extrapolateMaxScrollOffset(
+                       firstIndex: firstIndex,
+                       lastIndex: lastIndex,
+                       leadingScrollOffset: leadingScrollOffset,
+                       trailingScrollOffset: trailingScrollOffset,
+                       childCount: childCount.Value
+                   );
+        }
+
+        public int? childCount {
+            get { return this.widget.del.estimatedChildCount; }
+        }
+
+        public void didStartLayout() {
+            D.assert(this.debugAssertChildListLocked());
+        }
+
+        public void didFinishLayout() {
+            D.assert(this.debugAssertChildListLocked());
+            int firstIndex = this._childElements.FirstOrDefault().Key;
+            int lastIndex = this._childElements.LastOrDefault().Key;
+            this.widget.del.didFinishLayout(firstIndex: firstIndex, lastIndex: lastIndex);
+        }
+
+        public bool debugAssertChildListLocked() {
+            D.assert(this._currentlyUpdatingChildIndex == null);
+            return true;
+        }
+
+        public void didAdoptChild(RenderBox child) {
+            D.assert(this._currentlyUpdatingChildIndex != null);
+            SliverMultiBoxAdaptorParentData childParentData = (SliverMultiBoxAdaptorParentData) child.parentData;
+            childParentData.index = this._currentlyUpdatingChildIndex.Value;
+        }
+
+        public void setDidUnderflow(bool value) {
+            this._didUnderflow = value;
+        }
+
         public override void update(Widget newWidgetRaw) {
             var newWidget = (SliverMultiBoxAdaptorWidget) newWidgetRaw;
             SliverMultiBoxAdaptorWidget oldWidget = this.widget;
-            base.update(newWidget);
+            base.update(newWidget: newWidget);
             SliverChildDelegate newDelegate = newWidget.del;
             SliverChildDelegate oldDelegate = oldWidget.del;
             if (newDelegate != oldDelegate &&
-                (newDelegate.GetType() != oldDelegate.GetType() || newDelegate.shouldRebuild(oldDelegate))) {
+                (newDelegate.GetType() != oldDelegate.GetType() ||
+                 newDelegate.shouldRebuild(oldDelegate: oldDelegate))) {
                 this.performRebuild();
             }
         }
-
-        Dictionary<int, Widget> _childWidgets = new Dictionary<int, Widget>();
-        SplayTree<int, Element> _childElements = new SplayTree<int, Element>();
-
-        RenderBox _currentBeforeChild;
 
         protected override void performRebuild() {
             this._childWidgets.Clear();
@@ -290,14 +394,15 @@ namespace Unity.UIWidgets.widgets {
 
                 for (int index = firstIndex; index <= lastIndex; ++index) {
                     this._currentlyUpdatingChildIndex = index;
-                    Element newChild = this.updateChild(this._childElements.getOrDefault(index), this._build(index),
-                        index);
+                    Element newChild = this.updateChild(this._childElements.getOrDefault(key: index),
+                        this._build(index: index),
+                        newSlot: index);
                     if (newChild != null) {
-                        this._childElements[index] = newChild;
+                        this._childElements[key: index] = newChild;
                         this._currentBeforeChild = (RenderBox) newChild.renderObject;
                     }
                     else {
-                        this._childElements.Remove(index);
+                        this._childElements.Remove(key: index);
                     }
                 }
             }
@@ -307,32 +412,7 @@ namespace Unity.UIWidgets.widgets {
         }
 
         Widget _build(int index) {
-            return this._childWidgets.putIfAbsent(index, () => this.widget.del.build(this, index));
-        }
-
-        public void createChild(int index, RenderBox after = null) {
-            D.assert(this._currentlyUpdatingChildIndex == null);
-            this.owner.buildScope(this, () => {
-                bool insertFirst = after == null;
-                D.assert(insertFirst || this._childElements[index - 1] != null);
-                this._currentBeforeChild = insertFirst ? null : (RenderBox) this._childElements[index - 1].renderObject;
-                Element newChild;
-                try {
-                    this._currentlyUpdatingChildIndex = index;
-                    this._childElements.TryGetValue(index, out newChild);
-                    newChild = this.updateChild(newChild, this._build(index), index);
-                }
-                finally {
-                    this._currentlyUpdatingChildIndex = null;
-                }
-
-                if (newChild != null) {
-                    this._childElements[index] = newChild;
-                }
-                else {
-                    this._childElements.Remove(index);
-                }
-            });
+            return this._childWidgets.putIfAbsent(key: index, () => this.widget.del.build(this, index: index));
         }
 
         protected override Element updateChild(Element child, Widget newWidget, object newSlot) {
@@ -341,7 +421,7 @@ namespace Unity.UIWidgets.widgets {
                 oldParentData = (SliverMultiBoxAdaptorParentData) child.renderObject.parentData;
             }
 
-            Element newChild = base.updateChild(child, newWidget, newSlot);
+            Element newChild = base.updateChild(child: child, newWidget: newWidget, newSlot: newSlot);
 
             SliverMultiBoxAdaptorParentData newParentData = null;
             if (newChild != null && newChild.renderObject != null) {
@@ -362,26 +442,6 @@ namespace Unity.UIWidgets.widgets {
             this._childElements.Remove((int) child.slot);
         }
 
-        public void removeChild(RenderBox child) {
-            int index = this.renderObject.indexOf(child);
-            D.assert(this._currentlyUpdatingChildIndex == null);
-            D.assert(index >= 0);
-            this.owner.buildScope(this, () => {
-                D.assert(this._childElements.ContainsKey(index));
-                try {
-                    this._currentlyUpdatingChildIndex = index;
-                    Element result = this.updateChild(this._childElements[index], null, index);
-                    D.assert(result == null);
-                }
-                finally {
-                    this._currentlyUpdatingChildIndex = null;
-                }
-
-                this._childElements.Remove(index);
-                D.assert(!this._childElements.ContainsKey(index));
-            });
-        }
-
         static double _extrapolateMaxScrollOffset(
             int firstIndex,
             int lastIndex,
@@ -399,72 +459,12 @@ namespace Unity.UIWidgets.widgets {
             return trailingScrollOffset + averageExtent * remainingCount;
         }
 
-        public double estimateMaxScrollOffset(SliverConstraints constraints,
-            int firstIndex = 0,
-            int lastIndex = 0,
-            double leadingScrollOffset = 0,
-            double trailingScrollOffset = 0
-        ) {
-            int? childCount = this.childCount;
-            if (childCount == null) {
-                return double.PositiveInfinity;
-            }
-
-            return this.widget.estimateMaxScrollOffset(
-                       constraints,
-                       firstIndex,
-                       lastIndex,
-                       leadingScrollOffset,
-                       trailingScrollOffset
-                   ) ?? _extrapolateMaxScrollOffset(
-                       firstIndex,
-                       lastIndex,
-                       leadingScrollOffset,
-                       trailingScrollOffset,
-                       childCount.Value
-                   );
-        }
-
-        public int? childCount {
-            get { return this.widget.del.estimatedChildCount; }
-        }
-
-        public void didStartLayout() {
-            D.assert(this.debugAssertChildListLocked());
-        }
-
-        public void didFinishLayout() {
-            D.assert(this.debugAssertChildListLocked());
-            int firstIndex = this._childElements.FirstOrDefault().Key;
-            int lastIndex = this._childElements.LastOrDefault().Key;
-            this.widget.del.didFinishLayout(firstIndex, lastIndex);
-        }
-
-        int? _currentlyUpdatingChildIndex;
-
-        public bool debugAssertChildListLocked() {
-            D.assert(this._currentlyUpdatingChildIndex == null);
-            return true;
-        }
-
-        public void didAdoptChild(RenderBox child) {
-            D.assert(this._currentlyUpdatingChildIndex != null);
-            SliverMultiBoxAdaptorParentData childParentData = (SliverMultiBoxAdaptorParentData) child.parentData;
-            childParentData.index = this._currentlyUpdatingChildIndex.Value;
-        }
-
-        bool _didUnderflow = false;
-
-        public void setDidUnderflow(bool value) {
-            this._didUnderflow = value;
-        }
-
         protected override void insertChildRenderObject(RenderObject child, object slotRaw) {
             D.assert(slotRaw != null);
             int slot = (int) slotRaw;
 
             D.assert(this._currentlyUpdatingChildIndex == slot);
-            D.assert(this.renderObject.debugValidateChild(child));
+            D.assert(this.renderObject.debugValidateChild(child: child));
             this.renderObject.insert((RenderBox) child, after: this._currentBeforeChild);
             D.assert(() => {
                 SliverMultiBoxAdaptorParentData childParentData = (SliverMultiBoxAdaptorParentData) child.parentData;
@@ -484,7 +484,7 @@ namespace Unity.UIWidgets.widgets {
 
         public override void visitChildren(ElementVisitor visitor) {
             D.assert(!this._childElements.Values.Any(child => child == null));
-            this._childElements.Values.ToList().ForEach(e => visitor(e));
+            this._childElements.Values.ToList().ForEach(e => visitor(element: e));
         }
 
         public override void debugVisitOnstageChildren(ElementVisitor visitor) {
@@ -504,11 +504,13 @@ namespace Unity.UIWidgets.widgets {
                 return parentData.layoutOffset < this.renderObject.constraints.scrollOffset +
                        this.renderObject.constraints.remainingPaintExtent &&
                        parentData.layoutOffset + itemExtent > this.renderObject.constraints.scrollOffset;
-            }).ToList().ForEach(e => visitor(e));
+            }).ToList().ForEach(e => visitor(element: e));
         }
     }
 
     public class KeepAlive : ParentDataWidget<SliverMultiBoxAdaptorWidget> {
+        public readonly bool keepAlive;
+
         public KeepAlive(
             Key key = null,
             bool keepAlive = true,
@@ -517,8 +519,6 @@ namespace Unity.UIWidgets.widgets {
             D.assert(child != null);
             this.keepAlive = keepAlive;
         }
-
-        public readonly bool keepAlive;
 
         public override void applyParentData(RenderObject renderObject) {
             D.assert(renderObject.parentData is SliverMultiBoxAdaptorParentData);
@@ -537,8 +537,8 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-            base.debugFillProperties(properties);
-            properties.add(new DiagnosticsProperty<bool>("keepAlive", this.keepAlive));
+            base.debugFillProperties(properties: properties);
+            properties.add(new DiagnosticsProperty<bool>("keepAlive", value: this.keepAlive));
         }
     }
 }
