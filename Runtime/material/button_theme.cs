@@ -231,19 +231,21 @@ namespace Unity.UIWidgets.material {
         }
 
 
-        Color getFillColor(MaterialButton button) {
+        public Color getFillColor(MaterialButton button) {
             Color fillColor = button.enabled ? button.color : button.disabledColor;
             if (fillColor != null) {
                 return fillColor;
             }
 
-//    todo xingwei.zhu: uncomment these when FlatButton & OutlineButton & RaisedButton are ready
-//            if (button is FlatButton || button is OutlineButton)
-//                return null;
-//            
-//            
-//            if (button.enabled && button is RaisedButton && this._buttonColor != null)
-//                return this._buttonColor;
+//todo:xingwei.zhu: uncomment these when OutlineButton are ready
+            if (button is FlatButton /* || button is OutlineButton*/) {
+                return null;
+            }
+
+
+            if (button.enabled && button is RaisedButton && this._buttonColor != null) {
+                return this._buttonColor;
+            }
 
             switch (this.getTextTheme(button)) {
                 case ButtonTextTheme.normal:
@@ -282,9 +284,11 @@ namespace Unity.UIWidgets.material {
                         return Colors.white;
                     }
 
-//    todo xingwei.zhu: uncomment these when FlatButton & OutlineButton are ready
-//                    if (button is FlatButton || button is OutlineButton)
-//                        return this.colorScheme.primary;
+//todo:xingwei.zhu: uncomment these when OutlineButton are ready
+                    if (button is FlatButton /* || button is OutlineButton*/) {
+                        return this.colorScheme.primary;
+                    }
+
                     return Colors.black;
                 }
             }
@@ -298,20 +302,21 @@ namespace Unity.UIWidgets.material {
                 return button.splashColor;
             }
 
-//    todo xingwei.zhu: uncomment these when FlatButton & OutlineButton & RaisedButton are ready
-//            if (this._splashColor != null && (button is RaisedButton || button is OutlineButton)) {
-//                return this._splashColor;
-//            }
-//
-//            if (this._splashColor != null && button is FlatButton) {
-//                switch (this.getTextTheme(button)) {
-//                    case ButtonTextTheme.normal:
-//                    case ButtonTextTheme.accent:
-//                        return this._splashColor;
-//                    case ButtonTextTheme.primary:
-//                        break;
-//                }
-//            }
+//todo:xingwei.zhu: uncomment these when OutlineButton is ready
+            if (this._splashColor != null && (button is RaisedButton /* || button is OutlineButton*/)) {
+                return this._splashColor;
+            }
+
+            if (this._splashColor != null && button is FlatButton) {
+                switch (this.getTextTheme(button)) {
+                    case ButtonTextTheme.normal:
+                    case ButtonTextTheme.accent:
+                        return this._splashColor;
+                    case ButtonTextTheme.primary:
+                        break;
+                }
+            }
+
             return this.getTextColor(button).withOpacity(0.12);
         }
 
@@ -338,9 +343,10 @@ namespace Unity.UIWidgets.material {
                 return button.elevation ?? 0.0;
             }
 
-//    todo xingwei.zhu: uncomment these when FlatButton are ready            
-//            if (button is FlatButton)
-//                return 0.0;
+            if (button is FlatButton) {
+                return 0.0;
+            }
+
             return 2.0;
         }
 
@@ -350,9 +356,11 @@ namespace Unity.UIWidgets.material {
                 return button.highlightElevation ?? 0.0;
             }
 
-//    todo xingwei.zhu: uncomment these when FlatButton & OutlineButton are ready 
-//            if (button is FlatButton)
-//                return 0.0;
+            if (button is FlatButton) {
+                return 0.0;
+            }
+
+//todo:xingwei.zhu: uncomment these when OutlineButton are ready
 //            if (button is OutlineButton)
 //                return 2.0;
             return 8.0;
@@ -373,9 +381,9 @@ namespace Unity.UIWidgets.material {
                 return button.padding;
             }
 
-//    todo xingwei.zhu: uncomment these when MaterialButtonWithIconMixin are ready 
-//            if (button is MaterialButtonWithIconMixin)
-//                return const EdgeInsetsDirectional.only(start: 12.0, end: 16.0);
+            if (button is MaterialButtonWithIconMixin) {
+                return EdgeInsets.fromLTRB(12.0, 0.0, 16.0, 0.0);
+            }
 
             if (this._padding != null) {
                 return this._padding;

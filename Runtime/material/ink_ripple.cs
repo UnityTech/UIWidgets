@@ -1,4 +1,3 @@
-using System;
 using Unity.UIWidgets.animation;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.painting;
@@ -6,8 +5,8 @@ using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
 
 namespace Unity.UIWidgets.material {
-    public class _InkSplashFactory : InteractiveInkFeatureFactory {
-        public _InkSplashFactory() {
+    public class _InkRippleFactory : InteractiveInkFeatureFactory {
+        public _InkRippleFactory() {
         }
 
         public override InteractiveInkFeature create(
@@ -26,7 +25,7 @@ namespace Unity.UIWidgets.material {
             D.assert(referenceBox != null);
             D.assert(position != null);
             D.assert(color != null);
-            return new InkSplash(
+            return new InkRipple(
                 controller: controller,
                 referenceBox: referenceBox,
                 position: position,
@@ -40,8 +39,8 @@ namespace Unity.UIWidgets.material {
         }
     }
 
-    public class InkSplash : InteractiveInkFeature {
-        public InkSplash(
+    public class InkRipple : InteractiveInkFeature {
+        public InkRipple(
             MaterialInkController controller = null,
             RenderBox referenceBox = null,
             Offset position = null,
@@ -59,32 +58,48 @@ namespace Unity.UIWidgets.material {
             onRemoved: onRemoved) {
             D.assert(controller != null);
             D.assert(referenceBox != null);
+            D.assert(color != null);
+            D.assert(position != null);
+
             this._position = position;
             this._borderRadius = borderRadius ?? BorderRadius.zero;
             this._customBorder = customBorder;
             this._targetRadius =
-                radius ?? InkSplashUtils._getTargetRadius(referenceBox, containedInkWell, rectCallback, position);
-            this._clipCallback = InkSplashUtils._getClipCallback(referenceBox, containedInkWell, rectCallback);
-            this._repositionToReferenceBox = !containedInkWell;
+                radius ?? InkRippleUtils._getTargetRadius(referenceBox, containedInkWell, rectCallback, position);
+            this._clipCallback = InkRippleUtils._getClipCallback(referenceBox, containedInkWell, rectCallback);
 
             D.assert(this._borderRadius != null);
+
+            this._fadeInController =
+                new AnimationController(duration: InkRippleUtils._kFadeInDuration, vsync: controller.vsync);
+            this._fadeInController.addListener(controller.markNeedsPaint);
+            this._fadeInController.forward();
+            this._fadeIn = this._fadeInController.drive(new IntTween(
+                begin: 0,
+                end: color.alpha
+            ));
+
             this._radiusController = new AnimationController(
-                duration: InkSplashUtils._kUnconfirmedSplashDuration,
+                duration: InkRippleUtils._kUnconfirmedRippleDuration,
                 vsync: controller.vsync);
             this._radiusController.addListener(controller.markNeedsPaint);
             this._radiusController.forward();
             this._radius = this._radiusController.drive(new DoubleTween(
-                begin: InkSplashUtils._kSplashInitialSize,
-                end: this._targetRadius));
+                    begin: this._targetRadius * 0.30,
+                    end: this._targetRadius + 5.0
+                ).chain(_easeCurveTween)
+            );
 
-            this._alphaController = new AnimationController(
-                duration: InkSplashUtils._kSplashFadeDuration,
+            this._fadeOutController = new AnimationController(
+                duration: InkRippleUtils._kFadeOutDuration,
                 vsync: controller.vsync);
-            this._alphaController.addListener(controller.markNeedsPaint);
-            this._alphaController.addStatusListener(this._handleAlphaStatusChanged);
-            this._alpha = this._alphaController.drive(new IntTween(
-                begin: color.alpha,
-                end: 0));
+            this._fadeOutController.addListener(controller.markNeedsPaint);
+            this._fadeOutController.addStatusListener(this._handleAlphaStatusChanged);
+            this._fadeOut = this._fadeOutController.drive(new IntTween(
+                    begin: color.alpha,
+                    end: 0
+                ).chain(_fadeOutIntervalTween)
+            );
 
             controller.addInkFeature(this);
         }
@@ -99,25 +114,36 @@ namespace Unity.UIWidgets.material {
 
         readonly RectCallback _clipCallback;
 
-        readonly bool _repositionToReferenceBox;
-
         Animation<double> _radius;
         AnimationController _radiusController;
 
-        Animation<int> _alpha;
-        AnimationController _alphaController;
+        Animation<int> _fadeIn;
+        AnimationController _fadeInController;
 
-        public static InteractiveInkFeatureFactory splashFactory = new _InkSplashFactory();
+        Animation<int> _fadeOut;
+        AnimationController _fadeOutController;
+
+        public static InteractiveInkFeatureFactory splashFactory = new _InkRippleFactory();
+
+        static readonly Animatable<double> _easeCurveTween = new CurveTween(curve: Curves.ease);
+
+        static readonly Animatable<double> _fadeOutIntervalTween =
+            new CurveTween(curve: new Interval(InkRippleUtils._kFadeOutIntervalStart, 1.0));
 
         public override void confirm() {
-            int duration = (this._targetRadius / InkSplashUtils._kSplashConfirmedVelocity).floor();
-            this._radiusController.duration = new TimeSpan(0, 0, 0, 0, duration);
+            this._radiusController.duration = InkRippleUtils._kRadiusDuration;
             this._radiusController.forward();
-            this._alphaController.forward();
+            this._fadeInController.forward();
+            this._fadeOutController.animateTo(1.0, duration: InkRippleUtils._kFadeOutDuration);
         }
 
         public override void cancel() {
-            this._alphaController?.forward();
+            this._fadeInController.stop();
+            double fadeOutValue = 1.0 - this._fadeInController.value;
+            this._fadeOutController.setValue(fadeOutValue);
+            if (fadeOutValue < 1.0) {
+                this._fadeOutController.animateTo(1.0, duration: InkRippleUtils._kCancelDuration);
+            }
         }
 
         void _handleAlphaStatusChanged(AnimationStatus status) {
@@ -128,18 +154,19 @@ namespace Unity.UIWidgets.material {
 
         public override void dispose() {
             this._radiusController.dispose();
-            this._alphaController.dispose();
-            this._alphaController = null;
+            this._fadeInController.dispose();
+            this._fadeOutController.dispose();
             base.dispose();
         }
 
         protected override void paintFeature(Canvas canvas, Matrix3 transform) {
-            Paint paint = new Paint {color = this.color.withAlpha(this._alpha.value)};
-            Offset center = this._position;
-            if (this._repositionToReferenceBox) {
-                center = Offset.lerp(center, this.referenceBox.size.center(Offset.zero), this._radiusController.value);
-            }
-
+            int alpha = this._fadeInController.isAnimating ? this._fadeIn.value : this._fadeOut.value;
+            Paint paint = new Paint {color = this.color.withAlpha(alpha)};
+            Offset center = Offset.lerp(
+                this._position,
+                this.referenceBox.size.center(Offset.zero),
+                Curves.ease.transform(this._radiusController.value)
+            );
             Offset originOffset = transform.getAsTranslation();
             canvas.save();
             if (originOffset == null) {

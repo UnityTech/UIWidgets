@@ -5,6 +5,7 @@ using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
+using Unity.UIWidgets.utils;
 using UnityEngine;
 using Color = Unity.UIWidgets.ui.Color;
 using Rect = Unity.UIWidgets.ui.Rect;
@@ -92,6 +93,83 @@ namespace Unity.UIWidgets.widgets {
         public override void didUnmountRenderObject(RenderObject renderObject) {
             ((RenderCustomPaint) renderObject).painter = null;
             ((RenderCustomPaint) renderObject).foregroundPainter = null;
+        }
+    }
+
+    public class ClipRect : SingleChildRenderObjectWidget {
+        public ClipRect(
+            Key key = null,
+            CustomClipper<Rect> clipper = null,
+            Clip clipBehavior = Clip.hardEdge,
+            Widget child = null
+        ) : base(key: key, child: child) {
+            this.clipper = clipper;
+            this.clipBehavior = clipBehavior;
+        }
+
+        public readonly CustomClipper<Rect> clipper;
+
+        public readonly Clip clipBehavior;
+
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderClipRect(
+                clipper: this.clipper,
+                clipBehavior: this.clipBehavior);
+        }
+
+        public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
+            RenderClipRect _renderObject = (RenderClipRect) renderObject;
+            _renderObject.clipper = this.clipper;
+        }
+
+        public override void didUnmountRenderObject(RenderObject renderObject) {
+            RenderClipRect _renderObject = (RenderClipRect) renderObject;
+            _renderObject.clipper = null;
+        }
+
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new DiagnosticsProperty<CustomClipper<Rect>>("clipper", this.clipper, defaultValue: null));
+        }
+    }
+
+    public class ClipPath : SingleChildRenderObjectWidget {
+        public ClipPath(
+            Key key = null,
+            CustomClipper<Path> clipper = null,
+            Clip clipBehavior = Clip.antiAlias,
+            Widget child = null
+        ) : base(key: key, child: child) {
+            this.clipper = clipper;
+            this.clipBehavior = clipBehavior;
+        }
+
+        public readonly CustomClipper<Path> clipper;
+
+        public readonly Clip clipBehavior;
+
+
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderClipPath(clipper: this.clipper, clipBehavior: this.clipBehavior);
+        }
+
+
+        public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
+            RenderClipPath _renderObject = (RenderClipPath) renderObject;
+            _renderObject.clipper = this.clipper;
+        }
+
+
+        public override void didUnmountRenderObject(RenderObject renderObject) {
+            RenderClipPath _renderObject = (RenderClipPath) renderObject;
+            _renderObject.clipper = null;
+        }
+
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new DiagnosticsProperty<CustomClipper<Path>>("clipper", this.clipper, defaultValue: null));
         }
     }
 
@@ -373,6 +451,39 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
+
+    public class ListBody : MultiChildRenderObjectWidget {
+        public ListBody(
+            Key key = null,
+            Axis mainAxis = Axis.vertical,
+            bool reverse = false,
+            List<Widget> children = null
+        ) : base(key: key, children: children ?? new List<Widget>()) {
+            this.mainAxis = mainAxis;
+            this.reverse = reverse;
+        }
+
+        public readonly Axis mainAxis;
+
+        public readonly bool reverse;
+
+
+        AxisDirection _getDirection(BuildContext context) {
+            return AxisDirectionUtils.getAxisDirectionFromAxisReverseAndDirectionality(context, this.mainAxis,
+                       this.reverse) ?? AxisDirection.right;
+        }
+
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderListBody(
+                axisDirection: this._getDirection(context));
+        }
+
+        public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
+            RenderListBody _renderObject = (RenderListBody) renderObject;
+            _renderObject.axisDirection = this._getDirection(context);
+        }
+    }
+
     public class Stack : MultiChildRenderObjectWidget {
         public Stack(
             Key key = null,
@@ -620,6 +731,17 @@ namespace Unity.UIWidgets.widgets {
             properties.add(new IntProperty("flex", this.flex));
         }
     }
+
+    public class Expanded : Flexible {
+        public Expanded(
+            Key key = null,
+            int flex = 1,
+            Widget child = null
+        ) : base(key: key, flex: flex, fit: FlexFit.tight, child: child) {
+            D.assert(child != null);
+        }
+    }
+
 
     public class PhysicalModel : SingleChildRenderObjectWidget {
         public PhysicalModel(
