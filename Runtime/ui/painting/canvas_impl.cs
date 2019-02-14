@@ -535,7 +535,7 @@ namespace Unity.UIWidgets.ui {
 
             var state = this._getState();
 
-            var mesh = ImageMeshGenerator.imageNineMesh(state.matrix, src, center, dst);
+            var mesh = ImageMeshGenerator.imageNineMesh(state.matrix, src, center, image.width, image.height, dst);
             
             if (!this._applyClip(mesh.bounds)) {
                 return;
@@ -1157,16 +1157,16 @@ namespace Unity.UIWidgets.ui {
             return new MeshMesh(matrix, vertices, _imageTriangles, uv);
         }
 
-        public static MeshMesh imageNineMesh(Matrix3 matrix, Rect src, Rect center, Rect dst) {
+        public static MeshMesh imageNineMesh(Matrix3 matrix, Rect src, Rect center, int srcWidth, int srcHeight, Rect dst) {
             float x0 = (float) dst.left;
             float x3 = (float) dst.right;
-            float x1 = x0 + (float) ((center.left - src.left) * dst.width);
-            float x2 = x3 - (float) ((src.right - center.right) * dst.width);
+            float x1 = x0 + (float) ((center.left - src.left) * srcWidth);
+            float x2 = x3 - (float) ((src.right - center.right) * srcHeight);
 
             float y0 = (float) dst.top;
             float y3 = (float) dst.bottom;
-            float y1 = y0 + (float) ((center.top - src.top) * dst.height);
-            float y2 = y3 - (float) ((src.bottom - center.bottom) * dst.height);
+            float y1 = y0 + (float) ((center.top - src.top) * srcWidth);
+            float y2 = y3 - (float) ((src.bottom - center.bottom) * srcHeight);
 
             float tx0 = (float) src.left;
             float tx1 = (float) center.left;
