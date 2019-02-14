@@ -348,6 +348,21 @@ namespace Unity.UIWidgets.widgets {
                 recognizer.addPointer(evt);
             }
         }
+        
+        void _handlePointerScroll(PointerScrollingEvent evt) {
+            if (!evt.down) {
+                return;
+            }
+            D.assert(this._recognizers != null);
+            foreach (GestureRecognizer recognizer in this._recognizers.Values) {
+                recognizer.addPointer(new PointerDownEvent(
+                    timeStamp:evt.timeStamp,
+                    pointer: evt.pointer,
+                    kind: evt.kind,
+                    device: evt.device,
+                    position: evt.position));
+            }
+        }
 
         HitTestBehavior _defaultBehavior {
             get { return this.widget.child == null ? HitTestBehavior.translucent : HitTestBehavior.deferToChild; }
@@ -357,6 +372,7 @@ namespace Unity.UIWidgets.widgets {
         public override Widget build(BuildContext context) {
             Widget result = new Listener(
                 onPointerDown: this._handlePointerDown,
+                onPointerScroll: this._handlePointerScroll,
                 behavior: this.widget.behavior ?? this._defaultBehavior,
                 child: this.widget.child
             );

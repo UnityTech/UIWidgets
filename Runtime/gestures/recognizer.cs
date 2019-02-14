@@ -74,7 +74,7 @@ namespace Unity.UIWidgets.gestures {
 
         readonly Dictionary<int, GestureArenaEntry> _entries = new Dictionary<int, GestureArenaEntry>();
 
-        readonly HashSet<int> _trackedPointers = new HashSet<int>();
+        protected readonly HashSet<int> _trackedPointers = new HashSet<int>();
 
         protected abstract void handleEvent(PointerEvent evt);
 
@@ -129,8 +129,10 @@ namespace Unity.UIWidgets.gestures {
         protected void startTrackingPointer(int pointer) {
             GestureBinding.instance.pointerRouter.addRoute(pointer, this.handleEvent);
             this._trackedPointers.Add(pointer);
-            D.assert(!this._entries.ContainsKey(pointer));
-            this._entries[pointer] = this._addPointerToArena(pointer);
+            //D.assert(!this._entries.ContainsKey(pointer));
+            if (!this._entries.ContainsKey(pointer)) {
+                this._entries[pointer] = this._addPointerToArena(pointer);
+            }
         }
 
         protected void stopTrackingPointer(int pointer) {
@@ -146,6 +148,15 @@ namespace Unity.UIWidgets.gestures {
         protected void stopTrackingIfPointerNoLongerDown(PointerEvent evt) {
             if (evt is PointerUpEvent || evt is PointerCancelEvent) {
                 this.stopTrackingPointer(evt.pointer);
+            }
+
+            if (evt is PointerScrollingEvent) {
+                if (evt.delta == Offset.zero && !evt.down) {
+                    this.stopTrackingPointer(evt.pointer);
+                }
+                else {
+                    Debug.Log("udddddddddddddd");
+                }
             }
         }
     }

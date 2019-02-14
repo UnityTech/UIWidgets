@@ -13,8 +13,10 @@ namespace Unity.UIWidgets.gestures {
 
         public void addRoute(int pointer, PointerRoute route) {
             var routes = this._routeMap.putIfAbsent(pointer, () => new HashSet<PointerRoute>());
-            D.assert(!routes.Contains(route));
-            routes.Add(route);
+            //D.assert(!routes.Contains(route));
+            if (!routes.Contains(route)) {
+                routes.Add(route);
+            }
         }
 
         public void removeRoute(int pointer, PointerRoute route) {

@@ -10,7 +10,7 @@ using Material = Unity.UIWidgets.material.Material;
 
 namespace UIWidgetsSample {
     public class ExpansionPanelCanvas : WidgetCanvas {
-        int testCaseId = 1;
+        int testCaseId = 0;
 
         readonly List<Widget> testCases = new List<Widget> {
             new SingleChildScrollWidget(),

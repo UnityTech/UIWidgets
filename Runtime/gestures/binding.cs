@@ -57,6 +57,10 @@ namespace Unity.UIWidgets.gestures {
                 this._handlePointerHoverEvent(evt);
             }
 
+            if (evt is PointerScrollingEvent || evt is PointerScrollStartEvent || evt is PointerScrollEndEvent) {
+                this._handlePointerScrollEvent(evt);
+            }
+
             HitTestResult result;
             if (evt is PointerDownEvent) {
                 D.assert(!this._hitTests.ContainsKey(evt.pointer));
@@ -76,7 +80,7 @@ namespace Unity.UIWidgets.gestures {
                 result = this._hitTests[evt.pointer];
                 this._hitTests.Remove(evt.pointer);
             }
-            else if (evt.down) {
+            else if (!(evt is PointerScrollStartEvent) && evt.down) {
                 result = this._hitTests[evt.pointer];
             }
             else {
@@ -85,6 +89,47 @@ namespace Unity.UIWidgets.gestures {
 
             if (result != null) {
                 this.dispatchEvent(evt, result);
+            }
+        }
+        //public Offset lastScrollStartPos = null;
+
+        void _handlePointerScrollEvent(PointerEvent evt) {
+
+            void _handleScrolling(PointerEvent subEvt, bool start) {
+                //if (this.lastScrollStartPos == null) {
+                //    return;
+               // }
+                
+                HitTestResult result = new HitTestResult();
+                this.hitTest(result, subEvt.position);
+
+                foreach (var hitTestEntry in result.path) {
+                    //Debug.Log("hitTestEntry: " + hitTestEntry);
+                    hitTestEntry.target.handleEvent(new PointerScrollingEvent(
+                        timeStamp: subEvt.timeStamp,
+                        pointer: subEvt.pointer,
+                        device: subEvt.device,
+                        kind: subEvt.kind,
+                        position: subEvt.position,
+                        delta: subEvt.delta,
+                        start: start
+                    ), hitTestEntry);
+                }
+                
+                this.dispatchEvent(evt, result);
+            }
+            // scroll start
+            // evt.position = the current pointer position
+            if (evt is PointerScrollStartEvent) { 
+                //this.lastScrollStartPos = evt.position;
+                _handleScrolling(evt, true);
+            }
+            else if (evt is PointerScrollEndEvent) {
+                //this.lastScrollStartPos = null;
+                _handleScrolling(evt, false);
+            } 
+            else if (evt is PointerScrollingEvent) {
+                _handleScrolling(evt, false);
             }
         }
 
@@ -141,8 +186,11 @@ namespace Unity.UIWidgets.gestures {
         }
 
         public void handleEvent(PointerEvent evt, HitTestEntry entry) {
+            if (evt is PointerScrollingEvent) {
+                Debug.Log("ffffffffff");
+            }
             this.pointerRouter.route(evt);
-            if (evt is PointerDownEvent) {
+            if (evt is PointerDownEvent || (evt is PointerScrollingEvent && evt.down)) {
                 this.gestureArena.close(evt.pointer);
             }
             else if (evt is PointerUpEvent) {

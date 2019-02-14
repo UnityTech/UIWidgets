@@ -10,6 +10,9 @@ namespace Unity.UIWidgets.ui {
         down,
         move,
         up,
+        scroll_start,
+        scrolling,
+        scroll_end
     }
 
     public enum PointerDeviceKind {

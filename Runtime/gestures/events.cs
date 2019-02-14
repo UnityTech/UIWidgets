@@ -68,6 +68,62 @@ namespace Unity.UIWidgets.gestures {
         }
     }
 
+    public class PointerScrollStartEvent : PointerEvent {
+        public PointerScrollStartEvent(
+            TimeSpan timeStamp,
+            int pointer = 0,
+            PointerDeviceKind kind = PointerDeviceKind.mouse,
+            int device = 0,
+            Offset position = null)
+            : base(
+                timeStamp,
+                pointer: pointer,
+                kind: kind,
+                device: device,
+                position: position,
+                down: true) {
+        }
+    }
+    
+    public class PointerScrollEndEvent : PointerEvent {
+        public PointerScrollEndEvent(
+            TimeSpan timeStamp,
+            int pointer = 0,
+            PointerDeviceKind kind = PointerDeviceKind.mouse,
+            int device = 0,
+            Offset position = null,
+            Offset delta = null)
+            : base(
+                timeStamp,
+                pointer: pointer,
+                kind: kind,
+                device: device,
+                position: position,
+                down: false,
+                delta : delta) {
+        }
+    }
+    
+    public class PointerScrollingEvent : PointerEvent {
+        public PointerScrollingEvent(
+            TimeSpan timeStamp,
+            int pointer = 0,
+            PointerDeviceKind kind = PointerDeviceKind.mouse,
+            int device = 0,
+            Offset position = null,
+            Offset delta = null,
+            bool start = false)
+            : base(
+                timeStamp,
+                pointer: pointer,
+                kind: kind,
+                device: device,
+                position: position,
+                down: start,
+                delta: delta) {
+        }
+    }
+
     public class PointerHoverEvent : PointerEvent {
         public PointerHoverEvent(
             TimeSpan timeStamp,

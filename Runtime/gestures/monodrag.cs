@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
+using UnityEngine;
 
 namespace Unity.UIWidgets.gestures {
     enum _DragState {
@@ -69,12 +70,29 @@ namespace Unity.UIWidgets.gestures {
         }
 
         protected override void handleEvent(PointerEvent evt) {
+            Debug.Log("handle Event >>> " + evt);
             D.assert(this._state != _DragState.ready);
             if (!evt.synthesized
-                && (evt is PointerDownEvent || evt is PointerMoveEvent)) {
+                && (evt is PointerDownEvent || evt is PointerMoveEvent || evt is PointerScrollingEvent)) {
                 var tracker = this._velocityTrackers[evt.pointer];
                 D.assert(tracker != null);
                 tracker.addPosition(evt.timeStamp, evt.position);
+            }
+
+            if (evt is PointerScrollingEvent) {
+                Debug.Log("handle Event >>>>" + evt.position + " == " + evt.delta);
+                Offset delta = evt.delta;
+                if (this.onUpdate != null) {
+                    this.invokeCallback<object>("onUpdate", () => {
+                        this.onUpdate(new DragUpdateDetails(
+                            sourceTimeStamp: evt.timeStamp,
+                            delta: this._getDeltaForDetails(delta),
+                            primaryDelta: this._getPrimaryValueFromOffset(delta),
+                            globalPosition: evt.position
+                        ));
+                        return null;
+                    });
+                }
             }
 
             if (evt is PointerMoveEvent) {
@@ -160,8 +178,11 @@ namespace Unity.UIWidgets.gestures {
                 D.assert(tracker != null);
 
                 var estimate = tracker.getVelocityEstimate();
+                //if (estimate != null && this._isFlingGesture(estimate) || pointer == 5) {
+                //    Offset ret = pointer == 5 ? new Offset(0, 1) : estimate.pixelsPerSecond;
                 if (estimate != null && this._isFlingGesture(estimate)) {
-                    Velocity velocity = new Velocity(pixelsPerSecond: estimate.pixelsPerSecond)
+                    Offset ret = estimate.pixelsPerSecond;
+                    Velocity velocity = new Velocity(pixelsPerSecond: ret)
                         .clampMagnitude(this.minFlingVelocity ?? Constants.kMinFlingVelocity,
                             this.maxFlingVelocity ?? Constants.kMaxFlingVelocity);
                     this.invokeCallback<object>("onEnd", () => {
