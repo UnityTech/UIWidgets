@@ -1161,11 +1161,11 @@ namespace Unity.UIWidgets.ui {
             float x0 = (float) dst.left;
             float x3 = (float) dst.right;
             float x1 = x0 + (float) ((center.left - src.left) * srcWidth);
-            float x2 = x3 - (float) ((src.right - center.right) * srcHeight);
+            float x2 = x3 - (float) ((src.right - center.right) * srcWidth);
 
             float y0 = (float) dst.top;
             float y3 = (float) dst.bottom;
-            float y1 = y0 + (float) ((center.top - src.top) * srcWidth);
+            float y1 = y0 + (float) ((center.top - src.top) * srcHeight);
             float y2 = y3 - (float) ((src.bottom - center.bottom) * srcHeight);
 
             float tx0 = (float) src.left;
