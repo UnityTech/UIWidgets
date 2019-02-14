@@ -135,7 +135,7 @@ namespace Unity.UIWidgets.painting {
         }
     }
 
-    public class AssetImageConfiguration: IEquatable<AssetImageConfiguration> {
+    public class AssetImageConfiguration : IEquatable<AssetImageConfiguration> {
         public readonly ImageConfiguration configuration;
         public readonly string assetName;
 
@@ -143,7 +143,7 @@ namespace Unity.UIWidgets.painting {
             this.configuration = configuration;
             this.assetName = assetName;
         }
-        
+
         public bool Equals(AssetImageConfiguration other) {
             if (ReferenceEquals(null, other)) {
                 return false;
@@ -174,7 +174,8 @@ namespace Unity.UIWidgets.painting {
 
         public override int GetHashCode() {
             unchecked {
-                return ((this.configuration != null ? this.configuration.GetHashCode() : 0) * 397) ^ (this.assetName != null ? this.assetName.GetHashCode() : 0);
+                return ((this.configuration != null ? this.configuration.GetHashCode() : 0) * 397) ^
+                       (this.assetName != null ? this.assetName.GetHashCode() : 0);
             }
         }
 
@@ -186,21 +187,24 @@ namespace Unity.UIWidgets.painting {
             return !Equals(left, right);
         }
     }
-    
-    public class AssetBundleCache {
 
+    public class AssetBundleCache {
         static readonly AssetBundleCache _instance = new AssetBundleCache();
 
-        public static AssetBundleCache instance => _instance;
-        
-        readonly Dictionary<int, Dictionary<AssetImageConfiguration, AssetBundleImageKey>> _bundleCaches = 
+        public static AssetBundleCache instance {
+            get { return _instance; }
+        }
+
+        readonly Dictionary<int, Dictionary<AssetImageConfiguration, AssetBundleImageKey>> _bundleCaches =
             new Dictionary<int, Dictionary<AssetImageConfiguration, AssetBundleImageKey>>();
+
         public Dictionary<AssetImageConfiguration, AssetBundleImageKey> get(AssetBundle bundle) {
             Dictionary<AssetImageConfiguration, AssetBundleImageKey> result;
             int id = bundle == null ? 0 : bundle.GetInstanceID();
             if (this._bundleCaches.TryGetValue(id, out result)) {
                 return result;
             }
+
             result = new Dictionary<AssetImageConfiguration, AssetBundleImageKey>();
             this._bundleCaches[id] = result;
             return result;

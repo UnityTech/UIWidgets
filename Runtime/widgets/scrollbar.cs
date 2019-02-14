@@ -169,7 +169,7 @@ namespace Unity.UIWidgets.widgets {
             }
         }
 
-        public bool hitTest(Offset position) {
+        public bool? hitTest(Offset position) {
             return false;
         }
 

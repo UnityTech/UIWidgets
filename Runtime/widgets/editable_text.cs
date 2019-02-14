@@ -71,7 +71,7 @@ namespace Unity.UIWidgets.widgets {
 
         public readonly TextDirection? textDirection;
 
-        public readonly double textScaleFactor;
+        public readonly double? textScaleFactor;
 
         public readonly Color cursorColor;
 
@@ -96,7 +96,7 @@ namespace Unity.UIWidgets.widgets {
         public EditableText(TextEditingController controller, FocusNode focusNode, TextStyle style,
             Color cursorColor, bool obscureText = false, bool autocorrect = false,
             TextAlign textAlign = TextAlign.left, TextDirection? textDirection = null,
-            double textScaleFactor = 1.0, int maxLines = 1,
+            double? textScaleFactor = null, int maxLines = 1,
             bool autofocus = false, Color selectionColor = null, TextSelectionControls selectionControls = null,
             ValueChanged<string> onChanged = null, VoidCallback onEditingComplete = null,
             ValueChanged<string> onSubmitted = null, SelectionChangedCallback onSelectionChanged = null,
@@ -158,7 +158,7 @@ namespace Unity.UIWidgets.widgets {
                 defaultValue: Diagnostics.kNullDefaultValue));
             properties.add(new EnumProperty<TextDirection?>("textDirection", this.textDirection,
                 defaultValue: Diagnostics.kNullDefaultValue));
-            properties.add(new DiagnosticsProperty<double>("textScaleFactor", this.textScaleFactor,
+            properties.add(new DiagnosticsProperty<double?>("textScaleFactor", this.textScaleFactor,
                 defaultValue: Diagnostics.kNullDefaultValue));
             properties.add(new DiagnosticsProperty<int>("maxLines", this.maxLines, defaultValue: 1));
             properties.add(new DiagnosticsProperty<bool>("autofocus", this.autofocus, defaultValue: false));
@@ -752,8 +752,7 @@ namespace Unity.UIWidgets.widgets {
                             hasFocus: this._hasFocus,
                             maxLines: this.widget.maxLines,
                             selectionColor: this.widget.selectionColor,
-                            textScaleFactor: Window.instance
-                                .devicePixelRatio, // todo widget.textScaleFactor ?? MediaQuery.textScaleFactorOf(context),
+                            textScaleFactor: this.widget.textScaleFactor ?? MediaQuery.textScaleFactorOf(context),
                             textAlign: this.widget.textAlign,
                             textDirection: this._textDirection,
                             obscureText: this.widget.obscureText,
