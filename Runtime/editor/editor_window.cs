@@ -301,7 +301,7 @@ namespace Unity.UIWidgets.editor {
                         physicalX: evt.mousePosition.x * this._devicePixelRatio,
                         physicalY: evt.mousePosition.y * this._devicePixelRatio
                     );
-                } EventType.ScrollWheel
+                }
 
                 if (pointerData != null) {
                     this.onPointerEvent(new PointerDataPacket(new List<PointerData> {

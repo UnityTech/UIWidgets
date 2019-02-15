@@ -10,9 +10,7 @@ namespace Unity.UIWidgets.ui {
         down,
         move,
         up,
-        scroll_start,
-        scrolling,
-        scroll_end
+        scroll
     }
 
     public enum PointerDeviceKind {
@@ -42,6 +40,24 @@ namespace Unity.UIWidgets.ui {
         public int device;
         public double physicalX;
         public double physicalY;
+    }
+
+    public class ScrollData : PointerData {
+        public ScrollData(
+            TimeSpan timeStamp,
+            PointerChange change,
+            PointerDeviceKind kind,
+            int device,
+            double physicalX,
+            double physicalY,
+            double scrollX,
+            double scrollY) : base(timeStamp, change, kind, device, physicalX, physicalY) {
+            this.scrollX = scrollX;
+            this.scrollY = scrollY;
+        }
+
+        public double scrollX;
+        public double scrollY;
     }
 
     public class PointerDataPacket {

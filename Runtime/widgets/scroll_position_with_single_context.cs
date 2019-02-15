@@ -89,6 +89,20 @@ namespace Unity.UIWidgets.widgets {
             }
         }
 
+        public virtual void applyUserScrollOffset(double delta) {
+            this.updateUserScrollDirection(delta > 0.0 ? ScrollDirection.forward : ScrollDirection.reverse);
+
+            var pixel = this.pixels - this.physics.applyPhysicsToUserOffset(this, delta);
+            if (pixel < this.minScrollExtent) {
+                pixel = this.minScrollExtent;
+            }
+
+            if (pixel > this.maxScrollExtent) {
+                pixel = this.maxScrollExtent;
+            }
+            this.setPixels(pixel);
+        }
+
         public virtual void applyUserOffset(double delta) {
             this.updateUserScrollDirection(delta > 0.0 ? ScrollDirection.forward : ScrollDirection.reverse);
             this.setPixels(this.pixels - this.physics.applyPhysicsToUserOffset(this, delta));

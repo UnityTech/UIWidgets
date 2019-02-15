@@ -63,7 +63,8 @@ namespace Unity.UIWidgets.gestures {
         _TapTracker _firstTap;
         readonly Dictionary<int, _TapTracker> _trackers = new Dictionary<int, _TapTracker>();
 
-        public override void addPointer(PointerDownEvent evt) {
+        public override void addPointer(PointerEvent evt) {
+            D.assert(evt is PointerDownEvent);
             if (this._firstTap != null &&
                 !this._firstTap.isWithinTolerance(evt, Constants.kDoubleTapSlop)) {
                 return;
@@ -71,7 +72,7 @@ namespace Unity.UIWidgets.gestures {
 
             this._stopDoubleTapTimer();
             _TapTracker tracker = new _TapTracker(
-                evt: evt,
+                evt: (PointerDownEvent)evt,
                 entry: GestureBinding.instance.gestureArena.add(evt.pointer, this)
             );
             this._trackers[evt.pointer] = tracker;

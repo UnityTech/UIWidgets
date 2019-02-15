@@ -1418,7 +1418,7 @@ namespace Unity.UIWidgets.rendering {
 
     public delegate void PointerLeaveEventListener(PointerLeaveEvent evt);
 
-    public delegate void PointerScrollEventListener(PointerScrollingEvent evt);
+    public delegate void PointerScrollEventListener(PointerScrollEvent evt);
 
     public class RenderPointerListener : RenderProxyBoxWithHitTestBehavior {
         public RenderPointerListener(
@@ -1501,8 +1501,8 @@ namespace Unity.UIWidgets.rendering {
                 return;
             }
 
-            if (this.onPointerScroll != null && evt is PointerScrollingEvent) {
-                this.onPointerScroll((PointerScrollingEvent) evt);
+            if (this.onPointerScroll != null && evt is PointerScrollEvent) {
+                this.onPointerScroll((PointerScrollEvent) evt);
             }
         }
 

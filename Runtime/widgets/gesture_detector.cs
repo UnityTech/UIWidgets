@@ -349,18 +349,10 @@ namespace Unity.UIWidgets.widgets {
             }
         }
         
-        void _handlePointerScroll(PointerScrollingEvent evt) {
-            if (!evt.down) {
-                return;
-            }
+        void _handlePointerScroll(PointerScrollEvent evt) {
             D.assert(this._recognizers != null);
             foreach (GestureRecognizer recognizer in this._recognizers.Values) {
-                recognizer.addPointer(new PointerDownEvent(
-                    timeStamp:evt.timeStamp,
-                    pointer: evt.pointer,
-                    kind: evt.kind,
-                    device: evt.device,
-                    position: evt.position));
+                recognizer.addPointer(evt);
             }
         }
 

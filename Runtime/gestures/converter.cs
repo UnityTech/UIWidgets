@@ -122,7 +122,8 @@ namespace Unity.UIWidgets.gestures {
                         break;
                     }
 
-                    case PointerChange.scroll_start: {
+                    case PointerChange.scroll: {
+                        var _scrollData = (ScrollData) datum;
                         _PointerState state = _ensureStateForPointer(datum, position);
                         state.initScrollPointer();
                         
@@ -130,50 +131,16 @@ namespace Unity.UIWidgets.gestures {
                             state.lastPosition = position;
                         }
                         
-                        yield return new PointerScrollStartEvent(
+                        yield return new PointerScrollEvent(
                             timeStamp: timeStamp,
                             pointer: state.pointer,
                             kind: kind,
-                            device: datum.device,
-                            position: position
+                            device: _scrollData.device,
+                            position: position,
+                            delta: new Offset(_scrollData.scrollX, _scrollData.scrollY) / devicePixelRatio
                         );
                         break;
                     }
-                    
-                    
-                    case PointerChange.scroll_end: {
-                        D.assert(_pointers.ContainsKey(datum.device));
-
-                        _PointerState state = _pointers[datum.device];
-
-                        Offset startPosition = state.lastPosition;
-                        yield return new PointerScrollEndEvent(
-                            timeStamp: timeStamp,
-                            pointer: state.pointer,
-                            kind: kind,
-                            device: datum.device,
-                            position: startPosition,
-                            delta: position
-                        );
-                        break;
-                    }
-                    
-                    case PointerChange.scrolling: {
-                        D.assert(_pointers.ContainsKey(datum.device));
-
-                        _PointerState state = _pointers[datum.device];
-
-                        Offset startPosition = state.lastPosition;
-                        yield return new PointerScrollingEvent(
-                            timeStamp: timeStamp,
-                            pointer: state.pointer,
-                            kind: kind,
-                            device: datum.device,
-                            position: startPosition,
-                            delta: position
-                        );
-                        break;
-                    }     
                     
                     case PointerChange.up:
                     case PointerChange.cancel: {

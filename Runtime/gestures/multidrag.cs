@@ -147,12 +147,13 @@ namespace Unity.UIWidgets.gestures {
 
         Dictionary<int, T> _pointers = new Dictionary<int, T>();
 
-        public override void addPointer(PointerDownEvent pEvent) {
+        public override void addPointer(PointerEvent pEvent) {
             D.assert(this._pointers != null);
             D.assert(pEvent.position != null);
             D.assert(!this._pointers.ContainsKey(pEvent.pointer));
+            D.assert(pEvent is PointerDownEvent);
 
-            T state = this.createNewPointerState(pEvent);
+            T state = this.createNewPointerState((PointerDownEvent)pEvent);
             this._pointers[pEvent.pointer] = state;
             GestureBinding.instance.pointerRouter.addRoute(pEvent.pointer, this._handleEvent);
             state._setArenaEntry(GestureBinding.instance.gestureArena.add(pEvent.pointer, this));

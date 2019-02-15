@@ -67,10 +67,6 @@ namespace Unity.UIWidgets.engine {
         Vector2 _lastMouseMove;
         bool _mouseEntered;
         
-        Vector2 _lastScrollMove;
-        TimeSpan _lastScrollEndTime = TimeSpan.Zero;
-        static readonly TimeSpan _ScrollEndInterval = new TimeSpan(0, 0, 0, 0, 200);
-
         protected override void OnEnable() {
             base.OnEnable();
 
@@ -94,8 +90,6 @@ namespace Unity.UIWidgets.engine {
 
             this._windowAdapter.attachRootWidget(root);
             this._lastMouseMove = Input.mousePosition;
-            this._lastScrollMove = Input.mouseScrollDelta;
-            Debug.Log(this._lastScrollMove);
         }
 
         public double pixelRatio {
@@ -160,60 +154,21 @@ namespace Unity.UIWidgets.engine {
             }
 
             if (this._mouseEntered) {
-                // 0 -> !0  => scroll start, use the current position to perform hit test and set the 
-                // current scroll target (if can, otherwise set it null), this target should be saved
-                // !0 -> !0 => use the delta to do the scroll thing.
-                // !0 -> 0 => scroll end. current scroll target = null
-                if (this._lastScrollMove.y == 0 && Input.mouseScrollDelta.y == 0) {
-                    if (this._lastScrollEndTime != TimeSpan.Zero &&
-                        (Timer.timespanSinceStartup - this._lastScrollEndTime > _ScrollEndInterval)) {
-                        this._lastScrollEndTime = TimeSpan.Zero;
-                        this._windowAdapter.postPointerEvent(new PointerData(
-                            timeStamp: Timer.timespanSinceStartup,
-                            change: PointerChange.scroll_end,
-                            kind: PointerDeviceKind.mouse,
-                            device: this.getScrollButton(),
-                            physicalX: 0,
-                            physicalY: 0
-                        ));
-                    }
-                }
-                else if (this._lastScrollMove.y != 0 && Input.mouseScrollDelta.y == 0) {
-                    //Debug.Log("scroll end");
-                    this._lastScrollEndTime = Timer.timespanSinceStartup;
-                    
-                    this._windowAdapter.postPointerEvent(new PointerData(
-                        timeStamp: Timer.timespanSinceStartup,
-                        change: PointerChange.scrolling,
-                        kind: PointerDeviceKind.mouse,
-                        device: this.getScrollButton(),
-                        physicalX: 0,
-                        physicalY: this._lastScrollMove.y
-                    ));
-                } else if (this._lastScrollMove.y == 0 && Input.mouseScrollDelta.y != 0) {
-                    //Debug.Log("scroll start");
+                if (Input.mouseScrollDelta.y != 0) {
                     var pos = this.getPointPosition(Input.mousePosition);
-                    this._windowAdapter.postPointerEvent(new PointerData(
+                    this._windowAdapter.postPointerEvent(new ScrollData(
                         timeStamp: Timer.timespanSinceStartup,
-                        change: PointerChange.scroll_start,
+                        change: PointerChange.scroll,
                         kind: PointerDeviceKind.mouse,
                         device: this.getScrollButton(),
                         physicalX: pos.x,
-                        physicalY: pos.y
-                    ));
-                } else if (this._lastScrollMove.y != 0 && Input.mouseScrollDelta.y != 0) {
-                    //Debug.Log("scroll continue");
-                    this._windowAdapter.postPointerEvent(new PointerData(
-                        timeStamp: Timer.timespanSinceStartup,
-                        change: PointerChange.scrolling,
-                        kind: PointerDeviceKind.mouse,
-                        device: this.getScrollButton(),
-                        physicalX: 0,
-                        physicalY: this._lastScrollMove.y
+                        physicalY: pos.y,
+                        scrollX: Input.mouseScrollDelta.x,
+                        scrollY: Input.mouseScrollDelta.y * 5
                     ));
                 }
             }
-            this._lastScrollMove = Input.mouseScrollDelta;
+
 
             this._lastMouseMove = Input.mousePosition;
 

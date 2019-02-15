@@ -15,7 +15,7 @@ namespace Unity.UIWidgets.gestures {
 
         public readonly object debugOwner;
 
-        public abstract void addPointer(PointerDownEvent evt);
+        public abstract void addPointer(PointerEvent evt);
 
         public virtual void dispose() {
         }
@@ -126,6 +126,10 @@ namespace Unity.UIWidgets.gestures {
             return GestureBinding.instance.gestureArena.add(pointer, this);
         }
 
+        protected void startTrackingScrollerPointer(int pointer) {
+            GestureBinding.instance.pointerRouter.addRoute(pointer, this.handleEvent);
+        }
+
         protected void startTrackingPointer(int pointer) {
             GestureBinding.instance.pointerRouter.addRoute(pointer, this.handleEvent);
             this._trackedPointers.Add(pointer);
@@ -148,15 +152,6 @@ namespace Unity.UIWidgets.gestures {
         protected void stopTrackingIfPointerNoLongerDown(PointerEvent evt) {
             if (evt is PointerUpEvent || evt is PointerCancelEvent) {
                 this.stopTrackingPointer(evt.pointer);
-            }
-
-            if (evt is PointerScrollingEvent) {
-                if (evt.delta == Offset.zero && !evt.down) {
-                    this.stopTrackingPointer(evt.pointer);
-                }
-                else {
-                    Debug.Log("udddddddddddddd");
-                }
             }
         }
     }
@@ -185,7 +180,7 @@ namespace Unity.UIWidgets.gestures {
 
         Timer _timer;
 
-        public override void addPointer(PointerDownEvent evt) {
+        public override void addPointer(PointerEvent evt) {
             this.startTrackingPointer(evt.pointer);
             if (this.state == GestureRecognizerState.ready) {
                 this.state = GestureRecognizerState.possible;
