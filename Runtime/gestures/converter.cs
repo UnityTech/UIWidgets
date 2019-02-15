@@ -14,7 +14,16 @@ namespace Unity.UIWidgets.gestures {
 
         int _pointer;
 
-        static int _pointerCount = 0;
+        // pointers 0 ~ 9 are preserved for special unique inputs
+        static int _pointerCount = 10;
+
+        // special pointer id:
+        // mouse scroll
+        const int scrollPointer = 5;
+
+        public void initScrollPointer() {
+            this._pointer = scrollPointer;
+        }
 
         public void startNewPointer() {
             _pointerCount += 1;
@@ -116,6 +125,27 @@ namespace Unity.UIWidgets.gestures {
                         );
                         break;
                     }
+
+                    case PointerChange.scroll: {
+                        var _scrollData = (ScrollData) datum;
+                        _PointerState state = _ensureStateForPointer(datum, position);
+                        state.initScrollPointer();
+
+                        if (state.lastPosition != position) {
+                            state.lastPosition = position;
+                        }
+
+                        yield return new PointerScrollEvent(
+                            timeStamp: timeStamp,
+                            pointer: state.pointer,
+                            kind: kind,
+                            device: _scrollData.device,
+                            position: position,
+                            delta: new Offset(_scrollData.scrollX, _scrollData.scrollY) / devicePixelRatio
+                        );
+                        break;
+                    }
+
                     case PointerChange.up:
                     case PointerChange.cancel: {
                         D.assert(_pointers.ContainsKey(datum.device));

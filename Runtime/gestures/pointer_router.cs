@@ -26,6 +26,12 @@ namespace Unity.UIWidgets.gestures {
             }
         }
 
+        public void clearScrollRoute(int pointer) {
+            if (this._routeMap.ContainsKey(pointer)) {
+                this._routeMap.Remove(pointer);
+            }
+        }
+
         public void addGlobalRoute(PointerRoute route) {
             D.assert(!this._globalRoutes.Contains(route));
             this._globalRoutes.Add(route);

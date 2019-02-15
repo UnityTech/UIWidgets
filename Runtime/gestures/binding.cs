@@ -57,6 +57,11 @@ namespace Unity.UIWidgets.gestures {
                 this._handlePointerHoverEvent(evt);
             }
 
+            if (evt is PointerScrollEvent) {
+                this._handlePointerScrollEvent(evt);
+                return;
+            }
+
             HitTestResult result;
             if (evt is PointerDownEvent) {
                 D.assert(!this._hitTests.ContainsKey(evt.pointer));
@@ -86,6 +91,15 @@ namespace Unity.UIWidgets.gestures {
             if (result != null) {
                 this.dispatchEvent(evt, result);
             }
+        }
+
+        void _handlePointerScrollEvent(PointerEvent evt) {
+            this.pointerRouter.clearScrollRoute(evt.pointer);
+
+            HitTestResult result = new HitTestResult();
+            this.hitTest(result, evt.position);
+
+            this.dispatchEvent(evt, result);
         }
 
         void _handlePointerHoverEvent(PointerEvent evt) {
