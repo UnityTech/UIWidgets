@@ -95,10 +95,10 @@ namespace Unity.UIWidgets.gestures {
 
         void _handlePointerScrollEvent(PointerEvent evt) {
             this.pointerRouter.clearScrollRoute(evt.pointer);
-            
+
             HitTestResult result = new HitTestResult();
             this.hitTest(result, evt.position);
-            
+
             this.dispatchEvent(evt, result);
         }
 

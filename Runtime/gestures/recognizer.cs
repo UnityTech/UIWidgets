@@ -15,7 +15,10 @@ namespace Unity.UIWidgets.gestures {
 
         public readonly object debugOwner;
 
-        public abstract void addPointer(PointerEvent evt);
+        public abstract void addPointer(PointerDownEvent evt);
+
+        public virtual void addScrollPointer(PointerScrollEvent evt) {
+        }
 
         public virtual void dispose() {
         }
@@ -74,7 +77,7 @@ namespace Unity.UIWidgets.gestures {
 
         readonly Dictionary<int, GestureArenaEntry> _entries = new Dictionary<int, GestureArenaEntry>();
 
-        protected readonly HashSet<int> _trackedPointers = new HashSet<int>();
+        readonly HashSet<int> _trackedPointers = new HashSet<int>();
 
         protected abstract void handleEvent(PointerEvent evt);
 
@@ -133,10 +136,8 @@ namespace Unity.UIWidgets.gestures {
         protected void startTrackingPointer(int pointer) {
             GestureBinding.instance.pointerRouter.addRoute(pointer, this.handleEvent);
             this._trackedPointers.Add(pointer);
-            //D.assert(!this._entries.ContainsKey(pointer));
-            if (!this._entries.ContainsKey(pointer)) {
-                this._entries[pointer] = this._addPointerToArena(pointer);
-            }
+            D.assert(!this._entries.ContainsKey(pointer));
+            this._entries[pointer] = this._addPointerToArena(pointer);
         }
 
         protected void stopTrackingPointer(int pointer) {
@@ -180,7 +181,7 @@ namespace Unity.UIWidgets.gestures {
 
         Timer _timer;
 
-        public override void addPointer(PointerEvent evt) {
+        public override void addPointer(PointerDownEvent evt) {
             this.startTrackingPointer(evt.pointer);
             if (this.state == GestureRecognizerState.ready) {
                 this.state = GestureRecognizerState.possible;

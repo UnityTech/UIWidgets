@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
-using UnityEngine;
 
 namespace Unity.UIWidgets.gestures {
     enum _DragState {
@@ -48,26 +47,24 @@ namespace Unity.UIWidgets.gestures {
 
         readonly Dictionary<int, VelocityTracker> _velocityTrackers = new Dictionary<int, VelocityTracker>();
 
-        public override void addPointer(PointerEvent evt) {
-            if (evt is PointerScrollEvent) {
-                this.startTrackingScrollerPointer(evt.pointer);
-                if (this._state == _DragState.ready) {
-                    this._state = _DragState.possible;
-                    this._initialPosition = evt.position;
-                    if (this.onStart != null) {
-                        this.invokeCallback<object>("onStart", () => {
-                            this.onStart(new DragStartDetails(
-                                sourceTimeStamp: evt.timeStamp,
-                                globalPosition: this._initialPosition
-                            ));
-                            return null;
-                        });
-                    }
+        public override void addScrollPointer(PointerScrollEvent evt) {
+            this.startTrackingScrollerPointer(evt.pointer);
+            if (this._state == _DragState.ready) {
+                this._state = _DragState.possible;
+                this._initialPosition = evt.position;
+                if (this.onStart != null) {
+                    this.invokeCallback<object>("onStart", () => {
+                        this.onStart(new DragStartDetails(
+                            sourceTimeStamp: evt.timeStamp,
+                            globalPosition: this._initialPosition
+                        ));
+                        return null;
+                    });
                 }
-
-                return;
             }
-            
+        }
+
+        public override void addPointer(PointerDownEvent evt) {
             this.startTrackingPointer(evt.pointer);
             this._velocityTrackers[evt.pointer] = new VelocityTracker();
             if (this._state == _DragState.ready) {
@@ -113,16 +110,17 @@ namespace Unity.UIWidgets.gestures {
                 }
 
                 this.invokeCallback<object>("onEnd", () => {
-                    this.onEnd(new DragEndDetails(
-                        velocity: Velocity.zero,
-                        primaryVelocity: 0.0
-                    ));
-                    return null;
-                }, debugReport: () => { return ""; }
+                        this.onEnd(new DragEndDetails(
+                            velocity: Velocity.zero,
+                            primaryVelocity: 0.0
+                        ));
+                        return null;
+                    }, debugReport: () => { return ""; }
                 );
-                
-                
+
+
                 this._state = _DragState.ready;
+                return;
             }
 
             if (evt is PointerMoveEvent) {
@@ -208,11 +206,8 @@ namespace Unity.UIWidgets.gestures {
                 D.assert(tracker != null);
 
                 var estimate = tracker.getVelocityEstimate();
-                //if (estimate != null && this._isFlingGesture(estimate) || pointer == 5) {
-                //    Offset ret = pointer == 5 ? new Offset(0, 1) : estimate.pixelsPerSecond;
                 if (estimate != null && this._isFlingGesture(estimate)) {
-                    Offset ret = estimate.pixelsPerSecond;
-                    Velocity velocity = new Velocity(pixelsPerSecond: ret)
+                    Velocity velocity = new Velocity(pixelsPerSecond: estimate.pixelsPerSecond)
                         .clampMagnitude(this.minFlingVelocity ?? Constants.kMinFlingVelocity,
                             this.maxFlingVelocity ?? Constants.kMaxFlingVelocity);
                     this.invokeCallback<object>("onEnd", () => {

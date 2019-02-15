@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Unity.UIWidgets.animation;
 using Unity.UIWidgets.async;
 using Unity.UIWidgets.editor;
@@ -66,7 +65,10 @@ namespace Unity.UIWidgets.engine {
         Texture _texture;
         Vector2 _lastMouseMove;
         bool _mouseEntered;
-        
+
+        const int mouseButtonNum = 3;
+        const int mouseScrollId = mouseButtonNum + 1;
+
         protected override void OnEnable() {
             base.OnEnable();
 
@@ -196,11 +198,11 @@ namespace Unity.UIWidgets.engine {
         }
 
         int getScrollButton() {
-            return 5;
+            return mouseScrollId;
         }
 
         int getMouseButtonDown() {
-            for (int key = 0; key < 3; key++) {
+            for (int key = 0; key < mouseButtonNum; key++) {
                 if (Input.GetMouseButton(key)) {
                     return key;
                 }

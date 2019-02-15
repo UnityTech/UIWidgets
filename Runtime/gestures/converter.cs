@@ -14,7 +14,11 @@ namespace Unity.UIWidgets.gestures {
 
         int _pointer;
 
+        // pointers 0 ~ 9 are preserved for special unique inputs
         static int _pointerCount = 10;
+
+        // special pointer id:
+        // mouse scroll
         const int scrollPointer = 5;
 
         public void initScrollPointer() {
@@ -126,11 +130,11 @@ namespace Unity.UIWidgets.gestures {
                         var _scrollData = (ScrollData) datum;
                         _PointerState state = _ensureStateForPointer(datum, position);
                         state.initScrollPointer();
-                        
+
                         if (state.lastPosition != position) {
                             state.lastPosition = position;
                         }
-                        
+
                         yield return new PointerScrollEvent(
                             timeStamp: timeStamp,
                             pointer: state.pointer,
@@ -141,7 +145,7 @@ namespace Unity.UIWidgets.gestures {
                         );
                         break;
                     }
-                    
+
                     case PointerChange.up:
                     case PointerChange.cancel: {
                         D.assert(_pointers.ContainsKey(datum.device));

@@ -252,7 +252,7 @@ namespace Unity.UIWidgets.widgets {
             D.assert(details.primaryDelta != null);
             this._lastDetails = details;
             double offset = details.primaryDelta.Value;
-            
+
             if (details.isScroll) {
                 if (offset == 0.0) {
                     return;
@@ -261,13 +261,13 @@ namespace Unity.UIWidgets.widgets {
                 if (this._reversed) {
                     offset = -offset;
                 }
-                
-                
+
+
                 this.del.applyUserScrollOffset(offset);
                 return;
             }
-            
-            
+
+
             if (offset != 0.0) {
                 this._lastNonStationaryTimestamp = details.sourceTimeStamp;
             }

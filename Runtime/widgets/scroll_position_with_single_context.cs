@@ -100,6 +100,7 @@ namespace Unity.UIWidgets.widgets {
             if (pixel > this.maxScrollExtent) {
                 pixel = this.maxScrollExtent;
             }
+
             this.setPixels(pixel);
         }
 

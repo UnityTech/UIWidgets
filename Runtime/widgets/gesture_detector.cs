@@ -348,11 +348,11 @@ namespace Unity.UIWidgets.widgets {
                 recognizer.addPointer(evt);
             }
         }
-        
+
         void _handlePointerScroll(PointerScrollEvent evt) {
             D.assert(this._recognizers != null);
             foreach (GestureRecognizer recognizer in this._recognizers.Values) {
-                recognizer.addPointer(evt);
+                recognizer.addScrollPointer(evt);
             }
         }
 
