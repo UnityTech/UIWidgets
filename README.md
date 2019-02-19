@@ -3,8 +3,8 @@
 
 ## Introduction
 
-UIWidget is a plugin package of Unity Editor which helps developers to create, debug and deploy efficient, 
-cross-platform Apps using Unity Engine. 
+UIWidget is a plugin package for Unity Editor which helps developers to create, debug and deploy efficient, 
+cross-platform Apps using the Unity Engine. 
 
 UIWidget is mainly derived from Flutter @https://github.com/flutter/flutter. However, taking advantage of
 the powerful Unity Engine, it offers developers many new features to improve their Apps 
@@ -48,21 +48,95 @@ Generally, you can make it using a console (or terminal) application by just a f
 ## Getting Start
 
 #### i. Overview
+In this tutorial, we will create a very simple UIWidget App as the kick-starter. The app contains 
+only a text label and a button. The text label will count the times of clicks upon the button.
+
+First of all, please open or create a Unity Project and open it with Unity Editor. 
 
 #### ii. Scene Build
+A UIWidget App is usually built upon a Unity UI Canvas. Please follow the steps to create a
+UI Canvas in Unity.
+1. Create a new Scene by "File -> New Scene";
+1. Create a UI Canvas in the scene by "GameObject -> UI -> Canvas";
+1. Add a Panel (i.e., **Panel 1**) to the UI Canvas by right click on the Canvas and select "UI -> Panel". Then remove the 
+**Image** Component from the Panel.
 
 #### iii. Create Widget
+A UIWidget App is written in **C# Scripts**. Please follow the steps to create an App and play it
+in Unity Editor.
+
+1. Create a new C# Script named "ExampleCanvas.cs" and paste the following codes into it.
+   ```none
+    using System.Collections.Generic;
+    using Unity.UIWidgets.engine;
+    using Unity.UIWidgets.foundation;
+    using Unity.UIWidgets.material;
+    using Unity.UIWidgets.painting;
+    using Unity.UIWidgets.widgets;
+    
+    namespace UIWidgetsSample {
+        public class ExampleCanvas : WidgetCanvas {
+            protected override Widget getWidget() {
+                return new ExampleApp();
+            }
+    
+            class ExampleApp : StatefulWidget {
+                public ExampleApp(Key key = null) : base(key) {
+                }
+    
+                public override State createState() {
+                    return new ExampleState();
+                }
+            }
+    
+            class ExampleState : State<ExampleApp> {
+                int counter = 0;
+    
+                public override Widget build(BuildContext context) {
+                    return new Column(
+                        children: new List<Widget> {
+                            new Text("Counter: " + this.counter),
+                            new GestureDetector(
+                                onTap: () => {
+                                    this.setState(()
+                                     => {
+                                        this.counter++;
+                                    });
+                                },
+                                child: new Container(
+                                    padding: EdgeInsets.symmetric(20, 20),
+                                    color: Colors.blue,
+                                    child: new Text("Click Me")
+                                )
+                            )
+                        }
+                    );
+                }
+            }
+        }
+    }
+   ```
+   
+1. Save this script and attach it to **Panel 1** as its component.
+1. Press the "Play" Button to start the App in Unity Editor.
 
 #### iv. Build App
+Finally, the UIWidget App can be built to packages for any specific platform by the following steps.
+1. Open the Build Settings Panel by "File -> Build Settings..."
+1. Choose a target platform and click "Build". Then the Unity Editor will automatically assemble 
+all relevant resources and generate the final App package.
 
-#### v. Move to Editor
 
 ## Learn
 
 #### Samples
+You can find many UIWidget App samples in the UIWidget package in the **Samples** folder.
+Feel free to try them out and make modifications to see the results.
 
 #### Wiki
-
+The develop team is still working on the UIWidget Wiki. However, since UIWidget is mainly derived from Flutter,
+ you can refer to Flutter Wiki to access detailed descriptions of UIWidget APIs 
+ from those of their Flutter counterparts. 
 
 ## How to Contribute
 
