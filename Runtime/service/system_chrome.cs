@@ -92,7 +92,7 @@ namespace Unity.UIWidgets.service {
             };
         }
 
-        public string toString() {
+        public override string ToString() {
             return this._toMap().ToString();
         }
 

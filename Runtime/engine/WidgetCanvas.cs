@@ -66,6 +66,9 @@ namespace Unity.UIWidgets.engine {
         Vector2 _lastMouseMove;
         bool _mouseEntered;
 
+        const int mouseButtonNum = 3;
+        const int mouseScrollId = mouseButtonNum + 1;
+
         protected override void OnEnable() {
             base.OnEnable();
 
@@ -152,6 +155,23 @@ namespace Unity.UIWidgets.engine {
                 this.handleMouseMove();
             }
 
+            if (this._mouseEntered) {
+                if (Input.mouseScrollDelta.y != 0) {
+                    var pos = this.getPointPosition(Input.mousePosition);
+                    this._windowAdapter.postPointerEvent(new ScrollData(
+                        timeStamp: Timer.timespanSinceStartup,
+                        change: PointerChange.scroll,
+                        kind: PointerDeviceKind.mouse,
+                        device: this.getScrollButton(),
+                        physicalX: pos.x,
+                        physicalY: pos.y,
+                        scrollX: Input.mouseScrollDelta.x,
+                        scrollY: Input.mouseScrollDelta.y * 5
+                    ));
+                }
+            }
+
+
             this._lastMouseMove = Input.mousePosition;
 
             D.assert(this._windowAdapter != null);
@@ -177,8 +197,12 @@ namespace Unity.UIWidgets.engine {
             ));
         }
 
+        int getScrollButton() {
+            return mouseScrollId;
+        }
+
         int getMouseButtonDown() {
-            for (int key = 0; key < 3; key++) {
+            for (int key = 0; key < mouseButtonNum; key++) {
                 if (Input.GetMouseButton(key)) {
                     return key;
                 }

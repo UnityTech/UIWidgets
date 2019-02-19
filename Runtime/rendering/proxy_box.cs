@@ -522,7 +522,7 @@ namespace Unity.UIWidgets.rendering {
 
         public abstract bool shouldReclip(CustomClipper<T> oldClipper);
 
-        public string toString() {
+        public override string ToString() {
             return this.GetType() + "";
         }
     }
@@ -620,8 +620,8 @@ namespace Unity.UIWidgets.rendering {
             return this._clipper?.getApproximateClipRect(this.size) ?? Offset.zero & this.size;
         }
 
-        Paint _debugPaint;
-        TextPainter _debugText;
+        protected Paint _debugPaint;
+        protected TextPainter _debugText;
 
         protected override void debugPaintSize(PaintingContext context, Offset offset) {
             D.assert(() => {
@@ -646,6 +646,113 @@ namespace Unity.UIWidgets.rendering {
 //                                          ));
 //                this._debugText.layout();
 //                }
+                return true;
+            });
+        }
+    }
+
+
+    public class RenderClipRect : _RenderCustomClip<Rect> {
+        public RenderClipRect(
+            RenderBox child = null,
+            CustomClipper<Rect> clipper = null,
+            Clip clipBehavior = Clip.antiAlias
+        ) : base(
+            child: child,
+            clipper: clipper,
+            clipBehavior: clipBehavior) {
+        }
+
+        protected override Rect _defaultClip {
+            get { return Offset.zero & this.size; }
+        }
+
+        public override bool hitTest(HitTestResult result, Offset position = null) {
+            if (this._clipper != null) {
+                this._updateClip();
+                D.assert(this._clip != null);
+                if (!this._clip.contains(position)) {
+                    return false;
+                }
+            }
+
+            return base.hitTest(result, position: position);
+        }
+
+        public override void paint(PaintingContext context, Offset offset) {
+            if (this.child != null) {
+                this._updateClip();
+                context.pushClipRect(this.needsCompositing, offset, this._clip,
+                    base.paint, clipBehavior: this.clipBehavior);
+            }
+        }
+
+        protected override void debugPaintSize(PaintingContext context, Offset offset) {
+            D.assert(() => {
+                if (this.child != null) {
+                    base.debugPaintSize(context, offset);
+                    context.canvas.drawRect(this._clip.shift(offset), this._debugPaint);
+                    this._debugText.paint(context.canvas,
+                        offset + new Offset(this._clip.width / 8.0,
+                            -(this._debugText.text.style.fontSize ?? 0.0) * 1.1));
+                }
+
+                return true;
+            });
+        }
+    }
+
+
+    public class RenderClipPath : _RenderCustomClip<Path> {
+        public RenderClipPath(
+            RenderBox child = null,
+            CustomClipper<Path> clipper = null,
+            Clip clipBehavior = Clip.antiAlias
+        ) : base(child: child, clipper: clipper, clipBehavior: clipBehavior) {
+            D.assert(clipBehavior != Clip.none);
+        }
+
+        protected override Path _defaultClip {
+            get {
+                var path = new Path();
+                path.addRect(Offset.zero & this.size);
+                return path;
+            }
+        }
+
+        public override bool hitTest(HitTestResult result, Offset position = null) {
+            if (this._clipper != null) {
+                this._updateClip();
+                D.assert(this._clip != null);
+                if (!this._clip.contains(position)) {
+                    return false;
+                }
+            }
+
+            return base.hitTest(result, position: position);
+        }
+
+
+        public override void paint(PaintingContext context, Offset offset) {
+            if (this.child != null) {
+                this._updateClip();
+                //todo:xingwei.zhu pushClipPath()
+//                context.pushClipPath(this.needsCompositing, offset, Offset.zero & this.size,
+//                    this._clip, base.paint, clipBehavior: this.clipBehavior);
+                base.paint(context, offset);
+            }
+        }
+
+        protected override void debugPaintSize(PaintingContext context, Offset offset) {
+            D.assert(() => {
+                if (this.child != null) {
+                    base.debugPaintSize(context, offset);
+                    Path offsetPath = new Path();
+                    offsetPath.addPath(this._clip, offset);
+                    context.canvas.drawPath(offsetPath, this._debugPaint);
+                    this._debugText.paint(context.canvas, offset);
+                }
+
                 return true;
             });
         }
@@ -804,7 +911,7 @@ namespace Unity.UIWidgets.rendering {
             return base.hitTest(result, position: position);
         }
 
-        //todo:xingwei.zhu: implementation shadow + compositeLayer
+        //todo:xingwei.zhu: implementation shadow + compositeLayer (issue: no color when composite)
         public override void paint(PaintingContext context, Offset offset) {
             if (this.child != null) {
                 this._updateClip();
@@ -826,6 +933,12 @@ namespace Unity.UIWidgets.rendering {
                         this.elevation,
                         this.color.alpha != 0xFF
                     );*/
+                }
+
+                if (this.needsCompositing) {
+                    ContainerLayer container = new ContainerLayer();
+                    context.pushLayer(container, base.paint, offset, childPaintBounds: offsetBounds);
+                    return;
                 }
 
                 Paint paint = new Paint {color = this.color};
@@ -882,7 +995,7 @@ namespace Unity.UIWidgets.rendering {
             return base.hitTest(result, position: position);
         }
 
-        //todo:xingwei.zhu: implementation shadow + compositeLayer
+        //todo:xingwei.zhu: implementation shadow + compositeLayer (issue: no color when composite)
         public override void paint(PaintingContext context, Offset offset) {
             if (this.child != null) {
                 this._updateClip();
@@ -903,6 +1016,13 @@ namespace Unity.UIWidgets.rendering {
 //                        this.color.alpha != 0xFF,
 //                    );
 //                }
+
+                if (this.needsCompositing) {
+                    ContainerLayer container = new ContainerLayer();
+                    context.pushLayer(container, base.paint, offset, childPaintBounds: offsetBounds);
+                    return;
+                }
+
                 Paint paint = new Paint {color = this.color, style = PaintingStyle.fill};
                 canvas.drawPath(offsetPath, paint);
                 context.clipPathAndPaint(offsetPath, this.clipBehavior,
@@ -1298,6 +1418,8 @@ namespace Unity.UIWidgets.rendering {
 
     public delegate void PointerLeaveEventListener(PointerLeaveEvent evt);
 
+    public delegate void PointerScrollEventListener(PointerScrollEvent evt);
+
     public class RenderPointerListener : RenderProxyBoxWithHitTestBehavior {
         public RenderPointerListener(
             PointerDownEventListener onPointerDown = null,
@@ -1307,6 +1429,7 @@ namespace Unity.UIWidgets.rendering {
             PointerHoverEventListener onPointerHover = null,
             PointerLeaveEventListener onPointerLeave = null,
             PointerEnterEventListener onPointerEnter = null,
+            PointerScrollEventListener onPointerScroll = null,
             HitTestBehavior behavior = HitTestBehavior.deferToChild,
             RenderBox child = null
         ) : base(behavior: behavior, child: child) {
@@ -1317,6 +1440,7 @@ namespace Unity.UIWidgets.rendering {
             this.onPointerHover = onPointerHover;
             this.onPointerLeave = onPointerLeave;
             this.onPointerEnter = onPointerEnter;
+            this.onPointerScroll = onPointerScroll;
         }
 
         public PointerDownEventListener onPointerDown;
@@ -1332,6 +1456,8 @@ namespace Unity.UIWidgets.rendering {
         public PointerLeaveEventListener onPointerLeave;
 
         public PointerEnterEventListener onPointerEnter;
+
+        public PointerScrollEventListener onPointerScroll;
 
         protected override void performResize() {
             this.size = this.constraints.biggest;
@@ -1373,6 +1499,10 @@ namespace Unity.UIWidgets.rendering {
             if (this.onPointerEnter != null && evt is PointerEnterEvent) {
                 this.onPointerEnter((PointerEnterEvent) evt);
                 return;
+            }
+
+            if (this.onPointerScroll != null && evt is PointerScrollEvent) {
+                this.onPointerScroll((PointerScrollEvent) evt);
             }
         }
 

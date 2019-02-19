@@ -24,14 +24,13 @@ namespace Unity.UIWidgets.material {
             double? disabledElevation = null,
             EdgeInsets padding = null,
             ShapeBorder shape = null,
-            Clip clipBehavior = Clip.none,
+            Clip? clipBehavior = Clip.none,
             MaterialTapTargetSize? materialTapTargetSize = null,
             TimeSpan? animationDuration = null,
             double? minWidth = null,
             double? height = null,
             Widget child = null
         ) : base(key: key) {
-            D.assert(onPressed != null);
             this.onPressed = onPressed;
             this.onHighlightChanged = onHighlightChanged;
             this.textTheme = textTheme;
@@ -129,5 +128,9 @@ namespace Unity.UIWidgets.material {
             base.debugFillProperties(properties);
             properties.add(new FlagProperty("enabled", value: this.enabled, ifFalse: "disabled"));
         }
+    }
+
+
+    public interface MaterialButtonWithIconMixin {
     }
 }

@@ -19,6 +19,31 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
+
+    public class DecorationTween : Tween<Decoration> {
+        public DecorationTween(
+            Decoration begin = null,
+            Decoration end = null) : base(begin: begin, end: end) {
+        }
+
+        public override Decoration lerp(double t) {
+            return Decoration.lerp(this.begin, this.end, t);
+        }
+    }
+
+
+    public class EdgeInsetsTween : Tween<EdgeInsets> {
+        public EdgeInsetsTween(
+            EdgeInsets begin = null,
+            EdgeInsets end = null) : base(begin: begin, end: end) {
+        }
+
+        public override EdgeInsets lerp(double t) {
+            return EdgeInsets.lerp(this.begin, this.end, t);
+        }
+    }
+
+
     public class BorderRadiusTween : Tween<BorderRadius> {
         public BorderRadiusTween(
             BorderRadius begin = null,
@@ -27,6 +52,34 @@ namespace Unity.UIWidgets.widgets {
 
         public override BorderRadius lerp(double t) {
             return BorderRadius.lerp(this.begin, this.end, t);
+        }
+    }
+
+
+    public class BorderTween : Tween<Border> {
+        public BorderTween(
+            Border begin = null,
+            Border end = null) : base(begin: begin, end: end) {
+        }
+
+        public override Border lerp(double t) {
+            return Border.lerp(this.begin, this.end, t);
+        }
+    }
+
+
+    public class Matrix3Tween : Tween<Matrix3> {
+        public Matrix3Tween(
+            Matrix3 begin = null,
+            Matrix3 end = null) : base(begin: begin, end: end) {
+        }
+
+        //todo:xingwei.zhu implement full matrix3 lerp
+        public override Matrix3 lerp(double t) {
+            D.assert(this.begin != null);
+            D.assert(this.end != null);
+
+            return t < 0.5 ? this.begin : this.end;
         }
     }
 
@@ -197,6 +250,141 @@ namespace Unity.UIWidgets.widgets {
 
         void _handleAnimationChanged() {
             this.setState(() => { });
+        }
+    }
+
+
+    public class AnimatedContainer : ImplicitlyAnimatedWidget {
+        public AnimatedContainer(
+            Key key = null,
+            Alignment alignment = null,
+            EdgeInsets padding = null,
+            Color color = null,
+            Decoration decoration = null,
+            Decoration foregroundDecoration = null,
+            double? width = null,
+            double? height = null,
+            BoxConstraints constraints = null,
+            EdgeInsets margin = null,
+            Matrix3 transform = null,
+            Widget child = null,
+            Curve curve = null,
+            TimeSpan? duration = null
+        ) : base(key: key, curve: curve ?? Curves.linear, duration: duration) {
+            D.assert(duration != null);
+            D.assert(margin == null || margin.isNonNegative);
+            D.assert(padding == null || padding.isNonNegative);
+            D.assert(decoration == null || decoration.debugAssertIsValid());
+            D.assert(constraints == null || constraints.debugAssertIsValid());
+            D.assert(color == null || decoration == null,
+                "Cannot provide both a color and a decoration\n" +
+                "The color argument is just a shorthand for \"decoration: new BoxDecoration(backgroundColor: color)\".");
+            this.alignment = alignment;
+            this.padding = padding;
+            this.foregroundDecoration = foregroundDecoration;
+            this.margin = margin;
+            this.transform = transform;
+            this.child = child;
+            this.decoration = decoration ?? (color != null ? new BoxDecoration(color: color) : null);
+            this.constraints =
+                (width != null || height != null)
+                    ? constraints?.tighten(width: width, height: height)
+                      ?? BoxConstraints.tightFor(width: width, height: height)
+                    : constraints;
+        }
+
+        public readonly Widget child;
+
+        public readonly Alignment alignment;
+
+        public readonly EdgeInsets padding;
+
+        public readonly Decoration decoration;
+
+        public readonly Decoration foregroundDecoration;
+
+        public readonly BoxConstraints constraints;
+
+        public readonly EdgeInsets margin;
+
+        public readonly Matrix3 transform;
+
+
+        public override State createState() {
+            return new _AnimatedContainerState();
+        }
+
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new DiagnosticsProperty<Alignment>("alignment", this.alignment, showName: false,
+                defaultValue: null));
+            properties.add(new DiagnosticsProperty<EdgeInsets>("padding", this.padding, defaultValue: null));
+            properties.add(new DiagnosticsProperty<Decoration>("bg", this.decoration, defaultValue: null));
+            properties.add(
+                new DiagnosticsProperty<Decoration>("fg", this.foregroundDecoration, defaultValue: null));
+            properties.add(new DiagnosticsProperty<BoxConstraints>("constraints", this.constraints,
+                defaultValue: null,
+                showName: false));
+            properties.add(new DiagnosticsProperty<EdgeInsets>("margin", this.margin, defaultValue: null));
+            properties.add(ObjectFlagProperty<Matrix3>.has("transform", this.transform));
+        }
+    }
+
+    public class _AnimatedContainerState : AnimatedWidgetBaseState<AnimatedContainer> {
+        AlignmentTween _alignment;
+        EdgeInsetsTween _padding;
+        DecorationTween _decoration;
+        DecorationTween _foregroundDecoration;
+        BoxConstraintsTween _constraints;
+        EdgeInsetsTween _margin;
+        Matrix3Tween _transform;
+
+
+        protected override void forEachTween(ITweenVisitor visitor) {
+            this._alignment = (AlignmentTween) visitor.visit(this, this._alignment, this.widget.alignment,
+                (Alignment value) => new AlignmentTween(begin: value));
+            this._padding = (EdgeInsetsTween) visitor.visit(this, this._padding, this.widget.padding,
+                (EdgeInsets value) => new EdgeInsetsTween(begin: value));
+            this._decoration = (DecorationTween) visitor.visit(this, this._decoration, this.widget.decoration,
+                (Decoration value) => new DecorationTween(begin: value));
+            this._foregroundDecoration = (DecorationTween) visitor.visit(this, this._foregroundDecoration,
+                this.widget.foregroundDecoration, (Decoration value) => new DecorationTween(begin: value));
+            this._constraints = (BoxConstraintsTween) visitor.visit(this, this._constraints, this.widget.constraints,
+                (BoxConstraints value) => new BoxConstraintsTween(begin: value));
+            this._margin = (EdgeInsetsTween) visitor.visit(this, this._margin, this.widget.margin,
+                (EdgeInsets value) => new EdgeInsetsTween(begin: value));
+            this._transform = (Matrix3Tween) visitor.visit(this, this._transform, this.widget.transform,
+                (Matrix3 value) => new Matrix3Tween(begin: value));
+        }
+
+
+        public override Widget build(BuildContext context) {
+            return new Container(
+                child: this.widget.child,
+                alignment: this._alignment?.evaluate(this.animation),
+                padding: this._padding?.evaluate(this.animation),
+                decoration: this._decoration?.evaluate(this.animation),
+                forgroundDecoration: this._foregroundDecoration?.evaluate(this.animation),
+                constraints: this._constraints?.evaluate(this.animation),
+                margin: this._margin?.evaluate(this.animation),
+                transfrom: this._transform?.evaluate(this.animation)
+            );
+        }
+
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder description) {
+            base.debugFillProperties(description);
+            description.add(new DiagnosticsProperty<AlignmentTween>("alignment", this._alignment, showName: false,
+                defaultValue: null));
+            description.add(new DiagnosticsProperty<EdgeInsetsTween>("padding", this._padding, defaultValue: null));
+            description.add(new DiagnosticsProperty<DecorationTween>("bg", this._decoration, defaultValue: null));
+            description.add(
+                new DiagnosticsProperty<DecorationTween>("fg", this._foregroundDecoration, defaultValue: null));
+            description.add(new DiagnosticsProperty<BoxConstraintsTween>("constraints", this._constraints,
+                showName: false, defaultValue: null));
+            description.add(new DiagnosticsProperty<EdgeInsetsTween>("margin", this._margin, defaultValue: null));
+            description.add(ObjectFlagProperty<Matrix3Tween>.has("transform", this._transform));
         }
     }
 

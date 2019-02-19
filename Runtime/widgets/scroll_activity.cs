@@ -16,6 +16,8 @@ namespace Unity.UIWidgets.widgets {
 
         void applyUserOffset(double delta);
 
+        void applyUserScrollOffset(double delta);
+
         void goIdle();
 
         void goBallistic(double velocity);
@@ -250,6 +252,22 @@ namespace Unity.UIWidgets.widgets {
             D.assert(details.primaryDelta != null);
             this._lastDetails = details;
             double offset = details.primaryDelta.Value;
+
+            if (details.isScroll) {
+                if (offset == 0.0) {
+                    return;
+                }
+
+                if (this._reversed) {
+                    offset = -offset;
+                }
+
+
+                this.del.applyUserScrollOffset(offset);
+                return;
+            }
+
+
             if (offset != 0.0) {
                 this._lastNonStationaryTimestamp = details.sourceTimeStamp;
             }

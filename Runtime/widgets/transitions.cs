@@ -1,5 +1,7 @@
-﻿using Unity.UIWidgets.animation;
+﻿using System;
+using Unity.UIWidgets.animation;
 using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
 
@@ -87,6 +89,36 @@ namespace Unity.UIWidgets.widgets {
                 transformHitTests: this.transformHitTests,
                 child: this.child
             );
+        }
+    }
+
+
+    public class RotationTransition : AnimatedWidget {
+        public RotationTransition(
+            Key key = null,
+            Animation<double> turns = null,
+            Alignment alignment = null,
+            Widget child = null) : base(key: key, listenable: turns) {
+            D.assert(turns != null);
+            this.alignment = alignment ?? Alignment.center;
+            this.child = child;
+        }
+
+        public Animation<double> turns {
+            get { return (Animation<double>) this.listenable; }
+        }
+
+        public readonly Alignment alignment;
+
+        public readonly Widget child;
+
+        protected internal override Widget build(BuildContext context) {
+            double turnsValue = this.turns.value;
+            Matrix3 transform = Matrix3.makeRotate((float) (turnsValue * Math.PI * 2.0));
+            return new Transform(
+                transform: transform,
+                alignment: this.alignment,
+                child: this.child);
         }
     }
 

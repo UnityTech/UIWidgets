@@ -9,7 +9,7 @@ namespace Unity.UIWidgets.widgets {
 
         bool shouldRepaint(CustomPainter oldDelegate);
 
-        bool hitTest(Offset position);
+        bool? hitTest(Offset position);
     }
 
     public abstract class AbstractCustomPainter : CustomPainter {
@@ -31,8 +31,8 @@ namespace Unity.UIWidgets.widgets {
 
         public abstract bool shouldRepaint(CustomPainter oldDelegate);
 
-        public virtual bool hitTest(Offset position) {
-            return true;
+        public virtual bool? hitTest(Offset position) {
+            return null;
         }
 
         public override string ToString() {
@@ -136,7 +136,7 @@ namespace Unity.UIWidgets.widgets {
         }
 
         protected override bool hitTestChildren(HitTestResult result, Offset position) {
-            if (this._foregroundPainter != null && (this._foregroundPainter.hitTest(position))) {
+            if (this._foregroundPainter != null && ((this._foregroundPainter.hitTest(position)) ?? false)) {
                 return true;
             }
 
@@ -145,7 +145,7 @@ namespace Unity.UIWidgets.widgets {
 
 
         protected override bool hitTestSelf(Offset position) {
-            return this._painter != null && this._painter.hitTest(position);
+            return this._painter != null && (this._painter.hitTest(position) ?? true);
         }
 
         protected override void performResize() {
