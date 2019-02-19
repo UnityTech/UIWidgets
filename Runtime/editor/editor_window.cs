@@ -311,7 +311,7 @@ namespace Unity.UIWidgets.editor {
             }
 
             if (this._textInput != null) {
-                this._textInput.OnGUI();
+                this._textInput.keyboardManager.OnGUI();
             }
         }
 
@@ -319,6 +319,10 @@ namespace Unity.UIWidgets.editor {
             Timer.update();
 
             using (this.getScope()) {
+                if (this._textInput != null) {
+                    this._textInput.keyboardManager.Update();
+                }
+            
                 this._timerProvider.update(this.flushMicrotasks);
                 this.flushMicrotasks();
             }

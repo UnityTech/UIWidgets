@@ -1,9 +1,102 @@
 ﻿using System;
+using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
 using UnityEngine;
 
 namespace Unity.UIWidgets.service {
+
+    public class TextInputType:IEquatable<TextInputType> {
+        public readonly int index;
+        public readonly bool? signed;
+        public readonly bool? decimalNum;
+
+        TextInputType(int index, bool? signed = null, bool? decimalNum = null) {
+            this.index = index;
+            this.signed = signed;
+            this.decimalNum = decimalNum;
+        }
+
+        public static TextInputType numberWithOptions(bool signed = false, bool decimalNum = false) {
+            return new TextInputType(2, signed: signed, decimalNum: decimalNum);
+        }
+        
+        public static readonly TextInputType text = new TextInputType(0);
+        public static readonly TextInputType multiline = new TextInputType(1);
+        
+        public static readonly TextInputType number = numberWithOptions();
+        
+        public static readonly TextInputType phone = new TextInputType(3);
+        
+        public static readonly TextInputType datetime = new TextInputType(4);
+        
+        public static readonly TextInputType emailAddress = new TextInputType(5);
+        
+        public static readonly TextInputType url = new TextInputType(6);
+
+        public static List<string> _names = new List<string> {
+            "text", "multiline", "number", "phone", "datetime", "emailAddress", "url"
+        };
+
+        public Dictionary<string, object> toJson() {
+            return new Dictionary<string, object>() {
+                {"name", this._name},
+                {"signed", this.signed},
+                {"decimal", this.decimalNum}
+            };
+        }
+        string  _name => $"TextInputType.{_names[this.index]}";
+
+        public bool Equals(TextInputType other) {
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
+
+            return this.index == other.index && this.signed == other.signed && this.decimalNum == other.decimalNum;
+        }
+
+        public override bool Equals(object obj) {
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
+
+            return this.Equals((TextInputType) obj);
+        }
+
+        public override int GetHashCode() {
+            unchecked {
+                var hashCode = this.index;
+                hashCode = (hashCode * 397) ^ this.signed.GetHashCode();
+                hashCode = (hashCode * 397) ^ this.decimalNum.GetHashCode();
+                return hashCode;
+            }
+        }
+
+        public static bool operator ==(TextInputType left, TextInputType right) {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(TextInputType left, TextInputType right) {
+            return !Equals(left, right);
+        }
+
+        public override string ToString() {
+            return $"{this.GetType().FullName}(name: {this._name}, signed: {this.signed}, decimal: {this.decimalNum})";
+        }
+    }
+    
     public class TextEditingValue : IEquatable<TextEditingValue> {
         public readonly string text;
         public readonly TextSelection selection;
@@ -247,7 +340,32 @@ namespace Unity.UIWidgets.service {
         scrollPageUp,
         scrollPageDown,
     }
-    // text client
+
+    public class TextInputConfiguration {
+
+        public TextInputConfiguration(TextInputType inputType = null, 
+            bool obscureText = false, bool autocorrect = true, TextInputAction inputAction = TextInputAction.done) {
+            this.inputType = inputType ?? TextInputType.text;
+            this.inputAction = inputAction;
+            this.obscureText = obscureText;
+            this.autocorrect = autocorrect;
+        }
+        
+        public readonly TextInputType inputType;
+        public readonly bool obscureText;
+        public readonly bool autocorrect;
+        public readonly TextInputAction inputAction;
+
+        public Dictionary<string, object> toJson() {
+            return new Dictionary<string, object>() {
+                {"inputType", this.inputType.toJson()},
+                {"obscureText", this.obscureText},
+                {"autocorrect", this.autocorrect},
+                {"inputAction", this.inputAction.ToString()}
+            };
+        }
+        
+    }
 
     public class TextInputConnection {
         internal TextInputConnection(TextInputClient client, TextInput textInput) {
@@ -264,7 +382,7 @@ namespace Unity.UIWidgets.service {
 
         public void setEditingState(TextEditingValue value) {
             D.assert(this.attached);
-            this._textInput._value = value;
+            this._textInput.keyboardManager.setEditingState(value);
         }
 
         public void setCompositionCursorPos(double x, double y) {
@@ -274,93 +392,87 @@ namespace Unity.UIWidgets.service {
 
         public void close() {
             if (this.attached) {
+                this._textInput.keyboardManager.clearClient();
                 this._textInput._currentConnection = null;
-                this._textInput._value = null;
                 Input.imeCompositionMode = IMECompositionMode.Auto;
+                this._textInput._scheduleHide();
             }
 
             D.assert(!this.attached);
+        }
+
+        public void show() {
+            D.assert(this.attached);
+            Input.imeCompositionMode = IMECompositionMode.On;
+            this._textInput.keyboardManager.show();
         }
 
         static int _nextId = 1;
         internal readonly int _id;
         internal readonly TextInputClient _client;
         internal readonly TextInput _textInput;
+        TouchScreenKeyboard _keyboard;
     }
 
     public class TextInput {
         internal TextInputConnection _currentConnection;
-        internal TextEditingValue _value;
-        string _lastCompositionString;
+  
+        public readonly KeyboadManager keyboardManager;
 
-        public TextInputConnection attach(TextInputClient client) {
+        public TextInput() {
+            this.keyboardManager = new KeyboadManager(this);
+        }
+        
+        public TextInputConnection attach(TextInputClient client, TextInputConfiguration configuration) {
             D.assert(client != null);
             var connection = new TextInputConnection(client, this);
+            this.keyboardManager.setClient(connection._id, configuration);
             this._currentConnection = connection;
-            Input.imeCompositionMode = IMECompositionMode.On;
             return connection;
-        }
-
-        public void OnGUI() {
-            if (this._currentConnection == null) {
-                return;
-            }
-
-            var currentEvent = Event.current;
-            if (currentEvent.type == EventType.KeyDown) {
-                var action = TextInputUtils.getInputAction(currentEvent);
-                if (action != null) {
-                    this._performAction(this._currentConnection._id, action.Value);
-                }
-
-                if (action == null || action == TextInputAction.newline) {
-                    if (currentEvent.keyCode == KeyCode.None) {
-                        this._value = this._value.clearCompose().insert(new string(currentEvent.character, 1));
-                        this._updateEditingState(this._currentConnection._id, this._value);
-                    }
-                }
-
-                currentEvent.Use();
-            }
-
-            if (!string.IsNullOrEmpty(Input.compositionString) &&
-                this._lastCompositionString != Input.compositionString) {
-                this._value = this._value.compose(Input.compositionString);
-                this._updateEditingState(this._currentConnection._id, this._value);
-            }
-
-            this._lastCompositionString = Input.compositionString;
         }
 
         public void setCompositionCursorPos(double x, double y) {
             Input.compositionCursorPos = new Vector2((float) x, (float) y);
         }
 
-        void _updateEditingState(int client, TextEditingValue value) {
-            Window.instance.run(() => {
-                if (this._currentConnection == null) {
-                    return;
-                }
+        internal void _updateEditingState(int client, TextEditingValue value) {
+            if (this._currentConnection == null) {
+                return;
+            }
 
-                if (client != this._currentConnection._id) {
-                    return;
-                }
+            if (client != this._currentConnection._id) {
+                return;
+            }
 
-                this._currentConnection._client.updateEditingValue(value);
-            });
+            this._currentConnection._client.updateEditingValue(value);
         }
 
-        void _performAction(int client, TextInputAction action) {
-            Window.instance.run(() => {
+        internal void _performAction(int client, TextInputAction action) {
+            if (this._currentConnection == null) {
+                return;
+            }
+
+            if (client != this._currentConnection._id) {
+                return;
+            }
+
+            this._currentConnection._client.performAction(action);
+        }
+        
+        
+        bool _hidePending = false;
+        internal void _scheduleHide() {
+            if (this._hidePending) {
+                return;
+            }
+            this._hidePending = true;
+            
+            Window.instance.scheduleMicrotask(() => {
+                this._hidePending = false;
                 if (this._currentConnection == null) {
-                    return;
-                }
+                    this.keyboardManager.hide();
 
-                if (client != this._currentConnection._id) {
-                    return;
                 }
-
-                this._currentConnection._client.performAction(action);
             });
         }
     }
