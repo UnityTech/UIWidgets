@@ -47,6 +47,23 @@ namespace Unity.UIWidgets.gestures {
 
         readonly Dictionary<int, VelocityTracker> _velocityTrackers = new Dictionary<int, VelocityTracker>();
 
+        public override void addScrollPointer(PointerScrollEvent evt) {
+            this.startTrackingScrollerPointer(evt.pointer);
+            if (this._state == _DragState.ready) {
+                this._state = _DragState.possible;
+                this._initialPosition = evt.position;
+                if (this.onStart != null) {
+                    this.invokeCallback<object>("onStart", () => {
+                        this.onStart(new DragStartDetails(
+                            sourceTimeStamp: evt.timeStamp,
+                            globalPosition: this._initialPosition
+                        ));
+                        return null;
+                    });
+                }
+            }
+        }
+
         public override void addPointer(PointerDownEvent evt) {
             this.startTrackingPointer(evt.pointer);
             this._velocityTrackers[evt.pointer] = new VelocityTracker();
@@ -75,6 +92,35 @@ namespace Unity.UIWidgets.gestures {
                 var tracker = this._velocityTrackers[evt.pointer];
                 D.assert(tracker != null);
                 tracker.addPosition(evt.timeStamp, evt.position);
+            }
+
+            if (evt is PointerScrollEvent) {
+                Offset delta = evt.delta;
+                if (this.onUpdate != null) {
+                    this.invokeCallback<object>("onUpdate", () => {
+                        this.onUpdate(new DragUpdateDetails(
+                            sourceTimeStamp: evt.timeStamp,
+                            delta: this._getDeltaForDetails(delta),
+                            primaryDelta: this._getPrimaryValueFromOffset(delta),
+                            globalPosition: evt.position,
+                            isScroll: true
+                        ));
+                        return null;
+                    });
+                }
+
+                this.invokeCallback<object>("onEnd", () => {
+                        this.onEnd(new DragEndDetails(
+                            velocity: Velocity.zero,
+                            primaryVelocity: 0.0
+                        ));
+                        return null;
+                    }, debugReport: () => { return ""; }
+                );
+
+
+                this._state = _DragState.ready;
+                return;
             }
 
             if (evt is PointerMoveEvent) {

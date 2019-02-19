@@ -1418,6 +1418,8 @@ namespace Unity.UIWidgets.rendering {
 
     public delegate void PointerLeaveEventListener(PointerLeaveEvent evt);
 
+    public delegate void PointerScrollEventListener(PointerScrollEvent evt);
+
     public class RenderPointerListener : RenderProxyBoxWithHitTestBehavior {
         public RenderPointerListener(
             PointerDownEventListener onPointerDown = null,
@@ -1427,6 +1429,7 @@ namespace Unity.UIWidgets.rendering {
             PointerHoverEventListener onPointerHover = null,
             PointerLeaveEventListener onPointerLeave = null,
             PointerEnterEventListener onPointerEnter = null,
+            PointerScrollEventListener onPointerScroll = null,
             HitTestBehavior behavior = HitTestBehavior.deferToChild,
             RenderBox child = null
         ) : base(behavior: behavior, child: child) {
@@ -1437,6 +1440,7 @@ namespace Unity.UIWidgets.rendering {
             this.onPointerHover = onPointerHover;
             this.onPointerLeave = onPointerLeave;
             this.onPointerEnter = onPointerEnter;
+            this.onPointerScroll = onPointerScroll;
         }
 
         public PointerDownEventListener onPointerDown;
@@ -1452,6 +1456,8 @@ namespace Unity.UIWidgets.rendering {
         public PointerLeaveEventListener onPointerLeave;
 
         public PointerEnterEventListener onPointerEnter;
+
+        public PointerScrollEventListener onPointerScroll;
 
         protected override void performResize() {
             this.size = this.constraints.biggest;
@@ -1493,6 +1499,10 @@ namespace Unity.UIWidgets.rendering {
             if (this.onPointerEnter != null && evt is PointerEnterEvent) {
                 this.onPointerEnter((PointerEnterEvent) evt);
                 return;
+            }
+
+            if (this.onPointerScroll != null && evt is PointerScrollEvent) {
+                this.onPointerScroll((PointerScrollEvent) evt);
             }
         }
 

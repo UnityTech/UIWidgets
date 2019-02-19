@@ -349,6 +349,13 @@ namespace Unity.UIWidgets.widgets {
             }
         }
 
+        void _handlePointerScroll(PointerScrollEvent evt) {
+            D.assert(this._recognizers != null);
+            foreach (GestureRecognizer recognizer in this._recognizers.Values) {
+                recognizer.addScrollPointer(evt);
+            }
+        }
+
         HitTestBehavior _defaultBehavior {
             get { return this.widget.child == null ? HitTestBehavior.translucent : HitTestBehavior.deferToChild; }
         }
@@ -357,6 +364,7 @@ namespace Unity.UIWidgets.widgets {
         public override Widget build(BuildContext context) {
             Widget result = new Listener(
                 onPointerDown: this._handlePointerDown,
+                onPointerScroll: this._handlePointerScroll,
                 behavior: this.widget.behavior ?? this._defaultBehavior,
                 child: this.widget.child
             );

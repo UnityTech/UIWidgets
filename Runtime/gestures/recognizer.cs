@@ -17,6 +17,9 @@ namespace Unity.UIWidgets.gestures {
 
         public abstract void addPointer(PointerDownEvent evt);
 
+        public virtual void addScrollPointer(PointerScrollEvent evt) {
+        }
+
         public virtual void dispose() {
         }
 
@@ -124,6 +127,10 @@ namespace Unity.UIWidgets.gestures {
             }
 
             return GestureBinding.instance.gestureArena.add(pointer, this);
+        }
+
+        protected void startTrackingScrollerPointer(int pointer) {
+            GestureBinding.instance.pointerRouter.addRoute(pointer, this.handleEvent);
         }
 
         protected void startTrackingPointer(int pointer) {

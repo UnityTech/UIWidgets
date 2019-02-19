@@ -1453,6 +1453,7 @@ namespace Unity.UIWidgets.widgets {
             PointerHoverEventListener onPointerHover = null,
             PointerLeaveEventListener onPointerLeave = null,
             PointerEnterEventListener onPointerEnter = null,
+            PointerScrollEventListener onPointerScroll = null,
             HitTestBehavior behavior = HitTestBehavior.deferToChild,
             Widget child = null
         ) : base(key: key, child: child) {
@@ -1463,6 +1464,7 @@ namespace Unity.UIWidgets.widgets {
             this.onPointerHover = onPointerHover;
             this.onPointerLeave = onPointerLeave;
             this.onPointerEnter = onPointerEnter;
+            this.onPointerScroll = onPointerScroll;
             this.behavior = behavior;
         }
 
@@ -1480,6 +1482,8 @@ namespace Unity.UIWidgets.widgets {
 
         public readonly PointerLeaveEventListener onPointerLeave;
 
+        public readonly PointerScrollEventListener onPointerScroll;
+
         public readonly HitTestBehavior behavior;
 
         public override RenderObject createRenderObject(BuildContext context) {
@@ -1491,6 +1495,7 @@ namespace Unity.UIWidgets.widgets {
                 onPointerEnter: this.onPointerEnter,
                 onPointerLeave: this.onPointerLeave,
                 onPointerHover: this.onPointerHover,
+                onPointerScroll: this.onPointerScroll,
                 behavior: this.behavior
             );
         }
@@ -1504,6 +1509,7 @@ namespace Unity.UIWidgets.widgets {
             renderObject.onPointerEnter = this.onPointerEnter;
             renderObject.onPointerHover = this.onPointerHover;
             renderObject.onPointerLeave = this.onPointerLeave;
+            renderObject.onPointerScroll = this.onPointerScroll;
             renderObject.behavior = this.behavior;
         }
 
@@ -1536,6 +1542,10 @@ namespace Unity.UIWidgets.widgets {
 
             if (this.onPointerLeave != null) {
                 listeners.Add("leave");
+            }
+
+            if (this.onPointerScroll != null) {
+                listeners.Add("scroll");
             }
 
             properties.add(new EnumerableProperty<string>("listeners", listeners, ifEmpty: "<none>"));

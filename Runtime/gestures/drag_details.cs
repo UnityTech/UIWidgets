@@ -41,11 +41,13 @@ namespace Unity.UIWidgets.gestures {
             TimeSpan sourceTimeStamp,
             Offset delta = null,
             double? primaryDelta = null,
-            Offset globalPosition = null) {
+            Offset globalPosition = null,
+            bool isScroll = false) {
             this.sourceTimeStamp = sourceTimeStamp;
             this.delta = delta ?? Offset.zero;
             this.primaryDelta = primaryDelta;
             this.globalPosition = globalPosition ?? Offset.zero;
+            this.isScroll = isScroll;
             D.assert(primaryDelta == null
                      || primaryDelta == this.delta.dx && this.delta.dy == 0.0
                      || primaryDelta == this.delta.dy && this.delta.dx == 0.0);
@@ -58,6 +60,8 @@ namespace Unity.UIWidgets.gestures {
         public readonly double? primaryDelta;
 
         public readonly Offset globalPosition;
+
+        public readonly bool isScroll;
 
         public override string ToString() {
             return this.GetType() + "(" + this.delta + ")";
