@@ -3,6 +3,29 @@
 
 ## Introduction
 
+UIWidget is a plugin package of Unity Editor which helps developers to create, debug and deploy efficient, 
+cross-platform Apps using Unity Engine. 
+
+UIWidget is mainly derived from Flutter @https://github.com/flutter/flutter. However, taking advantage of
+the powerful Unity Engine, it offers developers many new features to improve their Apps 
+as well as the develop workflow significantly.
+
+
+#### Efficiency
+Using the latest Unity rendering SDKs, a UIWidget App can run very fast and keep >60fps in most times.
+
+
+#### Cross-Platform
+A UIWidget App can be deployed on all kinds of platforms including PCs, mobile devices and web page directly, like 
+any other Unity projects.
+
+#### 3D-Support
+Except for basic 2D UIs, Developers are also able to include 3D Models, particle-systems to their UIWidget Apps.
+
+
+#### Developer-Friendliness
+A UIWidget App can be debug in the Unity Editor directly with many advanced tools like
+CPU/GPU Profiling, FPS Profiling.
 
 ## Requirement
 
@@ -41,7 +64,7 @@ Generally, you can make it using a console (or terminal) application by just a f
 #### Wiki
 
 
-## Contribute
+## How to Contribute
 
 
 #### Code Style
