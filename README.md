@@ -20,7 +20,7 @@ A UIWidget App can be deployed on all kinds of platforms including PCs, mobile d
 any other Unity projects.
 
 #### 3D-Support
-Except for basic 2D UIs, Developers are also able to include 3D Models, particle-systems to their UIWidget Apps.
+Except for basic 2D UIs, developers are also able to include 3D Models, particle-systems to their UIWidget Apps.
 
 
 #### Developer-Friendliness
@@ -136,7 +136,7 @@ Feel free to try them out and make modifications to see the results.
 #### Wiki
 The develop team is still working on the UIWidget Wiki. However, since UIWidget is mainly derived from Flutter,
  you can refer to Flutter Wiki to access detailed descriptions of UIWidget APIs 
- from those of their Flutter counterparts. 
+ from those of their Flutter counterparts.
 
 ## How to Contribute
 If you want to join us, please contact us via Github and we will respond as soon as possible.
