@@ -139,7 +139,7 @@ The develop team is still working on the UIWidget Wiki. However, since UIWidget 
  from those of their Flutter counterparts. 
 
 ## How to Contribute
-
+If you want to join us, please contact us via Github and we will respond as soon as possible.
 
 #### Code Style
 1. **Import the Customized Code Cleanup Settings**: Open Preferences -> Manage Layers, 
