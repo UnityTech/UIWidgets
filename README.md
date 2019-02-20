@@ -23,9 +23,10 @@ any other Unity projects.
 Except for basic 2D UIs, developers are also able to include 3D Models, particle-systems to their UIWidget Apps.
 
 
-#### Developer-Friendliness
+#### Developer-Friendly
 A UIWidget App can be debug in the Unity Editor directly with many advanced tools like
 CPU/GPU Profiling, FPS Profiling.
+
 
 ## Requirement
 
@@ -33,7 +34,7 @@ CPU/GPU Profiling, FPS Profiling.
 Install **Unity 2018.3** or above. You can download the latest Unity on https://unity3d.com/get-unity/download.
 
 #### UIWidget Package
-Visit our Github repository https://gitlab.cds.internal.unity3d.com/upm-packages/ui-widgets/com.unity.uiwidgets.git
+Visit our Github repository https://github.com/UnityTech/UIWidgets
  to download the latest UIWidget package.
  
 Move the downloaded package folder into the **Package** folder of your Unity project.
@@ -42,7 +43,7 @@ Generally, you can make it using a console (or terminal) application by just a f
     
    ```none
     cd <YourProjectPath>/Packages
-    git clone https://gitlab.cds.internal.unity3d.com/upm-packages/ui-widgets/com.unity.uiwidgets.git com.unity.uiwidgets
+    git clone https://github.com/UnityTech/UIWidgets.git com.unity.uiwidgets
    ```
 
 ## Getting Start
@@ -133,10 +134,25 @@ all relevant resources and generate the final App package.
 You can find many UIWidget App samples in the UIWidget package in the **Samples** folder.
 Feel free to try them out and make modifications to see the results.
 
+You can also try UIWidget-based Editor windows by clicking **UIWidgetsTest** on the main menu 
+and open one of the dropdown samples.
+
 #### Wiki
 The develop team is still working on the UIWidget Wiki. However, since UIWidget is mainly derived from Flutter,
  you can refer to Flutter Wiki to access detailed descriptions of UIWidget APIs 
  from those of their Flutter counterparts.
+ 
+#### FAQ
+
+| Question     | Answer  |
+| :-----------------------------------------------| -----------: |
+| Can I create standalone App using UIWidget?     | **Yes**  |
+| Can I use UIWidget to build game UIs?   | **Yes**    |
+| Can I develop Unity Editor plugins using UIWidget?  | **Yes** |
+| Is UIWidget a extension of UGUI/NGUI? | **No** |
+| Is UIWidget just a copy of Flutter? | **No** | 
+| Can I create UI with UIWidget by simply drag&drop? | **No** |
+| Do I have to pay for using UIWidget? | **No** |
 
 ## How to Contribute
 If you want to join us, please contact us via Github and we will respond as soon as possible.
