@@ -598,7 +598,7 @@ namespace Unity.UIWidgets.rendering {
             D.assert(this._textLayoutLastWidth == this.constraints.maxWidth);
             var effectiveOffset = offset + this._paintOffset;
 
-            if (this._selection != null) {
+            if (this._selection != null && this._selection.isValid) {
                 if (this._selection.isCollapsed && this._showCursor.value && this.cursorColor != null) {
                     this._paintCaret(context.canvas, effectiveOffset);
                 }

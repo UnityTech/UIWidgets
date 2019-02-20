@@ -4,8 +4,11 @@ using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.material;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
+using Unity.UIWidgets.service;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
+using UnityEngine;
+using Color = Unity.UIWidgets.ui.Color;
 using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace UIWidgetsSample {
@@ -23,7 +26,8 @@ namespace UIWidgetsSample {
         }
 
         protected override Widget getWidget() {
-            return new TextInputSample(key: null, title: this.gameObject.name);
+            return new EditableInputTypeWidget();
+            // return new TextInputSample(key: null, title: this.gameObject.name);
         }
 
         class _TextInputSampleState : State<TextInputSample> {
@@ -119,6 +123,96 @@ namespace UIWidgetsSample {
                 );
                 return container;
             }
+        }
+    }
+
+    public class EditableInputTypeWidget : StatelessWidget {
+
+        Widget rowWidgets(string title, Widget widget) {
+            return new Container(
+                height: 80,
+                //width:300,
+                child: new Row(
+                    children: new List<Widget> {
+                        new Container(width: 100, child: new Text(title)),
+                        new Flexible(child: new Container(child: widget, padding: EdgeInsets.all(4), decoration: 
+                            new BoxDecoration(border: Border.all(color: Color.black))))
+                       // widget,
+                    }
+            ));
+        }
+
+        void textSubmitted(string text) {
+            Debug.Log($"text submitted {text}");
+        }
+        
+        public override Widget build(BuildContext context) {
+            List<Widget> widgets = new List<Widget>();
+            var style = new TextStyle();
+            var cursorColor = new Color(0xFF000000);
+            widgets.Add(this.rowWidgets("Default", new EditStateProvider(builder: ((buildContext, controller, node) => 
+                    new EditableText(controller, node, style, cursorColor, onSubmitted:this.textSubmitted)))));
+            
+            widgets.Add(this.rowWidgets("Multiple Line", new EditStateProvider(builder: ((buildContext, controller, node) => 
+                new EditableText(controller, node, style, cursorColor, maxLines: 4, onSubmitted:this.textSubmitted)))));
+            
+            widgets.Add(this.rowWidgets("ObscureText", new EditStateProvider(builder: ((buildContext, controller, node) => 
+                new EditableText(controller, node, style, cursorColor, obscureText: true, onSubmitted:this.textSubmitted)))));
+            
+            widgets.Add(this.rowWidgets("Number", new EditStateProvider(builder: ((buildContext, controller, node) => 
+                new EditableText(controller, node, style, cursorColor, keyboardType: TextInputType.number, onSubmitted:this.textSubmitted)))));
+            
+            widgets.Add(this.rowWidgets("Phone", new EditStateProvider(builder: ((buildContext, controller, node) => 
+                new EditableText(controller, node, style, cursorColor, keyboardType: TextInputType.phone, onSubmitted:this.textSubmitted)))));
+            
+            widgets.Add(this.rowWidgets("Email", new EditStateProvider(builder: ((buildContext, controller, node) => 
+                new EditableText(controller, node, style, cursorColor, keyboardType: TextInputType.emailAddress, onSubmitted:this.textSubmitted)))));
+            
+            widgets.Add(this.rowWidgets("Url", new EditStateProvider(builder: ((buildContext, controller, node) => 
+                new EditableText(controller, node, style, cursorColor, keyboardType: TextInputType.url, onSubmitted:this.textSubmitted)))));
+            
+            return new Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: widgets);
+        }
+    }
+    
+    public class EditStateProvider : StatefulWidget {
+
+        public delegate EditableText EditableBuilder(BuildContext context,
+            TextEditingController controller, FocusNode focusNode);
+
+        public readonly EditableBuilder builder;
+        public EditStateProvider(Key key = null, EditableBuilder builder = null) : base(key) {
+            D.assert(builder != null);
+            this.builder = builder;
+        }
+
+        public override State createState() {
+            return new _EditStateProviderState();
+        }
+    }
+
+    internal class _EditStateProviderState : State<EditStateProvider> {
+
+        TextEditingController _controller;
+        FocusNode _focusNode;
+        
+        public override void initState() {
+            base.initState();
+            this._focusNode = new FocusNode();
+            this._controller = new TextEditingController("");
+            
+        }
+        
+        
+        public override void dispose() {
+            this._focusNode.dispose();
+            base.dispose();
+        }
+        
+        public override Widget build(BuildContext context) {
+            return this.widget.builder(context, this._controller, this._focusNode);
         }
     }
 }

@@ -75,13 +75,17 @@ namespace Unity.UIWidgets.widgets {
 
         public readonly Color cursorColor;
 
-        public readonly int maxLines;
+        public readonly int? maxLines;
 
         public readonly bool autofocus;
 
         public readonly Color selectionColor;
 
         public readonly TextSelectionControls selectionControls;
+
+        public readonly TextInputType keyboardType;
+
+        public readonly TextInputAction? textInputAction;
 
         public readonly ValueChanged<string> onChanged;
         public readonly VoidCallback onEditingComplete;
@@ -96,8 +100,9 @@ namespace Unity.UIWidgets.widgets {
         public EditableText(TextEditingController controller, FocusNode focusNode, TextStyle style,
             Color cursorColor, bool obscureText = false, bool autocorrect = false,
             TextAlign textAlign = TextAlign.left, TextDirection? textDirection = null,
-            double? textScaleFactor = null, int maxLines = 1,
+            double? textScaleFactor = null, int? maxLines = 1,
             bool autofocus = false, Color selectionColor = null, TextSelectionControls selectionControls = null,
+            TextInputType keyboardType = null, TextInputAction? textInputAction = null,
             ValueChanged<string> onChanged = null, VoidCallback onEditingComplete = null,
             ValueChanged<string> onSubmitted = null, SelectionChangedCallback onSelectionChanged = null,
             List<TextInputFormatter> inputFormatters = null, bool rendererIgnoresPointer = false,
@@ -107,6 +112,8 @@ namespace Unity.UIWidgets.widgets {
             D.assert(focusNode != null);
             D.assert(style != null);
             D.assert(cursorColor != null);
+            D.assert(maxLines == null || maxLines > 0);
+            this.keyboardType = keyboardType ?? (maxLines == 1 ? TextInputType.text : TextInputType.multiline);
             this.scrollPadding = scrollPadding ?? EdgeInsets.all(20.0);
             this.controller = controller;
             this.focusNode = focusNode;
@@ -116,6 +123,7 @@ namespace Unity.UIWidgets.widgets {
             this.textAlign = textAlign;
             this.textDirection = textDirection;
             this.textScaleFactor = textScaleFactor;
+            this.textInputAction = textInputAction;
             this.cursorColor = cursorColor;
             this.maxLines = maxLines;
             this.autofocus = autofocus;
@@ -160,8 +168,9 @@ namespace Unity.UIWidgets.widgets {
                 defaultValue: Diagnostics.kNullDefaultValue));
             properties.add(new DiagnosticsProperty<double?>("textScaleFactor", this.textScaleFactor,
                 defaultValue: Diagnostics.kNullDefaultValue));
-            properties.add(new DiagnosticsProperty<int>("maxLines", this.maxLines, defaultValue: 1));
+            properties.add(new DiagnosticsProperty<int?>("maxLines", this.maxLines, defaultValue: 1));
             properties.add(new DiagnosticsProperty<bool>("autofocus", this.autofocus, defaultValue: false));
+            properties.add(new DiagnosticsProperty<TextInputType>("keyboardType", this.keyboardType, defaultValue: null));
         }
     }
 
@@ -475,9 +484,16 @@ namespace Unity.UIWidgets.widgets {
             if (!this._hasInputConnection) {
                 TextEditingValue localValue = this._value;
                 this._lastKnownRemoteTextEditingValue = localValue;
-                this._textInputConnection = Window.instance.textInput.attach(this);
+                this._textInputConnection = Window.instance.textInput.attach(this, new TextInputConfiguration(
+                    inputType: this.widget.keyboardType,
+                    obscureText: this.widget.obscureText,
+                    autocorrect: this.widget.autocorrect,
+                    inputAction: this.widget.textInputAction ?? ((this.widget.keyboardType == TextInputType.multiline) ? 
+                                     TextInputAction.newline: TextInputAction.done)
+                    ));
                 this._textInputConnection.setEditingState(localValue);
             }
+            this._textInputConnection.show();
         }
 
         void _closeInputConnectionIfNeeded() {
@@ -658,7 +674,8 @@ namespace Unity.UIWidgets.widgets {
         }
 
         void _startOrStopCursorTimerIfNeeded() {
-            if (this._cursorTimer == null && this._hasFocus && this._value.selection.isCollapsed) {
+            if (this._cursorTimer == null && this._hasFocus && this._value.selection.isCollapsed && 
+                !Window.instance.textInput.keyboardManager.textInputOnKeyboard()) {
                 this._startCursorTimer();
             }
             else if (this._cursorTimer != null && (!this._hasFocus || !this._value.selection.isCollapsed)) {
@@ -788,7 +805,7 @@ namespace Unity.UIWidgets.widgets {
             if (this.widget.obscureText) {
                 text = new string(RenderEditable.obscuringCharacter, text.Length);
                 int o = this._obscureShowCharTicksPending > 0 ? this._obscureLatestCharIndex : -1;
-                if (o >= 0 && o < text.Length) {
+                if (!Window.instance.textInput.keyboardManager.textInputOnKeyboard() && o >= 0 && o < text.Length) {
                     text = text.Substring(0, o) + this._value.text.Substring(o, 1) + text.Substring(o + 1);
                 }
             }
@@ -804,7 +821,7 @@ namespace Unity.UIWidgets.widgets {
         public readonly Color cursorColor;
         public readonly ValueNotifier<bool> showCursor;
         public readonly bool hasFocus;
-        public readonly int maxLines;
+        public readonly int? maxLines;
         public readonly Color selectionColor;
         public readonly double textScaleFactor;
         public readonly TextAlign textAlign;
@@ -819,7 +836,7 @@ namespace Unity.UIWidgets.widgets {
 
         public _Editable(TextSpan textSpan = null, TextEditingValue value = null,
             Color cursorColor = null, ValueNotifier<bool> showCursor = null, bool hasFocus = false,
-            int maxLines = 0, Color selectionColor = null, double textScaleFactor = 1.0,
+            int? maxLines = null, Color selectionColor = null, double textScaleFactor = 1.0,
             TextDirection? textDirection = null, bool obscureText = false, TextAlign textAlign = TextAlign.left,
             bool autocorrect = false, ViewportOffset offset = null, SelectionChangedHandler onSelectionChanged = null,
             CaretChangedHandler onCaretChanged = null, bool rendererIgnoresPointer = false,
