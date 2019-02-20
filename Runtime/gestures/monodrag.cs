@@ -87,13 +87,6 @@ namespace Unity.UIWidgets.gestures {
 
         protected override void handleEvent(PointerEvent evt) {
             D.assert(this._state != _DragState.ready);
-            if (!evt.synthesized
-                && (evt is PointerDownEvent || evt is PointerMoveEvent)) {
-                var tracker = this._velocityTrackers[evt.pointer];
-                D.assert(tracker != null);
-                tracker.addPosition(evt.timeStamp, evt.position);
-            }
-
             if (evt is PointerScrollEvent) {
                 Offset delta = evt.delta;
                 if (this.onUpdate != null) {
@@ -115,12 +108,19 @@ namespace Unity.UIWidgets.gestures {
                             primaryVelocity: 0.0
                         ));
                         return null;
-                    }, debugReport: () => { return ""; }
+                    }, debugReport: () => { return "Pointer scroll end"; }
                 );
 
 
                 this._state = _DragState.ready;
                 return;
+            }
+
+            if (!evt.synthesized
+                && (evt is PointerDownEvent || evt is PointerMoveEvent)) {
+                var tracker = this._velocityTrackers[evt.pointer];
+                D.assert(tracker != null);
+                tracker.addPosition(evt.timeStamp, evt.position);
             }
 
             if (evt is PointerMoveEvent) {
