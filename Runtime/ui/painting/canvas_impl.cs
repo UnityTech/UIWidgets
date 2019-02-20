@@ -738,13 +738,18 @@ namespace Unity.UIWidgets.ui {
 
         void _drawLayer(RenderLayer layer, CommandBuffer cmdBuf) {
             foreach (var subLayer in layer.layers) {
-                cmdBuf.GetTemporaryRT(subLayer.rtID, new RenderTextureDescriptor(
+                var desc = new RenderTextureDescriptor(
                     subLayer.width, subLayer.height,
                     RenderTextureFormat.Default, 24) {
-                    msaaSamples = QualitySettings.antiAliasing,
                     useMipMap = false,
                     autoGenerateMips = false,
-                }, FilterMode.Bilinear);
+                };
+                
+                if (QualitySettings.antiAliasing != 0) {
+                    desc.msaaSamples = QualitySettings.antiAliasing;
+                }
+                
+                cmdBuf.GetTemporaryRT(subLayer.rtID, desc, FilterMode.Bilinear);
                 this._drawLayer(subLayer, cmdBuf);
             }
 

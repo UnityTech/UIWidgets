@@ -132,11 +132,14 @@ namespace UIWidgets.Tests {
                     width,
                     height,
                     RenderTextureFormat.Default, 24) {
-                    msaaSamples = QualitySettings.antiAliasing,
                     useMipMap = false,
                     autoGenerateMips = false,
                 };
 
+                if (QualitySettings.antiAliasing != 0) {
+                    desc.msaaSamples = QualitySettings.antiAliasing;
+                }
+                
                 this._renderTexture = RenderTexture.GetTemporary(desc);
             }
         }
