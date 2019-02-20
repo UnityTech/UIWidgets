@@ -3,76 +3,76 @@ using UnityEngine;
 
 namespace Unity.UIWidgets.editor {
     public class ScrollInput {
-        float scrollDeltaX;
-        float scrollDeltaY;
+        readonly int _bufferSize = 10;
+        readonly float _scrollScale = 10;
 
-        readonly int bufferSize;
-        readonly float scrollScale = 10;
+        float _scrollDeltaX;
+        float _scrollDeltaY;
 
-        int bufferIndex = 10;
-        float CurDeltaX;
-        float CurDeltaY;
+        int _bufferIndex;
+        float _curDeltaX;
+        float _curDeltaY;
 
-        float PointerX;
-        float PointerY;
-        int buttonId;
+        float _pointerX;
+        float _pointerY;
+        int _buttonId;
 
         public ScrollInput(int bufferSize = 10, float scrollScale = 10) {
-            this.bufferIndex = bufferSize;
-            this.bufferSize = bufferSize;
-            this.scrollDeltaX = 0;
-            this.scrollDeltaY = 0;
-            this.CurDeltaX = 0;
-            this.CurDeltaY = 0;
-            this.scrollScale = scrollScale;
+            this._bufferIndex = bufferSize;
+            this._bufferSize = bufferSize;
+            this._scrollDeltaX = 0;
+            this._scrollDeltaY = 0;
+            this._curDeltaX = 0;
+            this._curDeltaY = 0;
+            this._scrollScale = scrollScale;
         }
 
-        public void OnScroll(float deltaX, float deltaY, float PointerX, float PointerY, int buttonId) {
-            this.scrollDeltaX += deltaX * this.scrollScale;
-            this.scrollDeltaY += deltaY * this.scrollScale;
-            this.bufferIndex = this.bufferSize;
-            this.CurDeltaX = this.scrollDeltaX / this.bufferIndex;
-            this.CurDeltaY = this.scrollDeltaY / this.bufferIndex;
+        public void onScroll(float deltaX, float deltaY, float pointerX, float pointerY, int buttonId) {
+            this._scrollDeltaX += deltaX * this._scrollScale;
+            this._scrollDeltaY += deltaY * this._scrollScale;
+            this._bufferIndex = this._bufferSize;
+            this._curDeltaX = this._scrollDeltaX / this._bufferIndex;
+            this._curDeltaY = this._scrollDeltaY / this._bufferIndex;
 
-            this.PointerX = PointerX;
-            this.PointerY = PointerY;
-            this.buttonId = buttonId;
+            this._pointerX = pointerX;
+            this._pointerY = pointerY;
+            this._buttonId = buttonId;
         }
 
-        public int GetDeviceId() {
-            return this.buttonId;
+        public int getDeviceId() {
+            return this._buttonId;
         }
 
-        public float GetPointerPosX() {
-            return this.PointerX;
+        public float getPointerPosX() {
+            return this._pointerX;
         }
 
-        public float GetPointerPosY() {
-            return this.PointerY;
+        public float getPointerPosY() {
+            return this._pointerY;
         }
 
-        public Vector2 GetScrollDelta() {
-            if (this.scrollDeltaX == 0 && this.scrollDeltaY == 0) {
+        public Vector2 getScrollDelta() {
+            if (this._scrollDeltaX == 0 && this._scrollDeltaY == 0) {
                 return Vector2.zero;
             }
 
             var deltaScroll = new Vector2();
-            if (this.bufferIndex == 0) {
-                deltaScroll.x = this.scrollDeltaX;
-                deltaScroll.y = this.scrollDeltaY;
-                this.scrollDeltaX = 0;
-                this.scrollDeltaY = 0;
+            if (this._bufferIndex == 0) {
+                deltaScroll.x = this._scrollDeltaX;
+                deltaScroll.y = this._scrollDeltaY;
+                this._scrollDeltaX = 0;
+                this._scrollDeltaY = 0;
             }
             else {
-                deltaScroll.x = this.CurDeltaX;
-                deltaScroll.y = this.CurDeltaY;
-                this.scrollDeltaX = this.CurDeltaX > 0
-                    ? Math.Max(0, this.scrollDeltaX - this.CurDeltaX)
-                    : Math.Min(0, this.scrollDeltaX - this.CurDeltaX);
-                this.scrollDeltaY = this.CurDeltaY > 0
-                    ? Math.Max(0, this.scrollDeltaY - this.CurDeltaY)
-                    : Math.Min(0, this.scrollDeltaY - this.CurDeltaY);
-                this.bufferIndex--;
+                deltaScroll.x = this._curDeltaX;
+                deltaScroll.y = this._curDeltaY;
+                this._scrollDeltaX = this._curDeltaX > 0
+                    ? Math.Max(0, this._scrollDeltaX - this._curDeltaX)
+                    : Math.Min(0, this._scrollDeltaX - this._curDeltaX);
+                this._scrollDeltaY = this._curDeltaY > 0
+                    ? Math.Max(0, this._scrollDeltaY - this._curDeltaY)
+                    : Math.Min(0, this._scrollDeltaY - this._curDeltaY);
+                this._bufferIndex--;
             }
 
             return deltaScroll;

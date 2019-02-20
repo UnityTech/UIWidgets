@@ -305,7 +305,7 @@ namespace Unity.UIWidgets.editor {
                     );
                 }
                 else if (evt.type == EventType.ScrollWheel) {
-                    this._scrollInput.OnScroll((float) (-evt.delta.x * this._devicePixelRatio),
+                    this._scrollInput.onScroll((float) (-evt.delta.x * this._devicePixelRatio),
                         (float) (-evt.delta.y * this._devicePixelRatio),
                         (float) (evt.mousePosition.x * this._devicePixelRatio),
                         (float) (evt.mousePosition.y * this._devicePixelRatio),
@@ -325,8 +325,8 @@ namespace Unity.UIWidgets.editor {
             }
         }
 
-        void _UpdateScrollInput() {
-            var deltaScroll = this._scrollInput.GetScrollDelta();
+        void _updateScrollInput() {
+            var deltaScroll = this._scrollInput.getScrollDelta();
 
             if (deltaScroll == Vector2.zero) {
                 return;
@@ -336,9 +336,9 @@ namespace Unity.UIWidgets.editor {
                 timeStamp: Timer.timespanSinceStartup,
                 change: PointerChange.scroll,
                 kind: PointerDeviceKind.mouse,
-                device: this._scrollInput.GetDeviceId(),
-                physicalX: this._scrollInput.GetPointerPosX(),
-                physicalY: this._scrollInput.GetPointerPosY(),
+                device: this._scrollInput.getDeviceId(),
+                physicalX: this._scrollInput.getPointerPosX(),
+                physicalY: this._scrollInput.getPointerPosY(),
                 scrollX: deltaScroll.x,
                 scrollY: deltaScroll.y
             );
@@ -352,7 +352,7 @@ namespace Unity.UIWidgets.editor {
             Timer.update();
 
             using (this.getScope()) {
-                this._UpdateScrollInput();
+                this._updateScrollInput();
                 this._timerProvider.update(this.flushMicrotasks);
                 this.flushMicrotasks();
             }

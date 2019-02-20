@@ -160,22 +160,22 @@ namespace Unity.UIWidgets.engine {
             if (this._mouseEntered) {
                 if (Input.mouseScrollDelta.y != 0 || Input.mouseScrollDelta.x != 0) {
                     var pos = this.getPointPosition(Input.mousePosition);
-                    this._scrollInput.OnScroll((float) (Input.mouseScrollDelta.x * this.pixelRatio),
+                    this._scrollInput.onScroll((float) (Input.mouseScrollDelta.x * this.pixelRatio),
                         (float) (Input.mouseScrollDelta.y * this.pixelRatio),
                         pos.x,
                         pos.y,
                         this.getScrollButton());
                 }
 
-                var deltaScroll = this._scrollInput.GetScrollDelta();
+                var deltaScroll = this._scrollInput.getScrollDelta();
                 if (deltaScroll != Vector2.zero) {
                     this._windowAdapter.postPointerEvent(new ScrollData(
                         timeStamp: Timer.timespanSinceStartup,
                         change: PointerChange.scroll,
                         kind: PointerDeviceKind.mouse,
-                        device: this._scrollInput.GetDeviceId(),
-                        physicalX: this._scrollInput.GetPointerPosX(),
-                        physicalY: this._scrollInput.GetPointerPosY(),
+                        device: this._scrollInput.getDeviceId(),
+                        physicalX: this._scrollInput.getPointerPosX(),
+                        physicalY: this._scrollInput.getPointerPosY(),
                         scrollX: deltaScroll.x,
                         scrollY: deltaScroll.y
                     ));
