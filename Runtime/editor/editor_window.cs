@@ -105,6 +105,8 @@ namespace Unity.UIWidgets.editor {
         readonly TimerProvider _timerProvider = new TimerProvider();
         readonly TextInput _textInput = new TextInput();
         readonly Rasterizer _rasterizer = new Rasterizer();
+        readonly ScrollInput _scrollInput = new ScrollInput();
+
 
         bool _regenerateLayerTree;
         Surface _surface;
@@ -303,15 +305,11 @@ namespace Unity.UIWidgets.editor {
                     );
                 }
                 else if (evt.type == EventType.ScrollWheel) {
-                    pointerData = new ScrollData(
-                        timeStamp: Timer.timespanSinceStartup,
-                        change: PointerChange.scroll,
-                        kind: PointerDeviceKind.mouse,
-                        device: evt.button,
-                        physicalX: evt.mousePosition.x * this._devicePixelRatio,
-                        physicalY: evt.mousePosition.y * this._devicePixelRatio,
-                        scrollX: -evt.delta.x,
-                        scrollY: -evt.delta.y
+                    this._scrollInput.onScroll((float) (-evt.delta.x * this._devicePixelRatio),
+                        (float) (-evt.delta.y * this._devicePixelRatio),
+                        (float) (evt.mousePosition.x * this._devicePixelRatio),
+                        (float) (evt.mousePosition.y * this._devicePixelRatio),
+                        evt.button
                     );
                 }
 
@@ -327,10 +325,34 @@ namespace Unity.UIWidgets.editor {
             }
         }
 
+        void _updateScrollInput() {
+            var deltaScroll = this._scrollInput.getScrollDelta();
+
+            if (deltaScroll == Vector2.zero) {
+                return;
+            }
+
+            PointerData pointerData = new ScrollData(
+                timeStamp: Timer.timespanSinceStartup,
+                change: PointerChange.scroll,
+                kind: PointerDeviceKind.mouse,
+                device: this._scrollInput.getDeviceId(),
+                physicalX: this._scrollInput.getPointerPosX(),
+                physicalY: this._scrollInput.getPointerPosY(),
+                scrollX: deltaScroll.x,
+                scrollY: deltaScroll.y
+            );
+
+            this.onPointerEvent(new PointerDataPacket(new List<PointerData> {
+                pointerData
+            }));
+        }
+
         public void Update() {
             Timer.update();
 
             using (this.getScope()) {
+                this._updateScrollInput();
                 if (this._textInput != null) {
                     this._textInput.keyboardManager.Update();
                 }

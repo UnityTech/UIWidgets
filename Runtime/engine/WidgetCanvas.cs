@@ -69,6 +69,8 @@ namespace Unity.UIWidgets.engine {
         const int mouseButtonNum = 3;
         const int mouseScrollId = mouseButtonNum + 1;
 
+        readonly ScrollInput _scrollInput = new ScrollInput();
+
         protected override void OnEnable() {
             base.OnEnable();
 
@@ -156,17 +158,26 @@ namespace Unity.UIWidgets.engine {
             }
 
             if (this._mouseEntered) {
-                if (Input.mouseScrollDelta.y != 0) {
+                if (Input.mouseScrollDelta.y != 0 || Input.mouseScrollDelta.x != 0) {
                     var pos = this.getPointPosition(Input.mousePosition);
+                    this._scrollInput.onScroll((float) (Input.mouseScrollDelta.x * this.pixelRatio),
+                        (float) (Input.mouseScrollDelta.y * this.pixelRatio),
+                        pos.x,
+                        pos.y,
+                        this.getScrollButton());
+                }
+
+                var deltaScroll = this._scrollInput.getScrollDelta();
+                if (deltaScroll != Vector2.zero) {
                     this._windowAdapter.postPointerEvent(new ScrollData(
                         timeStamp: Timer.timespanSinceStartup,
                         change: PointerChange.scroll,
                         kind: PointerDeviceKind.mouse,
-                        device: this.getScrollButton(),
-                        physicalX: pos.x,
-                        physicalY: pos.y,
-                        scrollX: Input.mouseScrollDelta.x,
-                        scrollY: Input.mouseScrollDelta.y * 5
+                        device: this._scrollInput.getDeviceId(),
+                        physicalX: this._scrollInput.getPointerPosX(),
+                        physicalY: this._scrollInput.getPointerPosY(),
+                        scrollX: deltaScroll.x,
+                        scrollY: deltaScroll.y
                     ));
                 }
             }

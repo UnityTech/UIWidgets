@@ -53,13 +53,13 @@ namespace Unity.UIWidgets.gestures {
         public readonly HashSet<HitTestTarget> lastMoveTargets = new HashSet<HitTestTarget>();
 
         void _handlePointerEvent(PointerEvent evt) {
-            if (evt is PointerHoverEvent) {
-                this._handlePointerHoverEvent(evt);
-            }
-
             if (evt is PointerScrollEvent) {
                 this._handlePointerScrollEvent(evt);
                 return;
+            }
+
+            if (evt is PointerHoverEvent) {
+                this._handlePointerHoverEvent(evt);
             }
 
             HitTestResult result;

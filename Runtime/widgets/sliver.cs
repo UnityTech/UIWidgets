@@ -4,7 +4,6 @@ using System.Linq;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
-using Unity.UIWidgets.ui;
 
 namespace Unity.UIWidgets.widgets {
     public abstract class SliverChildDelegate {
@@ -266,8 +265,7 @@ namespace Unity.UIWidgets.widgets {
         }
 
         Dictionary<int, Widget> _childWidgets = new Dictionary<int, Widget>();
-        SplayTree<int, Element> _childElements = new SplayTree<int, Element>();
-
+        SortedDictionary<int, Element> _childElements = new SortedDictionary<int, Element>();
         RenderBox _currentBeforeChild;
 
         protected override void performRebuild() {
@@ -281,8 +279,8 @@ namespace Unity.UIWidgets.widgets {
                 int lastIndex = 0;
 
                 if (!this._childElements.isEmpty()) {
-                    firstIndex = this._childElements.First().Key;
-                    lastIndex = this._childElements.Last().Key;
+                    firstIndex = this._childElements.Keys.First();
+                    lastIndex = this._childElements.Keys.Last();
                     if (this._didUnderflow) {
                         lastIndex += 1;
                     }
@@ -435,8 +433,8 @@ namespace Unity.UIWidgets.widgets {
 
         public void didFinishLayout() {
             D.assert(this.debugAssertChildListLocked());
-            int firstIndex = this._childElements.FirstOrDefault().Key;
-            int lastIndex = this._childElements.LastOrDefault().Key;
+            int firstIndex = this._childElements.Keys.FirstOrDefault();
+            int lastIndex = this._childElements.Keys.LastOrDefault();
             this.widget.del.didFinishLayout(firstIndex, lastIndex);
         }
 

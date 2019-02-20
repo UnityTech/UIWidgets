@@ -503,7 +503,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public List<TextBox> getRectsForRange(int start, int end) {
-            var lineBoxes = new SplayTree<int, List<TextBox>>();
+            var lineBoxes = new SortedDictionary<int, List<TextBox>>();
             foreach (var run in this._codeUnitRuns) {
                 if (run.codeUnits.start >= end) {
                     break;
