@@ -52,7 +52,9 @@ namespace Unity.UIWidgets.engine {
         }
 
         protected override Vector2 queryWindowSize() {
-            return this._widgetCanvas.rectTransform.rect.size;
+            var size = this._widgetCanvas.rectTransform.rect.size;
+            size = size * this._widgetCanvas.canvas.scaleFactor / (float)this._widgetCanvas.pixelRatio;
+            return new Vector2	(Mathf.Round	(size.x), Mathf.Round	(size.y));
         }
     }
 
@@ -97,7 +99,7 @@ namespace Unity.UIWidgets.engine {
         }
 
         public double pixelRatio {
-            get { return this.canvas.scaleFactor; }
+            get { return DisplayMetrics.devicePixelRatio; }
         }
 
         protected virtual Dictionary<string, WidgetBuilder> routes {
@@ -159,9 +161,10 @@ namespace Unity.UIWidgets.engine {
 
             if (this._mouseEntered) {
                 if (Input.mouseScrollDelta.y != 0 || Input.mouseScrollDelta.x != 0) {
+                    var scaleFactor = this.canvas.scaleFactor;
                     var pos = this.getPointPosition(Input.mousePosition);
-                    this._scrollInput.onScroll((float) (Input.mouseScrollDelta.x * this.pixelRatio),
-                        (float) (Input.mouseScrollDelta.y * this.pixelRatio),
+                    this._scrollInput.onScroll((float) (Input.mouseScrollDelta.x * scaleFactor),
+                        (float) (Input.mouseScrollDelta.y * scaleFactor),
                         pos.x,
                         pos.y,
                         this.getScrollButton());
@@ -251,9 +254,9 @@ namespace Unity.UIWidgets.engine {
             Vector2 localPoint;
             RectTransformUtility.ScreenPointToLocalPointInRectangle(this.rectTransform, eventData.position,
                 eventData.enterEventCamera, out localPoint);
-            var pixelRatio = this.pixelRatio;
-            localPoint.x = (float) ((localPoint.x - this.rectTransform.rect.min.x) * pixelRatio);
-            localPoint.y = (float) ((this.rectTransform.rect.max.y - localPoint.y) * pixelRatio);
+            var scaleFactor = this.canvas.scaleFactor;
+            localPoint.x = (localPoint.x - this.rectTransform.rect.min.x) * scaleFactor;
+            localPoint.y = (this.rectTransform.rect.max.y - localPoint.y) * scaleFactor;
             return localPoint;
         }
 
@@ -268,8 +271,9 @@ namespace Unity.UIWidgets.engine {
 
             RectTransformUtility.ScreenPointToLocalPointInRectangle(this.rectTransform, position,
                 eventCamera, out localPoint);
-            localPoint.x = (float) ((localPoint.x - this.rectTransform.rect.min.x) * this.pixelRatio);
-            localPoint.y = (float) ((this.rectTransform.rect.max.y - localPoint.y) * this.pixelRatio);
+            var scaleFactor = this.canvas.scaleFactor;
+            localPoint.x = (localPoint.x - this.rectTransform.rect.min.x) * scaleFactor;
+            localPoint.y = (this.rectTransform.rect.max.y - localPoint.y) * scaleFactor;
             return localPoint;
         }
 
