@@ -117,6 +117,9 @@ namespace Unity.UIWidgets.editor {
             get { return this._alive; }
         }
 
+        protected virtual void updateSafeArea() {
+        }
+
         public void OnEnable() {
             this._devicePixelRatio = this.queryDevicePixelRatio();
             var size = this.queryWindowSize();
@@ -126,6 +129,7 @@ namespace Unity.UIWidgets.editor {
                 this._lastWindowWidth * this._devicePixelRatio,
                 this._lastWindowHeight * this._devicePixelRatio);
 
+            this.updateSafeArea();
             D.assert(this._surface == null);
             this._surface = this.createSurface();
 
@@ -215,6 +219,7 @@ namespace Unity.UIWidgets.editor {
                         this._lastWindowWidth * this._devicePixelRatio,
                         this._lastWindowHeight * this._devicePixelRatio);
 
+                    this.updateSafeArea();
                     if (this.onMetricsChanged != null) {
                         this.onMetricsChanged();
                     }
