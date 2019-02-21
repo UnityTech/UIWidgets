@@ -17,6 +17,14 @@ namespace Unity.UIWidgets.engine {
         readonly WidgetCanvas _widgetCanvas;
         bool _needsPaint;
 
+        protected override void updateSafeArea() {
+            this._padding = new WindowPadding(
+                Screen.safeArea.x, 
+                Screen.safeArea.y, 
+                Screen.width - Screen.safeArea.width,
+                Screen.height - Screen.safeArea.height);
+        }
+
         public override void scheduleFrame(bool regenerateLayerTree = true) {
             base.scheduleFrame(regenerateLayerTree);
             this._needsPaint = true;
