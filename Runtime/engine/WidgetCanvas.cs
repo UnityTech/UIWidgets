@@ -28,6 +28,9 @@ namespace Unity.UIWidgets.engine {
 
 
         public override void OnGUI(Event evt) {
+            if (this.displayMetricsChanged()) {
+                this._needsPaint = true;
+            }
             if (evt.type == EventType.Repaint) {
                 if (!this._needsPaint) {
                     return;

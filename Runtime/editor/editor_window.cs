@@ -192,23 +192,25 @@ namespace Unity.UIWidgets.editor {
             }
         }
 
+        protected bool displayMetricsChanged() {
+            if (this._devicePixelRatio != this.queryDevicePixelRatio()) {
+                return true;
+            }
+            var size = this.queryWindowSize();
+            if (this._lastWindowWidth != size.x
+                || this._lastWindowHeight != size.y) {
+                return true;
+            }
+
+            return false;
+        }
+
         public virtual void OnGUI(Event evt = null) {
             evt = evt ?? Event.current;
             using (this.getScope()) {
-                bool dirty = false;
-
-                if (this._devicePixelRatio != this.queryDevicePixelRatio()) {
-                    dirty = true;
-                }
-
-                var size = this.queryWindowSize();
-                if (this._lastWindowWidth != size.x
-                    || this._lastWindowHeight != size.y) {
-                    dirty = true;
-                }
-
-                if (dirty) {
+                if (this.displayMetricsChanged()) {
                     this._devicePixelRatio = this.queryDevicePixelRatio();
+                    var size = this.queryWindowSize();
                     this._lastWindowWidth = size.x;
                     this._lastWindowHeight = size.y;
                     this._physicalSize = new Size(
