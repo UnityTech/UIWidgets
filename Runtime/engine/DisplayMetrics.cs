@@ -1,3 +1,4 @@
+using System;
 using System.Runtime.InteropServices;
 using UnityEngine;
 
@@ -6,9 +7,20 @@ namespace Unity.UIWidgets.engine {
     public class DisplayMetrics {
 
         static float _devicePixelRatio = 0;
+
+        static Func<float> _devicePixelRatioGetter;
+
+        public static void SetDevicePixelRatioGetter(Func<float> f) {
+            _devicePixelRatioGetter = f;
+        }
         
         public static float devicePixelRatio {
             get {
+
+                if (_devicePixelRatioGetter != null) {
+                    return _devicePixelRatioGetter();
+                }
+
                 if (_devicePixelRatio > 0) {
                     return _devicePixelRatio;
                 }
@@ -29,7 +41,7 @@ namespace Unity.UIWidgets.engine {
                 return _devicePixelRatio;
             }
             
-        }
+        }      
 
         static float DevicePixelRatioAndroid() {
             using (
