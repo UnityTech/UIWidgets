@@ -48,12 +48,12 @@ namespace Unity.UIWidgets.engine {
         }
 
         protected override double queryDevicePixelRatio() {
-            return this._widgetCanvas.pixelRatio;
+            return this._widgetCanvas.devicePixelRatio;
         }
 
         protected override Vector2 queryWindowSize() {
             var size = this._widgetCanvas.rectTransform.rect.size;
-            size = size * this._widgetCanvas.canvas.scaleFactor / (float)this._widgetCanvas.pixelRatio;
+            size = size * this._widgetCanvas.canvas.scaleFactor / (float)this._widgetCanvas.devicePixelRatio;
             return new Vector2	(Mathf.Round	(size.x), Mathf.Round	(size.y));
         }
     }
@@ -63,6 +63,9 @@ namespace Unity.UIWidgets.engine {
         IPointerEnterHandler, IPointerExitHandler {
         static Event _repaintEvent;
 
+        [SerializeField]
+        protected double devicePixelRatioOverride;
+        
         WindowAdapter _windowAdapter;
         Texture _texture;
         Vector2 _lastMouseMove;
@@ -98,8 +101,8 @@ namespace Unity.UIWidgets.engine {
             this._lastMouseMove = Input.mousePosition;
         }
 
-        public double pixelRatio {
-            get { return DisplayMetrics.devicePixelRatio; }
+        public double devicePixelRatio {
+            get { return this.devicePixelRatioOverride > 0 ? this.devicePixelRatioOverride : DisplayMetrics.devicePixelRatio; }
         }
 
         protected virtual Dictionary<string, WidgetBuilder> routes {
