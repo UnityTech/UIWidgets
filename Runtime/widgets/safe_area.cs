@@ -38,10 +38,10 @@ namespace Unity.UIWidgets.widgets {
             EdgeInsets padding = MediaQuery.of(context).padding;
             return new Padding(
                 padding: EdgeInsets.only(
-                    left: Math.Max(this.left ? padding.left : 0.0, this.minimum.left),
-                    top: Math.Max(this.top ? padding.top : 0.0, this.minimum.top),
-                    right: Math.Max(this.right ? padding.right : 0.0, this.minimum.right),
-                    bottom: Math.Max(this.bottom ? padding.bottom : 0.0, this.minimum.bottom)
+                    left: (float) Math.Max(this.left ? padding.left : 0.0, this.minimum.left),
+                    top: (float) Math.Max(this.top ? padding.top : 0.0, this.minimum.top),
+                    right: (float) Math.Max(this.right ? padding.right : 0.0, this.minimum.right),
+                    bottom: (float) Math.Max(this.bottom ? padding.bottom : 0.0, this.minimum.bottom)
                 ),
                 child: MediaQuery.removePadding(
                     context: context,

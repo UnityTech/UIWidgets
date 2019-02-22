@@ -78,61 +78,61 @@ namespace Unity.UIWidgets.rendering {
 
         BoxConstraints _additionalConstraints;
 
-        protected override double computeMinIntrinsicWidth(double height) {
+        protected override float computeMinIntrinsicWidth(float height) {
             if (this._additionalConstraints.hasBoundedWidth && this._additionalConstraints.hasTightWidth) {
-                return this._additionalConstraints.minWidth;
+                return (float) this._additionalConstraints.minWidth;
             }
 
-            double width = base.computeMinIntrinsicWidth(height);
-            D.assert(width.isFinite());
+            float width = base.computeMinIntrinsicWidth(height);
+            D.assert(!float.IsInfinity(width));
 
             if (!this._additionalConstraints.hasInfiniteWidth) {
-                return this._additionalConstraints.constrainWidth(width);
+                return (float) this._additionalConstraints.constrainWidth(width);
             }
 
             return width;
         }
 
-        protected override double computeMaxIntrinsicWidth(double height) {
+        protected override float computeMaxIntrinsicWidth(float height) {
             if (this._additionalConstraints.hasBoundedWidth && this._additionalConstraints.hasTightWidth) {
-                return this._additionalConstraints.minWidth;
+                return (float) this._additionalConstraints.minWidth;
             }
 
-            double width = base.computeMaxIntrinsicWidth(height);
-            D.assert(width.isFinite());
+            float width = base.computeMaxIntrinsicWidth(height);
+            D.assert(!float.IsInfinity(width));
 
             if (!this._additionalConstraints.hasInfiniteWidth) {
-                return this._additionalConstraints.constrainWidth(width);
+                return (float) this._additionalConstraints.constrainWidth(width);
             }
 
             return width;
         }
 
-        protected override double computeMinIntrinsicHeight(double width) {
+        protected override float computeMinIntrinsicHeight(float width) {
             if (this._additionalConstraints.hasBoundedHeight && this._additionalConstraints.hasTightHeight) {
-                return this._additionalConstraints.minHeight;
+                return (float) this._additionalConstraints.minHeight;
             }
 
-            double height = base.computeMinIntrinsicHeight(width);
-            D.assert(height.isFinite());
+            float height = base.computeMinIntrinsicHeight(width);
+            D.assert(!float.IsInfinity(height));
 
             if (!this._additionalConstraints.hasInfiniteHeight) {
-                return this._additionalConstraints.constrainHeight(height);
+                return (float) this._additionalConstraints.constrainHeight(height);
             }
 
             return height;
         }
 
-        protected override double computeMaxIntrinsicHeight(double width) {
+        protected override float computeMaxIntrinsicHeight(float width) {
             if (this._additionalConstraints.hasBoundedHeight && this._additionalConstraints.hasTightHeight) {
-                return this._additionalConstraints.minHeight;
+                return (float) this._additionalConstraints.minHeight;
             }
 
-            double height = base.computeMaxIntrinsicHeight(width);
-            D.assert(height.isFinite());
+            float height = base.computeMaxIntrinsicHeight(width);
+            D.assert(!float.IsInfinity(height));
 
             if (!this._additionalConstraints.hasInfiniteHeight) {
-                return this._additionalConstraints.constrainHeight(height);
+                return (float) this._additionalConstraints.constrainHeight(height);
             }
 
             return height;
@@ -172,8 +172,8 @@ namespace Unity.UIWidgets.rendering {
     public class RenderLimitedBox : RenderProxyBox {
         public RenderLimitedBox(
             RenderBox child = null,
-            double maxWidth = double.PositiveInfinity,
-            double maxHeight = double.PositiveInfinity
+            float maxWidth = float.PositiveInfinity,
+            float maxHeight = float.PositiveInfinity
         ) : base(child) {
             D.assert(maxWidth >= 0.0);
             D.assert(maxHeight >= 0.0);
@@ -182,7 +182,7 @@ namespace Unity.UIWidgets.rendering {
             this._maxHeight = maxHeight;
         }
 
-        public double maxWidth {
+        public float maxWidth {
             get { return this._maxWidth; }
             set {
                 D.assert(value >= 0.0);
@@ -195,9 +195,9 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
-        double _maxWidth;
+        float _maxWidth;
 
-        public double maxHeight {
+        public float maxHeight {
             get { return this._maxHeight; }
             set {
                 D.assert(value >= 0.0);
@@ -210,7 +210,7 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
-        double _maxHeight;
+        float _maxHeight;
 
         BoxConstraints _limitConstraints(BoxConstraints constraints) {
             return new BoxConstraints(
@@ -243,11 +243,11 @@ namespace Unity.UIWidgets.rendering {
     }
 
     public class RenderAspectRatio : RenderProxyBox {
-        public RenderAspectRatio(double aspectRatio, RenderBox child = null) : base(child) {
+        public RenderAspectRatio(float aspectRatio, RenderBox child = null) : base(child) {
             this._aspectRatio = aspectRatio;
         }
 
-        public double aspectRatio {
+        public float aspectRatio {
             get { return this._aspectRatio; }
             set {
                 if (this._aspectRatio == value) {
@@ -259,10 +259,10 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
-        double _aspectRatio;
+        float _aspectRatio;
 
 
-        protected override double computeMinIntrinsicWidth(double height) {
+        protected override float computeMinIntrinsicWidth(float height) {
             if (!double.IsInfinity(height)) {
                 return height * this._aspectRatio;
             }
@@ -271,10 +271,10 @@ namespace Unity.UIWidgets.rendering {
                 return this.child.getMinIntrinsicWidth(height);
             }
 
-            return 0.0;
+            return 0.0f;
         }
 
-        protected override double computeMaxIntrinsicWidth(double height) {
+        protected override float computeMaxIntrinsicWidth(float height) {
             if (!double.IsInfinity(height)) {
                 return height * this._aspectRatio;
             }
@@ -283,10 +283,10 @@ namespace Unity.UIWidgets.rendering {
                 return this.child.getMaxIntrinsicWidth(height);
             }
 
-            return 0.0;
+            return 0.0f;
         }
 
-        protected override double computeMinIntrinsicHeight(double width) {
+        protected override float computeMinIntrinsicHeight(float width) {
             if (!double.IsInfinity(width)) {
                 return width / this._aspectRatio;
             }
@@ -295,10 +295,10 @@ namespace Unity.UIWidgets.rendering {
                 return this.child.getMinIntrinsicHeight(width);
             }
 
-            return 0.0;
+            return 0.0f;
         }
 
-        protected override double computeMaxIntrinsicHeight(double width) {
+        protected override float computeMaxIntrinsicHeight(float width) {
             if (!double.IsInfinity(width)) {
                 return width / this._aspectRatio;
             }
@@ -307,7 +307,7 @@ namespace Unity.UIWidgets.rendering {
                 return this.child.getMaxIntrinsicHeight(width);
             }
 
-            return 0.0;
+            return 0.0f;
         }
 
         Size _applyAspectRatio(BoxConstraints constraints) {
@@ -339,7 +339,7 @@ namespace Unity.UIWidgets.rendering {
                 width = height * this._aspectRatio;
             }
 
-            return constraints.constrain(new Size(width, height));
+            return constraints.constrain(new Size((float) width, (float) height));
         }
 
         protected override void performLayout() {
@@ -419,7 +419,7 @@ namespace Unity.UIWidgets.rendering {
 
     public class RenderAnimatedOpacity : RenderProxyBox {
         public RenderAnimatedOpacity(
-            Animation<double> opacity = null,
+            Animation<float> opacity = null,
             RenderBox child = null
         ) : base(child) {
             D.assert(opacity != null);
@@ -435,9 +435,9 @@ namespace Unity.UIWidgets.rendering {
 
         bool _currentlyNeedsCompositing;
 
-        Animation<double> _opacity;
+        Animation<float> _opacity;
 
-        public Animation<double> opacity {
+        public Animation<float> opacity {
             get { return this._opacity; }
             set {
                 D.assert(value != null);
@@ -472,7 +472,7 @@ namespace Unity.UIWidgets.rendering {
 
         public void _updateOpacity() {
             var oldAlpha = this._alpha;
-            this._alpha = RenderOpacity._getAlphaFromOpacity(this._opacity.value.clamp(0.0, 1.0));
+            this._alpha = RenderOpacity._getAlphaFromOpacity(this._opacity.value.clamp(0.0f, 1.0f));
             if (oldAlpha != this._alpha) {
                 bool didNeedCompositing = this._currentlyNeedsCompositing;
                 this._currentlyNeedsCompositing = this._alpha > 0 && this._alpha < 255;
@@ -502,7 +502,7 @@ namespace Unity.UIWidgets.rendering {
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
-            properties.add(new DiagnosticsProperty<Animation<double>>("opacity", this.opacity));
+            properties.add(new DiagnosticsProperty<Animation<float>>("opacity", this.opacity));
         }
     }
 
@@ -693,8 +693,8 @@ namespace Unity.UIWidgets.rendering {
                     base.debugPaintSize(context, offset);
                     context.canvas.drawRect(this._clip.shift(offset), this._debugPaint);
                     this._debugText.paint(context.canvas,
-                        offset + new Offset(this._clip.width / 8.0,
-                            -(this._debugText.text.style.fontSize ?? 0.0) * 1.1));
+                        offset + new Offset(this._clip.width / 8.0f,
+                            -(this._debugText.text.style.fontSize ?? 0.0f) * 1.1f));
                 }
 
                 return true;
@@ -1690,40 +1690,40 @@ namespace Unity.UIWidgets.rendering {
 
         bool _offstage;
 
-        protected override double computeMinIntrinsicWidth(double height) {
+        protected override float computeMinIntrinsicWidth(float height) {
             if (this.offstage) {
-                return 0.0;
+                return 0.0f;
             }
 
             return base.computeMinIntrinsicWidth(height);
         }
 
 
-        protected override double computeMaxIntrinsicWidth(double height) {
+        protected override float computeMaxIntrinsicWidth(float height) {
             if (this.offstage) {
-                return 0.0;
+                return 0.0f;
             }
 
             return base.computeMaxIntrinsicWidth(height);
         }
 
-        protected override double computeMinIntrinsicHeight(double width) {
+        protected override float computeMinIntrinsicHeight(float width) {
             if (this.offstage) {
-                return 0.0;
+                return 0.0f;
             }
 
             return base.computeMinIntrinsicHeight(width);
         }
 
-        protected override double computeMaxIntrinsicHeight(double width) {
+        protected override float computeMaxIntrinsicHeight(float width) {
             if (this.offstage) {
-                return 0.0;
+                return 0.0f;
             }
 
             return base.computeMaxIntrinsicHeight(width);
         }
 
-        protected override double? computeDistanceToActualBaseline(TextBaseline baseline) {
+        protected override float? computeDistanceToActualBaseline(TextBaseline baseline) {
             if (this.offstage) {
                 return null;
             }
@@ -1962,10 +1962,10 @@ namespace Unity.UIWidgets.rendering {
                 base.paint,
                 Offset.zero,
                 childPaintBounds: Rect.fromLTRB(
-                    double.NegativeInfinity,
-                    double.NegativeInfinity,
-                    double.PositiveInfinity,
-                    double.PositiveInfinity
+                    float.NegativeInfinity,
+                    float.NegativeInfinity,
+                    float.PositiveInfinity,
+                    float.PositiveInfinity
                 )
             );
         }

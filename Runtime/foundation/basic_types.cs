@@ -95,10 +95,11 @@ namespace Unity.UIWidgets.foundation {
                         hashCode = (hashCode * 397) ^ item.GetHashCode();
                     }
                 }
+
                 return hashCode;
             }
         }
-        
+
         public static bool equalsList<T>(this IList<T> it, IList<T> list) {
             if (it == null && list == null) {
                 return true;
@@ -120,7 +121,7 @@ namespace Unity.UIWidgets.foundation {
 
             return true;
         }
-        
+
         public static string toStringList<T>(this IList<T> it) {
             return "{ " + string.Join(", ", it.Select(item => item.ToString())) + " }";
         }

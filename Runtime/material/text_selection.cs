@@ -60,7 +60,7 @@ namespace Unity.UIWidgets.material {
 
             return new Container(
                 color: new Color(0xFFEFEFEF),
-                height: 44.0, child: new Row(mainAxisSize: MainAxisSize.min, children: items));
+                height: 44.0f, child: new Row(mainAxisSize: MainAxisSize.min, children: items));
         }
     }
 
@@ -100,7 +100,7 @@ namespace Unity.UIWidgets.material {
                 y = this.screenSize.height - childSize.height - _TextSelectionUtils._kToolbarScreenPadding;
             }
 
-            return new Offset(x, y);
+            return new Offset((float) x, (float) y);
         }
 
         public override bool shouldRelayout(SingleChildLayoutDelegate oldDelegate) {
@@ -119,8 +119,8 @@ namespace Unity.UIWidgets.material {
             Paint paint = new Paint();
             paint.color = this.color;
             double radius = size.width / 2.0;
-            canvas.drawCircle(new Offset(radius, radius), radius, paint);
-            canvas.drawRect(Rect.fromLTWH(0.0, 0.0, radius, radius), paint);
+            canvas.drawCircle(new Offset((float) radius, (float) radius), radius, paint);
+            canvas.drawRect(Rect.fromLTWH(0.0f, 0.0f, (float) radius, (float) radius), paint);
         }
 
 
@@ -132,8 +132,8 @@ namespace Unity.UIWidgets.material {
     class _MaterialTextSelectionControls : TextSelectionControls {
         public override Size handleSize {
             get {
-                return new Size(_TextSelectionUtils._kHandleSize,
-                    _TextSelectionUtils._kHandleSize);
+                return new Size((float) _TextSelectionUtils._kHandleSize,
+                    (float) _TextSelectionUtils._kHandleSize);
             }
         }
 
@@ -167,7 +167,7 @@ namespace Unity.UIWidgets.material {
 
         public override Widget buildHandle(BuildContext context, TextSelectionHandleType type, double textLineHeight) {
             Widget handle = new Padding(
-                padding: EdgeInsets.only(right: 26.0, bottom: 26.0),
+                padding: EdgeInsets.only(right: 26.0f, bottom: 26.0f),
                 child: new SizedBox(
                     width: 20,
                     height: 20,
@@ -208,7 +208,7 @@ namespace Unity.UIWidgets.material {
             Widget child = null
         ) : base(key: key) {
             this.onPressed = onPressed;
-            this.padding = padding ?? EdgeInsets.all(8.0);
+            this.padding = padding ?? EdgeInsets.all(8.0f);
             this.backgroundColor = backgroundColor ?? new Color(0);
             this.child = child;
         }

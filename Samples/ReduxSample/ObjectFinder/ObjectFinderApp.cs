@@ -115,7 +115,7 @@ namespace Unity.UIWidgets.Sample.Redux.ObjectFinder {
 
         Widget _buildTitle() {
             return new Text(this.widget.title, textAlign: TextAlign.center,
-                style: new TextStyle(fontSize: 20, height: 1.5));
+                style: new TextStyle(fontSize: 20, height: 1.5f));
         }
 
         Widget _buildSearchInput() {
@@ -159,7 +159,7 @@ namespace Unity.UIWidgets.Sample.Redux.ObjectFinder {
 
         Widget _buildResultCount() {
             return new Text($"Total Results:{this.widget.objectInfos.Count}",
-                style: new TextStyle(height: 3.0, fontSize: 12));
+                style: new TextStyle(height: 3.0f, fontSize: 12));
         }
 
         Widget _buildResults() {

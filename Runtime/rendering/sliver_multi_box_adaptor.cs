@@ -11,12 +11,12 @@ namespace Unity.UIWidgets.rendering {
 
         void removeChild(RenderBox child);
 
-        double estimateMaxScrollOffset(
+        float estimateMaxScrollOffset(
             SliverConstraints constraints,
             int firstIndex = 0,
             int lastIndex = 0,
-            double leadingScrollOffset = 0,
-            double trailingScrollOffset = 0);
+            float leadingScrollOffset = 0,
+            float trailingScrollOffset = 0);
 
         int? childCount { get; }
 
@@ -129,7 +129,8 @@ namespace Unity.UIWidgets.rendering {
                     child.parentData = childParentData;
                     this.insert(child, after: after);
                     childParentData._keptAlive = false;
-                } else {
+                }
+                else {
                     this._childManager.createChild(index, after: after);
                 }
             });
@@ -144,7 +145,8 @@ namespace Unity.UIWidgets.rendering {
                 child.parentData = childParentData;
                 base.adoptChild(child);
                 childParentData._keptAlive = true;
-            } else {
+            }
+            else {
                 D.assert(child.parent == this);
                 this._childManager.removeChild(child);
                 D.assert(child.parent == null);
@@ -180,7 +182,7 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
-        protected bool addInitialChild(int index = 0, double layoutOffset = 0.0) {
+        protected bool addInitialChild(int index = 0, float layoutOffset = 0.0f) {
             D.assert(this._debugAssertChildListLocked());
             D.assert(this.firstChild == null);
 
@@ -265,7 +267,7 @@ namespace Unity.UIWidgets.rendering {
             return childParentData.index;
         }
 
-        protected double paintExtentOf(RenderBox child) {
+        protected float paintExtentOf(RenderBox child) {
             D.assert(child != null);
             D.assert(child.hasSize);
 
@@ -276,11 +278,11 @@ namespace Unity.UIWidgets.rendering {
                     return child.size.height;
             }
 
-            return 0.0;
+            return 0.0f;
         }
 
-        protected override bool hitTestChildren(HitTestResult result, double mainAxisPosition = 0.0,
-            double crossAxisPosition = 0.0) {
+        protected override bool hitTestChildren(HitTestResult result, float mainAxisPosition = 0.0f,
+            float crossAxisPosition = 0.0f) {
             RenderBox child = this.lastChild;
             while (child != null) {
                 if (this.hitTestBoxChild(result, child, mainAxisPosition: mainAxisPosition,
@@ -294,11 +296,11 @@ namespace Unity.UIWidgets.rendering {
             return false;
         }
 
-        public override double childMainAxisPosition(RenderObject child) {
+        public override float childMainAxisPosition(RenderObject child) {
             return this.childScrollOffset(child) - this.constraints.scrollOffset;
         }
 
-        public override double childScrollOffset(RenderObject child) {
+        public override float childScrollOffset(RenderObject child) {
             D.assert(child != null);
             D.assert(child.parent == this);
 
@@ -320,35 +322,35 @@ namespace Unity.UIWidgets.rendering {
             switch (GrowthDirectionUtils.applyGrowthDirectionToAxisDirection(this.constraints.axisDirection,
                 this.constraints.growthDirection)) {
                 case AxisDirection.up:
-                    mainAxisUnit = new Offset(0.0, -1.0);
-                    crossAxisUnit = new Offset(1.0, 0.0);
-                    originOffset = offset + new Offset(0.0, this.geometry.paintExtent);
+                    mainAxisUnit = new Offset(0.0f, -1.0f);
+                    crossAxisUnit = new Offset(1.0f, 0.0f);
+                    originOffset = offset + new Offset(0.0f, this.geometry.paintExtent);
                     addExtent = true;
                     break;
                 case AxisDirection.right:
-                    mainAxisUnit = new Offset(1.0, 0.0);
-                    crossAxisUnit = new Offset(0.0, 1.0);
+                    mainAxisUnit = new Offset(1.0f, 0.0f);
+                    crossAxisUnit = new Offset(0.0f, 1.0f);
                     originOffset = offset;
                     addExtent = false;
                     break;
                 case AxisDirection.down:
-                    mainAxisUnit = new Offset(0.0, 1.0);
-                    crossAxisUnit = new Offset(1.0, 0.0);
+                    mainAxisUnit = new Offset(0.0f, 1.0f);
+                    crossAxisUnit = new Offset(1.0f, 0.0f);
                     originOffset = offset;
                     addExtent = false;
                     break;
                 case AxisDirection.left:
-                    mainAxisUnit = new Offset(-1.0, 0.0);
-                    crossAxisUnit = new Offset(0.0, 1.0);
-                    originOffset = offset + new Offset(this.geometry.paintExtent, 0.0);
+                    mainAxisUnit = new Offset(-1.0f, 0.0f);
+                    crossAxisUnit = new Offset(0.0f, 1.0f);
+                    originOffset = offset + new Offset((float) this.geometry.paintExtent, 0.0f);
                     addExtent = true;
                     break;
             }
 
             RenderBox child = this.firstChild;
             while (child != null) {
-                double mainAxisDelta = this.childMainAxisPosition(child);
-                double crossAxisDelta = this.childCrossAxisPosition(child);
+                float mainAxisDelta = this.childMainAxisPosition(child);
+                float crossAxisDelta = this.childCrossAxisPosition(child);
                 Offset childOffset = new Offset(
                     originOffset.dx + mainAxisUnit.dx * mainAxisDelta + crossAxisUnit.dx * crossAxisDelta,
                     originOffset.dy + mainAxisUnit.dy * mainAxisDelta + crossAxisUnit.dy * crossAxisDelta

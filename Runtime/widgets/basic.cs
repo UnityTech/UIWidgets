@@ -176,8 +176,8 @@ namespace Unity.UIWidgets.widgets {
     public class LimitedBox : SingleChildRenderObjectWidget {
         public LimitedBox(
             Key key = null,
-            double maxWidth = double.MaxValue,
-            double maxHeight = double.MaxValue,
+            float maxWidth = float.MaxValue,
+            float maxHeight = float.MaxValue,
             Widget child = null
         ) : base(key, child) {
             D.assert(maxWidth >= 0.0);
@@ -187,8 +187,8 @@ namespace Unity.UIWidgets.widgets {
             this.maxWidth = maxWidth;
         }
 
-        public readonly double maxWidth;
-        public readonly double maxHeight;
+        public readonly float maxWidth;
+        public readonly float maxHeight;
 
         public override RenderObject createRenderObject(BuildContext context) {
             return new RenderLimitedBox(
@@ -205,20 +205,20 @@ namespace Unity.UIWidgets.widgets {
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
-            properties.add(new DoubleProperty("maxWidth", this.maxWidth, defaultValue: double.PositiveInfinity));
-            properties.add(new DoubleProperty("maxHeight", this.maxHeight, defaultValue: double.PositiveInfinity));
+            properties.add(new FloatProperty("maxWidth", this.maxWidth, defaultValue: float.PositiveInfinity));
+            properties.add(new FloatProperty("maxHeight", this.maxHeight, defaultValue: float.PositiveInfinity));
         }
     }
 
     public class SizedBox : SingleChildRenderObjectWidget {
-        public SizedBox(Key key = null, double? width = null, double? height = null, Widget child = null)
+        public SizedBox(Key key = null, float? width = null, float? height = null, Widget child = null)
             : base(key: key, child: child) {
             this.width = width;
             this.height = height;
         }
 
         public static SizedBox expand(Key key = null, Widget child = null) {
-            return new SizedBox(key, double.PositiveInfinity, double.PositiveInfinity, child);
+            return new SizedBox(key, float.PositiveInfinity, float.PositiveInfinity, child);
         }
 
         public static SizedBox shrink(Key key = null, Widget child = null) {
@@ -227,13 +227,13 @@ namespace Unity.UIWidgets.widgets {
 
         public static SizedBox fromSize(Key key = null, Widget child = null, Size size = null) {
             return new SizedBox(key,
-                size == null ? (double?) null : size.width,
-                size == null ? (double?) null : size.height, child);
+                size == null ? (float?) null : size.width,
+                size == null ? (float?) null : size.height, child);
         }
 
-        public readonly double? width;
+        public readonly float? width;
 
-        public readonly double? height;
+        public readonly float? height;
 
         public override RenderObject createRenderObject(BuildContext context) {
             return new RenderConstrainedBox(
@@ -429,13 +429,13 @@ namespace Unity.UIWidgets.widgets {
     public class AspectRatio : SingleChildRenderObjectWidget {
         public AspectRatio(
             Key key = null,
-            double aspectRatio = 1.0,
+            float aspectRatio = 1.0f,
             Widget child = null
         ) : base(key: key, child: child) {
             this.aspectRatio = aspectRatio;
         }
 
-        public readonly double aspectRatio;
+        public readonly float aspectRatio;
 
         public override RenderObject createRenderObject(BuildContext context) {
             return new RenderAspectRatio(aspectRatio: this.aspectRatio);
@@ -526,8 +526,8 @@ namespace Unity.UIWidgets.widgets {
     }
 
     public class Positioned : ParentDataWidget<Stack> {
-        public Positioned(Widget child, Key key = null, double? left = null, double? top = null,
-            double? right = null, double? bottom = null, double? width = null, double? height = null) :
+        public Positioned(Widget child, Key key = null, float? left = null, float? top = null,
+            float? right = null, float? bottom = null, float? width = null, float? height = null) :
             base(key, child) {
             D.assert(left == null || right == null || width == null);
             D.assert(top == null || bottom == null || height == null);
@@ -550,15 +550,15 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public static Positioned fill(Widget child, Key key = null) {
-            return new Positioned(child, key: key, left: 0.0,
-                top: 0.0, right: 0.0, bottom: 0.0);
+            return new Positioned(child, key: key, left: 0.0f,
+                top: 0.0f, right: 0.0f, bottom: 0.0f);
         }
 
         public static Positioned directional(Widget child, TextDirection textDirection, Key key = null,
-            double? start = null, double? top = null,
-            double? end = null, double? bottom = null, double? width = null, double? height = null) {
-            double? left = null;
-            double? right = null;
+            float? start = null, float? top = null,
+            float? end = null, float? bottom = null, float? width = null, float? height = null) {
+            float? left = null;
+            float? right = null;
             switch (textDirection) {
                 case TextDirection.rtl:
                     left = end;
@@ -574,17 +574,17 @@ namespace Unity.UIWidgets.widgets {
                 height: height);
         }
 
-        public readonly double? left;
+        public readonly float? left;
 
-        public readonly double? top;
+        public readonly float? top;
 
-        public readonly double? right;
+        public readonly float? right;
 
-        public readonly double? bottom;
+        public readonly float? bottom;
 
-        public readonly double? width;
+        public readonly float? width;
 
-        public readonly double? height;
+        public readonly float? height;
 
         public override void applyParentData(RenderObject renderObject) {
             D.assert(renderObject.parentData is StackParentData);
@@ -1084,8 +1084,8 @@ namespace Unity.UIWidgets.widgets {
         public Align(
             Key key = null,
             Alignment alignment = null,
-            double? widthFactor = null,
-            double? heightFactor = null,
+            float? widthFactor = null,
+            float? heightFactor = null,
             Widget child = null
         ) : base(key, child) {
             D.assert(widthFactor == null || widthFactor >= 0.0);
@@ -1098,9 +1098,9 @@ namespace Unity.UIWidgets.widgets {
 
         public readonly Alignment alignment;
 
-        public readonly double? widthFactor;
+        public readonly float? widthFactor;
 
-        public readonly double? heightFactor;
+        public readonly float? heightFactor;
 
         public override RenderObject createRenderObject(BuildContext context) {
             return new RenderPositionedBox(
@@ -1130,8 +1130,8 @@ namespace Unity.UIWidgets.widgets {
     public class Center : Align {
         public Center(
             Key key = null,
-            double? widthFactor = null,
-            double? heightFactor = null,
+            float? widthFactor = null,
+            float? heightFactor = null,
             Widget child = null)
             : base(
                 key: key,
@@ -1267,7 +1267,7 @@ namespace Unity.UIWidgets.widgets {
             TextAlign textAlign = TextAlign.left,
             bool softWrap = true,
             TextOverflow overflow = TextOverflow.clip,
-            double textScaleFactor = 1.0,
+            float textScaleFactor = 1.0f,
             int? maxLines = null
         ) : base(key: key) {
             D.assert(text != null);
@@ -1285,7 +1285,7 @@ namespace Unity.UIWidgets.widgets {
         public readonly TextAlign textAlign;
         public readonly bool softWrap;
         public readonly TextOverflow overflow;
-        public readonly double textScaleFactor;
+        public readonly float textScaleFactor;
         public readonly int? maxLines;
 
         public override RenderObject createRenderObject(BuildContext context) {
@@ -1325,9 +1325,9 @@ namespace Unity.UIWidgets.widgets {
         public RawImage(
             Key key = null,
             ui.Image image = null,
-            double? width = null,
-            double? height = null,
-            double scale = 1.0,
+            float? width = null,
+            float? height = null,
+            float scale = 1.0f,
             Color color = null,
             BlendMode colorBlendMode = BlendMode.srcIn,
             BoxFit? fit = null,
@@ -1352,9 +1352,9 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public readonly ui.Image image;
-        public readonly double? width;
-        public readonly double? height;
-        public readonly double scale;
+        public readonly float? width;
+        public readonly float? height;
+        public readonly float scale;
         public readonly Color color;
         public readonly FilterMode filterMode;
         public readonly BlendMode colorBlendMode;

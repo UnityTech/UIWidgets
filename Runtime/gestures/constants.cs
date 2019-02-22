@@ -2,13 +2,13 @@ using System;
 
 namespace Unity.UIWidgets.gestures {
     public static class Constants {
-        public const double kTouchSlop = 18.0;
+        public const float kTouchSlop = 18.0f;
 
-        public const double kDoubleTapTouchSlop = kTouchSlop;
+        public const float kDoubleTapTouchSlop = kTouchSlop;
 
-        public const double kDoubleTapSlop = 100.0;
+        public const float kDoubleTapSlop = 100.0f;
 
-        public const double kPanSlop = kTouchSlop * 2.0;
+        public const float kPanSlop = kTouchSlop * 2.0f;
 
         public static readonly TimeSpan kPressTimeout = new TimeSpan(0, 0, 0, 0, 100);
 
@@ -16,8 +16,8 @@ namespace Unity.UIWidgets.gestures {
 
         public static readonly TimeSpan kLongPressTimeout = new TimeSpan(0, 0, 0, 0, 500);
 
-        public const double kMinFlingVelocity = 50.0;
+        public const float kMinFlingVelocity = 50.0f;
 
-        public const double kMaxFlingVelocity = 8000.0;
+        public const float kMaxFlingVelocity = 8000.0f;
     }
 }

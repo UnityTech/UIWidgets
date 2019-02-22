@@ -19,16 +19,16 @@ namespace Unity.UIWidgets.material {
             Color highlightColor = null,
             Color splashColor = null,
             Brightness? colorBrightness = null,
-            double? elevation = null,
-            double? highlightElevation = null,
-            double? disabledElevation = null,
+            float? elevation = null,
+            float? highlightElevation = null,
+            float? disabledElevation = null,
             EdgeInsets padding = null,
             ShapeBorder shape = null,
             Clip? clipBehavior = Clip.none,
             MaterialTapTargetSize? materialTapTargetSize = null,
             TimeSpan? animationDuration = null,
-            double? minWidth = null,
-            double? height = null,
+            float? minWidth = null,
+            float? height = null,
             Widget child = null
         ) : base(key: key) {
             this.onPressed = onPressed;
@@ -96,9 +96,9 @@ namespace Unity.UIWidgets.material {
 
         public readonly MaterialTapTargetSize? materialTapTargetSize;
 
-        public readonly double? minWidth;
+        public readonly float? minWidth;
 
-        public readonly double? height;
+        public readonly float? height;
 
         public override Widget build(BuildContext context) {
             ThemeData theme = Theme.of(context);

@@ -33,7 +33,7 @@ namespace Unity.UIWidgets.rendering {
 
         EdgeInsets _padding;
 
-        public double beforePadding {
+        public float beforePadding {
             get {
                 D.assert(this.constraints != null);
 
@@ -49,11 +49,11 @@ namespace Unity.UIWidgets.rendering {
                         return this._padding.right;
                 }
 
-                return 0.0;
+                return 0.0f;
             }
         }
 
-        public double afterPadding {
+        public float afterPadding {
             get {
                 D.assert(this.constraints != null);
 
@@ -69,11 +69,11 @@ namespace Unity.UIWidgets.rendering {
                         return this._padding.left;
                 }
 
-                return 0.0;
+                return 0.0f;
             }
         }
 
-        public double mainAxisPadding {
+        public float mainAxisPadding {
             get {
                 D.assert(this.constraints != null);
 
@@ -81,7 +81,7 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
-        public double crossAxisPadding {
+        public float crossAxisPadding {
             get {
                 D.assert(this.constraints != null);
 
@@ -93,7 +93,7 @@ namespace Unity.UIWidgets.rendering {
                 }
 
                 D.assert(false);
-                return 0.0;
+                return 0.0f;
             }
         }
 
@@ -104,10 +104,10 @@ namespace Unity.UIWidgets.rendering {
         }
 
         protected override void performLayout() {
-            double beforePadding = this.beforePadding;
-            double afterPadding = this.afterPadding;
-            double mainAxisPadding = this.mainAxisPadding;
-            double crossAxisPadding = this.crossAxisPadding;
+            float beforePadding = this.beforePadding;
+            float afterPadding = this.afterPadding;
+            float mainAxisPadding = this.mainAxisPadding;
+            float crossAxisPadding = this.crossAxisPadding;
             if (this.child == null) {
                 this.geometry = new SliverGeometry(
                     scrollExtent: mainAxisPadding,
@@ -119,14 +119,14 @@ namespace Unity.UIWidgets.rendering {
 
             this.child.layout(
                 this.constraints.copyWith(
-                    scrollOffset: Math.Max(0.0, this.constraints.scrollOffset - beforePadding),
-                    cacheOrigin: Math.Min(0.0, this.constraints.cacheOrigin + beforePadding),
-                    overlap: 0.0,
+                    scrollOffset: (float) Math.Max(0.0, this.constraints.scrollOffset - beforePadding),
+                    cacheOrigin: (float) Math.Min(0.0, this.constraints.cacheOrigin + beforePadding),
+                    overlap: 0.0f,
                     remainingPaintExtent: this.constraints.remainingPaintExtent -
-                                          this.calculatePaintOffset(this.constraints, from: 0.0, to: beforePadding),
+                                          this.calculatePaintOffset(this.constraints, from: 0.0f, to: beforePadding),
                     remainingCacheExtent: this.constraints.remainingCacheExtent -
-                                          this.calculateCacheOffset(this.constraints, from: 0.0, to: beforePadding),
-                    crossAxisExtent: Math.Max(0.0, this.constraints.crossAxisExtent - crossAxisPadding)
+                                          this.calculateCacheOffset(this.constraints, from: 0.0f, to: beforePadding),
+                    crossAxisExtent: (float) Math.Max(0.0, this.constraints.crossAxisExtent - crossAxisPadding)
                 ),
                 parentUsesSize: true
             );
@@ -141,7 +141,7 @@ namespace Unity.UIWidgets.rendering {
 
             double beforePaddingPaintExtent = this.calculatePaintOffset(
                 this.constraints,
-                from: 0.0,
+                from: 0.0f,
                 to: beforePadding
             );
 
@@ -154,7 +154,7 @@ namespace Unity.UIWidgets.rendering {
             double mainAxisPaddingPaintExtent = beforePaddingPaintExtent + afterPaddingPaintExtent;
             double beforePaddingCacheExtent = this.calculateCacheOffset(
                 this.constraints,
-                from: 0.0,
+                from: 0.0f,
                 to: beforePadding
             );
             double afterPaddingCacheExtent = this.calculateCacheOffset(
@@ -172,12 +172,13 @@ namespace Unity.UIWidgets.rendering {
 
             this.geometry = new SliverGeometry(
                 scrollExtent: mainAxisPadding + childLayoutGeometry.scrollExtent,
-                paintExtent: paintExtent,
-                layoutExtent: Math.Min(mainAxisPaddingPaintExtent + childLayoutGeometry.layoutExtent, paintExtent),
-                cacheExtent: Math.Min(mainAxisPaddingCacheExtent + childLayoutGeometry.cacheExtent,
+                paintExtent: (float) paintExtent,
+                layoutExtent: (float) Math.Min(mainAxisPaddingPaintExtent + childLayoutGeometry.layoutExtent,
+                    paintExtent),
+                cacheExtent: (float) Math.Min(mainAxisPaddingCacheExtent + childLayoutGeometry.cacheExtent,
                     this.constraints.remainingCacheExtent),
                 maxPaintExtent: mainAxisPadding + childLayoutGeometry.maxPaintExtent,
-                hitTestExtent: Math.Max(
+                hitTestExtent: (float) Math.Max(
                     mainAxisPaddingPaintExtent + childLayoutGeometry.paintExtent,
                     beforePaddingPaintExtent + childLayoutGeometry.hitTestExtent
                 ),
@@ -195,12 +196,12 @@ namespace Unity.UIWidgets.rendering {
                     break;
                 case AxisDirection.right:
                     childParentData.paintOffset =
-                        new Offset(this.calculatePaintOffset(this.constraints, from: 0.0, to: this._padding.left),
+                        new Offset(this.calculatePaintOffset(this.constraints, from: 0.0f, to: this._padding.left),
                             this._padding.top);
                     break;
                 case AxisDirection.down:
                     childParentData.paintOffset = new Offset(this._padding.left,
-                        this.calculatePaintOffset(this.constraints, from: 0.0, to: this._padding.top));
+                        this.calculatePaintOffset(this.constraints, from: 0.0f, to: this._padding.top));
                     break;
                 case AxisDirection.left:
                     childParentData.paintOffset = new Offset(
@@ -218,8 +219,8 @@ namespace Unity.UIWidgets.rendering {
             D.assert(crossAxisPadding == this.crossAxisPadding);
         }
 
-        protected override bool hitTestChildren(HitTestResult result, double mainAxisPosition = 0.0,
-            double crossAxisPosition = 0.0) {
+        protected override bool hitTestChildren(HitTestResult result, float mainAxisPosition = 0.0f,
+            float crossAxisPosition = 0.0f) {
             if (this.child != null && this.child.geometry.hitTestExtent > 0.0) {
                 return this.child.hitTest(result,
                     mainAxisPosition: mainAxisPosition - this.childMainAxisPosition(this.child),
@@ -229,14 +230,14 @@ namespace Unity.UIWidgets.rendering {
             return false;
         }
 
-        public override double childMainAxisPosition(RenderObject child) {
+        public override float childMainAxisPosition(RenderObject child) {
             D.assert(child != null);
             D.assert(child == this.child);
 
-            return this.calculatePaintOffset(this.constraints, from: 0.0, to: this.beforePadding);
+            return this.calculatePaintOffset(this.constraints, from: 0.0f, to: this.beforePadding);
         }
 
-        public override double childCrossAxisPosition(RenderObject child) {
+        public override float childCrossAxisPosition(RenderObject child) {
             D.assert(child != null);
             D.assert(child == this.child);
             D.assert(this.constraints != null);
@@ -251,10 +252,10 @@ namespace Unity.UIWidgets.rendering {
                     return this._padding.top;
             }
 
-            return 0.0;
+            return 0.0f;
         }
 
-        public override double childScrollOffset(RenderObject child) {
+        public override float childScrollOffset(RenderObject child) {
             D.assert(child.parent == this);
 
             return this.beforePadding;

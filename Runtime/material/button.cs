@@ -29,7 +29,7 @@ namespace Unity.UIWidgets.material {
             MaterialTapTargetSize _materialTapTargetSize = materialTapTargetSize ?? MaterialTapTargetSize.padded;
             shape = shape ?? new RoundedRectangleBorder();
             padding = padding ?? EdgeInsets.zero;
-            constraints = constraints ?? new BoxConstraints(minWidth: 88.0, minHeight: 36.0);
+            constraints = constraints ?? new BoxConstraints(minWidth: 88.0f, minHeight: 36.0f);
             TimeSpan _animationDuration = animationDuration ?? Constants.kThemeChangeDuration;
 
             this.onPressed = onPressed;
@@ -134,8 +134,8 @@ namespace Unity.UIWidgets.material {
                             child: new Container(
                                 padding: this.widget.padding,
                                 child: new Center(
-                                    widthFactor: 1.0,
-                                    heightFactor: 1.0,
+                                    widthFactor: 1.0f,
+                                    heightFactor: 1.0f,
                                     child: this.widget.child)
                             )
                         )

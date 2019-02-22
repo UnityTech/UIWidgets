@@ -9,25 +9,25 @@ namespace Unity.UIWidgets.rendering {
         ) : base(childManager: childManager) {
         }
 
-        public abstract double itemExtent { get; set; }
+        public abstract float itemExtent { get; set; }
 
-        protected virtual double indexToLayoutOffset(double itemExtent, int index) {
+        protected virtual float indexToLayoutOffset(float itemExtent, int index) {
             return itemExtent * index;
         }
 
-        protected virtual int getMinChildIndexForScrollOffset(double scrollOffset, double itemExtent) {
+        protected virtual int getMinChildIndexForScrollOffset(float scrollOffset, float itemExtent) {
             return itemExtent > 0.0 ? Math.Max(0, (int) (scrollOffset / itemExtent)) : 0;
         }
 
-        protected virtual int getMaxChildIndexForScrollOffset(double scrollOffset, double itemExtent) {
+        protected virtual int getMaxChildIndexForScrollOffset(float scrollOffset, float itemExtent) {
             return itemExtent > 0.0 ? Math.Max(0, (int) Math.Ceiling(scrollOffset / itemExtent) - 1) : 0;
         }
 
-        protected virtual double estimateMaxScrollOffset(SliverConstraints constraints,
+        protected virtual float estimateMaxScrollOffset(SliverConstraints constraints,
             int firstIndex = 0,
             int lastIndex = 0,
-            double leadingScrollOffset = 0.0,
-            double trailingScrollOffset = 0.0
+            float leadingScrollOffset = 0.0f,
+            float trailingScrollOffset = 0.0f
         ) {
             return this.childManager.estimateMaxScrollOffset(
                 constraints,
@@ -38,7 +38,7 @@ namespace Unity.UIWidgets.rendering {
             );
         }
 
-        protected double computeMaxScrollOffset(SliverConstraints constraints, double itemExtent) {
+        protected float computeMaxScrollOffset(SliverConstraints constraints, float itemExtent) {
             return this.childManager.childCount.Value * itemExtent;
         }
 
@@ -46,13 +46,13 @@ namespace Unity.UIWidgets.rendering {
             this.childManager.didStartLayout();
             this.childManager.setDidUnderflow(false);
 
-            double itemExtent = this.itemExtent;
+            float itemExtent = this.itemExtent;
 
-            double scrollOffset = this.constraints.scrollOffset + this.constraints.cacheOrigin;
+            float scrollOffset = this.constraints.scrollOffset + this.constraints.cacheOrigin;
             D.assert(scrollOffset >= 0.0);
-            double remainingExtent = this.constraints.remainingCacheExtent;
+            float remainingExtent = this.constraints.remainingCacheExtent;
             D.assert(remainingExtent >= 0.0);
-            double targetEndScrollOffset = scrollOffset + remainingExtent;
+            float targetEndScrollOffset = scrollOffset + remainingExtent;
 
             BoxConstraints childConstraints = this.constraints.asBoxConstraints(
                 minExtent: itemExtent,
@@ -79,7 +79,7 @@ namespace Unity.UIWidgets.rendering {
             if (this.firstChild == null) {
                 if (!this.addInitialChild(index: firstIndex,
                     layoutOffset: this.indexToLayoutOffset(itemExtent, firstIndex))) {
-                    double max = this.computeMaxScrollOffset(this.constraints, itemExtent);
+                    float max = this.computeMaxScrollOffset(this.constraints, itemExtent);
                     this.geometry = new SliverGeometry(
                         scrollExtent: max,
                         maxPaintExtent: max
@@ -130,8 +130,8 @@ namespace Unity.UIWidgets.rendering {
             }
 
             int lastIndex = this.indexOf(this.lastChild);
-            double leadingScrollOffset = this.indexToLayoutOffset(itemExtent, firstIndex);
-            double trailingScrollOffset = this.indexToLayoutOffset(itemExtent, lastIndex + 1);
+            float leadingScrollOffset = this.indexToLayoutOffset(itemExtent, firstIndex);
+            float trailingScrollOffset = this.indexToLayoutOffset(itemExtent, lastIndex + 1);
 
             D.assert(firstIndex == 0 || this.childScrollOffset(this.firstChild) <= scrollOffset);
             D.assert(this.debugAssertChildListIsNonEmptyAndContiguous());
@@ -139,7 +139,7 @@ namespace Unity.UIWidgets.rendering {
             D.assert(targetLastIndex == null || lastIndex <= targetLastIndex);
 
 
-            double estimatedMaxScrollOffset = this.estimateMaxScrollOffset(
+            float estimatedMaxScrollOffset = this.estimateMaxScrollOffset(
                 this.constraints,
                 firstIndex: firstIndex,
                 lastIndex: lastIndex,
@@ -147,19 +147,19 @@ namespace Unity.UIWidgets.rendering {
                 trailingScrollOffset: trailingScrollOffset
             );
 
-            double paintExtent = this.calculatePaintOffset(
+            float paintExtent = this.calculatePaintOffset(
                 this.constraints,
-                from: leadingScrollOffset,
-                to: trailingScrollOffset
+                from: (float) leadingScrollOffset,
+                to: (float) trailingScrollOffset
             );
 
-            double cacheExtent = this.calculateCacheOffset(
+            float cacheExtent = this.calculateCacheOffset(
                 this.constraints,
-                from: leadingScrollOffset,
-                to: trailingScrollOffset
+                from: (float) leadingScrollOffset,
+                to: (float) trailingScrollOffset
             );
 
-            double targetEndScrollOffsetForPaint =
+            float targetEndScrollOffsetForPaint =
                 this.constraints.scrollOffset + this.constraints.remainingPaintExtent;
             int? targetLastIndexForPaint = !double.IsInfinity(targetEndScrollOffsetForPaint)
                 ? this.getMaxChildIndexForScrollOffset(targetEndScrollOffsetForPaint, itemExtent)
@@ -184,12 +184,12 @@ namespace Unity.UIWidgets.rendering {
     public class RenderSliverFixedExtentList : RenderSliverFixedExtentBoxAdaptor {
         public RenderSliverFixedExtentList(
             RenderSliverBoxChildManager childManager = null,
-            double itemExtent = 0.0
+            float itemExtent = 0.0f
         ) : base(childManager: childManager) {
             this._itemExtent = itemExtent;
         }
 
-        public override double itemExtent {
+        public override float itemExtent {
             get { return this._itemExtent; }
             set {
                 if (this._itemExtent == value) {
@@ -201,6 +201,6 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
-        double _itemExtent;
+        float _itemExtent;
     }
 }

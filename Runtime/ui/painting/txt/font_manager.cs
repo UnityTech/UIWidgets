@@ -57,6 +57,7 @@ namespace Unity.UIWidgets.ui {
             foreach (var fontName in osFont.fontNames) {
                 this._fonts[fontName] = newFont;
             }
+
             return newFont;
         }
 

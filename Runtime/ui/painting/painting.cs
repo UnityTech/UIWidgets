@@ -20,7 +20,7 @@ namespace Unity.UIWidgets.ui {
             return a.withAlpha((a.alpha * factor).round().clamp(0, 255));
         }
     }
-    
+
     public class Color : IEquatable<Color> {
         public Color(long value) {
             this.value = value & 0xFFFFFFFF;
@@ -324,7 +324,7 @@ namespace Unity.UIWidgets.ui {
         }
     }
 
-  
+
     public class Paint {
         static readonly Color _kColorDefault = new Color(0xFFFFFFFF);
 

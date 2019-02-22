@@ -30,7 +30,7 @@ namespace Unity.UIWidgets.widgets {
         public override AnimationController createAnimationController() {
             var controller = base.createAnimationController();
             if (this.settings.isInitialRoute) {
-                controller.setValue(1.0);
+                controller.setValue(1.0f);
             }
 
             return controller;
@@ -76,18 +76,18 @@ namespace Unity.UIWidgets.widgets {
 
         public override bool maintainState { get; }
 
-        Widget _defaultTransitionsBuilder(BuildContext context, Animation<double>
-            animation, Animation<double> secondaryAnimation, Widget child) {
+        Widget _defaultTransitionsBuilder(BuildContext context, Animation<float>
+            animation, Animation<float> secondaryAnimation, Widget child) {
             return child;
         }
 
-        public override Widget buildPage(BuildContext context, Animation<double> animation,
-            Animation<double> secondaryAnimation) {
+        public override Widget buildPage(BuildContext context, Animation<float> animation,
+            Animation<float> secondaryAnimation) {
             return this.pageBuilder(context, animation, secondaryAnimation);
         }
 
-        public override Widget buildTransitions(BuildContext context, Animation<double> animation,
-            Animation<double> secondaryAnimation, Widget child) {
+        public override Widget buildTransitions(BuildContext context, Animation<float> animation,
+            Animation<float> secondaryAnimation, Widget child) {
             return this.transitionsBuilder(context, animation, secondaryAnimation, child);
         }
     }

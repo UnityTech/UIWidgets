@@ -73,11 +73,12 @@ namespace Unity.UIWidgets.ui {
                         paintBounds = state.xform.mapRect(paintBounds);
                         this._addPaintBounds(paintBounds);
                     }
+
                     break;
                 }
                 case DrawTranslate cmd: {
                     var state = this._getState();
-                    state.xform.preTranslate((float) cmd.dx, (float) cmd.dy);
+                    state.xform.preTranslate(cmd.dx, cmd.dy);
                     break;
                 }
                 case DrawScale cmd: {
@@ -95,6 +96,7 @@ namespace Unity.UIWidgets.ui {
                             (float) cmd.offset.dx,
                             (float) cmd.offset.dy);
                     }
+
                     break;
                 }
                 case DrawSkew cmd: {

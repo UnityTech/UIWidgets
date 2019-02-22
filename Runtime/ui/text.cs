@@ -19,9 +19,9 @@ namespace Unity.UIWidgets.ui {
     }
 
     public class ParagraphConstraints : IEquatable<ParagraphConstraints> {
-        public readonly double width;
+        public readonly float width;
 
-        public ParagraphConstraints(double width) {
+        public ParagraphConstraints(float width) {
             this.width = width;
         }
 
@@ -72,13 +72,13 @@ namespace Unity.UIWidgets.ui {
 
     public class TextStyle : IEquatable<TextStyle> {
         public readonly Color color = Color.fromARGB(255, 0, 0, 0);
-        public readonly double fontSize = 14.0;
+        public readonly float fontSize = 14.0f;
         public readonly FontWeight fontWeight = FontWeight.w400;
         public readonly FontStyle fontStyle = FontStyle.normal;
-        public readonly double letterSpacing = 0.0;
-        public readonly double wordSpacing = 0.0;
+        public readonly float letterSpacing = 0.0f;
+        public readonly float wordSpacing = 0.0f;
         public readonly TextBaseline textBaseline = TextBaseline.alphabetic;
-        public readonly double height = 1.0;
+        public readonly float height = 1.0f;
         public readonly TextDecoration decoration = TextDecoration.none;
         public readonly Color decorationColor;
         public readonly TextDecorationStyle decorationStyle = TextDecorationStyle.solid;
@@ -173,9 +173,9 @@ namespace Unity.UIWidgets.ui {
         }
 
 
-        public TextStyle(Color color = null, double? fontSize = null,
-            FontWeight? fontWeight = null, FontStyle? fontStyle = null, double? letterSpacing = null,
-            double? wordSpacing = null, TextBaseline? textBaseline = null, double? height = null,
+        public TextStyle(Color color = null, float? fontSize = null,
+            FontWeight? fontWeight = null, FontStyle? fontStyle = null, float? letterSpacing = null,
+            float? wordSpacing = null, TextBaseline? textBaseline = null, float? height = null,
             TextDecoration decoration = null, TextDecorationStyle? decorationStyle = null, Color decorationColor = null,
             string fontFamily = null,
             Paint background = null
@@ -203,9 +203,9 @@ namespace Unity.UIWidgets.ui {
             FontWeight? fontWeight = null,
             FontStyle? fontStyle = null,
             int? maxLines = null,
-            double? fontSize = null,
+            float? fontSize = null,
             string fontFamily = null,
-            double? lineHeight = null, // todo  
+            float? lineHeight = null, // todo  
             string ellipsis = null) {
             this.textAlign = textAlign;
             this.textDirection = textDirection;
@@ -292,9 +292,9 @@ namespace Unity.UIWidgets.ui {
         public readonly FontWeight? fontWeight;
         public readonly FontStyle? fontStyle;
         public readonly int? maxLines;
-        public readonly double? fontSize;
+        public readonly float? fontSize;
         public readonly string fontFamily;
-        public readonly double? lineHeight;
+        public readonly float? lineHeight;
         public readonly string ellipsis;
 
         public bool ellipsized() {
@@ -440,17 +440,17 @@ namespace Unity.UIWidgets.ui {
     }
 
     public class TextBox : IEquatable<TextBox> {
-        public readonly double left;
+        public readonly float left;
 
-        public readonly double top;
+        public readonly float top;
 
-        public readonly double right;
+        public readonly float right;
 
-        public readonly double bottom;
+        public readonly float bottom;
 
         public readonly TextDirection direction;
 
-        TextBox(double left, double top, double right, double bottom, TextDirection direction) {
+        TextBox(float left, float top, float right, float bottom, TextDirection direction) {
             this.left = left;
             this.top = top;
             this.right = right;
@@ -458,7 +458,7 @@ namespace Unity.UIWidgets.ui {
             this.direction = direction;
         }
 
-        public static TextBox fromLTBD(double left, double top, double right, double bottom, TextDirection direction) {
+        public static TextBox fromLTBD(float left, float top, float right, float bottom, TextDirection direction) {
             return new TextBox(left, top, right, bottom, direction);
         }
 
@@ -466,11 +466,11 @@ namespace Unity.UIWidgets.ui {
             return Rect.fromLTRB(this.left, this.top, this.right, this.bottom);
         }
 
-        public double start {
+        public float start {
             get { return this.direction == TextDirection.ltr ? this.left : this.right; }
         }
 
-        public double end {
+        public float end {
             get { return this.direction == TextDirection.ltr ? this.right : this.left; }
         }
 

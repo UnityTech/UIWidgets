@@ -16,7 +16,7 @@ namespace Unity.UIWidgets.material {
             this.color = color;
             this.elevation = elevation;
             this.shape = shape;
-            this.margin = margin ?? EdgeInsets.all(4.0);
+            this.margin = margin ?? EdgeInsets.all(4.0f);
             this.clipBehavior = clipBehavior;
             this.child = child;
         }
@@ -35,13 +35,13 @@ namespace Unity.UIWidgets.material {
 
         public override Widget build(BuildContext context) {
             return new Container(
-                margin: this.margin ?? EdgeInsets.all(4.0),
+                margin: this.margin ?? EdgeInsets.all(4.0f),
                 child: new Material(
                     type: MaterialType.card,
                     color: this.color ?? Theme.of(context).cardColor,
                     elevation: this.elevation ?? 1.0,
                     shape: this.shape ?? new RoundedRectangleBorder(
-                               borderRadius: BorderRadius.all(Radius.circular(4.0))
+                               borderRadius: BorderRadius.all(Radius.circular(4.0f))
                            ),
                     clipBehavior: this.clipBehavior,
                     child: this.child)

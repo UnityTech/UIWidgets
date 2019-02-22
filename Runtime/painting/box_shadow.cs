@@ -7,8 +7,8 @@ namespace Unity.UIWidgets.painting {
         public BoxShadow(
             Color color = null,
             Offset offset = null,
-            double blurRadius = 0.0,
-            double spreadRadius = 0.0
+            float blurRadius = 0.0f,
+            float spreadRadius = 0.0f
         ) {
             this.color = color ?? Color.black;
             this.offset = offset ?? Offset.zero;
@@ -18,8 +18,8 @@ namespace Unity.UIWidgets.painting {
 
         public readonly Color color;
         public readonly Offset offset;
-        public readonly double blurRadius;
-        public readonly double spreadRadius;
+        public readonly float blurRadius;
+        public readonly float spreadRadius;
 
         public static double convertRadiusToSigma(double radius) {
             return radius * 0.57735 + 0.5;
@@ -36,7 +36,7 @@ namespace Unity.UIWidgets.painting {
             };
         }
 
-        public BoxShadow scale(double factor) {
+        public BoxShadow scale(float factor) {
             return new BoxShadow(
                 color: this.color,
                 offset: this.offset * factor,
@@ -45,7 +45,7 @@ namespace Unity.UIWidgets.painting {
             );
         }
 
-        public static BoxShadow lerp(BoxShadow a, BoxShadow b, double t) {
+        public static BoxShadow lerp(BoxShadow a, BoxShadow b, float t) {
             if (a == null && b == null) {
                 return null;
             }
@@ -55,18 +55,18 @@ namespace Unity.UIWidgets.painting {
             }
 
             if (b == null) {
-                return a.scale(1.0 - t);
+                return a.scale(1.0f - t);
             }
 
             return new BoxShadow(
                 color: Color.lerp(a.color, b.color, t),
                 offset: Offset.lerp(a.offset, b.offset, t),
-                blurRadius: MathUtils.lerpDouble(a.blurRadius, b.blurRadius, t),
-                spreadRadius: MathUtils.lerpDouble(a.spreadRadius, b.spreadRadius, t)
+                blurRadius: MathUtils.lerpFloat(a.blurRadius, b.blurRadius, t),
+                spreadRadius: MathUtils.lerpFloat(a.spreadRadius, b.spreadRadius, t)
             );
         }
 
-        public static List<BoxShadow> lerpList(List<BoxShadow> a, List<BoxShadow> b, double t) {
+        public static List<BoxShadow> lerpList(List<BoxShadow> a, List<BoxShadow> b, float t) {
             if (a == null && b == null) {
                 return null;
             }
@@ -80,7 +80,7 @@ namespace Unity.UIWidgets.painting {
             }
 
             for (int i = commonLength; i < a.Count; i += 1) {
-                result.Add(a[i].scale(1.0 - t));
+                result.Add(a[i].scale(1.0f - t));
             }
 
             for (int i = commonLength; i < b.Count; i += 1) {

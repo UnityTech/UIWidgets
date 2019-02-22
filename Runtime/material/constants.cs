@@ -19,8 +19,8 @@ namespace Unity.UIWidgets.material {
 
         public static readonly TimeSpan kTabScrollDuration = new TimeSpan(0, 0, 0, 0, 300);
 
-        public static readonly EdgeInsets kTabLabelPadding = EdgeInsets.symmetric(horizontal: 16.0);
+        public static readonly EdgeInsets kTabLabelPadding = EdgeInsets.symmetric(horizontal: 16.0f);
 
-        public static readonly EdgeInsets kMaterialListPadding = EdgeInsets.symmetric(vertical: 8.0);
+        public static readonly EdgeInsets kMaterialListPadding = EdgeInsets.symmetric(vertical: 8.0f);
     }
 }

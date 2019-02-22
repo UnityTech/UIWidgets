@@ -206,40 +206,40 @@ namespace Unity.UIWidgets.rendering {
             return constraints.constrain(this._delegate.getSize(constraints));
         }
 
-        protected override double computeMinIntrinsicWidth(double height) {
-            double width = this._getSize(BoxConstraints.tightForFinite(height: height)).width;
-            if (width.isFinite()) {
+        protected override float computeMinIntrinsicWidth(float height) {
+            float width = (float) this._getSize(BoxConstraints.tightForFinite(height: height)).width;
+            if (!float.IsInfinity(width)) {
                 return width;
             }
 
-            return 0.0;
+            return 0.0f;
         }
 
-        protected override double computeMaxIntrinsicWidth(double height) {
-            double width = this._getSize(BoxConstraints.tightForFinite(height: height)).width;
-            if (width.isFinite()) {
+        protected override float computeMaxIntrinsicWidth(float height) {
+            float width = (float) this._getSize(BoxConstraints.tightForFinite(height: height)).width;
+            if (!float.IsInfinity(width)) {
                 return width;
             }
 
-            return 0.0;
+            return 0.0f;
         }
 
-        protected override double computeMinIntrinsicHeight(double width) {
-            double height = this._getSize(BoxConstraints.tightForFinite(width: width)).height;
-            if (height.isFinite()) {
+        protected override float computeMinIntrinsicHeight(float width) {
+            float height = (float) this._getSize(BoxConstraints.tightForFinite(width: width)).height;
+            if (!float.IsInfinity(height)) {
                 return height;
             }
 
-            return 0.0;
+            return 0.0f;
         }
 
-        protected override double computeMaxIntrinsicHeight(double width) {
-            double height = this._getSize(BoxConstraints.tightForFinite(width: width)).height;
-            if (height.isFinite()) {
+        protected override float computeMaxIntrinsicHeight(float width) {
+            float height = (float) this._getSize(BoxConstraints.tightForFinite(width: width)).height;
+            if (!float.IsInfinity(height)) {
                 return height;
             }
 
-            return 0.0;
+            return 0.0f;
         }
 
         protected override void performLayout() {

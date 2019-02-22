@@ -17,39 +17,39 @@ namespace Unity.UIWidgets.material {
             D.assert(this.end != null);
 
             Offset delta = this.end - this.begin;
-            double deltaX = delta.dx.abs();
-            double deltaY = delta.dy.abs();
-            double distanceFromAtoB = delta.distance;
+            float deltaX = delta.dx.abs();
+            float deltaY = delta.dy.abs();
+            float distanceFromAtoB = delta.distance;
             Offset c = new Offset(this.end.dx, this.begin.dy);
 
-            double sweepAngle() {
-                return 2.0 * Math.Asin(distanceFromAtoB / (2.0 * this._radius));
+            float sweepAngle() {
+                return 2.0f * (float) Math.Asin(distanceFromAtoB / (2.0f * this._radius));
             }
 
             if (deltaX > ArcUtils._kOnAxisDelta && deltaY > ArcUtils._kOnAxisDelta) {
                 if (deltaX < deltaY) {
-                    this._radius = distanceFromAtoB * distanceFromAtoB / (c - this.begin).distance / 2.0;
+                    this._radius = distanceFromAtoB * distanceFromAtoB / (c - this.begin).distance / 2.0f;
                     this._center = new Offset(this.end.dx + this._radius * (this.begin.dx - this.end.dx).sign(),
                         this.end.dy);
                     if (this.begin.dx < this.end.dx) {
                         this._beginAngle = sweepAngle() * (this.begin.dy - this.end.dy).sign();
-                        this._endAngle = 0.0;
+                        this._endAngle = 0.0f;
                     }
                     else {
-                        this._beginAngle = Math.PI + sweepAngle() * (this.end.dy - this.begin.dy).sign();
-                        this._endAngle = Math.PI;
+                        this._beginAngle = (float) (Math.PI + sweepAngle() * (this.end.dy - this.begin.dy).sign());
+                        this._endAngle = (float) Math.PI;
                     }
                 }
                 else {
-                    this._radius = distanceFromAtoB * distanceFromAtoB / (c - this.end).distance / 2.0;
+                    this._radius = distanceFromAtoB * distanceFromAtoB / (c - this.end).distance / 2.0f;
                     this._center = new Offset(this.begin.dx,
                         this.begin.dy + (this.end.dy - this.begin.dy).sign() * this._radius);
                     if (this.begin.dy < this.end.dy) {
-                        this._beginAngle = -Math.PI / 2.0;
+                        this._beginAngle = -(float) Math.PI / 2.0f;
                         this._endAngle = this._beginAngle + sweepAngle() * (this.end.dx - this.begin.dx).sign();
                     }
                     else {
-                        this._beginAngle = Math.PI / 2.0;
+                        this._beginAngle = (float) Math.PI / 2.0f;
                         this._endAngle = this._beginAngle + sweepAngle() * (this.begin.dx - this.end.dx).sign();
                     }
                 }
@@ -95,7 +95,7 @@ namespace Unity.UIWidgets.material {
             }
         }
 
-        double _radius;
+        float _radius;
 
         public double? beginAngle {
             get {
@@ -111,7 +111,7 @@ namespace Unity.UIWidgets.material {
             }
         }
 
-        double? _beginAngle;
+        float? _beginAngle;
 
         public double? endAngle {
             get {
@@ -127,7 +127,7 @@ namespace Unity.UIWidgets.material {
             }
         }
 
-        double? _endAngle;
+        float? _endAngle;
 
         public new Offset begin {
             get { return base.begin; }
@@ -149,7 +149,7 @@ namespace Unity.UIWidgets.material {
             }
         }
 
-        public override Offset lerp(double t) {
+        public override Offset lerp(float t) {
             if (this._dirty) {
                 this._initialze();
             }
@@ -169,7 +169,7 @@ namespace Unity.UIWidgets.material {
             double angle = MathUtils.lerpNullableDouble(this._beginAngle, this._endAngle, t) ?? 0.0;
             double x = Math.Cos(angle) * this._radius;
             double y = Math.Sin(angle) * this._radius;
-            return this._center + new Offset(x, y);
+            return this._center + new Offset((float) x, (float) y);
         }
 
         public override string ToString() {
@@ -290,7 +290,7 @@ namespace Unity.UIWidgets.material {
             }
         }
 
-        public override Rect lerp(double t) {
+        public override Rect lerp(float t) {
             if (this._dirty) {
                 this._initialize();
             }
@@ -365,7 +365,7 @@ namespace Unity.UIWidgets.material {
             }
         }
 
-        public override Rect lerp(double t) {
+        public override Rect lerp(float t) {
             if (this._dirty) {
                 this._initialize();
             }
@@ -382,10 +382,10 @@ namespace Unity.UIWidgets.material {
             double width = MathUtils.lerpDouble(this.begin.width, this.end.width, t);
             double height = MathUtils.lerpDouble(this.begin.height, this.end.height, t);
             return Rect.fromLTWH(
-                center.dx - width / 2.0,
-                center.dy - height / 2.0,
-                width,
-                height);
+                (float) (center.dx - width / 2.0),
+                (float) (center.dy - height / 2.0),
+                (float) width,
+                (float) height);
         }
 
         public override string ToString() {

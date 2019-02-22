@@ -12,92 +12,92 @@ namespace Unity.UIWidgets.material {
             new Dictionary<int, List<BoxShadow>> {
                 {
                     1, new List<BoxShadow> {
-                        new BoxShadow(offset: new Offset(0.0, 2.0), blurRadius: 1.0, spreadRadius: -1.0,
+                        new BoxShadow(offset: new Offset(0.0f, 2.0f), blurRadius: 1.0f, spreadRadius: -1.0f,
                             color: _kKeyUmbraOpacity),
-                        new BoxShadow(offset: new Offset(0.0, 1.0), blurRadius: 1.0, spreadRadius: 0.0,
+                        new BoxShadow(offset: new Offset(0.0f, 1.0f), blurRadius: 1.0f, spreadRadius: 0.0f,
                             color: _kKeyPenumbraOpacity),
-                        new BoxShadow(offset: new Offset(0.0, 1.0), blurRadius: 3.0, spreadRadius: 0.0,
+                        new BoxShadow(offset: new Offset(0.0f, 1.0f), blurRadius: 3.0f, spreadRadius: 0.0f,
                             color: _kAmbientShadowOpacity)
                     }
                 }, {
                     2, new List<BoxShadow> {
-                        new BoxShadow(offset: new Offset(0.0, 3.0), blurRadius: 1.0, spreadRadius: -2.0,
+                        new BoxShadow(offset: new Offset(0.0f, 3.0f), blurRadius: 1.0f, spreadRadius: -2.0f,
                             color: _kKeyUmbraOpacity),
-                        new BoxShadow(offset: new Offset(0.0, 2.0), blurRadius: 2.0, spreadRadius: 0.0,
+                        new BoxShadow(offset: new Offset(0.0f, 2.0f), blurRadius: 2.0f, spreadRadius: 0.0f,
                             color: _kKeyPenumbraOpacity),
-                        new BoxShadow(offset: new Offset(0.0, 1.0), blurRadius: 5.0, spreadRadius: 0.0,
+                        new BoxShadow(offset: new Offset(0.0f, 1.0f), blurRadius: 5.0f, spreadRadius: 0.0f,
                             color: _kAmbientShadowOpacity)
                     }
                 }, {
                     3, new List<BoxShadow> {
-                        new BoxShadow(offset: new Offset(0.0, 3.0), blurRadius: 3.0, spreadRadius: -2.0,
+                        new BoxShadow(offset: new Offset(0.0f, 3.0f), blurRadius: 3.0f, spreadRadius: -2.0f,
                             color: _kKeyUmbraOpacity),
-                        new BoxShadow(offset: new Offset(0.0, 3.0), blurRadius: 4.0, spreadRadius: 0.0,
+                        new BoxShadow(offset: new Offset(0.0f, 3.0f), blurRadius: 4.0f, spreadRadius: 0.0f,
                             color: _kKeyPenumbraOpacity),
-                        new BoxShadow(offset: new Offset(0.0, 1.0), blurRadius: 8.0, spreadRadius: 0.0,
+                        new BoxShadow(offset: new Offset(0.0f, 1.0f), blurRadius: 8.0f, spreadRadius: 0.0f,
                             color: _kAmbientShadowOpacity)
                     }
                 }, {
                     4, new List<BoxShadow> {
-                        new BoxShadow(offset: new Offset(0.0, 2.0), blurRadius: 4.0, spreadRadius: -1.0,
+                        new BoxShadow(offset: new Offset(0.0f, 2.0f), blurRadius: 4.0f, spreadRadius: -1.0f,
                             color: _kKeyUmbraOpacity),
-                        new BoxShadow(offset: new Offset(0.0, 4.0), blurRadius: 5.0, spreadRadius: 0.0,
+                        new BoxShadow(offset: new Offset(0.0f, 4.0f), blurRadius: 5.0f, spreadRadius: 0.0f,
                             color: _kKeyPenumbraOpacity),
-                        new BoxShadow(offset: new Offset(0.0, 1.0), blurRadius: 10.0, spreadRadius: 0.0,
+                        new BoxShadow(offset: new Offset(0.0f, 1.0f), blurRadius: 10.0f, spreadRadius: 0.0f,
                             color: _kAmbientShadowOpacity)
                     }
                 }, {
                     6, new List<BoxShadow> {
-                        new BoxShadow(offset: new Offset(0.0, 3.0), blurRadius: 5.0, spreadRadius: -1.0,
+                        new BoxShadow(offset: new Offset(0.0f, 3.0f), blurRadius: 5.0f, spreadRadius: -1.0f,
                             color: _kKeyUmbraOpacity),
-                        new BoxShadow(offset: new Offset(0.0, 6.0), blurRadius: 10.0, spreadRadius: 0.0,
+                        new BoxShadow(offset: new Offset(0.0f, 6.0f), blurRadius: 10.0f, spreadRadius: 0.0f,
                             color: _kKeyPenumbraOpacity),
-                        new BoxShadow(offset: new Offset(0.0, 1.0), blurRadius: 18.0, spreadRadius: 0.0,
+                        new BoxShadow(offset: new Offset(0.0f, 1.0f), blurRadius: 18.0f, spreadRadius: 0.0f,
                             color: _kAmbientShadowOpacity)
                     }
                 }, {
                     8, new List<BoxShadow> {
-                        new BoxShadow(offset: new Offset(0.0, 5.0), blurRadius: 5.0, spreadRadius: -3.0,
+                        new BoxShadow(offset: new Offset(0.0f, 5.0f), blurRadius: 5.0f, spreadRadius: -3.0f,
                             color: _kKeyUmbraOpacity),
-                        new BoxShadow(offset: new Offset(0.0, 8.0), blurRadius: 10.0, spreadRadius: 1.0,
+                        new BoxShadow(offset: new Offset(0.0f, 8.0f), blurRadius: 10.0f, spreadRadius: 1.0f,
                             color: _kKeyPenumbraOpacity),
-                        new BoxShadow(offset: new Offset(0.0, 3.0), blurRadius: 14.0, spreadRadius: 2.0,
+                        new BoxShadow(offset: new Offset(0.0f, 3.0f), blurRadius: 14.0f, spreadRadius: 2.0f,
                             color: _kAmbientShadowOpacity)
                     }
                 }, {
                     9, new List<BoxShadow> {
-                        new BoxShadow(offset: new Offset(0.0, 5.0), blurRadius: 6.0, spreadRadius: -3.0,
+                        new BoxShadow(offset: new Offset(0.0f, 5.0f), blurRadius: 6.0f, spreadRadius: -3.0f,
                             color: _kKeyUmbraOpacity),
-                        new BoxShadow(offset: new Offset(0.0, 9.0), blurRadius: 12.0, spreadRadius: 1.0,
+                        new BoxShadow(offset: new Offset(0.0f, 9.0f), blurRadius: 12.0f, spreadRadius: 1.0f,
                             color: _kKeyPenumbraOpacity),
-                        new BoxShadow(offset: new Offset(0.0, 3.0), blurRadius: 16.0, spreadRadius: 2.0,
+                        new BoxShadow(offset: new Offset(0.0f, 3.0f), blurRadius: 16.0f, spreadRadius: 2.0f,
                             color: _kAmbientShadowOpacity)
                     }
                 }, {
                     12, new List<BoxShadow> {
-                        new BoxShadow(offset: new Offset(0.0, 7.0), blurRadius: 8.0, spreadRadius: -4.0,
+                        new BoxShadow(offset: new Offset(0.0f, 7.0f), blurRadius: 8.0f, spreadRadius: -4.0f,
                             color: _kKeyUmbraOpacity),
-                        new BoxShadow(offset: new Offset(0.0, 12.0), blurRadius: 17.0, spreadRadius: 2.0,
+                        new BoxShadow(offset: new Offset(0.0f, 12.0f), blurRadius: 17.0f, spreadRadius: 2.0f,
                             color: _kKeyPenumbraOpacity),
-                        new BoxShadow(offset: new Offset(0.0, 5.0), blurRadius: 22.0, spreadRadius: 4.0,
+                        new BoxShadow(offset: new Offset(0.0f, 5.0f), blurRadius: 22.0f, spreadRadius: 4.0f,
                             color: _kAmbientShadowOpacity)
                     }
                 }, {
                     16, new List<BoxShadow> {
-                        new BoxShadow(offset: new Offset(0.0, 8.0), blurRadius: 10.0, spreadRadius: -5.0,
+                        new BoxShadow(offset: new Offset(0.0f, 8.0f), blurRadius: 10.0f, spreadRadius: -5.0f,
                             color: _kKeyUmbraOpacity),
-                        new BoxShadow(offset: new Offset(0.0, 16.0), blurRadius: 24.0, spreadRadius: 2.0,
+                        new BoxShadow(offset: new Offset(0.0f, 16.0f), blurRadius: 24.0f, spreadRadius: 2.0f,
                             color: _kKeyPenumbraOpacity),
-                        new BoxShadow(offset: new Offset(0.0, 6.0), blurRadius: 30.0, spreadRadius: 5.0,
+                        new BoxShadow(offset: new Offset(0.0f, 6.0f), blurRadius: 30.0f, spreadRadius: 5.0f,
                             color: _kAmbientShadowOpacity)
                     }
                 }, {
                     24, new List<BoxShadow> {
-                        new BoxShadow(offset: new Offset(0.0, 11.0), blurRadius: 15.0, spreadRadius: -7.0,
+                        new BoxShadow(offset: new Offset(0.0f, 11.0f), blurRadius: 15.0f, spreadRadius: -7.0f,
                             color: _kKeyUmbraOpacity),
-                        new BoxShadow(offset: new Offset(0.0, 24.0), blurRadius: 38.0, spreadRadius: 3.0,
+                        new BoxShadow(offset: new Offset(0.0f, 24.0f), blurRadius: 38.0f, spreadRadius: 3.0f,
                             color: _kKeyPenumbraOpacity),
-                        new BoxShadow(offset: new Offset(0.0, 9.0), blurRadius: 46.0, spreadRadius: 8.0,
+                        new BoxShadow(offset: new Offset(0.0f, 9.0f), blurRadius: 46.0f, spreadRadius: 8.0f,
                             color: _kAmbientShadowOpacity)
                     }
                 }

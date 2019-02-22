@@ -57,7 +57,7 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public static IPromise ensureVisible(BuildContext context,
-            double alignment = 0.0,
+            float alignment = 0.0f,
             TimeSpan? duration = null,
             Curve curve = null
         ) {
@@ -246,11 +246,11 @@ namespace Unity.UIWidgets.widgets {
                                     instance.onEnd = this._handleDragEnd;
                                     instance.onCancel = this._handleDragCancel;
                                     instance.minFlingDistance =
-                                        this._physics == null ? (double?) null : this._physics.minFlingDistance;
+                                        this._physics == null ? (float?) null : this._physics.minFlingDistance;
                                     instance.minFlingVelocity =
-                                        this._physics == null ? (double?) null : this._physics.minFlingVelocity;
+                                        this._physics == null ? (float?) null : this._physics.minFlingVelocity;
                                     instance.maxFlingVelocity =
-                                        this._physics == null ? (double?) null : this._physics.maxFlingVelocity;
+                                        this._physics == null ? (float?) null : this._physics.maxFlingVelocity;
                                 }
                             ));
                         break;
@@ -266,11 +266,11 @@ namespace Unity.UIWidgets.widgets {
                                     instance.onEnd = this._handleDragEnd;
                                     instance.onCancel = this._handleDragCancel;
                                     instance.minFlingDistance =
-                                        this._physics == null ? (double?) null : this._physics.minFlingDistance;
+                                        this._physics == null ? (float?) null : this._physics.minFlingDistance;
                                     instance.minFlingVelocity =
-                                        this._physics == null ? (double?) null : this._physics.minFlingVelocity;
+                                        this._physics == null ? (float?) null : this._physics.minFlingVelocity;
                                     instance.maxFlingVelocity =
-                                        this._physics == null ? (double?) null : this._physics.maxFlingVelocity;
+                                        this._physics == null ? (float?) null : this._physics.maxFlingVelocity;
                                 }
                             ));
                         break;

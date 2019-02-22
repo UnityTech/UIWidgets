@@ -13,7 +13,7 @@ namespace Unity.UIWidgets.painting {
     public class BorderSide : IEquatable<BorderSide> {
         public BorderSide(
             Color color = null,
-            double width = 1.0,
+            float width = 1.0f,
             BorderStyle style = BorderStyle.solid
         ) {
             this.color = color ?? Color.black;
@@ -50,14 +50,14 @@ namespace Unity.UIWidgets.painting {
         }
 
         public readonly Color color;
-        public readonly double width;
+        public readonly float width;
         public readonly BorderStyle style;
 
-        public static readonly BorderSide none = new BorderSide(width: 0.0);
+        public static readonly BorderSide none = new BorderSide(width: 0.0f);
 
         public BorderSide copyWith(
             Color color = null,
-            double? width = null,
+            float? width = null,
             BorderStyle? style = null
         ) {
             D.assert(width == null || width >= 0.0);
@@ -72,7 +72,7 @@ namespace Unity.UIWidgets.painting {
         public BorderSide scale(double t) {
             return new BorderSide(
                 color: this.color,
-                width: Math.Max(0.0, this.width * t),
+                width: (float) Math.Max(0.0, this.width * t),
                 style: t <= 0.0 ? BorderStyle.none : this.style
             );
         }
@@ -107,18 +107,18 @@ namespace Unity.UIWidgets.painting {
             return a.style == b.style && a.color == b.color;
         }
 
-        public static BorderSide lerp(BorderSide a, BorderSide b, double t) {
+        public static BorderSide lerp(BorderSide a, BorderSide b, float t) {
             D.assert(a != null);
             D.assert(b != null);
-            if (t == 0.0) {
+            if (t == 0.0f) {
                 return a;
             }
 
-            if (t == 1.0) {
+            if (t == 1.0f) {
                 return b;
             }
 
-            double width = MathUtils.lerpDouble(a.width, b.width, t);
+            float width = MathUtils.lerpFloat(a.width, b.width, t);
             if (width < 0.0) {
                 return none;
             }
@@ -222,9 +222,9 @@ namespace Unity.UIWidgets.painting {
                    new _CompoundBorder(new List<ShapeBorder> {other, it});
         }
 
-        public abstract ShapeBorder scale(double t);
+        public abstract ShapeBorder scale(float t);
 
-        public virtual ShapeBorder lerpFrom(ShapeBorder a, double t) {
+        public virtual ShapeBorder lerpFrom(ShapeBorder a, float t) {
             if (a == null) {
                 return this.scale(t);
             }
@@ -232,15 +232,15 @@ namespace Unity.UIWidgets.painting {
             return null;
         }
 
-        public virtual ShapeBorder lerpTo(ShapeBorder b, double t) {
+        public virtual ShapeBorder lerpTo(ShapeBorder b, float t) {
             if (b == null) {
-                return this.scale(1.0 - t);
+                return this.scale(1.0f - t);
             }
 
             return null;
         }
 
-        public static ShapeBorder lerp(ShapeBorder a, ShapeBorder b, double t) {
+        public static ShapeBorder lerp(ShapeBorder a, ShapeBorder b, float t) {
             ShapeBorder result = null;
             if (b != null) {
                 result = b.lerpFrom(a, t);
@@ -313,21 +313,21 @@ namespace Unity.UIWidgets.painting {
             return new _CompoundBorder(mergedBorders);
         }
 
-        public override ShapeBorder scale(double t) {
+        public override ShapeBorder scale(float t) {
             return new _CompoundBorder(
                 this.borders.Select(border => border.scale(t)).ToList()
             );
         }
 
-        public override ShapeBorder lerpFrom(ShapeBorder a, double t) {
+        public override ShapeBorder lerpFrom(ShapeBorder a, float t) {
             return lerp(a, this, t);
         }
 
-        public override ShapeBorder lerpTo(ShapeBorder b, double t) {
+        public override ShapeBorder lerpTo(ShapeBorder b, float t) {
             return lerp(this, b, t);
         }
 
-        public new static _CompoundBorder lerp(ShapeBorder a, ShapeBorder b, double t) {
+        public new static _CompoundBorder lerp(ShapeBorder a, ShapeBorder b, float t) {
             D.assert(a is _CompoundBorder || b is _CompoundBorder);
             List<ShapeBorder> aList = a is _CompoundBorder aBorder ? aBorder.borders : new List<ShapeBorder> {a};
             List<ShapeBorder> bList = b is _CompoundBorder bBorder ? bBorder.borders : new List<ShapeBorder> {b};
@@ -349,7 +349,7 @@ namespace Unity.UIWidgets.painting {
                 }
 
                 if (localA != null) {
-                    results.Add(localA.scale(1.0 - t));
+                    results.Add(localA.scale(1.0f - t));
                 }
             }
 

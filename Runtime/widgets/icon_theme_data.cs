@@ -6,8 +6,8 @@ namespace Unity.UIWidgets.widgets {
     public class IconThemeData : Diagnosticable, IEquatable<IconThemeData> {
         public IconThemeData(
             Color color = null,
-            double? opacity = null,
-            double? size = null) {
+            float? opacity = null,
+            float? size = null) {
             this.color = color;
             this._opacity = opacity;
             this.size = size;
@@ -16,14 +16,14 @@ namespace Unity.UIWidgets.widgets {
         public static IconThemeData fallback() {
             return new IconThemeData(
                 color: new Color(0xFF000000),
-                opacity: 1.0,
-                size: 24.0);
+                opacity: 1.0f,
+                size: 24.0f);
         }
 
         public IconThemeData copyWith(
             Color color = null,
-            double? opacity = null,
-            double? size = null) {
+            float? opacity = null,
+            float? size = null) {
             return new IconThemeData(
                 color: color ?? this.color,
                 opacity: opacity ?? this.opacity,
@@ -49,19 +49,19 @@ namespace Unity.UIWidgets.widgets {
 
         public readonly Color color;
 
-        public double? opacity {
-            get { return this._opacity == null ? (double?) null : this._opacity.Value.clamp(0.0, 1.0); }
+        public float? opacity {
+            get { return this._opacity == null ? (float?) null : this._opacity.Value.clamp(0.0f, 1.0f); }
         }
 
-        readonly double? _opacity;
+        readonly float? _opacity;
 
-        public readonly double? size;
+        public readonly float? size;
 
-        public static IconThemeData lerp(IconThemeData a, IconThemeData b, double t) {
+        public static IconThemeData lerp(IconThemeData a, IconThemeData b, float t) {
             return new IconThemeData(
                 color: Color.lerp(a.color, b.color, t),
-                opacity: MathUtils.lerpNullableDouble(a.opacity, b.opacity, t),
-                size: MathUtils.lerpNullableDouble(a.size, b.size, t));
+                opacity: MathUtils.lerpNullableFloat(a.opacity, b.opacity, t),
+                size: MathUtils.lerpNullableFloat(a.size, b.size, t));
         }
 
 

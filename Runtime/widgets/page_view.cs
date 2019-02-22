@@ -13,7 +13,7 @@ namespace Unity.UIWidgets.widgets {
         public PageController(
             int initialPage = 0,
             bool keepPage = true,
-            double viewportFraction = 1.0
+            float viewportFraction = 1.0f
         ) {
             this.initialPage = initialPage;
             this.keepPage = keepPage;
@@ -25,7 +25,7 @@ namespace Unity.UIWidgets.widgets {
 
         public readonly bool keepPage;
 
-        public readonly double viewportFraction;
+        public readonly float viewportFraction;
 
 
         public double page {
@@ -84,18 +84,18 @@ namespace Unity.UIWidgets.widgets {
     }
 
     public interface IPageMetrics : ScrollMetrics {
-        double page { get; }
-        double viewportFraction { get; }
+        float page { get; }
+        float viewportFraction { get; }
     }
 
     public class PageMetrics : FixedScrollMetrics, IPageMetrics {
         public PageMetrics(
-            double minScrollExtent = 0.0,
-            double maxScrollExtent = 0.0,
-            double pixels = 0.0,
-            double viewportDimension = 0.0,
+            float minScrollExtent = 0.0f,
+            float maxScrollExtent = 0.0f,
+            float pixels = 0.0f,
+            float viewportDimension = 0.0f,
             AxisDirection axisDirection = AxisDirection.down,
-            double viewportFraction = 0.0
+            float viewportFraction = 0.0f
         ) : base(
             minScrollExtent: minScrollExtent,
             maxScrollExtent: maxScrollExtent,
@@ -106,16 +106,16 @@ namespace Unity.UIWidgets.widgets {
             this._viewportFraction = viewportFraction;
         }
 
-        public readonly double _viewportFraction;
+        public readonly float _viewportFraction;
 
-        public double page {
+        public float page {
             get {
-                return Math.Max(0.0, this.pixels.clamp(this.minScrollExtent, this.maxScrollExtent)) /
-                       Math.Max(1.0, this.viewportDimension * this.viewportFraction);
+                return (float) (Math.Max(0.0, this.pixels.clamp(this.minScrollExtent, this.maxScrollExtent)) /
+                                Math.Max(1.0, this.viewportDimension * this.viewportFraction));
             }
         }
 
-        public double viewportFraction {
+        public float viewportFraction {
             get { return this._viewportFraction; }
         }
     }
@@ -126,7 +126,7 @@ namespace Unity.UIWidgets.widgets {
             ScrollContext context = null,
             int initialPage = 0,
             bool keepPage = true,
-            double viewportFraction = 1.0,
+            float viewportFraction = 1.0f,
             ScrollPosition oldPosition = null
         ) :
             base(
@@ -143,32 +143,32 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public readonly int initialPage;
-        double _pageToUseOnStartup;
+        float _pageToUseOnStartup;
 
-        public double viewportFraction {
+        public float viewportFraction {
             get { return this._viewportFraction; }
             set {
                 if (this._viewportFraction == value) {
                     return;
                 }
 
-                double oldPage = this.page;
+                float oldPage = this.page;
                 this._viewportFraction = value;
                 this.forcePixels(this.getPixelsFromPage(oldPage));
             }
         }
 
-        double _viewportFraction;
+        float _viewportFraction;
 
-        public double getPageFromPixels(double pixels, double viewportDimension) {
-            return Math.Max(0.0, pixels) / Math.Max(1.0, viewportDimension * this.viewportFraction);
+        public float getPageFromPixels(double pixels, double viewportDimension) {
+            return (float) (Math.Max(0.0, pixels) / Math.Max(1.0, viewportDimension * this.viewportFraction));
         }
 
-        public double getPixelsFromPage(double page) {
+        public float getPixelsFromPage(float page) {
             return page * this.viewportDimension * this.viewportFraction;
         }
 
-        public double page {
+        public float page {
             get {
                 return this.getPageFromPixels(this.pixels.clamp(this.minScrollExtent, this.maxScrollExtent),
                     this.viewportDimension);
@@ -183,11 +183,11 @@ namespace Unity.UIWidgets.widgets {
         protected override void restoreScrollOffset() {
             object value = PageStorage.of(this.context.storageContext)?.readState(this.context.storageContext);
             if (value != null) {
-                this._pageToUseOnStartup = (double) value;
+                this._pageToUseOnStartup = (float) value;
             }
         }
 
-        public override bool applyViewportDimension(double viewportDimension) {
+        public override bool applyViewportDimension(float viewportDimension) {
             double oldViewportDimensions = 0.0;
             if (this.haveDimensions) {
                 oldViewportDimensions = this.viewportDimension;
@@ -199,10 +199,10 @@ namespace Unity.UIWidgets.widgets {
                 oldPixels = this.pixels;
             }
 
-            double page = (oldPixels == null || oldViewportDimensions == 0.0)
+            float page = (oldPixels == null || oldViewportDimensions == 0.0)
                 ? this._pageToUseOnStartup
                 : this.getPageFromPixels(oldPixels.Value, oldViewportDimensions);
-            double newPixels = this.getPixelsFromPage(page);
+            float newPixels = this.getPixelsFromPage(page);
             if (newPixels != oldPixels) {
                 this.correctPixels(newPixels);
                 return false;
@@ -220,7 +220,7 @@ namespace Unity.UIWidgets.widgets {
             return new PageScrollPhysics(parent: this.buildParent(ancestor));
         }
 
-        double _getPage(ScrollPosition position) {
+        float _getPage(ScrollPosition position) {
             if (position is _PagePosition) {
                 return ((_PagePosition) position).page;
             }
@@ -228,7 +228,7 @@ namespace Unity.UIWidgets.widgets {
             return position.pixels / position.viewportDimension;
         }
 
-        double _getPixels(ScrollPosition position, double page) {
+        float _getPixels(ScrollPosition position, float page) {
             if (position is _PagePosition) {
                 return ((_PagePosition) position).getPixelsFromPage(page);
             }
@@ -236,7 +236,7 @@ namespace Unity.UIWidgets.widgets {
             return page * position.viewportDimension;
         }
 
-        double _getTargetPixels(ScrollPosition position, Tolerance tolerance, double velocity) {
+        float _getTargetPixels(ScrollPosition position, Tolerance tolerance, double velocity) {
             double page = this._getPage(position);
             if (velocity < -tolerance.velocity) {
                 page -= 0.5;
@@ -248,14 +248,14 @@ namespace Unity.UIWidgets.widgets {
             return this._getPixels(position, page.round());
         }
 
-        public override Simulation createBallisticSimulation(ScrollMetrics position, double velocity) {
+        public override Simulation createBallisticSimulation(ScrollMetrics position, float velocity) {
             if ((velocity <= 0.0 && position.pixels <= position.minScrollExtent) ||
                 (velocity >= 0.0 && position.pixels >= position.maxScrollExtent)) {
                 return base.createBallisticSimulation(position, velocity);
             }
 
             Tolerance tolerance = this.tolerance;
-            double target = this._getTargetPixels((ScrollPosition) position, tolerance, velocity);
+            float target = this._getTargetPixels((ScrollPosition) position, tolerance, velocity);
             if (target != position.pixels) {
                 return new ScrollSpringSimulation(this.spring, position.pixels, target, velocity, tolerance: tolerance);
             }
@@ -372,7 +372,7 @@ namespace Unity.UIWidgets.widgets {
                     physics: physics,
                     viewportBuilder: (BuildContext _context, ViewportOffset position) => {
                         return new Viewport(
-                            cacheExtent: 0.0,
+                            cacheExtent: 0.0f,
                             axisDirection: axisDirection,
                             offset: position,
                             slivers: new List<Widget> {

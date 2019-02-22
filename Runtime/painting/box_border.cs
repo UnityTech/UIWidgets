@@ -24,7 +24,7 @@ namespace Unity.UIWidgets.painting {
 
         public static Border all(
             Color color = null,
-            double width = 1.0,
+            float width = 1.0f,
             BorderStyle style = BorderStyle.solid
         ) {
             BorderSide side = new BorderSide(color: color, width: width, style: style);
@@ -108,7 +108,7 @@ namespace Unity.UIWidgets.painting {
             return null;
         }
 
-        public override ShapeBorder scale(double t) {
+        public override ShapeBorder scale(float t) {
             return new Border(
                 top: this.top.scale(t),
                 right: this.right.scale(t),
@@ -117,7 +117,7 @@ namespace Unity.UIWidgets.painting {
             );
         }
 
-        public override ShapeBorder lerpFrom(ShapeBorder a, double t) {
+        public override ShapeBorder lerpFrom(ShapeBorder a, float t) {
             if (a is Border border) {
                 return lerp(border, this, t);
             }
@@ -125,7 +125,7 @@ namespace Unity.UIWidgets.painting {
             return base.lerpFrom(a, t);
         }
 
-        public override ShapeBorder lerpTo(ShapeBorder b, double t) {
+        public override ShapeBorder lerpTo(ShapeBorder b, float t) {
             if (b is Border border) {
                 return lerp(this, border, t);
             }
@@ -133,7 +133,7 @@ namespace Unity.UIWidgets.painting {
             return base.lerpTo(b, t);
         }
 
-        public static Border lerp(Border a, Border b, double t) {
+        public static Border lerp(Border a, Border b, float t) {
             if (a == null && b == null) {
                 return null;
             }
@@ -143,7 +143,7 @@ namespace Unity.UIWidgets.painting {
             }
 
             if (b == null) {
-                return (Border) a.scale(1.0 - t);
+                return (Border) a.scale(1.0f - t);
             }
 
             return new Border(
@@ -214,7 +214,7 @@ namespace Unity.UIWidgets.painting {
             };
 
             RRect outer = borderRadius.toRRect(rect);
-            double width = side.width;
+            float width = side.width;
             if (width == 0.0) {
                 paint.style = PaintingStyle.stroke;
                 paint.strokeWidth = 0.0;
@@ -236,9 +236,9 @@ namespace Unity.UIWidgets.painting {
 
         static void _paintUniformBorderWithRectangle(Canvas canvas, Rect rect, BorderSide side) {
             D.assert(side.style != BorderStyle.none);
-            double width = side.width;
+            float width = side.width;
             Paint paint = side.toPaint();
-            canvas.drawRect(rect.deflate(width / 2.0), paint);
+            canvas.drawRect(rect.deflate(width / 2.0f), paint);
         }
 
         public bool Equals(Border other) {

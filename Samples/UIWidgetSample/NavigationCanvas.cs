@@ -33,10 +33,10 @@ namespace UIWidgetsSample {
                 return (RouteSettings settings, WidgetBuilder builder) =>
                     new PageRouteBuilder(
                         settings: settings,
-                        pageBuilder: (BuildContext context, Animation<double> animation,
-                            Animation<double> secondaryAnimation) => builder(context),
-                        transitionsBuilder: (BuildContext context, Animation<double>
-                                animation, Animation<double> secondaryAnimation, Widget child) =>
+                        pageBuilder: (BuildContext context, Animation<float> animation,
+                            Animation<float> secondaryAnimation) => builder(context),
+                        transitionsBuilder: (BuildContext context, Animation<float>
+                                animation, Animation<float> secondaryAnimation, Widget child) =>
                             new _FadeUpwardsPageTransition(
                                 routeAnimation: animation,
                                 child: child
@@ -96,7 +96,7 @@ namespace UIWidgetsSample {
     class _FadeUpwardsPageTransition : StatelessWidget {
         internal _FadeUpwardsPageTransition(
             Key key = null,
-            Animation<double> routeAnimation = null, // The route's linear 0.0 - 1.0 animation.
+            Animation<float> routeAnimation = null, // The route's linear 0.0 - 1.0 animation.
             Widget child = null
         ) : base(key: key) {
             this._positionAnimation = _bottomUpTween.chain(_fastOutSlowInTween).animate(routeAnimation);
@@ -105,15 +105,15 @@ namespace UIWidgetsSample {
         }
 
         static Tween<Offset> _bottomUpTween = new OffsetTween(
-            begin: new Offset(0.0, 0.25),
+            begin: new Offset(0.0f, 0.25f),
             end: Offset.zero
         );
 
-        static Animatable<double> _fastOutSlowInTween = new CurveTween(curve: Curves.fastOutSlowIn);
-        static Animatable<double> _easeInTween = new CurveTween(curve: Curves.easeIn);
+        static Animatable<float> _fastOutSlowInTween = new CurveTween(curve: Curves.fastOutSlowIn);
+        static Animatable<float> _easeInTween = new CurveTween(curve: Curves.easeIn);
 
         readonly Animation<Offset> _positionAnimation;
-        readonly Animation<double> _opacityAnimation;
+        readonly Animation<float> _opacityAnimation;
         public readonly Widget child;
 
         public override Widget build(BuildContext context) {
@@ -165,8 +165,8 @@ namespace UIWidgetsSample {
             bool barrierDismissible = true, WidgetBuilder builder = null) {
             DialogUtils.showGeneralDialog(
                 context: context,
-                pageBuilder: (BuildContext buildContext, Animation<double> animation,
-                    Animation<double> secondaryAnimation) => {
+                pageBuilder: (BuildContext buildContext, Animation<float> animation,
+                    Animation<float> secondaryAnimation) => {
                     return builder(buildContext);
                 },
                 barrierDismissible: barrierDismissible,
@@ -178,7 +178,7 @@ namespace UIWidgetsSample {
         }
 
         static Widget _buildMaterialDialogTransitions(BuildContext context,
-            Animation<double> animation, Animation<double> secondaryAnimation, Widget child) {
+            Animation<float> animation, Animation<float> secondaryAnimation, Widget child) {
             return new FadeTransition(
                 opacity: new CurvedAnimation(
                     parent: animation,

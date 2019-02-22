@@ -10,13 +10,13 @@ namespace Unity.UIWidgets.ui {
 
         int getSaveCount();
 
-        void translate(double dx, double dy);
+        void translate(float dx, float dy);
 
-        void scale(double sx, double? sy = null);
+        void scale(float sx, float? sy = null);
 
-        void rotate(double radians, Offset offset = null);
+        void rotate(float radians, Offset offset = null);
 
-        void skew(double sx, double sy);
+        void skew(float sx, float sy);
 
         void concat(Matrix3 matrix);
 
@@ -46,7 +46,7 @@ namespace Unity.UIWidgets.ui {
 
         void drawCircle(Offset c, double radius, Paint paint);
 
-        void drawArc(Rect rect, double startAngle, double sweepAngle, bool useCenter, Paint paint);
+        void drawArc(Rect rect, float startAngle, float sweepAngle, bool useCenter, Paint paint);
 
         void drawPath(Path path, Paint paint);
 
@@ -102,28 +102,28 @@ namespace Unity.UIWidgets.ui {
             return this._saveCount;
         }
 
-        public void translate(double dx, double dy) {
+        public void translate(float dx, float dy) {
             this._recorder.addDrawCmd(new DrawTranslate {
                 dx = dx,
                 dy = dy,
             });
         }
 
-        public void scale(double sx, double? sy = null) {
+        public void scale(float sx, float? sy = null) {
             this._recorder.addDrawCmd(new DrawScale {
                 sx = sx,
                 sy = sy,
             });
         }
 
-        public void rotate(double radians, Offset offset = null) {
+        public void rotate(float radians, Offset offset = null) {
             this._recorder.addDrawCmd(new DrawRotate {
                 radians = radians,
                 offset = offset,
             });
         }
 
-        public void skew(double sx, double sy) {
+        public void skew(float sx, float sy) {
             this._recorder.addDrawCmd(new DrawSkew {
                 sx = sx,
                 sy = sy,
@@ -188,6 +188,7 @@ namespace Unity.UIWidgets.ui {
             if (rect.size.isEmpty) {
                 return;
             }
+
             var path = new Path();
             path.addRect(rect);
 
@@ -240,7 +241,7 @@ namespace Unity.UIWidgets.ui {
             });
         }
 
-        public void drawArc(Rect rect, double startAngle, double sweepAngle, bool useCenter, Paint paint) {
+        public void drawArc(Rect rect, float startAngle, float sweepAngle, bool useCenter, Paint paint) {
             var path = new Path();
             //path.(c.dx, c.dy, radius);
 

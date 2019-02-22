@@ -202,7 +202,7 @@ namespace Unity.UIWidgets.painting {
             Canvas canvas = null,
             Rect rect = null,
             Image image = null,
-            double scale = 1.0,
+            float scale = 1.0f,
             ColorFilter colorFilter = null,
             BoxFit? fit = null,
             Alignment alignment = null,
@@ -264,7 +264,7 @@ namespace Unity.UIWidgets.painting {
             double halfHeightDelta = (outputSize.height - destinationSize.height) / 2.0;
             double dx = halfWidthDelta + alignment.x * halfWidthDelta;
             double dy = halfHeightDelta + alignment.y * halfHeightDelta;
-            Offset destinationPosition = rect.topLeft.translate(dx, dy);
+            Offset destinationPosition = rect.topLeft.translate((float) dx, (float) dy);
             Rect destinationRect = destinationPosition & destinationSize;
             bool needSave = repeat != ImageRepeat.noRepeat;
             if (needSave) {
@@ -305,8 +305,8 @@ namespace Unity.UIWidgets.painting {
             int startY = 0;
             int stopX = 0;
             int stopY = 0;
-            double strideX = fundamentalRect.width;
-            double strideY = fundamentalRect.height;
+            float strideX = fundamentalRect.width;
+            float strideY = fundamentalRect.height;
 
             if (repeat == ImageRepeat.repeat || repeat == ImageRepeat.repeatX) {
                 startX = ((outputRect.left - fundamentalRect.left) / strideX).floor();

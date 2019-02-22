@@ -32,7 +32,7 @@ namespace Unity.UIWidgets.painting {
                 x = (size.width - childSize.width) / 2.0;
             }
             else {
-                double normalizedTargetX = target.dx.clamp(margin, size.width - margin);
+                double normalizedTargetX = target.dx.clamp((float) margin, (float) (size.width - margin));
                 double edge = margin + childSize.width / 2.0;
                 if (normalizedTargetX < edge) {
                     x = margin;
@@ -45,7 +45,7 @@ namespace Unity.UIWidgets.painting {
                 }
             }
 
-            return new Offset(x, y);
+            return new Offset((float) x, (float) y);
         }
     }
 }

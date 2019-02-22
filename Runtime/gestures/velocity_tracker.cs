@@ -30,7 +30,7 @@ namespace Unity.UIWidgets.gestures {
                 pixelsPerSecond: a.pixelsPerSecond + b.pixelsPerSecond);
         }
 
-        public Velocity clampMagnitude(double minValue, double maxValue) {
+        public Velocity clampMagnitude(float minValue, float maxValue) {
             D.assert(minValue >= 0.0);
             D.assert(maxValue >= 0.0 && maxValue >= minValue);
             double valueSquared = this.pixelsPerSecond.distanceSquared;
@@ -156,10 +156,10 @@ namespace Unity.UIWidgets.gestures {
         }
 
         public VelocityEstimate getVelocityEstimate() {
-            List<double> x = new List<double>();
-            List<double> y = new List<double>();
-            List<double> w = new List<double>();
-            List<double> time = new List<double>();
+            List<float> x = new List<float>();
+            List<float> y = new List<float>();
+            List<float> w = new List<float>();
+            List<float> time = new List<float>();
             int sampleCount = 0;
             int index = this._index;
 
@@ -177,8 +177,8 @@ namespace Unity.UIWidgets.gestures {
                     break;
                 }
 
-                double age = (newestSample.time - sample.time).TotalMilliseconds;
-                double delta = Math.Abs((sample.time - previousSample.time).TotalMilliseconds);
+                float age = (float) (newestSample.time - sample.time).TotalMilliseconds;
+                float delta = (float) Math.Abs((sample.time - previousSample.time).TotalMilliseconds);
                 previousSample = sample;
                 if (age > _horizonMilliseconds ||
                     delta > _assumePointerMoveStoppedMilliseconds) {
@@ -189,7 +189,7 @@ namespace Unity.UIWidgets.gestures {
                 Offset position = sample.point;
                 x.Add(position.dx);
                 y.Add(position.dy);
-                w.Add(1.0);
+                w.Add(1.0f);
                 time.Add(-age);
                 index = (index == 0 ? _historySize : index) - 1;
 

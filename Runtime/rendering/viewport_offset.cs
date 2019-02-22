@@ -31,7 +31,7 @@ namespace Unity.UIWidgets.rendering {
         protected ViewportOffset() {
         }
 
-        public static ViewportOffset @fixed(double value) {
+        public static ViewportOffset @fixed(float value) {
             return new _FixedViewportOffset(value);
         }
 
@@ -39,14 +39,14 @@ namespace Unity.UIWidgets.rendering {
             return _FixedViewportOffset.zero();
         }
 
-        public abstract double pixels { get; }
-        public abstract bool applyViewportDimension(double viewportDimension);
-        public abstract bool applyContentDimensions(double minScrollExtent, double maxScrollExtent);
+        public abstract float pixels { get; }
+        public abstract bool applyViewportDimension(float viewportDimension);
+        public abstract bool applyContentDimensions(float minScrollExtent, float maxScrollExtent);
 
-        public abstract void correctBy(double correction);
-        public abstract void jumpTo(double pixels);
+        public abstract void correctBy(float correction);
+        public abstract void jumpTo(float pixels);
 
-        public abstract IPromise animateTo(double to, TimeSpan duration, Curve curve);
+        public abstract IPromise animateTo(float to, TimeSpan duration, Curve curve);
 
         public abstract ScrollDirection userScrollDirection { get; }
 
@@ -64,36 +64,36 @@ namespace Unity.UIWidgets.rendering {
     }
 
     class _FixedViewportOffset : ViewportOffset {
-        internal _FixedViewportOffset(double _pixels) {
+        internal _FixedViewportOffset(float _pixels) {
             this._pixels = _pixels;
         }
 
         internal new static _FixedViewportOffset zero() {
-            return new _FixedViewportOffset(0.0);
+            return new _FixedViewportOffset(0.0f);
         }
 
-        double _pixels;
+        float _pixels;
 
-        public override double pixels {
+        public override float pixels {
             get { return this._pixels; }
         }
 
-        public override bool applyViewportDimension(double viewportDimension) {
+        public override bool applyViewportDimension(float viewportDimension) {
             return true;
         }
 
-        public override bool applyContentDimensions(double minScrollExtent, double maxScrollExtent) {
+        public override bool applyContentDimensions(float minScrollExtent, float maxScrollExtent) {
             return true;
         }
 
-        public override void correctBy(double correction) {
+        public override void correctBy(float correction) {
             this._pixels += correction;
         }
 
-        public override void jumpTo(double pixels) {
+        public override void jumpTo(float pixels) {
         }
 
-        public override IPromise animateTo(double to, TimeSpan duration, Curve curve) {
+        public override IPromise animateTo(float to, TimeSpan duration, Curve curve) {
             return Promise.Resolved();
         }
 

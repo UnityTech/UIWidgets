@@ -46,9 +46,9 @@ namespace UIWidgets.Tests {
         WindowAdapter _windowAdapter;
 
         MeshPool _meshPool;
-        
+
         static Texture2D texture6;
-        
+
         CanvasAndLayers() {
             this._options = new Action[] {
                 this.drawPloygon4,
@@ -113,7 +113,7 @@ namespace UIWidgets.Tests {
             this._windowAdapter = new EditorWindowAdapter(this);
             this._windowAdapter.OnEnable();
             this._meshPool = new MeshPool();
-            
+
             texture6 = Resources.Load<Texture2D>("6");
         }
 
@@ -139,7 +139,7 @@ namespace UIWidgets.Tests {
                 if (QualitySettings.antiAliasing != 0) {
                     desc.msaaSamples = QualitySettings.antiAliasing;
                 }
-                
+
                 this._renderTexture = RenderTexture.GetTemporary(desc);
             }
         }
@@ -152,7 +152,8 @@ namespace UIWidgets.Tests {
         }
 
         void drawPloygon4() {
-            var canvas = new CommandBufferCanvas(this._renderTexture, (float) Window.instance.devicePixelRatio, this._meshPool);
+            var canvas = new CommandBufferCanvas(this._renderTexture, (float) Window.instance.devicePixelRatio,
+                this._meshPool);
 
             var paint = new Paint {
                 color = new Color(0xFFFF0000),
@@ -165,7 +166,7 @@ namespace UIWidgets.Tests {
 //                Unity.UIWidgets.ui.Rect.fromLTRB(10, 10, 110, 110),
 //                paint);
 
-            canvas.rotate(Math.PI * 15 / 180);
+            canvas.rotate((float) Math.PI * 15 / 180);
 
             var path = new Path();
             path.moveTo(10, 150);
@@ -185,12 +186,12 @@ namespace UIWidgets.Tests {
                     Event.current.mousePosition.x,
                     Event.current.mousePosition.y
                 );
-                
+
                 Debug.Log(pos + ": " + path.contains(pos));
             }
 
             canvas.drawPath(path, paint);
-            
+
             canvas.translate(100, 100);
 
             paint.shader = Gradient.radial(new Offset(80, 80), 100, new List<Color>() {
@@ -198,24 +199,25 @@ namespace UIWidgets.Tests {
             }, null, TileMode.clamp);
             canvas.drawPath(path, paint);
 
-            
+
             canvas.translate(100, 100);
             paint.shader = Gradient.sweep(new Offset(120, 100), new List<Color>() {
-                Colors.red, Colors.black, Colors.green, Colors.red,
-            }, null, TileMode.clamp, 10 * Math.PI / 180, 135 * Math.PI / 180);
+                    Colors.red, Colors.black, Colors.green, Colors.red,
+                }, null, TileMode.clamp, 10 * Math.PI / 180, 135 * Math.PI / 180);
             canvas.drawPath(path, paint);
-            
+
 
             canvas.translate(100, 100);
             //paint.maskFilter = MaskFilter.blur(BlurStyle.normal, 5);
             paint.shader = new ImageShader(new Image(texture6, true), TileMode.mirror);
             canvas.drawPath(path, paint);
-            
+
             canvas.flush();
         }
 
         void drawLine() {
-            var canvas = new CommandBufferCanvas(this._renderTexture, (float) Window.instance.devicePixelRatio, this._meshPool);
+            var canvas = new CommandBufferCanvas(this._renderTexture, (float) Window.instance.devicePixelRatio,
+                this._meshPool);
 
             var paint = new Paint {
                 color = new Color(0xFFFF0000),
@@ -246,14 +248,14 @@ namespace UIWidgets.Tests {
                 new Offset(90, 10),
                 paint);
 
-            paint.maskFilter = MaskFilter.blur(BlurStyle.normal, 1);                
+            paint.maskFilter = MaskFilter.blur(BlurStyle.normal, 1);
             paint.strokeWidth = 4;
-            
+
             canvas.drawLine(
                 new Offset(40, 20),
                 new Offset(120, 190),
-                paint);            
-            
+                paint);
+
             canvas.scale(3);
             TextBlob textBlob = new TextBlob("This is a text blob", 0, 19, new Vector2d[] {
                 new Vector2d(10, 0),
@@ -275,10 +277,10 @@ namespace UIWidgets.Tests {
                 new Vector2d(170, 0),
                 new Vector2d(180, 0),
                 new Vector2d(190, 0),
-            }, Unity.UIWidgets.ui.Rect.fromLTWH(0 ,0, 200, 50), new TextStyle());
-            
+            }, Unity.UIWidgets.ui.Rect.fromLTWH(0, 0, 200, 50), new TextStyle());
+
             canvas.drawTextBlob(textBlob, new Offset(100, 100), paint);
-            
+
             canvas.drawLine(
                 new Offset(10, 30),
                 new Offset(10, 60),
@@ -288,12 +290,13 @@ namespace UIWidgets.Tests {
                 new Offset(20, 30),
                 new Offset(20, 60),
                 new Paint() {style = PaintingStyle.stroke, strokeWidth = 0.333});
-            
+
             canvas.flush();
         }
 
         void drawRect() {
-            var canvas = new CommandBufferCanvas(this._renderTexture, (float) Window.instance.devicePixelRatio, this._meshPool);
+            var canvas = new CommandBufferCanvas(this._renderTexture, (float) Window.instance.devicePixelRatio,
+                this._meshPool);
 
             var paint = new Paint {
                 color = new Color(0xFFFF0000),
@@ -322,18 +325,19 @@ namespace UIWidgets.Tests {
 
             canvas.flush();
         }
-        
+
         void drawRectShadow() {
-            var canvas = new CommandBufferCanvas(this._renderTexture, (float) Window.instance.devicePixelRatio, this._meshPool);
+            var canvas = new CommandBufferCanvas(this._renderTexture, (float) Window.instance.devicePixelRatio,
+                this._meshPool);
 
             var paint = new Paint {
                 color = new Color(0xFF00FF00),
                 maskFilter = MaskFilter.blur(BlurStyle.normal, 3),
             };
-            
+
             canvas.clipRect(Unity.UIWidgets.ui.Rect.fromLTWH(25, 25, 300, 300));
-                
-            canvas.rotate(-Math.PI/8.0);
+
+            canvas.rotate(-(float) Math.PI / 8.0f);
 
             canvas.drawRect(
                 Unity.UIWidgets.ui.Rect.fromLTWH(10, 10, 100, 100),
@@ -341,7 +345,7 @@ namespace UIWidgets.Tests {
 
             paint = new Paint {
                 color = new Color(0xFFFFFF00),
-                maskFilter = MaskFilter.blur(BlurStyle.normal, 5),                
+                maskFilter = MaskFilter.blur(BlurStyle.normal, 5),
                 style = PaintingStyle.stroke,
                 strokeWidth = 55,
                 shader = Gradient.linear(new Offset(10, 10), new Offset(180, 180), new List<Color>() {
@@ -352,9 +356,9 @@ namespace UIWidgets.Tests {
             canvas.drawRect(
                 Unity.UIWidgets.ui.Rect.fromLTWH(10, 150, 200, 200),
                 paint);
-            
-            canvas.drawImage(new Image(texture6, true), 
-                new Offset(50, 150), 
+
+            canvas.drawImage(new Image(texture6, true),
+                new Offset(50, 150),
                 paint);
 
             canvas.flush();
@@ -400,7 +404,8 @@ namespace UIWidgets.Tests {
             var picture = pictureRecorder.endRecording();
             Debug.Log("picture.paintBounds: " + picture.paintBounds);
 
-            var editorCanvas = new CommandBufferCanvas(this._renderTexture, (float) Window.instance.devicePixelRatio, this._meshPool);
+            var editorCanvas = new CommandBufferCanvas(this._renderTexture, (float) Window.instance.devicePixelRatio,
+                this._meshPool);
             editorCanvas.drawPicture(picture);
 
             editorCanvas.rotate(-15 * Mathf.PI / 180);
@@ -414,14 +419,14 @@ namespace UIWidgets.Tests {
                 return;
             }
 
-            var canvas = new CommandBufferCanvas(this._renderTexture, (float) Window.instance.devicePixelRatio, this._meshPool);
+            var canvas = new CommandBufferCanvas(this._renderTexture, (float) Window.instance.devicePixelRatio,
+                this._meshPool);
 
             var paint = new Paint {
                 // color = new Color(0x7FFF0000),
                 shader = Gradient.linear(new Offset(100, 100), new Offset(280, 280), new List<Color>() {
                     Colors.red, Colors.black, Colors.green
                 }, null, TileMode.clamp)
-
             };
 
             canvas.drawImageRect(this._stream.completer.currentImage.image,
@@ -458,7 +463,7 @@ namespace UIWidgets.Tests {
             var rrect1 = RRect.fromRectAndCorners(rect1, 0, 4, 8, 16);
             canvas.drawDRRect(rrect, rrect1, paint);
 
-            canvas.rotate(-45 * Mathf.PI / 180.0, new Offset(150, 150));
+            canvas.rotate(-45 * Mathf.PI / 180.0f, new Offset(150, 150));
 
 //            paint = new Paint {
 //                color = new Color(0xFF00FFFF),
@@ -471,7 +476,8 @@ namespace UIWidgets.Tests {
             var picture = pictureRecorder.endRecording();
             Debug.Log("picture.paintBounds: " + picture.paintBounds);
 
-            var editorCanvas = new CommandBufferCanvas(this._renderTexture, (float) Window.instance.devicePixelRatio, this._meshPool);
+            var editorCanvas = new CommandBufferCanvas(this._renderTexture, (float) Window.instance.devicePixelRatio,
+                this._meshPool);
             editorCanvas.rotate(-5 * Mathf.PI / 180);
             editorCanvas.clipRect(Unity.UIWidgets.ui.Rect.fromLTWH(25, 15, 250, 250));
             editorCanvas.rotate(5 * Mathf.PI / 180);
@@ -513,7 +519,7 @@ namespace UIWidgets.Tests {
             var rrect1 = RRect.fromRectAndCorners(rect1, 0, 4, 8, 16);
             canvas.drawDRRect(rrect, rrect1, paint);
 
-            canvas.rotate(-45 * Mathf.PI / 180.0, new Offset(150, 150));
+            canvas.rotate(-45 * Mathf.PI / 180.0f, new Offset(150, 150));
 
 //            paint = new Paint {
 //                color = new Color(0xFF00FFFF),
@@ -526,7 +532,8 @@ namespace UIWidgets.Tests {
             var picture = pictureRecorder.endRecording();
             Debug.Log("picture.paintBounds: " + picture.paintBounds);
 
-            var editorCanvas = new CommandBufferCanvas(this._renderTexture, (float) Window.instance.devicePixelRatio, this._meshPool);
+            var editorCanvas = new CommandBufferCanvas(this._renderTexture, (float) Window.instance.devicePixelRatio,
+                this._meshPool);
             editorCanvas.rotate(-5 * Mathf.PI / 180);
             editorCanvas.clipRRect(RRect.fromRectAndRadius(Unity.UIWidgets.ui.Rect.fromLTWH(25, 15, 250, 250), 50));
             editorCanvas.rotate(5 * Mathf.PI / 180);
@@ -568,7 +575,7 @@ namespace UIWidgets.Tests {
             var rrect1 = RRect.fromRectAndCorners(rect1, 0, 4, 8, 16);
             canvas.drawDRRect(rrect, rrect1, paint);
 
-            canvas.rotate(-45 * Mathf.PI / 180.0, new Offset(150, 150));
+            canvas.rotate(-45 * Mathf.PI / 180.0f, new Offset(150, 150));
 
 //            paint = new Paint {
 //                color = new Color(0xFF00FFFF),
@@ -581,7 +588,8 @@ namespace UIWidgets.Tests {
             var picture = pictureRecorder.endRecording();
             Debug.Log("picture.paintBounds: " + picture.paintBounds);
 
-            var editorCanvas = new CommandBufferCanvas(this._renderTexture, (float) Window.instance.devicePixelRatio, this._meshPool);
+            var editorCanvas = new CommandBufferCanvas(this._renderTexture, (float) Window.instance.devicePixelRatio,
+                this._meshPool);
 
             editorCanvas.saveLayer(picture.paintBounds, new Paint {color = new Color(0x7FFFFFFF)});
             editorCanvas.drawPicture(picture);

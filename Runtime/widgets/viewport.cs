@@ -11,10 +11,10 @@ namespace Unity.UIWidgets.widgets {
             Key key = null,
             AxisDirection axisDirection = AxisDirection.down,
             AxisDirection? crossAxisDirection = null,
-            double anchor = 0.0,
+            float anchor = 0.0f,
             ViewportOffset offset = null,
             Key center = null,
-            double? cacheExtent = null,
+            float? cacheExtent = null,
             List<Widget> slivers = null
         ) : base(key: key, children: slivers) {
             D.assert(offset != null);
@@ -32,13 +32,13 @@ namespace Unity.UIWidgets.widgets {
 
         public readonly AxisDirection? crossAxisDirection;
 
-        public readonly double anchor;
+        public readonly float anchor;
 
         public readonly ViewportOffset offset;
 
         public readonly Key center;
 
-        public readonly double? cacheExtent;
+        public readonly float? cacheExtent;
 
         public static AxisDirection getDefaultCrossAxisDirection(BuildContext context, AxisDirection axisDirection) {
             switch (axisDirection) {

@@ -24,13 +24,13 @@ namespace UIWidgetsSample {
             paint.strokeWidth = 2;
             paint.style = PaintingStyle.stroke;
             for (int i = 1; i < numGrid; i++) {
-                double offsetY = size.height * i / numGrid;
+                float offsetY = size.height * i / numGrid;
                 canvas.drawLine(new Offset(0, offsetY), new Offset(size.width, offsetY),
                     paint);
             }
 
             for (int i = 1; i < numGrid; i++) {
-                double offsetx = size.width * i / numGrid;
+                float offsetx = size.width * i / numGrid;
                 canvas.drawLine(new Offset(offsetx, 0), new Offset(offsetx, size.height),
                     paint);
             }
@@ -38,7 +38,7 @@ namespace UIWidgetsSample {
 
             // draw a arrow line
             canvas.save();
-            canvas.rotate(0.4);
+            canvas.rotate(0.4f);
             canvas.scale(2, 2);
             canvas.translate(50, 50);
             canvas.drawLine(new Offset(0, 0), new Offset(100, 0),

@@ -1,4 +1,5 @@
-﻿using Unity.UIWidgets.editor;
+﻿using Unity.UIWidgets.animation;
+using Unity.UIWidgets.editor;
 using Unity.UIWidgets.material;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.widgets;
@@ -48,8 +49,8 @@ namespace UIWidgets.Tests {
             this.root = new Container(
                 width: 200,
                 height: 200,
-                margin: EdgeInsets.all(30.0),
-                padding: EdgeInsets.all(15.0),
+                margin: EdgeInsets.all(30.0f),
+                padding: EdgeInsets.all(15.0f),
                 color: Color.fromARGB(255, 244, 190, 85),
                 child: new EditableText(
                     maxLines: 100,
@@ -65,8 +66,8 @@ namespace UIWidgets.Tests {
                 pageRouteBuilder: (RouteSettings settings, WidgetBuilder builder) =>
                     new PageRouteBuilder(
                         settings: settings,
-                        pageBuilder: (BuildContext context, Unity.UIWidgets.animation.Animation<double> animation, 
-                            Unity.UIWidgets.animation.Animation<double> secondaryAnimation) => builder(context)
+                        pageBuilder: (BuildContext context, Animation<float> animation,
+                            Animation<float> secondaryAnimation) => builder(context)
                     )));
             this.titleContent = new GUIContent("EditableTextWidget");
         }

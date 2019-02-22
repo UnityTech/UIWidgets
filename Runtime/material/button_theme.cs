@@ -26,8 +26,8 @@ namespace Unity.UIWidgets.material {
             Key key = null,
             ButtonTextTheme textTheme = ButtonTextTheme.normal,
             ButtonBarLayoutBehavior layoutBehavior = ButtonBarLayoutBehavior.padded,
-            double minWidth = 88.0,
-            double height = 36.0,
+            float minWidth = 88.0f,
+            float height = 36.0f,
             EdgeInsets padding = null,
             ShapeBorder shape = null,
             bool alignedDropdown = false,
@@ -91,8 +91,8 @@ namespace Unity.UIWidgets.material {
     public class ButtonThemeData : Diagnosticable {
         public ButtonThemeData(
             ButtonTextTheme textTheme = ButtonTextTheme.normal,
-            double minWidth = 88.0,
-            double height = 36.0,
+            float minWidth = 88.0f,
+            float height = 36.0f,
             EdgeInsets padding = null,
             ShapeBorder shape = null,
             ButtonBarLayoutBehavior layoutBehavior = ButtonBarLayoutBehavior.padded,
@@ -122,9 +122,9 @@ namespace Unity.UIWidgets.material {
         }
 
 
-        public readonly double minWidth;
+        public readonly float minWidth;
 
-        public readonly double height;
+        public readonly float height;
 
         public readonly ButtonTextTheme textTheme;
 
@@ -146,9 +146,9 @@ namespace Unity.UIWidgets.material {
                 switch (this.textTheme) {
                     case ButtonTextTheme.normal:
                     case ButtonTextTheme.accent:
-                        return EdgeInsets.symmetric(horizontal: 16.0);
+                        return EdgeInsets.symmetric(horizontal: 16.0f);
                     case ButtonTextTheme.primary:
-                        return EdgeInsets.symmetric(horizontal: 24.0);
+                        return EdgeInsets.symmetric(horizontal: 24.0f);
                 }
 
                 D.assert(false);
@@ -168,10 +168,10 @@ namespace Unity.UIWidgets.material {
                     case ButtonTextTheme.normal:
                     case ButtonTextTheme.accent:
                         return new RoundedRectangleBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(2.0)));
+                            borderRadius: BorderRadius.all(Radius.circular(2.0f)));
                     case ButtonTextTheme.primary:
                         return new RoundedRectangleBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(4.0)));
+                            borderRadius: BorderRadius.all(Radius.circular(4.0f)));
                 }
 
                 return new RoundedRectangleBorder();
@@ -382,7 +382,7 @@ namespace Unity.UIWidgets.material {
             }
 
             if (button is MaterialButtonWithIconMixin) {
-                return EdgeInsets.fromLTRB(12.0, 0.0, 16.0, 0.0);
+                return EdgeInsets.fromLTRB(12.0f, 0.0f, 16.0f, 0.0f);
             }
 
             if (this._padding != null) {
@@ -392,9 +392,9 @@ namespace Unity.UIWidgets.material {
             switch (this.getTextTheme(button)) {
                 case ButtonTextTheme.normal:
                 case ButtonTextTheme.accent:
-                    return EdgeInsets.symmetric(horizontal: 16.0);
+                    return EdgeInsets.symmetric(horizontal: 16.0f);
                 case ButtonTextTheme.primary:
-                    return EdgeInsets.symmetric(horizontal: 24.0);
+                    return EdgeInsets.symmetric(horizontal: 24.0f);
             }
 
             D.assert(false);
@@ -423,8 +423,8 @@ namespace Unity.UIWidgets.material {
         public ButtonThemeData copyWith(
             ButtonTextTheme? textTheme = null,
             ButtonBarLayoutBehavior? layoutBehavior = null,
-            double? minWidth = null,
-            double? height = null,
+            float? minWidth = null,
+            float? height = null,
             EdgeInsets padding = null,
             ShapeBorder shape = null,
             bool? alignedDropdown = null,

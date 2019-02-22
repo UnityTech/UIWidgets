@@ -4,18 +4,17 @@ using Unity.UIWidgets.foundation;
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
-  public enum TileMode : int {
+    public enum TileMode : int {
         clamp = 0,
         mirror = 1,
         repeated = 2,
-    }   
+    }
 
     public abstract class PaintShader {
     }
 
-  
+
     public class Gradient : PaintShader {
-        
         public static Gradient linear(
             Offset start, Offset end, List<Color> colors,
             List<double> colorStops = null, TileMode tileMode = TileMode.clamp,
@@ -23,7 +22,7 @@ namespace Unity.UIWidgets.ui {
             D.assert(PaintingUtils._offsetIsValid(start));
             D.assert(PaintingUtils._offsetIsValid(end));
             D.assert(colors != null && colors.Count >= 2);
-            
+
             _validateColorStops(ref colors, ref colorStops);
 
             return new _LinearGradient(start, end, colors, colorStops, tileMode, matrix);
@@ -35,9 +34,9 @@ namespace Unity.UIWidgets.ui {
             Matrix3 matrix = null) {
             D.assert(PaintingUtils._offsetIsValid(center));
             D.assert(colors != null && colors.Count >= 2);
-            
+
             _validateColorStops(ref colors, ref colorStops);
-            
+
             return new _RadialGradient(center, radius, colors, colorStops, tileMode, matrix);
         }
 
@@ -45,13 +44,13 @@ namespace Unity.UIWidgets.ui {
             Offset center, List<Color> colors,
             List<double> colorStops = null, TileMode tileMode = TileMode.clamp,
             double startAngle = 0.0, double endAngle = Math.PI * 2,
-            Matrix3 matrix = null) {            
+            Matrix3 matrix = null) {
             D.assert(PaintingUtils._offsetIsValid(center));
             D.assert(colors != null && colors.Count >= 2);
             D.assert(startAngle < endAngle);
-            
+
             _validateColorStops(ref colors, ref colorStops);
-            
+
             return new _SweepGradient(center, colors, colorStops, tileMode, startAngle, endAngle, matrix);
         }
 
@@ -66,6 +65,7 @@ namespace Unity.UIWidgets.ui {
                 for (int i = 1; i < stepCount; i++) {
                     colorStops.Add(colorStops[i - 1] + step);
                 }
+
                 colorStops.Add(1);
 
                 return;
@@ -83,23 +83,27 @@ namespace Unity.UIWidgets.ui {
             if (dummyFirst) {
                 newColors.Add(colors[0]);
             }
+
             for (int i = 0; i < colors.Count; i++) {
                 newColors.Add(colors[i]);
             }
+
             if (dummyLast) {
                 newColors.Add(colors[colors.Count - 1]);
             }
-            
+
             var newColorStops = new List<double>(count);
             if (dummyFirst) {
                 newColorStops.Add(0.0);
             }
+
             var prevStop = 0.0;
             for (int i = 0; i < colorStops.Count; i++) {
                 var stop = Math.Max(Math.Min(colorStops[i], 1.0), prevStop);
                 newColorStops.Add(stop);
                 prevStop = stop;
             }
+
             if (dummyLast) {
                 newColorStops.Add(1.0);
             }
@@ -107,21 +111,23 @@ namespace Unity.UIWidgets.ui {
             colors = newColors;
             colorStops = newColorStops;
         }
-        
+
         static readonly GradientBitmapCache _cache = new GradientBitmapCache();
 
         internal static Image makeTexturedColorizer(List<Color> colors, List<double> positions) {
             int count = colors.Count;
             D.assert(count >= 2);
-            
+
             bool bottomHardStop = ScalarUtils.ScalarNearlyEqual((float) positions[0], (float) positions[1]);
-            bool topHardStop = ScalarUtils.ScalarNearlyEqual((float) positions[count - 2], (float) positions[count - 1]);
+            bool topHardStop =
+                ScalarUtils.ScalarNearlyEqual((float) positions[count - 2], (float) positions[count - 1]);
 
             int offset = 0;
             if (bottomHardStop) {
                 offset += 1;
                 count--;
             }
+
             if (topHardStop) {
                 count--;
             }
@@ -141,10 +147,10 @@ namespace Unity.UIWidgets.ui {
             this.resolution = resolution;
             this._entryCount = 0;
             this._head = this._tail = null;
-            
+
             D.assert(this.validate);
         }
-        
+
         public readonly int maxEntries;
         public readonly int resolution;
 
@@ -175,19 +181,21 @@ namespace Unity.UIWidgets.ui {
             if (entry.prev != null) {
                 D.assert(this._head != entry);
                 entry.prev.next = entry.next;
-            } else {
+            }
+            else {
                 D.assert(this._head == entry);
                 this._head = entry.next;
             }
-            
+
             if (entry.next != null) {
                 D.assert(this._tail != entry);
                 entry.next.prev = entry.prev;
-            } else {
+            }
+            else {
                 D.assert(this._tail == entry);
                 this._tail = entry.prev;
             }
-            
+
             return entry;
         }
 
@@ -196,29 +204,32 @@ namespace Unity.UIWidgets.ui {
             entry.next = this._head;
             if (this._head != null) {
                 this._head.prev = entry;
-            } else {
+            }
+            else {
                 this._tail = entry;
             }
+
             this._head = entry;
         }
 
         bool find(_Key key, out Image image) {
             D.assert(this.validate);
-            
+
             var entry = this._head;
             while (entry != null) {
                 if (entry.key == key) {
                     image = entry.image;
-                    
+
                     // move to the head of our list, so we purge it last
                     this.release(entry);
                     this.attachToHead(entry);
                     D.assert(this.validate);
                     return true;
                 }
+
                 entry = entry.next;
             }
-            
+
             D.assert(this.validate);
             image = null;
             return false;
@@ -240,7 +251,7 @@ namespace Unity.UIWidgets.ui {
             Texture2D tex = new Texture2D(this.resolution, 1, TextureFormat.RGBA32, false);
             tex.hideFlags = HideFlags.HideAndDontSave;
             tex.wrapMode = TextureWrapMode.Clamp;
-            
+
             var bytes = new byte[this.resolution * 4];
 
             int count = colors.Count;
@@ -290,7 +301,8 @@ namespace Unity.UIWidgets.ui {
 
                 if (this._entryCount == 1) {
                     D.assert(this._head == this._tail);
-                } else {
+                }
+                else {
                     D.assert(this._head != this._tail);
                 }
 
@@ -300,6 +312,7 @@ namespace Unity.UIWidgets.ui {
                     count += 1;
                     entry = entry.next;
                 }
+
                 D.assert(count == this._entryCount);
 
                 entry = this._tail;
@@ -307,8 +320,10 @@ namespace Unity.UIWidgets.ui {
                     count -= 1;
                     entry = entry.prev;
                 }
+
                 D.assert(0 == count);
-            } else {
+            }
+            else {
                 D.assert(null == this._head);
                 D.assert(null == this._tail);
             }
@@ -319,7 +334,7 @@ namespace Unity.UIWidgets.ui {
         class _Entry {
             public _Entry prev;
             public _Entry next;
-            
+
             public _Key key;
             public Image image;
         }
@@ -329,7 +344,7 @@ namespace Unity.UIWidgets.ui {
                 D.assert(colors != null);
                 D.assert(positions != null);
                 D.assert(colors.Count == positions.Count);
-                
+
                 this.colors = colors;
                 this.positions = positions;
                 this._hashCode = _getHashCode(this.colors) ^ _getHashCode(this.positions);
@@ -337,18 +352,20 @@ namespace Unity.UIWidgets.ui {
             }
 
             public readonly List<Color> colors;
-            
+
             public readonly List<double> positions;
-            
+
             readonly int _hashCode;
 
             public bool Equals(_Key other) {
                 if (ReferenceEquals(null, other)) {
                     return false;
                 }
+
                 if (ReferenceEquals(this, other)) {
                     return true;
                 }
+
                 return _listEquals(this.colors, other.colors) &&
                        _listEquals(this.positions, other.positions);
             }
@@ -357,12 +374,15 @@ namespace Unity.UIWidgets.ui {
                 if (ReferenceEquals(null, obj)) {
                     return false;
                 }
+
                 if (ReferenceEquals(this, obj)) {
                     return true;
                 }
+
                 if (obj.GetType() != this.GetType()) {
                     return false;
                 }
+
                 return this.Equals((_Key) obj);
             }
 
@@ -384,6 +404,7 @@ namespace Unity.UIWidgets.ui {
                     foreach (var item in list) {
                         hashCode = (hashCode * 397) ^ item.GetHashCode();
                     }
+
                     return hashCode;
                 }
             }
@@ -403,7 +424,7 @@ namespace Unity.UIWidgets.ui {
             }
         }
     }
-    
+
 
     class _LinearGradient : Gradient {
         public _LinearGradient(
@@ -436,14 +457,15 @@ namespace Unity.UIWidgets.ui {
         public Color rightColor {
             get { return this.colors[this.colors.Count - 1]; }
         }
-        
+
         public Matrix3 getGradientMat(Matrix3 ctm) {
             var mat = Matrix3.I();
             ctm.invert(mat); // just use I() if not invertible.
-            
+
             if (this.matrix != null) {
                 mat.postConcat(this.matrix);
             }
+
             mat.postConcat(this.ptsToUnit);
             return mat;
         }
@@ -453,7 +475,7 @@ namespace Unity.UIWidgets.ui {
             var mag = vec.distance;
             var inv = mag != 0 ? 1 / mag : 0;
             vec = vec.scale(inv);
-            
+
             var matrix = Matrix3.I();
             matrix.setSinCos((float) -vec.dy, (float) vec.dx, (float) start.dx, (float) start.dy);
             matrix.postTranslate((float) -start.dx, (float) -start.dy);
@@ -477,7 +499,7 @@ namespace Unity.UIWidgets.ui {
             this.ptsToUnit = radToUnitMatrix(center, radius);
             this.gradientTex = makeTexturedColorizer(colors, colorStops);
         }
-        
+
         public readonly Offset center;
         public readonly double radius;
         public readonly List<Color> colors;
@@ -486,7 +508,7 @@ namespace Unity.UIWidgets.ui {
         public readonly Matrix3 matrix;
         public readonly Matrix3 ptsToUnit;
         public readonly Image gradientTex;
-        
+
         public Color leftColor {
             get { return this.colors[0]; }
         }
@@ -494,7 +516,7 @@ namespace Unity.UIWidgets.ui {
         public Color rightColor {
             get { return this.colors[this.colors.Count - 1]; }
         }
-        
+
         public Matrix3 getGradientMat(Matrix3 ctm) {
             var mat = Matrix3.I();
             ctm.invert(mat); // just use I() if not invertible.
@@ -502,6 +524,7 @@ namespace Unity.UIWidgets.ui {
             if (this.matrix != null) {
                 mat.postConcat(this.matrix);
             }
+
             mat.postConcat(this.ptsToUnit);
             return mat;
         }
@@ -517,7 +540,6 @@ namespace Unity.UIWidgets.ui {
     }
 
     class _SweepGradient : Gradient {
-        
         public _SweepGradient(
             Offset center, List<Color> colors,
             List<double> colorStops = null, TileMode tileMode = TileMode.clamp,
@@ -536,14 +558,14 @@ namespace Unity.UIWidgets.ui {
             var t1 = endAngle / (Math.PI * 2f);
             this.bias = -t0;
             this.scale = 1f / (t1 - t0);
-            
+
             var ptsToUnit = Matrix3.I();
             ptsToUnit.setTranslate((float) -center.dx, (float) -center.dy);
             this.ptsToUnit = ptsToUnit;
-            
+
             this.gradientTex = makeTexturedColorizer(colors, colorStops);
         }
-        
+
         public readonly Offset center;
         public readonly List<Color> colors;
         public readonly List<double> colorStops;
@@ -555,7 +577,7 @@ namespace Unity.UIWidgets.ui {
         public readonly Image gradientTex;
         public readonly double bias;
         public readonly double scale;
-        
+
         public Color leftColor {
             get { return this.colors[0]; }
         }
@@ -563,7 +585,7 @@ namespace Unity.UIWidgets.ui {
         public Color rightColor {
             get { return this.colors[this.colors.Count - 1]; }
         }
-        
+
         public Matrix3 getGradientMat(Matrix3 ctm) {
             var mat = Matrix3.I();
             ctm.invert(mat); // just use I() if not invertible.
@@ -571,6 +593,7 @@ namespace Unity.UIWidgets.ui {
             if (this.matrix != null) {
                 mat.postConcat(this.matrix);
             }
+
             mat.postConcat(this.ptsToUnit);
             return mat;
         }
@@ -587,7 +610,7 @@ namespace Unity.UIWidgets.ui {
         public readonly Image image;
         public readonly TileMode tileMode;
         public readonly Matrix3 matrix;
-        
+
         public Matrix3 getShaderMat(Matrix3 ctm) {
             var mat = Matrix3.I();
             ctm.invert(mat); // just use I() if not invertible.
@@ -595,7 +618,7 @@ namespace Unity.UIWidgets.ui {
             if (this.matrix != null) {
                 mat.postConcat(this.matrix);
             }
-            
+
             mat.postScale(1f / this.image.width, 1f / this.image.height);
             return mat;
         }

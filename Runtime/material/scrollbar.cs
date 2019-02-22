@@ -25,7 +25,7 @@ namespace Unity.UIWidgets.material {
         public Color _themeColor;
 
         public AnimationController _fadeoutAnimationController;
-        public Animation<double> _FadeoutOpacityAnimation;
+        public Animation<float> _FadeoutOpacityAnimation;
         public Timer _fadeoutTimer;
 
         public override void initState() {

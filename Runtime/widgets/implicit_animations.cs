@@ -14,7 +14,7 @@ namespace Unity.UIWidgets.widgets {
         ) : base(begin: begin, end: end) {
         }
 
-        public override BoxConstraints lerp(double t) {
+        public override BoxConstraints lerp(float t) {
             return BoxConstraints.lerp(this.begin, this.end, t);
         }
     }
@@ -26,7 +26,7 @@ namespace Unity.UIWidgets.widgets {
             Decoration end = null) : base(begin: begin, end: end) {
         }
 
-        public override Decoration lerp(double t) {
+        public override Decoration lerp(float t) {
             return Decoration.lerp(this.begin, this.end, t);
         }
     }
@@ -38,7 +38,7 @@ namespace Unity.UIWidgets.widgets {
             EdgeInsets end = null) : base(begin: begin, end: end) {
         }
 
-        public override EdgeInsets lerp(double t) {
+        public override EdgeInsets lerp(float t) {
             return EdgeInsets.lerp(this.begin, this.end, t);
         }
     }
@@ -50,7 +50,7 @@ namespace Unity.UIWidgets.widgets {
             BorderRadius end = null) : base(begin: begin, end: end) {
         }
 
-        public override BorderRadius lerp(double t) {
+        public override BorderRadius lerp(float t) {
             return BorderRadius.lerp(this.begin, this.end, t);
         }
     }
@@ -62,7 +62,7 @@ namespace Unity.UIWidgets.widgets {
             Border end = null) : base(begin: begin, end: end) {
         }
 
-        public override Border lerp(double t) {
+        public override Border lerp(float t) {
             return Border.lerp(this.begin, this.end, t);
         }
     }
@@ -75,7 +75,7 @@ namespace Unity.UIWidgets.widgets {
         }
 
         //todo:xingwei.zhu implement full matrix3 lerp
-        public override Matrix3 lerp(double t) {
+        public override Matrix3 lerp(float t) {
             D.assert(this.begin != null);
             D.assert(this.end != null);
 
@@ -89,7 +89,7 @@ namespace Unity.UIWidgets.widgets {
             TextStyle end = null) : base(begin: begin, end: end) {
         }
 
-        public override TextStyle lerp(double t) {
+        public override TextStyle lerp(float t) {
             return TextStyle.lerp(this.begin, this.end, t);
         }
     }
@@ -166,11 +166,11 @@ namespace Unity.UIWidgets.widgets {
 
         AnimationController _controller;
 
-        public Animation<double> animation {
+        public Animation<float> animation {
             get { return this._animation; }
         }
 
-        Animation<double> _animation;
+        Animation<float> _animation;
 
         public override void initState() {
             base.initState();
@@ -195,7 +195,7 @@ namespace Unity.UIWidgets.widgets {
             if (this._constructTweens()) {
                 var visitor = new TweenVisitorUpdateTween();
                 this.forEachTween(visitor);
-                this._controller.setValue(0.0);
+                this._controller.setValue(0.0f);
                 this._controller.forward();
                 this.didUpdateTweens();
             }
@@ -262,8 +262,8 @@ namespace Unity.UIWidgets.widgets {
             Color color = null,
             Decoration decoration = null,
             Decoration foregroundDecoration = null,
-            double? width = null,
-            double? height = null,
+            float? width = null,
+            float? height = null,
             BoxConstraints constraints = null,
             EdgeInsets margin = null,
             Matrix3 transform = null,

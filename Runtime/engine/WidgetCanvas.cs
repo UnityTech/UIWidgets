@@ -19,8 +19,8 @@ namespace Unity.UIWidgets.engine {
 
         protected override void updateSafeArea() {
             this._padding = new WindowPadding(
-                Screen.safeArea.x, 
-                Screen.safeArea.y, 
+                Screen.safeArea.x,
+                Screen.safeArea.y,
                 Screen.width - Screen.safeArea.width,
                 Screen.height - Screen.safeArea.height);
         }
@@ -39,6 +39,7 @@ namespace Unity.UIWidgets.engine {
             if (this.displayMetricsChanged()) {
                 this._needsPaint = true;
             }
+
             if (evt.type == EventType.Repaint) {
                 if (!this._needsPaint) {
                     return;
@@ -58,14 +59,14 @@ namespace Unity.UIWidgets.engine {
             get { return new GUIContent(this._widgetCanvas.gameObject.name); }
         }
 
-        protected override double queryDevicePixelRatio() {
+        protected override float queryDevicePixelRatio() {
             return this._widgetCanvas.devicePixelRatio;
         }
 
         protected override Vector2 queryWindowSize() {
             var size = this._widgetCanvas.rectTransform.rect.size;
-            size = size * this._widgetCanvas.canvas.scaleFactor / (float)this._widgetCanvas.devicePixelRatio;
-            return new Vector2	(Mathf.Round	(size.x), Mathf.Round	(size.y));
+            size = size * this._widgetCanvas.canvas.scaleFactor / (float) this._widgetCanvas.devicePixelRatio;
+            return new Vector2(Mathf.Round(size.x), Mathf.Round(size.y));
         }
     }
 
@@ -75,8 +76,8 @@ namespace Unity.UIWidgets.engine {
         static Event _repaintEvent;
 
         [SerializeField]
-        protected double devicePixelRatioOverride;
-        
+        protected float devicePixelRatioOverride;
+
         WindowAdapter _windowAdapter;
         Texture _texture;
         Vector2 _lastMouseMove;
@@ -112,8 +113,12 @@ namespace Unity.UIWidgets.engine {
             this._lastMouseMove = Input.mousePosition;
         }
 
-        public double devicePixelRatio {
-            get { return this.devicePixelRatioOverride > 0 ? this.devicePixelRatioOverride : DisplayMetrics.devicePixelRatio; }
+        public float devicePixelRatio {
+            get {
+                return this.devicePixelRatioOverride > 0
+                    ? this.devicePixelRatioOverride
+                    : DisplayMetrics.devicePixelRatio;
+            }
         }
 
         protected virtual Dictionary<string, WidgetBuilder> routes {
@@ -141,8 +146,8 @@ namespace Unity.UIWidgets.engine {
                 return (RouteSettings settings, WidgetBuilder builder) =>
                     new PageRouteBuilder(
                         settings: settings,
-                        pageBuilder: (BuildContext context, Animation<double> animation,
-                            Animation<double> secondaryAnimation) => builder(context)
+                        pageBuilder: (BuildContext context, Animation<float> animation,
+                            Animation<float> secondaryAnimation) => builder(context)
                     );
             }
         }

@@ -143,11 +143,11 @@ namespace Unity.UIWidgets.material {
         public readonly GlobalKey _drawerKey = GlobalKey.key();
 
 
-        double _width {
+        float _width {
             get {
                 RenderBox box = (RenderBox) this._drawerKey.currentContext?.findRenderObject();
                 if (box != null) {
-                    return box.size.width;
+                    return (float) box.size.width;
                 }
 
                 return DrawerUtils._kWidth;
@@ -157,7 +157,7 @@ namespace Unity.UIWidgets.material {
         bool _previouslyOpened = false;
 
         void _move(DragUpdateDetails details) {
-            double delta = (details.primaryDelta ?? 0) / this._width;
+            float delta = (details.primaryDelta ?? 0) / this._width;
             switch (this.widget.alignment) {
                 case DrawerAlignment.start:
                     break;
@@ -182,7 +182,7 @@ namespace Unity.UIWidgets.material {
             }
 
             if (details.velocity.pixelsPerSecond.dx.abs() >= DrawerUtils._kMinFlingVelocity) {
-                double visualVelocity = details.velocity.pixelsPerSecond.dx / DrawerUtils._kWidth;
+                float visualVelocity = (float) details.velocity.pixelsPerSecond.dx / DrawerUtils._kWidth;
                 switch (this.widget.alignment) {
                     case DrawerAlignment.start:
                         break;
@@ -202,14 +202,14 @@ namespace Unity.UIWidgets.material {
         }
 
         public void open() {
-            this._controller.fling(velocity: 1.0);
+            this._controller.fling(velocity: 1.0f);
             if (this.widget.drawerCallback != null) {
                 this.widget.drawerCallback(true);
             }
         }
 
         public void close() {
-            this._controller.fling(velocity: -1.0);
+            this._controller.fling(velocity: -1.0f);
             if (this.widget.drawerCallback != null) {
                 this.widget.drawerCallback(false);
             }
@@ -258,7 +258,7 @@ namespace Unity.UIWidgets.material {
                         onHorizontalDragUpdate: this._move,
                         onHorizontalDragEnd: this._settle,
                         behavior: HitTestBehavior.translucent,
-                        child: new Container(width: dragAreaWidth)
+                        child: new Container(width: (float) dragAreaWidth)
                     )
                 );
             }

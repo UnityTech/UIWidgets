@@ -5,28 +5,28 @@ using Unity.UIWidgets.ui;
 
 namespace Unity.UIWidgets.animation {
     public abstract class Animatable<T> {
-        public abstract T evaluate(Animation<double> animation);
+        public abstract T evaluate(Animation<float> animation);
 
-        public Animation<T> animate(Animation<double> parent) {
+        public Animation<T> animate(Animation<float> parent) {
             return new _AnimatedEvaluation<T>(parent, this);
         }
 
-        public Animatable<T> chain(Animatable<double> parent) {
+        public Animatable<T> chain(Animatable<float> parent) {
             return new _ChainedEvaluation<T>(parent, this);
         }
     }
 
-    class _AnimatedEvaluation<T> : AnimationWithParentMixin<double, T> {
-        internal _AnimatedEvaluation(Animation<double> parent, Animatable<T> evaluatable) {
+    class _AnimatedEvaluation<T> : AnimationWithParentMixin<float, T> {
+        internal _AnimatedEvaluation(Animation<float> parent, Animatable<T> evaluatable) {
             this._parent = parent;
             this._evaluatable = evaluatable;
         }
 
-        public override Animation<double> parent {
+        public override Animation<float> parent {
             get { return this._parent; }
         }
 
-        readonly Animation<double> _parent;
+        readonly Animation<float> _parent;
 
         readonly Animatable<T> _evaluatable;
 
@@ -45,18 +45,18 @@ namespace Unity.UIWidgets.animation {
 
 
     class _ChainedEvaluation<T> : Animatable<T> {
-        internal _ChainedEvaluation(Animatable<double> parent, Animatable<T> evaluatable) {
+        internal _ChainedEvaluation(Animatable<float> parent, Animatable<T> evaluatable) {
             this._parent = parent;
             this._evaluatable = evaluatable;
         }
 
-        readonly Animatable<double> _parent;
+        readonly Animatable<float> _parent;
 
         readonly Animatable<T> _evaluatable;
 
-        public override T evaluate(Animation<double> animation) {
-            double value = this._parent.evaluate(animation);
-            return this._evaluatable.evaluate(new AlwaysStoppedAnimation<double>(value));
+        public override T evaluate(Animation<float> animation) {
+            float value = this._parent.evaluate(animation);
+            return this._evaluatable.evaluate(new AlwaysStoppedAnimation<float>(value));
         }
 
         public override string ToString() {
@@ -74,10 +74,10 @@ namespace Unity.UIWidgets.animation {
 
         public T end;
 
-        public abstract T lerp(double t);
+        public abstract T lerp(float t);
 
-        public override T evaluate(Animation<double> animation) {
-            double t = animation.value;
+        public override T evaluate(Animation<float> animation) {
+            float t = animation.value;
             if (t == 0.0) {
                 return this.begin;
             }
@@ -145,8 +145,8 @@ namespace Unity.UIWidgets.animation {
 
         public readonly Tween<T> parent;
 
-        public override T lerp(double t) {
-            return this.parent.lerp(1.0 - t);
+        public override T lerp(float t) {
+            return this.parent.lerp(1.0f - t);
         }
     }
 
@@ -154,7 +154,7 @@ namespace Unity.UIWidgets.animation {
         public ColorTween(Color begin = null, Color end = null) : base(begin: begin, end: end) {
         }
 
-        public override Color lerp(double t) {
+        public override Color lerp(float t) {
             return Color.lerp(this.begin, this.end, t);
         }
     }
@@ -163,7 +163,7 @@ namespace Unity.UIWidgets.animation {
         public SizeTween(Size begin = null, Size end = null) : base(begin: begin, end: end) {
         }
 
-        public override Size lerp(double t) {
+        public override Size lerp(float t) {
             return Size.lerp(this.begin, this.end, t);
         }
     }
@@ -172,7 +172,7 @@ namespace Unity.UIWidgets.animation {
         public RectTween(Rect begin = null, Rect end = null) : base(begin: begin, end: end) {
         }
 
-        public override Rect lerp(double t) {
+        public override Rect lerp(float t) {
             return Rect.lerp(this.begin, this.end, t);
         }
     }
@@ -181,7 +181,7 @@ namespace Unity.UIWidgets.animation {
         public IntTween(int begin, int end) : base(begin: begin, end: end) {
         }
 
-        public override int lerp(double t) {
+        public override int lerp(float t) {
             return (this.begin + (this.end - this.begin) * t).round();
         }
     }
@@ -190,7 +190,16 @@ namespace Unity.UIWidgets.animation {
         public DoubleTween(double begin, double end) : base(begin: begin, end: end) {
         }
 
-        public override double lerp(double t) {
+        public override double lerp(float t) {
+            return this.begin + (this.end - this.begin) * t;
+        }
+    }
+
+    public class FloatTween : Tween<float> {
+        public FloatTween(float begin, float end) : base(begin: begin, end: end) {
+        }
+
+        public override float lerp(float t) {
             return this.begin + (this.end - this.begin) * t;
         }
     }
@@ -199,7 +208,7 @@ namespace Unity.UIWidgets.animation {
         public StepTween(int begin, int end) : base(begin: begin, end: end) {
         }
 
-        public override int lerp(double t) {
+        public override int lerp(float t) {
             return (this.begin + (this.end - this.begin) * t).floor();
         }
     }
@@ -208,12 +217,12 @@ namespace Unity.UIWidgets.animation {
         public OffsetTween(Offset begin, Offset end) : base(begin: begin, end: end) {
         }
 
-        public override Offset lerp(double t) {
+        public override Offset lerp(float t) {
             return (this.begin + (this.end - this.begin) * t);
         }
     }
 
-    public class CurveTween : Animatable<double> {
+    public class CurveTween : Animatable<float> {
         public CurveTween(Curve curve = null) {
             D.assert(curve != null);
             this.curve = curve;
@@ -221,8 +230,8 @@ namespace Unity.UIWidgets.animation {
 
         public readonly Curve curve;
 
-        public override double evaluate(Animation<double> animation) {
-            double t = animation.value;
+        public override float evaluate(Animation<float> animation) {
+            float t = animation.value;
             if (t == 0.0 || t == 1.0) {
                 D.assert(this.curve.transform(t).round() == t);
                 return t;

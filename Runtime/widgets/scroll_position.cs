@@ -45,22 +45,22 @@ namespace Unity.UIWidgets.widgets {
 
         public readonly string debugLabel;
 
-        public double minScrollExtent {
+        public float minScrollExtent {
             get { return this._minScrollExtent.Value; }
         }
 
-        double? _minScrollExtent;
+        float? _minScrollExtent;
 
-        public double maxScrollExtent {
+        public float maxScrollExtent {
             get { return this._maxScrollExtent.Value; }
         }
 
-        double? _maxScrollExtent;
+        float? _maxScrollExtent;
 
-        public override double pixels {
+        public override float pixels {
             get {
                 D.assert(this._pixels != null);
-                return this._pixels ?? 0.0;
+                return this._pixels ?? 0.0f;
             }
         }
 
@@ -68,13 +68,13 @@ namespace Unity.UIWidgets.widgets {
             get { return this._pixels != null; }
         }
 
-        internal double? _pixels;
+        internal float? _pixels;
 
-        public double viewportDimension {
+        public float viewportDimension {
             get { return this._viewportDimension.Value; }
         }
 
-        double? _viewportDimension;
+        float? _viewportDimension;
 
         public bool haveDimensions {
             get { return this._haveDimensions; }
@@ -105,11 +105,11 @@ namespace Unity.UIWidgets.widgets {
             this.isScrollingNotifier.value = this.activity.isScrolling;
         }
 
-        public virtual double setPixels(double newPixels) {
+        public virtual float setPixels(float newPixels) {
             D.assert(this._pixels != null);
             D.assert(SchedulerBinding.instance.schedulerPhase <= SchedulerPhase.transientCallbacks);
             if (newPixels != this.pixels) {
-                double overscroll = this.applyBoundaryConditions(newPixels);
+                float overscroll = this.applyBoundaryConditions(newPixels);
                 D.assert(() => {
                     double delta = newPixels - this.pixels;
                     if (overscroll.abs() > delta.abs()) {
@@ -125,7 +125,7 @@ namespace Unity.UIWidgets.widgets {
                     return true;
                 });
 
-                double oldPixels = this.pixels;
+                float oldPixels = this.pixels;
                 this._pixels = newPixels - overscroll;
                 if (this.pixels != oldPixels) {
                     this.notifyListeners();
@@ -138,14 +138,14 @@ namespace Unity.UIWidgets.widgets {
                 }
             }
 
-            return 0.0;
+            return 0.0f;
         }
 
-        public void correctPixels(double value) {
+        public void correctPixels(float value) {
             this._pixels = value;
         }
 
-        public override void correctBy(double correction) {
+        public override void correctBy(float correction) {
             D.assert(
                 this._pixels != null,
                 "An initial pixels value must exist by caling correctPixels on the ScrollPosition"
@@ -155,7 +155,7 @@ namespace Unity.UIWidgets.widgets {
             this._didChangeViewportDimensionOrReceiveCorrection = true;
         }
 
-        protected void forcePixels(double value) {
+        protected void forcePixels(float value) {
             D.assert(this._pixels != null);
             this._pixels = value;
             this.notifyListeners();
@@ -174,14 +174,14 @@ namespace Unity.UIWidgets.widgets {
                 if (pageStorage != null) {
                     object valueRaw = pageStorage.readState(this.context.storageContext);
                     if (valueRaw != null) {
-                        this.correctPixels((double) valueRaw);
+                        this.correctPixels((float) valueRaw);
                     }
                 }
             }
         }
 
-        protected double applyBoundaryConditions(double value) {
-            double result = this.physics.applyBoundaryConditions(this, value);
+        protected float applyBoundaryConditions(float value) {
+            float result = this.physics.applyBoundaryConditions(this, value);
             D.assert(() => {
                 double delta = value - this.pixels;
                 if (result.abs() > delta.abs()) {
@@ -204,7 +204,7 @@ namespace Unity.UIWidgets.widgets {
 
         bool _didChangeViewportDimensionOrReceiveCorrection = true;
 
-        public override bool applyViewportDimension(double viewportDimension) {
+        public override bool applyViewportDimension(float viewportDimension) {
             if (this._viewportDimension != viewportDimension) {
                 this._viewportDimension = viewportDimension;
                 this._didChangeViewportDimensionOrReceiveCorrection = true;
@@ -213,7 +213,7 @@ namespace Unity.UIWidgets.widgets {
             return true;
         }
 
-        public override bool applyContentDimensions(double minScrollExtent, double maxScrollExtent) {
+        public override bool applyContentDimensions(float minScrollExtent, float maxScrollExtent) {
             if (!PhysicsUtils.nearEqual(this._minScrollExtent, minScrollExtent, Tolerance.defaultTolerance.distance) ||
                 !PhysicsUtils.nearEqual(this._maxScrollExtent, maxScrollExtent, Tolerance.defaultTolerance.distance) ||
                 this._didChangeViewportDimensionOrReceiveCorrection) {
@@ -233,7 +233,7 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public IPromise ensureVisible(RenderObject renderObject,
-            double alignment = 0.0,
+            float alignment = 0.0f,
             TimeSpan? duration = null,
             Curve curve = null
         ) {
@@ -241,7 +241,7 @@ namespace Unity.UIWidgets.widgets {
             RenderAbstractViewport viewport = RenderViewportUtils.of(renderObject);
             D.assert(viewport != null);
 
-            double target = viewport.getOffsetToReveal(renderObject, alignment).offset.clamp(
+            float target = viewport.getOffsetToReveal(renderObject, alignment).offset.clamp(
                 this.minScrollExtent, this.maxScrollExtent);
 
             if (target == this.pixels) {
@@ -310,7 +310,7 @@ namespace Unity.UIWidgets.widgets {
                 ScrollMetricsUtils.copyWith(this), this.context.notificationContext);
         }
 
-        public void didUpdateScrollPositionBy(double delta) {
+        public void didUpdateScrollPositionBy(float delta) {
             this.activity.dispatchScrollUpdateNotification(
                 ScrollMetricsUtils.copyWith(this), this.context.notificationContext, delta);
         }
@@ -323,7 +323,7 @@ namespace Unity.UIWidgets.widgets {
             }
         }
 
-        public void didOverscrollBy(double value) {
+        public void didOverscrollBy(float value) {
             D.assert(this.activity.isScrolling);
             this.activity.dispatchOverscrollNotification(
                 ScrollMetricsUtils.copyWith(this), this.context.notificationContext, value);

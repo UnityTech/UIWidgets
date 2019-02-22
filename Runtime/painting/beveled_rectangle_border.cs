@@ -20,30 +20,32 @@ namespace Unity.UIWidgets.painting {
             get { return EdgeInsets.all(this.side.width); }
         }
 
-        public override ShapeBorder scale(double t) {
+        public override ShapeBorder scale(float t) {
             return new BeveledRectangleBorder(
                 side: this.side.scale(t),
                 borderRadius: this.borderRadius * t
             );
         }
 
-        public override ShapeBorder lerpFrom(ShapeBorder a, double t) {
+        public override ShapeBorder lerpFrom(ShapeBorder a, float t) {
             if (a is BeveledRectangleBorder border) {
                 return new BeveledRectangleBorder(
                     side: BorderSide.lerp(border.side, this.side, t),
                     borderRadius: BorderRadius.lerp(border.borderRadius, this.borderRadius, t)
                 );
             }
+
             return base.lerpFrom(a, t);
         }
 
-        public override ShapeBorder lerpTo(ShapeBorder b, double t) {
+        public override ShapeBorder lerpTo(ShapeBorder b, float t) {
             if (b is BeveledRectangleBorder border) {
                 return new BeveledRectangleBorder(
                     side: BorderSide.lerp(this.side, border.side, t),
                     borderRadius: BorderRadius.lerp(this.borderRadius, border.borderRadius, t)
                 );
             }
+
             return base.lerpTo(b, t);
         }
 
@@ -63,14 +65,14 @@ namespace Unity.UIWidgets.painting {
             double brRadiusY = Math.Max(0.0, rrect.brRadiusY);
 
             List<Offset> vertices = new List<Offset> {
-                new Offset(rrect.left, Math.Min(centerLeft.dy, rrect.top + tlRadiusY)),
-                new Offset(Math.Min(centerTop.dx, rrect.left + tlRadiusX), rrect.top),
-                new Offset(Math.Max(centerTop.dx, rrect.right - trRadiusX), rrect.top),
-                new Offset(rrect.right, Math.Min(centerRight.dy, rrect.top + trRadiusY)),
-                new Offset(rrect.right, Math.Max(centerRight.dy, rrect.bottom - brRadiusY)),
-                new Offset(Math.Max(centerBottom.dx, rrect.right - brRadiusX), rrect.bottom),
-                new Offset(Math.Min(centerBottom.dx, rrect.left + blRadiusX), rrect.bottom),
-                new Offset(rrect.left, Math.Max(centerLeft.dy, rrect.bottom - blRadiusY)),
+                new Offset(rrect.left, (float) Math.Min(centerLeft.dy, rrect.top + tlRadiusY)),
+                new Offset((float) Math.Min(centerTop.dx, rrect.left + tlRadiusX), rrect.top),
+                new Offset((float) Math.Max(centerTop.dx, rrect.right - trRadiusX), rrect.top),
+                new Offset(rrect.right, (float) Math.Min(centerRight.dy, rrect.top + trRadiusY)),
+                new Offset(rrect.right, (float) Math.Max(centerRight.dy, rrect.bottom - brRadiusY)),
+                new Offset((float) Math.Max(centerBottom.dx, rrect.right - brRadiusX), rrect.bottom),
+                new Offset((float) Math.Min(centerBottom.dx, rrect.left + blRadiusX), rrect.bottom),
+                new Offset(rrect.left, (float) Math.Max(centerLeft.dy, rrect.bottom - blRadiusY)),
             };
 
             var path = new Path();
@@ -90,6 +92,7 @@ namespace Unity.UIWidgets.painting {
             if (rect.isEmpty) {
                 return;
             }
+
             switch (this.side.style) {
                 case BorderStyle.none:
                     break;
@@ -105,9 +108,11 @@ namespace Unity.UIWidgets.painting {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return Equals(this.side, other.side) && Equals(this.borderRadius, other.borderRadius);
         }
 
@@ -115,12 +120,15 @@ namespace Unity.UIWidgets.painting {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((BeveledRectangleBorder) obj);
         }
 

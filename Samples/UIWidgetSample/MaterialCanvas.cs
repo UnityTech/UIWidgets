@@ -39,7 +39,7 @@ namespace UIWidgetsSample {
                         width: 30,
                         height: 30,
                         child: new InkWell(
-                            borderRadius: BorderRadius.circular(2.0),
+                            borderRadius: BorderRadius.circular(2.0f),
                             highlightColor: new Color(0xAAFF0000),
                             splashColor: new Color(0xAA0000FF),
                             onTap: () => { Debug.Log("on tap"); }

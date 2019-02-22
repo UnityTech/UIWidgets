@@ -3,7 +3,7 @@ using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
 
 namespace Unity.UIWidgets.animation {
-    class _AlwaysCompleteAnimation : Animation<double> {
+    class _AlwaysCompleteAnimation : Animation<float> {
         internal _AlwaysCompleteAnimation() {
         }
 
@@ -24,8 +24,8 @@ namespace Unity.UIWidgets.animation {
         }
 
 
-        public override double value {
-            get { return 1.0; }
+        public override float value {
+            get { return 1.0f; }
         }
 
         public override string ToString() {
@@ -33,7 +33,7 @@ namespace Unity.UIWidgets.animation {
         }
     }
 
-    class _AlwaysDismissedAnimation : Animation<double> {
+    class _AlwaysDismissedAnimation : Animation<float> {
         internal _AlwaysDismissedAnimation() {
         }
 
@@ -54,8 +54,8 @@ namespace Unity.UIWidgets.animation {
         }
 
 
-        public override double value {
-            get { return 0.0; }
+        public override float value {
+            get { return 0.0f; }
         }
 
         public override string ToString() {
@@ -120,20 +120,20 @@ namespace Unity.UIWidgets.animation {
     }
 
     public class ProxyAnimation :
-        AnimationLocalStatusListenersMixinAnimationLocalListenersMixinAnimationLazyListenerMixinAnimation<double> {
-        public ProxyAnimation(Animation<double> animation = null) {
+        AnimationLocalStatusListenersMixinAnimationLocalListenersMixinAnimationLazyListenerMixinAnimation<float> {
+        public ProxyAnimation(Animation<float> animation = null) {
             this._parent = animation;
             if (this._parent == null) {
                 this._status = AnimationStatus.dismissed;
-                this._value = 0.0;
+                this._value = 0.0f;
             }
         }
 
         AnimationStatus _status;
 
-        double _value;
+        float _value;
 
-        public Animation<double> parent {
+        public Animation<float> parent {
             get { return this._parent; }
             set {
                 if (value == this._parent) {
@@ -168,7 +168,7 @@ namespace Unity.UIWidgets.animation {
             }
         }
 
-        Animation<double> _parent;
+        Animation<float> _parent;
 
         protected override void didStartListening() {
             if (this._parent != null) {
@@ -188,7 +188,7 @@ namespace Unity.UIWidgets.animation {
             get { return this._parent != null ? this._parent.status : this._status; }
         }
 
-        public override double value {
+        public override float value {
             get { return this._parent != null ? this._parent.value : this._value; }
         }
 
@@ -261,9 +261,9 @@ namespace Unity.UIWidgets.animation {
         }
     }
 
-    public class CurvedAnimation : AnimationWithParentMixin<double, double> {
+    public class CurvedAnimation : AnimationWithParentMixin<float, float> {
         public CurvedAnimation(
-            Animation<double> parent = null,
+            Animation<float> parent = null,
             Curve curve = null,
             Curve reverseCurve = null
         ) {
@@ -277,11 +277,11 @@ namespace Unity.UIWidgets.animation {
             parent.addStatusListener(this._updateCurveDirection);
         }
 
-        public override Animation<double> parent {
+        public override Animation<float> parent {
             get { return this._parent; }
         }
 
-        readonly Animation<double> _parent;
+        readonly Animation<float> _parent;
 
         public Curve curve;
 
@@ -311,11 +311,11 @@ namespace Unity.UIWidgets.animation {
             }
         }
 
-        public override double value {
+        public override float value {
             get {
                 Curve activeCurve = this._useForwardCurve ? this.curve : this.reverseCurve;
 
-                double t = this.parent.value;
+                float t = this.parent.value;
                 if (activeCurve == null) {
                     return t;
                 }
@@ -363,10 +363,10 @@ namespace Unity.UIWidgets.animation {
     }
 
     public class TrainHoppingAnimation :
-        AnimationLocalStatusListenersMixinAnimationLocalListenersMixinAnimationEagerListenerMixinAnimation<double> {
+        AnimationLocalStatusListenersMixinAnimationLocalListenersMixinAnimationEagerListenerMixinAnimation<float> {
         public TrainHoppingAnimation(
-            Animation<double> currentTrain = null,
-            Animation<double> nextTrain = null,
+            Animation<float> currentTrain = null,
+            Animation<float> nextTrain = null,
             VoidCallback onSwitchedTrain = null) {
             D.assert(currentTrain != null);
             this._currentTrain = currentTrain;
@@ -393,12 +393,12 @@ namespace Unity.UIWidgets.animation {
             }
         }
 
-        public Animation<double> currentTrain {
+        public Animation<float> currentTrain {
             get { return this._currentTrain; }
         }
 
-        Animation<double> _currentTrain;
-        Animation<double> _nextTrain;
+        Animation<float> _currentTrain;
+        Animation<float> _nextTrain;
         _TrainHoppingMode _mode;
 
         public VoidCallback onSwitchedTrain;
@@ -459,7 +459,7 @@ namespace Unity.UIWidgets.animation {
             }
         }
 
-        public override double value {
+        public override float value {
             get { return this._currentTrain.value; }
         }
 
@@ -587,8 +587,8 @@ namespace Unity.UIWidgets.animation {
     }
 
     public static class Animations {
-        public static readonly Animation<double> kAlwaysCompleteAnimation = new _AlwaysCompleteAnimation();
+        public static readonly Animation<float> kAlwaysCompleteAnimation = new _AlwaysCompleteAnimation();
 
-        public static readonly Animation<double> kAlwaysDismissedAnimation = new _AlwaysDismissedAnimation();
+        public static readonly Animation<float> kAlwaysDismissedAnimation = new _AlwaysDismissedAnimation();
     }
 }

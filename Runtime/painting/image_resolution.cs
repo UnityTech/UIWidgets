@@ -83,7 +83,7 @@ namespace Unity.UIWidgets.painting {
             yield return new AssetBundleImageKey(
                 bundle,
                 this.assetName,
-                scale: 1.0
+                scale: 1.0f
             );
         }
 

@@ -37,8 +37,8 @@ namespace UIWidgetsSample {
             return new Material(
                 child: new SingleChildScrollView(
                     child: new Container(
-                        width: 40.0,
-                        height: 40.0,
+                        width: 40.0f,
+                        height: 40.0f,
                         constraints: BoxConstraints.tight(new Size(40, 600)),
                         color: AsScreenCanvas.CLColors.red,
                         child: new Center(child: new Text("Beijing"))

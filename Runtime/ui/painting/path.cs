@@ -1548,6 +1548,7 @@ namespace Unity.UIWidgets.ui {
         public readonly Rect rawBounds;
 
         Rect _bounds;
+
         public Rect bounds {
             get {
                 if (this._bounds == null) {
@@ -1557,9 +1558,10 @@ namespace Unity.UIWidgets.ui {
                 return this._bounds;
             }
         }
-        
-        
+
+
         MeshMesh _boundsMesh;
+
         static readonly List<int> _boundsTriangles = new List<int>(6) {
             0, 2, 1, 1, 2, 3
         };
@@ -1589,7 +1591,8 @@ namespace Unity.UIWidgets.ui {
             this._boundsMesh = this;
         }
 
-        public MeshMesh(Matrix3 matrix, List<Vector3> vertices, List<int> triangles, List<Vector2> uv = null, Rect rawBounds = null) {
+        public MeshMesh(Matrix3 matrix, List<Vector3> vertices, List<int> triangles, List<Vector2> uv = null,
+            Rect rawBounds = null) {
             D.assert(vertices != null);
             D.assert(vertices.Count >= 0);
             D.assert(triangles != null);
@@ -1603,10 +1606,10 @@ namespace Unity.UIWidgets.ui {
 
             if (rawBounds == null) {
                 if (vertices.Count > 0) {
-                    double minX = vertices[0].x;
-                    double maxX = vertices[0].x;
-                    double minY = vertices[0].y;
-                    double maxY = vertices[0].y;
+                    float minX = vertices[0].x;
+                    float maxX = vertices[0].x;
+                    float minY = vertices[0].y;
+                    float maxY = vertices[0].y;
 
                     for (int i = 1; i < vertices.Count; i++) {
                         var vertex = vertices[i];
@@ -1628,7 +1631,8 @@ namespace Unity.UIWidgets.ui {
                     }
 
                     rawBounds = Rect.fromLTRB(minX, minY, maxX, maxY);
-                } else {
+                }
+                else {
                     rawBounds = Rect.zero;
                 }
             }

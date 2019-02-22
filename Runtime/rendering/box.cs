@@ -21,20 +21,20 @@ namespace Unity.UIWidgets.rendering {
 
     public class BoxConstraints : Constraints, IEquatable<BoxConstraints> {
         public BoxConstraints(
-            double minWidth = 0.0,
-            double maxWidth = double.PositiveInfinity,
-            double minHeight = 0.0,
-            double maxHeight = double.PositiveInfinity) {
+            float minWidth = 0.0f,
+            float maxWidth = float.PositiveInfinity,
+            float minHeight = 0.0f,
+            float maxHeight = float.PositiveInfinity) {
             this.minWidth = minWidth;
             this.maxWidth = maxWidth;
             this.minHeight = minHeight;
             this.maxHeight = maxHeight;
         }
 
-        public readonly double minWidth;
-        public readonly double maxWidth;
-        public readonly double minHeight;
-        public readonly double maxHeight;
+        public readonly float minWidth;
+        public readonly float maxWidth;
+        public readonly float minHeight;
+        public readonly float maxHeight;
 
         public static BoxConstraints tight(Size size) {
             return new BoxConstraints(
@@ -46,26 +46,26 @@ namespace Unity.UIWidgets.rendering {
         }
 
         public static BoxConstraints tightFor(
-            double? width = null,
-            double? height = null
+            float? width = null,
+            float? height = null
         ) {
             return new BoxConstraints(
-                width ?? 0.0,
-                width ?? double.PositiveInfinity,
-                height ?? 0.0,
-                height ?? double.PositiveInfinity
+                width ?? 0.0f,
+                width ?? float.PositiveInfinity,
+                height ?? 0.0f,
+                height ?? float.PositiveInfinity
             );
         }
 
         public static BoxConstraints tightForFinite(
-            double width = double.PositiveInfinity,
-            double height = double.PositiveInfinity
+            float width = float.PositiveInfinity,
+            float height = float.PositiveInfinity
         ) {
             return new BoxConstraints(
-                !double.IsPositiveInfinity(width) ? width : 0.0,
-                !double.IsPositiveInfinity(width) ? width : double.PositiveInfinity,
-                !double.IsPositiveInfinity(height) ? height : 0.0,
-                !double.IsPositiveInfinity(height) ? height : double.PositiveInfinity
+                !double.IsPositiveInfinity(width) ? width : 0.0f,
+                !double.IsPositiveInfinity(width) ? width : float.PositiveInfinity,
+                !double.IsPositiveInfinity(height) ? height : 0.0f,
+                !double.IsPositiveInfinity(height) ? height : float.PositiveInfinity
             );
         }
 
@@ -79,22 +79,22 @@ namespace Unity.UIWidgets.rendering {
         }
 
         public static BoxConstraints expand(
-            double? width = null,
-            double? height = null
+            float? width = null,
+            float? height = null
         ) {
             return new BoxConstraints(
-                width ?? double.PositiveInfinity,
-                width ?? double.PositiveInfinity,
-                height ?? double.PositiveInfinity,
-                height ?? double.PositiveInfinity
+                width ?? float.PositiveInfinity,
+                width ?? float.PositiveInfinity,
+                height ?? float.PositiveInfinity,
+                height ?? float.PositiveInfinity
             );
         }
 
         public BoxConstraints copyWith(
-            double? minWidth = null,
-            double? maxWidth = null,
-            double? minHeight = null,
-            double? maxHeight = null
+            float? minWidth = null,
+            float? maxWidth = null,
+            float? minHeight = null,
+            float? maxHeight = null
         ) {
             return new BoxConstraints(
                 minWidth ?? this.minWidth,
@@ -107,10 +107,10 @@ namespace Unity.UIWidgets.rendering {
         public BoxConstraints deflate(EdgeInsets edges) {
             D.assert(edges != null);
             D.assert(this.debugAssertIsValid());
-            double horizontal = edges.horizontal;
-            double vertical = edges.vertical;
-            double deflatedMinWidth = Math.Max(0.0, this.minWidth - horizontal);
-            double deflatedMinHeight = Math.Max(0.0, this.minHeight - vertical);
+            float horizontal = edges.horizontal;
+            float vertical = edges.vertical;
+            float deflatedMinWidth = (float) Math.Max(0.0, this.minWidth - horizontal);
+            float deflatedMinHeight = (float) Math.Max(0.0, this.minHeight - vertical);
             return new BoxConstraints(
                 minWidth: deflatedMinWidth,
                 maxWidth: Math.Max(deflatedMinWidth, this.maxWidth - horizontal),
@@ -122,9 +122,9 @@ namespace Unity.UIWidgets.rendering {
         public BoxConstraints loosen() {
             D.assert(this.debugAssertIsValid());
             return new BoxConstraints(
-                minWidth: 0.0,
+                minWidth: 0.0f,
                 maxWidth: this.maxWidth,
-                minHeight: 0.0,
+                minHeight: 0.0f,
                 maxHeight: this.maxHeight
             );
         }
@@ -139,8 +139,8 @@ namespace Unity.UIWidgets.rendering {
         }
 
         public BoxConstraints tighten(
-            double? width = null,
-            double? height = null
+            float? width = null,
+            float? height = null
         ) {
             return new BoxConstraints(
                 minWidth: width == null ? this.minWidth : width.Value.clamp(this.minWidth, this.maxWidth),
@@ -169,12 +169,12 @@ namespace Unity.UIWidgets.rendering {
             return new BoxConstraints(minHeight: this.minHeight, maxHeight: this.maxHeight);
         }
 
-        public double constrainWidth(double width = double.PositiveInfinity) {
+        public float constrainWidth(float width = float.PositiveInfinity) {
             D.assert(this.debugAssertIsValid());
             return width.clamp(this.minWidth, this.maxWidth);
         }
 
-        public double constrainHeight(double height = double.PositiveInfinity) {
+        public float constrainHeight(float height = float.PositiveInfinity) {
             D.assert(this.debugAssertIsValid());
             return height.clamp(this.minHeight, this.maxHeight);
         }
@@ -201,7 +201,7 @@ namespace Unity.UIWidgets.rendering {
             return result;
         }
 
-        public Size constrainDimensions(double width, double height) {
+        public Size constrainDimensions(float width, float height) {
             return new Size(this.constrainWidth(width), this.constrainHeight(height));
         }
 
@@ -215,11 +215,11 @@ namespace Unity.UIWidgets.rendering {
                 return result1;
             }
 
-            double width = size.width;
-            double height = size.height;
+            float width = size.width;
+            float height = size.height;
             D.assert(width > 0.0);
             D.assert(height > 0.0);
-            double aspectRatio = width / height;
+            float aspectRatio = width / height;
 
             if (width > this.maxWidth) {
                 width = this.maxWidth;
@@ -254,7 +254,7 @@ namespace Unity.UIWidgets.rendering {
         }
 
         public Size smallest {
-            get { return new Size(this.constrainWidth(0.0), this.constrainHeight(0.0)); }
+            get { return new Size(this.constrainWidth(0.0f), this.constrainHeight(0.0f)); }
         }
 
         public bool hasTightWidth {
@@ -291,7 +291,7 @@ namespace Unity.UIWidgets.rendering {
                    this.minHeight <= size.height && size.height <= this.maxHeight;
         }
 
-        public static BoxConstraints operator *(BoxConstraints it, double factor) {
+        public static BoxConstraints operator *(BoxConstraints it, float factor) {
             return new BoxConstraints(
                 minWidth: it.minWidth * factor,
                 maxWidth: it.maxWidth * factor,
@@ -300,7 +300,7 @@ namespace Unity.UIWidgets.rendering {
             );
         }
 
-        public static BoxConstraints operator /(BoxConstraints it, double factor) {
+        public static BoxConstraints operator /(BoxConstraints it, float factor) {
             return new BoxConstraints(
                 minWidth: it.minWidth / factor,
                 maxWidth: it.maxWidth / factor,
@@ -309,7 +309,7 @@ namespace Unity.UIWidgets.rendering {
             );
         }
 
-        public static BoxConstraints operator %(BoxConstraints it, double value) {
+        public static BoxConstraints operator %(BoxConstraints it, float value) {
             return new BoxConstraints(
                 minWidth: it.minWidth % value,
                 maxWidth: it.maxWidth % value,
@@ -318,7 +318,7 @@ namespace Unity.UIWidgets.rendering {
             );
         }
 
-        public static BoxConstraints lerp(BoxConstraints a, BoxConstraints b, double t) {
+        public static BoxConstraints lerp(BoxConstraints a, BoxConstraints b, float t) {
             if (a == null && b == null) {
                 return null;
             }
@@ -328,7 +328,7 @@ namespace Unity.UIWidgets.rendering {
             }
 
             if (b == null) {
-                return a * (1.0 - t);
+                return a * (1.0f - t);
             }
 
             D.assert(a.debugAssertIsValid());
@@ -351,17 +351,17 @@ namespace Unity.UIWidgets.rendering {
                 "Cannot interpolate between finite constraints and unbounded constraints.");
             return new BoxConstraints(
                 minWidth: a.minWidth.isFinite()
-                    ? MathUtils.lerpDouble(a.minWidth, b.minWidth, t)
-                    : double.PositiveInfinity,
+                    ? MathUtils.lerpFloat(a.minWidth, b.minWidth, t)
+                    : float.PositiveInfinity,
                 maxWidth: a.maxWidth.isFinite()
-                    ? MathUtils.lerpDouble(a.maxWidth, b.maxWidth, t)
-                    : double.PositiveInfinity,
+                    ? MathUtils.lerpFloat(a.maxWidth, b.maxWidth, t)
+                    : float.PositiveInfinity,
                 minHeight: a.minHeight.isFinite()
-                    ? MathUtils.lerpDouble(a.minHeight, b.minHeight, t)
-                    : double.PositiveInfinity,
+                    ? MathUtils.lerpFloat(a.minHeight, b.minHeight, t)
+                    : float.PositiveInfinity,
                 maxHeight: a.maxHeight.isFinite()
-                    ? MathUtils.lerpDouble(a.maxHeight, b.maxHeight, t)
-                    : double.PositiveInfinity
+                    ? MathUtils.lerpFloat(a.maxHeight, b.maxHeight, t)
+                    : float.PositiveInfinity
             );
         }
 
@@ -479,8 +479,8 @@ namespace Unity.UIWidgets.rendering {
                 return this;
             }
 
-            var minWidth = this.minWidth >= 0.0 ? this.minWidth : 0.0;
-            var minHeight = this.minHeight >= 0.0 ? this.minHeight : 0.0;
+            var minWidth = this.minWidth >= 0.0 ? this.minWidth : 0.0f;
+            var minHeight = this.minHeight >= 0.0 ? this.minHeight : 0.0f;
 
             return new BoxConstraints(
                 minWidth,
@@ -657,10 +657,10 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
-        Dictionary<_IntrinsicDimensionsCacheEntry, double> _cachedIntrinsicDimensions;
+        Dictionary<_IntrinsicDimensionsCacheEntry, float> _cachedIntrinsicDimensions;
 
-        double _computeIntrinsicDimension(_IntrinsicDimension dimension, double argument,
-            Func<double, double> computer) {
+        float _computeIntrinsicDimension(_IntrinsicDimension dimension, float argument,
+            Func<float, float> computer) {
             D.assert(debugCheckingIntrinsics || !this.debugDoingThisResize);
             bool shouldCache = true;
             D.assert(() => {
@@ -674,7 +674,7 @@ namespace Unity.UIWidgets.rendering {
             if (shouldCache) {
                 this._cachedIntrinsicDimensions =
                     this._cachedIntrinsicDimensions
-                    ?? new Dictionary<_IntrinsicDimensionsCacheEntry, double>();
+                    ?? new Dictionary<_IntrinsicDimensionsCacheEntry, float>();
                 return this._cachedIntrinsicDimensions.putIfAbsent(
                     new _IntrinsicDimensionsCacheEntry(dimension, argument),
                     () => computer(argument));
@@ -683,7 +683,7 @@ namespace Unity.UIWidgets.rendering {
             return computer(argument);
         }
 
-        public double getMinIntrinsicWidth(double height) {
+        public float getMinIntrinsicWidth(float height) {
             D.assert(() => {
                 if (height < 0.0) {
                     throw new UIWidgetsError(
@@ -701,11 +701,11 @@ namespace Unity.UIWidgets.rendering {
             return this._computeIntrinsicDimension(_IntrinsicDimension.minWidth, height, this.computeMinIntrinsicWidth);
         }
 
-        protected virtual double computeMinIntrinsicWidth(double height) {
-            return 0.0;
+        protected virtual float computeMinIntrinsicWidth(float height) {
+            return 0.0f;
         }
 
-        public double getMaxIntrinsicWidth(double height) {
+        public float getMaxIntrinsicWidth(float height) {
             D.assert(() => {
                 if (height < 0.0) {
                     throw new UIWidgetsError(
@@ -723,11 +723,11 @@ namespace Unity.UIWidgets.rendering {
             return this._computeIntrinsicDimension(_IntrinsicDimension.maxWidth, height, this.computeMaxIntrinsicWidth);
         }
 
-        protected virtual double computeMaxIntrinsicWidth(double height) {
-            return 0.0;
+        protected virtual float computeMaxIntrinsicWidth(float height) {
+            return 0.0f;
         }
 
-        public double getMinIntrinsicHeight(double width) {
+        public float getMinIntrinsicHeight(float width) {
             D.assert(() => {
                 if (width < 0.0) {
                     throw new UIWidgetsError(
@@ -746,11 +746,11 @@ namespace Unity.UIWidgets.rendering {
                 this.computeMinIntrinsicHeight);
         }
 
-        protected virtual double computeMinIntrinsicHeight(double width) {
-            return 0.0;
+        protected virtual float computeMinIntrinsicHeight(float width) {
+            return 0.0f;
         }
 
-        public double getMaxIntrinsicHeight(double width) {
+        public float getMaxIntrinsicHeight(float width) {
             D.assert(() => {
                 if (width < 0.0) {
                     throw new UIWidgetsError(
@@ -769,8 +769,8 @@ namespace Unity.UIWidgets.rendering {
                 this.computeMaxIntrinsicHeight);
         }
 
-        protected virtual double computeMaxIntrinsicHeight(double width) {
-            return 0.0;
+        protected virtual float computeMaxIntrinsicHeight(float width) {
+            return 0.0f;
         }
 
         public bool hasSize {
@@ -918,7 +918,7 @@ namespace Unity.UIWidgets.rendering {
             this.size = this.size;
         }
 
-        Dictionary<TextBaseline, double?> _cachedBaselines;
+        Dictionary<TextBaseline, float?> _cachedBaselines;
         static bool _debugDoingBaseline = false;
 
         static bool _debugSetDoingBaseline(bool value) {
@@ -926,7 +926,7 @@ namespace Unity.UIWidgets.rendering {
             return true;
         }
 
-        public double? getDistanceToBaseline(TextBaseline baseline, bool onlyReal = false) {
+        public float? getDistanceToBaseline(TextBaseline baseline, bool onlyReal = false) {
             D.assert(!_debugDoingBaseline,
                 "Please see the documentation for computeDistanceToActualBaseline for the required calling conventions of this method.");
             D.assert(!this.debugNeedsLayout);
@@ -946,7 +946,7 @@ namespace Unity.UIWidgets.rendering {
             });
 
             D.assert(_debugSetDoingBaseline(true));
-            double? result = this.getDistanceToActualBaseline(baseline);
+            float? result = this.getDistanceToActualBaseline(baseline);
             D.assert(_debugSetDoingBaseline(false));
 
             if (result == null && !onlyReal) {
@@ -956,15 +956,15 @@ namespace Unity.UIWidgets.rendering {
             return result;
         }
 
-        public virtual double? getDistanceToActualBaseline(TextBaseline baseline) {
+        public virtual float? getDistanceToActualBaseline(TextBaseline baseline) {
             D.assert(_debugDoingBaseline,
                 "Please see the documentation for computeDistanceToActualBaseline for the required calling conventions of this method.");
 
-            this._cachedBaselines = this._cachedBaselines ?? new Dictionary<TextBaseline, double?>();
+            this._cachedBaselines = this._cachedBaselines ?? new Dictionary<TextBaseline, float?>();
             return this._cachedBaselines.putIfAbsent(baseline, () => this.computeDistanceToActualBaseline(baseline));
         }
 
-        protected virtual double? computeDistanceToActualBaseline(TextBaseline baseline) {
+        protected virtual float? computeDistanceToActualBaseline(TextBaseline baseline) {
             D.assert(_debugDoingBaseline,
                 "Please see the documentation for computeDistanceToActualBaseline for the required calling conventions of this method.");
 
@@ -1051,29 +1051,29 @@ namespace Unity.UIWidgets.rendering {
                     var failures = new StringBuilder();
                     int failureCount = 0;
 
-                    var testIntrinsic = new Func<Func<double, double>, string, double, double>(
+                    var testIntrinsic = new Func<Func<float, float>, string, float, float>(
                         (function, name, constraint) => {
-                            double result = function(constraint);
+                            float result = function(constraint);
                             if (result < 0) {
                                 failures.AppendLine(" * " + name + "(" + constraint + ") returned a negative value: " +
                                                     result);
                                 failureCount += 1;
                             }
 
-                            if (!result.isFinite()) {
+                            if (float.IsInfinity(result)) {
                                 failures.AppendLine(" * " + name + "(" + constraint +
                                                     ") returned a non-finite value: " + result);
                                 failureCount += 1;
                             }
 
-                            return result;
+                            return (float) result;
                         });
 
                     var testIntrinsicsForValues =
-                        new Action<Func<double, double>, Func<double, double>, string, double>(
+                        new Action<Func<float, float>, Func<float, float>, string, float>(
                             (getMin, getMax, name, constraint) => {
-                                double min = testIntrinsic(getMin, "getMinIntrinsic" + name, constraint);
-                                double max = testIntrinsic(getMax, "getMaxIntrinsic" + name, constraint);
+                                float min = testIntrinsic(getMin, "getMinIntrinsic" + name, constraint);
+                                float max = testIntrinsic(getMax, "getMaxIntrinsic" + name, constraint);
                                 if (min > max) {
                                     failures.AppendLine(
                                         " * getMinIntrinsic" + name + "(" + constraint + ") returned a larger value (" +
@@ -1084,18 +1084,18 @@ namespace Unity.UIWidgets.rendering {
                             });
 
                     testIntrinsicsForValues(this.getMinIntrinsicWidth, this.getMaxIntrinsicWidth, "Width",
-                        double.PositiveInfinity);
+                        float.PositiveInfinity);
                     testIntrinsicsForValues(this.getMinIntrinsicHeight, this.getMaxIntrinsicHeight, "Height",
-                        double.PositiveInfinity);
+                        float.PositiveInfinity);
 
                     if (this.constraints.hasBoundedWidth) {
                         testIntrinsicsForValues(this.getMinIntrinsicWidth, this.getMaxIntrinsicWidth, "Width",
-                            this.constraints.maxWidth);
+                            (float) this.constraints.maxWidth);
                     }
 
                     if (this.constraints.hasBoundedHeight) {
                         testIntrinsicsForValues(this.getMinIntrinsicHeight, this.getMaxIntrinsicHeight, "Height",
-                            this.constraints.maxHeight);
+                            (float) this.constraints.maxHeight);
                     }
 
                     debugCheckingIntrinsics = false;

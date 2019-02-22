@@ -2,7 +2,7 @@
     public class PaintRecord {
         public PaintRecord(TextStyle style, Offset offset, TextBlob _text,
             FontMetrics metrics,
-            int line, double runWidth) {
+            int line, float runWidth) {
             this._style = style;
             this._text = _text;
             this._line = line;
@@ -23,7 +23,7 @@
             get { return this._line; }
         }
 
-        public double runWidth {
+        public float runWidth {
             get { return this._runWidth; }
         }
 
@@ -39,7 +39,7 @@
         TextStyle _style;
         TextBlob _text;
         int _line;
-        double _runWidth;
+        float _runWidth;
         Offset _offset;
         FontMetrics _metrics;
     }

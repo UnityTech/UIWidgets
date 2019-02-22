@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.UIWidgets.animation;
 using Unity.UIWidgets.editor;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
@@ -75,7 +76,8 @@ namespace UIWidgets.Tests {
                 if (GUILayout.Button("UnloadUnusedAssets")) {
                     Resources.UnloadUnusedAssets();
                 }
-            } else if (selected != this._selected || !this.hasInvoked) {
+            }
+            else if (selected != this._selected || !this.hasInvoked) {
                 this._selected = selected;
                 this.hasInvoked = true;
 
@@ -92,8 +94,8 @@ namespace UIWidgets.Tests {
                 pageRouteBuilder: (RouteSettings settings, WidgetBuilder builder) =>
                     new PageRouteBuilder(
                         settings: settings,
-                        pageBuilder: (BuildContext context, Unity.UIWidgets.animation.Animation<double> animation, 
-                            Unity.UIWidgets.animation.Animation<double> secondaryAnimation) => builder(context)
+                        pageBuilder: (BuildContext context, Animation<float> animation,
+                            Animation<float> secondaryAnimation) => builder(context)
                     )));
         }
 
@@ -104,7 +106,7 @@ namespace UIWidgets.Tests {
         void OnEnable() {
             this.windowAdapter = new EditorWindowAdapter(this);
             this.windowAdapter.OnEnable();
-            
+
             FontManager.instance.addFont(Resources.Load<Font>("MaterialIcons-Regular"));
         }
 
@@ -214,14 +216,13 @@ namespace UIWidgets.Tests {
             var container = new Container(
                 width: 200,
                 height: 200,
-                margin: EdgeInsets.all(30.0),
-                padding: EdgeInsets.all(15.0),
+                margin: EdgeInsets.all(30.0f),
+                padding: EdgeInsets.all(15.0f),
                 child: image,
-                
                 decoration: new BoxDecoration(
                     color: CLColors.white,
                     borderRadius: BorderRadius.all(30),
-                    gradient: new LinearGradient(colors: new List<Color>{CLColors.blue, CLColors.red, CLColors.green})
+                    gradient: new LinearGradient(colors: new List<Color> {CLColors.blue, CLColors.red, CLColors.green})
                 )
             );
 
@@ -266,11 +267,11 @@ namespace UIWidgets.Tests {
     }
 
     class _AsScreenState : State<AsScreen> {
-        const double headerHeight = 50.0;
+        const float headerHeight = 50.0f;
 
         Widget _buildHeader(BuildContext context) {
             var container = new Container(
-                padding: EdgeInsets.only(left: 16.0, right: 8.0),
+                padding: EdgeInsets.only(left: 16.0f, right: 8.0f),
                 height: headerHeight,
                 color: CLColors.header,
                 child: new Row(
@@ -286,10 +287,10 @@ namespace UIWidgets.Tests {
                             )
                         ),
                         new CustomButton(
-                            padding: EdgeInsets.only(0.0, 0.0, 16.0, 0.0),
+                            padding: EdgeInsets.only(0.0f, 0.0f, 16.0f, 0.0f),
                             child: new Icon(
                                 Icons.keyboard_arrow_down,
-                                size: 18.0,
+                                size: 18.0f,
                                 color: CLColors.icon2
                             )
                         ),
@@ -300,7 +301,7 @@ namespace UIWidgets.Tests {
                             ),
                             width: 320,
                             height: 36,
-                            padding: EdgeInsets.all(10.0),
+                            padding: EdgeInsets.all(10.0f),
                             margin: EdgeInsets.only(right: 4),
                             child: new EditableText(
                                 maxLines: 1,
@@ -326,10 +327,10 @@ namespace UIWidgets.Tests {
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: new List<Widget> {
                                     new CustomButton(
-                                        padding: EdgeInsets.only(8.0, 0.0, 8.0, 0.0),
+                                        padding: EdgeInsets.only(8.0f, 0.0f, 8.0f, 0.0f),
                                         child: new Icon(
                                             Icons.search,
-                                            size: 18.0,
+                                            size: 18.0f,
                                             color: CLColors.white
                                         )
                                     )
@@ -543,7 +544,7 @@ namespace UIWidgets.Tests {
             var mediaQueryData = MediaQuery.of(context);
             var px = mediaQueryData.size.width / 2;
             var py = mediaQueryData.size.width / 2;
-            
+
             var container = new Container(
                 color: CLColors.background3,
                 child: new Container(
@@ -711,14 +712,14 @@ namespace UIWidgets.Tests {
     }
 
     class _EventsWaterfallScreenState : State<EventsWaterfallScreen> {
-        const double headerHeight = 80.0;
+        const float headerHeight = 80.0f;
 
-        double _offsetY = 0.0;
+        float _offsetY = 0.0f;
         int _index = -1;
 
         Widget _buildHeader(BuildContext context) {
             return new Container(
-                padding: EdgeInsets.only(left: 16.0, right: 8.0),
+                padding: EdgeInsets.only(left: 16.0f, right: 8.0f),
                 //  color: CLColors.blue,
                 height: headerHeight - this._offsetY,
                 child: new Row(
@@ -729,24 +730,24 @@ namespace UIWidgets.Tests {
                             child: new Text(
                                 "Today",
                                 style: new TextStyle(
-                                    fontSize: (34.0 / headerHeight) *
+                                    fontSize: (34.0f / headerHeight) *
                                               (headerHeight - this._offsetY),
                                     color: CLColors.white
                                 )
                             )),
                         new CustomButton(
-                            padding: EdgeInsets.only(8.0, 0.0, 8.0, 0.0),
+                            padding: EdgeInsets.only(8.0f, 0.0f, 8.0f, 0.0f),
                             child: new Icon(
                                 Icons.notifications,
-                                size: 18.0,
+                                size: 18.0f,
                                 color: CLColors.icon2
                             )
                         ),
                         new CustomButton(
-                            padding: EdgeInsets.only(8.0, 0.0, 16.0, 0.0),
+                            padding: EdgeInsets.only(8.0f, 0.0f, 16.0f, 0.0f),
                             child: new Icon(
                                 Icons.account_circle,
-                                size: 18.0,
+                                size: 18.0f,
                                 color: CLColors.icon2
                             )
                         )
@@ -756,14 +757,15 @@ namespace UIWidgets.Tests {
         }
 
         bool _onNotification(ScrollNotification notification, BuildContext context) {
-            double pixels = notification.metrics.pixels;
+            float pixels = notification.metrics.pixels;
             if (pixels >= 0.0) {
                 if (pixels <= headerHeight) {
-                    this.setState(() => { this._offsetY = pixels / 2.0; });
+                    this.setState(() => { this._offsetY = pixels / 2.0f; });
                 }
-            } else {
+            }
+            else {
                 if (this._offsetY != 0.0) {
-                    this.setState(() => { this._offsetY = 0.0; });
+                    this.setState(() => { this._offsetY = 0.0f; });
                 }
             }
 
@@ -822,7 +824,7 @@ namespace UIWidgets.Tests {
             Widget child = null
         ) : base(key: key) {
             this.onPressed = onPressed;
-            this.padding = padding ?? EdgeInsets.all(8.0);
+            this.padding = padding ?? EdgeInsets.all(8.0f);
             this.backgroundColor = backgroundColor ?? CLColors.transparent;
             this.child = child;
         }

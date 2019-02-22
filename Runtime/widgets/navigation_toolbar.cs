@@ -83,8 +83,8 @@ namespace Unity.UIWidgets.widgets {
 
             if (this.hasChild(_ToolbarSlot.leading)) {
                 BoxConstraints constraints = new BoxConstraints(
-                    minWidth: 0.0,
-                    maxWidth: size.width / 3.0,
+                    minWidth: 0.0f,
+                    maxWidth: size.width / 3.0f,
                     minHeight: size.height,
                     maxHeight: size.height
                 );
@@ -99,7 +99,7 @@ namespace Unity.UIWidgets.widgets {
                         break;
                 }
 
-                this.positionChild(_ToolbarSlot.leading, new Offset(leadingX, 0.0));
+                this.positionChild(_ToolbarSlot.leading, new Offset((float) leadingX, 0.0f));
             }
 
             if (this.hasChild(_ToolbarSlot.trailing)) {
@@ -117,12 +117,12 @@ namespace Unity.UIWidgets.widgets {
 
                 double trailingY = (size.height - trailingSize.height) / 2.0;
                 trailingWidth = trailingSize.width;
-                this.positionChild(_ToolbarSlot.trailing, new Offset(trailingX, trailingY));
+                this.positionChild(_ToolbarSlot.trailing, new Offset((float) trailingX, (float) trailingY));
             }
 
             if (this.hasChild(_ToolbarSlot.middle)) {
                 double maxWidth = Math.Max(size.width - leadingWidth - trailingWidth - this.middleSpacing * 2.0, 0.0);
-                BoxConstraints constraints = BoxConstraints.loose(size).copyWith(maxWidth: maxWidth);
+                BoxConstraints constraints = BoxConstraints.loose(size).copyWith(maxWidth: (float) maxWidth);
                 Size middleSize = this.layoutChild(_ToolbarSlot.middle, constraints);
 
                 double middleStartMargin = leadingWidth + this.middleSpacing;
@@ -150,7 +150,7 @@ namespace Unity.UIWidgets.widgets {
                         break;
                 }
 
-                this.positionChild(_ToolbarSlot.middle, new Offset(middleX, middleY));
+                this.positionChild(_ToolbarSlot.middle, new Offset((float) middleX, (float) middleY));
             }
         }
 

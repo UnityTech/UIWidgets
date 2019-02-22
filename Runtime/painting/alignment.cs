@@ -49,21 +49,21 @@ namespace Unity.UIWidgets.painting {
         public Offset alongOffset(Offset other) {
             double centerX = other.dx / 2.0;
             double centerY = other.dy / 2.0;
-            return new Offset(centerX + this.x * centerX, centerY + this.y * centerY);
+            return new Offset((float) (centerX + this.x * centerX), (float) (centerY + this.y * centerY));
         }
 
         public Offset alongSize(Size other) {
             double centerX = other.width / 2.0;
             double centerY = other.height / 2.0;
-            return new Offset(centerX + this.x * centerX, centerY + this.y * centerY);
+            return new Offset((float) (centerX + this.x * centerX), (float) (centerY + this.y * centerY));
         }
 
         public Offset withinRect(Rect rect) {
             double halfWidth = rect.width / 2.0;
             double halfHeight = rect.height / 2.0;
             return new Offset(
-                rect.left + halfWidth + this.x * halfWidth,
-                rect.top + halfHeight + this.y * halfHeight
+                (float) (rect.left + halfWidth + this.x * halfWidth),
+                (float) (rect.top + halfHeight + this.y * halfHeight)
             );
         }
 
@@ -71,8 +71,8 @@ namespace Unity.UIWidgets.painting {
             double halfWidthDelta = (rect.width - size.width) / 2.0;
             double halfHeightDelta = (rect.height - size.height) / 2.0;
             return Rect.fromLTWH(
-                rect.left + halfWidthDelta + this.x * halfWidthDelta,
-                rect.top + halfHeightDelta + this.y * halfHeightDelta,
+                (float) (rect.left + halfWidthDelta + this.x * halfWidthDelta),
+                (float) (rect.top + halfHeightDelta + this.y * halfHeightDelta),
                 size.width,
                 size.height
             );

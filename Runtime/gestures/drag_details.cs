@@ -40,7 +40,7 @@ namespace Unity.UIWidgets.gestures {
         public DragUpdateDetails(
             TimeSpan sourceTimeStamp,
             Offset delta = null,
-            double? primaryDelta = null,
+            float? primaryDelta = null,
             Offset globalPosition = null,
             bool isScroll = false) {
             this.sourceTimeStamp = sourceTimeStamp;
@@ -57,7 +57,7 @@ namespace Unity.UIWidgets.gestures {
 
         public readonly Offset delta;
 
-        public readonly double? primaryDelta;
+        public readonly float? primaryDelta;
 
         public readonly Offset globalPosition;
 

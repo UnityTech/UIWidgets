@@ -167,7 +167,7 @@ namespace Unity.UIWidgets.material {
                 mainAxisSize: MainAxisSize.min,
                 children: new List<Widget> {
                     icon,
-                    new SizedBox(width: 8.0),
+                    new SizedBox(width: 8.0f),
                     label
                 }
             )) {

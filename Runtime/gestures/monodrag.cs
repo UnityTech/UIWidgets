@@ -29,11 +29,11 @@ namespace Unity.UIWidgets.gestures {
 
         public GestureDragCancelCallback onCancel;
 
-        public double? minFlingDistance;
+        public float? minFlingDistance;
 
-        public double? minFlingVelocity;
+        public float? minFlingVelocity;
 
-        public double? maxFlingVelocity;
+        public float? maxFlingVelocity;
 
         _DragState _state = _DragState.ready;
         Offset _initialPosition;
@@ -42,7 +42,7 @@ namespace Unity.UIWidgets.gestures {
 
         protected abstract bool _isFlingGesture(VelocityEstimate estimate);
         protected abstract Offset _getDeltaForDetails(Offset delta);
-        protected abstract double? _getPrimaryValueFromOffset(Offset value);
+        protected abstract float? _getPrimaryValueFromOffset(Offset value);
         protected abstract bool _hasSufficientPendingDragDeltaToAccept { get; }
 
         readonly Dictionary<int, VelocityTracker> _velocityTrackers = new Dictionary<int, VelocityTracker>();
@@ -259,11 +259,11 @@ namespace Unity.UIWidgets.gestures {
         }
 
         protected override Offset _getDeltaForDetails(Offset delta) {
-            return new Offset(0.0, delta.dy);
+            return new Offset(0.0f, delta.dy);
         }
 
-        protected override double? _getPrimaryValueFromOffset(Offset value) {
-            return value.dy;
+        protected override float? _getPrimaryValueFromOffset(Offset value) {
+            return (float) value.dy;
         }
 
         public override string debugDescription {
@@ -287,11 +287,11 @@ namespace Unity.UIWidgets.gestures {
         }
 
         protected override Offset _getDeltaForDetails(Offset delta) {
-            return new Offset(delta.dx, 0.0);
+            return new Offset(delta.dx, 0.0f);
         }
 
-        protected override double? _getPrimaryValueFromOffset(Offset value) {
-            return value.dx;
+        protected override float? _getPrimaryValueFromOffset(Offset value) {
+            return (float) value.dx;
         }
 
         public override string debugDescription {
@@ -319,7 +319,7 @@ namespace Unity.UIWidgets.gestures {
             return delta;
         }
 
-        protected override double? _getPrimaryValueFromOffset(Offset value) {
+        protected override float? _getPrimaryValueFromOffset(Offset value) {
             return null;
         }
 

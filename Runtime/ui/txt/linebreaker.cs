@@ -58,10 +58,10 @@ namespace Unity.UIWidgets.ui {
     public class Candidate {
         public int offset;
         public int pre;
-        public double preBreak;
+        public float preBreak;
         public float penalty;
 
-        public double postBreak;
+        public float postBreak;
         public int preSpaceCount;
         public int postSpaceCount;
     }
@@ -77,9 +77,9 @@ namespace Unity.UIWidgets.ui {
         List<int> _breaks = new List<int>();
         List<float> _widths = new List<float>();
         WordBreaker _wordBreaker = new WordBreaker();
-        double _width = 0.0;
-        double _preBreak;
-        double _lineWidth;
+        float _width = 0.0f;
+        float _preBreak;
+        float _lineWidth;
         int _lastBreak;
         int _bestBreak;
         float _bestScore;
@@ -144,8 +144,8 @@ namespace Unity.UIWidgets.ui {
             int afterWord = start;
             int lastBreak = start;
 
-            double lastBreakWidth = this._width;
-            double postBreak = this._width;
+            float lastBreakWidth = this._width;
+            float postBreak = this._width;
             int postSpaceCount = this._spaceCount;
 
             for (int i = start; i < end; i++) {
@@ -202,10 +202,10 @@ namespace Unity.UIWidgets.ui {
             this._tabStops = tabStops;
         }
 
-        void _addWordBreak(int offset, double preBreak, double postBreak, int preSpaceCount, int postSpaceCount,
+        void _addWordBreak(int offset, float preBreak, float postBreak, int preSpaceCount, int postSpaceCount,
             float penalty) {
             Candidate cand = new Candidate();
-            double width = this._candidates[this._candidates.Count - 1].preBreak;
+            float width = this._candidates[this._candidates.Count - 1].preBreak;
             if (postBreak - width > this._lineWidth) {
                 int i = this._candidates[this._candidates.Count - 1].offset;
                 width += this._charWidths[i++];

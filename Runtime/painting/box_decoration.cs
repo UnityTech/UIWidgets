@@ -49,7 +49,7 @@ namespace Unity.UIWidgets.painting {
             get { return this.border?.dimensions; }
         }
 
-        public BoxDecoration scale(double factor) {
+        public BoxDecoration scale(float factor) {
             return new BoxDecoration(
                 color: Color.lerp(null, this.color, factor),
                 image: this.image,
@@ -66,7 +66,7 @@ namespace Unity.UIWidgets.painting {
             get { return this.boxShadow != null; }
         }
 
-        public override Decoration lerpFrom(Decoration a, double t) {
+        public override Decoration lerpFrom(Decoration a, float t) {
             if (a == null) {
                 return this.scale(t);
             }
@@ -78,9 +78,9 @@ namespace Unity.UIWidgets.painting {
             return base.lerpFrom(a, t);
         }
 
-        public override Decoration lerpTo(Decoration b, double t) {
+        public override Decoration lerpTo(Decoration b, float t) {
             if (b == null) {
-                return this.scale(1.0 - t);
+                return this.scale(1.0f - t);
             }
 
             if (b is BoxDecoration boxDecoration) {
@@ -90,7 +90,7 @@ namespace Unity.UIWidgets.painting {
             return base.lerpTo(b, t);
         }
 
-        public static BoxDecoration lerp(BoxDecoration a, BoxDecoration b, double t) {
+        public static BoxDecoration lerp(BoxDecoration a, BoxDecoration b, float t) {
             if (a == null && b == null) {
                 return null;
             }
@@ -100,7 +100,7 @@ namespace Unity.UIWidgets.painting {
             }
 
             if (b == null) {
-                return a.scale(1.0 - t);
+                return a.scale(1.0f - t);
             }
 
             if (t == 0.0) {

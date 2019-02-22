@@ -11,13 +11,13 @@ namespace Unity.UIWidgets.animation {
     }
 
     public class AnimationController :
-        AnimationLocalStatusListenersMixinAnimationLocalListenersMixinAnimationEagerListenerMixinAnimation<double> {
+        AnimationLocalStatusListenersMixinAnimationLocalListenersMixinAnimationEagerListenerMixinAnimation<float> {
         public AnimationController(
-            double? value = null,
+            float? value = null,
             TimeSpan? duration = null,
             string debugLabel = null,
-            double lowerBound = 0.0,
-            double upperBound = 1.0,
+            float lowerBound = 0.0f,
+            float upperBound = 1.0f,
             TickerProvider vsync = null
         ) {
             D.assert(upperBound >= lowerBound);
@@ -34,14 +34,14 @@ namespace Unity.UIWidgets.animation {
         }
 
         AnimationController(
-            double value = 0.0,
+            float value = 0.0f,
             TimeSpan? duration = null,
             string debugLabel = null,
             TickerProvider vsync = null
         ) {
             D.assert(vsync != null);
-            this.lowerBound = double.NegativeInfinity;
-            this.upperBound = double.PositiveInfinity;
+            this.lowerBound = float.NegativeInfinity;
+            this.upperBound = float.PositiveInfinity;
             this._direction = _AnimationDirection.forward;
 
             this.duration = duration;
@@ -52,7 +52,7 @@ namespace Unity.UIWidgets.animation {
         }
 
         public static AnimationController unbounded(
-            double value = 0.0,
+            float value = 0.0f,
             TimeSpan? duration = null,
             string debugLabel = null,
             TickerProvider vsync = null
@@ -60,13 +60,13 @@ namespace Unity.UIWidgets.animation {
             return new AnimationController(value, duration, debugLabel, vsync);
         }
 
-        public readonly double lowerBound;
+        public readonly float lowerBound;
 
-        public readonly double upperBound;
+        public readonly float upperBound;
 
         public readonly string debugLabel;
 
-        public Animation<double> view {
+        public Animation<float> view {
             get { return this; }
         }
 
@@ -82,13 +82,13 @@ namespace Unity.UIWidgets.animation {
 
         Simulation _simulation;
 
-        public override double value {
+        public override float value {
             get { return this._value; }
         }
 
-        double _value;
+        float _value;
 
-        public void setValue(double newValue) {
+        public void setValue(float newValue) {
             this.stop();
             this._internalSetValue(newValue);
             this.notifyListeners();
@@ -100,17 +100,17 @@ namespace Unity.UIWidgets.animation {
             this.setValue(this.lowerBound);
         }
 
-        public double velocity {
+        public float velocity {
             get {
                 if (!this.isAnimating) {
-                    return 0.0;
+                    return 0.0f;
                 }
 
-                return this._simulation.dx((double) this.lastElapsedDuration.Value.Ticks / TimeSpan.TicksPerSecond);
+                return this._simulation.dx(this.lastElapsedDuration.Value.Ticks / TimeSpan.TicksPerSecond);
             }
         }
 
-        void _internalSetValue(double newValue) {
+        void _internalSetValue(float newValue) {
             this._value = newValue.clamp(this.lowerBound, this.upperBound);
             if (this._value == this.lowerBound) {
                 this._status = AnimationStatus.dismissed;
@@ -143,7 +143,7 @@ namespace Unity.UIWidgets.animation {
 
         AnimationStatus _status;
 
-        public TickerFuture forward(double? from = null) {
+        public TickerFuture forward(float? from = null) {
             D.assert(() => {
                 if (this.duration == null) {
                     throw new UIWidgetsError(
@@ -163,7 +163,7 @@ namespace Unity.UIWidgets.animation {
             return this._animateToInternal(this.upperBound);
         }
 
-        public TickerFuture reverse(double? from = null) {
+        public TickerFuture reverse(float? from = null) {
             D.assert(() => {
                 if (this.duration == null) {
                     throw new UIWidgetsError(
@@ -183,14 +183,14 @@ namespace Unity.UIWidgets.animation {
             return this._animateToInternal(this.lowerBound);
         }
 
-        public TickerFuture animateTo(double target, TimeSpan? duration = null, Curve curve = null) {
+        public TickerFuture animateTo(float target, TimeSpan? duration = null, Curve curve = null) {
             curve = curve ?? Curves.linear;
 
             this._direction = _AnimationDirection.forward;
             return this._animateToInternal(target, duration: duration, curve: curve);
         }
 
-        TickerFuture _animateToInternal(double target, TimeSpan? duration = null, Curve curve = null) {
+        TickerFuture _animateToInternal(float target, TimeSpan? duration = null, Curve curve = null) {
             curve = curve ?? Curves.linear;
 
             TimeSpan? simulationDuration = duration;
@@ -207,8 +207,8 @@ namespace Unity.UIWidgets.animation {
 
                     return true;
                 });
-                double range = this.upperBound - this.lowerBound;
-                double remainingFraction = range.isFinite() ? (target - this._value).abs() / range : 1.0;
+                float range = this.upperBound - this.lowerBound;
+                float remainingFraction = range.isFinite() ? (target - this._value).abs() / range : 1.0f;
                 simulationDuration = TimeSpan.FromTicks((long) (this.duration.Value.Ticks * remainingFraction));
             }
             else if (target == this.value) {
@@ -236,7 +236,7 @@ namespace Unity.UIWidgets.animation {
                 new _InterpolationSimulation(this._value, target, simulationDuration.Value, curve));
         }
 
-        public TickerFuture repeat(double? min = null, double? max = null, TimeSpan? period = null) {
+        public TickerFuture repeat(float? min = null, float? max = null, TimeSpan? period = null) {
             min = min ?? this.lowerBound;
             max = max ?? this.upperBound;
             period = period ?? this.duration;
@@ -255,9 +255,9 @@ namespace Unity.UIWidgets.animation {
             return this.animateWith(new _RepeatingSimulation(min.Value, max.Value, period.Value));
         }
 
-        public TickerFuture fling(double velocity = 1.0) {
+        public TickerFuture fling(float velocity = 1.0f) {
             this._direction = velocity < 0.0 ? _AnimationDirection.reverse : _AnimationDirection.forward;
-            double target = velocity < 0.0
+            float target = velocity < 0.0f
                 ? this.lowerBound - _kFlingTolerance.distance
                 : this.upperBound + _kFlingTolerance.distance;
             Simulation simulation = new SpringSimulation(_kFlingSpringDescription, this.value,
@@ -277,7 +277,7 @@ namespace Unity.UIWidgets.animation {
             D.assert(!this.isAnimating);
             this._simulation = simulation;
             this._lastElapsedDuration = TimeSpan.Zero;
-            this._value = simulation.x(0.0).clamp(this.lowerBound, this.upperBound);
+            this._value = simulation.x(0.0f).clamp(this.lowerBound, this.upperBound);
             var result = this._ticker.start();
             this._status = (this._direction == _AnimationDirection.forward)
                 ? AnimationStatus.forward
@@ -321,7 +321,7 @@ namespace Unity.UIWidgets.animation {
 
         void _tick(TimeSpan elapsed) {
             this._lastElapsedDuration = elapsed;
-            double elapsedInSeconds = (double) elapsed.Ticks / TimeSpan.TicksPerSecond;
+            float elapsedInSeconds = elapsed.Ticks / TimeSpan.TicksPerSecond;
             D.assert(elapsedInSeconds >= 0.0);
             this._value = this._simulation.x(elapsedInSeconds).clamp(this.lowerBound, this.upperBound);
             if (this._simulation.isDone(elapsedInSeconds)) {
@@ -350,33 +350,33 @@ namespace Unity.UIWidgets.animation {
         );
 
         static readonly Tolerance _kFlingTolerance = new Tolerance(
-            velocity: double.PositiveInfinity,
-            distance: 0.01
+            velocity: float.PositiveInfinity,
+            distance: 0.01f
         );
     }
 
 
     class _InterpolationSimulation : Simulation {
-        internal _InterpolationSimulation(double begin, double end, TimeSpan duration, Curve curve) {
+        internal _InterpolationSimulation(float begin, float end, TimeSpan duration, Curve curve) {
             this._begin = begin;
             this._end = end;
             this._curve = curve;
 
             D.assert(duration.Ticks > 0);
-            this._durationInSeconds = (double) duration.Ticks / TimeSpan.TicksPerSecond;
+            this._durationInSeconds = duration.Ticks / TimeSpan.TicksPerSecond;
         }
 
-        readonly double _durationInSeconds;
-        readonly double _begin;
-        readonly double _end;
+        readonly float _durationInSeconds;
+        readonly float _begin;
+        readonly float _end;
         readonly Curve _curve;
 
-        public override double x(double timeInSeconds) {
-            double t = (timeInSeconds / this._durationInSeconds).clamp(0.0, 1.0);
-            if (t == 0.0) {
+        public override float x(float timeInSeconds) {
+            float t = (timeInSeconds / this._durationInSeconds).clamp(0.0f, 1.0f);
+            if (t == 0.0f) {
                 return this._begin;
             }
-            else if (t == 1.0) {
+            else if (t == 1.0f) {
                 return this._end;
             }
             else {
@@ -384,39 +384,39 @@ namespace Unity.UIWidgets.animation {
             }
         }
 
-        public override double dx(double timeInSeconds) {
-            double epsilon = this.tolerance.time;
+        public override float dx(float timeInSeconds) {
+            float epsilon = this.tolerance.time;
             return (this.x(timeInSeconds + epsilon) - this.x(timeInSeconds - epsilon)) / (2 * epsilon);
         }
 
-        public override bool isDone(double timeInSeconds) {
+        public override bool isDone(float timeInSeconds) {
             return timeInSeconds > this._durationInSeconds;
         }
     }
 
     class _RepeatingSimulation : Simulation {
-        internal _RepeatingSimulation(double min, double max, TimeSpan period) {
+        internal _RepeatingSimulation(float min, float max, TimeSpan period) {
             this._min = min;
             this._max = max;
-            this._periodInSeconds = (double) period.Ticks / TimeSpan.TicksPerSecond;
-            D.assert(this._periodInSeconds > 0.0);
+            this._periodInSeconds = period.Ticks / TimeSpan.TicksPerSecond;
+            D.assert(this._periodInSeconds > 0.0f);
         }
 
-        readonly double _min;
-        readonly double _max;
-        readonly double _periodInSeconds;
+        readonly float _min;
+        readonly float _max;
+        readonly float _periodInSeconds;
 
-        public override double x(double timeInSeconds) {
-            D.assert(timeInSeconds >= 0.0);
-            double t = (timeInSeconds / this._periodInSeconds) % 1.0;
-            return MathUtils.lerpDouble(this._min, this._max, t);
+        public override float x(float timeInSeconds) {
+            D.assert(timeInSeconds >= 0.0f);
+            float t = (timeInSeconds / this._periodInSeconds) % 1.0f;
+            return MathUtils.lerpFloat(this._min, this._max, t);
         }
 
-        public override double dx(double timeInSeconds) {
+        public override float dx(float timeInSeconds) {
             return (this._max - this._min) / this._periodInSeconds;
         }
 
-        public override bool isDone(double timeInSeconds) {
+        public override bool isDone(float timeInSeconds) {
             return false;
         }
     }

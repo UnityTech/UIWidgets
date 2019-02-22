@@ -105,7 +105,7 @@ namespace Unity.UIWidgets.material {
             properties.add(new EnumProperty<BorderRadius>("borderRadius", this.borderRadius, defaultValue: null));
         }
 
-        public const double defaultSplashRadius = 35.0;
+        public const float defaultSplashRadius = 35.0f;
     }
 
 
@@ -293,7 +293,7 @@ namespace Unity.UIWidgets.material {
             if (this._inkFeatures != null && this._inkFeatures.isNotEmpty()) {
                 Canvas canvas = context.canvas;
                 canvas.save();
-                canvas.translate(offset.dx, offset.dy);
+                canvas.translate((float) offset.dx, (float) offset.dy);
                 canvas.clipRect(Offset.zero & this.size);
                 foreach (InkFeature inkFeature in this._inkFeatures) {
                     inkFeature._paint(canvas);
@@ -405,7 +405,7 @@ namespace Unity.UIWidgets.material {
             ShapeBorder end = null) : base(begin: begin, end: end) {
         }
 
-        public override ShapeBorder lerp(double t) {
+        public override ShapeBorder lerp(float t) {
             return ShapeBorder.lerp(this.begin, this.end, t);
         }
     }

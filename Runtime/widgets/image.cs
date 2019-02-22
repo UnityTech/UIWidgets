@@ -59,8 +59,8 @@ namespace Unity.UIWidgets.widgets {
         public Image(
             Key key = null,
             ImageProvider image = null,
-            double? width = null,
-            double? height = null,
+            float? width = null,
+            float? height = null,
             Color color = null,
             BlendMode colorBlendMode = BlendMode.srcIn,
             BoxFit? fit = null,
@@ -87,9 +87,9 @@ namespace Unity.UIWidgets.widgets {
         public static Image network(
             string src,
             Key key = null,
-            double scale = 1.0,
-            double? width = null,
-            double? height = null,
+            float scale = 1.0f,
+            float? width = null,
+            float? height = null,
             Color color = null,
             BlendMode colorBlendMode = BlendMode.srcIn,
             BoxFit? fit = null,
@@ -120,9 +120,9 @@ namespace Unity.UIWidgets.widgets {
         public static Image file(
             string file,
             Key key = null,
-            double scale = 1.0,
-            double? width = null,
-            double? height = null,
+            float scale = 1.0f,
+            float? width = null,
+            float? height = null,
             Color color = null,
             BlendMode colorBlendMode = BlendMode.srcIn,
             BoxFit? fit = null,
@@ -153,9 +153,9 @@ namespace Unity.UIWidgets.widgets {
             string name,
             Key key = null,
             AssetBundle bundle = null,
-            double? scale = null,
-            double? width = null,
-            double? height = null,
+            float? scale = null,
+            float? width = null,
+            float? height = null,
             Color color = null,
             BlendMode colorBlendMode = BlendMode.srcIn,
             BoxFit? fit = null,
@@ -188,9 +188,9 @@ namespace Unity.UIWidgets.widgets {
         public static Image memory(
             byte[] bytes,
             Key key = null,
-            double scale = 1.0,
-            double? width = null,
-            double? height = null,
+            float scale = 1.0f,
+            float? width = null,
+            float? height = null,
             Color color = null,
             BlendMode colorBlendMode = BlendMode.srcIn,
             BoxFit? fit = null,
@@ -218,8 +218,8 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public readonly ImageProvider image;
-        public readonly double? width;
-        public readonly double? height;
+        public readonly float? width;
+        public readonly float? height;
         public readonly Color color;
         public readonly FilterMode filterMode;
         public readonly BlendMode colorBlendMode;
@@ -347,7 +347,7 @@ namespace Unity.UIWidgets.widgets {
                 image: this._imageInfo?.image,
                 width: this.widget.width,
                 height: this.widget.height,
-                scale: this._imageInfo?.scale ?? 1.0,
+                scale: this._imageInfo?.scale ?? 1.0f,
                 color: this.widget.color,
                 colorBlendMode: this.widget.colorBlendMode,
                 fit: this.widget.fit,

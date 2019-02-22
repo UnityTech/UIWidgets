@@ -42,31 +42,31 @@ namespace Unity.UIWidgets.physics {
     public class SpringSimulation : Simulation {
         public SpringSimulation(
             SpringDescription spring,
-            double start,
-            double end,
-            double velocity,
+            float start,
+            float end,
+            float velocity,
             Tolerance tolerance = null
         ) : base(tolerance: tolerance) {
             this._endPosition = end;
             this._solution = _SpringSolution.create(spring, start - end, velocity);
         }
 
-        protected readonly double _endPosition;
+        protected readonly float _endPosition;
         readonly _SpringSolution _solution;
 
         public SpringType type {
             get { return this._solution.type; }
         }
 
-        public override double x(double time) {
+        public override float x(float time) {
             return this._endPosition + this._solution.x(time);
         }
 
-        public override double dx(double time) {
+        public override float dx(float time) {
             return this._solution.dx(time);
         }
 
-        public override bool isDone(double time) {
+        public override bool isDone(float time) {
             return PhysicsUtils.nearZero(this._solution.x(time), this.tolerance.distance) &&
                    PhysicsUtils.nearZero(this._solution.dx(time), this.tolerance.velocity);
         }
@@ -79,14 +79,14 @@ namespace Unity.UIWidgets.physics {
     public class ScrollSpringSimulation : SpringSimulation {
         public ScrollSpringSimulation(
             SpringDescription spring,
-            double start,
-            double end,
-            double velocity,
+            float start,
+            float end,
+            float velocity,
             Tolerance tolerance = null
         ) : base(spring, start, end, velocity, tolerance: tolerance) {
         }
 
-        public override double x(double time) {
+        public override float x(float time) {
             return this.isDone(time) ? this._endPosition : base.x(time);
         }
     }
@@ -105,14 +105,14 @@ namespace Unity.UIWidgets.physics {
             }
 
             if (cmk > 0.0) {
-                return _OverdampedSolution.create(spring, initialPosition, initialVelocity);
+                return create(spring, initialPosition, initialVelocity);
             }
 
             return _UnderdampedSolution.create(spring, initialPosition, initialVelocity);
         }
 
-        public abstract double x(double time);
-        public abstract double dx(double time);
+        public abstract float x(float time);
+        public abstract float dx(float time);
         public abstract SpringType type { get; }
     }
 
@@ -138,13 +138,13 @@ namespace Unity.UIWidgets.physics {
 
         readonly double _r, _c1, _c2;
 
-        public override double x(double time) {
-            return (this._c1 + this._c2 * time) * Math.Pow(Math.E, this._r * time);
+        public override float x(float time) {
+            return (float) ((this._c1 + this._c2 * time) * Math.Pow(Math.E, this._r * time));
         }
 
-        public override double dx(double time) {
+        public override float dx(float time) {
             double power = Math.Pow(Math.E, this._r * time);
-            return this._r * (this._c1 + this._c2 * time) * power + this._c2 * power;
+            return (float) (this._r * (this._c1 + this._c2 * time) * power + this._c2 * power);
         }
 
         public override SpringType type {
@@ -155,8 +155,8 @@ namespace Unity.UIWidgets.physics {
     class _OverdampedSolution : _SpringSolution {
         internal new static _OverdampedSolution create(
             SpringDescription spring,
-            double distance,
-            double velocity
+            float distance,
+            float velocity
         ) {
             double cmk = spring.damping * spring.damping - 4 * spring.mass * spring.stiffness;
             double r1 = (-spring.damping - Math.Sqrt(cmk)) / (2.0 * spring.mass);
@@ -177,14 +177,14 @@ namespace Unity.UIWidgets.physics {
 
         readonly double _r1, _r2, _c1, _c2;
 
-        public override double x(double time) {
-            return this._c1 * Math.Pow(Math.E, this._r1 * time) +
-                   this._c2 * Math.Pow(Math.E, this._r2 * time);
+        public override float x(float time) {
+            return (float) (this._c1 * Math.Pow(Math.E, this._r1 * time) +
+                            this._c2 * Math.Pow(Math.E, this._r2 * time));
         }
 
-        public override double dx(double time) {
-            return this._c1 * this._r1 * Math.Pow(Math.E, this._r1 * time) +
-                   this._c2 * this._r2 * Math.Pow(Math.E, this._r2 * time);
+        public override float dx(float time) {
+            return (float) (this._c1 * this._r1 * Math.Pow(Math.E, this._r1 * time) +
+                            this._c2 * this._r2 * Math.Pow(Math.E, this._r2 * time));
         }
 
         public override SpringType type {
@@ -217,17 +217,17 @@ namespace Unity.UIWidgets.physics {
 
         readonly double _w, _r, _c1, _c2;
 
-        public override double x(double time) {
-            return Math.Pow(Math.E, this._r * time) *
-                   (this._c1 * Math.Cos(this._w * time) + this._c2 * Math.Sin(this._w * time));
+        public override float x(float time) {
+            return (float) (Math.Pow(Math.E, this._r * time) *
+                            (this._c1 * Math.Cos(this._w * time) + this._c2 * Math.Sin(this._w * time)));
         }
 
-        public override double dx(double time) {
+        public override float dx(float time) {
             double power = Math.Pow(Math.E, this._r * time);
             double cosine = Math.Cos(this._w * time);
             double sine = Math.Sin(this._w * time);
-            return power * (this._c2 * this._w * cosine - this._c1 * this._w * sine) +
-                   this._r * power * (this._c2 * sine + this._c1 * cosine);
+            return (float) (power * (this._c2 * this._w * cosine - this._c1 * this._w * sine) +
+                            this._r * power * (this._c2 * sine + this._c1 * cosine));
         }
 
         public override SpringType type {

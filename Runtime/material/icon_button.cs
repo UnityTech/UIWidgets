@@ -9,7 +9,7 @@ namespace Unity.UIWidgets.material {
     public class IconButton : StatelessWidget {
         public IconButton(
             Key key = null,
-            double iconSize = 24.0,
+            float iconSize = 24.0f,
             EdgeInsets padding = null,
             Alignment alignment = null,
             Widget icon = null,
@@ -22,7 +22,7 @@ namespace Unity.UIWidgets.material {
             D.assert(icon != null);
 
             this.iconSize = iconSize;
-            this.padding = padding ?? EdgeInsets.all(8.0);
+            this.padding = padding ?? EdgeInsets.all(8.0f);
             this.alignment = alignment ?? Alignment.center;
             this.icon = icon;
             this.color = color;
@@ -33,7 +33,7 @@ namespace Unity.UIWidgets.material {
             this.tooltip = tooltip;
         }
 
-        public readonly double iconSize;
+        public readonly float iconSize;
 
         public readonly EdgeInsets padding;
 
@@ -98,9 +98,9 @@ namespace Unity.UIWidgets.material {
                 child: result,
                 highlightColor: this.highlightColor ?? Theme.of(context).highlightColor,
                 splashColor: this.splashColor ?? Theme.of(context).splashColor,
-                radius: Math.Max(
+                radius: (float) Math.Max(
                     Material.defaultSplashRadius,
-                    (this.iconSize + Math.Min(this.padding.horizontal, this.padding.vertical)) * 0.7)
+                    (this.iconSize + Math.Min(this.padding.horizontal, this.padding.vertical)) * 0.7f)
             );
         }
 

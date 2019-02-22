@@ -53,7 +53,7 @@ namespace Unity.UIWidgets.material {
             RectCallback rectCallback = null,
             BorderRadius borderRadius = null,
             ShapeBorder customBorder = null,
-            double? radius = null,
+            float? radius = null,
             VoidCallback onRemoved = null);
     }
 
@@ -70,7 +70,7 @@ namespace Unity.UIWidgets.material {
             ValueChanged<bool> onHighlightChanged = null,
             bool containedInkWell = false,
             BoxShape highlightShape = BoxShape.circle,
-            double? radius = null,
+            float? radius = null,
             BorderRadius borderRadius = null,
             ShapeBorder customBorder = null,
             Color highlightColor = null,
@@ -111,7 +111,7 @@ namespace Unity.UIWidgets.material {
 
         public readonly BoxShape highlightShape;
 
-        public readonly double? radius;
+        public readonly float? radius;
 
         public readonly BorderRadius borderRadius;
 
@@ -371,7 +371,7 @@ namespace Unity.UIWidgets.material {
             Color highlightColor = null,
             Color splashColor = null,
             InteractiveInkFeatureFactory splashFactory = null,
-            double? radius = null,
+            float? radius = null,
             BorderRadius borderRadius = null,
             ShapeBorder customBorder = null
         ) : base(

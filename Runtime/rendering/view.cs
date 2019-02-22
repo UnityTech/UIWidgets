@@ -6,7 +6,7 @@ namespace Unity.UIWidgets.rendering {
     public class ViewConfiguration {
         public ViewConfiguration(
             Size size = null,
-            double devicePixelRatio = 1.0
+            float devicePixelRatio = 1.0f
         ) {
             this.size = size ?? Size.zero;
             this.devicePixelRatio = devicePixelRatio;
@@ -14,7 +14,7 @@ namespace Unity.UIWidgets.rendering {
 
         public readonly Size size;
 
-        public readonly double devicePixelRatio;
+        public readonly float devicePixelRatio;
 
         public Matrix3 toMatrix() {
             return Matrix3.I();

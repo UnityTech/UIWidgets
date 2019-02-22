@@ -8,7 +8,7 @@ using Unity.UIWidgets.ui;
 
 namespace Unity.UIWidgets.rendering {
     public interface RenderAbstractViewport {
-        RevealedOffset getOffsetToReveal(RenderObject target, double alignment, Rect rect = null);
+        RevealedOffset getOffsetToReveal(RenderObject target, float alignment, Rect rect = null);
         RenderObject parent { get; }
     }
 
@@ -25,19 +25,19 @@ namespace Unity.UIWidgets.rendering {
             return null;
         }
 
-        public const double defaultCacheExtent = 250.0;
+        public const float defaultCacheExtent = 250.0f;
     }
 
     public class RevealedOffset {
         public RevealedOffset(
-            double offset,
+            float offset,
             Rect rect) {
             D.assert(rect != null);
             this.offset = offset;
             this.rect = rect;
         }
 
-        public readonly double offset;
+        public readonly float offset;
         public readonly Rect rect;
 
         public override string ToString() {
@@ -53,7 +53,7 @@ namespace Unity.UIWidgets.rendering {
             AxisDirection axisDirection = AxisDirection.down,
             AxisDirection crossAxisDirection = AxisDirection.right,
             ViewportOffset offset = null,
-            double cacheExtent = RenderViewportUtils.defaultCacheExtent
+            float cacheExtent = RenderViewportUtils.defaultCacheExtent
         ) {
             D.assert(offset != null);
             D.assert(AxisUtils.axisDirectionToAxis(axisDirection) != AxisUtils.axisDirectionToAxis(crossAxisDirection));
@@ -123,7 +123,7 @@ namespace Unity.UIWidgets.rendering {
 
         ViewportOffset _offset;
 
-        public double cacheExtent {
+        public float cacheExtent {
             get { return this._cacheExtent; }
             set {
                 if (value == this._cacheExtent) {
@@ -135,7 +135,7 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
-        double _cacheExtent;
+        float _cacheExtent;
 
         public override void attach(object owner) {
             base.attach(owner);
@@ -166,57 +166,57 @@ namespace Unity.UIWidgets.rendering {
             return true;
         }
 
-        protected override double computeMinIntrinsicWidth(double height) {
+        protected override float computeMinIntrinsicWidth(float height) {
             D.assert(this.debugThrowIfNotCheckingIntrinsics());
-            return 0.0;
+            return 0.0f;
         }
 
-        protected override double computeMaxIntrinsicWidth(double height) {
+        protected override float computeMaxIntrinsicWidth(float height) {
             D.assert(this.debugThrowIfNotCheckingIntrinsics());
-            return 0.0;
+            return 0.0f;
         }
 
-        protected override double computeMinIntrinsicHeight(double width) {
+        protected override float computeMinIntrinsicHeight(float width) {
             D.assert(this.debugThrowIfNotCheckingIntrinsics());
-            return 0.0;
+            return 0.0f;
         }
 
-        protected override double computeMaxIntrinsicHeight(double width) {
+        protected override float computeMaxIntrinsicHeight(float width) {
             D.assert(this.debugThrowIfNotCheckingIntrinsics());
-            return 0.0;
+            return 0.0f;
         }
 
         public override bool isRepaintBoundary {
             get { return true; }
         }
 
-        protected double layoutChildSequence(
+        protected float layoutChildSequence(
             RenderSliver child,
-            double scrollOffset,
-            double overlap,
-            double layoutOffset,
-            double remainingPaintExtent,
-            double mainAxisExtent,
-            double crossAxisExtent,
+            float scrollOffset,
+            float overlap,
+            float layoutOffset,
+            float remainingPaintExtent,
+            float mainAxisExtent,
+            float crossAxisExtent,
             GrowthDirection growthDirection,
             Func<RenderSliver, RenderSliver> advance,
-            double remainingCacheExtent,
-            double cacheOrigin
+            float remainingCacheExtent,
+            float cacheOrigin
         ) {
             D.assert(scrollOffset.isFinite());
             D.assert(scrollOffset >= 0.0);
 
-            double initialLayoutOffset = layoutOffset;
+            float initialLayoutOffset = layoutOffset;
             ScrollDirection adjustedUserScrollDirection =
                 GrowthDirectionUtils.applyGrowthDirectionToScrollDirection(
                     this.offset.userScrollDirection, growthDirection);
-            double maxPaintOffset = layoutOffset + overlap;
+            float maxPaintOffset = layoutOffset + overlap;
 
             while (child != null) {
-                double sliverScrollOffset = scrollOffset <= 0.0 ? 0.0 : scrollOffset;
+                float sliverScrollOffset = scrollOffset <= 0.0 ? 0.0f : scrollOffset;
 
-                double correctedCacheOrigin = Math.Max(cacheOrigin, -sliverScrollOffset);
-                double cacheExtentCorrection = cacheOrigin - correctedCacheOrigin;
+                float correctedCacheOrigin = (float) Math.Max(cacheOrigin, -sliverScrollOffset);
+                float cacheExtentCorrection = cacheOrigin - correctedCacheOrigin;
 
                 D.assert(sliverScrollOffset >= correctedCacheOrigin.abs());
                 D.assert(correctedCacheOrigin <= 0.0);
@@ -229,12 +229,13 @@ namespace Unity.UIWidgets.rendering {
                     userScrollDirection: adjustedUserScrollDirection,
                     scrollOffset: sliverScrollOffset,
                     overlap: maxPaintOffset - layoutOffset,
-                    remainingPaintExtent: Math.Max(0.0, remainingPaintExtent - layoutOffset + initialLayoutOffset),
+                    remainingPaintExtent: (float) Math.Max(0.0,
+                        remainingPaintExtent - layoutOffset + initialLayoutOffset),
                     crossAxisExtent: crossAxisExtent,
                     crossAxisDirection: this.crossAxisDirection,
                     viewportMainAxisExtent: mainAxisExtent,
-                    remainingCacheExtent: Math.Max(0.0, remainingCacheExtent + cacheExtentCorrection),
-                    cacheOrigin: correctedCacheOrigin
+                    remainingCacheExtent: (float) Math.Max(0.0, remainingCacheExtent + cacheExtentCorrection),
+                    cacheOrigin: (float) correctedCacheOrigin
                 ), parentUsesSize: true);
 
                 var childLayoutGeometry = child.geometry;
@@ -244,7 +245,7 @@ namespace Unity.UIWidgets.rendering {
                     return childLayoutGeometry.scrollOffsetCorrection.Value;
                 }
 
-                double effectiveLayoutOffset = layoutOffset + childLayoutGeometry.paintOrigin;
+                float effectiveLayoutOffset = layoutOffset + childLayoutGeometry.paintOrigin;
 
                 if (childLayoutGeometry.visible || scrollOffset > 0) {
                     this.updateChildLayoutOffset(child, effectiveLayoutOffset, growthDirection);
@@ -253,13 +254,14 @@ namespace Unity.UIWidgets.rendering {
                     this.updateChildLayoutOffset(child, -scrollOffset + initialLayoutOffset, growthDirection);
                 }
 
-                maxPaintOffset = Math.Max(effectiveLayoutOffset + childLayoutGeometry.paintExtent, maxPaintOffset);
+                maxPaintOffset = (float) Math.Max(effectiveLayoutOffset + childLayoutGeometry.paintExtent,
+                    maxPaintOffset);
                 scrollOffset -= childLayoutGeometry.scrollExtent;
                 layoutOffset += childLayoutGeometry.layoutExtent;
 
                 if (childLayoutGeometry.cacheExtent != 0.0) {
                     remainingCacheExtent -= childLayoutGeometry.cacheExtent - cacheExtentCorrection;
-                    cacheOrigin = Math.Min(correctedCacheOrigin + childLayoutGeometry.cacheExtent, 0.0);
+                    cacheOrigin = (float) Math.Min(correctedCacheOrigin + childLayoutGeometry.cacheExtent, 0.0);
                 }
 
                 this.updateOutOfBandData(growthDirection, childLayoutGeometry);
@@ -267,7 +269,7 @@ namespace Unity.UIWidgets.rendering {
                 child = advance(child);
             }
 
-            return 0.0;
+            return 0.0f;
         }
 
         public override Rect describeApproximatePaintClip(RenderObject childRaw) {
@@ -278,12 +280,12 @@ namespace Unity.UIWidgets.rendering {
                 return viewportClip;
             }
 
-            double left = viewportClip.left;
-            double right = viewportClip.right;
-            double top = viewportClip.top;
-            double bottom = viewportClip.bottom;
-            double startOfOverlap = child.constraints.viewportMainAxisExtent - child.constraints.remainingPaintExtent;
-            double overlapCorrection = startOfOverlap + child.constraints.overlap;
+            float left = viewportClip.left;
+            float right = viewportClip.right;
+            float top = viewportClip.top;
+            float bottom = viewportClip.bottom;
+            float startOfOverlap = child.constraints.viewportMainAxisExtent - child.constraints.remainingPaintExtent;
+            float overlapCorrection = startOfOverlap + child.constraints.overlap;
             switch (GrowthDirectionUtils.applyGrowthDirectionToAxisDirection(
                 this.axisDirection, child.constraints.growthDirection)) {
                 case AxisDirection.down:
@@ -358,7 +360,7 @@ namespace Unity.UIWidgets.rendering {
         protected override bool hitTestChildren(HitTestResult result, Offset position = null) {
             D.assert(position != null);
 
-            double mainAxisPosition = 0, crossAxisPosition = 0;
+            float mainAxisPosition = 0, crossAxisPosition = 0;
             switch (this.axis) {
                 case Axis.vertical:
                     mainAxisPosition = position.dy;
@@ -383,9 +385,9 @@ namespace Unity.UIWidgets.rendering {
             return false;
         }
 
-        public RevealedOffset getOffsetToReveal(RenderObject target, double alignment, Rect rect = null) {
-            double leadingScrollOffset = 0.0;
-            double targetMainAxisExtent = 0.0;
+        public RevealedOffset getOffsetToReveal(RenderObject target, float alignment, Rect rect = null) {
+            float leadingScrollOffset = 0.0f;
+            float targetMainAxisExtent = 0.0f;
             RenderObject descendant;
             rect = rect ?? target.paintBounds;
 
@@ -409,7 +411,7 @@ namespace Unity.UIWidgets.rendering {
                 transform = targetBox.getTransformTo(pivot);
                 Rect bounds = transform.mapRect(rect);
 
-                double offset = 0.0;
+                float offset = 0.0f;
 
                 GrowthDirection growthDirection = pivotParent.constraints.growthDirection;
                 switch (GrowthDirectionUtils.applyGrowthDirectionToAxisDirection(this.axisDirection, growthDirection)) {
@@ -453,7 +455,7 @@ namespace Unity.UIWidgets.rendering {
             }
             else if (target is RenderSliver) {
                 RenderSliver targetSliver = (RenderSliver) target;
-                leadingScrollOffset = 0.0;
+                leadingScrollOffset = 0.0f;
                 targetMainAxisExtent = targetSliver.geometry.scrollExtent;
                 descendant = targetSliver;
             }
@@ -472,7 +474,7 @@ namespace Unity.UIWidgets.rendering {
             D.assert(child is RenderSliver);
 
             RenderSliver sliver = (RenderSliver) child;
-            double extentOfPinnedSlivers = this.maxScrollObstructionExtentBefore(sliver);
+            float extentOfPinnedSlivers = this.maxScrollObstructionExtentBefore(sliver);
             leadingScrollOffset = this.scrollOffsetOf(sliver, leadingScrollOffset);
             switch (sliver.constraints.growthDirection) {
                 case GrowthDirection.forward:
@@ -482,7 +484,7 @@ namespace Unity.UIWidgets.rendering {
                     break;
             }
 
-            double mainAxisExtent = 0.0;
+            float mainAxisExtent = 0.0f;
             switch (this.axis) {
                 case Axis.horizontal:
                     mainAxisExtent = this.size.width - extentOfPinnedSlivers;
@@ -492,8 +494,8 @@ namespace Unity.UIWidgets.rendering {
                     break;
             }
 
-            double targetOffset = leadingScrollOffset - (mainAxisExtent - targetMainAxisExtent) * alignment;
-            double offsetDifference = this.offset.pixels - targetOffset;
+            float targetOffset = leadingScrollOffset - (mainAxisExtent - targetMainAxisExtent) * alignment;
+            float offsetDifference = this.offset.pixels - targetOffset;
 
             transform = target.getTransformTo(this);
             this.applyPaintTransform(child, transform);
@@ -501,23 +503,23 @@ namespace Unity.UIWidgets.rendering {
 
             switch (this.axisDirection) {
                 case AxisDirection.down:
-                    targetRect = targetRect.translate(0.0, offsetDifference);
+                    targetRect = targetRect.translate(0.0f, offsetDifference);
                     break;
                 case AxisDirection.right:
-                    targetRect = targetRect.translate(offsetDifference, 0.0);
+                    targetRect = targetRect.translate(offsetDifference, 0.0f);
                     break;
                 case AxisDirection.up:
-                    targetRect = targetRect.translate(0.0, -offsetDifference);
+                    targetRect = targetRect.translate(0.0f, -offsetDifference);
                     break;
                 case AxisDirection.left:
-                    targetRect = targetRect.translate(-offsetDifference, 0.0);
+                    targetRect = targetRect.translate(-offsetDifference, 0.0f);
                     break;
             }
 
             return new RevealedOffset(offset: targetOffset, rect: targetRect);
         }
 
-        protected Offset computeAbsolutePaintOffset(RenderSliver child, double layoutOffset,
+        protected Offset computeAbsolutePaintOffset(RenderSliver child, float layoutOffset,
             GrowthDirection growthDirection) {
             D.assert(this.hasSize);
             D.assert(child != null);
@@ -525,13 +527,13 @@ namespace Unity.UIWidgets.rendering {
 
             switch (GrowthDirectionUtils.applyGrowthDirectionToAxisDirection(this.axisDirection, growthDirection)) {
                 case AxisDirection.up:
-                    return new Offset(0.0, this.size.height - (layoutOffset + child.geometry.paintExtent));
+                    return new Offset(0.0f, this.size.height - (layoutOffset + child.geometry.paintExtent));
                 case AxisDirection.right:
-                    return new Offset(layoutOffset, 0.0);
+                    return new Offset(layoutOffset, 0.0f);
                 case AxisDirection.down:
-                    return new Offset(0.0, layoutOffset);
+                    return new Offset(0.0f, layoutOffset);
                 case AxisDirection.left:
-                    return new Offset(this.size.width - (layoutOffset + child.geometry.paintExtent), 0.0);
+                    return new Offset(this.size.width - (layoutOffset + child.geometry.paintExtent), 0.0f);
             }
 
             return null;
@@ -571,16 +573,16 @@ namespace Unity.UIWidgets.rendering {
         protected abstract void
             updateOutOfBandData(GrowthDirection growthDirection, SliverGeometry childLayoutGeometry);
 
-        protected abstract void updateChildLayoutOffset(RenderSliver child, double layoutOffset,
+        protected abstract void updateChildLayoutOffset(RenderSliver child, float layoutOffset,
             GrowthDirection growthDirection);
 
         protected abstract Offset paintOffsetOf(RenderSliver child);
 
-        protected abstract double scrollOffsetOf(RenderSliver child, double scrollOffsetWithinChild);
+        protected abstract float scrollOffsetOf(RenderSliver child, float scrollOffsetWithinChild);
 
-        protected abstract double maxScrollObstructionExtentBefore(RenderSliver child);
+        protected abstract float maxScrollObstructionExtentBefore(RenderSliver child);
 
-        protected abstract double computeChildMainAxisPosition(RenderSliver child, double parentMainAxisPosition);
+        protected abstract float computeChildMainAxisPosition(RenderSliver child, float parentMainAxisPosition);
 
         protected abstract int indexOfFirstChild { get; }
 
@@ -640,8 +642,8 @@ namespace Unity.UIWidgets.rendering {
                 return rect;
             }
 
-            RevealedOffset leadingEdgeOffset = viewport.getOffsetToReveal(descendant, 0.0, rect: rect);
-            RevealedOffset trailingEdgeOffset = viewport.getOffsetToReveal(descendant, 1.0, rect: rect);
+            RevealedOffset leadingEdgeOffset = viewport.getOffsetToReveal(descendant, 0.0f, rect: rect);
+            RevealedOffset trailingEdgeOffset = viewport.getOffsetToReveal(descendant, 1.0f, rect: rect);
             double currentOffset = offset.pixels;
 
 
@@ -684,7 +686,7 @@ namespace Unity.UIWidgets.rendering {
             double anchor = 0.0,
             List<RenderSliver> children = null,
             RenderSliver center = null,
-            double cacheExtent = RenderViewportUtils.defaultCacheExtent
+            float cacheExtent = RenderViewportUtils.defaultCacheExtent
         ) : base(axisDirection, crossAxisDirection, offset, cacheExtent) {
             D.assert(anchor >= 0.0 && anchor <= 1.0);
             this._anchor = anchor;
@@ -827,12 +829,12 @@ namespace Unity.UIWidgets.rendering {
                 this._minScrollExtent = 0.0;
                 this._maxScrollExtent = 0.0;
                 this._hasVisualOverflow = false;
-                this.offset.applyContentDimensions(0.0, 0.0);
+                this.offset.applyContentDimensions(0.0f, 0.0f);
                 return;
             }
 
-            double mainAxisExtent = 0.0;
-            double crossAxisExtent = 0.0;
+            float mainAxisExtent = 0.0f;
+            float crossAxisExtent = 0.0f;
             switch (this.axis) {
                 case Axis.vertical:
                     mainAxisExtent = this.size.height;
@@ -844,7 +846,7 @@ namespace Unity.UIWidgets.rendering {
                     break;
             }
 
-            double centerOffsetAdjustment = this.center.centerOffsetAdjustment;
+            float centerOffsetAdjustment = this.center.centerOffsetAdjustment;
 
             int count = 0;
             do {
@@ -855,8 +857,8 @@ namespace Unity.UIWidgets.rendering {
                 }
                 else {
                     if (this.offset.applyContentDimensions(
-                        Math.Min(0.0, this._minScrollExtent + mainAxisExtent * this.anchor),
-                        Math.Max(0.0, this._maxScrollExtent - mainAxisExtent * (1.0 - this.anchor))
+                        (float) Math.Min(0.0, this._minScrollExtent + mainAxisExtent * this.anchor),
+                        (float) Math.Max(0.0, this._maxScrollExtent - mainAxisExtent * (1.0 - this.anchor))
                     )) {
                         break;
                     }
@@ -892,7 +894,7 @@ namespace Unity.UIWidgets.rendering {
             });
         }
 
-        double _attemptLayout(double mainAxisExtent, double crossAxisExtent, double correctedOffset) {
+        float _attemptLayout(float mainAxisExtent, float crossAxisExtent, float correctedOffset) {
             D.assert(!mainAxisExtent.isNaN());
             D.assert(mainAxisExtent >= 0.0);
             D.assert(crossAxisExtent.isFinite());
@@ -916,18 +918,18 @@ namespace Unity.UIWidgets.rendering {
             RenderSliver leadingNegativeChild = this.childBefore(this.center);
 
             if (leadingNegativeChild != null) {
-                double result = this.layoutChildSequence(
+                float result = this.layoutChildSequence(
                     child: leadingNegativeChild,
-                    scrollOffset: Math.Max(mainAxisExtent, centerOffset) - mainAxisExtent,
-                    overlap: 0.0,
-                    layoutOffset: forwardDirectionRemainingPaintExtent,
-                    remainingPaintExtent: reverseDirectionRemainingPaintExtent,
+                    scrollOffset: (float) Math.Max(mainAxisExtent, centerOffset) - mainAxisExtent,
+                    overlap: 0.0f,
+                    layoutOffset: (float) forwardDirectionRemainingPaintExtent,
+                    remainingPaintExtent: (float) reverseDirectionRemainingPaintExtent,
                     mainAxisExtent: mainAxisExtent,
                     crossAxisExtent: crossAxisExtent,
                     growthDirection: GrowthDirection.reverse,
                     advance: this.childBefore,
-                    remainingCacheExtent: reverseDirectionRemainingCacheExtent,
-                    cacheOrigin: (mainAxisExtent - centerOffset).clamp(-this.cacheExtent, 0.0)
+                    remainingCacheExtent: (float) reverseDirectionRemainingCacheExtent,
+                    cacheOrigin: (float) (mainAxisExtent - centerOffset).clamp(-this.cacheExtent, 0.0)
                 );
                 if (result != 0.0) {
                     return -result;
@@ -936,16 +938,18 @@ namespace Unity.UIWidgets.rendering {
 
             return this.layoutChildSequence(
                 child: this.center,
-                scrollOffset: Math.Max(0.0, -centerOffset),
-                overlap: leadingNegativeChild == null ? Math.Min(0.0, -centerOffset) : 0.0,
-                layoutOffset: centerOffset >= mainAxisExtent ? centerOffset : reverseDirectionRemainingPaintExtent,
-                remainingPaintExtent: forwardDirectionRemainingPaintExtent,
+                scrollOffset: (float) Math.Max(0.0, -centerOffset),
+                overlap: leadingNegativeChild == null ? (float) Math.Min(0.0, -centerOffset) : 0.0f,
+                layoutOffset: centerOffset >= mainAxisExtent
+                    ? (float) centerOffset
+                    : (float) reverseDirectionRemainingPaintExtent,
+                remainingPaintExtent: (float) forwardDirectionRemainingPaintExtent,
                 mainAxisExtent: mainAxisExtent,
                 crossAxisExtent: crossAxisExtent,
                 growthDirection: GrowthDirection.forward,
                 advance: this.childAfter,
-                remainingCacheExtent: forwardDirectionRemainingCacheExtent,
-                cacheOrigin: centerOffset.clamp(-this.cacheExtent, 0.0)
+                remainingCacheExtent: (float) forwardDirectionRemainingCacheExtent,
+                cacheOrigin: (float) centerOffset.clamp(-this.cacheExtent, 0.0)
             );
         }
 
@@ -969,7 +973,7 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
-        protected override void updateChildLayoutOffset(RenderSliver child, double layoutOffset,
+        protected override void updateChildLayoutOffset(RenderSliver child, float layoutOffset,
             GrowthDirection growthDirection) {
             var childParentData = (SliverPhysicalParentData) child.parentData;
             childParentData.paintOffset = this.computeAbsolutePaintOffset(child, layoutOffset, growthDirection);
@@ -980,13 +984,13 @@ namespace Unity.UIWidgets.rendering {
             return childParentData.paintOffset;
         }
 
-        protected override double scrollOffsetOf(RenderSliver child, double scrollOffsetWithinChild) {
+        protected override float scrollOffsetOf(RenderSliver child, float scrollOffsetWithinChild) {
             D.assert(child.parent == this);
 
             GrowthDirection growthDirection = child.constraints.growthDirection;
             switch (growthDirection) {
                 case GrowthDirection.forward: {
-                    double scrollOffsetToChild = 0.0;
+                    float scrollOffsetToChild = 0.0f;
                     RenderSliver current = this.center;
                     while (current != child) {
                         scrollOffsetToChild += current.geometry.scrollExtent;
@@ -996,7 +1000,7 @@ namespace Unity.UIWidgets.rendering {
                     return scrollOffsetToChild + scrollOffsetWithinChild;
                 }
                 case GrowthDirection.reverse: {
-                    double scrollOffsetToChild = 0.0;
+                    float scrollOffsetToChild = 0.0f;
                     RenderSliver current = this.childBefore(this.center);
                     while (current != child) {
                         scrollOffsetToChild -= current.geometry.scrollExtent;
@@ -1008,16 +1012,16 @@ namespace Unity.UIWidgets.rendering {
             }
 
             D.assert(false);
-            return 0.0;
+            return 0.0f;
         }
 
-        protected override double maxScrollObstructionExtentBefore(RenderSliver child) {
+        protected override float maxScrollObstructionExtentBefore(RenderSliver child) {
             D.assert(child.parent == this);
 
             GrowthDirection growthDirection = child.constraints.growthDirection;
             switch (growthDirection) {
                 case GrowthDirection.forward: {
-                    double pinnedExtent = 0.0;
+                    float pinnedExtent = 0.0f;
                     RenderSliver current = this.center;
                     while (current != child) {
                         pinnedExtent += current.geometry.maxScrollObstructionExtent;
@@ -1027,7 +1031,7 @@ namespace Unity.UIWidgets.rendering {
                     return pinnedExtent;
                 }
                 case GrowthDirection.reverse: {
-                    double pinnedExtent = 0.0;
+                    float pinnedExtent = 0.0f;
                     RenderSliver current = this.childBefore(this.center);
                     while (current != child) {
                         pinnedExtent += current.geometry.maxScrollObstructionExtent;
@@ -1039,7 +1043,7 @@ namespace Unity.UIWidgets.rendering {
             }
 
             D.assert(false);
-            return 0.0;
+            return 0.0f;
         }
 
         public override void applyPaintTransform(RenderObject child, Matrix3 transform) {
@@ -1049,7 +1053,7 @@ namespace Unity.UIWidgets.rendering {
             childParentData.applyPaintTransform(transform);
         }
 
-        protected override double computeChildMainAxisPosition(RenderSliver child, double parentMainAxisPosition) {
+        protected override float computeChildMainAxisPosition(RenderSliver child, float parentMainAxisPosition) {
             D.assert(child != null);
             D.assert(child.constraints != null);
             SliverPhysicalParentData childParentData = (SliverPhysicalParentData) child.parentData;
@@ -1066,7 +1070,7 @@ namespace Unity.UIWidgets.rendering {
             }
 
             D.assert(false);
-            return 0.0;
+            return 0.0f;
         }
 
         protected override int indexOfFirstChild {
@@ -1180,8 +1184,8 @@ namespace Unity.UIWidgets.rendering {
             return true;
         }
 
-        double _maxScrollExtent = 0.0;
-        double _shrinkWrapExtent = 0.0;
+        float _maxScrollExtent = 0.0f;
+        float _shrinkWrapExtent = 0.0f;
         bool _hasVisualOverflow = false;
 
         protected override void performLayout() {
@@ -1197,16 +1201,16 @@ namespace Unity.UIWidgets.rendering {
                         break;
                 }
 
-                this.offset.applyViewportDimension(0.0);
-                this._maxScrollExtent = 0.0;
-                this._shrinkWrapExtent = 0.0;
+                this.offset.applyViewportDimension(0.0f);
+                this._maxScrollExtent = 0.0f;
+                this._shrinkWrapExtent = 0.0f;
                 this._hasVisualOverflow = false;
-                this.offset.applyContentDimensions(0.0, 0.0);
+                this.offset.applyContentDimensions(0.0f, 0.0f);
                 return;
             }
 
-            double mainAxisExtent = 0.0;
-            double crossAxisExtent = 0.0;
+            float mainAxisExtent = 0.0f;
+            float crossAxisExtent = 0.0f;
             switch (this.axis) {
                 case Axis.vertical:
                     D.assert(this.constraints.hasBoundedWidth);
@@ -1220,7 +1224,7 @@ namespace Unity.UIWidgets.rendering {
                     break;
             }
 
-            double effectiveExtent = 0.0;
+            float effectiveExtent = 0.0f;
             do {
                 var correction = this._attemptLayout(mainAxisExtent, crossAxisExtent, this.offset.pixels);
                 if (correction != 0.0) {
@@ -1238,7 +1242,8 @@ namespace Unity.UIWidgets.rendering {
 
                     bool didAcceptViewportDimension = this.offset.applyViewportDimension(effectiveExtent);
                     bool didAcceptContentDimension =
-                        this.offset.applyContentDimensions(0.0, Math.Max(0.0, this._maxScrollExtent - effectiveExtent));
+                        this.offset.applyContentDimensions(0.0f,
+                            (float) Math.Max(0.0, this._maxScrollExtent - effectiveExtent));
                     if (didAcceptViewportDimension && didAcceptContentDimension) {
                         break;
                     }
@@ -1255,22 +1260,22 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
-        double _attemptLayout(double mainAxisExtent, double crossAxisExtent, double correctedOffset) {
+        float _attemptLayout(float mainAxisExtent, float crossAxisExtent, float correctedOffset) {
             D.assert(!mainAxisExtent.isNaN());
             D.assert(mainAxisExtent >= 0.0);
             D.assert(crossAxisExtent.isFinite());
             D.assert(crossAxisExtent >= 0.0);
             D.assert(correctedOffset.isFinite());
 
-            this._maxScrollExtent = 0.0;
-            this._shrinkWrapExtent = 0.0;
+            this._maxScrollExtent = 0.0f;
+            this._shrinkWrapExtent = 0.0f;
             this._hasVisualOverflow = false;
 
             return this.layoutChildSequence(
                 child: this.firstChild,
-                scrollOffset: Math.Max(0.0, correctedOffset),
-                overlap: Math.Min(0.0, correctedOffset),
-                layoutOffset: 0.0,
+                scrollOffset: (float) Math.Max(0.0, correctedOffset),
+                overlap: (float) Math.Min(0.0, correctedOffset),
+                layoutOffset: 0.0f,
                 remainingPaintExtent: mainAxisExtent,
                 mainAxisExtent: mainAxisExtent,
                 crossAxisExtent: crossAxisExtent,
@@ -1297,7 +1302,7 @@ namespace Unity.UIWidgets.rendering {
             this._shrinkWrapExtent += childLayoutGeometry.maxPaintExtent;
         }
 
-        protected override void updateChildLayoutOffset(RenderSliver child, double layoutOffset,
+        protected override void updateChildLayoutOffset(RenderSliver child, float layoutOffset,
             GrowthDirection growthDirection) {
             D.assert(growthDirection == GrowthDirection.forward);
 
@@ -1310,11 +1315,11 @@ namespace Unity.UIWidgets.rendering {
             return this.computeAbsolutePaintOffset(child, childParentData.layoutOffset, GrowthDirection.forward);
         }
 
-        protected override double scrollOffsetOf(RenderSliver child, double scrollOffsetWithinChild) {
+        protected override float scrollOffsetOf(RenderSliver child, float scrollOffsetWithinChild) {
             D.assert(child.parent == this);
             D.assert(child.constraints.growthDirection == GrowthDirection.forward);
 
-            double scrollOffsetToChild = 0.0;
+            float scrollOffsetToChild = 0.0f;
             RenderSliver current = this.firstChild;
             while (current != child) {
                 scrollOffsetToChild += current.geometry.scrollExtent;
@@ -1324,11 +1329,11 @@ namespace Unity.UIWidgets.rendering {
             return scrollOffsetToChild + scrollOffsetWithinChild;
         }
 
-        protected override double maxScrollObstructionExtentBefore(RenderSliver child) {
+        protected override float maxScrollObstructionExtentBefore(RenderSliver child) {
             D.assert(child.parent == this);
             D.assert(child.constraints.growthDirection == GrowthDirection.forward);
 
-            double pinnedExtent = 0.0;
+            float pinnedExtent = 0.0f;
             RenderSliver current = this.firstChild;
             while (current != child) {
                 pinnedExtent += current.geometry.maxScrollObstructionExtent;
@@ -1345,7 +1350,7 @@ namespace Unity.UIWidgets.rendering {
             transform.preTranslate((float) offset.dx, (float) offset.dy);
         }
 
-        protected override double computeChildMainAxisPosition(RenderSliver child, double parentMainAxisPosition) {
+        protected override float computeChildMainAxisPosition(RenderSliver child, float parentMainAxisPosition) {
             D.assert(child != null);
             D.assert(child.constraints != null);
             D.assert(this.hasSize);
@@ -1362,7 +1367,7 @@ namespace Unity.UIWidgets.rendering {
             }
 
             D.assert(false);
-            return 0.0;
+            return 0.0f;
         }
 
         protected override int indexOfFirstChild {

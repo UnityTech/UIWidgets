@@ -19,7 +19,7 @@ namespace Unity.UIWidgets.material {
             RectCallback rectCallback = null,
             BorderRadius borderRadius = null,
             ShapeBorder customBorder = null,
-            double? radius = null,
+            float? radius = null,
             VoidCallback onRemoved = null
         ) {
             D.assert(controller != null);
@@ -50,7 +50,7 @@ namespace Unity.UIWidgets.material {
             RectCallback rectCallback = null,
             BorderRadius borderRadius = null,
             ShapeBorder customBorder = null,
-            double? radius = null,
+            float? radius = null,
             VoidCallback onRemoved = null
         ) : base(
             controller: controller,
@@ -95,7 +95,7 @@ namespace Unity.UIWidgets.material {
 
         readonly ShapeBorder _customBorder;
 
-        readonly double _targetRadius;
+        readonly float _targetRadius;
 
         readonly RectCallback _clipCallback;
 
@@ -146,7 +146,7 @@ namespace Unity.UIWidgets.material {
                 canvas.concat(transform);
             }
             else {
-                canvas.translate(originOffset.dx, originOffset.dy);
+                canvas.translate((float) originOffset.dx, (float) originOffset.dy);
             }
 
             if (this._clipCallback != null) {

@@ -50,7 +50,7 @@ namespace Unity.UIWidgets.flow {
             var canvas = context.canvas;
 
             canvas.save();
-            canvas.translate(this._offset.dx, this._offset.dy);
+            canvas.translate((float) this._offset.dx, (float) this._offset.dy);
 
             // align to pixel
             var matrix = canvas.getTotalMatrix();

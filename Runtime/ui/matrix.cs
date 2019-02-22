@@ -39,7 +39,7 @@ namespace Unity.UIWidgets.ui {
             m.setTranslate((float) offset.dx, (float) offset.dy);
             return m;
         }
-        
+
         public static Matrix3 makeSkew(float dx, float dy) {
             var m = new Matrix3();
             m.setSkew(dx, dy);

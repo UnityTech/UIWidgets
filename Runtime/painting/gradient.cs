@@ -5,7 +5,6 @@ using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
 
 namespace Unity.UIWidgets.painting {
-
     class _ColorsAndStops {
         public _ColorsAndStops(List<Color> colors, List<double> stops) {
             this.colors = colors;
@@ -62,6 +61,7 @@ namespace Unity.UIWidgets.painting {
             if (this.stops != null) {
                 return this.stops;
             }
+
             if (this.colors.Count == 2) {
                 return null;
             }
@@ -88,6 +88,7 @@ namespace Unity.UIWidgets.painting {
             if (b == null) {
                 return this.scale(1.0 - t);
             }
+
             return null;
         }
 
@@ -117,7 +118,6 @@ namespace Unity.UIWidgets.painting {
 
 
     public class LinearGradient : Gradient, IEquatable<LinearGradient> {
-
         public LinearGradient(
             Alignment begin = null,
             Alignment end = null,
@@ -157,7 +157,7 @@ namespace Unity.UIWidgets.painting {
 
         protected override Gradient lerpFrom(Gradient a, double t) {
             if (a == null || (a is LinearGradient && a.colors.Count == this.colors.Count)) {
-                return LinearGradient.lerp((LinearGradient) a, this, t);
+                return lerp((LinearGradient) a, this, t);
             }
 
             return base.lerpFrom(a, t);
@@ -165,8 +165,9 @@ namespace Unity.UIWidgets.painting {
 
         protected override Gradient lerpTo(Gradient b, double t) {
             if (b == null || (b is LinearGradient && b.colors.Count == this.colors.Count)) {
-                return LinearGradient.lerp(this, (LinearGradient) b, t);
+                return lerp(this, (LinearGradient) b, t);
             }
+
             return base.lerpTo(b, t);
         }
 
@@ -174,9 +175,11 @@ namespace Unity.UIWidgets.painting {
             if (a == null && b == null) {
                 return null;
             }
+
             if (a == null) {
                 return (LinearGradient) b.scale(t);
             }
+
             if (b == null) {
                 return (LinearGradient) a.scale(1.0 - t);
             }
@@ -196,9 +199,11 @@ namespace Unity.UIWidgets.painting {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return
                 this.colors.equalsList(other.colors) &&
                 this.stops.equalsList(other.stops) &&
@@ -211,12 +216,15 @@ namespace Unity.UIWidgets.painting {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((LinearGradient) obj);
         }
 
@@ -239,14 +247,13 @@ namespace Unity.UIWidgets.painting {
             return !Equals(left, right);
         }
 
-        public override String ToString() {
+        public override string ToString() {
             return $"{this.GetType()}({this.begin}, {this.end}," +
                    $"{this.colors.toStringList()}, {this.stops.toStringList()}, {this.tileMode})";
         }
     }
 
     public class RadialGradient : Gradient, IEquatable<RadialGradient> {
-
         public RadialGradient(
             Alignment center = null,
             double radius = 0.5,
@@ -287,7 +294,7 @@ namespace Unity.UIWidgets.painting {
 
         protected override Gradient lerpFrom(Gradient a, double t) {
             if (a == null || (a is RadialGradient && a.colors.Count == this.colors.Count)) {
-                return RadialGradient.lerp((RadialGradient) a, this, t);
+                return lerp((RadialGradient) a, this, t);
             }
 
             return base.lerpFrom(a, t);
@@ -295,8 +302,9 @@ namespace Unity.UIWidgets.painting {
 
         protected override Gradient lerpTo(Gradient b, double t) {
             if (b == null || (b is RadialGradient && b.colors.Count == this.colors.Count)) {
-                return RadialGradient.lerp(this, (RadialGradient) b, t);
+                return lerp(this, (RadialGradient) b, t);
             }
+
             return base.lerpTo(b, t);
         }
 
@@ -304,9 +312,11 @@ namespace Unity.UIWidgets.painting {
             if (a == null && b == null) {
                 return null;
             }
+
             if (a == null) {
                 return (RadialGradient) b.scale(t);
             }
+
             if (b == null) {
                 return (RadialGradient) a.scale(1.0 - t);
             }
@@ -326,9 +336,11 @@ namespace Unity.UIWidgets.painting {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return
                 this.colors.equalsList(other.colors) &&
                 this.stops.equalsList(other.stops) &&
@@ -341,12 +353,15 @@ namespace Unity.UIWidgets.painting {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((RadialGradient) obj);
         }
 
@@ -369,14 +384,13 @@ namespace Unity.UIWidgets.painting {
             return !Equals(left, right);
         }
 
-        public override String ToString() {
+        public override string ToString() {
             return $"{this.GetType()}({this.center}, {this.radius}," +
                    $"{this.colors.toStringList()}, {this.stops.toStringList()}, {this.tileMode})";
         }
     }
-    
-      public class SweepGradient : Gradient, IEquatable<SweepGradient> {
 
+    public class SweepGradient : Gradient, IEquatable<SweepGradient> {
         public SweepGradient(
             Alignment center = null,
             double startAngle = 0.0,
@@ -394,7 +408,7 @@ namespace Unity.UIWidgets.painting {
         public readonly Alignment center;
 
         public readonly double startAngle;
-        
+
         public readonly double endAngle;
 
         public readonly TileMode tileMode;
@@ -422,7 +436,7 @@ namespace Unity.UIWidgets.painting {
 
         protected override Gradient lerpFrom(Gradient a, double t) {
             if (a == null || (a is SweepGradient && a.colors.Count == this.colors.Count)) {
-                return SweepGradient.lerp((SweepGradient) a, this, t);
+                return lerp((SweepGradient) a, this, t);
             }
 
             return base.lerpFrom(a, t);
@@ -430,8 +444,9 @@ namespace Unity.UIWidgets.painting {
 
         protected override Gradient lerpTo(Gradient b, double t) {
             if (b == null || (b is SweepGradient && b.colors.Count == this.colors.Count)) {
-                return SweepGradient.lerp(this, (SweepGradient) b, t);
+                return lerp(this, (SweepGradient) b, t);
             }
+
             return base.lerpTo(b, t);
         }
 
@@ -439,9 +454,11 @@ namespace Unity.UIWidgets.painting {
             if (a == null && b == null) {
                 return null;
             }
+
             if (a == null) {
                 return (SweepGradient) b.scale(t);
             }
+
             if (b == null) {
                 return (SweepGradient) a.scale(1.0 - t);
             }
@@ -462,9 +479,11 @@ namespace Unity.UIWidgets.painting {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return
                 this.colors.equalsList(other.colors) &&
                 this.stops.equalsList(other.stops) &&
@@ -478,12 +497,15 @@ namespace Unity.UIWidgets.painting {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((SweepGradient) obj);
         }
 
@@ -507,7 +529,7 @@ namespace Unity.UIWidgets.painting {
             return !Equals(left, right);
         }
 
-        public override String ToString() {
+        public override string ToString() {
             return $"{this.GetType()}({this.center}, {this.startAngle}, {this.endAngle}, " +
                    $"{this.colors.toStringList()}, {this.stops.toStringList()}, {this.tileMode})";
         }

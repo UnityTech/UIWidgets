@@ -12,19 +12,19 @@ namespace Unity.UIWidgets.painting {
         TextSpan _text;
         TextAlign _textAlign;
         TextDirection? _textDirection;
-        double _textScaleFactor;
+        float _textScaleFactor;
         Paragraph _layoutTemplate;
         Paragraph _paragraph;
         bool _needsLayout = true;
         int? _maxLines;
         string _ellipsis;
-        double _lastMinWidth;
-        double _lastMaxWidth;
+        float _lastMinWidth;
+        float _lastMaxWidth;
 
         public TextPainter(TextSpan text,
             TextAlign textAlign = TextAlign.left,
             TextDirection textDirection = TextDirection.ltr,
-            double textScaleFactor = 1.0,
+            float textScaleFactor = 1.0f,
             int? maxLines = null,
             string ellipsis = "") {
             this._text = text;
@@ -36,7 +36,7 @@ namespace Unity.UIWidgets.painting {
         }
 
 
-        public double textScaleFactor {
+        public float textScaleFactor {
             get { return this._textScaleFactor; }
             set {
                 if (this._textScaleFactor == value) {
@@ -134,35 +134,35 @@ namespace Unity.UIWidgets.painting {
             }
         }
 
-        public double minIntrinsicWidth {
+        public float minIntrinsicWidth {
             get {
                 Debug.Assert(!this._needsLayout);
                 return this._applyFloatingPointHack(this._paragraph.minIntrinsicWidth);
             }
         }
 
-        public double maxIntrinsicWidth {
+        public float maxIntrinsicWidth {
             get {
                 Debug.Assert(!this._needsLayout);
                 return this._applyFloatingPointHack(this._paragraph.maxIntrinsicWidth);
             }
         }
 
-        public double height {
+        public float height {
             get {
                 Debug.Assert(!this._needsLayout);
                 return this._applyFloatingPointHack(this._paragraph.height);
             }
         }
 
-        public double width {
+        public float width {
             get {
                 Debug.Assert(!this._needsLayout);
                 return this._applyFloatingPointHack(this._paragraph.width);
             }
         }
 
-        public double computeDistanceToActualBaseline(TextBaseline baseline) {
+        public float computeDistanceToActualBaseline(TextBaseline baseline) {
             Debug.Assert(!this._needsLayout);
             switch (baseline) {
                 case TextBaseline.alphabetic:
@@ -171,10 +171,10 @@ namespace Unity.UIWidgets.painting {
                     return this._paragraph.ideographicBaseline;
             }
 
-            return 0.0;
+            return 0.0f;
         }
 
-        public void layout(double minWidth = 0.0, double maxWidth = double.PositiveInfinity) {
+        public void layout(float minWidth = 0.0f, float maxWidth = float.PositiveInfinity) {
             Debug.Assert(this.text != null,
                 "TextPainter.text must be set to a non-null value before using the TextPainter.");
             Debug.Assert(this.textDirection != null,
@@ -331,7 +331,7 @@ namespace Unity.UIWidgets.painting {
                 this.ellipsis, this.maxLines, this.textScaleFactor);
         }
 
-        public double preferredLineHeight {
+        public float preferredLineHeight {
             get {
                 if (this._layoutTemplate == null) {
                     var builder = new ParagraphBuilder(this._createParagraphStyle(TextDirection.ltr)
@@ -342,15 +342,15 @@ namespace Unity.UIWidgets.painting {
 
                     builder.addText(" ");
                     this._layoutTemplate = builder.build();
-                    this._layoutTemplate.layout(new ParagraphConstraints(double.PositiveInfinity));
+                    this._layoutTemplate.layout(new ParagraphConstraints(float.PositiveInfinity));
                 }
 
                 return this._layoutTemplate.height;
             }
         }
 
-        double _applyFloatingPointHack(double layoutValue) {
-            return Math.Ceiling(layoutValue);
+        float _applyFloatingPointHack(double layoutValue) {
+            return (float) Math.Ceiling(layoutValue);
         }
 
 
@@ -397,12 +397,12 @@ namespace Unity.UIWidgets.painting {
                     case TextAlign.left:
                         return Offset.zero;
                     case TextAlign.right:
-                        return new Offset(this.width, 0.0);
+                        return new Offset(this.width, 0.0f);
                     case TextAlign.center:
-                        return new Offset(this.width / 2.0, 0.0);
+                        return new Offset(this.width / 2.0f, 0.0f);
                     case TextAlign.justify:
                         if (this.textDirection == TextDirection.rtl) {
-                            return new Offset(this.width, 0.0);
+                            return new Offset(this.width, 0.0f);
                         }
 
                         return Offset.zero;

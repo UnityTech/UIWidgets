@@ -20,14 +20,14 @@ namespace Unity.UIWidgets.painting {
             get { return EdgeInsets.all(this.side.width); }
         }
 
-        public override ShapeBorder scale(double t) {
+        public override ShapeBorder scale(float t) {
             return new RoundedRectangleBorder(
                 side: this.side.scale(t),
                 borderRadius: this.borderRadius * t
             );
         }
 
-        public override ShapeBorder lerpFrom(ShapeBorder a, double t) {
+        public override ShapeBorder lerpFrom(ShapeBorder a, float t) {
             if (a is RoundedRectangleBorder border) {
                 return new RoundedRectangleBorder(
                     side: BorderSide.lerp(border.side, this.side, t),
@@ -39,14 +39,14 @@ namespace Unity.UIWidgets.painting {
                 return new _RoundedRectangleToCircleBorder(
                     side: BorderSide.lerp(circleBorder.side, this.side, t),
                     borderRadius: this.borderRadius,
-                    circleness: 1.0 - t
+                    circleness: 1.0f - t
                 );
             }
 
             return base.lerpFrom(a, t);
         }
 
-        public override ShapeBorder lerpTo(ShapeBorder b, double t) {
+        public override ShapeBorder lerpTo(ShapeBorder b, float t) {
             if (b is RoundedRectangleBorder border) {
                 return new RoundedRectangleBorder(
                     side: BorderSide.lerp(this.side, border.side, t),
@@ -82,7 +82,7 @@ namespace Unity.UIWidgets.painting {
                 case BorderStyle.none:
                     break;
                 case BorderStyle.solid:
-                    double width = this.side.width;
+                    float width = this.side.width;
                     if (width == 0.0) {
                         canvas.drawRRect(this.borderRadius.toRRect(rect), this.side.toPaint());
                     }
@@ -151,7 +151,7 @@ namespace Unity.UIWidgets.painting {
         public _RoundedRectangleToCircleBorder(
             BorderSide side = null,
             BorderRadius borderRadius = null,
-            double circleness = 0.0
+            float circleness = 0.0f
         ) {
             this.side = side ?? BorderSide.none;
             this.borderRadius = borderRadius ?? BorderRadius.zero;
@@ -162,13 +162,13 @@ namespace Unity.UIWidgets.painting {
 
         public readonly BorderRadius borderRadius;
 
-        public readonly double circleness;
+        public readonly float circleness;
 
         public override EdgeInsets dimensions {
             get { return EdgeInsets.all(this.side.width); }
         }
 
-        public override ShapeBorder scale(double t) {
+        public override ShapeBorder scale(float t) {
             return new _RoundedRectangleToCircleBorder(
                 side: this.side.scale(t),
                 borderRadius: this.borderRadius * t,
@@ -176,7 +176,7 @@ namespace Unity.UIWidgets.painting {
             );
         }
 
-        public override ShapeBorder lerpFrom(ShapeBorder a, double t) {
+        public override ShapeBorder lerpFrom(ShapeBorder a, float t) {
             if (a is RoundedRectangleBorder rectBorder) {
                 return new _RoundedRectangleToCircleBorder(
                     side: BorderSide.lerp(rectBorder.side, this.side, t),
@@ -189,7 +189,7 @@ namespace Unity.UIWidgets.painting {
                 return new _RoundedRectangleToCircleBorder(
                     side: BorderSide.lerp(circleBorder.side, this.side, t),
                     borderRadius: this.borderRadius,
-                    circleness: this.circleness + (1.0 - this.circleness) * (1.0 - t)
+                    circleness: this.circleness + (1.0f - this.circleness) * (1.0f - t)
                 );
             }
 
@@ -197,19 +197,19 @@ namespace Unity.UIWidgets.painting {
                 return new _RoundedRectangleToCircleBorder(
                     side: BorderSide.lerp(border.side, this.side, t),
                     borderRadius: BorderRadius.lerp(border.borderRadius, this.borderRadius, t),
-                    circleness: MathUtils.lerpDouble(border.circleness, this.circleness, t)
+                    circleness: MathUtils.lerpFloat(border.circleness, this.circleness, t)
                 );
             }
 
             return base.lerpFrom(a, t);
         }
 
-        public override ShapeBorder lerpTo(ShapeBorder b, double t) {
+        public override ShapeBorder lerpTo(ShapeBorder b, float t) {
             if (b is RoundedRectangleBorder rectBorder) {
                 return new _RoundedRectangleToCircleBorder(
                     side: BorderSide.lerp(this.side, rectBorder.side, t),
                     borderRadius: BorderRadius.lerp(this.borderRadius, rectBorder.borderRadius, t),
-                    circleness: this.circleness * (1.0 - t)
+                    circleness: this.circleness * (1.0f - t)
                 );
             }
 
@@ -217,7 +217,7 @@ namespace Unity.UIWidgets.painting {
                 return new _RoundedRectangleToCircleBorder(
                     side: BorderSide.lerp(this.side, circleBorder.side, t),
                     borderRadius: this.borderRadius,
-                    circleness: this.circleness + (1.0 - this.circleness) * t
+                    circleness: this.circleness + (1.0f - this.circleness) * t
                 );
             }
 
@@ -225,7 +225,7 @@ namespace Unity.UIWidgets.painting {
                 return new _RoundedRectangleToCircleBorder(
                     side: BorderSide.lerp(this.side, border.side, t),
                     borderRadius: BorderRadius.lerp(this.borderRadius, border.borderRadius, t),
-                    circleness: MathUtils.lerpDouble(this.circleness, border.circleness, t)
+                    circleness: MathUtils.lerpFloat(this.circleness, border.circleness, t)
                 );
             }
 
@@ -241,17 +241,17 @@ namespace Unity.UIWidgets.painting {
                 double delta = this.circleness * (rect.height - rect.width) / 2.0;
                 return Rect.fromLTRB(
                     rect.left,
-                    rect.top + delta,
+                    (float) (rect.top + delta),
                     rect.right,
-                    rect.bottom - delta
+                    (float) (rect.bottom - delta)
                 );
             }
             else {
                 double delta = this.circleness * (rect.width - rect.height) / 2.0;
                 return Rect.fromLTRB(
-                    rect.left + delta,
+                    (float) (rect.left + delta),
                     rect.top,
-                    rect.right - delta,
+                    (float) (rect.right - delta),
                     rect.bottom
                 );
             }
@@ -259,11 +259,11 @@ namespace Unity.UIWidgets.painting {
 
         BorderRadius _adjustBorderRadius(Rect rect) {
             BorderRadius resolvedRadius = this.borderRadius;
-            if (this.circleness == 0.0) {
+            if (this.circleness == 0.0f) {
                 return resolvedRadius;
             }
 
-            return BorderRadius.lerp(resolvedRadius, BorderRadius.circular(rect.shortestSide / 2.0), this.circleness);
+            return BorderRadius.lerp(resolvedRadius, BorderRadius.circular(rect.shortestSide / 2.0f), this.circleness);
         }
 
         public override Path getInnerPath(Rect rect) {
@@ -283,7 +283,7 @@ namespace Unity.UIWidgets.painting {
                 case BorderStyle.none:
                     break;
                 case BorderStyle.solid:
-                    double width = this.side.width;
+                    float width = this.side.width;
                     if (width == 0.0) {
                         canvas.drawRRect(this._adjustBorderRadius(rect).toRRect(this._adjustRect(rect)),
                             this.side.toPaint());

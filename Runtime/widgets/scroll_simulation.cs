@@ -6,10 +6,10 @@ using Unity.UIWidgets.ui;
 namespace Unity.UIWidgets.widgets {
     public class BouncingScrollSimulation : Simulation {
         public BouncingScrollSimulation(
-            double position,
-            double velocity,
-            double leadingExtent,
-            double trailingExtent,
+            float position,
+            float velocity,
+            float leadingExtent,
+            float trailingExtent,
             SpringDescription spring,
             Tolerance tolerance = null
         ) : base(tolerance: tolerance) {
@@ -22,63 +22,68 @@ namespace Unity.UIWidgets.widgets {
 
             if (position < leadingExtent) {
                 this._springSimulation = this._underscrollSimulation(position, velocity);
-                this._springTime = double.NegativeInfinity;
-            } else if (position > trailingExtent) {
+                this._springTime = float.NegativeInfinity;
+            }
+            else if (position > trailingExtent) {
                 this._springSimulation = this._overscrollSimulation(position, velocity);
-                this._springTime = double.NegativeInfinity;
-            } else {
-                this._frictionSimulation = new FrictionSimulation(0.135, position, velocity);
+                this._springTime = float.NegativeInfinity;
+            }
+            else {
+                this._frictionSimulation = new FrictionSimulation(0.135f, position, velocity);
                 double finalX = this._frictionSimulation.finalX;
                 if (velocity > 0.0 && finalX > trailingExtent) {
                     this._springTime = this._frictionSimulation.timeAtX(trailingExtent);
                     this._springSimulation = this._overscrollSimulation(
                         trailingExtent,
-                        Math.Min(this._frictionSimulation.dx(this._springTime),
+                        (float) Math.Min(this._frictionSimulation.dx(this._springTime),
                             maxSpringTransferVelocity)
                     );
                     D.assert(this._springTime.isFinite());
-                } else if (velocity < 0.0 && finalX < leadingExtent) {
+                }
+                else if (velocity < 0.0 && finalX < leadingExtent) {
                     this._springTime = this._frictionSimulation.timeAtX(leadingExtent);
                     this._springSimulation = this._underscrollSimulation(
                         leadingExtent,
-                        Math.Min(this._frictionSimulation.dx(this._springTime),
+                        (float) Math.Min(this._frictionSimulation.dx(this._springTime),
                             maxSpringTransferVelocity)
                     );
                     D.assert(this._springTime.isFinite());
-                } else {
-                    this._springTime = double.PositiveInfinity;
+                }
+                else {
+                    this._springTime = float.PositiveInfinity;
                 }
             }
         }
 
         const double maxSpringTransferVelocity = 5000.0;
 
-        public readonly double leadingExtent;
+        public readonly float leadingExtent;
 
-        public readonly double trailingExtent;
+        public readonly float trailingExtent;
 
         public readonly SpringDescription spring;
 
         readonly FrictionSimulation _frictionSimulation;
         readonly Simulation _springSimulation;
-        readonly double _springTime;
-        double _timeOffset = 0.0;
+        readonly float _springTime;
+        float _timeOffset = 0.0f;
 
-        Simulation _underscrollSimulation(double x, double dx) {
+        Simulation _underscrollSimulation(float x, float dx) {
             return new ScrollSpringSimulation(this.spring, x, this.leadingExtent, dx);
         }
 
-        Simulation _overscrollSimulation(double x, double dx) {
+        Simulation _overscrollSimulation(float x, float dx) {
             return new ScrollSpringSimulation(this.spring, x, this.trailingExtent, dx);
         }
 
         Simulation _simulation(double time) {
             Simulation simulation;
             if (time > this._springTime) {
-                this._timeOffset = this._springTime.isFinite() ? this._springTime : 0.0;
+                this._timeOffset = this._springTime.isFinite() ? this._springTime : 0.0f;
                 simulation = this._springSimulation;
-            } else {
-                this._timeOffset = 0.0;
+            }
+            else {
+                this._timeOffset = 0.0f;
                 simulation = this._frictionSimulation;
             }
 
@@ -86,15 +91,15 @@ namespace Unity.UIWidgets.widgets {
             return simulation;
         }
 
-        public override double x(double time) {
+        public override float x(float time) {
             return this._simulation(time).x(time - this._timeOffset);
         }
 
-        public override double dx(double time) {
+        public override float dx(float time) {
             return this._simulation(time).dx(time - this._timeOffset);
         }
 
-        public override bool isDone(double time) {
+        public override bool isDone(float time) {
             return this._simulation(time).isDone(time - this._timeOffset);
         }
 
@@ -154,19 +159,19 @@ namespace Unity.UIWidgets.widgets {
             return (3.6 * t * t) - (6.54 * t) + _initialVelocityPenetration;
         }
 
-        public override double x(double time) {
+        public override float x(float time) {
             double t = (time / this._duration).clamp(0.0, 1.0);
-            return this.position + this._distance * _flingDistancePenetration(t) *
-                   this.velocity.sign();
+            return (float) (this.position + this._distance * _flingDistancePenetration(t) *
+                            this.velocity.sign());
         }
 
-        public override double dx(double time) {
+        public override float dx(float time) {
             double t = (time / this._duration).clamp(0.0, 1.0);
-            return this._distance * _flingVelocityPenetration(t) * this.velocity.sign() /
-                   this._duration;
+            return (float) (this._distance * _flingVelocityPenetration(t) * this.velocity.sign() /
+                            this._duration);
         }
 
-        public override bool isDone(double time) {
+        public override bool isDone(float time) {
             return time >= this._duration;
         }
     }

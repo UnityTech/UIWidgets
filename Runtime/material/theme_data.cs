@@ -535,7 +535,7 @@ namespace Unity.UIWidgets.material {
             return Brightness.dark;
         }
 
-        public static ThemeData lerp(ThemeData a, ThemeData b, double t) {
+        public static ThemeData lerp(ThemeData a, ThemeData b, float t) {
             D.assert(a != null);
             D.assert(b != null);
             return raw(

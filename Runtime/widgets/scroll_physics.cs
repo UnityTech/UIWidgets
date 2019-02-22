@@ -24,7 +24,7 @@ namespace Unity.UIWidgets.widgets {
             return new ScrollPhysics(parent: this.buildParent(ancestor));
         }
 
-        public virtual double applyPhysicsToUserOffset(ScrollMetrics position, double offset) {
+        public virtual float applyPhysicsToUserOffset(ScrollMetrics position, float offset) {
             if (this.parent == null) {
                 return offset;
             }
@@ -40,15 +40,15 @@ namespace Unity.UIWidgets.widgets {
             return this.parent.shouldAcceptUserOffset(position);
         }
 
-        public virtual double applyBoundaryConditions(ScrollMetrics position, double value) {
+        public virtual float applyBoundaryConditions(ScrollMetrics position, float value) {
             if (this.parent == null) {
-                return 0.0;
+                return 0.0f;
             }
 
             return this.parent.applyBoundaryConditions(position, value);
         }
 
-        public virtual Simulation createBallisticSimulation(ScrollMetrics position, double velocity) {
+        public virtual Simulation createBallisticSimulation(ScrollMetrics position, float velocity) {
             if (this.parent == null) {
                 return null;
             }
@@ -74,8 +74,8 @@ namespace Unity.UIWidgets.widgets {
 
         // todo: Handle the case of the device pixel ratio changing. use 1 as devicePixelRatio for now.
         static readonly Tolerance _kDefaultTolerance = new Tolerance(
-            velocity: 1.0 / (0.050 * 1),
-            distance: 1.0 / 1
+            velocity: 1.0f / (0.050f * 1),
+            distance: 1.0f / 1
         );
 
         public virtual Tolerance tolerance {
@@ -88,7 +88,7 @@ namespace Unity.UIWidgets.widgets {
             }
         }
 
-        public virtual double minFlingDistance {
+        public virtual float minFlingDistance {
             get {
                 if (this.parent == null) {
                     return Constants.kTouchSlop;
@@ -98,15 +98,15 @@ namespace Unity.UIWidgets.widgets {
             }
         }
 
-        public virtual double carriedMomentum(double existingVelocity) {
+        public virtual float carriedMomentum(float existingVelocity) {
             if (this.parent == null) {
-                return 0.0;
+                return 0.0f;
             }
 
             return this.parent.carriedMomentum(existingVelocity);
         }
 
-        public virtual double minFlingVelocity {
+        public virtual float minFlingVelocity {
             get {
                 if (this.parent == null) {
                     return Constants.kMinFlingVelocity;
@@ -116,7 +116,7 @@ namespace Unity.UIWidgets.widgets {
             }
         }
 
-        public virtual double maxFlingVelocity {
+        public virtual float maxFlingVelocity {
             get {
                 if (this.parent == null) {
                     return Constants.kMaxFlingVelocity;
@@ -126,10 +126,10 @@ namespace Unity.UIWidgets.widgets {
             }
         }
 
-        public virtual double dragStartDistanceMotionThreshold {
+        public virtual float dragStartDistanceMotionThreshold {
             get {
                 if (this.parent == null) {
-                    return 0.0;
+                    return 0.0f;
                 }
 
                 return this.parent.dragStartDistanceMotionThreshold;
@@ -162,7 +162,7 @@ namespace Unity.UIWidgets.widgets {
             return 0.52 * Math.Pow(1 - overscrollFraction, 2);
         }
 
-        public override double applyPhysicsToUserOffset(ScrollMetrics position, double offset) {
+        public override float applyPhysicsToUserOffset(ScrollMetrics position, float offset) {
             D.assert(position.minScrollExtent <= position.maxScrollExtent);
 
             if (!position.outOfRange()) {
@@ -177,16 +177,16 @@ namespace Unity.UIWidgets.widgets {
             double friction = easing
                 ? this.frictionFactor((overscrollPast - offset.abs()) / position.viewportDimension)
                 : this.frictionFactor(overscrollPast / position.viewportDimension);
-            double direction = offset.sign();
+            float direction = offset.sign();
 
-            return direction * _applyFriction(overscrollPast, offset.abs(), friction);
+            return direction * _applyFriction((float) overscrollPast, offset.abs(), (float) friction);
         }
 
-        static double _applyFriction(double extentOutside, double absDelta, double gamma) {
+        static float _applyFriction(float extentOutside, float absDelta, float gamma) {
             D.assert(absDelta > 0);
             double total = 0.0;
             if (extentOutside > 0) {
-                double deltaToLimit = extentOutside / gamma;
+                float deltaToLimit = extentOutside / gamma;
                 if (absDelta < deltaToLimit) {
                     return absDelta * gamma;
                 }
@@ -195,20 +195,20 @@ namespace Unity.UIWidgets.widgets {
                 absDelta -= deltaToLimit;
             }
 
-            return total + absDelta;
+            return (float) total + absDelta;
         }
 
-        public override double applyBoundaryConditions(ScrollMetrics position, double value) {
-            return 0.0;
+        public override float applyBoundaryConditions(ScrollMetrics position, float value) {
+            return 0.0f;
         }
 
-        public override Simulation createBallisticSimulation(ScrollMetrics position, double velocity) {
+        public override Simulation createBallisticSimulation(ScrollMetrics position, float velocity) {
             Tolerance tolerance = this.tolerance;
             if (velocity.abs() >= tolerance.velocity || position.outOfRange()) {
                 return new BouncingScrollSimulation(
                     spring: this.spring,
                     position: position.pixels,
-                    velocity: velocity * 0.91,
+                    velocity: velocity * 0.91f,
                     leadingExtent: position.minScrollExtent,
                     trailingExtent: position.maxScrollExtent,
                     tolerance: tolerance
@@ -218,16 +218,17 @@ namespace Unity.UIWidgets.widgets {
             return null;
         }
 
-        public override double minFlingVelocity {
-            get { return Constants.kMinFlingVelocity * 2.0; }
+        public override float minFlingVelocity {
+            get { return Constants.kMinFlingVelocity * 2.0f; }
         }
 
-        public override double carriedMomentum(double existingVelocity) {
-            return existingVelocity.sign() * Math.Min(0.000816 * Math.Pow(existingVelocity.abs(), 1.967), 40000.0);
+        public override float carriedMomentum(float existingVelocity) {
+            return existingVelocity.sign() *
+                   (float) Math.Min(0.000816 * Math.Pow(existingVelocity.abs(), 1.967), 40000.0);
         }
 
-        public override double dragStartDistanceMotionThreshold {
-            get { return 3.5; }
+        public override float dragStartDistanceMotionThreshold {
+            get { return 3.5f; }
         }
     }
 
@@ -240,7 +241,7 @@ namespace Unity.UIWidgets.widgets {
             return new ClampingScrollPhysics(parent: this.buildParent(ancestor));
         }
 
-        public override double applyBoundaryConditions(ScrollMetrics position, double value) {
+        public override float applyBoundaryConditions(ScrollMetrics position, float value) {
             D.assert(() => {
                 if (value == position.pixels) {
                     throw new UIWidgetsError(
@@ -271,10 +272,10 @@ namespace Unity.UIWidgets.widgets {
                 return value - position.maxScrollExtent;
             }
 
-            return 0.0;
+            return 0.0f;
         }
 
-        public override Simulation createBallisticSimulation(ScrollMetrics position, double velocity) {
+        public override Simulation createBallisticSimulation(ScrollMetrics position, float velocity) {
             Tolerance tolerance = this.tolerance;
             if (position.outOfRange()) {
                 double? end = null;
@@ -291,7 +292,7 @@ namespace Unity.UIWidgets.widgets {
                     this.spring,
                     position.pixels,
                     position.maxScrollExtent,
-                    Math.Min(0.0, velocity),
+                    (float) Math.Min(0.0, velocity),
                     tolerance: tolerance
                 );
             }

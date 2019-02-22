@@ -12,17 +12,32 @@ namespace Unity.UIWidgets.ui {
             this.textBlobId = textBlobId;
             this.scale = scale;
         }
-        
+
         public bool Equals(MeshKey other) {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
+
             return this.textBlobId == other.textBlobId && this.scale.Equals(other.scale);
         }
 
         public override bool Equals(object obj) {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
+
             return this.Equals((MeshKey) obj);
         }
 
@@ -94,7 +109,7 @@ namespace Unity.UIWidgets.ui {
             var style = textBlob.style;
             var fontInfo = FontManager.instance.getOrCreate(style.fontFamily);
             var key = new MeshKey(textBlob.instanceId, scale);
-            
+
             _meshes.TryGetValue(key, out var meshInfo);
             if (meshInfo != null && meshInfo.textureVersion == fontInfo.textureVersion) {
                 meshInfo.touch();
@@ -122,7 +137,7 @@ namespace Unity.UIWidgets.ui {
 
                 CharacterInfo charInfo;
                 font.GetCharacterInfo(ch, out charInfo, fontSizeToLoad, style.UnityFontStyle);
-            
+
                 var minX = charInfo.minX / scale;
                 var maxX = charInfo.maxX / scale;
                 var minY = charInfo.minY / scale;
@@ -151,7 +166,7 @@ namespace Unity.UIWidgets.ui {
             if (vertices.Count == 0) {
                 return null;
             }
-            
+
             MeshMesh mesh = vertices.Count > 0 ? new MeshMesh(null, vertices, triangles, uv) : null;
             _meshes[key] = new MeshInfo(key, mesh, fontInfo.textureVersion);
 

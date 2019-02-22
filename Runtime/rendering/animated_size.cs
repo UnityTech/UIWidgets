@@ -143,7 +143,7 @@ namespace Unity.UIWidgets.rendering {
 
         void _restartAnimation() {
             this._lastValue = 0.0;
-            this._controller.forward(from: 0.0);
+            this._controller.forward(from: 0.0f);
         }
 
         void _layoutStart() {
