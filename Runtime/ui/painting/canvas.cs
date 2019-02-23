@@ -44,7 +44,7 @@ namespace Unity.UIWidgets.ui {
 
         void drawOval(Rect rect, Paint paint);
 
-        void drawCircle(Offset c, double radius, Paint paint);
+        void drawCircle(Offset c, float radius, Paint paint);
 
         void drawArc(Rect rect, float startAngle, float sweepAngle, bool useCenter, Paint paint);
 
@@ -231,7 +231,7 @@ namespace Unity.UIWidgets.ui {
             });
         }
 
-        public void drawCircle(Offset c, double radius, Paint paint) {
+        public void drawCircle(Offset c, float radius, Paint paint) {
             var path = new Path();
             path.addCircle(c.dx, c.dy, radius);
 

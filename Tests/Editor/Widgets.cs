@@ -462,8 +462,8 @@ namespace UIWidgets.Tests {
             var testCard = new AssetCard(
                 "AI Template",
                 "INVECTOR",
-                45.0,
-                36.0,
+                45.0f,
+                36.0f,
                 true,
                 "https://d2ujflorbtfzji.cloudfront.net/key-image/46dc65c1-f605-4ccb-97e0-3d60b28cfdfe.jpg"
             );
@@ -550,7 +550,7 @@ namespace UIWidgets.Tests {
                 child: new Container(
                     color: CLColors.background3,
                     child: new Transform(
-                        transform: Matrix3.makeRotate(45, (float) px, (float) py),
+                        transform: Matrix3.makeRotate(45, px, py),
                         child:
                         new Column(
                             children: new List<Widget> {
@@ -569,8 +569,8 @@ namespace UIWidgets.Tests {
         public AssetCard(
             string name,
             string category,
-            double price,
-            double priceDiscount,
+            float price,
+            float priceDiscount,
             bool showBadge,
             string imageSrc
         ) {
@@ -584,8 +584,8 @@ namespace UIWidgets.Tests {
 
         public readonly string name;
         public readonly string category;
-        public readonly double price;
-        public readonly double priceDiscount;
+        public readonly float price;
+        public readonly float priceDiscount;
         public readonly bool showBadge;
         public readonly string imageSrc;
 

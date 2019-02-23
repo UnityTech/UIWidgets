@@ -58,11 +58,11 @@ namespace Unity.UIWidgets.ui {
 
             var state = this._getState();
             var textureWidth = Mathf.CeilToInt(
-                (float) bounds.width * state.scale * this._devicePixelRatio);
+                bounds.width * state.scale * this._devicePixelRatio);
             textureWidth = Mathf.Max(textureWidth, 1);
 
             var textureHeight = Mathf.CeilToInt(
-                (float) bounds.height * state.scale * this._devicePixelRatio);
+                bounds.height * state.scale * this._devicePixelRatio);
             textureHeight = Mathf.Max(textureHeight, 1);
 
             var parentLayer = this._getLayer();
@@ -125,7 +125,7 @@ namespace Unity.UIWidgets.ui {
                 state.matrix = matrix;
             }
             else {
-                var matrix = Matrix3.makeRotate(radians, (float) offset.dx, (float) offset.dy);
+                var matrix = Matrix3.makeRotate(radians, offset.dx, offset.dy);
                 matrix.postConcat(state.matrix);
                 state.matrix = matrix;
             }
@@ -217,7 +217,7 @@ namespace Unity.UIWidgets.ui {
             this.drawPath(path, paint);
         }
 
-        public void drawCircle(Offset c, double radius, Paint paint) {
+        public void drawCircle(Offset c, float radius, Paint paint) {
             var path = new Path();
             path.addCircle(c.dx, c.dy, radius);
             this.drawPath(path, paint);
@@ -292,10 +292,10 @@ namespace Unity.UIWidgets.ui {
 
         RenderLayer _createMaskLayer(RenderLayer parentLayer, Rect maskBounds, Action<Paint> drawCallback,
             Paint paint) {
-            var textureWidth = Mathf.CeilToInt((float) maskBounds.width * this._devicePixelRatio);
+            var textureWidth = Mathf.CeilToInt(maskBounds.width * this._devicePixelRatio);
             textureWidth = Mathf.Max(1, textureWidth);
 
-            var textureHeight = Mathf.CeilToInt((float) maskBounds.height * this._devicePixelRatio);
+            var textureHeight = Mathf.CeilToInt(maskBounds.height * this._devicePixelRatio);
             textureHeight = Mathf.Max(1, textureHeight);
 
             var maskLayer = new RenderLayer {
@@ -323,10 +323,10 @@ namespace Unity.UIWidgets.ui {
         RenderLayer _createBlurLayer(RenderLayer maskLayer, float sigma, RenderLayer parentLayer) {
             sigma = BlurUtils.adjustSigma(sigma, out var scaleFactor, out var radius);
 
-            var textureWidth = Mathf.CeilToInt((float) maskLayer.width / scaleFactor);
+            var textureWidth = Mathf.CeilToInt(maskLayer.width / scaleFactor);
             textureWidth = Mathf.Max(1, textureWidth);
 
-            var textureHeight = Mathf.CeilToInt((float) maskLayer.height / scaleFactor);
+            var textureHeight = Mathf.CeilToInt(maskLayer.height / scaleFactor);
             textureHeight = Mathf.Max(1, textureHeight);
 
             var blurXLayer = new RenderLayer {
@@ -379,7 +379,7 @@ namespace Unity.UIWidgets.ui {
             }
 
             var state = this._getState();
-            float sigma = state.scale * (float) maskFilter.sigma;
+            float sigma = state.scale * maskFilter.sigma;
             if (sigma <= 0) {
                 return;
             }
@@ -438,7 +438,7 @@ namespace Unity.UIWidgets.ui {
             }
             else {
                 var state = this._getState();
-                float strokeWidth = ((float) paint.strokeWidth * state.scale).clamp(0, 200.0f);
+                float strokeWidth = (paint.strokeWidth * state.scale).clamp(0, 200.0f);
                 float alpha = 1.0f;
 
                 if (strokeWidth == 0) {
@@ -457,7 +457,7 @@ namespace Unity.UIWidgets.ui {
                     strokeWidth / state.scale * 0.5f,
                     paint.strokeCap,
                     paint.strokeJoin,
-                    (float) paint.strokeMiterLimit).transform(state.matrix);
+                    paint.strokeMiterLimit).transform(state.matrix);
 
                 Action<Paint> drawMesh = (Paint p) => {
                     if (!this._applyClip(mesh.bounds)) {
@@ -661,7 +661,7 @@ namespace Unity.UIWidgets.ui {
             var scale = state.scale * this._devicePixelRatio;
 
             var matrix = new Matrix3(state.matrix);
-            matrix.preTranslate((float) offset.dx, (float) offset.dy);
+            matrix.preTranslate(offset.dx, offset.dy);
             var mesh = MeshGenerator.generateMesh(textBlob, scale)?.transform(matrix);
             if (mesh == null) {
                 return;
@@ -909,10 +909,10 @@ namespace Unity.UIWidgets.ui {
                 get {
                     if (!this._viewport.HasValue) {
                         this._viewport = new Vector4(
-                            (float) this.layerBounds.left,
-                            (float) this.layerBounds.top,
-                            (float) this.layerBounds.width,
-                            (float) this.layerBounds.height);
+                            this.layerBounds.left,
+                            this.layerBounds.top,
+                            this.layerBounds.width,
+                            this.layerBounds.height);
                     }
 
                     return this._viewport.Value;
@@ -1158,18 +1158,18 @@ namespace Unity.UIWidgets.ui {
             var vertices = new List<Vector3>(4);
             var uv = new List<Vector2>(4);
 
-            float uvx0 = (float) src.left;
-            float uvx1 = (float) src.right;
-            float uvy0 = 1.0f - (float) src.top;
-            float uvy1 = 1.0f - (float) src.bottom;
+            float uvx0 = src.left;
+            float uvx1 = src.right;
+            float uvy0 = 1.0f - src.top;
+            float uvy1 = 1.0f - src.bottom;
 
-            vertices.Add(new Vector2((float) dst.left, (float) dst.top));
+            vertices.Add(new Vector2(dst.left, dst.top));
             uv.Add(new Vector2(uvx0, uvy0));
-            vertices.Add(new Vector2((float) dst.left, (float) dst.bottom));
+            vertices.Add(new Vector2(dst.left, dst.bottom));
             uv.Add(new Vector2(uvx0, uvy1));
-            vertices.Add(new Vector2((float) dst.right, (float) dst.bottom));
+            vertices.Add(new Vector2(dst.right, dst.bottom));
             uv.Add(new Vector2(uvx1, uvy1));
-            vertices.Add(new Vector2((float) dst.right, (float) dst.top));
+            vertices.Add(new Vector2(dst.right, dst.top));
             uv.Add(new Vector2(uvx1, uvy0));
 
             return new MeshMesh(matrix, vertices, _imageTriangles, uv);
@@ -1177,24 +1177,24 @@ namespace Unity.UIWidgets.ui {
 
         public static MeshMesh imageNineMesh(Matrix3 matrix, Rect src, Rect center, int srcWidth, int srcHeight,
             Rect dst) {
-            float x0 = (float) dst.left;
-            float x3 = (float) dst.right;
-            float x1 = x0 + (float) ((center.left - src.left) * srcWidth);
-            float x2 = x3 - (float) ((src.right - center.right) * srcWidth);
+            float x0 = dst.left;
+            float x3 = dst.right;
+            float x1 = x0 + ((center.left - src.left) * srcWidth);
+            float x2 = x3 - ((src.right - center.right) * srcWidth);
 
-            float y0 = (float) dst.top;
-            float y3 = (float) dst.bottom;
-            float y1 = y0 + (float) ((center.top - src.top) * srcHeight);
-            float y2 = y3 - (float) ((src.bottom - center.bottom) * srcHeight);
+            float y0 = dst.top;
+            float y3 = dst.bottom;
+            float y1 = y0 + ((center.top - src.top) * srcHeight);
+            float y2 = y3 - ((src.bottom - center.bottom) * srcHeight);
 
-            float tx0 = (float) src.left;
-            float tx1 = (float) center.left;
-            float tx2 = (float) center.right;
-            float tx3 = (float) src.right;
-            float ty0 = 1 - (float) src.top;
-            float ty1 = 1 - (float) center.top;
-            float ty2 = 1 - (float) center.bottom;
-            float ty3 = 1 - (float) src.bottom;
+            float tx0 = src.left;
+            float tx1 = center.left;
+            float tx2 = center.right;
+            float tx3 = src.right;
+            float ty0 = 1 - src.top;
+            float ty1 = 1 - center.top;
+            float ty2 = 1 - center.bottom;
+            float ty3 = 1 - src.bottom;
 
             var vertices = new List<Vector3>(16);
             var uv = new List<Vector2>(16);

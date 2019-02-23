@@ -1,5 +1,6 @@
 using System;
 using Unity.UIWidgets.painting;
+using UnityEngine;
 
 namespace Unity.UIWidgets.widgets {
     public interface ScrollMetrics {
@@ -56,17 +57,17 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public static float extentBefore(this ScrollMetrics it) {
-            return (float) Math.Max(it.pixels - it.minScrollExtent, 0.0);
+            return Mathf.Max(it.pixels - it.minScrollExtent, 0.0f);
         }
 
         public static float extentInside(this ScrollMetrics it) {
-            return Math.Min(it.pixels, it.maxScrollExtent) -
-                   Math.Max(it.pixels, it.minScrollExtent) +
-                   Math.Min(it.viewportDimension, it.maxScrollExtent - it.minScrollExtent);
+            return Mathf.Min(it.pixels, it.maxScrollExtent) -
+                   Mathf.Max(it.pixels, it.minScrollExtent) +
+                   Mathf.Min(it.viewportDimension, it.maxScrollExtent - it.minScrollExtent);
         }
 
         public static float extentAfter(this ScrollMetrics it) {
-            return (float) Math.Max(it.maxScrollExtent - it.pixels, 0.0);
+            return Mathf.Max(it.maxScrollExtent - it.pixels, 0.0f);
         }
     }
 

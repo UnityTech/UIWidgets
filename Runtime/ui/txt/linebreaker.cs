@@ -51,7 +51,7 @@ namespace Unity.UIWidgets.ui {
                 return widthSoFar;
             }
 
-            return (float) (Math.Floor(widthSoFar / this._tabWidth + 1) * this._tabWidth);
+            return (Mathf.Floor(widthSoFar / this._tabWidth + 1) * this._tabWidth);
         }
     }
 
@@ -92,7 +92,7 @@ namespace Unity.UIWidgets.ui {
             int nCand = this._candidates.Count;
             if (nCand > 0 && (nCand == 1 || this._lastBreak != nCand - 1)) {
                 var cand = this._candidates[this._candidates.Count - 1];
-                this._pushBreak(cand.offset, (float) (cand.postBreak - this._preBreak));
+                this._pushBreak(cand.offset, (cand.postBreak - this._preBreak));
             }
 
             return this._breaks.Count;
@@ -151,7 +151,7 @@ namespace Unity.UIWidgets.ui {
             for (int i = start; i < end; i++) {
                 char c = this._textBuf[i + this._textOffset];
                 if (c == '\t') {
-                    this._width = this._preBreak + this._tabStops.nextTab((float) (this._width - this._preBreak));
+                    this._width = this._preBreak + this._tabStops.nextTab((this._width - this._preBreak));
                     if (this.mFirstTabIndex == int.MaxValue) {
                         this.mFirstTabIndex = i;
                     }
@@ -249,7 +249,7 @@ namespace Unity.UIWidgets.ui {
 
         void _pushGreedyBreak() {
             var bestCandidate = this._candidates[this._bestBreak];
-            this._pushBreak(bestCandidate.offset, (float) (bestCandidate.postBreak - this._preBreak));
+            this._pushBreak(bestCandidate.offset, (bestCandidate.postBreak - this._preBreak));
             this._bestScore = ScoreInfty;
             this._lastBreak = this._bestBreak;
             this._preBreak = bestCandidate.preBreak;

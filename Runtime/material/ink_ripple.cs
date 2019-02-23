@@ -173,7 +173,7 @@ namespace Unity.UIWidgets.material {
                 canvas.concat(transform);
             }
             else {
-                canvas.translate((float) originOffset.dx, (float) originOffset.dy);
+                canvas.translate(originOffset.dx, originOffset.dy);
             }
 
             if (this._clipCallback != null) {

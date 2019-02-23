@@ -142,10 +142,10 @@ namespace Unity.UIWidgets.material {
             properties.add(new DiagnosticsProperty<Color>("splashColor", this.splashColor, defaultValue: null));
             properties.add(new DiagnosticsProperty<Brightness?>("colorBrightness", this.colorBrightness,
                 defaultValue: null));
-            properties.add(new DiagnosticsProperty<double?>("elevation", this.elevation, defaultValue: null));
-            properties.add(new DiagnosticsProperty<double?>("highlightElevation", this.highlightElevation,
+            properties.add(new DiagnosticsProperty<float?>("elevation", this.elevation, defaultValue: null));
+            properties.add(new DiagnosticsProperty<float?>("highlightElevation", this.highlightElevation,
                 defaultValue: null));
-            properties.add(new DiagnosticsProperty<double?>("disabledElevation", this.disabledElevation,
+            properties.add(new DiagnosticsProperty<float?>("disabledElevation", this.disabledElevation,
                 defaultValue: null));
             properties.add(new DiagnosticsProperty<EdgeInsets>("padding", this.padding, defaultValue: null));
             properties.add(new DiagnosticsProperty<ShapeBorder>("shape", this.shape, defaultValue: null));

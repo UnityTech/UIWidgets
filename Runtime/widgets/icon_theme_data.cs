@@ -116,9 +116,9 @@ namespace Unity.UIWidgets.widgets {
             base.debugFillProperties(properties);
             properties.add(new DiagnosticsProperty<Color>("color", this.color,
                 defaultValue: Diagnostics.kNullDefaultValue));
-            properties.add(new DoubleProperty("opacity", this.opacity,
+            properties.add(new floatProperty("opacity", this.opacity,
                 defaultValue: Diagnostics.kNullDefaultValue));
-            properties.add(new DoubleProperty("size", this.size,
+            properties.add(new floatProperty("size", this.size,
                 defaultValue: Diagnostics.kNullDefaultValue));
         }
     }

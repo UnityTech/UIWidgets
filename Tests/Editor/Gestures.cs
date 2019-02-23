@@ -60,8 +60,8 @@ namespace UIWidgets.Tests {
             this._panRecognizer = new PanGestureRecognizer();
             this._panRecognizer.onUpdate = (details) => { Debug.Log("onUpdate " + details); };
 
-            this._doubleTapGesture = new DoubleTapGestureRecognizer();
-            this._doubleTapGesture.onDoubleTap = (detail) => { Debug.Log("onDoubleTap"); };
+            this._floatTapGesture = new floatTapGestureRecognizer();
+            this._floatTapGesture.onfloatTap = (detail) => { Debug.Log("onfloatTap"); };
         }
 
         void OnDisable() {
@@ -73,12 +73,12 @@ namespace UIWidgets.Tests {
 
         PanGestureRecognizer _panRecognizer;
 
-        DoubleTapGestureRecognizer _doubleTapGesture;
+        floatTapGestureRecognizer _floatTapGesture;
 
         void _handlePointerDown(PointerDownEvent evt) {
             this._tapRecognizer.addPointer(evt);
             this._panRecognizer.addPointer(evt);
-            this._doubleTapGesture.addPointer(evt);
+            this._floatTapGesture.addPointer(evt);
         }
 
         RenderBox tap() {

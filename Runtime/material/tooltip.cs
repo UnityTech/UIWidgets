@@ -48,7 +48,7 @@ namespace Unity.UIWidgets.material {
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             properties.add(new StringProperty("message", this.message, showName: false));
-            properties.add(new DoubleProperty("vertical offset", this.verticalOffset));
+            properties.add(new floatProperty("vertical offset", this.verticalOffset));
             properties.add(new FlagProperty("position", value: this.preferBelow, ifTrue: "below", ifFalse: "above",
                 showName: true));
         }
@@ -157,19 +157,19 @@ namespace Unity.UIWidgets.material {
     public class _TooltipPositionDelegate : SingleChildLayoutDelegate {
         public _TooltipPositionDelegate(
             Offset target = null,
-            double? verticalOffset = null,
+            float? verticalOffset = null,
             bool? preferBelow = null) {
             D.assert(target != null);
             D.assert(verticalOffset != null);
             D.assert(preferBelow != null);
             this.target = target;
-            this.verticalOffset = verticalOffset ?? 0.0;
+            this.verticalOffset = verticalOffset ?? 0.0f;
             this.preferBelow = preferBelow ?? true;
         }
 
         public readonly Offset target;
 
-        public readonly double verticalOffset;
+        public readonly float verticalOffset;
 
         public readonly bool preferBelow;
 
@@ -246,7 +246,7 @@ namespace Unity.UIWidgets.material {
                         child: new FadeTransition(
                             opacity: this.animation,
                             child: new Opacity(
-                                opacity: 0.9,
+                                opacity: 0.9f,
                                 child: new ConstrainedBox(
                                     constraints: new BoxConstraints(minHeight: this.height ?? 0.0f),
                                     child: new Container(

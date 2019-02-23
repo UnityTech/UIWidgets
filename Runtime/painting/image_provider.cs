@@ -13,7 +13,7 @@ namespace Unity.UIWidgets.painting {
     public class ImageConfiguration : IEquatable<ImageConfiguration> {
         public ImageConfiguration(
             AssetBundle bundle = null,
-            double? devicePixelRatio = null,
+            float? devicePixelRatio = null,
             Locale locale = null,
             Size size = null,
             RuntimePlatform? platform = null
@@ -27,7 +27,7 @@ namespace Unity.UIWidgets.painting {
 
         public ImageConfiguration copyWith(
             AssetBundle bundle = null,
-            double? devicePixelRatio = null,
+            float? devicePixelRatio = null,
             Locale locale = null,
             Size size = null,
             RuntimePlatform? platform = null
@@ -43,7 +43,7 @@ namespace Unity.UIWidgets.painting {
 
         public readonly AssetBundle bundle;
 
-        public readonly double? devicePixelRatio;
+        public readonly float? devicePixelRatio;
 
         public readonly Locale locale;
 

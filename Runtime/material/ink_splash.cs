@@ -73,7 +73,7 @@ namespace Unity.UIWidgets.material {
                 vsync: controller.vsync);
             this._radiusController.addListener(controller.markNeedsPaint);
             this._radiusController.forward();
-            this._radius = this._radiusController.drive(new DoubleTween(
+            this._radius = this._radiusController.drive(new floatTween(
                 begin: InkSplashUtils._kSplashInitialSize,
                 end: this._targetRadius));
 
@@ -101,7 +101,7 @@ namespace Unity.UIWidgets.material {
 
         readonly bool _repositionToReferenceBox;
 
-        Animation<double> _radius;
+        Animation<float> _radius;
         AnimationController _radiusController;
 
         Animation<int> _alpha;
@@ -146,7 +146,7 @@ namespace Unity.UIWidgets.material {
                 canvas.concat(transform);
             }
             else {
-                canvas.translate((float) originOffset.dx, (float) originOffset.dy);
+                canvas.translate(originOffset.dx, originOffset.dy);
             }
 
             if (this._clipCallback != null) {

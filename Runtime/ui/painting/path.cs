@@ -127,36 +127,36 @@ namespace Unity.UIWidgets.ui {
             this._cache = null;
         }
 
-        public void moveTo(double x, double y) {
+        public void moveTo(float x, float y) {
             this._appendCommands(new[] {
                 (float) PathCommand.moveTo,
-                (float) x, (float) y,
+                x, y,
             });
         }
 
-        public void lineTo(double x, double y) {
+        public void lineTo(float x, float y) {
             this._appendCommands(new[] {
                 (float) PathCommand.lineTo,
-                (float) x, (float) y,
+                x, y,
             });
         }
 
-        public void bezierTo(double c1x, double c1y, double c2x, double c2y, double x, double y) {
+        public void bezierTo(float c1x, float c1y, float c2x, float c2y, float x, float y) {
             this._appendCommands(new[] {
                 (float) PathCommand.bezierTo,
-                (float) c1x, (float) c1y, (float) c2x, (float) c2y, (float) x, (float) y,
+                c1x, c1y, c2x, c2y, x, y,
             });
         }
 
-        public void quadTo(double cx, double cy, double x, double y) {
+        public void quadTo(float cx, float cy, float x, float y) {
             var x0 = this._commandx;
             var y0 = this._commandy;
 
             this._appendCommands(new[] {
                 (float) PathCommand.bezierTo,
-                (float) (x0 + 2.0f / 3.0f * (cx - x0)), (float) (y0 + 2.0f / 3.0f * (cy - y0)),
-                (float) (x + 2.0f / 3.0f * (cx - x)), (float) (y + 2.0f / 3.0f * (cy - y)),
-                (float) x, (float) y,
+                (x0 + 2.0f / 3.0f * (cx - x0)), (y0 + 2.0f / 3.0f * (cy - y0)),
+                (x + 2.0f / 3.0f * (cx - x)), (y + 2.0f / 3.0f * (cy - y)),
+                x, y,
             });
         }
 
@@ -175,32 +175,32 @@ namespace Unity.UIWidgets.ui {
 
         public void addRect(Rect rect) {
             this._appendCommands(new[] {
-                (float) PathCommand.moveTo, (float) rect.left, (float) rect.top,
-                (float) PathCommand.lineTo, (float) rect.left, (float) rect.bottom,
-                (float) PathCommand.lineTo, (float) rect.right, (float) rect.bottom,
-                (float) PathCommand.lineTo, (float) rect.right, (float) rect.top,
+                (float) PathCommand.moveTo, rect.left, rect.top,
+                (float) PathCommand.lineTo, rect.left, rect.bottom,
+                (float) PathCommand.lineTo, rect.right, rect.bottom,
+                (float) PathCommand.lineTo, rect.right, rect.top,
                 (float) PathCommand.close
             });
         }
 
         public void addRRect(RRect rrect) {
-            float w = (float) rrect.width;
-            float h = (float) rrect.height;
+            float w = rrect.width;
+            float h = rrect.height;
             float halfw = Mathf.Abs(w) * 0.5f;
             float halfh = Mathf.Abs(h) * 0.5f;
             float signW = Mathf.Sign(w);
             float signH = Mathf.Sign(h);
 
-            float rxBL = Mathf.Min((float) rrect.blRadiusX, halfw) * signW;
-            float ryBL = Mathf.Min((float) rrect.blRadiusY, halfh) * signH;
-            float rxBR = Mathf.Min((float) rrect.brRadiusX, halfw) * signW;
-            float ryBR = Mathf.Min((float) rrect.brRadiusY, halfh) * signH;
-            float rxTR = Mathf.Min((float) rrect.trRadiusX, halfw) * signW;
-            float ryTR = Mathf.Min((float) rrect.trRadiusY, halfh) * signH;
-            float rxTL = Mathf.Min((float) rrect.tlRadiusX, halfw) * signW;
-            float ryTL = Mathf.Min((float) rrect.tlRadiusY, halfh) * signH;
-            float x = (float) rrect.left;
-            float y = (float) rrect.top;
+            float rxBL = Mathf.Min(rrect.blRadiusX, halfw) * signW;
+            float ryBL = Mathf.Min(rrect.blRadiusY, halfh) * signH;
+            float rxBR = Mathf.Min(rrect.brRadiusX, halfw) * signW;
+            float ryBR = Mathf.Min(rrect.brRadiusY, halfh) * signH;
+            float rxTR = Mathf.Min(rrect.trRadiusX, halfw) * signW;
+            float ryTR = Mathf.Min(rrect.trRadiusY, halfh) * signH;
+            float rxTL = Mathf.Min(rrect.tlRadiusX, halfw) * signW;
+            float ryTL = Mathf.Min(rrect.tlRadiusY, halfh) * signH;
+            float x = rrect.left;
+            float y = rrect.top;
 
             this._appendCommands(new[] {
                 (float) PathCommand.moveTo, x, y + ryTL,
@@ -220,22 +220,22 @@ namespace Unity.UIWidgets.ui {
             });
         }
 
-        public void addEllipse(double cx, double cy, double rx, double ry) {
+        public void addEllipse(float cx, float cy, float rx, float ry) {
             this._appendCommands(new[] {
-                (float) PathCommand.moveTo, (float) (cx - rx), (float) cy,
-                (float) PathCommand.bezierTo, (float) (cx - rx), (float) (cy + ry * _KAPPA90),
-                (float) (cx - rx * _KAPPA90), (float) (cy + ry), (float) cx, (float) (cy + ry),
-                (float) PathCommand.bezierTo, (float) (cx + rx * _KAPPA90), (float) (cy + ry),
-                (float) (cx + rx), (float) (cy + ry * _KAPPA90), (float) (cx + rx), (float) cy,
-                (float) PathCommand.bezierTo, (float) (cx + rx), (float) (cy - ry * _KAPPA90),
-                (float) (cx + rx * _KAPPA90), (float) (cy - ry), (float) cx, (float) (cy - ry),
-                (float) PathCommand.bezierTo, (float) (cx - rx * _KAPPA90), (float) (cy - ry),
-                (float) (cx - rx), (float) (cy - ry * _KAPPA90), (float) (cx - rx), (float) cy,
+                (float) PathCommand.moveTo, (cx - rx), cy,
+                (float) PathCommand.bezierTo, (cx - rx), (cy + ry * _KAPPA90),
+                (cx - rx * _KAPPA90), (cy + ry), cx, (cy + ry),
+                (float) PathCommand.bezierTo, (cx + rx * _KAPPA90), (cy + ry),
+                (cx + rx), (cy + ry * _KAPPA90), (cx + rx), cy,
+                (float) PathCommand.bezierTo, (cx + rx), (cy - ry * _KAPPA90),
+                (cx + rx * _KAPPA90), (cy - ry), cx, (cy - ry),
+                (float) PathCommand.bezierTo, (cx - rx * _KAPPA90), (cy - ry),
+                (cx - rx), (cy - ry * _KAPPA90), (cx - rx), cy,
                 (float) PathCommand.close,
             });
         }
 
-        public void addCircle(double cx, double cy, double r) {
+        public void addCircle(float cx, float cy, float r) {
             this.addEllipse(cx, cy, r, r);
         }
 
@@ -253,14 +253,14 @@ namespace Unity.UIWidgets.ui {
 
             var commands = new List<float>();
             commands.Add((float) PathCommand.moveTo);
-            commands.Add((float) points[0].dx);
-            commands.Add((float) points[0].dy);
+            commands.Add(points[0].dx);
+            commands.Add(points[0].dy);
 
             for (int i = 1; i < points.Count; i++) {
                 var point = points[i];
                 commands.Add((float) PathCommand.lineTo);
-                commands.Add((float) point.dx);
-                commands.Add((float) point.dy);
+                commands.Add(point.dx);
+                commands.Add(point.dy);
             }
 
             if (close) {
@@ -282,18 +282,18 @@ namespace Unity.UIWidgets.ui {
                     case PathCommand.moveTo:
                     case PathCommand.lineTo:
                         commands.Add(path._commands[i]);
-                        commands.Add(path._commands[i + 1] + (float) offset.dx);
-                        commands.Add(path._commands[i + 2] + (float) offset.dy);
+                        commands.Add(path._commands[i + 1] + offset.dx);
+                        commands.Add(path._commands[i + 2] + offset.dy);
                         i += 3;
                         break;
                     case PathCommand.bezierTo:
                         commands.Add(path._commands[i]);
-                        commands.Add(path._commands[i + 1] + (float) offset.dx);
-                        commands.Add(path._commands[i + 2] + (float) offset.dy);
-                        commands.Add(path._commands[i + 3] + (float) offset.dx);
-                        commands.Add(path._commands[i + 4] + (float) offset.dy);
-                        commands.Add(path._commands[i + 5] + (float) offset.dx);
-                        commands.Add(path._commands[i + 6] + (float) offset.dy);
+                        commands.Add(path._commands[i + 1] + offset.dx);
+                        commands.Add(path._commands[i + 2] + offset.dy);
+                        commands.Add(path._commands[i + 3] + offset.dx);
+                        commands.Add(path._commands[i + 4] + offset.dy);
+                        commands.Add(path._commands[i + 5] + offset.dx);
+                        commands.Add(path._commands[i + 6] + offset.dy);
                         i += 7;
                         break;
                     case PathCommand.close:
@@ -324,8 +324,8 @@ namespace Unity.UIWidgets.ui {
                 return false;
             }
 
-            float x = (float) point.dx;
-            float y = (float) point.dy;
+            float x = point.dx;
+            float y = point.dy;
 
             float lastMoveToX = 0;
             float lastMoveToY = 0;
@@ -457,8 +457,8 @@ namespace Unity.UIWidgets.ui {
         }
 
         static int _winding_mono_cubic(Offset[] pts, int ptsBase, float x, float y) {
-            float y0 = (float) pts[ptsBase + 0].dy;
-            float y3 = (float) pts[ptsBase + 3].dy;
+            float y0 = pts[ptsBase + 0].dy;
+            float y3 = pts[ptsBase + 3].dy;
 
             if (y0 == y3) {
                 return 0;
@@ -481,7 +481,7 @@ namespace Unity.UIWidgets.ui {
             // quickreject or quickaccept
             float minX = float.MaxValue, maxX = float.MinValue;
             for (int i = 0; i < 4; i++) {
-                var dx = (float) pts[ptsBase + i].dx;
+                var dx = pts[ptsBase + i].dx;
                 if (dx < minX) {
                     minX = dx;
                 }
@@ -506,10 +506,10 @@ namespace Unity.UIWidgets.ui {
             }
 
             float xt = _eval_cubic_pts(
-                (float) pts[ptsBase + 0].dx,
-                (float) pts[ptsBase + 1].dx,
-                (float) pts[ptsBase + 2].dx,
-                (float) pts[ptsBase + 3].dx, t);
+                pts[ptsBase + 0].dx,
+                pts[ptsBase + 1].dx,
+                pts[ptsBase + 2].dx,
+                pts[ptsBase + 3].dx, t);
 
             return xt < x ? dir : 0;
         }
@@ -529,10 +529,10 @@ namespace Unity.UIWidgets.ui {
 
         static bool _chopMonoAtY(Offset[] pts, int ptsBase, float y, out float t) {
             float[] ycrv = {
-                (float) pts[ptsBase + 0].dy - y,
-                (float) pts[ptsBase + 1].dy - y,
-                (float) pts[ptsBase + 2].dy - y,
-                (float) pts[ptsBase + 3].dy - y
+                pts[ptsBase + 0].dy - y,
+                pts[ptsBase + 1].dy - y,
+                pts[ptsBase + 2].dy - y,
+                pts[ptsBase + 3].dy - y
             };
 
             // NEWTON_RAPHSON Quadratic convergence, typically <= 3 iterations.
@@ -571,7 +571,7 @@ namespace Unity.UIWidgets.ui {
             return converged;
         }
 
-        static void _flatten_double_cubic_extrema(Offset[] dst, int dstBase) {
+        static void _flatten_float_cubic_extrema(Offset[] dst, int dstBase) {
             var dy = dst[dstBase + 3].dy;
             dst[dstBase + 2] = new Offset(dst[dstBase + 2].dx, dy);
             dst[dstBase + 4] = new Offset(dst[dstBase + 4].dx, dy);
@@ -583,15 +583,15 @@ namespace Unity.UIWidgets.ui {
 
             float[] tValues = new float[2];
             int roots = _findCubicExtrema(
-                (float) src[0].dy, (float) src[1].dy, (float) src[2].dy, (float) src[3].dy,
+                src[0].dy, src[1].dy, src[2].dy, src[3].dy,
                 tValues);
 
             _chopCubicAt(src, dst, tValues, roots);
             if (dst != null && roots > 0) {
                 // we do some cleanup to ensure our Y extrema are flat
-                _flatten_double_cubic_extrema(dst, 0);
+                _flatten_float_cubic_extrema(dst, 0);
                 if (roots == 2) {
-                    _flatten_double_cubic_extrema(dst, 3);
+                    _flatten_float_cubic_extrema(dst, 3);
                 }
             }
 
@@ -731,14 +731,14 @@ namespace Unity.UIWidgets.ui {
 
             int r = 0;
 
-            // use doubles so we don't overflow temporarily trying to compute R
-            double dr = (double) B * B - 4 * (double) A * C;
+            // use floats so we don't overflow temporarily trying to compute R
+            float dr = B * B - 4 * A * C;
             if (dr < 0) {
                 return _return_check_zero(0);
             }
 
-            dr = Math.Sqrt(dr);
-            float R = (float) dr;
+            dr = Mathf.Sqrt(dr);
+            float R = dr;
 
             if (float.IsInfinity(R)) {
                 return _return_check_zero(0);
@@ -755,7 +755,7 @@ namespace Unity.UIWidgets.ui {
                 }
                 else if (roots[0] == roots[1]) {
                     // nearly-equal?
-                    r -= 1; // skip the double root
+                    r -= 1; // skip the float root
                 }
             }
 
@@ -1362,7 +1362,7 @@ namespace Unity.UIWidgets.ui {
             dst.Add(new Vector2(px + dlx * w, py + dly * w));
             dst.Add(new Vector2(px - dlx * w, py - dly * w));
             for (var i = 0; i < ncap; i++) {
-                float a = i / (float) (ncap - 1) * Mathf.PI;
+                float a = i / (ncap - 1) * Mathf.PI;
                 float ax = Mathf.Cos(a) * w, ay = Mathf.Sin(a) * w;
                 dst.Add(new Vector2(px, py));
                 dst.Add(new Vector2(px - dlx * ax + dx * ay, py - dly * ax + dy * ay));
@@ -1377,7 +1377,7 @@ namespace Unity.UIWidgets.ui {
             float dly = -dx;
 
             for (var i = 0; i < ncap; i++) {
-                float a = i / (float) (ncap - 1) * Mathf.PI;
+                float a = i / (ncap - 1) * Mathf.PI;
                 float ax = Mathf.Cos(a) * w, ay = Mathf.Sin(a) * w;
                 dst.Add(new Vector2(px - dlx * ax - dx * ay, py - dly * ax - dy * ay));
                 dst.Add(new Vector2(px, py));
@@ -1431,7 +1431,7 @@ namespace Unity.UIWidgets.ui {
 
                 var n = Mathf.CeilToInt((a0 - a1) / Mathf.PI * ncap).clamp(2, ncap);
                 for (var i = 0; i < n; i++) {
-                    float u = i / (float) (n - 1);
+                    float u = i / (n - 1);
                     float a = a0 + u * (a1 - a0);
                     float rx = p1.x + Mathf.Cos(a) * rw;
                     float ry = p1.y + Mathf.Sin(a) * rw;
@@ -1459,7 +1459,7 @@ namespace Unity.UIWidgets.ui {
 
                 var n = Mathf.CeilToInt((a1 - a0) / Mathf.PI * ncap).clamp(2, ncap);
                 for (var i = 0; i < n; i++) {
-                    float u = i / (float) (n - 1);
+                    float u = i / (n - 1);
                     float a = a0 + u * (a1 - a0);
                     float lx = p1.x + Mathf.Cos(a) * lw;
                     float ly = p1.y + Mathf.Sin(a) * lw;
@@ -1578,10 +1578,10 @@ namespace Unity.UIWidgets.ui {
 
         public MeshMesh(Rect rect) {
             this.vertices = new List<Vector3>(4) {
-                new Vector3((float) rect.right, (float) rect.bottom),
-                new Vector3((float) rect.right, (float) rect.top),
-                new Vector3((float) rect.left, (float) rect.bottom),
-                new Vector3((float) rect.left, (float) rect.top)
+                new Vector3(rect.right, rect.bottom),
+                new Vector3(rect.right, rect.top),
+                new Vector3(rect.left, rect.bottom),
+                new Vector3(rect.left, rect.top)
             };
 
             this.triangles = _boundsTriangles;

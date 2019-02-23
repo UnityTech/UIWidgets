@@ -14,9 +14,9 @@ namespace Unity.UIWidgets.rendering {
 
             float scrollOffset = this.constraints.scrollOffset + this.constraints.cacheOrigin;
             D.assert(scrollOffset >= 0.0);
-            double remainingExtent = this.constraints.remainingCacheExtent;
+            float remainingExtent = this.constraints.remainingCacheExtent;
             D.assert(remainingExtent >= 0.0);
-            double targetEndScrollOffset = scrollOffset + remainingExtent;
+            float targetEndScrollOffset = scrollOffset + remainingExtent;
             BoxConstraints childConstraints = this.constraints.asBoxConstraints();
             int leadingGarbage = 0;
             int trailingGarbage = 0;

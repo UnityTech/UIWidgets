@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using Unity.UIWidgets.ui;
+using UnityEngine;
+using Color = Unity.UIWidgets.ui.Color;
 
 namespace Unity.UIWidgets.painting {
     public class BoxShadow : IEquatable<BoxShadow> {
@@ -21,11 +23,11 @@ namespace Unity.UIWidgets.painting {
         public readonly float blurRadius;
         public readonly float spreadRadius;
 
-        public static double convertRadiusToSigma(double radius) {
-            return radius * 0.57735 + 0.5;
+        public static float convertRadiusToSigma(float radius) {
+            return radius * 0.57735f + 0.5f;
         }
 
-        public double blurSigma {
+        public float blurSigma {
             get { return convertRadiusToSigma(this.blurRadius); }
         }
 
@@ -74,7 +76,7 @@ namespace Unity.UIWidgets.painting {
             a = a ?? new List<BoxShadow>();
             b = b ?? new List<BoxShadow>();
             List<BoxShadow> result = new List<BoxShadow>();
-            int commonLength = Math.Min(a.Count, b.Count);
+            int commonLength = Mathf.Min(a.Count, b.Count);
             for (int i = 0; i < commonLength; i += 1) {
                 result.Add(lerp(a[i], b[i], t));
             }

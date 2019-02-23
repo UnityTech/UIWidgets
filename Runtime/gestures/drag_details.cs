@@ -73,7 +73,7 @@ namespace Unity.UIWidgets.gestures {
     public class DragEndDetails {
         public DragEndDetails(
             Velocity velocity = null,
-            double? primaryVelocity = null
+            float? primaryVelocity = null
         ) {
             this.velocity = velocity ?? Velocity.zero;
             this.primaryVelocity = primaryVelocity;
@@ -85,7 +85,7 @@ namespace Unity.UIWidgets.gestures {
 
         public readonly Velocity velocity;
 
-        public readonly double? primaryVelocity;
+        public readonly float? primaryVelocity;
 
         public override string ToString() {
             return this.GetType() + "(" + this.velocity + ")";

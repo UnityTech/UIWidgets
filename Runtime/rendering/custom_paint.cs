@@ -160,7 +160,7 @@ namespace Unity.UIWidgets.widgets {
                 return true;
             });
             if (offset != Offset.zero) {
-                canvas.translate((float) offset.dx, (float) offset.dy);
+                canvas.translate(offset.dx, offset.dy);
             }
 
             painter.paint(canvas, this.size);

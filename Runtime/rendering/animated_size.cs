@@ -43,7 +43,7 @@ namespace Unity.UIWidgets.rendering {
         CurvedAnimation _animation;
         readonly SizeTween _sizeTween = new SizeTween();
         bool _hasVisualOverflow;
-        double _lastValue;
+        float _lastValue;
 
         public RenderAnimatedSizeState state {
             get { return this._state; }
@@ -142,7 +142,7 @@ namespace Unity.UIWidgets.rendering {
         }
 
         void _restartAnimation() {
-            this._lastValue = 0.0;
+            this._lastValue = 0.0f;
             this._controller.forward(from: 0.0f);
         }
 

@@ -27,8 +27,8 @@ namespace Unity.UIWidgets.flow {
             var bounds = canvas.getTotalMatrix().mapRect(this.logicalRect);
 
             D.assert(() => {
-                var textureWidth = Mathf.CeilToInt((float) bounds.width * this.devicePixelRatio);
-                var textureHeight = Mathf.CeilToInt((float) bounds.height * this.devicePixelRatio);
+                var textureWidth = Mathf.CeilToInt(bounds.width * this.devicePixelRatio);
+                var textureHeight = Mathf.CeilToInt(bounds.height * this.devicePixelRatio);
 
                 D.assert(this.image.width == textureWidth);
                 D.assert(this.image.height == textureHeight);
@@ -211,8 +211,8 @@ namespace Unity.UIWidgets.flow {
             var bounds = transform.mapRect(picture.paintBounds);
 
             var desc = new RenderTextureDescriptor(
-                Mathf.CeilToInt((float) (bounds.width * devicePixelRatio)),
-                Mathf.CeilToInt((float) (bounds.height * devicePixelRatio)),
+                Mathf.CeilToInt((bounds.width * devicePixelRatio)),
+                Mathf.CeilToInt((bounds.height * devicePixelRatio)),
                 RenderTextureFormat.Default, 24) {
                 useMipMap = false,
                 autoGenerateMips = false,
@@ -226,7 +226,7 @@ namespace Unity.UIWidgets.flow {
             renderTexture.hideFlags = HideFlags.HideAndDontSave;
 
             var canvas = new CommandBufferCanvas(renderTexture, devicePixelRatio, meshPool);
-            canvas.translate((float) -bounds.left, (float) -bounds.top);
+            canvas.translate(-bounds.left, -bounds.top);
             canvas.concat(transform);
             canvas.drawPicture(picture);
             canvas.flush();

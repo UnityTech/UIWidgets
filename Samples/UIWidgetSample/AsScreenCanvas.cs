@@ -218,8 +218,8 @@ namespace UIWidgetsSample {
                 var testCard = new AssetCard(
                     "AI Template",
                     "INVECTOR",
-                    45.0,
-                    36.0,
+                    45.0f,
+                    36.0f,
                     true,
                     "https://d2ujflorbtfzji.cloudfront.net/key-image/46dc65c1-f605-4ccb-97e0-3d60b28cfdfe.jpg"
                 );
@@ -317,8 +317,8 @@ namespace UIWidgetsSample {
             public AssetCard(
                 string name,
                 string category,
-                double price,
-                double priceDiscount,
+                float price,
+                float priceDiscount,
                 bool showBadge,
                 string imageSrc
             ) {
@@ -332,8 +332,8 @@ namespace UIWidgetsSample {
 
             public string name;
             public string category;
-            public double price;
-            public double priceDiscount;
+            public float price;
+            public float priceDiscount;
             public bool showBadge;
             public string imageSrc;
 

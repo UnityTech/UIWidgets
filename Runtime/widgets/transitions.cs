@@ -4,6 +4,7 @@ using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
+using UnityEngine;
 
 namespace Unity.UIWidgets.widgets {
     public abstract class AnimatedWidget : StatefulWidget {
@@ -104,8 +105,8 @@ namespace Unity.UIWidgets.widgets {
             this.child = child;
         }
 
-        public Animation<double> turns {
-            get { return (Animation<double>) this.listenable; }
+        public Animation<float> turns {
+            get { return (Animation<float>) this.listenable; }
         }
 
         public readonly Alignment alignment;
@@ -113,8 +114,8 @@ namespace Unity.UIWidgets.widgets {
         public readonly Widget child;
 
         protected internal override Widget build(BuildContext context) {
-            double turnsValue = this.turns.value;
-            Matrix3 transform = Matrix3.makeRotate((float) (turnsValue * Math.PI * 2.0));
+            float turnsValue = this.turns.value;
+            Matrix3 transform = Matrix3.makeRotate((turnsValue * Mathf.PI * 2.0f));
             return new Transform(
                 transform: transform,
                 alignment: this.alignment,

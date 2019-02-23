@@ -3,15 +3,15 @@ using Unity.UIWidgets.painting;
 
 namespace Unity.UIWidgets.material {
     public static class Constants {
-        public static readonly double kToolbarHeight = 56.0;
+        public static readonly float kToolbarHeight = 56.0f;
 
-        public static readonly double kBottomNavigationBarHeight = 56.0;
+        public static readonly float kBottomNavigationBarHeight = 56.0f;
 
-        public static readonly double kTextTabBarHeight = 48.0;
+        public static readonly float kTextTabBarHeight = 48.0f;
 
         public static readonly TimeSpan kThemeChangeDuration = new TimeSpan(0, 0, 0, 0, 200);
 
-        public static readonly double kRadialReactionRadius = 20.0;
+        public static readonly float kRadialReactionRadius = 20.0f;
 
         public static readonly TimeSpan kRadialReactionDuration = new TimeSpan(0, 0, 0, 0, 100);
 

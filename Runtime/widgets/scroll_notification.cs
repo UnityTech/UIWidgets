@@ -50,7 +50,7 @@ namespace Unity.UIWidgets.widgets {
             ScrollMetrics metrics = null,
             BuildContext context = null,
             DragUpdateDetails dragDetails = null,
-            double scrollDelta = 0
+            float scrollDelta = 0
         ) : base(metrics: metrics, context: context) {
             this.dragDetails = dragDetails;
             this.scrollDelta = scrollDelta;
@@ -58,7 +58,7 @@ namespace Unity.UIWidgets.widgets {
 
         public readonly DragUpdateDetails dragDetails;
 
-        public readonly double scrollDelta;
+        public readonly float scrollDelta;
 
         protected override void debugFillDescription(List<string> description) {
             base.debugFillDescription(description);
@@ -74,8 +74,8 @@ namespace Unity.UIWidgets.widgets {
             ScrollMetrics metrics = null,
             BuildContext context = null,
             DragUpdateDetails dragDetails = null,
-            double overscroll = 0,
-            double velocity = 0
+            float overscroll = 0,
+            float velocity = 0
         ) : base(metrics: metrics, context: context) {
             this.dragDetails = dragDetails;
             this.overscroll = overscroll;
@@ -84,9 +84,9 @@ namespace Unity.UIWidgets.widgets {
 
         public readonly DragUpdateDetails dragDetails;
 
-        public readonly double overscroll;
+        public readonly float overscroll;
 
-        public readonly double velocity;
+        public readonly float velocity;
 
         protected override void debugFillDescription(List<string> description) {
             base.debugFillDescription(description);
@@ -103,8 +103,8 @@ namespace Unity.UIWidgets.widgets {
             ScrollMetrics metrics = null,
             BuildContext context = null,
             DragEndDetails dragDetails = null,
-            double overscroll = 0,
-            double velocity = 0
+            float overscroll = 0,
+            float velocity = 0
         ) : base(metrics: metrics, context: context) {
             this.dragDetails = dragDetails;
         }

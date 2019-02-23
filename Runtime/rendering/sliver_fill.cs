@@ -43,11 +43,11 @@ namespace Unity.UIWidgets.rendering {
         }
 
         protected override int getMinChildIndexForScrollOffset(float scrollOffset, float itemExtent) {
-            return base.getMinChildIndexForScrollOffset(Math.Max(scrollOffset - this._padding, 0.0f), itemExtent);
+            return base.getMinChildIndexForScrollOffset(Mathf.Max(scrollOffset - this._padding, 0.0f), itemExtent);
         }
 
         protected override int getMaxChildIndexForScrollOffset(float scrollOffset, float itemExtent) {
-            return base.getMaxChildIndexForScrollOffset(Math.Max(scrollOffset - this._padding, 0.0f), itemExtent);
+            return base.getMaxChildIndexForScrollOffset(Mathf.Max(scrollOffset - this._padding, 0.0f), itemExtent);
         }
 
         protected override float estimateMaxScrollOffset(SliverConstraints constraints,
@@ -74,7 +74,7 @@ namespace Unity.UIWidgets.rendering {
         }
 
         protected override void performLayout() {
-            float extent = this.constraints.remainingPaintExtent - Math.Min(this.constraints.overlap, 0.0f);
+            float extent = this.constraints.remainingPaintExtent - Mathf.Min(this.constraints.overlap, 0.0f);
             if (this.child != null) {
                 this.child.layout(this.constraints.asBoxConstraints(minExtent: extent, maxExtent: extent),
                     parentUsesSize: true);

@@ -3,6 +3,8 @@ using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.ui;
+using UnityEngine;
+using Rect = Unity.UIWidgets.ui.Rect;
 
 namespace Unity.UIWidgets.rendering {
     public class RenderSliverPadding : RenderObjectWithChildMixinRenderSliver<RenderSliver> {
@@ -111,7 +113,7 @@ namespace Unity.UIWidgets.rendering {
             if (this.child == null) {
                 this.geometry = new SliverGeometry(
                     scrollExtent: mainAxisPadding,
-                    paintExtent: Math.Min(mainAxisPadding, this.constraints.remainingPaintExtent),
+                    paintExtent: Mathf.Min(mainAxisPadding, this.constraints.remainingPaintExtent),
                     maxPaintExtent: mainAxisPadding
                 );
                 return;
@@ -119,14 +121,14 @@ namespace Unity.UIWidgets.rendering {
 
             this.child.layout(
                 this.constraints.copyWith(
-                    scrollOffset: (float) Math.Max(0.0, this.constraints.scrollOffset - beforePadding),
-                    cacheOrigin: (float) Math.Min(0.0, this.constraints.cacheOrigin + beforePadding),
+                    scrollOffset: Mathf.Max(0.0f, this.constraints.scrollOffset - beforePadding),
+                    cacheOrigin: Mathf.Min(0.0f, this.constraints.cacheOrigin + beforePadding),
                     overlap: 0.0f,
                     remainingPaintExtent: this.constraints.remainingPaintExtent -
                                           this.calculatePaintOffset(this.constraints, from: 0.0f, to: beforePadding),
                     remainingCacheExtent: this.constraints.remainingCacheExtent -
                                           this.calculateCacheOffset(this.constraints, from: 0.0f, to: beforePadding),
-                    crossAxisExtent: (float) Math.Max(0.0, this.constraints.crossAxisExtent - crossAxisPadding)
+                    crossAxisExtent: Mathf.Max(0.0f, this.constraints.crossAxisExtent - crossAxisPadding)
                 ),
                 parentUsesSize: true
             );
@@ -139,46 +141,46 @@ namespace Unity.UIWidgets.rendering {
                 return;
             }
 
-            double beforePaddingPaintExtent = this.calculatePaintOffset(
+            float beforePaddingPaintExtent = this.calculatePaintOffset(
                 this.constraints,
                 from: 0.0f,
                 to: beforePadding
             );
 
-            double afterPaddingPaintExtent = this.calculatePaintOffset(
+            float afterPaddingPaintExtent = this.calculatePaintOffset(
                 this.constraints,
                 from: beforePadding + childLayoutGeometry.scrollExtent,
                 to: mainAxisPadding + childLayoutGeometry.scrollExtent
             );
 
-            double mainAxisPaddingPaintExtent = beforePaddingPaintExtent + afterPaddingPaintExtent;
-            double beforePaddingCacheExtent = this.calculateCacheOffset(
+            float mainAxisPaddingPaintExtent = beforePaddingPaintExtent + afterPaddingPaintExtent;
+            float beforePaddingCacheExtent = this.calculateCacheOffset(
                 this.constraints,
                 from: 0.0f,
                 to: beforePadding
             );
-            double afterPaddingCacheExtent = this.calculateCacheOffset(
+            float afterPaddingCacheExtent = this.calculateCacheOffset(
                 this.constraints,
                 from: beforePadding + childLayoutGeometry.scrollExtent,
                 to: mainAxisPadding + childLayoutGeometry.scrollExtent
             );
 
-            double mainAxisPaddingCacheExtent = afterPaddingCacheExtent + beforePaddingCacheExtent;
-            double paintExtent = Math.Min(
-                beforePaddingPaintExtent + Math.Max(childLayoutGeometry.paintExtent,
+            float mainAxisPaddingCacheExtent = afterPaddingCacheExtent + beforePaddingCacheExtent;
+            float paintExtent = Mathf.Min(
+                beforePaddingPaintExtent + Mathf.Max(childLayoutGeometry.paintExtent,
                     childLayoutGeometry.layoutExtent + afterPaddingPaintExtent),
                 this.constraints.remainingPaintExtent
             );
 
             this.geometry = new SliverGeometry(
                 scrollExtent: mainAxisPadding + childLayoutGeometry.scrollExtent,
-                paintExtent: (float) paintExtent,
-                layoutExtent: (float) Math.Min(mainAxisPaddingPaintExtent + childLayoutGeometry.layoutExtent,
+                paintExtent: paintExtent,
+                layoutExtent: Mathf.Min(mainAxisPaddingPaintExtent + childLayoutGeometry.layoutExtent,
                     paintExtent),
-                cacheExtent: (float) Math.Min(mainAxisPaddingCacheExtent + childLayoutGeometry.cacheExtent,
+                cacheExtent: Mathf.Min(mainAxisPaddingCacheExtent + childLayoutGeometry.cacheExtent,
                     this.constraints.remainingCacheExtent),
                 maxPaintExtent: mainAxisPadding + childLayoutGeometry.maxPaintExtent,
-                hitTestExtent: (float) Math.Max(
+                hitTestExtent: Mathf.Max(
                     mainAxisPaddingPaintExtent + childLayoutGeometry.paintExtent,
                     beforePaddingPaintExtent + childLayoutGeometry.hitTestExtent
                 ),

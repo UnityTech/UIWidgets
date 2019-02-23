@@ -238,20 +238,20 @@ namespace Unity.UIWidgets.painting {
             }
 
             if (rect.width < rect.height) {
-                double delta = this.circleness * (rect.height - rect.width) / 2.0;
+                float delta = this.circleness * (rect.height - rect.width) / 2.0f;
                 return Rect.fromLTRB(
                     rect.left,
-                    (float) (rect.top + delta),
+                    (rect.top + delta),
                     rect.right,
-                    (float) (rect.bottom - delta)
+                    (rect.bottom - delta)
                 );
             }
             else {
-                double delta = this.circleness * (rect.width - rect.height) / 2.0;
+                float delta = this.circleness * (rect.width - rect.height) / 2.0f;
                 return Rect.fromLTRB(
-                    (float) (rect.left + delta),
+                    (rect.left + delta),
                     rect.top,
-                    (float) (rect.right - delta),
+                    (rect.right - delta),
                     rect.bottom
                 );
             }

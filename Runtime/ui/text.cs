@@ -304,7 +304,7 @@ namespace Unity.UIWidgets.ui {
 
     public enum TextDecorationStyle {
         solid,
-        doubleLine,
+        floatLine,
     }
 
     public class TextDecoration : IEquatable<TextDecoration> {

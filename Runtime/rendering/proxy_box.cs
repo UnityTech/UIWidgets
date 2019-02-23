@@ -80,14 +80,14 @@ namespace Unity.UIWidgets.rendering {
 
         protected override float computeMinIntrinsicWidth(float height) {
             if (this._additionalConstraints.hasBoundedWidth && this._additionalConstraints.hasTightWidth) {
-                return (float) this._additionalConstraints.minWidth;
+                return this._additionalConstraints.minWidth;
             }
 
             float width = base.computeMinIntrinsicWidth(height);
             D.assert(!float.IsInfinity(width));
 
             if (!this._additionalConstraints.hasInfiniteWidth) {
-                return (float) this._additionalConstraints.constrainWidth(width);
+                return this._additionalConstraints.constrainWidth(width);
             }
 
             return width;
@@ -95,14 +95,14 @@ namespace Unity.UIWidgets.rendering {
 
         protected override float computeMaxIntrinsicWidth(float height) {
             if (this._additionalConstraints.hasBoundedWidth && this._additionalConstraints.hasTightWidth) {
-                return (float) this._additionalConstraints.minWidth;
+                return this._additionalConstraints.minWidth;
             }
 
             float width = base.computeMaxIntrinsicWidth(height);
             D.assert(!float.IsInfinity(width));
 
             if (!this._additionalConstraints.hasInfiniteWidth) {
-                return (float) this._additionalConstraints.constrainWidth(width);
+                return this._additionalConstraints.constrainWidth(width);
             }
 
             return width;
@@ -110,14 +110,14 @@ namespace Unity.UIWidgets.rendering {
 
         protected override float computeMinIntrinsicHeight(float width) {
             if (this._additionalConstraints.hasBoundedHeight && this._additionalConstraints.hasTightHeight) {
-                return (float) this._additionalConstraints.minHeight;
+                return this._additionalConstraints.minHeight;
             }
 
             float height = base.computeMinIntrinsicHeight(width);
             D.assert(!float.IsInfinity(height));
 
             if (!this._additionalConstraints.hasInfiniteHeight) {
-                return (float) this._additionalConstraints.constrainHeight(height);
+                return this._additionalConstraints.constrainHeight(height);
             }
 
             return height;
@@ -125,14 +125,14 @@ namespace Unity.UIWidgets.rendering {
 
         protected override float computeMaxIntrinsicHeight(float width) {
             if (this._additionalConstraints.hasBoundedHeight && this._additionalConstraints.hasTightHeight) {
-                return (float) this._additionalConstraints.minHeight;
+                return this._additionalConstraints.minHeight;
             }
 
             float height = base.computeMaxIntrinsicHeight(width);
             D.assert(!float.IsInfinity(height));
 
             if (!this._additionalConstraints.hasInfiniteHeight) {
-                return (float) this._additionalConstraints.constrainHeight(height);
+                return this._additionalConstraints.constrainHeight(height);
             }
 
             return height;
@@ -237,8 +237,8 @@ namespace Unity.UIWidgets.rendering {
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
-            properties.add(new DoubleProperty("maxWidth", this.maxWidth, defaultValue: double.PositiveInfinity));
-            properties.add(new DoubleProperty("maxHeight", this.maxHeight, defaultValue: double.PositiveInfinity));
+            properties.add(new floatProperty("maxWidth", this.maxWidth, defaultValue: float.PositiveInfinity));
+            properties.add(new floatProperty("maxHeight", this.maxHeight, defaultValue: float.PositiveInfinity));
         }
     }
 
@@ -263,7 +263,7 @@ namespace Unity.UIWidgets.rendering {
 
 
         protected override float computeMinIntrinsicWidth(float height) {
-            if (!double.IsInfinity(height)) {
+            if (!float.IsInfinity(height)) {
                 return height * this._aspectRatio;
             }
 
@@ -275,7 +275,7 @@ namespace Unity.UIWidgets.rendering {
         }
 
         protected override float computeMaxIntrinsicWidth(float height) {
-            if (!double.IsInfinity(height)) {
+            if (!float.IsInfinity(height)) {
                 return height * this._aspectRatio;
             }
 
@@ -287,7 +287,7 @@ namespace Unity.UIWidgets.rendering {
         }
 
         protected override float computeMinIntrinsicHeight(float width) {
-            if (!double.IsInfinity(width)) {
+            if (!float.IsInfinity(width)) {
                 return width / this._aspectRatio;
             }
 
@@ -299,7 +299,7 @@ namespace Unity.UIWidgets.rendering {
         }
 
         protected override float computeMaxIntrinsicHeight(float width) {
-            if (!double.IsInfinity(width)) {
+            if (!float.IsInfinity(width)) {
                 return width / this._aspectRatio;
             }
 
@@ -316,8 +316,8 @@ namespace Unity.UIWidgets.rendering {
                 return constraints.smallest;
             }
 
-            double width = constraints.maxWidth;
-            double height = width / this._aspectRatio;
+            float width = constraints.maxWidth;
+            float height = width / this._aspectRatio;
 
             if (width > constraints.maxWidth) {
                 width = constraints.maxWidth;
@@ -339,7 +339,7 @@ namespace Unity.UIWidgets.rendering {
                 width = height * this._aspectRatio;
             }
 
-            return constraints.constrain(new Size((float) width, (float) height));
+            return constraints.constrain(new Size(width, height));
         }
 
         protected override void performLayout() {
@@ -351,12 +351,12 @@ namespace Unity.UIWidgets.rendering {
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
-            properties.add(new DoubleProperty("aspectRatio", this.aspectRatio));
+            properties.add(new floatProperty("aspectRatio", this.aspectRatio));
         }
     }
 
     public class RenderOpacity : RenderProxyBox {
-        public RenderOpacity(double opacity = 1.0, RenderBox child = null) : base(child) {
+        public RenderOpacity(float opacity = 1.0f, RenderBox child = null) : base(child) {
             D.assert(opacity >= 0.0 && opacity <= 1.0);
             this._opacity = opacity;
             this._alpha = _getAlphaFromOpacity(opacity);
@@ -368,13 +368,13 @@ namespace Unity.UIWidgets.rendering {
 
         int _alpha;
 
-        internal static int _getAlphaFromOpacity(double opacity) {
+        internal static int _getAlphaFromOpacity(float opacity) {
             return (opacity * 255).round();
         }
 
-        double _opacity;
+        float _opacity;
 
-        public double opacity {
+        public float opacity {
             get { return this._opacity; }
             set {
                 D.assert(value >= 0.0 && value <= 1.0);
@@ -413,7 +413,7 @@ namespace Unity.UIWidgets.rendering {
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
-            properties.add(new DoubleProperty("opacity", this.opacity));
+            properties.add(new floatProperty("opacity", this.opacity));
         }
     }
 
@@ -761,7 +761,7 @@ namespace Unity.UIWidgets.rendering {
     public abstract class _RenderPhysicalModelBase<T> : _RenderCustomClip<T> where T : class {
         public _RenderPhysicalModelBase(
             RenderBox child = null,
-            double? elevation = null,
+            float? elevation = null,
             Color color = null,
             Color shadowColor = null,
             Clip clipBehavior = Clip.none,
@@ -770,12 +770,12 @@ namespace Unity.UIWidgets.rendering {
             D.assert(elevation != null);
             D.assert(color != null);
             D.assert(shadowColor != null);
-            this._elevation = elevation ?? 0.0;
+            this._elevation = elevation ?? 0.0f;
             this._color = color;
             this._shadowColor = shadowColor;
         }
 
-        public double elevation {
+        public float elevation {
             get { return this._elevation; }
             set {
                 if (this.elevation == value) {
@@ -792,7 +792,7 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
-        double _elevation;
+        float _elevation;
 
         public Color shadowColor {
             get { return this._shadowColor; }
@@ -834,7 +834,7 @@ namespace Unity.UIWidgets.rendering {
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder description) {
             base.debugFillProperties(description);
-            description.add(new DoubleProperty("elevation", this.elevation));
+            description.add(new floatProperty("elevation", this.elevation));
             description.add(new DiagnosticsProperty<Color>("color", this.color));
             description.add(new DiagnosticsProperty<Color>("shadowColor", this.shadowColor));
         }
@@ -846,7 +846,7 @@ namespace Unity.UIWidgets.rendering {
             BoxShape shape = BoxShape.rectangle,
             Clip clipBehavior = Clip.none,
             BorderRadius borderRadius = null,
-            double elevation = 0.0,
+            float elevation = 0.0f,
             Color color = null,
             Color shadowColor = null
         ) : base(clipBehavior: clipBehavior, child: child, elevation: elevation, color: color,
@@ -962,7 +962,7 @@ namespace Unity.UIWidgets.rendering {
             RenderBox child = null,
             CustomClipper<Path> clipper = null,
             Clip clipBehavior = Clip.none,
-            double elevation = 0.0,
+            float elevation = 0.0f,
             Color color = null,
             Color shadowColor = null
         ) : base(child: child,
@@ -1235,26 +1235,26 @@ namespace Unity.UIWidgets.rendering {
             this.markNeedsPaint();
         }
 
-        public void rotateX(double degrees) {
+        public void rotateX(float degrees) {
             //2D, do nothing
         }
 
-        public void rotateY(double degrees) {
+        public void rotateY(float degrees) {
             //2D, do nothing
         }
 
-        public void rotateZ(double degrees) {
-            this._transform.preRotate((float) degrees);
+        public void rotateZ(float degrees) {
+            this._transform.preRotate(degrees);
             this.markNeedsPaint();
         }
 
-        public void translate(double x, double y = 0.0, double z = 0.0) {
-            this._transform.preTranslate((float) x, (float) y);
+        public void translate(float x, float y = 0.0f, float z = 0.0f) {
+            this._transform.preTranslate(x, y);
             this.markNeedsPaint();
         }
 
-        public void scale(double x, double y, double z) {
-            this._transform.preScale((float) x, (float) y);
+        public void scale(float x, float y, float z) {
+            this._transform.preScale(x, y);
             this.markNeedsPaint();
         }
 
@@ -1267,23 +1267,23 @@ namespace Unity.UIWidgets.rendering {
 
                 var result = Matrix3.I();
                 if (this._origin != null) {
-                    result.preTranslate((float) this._origin.dx, (float) this._origin.dy);
+                    result.preTranslate(this._origin.dx, this._origin.dy);
                 }
 
                 Offset translation = null;
                 if (resolvedAlignment != null) {
                     translation = resolvedAlignment.alongSize(this.size);
-                    result.preTranslate((float) translation.dx, (float) translation.dy);
+                    result.preTranslate(translation.dx, translation.dy);
                 }
 
                 result.preConcat(this._transform);
 
                 if (resolvedAlignment != null) {
-                    result.preTranslate((float) -translation.dx, (float) -translation.dy);
+                    result.preTranslate(-translation.dx, -translation.dy);
                 }
 
                 if (this._origin != null) {
-                    result.preTranslate((float) -this._origin.dx, (float) -this._origin.dy);
+                    result.preTranslate(-this._origin.dx, -this._origin.dy);
                 }
 
                 return result;
@@ -1393,8 +1393,8 @@ namespace Unity.UIWidgets.rendering {
         }
 
         public override void applyPaintTransform(RenderObject child, Matrix3 transform) {
-            transform.preTranslate((float) (this.translation.dx * this.size.width),
-                (float) (this.translation.dy * this.size.height));
+            transform.preTranslate((this.translation.dx * this.size.width),
+                (this.translation.dy * this.size.height));
         }
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
@@ -1597,8 +1597,8 @@ namespace Unity.UIWidgets.rendering {
                     properties.add(new MessageProperty("usefulness ratio", "no metrics collected yet (never painted)"));
                 }
                 else {
-                    double fraction = (double) this.debugAsymmetricPaintCount /
-                                      (this.debugSymmetricPaintCount + this.debugAsymmetricPaintCount);
+                    float fraction = this.debugAsymmetricPaintCount /
+                                     (this.debugSymmetricPaintCount + this.debugAsymmetricPaintCount);
 
                     string diagnosis;
                     if (this.debugSymmetricPaintCount + this.debugAsymmetricPaintCount < 5) {

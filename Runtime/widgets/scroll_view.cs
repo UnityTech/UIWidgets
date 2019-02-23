@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
+using UnityEngine;
 
 namespace Unity.UIWidgets.widgets {
     public abstract class ScrollView : StatelessWidget {
@@ -318,7 +319,7 @@ namespace Unity.UIWidgets.widgets {
                         ? itemBuilder(context, itemIndex)
                         : separatorBuilder(context, itemIndex);
                 },
-                childCount: Math.Max(0, itemCount * 2 - 1),
+                childCount: Mathf.Max(0, itemCount * 2 - 1),
                 addAutomaticKeepAlives: addAutomaticKeepAlives,
                 addRepaintBoundaries: addRepaintBoundaries
             );
@@ -430,7 +431,7 @@ namespace Unity.UIWidgets.widgets {
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
-            properties.add(new DoubleProperty("itemExtent", this.itemExtent,
+            properties.add(new floatProperty("itemExtent", this.itemExtent,
                 defaultValue: Diagnostics.kNullDefaultValue));
         }
     }

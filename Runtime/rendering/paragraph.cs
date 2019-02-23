@@ -122,7 +122,7 @@ namespace Unity.UIWidgets.rendering {
         public float textScaleFactor {
             get { return this._textPainter.textScaleFactor; }
             set {
-                if (Math.Abs(this._textPainter.textScaleFactor - value) < 0.00000001) {
+                if (Mathf.Abs(this._textPainter.textScaleFactor - value) < 0.00000001) {
                     return;
                 }
 
@@ -213,7 +213,7 @@ namespace Unity.UIWidgets.rendering {
         }
 
         void _layoutTextWithConstraints(BoxConstraints constraints) {
-            this._layoutText(minWidth: (float) constraints.minWidth, maxWidth: (float) constraints.maxWidth);
+            this._layoutText(minWidth: constraints.minWidth, maxWidth: constraints.maxWidth);
         }
 
         public override List<DiagnosticsNode> debugDescribeChildren() {
@@ -229,7 +229,7 @@ namespace Unity.UIWidgets.rendering {
             properties.add(new FlagProperty("softWrap", value: this.softWrap, ifTrue: "wrapping at box width",
                 ifFalse: "no wrapping except at line break characters", showName: true));
             properties.add(new EnumProperty<TextOverflow>("overflow", this.overflow));
-            properties.add(new DoubleProperty("textScaleFactor", this.textScaleFactor, defaultValue: 1.0));
+            properties.add(new floatProperty("textScaleFactor", this.textScaleFactor, defaultValue: 1.0));
             properties.add(new IntProperty("maxLines", this.maxLines, ifNull: "unlimited"));
         }
     }

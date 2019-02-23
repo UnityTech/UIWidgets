@@ -8,7 +8,7 @@ namespace Unity.UIWidgets.material {
         public Card(
             Key key = null,
             Color color = null,
-            double? elevation = null,
+            float? elevation = null,
             ShapeBorder shape = null,
             EdgeInsets margin = null,
             Clip clipBehavior = Clip.none,
@@ -23,7 +23,7 @@ namespace Unity.UIWidgets.material {
 
         public readonly Color color;
 
-        public readonly double? elevation;
+        public readonly float? elevation;
 
         public readonly ShapeBorder shape;
 
@@ -39,7 +39,7 @@ namespace Unity.UIWidgets.material {
                 child: new Material(
                     type: MaterialType.card,
                     color: this.color ?? Theme.of(context).cardColor,
-                    elevation: this.elevation ?? 1.0,
+                    elevation: this.elevation ?? 1.0f,
                     shape: this.shape ?? new RoundedRectangleBorder(
                                borderRadius: BorderRadius.all(Radius.circular(4.0f))
                            ),

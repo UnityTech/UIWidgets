@@ -65,7 +65,7 @@ namespace Unity.UIWidgets.engine {
 
         protected override Vector2 queryWindowSize() {
             var size = this._widgetCanvas.rectTransform.rect.size;
-            size = size * this._widgetCanvas.canvas.scaleFactor / (float) this._widgetCanvas.devicePixelRatio;
+            size = size * this._widgetCanvas.canvas.scaleFactor / this._widgetCanvas.devicePixelRatio;
             return new Vector2(Mathf.Round(size.x), Mathf.Round(size.y));
         }
     }
@@ -75,8 +75,7 @@ namespace Unity.UIWidgets.engine {
         IPointerEnterHandler, IPointerExitHandler {
         static Event _repaintEvent;
 
-        [SerializeField]
-        protected float devicePixelRatioOverride;
+        [SerializeField] protected float devicePixelRatioOverride;
 
         WindowAdapter _windowAdapter;
         Texture _texture;
@@ -182,8 +181,8 @@ namespace Unity.UIWidgets.engine {
                 if (Input.mouseScrollDelta.y != 0 || Input.mouseScrollDelta.x != 0) {
                     var scaleFactor = this.canvas.scaleFactor;
                     var pos = this.getPointPosition(Input.mousePosition);
-                    this._scrollInput.onScroll((float) (Input.mouseScrollDelta.x * scaleFactor),
-                        (float) (Input.mouseScrollDelta.y * scaleFactor),
+                    this._scrollInput.onScroll(Input.mouseScrollDelta.x * scaleFactor,
+                        Input.mouseScrollDelta.y * scaleFactor,
                         pos.x,
                         pos.y,
                         this.getScrollButton());

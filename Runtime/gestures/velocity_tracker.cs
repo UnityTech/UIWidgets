@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
+using UnityEngine;
 
 namespace Unity.UIWidgets.gestures {
     public class Velocity : IEquatable<Velocity> {
@@ -33,7 +34,7 @@ namespace Unity.UIWidgets.gestures {
         public Velocity clampMagnitude(float minValue, float maxValue) {
             D.assert(minValue >= 0.0);
             D.assert(maxValue >= 0.0 && maxValue >= minValue);
-            double valueSquared = this.pixelsPerSecond.distanceSquared;
+            float valueSquared = this.pixelsPerSecond.distanceSquared;
             if (valueSquared > maxValue * maxValue) {
                 return new Velocity(pixelsPerSecond: (this.pixelsPerSecond / this.pixelsPerSecond.distance) * maxValue);
             }
@@ -93,7 +94,7 @@ namespace Unity.UIWidgets.gestures {
     public class VelocityEstimate {
         public VelocityEstimate(
             Offset pixelsPerSecond,
-            double confidence,
+            float confidence,
             TimeSpan duration,
             Offset offset
         ) {
@@ -107,7 +108,7 @@ namespace Unity.UIWidgets.gestures {
 
         public readonly Offset pixelsPerSecond;
 
-        public readonly double confidence;
+        public readonly float confidence;
 
         public readonly TimeSpan duration;
 
@@ -178,7 +179,7 @@ namespace Unity.UIWidgets.gestures {
                 }
 
                 float age = (float) (newestSample.time - sample.time).TotalMilliseconds;
-                float delta = (float) Math.Abs((sample.time - previousSample.time).TotalMilliseconds);
+                float delta = Mathf.Abs((float) (sample.time - previousSample.time).TotalMilliseconds);
                 previousSample = sample;
                 if (age > _horizonMilliseconds ||
                     delta > _assumePointerMoveStoppedMilliseconds) {
@@ -215,7 +216,7 @@ namespace Unity.UIWidgets.gestures {
 
             return new VelocityEstimate(
                 pixelsPerSecond: Offset.zero,
-                confidence: 1.0,
+                confidence: 1.0f,
                 duration: newestSample.time - oldestSample.time,
                 offset: newestSample.point - oldestSample.point
             );

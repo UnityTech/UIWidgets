@@ -1,5 +1,8 @@
 using System;
 using Unity.UIWidgets.ui;
+using UnityEngine;
+using Canvas = Unity.UIWidgets.ui.Canvas;
+using Rect = Unity.UIWidgets.ui.Rect;
 
 namespace Unity.UIWidgets.painting {
     public class CircleBorder : ShapeBorder, IEquatable<CircleBorder> {
@@ -37,7 +40,7 @@ namespace Unity.UIWidgets.painting {
             var path = new Path();
             path.addOval(Rect.fromCircle(
                 center: rect.center,
-                radius: (float) Math.Max(0.0, rect.shortestSide / 2.0 - this.side.width)
+                radius: Mathf.Max(0.0f, rect.shortestSide / 2.0f - this.side.width)
             ));
             return path;
         }
@@ -56,7 +59,7 @@ namespace Unity.UIWidgets.painting {
                 case BorderStyle.none:
                     break;
                 case BorderStyle.solid:
-                    canvas.drawCircle(rect.center, (rect.shortestSide - this.side.width) / 2.0, this.side.toPaint());
+                    canvas.drawCircle(rect.center, (rect.shortestSide - this.side.width) / 2.0f, this.side.toPaint());
                     break;
             }
         }

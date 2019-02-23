@@ -17,7 +17,7 @@ namespace Unity.UIWidgets.ui {
     public class Gradient : PaintShader {
         public static Gradient linear(
             Offset start, Offset end, List<Color> colors,
-            List<double> colorStops = null, TileMode tileMode = TileMode.clamp,
+            List<float> colorStops = null, TileMode tileMode = TileMode.clamp,
             Matrix3 matrix = null) {
             D.assert(PaintingUtils._offsetIsValid(start));
             D.assert(PaintingUtils._offsetIsValid(end));
@@ -29,8 +29,8 @@ namespace Unity.UIWidgets.ui {
         }
 
         public static Gradient radial(
-            Offset center, double radius, List<Color> colors,
-            List<double> colorStops = null, TileMode tileMode = TileMode.clamp,
+            Offset center, float radius, List<Color> colors,
+            List<float> colorStops = null, TileMode tileMode = TileMode.clamp,
             Matrix3 matrix = null) {
             D.assert(PaintingUtils._offsetIsValid(center));
             D.assert(colors != null && colors.Count >= 2);
@@ -42,8 +42,8 @@ namespace Unity.UIWidgets.ui {
 
         public static Gradient sweep(
             Offset center, List<Color> colors,
-            List<double> colorStops = null, TileMode tileMode = TileMode.clamp,
-            double startAngle = 0.0, double endAngle = Math.PI * 2,
+            List<float> colorStops = null, TileMode tileMode = TileMode.clamp,
+            float startAngle = 0.0f, float endAngle = Mathf.PI * 2,
             Matrix3 matrix = null) {
             D.assert(PaintingUtils._offsetIsValid(center));
             D.assert(colors != null && colors.Count >= 2);
@@ -54,14 +54,14 @@ namespace Unity.UIWidgets.ui {
             return new _SweepGradient(center, colors, colorStops, tileMode, startAngle, endAngle, matrix);
         }
 
-        static void _validateColorStops(ref List<Color> colors, ref List<double> colorStops) {
+        static void _validateColorStops(ref List<Color> colors, ref List<float> colorStops) {
             if (colorStops == null) {
                 colors = new List<Color>(colors);
 
-                colorStops = new List<double>(colors.Count);
+                colorStops = new List<float>(colors.Count);
                 colorStops.Add(0);
                 var stepCount = colors.Count - 1;
-                var step = 1.0 / stepCount;
+                var step = 1.0f / stepCount;
                 for (int i = 1; i < stepCount; i++) {
                     colorStops.Add(colorStops[i - 1] + step);
                 }
@@ -92,20 +92,20 @@ namespace Unity.UIWidgets.ui {
                 newColors.Add(colors[colors.Count - 1]);
             }
 
-            var newColorStops = new List<double>(count);
+            var newColorStops = new List<float>(count);
             if (dummyFirst) {
-                newColorStops.Add(0.0);
+                newColorStops.Add(0.0f);
             }
 
-            var prevStop = 0.0;
+            var prevStop = 0.0f;
             for (int i = 0; i < colorStops.Count; i++) {
-                var stop = Math.Max(Math.Min(colorStops[i], 1.0), prevStop);
+                var stop = Mathf.Max(Mathf.Min(colorStops[i], 1.0f), prevStop);
                 newColorStops.Add(stop);
                 prevStop = stop;
             }
 
             if (dummyLast) {
-                newColorStops.Add(1.0);
+                newColorStops.Add(1.0f);
             }
 
             colors = newColors;
@@ -114,13 +114,13 @@ namespace Unity.UIWidgets.ui {
 
         static readonly GradientBitmapCache _cache = new GradientBitmapCache();
 
-        internal static Image makeTexturedColorizer(List<Color> colors, List<double> positions) {
+        internal static Image makeTexturedColorizer(List<Color> colors, List<float> positions) {
             int count = colors.Count;
             D.assert(count >= 2);
 
-            bool bottomHardStop = ScalarUtils.ScalarNearlyEqual((float) positions[0], (float) positions[1]);
+            bool bottomHardStop = ScalarUtils.ScalarNearlyEqual(positions[0], positions[1]);
             bool topHardStop =
-                ScalarUtils.ScalarNearlyEqual((float) positions[count - 2], (float) positions[count - 1]);
+                ScalarUtils.ScalarNearlyEqual(positions[count - 2], positions[count - 1]);
 
             int offset = 0;
             if (bottomHardStop) {
@@ -158,7 +158,7 @@ namespace Unity.UIWidgets.ui {
         _Entry _head;
         _Entry _tail;
 
-        public Image getGradient(List<Color> colors, List<double> positions) {
+        public Image getGradient(List<Color> colors, List<float> positions) {
             var key = new _Key(colors, positions);
 
             if (!this.find(key, out var image)) {
@@ -247,7 +247,7 @@ namespace Unity.UIWidgets.ui {
             this._entryCount++;
         }
 
-        Image fillGradient(List<Color> colors, List<double> positions) {
+        Image fillGradient(List<Color> colors, List<float> positions) {
             Texture2D tex = new Texture2D(this.resolution, 1, TextureFormat.RGBA32, false);
             tex.hideFlags = HideFlags.HideAndDontSave;
             tex.wrapMode = TextureWrapMode.Clamp;
@@ -260,14 +260,14 @@ namespace Unity.UIWidgets.ui {
                 // Historically, stops have been mapped to [0, 256], with 256 then nudged to the next
                 // smaller value, then truncate for the texture index. This seems to produce the best
                 // results for some common distributions, so we preserve the behavior.
-                int nextIndex = (int) Mathf.Min((float) positions[i] * this.resolution, this.resolution - 1);
+                int nextIndex = (int) Mathf.Min(positions[i] * this.resolution, this.resolution - 1);
 
                 if (nextIndex > prevIndex) {
                     var c0 = colors[i - 1];
                     var c1 = colors[i];
 
                     var step = 1.0f / (nextIndex - prevIndex);
-                    var t = 0.0;
+                    var t = 0.0f;
 
                     for (int curIndex = prevIndex; curIndex <= nextIndex; ++curIndex) {
                         var c = Color.lerp(c0, c1, t);
@@ -340,7 +340,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         class _Key : IEquatable<_Key> {
-            public _Key(List<Color> colors, List<double> positions) {
+            public _Key(List<Color> colors, List<float> positions) {
                 D.assert(colors != null);
                 D.assert(positions != null);
                 D.assert(colors.Count == positions.Count);
@@ -353,7 +353,7 @@ namespace Unity.UIWidgets.ui {
 
             public readonly List<Color> colors;
 
-            public readonly List<double> positions;
+            public readonly List<float> positions;
 
             readonly int _hashCode;
 
@@ -429,7 +429,7 @@ namespace Unity.UIWidgets.ui {
     class _LinearGradient : Gradient {
         public _LinearGradient(
             Offset start, Offset end, List<Color> colors,
-            List<double> colorStops, TileMode tileMode,
+            List<float> colorStops, TileMode tileMode,
             Matrix3 matrix = null) {
             this.start = start;
             this.end = end;
@@ -444,7 +444,7 @@ namespace Unity.UIWidgets.ui {
         public readonly Offset start;
         public readonly Offset end;
         public readonly List<Color> colors;
-        public readonly List<double> colorStops;
+        public readonly List<float> colorStops;
         public readonly TileMode tileMode;
         public readonly Matrix3 matrix;
         public readonly Matrix3 ptsToUnit;
@@ -477,17 +477,17 @@ namespace Unity.UIWidgets.ui {
             vec = vec.scale(inv);
 
             var matrix = Matrix3.I();
-            matrix.setSinCos((float) -vec.dy, (float) vec.dx, (float) start.dx, (float) start.dy);
-            matrix.postTranslate((float) -start.dx, (float) -start.dy);
-            matrix.postScale((float) inv, (float) inv);
+            matrix.setSinCos(-vec.dy, vec.dx, start.dx, start.dy);
+            matrix.postTranslate(-start.dx, -start.dy);
+            matrix.postScale(inv, inv);
             return matrix;
         }
     }
 
     class _RadialGradient : Gradient {
         public _RadialGradient(
-            Offset center, double radius, List<Color> colors,
-            List<double> colorStops = null, TileMode tileMode = TileMode.clamp,
+            Offset center, float radius, List<Color> colors,
+            List<float> colorStops = null, TileMode tileMode = TileMode.clamp,
             Matrix3 matrix = null
         ) {
             this.center = center;
@@ -501,9 +501,9 @@ namespace Unity.UIWidgets.ui {
         }
 
         public readonly Offset center;
-        public readonly double radius;
+        public readonly float radius;
         public readonly List<Color> colors;
-        public readonly List<double> colorStops;
+        public readonly List<float> colorStops;
         public readonly TileMode tileMode;
         public readonly Matrix3 matrix;
         public readonly Matrix3 ptsToUnit;
@@ -529,12 +529,12 @@ namespace Unity.UIWidgets.ui {
             return mat;
         }
 
-        static Matrix3 radToUnitMatrix(Offset center, double radius) {
+        static Matrix3 radToUnitMatrix(Offset center, float radius) {
             var inv = radius != 0 ? 1 / radius : 0;
 
             var matrix = Matrix3.I();
-            matrix.setTranslate((float) -center.dx, (float) -center.dy);
-            matrix.postScale((float) inv, (float) inv);
+            matrix.setTranslate(-center.dx, -center.dy);
+            matrix.postScale(inv, inv);
             return matrix;
         }
     }
@@ -542,8 +542,8 @@ namespace Unity.UIWidgets.ui {
     class _SweepGradient : Gradient {
         public _SweepGradient(
             Offset center, List<Color> colors,
-            List<double> colorStops = null, TileMode tileMode = TileMode.clamp,
-            double startAngle = 0.0, double endAngle = Math.PI * 2,
+            List<float> colorStops = null, TileMode tileMode = TileMode.clamp,
+            float startAngle = 0.0f, float endAngle = Mathf.PI * 2,
             Matrix3 matrix = null
         ) {
             this.center = center;
@@ -554,13 +554,13 @@ namespace Unity.UIWidgets.ui {
             this.endAngle = endAngle;
             this.matrix = matrix;
 
-            var t0 = startAngle / (Math.PI * 2f);
-            var t1 = endAngle / (Math.PI * 2f);
+            var t0 = startAngle / (Mathf.PI * 2f);
+            var t1 = endAngle / (Mathf.PI * 2f);
             this.bias = -t0;
             this.scale = 1f / (t1 - t0);
 
             var ptsToUnit = Matrix3.I();
-            ptsToUnit.setTranslate((float) -center.dx, (float) -center.dy);
+            ptsToUnit.setTranslate(-center.dx, -center.dy);
             this.ptsToUnit = ptsToUnit;
 
             this.gradientTex = makeTexturedColorizer(colors, colorStops);
@@ -568,15 +568,15 @@ namespace Unity.UIWidgets.ui {
 
         public readonly Offset center;
         public readonly List<Color> colors;
-        public readonly List<double> colorStops;
+        public readonly List<float> colorStops;
         public readonly TileMode tileMode;
-        public readonly double startAngle;
-        public readonly double endAngle;
+        public readonly float startAngle;
+        public readonly float endAngle;
         public readonly Matrix3 matrix;
         public readonly Matrix3 ptsToUnit;
         public readonly Image gradientTex;
-        public readonly double bias;
-        public readonly double scale;
+        public readonly float bias;
+        public readonly float scale;
 
         public Color leftColor {
             get { return this.colors[0]; }

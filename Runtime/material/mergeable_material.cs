@@ -74,7 +74,7 @@ namespace Unity.UIWidgets.material {
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             properties.add(new EnumProperty<Axis>("mainAxis", this.mainAxis));
-            properties.add(new DoubleProperty("elevation", this.elevation));
+            properties.add(new floatProperty("elevation", this.elevation));
         }
 
         public override State createState() {

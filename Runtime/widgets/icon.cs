@@ -29,7 +29,7 @@ namespace Unity.UIWidgets.widgets {
                 return new SizedBox(width: iconSize, height: iconSize);
             }
 
-            double iconOpacity = iconTheme.opacity.Value;
+            float iconOpacity = iconTheme.opacity.Value;
             Color iconColor = this.color ?? iconTheme.color;
             if (iconOpacity != 1.0) {
                 iconColor = iconColor.withOpacity(iconColor.opacity * iconOpacity);

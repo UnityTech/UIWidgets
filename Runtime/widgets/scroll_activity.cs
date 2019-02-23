@@ -7,6 +7,7 @@ using Unity.UIWidgets.painting;
 using Unity.UIWidgets.physics;
 using Unity.UIWidgets.scheduler;
 using Unity.UIWidgets.ui;
+using UnityEngine;
 
 namespace Unity.UIWidgets.widgets {
     public interface ScrollActivityDelegate {
@@ -187,7 +188,7 @@ namespace Unity.UIWidgets.widgets {
 
         public static readonly TimeSpan motionStoppedDurationThreshold = new TimeSpan(0, 0, 0, 0, 50);
 
-        const double _bigThresholdBreakDistance = 24.0;
+        const float _bigThresholdBreakDistance = 24.0f;
 
         bool _reversed {
             get { return AxisUtils.axisDirectionIsReversed(this.del.axisDirection); }
@@ -235,8 +236,8 @@ namespace Unity.UIWidgets.widgets {
                             return offset;
                         }
                         else {
-                            return (float) Math.Min(
-                                       this.motionStartDistanceThreshold.Value / 3.0,
+                            return Mathf.Min(
+                                       this.motionStartDistanceThreshold.Value / 3.0f,
                                        offset.abs()
                                    ) * offset.sign();
                         }
@@ -287,7 +288,7 @@ namespace Unity.UIWidgets.widgets {
 
         public void end(DragEndDetails details) {
             D.assert(details.primaryVelocity != null);
-            double velocity = -details.primaryVelocity.Value;
+            float velocity = -details.primaryVelocity.Value;
             if (this._reversed) {
                 velocity = -velocity;
             }
@@ -298,7 +299,7 @@ namespace Unity.UIWidgets.widgets {
                 velocity += this.carriedVelocity.Value;
             }
 
-            this.del.goBallistic((float) velocity);
+            this.del.goBallistic(velocity);
         }
 
         public void cancel() {

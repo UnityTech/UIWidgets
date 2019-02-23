@@ -1,7 +1,7 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.UIWidgets.foundation;
+using UnityEngine;
 
 namespace Unity.UIWidgets.gestures {
     class _Vector {
@@ -42,7 +42,7 @@ namespace Unity.UIWidgets.gestures {
         }
 
         public float norm() {
-            return (float) Math.Sqrt(this * this);
+            return Mathf.Sqrt(this * this);
         }
     }
 
@@ -76,7 +76,7 @@ namespace Unity.UIWidgets.gestures {
 
         public readonly List<float> coefficients;
 
-        public double confidence;
+        public float confidence;
     }
 
     public class LeastSquaresSolver {
@@ -136,7 +136,7 @@ namespace Unity.UIWidgets.gestures {
                 }
 
                 float norm = q.getRow(j).norm();
-                if (norm < 0.000001) {
+                if (norm < 0.000001f) {
                     // Vectors are linearly dependent or zero so no solution.
                     return null;
                 }
@@ -172,29 +172,29 @@ namespace Unity.UIWidgets.gestures {
             // ...where sumSquaredError is the residual sum of squares (variance of the
             // error), and sumSquaredTotal is the total sum of squares (variance of the
             // data) where each has been weighted.
-            double yMean = 0.0;
+            float yMean = 0.0f;
             for (int h = 0; h < m; h += 1) {
                 yMean += this.y[h];
             }
 
             yMean /= m;
 
-            double sumSquaredError = 0.0;
-            double sumSquaredTotal = 0.0;
+            float sumSquaredError = 0.0f;
+            float sumSquaredTotal = 0.0f;
             for (int h = 0; h < m; h += 1) {
-                double term = 1.0;
-                double err = this.y[h] - result.coefficients[0];
+                float term = 1.0f;
+                float err = this.y[h] - result.coefficients[0];
                 for (int i = 1; i < n; i += 1) {
                     term *= this.x[h];
                     err -= term * result.coefficients[i];
                 }
 
                 sumSquaredError += this.w[h] * this.w[h] * err * err;
-                double v = this.y[h] - yMean;
+                float v = this.y[h] - yMean;
                 sumSquaredTotal += this.w[h] * this.w[h] * v * v;
             }
 
-            result.confidence = sumSquaredTotal <= 0.000001 ? 1.0 : 1.0 - (sumSquaredError / sumSquaredTotal);
+            result.confidence = sumSquaredTotal <= 0.000001f ? 1.0f : 1.0f - (sumSquaredError / sumSquaredTotal);
             return result;
         }
     }

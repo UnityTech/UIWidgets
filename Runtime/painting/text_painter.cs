@@ -263,7 +263,7 @@ namespace Unity.UIWidgets.painting {
         public TextPosition getPositionVerticalMove(TextPosition position, int move) {
             D.assert(!this._needsLayout);
             var offset = this.getOffsetForCaret(position, Rect.zero);
-            var lineIndex = Math.Min(Math.Max(this._paragraph.getLine(position) + move, 0),
+            var lineIndex = Mathf.Min(Mathf.Max(this._paragraph.getLine(position) + move, 0),
                 this._paragraph.getLineCount() - 1);
             var targetLineStart = this._paragraph.getLineRange(lineIndex).start;
             var newLineOffset = this.getOffsetForCaret(new TextPosition(targetLineStart), Rect.zero);
@@ -301,14 +301,14 @@ namespace Unity.UIWidgets.painting {
 
         public TextPosition getWordLeft(TextPosition position) {
             D.assert(!this._needsLayout);
-            var offset = Math.Max(position.offset - 1, 0);
+            var offset = Mathf.Max(position.offset - 1, 0);
             while (true) {
                 var range = this._paragraph.getWordBoundary(offset);
                 if (!char.IsWhiteSpace((char) (this.text.codeUnitAt(range.start) ?? 0))) {
                     return new TextPosition(range.start);
                 }
 
-                offset = Math.Max(range.start - 1, 0);
+                offset = Mathf.Max(range.start - 1, 0);
                 if (offset == 0) {
                     break;
                 }
@@ -349,8 +349,8 @@ namespace Unity.UIWidgets.painting {
             }
         }
 
-        float _applyFloatingPointHack(double layoutValue) {
-            return (float) Math.Ceiling(layoutValue);
+        float _applyFloatingPointHack(float layoutValue) {
+            return Mathf.Ceil(layoutValue);
         }
 
 

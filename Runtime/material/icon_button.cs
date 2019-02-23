@@ -4,6 +4,8 @@ using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
+using UnityEngine;
+using Color = Unity.UIWidgets.ui.Color;
 
 namespace Unity.UIWidgets.material {
     public class IconButton : StatelessWidget {
@@ -98,9 +100,9 @@ namespace Unity.UIWidgets.material {
                 child: result,
                 highlightColor: this.highlightColor ?? Theme.of(context).highlightColor,
                 splashColor: this.splashColor ?? Theme.of(context).splashColor,
-                radius: (float) Math.Max(
+                radius: Mathf.Max(
                     Material.defaultSplashRadius,
-                    (this.iconSize + Math.Min(this.padding.horizontal, this.padding.vertical)) * 0.7f)
+                    (this.iconSize + Mathf.Min(this.padding.horizontal, this.padding.vertical)) * 0.7f)
             );
         }
 

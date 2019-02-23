@@ -90,7 +90,7 @@ namespace Unity.UIWidgets.material {
             unselectedWidgetColor = unselectedWidgetColor ?? (isDark ? Colors.white70 : Colors.black54);
             secondaryHeaderColor = secondaryHeaderColor ?? (isDark ? Colors.grey[700] : primarySwatch[50]);
             textSelectionColor = textSelectionColor ?? (isDark ? accentColor : primarySwatch[200]);
-            cursorColor = cursorColor ?? Color.fromRGBO(66, 133, 244, 1.0);
+            cursorColor = cursorColor ?? Color.fromRGBO(66, 133, 244, 1.0f);
             textSelectionHandleColor =
                 textSelectionHandleColor ?? (isDark ? Colors.tealAccent[400] : primarySwatch[300]);
 
@@ -526,9 +526,9 @@ namespace Unity.UIWidgets.material {
 
 
         public static Brightness estimateBrightnessForColor(Color color) {
-            double relativeLuminance = color.computeLuminance();
-            double kThreshold = 0.15;
-            if ((relativeLuminance + 0.05) * (relativeLuminance + 0.05) > kThreshold) {
+            float relativeLuminance = color.computeLuminance();
+            float kThreshold = 0.15f;
+            if ((relativeLuminance + 0.05f) * (relativeLuminance + 0.05f) > kThreshold) {
                 return Brightness.light;
             }
 

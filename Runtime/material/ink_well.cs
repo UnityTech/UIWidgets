@@ -65,7 +65,7 @@ namespace Unity.UIWidgets.material {
             GestureTapCallback onTap = null,
             GestureTapDownCallback onTapDown = null,
             GestureTapCallback onTapCancel = null,
-            GestureTapCallback onDoubleTap = null,
+            GestureTapCallback onfloatTap = null,
             GestureLongPressCallback onLongPress = null,
             ValueChanged<bool> onHighlightChanged = null,
             bool containedInkWell = false,
@@ -80,7 +80,7 @@ namespace Unity.UIWidgets.material {
             this.onTap = onTap;
             this.onTapDown = onTapDown;
             this.onTapCancel = onTapCancel;
-            this.onDoubleTap = onDoubleTap;
+            this.onfloatTap = onfloatTap;
             this.onLongPress = onLongPress;
             this.onHighlightChanged = onHighlightChanged;
             this.containedInkWell = containedInkWell;
@@ -101,7 +101,7 @@ namespace Unity.UIWidgets.material {
 
         public readonly GestureTapCallback onTapCancel;
 
-        public readonly GestureTapCallback onDoubleTap;
+        public readonly GestureTapCallback onfloatTap;
 
         public readonly GestureLongPressCallback onLongPress;
 
@@ -145,8 +145,8 @@ namespace Unity.UIWidgets.material {
                 gestures.Add("tap");
             }
 
-            if (this.onDoubleTap != null) {
-                gestures.Add("double tap");
+            if (this.onfloatTap != null) {
+                gestures.Add("float tap");
             }
 
             if (this.onLongPress != null) {
@@ -293,11 +293,11 @@ namespace Unity.UIWidgets.material {
             this.updateHighlight(false);
         }
 
-        void _handleDoubleTap() {
+        void _handlefloatTap() {
             this._currentSplash?.confirm();
             this._currentSplash = null;
-            if (this.widget.onDoubleTap != null) {
-                this.widget.onDoubleTap();
+            if (this.widget.onfloatTap != null) {
+                this.widget.onfloatTap();
             }
         }
 
@@ -338,15 +338,15 @@ namespace Unity.UIWidgets.material {
                 this._currentSplash.color = this.widget.splashColor ?? themeData.splashColor;
             }
 
-            bool enabled = this.widget.onTap != null || this.widget.onDoubleTap != null ||
+            bool enabled = this.widget.onTap != null || this.widget.onfloatTap != null ||
                            this.widget.onLongPress != null;
 
             return new GestureDetector(
                 onTapDown: enabled ? (GestureTapDownCallback) this._handleTapDown : null,
                 onTap: enabled ? (GestureTapCallback) (() => this._handleTap(context)) : null,
                 onTapCancel: enabled ? (GestureTapCancelCallback) this._handleTapCancel : null,
-                onDoubleTap: this.widget.onDoubleTap != null
-                    ? (GestureDoubleTapCallback) (details => this._handleDoubleTap())
+                onfloatTap: this.widget.onfloatTap != null
+                    ? (GesturefloatTapCallback) (details => this._handlefloatTap())
                     : null,
                 onLongPress: this.widget.onLongPress != null
                     ? (GestureLongPressCallback) (() => this._handleLongPress(context))
@@ -363,7 +363,7 @@ namespace Unity.UIWidgets.material {
             Key key = null,
             Widget child = null,
             GestureTapCallback onTap = null,
-            GestureTapCallback onDoubleTap = null,
+            GestureTapCallback onfloatTap = null,
             GestureLongPressCallback onLongPress = null,
             GestureTapDownCallback onTapDown = null,
             GestureTapCancelCallback onTapCancel = null,
@@ -378,7 +378,7 @@ namespace Unity.UIWidgets.material {
             key: key,
             child: child,
             onTap: onTap,
-            onDoubleTap: onDoubleTap,
+            onfloatTap: onfloatTap,
             onLongPress: onLongPress,
             onTapDown: onTapDown,
             onTapCancel: () => {

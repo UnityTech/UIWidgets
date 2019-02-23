@@ -3,17 +3,6 @@ using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
     public static class MathUtils {
-        public static double clamp(this double value, double min, double max) {
-            if (value < min) {
-                value = min;
-            }
-            else if (value > max) {
-                value = max;
-            }
-
-            return value;
-        }
-
         public static float clamp(this float value, float min, float max) {
             if (value < min) {
                 value = min;
@@ -36,16 +25,8 @@ namespace Unity.UIWidgets.ui {
             return value;
         }
 
-        public static double abs(this double value) {
-            return Math.Abs(value);
-        }
-
         public static float abs(this float value) {
             return Mathf.Abs(value);
-        }
-
-        public static int sign(this double value) {
-            return Math.Sign(value);
         }
 
         public static int sign(this float value) {
@@ -64,18 +45,18 @@ namespace Unity.UIWidgets.ui {
             return float.IsNaN(it);
         }
 
-        public static double lerpDouble(double a, double b, double t) {
+        public static float lerpfloat(float a, float b, float t) {
             return a + (b - a) * t;
         }
 
-        public static float? lerpNullableDouble(float? a, float? b, float t) {
+        public static float? lerpNullablefloat(float? a, float? b, float t) {
             if (a == null && b == null) {
                 return null;
             }
 
             a = a ?? b;
             b = b ?? a;
-            return (float) a + ((float) b - (float) a) * t;
+            return a + (b - a) * t;
         }
 
         public static float? lerpNullableFloat(float? a, float? b, float t) {
@@ -85,23 +66,11 @@ namespace Unity.UIWidgets.ui {
 
             a = a ?? b;
             b = b ?? a;
-            return (float) a + ((float) b - (float) a) * t;
+            return a + (b - a) * t;
         }
 
         public static float lerpFloat(float a, float b, float t) {
             return a + (b - a) * t;
-        }
-
-        public static int round(this double value) {
-            return (int) Math.Round(value);
-        }
-
-        public static int floor(this double value) {
-            return (int) Math.Floor(value);
-        }
-
-        public static int ceil(this double value) {
-            return (int) Math.Ceiling(value);
         }
 
         public static int round(this float value) {
@@ -211,7 +180,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public float distance {
-            get { return (float) Math.Sqrt(this._dx * this._dx + this._dy * this._dy); }
+            get { return Mathf.Sqrt(this._dx * this._dx + this._dy * this._dy); }
         }
 
         public float distanceSquared {
@@ -368,11 +337,11 @@ namespace Unity.UIWidgets.ui {
         }
 
         public float shortestSide {
-            get { return Math.Min(this.width.abs(), this.height.abs()); }
+            get { return Mathf.Min(this.width.abs(), this.height.abs()); }
         }
 
         public float longestSide {
-            get { return Math.Max(this.width.abs(), this.height.abs()); }
+            get { return Mathf.Max(this.width.abs(), this.height.abs()); }
         }
 
         public Offset topLeft(Offset origin) {
@@ -494,10 +463,10 @@ namespace Unity.UIWidgets.ui {
 
         public static Rect fromPoints(Offset a, Offset b) {
             return new Rect(
-                Math.Min(a.dx, b.dx),
-                Math.Min(a.dy, b.dy),
-                Math.Max(a.dx, b.dx),
-                Math.Max(a.dy, b.dy)
+                Mathf.Min(a.dx, b.dx),
+                Mathf.Min(a.dy, b.dy),
+                Mathf.Max(a.dx, b.dx),
+                Mathf.Max(a.dy, b.dy)
             );
         }
 
@@ -574,19 +543,19 @@ namespace Unity.UIWidgets.ui {
 
         public Rect intersect(Rect other) {
             return fromLTRB(
-                Math.Max(this.left, other.left),
-                Math.Max(this.top, other.top),
-                Math.Min(this.right, other.right),
-                Math.Min(this.bottom, other.bottom)
+                Mathf.Max(this.left, other.left),
+                Mathf.Max(this.top, other.top),
+                Mathf.Min(this.right, other.right),
+                Mathf.Min(this.bottom, other.bottom)
             );
         }
 
         public Rect expandToInclude(Rect other) {
             return fromLTRB(
-                Math.Min(this.left, other.left),
-                Math.Min(this.top, other.top),
-                Math.Max(this.right, other.right),
-                Math.Max(this.bottom, other.bottom)
+                Mathf.Min(this.left, other.left),
+                Mathf.Min(this.top, other.top),
+                Mathf.Max(this.right, other.right),
+                Mathf.Max(this.bottom, other.bottom)
             );
         }
 
@@ -603,11 +572,11 @@ namespace Unity.UIWidgets.ui {
         }
 
         public float shortestSide {
-            get { return Math.Min(Math.Abs(this.width), Math.Abs(this.height)); }
+            get { return Mathf.Min(Mathf.Abs(this.width), Mathf.Abs(this.height)); }
         }
 
         public float longestSide {
-            get { return Math.Max(Math.Abs(this.width), Math.Abs(this.height)); }
+            get { return Mathf.Max(Mathf.Abs(this.width), Mathf.Abs(this.height)); }
         }
 
         public Offset topLeft {
@@ -661,20 +630,20 @@ namespace Unity.UIWidgets.ui {
 
         public Rect round() {
             return fromLTRB(
-                (float) Math.Round(this.left), (float) Math.Round(this.top),
-                (float) Math.Round(this.right), (float) Math.Round(this.bottom));
+                Mathf.Round(this.left), Mathf.Round(this.top),
+                Mathf.Round(this.right), Mathf.Round(this.bottom));
         }
 
         public Rect roundOut() {
             return fromLTRB(
-                (float) Math.Floor(this.left), (float) Math.Floor(this.top),
-                (float) Math.Ceiling(this.right), (float) Math.Ceiling(this.bottom));
+                Mathf.Floor(this.left), Mathf.Floor(this.top),
+                Mathf.Ceil(this.right), Mathf.Ceil(this.bottom));
         }
 
         public Rect roundIn() {
             return fromLTRB(
-                (float) Math.Ceiling(this.left), (float) Math.Ceiling(this.top),
-                (float) Math.Floor(this.right), (float) Math.Floor(this.bottom));
+                Mathf.Ceil(this.left), Mathf.Ceil(this.top),
+                Mathf.Floor(this.right), Mathf.Floor(this.bottom));
         }
 
         public static Rect lerp(Rect a, Rect b, float t) {
@@ -1071,10 +1040,10 @@ namespace Unity.UIWidgets.ui {
             get {
                 const float kInsetFactor = 0.29289321881f; // 1-cos(pi/4)
 
-                float leftRadius = Math.Max(this.blRadiusX, this.tlRadiusX);
-                float topRadius = Math.Max(this.tlRadiusY, this.trRadiusY);
-                float rightRadius = Math.Max(this.trRadiusX, this.brRadiusX);
-                float bottomRadius = Math.Max(this.brRadiusY, this.blRadiusY);
+                float leftRadius = Mathf.Max(this.blRadiusX, this.tlRadiusX);
+                float topRadius = Mathf.Max(this.tlRadiusY, this.trRadiusY);
+                float rightRadius = Mathf.Max(this.trRadiusX, this.brRadiusX);
+                float bottomRadius = Mathf.Max(this.brRadiusY, this.blRadiusY);
 
                 return Rect.fromLTRB(
                     this.left + leftRadius * kInsetFactor,
@@ -1087,10 +1056,10 @@ namespace Unity.UIWidgets.ui {
 
         public Rect middleRect {
             get {
-                float leftRadius = Math.Max(this.blRadiusX, this.tlRadiusX);
-                float topRadius = Math.Max(this.tlRadiusY, this.trRadiusY);
-                float rightRadius = Math.Max(this.trRadiusX, this.brRadiusX);
-                float bottomRadius = Math.Max(this.brRadiusY, this.blRadiusY);
+                float leftRadius = Mathf.Max(this.blRadiusX, this.tlRadiusX);
+                float topRadius = Mathf.Max(this.tlRadiusY, this.trRadiusY);
+                float rightRadius = Mathf.Max(this.trRadiusX, this.brRadiusX);
+                float bottomRadius = Mathf.Max(this.brRadiusY, this.blRadiusY);
 
                 return Rect.fromLTRB(
                     this.left + leftRadius,
@@ -1103,8 +1072,8 @@ namespace Unity.UIWidgets.ui {
 
         public Rect wideMiddleRect {
             get {
-                float topRadius = Math.Max(this.tlRadiusY, this.trRadiusY);
-                float bottomRadius = Math.Max(this.brRadiusY, this.blRadiusY);
+                float topRadius = Mathf.Max(this.tlRadiusY, this.trRadiusY);
+                float bottomRadius = Mathf.Max(this.brRadiusY, this.blRadiusY);
 
                 return Rect.fromLTRB(
                     this.left,
@@ -1117,8 +1086,8 @@ namespace Unity.UIWidgets.ui {
 
         public Rect tallMiddleRect {
             get {
-                float leftRadius = Math.Max(this.blRadiusX, this.tlRadiusX);
-                float rightRadius = Math.Max(this.trRadiusX, this.brRadiusX);
+                float leftRadius = Mathf.Max(this.blRadiusX, this.tlRadiusX);
+                float rightRadius = Mathf.Max(this.trRadiusX, this.brRadiusX);
 
                 return Rect.fromLTRB(
                     this.left + leftRadius,
@@ -1178,11 +1147,11 @@ namespace Unity.UIWidgets.ui {
         }
 
         public float shortestSide {
-            get { return Math.Min(this.width.abs(), this.height.abs()); }
+            get { return Mathf.Min(this.width.abs(), this.height.abs()); }
         }
 
         public float longestSide {
-            get { return Math.Max(this.width.abs(), this.height.abs()); }
+            get { return Mathf.Max(this.width.abs(), this.height.abs()); }
         }
 
         public Offset center {
@@ -1192,7 +1161,7 @@ namespace Unity.UIWidgets.ui {
         float _getMin(float min, float radius1, float radius2, float limit) {
             float sum = radius1 + radius2;
             if (sum > limit && sum != 0.0) {
-                return Math.Min(min, limit / sum);
+                return Mathf.Min(min, limit / sum);
             }
 
             return min;

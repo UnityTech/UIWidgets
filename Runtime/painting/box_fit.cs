@@ -1,5 +1,6 @@
 using System;
 using Unity.UIWidgets.ui;
+using UnityEngine;
 
 namespace Unity.UIWidgets.painting {
     public enum BoxFit {
@@ -70,21 +71,21 @@ namespace Unity.UIWidgets.painting {
                         outputSize.height);
                     break;
                 case BoxFit.none:
-                    sourceSize = new Size(Math.Min(inputSize.width, outputSize.width),
-                        Math.Min(inputSize.height, outputSize.height));
+                    sourceSize = new Size(Mathf.Min(inputSize.width, outputSize.width),
+                        Mathf.Min(inputSize.height, outputSize.height));
                     destinationSize = sourceSize;
                     break;
                 case BoxFit.scaleDown:
                     sourceSize = inputSize;
                     destinationSize = inputSize;
-                    double aspectRatio = inputSize.width / inputSize.height;
+                    float aspectRatio = inputSize.width / inputSize.height;
                     if (destinationSize.height > outputSize.height) {
-                        destinationSize = new Size((float) (outputSize.height * aspectRatio),
-                            (float) outputSize.height);
+                        destinationSize = new Size((outputSize.height * aspectRatio),
+                            outputSize.height);
                     }
 
                     if (destinationSize.width > outputSize.width) {
-                        destinationSize = new Size(outputSize.width, (float) (outputSize.width / aspectRatio));
+                        destinationSize = new Size(outputSize.width, (outputSize.width / aspectRatio));
                     }
 
                     break;

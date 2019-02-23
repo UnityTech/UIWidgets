@@ -344,9 +344,9 @@ namespace Unity.UIWidgets.animation {
         }
 
         static readonly SpringDescription _kFlingSpringDescription = SpringDescription.withDampingRatio(
-            mass: 1.0,
-            stiffness: 500.0,
-            ratio: 1.0
+            mass: 1.0f,
+            stiffness: 500.0f,
+            ratio: 1.0f
         );
 
         static readonly Tolerance _kFlingTolerance = new Tolerance(

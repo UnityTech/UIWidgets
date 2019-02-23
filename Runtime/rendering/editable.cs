@@ -18,7 +18,7 @@ namespace Unity.UIWidgets.rendering {
 
     public enum SelectionChangedCause {
         tap,
-        doubleTap,
+        floatTap,
         longPress,
         keyboard,
     }
@@ -38,8 +38,8 @@ namespace Unity.UIWidgets.rendering {
         }
     }
 /*
-    this._doubleTapGesture = new DoubleTapGestureRecognizer(this.rendererBindings.rendererBinding);
-    this._doubleTapGesture.onDoubleTap = () => { Debug.Log("onDoubleTap"); };*/
+    this._floatTapGesture = new floatTapGestureRecognizer(this.rendererBindings.rendererBinding);
+    this._floatTapGesture.onfloatTap = () => { Debug.Log("onfloatTap"); };*/
 
     public class RenderEditable : RenderBox {
         public static readonly char obscuringCharacter = '•';
@@ -58,7 +58,7 @@ namespace Unity.UIWidgets.rendering {
         bool _obscureText;
         TapGestureRecognizer _tap;
         LongPressGestureRecognizer _longPress;
-        DoubleTapGestureRecognizer _doubleTap;
+        floatTapGestureRecognizer _floatTap;
         public bool ignorePointer;
         public SelectionChangedHandler onSelectionChanged;
         public CaretChangedHandler onCaretChanged;
@@ -94,10 +94,10 @@ namespace Unity.UIWidgets.rendering {
             D.assert(!this._showCursor.value || cursorColor != null);
 
             this._tap = new TapGestureRecognizer(this);
-            this._doubleTap = new DoubleTapGestureRecognizer(this);
+            this._floatTap = new floatTapGestureRecognizer(this);
             this._tap.onTapDown = this._handleTapDown;
             this._tap.onTap = this._handleTap;
-            this._doubleTap.onDoubleTap = this._handleDoubleTap;
+            this._floatTap.onfloatTap = this._handlefloatTap;
             this._longPress = new LongPressGestureRecognizer(debugOwner: this);
             this._longPress.onLongPress = this._handleLongPress;
         }
@@ -317,7 +317,7 @@ namespace Unity.UIWidgets.rendering {
         ///
         public List<TextSelectionPoint> getEndpointsForSelection(TextSelection selection) {
             D.assert(this.constraints != null);
-            this._layoutText((float) this.constraints.maxWidth);
+            this._layoutText(this.constraints.maxWidth);
             var paintOffset = this._paintOffset;
             if (selection.isCollapsed) {
                 var caretOffset = this._textPainter.getOffsetForCaret(selection.extendPos, this._caretPrototype);
@@ -337,13 +337,13 @@ namespace Unity.UIWidgets.rendering {
         }
 
         public TextPosition getPositionForPoint(Offset globalPosition) {
-            this._layoutText((float) this.constraints.maxWidth);
+            this._layoutText(this.constraints.maxWidth);
             globalPosition -= this._paintOffset;
             return this._textPainter.getPositionForOffset(this.globalToLocal(globalPosition));
         }
 
         public Rect getLocalRectForCaret(TextPosition caretPosition) {
-            this._layoutText((float) this.constraints.maxWidth);
+            this._layoutText(this.constraints.maxWidth);
             var caretOffset = this._textPainter.getOffsetForCaret(caretPosition, this._caretPrototype);
             return Rect.fromLTWH(0.0f, 0.0f, _kCaretWidth, this.preferredLineHeight)
                 .shift(caretOffset + this._paintOffset);
@@ -482,7 +482,7 @@ namespace Unity.UIWidgets.rendering {
         }
 
         protected override float? computeDistanceToActualBaseline(TextBaseline baseline) {
-            this._layoutText((float) this.constraints.maxWidth);
+            this._layoutText(this.constraints.maxWidth);
             return this._textPainter.computeDistanceToActualBaseline(baseline);
         }
 
@@ -494,7 +494,7 @@ namespace Unity.UIWidgets.rendering {
             D.assert(this.debugHandleEvent(evt, entry));
             if (evt is PointerDownEvent && this.onSelectionChanged != null) {
                 this._tap.addPointer((PointerDownEvent) evt);
-                this._doubleTap.addPointer((PointerDownEvent) evt);
+                this._floatTap.addPointer((PointerDownEvent) evt);
                 this._longPress.addPointer((PointerDownEvent) evt);
             }
         }
@@ -504,7 +504,7 @@ namespace Unity.UIWidgets.rendering {
         }
 
         public void handleTap() {
-            this._layoutText((float) this.constraints.maxWidth);
+            this._layoutText(this.constraints.maxWidth);
             D.assert(this._lastTapDownPosition != null);
             if (this.onSelectionChanged != null) {
                 var position = this._textPainter.getPositionForOffset(this.globalToLocal(this._lastTapDownPosition));
@@ -512,9 +512,9 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
-        public void handleDoubleTap(DoubleTapDetails details) {
+        public void handlefloatTap(floatTapDetails details) {
             this._lastTapDownPosition = details.firstGlobalPosition - this._paintOffset;
-            this.selectWord(cause: SelectionChangedCause.doubleTap);
+            this.selectWord(cause: SelectionChangedCause.floatTap);
         }
 
         public void handleLongPress() {
@@ -522,7 +522,7 @@ namespace Unity.UIWidgets.rendering {
         }
 
         void selectWord(SelectionChangedCause? cause = null) {
-            this._layoutText((float) this.constraints.maxWidth);
+            this._layoutText(this.constraints.maxWidth);
             D.assert(this._lastTapDownPosition != null);
             if (this.onSelectionChanged != null) {
                 TextPosition position =
@@ -532,14 +532,14 @@ namespace Unity.UIWidgets.rendering {
         }
 
         protected override void performLayout() {
-            this._layoutText((float) this.constraints.maxWidth);
+            this._layoutText(this.constraints.maxWidth);
             this._caretPrototype = Rect.fromLTWH(0.0f, _kCaretHeightOffset, _kCaretWidth,
                 this.preferredLineHeight - 2.0f * _kCaretHeightOffset);
             this._selectionRects = null;
 
             var textPainterSize = this._textPainter.size;
             this.size = new Size(this.constraints.maxWidth,
-                this.constraints.constrainHeight(this._preferredHeight((float) this.constraints.maxWidth)));
+                this.constraints.constrainHeight(this._preferredHeight(this.constraints.maxWidth)));
             var contentSize = new Size(textPainterSize.width + _kCaretGap + _kCaretWidth,
                 textPainterSize.height);
             var _maxScrollExtent = this._getMaxScrollExtend(contentSize);
@@ -549,7 +549,7 @@ namespace Unity.UIWidgets.rendering {
         }
 
         public override void paint(PaintingContext context, Offset offset) {
-            this._layoutText((float) this.constraints.maxWidth);
+            this._layoutText(this.constraints.maxWidth);
             if (this._hasVisualOverflow) {
                 context.pushClipRect(this.needsCompositing, offset, Offset.zero & this.size, this._paintContents);
             }
@@ -613,7 +613,7 @@ namespace Unity.UIWidgets.rendering {
                 var caretOffset = this._textPainter.getOffsetForCaret(this._selection.extendPos,
                     Rect.fromLTWH(0, 0, 1, this.preferredLineHeight));
                 var caretRec = this._caretPrototype.shift(caretOffset + effectiveOffset);
-                Input.compositionCursorPos = new Vector2((float) caretRec.left, (float) caretRec.bottom);
+                Input.compositionCursorPos = new Vector2(caretRec.left, caretRec.bottom);
             }
 
             this._textPainter.paint(context.canvas, effectiveOffset);
@@ -633,9 +633,9 @@ namespace Unity.UIWidgets.rendering {
             this.handleTap();
         }
 
-        void _handleDoubleTap(DoubleTapDetails details) {
+        void _handlefloatTap(floatTapDetails details) {
             D.assert(!this.ignorePointer);
-            this.handleDoubleTap(details);
+            this.handlefloatTap(details);
         }
 
         void _handleLongPress() {
@@ -652,7 +652,7 @@ namespace Unity.UIWidgets.rendering {
                 return this.preferredLineHeight * this.maxLines.Value;
             }
 
-            if (double.IsInfinity(width)) {
+            if (float.IsInfinity(width)) {
                 var text = this._textPainter.text.text;
                 int lines = 1;
                 for (int index = 0; index < text.Length; ++index) {
@@ -665,7 +665,7 @@ namespace Unity.UIWidgets.rendering {
             }
 
             this._layoutText(width);
-            return (float) Math.Max(this.preferredLineHeight, this._textPainter.height);
+            return Mathf.Max(this.preferredLineHeight, this._textPainter.height);
         }
 
         void _layoutText(float constraintWidth) {
@@ -674,7 +674,7 @@ namespace Unity.UIWidgets.rendering {
             }
 
             var caretMargin = _kCaretGap + _kCaretWidth;
-            var avialableWidth = (float) Math.Max(0.0, constraintWidth - caretMargin);
+            var avialableWidth = Mathf.Max(0.0f, constraintWidth - caretMargin);
             var maxWidth = this._isMultiline ? avialableWidth : float.PositiveInfinity;
             this._textPainter.layout(minWidth: avialableWidth, maxWidth: maxWidth);
             this._textLayoutLastWidth = constraintWidth;
@@ -729,9 +729,9 @@ namespace Unity.UIWidgets.rendering {
             D.assert(this.hasSize);
             switch (this._viewportAxis) {
                 case Axis.horizontal:
-                    return (float) Math.Max(0.0, contentSize.width - this.size.width);
+                    return Mathf.Max(0.0f, contentSize.width - this.size.width);
                 case Axis.vertical:
-                    return (float) Math.Max(0.0, contentSize.height - this.size.height);
+                    return Mathf.Max(0.0f, contentSize.height - this.size.height);
             }
 
             return 0.0f;
@@ -744,7 +744,7 @@ namespace Unity.UIWidgets.rendering {
             properties.add(new DiagnosticsProperty<ValueNotifier<bool>>("showCursor", this.showCursor));
             properties.add(new DiagnosticsProperty<int?>("maxLines", this.maxLines));
             properties.add(new DiagnosticsProperty<Color>("selectionColor", this.selectionColor));
-            properties.add(new DiagnosticsProperty<double>("textScaleFactor", this.textScaleFactor));
+            properties.add(new DiagnosticsProperty<float>("textScaleFactor", this.textScaleFactor));
             properties.add(new DiagnosticsProperty<TextSelection>("selection", this.selection));
             properties.add(new DiagnosticsProperty<ViewportOffset>("offset", this.offset));
         }

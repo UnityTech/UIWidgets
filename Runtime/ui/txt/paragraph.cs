@@ -218,11 +218,11 @@ namespace Unity.UIWidgets.ui {
         bool _didExceedMaxLines;
         TabStops _tabStops = new TabStops();
 
-        // private double _characterWidth;
+        // private float _characterWidth;
 
         float _width;
 
-        const float kDoubleDecorationSpacing = 3.0f;
+        const float kfloatDecorationSpacing = 3.0f;
 
         public float height {
             get { return this._lineHeights.Count == 0 ? 0 : this._lineHeights[this._lineHeights.Count - 1]; }
@@ -274,7 +274,7 @@ namespace Unity.UIWidgets.ui {
                 textStyle.UnityFontSize);
 
             this._needsLayout = false;
-            this._width = (float) Math.Floor(constraints.width);
+            this._width = Mathf.Floor(constraints.width);
 
             this.computeLineBreak();
 
@@ -285,9 +285,9 @@ namespace Unity.UIWidgets.ui {
             this._glyphLines.Clear();
 
             int styleMaxLines = this._paragraphStyle.maxLines ?? int.MaxValue;
-            var lineLimit = Math.Min(styleMaxLines, this._lineRanges.Count);
+            var lineLimit = Mathf.Min(styleMaxLines, this._lineRanges.Count);
             this._didExceedMaxLines = this._lineRanges.Count > styleMaxLines;
-            double maxWordWidth = 0;
+            float maxWordWidth = 0;
 
             Layout layout = new Layout();
             layout.setTabStops(this._tabStops);
@@ -327,8 +327,8 @@ namespace Unity.UIWidgets.ui {
                 while (styleRunIndex < this._runs.size) {
                     var styleRun = this._runs.getRun(styleRunIndex);
                     if (styleRun.start < lineEndIndex && styleRun.end > lineRange.start) {
-                        lineRuns.Add(new LineStyleRun(Math.Max(styleRun.start, lineRange.start),
-                            Math.Min(styleRun.end, lineEndIndex), styleRun.style));
+                        lineRuns.Add(new LineStyleRun(Mathf.Max(styleRun.start, lineRange.start),
+                            Mathf.Min(styleRun.end, lineEndIndex), styleRun.style));
                     }
 
                     if (styleRun.end >= lineEndIndex) {
@@ -346,8 +346,8 @@ namespace Unity.UIWidgets.ui {
                 List<PaintRecord> paintRecords = new List<PaintRecord>();
                 for (int i = 0; i < lineRuns.Count; ++i) {
                     var run = lineRuns[i];
-                    int textStart = Math.Max(run.start, lineRange.start);
-                    int textEnd = Math.Min(run.end, lineEndIndex);
+                    int textStart = Mathf.Max(run.start, lineRange.start);
+                    int textEnd = Mathf.Min(run.end, lineEndIndex);
                     int textCount = textEnd - textStart;
 
                     layout.doLayout(runXOffset, this._text, textStart, textCount, run.style);
@@ -355,7 +355,7 @@ namespace Unity.UIWidgets.ui {
                         continue;
                     }
 
-                    double wordStartPosition = double.NaN;
+                    float wordStartPosition = float.NaN;
                     // var layoutAdvances = layout.getAdvances();
                     builder.allocRunPos(run.style, this._text, textStart, textCount);
                     builder.setBounds(layout.getBounds());
@@ -380,11 +380,11 @@ namespace Unity.UIWidgets.ui {
                             }
 
                             wordIndex++;
-                            if (!double.IsNaN(wordStartPosition)) {
-                                double wordWidth =
+                            if (!float.IsNaN(wordStartPosition)) {
+                                float wordWidth =
                                     glyphPositions[glyphPositions.Count - 1].xPos.end - wordStartPosition;
-                                maxWordWidth = Math.Max(wordWidth, maxWordWidth);
-                                wordStartPosition = double.NaN;
+                                maxWordWidth = Mathf.Max(wordWidth, maxWordWidth);
+                                wordStartPosition = float.NaN;
                             }
                         }
                     }
@@ -429,7 +429,7 @@ namespace Unity.UIWidgets.ui {
                 float maxDescent = 0;
 
                 var updateLineMetrics = new Action<FontMetrics, TextStyle>((metrics, style) => {
-                    float lineSpacing = (float) ((lineNumber == 0)
+                    float lineSpacing = ((lineNumber == 0)
                         ? -metrics.ascent * style.height
                         : (-metrics.ascent + metrics.leading) * (style.height));
                     if (lineSpacing > maxLineSpacing) {
@@ -441,8 +441,8 @@ namespace Unity.UIWidgets.ui {
                         }
                     }
 
-                    double descent = metrics.descent * style.height;
-                    maxDescent = (float) Math.Max(descent, maxDescent);
+                    float descent = metrics.descent * style.height;
+                    maxDescent = Mathf.Max(descent, maxDescent);
                 });
 
                 foreach (var paintRecord in paintRecords) {
@@ -458,9 +458,9 @@ namespace Unity.UIWidgets.ui {
 
                 this._lineHeights.Add(
                     (this._lineHeights.Count == 0 ? 0 : this._lineHeights[this._lineHeights.Count - 1])
-                    + (float) Math.Round(maxLineSpacing + maxDescent));
+                    + Mathf.Round(maxLineSpacing + maxDescent));
                 this._lineBaseLines.Add(this._lineHeights[this._lineHeights.Count - 1] - maxDescent);
-                yOffset += (float) Math.Round(maxLineSpacing + preMaxDescent);
+                yOffset += Mathf.Round(maxLineSpacing + preMaxDescent);
                 preMaxDescent = maxDescent;
 
                 foreach (var paintRecord in paintRecords) {
@@ -470,23 +470,23 @@ namespace Unity.UIWidgets.ui {
             }
 
             this._maxIntrinsicWidth = 0;
-            double lineBlockWidth = 0;
+            float lineBlockWidth = 0;
             for (int i = 0; i < this._lineWidths.Count; ++i) {
                 lineBlockWidth += this._lineWidths[i];
                 if (this._lineRanges[i].hardBreak) {
-                    this._maxIntrinsicWidth = (float) Math.Max(lineBlockWidth, this._maxIntrinsicWidth);
+                    this._maxIntrinsicWidth = Mathf.Max(lineBlockWidth, this._maxIntrinsicWidth);
                     lineBlockWidth = 0;
                 }
             }
 
-            this._maxIntrinsicWidth = (float) Math.Max(lineBlockWidth, this._maxIntrinsicWidth);
+            this._maxIntrinsicWidth = Mathf.Max(lineBlockWidth, this._maxIntrinsicWidth);
 
             if (this._paragraphStyle.maxLines == 1 || (this._paragraphStyle.maxLines == null &&
                                                        this._paragraphStyle.ellipsized())) {
                 this._minIntrinsicWidth = this.maxIntrinsicWidth;
             }
             else {
-                this._minIntrinsicWidth = (float) Math.Min(maxWordWidth, this.maxIntrinsicWidth);
+                this._minIntrinsicWidth = Mathf.Min(maxWordWidth, this.maxIntrinsicWidth);
             }
         }
 
@@ -525,8 +525,8 @@ namespace Unity.UIWidgets.ui {
                     right = float.MinValue;
                     foreach (var gp in run.positions) {
                         if (gp.codeUnits.start >= start && gp.codeUnits.end <= end) {
-                            left = Math.Min(left, gp.xPos.start);
-                            right = Math.Max(right, gp.xPos.end);
+                            left = Mathf.Min(left, gp.xPos.start);
+                            right = Mathf.Max(right, gp.xPos.end);
                         }
                     }
 
@@ -586,7 +586,7 @@ namespace Unity.UIWidgets.ui {
             return TextBox.fromLTBD(0, top, 0, bottom, TextDirection.ltr);
         }
 
-        public PositionWithAffinity getGlyphPositionAtCoordinate(double dx, double dy) {
+        public PositionWithAffinity getGlyphPositionAtCoordinate(float dx, float dy) {
             if (this._lineHeights.Count == 0) {
                 return new PositionWithAffinity(0, TextAffinity.downstream);
             }
@@ -607,7 +607,7 @@ namespace Unity.UIWidgets.ui {
 
             GlyphPosition gp = null;
             for (int xIndex = 0; xIndex < lineGlyphPosition.Count; ++xIndex) {
-                double glyphEnd = xIndex < lineGlyphPosition.Count - 1
+                float glyphEnd = xIndex < lineGlyphPosition.Count - 1
                     ? lineGlyphPosition[xIndex + 1].xPos.start
                     : lineGlyphPosition[xIndex].xPos.end;
                 if (dx < glyphEnd) {
@@ -629,7 +629,7 @@ namespace Unity.UIWidgets.ui {
                 }
             }
 
-            double glyphCenter = (gp.xPos.start + gp.xPos.end) / 2;
+            float glyphCenter = (gp.xPos.start + gp.xPos.end) / 2;
             if ((direction == TextDirection.ltr && dx < glyphCenter) ||
                 (direction == TextDirection.rtl && dx >= glyphCenter)) {
                 return new PositionWithAffinity(gp.codeUnits.start, TextAffinity.downstream);
@@ -658,7 +658,7 @@ namespace Unity.UIWidgets.ui {
                 }
             }
 
-            return Math.Max(lineCount - 1, 0);
+            return Mathf.Max(lineCount - 1, 0);
         }
 
         public LineRange getLineRange(int lineIndex) {
@@ -701,7 +701,7 @@ namespace Unity.UIWidgets.ui {
                     continue;
                 }
 
-                lineBreaker.setLineWidth((float) this._width);
+                lineBreaker.setLineWidth(this._width);
                 lineBreaker.resize(blockSize);
                 lineBreaker.setTabStops(this._tabStops);
                 lineBreaker.setText(this._text, blockStart, blockSize);
@@ -717,8 +717,8 @@ namespace Unity.UIWidgets.ui {
                         continue;
                     }
 
-                    int runStart = Math.Max(run.start, blockStart) - blockStart;
-                    int runEnd = Math.Min(run.end, blockEnd) - blockStart;
+                    int runStart = Mathf.Max(run.start, blockStart) - blockStart;
+                    int runEnd = Mathf.Min(run.end, blockEnd) - blockStart;
                     lineBreaker.addStyleRun(run.style, runStart, runEnd);
 
                     if (run.end > blockEnd) {
@@ -803,7 +803,7 @@ namespace Unity.UIWidgets.ui {
 
             int decorationCount = 1;
             switch (record.style.decorationStyle) {
-                case TextDecorationStyle.doubleLine:
+                case TextDecorationStyle.floatLine:
                     decorationCount = 2;
                     break;
             }
@@ -811,7 +811,7 @@ namespace Unity.UIWidgets.ui {
 
             var decoration = record.style.decoration;
             for (int i = 0; i < decorationCount; i++) {
-                float yOffset = i * underLineThickness * kDoubleDecorationSpacing;
+                float yOffset = i * underLineThickness * kfloatDecorationSpacing;
                 float yOffsetOriginal = yOffset;
                 if (decoration != null && decoration.contains(TextDecoration.underline)) {
                     // underline
@@ -827,7 +827,7 @@ namespace Unity.UIWidgets.ui {
                 }
 
                 if (decoration != null && decoration.contains(TextDecoration.lineThrough)) {
-                    yOffset += (decorationCount - 1.0f) * underLineThickness * kDoubleDecorationSpacing / -2.0f;
+                    yOffset += (decorationCount - 1.0f) * underLineThickness * kfloatDecorationSpacing / -2.0f;
                     yOffset += metrics.strikeoutPosition ?? (metrics.fxHeight ?? 0) / -2.0f;
                     canvas.drawLine(new Offset(x, y + yOffset), new Offset(x + width, y + yOffset), paint);
                     yOffset = yOffsetOriginal;
@@ -836,7 +836,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         float getLineXOffset(float lineTotalAdvance) {
-            if (double.IsInfinity(this._width)) {
+            if (float.IsInfinity(this._width)) {
                 return 0;
             }
 

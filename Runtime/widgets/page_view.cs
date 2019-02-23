@@ -7,6 +7,7 @@ using Unity.UIWidgets.painting;
 using Unity.UIWidgets.physics;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
+using UnityEngine;
 
 namespace Unity.UIWidgets.widgets {
     public class PageController : ScrollController {
@@ -28,7 +29,7 @@ namespace Unity.UIWidgets.widgets {
         public readonly float viewportFraction;
 
 
-        public double page {
+        public float page {
             get {
                 D.assert(this.positions.isNotEmpty(),
                     "PageController.page cannot be accessed before a PageView is built with it."
@@ -110,8 +111,8 @@ namespace Unity.UIWidgets.widgets {
 
         public float page {
             get {
-                return (float) (Math.Max(0.0, this.pixels.clamp(this.minScrollExtent, this.maxScrollExtent)) /
-                                Math.Max(1.0, this.viewportDimension * this.viewportFraction));
+                return (Mathf.Max(0.0f, this.pixels.clamp(this.minScrollExtent, this.maxScrollExtent)) /
+                                Mathf.Max(1.0f, this.viewportDimension * this.viewportFraction));
             }
         }
 
@@ -160,8 +161,8 @@ namespace Unity.UIWidgets.widgets {
 
         float _viewportFraction;
 
-        public float getPageFromPixels(double pixels, double viewportDimension) {
-            return (float) (Math.Max(0.0, pixels) / Math.Max(1.0, viewportDimension * this.viewportFraction));
+        public float getPageFromPixels(float pixels, float viewportDimension) {
+            return (Mathf.Max(0.0f, pixels) / Mathf.Max(1.0f, viewportDimension * this.viewportFraction));
         }
 
         public float getPixelsFromPage(float page) {
@@ -188,18 +189,18 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public override bool applyViewportDimension(float viewportDimension) {
-            double oldViewportDimensions = 0.0;
+            float oldViewportDimensions = 0.0f;
             if (this.haveDimensions) {
                 oldViewportDimensions = this.viewportDimension;
             }
 
             bool result = base.applyViewportDimension(viewportDimension);
-            double? oldPixels = null;
+            float? oldPixels = null;
             if (this.hasPixles) {
                 oldPixels = this.pixels;
             }
 
-            float page = (oldPixels == null || oldViewportDimensions == 0.0)
+            float page = (oldPixels == null || oldViewportDimensions == 0.0f)
                 ? this._pageToUseOnStartup
                 : this.getPageFromPixels(oldPixels.Value, oldViewportDimensions);
             float newPixels = this.getPixelsFromPage(page);
@@ -236,13 +237,13 @@ namespace Unity.UIWidgets.widgets {
             return page * position.viewportDimension;
         }
 
-        float _getTargetPixels(ScrollPosition position, Tolerance tolerance, double velocity) {
-            double page = this._getPage(position);
+        float _getTargetPixels(ScrollPosition position, Tolerance tolerance, float velocity) {
+            float page = this._getPage(position);
             if (velocity < -tolerance.velocity) {
-                page -= 0.5;
+                page -= 0.5f;
             }
             else if (velocity > tolerance.velocity) {
-                page += 0.5;
+                page += 0.5f;
             }
 
             return this._getPixels(position, page.round());

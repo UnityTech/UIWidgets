@@ -23,7 +23,7 @@ namespace Unity.UIWidgets.widgets {
     public delegate void TextSelectionOverlayChanged(TextEditingValue value, Rect caretRect);
 
     public abstract class TextSelectionControls {
-        public abstract Widget buildHandle(BuildContext context, TextSelectionHandleType type, double textLineHeight);
+        public abstract Widget buildHandle(BuildContext context, TextSelectionHandleType type, float textLineHeight);
 
         public abstract Widget buildToolbar(BuildContext context, Rect globalEditableRegion, Offset position,
             TextSelectionDelegate selectionDelegate);

@@ -72,11 +72,11 @@ namespace Unity.UIWidgets.material {
 
         public readonly Color highlightColor;
 
-        public readonly double? elevation;
+        public readonly float? elevation;
 
-        public readonly double? highlightElevation;
+        public readonly float? highlightElevation;
 
-        public readonly double? disabledElevation;
+        public readonly float? disabledElevation;
 
         public readonly Brightness? colorBrightness;
 

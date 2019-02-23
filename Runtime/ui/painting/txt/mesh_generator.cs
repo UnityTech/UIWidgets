@@ -145,10 +145,10 @@ namespace Unity.UIWidgets.ui {
 
                 var baseIndex = vertices.Count;
 
-                vertices.Add(new Vector3((float) (position.x + minX), (float) (position.y - maxY), 0));
-                vertices.Add(new Vector3((float) (position.x + maxX), (float) (position.y - maxY), 0));
-                vertices.Add(new Vector3((float) (position.x + maxX), (float) (position.y - minY), 0));
-                vertices.Add(new Vector3((float) (position.x + minX), (float) (position.y - minY), 0));
+                vertices.Add(new Vector3((position.x + minX), (position.y - maxY), 0));
+                vertices.Add(new Vector3((position.x + maxX), (position.y - maxY), 0));
+                vertices.Add(new Vector3((position.x + maxX), (position.y - minY), 0));
+                vertices.Add(new Vector3((position.x + minX), (position.y - minY), 0));
 
                 triangles.Add(baseIndex);
                 triangles.Add(baseIndex + 1);

@@ -6,6 +6,9 @@ using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.ui;
+using UnityEngine;
+using Color = Unity.UIWidgets.ui.Color;
+using Rect = Unity.UIWidgets.ui.Rect;
 
 namespace Unity.UIWidgets.rendering {
     class _DebugSize : Size {
@@ -62,10 +65,10 @@ namespace Unity.UIWidgets.rendering {
             float height = float.PositiveInfinity
         ) {
             return new BoxConstraints(
-                !double.IsPositiveInfinity(width) ? width : 0.0f,
-                !double.IsPositiveInfinity(width) ? width : float.PositiveInfinity,
-                !double.IsPositiveInfinity(height) ? height : 0.0f,
-                !double.IsPositiveInfinity(height) ? height : float.PositiveInfinity
+                !float.IsPositiveInfinity(width) ? width : 0.0f,
+                !float.IsPositiveInfinity(width) ? width : float.PositiveInfinity,
+                !float.IsPositiveInfinity(height) ? height : 0.0f,
+                !float.IsPositiveInfinity(height) ? height : float.PositiveInfinity
             );
         }
 
@@ -109,13 +112,13 @@ namespace Unity.UIWidgets.rendering {
             D.assert(this.debugAssertIsValid());
             float horizontal = edges.horizontal;
             float vertical = edges.vertical;
-            float deflatedMinWidth = (float) Math.Max(0.0, this.minWidth - horizontal);
-            float deflatedMinHeight = (float) Math.Max(0.0, this.minHeight - vertical);
+            float deflatedMinWidth = Mathf.Max(0.0f, this.minWidth - horizontal);
+            float deflatedMinHeight = Mathf.Max(0.0f, this.minHeight - vertical);
             return new BoxConstraints(
                 minWidth: deflatedMinWidth,
-                maxWidth: Math.Max(deflatedMinWidth, this.maxWidth - horizontal),
+                maxWidth: Mathf.Max(deflatedMinWidth, this.maxWidth - horizontal),
                 minHeight: deflatedMinHeight,
-                maxHeight: Math.Max(deflatedMinHeight, this.maxHeight - vertical)
+                maxHeight: Mathf.Max(deflatedMinHeight, this.maxHeight - vertical)
             );
         }
 
@@ -270,19 +273,19 @@ namespace Unity.UIWidgets.rendering {
         }
 
         public bool hasBoundedWidth {
-            get { return this.maxWidth < double.PositiveInfinity; }
+            get { return this.maxWidth < float.PositiveInfinity; }
         }
 
         public bool hasBoundedHeight {
-            get { return this.maxHeight < double.PositiveInfinity; }
+            get { return this.maxHeight < float.PositiveInfinity; }
         }
 
         public bool hasInfiniteWidth {
-            get { return this.minWidth >= double.PositiveInfinity; }
+            get { return this.minWidth >= float.PositiveInfinity; }
         }
 
         public bool hasInfiniteHeight {
-            get { return this.minHeight >= double.PositiveInfinity; }
+            get { return this.minHeight >= float.PositiveInfinity; }
         }
 
         public bool isSatisfiedBy(Size size) {
@@ -335,19 +338,19 @@ namespace Unity.UIWidgets.rendering {
             D.assert(b.debugAssertIsValid());
             D.assert(
                 (a.minWidth.isFinite() && b.minWidth.isFinite()) ||
-                (a.minWidth == double.PositiveInfinity && b.minWidth == double.PositiveInfinity),
+                (a.minWidth == float.PositiveInfinity && b.minWidth == float.PositiveInfinity),
                 "Cannot interpolate between finite constraints and unbounded constraints.");
             D.assert(
                 (a.maxWidth.isFinite() && b.maxWidth.isFinite()) ||
-                (a.maxWidth == double.PositiveInfinity && b.maxWidth == double.PositiveInfinity),
+                (a.maxWidth == float.PositiveInfinity && b.maxWidth == float.PositiveInfinity),
                 "Cannot interpolate between finite constraints and unbounded constraints.");
             D.assert(
                 (a.minHeight.isFinite() && b.minHeight.isFinite()) ||
-                (a.minHeight == double.PositiveInfinity && b.minHeight == double.PositiveInfinity),
+                (a.minHeight == float.PositiveInfinity && b.minHeight == float.PositiveInfinity),
                 "Cannot interpolate between finite constraints and unbounded constraints.");
             D.assert(
                 (a.maxHeight.isFinite() && b.maxHeight.isFinite()) ||
-                (a.maxHeight == double.PositiveInfinity && b.maxHeight == double.PositiveInfinity),
+                (a.maxHeight == float.PositiveInfinity && b.maxHeight == float.PositiveInfinity),
                 "Cannot interpolate between finite constraints and unbounded constraints.");
             return new BoxConstraints(
                 minWidth: a.minWidth.isFinite()
@@ -541,17 +544,17 @@ namespace Unity.UIWidgets.rendering {
 
         public override string ToString() {
             string annotation = this.isNormalized ? "" : "; NOT NORMALIZED";
-            if (this.minWidth == double.PositiveInfinity &&
-                this.minHeight == double.PositiveInfinity) {
+            if (this.minWidth == float.PositiveInfinity &&
+                this.minHeight == float.PositiveInfinity) {
                 return "BoxConstraints(biggest" + annotation + ")";
             }
 
-            if (this.minWidth == 0 && this.maxWidth == double.PositiveInfinity &&
-                this.minHeight == 0 && this.maxHeight == double.PositiveInfinity) {
+            if (this.minWidth == 0 && this.maxWidth == float.PositiveInfinity &&
+                this.minHeight == 0 && this.maxHeight == float.PositiveInfinity) {
                 return "BoxConstraints(unconstrained" + annotation + ")";
             }
 
-            var describe = new Func<double, double, string, string>((min, max, dim) => {
+            var describe = new Func<float, float, string, string>((min, max, dim) => {
                 if (min == max) {
                     return dim + "=" + min.ToString("F1");
                 }
@@ -599,13 +602,13 @@ namespace Unity.UIWidgets.rendering {
     }
 
     class _IntrinsicDimensionsCacheEntry : IEquatable<_IntrinsicDimensionsCacheEntry> {
-        internal _IntrinsicDimensionsCacheEntry(_IntrinsicDimension dimension, double argument) {
+        internal _IntrinsicDimensionsCacheEntry(_IntrinsicDimension dimension, float argument) {
             this.dimension = dimension;
             this.argument = argument;
         }
 
         public readonly _IntrinsicDimension dimension;
-        public readonly double argument;
+        public readonly float argument;
 
         public bool Equals(_IntrinsicDimensionsCacheEntry other) {
             if (ReferenceEquals(null, other)) {
@@ -690,7 +693,7 @@ namespace Unity.UIWidgets.rendering {
                         "The height argument to getMinIntrinsicWidth was negative.\n" +
                         "The argument to getMinIntrinsicWidth must not be negative. " +
                         "If you perform computations on another height before passing it to " +
-                        "getMinIntrinsicWidth, consider using math.max() or double.clamp() " +
+                        "getMinIntrinsicWidth, consider using mathf.max() or float.clamp() " +
                         "to force the value into the valid range."
                     );
                 }
@@ -712,7 +715,7 @@ namespace Unity.UIWidgets.rendering {
                         "The height argument to getMaxIntrinsicWidth was negative.\n" +
                         "The argument to getMaxIntrinsicWidth must not be negative. " +
                         "If you perform computations on another height before passing it to " +
-                        "getMaxIntrinsicWidth, consider using math.max() or double.clamp() " +
+                        "getMaxIntrinsicWidth, consider using mathf.max() or float.clamp() " +
                         "to force the value into the valid range."
                     );
                 }
@@ -734,7 +737,7 @@ namespace Unity.UIWidgets.rendering {
                         "The width argument to getMinIntrinsicHeight was negative.\n" +
                         "The argument to getMinIntrinsicHeight must not be negative. " +
                         "If you perform computations on another width before passing it to " +
-                        "getMinIntrinsicHeight, consider using math.max() or double.clamp() " +
+                        "getMinIntrinsicHeight, consider using mathf.max() or float.clamp() " +
                         "to force the value into the valid range."
                     );
                 }
@@ -757,7 +760,7 @@ namespace Unity.UIWidgets.rendering {
                         "The width argument to getMaxIntrinsicHeight was negative.\n" +
                         "The argument to getMaxIntrinsicHeight must not be negative. " +
                         "If you perform computations on another width before passing it to " +
-                        "getMaxIntrinsicHeight, consider using math.max() or double.clamp() " +
+                        "getMaxIntrinsicHeight, consider using mathf.max() or float.clamp() " +
                         "to force the value into the valid range."
                     );
                 }
@@ -1066,7 +1069,7 @@ namespace Unity.UIWidgets.rendering {
                                 failureCount += 1;
                             }
 
-                            return (float) result;
+                            return result;
                         });
 
                     var testIntrinsicsForValues =
@@ -1090,12 +1093,12 @@ namespace Unity.UIWidgets.rendering {
 
                     if (this.constraints.hasBoundedWidth) {
                         testIntrinsicsForValues(this.getMinIntrinsicWidth, this.getMaxIntrinsicWidth, "Width",
-                            (float) this.constraints.maxWidth);
+                            this.constraints.maxWidth);
                     }
 
                     if (this.constraints.hasBoundedHeight) {
                         testIntrinsicsForValues(this.getMinIntrinsicHeight, this.getMaxIntrinsicHeight, "Height",
-                            (float) this.constraints.maxHeight);
+                            this.constraints.maxHeight);
                     }
 
                     debugCheckingIntrinsics = false;
@@ -1232,7 +1235,7 @@ namespace Unity.UIWidgets.rendering {
 
             var childParentData = (BoxParentData) child.parentData;
             var offset = childParentData.offset;
-            transform.preTranslate((float) offset.dx, (float) offset.dy);
+            transform.preTranslate(offset.dx, offset.dy);
         }
 
         public Offset globalToLocal(Offset point, RenderObject ancestor = null) {
@@ -1308,7 +1311,7 @@ namespace Unity.UIWidgets.rendering {
 //                    ..strokeWidth = 0.25;
 //                Path path;
 //                // ideographic baseline
-//                final double baselineI = getDistanceToBaseline(TextBaseline.ideographic, onlyReal: true);
+//                final float baselineI = getDistanceToBaseline(TextBaseline.ideographic, onlyReal: true);
 //                if (baselineI != null) {
 //                    paint.color =  const Color (0xFFFFD000);
 //                    path = Path();
@@ -1318,7 +1321,7 @@ namespace Unity.UIWidgets.rendering {
 //                }
 //
 //                // alphabetic baseline
-//                final double baselineA = getDistanceToBaseline(TextBaseline.alphabetic, onlyReal: true);
+//                final float baselineA = getDistanceToBaseline(TextBaseline.alphabetic, onlyReal: true);
 //                if (baselineA != null) {
 //                    paint.color =  const Color (0xFF00FF00);
 //                    path = Path();
@@ -1355,13 +1358,13 @@ namespace Unity.UIWidgets.rendering {
         : ContainerRenderObjectMixinRenderBox<ChildType, ParentDataType>
         where ChildType : RenderBox
         where ParentDataType : ContainerParentDataMixinBoxParentData<ChildType> {
-        public double? defaultComputeDistanceToFirstActualBaseline(TextBaseline baseline) {
+        public float? defaultComputeDistanceToFirstActualBaseline(TextBaseline baseline) {
             D.assert(!this.debugNeedsLayout);
 
             var child = this.firstChild;
             while (child != null) {
                 var childParentData = (ParentDataType) child.parentData;
-                double? result = child.getDistanceToActualBaseline(baseline);
+                float? result = child.getDistanceToActualBaseline(baseline);
                 if (result != null) {
                     return result.Value + childParentData.offset.dy;
                 }
@@ -1372,18 +1375,18 @@ namespace Unity.UIWidgets.rendering {
             return null;
         }
 
-        public double? defaultComputeDistanceToHighestActualBaseline(TextBaseline baseline) {
+        public float? defaultComputeDistanceToHighestActualBaseline(TextBaseline baseline) {
             D.assert(!this.debugNeedsLayout);
 
-            double? result = null;
+            float? result = null;
             var child = this.firstChild;
             while (child != null) {
                 var childParentData = (ParentDataType) child.parentData;
-                double? candidate = child.getDistanceToActualBaseline(baseline);
+                float? candidate = child.getDistanceToActualBaseline(baseline);
                 if (candidate != null) {
                     candidate += childParentData.offset.dy;
                     if (result != null) {
-                        result = Math.Min(result.Value, candidate.Value);
+                        result = Mathf.Min(result.Value, candidate.Value);
                     }
                     else {
                         result = candidate;

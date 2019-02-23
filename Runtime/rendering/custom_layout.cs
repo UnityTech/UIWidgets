@@ -207,7 +207,7 @@ namespace Unity.UIWidgets.rendering {
         }
 
         protected override float computeMinIntrinsicWidth(float height) {
-            float width = (float) this._getSize(BoxConstraints.tightForFinite(height: height)).width;
+            float width = this._getSize(BoxConstraints.tightForFinite(height: height)).width;
             if (!float.IsInfinity(width)) {
                 return width;
             }
@@ -216,7 +216,7 @@ namespace Unity.UIWidgets.rendering {
         }
 
         protected override float computeMaxIntrinsicWidth(float height) {
-            float width = (float) this._getSize(BoxConstraints.tightForFinite(height: height)).width;
+            float width = this._getSize(BoxConstraints.tightForFinite(height: height)).width;
             if (!float.IsInfinity(width)) {
                 return width;
             }
@@ -225,7 +225,7 @@ namespace Unity.UIWidgets.rendering {
         }
 
         protected override float computeMinIntrinsicHeight(float width) {
-            float height = (float) this._getSize(BoxConstraints.tightForFinite(width: width)).height;
+            float height = this._getSize(BoxConstraints.tightForFinite(width: width)).height;
             if (!float.IsInfinity(height)) {
                 return height;
             }
@@ -234,7 +234,7 @@ namespace Unity.UIWidgets.rendering {
         }
 
         protected override float computeMaxIntrinsicHeight(float width) {
-            float height = (float) this._getSize(BoxConstraints.tightForFinite(width: width)).height;
+            float height = this._getSize(BoxConstraints.tightForFinite(width: width)).height;
             if (!float.IsInfinity(height)) {
                 return height;
             }

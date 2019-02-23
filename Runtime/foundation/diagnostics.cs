@@ -699,8 +699,8 @@ namespace Unity.UIWidgets.foundation {
         }
     }
 
-    public class DoubleProperty : _NumProperty<double?> {
-        public DoubleProperty(string name, double? value,
+    public class floatProperty : _NumProperty<float?> {
+        public floatProperty(string name, float? value,
             string ifNull = null,
             string unit = null,
             string tooltip = null,
@@ -719,9 +719,9 @@ namespace Unity.UIWidgets.foundation {
         ) {
         }
 
-        DoubleProperty(
+        floatProperty(
             string name,
-            ComputePropertyValueCallback<double?> computeValue,
+            ComputePropertyValueCallback<float?> computeValue,
             string ifNull = null,
             bool showName = true,
             string unit = null,
@@ -740,9 +740,9 @@ namespace Unity.UIWidgets.foundation {
         ) {
         }
 
-        public static DoubleProperty lazy(
+        public static floatProperty lazy(
             string name,
-            ComputePropertyValueCallback<double?> computeValue,
+            ComputePropertyValueCallback<float?> computeValue,
             string ifNull = null,
             bool showName = true,
             string unit = null,
@@ -750,7 +750,7 @@ namespace Unity.UIWidgets.foundation {
             object defaultValue = null,
             DiagnosticLevel level = DiagnosticLevel.info
         ) {
-            return new DoubleProperty(
+            return new floatProperty(
                 name,
                 computeValue,
                 showName: showName,
@@ -843,8 +843,8 @@ namespace Unity.UIWidgets.foundation {
         }
     }
 
-    public class PercentProperty : DoubleProperty {
-        public PercentProperty(string name, double fraction,
+    public class PercentProperty : floatProperty {
+        public PercentProperty(string name, float fraction,
             string ifNull = null,
             bool showName = true,
             string tooltip = null,
@@ -874,7 +874,7 @@ namespace Unity.UIWidgets.foundation {
                 return "null";
             }
 
-            return (this.value.Value.clamp(0.0, 1.0) * 100).ToString("F1") + "%";
+            return (this.value.Value.clamp(0.0f, 1.0f) * 100).ToString("F1") + "%";
         }
     }
 

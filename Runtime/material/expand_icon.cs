@@ -5,13 +5,14 @@ using Unity.UIWidgets.painting;
 using Unity.UIWidgets.service;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
+using UnityEngine;
 
 namespace Unity.UIWidgets.material {
     public class ExpandIcon : StatefulWidget {
         public ExpandIcon(
             Key key = null,
             bool isExpanded = false,
-            double size = 24.0,
+            float size = 24.0f,
             ValueChanged<bool> onPressed = null,
             EdgeInsets padding = null) : base(key: key) {
             this.isExpanded = isExpanded;
@@ -22,7 +23,7 @@ namespace Unity.UIWidgets.material {
 
         public readonly bool isExpanded;
 
-        public readonly double size;
+        public readonly float size;
 
         public readonly ValueChanged<bool> onPressed;
 
@@ -46,7 +47,7 @@ namespace Unity.UIWidgets.material {
             this._controller = new AnimationController(duration: ThemeUtils.kThemeAnimationDuration, vsync: this);
             this._iconTurns = this._controller.drive(_iconTurnTween);
             if (this.widget.isExpanded) {
-                this._controller.setValue((float) Math.PI);
+                this._controller.setValue(Mathf.PI);
             }
         }
 

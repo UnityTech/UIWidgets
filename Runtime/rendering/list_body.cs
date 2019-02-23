@@ -4,6 +4,7 @@ using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.ui;
+using UnityEngine;
 
 namespace Unity.UIWidgets.rendering {
     public class ListBodyParentData : ContainerParentDataMixinBoxParentData<RenderBox> {
@@ -98,11 +99,11 @@ namespace Unity.UIWidgets.rendering {
                 );
             });
 
-            double mainAxisExtent = 0.0;
+            float mainAxisExtent = 0.0f;
             RenderBox child = this.firstChild;
 
             BoxConstraints innerConstraints;
-            double position;
+            float position;
 
             switch (this.axisDirection) {
                 case AxisDirection.right:
@@ -110,13 +111,13 @@ namespace Unity.UIWidgets.rendering {
                     while (child != null) {
                         child.layout(innerConstraints, parentUsesSize: true);
                         ListBodyParentData childParentData = (ListBodyParentData) child.parentData;
-                        childParentData.offset = new Offset((float) mainAxisExtent, 0.0f);
+                        childParentData.offset = new Offset(mainAxisExtent, 0.0f);
                         mainAxisExtent += child.size.width;
                         D.assert(child.parentData == childParentData);
                         child = childParentData.nextSibling;
                     }
 
-                    this.size = this.constraints.constrain(new Size((float) mainAxisExtent,
+                    this.size = this.constraints.constrain(new Size(mainAxisExtent,
                         this.constraints.maxHeight));
                     break;
                 case AxisDirection.left:
@@ -129,17 +130,17 @@ namespace Unity.UIWidgets.rendering {
                         child = childParentData.nextSibling;
                     }
 
-                    position = 0.0;
+                    position = 0.0f;
                     child = this.firstChild;
                     while (child != null) {
                         ListBodyParentData childParentData = (ListBodyParentData) child.parentData;
                         position += child.size.width;
-                        childParentData.offset = new Offset((float) (mainAxisExtent - position), 0.0f);
+                        childParentData.offset = new Offset((mainAxisExtent - position), 0.0f);
                         D.assert(child.parentData == childParentData);
                         child = childParentData.nextSibling;
                     }
 
-                    this.size = this.constraints.constrain(new Size((float) mainAxisExtent,
+                    this.size = this.constraints.constrain(new Size(mainAxisExtent,
                         this.constraints.maxHeight));
                     break;
                 case AxisDirection.down:
@@ -147,13 +148,13 @@ namespace Unity.UIWidgets.rendering {
                     while (child != null) {
                         child.layout(innerConstraints, parentUsesSize: true);
                         ListBodyParentData childParentData = (ListBodyParentData) child.parentData;
-                        childParentData.offset = new Offset(0.0f, (float) mainAxisExtent);
+                        childParentData.offset = new Offset(0.0f, mainAxisExtent);
                         mainAxisExtent += child.size.height;
                         D.assert(child.parentData == childParentData);
                         child = childParentData.nextSibling;
                     }
 
-                    this.size = this.constraints.constrain(new Size(this.constraints.maxWidth, (float) mainAxisExtent));
+                    this.size = this.constraints.constrain(new Size(this.constraints.maxWidth, mainAxisExtent));
                     break;
                 case AxisDirection.up:
                     innerConstraints = BoxConstraints.tightFor(width: this.constraints.maxWidth);
@@ -165,17 +166,17 @@ namespace Unity.UIWidgets.rendering {
                         child = childParentData.nextSibling;
                     }
 
-                    position = 0.0;
+                    position = 0.0f;
                     child = this.firstChild;
                     while (child != null) {
                         ListBodyParentData childParentData = (ListBodyParentData) child.parentData;
                         position += child.size.height;
-                        childParentData.offset = new Offset(0.0f, (float) (mainAxisExtent - position));
+                        childParentData.offset = new Offset(0.0f, (mainAxisExtent - position));
                         D.assert(child.parentData == childParentData);
                         child = childParentData.nextSibling;
                     }
 
-                    this.size = this.constraints.constrain(new Size(this.constraints.maxWidth, (float) mainAxisExtent));
+                    this.size = this.constraints.constrain(new Size(this.constraints.maxWidth, mainAxisExtent));
                     break;
             }
 
@@ -192,7 +193,7 @@ namespace Unity.UIWidgets.rendering {
             float extent = 0.0f;
             RenderBox child = this.firstChild;
             while (child != null) {
-                extent = Math.Max(extent, childSize(child));
+                extent = Mathf.Max(extent, childSize(child));
                 ListBodyParentData childParentData = (ListBodyParentData) child.parentData;
                 child = childParentData.nextSibling;
             }

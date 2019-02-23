@@ -8,6 +8,8 @@ using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.service;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
+using UnityEngine;
+using Color = Unity.UIWidgets.ui.Color;
 using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace Unity.UIWidgets.material {
@@ -684,17 +686,17 @@ namespace Unity.UIWidgets.material {
 
         protected override float computeMinIntrinsicWidth(float height) {
             float leadingWidth = this.leading != null
-                ? (float) Math.Max(this.leading.getMinIntrinsicWidth(height), _minLeadingWidth) + _horizontalTitleGap
+                ? Mathf.Max(this.leading.getMinIntrinsicWidth(height), _minLeadingWidth) + _horizontalTitleGap
                 : 0.0f;
-            return leadingWidth + (float) Math.Max(_minWidth(this.title, height), _minWidth(this.subtitle, height)) +
+            return leadingWidth + Mathf.Max(_minWidth(this.title, height), _minWidth(this.subtitle, height)) +
                    _maxWidth(this.trailing, height);
         }
 
         protected override float computeMaxIntrinsicWidth(float height) {
             float leadingWidth = this.leading != null
-                ? (float) Math.Max(this.leading.getMaxIntrinsicWidth(height), _minLeadingWidth) + _horizontalTitleGap
+                ? Mathf.Max(this.leading.getMaxIntrinsicWidth(height), _minLeadingWidth) + _horizontalTitleGap
                 : 0.0f;
-            return leadingWidth + (float) Math.Max(_maxWidth(this.title, height), _maxWidth(this.subtitle, height)) +
+            return leadingWidth + Mathf.Max(_maxWidth(this.title, height), _maxWidth(this.subtitle, height)) +
                    _maxWidth(this.trailing, height);
         }
 
@@ -717,9 +719,9 @@ namespace Unity.UIWidgets.material {
         }
 
         protected override float computeMinIntrinsicHeight(float width) {
-            return (float) Math.Max(
+            return Mathf.Max(
                 this._defaultTileHeight,
-                this.title.getMinIntrinsicHeight(width) + this.subtitle?.getMinIntrinsicHeight(width) ?? 0.0);
+                this.title.getMinIntrinsicHeight(width) + this.subtitle?.getMinIntrinsicHeight(width) ?? 0.0f);
         }
 
         protected override float computeMaxIntrinsicHeight(float width) {
@@ -732,8 +734,8 @@ namespace Unity.UIWidgets.material {
             return parentData.offset.dy + this.title.getDistanceToActualBaseline(baseline);
         }
 
-        static double _boxBaseline(RenderBox box, TextBaseline baseline) {
-            return box.getDistanceToBaseline(baseline) ?? 0.0;
+        static float _boxBaseline(RenderBox box, TextBaseline baseline) {
+            return box.getDistanceToBaseline(baseline) ?? 0.0f;
         }
 
         static Size _layoutBox(RenderBox box, BoxConstraints constraints) {
@@ -763,33 +765,33 @@ namespace Unity.UIWidgets.material {
             Size trailingSize = _layoutBox(this.trailing, looseConstraints);
 
             float titleStart = hasLeading
-                ? (float) Math.Max(_minLeadingWidth, leadingSize.width) + _horizontalTitleGap
+                ? Mathf.Max(_minLeadingWidth, leadingSize.width) + _horizontalTitleGap
                 : 0.0f;
             BoxConstraints textConstraints = looseConstraints.tighten(
                 width: tileWidth - titleStart - (hasTrailing ? trailingSize.width + _horizontalTitleGap : 0.0f));
             Size titleSize = _layoutBox(this.title, textConstraints);
             Size subtitleSize = _layoutBox(this.subtitle, textConstraints);
 
-            double titleBaseline = 0.0;
-            double subtitleBaseline = 0.0;
+            float titleBaseline = 0.0f;
+            float subtitleBaseline = 0.0f;
             if (isTwoLine) {
-                titleBaseline = this.isDense ? 28.0 : 32.0;
-                subtitleBaseline = this.isDense ? 48.0 : 52.0;
+                titleBaseline = this.isDense ? 28.0f : 32.0f;
+                subtitleBaseline = this.isDense ? 48.0f : 52.0f;
             }
             else if (this.isThreeLine) {
-                titleBaseline = this.isDense ? 22.0 : 28.0;
-                subtitleBaseline = this.isDense ? 42.0 : 48.0;
+                titleBaseline = this.isDense ? 22.0f : 28.0f;
+                subtitleBaseline = this.isDense ? 42.0f : 48.0f;
             }
             else {
                 D.assert(isOneLine);
             }
 
             float tileHeight = 0.0f;
-            double titleY = 0.0;
-            double subtitleY = 0.0;
+            float titleY = 0.0f;
+            float subtitleY = 0.0f;
             if (!hasSubtitle) {
-                tileHeight = (float) Math.Max(this._defaultTileHeight, titleSize.height + 2.0 * _minVerticalPadding);
-                titleY = (tileHeight - titleSize.height) / 2.0;
+                tileHeight = Mathf.Max(this._defaultTileHeight, titleSize.height + 2.0f * _minVerticalPadding);
+                titleY = (tileHeight - titleSize.height) / 2.0f;
             }
             else {
                 D.assert(this.subtitleBaselineType != null);
@@ -798,10 +800,10 @@ namespace Unity.UIWidgets.material {
                             _boxBaseline(this.subtitle, this.subtitleBaselineType ?? TextBaseline.alphabetic);
                 tileHeight = this._defaultTileHeight;
 
-                double titleOverlap = titleY + titleSize.height - subtitleY;
-                if (titleOverlap > 0.0) {
-                    titleY -= titleOverlap / 2.0;
-                    subtitleY += titleOverlap / 2.0;
+                float titleOverlap = titleY + titleSize.height - subtitleY;
+                if (titleOverlap > 0.0f) {
+                    titleY -= titleOverlap / 2.0f;
+                    subtitleY += titleOverlap / 2.0f;
                 }
 
                 if (titleY < _minVerticalPadding ||
@@ -812,23 +814,23 @@ namespace Unity.UIWidgets.material {
                 }
             }
 
-            double leadingY = (tileHeight - leadingSize.height) / 2.0;
-            double trailingY = (tileHeight - trailingSize.height) / 2.0;
+            float leadingY = (tileHeight - leadingSize.height) / 2.0f;
+            float trailingY = (tileHeight - trailingSize.height) / 2.0f;
 
             if (hasLeading) {
-                _positionBox(this.leading, new Offset(0.0f, (float) leadingY));
+                _positionBox(this.leading, new Offset(0.0f, leadingY));
             }
 
-            _positionBox(this.title, new Offset((float) titleStart, (float) titleY));
+            _positionBox(this.title, new Offset(titleStart, titleY));
             if (hasSubtitle) {
-                _positionBox(this.subtitle, new Offset((float) titleStart, (float) subtitleY));
+                _positionBox(this.subtitle, new Offset(titleStart, subtitleY));
             }
 
             if (hasTrailing) {
-                _positionBox(this.trailing, new Offset((float) tileWidth - trailingSize.width, (float) trailingY));
+                _positionBox(this.trailing, new Offset(tileWidth - trailingSize.width, trailingY));
             }
 
-            this.size = this.constraints.constrain(new Size((float) tileWidth, (float) tileHeight));
+            this.size = this.constraints.constrain(new Size(tileWidth, tileHeight));
             D.assert(this.size.width == this.constraints.constrainWidth(tileWidth));
             D.assert(this.size.height == this.constraints.constrainHeight(tileHeight));
         }

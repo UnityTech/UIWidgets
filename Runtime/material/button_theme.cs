@@ -204,8 +204,8 @@ namespace Unity.UIWidgets.material {
 
         Color _getDisabledColor(MaterialButton button) {
             return this.getBrightness(button) == Brightness.dark
-                ? this.colorScheme.onSurface.withOpacity(0.30)
-                : this.colorScheme.onSurface.withOpacity(0.38);
+                ? this.colorScheme.onSurface.withOpacity(0.30f)
+                : this.colorScheme.onSurface.withOpacity(0.38f);
         }
 
 
@@ -254,7 +254,7 @@ namespace Unity.UIWidgets.material {
                 case ButtonTextTheme.primary:
                     return button.enabled
                         ? this._buttonColor ?? this.colorScheme.primary
-                        : this.colorScheme.onSurface.withOpacity(0.12);
+                        : this.colorScheme.onSurface.withOpacity(0.12f);
             }
 
             D.assert(false);
@@ -317,7 +317,7 @@ namespace Unity.UIWidgets.material {
                 }
             }
 
-            return this.getTextColor(button).withOpacity(0.12);
+            return this.getTextColor(button).withOpacity(0.12f);
         }
 
         public Color getHighlightColor(MaterialButton button) {
@@ -328,7 +328,7 @@ namespace Unity.UIWidgets.material {
             switch (this.getTextTheme(button)) {
                 case ButtonTextTheme.normal:
                 case ButtonTextTheme.accent:
-                    return this._highlightColor ?? this.getTextColor(button).withOpacity(0.16);
+                    return this._highlightColor ?? this.getTextColor(button).withOpacity(0.16f);
                 case ButtonTextTheme.primary:
                     return Colors.transparent;
             }
@@ -338,41 +338,41 @@ namespace Unity.UIWidgets.material {
         }
 
 
-        public double getElevation(MaterialButton button) {
+        public float getElevation(MaterialButton button) {
             if (button.elevation != null) {
-                return button.elevation ?? 0.0;
+                return button.elevation ?? 0.0f;
             }
 
             if (button is FlatButton) {
-                return 0.0;
+                return 0.0f;
             }
 
-            return 2.0;
+            return 2.0f;
         }
 
 
-        public double getHighlightElevation(MaterialButton button) {
+        public float getHighlightElevation(MaterialButton button) {
             if (button.highlightElevation != null) {
-                return button.highlightElevation ?? 0.0;
+                return button.highlightElevation ?? 0.0f;
             }
 
             if (button is FlatButton) {
-                return 0.0;
+                return 0.0f;
             }
 
 //todo:xingwei.zhu: uncomment these when OutlineButton are ready
 //            if (button is OutlineButton)
 //                return 2.0;
-            return 8.0;
+            return 8.0f;
         }
 
 
-        public double getDisabledElevation(MaterialButton button) {
+        public float getDisabledElevation(MaterialButton button) {
             if (button.disabledElevation != null) {
-                return button.disabledElevation ?? 0.0;
+                return button.disabledElevation ?? 0.0f;
             }
 
-            return 0.0;
+            return 0.0f;
         }
 
 
@@ -520,8 +520,8 @@ namespace Unity.UIWidgets.material {
             ButtonThemeData defaultTheme = new ButtonThemeData();
             properties.add(new EnumProperty<ButtonTextTheme>("textTheme", this.textTheme,
                 defaultValue: defaultTheme.textTheme));
-            properties.add(new DoubleProperty("minWidth", this.minWidth, defaultValue: defaultTheme.minWidth));
-            properties.add(new DoubleProperty("height", this.height, defaultValue: defaultTheme.height));
+            properties.add(new floatProperty("minWidth", this.minWidth, defaultValue: defaultTheme.minWidth));
+            properties.add(new floatProperty("height", this.height, defaultValue: defaultTheme.height));
             properties.add(new DiagnosticsProperty<EdgeInsets>("padding", this.padding,
                 defaultValue: defaultTheme.padding));
             properties.add(new DiagnosticsProperty<ShapeBorder>("shape", this.shape, defaultValue: defaultTheme.shape));

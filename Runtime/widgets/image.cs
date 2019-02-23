@@ -13,7 +13,7 @@ namespace Unity.UIWidgets.widgets {
         public static ImageConfiguration createLocalImageConfiguration(BuildContext context, Size size = null) {
             return new ImageConfiguration(
                 bundle: DefaultAssetBundle.of(context),
-                devicePixelRatio: MediaQuery.of(context, nullOk: true)?.devicePixelRatio ?? 1.0,
+                devicePixelRatio: MediaQuery.of(context, nullOk: true)?.devicePixelRatio ?? 1.0f,
                 //locale: Localizations.localeOf(context, nullOk: true),
                 size: size,
                 platform: Application.platform
@@ -237,8 +237,8 @@ namespace Unity.UIWidgets.widgets {
             base.debugFillProperties(properties);
 
             properties.add(new DiagnosticsProperty<ImageProvider>("image", this.image));
-            properties.add(new DoubleProperty("width", this.width, defaultValue: Diagnostics.kNullDefaultValue));
-            properties.add(new DoubleProperty("height", this.height, defaultValue: Diagnostics.kNullDefaultValue));
+            properties.add(new floatProperty("width", this.width, defaultValue: Diagnostics.kNullDefaultValue));
+            properties.add(new floatProperty("height", this.height, defaultValue: Diagnostics.kNullDefaultValue));
             properties.add(new DiagnosticsProperty<Color>("color", this.color,
                 defaultValue: Diagnostics.kNullDefaultValue));
             properties.add(new EnumProperty<BlendMode>("colorBlendMode", this.colorBlendMode,

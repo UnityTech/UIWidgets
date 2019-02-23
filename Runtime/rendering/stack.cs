@@ -4,6 +4,8 @@ using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.ui;
+using UnityEngine;
+using Rect = Unity.UIWidgets.ui.Rect;
 
 namespace Unity.UIWidgets.rendering {
     public class RelativeRect : IEquatable<RelativeRect> {
@@ -68,10 +70,10 @@ namespace Unity.UIWidgets.rendering {
 
         public RelativeRect intersect(RelativeRect other) {
             return fromLTRB(
-                Math.Max(this.left, other.left),
-                Math.Max(this.top, other.top),
-                Math.Max(this.right, other.right),
-                Math.Max(this.bottom, other.bottom)
+                Mathf.Max(this.left, other.left),
+                Mathf.Max(this.top, other.top),
+                Mathf.Max(this.right, other.right),
+                Mathf.Max(this.bottom, other.bottom)
             );
         }
 
@@ -244,7 +246,7 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
-        public delegate double mainChildSizeGetter(RenderBox child);
+        public delegate float mainChildSizeGetter(RenderBox child);
 
         float _getIntrinsicDimension(mainChildSizeGetter getter) {
             float extent = 0.0f;
@@ -252,7 +254,7 @@ namespace Unity.UIWidgets.rendering {
             while (child != null) {
                 StackParentData childParentData = (StackParentData) child.parentData;
                 if (!childParentData.isPositioned) {
-                    extent = (float) Math.Max(extent, getter(child));
+                    extent = Mathf.Max(extent, getter(child));
                 }
 
                 D.assert(child.parentData == childParentData);
@@ -319,8 +321,8 @@ namespace Unity.UIWidgets.rendering {
                     child.layout(nonPositionedConstraints, parentUsesSize: true);
 
                     Size childSize = child.size;
-                    width = Math.Max(width, childSize.width);
-                    height = Math.Max(height, childSize.height);
+                    width = Mathf.Max(width, childSize.width);
+                    height = Mathf.Max(height, childSize.height);
                 }
 
                 child = childParentData.nextSibling;
@@ -365,7 +367,7 @@ namespace Unity.UIWidgets.rendering {
 
                     child.layout(childConstraints, parentUsesSize: true);
 
-                    double x;
+                    float x;
                     if (childParentData.left != null) {
                         x = childParentData.left.Value;
                     }
@@ -380,7 +382,7 @@ namespace Unity.UIWidgets.rendering {
                         this._hasVisualOverflow = true;
                     }
 
-                    double y;
+                    float y;
                     if (childParentData.top != null) {
                         y = childParentData.top.Value;
                     }
@@ -395,7 +397,7 @@ namespace Unity.UIWidgets.rendering {
                         this._hasVisualOverflow = true;
                     }
 
-                    childParentData.offset = new Offset((float) x, (float) y);
+                    childParentData.offset = new Offset(x, y);
                 }
 
                 D.assert(child.parentData == childParentData);

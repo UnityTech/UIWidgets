@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
+using UnityEngine;
 
 namespace Unity.UIWidgets.gestures {
     enum _DragState {
@@ -105,7 +106,7 @@ namespace Unity.UIWidgets.gestures {
                 this.invokeCallback<object>("onEnd", () => {
                         this.onEnd(new DragEndDetails(
                             velocity: Velocity.zero,
-                            primaryVelocity: 0.0
+                            primaryVelocity: 0.0f
                         ));
                         return null;
                     }, debugReport: () => { return "Pointer scroll end"; }
@@ -223,7 +224,7 @@ namespace Unity.UIWidgets.gestures {
                     this.invokeCallback<object>("onEnd", () => {
                             this.onEnd(new DragEndDetails(
                                 velocity: Velocity.zero,
-                                primaryVelocity: 0.0
+                                primaryVelocity: 0.0f
                             ));
                             return null;
                         }, debugReport: () =>
@@ -249,13 +250,13 @@ namespace Unity.UIWidgets.gestures {
         }
 
         protected override bool _isFlingGesture(VelocityEstimate estimate) {
-            double minVelocity = this.minFlingVelocity ?? Constants.kMinFlingVelocity;
-            double minDistance = this.minFlingDistance ?? Constants.kTouchSlop;
-            return Math.Abs(estimate.pixelsPerSecond.dy) > minVelocity && Math.Abs(estimate.offset.dy) > minDistance;
+            float minVelocity = this.minFlingVelocity ?? Constants.kMinFlingVelocity;
+            float minDistance = this.minFlingDistance ?? Constants.kTouchSlop;
+            return Mathf.Abs(estimate.pixelsPerSecond.dy) > minVelocity && Mathf.Abs(estimate.offset.dy) > minDistance;
         }
 
         protected override bool _hasSufficientPendingDragDeltaToAccept {
-            get { return Math.Abs(this._pendingDragOffset.dy) > Constants.kTouchSlop; }
+            get { return Mathf.Abs(this._pendingDragOffset.dy) > Constants.kTouchSlop; }
         }
 
         protected override Offset _getDeltaForDetails(Offset delta) {
@@ -263,7 +264,7 @@ namespace Unity.UIWidgets.gestures {
         }
 
         protected override float? _getPrimaryValueFromOffset(Offset value) {
-            return (float) value.dy;
+            return value.dy;
         }
 
         public override string debugDescription {
@@ -277,13 +278,13 @@ namespace Unity.UIWidgets.gestures {
         }
 
         protected override bool _isFlingGesture(VelocityEstimate estimate) {
-            double minVelocity = this.minFlingVelocity ?? Constants.kMinFlingVelocity;
-            double minDistance = this.minFlingDistance ?? Constants.kTouchSlop;
-            return Math.Abs(estimate.pixelsPerSecond.dx) > minVelocity && Math.Abs(estimate.offset.dx) > minDistance;
+            float minVelocity = this.minFlingVelocity ?? Constants.kMinFlingVelocity;
+            float minDistance = this.minFlingDistance ?? Constants.kTouchSlop;
+            return Mathf.Abs(estimate.pixelsPerSecond.dx) > minVelocity && Mathf.Abs(estimate.offset.dx) > minDistance;
         }
 
         protected override bool _hasSufficientPendingDragDeltaToAccept {
-            get { return Math.Abs(this._pendingDragOffset.dx) > Constants.kTouchSlop; }
+            get { return Mathf.Abs(this._pendingDragOffset.dx) > Constants.kTouchSlop; }
         }
 
         protected override Offset _getDeltaForDetails(Offset delta) {
@@ -291,7 +292,7 @@ namespace Unity.UIWidgets.gestures {
         }
 
         protected override float? _getPrimaryValueFromOffset(Offset value) {
-            return (float) value.dx;
+            return value.dx;
         }
 
         public override string debugDescription {
@@ -305,8 +306,8 @@ namespace Unity.UIWidgets.gestures {
         }
 
         protected override bool _isFlingGesture(VelocityEstimate estimate) {
-            double minVelocity = this.minFlingVelocity ?? Constants.kMinFlingVelocity;
-            double minDistance = this.minFlingDistance ?? Constants.kTouchSlop;
+            float minVelocity = this.minFlingVelocity ?? Constants.kMinFlingVelocity;
+            float minDistance = this.minFlingDistance ?? Constants.kTouchSlop;
             return estimate.pixelsPerSecond.distanceSquared > minVelocity * minVelocity
                    && estimate.offset.distanceSquared > minDistance * minDistance;
         }

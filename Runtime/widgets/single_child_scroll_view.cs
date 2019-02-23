@@ -6,6 +6,8 @@ using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.utils;
+using UnityEngine;
+using Rect = Unity.UIWidgets.ui.Rect;
 
 namespace Unity.UIWidgets.widgets {
     public class SingleChildScrollView : StatelessWidget {
@@ -121,7 +123,7 @@ namespace Unity.UIWidgets.widgets {
         public _RenderSingleChildViewport(
             AxisDirection axisDirection = AxisDirection.down,
             ViewportOffset offset = null,
-            double cacheExtent = RenderViewportUtils.defaultCacheExtent,
+            float cacheExtent = RenderViewportUtils.defaultCacheExtent,
             RenderBox child = null) {
             D.assert(offset != null);
             this._axisDirection = axisDirection;
@@ -175,7 +177,7 @@ namespace Unity.UIWidgets.widgets {
 
         ViewportOffset _offset;
 
-        public double cacheExtent {
+        public float cacheExtent {
             get { return this._cacheExtent; }
             set {
                 if (value == this._cacheExtent) {
@@ -187,7 +189,7 @@ namespace Unity.UIWidgets.widgets {
             }
         }
 
-        double _cacheExtent;
+        float _cacheExtent;
 
         void _hasScrolled() {
             this.markNeedsPaint();
@@ -245,9 +247,9 @@ namespace Unity.UIWidgets.widgets {
 
                 switch (this.axis) {
                     case Axis.horizontal:
-                        return (float) Math.Max(0.0, this.child.size.width - this.size.width);
+                        return Mathf.Max(0.0f, this.child.size.width - this.size.width);
                     case Axis.vertical:
-                        return (float) Math.Max(0.0, this.child.size.height - this.size.height);
+                        return Mathf.Max(0.0f, this.child.size.height - this.size.height);
                 }
 
                 D.assert(false);
@@ -356,7 +358,7 @@ namespace Unity.UIWidgets.widgets {
 
         public override void applyPaintTransform(RenderObject child, Matrix3 transform) {
             Offset paintOffset = this._paintOffset;
-            transform.preTranslate((float) paintOffset.dx, (float) paintOffset.dy);
+            transform.preTranslate(paintOffset.dx, paintOffset.dy);
         }
 
         public override Rect describeApproximatePaintClip(RenderObject child) {
@@ -388,9 +390,9 @@ namespace Unity.UIWidgets.widgets {
             Rect bounds = transform.mapRect(rect);
             Size contentSize = this.child.size;
 
-            double leadingScrollOffset = 0.0;
-            double targetMainAxisExtent = 0.0;
-            double mainAxisExtent = 0.0;
+            float leadingScrollOffset = 0.0f;
+            float targetMainAxisExtent = 0.0f;
+            float mainAxisExtent = 0.0f;
 
             switch (this.axisDirection) {
                 case AxisDirection.up:
@@ -415,9 +417,9 @@ namespace Unity.UIWidgets.widgets {
                     break;
             }
 
-            double targetOffset = leadingScrollOffset - (mainAxisExtent - targetMainAxisExtent) * alignment;
-            Rect targetRect = bounds.shift(this._paintOffsetForPosition((float) targetOffset));
-            return new RevealedOffset(offset: (float) targetOffset, rect: targetRect);
+            float targetOffset = leadingScrollOffset - (mainAxisExtent - targetMainAxisExtent) * alignment;
+            Rect targetRect = bounds.shift(this._paintOffsetForPosition(targetOffset));
+            return new RevealedOffset(offset: targetOffset, rect: targetRect);
         }
 
         public override void showOnScreen(

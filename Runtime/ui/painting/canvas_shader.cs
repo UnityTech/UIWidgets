@@ -248,8 +248,8 @@ namespace Unity.UIWidgets.ui {
                     props.SetVector("_leftColor", _colorToVector4(sweep.leftColor));
                     props.SetVector("_rightColor", _colorToVector4(sweep.rightColor));
                     props.SetInt("_tileMode", (int) sweep.tileMode);
-                    props.SetFloat("_bias", (float) sweep.bias);
-                    props.SetFloat("_scale", (float) sweep.scale);
+                    props.SetFloat("_bias", sweep.bias);
+                    props.SetFloat("_scale", sweep.scale);
                     return;
                 case ImageShader image:
                     pass = 4;

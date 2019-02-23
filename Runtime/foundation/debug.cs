@@ -53,7 +53,7 @@ namespace Unity.UIWidgets.foundation {
 
         // public static Color debugCurrentRepaintColor = Color.fromfromAHSV(0.4, 60.0, 1.0, 1.0);;
 
-        public static void _debugDrawDoubleRect(Canvas canvas, Rect outerRect, Rect innerRect, Color color) {
+        public static void _debugDrawfloatRect(Canvas canvas, Rect outerRect, Rect innerRect, Color color) {
 //            final Path path = new Path()
 //                ..fillType = PathFillType.evenOdd
 //                ..addRect(outerRect)
@@ -66,10 +66,10 @@ namespace Unity.UIWidgets.foundation {
         public static void debugPaintPadding(Canvas canvas, Rect outerRect, Rect innerRect, float outlineWidth = 2.0f) {
             assert(() => {
                 if (innerRect != null && !innerRect.isEmpty) {
-                    _debugDrawDoubleRect(canvas, outerRect, innerRect, new Color(0x900090FF));
+                    _debugDrawfloatRect(canvas, outerRect, innerRect, new Color(0x900090FF));
                 }
                 else {
-                    _debugDrawDoubleRect(canvas, innerRect.inflate(outlineWidth).intersect(outerRect), innerRect,
+                    _debugDrawfloatRect(canvas, innerRect.inflate(outlineWidth).intersect(outerRect), innerRect,
                         new Color(0xFF0090FF));
                     Paint paint = new Paint();
                     paint.color = new Color(0x90909090);

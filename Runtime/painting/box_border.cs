@@ -217,7 +217,7 @@ namespace Unity.UIWidgets.painting {
             float width = side.width;
             if (width == 0.0) {
                 paint.style = PaintingStyle.stroke;
-                paint.strokeWidth = 0.0;
+                paint.strokeWidth = 0.0f;
                 canvas.drawRRect(outer, paint);
             }
             else {
@@ -228,9 +228,9 @@ namespace Unity.UIWidgets.painting {
 
         static void _paintUniformBorderWithCircle(Canvas canvas, Rect rect, BorderSide side) {
             D.assert(side.style != BorderStyle.none);
-            double width = side.width;
+            float width = side.width;
             Paint paint = side.toPaint();
-            double radius = (rect.shortestSide - width) / 2.0;
+            float radius = (rect.shortestSide - width) / 2.0f;
             canvas.drawCircle(rect.center, radius, paint);
         }
 

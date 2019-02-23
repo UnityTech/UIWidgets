@@ -1,6 +1,7 @@
 using System;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
+using UnityEngine;
 
 namespace Unity.UIWidgets.animation {
     class _AlwaysCompleteAnimation : Animation<float> {
@@ -202,17 +203,17 @@ namespace Unity.UIWidgets.animation {
     }
 
 
-    public class ReverseAnimation : AnimationLocalStatusListenersMixinAnimationLazyListenerMixinAnimation<double> {
-        public ReverseAnimation(Animation<double> parent) {
+    public class ReverseAnimation : AnimationLocalStatusListenersMixinAnimationLazyListenerMixinAnimation<float> {
+        public ReverseAnimation(Animation<float> parent) {
             D.assert(parent != null);
             this._parent = parent;
         }
 
-        public Animation<double> parent {
+        public Animation<float> parent {
             get { return this._parent; }
         }
 
-        readonly Animation<double> _parent;
+        readonly Animation<float> _parent;
 
         public override void addListener(VoidCallback listener) {
             this.didRegisterListener();
@@ -240,8 +241,8 @@ namespace Unity.UIWidgets.animation {
             get { return this._reverseStatus(this.parent.status); }
         }
 
-        public override double value {
-            get { return 1.0 - this.parent.value; }
+        public override float value {
+            get { return 1.0f - this.parent.value; }
         }
 
         AnimationStatus _reverseStatus(AnimationStatus status) {
@@ -322,8 +323,8 @@ namespace Unity.UIWidgets.animation {
 
                 if (t == 0.0 || t == 1.0) {
                     D.assert(() => {
-                        double transformedValue = activeCurve.transform(t);
-                        double roundedTransformedValue = transformedValue.round();
+                        float transformedValue = activeCurve.transform(t);
+                        float roundedTransformedValue = transformedValue.round();
                         if (roundedTransformedValue != t) {
                             throw new UIWidgetsError(
                                 string.Format(
@@ -420,7 +421,7 @@ namespace Unity.UIWidgets.animation {
             get { return this._currentTrain.status; }
         }
 
-        double? _lastValue;
+        float? _lastValue;
 
         void _valueChangeHandler() {
             D.assert(this._currentTrain != null);
@@ -446,7 +447,7 @@ namespace Unity.UIWidgets.animation {
                 }
             }
 
-            double newValue = this.value;
+            float newValue = this.value;
             if (newValue != this._lastValue) {
                 this.notifyListeners();
                 this._lastValue = newValue;
@@ -550,39 +551,39 @@ namespace Unity.UIWidgets.animation {
         }
     }
 
-    public class AnimationMean : CompoundAnimation<double> {
+    public class AnimationMean : CompoundAnimation<float> {
         public AnimationMean(
-            Animation<double> left = null,
-            Animation<double> right = null
+            Animation<float> left = null,
+            Animation<float> right = null
         ) : base(first: left, next: right) {
         }
 
-        public override double value {
-            get { return (this.first.value + this.next.value) / 2.0; }
+        public override float value {
+            get { return (this.first.value + this.next.value) / 2.0f; }
         }
     }
 
-    public class AnimationMax : CompoundAnimation<double> {
+    public class AnimationMax : CompoundAnimation<float> {
         public AnimationMax(
-            Animation<double> left = null,
-            Animation<double> right = null
+            Animation<float> left = null,
+            Animation<float> right = null
         ) : base(first: left, next: right) {
         }
 
-        public override double value {
-            get { return Math.Max(this.first.value, this.next.value); }
+        public override float value {
+            get { return Mathf.Max(this.first.value, this.next.value); }
         }
     }
 
-    public class AnimationMin : CompoundAnimation<double> {
+    public class AnimationMin : CompoundAnimation<float> {
         public AnimationMin(
-            Animation<double> left = null,
-            Animation<double> right = null
+            Animation<float> left = null,
+            Animation<float> right = null
         ) : base(first: left, next: right) {
         }
 
-        public override double value {
-            get { return Math.Min(this.first.value, this.next.value); }
+        public override float value {
+            get { return Mathf.Min(this.first.value, this.next.value); }
         }
     }
 

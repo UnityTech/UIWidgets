@@ -1,6 +1,7 @@
 using System;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
+using UnityEngine;
 
 namespace Unity.UIWidgets.physics {
     public class FrictionSimulation : Simulation {
@@ -9,7 +10,7 @@ namespace Unity.UIWidgets.physics {
             Tolerance tolerance = null
         ) : base(tolerance: tolerance) {
             this._drag = drag;
-            this._dragLog = (float) Math.Log(drag);
+            this._dragLog = Mathf.Log(drag);
             this._x = position;
             this._v = velocity;
         }
@@ -34,15 +35,15 @@ namespace Unity.UIWidgets.physics {
         readonly float _v;
 
         static float _dragFor(float startPosition, float endPosition, float startVelocity, float endVelocity) {
-            return (float) Math.Pow(Math.E, (startVelocity - endVelocity) / (startPosition - endPosition));
+            return Mathf.Pow((float) Math.E, (startVelocity - endVelocity) / (startPosition - endPosition));
         }
 
         public override float x(float time) {
-            return this._x + this._v * (float) Math.Pow(this._drag, time) / this._dragLog - this._v / this._dragLog;
+            return this._x + this._v * Mathf.Pow(this._drag, time) / this._dragLog - this._v / this._dragLog;
         }
 
         public override float dx(float time) {
-            return this._v * (float) Math.Pow(this._drag, time);
+            return this._v * Mathf.Pow(this._drag, time);
         }
 
         public float finalX {
@@ -58,7 +59,7 @@ namespace Unity.UIWidgets.physics {
                 return float.PositiveInfinity;
             }
 
-            return (float) Math.Log(this._dragLog * (x - this._x) / this._v + 1.0) / this._dragLog;
+            return Mathf.Log(this._dragLog * (x - this._x) / this._v + 1.0f) / this._dragLog;
         }
 
         public override bool isDone(float time) {

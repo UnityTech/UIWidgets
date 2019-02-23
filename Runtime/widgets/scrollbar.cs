@@ -3,6 +3,10 @@ using Unity.UIWidgets.animation;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.ui;
+using UnityEngine;
+using Canvas = Unity.UIWidgets.ui.Canvas;
+using Color = Unity.UIWidgets.ui.Color;
+using Rect = Unity.UIWidgets.ui.Rect;
 
 namespace Unity.UIWidgets.widgets {
     public class ScrollbarPainter : ChangeNotifier, CustomPainter {
@@ -105,35 +109,35 @@ namespace Unity.UIWidgets.widgets {
             Size size,
             painterDelegate painter
         ) {
-            double thumbExtent = Math.Min(viewport, this.minOverscrollLength);
+            float thumbExtent = Mathf.Min(viewport, this.minOverscrollLength);
 
             if (before + inside + after > 0.0) {
-                double fractionVisible = inside / (before + inside + after);
-                thumbExtent = Math.Max(
+                float fractionVisible = inside / (before + inside + after);
+                thumbExtent = Mathf.Max(
                     thumbExtent,
                     viewport * fractionVisible - 2 * this.mainAxisMargin
                 );
 
                 if (before != 0.0 && after != 0.0) {
-                    thumbExtent = Math.Max(
+                    thumbExtent = Mathf.Max(
                         this.minLength,
                         thumbExtent
                     );
                 }
                 else {
-                    thumbExtent = Math.Max(
+                    thumbExtent = Mathf.Max(
                         thumbExtent,
-                        this.minLength * (((inside / viewport) - 0.8) / 0.2)
+                        this.minLength * (((inside / viewport) - 0.8f) / 0.2f)
                     );
                 }
             }
 
-            double fractionPast = before / (before + after);
-            double thumbOffset = (before + after > 0.0)
+            float fractionPast = before / (before + after);
+            float thumbOffset = (before + after > 0.0)
                 ? fractionPast * (viewport - thumbExtent - 2 * this.mainAxisMargin) + this.mainAxisMargin
                 : this.mainAxisMargin;
 
-            painter(canvas, size, (float) thumbOffset, (float) thumbExtent);
+            painter(canvas, size, thumbOffset, thumbExtent);
         }
 
         public override void dispose() {

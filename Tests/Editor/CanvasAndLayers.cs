@@ -152,7 +152,7 @@ namespace UIWidgets.Tests {
         }
 
         void drawPloygon4() {
-            var canvas = new CommandBufferCanvas(this._renderTexture, (float) Window.instance.devicePixelRatio,
+            var canvas = new CommandBufferCanvas(this._renderTexture, Window.instance.devicePixelRatio,
                 this._meshPool);
 
             var paint = new Paint {
@@ -166,7 +166,7 @@ namespace UIWidgets.Tests {
 //                Unity.UIWidgets.ui.Rect.fromLTRB(10, 10, 110, 110),
 //                paint);
 
-            canvas.rotate((float) Math.PI * 15 / 180);
+            canvas.rotate(Mathf.PI * 15 / 180);
 
             var path = new Path();
             path.moveTo(10, 150);
@@ -203,7 +203,7 @@ namespace UIWidgets.Tests {
             canvas.translate(100, 100);
             paint.shader = Gradient.sweep(new Offset(120, 100), new List<Color>() {
                     Colors.red, Colors.black, Colors.green, Colors.red,
-                }, null, TileMode.clamp, 10 * Math.PI / 180, 135 * Math.PI / 180);
+                }, null, TileMode.clamp, 10 * Mathf.PI / 180, 135 * Mathf.PI / 180);
             canvas.drawPath(path, paint);
 
 
@@ -216,7 +216,7 @@ namespace UIWidgets.Tests {
         }
 
         void drawLine() {
-            var canvas = new CommandBufferCanvas(this._renderTexture, (float) Window.instance.devicePixelRatio,
+            var canvas = new CommandBufferCanvas(this._renderTexture, Window.instance.devicePixelRatio,
                 this._meshPool);
 
             var paint = new Paint {
@@ -284,18 +284,18 @@ namespace UIWidgets.Tests {
             canvas.drawLine(
                 new Offset(10, 30),
                 new Offset(10, 60),
-                new Paint() {style = PaintingStyle.stroke, strokeWidth = 0.1});
+                new Paint() {style = PaintingStyle.stroke, strokeWidth = 0.1f});
 
             canvas.drawLine(
                 new Offset(20, 30),
                 new Offset(20, 60),
-                new Paint() {style = PaintingStyle.stroke, strokeWidth = 0.333});
+                new Paint() {style = PaintingStyle.stroke, strokeWidth = 0.333f});
 
             canvas.flush();
         }
 
         void drawRect() {
-            var canvas = new CommandBufferCanvas(this._renderTexture, (float) Window.instance.devicePixelRatio,
+            var canvas = new CommandBufferCanvas(this._renderTexture, Window.instance.devicePixelRatio,
                 this._meshPool);
 
             var paint = new Paint {
@@ -327,7 +327,7 @@ namespace UIWidgets.Tests {
         }
 
         void drawRectShadow() {
-            var canvas = new CommandBufferCanvas(this._renderTexture, (float) Window.instance.devicePixelRatio,
+            var canvas = new CommandBufferCanvas(this._renderTexture, Window.instance.devicePixelRatio,
                 this._meshPool);
 
             var paint = new Paint {
@@ -337,7 +337,7 @@ namespace UIWidgets.Tests {
 
             canvas.clipRect(Unity.UIWidgets.ui.Rect.fromLTWH(25, 25, 300, 300));
 
-            canvas.rotate(-(float) Math.PI / 8.0f);
+            canvas.rotate(-Mathf.PI / 8.0f);
 
             canvas.drawRect(
                 Unity.UIWidgets.ui.Rect.fromLTWH(10, 10, 100, 100),
@@ -404,7 +404,7 @@ namespace UIWidgets.Tests {
             var picture = pictureRecorder.endRecording();
             Debug.Log("picture.paintBounds: " + picture.paintBounds);
 
-            var editorCanvas = new CommandBufferCanvas(this._renderTexture, (float) Window.instance.devicePixelRatio,
+            var editorCanvas = new CommandBufferCanvas(this._renderTexture, Window.instance.devicePixelRatio,
                 this._meshPool);
             editorCanvas.drawPicture(picture);
 
@@ -419,7 +419,7 @@ namespace UIWidgets.Tests {
                 return;
             }
 
-            var canvas = new CommandBufferCanvas(this._renderTexture, (float) Window.instance.devicePixelRatio,
+            var canvas = new CommandBufferCanvas(this._renderTexture, Window.instance.devicePixelRatio,
                 this._meshPool);
 
             var paint = new Paint {
@@ -476,7 +476,7 @@ namespace UIWidgets.Tests {
             var picture = pictureRecorder.endRecording();
             Debug.Log("picture.paintBounds: " + picture.paintBounds);
 
-            var editorCanvas = new CommandBufferCanvas(this._renderTexture, (float) Window.instance.devicePixelRatio,
+            var editorCanvas = new CommandBufferCanvas(this._renderTexture, Window.instance.devicePixelRatio,
                 this._meshPool);
             editorCanvas.rotate(-5 * Mathf.PI / 180);
             editorCanvas.clipRect(Unity.UIWidgets.ui.Rect.fromLTWH(25, 15, 250, 250));
@@ -532,7 +532,7 @@ namespace UIWidgets.Tests {
             var picture = pictureRecorder.endRecording();
             Debug.Log("picture.paintBounds: " + picture.paintBounds);
 
-            var editorCanvas = new CommandBufferCanvas(this._renderTexture, (float) Window.instance.devicePixelRatio,
+            var editorCanvas = new CommandBufferCanvas(this._renderTexture, Window.instance.devicePixelRatio,
                 this._meshPool);
             editorCanvas.rotate(-5 * Mathf.PI / 180);
             editorCanvas.clipRRect(RRect.fromRectAndRadius(Unity.UIWidgets.ui.Rect.fromLTWH(25, 15, 250, 250), 50));
@@ -588,7 +588,7 @@ namespace UIWidgets.Tests {
             var picture = pictureRecorder.endRecording();
             Debug.Log("picture.paintBounds: " + picture.paintBounds);
 
-            var editorCanvas = new CommandBufferCanvas(this._renderTexture, (float) Window.instance.devicePixelRatio,
+            var editorCanvas = new CommandBufferCanvas(this._renderTexture, Window.instance.devicePixelRatio,
                 this._meshPool);
 
             editorCanvas.saveLayer(picture.paintBounds, new Paint {color = new Color(0x7FFFFFFF)});

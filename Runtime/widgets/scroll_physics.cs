@@ -3,6 +3,7 @@ using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.physics;
 using Unity.UIWidgets.ui;
+using UnityEngine;
 
 namespace Unity.UIWidgets.widgets {
     public class ScrollPhysics {
@@ -57,9 +58,9 @@ namespace Unity.UIWidgets.widgets {
         }
 
         static readonly SpringDescription _kDefaultSpring = SpringDescription.withDampingRatio(
-            mass: 0.5,
-            stiffness: 100.0,
-            ratio: 1.1
+            mass: 0.5f,
+            stiffness: 100.0f,
+            ratio: 1.1f
         );
 
         public virtual SpringDescription spring {
@@ -158,8 +159,8 @@ namespace Unity.UIWidgets.widgets {
             return new BouncingScrollPhysics(parent: this.buildParent(ancestor));
         }
 
-        public double frictionFactor(double overscrollFraction) {
-            return 0.52 * Math.Pow(1 - overscrollFraction, 2);
+        public float frictionFactor(float overscrollFraction) {
+            return 0.52f * Mathf.Pow(1 - overscrollFraction, 2);
         }
 
         public override float applyPhysicsToUserOffset(ScrollMetrics position, float offset) {
@@ -169,22 +170,22 @@ namespace Unity.UIWidgets.widgets {
                 return offset;
             }
 
-            double overscrollPastStart = Math.Max(position.minScrollExtent - position.pixels, 0.0);
-            double overscrollPastEnd = Math.Max(position.pixels - position.maxScrollExtent, 0.0);
-            double overscrollPast = Math.Max(overscrollPastStart, overscrollPastEnd);
-            bool easing = (overscrollPastStart > 0.0 && offset < 0.0) || (overscrollPastEnd > 0.0 && offset > 0.0);
+            float overscrollPastStart = Mathf.Max(position.minScrollExtent - position.pixels, 0.0f);
+            float overscrollPastEnd = Mathf.Max(position.pixels - position.maxScrollExtent, 0.0f);
+            float overscrollPast = Mathf.Max(overscrollPastStart, overscrollPastEnd);
+            bool easing = (overscrollPastStart > 0.0f && offset < 0.0f) || (overscrollPastEnd > 0.0f && offset > 0.0f);
 
-            double friction = easing
+            float friction = easing
                 ? this.frictionFactor((overscrollPast - offset.abs()) / position.viewportDimension)
                 : this.frictionFactor(overscrollPast / position.viewportDimension);
             float direction = offset.sign();
 
-            return direction * _applyFriction((float) overscrollPast, offset.abs(), (float) friction);
+            return direction * _applyFriction(overscrollPast, offset.abs(), friction);
         }
 
         static float _applyFriction(float extentOutside, float absDelta, float gamma) {
             D.assert(absDelta > 0);
-            double total = 0.0;
+            float total = 0.0f;
             if (extentOutside > 0) {
                 float deltaToLimit = extentOutside / gamma;
                 if (absDelta < deltaToLimit) {
@@ -195,7 +196,7 @@ namespace Unity.UIWidgets.widgets {
                 absDelta -= deltaToLimit;
             }
 
-            return (float) total + absDelta;
+            return total + absDelta;
         }
 
         public override float applyBoundaryConditions(ScrollMetrics position, float value) {
@@ -224,7 +225,7 @@ namespace Unity.UIWidgets.widgets {
 
         public override float carriedMomentum(float existingVelocity) {
             return existingVelocity.sign() *
-                   (float) Math.Min(0.000816 * Math.Pow(existingVelocity.abs(), 1.967), 40000.0);
+                   Mathf.Min(0.000816f * Mathf.Pow(existingVelocity.abs(), 1.967f), 40000.0f);
         }
 
         public override float dragStartDistanceMotionThreshold {
@@ -278,7 +279,7 @@ namespace Unity.UIWidgets.widgets {
         public override Simulation createBallisticSimulation(ScrollMetrics position, float velocity) {
             Tolerance tolerance = this.tolerance;
             if (position.outOfRange()) {
-                double? end = null;
+                float? end = null;
                 if (position.pixels > position.maxScrollExtent) {
                     end = position.maxScrollExtent;
                 }
@@ -292,7 +293,7 @@ namespace Unity.UIWidgets.widgets {
                     this.spring,
                     position.pixels,
                     position.maxScrollExtent,
-                    (float) Math.Min(0.0, velocity),
+                    Mathf.Min(0.0f, velocity),
                     tolerance: tolerance
                 );
             }

@@ -214,7 +214,7 @@ namespace Unity.UIWidgets.widgets {
                 ifFalse: "no wrapping except at line break characters", showName: true));
             properties.add(new EnumProperty<TextOverflow?>("overflow", this.overflow,
                 defaultValue: Diagnostics.kNullDefaultValue));
-            properties.add(new DoubleProperty("textScaleFactor", this.textScaleFactor,
+            properties.add(new floatProperty("textScaleFactor", this.textScaleFactor,
                 defaultValue: Diagnostics.kNullDefaultValue));
             properties.add(new IntProperty("maxLines", this.maxLines, defaultValue: Diagnostics.kNullDefaultValue));
         }

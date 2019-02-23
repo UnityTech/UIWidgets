@@ -614,14 +614,14 @@ namespace Unity.UIWidgets.widgets {
             return _area(o1).CompareTo(_area(o2));
         }
 
-        static double _area(RenderObject obj) {
+        static float _area(RenderObject obj) {
             var bounds = obj.semanticBounds;
             Size size = null;
             if (bounds != null) {
                 size = bounds.size;
             }
 
-            return size == null ? double.PositiveInfinity : size.width * size.height;
+            return size == null ? float.PositiveInfinity : size.width * size.height;
         }
     }
 
@@ -889,7 +889,7 @@ namespace Unity.UIWidgets.widgets {
 
         public Picture _picture;
         // public  TextPainter _textPainter;
-        // public double _textPainterMaxWidth;
+        // public float _textPainterMaxWidth;
 
 
         public override void addToScene(SceneBuilder builder, Offset layerOffset) {

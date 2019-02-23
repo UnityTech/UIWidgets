@@ -1,6 +1,7 @@
 using System;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
+using UnityEngine;
 
 namespace Unity.UIWidgets.painting {
     public static class Geometry {
@@ -9,8 +10,8 @@ namespace Unity.UIWidgets.painting {
             Size childSize = null,
             Offset target = null,
             bool? preferBelow = null,
-            double verticalOffset = 0.0,
-            double margin = 10.0) {
+            float verticalOffset = 0.0f,
+            float margin = 10.0f) {
             D.assert(size != null);
             D.assert(childSize != null);
             D.assert(target != null);
@@ -19,21 +20,21 @@ namespace Unity.UIWidgets.painting {
             bool fitsBelow = target.dy + verticalOffset + childSize.height <= size.height - margin;
             bool fitsAbove = target.dy - verticalOffset - childSize.height >= margin;
             bool tooltipBelow = (preferBelow ?? true) ? (fitsBelow || !fitsAbove) : !(fitsAbove || !fitsBelow);
-            double y;
+            float y;
             if (tooltipBelow) {
-                y = Math.Min(target.dy + verticalOffset, size.height - margin);
+                y = Mathf.Min(target.dy + verticalOffset, size.height - margin);
             }
             else {
-                y = Math.Max(target.dy - verticalOffset - childSize.height, margin);
+                y = Mathf.Max(target.dy - verticalOffset - childSize.height, margin);
             }
 
-            double x;
+            float x;
             if (size.width - margin * 2.0 < childSize.width) {
-                x = (size.width - childSize.width) / 2.0;
+                x = (size.width - childSize.width) / 2.0f;
             }
             else {
-                double normalizedTargetX = target.dx.clamp((float) margin, (float) (size.width - margin));
-                double edge = margin + childSize.width / 2.0;
+                float normalizedTargetX = target.dx.clamp(margin, size.width - margin);
+                float edge = margin + childSize.width / 2.0f;
                 if (normalizedTargetX < edge) {
                     x = margin;
                 }
@@ -41,11 +42,11 @@ namespace Unity.UIWidgets.painting {
                     x = size.width - margin - childSize.width;
                 }
                 else {
-                    x = normalizedTargetX - childSize.width / 2.0;
+                    x = normalizedTargetX - childSize.width / 2.0f;
                 }
             }
 
-            return new Offset((float) x, (float) y);
+            return new Offset(x, y);
         }
     }
 }

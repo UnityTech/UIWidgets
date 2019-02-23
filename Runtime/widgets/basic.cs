@@ -33,11 +33,11 @@ namespace Unity.UIWidgets.widgets {
     }
 
     public class Opacity : SingleChildRenderObjectWidget {
-        public Opacity(double opacity, Key key = null, Widget child = null) : base(key, child) {
+        public Opacity(float opacity, Key key = null, Widget child = null) : base(key, child) {
             this.opacity = opacity;
         }
 
-        public readonly double opacity;
+        public readonly float opacity;
 
         public override RenderObject createRenderObject(BuildContext context) {
             return new RenderOpacity(opacity: this.opacity);
@@ -252,7 +252,7 @@ namespace Unity.UIWidgets.widgets {
 
         public override string toStringShort() {
             string type;
-            if (this.width == double.PositiveInfinity && this.height == double.PositiveInfinity) {
+            if (this.width == float.PositiveInfinity && this.height == float.PositiveInfinity) {
                 type = this.GetType() + "expand";
             }
             else if (this.width == 0.0 && this.height == 0.0) {
@@ -268,7 +268,7 @@ namespace Unity.UIWidgets.widgets {
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             DiagnosticLevel level;
-            if ((this.width == double.PositiveInfinity && this.height == double.PositiveInfinity) ||
+            if ((this.width == float.PositiveInfinity && this.height == float.PositiveInfinity) ||
                 (this.width == 0.0 && this.height == 0.0)) {
                 level = DiagnosticLevel.hidden;
             }
@@ -276,10 +276,10 @@ namespace Unity.UIWidgets.widgets {
                 level = DiagnosticLevel.info;
             }
 
-            properties.add(new DoubleProperty("width", this.width,
+            properties.add(new floatProperty("width", this.width,
                 defaultValue: Diagnostics.kNullDefaultValue,
                 level: level));
-            properties.add(new DoubleProperty("height", this.height,
+            properties.add(new floatProperty("height", this.height,
                 defaultValue: Diagnostics.kNullDefaultValue,
                 level: level));
         }
@@ -447,7 +447,7 @@ namespace Unity.UIWidgets.widgets {
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
-            properties.add(new DoubleProperty("aspectRatio", this.aspectRatio));
+            properties.add(new floatProperty("aspectRatio", this.aspectRatio));
         }
     }
 
@@ -631,12 +631,12 @@ namespace Unity.UIWidgets.widgets {
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
-            properties.add(new DoubleProperty("left", this.left, defaultValue: null));
-            properties.add(new DoubleProperty("top", this.top, defaultValue: null));
-            properties.add(new DoubleProperty("right", this.right, defaultValue: null));
-            properties.add(new DoubleProperty("bottom", this.bottom, defaultValue: null));
-            properties.add(new DoubleProperty("width", this.width, defaultValue: null));
-            properties.add(new DoubleProperty("height", this.height, defaultValue: null));
+            properties.add(new floatProperty("left", this.left, defaultValue: null));
+            properties.add(new floatProperty("top", this.top, defaultValue: null));
+            properties.add(new floatProperty("right", this.right, defaultValue: null));
+            properties.add(new floatProperty("bottom", this.bottom, defaultValue: null));
+            properties.add(new floatProperty("width", this.width, defaultValue: null));
+            properties.add(new floatProperty("height", this.height, defaultValue: null));
         }
     }
 
@@ -749,7 +749,7 @@ namespace Unity.UIWidgets.widgets {
             BoxShape shape = BoxShape.rectangle,
             Clip clipBehavior = Clip.none,
             BorderRadius borderRadius = null,
-            double elevation = 0.0,
+            float elevation = 0.0f,
             Color color = null,
             Color shadowColor = null,
             Widget child = null) : base(key: key, child: child) {
@@ -769,7 +769,7 @@ namespace Unity.UIWidgets.widgets {
 
         public readonly BorderRadius borderRadius;
 
-        public readonly double elevation;
+        public readonly float elevation;
 
         public readonly Color color;
 
@@ -799,7 +799,7 @@ namespace Unity.UIWidgets.widgets {
             base.debugFillProperties(properties);
             properties.add(new EnumProperty<BoxShape>("shape", this.shape));
             properties.add(new DiagnosticsProperty<BorderRadius>("borderRadius", this.borderRadius));
-            properties.add(new DoubleProperty("elevation", this.elevation));
+            properties.add(new floatProperty("elevation", this.elevation));
             properties.add(new DiagnosticsProperty<Color>("color", this.color));
             properties.add(new DiagnosticsProperty<Color>("shadowColor", this.shadowColor));
         }
@@ -811,7 +811,7 @@ namespace Unity.UIWidgets.widgets {
             Key key = null,
             CustomClipper<Path> clipper = null,
             Clip clipBehavior = Clip.none,
-            double elevation = 0.0,
+            float elevation = 0.0f,
             Color color = null,
             Color shadowColor = null,
             Widget child = null) : base(key: key, child: child) {
@@ -828,7 +828,7 @@ namespace Unity.UIWidgets.widgets {
 
         public readonly Clip clipBehavior;
 
-        public readonly double elevation;
+        public readonly float elevation;
 
         public readonly Color color;
 
@@ -854,7 +854,7 @@ namespace Unity.UIWidgets.widgets {
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             properties.add(new DiagnosticsProperty<CustomClipper<Path>>("clipper", this.clipper));
-            properties.add(new DoubleProperty("elevation", this.elevation));
+            properties.add(new floatProperty("elevation", this.elevation));
             properties.add(new DiagnosticsProperty<Color>("color", this.color));
             properties.add(new DiagnosticsProperty<Color>("shadowColor", this.shadowColor));
         }
@@ -912,9 +912,9 @@ namespace Unity.UIWidgets.widgets {
             Alignment alignment = null,
             bool transformHitTests = true,
             Widget child = null,
-            double degree = 0.0
+            float degree = 0.0f
         ) : base(key: key, child: child) {
-            this.transform = Matrix3.makeRotate((float) degree);
+            this.transform = Matrix3.makeRotate(degree);
             this.origin = origin;
             this.alignment = alignment;
             this.transformHitTests = transformHitTests;
@@ -922,7 +922,7 @@ namespace Unity.UIWidgets.widgets {
 
         public static Transform rotate(
             Key key = null,
-            double degree = 0.0,
+            float degree = 0.0f,
             Offset origin = null,
             Alignment alignment = null,
             bool transformHitTests = true,
@@ -938,7 +938,7 @@ namespace Unity.UIWidgets.widgets {
             Widget child = null
         ) : base(key: key, child: child) {
             D.assert(offset != null);
-            this.transform = Matrix3.makeTrans((float) offset.dx, (float) offset.dy);
+            this.transform = Matrix3.makeTrans(offset.dx, offset.dy);
             this.origin = null;
             this.alignment = null;
             this.transformHitTests = transformHitTests;
@@ -955,13 +955,13 @@ namespace Unity.UIWidgets.widgets {
 
         Transform(
             Key key = null,
-            double scale = 1.0,
+            float scale = 1.0f,
             Offset origin = null,
             Alignment alignment = null,
             bool transformHitTests = true,
             Widget child = null
         ) : base(key: key, child: child) {
-            this.transform = Matrix3.makeScale((float) scale, (float) scale);
+            this.transform = Matrix3.makeScale(scale, scale);
             this.origin = origin;
             this.alignment = alignment;
             this.transformHitTests = transformHitTests;
@@ -969,7 +969,7 @@ namespace Unity.UIWidgets.widgets {
 
         public static Transform scale(
             Key key = null,
-            double scale = 1.0,
+            float scale = 1.0f,
             Offset origin = null,
             Alignment alignment = null,
             bool transformHitTests = true,
@@ -1120,9 +1120,9 @@ namespace Unity.UIWidgets.widgets {
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             properties.add(new DiagnosticsProperty<Alignment>("alignment", this.alignment));
-            properties.add(new DoubleProperty("widthFactor",
+            properties.add(new floatProperty("widthFactor",
                 this.widthFactor, defaultValue: Diagnostics.kNullDefaultValue));
-            properties.add(new DoubleProperty("heightFactor",
+            properties.add(new floatProperty("heightFactor",
                 this.heightFactor, defaultValue: Diagnostics.kNullDefaultValue));
         }
     }
@@ -1315,7 +1315,7 @@ namespace Unity.UIWidgets.widgets {
             properties.add(new FlagProperty("softWrap", value: this.softWrap, ifTrue: "wrapping at box width",
                 ifFalse: "no wrapping except at line break characters", showName: true));
             properties.add(new EnumProperty<TextOverflow>("overflow", this.overflow, defaultValue: TextOverflow.clip));
-            properties.add(new DoubleProperty("textScaleFactor", this.textScaleFactor, defaultValue: 1.0));
+            properties.add(new floatProperty("textScaleFactor", this.textScaleFactor, defaultValue: 1.0));
             properties.add(new IntProperty("maxLines", this.maxLines, ifNull: "unlimited"));
             properties.add(new StringProperty("text", this.text.toPlainText()));
         }
@@ -1401,9 +1401,9 @@ namespace Unity.UIWidgets.widgets {
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             properties.add(new DiagnosticsProperty<ui.Image>("image", this.image));
-            properties.add(new DoubleProperty("width", this.width, defaultValue: Diagnostics.kNullDefaultValue));
-            properties.add(new DoubleProperty("height", this.height, defaultValue: Diagnostics.kNullDefaultValue));
-            properties.add(new DoubleProperty("scale", this.scale, defaultValue: 1.0));
+            properties.add(new floatProperty("width", this.width, defaultValue: Diagnostics.kNullDefaultValue));
+            properties.add(new floatProperty("height", this.height, defaultValue: Diagnostics.kNullDefaultValue));
+            properties.add(new floatProperty("scale", this.scale, defaultValue: 1.0));
             properties.add(new DiagnosticsProperty<Color>("color", this.color,
                 defaultValue: Diagnostics.kNullDefaultValue));
             properties.add(new EnumProperty<BlendMode>("colorBlendMode", this.colorBlendMode,

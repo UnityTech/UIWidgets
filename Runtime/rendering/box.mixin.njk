@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.ui;
 
@@ -35,7 +36,7 @@ namespace Unity.UIWidgets.rendering {
                 if (candidate != null) {
                     candidate += childParentData.offset.dy;
                     if (result != null) {
-                        result = Math.Min(result.Value, candidate.Value);
+                        result = Mathf.Min(result.Value, candidate.Value);
                     } else {
                         result = candidate;
                     }

@@ -167,7 +167,7 @@ namespace Unity.UIWidgets.widgets {
                 defaultValue: Diagnostics.kNullDefaultValue));
             properties.add(new EnumProperty<TextDirection?>("textDirection", this.textDirection,
                 defaultValue: Diagnostics.kNullDefaultValue));
-            properties.add(new DiagnosticsProperty<double?>("textScaleFactor", this.textScaleFactor,
+            properties.add(new DiagnosticsProperty<float?>("textScaleFactor", this.textScaleFactor,
                 defaultValue: Diagnostics.kNullDefaultValue));
             properties.add(new DiagnosticsProperty<int?>("maxLines", this.maxLines, defaultValue: 1));
             properties.add(new DiagnosticsProperty<bool>("autofocus", this.autofocus, defaultValue: false));
@@ -457,10 +457,10 @@ namespace Unity.UIWidgets.widgets {
 
         // Calculate the new scroll offset so the cursor remains visible.
         float _getScrollOffsetForCaret(Rect caretRect) {
-            double caretStart = this._isMultiline ? caretRect.top : caretRect.left;
-            double caretEnd = this._isMultiline ? caretRect.bottom : caretRect.right;
-            double scrollOffset = this._scrollController.offset;
-            double viewportExtent = this._scrollController.position.viewportDimension;
+            float caretStart = this._isMultiline ? caretRect.top : caretRect.left;
+            float caretEnd = this._isMultiline ? caretRect.bottom : caretRect.right;
+            float scrollOffset = this._scrollController.offset;
+            float viewportExtent = this._scrollController.position.viewportDimension;
             if (caretStart < 0.0) {
                 scrollOffset += caretStart;
             }
@@ -468,7 +468,7 @@ namespace Unity.UIWidgets.widgets {
                 scrollOffset += caretEnd - viewportExtent;
             }
 
-            return (float) scrollOffset;
+            return scrollOffset;
         }
 
         // Calculates where the `caretRect` would be if `_scrollController.offset` is set to `scrollOffset`.
@@ -567,7 +567,7 @@ namespace Unity.UIWidgets.widgets {
                     this._selectionOverlay.showHandles();
                 }
 
-                if (longPress || cause == SelectionChangedCause.doubleTap) {
+                if (longPress || cause == SelectionChangedCause.floatTap) {
                     this._selectionOverlay.showToolbar();
                 }
             }

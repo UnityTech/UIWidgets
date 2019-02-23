@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
 using Unity.UIWidgets.ui;
+using UnityEngine;
+using Canvas = Unity.UIWidgets.ui.Canvas;
+using Rect = Unity.UIWidgets.ui.Rect;
 
 namespace Unity.UIWidgets.painting {
     public class BeveledRectangleBorder : ShapeBorder, IEquatable<BeveledRectangleBorder> {
@@ -55,24 +58,24 @@ namespace Unity.UIWidgets.painting {
             Offset centerTop = new Offset(rrect.center.dx, rrect.top);
             Offset centerBottom = new Offset(rrect.center.dx, rrect.bottom);
 
-            double tlRadiusX = Math.Max(0.0, rrect.tlRadiusX);
-            double tlRadiusY = Math.Max(0.0, rrect.tlRadiusY);
-            double trRadiusX = Math.Max(0.0, rrect.trRadiusX);
-            double trRadiusY = Math.Max(0.0, rrect.trRadiusY);
-            double blRadiusX = Math.Max(0.0, rrect.blRadiusX);
-            double blRadiusY = Math.Max(0.0, rrect.blRadiusY);
-            double brRadiusX = Math.Max(0.0, rrect.brRadiusX);
-            double brRadiusY = Math.Max(0.0, rrect.brRadiusY);
+            float tlRadiusX = Mathf.Max(0.0f, rrect.tlRadiusX);
+            float tlRadiusY = Mathf.Max(0.0f, rrect.tlRadiusY);
+            float trRadiusX = Mathf.Max(0.0f, rrect.trRadiusX);
+            float trRadiusY = Mathf.Max(0.0f, rrect.trRadiusY);
+            float blRadiusX = Mathf.Max(0.0f, rrect.blRadiusX);
+            float blRadiusY = Mathf.Max(0.0f, rrect.blRadiusY);
+            float brRadiusX = Mathf.Max(0.0f, rrect.brRadiusX);
+            float brRadiusY = Mathf.Max(0.0f, rrect.brRadiusY);
 
             List<Offset> vertices = new List<Offset> {
-                new Offset(rrect.left, (float) Math.Min(centerLeft.dy, rrect.top + tlRadiusY)),
-                new Offset((float) Math.Min(centerTop.dx, rrect.left + tlRadiusX), rrect.top),
-                new Offset((float) Math.Max(centerTop.dx, rrect.right - trRadiusX), rrect.top),
-                new Offset(rrect.right, (float) Math.Min(centerRight.dy, rrect.top + trRadiusY)),
-                new Offset(rrect.right, (float) Math.Max(centerRight.dy, rrect.bottom - brRadiusY)),
-                new Offset((float) Math.Max(centerBottom.dx, rrect.right - brRadiusX), rrect.bottom),
-                new Offset((float) Math.Min(centerBottom.dx, rrect.left + blRadiusX), rrect.bottom),
-                new Offset(rrect.left, (float) Math.Max(centerLeft.dy, rrect.bottom - blRadiusY)),
+                new Offset(rrect.left, Mathf.Min(centerLeft.dy, rrect.top + tlRadiusY)),
+                new Offset(Mathf.Min(centerTop.dx, rrect.left + tlRadiusX), rrect.top),
+                new Offset(Mathf.Max(centerTop.dx, rrect.right - trRadiusX), rrect.top),
+                new Offset(rrect.right, Mathf.Min(centerRight.dy, rrect.top + trRadiusY)),
+                new Offset(rrect.right, Mathf.Max(centerRight.dy, rrect.bottom - brRadiusY)),
+                new Offset(Mathf.Max(centerBottom.dx, rrect.right - brRadiusX), rrect.bottom),
+                new Offset(Mathf.Min(centerBottom.dx, rrect.left + blRadiusX), rrect.bottom),
+                new Offset(rrect.left, Mathf.Max(centerLeft.dy, rrect.bottom - blRadiusY)),
             };
 
             var path = new Path();

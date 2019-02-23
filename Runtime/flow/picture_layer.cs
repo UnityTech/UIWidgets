@@ -31,7 +31,7 @@ namespace Unity.UIWidgets.flow {
         public override void preroll(PrerollContext context, Matrix3 matrix) {
             if (context.rasterCache != null) {
                 Matrix3 ctm = new Matrix3(matrix);
-                ctm.postTranslate((float) this._offset.dx, (float) this._offset.dy);
+                ctm.postTranslate(this._offset.dx, this._offset.dy);
                 ctm[2] = ctm[2].alignToPixel(context.devicePixelRatio);
                 ctm[5] = ctm[5].alignToPixel(context.devicePixelRatio);
 
@@ -50,7 +50,7 @@ namespace Unity.UIWidgets.flow {
             var canvas = context.canvas;
 
             canvas.save();
-            canvas.translate((float) this._offset.dx, (float) this._offset.dy);
+            canvas.translate(this._offset.dx, this._offset.dy);
 
             // align to pixel
             var matrix = canvas.getTotalMatrix();

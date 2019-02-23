@@ -54,7 +54,7 @@ namespace Unity.UIWidgets.editor {
     }
 
     public interface Surface : IDisposable {
-        SurfaceFrame acquireFrame(Size size, double devicePixelRatio);
+        SurfaceFrame acquireFrame(Size size, float devicePixelRatio);
 
         MeshPool getMeshPool();
     }
@@ -104,7 +104,7 @@ namespace Unity.UIWidgets.editor {
             this._drawToTargetFunc = drawToTargetFunc;
         }
 
-        public SurfaceFrame acquireFrame(Size size, double devicePixelRatio) {
+        public SurfaceFrame acquireFrame(Size size, float devicePixelRatio) {
             this._createOrUpdateRenderTexture(size, devicePixelRatio);
 
             return new SurfaceFrame(this._surface,
@@ -136,8 +136,8 @@ namespace Unity.UIWidgets.editor {
             this._surface.getCanvas().reset();
 
             var screenRect = new Rect(0, 0,
-                (float) (this._surface.size.width / this._surface.devicePixelRatio),
-                (float) (this._surface.size.height / this._surface.devicePixelRatio));
+                this._surface.size.width / this._surface.devicePixelRatio,
+                this._surface.size.height / this._surface.devicePixelRatio);
 
             if (this._drawToTargetFunc == null) {
                 Graphics.DrawTexture(screenRect, this._surface.getRenderTexture(),
@@ -151,7 +151,7 @@ namespace Unity.UIWidgets.editor {
             return true;
         }
 
-        void _createOrUpdateRenderTexture(Size size, double devicePixelRatio) {
+        void _createOrUpdateRenderTexture(Size size, float devicePixelRatio) {
             if (this._surface != null
                 && this._surface.size == size
                 && this._surface.devicePixelRatio == devicePixelRatio
@@ -171,7 +171,7 @@ namespace Unity.UIWidgets.editor {
     public class GrSurface : IDisposable {
         public readonly Size size;
 
-        public readonly double devicePixelRatio;
+        public readonly float devicePixelRatio;
 
         readonly MeshPool _meshPool;
 
@@ -186,13 +186,13 @@ namespace Unity.UIWidgets.editor {
         public Canvas getCanvas() {
             if (this._canvas == null) {
                 this._canvas = new CommandBufferCanvas(
-                    this._renderTexture, (float) this.devicePixelRatio, this._meshPool);
+                    this._renderTexture, this.devicePixelRatio, this._meshPool);
             }
 
             return this._canvas;
         }
 
-        public GrSurface(Size size, double devicePixelRatio, MeshPool meshPool) {
+        public GrSurface(Size size, float devicePixelRatio, MeshPool meshPool) {
             this.size = size;
             this.devicePixelRatio = devicePixelRatio;
 

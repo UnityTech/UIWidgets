@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
+using UnityEngine;
+using Canvas = Unity.UIWidgets.ui.Canvas;
+using Color = Unity.UIWidgets.ui.Color;
+using Rect = Unity.UIWidgets.ui.Rect;
 
 namespace Unity.UIWidgets.painting {
     public enum BorderStyle {
@@ -69,10 +73,10 @@ namespace Unity.UIWidgets.painting {
             );
         }
 
-        public BorderSide scale(double t) {
+        public BorderSide scale(float t) {
             return new BorderSide(
                 color: this.color,
-                width: (float) Math.Max(0.0, this.width * t),
+                width: Mathf.Max(0.0f, this.width * t),
                 style: t <= 0.0 ? BorderStyle.none : this.style
             );
         }
@@ -88,7 +92,7 @@ namespace Unity.UIWidgets.painting {
                 case BorderStyle.none:
                     return new Paint {
                         color = Color.clear,
-                        strokeWidth = 0.0,
+                        strokeWidth = 0.0f,
                         style = PaintingStyle.stroke
                     };
             }
@@ -332,7 +336,7 @@ namespace Unity.UIWidgets.painting {
             List<ShapeBorder> aList = a is _CompoundBorder aBorder ? aBorder.borders : new List<ShapeBorder> {a};
             List<ShapeBorder> bList = b is _CompoundBorder bBorder ? bBorder.borders : new List<ShapeBorder> {b};
             List<ShapeBorder> results = new List<ShapeBorder>();
-            int length = Math.Max(aList.Count, bList.Count);
+            int length = Mathf.Max(aList.Count, bList.Count);
             for (int index = 0; index < length; index += 1) {
                 ShapeBorder localA = index < aList.Count ? aList[index] : null;
                 ShapeBorder localB = index < bList.Count ? bList[index] : null;
@@ -438,14 +442,14 @@ namespace Unity.UIWidgets.painting {
             switch (top.style) {
                 case BorderStyle.solid:
                     Paint paint = new Paint {
-                        strokeWidth = 0.0,
+                        strokeWidth = 0.0f,
                         color = top.color,
                     };
 
                     Path path = new Path();
                     path.moveTo(rect.left, rect.top);
                     path.lineTo(rect.right, rect.top);
-                    if (top.width == 0.0) {
+                    if (top.width == 0.0f) {
                         paint.style = PaintingStyle.stroke;
                     }
                     else {
@@ -463,7 +467,7 @@ namespace Unity.UIWidgets.painting {
             switch (right.style) {
                 case BorderStyle.solid:
                     Paint paint = new Paint {
-                        strokeWidth = 0.0,
+                        strokeWidth = 0.0f,
                         color = right.color,
                     };
 
@@ -488,7 +492,7 @@ namespace Unity.UIWidgets.painting {
             switch (bottom.style) {
                 case BorderStyle.solid:
                     Paint paint = new Paint {
-                        strokeWidth = 0.0,
+                        strokeWidth = 0.0f,
                         color = bottom.color,
                     };
 
@@ -513,14 +517,14 @@ namespace Unity.UIWidgets.painting {
             switch (left.style) {
                 case BorderStyle.solid:
                     Paint paint = new Paint {
-                        strokeWidth = 0.0,
+                        strokeWidth = 0.0f,
                         color = left.color,
                     };
 
                     Path path = new Path();
                     path.moveTo(rect.left, rect.bottom);
                     path.lineTo(rect.left, rect.top);
-                    if (left.width == 0.0) {
+                    if (left.width == 0.0f) {
                         paint.style = PaintingStyle.stroke;
                     }
                     else {

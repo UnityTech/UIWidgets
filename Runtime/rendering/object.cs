@@ -270,9 +270,9 @@ namespace Unity.UIWidgets.rendering {
 
         public void pushTransform(bool needsCompositing, Offset offset, Matrix3 transform,
             PaintingContextCallback painter) {
-            var effectiveTransform = Matrix3.makeTrans((float) offset.dx, (float) offset.dy);
+            var effectiveTransform = Matrix3.makeTrans(offset.dx, offset.dy);
             effectiveTransform.preConcat(transform);
-            effectiveTransform.preTranslate((float) -offset.dx, (float) -offset.dy);
+            effectiveTransform.preTranslate(-offset.dx, -offset.dy);
 
             if (needsCompositing) {
                 var inverse = Matrix3.I();

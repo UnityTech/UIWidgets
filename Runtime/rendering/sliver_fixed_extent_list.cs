@@ -1,6 +1,7 @@
 using System;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
+using UnityEngine;
 
 namespace Unity.UIWidgets.rendering {
     public abstract class RenderSliverFixedExtentBoxAdaptor : RenderSliverMultiBoxAdaptor {
@@ -16,11 +17,11 @@ namespace Unity.UIWidgets.rendering {
         }
 
         protected virtual int getMinChildIndexForScrollOffset(float scrollOffset, float itemExtent) {
-            return itemExtent > 0.0 ? Math.Max(0, (int) (scrollOffset / itemExtent)) : 0;
+            return itemExtent > 0.0 ? Mathf.Max(0, (int) (scrollOffset / itemExtent)) : 0;
         }
 
         protected virtual int getMaxChildIndexForScrollOffset(float scrollOffset, float itemExtent) {
-            return itemExtent > 0.0 ? Math.Max(0, (int) Math.Ceiling(scrollOffset / itemExtent) - 1) : 0;
+            return itemExtent > 0.0 ? Mathf.Max(0, (int) Mathf.Ceil(scrollOffset / itemExtent) - 1) : 0;
         }
 
         protected virtual float estimateMaxScrollOffset(SliverConstraints constraints,
@@ -149,19 +150,19 @@ namespace Unity.UIWidgets.rendering {
 
             float paintExtent = this.calculatePaintOffset(
                 this.constraints,
-                from: (float) leadingScrollOffset,
-                to: (float) trailingScrollOffset
+                from: leadingScrollOffset,
+                to: trailingScrollOffset
             );
 
             float cacheExtent = this.calculateCacheOffset(
                 this.constraints,
-                from: (float) leadingScrollOffset,
-                to: (float) trailingScrollOffset
+                from: leadingScrollOffset,
+                to: trailingScrollOffset
             );
 
             float targetEndScrollOffsetForPaint =
                 this.constraints.scrollOffset + this.constraints.remainingPaintExtent;
-            int? targetLastIndexForPaint = !double.IsInfinity(targetEndScrollOffsetForPaint)
+            int? targetLastIndexForPaint = !float.IsInfinity(targetEndScrollOffsetForPaint)
                 ? this.getMaxChildIndexForScrollOffset(targetEndScrollOffsetForPaint, itemExtent)
                 : (int?) null;
             this.geometry = new SliverGeometry(

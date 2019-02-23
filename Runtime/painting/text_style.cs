@@ -326,7 +326,7 @@ namespace Unity.UIWidgets.painting {
                 defaultValue: Diagnostics.kNullDefaultValue));
             styles.Add(new StringProperty("family", this.fontFamily, defaultValue: Diagnostics.kNullDefaultValue,
                 quoted: false));
-            styles.Add(new DiagnosticsProperty<double?>("size", this.fontSize,
+            styles.Add(new DiagnosticsProperty<float?>("size", this.fontSize,
                 defaultValue: Diagnostics.kNullDefaultValue));
             string weightDescription = "";
             if (this.fontWeight != null) {
@@ -347,13 +347,13 @@ namespace Unity.UIWidgets.painting {
             ));
             styles.Add(new EnumProperty<FontStyle?>("style", this.fontStyle,
                 defaultValue: Diagnostics.kNullDefaultValue));
-            styles.Add(new DiagnosticsProperty<double?>("letterSpacing", this.letterSpacing,
+            styles.Add(new DiagnosticsProperty<float?>("letterSpacing", this.letterSpacing,
                 defaultValue: Diagnostics.kNullDefaultValue));
-            styles.Add(new DiagnosticsProperty<double?>("wordSpacing", this.wordSpacing,
+            styles.Add(new DiagnosticsProperty<float?>("wordSpacing", this.wordSpacing,
                 defaultValue: Diagnostics.kNullDefaultValue));
             styles.Add(new EnumProperty<TextBaseline?>("baseline", this.textBaseline,
                 defaultValue: Diagnostics.kNullDefaultValue));
-            styles.Add(new DiagnosticsProperty<double?>("height", this.height,
+            styles.Add(new DiagnosticsProperty<float?>("height", this.height,
                 defaultValue: Diagnostics.kNullDefaultValue));
             styles.Add(new StringProperty("background", this.background == null ? null : this.background.ToString(),
                 defaultValue: Diagnostics.kNullDefaultValue, quoted: false));

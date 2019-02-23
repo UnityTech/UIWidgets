@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.ui;
+using UnityEngine;
 
 namespace Unity.UIWidgets.rendering {
     public abstract class
@@ -33,7 +34,7 @@ namespace Unity.UIWidgets.rendering {
                 if (candidate != null) {
                     candidate += childParentData.offset.dy;
                     if (result != null) {
-                        result = (float) Math.Min(result.Value, candidate.Value);
+                        result = Mathf.Min(result.Value, candidate.Value);
                     }
                     else {
                         result = candidate;

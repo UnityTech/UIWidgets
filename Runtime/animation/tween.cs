@@ -186,11 +186,11 @@ namespace Unity.UIWidgets.animation {
         }
     }
 
-    public class DoubleTween : Tween<double> {
-        public DoubleTween(double begin, double end) : base(begin: begin, end: end) {
+    public class floatTween : Tween<float> {
+        public floatTween(float begin, float end) : base(begin: begin, end: end) {
         }
 
-        public override double lerp(float t) {
+        public override float lerp(float t) {
             return this.begin + (this.end - this.begin) * t;
         }
     }

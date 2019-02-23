@@ -4,6 +4,8 @@ using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
+using UnityEngine;
+using Color = Unity.UIWidgets.ui.Color;
 
 namespace Unity.UIWidgets.material {
     public static class ThemeDataUtils {
@@ -69,11 +71,11 @@ namespace Unity.UIWidgets.material {
         }
 
         static float _getSplashRadiusForPositionInSize(Size bounds, Offset position) {
-            double d1 = (position - bounds.topLeft(Offset.zero)).distance;
-            double d2 = (position - bounds.topRight(Offset.zero)).distance;
-            double d3 = (position - bounds.bottomLeft(Offset.zero)).distance;
-            double d4 = (position - bounds.bottomRight(Offset.zero)).distance;
-            return Math.Max(Math.Max(d1, d2), Math.Max(d3, d4)).ceil();
+            float d1 = (position - bounds.topLeft(Offset.zero)).distance;
+            float d2 = (position - bounds.topRight(Offset.zero)).distance;
+            float d3 = (position - bounds.bottomLeft(Offset.zero)).distance;
+            float d4 = (position - bounds.bottomRight(Offset.zero)).distance;
+            return Mathf.Max(Mathf.Max(d1, d2), Mathf.Max(d3, d4)).ceil();
         }
     }
 
@@ -103,9 +105,9 @@ namespace Unity.UIWidgets.material {
         public static float _getTargetRadius(RenderBox referenceBox, bool containedInkWell, RectCallback rectCallback,
             Offset position) {
             Size size = rectCallback != null ? rectCallback().size : referenceBox.size;
-            double d1 = size.bottomRight(Offset.zero).distance;
-            double d2 = (size.topRight(Offset.zero) - size.bottomLeft(Offset.zero)).distance;
-            return (float) (Math.Max(d1, d2) / 2.0);
+            float d1 = size.bottomRight(Offset.zero).distance;
+            float d2 = (size.topRight(Offset.zero) - size.bottomLeft(Offset.zero)).distance;
+            return (Mathf.Max(d1, d2) / 2.0f);
         }
     }
 
@@ -119,7 +121,7 @@ namespace Unity.UIWidgets.material {
 
 
     public static class ArcUtils {
-        public const double _kOnAxisDelta = 2.0;
+        public const float _kOnAxisDelta = 2.0f;
 
         public static readonly List<_Diagonal> _allDiagonals = new List<_Diagonal> {
             new _Diagonal(_CornerId.topLeft, _CornerId.bottomRight),
@@ -128,14 +130,14 @@ namespace Unity.UIWidgets.material {
             new _Diagonal(_CornerId.bottomLeft, _CornerId.topRight)
         };
 
-        public delegate double _KeyFunc<T>(T input);
+        public delegate float _KeyFunc<T>(T input);
 
 
         public static T _maxBy<T>(List<T> input, _KeyFunc<T> keyFunc) {
             T maxValue = default(T);
-            double? maxKey = null;
+            float? maxKey = null;
             foreach (T value in input) {
-                double key = keyFunc(value);
+                float key = keyFunc(value);
                 if (maxKey == null || key > maxKey) {
                     maxValue = value;
                     maxKey = key;

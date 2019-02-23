@@ -417,7 +417,7 @@ namespace Unity.UIWidgets.rendering {
 
             var totalOffset = this.offset + layerOffset;
             if (totalOffset != Offset.zero) {
-                this._lastEffectiveTransform = Matrix3.makeTrans((float) totalOffset.dx, (float) totalOffset.dy);
+                this._lastEffectiveTransform = Matrix3.makeTrans(totalOffset.dx, totalOffset.dy);
                 this._lastEffectiveTransform.preConcat(this._transform);
             }
 
@@ -521,7 +521,7 @@ namespace Unity.UIWidgets.rendering {
         public override void applyTransform(Layer child, Matrix3 transform) {
             D.assert(this._lastOffset != null);
             if (this._lastOffset != Offset.zero) {
-                transform.preTranslate((float) this._lastOffset.dx, (float) this._lastOffset.dy);
+                transform.preTranslate(this._lastOffset.dx, this._lastOffset.dy);
             }
         }
 
@@ -560,7 +560,7 @@ namespace Unity.UIWidgets.rendering {
                 return null;
             }
 
-            Matrix3 result = Matrix3.makeTrans((float) -this._lastOffset.dx, (float) -this._lastOffset.dy);
+            Matrix3 result = Matrix3.makeTrans(-this._lastOffset.dx, -this._lastOffset.dy);
             result.preConcat(this._lastTransform);
             return result;
         }
@@ -619,7 +619,7 @@ namespace Unity.UIWidgets.rendering {
 
             inverseTransform = inverse;
             inverseTransform.preConcat(forwardTransform);
-            inverseTransform.preTranslate((float) this.linkedOffset.dx, (float) this.linkedOffset.dy);
+            inverseTransform.preTranslate(this.linkedOffset.dx, this.linkedOffset.dy);
             this._lastTransform = inverseTransform;
         }
 
@@ -640,7 +640,7 @@ namespace Unity.UIWidgets.rendering {
             }
             else {
                 this._lastOffset = null;
-                var matrix = Matrix3.makeTrans((float) this.unlinkedOffset.dx, (float) this.unlinkedOffset.dy);
+                var matrix = Matrix3.makeTrans(this.unlinkedOffset.dx, this.unlinkedOffset.dy);
                 builder.pushTransform(matrix);
                 this.addChildrenToScene(builder, Offset.zero);
                 builder.pop();
@@ -654,7 +654,7 @@ namespace Unity.UIWidgets.rendering {
                 transform.preConcat(this._lastTransform);
             }
             else {
-                transform.preConcat(Matrix3.makeTrans((float) this.unlinkedOffset.dx, (float) this.unlinkedOffset.dy));
+                transform.preConcat(Matrix3.makeTrans(this.unlinkedOffset.dx, this.unlinkedOffset.dy));
             }
         }
 

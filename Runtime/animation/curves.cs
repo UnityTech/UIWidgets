@@ -1,6 +1,6 @@
-using System;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
+using UnityEngine;
 
 namespace Unity.UIWidgets.animation {
     public abstract class Curve {
@@ -85,11 +85,11 @@ namespace Unity.UIWidgets.animation {
     }
 
     public class Threshold : Curve {
-        public Threshold(double threshold) {
+        public Threshold(float threshold) {
             this.threshold = threshold;
         }
 
-        public readonly double threshold;
+        public readonly float threshold;
 
         public override float transform(float t) {
             D.assert(t >= 0.0 && t <= 1.0);
@@ -230,7 +230,7 @@ namespace Unity.UIWidgets.animation {
             D.assert(t >= 0.0 && t <= 1.0);
             float s = this.period / 4.0f;
             t = t - 1.0f;
-            return (float) (-Math.Pow(2.0, 10.0 * t) * Math.Sin((t - s) * (Math.PI * 2.0) / this.period));
+            return -Mathf.Pow(2.0f, 10.0f * t) * Mathf.Sin((t - s) * (Mathf.PI * 2.0f) / this.period);
         }
 
         public override string ToString() {
@@ -239,16 +239,16 @@ namespace Unity.UIWidgets.animation {
     }
 
     public class ElasticOutCurve : Curve {
-        public ElasticOutCurve(double period = 0.4) {
+        public ElasticOutCurve(float period = 0.4f) {
             this.period = period;
         }
 
-        public readonly double period;
+        public readonly float period;
 
         public override float transform(float t) {
             D.assert(t >= 0.0 && t <= 1.0);
-            double s = this.period / 4.0;
-            return (float) (Math.Pow(2.0, -10.0 * t) * Math.Sin((t - s) * (Math.PI * 2.0) / this.period) + 1.0);
+            float s = this.period / 4.0f;
+            return Mathf.Pow(2.0f, -10.0f * t) * Mathf.Sin((t - s) * (Mathf.PI * 2.0f) / this.period) + 1.0f;
         }
 
         public override string ToString() {
@@ -257,22 +257,22 @@ namespace Unity.UIWidgets.animation {
     }
 
     public class ElasticInOutCurve : Curve {
-        public ElasticInOutCurve(double period = 0.4) {
+        public ElasticInOutCurve(float period = 0.4f) {
             this.period = period;
         }
 
-        public readonly double period;
+        public readonly float period;
 
         public override float transform(float t) {
             D.assert(t >= 0.0 && t <= 1.0);
-            double s = this.period / 4.0f;
+            float s = this.period / 4.0f;
             t = 2.0f * t - 1.0f;
             if (t < 0.0) {
-                return (float) (-0.5 * Math.Pow(2.0f, 10.0f * t) * Math.Sin((t - s) * (Math.PI * 2.0f) / this.period));
+                return -0.5f * Mathf.Pow(2.0f, 10.0f * t) * Mathf.Sin((t - s) * (Mathf.PI * 2.0f) / this.period);
             }
             else {
-                return (float) (Math.Pow(2.0f, -10.0f * t) * Math.Sin((t - s) * (Math.PI * 2.0f) / this.period) * 0.5f +
-                                1.0f);
+                return Mathf.Pow(2.0f, -10.0f * t) * Mathf.Sin((t - s) * (Mathf.PI * 2.0f) / this.period) * 0.5f +
+                       1.0f;
             }
         }
 

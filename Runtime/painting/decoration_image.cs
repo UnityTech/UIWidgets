@@ -260,11 +260,11 @@ namespace Unity.UIWidgets.painting {
 
             paint.invertColors = invertColors;
 
-            double halfWidthDelta = (outputSize.width - destinationSize.width) / 2.0;
-            double halfHeightDelta = (outputSize.height - destinationSize.height) / 2.0;
-            double dx = halfWidthDelta + alignment.x * halfWidthDelta;
-            double dy = halfHeightDelta + alignment.y * halfHeightDelta;
-            Offset destinationPosition = rect.topLeft.translate((float) dx, (float) dy);
+            float halfWidthDelta = (outputSize.width - destinationSize.width) / 2.0f;
+            float halfHeightDelta = (outputSize.height - destinationSize.height) / 2.0f;
+            float dx = halfWidthDelta + alignment.x * halfWidthDelta;
+            float dy = halfHeightDelta + alignment.y * halfHeightDelta;
+            Offset destinationPosition = rect.topLeft.translate(dx, dy);
             Rect destinationRect = destinationPosition & destinationSize;
             bool needSave = repeat != ImageRepeat.noRepeat;
             if (needSave) {

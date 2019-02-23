@@ -174,15 +174,15 @@ namespace Unity.UIWidgets.service {
 
         public TextEditingValue moveExtent(int move) {
             int offset = this.selection.extentOffset + move;
-            offset = Math.Max(0, offset);
-            offset = Math.Min(offset, this.text.Length);
+            offset = Mathf.Max(0, offset);
+            offset = Mathf.Min(offset, this.text.Length);
             return this.copyWith(selection: this.selection.copyWith(extentOffset: offset));
         }
 
         public TextEditingValue moveSelection(int move) {
             int offset = this.selection.baseOffset + move;
-            offset = Math.Max(0, offset);
-            offset = Math.Min(offset, this.text.Length);
+            offset = Mathf.Max(0, offset);
+            offset = Mathf.Min(offset, this.text.Length);
             return this.copyWith(selection: TextSelection.collapsed(offset, affinity: this.selection.affinity));
         }
 
@@ -385,7 +385,7 @@ namespace Unity.UIWidgets.service {
             this._textInput.keyboardManager.setEditingState(value);
         }
 
-        public void setCompositionCursorPos(double x, double y) {
+        public void setCompositionCursorPos(float x, float y) {
             D.assert(this.attached);
             this._textInput.setCompositionCursorPos(x, y);
         }
@@ -431,8 +431,8 @@ namespace Unity.UIWidgets.service {
             return connection;
         }
 
-        public void setCompositionCursorPos(double x, double y) {
-            Input.compositionCursorPos = new Vector2((float) x, (float) y);
+        public void setCompositionCursorPos(float x, float y) {
+            Input.compositionCursorPos = new Vector2(x, y);
         }
 
         internal void _updateEditingState(int client, TextEditingValue value) {

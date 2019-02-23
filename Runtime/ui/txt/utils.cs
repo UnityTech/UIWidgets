@@ -1,9 +1,9 @@
-﻿using System;
+﻿using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
     class Utils {
-        public static double PixelCorrectRound(double v) {
-            return Math.Round(v * Window.instance.devicePixelRatio) / Window.instance.devicePixelRatio;
+        public static float PixelCorrectRound(float v) {
+            return Mathf.Round(v * Window.instance.devicePixelRatio) / Window.instance.devicePixelRatio;
         }
     }
 }

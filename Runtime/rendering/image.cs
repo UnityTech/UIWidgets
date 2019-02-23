@@ -217,8 +217,8 @@ namespace Unity.UIWidgets.rendering {
             }
 
             return constraints.constrainSizeAndAttemptToPreserveAspectRatio(new Size(
-                (float) (this._image.width / this._scale),
-                (float) (this._image.height / this._scale)
+                (this._image.width / this._scale),
+                (this._image.height / this._scale)
             ));
         }
 
@@ -228,12 +228,12 @@ namespace Unity.UIWidgets.rendering {
                 return 0.0f;
             }
 
-            return (float) this._sizeForConstraints(BoxConstraints.tightForFinite(height: height)).width;
+            return this._sizeForConstraints(BoxConstraints.tightForFinite(height: height)).width;
         }
 
         protected override float computeMaxIntrinsicWidth(float height) {
             D.assert(height >= 0.0);
-            return (float) this._sizeForConstraints(BoxConstraints.tightForFinite(height: height)).width;
+            return this._sizeForConstraints(BoxConstraints.tightForFinite(height: height)).width;
         }
 
         protected override float computeMinIntrinsicHeight(float width) {
@@ -242,12 +242,12 @@ namespace Unity.UIWidgets.rendering {
                 return 0.0f;
             }
 
-            return (float) this._sizeForConstraints(BoxConstraints.tightForFinite(width: width)).height;
+            return this._sizeForConstraints(BoxConstraints.tightForFinite(width: width)).height;
         }
 
         protected override float computeMaxIntrinsicHeight(float width) {
             D.assert(width >= 0.0);
-            return (float) this._sizeForConstraints(BoxConstraints.tightForFinite(width: width)).height;
+            return this._sizeForConstraints(BoxConstraints.tightForFinite(width: width)).height;
         }
 
         protected override bool hitTestSelf(Offset position) {
@@ -281,9 +281,9 @@ namespace Unity.UIWidgets.rendering {
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             properties.add(new DiagnosticsProperty<Image>("image", this.image));
-            properties.add(new DoubleProperty("width", this.width, defaultValue: Diagnostics.kNullDefaultValue));
-            properties.add(new DoubleProperty("height", this.height, defaultValue: Diagnostics.kNullDefaultValue));
-            properties.add(new DoubleProperty("scale", this.scale, defaultValue: 1.0));
+            properties.add(new floatProperty("width", this.width, defaultValue: Diagnostics.kNullDefaultValue));
+            properties.add(new floatProperty("height", this.height, defaultValue: Diagnostics.kNullDefaultValue));
+            properties.add(new floatProperty("scale", this.scale, defaultValue: 1.0));
             properties.add(new DiagnosticsProperty<Color>("color", this.color,
                 defaultValue: Diagnostics.kNullDefaultValue));
             properties.add(new EnumProperty<BlendMode>("colorBlendMode", this.colorBlendMode,

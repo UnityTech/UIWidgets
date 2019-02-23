@@ -111,7 +111,7 @@ namespace Unity.UIWidgets.widgets {
             if (newPixels != this.pixels) {
                 float overscroll = this.applyBoundaryConditions(newPixels);
                 D.assert(() => {
-                    double delta = newPixels - this.pixels;
+                    float delta = newPixels - this.pixels;
                     if (overscroll.abs() > delta.abs()) {
                         throw new UIWidgetsError(
                             string.Format(
@@ -183,7 +183,7 @@ namespace Unity.UIWidgets.widgets {
         protected float applyBoundaryConditions(float value) {
             float result = this.physics.applyBoundaryConditions(this, value);
             D.assert(() => {
-                double delta = value - this.pixels;
+                float delta = value - this.pixels;
                 if (result.abs() > delta.abs()) {
                     throw new UIWidgetsError(
                         $"{this.physics.GetType()}.applyBoundaryConditions returned invalid overscroll value.\n" +

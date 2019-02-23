@@ -45,7 +45,7 @@ namespace Unity.UIWidgets.material {
 
             ThemeData theme = Theme.of(this.context);
 
-            this._themeColor = theme.highlightColor.withOpacity(1.0);
+            this._themeColor = theme.highlightColor.withOpacity(1.0f);
             this._textDirection = Directionality.of(this.context);
             this._materialPainter = this._BuildMaterialScrollbarPainter();
         }

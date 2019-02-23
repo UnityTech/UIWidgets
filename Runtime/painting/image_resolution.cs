@@ -43,7 +43,7 @@ namespace Unity.UIWidgets.painting {
             });
         }
 
-        IEnumerator _loadAssetAsync(AssetBundle bundle, double devicePixelRatio) {
+        IEnumerator _loadAssetAsync(AssetBundle bundle, float devicePixelRatio) {
             var extension = Path.GetExtension(this.assetName);
             var name = Path.GetFileNameWithoutExtension(this.assetName);
 

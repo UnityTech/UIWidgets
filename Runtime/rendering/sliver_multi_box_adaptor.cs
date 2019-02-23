@@ -342,7 +342,7 @@ namespace Unity.UIWidgets.rendering {
                 case AxisDirection.left:
                     mainAxisUnit = new Offset(-1.0f, 0.0f);
                     crossAxisUnit = new Offset(0.0f, 1.0f);
-                    originOffset = offset + new Offset((float) this.geometry.paintExtent, 0.0f);
+                    originOffset = offset + new Offset(this.geometry.paintExtent, 0.0f);
                     addExtent = true;
                     break;
             }

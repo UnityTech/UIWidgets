@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.ui;
+using UnityEngine;
 
 namespace Unity.UIWidgets.rendering {
     public enum FlexFit {
@@ -161,7 +162,7 @@ namespace Unity.UIWidgets.rendering {
 
         public TextBaseline _textBaseline;
 
-        public double _overflow;
+        public float _overflow;
 
         public override void setupParentData(RenderObject child) {
             if (!(child.parentData is FlexParentData)) {
@@ -184,8 +185,8 @@ namespace Unity.UIWidgets.rendering {
                     int flex = this._getFlex(child);
                     totalFlex += flex;
                     if (flex > 0) {
-                        double flexFraction = childSize(child, extent) / this._getFlex(child);
-                        maxFlexFractionSoFar = (float) Math.Max(maxFlexFractionSoFar, flexFraction);
+                        float flexFraction = childSize(child, extent) / this._getFlex(child);
+                        maxFlexFractionSoFar = Mathf.Max(maxFlexFractionSoFar, flexFraction);
                     }
                     else {
                         inflexibleSpace += childSize(child, extent);
@@ -198,7 +199,7 @@ namespace Unity.UIWidgets.rendering {
                 return maxFlexFractionSoFar * totalFlex + inflexibleSpace;
             }
             else {
-                double availableMainSpace = extent;
+                float availableMainSpace = extent;
                 int totalFlex = 0;
                 float inflexibleSpace = 0.0f;
                 float maxCrossSize = 0.0f;
@@ -222,20 +223,20 @@ namespace Unity.UIWidgets.rendering {
                         }
 
                         inflexibleSpace += mainSize;
-                        maxCrossSize = Math.Max(maxCrossSize, crossSize);
+                        maxCrossSize = Mathf.Max(maxCrossSize, crossSize);
                     }
 
                     var childParentData = (FlexParentData) child.parentData;
                     child = childParentData.nextSibling;
                 }
 
-                float spacePerFlex = (float) Math.Max(0.0, (availableMainSpace - inflexibleSpace) / totalFlex);
+                float spacePerFlex = Mathf.Max(0.0f, (availableMainSpace - inflexibleSpace) / totalFlex);
 
                 child = this.firstChild;
                 while (child != null) {
                     int flex = this._getFlex(child);
                     if (flex > 0) {
-                        maxCrossSize = Math.Max(maxCrossSize, childSize(child, spacePerFlex * flex));
+                        maxCrossSize = Mathf.Max(maxCrossSize, childSize(child, spacePerFlex * flex));
                     }
 
                     var childParentData = (FlexParentData) child.parentData;
@@ -296,7 +297,7 @@ namespace Unity.UIWidgets.rendering {
             return childParentData.fit;
         }
 
-        public double _getCrossSize(RenderBox child) {
+        public float _getCrossSize(RenderBox child) {
             switch (this._direction) {
                 case Axis.horizontal:
                     return child.size.height;
@@ -307,7 +308,7 @@ namespace Unity.UIWidgets.rendering {
             return 0;
         }
 
-        public double _getMainSize(RenderBox child) {
+        public float _getMainSize(RenderBox child) {
             switch (this._direction) {
                 case Axis.horizontal:
                     return child.size.width;
@@ -321,13 +322,13 @@ namespace Unity.UIWidgets.rendering {
         protected override void performLayout() {
             int totalFlex = 0;
             int totalChildren = 0;
-            double maxMainSize = this._direction == Axis.horizontal
+            float maxMainSize = this._direction == Axis.horizontal
                 ? this.constraints.maxWidth
                 : this.constraints.maxHeight;
-            bool canFlex = maxMainSize < double.PositiveInfinity;
+            bool canFlex = maxMainSize < float.PositiveInfinity;
 
-            double crossSize = 0.0;
-            double allocatedSize = 0.0;
+            float crossSize = 0.0f;
+            float allocatedSize = 0.0f;
             RenderBox child = this.firstChild;
             RenderBox lastFlexChild = null;
             while (child != null) {
@@ -369,31 +370,31 @@ namespace Unity.UIWidgets.rendering {
 
                     child.layout(innerConstraints, parentUsesSize: true);
                     allocatedSize += this._getMainSize(child);
-                    crossSize = Math.Max(crossSize, this._getCrossSize(child));
+                    crossSize = Mathf.Max(crossSize, this._getCrossSize(child));
                 }
 
                 child = childParentData.nextSibling;
             }
 
-            double freeSpace = Math.Max(0.0, (canFlex ? maxMainSize : 0.0) - allocatedSize);
-            double allocatedFlexSpace = 0.0;
-            double maxBaselineDistance = 0.0;
+            float freeSpace = Mathf.Max(0.0f, (canFlex ? maxMainSize : 0.0f) - allocatedSize);
+            float allocatedFlexSpace = 0.0f;
+            float maxBaselineDistance = 0.0f;
             if (totalFlex > 0 || this.crossAxisAlignment == CrossAxisAlignment.baseline) {
-                double spacePerFlex = canFlex && totalFlex > 0 ? (freeSpace / totalFlex) : double.NaN;
+                float spacePerFlex = canFlex && totalFlex > 0 ? (freeSpace / totalFlex) : float.NaN;
                 child = this.firstChild;
                 while (child != null) {
                     int flex = this._getFlex(child);
                     if (flex > 0) {
-                        double maxChildExtent = canFlex
+                        float maxChildExtent = canFlex
                             ? (child == lastFlexChild ? (freeSpace - allocatedFlexSpace) : spacePerFlex * flex)
-                            : double.PositiveInfinity;
-                        double minChildExtent = 0.0;
+                            : float.PositiveInfinity;
+                        float minChildExtent = 0.0f;
                         switch (this._getFit(child)) {
                             case FlexFit.tight:
                                 minChildExtent = maxChildExtent;
                                 break;
                             case FlexFit.loose:
-                                minChildExtent = 0.0;
+                                minChildExtent = 0.0f;
                                 break;
                         }
 
@@ -402,8 +403,8 @@ namespace Unity.UIWidgets.rendering {
                             switch (this._direction) {
                                 case Axis.horizontal:
                                     innerConstraints = new BoxConstraints(
-                                        minWidth: (float) minChildExtent,
-                                        maxWidth: (float) maxChildExtent,
+                                        minWidth: minChildExtent,
+                                        maxWidth: maxChildExtent,
                                         minHeight: this.constraints.maxHeight,
                                         maxHeight: this.constraints.maxHeight);
                                     break;
@@ -411,8 +412,8 @@ namespace Unity.UIWidgets.rendering {
                                     innerConstraints = new BoxConstraints(
                                         minWidth: this.constraints.maxWidth,
                                         maxWidth: this.constraints.maxWidth,
-                                        minHeight: (float) minChildExtent,
-                                        maxHeight: (float) maxChildExtent);
+                                        minHeight: minChildExtent,
+                                        maxHeight: maxChildExtent);
                                     break;
                             }
                         }
@@ -420,30 +421,30 @@ namespace Unity.UIWidgets.rendering {
                             switch (this._direction) {
                                 case Axis.horizontal:
                                     innerConstraints = new BoxConstraints(
-                                        minWidth: (float) minChildExtent,
-                                        maxWidth: (float) maxChildExtent,
+                                        minWidth: minChildExtent,
+                                        maxWidth: maxChildExtent,
                                         maxHeight: this.constraints.maxHeight);
                                     break;
                                 case Axis.vertical:
                                     innerConstraints = new BoxConstraints(
                                         maxWidth: this.constraints.maxWidth,
-                                        minHeight: (float) minChildExtent,
-                                        maxHeight: (float) maxChildExtent);
+                                        minHeight: minChildExtent,
+                                        maxHeight: maxChildExtent);
                                     break;
                             }
                         }
 
                         child.layout(innerConstraints, parentUsesSize: true);
-                        double childSize = this._getMainSize(child);
+                        float childSize = this._getMainSize(child);
                         allocatedSize += childSize;
                         allocatedFlexSpace += maxChildExtent;
-                        crossSize = Math.Max(crossSize, this._getCrossSize(child));
+                        crossSize = Mathf.Max(crossSize, this._getCrossSize(child));
                     }
 
                     if (this.crossAxisAlignment == CrossAxisAlignment.baseline) {
-                        double? distance = child.getDistanceToBaseline(this.textBaseline, onlyReal: true);
+                        float? distance = child.getDistanceToBaseline(this.textBaseline, onlyReal: true);
                         if (distance != null) {
-                            maxBaselineDistance = Math.Max(maxBaselineDistance, distance.Value);
+                            maxBaselineDistance = Mathf.Max(maxBaselineDistance, distance.Value);
                         }
                     }
 
@@ -452,62 +453,62 @@ namespace Unity.UIWidgets.rendering {
                 }
             }
 
-            double idealSize = canFlex && this.mainAxisSize == MainAxisSize.max ? maxMainSize : allocatedSize;
-            double actualSize = 0.0;
-            double actualSizeDelta = 0.0;
+            float idealSize = canFlex && this.mainAxisSize == MainAxisSize.max ? maxMainSize : allocatedSize;
+            float actualSize = 0.0f;
+            float actualSizeDelta = 0.0f;
             switch (this._direction) {
                 case Axis.horizontal:
-                    this.size = this.constraints.constrain(new Size((float) idealSize, (float) crossSize));
+                    this.size = this.constraints.constrain(new Size(idealSize, crossSize));
                     actualSize = this.size.width;
                     crossSize = this.size.height;
                     break;
                 case Axis.vertical:
-                    this.size = this.constraints.constrain(new Size((float) crossSize, (float) idealSize));
+                    this.size = this.constraints.constrain(new Size(crossSize, idealSize));
                     actualSize = this.size.height;
                     crossSize = this.size.width;
                     break;
             }
 
             actualSizeDelta = actualSize - allocatedSize;
-            this._overflow = Math.Max(0.0, -actualSizeDelta);
+            this._overflow = Mathf.Max(0.0f, -actualSizeDelta);
 
-            double remainingSpace = Math.Max(0.0, actualSizeDelta);
-            double leadingSpace = 0.0;
-            double betweenSpace = 0.0;
+            float remainingSpace = Mathf.Max(0.0f, actualSizeDelta);
+            float leadingSpace = 0.0f;
+            float betweenSpace = 0.0f;
             bool flipMainAxis = !_startIsTopLeft(this.direction, this.textDirection, this.verticalDirection);
             switch (this._mainAxisAlignment) {
                 case MainAxisAlignment.start:
-                    leadingSpace = 0.0;
-                    betweenSpace = 0.0;
+                    leadingSpace = 0.0f;
+                    betweenSpace = 0.0f;
                     break;
                 case MainAxisAlignment.end:
                     leadingSpace = remainingSpace;
-                    betweenSpace = 0.0;
+                    betweenSpace = 0.0f;
                     break;
                 case MainAxisAlignment.center:
-                    leadingSpace = remainingSpace / 2.0;
-                    betweenSpace = 0.0;
+                    leadingSpace = remainingSpace / 2.0f;
+                    betweenSpace = 0.0f;
                     break;
                 case MainAxisAlignment.spaceBetween:
-                    leadingSpace = 0.0;
-                    betweenSpace = totalChildren > 1 ? remainingSpace / (totalChildren - 1) : 0.0;
+                    leadingSpace = 0.0f;
+                    betweenSpace = totalChildren > 1 ? remainingSpace / (totalChildren - 1) : 0.0f;
                     break;
                 case MainAxisAlignment.spaceAround:
-                    betweenSpace = totalChildren > 0 ? remainingSpace / totalChildren : 0.0;
-                    leadingSpace = betweenSpace / 2.0;
+                    betweenSpace = totalChildren > 0 ? remainingSpace / totalChildren : 0.0f;
+                    leadingSpace = betweenSpace / 2.0f;
                     break;
                 case MainAxisAlignment.spaceEvenly:
-                    betweenSpace = totalChildren > 0 ? remainingSpace / (totalChildren + 1) : 0.0;
+                    betweenSpace = totalChildren > 0 ? remainingSpace / (totalChildren + 1) : 0.0f;
                     leadingSpace = betweenSpace;
                     break;
             }
 
             // Position elements
-            double childMainPosition = flipMainAxis ? actualSize - leadingSpace : leadingSpace;
+            float childMainPosition = flipMainAxis ? actualSize - leadingSpace : leadingSpace;
             child = this.firstChild;
             while (child != null) {
                 var childParentData = (FlexParentData) child.parentData;
-                double childCrossPosition = 0.0;
+                float childCrossPosition = 0.0f;
                 switch (this._crossAxisAlignment) {
                     case CrossAxisAlignment.start:
                     case CrossAxisAlignment.end:
@@ -515,19 +516,19 @@ namespace Unity.UIWidgets.rendering {
                             _startIsTopLeft(
                                 AxisUtils.flipAxis(this.direction), this.textDirection, this.verticalDirection)
                             == (this._crossAxisAlignment == CrossAxisAlignment.start)
-                                ? 0.0
+                                ? 0.0f
                                 : crossSize - this._getCrossSize(child);
                         break;
                     case CrossAxisAlignment.center:
-                        childCrossPosition = crossSize / 2.0 - this._getCrossSize(child) / 2.0;
+                        childCrossPosition = crossSize / 2.0f - this._getCrossSize(child) / 2.0f;
                         break;
                     case CrossAxisAlignment.stretch:
-                        childCrossPosition = 0.0;
+                        childCrossPosition = 0.0f;
                         break;
                     case CrossAxisAlignment.baseline:
-                        childCrossPosition = 0.0;
+                        childCrossPosition = 0.0f;
                         if (this._direction == Axis.horizontal) {
-                            double? distance = child.getDistanceToBaseline(this.textBaseline, onlyReal: true);
+                            float? distance = child.getDistanceToBaseline(this.textBaseline, onlyReal: true);
                             if (distance != null) {
                                 childCrossPosition = maxBaselineDistance - distance.Value;
                             }
@@ -542,10 +543,10 @@ namespace Unity.UIWidgets.rendering {
 
                 switch (this._direction) {
                     case Axis.horizontal:
-                        childParentData.offset = new Offset((float) childMainPosition, (float) childCrossPosition);
+                        childParentData.offset = new Offset(childMainPosition, childCrossPosition);
                         break;
                     case Axis.vertical:
-                        childParentData.offset = new Offset((float) childCrossPosition, (float) childMainPosition);
+                        childParentData.offset = new Offset(childCrossPosition, childMainPosition);
                         break;
                 }
 
@@ -587,7 +588,7 @@ namespace Unity.UIWidgets.rendering {
         }
 
         public override void paint(PaintingContext context, Offset offset) {
-            if (this._overflow <= 0.0) {
+            if (this._overflow <= 0.0f) {
                 this.defaultPaint(context, offset);
                 return;
             }

@@ -2,6 +2,10 @@ using System;
 using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
+using UnityEngine;
+using Canvas = Unity.UIWidgets.ui.Canvas;
+using Color = Unity.UIWidgets.ui.Color;
+using Rect = Unity.UIWidgets.ui.Rect;
 
 namespace Unity.UIWidgets.painting {
     public class BoxDecoration : Decoration, IEquatable<BoxDecoration> {
@@ -209,8 +213,8 @@ namespace Unity.UIWidgets.painting {
                     return true;
                 case BoxShape.circle:
                     Offset center = size.center(Offset.zero);
-                    double distance = (position - center).distance;
-                    return distance <= Math.Min(size.width, size.height) / 2.0;
+                    float distance = (position - center).distance;
+                    return distance <= Mathf.Min(size.width, size.height) / 2.0;
             }
 
             return false;
@@ -266,7 +270,7 @@ namespace Unity.UIWidgets.painting {
                 case BoxShape.circle:
                     D.assert(this._decoration.borderRadius == null);
                     Offset center = rect.center;
-                    double radius = rect.shortestSide / 2.0;
+                    float radius = rect.shortestSide / 2.0f;
                     canvas.drawCircle(center, radius, paint);
                     break;
                 case BoxShape.rectangle:

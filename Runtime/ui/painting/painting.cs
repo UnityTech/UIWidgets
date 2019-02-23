@@ -16,7 +16,7 @@ namespace Unity.UIWidgets.ui {
             return true;
         }
 
-        internal static Color _scaleAlpha(Color a, double factor) {
+        internal static Color _scaleAlpha(Color a, float factor) {
             return a.withAlpha((a.alpha * factor).round().clamp(0, 255));
         }
     }
@@ -40,7 +40,7 @@ namespace Unity.UIWidgets.ui {
                  ((b & 0xff) << 0)) & 0xFFFFFFFF);
         }
 
-        public static Color fromRGBO(int r, int g, int b, double opacity) {
+        public static Color fromRGBO(int r, int g, int b, float opacity) {
             return new Color(
                 ((((int) (opacity * 0xff) & 0xff) << 24) |
                  ((r & 0xff) << 16) |
@@ -54,8 +54,8 @@ namespace Unity.UIWidgets.ui {
             get { return (int) ((0xff000000 & this.value) >> 24); }
         }
 
-        public double opacity {
-            get { return this.alpha / 255.0; }
+        public float opacity {
+            get { return this.alpha / 255.0f; }
         }
 
         public int red {
@@ -74,7 +74,7 @@ namespace Unity.UIWidgets.ui {
             return fromARGB(a, this.red, this.green, this.blue);
         }
 
-        public Color withOpacity(double opacity) {
+        public Color withOpacity(float opacity) {
             return this.withAlpha((int) (opacity * 255));
         }
 
@@ -90,22 +90,22 @@ namespace Unity.UIWidgets.ui {
             return fromARGB(this.alpha, this.red, this.green, b);
         }
 
-        static double _linearizeColorComponent(double component) {
-            if (component <= 0.03928) {
-                return component / 12.92;
+        static float _linearizeColorComponent(float component) {
+            if (component <= 0.03928f) {
+                return component / 12.92f;
             }
 
-            return Math.Pow((component + 0.055) / 1.055, 2.4);
+            return Mathf.Pow((component + 0.055f) / 1.055f, 2.4f);
         }
 
-        public double computeLuminance() {
-            double R = _linearizeColorComponent(this.red / 0xFF);
-            double G = _linearizeColorComponent(this.green / 0xFF);
-            double B = _linearizeColorComponent(this.blue / 0xFF);
-            return 0.2126 * R + 0.7152 * G + 0.0722 * B;
+        public float computeLuminance() {
+            float R = _linearizeColorComponent(this.red / 0xFF);
+            float G = _linearizeColorComponent(this.green / 0xFF);
+            float B = _linearizeColorComponent(this.blue / 0xFF);
+            return 0.2126f * R + 0.7152f * G + 0.0722f * B;
         }
 
-        public static Color lerp(Color a, Color b, double t) {
+        public static Color lerp(Color a, Color b, float t) {
             if (a == null && b == null) {
                 return null;
             }
@@ -115,14 +115,14 @@ namespace Unity.UIWidgets.ui {
             }
 
             if (b == null) {
-                return a._scaleAlpha(1.0 - t);
+                return a._scaleAlpha(1.0f - t);
             }
 
             return fromARGB(
-                ((int) MathUtils.lerpDouble(a.alpha, b.alpha, t)).clamp(0, 255),
-                ((int) MathUtils.lerpDouble(a.red, b.red, t)).clamp(0, 255),
-                ((int) MathUtils.lerpDouble(a.green, b.green, t)).clamp(0, 255),
-                ((int) MathUtils.lerpDouble(a.blue, b.blue, t)).clamp(0, 255)
+                ((int) MathUtils.lerpfloat(a.alpha, b.alpha, t)).clamp(0, 255),
+                ((int) MathUtils.lerpfloat(a.red, b.red, t)).clamp(0, 255),
+                ((int) MathUtils.lerpfloat(a.green, b.green, t)).clamp(0, 255),
+                ((int) MathUtils.lerpfloat(a.blue, b.blue, t)).clamp(0, 255)
             );
         }
 
@@ -203,17 +203,17 @@ namespace Unity.UIWidgets.ui {
     }
 
     public class MaskFilter : IEquatable<MaskFilter> {
-        MaskFilter(BlurStyle style, double sigma) {
+        MaskFilter(BlurStyle style, float sigma) {
             this.style = style;
             this.sigma = sigma;
         }
 
-        public static MaskFilter blur(BlurStyle style, double sigma) {
+        public static MaskFilter blur(BlurStyle style, float sigma) {
             return new MaskFilter(style, sigma);
         }
 
         public readonly BlurStyle style;
-        public readonly double sigma;
+        public readonly float sigma;
 
         public bool Equals(MaskFilter other) {
             if (ReferenceEquals(null, other)) {
@@ -334,13 +334,13 @@ namespace Unity.UIWidgets.ui {
 
         public PaintingStyle style = PaintingStyle.fill;
 
-        public double strokeWidth = 0;
+        public float strokeWidth = 0;
 
         public StrokeCap strokeCap = StrokeCap.butt;
 
         public StrokeJoin strokeJoin = StrokeJoin.miter;
 
-        public double strokeMiterLimit = 4.0;
+        public float strokeMiterLimit = 4.0f;
 
         public FilterMode filterMode = FilterMode.Point;
 
@@ -395,18 +395,18 @@ namespace Unity.UIWidgets.ui {
         }
 
         public static Vector2 toVector(this Offset offset) {
-            return new Vector2((float) offset.dx, (float) offset.dy);
+            return new Vector2(offset.dx, offset.dy);
         }
 
         public static UnityEngine.Rect toRect(this Rect rect) {
-            return new UnityEngine.Rect((float) rect.left, (float) rect.top, (float) rect.width, (float) rect.height);
+            return new UnityEngine.Rect(rect.left, rect.top, rect.width, rect.height);
         }
 
         public static float alignToPixel(this float v, float devicePixelRatio) {
             return Mathf.Round(v * devicePixelRatio) / devicePixelRatio;
         }
 
-        internal static Color _scaleAlpha(this Color a, double factor) {
+        internal static Color _scaleAlpha(this Color a, float factor) {
             return a.withAlpha((a.alpha * factor).round().clamp(0, 255));
         }
     }

@@ -313,10 +313,10 @@ namespace Unity.UIWidgets.editor {
                     );
                 }
                 else if (evt.type == EventType.ScrollWheel) {
-                    this._scrollInput.onScroll((float) (-evt.delta.x * this._devicePixelRatio),
-                        (float) (-evt.delta.y * this._devicePixelRatio),
-                        (float) (evt.mousePosition.x * this._devicePixelRatio),
-                        (float) (evt.mousePosition.y * this._devicePixelRatio),
+                    this._scrollInput.onScroll(-evt.delta.x * this._devicePixelRatio,
+                        -evt.delta.y * this._devicePixelRatio,
+                        evt.mousePosition.x * this._devicePixelRatio,
+                        evt.mousePosition.y * this._devicePixelRatio,
                         evt.button
                     );
                 }

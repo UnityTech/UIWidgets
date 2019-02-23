@@ -7,6 +7,7 @@ using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
+using UnityEngine;
 
 namespace Unity.UIWidgets.material {
     public enum DrawerAlignment {
@@ -17,13 +18,13 @@ namespace Unity.UIWidgets.material {
     public class Drawer : StatelessWidget {
         public Drawer(
             Key key = null,
-            double elevation = 16.0,
+            float elevation = 16.0f,
             Widget child = null) : base(key: key) {
             this.elevation = elevation;
             this.child = child;
         }
 
-        public readonly double elevation;
+        public readonly float elevation;
 
         public readonly Widget child;
 
@@ -147,7 +148,7 @@ namespace Unity.UIWidgets.material {
             get {
                 RenderBox box = (RenderBox) this._drawerKey.currentContext?.findRenderObject();
                 if (box != null) {
-                    return (float) box.size.width;
+                    return box.size.width;
                 }
 
                 return DrawerUtils._kWidth;
@@ -182,7 +183,7 @@ namespace Unity.UIWidgets.material {
             }
 
             if (details.velocity.pixelsPerSecond.dx.abs() >= DrawerUtils._kMinFlingVelocity) {
-                float visualVelocity = (float) details.velocity.pixelsPerSecond.dx / DrawerUtils._kWidth;
+                float visualVelocity = details.velocity.pixelsPerSecond.dx / DrawerUtils._kWidth;
                 switch (this.widget.alignment) {
                     case DrawerAlignment.start:
                         break;
@@ -247,9 +248,9 @@ namespace Unity.UIWidgets.material {
         Widget _buildDrawer(BuildContext context) {
             bool drawerIsStart = this.widget.alignment == DrawerAlignment.start;
             EdgeInsets padding = MediaQuery.of(context).padding;
-            double dragAreaWidth = drawerIsStart ? padding.left : padding.right;
+            float dragAreaWidth = drawerIsStart ? padding.left : padding.right;
 
-            dragAreaWidth = Math.Max(dragAreaWidth, DrawerUtils._kEdgeDragWidth);
+            dragAreaWidth = Mathf.Max(dragAreaWidth, DrawerUtils._kEdgeDragWidth);
             if (this._controller.status == AnimationStatus.dismissed) {
                 return new Align(
                     alignment: this._drawerOuterAlignment,
@@ -258,7 +259,7 @@ namespace Unity.UIWidgets.material {
                         onHorizontalDragUpdate: this._move,
                         onHorizontalDragEnd: this._settle,
                         behavior: HitTestBehavior.translucent,
-                        child: new Container(width: (float) dragAreaWidth)
+                        child: new Container(width: dragAreaWidth)
                     )
                 );
             }

@@ -20,8 +20,8 @@ namespace Unity.UIWidgets.widgets {
         public virtual float? estimateMaxScrollOffset(
             int firstIndex,
             int lastIndex,
-            double leadingScrollOffset,
-            double trailingScrollOffset
+            float leadingScrollOffset,
+            float trailingScrollOffset
         ) {
             return null;
         }
@@ -168,8 +168,8 @@ namespace Unity.UIWidgets.widgets {
             SliverConstraints constraints,
             int firstIndex,
             int lastIndex,
-            double leadingScrollOffset,
-            double trailingScrollOffset
+            float leadingScrollOffset,
+            float trailingScrollOffset
         ) {
             D.assert(lastIndex >= firstIndex);
             return this.del.estimateMaxScrollOffset(
@@ -393,9 +393,9 @@ namespace Unity.UIWidgets.widgets {
             }
 
             int reifiedCount = lastIndex - firstIndex + 1;
-            double averageExtent = (trailingScrollOffset - leadingScrollOffset) / reifiedCount;
+            float averageExtent = (trailingScrollOffset - leadingScrollOffset) / reifiedCount;
             int remainingCount = childCount - lastIndex - 1;
-            return (float) (trailingScrollOffset + averageExtent * remainingCount);
+            return (trailingScrollOffset + averageExtent * remainingCount);
         }
 
         public float estimateMaxScrollOffset(SliverConstraints constraints,
@@ -490,7 +490,7 @@ namespace Unity.UIWidgets.widgets {
             this._childElements.Values.Where(child => {
                 SliverMultiBoxAdaptorParentData parentData =
                     (SliverMultiBoxAdaptorParentData) child.renderObject.parentData;
-                double itemExtent = 0;
+                float itemExtent = 0;
                 switch (this.renderObject.constraints.axis) {
                     case Axis.horizontal:
                         itemExtent = child.renderObject.paintBounds.width;

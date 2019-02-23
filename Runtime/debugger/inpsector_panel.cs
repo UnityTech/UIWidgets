@@ -87,7 +87,7 @@ namespace Unity.UIWidgets.debugger {
             EditorGUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
 
             // splitter
-            this.m_SplitOffset = Math.Max(0, this.m_SplitOffset);
+            this.m_SplitOffset = Mathf.Max(0, this.m_SplitOffset);
             var rect = EditorGUILayout.GetControlRect(GUILayout.ExpandWidth(true),
                 GUILayout.Height(this.m_SplitOffset));
             this.m_TreeView.OnGUI(rect);

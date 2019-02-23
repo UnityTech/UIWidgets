@@ -83,25 +83,25 @@ namespace Unity.UIWidgets.ui {
                 }
                 case DrawScale cmd: {
                     var state = this._getState();
-                    state.xform.preScale((float) cmd.sx, (float) (cmd.sy ?? cmd.sx));
+                    state.xform.preScale(cmd.sx, (cmd.sy ?? cmd.sx));
                     break;
                 }
                 case DrawRotate cmd: {
                     var state = this._getState();
                     if (cmd.offset == null) {
-                        state.xform.preRotate((float) cmd.radians);
+                        state.xform.preRotate(cmd.radians);
                     }
                     else {
-                        state.xform.preRotate((float) cmd.radians,
-                            (float) cmd.offset.dx,
-                            (float) cmd.offset.dy);
+                        state.xform.preRotate(cmd.radians,
+                            cmd.offset.dx,
+                            cmd.offset.dy);
                     }
 
                     break;
                 }
                 case DrawSkew cmd: {
                     var state = this._getState();
-                    state.xform.preSkew((float) cmd.sx, (float) cmd.sy);
+                    state.xform.preSkew(cmd.sx, cmd.sy);
                     break;
                 }
                 case DrawConcat cmd: {
@@ -138,7 +138,7 @@ namespace Unity.UIWidgets.ui {
                     var scale = XformUtils.getScale(state.xform);
 
                     var rect = cmd.path.flatten(
-                        scale * (float) Window.instance.devicePixelRatio
+                        scale * Window.instance.devicePixelRatio
                     ).getFillMesh(out _).transform(state.xform).bounds;
                     state.scissor = state.scissor == null ? rect : state.scissor.intersect(rect);
                     break;
@@ -148,7 +148,7 @@ namespace Unity.UIWidgets.ui {
                     var scale = XformUtils.getScale(state.xform);
                     var path = cmd.path;
                     var paint = cmd.paint;
-                    var devicePixelRatio = (float) Window.instance.devicePixelRatio;
+                    var devicePixelRatio = Window.instance.devicePixelRatio;
 
                     MeshMesh mesh;
                     if (paint.style == PaintingStyle.fill) {
@@ -156,7 +156,7 @@ namespace Unity.UIWidgets.ui {
                         mesh = cache.getFillMesh(out _).transform(state.xform);
                     }
                     else {
-                        float strokeWidth = ((float) paint.strokeWidth * scale).clamp(0, 200.0f);
+                        float strokeWidth = (paint.strokeWidth * scale).clamp(0, 200.0f);
                         float fringeWidth = 1 / devicePixelRatio;
 
                         if (strokeWidth < fringeWidth) {
@@ -168,7 +168,7 @@ namespace Unity.UIWidgets.ui {
                             strokeWidth / scale * 0.5f,
                             paint.strokeCap,
                             paint.strokeJoin,
-                            (float) paint.strokeMiterLimit).transform(state.xform);
+                            paint.strokeMiterLimit).transform(state.xform);
                     }
 
                     this._addPaintBounds(mesh.bounds);

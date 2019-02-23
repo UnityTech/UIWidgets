@@ -2,6 +2,7 @@ using System;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.physics;
 using Unity.UIWidgets.ui;
+using UnityEngine;
 
 namespace Unity.UIWidgets.widgets {
     public class BouncingScrollSimulation : Simulation {
@@ -30,21 +31,21 @@ namespace Unity.UIWidgets.widgets {
             }
             else {
                 this._frictionSimulation = new FrictionSimulation(0.135f, position, velocity);
-                double finalX = this._frictionSimulation.finalX;
-                if (velocity > 0.0 && finalX > trailingExtent) {
+                float finalX = this._frictionSimulation.finalX;
+                if (velocity > 0.0f && finalX > trailingExtent) {
                     this._springTime = this._frictionSimulation.timeAtX(trailingExtent);
                     this._springSimulation = this._overscrollSimulation(
                         trailingExtent,
-                        (float) Math.Min(this._frictionSimulation.dx(this._springTime),
+                        Mathf.Min(this._frictionSimulation.dx(this._springTime),
                             maxSpringTransferVelocity)
                     );
                     D.assert(this._springTime.isFinite());
                 }
-                else if (velocity < 0.0 && finalX < leadingExtent) {
+                else if (velocity < 0.0f && finalX < leadingExtent) {
                     this._springTime = this._frictionSimulation.timeAtX(leadingExtent);
                     this._springSimulation = this._underscrollSimulation(
                         leadingExtent,
-                        (float) Math.Min(this._frictionSimulation.dx(this._springTime),
+                        Mathf.Min(this._frictionSimulation.dx(this._springTime),
                             maxSpringTransferVelocity)
                     );
                     D.assert(this._springTime.isFinite());
@@ -55,7 +56,7 @@ namespace Unity.UIWidgets.widgets {
             }
         }
 
-        const double maxSpringTransferVelocity = 5000.0;
+        const float maxSpringTransferVelocity = 5000.0f;
 
         public readonly float leadingExtent;
 
@@ -76,7 +77,7 @@ namespace Unity.UIWidgets.widgets {
             return new ScrollSpringSimulation(this.spring, x, this.trailingExtent, dx);
         }
 
-        Simulation _simulation(double time) {
+        Simulation _simulation(float time) {
             Simulation simulation;
             if (time > this._springTime) {
                 this._timeOffset = this._springTime.isFinite() ? this._springTime : 0.0f;
@@ -110,12 +111,12 @@ namespace Unity.UIWidgets.widgets {
 
     public class ClampingScrollSimulation : Simulation {
         public ClampingScrollSimulation(
-            double position,
-            double velocity,
-            double friction = 0.015,
+            float position,
+            float velocity,
+            float friction = 0.015f,
             Tolerance tolerance = null
         ) : base(tolerance: tolerance) {
-            D.assert(_flingVelocityPenetration(0.0) ==
+            D.assert(_flingVelocityPenetration(0.0f) ==
                      _initialVelocityPenetration);
             this.position = position;
             this.velocity = velocity;
@@ -125,49 +126,49 @@ namespace Unity.UIWidgets.widgets {
             this._distance = (velocity * this._duration / _initialVelocityPenetration).abs();
         }
 
-        public readonly double position;
+        public readonly float position;
 
-        public readonly double velocity;
+        public readonly float velocity;
 
-        public readonly double friction;
+        public readonly float friction;
 
-        readonly double _duration;
+        readonly float _duration;
 
-        readonly double _distance;
+        readonly float _distance;
 
-        static readonly double _kDecelerationRate = Math.Log(0.78) / Math.Log(0.9);
+        static readonly float _kDecelerationRate = Mathf.Log(0.78f) / Mathf.Log(0.9f);
 
-        static double _decelerationForFriction(double friction) {
-            return friction * 61774.04968;
+        static float _decelerationForFriction(float friction) {
+            return friction * 61774.04968f;
         }
 
-        double _flingDuration(double velocity) {
-            double scaledFriction = this.friction * _decelerationForFriction(0.84);
+        float _flingDuration(float velocity) {
+            float scaledFriction = this.friction * _decelerationForFriction(0.84f);
 
-            double deceleration = Math.Log(0.35 * velocity.abs() / scaledFriction);
+            float deceleration = Mathf.Log(0.35f * velocity.abs() / scaledFriction);
 
-            return Math.Exp(deceleration / (_kDecelerationRate - 1.0));
+            return Mathf.Exp(deceleration / (_kDecelerationRate - 1.0f));
         }
 
-        const double _initialVelocityPenetration = 3.065;
+        const float _initialVelocityPenetration = 3.065f;
 
-        static double _flingDistancePenetration(double t) {
-            return (1.2 * t * t * t) - (3.27 * t * t) + (_initialVelocityPenetration * t);
+        static float _flingDistancePenetration(float t) {
+            return (1.2f * t * t * t) - (3.27f * t * t) + (_initialVelocityPenetration * t);
         }
 
-        static double _flingVelocityPenetration(double t) {
-            return (3.6 * t * t) - (6.54 * t) + _initialVelocityPenetration;
+        static float _flingVelocityPenetration(float t) {
+            return (3.6f * t * t) - (6.54f * t) + _initialVelocityPenetration;
         }
 
         public override float x(float time) {
-            double t = (time / this._duration).clamp(0.0, 1.0);
-            return (float) (this.position + this._distance * _flingDistancePenetration(t) *
+            float t = (time / this._duration).clamp(0.0f, 1.0f);
+            return (this.position + this._distance * _flingDistancePenetration(t) *
                             this.velocity.sign());
         }
 
         public override float dx(float time) {
-            double t = (time / this._duration).clamp(0.0, 1.0);
-            return (float) (this._distance * _flingVelocityPenetration(t) * this.velocity.sign() /
+            float t = (time / this._duration).clamp(0.0f, 1.0f);
+            return (this._distance * _flingVelocityPenetration(t) * this.velocity.sign() /
                             this._duration);
         }
 
