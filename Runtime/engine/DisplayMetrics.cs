@@ -20,15 +20,15 @@ namespace Unity.UIWidgets.engine {
                     return _devicePixelRatio;
                 }
 
-#if UNITY_ANDROID
+#if UNITY_ANDROID 
                 _devicePixelRatio = AndroidDevicePixelRatio();
 #endif
-
-#if UNITY_WEBGL
+                
+#if UNITY_WEBGL 
                 _devicePixelRatio = UIWidgetsWebGLDevicePixelRatio();
 #endif
-
-#if UNITY_IOS
+                
+#if UNITY_IOS 
                 _devicePixelRatio = IOSDeviceSaleFactor();
 #endif
 
@@ -38,9 +38,10 @@ namespace Unity.UIWidgets.engine {
 
                 return _devicePixelRatio;
             }
+            
         }
 
-#if UNITY_ANDROID
+#if UNITY_ANDROID 
         static float AndroidDevicePixelRatio() {
             using (
                 AndroidJavaClass unityPlayerClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer")
@@ -67,5 +68,6 @@ namespace Unity.UIWidgets.engine {
         [DllImport("__Internal")]
         static extern int IOSDeviceSaleFactor();
 #endif
+        
     }
 }
