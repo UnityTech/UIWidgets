@@ -276,10 +276,10 @@ namespace Unity.UIWidgets.widgets {
                 level = DiagnosticLevel.info;
             }
 
-            properties.add(new floatProperty("width", this.width,
+            properties.add(new FloatProperty("width", this.width,
                 defaultValue: Diagnostics.kNullDefaultValue,
                 level: level));
-            properties.add(new floatProperty("height", this.height,
+            properties.add(new FloatProperty("height", this.height,
                 defaultValue: Diagnostics.kNullDefaultValue,
                 level: level));
         }
@@ -447,7 +447,7 @@ namespace Unity.UIWidgets.widgets {
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
-            properties.add(new floatProperty("aspectRatio", this.aspectRatio));
+            properties.add(new FloatProperty("aspectRatio", this.aspectRatio));
         }
     }
 
@@ -631,12 +631,12 @@ namespace Unity.UIWidgets.widgets {
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
-            properties.add(new floatProperty("left", this.left, defaultValue: null));
-            properties.add(new floatProperty("top", this.top, defaultValue: null));
-            properties.add(new floatProperty("right", this.right, defaultValue: null));
-            properties.add(new floatProperty("bottom", this.bottom, defaultValue: null));
-            properties.add(new floatProperty("width", this.width, defaultValue: null));
-            properties.add(new floatProperty("height", this.height, defaultValue: null));
+            properties.add(new FloatProperty("left", this.left, defaultValue: null));
+            properties.add(new FloatProperty("top", this.top, defaultValue: null));
+            properties.add(new FloatProperty("right", this.right, defaultValue: null));
+            properties.add(new FloatProperty("bottom", this.bottom, defaultValue: null));
+            properties.add(new FloatProperty("width", this.width, defaultValue: null));
+            properties.add(new FloatProperty("height", this.height, defaultValue: null));
         }
     }
 
@@ -799,7 +799,7 @@ namespace Unity.UIWidgets.widgets {
             base.debugFillProperties(properties);
             properties.add(new EnumProperty<BoxShape>("shape", this.shape));
             properties.add(new DiagnosticsProperty<BorderRadius>("borderRadius", this.borderRadius));
-            properties.add(new floatProperty("elevation", this.elevation));
+            properties.add(new FloatProperty("elevation", this.elevation));
             properties.add(new DiagnosticsProperty<Color>("color", this.color));
             properties.add(new DiagnosticsProperty<Color>("shadowColor", this.shadowColor));
         }
@@ -854,7 +854,7 @@ namespace Unity.UIWidgets.widgets {
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             properties.add(new DiagnosticsProperty<CustomClipper<Path>>("clipper", this.clipper));
-            properties.add(new floatProperty("elevation", this.elevation));
+            properties.add(new FloatProperty("elevation", this.elevation));
             properties.add(new DiagnosticsProperty<Color>("color", this.color));
             properties.add(new DiagnosticsProperty<Color>("shadowColor", this.shadowColor));
         }
@@ -1120,9 +1120,9 @@ namespace Unity.UIWidgets.widgets {
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             properties.add(new DiagnosticsProperty<Alignment>("alignment", this.alignment));
-            properties.add(new floatProperty("widthFactor",
+            properties.add(new FloatProperty("widthFactor",
                 this.widthFactor, defaultValue: Diagnostics.kNullDefaultValue));
-            properties.add(new floatProperty("heightFactor",
+            properties.add(new FloatProperty("heightFactor",
                 this.heightFactor, defaultValue: Diagnostics.kNullDefaultValue));
         }
     }
@@ -1315,7 +1315,7 @@ namespace Unity.UIWidgets.widgets {
             properties.add(new FlagProperty("softWrap", value: this.softWrap, ifTrue: "wrapping at box width",
                 ifFalse: "no wrapping except at line break characters", showName: true));
             properties.add(new EnumProperty<TextOverflow>("overflow", this.overflow, defaultValue: TextOverflow.clip));
-            properties.add(new floatProperty("textScaleFactor", this.textScaleFactor, defaultValue: 1.0));
+            properties.add(new FloatProperty("textScaleFactor", this.textScaleFactor, defaultValue: 1.0));
             properties.add(new IntProperty("maxLines", this.maxLines, ifNull: "unlimited"));
             properties.add(new StringProperty("text", this.text.toPlainText()));
         }
@@ -1401,9 +1401,9 @@ namespace Unity.UIWidgets.widgets {
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             properties.add(new DiagnosticsProperty<ui.Image>("image", this.image));
-            properties.add(new floatProperty("width", this.width, defaultValue: Diagnostics.kNullDefaultValue));
-            properties.add(new floatProperty("height", this.height, defaultValue: Diagnostics.kNullDefaultValue));
-            properties.add(new floatProperty("scale", this.scale, defaultValue: 1.0));
+            properties.add(new FloatProperty("width", this.width, defaultValue: Diagnostics.kNullDefaultValue));
+            properties.add(new FloatProperty("height", this.height, defaultValue: Diagnostics.kNullDefaultValue));
+            properties.add(new FloatProperty("scale", this.scale, defaultValue: 1.0));
             properties.add(new DiagnosticsProperty<Color>("color", this.color,
                 defaultValue: Diagnostics.kNullDefaultValue));
             properties.add(new EnumProperty<BlendMode>("colorBlendMode", this.colorBlendMode,

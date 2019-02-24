@@ -129,9 +129,6 @@ namespace Unity.UIWidgets.animation {
 
         public override float transform(float t) {
             D.assert(t >= 0.0 && t <= 1.0);
-            if (t.isNaN()) {
-                return float.NaN;
-            }
 
             float start = 0.0f;
             float end = 1.0f;

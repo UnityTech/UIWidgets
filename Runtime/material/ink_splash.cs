@@ -73,7 +73,7 @@ namespace Unity.UIWidgets.material {
                 vsync: controller.vsync);
             this._radiusController.addListener(controller.markNeedsPaint);
             this._radiusController.forward();
-            this._radius = this._radiusController.drive(new floatTween(
+            this._radius = this._radiusController.drive(new FloatTween(
                 begin: InkSplashUtils._kSplashInitialSize,
                 end: this._targetRadius));
 

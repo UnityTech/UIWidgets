@@ -567,7 +567,7 @@ namespace Unity.UIWidgets.widgets {
                     this._selectionOverlay.showHandles();
                 }
 
-                if (longPress || cause == SelectionChangedCause.floatTap) {
+                if (longPress || cause == SelectionChangedCause.doubleTap) {
                     this._selectionOverlay.showToolbar();
                 }
             }

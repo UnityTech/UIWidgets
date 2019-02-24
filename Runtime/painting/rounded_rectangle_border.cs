@@ -241,17 +241,17 @@ namespace Unity.UIWidgets.painting {
                 float delta = this.circleness * (rect.height - rect.width) / 2.0f;
                 return Rect.fromLTRB(
                     rect.left,
-                    (rect.top + delta),
+                    rect.top + delta,
                     rect.right,
-                    (rect.bottom - delta)
+                    rect.bottom - delta
                 );
             }
             else {
                 float delta = this.circleness * (rect.width - rect.height) / 2.0f;
                 return Rect.fromLTRB(
-                    (rect.left + delta),
+                    rect.left + delta,
                     rect.top,
-                    (rect.right - delta),
+                    rect.right - delta,
                     rect.bottom
                 );
             }

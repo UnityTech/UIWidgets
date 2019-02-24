@@ -87,7 +87,7 @@ namespace Unity.UIWidgets.widgets {
             properties.add(new EnumProperty<AxisDirection>("axisDirection", this.axisDirection));
             properties.add(new EnumProperty<AxisDirection?>("crossAxisDirection", this.crossAxisDirection,
                 defaultValue: Diagnostics.kNullDefaultValue));
-            properties.add(new floatProperty("anchor", this.anchor));
+            properties.add(new FloatProperty("anchor", this.anchor));
             properties.add(new DiagnosticsProperty<ViewportOffset>("offset", this.offset));
             if (this.center != null) {
                 properties.add(new DiagnosticsProperty<Key>("center", this.center));

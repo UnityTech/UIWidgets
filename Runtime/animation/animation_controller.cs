@@ -106,7 +106,7 @@ namespace Unity.UIWidgets.animation {
                     return 0.0f;
                 }
 
-                return this._simulation.dx(this.lastElapsedDuration.Value.Ticks / TimeSpan.TicksPerSecond);
+                return this._simulation.dx((float) this.lastElapsedDuration.Value.Ticks / TimeSpan.TicksPerSecond);
             }
         }
 
@@ -321,7 +321,7 @@ namespace Unity.UIWidgets.animation {
 
         void _tick(TimeSpan elapsed) {
             this._lastElapsedDuration = elapsed;
-            float elapsedInSeconds = elapsed.Ticks / TimeSpan.TicksPerSecond;
+            float elapsedInSeconds = (float) elapsed.Ticks / TimeSpan.TicksPerSecond;
             D.assert(elapsedInSeconds >= 0.0);
             this._value = this._simulation.x(elapsedInSeconds).clamp(this.lowerBound, this.upperBound);
             if (this._simulation.isDone(elapsedInSeconds)) {
@@ -363,7 +363,7 @@ namespace Unity.UIWidgets.animation {
             this._curve = curve;
 
             D.assert(duration.Ticks > 0);
-            this._durationInSeconds = duration.Ticks / TimeSpan.TicksPerSecond;
+            this._durationInSeconds = (float) duration.Ticks / TimeSpan.TicksPerSecond;
         }
 
         readonly float _durationInSeconds;
@@ -398,7 +398,7 @@ namespace Unity.UIWidgets.animation {
         internal _RepeatingSimulation(float min, float max, TimeSpan period) {
             this._min = min;
             this._max = max;
-            this._periodInSeconds = period.Ticks / TimeSpan.TicksPerSecond;
+            this._periodInSeconds = (float) period.Ticks / TimeSpan.TicksPerSecond;
             D.assert(this._periodInSeconds > 0.0f);
         }
 

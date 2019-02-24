@@ -168,7 +168,7 @@ namespace Unity.UIWidgets.material {
                 return Offset.lerp(this.begin, this.end, t);
             }
 
-            float angle = MathUtils.lerpNullablefloat(this._beginAngle, this._endAngle, t) ?? 0.0f;
+            float angle = MathUtils.lerpNullableFloat(this._beginAngle, this._endAngle, t) ?? 0.0f;
             float x = Mathf.Cos(angle) * this._radius;
             float y = Mathf.Sin(angle) * this._radius;
             return this._center + new Offset(x, y);
@@ -381,8 +381,8 @@ namespace Unity.UIWidgets.material {
             }
 
             Offset center = this._centerArc.lerp(t);
-            float width = MathUtils.lerpfloat(this.begin.width, this.end.width, t);
-            float height = MathUtils.lerpfloat(this.begin.height, this.end.height, t);
+            float width = MathUtils.lerpFloat(this.begin.width, this.end.width, t);
+            float height = MathUtils.lerpFloat(this.begin.height, this.end.height, t);
             return Rect.fromLTWH(
                 (center.dx - width / 2.0f),
                 (center.dy - height / 2.0f),

@@ -6,10 +6,10 @@ using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
 
 namespace Unity.UIWidgets.gestures {
-    public delegate void GesturefloatTapCallback(floatTapDetails details);
+    public delegate void GestureDoubleTapCallback(DoubleTapDetails details);
 
-    public class floatTapDetails {
-        public floatTapDetails(Offset firstGlobalPosition = null) {
+    public class DoubleTapDetails {
+        public DoubleTapDetails(Offset firstGlobalPosition = null) {
             this.firstGlobalPosition = firstGlobalPosition ?? Offset.zero;
         }
 
@@ -52,24 +52,24 @@ namespace Unity.UIWidgets.gestures {
     }
 
 
-    public class floatTapGestureRecognizer : GestureRecognizer {
-        public floatTapGestureRecognizer(object debugOwner = null)
+    public class DoubleTapGestureRecognizer : GestureRecognizer {
+        public DoubleTapGestureRecognizer(object debugOwner = null)
             : base(debugOwner: debugOwner) {
         }
 
-        public GesturefloatTapCallback onfloatTap;
+        public GestureDoubleTapCallback onDoubleTap;
 
-        Timer _floatTapTimer;
+        Timer _doubleTapTimer;
         _TapTracker _firstTap;
         readonly Dictionary<int, _TapTracker> _trackers = new Dictionary<int, _TapTracker>();
 
         public override void addPointer(PointerDownEvent evt) {
             if (this._firstTap != null &&
-                !this._firstTap.isWithinTolerance(evt, Constants.kfloatTapSlop)) {
+                !this._firstTap.isWithinTolerance(evt, Constants.kDoubleTapSlop)) {
                 return;
             }
 
-            this._stopfloatTapTimer();
+            this._stopDoubleTapTimer();
             _TapTracker tracker = new _TapTracker(
                 evt: evt,
                 entry: GestureBinding.instance.gestureArena.add(evt.pointer, this)
@@ -90,7 +90,7 @@ namespace Unity.UIWidgets.gestures {
                 }
             }
             else if (evt is PointerMoveEvent) {
-                if (!tracker.isWithinTolerance(evt, Constants.kfloatTapTouchSlop)) {
+                if (!tracker.isWithinTolerance(evt, Constants.kDoubleTapTouchSlop)) {
                     this._reject(tracker);
                 }
             }
@@ -133,7 +133,7 @@ namespace Unity.UIWidgets.gestures {
         }
 
         void _reset() {
-            this._stopfloatTapTimer();
+            this._stopDoubleTapTimer();
             if (this._firstTap != null) {
                 _TapTracker tracker = this._firstTap;
                 this._firstTap = null;
@@ -145,7 +145,7 @@ namespace Unity.UIWidgets.gestures {
         }
 
         void _registerFirstTap(_TapTracker tracker) {
-            this._startfloatTapTimer();
+            this._startDoubleTapTimer();
             GestureBinding.instance.gestureArena.hold(tracker.pointer);
             this._freezeTracker(tracker);
             this._trackers.Remove(tracker.pointer);
@@ -159,9 +159,9 @@ namespace Unity.UIWidgets.gestures {
             tracker.entry.resolve(GestureDisposition.accepted);
             this._freezeTracker(tracker);
             this._trackers.Remove(tracker.pointer);
-            if (this.onfloatTap != null) {
-                this.invokeCallback<object>("onfloatTap", () => {
-                    this.onfloatTap(new floatTapDetails(initialPosition));
+            if (this.onDoubleTap != null) {
+                this.invokeCallback<object>("onDoubleTap", () => {
+                    this.onDoubleTap(new DoubleTapDetails(initialPosition));
                     return null;
                 });
             }
@@ -178,21 +178,21 @@ namespace Unity.UIWidgets.gestures {
             tracker.stopTrackingPointer(this._handleEvent);
         }
 
-        void _startfloatTapTimer() {
-            this._floatTapTimer =
-                this._floatTapTimer
-                ?? Window.instance.run(Constants.kfloatTapTimeout, this._reset);
+        void _startDoubleTapTimer() {
+            this._doubleTapTimer =
+                this._doubleTapTimer
+                ?? Window.instance.run(Constants.kDoubleTapTimeout, this._reset);
         }
 
-        void _stopfloatTapTimer() {
-            if (this._floatTapTimer != null) {
-                this._floatTapTimer.cancel();
-                this._floatTapTimer = null;
+        void _stopDoubleTapTimer() {
+            if (this._doubleTapTimer != null) {
+                this._doubleTapTimer.cancel();
+                this._doubleTapTimer = null;
             }
         }
 
         public override string debugDescription {
-            get { return "float tap"; }
+            get { return "double tap"; }
         }
     }
 }

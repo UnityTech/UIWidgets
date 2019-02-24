@@ -18,7 +18,7 @@ namespace Unity.UIWidgets.rendering {
 
     public enum SelectionChangedCause {
         tap,
-        floatTap,
+        doubleTap,
         longPress,
         keyboard,
     }
@@ -38,8 +38,8 @@ namespace Unity.UIWidgets.rendering {
         }
     }
 /*
-    this._floatTapGesture = new floatTapGestureRecognizer(this.rendererBindings.rendererBinding);
-    this._floatTapGesture.onfloatTap = () => { Debug.Log("onfloatTap"); };*/
+    this._doubleTapGesture = new DoubleTapGestureRecognizer(this.rendererBindings.rendererBinding);
+    this._doubleTapGesture.onDoubleTap = () => { Debug.Log("onDoubleTap"); };*/
 
     public class RenderEditable : RenderBox {
         public static readonly char obscuringCharacter = '•';
@@ -58,7 +58,7 @@ namespace Unity.UIWidgets.rendering {
         bool _obscureText;
         TapGestureRecognizer _tap;
         LongPressGestureRecognizer _longPress;
-        floatTapGestureRecognizer _floatTap;
+        DoubleTapGestureRecognizer _doubleTap;
         public bool ignorePointer;
         public SelectionChangedHandler onSelectionChanged;
         public CaretChangedHandler onCaretChanged;
@@ -94,10 +94,10 @@ namespace Unity.UIWidgets.rendering {
             D.assert(!this._showCursor.value || cursorColor != null);
 
             this._tap = new TapGestureRecognizer(this);
-            this._floatTap = new floatTapGestureRecognizer(this);
+            this._doubleTap = new DoubleTapGestureRecognizer(this);
             this._tap.onTapDown = this._handleTapDown;
             this._tap.onTap = this._handleTap;
-            this._floatTap.onfloatTap = this._handlefloatTap;
+            this._doubleTap.onDoubleTap = this._handleDoubleTap;
             this._longPress = new LongPressGestureRecognizer(debugOwner: this);
             this._longPress.onLongPress = this._handleLongPress;
         }
@@ -494,7 +494,7 @@ namespace Unity.UIWidgets.rendering {
             D.assert(this.debugHandleEvent(evt, entry));
             if (evt is PointerDownEvent && this.onSelectionChanged != null) {
                 this._tap.addPointer((PointerDownEvent) evt);
-                this._floatTap.addPointer((PointerDownEvent) evt);
+                this._doubleTap.addPointer((PointerDownEvent) evt);
                 this._longPress.addPointer((PointerDownEvent) evt);
             }
         }
@@ -512,9 +512,9 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
-        public void handlefloatTap(floatTapDetails details) {
+        public void handleDoubleTap(DoubleTapDetails details) {
             this._lastTapDownPosition = details.firstGlobalPosition - this._paintOffset;
-            this.selectWord(cause: SelectionChangedCause.floatTap);
+            this.selectWord(cause: SelectionChangedCause.doubleTap);
         }
 
         public void handleLongPress() {
@@ -633,9 +633,9 @@ namespace Unity.UIWidgets.rendering {
             this.handleTap();
         }
 
-        void _handlefloatTap(floatTapDetails details) {
+        void _handleDoubleTap(DoubleTapDetails details) {
             D.assert(!this.ignorePointer);
-            this.handlefloatTap(details);
+            this.handleDoubleTap(details);
         }
 
         void _handleLongPress() {
@@ -652,7 +652,7 @@ namespace Unity.UIWidgets.rendering {
                 return this.preferredLineHeight * this.maxLines.Value;
             }
 
-            if (float.IsInfinity(width)) {
+            if (!width.isFinite()) {
                 var text = this._textPainter.text.text;
                 int lines = 1;
                 for (int index = 0; index < text.Length; ++index) {

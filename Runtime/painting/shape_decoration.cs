@@ -76,10 +76,10 @@ namespace Unity.UIWidgets.painting {
 
         public override Decoration lerpFrom(Decoration a, float t) {
             if (a is BoxDecoration decoration) {
-                return lerp(fromBoxDecoration(decoration), this, t);
+                return ShapeDecoration.lerp(ShapeDecoration.fromBoxDecoration(decoration), this, t);
             }
             else if (a == null || a is ShapeDecoration) {
-                return lerp(a, this, t);
+                return ShapeDecoration.lerp(a, this, t);
             }
 
             return base.lerpFrom(a, t);
@@ -87,10 +87,10 @@ namespace Unity.UIWidgets.painting {
 
         public override Decoration lerpTo(Decoration b, float t) {
             if (b is BoxDecoration decoration) {
-                return lerp(this, fromBoxDecoration(decoration), t);
+                return ShapeDecoration.lerp(this, fromBoxDecoration(decoration), t);
             }
             else if (b == null || b is ShapeDecoration) {
-                return lerp(this, b, t);
+                return ShapeDecoration.lerp(this, b, t);
             }
 
             return base.lerpTo(b, t);

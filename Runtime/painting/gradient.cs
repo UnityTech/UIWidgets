@@ -37,7 +37,7 @@ namespace Unity.UIWidgets.painting {
                 D.assert(aStops.Count == bStops.Count);
                 interpolatedStops = new List<float>();
                 for (int i = 0; i < aStops.Count; i += 1) {
-                    interpolatedStops.Add(MathUtils.lerpfloat(aStops[i], bStops[i], t).clamp(0.0f, 1.0f));
+                    interpolatedStops.Add(MathUtils.lerpFloat(aStops[i], bStops[i], t).clamp(0.0f, 1.0f));
                 }
             }
 
@@ -160,7 +160,7 @@ namespace Unity.UIWidgets.painting {
 
         protected override Gradient lerpFrom(Gradient a, float t) {
             if (a == null || (a is LinearGradient && a.colors.Count == this.colors.Count)) {
-                return lerp((LinearGradient) a, this, t);
+                return LinearGradient.lerp((LinearGradient) a, this, t);
             }
 
             return base.lerpFrom(a, t);
@@ -168,7 +168,7 @@ namespace Unity.UIWidgets.painting {
 
         protected override Gradient lerpTo(Gradient b, float t) {
             if (b == null || (b is LinearGradient && b.colors.Count == this.colors.Count)) {
-                return lerp(this, (LinearGradient) b, t);
+                return LinearGradient.lerp(this, (LinearGradient) b, t);
             }
 
             return base.lerpTo(b, t);
@@ -250,7 +250,7 @@ namespace Unity.UIWidgets.painting {
             return !Equals(left, right);
         }
 
-        public override string ToString() {
+        public override String ToString() {
             return $"{this.GetType()}({this.begin}, {this.end}," +
                    $"{this.colors.toStringList()}, {this.stops.toStringList()}, {this.tileMode})";
         }
@@ -297,7 +297,7 @@ namespace Unity.UIWidgets.painting {
 
         protected override Gradient lerpFrom(Gradient a, float t) {
             if (a == null || (a is RadialGradient && a.colors.Count == this.colors.Count)) {
-                return lerp((RadialGradient) a, this, t);
+                return RadialGradient.lerp((RadialGradient) a, this, t);
             }
 
             return base.lerpFrom(a, t);
@@ -305,7 +305,7 @@ namespace Unity.UIWidgets.painting {
 
         protected override Gradient lerpTo(Gradient b, float t) {
             if (b == null || (b is RadialGradient && b.colors.Count == this.colors.Count)) {
-                return lerp(this, (RadialGradient) b, t);
+                return RadialGradient.lerp(this, (RadialGradient) b, t);
             }
 
             return base.lerpTo(b, t);
@@ -328,7 +328,7 @@ namespace Unity.UIWidgets.painting {
                 _ColorsAndStops._interpolateColorsAndStops(a.colors, a.stops, b.colors, b.stops, t);
             return new RadialGradient(
                 center: Alignment.lerp(a.center, b.center, t),
-                radius: Mathf.Max(0.0f, MathUtils.lerpfloat(a.radius, b.radius, t)),
+                radius: Mathf.Max(0.0f, MathUtils.lerpFloat(a.radius, b.radius, t)),
                 colors: interpolated.colors,
                 stops: interpolated.stops,
                 tileMode: t < 0.5 ? a.tileMode : b.tileMode
@@ -387,7 +387,7 @@ namespace Unity.UIWidgets.painting {
             return !Equals(left, right);
         }
 
-        public override string ToString() {
+        public override String ToString() {
             return $"{this.GetType()}({this.center}, {this.radius}," +
                    $"{this.colors.toStringList()}, {this.stops.toStringList()}, {this.tileMode})";
         }
@@ -439,7 +439,7 @@ namespace Unity.UIWidgets.painting {
 
         protected override Gradient lerpFrom(Gradient a, float t) {
             if (a == null || (a is SweepGradient && a.colors.Count == this.colors.Count)) {
-                return lerp((SweepGradient) a, this, t);
+                return SweepGradient.lerp((SweepGradient) a, this, t);
             }
 
             return base.lerpFrom(a, t);
@@ -470,8 +470,8 @@ namespace Unity.UIWidgets.painting {
                 _ColorsAndStops._interpolateColorsAndStops(a.colors, a.stops, b.colors, b.stops, t);
             return new SweepGradient(
                 center: Alignment.lerp(a.center, b.center, t),
-                startAngle: Mathf.Max(0.0f, MathUtils.lerpfloat(a.startAngle, b.startAngle, t)),
-                endAngle: Mathf.Max(0.0f, MathUtils.lerpfloat(a.endAngle, b.endAngle, t)),
+                startAngle: Mathf.Max(0.0f, MathUtils.lerpFloat(a.startAngle, b.startAngle, t)),
+                endAngle: Mathf.Max(0.0f, MathUtils.lerpFloat(a.endAngle, b.endAngle, t)),
                 colors: interpolated.colors,
                 stops: interpolated.stops,
                 tileMode: t < 0.5 ? a.tileMode : b.tileMode
@@ -532,7 +532,7 @@ namespace Unity.UIWidgets.painting {
             return !Equals(left, right);
         }
 
-        public override string ToString() {
+        public override String ToString() {
             return $"{this.GetType()}({this.center}, {this.startAngle}, {this.endAngle}, " +
                    $"{this.colors.toStringList()}, {this.stops.toStringList()}, {this.tileMode})";
         }

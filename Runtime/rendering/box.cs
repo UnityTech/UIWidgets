@@ -693,7 +693,7 @@ namespace Unity.UIWidgets.rendering {
                         "The height argument to getMinIntrinsicWidth was negative.\n" +
                         "The argument to getMinIntrinsicWidth must not be negative. " +
                         "If you perform computations on another height before passing it to " +
-                        "getMinIntrinsicWidth, consider using mathf.max() or float.clamp() " +
+                        "getMinIntrinsicWidth, consider using Mathf.Max() or float.clamp() " +
                         "to force the value into the valid range."
                     );
                 }
@@ -715,7 +715,7 @@ namespace Unity.UIWidgets.rendering {
                         "The height argument to getMaxIntrinsicWidth was negative.\n" +
                         "The argument to getMaxIntrinsicWidth must not be negative. " +
                         "If you perform computations on another height before passing it to " +
-                        "getMaxIntrinsicWidth, consider using mathf.max() or float.clamp() " +
+                        "getMaxIntrinsicWidth, consider using Mathf.Max() or float.clamp() " +
                         "to force the value into the valid range."
                     );
                 }
@@ -737,7 +737,7 @@ namespace Unity.UIWidgets.rendering {
                         "The width argument to getMinIntrinsicHeight was negative.\n" +
                         "The argument to getMinIntrinsicHeight must not be negative. " +
                         "If you perform computations on another width before passing it to " +
-                        "getMinIntrinsicHeight, consider using mathf.max() or float.clamp() " +
+                        "getMinIntrinsicHeight, consider using Mathf.Max() or float.clamp() " +
                         "to force the value into the valid range."
                     );
                 }
@@ -760,7 +760,7 @@ namespace Unity.UIWidgets.rendering {
                         "The width argument to getMaxIntrinsicHeight was negative.\n" +
                         "The argument to getMaxIntrinsicHeight must not be negative. " +
                         "If you perform computations on another width before passing it to " +
-                        "getMaxIntrinsicHeight, consider using mathf.max() or float.clamp() " +
+                        "getMaxIntrinsicHeight, consider using Mathf.Max() or float.clamp() " +
                         "to force the value into the valid range."
                     );
                 }
@@ -1063,7 +1063,7 @@ namespace Unity.UIWidgets.rendering {
                                 failureCount += 1;
                             }
 
-                            if (float.IsInfinity(result)) {
+                            if (result.isInfinite()) {
                                 failures.AppendLine(" * " + name + "(" + constraint +
                                                     ") returned a non-finite value: " + result);
                                 failureCount += 1;

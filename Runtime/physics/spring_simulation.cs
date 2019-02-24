@@ -106,7 +106,7 @@ namespace Unity.UIWidgets.physics {
             }
 
             if (cmk > 0.0) {
-                return create(spring, initialPosition, initialVelocity);
+                return _OverdampedSolution.create(spring, initialPosition, initialVelocity);
             }
 
             return _UnderdampedSolution.create(spring, initialPosition, initialVelocity);

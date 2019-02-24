@@ -45,17 +45,7 @@ namespace Unity.UIWidgets.ui {
             return float.IsNaN(it);
         }
 
-        public static float lerpfloat(float a, float b, float t) {
-            return a + (b - a) * t;
-        }
-
-        public static float? lerpNullablefloat(float? a, float? b, float t) {
-            if (a == null && b == null) {
-                return null;
-            }
-
-            a = a ?? b;
-            b = b ?? a;
+        public static float lerpFloat(float a, float b, float t) {
             return a + (b - a) * t;
         }
 
@@ -66,10 +56,6 @@ namespace Unity.UIWidgets.ui {
 
             a = a ?? b;
             b = b ?? a;
-            return a + (b - a) * t;
-        }
-
-        public static float lerpFloat(float a, float b, float t) {
             return a + (b - a) * t;
         }
 

@@ -178,7 +178,7 @@ namespace Unity.UIWidgets.painting {
             if (a is _StadiumToCircleBorder border) {
                 return new _StadiumToCircleBorder(
                     side: BorderSide.lerp(border.side, this.side, t),
-                    circleness: MathUtils.lerpfloat(border.circleness, this.circleness, t)
+                    circleness: MathUtils.lerpFloat(border.circleness, this.circleness, t)
                 );
             }
 
@@ -203,7 +203,7 @@ namespace Unity.UIWidgets.painting {
             if (b is _StadiumToCircleBorder border) {
                 return new _StadiumToCircleBorder(
                     side: BorderSide.lerp(this.side, border.side, t),
-                    circleness: MathUtils.lerpfloat(this.circleness, border.circleness, t)
+                    circleness: MathUtils.lerpFloat(this.circleness, border.circleness, t)
                 );
             }
 
@@ -372,7 +372,7 @@ namespace Unity.UIWidgets.painting {
                 return new _StadiumToRoundedRectangleBorder(
                     side: BorderSide.lerp(border.side, this.side, t),
                     borderRadius: BorderRadius.lerp(border.borderRadius, this.borderRadius, t),
-                    rectness: MathUtils.lerpfloat(border.rectness, this.rectness, t)
+                    rectness: MathUtils.lerpFloat(border.rectness, this.rectness, t)
                 );
             }
 
@@ -400,7 +400,7 @@ namespace Unity.UIWidgets.painting {
                 return new _StadiumToRoundedRectangleBorder(
                     side: BorderSide.lerp(this.side, border.side, t),
                     borderRadius: BorderRadius.lerp(this.borderRadius, border.borderRadius, t),
-                    rectness: MathUtils.lerpfloat(this.rectness, border.rectness, t)
+                    rectness: MathUtils.lerpFloat(this.rectness, border.rectness, t)
                 );
             }
 
@@ -411,7 +411,7 @@ namespace Unity.UIWidgets.painting {
             return BorderRadius.lerp(
                 this.borderRadius,
                 BorderRadius.all(Radius.circular(rect.shortestSide / 2.0f)),
-                (1.0f - this.rectness)
+                1.0f - this.rectness
             );
         }
 

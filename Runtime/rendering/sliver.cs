@@ -397,35 +397,35 @@ namespace Unity.UIWidgets.rendering {
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
-            properties.add(new floatProperty("scrollExtent", this.scrollExtent));
+            properties.add(new FloatProperty("scrollExtent", this.scrollExtent));
             if (this.paintExtent > 0.0f) {
-                properties.add(new floatProperty("paintExtent", this.paintExtent,
+                properties.add(new FloatProperty("paintExtent", this.paintExtent,
                     unit: this.visible ? null : " but not painting"));
             }
             else if (this.paintExtent == 0.0f) {
                 if (this.visible) {
-                    properties.add(new floatProperty("paintExtent", this.paintExtent,
+                    properties.add(new FloatProperty("paintExtent", this.paintExtent,
                         unit: this.visible ? null : " but visible"));
                 }
 
                 properties.add(new FlagProperty("visible", value: this.visible, ifFalse: "hidden"));
             }
             else {
-                properties.add(new floatProperty("paintExtent", this.paintExtent, tooltip: "!"));
+                properties.add(new FloatProperty("paintExtent", this.paintExtent, tooltip: "!"));
             }
 
-            properties.add(new floatProperty("paintOrigin", this.paintOrigin,
+            properties.add(new FloatProperty("paintOrigin", this.paintOrigin,
                 defaultValue: 0.0f));
-            properties.add(new floatProperty("layoutExtent", this.layoutExtent,
+            properties.add(new FloatProperty("layoutExtent", this.layoutExtent,
                 defaultValue: this.paintExtent));
-            properties.add(new floatProperty("maxPaintExtent", this.maxPaintExtent));
-            properties.add(new floatProperty("hitTestExtent", this.hitTestExtent,
+            properties.add(new FloatProperty("maxPaintExtent", this.maxPaintExtent));
+            properties.add(new FloatProperty("hitTestExtent", this.hitTestExtent,
                 defaultValue: this.paintExtent));
             properties.add(new DiagnosticsProperty<bool>("hasVisualOverflow", this.hasVisualOverflow,
                 defaultValue: false));
-            properties.add(new floatProperty("scrollOffsetCorrection", this.scrollOffsetCorrection,
+            properties.add(new FloatProperty("scrollOffsetCorrection", this.scrollOffsetCorrection,
                 defaultValue: Diagnostics.kNullDefaultValue));
-            properties.add(new floatProperty("cacheExtent", this.cacheExtent,
+            properties.add(new FloatProperty("cacheExtent", this.cacheExtent,
                 defaultValue: 0.0f));
         }
     }

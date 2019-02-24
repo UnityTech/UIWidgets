@@ -520,8 +520,8 @@ namespace Unity.UIWidgets.material {
             ButtonThemeData defaultTheme = new ButtonThemeData();
             properties.add(new EnumProperty<ButtonTextTheme>("textTheme", this.textTheme,
                 defaultValue: defaultTheme.textTheme));
-            properties.add(new floatProperty("minWidth", this.minWidth, defaultValue: defaultTheme.minWidth));
-            properties.add(new floatProperty("height", this.height, defaultValue: defaultTheme.height));
+            properties.add(new FloatProperty("minWidth", this.minWidth, defaultValue: defaultTheme.minWidth));
+            properties.add(new FloatProperty("height", this.height, defaultValue: defaultTheme.height));
             properties.add(new DiagnosticsProperty<EdgeInsets>("padding", this.padding,
                 defaultValue: defaultTheme.padding));
             properties.add(new DiagnosticsProperty<ShapeBorder>("shape", this.shape, defaultValue: defaultTheme.shape));

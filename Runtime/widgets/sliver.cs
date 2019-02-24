@@ -395,7 +395,7 @@ namespace Unity.UIWidgets.widgets {
             int reifiedCount = lastIndex - firstIndex + 1;
             float averageExtent = (trailingScrollOffset - leadingScrollOffset) / reifiedCount;
             int remainingCount = childCount - lastIndex - 1;
-            return (trailingScrollOffset + averageExtent * remainingCount);
+            return trailingScrollOffset + averageExtent * remainingCount;
         }
 
         public float estimateMaxScrollOffset(SliverConstraints constraints,

@@ -171,7 +171,7 @@ namespace Unity.UIWidgets.rendering {
                     while (child != null) {
                         ListBodyParentData childParentData = (ListBodyParentData) child.parentData;
                         position += child.size.height;
-                        childParentData.offset = new Offset(0.0f, (mainAxisExtent - position));
+                        childParentData.offset = new Offset(0.0f, mainAxisExtent - position);
                         D.assert(child.parentData == childParentData);
                         child = childParentData.nextSibling;
                     }

@@ -281,9 +281,9 @@ namespace Unity.UIWidgets.rendering {
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             properties.add(new DiagnosticsProperty<Image>("image", this.image));
-            properties.add(new floatProperty("width", this.width, defaultValue: Diagnostics.kNullDefaultValue));
-            properties.add(new floatProperty("height", this.height, defaultValue: Diagnostics.kNullDefaultValue));
-            properties.add(new floatProperty("scale", this.scale, defaultValue: 1.0));
+            properties.add(new FloatProperty("width", this.width, defaultValue: Diagnostics.kNullDefaultValue));
+            properties.add(new FloatProperty("height", this.height, defaultValue: Diagnostics.kNullDefaultValue));
+            properties.add(new FloatProperty("scale", this.scale, defaultValue: 1.0));
             properties.add(new DiagnosticsProperty<Color>("color", this.color,
                 defaultValue: Diagnostics.kNullDefaultValue));
             properties.add(new EnumProperty<BlendMode>("colorBlendMode", this.colorBlendMode,

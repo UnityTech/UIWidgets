@@ -229,7 +229,7 @@ namespace Unity.UIWidgets.rendering {
             properties.add(new FlagProperty("softWrap", value: this.softWrap, ifTrue: "wrapping at box width",
                 ifFalse: "no wrapping except at line break characters", showName: true));
             properties.add(new EnumProperty<TextOverflow>("overflow", this.overflow));
-            properties.add(new floatProperty("textScaleFactor", this.textScaleFactor, defaultValue: 1.0));
+            properties.add(new FloatProperty("textScaleFactor", this.textScaleFactor, defaultValue: 1.0));
             properties.add(new IntProperty("maxLines", this.maxLines, ifNull: "unlimited"));
         }
     }

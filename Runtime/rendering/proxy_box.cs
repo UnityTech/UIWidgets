@@ -84,7 +84,7 @@ namespace Unity.UIWidgets.rendering {
             }
 
             float width = base.computeMinIntrinsicWidth(height);
-            D.assert(!float.IsInfinity(width));
+            D.assert(width.isFinite());
 
             if (!this._additionalConstraints.hasInfiniteWidth) {
                 return this._additionalConstraints.constrainWidth(width);
@@ -99,7 +99,7 @@ namespace Unity.UIWidgets.rendering {
             }
 
             float width = base.computeMaxIntrinsicWidth(height);
-            D.assert(!float.IsInfinity(width));
+            D.assert(width.isFinite());
 
             if (!this._additionalConstraints.hasInfiniteWidth) {
                 return this._additionalConstraints.constrainWidth(width);
@@ -114,7 +114,7 @@ namespace Unity.UIWidgets.rendering {
             }
 
             float height = base.computeMinIntrinsicHeight(width);
-            D.assert(!float.IsInfinity(height));
+            D.assert(height.isFinite());
 
             if (!this._additionalConstraints.hasInfiniteHeight) {
                 return this._additionalConstraints.constrainHeight(height);
@@ -129,7 +129,7 @@ namespace Unity.UIWidgets.rendering {
             }
 
             float height = base.computeMaxIntrinsicHeight(width);
-            D.assert(!float.IsInfinity(height));
+            D.assert(height.isFinite());
 
             if (!this._additionalConstraints.hasInfiniteHeight) {
                 return this._additionalConstraints.constrainHeight(height);
@@ -237,8 +237,8 @@ namespace Unity.UIWidgets.rendering {
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
-            properties.add(new floatProperty("maxWidth", this.maxWidth, defaultValue: float.PositiveInfinity));
-            properties.add(new floatProperty("maxHeight", this.maxHeight, defaultValue: float.PositiveInfinity));
+            properties.add(new FloatProperty("maxWidth", this.maxWidth, defaultValue: float.PositiveInfinity));
+            properties.add(new FloatProperty("maxHeight", this.maxHeight, defaultValue: float.PositiveInfinity));
         }
     }
 
@@ -263,7 +263,7 @@ namespace Unity.UIWidgets.rendering {
 
 
         protected override float computeMinIntrinsicWidth(float height) {
-            if (!float.IsInfinity(height)) {
+            if (height.isFinite()) {
                 return height * this._aspectRatio;
             }
 
@@ -275,7 +275,7 @@ namespace Unity.UIWidgets.rendering {
         }
 
         protected override float computeMaxIntrinsicWidth(float height) {
-            if (!float.IsInfinity(height)) {
+            if (height.isFinite()) {
                 return height * this._aspectRatio;
             }
 
@@ -287,7 +287,7 @@ namespace Unity.UIWidgets.rendering {
         }
 
         protected override float computeMinIntrinsicHeight(float width) {
-            if (!float.IsInfinity(width)) {
+            if (width.isFinite()) {
                 return width / this._aspectRatio;
             }
 
@@ -299,7 +299,7 @@ namespace Unity.UIWidgets.rendering {
         }
 
         protected override float computeMaxIntrinsicHeight(float width) {
-            if (!float.IsInfinity(width)) {
+            if (width.isFinite()) {
                 return width / this._aspectRatio;
             }
 
@@ -351,7 +351,7 @@ namespace Unity.UIWidgets.rendering {
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
-            properties.add(new floatProperty("aspectRatio", this.aspectRatio));
+            properties.add(new FloatProperty("aspectRatio", this.aspectRatio));
         }
     }
 
@@ -413,7 +413,7 @@ namespace Unity.UIWidgets.rendering {
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
-            properties.add(new floatProperty("opacity", this.opacity));
+            properties.add(new FloatProperty("opacity", this.opacity));
         }
     }
 
@@ -834,7 +834,7 @@ namespace Unity.UIWidgets.rendering {
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder description) {
             base.debugFillProperties(description);
-            description.add(new floatProperty("elevation", this.elevation));
+            description.add(new FloatProperty("elevation", this.elevation));
             description.add(new DiagnosticsProperty<Color>("color", this.color));
             description.add(new DiagnosticsProperty<Color>("shadowColor", this.shadowColor));
         }
@@ -1393,8 +1393,8 @@ namespace Unity.UIWidgets.rendering {
         }
 
         public override void applyPaintTransform(RenderObject child, Matrix3 transform) {
-            transform.preTranslate((this.translation.dx * this.size.width),
-                (this.translation.dy * this.size.height));
+            transform.preTranslate(this.translation.dx * this.size.width,
+                this.translation.dy * this.size.height);
         }
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
@@ -1597,7 +1597,7 @@ namespace Unity.UIWidgets.rendering {
                     properties.add(new MessageProperty("usefulness ratio", "no metrics collected yet (never painted)"));
                 }
                 else {
-                    float fraction = this.debugAsymmetricPaintCount /
+                    float fraction = (float) this.debugAsymmetricPaintCount /
                                      (this.debugSymmetricPaintCount + this.debugAsymmetricPaintCount);
 
                     string diagnosis;

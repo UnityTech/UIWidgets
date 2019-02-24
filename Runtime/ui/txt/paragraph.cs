@@ -222,7 +222,7 @@ namespace Unity.UIWidgets.ui {
 
         float _width;
 
-        const float kfloatDecorationSpacing = 3.0f;
+        const float kFloatDecorationSpacing = 3.0f;
 
         public float height {
             get { return this._lineHeights.Count == 0 ? 0 : this._lineHeights[this._lineHeights.Count - 1]; }
@@ -803,7 +803,7 @@ namespace Unity.UIWidgets.ui {
 
             int decorationCount = 1;
             switch (record.style.decorationStyle) {
-                case TextDecorationStyle.floatLine:
+                case TextDecorationStyle.doubleLine:
                     decorationCount = 2;
                     break;
             }
@@ -811,7 +811,7 @@ namespace Unity.UIWidgets.ui {
 
             var decoration = record.style.decoration;
             for (int i = 0; i < decorationCount; i++) {
-                float yOffset = i * underLineThickness * kfloatDecorationSpacing;
+                float yOffset = i * underLineThickness * kFloatDecorationSpacing;
                 float yOffsetOriginal = yOffset;
                 if (decoration != null && decoration.contains(TextDecoration.underline)) {
                     // underline
@@ -827,7 +827,7 @@ namespace Unity.UIWidgets.ui {
                 }
 
                 if (decoration != null && decoration.contains(TextDecoration.lineThrough)) {
-                    yOffset += (decorationCount - 1.0f) * underLineThickness * kfloatDecorationSpacing / -2.0f;
+                    yOffset += (decorationCount - 1.0f) * underLineThickness * kFloatDecorationSpacing / -2.0f;
                     yOffset += metrics.strikeoutPosition ?? (metrics.fxHeight ?? 0) / -2.0f;
                     canvas.drawLine(new Offset(x, y + yOffset), new Offset(x + width, y + yOffset), paint);
                     yOffset = yOffsetOriginal;
@@ -836,7 +836,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         float getLineXOffset(float lineTotalAdvance) {
-            if (float.IsInfinity(this._width)) {
+            if (this._width.isInfinite()) {
                 return 0;
             }
 

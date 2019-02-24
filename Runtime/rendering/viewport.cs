@@ -1147,7 +1147,7 @@ namespace Unity.UIWidgets.rendering {
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
-            properties.add(new floatProperty("anchor", this.anchor));
+            properties.add(new FloatProperty("anchor", this.anchor));
         }
     }
 

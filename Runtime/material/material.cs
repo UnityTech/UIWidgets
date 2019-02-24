@@ -96,7 +96,7 @@ namespace Unity.UIWidgets.material {
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             properties.add(new EnumProperty<MaterialType>("type", this.type));
-            properties.add(new floatProperty("elevation", this.elevation, defaultValue: 0.0));
+            properties.add(new FloatProperty("elevation", this.elevation, defaultValue: 0.0));
             properties.add(new DiagnosticsProperty<Color>("color", this.color, defaultValue: null));
             properties.add(new DiagnosticsProperty<Color>("shadowColor", this.shadowColor,
                 defaultValue: new Color(0xFF000000)));
@@ -456,20 +456,20 @@ namespace Unity.UIWidgets.material {
         public override void debugFillProperties(DiagnosticPropertiesBuilder description) {
             base.debugFillProperties(description);
             description.add(new DiagnosticsProperty<ShapeBorder>("shape", this.shape));
-            description.add(new floatProperty("elevation", this.elevation));
+            description.add(new FloatProperty("elevation", this.elevation));
             description.add(new DiagnosticsProperty<Color>("color", this.color));
             description.add(new DiagnosticsProperty<Color>("shadowColor", this.shadowColor));
         }
     }
 
     public class _MaterialInteriorState : AnimatedWidgetBaseState<_MaterialInterior> {
-        floatTween _elevation;
+        FloatTween _elevation;
         ColorTween _shadowColor;
         ShapeBorderTween _border;
 
         protected override void forEachTween(ITweenVisitor visitor) {
-            this._elevation = (floatTween) visitor.visit(this, this._elevation, this.widget.elevation,
-                (float value) => new floatTween(begin: value, end: value));
+            this._elevation = (FloatTween) visitor.visit(this, this._elevation, this.widget.elevation,
+                (float value) => new FloatTween(begin: value, end: value));
             this._shadowColor = (ColorTween) visitor.visit(this, this._shadowColor, this.widget.shadowColor,
                 (Color value) => new ColorTween(begin: value));
             this._border = (ShapeBorderTween) visitor.visit(this, this._border, this.widget.shape,

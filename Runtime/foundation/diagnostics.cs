@@ -699,78 +699,6 @@ namespace Unity.UIWidgets.foundation {
         }
     }
 
-    public class floatProperty : _NumProperty<float?> {
-        public floatProperty(string name, float? value,
-            string ifNull = null,
-            string unit = null,
-            string tooltip = null,
-            object defaultValue = null,
-            bool showName = true,
-            DiagnosticLevel level = DiagnosticLevel.info
-        ) : base(
-            name,
-            value,
-            ifNull: ifNull,
-            unit: unit,
-            tooltip: tooltip,
-            defaultValue: defaultValue,
-            showName: showName,
-            level: level
-        ) {
-        }
-
-        floatProperty(
-            string name,
-            ComputePropertyValueCallback<float?> computeValue,
-            string ifNull = null,
-            bool showName = true,
-            string unit = null,
-            string tooltip = null,
-            object defaultValue = null,
-            DiagnosticLevel level = DiagnosticLevel.info
-        ) : base(
-            name,
-            computeValue,
-            showName: showName,
-            ifNull: ifNull,
-            unit: unit,
-            tooltip: tooltip,
-            defaultValue: defaultValue,
-            level: level
-        ) {
-        }
-
-        public static floatProperty lazy(
-            string name,
-            ComputePropertyValueCallback<float?> computeValue,
-            string ifNull = null,
-            bool showName = true,
-            string unit = null,
-            string tooltip = null,
-            object defaultValue = null,
-            DiagnosticLevel level = DiagnosticLevel.info
-        ) {
-            return new floatProperty(
-                name,
-                computeValue,
-                showName: showName,
-                ifNull: ifNull,
-                unit: unit,
-                tooltip: tooltip,
-                defaultValue: defaultValue,
-                level: level
-            );
-        }
-
-        protected override string numberToString() {
-            if (this.value != null) {
-                return this.value.Value.ToString("F1");
-            }
-
-            return "null";
-        }
-    }
-
     public class FloatProperty : _NumProperty<float?> {
         public FloatProperty(string name, float? value,
             string ifNull = null,
@@ -843,7 +771,7 @@ namespace Unity.UIWidgets.foundation {
         }
     }
 
-    public class PercentProperty : floatProperty {
+    public class PercentProperty : FloatProperty {
         public PercentProperty(string name, float fraction,
             string ifNull = null,
             bool showName = true,

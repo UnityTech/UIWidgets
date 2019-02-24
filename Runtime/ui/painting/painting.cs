@@ -119,10 +119,10 @@ namespace Unity.UIWidgets.ui {
             }
 
             return fromARGB(
-                ((int) MathUtils.lerpfloat(a.alpha, b.alpha, t)).clamp(0, 255),
-                ((int) MathUtils.lerpfloat(a.red, b.red, t)).clamp(0, 255),
-                ((int) MathUtils.lerpfloat(a.green, b.green, t)).clamp(0, 255),
-                ((int) MathUtils.lerpfloat(a.blue, b.blue, t)).clamp(0, 255)
+                ((int) MathUtils.lerpFloat(a.alpha, b.alpha, t)).clamp(0, 255),
+                ((int) MathUtils.lerpFloat(a.red, b.red, t)).clamp(0, 255),
+                ((int) MathUtils.lerpFloat(a.green, b.green, t)).clamp(0, 255),
+                ((int) MathUtils.lerpFloat(a.blue, b.blue, t)).clamp(0, 255)
             );
         }
 

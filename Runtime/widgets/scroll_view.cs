@@ -431,7 +431,7 @@ namespace Unity.UIWidgets.widgets {
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
-            properties.add(new floatProperty("itemExtent", this.itemExtent,
+            properties.add(new FloatProperty("itemExtent", this.itemExtent,
                 defaultValue: Diagnostics.kNullDefaultValue));
         }
     }

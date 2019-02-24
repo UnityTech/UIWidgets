@@ -49,21 +49,21 @@ namespace Unity.UIWidgets.painting {
         public Offset alongOffset(Offset other) {
             float centerX = other.dx / 2.0f;
             float centerY = other.dy / 2.0f;
-            return new Offset((centerX + this.x * centerX), (centerY + this.y * centerY));
+            return new Offset(centerX + this.x * centerX, centerY + this.y * centerY);
         }
 
         public Offset alongSize(Size other) {
             float centerX = other.width / 2.0f;
             float centerY = other.height / 2.0f;
-            return new Offset((centerX + this.x * centerX), (centerY + this.y * centerY));
+            return new Offset(centerX + this.x * centerX, centerY + this.y * centerY);
         }
 
         public Offset withinRect(Rect rect) {
             float halfWidth = rect.width / 2.0f;
             float halfHeight = rect.height / 2.0f;
             return new Offset(
-                (rect.left + halfWidth + this.x * halfWidth),
-                (rect.top + halfHeight + this.y * halfHeight)
+                rect.left + halfWidth + this.x * halfWidth,
+                rect.top + halfHeight + this.y * halfHeight
             );
         }
 
@@ -71,8 +71,8 @@ namespace Unity.UIWidgets.painting {
             float halfWidthDelta = (rect.width - size.width) / 2.0f;
             float halfHeightDelta = (rect.height - size.height) / 2.0f;
             return Rect.fromLTWH(
-                (rect.left + halfWidthDelta + this.x * halfWidthDelta),
-                (rect.top + halfHeightDelta + this.y * halfHeightDelta),
+                rect.left + halfWidthDelta + this.x * halfWidthDelta,
+                rect.top + halfHeightDelta + this.y * halfHeightDelta,
                 size.width,
                 size.height
             );
@@ -84,14 +84,14 @@ namespace Unity.UIWidgets.painting {
             }
 
             if (a == null) {
-                return new Alignment(MathUtils.lerpfloat(0.0f, b.x, t), MathUtils.lerpfloat(0.0f, b.y, t));
+                return new Alignment(MathUtils.lerpFloat(0.0f, b.x, t), MathUtils.lerpFloat(0.0f, b.y, t));
             }
 
             if (b == null) {
-                return new Alignment(MathUtils.lerpfloat(a.x, 0.0f, t), MathUtils.lerpfloat(a.y, 0.0f, t));
+                return new Alignment(MathUtils.lerpFloat(a.x, 0.0f, t), MathUtils.lerpFloat(a.y, 0.0f, t));
             }
 
-            return new Alignment(MathUtils.lerpfloat(a.x, b.x, t), MathUtils.lerpfloat(a.y, b.y, t));
+            return new Alignment(MathUtils.lerpFloat(a.x, b.x, t), MathUtils.lerpFloat(a.y, b.y, t));
         }
 
         public bool Equals(Alignment other) {

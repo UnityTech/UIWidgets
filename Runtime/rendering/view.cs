@@ -149,7 +149,7 @@ namespace Unity.UIWidgets.rendering {
             });
             properties.add(new DiagnosticsProperty<Size>("window size", Window.instance.physicalSize,
                 tooltip: "in physical pixels"));
-            properties.add(new floatProperty("device pixel ratio", Window.instance.devicePixelRatio,
+            properties.add(new FloatProperty("device pixel ratio", Window.instance.devicePixelRatio,
                 tooltip: "physical pixels per logical pixel"));
             properties.add(new DiagnosticsProperty<ViewConfiguration>("configuration", this.configuration,
                 tooltip: "in logical pixels"));

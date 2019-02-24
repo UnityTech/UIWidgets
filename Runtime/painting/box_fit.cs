@@ -80,12 +80,12 @@ namespace Unity.UIWidgets.painting {
                     destinationSize = inputSize;
                     float aspectRatio = inputSize.width / inputSize.height;
                     if (destinationSize.height > outputSize.height) {
-                        destinationSize = new Size((outputSize.height * aspectRatio),
+                        destinationSize = new Size(outputSize.height * aspectRatio,
                             outputSize.height);
                     }
 
                     if (destinationSize.width > outputSize.width) {
-                        destinationSize = new Size(outputSize.width, (outputSize.width / aspectRatio));
+                        destinationSize = new Size(outputSize.width, outputSize.width / aspectRatio);
                     }
 
                     break;

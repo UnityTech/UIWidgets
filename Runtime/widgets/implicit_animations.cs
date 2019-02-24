@@ -519,7 +519,7 @@ namespace Unity.UIWidgets.widgets {
             base.debugFillProperties(properties);
             properties.add(new EnumProperty<BoxShape>("shape", this.shape));
             properties.add(new DiagnosticsProperty<BorderRadius>("borderRadius", this.borderRadius));
-            properties.add(new floatProperty("elevation", this.elevation));
+            properties.add(new FloatProperty("elevation", this.elevation));
             properties.add(new DiagnosticsProperty<Color>("color", this.color));
             properties.add(new DiagnosticsProperty<bool>("animateColor", this.animateColor));
             properties.add(new DiagnosticsProperty<Color>("shadowColor", this.shadowColor));
@@ -529,15 +529,15 @@ namespace Unity.UIWidgets.widgets {
 
     public class _AnimatedPhysicalModelState : AnimatedWidgetBaseState<AnimatedPhysicalModel> {
         BorderRadiusTween _borderRadius;
-        floatTween _elevation;
+        FloatTween _elevation;
         ColorTween _color;
         ColorTween _shadowColor;
 
         protected override void forEachTween(ITweenVisitor visitor) {
             this._borderRadius = (BorderRadiusTween) visitor.visit(this, this._borderRadius, this.widget.borderRadius,
                 (BorderRadius value) => new BorderRadiusTween(begin: value));
-            this._elevation = (floatTween) visitor.visit(this, this._elevation, this.widget.elevation,
-                (float value) => new floatTween(begin: value, end: value));
+            this._elevation = (FloatTween) visitor.visit(this, this._elevation, this.widget.elevation,
+                (float value) => new FloatTween(begin: value, end: value));
             this._color = (ColorTween) visitor.visit(this, this._color, this.widget.color,
                 (Color value) => new ColorTween(begin: value));
             this._shadowColor = (ColorTween) visitor.visit(this, this._shadowColor, this.widget.shadowColor,

@@ -48,7 +48,7 @@ namespace Unity.UIWidgets.material {
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             properties.add(new StringProperty("message", this.message, showName: false));
-            properties.add(new floatProperty("vertical offset", this.verticalOffset));
+            properties.add(new FloatProperty("vertical offset", this.verticalOffset));
             properties.add(new FlagProperty("position", value: this.preferBelow, ifTrue: "below", ifFalse: "above",
                 showName: true));
         }

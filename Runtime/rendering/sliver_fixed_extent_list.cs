@@ -162,7 +162,7 @@ namespace Unity.UIWidgets.rendering {
 
             float targetEndScrollOffsetForPaint =
                 this.constraints.scrollOffset + this.constraints.remainingPaintExtent;
-            int? targetLastIndexForPaint = !float.IsInfinity(targetEndScrollOffsetForPaint)
+            int? targetLastIndexForPaint = targetEndScrollOffsetForPaint.isFinite()
                 ? this.getMaxChildIndexForScrollOffset(targetEndScrollOffsetForPaint, itemExtent)
                 : (int?) null;
             this.geometry = new SliverGeometry(

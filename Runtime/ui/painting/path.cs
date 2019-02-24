@@ -571,7 +571,7 @@ namespace Unity.UIWidgets.ui {
             return converged;
         }
 
-        static void _flatten_float_cubic_extrema(Offset[] dst, int dstBase) {
+        static void _flatten_double_cubic_extrema(Offset[] dst, int dstBase) {
             var dy = dst[dstBase + 3].dy;
             dst[dstBase + 2] = new Offset(dst[dstBase + 2].dx, dy);
             dst[dstBase + 4] = new Offset(dst[dstBase + 4].dx, dy);
@@ -589,9 +589,9 @@ namespace Unity.UIWidgets.ui {
             _chopCubicAt(src, dst, tValues, roots);
             if (dst != null && roots > 0) {
                 // we do some cleanup to ensure our Y extrema are flat
-                _flatten_float_cubic_extrema(dst, 0);
+                _flatten_double_cubic_extrema(dst, 0);
                 if (roots == 2) {
-                    _flatten_float_cubic_extrema(dst, 3);
+                    _flatten_double_cubic_extrema(dst, 3);
                 }
             }
 
@@ -731,14 +731,14 @@ namespace Unity.UIWidgets.ui {
 
             int r = 0;
 
-            // use floats so we don't overflow temporarily trying to compute R
-            float dr = B * B - 4 * A * C;
+            // use doubles so we don't overflow temporarily trying to compute R
+            double dr = (double) B * B - 4 * (double) A * C;
             if (dr < 0) {
                 return _return_check_zero(0);
             }
 
-            dr = Mathf.Sqrt(dr);
-            float R = dr;
+            dr = Math.Sqrt(dr);
+            float R = (float) dr;
 
             if (float.IsInfinity(R)) {
                 return _return_check_zero(0);
@@ -755,7 +755,7 @@ namespace Unity.UIWidgets.ui {
                 }
                 else if (roots[0] == roots[1]) {
                     // nearly-equal?
-                    r -= 1; // skip the float root
+                    r -= 1; // skip the double root
                 }
             }
 

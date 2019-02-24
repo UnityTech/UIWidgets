@@ -418,7 +418,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         static float muladdmul(float a, float b, float c, float d) {
-            return (a * b + c * d);
+            return (float) ((double) a * b + (double) c * d);
         }
 
         public void setConcat(Matrix3 a, Matrix3 b) {
@@ -889,14 +889,14 @@ namespace Unity.UIWidgets.ui {
             }
             else {
                 // not perspective
-                dst[kMScaleX] = (src[kMScaleY] * invDet);
-                dst[kMSkewX] = (-src[kMSkewX] * invDet);
+                dst[kMScaleX] = src[kMScaleY] * invDet;
+                dst[kMSkewX] = -src[kMSkewX] * invDet;
                 dst[kMTransX] =
                     ScalarUtils.dcross_dscale(src[kMSkewX], src[kMTransY], src[kMScaleY],
                         src[kMTransX], invDet);
 
-                dst[kMSkewY] = (-src[kMSkewY] * invDet);
-                dst[kMScaleY] = (src[kMScaleX] * invDet);
+                dst[kMSkewY] = -src[kMSkewY] * invDet;
+                dst[kMScaleY] = src[kMScaleX] * invDet;
                 dst[kMTransY] =
                     ScalarUtils.dcross_dscale(src[kMSkewY], src[kMTransX], src[kMScaleX],
                         src[kMTransY], invDet);
@@ -1410,18 +1410,18 @@ namespace Unity.UIWidgets.ui {
             return a * b - c * d;
         }
 
-        public static float dcross(float a, float b, float c, float d) {
+        public static double dcross(double a, double b, double c, double d) {
             return a * b - c * d;
         }
 
         public static float scross_dscale(float a, float b,
-            float c, float d, float scale) {
-            return (scross(a, b, c, d) * scale);
+            float c, float d, double scale) {
+            return (float) (scross(a, b, c, d) * scale);
         }
 
-        public static float dcross_dscale(float a, float b,
-            float c, float d, float scale) {
-            return (dcross(a, b, c, d) * scale);
+        public static float dcross_dscale(double a, double b,
+            double c, double d, double scale) {
+            return (float) (dcross(a, b, c, d) * scale);
         }
 
         public static bool is_degenerate_2x2(
@@ -1433,7 +1433,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public static float inv_determinant(float[] mat, int isPerspective) {
-            float det;
+            double det;
 
             if (isPerspective != 0) {
                 det = mat[Matrix3.kMScaleX] *
@@ -1456,12 +1456,12 @@ namespace Unity.UIWidgets.ui {
             // Since the determinant is on the order of the cube of the matrix members,
             // compare to the cube of the default nearly-zero constant (although an
             // estimate of the condition number would be better if it wasn't so expensive).
-            if (ScalarNearlyZero(det,
+            if (ScalarNearlyZero((float) det,
                 kScalarNearlyZero * kScalarNearlyZero * kScalarNearlyZero)) {
                 return 0;
             }
 
-            return 1.0f / det;
+            return 1.0f / (float) det;
         }
     }
 }

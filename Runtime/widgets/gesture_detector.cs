@@ -69,7 +69,7 @@ namespace Unity.UIWidgets.widgets {
             GestureTapUpCallback onTapUp = null,
             GestureTapCallback onTap = null,
             GestureTapCancelCallback onTapCancel = null,
-            GesturefloatTapCallback onfloatTap = null,
+            GestureDoubleTapCallback onDoubleTap = null,
             GestureLongPressCallback onLongPress = null,
             GestureDragDownCallback onVerticalDragDown = null,
             GestureDragStartCallback onVerticalDragStart = null,
@@ -113,7 +113,7 @@ namespace Unity.UIWidgets.widgets {
             this.onTapUp = onTapUp;
             this.onTap = onTap;
             this.onTapCancel = onTapCancel;
-            this.onfloatTap = onfloatTap;
+            this.onDoubleTap = onDoubleTap;
             this.onLongPress = onLongPress;
             this.onVerticalDragDown = onVerticalDragDown;
             this.onVerticalDragStart = onVerticalDragStart;
@@ -138,7 +138,7 @@ namespace Unity.UIWidgets.widgets {
         public readonly GestureTapUpCallback onTapUp;
         public readonly GestureTapCallback onTap;
         public readonly GestureTapCancelCallback onTapCancel;
-        public readonly GesturefloatTapCallback onfloatTap;
+        public readonly GestureDoubleTapCallback onDoubleTap;
         public readonly GestureLongPressCallback onLongPress;
         public readonly GestureDragDownCallback onVerticalDragDown;
         public readonly GestureDragStartCallback onVerticalDragStart;
@@ -176,11 +176,11 @@ namespace Unity.UIWidgets.widgets {
                     );
             }
 
-            if (this.onfloatTap != null) {
-                gestures[typeof(floatTapGestureRecognizer)] =
-                    new GestureRecognizerFactoryWithHandlers<floatTapGestureRecognizer>(
-                        () => new floatTapGestureRecognizer(debugOwner: this),
-                        instance => { instance.onfloatTap = this.onfloatTap; }
+            if (this.onDoubleTap != null) {
+                gestures[typeof(DoubleTapGestureRecognizer)] =
+                    new GestureRecognizerFactoryWithHandlers<DoubleTapGestureRecognizer>(
+                        () => new DoubleTapGestureRecognizer(debugOwner: this),
+                        instance => { instance.onDoubleTap = this.onDoubleTap; }
                     );
             }
 

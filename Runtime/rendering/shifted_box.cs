@@ -335,8 +335,8 @@ namespace Unity.UIWidgets.rendering {
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
-            properties.add(new floatProperty("widthFactor", this._widthFactor, ifNull: "expand"));
-            properties.add(new floatProperty("heightFactor", this._heightFactor, ifNull: "expand"));
+            properties.add(new FloatProperty("widthFactor", this._widthFactor, ifNull: "expand"));
+            properties.add(new FloatProperty("heightFactor", this._heightFactor, ifNull: "expand"));
         }
     }
 
