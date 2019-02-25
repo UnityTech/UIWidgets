@@ -4,11 +4,11 @@ namespace Unity.UIWidgets.physics {
             this.tolerance = tolerance ?? Tolerance.defaultTolerance;
         }
 
-        public abstract double x(double time);
+        public abstract float x(float time);
 
-        public abstract double dx(double time);
+        public abstract float dx(float time);
 
-        public abstract bool isDone(double time);
+        public abstract bool isDone(float time);
 
         public Tolerance tolerance;
     }

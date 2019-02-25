@@ -1,11 +1,8 @@
 using System;
 using System.Runtime.InteropServices;
-using UnityEngine;
 
 namespace Unity.UIWidgets.engine {
-
     public class DisplayMetrics {
-
         static float _devicePixelRatio = 0;
 
         static Func<float> _devicePixelRatioGetter;
@@ -13,10 +10,9 @@ namespace Unity.UIWidgets.engine {
         public static void SetDevicePixelRatioGetter(Func<float> f) {
             _devicePixelRatioGetter = f;
         }
-        
+
         public static float devicePixelRatio {
             get {
-
                 if (_devicePixelRatioGetter != null) {
                     return _devicePixelRatioGetter();
                 }
@@ -25,14 +21,17 @@ namespace Unity.UIWidgets.engine {
                     return _devicePixelRatio;
                 }
 
-                if (Application.platform == RuntimePlatform.Android) {
-                    _devicePixelRatio = DevicePixelRatioAndroid();
-                } else if (Application.platform == RuntimePlatform.WebGLPlayer) {
-                    _devicePixelRatio = UIWidgetsWebGLDevicePixelRatio();
-                } else if (Application.platform == RuntimePlatform.IPhonePlayer ||
-                           Application.platform == RuntimePlatform.tvOS) {
-                    _devicePixelRatio = IOSDeviceSaleFactor();
-                }
+#if UNITY_ANDROID 
+                _devicePixelRatio = AndroidDevicePixelRatio();
+#endif
+                
+#if UNITY_WEBGL 
+                _devicePixelRatio = UIWidgetsWebGLDevicePixelRatio();
+#endif
+                
+#if UNITY_IOS 
+                _devicePixelRatio = IOSDeviceSaleFactor();
+#endif
 
                 if (_devicePixelRatio <= 0) {
                     _devicePixelRatio = 1;
@@ -41,9 +40,10 @@ namespace Unity.UIWidgets.engine {
                 return _devicePixelRatio;
             }
             
-        }      
+        }
 
-        static float DevicePixelRatioAndroid() {
+#if UNITY_ANDROID 
+        static float AndroidDevicePixelRatio() {
             using (
                 AndroidJavaClass unityPlayerClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer")
             ) {
@@ -54,17 +54,21 @@ namespace Unity.UIWidgets.engine {
                     displayInstance = windowManagerInstance.Call<AndroidJavaObject>("getDefaultDisplay")
                 ) {
                     displayInstance.Call("getMetrics", metricsInstance);
-                    return  metricsInstance.Get<float>("density");
+                    return metricsInstance.Get<float>("density");
                 }
             }
         }
+#endif
 
+#if UNITY_WEBGL
         [DllImport("__Internal")]
         static extern float UIWidgetsWebGLDevicePixelRatio();
+#endif
 
+#if UNITY_IOS
         [DllImport("__Internal")]
         static extern int IOSDeviceSaleFactor();
-
+#endif
+        
     }
-    
 }

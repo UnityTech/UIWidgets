@@ -58,11 +58,11 @@ namespace Unity.UIWidgets.ui {
 
             var state = this._getState();
             var textureWidth = Mathf.CeilToInt(
-                (float) bounds.width * state.scale * this._devicePixelRatio);
+                bounds.width * state.scale * this._devicePixelRatio);
             textureWidth = Mathf.Max(textureWidth, 1);
 
             var textureHeight = Mathf.CeilToInt(
-                (float) bounds.height * state.scale * this._devicePixelRatio);
+                bounds.height * state.scale * this._devicePixelRatio);
             textureHeight = Mathf.Max(textureHeight, 1);
 
             var parentLayer = this._getLayer();
@@ -102,37 +102,38 @@ namespace Unity.UIWidgets.ui {
             this._getLayer().draws.Add(renderDraw);
         }
 
-        public void translate(double dx, double dy) {
+        public void translate(float dx, float dy) {
             var state = this._getState();
-            var matrix = Matrix3.makeTrans((float) dx, (float) dy);
+            var matrix = Matrix3.makeTrans(dx, dy);
             matrix.postConcat(state.matrix);
             state.matrix = matrix;
         }
 
-        public void scale(double sx, double? sy = null) {
+        public void scale(float sx, float? sy = null) {
             var state = this._getState();
-            var matrix = Matrix3.makeScale((float) sx, (float) (sy ?? sx));
+            var matrix = Matrix3.makeScale(sx, (sy ?? sx));
             matrix.postConcat(state.matrix);
             state.matrix = matrix;
         }
 
-        public void rotate(double radians, Offset offset = null) {
+        public void rotate(float radians, Offset offset = null) {
             var state = this._getState();
 
             if (offset == null) {
-                var matrix = Matrix3.makeRotate((float) radians);
+                var matrix = Matrix3.makeRotate(radians);
                 matrix.postConcat(state.matrix);
                 state.matrix = matrix;
-            } else {
-                var matrix = Matrix3.makeRotate((float) radians, (float) offset.dx, (float) offset.dy);
+            }
+            else {
+                var matrix = Matrix3.makeRotate(radians, offset.dx, offset.dy);
                 matrix.postConcat(state.matrix);
                 state.matrix = matrix;
             }
         }
 
-        public void skew(double sx, double sy) {
+        public void skew(float sx, float sy) {
             var state = this._getState();
-            var matrix = Matrix3.makeSkew((float) sx, (float) sy);
+            var matrix = Matrix3.makeSkew(sx, sy);
             matrix.postConcat(state.matrix);
             state.matrix = matrix;
         }
@@ -216,13 +217,13 @@ namespace Unity.UIWidgets.ui {
             this.drawPath(path, paint);
         }
 
-        public void drawCircle(Offset c, double radius, Paint paint) {
+        public void drawCircle(Offset c, float radius, Paint paint) {
             var path = new Path();
             path.addCircle(c.dx, c.dy, radius);
             this.drawPath(path, paint);
         }
 
-        public void drawArc(Rect rect, double startAngle, double sweepAngle, bool useCenter, Paint paint) {
+        public void drawArc(Rect rect, float startAngle, float sweepAngle, bool useCenter, Paint paint) {
             //var path = new Path();
         }
 
@@ -236,7 +237,7 @@ namespace Unity.UIWidgets.ui {
             });
             layer.lastScissor = scissor;
         }
-        
+
         bool _applyClip(Rect queryBounds) {
             var layer = this._getLayer();
             var layerBounds = layer.layerBounds;
@@ -250,7 +251,8 @@ namespace Unity.UIWidgets.ui {
 
             if (scissor == layerBounds) {
                 this._tryAddScissor(layer, null);
-            } else {
+            }
+            else {
                 var deviceScissor = Rect.fromLTRB(
                     scissor.left - layerBounds.left, layerBounds.bottom - scissor.bottom,
                     scissor.right - layerBounds.left, layerBounds.bottom - scissor.top
@@ -261,7 +263,7 @@ namespace Unity.UIWidgets.ui {
                 if (deviceScissor.isEmpty) {
                     return false;
                 }
-                
+
                 this._tryAddScissor(layer, deviceScissor);
             }
 
@@ -269,7 +271,8 @@ namespace Unity.UIWidgets.ui {
             if (this._mustRenderClip(maskGenID, reducedClip.scissor)) {
                 if (maskGenID == ClipStack.wideOpenGenID) {
                     layer.ignoreClip = true;
-                } else {
+                }
+                else {
                     layer.ignoreClip = false;
 
                     var boundsMesh = new MeshMesh(reducedClip.scissor);
@@ -287,11 +290,12 @@ namespace Unity.UIWidgets.ui {
             return true;
         }
 
-        RenderLayer _createMaskLayer(RenderLayer parentLayer, Rect maskBounds, Action<Paint> drawCallback, Paint paint) {
-            var textureWidth = Mathf.CeilToInt((float) maskBounds.width * this._devicePixelRatio);
+        RenderLayer _createMaskLayer(RenderLayer parentLayer, Rect maskBounds, Action<Paint> drawCallback,
+            Paint paint) {
+            var textureWidth = Mathf.CeilToInt(maskBounds.width * this._devicePixelRatio);
             textureWidth = Mathf.Max(1, textureWidth);
 
-            var textureHeight = Mathf.CeilToInt((float) maskBounds.height * this._devicePixelRatio);
+            var textureHeight = Mathf.CeilToInt(maskBounds.height * this._devicePixelRatio);
             textureHeight = Mathf.Max(1, textureHeight);
 
             var maskLayer = new RenderLayer {
@@ -319,10 +323,10 @@ namespace Unity.UIWidgets.ui {
         RenderLayer _createBlurLayer(RenderLayer maskLayer, float sigma, RenderLayer parentLayer) {
             sigma = BlurUtils.adjustSigma(sigma, out var scaleFactor, out var radius);
 
-            var textureWidth = Mathf.CeilToInt((float) maskLayer.width / scaleFactor);
+            var textureWidth = Mathf.CeilToInt(maskLayer.width / scaleFactor);
             textureWidth = Mathf.Max(1, textureWidth);
 
-            var textureHeight = Mathf.CeilToInt((float) maskLayer.height / scaleFactor);
+            var textureHeight = Mathf.CeilToInt(maskLayer.height / scaleFactor);
             textureHeight = Mathf.Max(1, textureHeight);
 
             var blurXLayer = new RenderLayer {
@@ -375,7 +379,7 @@ namespace Unity.UIWidgets.ui {
             }
 
             var state = this._getState();
-            float sigma = state.scale * (float) maskFilter.sigma;
+            float sigma = state.scale * maskFilter.sigma;
             if (sigma <= 0) {
                 return;
             }
@@ -402,14 +406,14 @@ namespace Unity.UIWidgets.ui {
         public void drawPath(Path path, Paint paint) {
             D.assert(path != null);
             D.assert(paint != null);
-            
+
             if (paint.style == PaintingStyle.fill) {
                 var state = this._getState();
                 var cache = path.flatten(state.scale * this._devicePixelRatio);
 
                 bool convex;
                 var mesh = cache.getFillMesh(out convex).transform(state.matrix);
-                
+
                 Action<Paint> drawMesh = (Paint p) => {
                     if (!this._applyClip(mesh.bounds)) {
                         return;
@@ -429,12 +433,12 @@ namespace Unity.UIWidgets.ui {
                     this._drawWithMaskFilter(mesh.bounds, drawMesh, paint, paint.maskFilter);
                     return;
                 }
-                
+
                 drawMesh(paint);
             }
             else {
                 var state = this._getState();
-                float strokeWidth = ((float) paint.strokeWidth * state.scale).clamp(0, 200.0f);
+                float strokeWidth = (paint.strokeWidth * state.scale).clamp(0, 200.0f);
                 float alpha = 1.0f;
 
                 if (strokeWidth == 0) {
@@ -453,7 +457,7 @@ namespace Unity.UIWidgets.ui {
                     strokeWidth / state.scale * 0.5f,
                     paint.strokeCap,
                     paint.strokeJoin,
-                    (float) paint.strokeMiterLimit).transform(state.matrix);
+                    paint.strokeMiterLimit).transform(state.matrix);
 
                 Action<Paint> drawMesh = (Paint p) => {
                     if (!this._applyClip(mesh.bounds)) {
@@ -464,12 +468,12 @@ namespace Unity.UIWidgets.ui {
                     layer.draws.Add(CanvasShader.stroke0(layer, p, alpha, mesh));
                     layer.draws.Add(CanvasShader.stroke1(layer, mesh));
                 };
-                
+
                 if (paint.maskFilter != null && paint.maskFilter.sigma != 0) {
                     this._drawWithMaskFilter(mesh.bounds, drawMesh, paint, paint.maskFilter);
                     return;
                 }
-                
+
                 drawMesh(paint);
             }
         }
@@ -499,7 +503,8 @@ namespace Unity.UIWidgets.ui {
 
             if (src == null) {
                 src = Rect.one;
-            } else {
+            }
+            else {
                 src = src.scale(1f / image.width, 1f / image.height);
             }
 
@@ -527,8 +532,9 @@ namespace Unity.UIWidgets.ui {
             var scaleY = 1f / image.height;
             if (src == null) {
                 src = Rect.one;
-            } else {
-                src = src.scale(scaleX, scaleY);                
+            }
+            else {
+                src = src.scale(scaleX, scaleY);
             }
 
             center = center.scale(scaleX, scaleY);
@@ -536,7 +542,7 @@ namespace Unity.UIWidgets.ui {
             var state = this._getState();
 
             var mesh = ImageMeshGenerator.imageNineMesh(state.matrix, src, center, image.width, image.height, dst);
-            
+
             if (!this._applyClip(mesh.bounds)) {
                 return;
             }
@@ -650,17 +656,17 @@ namespace Unity.UIWidgets.ui {
             D.assert(textBlob != null);
             D.assert(offset != null);
             D.assert(paint != null);
-            
+
             var state = this._getState();
             var scale = state.scale * this._devicePixelRatio;
-            
+
             var matrix = new Matrix3(state.matrix);
-            matrix.preTranslate((float) offset.dx, (float) offset.dy);            
+            matrix.preTranslate(offset.dx, offset.dy);
             var mesh = MeshGenerator.generateMesh(textBlob, scale)?.transform(matrix);
             if (mesh == null) {
                 return;
             }
-            
+
             var font = FontManager.instance.getOrCreate(textBlob.style.fontFamily).font;
             var tex = font.material.mainTexture;
 
@@ -744,11 +750,11 @@ namespace Unity.UIWidgets.ui {
                     useMipMap = false,
                     autoGenerateMips = false,
                 };
-                
+
                 if (QualitySettings.antiAliasing != 0) {
                     desc.msaaSamples = QualitySettings.antiAliasing;
                 }
-                
+
                 cmdBuf.GetTemporaryRT(subLayer.rtID, desc, FilterMode.Bilinear);
                 this._drawLayer(subLayer, cmdBuf);
             }
@@ -784,7 +790,8 @@ namespace Unity.UIWidgets.ui {
 
                         if (cmd.mesh.matrix == null) {
                             cmd.properties.SetFloatArray(RenderDraw.matId, RenderDraw.idMat3.fMat);
-                        } else {
+                        }
+                        else {
                             cmd.properties.SetFloatArray(RenderDraw.matId, cmd.mesh.matrix.fMat);
                         }
 
@@ -792,13 +799,16 @@ namespace Unity.UIWidgets.ui {
                         if (cmd.layer != null) {
                             cmdBuf.SetGlobalTexture(RenderDraw.texId, BuiltinRenderTextureType.None);
                         }
+
                         break;
                     case RenderScissor cmd:
                         if (cmd.deviceScissor == null) {
                             cmdBuf.DisableScissorRect();
-                        } else {
+                        }
+                        else {
                             cmdBuf.EnableScissorRect(cmd.deviceScissor.toRect());
                         }
+
                         break;
                 }
             }
@@ -818,6 +828,7 @@ namespace Unity.UIWidgets.ui {
                             cmd.meshObj = null;
                             cmd.meshObjCreated = false;
                         }
+
                         break;
                 }
             }
@@ -839,13 +850,13 @@ namespace Unity.UIWidgets.ui {
 
         bool _mustRenderClip(uint clipGenId, Rect clipBounds) {
             var layer = this._getLayer();
-            
+
             return layer.lastClipGenId != clipGenId || layer.lastClipBounds != clipBounds;
         }
 
         internal class State {
             static readonly Matrix3 _id = Matrix3.I();
-            
+
             Matrix3 _matrix;
             float? _scale;
 
@@ -853,7 +864,7 @@ namespace Unity.UIWidgets.ui {
                 this._matrix = matrix ?? _id;
                 this._scale = scale;
             }
-            
+
             public Matrix3 matrix {
                 get { return this._matrix; }
                 set {
@@ -867,6 +878,7 @@ namespace Unity.UIWidgets.ui {
                     if (this._scale == null) {
                         this._scale = XformUtils.getScale(this._matrix);
                     }
+
                     return this._scale.Value;
                 }
             }
@@ -897,11 +909,12 @@ namespace Unity.UIWidgets.ui {
                 get {
                     if (!this._viewport.HasValue) {
                         this._viewport = new Vector4(
-                            (float) this.layerBounds.left,
-                            (float) this.layerBounds.top,
-                            (float) this.layerBounds.width,
-                            (float) this.layerBounds.height);
+                            this.layerBounds.left,
+                            this.layerBounds.top,
+                            this.layerBounds.width,
+                            this.layerBounds.height);
                     }
+
                     return this._viewport.Value;
                 }
             }
@@ -947,10 +960,10 @@ namespace Unity.UIWidgets.ui {
             if (matrix.getSkewY() == 0) {
                 return matrix.getScaleX();
             }
-            
+
             var x = matrix.getScaleX();
             var y = matrix.getSkewY();
-            
+
             return Mathf.Sqrt(x * x + y * y);
         }
 
@@ -985,7 +998,7 @@ namespace Unity.UIWidgets.ui {
             // geometric mean of len0 and len1.
             return Mathf.Sqrt(scaleX * scaleY);
         }
-        
+
         public static float mapRadius(Matrix3 matrix, float radius) {
             return getScale(matrix) * radius;
         }
@@ -1145,42 +1158,43 @@ namespace Unity.UIWidgets.ui {
             var vertices = new List<Vector3>(4);
             var uv = new List<Vector2>(4);
 
-            float uvx0 = (float) src.left;
-            float uvx1 = (float) src.right;
-            float uvy0 = 1.0f - (float) src.top;
-            float uvy1 = 1.0f - (float) src.bottom;
+            float uvx0 = src.left;
+            float uvx1 = src.right;
+            float uvy0 = 1.0f - src.top;
+            float uvy1 = 1.0f - src.bottom;
 
-            vertices.Add(new Vector2((float) dst.left, (float) dst.top));
+            vertices.Add(new Vector2(dst.left, dst.top));
             uv.Add(new Vector2(uvx0, uvy0));
-            vertices.Add(new Vector2((float) dst.left, (float) dst.bottom));
+            vertices.Add(new Vector2(dst.left, dst.bottom));
             uv.Add(new Vector2(uvx0, uvy1));
-            vertices.Add(new Vector2((float) dst.right, (float) dst.bottom));
+            vertices.Add(new Vector2(dst.right, dst.bottom));
             uv.Add(new Vector2(uvx1, uvy1));
-            vertices.Add(new Vector2((float) dst.right, (float) dst.top));
+            vertices.Add(new Vector2(dst.right, dst.top));
             uv.Add(new Vector2(uvx1, uvy0));
 
             return new MeshMesh(matrix, vertices, _imageTriangles, uv);
         }
 
-        public static MeshMesh imageNineMesh(Matrix3 matrix, Rect src, Rect center, int srcWidth, int srcHeight, Rect dst) {
-            float x0 = (float) dst.left;
-            float x3 = (float) dst.right;
-            float x1 = x0 + (float) ((center.left - src.left) * srcWidth);
-            float x2 = x3 - (float) ((src.right - center.right) * srcWidth);
+        public static MeshMesh imageNineMesh(Matrix3 matrix, Rect src, Rect center, int srcWidth, int srcHeight,
+            Rect dst) {
+            float x0 = dst.left;
+            float x3 = dst.right;
+            float x1 = x0 + ((center.left - src.left) * srcWidth);
+            float x2 = x3 - ((src.right - center.right) * srcWidth);
 
-            float y0 = (float) dst.top;
-            float y3 = (float) dst.bottom;
-            float y1 = y0 + (float) ((center.top - src.top) * srcHeight);
-            float y2 = y3 - (float) ((src.bottom - center.bottom) * srcHeight);
+            float y0 = dst.top;
+            float y3 = dst.bottom;
+            float y1 = y0 + ((center.top - src.top) * srcHeight);
+            float y2 = y3 - ((src.bottom - center.bottom) * srcHeight);
 
-            float tx0 = (float) src.left;
-            float tx1 = (float) center.left;
-            float tx2 = (float) center.right;
-            float tx3 = (float) src.right;
-            float ty0 = 1 - (float) src.top;
-            float ty1 = 1 - (float) center.top;
-            float ty2 = 1 - (float) center.bottom;
-            float ty3 = 1 - (float) src.bottom;
+            float tx0 = src.left;
+            float tx1 = center.left;
+            float tx2 = center.right;
+            float tx3 = src.right;
+            float ty0 = 1 - src.top;
+            float ty1 = 1 - center.top;
+            float ty2 = 1 - center.bottom;
+            float ty3 = 1 - src.bottom;
 
             var vertices = new List<Vector3>(16);
             var uv = new List<Vector2>(16);
@@ -1217,8 +1231,8 @@ namespace Unity.UIWidgets.ui {
             uv.Add(new Vector2(tx2, ty3));
             vertices.Add(new Vector2(x3, y3));
             uv.Add(new Vector2(tx3, ty3));
-            
+
             return new MeshMesh(matrix, vertices, _imageNineTriangles, uv);
-        }        
+        }
     }
 }

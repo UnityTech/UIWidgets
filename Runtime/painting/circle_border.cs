@@ -1,5 +1,8 @@
 using System;
 using Unity.UIWidgets.ui;
+using UnityEngine;
+using Canvas = Unity.UIWidgets.ui.Canvas;
+using Rect = Unity.UIWidgets.ui.Rect;
 
 namespace Unity.UIWidgets.painting {
     public class CircleBorder : ShapeBorder, IEquatable<CircleBorder> {
@@ -13,11 +16,11 @@ namespace Unity.UIWidgets.painting {
             get { return EdgeInsets.all(this.side.width); }
         }
 
-        public override ShapeBorder scale(double t) {
+        public override ShapeBorder scale(float t) {
             return new CircleBorder(side: this.side.scale(t));
         }
 
-        public override ShapeBorder lerpFrom(ShapeBorder a, double t) {
+        public override ShapeBorder lerpFrom(ShapeBorder a, float t) {
             if (a is CircleBorder border) {
                 return new CircleBorder(side: BorderSide.lerp(border.side, this.side, t));
             }
@@ -25,7 +28,7 @@ namespace Unity.UIWidgets.painting {
             return base.lerpFrom(a, t);
         }
 
-        public override ShapeBorder lerpTo(ShapeBorder b, double t) {
+        public override ShapeBorder lerpTo(ShapeBorder b, float t) {
             if (b is CircleBorder border) {
                 return new CircleBorder(side: BorderSide.lerp(this.side, border.side, t));
             }
@@ -37,7 +40,7 @@ namespace Unity.UIWidgets.painting {
             var path = new Path();
             path.addOval(Rect.fromCircle(
                 center: rect.center,
-                radius: Math.Max(0.0, rect.shortestSide / 2.0 - this.side.width)
+                radius: Mathf.Max(0.0f, rect.shortestSide / 2.0f - this.side.width)
             ));
             return path;
         }
@@ -46,7 +49,7 @@ namespace Unity.UIWidgets.painting {
             var path = new Path();
             path.addOval(Rect.fromCircle(
                 center: rect.center,
-                radius: rect.shortestSide / 2.0
+                radius: rect.shortestSide / 2.0f
             ));
             return path;
         }
@@ -56,7 +59,7 @@ namespace Unity.UIWidgets.painting {
                 case BorderStyle.none:
                     break;
                 case BorderStyle.solid:
-                    canvas.drawCircle(rect.center, (rect.shortestSide - this.side.width) / 2.0, this.side.toPaint());
+                    canvas.drawCircle(rect.center, (rect.shortestSide - this.side.width) / 2.0f, this.side.toPaint());
                     break;
             }
         }

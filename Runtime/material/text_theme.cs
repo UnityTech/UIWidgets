@@ -119,8 +119,8 @@ namespace Unity.UIWidgets.material {
 
         public TextTheme apply(
             string fontFamily = null,
-            double fontSizeFactor = 1.0,
-            double fontSizeDelta = 0.0,
+            float fontSizeFactor = 1.0f,
+            float fontSizeDelta = 0.0f,
             Color displayColor = null,
             Color bodyColor = null,
             TextDecoration decoration = null,
@@ -248,7 +248,7 @@ namespace Unity.UIWidgets.material {
             );
         }
 
-        public static TextTheme lerp(TextTheme a, TextTheme b, double t) {
+        public static TextTheme lerp(TextTheme a, TextTheme b, float t) {
             D.assert(a != null);
             D.assert(b != null);
             return new TextTheme(

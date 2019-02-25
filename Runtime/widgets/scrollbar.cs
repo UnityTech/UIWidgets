@@ -3,19 +3,23 @@ using Unity.UIWidgets.animation;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.ui;
+using UnityEngine;
+using Canvas = Unity.UIWidgets.ui.Canvas;
+using Color = Unity.UIWidgets.ui.Color;
+using Rect = Unity.UIWidgets.ui.Rect;
 
 namespace Unity.UIWidgets.widgets {
     public class ScrollbarPainter : ChangeNotifier, CustomPainter {
         public ScrollbarPainter(
             Color color,
             TextDirection textDirection,
-            double thickness,
-            Animation<double> fadeoutOpacityAnimation,
-            double mainAxisMargin = 0.0,
-            double crossAxisMargin = 0.0,
+            float thickness,
+            Animation<float> fadeoutOpacityAnimation,
+            float mainAxisMargin = 0.0f,
+            float crossAxisMargin = 0.0f,
             Radius radius = null,
-            double minLength = _kMinThumbExtent,
-            double minOverscrollLength = _kMinThumbExtent
+            float minLength = _kMinThumbExtent,
+            float minOverscrollLength = _kMinThumbExtent
         ) {
             this.color = color;
             this.textDirection = textDirection;
@@ -29,17 +33,17 @@ namespace Unity.UIWidgets.widgets {
             fadeoutOpacityAnimation.addListener(this.notifyListeners);
         }
 
-        const double _kMinThumbExtent = 18.0;
+        const float _kMinThumbExtent = 18.0f;
 
         public Color color;
         public TextDirection? textDirection;
-        public double thickness;
-        public Animation<double> fadeoutOpacityAnimation;
-        public double mainAxisMargin;
-        public double crossAxisMargin;
+        public float thickness;
+        public Animation<float> fadeoutOpacityAnimation;
+        public float mainAxisMargin;
+        public float crossAxisMargin;
         public Radius radius;
-        public double minLength;
-        public double minOverscrollLength;
+        public float minLength;
+        public float minOverscrollLength;
 
         ScrollMetrics _lastMetrics;
         AxisDirection? _lastAxisDirection;
@@ -58,7 +62,7 @@ namespace Unity.UIWidgets.widgets {
             }
         }
 
-        double _getThumbX(Size size) {
+        float _getThumbX(Size size) {
             D.assert(this.textDirection != null);
             switch (this.textDirection) {
                 case TextDirection.rtl:
@@ -70,7 +74,7 @@ namespace Unity.UIWidgets.widgets {
             return 0;
         }
 
-        void _paintVerticalThumb(Canvas canvas, Size size, double thumbOffset, double thumbExtent) {
+        void _paintVerticalThumb(Canvas canvas, Size size, float thumbOffset, float thumbExtent) {
             Offset thumbOrigin = new Offset(this._getThumbX(size), thumbOffset);
             Size thumbSize = new Size(this.thickness, thumbExtent);
             Rect thumbRect = thumbOrigin & thumbSize;
@@ -82,7 +86,7 @@ namespace Unity.UIWidgets.widgets {
             }
         }
 
-        void _paintHorizontalThumb(Canvas canvas, Size size, double thumbOffset, double thumbExtent) {
+        void _paintHorizontalThumb(Canvas canvas, Size size, float thumbOffset, float thumbExtent) {
             Offset thumbOrigin = new Offset(thumbOffset, size.height - this.thickness);
             Size thumbSize = new Size(thumbExtent, this.thickness);
             Rect thumbRect = thumbOrigin & thumbSize;
@@ -94,42 +98,42 @@ namespace Unity.UIWidgets.widgets {
             }
         }
 
-        public delegate void painterDelegate(Canvas canvas, Size size, double thumbOffset, double thumbExtent);
+        public delegate void painterDelegate(Canvas canvas, Size size, float thumbOffset, float thumbExtent);
 
         void _paintThumb(
-            double before,
-            double inside,
-            double after,
-            double viewport,
+            float before,
+            float inside,
+            float after,
+            float viewport,
             Canvas canvas,
             Size size,
             painterDelegate painter
         ) {
-            double thumbExtent = Math.Min(viewport, this.minOverscrollLength);
+            float thumbExtent = Mathf.Min(viewport, this.minOverscrollLength);
 
             if (before + inside + after > 0.0) {
-                double fractionVisible = inside / (before + inside + after);
-                thumbExtent = Math.Max(
+                float fractionVisible = inside / (before + inside + after);
+                thumbExtent = Mathf.Max(
                     thumbExtent,
                     viewport * fractionVisible - 2 * this.mainAxisMargin
                 );
 
                 if (before != 0.0 && after != 0.0) {
-                    thumbExtent = Math.Max(
+                    thumbExtent = Mathf.Max(
                         this.minLength,
                         thumbExtent
                     );
                 }
                 else {
-                    thumbExtent = Math.Max(
+                    thumbExtent = Mathf.Max(
                         thumbExtent,
-                        this.minLength * (((inside / viewport) - 0.8) / 0.2)
+                        this.minLength * (((inside / viewport) - 0.8f) / 0.2f)
                     );
                 }
             }
 
-            double fractionPast = before / (before + after);
-            double thumbOffset = (before + after > 0.0)
+            float fractionPast = before / (before + after);
+            float thumbOffset = (before + after > 0.0)
                 ? fractionPast * (viewport - thumbExtent - 2 * this.mainAxisMargin) + this.mainAxisMargin
                 : this.mainAxisMargin;
 

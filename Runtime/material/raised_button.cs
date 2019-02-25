@@ -21,9 +21,9 @@ namespace Unity.UIWidgets.material {
             Color highlightColor = null,
             Color splashColor = null,
             Brightness? colorBrightness = null,
-            double? elevation = null,
-            double? highlightElevation = null,
-            double? disabledElevation = null,
+            float? elevation = null,
+            float? highlightElevation = null,
+            float? disabledElevation = null,
             EdgeInsets padding = null,
             ShapeBorder shape = null,
             Clip? clipBehavior = Clip.none,
@@ -68,9 +68,9 @@ namespace Unity.UIWidgets.material {
             Color highlightColor = null,
             Color splashColor = null,
             Brightness? colorBrightness = null,
-            double? elevation = null,
-            double? highlightElevation = null,
-            double? disabledElevation = null,
+            float? elevation = null,
+            float? highlightElevation = null,
+            float? disabledElevation = null,
             EdgeInsets padding = null,
             ShapeBorder shape = null,
             Clip? clipBehavior = null,
@@ -142,10 +142,10 @@ namespace Unity.UIWidgets.material {
             properties.add(new DiagnosticsProperty<Color>("splashColor", this.splashColor, defaultValue: null));
             properties.add(new DiagnosticsProperty<Brightness?>("colorBrightness", this.colorBrightness,
                 defaultValue: null));
-            properties.add(new DiagnosticsProperty<double?>("elevation", this.elevation, defaultValue: null));
-            properties.add(new DiagnosticsProperty<double?>("highlightElevation", this.highlightElevation,
+            properties.add(new DiagnosticsProperty<float?>("elevation", this.elevation, defaultValue: null));
+            properties.add(new DiagnosticsProperty<float?>("highlightElevation", this.highlightElevation,
                 defaultValue: null));
-            properties.add(new DiagnosticsProperty<double?>("disabledElevation", this.disabledElevation,
+            properties.add(new DiagnosticsProperty<float?>("disabledElevation", this.disabledElevation,
                 defaultValue: null));
             properties.add(new DiagnosticsProperty<EdgeInsets>("padding", this.padding, defaultValue: null));
             properties.add(new DiagnosticsProperty<ShapeBorder>("shape", this.shape, defaultValue: null));
@@ -167,9 +167,9 @@ namespace Unity.UIWidgets.material {
             Color highlightColor = null,
             Color splashColor = null,
             Brightness? colorBrightness = null,
-            double? elevation = null,
-            double? highlightElevation = null,
-            double? disabledElevation = null,
+            float? elevation = null,
+            float? highlightElevation = null,
+            float? disabledElevation = null,
             EdgeInsets padding = null,
             ShapeBorder shape = null,
             Clip? clipBehavior = Clip.none,
@@ -201,7 +201,7 @@ namespace Unity.UIWidgets.material {
                 mainAxisSize: MainAxisSize.min,
                 children: new List<Widget> {
                     icon,
-                    new SizedBox(width: 8.0),
+                    new SizedBox(width: 8.0f),
                     label
                 }
             )) {

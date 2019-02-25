@@ -9,7 +9,7 @@ using Unity.UIWidgets.ui;
 
 namespace Unity.UIWidgets.painting {
     public class ImageInfo : IEquatable<ImageInfo> {
-        public ImageInfo(Image image, double scale = 1.0) {
+        public ImageInfo(Image image, float scale = 1.0f) {
             D.assert(image != null);
 
             this.image = image;
@@ -17,7 +17,7 @@ namespace Unity.UIWidgets.painting {
         }
 
         public readonly Image image;
-        public readonly double scale;
+        public readonly float scale;
 
         public bool Equals(ImageInfo other) {
             if (ReferenceEquals(null, other)) {
@@ -286,7 +286,7 @@ namespace Unity.UIWidgets.painting {
     public class MultiFrameImageStreamCompleter : ImageStreamCompleter {
         public MultiFrameImageStreamCompleter(
             IPromise<Codec> codec,
-            double scale,
+            float scale,
             InformationCollector informationCollector = null
         ) {
             D.assert(codec != null);
@@ -308,7 +308,7 @@ namespace Unity.UIWidgets.painting {
         }
 
         Codec _codec;
-        readonly double _scale;
+        readonly float _scale;
         readonly InformationCollector _informationCollector;
 
         FrameInfo _nextFrame;

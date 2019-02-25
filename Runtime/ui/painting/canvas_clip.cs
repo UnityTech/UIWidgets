@@ -104,8 +104,8 @@ namespace Unity.UIWidgets.ui {
 //                }
 //                
 //                var offset = this._invMat.mapXY(x, y);
-//                x = (float) offset.dx;
-//                y = (float) offset.dy;
+//                x = offset.dx;
+//                y = offset.dy;
 //            }
 //
 //            for (var i = 0; i < this.mesh.vertices.Count; i++) {
@@ -127,10 +127,10 @@ namespace Unity.UIWidgets.ui {
 
 //            this seems to be inefficient. disable it for now.
 //            if (this.convex) {
-//                return this._convexContains((float) rect.left, (float) rect.top) &&
-//                       this._convexContains((float) rect.left, (float) rect.bottom) &&
-//                       this._convexContains((float) rect.right, (float) rect.top) &&
-//                       this._convexContains((float) rect.right, (float) rect.bottom);
+//                return this._convexContains(rect.left, rect.top) &&
+//                       this._convexContains(rect.left, rect.bottom) &&
+//                       this._convexContains(rect.right, rect.top) &&
+//                       this._convexContains(rect.right, rect.bottom);
 //            }
 
             return false;

@@ -48,9 +48,9 @@ namespace Unity.UIWidgets.material {
     }
 
     public class _ExpansionTileState : SingleTickerProviderStateMixin<ExpansionTile> {
-        static readonly Animatable<double> _easeOutTween = new CurveTween(curve: Curves.easeOut);
-        static readonly Animatable<double> _easeInTween = new CurveTween(curve: Curves.easeIn);
-        static readonly Animatable<double> _halfTween = new DoubleTween(begin: 0.0, end: 0.5);
+        static readonly Animatable<float> _easeOutTween = new CurveTween(curve: Curves.easeOut);
+        static readonly Animatable<float> _easeInTween = new CurveTween(curve: Curves.easeIn);
+        static readonly Animatable<float> _halfTween = new FloatTween(begin: 0.0f, end: 0.5f);
 
         readonly ColorTween _borderColorTween = new ColorTween();
         readonly ColorTween _headerColorTween = new ColorTween();
@@ -58,8 +58,8 @@ namespace Unity.UIWidgets.material {
         readonly ColorTween _backgroundColorTween = new ColorTween();
 
         AnimationController _controller;
-        Animation<double> _iconTurns;
-        Animation<double> _heightFactor;
+        Animation<float> _iconTurns;
+        Animation<float> _heightFactor;
         Animation<Color> _borderColor;
         Animation<Color> _headerColor;
         Animation<Color> _iconColor;
@@ -82,7 +82,7 @@ namespace Unity.UIWidgets.material {
                 : (bool) PageStorage.of(this.context)?.readState(this.context);
 
             if (this._isExpanded) {
-                this._controller.setValue(1.0);
+                this._controller.setValue(1.0f);
             }
         }
 

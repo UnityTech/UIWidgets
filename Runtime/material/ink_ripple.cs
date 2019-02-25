@@ -18,7 +18,7 @@ namespace Unity.UIWidgets.material {
             RectCallback rectCallback = null,
             BorderRadius borderRadius = null,
             ShapeBorder customBorder = null,
-            double? radius = null,
+            float? radius = null,
             VoidCallback onRemoved = null
         ) {
             D.assert(controller != null);
@@ -49,7 +49,7 @@ namespace Unity.UIWidgets.material {
             RectCallback rectCallback = null,
             BorderRadius borderRadius = null,
             ShapeBorder customBorder = null,
-            double? radius = null,
+            float? radius = null,
             VoidCallback onRemoved = null
         ) : base(
             controller: controller,
@@ -84,9 +84,9 @@ namespace Unity.UIWidgets.material {
                 vsync: controller.vsync);
             this._radiusController.addListener(controller.markNeedsPaint);
             this._radiusController.forward();
-            this._radius = this._radiusController.drive(new DoubleTween(
-                    begin: this._targetRadius * 0.30,
-                    end: this._targetRadius + 5.0
+            this._radius = this._radiusController.drive(new FloatTween(
+                    begin: this._targetRadius * 0.30f,
+                    end: this._targetRadius + 5.0f
                 ).chain(_easeCurveTween)
             );
 
@@ -110,11 +110,11 @@ namespace Unity.UIWidgets.material {
 
         readonly ShapeBorder _customBorder;
 
-        readonly double _targetRadius;
+        readonly float _targetRadius;
 
         readonly RectCallback _clipCallback;
 
-        Animation<double> _radius;
+        Animation<float> _radius;
         AnimationController _radiusController;
 
         Animation<int> _fadeIn;
@@ -125,24 +125,24 @@ namespace Unity.UIWidgets.material {
 
         public static InteractiveInkFeatureFactory splashFactory = new _InkRippleFactory();
 
-        static readonly Animatable<double> _easeCurveTween = new CurveTween(curve: Curves.ease);
+        static readonly Animatable<float> _easeCurveTween = new CurveTween(curve: Curves.ease);
 
-        static readonly Animatable<double> _fadeOutIntervalTween =
-            new CurveTween(curve: new Interval(InkRippleUtils._kFadeOutIntervalStart, 1.0));
+        static readonly Animatable<float> _fadeOutIntervalTween =
+            new CurveTween(curve: new Interval(InkRippleUtils._kFadeOutIntervalStart, 1.0f));
 
         public override void confirm() {
             this._radiusController.duration = InkRippleUtils._kRadiusDuration;
             this._radiusController.forward();
             this._fadeInController.forward();
-            this._fadeOutController.animateTo(1.0, duration: InkRippleUtils._kFadeOutDuration);
+            this._fadeOutController.animateTo(1.0f, duration: InkRippleUtils._kFadeOutDuration);
         }
 
         public override void cancel() {
             this._fadeInController.stop();
-            double fadeOutValue = 1.0 - this._fadeInController.value;
+            float fadeOutValue = 1.0f - this._fadeInController.value;
             this._fadeOutController.setValue(fadeOutValue);
             if (fadeOutValue < 1.0) {
-                this._fadeOutController.animateTo(1.0, duration: InkRippleUtils._kCancelDuration);
+                this._fadeOutController.animateTo(1.0f, duration: InkRippleUtils._kCancelDuration);
             }
         }
 

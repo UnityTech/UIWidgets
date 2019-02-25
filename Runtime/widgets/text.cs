@@ -109,7 +109,7 @@ namespace Unity.UIWidgets.widgets {
             TextAlign? textAlign = null,
             bool? softWrap = null,
             TextOverflow? overflow = null,
-            double? textScaleFactor = null,
+            float? textScaleFactor = null,
             int? maxLines = null) : base(key) {
             D.assert(data != null);
             this.textSpan = null;
@@ -128,7 +128,7 @@ namespace Unity.UIWidgets.widgets {
             TextAlign? textAlign = null,
             bool? softWrap = null,
             TextOverflow? overflow = null,
-            double? textScaleFactor = null,
+            float? textScaleFactor = null,
             int? maxLines = null) : base(key) {
             D.assert(textSpan != null);
             this.textSpan = textSpan;
@@ -147,7 +147,7 @@ namespace Unity.UIWidgets.widgets {
             TextAlign? textAlign = null,
             bool? softWrap = null,
             TextOverflow? overflow = null,
-            double? textScaleFactor = null,
+            float? textScaleFactor = null,
             int? maxLines = null) {
             return new Text(
                 textSpan, key,
@@ -171,7 +171,7 @@ namespace Unity.UIWidgets.widgets {
 
         public readonly TextOverflow? overflow;
 
-        public readonly double? textScaleFactor;
+        public readonly float? textScaleFactor;
 
         public readonly int? maxLines;
 
@@ -186,7 +186,7 @@ namespace Unity.UIWidgets.widgets {
                 textAlign: this.textAlign ?? defaultTextStyle.textAlign ?? TextAlign.left,
                 softWrap: this.softWrap ?? defaultTextStyle.softWrap,
                 overflow: this.overflow ?? defaultTextStyle.overflow,
-                textScaleFactor: this.textScaleFactor ?? 1.0, // MediaQuery.textScaleFactorOf(context), todo
+                textScaleFactor: this.textScaleFactor ?? 1.0f, // MediaQuery.textScaleFactorOf(context), todo
                 maxLines: this.maxLines ?? defaultTextStyle.maxLines,
                 text: new TextSpan(
                     style: effectiveTextStyle,
@@ -214,7 +214,7 @@ namespace Unity.UIWidgets.widgets {
                 ifFalse: "no wrapping except at line break characters", showName: true));
             properties.add(new EnumProperty<TextOverflow?>("overflow", this.overflow,
                 defaultValue: Diagnostics.kNullDefaultValue));
-            properties.add(new DoubleProperty("textScaleFactor", this.textScaleFactor,
+            properties.add(new FloatProperty("textScaleFactor", this.textScaleFactor,
                 defaultValue: Diagnostics.kNullDefaultValue));
             properties.add(new IntProperty("maxLines", this.maxLines, defaultValue: Diagnostics.kNullDefaultValue));
         }

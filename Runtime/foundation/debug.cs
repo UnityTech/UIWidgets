@@ -2,12 +2,19 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using Unity.UIWidgets.ui;
+using Debug = UnityEngine.Debug;
 
 namespace Unity.UIWidgets.foundation {
     public static class D {
+
+        public static void logError(string message, Exception ex = null) {
+            Debug.LogException(new ReportError(message, ex));
+        }
         [Conditional("UIWidgets_DEBUG")]
         public static void assert(Func<bool> result, string message = null) {
-            assert(result(), message);
+            if (!result()) {
+                throw new AssertionError(message);
+            }
         }
 
         [Conditional("UIWidgets_DEBUG")]
@@ -63,7 +70,7 @@ namespace Unity.UIWidgets.foundation {
 //            canvas.drawPath(path, paint);
         }
 
-        public static void debugPaintPadding(Canvas canvas, Rect outerRect, Rect innerRect, double outlineWidth = 2.0) {
+        public static void debugPaintPadding(Canvas canvas, Rect outerRect, Rect innerRect, float outlineWidth = 2.0f) {
             assert(() => {
                 if (innerRect != null && !innerRect.isEmpty) {
                     _debugDrawDoubleRect(canvas, outerRect, innerRect, new Color(0x900090FF));
@@ -88,6 +95,28 @@ namespace Unity.UIWidgets.foundation {
 
         public override string StackTrace {
             get {
+                var stackTrace = base.StackTrace;
+                var lines = stackTrace.Split('\n');
+                var strippedLines = lines.Skip(1);
+
+                return string.Join("\n", strippedLines);
+            }
+        }
+    }
+    
+    
+    public class ReportError : Exception {
+        Exception ex;
+        public ReportError(string message, Exception ex = null) : base(message) {
+            this.ex = ex;
+        }
+
+        public override string StackTrace {
+            get {
+                if (this.ex != null) {
+                    return this.ex.StackTrace;
+                }
+                
                 var stackTrace = base.StackTrace;
                 var lines = stackTrace.Split('\n');
                 var strippedLines = lines.Skip(1);

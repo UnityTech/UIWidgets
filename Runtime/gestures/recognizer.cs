@@ -238,7 +238,7 @@ namespace Unity.UIWidgets.gestures {
             }
         }
 
-        double _getDistance(PointerEvent evt) {
+        float _getDistance(PointerEvent evt) {
             Offset offset = evt.position - this.initialPosition;
             return offset.distance;
         }

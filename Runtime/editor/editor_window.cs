@@ -71,7 +71,7 @@ namespace Unity.UIWidgets.editor {
             get { return this.editorWindow.titleContent; }
         }
 
-        protected override double queryDevicePixelRatio() {
+        protected override float queryDevicePixelRatio() {
             return EditorGUIUtility.pixelsPerPoint;
         }
 
@@ -200,6 +200,7 @@ namespace Unity.UIWidgets.editor {
             if (this._devicePixelRatio != this.queryDevicePixelRatio()) {
                 return true;
             }
+
             var size = this.queryWindowSize();
             if (this._lastWindowWidth != size.x
                 || this._lastWindowHeight != size.y) {
@@ -235,7 +236,7 @@ namespace Unity.UIWidgets.editor {
             get { return null; }
         }
 
-        protected abstract double queryDevicePixelRatio();
+        protected abstract float queryDevicePixelRatio();
         protected abstract Vector2 queryWindowSize();
 
         protected virtual Surface createSurface() {
@@ -312,10 +313,10 @@ namespace Unity.UIWidgets.editor {
                     );
                 }
                 else if (evt.type == EventType.ScrollWheel) {
-                    this._scrollInput.onScroll((float) (-evt.delta.x * this._devicePixelRatio),
-                        (float) (-evt.delta.y * this._devicePixelRatio),
-                        (float) (evt.mousePosition.x * this._devicePixelRatio),
-                        (float) (evt.mousePosition.y * this._devicePixelRatio),
+                    this._scrollInput.onScroll(-evt.delta.x * this._devicePixelRatio,
+                        -evt.delta.y * this._devicePixelRatio,
+                        evt.mousePosition.x * this._devicePixelRatio,
+                        evt.mousePosition.y * this._devicePixelRatio,
                         evt.button
                     );
                 }
@@ -363,7 +364,7 @@ namespace Unity.UIWidgets.editor {
                 if (this._textInput != null) {
                     this._textInput.keyboardManager.Update();
                 }
-            
+
                 this._timerProvider.update(this.flushMicrotasks);
                 this.flushMicrotasks();
             }

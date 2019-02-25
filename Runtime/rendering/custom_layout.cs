@@ -206,40 +206,40 @@ namespace Unity.UIWidgets.rendering {
             return constraints.constrain(this._delegate.getSize(constraints));
         }
 
-        protected override double computeMinIntrinsicWidth(double height) {
-            double width = this._getSize(BoxConstraints.tightForFinite(height: height)).width;
+        protected override float computeMinIntrinsicWidth(float height) {
+            float width = this._getSize(BoxConstraints.tightForFinite(height: height)).width;
             if (width.isFinite()) {
                 return width;
             }
 
-            return 0.0;
+            return 0.0f;
         }
 
-        protected override double computeMaxIntrinsicWidth(double height) {
-            double width = this._getSize(BoxConstraints.tightForFinite(height: height)).width;
+        protected override float computeMaxIntrinsicWidth(float height) {
+            float width = this._getSize(BoxConstraints.tightForFinite(height: height)).width;
             if (width.isFinite()) {
                 return width;
             }
 
-            return 0.0;
+            return 0.0f;
         }
 
-        protected override double computeMinIntrinsicHeight(double width) {
-            double height = this._getSize(BoxConstraints.tightForFinite(width: width)).height;
+        protected override float computeMinIntrinsicHeight(float width) {
+            float height = this._getSize(BoxConstraints.tightForFinite(width: width)).height;
             if (height.isFinite()) {
                 return height;
             }
 
-            return 0.0;
+            return 0.0f;
         }
 
-        protected override double computeMaxIntrinsicHeight(double width) {
-            double height = this._getSize(BoxConstraints.tightForFinite(width: width)).height;
+        protected override float computeMaxIntrinsicHeight(float width) {
+            float height = this._getSize(BoxConstraints.tightForFinite(width: width)).height;
             if (height.isFinite()) {
                 return height;
             }
 
-            return 0.0;
+            return 0.0f;
         }
 
         protected override void performLayout() {

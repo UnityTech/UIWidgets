@@ -26,7 +26,7 @@ namespace Unity.UIWidgets.material {
 
         public override Widget build(BuildContext context) {
             ButtonThemeData buttonTheme = ButtonTheme.of(context);
-            double paddingUnit = buttonTheme.padding.horizontal / 4.0;
+            float paddingUnit = buttonTheme.padding.horizontal / 4.0f;
             List<Widget> _children = new List<Widget>();
             foreach (Widget _child in this.children) {
                 _children.Add(
@@ -47,7 +47,7 @@ namespace Unity.UIWidgets.material {
                 case ButtonBarLayoutBehavior.padded:
                     return new Padding(
                         padding: EdgeInsets.symmetric(
-                            vertical: 2.0 * paddingUnit,
+                            vertical: 2.0f * paddingUnit,
                             horizontal: paddingUnit
                         ),
                         child: child
@@ -55,7 +55,7 @@ namespace Unity.UIWidgets.material {
                 case ButtonBarLayoutBehavior.constrained:
                     return new Container(
                         padding: EdgeInsets.symmetric(horizontal: paddingUnit),
-                        constraints: new BoxConstraints(minHeight: 52.0),
+                        constraints: new BoxConstraints(minHeight: 52.0f),
                         alignment: Alignment.center,
                         child: child
                     );

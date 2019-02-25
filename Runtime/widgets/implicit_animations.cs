@@ -14,7 +14,7 @@ namespace Unity.UIWidgets.widgets {
         ) : base(begin: begin, end: end) {
         }
 
-        public override BoxConstraints lerp(double t) {
+        public override BoxConstraints lerp(float t) {
             return BoxConstraints.lerp(this.begin, this.end, t);
         }
     }
@@ -26,7 +26,7 @@ namespace Unity.UIWidgets.widgets {
             Decoration end = null) : base(begin: begin, end: end) {
         }
 
-        public override Decoration lerp(double t) {
+        public override Decoration lerp(float t) {
             return Decoration.lerp(this.begin, this.end, t);
         }
     }
@@ -38,7 +38,7 @@ namespace Unity.UIWidgets.widgets {
             EdgeInsets end = null) : base(begin: begin, end: end) {
         }
 
-        public override EdgeInsets lerp(double t) {
+        public override EdgeInsets lerp(float t) {
             return EdgeInsets.lerp(this.begin, this.end, t);
         }
     }
@@ -50,7 +50,7 @@ namespace Unity.UIWidgets.widgets {
             BorderRadius end = null) : base(begin: begin, end: end) {
         }
 
-        public override BorderRadius lerp(double t) {
+        public override BorderRadius lerp(float t) {
             return BorderRadius.lerp(this.begin, this.end, t);
         }
     }
@@ -62,7 +62,7 @@ namespace Unity.UIWidgets.widgets {
             Border end = null) : base(begin: begin, end: end) {
         }
 
-        public override Border lerp(double t) {
+        public override Border lerp(float t) {
             return Border.lerp(this.begin, this.end, t);
         }
     }
@@ -75,7 +75,7 @@ namespace Unity.UIWidgets.widgets {
         }
 
         //todo:xingwei.zhu implement full matrix3 lerp
-        public override Matrix3 lerp(double t) {
+        public override Matrix3 lerp(float t) {
             D.assert(this.begin != null);
             D.assert(this.end != null);
 
@@ -89,7 +89,7 @@ namespace Unity.UIWidgets.widgets {
             TextStyle end = null) : base(begin: begin, end: end) {
         }
 
-        public override TextStyle lerp(double t) {
+        public override TextStyle lerp(float t) {
             return TextStyle.lerp(this.begin, this.end, t);
         }
     }
@@ -166,11 +166,11 @@ namespace Unity.UIWidgets.widgets {
 
         AnimationController _controller;
 
-        public Animation<double> animation {
+        public Animation<float> animation {
             get { return this._animation; }
         }
 
-        Animation<double> _animation;
+        Animation<float> _animation;
 
         public override void initState() {
             base.initState();
@@ -195,7 +195,7 @@ namespace Unity.UIWidgets.widgets {
             if (this._constructTweens()) {
                 var visitor = new TweenVisitorUpdateTween();
                 this.forEachTween(visitor);
-                this._controller.setValue(0.0);
+                this._controller.setValue(0.0f);
                 this._controller.forward();
                 this.didUpdateTweens();
             }
@@ -262,8 +262,8 @@ namespace Unity.UIWidgets.widgets {
             Color color = null,
             Decoration decoration = null,
             Decoration foregroundDecoration = null,
-            double? width = null,
-            double? height = null,
+            float? width = null,
+            float? height = null,
             BoxConstraints constraints = null,
             EdgeInsets margin = null,
             Matrix3 transform = null,
@@ -468,7 +468,7 @@ namespace Unity.UIWidgets.widgets {
             BoxShape? shape = null,
             Clip clipBehavior = Clip.none,
             BorderRadius borderRadius = null,
-            double? elevation = null,
+            float? elevation = null,
             Color color = null,
             bool animateColor = true,
             Color shadowColor = null,
@@ -486,7 +486,7 @@ namespace Unity.UIWidgets.widgets {
             this.shape = shape ?? BoxShape.circle;
             this.clipBehavior = clipBehavior;
             this.borderRadius = borderRadius ?? BorderRadius.zero;
-            this.elevation = elevation ?? 0.0;
+            this.elevation = elevation ?? 0.0f;
             this.color = color;
             this.animateColor = animateColor;
             this.shadowColor = shadowColor;
@@ -501,7 +501,7 @@ namespace Unity.UIWidgets.widgets {
 
         public readonly BorderRadius borderRadius;
 
-        public readonly double elevation;
+        public readonly float elevation;
 
         public readonly Color color;
 
@@ -519,7 +519,7 @@ namespace Unity.UIWidgets.widgets {
             base.debugFillProperties(properties);
             properties.add(new EnumProperty<BoxShape>("shape", this.shape));
             properties.add(new DiagnosticsProperty<BorderRadius>("borderRadius", this.borderRadius));
-            properties.add(new DoubleProperty("elevation", this.elevation));
+            properties.add(new FloatProperty("elevation", this.elevation));
             properties.add(new DiagnosticsProperty<Color>("color", this.color));
             properties.add(new DiagnosticsProperty<bool>("animateColor", this.animateColor));
             properties.add(new DiagnosticsProperty<Color>("shadowColor", this.shadowColor));
@@ -529,15 +529,15 @@ namespace Unity.UIWidgets.widgets {
 
     public class _AnimatedPhysicalModelState : AnimatedWidgetBaseState<AnimatedPhysicalModel> {
         BorderRadiusTween _borderRadius;
-        DoubleTween _elevation;
+        FloatTween _elevation;
         ColorTween _color;
         ColorTween _shadowColor;
 
         protected override void forEachTween(ITweenVisitor visitor) {
             this._borderRadius = (BorderRadiusTween) visitor.visit(this, this._borderRadius, this.widget.borderRadius,
                 (BorderRadius value) => new BorderRadiusTween(begin: value));
-            this._elevation = (DoubleTween) visitor.visit(this, this._elevation, this.widget.elevation,
-                (double value) => new DoubleTween(begin: value, end: value));
+            this._elevation = (FloatTween) visitor.visit(this, this._elevation, this.widget.elevation,
+                (float value) => new FloatTween(begin: value, end: value));
             this._color = (ColorTween) visitor.visit(this, this._color, this.widget.color,
                 (Color value) => new ColorTween(begin: value));
             this._shadowColor = (ColorTween) visitor.visit(this, this._shadowColor, this.widget.shadowColor,

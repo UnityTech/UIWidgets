@@ -6,16 +6,16 @@ using Unity.UIWidgets.ui;
 
 namespace Unity.UIWidgets.painting {
     public class TextStyle : Diagnosticable, IEquatable<TextStyle>, ParagraphBuilder.ITextStyleProvider {
-        public static readonly double _defaultFontSize = 14.0;
+        public static readonly float _defaultFontSize = 14.0f;
         public readonly bool inherit;
         public readonly Color color;
-        public readonly double? fontSize;
+        public readonly float? fontSize;
         public readonly FontWeight? fontWeight;
         public readonly FontStyle? fontStyle;
-        public readonly double? letterSpacing;
-        public readonly double? wordSpacing;
+        public readonly float? letterSpacing;
+        public readonly float? wordSpacing;
         public readonly TextBaseline? textBaseline;
-        public readonly double? height;
+        public readonly float? height;
         public readonly TextDecoration decoration;
         public readonly Color decorationColor;
         public readonly TextDecorationStyle? decorationStyle;
@@ -26,10 +26,10 @@ namespace Unity.UIWidgets.painting {
         const string _kDefaultDebugLabel = "unknown";
 
 
-        public TextStyle(bool inherit = true, Color color = null, double? fontSize = null,
+        public TextStyle(bool inherit = true, Color color = null, float? fontSize = null,
             FontWeight? fontWeight = null,
-            FontStyle? fontStyle = null, double? letterSpacing = null, double? wordSpacing = null,
-            TextBaseline? textBaseline = null, double? height = null, Paint background = null,
+            FontStyle? fontStyle = null, float? letterSpacing = null, float? wordSpacing = null,
+            TextBaseline? textBaseline = null, float? height = null, Paint background = null,
             TextDecoration decoration = null,
             Color decorationColor = null, TextDecorationStyle? decorationStyle = null,
             string fontFamily = null, string debugLabel = null) {
@@ -105,7 +105,7 @@ namespace Unity.UIWidgets.painting {
         }
 
         public ParagraphStyle getParagraphStyle(TextAlign textAlign,
-            TextDirection textDirection, string ellipsis, int? maxLines, double textScaleFactor = 1.0) {
+            TextDirection textDirection, string ellipsis, int? maxLines, float textScaleFactor = 1.0f) {
             return new ParagraphStyle(
                 textAlign, textDirection, this.fontWeight, this.fontStyle,
                 maxLines, (this.fontSize ?? _defaultFontSize) * textScaleFactor, this.fontFamily, this.height,
@@ -120,15 +120,15 @@ namespace Unity.UIWidgets.painting {
             Color decorationColor = null,
             TextDecorationStyle? decorationStyle = null,
             string fontFamily = null,
-            double fontSizeFactor = 1.0,
-            double fontSizeDelta = 0.0,
+            float fontSizeFactor = 1.0f,
+            float fontSizeDelta = 0.0f,
             int fontWeightDelta = 0,
-            double letterSpacingFactor = 1.0,
-            double letterSpacingDelta = 0.0,
-            double wordSpacingFactor = 1.0,
-            double wordSpacingDelta = 0.0,
-            double heightFactor = 1.0,
-            double heightDelta = 0.0
+            float letterSpacingFactor = 1.0f,
+            float letterSpacingDelta = 0.0f,
+            float wordSpacingFactor = 1.0f,
+            float wordSpacingDelta = 0.0f,
+            float heightFactor = 1.0f,
+            float heightDelta = 0.0f
         ) {
             D.assert(this.fontSize != null || (fontSizeFactor == 1.0 && fontSizeDelta == 0.0));
             D.assert(this.fontWeight != null || fontWeightDelta == 0.0);
@@ -204,13 +204,13 @@ namespace Unity.UIWidgets.painting {
 
         public TextStyle copyWith(Color color = null,
             string fontFamily = null,
-            double? fontSize = null,
+            float? fontSize = null,
             FontWeight? fontWeight = null,
             FontStyle? fontStyle = null,
-            double? letterSpacing = null,
-            double? wordSpacing = null,
+            float? letterSpacing = null,
+            float? wordSpacing = null,
             TextBaseline? textBaseline = null,
-            double? height = null,
+            float? height = null,
             Paint background = null,
             TextDecoration decoration = null,
             Color decorationColor = null,
@@ -244,7 +244,7 @@ namespace Unity.UIWidgets.painting {
             );
         }
 
-        public static TextStyle lerp(TextStyle a, TextStyle b, double t) {
+        public static TextStyle lerp(TextStyle a, TextStyle b, float t) {
             D.assert(a == null || b == null || a.inherit == b.inherit);
             if (a == null && b == null) {
                 return null;
@@ -301,15 +301,15 @@ namespace Unity.UIWidgets.painting {
                 inherit: b.inherit,
                 color: Color.lerp(a.color, b.color, t),
                 fontFamily: t < 0.5 ? a.fontFamily : b.fontFamily,
-                fontSize: MathUtils.lerpNullableDouble(a.fontSize ?? b.fontSize, b.fontSize ?? a.fontSize, t),
+                fontSize: MathUtils.lerpNullableFloat(a.fontSize ?? b.fontSize, b.fontSize ?? a.fontSize, t),
                 fontWeight: t < 0.5 ? a.fontWeight : b.fontWeight,
                 fontStyle: t < 0.5 ? a.fontStyle : b.fontStyle,
-                letterSpacing: MathUtils.lerpNullableDouble(a.letterSpacing ?? b.letterSpacing,
+                letterSpacing: MathUtils.lerpNullableFloat(a.letterSpacing ?? b.letterSpacing,
                     b.letterSpacing ?? a.letterSpacing, t),
-                wordSpacing: MathUtils.lerpNullableDouble(a.wordSpacing ?? b.wordSpacing,
+                wordSpacing: MathUtils.lerpNullableFloat(a.wordSpacing ?? b.wordSpacing,
                     b.wordSpacing ?? a.wordSpacing, t),
                 textBaseline: t < 0.5 ? a.textBaseline : b.textBaseline,
-                height: MathUtils.lerpNullableDouble(a.height ?? b.height, b.height ?? a.height, t),
+                height: MathUtils.lerpNullableFloat(a.height ?? b.height, b.height ?? a.height, t),
                 background: t < 0.5 ? a.background : b.background,
                 decoration: t < 0.5 ? a.decoration : b.decoration,
                 decorationColor: Color.lerp(a.decorationColor, b.decorationColor, t),
@@ -326,7 +326,7 @@ namespace Unity.UIWidgets.painting {
                 defaultValue: Diagnostics.kNullDefaultValue));
             styles.Add(new StringProperty("family", this.fontFamily, defaultValue: Diagnostics.kNullDefaultValue,
                 quoted: false));
-            styles.Add(new DiagnosticsProperty<double?>("size", this.fontSize,
+            styles.Add(new DiagnosticsProperty<float?>("size", this.fontSize,
                 defaultValue: Diagnostics.kNullDefaultValue));
             string weightDescription = "";
             if (this.fontWeight != null) {
@@ -347,13 +347,13 @@ namespace Unity.UIWidgets.painting {
             ));
             styles.Add(new EnumProperty<FontStyle?>("style", this.fontStyle,
                 defaultValue: Diagnostics.kNullDefaultValue));
-            styles.Add(new DiagnosticsProperty<double?>("letterSpacing", this.letterSpacing,
+            styles.Add(new DiagnosticsProperty<float?>("letterSpacing", this.letterSpacing,
                 defaultValue: Diagnostics.kNullDefaultValue));
-            styles.Add(new DiagnosticsProperty<double?>("wordSpacing", this.wordSpacing,
+            styles.Add(new DiagnosticsProperty<float?>("wordSpacing", this.wordSpacing,
                 defaultValue: Diagnostics.kNullDefaultValue));
             styles.Add(new EnumProperty<TextBaseline?>("baseline", this.textBaseline,
                 defaultValue: Diagnostics.kNullDefaultValue));
-            styles.Add(new DiagnosticsProperty<double?>("height", this.height,
+            styles.Add(new DiagnosticsProperty<float?>("height", this.height,
                 defaultValue: Diagnostics.kNullDefaultValue));
             styles.Add(new StringProperty("background", this.background == null ? null : this.background.ToString(),
                 defaultValue: Diagnostics.kNullDefaultValue, quoted: false));

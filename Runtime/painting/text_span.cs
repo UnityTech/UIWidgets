@@ -22,7 +22,7 @@ namespace Unity.UIWidgets.painting {
             this.children = children;
         }
 
-        public void build(ParagraphBuilder builder, double textScaleFactor = 1.0) {
+        public void build(ParagraphBuilder builder, float textScaleFactor = 1.0f) {
             var hasTyle = this.style != null;
             if (hasTyle) {
                 builder.pushStyle(this.style);

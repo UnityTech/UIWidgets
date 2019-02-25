@@ -18,7 +18,7 @@ namespace Unity.UIWidgets.async {
                     action();
                 }
                 catch (Exception ex) {
-                    Debug.LogError("Error to execute microtask: " + ex);
+                    D.logError("Error to execute microtask: ", ex);
                 }
             }
         }

@@ -2,6 +2,10 @@ using System;
 using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
+using UnityEngine;
+using Canvas = Unity.UIWidgets.ui.Canvas;
+using Color = Unity.UIWidgets.ui.Color;
+using Rect = Unity.UIWidgets.ui.Rect;
 
 namespace Unity.UIWidgets.painting {
     public class BoxDecoration : Decoration, IEquatable<BoxDecoration> {
@@ -49,7 +53,7 @@ namespace Unity.UIWidgets.painting {
             get { return this.border?.dimensions; }
         }
 
-        public BoxDecoration scale(double factor) {
+        public BoxDecoration scale(float factor) {
             return new BoxDecoration(
                 color: Color.lerp(null, this.color, factor),
                 image: this.image,
@@ -66,7 +70,7 @@ namespace Unity.UIWidgets.painting {
             get { return this.boxShadow != null; }
         }
 
-        public override Decoration lerpFrom(Decoration a, double t) {
+        public override Decoration lerpFrom(Decoration a, float t) {
             if (a == null) {
                 return this.scale(t);
             }
@@ -78,9 +82,9 @@ namespace Unity.UIWidgets.painting {
             return base.lerpFrom(a, t);
         }
 
-        public override Decoration lerpTo(Decoration b, double t) {
+        public override Decoration lerpTo(Decoration b, float t) {
             if (b == null) {
-                return this.scale(1.0 - t);
+                return this.scale(1.0f - t);
             }
 
             if (b is BoxDecoration boxDecoration) {
@@ -90,7 +94,7 @@ namespace Unity.UIWidgets.painting {
             return base.lerpTo(b, t);
         }
 
-        public static BoxDecoration lerp(BoxDecoration a, BoxDecoration b, double t) {
+        public static BoxDecoration lerp(BoxDecoration a, BoxDecoration b, float t) {
             if (a == null && b == null) {
                 return null;
             }
@@ -100,7 +104,7 @@ namespace Unity.UIWidgets.painting {
             }
 
             if (b == null) {
-                return a.scale(1.0 - t);
+                return a.scale(1.0f - t);
             }
 
             if (t == 0.0) {
@@ -209,8 +213,8 @@ namespace Unity.UIWidgets.painting {
                     return true;
                 case BoxShape.circle:
                     Offset center = size.center(Offset.zero);
-                    double distance = (position - center).distance;
-                    return distance <= Math.Min(size.width, size.height) / 2.0;
+                    float distance = (position - center).distance;
+                    return distance <= Mathf.Min(size.width, size.height) / 2.0;
             }
 
             return false;
@@ -266,7 +270,7 @@ namespace Unity.UIWidgets.painting {
                 case BoxShape.circle:
                     D.assert(this._decoration.borderRadius == null);
                     Offset center = rect.center;
-                    double radius = rect.shortestSide / 2.0;
+                    float radius = rect.shortestSide / 2.0f;
                     canvas.drawCircle(center, radius, paint);
                     break;
                 case BoxShape.rectangle:

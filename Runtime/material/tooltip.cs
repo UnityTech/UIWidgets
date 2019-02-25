@@ -13,16 +13,16 @@ namespace Unity.UIWidgets.material {
         public Tooltip(
             Key key = null,
             string message = null,
-            double height = 32.0,
+            float height = 32.0f,
             EdgeInsets padding = null,
-            double verticalOffset = 24.0,
+            float verticalOffset = 24.0f,
             bool preferBelow = true,
             Widget child = null
         ) : base(key: key) {
             D.assert(message != null);
             this.message = message;
             this.height = height;
-            this.padding = padding ?? EdgeInsets.symmetric(horizontal: 16.0);
+            this.padding = padding ?? EdgeInsets.symmetric(horizontal: 16.0f);
             this.verticalOffset = verticalOffset;
             this.preferBelow = preferBelow;
             this.child = child;
@@ -31,11 +31,11 @@ namespace Unity.UIWidgets.material {
 
         public readonly string message;
 
-        public readonly double height;
+        public readonly float height;
 
         public readonly EdgeInsets padding;
 
-        public readonly double verticalOffset;
+        public readonly float verticalOffset;
 
         public readonly bool preferBelow;
 
@@ -48,7 +48,7 @@ namespace Unity.UIWidgets.material {
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             properties.add(new StringProperty("message", this.message, showName: false));
-            properties.add(new DoubleProperty("vertical offset", this.verticalOffset));
+            properties.add(new FloatProperty("vertical offset", this.verticalOffset));
             properties.add(new FlagProperty("position", value: this.preferBelow, ifTrue: "below", ifFalse: "above",
                 showName: true));
         }
@@ -157,19 +157,19 @@ namespace Unity.UIWidgets.material {
     public class _TooltipPositionDelegate : SingleChildLayoutDelegate {
         public _TooltipPositionDelegate(
             Offset target = null,
-            double? verticalOffset = null,
+            float? verticalOffset = null,
             bool? preferBelow = null) {
             D.assert(target != null);
             D.assert(verticalOffset != null);
             D.assert(preferBelow != null);
             this.target = target;
-            this.verticalOffset = verticalOffset ?? 0.0;
+            this.verticalOffset = verticalOffset ?? 0.0f;
             this.preferBelow = preferBelow ?? true;
         }
 
         public readonly Offset target;
 
-        public readonly double verticalOffset;
+        public readonly float verticalOffset;
 
         public readonly bool preferBelow;
 
@@ -199,11 +199,11 @@ namespace Unity.UIWidgets.material {
         public _TooltipOverlay(
             Key key = null,
             string message = null,
-            double? height = null,
+            float? height = null,
             EdgeInsets padding = null,
-            Animation<double> animation = null,
+            Animation<float> animation = null,
             Offset target = null,
-            double? verticalOffset = null,
+            float? verticalOffset = null,
             bool? preferBelow = null
         ) : base(key: key) {
             this.message = message;
@@ -217,15 +217,15 @@ namespace Unity.UIWidgets.material {
 
         public readonly string message;
 
-        public readonly double? height;
+        public readonly float? height;
 
         public readonly EdgeInsets padding;
 
-        public readonly Animation<double> animation;
+        public readonly Animation<float> animation;
 
         public readonly Offset target;
 
-        public readonly double? verticalOffset;
+        public readonly float? verticalOffset;
 
         public readonly bool? preferBelow;
 
@@ -246,17 +246,17 @@ namespace Unity.UIWidgets.material {
                         child: new FadeTransition(
                             opacity: this.animation,
                             child: new Opacity(
-                                opacity: 0.9,
+                                opacity: 0.9f,
                                 child: new ConstrainedBox(
-                                    constraints: new BoxConstraints(minHeight: this.height ?? 0.0),
+                                    constraints: new BoxConstraints(minHeight: this.height ?? 0.0f),
                                     child: new Container(
                                         decoration: new BoxDecoration(
                                             color: darkTheme.backgroundColor,
-                                            borderRadius: BorderRadius.circular(2.0)),
+                                            borderRadius: BorderRadius.circular(2.0f)),
                                         padding: this.padding,
                                         child: new Center(
-                                            widthFactor: 1.0,
-                                            heightFactor: 1.0,
+                                            widthFactor: 1.0f,
+                                            heightFactor: 1.0f,
                                             child: new Text(this.message, style: darkTheme.textTheme.body1)
                                         )
                                     )

@@ -124,7 +124,7 @@ namespace UIWidgets.Tests {
 
         RenderBox textDecoration() {
             return this.box(
-                new RenderParagraph(new TextSpan(style: new TextStyle(height: 1.2), text: "", children:
+                new RenderParagraph(new TextSpan(style: new TextStyle(height: 1.2f), text: "", children:
                     new List<TextSpan>() {
                         new TextSpan(style: new TextStyle(color: Color.fromARGB(255, 255, 0, 0),
                                 decoration: TextDecoration.underline),
@@ -210,9 +210,9 @@ namespace UIWidgets.Tests {
                     new List<TextSpan>() {
                         new TextSpan(style: new TextStyle(height: 1),
                             text: "Height 1.0 Text:" + text),
-                        new TextSpan(style: new TextStyle(height: 1.2),
+                        new TextSpan(style: new TextStyle(height: 1.2f),
                             text: "Height 1.2 Text:" + text),
-                        new TextSpan(style: new TextStyle(height: 1.5),
+                        new TextSpan(style: new TextStyle(height: 1.5f),
                             text: "Height 1.5 Text:" + text),
                     })), width: 300, height: 300);
         }

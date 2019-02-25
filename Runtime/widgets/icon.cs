@@ -7,7 +7,7 @@ namespace Unity.UIWidgets.widgets {
     public class Icon : StatelessWidget {
         public Icon(IconData icon,
             Key key = null,
-            double? size = null,
+            float? size = null,
             Color color = null
         ) : base(key: key) {
             this.icon = icon;
@@ -17,19 +17,19 @@ namespace Unity.UIWidgets.widgets {
 
         public readonly IconData icon;
 
-        public readonly double? size;
+        public readonly float? size;
 
         public readonly Color color;
 
         public override Widget build(BuildContext context) {
             IconThemeData iconTheme = IconTheme.of(context);
-            double iconSize = this.size ?? iconTheme.size.Value;
+            float iconSize = this.size ?? iconTheme.size.Value;
 
             if (this.icon == null) {
                 return new SizedBox(width: iconSize, height: iconSize);
             }
 
-            double iconOpacity = iconTheme.opacity.Value;
+            float iconOpacity = iconTheme.opacity.Value;
             Color iconColor = this.color ?? iconTheme.color;
             if (iconOpacity != 1.0) {
                 iconColor = iconColor.withOpacity(iconColor.opacity * iconOpacity);

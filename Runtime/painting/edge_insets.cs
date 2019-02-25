@@ -3,17 +3,17 @@ using Unity.UIWidgets.ui;
 
 namespace Unity.UIWidgets.painting {
     public class EdgeInsets : IEquatable<EdgeInsets> {
-        EdgeInsets(double left, double top, double right, double bottom) {
+        EdgeInsets(float left, float top, float right, float bottom) {
             this.left = left;
             this.right = right;
             this.top = top;
             this.bottom = bottom;
         }
 
-        public readonly double left;
-        public readonly double right;
-        public readonly double top;
-        public readonly double bottom;
+        public readonly float left;
+        public readonly float right;
+        public readonly float top;
+        public readonly float bottom;
 
         public bool isNonNegative {
             get {
@@ -24,15 +24,15 @@ namespace Unity.UIWidgets.painting {
             }
         }
 
-        public double horizontal {
+        public float horizontal {
             get { return this.left + this.right; }
         }
 
-        public double vertical {
+        public float vertical {
             get { return this.top + this.bottom; }
         }
 
-        public double along(Axis axis) {
+        public float along(Axis axis) {
             switch (axis) {
                 case Axis.horizontal:
                     return this.horizontal;
@@ -59,23 +59,23 @@ namespace Unity.UIWidgets.painting {
             return new Size(size.width - this.horizontal, size.height - this.vertical);
         }
 
-        public static EdgeInsets fromLTRB(double left, double top, double right, double bottom) {
+        public static EdgeInsets fromLTRB(float left, float top, float right, float bottom) {
             return new EdgeInsets(left, top, right, bottom);
         }
 
-        public static EdgeInsets all(double value) {
+        public static EdgeInsets all(float value) {
             return new EdgeInsets(value, value, value, value);
         }
 
-        public static EdgeInsets only(double left = 0.0, double top = 0.0, double right = 0.0, double bottom = 0.0) {
+        public static EdgeInsets only(float left = 0.0f, float top = 0.0f, float right = 0.0f, float bottom = 0.0f) {
             return new EdgeInsets(left, top, right, bottom);
         }
 
-        public static EdgeInsets symmetric(double vertical = 0.0, double horizontal = 0.0) {
+        public static EdgeInsets symmetric(float vertical = 0.0f, float horizontal = 0.0f) {
             return new EdgeInsets(horizontal, vertical, horizontal, vertical);
         }
 
-        public static EdgeInsets fromWindowPadding(WindowPadding padding, double devicePixelRatio) {
+        public static EdgeInsets fromWindowPadding(WindowPadding padding, float devicePixelRatio) {
             return new EdgeInsets(
                 left: padding.left / devicePixelRatio,
                 top: padding.top / devicePixelRatio,
@@ -159,7 +159,7 @@ namespace Unity.UIWidgets.painting {
             );
         }
 
-        public static EdgeInsets operator *(EdgeInsets a, double b) {
+        public static EdgeInsets operator *(EdgeInsets a, float b) {
             return fromLTRB(
                 a.left * b,
                 a.top * b,
@@ -168,7 +168,7 @@ namespace Unity.UIWidgets.painting {
             );
         }
 
-        public static EdgeInsets operator /(EdgeInsets a, double b) {
+        public static EdgeInsets operator /(EdgeInsets a, float b) {
             return fromLTRB(
                 a.left / b,
                 a.top / b,
@@ -177,7 +177,7 @@ namespace Unity.UIWidgets.painting {
             );
         }
 
-        public static EdgeInsets operator %(EdgeInsets a, double b) {
+        public static EdgeInsets operator %(EdgeInsets a, float b) {
             return fromLTRB(
                 a.left % b,
                 a.top % b,
@@ -186,7 +186,7 @@ namespace Unity.UIWidgets.painting {
             );
         }
 
-        public static EdgeInsets lerp(EdgeInsets a, EdgeInsets b, double t) {
+        public static EdgeInsets lerp(EdgeInsets a, EdgeInsets b, float t) {
             if (a == null && b == null) {
                 return null;
             }
@@ -196,22 +196,22 @@ namespace Unity.UIWidgets.painting {
             }
 
             if (b == null) {
-                return a * (1.0 - t);
+                return a * (1.0f - t);
             }
 
             return fromLTRB(
-                MathUtils.lerpDouble(a.left, b.left, t),
-                MathUtils.lerpDouble(a.top, b.top, t),
-                MathUtils.lerpDouble(a.right, b.right, t),
-                MathUtils.lerpDouble(a.bottom, b.bottom, t)
+                MathUtils.lerpFloat(a.left, b.left, t),
+                MathUtils.lerpFloat(a.top, b.top, t),
+                MathUtils.lerpFloat(a.right, b.right, t),
+                MathUtils.lerpFloat(a.bottom, b.bottom, t)
             );
         }
 
         public EdgeInsets copyWith(
-            double? left = null,
-            double? top = null,
-            double? right = null,
-            double? bottom = null
+            float? left = null,
+            float? top = null,
+            float? right = null,
+            float? bottom = null
         ) {
             return only(
                 left: left ?? this.left,

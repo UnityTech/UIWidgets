@@ -19,11 +19,11 @@ namespace Unity.UIWidgets.painting {
             return only(radius, radius, radius, radius);
         }
 
-        public static BorderRadius all(double radius) {
+        public static BorderRadius all(float radius) {
             return only(radius, radius, radius, radius);
         }
 
-        public static BorderRadius circular(double radius) {
+        public static BorderRadius circular(float radius) {
             return all(Radius.circular(radius));
         }
 
@@ -31,7 +31,7 @@ namespace Unity.UIWidgets.painting {
             return only(top, top, bottom, bottom);
         }
 
-        public static BorderRadius vertical(double? top = null, double? bottom = null) {
+        public static BorderRadius vertical(float? top = null, float? bottom = null) {
             return only(top, top, bottom, bottom);
         }
 
@@ -39,7 +39,7 @@ namespace Unity.UIWidgets.painting {
             return only(left, right, right, left);
         }
 
-        public static BorderRadius horizontal(double? left = null, double? right = null) {
+        public static BorderRadius horizontal(float? left = null, float? right = null) {
             return only(left, right, right, left);
         }
 
@@ -50,8 +50,8 @@ namespace Unity.UIWidgets.painting {
         }
 
         public static BorderRadius only(
-            double? topLeft = null, double? topRight = null,
-            double? bottomRight = null, double? bottomLeft = null) {
+            float? topLeft = null, float? topRight = null,
+            float? bottomRight = null, float? bottomLeft = null) {
             var tlRadius = topLeft != null ? Radius.circular(topLeft.Value) : null;
             var trRadius = topRight != null ? Radius.circular(topRight.Value) : null;
             var brRadius = bottomRight != null ? Radius.circular(bottomRight.Value) : null;
@@ -104,7 +104,7 @@ namespace Unity.UIWidgets.painting {
             );
         }
 
-        public static BorderRadius operator *(BorderRadius it, double other) {
+        public static BorderRadius operator *(BorderRadius it, float other) {
             return only(
                 topLeft: it.topLeft * other,
                 topRight: it.topRight * other,
@@ -113,7 +113,7 @@ namespace Unity.UIWidgets.painting {
             );
         }
 
-        public static BorderRadius operator /(BorderRadius it, double other) {
+        public static BorderRadius operator /(BorderRadius it, float other) {
             return only(
                 topLeft: it.topLeft / other,
                 topRight: it.topRight / other,
@@ -122,7 +122,7 @@ namespace Unity.UIWidgets.painting {
             );
         }
 
-        public static BorderRadius operator %(BorderRadius it, double other) {
+        public static BorderRadius operator %(BorderRadius it, float other) {
             return only(
                 topLeft: it.topLeft % other,
                 topRight: it.topRight % other,
@@ -131,7 +131,7 @@ namespace Unity.UIWidgets.painting {
             );
         }
 
-        public static BorderRadius lerp(BorderRadius a, BorderRadius b, double t) {
+        public static BorderRadius lerp(BorderRadius a, BorderRadius b, float t) {
             if (a == null && b == null) {
                 return null;
             }
@@ -141,7 +141,7 @@ namespace Unity.UIWidgets.painting {
             }
 
             if (b == null) {
-                return a * (1.0 - t);
+                return a * (1.0f - t);
             }
 
             return only(

@@ -32,7 +32,7 @@ namespace Unity.UIWidgets.rendering {
             TextDirection textDirection = TextDirection.ltr,
             bool softWrap = true,
             TextOverflow overflow = TextOverflow.clip,
-            double textScaleFactor = 1.0,
+            float textScaleFactor = 1.0f,
             int? maxLines = null
         ) {
             D.assert(maxLines == null || maxLines > 0);
@@ -119,10 +119,10 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
-        public double textScaleFactor {
+        public float textScaleFactor {
             get { return this._textPainter.textScaleFactor; }
             set {
-                if (Math.Abs(this._textPainter.textScaleFactor - value) < 0.00000001) {
+                if (Mathf.Abs(this._textPainter.textScaleFactor - value) < 0.00000001) {
                     return;
                 }
 
@@ -148,30 +148,30 @@ namespace Unity.UIWidgets.rendering {
             get { return this._textPainter.size; }
         }
 
-        protected override double computeMinIntrinsicWidth(double height) {
+        protected override float computeMinIntrinsicWidth(float height) {
             this._layoutText();
             return this._textPainter.minIntrinsicWidth;
         }
 
-        protected override double computeMaxIntrinsicWidth(double height) {
+        protected override float computeMaxIntrinsicWidth(float height) {
             this._layoutText();
             return this._textPainter.maxIntrinsicWidth;
         }
 
-        double _computeIntrinsicHeight(double width) {
+        float _computeIntrinsicHeight(float width) {
             this._layoutText(minWidth: width, maxWidth: width);
             return this._textPainter.height;
         }
 
-        protected override double computeMinIntrinsicHeight(double width) {
+        protected override float computeMinIntrinsicHeight(float width) {
             return this._computeIntrinsicHeight(width);
         }
 
-        protected override double computeMaxIntrinsicHeight(double width) {
+        protected override float computeMaxIntrinsicHeight(float width) {
             return this._computeIntrinsicHeight(width);
         }
 
-        protected override double? computeDistanceToActualBaseline(TextBaseline baseline) {
+        protected override float? computeDistanceToActualBaseline(TextBaseline baseline) {
             this._layoutTextWithConstraints(this.constraints);
             return this._textPainter.computeDistanceToActualBaseline(baseline);
         }
@@ -207,9 +207,9 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
-        void _layoutText(double minWidth = 0.0, double maxWidth = double.PositiveInfinity) {
+        void _layoutText(float minWidth = 0.0f, float maxWidth = float.PositiveInfinity) {
             var widthMatters = this.softWrap || this.overflow == TextOverflow.ellipsis;
-            this._textPainter.layout(minWidth, widthMatters ? maxWidth : double.PositiveInfinity);
+            this._textPainter.layout(minWidth, widthMatters ? maxWidth : float.PositiveInfinity);
         }
 
         void _layoutTextWithConstraints(BoxConstraints constraints) {
@@ -229,7 +229,7 @@ namespace Unity.UIWidgets.rendering {
             properties.add(new FlagProperty("softWrap", value: this.softWrap, ifTrue: "wrapping at box width",
                 ifFalse: "no wrapping except at line break characters", showName: true));
             properties.add(new EnumProperty<TextOverflow>("overflow", this.overflow));
-            properties.add(new DoubleProperty("textScaleFactor", this.textScaleFactor, defaultValue: 1.0));
+            properties.add(new FloatProperty("textScaleFactor", this.textScaleFactor, defaultValue: 1.0));
             properties.add(new IntProperty("maxLines", this.maxLines, ifNull: "unlimited"));
         }
     }

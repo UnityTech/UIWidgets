@@ -66,8 +66,8 @@ namespace Unity.UIWidgets.widgets {
             Color color = null,
             Decoration decoration = null,
             Decoration forgroundDecoration = null,
-            double? width = null,
-            double? height = null,
+            float? width = null,
+            float? height = null,
             BoxConstraints constraints = null,
             EdgeInsets margin = null,
             Matrix3 transfrom = null,
@@ -124,8 +124,8 @@ namespace Unity.UIWidgets.widgets {
 
             if (this.child == null && (this.constraints == null || !this.constraints.isTight)) {
                 current = new LimitedBox(
-                    maxWidth: 0.0,
-                    maxHeight: 0.0,
+                    maxWidth: 0.0f,
+                    maxHeight: 0.0f,
                     child: new ConstrainedBox(constraints: BoxConstraints.expand())
                 );
             }

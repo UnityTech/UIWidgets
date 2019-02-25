@@ -5,8 +5,7 @@ using Unity.UIWidgets.ui;
 using UnityEngine;
 
 namespace Unity.UIWidgets.service {
-
-    public class TextInputType:IEquatable<TextInputType> {
+    public class TextInputType : IEquatable<TextInputType> {
         public readonly int index;
         public readonly bool? signed;
         public readonly bool? decimalNum;
@@ -20,18 +19,18 @@ namespace Unity.UIWidgets.service {
         public static TextInputType numberWithOptions(bool signed = false, bool decimalNum = false) {
             return new TextInputType(2, signed: signed, decimalNum: decimalNum);
         }
-        
+
         public static readonly TextInputType text = new TextInputType(0);
         public static readonly TextInputType multiline = new TextInputType(1);
-        
+
         public static readonly TextInputType number = numberWithOptions();
-        
+
         public static readonly TextInputType phone = new TextInputType(3);
-        
+
         public static readonly TextInputType datetime = new TextInputType(4);
-        
+
         public static readonly TextInputType emailAddress = new TextInputType(5);
-        
+
         public static readonly TextInputType url = new TextInputType(6);
 
         public static List<string> _names = new List<string> {
@@ -45,7 +44,10 @@ namespace Unity.UIWidgets.service {
                 {"decimal", this.decimalNum}
             };
         }
-        string  _name => $"TextInputType.{_names[this.index]}";
+
+        string _name {
+            get { return $"TextInputType.{_names[this.index]}"; }
+        }
 
         public bool Equals(TextInputType other) {
             if (ReferenceEquals(null, other)) {
@@ -96,7 +98,7 @@ namespace Unity.UIWidgets.service {
             return $"{this.GetType().FullName}(name: {this._name}, signed: {this.signed}, decimal: {this.decimalNum})";
         }
     }
-    
+
     public class TextEditingValue : IEquatable<TextEditingValue> {
         public readonly string text;
         public readonly TextSelection selection;
@@ -172,15 +174,15 @@ namespace Unity.UIWidgets.service {
 
         public TextEditingValue moveExtent(int move) {
             int offset = this.selection.extentOffset + move;
-            offset = Math.Max(0, offset);
-            offset = Math.Min(offset, this.text.Length);
+            offset = Mathf.Max(0, offset);
+            offset = Mathf.Min(offset, this.text.Length);
             return this.copyWith(selection: this.selection.copyWith(extentOffset: offset));
         }
 
         public TextEditingValue moveSelection(int move) {
             int offset = this.selection.baseOffset + move;
-            offset = Math.Max(0, offset);
-            offset = Math.Min(offset, this.text.Length);
+            offset = Mathf.Max(0, offset);
+            offset = Mathf.Min(offset, this.text.Length);
             return this.copyWith(selection: TextSelection.collapsed(offset, affinity: this.selection.affinity));
         }
 
@@ -342,15 +344,14 @@ namespace Unity.UIWidgets.service {
     }
 
     public class TextInputConfiguration {
-
-        public TextInputConfiguration(TextInputType inputType = null, 
+        public TextInputConfiguration(TextInputType inputType = null,
             bool obscureText = false, bool autocorrect = true, TextInputAction inputAction = TextInputAction.done) {
             this.inputType = inputType ?? TextInputType.text;
             this.inputAction = inputAction;
             this.obscureText = obscureText;
             this.autocorrect = autocorrect;
         }
-        
+
         public readonly TextInputType inputType;
         public readonly bool obscureText;
         public readonly bool autocorrect;
@@ -364,7 +365,6 @@ namespace Unity.UIWidgets.service {
                 {"inputAction", this.inputAction.ToString()}
             };
         }
-        
     }
 
     public class TextInputConnection {
@@ -385,7 +385,7 @@ namespace Unity.UIWidgets.service {
             this._textInput.keyboardManager.setEditingState(value);
         }
 
-        public void setCompositionCursorPos(double x, double y) {
+        public void setCompositionCursorPos(float x, float y) {
             D.assert(this.attached);
             this._textInput.setCompositionCursorPos(x, y);
         }
@@ -416,13 +416,13 @@ namespace Unity.UIWidgets.service {
 
     public class TextInput {
         internal TextInputConnection _currentConnection;
-  
+
         public readonly KeyboadManager keyboardManager;
 
         public TextInput() {
             this.keyboardManager = new KeyboadManager(this);
         }
-        
+
         public TextInputConnection attach(TextInputClient client, TextInputConfiguration configuration) {
             D.assert(client != null);
             var connection = new TextInputConnection(client, this);
@@ -431,8 +431,8 @@ namespace Unity.UIWidgets.service {
             return connection;
         }
 
-        public void setCompositionCursorPos(double x, double y) {
-            Input.compositionCursorPos = new Vector2((float) x, (float) y);
+        public void setCompositionCursorPos(float x, float y) {
+            Input.compositionCursorPos = new Vector2(x, y);
         }
 
         internal void _updateEditingState(int client, TextEditingValue value) {
@@ -458,20 +458,21 @@ namespace Unity.UIWidgets.service {
 
             this._currentConnection._client.performAction(action);
         }
-        
-        
+
+
         bool _hidePending = false;
+
         internal void _scheduleHide() {
             if (this._hidePending) {
                 return;
             }
+
             this._hidePending = true;
-            
+
             Window.instance.scheduleMicrotask(() => {
                 this._hidePending = false;
                 if (this._currentConnection == null) {
                     this.keyboardManager.hide();
-
                 }
             });
         }

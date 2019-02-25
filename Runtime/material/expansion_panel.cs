@@ -277,7 +277,7 @@ namespace Unity.UIWidgets.material {
                             margin: EdgeInsets.fromLTRB(0, 0, 8, 0),
                             child: new ExpandIcon(
                                 isExpanded: this._isChildExpanded(index),
-                                padding: EdgeInsets.all(16.0),
+                                padding: EdgeInsets.all(16.0f),
                                 onPressed: (bool isExpanded) => this._handlePressed(isExpanded, expandIndex)
                             )
                         )
@@ -290,10 +290,10 @@ namespace Unity.UIWidgets.material {
                             children: new List<Widget> {
                                 header,
                                 new AnimatedCrossFade(
-                                    firstChild: new Container(height: 0.0),
+                                    firstChild: new Container(height: 0.0f),
                                     secondChild: child.body,
-                                    firstCurve: new Interval(0.0, 0.6, curve: Curves.fastOutSlowIn),
-                                    secondCurve: new Interval(0.4, 1.0, curve: Curves.fastOutSlowIn),
+                                    firstCurve: new Interval(0.0f, 0.6f, curve: Curves.fastOutSlowIn),
+                                    secondCurve: new Interval(0.4f, 1.0f, curve: Curves.fastOutSlowIn),
                                     sizeCurve: Curves.fastOutSlowIn,
                                     crossFadeState: this._isChildExpanded(index)
                                         ? CrossFadeState.showSecond

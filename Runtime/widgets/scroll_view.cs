@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
+using UnityEngine;
 
 namespace Unity.UIWidgets.widgets {
     public abstract class ScrollView : StatelessWidget {
@@ -14,7 +15,7 @@ namespace Unity.UIWidgets.widgets {
             bool? primary = null,
             ScrollPhysics physics = null,
             bool shrinkWrap = false,
-            double? cacheExtent = null
+            float? cacheExtent = null
         ) : base(key: key) {
             D.assert(!(controller != null && primary == true),
                 "Primary ScrollViews obtain their ScrollController via inheritance from a PrimaryScrollController widget. " +
@@ -38,7 +39,7 @@ namespace Unity.UIWidgets.widgets {
         public readonly bool primary;
         public readonly ScrollPhysics physics;
         public readonly bool shrinkWrap;
-        public readonly double? cacheExtent;
+        public readonly float? cacheExtent;
 
         protected AxisDirection getDirection(BuildContext context) {
             return LayoutUtils.getAxisDirectionFromAxisReverseAndDirectionality(
@@ -111,7 +112,7 @@ namespace Unity.UIWidgets.widgets {
             bool? primary = null,
             ScrollPhysics physics = null,
             bool shrinkWrap = false,
-            double? cacheExtent = null,
+            float? cacheExtent = null,
             List<Widget> slivers = null
         ) : base(
             key: key,
@@ -143,7 +144,7 @@ namespace Unity.UIWidgets.widgets {
             ScrollPhysics physics = null,
             bool shrinkWrap = false,
             EdgeInsets padding = null,
-            double? cacheExtent = null
+            float? cacheExtent = null
         ) : base(
             key: key,
             scrollDirection: scrollDirection,
@@ -189,10 +190,10 @@ namespace Unity.UIWidgets.widgets {
             ScrollPhysics physics = null,
             bool shrinkWrap = false,
             EdgeInsets padding = null,
-            double? itemExtent = null,
+            float? itemExtent = null,
             bool addAutomaticKeepAlives = true,
             bool addRepaintBoundaries = true,
-            double? cacheExtent = null,
+            float? cacheExtent = null,
             List<Widget> children = null
         ) : base(
             key: key,
@@ -222,12 +223,12 @@ namespace Unity.UIWidgets.widgets {
             ScrollPhysics physics = null,
             bool shrinkWrap = false,
             EdgeInsets padding = null,
-            double? itemExtent = null,
+            float? itemExtent = null,
             IndexedWidgetBuilder itemBuilder = null,
             int? itemCount = null,
             bool addAutomaticKeepAlives = true,
             bool addRepaintBoundaries = true,
-            double? cacheExtent = null
+            float? cacheExtent = null
         ) : base(key: key,
             scrollDirection: scrollDirection,
             reverse: reverse,
@@ -256,12 +257,12 @@ namespace Unity.UIWidgets.widgets {
             ScrollPhysics physics = null,
             bool shrinkWrap = false,
             EdgeInsets padding = null,
-            double? itemExtent = null,
+            float? itemExtent = null,
             IndexedWidgetBuilder itemBuilder = null,
             int? itemCount = null,
             bool addAutomaticKeepAlives = true,
             bool addRepaintBoundaries = true,
-            double? cacheExtent = null
+            float? cacheExtent = null
         ) {
             return new ListView(
                 key,
@@ -295,7 +296,7 @@ namespace Unity.UIWidgets.widgets {
             int itemCount = 0,
             bool addAutomaticKeepAlives = true,
             bool addRepaintBoundaries = true,
-            double? cacheExtent = null
+            float? cacheExtent = null
         ) : base(
             key: key,
             scrollDirection: scrollDirection,
@@ -318,7 +319,7 @@ namespace Unity.UIWidgets.widgets {
                         ? itemBuilder(context, itemIndex)
                         : separatorBuilder(context, itemIndex);
                 },
-                childCount: Math.Max(0, itemCount * 2 - 1),
+                childCount: Mathf.Max(0, itemCount * 2 - 1),
                 addAutomaticKeepAlives: addAutomaticKeepAlives,
                 addRepaintBoundaries: addRepaintBoundaries
             );
@@ -338,7 +339,7 @@ namespace Unity.UIWidgets.widgets {
             int itemCount = 0,
             bool addAutomaticKeepAlives = true,
             bool addRepaintBoundaries = true,
-            double? cacheExtent = null
+            float? cacheExtent = null
         ) {
             return new ListView(
                 key,
@@ -367,9 +368,9 @@ namespace Unity.UIWidgets.widgets {
             ScrollPhysics physics = null,
             bool shrinkWrap = false,
             EdgeInsets padding = null,
-            double? itemExtent = null,
+            float? itemExtent = null,
             SliverChildDelegate childrenDelegate = null,
-            double? cacheExtent = null
+            float? cacheExtent = null
         ) : base(
             key: key,
             scrollDirection: scrollDirection,
@@ -395,9 +396,9 @@ namespace Unity.UIWidgets.widgets {
             ScrollPhysics physics = null,
             bool shrinkWrap = false,
             EdgeInsets padding = null,
-            double? itemExtent = null,
+            float? itemExtent = null,
             SliverChildDelegate childrenDelegate = null,
-            double? cacheExtent = null
+            float? cacheExtent = null
         ) {
             return new ListView(
                 key,
@@ -413,7 +414,7 @@ namespace Unity.UIWidgets.widgets {
                 cacheExtent);
         }
 
-        public readonly double? itemExtent;
+        public readonly float? itemExtent;
 
         public readonly SliverChildDelegate childrenDelegate;
 
@@ -430,7 +431,7 @@ namespace Unity.UIWidgets.widgets {
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
-            properties.add(new DoubleProperty("itemExtent", this.itemExtent,
+            properties.add(new FloatProperty("itemExtent", this.itemExtent,
                 defaultValue: Diagnostics.kNullDefaultValue));
         }
     }

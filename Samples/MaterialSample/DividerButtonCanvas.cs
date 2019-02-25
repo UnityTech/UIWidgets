@@ -1,14 +1,11 @@
 ﻿using System.Collections.Generic;
-using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.engine;
-using Unity.UIWidgets.widgets;
-using Unity.UIWidgets.gestures;
-using Unity.UIWidgets.painting;
+using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.material;
+using Unity.UIWidgets.painting;
 using Unity.UIWidgets.ui;
-using Color = Unity.UIWidgets.ui.Color;
+using Unity.UIWidgets.widgets;
 using TextStyle = Unity.UIWidgets.painting.TextStyle;
-
 
 namespace UIWidgetsSample {
     public class DividerButtonCanvas : WidgetCanvas {
@@ -18,8 +15,8 @@ namespace UIWidgetsSample {
 
         public class DemoApp : StatefulWidget {
             public DemoApp(Key key = null) : base(key) {
-
             }
+
             public override State createState() {
                 return new _DemoAppState();
             }
@@ -29,6 +26,7 @@ namespace UIWidgetsSample {
             string title = "Hello";
             string subtitle = "World";
             TextEditingController controller = new TextEditingController("");
+
             public override Widget build(BuildContext context) {
                 return new Container(
                     height: 200,
@@ -41,20 +39,20 @@ namespace UIWidgetsSample {
                     child: new Center(
                         child: new Column(
                             children: new List<Widget>() {
-                                new Text(title),
+                                new Text(this.title),
                                 new Divider(),
-                                new Text(subtitle),
+                                new Text(this.subtitle),
                                 new Divider(),
                                 new Container(
                                     width: 500,
                                     decoration: new BoxDecoration(border: Border.all(new Color(0xFF00FF00), 1)),
                                     child: new EditableText(
-                                        controller: controller,
+                                        controller: this.controller,
                                         focusNode: new FocusNode(),
                                         style: new TextStyle(
-                                                fontSize: 18,
-                                                height: 1.5f,
-                                                color: new Color(0xFFFF89FD)),
+                                            fontSize: 18,
+                                            height: 1.5f,
+                                            color: new Color(0xFFFF89FD)),
                                         cursorColor: Color.fromARGB(255, 0, 0, 0)
                                     )
                                 ),
@@ -63,22 +61,18 @@ namespace UIWidgetsSample {
                                     children: new List<Widget> {
                                         new FlatButton(
                                             onPressed: () => {
-                                                setState(() => {
-                                                    title = controller.text;
-                                                });
+                                                this.setState(() => { this.title = this.controller.text; });
                                             },
-                                            padding: EdgeInsets.all(5.0),
+                                            padding: EdgeInsets.all(5.0f),
                                             child: new Center(
                                                 child: new Text("Set Title")
                                             )
                                         ),
                                         new RaisedButton(
                                             onPressed: () => {
-                                                setState(() => {
-                                                    subtitle = controller.text;
-                                                });
+                                                this.setState(() => { this.subtitle = this.controller.text; });
                                             },
-                                            padding: EdgeInsets.all(5.0),
+                                            padding: EdgeInsets.all(5.0f),
                                             child: new Center(
                                                 child: new Text("Set Subtitle")
                                             )

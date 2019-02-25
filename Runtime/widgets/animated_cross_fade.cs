@@ -67,9 +67,9 @@ namespace Unity.UIWidgets.widgets {
                 children: new List<Widget> {
                     new Positioned(
                         key: bottomChildKey,
-                        left: 0.0,
-                        top: 0.0,
-                        right: 0.0,
+                        left: 0.0f,
+                        top: 0.0f,
+                        right: 0.0f,
                         child: bottomChild),
                     new Positioned(
                         key: topChildKey,
@@ -93,15 +93,15 @@ namespace Unity.UIWidgets.widgets {
 
     public class _AnimatedCrossFadeState : TickerProviderStateMixin<AnimatedCrossFade> {
         AnimationController _controller;
-        Animation<double> _firstAnimation;
-        Animation<double> _secondAnimation;
+        Animation<float> _firstAnimation;
+        Animation<float> _secondAnimation;
 
 
         public override void initState() {
             base.initState();
             this._controller = new AnimationController(duration: this.widget.duration, vsync: this);
             if (this.widget.crossFadeState == CrossFadeState.showSecond) {
-                this._controller.setValue(1.0);
+                this._controller.setValue(1.0f);
             }
 
             this._firstAnimation = this._initAnimation(this.widget.firstCurve, true);
@@ -109,10 +109,10 @@ namespace Unity.UIWidgets.widgets {
             this._controller.addStatusListener((AnimationStatus status) => { this.setState(() => { }); });
         }
 
-        Animation<double> _initAnimation(Curve curve, bool inverted) {
-            Animation<double> result = this._controller.drive(new CurveTween(curve: curve));
+        Animation<float> _initAnimation(Curve curve, bool inverted) {
+            Animation<float> result = this._controller.drive(new CurveTween(curve: curve));
             if (inverted) {
-                result = result.drive(new DoubleTween(begin: 1.0, end: 0.0));
+                result = result.drive(new FloatTween(begin: 1.0f, end: 0.0f));
             }
 
             return result;
@@ -165,10 +165,10 @@ namespace Unity.UIWidgets.widgets {
 
             Key topKey;
             Widget topChild;
-            Animation<double> topAnimation;
+            Animation<float> topAnimation;
             Key bottomKey;
             Widget bottomChild;
-            Animation<double> bottomAnimation;
+            Animation<float> bottomAnimation;
             if (transitioningForwards) {
                 topKey = kSecondChildKey;
                 topChild = this.widget.secondChild;

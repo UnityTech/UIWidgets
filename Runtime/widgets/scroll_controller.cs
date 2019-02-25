@@ -9,7 +9,7 @@ using Unity.UIWidgets.ui;
 namespace Unity.UIWidgets.widgets {
     public class ScrollController : ChangeNotifier {
         public ScrollController(
-            double initialScrollOffset = 0.0,
+            float initialScrollOffset = 0.0f,
             bool keepScrollOffset = true,
             string debugLabel = null
         ) {
@@ -18,11 +18,11 @@ namespace Unity.UIWidgets.widgets {
             this.debugLabel = debugLabel;
         }
 
-        public virtual double initialScrollOffset {
+        public virtual float initialScrollOffset {
             get { return this._initialScrollOffset; }
         }
 
-        readonly double _initialScrollOffset;
+        readonly float _initialScrollOffset;
 
         public readonly bool keepScrollOffset;
 
@@ -46,12 +46,12 @@ namespace Unity.UIWidgets.widgets {
             }
         }
 
-        public double offset {
+        public float offset {
             get { return this.position.pixels; }
         }
 
 
-        public IPromise animateTo(double to,
+        public IPromise animateTo(float to,
             TimeSpan duration,
             Curve curve
         ) {
@@ -64,7 +64,7 @@ namespace Unity.UIWidgets.widgets {
             return Promise.All(animations);
         }
 
-        public void jumpTo(double value) {
+        public void jumpTo(float value) {
             D.assert(this._positions.isNotEmpty(), "ScrollController not attached to any scroll views.");
             foreach (ScrollPosition position in new List<ScrollPosition>(this._positions)) {
                 position.jumpTo(value);
@@ -135,7 +135,7 @@ namespace Unity.UIWidgets.widgets {
 
     public class TrackingScrollController : ScrollController {
         public TrackingScrollController(
-            double initialScrollOffset = 0.0,
+            float initialScrollOffset = 0.0f,
             bool keepScrollOffset = true,
             string debugLabel = null
         ) : base(initialScrollOffset: initialScrollOffset,
@@ -147,13 +147,13 @@ namespace Unity.UIWidgets.widgets {
             new Dictionary<ScrollPosition, VoidCallback>();
 
         ScrollPosition _lastUpdated;
-        double? _lastUpdatedOffset;
+        float? _lastUpdatedOffset;
 
         public ScrollPosition mostRecentlyUpdatedPosition {
             get { return this._lastUpdated; }
         }
 
-        public override double initialScrollOffset {
+        public override float initialScrollOffset {
             get { return this._lastUpdatedOffset ?? base.initialScrollOffset; }
         }
 

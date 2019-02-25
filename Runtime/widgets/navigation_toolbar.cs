@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
+using UnityEngine;
 
 namespace Unity.UIWidgets.widgets {
     public class NavigationToolbar : StatelessWidget {
         public NavigationToolbar(Key key = null, Widget leading = null, Widget middle = null,
-            Widget trailing = null, bool centerMiddle = true, double middleSpacing = kMiddleSpacing) : base(key) {
+            Widget trailing = null, bool centerMiddle = true, float middleSpacing = kMiddleSpacing) : base(key) {
             this.leading = leading;
             this.middle = middle;
             this.trailing = trailing;
@@ -15,13 +16,13 @@ namespace Unity.UIWidgets.widgets {
             this.middleSpacing = middleSpacing;
         }
 
-        public const double kMiddleSpacing = 16.0;
+        public const float kMiddleSpacing = 16.0f;
 
         public readonly Widget leading;
         public readonly Widget middle;
         public readonly Widget trailing;
         public readonly bool centerMiddle;
-        public readonly double middleSpacing;
+        public readonly float middleSpacing;
 
         public override Widget build(BuildContext context) {
             D.assert(WidgetsD.debugCheckHasDirectionality(context));
@@ -60,78 +61,78 @@ namespace Unity.UIWidgets.widgets {
     class _ToolbarLayout : MultiChildLayoutDelegate {
         public _ToolbarLayout(
             bool? centerMiddle = true,
-            double? middleSpacing = null,
+            float? middleSpacing = null,
             TextDirection? textDirection = null
         ) {
             D.assert(textDirection != null);
             D.assert(middleSpacing != null);
             this.centerMiddle = centerMiddle ?? true;
-            this.middleSpacing = middleSpacing ?? 0.0;
+            this.middleSpacing = middleSpacing ?? 0.0f;
             this.textDirection = textDirection ?? TextDirection.ltr;
         }
 
 
         public readonly bool centerMiddle;
 
-        public readonly double middleSpacing;
+        public readonly float middleSpacing;
 
         public readonly TextDirection textDirection;
 
         public override void performLayout(Size size) {
-            double leadingWidth = 0.0;
-            double trailingWidth = 0.0;
+            float leadingWidth = 0.0f;
+            float trailingWidth = 0.0f;
 
             if (this.hasChild(_ToolbarSlot.leading)) {
                 BoxConstraints constraints = new BoxConstraints(
-                    minWidth: 0.0,
-                    maxWidth: size.width / 3.0,
+                    minWidth: 0.0f,
+                    maxWidth: size.width / 3.0f,
                     minHeight: size.height,
                     maxHeight: size.height
                 );
                 leadingWidth = this.layoutChild(_ToolbarSlot.leading, constraints).width;
-                double leadingX = 0.0;
+                float leadingX = 0.0f;
                 switch (this.textDirection) {
                     case TextDirection.rtl:
                         leadingX = size.width - leadingWidth;
                         break;
                     case TextDirection.ltr:
-                        leadingX = 0.0;
+                        leadingX = 0.0f;
                         break;
                 }
 
-                this.positionChild(_ToolbarSlot.leading, new Offset(leadingX, 0.0));
+                this.positionChild(_ToolbarSlot.leading, new Offset(leadingX, 0.0f));
             }
 
             if (this.hasChild(_ToolbarSlot.trailing)) {
                 BoxConstraints constraints = BoxConstraints.loose(size);
                 Size trailingSize = this.layoutChild(_ToolbarSlot.trailing, constraints);
-                double trailingX = 0.0;
+                float trailingX = 0.0f;
                 switch (this.textDirection) {
                     case TextDirection.rtl:
-                        trailingX = 0.0;
+                        trailingX = 0.0f;
                         break;
                     case TextDirection.ltr:
                         trailingX = size.width - trailingSize.width;
                         break;
                 }
 
-                double trailingY = (size.height - trailingSize.height) / 2.0;
+                float trailingY = (size.height - trailingSize.height) / 2.0f;
                 trailingWidth = trailingSize.width;
                 this.positionChild(_ToolbarSlot.trailing, new Offset(trailingX, trailingY));
             }
 
             if (this.hasChild(_ToolbarSlot.middle)) {
-                double maxWidth = Math.Max(size.width - leadingWidth - trailingWidth - this.middleSpacing * 2.0, 0.0);
+                float maxWidth = Mathf.Max(size.width - leadingWidth - trailingWidth - this.middleSpacing * 2.0f, 0.0f);
                 BoxConstraints constraints = BoxConstraints.loose(size).copyWith(maxWidth: maxWidth);
                 Size middleSize = this.layoutChild(_ToolbarSlot.middle, constraints);
 
-                double middleStartMargin = leadingWidth + this.middleSpacing;
-                double middleStart = middleStartMargin;
-                double middleY = (size.height - middleSize.height) / 2.0;
+                float middleStartMargin = leadingWidth + this.middleSpacing;
+                float middleStart = middleStartMargin;
+                float middleY = (size.height - middleSize.height) / 2.0f;
                 // If the centered middle will not fit between the leading and trailing
                 // widgets, then align its left or right edge with the adjacent boundary.
                 if (this.centerMiddle) {
-                    middleStart = (size.width - middleSize.width) / 2.0;
+                    middleStart = (size.width - middleSize.width) / 2.0f;
                     if (middleStart + middleSize.width > size.width - trailingWidth) {
                         middleStart = size.width - trailingWidth - middleSize.width;
                     }
@@ -140,7 +141,7 @@ namespace Unity.UIWidgets.widgets {
                     }
                 }
 
-                double middleX = 0.0;
+                float middleX = 0.0f;
                 switch (this.textDirection) {
                     case TextDirection.rtl:
                         middleX = size.width - middleSize.width - middleStart;

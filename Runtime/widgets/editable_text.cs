@@ -71,7 +71,7 @@ namespace Unity.UIWidgets.widgets {
 
         public readonly TextDirection? textDirection;
 
-        public readonly double? textScaleFactor;
+        public readonly float? textScaleFactor;
 
         public readonly Color cursorColor;
 
@@ -100,7 +100,7 @@ namespace Unity.UIWidgets.widgets {
         public EditableText(TextEditingController controller, FocusNode focusNode, TextStyle style,
             Color cursorColor, bool obscureText = false, bool autocorrect = false,
             TextAlign textAlign = TextAlign.left, TextDirection? textDirection = null,
-            double? textScaleFactor = null, int? maxLines = 1,
+            float? textScaleFactor = null, int? maxLines = 1,
             bool autofocus = false, Color selectionColor = null, TextSelectionControls selectionControls = null,
             TextInputType keyboardType = null, TextInputAction? textInputAction = null,
             ValueChanged<string> onChanged = null, VoidCallback onEditingComplete = null,
@@ -114,7 +114,8 @@ namespace Unity.UIWidgets.widgets {
             D.assert(cursorColor != null);
             D.assert(maxLines == null || maxLines > 0);
             this.keyboardType = keyboardType ?? (maxLines == 1 ? TextInputType.text : TextInputType.multiline);
-            this.scrollPadding = scrollPadding ?? EdgeInsets.all(20.0);
+
+            this.scrollPadding = scrollPadding ?? EdgeInsets.all(20.0f);
             this.controller = controller;
             this.focusNode = focusNode;
             this.obscureText = obscureText;
@@ -166,11 +167,12 @@ namespace Unity.UIWidgets.widgets {
                 defaultValue: Diagnostics.kNullDefaultValue));
             properties.add(new EnumProperty<TextDirection?>("textDirection", this.textDirection,
                 defaultValue: Diagnostics.kNullDefaultValue));
-            properties.add(new DiagnosticsProperty<double?>("textScaleFactor", this.textScaleFactor,
+            properties.add(new DiagnosticsProperty<float?>("textScaleFactor", this.textScaleFactor,
                 defaultValue: Diagnostics.kNullDefaultValue));
             properties.add(new DiagnosticsProperty<int?>("maxLines", this.maxLines, defaultValue: 1));
             properties.add(new DiagnosticsProperty<bool>("autofocus", this.autofocus, defaultValue: false));
-            properties.add(new DiagnosticsProperty<TextInputType>("keyboardType", this.keyboardType, defaultValue: null));
+            properties.add(
+                new DiagnosticsProperty<TextInputType>("keyboardType", this.keyboardType, defaultValue: null));
         }
     }
 
@@ -454,11 +456,11 @@ namespace Unity.UIWidgets.widgets {
 
 
         // Calculate the new scroll offset so the cursor remains visible.
-        double _getScrollOffsetForCaret(Rect caretRect) {
-            double caretStart = this._isMultiline ? caretRect.top : caretRect.left;
-            double caretEnd = this._isMultiline ? caretRect.bottom : caretRect.right;
-            double scrollOffset = this._scrollController.offset;
-            double viewportExtent = this._scrollController.position.viewportDimension;
+        float _getScrollOffsetForCaret(Rect caretRect) {
+            float caretStart = this._isMultiline ? caretRect.top : caretRect.left;
+            float caretEnd = this._isMultiline ? caretRect.bottom : caretRect.right;
+            float scrollOffset = this._scrollController.offset;
+            float viewportExtent = this._scrollController.position.viewportDimension;
             if (caretStart < 0.0) {
                 scrollOffset += caretStart;
             }
@@ -470,9 +472,9 @@ namespace Unity.UIWidgets.widgets {
         }
 
         // Calculates where the `caretRect` would be if `_scrollController.offset` is set to `scrollOffset`.
-        Rect _getCaretRectAtScrollOffset(Rect caretRect, double scrollOffset) {
-            double offsetDiff = this._scrollController.offset - scrollOffset;
-            return this._isMultiline ? caretRect.translate(0.0, offsetDiff) : caretRect.translate(offsetDiff, 0.0);
+        Rect _getCaretRectAtScrollOffset(Rect caretRect, float scrollOffset) {
+            float offsetDiff = this._scrollController.offset - scrollOffset;
+            return this._isMultiline ? caretRect.translate(0.0f, offsetDiff) : caretRect.translate(offsetDiff, 0.0f);
         }
 
         bool _hasInputConnection {
@@ -488,11 +490,13 @@ namespace Unity.UIWidgets.widgets {
                     inputType: this.widget.keyboardType,
                     obscureText: this.widget.obscureText,
                     autocorrect: this.widget.autocorrect,
-                    inputAction: this.widget.textInputAction ?? ((this.widget.keyboardType == TextInputType.multiline) ? 
-                                     TextInputAction.newline: TextInputAction.done)
-                    ));
+                    inputAction: this.widget.textInputAction ?? ((this.widget.keyboardType == TextInputType.multiline)
+                                     ? TextInputAction.newline
+                                     : TextInputAction.done)
+                ));
                 this._textInputConnection.setEditingState(localValue);
             }
+
             this._textInputConnection.show();
         }
 
@@ -602,7 +606,7 @@ namespace Unity.UIWidgets.widgets {
                     return;
                 }
 
-                double scrollOffsetForCaret = this._getScrollOffsetForCaret(this._currentCaretRect);
+                float scrollOffsetForCaret = this._getScrollOffsetForCaret(this._currentCaretRect);
                 this._scrollController.animateTo(scrollOffsetForCaret,
                     duration: _caretAnimationDuration,
                     curve: _caretAnimationCurve);
@@ -674,7 +678,7 @@ namespace Unity.UIWidgets.widgets {
         }
 
         void _startOrStopCursorTimerIfNeeded() {
-            if (this._cursorTimer == null && this._hasFocus && this._value.selection.isCollapsed && 
+            if (this._cursorTimer == null && this._hasFocus && this._value.selection.isCollapsed &&
                 !Window.instance.textInput.keyboardManager.textInputOnKeyboard()) {
                 this._startCursorTimer();
             }
@@ -823,7 +827,7 @@ namespace Unity.UIWidgets.widgets {
         public readonly bool hasFocus;
         public readonly int? maxLines;
         public readonly Color selectionColor;
-        public readonly double textScaleFactor;
+        public readonly float textScaleFactor;
         public readonly TextAlign textAlign;
         public readonly TextDirection? textDirection;
         public readonly bool obscureText;
@@ -836,7 +840,7 @@ namespace Unity.UIWidgets.widgets {
 
         public _Editable(TextSpan textSpan = null, TextEditingValue value = null,
             Color cursorColor = null, ValueNotifier<bool> showCursor = null, bool hasFocus = false,
-            int? maxLines = null, Color selectionColor = null, double textScaleFactor = 1.0,
+            int? maxLines = null, Color selectionColor = null, float textScaleFactor = 1.0f,
             TextDirection? textDirection = null, bool obscureText = false, TextAlign textAlign = TextAlign.left,
             bool autocorrect = false, ViewportOffset offset = null, SelectionChangedHandler onSelectionChanged = null,
             CaretChangedHandler onCaretChanged = null, bool rendererIgnoresPointer = false,

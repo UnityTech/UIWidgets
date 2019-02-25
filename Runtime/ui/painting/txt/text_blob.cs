@@ -1,9 +1,4 @@
-﻿using System.Collections.Generic;
-using Unity.UIWidgets.foundation;
-
-namespace Unity.UIWidgets.ui {
-
-    
+﻿namespace Unity.UIWidgets.ui {
     public class TextBlob {
         public TextBlob(string text, int textOffset, int textSize, Vector2d[] positions, Rect bounds, TextStyle style) {
             this.instanceId = ++_nextInstanceId;
@@ -38,7 +33,6 @@ namespace Unity.UIWidgets.ui {
         Rect _bounds;
 
         public void allocRunPos(TextStyle style, string text, int offset, int size) {
-            
             this._style = style;
             this._text = text;
             this._textOffset = offset;
@@ -51,7 +45,7 @@ namespace Unity.UIWidgets.ui {
         public void setBounds(Rect bounds) {
             this._bounds = bounds;
         }
-        
+
         public TextBlob make() {
             var result = new TextBlob(this._text, this._textOffset,
                 this._size, this.positions, this._bounds, this._style);

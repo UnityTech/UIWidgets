@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
-using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
 
@@ -15,10 +14,10 @@ namespace Unity.UIWidgets.async {
             this.cancel();
         }
 
-        public static double timeSinceStartup {
+        public static float timeSinceStartup {
             get {
 #if UNITY_EDITOR
-                return EditorApplication.timeSinceStartup;
+                return (float) EditorApplication.timeSinceStartup;
 #else
                 return Time.realtimeSinceStartup;
 #endif
@@ -56,7 +55,7 @@ namespace Unity.UIWidgets.async {
                     callback();
                 }
                 catch (Exception ex) {
-                    Debug.LogError("Error to execute runInMain callback: " + ex);
+                    D.logError("Error to execute runInMain callback: ", ex);
                 }
             }
         }
@@ -143,7 +142,7 @@ namespace Unity.UIWidgets.async {
         }
 
         class TimerImpl : Timer, IComparable<TimerImpl> {
-            double _deadline;
+            float _deadline;
             readonly Action _callback;
             bool _done;
 
@@ -151,7 +150,7 @@ namespace Unity.UIWidgets.async {
             readonly TimeSpan _interval;
 
             public TimerImpl(TimeSpan duration, Action callback, bool periodic = false) {
-                this._deadline = timeSinceStartup + duration.TotalSeconds;
+                this._deadline = timeSinceStartup + (float) duration.TotalSeconds;
                 this._callback = callback;
                 this._done = false;
 
@@ -167,7 +166,7 @@ namespace Unity.UIWidgets.async {
                 this._done = false;
             }
 
-            public double deadline {
+            public float deadline {
                 get { return this._deadline; }
             }
 
@@ -193,11 +192,11 @@ namespace Unity.UIWidgets.async {
                     this._callback();
                 }
                 catch (Exception ex) {
-                    Debug.LogError("Error to execute timer callback: " + ex);
+                    D.logError("Error to execute timer callback: ", ex);
                 }
 
                 if (this.periodic) {
-                    this._deadline = now + this._interval.TotalSeconds;
+                    this._deadline = now + (float) this._interval.TotalSeconds;
                 }
             }
 

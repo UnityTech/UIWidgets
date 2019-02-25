@@ -16,9 +16,9 @@ namespace Unity.UIWidgets.material {
             Color fillColor = null,
             Color highlightColor = null,
             Color splashColor = null,
-            double elevation = 2.0,
-            double highlightElevation = 8.0,
-            double disabledElevation = 0.0,
+            float elevation = 2.0f,
+            float highlightElevation = 8.0f,
+            float disabledElevation = 0.0f,
             EdgeInsets padding = null,
             BoxConstraints constraints = null,
             ShapeBorder shape = null,
@@ -29,7 +29,7 @@ namespace Unity.UIWidgets.material {
             MaterialTapTargetSize _materialTapTargetSize = materialTapTargetSize ?? MaterialTapTargetSize.padded;
             shape = shape ?? new RoundedRectangleBorder();
             padding = padding ?? EdgeInsets.zero;
-            constraints = constraints ?? new BoxConstraints(minWidth: 88.0, minHeight: 36.0);
+            constraints = constraints ?? new BoxConstraints(minWidth: 88.0f, minHeight: 36.0f);
             TimeSpan _animationDuration = animationDuration ?? Constants.kThemeChangeDuration;
 
             this.onPressed = onPressed;
@@ -62,11 +62,11 @@ namespace Unity.UIWidgets.material {
 
         public readonly Color splashColor;
 
-        public readonly double elevation;
+        public readonly float elevation;
 
-        public readonly double highlightElevation;
+        public readonly float highlightElevation;
 
-        public readonly double disabledElevation;
+        public readonly float disabledElevation;
 
         public readonly EdgeInsets padding;
 
@@ -105,7 +105,7 @@ namespace Unity.UIWidgets.material {
         }
 
         public override Widget build(BuildContext context) {
-            double elevation = this.widget.enabled
+            float elevation = this.widget.enabled
                 ? (this._highlight ? this.widget.highlightElevation : this.widget.elevation)
                 : this.widget.disabledElevation;
 
@@ -134,8 +134,8 @@ namespace Unity.UIWidgets.material {
                             child: new Container(
                                 padding: this.widget.padding,
                                 child: new Center(
-                                    widthFactor: 1.0,
-                                    heightFactor: 1.0,
+                                    widthFactor: 1.0f,
+                                    heightFactor: 1.0f,
                                     child: this.widget.child)
                             )
                         )

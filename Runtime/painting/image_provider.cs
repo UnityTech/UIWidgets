@@ -13,7 +13,7 @@ namespace Unity.UIWidgets.painting {
     public class ImageConfiguration : IEquatable<ImageConfiguration> {
         public ImageConfiguration(
             AssetBundle bundle = null,
-            double? devicePixelRatio = null,
+            float? devicePixelRatio = null,
             Locale locale = null,
             Size size = null,
             RuntimePlatform? platform = null
@@ -27,7 +27,7 @@ namespace Unity.UIWidgets.painting {
 
         public ImageConfiguration copyWith(
             AssetBundle bundle = null,
-            double? devicePixelRatio = null,
+            float? devicePixelRatio = null,
             Locale locale = null,
             Size size = null,
             RuntimePlatform? platform = null
@@ -43,7 +43,7 @@ namespace Unity.UIWidgets.painting {
 
         public readonly AssetBundle bundle;
 
-        public readonly double? devicePixelRatio;
+        public readonly float? devicePixelRatio;
 
         public readonly Locale locale;
 
@@ -205,7 +205,7 @@ namespace Unity.UIWidgets.painting {
         public AssetBundleImageKey(
             AssetBundle bundle,
             string name,
-            double scale
+            float scale
         ) {
             D.assert(name != null);
             D.assert(scale >= 0.0);
@@ -219,7 +219,7 @@ namespace Unity.UIWidgets.painting {
 
         public readonly string name;
 
-        public readonly double scale;
+        public readonly float scale;
 
         public bool Equals(AssetBundleImageKey other) {
             if (ReferenceEquals(null, other)) {
@@ -334,7 +334,7 @@ namespace Unity.UIWidgets.painting {
 
     public class NetworkImage : ImageProvider<NetworkImage>, IEquatable<NetworkImage> {
         public NetworkImage(string url,
-            double scale = 1.0,
+            float scale = 1.0f,
             IDictionary<string, string> headers = null) {
             D.assert(url != null);
             this.url = url;
@@ -344,7 +344,7 @@ namespace Unity.UIWidgets.painting {
 
         public readonly string url;
 
-        public readonly double scale;
+        public readonly float scale;
 
         public readonly IDictionary<string, string> headers;
 
@@ -465,7 +465,7 @@ namespace Unity.UIWidgets.painting {
     }
 
     public class FileImage : ImageProvider<FileImage>, IEquatable<FileImage> {
-        public FileImage(string file, double scale = 1.0) {
+        public FileImage(string file, float scale = 1.0f) {
             D.assert(file != null);
             this.file = file;
             this.scale = scale;
@@ -473,7 +473,7 @@ namespace Unity.UIWidgets.painting {
 
         public readonly string file;
 
-        public readonly double scale;
+        public readonly float scale;
 
         protected override IPromise<FileImage> obtainKey(ImageConfiguration configuration) {
             return Promise<FileImage>.Resolved(this);
@@ -575,7 +575,7 @@ namespace Unity.UIWidgets.painting {
     }
 
     public class MemoryImage : ImageProvider<MemoryImage>, IEquatable<MemoryImage> {
-        public MemoryImage(byte[] bytes, double scale = 1.0) {
+        public MemoryImage(byte[] bytes, float scale = 1.0f) {
             D.assert(bytes != null);
             this.bytes = bytes;
             this.scale = scale;
@@ -583,7 +583,7 @@ namespace Unity.UIWidgets.painting {
 
         public readonly byte[] bytes;
 
-        public readonly double scale;
+        public readonly float scale;
 
         protected override IPromise<MemoryImage> obtainKey(ImageConfiguration configuration) {
             return Promise<MemoryImage>.Resolved(this);
@@ -651,7 +651,7 @@ namespace Unity.UIWidgets.painting {
     public class ExactAssetImage : AssetBundleImageProvider, IEquatable<ExactAssetImage> {
         public ExactAssetImage(
             string assetName,
-            double scale = 1.0,
+            float scale = 1.0f,
             AssetBundle bundle = null
         ) {
             D.assert(assetName != null);
@@ -662,7 +662,7 @@ namespace Unity.UIWidgets.painting {
 
         public readonly string assetName;
 
-        public readonly double scale;
+        public readonly float scale;
 
         public readonly AssetBundle bundle;
 

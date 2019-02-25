@@ -4,6 +4,7 @@ using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
+using UnityEngine;
 
 namespace Unity.UIWidgets.widgets {
     public abstract class AnimatedWidget : StatefulWidget {
@@ -96,7 +97,7 @@ namespace Unity.UIWidgets.widgets {
     public class RotationTransition : AnimatedWidget {
         public RotationTransition(
             Key key = null,
-            Animation<double> turns = null,
+            Animation<float> turns = null,
             Alignment alignment = null,
             Widget child = null) : base(key: key, listenable: turns) {
             D.assert(turns != null);
@@ -104,8 +105,8 @@ namespace Unity.UIWidgets.widgets {
             this.child = child;
         }
 
-        public Animation<double> turns {
-            get { return (Animation<double>) this.listenable; }
+        public Animation<float> turns {
+            get { return (Animation<float>) this.listenable; }
         }
 
         public readonly Alignment alignment;
@@ -113,8 +114,8 @@ namespace Unity.UIWidgets.widgets {
         public readonly Widget child;
 
         protected internal override Widget build(BuildContext context) {
-            double turnsValue = this.turns.value;
-            Matrix3 transform = Matrix3.makeRotate((float) (turnsValue * Math.PI * 2.0));
+            float turnsValue = this.turns.value;
+            Matrix3 transform = Matrix3.makeRotate((turnsValue * Mathf.PI * 2.0f));
             return new Transform(
                 transform: transform,
                 alignment: this.alignment,
@@ -123,12 +124,12 @@ namespace Unity.UIWidgets.widgets {
     }
 
     public class FadeTransition : SingleChildRenderObjectWidget {
-        public FadeTransition(Key key = null, Animation<double> opacity = null,
+        public FadeTransition(Key key = null, Animation<float> opacity = null,
             Widget child = null) : base(key: key, child: child) {
             this.opacity = opacity;
         }
 
-        public readonly Animation<double> opacity;
+        public readonly Animation<float> opacity;
 
         public override RenderObject createRenderObject(BuildContext context) {
             return new RenderAnimatedOpacity(
@@ -142,7 +143,7 @@ namespace Unity.UIWidgets.widgets {
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
-            properties.add(new DiagnosticsProperty<Animation<double>>("opacity", this.opacity));
+            properties.add(new DiagnosticsProperty<Animation<float>>("opacity", this.opacity));
         }
     }
 

@@ -138,7 +138,7 @@ namespace Unity.UIWidgets.async {
 
     struct _WaitForSecondsProcessor {
         UIWidgetsWaitForSeconds _current;
-        double _targetTime;
+        float _targetTime;
 
         public void set(UIWidgetsWaitForSeconds yieldStatement) {
             if (this._current != yieldStatement) {
@@ -218,7 +218,7 @@ namespace Unity.UIWidgets.async {
     }
 
     public class UIWidgetsWaitForSeconds {
-        public double waitTime { get; }
+        public float waitTime { get; }
 
         public UIWidgetsWaitForSeconds(float time) {
             this.waitTime = time;
@@ -293,7 +293,7 @@ namespace Unity.UIWidgets.async {
                     callbackNode.callback();
                 }
                 catch (Exception ex) {
-                    Debug.LogError("Failed to execute callback in BackgroundCallbacks: " + ex);
+                    D.logError("Failed to execute callback in BackgroundCallbacks: ", ex);
                 }
 
                 if (!callbackNode.isDone) {

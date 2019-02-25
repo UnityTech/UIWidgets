@@ -19,7 +19,7 @@ namespace Unity.UIWidgets.material {
             RectCallback rectCallback = null,
             BorderRadius borderRadius = null,
             ShapeBorder customBorder = null,
-            double? radius = null,
+            float? radius = null,
             VoidCallback onRemoved = null
         ) {
             D.assert(controller != null);
@@ -50,7 +50,7 @@ namespace Unity.UIWidgets.material {
             RectCallback rectCallback = null,
             BorderRadius borderRadius = null,
             ShapeBorder customBorder = null,
-            double? radius = null,
+            float? radius = null,
             VoidCallback onRemoved = null
         ) : base(
             controller: controller,
@@ -73,7 +73,7 @@ namespace Unity.UIWidgets.material {
                 vsync: controller.vsync);
             this._radiusController.addListener(controller.markNeedsPaint);
             this._radiusController.forward();
-            this._radius = this._radiusController.drive(new DoubleTween(
+            this._radius = this._radiusController.drive(new FloatTween(
                 begin: InkSplashUtils._kSplashInitialSize,
                 end: this._targetRadius));
 
@@ -95,13 +95,13 @@ namespace Unity.UIWidgets.material {
 
         readonly ShapeBorder _customBorder;
 
-        readonly double _targetRadius;
+        readonly float _targetRadius;
 
         readonly RectCallback _clipCallback;
 
         readonly bool _repositionToReferenceBox;
 
-        Animation<double> _radius;
+        Animation<float> _radius;
         AnimationController _radiusController;
 
         Animation<int> _alpha;

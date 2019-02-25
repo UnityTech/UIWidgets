@@ -47,7 +47,7 @@ namespace Unity.UIWidgets.Sample.Redux {
 
         Widget createWidget() {
             return new Container(
-                height: 200.0,
+                height: 200.0f,
                 padding: EdgeInsets.all(10),
                 decoration: new BoxDecoration(
                     color: new Color(0xFF7F7F7F),
@@ -85,7 +85,7 @@ namespace Unity.UIWidgets.Sample.Redux {
             Widget child = null
         ) : base(key: key) {
             this.onPressed = onPressed;
-            this.padding = padding ?? EdgeInsets.all(8.0);
+            this.padding = padding ?? EdgeInsets.all(8.0f);
             this.backgroundColor = backgroundColor;
             this.child = child;
         }

@@ -70,7 +70,8 @@ namespace UIWidgets.Tests {
 
             if (windowAdapter == null) {
                 windowAdapter = new EditorWindowAdapter(sceneView);
-            } else if (windowAdapter != null && windowAdapter.editorWindow != sceneView) {
+            }
+            else if (windowAdapter != null && windowAdapter.editorWindow != sceneView) {
                 windowAdapter = new EditorWindowAdapter(sceneView);
             }
 
@@ -87,7 +88,8 @@ namespace UIWidgets.Tests {
                 Event.current.type = _lastEventType;
                 windowAdapter.OnGUI();
                 Event.current.type = EventType.Used;
-            } else {
+            }
+            else {
                 windowAdapter.OnGUI();
             }
 
@@ -108,7 +110,7 @@ namespace UIWidgets.Tests {
 
         public static Widget listView() {
             return ListView.builder(
-                itemExtent: 20.0,
+                itemExtent: 20.0f,
                 itemBuilder: (context, index) => {
                     return new Container(
                         color: Color.fromARGB(255, (index * 10) % 256, (index * 10) % 256, (index * 10) % 256)

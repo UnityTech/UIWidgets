@@ -43,9 +43,9 @@ namespace Unity.UIWidgets.rendering {
 
     public class RenderEditable : RenderBox {
         public static readonly char obscuringCharacter = '•';
-        static readonly double _kCaretGap = 1.0;
-        static readonly double _kCaretHeightOffset = 2.0;
-        static readonly double _kCaretWidth = 1.0;
+        static readonly float _kCaretGap = 1.0f;
+        static readonly float _kCaretHeightOffset = 2.0f;
+        static readonly float _kCaretWidth = 1.0f;
 
         TextPainter _textPainter;
         Color _cursorColor;
@@ -63,7 +63,7 @@ namespace Unity.UIWidgets.rendering {
         public SelectionChangedHandler onSelectionChanged;
         public CaretChangedHandler onCaretChanged;
         Rect _lastCaretRect;
-        double? _textLayoutLastWidth;
+        float? _textLayoutLastWidth;
         List<TextBox> _selectionRects;
         Rect _caretPrototype;
         bool _hasVisualOverflow = false;
@@ -71,7 +71,7 @@ namespace Unity.UIWidgets.rendering {
 
         public RenderEditable(TextSpan text, TextDirection textDirection, ViewportOffset offset,
             ValueNotifier<bool> showCursor,
-            TextAlign textAlign = TextAlign.left, double textScaleFactor = 1.0, Color cursorColor = null,
+            TextAlign textAlign = TextAlign.left, float textScaleFactor = 1.0f, Color cursorColor = null,
             bool? hasFocus = null, int? maxLines = 1, Color selectionColor = null,
             TextSelection selection = null, bool obscureText = false, SelectionChangedHandler onSelectionChanged = null,
             CaretChangedHandler onCaretChanged = null, bool ignorePointer = false) {
@@ -222,7 +222,7 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
-        public double textScaleFactor {
+        public float textScaleFactor {
             get { return this._textPainter.textScaleFactor; }
             set {
                 if (this._textPainter.textScaleFactor == value) {
@@ -290,7 +290,7 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
-        public double preferredLineHeight {
+        public float preferredLineHeight {
             get { return this._textPainter.preferredLineHeight; }
         }
 
@@ -321,7 +321,7 @@ namespace Unity.UIWidgets.rendering {
             var paintOffset = this._paintOffset;
             if (selection.isCollapsed) {
                 var caretOffset = this._textPainter.getOffsetForCaret(selection.extendPos, this._caretPrototype);
-                var start = new Offset(0.0, this.preferredLineHeight) + caretOffset + paintOffset;
+                var start = new Offset(0.0f, this.preferredLineHeight) + caretOffset + paintOffset;
                 return new List<TextSelectionPoint> {new TextSelectionPoint(start, null)};
             }
             else {
@@ -345,7 +345,7 @@ namespace Unity.UIWidgets.rendering {
         public Rect getLocalRectForCaret(TextPosition caretPosition) {
             this._layoutText(this.constraints.maxWidth);
             var caretOffset = this._textPainter.getOffsetForCaret(caretPosition, this._caretPrototype);
-            return Rect.fromLTWH(0.0, 0.0, _kCaretWidth, this.preferredLineHeight)
+            return Rect.fromLTWH(0.0f, 0.0f, _kCaretWidth, this.preferredLineHeight)
                 .shift(caretOffset + this._paintOffset);
         }
 
@@ -463,25 +463,25 @@ namespace Unity.UIWidgets.rendering {
             return new TextPosition(line.start, affinity ?? position.affinity);
         }
 
-        protected override double computeMinIntrinsicWidth(double height) {
-            this._layoutText(double.PositiveInfinity);
+        protected override float computeMinIntrinsicWidth(float height) {
+            this._layoutText(float.PositiveInfinity);
             return this._textPainter.minIntrinsicWidth;
         }
 
-        protected override double computeMaxIntrinsicWidth(double height) {
-            this._layoutText(double.PositiveInfinity);
+        protected override float computeMaxIntrinsicWidth(float height) {
+            this._layoutText(float.PositiveInfinity);
             return this._textPainter.maxIntrinsicWidth;
         }
 
-        protected override double computeMinIntrinsicHeight(double width) {
+        protected override float computeMinIntrinsicHeight(float width) {
             return this._preferredHeight(width);
         }
 
-        protected override double computeMaxIntrinsicHeight(double width) {
+        protected override float computeMaxIntrinsicHeight(float width) {
             return this._preferredHeight(width);
         }
 
-        protected override double? computeDistanceToActualBaseline(TextBaseline baseline) {
+        protected override float? computeDistanceToActualBaseline(TextBaseline baseline) {
             this._layoutText(this.constraints.maxWidth);
             return this._textPainter.computeDistanceToActualBaseline(baseline);
         }
@@ -533,8 +533,8 @@ namespace Unity.UIWidgets.rendering {
 
         protected override void performLayout() {
             this._layoutText(this.constraints.maxWidth);
-            this._caretPrototype = Rect.fromLTWH(0.0, _kCaretHeightOffset, _kCaretWidth,
-                this.preferredLineHeight - 2.0 * _kCaretHeightOffset);
+            this._caretPrototype = Rect.fromLTWH(0.0f, _kCaretHeightOffset, _kCaretWidth,
+                this.preferredLineHeight - 2.0f * _kCaretHeightOffset);
             this._selectionRects = null;
 
             var textPainterSize = this._textPainter.size;
@@ -545,7 +545,7 @@ namespace Unity.UIWidgets.rendering {
             var _maxScrollExtent = this._getMaxScrollExtend(contentSize);
             this._hasVisualOverflow = _maxScrollExtent > 0.0;
             this.offset.applyViewportDimension(this._viewportExtend);
-            this.offset.applyContentDimensions(0.0, _maxScrollExtent);
+            this.offset.applyContentDimensions(0.0f, _maxScrollExtent);
         }
 
         public override void paint(PaintingContext context, Offset offset) {
@@ -613,7 +613,7 @@ namespace Unity.UIWidgets.rendering {
                 var caretOffset = this._textPainter.getOffsetForCaret(this._selection.extendPos,
                     Rect.fromLTWH(0, 0, 1, this.preferredLineHeight));
                 var caretRec = this._caretPrototype.shift(caretOffset + effectiveOffset);
-                Input.compositionCursorPos = new Vector2((float) caretRec.left, (float) caretRec.bottom);
+                Input.compositionCursorPos = new Vector2(caretRec.left, caretRec.bottom);
             }
 
             this._textPainter.paint(context.canvas, effectiveOffset);
@@ -647,12 +647,12 @@ namespace Unity.UIWidgets.rendering {
             // todo
         }
 
-        double _preferredHeight(double width) {
+        float _preferredHeight(float width) {
             if (this.maxLines != null) {
                 return this.preferredLineHeight * this.maxLines.Value;
             }
 
-            if (double.IsInfinity(width)) {
+            if (!width.isFinite()) {
                 var text = this._textPainter.text.text;
                 int lines = 1;
                 for (int index = 0; index < text.Length; ++index) {
@@ -665,17 +665,17 @@ namespace Unity.UIWidgets.rendering {
             }
 
             this._layoutText(width);
-            return Math.Max(this.preferredLineHeight, this._textPainter.height);
+            return Mathf.Max(this.preferredLineHeight, this._textPainter.height);
         }
 
-        void _layoutText(double constraintWidth) {
+        void _layoutText(float constraintWidth) {
             if (this._textLayoutLastWidth == constraintWidth) {
                 return;
             }
 
             var caretMargin = _kCaretGap + _kCaretWidth;
-            var avialableWidth = Math.Max(0.0, constraintWidth - caretMargin);
-            var maxWidth = this._isMultiline ? avialableWidth : double.PositiveInfinity;
+            var avialableWidth = Mathf.Max(0.0f, constraintWidth - caretMargin);
+            var maxWidth = this._isMultiline ? avialableWidth : float.PositiveInfinity;
             this._textPainter.layout(minWidth: avialableWidth, maxWidth: maxWidth);
             this._textLayoutLastWidth = constraintWidth;
         }
@@ -702,16 +702,16 @@ namespace Unity.UIWidgets.rendering {
             get {
                 switch (this._viewportAxis) {
                     case Axis.horizontal:
-                        return new Offset(-this.offset.pixels, 0.0);
+                        return new Offset(-this.offset.pixels, 0.0f);
                     case Axis.vertical:
-                        return new Offset(0.0, -this.offset.pixels);
+                        return new Offset(0.0f, -this.offset.pixels);
                 }
 
                 return null;
             }
         }
 
-        double _viewportExtend {
+        float _viewportExtend {
             get {
                 D.assert(this.hasSize);
                 switch (this._viewportAxis) {
@@ -721,20 +721,20 @@ namespace Unity.UIWidgets.rendering {
                         return this.size.height;
                 }
 
-                return 0.0;
+                return 0.0f;
             }
         }
 
-        double _getMaxScrollExtend(Size contentSize) {
+        float _getMaxScrollExtend(Size contentSize) {
             D.assert(this.hasSize);
             switch (this._viewportAxis) {
                 case Axis.horizontal:
-                    return Math.Max(0.0, contentSize.width - this.size.width);
+                    return Mathf.Max(0.0f, contentSize.width - this.size.width);
                 case Axis.vertical:
-                    return Math.Max(0.0, contentSize.height - this.size.height);
+                    return Mathf.Max(0.0f, contentSize.height - this.size.height);
             }
 
-            return 0.0;
+            return 0.0f;
         }
 
 
@@ -744,7 +744,7 @@ namespace Unity.UIWidgets.rendering {
             properties.add(new DiagnosticsProperty<ValueNotifier<bool>>("showCursor", this.showCursor));
             properties.add(new DiagnosticsProperty<int?>("maxLines", this.maxLines));
             properties.add(new DiagnosticsProperty<Color>("selectionColor", this.selectionColor));
-            properties.add(new DiagnosticsProperty<double>("textScaleFactor", this.textScaleFactor));
+            properties.add(new DiagnosticsProperty<float>("textScaleFactor", this.textScaleFactor));
             properties.add(new DiagnosticsProperty<TextSelection>("selection", this.selection));
             properties.add(new DiagnosticsProperty<ViewportOffset>("offset", this.offset));
         }

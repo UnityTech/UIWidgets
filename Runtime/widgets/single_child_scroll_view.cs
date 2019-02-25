@@ -6,6 +6,8 @@ using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.utils;
+using UnityEngine;
+using Rect = Unity.UIWidgets.ui.Rect;
 
 namespace Unity.UIWidgets.widgets {
     public class SingleChildScrollView : StatelessWidget {
@@ -121,7 +123,7 @@ namespace Unity.UIWidgets.widgets {
         public _RenderSingleChildViewport(
             AxisDirection axisDirection = AxisDirection.down,
             ViewportOffset offset = null,
-            double cacheExtent = RenderViewportUtils.defaultCacheExtent,
+            float cacheExtent = RenderViewportUtils.defaultCacheExtent,
             RenderBox child = null) {
             D.assert(offset != null);
             this._axisDirection = axisDirection;
@@ -175,7 +177,7 @@ namespace Unity.UIWidgets.widgets {
 
         ViewportOffset _offset;
 
-        public double cacheExtent {
+        public float cacheExtent {
             get { return this._cacheExtent; }
             set {
                 if (value == this._cacheExtent) {
@@ -187,7 +189,7 @@ namespace Unity.UIWidgets.widgets {
             }
         }
 
-        double _cacheExtent;
+        float _cacheExtent;
 
         void _hasScrolled() {
             this.markNeedsPaint();
@@ -214,7 +216,7 @@ namespace Unity.UIWidgets.widgets {
         }
 
 
-        double _viewportExtent {
+        float _viewportExtent {
             get {
                 D.assert(this.hasSize);
                 switch (this.axis) {
@@ -225,33 +227,33 @@ namespace Unity.UIWidgets.widgets {
                 }
 
                 D.assert(false);
-                return 0.0;
+                return 0.0f;
             }
         }
 
-        double _minScrollExtent {
+        float _minScrollExtent {
             get {
                 D.assert(this.hasSize);
-                return 0.0;
+                return 0.0f;
             }
         }
 
-        double _maxScrollExtent {
+        float _maxScrollExtent {
             get {
                 D.assert(this.hasSize);
                 if (this.child == null) {
-                    return 0.0;
+                    return 0.0f;
                 }
 
                 switch (this.axis) {
                     case Axis.horizontal:
-                        return Math.Max(0.0, this.child.size.width - this.size.width);
+                        return Mathf.Max(0.0f, this.child.size.width - this.size.width);
                     case Axis.vertical:
-                        return Math.Max(0.0, this.child.size.height - this.size.height);
+                        return Mathf.Max(0.0f, this.child.size.height - this.size.height);
                 }
 
                 D.assert(false);
-                return 0.0;
+                return 0.0f;
             }
         }
 
@@ -267,36 +269,36 @@ namespace Unity.UIWidgets.widgets {
         }
 
 
-        protected override double computeMinIntrinsicWidth(double height) {
+        protected override float computeMinIntrinsicWidth(float height) {
             if (this.child != null) {
                 return this.child.getMinIntrinsicWidth(height);
             }
 
-            return 0.0;
+            return 0.0f;
         }
 
-        protected override double computeMaxIntrinsicWidth(double height) {
+        protected override float computeMaxIntrinsicWidth(float height) {
             if (this.child != null) {
                 return this.child.getMaxIntrinsicWidth(height);
             }
 
-            return 0.0;
+            return 0.0f;
         }
 
-        protected override double computeMinIntrinsicHeight(double width) {
+        protected override float computeMinIntrinsicHeight(float width) {
             if (this.child != null) {
                 return this.child.getMinIntrinsicHeight(width);
             }
 
-            return 0.0;
+            return 0.0f;
         }
 
-        protected override double computeMaxIntrinsicHeight(double width) {
+        protected override float computeMaxIntrinsicHeight(float width) {
             if (this.child != null) {
                 return this.child.getMaxIntrinsicHeight(width);
             }
 
-            return 0.0;
+            return 0.0f;
         }
 
         protected override void performLayout() {
@@ -316,16 +318,16 @@ namespace Unity.UIWidgets.widgets {
             get { return this._paintOffsetForPosition(this.offset.pixels); }
         }
 
-        Offset _paintOffsetForPosition(double position) {
+        Offset _paintOffsetForPosition(float position) {
             switch (this.axisDirection) {
                 case AxisDirection.up:
-                    return new Offset(0.0, position - this.child.size.height + this.size.height);
+                    return new Offset(0.0f, position - this.child.size.height + this.size.height);
                 case AxisDirection.down:
-                    return new Offset(0.0, -position);
+                    return new Offset(0.0f, -position);
                 case AxisDirection.left:
-                    return new Offset(position - this.child.size.width + this.size.width, 0.0);
+                    return new Offset(position - this.child.size.width + this.size.width, 0.0f);
                 case AxisDirection.right:
-                    return new Offset(-position, 0.0);
+                    return new Offset(-position, 0.0f);
             }
 
             return null;
@@ -356,7 +358,7 @@ namespace Unity.UIWidgets.widgets {
 
         public override void applyPaintTransform(RenderObject child, Matrix3 transform) {
             Offset paintOffset = this._paintOffset;
-            transform.preTranslate((float) paintOffset.dx, (float) paintOffset.dy);
+            transform.preTranslate(paintOffset.dx, paintOffset.dy);
         }
 
         public override Rect describeApproximatePaintClip(RenderObject child) {
@@ -377,7 +379,7 @@ namespace Unity.UIWidgets.widgets {
         }
 
 
-        public RevealedOffset getOffsetToReveal(RenderObject target, double alignment, Rect rect = null) {
+        public RevealedOffset getOffsetToReveal(RenderObject target, float alignment, Rect rect = null) {
             rect = rect ?? target.paintBounds;
             if (!(target is RenderBox)) {
                 return new RevealedOffset(offset: this.offset.pixels, rect: rect);
@@ -388,9 +390,9 @@ namespace Unity.UIWidgets.widgets {
             Rect bounds = transform.mapRect(rect);
             Size contentSize = this.child.size;
 
-            double leadingScrollOffset = 0.0;
-            double targetMainAxisExtent = 0.0;
-            double mainAxisExtent = 0.0;
+            float leadingScrollOffset = 0.0f;
+            float targetMainAxisExtent = 0.0f;
+            float mainAxisExtent = 0.0f;
 
             switch (this.axisDirection) {
                 case AxisDirection.up:
@@ -415,7 +417,7 @@ namespace Unity.UIWidgets.widgets {
                     break;
             }
 
-            double targetOffset = leadingScrollOffset - (mainAxisExtent - targetMainAxisExtent) * alignment;
+            float targetOffset = leadingScrollOffset - (mainAxisExtent - targetMainAxisExtent) * alignment;
             Rect targetRect = bounds.shift(this._paintOffsetForPosition(targetOffset));
             return new RevealedOffset(offset: targetOffset, rect: targetRect);
         }

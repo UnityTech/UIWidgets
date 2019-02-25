@@ -36,10 +36,10 @@ namespace Unity.UIWidgets.ui {
 
         public static Matrix3 makeTrans(Offset offset) {
             var m = new Matrix3();
-            m.setTranslate((float) offset.dx, (float) offset.dy);
+            m.setTranslate(offset.dx, offset.dy);
             return m;
         }
-        
+
         public static Matrix3 makeSkew(float dx, float dy) {
             var m = new Matrix3();
             m.setSkew(dx, dy);
@@ -700,10 +700,10 @@ namespace Unity.UIWidgets.ui {
             }
             else {
                 var points = new[] {
-                    this.mapXY((float) src.left, (float) src.top),
-                    this.mapXY((float) src.right, (float) src.top),
-                    this.mapXY((float) src.right, (float) src.bottom),
-                    this.mapXY((float) src.left, (float) src.bottom),
+                    this.mapXY(src.left, src.top),
+                    this.mapXY(src.right, src.top),
+                    this.mapXY(src.right, src.bottom),
+                    this.mapXY(src.left, src.bottom),
                 };
 
                 var minX = points[0].dx;
@@ -712,10 +712,10 @@ namespace Unity.UIWidgets.ui {
                 var maxY = points[0].dy;
 
                 for (int i = 1; i < 4; ++i) {
-                    minX = Math.Min(minX, points[i].dx);
-                    minY = Math.Min(minY, points[i].dy);
-                    maxX = Math.Max(maxX, points[i].dx);
-                    maxY = Math.Max(maxY, points[i].dy);
+                    minX = Mathf.Min(minX, points[i].dx);
+                    minY = Mathf.Min(minY, points[i].dy);
+                    maxX = Mathf.Max(maxX, points[i].dx);
+                    maxY = Mathf.Max(maxY, points[i].dy);
                 }
 
                 dst = Rect.fromLTRB(minX, minY, maxX, maxY);
@@ -852,7 +852,7 @@ namespace Unity.UIWidgets.ui {
             kRectStaysRect_Shift
         }
 
-        static void ComputeInv(float[] dst, float[] src, double invDet, bool isPersp) {
+        static void ComputeInv(float[] dst, float[] src, float invDet, bool isPersp) {
             D.assert(src != dst);
             D.assert(src != null && dst != null);
 
@@ -889,14 +889,14 @@ namespace Unity.UIWidgets.ui {
             }
             else {
                 // not perspective
-                dst[kMScaleX] = (float) (src[kMScaleY] * invDet);
-                dst[kMSkewX] = (float) (-src[kMSkewX] * invDet);
+                dst[kMScaleX] = src[kMScaleY] * invDet;
+                dst[kMSkewX] = -src[kMSkewX] * invDet;
                 dst[kMTransX] =
                     ScalarUtils.dcross_dscale(src[kMSkewX], src[kMTransY], src[kMScaleY],
                         src[kMTransX], invDet);
 
-                dst[kMSkewY] = (float) (-src[kMSkewY] * invDet);
-                dst[kMScaleY] = (float) (src[kMScaleX] * invDet);
+                dst[kMSkewY] = -src[kMSkewY] * invDet;
+                dst[kMScaleY] = src[kMScaleX] * invDet;
                 dst[kMTransY] =
                     ScalarUtils.dcross_dscale(src[kMSkewY], src[kMTransX], src[kMScaleX],
                         src[kMTransY], invDet);
@@ -1180,8 +1180,8 @@ namespace Unity.UIWidgets.ui {
 
             if (count > 0) {
                 for (int i = 0; i < count; ++i) {
-                    var sy = (float) src[i].dy;
-                    var sx = (float) src[i].dx;
+                    var sy = src[i].dy;
+                    var sx = src[i].dx;
                     var x = ScalarUtils.sdot(sx, m.fMat[kMScaleX], sy, m.fMat[kMSkewX]) +
                             m.fMat[kMTransX];
                     var y = ScalarUtils.sdot(sx, m.fMat[kMSkewY], sy, m.fMat[kMScaleY]) +
@@ -1263,7 +1263,7 @@ namespace Unity.UIWidgets.ui {
             }
 
             int isPersp = (int) (mask & TypeMask.kPerspective_Mask);
-            double invDet = ScalarUtils.inv_determinant(this.fMat, isPersp);
+            float invDet = ScalarUtils.inv_determinant(this.fMat, isPersp);
 
             if (invDet == 0) {
                 // underflow
@@ -1338,7 +1338,7 @@ namespace Unity.UIWidgets.ui {
 
 
         public Offset mapPoint(Offset point) {
-            return this.mapXY((float) point.dx, (float) point.dy);
+            return this.mapXY(point.dx, point.dy);
         }
     }
 
@@ -1432,7 +1432,7 @@ namespace Unity.UIWidgets.ui {
                 kScalarNearlyZero * kScalarNearlyZero);
         }
 
-        public static double inv_determinant(float[] mat, int isPerspective) {
+        public static float inv_determinant(float[] mat, int isPerspective) {
             double det;
 
             if (isPerspective != 0) {
@@ -1461,7 +1461,7 @@ namespace Unity.UIWidgets.ui {
                 return 0;
             }
 
-            return 1.0 / det;
+            return 1.0f / (float) det;
         }
     }
 }

@@ -418,11 +418,11 @@ namespace Unity.UIWidgets.widgets {
         public readonly InspectorSelection selection;
         public bool isSelectMode = true;
         readonly GlobalKey _ignorePointerKey = GlobalKey.key();
-        const double _edgeHitMargin = 2.0;
-        const double _kOffScreenMargin = 1.0;
-        const double _kScreenEdgeMargin = 10.0;
-        const double _kTooltipPadding = 5.0;
-        const double _kInspectButtonMargin = 10.0;
+        const float _edgeHitMargin = 2.0f;
+        const float _kOffScreenMargin = 1.0f;
+        const float _kScreenEdgeMargin = 10.0f;
+        const float _kTooltipPadding = 5.0f;
+        const float _kInspectButtonMargin = 10.0f;
 
         public override void initState() {
             base.initState();
@@ -614,14 +614,14 @@ namespace Unity.UIWidgets.widgets {
             return _area(o1).CompareTo(_area(o2));
         }
 
-        static double _area(RenderObject obj) {
+        static float _area(RenderObject obj) {
             var bounds = obj.semanticBounds;
             Size size = null;
             if (bounds != null) {
                 size = bounds.size;
             }
 
-            return size == null ? double.PositiveInfinity : size.width * size.height;
+            return size == null ? float.PositiveInfinity : size.width * size.height;
         }
     }
 
@@ -735,7 +735,7 @@ namespace Unity.UIWidgets.widgets {
         }
 
         protected override void performResize() {
-            this.size = this.constraints.constrain(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            this.size = this.constraints.constrain(new Size(float.PositiveInfinity, float.PositiveInfinity));
         }
 
         public override void paint(PaintingContext context, Offset offset) {
@@ -889,7 +889,7 @@ namespace Unity.UIWidgets.widgets {
 
         public Picture _picture;
         // public  TextPainter _textPainter;
-        // public double _textPainterMaxWidth;
+        // public float _textPainterMaxWidth;
 
 
         public override void addToScene(SceneBuilder builder, Offset layerOffset) {
@@ -932,7 +932,7 @@ namespace Unity.UIWidgets.widgets {
                 color = _kHighlightedRenderObjectBorderColor, style = PaintingStyle.stroke,
                 strokeWidth = 1
             };
-            Rect selectedPaintRect = state.selected.rect.deflate(0.5);
+            Rect selectedPaintRect = state.selected.rect.deflate(0.5f);
             canvas.save();
             canvas.setMatrix(state.selected.transform);
             canvas.drawRect(selectedPaintRect, fillPaint);
@@ -942,7 +942,7 @@ namespace Unity.UIWidgets.widgets {
             foreach (var transformedRect in state.candidates) {
                 canvas.save();
                 canvas.setMatrix(transformedRect.transform);
-                canvas.drawRect(transformedRect.rect.deflate(0.5), borderPaint);
+                canvas.drawRect(transformedRect.rect.deflate(0.5f), borderPaint);
                 canvas.restore();
             }
 

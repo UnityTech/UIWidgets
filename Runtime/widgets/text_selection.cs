@@ -23,7 +23,7 @@ namespace Unity.UIWidgets.widgets {
     public delegate void TextSelectionOverlayChanged(TextEditingValue value, Rect caretRect);
 
     public abstract class TextSelectionControls {
-        public abstract Widget buildHandle(BuildContext context, TextSelectionHandleType type, double textLineHeight);
+        public abstract Widget buildHandle(BuildContext context, TextSelectionHandleType type, float textLineHeight);
 
         public abstract Widget buildToolbar(BuildContext context, Rect globalEditableRegion, Offset position,
             TextSelectionDelegate selectionDelegate);
@@ -141,11 +141,11 @@ namespace Unity.UIWidgets.widgets {
         AnimationController _handleController;
         AnimationController _toolbarController;
 
-        Animation<double> _handleOpacity {
+        Animation<float> _handleOpacity {
             get { return this._handleController.view; }
         }
 
-        Animation<double> _toolbarOpacity {
+        Animation<float> _toolbarOpacity {
             get { return this._toolbarController.view; }
         }
 
@@ -168,14 +168,14 @@ namespace Unity.UIWidgets.widgets {
                     this._buildHandle(context, _TextSelectionHandlePosition.end)),
             };
             Overlay.of(this.context, debugRequiredFor: this.debugRequiredFor).insertAll(this._handles);
-            this._handleController.forward(from: 0.0);
+            this._handleController.forward(from: 0.0f);
         }
 
         public void showToolbar() {
             D.assert(this._toolbar == null);
             this._toolbar = new OverlayEntry(builder: this._buildToolbar);
             Overlay.of(this.context, debugRequiredFor: this.debugRequiredFor).insert(this._toolbar);
-            this._toolbarController.forward(from: 0.0);
+            this._toolbarController.forward(from: 0.0f);
         }
 
         public void update(TextEditingValue newValue) {
@@ -264,7 +264,7 @@ namespace Unity.UIWidgets.widgets {
             // Find the horizontal midpoint, just above the selected text.
             List<TextSelectionPoint> endpoints = this.renderObject.getEndpointsForSelection(this._selection);
             Offset midpoint = new Offset(
-                (endpoints.Count == 1) ? endpoints[0].point.dx : (endpoints[0].point.dx + endpoints[1].point.dx) / 2.0,
+                (endpoints.Count == 1) ? endpoints[0].point.dx : (endpoints[0].point.dx + endpoints[1].point.dx) / 2.0f,
                 endpoints[0].point.dy - this.renderObject.preferredLineHeight
             );
 
@@ -351,7 +351,7 @@ namespace Unity.UIWidgets.widgets {
 
         void _handleDragStart(DragStartDetails details) {
             this._dragPosition = details.globalPosition +
-                                 new Offset(0.0, -this.widget.selectionControls.handleSize.height);
+                                 new Offset(0.0f, -this.widget.selectionControls.handleSize.height);
         }
 
         void _handleDragUpdate(DragUpdateDetails details) {

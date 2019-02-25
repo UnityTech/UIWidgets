@@ -144,24 +144,24 @@ namespace Unity.UIWidgets.widgets {
             return true;
         }
 
-        protected override double computeMinIntrinsicWidth(double height) {
+        protected override float computeMinIntrinsicWidth(float height) {
             D.assert(this._debugThrowIfNotCheckingIntrinsics());
-            return 0.0;
+            return 0.0f;
         }
 
-        protected override double computeMaxIntrinsicWidth(double height) {
+        protected override float computeMaxIntrinsicWidth(float height) {
             D.assert(this._debugThrowIfNotCheckingIntrinsics());
-            return 0.0;
+            return 0.0f;
         }
 
-        protected override double computeMinIntrinsicHeight(double width) {
+        protected override float computeMinIntrinsicHeight(float width) {
             D.assert(this._debugThrowIfNotCheckingIntrinsics());
-            return 0.0;
+            return 0.0f;
         }
 
-        protected override double computeMaxIntrinsicHeight(double width) {
+        protected override float computeMaxIntrinsicHeight(float width) {
             D.assert(this._debugThrowIfNotCheckingIntrinsics());
-            return 0.0;
+            return 0.0f;
         }
 
         protected override void performLayout() {
