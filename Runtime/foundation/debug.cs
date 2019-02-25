@@ -7,7 +7,7 @@ using Debug = UnityEngine.Debug;
 namespace Unity.UIWidgets.foundation {
     public static class D {
 
-        public static void LogError(string message, Exception ex = null) {
+        public static void logError(string message, Exception ex = null) {
             Debug.LogException(new ReportError(message, ex));
         }
         [Conditional("UIWidgets_DEBUG")]

@@ -117,7 +117,7 @@ namespace Unity.UIWidgets.foundation {
                 return;
             }
 
-            D.LogError(details.ToString(), details.exception);
+            D.logError(details.ToString(), details.exception);
         }
 
         public static IEnumerable<string> defaultStackFilter(IEnumerable<string> frames) {
