@@ -95,17 +95,11 @@ namespace Unity.UIWidgets.foundation {
         }
     }
 
-    public class UIWidgetsError : AssertionError {
+    public class UIWidgetsError : Exception {
         public UIWidgetsError(string message) : base(message) {
         }
 
         public static UIWidgetsExceptionHandler onError = dumpErrorToConsole;
-
-        static int _errorCount = 0;
-
-        public static void resetErrorCount() {
-            _errorCount = 0;
-        }
 
         public static void dumpErrorToConsole(UIWidgetsErrorDetails details) {
             dumpErrorToConsole(details, forceReport: false);
@@ -123,14 +117,7 @@ namespace Unity.UIWidgets.foundation {
                 return;
             }
 
-            if (_errorCount == 0 || forceReport) {
-                Debug.LogError(details.ToString());
-            }
-            else {
-                Debug.LogWarning("Another exception was thrown: " + details);
-            }
-
-            _errorCount += 1;
+            D.LogError(details.ToString(), details.exception);
         }
 
         public static IEnumerable<string> defaultStackFilter(IEnumerable<string> frames) {
