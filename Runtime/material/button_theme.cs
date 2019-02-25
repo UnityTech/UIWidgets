@@ -26,8 +26,8 @@ namespace Unity.UIWidgets.material {
             Key key = null,
             ButtonTextTheme textTheme = ButtonTextTheme.normal,
             ButtonBarLayoutBehavior layoutBehavior = ButtonBarLayoutBehavior.padded,
-            double minWidth = 88.0,
-            double height = 36.0,
+            float minWidth = 88.0f,
+            float height = 36.0f,
             EdgeInsets padding = null,
             ShapeBorder shape = null,
             bool alignedDropdown = false,
@@ -91,8 +91,8 @@ namespace Unity.UIWidgets.material {
     public class ButtonThemeData : Diagnosticable {
         public ButtonThemeData(
             ButtonTextTheme textTheme = ButtonTextTheme.normal,
-            double minWidth = 88.0,
-            double height = 36.0,
+            float minWidth = 88.0f,
+            float height = 36.0f,
             EdgeInsets padding = null,
             ShapeBorder shape = null,
             ButtonBarLayoutBehavior layoutBehavior = ButtonBarLayoutBehavior.padded,
@@ -122,9 +122,9 @@ namespace Unity.UIWidgets.material {
         }
 
 
-        public readonly double minWidth;
+        public readonly float minWidth;
 
-        public readonly double height;
+        public readonly float height;
 
         public readonly ButtonTextTheme textTheme;
 
@@ -146,9 +146,9 @@ namespace Unity.UIWidgets.material {
                 switch (this.textTheme) {
                     case ButtonTextTheme.normal:
                     case ButtonTextTheme.accent:
-                        return EdgeInsets.symmetric(horizontal: 16.0);
+                        return EdgeInsets.symmetric(horizontal: 16.0f);
                     case ButtonTextTheme.primary:
-                        return EdgeInsets.symmetric(horizontal: 24.0);
+                        return EdgeInsets.symmetric(horizontal: 24.0f);
                 }
 
                 D.assert(false);
@@ -168,10 +168,10 @@ namespace Unity.UIWidgets.material {
                     case ButtonTextTheme.normal:
                     case ButtonTextTheme.accent:
                         return new RoundedRectangleBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(2.0)));
+                            borderRadius: BorderRadius.all(Radius.circular(2.0f)));
                     case ButtonTextTheme.primary:
                         return new RoundedRectangleBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(4.0)));
+                            borderRadius: BorderRadius.all(Radius.circular(4.0f)));
                 }
 
                 return new RoundedRectangleBorder();
@@ -204,8 +204,8 @@ namespace Unity.UIWidgets.material {
 
         Color _getDisabledColor(MaterialButton button) {
             return this.getBrightness(button) == Brightness.dark
-                ? this.colorScheme.onSurface.withOpacity(0.30)
-                : this.colorScheme.onSurface.withOpacity(0.38);
+                ? this.colorScheme.onSurface.withOpacity(0.30f)
+                : this.colorScheme.onSurface.withOpacity(0.38f);
         }
 
 
@@ -254,7 +254,7 @@ namespace Unity.UIWidgets.material {
                 case ButtonTextTheme.primary:
                     return button.enabled
                         ? this._buttonColor ?? this.colorScheme.primary
-                        : this.colorScheme.onSurface.withOpacity(0.12);
+                        : this.colorScheme.onSurface.withOpacity(0.12f);
             }
 
             D.assert(false);
@@ -317,7 +317,7 @@ namespace Unity.UIWidgets.material {
                 }
             }
 
-            return this.getTextColor(button).withOpacity(0.12);
+            return this.getTextColor(button).withOpacity(0.12f);
         }
 
         public Color getHighlightColor(MaterialButton button) {
@@ -328,7 +328,7 @@ namespace Unity.UIWidgets.material {
             switch (this.getTextTheme(button)) {
                 case ButtonTextTheme.normal:
                 case ButtonTextTheme.accent:
-                    return this._highlightColor ?? this.getTextColor(button).withOpacity(0.16);
+                    return this._highlightColor ?? this.getTextColor(button).withOpacity(0.16f);
                 case ButtonTextTheme.primary:
                     return Colors.transparent;
             }
@@ -338,41 +338,41 @@ namespace Unity.UIWidgets.material {
         }
 
 
-        public double getElevation(MaterialButton button) {
+        public float getElevation(MaterialButton button) {
             if (button.elevation != null) {
-                return button.elevation ?? 0.0;
+                return button.elevation ?? 0.0f;
             }
 
             if (button is FlatButton) {
-                return 0.0;
+                return 0.0f;
             }
 
-            return 2.0;
+            return 2.0f;
         }
 
 
-        public double getHighlightElevation(MaterialButton button) {
+        public float getHighlightElevation(MaterialButton button) {
             if (button.highlightElevation != null) {
-                return button.highlightElevation ?? 0.0;
+                return button.highlightElevation ?? 0.0f;
             }
 
             if (button is FlatButton) {
-                return 0.0;
+                return 0.0f;
             }
 
 //todo:xingwei.zhu: uncomment these when OutlineButton are ready
 //            if (button is OutlineButton)
 //                return 2.0;
-            return 8.0;
+            return 8.0f;
         }
 
 
-        public double getDisabledElevation(MaterialButton button) {
+        public float getDisabledElevation(MaterialButton button) {
             if (button.disabledElevation != null) {
-                return button.disabledElevation ?? 0.0;
+                return button.disabledElevation ?? 0.0f;
             }
 
-            return 0.0;
+            return 0.0f;
         }
 
 
@@ -382,7 +382,7 @@ namespace Unity.UIWidgets.material {
             }
 
             if (button is MaterialButtonWithIconMixin) {
-                return EdgeInsets.fromLTRB(12.0, 0.0, 16.0, 0.0);
+                return EdgeInsets.fromLTRB(12.0f, 0.0f, 16.0f, 0.0f);
             }
 
             if (this._padding != null) {
@@ -392,9 +392,9 @@ namespace Unity.UIWidgets.material {
             switch (this.getTextTheme(button)) {
                 case ButtonTextTheme.normal:
                 case ButtonTextTheme.accent:
-                    return EdgeInsets.symmetric(horizontal: 16.0);
+                    return EdgeInsets.symmetric(horizontal: 16.0f);
                 case ButtonTextTheme.primary:
-                    return EdgeInsets.symmetric(horizontal: 24.0);
+                    return EdgeInsets.symmetric(horizontal: 24.0f);
             }
 
             D.assert(false);
@@ -423,8 +423,8 @@ namespace Unity.UIWidgets.material {
         public ButtonThemeData copyWith(
             ButtonTextTheme? textTheme = null,
             ButtonBarLayoutBehavior? layoutBehavior = null,
-            double? minWidth = null,
-            double? height = null,
+            float? minWidth = null,
+            float? height = null,
             EdgeInsets padding = null,
             ShapeBorder shape = null,
             bool? alignedDropdown = null,
@@ -520,8 +520,8 @@ namespace Unity.UIWidgets.material {
             ButtonThemeData defaultTheme = new ButtonThemeData();
             properties.add(new EnumProperty<ButtonTextTheme>("textTheme", this.textTheme,
                 defaultValue: defaultTheme.textTheme));
-            properties.add(new DoubleProperty("minWidth", this.minWidth, defaultValue: defaultTheme.minWidth));
-            properties.add(new DoubleProperty("height", this.height, defaultValue: defaultTheme.height));
+            properties.add(new FloatProperty("minWidth", this.minWidth, defaultValue: defaultTheme.minWidth));
+            properties.add(new FloatProperty("height", this.height, defaultValue: defaultTheme.height));
             properties.add(new DiagnosticsProperty<EdgeInsets>("padding", this.padding,
                 defaultValue: defaultTheme.padding));
             properties.add(new DiagnosticsProperty<ShapeBorder>("shape", this.shape, defaultValue: defaultTheme.shape));

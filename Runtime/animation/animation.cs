@@ -58,8 +58,8 @@ namespace Unity.UIWidgets.animation {
         }
 
         public Animation<U> drive<U>(Animatable<U> child) {
-            D.assert(this is Animation<double>);
-            return child.animate(this as Animation<double>);
+            D.assert(this is Animation<float>);
+            return child.animate(this as Animation<float>);
         }
     }
 }

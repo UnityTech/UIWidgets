@@ -14,23 +14,23 @@
     }
 
     public class DrawTranslate : DrawCmd {
-        public double dx;
-        public double dy;
+        public float dx;
+        public float dy;
     }
 
     public class DrawScale : DrawCmd {
-        public double sx;
-        public double? sy;
+        public float sx;
+        public float? sy;
     }
 
     public class DrawRotate : DrawCmd {
-        public double radians;
+        public float radians;
         public Offset offset;
     }
 
     public class DrawSkew : DrawCmd {
-        public double sx;
-        public double sy;
+        public float sx;
+        public float sy;
     }
 
     public class DrawConcat : DrawCmd {

@@ -16,9 +16,9 @@ namespace Unity.UIWidgets.flow {
             set { this._frameSize = value; }
         }
 
-        double _devicePixelRatio;
+        float _devicePixelRatio;
 
-        public double devicePixelRatio {
+        public float devicePixelRatio {
             get { return this._devicePixelRatio; }
             set { this._devicePixelRatio = value; }
         }

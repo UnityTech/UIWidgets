@@ -14,7 +14,7 @@ namespace Unity.UIWidgets.widgets {
         public ScrollPositionWithSingleContext(
             ScrollPhysics physics = null,
             ScrollContext context = null,
-            double? initialPixels = 0.0,
+            float? initialPixels = 0.0f,
             bool keepScrollOffset = true,
             ScrollPosition oldPosition = null,
             string debugLabel = null
@@ -37,13 +37,13 @@ namespace Unity.UIWidgets.widgets {
         }
 
 
-        double _heldPreviousVelocity = 0.0;
+        float _heldPreviousVelocity = 0.0f;
 
         public override AxisDirection axisDirection {
             get { return this.context.axisDirection; }
         }
 
-        public override double setPixels(double newPixels) {
+        public override float setPixels(float newPixels) {
             D.assert(this.activity.isScrolling);
             return base.setPixels(newPixels);
         }
@@ -72,7 +72,7 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public override void beginActivity(ScrollActivity newActivity) {
-            this._heldPreviousVelocity = 0.0;
+            this._heldPreviousVelocity = 0.0f;
             if (newActivity == null) {
                 return;
             }
@@ -89,7 +89,7 @@ namespace Unity.UIWidgets.widgets {
             }
         }
 
-        public virtual void applyUserScrollOffset(double delta) {
+        public virtual void applyUserScrollOffset(float delta) {
             this.updateUserScrollDirection(delta > 0.0 ? ScrollDirection.forward : ScrollDirection.reverse);
 
             var pixel = this.pixels - this.physics.applyPhysicsToUserOffset(this, delta);
@@ -104,7 +104,7 @@ namespace Unity.UIWidgets.widgets {
             this.setPixels(pixel);
         }
 
-        public virtual void applyUserOffset(double delta) {
+        public virtual void applyUserOffset(float delta) {
             this.updateUserScrollDirection(delta > 0.0 ? ScrollDirection.forward : ScrollDirection.reverse);
             this.setPixels(this.pixels - this.physics.applyPhysicsToUserOffset(this, delta));
         }
@@ -113,7 +113,7 @@ namespace Unity.UIWidgets.widgets {
             this.beginActivity(new IdleScrollActivity(this));
         }
 
-        public void goBallistic(double velocity) {
+        public void goBallistic(float velocity) {
             D.assert(this._pixels != null);
             Simulation simulation = this.physics.createBallisticSimulation(this, velocity);
             if (simulation != null) {
@@ -139,7 +139,7 @@ namespace Unity.UIWidgets.widgets {
             this.didUpdateScrollDirection(value);
         }
 
-        public override IPromise animateTo(double to,
+        public override IPromise animateTo(float to,
             TimeSpan duration,
             Curve curve
         ) {
@@ -160,10 +160,10 @@ namespace Unity.UIWidgets.widgets {
             return activity.done;
         }
 
-        public override void jumpTo(double value) {
+        public override void jumpTo(float value) {
             this.goIdle();
             if (this.pixels != value) {
-                double oldPixels = this.pixels;
+                float oldPixels = this.pixels;
                 this.forcePixels(value);
                 // this.notifyListeners(); already in forcePixels, no need here.
                 this.didStartScroll();
@@ -171,11 +171,11 @@ namespace Unity.UIWidgets.widgets {
                 this.didEndScroll();
             }
 
-            this.goBallistic(0.0);
+            this.goBallistic(0.0f);
         }
 
         public override ScrollHoldController hold(VoidCallback holdCancelCallback) {
-            double previousVelocity = this.activity.velocity;
+            float previousVelocity = this.activity.velocity;
             HoldScrollActivity holdActivity = new HoldScrollActivity(
                 del: this,
                 onHoldCanceled: holdCancelCallback

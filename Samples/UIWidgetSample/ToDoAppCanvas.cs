@@ -34,7 +34,7 @@ namespace UIWidgetsSample {
                 Widget child = null
             ) : base(key: key) {
                 this.onPressed = onPressed;
-                this.padding = padding ?? EdgeInsets.all(8.0);
+                this.padding = padding ?? EdgeInsets.all(8.0f);
                 this.backgroundColor = backgroundColor ?? AsScreenCanvas.CLColors.transparent;
                 this.child = child;
             }
@@ -135,7 +135,7 @@ namespace UIWidgetsSample {
                     return (Widget) new Text(
                         item.content, style: new TextStyle(
                             fontSize: 18,
-                            height: 1.5
+                            height: 1.5f
                         )
                     );
                 });
@@ -177,7 +177,7 @@ namespace UIWidgetsSample {
             Widget child = null
         ) : base(key: key) {
             this.onPressed = onPressed;
-            this.padding = padding ?? EdgeInsets.all(8.0);
+            this.padding = padding ?? EdgeInsets.all(8.0f);
             this.backgroundColor = backgroundColor ?? AsScreenCanvas.CLColors.transparent;
             this.child = child;
         }

@@ -1,27 +1,28 @@
 using System;
 using Unity.UIWidgets.painting;
+using UnityEngine;
 
 namespace Unity.UIWidgets.widgets {
     public interface ScrollMetrics {
-        double minScrollExtent { get; }
+        float minScrollExtent { get; }
 
-        double maxScrollExtent { get; }
+        float maxScrollExtent { get; }
 
-        double pixels { get; }
+        float pixels { get; }
 
-        double viewportDimension { get; }
+        float viewportDimension { get; }
 
         AxisDirection axisDirection { get; }
     }
 
     public static class ScrollMetricsUtils {
         public static ScrollMetrics copyWith(ScrollMetrics it,
-            double? minScrollExtent = null,
-            double? maxScrollExtent = null,
-            double? pixels = null,
-            double? viewportDimension = null,
+            float? minScrollExtent = null,
+            float? maxScrollExtent = null,
+            float? pixels = null,
+            float? viewportDimension = null,
             AxisDirection? axisDirection = null,
-            double? viewportFraction = null
+            float? viewportFraction = null
         ) {
             if (it is IPageMetrics) {
                 return new PageMetrics(
@@ -55,27 +56,27 @@ namespace Unity.UIWidgets.widgets {
             return it.pixels == it.minScrollExtent || it.pixels == it.maxScrollExtent;
         }
 
-        public static double extentBefore(this ScrollMetrics it) {
-            return Math.Max(it.pixels - it.minScrollExtent, 0.0);
+        public static float extentBefore(this ScrollMetrics it) {
+            return Mathf.Max(it.pixels - it.minScrollExtent, 0.0f);
         }
 
-        public static double extentInside(this ScrollMetrics it) {
-            return Math.Min(it.pixels, it.maxScrollExtent) -
-                   Math.Max(it.pixels, it.minScrollExtent) +
-                   Math.Min(it.viewportDimension, it.maxScrollExtent - it.minScrollExtent);
+        public static float extentInside(this ScrollMetrics it) {
+            return Mathf.Min(it.pixels, it.maxScrollExtent) -
+                   Mathf.Max(it.pixels, it.minScrollExtent) +
+                   Mathf.Min(it.viewportDimension, it.maxScrollExtent - it.minScrollExtent);
         }
 
-        public static double extentAfter(this ScrollMetrics it) {
-            return Math.Max(it.maxScrollExtent - it.pixels, 0.0);
+        public static float extentAfter(this ScrollMetrics it) {
+            return Mathf.Max(it.maxScrollExtent - it.pixels, 0.0f);
         }
     }
 
     public class FixedScrollMetrics : ScrollMetrics {
         public FixedScrollMetrics(
-            double minScrollExtent = 0.0,
-            double maxScrollExtent = 0.0,
-            double pixels = 0.0,
-            double viewportDimension = 0.0,
+            float minScrollExtent = 0.0f,
+            float maxScrollExtent = 0.0f,
+            float pixels = 0.0f,
+            float viewportDimension = 0.0f,
             AxisDirection axisDirection = AxisDirection.down
         ) {
             this.minScrollExtent = minScrollExtent;
@@ -85,13 +86,13 @@ namespace Unity.UIWidgets.widgets {
             this.axisDirection = axisDirection;
         }
 
-        public double minScrollExtent { get; private set; }
+        public float minScrollExtent { get; private set; }
 
-        public double maxScrollExtent { get; private set; }
+        public float maxScrollExtent { get; private set; }
 
-        public double pixels { get; private set; }
+        public float pixels { get; private set; }
 
-        public double viewportDimension { get; private set; }
+        public float viewportDimension { get; private set; }
 
         public AxisDirection axisDirection { get; private set; }
 

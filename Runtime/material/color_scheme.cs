@@ -232,7 +232,7 @@ namespace Unity.UIWidgets.material {
             );
         }
 
-        public static ColorScheme lerp(ColorScheme a, ColorScheme b, double t) {
+        public static ColorScheme lerp(ColorScheme a, ColorScheme b, float t) {
             return new ColorScheme(
                 primary: Color.lerp(a.primary, b.primary, t),
                 primaryVariant: Color.lerp(a.primaryVariant, b.primaryVariant, t),

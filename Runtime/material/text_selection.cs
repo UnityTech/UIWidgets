@@ -22,8 +22,8 @@ namespace Unity.UIWidgets.material {
     }
 
     static class _TextSelectionUtils {
-        internal const double _kHandleSize = 22.0;
-        internal const double _kToolbarScreenPadding = 8.0;
+        internal const float _kHandleSize = 22.0f;
+        internal const float _kToolbarScreenPadding = 8.0f;
     }
 
     class _TextSelectionToolbar : StatelessWidget {
@@ -60,7 +60,7 @@ namespace Unity.UIWidgets.material {
 
             return new Container(
                 color: new Color(0xFFEFEFEF),
-                height: 44.0, child: new Row(mainAxisSize: MainAxisSize.min, children: items));
+                height: 44.0f, child: new Row(mainAxisSize: MainAxisSize.min, children: items));
         }
     }
 
@@ -83,8 +83,8 @@ namespace Unity.UIWidgets.material {
         public override Offset getPositionForChild(Size size, Size childSize) {
             Offset globalPosition = this.globalEditableRegion.topLeft + this.position;
 
-            double x = globalPosition.dx - childSize.width / 2.0;
-            double y = globalPosition.dy - childSize.height;
+            float x = globalPosition.dx - childSize.width / 2.0f;
+            float y = globalPosition.dy - childSize.height;
 
             if (x < _TextSelectionUtils._kToolbarScreenPadding) {
                 x = _TextSelectionUtils._kToolbarScreenPadding;
@@ -118,9 +118,9 @@ namespace Unity.UIWidgets.material {
         public override void paint(Canvas canvas, Size size) {
             Paint paint = new Paint();
             paint.color = this.color;
-            double radius = size.width / 2.0;
+            float radius = size.width / 2.0f;
             canvas.drawCircle(new Offset(radius, radius), radius, paint);
-            canvas.drawRect(Rect.fromLTWH(0.0, 0.0, radius, radius), paint);
+            canvas.drawRect(Rect.fromLTWH(0.0f, 0.0f, radius, radius), paint);
         }
 
 
@@ -165,9 +165,9 @@ namespace Unity.UIWidgets.material {
             );
         }
 
-        public override Widget buildHandle(BuildContext context, TextSelectionHandleType type, double textLineHeight) {
+        public override Widget buildHandle(BuildContext context, TextSelectionHandleType type, float textLineHeight) {
             Widget handle = new Padding(
-                padding: EdgeInsets.only(right: 26.0, bottom: 26.0),
+                padding: EdgeInsets.only(right: 26.0f, bottom: 26.0f),
                 child: new SizedBox(
                     width: 20,
                     height: 20,
@@ -208,7 +208,7 @@ namespace Unity.UIWidgets.material {
             Widget child = null
         ) : base(key: key) {
             this.onPressed = onPressed;
-            this.padding = padding ?? EdgeInsets.all(8.0);
+            this.padding = padding ?? EdgeInsets.all(8.0f);
             this.backgroundColor = backgroundColor ?? new Color(0);
             this.child = child;
         }

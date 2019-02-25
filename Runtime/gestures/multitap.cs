@@ -45,7 +45,7 @@ namespace Unity.UIWidgets.gestures {
             }
         }
 
-        public bool isWithinTolerance(PointerEvent evt, double tolerance) {
+        public bool isWithinTolerance(PointerEvent evt, float tolerance) {
             Offset offset = evt.position - this._initialPosition;
             return offset.distance <= tolerance;
         }

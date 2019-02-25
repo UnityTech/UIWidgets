@@ -5,24 +5,25 @@ using Unity.UIWidgets.painting;
 using Unity.UIWidgets.service;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
+using UnityEngine;
 
 namespace Unity.UIWidgets.material {
     public class ExpandIcon : StatefulWidget {
         public ExpandIcon(
             Key key = null,
             bool isExpanded = false,
-            double size = 24.0,
+            float size = 24.0f,
             ValueChanged<bool> onPressed = null,
             EdgeInsets padding = null) : base(key: key) {
             this.isExpanded = isExpanded;
             this.size = size;
             this.onPressed = onPressed;
-            this.padding = padding ?? EdgeInsets.all(8.0);
+            this.padding = padding ?? EdgeInsets.all(8.0f);
         }
 
         public readonly bool isExpanded;
 
-        public readonly double size;
+        public readonly float size;
 
         public readonly ValueChanged<bool> onPressed;
 
@@ -36,17 +37,17 @@ namespace Unity.UIWidgets.material {
 
     public class _ExpandIconState : SingleTickerProviderStateMixin<ExpandIcon> {
         AnimationController _controller;
-        Animation<double> _iconTurns;
+        Animation<float> _iconTurns;
 
-        static readonly Animatable<double> _iconTurnTween =
-            new DoubleTween(begin: 0.0, end: 0.5).chain(new CurveTween(curve: Curves.fastOutSlowIn));
+        static readonly Animatable<float> _iconTurnTween =
+            new FloatTween(begin: 0.0f, end: 0.5f).chain(new CurveTween(curve: Curves.fastOutSlowIn));
 
         public override void initState() {
             base.initState();
             this._controller = new AnimationController(duration: ThemeUtils.kThemeAnimationDuration, vsync: this);
             this._iconTurns = this._controller.drive(_iconTurnTween);
             if (this.widget.isExpanded) {
-                this._controller.setValue(Math.PI);
+                this._controller.setValue(Mathf.PI);
             }
         }
 

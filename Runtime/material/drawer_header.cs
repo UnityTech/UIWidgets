@@ -17,8 +17,8 @@ namespace Unity.UIWidgets.material {
         ) : base(key: key) {
             D.assert(child != null);
             this.decoration = decoration;
-            this.margin = margin ?? EdgeInsets.only(bottom: 8.0);
-            this.padding = padding ?? EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0);
+            this.margin = margin ?? EdgeInsets.only(bottom: 8.0f);
+            this.padding = padding ?? EdgeInsets.fromLTRB(16.0f, 16.0f, 16.0f, 8.0f);
             this.duration = duration ?? new TimeSpan(0, 0, 0, 0, 250);
             this.curve = curve ?? Curves.fastOutSlowIn;
             this.child = child;
@@ -41,7 +41,7 @@ namespace Unity.UIWidgets.material {
         public override Widget build(BuildContext context) {
             D.assert(MaterialDebug.debugCheckHasMaterial(context));
             ThemeData theme = Theme.of(context);
-            double statusBarHeight = MediaQuery.of(context).padding.top;
+            float statusBarHeight = MediaQuery.of(context).padding.top;
             return new Container(
                 height: statusBarHeight + DrawerHeaderUtils._kDrawerHeaderHeight,
                 margin: this.margin,

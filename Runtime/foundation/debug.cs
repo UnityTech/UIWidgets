@@ -63,7 +63,7 @@ namespace Unity.UIWidgets.foundation {
 //            canvas.drawPath(path, paint);
         }
 
-        public static void debugPaintPadding(Canvas canvas, Rect outerRect, Rect innerRect, double outlineWidth = 2.0) {
+        public static void debugPaintPadding(Canvas canvas, Rect outerRect, Rect innerRect, float outlineWidth = 2.0f) {
             assert(() => {
                 if (innerRect != null && !innerRect.isEmpty) {
                     _debugDrawDoubleRect(canvas, outerRect, innerRect, new Color(0x900090FF));

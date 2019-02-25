@@ -7,8 +7,8 @@ namespace Unity.UIWidgets.material {
     public class Divider : StatelessWidget {
         public Divider(
             Key key = null,
-            double height = 16.0,
-            double indent = 0.0,
+            float height = 16.0f,
+            float indent = 0.0f,
             Color color = null) : base(key: key) {
             D.assert(height >= 0.0);
             this.height = height;
@@ -16,13 +16,13 @@ namespace Unity.UIWidgets.material {
             this.color = color;
         }
 
-        public readonly double height;
+        public readonly float height;
 
-        public readonly double indent;
+        public readonly float indent;
 
         public readonly Color color;
 
-        public static BorderSide createBorderSide(BuildContext context, Color color = null, double width = 0.0) {
+        public static BorderSide createBorderSide(BuildContext context, Color color = null, float width = 0.0f) {
             return new BorderSide(
                 color: color ?? Theme.of(context).dividerColor,
                 width: width);
@@ -33,7 +33,7 @@ namespace Unity.UIWidgets.material {
                 height: this.height,
                 child: new Center(
                     child: new Container(
-                        height: 0.0,
+                        height: 0.0f,
                         margin: EdgeInsets.only(this.indent),
                         decoration: new BoxDecoration(
                             border: new Border(

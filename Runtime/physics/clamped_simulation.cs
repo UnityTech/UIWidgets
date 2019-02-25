@@ -4,10 +4,10 @@ using Unity.UIWidgets.ui;
 namespace Unity.UIWidgets.physics {
     public class ClampedSimulation : Simulation {
         public ClampedSimulation(Simulation simulation,
-            double xMin = double.NegativeInfinity,
-            double xMax = double.PositiveInfinity,
-            double dxMin = double.NegativeInfinity,
-            double dxMax = double.PositiveInfinity
+            float xMin = float.NegativeInfinity,
+            float xMax = float.PositiveInfinity,
+            float dxMin = float.NegativeInfinity,
+            float dxMax = float.PositiveInfinity
         ) {
             D.assert(simulation != null);
             D.assert(xMax >= xMin);
@@ -21,23 +21,23 @@ namespace Unity.UIWidgets.physics {
 
         public readonly Simulation simulation;
 
-        public readonly double xMin;
+        public readonly float xMin;
 
-        public readonly double xMax;
+        public readonly float xMax;
 
-        public readonly double dxMin;
+        public readonly float dxMin;
 
-        public readonly double dxMax;
+        public readonly float dxMax;
 
-        public override double x(double time) {
+        public override float x(float time) {
             return this.simulation.x(time).clamp(this.xMin, this.xMax);
         }
 
-        public override double dx(double time) {
+        public override float dx(float time) {
             return this.simulation.dx(time).clamp(this.dxMin, this.dxMax);
         }
 
-        public override bool isDone(double time) {
+        public override bool isDone(float time) {
             return this.simulation.isDone(time);
         }
     }

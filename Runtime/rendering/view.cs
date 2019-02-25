@@ -6,7 +6,7 @@ namespace Unity.UIWidgets.rendering {
     public class ViewConfiguration {
         public ViewConfiguration(
             Size size = null,
-            double devicePixelRatio = 1.0
+            float devicePixelRatio = 1.0f
         ) {
             this.size = size ?? Size.zero;
             this.devicePixelRatio = devicePixelRatio;
@@ -14,7 +14,7 @@ namespace Unity.UIWidgets.rendering {
 
         public readonly Size size;
 
-        public readonly double devicePixelRatio;
+        public readonly float devicePixelRatio;
 
         public Matrix3 toMatrix() {
             return Matrix3.I();
@@ -149,7 +149,7 @@ namespace Unity.UIWidgets.rendering {
             });
             properties.add(new DiagnosticsProperty<Size>("window size", Window.instance.physicalSize,
                 tooltip: "in physical pixels"));
-            properties.add(new DoubleProperty("device pixel ratio", Window.instance.devicePixelRatio,
+            properties.add(new FloatProperty("device pixel ratio", Window.instance.devicePixelRatio,
                 tooltip: "physical pixels per logical pixel"));
             properties.add(new DiagnosticsProperty<ViewConfiguration>("configuration", this.configuration,
                 tooltip: "in logical pixels"));

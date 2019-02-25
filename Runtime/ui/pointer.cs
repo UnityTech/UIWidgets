@@ -24,8 +24,8 @@ namespace Unity.UIWidgets.ui {
             PointerChange change,
             PointerDeviceKind kind,
             int device,
-            double physicalX,
-            double physicalY) {
+            float physicalX,
+            float physicalY) {
             this.timeStamp = timeStamp;
             this.change = change;
             this.kind = kind;
@@ -38,8 +38,8 @@ namespace Unity.UIWidgets.ui {
         public PointerChange change;
         public PointerDeviceKind kind;
         public int device;
-        public double physicalX;
-        public double physicalY;
+        public float physicalX;
+        public float physicalY;
     }
 
     public class ScrollData : PointerData {
@@ -48,16 +48,16 @@ namespace Unity.UIWidgets.ui {
             PointerChange change,
             PointerDeviceKind kind,
             int device,
-            double physicalX,
-            double physicalY,
-            double scrollX,
-            double scrollY) : base(timeStamp, change, kind, device, physicalX, physicalY) {
+            float physicalX,
+            float physicalY,
+            float scrollX,
+            float scrollY) : base(timeStamp, change, kind, device, physicalX, physicalY) {
             this.scrollX = scrollX;
             this.scrollY = scrollY;
         }
 
-        public double scrollX;
-        public double scrollY;
+        public float scrollX;
+        public float scrollY;
     }
 
     public class PointerDataPacket {

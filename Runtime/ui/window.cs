@@ -12,22 +12,22 @@ namespace Unity.UIWidgets.ui {
     public delegate void PointerDataPacketCallback(PointerDataPacket packet);
 
     public class WindowPadding {
-        public WindowPadding(double left, double top, double right, double bottom) {
+        public WindowPadding(float left, float top, float right, float bottom) {
             this.left = left;
             this.top = top;
             this.right = right;
             this.bottom = bottom;
         }
 
-        public readonly double left;
+        public readonly float left;
 
-        public readonly double top;
+        public readonly float top;
 
-        public readonly double right;
+        public readonly float right;
 
-        public readonly double bottom;
+        public readonly float bottom;
 
-        public static WindowPadding zero = new WindowPadding(left: 0.0, top: 0.0, right: 0.0, bottom: 0.0);
+        public static WindowPadding zero = new WindowPadding(left: 0.0f, top: 0.0f, right: 0.0f, bottom: 0.0f);
 
         public override string ToString() {
             return $"{this.GetType()}(left: {this.left}, top: {this.top}, right: {this.right}, bottom: {this.bottom})";
@@ -131,11 +131,11 @@ namespace Unity.UIWidgets.ui {
 
         static Window _instance;
 
-        public double devicePixelRatio {
+        public float devicePixelRatio {
             get { return this._devicePixelRatio; }
         }
 
-        protected double _devicePixelRatio = 1.0;
+        protected float _devicePixelRatio = 1.0f;
 
         public Size physicalSize {
             get { return this._physicalSize; }
@@ -185,11 +185,11 @@ namespace Unity.UIWidgets.ui {
 
         VoidCallback _onLocaleChanged;
 
-        public double textScaleFactor {
+        public float textScaleFactor {
             get { return this._textScaleFactor; }
         }
 
-        protected double _textScaleFactor = 1.0;
+        protected float _textScaleFactor = 1.0f;
 
         public VoidCallback onTextScaleFactorChanged {
             get { return this._onTextScaleFactorChanged; }

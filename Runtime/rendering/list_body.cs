@@ -4,12 +4,13 @@ using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.ui;
+using UnityEngine;
 
 namespace Unity.UIWidgets.rendering {
     public class ListBodyParentData : ContainerParentDataMixinBoxParentData<RenderBox> {
     }
 
-    delegate double __ChildSizingFunction(RenderBox child);
+    delegate float __ChildSizingFunction(RenderBox child);
 
 
     public class RenderListBody : RenderBoxContainerDefaultsMixinContainerRenderObjectMixinRenderBox<RenderBox,
@@ -98,11 +99,11 @@ namespace Unity.UIWidgets.rendering {
                 );
             });
 
-            double mainAxisExtent = 0.0;
+            float mainAxisExtent = 0.0f;
             RenderBox child = this.firstChild;
 
             BoxConstraints innerConstraints;
-            double position;
+            float position;
 
             switch (this.axisDirection) {
                 case AxisDirection.right:
@@ -110,13 +111,14 @@ namespace Unity.UIWidgets.rendering {
                     while (child != null) {
                         child.layout(innerConstraints, parentUsesSize: true);
                         ListBodyParentData childParentData = (ListBodyParentData) child.parentData;
-                        childParentData.offset = new Offset(mainAxisExtent, 0.0);
+                        childParentData.offset = new Offset(mainAxisExtent, 0.0f);
                         mainAxisExtent += child.size.width;
                         D.assert(child.parentData == childParentData);
                         child = childParentData.nextSibling;
                     }
 
-                    this.size = this.constraints.constrain(new Size(mainAxisExtent, this.constraints.maxHeight));
+                    this.size = this.constraints.constrain(new Size(mainAxisExtent,
+                        this.constraints.maxHeight));
                     break;
                 case AxisDirection.left:
                     innerConstraints = BoxConstraints.tightFor(height: this.constraints.maxHeight);
@@ -128,24 +130,25 @@ namespace Unity.UIWidgets.rendering {
                         child = childParentData.nextSibling;
                     }
 
-                    position = 0.0;
+                    position = 0.0f;
                     child = this.firstChild;
                     while (child != null) {
                         ListBodyParentData childParentData = (ListBodyParentData) child.parentData;
                         position += child.size.width;
-                        childParentData.offset = new Offset(mainAxisExtent - position, 0.0);
+                        childParentData.offset = new Offset((mainAxisExtent - position), 0.0f);
                         D.assert(child.parentData == childParentData);
                         child = childParentData.nextSibling;
                     }
 
-                    this.size = this.constraints.constrain(new Size(mainAxisExtent, this.constraints.maxHeight));
+                    this.size = this.constraints.constrain(new Size(mainAxisExtent,
+                        this.constraints.maxHeight));
                     break;
                 case AxisDirection.down:
                     innerConstraints = BoxConstraints.tightFor(width: this.constraints.maxWidth);
                     while (child != null) {
                         child.layout(innerConstraints, parentUsesSize: true);
                         ListBodyParentData childParentData = (ListBodyParentData) child.parentData;
-                        childParentData.offset = new Offset(0.0, mainAxisExtent);
+                        childParentData.offset = new Offset(0.0f, mainAxisExtent);
                         mainAxisExtent += child.size.height;
                         D.assert(child.parentData == childParentData);
                         child = childParentData.nextSibling;
@@ -163,12 +166,12 @@ namespace Unity.UIWidgets.rendering {
                         child = childParentData.nextSibling;
                     }
 
-                    position = 0.0;
+                    position = 0.0f;
                     child = this.firstChild;
                     while (child != null) {
                         ListBodyParentData childParentData = (ListBodyParentData) child.parentData;
                         position += child.size.height;
-                        childParentData.offset = new Offset(0.0, mainAxisExtent - position);
+                        childParentData.offset = new Offset(0.0f, mainAxisExtent - position);
                         D.assert(child.parentData == childParentData);
                         child = childParentData.nextSibling;
                     }
@@ -186,11 +189,11 @@ namespace Unity.UIWidgets.rendering {
             properties.add(new EnumProperty<AxisDirection>("axisDirection", this.axisDirection));
         }
 
-        double _getIntrinsicCrossAxis(__ChildSizingFunction childSize) {
-            double extent = 0.0;
+        float _getIntrinsicCrossAxis(__ChildSizingFunction childSize) {
+            float extent = 0.0f;
             RenderBox child = this.firstChild;
             while (child != null) {
-                extent = Math.Max(extent, childSize(child));
+                extent = Mathf.Max(extent, childSize(child));
                 ListBodyParentData childParentData = (ListBodyParentData) child.parentData;
                 child = childParentData.nextSibling;
             }
@@ -198,8 +201,8 @@ namespace Unity.UIWidgets.rendering {
             return extent;
         }
 
-        double _getIntrinsicMainAxis(__ChildSizingFunction childSize) {
-            double extent = 0.0;
+        float _getIntrinsicMainAxis(__ChildSizingFunction childSize) {
+            float extent = 0.0f;
             RenderBox child = this.firstChild;
             while (child != null) {
                 extent += childSize(child);
@@ -211,7 +214,7 @@ namespace Unity.UIWidgets.rendering {
         }
 
 
-        protected override double computeMinIntrinsicWidth(double height) {
+        protected override float computeMinIntrinsicWidth(float height) {
             switch (this.mainAxis) {
                 case Axis.horizontal:
                     return this._getIntrinsicMainAxis((RenderBox child) => child.getMinIntrinsicWidth(height));
@@ -220,11 +223,11 @@ namespace Unity.UIWidgets.rendering {
             }
 
             D.assert(false);
-            return 0.0;
+            return 0.0f;
         }
 
 
-        protected override double computeMaxIntrinsicWidth(double height) {
+        protected override float computeMaxIntrinsicWidth(float height) {
             switch (this.mainAxis) {
                 case Axis.horizontal:
                     return this._getIntrinsicMainAxis((RenderBox child) => child.getMaxIntrinsicWidth(height));
@@ -233,11 +236,11 @@ namespace Unity.UIWidgets.rendering {
             }
 
             D.assert(false);
-            return 0.0;
+            return 0.0f;
         }
 
 
-        protected override double computeMinIntrinsicHeight(double width) {
+        protected override float computeMinIntrinsicHeight(float width) {
             switch (this.mainAxis) {
                 case Axis.horizontal:
                     return this._getIntrinsicMainAxis((RenderBox child) => child.getMinIntrinsicHeight(width));
@@ -246,11 +249,11 @@ namespace Unity.UIWidgets.rendering {
             }
 
             D.assert(false);
-            return 0.0;
+            return 0.0f;
         }
 
 
-        protected override double computeMaxIntrinsicHeight(double width) {
+        protected override float computeMaxIntrinsicHeight(float width) {
             switch (this.mainAxis) {
                 case Axis.horizontal:
                     return this._getIntrinsicMainAxis((RenderBox child) => child.getMaxIntrinsicHeight(width));
@@ -259,11 +262,11 @@ namespace Unity.UIWidgets.rendering {
             }
 
             D.assert(false);
-            return 0.0;
+            return 0.0f;
         }
 
 
-        protected override double? computeDistanceToActualBaseline(TextBaseline baseline) {
+        protected override float? computeDistanceToActualBaseline(TextBaseline baseline) {
             return this.defaultComputeDistanceToFirstActualBaseline(baseline);
         }
 

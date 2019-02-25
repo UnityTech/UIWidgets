@@ -4,53 +4,65 @@ using UnityEngine;
 using UnityEngine.Rendering;
 
 namespace Unity.UIWidgets.ui {
-
     static class MaterialProps {
         static readonly int _srcBlend = Shader.PropertyToID("_SrcBlend");
         static readonly int _dstBlend = Shader.PropertyToID("_DstBlend");
         static readonly int _stencilComp = Shader.PropertyToID("_StencilComp");
 
         public static void set(Material mat, BlendMode op) {
-             if (op == BlendMode.srcOver) {
+            if (op == BlendMode.srcOver) {
                 mat.SetInt(_srcBlend, (int) UnityEngine.Rendering.BlendMode.One);
                 mat.SetInt(_dstBlend, (int) UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
-            } else if (op == BlendMode.srcIn) {
+            }
+            else if (op == BlendMode.srcIn) {
                 mat.SetInt(_srcBlend, (int) UnityEngine.Rendering.BlendMode.DstAlpha);
                 mat.SetInt(_dstBlend, (int) UnityEngine.Rendering.BlendMode.Zero);
-            } else if (op == BlendMode.srcOut) {
+            }
+            else if (op == BlendMode.srcOut) {
                 mat.SetInt(_srcBlend, (int) UnityEngine.Rendering.BlendMode.OneMinusDstAlpha);
                 mat.SetInt(_dstBlend, (int) UnityEngine.Rendering.BlendMode.Zero);
-            } else if (op == BlendMode.srcATop) {
+            }
+            else if (op == BlendMode.srcATop) {
                 mat.SetInt(_srcBlend, (int) UnityEngine.Rendering.BlendMode.DstAlpha);
                 mat.SetInt(_dstBlend, (int) UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
-            } else if (op == BlendMode.dstOver) {
+            }
+            else if (op == BlendMode.dstOver) {
                 mat.SetInt(_srcBlend, (int) UnityEngine.Rendering.BlendMode.OneMinusDstAlpha);
                 mat.SetInt(_dstBlend, (int) UnityEngine.Rendering.BlendMode.One);
-            } else if (op == BlendMode.dstIn) {
+            }
+            else if (op == BlendMode.dstIn) {
                 mat.SetInt(_srcBlend, (int) UnityEngine.Rendering.BlendMode.Zero);
                 mat.SetInt(_dstBlend, (int) UnityEngine.Rendering.BlendMode.SrcAlpha);
-            } else if (op == BlendMode.dstOut) {
+            }
+            else if (op == BlendMode.dstOut) {
                 mat.SetInt(_srcBlend, (int) UnityEngine.Rendering.BlendMode.Zero);
                 mat.SetInt(_dstBlend, (int) UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
-            } else if (op == BlendMode.dstATop) {
+            }
+            else if (op == BlendMode.dstATop) {
                 mat.SetInt(_srcBlend, (int) UnityEngine.Rendering.BlendMode.OneMinusDstAlpha);
                 mat.SetInt(_dstBlend, (int) UnityEngine.Rendering.BlendMode.SrcAlpha);
-            } else if (op == BlendMode.plus) {
+            }
+            else if (op == BlendMode.plus) {
                 mat.SetInt(_srcBlend, (int) UnityEngine.Rendering.BlendMode.One);
                 mat.SetInt(_dstBlend, (int) UnityEngine.Rendering.BlendMode.One);
-            } else if (op == BlendMode.src) {
+            }
+            else if (op == BlendMode.src) {
                 mat.SetInt(_srcBlend, (int) UnityEngine.Rendering.BlendMode.One);
                 mat.SetInt(_dstBlend, (int) UnityEngine.Rendering.BlendMode.Zero);
-            } else if (op == BlendMode.dst) {
+            }
+            else if (op == BlendMode.dst) {
                 mat.SetInt(_srcBlend, (int) UnityEngine.Rendering.BlendMode.Zero);
                 mat.SetInt(_dstBlend, (int) UnityEngine.Rendering.BlendMode.One);
-            } else if (op == BlendMode.xor) {
+            }
+            else if (op == BlendMode.xor) {
                 mat.SetInt(_srcBlend, (int) UnityEngine.Rendering.BlendMode.OneMinusDstAlpha);
                 mat.SetInt(_dstBlend, (int) UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
-            } else if (op == BlendMode.clear) {
+            }
+            else if (op == BlendMode.clear) {
                 mat.SetInt(_srcBlend, (int) UnityEngine.Rendering.BlendMode.Zero);
                 mat.SetInt(_dstBlend, (int) UnityEngine.Rendering.BlendMode.Zero);
-            } else {
+            }
+            else {
                 Debug.LogWarning("Not supported BlendMode: " + op + ". Defaults to srcOver");
                 mat.SetInt(_srcBlend, (int) UnityEngine.Rendering.BlendMode.One);
                 mat.SetInt(_dstBlend, (int) UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
@@ -61,7 +73,7 @@ namespace Unity.UIWidgets.ui {
             mat.SetFloat(_stencilComp, (int) op);
         }
     }
-    
+
     class MaterialByBlendMode {
         public MaterialByBlendMode(Shader shader) {
             this._shader = shader;
@@ -79,12 +91,12 @@ namespace Unity.UIWidgets.ui {
 
             mat = new Material(this._shader) {hideFlags = HideFlags.HideAndDontSave};
             MaterialProps.set(mat, op);
-            
+
             this._materials[key] = mat;
             return mat;
         }
     }
-    
+
     class MaterialByStencilComp {
         public MaterialByStencilComp(Shader shader) {
             this._shader = shader;
@@ -102,7 +114,7 @@ namespace Unity.UIWidgets.ui {
 
             mat = new Material(this._shader) {hideFlags = HideFlags.HideAndDontSave};
             MaterialProps.set(mat, ignoreClip ? CompareFunction.Always : CompareFunction.Equal);
-            
+
             this._materials[key] = mat;
             return mat;
         }
@@ -126,11 +138,11 @@ namespace Unity.UIWidgets.ui {
             mat = new Material(this._shader) {hideFlags = HideFlags.HideAndDontSave};
             MaterialProps.set(mat, blend);
             MaterialProps.set(mat, ignoreClip ? CompareFunction.Always : CompareFunction.Equal);
-            
+
             this._materials[key] = mat;
             return mat;
         }
-    }   
+    }
 
     static class CanvasShader {
         static readonly MaterialByBlendModeStencilComp _convexFillMat;
@@ -147,30 +159,37 @@ namespace Unity.UIWidgets.ui {
             if (convexFillShader == null) {
                 throw new Exception("UIWidgets/canvas_convexFill not found");
             }
+
             var fill0Shader = Shader.Find("UIWidgets/canvas_fill0");
             if (fill0Shader == null) {
                 throw new Exception("UIWidgets/canvas_fill0 not found");
             }
+
             var fill1Shader = Shader.Find("UIWidgets/canvas_fill1");
             if (fill1Shader == null) {
                 throw new Exception("UIWidgets/canvas_fill1 not found");
             }
+
             var stroke0Shader = Shader.Find("UIWidgets/canvas_stroke0");
             if (stroke0Shader == null) {
                 throw new Exception("UIWidgets/canvas_stroke0 not found");
             }
+
             var stroke1Shader = Shader.Find("UIWidgets/canvas_stroke1");
             if (stroke1Shader == null) {
                 throw new Exception("UIWidgets/canvas_stroke1 not found");
             }
+
             var texShader = Shader.Find("UIWidgets/canvas_tex");
             if (texShader == null) {
                 throw new Exception("UIWidgets/canvas_tex not found");
             }
+
             var stencilShader = Shader.Find("UIWidgets/canvas_stencil");
             if (stencilShader == null) {
                 throw new Exception("UIWidgets/canvas_stencil not found");
             }
+
             var filterShader = Shader.Find("UIWidgets/canvas_filter");
             if (filterShader == null) {
                 throw new Exception("UIWidgets/canvas_filter not found");
@@ -229,8 +248,8 @@ namespace Unity.UIWidgets.ui {
                     props.SetVector("_leftColor", _colorToVector4(sweep.leftColor));
                     props.SetVector("_rightColor", _colorToVector4(sweep.rightColor));
                     props.SetInt("_tileMode", (int) sweep.tileMode);
-                    props.SetFloat("_bias", (float) sweep.bias);
-                    props.SetFloat("_scale", (float) sweep.scale);
+                    props.SetFloat("_bias", sweep.bias);
+                    props.SetFloat("_scale", sweep.scale);
                     return;
                 case ImageShader image:
                     pass = 4;

@@ -1,14 +1,16 @@
 using System;
 using System.Collections.Generic;
 using Unity.UIWidgets.ui;
+using UnityEngine;
+using Color = Unity.UIWidgets.ui.Color;
 
 namespace Unity.UIWidgets.painting {
     public class BoxShadow : IEquatable<BoxShadow> {
         public BoxShadow(
             Color color = null,
             Offset offset = null,
-            double blurRadius = 0.0,
-            double spreadRadius = 0.0
+            float blurRadius = 0.0f,
+            float spreadRadius = 0.0f
         ) {
             this.color = color ?? Color.black;
             this.offset = offset ?? Offset.zero;
@@ -18,14 +20,14 @@ namespace Unity.UIWidgets.painting {
 
         public readonly Color color;
         public readonly Offset offset;
-        public readonly double blurRadius;
-        public readonly double spreadRadius;
+        public readonly float blurRadius;
+        public readonly float spreadRadius;
 
-        public static double convertRadiusToSigma(double radius) {
-            return radius * 0.57735 + 0.5;
+        public static float convertRadiusToSigma(float radius) {
+            return radius * 0.57735f + 0.5f;
         }
 
-        public double blurSigma {
+        public float blurSigma {
             get { return convertRadiusToSigma(this.blurRadius); }
         }
 
@@ -36,7 +38,7 @@ namespace Unity.UIWidgets.painting {
             };
         }
 
-        public BoxShadow scale(double factor) {
+        public BoxShadow scale(float factor) {
             return new BoxShadow(
                 color: this.color,
                 offset: this.offset * factor,
@@ -45,7 +47,7 @@ namespace Unity.UIWidgets.painting {
             );
         }
 
-        public static BoxShadow lerp(BoxShadow a, BoxShadow b, double t) {
+        public static BoxShadow lerp(BoxShadow a, BoxShadow b, float t) {
             if (a == null && b == null) {
                 return null;
             }
@@ -55,18 +57,18 @@ namespace Unity.UIWidgets.painting {
             }
 
             if (b == null) {
-                return a.scale(1.0 - t);
+                return a.scale(1.0f - t);
             }
 
             return new BoxShadow(
                 color: Color.lerp(a.color, b.color, t),
                 offset: Offset.lerp(a.offset, b.offset, t),
-                blurRadius: MathUtils.lerpDouble(a.blurRadius, b.blurRadius, t),
-                spreadRadius: MathUtils.lerpDouble(a.spreadRadius, b.spreadRadius, t)
+                blurRadius: MathUtils.lerpFloat(a.blurRadius, b.blurRadius, t),
+                spreadRadius: MathUtils.lerpFloat(a.spreadRadius, b.spreadRadius, t)
             );
         }
 
-        public static List<BoxShadow> lerpList(List<BoxShadow> a, List<BoxShadow> b, double t) {
+        public static List<BoxShadow> lerpList(List<BoxShadow> a, List<BoxShadow> b, float t) {
             if (a == null && b == null) {
                 return null;
             }
@@ -74,13 +76,13 @@ namespace Unity.UIWidgets.painting {
             a = a ?? new List<BoxShadow>();
             b = b ?? new List<BoxShadow>();
             List<BoxShadow> result = new List<BoxShadow>();
-            int commonLength = Math.Min(a.Count, b.Count);
+            int commonLength = Mathf.Min(a.Count, b.Count);
             for (int i = 0; i < commonLength; i += 1) {
                 result.Add(lerp(a[i], b[i], t));
             }
 
             for (int i = commonLength; i < a.Count; i += 1) {
-                result.Add(a[i].scale(1.0 - t));
+                result.Add(a[i].scale(1.0f - t));
             }
 
             for (int i = commonLength; i < b.Count; i += 1) {

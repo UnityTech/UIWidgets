@@ -9,9 +9,9 @@ namespace Unity.UIWidgets.rendering {
     class RenderImage : RenderBox {
         public RenderImage(
             Image image = null,
-            double? width = null,
-            double? height = null,
-            double scale = 1.0,
+            float? width = null,
+            float? height = null,
+            float scale = 1.0f,
             Color color = null,
             BlendMode colorBlendMode = BlendMode.srcIn,
             BoxFit? fit = null,
@@ -52,9 +52,9 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
-        double? _width;
+        float? _width;
 
-        public double? width {
+        public float? width {
             get { return this._width; }
             set {
                 if (value == this._width) {
@@ -66,9 +66,9 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
-        double? _height;
+        float? _height;
 
-        public double? height {
+        public float? height {
             get { return this._height; }
             set {
                 if (value == this._height) {
@@ -80,9 +80,9 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
-        double _scale;
+        float _scale;
 
-        public double scale {
+        public float scale {
             get { return this._scale; }
             set {
                 if (value == this._scale) {
@@ -217,35 +217,35 @@ namespace Unity.UIWidgets.rendering {
             }
 
             return constraints.constrainSizeAndAttemptToPreserveAspectRatio(new Size(
-                this._image.width / this._scale,
-                this._image.height / this._scale
+                (this._image.width / this._scale),
+                (this._image.height / this._scale)
             ));
         }
 
-        protected override double computeMinIntrinsicWidth(double height) {
+        protected override float computeMinIntrinsicWidth(float height) {
             D.assert(height >= 0.0);
             if (this._width == null && this._height == null) {
-                return 0.0;
+                return 0.0f;
             }
 
             return this._sizeForConstraints(BoxConstraints.tightForFinite(height: height)).width;
         }
 
-        protected override double computeMaxIntrinsicWidth(double height) {
+        protected override float computeMaxIntrinsicWidth(float height) {
             D.assert(height >= 0.0);
             return this._sizeForConstraints(BoxConstraints.tightForFinite(height: height)).width;
         }
 
-        protected override double computeMinIntrinsicHeight(double width) {
+        protected override float computeMinIntrinsicHeight(float width) {
             D.assert(width >= 0.0);
             if (this._width == null && this._height == null) {
-                return 0.0;
+                return 0.0f;
             }
 
             return this._sizeForConstraints(BoxConstraints.tightForFinite(width: width)).height;
         }
 
-        protected override double computeMaxIntrinsicHeight(double width) {
+        protected override float computeMaxIntrinsicHeight(float width) {
             D.assert(width >= 0.0);
             return this._sizeForConstraints(BoxConstraints.tightForFinite(width: width)).height;
         }
@@ -281,9 +281,9 @@ namespace Unity.UIWidgets.rendering {
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             properties.add(new DiagnosticsProperty<Image>("image", this.image));
-            properties.add(new DoubleProperty("width", this.width, defaultValue: Diagnostics.kNullDefaultValue));
-            properties.add(new DoubleProperty("height", this.height, defaultValue: Diagnostics.kNullDefaultValue));
-            properties.add(new DoubleProperty("scale", this.scale, defaultValue: 1.0));
+            properties.add(new FloatProperty("width", this.width, defaultValue: Diagnostics.kNullDefaultValue));
+            properties.add(new FloatProperty("height", this.height, defaultValue: Diagnostics.kNullDefaultValue));
+            properties.add(new FloatProperty("scale", this.scale, defaultValue: 1.0));
             properties.add(new DiagnosticsProperty<Color>("color", this.color,
                 defaultValue: Diagnostics.kNullDefaultValue));
             properties.add(new EnumProperty<BlendMode>("colorBlendMode", this.colorBlendMode,

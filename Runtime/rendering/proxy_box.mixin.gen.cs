@@ -11,39 +11,39 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
-        protected override double computeMinIntrinsicWidth(double height) {
+        protected override float computeMinIntrinsicWidth(float height) {
             if (this.child != null) {
                 return this.child.getMinIntrinsicWidth(height);
             }
 
-            return 0.0;
+            return 0.0f;
         }
 
-        protected override double computeMaxIntrinsicWidth(double height) {
+        protected override float computeMaxIntrinsicWidth(float height) {
             if (this.child != null) {
                 return this.child.getMaxIntrinsicWidth(height);
             }
 
-            return 0.0;
+            return 0.0f;
         }
 
-        protected override double computeMinIntrinsicHeight(double width) {
+        protected override float computeMinIntrinsicHeight(float width) {
             if (this.child != null) {
                 return this.child.getMinIntrinsicHeight(width);
             }
 
-            return 0.0;
+            return 0.0f;
         }
 
-        protected override double computeMaxIntrinsicHeight(double width) {
+        protected override float computeMaxIntrinsicHeight(float width) {
             if (this.child != null) {
                 return this.child.getMaxIntrinsicHeight(width);
             }
 
-            return 0.0;
+            return 0.0f;
         }
 
-        protected override double? computeDistanceToActualBaseline(TextBaseline baseline) {
+        protected override float? computeDistanceToActualBaseline(TextBaseline baseline) {
             if (this.child != null) {
                 return this.child.getDistanceToActualBaseline(baseline);
             }

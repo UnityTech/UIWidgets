@@ -17,11 +17,11 @@ namespace Unity.UIWidgets.widgets {
             get { return null; }
         }
 
-        public virtual double? estimateMaxScrollOffset(
+        public virtual float? estimateMaxScrollOffset(
             int firstIndex,
             int lastIndex,
-            double leadingScrollOffset,
-            double trailingScrollOffset
+            float leadingScrollOffset,
+            float trailingScrollOffset
         ) {
             return null;
         }
@@ -164,12 +164,12 @@ namespace Unity.UIWidgets.widgets {
             return new SliverMultiBoxAdaptorElement(this);
         }
 
-        public double? estimateMaxScrollOffset(
+        public float? estimateMaxScrollOffset(
             SliverConstraints constraints,
             int firstIndex,
             int lastIndex,
-            double leadingScrollOffset,
-            double trailingScrollOffset
+            float leadingScrollOffset,
+            float trailingScrollOffset
         ) {
             D.assert(lastIndex >= firstIndex);
             return this.del.estimateMaxScrollOffset(
@@ -203,12 +203,12 @@ namespace Unity.UIWidgets.widgets {
         public SliverFixedExtentList(
             Key key = null,
             SliverChildDelegate del = null,
-            double itemExtent = 0
+            float itemExtent = 0
         ) : base(key: key, del: del) {
             this.itemExtent = itemExtent;
         }
 
-        public readonly double itemExtent;
+        public readonly float itemExtent;
 
         public override RenderObject createRenderObject(BuildContext context) {
             SliverMultiBoxAdaptorElement element = (SliverMultiBoxAdaptorElement) context;
@@ -224,12 +224,12 @@ namespace Unity.UIWidgets.widgets {
     public class SliverFillViewport : SliverMultiBoxAdaptorWidget {
         public SliverFillViewport(
             Key key = null, SliverChildDelegate del = null,
-            double viewportFraction = 1.0) : base(key: key, del: del) {
+            float viewportFraction = 1.0f) : base(key: key, del: del) {
             D.assert(viewportFraction > 0.0);
             this.viewportFraction = viewportFraction;
         }
 
-        public readonly double viewportFraction;
+        public readonly float viewportFraction;
 
         public override RenderObject createRenderObject(BuildContext context) {
             SliverMultiBoxAdaptorElement element = (SliverMultiBoxAdaptorElement) context;
@@ -381,11 +381,11 @@ namespace Unity.UIWidgets.widgets {
             });
         }
 
-        static double _extrapolateMaxScrollOffset(
+        static float _extrapolateMaxScrollOffset(
             int firstIndex,
             int lastIndex,
-            double leadingScrollOffset,
-            double trailingScrollOffset,
+            float leadingScrollOffset,
+            float trailingScrollOffset,
             int childCount
         ) {
             if (lastIndex == childCount - 1) {
@@ -393,20 +393,20 @@ namespace Unity.UIWidgets.widgets {
             }
 
             int reifiedCount = lastIndex - firstIndex + 1;
-            double averageExtent = (trailingScrollOffset - leadingScrollOffset) / reifiedCount;
+            float averageExtent = (trailingScrollOffset - leadingScrollOffset) / reifiedCount;
             int remainingCount = childCount - lastIndex - 1;
             return trailingScrollOffset + averageExtent * remainingCount;
         }
 
-        public double estimateMaxScrollOffset(SliverConstraints constraints,
+        public float estimateMaxScrollOffset(SliverConstraints constraints,
             int firstIndex = 0,
             int lastIndex = 0,
-            double leadingScrollOffset = 0,
-            double trailingScrollOffset = 0
+            float leadingScrollOffset = 0,
+            float trailingScrollOffset = 0
         ) {
             int? childCount = this.childCount;
             if (childCount == null) {
-                return double.PositiveInfinity;
+                return float.PositiveInfinity;
             }
 
             return this.widget.estimateMaxScrollOffset(
@@ -490,7 +490,7 @@ namespace Unity.UIWidgets.widgets {
             this._childElements.Values.Where(child => {
                 SliverMultiBoxAdaptorParentData parentData =
                     (SliverMultiBoxAdaptorParentData) child.renderObject.parentData;
-                double itemExtent = 0;
+                float itemExtent = 0;
                 switch (this.renderObject.constraints.axis) {
                     case Axis.horizontal:
                         itemExtent = child.renderObject.paintBounds.width;

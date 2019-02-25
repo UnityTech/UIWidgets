@@ -12,8 +12,8 @@ namespace Unity.UIWidgets.widgets {
     public class MediaQueryData : IEquatable<MediaQueryData> {
         public MediaQueryData(
             Size size = null,
-            double devicePixelRatio = 1.0,
-            double textScaleFactor = 1.0,
+            float devicePixelRatio = 1.0f,
+            float textScaleFactor = 1.0f,
             EdgeInsets viewInsets = null,
             EdgeInsets padding = null,
             bool alwaysUse24HourFormat = false,
@@ -51,9 +51,9 @@ namespace Unity.UIWidgets.widgets {
 
         public readonly Size size;
 
-        public readonly double devicePixelRatio;
+        public readonly float devicePixelRatio;
 
-        public readonly double textScaleFactor;
+        public readonly float textScaleFactor;
 
         public readonly EdgeInsets viewInsets;
 
@@ -75,8 +75,8 @@ namespace Unity.UIWidgets.widgets {
 
         public MediaQueryData copyWith(
             Size size = null,
-            double? devicePixelRatio = null,
-            double? textScaleFactor = null,
+            float? devicePixelRatio = null,
+            float? textScaleFactor = null,
             EdgeInsets viewInsets = null,
             EdgeInsets padding = null,
             bool? alwaysUse24HourFormat = null,
@@ -114,10 +114,10 @@ namespace Unity.UIWidgets.widgets {
                 devicePixelRatio: this.devicePixelRatio,
                 textScaleFactor: this.textScaleFactor,
                 padding: this.padding.copyWith(
-                    left: removeLeft ? (double?) 0.0 : null,
-                    top: removeTop ? (double?) 0.0 : null,
-                    right: removeRight ? (double?) 0.0 : null,
-                    bottom: removeBottom ? (double?) 0.0 : null
+                    left: removeLeft ? (float?) 0.0 : null,
+                    top: removeTop ? (float?) 0.0 : null,
+                    right: removeRight ? (float?) 0.0 : null,
+                    bottom: removeBottom ? (float?) 0.0 : null
                 ),
                 viewInsets: this.viewInsets,
                 alwaysUse24HourFormat: this.alwaysUse24HourFormat,
@@ -144,10 +144,10 @@ namespace Unity.UIWidgets.widgets {
                 textScaleFactor: this.textScaleFactor,
                 padding: this.padding,
                 viewInsets: this.viewInsets.copyWith(
-                    left: removeLeft ? (double?) 0.0 : null,
-                    top: removeTop ? (double?) 0.0 : null,
-                    right: removeRight ? (double?) 0.0 : null,
-                    bottom: removeBottom ? (double?) 0.0 : null
+                    left: removeLeft ? (float?) 0.0 : null,
+                    top: removeTop ? (float?) 0.0 : null,
+                    right: removeRight ? (float?) 0.0 : null,
+                    bottom: removeBottom ? (float?) 0.0 : null
                 ),
                 alwaysUse24HourFormat: this.alwaysUse24HourFormat,
                 disableAnimations: this.disableAnimations,
@@ -309,8 +309,8 @@ namespace Unity.UIWidgets.widgets {
                 $"  {context}");
         }
 
-        public static double textScaleFactorOf(BuildContext context) {
-            return of(context, nullOk: true)?.textScaleFactor ?? 1.0;
+        public static float textScaleFactorOf(BuildContext context) {
+            return of(context, nullOk: true)?.textScaleFactor ?? 1.0f;
         }
 
         static bool boldTextOverride(BuildContext context) {

@@ -12,8 +12,8 @@ namespace Unity.UIWidgets.material {
             EdgeInsets padding = null,
             Color color = null,
             Decoration decoration = null,
-            double? width = null,
-            double? height = null,
+            float? width = null,
+            float? height = null,
             Widget child = null) : base(key: key) {
             D.assert(padding == null || padding.isNonNegative);
             D.assert(decoration == null || decoration.debugAssertIsValid());
@@ -37,8 +37,8 @@ namespace Unity.UIWidgets.material {
             Alignment alignment = null,
             Rect centerSlice = null,
             ImageRepeat repeat = ImageRepeat.noRepeat,
-            double? width = null,
-            double? height = null,
+            float? width = null,
+            float? height = null,
             Widget child = null
         ) {
             D.assert(padding == null || padding.isNonNegative);
@@ -71,9 +71,9 @@ namespace Unity.UIWidgets.material {
 
         public readonly Decoration decoration;
 
-        public readonly double? width;
+        public readonly float? width;
 
-        public readonly double? height;
+        public readonly float? height;
 
         public EdgeInsets _paddingIncludingDecoration {
             get {

@@ -1,10 +1,10 @@
-using System;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
+using UnityEngine;
 
 namespace Unity.UIWidgets.animation {
     public abstract class Curve {
-        public abstract double transform(double t);
+        public abstract float transform(float t);
 
         public Curve flipped {
             get { return new FlippedCurve(this); }
@@ -16,7 +16,7 @@ namespace Unity.UIWidgets.animation {
     }
 
     class _Linear : Curve {
-        public override double transform(double t) {
+        public override float transform(float t) {
             return t;
         }
     }
@@ -28,10 +28,10 @@ namespace Unity.UIWidgets.animation {
 
         public readonly int count;
 
-        public override double transform(double t) {
+        public override float transform(float t) {
             D.assert(t >= 0.0 && t <= 1.0);
-            if (t == 1.0) {
-                return 1.0;
+            if (t == 1.0f) {
+                return 1.0f;
             }
 
             t *= this.count;
@@ -44,19 +44,19 @@ namespace Unity.UIWidgets.animation {
     }
 
     public class Interval : Curve {
-        public Interval(double begin, double end, Curve curve = null) {
+        public Interval(float begin, float end, Curve curve = null) {
             this.begin = begin;
             this.end = end;
             this.curve = curve ?? Curves.linear;
         }
 
-        public readonly double begin;
+        public readonly float begin;
 
-        public readonly double end;
+        public readonly float end;
 
         public readonly Curve curve;
 
-        public override double transform(double t) {
+        public override float transform(float t) {
             D.assert(t >= 0.0 && t <= 1.0);
             D.assert(this.begin >= 0.0);
             D.assert(this.begin <= 1.0);
@@ -67,7 +67,7 @@ namespace Unity.UIWidgets.animation {
                 return t;
             }
 
-            t = ((t - this.begin) / (this.end - this.begin)).clamp(0.0, 1.0);
+            t = ((t - this.begin) / (this.end - this.begin)).clamp(0.0f, 1.0f);
             if (t == 0.0 || t == 1.0) {
                 return t;
             }
@@ -85,13 +85,13 @@ namespace Unity.UIWidgets.animation {
     }
 
     public class Threshold : Curve {
-        public Threshold(double threshold) {
+        public Threshold(float threshold) {
             this.threshold = threshold;
         }
 
-        public readonly double threshold;
+        public readonly float threshold;
 
-        public override double transform(double t) {
+        public override float transform(float t) {
             D.assert(t >= 0.0 && t <= 1.0);
             D.assert(this.threshold >= 0.0);
             D.assert(this.threshold <= 1.0);
@@ -99,41 +99,42 @@ namespace Unity.UIWidgets.animation {
                 return t;
             }
 
-            return t < this.threshold ? 0.0 : 1.0;
+            return t < this.threshold ? 0.0f : 1.0f;
         }
     }
 
     public class Cubic : Curve {
-        public Cubic(double a, double b, double c, double d) {
+        public Cubic(float a, float b, float c, float d) {
             this.a = a;
             this.b = b;
             this.c = c;
             this.d = d;
         }
 
-        public readonly double a;
+        public readonly float a;
 
-        public readonly double b;
+        public readonly float b;
 
-        public readonly double c;
+        public readonly float c;
 
-        public readonly double d;
+        public readonly float d;
 
-        const double _cubicErrorBound = 0.001;
+        const float _cubicErrorBound = 0.001f;
 
-        double _evaluateCubic(double a, double b, double m) {
+        float _evaluateCubic(float a, float b, float m) {
             return 3 * a * (1 - m) * (1 - m) * m +
                    3 * b * (1 - m) * m * m +
                    m * m * m;
         }
 
-        public override double transform(double t) {
+        public override float transform(float t) {
             D.assert(t >= 0.0 && t <= 1.0);
-            double start = 0.0;
-            double end = 1.0;
+
+            float start = 0.0f;
+            float end = 1.0f;
             while (true) {
-                double midpoint = (start + end) / 2;
-                double estimate = this._evaluateCubic(this.a, this.c, midpoint);
+                float midpoint = (start + end) / 2;
+                float estimate = this._evaluateCubic(this.a, this.c, midpoint);
                 if ((t - estimate).abs() < _cubicErrorBound) {
                     return this._evaluateCubic(this.b, this.d, midpoint);
                 }
@@ -160,8 +161,8 @@ namespace Unity.UIWidgets.animation {
 
         public readonly Curve curve;
 
-        public override double transform(double t) {
-            return 1.0 - this.curve.transform(1.0 - t);
+        public override float transform(float t) {
+            return 1.0f - this.curve.transform(1.0f - t);
         }
 
         public override string ToString() {
@@ -173,10 +174,10 @@ namespace Unity.UIWidgets.animation {
         internal _DecelerateCurve() {
         }
 
-        public override double transform(double t) {
+        public override float transform(float t) {
             D.assert(t >= 0.0 && t <= 1.0);
-            t = 1.0 - t;
-            return 1.0 - t * t;
+            t = 1.0f - t;
+            return 1.0f - t * t;
         }
     }
 
@@ -184,9 +185,9 @@ namespace Unity.UIWidgets.animation {
         internal _BounceInCurve() {
         }
 
-        public override double transform(double t) {
+        public override float transform(float t) {
             D.assert(t >= 0.0 && t <= 1.0);
-            return 1.0 - Curves._bounce(1.0 - t);
+            return 1.0f - Curves._bounce(1.0f - t);
         }
     }
 
@@ -194,8 +195,8 @@ namespace Unity.UIWidgets.animation {
         internal _BounceOutCurve() {
         }
 
-        public override double transform(double t) {
-            D.assert(t >= 0.0 && t <= 1.0);
+        public override float transform(float t) {
+            D.assert(t >= 0.0f && t <= 1.0f);
             return Curves._bounce(t);
         }
     }
@@ -204,29 +205,29 @@ namespace Unity.UIWidgets.animation {
         internal _BounceInOutCurve() {
         }
 
-        public override double transform(double t) {
-            D.assert(t >= 0.0 && t <= 1.0);
-            if (t < 0.5) {
-                return (1.0 - Curves._bounce(1.0 - t)) * 0.5;
+        public override float transform(float t) {
+            D.assert(t >= 0.0 && t <= 1.0f);
+            if (t < 0.5f) {
+                return (1.0f - Curves._bounce(1.0f - t)) * 0.5f;
             }
             else {
-                return Curves._bounce(t * 2.0 - 1.0) * 0.5 + 0.5;
+                return Curves._bounce(t * 2.0f - 1.0f) * 0.5f + 0.5f;
             }
         }
     }
 
     public class ElasticInCurve : Curve {
-        public ElasticInCurve(double period = 0.4) {
+        public ElasticInCurve(float period = 0.4f) {
             this.period = period;
         }
 
-        public readonly double period;
+        public readonly float period;
 
-        public override double transform(double t) {
+        public override float transform(float t) {
             D.assert(t >= 0.0 && t <= 1.0);
-            double s = this.period / 4.0;
-            t = t - 1.0;
-            return -Math.Pow(2.0, 10.0 * t) * Math.Sin((t - s) * (Math.PI * 2.0) / this.period);
+            float s = this.period / 4.0f;
+            t = t - 1.0f;
+            return -Mathf.Pow(2.0f, 10.0f * t) * Mathf.Sin((t - s) * (Mathf.PI * 2.0f) / this.period);
         }
 
         public override string ToString() {
@@ -235,16 +236,16 @@ namespace Unity.UIWidgets.animation {
     }
 
     public class ElasticOutCurve : Curve {
-        public ElasticOutCurve(double period = 0.4) {
+        public ElasticOutCurve(float period = 0.4f) {
             this.period = period;
         }
 
-        public readonly double period;
+        public readonly float period;
 
-        public override double transform(double t) {
+        public override float transform(float t) {
             D.assert(t >= 0.0 && t <= 1.0);
-            double s = this.period / 4.0;
-            return Math.Pow(2.0, -10.0 * t) * Math.Sin((t - s) * (Math.PI * 2.0) / this.period) + 1.0;
+            float s = this.period / 4.0f;
+            return Mathf.Pow(2.0f, -10.0f * t) * Mathf.Sin((t - s) * (Mathf.PI * 2.0f) / this.period) + 1.0f;
         }
 
         public override string ToString() {
@@ -253,21 +254,22 @@ namespace Unity.UIWidgets.animation {
     }
 
     public class ElasticInOutCurve : Curve {
-        public ElasticInOutCurve(double period = 0.4) {
+        public ElasticInOutCurve(float period = 0.4f) {
             this.period = period;
         }
 
-        public readonly double period;
+        public readonly float period;
 
-        public override double transform(double t) {
+        public override float transform(float t) {
             D.assert(t >= 0.0 && t <= 1.0);
-            double s = this.period / 4.0;
-            t = 2.0 * t - 1.0;
+            float s = this.period / 4.0f;
+            t = 2.0f * t - 1.0f;
             if (t < 0.0) {
-                return -0.5 * Math.Pow(2.0, 10.0 * t) * Math.Sin((t - s) * (Math.PI * 2.0) / this.period);
+                return -0.5f * Mathf.Pow(2.0f, 10.0f * t) * Mathf.Sin((t - s) * (Mathf.PI * 2.0f) / this.period);
             }
             else {
-                return Math.Pow(2.0, -10.0 * t) * Math.Sin((t - s) * (Math.PI * 2.0) / this.period) * 0.5 + 1.0;
+                return Mathf.Pow(2.0f, -10.0f * t) * Mathf.Sin((t - s) * (Mathf.PI * 2.0f) / this.period) * 0.5f +
+                       1.0f;
             }
         }
 
@@ -281,15 +283,15 @@ namespace Unity.UIWidgets.animation {
 
         public static readonly Curve decelerate = new _DecelerateCurve();
 
-        public static readonly Curve ease = new Cubic(0.25, 0.1, 0.25, 1.0);
+        public static readonly Curve ease = new Cubic(0.25f, 0.1f, 0.25f, 1.0f);
 
-        public static readonly Curve easeIn = new Cubic(0.42, 0.0, 1.0, 1.0);
+        public static readonly Curve easeIn = new Cubic(0.42f, 0.0f, 1.0f, 1.0f);
 
-        public static readonly Curve easeOut = new Cubic(0.0, 0.0, 0.58, 1.0);
+        public static readonly Curve easeOut = new Cubic(0.0f, 0.0f, 0.58f, 1.0f);
 
-        public static readonly Curve easeInOut = new Cubic(0.42, 0.0, 0.58, 1.0);
+        public static readonly Curve easeInOut = new Cubic(0.42f, 0.0f, 0.58f, 1.0f);
 
-        public static readonly Curve fastOutSlowIn = new Cubic(0.4, 0.0, 0.2, 1.0);
+        public static readonly Curve fastOutSlowIn = new Cubic(0.4f, 0.0f, 0.2f, 1.0f);
 
         public static readonly Curve bounceIn = new _BounceInCurve();
 
@@ -303,21 +305,21 @@ namespace Unity.UIWidgets.animation {
 
         public static readonly Curve elasticInOut = new ElasticInOutCurve();
 
-        internal static double _bounce(double t) {
-            if (t < 1.0 / 2.75) {
-                return 7.5625 * t * t;
+        internal static float _bounce(float t) {
+            if (t < 1.0f / 2.75f) {
+                return 7.5625f * t * t;
             }
-            else if (t < 2 / 2.75) {
-                t -= 1.5 / 2.75;
-                return 7.5625 * t * t + 0.75;
+            else if (t < 2 / 2.75f) {
+                t -= 1.5f / 2.75f;
+                return 7.5625f * t * t + 0.75f;
             }
-            else if (t < 2.5 / 2.75) {
-                t -= 2.25 / 2.75;
-                return 7.5625 * t * t + 0.9375;
+            else if (t < 2.5f / 2.75f) {
+                t -= 2.25f / 2.75f;
+                return 7.5625f * t * t + 0.9375f;
             }
 
-            t -= 2.625 / 2.75;
-            return 7.5625 * t * t + 0.984375;
+            t -= 2.625f / 2.75f;
+            return 7.5625f * t * t + 0.984375f;
         }
     }
 }

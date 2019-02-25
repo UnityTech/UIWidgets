@@ -78,7 +78,7 @@ namespace Unity.UIWidgets.scheduler {
             Window.instance.onDrawFrame += this._handleDrawFrame;
         }
 
-        public double timeDilation {
+        public float timeDilation {
             get { return this._timeDilation; }
             set {
                 if (this._timeDilation == value) {
@@ -90,7 +90,7 @@ namespace Unity.UIWidgets.scheduler {
             }
         }
 
-        double _timeDilation = 1.0;
+        float _timeDilation = 1.0f;
 
         int _nextFrameCallbackId = 0;
         Dictionary<int, _FrameCallbackEntry> _transientCallbacks = new Dictionary<int, _FrameCallbackEntry>();

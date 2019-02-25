@@ -1,23 +1,23 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.UIWidgets.foundation;
+using UnityEngine;
 
 namespace Unity.UIWidgets.gestures {
     class _Vector {
         internal _Vector(int size) {
             this._offset = 0;
             this._length = size;
-            this._elements = Enumerable.Repeat(0.0, size).ToList();
+            this._elements = Enumerable.Repeat(0.0f, size).ToList();
         }
 
-        _Vector(List<double> values, int offset, int length) {
+        _Vector(List<float> values, int offset, int length) {
             this._offset = offset;
             this._length = length;
             this._elements = values;
         }
 
-        internal static _Vector fromVOL(List<double> values, int offset, int length) {
+        internal static _Vector fromVOL(List<float> values, int offset, int length) {
             return new _Vector(values, offset, length);
         }
 
@@ -25,15 +25,15 @@ namespace Unity.UIWidgets.gestures {
 
         readonly int _length;
 
-        readonly List<double> _elements;
+        readonly List<float> _elements;
 
-        public double this[int i] {
+        public float this[int i] {
             get { return this._elements[i + this._offset]; }
             set { this._elements[i + this._offset] = value; }
         }
 
-        public static double operator *(_Vector a, _Vector b) {
-            double result = 0.0;
+        public static float operator *(_Vector a, _Vector b) {
+            float result = 0.0f;
             for (int i = 0; i < a._length; i += 1) {
                 result += a[i] * b[i];
             }
@@ -41,21 +41,21 @@ namespace Unity.UIWidgets.gestures {
             return result;
         }
 
-        public double norm() {
-            return Math.Sqrt(this * this);
+        public float norm() {
+            return Mathf.Sqrt(this * this);
         }
     }
 
     class _Matrix {
         internal _Matrix(int rows, int cols) {
             this._columns = cols;
-            this._elements = Enumerable.Repeat(0.0, rows * cols).ToList();
+            this._elements = Enumerable.Repeat(0.0f, rows * cols).ToList();
         }
 
         readonly int _columns;
-        readonly List<double> _elements;
+        readonly List<float> _elements;
 
-        public double this[int row, int col] {
+        public float this[int row, int col] {
             get { return this._elements[row * this._columns + col]; }
             set { this._elements[row * this._columns + col] = value; }
         }
@@ -71,16 +71,16 @@ namespace Unity.UIWidgets.gestures {
 
     public class PolynomialFit {
         public PolynomialFit(int degree) {
-            this.coefficients = Enumerable.Repeat(0.0, degree + 1).ToList();
+            this.coefficients = Enumerable.Repeat(0.0f, degree + 1).ToList();
         }
 
-        public readonly List<double> coefficients;
+        public readonly List<float> coefficients;
 
-        public double confidence;
+        public float confidence;
     }
 
     public class LeastSquaresSolver {
-        public LeastSquaresSolver(List<double> x, List<double> y, List<double> w) {
+        public LeastSquaresSolver(List<float> x, List<float> y, List<float> w) {
             D.assert(x != null && y != null && w != null);
             D.assert(x.Count == y.Count);
             D.assert(y.Count == w.Count);
@@ -89,11 +89,11 @@ namespace Unity.UIWidgets.gestures {
             this.w = w;
         }
 
-        public readonly List<double> x;
+        public readonly List<float> x;
 
-        public readonly List<double> y;
+        public readonly List<float> y;
 
-        public readonly List<double> w;
+        public readonly List<float> w;
 
         /// Fits a polynomial of the given degree to the data points.
         public PolynomialFit solve(int degree) {
@@ -129,25 +129,25 @@ namespace Unity.UIWidgets.gestures {
                 }
 
                 for (int i = 0; i < j; i += 1) {
-                    double dot = q.getRow(j) * q.getRow(i);
+                    float dot = q.getRow(j) * q.getRow(i);
                     for (int h = 0; h < m; h += 1) {
                         q[j, h] = q[j, h] - dot * q[i, h];
                     }
                 }
 
-                double norm = q.getRow(j).norm();
-                if (norm < 0.000001) {
+                float norm = q.getRow(j).norm();
+                if (norm < 0.000001f) {
                     // Vectors are linearly dependent or zero so no solution.
                     return null;
                 }
 
-                double inverseNorm = 1.0 / norm;
+                float inverseNorm = 1.0f / norm;
                 for (int h = 0; h < m; h += 1) {
                     q[j, h] = q[j, h] * inverseNorm;
                 }
 
                 for (int i = 0; i < n; i += 1) {
-                    r[j, i] = i < j ? 0.0 : q.getRow(j) * a.getRow(i);
+                    r[j, i] = i < j ? 0.0f : q.getRow(j) * a.getRow(i);
                 }
             }
 
@@ -172,29 +172,29 @@ namespace Unity.UIWidgets.gestures {
             // ...where sumSquaredError is the residual sum of squares (variance of the
             // error), and sumSquaredTotal is the total sum of squares (variance of the
             // data) where each has been weighted.
-            double yMean = 0.0;
+            float yMean = 0.0f;
             for (int h = 0; h < m; h += 1) {
                 yMean += this.y[h];
             }
 
             yMean /= m;
 
-            double sumSquaredError = 0.0;
-            double sumSquaredTotal = 0.0;
+            float sumSquaredError = 0.0f;
+            float sumSquaredTotal = 0.0f;
             for (int h = 0; h < m; h += 1) {
-                double term = 1.0;
-                double err = this.y[h] - result.coefficients[0];
+                float term = 1.0f;
+                float err = this.y[h] - result.coefficients[0];
                 for (int i = 1; i < n; i += 1) {
                     term *= this.x[h];
                     err -= term * result.coefficients[i];
                 }
 
                 sumSquaredError += this.w[h] * this.w[h] * err * err;
-                double v = this.y[h] - yMean;
+                float v = this.y[h] - yMean;
                 sumSquaredTotal += this.w[h] * this.w[h] * v * v;
             }
 
-            result.confidence = sumSquaredTotal <= 0.000001 ? 1.0 : 1.0 - (sumSquaredError / sumSquaredTotal);
+            result.confidence = sumSquaredTotal <= 0.000001f ? 1.0f : 1.0f - (sumSquaredError / sumSquaredTotal);
             return result;
         }
     }

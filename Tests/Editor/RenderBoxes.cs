@@ -78,13 +78,14 @@ namespace UIWidgets.Tests {
                             new BoxShadow(
                                 color: new Color(0xFFFF00FF),
                                 offset: new Offset(0, 0),
-                                blurRadius: 3.0,
+                                blurRadius: 3.0f,
                                 spreadRadius: 10
                             )
                         },
                         image: new DecorationImage(
                             image: new NetworkImage(
-                                url: "https://sg.fiverrcdn.com/photos/4665137/original/39322-140411095619534.jpg?1424268945"
+                                url:
+                                "https://sg.fiverrcdn.com/photos/4665137/original/39322-140411095619534.jpg?1424268945"
                             ),
                             fit: BoxFit.cover)
                     )
@@ -106,7 +107,8 @@ namespace UIWidgets.Tests {
                             BorderRadius.circular(5)),
                         image: new DecorationImage(
                             image: new NetworkImage(
-                                url: "https://sg.fiverrcdn.com/photos/4665137/original/39322-140411095619534.jpg?1424268945"
+                                url:
+                                "https://sg.fiverrcdn.com/photos/4665137/original/39322-140411095619534.jpg?1424268945"
                             ),
                             fit: BoxFit.cover)
                     )
@@ -114,7 +116,7 @@ namespace UIWidgets.Tests {
             );
         }
 
-        
+
         RenderBox flex() {
             var flexbox = new RenderFlex(
                 direction: Axis.horizontal,

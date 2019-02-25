@@ -1,8 +1,9 @@
-﻿using System;
-using Unity.UIWidgets.foundation;
+﻿using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.ui;
+using UnityEngine;
+using Rect = Unity.UIWidgets.ui.Rect;
 
 namespace Unity.UIWidgets.rendering {
     public abstract class RenderShiftedBox : RenderObjectWithChildMixinRenderBox<RenderBox> {
@@ -10,40 +11,40 @@ namespace Unity.UIWidgets.rendering {
             this.child = child;
         }
 
-        protected override double computeMinIntrinsicWidth(double height) {
+        protected override float computeMinIntrinsicWidth(float height) {
             if (this.child != null) {
                 return this.child.getMinIntrinsicWidth(height);
             }
 
-            return 0.0;
+            return 0.0f;
         }
 
-        protected override double computeMaxIntrinsicWidth(double height) {
+        protected override float computeMaxIntrinsicWidth(float height) {
             if (this.child != null) {
                 return this.child.getMaxIntrinsicWidth(height);
             }
 
-            return 0.0;
+            return 0.0f;
         }
 
-        protected override double computeMinIntrinsicHeight(double width) {
+        protected override float computeMinIntrinsicHeight(float width) {
             if (this.child != null) {
                 return this.child.getMinIntrinsicHeight(width);
             }
 
-            return 0.0;
+            return 0.0f;
         }
 
-        protected override double computeMaxIntrinsicHeight(double width) {
+        protected override float computeMaxIntrinsicHeight(float width) {
             if (this.child != null) {
                 return this.child.getMaxIntrinsicHeight(width);
             }
 
-            return 0.0;
+            return 0.0f;
         }
 
-        protected override double? computeDistanceToActualBaseline(TextBaseline baseline) {
-            double? result;
+        protected override float? computeDistanceToActualBaseline(TextBaseline baseline) {
+            float? result;
 
             if (this.child != null) {
                 D.assert(!this.debugNeedsLayout);
@@ -106,36 +107,36 @@ namespace Unity.UIWidgets.rendering {
 
         EdgeInsets _padding;
 
-        protected override double computeMinIntrinsicWidth(double height) {
+        protected override float computeMinIntrinsicWidth(float height) {
             if (this.child != null) {
-                return this.child.getMinIntrinsicWidth(Math.Max(0.0, height - this._padding.vertical)) +
+                return this.child.getMinIntrinsicWidth(Mathf.Max(0.0f, height - this._padding.vertical)) +
                        this._padding.horizontal;
             }
 
             return this._padding.horizontal;
         }
 
-        protected override double computeMaxIntrinsicWidth(double height) {
+        protected override float computeMaxIntrinsicWidth(float height) {
             if (this.child != null) {
-                return this.child.getMaxIntrinsicWidth(Math.Max(0.0, height - this._padding.vertical)) +
+                return this.child.getMaxIntrinsicWidth(Mathf.Max(0.0f, height - this._padding.vertical)) +
                        this._padding.horizontal;
             }
 
             return this._padding.horizontal;
         }
 
-        protected override double computeMinIntrinsicHeight(double width) {
+        protected override float computeMinIntrinsicHeight(float width) {
             if (this.child != null) {
-                return this.child.getMinIntrinsicHeight(Math.Max(0.0, width - this._padding.horizontal)) +
+                return this.child.getMinIntrinsicHeight(Mathf.Max(0.0f, width - this._padding.horizontal)) +
                        this._padding.vertical;
             }
 
             return this._padding.vertical;
         }
 
-        protected override double computeMaxIntrinsicHeight(double width) {
+        protected override float computeMaxIntrinsicHeight(float width) {
             if (this.child != null) {
-                return this.child.getMaxIntrinsicHeight(Math.Max(0.0, width - this._padding.horizontal)) +
+                return this.child.getMaxIntrinsicHeight(Mathf.Max(0.0f, width - this._padding.horizontal)) +
                        this._padding.vertical;
             }
 
@@ -214,8 +215,8 @@ namespace Unity.UIWidgets.rendering {
     public class RenderPositionedBox : RenderAligningShiftedBox {
         public RenderPositionedBox(
             RenderBox child = null,
-            double? widthFactor = null,
-            double? heightFactor = null,
+            float? widthFactor = null,
+            float? heightFactor = null,
             Alignment alignment = null
         ) : base(alignment, child) {
             D.assert(widthFactor == null || widthFactor >= 0.0);
@@ -225,7 +226,7 @@ namespace Unity.UIWidgets.rendering {
             this._heightFactor = heightFactor;
         }
 
-        public double? widthFactor {
+        public float? widthFactor {
             get { return this._widthFactor; }
             set {
                 D.assert(value == null || value >= 0.0);
@@ -238,9 +239,9 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
-        double? _widthFactor;
+        float? _widthFactor;
 
-        public double? heightFactor {
+        public float? heightFactor {
             get { return this._heightFactor; }
             set {
                 D.assert(value == null || value >= 0.0);
@@ -253,23 +254,23 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
-        double? _heightFactor;
+        float? _heightFactor;
 
         protected override void performLayout() {
-            bool shrinkWrapWidth = this._widthFactor != null || double.IsPositiveInfinity(this.constraints.maxWidth);
-            bool shrinkWrapHeight = this._heightFactor != null || double.IsPositiveInfinity(this.constraints.maxHeight);
+            bool shrinkWrapWidth = this._widthFactor != null || float.IsPositiveInfinity(this.constraints.maxWidth);
+            bool shrinkWrapHeight = this._heightFactor != null || float.IsPositiveInfinity(this.constraints.maxHeight);
 
             if (this.child != null) {
                 this.child.layout(this.constraints.loosen(), parentUsesSize: true);
                 this.size = this.constraints.constrain(new Size(
-                    shrinkWrapWidth ? this.child.size.width * (this._widthFactor ?? 1.0) : double.PositiveInfinity,
-                    shrinkWrapHeight ? this.child.size.height * (this._heightFactor ?? 1.0) : double.PositiveInfinity));
+                    shrinkWrapWidth ? this.child.size.width * (this._widthFactor ?? 1.0f) : float.PositiveInfinity,
+                    shrinkWrapHeight ? this.child.size.height * (this._heightFactor ?? 1.0f) : float.PositiveInfinity));
                 this.alignChild();
             }
             else {
                 this.size = this.constraints.constrain(new Size(
-                    shrinkWrapWidth ? 0.0 : double.PositiveInfinity,
-                    shrinkWrapHeight ? 0.0 : double.PositiveInfinity));
+                    shrinkWrapWidth ? 0.0f : float.PositiveInfinity,
+                    shrinkWrapHeight ? 0.0f : float.PositiveInfinity));
             }
         }
 
@@ -287,7 +288,7 @@ namespace Unity.UIWidgets.rendering {
 //        final BoxParentData childParentData = child.parentData;
 //        if (childParentData.offset.dy > 0.0) {
 //          // vertical alignment arrows
-//          final double headSize = math.min(childParentData.offset.dy * 0.2, 10.0);
+//          final float headSize = math.min(childParentData.offset.dy * 0.2, 10.0);
 //          path
 //            ..moveTo(offset.dx + size.width / 2.0, offset.dy)
 //            ..relativeLineTo(0.0, childParentData.offset.dy - headSize)
@@ -305,7 +306,7 @@ namespace Unity.UIWidgets.rendering {
 //            }
 //            if (childParentData.offset.dx > 0.0) {
 //              // horizontal alignment arrows
-//              final double headSize = math.min(childParentData.offset.dx * 0.2, 10.0);
+//              final float headSize = math.min(childParentData.offset.dx * 0.2, 10.0);
 //              path
 //                ..moveTo(offset.dx, offset.dy + size.height / 2.0)
 //                ..relativeLineTo(childParentData.offset.dx - headSize, 0.0)
@@ -334,18 +335,18 @@ namespace Unity.UIWidgets.rendering {
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
-            properties.add(new DoubleProperty("widthFactor", this._widthFactor, ifNull: "expand"));
-            properties.add(new DoubleProperty("heightFactor", this._heightFactor, ifNull: "expand"));
+            properties.add(new FloatProperty("widthFactor", this._widthFactor, ifNull: "expand"));
+            properties.add(new FloatProperty("heightFactor", this._heightFactor, ifNull: "expand"));
         }
     }
 
     public class RenderConstrainedOverflowBox : RenderAligningShiftedBox {
         public RenderConstrainedOverflowBox(
             RenderBox child = null,
-            double? minWidth = null,
-            double? maxWidth = null,
-            double? minHeight = null,
-            double? maxHeight = null,
+            float? minWidth = null,
+            float? maxWidth = null,
+            float? minHeight = null,
+            float? maxHeight = null,
             Alignment alignment = null
         ) : base(alignment, child) {
             this._minWidth = minWidth;
@@ -354,7 +355,7 @@ namespace Unity.UIWidgets.rendering {
             this._maxHeight = maxHeight;
         }
 
-        public double? minWidth {
+        public float? minWidth {
             get { return this._minWidth; }
             set {
                 if (this._minWidth == value) {
@@ -366,9 +367,9 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
-        public double? _minWidth;
+        public float? _minWidth;
 
-        public double? maxWidth {
+        public float? maxWidth {
             get { return this._maxWidth; }
             set {
                 if (this._maxWidth == value) {
@@ -380,9 +381,9 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
-        public double? _maxWidth;
+        public float? _maxWidth;
 
-        public double? minHeight {
+        public float? minHeight {
             get { return this._minHeight; }
             set {
                 if (this._minHeight == value) {
@@ -394,9 +395,9 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
-        public double? _minHeight;
+        public float? _minHeight;
 
-        public double? maxHeight {
+        public float? maxHeight {
             get { return this._maxHeight; }
             set {
                 if (this._maxHeight == value) {
@@ -408,7 +409,7 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
-        public double? _maxHeight;
+        public float? _maxHeight;
 
         public BoxConstraints _getInnerConstraints(BoxConstraints constraints) {
             return new BoxConstraints(
@@ -537,23 +538,23 @@ namespace Unity.UIWidgets.rendering {
 
         public Size _requestedSize;
 
-        protected override double computeMinIntrinsicWidth(double height) {
+        protected override float computeMinIntrinsicWidth(float height) {
             return this._requestedSize.width;
         }
 
-        protected override double computeMaxIntrinsicWidth(double height) {
+        protected override float computeMaxIntrinsicWidth(float height) {
             return this._requestedSize.width;
         }
 
-        protected override double computeMinIntrinsicHeight(double width) {
+        protected override float computeMinIntrinsicHeight(float width) {
             return this._requestedSize.height;
         }
 
-        protected override double computeMaxIntrinsicHeight(double width) {
+        protected override float computeMaxIntrinsicHeight(float width) {
             return this._requestedSize.height;
         }
 
-        protected override double? computeDistanceToActualBaseline(TextBaseline baseline) {
+        protected override float? computeDistanceToActualBaseline(TextBaseline baseline) {
             if (this.child != null) {
                 return this.child.getDistanceToActualBaseline(baseline);
             }
@@ -573,15 +574,15 @@ namespace Unity.UIWidgets.rendering {
     public class RenderFractionallySizedOverflowBox : RenderAligningShiftedBox {
         public RenderFractionallySizedOverflowBox(
             RenderBox child = null,
-            double? widthFactor = null,
-            double? heightFactor = null,
+            float? widthFactor = null,
+            float? heightFactor = null,
             Alignment alignment = null
         ) : base(alignment, child) {
             this._widthFactor = widthFactor;
             this._heightFactor = heightFactor;
         }
 
-        public double? widthFactor {
+        public float? widthFactor {
             get { return this._widthFactor; }
             set {
                 if (this._widthFactor != value) {
@@ -593,9 +594,9 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
-        public double? _widthFactor;
+        public float? _widthFactor;
 
-        public double? heightFactor {
+        public float? heightFactor {
             get { return this._heightFactor; }
             set {
                 if (this._heightFactor != value) {
@@ -607,21 +608,21 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
-        public double? _heightFactor;
+        public float? _heightFactor;
 
         public BoxConstraints _getInnerConstraints(BoxConstraints constraints) {
-            double minWidth = constraints.minWidth;
-            double maxWidth = constraints.maxWidth;
+            float minWidth = constraints.minWidth;
+            float maxWidth = constraints.maxWidth;
             if (this._widthFactor != null) {
-                double width = maxWidth * this._widthFactor.Value;
+                float width = maxWidth * this._widthFactor.Value;
                 minWidth = width;
                 maxWidth = width;
             }
 
-            double minHeight = constraints.minHeight;
-            double maxHeight = constraints.maxHeight;
+            float minHeight = constraints.minHeight;
+            float maxHeight = constraints.maxHeight;
             if (this._heightFactor != null) {
-                double height = maxHeight * this._heightFactor.Value;
+                float height = maxHeight * this._heightFactor.Value;
                 minHeight = height;
                 maxHeight = height;
             }
@@ -634,52 +635,52 @@ namespace Unity.UIWidgets.rendering {
             );
         }
 
-        protected override double computeMinIntrinsicWidth(double height) {
-            double result;
+        protected override float computeMinIntrinsicWidth(float height) {
+            float result;
             if (this.child == null) {
                 result = base.computeMinIntrinsicWidth(height);
             }
             else {
-                result = this.child.getMinIntrinsicWidth(height * (this._heightFactor ?? 1.0));
+                result = this.child.getMinIntrinsicWidth(height * (this._heightFactor ?? 1.0f));
             }
 
-            return result / (this._widthFactor ?? 1.0);
+            return result / (this._widthFactor ?? 1.0f);
         }
 
-        protected override double computeMaxIntrinsicWidth(double height) {
-            double result;
+        protected override float computeMaxIntrinsicWidth(float height) {
+            float result;
             if (this.child == null) {
                 result = base.computeMaxIntrinsicWidth(height);
             }
             else {
-                result = this.child.getMaxIntrinsicWidth(height * (this._heightFactor ?? 1.0));
+                result = this.child.getMaxIntrinsicWidth(height * (this._heightFactor ?? 1.0f));
             }
 
-            return result / (this._widthFactor ?? 1.0);
+            return result / (this._widthFactor ?? 1.0f);
         }
 
-        protected override double computeMinIntrinsicHeight(double width) {
-            double result;
+        protected override float computeMinIntrinsicHeight(float width) {
+            float result;
             if (this.child == null) {
                 result = base.computeMinIntrinsicHeight(width);
             }
             else {
-                result = this.child.getMinIntrinsicHeight(width * (this._widthFactor ?? 1.0));
+                result = this.child.getMinIntrinsicHeight(width * (this._widthFactor ?? 1.0f));
             }
 
-            return result / (this._heightFactor ?? 1.0);
+            return result / (this._heightFactor ?? 1.0f);
         }
 
-        protected override double computeMaxIntrinsicHeight(double width) {
-            double result;
+        protected override float computeMaxIntrinsicHeight(float width) {
+            float result;
             if (this.child == null) {
                 result = base.computeMaxIntrinsicHeight(width);
             }
             else {
-                result = this.child.getMaxIntrinsicHeight(width * (this._widthFactor ?? 1.0));
+                result = this.child.getMaxIntrinsicHeight(width * (this._widthFactor ?? 1.0f));
             }
 
-            return result / (this._heightFactor ?? 1.0);
+            return result / (this._heightFactor ?? 1.0f);
         }
 
         protected override void performLayout() {
@@ -763,40 +764,40 @@ namespace Unity.UIWidgets.rendering {
         }
 
 
-        protected override double computeMinIntrinsicWidth(double height) {
-            double width = this._getSize(BoxConstraints.tightForFinite(height: height)).width;
+        protected override float computeMinIntrinsicWidth(float height) {
+            float width = this._getSize(BoxConstraints.tightForFinite(height: height)).width;
             if (width.isFinite()) {
                 return width;
             }
 
-            return 0.0;
+            return 0.0f;
         }
 
-        protected override double computeMaxIntrinsicWidth(double height) {
-            double width = this._getSize(BoxConstraints.tightForFinite(height: height)).width;
+        protected override float computeMaxIntrinsicWidth(float height) {
+            float width = this._getSize(BoxConstraints.tightForFinite(height: height)).width;
             if (width.isFinite()) {
                 return width;
             }
 
-            return 0.0;
+            return 0.0f;
         }
 
-        protected override double computeMinIntrinsicHeight(double width) {
-            double height = this._getSize(BoxConstraints.tightForFinite(width: width)).height;
+        protected override float computeMinIntrinsicHeight(float width) {
+            float height = this._getSize(BoxConstraints.tightForFinite(width: width)).height;
             if (height.isFinite()) {
                 return height;
             }
 
-            return 0.0;
+            return 0.0f;
         }
 
-        protected override double computeMaxIntrinsicHeight(double width) {
-            double height = this._getSize(BoxConstraints.tightForFinite(width: width)).height;
+        protected override float computeMaxIntrinsicHeight(float width) {
+            float height = this._getSize(BoxConstraints.tightForFinite(width: width)).height;
             if (height.isFinite()) {
                 return height;
             }
 
-            return 0.0;
+            return 0.0f;
         }
 
         protected override void performLayout() {
@@ -815,14 +816,14 @@ namespace Unity.UIWidgets.rendering {
     public class RenderBaseline : RenderShiftedBox {
         public RenderBaseline(
             RenderBox child = null,
-            double baseline = 0.0,
+            float baseline = 0.0f,
             TextBaseline baselineType = TextBaseline.alphabetic
         ) : base(child) {
             this._baseline = baseline;
             this._baselineType = baselineType;
         }
 
-        public double baseline {
+        public float baseline {
             get { return this._baseline; }
             set {
                 if (this._baseline != value) {
@@ -834,7 +835,7 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
-        public double _baseline;
+        public float _baseline;
 
 
         public TextBaseline baselineType {
@@ -854,11 +855,11 @@ namespace Unity.UIWidgets.rendering {
         protected override void performLayout() {
             if (this.child != null) {
                 this.child.layout(this.constraints.loosen(), parentUsesSize: true);
-                double? childBaseline = this.child.getDistanceToBaseline(this.baselineType);
-                double actualBaseline = this.baseline;
-                double top = actualBaseline - childBaseline.Value;
+                float? childBaseline = this.child.getDistanceToBaseline(this.baselineType);
+                float actualBaseline = this.baseline;
+                float top = actualBaseline - childBaseline.Value;
                 var childParentData = (BoxParentData) this.child.parentData;
-                childParentData.offset = new Offset(0.0, top);
+                childParentData.offset = new Offset(0.0f, top);
                 Size childSize = this.child.size;
                 this.size = this.constraints.constrain(new Size(childSize.width, top + childSize.height));
             }

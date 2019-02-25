@@ -23,36 +23,36 @@ namespace UIWidgets.Tests {
         int _selected;
 
         class _FixedViewportOffset : ViewportOffset {
-            internal _FixedViewportOffset(double _pixels) {
+            internal _FixedViewportOffset(float _pixels) {
                 this._pixels = _pixels;
             }
 
             internal new static _FixedViewportOffset zero() {
-                return new _FixedViewportOffset(0.0);
+                return new _FixedViewportOffset(0.0f);
             }
 
-            double _pixels;
+            float _pixels;
 
-            public override double pixels {
+            public override float pixels {
                 get { return this._pixels; }
             }
 
-            public override bool applyViewportDimension(double viewportDimension) {
+            public override bool applyViewportDimension(float viewportDimension) {
                 return true;
             }
 
-            public override bool applyContentDimensions(double minScrollExtent, double maxScrollExtent) {
+            public override bool applyContentDimensions(float minScrollExtent, float maxScrollExtent) {
                 return true;
             }
 
-            public override void correctBy(double correction) {
+            public override void correctBy(float correction) {
                 this._pixels += correction;
             }
 
-            public override void jumpTo(double pixels) {
+            public override void jumpTo(float pixels) {
             }
 
-            public override IPromise animateTo(double to, TimeSpan duration, Curve curve) {
+            public override IPromise animateTo(float to, TimeSpan duration, Curve curve) {
                 return Promise.Resolved();
             }
 
@@ -138,7 +138,7 @@ namespace UIWidgets.Tests {
                     new TextSpan(
                         "Word Wrap:The ascent of the font is the distance from the baseline to the top line of the font, as defined in the font's original data file.",
                         null),
-                }, style: new TextStyle(height: 1.0));
+                }, style: new TextStyle(height: 1.0f));
 
             var flexbox = new RenderFlex(
                 direction: Axis.vertical,
@@ -147,7 +147,7 @@ namespace UIWidgets.Tests {
 
             flexbox.add(this.flexItemBox(
                 new Unity.UIWidgets.rendering.RenderEditable(span, TextDirection.ltr,
-                    new _FixedViewportOffset(0.0), new ValueNotifier<bool>(true),
+                    new _FixedViewportOffset(0.0f), new ValueNotifier<bool>(true),
                     onSelectionChanged: this.selectionChanged, cursorColor: Color.fromARGB(255, 0, 0, 0),
                     maxLines: 100,
                     selectionColor: Color.fromARGB(255, 255, 0, 0))
@@ -158,10 +158,10 @@ namespace UIWidgets.Tests {
                     new TextSpan(
                         "Hard Break:The ascent of the font is the distance\nfrom the baseline to the top \nline of the font,\nas defined in",
                         null),
-                }, style: new TextStyle(height: 1.0));
+                }, style: new TextStyle(height: 1.0f));
             flexbox.add(this.flexItemBox(
                 new Unity.UIWidgets.rendering.RenderEditable(span, TextDirection.ltr,
-                    new _FixedViewportOffset(0.0), new ValueNotifier<bool>(true),
+                    new _FixedViewportOffset(0.0f), new ValueNotifier<bool>(true),
                     onSelectionChanged: this.selectionChanged, cursorColor: Color.fromARGB(255, 0, 0, 0),
                     maxLines: 100,
                     selectionColor: Color.fromARGB(255, 255, 0, 0))
@@ -170,10 +170,10 @@ namespace UIWidgets.Tests {
             span = new TextSpan("", children:
                 new List<TextSpan> {
                     new TextSpan("Single Line:How to create mixin", null),
-                }, style: new TextStyle(height: 1.0));
+                }, style: new TextStyle(height: 1.0f));
             flexbox.add(this.flexItemBox(
                 new Unity.UIWidgets.rendering.RenderEditable(span, TextDirection.ltr,
-                    new _FixedViewportOffset(0.0), new ValueNotifier<bool>(true),
+                    new _FixedViewportOffset(0.0f), new ValueNotifier<bool>(true),
                     onSelectionChanged: this.selectionChanged, cursorColor: Color.fromARGB(255, 0, 0, 0),
                     selectionColor: Color.fromARGB(255, 255, 0, 0))
                 , width: 300));

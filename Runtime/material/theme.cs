@@ -82,7 +82,7 @@ namespace Unity.UIWidgets.material {
         ) : base(begin: begin, end: end) {
         }
 
-        public override ThemeData lerp(double t) {
+        public override ThemeData lerp(float t) {
             return ThemeData.lerp(this.begin, this.end, t);
         }
     }

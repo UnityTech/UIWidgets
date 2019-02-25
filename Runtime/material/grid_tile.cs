@@ -32,17 +32,17 @@ namespace Unity.UIWidgets.material {
             };
             if (this.header != null) {
                 children.Add(new Positioned(
-                    top: 0.0,
-                    left: 0.0,
-                    right: 0.0,
+                    top: 0.0f,
+                    left: 0.0f,
+                    right: 0.0f,
                     child: this.header));
             }
 
             if (this.footer != null) {
                 children.Add(new Positioned(
-                    left: 0.0,
-                    bottom: 0.0,
-                    right: 0.0,
+                    left: 0.0f,
+                    bottom: 0.0f,
+                    right: 0.0f,
                     child: this.footer));
             }
 

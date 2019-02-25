@@ -73,11 +73,11 @@ namespace Unity.UIWidgets.widgets {
             get { return this.controller.status == AnimationStatus.dismissed; }
         }
 
-        public virtual Animation<double> animation {
+        public virtual Animation<float> animation {
             get { return this._animation; }
         }
 
-        internal Animation<double> _animation;
+        internal Animation<float> _animation;
 
         public AnimationController controller {
             get { return this._controller; }
@@ -97,7 +97,7 @@ namespace Unity.UIWidgets.widgets {
             );
         }
 
-        public virtual Animation<double> createAnimation() {
+        public virtual Animation<float> createAnimation() {
             D.assert(this._transitionCompleter.CurState == PromiseState.Pending,
                 $"Cannot reuse a {this.GetType()} after disposing it.");
             D.assert(this._controller != null);
@@ -138,7 +138,7 @@ namespace Unity.UIWidgets.widgets {
             this.changedInternalState();
         }
 
-        public virtual Animation<double> secondaryAnimation {
+        public virtual Animation<float> secondaryAnimation {
             get { return this._secondaryAnimation; }
         }
 
@@ -201,7 +201,7 @@ namespace Unity.UIWidgets.widgets {
         void _updateSecondaryAnimation(Route nextRoute) {
             if (nextRoute is TransitionRoute && this.canTransitionTo((TransitionRoute) nextRoute) &&
                 ((TransitionRoute) nextRoute).canTransitionFrom(this)) {
-                Animation<double> current = this._secondaryAnimation.parent;
+                Animation<float> current = this._secondaryAnimation.parent;
                 if (current != null) {
                     if (current is TrainHoppingAnimation) {
                         TrainHoppingAnimation newAnimation = null;
@@ -498,13 +498,13 @@ namespace Unity.UIWidgets.widgets {
                                     && route.settings.name == name;
         }
 
-        public abstract Widget buildPage(BuildContext context, Animation<double> animation,
-            Animation<double> secondaryAnimation);
+        public abstract Widget buildPage(BuildContext context, Animation<float> animation,
+            Animation<float> secondaryAnimation);
 
         public virtual Widget buildTransitions(
             BuildContext context,
-            Animation<double> animation,
-            Animation<double> secondaryAnimation,
+            Animation<float> animation,
+            Animation<float> secondaryAnimation,
             Widget child
         ) {
             return child;
@@ -558,13 +558,13 @@ namespace Unity.UIWidgets.widgets {
             get { return this._subtreeKey.currentContext; }
         }
 
-        public override Animation<double> animation {
+        public override Animation<float> animation {
             get { return this._animationProxy; }
         }
 
         ProxyAnimation _animationProxy;
 
-        public override Animation<double> secondaryAnimation {
+        public override Animation<float> secondaryAnimation {
             get { return this._secondaryAnimationProxy; }
         }
 
@@ -639,7 +639,7 @@ namespace Unity.UIWidgets.widgets {
         internal readonly GlobalKey _subtreeKey = new LabeledGlobalKey<_ModalScopeState>();
         internal readonly PageStorageBucket _storageBucket = new PageStorageBucket();
 
-        static readonly Animatable<double> _easeCurveTween = new CurveTween(curve: Curves.ease);
+        static readonly Animatable<float> _easeCurveTween = new CurveTween(curve: Curves.ease);
         OverlayEntry _modalBarrier;
 
         Widget _buildModalBarrier(BuildContext context) {
@@ -798,13 +798,13 @@ namespace Unity.UIWidgets.widgets {
 
         readonly RouteTransitionsBuilder _transitionBuilder;
 
-        public override Widget buildPage(BuildContext context, Animation<double> animation,
-            Animation<double> secondaryAnimation) {
+        public override Widget buildPage(BuildContext context, Animation<float> animation,
+            Animation<float> secondaryAnimation) {
             return this._pageBuilder(context, animation, secondaryAnimation);
         }
 
-        public override Widget buildTransitions(BuildContext context, Animation<double> animation,
-            Animation<double> secondaryAnimation, Widget child) {
+        public override Widget buildTransitions(BuildContext context, Animation<float> animation,
+            Animation<float> secondaryAnimation, Widget child) {
             if (this._transitionBuilder == null) {
                 return new FadeTransition(
                     opacity: new CurvedAnimation(
@@ -841,9 +841,9 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
-    public delegate Widget RoutePageBuilder(BuildContext context, Animation<double> animation,
-        Animation<double> secondaryAnimation);
+    public delegate Widget RoutePageBuilder(BuildContext context, Animation<float> animation,
+        Animation<float> secondaryAnimation);
 
-    public delegate Widget RouteTransitionsBuilder(BuildContext context, Animation<double> animation,
-        Animation<double> secondaryAnimation, Widget child);
+    public delegate Widget RouteTransitionsBuilder(BuildContext context, Animation<float> animation,
+        Animation<float> secondaryAnimation, Widget child);
 }

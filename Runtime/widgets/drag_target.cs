@@ -562,10 +562,10 @@ namespace Unity.UIWidgets.widgets {
             }
 
             if (this.axis == Axis.horizontal) {
-                return new Offset(offset.dx, 0.0);
+                return new Offset(offset.dx, 0.0f);
             }
 
-            return new Offset(0.0, offset.dy);
+            return new Offset(0.0f, offset.dy);
         }
     }
 }

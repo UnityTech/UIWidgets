@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.ui;
+using UnityEngine;
 
 namespace Unity.UIWidgets.rendering {
     public abstract class
@@ -9,11 +10,11 @@ namespace Unity.UIWidgets.rendering {
         : ContainerRenderObjectMixinRenderBox<ChildType, ParentDataType>
         where ChildType : RenderBox
         where ParentDataType : ContainerParentDataMixinBoxParentData<ChildType> {
-        public double? defaultComputeDistanceToFirstActualBaseline(TextBaseline baseline) {
+        public float? defaultComputeDistanceToFirstActualBaseline(TextBaseline baseline) {
             var child = this.firstChild;
             while (child != null) {
                 var childParentData = (ParentDataType) child.parentData;
-                double? result = child.getDistanceToActualBaseline(baseline);
+                float? result = child.getDistanceToActualBaseline(baseline);
                 if (result != null) {
                     return result.Value + childParentData.offset.dy;
                 }
@@ -24,16 +25,16 @@ namespace Unity.UIWidgets.rendering {
             return null;
         }
 
-        public double? defaultComputeDistanceToHighestActualBaseline(TextBaseline baseline) {
-            double? result = null;
+        public float? defaultComputeDistanceToHighestActualBaseline(TextBaseline baseline) {
+            float? result = null;
             var child = this.firstChild;
             while (child != null) {
                 var childParentData = (ParentDataType) child.parentData;
-                double? candidate = child.getDistanceToActualBaseline(baseline);
+                float? candidate = child.getDistanceToActualBaseline(baseline);
                 if (candidate != null) {
                     candidate += childParentData.offset.dy;
                     if (result != null) {
-                        result = Math.Min(result.Value, candidate.Value);
+                        result = Mathf.Min(result.Value, candidate.Value);
                     }
                     else {
                         result = candidate;

@@ -11,10 +11,10 @@ namespace Unity.UIWidgets.widgets {
             Key key = null,
             AxisDirection axisDirection = AxisDirection.down,
             AxisDirection? crossAxisDirection = null,
-            double anchor = 0.0,
+            float anchor = 0.0f,
             ViewportOffset offset = null,
             Key center = null,
-            double? cacheExtent = null,
+            float? cacheExtent = null,
             List<Widget> slivers = null
         ) : base(key: key, children: slivers) {
             D.assert(offset != null);
@@ -32,13 +32,13 @@ namespace Unity.UIWidgets.widgets {
 
         public readonly AxisDirection? crossAxisDirection;
 
-        public readonly double anchor;
+        public readonly float anchor;
 
         public readonly ViewportOffset offset;
 
         public readonly Key center;
 
-        public readonly double? cacheExtent;
+        public readonly float? cacheExtent;
 
         public static AxisDirection getDefaultCrossAxisDirection(BuildContext context, AxisDirection axisDirection) {
             switch (axisDirection) {
@@ -87,7 +87,7 @@ namespace Unity.UIWidgets.widgets {
             properties.add(new EnumProperty<AxisDirection>("axisDirection", this.axisDirection));
             properties.add(new EnumProperty<AxisDirection?>("crossAxisDirection", this.crossAxisDirection,
                 defaultValue: Diagnostics.kNullDefaultValue));
-            properties.add(new DoubleProperty("anchor", this.anchor));
+            properties.add(new FloatProperty("anchor", this.anchor));
             properties.add(new DiagnosticsProperty<ViewportOffset>("offset", this.offset));
             if (this.center != null) {
                 properties.add(new DiagnosticsProperty<Key>("center", this.center));

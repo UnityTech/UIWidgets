@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
 using Unity.UIWidgets.ui;
+using UnityEngine;
+using Canvas = Unity.UIWidgets.ui.Canvas;
+using Rect = Unity.UIWidgets.ui.Rect;
 
 namespace Unity.UIWidgets.painting {
     public class BeveledRectangleBorder : ShapeBorder, IEquatable<BeveledRectangleBorder> {
@@ -20,30 +23,32 @@ namespace Unity.UIWidgets.painting {
             get { return EdgeInsets.all(this.side.width); }
         }
 
-        public override ShapeBorder scale(double t) {
+        public override ShapeBorder scale(float t) {
             return new BeveledRectangleBorder(
                 side: this.side.scale(t),
                 borderRadius: this.borderRadius * t
             );
         }
 
-        public override ShapeBorder lerpFrom(ShapeBorder a, double t) {
+        public override ShapeBorder lerpFrom(ShapeBorder a, float t) {
             if (a is BeveledRectangleBorder border) {
                 return new BeveledRectangleBorder(
                     side: BorderSide.lerp(border.side, this.side, t),
                     borderRadius: BorderRadius.lerp(border.borderRadius, this.borderRadius, t)
                 );
             }
+
             return base.lerpFrom(a, t);
         }
 
-        public override ShapeBorder lerpTo(ShapeBorder b, double t) {
+        public override ShapeBorder lerpTo(ShapeBorder b, float t) {
             if (b is BeveledRectangleBorder border) {
                 return new BeveledRectangleBorder(
                     side: BorderSide.lerp(this.side, border.side, t),
                     borderRadius: BorderRadius.lerp(this.borderRadius, border.borderRadius, t)
                 );
             }
+
             return base.lerpTo(b, t);
         }
 
@@ -53,24 +58,24 @@ namespace Unity.UIWidgets.painting {
             Offset centerTop = new Offset(rrect.center.dx, rrect.top);
             Offset centerBottom = new Offset(rrect.center.dx, rrect.bottom);
 
-            double tlRadiusX = Math.Max(0.0, rrect.tlRadiusX);
-            double tlRadiusY = Math.Max(0.0, rrect.tlRadiusY);
-            double trRadiusX = Math.Max(0.0, rrect.trRadiusX);
-            double trRadiusY = Math.Max(0.0, rrect.trRadiusY);
-            double blRadiusX = Math.Max(0.0, rrect.blRadiusX);
-            double blRadiusY = Math.Max(0.0, rrect.blRadiusY);
-            double brRadiusX = Math.Max(0.0, rrect.brRadiusX);
-            double brRadiusY = Math.Max(0.0, rrect.brRadiusY);
+            float tlRadiusX = Mathf.Max(0.0f, rrect.tlRadiusX);
+            float tlRadiusY = Mathf.Max(0.0f, rrect.tlRadiusY);
+            float trRadiusX = Mathf.Max(0.0f, rrect.trRadiusX);
+            float trRadiusY = Mathf.Max(0.0f, rrect.trRadiusY);
+            float blRadiusX = Mathf.Max(0.0f, rrect.blRadiusX);
+            float blRadiusY = Mathf.Max(0.0f, rrect.blRadiusY);
+            float brRadiusX = Mathf.Max(0.0f, rrect.brRadiusX);
+            float brRadiusY = Mathf.Max(0.0f, rrect.brRadiusY);
 
             List<Offset> vertices = new List<Offset> {
-                new Offset(rrect.left, Math.Min(centerLeft.dy, rrect.top + tlRadiusY)),
-                new Offset(Math.Min(centerTop.dx, rrect.left + tlRadiusX), rrect.top),
-                new Offset(Math.Max(centerTop.dx, rrect.right - trRadiusX), rrect.top),
-                new Offset(rrect.right, Math.Min(centerRight.dy, rrect.top + trRadiusY)),
-                new Offset(rrect.right, Math.Max(centerRight.dy, rrect.bottom - brRadiusY)),
-                new Offset(Math.Max(centerBottom.dx, rrect.right - brRadiusX), rrect.bottom),
-                new Offset(Math.Min(centerBottom.dx, rrect.left + blRadiusX), rrect.bottom),
-                new Offset(rrect.left, Math.Max(centerLeft.dy, rrect.bottom - blRadiusY)),
+                new Offset(rrect.left, Mathf.Min(centerLeft.dy, rrect.top + tlRadiusY)),
+                new Offset(Mathf.Min(centerTop.dx, rrect.left + tlRadiusX), rrect.top),
+                new Offset(Mathf.Max(centerTop.dx, rrect.right - trRadiusX), rrect.top),
+                new Offset(rrect.right, Mathf.Min(centerRight.dy, rrect.top + trRadiusY)),
+                new Offset(rrect.right, Mathf.Max(centerRight.dy, rrect.bottom - brRadiusY)),
+                new Offset(Mathf.Max(centerBottom.dx, rrect.right - brRadiusX), rrect.bottom),
+                new Offset(Mathf.Min(centerBottom.dx, rrect.left + blRadiusX), rrect.bottom),
+                new Offset(rrect.left, Mathf.Max(centerLeft.dy, rrect.bottom - blRadiusY)),
             };
 
             var path = new Path();
@@ -90,6 +95,7 @@ namespace Unity.UIWidgets.painting {
             if (rect.isEmpty) {
                 return;
             }
+
             switch (this.side.style) {
                 case BorderStyle.none:
                     break;
@@ -105,9 +111,11 @@ namespace Unity.UIWidgets.painting {
             if (ReferenceEquals(null, other)) {
                 return false;
             }
+
             if (ReferenceEquals(this, other)) {
                 return true;
             }
+
             return Equals(this.side, other.side) && Equals(this.borderRadius, other.borderRadius);
         }
 
@@ -115,12 +123,15 @@ namespace Unity.UIWidgets.painting {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((BeveledRectangleBorder) obj);
         }
 

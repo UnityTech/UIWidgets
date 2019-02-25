@@ -24,12 +24,12 @@ namespace Unity.UIWidgets.rendering {
         static TextStyle textStyle = new TextStyle(
             color: new Color(0xFFFFFF66),
             fontFamily: "monospace",
-            fontSize: 14.0,
+            fontSize: 14.0f,
             fontWeight: FontWeight.w700
         );
 
         static ParagraphStyle paragraphStyle = new ParagraphStyle(
-            lineHeight: 1.0
+            lineHeight: 1.0f
         );
     }
 }

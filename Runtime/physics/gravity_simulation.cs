@@ -4,10 +4,10 @@ using Unity.UIWidgets.ui;
 namespace Unity.UIWidgets.physics {
     public class GravitySimulation : Simulation {
         public GravitySimulation(
-            double acceleration,
-            double distance,
-            double endDistance,
-            double velocity
+            float acceleration,
+            float distance,
+            float endDistance,
+            float velocity
         ) {
             D.assert(endDistance >= 0);
             this._a = acceleration;
@@ -16,20 +16,20 @@ namespace Unity.UIWidgets.physics {
             this._end = endDistance;
         }
 
-        readonly double _x;
-        readonly double _v;
-        readonly double _a;
-        readonly double _end;
+        readonly float _x;
+        readonly float _v;
+        readonly float _a;
+        readonly float _end;
 
-        public override double x(double time) {
-            return this._x + this._v * time + 0.5 * this._a * time * time;
+        public override float x(float time) {
+            return this._x + this._v * time + 0.5f * this._a * time * time;
         }
 
-        public override double dx(double time) {
+        public override float dx(float time) {
             return this._v + time * this._a;
         }
 
-        public override bool isDone(double time) {
+        public override bool isDone(float time) {
             return this.x(time).abs() >= this._end;
         }
     }

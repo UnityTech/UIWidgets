@@ -25,11 +25,11 @@ namespace UIWidgetsSample {
         }
 
         class _AsScreenState : State<AsScreen> {
-            const double headerHeight = 50.0;
+            const float headerHeight = 50.0f;
 
             Widget _buildHeader(BuildContext context) {
                 return new Container(
-                    padding: EdgeInsets.only(left: 16.0, right: 8.0),
+                    padding: EdgeInsets.only(left: 16.0f, right: 8.0f),
                     height: headerHeight,
                     color: CLColors.header,
                     child: new Row(
@@ -45,10 +45,10 @@ namespace UIWidgetsSample {
                                 )
                             ),
                             new CustomButton(
-                                padding: EdgeInsets.only(0.0, 0.0, 16.0, 0.0),
+                                padding: EdgeInsets.only(0.0f, 0.0f, 16.0f, 0.0f),
                                 child: new Icon(
                                     Icons.keyboard_arrow_down,
-                                    size: 18.0,
+                                    size: 18.0f,
                                     color: CLColors.icon2
                                 )
                             ),
@@ -59,7 +59,7 @@ namespace UIWidgetsSample {
                                 ),
                                 width: 320,
                                 height: 36,
-                                padding: EdgeInsets.all(10.0),
+                                padding: EdgeInsets.all(10.0f),
                                 margin: EdgeInsets.only(right: 4),
                                 child: new EditableText(
                                     maxLines: 1,
@@ -85,10 +85,10 @@ namespace UIWidgetsSample {
                                     crossAxisAlignment: CrossAxisAlignment.center,
                                     children: new List<Widget> {
                                         new CustomButton(
-                                            padding: EdgeInsets.only(8.0, 0.0, 8.0, 0.0),
+                                            padding: EdgeInsets.only(8.0f, 0.0f, 8.0f, 0.0f),
                                             child: new Icon(
                                                 Icons.search,
-                                                size: 18.0,
+                                                size: 18.0f,
                                                 color: CLColors.white
                                             )
                                         )
@@ -218,8 +218,8 @@ namespace UIWidgetsSample {
                 var testCard = new AssetCard(
                     "AI Template",
                     "INVECTOR",
-                    45.0,
-                    36.0,
+                    45.0f,
+                    36.0f,
                     true,
                     "https://d2ujflorbtfzji.cloudfront.net/key-image/46dc65c1-f605-4ccb-97e0-3d60b28cfdfe.jpg"
                 );
@@ -317,8 +317,8 @@ namespace UIWidgetsSample {
             public AssetCard(
                 string name,
                 string category,
-                double price,
-                double priceDiscount,
+                float price,
+                float priceDiscount,
                 bool showBadge,
                 string imageSrc
             ) {
@@ -332,8 +332,8 @@ namespace UIWidgetsSample {
 
             public string name;
             public string category;
-            public double price;
-            public double priceDiscount;
+            public float price;
+            public float priceDiscount;
             public bool showBadge;
             public string imageSrc;
 
@@ -460,13 +460,13 @@ namespace UIWidgetsSample {
         }
 
         class _EventsWaterfallScreenState : State<EventsWaterfallScreen> {
-            const double headerHeight = 80.0;
+            const float headerHeight = 80.0f;
 
-            double _offsetY = 0.0;
+            float _offsetY = 0.0f;
 
             Widget _buildHeader(BuildContext context) {
                 return new Container(
-                    padding: EdgeInsets.only(left: 16.0, right: 8.0),
+                    padding: EdgeInsets.only(left: 16.0f, right: 8.0f),
                     //  color: CLColors.blue,
                     height: headerHeight - this._offsetY,
                     child: new Row(
@@ -477,24 +477,24 @@ namespace UIWidgetsSample {
                                 child: new Text(
                                     "Today",
                                     style: new TextStyle(
-                                        fontSize: (34.0 / headerHeight) *
+                                        fontSize: (34.0f / headerHeight) *
                                                   (headerHeight - this._offsetY),
                                         color: CLColors.white
                                     )
                                 )),
                             new CustomButton(
-                                padding: EdgeInsets.only(8.0, 0.0, 8.0, 0.0),
+                                padding: EdgeInsets.only(8.0f, 0.0f, 8.0f, 0.0f),
                                 child: new Icon(
                                     Icons.notifications,
-                                    size: 18.0,
+                                    size: 18.0f,
                                     color: CLColors.icon2
                                 )
                             ),
                             new CustomButton(
-                                padding: EdgeInsets.only(8.0, 0.0, 16.0, 0.0),
+                                padding: EdgeInsets.only(8.0f, 0.0f, 16.0f, 0.0f),
                                 child: new Icon(
                                     Icons.account_circle,
-                                    size: 18.0,
+                                    size: 18.0f,
                                     color: CLColors.icon2
                                 )
                             )
@@ -504,15 +504,15 @@ namespace UIWidgetsSample {
             }
 
             bool _onNotification(ScrollNotification notification, BuildContext context) {
-                double pixels = notification.metrics.pixels;
+                float pixels = notification.metrics.pixels;
                 if (pixels >= 0.0) {
                     if (pixels <= headerHeight) {
-                        this.setState(() => { this._offsetY = pixels / 2.0; });
+                        this.setState(() => { this._offsetY = pixels / 2.0f; });
                     }
                 }
                 else {
                     if (this._offsetY != 0.0) {
-                        this.setState(() => { this._offsetY = 0.0; });
+                        this.setState(() => { this._offsetY = 0.0f; });
                     }
                 }
 

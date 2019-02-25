@@ -67,11 +67,11 @@ namespace Unity.UIWidgets.editor {
                 deltaScroll.x = this._curDeltaX;
                 deltaScroll.y = this._curDeltaY;
                 this._scrollDeltaX = this._curDeltaX > 0
-                    ? Math.Max(0, this._scrollDeltaX - this._curDeltaX)
-                    : Math.Min(0, this._scrollDeltaX - this._curDeltaX);
+                    ? Mathf.Max(0, this._scrollDeltaX - this._curDeltaX)
+                    : Mathf.Min(0, this._scrollDeltaX - this._curDeltaX);
                 this._scrollDeltaY = this._curDeltaY > 0
-                    ? Math.Max(0, this._scrollDeltaY - this._curDeltaY)
-                    : Math.Min(0, this._scrollDeltaY - this._curDeltaY);
+                    ? Mathf.Max(0, this._scrollDeltaY - this._curDeltaY)
+                    : Mathf.Min(0, this._scrollDeltaY - this._curDeltaY);
                 this._bufferIndex--;
             }
 

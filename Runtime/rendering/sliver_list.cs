@@ -12,11 +12,11 @@ namespace Unity.UIWidgets.rendering {
             this.childManager.didStartLayout();
             this.childManager.setDidUnderflow(false);
 
-            double scrollOffset = this.constraints.scrollOffset + this.constraints.cacheOrigin;
+            float scrollOffset = this.constraints.scrollOffset + this.constraints.cacheOrigin;
             D.assert(scrollOffset >= 0.0);
-            double remainingExtent = this.constraints.remainingCacheExtent;
+            float remainingExtent = this.constraints.remainingCacheExtent;
             D.assert(remainingExtent >= 0.0);
-            double targetEndScrollOffset = scrollOffset + remainingExtent;
+            float targetEndScrollOffset = scrollOffset + remainingExtent;
             BoxConstraints childConstraints = this.constraints.asBoxConstraints();
             int leadingGarbage = 0;
             int trailingGarbage = 0;
@@ -33,14 +33,14 @@ namespace Unity.UIWidgets.rendering {
             RenderBox leadingChildWithLayout = null, trailingChildWithLayout = null;
 
             RenderBox earliestUsefulChild = this.firstChild;
-            for (double earliestScrollOffset = this.childScrollOffset(earliestUsefulChild);
+            for (float earliestScrollOffset = this.childScrollOffset(earliestUsefulChild);
                 earliestScrollOffset > scrollOffset;
                 earliestScrollOffset = this.childScrollOffset(earliestUsefulChild)) {
                 earliestUsefulChild = this.insertAndLayoutLeadingChild(childConstraints, parentUsesSize: true);
 
                 if (earliestUsefulChild == null) {
                     var childParentData = (SliverMultiBoxAdaptorParentData) this.firstChild.parentData;
-                    childParentData.layoutOffset = 0.0;
+                    childParentData.layoutOffset = 0.0f;
 
                     if (scrollOffset == 0.0) {
                         earliestUsefulChild = this.firstChild;
@@ -56,9 +56,9 @@ namespace Unity.UIWidgets.rendering {
                     }
                 }
                 else {
-                    double firstChildScrollOffset = earliestScrollOffset - this.paintExtentOf(this.firstChild);
+                    float firstChildScrollOffset = earliestScrollOffset - this.paintExtentOf(this.firstChild);
                     if (firstChildScrollOffset < 0.0) {
-                        double correction = 0.0;
+                        float correction = 0.0f;
                         while (earliestUsefulChild != null) {
                             D.assert(this.firstChild == earliestUsefulChild);
                             correction += this.paintExtentOf(this.firstChild);
@@ -70,7 +70,7 @@ namespace Unity.UIWidgets.rendering {
                             scrollOffsetCorrection: correction - earliestScrollOffset
                         );
                         var childParentData = (SliverMultiBoxAdaptorParentData) this.firstChild.parentData;
-                        childParentData.layoutOffset = 0.0;
+                        childParentData.layoutOffset = 0.0f;
                         return;
                     }
                     else {
@@ -95,7 +95,7 @@ namespace Unity.UIWidgets.rendering {
             bool inLayoutRange = true;
             RenderBox child = earliestUsefulChild;
             int index = this.indexOf(child);
-            double endScrollOffset = this.childScrollOffset(child) + this.paintExtentOf(child);
+            float endScrollOffset = this.childScrollOffset(child) + this.paintExtentOf(child);
 
             Func<bool> advance = () => {
                 D.assert(child != null);
@@ -142,10 +142,10 @@ namespace Unity.UIWidgets.rendering {
 
                     this.collectGarbage(leadingGarbage - 1, 0);
                     D.assert(this.firstChild == this.lastChild);
-                    double extent = this.childScrollOffset(this.lastChild) + this.paintExtentOf(this.lastChild);
+                    float extent = this.childScrollOffset(this.lastChild) + this.paintExtentOf(this.lastChild);
                     this.geometry = new SliverGeometry(
                         scrollExtent: extent,
-                        paintExtent: 0.0,
+                        paintExtent: 0.0f,
                         maxPaintExtent: extent
                     );
                     return;
@@ -171,7 +171,7 @@ namespace Unity.UIWidgets.rendering {
 
             D.assert(this.debugAssertChildListIsNonEmptyAndContiguous());
 
-            double? estimatedMaxScrollOffset;
+            float? estimatedMaxScrollOffset;
             if (reachedEnd) {
                 estimatedMaxScrollOffset = endScrollOffset;
             }
@@ -187,17 +187,17 @@ namespace Unity.UIWidgets.rendering {
                 D.assert(estimatedMaxScrollOffset >= endScrollOffset - this.childScrollOffset(this.firstChild));
             }
 
-            double paintExtent = this.calculatePaintOffset(
+            float paintExtent = this.calculatePaintOffset(
                 this.constraints,
                 from: this.childScrollOffset(this.firstChild),
                 to: endScrollOffset
             );
-            double cacheExtent = this.calculateCacheOffset(
+            float cacheExtent = this.calculateCacheOffset(
                 this.constraints,
                 from: this.childScrollOffset(this.firstChild),
                 to: endScrollOffset
             );
-            double targetEndScrollOffsetForPaint =
+            float targetEndScrollOffsetForPaint =
                 this.constraints.scrollOffset + this.constraints.remainingPaintExtent;
             this.geometry = new SliverGeometry(
                 scrollExtent: estimatedMaxScrollOffset.Value,

@@ -36,7 +36,7 @@ namespace Unity.UIWidgets.material {
         public Material(
             Key key = null,
             MaterialType type = MaterialType.canvas,
-            double elevation = 0.0,
+            float elevation = 0.0f,
             Color color = null,
             Color shadowColor = null,
             TextStyle textStyle = null,
@@ -65,7 +65,7 @@ namespace Unity.UIWidgets.material {
 
         public readonly MaterialType type;
 
-        public readonly double elevation;
+        public readonly float elevation;
 
         public readonly Color color;
 
@@ -96,7 +96,7 @@ namespace Unity.UIWidgets.material {
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             properties.add(new EnumProperty<MaterialType>("type", this.type));
-            properties.add(new DoubleProperty("elevation", this.elevation, defaultValue: 0.0));
+            properties.add(new FloatProperty("elevation", this.elevation, defaultValue: 0.0));
             properties.add(new DiagnosticsProperty<Color>("color", this.color, defaultValue: null));
             properties.add(new DiagnosticsProperty<Color>("shadowColor", this.shadowColor,
                 defaultValue: new Color(0xFF000000)));
@@ -105,7 +105,7 @@ namespace Unity.UIWidgets.material {
             properties.add(new EnumProperty<BorderRadius>("borderRadius", this.borderRadius, defaultValue: null));
         }
 
-        public const double defaultSplashRadius = 35.0;
+        public const float defaultSplashRadius = 35.0f;
     }
 
 
@@ -405,7 +405,7 @@ namespace Unity.UIWidgets.material {
             ShapeBorder end = null) : base(begin: begin, end: end) {
         }
 
-        public override ShapeBorder lerp(double t) {
+        public override ShapeBorder lerp(float t) {
             return ShapeBorder.lerp(this.begin, this.end, t);
         }
     }
@@ -416,7 +416,7 @@ namespace Unity.UIWidgets.material {
             Widget child = null,
             ShapeBorder shape = null,
             Clip clipBehavior = Clip.none,
-            double? elevation = null,
+            float? elevation = null,
             Color color = null,
             Color shadowColor = null,
             Curve curve = null,
@@ -431,7 +431,7 @@ namespace Unity.UIWidgets.material {
             this.child = child;
             this.shape = shape;
             this.clipBehavior = clipBehavior;
-            this.elevation = elevation ?? 0.0;
+            this.elevation = elevation ?? 0.0f;
             this.color = color;
             this.shadowColor = shadowColor;
         }
@@ -442,7 +442,7 @@ namespace Unity.UIWidgets.material {
 
         public readonly Clip clipBehavior;
 
-        public readonly double elevation;
+        public readonly float elevation;
 
         public readonly Color color;
 
@@ -456,20 +456,20 @@ namespace Unity.UIWidgets.material {
         public override void debugFillProperties(DiagnosticPropertiesBuilder description) {
             base.debugFillProperties(description);
             description.add(new DiagnosticsProperty<ShapeBorder>("shape", this.shape));
-            description.add(new DoubleProperty("elevation", this.elevation));
+            description.add(new FloatProperty("elevation", this.elevation));
             description.add(new DiagnosticsProperty<Color>("color", this.color));
             description.add(new DiagnosticsProperty<Color>("shadowColor", this.shadowColor));
         }
     }
 
     public class _MaterialInteriorState : AnimatedWidgetBaseState<_MaterialInterior> {
-        DoubleTween _elevation;
+        FloatTween _elevation;
         ColorTween _shadowColor;
         ShapeBorderTween _border;
 
         protected override void forEachTween(ITweenVisitor visitor) {
-            this._elevation = (DoubleTween) visitor.visit(this, this._elevation, this.widget.elevation,
-                (double value) => new DoubleTween(begin: value, end: value));
+            this._elevation = (FloatTween) visitor.visit(this, this._elevation, this.widget.elevation,
+                (float value) => new FloatTween(begin: value, end: value));
             this._shadowColor = (ColorTween) visitor.visit(this, this._shadowColor, this.widget.shadowColor,
                 (Color value) => new ColorTween(begin: value));
             this._border = (ShapeBorderTween) visitor.visit(this, this._border, this.widget.shape,
