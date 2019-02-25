@@ -149,7 +149,7 @@ namespace Unity.UIWidgets.gestures {
                     entry.target.handleEvent(evt, entry);
                 }
                 catch (Exception ex) {
-                    Debug.LogError("Error while dispatching a pointer event: " + ex);
+                    D.logError("Error while dispatching a pointer event: ", ex);
                 }
             }
         }

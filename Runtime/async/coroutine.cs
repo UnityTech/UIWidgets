@@ -293,7 +293,7 @@ namespace Unity.UIWidgets.async {
                     callbackNode.callback();
                 }
                 catch (Exception ex) {
-                    Debug.LogError("Failed to execute callback in BackgroundCallbacks: " + ex);
+                    D.logError("Failed to execute callback in BackgroundCallbacks: ", ex);
                 }
 
                 if (!callbackNode.isDone) {
