@@ -17,7 +17,7 @@ namespace Unity.UIWidgets.rendering {
                 return this.child.getMinIntrinsicWidth(height);
             }
 
-            return 0.0;
+            return 0.0f;
         }
 
         protected override float computeMaxIntrinsicWidth(float height) {
@@ -25,7 +25,7 @@ namespace Unity.UIWidgets.rendering {
                 return this.child.getMaxIntrinsicWidth(height);
             }
 
-            return 0.0;
+            return 0.0f;
         }
 
         protected override float computeMinIntrinsicHeight(float width) {
@@ -33,7 +33,7 @@ namespace Unity.UIWidgets.rendering {
                 return this.child.getMinIntrinsicHeight(width);
             }
 
-            return 0.0;
+            return 0.0f;
         }
 
         protected override float computeMaxIntrinsicHeight(float width) {
@@ -41,7 +41,7 @@ namespace Unity.UIWidgets.rendering {
                 return this.child.getMaxIntrinsicHeight(width);
             }
 
-            return 0.0;
+            return 0.0f;
         }
 
         protected override float? computeDistanceToActualBaseline(TextBaseline baseline) {
