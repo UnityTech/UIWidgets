@@ -1,24 +1,37 @@
 using System;
 using System.Runtime.InteropServices;
+using UnityEngine;
 
 namespace Unity.UIWidgets.engine {
-    public class DisplayMetrics {
-        static float _devicePixelRatio = 0;
 
-        static Func<float> _devicePixelRatioGetter;
+    public static class DisplayMetricsProvider {
+        public static Func<DisplayMetrics> provider = () => new PlayerDisplayMetrics();
+    }
 
-        public static void SetDevicePixelRatioGetter(Func<float> f) {
-            _devicePixelRatioGetter = f;
+    public interface DisplayMetrics {
+        void OnGUI();
+
+        void Update();
+
+        float DevicePixelRatio { get; } 
+    }
+
+    public class PlayerDisplayMetrics: DisplayMetrics {
+        
+        float _devicePixelRatio = 0;
+
+        public void OnGUI() {
+            
         }
 
-        public static float devicePixelRatio {
-            get {
-                if (_devicePixelRatioGetter != null) {
-                    return _devicePixelRatioGetter();
-                }
+        public void Update() {
+        }
 
-                if (_devicePixelRatio > 0) {
-                    return _devicePixelRatio;
+
+        public float DevicePixelRatio {
+            get {
+                if (this._devicePixelRatio > 0) {
+                    return this._devicePixelRatio;
                 }
 
 #if UNITY_ANDROID 
@@ -33,11 +46,11 @@ namespace Unity.UIWidgets.engine {
                 _devicePixelRatio = IOSDeviceScaleFactor();
 #endif
 
-                if (_devicePixelRatio <= 0) {
-                    _devicePixelRatio = 1;
+                if (this._devicePixelRatio <= 0) {
+                    this._devicePixelRatio = 1;
                 }
 
-                return _devicePixelRatio;
+                return this._devicePixelRatio;
             }
             
         }
