@@ -56,7 +56,7 @@ namespace Unity.UIWidgets.async {
                     callback();
                 }
                 catch (Exception ex) {
-                    Debug.LogError("Error to execute runInMain callback: " + ex);
+                    D.logError("Error to execute runInMain callback: ", ex);
                 }
             }
         }
@@ -193,7 +193,7 @@ namespace Unity.UIWidgets.async {
                     this._callback();
                 }
                 catch (Exception ex) {
-                    Debug.LogError("Error to execute timer callback: " + ex);
+                    D.logError("Error to execute timer callback: ", ex);
                 }
 
                 if (this.periodic) {

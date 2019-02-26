@@ -1,7 +1,7 @@
 using System;
-#if UNITY_ANDROID 
+using System.Runtime.InteropServices;
 using UnityEngine;
-#endif
+
 namespace Unity.UIWidgets.engine {
 
     public static class DisplayMetricsProvider {
