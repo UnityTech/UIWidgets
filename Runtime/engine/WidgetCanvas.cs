@@ -64,9 +64,12 @@ namespace Unity.UIWidgets.engine {
         }
 
         protected override Vector2 queryWindowSize() {
-            var size = this._widgetCanvas.rectTransform.rect.size;
-            size = size * this._widgetCanvas.canvas.scaleFactor / this._widgetCanvas.devicePixelRatio;
-            return new Vector2(Mathf.Round(size.x), Mathf.Round(size.y));
+            var rect = RectTransformUtility.PixelAdjustRect(this._widgetCanvas.rectTransform, 
+                this._widgetCanvas.canvas);
+            var size = new Vector2(rect.width, rect.height) / this._widgetCanvas.devicePixelRatio;
+            size.x = Mathf.Round(size.x);
+            size.y = Mathf.Round(size.y);
+            return size;
         }
     }
 
@@ -76,7 +79,6 @@ namespace Unity.UIWidgets.engine {
         static Event _repaintEvent;
 
         [SerializeField] protected float devicePixelRatioOverride;
-
         WindowAdapter _windowAdapter;
         Texture _texture;
         Vector2 _lastMouseMove;
@@ -86,9 +88,11 @@ namespace Unity.UIWidgets.engine {
         const int mouseScrollId = mouseButtonNum + 1;
 
         readonly ScrollInput _scrollInput = new ScrollInput();
-
+        DisplayMetrics _displayMetrics;
+        
         protected override void OnEnable() {
             base.OnEnable();
+            this._displayMetrics = DisplayMetricsProvider.provider();
 
             if (_repaintEvent == null) {
                 _repaintEvent = new Event {type = EventType.Repaint};
@@ -116,7 +120,7 @@ namespace Unity.UIWidgets.engine {
             get {
                 return this.devicePixelRatioOverride > 0
                     ? this.devicePixelRatioOverride
-                    : DisplayMetrics.devicePixelRatio;
+                    : this._displayMetrics.DevicePixelRatio;
             }
         }
 
@@ -166,8 +170,9 @@ namespace Unity.UIWidgets.engine {
             this.texture = texture;
             this.material = mat;
         }
-
+        
         void Update() {
+            this._displayMetrics.Update();
             if (EventSystem.current != null && EventSystem.current.currentSelectedGameObject != this.gameObject) {
                 this.unfocusIfNeeded();
             }
@@ -212,6 +217,7 @@ namespace Unity.UIWidgets.engine {
         }
 
         void OnGUI() {
+            this._displayMetrics.OnGUI();
             if (Event.current.type == EventType.KeyDown || Event.current.type == EventType.KeyUp) {
                 this._windowAdapter.OnGUI(Event.current);
             }
