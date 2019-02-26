@@ -49,7 +49,7 @@ namespace Unity.UIWidgets.ui {
                 var rect = Rect.fromLTRB(characterInfo.minX, -characterInfo.maxY, characterInfo.maxX,
                     -characterInfo.minY);
                 rect = rect.translate(this._advance, 0);
-                if (this._bounds == null) {
+                if (this._bounds == null || this._bounds.isEmpty) {
                     this._bounds = rect;
                 }
                 else {

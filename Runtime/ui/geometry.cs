@@ -537,6 +537,14 @@ namespace Unity.UIWidgets.ui {
         }
 
         public Rect expandToInclude(Rect other) {
+            if (this.isEmpty) {
+                return other;
+            }
+
+            if (other == null || other.isEmpty) {
+                return this;
+            }
+            
             return fromLTRB(
                 Mathf.Min(this.left, other.left),
                 Mathf.Min(this.top, other.top),

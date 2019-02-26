@@ -9,6 +9,24 @@ namespace Unity.UIWidgets.rendering {
             get { return (ContainerLayer) base.parent; }
         }
 
+        bool _needsAddToScene = true;
+
+        protected void markNeedsAddToScene() {
+            this._needsAddToScene = true;
+        }
+
+        protected virtual bool alwaysNeedsAddToScene {
+            get { return false; }
+        }
+
+        internal bool _subtreeNeedsAddToScene;
+
+        flow.Layer _engineLayer;
+
+        internal virtual void updateSubtreeNeedsAddToScene() {
+            this._subtreeNeedsAddToScene = this._needsAddToScene || this.alwaysNeedsAddToScene;
+        }
+
         public Layer nextSibling {
             get { return this._nextSibling; }
         }
@@ -20,6 +38,16 @@ namespace Unity.UIWidgets.rendering {
         }
 
         internal Layer _previousSibling;
+
+        protected override void dropChild(AbstractNodeMixinDiagnosticableTree child) {
+            this.markNeedsAddToScene();
+            base.dropChild(child);
+        }
+
+        protected override void adoptChild(AbstractNodeMixinDiagnosticableTree child) {
+            this.markNeedsAddToScene();
+            base.adoptChild(child);
+        }
 
         public virtual void remove() {
             if (this.parent != null) {
@@ -72,12 +100,22 @@ namespace Unity.UIWidgets.rendering {
             D.assert(!this.attached);
         }
 
-        public abstract void addToScene(SceneBuilder builder, Offset layerOffset);
+        internal abstract flow.Layer addToScene(SceneBuilder builder, Offset layerOffset = null);
+
+        internal void _addToSceneWithRetainedRendering(SceneBuilder builder) {
+            if (!this._subtreeNeedsAddToScene && this._engineLayer != null) {
+                builder.addRetained(this._engineLayer);
+                return;
+            }
+
+            this._engineLayer = this.addToScene(builder);
+            this._needsAddToScene = false;
+        }
 
         public object debugCreator;
 
         public override string toStringShort() {
-            return base.toStringShort() + (this.owner == null ? "DETACHED" : "");
+            return base.toStringShort() + (this.owner == null ? " DETACHED" : "");
         }
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
@@ -97,15 +135,46 @@ namespace Unity.UIWidgets.rendering {
 
         public readonly Rect canvasBounds;
 
-        public Picture picture;
+        Picture _picture;
 
-        public bool isComplexHint = false;
+        public Picture picture {
+            get { return this._picture; }
+            set {
+                this.markNeedsAddToScene();
+                this._picture = value;
+            }
+        }
 
-        public bool willChangeHint = false;
+        bool _isComplexHint = false;
 
-        public override void addToScene(SceneBuilder builder, Offset layerOffset) {
+        public bool isComplexHint {
+            get { return this._isComplexHint; }
+            set {
+                if (value != this._isComplexHint) {
+                    this._isComplexHint = value;
+                    this.markNeedsAddToScene();
+                }
+            }
+        }
+
+        bool _willChangeHint = false;
+
+        public bool willChangeHint {
+            get { return this._willChangeHint; }
+            set {
+                if (value != this._willChangeHint) {
+                    this._willChangeHint = value;
+                    this.markNeedsAddToScene();
+                }
+            }
+        }
+
+        internal override flow.Layer addToScene(SceneBuilder builder, Offset layerOffset = null) {
+            layerOffset = layerOffset ?? Offset.zero;
+
             builder.addPicture(layerOffset, this.picture,
-                isComplex: this.isComplexHint, willChange: this.willChangeHint);
+                isComplexHint: this.isComplexHint, willChangeHint: this.willChangeHint);
+            return null;
         }
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
@@ -147,6 +216,16 @@ namespace Unity.UIWidgets.rendering {
             }
 
             return child == equals;
+        }
+
+        internal override void updateSubtreeNeedsAddToScene() {
+            base.updateSubtreeNeedsAddToScene();
+            Layer child = this.firstChild;
+            while (child != null) {
+                child.updateSubtreeNeedsAddToScene();
+                this._subtreeNeedsAddToScene = this._subtreeNeedsAddToScene || child._subtreeNeedsAddToScene;
+                child = child.nextSibling;
+            }
         }
 
         public override void attach(object owner) {
@@ -201,7 +280,7 @@ namespace Unity.UIWidgets.rendering {
             D.assert(child.attached == this.attached);
         }
 
-        public void _removeChild(Layer child) {
+        internal void _removeChild(Layer child) {
             D.assert(child.parent == this);
             D.assert(child.attached == this.attached);
             D.assert(this._debugUltimatePreviousSiblingOf(child, equals: this.firstChild));
@@ -210,16 +289,14 @@ namespace Unity.UIWidgets.rendering {
             if (child._previousSibling == null) {
                 D.assert(this.firstChild == child);
                 this._firstChild = child.nextSibling;
-            }
-            else {
+            } else {
                 child._previousSibling._nextSibling = child.nextSibling;
             }
 
             if (child._nextSibling == null) {
                 D.assert(this.lastChild == child);
                 this._lastChild = child.previousSibling;
-            }
-            else {
+            } else {
                 child._nextSibling._previousSibling = child.previousSibling;
             }
 
@@ -252,20 +329,26 @@ namespace Unity.UIWidgets.rendering {
             this._lastChild = null;
         }
 
-        public override void addToScene(SceneBuilder builder, Offset layerOffset) {
+        internal override flow.Layer addToScene(SceneBuilder builder, Offset layerOffset = null) {
             this.addChildrenToScene(builder, layerOffset);
+            return null;
         }
 
-        public void addChildrenToScene(SceneBuilder builder, Offset childOffset) {
+        public void addChildrenToScene(SceneBuilder builder, Offset childOffset = null) {
             Layer child = this.firstChild;
             while (child != null) {
-                child.addToScene(builder, childOffset);
+                if (childOffset == null || childOffset == Offset.zero) {
+                    child._addToSceneWithRetainedRendering(builder);
+                } else {
+                    child.addToScene(builder, childOffset);
+                }
                 child = child.nextSibling;
             }
         }
 
         public virtual void applyTransform(Layer child, Matrix3 transform) {
             D.assert(child != null);
+            D.assert(transform != null);
         }
 
         public override List<DiagnosticsNode> debugDescribeChildren() {
@@ -292,13 +375,43 @@ namespace Unity.UIWidgets.rendering {
 
     public class OffsetLayer : ContainerLayer {
         public OffsetLayer(Offset offset = null) {
-            this.offset = offset ?? Offset.zero;
+            this._offset = offset ?? Offset.zero;
         }
 
-        public Offset offset;
+        Offset _offset;
 
-        public override void addToScene(SceneBuilder builder, Offset layerOffset) {
-            this.addChildrenToScene(builder, this.offset + layerOffset);
+        public Offset offset {
+            get { return this._offset; }
+            set {
+                value = value ?? Offset.zero;
+                if (value != this._offset) {
+                    this._offset = value;
+                    this.markNeedsAddToScene();
+                }
+            }
+        }
+
+        public override void applyTransform(Layer child, Matrix3 transform) {
+            D.assert(child != null);
+            D.assert(transform != null);
+            transform.preTranslate((float) this.offset.dx, (float) this.offset.dy);
+        }
+
+        public Scene buildScene(SceneBuilder builder) {
+            this.updateSubtreeNeedsAddToScene();
+            this.addToScene(builder);
+            return builder.build();
+        }
+
+        internal override flow.Layer addToScene(SceneBuilder builder, Offset layerOffset = null) {
+            layerOffset = layerOffset ?? Offset.zero;
+
+            var engineLayer = builder.pushOffset(
+                (float) (layerOffset.dx + this.offset.dx),
+                (float) (layerOffset.dy + this.offset.dy));
+            this.addChildrenToScene(builder);
+            builder.pop();
+            return engineLayer;
         }
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
@@ -312,24 +425,40 @@ namespace Unity.UIWidgets.rendering {
             Rect clipRect = null,
             Clip clipBehavior = Clip.hardEdge
         ) {
+            D.assert(clipRect != null);
             D.assert(clipBehavior != Clip.none);
-            this.clipRect = clipRect;
+            this._clipRect = clipRect;
             this._clipBehavior = clipBehavior;
         }
 
-        public readonly Rect clipRect;
+        Rect _clipRect;
 
-        public Clip clipBehavior {
-            get { return this._clipBehavior; }
+        public Rect clipRect {
+            get { return this._clipRect; }
             set {
-                D.assert(value != Clip.none);
-                this._clipBehavior = value;
+                if (value != this._clipRect) {
+                    this._clipRect = value;
+                    this.markNeedsAddToScene();
+                }
             }
         }
 
         Clip _clipBehavior;
 
-        public override void addToScene(SceneBuilder builder, Offset layerOffset) {
+        public Clip clipBehavior {
+            get { return this._clipBehavior; }
+            set {
+                D.assert(value != Clip.none);
+                if (value != this._clipBehavior) {
+                    this._clipBehavior = value;
+                    this.markNeedsAddToScene();
+                }
+            }
+        }
+
+        internal override flow.Layer addToScene(SceneBuilder builder, Offset layerOffset = null) {
+            layerOffset = layerOffset ?? Offset.zero;
+            
             bool enabled = true;
             D.assert(() => {
                 enabled = !D.debugDisableClipLayers;
@@ -345,6 +474,8 @@ namespace Unity.UIWidgets.rendering {
             if (enabled) {
                 builder.pop();
             }
+
+            return null;
         }
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
@@ -358,24 +489,38 @@ namespace Unity.UIWidgets.rendering {
             RRect clipRRect = null,
             Clip clipBehavior = Clip.hardEdge
         ) {
+            D.assert(clipRRect != null);
             D.assert(clipBehavior != Clip.none);
-            this.clipRRect = clipRRect;
+            this._clipRRect = clipRRect;
             this._clipBehavior = clipBehavior;
         }
 
-        public readonly RRect clipRRect;
+        RRect _clipRRect;
 
-        public Clip clipBehavior {
-            get { return this._clipBehavior; }
+        public RRect clipRRect {
+            get { return this._clipRRect; }
             set {
-                D.assert(value != Clip.none);
-                this._clipBehavior = value;
+                if (value != this._clipRRect) {
+                    this._clipRRect = value;
+                    this.markNeedsAddToScene();
+                }
             }
         }
 
         Clip _clipBehavior;
 
-        public override void addToScene(SceneBuilder builder, Offset layerOffset) {
+        public Clip clipBehavior {
+            get { return this._clipBehavior; }
+            set {
+                D.assert(value != Clip.none);
+                if (value != this._clipBehavior) {
+                    this._clipBehavior = value;
+                    this.markNeedsAddToScene();
+                }
+            }
+        }
+
+        internal override flow.Layer addToScene(SceneBuilder builder, Offset layerOffset = null) {
             bool enabled = true;
             D.assert(() => {
                 enabled = !D.debugDisableClipLayers;
@@ -391,11 +536,70 @@ namespace Unity.UIWidgets.rendering {
             if (enabled) {
                 builder.pop();
             }
+
+            return null;
         }
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             properties.add(new DiagnosticsProperty<RRect>("clipRRect", this.clipRRect));
+        }
+    }
+
+    public class ClipPathLayer : ContainerLayer {
+        public ClipPathLayer(
+            Path clipPath = null,
+            Clip clipBehavior = Clip.hardEdge
+        ) {
+            D.assert(clipPath != null);
+            D.assert(clipBehavior != Clip.none);
+            this._clipPath = clipPath;
+            this._clipBehavior = clipBehavior;
+        }
+
+        Path _clipPath;
+
+        public Path clipPath {
+            get { return this._clipPath; }
+            set {
+                if (value != this._clipPath) {
+                    this._clipPath = value;
+                    this.markNeedsAddToScene();
+                }
+            }
+        }
+
+        Clip _clipBehavior;
+
+        public Clip clipBehavior {
+            get { return this._clipBehavior; }
+            set {
+                D.assert(value != Clip.none);
+                if (value != this._clipBehavior) {
+                    this._clipBehavior = value;
+                    this.markNeedsAddToScene();
+                }
+            }
+        }
+
+        internal override flow.Layer addToScene(SceneBuilder builder, Offset layerOffset = null) {
+            bool enabled = true;
+            D.assert(() => {
+                enabled = !D.debugDisableClipLayers;
+                return true;
+            });
+
+            if (enabled) {
+                builder.pushClipPath(this.clipPath.shift(layerOffset));
+            }
+
+            this.addChildrenToScene(builder, layerOffset);
+
+            if (enabled) {
+                builder.pop();
+            }
+
+            return null;
         }
     }
 
@@ -412,7 +616,9 @@ namespace Unity.UIWidgets.rendering {
         Matrix3 _transform;
         Matrix3 _lastEffectiveTransform;
 
-        public override void addToScene(SceneBuilder builder, Offset layerOffset) {
+        internal override flow.Layer addToScene(SceneBuilder builder, Offset layerOffset = null) {
+            layerOffset = layerOffset ?? Offset.zero;
+            
             this._lastEffectiveTransform = this._transform;
 
             var totalOffset = this.offset + layerOffset;
@@ -422,12 +628,14 @@ namespace Unity.UIWidgets.rendering {
             }
 
             builder.pushTransform(this._lastEffectiveTransform);
-            this.addChildrenToScene(builder, Offset.zero);
+            this.addChildrenToScene(builder);
             builder.pop();
+            return null;
         }
 
         public override void applyTransform(Layer child, Matrix3 transform) {
             D.assert(child != null);
+            D.assert(transform != null);
             transform.preConcat(this._lastEffectiveTransform);
         }
 
@@ -438,31 +646,60 @@ namespace Unity.UIWidgets.rendering {
     }
 
     public class OpacityLayer : ContainerLayer {
-        public OpacityLayer(int alpha = 255) {
-            this.alpha = alpha;
+        public OpacityLayer(int alpha = 255, Offset offset = null) {
+            this._alpha = alpha;
+            this._offset = offset ?? Offset.zero;
         }
 
-        public int alpha;
+        int _alpha;
 
-        public override void addToScene(SceneBuilder builder, Offset layerOffset) {
+        public int alpha {
+            get { return this._alpha; }
+            set {
+                if (value != this._alpha) {
+                    this._alpha = value;
+                    this.markNeedsAddToScene();
+                }
+            }
+        }
+
+        Offset _offset;
+
+        public Offset offset {
+            get { return this._offset; }
+            set {
+                value = value ?? Offset.zero;
+                if (value != this._offset) {
+                    this._offset = value;
+                    this.markNeedsAddToScene();
+                }
+            }
+        }
+
+        internal override flow.Layer addToScene(SceneBuilder builder, Offset layerOffset = null) {
+            layerOffset = layerOffset ?? Offset.zero;
+
             bool enabled = true;
             D.assert(() => {
                 enabled = !D.debugDisableOpacityLayers;
                 return true;
             });
             if (enabled) {
-                builder.pushOpacity(this.alpha);
+                builder.pushOpacity(this.alpha, offset: this.offset + layerOffset);
             }
 
             this.addChildrenToScene(builder, layerOffset);
             if (enabled) {
                 builder.pop();
             }
+
+            return null;
         }
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             properties.add(new IntProperty("alpha", this.alpha));
+            properties.add(new DiagnosticsProperty<Offset>("offset", this.offset));
         }
     }
 
@@ -479,14 +716,19 @@ namespace Unity.UIWidgets.rendering {
     }
 
     public class LeaderLayer : ContainerLayer {
-        public readonly LayerLink link;
-        public Offset offset;
-
         public LeaderLayer(LayerLink link, Offset offset = null) {
             D.assert(link != null);
             offset = offset ?? Offset.zero;
             this.link = link;
             this.offset = offset;
+        }
+
+        public readonly LayerLink link;
+
+        public Offset offset;
+
+        protected override bool alwaysNeedsAddToScene {
+            get { return true; }
         }
 
         public override void attach(object owner) {
@@ -505,7 +747,9 @@ namespace Unity.UIWidgets.rendering {
 
         internal Offset _lastOffset;
 
-        public override void addToScene(SceneBuilder builder, Offset layerOffset) {
+        internal override flow.Layer addToScene(SceneBuilder builder, Offset layerOffset = null) {
+            layerOffset = layerOffset ?? Offset.zero;
+
             D.assert(this.offset != null);
             this._lastOffset = this.offset + layerOffset;
             if (this._lastOffset != Offset.zero) {
@@ -516,6 +760,8 @@ namespace Unity.UIWidgets.rendering {
             if (this._lastOffset != Offset.zero) {
                 builder.pop();
             }
+
+            return null;
         }
 
         public override void applyTransform(Layer child, Matrix3 transform) {
@@ -542,18 +788,17 @@ namespace Unity.UIWidgets.rendering {
             D.assert(link != null);
             this.link = link;
             this.showWhenUnlinked = showWhenUnlinked;
-            this.unlinkedOffset = unlinkedOffset;
-            this.linkedOffset = linkedOffset;
+            this.unlinkedOffset = unlinkedOffset ?? Offset.zero;
+            this.linkedOffset = linkedOffset ?? Offset.zero;
         }
 
         public readonly LayerLink link;
-        public readonly bool showWhenUnlinked;
-        public readonly Offset unlinkedOffset;
-        public readonly Offset linkedOffset;
+        public bool showWhenUnlinked;
+        public Offset unlinkedOffset;
+        public Offset linkedOffset;
 
         Offset _lastOffset;
         Matrix3 _lastTransform;
-        Matrix3 _invertedTransform;
 
         public Matrix3 getLastTransform() {
             if (this._lastTransform == null) {
@@ -603,7 +848,7 @@ namespace Unity.UIWidgets.rendering {
             ancestor = layer;
 
             layer = this;
-            List<ContainerLayer> inverseLayers = new List<ContainerLayer>();
+            List<ContainerLayer> inverseLayers = new List<ContainerLayer> {layer};
             do {
                 layer = layer.parent;
                 inverseLayers.Add(layer);
@@ -612,7 +857,7 @@ namespace Unity.UIWidgets.rendering {
             Matrix3 forwardTransform = this._collectTransformForLayerChain(forwardLayers);
             Matrix3 inverseTransform = this._collectTransformForLayerChain(inverseLayers);
             var inverse = Matrix3.I();
-            var invertible = inverseTransform.invert(inverseTransform);
+            var invertible = inverseTransform.invert(inverse);
             if (!invertible) {
                 return;
             }
@@ -623,28 +868,35 @@ namespace Unity.UIWidgets.rendering {
             this._lastTransform = inverseTransform;
         }
 
-        public override void addToScene(SceneBuilder builder, Offset layerOffset) {
+        protected override bool alwaysNeedsAddToScene {
+            get { return true; }
+        }
+
+        internal override flow.Layer addToScene(SceneBuilder builder, Offset layerOffset = null) {
+            layerOffset = layerOffset ?? Offset.zero;
+
             D.assert(this.link != null);
             if (this.link.leader == null && !this.showWhenUnlinked) {
                 this._lastTransform = null;
                 this._lastOffset = null;
-                return;
+                return null;
             }
 
             this._establishTransform();
             if (this._lastTransform != null) {
                 builder.pushTransform(this._lastTransform);
-                this.addChildrenToScene(builder, Offset.zero);
+                this.addChildrenToScene(builder);
                 builder.pop();
                 this._lastOffset = this.unlinkedOffset + layerOffset;
-            }
-            else {
+            } else {
                 this._lastOffset = null;
                 var matrix = Matrix3.makeTrans(this.unlinkedOffset.dx, this.unlinkedOffset.dy);
                 builder.pushTransform(matrix);
-                this.addChildrenToScene(builder, Offset.zero);
+                this.addChildrenToScene(builder);
                 builder.pop();
             }
+
+            return null;
         }
 
         public override void applyTransform(Layer child, Matrix3 transform) {
@@ -652,8 +904,7 @@ namespace Unity.UIWidgets.rendering {
             D.assert(transform != null);
             if (this._lastTransform != null) {
                 transform.preConcat(this._lastTransform);
-            }
-            else {
+            } else {
                 transform.preConcat(Matrix3.makeTrans(this.unlinkedOffset.dx, this.unlinkedOffset.dy));
             }
         }
@@ -661,7 +912,8 @@ namespace Unity.UIWidgets.rendering {
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             properties.add(new DiagnosticsProperty<LayerLink>("link", this.link));
-            properties.add(new TransformProperty("transform", this.getLastTransform(), defaultValue: null));
+            properties.add(new TransformProperty("transform", this.getLastTransform(),
+                defaultValue: Diagnostics.kNullDefaultValue));
         }
     }
 }

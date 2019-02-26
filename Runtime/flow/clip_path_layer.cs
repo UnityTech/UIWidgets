@@ -1,39 +1,40 @@
-﻿using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
 
 namespace Unity.UIWidgets.flow {
-    public class ClipRectLayer : ContainerLayer {
-        Rect _clipRect;
+    public class ClipPathLayer : ContainerLayer {
+        Path _clipPath;
 
-        public Rect clipRect {
-            set { this._clipRect = value; }
+        public Path clipPath {
+            set { this._clipPath = value; }
         }
 
         public override void preroll(PrerollContext context, Matrix3 matrix) {
             var previousCullRect = context.cullRect;
 
-            context.cullRect = context.cullRect.intersect(this._clipRect);
+            var clipPathBounds = this._clipPath.getBounds();
+            context.cullRect = context.cullRect.intersect(clipPathBounds);
 
             if (!context.cullRect.isEmpty) {
                 var childPaintBounds = Rect.zero;
                 this.prerollChildren(context, matrix, ref childPaintBounds);
-                childPaintBounds = childPaintBounds.intersect(this._clipRect);
 
+                childPaintBounds = childPaintBounds.intersect(clipPathBounds);
                 if (!childPaintBounds.isEmpty) {
                     this.paintBounds = childPaintBounds;
                 }
             }
-            
+
             context.cullRect = previousCullRect;
         }
 
         public override void paint(PaintContext context) {
             D.assert(this.needsPainting);
-            
+
             var canvas = context.canvas;
 
             canvas.save();
-            canvas.clipRect(this.paintBounds);
+            canvas.clipPath(this._clipPath);
 
             try {
                 this.paintChildren(context);

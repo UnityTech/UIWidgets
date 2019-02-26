@@ -169,3 +169,15 @@ Pick a Cleanup scope as you want and Choose "UIWidgets" as the "Code cleanup pro
 3. **Refine Code Style Rules**: Edit the ".editorconfig" file under \<YourProjectPath\>/Packages/com.unity.uiwidgets/". Visit
  https://www.jetbrains.com/help/rider/EditorConfig_Index.html for the detailed.
 
+#### Generate njk Code
+
+1. **Go to scripts Folder and Run npm install**:
+```
+cd <YourProjectPath>/Packages/com.unity.uiwidgets/scripts
+npm install
+```
+
+2. **Run the codegen Command**:
+```
+node uiwidgets-cli.js codegen . generate mixin code
+```

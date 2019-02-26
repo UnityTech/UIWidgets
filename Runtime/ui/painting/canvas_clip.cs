@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using Unity.UIWidgets.foundation;
 using UnityEngine;
 
@@ -151,6 +150,8 @@ namespace Unity.UIWidgets.ui {
         public const uint wideOpenGenID = 2;
 
         public readonly List<ClipElement> stack = new List<ClipElement>();
+        
+        ClipElement _lastElement;
         Rect _bound;
         int _saveCount;
 
@@ -164,13 +165,13 @@ namespace Unity.UIWidgets.ui {
         }
 
         void _restoreTo(int saveCount) {
-            while (this.stack.Count > 0) {
-                var element = this.stack[this.stack.Count - 1];
-                if (element.saveCount <= saveCount) {
+            while (this._lastElement != null) {
+                if (this._lastElement.saveCount <= saveCount) {
                     break;
                 }
 
                 this.stack.RemoveAt(this.stack.Count - 1);
+                this._lastElement = this.stack.Count == 0 ? null : this.stack[this.stack.Count - 1];
             }
         }
 
@@ -180,7 +181,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         void _pushElement(ClipElement element) {
-            ClipElement prior = this.stack.LastOrDefault();
+            ClipElement prior = this._lastElement;
             if (prior != null) {
                 if (prior.isEmpty()) {
                     return;
@@ -209,17 +210,18 @@ namespace Unity.UIWidgets.ui {
             }
 
             this.stack.Add(element);
+            this._lastElement = element;
             element.updateBoundAndGenID(prior);
         }
 
         public void getBounds(out Rect bound, out bool isIntersectionOfRects) {
-            if (this.stack.Count == 0) {
+            if (this._lastElement == null) {
                 bound = null;
                 isIntersectionOfRects = false;
                 return;
             }
 
-            var element = this.stack.Last();
+            var element = this._lastElement;
             bound = element.getBound();
             isIntersectionOfRects = element.isIntersectionOfRects();
         }
@@ -228,13 +230,14 @@ namespace Unity.UIWidgets.ui {
     class ReducedClip {
         public readonly Rect scissor;
         public readonly List<ClipElement> maskElements = new List<ClipElement>();
+        ClipElement _lastElement;
 
         public bool isEmpty() {
             return this.scissor != null && this.scissor.isEmpty;
         }
 
         public uint maskGenID() {
-            var element = this.maskElements.LastOrDefault();
+            var element = this._lastElement;
             if (element == null) {
                 return ClipStack.wideOpenGenID;
             }
@@ -253,7 +256,6 @@ namespace Unity.UIWidgets.ui {
             }
 
             stackBounds = layerBounds.intersect(stackBounds);
-
             if (iior) {
                 this.scissor = stackBounds;
                 return;
@@ -280,6 +282,7 @@ namespace Unity.UIWidgets.ui {
                 }
 
                 this.maskElements.Add(element);
+                this._lastElement = element;
             }
         }
     }
