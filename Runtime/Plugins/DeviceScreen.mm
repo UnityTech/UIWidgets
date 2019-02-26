@@ -1,7 +1,7 @@
 #import <UIKit/UIKit.h>
 extern "C"
 {
-    int IOSDeviceSaleFactor()
+    int IOSDeviceScaleFactor()
     {
         return [[UIScreen mainScreen] scale];
     }

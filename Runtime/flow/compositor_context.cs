@@ -25,7 +25,7 @@ namespace Unity.UIWidgets.flow {
 
             public bool raster(LayerTree layerTree, bool ignoreRasterCache) {
                 layerTree.preroll(this, ignoreRasterCache);
-                layerTree.paint(this);
+                layerTree.paint(this, ignoreRasterCache);
                 return true;
             }
 

@@ -74,7 +74,7 @@ namespace Unity.UIWidgets.ui {
             this._recorder = recorder;
         }
 
-        readonly PictureRecorder _recorder;
+        protected readonly PictureRecorder _recorder;
 
         int _saveCount = 1;
 
@@ -137,7 +137,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public Matrix3 getTotalMatrix() {
-            throw new Exception("not available in recorder");
+            return this._recorder.getTotalMatrix();
         }
 
         public void resetMatrix() {
@@ -151,7 +151,7 @@ namespace Unity.UIWidgets.ui {
             });
         }
 
-        public float getDevicePixelRatio() {
+        public virtual float getDevicePixelRatio() {
             throw new Exception("not available in recorder");
         }
 
@@ -316,12 +316,12 @@ namespace Unity.UIWidgets.ui {
             });
         }
 
-        public void flush() {
+        public virtual void flush() {
             throw new Exception("not available in recorder");
         }
 
         public void reset() {
-            throw new Exception("not available in recorder");
+            this._recorder.reset();
         }
     }
 }

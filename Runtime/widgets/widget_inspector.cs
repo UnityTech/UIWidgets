@@ -892,9 +892,11 @@ namespace Unity.UIWidgets.widgets {
         // public float _textPainterMaxWidth;
 
 
-        public override void addToScene(SceneBuilder builder, Offset layerOffset) {
+        internal override flow.Layer addToScene(SceneBuilder builder, Offset layerOffset = null) {
+            layerOffset = layerOffset ?? Offset.zero;
+            
             if (!this.selection.active) {
-                return;
+                return null;
             }
 
             RenderObject selected = this.selection.current;
@@ -919,6 +921,7 @@ namespace Unity.UIWidgets.widgets {
             }
 
             builder.addPicture(layerOffset, this._picture);
+            return null;
         }
 
 

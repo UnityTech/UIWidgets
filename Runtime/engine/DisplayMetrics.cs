@@ -30,7 +30,7 @@ namespace Unity.UIWidgets.engine {
 #endif
                 
 #if UNITY_IOS 
-                _devicePixelRatio = IOSDeviceSaleFactor();
+                _devicePixelRatio = IOSDeviceScaleFactor();
 #endif
 
                 if (_devicePixelRatio <= 0) {
@@ -67,7 +67,7 @@ namespace Unity.UIWidgets.engine {
 
 #if UNITY_IOS
         [DllImport("__Internal")]
-        static extern int IOSDeviceSaleFactor();
+        static extern int IOSDeviceScaleFactor();
 #endif
         
     }

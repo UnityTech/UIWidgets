@@ -57,7 +57,7 @@ namespace Unity.UIWidgets.painting {
         public readonly float width;
         public readonly BorderStyle style;
 
-        public static readonly BorderSide none = new BorderSide(width: 0.0f);
+        public static readonly BorderSide none = new BorderSide(width: 0.0f, style: BorderStyle.none);
 
         public BorderSide copyWith(
             Color color = null,
@@ -513,7 +513,7 @@ namespace Unity.UIWidgets.painting {
                 case BorderStyle.none:
                     break;
             }
-
+            
             switch (left.style) {
                 case BorderStyle.solid:
                     Paint paint = new Paint {

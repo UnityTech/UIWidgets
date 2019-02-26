@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Unity.UIWidgets.foundation;
 using UnityEngine;
 
@@ -63,6 +64,44 @@ namespace Unity.UIWidgets.ui {
 
         public Path() {
             this._reset();
+        }
+
+        public override string ToString() {
+            var sb = new StringBuilder("Path: count = " + this._commands.Count);
+
+            var i = 0;
+            while (i < this._commands.Count) {
+                var cmd = (PathCommand) this._commands[i];
+                switch (cmd) {
+                    case PathCommand.moveTo:
+                        sb.Append(", moveTo(" + this._commands[i + 1] + ", " + this._commands[i + 2] + ")");
+                        i += 3;
+                        break;
+                    case PathCommand.lineTo:
+                        sb.Append(", lineTo(" + this._commands[i + 1] + ", " + this._commands[i + 2] + ")");
+                        i += 3;
+                        break;
+                    case PathCommand.bezierTo:
+                        sb.Append(", bezierTo(" + this._commands[i + 1] + ", " + this._commands[i + 2] +
+                                  ", " + this._commands[i + 3] + ", " + this._commands[i + 4] +
+                                  ", " + this._commands[i + 5] + ", " + this._commands[i + 6] + ")");
+                        i += 7;
+                        break;
+                    case PathCommand.close:
+                        sb.Append(", close()");
+                        i++;
+                        break;
+                    case PathCommand.winding:
+                        sb.Append(", winding(" + (PathWinding) this._commands[i + 1] + ")");
+                        i += 2;
+                        break;
+                    default:
+                        D.assert(false, "unknown cmd: " + cmd);
+                        break;
+                }
+            }
+
+            return sb.ToString();
         }
 
         void _reset() {
@@ -270,8 +309,16 @@ namespace Unity.UIWidgets.ui {
             this._appendCommands(commands.ToArray());
         }
 
+        public Path shift(Offset offset) {
+            offset = offset ?? Offset.zero;
+            var path = new Path();
+            path.addPath(this, offset);
+            return path;
+        }
+        
         public void addPath(Path path, Offset offset) {
             D.assert(path != null);
+            D.assert(offset != null);
 
             var commands = new List<float>();
 

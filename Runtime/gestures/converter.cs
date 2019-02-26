@@ -148,8 +148,11 @@ namespace Unity.UIWidgets.gestures {
 
                     case PointerChange.up:
                     case PointerChange.cancel: {
-                        D.assert(_pointers.ContainsKey(datum.device));
-                        _PointerState state = _pointers[datum.device];
+                        _PointerState state = _pointers.getOrDefault(datum.device);
+                        if (state == null || !state.down) {
+                            break;
+                        }
+                        
                         D.assert(state.down);
                         if (position != state.lastPosition) {
                             Offset offset = position - state.lastPosition;
