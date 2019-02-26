@@ -398,6 +398,8 @@ namespace Unity.UIWidgets.ui {
 
             var mat = _texMat.getMaterial(paint.blendMode, layer.ignoreClip);
             _getShaderPassAndProps(viewport, ctm, paint, 1.0f, out var pass, out var props);
+
+            image.texture.filterMode = paint.filterMode;
             props.SetTexture("_tex", image.texture);
             props.SetInt("_texMode", image.texture is RenderTexture ? 1 : 0); // pre alpha if RT else post alpha
 
@@ -414,7 +416,6 @@ namespace Unity.UIWidgets.ui {
             MeshMesh mesh, PictureFlusher.RenderLayer renderLayer) {
             Vector4 viewport = layer.viewport;
             Matrix3 ctm = layer.states[layer.states.Count - 1].matrix;
-
 
             var mat = _texMat.getMaterial(paint.blendMode, layer.ignoreClip);
             _getShaderPassAndProps(viewport, ctm, paint, 1.0f, out var pass, out var props);
@@ -436,6 +437,7 @@ namespace Unity.UIWidgets.ui {
 
             var mat = _texMat.getMaterial(paint.blendMode, layer.ignoreClip);
             _getShaderPassAndProps(viewport, ctm, paint, 1.0f, out var pass, out var props);
+            tex.filterMode = paint.filterMode;
             props.SetTexture("_tex", tex);
             props.SetInt("_texMode", 2); // alpha only
 
