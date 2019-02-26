@@ -90,6 +90,8 @@ namespace Unity.UIWidgets.engine {
         protected override void OnEnable() {
             base.OnEnable();
 
+            Input.simulateMouseWithTouches = false;
+
             if (_repaintEvent == null) {
                 _repaintEvent = new Event {type = EventType.Repaint};
             }
@@ -178,29 +180,7 @@ namespace Unity.UIWidgets.engine {
             }
 
             if (this._mouseEntered) {
-                if (Input.mouseScrollDelta.y != 0 || Input.mouseScrollDelta.x != 0) {
-                    var scaleFactor = this.canvas.scaleFactor;
-                    var pos = this.getPointPosition(Input.mousePosition);
-                    this._scrollInput.onScroll(Input.mouseScrollDelta.x * scaleFactor,
-                        Input.mouseScrollDelta.y * scaleFactor,
-                        pos.x,
-                        pos.y,
-                        this.getScrollButton());
-                }
-
-                var deltaScroll = this._scrollInput.getScrollDelta();
-                if (deltaScroll != Vector2.zero) {
-                    this._windowAdapter.postPointerEvent(new ScrollData(
-                        timeStamp: Timer.timespanSinceStartup,
-                        change: PointerChange.scroll,
-                        kind: PointerDeviceKind.mouse,
-                        device: this._scrollInput.getDeviceId(),
-                        physicalX: this._scrollInput.getPointerPosX(),
-                        physicalY: this._scrollInput.getPointerPosY(),
-                        scrollX: deltaScroll.x,
-                        scrollY: deltaScroll.y
-                    ));
-                }
+                this.handleMouseScroll();
             }
 
 
@@ -228,6 +208,33 @@ namespace Unity.UIWidgets.engine {
                 physicalY: pos.y
             ));
         }
+        
+        void handleMouseScroll() {
+            if (Input.mouseScrollDelta.y != 0 || Input.mouseScrollDelta.x != 0) {
+                var scaleFactor = this.canvas.scaleFactor;
+                var pos = this.getPointPosition(Input.mousePosition);
+                this._scrollInput.onScroll(Input.mouseScrollDelta.x * scaleFactor,
+                    Input.mouseScrollDelta.y * scaleFactor,
+                    pos.x,
+                    pos.y,
+                    this.getScrollButton());
+            }
+
+            var deltaScroll = this._scrollInput.getScrollDelta();
+            if (deltaScroll != Vector2.zero) {
+                this._windowAdapter.postPointerEvent(new ScrollData(
+                    timeStamp: Timer.timespanSinceStartup,
+                    change: PointerChange.scroll,
+                    kind: PointerDeviceKind.mouse,
+                    device: this._scrollInput.getDeviceId(),
+                    physicalX: this._scrollInput.getPointerPosX(),
+                    physicalY: this._scrollInput.getPointerPosY(),
+                    scrollX: deltaScroll.x,
+                    scrollY: deltaScroll.y
+                ));
+            }
+        }
+
 
         int getScrollButton() {
             return mouseScrollId;

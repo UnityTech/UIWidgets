@@ -1,9 +1,8 @@
-using System;
 using UnityEngine;
 
 namespace Unity.UIWidgets.editor {
     public class ScrollInput {
-        readonly int _bufferSize = 10;
+        readonly int _bufferSize = 20;
         readonly float _scrollScale = 10;
 
         float _scrollDeltaX;
@@ -17,14 +16,15 @@ namespace Unity.UIWidgets.editor {
         float _pointerY;
         int _buttonId;
 
-        public ScrollInput(int bufferSize = 10, float scrollScale = 10) {
-            this._bufferIndex = bufferSize;
-            this._bufferSize = bufferSize;
+        public ScrollInput(int? bufferSize = null, float? scrollScale = null) {
+            this._bufferSize = bufferSize ?? this._bufferSize;
+            this._scrollScale = scrollScale ?? this._scrollScale;
+            
+            this._bufferIndex = this._bufferSize;
             this._scrollDeltaX = 0;
             this._scrollDeltaY = 0;
             this._curDeltaX = 0;
             this._curDeltaY = 0;
-            this._scrollScale = scrollScale;
         }
 
         public void onScroll(float deltaX, float deltaY, float pointerX, float pointerY, int buttonId) {
