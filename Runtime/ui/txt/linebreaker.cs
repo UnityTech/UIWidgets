@@ -204,7 +204,7 @@ namespace Unity.UIWidgets.ui {
 
         void _addWordBreak(int offset, float preBreak, float postBreak, int preSpaceCount, int postSpaceCount,
             float penalty) {
-            Candidate cand = new Candidate();
+            
             float width = this._candidates[this._candidates.Count - 1].preBreak;
             if (postBreak - width > this._lineWidth) {
                 int i = this._candidates[this._candidates.Count - 1].offset;
@@ -212,25 +212,27 @@ namespace Unity.UIWidgets.ui {
                 for (; i < offset; i++) {
                     float w = this._charWidths[i];
                     if (w > 0) {
-                        cand.offset = i;
-                        cand.preBreak = width;
-                        cand.postBreak = width;
-                        cand.preSpaceCount = postSpaceCount;
-                        cand.preSpaceCount = postSpaceCount;
-                        cand.penalty = ScoreDesperate;
-                        this._addCandidate(cand);
+                        this._addCandidate(new Candidate {
+                            offset = i,
+                            preBreak = width,
+                            postBreak = width,
+                            preSpaceCount = postSpaceCount,
+                            postSpaceCount = postSpaceCount,
+                            penalty = ScoreDesperate,
+                        });
                         width += w;
                     }
                 }
             }
-
-            cand.offset = offset;
-            cand.preBreak = preBreak;
-            cand.postBreak = postBreak;
-            cand.penalty = penalty;
-            cand.preSpaceCount = preSpaceCount;
-            cand.preSpaceCount = postSpaceCount;
-            this._addCandidate(cand);
+            
+            this._addCandidate(new Candidate {
+                offset = offset,
+                preBreak = preBreak,
+                postBreak = postBreak,
+                preSpaceCount = preSpaceCount,
+                postSpaceCount = postSpaceCount,
+                penalty = penalty
+            });
         }
 
 
