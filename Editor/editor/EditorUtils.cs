@@ -7,8 +7,8 @@ using UnityEngine;
 
 namespace Unity.UIWidgets.Editor {
     [InitializeOnLoad]
-    public class EitorUtils {
-        static EitorUtils() {
+    public class EditorUtils {
+        static EditorUtils() {
             DisplayMetricsProvider.provider = () => new EditorPlayerDisplayMetrics();
         }
     }
@@ -17,11 +17,11 @@ namespace Unity.UIWidgets.Editor {
 
         float _lastDevicePixelRatio = 0;
 
-         public void OnGUI() {
-         }
+        public void OnGUI() {
+        }
 
-         public void Update() {
-             this._lastDevicePixelRatio = GameViewUtil.getGameViewDevicePixelRatio();
+        public void Update() {
+            this._lastDevicePixelRatio = GameViewUtil.getGameViewDevicePixelRatio();
         }
 
         public float DevicePixelRatio {
@@ -29,13 +29,13 @@ namespace Unity.UIWidgets.Editor {
         }
     }
 
-    internal static class GameViewUtil {
-        
+    static class GameViewUtil {
+
         static Type _gameViewType;
-        
+
         static string _gameViewClassName = "UnityEditor.GameView";
-        
-         public static float  getGameViewDevicePixelRatio(float fallback = 1) {
+
+        public static float getGameViewDevicePixelRatio(float fallback = 1) {
             loadTypeIfNeed();
 
             EditorWindow gameview = getMainGameView();
@@ -64,28 +64,28 @@ namespace Unity.UIWidgets.Editor {
             }
 
             return fallback;
-         }
+        }
 
-         static EditorWindow getMainGameView() {
-             IEnumerable enumerable = null;
-             if (!getFieldValue(null, "s_GameViews", ref enumerable)) {
-                 return null;
-             }
-             IEnumerator enumerator = enumerable != null ? enumerable.GetEnumerator() : null;
-             if (enumerator != null && enumerator.MoveNext()) {
-                 return enumerator.Current as EditorWindow;
-             }
-             return null;
-         }
-         
+        static EditorWindow getMainGameView() {
+            IEnumerable enumerable = null;
+            if (!getFieldValue(null, "s_GameViews", ref enumerable)) {
+                return null;
+            }
+            IEnumerator enumerator = enumerable != null ? enumerable.GetEnumerator() : null;
+            if (enumerator != null && enumerator.MoveNext()) {
+                return enumerator.Current as EditorWindow;
+            }
+            return null;
+        }
+
         static bool getFieldValue<T>(object ins, string name, ref T result) {
             var fieldInfo = _gameViewType.GetField(name, BindingFlags.Public
-                                                              | BindingFlags.NonPublic 
-                                                              | BindingFlags.Static | BindingFlags.Instance);
+                                                         | BindingFlags.NonPublic
+                                                         | BindingFlags.Static | BindingFlags.Instance);
             if (fieldInfo == null) {
                 return false;
             }
-            result = (T)fieldInfo.GetValue(ins);
+            result = (T) fieldInfo.GetValue(ins);
             return true;
         }
 
@@ -99,11 +99,11 @@ namespace Unity.UIWidgets.Editor {
                 }
             }
         }
-        
+
         static bool getPropertyValue<T>(object ins, string name, ref T result) {
-            var property = _gameViewType.GetProperty(name, BindingFlags.Public
-                                                                | BindingFlags.NonPublic | 
-                                                                BindingFlags.Static | BindingFlags.Instance);
+            var property = _gameViewType.GetProperty(name,
+                BindingFlags.Public | BindingFlags.NonPublic |
+                BindingFlags.Static | BindingFlags.Instance);
             if (property == null) {
                 return false;
             }
