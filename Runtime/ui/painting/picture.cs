@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Unity.UIWidgets.foundation;
+using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
     public class Picture {
@@ -20,6 +20,21 @@ namespace Unity.UIWidgets.ui {
         readonly List<CanvasState> _states = new List<CanvasState>();
 
         public PictureRecorder() {
+            this.reset();
+        }
+
+        CanvasState _getState() {
+            D.assert(this._states.Count > 0);
+            return this._states[this._states.Count - 1];
+        }
+
+        public Matrix3 getTotalMatrix() {
+            return this._getState().xform;
+        }
+
+        public void reset() {
+            this._drawCmds.Clear();
+            this._states.Clear();
             this._states.Add(new CanvasState {
                 xform = Matrix3.I(),
                 scissor = null,
@@ -29,18 +44,13 @@ namespace Unity.UIWidgets.ui {
             });
         }
 
-        CanvasState _getState() {
-            D.assert(this._states.Count > 0);
-            return this._states.Last();
-        }
-
         public Picture endRecording() {
             if (this._states.Count > 1) {
                 throw new Exception("unmatched save/restore commands");
             }
 
-            var state = this._getState();
-            return new Picture(this._drawCmds, state.paintBounds);
+            var state = this._getState();            
+            return new Picture(new List<DrawCmd>(this._drawCmds), state.paintBounds);
         }
 
         public void addDrawCmd(DrawCmd drawCmd) {
@@ -67,51 +77,52 @@ namespace Unity.UIWidgets.ui {
 
                     if (!stateToRestore.saveLayer) {
                         state.paintBounds = stateToRestore.paintBounds;
-                    }
-                    else {
+                    } else {
                         var paintBounds = stateToRestore.paintBounds.shift(stateToRestore.layerOffset);
                         paintBounds = state.xform.mapRect(paintBounds);
                         this._addPaintBounds(paintBounds);
                     }
-
                     break;
                 }
                 case DrawTranslate cmd: {
                     var state = this._getState();
+                    state.xform = new Matrix3(state.xform);
                     state.xform.preTranslate(cmd.dx, cmd.dy);
                     break;
                 }
                 case DrawScale cmd: {
                     var state = this._getState();
+                    state.xform = new Matrix3(state.xform);
                     state.xform.preScale(cmd.sx, (cmd.sy ?? cmd.sx));
                     break;
                 }
                 case DrawRotate cmd: {
                     var state = this._getState();
+                    state.xform = new Matrix3(state.xform);
                     if (cmd.offset == null) {
                         state.xform.preRotate(cmd.radians);
-                    }
-                    else {
+                    } else {
                         state.xform.preRotate(cmd.radians,
                             cmd.offset.dx,
                             cmd.offset.dy);
                     }
-
                     break;
                 }
                 case DrawSkew cmd: {
                     var state = this._getState();
+                    state.xform = new Matrix3(state.xform);
                     state.xform.preSkew(cmd.sx, cmd.sy);
                     break;
                 }
                 case DrawConcat cmd: {
                     var state = this._getState();
+                    state.xform = new Matrix3(state.xform);
                     state.xform.preConcat(cmd.matrix);
                     break;
                 }
                 case DrawResetMatrix _: {
                     var state = this._getState();
-                    state.xform.reset();
+                    state.xform = Matrix3.I();
                     break;
                 }
                 case DrawSetMatrix cmd: {
@@ -154,8 +165,7 @@ namespace Unity.UIWidgets.ui {
                     if (paint.style == PaintingStyle.fill) {
                         var cache = path.flatten(scale * devicePixelRatio);
                         mesh = cache.getFillMesh(out _).transform(state.xform);
-                    }
-                    else {
+                    } else {
                         float strokeWidth = (paint.strokeWidth * scale).clamp(0, 200.0f);
                         float fringeWidth = 1 / devicePixelRatio;
 
@@ -170,8 +180,15 @@ namespace Unity.UIWidgets.ui {
                             paint.strokeJoin,
                             paint.strokeMiterLimit).transform(state.xform);
                     }
-
-                    this._addPaintBounds(mesh.bounds);
+                    
+                    
+                    if (paint.maskFilter != null && paint.maskFilter.sigma != 0) {
+                        float sigma = scale * paint.maskFilter.sigma;
+                        float sigma3 = 3 * sigma;
+                        this._addPaintBounds(mesh.bounds.inflate(sigma3));
+                    } else {
+                        this._addPaintBounds(mesh.bounds);
+                    }
                     break;
                 }
                 case DrawImage cmd: {
@@ -202,9 +219,19 @@ namespace Unity.UIWidgets.ui {
                 }
                 case DrawTextBlob cmd: {
                     var state = this._getState();
+                    var scale = XformUtils.getScale(state.xform);
                     var rect = cmd.textBlob.boundsInText.shift(cmd.offset);
                     rect = state.xform.mapRect(rect);
-                    this._addPaintBounds(rect);
+                    
+                    var paint = cmd.paint;
+                    if (paint.maskFilter != null && paint.maskFilter.sigma != 0) {
+                        float sigma = scale * paint.maskFilter.sigma;
+                        float sigma3 = 3 * sigma;
+                        this._addPaintBounds(rect.inflate(sigma3));
+                    } else {
+                        this._addPaintBounds(rect);
+                    }
+                    
                     break;
                 }
                 default:
@@ -218,10 +245,13 @@ namespace Unity.UIWidgets.ui {
                 paintBounds = paintBounds.intersect(state.scissor);
             }
 
+            if (paintBounds == null || paintBounds.isEmpty) {
+                return;
+            }
+
             if (state.paintBounds.isEmpty) {
                 state.paintBounds = paintBounds;
-            }
-            else {
+            } else {
                 state.paintBounds = state.paintBounds.expandToInclude(paintBounds);
             }
         }

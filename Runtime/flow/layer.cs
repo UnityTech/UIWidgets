@@ -4,10 +4,12 @@ namespace Unity.UIWidgets.flow {
     public class PrerollContext {
         public RasterCache rasterCache;
         public float devicePixelRatio;
+        public Rect cullRect;
     }
 
     public class PaintContext {
         public Canvas canvas;
+        public RasterCache rasterCache;
     }
 
     public abstract class Layer {
@@ -22,7 +24,7 @@ namespace Unity.UIWidgets.flow {
 
         public Rect paintBounds {
             get { return this._paintBounds; }
-            set { this._paintBounds = value; }
+            set { this._paintBounds = value ?? Rect.zero; }
         }
 
         public bool needsPainting {
@@ -33,5 +35,17 @@ namespace Unity.UIWidgets.flow {
         }
 
         public abstract void paint(PaintContext context);
+    }
+
+    static class LayerUtils {
+        public static void alignToPixel(this Canvas canvas) {
+            var matrix = canvas.getTotalMatrix();
+            var devicePixelRatio = canvas.getDevicePixelRatio();
+            var x = matrix[2].alignToPixel(devicePixelRatio);
+            var y = matrix[5].alignToPixel(devicePixelRatio);
+            if (x != matrix[2] || y != matrix[5]) {
+                canvas.translate(x - matrix[2], y - matrix[5]);
+            }
+        }
     }
 }

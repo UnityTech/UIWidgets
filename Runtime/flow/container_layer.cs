@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
 
 namespace Unity.UIWidgets.flow {
@@ -23,11 +24,18 @@ namespace Unity.UIWidgets.flow {
         protected void prerollChildren(PrerollContext context, Matrix3 childMatrix, ref Rect childPaintBounds) {
             foreach (var layer in this._layers) {
                 layer.preroll(context, childMatrix);
-                childPaintBounds = childPaintBounds.expandToInclude(layer.paintBounds);
+
+                if (childPaintBounds == null || childPaintBounds.isEmpty) {
+                    childPaintBounds = layer.paintBounds;
+                } else {
+                    childPaintBounds = childPaintBounds.expandToInclude(layer.paintBounds);
+                }
             }
         }
 
         protected void paintChildren(PaintContext context) {
+            D.assert(this.needsPainting);
+            
             foreach (var layer in this._layers) {
                 if (layer.needsPainting) {
                     layer.paint(context);

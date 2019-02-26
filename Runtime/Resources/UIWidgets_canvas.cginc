@@ -127,7 +127,7 @@ v2f vert (appdata_t v) {
     
     float3x3 mat = float3x3(_mat[0], _mat[1], _mat[2], _mat[3], _mat[4], _mat[5], 0, 0, 1);
     
-    half2 p = mul(mat, half3(v.vertex.xy, 1.0)).xy - _viewport.xy;
+    float2 p = mul(mat, float3(v.vertex.xy, 1.0)).xy - _viewport.xy;
     
 #if UNITY_UV_STARTS_AT_TOP
     o.vertex = float4(2.0 * p.x / _viewport.z - 1.0, 2.0 * p.y / _viewport.w - 1.0, 0, 1);

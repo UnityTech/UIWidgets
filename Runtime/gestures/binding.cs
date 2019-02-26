@@ -78,11 +78,11 @@ namespace Unity.UIWidgets.gestures {
                 });
             }
             else if (evt is PointerUpEvent || evt is PointerCancelEvent) {
-                result = this._hitTests[evt.pointer];
+                result = this._hitTests.getOrDefault(evt.pointer);
                 this._hitTests.Remove(evt.pointer);
             }
             else if (evt.down) {
-                result = this._hitTests[evt.pointer];
+                result = this._hitTests.getOrDefault(evt.pointer);
             }
             else {
                 return;
