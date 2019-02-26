@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
+using UnityEngine;
 
 namespace Unity.UIWidgets.engine {
     public class DisplayMetrics {
