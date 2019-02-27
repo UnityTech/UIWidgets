@@ -84,14 +84,17 @@ namespace Unity.UIWidgets.engine {
         Vector2 _lastMouseMove;
         bool _mouseEntered;
 
-        const int mouseButtonNum = 3;
-        const int mouseScrollId = mouseButtonNum + 1;
-
         readonly ScrollInput _scrollInput = new ScrollInput();
         DisplayMetrics _displayMetrics;
 
+        const int mouseButtonNum = 3;
+
         protected override void OnEnable() {
             base.OnEnable();
+
+            //Disable touch -> mouse event on mobile devices
+            Input.simulateMouseWithTouches = false;
+
             this._displayMetrics = DisplayMetricsProvider.provider();
 
             if (_repaintEvent == null) {
@@ -177,17 +180,23 @@ namespace Unity.UIWidgets.engine {
                 this.unfocusIfNeeded();
             }
 
+#if UNITY_IOS || UNITY_ANDROID
+            if (this._mouseEntered && Input.touchCount != 0) {
+                this.handleTouchMove();
+            }
+#else
             if (this._mouseEntered && (this._lastMouseMove.x != Input.mousePosition.x ||
                                        this._lastMouseMove.y != Input.mousePosition.y)) {
                 this.handleMouseMove();
             }
+#endif
+
+            this._lastMouseMove = Input.mousePosition;
+
 
             if (this._mouseEntered) {
                 this.handleMouseScroll();
             }
-
-
-            this._lastMouseMove = Input.mousePosition;
 
             D.assert(this._windowAdapter != null);
             this._windowAdapter.Update();
@@ -198,6 +207,25 @@ namespace Unity.UIWidgets.engine {
             this._displayMetrics.OnGUI();
             if (Event.current.type == EventType.KeyDown || Event.current.type == EventType.KeyUp) {
                 this._windowAdapter.OnGUI(Event.current);
+            }
+        }
+
+        void handleTouchMove() {
+            for (var touchIndex = 0; touchIndex < Input.touchCount; touchIndex++) {
+                var touchEvent = Input.GetTouch(touchIndex);
+                if (touchEvent.phase != TouchPhase.Moved) {
+                    continue;
+                }
+
+                var pos = this.getPointPosition(Input.mousePosition);
+                this._windowAdapter.postPointerEvent(new PointerData(
+                    timeStamp: Timer.timespanSinceStartup,
+                    change: PointerChange.hover,
+                    kind: InputUtils.getPointerDeviceKind(),
+                    device: InputUtils.getTouchFingerKey(touchEvent.fingerId),
+                    physicalX: pos.x,
+                    physicalY: pos.y
+                ));
             }
         }
 
@@ -221,7 +249,7 @@ namespace Unity.UIWidgets.engine {
                     Input.mouseScrollDelta.y * scaleFactor,
                     pos.x,
                     pos.y,
-                    this.getScrollButton());
+                    InputUtils.getScrollButtonKey());
             }
 
             var deltaScroll = this._scrollInput.getScrollDelta();
@@ -239,15 +267,10 @@ namespace Unity.UIWidgets.engine {
             }
         }
 
-
-        int getScrollButton() {
-            return mouseScrollId;
-        }
-
         int getMouseButtonDown() {
             for (int key = 0; key < mouseButtonNum; key++) {
                 if (Input.GetMouseButton(key)) {
-                    return key;
+                    return InputUtils.getMouseButtonKey(key);
                 }
             }
 
@@ -260,8 +283,8 @@ namespace Unity.UIWidgets.engine {
             this._windowAdapter.postPointerEvent(new PointerData(
                 timeStamp: Timer.timespanSinceStartup,
                 change: PointerChange.down,
-                kind: PointerDeviceKind.mouse,
-                device: (int) eventData.button,
+                kind: InputUtils.getPointerDeviceKind(),
+                device: InputUtils.getPointerDeviceKey(eventData),
                 physicalX: position.x,
                 physicalY: position.y
             ));
@@ -272,8 +295,8 @@ namespace Unity.UIWidgets.engine {
             this._windowAdapter.postPointerEvent(new PointerData(
                 timeStamp: Timer.timespanSinceStartup,
                 change: PointerChange.up,
-                kind: PointerDeviceKind.mouse,
-                device: (int) eventData.button,
+                kind: InputUtils.getPointerDeviceKind(),
+                device: InputUtils.getPointerDeviceKey(eventData),
                 physicalX: position.x,
                 physicalY: position.y
             ));
@@ -311,8 +334,8 @@ namespace Unity.UIWidgets.engine {
             this._windowAdapter.postPointerEvent(new PointerData(
                 timeStamp: Timer.timespanSinceStartup,
                 change: PointerChange.move,
-                kind: PointerDeviceKind.mouse,
-                device: (int) eventData.button,
+                kind: InputUtils.getPointerDeviceKind(),
+                device: InputUtils.getPointerDeviceKey(eventData),
                 physicalX: position.x,
                 physicalY: position.y
             ));
@@ -325,8 +348,8 @@ namespace Unity.UIWidgets.engine {
             this._windowAdapter.postPointerEvent(new PointerData(
                 timeStamp: Timer.timespanSinceStartup,
                 change: PointerChange.hover,
-                kind: PointerDeviceKind.mouse,
-                device: (int) eventData.button,
+                kind: InputUtils.getPointerDeviceKind(),
+                device: InputUtils.getPointerDeviceKey(eventData),
                 physicalX: position.x,
                 physicalY: position.y
             ));
@@ -338,8 +361,8 @@ namespace Unity.UIWidgets.engine {
             this._windowAdapter.postPointerEvent(new PointerData(
                 timeStamp: Timer.timespanSinceStartup,
                 change: PointerChange.hover,
-                kind: PointerDeviceKind.mouse,
-                device: (int) eventData.button,
+                kind: InputUtils.getPointerDeviceKind(),
+                device: InputUtils.getPointerDeviceKey(eventData),
                 physicalX: position.x,
                 physicalY: position.y
             ));
