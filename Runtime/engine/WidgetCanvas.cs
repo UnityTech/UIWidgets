@@ -221,7 +221,7 @@ namespace Unity.UIWidgets.engine {
                 this._windowAdapter.postPointerEvent(new PointerData(
                     timeStamp: Timer.timespanSinceStartup,
                     change: PointerChange.hover,
-                    kind: InputUtils.getPointerDeviceKind(),
+                    kind: PointerDeviceKind.touch,
                     device: InputUtils.getTouchFingerKey(touchEvent.fingerId),
                     physicalX: pos.x,
                     physicalY: pos.y
