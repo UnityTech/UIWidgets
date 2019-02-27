@@ -441,10 +441,19 @@ namespace Unity.UIWidgets.widgets {
                 return true;
             });
 
+            if (Window.hasInstance) {
+                this._setState(fn);
+            } else {
+                using (WindowProvider.of(this.context).getScope()) {
+                    this._setState(fn);
+                }
+            }
+        }
+
+        void _setState(VoidCallback fn = null) {
             if (fn != null) {
                 fn();
             }
-
             this._element.markNeedsBuild();
         }
 

@@ -78,9 +78,9 @@ namespace Unity.UIWidgets.ui {
             this._dy = _dy;
         }
 
-        public readonly float _dx;
+        protected readonly float _dx;
 
-        public readonly float _dy;
+        protected readonly float _dy;
 
         public bool isInfinite {
             get { return float.IsInfinity(this._dx) || float.IsInfinity(this._dy); }

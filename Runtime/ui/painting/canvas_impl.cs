@@ -284,6 +284,7 @@ namespace Unity.UIWidgets.ui {
                 width = textureWidth,
                 height = textureHeight,
                 layerBounds = maskBounds,
+                filterMode = FilterMode.Bilinear,
             };
 
             parentLayer.layers.Add(maskLayer);
@@ -321,6 +322,7 @@ namespace Unity.UIWidgets.ui {
                 width = textureWidth,
                 height = textureHeight,
                 layerBounds = maskLayer.layerBounds,
+                filterMode = FilterMode.Bilinear,
             };
 
             parentLayer.layers.Add(blurXLayer);
@@ -330,6 +332,7 @@ namespace Unity.UIWidgets.ui {
                 width = textureWidth,
                 height = textureHeight,
                 layerBounds = maskLayer.layerBounds,
+                filterMode = FilterMode.Bilinear,
             };
 
             parentLayer.layers.Add(blurYLayer);
@@ -703,7 +706,7 @@ namespace Unity.UIWidgets.ui {
                     desc.msaaSamples = QualitySettings.antiAliasing;
                 }
                 
-                cmdBuf.GetTemporaryRT(subLayer.rtID, desc, FilterMode.Bilinear);
+                cmdBuf.GetTemporaryRT(subLayer.rtID, desc, subLayer.filterMode);
                 this._drawLayer(subLayer, cmdBuf);
             }
 
@@ -789,6 +792,7 @@ namespace Unity.UIWidgets.ui {
             public int rtID;
             public int width;
             public int height;
+            public FilterMode filterMode = FilterMode.Point;
             public Rect layerBounds;
             public Paint layerPaint;
             public readonly List<object> draws = new List<object>();

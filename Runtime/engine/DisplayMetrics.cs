@@ -35,15 +35,15 @@ namespace Unity.UIWidgets.engine {
                 }
 
 #if UNITY_ANDROID 
-                _devicePixelRatio = AndroidDevicePixelRatio();
+                this._devicePixelRatio = AndroidDevicePixelRatio();
 #endif
                 
 #if UNITY_WEBGL 
-                _devicePixelRatio = UIWidgetsWebGLDevicePixelRatio();
+                this._devicePixelRatio = UIWidgetsWebGLDevicePixelRatio();
 #endif
                 
 #if UNITY_IOS 
-                _devicePixelRatio = IOSDeviceScaleFactor();
+                this._devicePixelRatio = IOSDeviceScaleFactor();
 #endif
 
                 if (this._devicePixelRatio <= 0) {
