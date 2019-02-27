@@ -19,7 +19,7 @@ namespace Unity.UIWidgets.editor {
         public ScrollInput(int? bufferSize = null, float? scrollScale = null) {
             this._bufferSize = bufferSize ?? this._bufferSize;
             this._scrollScale = scrollScale ?? this._scrollScale;
-            
+
             this._bufferIndex = this._bufferSize;
             this._scrollDeltaX = 0;
             this._scrollDeltaY = 0;
