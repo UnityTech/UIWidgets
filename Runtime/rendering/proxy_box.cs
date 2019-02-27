@@ -703,6 +703,73 @@ namespace Unity.UIWidgets.rendering {
     }
 
 
+    public class RenderClipRRect : _RenderCustomClip<RRect> {
+        public RenderClipRRect(
+            RenderBox child = null,
+            BorderRadius borderRadius = null,
+            CustomClipper<RRect> clipper = null,
+            Clip clipBehavior = Clip.antiAlias
+        ) : base(child: child, clipper: clipper, clipBehavior: clipBehavior) {
+            D.assert(clipBehavior != Clip.none);
+            this._borderRadius = borderRadius ?? BorderRadius.zero;
+            D.assert(this._borderRadius != null || clipper != null);
+        }
+
+        public BorderRadius borderRadius {
+            get { return this._borderRadius; }
+            set {
+                D.assert(value != null);
+                if (this._borderRadius == value) {
+                    return;
+                }
+
+                this._borderRadius = value;
+                this._markNeedsClip();
+            }
+        }
+
+        BorderRadius _borderRadius;
+
+        protected override RRect _defaultClip {
+            get { return this._borderRadius.toRRect(Offset.zero & this.size); }
+        }
+
+        public override bool hitTest(HitTestResult result, Offset position = null) {
+            if (this._clipper != null) {
+                this._updateClip();
+                D.assert(this._clip != null);
+                if (!this._clip.contains(position)) {
+                    return false;
+                }
+            }
+
+            return base.hitTest(result, position: position);
+        }
+
+        public override void paint(PaintingContext context, Offset offset) {
+            if (this.child != null) {
+                this._updateClip();
+                context.pushClipRRect(this.needsCompositing, offset, this._clip.outerRect, this._clip,
+                    base.paint, clipBehavior: this.clipBehavior);
+            }
+        }
+
+        protected override void debugPaintSize(PaintingContext context, Offset offset) {
+            D.assert(() => {
+                if (this.child != null) {
+                    base.debugPaintSize(context, offset);
+                    context.canvas.drawRRect(this._clip.shift(offset), this._debugPaint);
+                    this._debugText.paint(context.canvas,
+                        offset + new Offset(this._clip.tlRadiusX,
+                            -(this._debugText.text.style.fontSize ?? 0.0f) * 1.1f));
+                }
+
+                return true;
+            });
+        }
+    }
+
+
     public class RenderClipPath : _RenderCustomClip<Path> {
         public RenderClipPath(
             RenderBox child = null,
