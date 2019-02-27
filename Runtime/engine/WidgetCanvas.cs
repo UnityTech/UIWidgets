@@ -217,7 +217,7 @@ namespace Unity.UIWidgets.engine {
                     continue;
                 }
 
-                var pos = this.getPointPosition(Input.mousePosition);
+                var pos = this.getPointPosition(touchEvent.position);
                 this._windowAdapter.postPointerEvent(new PointerData(
                     timeStamp: Timer.timespanSinceStartup,
                     change: PointerChange.hover,
