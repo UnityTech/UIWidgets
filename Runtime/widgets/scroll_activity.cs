@@ -295,7 +295,7 @@ namespace Unity.UIWidgets.widgets {
 
             this._lastDetails = details;
 
-            if (this._retainMomentum && velocity != 0.0f && velocity.sign() == this.carriedVelocity.Value.sign()) {
+            if (this._retainMomentum && velocity.sign() == this.carriedVelocity.Value.sign()) {
                 velocity += this.carriedVelocity.Value;
             }
 

@@ -30,7 +30,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public static int sign(this float value) {
-            return (int) Mathf.Sign(value);
+            return value == 0.0f ? 0 : value > 0.0f ? 1 : -1;
         }
 
         public static bool isInfinite(this float it) {
@@ -544,7 +544,7 @@ namespace Unity.UIWidgets.ui {
             if (other == null || other.isEmpty) {
                 return this;
             }
-            
+
             return fromLTRB(
                 Mathf.Min(this.left, other.left),
                 Mathf.Min(this.top, other.top),
