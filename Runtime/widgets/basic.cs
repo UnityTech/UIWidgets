@@ -134,6 +134,45 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
+    public class ClipRRect : SingleChildRenderObjectWidget {
+        public ClipRRect(
+            Key key = null,
+            BorderRadius borderRadius = null,
+            CustomClipper<RRect> clipper = null,
+            Clip clipBehavior = Clip.antiAlias,
+            Widget child = null
+        ) : base(key: key, child: child) {
+            D.assert(borderRadius != null || clipper != null);
+            this.borderRadius = borderRadius;
+            this.clipper = clipper;
+            this.clipBehavior = clipBehavior;
+        }
+
+        public readonly BorderRadius borderRadius;
+
+        public readonly CustomClipper<RRect> clipper;
+
+        public readonly Clip clipBehavior;
+
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderClipRRect(borderRadius: this.borderRadius, clipper: this.clipper,
+                clipBehavior: this.clipBehavior);
+        }
+
+        public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
+            RenderClipRRect _renderObject = (RenderClipRRect) renderObject;
+            _renderObject.borderRadius = this.borderRadius;
+            _renderObject.clipper = this.clipper;
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new DiagnosticsProperty<BorderRadius>("borderRadius", this.borderRadius, showName: false,
+                defaultValue: null));
+            properties.add(new DiagnosticsProperty<CustomClipper<RRect>>("clipper", this.clipper, defaultValue: null));
+        }
+    }
+
     public class ClipPath : SingleChildRenderObjectWidget {
         public ClipPath(
             Key key = null,

@@ -289,14 +289,16 @@ namespace Unity.UIWidgets.rendering {
             if (child._previousSibling == null) {
                 D.assert(this.firstChild == child);
                 this._firstChild = child.nextSibling;
-            } else {
+            }
+            else {
                 child._previousSibling._nextSibling = child.nextSibling;
             }
 
             if (child._nextSibling == null) {
                 D.assert(this.lastChild == child);
                 this._lastChild = child.previousSibling;
-            } else {
+            }
+            else {
                 child._nextSibling._previousSibling = child.previousSibling;
             }
 
@@ -339,9 +341,11 @@ namespace Unity.UIWidgets.rendering {
             while (child != null) {
                 if (childOffset == null || childOffset == Offset.zero) {
                     child._addToSceneWithRetainedRendering(builder);
-                } else {
+                }
+                else {
                     child.addToScene(builder, childOffset);
                 }
+
                 child = child.nextSibling;
             }
         }
@@ -458,7 +462,7 @@ namespace Unity.UIWidgets.rendering {
 
         internal override flow.Layer addToScene(SceneBuilder builder, Offset layerOffset = null) {
             layerOffset = layerOffset ?? Offset.zero;
-            
+
             bool enabled = true;
             D.assert(() => {
                 enabled = !D.debugDisableClipLayers;
@@ -521,6 +525,8 @@ namespace Unity.UIWidgets.rendering {
         }
 
         internal override flow.Layer addToScene(SceneBuilder builder, Offset layerOffset = null) {
+            layerOffset = layerOffset ?? Offset.zero;
+
             bool enabled = true;
             D.assert(() => {
                 enabled = !D.debugDisableClipLayers;
@@ -583,6 +589,8 @@ namespace Unity.UIWidgets.rendering {
         }
 
         internal override flow.Layer addToScene(SceneBuilder builder, Offset layerOffset = null) {
+            layerOffset = layerOffset ?? Offset.zero;
+
             bool enabled = true;
             D.assert(() => {
                 enabled = !D.debugDisableClipLayers;
@@ -618,7 +626,7 @@ namespace Unity.UIWidgets.rendering {
 
         internal override flow.Layer addToScene(SceneBuilder builder, Offset layerOffset = null) {
             layerOffset = layerOffset ?? Offset.zero;
-            
+
             this._lastEffectiveTransform = this._transform;
 
             var totalOffset = this.offset + layerOffset;
@@ -888,7 +896,8 @@ namespace Unity.UIWidgets.rendering {
                 this.addChildrenToScene(builder);
                 builder.pop();
                 this._lastOffset = this.unlinkedOffset + layerOffset;
-            } else {
+            }
+            else {
                 this._lastOffset = null;
                 var matrix = Matrix3.makeTrans(this.unlinkedOffset.dx, this.unlinkedOffset.dy);
                 builder.pushTransform(matrix);
@@ -904,7 +913,8 @@ namespace Unity.UIWidgets.rendering {
             D.assert(transform != null);
             if (this._lastTransform != null) {
                 transform.preConcat(this._lastTransform);
-            } else {
+            }
+            else {
                 transform.preConcat(Matrix3.makeTrans(this.unlinkedOffset.dx, this.unlinkedOffset.dy));
             }
         }

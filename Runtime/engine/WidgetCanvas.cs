@@ -64,7 +64,7 @@ namespace Unity.UIWidgets.engine {
         }
 
         protected override Vector2 queryWindowSize() {
-            var rect = RectTransformUtility.PixelAdjustRect(this._widgetCanvas.rectTransform, 
+            var rect = RectTransformUtility.PixelAdjustRect(this._widgetCanvas.rectTransform,
                 this._widgetCanvas.canvas);
             var size = new Vector2(rect.width, rect.height) / this._widgetCanvas.devicePixelRatio;
             size.x = Mathf.Round(size.x);
@@ -89,7 +89,7 @@ namespace Unity.UIWidgets.engine {
 
         readonly ScrollInput _scrollInput = new ScrollInput();
         DisplayMetrics _displayMetrics;
-        
+
         protected override void OnEnable() {
             base.OnEnable();
             this._displayMetrics = DisplayMetricsProvider.provider();
@@ -170,7 +170,7 @@ namespace Unity.UIWidgets.engine {
             this.texture = texture;
             this.material = mat;
         }
-        
+
         void Update() {
             this._displayMetrics.Update();
             if (EventSystem.current != null && EventSystem.current.currentSelectedGameObject != this.gameObject) {
@@ -183,29 +183,7 @@ namespace Unity.UIWidgets.engine {
             }
 
             if (this._mouseEntered) {
-                if (Input.mouseScrollDelta.y != 0 || Input.mouseScrollDelta.x != 0) {
-                    var scaleFactor = this.canvas.scaleFactor;
-                    var pos = this.getPointPosition(Input.mousePosition);
-                    this._scrollInput.onScroll(Input.mouseScrollDelta.x * scaleFactor,
-                        Input.mouseScrollDelta.y * scaleFactor,
-                        pos.x,
-                        pos.y,
-                        this.getScrollButton());
-                }
-
-                var deltaScroll = this._scrollInput.getScrollDelta();
-                if (deltaScroll != Vector2.zero) {
-                    this._windowAdapter.postPointerEvent(new ScrollData(
-                        timeStamp: Timer.timespanSinceStartup,
-                        change: PointerChange.scroll,
-                        kind: PointerDeviceKind.mouse,
-                        device: this._scrollInput.getDeviceId(),
-                        physicalX: this._scrollInput.getPointerPosX(),
-                        physicalY: this._scrollInput.getPointerPosY(),
-                        scrollX: deltaScroll.x,
-                        scrollY: deltaScroll.y
-                    ));
-                }
+                this.handleMouseScroll();
             }
 
 
@@ -234,6 +212,33 @@ namespace Unity.UIWidgets.engine {
                 physicalY: pos.y
             ));
         }
+
+        void handleMouseScroll() {
+            if (Input.mouseScrollDelta.y != 0 || Input.mouseScrollDelta.x != 0) {
+                var scaleFactor = this.canvas.scaleFactor;
+                var pos = this.getPointPosition(Input.mousePosition);
+                this._scrollInput.onScroll(Input.mouseScrollDelta.x * scaleFactor,
+                    Input.mouseScrollDelta.y * scaleFactor,
+                    pos.x,
+                    pos.y,
+                    this.getScrollButton());
+            }
+
+            var deltaScroll = this._scrollInput.getScrollDelta();
+            if (deltaScroll != Vector2.zero) {
+                this._windowAdapter.postPointerEvent(new ScrollData(
+                    timeStamp: Timer.timespanSinceStartup,
+                    change: PointerChange.scroll,
+                    kind: PointerDeviceKind.mouse,
+                    device: this._scrollInput.getDeviceId(),
+                    physicalX: this._scrollInput.getPointerPosX(),
+                    physicalY: this._scrollInput.getPointerPosY(),
+                    scrollX: deltaScroll.x,
+                    scrollY: deltaScroll.y
+                ));
+            }
+        }
+
 
         int getScrollButton() {
             return mouseScrollId;
