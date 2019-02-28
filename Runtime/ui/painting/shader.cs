@@ -458,10 +458,7 @@ namespace Unity.UIWidgets.ui {
             get { return this.colors[this.colors.Count - 1]; }
         }
 
-        public Matrix3 getGradientMat(Matrix3 ctm) {
-            var mat = Matrix3.I();
-            ctm.invert(mat); // just use I() if not invertible.
-
+        public Matrix3 getGradientMat(Matrix3 mat) {
             if (this.matrix != null) {
                 mat.postConcat(this.matrix);
             }
@@ -517,10 +514,7 @@ namespace Unity.UIWidgets.ui {
             get { return this.colors[this.colors.Count - 1]; }
         }
 
-        public Matrix3 getGradientMat(Matrix3 ctm) {
-            var mat = Matrix3.I();
-            ctm.invert(mat); // just use I() if not invertible.
-
+        public Matrix3 getGradientMat(Matrix3 mat) {
             if (this.matrix != null) {
                 mat.postConcat(this.matrix);
             }
@@ -586,10 +580,7 @@ namespace Unity.UIWidgets.ui {
             get { return this.colors[this.colors.Count - 1]; }
         }
 
-        public Matrix3 getGradientMat(Matrix3 ctm) {
-            var mat = Matrix3.I();
-            ctm.invert(mat); // just use I() if not invertible.
-
+        public Matrix3 getGradientMat(Matrix3 mat) {
             if (this.matrix != null) {
                 mat.postConcat(this.matrix);
             }
@@ -611,10 +602,7 @@ namespace Unity.UIWidgets.ui {
         public readonly TileMode tileMode;
         public readonly Matrix3 matrix;
 
-        public Matrix3 getShaderMat(Matrix3 ctm) {
-            var mat = Matrix3.I();
-            ctm.invert(mat); // just use I() if not invertible.
-
+        public Matrix3 getShaderMat(Matrix3 mat) {
             if (this.matrix != null) {
                 mat.postConcat(this.matrix);
             }

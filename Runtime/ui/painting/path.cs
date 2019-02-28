@@ -124,7 +124,7 @@ namespace Unity.UIWidgets.ui {
 
         public Rect getBounds() {
             if (this._minX >= this._maxX || this._minY >= this._maxY) {
-                return null;
+                return Rect.zero;
             }
 
             return Rect.fromLTRB(this._minX, this._minY, this._maxX, this._maxY);

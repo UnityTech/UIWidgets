@@ -754,6 +754,10 @@ namespace Unity.UIWidgets.ui {
                 return true;
             }
 
+            if (ReferenceEquals(a, b)) {
+                return true;
+            }
+
             if (ReferenceEquals(a, null) || ReferenceEquals(b, null)) {
                 return false;
             }
