@@ -184,19 +184,21 @@ namespace Unity.UIWidgets.rendering {
 
             D.assert(() => {
                 if (D.debugRepaintRainbowEnabled) {
-//                    var Paint paint = Paint()
-//                        ..style = PaintingStyle.stroke
-//                        ..strokeWidth = 6.0
-//                        ..color = debugCurrentRepaintColor.toColor();
-//                    this.canvas.drawRect(this.estimatedBounds.deflate(3.0), paint);
+                    var paint = new Paint {
+                        style = PaintingStyle.stroke,
+                        strokeWidth = 6.0f,
+                        color = D.debugCurrentRepaintColor.toColor()
+                    };
+                    this.canvas.drawRect(this.estimatedBounds.deflate(3.0f), paint);
                 }
 
                 if (D.debugPaintLayerBordersEnabled) {
-//                    final Paint paint = Paint()
-//                        ..style = PaintingStyle.stroke
-//                        ..strokeWidth = 1.0
-//                        ..color = const Color(0xFFFF9800);
-//                    this.canvas.drawRect(estimatedBounds, paint);
+                    Paint paint = new Paint {
+                        style = PaintingStyle.stroke,
+                        strokeWidth = 1.0f,
+                        color = new ui.Color(0xFFFF9800),
+                    };
+                    this.canvas.drawRect(this.estimatedBounds, paint);
                 }
 
                 return true;

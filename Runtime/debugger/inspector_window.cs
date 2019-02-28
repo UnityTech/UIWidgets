@@ -1,20 +1,49 @@
 ﻿#if UNITY_EDITOR
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using RSG.Promises;
 using Unity.UIWidgets.editor;
+using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.widgets;
 using UnityEditor;
 using UnityEngine;
 
 namespace Unity.UIWidgets.debugger {
     public class WidgetsInpsectorWindow : EditorWindow {
+
+        const float debugPaintToggleGroupWidth = 120;
+        
+        const float debugPaintToggleGroupHeight = 100;
+        
         InspectorService m_InspectorService;
         bool m_ShowInspect;
+        
+        [SerializeField]
+        bool m_DebugPaint;
+        
+        [SerializeField]
+        bool m_DebugPaintSize;
+        
+        [SerializeField]
+        bool m_DebugPaintBaseline;
+        
+        [SerializeField]
+        bool m_DebugPaintPointer;
+        
+        [SerializeField]
+        bool m_DebugPaintLayer;
+
+        bool m_ShowDebugPaintToggles;
+        
         readonly List<InspectorPanel> m_Panels = new List<InspectorPanel>();
+
+        Rect _debugPaintTogglesRect;
         int m_PanelIndex = 0;
         [SerializeField] List<PanelState> m_PanelStates = new List<PanelState>();
 
+        List<Action> m_UpdateActions = new List<Action>();
+        
         [MenuItem("Window/Analysis/UIWidgets Inspector")]
         public static void Init() {
             WidgetsInpsectorWindow window =
@@ -23,14 +52,50 @@ namespace Unity.UIWidgets.debugger {
         }
 
         void OnGUI() {
-            EditorGUILayout.BeginHorizontal(EditorStyles.toolbar, GUILayout.ExpandWidth(true));
+            GUILayout.BeginHorizontal(EditorStyles.toolbar, GUILayout.ExpandWidth(true));
             this.DoSelectDropDown();
+            bool needDebugPaintUpdate = false;
+            
             if (this.m_InspectorService != null) {
+                if (GUILayout.Button("Refersh", EditorStyles.toolbarButton)) {
+                    foreach (var panel in this.m_Panels) {
+                        panel.MarkNeedReload();
+                    }
+                }
+                
                 EditorGUI.BeginChangeCheck();
                 var newShowInspect = GUILayout.Toggle(this.m_ShowInspect, new GUIContent("Inspect Element"),
                     EditorStyles.toolbarButton);
                 if (EditorGUI.EndChangeCheck()) {
                     this.m_InspectorService.setShowInspect(newShowInspect);
+                }
+
+                var style = (GUIStyle) "GV Gizmo DropDown";
+                Rect r = GUILayoutUtility.GetRect(new GUIContent("Debug Paint"), style);
+                Rect rightRect = new Rect(r.xMax - style.border.right, r.y, style.border.right, r.height);
+                if (EditorGUI.DropdownButton(rightRect, GUIContent.none, FocusType.Passive, GUIStyle.none))
+                {
+                    this.ScheduleUpdateAction(() => {
+                        this.m_ShowDebugPaintToggles = !this.m_ShowDebugPaintToggles;
+                        this.Repaint();
+                    });
+                }
+
+                if (Event.current.type == EventType.Repaint) {
+                    this._debugPaintTogglesRect = new Rect(r.xMax - debugPaintToggleGroupWidth, r.yMax + 2, 
+                        debugPaintToggleGroupWidth, debugPaintToggleGroupHeight);
+                }
+
+                EditorGUI.BeginChangeCheck();
+                this.m_DebugPaint = GUI.Toggle(r, this.m_DebugPaint, new GUIContent("Debug Paint"), style);
+                if (EditorGUI.EndChangeCheck()) {
+                    if (this.m_DebugPaint) {
+                        if (!this.m_DebugPaintSize && !this.m_DebugPaintLayer
+                                                   && !this.m_DebugPaintPointer && !this.m_DebugPaintBaseline) {
+                            this.m_DebugPaintSize = true;
+                        }
+                    }
+                    needDebugPaintUpdate = true;
                 }
             }
 
@@ -48,12 +113,64 @@ namespace Unity.UIWidgets.debugger {
                 });
                 EditorGUILayout.EndHorizontal();
 
-                this.m_Panels[this.m_PanelIndex].OnGUI();
+                bool shouldHandleGUI = true;
+                if (Event.current.type == EventType.MouseDown || Event.current.type == EventType.MouseUp) {
+                    if (this.m_ShowDebugPaintToggles && this._debugPaintTogglesRect.Contains(Event.current.mousePosition)) {
+                        shouldHandleGUI = false;
+                    }
+                }
+
+                if (shouldHandleGUI) {
+                    this.m_Panels[this.m_PanelIndex].OnGUI();
+                }
             }
+            
+           if (this.m_ShowDebugPaintToggles) {
+               this.DebugPaintToggles(ref needDebugPaintUpdate);
+           }
+
+           if (needDebugPaintUpdate) {
+               D.setDebugPaint(
+                   debugPaintSizeEnabled: this.m_DebugPaint && this.m_DebugPaintSize, 
+                   debugPaintBaselinesEnabled: this.m_DebugPaint && this.m_DebugPaintBaseline,
+                   debugPaintPointersEnabled: this.m_DebugPaint && this.m_DebugPaintPointer,
+                   debugPaintLayerBordersEnabled: this.m_DebugPaint && this.m_DebugPaintLayer,
+                   debugRepaintRainbowEnabled: this.m_DebugPaint && this.m_DebugPaintLayer
+                   );
+           }
         }
 
+        void DebugPaintToggles(ref bool needUpdate) {
+            //GUI.skin.box
+            GUILayout.BeginArea(this._debugPaintTogglesRect, GUI.skin.box);
+            GUILayout.BeginVertical();
+            EditorGUI.BeginChangeCheck();
+            GUILayout.Space(4);
+            this.m_DebugPaintSize = GUILayout.Toggle(this.m_DebugPaintSize, new GUIContent("Paint Size"));
+            this.m_DebugPaintBaseline = GUILayout.Toggle(this.m_DebugPaintBaseline, new GUIContent("Paint Baseline"));
+            this.m_DebugPaintPointer = GUILayout.Toggle(this.m_DebugPaintPointer, new GUIContent("Paint Pointer"));
+            this.m_DebugPaintLayer  = GUILayout.Toggle(this.m_DebugPaintLayer, new GUIContent("Paint Layer"));
+            if (EditorGUI.EndChangeCheck()) {
+                needUpdate = true;
+            }
+            GUILayout.EndVertical();
+            GUILayout.EndArea();
+
+            if (Event.current.type == EventType.MouseDown && 
+                !this._debugPaintTogglesRect.Contains(Event.current.mousePosition)) {
+                this.ScheduleUpdateAction(() => {
+                    this.m_ShowDebugPaintToggles = false;
+                    this.Repaint();
+                });
+            }
+        }
+        
         void DoSelectDropDown() {
             var currentWindow = this.m_InspectorService == null ? null : this.m_InspectorService.window;
+            if (currentWindow != null && !currentWindow.alive) {
+                currentWindow = null;
+            }
+            
             var selectTitle = currentWindow != null ? currentWindow.titleContent : new GUIContent("<Please Select>");
             if (GUILayout.Button(selectTitle, EditorStyles.toolbarDropDown)) {
                 var windows = new List<WindowAdapter>(WindowAdapter.windowAdapters.Where(w => {
@@ -121,6 +238,11 @@ namespace Unity.UIWidgets.debugger {
 
             this.m_Panels.Clear();
             this.m_ShowInspect = false;
+            this.m_ShowDebugPaintToggles = false;
+        }
+
+        void ScheduleUpdateAction(Action action) {
+            this.m_UpdateActions.Add(action);
         }
 
         void Update() {
@@ -147,6 +269,11 @@ namespace Unity.UIWidgets.debugger {
 
             if (this.m_Panels.Count > 0) {
                 this.m_PanelStates = this.m_Panels.Select(p => p.PanelState).ToList();
+            }
+
+            while (this.m_UpdateActions.Count > 0) {
+                this.m_UpdateActions[0]();
+                this.m_UpdateActions.RemoveAt(0);
             }
         }
 

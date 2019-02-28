@@ -335,7 +335,9 @@ namespace Unity.UIWidgets.rendering {
                 base.debugPaintSize(context, offset);
 
                 Paint paint = new Paint {
-                    color = new Color(0xFF00FF00)
+                    color = new Color(0xFF00FF00),
+                    strokeWidth = 1.0f,
+                    style = PaintingStyle.stroke,
                 };
 
                 Canvas canvas = context.canvas;
@@ -352,8 +354,7 @@ namespace Unity.UIWidgets.rendering {
                     }
 
                     D.assert(size != null);
-//                    canvas.drawRect(((offset + this.paintOffsetOf(child)) & size).deflate(0.5),
-//                        BorderWidth.all(1), BorderRadius.zero, paint);
+                    canvas.drawRect(((offset + this.paintOffsetOf(child)) & size).deflate(0.5f), paint);
                     child = this.childAfter(child);
                 }
 

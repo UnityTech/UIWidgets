@@ -143,6 +143,11 @@ namespace Unity.UIWidgets.debugger {
             this.m_TreeView.node = node;
         }
 
+        public void MarkNeedReload() {
+            this.m_TreeView.node = null;
+            this.m_NeedSelectionUpdate = true;
+        }
+
         public void Update() {
             if (!this.m_VisibleToUser) {
                 return;
@@ -196,7 +201,6 @@ namespace Unity.UIWidgets.debugger {
                     item = this.m_TreeView.getTreeItemByValueRef(diagnosticsNode.valueRef);
                 }
 
-                this.m_TreeView.CollapseAll();
                 if (item != null) {
                     this.m_TreeView.SetSelection(new List<int> {item.id}, TreeViewSelectionOptions.RevealAndFrame);
                 }

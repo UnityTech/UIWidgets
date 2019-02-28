@@ -275,58 +275,69 @@ namespace Unity.UIWidgets.rendering {
         }
 
         protected override void debugPaintSize(PaintingContext context, Offset offset) {
-            base.debugPaintSize(context, offset);
+           base.debugPaintSize(context, offset);
             D.assert(() => {
                 Paint paint;
                 if (this.child != null && !this.child.size.isEmpty) {
-//        Path path;
-//        paint = Paint()
-//          ..style = PaintingStyle.stroke
-//          ..strokeWidth = 1.0
-//          ..color = const Color(0xFFFFFF00);
-//        path = Path();
-//        final BoxParentData childParentData = child.parentData;
-//        if (childParentData.offset.dy > 0.0) {
-//          // vertical alignment arrows
-//          final float headSize = math.min(childParentData.offset.dy * 0.2, 10.0);
-//          path
-//            ..moveTo(offset.dx + size.width / 2.0, offset.dy)
-//            ..relativeLineTo(0.0, childParentData.offset.dy - headSize)
-//            ..relativeLineTo(headSize, 0.0)
-//            ..relativeLineTo(-headSize, headSize)
-//            ..relativeLineTo(-headSize, -headSize)
-//            ..relativeLineTo(headSize, 0.0)
-//            ..moveTo(offset.dx + size.width / 2.0, offset.dy + size.height)
-//            ..relativeLineTo(0.0, -childParentData.offset.dy + headSize)
-//            ..relativeLineTo(headSize, 0.0)
-//            ..relativeLineTo(-headSize, -headSize)
-//            ..relativeLineTo(-headSize, headSize)
-//            ..relativeLineTo(headSize, 0.0);
-//          context.canvas.drawPath(path, paint);
-//            }
-//            if (childParentData.offset.dx > 0.0) {
-//              // horizontal alignment arrows
-//              final float headSize = math.min(childParentData.offset.dx * 0.2, 10.0);
-//              path
-//                ..moveTo(offset.dx, offset.dy + size.height / 2.0)
-//                ..relativeLineTo(childParentData.offset.dx - headSize, 0.0)
-//                ..relativeLineTo(0.0, headSize)
-//                ..relativeLineTo(headSize, -headSize)
-//                ..relativeLineTo(-headSize, -headSize)
-//                ..relativeLineTo(0.0, headSize)
-//                ..moveTo(offset.dx + size.width, offset.dy + size.height / 2.0)
-//                ..relativeLineTo(-childParentData.offset.dx + headSize, 0.0)
-//                ..relativeLineTo(0.0, headSize)
-//                ..relativeLineTo(-headSize, -headSize)
-//                ..relativeLineTo(headSize, -headSize)
-//                ..relativeLineTo(0.0, headSize);
-//              context.canvas.drawPath(path, paint);
-//            }
-                }
-                else {
-//        paint = Paint()
-//          ..color = const Color(0x90909090);
-//        context.canvas.drawRect(offset & size, paint);
+                    Path path;
+                    paint = new Paint {
+                        style = PaintingStyle.stroke,
+                        strokeWidth = 1.0f,
+                        color = new ui.Color(0xFFFFFF00)
+                    };
+
+                    BoxParentData childParentData = (BoxParentData) this.child.parentData;
+                    if (childParentData.offset.dy > 0) {
+                        float headSize = Mathf.Min(childParentData.offset.dy * 0.2f, 10.0f);
+
+                        float x = offset.dx + this.size.width / 2.0f;
+                        float y = offset.dy;
+                        path = new Path();
+                        path.moveTo(x, y);
+                        path.lineTo(x += 0.0f, y += childParentData.offset.dy - headSize);
+                        path.lineTo(x += headSize, y += 0.0f);
+                        path.lineTo(x += -headSize, y += headSize);
+                        path.lineTo(x += -headSize, y += -headSize);
+                        path.lineTo(x += headSize, y += 0.0f);
+
+                        x = offset.dx + this.size.width / 2.0f;
+                        y = offset.dy + this.size.height;
+                        path.moveTo(x, y);
+                        path.lineTo(x += 0.0f, y += -childParentData.offset.dy + headSize);
+                        path.lineTo(x += headSize, y += 0.0f);
+                        path.lineTo(x += -headSize, y += -headSize);
+                        path.lineTo(x += -headSize, y += headSize);
+                        path.lineTo(x += headSize, y += 0.0f);
+                        context.canvas.drawPath(path, paint);
+                    }
+
+                    if (childParentData.offset.dx > 0.0) {
+
+                        float headSize = Mathf.Min(childParentData.offset.dx * 0.2f, 10.0f);
+                        float x = offset.dx;
+                        float y = offset.dy + this.size.height / 2.0f;
+                        path = new Path();
+                        path.moveTo(x, y);
+                        path.lineTo(x += childParentData.offset.dx - headSize, y += 0.0f);
+                        path.lineTo(x += 0.0f, y += headSize);
+                        path.lineTo(x += headSize, y += -headSize);
+                        path.lineTo(x += -headSize, y += -headSize);
+                        path.lineTo(x += 0.0f, y += headSize);
+                        
+                        path.moveTo(x = offset.dx + this.size.width, y = offset.dy + this.size.height / 2.0f);
+                        path.lineTo(x += -childParentData.offset.dx + headSize, y += 0.0f);
+                        path.lineTo(x += 0.0f, y += headSize);
+                        path.lineTo(x += -headSize, y += -headSize);
+                        path.lineTo(x += headSize, y += -headSize);
+                        path.lineTo(x += 0.0f, y += headSize);
+                        path.close();
+                        context.canvas.drawPath(path, paint);
+                    }
+                } else {
+                    paint = new Paint {
+                        color = new ui.Color(0x90909090),
+                    };
+                    context.canvas.drawRect(offset & this.size, paint);
                 }
 
                 return true;

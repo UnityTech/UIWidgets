@@ -1315,7 +1315,7 @@ namespace Unity.UIWidgets.widgets {
             properties.add(new FlagProperty("softWrap", value: this.softWrap, ifTrue: "wrapping at box width",
                 ifFalse: "no wrapping except at line break characters", showName: true));
             properties.add(new EnumProperty<TextOverflow>("overflow", this.overflow, defaultValue: TextOverflow.clip));
-            properties.add(new FloatProperty("textScaleFactor", this.textScaleFactor, defaultValue: 1.0));
+            properties.add(new FloatProperty("textScaleFactor", this.textScaleFactor, defaultValue: 1.0f));
             properties.add(new IntProperty("maxLines", this.maxLines, ifNull: "unlimited"));
             properties.add(new StringProperty("text", this.text.toPlainText()));
         }
@@ -1403,7 +1403,7 @@ namespace Unity.UIWidgets.widgets {
             properties.add(new DiagnosticsProperty<ui.Image>("image", this.image));
             properties.add(new FloatProperty("width", this.width, defaultValue: Diagnostics.kNullDefaultValue));
             properties.add(new FloatProperty("height", this.height, defaultValue: Diagnostics.kNullDefaultValue));
-            properties.add(new FloatProperty("scale", this.scale, defaultValue: 1.0));
+            properties.add(new FloatProperty("scale", this.scale, defaultValue: 1.0f));
             properties.add(new DiagnosticsProperty<Color>("color", this.color,
                 defaultValue: Diagnostics.kNullDefaultValue));
             properties.add(new EnumProperty<BlendMode>("colorBlendMode", this.colorBlendMode,

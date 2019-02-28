@@ -96,7 +96,7 @@ namespace Unity.UIWidgets.material {
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             properties.add(new EnumProperty<MaterialType>("type", this.type));
-            properties.add(new FloatProperty("elevation", this.elevation, defaultValue: 0.0));
+            properties.add(new FloatProperty("elevation", this.elevation, defaultValue: 0.0f));
             properties.add(new DiagnosticsProperty<Color>("color", this.color, defaultValue: null));
             properties.add(new DiagnosticsProperty<Color>("shadowColor", this.shadowColor,
                 defaultValue: new Color(0xFF000000)));
