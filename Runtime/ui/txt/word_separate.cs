@@ -5,7 +5,7 @@
             Backward,
         }
 
-        enum characterType {
+        internal enum characterType {
             LetterLike,
             Symbol,
             WhiteSpace
@@ -22,11 +22,11 @@
                 return new Range<int>(0, 0);
             }
 
-            var t = this.classifyChar(index);
+            var t = classifyChar(this._text, index);
             int start = index;
             for (int i = index; i >= 0; --i) {
                 if (!char.IsLowSurrogate(this._text[start])) {
-                    if (this.classifyChar(i) != t) {
+                    if (classifyChar(this._text, i) != t) {
                         break;
                     }
 
@@ -37,7 +37,7 @@
             int end = index;
             for (int i = index; i < this._text.Length; ++i) {
                 if (!char.IsLowSurrogate(this._text[i])) {
-                    if (this.classifyChar(i) != t) {
+                    if (classifyChar(this._text, i) != t) {
                         break;
                     }
 
@@ -49,12 +49,12 @@
         }
 
 
-        characterType classifyChar(int index) {
-            if (char.IsWhiteSpace(this._text, index)) {
+        internal static characterType classifyChar(string text, int index) {
+            if (char.IsWhiteSpace(text, index)) {
                 return characterType.WhiteSpace;
             }
 
-            if (char.IsLetterOrDigit(this._text, index) || this._text[index] == '\'') {
+            if (char.IsLetterOrDigit(text, index) || text[index] == '\'') {
                 return characterType.LetterLike;
             }
 

@@ -240,6 +240,23 @@ namespace Unity.UIWidgets.ui {
             int candIndex = this._candidates.Count;
             this._candidates.Add(cand);
             if (cand.postBreak - this._preBreak > this._lineWidth) {
+                if (this._bestBreak == this._lastBreak) {
+                    this._bestBreak = candIndex;
+                }
+                this._pushGreedyBreak();
+            }
+
+            while (this._lastBreak != candIndex && cand.postBreak - this._preBreak > this._lineWidth) {
+                for (int i = this._lastBreak + 1; i < candIndex; i++) {
+                    float penalty = this._candidates[i].penalty;
+                    if (penalty <= this._bestScore) {
+                        this._bestBreak = i;
+                        this._bestScore = penalty;
+                    }
+                }
+                if (this._bestBreak == this._lastBreak) {
+                    this._bestBreak = candIndex;
+                }
                 this._pushGreedyBreak();
             }
 
