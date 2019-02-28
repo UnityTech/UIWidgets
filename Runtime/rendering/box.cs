@@ -1296,39 +1296,41 @@ namespace Unity.UIWidgets.rendering {
             D.assert(() => {
                 var paint = new Paint {
                     color = new Color(0xFF00FFFF),
+                    strokeWidth = 1,
+                    style = PaintingStyle.stroke,
                 };
-
-//                context.canvas.drawRect((offset & this.size).deflate(0.5),
-//                    BorderWidth.all(1), BorderRadius.zero, paint);
+                context.canvas.drawRect((offset & this.size).deflate(0.5f), paint);
                 return true;
             });
         }
 
         protected virtual void debugPaintBaselines(PaintingContext context, Offset offset) {
             D.assert(() => {
-//                final Paint paint = Paint()
-//                    ..style = PaintingStyle.stroke
-//                    ..strokeWidth = 0.25;
-//                Path path;
-//                // ideographic baseline
-//                final float baselineI = getDistanceToBaseline(TextBaseline.ideographic, onlyReal: true);
-//                if (baselineI != null) {
-//                    paint.color =  const Color (0xFFFFD000);
-//                    path = Path();
-//                    path.moveTo(offset.dx, offset.dy + baselineI);
-//                    path.lineTo(offset.dx + size.width, offset.dy + baselineI);
-//                    context.canvas.drawPath(path, paint);
-//                }
-//
-//                // alphabetic baseline
-//                final float baselineA = getDistanceToBaseline(TextBaseline.alphabetic, onlyReal: true);
-//                if (baselineA != null) {
-//                    paint.color =  const Color (0xFF00FF00);
-//                    path = Path();
-//                    path.moveTo(offset.dx, offset.dy + baselineA);
-//                    path.lineTo(offset.dx + size.width, offset.dy + baselineA);
-//                    context.canvas.drawPath(path, paint);
-//                }
+                Paint paint = new Paint {
+                    style = PaintingStyle.stroke,
+                    strokeWidth = 0.25f
+                };
+
+                Path path;
+                // ideographic baseline
+                float? baselineI = this.getDistanceToBaseline(TextBaseline.ideographic, onlyReal: true);
+                if (baselineI != null) {
+                    paint.color =  new Color(0xFFFFD000);
+                    path = new Path();
+                    path.moveTo(offset.dx, offset.dy + baselineI.Value);
+                    path.lineTo(offset.dx + this.size.width, offset.dy + baselineI.Value);
+                    context.canvas.drawPath(path, paint);
+                }
+
+                // alphabetic baseline
+                float? baselineA = this.getDistanceToBaseline(TextBaseline.alphabetic, onlyReal: true);
+                if (baselineA != null) {
+                    paint.color = new Color (0xFF00FF00);
+                    path = new Path();
+                    path.moveTo(offset.dx, offset.dy + baselineA.Value);
+                    path.lineTo(offset.dx + this.size.width, offset.dy + baselineA.Value);
+                    context.canvas.drawPath(path, paint);
+                }
 
                 return true;
             });
@@ -1340,7 +1342,7 @@ namespace Unity.UIWidgets.rendering {
                     var paint = new Paint {
                         color = new Color(0x00BBBB | ((0x04000000 * this.depth) & 0xFF000000)),
                     };
-//                    context.canvas.drawRect(offset & this.size, BorderWidth.zero, BorderRadius.zero, paint);
+                    context.canvas.drawRect(offset & this.size, paint);
                 }
 
                 return true;

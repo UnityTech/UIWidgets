@@ -155,9 +155,8 @@ namespace Unity.UIWidgets.rendering {
                     var paint = new Paint {
                         color = new Color(0x90909090)
                     };
-//                    context.canvas.drawRect(offset & this.size, BorderWidth.zero, BorderRadius.zero, paint);
+                    context.canvas.drawRect(offset & this.size, paint);
                 }
-
                 return true;
             });
         }

@@ -122,10 +122,9 @@ namespace Unity.UIWidgets.rendering {
             }
 
             D.assert(() => {
-//                if (D.debugRepaintRainbowEnabled || D.debugRepaintTextRainbowEnabled) {
-//                    debugCurrentRepaintColor =
-//                        debugCurrentRepaintColor.withHue((debugCurrentRepaintColor.hue + 2.0) % 360.0);
-//                }
+                if (D.debugRepaintRainbowEnabled || D.debugRepaintTextRainbowEnabled) {
+                    D.debugCurrentRepaintColor = D.debugCurrentRepaintColor.withHue((D.debugCurrentRepaintColor.hue + 2.0f) % 360.0f);
+                }
 
                 return true;
             });

@@ -128,6 +128,22 @@ Finally, the UIWidgets App can be built to packages for any specific platform by
 all relevant resources and generate the final App package.
 
 
+## Debug UIWidgets Application
+
+#### Define UIWidgets_DEBUG
+It's recommended to define the **UIWidgets_DEBUG** script symbol in editor, this will turn on 
+debug assertion in UIWidgets, which will help to find potential bugs earlier. To do this:
+please go to **Player Settings -> Other Settings -> Configuration -> Scripting Define Symbols**, 
+and add **UIWidgets_DEBUG**.  
+The symbol is for debug purpose, please remove it from your release build.
+
+#### UIWidgets Inspector
+The UIWidgets Inspector tool is for visualizing and exploring the widget trees. You can find it
+via *Window/Analysis/UIWidgets* inspector in Editor menu.  
+**Note**
+* **UIWidgets_DEBUG** needs to be define for inspector to work properly.  
+* Inspector currently only works in Editor Play Mode, inspect standalone built application is not supported for now.
+
 ## Learn
 
 #### Samples

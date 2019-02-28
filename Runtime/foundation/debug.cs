@@ -1,6 +1,8 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
+using Unity.UIWidgets.editor;
+using Unity.UIWidgets.painting;
 using Unity.UIWidgets.ui;
 using Debug = UnityEngine.Debug;
 
@@ -44,6 +46,8 @@ namespace Unity.UIWidgets.foundation {
 
         public static bool debugRepaintRainbowEnabled = false;
 
+        public static bool debugRepaintTextRainbowEnabled = false;
+
         public static bool debugPaintLayerBordersEnabled = false;
 
         public static bool debugPrintMarkNeedsLayoutStacks = false;
@@ -58,33 +62,74 @@ namespace Unity.UIWidgets.foundation {
 
         public static bool debugCheckIntrinsicSizes = false;
 
-        // public static Color debugCurrentRepaintColor = Color.fromfromAHSV(0.4, 60.0, 1.0, 1.0);;
+        public static HSVColor debugCurrentRepaintColor = 
+            HSVColor.fromAHSV(0.4f, 60.0f, 1.0f, 1.0f);
 
         public static void _debugDrawDoubleRect(Canvas canvas, Rect outerRect, Rect innerRect, Color color) {
-//            final Path path = new Path()
-//                ..fillType = PathFillType.evenOdd
-//                ..addRect(outerRect)
-//                ..addRect(innerRect);
-//            final Paint paint = new Paint()
-//                ..color = color;
-//            canvas.drawPath(path, paint);
+            Path path = new Path();
+            path.addRect(outerRect);
+            path.addRect(innerRect);
+            path.winding(PathWinding.clockwise);
+            var paint = new Paint {
+                color = color
+            };
+            canvas.drawPath(path, paint);
         }
 
         public static void debugPaintPadding(Canvas canvas, Rect outerRect, Rect innerRect, float outlineWidth = 2.0f) {
             assert(() => {
                 if (innerRect != null && !innerRect.isEmpty) {
                     _debugDrawDoubleRect(canvas, outerRect, innerRect, new Color(0x900090FF));
-                }
-                else {
                     _debugDrawDoubleRect(canvas, innerRect.inflate(outlineWidth).intersect(outerRect), innerRect,
                         new Color(0xFF0090FF));
+                }
+                else {
                     Paint paint = new Paint();
                     paint.color = new Color(0x90909090);
-//                    canvas.drawRect(outerRect, BorderWidth.zero, BorderRadius.zero, paint);
+                    canvas.drawRect(outerRect, paint);
                 }
 
                 return true;
             });
+        }
+        
+        public static void setDebugPaint(bool? debugPaintSizeEnabled = null,
+            bool? debugPaintBaselinesEnabled = null,
+            bool? debugPaintPointersEnabled= null,
+            bool? debugPaintLayerBordersEnabled = null,
+            bool? debugRepaintRainbowEnabled = null ) {
+
+            bool needRepaint = false;
+            if (debugPaintSizeEnabled != null && debugPaintSizeEnabled != D.debugPaintSizeEnabled) {
+                D.debugPaintSizeEnabled = debugPaintSizeEnabled.Value;
+                needRepaint = true;
+            }
+            
+            if (debugPaintBaselinesEnabled != null && debugPaintBaselinesEnabled != D.debugPaintBaselinesEnabled) {
+                D.debugPaintBaselinesEnabled = debugPaintBaselinesEnabled.Value;
+                needRepaint = true;
+            }
+            
+            if (debugPaintPointersEnabled != null && debugPaintPointersEnabled != D.debugPaintPointersEnabled) {
+                D.debugPaintPointersEnabled = debugPaintPointersEnabled.Value;
+                needRepaint = true;
+            }
+            
+            if (debugPaintLayerBordersEnabled != null && debugPaintLayerBordersEnabled != D.debugPaintLayerBordersEnabled) {
+                D.debugPaintLayerBordersEnabled = debugPaintLayerBordersEnabled.Value;
+                needRepaint = true;
+            }
+            
+            if (debugRepaintRainbowEnabled != null && debugRepaintRainbowEnabled != D.debugRepaintRainbowEnabled) {
+                D.debugRepaintRainbowEnabled = debugRepaintRainbowEnabled.Value;
+                needRepaint = true;
+            }
+
+            if (needRepaint) {
+                foreach (var adapter in WindowAdapter.windowAdapters) {
+                    adapter._forceRepaint();
+                }
+            }
         }
     }
 
@@ -124,5 +169,6 @@ namespace Unity.UIWidgets.foundation {
                 return string.Join("\n", strippedLines);
             }
         }
+        
     }
 }
