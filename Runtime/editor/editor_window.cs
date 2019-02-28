@@ -154,7 +154,6 @@ namespace Unity.UIWidgets.editor {
             if (this._binding == null) {
                 this._binding = new WidgetsBinding();
             }
-
             WidgetsBinding.instance = this._binding;
 
             return new WindowDisposable(this);
@@ -423,6 +422,17 @@ namespace Unity.UIWidgets.editor {
 
         public override TextInput textInput {
             get { return this._textInput; }
+        }
+        
+        internal void _forceRepaint() {
+            using (this.getScope()) {
+                RenderObjectVisitor visitor = null;
+                visitor = (child) => {
+                    child.markNeedsPaint();
+                    child.visitChildren(visitor);
+                };
+                this._binding.renderView?.visitChildren(visitor);
+            }
         }
     }
 }

@@ -54,6 +54,9 @@ only a text label and a button. The text label will count the times of clicks up
 
 First of all, please open or create a Unity Project and open it with Unity Editor. 
 
+And then open Project Settings, go to Player section and add "UIWidgets_DEBUG" to the Scripting Debug Symbols field.
+This enables the debug mode of UIWidgets for your development. Remove this for your release build afterwards.
+
 #### ii. Scene Build
 A UIWidgets App is usually built upon a Unity UI Canvas. Please follow the steps to create a
 UI Canvas in Unity.
@@ -77,6 +80,17 @@ in Unity Editor.
     
     namespace UIWidgetsSample {
         public class ExampleCanvas : WidgetCanvas {
+            protected override void OnEnable() {
+                base.OnEnable();
+                    
+                // Application.targetFrameRate = 60; // or higher if you want a smoother scrolling experience.
+                
+                // if you want to use your own font or font icons.
+                // use the font family name instead of the file name in FontStyle.fontFamily.
+                // you can get the font family name by clicking the font file and check its Inspector.                 
+                // FontManager.instance.addFont(Resources.Load<Font>(path: "path to your font"));                
+            }
+                
             protected override Widget getWidget() {
                 return new ExampleApp();
             }
@@ -127,6 +141,31 @@ Finally, the UIWidgets App can be built to packages for any specific platform by
 1. Choose a target platform and click "Build". Then the Unity Editor will automatically assemble 
 all relevant resources and generate the final App package.
 
+#### How to load images?
+1. Put your images files in Resources folder. e.g. image1.png.
+2. You can add image1@2.png and image1@3.png in the same folder to support HD screens.
+3. Use Image.asset("image1") to load the image. Note: as in Unity, ".png" is not needed.
+
+UIWidgets supports Gif as well!
+1. Suppose you have loading1.gif. Rename it to loading1.gif.bytes and copy it to Resources folder.
+2. You can add loading1@2.gif.bytes and loading1@3.gif.bytes in the same folder to support HD screens.
+3. Use Image.asset("loading1.gif") to load the gif images.
+
+## Debug UIWidgets Application
+
+#### Define UIWidgets_DEBUG
+It's recommended to define the **UIWidgets_DEBUG** script symbol in editor, this will turn on 
+debug assertion in UIWidgets, which will help to find potential bugs earlier. To do this:
+please go to **Player Settings -> Other Settings -> Configuration -> Scripting Define Symbols**, 
+and add **UIWidgets_DEBUG**.  
+The symbol is for debug purpose, please remove it from your release build.
+
+#### UIWidgets Inspector
+The UIWidgets Inspector tool is for visualizing and exploring the widget trees. You can find it
+via *Window/Analysis/UIWidgets* inspector in Editor menu.  
+**Note**
+* **UIWidgets_DEBUG** needs to be define for inspector to work properly.  
+* Inspector currently only works in Editor Play Mode, inspect standalone built application is not supported for now.
 
 ## Learn
 
