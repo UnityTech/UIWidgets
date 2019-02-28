@@ -831,17 +831,20 @@ namespace Unity.UIWidgets.ui {
             
             Matrix3 _matrix;
             float? _scale;
+            Matrix3 _invMatrix;
 
-            public State(Matrix3 matrix = null, float? scale = null) {
+            public State(Matrix3 matrix = null, float? scale = null, Matrix3 invMatrix = null) {
                 this._matrix = matrix ?? _id;
                 this._scale = scale;
+                this._invMatrix = invMatrix;
             }
             
             public Matrix3 matrix {
                 get { return this._matrix; }
                 set {
-                    this._matrix = value;
+                    this._matrix = value ?? _id;
                     this._scale = null;
+                    this._invMatrix = null;
                 }
             }
 
@@ -853,9 +856,19 @@ namespace Unity.UIWidgets.ui {
                     return this._scale.Value;
                 }
             }
+            
+            public Matrix3 invMatrix {
+                get {
+                    if (this._invMatrix == null) {
+                        this._invMatrix = Matrix3.I();
+                        this._matrix.invert(this._invMatrix);
+                    }
+                    return this._invMatrix;
+                }
+            }
 
             public State copy() {
-                return new State(this._matrix, this._scale);
+                return new State(this._matrix, this._scale, this._invMatrix);
             }
         }
         
