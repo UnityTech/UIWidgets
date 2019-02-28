@@ -82,7 +82,12 @@ namespace Unity.UIWidgets.engine {
         WindowAdapter _windowAdapter;
         Texture _texture;
         Vector2 _lastMouseMove;
-        bool _mouseEntered;
+
+        HashSet<int> _enteredPointers;
+
+        bool _mouseEntered {
+            get { return !this._enteredPointers.isEmpty(); }
+        }
 
         readonly ScrollInput _scrollInput = new ScrollInput();
         DisplayMetrics _displayMetrics;
@@ -92,7 +97,7 @@ namespace Unity.UIWidgets.engine {
         protected override void OnEnable() {
             base.OnEnable();
 
-            //Disable touch -> mouse event on mobile devices
+            //Disable the default touch -> mouse event conversion on mobile devices
             Input.simulateMouseWithTouches = false;
 
             this._displayMetrics = DisplayMetricsProvider.provider();
@@ -117,6 +122,8 @@ namespace Unity.UIWidgets.engine {
 
             this._windowAdapter.attachRootWidget(root);
             this._lastMouseMove = Input.mousePosition;
+
+            this._enteredPointers = new HashSet<int>();
         }
 
         public float devicePixelRatio {
@@ -180,19 +187,13 @@ namespace Unity.UIWidgets.engine {
                 this.unfocusIfNeeded();
             }
 
-#if UNITY_IOS || UNITY_ANDROID
-            if (this._mouseEntered && Input.touchCount != 0) {
-                this.handleTouchMove();
+            if (this._mouseEntered) {
+                if (this._lastMouseMove.x != Input.mousePosition.x || this._lastMouseMove.y != Input.mousePosition.y) {
+                    this.handleMouseMovement();
+                }
             }
-#else
-            if (this._mouseEntered && (this._lastMouseMove.x != Input.mousePosition.x ||
-                                       this._lastMouseMove.y != Input.mousePosition.y)) {
-                this.handleMouseMove();
-            }
-#endif
 
             this._lastMouseMove = Input.mousePosition;
-
 
             if (this._mouseEntered) {
                 this.handleMouseScroll();
@@ -210,26 +211,7 @@ namespace Unity.UIWidgets.engine {
             }
         }
 
-        void handleTouchMove() {
-            for (var touchIndex = 0; touchIndex < Input.touchCount; touchIndex++) {
-                var touchEvent = Input.GetTouch(touchIndex);
-                if (touchEvent.phase != TouchPhase.Moved) {
-                    continue;
-                }
-
-                var pos = this.getPointPosition(touchEvent.position);
-                this._windowAdapter.postPointerEvent(new PointerData(
-                    timeStamp: Timer.timespanSinceStartup,
-                    change: PointerChange.hover,
-                    kind: PointerDeviceKind.touch,
-                    device: InputUtils.getTouchFingerKey(touchEvent.fingerId),
-                    physicalX: pos.x,
-                    physicalY: pos.y
-                ));
-            }
-        }
-
-        void handleMouseMove() {
+        void handleMouseMovement() {
             var pos = this.getPointPosition(Input.mousePosition);
             this._windowAdapter.postPointerEvent(new PointerData(
                 timeStamp: Timer.timespanSinceStartup,
@@ -283,7 +265,7 @@ namespace Unity.UIWidgets.engine {
             this._windowAdapter.postPointerEvent(new PointerData(
                 timeStamp: Timer.timespanSinceStartup,
                 change: PointerChange.down,
-                kind: InputUtils.getPointerDeviceKind(),
+                kind: InputUtils.getPointerDeviceKind(eventData),
                 device: InputUtils.getPointerDeviceKey(eventData),
                 physicalX: position.x,
                 physicalY: position.y
@@ -295,7 +277,7 @@ namespace Unity.UIWidgets.engine {
             this._windowAdapter.postPointerEvent(new PointerData(
                 timeStamp: Timer.timespanSinceStartup,
                 change: PointerChange.up,
-                kind: InputUtils.getPointerDeviceKind(),
+                kind: InputUtils.getPointerDeviceKind(eventData),
                 device: InputUtils.getPointerDeviceKey(eventData),
                 physicalX: position.x,
                 physicalY: position.y
@@ -334,7 +316,7 @@ namespace Unity.UIWidgets.engine {
             this._windowAdapter.postPointerEvent(new PointerData(
                 timeStamp: Timer.timespanSinceStartup,
                 change: PointerChange.move,
-                kind: InputUtils.getPointerDeviceKind(),
+                kind: InputUtils.getPointerDeviceKind(eventData),
                 device: InputUtils.getPointerDeviceKey(eventData),
                 physicalX: position.x,
                 physicalY: position.y
@@ -342,27 +324,31 @@ namespace Unity.UIWidgets.engine {
         }
 
         public void OnPointerEnter(PointerEventData eventData) {
-            this._mouseEntered = true;
+            var pointerKey = InputUtils.getPointerDeviceKey(eventData);
+            this._enteredPointers.Add(pointerKey);
+
             this._lastMouseMove = eventData.position;
             var position = this.getPointPosition(eventData);
             this._windowAdapter.postPointerEvent(new PointerData(
                 timeStamp: Timer.timespanSinceStartup,
                 change: PointerChange.hover,
-                kind: InputUtils.getPointerDeviceKind(),
-                device: InputUtils.getPointerDeviceKey(eventData),
+                kind: InputUtils.getPointerDeviceKind(eventData),
+                device: pointerKey,
                 physicalX: position.x,
                 physicalY: position.y
             ));
         }
 
         public void OnPointerExit(PointerEventData eventData) {
-            this._mouseEntered = false;
+            var pointerKey = InputUtils.getPointerDeviceKey(eventData);
+            this._enteredPointers.Remove(pointerKey);
+
             var position = this.getPointPosition(eventData);
             this._windowAdapter.postPointerEvent(new PointerData(
                 timeStamp: Timer.timespanSinceStartup,
                 change: PointerChange.hover,
-                kind: InputUtils.getPointerDeviceKind(),
-                device: InputUtils.getPointerDeviceKey(eventData),
+                kind: InputUtils.getPointerDeviceKind(eventData),
+                device: pointerKey,
                 physicalX: position.x,
                 physicalY: position.y
             ));
