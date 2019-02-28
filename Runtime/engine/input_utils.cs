@@ -33,11 +33,15 @@ namespace Unity.UIWidgets.engine {
         }
 
         static bool isTouchEvent(PointerEventData eventData) {
-            return !isMouseEvent(eventData);
+            //pointerId >= 0 : touches
+            //ref: https://docs.unity3d.com/ScriptReference/EventSystems.PointerEventData-pointerId.html
+            return eventData.pointerId >= 0;
         }
 
         static bool isMouseEvent(PointerEventData eventData) {
-            return eventData.pointerId == -1;
+            //pointerId = -1, -2, -3 : mouse buttons
+            //ref: https://docs.unity3d.com/ScriptReference/EventSystems.PointerEventData-pointerId.html
+            return eventData.pointerId < 0;
         }
     }
 }
