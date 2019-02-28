@@ -38,7 +38,7 @@ namespace Unity.UIWidgets.debugger {
         
         readonly List<InspectorPanel> m_Panels = new List<InspectorPanel>();
 
-        Rect _debugPaintTogglesRect;
+        Rect m_DebugPaintTogglesRect;
         int m_PanelIndex = 0;
         [SerializeField] List<PanelState> m_PanelStates = new List<PanelState>();
 
@@ -52,7 +52,7 @@ namespace Unity.UIWidgets.debugger {
         }
 
         void OnGUI() {
-            GUILayout.BeginHorizontal(EditorStyles.toolbar, GUILayout.ExpandWidth(true));
+            EditorGUILayout.BeginHorizontal(EditorStyles.toolbar, GUILayout.ExpandWidth(true));
             this.DoSelectDropDown();
             bool needDebugPaintUpdate = false;
             
@@ -82,7 +82,7 @@ namespace Unity.UIWidgets.debugger {
                 }
 
                 if (Event.current.type == EventType.Repaint) {
-                    this._debugPaintTogglesRect = new Rect(r.xMax - debugPaintToggleGroupWidth, r.yMax + 2, 
+                    this.m_DebugPaintTogglesRect = new Rect(r.xMax - debugPaintToggleGroupWidth, r.yMax + 2, 
                         debugPaintToggleGroupWidth, debugPaintToggleGroupHeight);
                 }
 
@@ -115,7 +115,7 @@ namespace Unity.UIWidgets.debugger {
 
                 bool shouldHandleGUI = true;
                 if (Event.current.type == EventType.MouseDown || Event.current.type == EventType.MouseUp) {
-                    if (this.m_ShowDebugPaintToggles && this._debugPaintTogglesRect.Contains(Event.current.mousePosition)) {
+                    if (this.m_ShowDebugPaintToggles && this.m_DebugPaintTogglesRect.Contains(Event.current.mousePosition)) {
                         shouldHandleGUI = false;
                     }
                 }
@@ -141,8 +141,7 @@ namespace Unity.UIWidgets.debugger {
         }
 
         void DebugPaintToggles(ref bool needUpdate) {
-            //GUI.skin.box
-            GUILayout.BeginArea(this._debugPaintTogglesRect, GUI.skin.box);
+            GUILayout.BeginArea(this.m_DebugPaintTogglesRect, GUI.skin.box);
             GUILayout.BeginVertical();
             EditorGUI.BeginChangeCheck();
             GUILayout.Space(4);
@@ -157,7 +156,7 @@ namespace Unity.UIWidgets.debugger {
             GUILayout.EndArea();
 
             if (Event.current.type == EventType.MouseDown && 
-                !this._debugPaintTogglesRect.Contains(Event.current.mousePosition)) {
+                !this.m_DebugPaintTogglesRect.Contains(Event.current.mousePosition)) {
                 this.ScheduleUpdateAction(() => {
                     this.m_ShowDebugPaintToggles = false;
                     this.Repaint();
