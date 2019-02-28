@@ -149,33 +149,34 @@ namespace UIWidgetsSample {
             List<Widget> widgets = new List<Widget>();
             var style = new TextStyle();
             var cursorColor = new Color(0xFF000000);
+            var selectionColor = new Color(0xFF6F6F6F);
             widgets.Add(this.rowWidgets("Default", new EditStateProvider(builder: ((buildContext, controller, node) =>
-                new EditableText(controller, node, style, cursorColor, onSubmitted: this.textSubmitted)))));
+                new EditableText(controller, node, style, cursorColor, selectionColor: selectionColor,  onSubmitted: this.textSubmitted)))));
 
             widgets.Add(this.rowWidgets("Multiple Line", new EditStateProvider(
                 builder: ((buildContext, controller, node) =>
-                    new EditableText(controller, node, style, cursorColor, maxLines: 4,
+                    new EditableText(controller, node, style, cursorColor, selectionColor: selectionColor,  maxLines: 4,
                         onSubmitted: this.textSubmitted)))));
 
             widgets.Add(this.rowWidgets("ObscureText", new EditStateProvider(
                 builder: ((buildContext, controller, node) =>
-                    new EditableText(controller, node, style, cursorColor, obscureText: true,
+                    new EditableText(controller, node, style, cursorColor, selectionColor: selectionColor, obscureText: true,
                         onSubmitted: this.textSubmitted)))));
 
             widgets.Add(this.rowWidgets("Number", new EditStateProvider(builder: ((buildContext, controller, node) =>
-                new EditableText(controller, node, style, cursorColor, keyboardType: TextInputType.number,
+                new EditableText(controller, node, style, cursorColor, selectionColor: selectionColor, keyboardType: TextInputType.number,
                     onSubmitted: this.textSubmitted)))));
 
             widgets.Add(this.rowWidgets("Phone", new EditStateProvider(builder: ((buildContext, controller, node) =>
-                new EditableText(controller, node, style, cursorColor, keyboardType: TextInputType.phone,
+                new EditableText(controller, node, style, cursorColor, selectionColor: selectionColor, keyboardType: TextInputType.phone,
                     onSubmitted: this.textSubmitted)))));
 
             widgets.Add(this.rowWidgets("Email", new EditStateProvider(builder: ((buildContext, controller, node) =>
-                new EditableText(controller, node, style, cursorColor, keyboardType: TextInputType.emailAddress,
+                new EditableText(controller, node, style, cursorColor, selectionColor: selectionColor, keyboardType: TextInputType.emailAddress,
                     onSubmitted: this.textSubmitted)))));
 
             widgets.Add(this.rowWidgets("Url", new EditStateProvider(builder: ((buildContext, controller, node) =>
-                new EditableText(controller, node, style, cursorColor, keyboardType: TextInputType.url,
+                new EditableText(controller, node, style, cursorColor, selectionColor: selectionColor, keyboardType: TextInputType.url,
                     onSubmitted: this.textSubmitted)))));
 
             return new Column(

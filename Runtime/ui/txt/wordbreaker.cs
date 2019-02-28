@@ -1,3 +1,4 @@
+
 namespace Unity.UIWidgets.ui {
     public class WordBreaker {
         public const uint U16_SURROGATE_OFFSET = ((0xd800 << 10) + 0xdc00 - 0x10000);
@@ -17,7 +18,7 @@ namespace Unity.UIWidgets.ui {
                 this._current = this._findNextBreakInEmailOrUrl();
             }
             else {
-                this._current = this._findNextBreakNormal();
+                this._current = this._findNextBoundaryNormal();
             }
 
             return this._current;
@@ -31,6 +32,7 @@ namespace Unity.UIWidgets.ui {
             this._current = 0;
             this._scanOffset = 0;
             this._inEmailOrUrl = false;
+            this.nextUntilCodePoint();
         }
 
         public int current() {
@@ -87,22 +89,27 @@ namespace Unity.UIWidgets.ui {
             return 0;
         }
 
-        int _findNextBreakNormal() {
+        int _findNextBoundaryNormal() {
             if (this._current == this._size) {
                 return -1;
             }
 
+            WordSeparate.characterType preType = WordSeparate.classifyChar(this._text, this._current + this._offset);
             this._current++;
             for (; this._current < this._size; ++this._current) {
-                char c = this._text[this._current + this._offset];
-                if (LayoutUtils.isWordSpace(c) || c == '\t') {
-                    return this._current;
+                this.nextUntilCodePoint();
+                if (this._current >= this._size) {
+                    break;
                 }
+                var currentType = WordSeparate.classifyChar(this._text, this._current + this._offset);
+                if (currentType != preType) {
+                    break;
+                }
+                preType = currentType;
             }
-
             return this._current;
         }
-
+        
         void _detectEmailOrUrl() {
         }
 
@@ -142,6 +149,14 @@ namespace Unity.UIWidgets.ui {
 
         public static uint getSupplementary(uint lead, uint trail) {
             return (char) (((uint) (lead) << 10) + (uint) (trail - U16_SURROGATE_OFFSET));
+        }
+
+        void nextUntilCodePoint() {
+            while (this._current < this._size
+                   && (char.IsLowSurrogate(this._text[this._current + this._offset]) 
+                       ||  char.IsHighSurrogate(this._text[this._current + this._offset]))) {
+                this._current++;
+            }
         }
     }
 }
