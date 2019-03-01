@@ -82,16 +82,24 @@ namespace Unity.UIWidgets.engine {
         WindowAdapter _windowAdapter;
         Texture _texture;
         Vector2 _lastMouseMove;
-        bool _mouseEntered;
 
-        const int mouseButtonNum = 3;
-        const int mouseScrollId = mouseButtonNum + 1;
+        HashSet<int> _enteredPointers;
+
+        bool _mouseEntered {
+            get { return !this._enteredPointers.isEmpty(); }
+        }
 
         readonly ScrollInput _scrollInput = new ScrollInput();
         DisplayMetrics _displayMetrics;
 
+        const int mouseButtonNum = 3;
+
         protected override void OnEnable() {
             base.OnEnable();
+
+            //Disable the default touch -> mouse event conversion on mobile devices
+            Input.simulateMouseWithTouches = false;
+
             this._displayMetrics = DisplayMetricsProvider.provider();
 
             if (_repaintEvent == null) {
@@ -114,6 +122,8 @@ namespace Unity.UIWidgets.engine {
 
             this._windowAdapter.attachRootWidget(root);
             this._lastMouseMove = Input.mousePosition;
+
+            this._enteredPointers = new HashSet<int>();
         }
 
         public float devicePixelRatio {
@@ -177,17 +187,17 @@ namespace Unity.UIWidgets.engine {
                 this.unfocusIfNeeded();
             }
 
-            if (this._mouseEntered && (this._lastMouseMove.x != Input.mousePosition.x ||
-                                       this._lastMouseMove.y != Input.mousePosition.y)) {
-                this.handleMouseMove();
+            if (this._mouseEntered) {
+                if (this._lastMouseMove.x != Input.mousePosition.x || this._lastMouseMove.y != Input.mousePosition.y) {
+                    this.handleMouseMovement();
+                }
             }
+
+            this._lastMouseMove = Input.mousePosition;
 
             if (this._mouseEntered) {
                 this.handleMouseScroll();
             }
-
-
-            this._lastMouseMove = Input.mousePosition;
 
             D.assert(this._windowAdapter != null);
             this._windowAdapter.Update();
@@ -201,7 +211,7 @@ namespace Unity.UIWidgets.engine {
             }
         }
 
-        void handleMouseMove() {
+        void handleMouseMovement() {
             var pos = this.getPointPosition(Input.mousePosition);
             this._windowAdapter.postPointerEvent(new PointerData(
                 timeStamp: Timer.timespanSinceStartup,
@@ -221,7 +231,7 @@ namespace Unity.UIWidgets.engine {
                     Input.mouseScrollDelta.y * scaleFactor,
                     pos.x,
                     pos.y,
-                    this.getScrollButton());
+                    InputUtils.getScrollButtonKey());
             }
 
             var deltaScroll = this._scrollInput.getScrollDelta();
@@ -239,15 +249,10 @@ namespace Unity.UIWidgets.engine {
             }
         }
 
-
-        int getScrollButton() {
-            return mouseScrollId;
-        }
-
         int getMouseButtonDown() {
             for (int key = 0; key < mouseButtonNum; key++) {
                 if (Input.GetMouseButton(key)) {
-                    return key;
+                    return InputUtils.getMouseButtonKey(key);
                 }
             }
 
@@ -260,8 +265,8 @@ namespace Unity.UIWidgets.engine {
             this._windowAdapter.postPointerEvent(new PointerData(
                 timeStamp: Timer.timespanSinceStartup,
                 change: PointerChange.down,
-                kind: PointerDeviceKind.mouse,
-                device: (int) eventData.button,
+                kind: InputUtils.getPointerDeviceKind(eventData),
+                device: InputUtils.getPointerDeviceKey(eventData),
                 physicalX: position.x,
                 physicalY: position.y
             ));
@@ -272,8 +277,8 @@ namespace Unity.UIWidgets.engine {
             this._windowAdapter.postPointerEvent(new PointerData(
                 timeStamp: Timer.timespanSinceStartup,
                 change: PointerChange.up,
-                kind: PointerDeviceKind.mouse,
-                device: (int) eventData.button,
+                kind: InputUtils.getPointerDeviceKind(eventData),
+                device: InputUtils.getPointerDeviceKey(eventData),
                 physicalX: position.x,
                 physicalY: position.y
             ));
@@ -311,35 +316,39 @@ namespace Unity.UIWidgets.engine {
             this._windowAdapter.postPointerEvent(new PointerData(
                 timeStamp: Timer.timespanSinceStartup,
                 change: PointerChange.move,
-                kind: PointerDeviceKind.mouse,
-                device: (int) eventData.button,
+                kind: InputUtils.getPointerDeviceKind(eventData),
+                device: InputUtils.getPointerDeviceKey(eventData),
                 physicalX: position.x,
                 physicalY: position.y
             ));
         }
 
         public void OnPointerEnter(PointerEventData eventData) {
-            this._mouseEntered = true;
+            var pointerKey = InputUtils.getPointerDeviceKey(eventData);
+            this._enteredPointers.Add(pointerKey);
+
             this._lastMouseMove = eventData.position;
             var position = this.getPointPosition(eventData);
             this._windowAdapter.postPointerEvent(new PointerData(
                 timeStamp: Timer.timespanSinceStartup,
                 change: PointerChange.hover,
-                kind: PointerDeviceKind.mouse,
-                device: (int) eventData.button,
+                kind: InputUtils.getPointerDeviceKind(eventData),
+                device: pointerKey,
                 physicalX: position.x,
                 physicalY: position.y
             ));
         }
 
         public void OnPointerExit(PointerEventData eventData) {
-            this._mouseEntered = false;
+            var pointerKey = InputUtils.getPointerDeviceKey(eventData);
+            this._enteredPointers.Remove(pointerKey);
+
             var position = this.getPointPosition(eventData);
             this._windowAdapter.postPointerEvent(new PointerData(
                 timeStamp: Timer.timespanSinceStartup,
                 change: PointerChange.hover,
-                kind: PointerDeviceKind.mouse,
-                device: (int) eventData.button,
+                kind: InputUtils.getPointerDeviceKind(eventData),
+                device: pointerKey,
                 physicalX: position.x,
                 physicalY: position.y
             ));
