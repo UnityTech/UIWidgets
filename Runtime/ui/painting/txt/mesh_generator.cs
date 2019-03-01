@@ -88,15 +88,15 @@ namespace Unity.UIWidgets.ui {
         static readonly Dictionary<MeshKey, MeshInfo> _meshes = new Dictionary<MeshKey, MeshInfo>();
 
         static long _frameCount = 0;
-        readonly TextBlob textBlob;
-        readonly float scale;
+        readonly TextBlob _textBlob;
+        readonly float _scale;
         readonly Matrix3 _transform;
         MeshMesh _mesh;
         bool _resolved;
 
         public TextBlobMesh(TextBlob textBlob, float scale, Matrix3 transform) {
-            this.textBlob = textBlob;
-            this.scale = scale;
+            this._textBlob = textBlob;
+            this._scale = scale;
             this._transform = transform;
         }
         
@@ -124,9 +124,9 @@ namespace Unity.UIWidgets.ui {
 
             this._resolved = true;
             
-            var style = this.textBlob.style;
+            var style = this._textBlob.style;
             var fontInfo = FontManager.instance.getOrCreate(style.fontFamily);
-            var key = new MeshKey(this.textBlob.instanceId, this.scale);
+            var key = new MeshKey(this._textBlob.instanceId, this._scale);
 
             _meshes.TryGetValue(key, out var meshInfo);
             if (meshInfo != null && meshInfo.textureVersion == fontInfo.textureVersion) {
@@ -136,17 +136,17 @@ namespace Unity.UIWidgets.ui {
             }
 
             var font = fontInfo.font;
-            var length = this.textBlob.textSize;
-            var text = this.textBlob.text;
-            var fontSizeToLoad = Mathf.CeilToInt(style.UnityFontSize * this.scale);
+            var length = this._textBlob.textSize;
+            var text = this._textBlob.text;
+            var fontSizeToLoad = Mathf.CeilToInt(style.UnityFontSize * this._scale);
 
             var vertices = new List<Vector3>(length * 4);
             var triangles = new List<int>(length * 6);
             var uv = new List<Vector2>(length * 4);
             for (int charIndex = 0; charIndex < length; ++charIndex) {
-                var ch = text[charIndex + this.textBlob.textOffset];
+                var ch = text[charIndex + this._textBlob.textOffset];
                 // first char as origin for mesh position 
-                var position = this.textBlob.positions[charIndex];
+                var position = this._textBlob.positions[charIndex];
                 if (LayoutUtils.isWordSpace(ch) || LayoutUtils.isLineEndSpace(ch) || ch == '\t') {
                     continue;
                 }
@@ -154,10 +154,10 @@ namespace Unity.UIWidgets.ui {
                 CharacterInfo charInfo;
                 font.GetCharacterInfo(ch, out charInfo, fontSizeToLoad, style.UnityFontStyle);
 
-                var minX = charInfo.minX / this.scale;
-                var maxX = charInfo.maxX / this.scale;
-                var minY = charInfo.minY / this.scale;
-                var maxY = charInfo.maxY / this.scale;
+                var minX = charInfo.minX / this._scale;
+                var maxX = charInfo.maxX / this._scale;
+                var minY = charInfo.minY / this._scale;
+                var maxY = charInfo.maxY / this._scale;
 
                 var baseIndex = vertices.Count;
 
