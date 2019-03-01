@@ -102,7 +102,8 @@ namespace Unity.UIWidgets.ui {
                     break;
                 }
                 var currentType = WordSeparate.classifyChar(this._text, this._current + this._offset);
-                if (currentType != preType) {
+                if ((currentType == WordSeparate.characterType.WhiteSpace) 
+                    != (preType == WordSeparate.characterType.WhiteSpace)) {
                     break;
                 }
                 preType = currentType;
