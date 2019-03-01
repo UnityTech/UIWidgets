@@ -432,6 +432,16 @@ namespace Unity.UIWidgets.ui {
 
         public static PictureFlusher.RenderDraw texAlpha(PictureFlusher.RenderLayer layer, Paint paint,
             MeshMesh mesh, Texture tex) {
+            return texAlpha(layer, paint, mesh, null, tex);
+        }
+        
+        public static PictureFlusher.RenderDraw texAlpha(PictureFlusher.RenderLayer layer, Paint paint,
+            TextBlobMesh textMesh, Texture tex) {
+            return texAlpha(layer, paint, null, textMesh, tex);
+        }
+        
+        public static PictureFlusher.RenderDraw texAlpha(PictureFlusher.RenderLayer layer, Paint paint,
+            MeshMesh mesh, TextBlobMesh textMesh, Texture tex) {
             Vector4 viewport = layer.viewport;
             Matrix3 ctm = layer.states[layer.states.Count - 1].matrix;
 
@@ -443,6 +453,7 @@ namespace Unity.UIWidgets.ui {
 
             return new PictureFlusher.RenderDraw {
                 mesh = mesh,
+                textMesh = textMesh,
                 pass = pass,
                 material = mat,
                 properties = props,

@@ -29,7 +29,7 @@ namespace Unity.UIWidgets.widgets {
             Window.instance.onLocaleChanged += this.handleLocaleChanged;
             this.widgetInspectorService = new WidgetInspectorService(this);
             this.addPersistentFrameCallback((duration) => {
-                MeshGenerator.tickNextFrame();
+                TextBlobMesh.tickNextFrame();
                 TessellationGenerator.tickNextFrame();
             });
         }
