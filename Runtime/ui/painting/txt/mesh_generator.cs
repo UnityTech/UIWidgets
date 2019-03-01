@@ -78,16 +78,28 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void touch(long timeTolive = 5) {
-            this._timeToLive = timeTolive + MeshGenerator.frameCount;
+            this._timeToLive = timeTolive + TextBlobMesh.frameCount;
         }
     }
 
-
-    static class MeshGenerator {
+    
+    class TextBlobMesh {
+        
         static readonly Dictionary<MeshKey, MeshInfo> _meshes = new Dictionary<MeshKey, MeshInfo>();
 
         static long _frameCount = 0;
+        readonly TextBlob _textBlob;
+        readonly float _scale;
+        readonly Matrix3 _transform;
+        MeshMesh _mesh;
+        bool _resolved;
 
+        public TextBlobMesh(TextBlob textBlob, float scale, Matrix3 transform) {
+            this._textBlob = textBlob;
+            this._scale = scale;
+            this._transform = transform;
+        }
+        
         public static long frameCount {
             get { return _frameCount; }
         }
@@ -105,32 +117,36 @@ namespace Unity.UIWidgets.ui {
             }
         }
 
-        public static MeshMesh generateMesh(TextBlob textBlob, float scale) {
-            var style = textBlob.style;
+        public MeshMesh resovleMesh() {
+            if (this._resolved) {
+                return this._mesh;
+            }
+
+            this._resolved = true;
+            
+            var style = this._textBlob.style;
             var fontInfo = FontManager.instance.getOrCreate(style.fontFamily);
-            var key = new MeshKey(textBlob.instanceId, scale);
+            var key = new MeshKey(this._textBlob.instanceId, this._scale);
 
             _meshes.TryGetValue(key, out var meshInfo);
             if (meshInfo != null && meshInfo.textureVersion == fontInfo.textureVersion) {
                 meshInfo.touch();
-                return meshInfo.mesh;
+                this._mesh = meshInfo.mesh.transform(this._transform);
+                return this._mesh;
             }
 
             var font = fontInfo.font;
-            var length = textBlob.textSize;
-            var text = textBlob.text;
-            var fontSizeToLoad = Mathf.CeilToInt(style.UnityFontSize * scale);
-            var subText = textBlob.text.Substring(textBlob.textOffset, textBlob.textSize);
-            font.RequestCharactersInTexture(subText, fontSizeToLoad, style.UnityFontStyle);
-
+            var length = this._textBlob.textSize;
+            var text = this._textBlob.text;
+            var fontSizeToLoad = Mathf.CeilToInt(style.UnityFontSize * this._scale);
 
             var vertices = new List<Vector3>(length * 4);
             var triangles = new List<int>(length * 6);
             var uv = new List<Vector2>(length * 4);
             for (int charIndex = 0; charIndex < length; ++charIndex) {
-                var ch = text[charIndex + textBlob.textOffset];
+                var ch = text[charIndex + this._textBlob.textOffset];
                 // first char as origin for mesh position 
-                var position = textBlob.positions[charIndex];
+                var position = this._textBlob.positions[charIndex];
                 if (LayoutUtils.isWordSpace(ch) || LayoutUtils.isLineEndSpace(ch) || ch == '\t') {
                     continue;
                 }
@@ -138,10 +154,10 @@ namespace Unity.UIWidgets.ui {
                 CharacterInfo charInfo;
                 font.GetCharacterInfo(ch, out charInfo, fontSizeToLoad, style.UnityFontStyle);
 
-                var minX = charInfo.minX / scale;
-                var maxX = charInfo.maxX / scale;
-                var minY = charInfo.minY / scale;
-                var maxY = charInfo.maxY / scale;
+                var minX = charInfo.minX / this._scale;
+                var maxX = charInfo.maxX / this._scale;
+                var minY = charInfo.minY / this._scale;
+                var maxY = charInfo.maxY / this._scale;
 
                 var baseIndex = vertices.Count;
 
@@ -170,7 +186,8 @@ namespace Unity.UIWidgets.ui {
             MeshMesh mesh = vertices.Count > 0 ? new MeshMesh(null, vertices, triangles, uv) : null;
             _meshes[key] = new MeshInfo(key, mesh, fontInfo.textureVersion);
 
-            return mesh;
+            this._mesh = mesh.transform(this._transform);
+            return this._mesh;
         }
     }
 }
