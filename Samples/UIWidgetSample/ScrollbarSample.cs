@@ -1,14 +1,13 @@
 using System.Collections.Generic;
-using Unity.UIWidgets.engine;
 using Unity.UIWidgets.material;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
 
 namespace UIWidgetsSample {
-    public class ScrollbarCanvas : WidgetCanvas {
-        protected override Widget getWidget() {
-            return new Container(
+    public class ScrollbarSample : UIWidgetsSamplePanel {
+        protected override Widget createWidget(Window window) {
+            var scroll = new Container(
                 decoration: new BoxDecoration(
                     border: Border.all(color: new Color(0xFFFFFF00))
                 ),
@@ -37,6 +36,10 @@ namespace UIWidgetsSample {
                     )
                 )
             );
+            return new WidgetsApp(
+                home: scroll,
+                pageRouteBuilder: this.pageRouteBuilder,
+                window: window);
         }
     }
 }

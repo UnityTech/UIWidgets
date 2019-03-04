@@ -1,12 +1,13 @@
 using System.Collections.Generic;
-using Unity.UIWidgets.engine;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
 
 namespace UIWidgetsSample {
-    public class PageViewCanvas : WidgetCanvas {
-        protected override Widget getWidget() {
-            return new Container(
+    public class PageViewSample : UIWidgetsSamplePanel {
+            
+        protected override Widget createWidget(Window window) {
+            return new WidgetsApp(
+                home: new Container(
                 width: 200,
                 height: 400,
                 child: new PageView(
@@ -21,7 +22,9 @@ namespace UIWidgetsSample {
                             color: new Color(0xFF673AB7)
                         )
                     }
-                ));
+                )),
+                pageRouteBuilder: this.pageRouteBuilder,
+                window: window);
         }
     }
 }

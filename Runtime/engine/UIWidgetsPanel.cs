@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Unity.UIWidgets.animation;
 using Unity.UIWidgets.async;
 using Unity.UIWidgets.editor;
 using Unity.UIWidgets.foundation;
@@ -10,11 +9,10 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using RawImage = UnityEngine.UI.RawImage;
 using Rect = UnityEngine.Rect;
-using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace Unity.UIWidgets.engine {
     public class UIWidgetWindowAdapter : WindowAdapter {
-        readonly WidgetCanvas _widgetCanvas;
+        readonly UIWidgetsPanel _uiWidgetsPanel;
         bool _needsPaint;
 
         protected override void updateSafeArea() {
@@ -30,8 +28,8 @@ namespace Unity.UIWidgets.engine {
             this._needsPaint = true;
         }
 
-        public UIWidgetWindowAdapter(WidgetCanvas widgetCanvas) {
-            this._widgetCanvas = widgetCanvas;
+        public UIWidgetWindowAdapter(UIWidgetsPanel uiWidgetsPanel) {
+            this._uiWidgetsPanel = uiWidgetsPanel;
         }
 
 
@@ -52,21 +50,21 @@ namespace Unity.UIWidgets.engine {
         }
 
         protected override Surface createSurface() {
-            return new EditorWindowSurface(this._widgetCanvas.applyRenderTexture);
+            return new EditorWindowSurface(this._uiWidgetsPanel.applyRenderTexture);
         }
 
         public override GUIContent titleContent {
-            get { return new GUIContent(this._widgetCanvas.gameObject.name); }
+            get { return new GUIContent(this._uiWidgetsPanel.gameObject.name); }
         }
 
         protected override float queryDevicePixelRatio() {
-            return this._widgetCanvas.devicePixelRatio;
+            return this._uiWidgetsPanel.devicePixelRatio;
         }
 
         protected override Vector2 queryWindowSize() {
-            var rect = RectTransformUtility.PixelAdjustRect(this._widgetCanvas.rectTransform,
-                this._widgetCanvas.canvas);
-            var size = new Vector2(rect.width, rect.height) / this._widgetCanvas.devicePixelRatio;
+            var rect = RectTransformUtility.PixelAdjustRect(this._uiWidgetsPanel.rectTransform,
+                this._uiWidgetsPanel.canvas);
+            var size = new Vector2(rect.width, rect.height) / this._uiWidgetsPanel.devicePixelRatio;
             size.x = Mathf.Round(size.x);
             size.y = Mathf.Round(size.y);
             return size;
@@ -74,7 +72,7 @@ namespace Unity.UIWidgets.engine {
     }
 
     [RequireComponent(typeof(RectTransform))]
-    public abstract class WidgetCanvas : RawImage, IPointerDownHandler, IPointerUpHandler, IDragHandler,
+    public class UIWidgetsPanel : RawImage, IPointerDownHandler, IPointerUpHandler, IDragHandler,
         IPointerEnterHandler, IPointerExitHandler {
         static Event _repaintEvent;
 
@@ -110,17 +108,7 @@ namespace Unity.UIWidgets.engine {
             this._windowAdapter = new UIWidgetWindowAdapter(this);
 
             this._windowAdapter.OnEnable();
-            var root = new WidgetsApp(
-                home: this.getWidget(),
-                window: this._windowAdapter,
-                routes: this.routes,
-                textStyle: this.textStyle,
-                pageRouteBuilder: this.pageRouteBuilder,
-                onGenerateRoute: this.onGenerateRoute,
-                onUnknownRoute: this.onUnknownRoute);
-
-
-            this._windowAdapter.attachRootWidget(root);
+            this._windowAdapter.attachRootWidget(this.createWidget(this._windowAdapter));
             this._lastMouseMove = Input.mousePosition;
 
             this._enteredPointers = new HashSet<int>();
@@ -134,37 +122,6 @@ namespace Unity.UIWidgets.engine {
             }
         }
 
-        protected virtual Dictionary<string, WidgetBuilder> routes {
-            get { return null; }
-        }
-
-        protected virtual string initialRoute {
-            get { return null; }
-        }
-
-        protected virtual RouteFactory onGenerateRoute {
-            get { return null; }
-        }
-
-        protected virtual RouteFactory onUnknownRoute {
-            get { return null; }
-        }
-
-        protected virtual TextStyle textStyle {
-            get { return null; }
-        }
-
-        protected virtual PageRouteFactory pageRouteBuilder {
-            get {
-                return (RouteSettings settings, WidgetBuilder builder) =>
-                    new PageRouteBuilder(
-                        settings: settings,
-                        pageBuilder: (BuildContext context, Animation<float> animation,
-                            Animation<float> secondaryAnimation) => builder(context)
-                    );
-            }
-        }
-
         protected override void OnDisable() {
             D.assert(this._windowAdapter != null);
             this._windowAdapter.OnDisable();
@@ -172,7 +129,7 @@ namespace Unity.UIWidgets.engine {
             base.OnDisable();
         }
 
-        protected virtual Widget getWidget() {
+        protected virtual Widget createWidget(Window window) {
             return null;
         }
 

@@ -3,7 +3,7 @@ using UnityEditor;
 using UnityEditor.UI;
 
 namespace Unity.UIWidgets.Editor {
-    [CustomEditor(typeof(WidgetCanvas), true)]
+    [CustomEditor(typeof(UIWidgetsPanel), true)]
     [CanEditMultipleObjects]
     public class WidgetCanvasEditor : RawImageEditor {
         public override void OnInspectorGUI() {

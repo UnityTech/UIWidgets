@@ -9,7 +9,7 @@ using UnityEngine;
 using Material = Unity.UIWidgets.material.Material;
 
 namespace UIWidgetsSample {
-    public class ExpansionPanelCanvas : WidgetCanvas {
+    public class ExpansionPanelSample : UIWidgetsSamplePanel {
         int testCaseId = 1;
 
         readonly List<Widget> testCases = new List<Widget> {
@@ -17,8 +17,11 @@ namespace UIWidgetsSample {
             new ExpansionPanelWidget()
         };
 
-        protected override Widget getWidget() {
-            return this.testCases[this.testCaseId];
+        protected override Widget createWidget(Window window)  {
+            return new WidgetsApp(
+                home: this.testCases[this.testCaseId],
+                pageRouteBuilder: this.pageRouteBuilder,
+                window: window);
         }
     }
 
@@ -40,7 +43,7 @@ namespace UIWidgetsSample {
                         width: 40.0f,
                         height: 40.0f,
                         constraints: BoxConstraints.tight(new Size(40, 600)),
-                        color: AsScreenCanvas.CLColors.red,
+                        color: CLColors.red,
                         child: new Center(child: new Text("Beijing"))
                     )
                 )

@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Unity.UIWidgets.engine;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
@@ -7,9 +6,12 @@ using Unity.UIWidgets.widgets;
 using UnityEngine;
 
 namespace UIWidgetsSample {
-    public class DragDropCanvas : WidgetCanvas {
-        protected override Widget getWidget() {
-            return new DragDropApp();
+    public class DragDropSample : UIWidgetsSamplePanel {
+        protected override Widget createWidget(Window window) {
+            return new WidgetsApp(
+                home: new DragDropApp(),
+                pageRouteBuilder: this.pageRouteBuilder,
+                window: window);
         }
 
         class DragDropApp : StatefulWidget {
@@ -47,7 +49,7 @@ namespace UIWidgetsSample {
                                 width: 40.0f,
                                 height: 40.0f,
                                 constraints: BoxConstraints.tight(new Size(40, 40)),
-                                color: AsScreenCanvas.CLColors.red,
+                                color: CLColors.red,
                                 child: new Center(child: new Text("" + this.value))
                             );
                         }
@@ -62,7 +64,7 @@ namespace UIWidgetsSample {
 
                 var entry_bg = new OverlayEntry(
                     inner_context => new Container(
-                        color: AsScreenCanvas.CLColors.white
+                        color: CLColors.white
                     ));
 
                 var entry = new OverlayEntry(
@@ -74,19 +76,19 @@ namespace UIWidgetsSample {
                             child: new Draggable<int>(
                                 5,
                                 child: new Container(
-                                    color: AsScreenCanvas.CLColors.blue,
+                                    color: CLColors.blue,
                                     width: 30.0f,
                                     height: 30.0f,
                                     constraints: BoxConstraints.tight(new Size(30, 30)),
                                     child: new Center(child: new Text("5"))
                                 ),
                                 feedback: new Container(
-                                    color: AsScreenCanvas.CLColors.green,
+                                    color: CLColors.green,
                                     width: 30.0f,
                                     height: 30.0f),
                                 //maxSimultaneousDrags: 1,
                                 childWhenDragging: new Container(
-                                    color: AsScreenCanvas.CLColors.black,
+                                    color: CLColors.black,
                                     width: 30.0f,
                                     height: 30.0f,
                                     constraints: BoxConstraints.tight(new Size(30, 30))
@@ -106,19 +108,19 @@ namespace UIWidgetsSample {
                             new Draggable<int>(
                                 8,
                                 child: new Container(
-                                    color: AsScreenCanvas.CLColors.background4,
+                                    color: CLColors.background4,
                                     width: 30.0f,
                                     height: 30.0f,
                                     constraints: BoxConstraints.tight(new Size(30, 30)),
                                     child: new Center(child: new Text("8")))
                                 ,
                                 feedback: new Container(
-                                    color: AsScreenCanvas.CLColors.green,
+                                    color: CLColors.green,
                                     width: 30.0f,
                                     height: 30.0f),
                                 maxSimultaneousDrags: 1,
                                 childWhenDragging: new Container(
-                                    color: AsScreenCanvas.CLColors.black,
+                                    color: CLColors.black,
                                     width: 30.0f,
                                     height: 30.0f,
                                     constraints: BoxConstraints.tight(new Size(30, 30))
@@ -138,7 +140,7 @@ namespace UIWidgetsSample {
                 entries.Add(entry3);
 
                 return new Container(
-                    color: AsScreenCanvas.CLColors.white,
+                    color: CLColors.white,
                     child: new Overlay(
                         initialEntries: entries
                     )

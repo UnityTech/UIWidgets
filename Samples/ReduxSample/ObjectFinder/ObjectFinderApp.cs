@@ -10,12 +10,15 @@ using Unity.UIWidgets.widgets;
 using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace Unity.UIWidgets.Sample.Redux.ObjectFinder {
-    public class ObjectFinderApp : WidgetCanvas {
+    public class ObjectFinderApp : UIWidgetsSample.UIWidgetsSamplePanel {
         public ObjectFinderApp() {
         }
 
-        protected override Widget getWidget() {
-            return new StoreProvider<FinderAppState>(StoreProvider.store, this.createWidget());
+        protected override Widget createWidget(Window window)  {
+            return new WidgetsApp(
+                home: new StoreProvider<FinderAppState>(StoreProvider.store, this.createWidget()),
+                pageRouteBuilder: this.pageRouteBuilder,
+                window: window);
         }
 
         Widget createWidget() {

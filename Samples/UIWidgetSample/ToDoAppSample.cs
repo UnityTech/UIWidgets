@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Unity.UIWidgets.engine;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.material;
@@ -11,7 +10,7 @@ using Unity.UIWidgets.widgets;
 using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace UIWidgetsSample {
-    public class ToDoAppCanvas : WidgetCanvas {
+    public class ToDoAppSample : UIWidgetsSamplePanel {
         public class ToDoListApp : StatefulWidget {
             public ToDoListApp(Key key = null) : base(key) {
             }
@@ -21,8 +20,11 @@ namespace UIWidgetsSample {
             }
         }
 
-        protected override Widget getWidget() {
-            return new ToDoListApp();
+        protected override Widget createWidget(Window window) {
+            return new WidgetsApp(
+                home: new ToDoListApp(),
+                pageRouteBuilder: this.pageRouteBuilder,
+                window: window);
         }
 
         public class CustomButton : StatelessWidget {
@@ -35,7 +37,7 @@ namespace UIWidgetsSample {
             ) : base(key: key) {
                 this.onPressed = onPressed;
                 this.padding = padding ?? EdgeInsets.all(8.0f);
-                this.backgroundColor = backgroundColor ?? AsScreenCanvas.CLColors.transparent;
+                this.backgroundColor = backgroundColor ?? CLColors.transparent;
                 this.child = child;
             }
 
@@ -178,7 +180,7 @@ namespace UIWidgetsSample {
         ) : base(key: key) {
             this.onPressed = onPressed;
             this.padding = padding ?? EdgeInsets.all(8.0f);
-            this.backgroundColor = backgroundColor ?? AsScreenCanvas.CLColors.transparent;
+            this.backgroundColor = backgroundColor ?? CLColors.transparent;
             this.child = child;
         }
 

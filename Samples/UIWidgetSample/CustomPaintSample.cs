@@ -1,15 +1,17 @@
-using Unity.UIWidgets.engine;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
 
 namespace UIWidgetsSample {
-    public class CustomPaintCanvas : WidgetCanvas {
-        protected override Widget getWidget() {
-            return new CustomPaint(
-                child: new Container(width: 300, height: 300, color: new Color(0XFFFFFFFF)),
-                foregroundPainter: new GridPainter(null)
-            );
+    public class CustomPaintSample : UIWidgetsSamplePanel {
+        protected override Widget createWidget(Window window) {
+            return new WidgetsApp(
+                home: new Unity.UIWidgets.widgets.CustomPaint(
+                    child: new Container(width: 300, height: 300, color: new Color(0XFFFFFFFF)),
+                    foregroundPainter: new GridPainter(null)
+                ),
+                pageRouteBuilder: this.pageRouteBuilder,
+                window: window);
         }
     }
 
