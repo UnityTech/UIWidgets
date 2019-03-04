@@ -62,9 +62,9 @@ namespace Unity.UIWidgets.engine {
         }
 
         protected override Vector2 queryWindowSize() {
-            var rect = RectTransformUtility.PixelAdjustRect(this._uiWidgetsPanel.rectTransform,
-                this._uiWidgetsPanel.canvas);
-            var size = new Vector2(rect.width, rect.height) / this._uiWidgetsPanel.devicePixelRatio;
+            var rect = this._uiWidgetsPanel.rectTransform.rect;
+            var size = new Vector2(rect.width,rect.height) * 
+                       this._uiWidgetsPanel.canvas.scaleFactor / this._uiWidgetsPanel.devicePixelRatio;
             size.x = Mathf.Round(size.x);
             size.y = Mathf.Round(size.y);
             return size;

@@ -5,7 +5,7 @@ using UnityEditor.UI;
 namespace Unity.UIWidgets.Editor {
     [CustomEditor(typeof(UIWidgetsPanel), true)]
     [CanEditMultipleObjects]
-    public class WidgetCanvasEditor : RawImageEditor {
+    public class UIWidgetsPanelEditor : RawImageEditor {
         public override void OnInspectorGUI() {
             base.OnInspectorGUI();
             var pixelRatioProperty = this.serializedObject.FindProperty("devicePixelRatioOverride");
