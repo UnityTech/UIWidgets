@@ -1,4 +1,5 @@
 ﻿using System;
+using Unity.UIWidgets.foundation;
 
 namespace Unity.UIWidgets.ui {
     public interface Canvas {
@@ -64,6 +65,7 @@ namespace Unity.UIWidgets.ui {
 
         void drawTextBlob(TextBlob textBlob, Offset offset, Paint paint);
 
+        void drawParagraph(Paragraph paragraph, Offset offset);
         void flush();
 
         void reset();
@@ -314,6 +316,12 @@ namespace Unity.UIWidgets.ui {
                 offset = offset,
                 paint = new Paint(paint),
             });
+        }
+        
+        public void drawParagraph(Paragraph paragraph, Offset offset) {
+            D.assert(paragraph != null);
+            D.assert(PaintingUtils._offsetIsValid(offset));
+            paragraph.paint(this, offset);
         }
 
         public virtual void flush() {
