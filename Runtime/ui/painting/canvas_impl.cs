@@ -208,6 +208,10 @@ namespace Unity.UIWidgets.ui {
         }
         
         bool _applyClip(Rect queryBounds) {
+            if (queryBounds == null || queryBounds.isEmpty) {
+                return false;
+            }
+
             var layer = this._currentLayer;
             var layerBounds = layer.layerBounds;
             ReducedClip reducedClip = new ReducedClip(layer.clipStack, layerBounds, queryBounds);
@@ -735,6 +739,7 @@ namespace Unity.UIWidgets.ui {
                         // clear triangles first in order to bypass validation in SetVertices.
                         cmd.meshObj.SetTriangles((int[]) null, 0, false);
 
+                        D.assert(cmd.mesh.vertices.Count > 0);
                         cmd.meshObj.SetVertices(cmd.mesh.vertices);
                         cmd.meshObj.SetTriangles(cmd.mesh.triangles, 0, false);
                         cmd.meshObj.SetUVs(0, cmd.mesh.uv);
