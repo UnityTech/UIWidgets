@@ -69,9 +69,10 @@ UI Canvas in Unity.
 A UIWidgets App is written in **C# Scripts**. Please follow the steps to create an App and play it
 in Unity Editor.
 
-1. Create a new C# Script named "ExampleCanvas.cs" and paste the following codes into it.
+1. Create a new C# Script named "UIWidgetsExample.cs" and paste the following codes into it.
    ```none
     using System.Collections.Generic;
+    using Unity.UIWidgets.animation;
     using Unity.UIWidgets.engine;
     using Unity.UIWidgets.foundation;
     using Unity.UIWidgets.material;
@@ -79,20 +80,28 @@ in Unity Editor.
     using Unity.UIWidgets.widgets;
     
     namespace UIWidgetsSample {
-        public class ExampleCanvas : WidgetCanvas {
+        public class UIWidgetsExample : UIWidgetsPanel {
             protected override void OnEnable() {
                 base.OnEnable();
-                    
+    
                 // Application.targetFrameRate = 60; // or higher if you want a smoother scrolling experience.
-                
+    
                 // if you want to use your own font or font icons.
                 // use the font family name instead of the file name in FontStyle.fontFamily.
                 // you can get the font family name by clicking the font file and check its Inspector.                 
                 // FontManager.instance.addFont(Resources.Load<Font>(path: "path to your font"));                
             }
-                
-            protected override Widget getWidget() {
-                return new ExampleApp();
+    
+            protected override Widget createWidget() {
+                return new WidgetsApp(
+                    home: new ExampleApp(),
+                    pageRouteBuilder: (RouteSettings settings, WidgetBuilder builder) =>
+                        new PageRouteBuilder(
+                            settings: settings,
+                            pageBuilder: (BuildContext context, Animation<float> animation,
+                                Animation<float> secondaryAnimation) => builder(context)
+                        )
+                );
             }
     
             class ExampleApp : StatefulWidget {
@@ -114,7 +123,7 @@ in Unity Editor.
                             new GestureDetector(
                                 onTap: () => {
                                     this.setState(()
-                                     => {
+                                        => {
                                         this.counter++;
                                     });
                                 },

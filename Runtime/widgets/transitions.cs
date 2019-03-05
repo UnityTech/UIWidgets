@@ -123,6 +123,51 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
+    public class SizeTransition : AnimatedWidget {
+        public SizeTransition(
+            Key key = null,
+            Axis axis = Axis.vertical,
+            Animation<float> sizeFactor = null,
+            float axisAlignment = 0.0f,
+            Widget child = null) : base(key: key, listenable: sizeFactor) {
+            D.assert(axis != null);
+            D.assert(sizeFactor != null);
+            D.assert(axisAlignment != null);
+            this.axis = axis;
+            this.axisAlignment = axisAlignment;
+            this.child = child;
+        }
+
+        public readonly Axis axis;
+
+        public readonly float axisAlignment;
+
+        Animation<float> sizeFactor {
+            get { return (Animation<float>) this.listenable; }
+        }
+
+        public readonly Widget child;
+
+        protected internal override Widget build(BuildContext context) {
+            Alignment alignment;
+            if (this.axis == Axis.vertical) {
+                alignment = new Alignment(-1.0f, this.axisAlignment);
+            }
+            else {
+                alignment = new Alignment(this.axisAlignment, -1.0f);
+            }
+
+            return new ClipRect(
+                child: new Align(
+                    alignment: alignment,
+                    widthFactor: this.axis == Axis.horizontal ? (float?) Mathf.Max(this.sizeFactor.value, 0.0f) : null,
+                    heightFactor: this.axis == Axis.vertical ? (float?) Mathf.Max(this.sizeFactor.value, 0.0f) : null,
+                    child: this.child
+                )
+            );
+        }
+    }
+
     public class FadeTransition : SingleChildRenderObjectWidget {
         public FadeTransition(Key key = null, Animation<float> opacity = null,
             Widget child = null) : base(key: key, child: child) {

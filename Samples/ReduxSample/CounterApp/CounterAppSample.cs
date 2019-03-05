@@ -9,9 +9,11 @@ using Unity.UIWidgets.widgets;
 using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace Unity.UIWidgets.Sample.Redux {
-    public class CounterAppCanvas : WidgetCanvas {
-        protected override Widget getWidget() {
-            return new CounterApp();
+    public class CounterAppSample : UIWidgetsSample.UIWidgetsSamplePanel {
+        protected override Widget createWidget() {
+            return new WidgetsApp(
+                home: new CounterApp(),
+                pageRouteBuilder: this.pageRouteBuilder);
         }
     }
 

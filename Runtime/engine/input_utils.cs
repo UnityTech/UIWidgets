@@ -1,25 +1,22 @@
+using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
 using UnityEngine.EventSystems;
 
 namespace Unity.UIWidgets.engine {
-    public static class InputUtils {
+    static class InputUtils {
         const int mouseScrollId = 1;
-        const int preservedPointerKeyNum = 10;
+        const int preservedKeyNum = 10;
+        const int preservedMouseKeyNum = 100;
+        const int fingerKeyStart = preservedKeyNum + preservedMouseKeyNum;
 
-        public static PointerDeviceKind getPointerDeviceKind() {
-#if UNITY_IOS || UNITY_ANDROID
-            return PointerDeviceKind.touch;
-#else
-            return PointerDeviceKind.mouse;
-#endif
+        public static PointerDeviceKind getPointerDeviceKind(PointerEventData eventData) {
+            return isTouchEvent(eventData) ? PointerDeviceKind.touch : PointerDeviceKind.mouse;
         }
 
         public static int getPointerDeviceKey(PointerEventData eventData) {
-#if UNITY_IOS || UNITY_ANDROID
-            return getTouchFingerKey(eventData.pointerId);
-#else
-            return getMouseButtonKey((int) eventData.button);
-#endif
+            return isTouchEvent(eventData)
+                ? getTouchFingerKey(eventData.pointerId)
+                : getMouseButtonKey((int) eventData.button);
         }
 
         public static int getScrollButtonKey() {
@@ -27,11 +24,24 @@ namespace Unity.UIWidgets.engine {
         }
 
         public static int getMouseButtonKey(int buttonId) {
-            return buttonId + preservedPointerKeyNum;
+            D.assert(buttonId < preservedMouseKeyNum);
+            return buttonId + preservedKeyNum;
         }
 
-        public static int getTouchFingerKey(int fingerId) {
-            return fingerId + preservedPointerKeyNum;
+        static int getTouchFingerKey(int fingerId) {
+            return fingerId + fingerKeyStart;
+        }
+
+        static bool isTouchEvent(PointerEventData eventData) {
+            //pointerId >= 0 : touches
+            //ref: https://docs.unity3d.com/ScriptReference/EventSystems.PointerEventData-pointerId.html
+            return eventData.pointerId >= 0;
+        }
+
+        static bool isMouseEvent(PointerEventData eventData) {
+            //pointerId = -1, -2, -3 : mouse buttons
+            //ref: https://docs.unity3d.com/ScriptReference/EventSystems.PointerEventData-pointerId.html
+            return eventData.pointerId < 0;
         }
     }
 }

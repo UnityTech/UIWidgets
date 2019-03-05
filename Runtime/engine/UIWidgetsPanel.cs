@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Unity.UIWidgets.animation;
 using Unity.UIWidgets.async;
 using Unity.UIWidgets.editor;
 using Unity.UIWidgets.foundation;
@@ -10,11 +9,10 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using RawImage = UnityEngine.UI.RawImage;
 using Rect = UnityEngine.Rect;
-using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace Unity.UIWidgets.engine {
     public class UIWidgetWindowAdapter : WindowAdapter {
-        readonly WidgetCanvas _widgetCanvas;
+        readonly UIWidgetsPanel _uiWidgetsPanel;
         bool _needsPaint;
 
         protected override void updateSafeArea() {
@@ -30,8 +28,8 @@ namespace Unity.UIWidgets.engine {
             this._needsPaint = true;
         }
 
-        public UIWidgetWindowAdapter(WidgetCanvas widgetCanvas) {
-            this._widgetCanvas = widgetCanvas;
+        public UIWidgetWindowAdapter(UIWidgetsPanel uiWidgetsPanel) {
+            this._uiWidgetsPanel = uiWidgetsPanel;
         }
 
 
@@ -52,21 +50,21 @@ namespace Unity.UIWidgets.engine {
         }
 
         protected override Surface createSurface() {
-            return new EditorWindowSurface(this._widgetCanvas.applyRenderTexture);
+            return new EditorWindowSurface(this._uiWidgetsPanel.applyRenderTexture);
         }
 
         public override GUIContent titleContent {
-            get { return new GUIContent(this._widgetCanvas.gameObject.name); }
+            get { return new GUIContent(this._uiWidgetsPanel.gameObject.name); }
         }
 
         protected override float queryDevicePixelRatio() {
-            return this._widgetCanvas.devicePixelRatio;
+            return this._uiWidgetsPanel.devicePixelRatio;
         }
 
         protected override Vector2 queryWindowSize() {
-            var rect = RectTransformUtility.PixelAdjustRect(this._widgetCanvas.rectTransform,
-                this._widgetCanvas.canvas);
-            var size = new Vector2(rect.width, rect.height) / this._widgetCanvas.devicePixelRatio;
+            var rect = this._uiWidgetsPanel.rectTransform.rect;
+            var size = new Vector2(rect.width,rect.height) * 
+                       this._uiWidgetsPanel.canvas.scaleFactor / this._uiWidgetsPanel.devicePixelRatio;
             size.x = Mathf.Round(size.x);
             size.y = Mathf.Round(size.y);
             return size;
@@ -74,7 +72,7 @@ namespace Unity.UIWidgets.engine {
     }
 
     [RequireComponent(typeof(RectTransform))]
-    public abstract class WidgetCanvas : RawImage, IPointerDownHandler, IPointerUpHandler, IDragHandler,
+    public class UIWidgetsPanel : RawImage, IPointerDownHandler, IPointerUpHandler, IDragHandler,
         IPointerEnterHandler, IPointerExitHandler {
         static Event _repaintEvent;
 
@@ -82,7 +80,12 @@ namespace Unity.UIWidgets.engine {
         WindowAdapter _windowAdapter;
         Texture _texture;
         Vector2 _lastMouseMove;
-        bool _mouseEntered;
+
+        HashSet<int> _enteredPointers;
+
+        bool _mouseEntered {
+            get { return !this._enteredPointers.isEmpty(); }
+        }
 
         readonly ScrollInput _scrollInput = new ScrollInput();
         DisplayMetrics _displayMetrics;
@@ -92,7 +95,7 @@ namespace Unity.UIWidgets.engine {
         protected override void OnEnable() {
             base.OnEnable();
 
-            //Disable touch -> mouse event on mobile devices
+            //Disable the default touch -> mouse event conversion on mobile devices
             Input.simulateMouseWithTouches = false;
 
             this._displayMetrics = DisplayMetricsProvider.provider();
@@ -105,18 +108,15 @@ namespace Unity.UIWidgets.engine {
             this._windowAdapter = new UIWidgetWindowAdapter(this);
 
             this._windowAdapter.OnEnable();
-            var root = new WidgetsApp(
-                home: this.getWidget(),
-                window: this._windowAdapter,
-                routes: this.routes,
-                textStyle: this.textStyle,
-                pageRouteBuilder: this.pageRouteBuilder,
-                onGenerateRoute: this.onGenerateRoute,
-                onUnknownRoute: this.onUnknownRoute);
 
-
-            this._windowAdapter.attachRootWidget(root);
+            Widget root;
+            using (this._windowAdapter.getScope()) {
+                root = this.createWidget();
+            }
+            this._windowAdapter.attachRootWidget(root);   
             this._lastMouseMove = Input.mousePosition;
+
+            this._enteredPointers = new HashSet<int>();
         }
 
         public float devicePixelRatio {
@@ -127,37 +127,6 @@ namespace Unity.UIWidgets.engine {
             }
         }
 
-        protected virtual Dictionary<string, WidgetBuilder> routes {
-            get { return null; }
-        }
-
-        protected virtual string initialRoute {
-            get { return null; }
-        }
-
-        protected virtual RouteFactory onGenerateRoute {
-            get { return null; }
-        }
-
-        protected virtual RouteFactory onUnknownRoute {
-            get { return null; }
-        }
-
-        protected virtual TextStyle textStyle {
-            get { return null; }
-        }
-
-        protected virtual PageRouteFactory pageRouteBuilder {
-            get {
-                return (RouteSettings settings, WidgetBuilder builder) =>
-                    new PageRouteBuilder(
-                        settings: settings,
-                        pageBuilder: (BuildContext context, Animation<float> animation,
-                            Animation<float> secondaryAnimation) => builder(context)
-                    );
-            }
-        }
-
         protected override void OnDisable() {
             D.assert(this._windowAdapter != null);
             this._windowAdapter.OnDisable();
@@ -165,7 +134,7 @@ namespace Unity.UIWidgets.engine {
             base.OnDisable();
         }
 
-        protected virtual Widget getWidget() {
+        protected virtual Widget createWidget() {
             return null;
         }
 
@@ -180,19 +149,13 @@ namespace Unity.UIWidgets.engine {
                 this.unfocusIfNeeded();
             }
 
-#if UNITY_IOS || UNITY_ANDROID
-            if (this._mouseEntered && Input.touchCount != 0) {
-                this.handleTouchMove();
+            if (this._mouseEntered) {
+                if (this._lastMouseMove.x != Input.mousePosition.x || this._lastMouseMove.y != Input.mousePosition.y) {
+                    this.handleMouseMovement();
+                }
             }
-#else
-            if (this._mouseEntered && (this._lastMouseMove.x != Input.mousePosition.x ||
-                                       this._lastMouseMove.y != Input.mousePosition.y)) {
-                this.handleMouseMove();
-            }
-#endif
 
             this._lastMouseMove = Input.mousePosition;
-
 
             if (this._mouseEntered) {
                 this.handleMouseScroll();
@@ -210,26 +173,7 @@ namespace Unity.UIWidgets.engine {
             }
         }
 
-        void handleTouchMove() {
-            for (var touchIndex = 0; touchIndex < Input.touchCount; touchIndex++) {
-                var touchEvent = Input.GetTouch(touchIndex);
-                if (touchEvent.phase != TouchPhase.Moved) {
-                    continue;
-                }
-
-                var pos = this.getPointPosition(touchEvent.position);
-                this._windowAdapter.postPointerEvent(new PointerData(
-                    timeStamp: Timer.timespanSinceStartup,
-                    change: PointerChange.hover,
-                    kind: PointerDeviceKind.touch,
-                    device: InputUtils.getTouchFingerKey(touchEvent.fingerId),
-                    physicalX: pos.x,
-                    physicalY: pos.y
-                ));
-            }
-        }
-
-        void handleMouseMove() {
+        void handleMouseMovement() {
             var pos = this.getPointPosition(Input.mousePosition);
             this._windowAdapter.postPointerEvent(new PointerData(
                 timeStamp: Timer.timespanSinceStartup,
@@ -283,7 +227,7 @@ namespace Unity.UIWidgets.engine {
             this._windowAdapter.postPointerEvent(new PointerData(
                 timeStamp: Timer.timespanSinceStartup,
                 change: PointerChange.down,
-                kind: InputUtils.getPointerDeviceKind(),
+                kind: InputUtils.getPointerDeviceKind(eventData),
                 device: InputUtils.getPointerDeviceKey(eventData),
                 physicalX: position.x,
                 physicalY: position.y
@@ -295,7 +239,7 @@ namespace Unity.UIWidgets.engine {
             this._windowAdapter.postPointerEvent(new PointerData(
                 timeStamp: Timer.timespanSinceStartup,
                 change: PointerChange.up,
-                kind: InputUtils.getPointerDeviceKind(),
+                kind: InputUtils.getPointerDeviceKind(eventData),
                 device: InputUtils.getPointerDeviceKey(eventData),
                 physicalX: position.x,
                 physicalY: position.y
@@ -334,7 +278,7 @@ namespace Unity.UIWidgets.engine {
             this._windowAdapter.postPointerEvent(new PointerData(
                 timeStamp: Timer.timespanSinceStartup,
                 change: PointerChange.move,
-                kind: InputUtils.getPointerDeviceKind(),
+                kind: InputUtils.getPointerDeviceKind(eventData),
                 device: InputUtils.getPointerDeviceKey(eventData),
                 physicalX: position.x,
                 physicalY: position.y
@@ -342,27 +286,31 @@ namespace Unity.UIWidgets.engine {
         }
 
         public void OnPointerEnter(PointerEventData eventData) {
-            this._mouseEntered = true;
+            var pointerKey = InputUtils.getPointerDeviceKey(eventData);
+            this._enteredPointers.Add(pointerKey);
+
             this._lastMouseMove = eventData.position;
             var position = this.getPointPosition(eventData);
             this._windowAdapter.postPointerEvent(new PointerData(
                 timeStamp: Timer.timespanSinceStartup,
                 change: PointerChange.hover,
-                kind: InputUtils.getPointerDeviceKind(),
-                device: InputUtils.getPointerDeviceKey(eventData),
+                kind: InputUtils.getPointerDeviceKind(eventData),
+                device: pointerKey,
                 physicalX: position.x,
                 physicalY: position.y
             ));
         }
 
         public void OnPointerExit(PointerEventData eventData) {
-            this._mouseEntered = false;
+            var pointerKey = InputUtils.getPointerDeviceKey(eventData);
+            this._enteredPointers.Remove(pointerKey);
+
             var position = this.getPointPosition(eventData);
             this._windowAdapter.postPointerEvent(new PointerData(
                 timeStamp: Timer.timespanSinceStartup,
                 change: PointerChange.hover,
-                kind: InputUtils.getPointerDeviceKind(),
-                device: InputUtils.getPointerDeviceKey(eventData),
+                kind: InputUtils.getPointerDeviceKind(eventData),
+                device: pointerKey,
                 physicalX: position.x,
                 physicalY: position.y
             ));
