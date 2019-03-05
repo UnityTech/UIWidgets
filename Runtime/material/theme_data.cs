@@ -51,6 +51,7 @@ namespace Unity.UIWidgets.material {
             IconThemeData primaryIconTheme = null,
             IconThemeData accentIconTheme = null,
             MaterialTapTargetSize? materialTapTargetSize = null,
+            PageTransitionsTheme pageTransitionsTheme = null,
             ColorScheme colorScheme = null,
             Typography typography = null
         ) {
@@ -100,6 +101,7 @@ namespace Unity.UIWidgets.material {
             hintColor = hintColor ?? (isDark ? new Color(0x80FFFFFF) : new Color(0x8A000000));
             errorColor = errorColor ?? Colors.red[700];
 
+            pageTransitionsTheme = pageTransitionsTheme ?? new PageTransitionsTheme();
             primaryIconTheme = primaryIconTheme ??
                                (primaryIsDark
                                    ? new IconThemeData(color: Colors.white)
@@ -179,6 +181,7 @@ namespace Unity.UIWidgets.material {
             D.assert(primaryIconTheme != null);
             D.assert(accentIconTheme != null);
             D.assert(materialTapTargetSize != null);
+            D.assert(pageTransitionsTheme != null);
             D.assert(colorScheme != null);
             D.assert(typography != null);
 
@@ -221,6 +224,7 @@ namespace Unity.UIWidgets.material {
             this.primaryIconTheme = primaryIconTheme;
             this.accentIconTheme = accentIconTheme;
             this.materialTapTargetSize = materialTapTargetSize ?? MaterialTapTargetSize.padded;
+            this.pageTransitionsTheme = pageTransitionsTheme;
             this.colorScheme = colorScheme;
             this.typography = typography;
         }
@@ -263,6 +267,7 @@ namespace Unity.UIWidgets.material {
             IconThemeData primaryIconTheme,
             IconThemeData accentIconTheme,
             MaterialTapTargetSize? materialTapTargetSize,
+            PageTransitionsTheme pageTransitionsTheme,
             ColorScheme colorScheme,
             Typography typography
         ) {
@@ -302,6 +307,7 @@ namespace Unity.UIWidgets.material {
             D.assert(primaryIconTheme != null);
             D.assert(accentIconTheme != null);
             D.assert(materialTapTargetSize != null);
+            D.assert(pageTransitionsTheme != null);
             D.assert(colorScheme != null);
             D.assert(typography != null);
 
@@ -345,6 +351,7 @@ namespace Unity.UIWidgets.material {
                 primaryIconTheme: primaryIconTheme,
                 accentIconTheme: accentIconTheme,
                 materialTapTargetSize: materialTapTargetSize,
+                pageTransitionsTheme: pageTransitionsTheme,
                 colorScheme: colorScheme,
                 typography: typography);
         }
@@ -436,6 +443,8 @@ namespace Unity.UIWidgets.material {
 
         public readonly MaterialTapTargetSize materialTapTargetSize;
 
+        public readonly PageTransitionsTheme pageTransitionsTheme;
+
         public readonly ColorScheme colorScheme;
 
         public readonly Typography typography;
@@ -478,6 +487,7 @@ namespace Unity.UIWidgets.material {
             IconThemeData primaryIconTheme,
             IconThemeData accentIconTheme,
             MaterialTapTargetSize? materialTapTargetSize,
+            PageTransitionsTheme pageTransitionsTheme,
             ColorScheme colorScheme,
             Typography typography
         ) {
@@ -519,6 +529,7 @@ namespace Unity.UIWidgets.material {
                 primaryIconTheme: primaryIconTheme ?? this.primaryIconTheme,
                 accentIconTheme: accentIconTheme ?? this.accentIconTheme,
                 materialTapTargetSize: materialTapTargetSize ?? this.materialTapTargetSize,
+                pageTransitionsTheme: pageTransitionsTheme ?? this.pageTransitionsTheme,
                 colorScheme: colorScheme ?? this.colorScheme,
                 typography: typography ?? this.typography
             );
@@ -576,6 +587,7 @@ namespace Unity.UIWidgets.material {
                 primaryIconTheme: IconThemeData.lerp(a.primaryIconTheme, b.primaryIconTheme, t),
                 accentIconTheme: IconThemeData.lerp(a.accentIconTheme, b.accentIconTheme, t),
                 materialTapTargetSize: t < 0.5 ? a.materialTapTargetSize : b.materialTapTargetSize,
+                pageTransitionsTheme: t < 0.5 ? a.pageTransitionsTheme : b.pageTransitionsTheme,
                 colorScheme: ColorScheme.lerp(a.colorScheme, b.colorScheme, t),
                 typography: Typography.lerp(a.typography, b.typography, t)
             );
@@ -627,6 +639,7 @@ namespace Unity.UIWidgets.material {
                    other.primaryIconTheme == this.primaryIconTheme &&
                    other.accentIconTheme == this.accentIconTheme &&
                    other.materialTapTargetSize == this.materialTapTargetSize &&
+                   other.pageTransitionsTheme == this.pageTransitionsTheme &&
                    other.colorScheme == this.colorScheme &&
                    other.typography == this.typography;
         }
@@ -694,6 +707,7 @@ namespace Unity.UIWidgets.material {
                 hashCode = (hashCode * 397) ^ this.primaryIconTheme.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.accentIconTheme.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.materialTapTargetSize.GetHashCode();
+                hashCode = (hashCode * 397) ^ this.pageTransitionsTheme.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.colorScheme.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.typography.GetHashCode();
                 return hashCode;
@@ -764,6 +778,8 @@ namespace Unity.UIWidgets.material {
             properties.add(new DiagnosticsProperty<IconThemeData>("accentIconTheme", this.accentIconTheme));
             properties.add(
                 new DiagnosticsProperty<MaterialTapTargetSize>("materialTapTargetSize", this.materialTapTargetSize));
+            properties.add(
+                new DiagnosticsProperty<PageTransitionsTheme>("pageTransitionsTheme", this.pageTransitionsTheme));
             properties.add(new DiagnosticsProperty<ColorScheme>("colorScheme", this.colorScheme,
                 defaultValue: defaultData.colorScheme));
             properties.add(new DiagnosticsProperty<Typography>("typography", this.typography,

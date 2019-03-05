@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.material;
 using Unity.UIWidgets.painting;
-using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
 using UnityEngine;
 using Color = Unity.UIWidgets.ui.Color;
@@ -18,9 +17,8 @@ namespace UIWidgetsSample {
         };
 
         protected override Widget createWidget() {
-            return new WidgetsApp(
-                home: this.testCases[this.testCaseId],
-                pageRouteBuilder: this.pageRouteBuilder);
+            return new MaterialApp(
+                home: this.testCases[this.testCaseId]);
         }
     }
 
