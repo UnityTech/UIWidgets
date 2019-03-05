@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
     public interface Canvas {
@@ -243,7 +244,35 @@ namespace Unity.UIWidgets.ui {
 
         public void drawArc(Rect rect, float startAngle, float sweepAngle, bool useCenter, Paint paint) {
             var path = new Path();
-            //path.(c.dx, c.dy, radius);
+
+            if (useCenter) {
+                var center = rect.center;
+                path.moveTo(center.dx, center.dy);                
+            }
+
+            bool forceMoveTo = !useCenter;
+            while (sweepAngle <= -Mathf.PI * 2) {
+                path.addArc(rect, startAngle, -Mathf.PI, forceMoveTo);
+                startAngle -= Mathf.PI;
+                path.addArc(rect, startAngle, -Mathf.PI, false);
+                startAngle -= Mathf.PI;
+                forceMoveTo = false;
+                sweepAngle += Mathf.PI * 2;
+            }
+            
+            while (sweepAngle >= Mathf.PI * 2) {
+                path.addArc(rect, startAngle, Mathf.PI, forceMoveTo);
+                startAngle += Mathf.PI;
+                path.addArc(rect, startAngle, Mathf.PI, false);
+                startAngle += Mathf.PI;
+                forceMoveTo = false;
+                sweepAngle -= Mathf.PI * 2;
+            }
+
+            path.addArc(rect, startAngle, sweepAngle, forceMoveTo);
+            if (useCenter) {
+                path.close();
+            }
 
             this._recorder.addDrawCmd(new DrawPath {
                 path = path,
