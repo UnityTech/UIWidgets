@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Unity.UIWidgets.animation;
-using Unity.UIWidgets.engine;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
@@ -10,24 +9,19 @@ using Unity.UIWidgets.widgets;
 using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace UIWidgetsSample {
-    public class NavigationCanvas : WidgetCanvas {
-        protected override string initialRoute {
-            get { return "/"; }
-        }
+    public class NavigationSample : UIWidgetsSamplePanel {
 
-        protected override Dictionary<string, WidgetBuilder> routes {
-            get {
-                return new Dictionary<string, WidgetBuilder> {
+        protected override Widget createWidget() {
+            return new WidgetsApp(
+                initialRoute: "/",
+                textStyle: new TextStyle(fontSize: 24),
+                pageRouteBuilder: this.pageRouteBuilder,
+                routes: new Dictionary<string, WidgetBuilder> {
                     {"/", (context) => new HomeScreen()},
                     {"/detail", (context) => new DetailScreen()}
-                };
-            }
+                });
         }
-
-        protected override TextStyle textStyle {
-            get { return new TextStyle(fontSize: 24); }
-        }
-
+        
         protected override PageRouteFactory pageRouteBuilder {
             get {
                 return (RouteSettings settings, WidgetBuilder builder) =>
