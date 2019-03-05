@@ -1,10 +1,13 @@
+#if UNITY_EDITOR
+
 using System;
 using System.Collections;
 using System.Reflection;
 using Unity.UIWidgets.engine;
-using UnityEditor;
 using UnityEngine;
 
+
+using UnityEditor;
 namespace Unity.UIWidgets.Editor {
     [InitializeOnLoad]
     public class EditorUtils {
@@ -113,3 +116,5 @@ namespace Unity.UIWidgets.Editor {
         }
     }
 }
+
+#endif
