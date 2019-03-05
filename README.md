@@ -95,18 +95,13 @@ in Unity Editor.
             protected override Widget createWidget() {
                 return new WidgetsApp(
                     home: new ExampleApp(),
-                    pageRouteBuilder: this.pageRouteBuilder);
-            }
-    
-            protected virtual PageRouteFactory pageRouteBuilder {
-                get {
-                    return (RouteSettings settings, WidgetBuilder builder) =>
+                    pageRouteBuilder: (RouteSettings settings, WidgetBuilder builder) =>
                         new PageRouteBuilder(
                             settings: settings,
                             pageBuilder: (BuildContext context, Animation<float> animation,
                                 Animation<float> secondaryAnimation) => builder(context)
-                        );
-                }
+                        )
+                );
             }
     
             class ExampleApp : StatefulWidget {
