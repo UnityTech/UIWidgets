@@ -284,6 +284,169 @@ namespace Unity.UIWidgets.ui {
             this.addEllipse(center.dx, center.dy, oval.width / 2, oval.height / 2);
         }
 
+        public void arcTo(float x1, float y1, float x2, float y2, float radius) {
+            var x0 = this._commandx;
+            var y0 = this._commandy;
+
+            // Calculate tangential circle to lines (x0,y0)-(x1,y1) and (x1,y1)-(x2,y2).
+            float dx0 = x0 - x1;
+            float dy0 = y0 - y1;
+            float dx1 = x2 - x1;
+            float dy1 = y2 - y1;
+            PathUtils.normalize(ref dx0, ref dy0);
+            PathUtils.normalize(ref dx1, ref dy1);
+            float a = Mathf.Acos(dx0 * dx1 + dy0 * dy1);
+            float d = radius / Mathf.Tan(a / 2.0f);
+
+            if (d > 10000.0f) {
+                this.lineTo(x1, y1);
+                return;
+            }
+
+            float cx, cy, a0, a1;
+            PathWinding dir;
+            float cross = dx1 * dy0 - dx0 * dy1;
+            if (cross > 0.0f) {
+                cx = x1 + dx0 * d + dy0 * radius;
+                cy = y1 + dy0 * d + -dx0 * radius;
+                a0 = Mathf.Atan2(dx0, -dy0);
+                a1 = Mathf.Atan2(-dx1, dy1);
+                dir = PathWinding.clockwise;
+            } else {
+                cx = x1 + dx0 * d + -dy0 * radius;
+                cy = y1 + dy0 * d + dx0 * radius;
+                a0 = Mathf.Atan2(-dx0, dy0);
+                a1 = Mathf.Atan2(dx1, -dy1);
+                dir = PathWinding.counterClockwise;
+            }
+
+            this.addArc(cx, cy, radius, a0, a1, dir);
+        }
+
+        public void addArc(Rect rect, float startAngle, float sweepAngle, bool forceMoveTo = true) {
+            var mat = Matrix3.makeScale(rect.width / 2, rect.height / 2);
+            var center = rect.center;
+            mat.postTranslate(center.dx, center.dy);
+
+            var vals = this._getArcCommands(0, 0, 1, startAngle, startAngle + sweepAngle,
+                sweepAngle >= 0 ? PathWinding.clockwise : PathWinding.counterClockwise, forceMoveTo);
+
+            this._transformCommands(vals, mat);
+            this._appendCommands(vals.ToArray());
+        }
+
+        void _transformCommands(List<float> commands, Matrix3 mat) {
+            if (mat == null) {
+                return;
+            }
+            
+            var i = 0;
+            while (i < commands.Count) {
+                var cmd = (PathCommand) commands[i];
+                switch (cmd) {
+                    case PathCommand.moveTo:
+                    case PathCommand.lineTo:
+                        var res = mat.mapXY(commands[i + 1], commands[i + 2]);
+                        commands[i + 1] = res.dx;
+                        commands[i + 2] = res.dy;
+                        i += 3;
+                        break;
+                    case PathCommand.bezierTo:
+                        var res1 = mat.mapXY(commands[i + 1], commands[i + 2]);
+                        commands[i + 1] = res1.dx;
+                        commands[i + 2] = res1.dy;
+                        var res2 = mat.mapXY(commands[i + 3], commands[i + 4]);
+                        commands[i + 3] = res2.dx;
+                        commands[i + 4] = res2.dy;
+                        var res3 = mat.mapXY(commands[i + 5], commands[i + 6]);
+                        commands[i + 5] = res3.dx;
+                        commands[i + 6] = res3.dy;
+                        i += 7;
+                        break;
+                    case PathCommand.close:
+                        i++;
+                        break;
+                    case PathCommand.winding:
+                        i += 2;
+                        break;
+                    default:
+                        D.assert(false, "unknown cmd: " + cmd);
+                        break;
+                }
+            }
+
+        }
+        
+        List<float>  _getArcCommands(float cx, float cy, float r, float a0, float a1, PathWinding dir, bool forceMoveTo) {
+            // Clamp angles
+            float da = a1 - a0;
+            if (dir == PathWinding.clockwise) {
+                if (Mathf.Abs(da) >= Mathf.PI * 2) {
+                    da = Mathf.PI * 2;
+                } else {
+                    while (da < 0.0f) {
+                        da += Mathf.PI * 2;
+                    }
+                }
+            } else {
+                if (Mathf.Abs(da) >= Mathf.PI * 2) {
+                    da = -Mathf.PI * 2;
+                } else {
+                    while (da > 0.0f) {
+                        da -= Mathf.PI * 2;
+                    }
+                }
+            }
+
+            // Split arc into max 90 degree segments.
+            int ndivs = Mathf.Max(1, Mathf.Min((int) (Mathf.Abs(da) / (Mathf.PI * 0.5f) + 0.5f), 5));
+            float hda = (da / ndivs) / 2.0f;
+            float kappa = Mathf.Abs(4.0f / 3.0f * (1.0f - Mathf.Cos(hda)) / Mathf.Sin(hda));
+
+            if (dir == PathWinding.counterClockwise) {
+                kappa = -kappa;
+            }
+
+            PathCommand move = (forceMoveTo || this._commands.Count == 0) ? PathCommand.moveTo : PathCommand.lineTo;
+            float px = 0, py = 0, ptanx = 0, ptany = 0;
+
+            List<float> vals = new List<float>();
+            for (int i = 0; i <= ndivs; i++) {
+                float a = a0 + da * (i / (float) ndivs);
+                float dx = Mathf.Cos(a);
+                float dy = Mathf.Sin(a);
+                float x = cx + dx * r;
+                float y = cy + dy * r;
+                float tanx = -dy * r * kappa;
+                float tany = dx * r * kappa;
+
+                if (i == 0) {
+                    vals.Add((float) move);
+                    vals.Add(x);
+                    vals.Add(y);
+                } else {
+                    vals.Add((float) PathCommand.bezierTo);
+                    vals.Add(px + ptanx);
+                    vals.Add(py + ptany);
+                    vals.Add(x - tanx);
+                    vals.Add(y - tany);
+                    vals.Add(x);
+                    vals.Add(y);
+                }
+                px = x;
+                py = y;
+                ptanx = tanx;
+                ptany = tany;
+            }
+
+            return vals;
+        }
+        
+        public void addArc(float cx, float cy, float r, float a0, float a1, PathWinding dir, bool forceMoveTo = true) {
+            var vals = this._getArcCommands(cx, cy, r, a0, a1, dir, forceMoveTo);
+            this._appendCommands(vals.ToArray());
+        }
+
         public void addPolygon(IList<Offset> points, bool close) {
             D.assert(points != null);
             if (points.Count == 0) {

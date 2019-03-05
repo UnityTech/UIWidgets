@@ -60,6 +60,7 @@ namespace UIWidgets.Tests {
                 this.clipRRect,
                 this.saveLayer,
                 this.drawLine,
+                this.drawParagraph,
             };
             this._optionStrings = this._options.Select(x => x.Method.Name).ToArray();
             this._selected = 0;
@@ -248,6 +249,10 @@ namespace UIWidgets.Tests {
                 new Offset(90, 10),
                 paint);
 
+
+            canvas.drawArc(Unity.UIWidgets.ui.Rect.fromLTWH(200, 200, 100, 100), Mathf.PI / 4,
+                -Mathf.PI / 2 + Mathf.PI * 4 - 1, true, paint);
+
             paint.maskFilter = MaskFilter.blur(BlurStyle.normal, 1);
             paint.strokeWidth = 4;
 
@@ -414,6 +419,17 @@ namespace UIWidgets.Tests {
             editorCanvas.flush();
         }
 
+        void drawParagraph() {
+            var pb = new ParagraphBuilder(new ParagraphStyle{});
+            pb.addText("Hello drawParagraph");
+            var paragraph = pb.build();
+            paragraph.layout(new ParagraphConstraints(width:300));
+            var canvas = new CommandBufferCanvas(this._renderTexture, Window.instance.devicePixelRatio,
+                this._meshPool);
+            canvas.drawParagraph(paragraph, new Offset(10f, 100f));
+            canvas.flush();
+        }
+        
         void drawImageRect() {
             if (this._stream == null || this._stream.completer == null || this._stream.completer.currentImage == null) {
                 return;

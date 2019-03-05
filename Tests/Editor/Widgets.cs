@@ -90,7 +90,7 @@ namespace UIWidgets.Tests {
         }
 
         void _attachRootWidget(Widget widget) {
-            this.windowAdapter.attachRootWidget(new WidgetsApp(window: this.windowAdapter, home: widget,
+            this.windowAdapter.attachRootWidget(() => new WidgetsApp(home: widget,
                 pageRouteBuilder: (RouteSettings settings, WidgetBuilder builder) =>
                     new PageRouteBuilder(
                         settings: settings,

@@ -8,11 +8,14 @@ using Unity.UIWidgets.widgets;
 using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace UIWidgetsSample {
-    public class DividerButtonCanvas : WidgetCanvas {
-        protected override Widget getWidget() {
-            return new DemoApp();
+    public class DividerButton : UIWidgetsSamplePanel {
+        
+        protected override Widget createWidget() {
+            return new WidgetsApp(
+                home: new DemoApp(),
+                pageRouteBuilder: this.pageRouteBuilder);
         }
-
+        
         public class DemoApp : StatefulWidget {
             public DemoApp(Key key = null) : base(key) {
             }

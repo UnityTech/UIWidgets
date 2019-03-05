@@ -1,15 +1,15 @@
 using System.Collections.Generic;
-using Unity.UIWidgets.engine;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.material;
 using Unity.UIWidgets.painting;
+using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
 using UnityEngine;
 using Color = Unity.UIWidgets.ui.Color;
 using Material = Unity.UIWidgets.material.Material;
 
 namespace UIWidgetsSample {
-    public class MaterialCanvas : WidgetCanvas {
+    public class MaterialSample : UIWidgetsSamplePanel {
         int testCaseId = 0;
 
         List<Widget> testCases = new List<Widget> {
@@ -17,8 +17,10 @@ namespace UIWidgetsSample {
             new MaterialInkWellWidget()
         };
 
-        protected override Widget getWidget() {
-            return this.testCases[this.testCaseId];
+        protected override Widget createWidget() {
+            return new WidgetsApp(
+                home: this.testCases[this.testCaseId],
+                pageRouteBuilder: this.pageRouteBuilder);
         }
     }
 

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Unity.UIWidgets.engine;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.material;
 using Unity.UIWidgets.painting;
@@ -12,11 +11,12 @@ using Color = Unity.UIWidgets.ui.Color;
 using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace UIWidgetsSample {
-    public class TextInputCanvas : WidgetCanvas {
-        public class TextInputSample : StatefulWidget {
+    public class TextInputSample : UIWidgetsSamplePanel {
+        
+        class _TextInputSample : StatefulWidget {
             public readonly string title;
 
-            public TextInputSample(Key key = null, string title = null) : base(key) {
+            public _TextInputSample(Key key = null, string title = null) : base(key) {
                 this.title = title;
             }
 
@@ -25,12 +25,14 @@ namespace UIWidgetsSample {
             }
         }
 
-        protected override Widget getWidget() {
-            return new EditableInputTypeWidget();
-            // return new TextInputSample(key: null, title: this.gameObject.name);
+        protected override Widget createWidget()  {
+            return new WidgetsApp(
+                home: new EditableInputTypeWidget(),
+                pageRouteBuilder: this.pageRouteBuilder);
         }
+        
 
-        class _TextInputSampleState : State<TextInputSample> {
+        class _TextInputSampleState : State<_TextInputSample> {
             TextEditingController titleController = new TextEditingController("");
             TextEditingController descController = new TextEditingController("");
             FocusNode _titleFocusNode;
