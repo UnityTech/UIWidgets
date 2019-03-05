@@ -6,6 +6,7 @@ using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
 using UnityEngine;
 using Color = Unity.UIWidgets.ui.Color;
+using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace Unity.UIWidgets.material {
     public static class ThemeDataUtils {
@@ -175,5 +176,17 @@ namespace Unity.UIWidgets.material {
     public static class TooltipUtils {
         public static readonly TimeSpan _kFadeDuration = new TimeSpan(0, 0, 0, 0, 200);
         public static readonly TimeSpan _kShowDuration = new TimeSpan(0, 0, 0, 0, 1500);
+    }
+
+    public static class AppUtils {
+        public static readonly TextStyle _errorTextStyle = new TextStyle(
+            color: new Color(0xD0FF0000),
+            fontFamily: "monospace",
+            fontSize: 48.0f,
+            fontWeight: FontWeight.w700,
+            decoration: TextDecoration.underline,
+            decorationColor: new Color(0xFFFFFF00),
+            decorationStyle: TextDecorationStyle.doubleLine
+        );
     }
 }
