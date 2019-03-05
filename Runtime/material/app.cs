@@ -116,7 +116,6 @@ namespace Unity.UIWidgets.material {
                     onGenerateRoute: this.widget.onGenerateRoute,
                     onUnknownRoute: this.widget.onUnknownRoute,
                     builder: this.widget.builder,
-                    window: this.widget.window,
                     textStyle: AppUtils._errorTextStyle
                 )
             );
