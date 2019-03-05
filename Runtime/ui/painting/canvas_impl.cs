@@ -208,6 +208,10 @@ namespace Unity.UIWidgets.ui {
         }
         
         bool _applyClip(Rect queryBounds) {
+            if (queryBounds == null || queryBounds.isEmpty) {
+                return false;
+            }
+
             var layer = this._currentLayer;
             var layerBounds = layer.layerBounds;
             ReducedClip reducedClip = new ReducedClip(layer.clipStack, layerBounds, queryBounds);
@@ -743,7 +747,8 @@ namespace Unity.UIWidgets.ui {
                         if (cmd.textMesh != null) {
                             mesh = cmd.textMesh.resovleMesh();
                         }
-  
+                        
+                        D.assert(mesh.vertices.Count > 0);  
                         cmd.meshObj.SetVertices(mesh.vertices);
                         cmd.meshObj.SetTriangles(mesh.triangles, 0, false);
                         cmd.meshObj.SetUVs(0, mesh.uv);

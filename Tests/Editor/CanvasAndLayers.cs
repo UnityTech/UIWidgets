@@ -249,6 +249,10 @@ namespace UIWidgets.Tests {
                 new Offset(90, 10),
                 paint);
 
+
+            canvas.drawArc(Unity.UIWidgets.ui.Rect.fromLTWH(200, 200, 100, 100), Mathf.PI / 4,
+                -Mathf.PI / 2 + Mathf.PI * 4 - 1, true, paint);
+
             paint.maskFilter = MaskFilter.blur(BlurStyle.normal, 1);
             paint.strokeWidth = 4;
 
