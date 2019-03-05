@@ -6,7 +6,7 @@ using Unity.UIWidgets.widgets;
 
 namespace UIWidgetsSample {
     public class ScrollbarSample : UIWidgetsSamplePanel {
-        protected override Widget createWidget(Window window) {
+        protected override Widget createWidget() {
             var scroll = new Container(
                 decoration: new BoxDecoration(
                     border: Border.all(color: new Color(0xFFFFFF00))
@@ -38,8 +38,7 @@ namespace UIWidgetsSample {
             );
             return new WidgetsApp(
                 home: scroll,
-                pageRouteBuilder: this.pageRouteBuilder,
-                window: window);
+                pageRouteBuilder: this.pageRouteBuilder);
         }
     }
 }

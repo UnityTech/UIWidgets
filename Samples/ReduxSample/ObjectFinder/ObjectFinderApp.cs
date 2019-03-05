@@ -14,14 +14,13 @@ namespace Unity.UIWidgets.Sample.Redux.ObjectFinder {
         public ObjectFinderApp() {
         }
 
-        protected override Widget createWidget(Window window)  {
+        protected override Widget createWidget()  {
             return new WidgetsApp(
-                home: new StoreProvider<FinderAppState>(StoreProvider.store, this.createWidget()),
-                pageRouteBuilder: this.pageRouteBuilder,
-                window: window);
+                home: new StoreProvider<FinderAppState>(StoreProvider.store, this.createRootWidget()),
+                pageRouteBuilder: this.pageRouteBuilder);
         }
 
-        Widget createWidget() {
+        Widget createRootWidget() {
             return new StoreConnector<FinderAppState, ObjectFinderAppWidgetModel>(
                 (context, viewModel) => new ObjectFinderAppWidget(
                     viewModel, this.gameObject.name

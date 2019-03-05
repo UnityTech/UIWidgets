@@ -33,13 +33,11 @@ namespace Unity.UIWidgets.widgets {
             string initialRoute = null,
             Dictionary<string, WidgetBuilder> routes = null,
             TransitionBuilder builder = null,
-            Window window = null,
             TextStyle textStyle = null,
             Widget home = null
         ) : base(key) {
-            D.assert(window != null);
             routes = routes ?? new Dictionary<string, WidgetBuilder>();
-            this.window = window;
+            this.window = Window.instance;
             this.home = home;
             this.navigatorKey = navigatorKey;
             this.onGenerateRoute = onGenerateRoute;

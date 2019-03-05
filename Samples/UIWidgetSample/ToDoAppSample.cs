@@ -20,11 +20,10 @@ namespace UIWidgetsSample {
             }
         }
 
-        protected override Widget createWidget(Window window) {
+        protected override Widget createWidget() {
             return new WidgetsApp(
                 home: new ToDoListApp(),
-                pageRouteBuilder: this.pageRouteBuilder,
-                window: window);
+                pageRouteBuilder: this.pageRouteBuilder);
         }
 
         public class CustomButton : StatelessWidget {

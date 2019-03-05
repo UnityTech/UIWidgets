@@ -419,6 +419,12 @@ namespace Unity.UIWidgets.editor {
                 this._binding.attachRootWidget(root);
             }
         }
+        
+        public void attachRootWidget(Func<Widget> root) {
+            using (this.getScope()) {
+                this._binding.attachRootWidget(root());
+            }
+        }
 
         public override TextInput textInput {
             get { return this._textInput; }

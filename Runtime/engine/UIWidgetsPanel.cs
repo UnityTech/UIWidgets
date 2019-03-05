@@ -108,7 +108,12 @@ namespace Unity.UIWidgets.engine {
             this._windowAdapter = new UIWidgetWindowAdapter(this);
 
             this._windowAdapter.OnEnable();
-            this._windowAdapter.attachRootWidget(this.createWidget(this._windowAdapter));
+
+            Widget root;
+            using (this._windowAdapter.getScope()) {
+                root = this.createWidget();
+            }
+            this._windowAdapter.attachRootWidget(root);   
             this._lastMouseMove = Input.mousePosition;
 
             this._enteredPointers = new HashSet<int>();
@@ -129,7 +134,7 @@ namespace Unity.UIWidgets.engine {
             base.OnDisable();
         }
 
-        protected virtual Widget createWidget(Window window) {
+        protected virtual Widget createWidget() {
             return null;
         }
 

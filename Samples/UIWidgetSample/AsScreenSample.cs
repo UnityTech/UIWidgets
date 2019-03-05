@@ -10,11 +10,10 @@ using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace UIWidgetsSample {
     public class AsScreenSample : UIWidgetsSamplePanel {
-        protected override Widget createWidget(Window window) {
+        protected override Widget createWidget() {
             return new WidgetsApp(
                 home: new AsScreenWidget(),
-                pageRouteBuilder: this.pageRouteBuilder,
-                window: window);
+                pageRouteBuilder: this.pageRouteBuilder);
         }
 
         public class AsScreenWidget : StatefulWidget {

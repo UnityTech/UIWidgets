@@ -10,11 +10,10 @@ using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace Unity.UIWidgets.Sample.Redux {
     public class CounterAppSample : UIWidgetsSample.UIWidgetsSamplePanel {
-        protected override Widget createWidget(Window window) {
+        protected override Widget createWidget() {
             return new WidgetsApp(
                 home: new CounterApp(),
-                pageRouteBuilder: this.pageRouteBuilder,
-                window: window);
+                pageRouteBuilder: this.pageRouteBuilder);
         }
     }
 

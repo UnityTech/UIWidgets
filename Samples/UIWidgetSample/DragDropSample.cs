@@ -7,11 +7,11 @@ using UnityEngine;
 
 namespace UIWidgetsSample {
     public class DragDropSample : UIWidgetsSamplePanel {
-        protected override Widget createWidget(Window window) {
+        protected override Widget createWidget() {
             return new WidgetsApp(
                 home: new DragDropApp(),
-                pageRouteBuilder: this.pageRouteBuilder,
-                window: window);
+                pageRouteBuilder: this.pageRouteBuilder
+                );
         }
 
         class DragDropApp : StatefulWidget {

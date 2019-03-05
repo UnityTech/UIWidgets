@@ -11,7 +11,7 @@ using TextStyle = Unity.UIWidgets.painting.TextStyle;
 namespace UIWidgetsSample {
     public class NavigationSample : UIWidgetsSamplePanel {
 
-        protected override Widget createWidget(Window window) {
+        protected override Widget createWidget() {
             return new WidgetsApp(
                 initialRoute: "/",
                 textStyle: new TextStyle(fontSize: 24),
@@ -19,8 +19,7 @@ namespace UIWidgetsSample {
                 routes: new Dictionary<string, WidgetBuilder> {
                     {"/", (context) => new HomeScreen()},
                     {"/detail", (context) => new DetailScreen()}
-                },
-                window: window);
+                });
         }
         
         protected override PageRouteFactory pageRouteBuilder {

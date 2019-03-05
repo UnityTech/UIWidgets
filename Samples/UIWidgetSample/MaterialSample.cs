@@ -17,11 +17,10 @@ namespace UIWidgetsSample {
             new MaterialInkWellWidget()
         };
 
-        protected override Widget createWidget(Window window) {
+        protected override Widget createWidget() {
             return new WidgetsApp(
                 home: this.testCases[this.testCaseId],
-                pageRouteBuilder: this.pageRouteBuilder,
-                window: window);
+                pageRouteBuilder: this.pageRouteBuilder);
         }
     }
 

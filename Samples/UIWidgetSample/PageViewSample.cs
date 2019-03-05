@@ -5,7 +5,7 @@ using Unity.UIWidgets.widgets;
 namespace UIWidgetsSample {
     public class PageViewSample : UIWidgetsSamplePanel {
             
-        protected override Widget createWidget(Window window) {
+        protected override Widget createWidget() {
             return new WidgetsApp(
                 home: new Container(
                 width: 200,
@@ -23,8 +23,7 @@ namespace UIWidgetsSample {
                         )
                     }
                 )),
-                pageRouteBuilder: this.pageRouteBuilder,
-                window: window);
+                pageRouteBuilder: this.pageRouteBuilder);
         }
     }
 }

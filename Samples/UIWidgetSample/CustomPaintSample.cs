@@ -4,14 +4,13 @@ using Unity.UIWidgets.widgets;
 
 namespace UIWidgetsSample {
     public class CustomPaintSample : UIWidgetsSamplePanel {
-        protected override Widget createWidget(Window window) {
+        protected override Widget createWidget() {
             return new WidgetsApp(
                 home: new Unity.UIWidgets.widgets.CustomPaint(
                     child: new Container(width: 300, height: 300, color: new Color(0XFFFFFFFF)),
                     foregroundPainter: new GridPainter(null)
                 ),
-                pageRouteBuilder: this.pageRouteBuilder,
-                window: window);
+                pageRouteBuilder: this.pageRouteBuilder);
         }
     }
 
