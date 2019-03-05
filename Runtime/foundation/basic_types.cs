@@ -123,6 +123,9 @@ namespace Unity.UIWidgets.foundation {
         }
 
         public static string toStringList<T>(this IList<T> it) {
+            if (it == null) {
+                return null;
+            }
             return "{ " + string.Join(", ", it.Select(item => item.ToString())) + " }";
         }
     }

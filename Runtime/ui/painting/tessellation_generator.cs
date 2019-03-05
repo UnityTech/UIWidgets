@@ -103,7 +103,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void touch(long timeTolive = 5) {
-            this._timeToLive = timeTolive + MeshGenerator.frameCount;
+            this._timeToLive = timeTolive + TextBlobMesh.frameCount;
         }
     }
 

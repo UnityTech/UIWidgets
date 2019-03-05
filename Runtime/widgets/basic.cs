@@ -355,6 +355,18 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
+    public class SliverToBoxAdapter : SingleChildRenderObjectWidget {
+        public SliverToBoxAdapter(
+            Key key = null,
+            Widget child = null) : base(key: key, child: child) {
+        }
+
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderSliverToBoxAdapter();
+        }
+    }
+
+
     public class Flex : MultiChildRenderObjectWidget {
         public Flex(
             Axis direction = Axis.vertical,

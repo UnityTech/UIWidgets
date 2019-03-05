@@ -51,6 +51,10 @@ namespace Unity.UIWidgets.debugger {
             window.Show();
         }
 
+        void OnEnable() {
+            this.titleContent = new GUIContent("UIWidgets Inspector");
+        }
+
         void OnGUI() {
             EditorGUILayout.BeginHorizontal(EditorStyles.toolbar, GUILayout.ExpandWidth(true));
             this.DoSelectDropDown();

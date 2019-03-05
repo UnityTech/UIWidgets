@@ -646,16 +646,19 @@ namespace Unity.UIWidgets.ui {
             
             var matrix = new Matrix3(state.matrix);
             matrix.preTranslate(offset.dx, offset.dy);            
-            var mesh = MeshGenerator.generateMesh(textBlob, scale)?.transform(matrix);
-            if (mesh == null) {
-                return;
-            }
+            var mesh = new TextBlobMesh(textBlob, scale, matrix);
             
+            // request font texture so text mesh could be generated correctly
             var font = FontManager.instance.getOrCreate(textBlob.style.fontFamily).font;
+            var style = textBlob.style;
+            var fontSizeToLoad = Mathf.CeilToInt(style.UnityFontSize * scale);
+            var subText = textBlob.text.Substring(textBlob.textOffset, textBlob.textSize);
+            font.RequestCharactersInTexture(subText, fontSizeToLoad, style.UnityFontStyle);
+
             var tex = font.material.mainTexture;
 
             Action<Paint> drawMesh = (Paint p) => {
-                if (!this._applyClip(mesh.bounds)) {
+                if (!this._applyClip(textBlob.bounds)) {
                     return;
                 }
 
@@ -664,7 +667,7 @@ namespace Unity.UIWidgets.ui {
             };
 
             if (paint.maskFilter != null && paint.maskFilter.sigma != 0) {
-                this._drawWithMaskFilter(mesh.bounds, drawMesh, paint, paint.maskFilter);
+                this._drawWithMaskFilter(textBlob.bounds, drawMesh, paint, paint.maskFilter);
                 return;
             }
 
@@ -673,6 +676,7 @@ namespace Unity.UIWidgets.ui {
 
         public void flush(Picture picture) {
             this._reset();
+            
             this._drawPicture(picture, false);
             
             D.assert(this._layers.Count == 1);
@@ -735,14 +739,19 @@ namespace Unity.UIWidgets.ui {
                         // clear triangles first in order to bypass validation in SetVertices.
                         cmd.meshObj.SetTriangles((int[]) null, 0, false);
 
-                        cmd.meshObj.SetVertices(cmd.mesh.vertices);
-                        cmd.meshObj.SetTriangles(cmd.mesh.triangles, 0, false);
-                        cmd.meshObj.SetUVs(0, cmd.mesh.uv);
+                        MeshMesh mesh = cmd.mesh;
+                        if (cmd.textMesh != null) {
+                            mesh = cmd.textMesh.resovleMesh();
+                        }
+  
+                        cmd.meshObj.SetVertices(mesh.vertices);
+                        cmd.meshObj.SetTriangles(mesh.triangles, 0, false);
+                        cmd.meshObj.SetUVs(0, mesh.uv);
 
-                        if (cmd.mesh.matrix == null) {
+                        if (mesh.matrix == null) {
                             cmd.properties.SetFloatArray(RenderDraw.matId, RenderDraw.idMat3.fMat);
                         } else {
-                            cmd.properties.SetFloatArray(RenderDraw.matId, cmd.mesh.matrix.fMat);
+                            cmd.properties.SetFloatArray(RenderDraw.matId, mesh.matrix.fMat);
                         }
 
                         cmdBuf.DrawMesh(cmd.meshObj, RenderDraw.idMat, cmd.material, 0, cmd.pass, cmd.properties);
@@ -831,17 +840,20 @@ namespace Unity.UIWidgets.ui {
             
             Matrix3 _matrix;
             float? _scale;
+            Matrix3 _invMatrix;
 
-            public State(Matrix3 matrix = null, float? scale = null) {
+            public State(Matrix3 matrix = null, float? scale = null, Matrix3 invMatrix = null) {
                 this._matrix = matrix ?? _id;
                 this._scale = scale;
+                this._invMatrix = invMatrix;
             }
             
             public Matrix3 matrix {
                 get { return this._matrix; }
                 set {
-                    this._matrix = value;
+                    this._matrix = value ?? _id;
                     this._scale = null;
+                    this._invMatrix = null;
                 }
             }
 
@@ -853,14 +865,25 @@ namespace Unity.UIWidgets.ui {
                     return this._scale.Value;
                 }
             }
+            
+            public Matrix3 invMatrix {
+                get {
+                    if (this._invMatrix == null) {
+                        this._invMatrix = Matrix3.I();
+                        this._matrix.invert(this._invMatrix);
+                    }
+                    return this._invMatrix;
+                }
+            }
 
             public State copy() {
-                return new State(this._matrix, this._scale);
+                return new State(this._matrix, this._scale, this._invMatrix);
             }
         }
         
         internal class RenderDraw {
             public MeshMesh mesh;
+            public TextBlobMesh textMesh;
             public int pass;
             public MaterialPropertyBlock properties;
             public RenderLayer layer;
