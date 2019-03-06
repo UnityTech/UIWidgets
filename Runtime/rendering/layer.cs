@@ -926,4 +926,37 @@ namespace Unity.UIWidgets.rendering {
                 defaultValue: Diagnostics.kNullDefaultValue));
         }
     }
+
+    public class PerformanceOverlayLayer : Layer {
+        public PerformanceOverlayLayer(
+            Rect overlayRect = null,
+            int? optionsMask = null
+        ) {
+            D.assert(overlayRect != null);
+            D.assert(optionsMask != null);
+            this._overlayRect = overlayRect;
+            this.optionsMask = optionsMask ?? 0;
+        }
+
+        public Rect overlayRect {
+            get { return this._overlayRect; }
+            set {
+                if (value != this._overlayRect) {
+                    this._overlayRect = value;
+                    this.markNeedsAddToScene();
+                }
+            }
+        }
+
+        Rect _overlayRect;
+
+        public readonly int optionsMask;
+
+        internal override flow.Layer addToScene(SceneBuilder builder, Offset layerOffset = null) {
+            layerOffset = layerOffset ?? Offset.zero;
+
+            builder.addPerformanceOverlay(this.optionsMask, this.overlayRect.shift(layerOffset));
+            return null;
+        }
+    }
 }

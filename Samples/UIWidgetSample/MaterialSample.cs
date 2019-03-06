@@ -61,17 +61,22 @@ namespace UIWidgetsSample {
 
     class MaterialButtonWidgetState : State<MaterialButtonWidget> {
         public override Widget build(BuildContext context) {
-            return new Material(
-                child: new Center(
-                    child: new FlatButton(
-                        shape: new RoundedRectangleBorder(borderRadius: BorderRadius.all(20.0f)),
-                        color: new Color(0xFF00FF00),
-                        splashColor: new Color(0xFFFF0011),
-                        highlightColor: new Color(0x88FF0011),
-                            child: new Text("Click Me"),
-                        onPressed: () => { Debug.Log("pressed here"); }
-                    )
-                )
+            return new Stack(
+                children: new List<Widget> {
+                    new Material(
+                        child: new Center(
+                            child: new FlatButton(
+                                shape: new RoundedRectangleBorder(borderRadius: BorderRadius.all(20.0f)),
+                                color: new Color(0xFF00FF00),
+                                splashColor: new Color(0xFFFF0011),
+                                highlightColor: new Color(0x88FF0011),
+                                child: new Text("Click Me"),
+                                onPressed: () => { Debug.Log("pressed here"); }
+                            )
+                        )
+                    ),
+                    new PerformanceOverlay()
+                }
             );
         }
     }
