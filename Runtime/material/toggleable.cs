@@ -290,7 +290,7 @@ namespace Unity.UIWidgets.material {
             return true;
         }
 
-        public void handleEvent(PointerEvent pEvent, BoxHitTestEntry entry) {
+        public override void handleEvent(PointerEvent pEvent, HitTestEntry entry) {
             D.assert(this.debugHandleEvent(pEvent, entry));
             if (pEvent is PointerDownEvent && this.isInteractive) {
                 this._tap.addPointer((PointerDownEvent) pEvent);
