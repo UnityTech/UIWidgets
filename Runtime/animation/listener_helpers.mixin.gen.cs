@@ -4,6 +4,8 @@ using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
 
 namespace Unity.UIWidgets.animation {
+
+ 
     public abstract class AnimationLazyListenerMixinAnimation<T> : Animation<T> {
         int _listenerCounter = 0;
 
@@ -34,6 +36,8 @@ namespace Unity.UIWidgets.animation {
     }
 
 
+
+ 
     public abstract class AnimationEagerListenerMixinAnimation<T> : Animation<T> {
         protected void didRegisterListener() {
         }
@@ -46,8 +50,9 @@ namespace Unity.UIWidgets.animation {
     }
 
 
-    public abstract class
-        AnimationLocalListenersMixinAnimationLazyListenerMixinAnimation<T> : AnimationLazyListenerMixinAnimation<T> {
+
+ 
+    public abstract class AnimationLocalListenersMixinAnimationLazyListenerMixinAnimation<T> : AnimationLazyListenerMixinAnimation<T> {
         readonly ObserverList<VoidCallback> _listeners = new ObserverList<VoidCallback>();
 
         public override void addListener(VoidCallback listener) {
@@ -67,8 +72,7 @@ namespace Unity.UIWidgets.animation {
                     if (this._listeners.Contains(listener)) {
                         listener();
                     }
-                }
-                catch (Exception exception) {
+                } catch (Exception exception) {
                     UIWidgetsError.reportError(new UIWidgetsErrorDetails(
                         exception: exception,
                         library: "animation library",
@@ -84,8 +88,8 @@ namespace Unity.UIWidgets.animation {
     }
 
 
-    public abstract class
-        AnimationLocalListenersMixinAnimationEagerListenerMixinAnimation<T> : AnimationEagerListenerMixinAnimation<T> {
+ 
+    public abstract class AnimationLocalListenersMixinAnimationEagerListenerMixinAnimation<T> : AnimationEagerListenerMixinAnimation<T> {
         readonly ObserverList<VoidCallback> _listeners = new ObserverList<VoidCallback>();
 
         public override void addListener(VoidCallback listener) {
@@ -105,8 +109,7 @@ namespace Unity.UIWidgets.animation {
                     if (this._listeners.Contains(listener)) {
                         listener();
                     }
-                }
-                catch (Exception exception) {
+                } catch (Exception exception) {
                     UIWidgetsError.reportError(new UIWidgetsErrorDetails(
                         exception: exception,
                         library: "animation library",
@@ -122,9 +125,9 @@ namespace Unity.UIWidgets.animation {
     }
 
 
-    public abstract class
-        AnimationLocalStatusListenersMixinAnimationLocalListenersMixinAnimationLazyListenerMixinAnimation<T> :
-            AnimationLocalListenersMixinAnimationLazyListenerMixinAnimation<T> {
+
+ 
+    public abstract class AnimationLocalStatusListenersMixinAnimationLocalListenersMixinAnimationLazyListenerMixinAnimation<T> : AnimationLocalListenersMixinAnimationLazyListenerMixinAnimation<T> {
         readonly ObserverList<AnimationStatusListener> _statusListeners = new ObserverList<AnimationStatusListener>();
 
         public override void addStatusListener(AnimationStatusListener listener) {
@@ -144,8 +147,7 @@ namespace Unity.UIWidgets.animation {
                     if (this._statusListeners.Contains(listener)) {
                         listener(status);
                     }
-                }
-                catch (Exception exception) {
+                } catch (Exception exception) {
                     UIWidgetsError.reportError(new UIWidgetsErrorDetails(
                         exception: exception,
                         library: "animation library",
@@ -161,9 +163,8 @@ namespace Unity.UIWidgets.animation {
     }
 
 
-    public abstract class
-        AnimationLocalStatusListenersMixinAnimationLazyListenerMixinAnimation<T> : AnimationLazyListenerMixinAnimation<T
-        > {
+ 
+    public abstract class AnimationLocalStatusListenersMixinAnimationLazyListenerMixinAnimation<T> : AnimationLazyListenerMixinAnimation<T> {
         readonly ObserverList<AnimationStatusListener> _statusListeners = new ObserverList<AnimationStatusListener>();
 
         public override void addStatusListener(AnimationStatusListener listener) {
@@ -183,8 +184,7 @@ namespace Unity.UIWidgets.animation {
                     if (this._statusListeners.Contains(listener)) {
                         listener(status);
                     }
-                }
-                catch (Exception exception) {
+                } catch (Exception exception) {
                     UIWidgetsError.reportError(new UIWidgetsErrorDetails(
                         exception: exception,
                         library: "animation library",
@@ -200,9 +200,8 @@ namespace Unity.UIWidgets.animation {
     }
 
 
-    public abstract class
-        AnimationLocalStatusListenersMixinAnimationLocalListenersMixinAnimationEagerListenerMixinAnimation<T> :
-            AnimationLocalListenersMixinAnimationEagerListenerMixinAnimation<T> {
+ 
+    public abstract class AnimationLocalStatusListenersMixinAnimationLocalListenersMixinAnimationEagerListenerMixinAnimation<T> : AnimationLocalListenersMixinAnimationEagerListenerMixinAnimation<T> {
         readonly ObserverList<AnimationStatusListener> _statusListeners = new ObserverList<AnimationStatusListener>();
 
         public override void addStatusListener(AnimationStatusListener listener) {
@@ -222,8 +221,7 @@ namespace Unity.UIWidgets.animation {
                     if (this._statusListeners.Contains(listener)) {
                         listener(status);
                     }
-                }
-                catch (Exception exception) {
+                } catch (Exception exception) {
                     UIWidgetsError.reportError(new UIWidgetsErrorDetails(
                         exception: exception,
                         library: "animation library",
@@ -237,4 +235,6 @@ namespace Unity.UIWidgets.animation {
             }
         }
     }
+
+
 }

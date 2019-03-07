@@ -502,6 +502,37 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
+    public class IntrinsicWidth : SingleChildRenderObjectWidget {
+        public IntrinsicWidth(Key key = null, float? stepWidth = null, float? stepHeight = null, Widget child = null)
+            : base(key: key, child: child) {
+            this.stepWidth = stepWidth;
+            this.stepHeight = stepHeight;
+        }
+
+        public readonly float? stepWidth;
+
+        public readonly float? stepHeight;
+
+        public override RenderObject createRenderObject(BuildContext context) {
+           return new RenderIntrinsicWidth(stepWidth: this.stepWidth, stepHeight: this.stepHeight);
+        }
+
+        public override void updateRenderObject(BuildContext context, RenderObject renderObjectRaw) {
+            var renderObject = (RenderIntrinsicWidth) renderObjectRaw;
+            renderObject.stepWidth = this.stepWidth;
+            renderObject.stepHeight = this.stepHeight;
+        }
+    }
+
+    public class IntrinsicHeight : SingleChildRenderObjectWidget {
+        public IntrinsicHeight(Key key = null, Widget child = null)
+            : base(key: key, child: child) {
+        }
+
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderIntrinsicHeight();
+        }
+    }
 
     public class ListBody : MultiChildRenderObjectWidget {
         public ListBody(
@@ -1663,10 +1694,10 @@ namespace Unity.UIWidgets.widgets {
             bool absorbing = true,
             Widget child = null
         ) : base(key: key, child: child) {
+            this.absorbing = absorbing;
         }
 
         public readonly bool absorbing;
-
 
         public override RenderObject createRenderObject(BuildContext context) {
             return new RenderAbsorbPointer(

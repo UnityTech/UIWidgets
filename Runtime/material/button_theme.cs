@@ -64,6 +64,48 @@ namespace Unity.UIWidgets.material {
             this.data = data;
         }
 
+        public static ButtonTheme fromButtonThemeData(
+            Key key = null,
+            ButtonThemeData data = null,
+            Widget child = null) {
+            return new ButtonTheme(key, data, child);            
+        }
+
+        public static ButtonTheme bar(
+            Key key = null,
+            ButtonTextTheme textTheme = ButtonTextTheme.accent,
+            float minWidth = 64.0f,
+            float height = 36.0f,
+            EdgeInsets padding = null,
+            ShapeBorder shape = null,
+            bool alignedDropdown = false,
+            Color buttonColor = null,
+            Color disabledColor = null,
+            Color highlightColor = null,
+            Color splashColor = null,
+            ColorScheme colorScheme = null,
+            Widget child = null,
+            ButtonBarLayoutBehavior layoutBehavior = ButtonBarLayoutBehavior.padded
+        ) {
+            D.assert(minWidth >= 0.0);
+            D.assert(height >= 0.0);
+            return new ButtonTheme(key, new ButtonThemeData(
+                textTheme: textTheme,
+                minWidth: minWidth,
+                height: height,
+                padding: padding ?? EdgeInsets.symmetric(horizontal: 8.0f),
+                shape: shape,
+                alignedDropdown: alignedDropdown,
+                layoutBehavior: layoutBehavior,
+                buttonColor: buttonColor,
+                disabledColor: disabledColor,
+                highlightColor: highlightColor,
+                splashColor: splashColor,
+                colorScheme: colorScheme
+            ), child);
+        }
+
+
         public readonly ButtonThemeData data;
 
         public static ButtonThemeData of(BuildContext context) {
@@ -88,7 +130,7 @@ namespace Unity.UIWidgets.material {
     }
 
 
-    public class ButtonThemeData : Diagnosticable {
+    public class ButtonThemeData : Diagnosticable, IEquatable<ButtonThemeData> {
         public ButtonThemeData(
             ButtonTextTheme textTheme = ButtonTextTheme.normal,
             float minWidth = 88.0f,

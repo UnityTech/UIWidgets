@@ -47,7 +47,7 @@ namespace UIWidgetsSample {
                 body: new Container(
                     color: new Color(0xFF888888),
                     child: new Center(
-                        child: new CustomButton(onPressed: () => { Navigator.pushName(context, "/detail"); },
+                        child: new CustomButton(onPressed: () => { Navigator.pushNamed(context, "/detail"); },
                             child: new Text("Go to Detail"))
                     )),
                 title: "Home"
