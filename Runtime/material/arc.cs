@@ -1,4 +1,4 @@
-using System;
+using System.Collections.Generic;
 using Unity.UIWidgets.animation;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
@@ -6,6 +6,34 @@ using UnityEngine;
 using Rect = Unity.UIWidgets.ui.Rect;
 
 namespace Unity.UIWidgets.material {
+    static class ArcUtils {
+        public const float _kOnAxisDelta = 2.0f;
+
+        public static readonly List<_Diagonal> _allDiagonals = new List<_Diagonal> {
+            new _Diagonal(_CornerId.topLeft, _CornerId.bottomRight),
+            new _Diagonal(_CornerId.bottomRight, _CornerId.topLeft),
+            new _Diagonal(_CornerId.topRight, _CornerId.bottomLeft),
+            new _Diagonal(_CornerId.bottomLeft, _CornerId.topRight)
+        };
+
+        public delegate float _KeyFunc<T>(T input);
+
+
+        public static T _maxBy<T>(List<T> input, _KeyFunc<T> keyFunc) {
+            T maxValue = default(T);
+            float? maxKey = null;
+            foreach (T value in input) {
+                float key = keyFunc(value);
+                if (maxKey == null || key > maxKey) {
+                    maxValue = value;
+                    maxKey = key;
+                }
+            }
+
+            return maxValue;
+        }
+    }
+
     public class MaterialPointArcTween : Tween<Offset> {
         public MaterialPointArcTween(
             Offset begin = null,

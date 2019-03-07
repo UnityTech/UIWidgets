@@ -1,4 +1,3 @@
-using System;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
@@ -8,6 +7,11 @@ using UnityEngine;
 using Color = Unity.UIWidgets.ui.Color;
 
 namespace Unity.UIWidgets.material {
+    static class IconButtonUtils {
+        public const float _kMinButtonSize = 48.0f;
+    }
+
+
     public class IconButton : StatelessWidget {
         public IconButton(
             Key key = null,

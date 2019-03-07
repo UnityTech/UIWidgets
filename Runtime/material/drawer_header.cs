@@ -5,6 +5,11 @@ using Unity.UIWidgets.painting;
 using Unity.UIWidgets.widgets;
 
 namespace Unity.UIWidgets.material {
+    static class DrawerHeaderUtils {
+        public const float _kDrawerHeaderHeight = 160.0f + 1.0f;
+    }
+
+
     public class DrawerHeader : StatelessWidget {
         public DrawerHeader(
             Key key = null,

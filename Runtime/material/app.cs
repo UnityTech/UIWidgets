@@ -3,8 +3,22 @@ using Unity.UIWidgets.animation;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
+using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace Unity.UIWidgets.material {
+    static class AppUtils {
+        public static readonly TextStyle _errorTextStyle = new TextStyle(
+            color: new Color(0xD0FF0000),
+            fontFamily: "monospace",
+            fontSize: 48.0f,
+            fontWeight: FontWeight.w700,
+            decoration: TextDecoration.underline,
+            decorationColor: new Color(0xFFFFFF00),
+            decorationStyle: TextDecorationStyle.doubleLine
+        );
+    }
+
+
     public class MaterialApp : StatefulWidget {
         public MaterialApp(
             Key key = null,

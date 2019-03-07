@@ -10,6 +10,14 @@ using Unity.UIWidgets.widgets;
 using UnityEngine;
 
 namespace Unity.UIWidgets.material {
+    static class DrawerUtils {
+        public const float _kWidth = 304.0f;
+        public const float _kEdgeDragWidth = 20.0f;
+        public const float _kMinFlingVelocity = 365.0f;
+        public static readonly TimeSpan _kBaseSettleDuration = new TimeSpan(0, 0, 0, 0, 246);
+    }
+
+
     public enum DrawerAlignment {
         start,
         end
