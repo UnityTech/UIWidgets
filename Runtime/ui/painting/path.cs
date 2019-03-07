@@ -1097,8 +1097,6 @@ namespace Unity.UIWidgets.ui {
             }
 
             var points = TessellationGenerator.tessellateBezier(x1, y1, x2, y2, x3, y3, x4, y4, this._tessTol);
-            D.assert(points.Count > 0);
-            Debug.Log(points.Count + $"{x1} {y1} {x2} {y2} {x3} {y3} {x4} {y4}");
             
             points[points.Count - 1].flags = flags;
             foreach (var point in points) {
