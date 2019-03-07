@@ -1,9 +1,10 @@
+using System;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.service;
 using Unity.UIWidgets.ui;
 
 namespace Unity.UIWidgets.material {
-    public class ColorScheme : Diagnosticable {
+    public class ColorScheme : Diagnosticable, IEquatable<ColorScheme> {
         public ColorScheme(
             Color primary,
             Color primaryVariant,

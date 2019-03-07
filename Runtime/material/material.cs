@@ -479,7 +479,7 @@ namespace Unity.UIWidgets.material {
         ColorTween _shadowColor;
         ShapeBorderTween _border;
 
-        protected override void forEachTween(ITweenVisitor visitor) {
+        protected override void forEachTween(TweenVisitor visitor) {
             this._elevation = (FloatTween) visitor.visit(this, this._elevation, this.widget.elevation,
                 (float value) => new FloatTween(begin: value, end: value));
             this._shadowColor = (ColorTween) visitor.visit(this, this._shadowColor, this.widget.shadowColor,
