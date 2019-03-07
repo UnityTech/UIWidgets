@@ -1,10 +1,12 @@
-﻿using Unity.UIWidgets.gestures;
-using Unity.UIWidgets.ui;
+﻿using Unity.UIWidgets.ui;
+using Unity.UIWidgets.gestures;
+using UnityEngine;
 
 namespace Unity.UIWidgets.rendering {
-    public abstract class
-        RenderProxyBoxMixinRenderObjectWithChildMixinRenderBox<T> : RenderObjectWithChildMixinRenderBox<T>
-        where T : RenderBox {
+
+
+
+    public abstract class RenderProxyBoxMixinRenderObjectWithChildMixinRenderBox<T> : RenderObjectWithChildMixinRenderBox<T> where T : RenderBox {
         public override void setupParentData(RenderObject child) {
             if (!(child.parentData is ParentData)) {
                 child.parentData = new ParentData();
@@ -55,8 +57,7 @@ namespace Unity.UIWidgets.rendering {
             if (this.child != null) {
                 this.child.layout(this.constraints, parentUsesSize: true);
                 this.size = this.child.size;
-            }
-            else {
+            } else {
                 this.performResize();
             }
         }
@@ -80,7 +81,8 @@ namespace Unity.UIWidgets.rendering {
     }
 
 
-    public abstract class RenderProxyBoxMixinRenderObjectWithChildMixinRenderBoxRenderStack :
+    public abstract class RenderProxyBoxMixinRenderObjectWithChildMixinRenderBoxRenderStack: 
         RenderProxyBoxMixinRenderObjectWithChildMixinRenderBox<RenderStack> {
     }
+
 }

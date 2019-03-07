@@ -17,3 +17,10 @@ build.sh
 build.sh.meta
 build.bat
 build.bat.meta
+
+automation/**
+utr_output/**
+.Editor/**
+.yamato/**
+*.zip*
+scripts~/**

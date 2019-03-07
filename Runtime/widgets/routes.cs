@@ -819,7 +819,7 @@ namespace Unity.UIWidgets.widgets {
     }
 
     public static class DialogUtils {
-        public static Promise<object> showGeneralDialog(
+        public static IPromise<object> showGeneralDialog(
             BuildContext context = null,
             RoutePageBuilder pageBuilder = null,
             bool barrierDismissible = false,

@@ -354,6 +354,161 @@ namespace Unity.UIWidgets.rendering {
         }
     }
 
+    public class RenderIntrinsicWidth : RenderProxyBox {
+        public RenderIntrinsicWidth(
+            float? stepWidth = null,
+            float? stepHeight = null,
+            RenderBox child = null
+        ) : base(child) {
+            this._stepWidth = stepWidth;
+            this._stepHeight = stepHeight;
+        }
+
+        float? _stepWidth;
+
+        public float? stepWidth {
+            get { return this._stepWidth; }
+            set {
+                if (value == this._stepWidth) {
+                    return;
+                }
+                this._stepWidth = value;
+                this.markNeedsLayout();
+            }
+        }
+
+        float? _stepHeight;
+
+        public float? stepHeight {
+            get { return this._stepHeight; }
+            set {
+                if (value == this._stepHeight) {
+                    return;
+                }
+                this._stepHeight = value;
+                this.markNeedsLayout();
+            }
+        }
+
+        static float _applyStep(float input, float? step) {
+            D.assert(input.isFinite());
+            if (step == null) {
+                return input;
+            }
+            return (input / step.Value).ceil() * step.Value;
+        }
+
+        protected override float computeMinIntrinsicWidth(float height) {
+            return this.computeMaxIntrinsicWidth(height);
+        }
+
+        protected override float computeMaxIntrinsicWidth(float height) {
+            if (this.child == null) {
+                return 0.0f;
+            }
+            float width = this.child.getMaxIntrinsicWidth(height);
+            return _applyStep(width, this._stepWidth);
+        }
+
+        protected override float computeMinIntrinsicHeight(float width) {
+            if (this.child == null) {
+                return 0.0f;
+            }
+            if (!width.isFinite()) {
+                width = this.computeMaxIntrinsicWidth(float.PositiveInfinity);
+            }
+            D.assert(width.isFinite());
+            float height = this.child.getMinIntrinsicHeight(width);
+            return _applyStep(height, this._stepHeight);
+        }
+
+        protected override float computeMaxIntrinsicHeight(float width) {
+            if (this.child == null) {
+                return 0.0f;
+            }
+            if (!width.isFinite()) {
+                width = this.computeMaxIntrinsicWidth(float.PositiveInfinity);
+            }
+            D.assert(width.isFinite());
+            float height = this.child.getMaxIntrinsicHeight(width);
+            return _applyStep(height, this._stepHeight);
+        }
+
+        protected override void performLayout() {
+            if (this.child != null) {
+                BoxConstraints childConstraints = this.constraints;
+                if (!childConstraints.hasTightWidth) {
+                    float width = this.child.getMaxIntrinsicWidth(childConstraints.maxHeight);
+                    D.assert(width.isFinite());
+                    childConstraints = childConstraints.tighten(width: _applyStep(width, this._stepWidth));
+                }
+                if (this._stepHeight != null) {
+                    float height = this.child.getMaxIntrinsicHeight(childConstraints.maxWidth);
+                    D.assert(height.isFinite());
+                    childConstraints = childConstraints.tighten(height: _applyStep(height, this._stepHeight));
+                }
+                this.child.layout(childConstraints, parentUsesSize: true);
+                this.size = this.child.size;
+            } else {
+                this.performResize();
+            }
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new FloatProperty("stepWidth", this.stepWidth));
+            properties.add(new FloatProperty("stepHeight", this.stepHeight));
+        }
+    }
+
+    public class RenderIntrinsicHeight : RenderProxyBox {
+        public RenderIntrinsicHeight(
+            RenderBox child = null
+        ) : base(child) {
+        }
+
+        protected override float computeMinIntrinsicWidth(float height) {
+            if (this.child == null) {
+                return 0.0f;
+            }
+            if (!height.isFinite()) {
+                height = this.child.getMaxIntrinsicHeight(float.PositiveInfinity);
+            }
+            D.assert(height.isFinite());
+            return this.child.getMinIntrinsicWidth(height);
+        }
+
+        protected override float computeMaxIntrinsicWidth(float height) {
+            if (this.child == null) {
+                return 0.0f;
+            }
+            if (!height.isFinite()) {
+                height = this.child.getMaxIntrinsicHeight(float.PositiveInfinity);
+            }
+            D.assert(height.isFinite());
+            return this.child.getMaxIntrinsicWidth(height);
+        }
+
+        protected override float computeMinIntrinsicHeight(float width) {
+            return this.computeMaxIntrinsicHeight(width);
+        }
+
+        protected override void performLayout() {
+            if (this.child != null) {
+                BoxConstraints childConstraints = this.constraints;
+                if (!childConstraints.hasTightHeight) {
+                    float height = this.child.getMaxIntrinsicHeight(childConstraints.maxWidth);
+                    D.assert(height.isFinite());
+                    childConstraints = childConstraints.tighten(height: height);
+                }
+                this.child.layout(childConstraints, parentUsesSize: true);
+                this.size = this.child.size;
+            } else {
+                this.performResize();
+            }
+        }
+    }
+
     public class RenderOpacity : RenderProxyBox {
         public RenderOpacity(float opacity = 1.0f, RenderBox child = null) : base(child) {
             D.assert(opacity >= 0.0 && opacity <= 1.0);

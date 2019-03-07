@@ -119,7 +119,7 @@ namespace Unity.UIWidgets.material {
     class _AnimatedThemeState : AnimatedWidgetBaseState<AnimatedTheme> {
         ThemeDataTween _data;
 
-        protected override void forEachTween(ITweenVisitor visitor) {
+        protected override void forEachTween(TweenVisitor visitor) {
             this._data = (ThemeDataTween) visitor.visit(this, this._data, this.widget.data,
                 (ThemeData value) => new ThemeDataTween(begin: value));
         }

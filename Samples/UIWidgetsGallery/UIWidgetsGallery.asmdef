@@ -1,0 +1,6 @@
+{
+    "name": "UIWidgetsGallery",
+    "references": ["Unity.UIWidgets"],
+    "includePlatforms": [],
+    "excludePlatforms": []
+}
