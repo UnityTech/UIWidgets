@@ -194,11 +194,7 @@ namespace Unity.UIWidgets.material {
                 }
             }
 
-            //todo:xingwei.zhu: remove this condition when drawCircle bug fixed (when radius.value == 0)
-            if (this._radius.value != 0) {
-                canvas.drawCircle(center, this._radius.value, paint);
-            }
-
+            canvas.drawCircle(center, this._radius.value, paint);
             canvas.restore();
         }
     }
