@@ -1,3 +1,4 @@
+using System;
 using Unity.UIWidgets.animation;
 using Unity.UIWidgets.async;
 using Unity.UIWidgets.foundation;
@@ -5,6 +6,15 @@ using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
 
 namespace Unity.UIWidgets.material {
+    static class ScrollbarUtils {
+        public static readonly TimeSpan _kScrollbarFadeDuration = TimeSpan.FromMilliseconds(300);
+
+        public static readonly TimeSpan _kScrollbarTimeToFade = TimeSpan.FromMilliseconds(600);
+
+        public const float _kScrollbarThickness = 6.0f;
+    }
+
+
     public class Scrollbar : StatefulWidget {
         public Scrollbar(
             Key key = null,

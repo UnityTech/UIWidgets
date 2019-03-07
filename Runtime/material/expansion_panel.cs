@@ -8,6 +8,12 @@ using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.widgets;
 
 namespace Unity.UIWidgets.material {
+    static class ExpansionPanelUtils {
+        public const float _kPanelHeaderCollapsedHeight = 48.0f;
+        public const float _kPanelHeaderExpandedHeight = 64.0f;
+    }
+
+
     class _SaltedKey<S, V> : LocalKey {
         public _SaltedKey(
             S salt,

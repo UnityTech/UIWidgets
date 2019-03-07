@@ -5,6 +5,16 @@ using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
 
 namespace Unity.UIWidgets.material {
+    static class ThemeDataUtils {
+        public static readonly Color _kLightThemeHighlightColor = new Color(0x66BCBCBC);
+
+        public static readonly Color _kLightThemeSplashColor = new Color(0x66C8C8C8);
+
+        public static readonly Color _kDarkThemeHighlightColor = new Color(0x40CCCCCC);
+
+        public static readonly Color _kDarkThemeSplashColor = new Color(0x40CCCCCC);
+    }
+
     public enum MaterialTapTargetSize {
         padded,
 

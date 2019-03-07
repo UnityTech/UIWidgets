@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Unity.UIWidgets.async;
 using Unity.UIWidgets.editor;
 using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.service;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
 using UnityEngine;
@@ -144,6 +145,7 @@ namespace Unity.UIWidgets.engine {
         }
 
         void Update() {
+            PerformanceUtils.instance.updateDeltaTime(Time.unscaledDeltaTime);
             this._displayMetrics.Update();
             if (EventSystem.current != null && EventSystem.current.currentSelectedGameObject != this.gameObject) {
                 this.unfocusIfNeeded();

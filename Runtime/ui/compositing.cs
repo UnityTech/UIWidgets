@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Unity.UIWidgets.flow;
 using Unity.UIWidgets.foundation;
 
@@ -104,6 +104,21 @@ namespace Unity.UIWidgets.ui {
             layer.picture = picture;
             layer.isComplex = isComplexHint;
             layer.willChange = willChangeHint;
+            this._currentLayer.add(layer);
+        }
+
+        public void addPerformanceOverlay(int enabledOptions, Rect bounds) {
+            if (this._currentLayer == null) {
+                return;
+            }
+
+            var layer = new PerformanceOverlayLayer(enabledOptions);
+            layer.paintBounds = Rect.fromLTRB(
+                bounds.left,
+                bounds.top,
+                bounds.right,
+                bounds.bottom
+            );
             this._currentLayer.add(layer);
         }
     }

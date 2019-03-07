@@ -10,6 +10,18 @@ using Unity.UIWidgets.widgets;
 using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace Unity.UIWidgets.material {
+    static class MaterialConstantsUtils {
+        public static readonly Dictionary<MaterialType, BorderRadius> kMaterialEdges =
+            new Dictionary<MaterialType, BorderRadius> {
+                {MaterialType.canvas, null},
+                {MaterialType.card, BorderRadius.circular(2.0f)},
+                {MaterialType.circle, null},
+                {MaterialType.button, BorderRadius.circular(2.0f)},
+                {MaterialType.transparency, null}
+            };
+    }
+
+
     public delegate Rect RectCallback();
 
     public enum MaterialType {
