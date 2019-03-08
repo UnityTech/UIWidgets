@@ -33,10 +33,8 @@ namespace Unity.UIWidgets.material {
             string title = "",
             Color color = null,
             ThemeData theme = null,
-            bool showPerformanceOverlay = false,
-            Window window = null) : base(key: key) {
-            D.assert(window != null);
-            this.window = window;
+            bool showPerformanceOverlay = false
+        ) : base(key: key) {
             this.navigatorKey = navigatorKey;
             this.home = home;
             this.routes = routes ?? new Dictionary<string, WidgetBuilder>();
@@ -74,9 +72,6 @@ namespace Unity.UIWidgets.material {
         public readonly Color color;
 
         public readonly bool showPerformanceOverlay;
-
-        public readonly Window window;
-
 
         public override State createState() {
             return new _MaterialAppState();
