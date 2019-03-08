@@ -15,7 +15,7 @@ namespace Unity.UIWidgets.material {
     }
 
     public abstract class RenderToggleable : RenderConstrainedBox {
-        RenderToggleable(
+        protected RenderToggleable(
             bool? value = null,
             bool tristate = false,
             Color activeColor = null,
