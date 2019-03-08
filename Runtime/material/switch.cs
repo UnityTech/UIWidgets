@@ -130,7 +130,7 @@ namespace Unity.UIWidgets.material {
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             properties.add(new FlagProperty("value", value: this.value, ifTrue: "on", ifFalse: "off", showName: true));
-            properties.add(new ObjectFlagProperty<ValueChanged<bool>>("onChanged", this.onChanged, ifNull: "disabled"));
+            properties.add(new ObjectFlagProperty<ValueChanged<bool?>>("onChanged", this.onChanged, ifNull: "disabled"));
         }
     }
 

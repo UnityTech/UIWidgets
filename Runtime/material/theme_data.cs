@@ -239,7 +239,7 @@ namespace Unity.UIWidgets.material {
             this.iconTheme = iconTheme;
             this.primaryIconTheme = primaryIconTheme;
             this.accentIconTheme = accentIconTheme;
-            this.platform = platform;
+            this.platform = platform.Value;
             this.materialTapTargetSize = materialTapTargetSize ?? MaterialTapTargetSize.padded;
             this.pageTransitionsTheme = pageTransitionsTheme;
             this.colorScheme = colorScheme;
