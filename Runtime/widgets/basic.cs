@@ -514,7 +514,7 @@ namespace Unity.UIWidgets.widgets {
         public readonly float? stepHeight;
 
         public override RenderObject createRenderObject(BuildContext context) {
-           return new RenderIntrinsicWidth(stepWidth: this.stepWidth, stepHeight: this.stepHeight);
+            return new RenderIntrinsicWidth(stepWidth: this.stepWidth, stepHeight: this.stepHeight);
         }
 
         public override void updateRenderObject(BuildContext context, RenderObject renderObjectRaw) {
@@ -824,6 +824,85 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
+    public class Wrap : MultiChildRenderObjectWidget {
+        public Wrap(
+            Key key = null,
+            Axis direction = Axis.horizontal,
+            WrapAlignment alignment = WrapAlignment.start,
+            float spacing = 0.0f,
+            WrapAlignment runAlignment = WrapAlignment.start,
+            float runSpacing = 0.0f,
+            WrapCrossAlignment crossAxisAlignment = WrapCrossAlignment.start,
+            TextDirection? textDirection = null,
+            VerticalDirection verticalDirection = VerticalDirection.down,
+            List<Widget> children = null
+        ) : base(key: key, children: children) {
+            this.direction = direction;
+            this.alignment = alignment;
+            this.spacing = spacing;
+            this.runAlignment = runAlignment;
+            this.runSpacing = runSpacing;
+            this.crossAxisAlignment = crossAxisAlignment;
+            this.textDirection = textDirection;
+            this.verticalDirection = verticalDirection;
+        }
+
+        public readonly Axis direction;
+
+        public readonly WrapAlignment alignment;
+
+        public readonly float spacing;
+
+        public readonly WrapAlignment runAlignment;
+
+        public readonly float runSpacing;
+
+        public readonly WrapCrossAlignment crossAxisAlignment;
+
+        public readonly TextDirection? textDirection;
+
+        public readonly VerticalDirection verticalDirection;
+
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderWrap(
+                children: null,
+                direction: this.direction,
+                alignment: this.alignment,
+                spacing: this.spacing,
+                runAlignment: this.runAlignment,
+                runSpacing: this.runSpacing,
+                crossAxisAlignment: this.crossAxisAlignment,
+                textDirection: this.textDirection ?? Directionality.of(context),
+                verticalDirection: this.verticalDirection
+            );
+        }
+
+        public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
+            D.assert(renderObject is RenderWrap);
+            RenderWrap renderWrap = renderObject as RenderWrap;
+            renderWrap.direction = this.direction;
+            renderWrap.alignment = this.alignment;
+            renderWrap.spacing = this.spacing;
+            renderWrap.runAlignment = this.runAlignment;
+            renderWrap.runSpacing = this.runSpacing;
+            renderWrap.crossAxisAlignment = this.crossAxisAlignment;
+            renderWrap.textDirection = this.textDirection ?? Directionality.of(context);
+            renderWrap.verticalDirection = this.verticalDirection;
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new EnumProperty<Axis>("direction", this.direction));
+            properties.add(new EnumProperty<WrapAlignment>("alignment", this.alignment));
+            properties.add(new FloatProperty("spacing", this.spacing));
+            properties.add(new EnumProperty<WrapAlignment>("runAlignment", this.runAlignment));
+            properties.add(new FloatProperty("runSpacing", this.runSpacing));
+            properties.add(new FloatProperty("crossAxisAlignment", this.runSpacing));
+            properties.add(new EnumProperty<TextDirection?>("textDirection", this.textDirection, defaultValue: null));
+            properties.add(new EnumProperty<VerticalDirection>("verticalDirection", this.verticalDirection,
+                defaultValue: VerticalDirection.down));
+        }
+    }
 
     public class PhysicalModel : SingleChildRenderObjectWidget {
         public PhysicalModel(
