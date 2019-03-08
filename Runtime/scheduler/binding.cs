@@ -29,8 +29,7 @@ namespace Unity.UIWidgets.scheduler {
                         return true;
                     });
                     this.debugStack = debugCurrentCallbackStack;
-                }
-                else {
+                } else {
                     this.debugStack = new StackTrace(2, true);
                 }
 
@@ -55,7 +54,10 @@ namespace Unity.UIWidgets.scheduler {
     public class SchedulerBinding {
         public static SchedulerBinding instance {
             get {
-                D.assert(_instance != null, "Binding.instance is null");
+                D.assert(_instance != null,
+                    "Binding.instance is null. " +
+                    "This usually happens when there is a callback from outside of UIWidgets. " +
+                    "Try to use \"using (WindowProvider.of(BuildContext).getScope()) { ... }\" to wrap your code.");
                 return _instance;
             }
 
@@ -63,15 +65,14 @@ namespace Unity.UIWidgets.scheduler {
                 if (value == null) {
                     D.assert(_instance != null, "Binding.instance is already cleared.");
                     _instance = null;
-                }
-                else {
+                } else {
                     D.assert(_instance == null, "Binding.instance is already assigned.");
                     _instance = value;
                 }
             }
         }
 
-        static SchedulerBinding _instance;
+        internal static SchedulerBinding _instance;
 
         public SchedulerBinding() {
             Window.instance.onBeginFrame += this._handleBeginFrame;
@@ -253,8 +254,7 @@ namespace Unity.UIWidgets.scheduler {
                     if (rawTimeStamp != null) {
                         _debugDescribeTimeStamp(
                             this._currentFrameTimeStamp.Value, frameTimeStampDescription);
-                    }
-                    else {
+                    } else {
                         frameTimeStampDescription.Append("(warm-up frame)");
                     }
 
@@ -283,8 +283,7 @@ namespace Unity.UIWidgets.scheduler {
                 }
 
                 this._removedIds.Clear();
-            }
-            finally {
+            } finally {
                 this._schedulerPhase = SchedulerPhase.midFrameMicrotasks;
             }
         }
@@ -305,8 +304,7 @@ namespace Unity.UIWidgets.scheduler {
                 foreach (FrameCallback callback in localPostFrameCallbacks) {
                     this._invokeFrameCallback(callback, this._currentFrameTimeStamp.Value);
                 }
-            }
-            finally {
+            } finally {
                 this._schedulerPhase = SchedulerPhase.idle;
                 D.assert(() => {
                     if (D.debugPrintEndFrameBanner) {
@@ -357,8 +355,7 @@ namespace Unity.UIWidgets.scheduler {
 
             try {
                 callback(timeStamp);
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 UIWidgetsError.reportError(new UIWidgetsErrorDetails(
                     exception: ex,
                     library: "scheduler library",
