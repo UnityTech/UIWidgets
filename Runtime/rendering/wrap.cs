@@ -522,7 +522,7 @@ namespace Unity.UIWidgets.rendering {
                         crossAxisExtent += runSpacing;
                     }
 
-                    runMetrics.Append(new _RunMetrics(runMainAxisExtent, runCrossAxisExtent, childCount));
+                    runMetrics.Add(new _RunMetrics(runMainAxisExtent, runCrossAxisExtent, childCount));
                     runMainAxisExtent = 0.0f;
                     runCrossAxisExtent = 0.0f;
                     childCount = 0;
@@ -548,7 +548,7 @@ namespace Unity.UIWidgets.rendering {
                     crossAxisExtent += runSpacing;
                 }
 
-                runMetrics.Append(new _RunMetrics(runMainAxisExtent, runCrossAxisExtent, childCount));
+                runMetrics.Add(new _RunMetrics(runMainAxisExtent, runCrossAxisExtent, childCount));
             }
 
             int runCount = runMetrics.Count;
