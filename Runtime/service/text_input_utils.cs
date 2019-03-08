@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace Unity.UIWidgets.service {
-    public class TextInputUtils {
+    static partial class TextInputUtils {
         static Dictionary<Event, TextInputAction> _keyToOperations;
 
         public static TextInputAction? getInputAction(Event evt) {

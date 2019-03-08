@@ -1,0 +1,85 @@
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
+using Unity.UIWidgets.external.simplejson;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.service;
+using UnityEngine;
+
+namespace Unity.UIWidgets.engine {
+    public class UIWidgetsMessageManager: MonoBehaviour {
+
+        public delegate void MethodChannelMessageDelegate(string method, List<JSONNode> args);
+        
+        static UIWidgetsMessageManager _instance;
+
+        readonly Dictionary<string, MethodChannelMessageDelegate> _methodChannelMessageDelegates = 
+            new Dictionary<string, MethodChannelMessageDelegate>();
+        public static UIWidgetsMessageManager instance {
+            get { return _instance; } 
+        }
+        
+        string _lastObjectName;
+
+        void OnEnable() {
+            D.assert(_instance == null, "Only one instance of UIWidgetsMessageManager should exists");
+            _instance = this;
+            this.UpdateNameIfNeed();
+        }
+
+        void OnDisable() {
+            D.assert(_instance != null, "_instance should not be null");
+            _instance = null;
+        }
+
+        void Update() {
+            this.UpdateNameIfNeed();
+        }
+
+        void UpdateNameIfNeed() {
+            var name = this.gameObject.name;
+            if (name != this._lastObjectName) {
+                this._lastObjectName = name;
+#if UNITY_IOS 
+                if (!Application.isEditor) {
+                    UIWidgetsMessageSetObjectName(this._lastObjectName);
+                }
+#endif
+            }
+        }
+
+        public void AddChannelMessageDelegate(string channel, MethodChannelMessageDelegate del) {
+            MethodChannelMessageDelegate exists;
+            this._methodChannelMessageDelegates.TryGetValue(channel, out exists);
+            this._methodChannelMessageDelegates[channel] = exists + del;
+        }
+        
+        public void RemoveChannelMessageDelegate(string channel, MethodChannelMessageDelegate del) {
+            MethodChannelMessageDelegate exists;
+            this._methodChannelMessageDelegates.TryGetValue(channel, out exists);
+            if (exists != null) {
+                this._methodChannelMessageDelegates[channel] = exists - del;
+            }  
+        }
+
+        void OnUIWidgetsMethodMessage(string message) {
+            JSONObject jsonObject = (JSONObject)JSON.Parse(message);
+            string channel = jsonObject["channel"].Value;
+            string method = jsonObject["method"].Value;
+            var args = new List<JSONNode>(jsonObject["args"].AsArray.Children);
+            if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(method)) {
+                Debug.LogError("invalid uiwidgets method message");
+            }
+            else {
+                MethodChannelMessageDelegate exists;
+                this._methodChannelMessageDelegates.TryGetValue(channel, out exists);
+                exists?.Invoke(method, args);
+            }
+        }
+
+#if UNITY_IOS        
+        [DllImport("__Internal")]
+        static extern void UIWidgetsMessageSetObjectName(string objectName);
+#endif
+        
+    }
+}

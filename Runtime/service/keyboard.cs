@@ -1,8 +1,101 @@
+using System;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
+using Unity.UIWidgets.engine;
+using Unity.UIWidgets.external.simplejson;
+using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
 using UnityEngine;
 
 namespace Unity.UIWidgets.service {
-    public class KeyboadManager {
+
+    interface KeyboardDelegate: IDisposable {
+        void show();
+        void hide();
+        void setEditingState(TextEditingValue value);
+
+        void setClient(int client, TextInputConfiguration configuration);
+        void clearClient();
+
+        bool hashPreview();
+    }
+
+    public interface TextInputUpdateListener {
+        void Update();
+    }
+    
+    public interface TextInputOnGUIListener {
+        void OnGUI();
+    }
+
+    class DefaultKeyboardDelegate : KeyboardDelegate, TextInputOnGUIListener {
+
+        int _client;
+        string _lastCompositionString;
+        TextEditingValue _value;
+
+        public void show() {
+        }
+
+        public void hide() {
+        }
+
+        public void setEditingState(TextEditingValue value) {
+            this._value = value;
+        }
+
+        public void setClient(int client, TextInputConfiguration configuration) {
+            this._client = client;
+        }
+
+        public void clearClient() {
+            this._client = 0;
+        }
+
+        public bool hashPreview() {
+            return false;
+        }
+
+        public void OnGUI() {
+            if (TouchScreenKeyboard.isSupported) {
+                return;
+            }
+
+            if (this._client == 0) {
+                return;
+            }
+
+            var currentEvent = Event.current;
+            if (currentEvent != null && currentEvent.type == EventType.KeyDown) {
+                var action = TextInputUtils.getInputAction(currentEvent);
+                if (action != null) {
+                    Window.instance.run(() => { TextInput._performAction(this._client, action.Value); });
+                }
+
+                if (action == null || action == TextInputAction.newline) {
+                    if (currentEvent.keyCode == KeyCode.None) {
+                        this._value = this._value.clearCompose().insert(new string(currentEvent.character, 1));
+                        Window.instance.run(() => { TextInput._updateEditingState(this._client, this._value); });
+                    }
+                }
+
+                currentEvent.Use();
+            }
+
+            if (!string.IsNullOrEmpty(Input.compositionString) &&
+                this._lastCompositionString != Input.compositionString) {
+                this._value = this._value.compose(Input.compositionString);
+                Window.instance.run(() => { TextInput._updateEditingState(this._client, this._value); });
+            }
+
+            this._lastCompositionString = Input.compositionString;
+        }
+
+        public void Dispose() {
+        }
+    }
+    
+    class UnityTouchScreenKeyboardDelegate : KeyboardDelegate, TextInputUpdateListener {
         int _client;
         string _lastCompositionString;
         TextInputConfiguration _configuration;
@@ -12,19 +105,10 @@ namespace Unity.UIWidgets.service {
         bool _screenKeyboardDone;
         readonly TextInput _textInput;
 
-        public KeyboadManager(TextInput textInput) {
-            this._textInput = textInput;
-        }
-
         public void Update() {
-            if (!TouchScreenKeyboard.isSupported) {
-                return;
-            }
-
             if (this._client == 0 || this._keyboard == null) {
                 return;
             }
-
 
             if (this._keyboard.canSetSelection && this._pendingSelection != null) {
                 this._keyboard.selection = this._pendingSelection.Value;
@@ -35,7 +119,7 @@ namespace Unity.UIWidgets.service {
                 if (!this._screenKeyboardDone) {
                     this._screenKeyboardDone = true;
                     Window.instance.run(() => {
-                        this._textInput._performAction(this._client,
+                        TextInput._performAction(this._client,
                             TextInputAction.done);
                     });
                 }
@@ -52,53 +136,14 @@ namespace Unity.UIWidgets.service {
                 this._value = newValue;
                 if (changed) {
                     Window.instance.run(() => {
-                        this._textInput._updateEditingState(this._client,
+                        TextInput._updateEditingState(this._client,
                             this._value);
                     });
                 }
             }
         }
 
-        public void OnGUI() {
-            if (TouchScreenKeyboard.isSupported) {
-                return;
-            }
-
-            if (this._client == 0) {
-                return;
-            }
-
-            var currentEvent = Event.current;
-            if (currentEvent != null && currentEvent.type == EventType.KeyDown) {
-                var action = TextInputUtils.getInputAction(currentEvent);
-                if (action != null) {
-                    Window.instance.run(() => { this._textInput._performAction(this._client, action.Value); });
-                }
-
-                if (action == null || action == TextInputAction.newline) {
-                    if (currentEvent.keyCode == KeyCode.None) {
-                        this._value = this._value.clearCompose().insert(new string(currentEvent.character, 1));
-                        Window.instance.run(() => { this._textInput._updateEditingState(this._client, this._value); });
-                    }
-                }
-
-                currentEvent.Use();
-            }
-
-            if (!string.IsNullOrEmpty(Input.compositionString) &&
-                this._lastCompositionString != Input.compositionString) {
-                this._value = this._value.compose(Input.compositionString);
-                Window.instance.run(() => { this._textInput._updateEditingState(this._client, this._value); });
-            }
-
-            this._lastCompositionString = Input.compositionString;
-        }
-
         public void show() {
-            if (!TouchScreenKeyboard.isSupported) {
-                return;
-            }
-
             var secure = this._configuration.obscureText;
             var multiline = this._configuration.inputType == TextInputType.multiline;
             var autocorrection = this._configuration.autocorrect;
@@ -116,6 +161,10 @@ namespace Unity.UIWidgets.service {
 
         public void clearClient() {
             this._client = 0;
+        }
+
+        public bool hashPreview() {
+            return this._keyboard != null;
         }
 
         public void setClient(int client, TextInputConfiguration configuration) {
@@ -150,11 +199,7 @@ namespace Unity.UIWidgets.service {
                 }
             }
         }
-
-        public bool textInputOnKeyboard() {
-            return TouchScreenKeyboard.isSupported;
-        }
-
+        
         static TouchScreenKeyboardType getKeyboardTypeForConfiguration(TextInputConfiguration config) {
             var inputType = config.inputType;
 
@@ -176,5 +221,85 @@ namespace Unity.UIWidgets.service {
 
             return TouchScreenKeyboardType.Default;
         }
+
+        public void Dispose() {
+        }
     }
+
+#if UNITY_IOS || UNITY_ANDROID
+    class UIWidgetsTouchScreenKeyboardDelegate : KeyboardDelegate {
+
+        public UIWidgetsTouchScreenKeyboardDelegate() {
+            UIWidgetsMessageManager.instance.AddChannelMessageDelegate("TextInput", this.handleMethodCall);
+        }
+        
+        public void Dispose() {
+            UIWidgetsMessageManager.instance.RemoveChannelMessageDelegate("TextInput", this.handleMethodCall);
+        }
+
+        public void show() {
+            UIWidgetsTextInputShow();
+        }
+
+        public void hide() {
+            UIWidgetsTextInputHide();
+        }
+
+        public void setEditingState(TextEditingValue value) {
+            UIWidgetsTextInputSetTextInputEditingState(value.toJson().ToString());
+        }
+
+        public void setClient(int client, TextInputConfiguration configuration) {
+            UIWidgetsTextInputSetClient(client, configuration.toJson().ToString());
+        }
+
+        public void clearClient() {
+            UIWidgetsTextInputClearTextInputClient();
+        }
+
+        public bool hashPreview() {
+            return false;
+        }
+
+        void handleMethodCall(string method, List<JSONNode> args) {
+            if (TextInput._currentConnection == null) {
+                return;
+            }
+            int client = args[0].AsInt;
+            if (client != TextInput._currentConnection._id) {
+                return;
+            }
+
+            using (TextInput._currentConnection._window.getScope()) {
+                switch (method) {
+                    case "TextInputClient.updateEditingState":
+                        TextInput._updateEditingState(client, TextEditingValue.fromJson(args[1].AsObject));
+                        break;
+                    case "TextInputClient.performAction":
+                        TextInput._performAction(client, TextInputUtils._toTextInputAction(args[1].Value));
+                        break;
+                    default:
+                        throw new UIWidgetsError($"unknown method ${method}");
+                }
+            }
+        }
+        
+        [DllImport ("__Internal")]
+        internal static extern float UIWidgetsTextInputShow();
+        
+        [DllImport ("__Internal")]
+        internal static extern float UIWidgetsTextInputHide();
+        
+        [DllImport ("__Internal")]
+        internal static extern float UIWidgetsTextInputSetClient(int client, string configuration);
+        
+        [DllImport ("__Internal")]
+        internal static extern float UIWidgetsTextInputSetTextInputEditingState(string jsonText); // also send to client ?
+        
+        [DllImport ("__Internal")]
+        internal static extern float UIWidgetsTextInputClearTextInputClient();
+       
+#endif    
+    }
+
 }

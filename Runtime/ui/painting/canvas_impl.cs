@@ -743,6 +743,10 @@ namespace Unity.UIWidgets.ui {
                         if (cmd.textMesh != null) {
                             mesh = cmd.textMesh.resovleMesh();
                         }
+
+                        if (mesh == null) {
+                            continue;
+                        }
   
                         cmd.meshObj.SetVertices(mesh.vertices);
                         cmd.meshObj.SetTriangles(mesh.triangles, 0, false);
