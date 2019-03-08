@@ -47,7 +47,7 @@ namespace UIWidgetsGallery.gallery {
         Timer _timeDilationTimer;
 
         Dictionary<string, WidgetBuilder> _buildRoutes() {
-            return GalleryDemo.kAllGalleryDemos.ToDictionary(
+            return DemoUtils.kAllGalleryDemos.ToDictionary(
                 (demo) => $"{demo.routeName}",
                 (demo) => demo.buildRoute);
         }
@@ -102,16 +102,17 @@ namespace UIWidgetsGallery.gallery {
         }
 
         public override Widget build(BuildContext context) {
-//            Widget home = new GalleryHome(
-//                    testMode: this.widget.testMode,
-//                    optionsPage: new GalleryOptionsPage(
-//                        options: this._options,
-//                        onOptionsChanged: _handleOptionsChanged,
-//                        onSendFeedback: this.widget.onSendFeedback ?? () => { Application.OpenURL("https://github.com/UnityTech/UIWidgets/issues"); }
-//                    )
-//                );
+            Widget home = new GalleryHome(
+                testMode: this.widget.testMode,
+                optionsPage: new GalleryOptionsPage(
+                    options: this._options,
+                    onOptionsChanged: this._handleOptionsChanged,
+                    onSendFeedback: this.widget.onSendFeedback ?? (() => {
+                        Application.OpenURL("https://github.com/UnityTech/UIWidgets/issues");
+                    })
+                )
+            );
 
-            Widget home = null;
             if (this.widget.updateUrlFetcher != null) {
                 home = new Updater(
                     updateUrlFetcher: this.widget.updateUrlFetcher,

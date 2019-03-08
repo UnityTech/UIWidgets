@@ -29,10 +29,6 @@ namespace Unity.UIWidgets.material {
             get { return null; }
         }
 
-        public override string barrierLabel {
-            get { return null; }
-        }
-
         public override bool canTransitionFrom(TransitionRoute previousRoute) {
             return previousRoute is MaterialPageRoute;
         }

@@ -60,7 +60,7 @@ namespace Unity.UIWidgets.material {
         public readonly string tooltip;
 
         public override Widget build(BuildContext context) {
-            D.assert(MaterialDebug.debugCheckHasMaterial(context));
+            D.assert(MaterialD.debugCheckHasMaterial(context));
             Color currentColor;
             if (this.onPressed != null) {
                 currentColor = this.color;
