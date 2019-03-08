@@ -79,7 +79,7 @@ namespace Unity.UIWidgets.material {
 
 
         public override Widget build(BuildContext context) {
-            D.assert(MaterialDebug.debugCheckHasMaterial(context));
+            D.assert(MaterialD.debugCheckHasMaterial(context));
             ThemeData theme = Theme.of(context);
             return new IconButton(
                 padding: this.widget.padding,

@@ -1,8 +1,9 @@
 using System;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.service;
-using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
+using UnityEngine;
+using Color = Unity.UIWidgets.ui.Color;
 
 namespace Unity.UIWidgets.material {
     static class ThemeDataUtils {
@@ -61,6 +62,7 @@ namespace Unity.UIWidgets.material {
             IconThemeData iconTheme = null,
             IconThemeData primaryIconTheme = null,
             IconThemeData accentIconTheme = null,
+            RuntimePlatform? platform = null,
             MaterialTapTargetSize? materialTapTargetSize = null,
             PageTransitionsTheme pageTransitionsTheme = null,
             ColorScheme colorScheme = null,
@@ -124,7 +126,7 @@ namespace Unity.UIWidgets.material {
                                   : new IconThemeData(color: Colors.black));
             iconTheme = iconTheme ??
                         (isDark ? new IconThemeData(color: Colors.white) : new IconThemeData(color: Colors.black87));
-
+            platform = platform ?? Application.platform;
             typography = typography ?? new Typography();
             TextTheme defaultTextTheme = isDark ? typography.white : typography.black;
             textTheme = defaultTextTheme.merge(textTheme);
@@ -237,6 +239,7 @@ namespace Unity.UIWidgets.material {
             this.iconTheme = iconTheme;
             this.primaryIconTheme = primaryIconTheme;
             this.accentIconTheme = accentIconTheme;
+            this.platform = platform;
             this.materialTapTargetSize = materialTapTargetSize ?? MaterialTapTargetSize.padded;
             this.pageTransitionsTheme = pageTransitionsTheme;
             this.colorScheme = colorScheme;
@@ -281,6 +284,7 @@ namespace Unity.UIWidgets.material {
             IconThemeData iconTheme = null,
             IconThemeData primaryIconTheme = null,
             IconThemeData accentIconTheme = null,
+            RuntimePlatform? platform = null,
             MaterialTapTargetSize? materialTapTargetSize = null,
             PageTransitionsTheme pageTransitionsTheme = null,
             ColorScheme colorScheme = null,
@@ -322,6 +326,7 @@ namespace Unity.UIWidgets.material {
             D.assert(iconTheme != null);
             D.assert(primaryIconTheme != null);
             D.assert(accentIconTheme != null);
+            D.assert(platform != null);
             D.assert(materialTapTargetSize != null);
             D.assert(pageTransitionsTheme != null);
             D.assert(colorScheme != null);
@@ -366,6 +371,7 @@ namespace Unity.UIWidgets.material {
                 iconTheme: iconTheme,
                 primaryIconTheme: primaryIconTheme,
                 accentIconTheme: accentIconTheme,
+                platform: platform,
                 materialTapTargetSize: materialTapTargetSize,
                 pageTransitionsTheme: pageTransitionsTheme,
                 colorScheme: colorScheme,
@@ -458,6 +464,8 @@ namespace Unity.UIWidgets.material {
 
         public readonly IconThemeData accentIconTheme;
 
+        public readonly RuntimePlatform platform;
+
         public readonly MaterialTapTargetSize materialTapTargetSize;
 
         public readonly PageTransitionsTheme pageTransitionsTheme;
@@ -505,6 +513,7 @@ namespace Unity.UIWidgets.material {
             IconThemeData iconTheme = null,
             IconThemeData primaryIconTheme = null,
             IconThemeData accentIconTheme = null,
+            RuntimePlatform? platform = null,
             MaterialTapTargetSize? materialTapTargetSize = null,
             PageTransitionsTheme pageTransitionsTheme = null,
             ColorScheme colorScheme = null,
@@ -548,6 +557,7 @@ namespace Unity.UIWidgets.material {
                 iconTheme: iconTheme ?? this.iconTheme,
                 primaryIconTheme: primaryIconTheme ?? this.primaryIconTheme,
                 accentIconTheme: accentIconTheme ?? this.accentIconTheme,
+                platform: platform ?? this.platform,
                 materialTapTargetSize: materialTapTargetSize ?? this.materialTapTargetSize,
                 pageTransitionsTheme: pageTransitionsTheme ?? this.pageTransitionsTheme,
                 colorScheme: colorScheme ?? this.colorScheme,
@@ -555,7 +565,6 @@ namespace Unity.UIWidgets.material {
                 typography: typography ?? this.typography
             );
         }
-
 
         public static Brightness estimateBrightnessForColor(Color color) {
             float relativeLuminance = color.computeLuminance();
@@ -607,6 +616,7 @@ namespace Unity.UIWidgets.material {
                 iconTheme: IconThemeData.lerp(a.iconTheme, b.iconTheme, t),
                 primaryIconTheme: IconThemeData.lerp(a.primaryIconTheme, b.primaryIconTheme, t),
                 accentIconTheme: IconThemeData.lerp(a.accentIconTheme, b.accentIconTheme, t),
+                platform: t < 0.5 ? a.platform : b.platform,
                 materialTapTargetSize: t < 0.5 ? a.materialTapTargetSize : b.materialTapTargetSize,
                 pageTransitionsTheme: t < 0.5 ? a.pageTransitionsTheme : b.pageTransitionsTheme,
                 colorScheme: ColorScheme.lerp(a.colorScheme, b.colorScheme, t),
@@ -660,6 +670,7 @@ namespace Unity.UIWidgets.material {
                    other.iconTheme == this.iconTheme &&
                    other.primaryIconTheme == this.primaryIconTheme &&
                    other.accentIconTheme == this.accentIconTheme &&
+                   other.platform == this.platform &&
                    other.materialTapTargetSize == this.materialTapTargetSize &&
                    other.pageTransitionsTheme == this.pageTransitionsTheme &&
                    other.colorScheme == this.colorScheme &&
@@ -729,6 +740,7 @@ namespace Unity.UIWidgets.material {
                 hashCode = (hashCode * 397) ^ this.iconTheme.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.primaryIconTheme.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.accentIconTheme.GetHashCode();
+                hashCode = (hashCode * 397) ^ this.platform.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.materialTapTargetSize.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.pageTransitionsTheme.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.colorScheme.GetHashCode();
@@ -741,6 +753,8 @@ namespace Unity.UIWidgets.material {
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             ThemeData defaultData = fallback();
+            properties.add(new EnumProperty<RuntimePlatform>("platform", this.platform,
+                defaultValue: Application.platform));
             properties.add(new EnumProperty<Brightness>("brightness", this.brightness,
                 defaultValue: defaultData.brightness));
             properties.add(new DiagnosticsProperty<Color>("primaryColor", this.primaryColor,

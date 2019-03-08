@@ -7,7 +7,7 @@ using Unity.UIWidgets.widgets;
 
 namespace UIWidgetsGallery.gallery {
     public class GalleryDemoCategory : IEquatable<GalleryDemoCategory> {
-        GalleryDemoCategory(string name = null, IconData icon = null) {
+        public GalleryDemoCategory(string name = null, IconData icon = null) {
             D.assert(name != null);
             D.assert(icon != null);
 
@@ -60,28 +60,30 @@ namespace UIWidgetsGallery.gallery {
         public override string ToString() {
             return $"{this.GetType()}({this.name})";
         }
+    }
 
-        public static readonly GalleryDemoCategory _kDemos = new GalleryDemoCategory(
+    public static partial class DemoUtils {
+        internal static readonly GalleryDemoCategory _kDemos = new GalleryDemoCategory(
             name: "Studies",
             icon: GalleryIcons.animation
         );
 
-        public static readonly GalleryDemoCategory _kStyle = new GalleryDemoCategory(
+        internal static readonly GalleryDemoCategory _kStyle = new GalleryDemoCategory(
             name: "Style",
             icon: GalleryIcons.custom_typography
         );
 
-        public static readonly GalleryDemoCategory _kMaterialComponents = new GalleryDemoCategory(
+        internal static readonly GalleryDemoCategory _kMaterialComponents = new GalleryDemoCategory(
             name: "Material",
             icon: GalleryIcons.category_mdc
         );
 
-        public static readonly GalleryDemoCategory _kCupertinoComponents = new GalleryDemoCategory(
+        internal static readonly GalleryDemoCategory _kCupertinoComponents = new GalleryDemoCategory(
             name: "Cupertino",
             icon: GalleryIcons.phone_iphone
         );
 
-        public static readonly GalleryDemoCategory _kMedia = new GalleryDemoCategory(
+        internal static readonly GalleryDemoCategory _kMedia = new GalleryDemoCategory(
             name: "Media",
             icon: GalleryIcons.drive_video
         );
@@ -123,6 +125,9 @@ namespace UIWidgetsGallery.gallery {
             return $"{this.GetType()}({this.title} {this.routeName})";
         }
 
+    }
+
+    public static partial class DemoUtils {
         static List<GalleryDemo> _buildGalleryDemos() {
             List<GalleryDemo> galleryDemos = new List<GalleryDemo> {
 //                // Demos

@@ -164,7 +164,6 @@ namespace UIWidgetsSample {
                     return builder(buildContext);
                 },
                 barrierDismissible: barrierDismissible,
-                barrierLabel: "",
                 barrierColor: new Color(0x8A000000),
                 transitionDuration: TimeSpan.FromMilliseconds(150),
                 transitionBuilder: _buildMaterialDialogTransitions

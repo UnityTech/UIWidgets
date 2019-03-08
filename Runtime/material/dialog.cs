@@ -193,7 +193,7 @@ namespace Unity.UIWidgets.material {
         public readonly ShapeBorder shape;
 
         public override Widget build(BuildContext context) {
-            // D.assert(debugCheckHasMaterialLocalizations(context));
+            D.assert(MaterialD.debugCheckHasMaterialLocalizations(context));
 
             List<Widget> body = new List<Widget>();
 
@@ -250,7 +250,7 @@ namespace Unity.UIWidgets.material {
             bool barrierDismissible = true,
             WidgetBuilder builder = null
         ) {
-            // D.assert(debugCheckHasMaterialLocalizations(context));
+            D.assert(MaterialD.debugCheckHasMaterialLocalizations(context));
 
             return widgets.DialogUtils.showGeneralDialog(
                 context: context,
@@ -265,7 +265,6 @@ namespace Unity.UIWidgets.material {
                     );
                 },
                 barrierDismissible: barrierDismissible,
-                // barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
                 barrierColor: Colors.black54,
                 transitionDuration: new TimeSpan(0, 0, 0, 0, 150),
                 transitionBuilder: _buildMaterialDialogTransitions

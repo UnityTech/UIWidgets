@@ -25,6 +25,10 @@ namespace Unity.UIWidgets.ui {
             return value;
         }
 
+        public static int abs(this int value) {
+            return Mathf.Abs(value);
+        }
+
         public static float abs(this float value) {
             return Mathf.Abs(value);
         }

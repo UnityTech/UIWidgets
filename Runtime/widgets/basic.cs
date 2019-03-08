@@ -534,6 +534,34 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
+    public class Baseline : SingleChildRenderObjectWidget {
+        public Baseline(
+            Key key = null,
+            float? baseline = null,
+            TextBaseline? baselineType = null,
+            Widget child = null
+        ) : base(key: key, child: child) {
+            D.assert(baseline != null);
+            D.assert(baselineType != null);
+            this.baseline = baseline.Value;
+            this.baselineType = baselineType.Value;
+        }
+
+        public readonly float baseline;
+
+        public readonly TextBaseline baselineType;
+
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderBaseline(baseline: this.baseline, baselineType: this.baselineType);
+        }
+
+        public override void updateRenderObject(BuildContext context, RenderObject renderObjectRaw) {
+            RenderBaseline renderObject = (RenderBaseline) renderObjectRaw;
+            renderObject.baseline = this.baseline;
+            renderObject.baselineType = this.baselineType;
+        }
+    }
+
     public class ListBody : MultiChildRenderObjectWidget {
         public ListBody(
             Key key = null,
@@ -1826,6 +1854,45 @@ namespace Unity.UIWidgets.widgets {
             properties.add(new DiagnosticsProperty<object>("metaData", this.metaData));
         }
     }
+
+    public class KeyedSubtree : StatelessWidget {
+        public KeyedSubtree(
+            Key key,
+            Widget child = null
+        ) : base(key: key) {
+            D.assert(child != null);
+            this.child = child;
+        }
+
+
+        public static KeyedSubtree wrap(Widget child, int childIndex) {
+            Key key = child.key != null ? (Key) new ValueKey<Key>(child.key) : new ValueKey<int>(childIndex);
+            return new KeyedSubtree(key: key, child: child);
+        }
+
+        public readonly Widget child;
+
+        public static List<Widget> ensureUniqueKeysForList(IEnumerable<Widget> items, int baseIndex = 0) {
+            if (items == null) {
+                return null;
+
+            }
+            List<Widget> itemsWithUniqueKeys = new List<Widget>();
+            int itemIndex = baseIndex;
+            foreach (Widget item in items) {
+                itemsWithUniqueKeys.Add(KeyedSubtree.wrap(item, itemIndex));
+                itemIndex += 1;
+            }
+
+            D.assert(!WidgetsD.debugItemsHaveDuplicateKeys(itemsWithUniqueKeys));
+            return itemsWithUniqueKeys;
+        }
+
+        public override Widget build(BuildContext context) {
+            return this.child;
+        }
+    }
+
 
     public class Builder : StatelessWidget {
         public Builder(
