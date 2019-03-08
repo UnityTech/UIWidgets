@@ -130,9 +130,7 @@ namespace Unity.UIWidgets.widgets {
             Animation<float> sizeFactor = null,
             float axisAlignment = 0.0f,
             Widget child = null) : base(key: key, listenable: sizeFactor) {
-            D.assert(axis != null);
             D.assert(sizeFactor != null);
-            D.assert(axisAlignment != null);
             this.axis = axis;
             this.axisAlignment = axisAlignment;
             this.child = child;
