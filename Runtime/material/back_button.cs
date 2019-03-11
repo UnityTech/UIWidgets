@@ -1,6 +1,7 @@
 using Unity.UIWidgets.foundation;
-using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
+using UnityEngine;
+using Color = Unity.UIWidgets.ui.Color;
 
 namespace Unity.UIWidgets.material {
     public class BackButtonIcon : StatelessWidget {
@@ -8,12 +9,20 @@ namespace Unity.UIWidgets.material {
             Key key = null) : base(key: key) {
         }
 
-        static IconData _getIconData() {
-            return Icons.arrow_back;
+        static IconData _getIconData(RuntimePlatform platform) {
+            switch (platform) {
+                case RuntimePlatform.IPhonePlayer:
+                    return Icons.arrow_back_ios;
+                default:
+                    return Icons.arrow_back;
+            }
+
+            D.assert(false);
+            return null;
         }
 
         public override Widget build(BuildContext context) {
-            return new Icon(_getIconData());
+            return new Icon(_getIconData(Theme.of(context).platform));
         }
     }
 
@@ -30,6 +39,7 @@ namespace Unity.UIWidgets.material {
             return new IconButton(
                 icon: new BackButtonIcon(),
                 color: this.color,
+                tooltip: MaterialLocalizations.of(context).backButtonTooltip,
                 onPressed: () => { Navigator.maybePop(context); });
         }
     }
@@ -42,6 +52,7 @@ namespace Unity.UIWidgets.material {
         public override Widget build(BuildContext context) {
             return new IconButton(
                 icon: new Icon(Icons.close),
+                tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
                 onPressed: () => { Navigator.maybePop(context); });
         }
     }

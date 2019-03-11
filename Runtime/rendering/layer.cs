@@ -959,4 +959,25 @@ namespace Unity.UIWidgets.rendering {
             return null;
         }
     }
+
+    public class AnnotatedRegionLayer<T> : ContainerLayer 
+    where T : class {
+        public AnnotatedRegionLayer(
+            T value = null,
+            Size size = null) {  
+            D.assert(value != null);
+            this.value = value;
+            this.size = size;
+        }
+
+        public readonly T value;
+
+        public readonly Size size;
+        
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new DiagnosticsProperty<T>("value", this.value));
+            properties.add(new DiagnosticsProperty<Size>("size", this.size, defaultValue: null));
+        }
+    }
 }

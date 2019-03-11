@@ -1,22 +1,26 @@
-using System.Drawing;
 using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.ui;
 
 namespace Unity.UIWidgets.widgets {
     
-    public interface PreferredSizeWidget {
+    public interface IPreferredSizeWidget {
         Size preferredSize { get; }
     }
 
+    public abstract class PreferredSizeWidget : Widget, IPreferredSizeWidget {
+        public Size preferredSize { get; }
+    }
 
-    public class PreferredSize : StatelessWidget, PreferredSizeWidget {
+
+    public class PreferredSize : StatelessWidget, IPreferredSizeWidget {
         public PreferredSize(
             Key key = null,
             Widget child = null,
-            Size? preferredSize = null) : base(key: key) {
+            Size preferredSize = null) : base(key: key) {
             D.assert(child != null);
             D.assert(preferredSize != null);
             this.child = child;
-            this.preferredSize = preferredSize ?? Size.Empty;
+            this.preferredSize = preferredSize;
         }
 
         public readonly Widget child;

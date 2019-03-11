@@ -94,6 +94,37 @@ namespace Unity.UIWidgets.widgets {
     }
 
 
+    public class ScaleTransition : AnimatedWidget {
+        public ScaleTransition(
+            Key key = null,
+            Animation<float> scale = null,
+            Alignment alignment = null,
+            Widget child = null) : base(key: key, listenable: scale) {
+            D.assert(scale != null);
+            this.alignment = alignment ?? Alignment.center;
+            this.child = child;
+        }
+
+        public Animation<float> scale {
+            get { return (Animation<float>) this.listenable; }
+        }
+
+        public readonly Alignment alignment;
+
+        public readonly Widget child;
+        
+        protected internal override Widget build(BuildContext context) {
+            float scaleValue = this.scale.value;
+            Matrix3 transform = Matrix3.makeScale(scaleValue, scaleValue);
+            return new Transform(
+                transform: transform,
+                alignment: this.alignment,
+                child: this.child
+            );
+        }
+    }
+
+
     public class RotationTransition : AnimatedWidget {
         public RotationTransition(
             Key key = null,

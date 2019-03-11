@@ -2203,4 +2203,55 @@ namespace Unity.UIWidgets.rendering {
             properties.add(new TransformProperty("current transform matrix", this.getCurrentTransform()));
         }
     }
+
+    public class RenderAnnotatedRegion<T> : RenderProxyBox 
+    where T : class {
+        public RenderAnnotatedRegion(
+            T value = null,
+            bool? sized = null,
+            RenderBox child = null
+        ) : base(child: child) {
+            D.assert(value != null);
+            D.assert(sized != null);
+            this._value = value;
+            this._sized = sized.Value;
+        }
+
+        public T value {
+            get { return this._value; }
+            set {
+                if (this._value == value) {
+                    return;
+                }
+
+                this._value = value;
+                this.markNeedsPaint();
+            }
+        }
+
+        T _value;
+
+        public bool sized {
+            get { return this._sized; }
+            set {
+                if (this._sized == value) {
+                    return;
+                }
+
+                this._sized = value;
+                this.markNeedsPaint();
+            }
+        }
+
+        bool _sized;
+
+        protected override bool alwaysNeedsCompositing {
+            get { return true; }
+        }
+
+        public override void paint(PaintingContext context, Offset offset) {
+            AnnotatedRegionLayer<T> layer = new AnnotatedRegionLayer<T>(this.value, size: this.sized ? this.size : null);
+            context.pushLayer(layer, base.paint, offset);
+        }
+    }
 }
