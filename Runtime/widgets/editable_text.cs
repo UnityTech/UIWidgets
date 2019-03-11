@@ -74,6 +74,8 @@ namespace Unity.UIWidgets.widgets {
 
         public readonly TextDirection? textDirection;
 
+        public readonly TextCapitalization textCapitalization;
+
         public readonly float? textScaleFactor;
 
         public readonly Color cursorColor;
@@ -108,6 +110,7 @@ namespace Unity.UIWidgets.widgets {
             float? textScaleFactor = null, int? maxLines = 1,
             bool autofocus = false, Color selectionColor = null, TextSelectionControls selectionControls = null,
             TextInputType keyboardType = null, TextInputAction? textInputAction = null,
+            TextCapitalization textCapitalization = TextCapitalization.none,
             ValueChanged<string> onChanged = null, VoidCallback onEditingComplete = null,
             ValueChanged<string> onSubmitted = null, SelectionChangedCallback onSelectionChanged = null,
             List<TextInputFormatter> inputFormatters = null, bool rendererIgnoresPointer = false,
@@ -130,6 +133,7 @@ namespace Unity.UIWidgets.widgets {
             this.textDirection = textDirection;
             this.textScaleFactor = textScaleFactor;
             this.textInputAction = textInputAction;
+            this.textCapitalization = textCapitalization;
             this.cursorColor = cursorColor;
             this.maxLines = maxLines;
             this.autofocus = autofocus;
@@ -498,6 +502,7 @@ namespace Unity.UIWidgets.widgets {
                     inputAction: this.widget.textInputAction ?? ((this.widget.keyboardType == TextInputType.multiline)
                                      ? TextInputAction.newline
                                      : TextInputAction.done),
+                    textCapitalization: this.widget.textCapitalization,
                     unityTouchKeyboard: this.widget.unityTouchKeyboard
                                  
                 ));

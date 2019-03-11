@@ -39,7 +39,7 @@ namespace Unity.UIWidgets.engine {
             var name = this.gameObject.name;
             if (name != this._lastObjectName) {
                 this._lastObjectName = name;
-#if UNITY_IOS 
+#if UNITY_IOS || UNITY_ANDROID
                 if (!Application.isEditor) {
                     UIWidgetsMessageSetObjectName(this._lastObjectName);
                 }
@@ -79,6 +79,19 @@ namespace Unity.UIWidgets.engine {
 #if UNITY_IOS        
         [DllImport("__Internal")]
         static extern void UIWidgetsMessageSetObjectName(string objectName);
+#elif UNITY_ANDROID
+        
+        static void UIWidgetsMessageSetObjectName(string objectName) {
+            using (
+                AndroidJavaClass managerClass = new AndroidJavaClass("com.unity.uiwidgets.plugin.UIWidgetsMessageManager")
+            ) {
+                using (
+                    AndroidJavaObject managerInstance = managerClass.CallStatic<AndroidJavaObject>("getInstance")
+                ) {
+                    managerInstance.Call("SetObjectName", objectName);
+                }
+            }
+        }
 #endif
         
     }

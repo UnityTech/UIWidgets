@@ -130,9 +130,10 @@ namespace Unity.UIWidgets.service {
                     this._keyboard.text,
                     this._keyboard.canGetSelection
                         ? new TextSelection(keyboardSelection.start, keyboardSelection.end)
-                        : this._value.selection
+                        : TextSelection.collapsed(0)
                 );
                 var changed = this._value != newValue;
+                
                 this._value = newValue;
                 if (changed) {
                     Window.instance.run(() => {
@@ -284,21 +285,63 @@ namespace Unity.UIWidgets.service {
             }
         }
         
+#if UNITY_IOS
         [DllImport ("__Internal")]
-        internal static extern float UIWidgetsTextInputShow();
+        internal static extern void UIWidgetsTextInputShow();
         
         [DllImport ("__Internal")]
-        internal static extern float UIWidgetsTextInputHide();
+        internal static extern void UIWidgetsTextInputHide();
         
         [DllImport ("__Internal")]
-        internal static extern float UIWidgetsTextInputSetClient(int client, string configuration);
+        internal static extern void UIWidgetsTextInputSetClient(int client, string configuration);
         
         [DllImport ("__Internal")]
-        internal static extern float UIWidgetsTextInputSetTextInputEditingState(string jsonText); // also send to client ?
+        internal static extern void UIWidgetsTextInputSetTextInputEditingState(string jsonText); // also send to client ?
         
         [DllImport ("__Internal")]
-        internal static extern float UIWidgetsTextInputClearTextInputClient();
-       
+        internal static extern void UIWidgetsTextInputClearTextInputClient();
+#elif UNITY_ANDROID
+        internal static void UIWidgetsTextInputShow() {
+            using (
+                AndroidJavaClass pluginClass = new AndroidJavaClass("com.unity.uiwidgets.plugin.editing.TextInputPlugin")
+            ) {
+                pluginClass.CallStatic("show");
+            }
+        }
+        
+        internal static void UIWidgetsTextInputHide() {
+            using (
+                AndroidJavaClass pluginClass = new AndroidJavaClass("com.unity.uiwidgets.plugin.editing.TextInputPlugin")
+            ) {
+                pluginClass.CallStatic("hide");
+            }
+        }
+        
+        internal static void UIWidgetsTextInputSetClient(int client, string configuration) {
+            using (
+                AndroidJavaClass pluginClass = new AndroidJavaClass("com.unity.uiwidgets.plugin.editing.TextInputPlugin")
+            ) {
+               
+                pluginClass.CallStatic("setClient", client, configuration);
+            }
+        }
+        
+        internal static void UIWidgetsTextInputSetTextInputEditingState(string jsonText) {
+            using (
+                AndroidJavaClass pluginClass = new AndroidJavaClass("com.unity.uiwidgets.plugin.editing.TextInputPlugin")
+            ) {
+                pluginClass.CallStatic("setEditingState", jsonText);
+            }
+        }
+        
+        internal static void UIWidgetsTextInputClearTextInputClient() {
+            using (
+                AndroidJavaClass pluginClass = new AndroidJavaClass("com.unity.uiwidgets.plugin.editing.TextInputPlugin")
+            ) {
+                pluginClass.CallStatic("clearClient");
+            }
+        }
+#endif
 #endif    
     }
 

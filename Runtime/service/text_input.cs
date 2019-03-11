@@ -417,14 +417,24 @@ namespace Unity.UIWidgets.service {
         scrollPageDown,
     }
 
+    public enum TextCapitalization {
+        words,
+        sentences,
+        characters,
+        none
+    }
+
     class TextInputConfiguration {
         public TextInputConfiguration(TextInputType inputType = null,
             bool obscureText = false, bool autocorrect = true, TextInputAction inputAction = TextInputAction.done,
+            Brightness keyboardAppearance = Brightness.light, TextCapitalization textCapitalization = TextCapitalization.none,
             bool unityTouchKeyboard = false) {
             this.inputType = inputType ?? TextInputType.text;
             this.inputAction = inputAction;
             this.obscureText = obscureText;
             this.autocorrect = autocorrect;
+            this.textCapitalization = textCapitalization;
+            this.keyboardAppearance = keyboardAppearance;
             this.unityTouchKeyboard = unityTouchKeyboard;
         }
 
@@ -432,6 +442,8 @@ namespace Unity.UIWidgets.service {
         public readonly bool obscureText;
         public readonly bool autocorrect;
         public readonly TextInputAction inputAction;
+        public readonly TextCapitalization textCapitalization;
+        public readonly Brightness keyboardAppearance;
         public readonly bool unityTouchKeyboard;
 
         public JSONNode toJson() {
@@ -441,6 +453,8 @@ namespace Unity.UIWidgets.service {
             json["autocorrect"] = this.autocorrect;
             json["inputAction"] = $"TextInputAction.{this.inputAction.ToString()}";
             json["unityTouchKeyboard"] = this.unityTouchKeyboard;
+            json["textCapitalization"] = $"TextCapitalization.{this.textCapitalization.ToString()}";
+            json["keyboardAppearance"] = $"Brightness.{this.keyboardAppearance.ToString()}";
             return json;
         }
     }
