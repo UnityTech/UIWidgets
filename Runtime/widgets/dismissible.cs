@@ -44,6 +44,13 @@ namespace Unity.UIWidgets.widgets {
             this.resizeDuration = resizeDuration ?? new TimeSpan(0, 0, 0, 0, 300);
             this.dismissThresholds = dismissThresholds ?? new Dictionary<DismissDirection?, float?>();
             this.movementDuration = movementDuration ?? new TimeSpan(0, 0, 0, 0, 200);
+            this.child = child;
+            this.background = background;
+            this.secondaryBackground = secondaryBackground;
+            this.onResize = onResize;
+            this.onDismissed = onDismissed;
+            this.direction = direction;
+            this.crossAxisEndOffset = crossAxisEndOffset;
         }
 
         public readonly Widget child;
