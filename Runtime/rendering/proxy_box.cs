@@ -670,7 +670,7 @@ namespace Unity.UIWidgets.rendering {
 
         public abstract T getClip(Size size);
 
-        public Rect getApproximateClipRect(Size size) {
+        public virtual Rect getApproximateClipRect(Size size) {
             return Offset.zero & size;
         }
 

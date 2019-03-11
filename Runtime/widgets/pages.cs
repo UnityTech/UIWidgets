@@ -12,7 +12,7 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public override bool opaque {
-            get { return false; }
+            get { return true; }
         }
 
         public override bool barrierDismissible {

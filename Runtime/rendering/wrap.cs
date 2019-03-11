@@ -51,13 +51,6 @@ namespace Unity.UIWidgets.rendering {
             TextDirection? textDirection = null,
             VerticalDirection verticalDirection = VerticalDirection.down
         ) {
-            D.assert(direction != null);
-            D.assert(alignment != null);
-            D.assert(spacing != null);
-            D.assert(runAlignment != null);
-            D.assert(runSpacing != null);
-            D.assert(crossAxisAlignment != null);
-
             this._direction = direction;
             this._alignment = alignment;
             this._spacing = spacing;
@@ -75,7 +68,6 @@ namespace Unity.UIWidgets.rendering {
         public Axis direction {
             get { return this._direction; }
             set {
-                D.assert(value != null);
                 if (this._direction == value) {
                     return;
                 }
@@ -90,7 +82,6 @@ namespace Unity.UIWidgets.rendering {
         public WrapAlignment alignment {
             get { return this._alignment; }
             set {
-                D.assert(value != null);
                 if (this._alignment == value) {
                     return;
                 }
@@ -105,7 +96,6 @@ namespace Unity.UIWidgets.rendering {
         public float spacing {
             get { return this._spacing; }
             set {
-                D.assert(value != null);
                 if (this._spacing == value) {
                     return;
                 }
@@ -120,7 +110,6 @@ namespace Unity.UIWidgets.rendering {
         public WrapAlignment runAlignment {
             get { return this._runAlignment; }
             set {
-                D.assert(value != null);
                 if (this._runAlignment == value) {
                     return;
                 }
@@ -135,7 +124,6 @@ namespace Unity.UIWidgets.rendering {
         public float runSpacing {
             get { return this._runSpacing; }
             set {
-                D.assert(value != null);
                 if (this._runSpacing == value) {
                     return;
                 }
@@ -150,7 +138,6 @@ namespace Unity.UIWidgets.rendering {
         public WrapCrossAlignment crossAxisAlignment {
             get { return this._crossAxisAlignment; }
             set {
-                D.assert(value != null);
                 if (this._crossAxisAlignment == value) {
                     return;
                 }
@@ -186,10 +173,6 @@ namespace Unity.UIWidgets.rendering {
 
         public bool _debugHasNecessaryDirections {
             get {
-                D.assert(this.direction != null);
-                D.assert(this.alignment != null);
-                D.assert(this.runAlignment != null);
-                D.assert(this.crossAxisAlignment != null);
                 if (this.firstChild != null && this.lastChild != this.firstChild) {
                     // i.e. there"s more than one child
                     switch (this.direction) {
@@ -198,8 +181,6 @@ namespace Unity.UIWidgets.rendering {
                                 "Horizontal $runtimeType with multiple children has a null textDirection, so the layout order is undefined.");
                             break;
                         case Axis.vertical:
-                            D.assert(this.verticalDirection != null,
-                                "Vertical $runtimeType with multiple children has a null verticalDirection, so the layout order is undefined.");
                             break;
                     }
                 }
@@ -211,8 +192,6 @@ namespace Unity.UIWidgets.rendering {
                                 "Horizontal $runtimeType with alignment $alignment has a null textDirection, so the alignment cannot be resolved.");
                             break;
                         case Axis.vertical:
-                            D.assert(this.verticalDirection != null,
-                                "Vertical $runtimeType with alignment $alignment has a null verticalDirection, so the alignment cannot be resolved.");
                             break;
                     }
                 }
@@ -220,8 +199,6 @@ namespace Unity.UIWidgets.rendering {
                 if (this.runAlignment == WrapAlignment.start || this.runAlignment == WrapAlignment.end) {
                     switch (this.direction) {
                         case Axis.horizontal:
-                            D.assert(this.verticalDirection != null,
-                                "Horizontal $runtimeType with runAlignment $runAlignment has a null verticalDirection, so the alignment cannot be resolved.");
                             break;
                         case Axis.vertical:
                             D.assert(this.textDirection != null,
@@ -234,8 +211,6 @@ namespace Unity.UIWidgets.rendering {
                     this.crossAxisAlignment == WrapCrossAlignment.end) {
                     switch (this.direction) {
                         case Axis.horizontal:
-                            D.assert(this.verticalDirection != null,
-                                "Horizontal $runtimeType with crossAxisAlignment $crossAxisAlignment has a null verticalDirection, so the alignment cannot be resolved.");
                             break;
                         case Axis.vertical:
                             D.assert(this.textDirection != null,
@@ -502,7 +477,6 @@ namespace Unity.UIWidgets.rendering {
             }
 
             D.assert(childConstraints != null);
-            D.assert(mainAxisLimit != null);
             float spacing = this.spacing;
             float runSpacing = this.runSpacing;
             List<_RunMetrics> runMetrics = new List<_RunMetrics> { };
@@ -522,7 +496,7 @@ namespace Unity.UIWidgets.rendering {
                         crossAxisExtent += runSpacing;
                     }
 
-                    runMetrics.Append(new _RunMetrics(runMainAxisExtent, runCrossAxisExtent, childCount));
+                    runMetrics.Add(new _RunMetrics(runMainAxisExtent, runCrossAxisExtent, childCount));
                     runMainAxisExtent = 0.0f;
                     runCrossAxisExtent = 0.0f;
                     childCount = 0;
@@ -548,7 +522,7 @@ namespace Unity.UIWidgets.rendering {
                     crossAxisExtent += runSpacing;
                 }
 
-                runMetrics.Append(new _RunMetrics(runMainAxisExtent, runCrossAxisExtent, childCount));
+                runMetrics.Add(new _RunMetrics(runMainAxisExtent, runCrossAxisExtent, childCount));
             }
 
             int runCount = runMetrics.Count;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using RSG;
 using Unity.UIWidgets.editor;
 using Unity.UIWidgets.material;
 using Unity.UIWidgets.painting;
@@ -97,6 +98,10 @@ namespace UIWidgets.Tests {
 
                 Window.instance = this._windowAdapter;
 
+                if (Event.current.type == EventType.MouseDown) {
+                    Promise.Delayed(new TimeSpan(0, 0, 5)).Then(() => { Debug.Log("Promise.Delayed: 5s"); });
+                }
+
                 this._options[this._selected]();
 
                 Window.instance = null;
@@ -163,12 +168,6 @@ namespace UIWidgets.Tests {
                 }, null, TileMode.clamp)
             };
 
-//            canvas.drawRect(
-//                Unity.UIWidgets.ui.Rect.fromLTRB(10, 10, 110, 110),
-//                paint);
-
-            canvas.rotate(Mathf.PI * 15 / 180);
-
             var path = new Path();
             path.moveTo(10, 150);
             path.lineTo(10, 160);
@@ -192,6 +191,8 @@ namespace UIWidgets.Tests {
             }
 
             canvas.drawPath(path, paint);
+
+            canvas.rotate(Mathf.PI * 15 / 180);
 
             canvas.translate(100, 100);
 
