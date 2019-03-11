@@ -4,21 +4,21 @@ using Unity.UIWidgets.animation;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
+using Unity.UIWidgets.scheduler;
 using Unity.UIWidgets.service;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
 
 namespace Unity.UIWidgets.material {
-    
     static class SnackBarUtils {
         public const float _kSnackBarPadding = 24.0f;
         public const float _kSingleLineVerticalPadding = 14.0f;
-        public static Color _kSnackBackground = new Color(0xFF323232);
-        
-        public static TimeSpan _kSnackBarTransitionDuration = new TimeSpan(0, 0, 0, 0, 250);
-        public static TimeSpan _kSnackBarDisplayDuration = new TimeSpan(0, 0, 0, 0, 4000);
-        public static Curve _snackBarHeightCurve = Curves.fastOutSlowIn;
-        public static Curve _snackBarFadeCurve = new Interval(0.72f, 1.0f, curve: Curves.fastOutSlowIn);
+        public static readonly Color _kSnackBackground = new Color(0xFF323232);
+
+        public static readonly TimeSpan _kSnackBarTransitionDuration = new TimeSpan(0, 0, 0, 0, 250);
+        public static readonly TimeSpan _kSnackBarDisplayDuration = new TimeSpan(0, 0, 0, 0, 4000);
+        public static readonly Curve _snackBarHeightCurve = Curves.fastOutSlowIn;
+        public static readonly Curve _snackBarFadeCurve = new Interval(0.72f, 1.0f, curve: Curves.fastOutSlowIn);
     }
 
     public enum SnackBarClosedReason {
@@ -37,7 +37,7 @@ namespace Unity.UIWidgets.material {
             Color disabledTextColor = null,
             string label = null,
             VoidCallback onPressed = null
-            ) : base(key: key) {
+        ) : base(key: key) {
             D.assert(label != null);
             D.assert(onPressed != null);
             this.textColor = textColor;
@@ -62,23 +62,21 @@ namespace Unity.UIWidgets.material {
 
     class _SnackBarActionState : State<SnackBarAction> {
         bool _haveTriggeredAction = false;
-        
+
         void _handlePressed() {
             if (this._haveTriggeredAction) {
                 return;
             }
 
-            this.setState(() => {
-                this._haveTriggeredAction = true;
-            });
-            
+            this.setState(() => { this._haveTriggeredAction = true; });
+
             this.widget.onPressed();
             Scaffold.of(this.context).hideCurrentSnackBar(reason: SnackBarClosedReason.action);
         }
 
         public override Widget build(BuildContext context) {
             return new FlatButton(
-                onPressed: this._haveTriggeredAction ? (VoidCallback)null : this._handlePressed,
+                onPressed: this._haveTriggeredAction ? (VoidCallback) null : this._handlePressed,
                 child: new Text(this.widget.label),
                 textColor: this.widget.textColor,
                 disabledTextColor: this.widget.disabledTextColor
@@ -141,20 +139,79 @@ namespace Unity.UIWidgets.material {
                     padding: EdgeInsets.symmetric(horizontal: SnackBarUtils._kSnackBarPadding),
                     textTheme: ButtonTextTheme.accent,
                     child: this.action
-                    ));
+                ));
             }
             else {
                 children.Add(new SizedBox(width: SnackBarUtils._kSnackBarPadding));
             }
-            
-            CurvedAnimation heightAnimation = new CurvedAnimation(parent: this.animation, curve: SnackBarUtils._snackBarHeightCurve);
-            CurvedAnimation fadeAnimation = new CurvedAnimation(parent: this.animation, curve: SnackBarUtils._snackBarFadeCurve, reverseCurve: new Threshold(0.0f));
+
+            CurvedAnimation heightAnimation =
+                new CurvedAnimation(parent: this.animation, curve: SnackBarUtils._snackBarHeightCurve);
+            CurvedAnimation fadeAnimation = new CurvedAnimation(parent: this.animation,
+                curve: SnackBarUtils._snackBarFadeCurve, reverseCurve: new Threshold(0.0f));
             Widget snackbar = new SafeArea(
                 top: false,
                 child: new Row(
                     children: children,
                     crossAxisAlignment: CrossAxisAlignment.center
                 )
+            );
+
+            snackbar = new Dismissible(
+                key: Key.key("dismissible"),
+                direction: DismissDirection.down,
+                resizeDuration: null,
+                onDismissed: (DismissDirection? direction) => {
+                    Scaffold.of(context).removeCurrentSnackBar(reason: SnackBarClosedReason.swipe);
+                },
+                child: new Material(
+                    elevation: 6.0f,
+                    color: this.backgroundColor ?? SnackBarUtils._kSnackBackground,
+                    child: new Theme(
+                        data: darkTheme,
+                        child: mediaQueryData.accessibleNavigation
+                            ? snackbar
+                            : new FadeTransition(
+                                opacity: fadeAnimation,
+                                child: snackbar
+                            )
+                    )
+                )
+            );
+
+            return new ClipRect(
+                child: mediaQueryData.accessibleNavigation
+                    ? snackbar
+                    : new AnimatedBuilder(
+                        animation: heightAnimation,
+                        builder: (BuildContext subContext, Widget child) => {
+                            return new Align(
+                                alignment: Alignment.topLeft,
+                                heightFactor: heightAnimation.value,
+                                child: child
+                            );
+                        },
+                        child: snackbar
+                    )
+            );
+        }
+
+        public static AnimationController createAnimationController(TickerProvider vsync) {
+            return new AnimationController(
+                duration: SnackBarUtils._kSnackBarTransitionDuration,
+                debugLabel: "SnackBar",
+                vsync: vsync
+            );
+        }
+
+        public SnackBar withAnimation(Animation<float> newAnimation, Key fallbackKey = null) {
+            return new SnackBar(
+                key: this.key ?? fallbackKey,
+                content: this.content,
+                backgroundColor: this.backgroundColor,
+                action: this.action,
+                duration: this.duration,
+                animation: newAnimation
             );
         }
     }

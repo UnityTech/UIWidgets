@@ -7,7 +7,7 @@ namespace Unity.UIWidgets.material {
     public static class FloatingActionButtonLocationUtils {
         public const float kFloatingActionButtonMargin = 16.0f;
 
-        public static TimeSpan kFloatingActionButtonSegue = new TimeSpan(0, 0, 0, 0, 200);
+        public static readonly TimeSpan kFloatingActionButtonSegue = new TimeSpan(0, 0, 0, 0, 200);
 
         public const float kFloatingActionButtonTurnInterval = 0.125f;
     }

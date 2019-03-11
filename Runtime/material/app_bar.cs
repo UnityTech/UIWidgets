@@ -174,7 +174,7 @@ namespace Unity.UIWidgets.material {
                 }
                 else {
                     if (canPop) {
-                        leading = useCloseButton ? (Widget)new CloseButton() : new BackButton() : 
+                        leading = useCloseButton ? (Widget) new CloseButton() : new BackButton();
                     }
                 }
             }

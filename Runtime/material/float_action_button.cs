@@ -9,11 +9,11 @@ using Color = Unity.UIWidgets.ui.Color;
 
 namespace Unity.UIWidgets.material {
     static class FloatActionButtonUtils {
-        public static BoxConstraints _kSizeConstraints = BoxConstraints.tightFor(width: 56.0f, height: 56.0f);
+        public static readonly BoxConstraints _kSizeConstraints = BoxConstraints.tightFor(width: 56.0f, height: 56.0f);
         
-        public static BoxConstraints _kMiniSizeConstraints = BoxConstraints.tightFor(width: 40.0f, height: 40.0f);
+        public static readonly BoxConstraints _kMiniSizeConstraints = BoxConstraints.tightFor(width: 40.0f, height: 40.0f);
 
-        public static BoxConstraints _kExtendedSizeConstraints = new BoxConstraints(minHeight: 48.0f, maxHeight: 48.0f);
+        public static readonly BoxConstraints _kExtendedSizeConstraints = new BoxConstraints(minHeight: 48.0f, maxHeight: 48.0f);
     }
 
 
