@@ -35,7 +35,7 @@ namespace Unity.UIWidgets.material {
         }
     }
 
-    class AppBar : StatefulWidget, IPreferredSizeWidget {
+    public class AppBar : StatefulWidget, IPreferredSizeWidget {
         public AppBar(
             Key key = null,
             Widget leading = null,

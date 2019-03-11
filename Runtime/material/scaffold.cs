@@ -562,7 +562,7 @@ namespace Unity.UIWidgets.material {
     public class Scaffold : StatefulWidget {
         public Scaffold(
             Key key = null,
-            PreferredSizeWidget appBar = null,
+            AppBar appBar = null,
             Widget body = null,
             Widget floatingActionButton = null,
             FloatingActionButtonLocation floatingActionButtonLocation = null,
@@ -590,7 +590,7 @@ namespace Unity.UIWidgets.material {
             this.primary = primary;
         }
 
-        public readonly PreferredSizeWidget appBar;
+        public readonly AppBar appBar;
 
         public readonly Widget body;
 
