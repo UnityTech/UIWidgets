@@ -180,6 +180,7 @@ namespace Unity.UIWidgets.ui {
             }
 
             if (vertices.Count == 0) {
+                this._mesh = null;
                 return null;
             }
 

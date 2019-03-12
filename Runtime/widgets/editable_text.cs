@@ -8,6 +8,9 @@ using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.scheduler;
 using Unity.UIWidgets.service;
 using Unity.UIWidgets.ui;
+using UnityEngine;
+using Color = Unity.UIWidgets.ui.Color;
+using Rect = Unity.UIWidgets.ui.Rect;
 using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace Unity.UIWidgets.widgets {
@@ -71,6 +74,8 @@ namespace Unity.UIWidgets.widgets {
 
         public readonly TextDirection? textDirection;
 
+        public readonly TextCapitalization textCapitalization;
+
         public readonly float? textScaleFactor;
 
         public readonly Color cursorColor;
@@ -97,16 +102,19 @@ namespace Unity.UIWidgets.widgets {
 
         public readonly bool rendererIgnoresPointer;
 
+        public readonly bool unityTouchKeyboard;
+
         public EditableText(TextEditingController controller, FocusNode focusNode, TextStyle style,
             Color cursorColor, bool obscureText = false, bool autocorrect = false,
             TextAlign textAlign = TextAlign.left, TextDirection? textDirection = null,
             float? textScaleFactor = null, int? maxLines = 1,
             bool autofocus = false, Color selectionColor = null, TextSelectionControls selectionControls = null,
             TextInputType keyboardType = null, TextInputAction? textInputAction = null,
+            TextCapitalization textCapitalization = TextCapitalization.none,
             ValueChanged<string> onChanged = null, VoidCallback onEditingComplete = null,
             ValueChanged<string> onSubmitted = null, SelectionChangedCallback onSelectionChanged = null,
             List<TextInputFormatter> inputFormatters = null, bool rendererIgnoresPointer = false,
-            EdgeInsets scrollPadding = null,
+            EdgeInsets scrollPadding = null, bool unityTouchKeyboard = false,
             Key key = null) : base(key) {
             D.assert(controller != null);
             D.assert(focusNode != null);
@@ -125,6 +133,7 @@ namespace Unity.UIWidgets.widgets {
             this.textDirection = textDirection;
             this.textScaleFactor = textScaleFactor;
             this.textInputAction = textInputAction;
+            this.textCapitalization = textCapitalization;
             this.cursorColor = cursorColor;
             this.maxLines = maxLines;
             this.autofocus = autofocus;
@@ -135,6 +144,7 @@ namespace Unity.UIWidgets.widgets {
             this.onEditingComplete = onEditingComplete;
             this.rendererIgnoresPointer = rendererIgnoresPointer;
             this.selectionControls = selectionControls;
+            this.unityTouchKeyboard = unityTouchKeyboard;
             if (maxLines == 1) {
                 this.inputFormatters = new List<TextInputFormatter>();
                 this.inputFormatters.Add(BlacklistingTextInputFormatter.singleLineFormatter);
@@ -248,7 +258,7 @@ namespace Unity.UIWidgets.widgets {
                 this._hideSelectionOverlayIfNeeded();
                 this._showCaretOnScreen();
                 if (this.widget.obscureText && value.text.Length == this._value.text.Length + 1) {
-                    this._obscureShowCharTicksPending = _kObscureShowLatestCharCursorTicks;
+                    this._obscureShowCharTicksPending = !this._unityKeyboard() ? _kObscureShowLatestCharCursorTicks : 0;
                     this._obscureLatestCharIndex = this._value.selection.baseOffset;
                 }
             }
@@ -481,18 +491,20 @@ namespace Unity.UIWidgets.widgets {
             get { return this._textInputConnection != null && this._textInputConnection.attached; }
         }
 
-
         void _openInputConnection() {
             if (!this._hasInputConnection) {
                 TextEditingValue localValue = this._value;
                 this._lastKnownRemoteTextEditingValue = localValue;
-                this._textInputConnection = Window.instance.textInput.attach(this, new TextInputConfiguration(
+                this._textInputConnection = TextInput.attach(this, new TextInputConfiguration(
                     inputType: this.widget.keyboardType,
                     obscureText: this.widget.obscureText,
                     autocorrect: this.widget.autocorrect,
                     inputAction: this.widget.textInputAction ?? ((this.widget.keyboardType == TextInputType.multiline)
                                      ? TextInputAction.newline
-                                     : TextInputAction.done)
+                                     : TextInputAction.done),
+                    textCapitalization: this.widget.textCapitalization,
+                    unityTouchKeyboard: this.widget.unityTouchKeyboard
+                                 
                 ));
                 this._textInputConnection.setEditingState(localValue);
             }
@@ -552,7 +564,7 @@ namespace Unity.UIWidgets.widgets {
 
             this._hideSelectionOverlayIfNeeded();
 
-            if (this.widget.selectionControls != null) {
+            if (this.widget.selectionControls != null && !this._unityKeyboard()) {
                 this._selectionOverlay = new TextSelectionOverlay(
                     context: this.context,
                     value: this._value,
@@ -655,14 +667,14 @@ namespace Unity.UIWidgets.widgets {
         }
 
         void _cursorTick() {
-            this._showCursor.value = !this._showCursor.value;
+            this._showCursor.value = !this._unityKeyboard() && !this._showCursor.value;
             if (this._obscureShowCharTicksPending > 0) {
                 this.setState(() => { this._obscureShowCharTicksPending--; });
             }
         }
 
         void _startCursorTimer() {
-            this._showCursor.value = true;
+            this._showCursor.value = !this._unityKeyboard();
             this._cursorTimer = Window.instance.run(_kCursorBlinkHalfPeriod, this._cursorTick,
                 periodic: true);
         }
@@ -678,8 +690,7 @@ namespace Unity.UIWidgets.widgets {
         }
 
         void _startOrStopCursorTimerIfNeeded() {
-            if (this._cursorTimer == null && this._hasFocus && this._value.selection.isCollapsed &&
-                !Window.instance.textInput.keyboardManager.textInputOnKeyboard()) {
+            if (this._cursorTimer == null && this._hasFocus && this._value.selection.isCollapsed) {
                 this._startCursorTimer();
             }
             else if (this._cursorTimer != null && (!this._hasFocus || !this._value.selection.isCollapsed)) {
@@ -809,15 +820,20 @@ namespace Unity.UIWidgets.widgets {
             if (this.widget.obscureText) {
                 text = new string(RenderEditable.obscuringCharacter, text.Length);
                 int o = this._obscureShowCharTicksPending > 0 ? this._obscureLatestCharIndex : -1;
-                if (!Window.instance.textInput.keyboardManager.textInputOnKeyboard() && o >= 0 && o < text.Length) {
+                if (o >= 0 && o < text.Length) {
                     text = text.Substring(0, o) + this._value.text.Substring(o, 1) + text.Substring(o + 1);
                 }
             }
 
             return new TextSpan(style: this.widget.style, text: text);
         }
-    }
 
+        // unity keyboard has a preview view with editing function, text selection & cursor function of this widget is disable
+        // in the case
+        bool _unityKeyboard() {
+            return TouchScreenKeyboard.isSupported && this.widget.unityTouchKeyboard;
+        }
+    }
 
     class _Editable : LeafRenderObjectWidget {
         public readonly TextSpan textSpan;

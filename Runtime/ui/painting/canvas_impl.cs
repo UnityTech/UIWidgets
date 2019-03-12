@@ -747,6 +747,11 @@ namespace Unity.UIWidgets.ui {
                         if (cmd.textMesh != null) {
                             mesh = cmd.textMesh.resovleMesh();
                         }
+
+                        if (mesh == null) {
+                            continue;
+                        }
+  
                         
                         D.assert(mesh.vertices.Count > 0);  
                         cmd.meshObj.SetVertices(mesh.vertices);

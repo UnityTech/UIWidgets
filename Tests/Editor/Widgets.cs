@@ -60,7 +60,7 @@ namespace UIWidgets.Tests {
 
                 if (this._selected != selected) {
                     this._selected = selected;
-                    this._attachRootWidget(null);
+                    this._attachRootWidget(new Container());
                 }
 
                 if (GUILayout.Button("loadLocal")) {
@@ -90,7 +90,9 @@ namespace UIWidgets.Tests {
         }
 
         void _attachRootWidget(Widget widget) {
-            this.windowAdapter.attachRootWidget(() => new WidgetsApp(home: widget,
+            this.windowAdapter.attachRootWidget(() => new WidgetsApp(
+                home: widget,
+                navigatorKey: GlobalKey<NavigatorState>.key(),
                 pageRouteBuilder: (RouteSettings settings, WidgetBuilder builder) =>
                     new PageRouteBuilder(
                         settings: settings,
@@ -452,8 +454,9 @@ namespace UIWidgets.Tests {
                 height: 450,
                 color: CLColors.white,
                 child: Image.network(
-                    "https://d2ujflorbtfzji.cloudfront.net/banner/5c57178c-4be6-4903-953b-85125bfb7154.jpg",
-                    fit: BoxFit.cover
+                    "https://assetstorev1-prd-cdn.unity3d.com/banner/9716cc07-748c-43cc-8809-10113119c97a.jpg",
+                    fit: BoxFit.cover,
+                    filterMode: FilterMode.Bilinear
                 )
             );
         }
@@ -465,7 +468,7 @@ namespace UIWidgets.Tests {
                 45.0f,
                 36.0f,
                 true,
-                "https://d2ujflorbtfzji.cloudfront.net/key-image/46dc65c1-f605-4ccb-97e0-3d60b28cfdfe.jpg"
+                "https://assetstorev1-prd-cdn.unity3d.com/key-image/76a549ae-de17-4536-bd96-4231ed20dece.jpg"
             );
             return new Container(
                 margin: EdgeInsets.only(left: 98),
@@ -550,7 +553,7 @@ namespace UIWidgets.Tests {
                 child: new Container(
                     color: CLColors.background3,
                     child: new Transform(
-                        transform: Matrix3.makeRotate(45, px, py),
+                        transform: Matrix3.makeRotate(Mathf.PI/180 * 5, px, py),
                         child:
                         new Column(
                             children: new List<Widget> {

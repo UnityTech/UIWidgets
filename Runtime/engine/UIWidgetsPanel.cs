@@ -10,6 +10,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using RawImage = UnityEngine.UI.RawImage;
 using Rect = UnityEngine.Rect;
+using Texture = UnityEngine.Texture;
 
 namespace Unity.UIWidgets.engine {
     public class UIWidgetWindowAdapter : WindowAdapter {
@@ -95,12 +96,12 @@ namespace Unity.UIWidgets.engine {
 
         protected override void OnEnable() {
             base.OnEnable();
-
-            //Disable the default touch -> mouse event conversion on mobile devices
+           //Disable the default touch -> mouse event conversion on mobile devices
             Input.simulateMouseWithTouches = false;
 
             this._displayMetrics = DisplayMetricsProvider.provider();
-
+            this._displayMetrics.OnEnable();
+            
             if (_repaintEvent == null) {
                 _repaintEvent = new Event {type = EventType.Repaint};
             }
@@ -124,7 +125,7 @@ namespace Unity.UIWidgets.engine {
             get {
                 return this.devicePixelRatioOverride > 0
                     ? this.devicePixelRatioOverride
-                    : this._displayMetrics.DevicePixelRatio;
+                    : this._displayMetrics.devicePixelRatio;
             }
         }
 
@@ -147,6 +148,7 @@ namespace Unity.UIWidgets.engine {
         void Update() {
             PerformanceUtils.instance.updateDeltaTime(Time.unscaledDeltaTime);
             this._displayMetrics.Update();
+            UIWidgetsMessageManager.ensureUIWidgetsMessageManagerIfNeeded();
             if (EventSystem.current != null && EventSystem.current.currentSelectedGameObject != this.gameObject) {
                 this.unfocusIfNeeded();
             }

@@ -374,7 +374,7 @@ namespace Unity.UIWidgets.widgets {
                 case _FlingGestureKind.forward:
                     D.assert(this._dragExtent != 0.0f);
                     D.assert(!this._moveController.isDismissed);
-                    if ((this.widget.dismissThresholds[this._dismissDirection] ?? _kDismissThreshold) >= 1.0) {
+                    if ((this.widget.dismissThresholds.getOrDefault(this._dismissDirection) ?? _kDismissThreshold) >= 1.0) {
                         this._moveController.reverse();
                         break;
                     }
@@ -392,7 +392,7 @@ namespace Unity.UIWidgets.widgets {
                     if (!this._moveController.isDismissed) {
                         // we already know it's not completed, we check that above
                         if (this._moveController.value >
-                            (this.widget.dismissThresholds[this._dismissDirection] ?? _kDismissThreshold)) {
+                            (this.widget.dismissThresholds.getOrDefault(this._dismissDirection) ?? _kDismissThreshold)) {
                             this._moveController.forward();
                         }
                         else {

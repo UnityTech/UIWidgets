@@ -86,7 +86,7 @@ namespace Unity.UIWidgets.editor {
     public abstract class WindowAdapter : Window {
         static readonly List<WindowAdapter> _windowAdapters = new List<WindowAdapter>();
 
-        public static IEnumerable<WindowAdapter> windowAdapters {
+        public static List<WindowAdapter> windowAdapters {
             get { return _windowAdapters; }
         }
 
@@ -104,7 +104,6 @@ namespace Unity.UIWidgets.editor {
         readonly TimeSpan _epoch = new TimeSpan(Stopwatch.GetTimestamp());
         readonly MicrotaskQueue _microtaskQueue = new MicrotaskQueue();
         readonly TimerProvider _timerProvider = new TimerProvider();
-        readonly TextInput _textInput = new TextInput();
         readonly Rasterizer _rasterizer = new Rasterizer();
         readonly ScrollInput _scrollInput = new ScrollInput();
 
@@ -332,9 +331,7 @@ namespace Unity.UIWidgets.editor {
                 }
             }
 
-            if (this._textInput != null) {
-                this._textInput.keyboardManager.OnGUI();
-            }
+            TextInput.OnGUI();
         }
 
         void _updateScrollInput() {
@@ -365,10 +362,7 @@ namespace Unity.UIWidgets.editor {
 
             using (this.getScope()) {
                 this._updateScrollInput();
-                if (this._textInput != null) {
-                    this._textInput.keyboardManager.Update();
-                }
-
+                TextInput.Update();
                 this._timerProvider.update(this.flushMicrotasks);
                 this.flushMicrotasks();
             }
@@ -431,10 +425,6 @@ namespace Unity.UIWidgets.editor {
             }
         }
 
-        public override TextInput textInput {
-            get { return this._textInput; }
-        }
-        
         internal void _forceRepaint() {
             using (this.getScope()) {
                 RenderObjectVisitor visitor = null;

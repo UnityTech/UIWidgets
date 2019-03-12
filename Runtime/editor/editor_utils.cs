@@ -27,7 +27,11 @@ namespace Unity.UIWidgets.Editor {
             this._lastDevicePixelRatio = GameViewUtil.getGameViewDevicePixelRatio();
         }
 
-        public float DevicePixelRatio {
+        public void OnEnable() {
+            this._lastDevicePixelRatio = GameViewUtil.getGameViewDevicePixelRatio();
+        }
+        
+        public float devicePixelRatio {
             get { return this._lastDevicePixelRatio; }
         }
     }

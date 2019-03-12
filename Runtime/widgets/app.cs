@@ -185,7 +185,7 @@ namespace Unity.UIWidgets.widgets {
             var name = settings.name;
             var pageContentBuilder = name == Navigator.defaultRouteName && this.widget.home != null
                 ? context => this.widget.home
-                : this.widget.routes[name];
+                : this.widget.routes.getOrDefault(name);
 
             if (pageContentBuilder != null) {
                 D.assert(this.widget.pageRouteBuilder != null,

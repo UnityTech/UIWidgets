@@ -1825,6 +1825,7 @@ GameObject:
   - component: {fileID: 1387978527}
   - component: {fileID: 1387978529}
   - component: {fileID: 1387978528}
+  - component: {fileID: 1387978530}
   m_Layer: 5
   m_Name: ToAppPanel
   m_TagString: Untagged
@@ -1887,6 +1888,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1387978526}
   m_CullTransparentMesh: 0
+--- !u!114 &1387978530
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1387978526}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1b5fe397122c4c5988b2bddfe92bd95, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  videoClip: {fileID: 32900000, guid: 9906c152cf75248e98d1edd60759f014, type: 3}
+  renderTexture: {fileID: 8400000, guid: 53bf3f9b1464948cbb3f58add96afa32, type: 2}
 --- !u!1 &1399904530
 GameObject:
   m_ObjectHideFlags: 0

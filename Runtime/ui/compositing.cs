@@ -1,6 +1,7 @@
 using System;
 using Unity.UIWidgets.flow;
 using Unity.UIWidgets.foundation;
+using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
     public class SceneBuilder {
@@ -107,6 +108,24 @@ namespace Unity.UIWidgets.ui {
             this._currentLayer.add(layer);
         }
 
+        public void addTexture(
+            Texture texture,
+            Offset offset,
+            float width,
+            float height,
+            bool freeze) {
+            if (this._currentLayer == null) {
+                return;
+            }
+            
+            var layer = new TextureLayer();
+            layer.offset = offset;
+            layer.size = new Size(width, height);
+            layer.texture = texture;
+            layer.freeze = freeze;
+            this._currentLayer.add(layer);
+        }
+        
         public void addPerformanceOverlay(int enabledOptions, Rect bounds) {
             if (this._currentLayer == null) {
                 return;
