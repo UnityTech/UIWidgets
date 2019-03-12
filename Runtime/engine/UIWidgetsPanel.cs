@@ -25,6 +25,11 @@ namespace Unity.UIWidgets.engine {
                 Screen.height - Screen.safeArea.height);
         }
 
+        protected override bool hasFocus() {
+            return EventSystem.current != null &&
+                   EventSystem.current.currentSelectedGameObject == this._uiWidgetsPanel.gameObject;
+        }
+
         public override void scheduleFrame(bool regenerateLayerTree = true) {
             base.scheduleFrame(regenerateLayerTree);
             this._needsPaint = true;
@@ -149,10 +154,7 @@ namespace Unity.UIWidgets.engine {
             PerformanceUtils.instance.updateDeltaTime(Time.unscaledDeltaTime);
             this._displayMetrics.Update();
             UIWidgetsMessageManager.ensureUIWidgetsMessageManagerIfNeeded();
-            if (EventSystem.current != null && EventSystem.current.currentSelectedGameObject != this.gameObject) {
-                this.unfocusIfNeeded();
-            }
-
+            
             if (this._mouseEntered) {
                 if (this._lastMouseMove.x != Input.mousePosition.x || this._lastMouseMove.y != Input.mousePosition.y) {
                     this.handleMouseMovement();
@@ -168,6 +170,7 @@ namespace Unity.UIWidgets.engine {
             D.assert(this._windowAdapter != null);
             this._windowAdapter.Update();
             this._windowAdapter.OnGUI(_repaintEvent);
+           
         }
 
         void OnGUI() {
@@ -318,15 +321,6 @@ namespace Unity.UIWidgets.engine {
                 physicalX: position.x,
                 physicalY: position.y
             ));
-        }
-
-        void unfocusIfNeeded() {
-            using (this._windowAdapter.getScope()) {
-                var focusNode = WidgetsBinding.instance.focusManager.currentFocus;
-                if (focusNode != null) {
-                    focusNode.unfocus();
-                }
-            }
         }
     }
 }

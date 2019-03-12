@@ -68,6 +68,10 @@ namespace Unity.UIWidgets.editor {
             this.editorWindow.Repaint();
         }
 
+        protected override bool hasFocus() {
+            return EditorWindow.focusedWindow == this.editorWindow;
+        }
+
         public override GUIContent titleContent {
             get { return this.editorWindow.titleContent; }
         }
@@ -119,6 +123,8 @@ namespace Unity.UIWidgets.editor {
 
         protected virtual void updateSafeArea() {
         }
+
+        protected abstract bool hasFocus();
 
         public void OnEnable() {
             this._devicePixelRatio = this.queryDevicePixelRatio();
@@ -360,7 +366,14 @@ namespace Unity.UIWidgets.editor {
         public void Update() {
             Timer.update();
 
+            bool hasFocus = this.hasFocus();
             using (this.getScope()) {
+                if (hasFocus) {
+                    WidgetsBinding.instance.focusManager.focusIfNeed();
+                }
+                else {
+                    WidgetsBinding.instance.focusManager.unfocusIfNeed();
+                }
                 this._updateScrollInput();
                 TextInput.Update();
                 this._timerProvider.update(this.flushMicrotasks);
