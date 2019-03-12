@@ -2,6 +2,8 @@
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.ui;
+using UnityEngine;
+using Rect = Unity.UIWidgets.ui.Rect;
 
 namespace Unity.UIWidgets.rendering {
     public abstract class Layer : AbstractNodeMixinDiagnosticableTree {
@@ -180,6 +182,39 @@ namespace Unity.UIWidgets.rendering {
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             properties.add(new DiagnosticsProperty<Rect>("paint bounds", this.canvasBounds));
+        }
+    }
+
+    public class TextureLayer : Layer {
+        public TextureLayer(
+            Rect rect,
+            Texture texture,
+            bool freeze = false
+        ) {
+            D.assert(rect != null);
+            D.assert(texture != null);
+
+            this.rect = rect;
+            this.texture = texture;
+            this.freeze = freeze;
+        }
+
+        public readonly Rect rect;
+
+        public readonly Texture texture;
+
+        public readonly bool freeze;
+
+        internal override flow.Layer addToScene(SceneBuilder builder, Offset layerOffset = null) {
+            Rect shiftedRect = this.rect.shift(layerOffset);
+            builder.addTexture(
+                this.texture,
+                offset: shiftedRect.topLeft,
+                width: shiftedRect.width,
+                height: shiftedRect.height,
+                freeze: this.freeze
+            );
+            return null;
         }
     }
 
@@ -924,6 +959,39 @@ namespace Unity.UIWidgets.rendering {
             properties.add(new DiagnosticsProperty<LayerLink>("link", this.link));
             properties.add(new TransformProperty("transform", this.getLastTransform(),
                 defaultValue: Diagnostics.kNullDefaultValue));
+        }
+    }
+
+    public class PerformanceOverlayLayer : Layer {
+        public PerformanceOverlayLayer(
+            Rect overlayRect = null,
+            int? optionsMask = null
+        ) {
+            D.assert(overlayRect != null);
+            D.assert(optionsMask != null);
+            this._overlayRect = overlayRect;
+            this.optionsMask = optionsMask ?? 0;
+        }
+
+        public Rect overlayRect {
+            get { return this._overlayRect; }
+            set {
+                if (value != this._overlayRect) {
+                    this._overlayRect = value;
+                    this.markNeedsAddToScene();
+                }
+            }
+        }
+
+        Rect _overlayRect;
+
+        public readonly int optionsMask;
+
+        internal override flow.Layer addToScene(SceneBuilder builder, Offset layerOffset = null) {
+            layerOffset = layerOffset ?? Offset.zero;
+
+            builder.addPerformanceOverlay(this.optionsMask, this.overlayRect.shift(layerOffset));
+            return null;
         }
     }
 }

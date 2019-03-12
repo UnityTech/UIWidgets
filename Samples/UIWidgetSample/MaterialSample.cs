@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.material;
 using Unity.UIWidgets.painting;
-using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
 using UnityEngine;
 using Color = Unity.UIWidgets.ui.Color;
@@ -18,9 +17,8 @@ namespace UIWidgetsSample {
         };
 
         protected override Widget createWidget() {
-            return new WidgetsApp(
-                home: this.testCases[this.testCaseId],
-                pageRouteBuilder: this.pageRouteBuilder);
+            return new MaterialApp(
+                home: this.testCases[this.testCaseId]);
         }
     }
 
@@ -63,14 +61,22 @@ namespace UIWidgetsSample {
 
     class MaterialButtonWidgetState : State<MaterialButtonWidget> {
         public override Widget build(BuildContext context) {
-            return new Material(
-                child: new Center(
-                    child: new MaterialButton(
-                        splashColor: new Color(0xFFFF0011),
-                        highlightColor: new Color(0x88FF0011),
-                        onPressed: () => { Debug.Log("pressed here"); }
-                    )
-                )
+            return new Stack(
+                children: new List<Widget> {
+                    new Material(
+                        child: new Center(
+                            child: new FlatButton(
+                                shape: new RoundedRectangleBorder(borderRadius: BorderRadius.all(20.0f)),
+                                color: new Color(0xFF00FF00),
+                                splashColor: new Color(0xFFFF0011),
+                                highlightColor: new Color(0x88FF0011),
+                                child: new Text("Click Me"),
+                                onPressed: () => { Debug.Log("pressed here"); }
+                            )
+                        )
+                    ),
+                    new PerformanceOverlay()
+                }
             );
         }
     }

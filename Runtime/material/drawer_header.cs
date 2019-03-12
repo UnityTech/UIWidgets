@@ -5,6 +5,11 @@ using Unity.UIWidgets.painting;
 using Unity.UIWidgets.widgets;
 
 namespace Unity.UIWidgets.material {
+    static class DrawerHeaderUtils {
+        public const float _kDrawerHeaderHeight = 160.0f + 1.0f;
+    }
+
+
     public class DrawerHeader : StatelessWidget {
         public DrawerHeader(
             Key key = null,
@@ -39,7 +44,7 @@ namespace Unity.UIWidgets.material {
 
 
         public override Widget build(BuildContext context) {
-            D.assert(MaterialDebug.debugCheckHasMaterial(context));
+            D.assert(MaterialD.debugCheckHasMaterial(context));
             ThemeData theme = Theme.of(context);
             float statusBarHeight = MediaQuery.of(context).padding.top;
             return new Container(

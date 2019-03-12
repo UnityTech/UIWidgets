@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using RSG;
 using Unity.UIWidgets.editor;
 using Unity.UIWidgets.material;
 using Unity.UIWidgets.painting;
@@ -60,6 +61,7 @@ namespace UIWidgets.Tests {
                 this.clipRRect,
                 this.saveLayer,
                 this.drawLine,
+                this.drawParagraph,
             };
             this._optionStrings = this._options.Select(x => x.Method.Name).ToArray();
             this._selected = 0;
@@ -95,6 +97,10 @@ namespace UIWidgets.Tests {
                 this.createRenderTexture();
 
                 Window.instance = this._windowAdapter;
+
+                if (Event.current.type == EventType.MouseDown) {
+                    Promise.Delayed(new TimeSpan(0, 0, 5)).Then(() => { Debug.Log("Promise.Delayed: 5s"); });
+                }
 
                 this._options[this._selected]();
 
@@ -162,12 +168,6 @@ namespace UIWidgets.Tests {
                 }, null, TileMode.clamp)
             };
 
-//            canvas.drawRect(
-//                Unity.UIWidgets.ui.Rect.fromLTRB(10, 10, 110, 110),
-//                paint);
-
-            canvas.rotate(Mathf.PI * 15 / 180);
-
             var path = new Path();
             path.moveTo(10, 150);
             path.lineTo(10, 160);
@@ -191,6 +191,8 @@ namespace UIWidgets.Tests {
             }
 
             canvas.drawPath(path, paint);
+
+            canvas.rotate(Mathf.PI * 15 / 180);
 
             canvas.translate(100, 100);
 
@@ -247,6 +249,10 @@ namespace UIWidgets.Tests {
                 new Offset(40, 10),
                 new Offset(90, 10),
                 paint);
+
+
+            canvas.drawArc(Unity.UIWidgets.ui.Rect.fromLTWH(200, 200, 100, 100), Mathf.PI / 4,
+                -Mathf.PI / 2 + Mathf.PI * 4 - 1, true, paint);
 
             paint.maskFilter = MaskFilter.blur(BlurStyle.normal, 1);
             paint.strokeWidth = 4;
@@ -414,6 +420,17 @@ namespace UIWidgets.Tests {
             editorCanvas.flush();
         }
 
+        void drawParagraph() {
+            var pb = new ParagraphBuilder(new ParagraphStyle{});
+            pb.addText("Hello drawParagraph");
+            var paragraph = pb.build();
+            paragraph.layout(new ParagraphConstraints(width:300));
+            var canvas = new CommandBufferCanvas(this._renderTexture, Window.instance.devicePixelRatio,
+                this._meshPool);
+            canvas.drawParagraph(paragraph, new Offset(10f, 100f));
+            canvas.flush();
+        }
+        
         void drawImageRect() {
             if (this._stream == null || this._stream.completer == null || this._stream.completer.currentImage == null) {
                 return;

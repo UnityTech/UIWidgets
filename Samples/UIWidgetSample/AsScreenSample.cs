@@ -5,6 +5,8 @@ using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
+using UnityEngine;
+using Color = Unity.UIWidgets.ui.Color;
 using Image = Unity.UIWidgets.widgets.Image;
 using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
@@ -209,8 +211,9 @@ namespace UIWidgetsSample {
                     height: 450,
                     color: CLColors.white,
                     child: Image.network(
-                        "https://d2ujflorbtfzji.cloudfront.net/banner/5c57178c-4be6-4903-953b-85125bfb7154.jpg",
-                        fit: BoxFit.cover
+                        "https://assetstorev1-prd-cdn.unity3d.com/banner/9716cc07-748c-43cc-8809-10113119c97a.jpg",
+                        fit: BoxFit.cover,
+                        filterMode: FilterMode.Bilinear
                     )
                 );
             }
@@ -222,7 +225,7 @@ namespace UIWidgetsSample {
                     45.0f,
                     36.0f,
                     true,
-                    "https://d2ujflorbtfzji.cloudfront.net/key-image/46dc65c1-f605-4ccb-97e0-3d60b28cfdfe.jpg"
+                    "https://assetstorev1-prd-cdn.unity3d.com/key-image/76a549ae-de17-4536-bd96-4231ed20dece.jpg"
                 );
                 return new Container(
                     margin: EdgeInsets.only(left: 98),

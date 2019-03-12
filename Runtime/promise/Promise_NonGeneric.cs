@@ -1044,6 +1044,13 @@ namespace RSG {
             promise.Reject(ex);
             return promise;
         }
+        
+        public static IPromise Delayed(TimeSpan duration) {
+            var promise = new Promise();
+            Window.instance.run(duration, () => { promise.Resolve(); });
+            
+            return promise;
+        }
 
         public IPromise Finally(Action onComplete) {
             var promise = new Promise(isSync: true);

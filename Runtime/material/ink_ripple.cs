@@ -1,10 +1,47 @@
+using System;
 using Unity.UIWidgets.animation;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
+using UnityEngine;
+using Canvas = Unity.UIWidgets.ui.Canvas;
+using Color = Unity.UIWidgets.ui.Color;
+using Rect = Unity.UIWidgets.ui.Rect;
 
 namespace Unity.UIWidgets.material {
+    static class InkRippleUtils {
+        public static readonly TimeSpan _kUnconfirmedRippleDuration = new TimeSpan(0, 0, 1);
+        public static readonly TimeSpan _kFadeInDuration = new TimeSpan(0, 0, 0, 0, 75);
+        public static readonly TimeSpan _kRadiusDuration = new TimeSpan(0, 0, 0, 0, 225);
+        public static readonly TimeSpan _kFadeOutDuration = new TimeSpan(0, 0, 0, 0, 375);
+        public static readonly TimeSpan _kCancelDuration = new TimeSpan(0, 0, 0, 0, 75);
+
+        public const float _kFadeOutIntervalStart = 225.0f / 375.0f;
+
+        public static RectCallback _getClipCallback(RenderBox referenceBox, bool containedInkWell,
+            RectCallback rectCallback) {
+            if (rectCallback != null) {
+                D.assert(containedInkWell);
+                return rectCallback;
+            }
+
+            if (containedInkWell) {
+                return () => Offset.zero & referenceBox.size;
+            }
+
+            return null;
+        }
+
+        public static float _getTargetRadius(RenderBox referenceBox, bool containedInkWell, RectCallback rectCallback,
+            Offset position) {
+            Size size = rectCallback != null ? rectCallback().size : referenceBox.size;
+            float d1 = size.bottomRight(Offset.zero).distance;
+            float d2 = (size.topRight(Offset.zero) - size.bottomLeft(Offset.zero)).distance;
+            return (Mathf.Max(d1, d2) / 2.0f);
+        }
+    }
+
     public class _InkRippleFactory : InteractiveInkFeatureFactory {
         public _InkRippleFactory() {
         }
@@ -194,11 +231,7 @@ namespace Unity.UIWidgets.material {
                 }
             }
 
-            //todo:xingwei.zhu: remove this condition when drawCircle bug fixed (when radius.value == 0)
-            if (this._radius.value != 0) {
-                canvas.drawCircle(center, this._radius.value, paint);
-            }
-
+            canvas.drawCircle(center, this._radius.value, paint);
             canvas.restore();
         }
     }

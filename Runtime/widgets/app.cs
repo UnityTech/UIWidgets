@@ -22,6 +22,7 @@ namespace Unity.UIWidgets.widgets {
         public readonly Dictionary<string, WidgetBuilder> routes;
         public readonly TextStyle textStyle;
         public readonly Window window;
+        public readonly bool showPerformanceoverlay;
 
         public WidgetsApp(
             Key key = null,
@@ -34,7 +35,8 @@ namespace Unity.UIWidgets.widgets {
             Dictionary<string, WidgetBuilder> routes = null,
             TransitionBuilder builder = null,
             TextStyle textStyle = null,
-            Widget home = null
+            Widget home = null,
+            bool showPerformanceOverlay = false
         ) : base(key) {
             routes = routes ?? new Dictionary<string, WidgetBuilder>();
             this.window = Window.instance;
@@ -48,6 +50,7 @@ namespace Unity.UIWidgets.widgets {
             this.initialRoute = initialRoute;
             this.builder = builder;
             this.textStyle = textStyle;
+            this.showPerformanceoverlay = showPerformanceOverlay;
 
             D.assert(
                 home == null ||
@@ -182,7 +185,7 @@ namespace Unity.UIWidgets.widgets {
             var name = settings.name;
             var pageContentBuilder = name == Navigator.defaultRouteName && this.widget.home != null
                 ? context => this.widget.home
-                : this.widget.routes[name];
+                : this.widget.routes.getOrDefault(name);
 
             if (pageContentBuilder != null) {
                 D.assert(this.widget.pageRouteBuilder != null,
@@ -271,6 +274,22 @@ namespace Unity.UIWidgets.widgets {
                     style: this.widget.textStyle,
                     child: result
                 );
+            }
+
+            PerformanceOverlay performanceOverlay = null;
+            if (this.widget.showPerformanceoverlay) {
+                performanceOverlay = PerformanceOverlay.allEnabled();
+            }
+
+            if (performanceOverlay != null) {
+                result = new Stack(
+                    children: new List<Widget> {
+                        result,
+                        new Positioned(top: 0.0f,
+                            left: 0.0f,
+                            right: 0.0f,
+                            child: performanceOverlay)
+                    });
             }
 
             D.assert(() => {

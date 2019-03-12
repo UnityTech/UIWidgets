@@ -1,9 +1,10 @@
+using System;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
 using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace Unity.UIWidgets.material {
-    public class TextTheme : Diagnosticable {
+    public class TextTheme : Diagnosticable, IEquatable<TextTheme> {
         public TextTheme(
             TextStyle display4 = null,
             TextStyle display3 = null,

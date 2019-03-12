@@ -94,7 +94,6 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
-
     public abstract class ImplicitlyAnimatedWidget : StatefulWidget {
         public ImplicitlyAnimatedWidget(
             Key key = null,
@@ -119,12 +118,12 @@ namespace Unity.UIWidgets.widgets {
 
     public delegate Tween<T> TweenConstructor<T>(T targetValue);
 
-    public interface ITweenVisitor {
+    public interface TweenVisitor {
         Tween<T> visit<T, T2>(ImplicitlyAnimatedWidgetState<T2> state, Tween<T> tween, T targetValue,
             TweenConstructor<T> constructor) where T2 : ImplicitlyAnimatedWidget;
     }
 
-    public class TweenVisitorUpdateTween : ITweenVisitor {
+    public class TweenVisitorUpdateTween : TweenVisitor {
         public Tween<T> visit<T, T2>(ImplicitlyAnimatedWidgetState<T2> state, Tween<T> tween, T targetValue,
             TweenConstructor<T> constructor)
             where T2 : ImplicitlyAnimatedWidget {
@@ -133,7 +132,7 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
-    public class TweenVisitorCheckStartAnimation : ITweenVisitor {
+    public class TweenVisitorCheckStartAnimation : TweenVisitor {
         public bool shouldStartAnimation;
 
         public TweenVisitorCheckStartAnimation() {
@@ -234,7 +233,7 @@ namespace Unity.UIWidgets.widgets {
             return visitor.shouldStartAnimation;
         }
 
-        protected abstract void forEachTween(ITweenVisitor visitor);
+        protected abstract void forEachTween(TweenVisitor visitor);
 
         protected virtual void didUpdateTweens() {
         }
@@ -331,7 +330,7 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
-    public class _AnimatedContainerState : AnimatedWidgetBaseState<AnimatedContainer> {
+    class _AnimatedContainerState : AnimatedWidgetBaseState<AnimatedContainer> {
         AlignmentTween _alignment;
         EdgeInsetsTween _padding;
         DecorationTween _decoration;
@@ -341,7 +340,7 @@ namespace Unity.UIWidgets.widgets {
         Matrix3Tween _transform;
 
 
-        protected override void forEachTween(ITweenVisitor visitor) {
+        protected override void forEachTween(TweenVisitor visitor) {
             this._alignment = (AlignmentTween) visitor.visit(this, this._alignment, this.widget.alignment,
                 (Alignment value) => new AlignmentTween(begin: value));
             this._padding = (EdgeInsetsTween) visitor.visit(this, this._padding, this.widget.padding,
@@ -385,6 +384,56 @@ namespace Unity.UIWidgets.widgets {
                 showName: false, defaultValue: null));
             description.add(new DiagnosticsProperty<EdgeInsetsTween>("margin", this._margin, defaultValue: null));
             description.add(ObjectFlagProperty<Matrix3Tween>.has("transform", this._transform));
+        }
+    }
+
+    public class AnimatedPadding : ImplicitlyAnimatedWidget {
+        public AnimatedPadding(
+            Key key = null,
+            EdgeInsets padding = null,
+            Widget child = null,
+            Curve curve = null,
+            TimeSpan? duration = null
+        ) : base(key: key, curve: curve, duration: duration) {
+            D.assert(padding != null);
+            D.assert(padding.isNonNegative);
+            this.padding = padding;
+            this.child = child;
+        }
+
+        public readonly EdgeInsets padding;
+
+        public readonly Widget child;
+
+        public override State createState() {
+            return new _AnimatedPaddingState();
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new DiagnosticsProperty<EdgeInsets>("padding", this.padding));
+        }
+    }
+
+    class _AnimatedPaddingState : AnimatedWidgetBaseState<AnimatedPadding> {
+        EdgeInsetsTween _padding;
+
+        protected override void forEachTween(TweenVisitor visitor) {
+            this._padding = (EdgeInsetsTween) visitor.visit(this, this._padding, this.widget.padding,
+                (EdgeInsets value) => new EdgeInsetsTween(begin: value));
+        }
+
+        public override Widget build(BuildContext context) {
+            return new Padding(
+                padding: this._padding.evaluate(this.animation),
+                child: this.widget.child
+            );
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder description) {
+            base.debugFillProperties(description);
+            description.add(new DiagnosticsProperty<EdgeInsetsTween>("padding", this._padding,
+                defaultValue: Diagnostics.kNullDefaultValue));
         }
     }
 
@@ -441,10 +490,10 @@ namespace Unity.UIWidgets.widgets {
     }
 
 
-    public class _AnimatedDefaultTextStyleState : AnimatedWidgetBaseState<AnimatedDefaultTextStyle> {
+    class _AnimatedDefaultTextStyleState : AnimatedWidgetBaseState<AnimatedDefaultTextStyle> {
         TextStyleTween _style;
 
-        protected override void forEachTween(ITweenVisitor visitor) {
+        protected override void forEachTween(TweenVisitor visitor) {
             this._style = (TextStyleTween) visitor.visit(this, this._style, this.widget.style,
                 (TextStyle value) => new TextStyleTween(begin: value));
         }
@@ -527,13 +576,13 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
-    public class _AnimatedPhysicalModelState : AnimatedWidgetBaseState<AnimatedPhysicalModel> {
+    class _AnimatedPhysicalModelState : AnimatedWidgetBaseState<AnimatedPhysicalModel> {
         BorderRadiusTween _borderRadius;
         FloatTween _elevation;
         ColorTween _color;
         ColorTween _shadowColor;
 
-        protected override void forEachTween(ITweenVisitor visitor) {
+        protected override void forEachTween(TweenVisitor visitor) {
             this._borderRadius = (BorderRadiusTween) visitor.visit(this, this._borderRadius, this.widget.borderRadius,
                 (BorderRadius value) => new BorderRadiusTween(begin: value));
             this._elevation = (FloatTween) visitor.visit(this, this._elevation, this.widget.elevation,

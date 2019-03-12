@@ -530,11 +530,7 @@ namespace Unity.UIWidgets.widgets {
 
         public virtual bool barrierDismissible { get; }
 
-
         public virtual Color barrierColor { get; }
-
-
-        public virtual string barrierLabel { get; }
 
         public virtual bool maintainState { get; }
 
@@ -773,14 +769,12 @@ namespace Unity.UIWidgets.widgets {
 
     class _DialogRoute : PopupRoute {
         internal _DialogRoute(RoutePageBuilder pageBuilder = null, bool barrierDismissible = true,
-            string barrierLabel = null,
             Color barrierColor = null,
             TimeSpan? transitionDuration = null,
             RouteTransitionsBuilder transitionBuilder = null,
             RouteSettings setting = null) : base(settings: setting) {
             this._pageBuilder = pageBuilder;
             this.barrierDismissible = barrierDismissible;
-            this.barrierLabel = barrierLabel;
             this.barrierColor = barrierColor ?? new Color(0x80000000);
             this.transitionDuration = transitionDuration ?? TimeSpan.FromMilliseconds(200);
             this._transitionBuilder = transitionBuilder;
@@ -789,8 +783,6 @@ namespace Unity.UIWidgets.widgets {
         readonly RoutePageBuilder _pageBuilder;
 
         public override bool barrierDismissible { get; }
-
-        public override string barrierLabel { get; }
 
         public override Color barrierColor { get; }
 
@@ -819,21 +811,18 @@ namespace Unity.UIWidgets.widgets {
     }
 
     public static class DialogUtils {
-        public static Promise<object> showGeneralDialog(
+        public static IPromise<object> showGeneralDialog(
             BuildContext context = null,
             RoutePageBuilder pageBuilder = null,
             bool barrierDismissible = false,
-            string barrierLabel = null,
             Color barrierColor = null,
             TimeSpan? transitionDuration = null,
             RouteTransitionsBuilder transitionBuilder = null
         ) {
             D.assert(pageBuilder != null);
-            D.assert(!barrierDismissible || barrierLabel != null);
             return Navigator.of(context, rootNavigator: true).push(new _DialogRoute(
                 pageBuilder: pageBuilder,
                 barrierDismissible: barrierDismissible,
-                barrierLabel: barrierLabel,
                 barrierColor: barrierColor,
                 transitionDuration: transitionDuration,
                 transitionBuilder: transitionBuilder

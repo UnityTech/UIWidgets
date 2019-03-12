@@ -47,7 +47,7 @@ namespace UIWidgetsSample {
                 body: new Container(
                     color: new Color(0xFF888888),
                     child: new Center(
-                        child: new CustomButton(onPressed: () => { Navigator.pushName(context, "/detail"); },
+                        child: new CustomButton(onPressed: () => { Navigator.pushNamed(context, "/detail"); },
                             child: new Text("Go to Detail"))
                     )),
                 title: "Home"
@@ -164,7 +164,6 @@ namespace UIWidgetsSample {
                     return builder(buildContext);
                 },
                 barrierDismissible: barrierDismissible,
-                barrierLabel: "",
                 barrierColor: new Color(0x8A000000),
                 transitionDuration: TimeSpan.FromMilliseconds(150),
                 transitionBuilder: _buildMaterialDialogTransitions

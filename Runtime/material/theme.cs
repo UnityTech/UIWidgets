@@ -4,6 +4,10 @@ using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.widgets;
 
 namespace Unity.UIWidgets.material {
+    static class ThemeUtils {
+        public static readonly TimeSpan kThemeAnimationDuration = new TimeSpan(0, 0, 0, 0, 200);
+    }
+
     public class Theme : StatelessWidget {
         public Theme(
             Key key = null,
@@ -119,7 +123,7 @@ namespace Unity.UIWidgets.material {
     class _AnimatedThemeState : AnimatedWidgetBaseState<AnimatedTheme> {
         ThemeDataTween _data;
 
-        protected override void forEachTween(ITweenVisitor visitor) {
+        protected override void forEachTween(TweenVisitor visitor) {
             this._data = (ThemeDataTween) visitor.visit(this, this._data, this.widget.data,
                 (ThemeData value) => new ThemeDataTween(begin: value));
         }

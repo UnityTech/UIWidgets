@@ -4,6 +4,7 @@ using System.Diagnostics;
 using Unity.UIWidgets.async;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.rendering;
+using Unity.UIWidgets.scheduler;
 using Unity.UIWidgets.service;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
@@ -96,7 +97,7 @@ namespace Unity.UIWidgets.editor {
             }
         }
 
-        WidgetsBinding _binding;
+        internal WidgetsBinding _binding;
         float _lastWindowWidth;
         float _lastWindowHeight;
 
@@ -149,28 +150,32 @@ namespace Unity.UIWidgets.editor {
         }
 
         public override IDisposable getScope() {
-            instance = this;
+            WindowAdapter oldInstance = (WindowAdapter) Window._instance;            
+            Window._instance = this;
+            
             if (this._binding == null) {
                 this._binding = new WidgetsBinding();
-            }
-            WidgetsBinding.instance = this._binding;
-
-            return new WindowDisposable(this);
+            }            
+            SchedulerBinding._instance = this._binding;
+            
+            return new WindowDisposable(this, oldInstance);
         }
 
         class WindowDisposable : IDisposable {
             readonly WindowAdapter _window;
+            readonly WindowAdapter _oldWindow;
 
-            public WindowDisposable(WindowAdapter window) {
+            public WindowDisposable(WindowAdapter window, WindowAdapter oldWindow) {
                 this._window = window;
+                this._oldWindow = oldWindow;
             }
 
             public void Dispose() {
-                D.assert(instance == this._window);
-                instance = null;
+                D.assert(Window._instance == this._window);
+                Window._instance = this._oldWindow;
 
-                D.assert(WidgetsBinding.instance == this._window._binding);
-                WidgetsBinding.instance = null;
+                D.assert(SchedulerBinding._instance == this._window._binding);
+                SchedulerBinding._instance = this._oldWindow?._binding;
             }
         }
 
