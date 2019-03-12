@@ -101,6 +101,8 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
+    // There is a copy of the implementation of this mixin at widgets/automatic_keep_alive.cs,
+    // in AutomaticKeepAliveClientWithTickerProviderStateMixin, remember to keep the copy up to date
     public abstract class TickerProviderStateMixin<T> : State<T>, TickerProvider where T : StatefulWidget {
         HashSet<Ticker> _tickers;
 
