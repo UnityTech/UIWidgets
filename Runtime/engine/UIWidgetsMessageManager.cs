@@ -50,7 +50,7 @@ namespace Unity.UIWidgets.engine {
             if (name != this._lastObjectName) {
 #if UNITY_IOS || UNITY_ANDROID
                 if (!Application.isEditor) {
-                    UIWidgetsMessageSetObjectName(this._lastObjectName);
+                    UIWidgetsMessageSetObjectName(name);
                 }
                 this._lastObjectName = name;
 #endif
