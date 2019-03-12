@@ -311,7 +311,6 @@ namespace Unity.UIWidgets.widgets {
             this.rootScope._manager = this;
             D.assert(this.rootScope._firstChild == null);
             D.assert(this.rootScope._lastChild == null);
-            this.unfocusIfNeed();
         }
 
         public readonly FocusScopeNode rootScope = new FocusScopeNode();
@@ -366,22 +365,21 @@ namespace Unity.UIWidgets.widgets {
             if (this._currentFocus != null) {
                 this._currentFocus._notify();
             }
-            
-            Debug.Log($"updated none={this._noneScope.ToString()}:\n{this.ToString()}");
         }
 
-        public void unfocusIfNeed() {
-            if (this._noneScope._parent != null && this._noneScope.isFirstFocus) {
-                return;
+        public void focusNone(bool focus) {
+            if (focus) {
+                if (this._noneScope._parent != null && this._noneScope.isFirstFocus) {
+                    return;
+                }
+                this.rootScope.setFirstFocus(this._noneScope);
             }
-            this.rootScope.setFirstFocus(this._noneScope);
-        }
-
-        public void focusIfNeed() {
-            if (this._noneScope._parent == null) {
-                return;
+            else {
+                if (this._noneScope._parent == null) {
+                    return;
+                }
+                this._noneScope.detach();
             }
-            this._noneScope.detach();
         }
         
         public override string ToString() {

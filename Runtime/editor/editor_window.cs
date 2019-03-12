@@ -368,12 +368,7 @@ namespace Unity.UIWidgets.editor {
 
             bool hasFocus = this.hasFocus();
             using (this.getScope()) {
-                if (hasFocus) {
-                    WidgetsBinding.instance.focusManager.focusIfNeed();
-                }
-                else {
-                    WidgetsBinding.instance.focusManager.unfocusIfNeed();
-                }
+                WidgetsBinding.instance.focusManager.focusNone(!hasFocus);
                 this._updateScrollInput();
                 TextInput.Update();
                 this._timerProvider.update(this.flushMicrotasks);
