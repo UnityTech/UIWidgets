@@ -2,6 +2,8 @@
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.ui;
+using UnityEngine;
+using Rect = Unity.UIWidgets.ui.Rect;
 
 namespace Unity.UIWidgets.rendering {
     public abstract class Layer : AbstractNodeMixinDiagnosticableTree {
@@ -180,6 +182,39 @@ namespace Unity.UIWidgets.rendering {
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             properties.add(new DiagnosticsProperty<Rect>("paint bounds", this.canvasBounds));
+        }
+    }
+
+    public class TextureLayer : Layer {
+        public TextureLayer(
+            Rect rect,
+            Texture texture,
+            bool freeze = false
+        ) {
+            D.assert(rect != null);
+            D.assert(texture != null);
+
+            this.rect = rect;
+            this.texture = texture;
+            this.freeze = freeze;
+        }
+
+        public readonly Rect rect;
+
+        public readonly Texture texture;
+
+        public readonly bool freeze;
+
+        internal override flow.Layer addToScene(SceneBuilder builder, Offset layerOffset = null) {
+            Rect shiftedRect = this.rect.shift(layerOffset);
+            builder.addTexture(
+                this.texture,
+                offset: shiftedRect.topLeft,
+                width: shiftedRect.width,
+                height: shiftedRect.height,
+                freeze: this.freeze
+            );
+            return null;
         }
     }
 

@@ -223,6 +223,10 @@ namespace Unity.UIWidgets.ui {
 
         public abstract void scheduleFrame(bool regenerateLayerTree = true);
 
+        public void textureFrameAvailable() {
+            this.scheduleFrame(false);
+        }
+
         public abstract void render(Scene scene);
 
         public abstract void scheduleMicrotask(Action callback);
