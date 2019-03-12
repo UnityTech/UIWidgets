@@ -662,7 +662,7 @@ namespace Unity.UIWidgets.ui {
             var tex = font.material.mainTexture;
 
             Action<Paint> drawMesh = (Paint p) => {
-                if (!this._applyClip(textBlob.bounds)) {
+                if (!this._applyClip(matrix.mapRect(textBlob.bounds))) {
                     return;
                 }
 
