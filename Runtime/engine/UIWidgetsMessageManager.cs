@@ -21,15 +21,17 @@ namespace Unity.UIWidgets.engine {
             if (!Application.isPlaying) {
                 return;
             }
-            if (UIWidgetsMessageManager.instance != null) {
+            if (_instance != null) {
                 return;
             }
             var managerObj = new GameObject("__UIWidgetsMessageManager");
             managerObj.AddComponent<UIWidgetsMessageManager>();
         }
         
+#if UNITY_IOS || UNITY_ANDROID
         string _lastObjectName;
-
+#endif
+        
         void OnEnable() {
             D.assert(_instance == null, "Only one instance of UIWidgetsMessageManager should exists");
             _instance = this;
@@ -46,15 +48,16 @@ namespace Unity.UIWidgets.engine {
         }
 
         void UpdateNameIfNeed() {
+#if UNITY_IOS || UNITY_ANDROID
             var name = this.gameObject.name;
             if (name != this._lastObjectName) {
-#if UNITY_IOS || UNITY_ANDROID
+
                 if (!Application.isEditor) {
                     UIWidgetsMessageSetObjectName(name);
                 }
                 this._lastObjectName = name;
-#endif
             }
+#endif
         }
 
         public void AddChannelMessageDelegate(string channel, MethodChannelMessageDelegate del) {
