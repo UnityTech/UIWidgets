@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Unity.UIWidgets.external.simplejson;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
 using UnityEngine;
@@ -37,12 +38,12 @@ namespace Unity.UIWidgets.service {
             "text", "multiline", "number", "phone", "datetime", "emailAddress", "url"
         };
 
-        public Dictionary<string, object> toJson() {
-            return new Dictionary<string, object>() {
-                {"name", this._name},
-                {"signed", this.signed},
-                {"decimal", this.decimalNum}
-            };
+        public JSONNode toJson() {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject["name"] = this._name;
+            jsonObject["signed"] = this.signed;
+            jsonObject["decimal"] = this.decimalNum;
+            return jsonObject;
         }
 
         string _name {
@@ -99,17 +100,78 @@ namespace Unity.UIWidgets.service {
         }
     }
 
+    static partial class TextInputUtils {
+        internal static TextAffinity? _toTextAffinity(string affinity) {
+            switch (affinity) {
+                case "TextAffinity.downstream":
+                    return TextAffinity.downstream;
+                case "TextAffinity.upstream":
+                    return TextAffinity.upstream;
+            }
+            return null;
+        }
+
+        internal static TextInputAction _toTextInputAction(string action) {
+            switch (action) {
+                case "TextInputAction.none":
+                    return TextInputAction.none;
+                case "TextInputAction.unspecified":
+                    return TextInputAction.unspecified;
+                case "TextInputAction.go":
+                    return TextInputAction.go;
+                case "TextInputAction.search":
+                    return TextInputAction.search;
+                case "TextInputAction.send":
+                    return TextInputAction.send;
+                case "TextInputAction.next":
+                    return TextInputAction.next;
+                case "TextInputAction.previuos":
+                    return TextInputAction.previous;
+                case "TextInputAction.continue_action":
+                    return TextInputAction.continueAction;
+                case "TextInputAction.join":
+                    return TextInputAction.join;
+                case "TextInputAction.route":
+                    return TextInputAction.route;
+                case "TextInputAction.emergencyCall":
+                    return TextInputAction.emergencyCall;
+                case "TextInputAction.done":
+                    return TextInputAction.done;
+                case "TextInputAction.newline":
+                    return TextInputAction.newline;
+            }
+            throw new UIWidgetsError("Unknown text input action: $action");
+        }
+    }
+    
     public class TextEditingValue : IEquatable<TextEditingValue> {
         public readonly string text;
         public readonly TextSelection selection;
         public readonly TextRange composing;
-
+        static JSONNode defaultIndexNode = new JSONNumber(-1);
         public TextEditingValue(string text = "", TextSelection selection = null, TextRange composing = null) {
             this.text = text;
             this.selection = selection ?? TextSelection.collapsed(-1);
             this.composing = composing ?? TextRange.empty;
         }
 
+        public static TextEditingValue fromJson(JSONObject json) {
+            TextAffinity? affinity =
+                TextInputUtils._toTextAffinity(json["selectionAffinity"].Value);
+            return new TextEditingValue(
+                text: json["text"].Value,
+                selection: new TextSelection(
+                    baseOffset: json.GetValueOrDefault("selectionBase", defaultIndexNode).AsInt,
+                    extentOffset: json.GetValueOrDefault("selectionExtent", defaultIndexNode).AsInt,
+                    affinity: affinity != null ? affinity.Value : TextAffinity.downstream,
+                    isDirectional: json["selectionIsDirectional"].AsBool
+                ),
+                composing: new TextRange(
+                    start: json.GetValueOrDefault("composingBase", defaultIndexNode).AsInt,
+                    end: json.GetValueOrDefault("composingExtent", defaultIndexNode).AsInt
+                )
+            );
+        }
         public TextEditingValue copyWith(string text = null, TextSelection selection = null,
             TextRange composing = null) {
             return new TextEditingValue(
@@ -261,6 +323,18 @@ namespace Unity.UIWidgets.service {
         public override string ToString() {
             return $"Text: {this.text}, Selection: {this.selection}, Composing: {this.composing}";
         }
+
+        public JSONNode toJson() {
+            var json = new JSONObject();
+            json["text"] = this.text;
+            json["selectionBase"] = this.selection.baseOffset;
+            json["selectionExtent"] = this.selection.extentOffset;
+            json["selectionAffinity"] = this.selection.affinity.ToString();
+            json["selectionIsDirectional"] = this.selection.isDirectional;
+            json["composingBase"] = this.composing.start;
+            json["composingExtent"] = this.composing.end;
+            return json;
+        }
     }
 
     public interface TextSelectionDelegate {
@@ -343,59 +417,76 @@ namespace Unity.UIWidgets.service {
         scrollPageDown,
     }
 
-    public class TextInputConfiguration {
+    public enum TextCapitalization {
+        words,
+        sentences,
+        characters,
+        none
+    }
+
+    class TextInputConfiguration {
         public TextInputConfiguration(TextInputType inputType = null,
-            bool obscureText = false, bool autocorrect = true, TextInputAction inputAction = TextInputAction.done) {
+            bool obscureText = false, bool autocorrect = true, TextInputAction inputAction = TextInputAction.done,
+            Brightness keyboardAppearance = Brightness.light, TextCapitalization textCapitalization = TextCapitalization.none,
+            bool unityTouchKeyboard = false) {
             this.inputType = inputType ?? TextInputType.text;
             this.inputAction = inputAction;
             this.obscureText = obscureText;
             this.autocorrect = autocorrect;
+            this.textCapitalization = textCapitalization;
+            this.keyboardAppearance = keyboardAppearance;
+            this.unityTouchKeyboard = unityTouchKeyboard;
         }
 
         public readonly TextInputType inputType;
         public readonly bool obscureText;
         public readonly bool autocorrect;
         public readonly TextInputAction inputAction;
+        public readonly TextCapitalization textCapitalization;
+        public readonly Brightness keyboardAppearance;
+        public readonly bool unityTouchKeyboard;
 
-        public Dictionary<string, object> toJson() {
-            return new Dictionary<string, object>() {
-                {"inputType", this.inputType.toJson()},
-                {"obscureText", this.obscureText},
-                {"autocorrect", this.autocorrect},
-                {"inputAction", this.inputAction.ToString()}
-            };
+        public JSONNode toJson() {
+            var json = new JSONObject();
+            json["inputType"] = this.inputType.toJson();
+            json["obscureText"] = this.obscureText;
+            json["autocorrect"] = this.autocorrect;
+            json["inputAction"] = $"TextInputAction.{this.inputAction.ToString()}";
+            json["unityTouchKeyboard"] = this.unityTouchKeyboard;
+            json["textCapitalization"] = $"TextCapitalization.{this.textCapitalization.ToString()}";
+            json["keyboardAppearance"] = $"Brightness.{this.keyboardAppearance.ToString()}";
+            return json;
         }
     }
 
     public class TextInputConnection {
-        internal TextInputConnection(TextInputClient client, TextInput textInput) {
+        internal TextInputConnection(TextInputClient client) {
             D.assert(client != null);
-            D.assert(textInput != null);
+            this._window = Window.instance;
             this._client = client;
-            this._textInput = textInput;
             this._id = _nextId++;
         }
 
         public bool attached {
-            get { return this._textInput._currentConnection == this; }
+            get { return TextInput._currentConnection == this; }
         }
 
         public void setEditingState(TextEditingValue value) {
             D.assert(this.attached);
-            this._textInput.keyboardManager.setEditingState(value);
+            TextInput.keyboardDelegate.setEditingState(value);
         }
 
         public void setCompositionCursorPos(float x, float y) {
             D.assert(this.attached);
-            this._textInput.setCompositionCursorPos(x, y);
+            TextInput.setCompositionCursorPos(x, y);
         }
 
         public void close() {
             if (this.attached) {
-                this._textInput.keyboardManager.clearClient();
-                this._textInput._currentConnection = null;
+                TextInput.keyboardDelegate.clearClient();
+                TextInput._currentConnection = null;
                 Input.imeCompositionMode = IMECompositionMode.Auto;
-                this._textInput._scheduleHide();
+                TextInput._scheduleHide();
             }
 
             D.assert(!this.attached);
@@ -404,77 +495,107 @@ namespace Unity.UIWidgets.service {
         public void show() {
             D.assert(this.attached);
             Input.imeCompositionMode = IMECompositionMode.On;
-            this._textInput.keyboardManager.show();
+            TextInput.keyboardDelegate.show();
         }
 
         static int _nextId = 1;
         internal readonly int _id;
         internal readonly TextInputClient _client;
-        internal readonly TextInput _textInput;
+        internal readonly Window _window;
         TouchScreenKeyboard _keyboard;
     }
 
-    public class TextInput {
-        internal TextInputConnection _currentConnection;
+    class TextInput {
+        static internal TextInputConnection _currentConnection;
 
-        public readonly KeyboadManager keyboardManager;
+        static internal KeyboardDelegate keyboardDelegate;
 
         public TextInput() {
-            this.keyboardManager = new KeyboadManager(this);
         }
 
-        public TextInputConnection attach(TextInputClient client, TextInputConfiguration configuration) {
+        public static TextInputConnection attach(TextInputClient client, TextInputConfiguration configuration) {
             D.assert(client != null);
-            var connection = new TextInputConnection(client, this);
-            this.keyboardManager.setClient(connection._id, configuration);
-            this._currentConnection = connection;
+            var connection = new TextInputConnection(client);
+            _currentConnection = connection;
+            string x = configuration.toJson();
+            if (keyboardDelegate != null) {
+                keyboardDelegate.Dispose();
+            }
+
+            if (TouchScreenKeyboard.isSupported) {
+#if UNITY_IOS || UNITY_ANDROID
+                if (configuration.unityTouchKeyboard) {
+                    keyboardDelegate = new UnityTouchScreenKeyboardDelegate();
+                }
+                else {
+                    keyboardDelegate = new UIWidgetsTouchScreenKeyboardDelegate();
+                }
+#else
+                keyboardDelegate = new UnityTouchScreenKeyboardDelegate();
+#endif
+            }
+            else {
+                keyboardDelegate = new DefaultKeyboardDelegate();
+            }
+            keyboardDelegate.setClient(connection._id, configuration);
             return connection;
         }
 
-        public void setCompositionCursorPos(float x, float y) {
+        internal static void Update() {
+            if (_currentConnection != null && _currentConnection._window == Window.instance) {
+                (keyboardDelegate as TextInputUpdateListener)?.Update();
+            }
+        }
+        
+        internal static void OnGUI() {
+            if (_currentConnection != null && _currentConnection._window == Window.instance) {
+                (keyboardDelegate as TextInputOnGUIListener)?.OnGUI();
+            }
+        }
+        
+        public static void setCompositionCursorPos(float x, float y) {
             Input.compositionCursorPos = new Vector2(x, y);
         }
-
-        internal void _updateEditingState(int client, TextEditingValue value) {
-            if (this._currentConnection == null) {
+        
+        internal static void _updateEditingState(int client, TextEditingValue value) {
+            if (_currentConnection == null) {
                 return;
             }
 
-            if (client != this._currentConnection._id) {
+            if (client != _currentConnection._id) {
                 return;
             }
 
-            this._currentConnection._client.updateEditingValue(value);
+            _currentConnection._client.updateEditingValue(value);
         }
 
-        internal void _performAction(int client, TextInputAction action) {
-            if (this._currentConnection == null) {
+        internal static void  _performAction(int client, TextInputAction action) {
+            if (_currentConnection == null) {
                 return;
             }
 
-            if (client != this._currentConnection._id) {
+            if (client != _currentConnection._id) {
                 return;
             }
 
-            this._currentConnection._client.performAction(action);
+            _currentConnection._client.performAction(action);
         }
 
+        static bool _hidePending = false;
 
-        bool _hidePending = false;
-
-        internal void _scheduleHide() {
-            if (this._hidePending) {
+        static internal void _scheduleHide() {
+            if (_hidePending) {
                 return;
             }
 
-            this._hidePending = true;
+            _hidePending = true;
 
             Window.instance.scheduleMicrotask(() => {
-                this._hidePending = false;
-                if (this._currentConnection == null) {
-                    this.keyboardManager.hide();
+                _hidePending = false;
+                if (_currentConnection == null) {
+                    keyboardDelegate.hide();
                 }
             });
-        }
+        }     
     }
 }

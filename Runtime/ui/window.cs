@@ -237,8 +237,6 @@ namespace Unity.UIWidgets.ui {
 
         public abstract Timer runInMain(Action callback);
 
-        public abstract TextInput textInput { get; }
-
         public abstract IDisposable getScope();
     }
 }

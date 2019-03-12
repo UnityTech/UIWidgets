@@ -96,8 +96,7 @@ namespace Unity.UIWidgets.engine {
 
         protected override void OnEnable() {
             base.OnEnable();
-
-            //Disable the default touch -> mouse event conversion on mobile devices
+           //Disable the default touch -> mouse event conversion on mobile devices
             Input.simulateMouseWithTouches = false;
 
             this._displayMetrics = DisplayMetricsProvider.provider();
@@ -148,6 +147,7 @@ namespace Unity.UIWidgets.engine {
         void Update() {
             PerformanceUtils.instance.updateDeltaTime(Time.unscaledDeltaTime);
             this._displayMetrics.Update();
+            UIWidgetsMessageManager.ensureUIWidgetsMessageManagerIfNeeded();
             if (EventSystem.current != null && EventSystem.current.currentSelectedGameObject != this.gameObject) {
                 this.unfocusIfNeeded();
             }
