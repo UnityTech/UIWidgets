@@ -960,11 +960,11 @@ namespace Unity.UIWidgets.rendering {
         }
     }
 
-    public class AnnotatedRegionLayer<T> : ContainerLayer 
-    where T : class {
+    public class AnnotatedRegionLayer<T> : ContainerLayer
+        where T : class {
         public AnnotatedRegionLayer(
             T value = null,
-            Size size = null) {  
+            Size size = null) {
             D.assert(value != null);
             this.value = value;
             this.size = size;
@@ -973,7 +973,7 @@ namespace Unity.UIWidgets.rendering {
         public readonly T value;
 
         public readonly Size size;
-        
+
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             properties.add(new DiagnosticsProperty<T>("value", this.value));
@@ -1062,18 +1062,21 @@ namespace Unity.UIWidgets.rendering {
 
         internal override flow.Layer addToScene(SceneBuilder builder, Offset layerOffset = null) {
             layerOffset = layerOffset ?? Offset.zero;
+
             builder.pushPhysicalShape(
                 path: this.clipPath.shift(layerOffset),
                 elevation: this.elevation,
                 color: this.color,
                 shadowColor: this.shadowColor,
                 clipBehavior: this.clipBehavior);
+
             this.addChildrenToScene(builder, layerOffset);
+
             builder.pop();
             return null;
         }
-        
-        
+
+
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             properties.add(new FloatProperty("elevation", this.elevation));

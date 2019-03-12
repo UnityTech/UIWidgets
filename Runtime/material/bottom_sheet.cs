@@ -8,9 +8,8 @@ using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
 
 namespace Unity.UIWidgets.material {
-    
     static class BottomSheetUtils {
-        public static TimeSpan _kBottomSheetDuration = new TimeSpan(0, 0, 0, 0, 200);
+        public static readonly TimeSpan _kBottomSheetDuration = new TimeSpan(0, 0, 0, 0, 200);
         public const float _kMinFlingVelocity = 700.0f;
         public const float _kCloseProgressThreshold = 0.5f;
     }
@@ -59,11 +58,11 @@ namespace Unity.UIWidgets.material {
 
 
     class _BottomSheetState : State<BottomSheet> {
-        public readonly GlobalKey _childKey = GlobalKey.key(debugLabel: "BottomSheet child");
+        readonly GlobalKey _childKey = GlobalKey.key(debugLabel: "BottomSheet child");
 
         float? _childHeight {
             get {
-                RenderBox renderBox = (RenderBox)this._childKey.currentContext.findRenderObject();
+                RenderBox renderBox = (RenderBox) this._childKey.currentContext.findRenderObject();
                 return renderBox.size.height;
             }
         }
@@ -76,8 +75,10 @@ namespace Unity.UIWidgets.material {
             if (this._dismissUnderway) {
                 return;
             }
+
             this.widget.animationController.setValue(
-                this.widget.animationController.value - details.primaryDelta.Value / (this._childHeight ?? details.primaryDelta.Value));
+                this.widget.animationController.value -
+                details.primaryDelta.Value / (this._childHeight ?? details.primaryDelta.Value));
         }
 
         void _handleDragEnd(DragEndDetails details) {
@@ -94,31 +95,33 @@ namespace Unity.UIWidgets.material {
                 if (flingVelocity < 0.0f) {
                     this.widget.onClosing();
                 }
-                else if (this.widget.animationController.value < BottomSheetUtils._kCloseProgressThreshold) {
-                    if (this.widget.animationController.value > 0.0f) {
-                        this.widget.animationController.fling(velocity: -1.0f);
-                    }
+            }
+            else if (this.widget.animationController.value < BottomSheetUtils._kCloseProgressThreshold) {
+                if (this.widget.animationController.value > 0.0f) {
+                    this.widget.animationController.fling(velocity: -1.0f);
+                }
 
-                    this.widget.onClosing();
-                }
-                else {
-                    this.widget.animationController.forward();
-                }
+                this.widget.onClosing();
+            }
+            else {
+                this.widget.animationController.forward();
             }
         }
-        
+
         public override Widget build(BuildContext context) {
             Widget bottomSheet = new Material(
                 key: this._childKey,
                 elevation: this.widget.elevation,
                 child: this.widget.builder(context)
             );
-            
-            return !this.widget.enableDrag ? bottomSheet : new GestureDetector(
-                onVerticalDragUpdate: this._handleDragUpdate,
-                onVerticalDragEnd: this._handleDragEnd,
-                child: bottomSheet
-            );
+
+            return !this.widget.enableDrag
+                ? bottomSheet
+                : new GestureDetector(
+                    onVerticalDragUpdate: this._handleDragUpdate,
+                    onVerticalDragEnd: this._handleDragEnd,
+                    child: bottomSheet
+                );
         }
     }
 }

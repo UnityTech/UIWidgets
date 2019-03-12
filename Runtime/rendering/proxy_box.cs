@@ -4,7 +4,6 @@ using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.ui;
-using UnityEditor.Rendering;
 
 namespace Unity.UIWidgets.rendering {
     public class RenderProxyBox : RenderProxyBoxMixinRenderObjectWithChildMixinRenderBox<RenderBox> {
@@ -158,6 +157,7 @@ namespace Unity.UIWidgets.rendering {
                     };
                     context.canvas.drawRect(offset & this.size, paint);
                 }
+
                 return true;
             });
         }
@@ -373,6 +373,7 @@ namespace Unity.UIWidgets.rendering {
                 if (value == this._stepWidth) {
                     return;
                 }
+
                 this._stepWidth = value;
                 this.markNeedsLayout();
             }
@@ -386,6 +387,7 @@ namespace Unity.UIWidgets.rendering {
                 if (value == this._stepHeight) {
                     return;
                 }
+
                 this._stepHeight = value;
                 this.markNeedsLayout();
             }
@@ -396,6 +398,7 @@ namespace Unity.UIWidgets.rendering {
             if (step == null) {
                 return input;
             }
+
             return (input / step.Value).ceil() * step.Value;
         }
 
@@ -407,6 +410,7 @@ namespace Unity.UIWidgets.rendering {
             if (this.child == null) {
                 return 0.0f;
             }
+
             float width = this.child.getMaxIntrinsicWidth(height);
             return _applyStep(width, this._stepWidth);
         }
@@ -415,9 +419,11 @@ namespace Unity.UIWidgets.rendering {
             if (this.child == null) {
                 return 0.0f;
             }
+
             if (!width.isFinite()) {
                 width = this.computeMaxIntrinsicWidth(float.PositiveInfinity);
             }
+
             D.assert(width.isFinite());
             float height = this.child.getMinIntrinsicHeight(width);
             return _applyStep(height, this._stepHeight);
@@ -427,9 +433,11 @@ namespace Unity.UIWidgets.rendering {
             if (this.child == null) {
                 return 0.0f;
             }
+
             if (!width.isFinite()) {
                 width = this.computeMaxIntrinsicWidth(float.PositiveInfinity);
             }
+
             D.assert(width.isFinite());
             float height = this.child.getMaxIntrinsicHeight(width);
             return _applyStep(height, this._stepHeight);
@@ -443,14 +451,17 @@ namespace Unity.UIWidgets.rendering {
                     D.assert(width.isFinite());
                     childConstraints = childConstraints.tighten(width: _applyStep(width, this._stepWidth));
                 }
+
                 if (this._stepHeight != null) {
                     float height = this.child.getMaxIntrinsicHeight(childConstraints.maxWidth);
                     D.assert(height.isFinite());
                     childConstraints = childConstraints.tighten(height: _applyStep(height, this._stepHeight));
                 }
+
                 this.child.layout(childConstraints, parentUsesSize: true);
                 this.size = this.child.size;
-            } else {
+            }
+            else {
                 this.performResize();
             }
         }
@@ -472,9 +483,11 @@ namespace Unity.UIWidgets.rendering {
             if (this.child == null) {
                 return 0.0f;
             }
+
             if (!height.isFinite()) {
                 height = this.child.getMaxIntrinsicHeight(float.PositiveInfinity);
             }
+
             D.assert(height.isFinite());
             return this.child.getMinIntrinsicWidth(height);
         }
@@ -483,9 +496,11 @@ namespace Unity.UIWidgets.rendering {
             if (this.child == null) {
                 return 0.0f;
             }
+
             if (!height.isFinite()) {
                 height = this.child.getMaxIntrinsicHeight(float.PositiveInfinity);
             }
+
             D.assert(height.isFinite());
             return this.child.getMaxIntrinsicWidth(height);
         }
@@ -502,9 +517,11 @@ namespace Unity.UIWidgets.rendering {
                     D.assert(height.isFinite());
                     childConstraints = childConstraints.tighten(height: height);
                 }
+
                 this.child.layout(childConstraints, parentUsesSize: true);
                 this.size = this.child.size;
-            } else {
+            }
+            else {
                 this.performResize();
             }
         }
@@ -1133,7 +1150,7 @@ namespace Unity.UIWidgets.rendering {
             return base.hitTest(result, position: position);
         }
 
-        //todo:xingwei.zhu: implementation shadow + compositeLayer (issue: no color when composite)
+        //todo:xingwei.zhu: implementation shadow
         public override void paint(PaintingContext context, Offset offset) {
             if (this.child != null) {
                 this._updateClip();
@@ -1141,21 +1158,6 @@ namespace Unity.UIWidgets.rendering {
                 Rect offsetBounds = offsetRRect.outerRect;
                 Path offsetRRectAsPath = new Path();
                 offsetRRectAsPath.addRRect(offsetRRect);
-
-                Canvas canvas = context.canvas;
-                if (this.elevation != 0.0) {
-                    //draw Shadow
-                    /*canvas.drawRect(
-                        offsetBounds.inflate(20.0),
-                        _RenderPhysicalModelBase<RRect>._transparentPaint
-                    );
-                    canvas.drawShadow(
-                        offsetRRectAsPath,
-                        this.shadowColor,
-                        this.elevation,
-                        this.color.alpha != 0xFF
-                    );*/
-                }
 
                 if (this.needsCompositing) {
                     PhysicalModelLayer physicalModel = new PhysicalModelLayer(
@@ -1165,14 +1167,29 @@ namespace Unity.UIWidgets.rendering {
                         color: this.color,
                         shadowColor: this.shadowColor);
                     context.pushLayer(physicalModel, base.paint, offset, childPaintBounds: offsetBounds);
-                    return;
                 }
+                else {
+                    Canvas canvas = context.canvas;
+                    if (this.elevation != 0.0) {
+                        //draw Shadow
+                        /*canvas.drawRect(
+                            offsetBounds.inflate(20.0),
+                            _RenderPhysicalModelBase<RRect>._transparentPaint
+                        );
+                        canvas.drawShadow(
+                            offsetRRectAsPath,
+                            this.shadowColor,
+                            this.elevation,
+                            this.color.alpha != 0xFF
+                        );*/
+                    }
 
-                Paint paint = new Paint {color = this.color};
-                canvas.drawRRect(offsetRRect, paint);
-                context.clipRRectAndPaint(offsetRRect, this.clipBehavior, offsetBounds,
-                    () => base.paint(context, offset));
-                D.assert(context.canvas == canvas, "canvas changed even though needsCompositing was false");
+                    Paint paint = new Paint {color = this.color};
+                    canvas.drawRRect(offsetRRect, paint);
+                    context.clipRRectAndPaint(offsetRRect, this.clipBehavior, offsetBounds,
+                        () => base.paint(context, offset));
+                    D.assert(context.canvas == canvas, "canvas changed even though needsCompositing was false");
+                }
             }
         }
 
@@ -1222,7 +1239,7 @@ namespace Unity.UIWidgets.rendering {
             return base.hitTest(result, position: position);
         }
 
-        //todo:xingwei.zhu: implementation shadow + compositeLayer (issue: no color when composite)
+        //todo:xingwei.zhu: implementation shadow
         public override void paint(PaintingContext context, Offset offset) {
             if (this.child != null) {
                 this._updateClip();
@@ -1230,7 +1247,17 @@ namespace Unity.UIWidgets.rendering {
                 Path offsetPath = new Path();
                 offsetPath.addPath(this._clip, offset);
 
-                Canvas canvas = context.canvas;
+                if (this.needsCompositing) {
+                    PhysicalModelLayer physicalModel = new PhysicalModelLayer(
+                        clipPath: offsetPath,
+                        clipBehavior: this.clipBehavior,
+                        elevation: this.elevation,
+                        color: this.color,
+                        shadowColor: this.shadowColor);
+                    context.pushLayer(physicalModel, base.paint, offset, childPaintBounds: offsetBounds);
+                }
+                else {
+                    Canvas canvas = context.canvas;
 //                if (this.elevation != 0.0 && paintShadows) {
 //                    canvas.drawRect(
 //                        offsetBounds.inflate(20.0),
@@ -1243,23 +1270,12 @@ namespace Unity.UIWidgets.rendering {
 //                        this.color.alpha != 0xFF,
 //                    );
 //                }
-
-                if (this.needsCompositing) {
-                    PhysicalModelLayer physicalModel = new PhysicalModelLayer(
-                        clipPath: offsetPath,
-                        clipBehavior: this.clipBehavior,
-                        elevation: this.elevation,
-                        color: this.color,
-                        shadowColor: this.shadowColor);
-                    context.pushLayer(physicalModel, base.paint, offset, childPaintBounds: offsetBounds);
-                    return;
+                    Paint paint = new Paint {color = this.color, style = PaintingStyle.fill};
+                    canvas.drawPath(offsetPath, paint);
+                    context.clipPathAndPaint(offsetPath, this.clipBehavior,
+                        offsetBounds, () => base.paint(context, offset));
+                    D.assert(context.canvas == canvas, "canvas changed even though needsCompositing was false");
                 }
-
-                Paint paint = new Paint {color = this.color, style = PaintingStyle.fill};
-                canvas.drawPath(offsetPath, paint);
-                context.clipPathAndPaint(offsetPath, this.clipBehavior,
-                    offsetBounds, () => base.paint(context, offset));
-                D.assert(context.canvas == canvas, "canvas changed even though needsCompositing was false");
             }
         }
 
@@ -2215,8 +2231,8 @@ namespace Unity.UIWidgets.rendering {
         }
     }
 
-    public class RenderAnnotatedRegion<T> : RenderProxyBox 
-    where T : class {
+    public class RenderAnnotatedRegion<T> : RenderProxyBox
+        where T : class {
         public RenderAnnotatedRegion(
             T value = null,
             bool? sized = null,
@@ -2261,7 +2277,8 @@ namespace Unity.UIWidgets.rendering {
         }
 
         public override void paint(PaintingContext context, Offset offset) {
-            AnnotatedRegionLayer<T> layer = new AnnotatedRegionLayer<T>(this.value, size: this.sized ? this.size : null);
+            AnnotatedRegionLayer<T> layer =
+                new AnnotatedRegionLayer<T>(value: this.value, size: this.sized ? this.size : null);
             context.pushLayer(layer, base.paint, offset);
         }
     }

@@ -91,7 +91,8 @@ namespace Unity.UIWidgets.material {
             Color backgroundColor = null,
             SnackBarAction action = null,
             TimeSpan? duration = null,
-            Animation<float> animation = null) : base(key: key) {
+            Animation<float> animation = null
+        ) : base(key: key) {
             duration = duration ?? SnackBarUtils._kSnackBarDisplayDuration;
             D.assert(content != null);
             this.content = content;
@@ -110,6 +111,7 @@ namespace Unity.UIWidgets.material {
         public readonly TimeSpan duration;
 
         public readonly Animation<float> animation;
+
 
         public override Widget build(BuildContext context) {
             MediaQueryData mediaQueryData = MediaQuery.of(context);

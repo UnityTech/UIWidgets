@@ -65,6 +65,7 @@ namespace Unity.UIWidgets.material {
             if (this.widget.centerTitle != null) {
                 return this.widget.centerTitle;
             }
+
             D.assert(themeData.platform != null);
             switch (themeData.platform) {
                 case RuntimePlatform.IPhonePlayer:
@@ -81,7 +82,7 @@ namespace Unity.UIWidgets.material {
             if (effectiveCenterTitle) {
                 return Alignment.bottomCenter;
             }
-            
+
             return Alignment.bottomLeft;
         }
 
@@ -89,6 +90,8 @@ namespace Unity.UIWidgets.material {
             switch (this.widget.collapseMode) {
                 case CollapseMode.pin:
                     return -(settings.maxExtent.Value - settings.currentExtent.Value);
+                case CollapseMode.none:
+                    return 0.0f;
                 case CollapseMode.parallax:
                     float deltaExtent = settings.maxExtent.Value - settings.minExtent.Value;
                     return -new FloatTween(begin: 0.0f, end: deltaExtent / 4.0f).lerp(t);
@@ -98,13 +101,16 @@ namespace Unity.UIWidgets.material {
         }
 
         public override Widget build(BuildContext context) {
-            FlexibleSpaceBarSettings settings = (FlexibleSpaceBarSettings)context.inheritFromWidgetOfExactType(typeof(FlexibleSpaceBarSettings));
-            D.assert(settings != null, "A FlexibleSpaceBar must be wrapped in the widget returned by FlexibleSpaceBar.createSettings().");
+            FlexibleSpaceBarSettings settings =
+                (FlexibleSpaceBarSettings) context.inheritFromWidgetOfExactType(typeof(FlexibleSpaceBarSettings));
+            D.assert(settings != null,
+                "A FlexibleSpaceBar must be wrapped in the widget returned by FlexibleSpaceBar.createSettings().");
 
             List<Widget> children = new List<Widget>();
             float deltaExtent = settings.maxExtent.Value - settings.minExtent.Value;
 
-            float t = (1.0f - (settings.currentExtent.Value - settings.minExtent.Value) / deltaExtent.clamp(0.0f, 1.0f));
+            float t = (1.0f - (settings.currentExtent.Value - settings.minExtent.Value) / deltaExtent)
+                .clamp(0.0f, 1.0f);
 
             if (this.widget.background != null) {
                 float fadeStart = Mathf.Max(0.0f, 1.0f - Constants.kToolbarHeight / deltaExtent);
@@ -114,13 +120,13 @@ namespace Unity.UIWidgets.material {
                 float opacity = 1.0f - new Interval(fadeStart, fadeEnd).transform(t);
                 if (opacity > 0.0f) {
                     children.Add(new Positioned(
-                        top: this._getCollapsePadding(t, settings),
-                        left: 0.0f,
-                        right: 0.0f,
-                        height: settings.maxExtent,
-                        child: new Opacity(
-                            opacity: opacity,
-                            child: this.widget.background)
+                            top: this._getCollapsePadding(t, settings),
+                            left: 0.0f,
+                            right: 0.0f,
+                            height: settings.maxExtent,
+                            child: new Opacity(
+                                opacity: opacity,
+                                child: this.widget.background)
                         )
                     );
                 }
@@ -144,36 +150,37 @@ namespace Unity.UIWidgets.material {
                 TextStyle titleStyle = theme.primaryTextTheme.title;
                 titleStyle = titleStyle.copyWith(
                     color: titleStyle.color.withOpacity(toolbarOpacity));
+
                 bool effectiveCenterTitle = this._getEffectiveCenterTitle(theme).Value;
                 float scaleValue = new FloatTween(begin: 1.5f, end: 1.0f).lerp(t);
                 Matrix3 scaleTransform = Matrix3.makeScale(scaleValue, scaleValue);
                 Alignment titleAlignment = this._getTitleAlignment(effectiveCenterTitle);
+
                 children.Add(new Container(
-                    padding: EdgeInsets.fromLTRB(
-                    effectiveCenterTitle ? 0.0f : 72.0f,
-                    0f,
-                    0f,
-                    16.0f),
-                    child: new Transform(
-                        alignment: titleAlignment,
-                        transform: scaleTransform,
-                        child: new Align(
+                        padding: EdgeInsets.fromLTRB(
+                            effectiveCenterTitle ? 0.0f : 72.0f,
+                            0f,
+                            0f,
+                            16.0f),
+                        child: new Transform(
                             alignment: titleAlignment,
-                            child: new DefaultTextStyle(
-                                style: titleStyle,
-                                child: title)
+                            transform: scaleTransform,
+                            child: new Align(
+                                alignment: titleAlignment,
+                                child: new DefaultTextStyle(
+                                    style: titleStyle,
+                                    child: title)
                             )
                         )
                     )
                 );
             }
-            
+
             return new ClipRect(
                 child: new Stack(
                     children: children)
-                );
+            );
         }
-        
     }
 
 
@@ -187,6 +194,7 @@ namespace Unity.UIWidgets.material {
             Widget child = null
         ) : base(key: key, child: child) {
             D.assert(currentExtent != null);
+            D.assert(child != null);
             this.toolbarOpacity = toolbarOpacity;
             this.minExtent = minExtent;
             this.maxExtent = maxExtent;

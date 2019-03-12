@@ -66,7 +66,7 @@ namespace Unity.UIWidgets.ui {
 
         public Layer pushOpacity(int alpha, Offset offset = null) {
             offset = offset ?? Offset.zero;
-            
+
             var layer = new OpacityLayer();
             layer.alpha = alpha;
             layer.offset = offset;
@@ -94,7 +94,7 @@ namespace Unity.UIWidgets.ui {
             bool isComplexHint = false, bool willChangeHint = false) {
             D.assert(offset != null);
             D.assert(picture != null);
-            
+
             if (this._currentLayer == null) {
                 return;
             }

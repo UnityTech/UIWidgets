@@ -68,7 +68,7 @@ namespace Unity.UIWidgets.material {
             Key key = null,
             ButtonThemeData data = null,
             Widget child = null) {
-            return new ButtonTheme(key, data, child);            
+            return new ButtonTheme(key, data, child);
         }
 
         public static ButtonTheme bar(

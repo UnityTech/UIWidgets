@@ -3,12 +3,13 @@ using Unity.UIWidgets.rendering;
 
 namespace Unity.UIWidgets.widgets {
     public class AnnotatedRegion<T> : SingleChildRenderObjectWidget
-    where T : class {
+        where T : class {
         public AnnotatedRegion(
             Key key = null,
             Widget child = null,
             T value = null,
-            bool sized = true) : base(key: key, child: child) {
+            bool sized = true
+        ) : base(key: key, child: child) {
             D.assert(value != null);
             D.assert(child != null);
             this.value = value;

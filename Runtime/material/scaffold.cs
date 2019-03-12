@@ -90,8 +90,11 @@ namespace Unity.UIWidgets.material {
         }
 
         public readonly FloatingActionButtonLocation begin;
+
         public readonly FloatingActionButtonLocation end;
+
         public readonly FloatingActionButtonAnimator animator;
+
         public readonly float progress;
 
         public override Offset getOffset(ScaffoldPrelayoutGeometry scaffoldGeometry) {
@@ -159,6 +162,7 @@ namespace Unity.UIWidgets.material {
         public readonly BuildContext context;
 
         float floatingActionButtonScale;
+
         ScaffoldGeometry geometry;
 
         public new ScaffoldGeometry value {
@@ -224,6 +228,7 @@ namespace Unity.UIWidgets.material {
         public readonly float floatingActionButtonMoveAnimationProgress;
 
         public readonly FloatingActionButtonAnimator floatingActionButtonMotionAnimator;
+
 
         public override void performLayout(Size size) {
             BoxConstraints looseConstraints = BoxConstraints.loose(size);
@@ -374,12 +379,19 @@ namespace Unity.UIWidgets.material {
 
     class _FloatingActionButtonTransitionState : TickerProviderStateMixin<_FloatingActionButtonTransition> {
         AnimationController _previousController;
+
         Animation<float> _previousScaleAnimation;
+
         Animation<float> _previousRotationAnimation;
+
         AnimationController _currentController;
+
         Animation<float> _currentScaleAnimation;
+
         Animation<float> _extendedCurrentScaleAnimation;
+
         Animation<float> _currentRotationAnimation;
+
         Widget _previousChild;
 
         public override void initState() {
@@ -443,7 +455,7 @@ namespace Unity.UIWidgets.material {
             }
         }
 
-        static Animatable<float> _entranceTurnTween = new FloatTween(
+        static readonly Animatable<float> _entranceTurnTween = new FloatTween(
             begin: 1.0f - FloatingActionButtonLocationUtils.kFloatingActionButtonTurnInterval,
             end: 1.0f
         ).chain(new CurveTween(curve: Curves.easeIn));
@@ -562,7 +574,7 @@ namespace Unity.UIWidgets.material {
     public class Scaffold : StatefulWidget {
         public Scaffold(
             Key key = null,
-            AppBar appBar = null,
+            PreferredSizeWidget appBar = null,
             Widget body = null,
             Widget floatingActionButton = null,
             FloatingActionButtonLocation floatingActionButtonLocation = null,
@@ -574,7 +586,8 @@ namespace Unity.UIWidgets.material {
             Widget bottomSheet = null,
             Color backgroundColor = null,
             bool resizeToAvoidBottomPadding = true,
-            bool primary = true) : base(key: key) {
+            bool primary = true
+        ) : base(key: key) {
             this.appBar = appBar;
             this.body = body;
             this.floatingActionButton = floatingActionButton;
@@ -590,7 +603,7 @@ namespace Unity.UIWidgets.material {
             this.primary = primary;
         }
 
-        public readonly AppBar appBar;
+        public readonly PreferredSizeWidget appBar;
 
         public readonly Widget body;
 
@@ -682,6 +695,7 @@ namespace Unity.UIWidgets.material {
     }
 
     public class ScaffoldState : TickerProviderStateMixin<Scaffold> {
+        // DRAWER API
         public readonly GlobalKey<DrawerControllerState> _drawerKey = GlobalKey<DrawerControllerState>.key();
         public readonly GlobalKey<DrawerControllerState> _endDrawerKey = GlobalKey<DrawerControllerState>.key();
 
@@ -729,6 +743,7 @@ namespace Unity.UIWidgets.material {
             this._endDrawerKey.currentState?.open();
         }
 
+        // SNACK BAR API
         readonly Queue<ScaffoldFeatureController<SnackBar, SnackBarClosedReason>> _snackBars =
             new Queue<ScaffoldFeatureController<SnackBar, SnackBarClosedReason>>();
 
@@ -820,6 +835,7 @@ namespace Unity.UIWidgets.material {
             this._snackBarTimer = null;
         }
 
+        // PERSISTENT BOTTOM SHEET API
         readonly List<_PersistentBottomSheet> _dismissedBottomSheets = new List<_PersistentBottomSheet>();
         PersistentBottomSheetController<object> _currentBottomSheet;
 
@@ -907,6 +923,7 @@ namespace Unity.UIWidgets.material {
             return this._currentBottomSheet;
         }
 
+        // FLOATING ACTION BUTTON API
         AnimationController _floatingActionButtonMoveController;
         FloatingActionButtonAnimator _floatingActionButtonAnimator;
         FloatingActionButtonLocation _previousFloatingActionButtonLocation;
@@ -933,7 +950,8 @@ namespace Unity.UIWidgets.material {
             this._floatingActionButtonMoveController.forward(from: restartAnimationFrom);
         }
 
-        ScrollController _primaryScrollController = new ScrollController();
+        // IOS FEATURES
+        readonly ScrollController _primaryScrollController = new ScrollController();
 
         void _handleStatusBarTap() {
             if (this._primaryScrollController.hasClients) {
@@ -944,6 +962,7 @@ namespace Unity.UIWidgets.material {
             }
         }
 
+        // INTERNALS
         _ScaffoldGeometryNotifier _geometryNotifier;
 
 
@@ -1350,9 +1369,13 @@ namespace Unity.UIWidgets.material {
         }
 
         public readonly AnimationController animationController;
+
         public readonly bool enableDrag;
+
         public readonly VoidCallback onClosing;
+
         public readonly VoidCallback onDismissed;
+
         public readonly WidgetBuilder builder;
 
         public override State createState() {
@@ -1424,8 +1447,6 @@ namespace Unity.UIWidgets.material {
             Widget child = null
         ) : base(child: child) {
             D.assert(hasDrawer != null);
-            D.assert(child != null);
-            D.assert(geometryNotifier != null);
             this.hasDrawer = hasDrawer.Value;
             this.geometryNotifier = geometryNotifier;
         }

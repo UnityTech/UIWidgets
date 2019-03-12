@@ -50,7 +50,6 @@ namespace UIWidgetsSample {
         public override Widget build(BuildContext context) {
             return new Scaffold(
                     appBar: new AppBar(
-                        backgroundColor : Colors.blue,
                         title: new Text("Basic AppBar"),
                         actions: new List<Widget> {
                             new IconButton(

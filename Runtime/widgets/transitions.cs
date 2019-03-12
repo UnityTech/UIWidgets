@@ -1,5 +1,4 @@
-﻿using System;
-using Unity.UIWidgets.animation;
+﻿using Unity.UIWidgets.animation;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
@@ -99,9 +98,11 @@ namespace Unity.UIWidgets.widgets {
             Key key = null,
             Animation<float> scale = null,
             Alignment alignment = null,
-            Widget child = null) : base(key: key, listenable: scale) {
+            Widget child = null
+        ) : base(key: key, listenable: scale) {
+            alignment = alignment ?? Alignment.center;
             D.assert(scale != null);
-            this.alignment = alignment ?? Alignment.center;
+            this.alignment = alignment;
             this.child = child;
         }
 
@@ -112,7 +113,7 @@ namespace Unity.UIWidgets.widgets {
         public readonly Alignment alignment;
 
         public readonly Widget child;
-        
+
         protected internal override Widget build(BuildContext context) {
             float scaleValue = this.scale.value;
             Matrix3 transform = Matrix3.makeScale(scaleValue, scaleValue);

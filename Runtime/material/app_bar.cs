@@ -16,16 +16,17 @@ namespace Unity.UIWidgets.material {
     }
 
     class _ToolbarContainerLayout : SingleChildLayoutDelegate {
-        public _ToolbarContainerLayout() {}
-        
+        public _ToolbarContainerLayout() {
+        }
+
         public override BoxConstraints getConstraintsForChild(BoxConstraints constraints) {
             return constraints.tighten(height: Constants.kToolbarHeight);
         }
-        
+
         public override Size getSize(BoxConstraints constraints) {
             return new Size(constraints.maxWidth, Constants.kToolbarHeight);
         }
-        
+
         public override Offset getPositionForChild(Size size, Size childSize) {
             return new Offset(0.0f, size.height - childSize.height);
         }
@@ -35,7 +36,7 @@ namespace Unity.UIWidgets.material {
         }
     }
 
-    public class AppBar : StatefulWidget, IPreferredSizeWidget {
+    public class AppBar : PreferredSizeWidget {
         public AppBar(
             Key key = null,
             Widget leading = null,
@@ -53,7 +54,8 @@ namespace Unity.UIWidgets.material {
             bool? centerTitle = null,
             float titleSpacing = NavigationToolbar.kMiddleSpacing,
             float toolbarOpacity = 1.0f,
-            float bottomOpacity = 1.0f) : base(key: key) {
+            float bottomOpacity = 1.0f
+        ) : base(key: key) {
             this.leading = leading;
             this.automaticallyImplyLeading = automaticallyImplyLeading;
             this.title = title;
@@ -104,13 +106,14 @@ namespace Unity.UIWidgets.material {
         public readonly float toolbarOpacity;
 
         public readonly float bottomOpacity;
-        
-        public Size preferredSize { get; }
+
+        public override Size preferredSize { get; }
 
         public bool? _getEffectiveCenterTitle(ThemeData themeData) {
             if (this.centerTitle != null) {
                 return this.centerTitle;
             }
+
             D.assert(themeData.platform != null);
             switch (themeData.platform) {
                 case RuntimePlatform.IPhonePlayer:
@@ -138,7 +141,6 @@ namespace Unity.UIWidgets.material {
         }
 
         public override Widget build(BuildContext context) {
-            D.assert(!this.widget.primary);
             D.assert(MaterialD.debugCheckHasMaterialLocalizations(context));
             ThemeData themeData = Theme.of(context);
             ScaffoldState scaffold = Scaffold.of(context, nullOk: true);
@@ -148,17 +150,22 @@ namespace Unity.UIWidgets.material {
             bool hasEndDrawer = scaffold?.hasEndDrawer ?? false;
             bool canPop = parentRoute?.canPop ?? false;
             bool useCloseButton = parentRoute is PageRoute && ((PageRoute) parentRoute).fullscreenDialog;
-            
+
             IconThemeData appBarIconTheme = this.widget.iconTheme ?? themeData.primaryIconTheme;
             TextStyle centerStyle = this.widget.textTheme?.title ?? themeData.primaryTextTheme.title;
             TextStyle sideStyle = this.widget.textTheme?.body1 ?? themeData.primaryTextTheme.body1;
 
             if (this.widget.toolbarOpacity != 1.0f) {
-                float opacity = new Interval(0.25f, 1.0f, curve: Curves.fastOutSlowIn).transform(this.widget.toolbarOpacity);
-                if (centerStyle?.color != null)
+                float opacity =
+                    new Interval(0.25f, 1.0f, curve: Curves.fastOutSlowIn).transform(this.widget.toolbarOpacity);
+                if (centerStyle?.color != null) {
                     centerStyle = centerStyle.copyWith(color: centerStyle.color.withOpacity(opacity));
-                if (sideStyle?.color != null)
+                }
+
+                if (sideStyle?.color != null) {
                     sideStyle = sideStyle.copyWith(color: sideStyle.color.withOpacity(opacity));
+                }
+
                 appBarIconTheme = appBarIconTheme.copyWith(
                     opacity: opacity * (appBarIconTheme.opacity ?? 1.0f)
                 );
@@ -195,6 +202,7 @@ namespace Unity.UIWidgets.material {
                         namesRoute = true;
                         break;
                 }
+
                 title = new DefaultTextStyle(
                     style: centerStyle,
                     softWrap: false,
@@ -208,7 +216,8 @@ namespace Unity.UIWidgets.material {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: this.widget.actions);
-            } else if (hasEndDrawer) {
+            }
+            else if (hasEndDrawer) {
                 actions = new IconButton(
                     icon: new Icon(Icons.menu),
                     onPressed: this._handleDrawerButtonEnd,
@@ -221,7 +230,7 @@ namespace Unity.UIWidgets.material {
                 trailing: actions,
                 centerMiddle: this.widget._getEffectiveCenterTitle(themeData).Value,
                 middleSpacing: this.widget.titleSpacing);
-            
+
             Widget appBar = new ClipRect(
                 child: new CustomSingleChildLayout(
                     layoutDelegate: new _ToolbarContainerLayout(),
@@ -230,9 +239,9 @@ namespace Unity.UIWidgets.material {
                         child: new DefaultTextStyle(
                             style: sideStyle,
                             child: toolbar)
-                        )
                     )
-                );
+                )
+            );
 
             if (this.widget.bottom != null) {
                 appBar = new Column(
@@ -260,7 +269,7 @@ namespace Unity.UIWidgets.material {
                     top: true,
                     child: appBar);
             }
-            
+
             appBar = new Align(
                 alignment: Alignment.topCenter,
                 child: appBar);
@@ -274,7 +283,7 @@ namespace Unity.UIWidgets.material {
                     }
                 );
             }
-            
+
             Brightness brightness = this.widget.brightness ?? themeData.primaryColorBrightness;
             SystemUiOverlayStyle overlayStyle = brightness == Brightness.dark
                 ? SystemUiOverlayStyle.light

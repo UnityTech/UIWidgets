@@ -48,8 +48,9 @@ namespace Unity.UIWidgets.material {
         public CloseButton(
             Key key = null) : base(key: key) {
         }
-        
+
         public override Widget build(BuildContext context) {
+            D.assert(MaterialD.debugCheckHasMaterialLocalizations(context));
             return new IconButton(
                 icon: new Icon(Icons.close),
                 tooltip: MaterialLocalizations.of(context).closeButtonTooltip,

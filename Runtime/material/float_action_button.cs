@@ -10,10 +10,12 @@ using Color = Unity.UIWidgets.ui.Color;
 namespace Unity.UIWidgets.material {
     static class FloatActionButtonUtils {
         public static readonly BoxConstraints _kSizeConstraints = BoxConstraints.tightFor(width: 56.0f, height: 56.0f);
-        
-        public static readonly BoxConstraints _kMiniSizeConstraints = BoxConstraints.tightFor(width: 40.0f, height: 40.0f);
 
-        public static readonly BoxConstraints _kExtendedSizeConstraints = new BoxConstraints(minHeight: 48.0f, maxHeight: 48.0f);
+        public static readonly BoxConstraints _kMiniSizeConstraints =
+            BoxConstraints.tightFor(width: 40.0f, height: 40.0f);
+
+        public static readonly BoxConstraints _kExtendedSizeConstraints =
+            new BoxConstraints(minHeight: 48.0f, maxHeight: 48.0f);
     }
 
 
@@ -27,7 +29,7 @@ namespace Unity.UIWidgets.material {
     }
 
     public class FloatingActionButton : StatefulWidget {
-        protected FloatingActionButton(
+        FloatingActionButton(
             Key key = null,
             Widget child = null,
             string tooltip = null,
@@ -59,10 +61,12 @@ namespace Unity.UIWidgets.material {
             this.clipBehavior = clipBehavior;
             this.materialTapTargetSize = materialTapTargetSize;
             this.isExtended = isExtended;
-            this._sizeConstraints = _sizeConstraints ?? 
-                (mini ? FloatActionButtonUtils._kMiniSizeConstraints : FloatActionButtonUtils._kSizeConstraints);
+            this._sizeConstraints = _sizeConstraints ??
+                                    (mini
+                                        ? FloatActionButtonUtils._kMiniSizeConstraints
+                                        : FloatActionButtonUtils._kSizeConstraints);
         }
-        
+
         public FloatingActionButton(
             Key key = null,
             Widget child = null,
@@ -78,7 +82,7 @@ namespace Unity.UIWidgets.material {
             Clip clipBehavior = Clip.none,
             MaterialTapTargetSize? materialTapTargetSize = null,
             bool isExtended = false
-        ) : this(key : key,
+        ) : this(key: key,
             child: child,
             tooltip: tooltip,
             foregroundColor: foregroundColor,
@@ -111,10 +115,11 @@ namespace Unity.UIWidgets.material {
             Widget icon = null,
             Widget label = null
         ) {
-            D.assert(icon != null);
-            D.assert(label != null);
             heroTag = heroTag ?? new _DefaultHeroTag();
             shape = shape ?? new StadiumBorder();
+            D.assert(icon != null);
+            D.assert(label != null);
+
             BoxConstraints _sizeConstraints = FloatActionButtonUtils._kExtendedSizeConstraints;
             bool mini = false;
             Widget child = new _ChildOverflowBox(
@@ -144,7 +149,7 @@ namespace Unity.UIWidgets.material {
                 materialTapTargetSize: materialTapTargetSize,
                 isExtended: isExtended,
                 _sizeConstraints: _sizeConstraints
-                );
+            );
         }
 
         public readonly Widget child;
@@ -243,14 +248,14 @@ namespace Unity.UIWidgets.material {
         }
 
         public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
-            
         }
     }
 
 
     class _RenderChildOverflowBox : RenderAligningShiftedBox {
         public _RenderChildOverflowBox(
-            RenderBox child = null) : base(child: child, alignment: Alignment.center) {}
+            RenderBox child = null) : base(child: child, alignment: Alignment.center) {
+        }
 
         protected override float computeMinIntrinsicWidth(float height) {
             return 0.0f;

@@ -16,14 +16,15 @@ namespace Unity.UIWidgets.material {
     public abstract class FloatingActionButtonLocation {
         protected FloatingActionButtonLocation() {
         }
-        
-        public static FloatingActionButtonLocation endFloat = new _EndFloatFabLocation();
-        
-        public static FloatingActionButtonLocation centerFloat = new _CenterFloatFabLocation();
-        
-        public static FloatingActionButtonLocation endDocked = new _EndDockedFloatingActionButtonLocation();
-        
-        public static FloatingActionButtonLocation centerDocked = new _CenterDockedFloatingActionButtonLocation();
+
+        public static readonly FloatingActionButtonLocation endFloat = new _EndFloatFabLocation();
+
+        public static readonly FloatingActionButtonLocation centerFloat = new _CenterFloatFabLocation();
+
+        public static readonly FloatingActionButtonLocation endDocked = new _EndDockedFloatingActionButtonLocation();
+
+        public static readonly FloatingActionButtonLocation centerDocked =
+            new _CenterDockedFloatingActionButtonLocation();
 
         public abstract Offset getOffset(ScaffoldPrelayoutGeometry scaffoldGeometry);
 
@@ -109,7 +110,7 @@ namespace Unity.UIWidgets.material {
             }
 
             float maxFabY = scaffoldGeometry.scaffoldSize.height - fabHeight;
-            return Math.Min(maxFabY, fabY);
+            return Mathf.Min(maxFabY, fabY);
         }
     }
 
@@ -139,7 +140,7 @@ namespace Unity.UIWidgets.material {
         protected FloatingActionButtonAnimator() {
         }
 
-        public static FloatingActionButtonAnimator scaling = new _ScalingFabMotionAnimator();
+        public static readonly FloatingActionButtonAnimator scaling = new _ScalingFabMotionAnimator();
 
         public abstract Offset getOffset(Offset begin, Offset end, float progress);
 
@@ -206,7 +207,8 @@ namespace Unity.UIWidgets.material {
             Animation<T> first,
             Animation<T> next,
             Animation<float> parent,
-            float swapThreshold) : base(first: first, next: next) {
+            float swapThreshold
+        ) : base(first: first, next: next) {
             this.parent = parent;
             this.swapThreshold = swapThreshold;
         }

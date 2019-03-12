@@ -1,6 +1,5 @@
 using Unity.UIWidgets.ui;
 
-
 namespace Unity.UIWidgets.flow {
     public class PhysicalShapeLayer : ContainerLayer {
         public PhysicalShapeLayer(
@@ -8,7 +7,7 @@ namespace Unity.UIWidgets.flow {
             this.isRect_ = false;
             this.clip_behavior_ = clipBehavior;
         }
-        
+
         float elevation_;
         Color color_;
         Color shadow_color_;
@@ -19,6 +18,7 @@ namespace Unity.UIWidgets.flow {
         Clip clip_behavior_;
 
         public void set_path(Path path) {
+            //todo: xingwei.zhu : try to do path => rect transfer
             this.path_ = path;
             this.isRect_ = false;
             this.frameRRect_ = path.getBounds();
@@ -49,7 +49,7 @@ namespace Unity.UIWidgets.flow {
             }
             else {
                 Rect bounds = this.path_.getBounds();
-                //todo xingwei.zhu: draw & clip shadow
+                //todo xingwei.zhu: outter set shadow
                 //bounds.outset(20.0f, 20.0f);
                 this.paintBounds = bounds;
             }
@@ -57,7 +57,7 @@ namespace Unity.UIWidgets.flow {
 
         public override void paint(PaintContext context) {
             if (this.elevation_ != 0) {
-                this.drawShadow(context.canvas, this.path_, this.shadow_color_, this.elevation_, 
+                this.drawShadow(context.canvas, this.path_, this.shadow_color_, this.elevation_,
                     this.color_.alpha != 255, this.device_pixel_ratio_);
             }
 
@@ -88,7 +88,7 @@ namespace Unity.UIWidgets.flow {
                 //todo xingwei.zhu: drawPaint
                 context.canvas.drawPath(this.path_, paint);
             }
-            
+
             this.paintChildren(context);
             for (int i = 0; i < saveCount; i++) {
                 context.canvas.restore();
@@ -97,8 +97,7 @@ namespace Unity.UIWidgets.flow {
 
 
         void drawShadow(Canvas canvas, Path path, Color color, float elevation, bool transparentOccluder, float dpr) {
-            
+            //todo xingwei.zhu: to be implemented
         }
-        
     }
 }
