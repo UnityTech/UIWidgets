@@ -21,9 +21,8 @@ namespace UIWidgetsSample {
         };
 
         protected override Widget createWidget() {
-            return new WidgetsApp(
-                home: this.testCases[this.testCaseId],
-                pageRouteBuilder: this.pageRouteBuilder);
+            return new MaterialApp(
+                home: this.testCases[this.testCaseId]);
         }
         
         protected override void OnEnable() {
