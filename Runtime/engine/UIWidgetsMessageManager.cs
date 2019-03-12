@@ -1,8 +1,6 @@
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using Unity.UIWidgets.external.simplejson;
 using Unity.UIWidgets.foundation;
-using Unity.UIWidgets.service;
 using UnityEngine;
 
 namespace Unity.UIWidgets.engine {
@@ -16,6 +14,17 @@ namespace Unity.UIWidgets.engine {
             new Dictionary<string, MethodChannelMessageDelegate>();
         public static UIWidgetsMessageManager instance {
             get { return _instance; } 
+        }
+
+        internal static void ensureUIWidgetsMessageManagerIfNeeded() {
+            if (!Application.isPlaying) {
+                return;
+            }
+            if (UIWidgetsMessageManager.instance != null) {
+                return;
+            }
+            var managerObj = new GameObject("__UIWidgetsMessageManager");
+            managerObj.AddComponent<UIWidgetsMessageManager>();
         }
         
         string _lastObjectName;
@@ -38,11 +47,11 @@ namespace Unity.UIWidgets.engine {
         void UpdateNameIfNeed() {
             var name = this.gameObject.name;
             if (name != this._lastObjectName) {
-                this._lastObjectName = name;
 #if UNITY_IOS || UNITY_ANDROID
                 if (!Application.isEditor) {
                     UIWidgetsMessageSetObjectName(this._lastObjectName);
                 }
+                this._lastObjectName = name;
 #endif
             }
         }

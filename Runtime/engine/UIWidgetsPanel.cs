@@ -94,6 +94,7 @@ namespace Unity.UIWidgets.engine {
 
         protected override void OnEnable() {
             base.OnEnable();
+            UIWidgetsMessageManager.ensureUIWidgetsMessageManagerIfNeeded();
 
             //Disable the default touch -> mouse event conversion on mobile devices
             Input.simulateMouseWithTouches = false;
