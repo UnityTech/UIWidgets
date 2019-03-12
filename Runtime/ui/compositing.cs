@@ -121,6 +121,17 @@ namespace Unity.UIWidgets.ui {
             );
             this._currentLayer.add(layer);
         }
+
+        public Layer pushPhysicalShape(Path path, float elevation, Color color, Color shadowColor, Clip clipBehavior) {
+            var layer = new PhysicalShapeLayer(clipBehavior);
+            layer.set_path(path);
+            layer.set_elevation(elevation);
+            layer.set_color(color);
+            layer.set_shadow_color(shadowColor);
+            layer.set_device_pixel_ratio(Window.instance.devicePixelRatio);
+            this._pushLayer(layer);
+            return layer;
+        }
     }
 
     public class Scene : IDisposable {

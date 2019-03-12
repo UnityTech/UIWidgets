@@ -4,6 +4,7 @@ using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.ui;
+using UnityEditor.Rendering;
 
 namespace Unity.UIWidgets.rendering {
     public class RenderProxyBox : RenderProxyBoxMixinRenderObjectWithChildMixinRenderBox<RenderBox> {
@@ -1157,8 +1158,13 @@ namespace Unity.UIWidgets.rendering {
                 }
 
                 if (this.needsCompositing) {
-                    ContainerLayer container = new ContainerLayer();
-                    context.pushLayer(container, base.paint, offset, childPaintBounds: offsetBounds);
+                    PhysicalModelLayer physicalModel = new PhysicalModelLayer(
+                        clipPath: offsetRRectAsPath,
+                        clipBehavior: this.clipBehavior,
+                        elevation: this.elevation,
+                        color: this.color,
+                        shadowColor: this.shadowColor);
+                    context.pushLayer(physicalModel, base.paint, offset, childPaintBounds: offsetBounds);
                     return;
                 }
 
@@ -1239,8 +1245,13 @@ namespace Unity.UIWidgets.rendering {
 //                }
 
                 if (this.needsCompositing) {
-                    ContainerLayer container = new ContainerLayer();
-                    context.pushLayer(container, base.paint, offset, childPaintBounds: offsetBounds);
+                    PhysicalModelLayer physicalModel = new PhysicalModelLayer(
+                        clipPath: offsetPath,
+                        clipBehavior: this.clipBehavior,
+                        elevation: this.elevation,
+                        color: this.color,
+                        shadowColor: this.shadowColor);
+                    context.pushLayer(physicalModel, base.paint, offset, childPaintBounds: offsetBounds);
                     return;
                 }
 

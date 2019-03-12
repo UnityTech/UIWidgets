@@ -1,13 +1,14 @@
 using System.Collections.Generic;
-using System.Linq;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.material;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
+using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
 using UnityEngine;
 using Color = Unity.UIWidgets.ui.Color;
 using Material = Unity.UIWidgets.material.Material;
+using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace UIWidgetsSample {
     public class MaterialSample : UIWidgetsSamplePanel {
@@ -20,8 +21,14 @@ namespace UIWidgetsSample {
         };
 
         protected override Widget createWidget() {
-            return new MaterialApp(
-                home: this.testCases[this.testCaseId]);
+            return new WidgetsApp(
+                home: this.testCases[this.testCaseId],
+                pageRouteBuilder: this.pageRouteBuilder);
+        }
+        
+        protected override void OnEnable() {
+            base.OnEnable();
+            FontManager.instance.addFont(Resources.Load<Font>(path: "MaterialIcons-Regular"));
         }
     }
 
@@ -42,19 +49,21 @@ namespace UIWidgetsSample {
         }
 
         public override Widget build(BuildContext context) {
-            return new MaterialApp(
-                home: new Scaffold(
+            return new Scaffold(
                     appBar: new AppBar(
+                        backgroundColor : Colors.blue,
                         title: new Text("Basic AppBar"),
                         actions: new List<Widget> {
                             new IconButton(
                                 icon: new Icon(Choice.choices[0].icon),
+                                //color: Colors.blue,
                                 onPressed: () => {
                                     this._select((Choice.choices[0]));
                                 }
                                 ),
                             new IconButton(
                                 icon: new Icon(Choice.choices[1].icon),
+                                //color: Colors.blue,
                                 onPressed: () => {
                                     this._select((Choice.choices[1]));
                                 }
@@ -79,7 +88,6 @@ namespace UIWidgetsSample {
                         padding: EdgeInsets.all(16.0f),
                         child: new ChoiceCard(choice: this._selectedChoice)
                         )
-                    )
                 );
         }
     }
@@ -141,10 +149,11 @@ namespace UIWidgetsSample {
     class MaterialInkWidgetState : State<MaterialInkWellWidget> {
         public override Widget build(BuildContext context) {
             return new Material(
+                //color: Colors.blue,
                 child: new Center(
                     child: new Container(
-                        width: 30,
-                        height: 30,
+                        width: 200,
+                        height: 200,
                         child: new InkWell(
                             borderRadius: BorderRadius.circular(2.0f),
                             highlightColor: new Color(0xAAFF0000),

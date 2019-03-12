@@ -547,10 +547,10 @@ namespace Unity.UIWidgets.material {
                 hashCode = (hashCode * 397) ^ this.padding.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.shape.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.alignedDropdown.GetHashCode();
-                hashCode = (hashCode * 397) ^ this._buttonColor.GetHashCode();
-                hashCode = (hashCode * 397) ^ this._disabledColor.GetHashCode();
-                hashCode = (hashCode * 397) ^ this._highlightColor.GetHashCode();
-                hashCode = (hashCode * 397) ^ this._splashColor.GetHashCode();
+                hashCode = (hashCode * 397) ^ this._buttonColor?.GetHashCode() ?? 1;
+                hashCode = (hashCode * 397) ^ this._disabledColor?.GetHashCode() ?? 1;
+                hashCode = (hashCode * 397) ^ this._highlightColor?.GetHashCode() ?? 1;
+                hashCode = (hashCode * 397) ^ this._splashColor?.GetHashCode() ?? 1;
                 hashCode = (hashCode * 397) ^ this.colorScheme.GetHashCode();
                 hashCode = (hashCode * 397) ^ this._materialTapTargetSize.GetHashCode();
                 return hashCode;

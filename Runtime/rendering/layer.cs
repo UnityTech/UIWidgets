@@ -980,4 +980,104 @@ namespace Unity.UIWidgets.rendering {
             properties.add(new DiagnosticsProperty<Size>("size", this.size, defaultValue: null));
         }
     }
+
+
+    public class PhysicalModelLayer : ContainerLayer {
+        public PhysicalModelLayer(
+            Path clipPath = null,
+            Clip clipBehavior = Clip.none,
+            float? elevation = null,
+            Color color = null,
+            Color shadowColor = null) {
+            D.assert(clipPath != null);
+            D.assert(elevation != null);
+            D.assert(color != null);
+            D.assert(shadowColor != null);
+            this._clipPath = clipPath;
+            this._clipBehavior = clipBehavior;
+            this._elevation = elevation.Value;
+            this._color = color;
+            this.shadowColor = shadowColor;
+        }
+
+        public Path clipPath {
+            get { return this._clipPath; }
+            set {
+                if (value != this._clipPath) {
+                    this._clipPath = value;
+                    this.markNeedsAddToScene();
+                }
+            }
+        }
+
+        Path _clipPath;
+
+        public Clip clipBehavior {
+            get { return this._clipBehavior; }
+            set {
+                if (value != this._clipBehavior) {
+                    this._clipBehavior = value;
+                    this.markNeedsAddToScene();
+                }
+            }
+        }
+
+        Clip _clipBehavior;
+
+        public float elevation {
+            get { return this._elevation; }
+            set {
+                if (value != this._elevation) {
+                    this._elevation = value;
+                    this.markNeedsAddToScene();
+                }
+            }
+        }
+
+        float _elevation;
+
+        public Color color {
+            get { return this._color; }
+            set {
+                if (value != this._color) {
+                    this._color = value;
+                    this.markNeedsAddToScene();
+                }
+            }
+        }
+
+        Color _color;
+
+        public Color shadowColor {
+            get { return this._shadowColor; }
+            set {
+                if (value != this._shadowColor) {
+                    this._shadowColor = value;
+                    this.markNeedsAddToScene();
+                }
+            }
+        }
+
+        Color _shadowColor;
+
+        internal override flow.Layer addToScene(SceneBuilder builder, Offset layerOffset = null) {
+            layerOffset = layerOffset ?? Offset.zero;
+            builder.pushPhysicalShape(
+                path: this.clipPath.shift(layerOffset),
+                elevation: this.elevation,
+                color: this.color,
+                shadowColor: this.shadowColor,
+                clipBehavior: this.clipBehavior);
+            this.addChildrenToScene(builder, layerOffset);
+            builder.pop();
+            return null;
+        }
+        
+        
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new FloatProperty("elevation", this.elevation));
+            properties.add(new DiagnosticsProperty<Color>("color", this.color));
+        }
+    }
 }
