@@ -206,6 +206,8 @@ namespace Unity.UIWidgets.rendering {
         public readonly bool freeze;
 
         internal override flow.Layer addToScene(SceneBuilder builder, Offset layerOffset = null) {
+            layerOffset = layerOffset ?? Offset.zero;
+
             Rect shiftedRect = this.rect.shift(layerOffset);
             builder.addTexture(
                 this.texture,

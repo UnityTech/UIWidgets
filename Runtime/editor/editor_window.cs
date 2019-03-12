@@ -86,7 +86,7 @@ namespace Unity.UIWidgets.editor {
     public abstract class WindowAdapter : Window {
         static readonly List<WindowAdapter> _windowAdapters = new List<WindowAdapter>();
 
-        public static IEnumerable<WindowAdapter> windowAdapters {
+        public static List<WindowAdapter> windowAdapters {
             get { return _windowAdapters; }
         }
 
