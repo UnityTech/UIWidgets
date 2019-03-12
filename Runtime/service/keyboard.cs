@@ -342,7 +342,6 @@ namespace Unity.UIWidgets.service {
             }
         }
 #endif
-#endif    
     }
-
+#endif  
 }
