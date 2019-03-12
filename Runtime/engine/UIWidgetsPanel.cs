@@ -100,7 +100,8 @@ namespace Unity.UIWidgets.engine {
             Input.simulateMouseWithTouches = false;
 
             this._displayMetrics = DisplayMetricsProvider.provider();
-
+            this._displayMetrics.OnEnable();
+            
             if (_repaintEvent == null) {
                 _repaintEvent = new Event {type = EventType.Repaint};
             }
@@ -124,7 +125,7 @@ namespace Unity.UIWidgets.engine {
             get {
                 return this.devicePixelRatioOverride > 0
                     ? this.devicePixelRatioOverride
-                    : this._displayMetrics.DevicePixelRatio;
+                    : this._displayMetrics.devicePixelRatio;
             }
         }
 
