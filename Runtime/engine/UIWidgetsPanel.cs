@@ -125,7 +125,7 @@ namespace Unity.UIWidgets.engine {
             get {
                 return this.devicePixelRatioOverride > 0
                     ? this.devicePixelRatioOverride
-                    : this._displayMetrics.DevicePixelRatio;
+                    : this._displayMetrics.devicePixelRatio;
             }
         }
 

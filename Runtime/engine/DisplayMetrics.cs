@@ -13,7 +13,7 @@ namespace Unity.UIWidgets.engine {
         void OnGUI();
         void Update();
 
-        float DevicePixelRatio { get; } 
+        float devicePixelRatio { get; } 
     }
 
     public class PlayerDisplayMetrics: DisplayMetrics {
@@ -31,7 +31,7 @@ namespace Unity.UIWidgets.engine {
         }
 
 
-        public float DevicePixelRatio {
+        public float devicePixelRatio {
             get {
                 if (this._devicePixelRatio > 0) {
                     return this._devicePixelRatio;
