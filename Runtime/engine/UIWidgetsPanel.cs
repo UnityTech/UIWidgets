@@ -10,6 +10,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using RawImage = UnityEngine.UI.RawImage;
 using Rect = UnityEngine.Rect;
+using Texture = UnityEngine.Texture;
 
 namespace Unity.UIWidgets.engine {
     public class UIWidgetWindowAdapter : WindowAdapter {
