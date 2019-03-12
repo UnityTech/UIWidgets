@@ -7,7 +7,10 @@ using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
+using UnityEngine;
+using Color = Unity.UIWidgets.ui.Color;
 using TextStyle = Unity.UIWidgets.painting.TextStyle;
+using Texture = Unity.UIWidgets.widgets.Texture;
 
 namespace UIWidgetsSample {
     public class ToDoAppSample : UIWidgetsSamplePanel {
@@ -148,6 +151,16 @@ namespace UIWidgetsSample {
                 );
             }
 
+            Widget videoTexture() {
+                var texture = Resources.Load<RenderTexture>("VideoSampleRT");
+                return new Center(
+                    child: new Container(
+                        width: 480, height: 270,
+                        child: new Texture(texture: texture)
+                    )
+                );
+            }
+
             public override Widget build(BuildContext context) {
                 var container = new Container(
                     padding: EdgeInsets.all(10),
@@ -161,6 +174,7 @@ namespace UIWidgetsSample {
                             this.textInput(),
                             //      textInput(),
                             this.contents(),
+                            this.videoTexture(),
                         }
                     )
                 );
