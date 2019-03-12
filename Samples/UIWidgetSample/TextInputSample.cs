@@ -136,19 +136,16 @@ namespace UIWidgetsSample {
             return new _EditableInputTypeWidgetState();
         }
     }
-
+    
     class _EditableInputTypeWidgetState : State<EditableInputTypeWidget> {
-        bool unityKeyboard = false;
         Widget rowWidgets(string title, Widget widget) {
             return new Container(
                 height: 80,
-                //width:300,
                 child: new Row(
                     children: new List<Widget> {
                         new Container(width: 100, child: new Text(title)),
                         new Flexible(child: new Container(child: widget, padding: EdgeInsets.all(4), decoration:
                             new BoxDecoration(border: Border.all(color: Color.black))))
-                        // widget,
                     }
                 ));
         }

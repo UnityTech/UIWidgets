@@ -100,7 +100,8 @@ namespace Unity.UIWidgets.engine {
             Input.simulateMouseWithTouches = false;
 
             this._displayMetrics = DisplayMetricsProvider.provider();
-
+            this._displayMetrics.OnEnable();
+            
             if (_repaintEvent == null) {
                 _repaintEvent = new Event {type = EventType.Repaint};
             }

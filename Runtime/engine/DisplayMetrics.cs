@@ -9,8 +9,8 @@ namespace Unity.UIWidgets.engine {
     }
 
     public interface DisplayMetrics {
+        void OnEnable();
         void OnGUI();
-
         void Update();
 
         float DevicePixelRatio { get; } 
@@ -19,6 +19,9 @@ namespace Unity.UIWidgets.engine {
     public class PlayerDisplayMetrics: DisplayMetrics {
         
         float _devicePixelRatio = 0;
+
+        public void OnEnable() {
+        }
 
         public void OnGUI() {
             
