@@ -313,7 +313,7 @@ namespace Unity.UIWidgets.widgets {
 
         public T resourcesFor<T>(Type type) {
             D.assert(type != null);
-            T resources = (T) this._typeToResources[type];
+            T resources = (T) this._typeToResources.getOrDefault(type);
             return resources;
         }
 

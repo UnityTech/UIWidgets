@@ -41,7 +41,7 @@ namespace Unity.UIWidgets.material {
                 return inheritedTheme.theme.data;
             }
 
-            //MaterialLocalizations localizations = MaterialLocalizations.of(context);
+            MaterialLocalizations localizations = MaterialLocalizations.of(context);
             ScriptCategory category = ScriptCategory.englishLike;
             ThemeData theme = inheritedTheme?.theme?.data ?? _kFallbackTheme;
             return ThemeData.localize(theme, theme.typography.geometryThemeFor(category));
