@@ -82,7 +82,16 @@ namespace UIWidgetsSample {
                 body: new Padding(
                     padding: EdgeInsets.all(16.0f),
                     child: new ChoiceCard(choice: this._selectedChoice)
-                )
+                ),
+                floatingActionButton: new Builder(
+                    builder: (BuildContext subContext) => {
+                        return new FloatingActionButton(
+                            child: new Icon(Unity.UIWidgets.material.Icons.add_alert),
+                            onPressed: () => {
+                                Scaffold.of(subContext).showSnackBar(new SnackBar(
+                                    content: new Text("Float Alerting !")));
+                            });
+                    })
             );
         }
     }
