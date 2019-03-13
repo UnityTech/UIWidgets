@@ -324,6 +324,36 @@ namespace Unity.UIWidgets.ui {
         }
     }
 
+    public abstract class ImageFilter {
+        public static ImageFilter blur(float sigmaX = 0.0f, float sigmaY = 0.0f) {
+            return new _BlurImageFilter(sigmaX, sigmaY);
+        }
+
+        public static ImageFilter matrix(Matrix3 transform, FilterMode filterMode = FilterMode.Point) {
+            return new _MatrixImageFilter(transform, filterMode);
+        }
+    }
+
+    class _BlurImageFilter : ImageFilter {
+        public _BlurImageFilter(float sigmaX, float sigmaY) {
+            this.sigmaX = sigmaX;
+            this.sigmaY = sigmaY;
+        }
+        
+        public readonly float sigmaX;
+        public readonly float sigmaY;
+    }
+
+    class _MatrixImageFilter : ImageFilter {
+        public _MatrixImageFilter(Matrix3 transform, FilterMode filterMode) {
+            D.assert(transform != null);
+            this.transform = transform;
+            this.filterMode = filterMode;
+        }
+
+        public readonly Matrix3 transform;
+        public readonly FilterMode filterMode;
+    }
 
     public class Paint {
         static readonly Color _kColorDefault = new Color(0xFFFFFFFF);

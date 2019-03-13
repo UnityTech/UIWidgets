@@ -268,7 +268,7 @@ namespace UIWidgetsGallery.gallery {
     class _TextScaleFactorItem : StatelessWidget {
         public _TextScaleFactorItem(GalleryOptions options, ValueChanged<GalleryOptions> onOptionsChanged) {
             this.options = options;
-            this.onOptionsChanged = this.onOptionsChanged;
+            this.onOptionsChanged = onOptionsChanged;
         }
 
         public readonly GalleryOptions options;
