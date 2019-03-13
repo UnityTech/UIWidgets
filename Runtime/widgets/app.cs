@@ -187,6 +187,8 @@ namespace Unity.UIWidgets.widgets {
         public override void initState() {
             base.initState();
             this._updateNavigator();
+            
+            //todo: xingwei.zhu: change the default locale to ui.Window.locale
             this._locale =
                 this._resolveLocales(new List<Locale> {new Locale("en", "US")}, this.widget.supportedLocales);
 
