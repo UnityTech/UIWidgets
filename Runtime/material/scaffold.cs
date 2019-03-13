@@ -756,7 +756,7 @@ namespace Unity.UIWidgets.material {
                 this._snackBarController = SnackBar.createAnimationController(vsync: this);
                 this._snackBarController.addStatusListener(this._handleSnackBarStatusChange);
             }
-            
+
             if (this._snackBars.isEmpty()) {
                 D.assert(this._snackBarController.isDismissed);
                 this._snackBarController.forward();
@@ -849,7 +849,8 @@ namespace Unity.UIWidgets.material {
                 this._currentBottomSheet = this._buildBottomSheet<object>(
                     (BuildContext context) => this.widget.bottomSheet,
                     controller,
-                    false);
+                    false,
+                    null);
             }
         }
 
@@ -862,7 +863,7 @@ namespace Unity.UIWidgets.material {
 
 
         PersistentBottomSheetController<T> _buildBottomSheet<T>(WidgetBuilder builder, AnimationController controller,
-            bool isLocalHistoryEntry) {
+            bool isLocalHistoryEntry, T resolveValue) {
             Promise<T> completer = new Promise<T>();
             GlobalKey<_PersistentBottomSheetState> bottomSheetKey = GlobalKey<_PersistentBottomSheetState>.key();
             _PersistentBottomSheet bottomSheet = null;
@@ -876,7 +877,7 @@ namespace Unity.UIWidgets.material {
                 }
 
                 this.setState(() => { this._currentBottomSheet = null; });
-                completer.Done();
+                completer.Resolve(resolveValue);
             }
 
             LocalHistoryEntry entry = isLocalHistoryEntry
@@ -916,12 +917,12 @@ namespace Unity.UIWidgets.material {
                 isLocalHistoryEntry);
         }
 
-        PersistentBottomSheetController<object> showBottomSheet(WidgetBuilder builder) {
+        public PersistentBottomSheetController<object> showBottomSheet(WidgetBuilder builder) {
             this._closeCurrentBottomSheet();
             AnimationController controller = BottomSheet.createAnimationController(this);
             controller.forward();
             this.setState(() => {
-                this._currentBottomSheet = this._buildBottomSheet<object>(builder, controller, true);
+                this._currentBottomSheet = this._buildBottomSheet<object>(builder, controller, true, null);
             });
             return this._currentBottomSheet;
         }
@@ -1345,7 +1346,7 @@ namespace Unity.UIWidgets.material {
 
         public readonly Promise<U> _completer;
 
-        IPromise<U> closed {
+        public IPromise<U> closed {
             get { return this._completer; }
         }
 
@@ -1355,7 +1356,7 @@ namespace Unity.UIWidgets.material {
     }
 
 
-    class _PersistentBottomSheet : StatefulWidget {
+    public class _PersistentBottomSheet : StatefulWidget {
         public _PersistentBottomSheet(
             Key key = null,
             AnimationController animationController = null,
@@ -1429,7 +1430,7 @@ namespace Unity.UIWidgets.material {
     }
 
 
-    class PersistentBottomSheetController<T> : ScaffoldFeatureController<_PersistentBottomSheet, T> {
+    public class PersistentBottomSheetController<T> : ScaffoldFeatureController<_PersistentBottomSheet, T> {
         public PersistentBottomSheetController(
             _PersistentBottomSheet widget,
             Promise<T> completer,

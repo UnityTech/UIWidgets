@@ -44,12 +44,50 @@ namespace UIWidgetsSample {
     class MaterialAppBarWidgetState : State<MaterialAppBarWidget> {
         Choice _selectedChoice = Choice.choices[0];
 
+        GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>.key();
+
+        VoidCallback _showBottomSheetCallback;
+
+        public override void initState() {
+            base.initState();
+            this._showBottomSheetCallback = this._showBottomSheet;
+        }
+
+        void _showBottomSheet() {
+            this.setState(() => { this._showBottomSheetCallback = null; });
+
+            this._scaffoldKey.currentState.showBottomSheet((BuildContext subContext) => {
+                ThemeData themeData = Theme.of(subContext);
+                return new Container(
+                    decoration: new BoxDecoration(
+                        border: new Border(
+                            top: new BorderSide(
+                                color: themeData.disabledColor))),
+                    child: new Padding(
+                        padding: EdgeInsets.all(8.0f),
+                        child: new Text("Alert Bottom Sheet",
+                            textAlign: TextAlign.center,
+                            style: new TextStyle(
+                                color: themeData.accentColor,
+                                fontSize: 24.0f))
+                    )
+                );
+            }).closed.Then((object obj) => {
+                if (this.mounted) {
+                    this.setState(() => { this._showBottomSheetCallback = this._showBottomSheet; });
+                }
+
+                return null;
+            });
+        }
+
         void _select(Choice choice) {
             this.setState(() => { this._selectedChoice = choice; });
         }
 
         public override Widget build(BuildContext context) {
             return new Scaffold(
+                key: this._scaffoldKey,
                 appBar: new AppBar(
                     title: new Text("Basic AppBar"),
                     actions: new List<Widget> {
@@ -83,15 +121,11 @@ namespace UIWidgetsSample {
                     padding: EdgeInsets.all(16.0f),
                     child: new ChoiceCard(choice: this._selectedChoice)
                 ),
-                floatingActionButton: new Builder(
-                    builder: (BuildContext subContext) => {
-                        return new FloatingActionButton(
-                            child: new Icon(Unity.UIWidgets.material.Icons.add_alert),
-                            onPressed: () => {
-                                Scaffold.of(subContext).showSnackBar(new SnackBar(
-                                    content: new Text("Float Alerting !")));
-                            });
-                    }),
+                floatingActionButton: new FloatingActionButton(
+                    backgroundColor: Colors.redAccent,
+                    child: new Icon(Unity.UIWidgets.material.Icons.add_alert),
+                    onPressed: this._showBottomSheetCallback
+                ),
                 drawer: new Drawer(
                     child: new ListView(
                         padding: EdgeInsets.zero,
@@ -118,7 +152,6 @@ namespace UIWidgetsSample {
                         }
                     )
                 )
-                
             );
         }
     }
