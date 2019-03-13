@@ -66,7 +66,6 @@ namespace Unity.UIWidgets.material {
                 return this.widget.centerTitle;
             }
 
-            D.assert(themeData.platform != null);
             switch (themeData.platform) {
                 case RuntimePlatform.IPhonePlayer:
                     return true;
