@@ -2,11 +2,11 @@ using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
 
 namespace Unity.UIWidgets.widgets {
-    public interface IPreferredSizeWidget {
+    public interface SizePreferred {
         Size preferredSize { get; }
     }
 
-    public abstract class PreferredSizeWidget : StatefulWidget, IPreferredSizeWidget {
+    public abstract class PreferredSizeWidget : StatefulWidget, SizePreferred {
         protected PreferredSizeWidget(Key key = null) : base(key: key) {
         }
 
@@ -14,7 +14,7 @@ namespace Unity.UIWidgets.widgets {
     }
 
 
-    public class PreferredSize : StatelessWidget, IPreferredSizeWidget {
+    public class PreferredSize : StatelessWidget, SizePreferred {
         public PreferredSize(
             Key key = null,
             Widget child = null,

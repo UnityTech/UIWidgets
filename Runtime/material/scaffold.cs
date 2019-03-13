@@ -22,7 +22,7 @@ namespace Unity.UIWidgets.material {
             FloatingActionButtonAnimator.scaling;
     }
 
-    public enum _ScaffoldSlot {
+    enum _ScaffoldSlot {
         body,
         appBar,
         bottomSheet,

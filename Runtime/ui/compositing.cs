@@ -117,7 +117,7 @@ namespace Unity.UIWidgets.ui {
             if (this._currentLayer == null) {
                 return;
             }
-            
+
             var layer = new TextureLayer();
             layer.offset = offset;
             layer.size = new Size(width, height);
@@ -125,7 +125,7 @@ namespace Unity.UIWidgets.ui {
             layer.freeze = freeze;
             this._currentLayer.add(layer);
         }
-        
+
         public void addPerformanceOverlay(int enabledOptions, Rect bounds) {
             if (this._currentLayer == null) {
                 return;
@@ -143,11 +143,12 @@ namespace Unity.UIWidgets.ui {
 
         public Layer pushPhysicalShape(Path path, float elevation, Color color, Color shadowColor, Clip clipBehavior) {
             var layer = new PhysicalShapeLayer(clipBehavior);
-            layer.set_path(path);
-            layer.set_elevation(elevation);
-            layer.set_color(color);
-            layer.set_shadow_color(shadowColor);
-            layer.set_device_pixel_ratio(Window.instance.devicePixelRatio);
+            layer.path = path;
+            layer.elevation = elevation;
+            layer.color = color;
+            layer.shadowColor = shadowColor;
+            layer.devicePixelRatio = Window.instance.devicePixelRatio;
+
             this._pushLayer(layer);
             return layer;
         }

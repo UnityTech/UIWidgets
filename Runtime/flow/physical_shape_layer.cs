@@ -4,51 +4,53 @@ namespace Unity.UIWidgets.flow {
     public class PhysicalShapeLayer : ContainerLayer {
         public PhysicalShapeLayer(
             Clip clipBehavior) {
-            this.isRect_ = false;
-            this.clip_behavior_ = clipBehavior;
+            this._isRect = false;
+            this._clip_behavior = clipBehavior;
         }
 
-        float elevation_;
-        Color color_;
-        Color shadow_color_;
-        float device_pixel_ratio_;
-        Path path_;
-        bool isRect_;
-        Rect frameRRect_;
-        Clip clip_behavior_;
+        float _elevation;
+        Color _color;
+        Color _shadow_color;
+        float _device_pixel_ratio;
+        Path _path;
+        bool _isRect;
+        Rect _frameRRect;
+        Clip _clip_behavior;
 
-        public void set_path(Path path) {
-            //todo: xingwei.zhu : try to do path => rect transfer
-            this.path_ = path;
-            this.isRect_ = false;
-            this.frameRRect_ = path.getBounds();
+        public Path path {
+            set {
+                //todo: xingwei.zhu : try to do path => rect transfer
+                this._path = value;
+                this._isRect = false;
+                this._frameRRect = value.getBounds();
+            }
         }
 
-        public void set_elevation(float elevation) {
-            this.elevation_ = elevation;
+        public float elevation {
+            set { this._elevation = value; }
         }
 
-        public void set_color(Color color) {
-            this.color_ = color;
+        public Color color {
+            set { this._color = value; }
         }
 
-        public void set_shadow_color(Color shadowColor) {
-            this.shadow_color_ = shadowColor;
+        public Color shadowColor {
+            set { this._shadow_color = value; }
         }
 
-        public void set_device_pixel_ratio(float dpr) {
-            this.device_pixel_ratio_ = dpr;
+        public float devicePixelRatio {
+            set { this._device_pixel_ratio = value; }
         }
 
         public override void preroll(PrerollContext context, Matrix3 matrix) {
             Rect child_paint_bounds = Rect.zero;
             this.prerollChildren(context, matrix, ref child_paint_bounds);
 
-            if (this.elevation_ == 0) {
-                this.paintBounds = this.path_.getBounds();
+            if (this._elevation == 0) {
+                this.paintBounds = this._path.getBounds();
             }
             else {
-                Rect bounds = this.path_.getBounds();
+                Rect bounds = this._path.getBounds();
                 //todo xingwei.zhu: outter set shadow
                 //bounds.outset(20.0f, 20.0f);
                 this.paintBounds = bounds;
@@ -56,43 +58,20 @@ namespace Unity.UIWidgets.flow {
         }
 
         public override void paint(PaintContext context) {
-            if (this.elevation_ != 0) {
-                this.drawShadow(context.canvas, this.path_, this.shadow_color_, this.elevation_,
-                    this.color_.alpha != 255, this.device_pixel_ratio_);
+            if (this._elevation != 0) {
+                this.drawShadow(context.canvas, this._path, this._shadow_color, this._elevation,
+                    this._color.alpha != 255, this._device_pixel_ratio);
             }
 
-            Paint paint = new Paint {color = this.color_};
-            if (this.clip_behavior_ != Clip.antiAliasWithSaveLayer) {
-                context.canvas.drawPath(this.path_, paint);
-            }
+            Paint paint = new Paint {color = this._color};
+            //todo: xingwei.zhu: process according to different clipBehavior, currently use antiAlias as default
+
+            context.canvas.drawPath(this._path, paint);
 
             context.canvas.save();
-            int saveCount = 1;
-            switch (this.clip_behavior_) {
-                case Clip.hardEdge:
-                    context.canvas.clipPath(this.path_);
-                    break;
-                case Clip.antiAlias:
-                    context.canvas.clipPath(this.path_);
-                    break;
-                case Clip.antiAliasWithSaveLayer:
-                    context.canvas.clipPath(this.path_);
-                    context.canvas.saveLayer(this.paintBounds, null);
-                    saveCount++;
-                    break;
-                case Clip.none:
-                    break;
-            }
-
-            if (this.clip_behavior_ == Clip.antiAliasWithSaveLayer) {
-                //todo xingwei.zhu: drawPaint
-                context.canvas.drawPath(this.path_, paint);
-            }
-
+            context.canvas.clipPath(this._path);
             this.paintChildren(context);
-            for (int i = 0; i < saveCount; i++) {
-                context.canvas.restore();
-            }
+            context.canvas.restore();
         }
 
 
