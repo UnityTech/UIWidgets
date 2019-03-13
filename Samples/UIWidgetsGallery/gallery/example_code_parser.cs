@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using RSG;
 using UnityEngine;
 
@@ -11,44 +13,44 @@ namespace UIWidgetsGallery.gallery {
     
         Dictionary<string, string> _exampleCode;
     
-        async IPromise<string> getExampleCode(string tag, AssetBundle bundle) {
-            if (_exampleCode == null)
-                await _parseExampleCode(bundle);
-            return _exampleCode[tag];
+        IPromise<string> getExampleCode(string tag, AssetBundle bundle) {
+            if (this._exampleCode == null)
+                this._parseExampleCode(bundle);
+            return Promise<string>.Resolved(this._exampleCode[tag]);
         }
     
-        Future<void> _parseExampleCode(AssetBundle bundle) async {
-            final String code = await bundle.loadString("lib/gallery/example_code.dart") ??
-                                "// lib/gallery/example_code.dart not found\n";
-            _exampleCode = <String, String>{};
+        async Task _parseExampleCode(AssetBundle bundle) {
+            string code = Resources.Load<TextAsset>("example_code.cs")?.text ??
+                                "// example_code.cs not found\n";
+            this._exampleCode = new Dictionary<string, string>{};
     
-            final List<String> lines = code.split("\n");
+            List<String> lines = code.Split('\n').ToList();
     
-            List<String> codeBlock;
-            String codeTag;
+            List<String> codeBlock = null;
+            string codeTag = null;
     
-            for (String line in lines) {
+            foreach (string line in lines) {
                 if (codeBlock == null) {
                     // Outside a block.
-                    if (line.startsWith(_kStartTag)) {
+                    if (line.StartsWith(_kStartTag)) {
                         // Starting a new code block.
-                        codeBlock = <String>[];
-                        codeTag = line.substring(_kStartTag.length).trim();
+                        codeBlock = new List<String>();
+                        codeTag = line.Substring(_kStartTag.Length).Trim();
                     } else {
                         // Just skipping the line.
                     }
                 } else {
                     // Inside a block.
-                    if (line.startsWith(_kEndTag)) {
+                    if (line.StartsWith(_kEndTag)) {
                         // Add the block.
-                        _exampleCode[codeTag] = codeBlock.join("\n");
+                        this._exampleCode[codeTag] = string.Join("\n", codeBlock);
                         codeBlock = null;
                         codeTag = null;
                     } else {
                         // Add to the current block
                         // trimRight() to remove any \r on Windows
                         // without removing any useful indentation
-                        codeBlock.add(line.trimRight());
+                        codeBlock.Add(line.TrimEnd());
                     }
                 }
             }

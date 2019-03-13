@@ -164,7 +164,7 @@ namespace UIWidgetsGallery.gallery {
         string _exampleCode;
 
         public override void didChangeDependencies() {
-            getExampleCode(this.widget.exampleCodeTag, DefaultAssetBundle.of(this.context)).then<void>(
+            ExampleCodeParser.getExampleCode(this.widget.exampleCodeTag, DefaultAssetBundle.of(this.context)).then(
                 (string code) => {
                     if (this.mounted) {
                         this.setState(() => { this._exampleCode = code ?? "Example code not found"; });
