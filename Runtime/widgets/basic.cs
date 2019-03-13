@@ -654,7 +654,7 @@ namespace Unity.UIWidgets.widgets {
                 top: rect.top, width: rect.width, height: rect.height);
         }
 
-        public static Positioned fromRelativeRect(Rect rect, Widget child, Key key = null) {
+        public static Positioned fromRelativeRect(RelativeRect rect, Widget child, Key key = null) {
             return new Positioned(child, key: key, left: rect.left,
                 top: rect.top, right: rect.right, bottom: rect.bottom);
         }

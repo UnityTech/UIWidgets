@@ -4,6 +4,7 @@ using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
 using UnityEngine;
+using Rect = Unity.UIWidgets.ui.Rect;
 
 namespace Unity.UIWidgets.widgets {
     public abstract class AnimatedWidget : StatefulWidget {
@@ -219,6 +220,130 @@ namespace Unity.UIWidgets.widgets {
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             properties.add(new DiagnosticsProperty<Animation<float>>("opacity", this.opacity));
+        }
+    }
+
+
+    public class PositionedTransition : AnimatedWidget {
+        public PositionedTransition(
+            Key key = null,
+            Animation<RelativeRect> rect = null,
+            Widget child = null
+        ) : base(key: key, listenable: rect) {
+            D.assert(rect != null);
+            D.assert(child != null);
+            this.child = child;
+        }
+
+        Animation<RelativeRect> rect {
+            get { return (Animation<RelativeRect>) this.listenable; }
+        }
+
+
+        public readonly Widget child;
+
+
+        protected internal override Widget build(BuildContext context) {
+            return Positioned.fromRelativeRect(
+                rect: this.rect.value,
+                child: this.child
+            );
+        }
+    }
+
+    public class RelativePositionedTransition : AnimatedWidget {
+        public RelativePositionedTransition(
+            Key key = null,
+            Animation<Rect> rect = null,
+            Size size = null,
+            Widget child = null
+        ) : base(key: key, listenable: rect) {
+            D.assert(rect != null);
+            D.assert(size != null);
+            D.assert(child != null);
+        }
+
+        Animation<Rect> rect {
+            get { return (Animation<Rect>) this.listenable; }
+        }
+
+        public readonly Size size;
+
+        public readonly Widget child;
+
+        protected internal override Widget build(BuildContext context) {
+            RelativeRect offsets = RelativeRect.fromSize(this.rect.value, this.size);
+            return new Positioned(
+                top: offsets.top,
+                right: offsets.right,
+                bottom: offsets.bottom,
+                left: offsets.left,
+                child: this.child
+            );
+        }
+    }
+
+
+    public class DecoratedBoxTransition : AnimatedWidget {
+        public DecoratedBoxTransition(
+            Key key = null,
+            Animation<Decoration> decoration = null,
+            DecorationPosition position = DecorationPosition.background,
+            Widget child = null
+        ) : base(key: key, listenable: decoration) {
+            D.assert(decoration != null);
+            D.assert(child != null);
+            this.decoration = decoration;
+            this.position = position;
+            this.child = child;
+        }
+
+        public readonly Animation<Decoration> decoration;
+
+        public readonly DecorationPosition position;
+
+        public readonly Widget child;
+
+        protected internal override Widget build(BuildContext context) {
+            return new DecoratedBox(
+                decoration: this.decoration.value,
+                position: this.position,
+                child: this.child
+            );
+        }
+    }
+
+    public class AlignTransition : AnimatedWidget {
+        public AlignTransition(
+            Key key = null,
+            Animation<Alignment> alignment = null,
+            Widget child = null,
+            float? widthFactor = null,
+            float? heightFactor = null
+        ) : base(key: key, listenable: alignment) {
+            this.child = child;
+            this.widthFactor = widthFactor;
+            this.heightFactor = heightFactor;
+        }
+
+        Animation<Alignment> alignment {
+            get { return (Animation<Alignment>) this.listenable; }
+        }
+
+        public readonly float? widthFactor;
+
+        public readonly float? heightFactor;
+
+        public readonly Widget child;
+
+
+        protected internal override Widget build(BuildContext context) {
+            return new Align(
+                alignment: this.alignment.value,
+                widthFactor: this.widthFactor,
+                heightFactor: this.heightFactor,
+                child: this.child
+            );
         }
     }
 
