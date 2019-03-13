@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using RSG;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.material;
 using Unity.UIWidgets.painting;
@@ -77,7 +78,7 @@ namespace UIWidgetsSample {
                     this.setState(() => { this._showBottomSheetCallback = this._showBottomSheet; });
                 }
 
-                return null;
+                return new Promise();
             });
         }
 
