@@ -388,6 +388,7 @@ namespace Unity.UIWidgets.material {
             },
             onHighlightChanged: onHighlightChanged,
             containedInkWell: true,
+            highlightShape: BoxShape.rectangle,
             highlightColor: highlightColor,
             splashColor: splashColor,
             splashFactory: splashFactory,
