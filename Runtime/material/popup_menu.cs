@@ -15,7 +15,6 @@ using Rect = Unity.UIWidgets.ui.Rect;
 using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace Unity.UIWidgets.material {
-
     public static partial class PopupMenuUtils {
         internal static readonly TimeSpan _kMenuDuration = new TimeSpan(0, 0, 0, 0, 300);
         internal const float _kBaselineOffsetFromBottom = 20.0f;
@@ -43,7 +42,6 @@ namespace Unity.UIWidgets.material {
     public class PopupMenuDivider : PopupMenuEntry<object> {
         public PopupMenuDivider(Key key = null, float height = PopupMenuUtils._kMenuDividerHeight) : base(key: key) {
             this._height = height;
-
         }
 
         readonly float _height;
@@ -237,9 +235,11 @@ namespace Unity.UIWidgets.material {
         protected override void handleTap() {
             if (this.widget.isChecked) {
                 this._controller.reverse();
-            } else {
+            }
+            else {
                 this._controller.forward();
             }
+
             base.handleTap();
         }
 
@@ -279,6 +279,7 @@ namespace Unity.UIWidgets.material {
                         child: item
                     );
                 }
+
                 children.Add(new FadeTransition(
                     opacity: new CurvedAnimation(
                         parent: this.route.animation,
@@ -351,7 +352,8 @@ namespace Unity.UIWidgets.material {
             float y;
             if (this.selectedItemOffset == null) {
                 y = this.position.top;
-            } else {
+            }
+            else {
                 y = this.position.top + (size.height - this.position.top - this.position.bottom) / 2.0f -
                     this.selectedItemOffset.Value;
             }
@@ -359,21 +361,25 @@ namespace Unity.UIWidgets.material {
             float x;
             if (this.position.left > this.position.right) {
                 x = size.width - this.position.right - childSize.width;
-            } else if (this.position.left < this.position.right) {
+            }
+            else if (this.position.left < this.position.right) {
                 x = this.position.left;
-            } else {
+            }
+            else {
                 x = this.position.left;
             }
 
             if (x < PopupMenuUtils._kMenuScreenPadding) {
                 x = PopupMenuUtils._kMenuScreenPadding;
-            } else if (x + childSize.width > size.width - PopupMenuUtils._kMenuScreenPadding) {
+            }
+            else if (x + childSize.width > size.width - PopupMenuUtils._kMenuScreenPadding) {
                 x = size.width - childSize.width - PopupMenuUtils._kMenuScreenPadding;
             }
 
             if (y < PopupMenuUtils._kMenuScreenPadding) {
                 y = PopupMenuUtils._kMenuScreenPadding;
-            } else if (y + childSize.height > size.height - PopupMenuUtils._kMenuScreenPadding) {
+            }
+            else if (y + childSize.height > size.height - PopupMenuUtils._kMenuScreenPadding) {
                 y = size.height - childSize.height - PopupMenuUtils._kMenuScreenPadding;
             }
 
@@ -436,6 +442,7 @@ namespace Unity.UIWidgets.material {
                         selectedItemOffset = y + entry.height / 2.0f;
                         break;
                     }
+
                     y += entry.height;
                 }
             }
@@ -505,6 +512,7 @@ namespace Unity.UIWidgets.material {
             Icon icon = null,
             Offset offset = null
         ) : base(key: key) {
+            offset = offset ?? Offset.zero;
             D.assert(itemBuilder != null);
             D.assert(offset != null);
             D.assert(!(child != null && icon != null));
@@ -518,7 +526,7 @@ namespace Unity.UIWidgets.material {
             this.padding = padding ?? EdgeInsets.all(8.0f);
             this.child = child;
             this.icon = icon;
-            this.offset = offset ?? Offset.zero;
+            this.offset = offset;
         }
 
 
@@ -569,12 +577,15 @@ namespace Unity.UIWidgets.material {
                     if (!this.mounted) {
                         return;
                     }
+
                     if (newValue == null) {
                         if (this.widget.onCanceled != null) {
                             this.widget.onCanceled();
                         }
+
                         return;
                     }
+
                     if (this.widget.onSelected != null) {
                         this.widget.onSelected(newValue);
                     }

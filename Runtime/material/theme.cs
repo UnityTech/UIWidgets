@@ -41,8 +41,10 @@ namespace Unity.UIWidgets.material {
                 return inheritedTheme.theme.data;
             }
 
-            //todo:xingwei.zhu: material Localizations
-            return inheritedTheme?.theme?.data ?? _kFallbackTheme;
+            MaterialLocalizations localizations = MaterialLocalizations.of(context);
+            ScriptCategory category = ScriptCategory.englishLike;
+            ThemeData theme = inheritedTheme?.theme?.data ?? _kFallbackTheme;
+            return ThemeData.localize(theme, theme.typography.geometryThemeFor(category));
         }
 
         public override Widget build(BuildContext context) {

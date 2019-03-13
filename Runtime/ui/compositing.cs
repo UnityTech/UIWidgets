@@ -67,7 +67,7 @@ namespace Unity.UIWidgets.ui {
 
         public Layer pushOpacity(int alpha, Offset offset = null) {
             offset = offset ?? Offset.zero;
-            
+
             var layer = new OpacityLayer();
             layer.alpha = alpha;
             layer.offset = offset;
@@ -95,7 +95,7 @@ namespace Unity.UIWidgets.ui {
             bool isComplexHint = false, bool willChangeHint = false) {
             D.assert(offset != null);
             D.assert(picture != null);
-            
+
             if (this._currentLayer == null) {
                 return;
             }
@@ -117,7 +117,7 @@ namespace Unity.UIWidgets.ui {
             if (this._currentLayer == null) {
                 return;
             }
-            
+
             var layer = new TextureLayer();
             layer.offset = offset;
             layer.size = new Size(width, height);
@@ -125,7 +125,7 @@ namespace Unity.UIWidgets.ui {
             layer.freeze = freeze;
             this._currentLayer.add(layer);
         }
-        
+
         public void addPerformanceOverlay(int enabledOptions, Rect bounds) {
             if (this._currentLayer == null) {
                 return;
@@ -139,6 +139,18 @@ namespace Unity.UIWidgets.ui {
                 bounds.bottom
             );
             this._currentLayer.add(layer);
+        }
+
+        public Layer pushPhysicalShape(Path path, float elevation, Color color, Color shadowColor, Clip clipBehavior) {
+            var layer = new PhysicalShapeLayer(clipBehavior);
+            layer.path = path;
+            layer.elevation = elevation;
+            layer.color = color;
+            layer.shadowColor = shadowColor;
+            layer.devicePixelRatio = Window.instance.devicePixelRatio;
+
+            this._pushLayer(layer);
+            return layer;
         }
     }
 

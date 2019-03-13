@@ -118,11 +118,17 @@ namespace Unity.UIWidgets.service {
 
         public override int GetHashCode() {
             var hashCode = this.systemNavigationBarColor.GetHashCode();
-            hashCode = (hashCode * 397) ^ this.systemNavigationBarDividerColor.GetHashCode();
-            hashCode = (hashCode * 397) ^ this.statusBarColor.GetHashCode();
-            hashCode = (hashCode * 397) ^ this.statusBarBrightness.GetHashCode();
-            hashCode = (hashCode * 397) ^ this.statusBarIconBrightness.GetHashCode();
-            hashCode = (hashCode * 397) ^ this.systemNavigationBarIconBrightness.GetHashCode();
+            hashCode = (hashCode * 397) ^ (this.systemNavigationBarDividerColor != null
+                           ? this.systemNavigationBarDividerColor.GetHashCode()
+                           : 0);
+            hashCode = (hashCode * 397) ^ (this.statusBarColor != null ? this.statusBarColor.GetHashCode() : 0);
+            hashCode = (hashCode * 397) ^
+                       (this.statusBarBrightness != null ? this.statusBarBrightness.GetHashCode() : 0);
+            hashCode = (hashCode * 397) ^
+                       (this.statusBarIconBrightness != null ? this.statusBarIconBrightness.GetHashCode() : 0);
+            hashCode = (hashCode * 397) ^ (this.systemNavigationBarIconBrightness != null
+                           ? this.systemNavigationBarIconBrightness.GetHashCode()
+                           : 0);
             return hashCode;
         }
 

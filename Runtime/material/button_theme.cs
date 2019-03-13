@@ -68,7 +68,7 @@ namespace Unity.UIWidgets.material {
             Key key = null,
             ButtonThemeData data = null,
             Widget child = null) {
-            return new ButtonTheme(key, data, child);            
+            return new ButtonTheme(key, data, child);
         }
 
         public static ButtonTheme bar(
@@ -547,10 +547,10 @@ namespace Unity.UIWidgets.material {
                 hashCode = (hashCode * 397) ^ this.padding.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.shape.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.alignedDropdown.GetHashCode();
-                hashCode = (hashCode * 397) ^ this._buttonColor.GetHashCode();
-                hashCode = (hashCode * 397) ^ this._disabledColor.GetHashCode();
-                hashCode = (hashCode * 397) ^ this._highlightColor.GetHashCode();
-                hashCode = (hashCode * 397) ^ this._splashColor.GetHashCode();
+                hashCode = (hashCode * 397) ^ (this._buttonColor != null ? this._buttonColor.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (this._disabledColor != null ? this._disabledColor.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (this._highlightColor != null ? this._highlightColor.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (this._splashColor != null ? this._splashColor.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ this.colorScheme.GetHashCode();
                 hashCode = (hashCode * 397) ^ this._materialTapTargetSize.GetHashCode();
                 return hashCode;
