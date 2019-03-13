@@ -564,7 +564,7 @@ namespace Unity.UIWidgets.widgets {
 
             this._hideSelectionOverlayIfNeeded();
 
-            if (this.widget.selectionControls != null && !this._unityKeyboard()) {
+            if (this.widget.selectionControls != null && Application.isMobilePlatform && !this._unityKeyboard()) {
                 this._selectionOverlay = new TextSelectionOverlay(
                     context: this.context,
                     value: this._value,
