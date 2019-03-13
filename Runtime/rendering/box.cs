@@ -1160,7 +1160,8 @@ namespace Unity.UIWidgets.rendering {
             });
         }
 
-        public virtual bool hitTest(HitTestResult result, Offset position) {
+        public virtual bool hitTest(HitTestResult result, Offset position = null) {
+            D.assert(position != null);
             D.assert(() => {
                 if (!this.hasSize) {
                     if (this.debugNeedsLayout) {
