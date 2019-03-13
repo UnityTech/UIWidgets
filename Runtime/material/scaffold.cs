@@ -759,15 +759,15 @@ namespace Unity.UIWidgets.material {
                 this._snackBarController.forward();
             }
 
-            ScaffoldFeatureController<SnackBar, SnackBarClosedReason> controller =
-                new ScaffoldFeatureController<SnackBar, SnackBarClosedReason>(
-                    snackbar.withAnimation(this._snackBarController, fallbackKey: new UniqueKey()),
-                    new Promise<SnackBarClosedReason>(),
-                    () => {
-                        D.assert(this._snackBars.First() == controller);
-                        this.hideCurrentSnackBar(reason: SnackBarClosedReason.hide);
-                    },
-                    null);
+            ScaffoldFeatureController<SnackBar, SnackBarClosedReason> controller = null;
+            controller = new ScaffoldFeatureController<SnackBar, SnackBarClosedReason>(
+                snackbar.withAnimation(this._snackBarController, fallbackKey: new UniqueKey()),
+                new Promise<SnackBarClosedReason>(),
+                () => {
+                    D.assert(this._snackBars.First() == controller);
+                    this.hideCurrentSnackBar(reason: SnackBarClosedReason.hide);
+                },
+                null);
 
             this.setState(() => { this._snackBars.Enqueue(controller); });
             return controller;

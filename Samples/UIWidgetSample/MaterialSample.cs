@@ -22,9 +22,10 @@ namespace UIWidgetsSample {
 
         protected override Widget createWidget() {
             return new MaterialApp(
+                showPerformanceOverlay: true,
                 home: this.testCases[this.testCaseId]);
         }
-        
+
         protected override void OnEnable() {
             base.OnEnable();
             FontManager.instance.addFont(Resources.Load<Font>(path: "MaterialIcons-Regular"));
@@ -33,8 +34,8 @@ namespace UIWidgetsSample {
 
     class MaterialAppBarWidget : StatefulWidget {
         public MaterialAppBarWidget(Key key = null) : base(key) {
-            
         }
+
         public override State createState() {
             return new MaterialAppBarWidgetState();
         }
@@ -49,44 +50,40 @@ namespace UIWidgetsSample {
 
         public override Widget build(BuildContext context) {
             return new Scaffold(
-                    appBar: new AppBar(
-                        title: new Text("Basic AppBar"),
-                        actions: new List<Widget> {
-                            new IconButton(
-                                icon: new Icon(Choice.choices[0].icon),
-                                //color: Colors.blue,
-                                onPressed: () => {
-                                    this._select((Choice.choices[0]));
-                                }
-                                ),
-                            new IconButton(
-                                icon: new Icon(Choice.choices[1].icon),
-                                //color: Colors.blue,
-                                onPressed: () => {
-                                    this._select((Choice.choices[1]));
-                                }
-                            ),
-                            
-                            /*new PopupMenuButton<Choice>(
-                                onSelected: this._select,
-                                itemBuilder: (BuildContext subContext) => {
-                                    List<PopupMenuEntry<Choice>> popupItems = new List<PopupMenuEntry<Choice>>();
-                                    for (int i = 2; i < Choice.choices.Count; i++) {
-                                        popupItems.Add(new PopupMenuItem<Choice>(
-                                            value: Choice.choices[i],
-                                            child: new Text(Choice.choices[i].title)));
-                                    }
-
-                                    return popupItems;
-                                }
-                            )*/
-                        }
+                appBar: new AppBar(
+                    title: new Text("Basic AppBar"),
+                    actions: new List<Widget> {
+                        new IconButton(
+                            icon: new Icon(Choice.choices[0].icon),
+                            //color: Colors.blue,
+                            onPressed: () => { this._select((Choice.choices[0])); }
                         ),
-                    body: new Padding(
-                        padding: EdgeInsets.all(16.0f),
-                        child: new ChoiceCard(choice: this._selectedChoice)
+                        new IconButton(
+                            icon: new Icon(Choice.choices[1].icon),
+                            //color: Colors.blue,
+                            onPressed: () => { this._select((Choice.choices[1])); }
+                        ),
+
+                        new PopupMenuButton<Choice>(
+                            onSelected: this._select,
+                            itemBuilder: (BuildContext subContext) => {
+                                List<PopupMenuEntry<Choice>> popupItems = new List<PopupMenuEntry<Choice>>();
+                                for (int i = 2; i < Choice.choices.Count; i++) {
+                                    popupItems.Add(new PopupMenuItem<Choice>(
+                                        value: Choice.choices[i],
+                                        child: new Text(Choice.choices[i].title)));
+                                }
+
+                                return popupItems;
+                            }
                         )
-                );
+                    }
+                ),
+                body: new Padding(
+                    padding: EdgeInsets.all(16.0f),
+                    child: new ChoiceCard(choice: this._selectedChoice)
+                )
+            );
         }
     }
 
@@ -120,14 +117,14 @@ namespace UIWidgetsSample {
         public override Widget build(BuildContext context) {
             TextStyle textStyle = Theme.of(context).textTheme.display1;
             return new Card(
-                    color: Colors.white,
-                    child: new Center(
-                        child: new Column(
-                                   mainAxisSize: MainAxisSize.min,
-                                   crossAxisAlignment: CrossAxisAlignment.center,
-                                   children: new List<Widget>{
-                        new Icon(this.choice.icon, size: 128.0f, color: textStyle.color),
-                        new Text(this.choice.title, style: textStyle)
+                color: Colors.white,
+                child: new Center(
+                    child: new Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: new List<Widget> {
+                            new Icon(this.choice.icon, size: 128.0f, color: textStyle.color),
+                            new Text(this.choice.title, style: textStyle)
                         }
                     )
                 )

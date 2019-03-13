@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.service;
 using Unity.UIWidgets.widgets;
@@ -566,6 +568,27 @@ namespace Unity.UIWidgets.material {
             );
         }
 
+        const int _localizedThemeDataCacheSize = 5;
+
+        static readonly _FifoCache<_IdentityThemeDataCacheKey, ThemeData> _localizedThemeDataCache =
+            new _FifoCache<_IdentityThemeDataCacheKey, ThemeData>(_localizedThemeDataCacheSize);
+
+
+        public static ThemeData localize(ThemeData baseTheme, TextTheme localTextGeometry) {
+            D.assert(baseTheme != null);
+            D.assert(localTextGeometry != null);
+
+            return _localizedThemeDataCache.putIfAbsent(
+                new _IdentityThemeDataCacheKey(baseTheme, localTextGeometry),
+                () => {
+                    return baseTheme.copyWith(
+                        primaryTextTheme: localTextGeometry.merge(baseTheme.primaryTextTheme),
+                        accentTextTheme: localTextGeometry.merge(baseTheme.accentTextTheme),
+                        textTheme: localTextGeometry.merge(baseTheme.textTheme)
+                    );
+                });
+        }
+
         public static Brightness estimateBrightnessForColor(Color color) {
             float relativeLuminance = color.computeLuminance();
             float kThreshold = 0.15f;
@@ -824,6 +847,90 @@ namespace Unity.UIWidgets.material {
                 defaultValue: defaultData.dialogTheme));
             properties.add(new DiagnosticsProperty<Typography>("typography", this.typography,
                 defaultValue: defaultData.typography));
+        }
+    }
+
+
+    class _IdentityThemeDataCacheKey : IEquatable<_IdentityThemeDataCacheKey> {
+        public _IdentityThemeDataCacheKey(
+            ThemeData baseTheme,
+            TextTheme localTextGeometry) {
+            this.baseTheme = baseTheme;
+            this.localTextGeometry = localTextGeometry;
+        }
+
+        public readonly ThemeData baseTheme;
+
+        public readonly TextTheme localTextGeometry;
+
+        public bool Equals(_IdentityThemeDataCacheKey other) {
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
+
+            return this.baseTheme == other.baseTheme &&
+                   this.localTextGeometry == other.localTextGeometry;
+        }
+
+        public override bool Equals(object obj) {
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
+
+            return this.Equals((_IdentityThemeDataCacheKey) obj);
+        }
+
+        public static bool operator ==(_IdentityThemeDataCacheKey left, _IdentityThemeDataCacheKey right) {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(_IdentityThemeDataCacheKey left, _IdentityThemeDataCacheKey right) {
+            return !Equals(left, right);
+        }
+
+        public override int GetHashCode() {
+            var hashCode = this.baseTheme.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.localTextGeometry.GetHashCode();
+            return hashCode;
+        }
+    }
+
+    class _FifoCache<K, V> {
+        public _FifoCache(int maximumSize) {
+            D.assert(maximumSize > 0);
+            this._maximumSize = maximumSize;
+        }
+
+        readonly Dictionary<K, V> _cache = new Dictionary<K, V>();
+
+        readonly int _maximumSize;
+
+        public V putIfAbsent(K key, Func<V> value) {
+            D.assert(key != null);
+            D.assert(value != null);
+
+            if (this._cache.ContainsKey(key)) {
+                return this._cache[key];
+            }
+
+            if (this._cache.Count == this._maximumSize) {
+                this._cache.Remove(this._cache.Keys.First());
+            }
+
+            this._cache[key] = value();
+            return this._cache[key];
         }
     }
 }
