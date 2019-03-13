@@ -64,12 +64,12 @@ namespace UIWidgetsSample {
                             top: new BorderSide(
                                 color: themeData.disabledColor))),
                     child: new Padding(
-                        padding: EdgeInsets.all(8.0f),
-                        child: new Text("Alert Bottom Sheet",
+                        padding: EdgeInsets.all(32.0f),
+                        child: new Text("This is a Material persistent bottom sheet. Drag downwards to dismiss it.",
                             textAlign: TextAlign.center,
                             style: new TextStyle(
                                 color: themeData.accentColor,
-                                fontSize: 24.0f))
+                                fontSize: 16.0f))
                     )
                 );
             }).closed.Then((object obj) => {
