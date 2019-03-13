@@ -91,7 +91,34 @@ namespace UIWidgetsSample {
                                 Scaffold.of(subContext).showSnackBar(new SnackBar(
                                     content: new Text("Float Alerting !")));
                             });
-                    })
+                    }),
+                drawer: new Drawer(
+                    child: new ListView(
+                        padding: EdgeInsets.zero,
+                        children: new List<Widget> {
+                            new ListTile(
+                                leading: new Icon(Unity.UIWidgets.material.Icons.account_circle),
+                                title: new Text("Login"),
+                                onTap: () => { }
+                            ),
+                            new Divider(
+                                height: 2.0f),
+                            new ListTile(
+                                leading: new Icon(Unity.UIWidgets.material.Icons.account_balance_wallet),
+                                title: new Text("Wallet"),
+                                onTap: () => { }
+                            ),
+                            new Divider(
+                                height: 2.0f),
+                            new ListTile(
+                                leading: new Icon(Unity.UIWidgets.material.Icons.accessibility),
+                                title: new Text("Balance"),
+                                onTap: () => { }
+                            )
+                        }
+                    )
+                )
+                
             );
         }
     }
