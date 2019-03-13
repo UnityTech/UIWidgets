@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using Unity.UIWidgets.animation;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
@@ -95,8 +94,8 @@ namespace Unity.UIWidgets.material {
             return matchingBuilder.buildTransitions(route, context, animation, secondaryAnimation, child);
         }
 
-        List<PageTransitionsBuilder> _all(PageTransitionsBuilder builder) {
-            return new List<PageTransitionsBuilder> {this.builder};
+        PageTransitionsBuilder _all(PageTransitionsBuilder builder) {
+            return builder;
         }
 
         public bool Equals(PageTransitionsTheme other) {

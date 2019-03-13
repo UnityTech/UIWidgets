@@ -7,6 +7,10 @@ using Unity.UIWidgets.ui;
 using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace Unity.UIWidgets.widgets {
+    public delegate Locale LocaleListResolutionCallback(List<Locale> locales, List<Locale> supportedLocales);
+
+    public delegate Locale LocaleResolutionCallback(Locale locale, List<Locale> supportedLocales);
+
     public delegate PageRoute PageRouteFactory(RouteSettings settings, WidgetBuilder builder);
 
     public class WidgetsApp : StatefulWidget {
@@ -23,6 +27,11 @@ namespace Unity.UIWidgets.widgets {
         public readonly TextStyle textStyle;
         public readonly Window window;
         public readonly bool showPerformanceoverlay;
+        public readonly Locale locale;
+        public readonly List<LocalizationsDelegate> localizationsDelegates;
+        public readonly LocaleListResolutionCallback localeListResolutionCallback;
+        public readonly LocaleResolutionCallback localeResolutionCallback;
+        public readonly List<Locale> supportedLocales;
 
         public WidgetsApp(
             Key key = null,
@@ -36,9 +45,15 @@ namespace Unity.UIWidgets.widgets {
             TransitionBuilder builder = null,
             TextStyle textStyle = null,
             Widget home = null,
+            Locale locale = null,
+            List<LocalizationsDelegate> localizationsDelegates = null,
+            LocaleListResolutionCallback localeListResolutionCallback = null,
+            LocaleResolutionCallback localeResolutionCallback = null,
+            List<Locale> supportedLocales = null,
             bool showPerformanceOverlay = false
         ) : base(key) {
             routes = routes ?? new Dictionary<string, WidgetBuilder>();
+            supportedLocales = supportedLocales ?? new List<Locale> {new Locale("en", "US")};
             this.window = Window.instance;
             this.home = home;
             this.navigatorKey = navigatorKey;
@@ -50,6 +65,11 @@ namespace Unity.UIWidgets.widgets {
             this.initialRoute = initialRoute;
             this.builder = builder;
             this.textStyle = textStyle;
+            this.locale = locale;
+            this.localizationsDelegates = localizationsDelegates;
+            this.localeListResolutionCallback = localeListResolutionCallback;
+            this.localeResolutionCallback = localeResolutionCallback;
+            this.supportedLocales = supportedLocales;
             this.showPerformanceoverlay = showPerformanceOverlay;
 
             D.assert(
@@ -146,12 +166,32 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public void didChangeLocales(List<Locale> locale) {
-            // TODO: support locales.
+            Locale newLocale = this._resolveLocales(locale, this.widget.supportedLocales);
+            if (newLocale != this._locale) {
+                this.setState(() => { this._locale = newLocale; });
+            }
+        }
+
+        List<LocalizationsDelegate> _localizationsDelegates {
+            get {
+                List<LocalizationsDelegate> _delegates = new List<LocalizationsDelegate>();
+                if (this.widget.localizationsDelegates != null) {
+                    _delegates.AddRange(this.widget.localizationsDelegates);
+                }
+
+                _delegates.Add(DefaultWidgetsLocalizations.del);
+                return _delegates;
+            }
         }
 
         public override void initState() {
             base.initState();
             this._updateNavigator();
+            
+            //todo: xingwei.zhu: change the default locale to ui.Window.locale
+            this._locale =
+                this._resolveLocales(new List<Locale> {new Locale("en", "US")}, this.widget.supportedLocales);
+
             D.assert(() => {
                 WidgetInspectorService.instance.inspectorShowCallback += this.inspectorShowChanged;
                 return true;
@@ -241,6 +281,81 @@ namespace Unity.UIWidgets.widgets {
             return result;
         }
 
+        Locale _locale;
+
+        Locale _resolveLocales(List<Locale> preferredLocales, List<Locale> supportedLocales) {
+            if (this.widget.localeListResolutionCallback != null) {
+                Locale locale =
+                    this.widget.localeListResolutionCallback(preferredLocales, this.widget.supportedLocales);
+                if (locale != null) {
+                    return locale;
+                }
+            }
+
+            if (this.widget.localeResolutionCallback != null) {
+                Locale locale = this.widget.localeResolutionCallback(
+                    preferredLocales != null && preferredLocales.isNotEmpty() ? preferredLocales.first() : null,
+                    this.widget.supportedLocales
+                );
+                if (locale != null) {
+                    return locale;
+                }
+            }
+
+            return basicLocaleListResolution(preferredLocales, supportedLocales);
+        }
+
+
+        static Locale basicLocaleListResolution(List<Locale> preferredLocales, List<Locale> supportedLocales) {
+            if (preferredLocales == null || preferredLocales.isEmpty()) {
+                return supportedLocales.first();
+            }
+
+            Dictionary<string, Locale> allSupportedLocales = new Dictionary<string, Locale>();
+            Dictionary<string, Locale> languageLocales = new Dictionary<string, Locale>();
+            Dictionary<string, Locale> countryLocales = new Dictionary<string, Locale>();
+            foreach (Locale locale in supportedLocales) {
+                allSupportedLocales.putIfAbsent(locale.languageCode + "_" + locale.countryCode, () => locale);
+                languageLocales.putIfAbsent(locale.languageCode, () => locale);
+                countryLocales.putIfAbsent(locale.countryCode, () => locale);
+            }
+
+            Locale matchesLanguageCode = null;
+            Locale matchesCountryCode = null;
+
+            for (int localeIndex = 0; localeIndex < preferredLocales.Count; localeIndex++) {
+                Locale userLocale = preferredLocales[localeIndex];
+                if (allSupportedLocales.ContainsKey(userLocale.languageCode + "_" + userLocale.countryCode)) {
+                    return userLocale;
+                }
+
+                if (matchesLanguageCode != null) {
+                    return matchesLanguageCode;
+                }
+
+                if (languageLocales.ContainsKey(userLocale.languageCode)) {
+                    matchesLanguageCode = languageLocales[userLocale.languageCode];
+
+                    if (localeIndex == 0 &&
+                        !(localeIndex + 1 < preferredLocales.Count && preferredLocales[localeIndex + 1].languageCode ==
+                          userLocale.languageCode)) {
+                        return matchesLanguageCode;
+                    }
+                }
+
+
+                if (matchesCountryCode == null && userLocale.countryCode != null) {
+                    if (countryLocales.ContainsKey(userLocale.countryCode)) {
+                        matchesCountryCode = countryLocales[userLocale.countryCode];
+                    }
+                }
+            }
+
+            Locale resolvedLocale = matchesLanguageCode ?? matchesCountryCode ?? supportedLocales.first();
+            return resolvedLocale;
+        }
+
+
         void inspectorShowChanged() {
             this.setState();
         }
@@ -306,9 +421,16 @@ namespace Unity.UIWidgets.widgets {
                 child: result
             );
 
+            Locale appLocale = this.widget.locale != null
+                ? this._resolveLocales(new List<Locale> {this.widget.locale}, this.widget.supportedLocales)
+                : this._locale;
+
             result = new MediaQuery(
                 data: MediaQueryData.fromWindow(this.widget.window),
-                child: result
+                child: new Localizations(
+                    locale: appLocale,
+                    delegates: this._localizationsDelegates,
+                    child: result)
             );
 
             return result;

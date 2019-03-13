@@ -33,8 +33,14 @@ namespace Unity.UIWidgets.material {
             string title = "",
             Color color = null,
             ThemeData theme = null,
+            Locale locale = null,
+            List<LocalizationsDelegate<MaterialLocalizations>> localizationsDelegates = null,
+            LocaleListResolutionCallback localeListResolutionCallback = null,
+            LocaleResolutionCallback localeResolutionCallback = null,
+            List<Locale> supportedLocales = null,
             bool showPerformanceOverlay = false
         ) : base(key: key) {
+            supportedLocales = supportedLocales ?? new List<Locale> {new Locale("en", "US")};
             this.navigatorKey = navigatorKey;
             this.home = home;
             this.routes = routes ?? new Dictionary<string, WidgetBuilder>();
@@ -46,6 +52,11 @@ namespace Unity.UIWidgets.material {
             this.title = title;
             this.color = color;
             this.theme = theme;
+            this.locale = locale;
+            this.localizationsDelegates = localizationsDelegates;
+            this.localeListResolutionCallback = localeListResolutionCallback;
+            this.localeResolutionCallback = localeResolutionCallback;
+            this.supportedLocales = supportedLocales;
             this.showPerformanceOverlay = showPerformanceOverlay;
         }
 
@@ -70,6 +81,16 @@ namespace Unity.UIWidgets.material {
         public readonly ThemeData theme;
 
         public readonly Color color;
+
+        public readonly Locale locale;
+
+        public readonly List<LocalizationsDelegate<MaterialLocalizations>> localizationsDelegates;
+
+        public readonly LocaleListResolutionCallback localeListResolutionCallback;
+
+        public readonly LocaleResolutionCallback localeResolutionCallback;
+
+        public readonly List<Locale> supportedLocales;
 
         public readonly bool showPerformanceOverlay;
 
@@ -108,6 +129,19 @@ namespace Unity.UIWidgets.material {
             return new MaterialRectArcTween(begin: begin, end: end);
         }
 
+        List<LocalizationsDelegate> _localizationsDelegates {
+            get {
+                List<LocalizationsDelegate<MaterialLocalizations>> _delegates =
+                    new List<LocalizationsDelegate<MaterialLocalizations>>();
+                if (this.widget.localizationsDelegates != null) {
+                    _delegates.AddRange(this.widget.localizationsDelegates);
+                }
+
+                _delegates.Add(DefaultMaterialLocalizations.del);
+                return new List<LocalizationsDelegate>(_delegates);
+            }
+        }
+
         public override Widget build(BuildContext context) {
             ThemeData theme = this.widget.theme ?? ThemeData.fallback();
             Widget result = new AnimatedTheme(
@@ -125,7 +159,13 @@ namespace Unity.UIWidgets.material {
                     onGenerateRoute: this.widget.onGenerateRoute,
                     onUnknownRoute: this.widget.onUnknownRoute,
                     builder: this.widget.builder,
-                    textStyle: AppUtils._errorTextStyle
+                    textStyle: AppUtils._errorTextStyle,
+                    locale: this.widget.locale,
+                    localizationsDelegates: this._localizationsDelegates,
+                    localeResolutionCallback: this.widget.localeResolutionCallback,
+                    localeListResolutionCallback: this.widget.localeListResolutionCallback,
+                    supportedLocales: this.widget.supportedLocales,
+                    showPerformanceOverlay: this.widget.showPerformanceOverlay
                 )
             );
 

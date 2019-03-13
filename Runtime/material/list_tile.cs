@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.UIWidgets.foundation;
@@ -398,7 +397,7 @@ namespace Unity.UIWidgets.material {
         }
 
         void _mountChild(Widget widget, _ListTileSlot slot) {
-            Element oldChild = this.slotToChild[slot];
+            Element oldChild = this.slotToChild.getOrDefault(slot);
             Element newChild = this.updateChild(oldChild, widget, slot);
             if (oldChild != null) {
                 this.slotToChild.Remove(slot);
