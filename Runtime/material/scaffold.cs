@@ -751,9 +751,12 @@ namespace Unity.UIWidgets.material {
         Timer _snackBarTimer;
         bool _accessibleNavigation;
 
-        ScaffoldFeatureController<SnackBar, SnackBarClosedReason> showSnackBar(SnackBar snackbar) {
-            this._snackBarController = this._snackBarController ?? SnackBar.createAnimationController(vsync: this);
-            this._snackBarController.addStatusListener(this._handleSnackBarStatusChange);
+        public ScaffoldFeatureController<SnackBar, SnackBarClosedReason> showSnackBar(SnackBar snackbar) {
+            if (this._snackBarController == null) {
+                this._snackBarController = SnackBar.createAnimationController(vsync: this);
+                this._snackBarController.addStatusListener(this._handleSnackBarStatusChange);
+            }
+            
             if (this._snackBars.isEmpty()) {
                 D.assert(this._snackBarController.isDismissed);
                 this._snackBarController.forward();
@@ -1326,7 +1329,7 @@ namespace Unity.UIWidgets.material {
         }
     }
 
-    class ScaffoldFeatureController<T, U> where T : Widget {
+    public class ScaffoldFeatureController<T, U> where T : Widget {
         public ScaffoldFeatureController(
             T _widget,
             Promise<U> _completer,

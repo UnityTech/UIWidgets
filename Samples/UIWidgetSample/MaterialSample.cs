@@ -124,7 +124,17 @@ namespace UIWidgetsSample {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: new List<Widget> {
                             new Icon(this.choice.icon, size: 128.0f, color: textStyle.color),
-                            new Text(this.choice.title, style: textStyle)
+                            new RaisedButton(
+                                child: new Text(this.choice.title, style: textStyle),
+                                onPressed: () => {
+                                    SnackBar snackBar = new SnackBar(
+                                        content: new Text(this.choice.title + " is chosen !"),
+                                        action: new SnackBarAction(
+                                            label: "Ok",
+                                            onPressed: () => { }));
+
+                                    Scaffold.of(context).showSnackBar(snackBar);
+                                })
                         }
                     )
                 )
