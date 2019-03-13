@@ -151,7 +151,7 @@ namespace Unity.UIWidgets.Sample.Redux.ObjectFinder {
                     key: new ValueKey<int>(obj.id),
                     child: new Text(obj.name),
                     padding: EdgeInsets.all(8),
-                    color: this.widget.selected == obj.id ? new Color(0xFFFF0000) : null
+                    color: this.widget.selected == obj.id ? new Color(0xFFFF0000) : new Color(0)
                 ), onTap: () => {
                     if (this.widget.onSelect != null) {
                         this.widget.onSelect(obj.id);
