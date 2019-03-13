@@ -408,7 +408,7 @@ namespace Unity.UIWidgets.widgets {
         public virtual void didUpdateWidget(StatefulWidget oldWidget) {
         }
 
-        protected void setState(VoidCallback fn = null) {
+        public void setState(VoidCallback fn = null) {
             D.assert(() => {
                 if (this._debugLifecycleState == _StateLifecycle.defunct) {
                     throw new UIWidgetsError(

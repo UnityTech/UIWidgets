@@ -37,7 +37,8 @@ namespace Unity.UIWidgets.widgets {
                     Type type = del.type;
                     D.assert(!output.ContainsKey(type));
                     output[type] = completedValue;
-                } else {
+                }
+                else {
                     pendingList = pendingList ?? new List<_Pending>();
                     pendingList.Add(new _Pending(del, futureValue));
                 }
@@ -56,6 +57,7 @@ namespace Unity.UIWidgets.widgets {
                         D.assert(!output.ContainsKey(type));
                         output[type] = list[i];
                     }
+
                     return output;
                 });
         }
@@ -159,6 +161,9 @@ namespace Unity.UIWidgets.widgets {
             D.assert(locale != null);
             D.assert(delegates != null);
             D.assert(delegates.Any(del => del is LocalizationsDelegate<WidgetsLocalizations>));
+            this.locale = locale;
+            this.delegates = delegates;
+            this.child = child;
         }
 
         public static Localizations overrides(
@@ -172,9 +177,10 @@ namespace Unity.UIWidgets.widgets {
             if (delegates != null) {
                 mergedDelegates.InsertRange(0, delegates);
             }
+
             return new Localizations(
                 key: key,
-                locale: locale ?? Localizations.localeOf(context),
+                locale: locale ?? localeOf(context),
                 delegates: mergedDelegates,
                 child: child
             );
@@ -193,6 +199,7 @@ namespace Unity.UIWidgets.widgets {
             if (nullOk && scope == null) {
                 return null;
             }
+
             D.assert((bool) (scope != null), "a Localizations ancestor was not found");
             return scope.localizationsState.locale;
         }
@@ -258,6 +265,7 @@ namespace Unity.UIWidgets.widgets {
                     return true;
                 }
             }
+
             return false;
         }
 
@@ -286,13 +294,15 @@ namespace Unity.UIWidgets.widgets {
             if (typeToResources != null) {
                 this._typeToResources = typeToResources;
                 this._locale = locale;
-            } else {
+            }
+            else {
                 // WidgetsBinding.instance.deferFirstFrameReport();
                 typeToResourcesFuture.Then(value => {
                     // WidgetsBinding.instance.allowFirstFrameReport();
                     if (!this.mounted) {
                         return;
                     }
+
                     this.setState(() => {
                         this._typeToResources = value;
                         this._locale = locale;
@@ -311,6 +321,7 @@ namespace Unity.UIWidgets.widgets {
             if (this._locale == null) {
                 return new Container();
             }
+
             return new _LocalizationsScope(
                 key: this._localizedResourcesScopeKey,
                 locale: this._locale,
