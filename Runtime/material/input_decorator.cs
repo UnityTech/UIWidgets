@@ -1,0 +1,2346 @@
+using System;
+using System.Collections.Generic;
+using RSG.Promises;
+using Unity.UIWidgets.animation;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.gestures;
+using Unity.UIWidgets.painting;
+using Unity.UIWidgets.rendering;
+using Unity.UIWidgets.ui;
+using Unity.UIWidgets.widgets;
+using UnityEngine;
+using Canvas = Unity.UIWidgets.ui.Canvas;
+using Color = Unity.UIWidgets.ui.Color;
+using Object = System.Object;
+using Rect = Unity.UIWidgets.ui.Rect;
+using TextStyle = Unity.UIWidgets.painting.TextStyle;
+using Transform = Unity.UIWidgets.widgets.Transform;
+
+namespace Unity.UIWidgets.material {
+
+    class InputDecoratorConstants {
+        public static readonly TimeSpan _kTransitionDuration = new TimeSpan(0, 0, 0, 0, 200);
+        public static readonly Curve _kTransitionCurve = Curves.fastOutSlowIn;
+    }
+
+
+    class _InputBorderGap : ChangeNotifier {
+      float _start;
+      public float start {
+          get {
+              return this._start;
+          }
+          set {
+            if (value != this._start) {
+              this._start = value;
+              this.notifyListeners();
+            }
+          }
+      }
+
+      float _extent = 0.0f;
+      public float extent {
+          get {
+              return this._extent;
+          }
+          set {
+            if (value != this._extent) {
+              this._extent = value;
+              this.notifyListeners();
+            }
+          }
+      }
+
+      public static bool operator ==(_InputBorderGap left, _InputBorderGap other) {
+        return left.start == other.start && left.extent == other.extent;
+      }
+
+      public static bool operator !=(_InputBorderGap left, _InputBorderGap other) {
+        return left.start != other.start || left.extent != other.extent;
+      }
+
+      public override int GetHashCode() {
+        unchecked {
+            return (this.start.GetHashCode() * 397) ^ this.extent.GetHashCode();
+        }
+      }
+    }
+
+    class _InputBorderTween : Tween<InputBorder> {
+      _InputBorderTween(InputBorder begin = null, InputBorder end = null) : base(begin: begin, end: end) {}
+
+      public override InputBorder lerp(float t) => ShapeBorder.lerp(this.begin, this.end, t);
+    }
+
+    class _InputBorderPainter : AbstractCustomPainter {
+      public _InputBorderPainter(
+          Listenable repaint,
+          Animation<float> borderAnimation = null,
+          _InputBorderTween border = null,
+          Animation<float> gapAnimation = null,
+          _InputBorderGap gap = null,
+          TextDirection? textDirection = null,
+          Color fillColor = null
+      ) : base(repaint: repaint) {}
+
+      Animation<float> borderAnimation;
+      _InputBorderTween border;
+      Animation<float> gapAnimation;
+      _InputBorderGap gap;
+      TextDirection textDirection;
+      Color fillColor;
+
+      public override void paint(Canvas canvas, Size size) {
+        InputBorder borderValue = this.border.evaluate(this.borderAnimation);
+        Rect canvasRect = Offset.zero & size;
+
+        if (this.fillColor.alpha > 0) {
+            Paint paint = new Paint();
+            paint.color = this.fillColor;
+            paint.style = PaintingStyle.fill;
+          canvas.drawPath(
+            borderValue.getOuterPath(canvasRect, textDirection: this.textDirection),
+            paint
+          );
+        }
+
+        borderValue.paint(
+          canvas,
+          canvasRect,
+          gapStart: this.gap.start,
+          gapExtent: this.gap.extent,
+          gapPercentage: this.gapAnimation.value,
+          textDirection: this.textDirection
+        );
+      }
+
+      public override bool shouldRepaint(CustomPainter _oldPainter) {
+          _InputBorderPainter oldPainter = _oldPainter as _InputBorderPainter;
+        return this.borderAnimation != oldPainter.borderAnimation
+            || this.gapAnimation != oldPainter.gapAnimation
+            || this.border != oldPainter.border
+            || this.gap != oldPainter.gap
+            || this.textDirection != oldPainter.textDirection;
+      }
+    }
+
+    class _BorderContainer : StatefulWidget {
+      public _BorderContainer(
+        Key key = null,
+        InputBorder border = null,
+        _InputBorderGap gap = null,
+        Animation<float> gapAnimation = null,
+        Color fillColor = null,
+        Widget child = null
+      ) : base(key: key) {
+          D.assert(border != null);
+          D.assert(gap != null);
+          D.assert(fillColor != null);
+          this.border = border;
+          this.gap = gap;
+          this.gapAnimation = gapAnimation;
+          this.fillColor = fillColor;
+          this.child = child;
+      }
+
+      public readonly InputBorder border;
+      public readonly _InputBorderGap gap;
+      public readonly Animation<float> gapAnimation;
+      public readonly Color fillColor;
+      public readonly Widget child;
+
+      public override State createState() => new _BorderContainerState();
+    }
+
+    class _BorderContainerState : SingleTickerProviderStateMixin<_BorderContainer> {
+      AnimationController _controller;
+      Animation<float> _borderAnimation;
+      _InputBorderTween _border;
+
+      public void initState() {
+        base.initState();
+        this._controller = new AnimationController(
+          duration: InputDecoratorConstants._kTransitionDuration,
+          vsync: this
+        );
+        this._borderAnimation = new CurvedAnimation(
+          parent: this._controller,
+          curve: InputDecorator._kTransitionCurve
+        );
+        this._border = new _InputBorderTween(
+          begin: this.widget.border,
+          end: this.widget.border
+        );
+      }
+
+      public override void dispose() {
+        this._controller.dispose();
+        base.dispose();
+      }
+
+      public override void didUpdateWidget(StatefulWidget _oldWidget) {
+        _BorderContainer oldWidget = _oldWidget as _BorderContainer;
+        base.didUpdateWidget(oldWidget);
+        if (this.widget.border != oldWidget.border) {
+          this._border = new _InputBorderTween(
+            begin: oldWidget.border,
+            end: this.widget.border
+          );
+          this._controller.setValue(0.0f);
+          this._controller.forward();
+        }
+      }
+
+      public override Widget build(BuildContext context) {
+        return new CustomPaint(
+          foregroundPainter: new _InputBorderPainter(
+            repaint: ListenableUtils.merge(new List<Listenable>{this._borderAnimation, this.widget.gap}),
+            borderAnimation: this._borderAnimation,
+            border: this._border,
+            gapAnimation: this.widget.gapAnimation,
+            gap: this.widget.gap,
+            textDirection: Directionality.of(context),
+            fillColor: this.widget.fillColor
+          ),
+          child: this.widget.child
+        );
+      }
+    }
+
+    class _Shaker : AnimatedWidget {
+        public _Shaker(
+            Key key = null,
+            Animation<float> animation = null,
+            Widget child = null
+        ) : base(key: key, listenable: animation) {
+            this.child = child;
+        }
+
+      public readonly Widget child;
+
+      public Animation<float> animation {
+          get {
+              return (Animation<float>) this.listenable;
+          }
+      }
+
+      public float translateX {
+          get {
+            const float shakeDelta = 4.0f;
+            float t = this.animation.value;
+            if (t <= 0.25f)
+              return -t * shakeDelta;
+            else if (t < 0.75f)
+              return (t - 0.5f) * shakeDelta;
+            else
+              return (1.0f - t) * 4.0f * shakeDelta;
+          }
+      }
+
+      protected internal override Widget build(BuildContext context) {
+        return new Transform(
+          transform: Matrix3.makeTrans(this.translateX, 0.0f),
+          child: this.child
+        );
+      }
+    }
+
+    // Display the helper and error text. When the error text appears
+    // it fades and the helper text fades out. The error text also
+    // slides upwards a little when it first appears.
+    class _HelperError : StatefulWidget {
+        public _HelperError(
+            Key key = null,
+            TextAlign? textAlign = null,
+            string helperText = null,
+            TextStyle helperStyle = null,
+            string errorText = null,
+            TextStyle errorStyle = null,
+            int? errorMaxLines = null
+        ) : base(key: key) {
+          this.textAlign = textAlign;
+          this.helperText = helperText;
+          this.helperStyle = helperStyle;
+          this.errorText = errorText;
+          this.errorStyle = errorStyle;
+          this.errorMaxLines = errorMaxLines;
+        }
+
+      public readonly TextAlign? textAlign;
+      public readonly string helperText;
+      public readonly TextStyle helperStyle;
+      public readonly string errorText;
+      public readonly TextStyle errorStyle;
+      public readonly int? errorMaxLines;
+
+      public override State createState() => new _HelperErrorState();
+    }
+
+    class _HelperErrorState : SingleTickerProviderStateMixin<_HelperError> {
+      static readonly Widget empty = new SizedBox();
+
+      AnimationController _controller;
+      Widget _helper;
+      Widget _error;
+
+      public override void initState() {
+        base.initState();
+        this._controller = new AnimationController(
+          duration: InputDecoratorConstants._kTransitionDuration,
+          vsync: this
+        );
+        if (this.widget.errorText != null) {
+          this._error = this._buildError();
+          this._controller.setValue(1.0f);
+        } else if (this.widget.helperText != null) {
+          this._helper = this._buildHelper();
+        }
+        this._controller.addListener(this._handleChange);
+      }
+
+      public override void dispose() {
+        this._controller.dispose();
+        base.dispose();
+      }
+
+      void _handleChange() {
+        this.setState(() => {
+          // The _controller"s value has changed.
+        });
+      }
+
+      public override void didUpdateWidget(StatefulWidget _old) {
+        base.didUpdateWidget(_old);
+        
+        _HelperError old = _old as _HelperError;
+
+        string newErrorText = this.widget.errorText;
+        string newHelperText = this.widget.helperText;
+        string oldErrorText = old.errorText;
+        string oldHelperText = old.helperText;
+
+        bool errorTextStateChanged = (newErrorText != null) != (oldErrorText != null);
+        bool helperTextStateChanged = newErrorText == null && (newHelperText != null) != (oldHelperText != null);
+
+        if (errorTextStateChanged || helperTextStateChanged) {
+          if (newErrorText != null) {
+            this._error = this._buildError();
+            this._controller.forward();
+          } else if (newHelperText != null) {
+            this._helper = this._buildHelper();
+            this._controller.reverse();
+          } else {
+            this._controller.reverse();
+          }
+        }
+      }
+
+      Widget _buildHelper() {
+        D.assert(this.widget.helperText != null);
+        return new Opacity(
+            opacity: 1.0f - this._controller.value,
+            child: new Text(
+              this.widget.helperText,
+              style: this.widget.helperStyle,
+              textAlign: this.widget.textAlign,
+              overflow: TextOverflow.ellipsis
+            )
+        );
+      }
+
+      Widget _buildError() {
+        D.assert(this.widget.errorText != null);
+        return new Opacity(
+            opacity: this._controller.value,
+            child: new FractionalTranslation(
+              translation: new OffsetTween(
+                begin: new Offset(0.0f, -0.25f),
+                end: new Offset(0.0f, 0.0f)
+              ).evaluate(this._controller.view),
+              child: new Text(
+                this.widget.errorText,
+                style: this.widget.errorStyle,
+                textAlign: this.widget.textAlign,
+                overflow: TextOverflow.ellipsis,
+                maxLines: this.widget.errorMaxLines
+              )
+            )
+        );
+      }
+
+      public override Widget build(BuildContext context) {
+        if (this._controller.isDismissed) {
+          this._error = null;
+          if (this.widget.helperText != null) {
+            return this._helper = this._buildHelper();
+          } else {
+            this._helper = null;
+            return empty;
+          }
+        }
+
+        if (this._controller.isCompleted) {
+          this._helper = null;
+          if (this.widget.errorText != null) {
+            return this._error = this._buildError();
+          } else {
+            this._error = null;
+            return empty;
+          }
+        }
+
+        if (this._helper == null && this.widget.errorText != null)
+          return this._buildError();
+
+        if (this._error == null && this.widget.helperText != null)
+          return this._buildHelper();
+
+        if (this.widget.errorText != null) {
+          return new Stack(
+            children: new List< Widget>{
+              new Opacity(
+                opacity: 1.0f - this._controller.value,
+                child: this._helper
+              ),
+              this._buildError(),
+            }
+          );
+        }
+
+        if (this.widget.helperText != null) {
+          return new Stack(
+            children: new List<Widget>{
+              this._buildHelper(),
+              new Opacity(
+                opacity: this._controller.value,
+                child: this._error
+              )
+            }
+          );
+        }
+
+        return empty;
+      }
+    }
+
+    // Identifies the children of a _RenderDecorationElement.
+    enum _DecorationSlot {
+      icon,
+      input,
+      label,
+      hint,
+      prefix,
+      suffix,
+      prefixIcon,
+      suffixIcon,
+      helperError,
+      counter,
+      container
+    }
+
+    // An analog of InputDecoration for the _Decorator widget.
+    class _Decoration {
+      public _Decoration(
+          EdgeInsets contentPadding,
+          bool isCollapsed,
+          float floatingLabelHeight,
+          float floatingLabelProgress,
+          InputBorder border = null,
+          _InputBorderGap borderGap = null,
+          Widget icon = null,
+          Widget input = null,
+          Widget label = null,
+          Widget hint = null,
+          Widget prefix = null,
+          Widget suffix = null,
+          Widget prefixIcon = null,
+          Widget suffixIcon = null,
+          Widget helperError = null,
+          Widget counter = null,
+          Widget container = null
+      ) {
+           D.assert(contentPadding != null);
+           D.assert(isCollapsed != null);
+           D.assert(floatingLabelHeight != null);
+           D.assert(floatingLabelProgress != null);
+          this.contentPadding = contentPadding;
+          this.isCollapsed = isCollapsed;
+          this.floatingLabelHeight = floatingLabelHeight;
+          this.floatingLabelProgress = floatingLabelProgress;
+          this.border = border;
+          this.borderGap = borderGap;
+          this.icon = icon;
+          this.input = input;
+          this.label = label;
+          this.hint = hint;
+          this.prefix = prefix;
+          this.suffix = suffix;
+          this.prefixIcon = prefixIcon;
+          this.suffixIcon = suffixIcon;
+          this.helperError = helperError;
+          this.counter = counter;
+          this.container = container;
+      }
+
+      public readonly EdgeInsets contentPadding;
+      public readonly bool isCollapsed;
+      public readonly float floatingLabelHeight;
+      public readonly float floatingLabelProgress;
+      public readonly InputBorder border;
+      public readonly _InputBorderGap borderGap;
+      public readonly Widget icon;
+      public readonly Widget input;
+      public readonly Widget label;
+      public readonly Widget hint;
+      public readonly Widget prefix;
+      public readonly Widget suffix;
+      public readonly Widget prefixIcon;
+      public readonly Widget suffixIcon;
+      public readonly Widget helperError;
+      public readonly Widget counter;
+      public readonly Widget container;
+
+      public static bool operator ==(_Decoration left, _Decoration other) {
+        return left.contentPadding == other.contentPadding
+            && left.floatingLabelHeight == other.floatingLabelHeight
+            && left.floatingLabelProgress == other.floatingLabelProgress
+            && left.border == other.border
+            && left.borderGap == other.borderGap
+            && left.icon == other.icon
+            && left.input == other.input
+            && left.label == other.label
+            && left.hint == other.hint
+            && left.prefix == other.prefix
+            && left.suffix == other.suffix
+            && left.prefixIcon == other.prefixIcon
+            && left.suffixIcon == other.suffixIcon
+            && left.helperError == other.helperError
+            && left.counter == other.counter
+            && left.container == other.container;
+      }
+
+      public static bool operator !=(_Decoration left, _Decoration other) {
+          return !(left == other);
+      }
+
+      public override int GetHashCode() {
+        unchecked {
+            var hashCode = this.contentPadding.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.floatingLabelHeight.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.floatingLabelProgress.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.border.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.borderGap.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.icon.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.input.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.label.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.hint.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.prefix.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.suffix.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.prefixIcon.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.suffixIcon.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.helperError.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.counter.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.container.GetHashCode();
+            return hashCode;
+        }
+      }
+    }
+
+    class _RenderDecorationLayout {
+        public _RenderDecorationLayout(
+            Dictionary<RenderBox, float> boxToBaseline = null,
+            float? inputBaseline = null,
+            float? outlineBaseline = null,
+            float? subtextBaseline = null,
+            float? containerHeight = null,
+            float? subtextHeight = null
+        ) {
+          this.boxToBaseline = boxToBaseline;
+          this.inputBaseline = inputBaseline;
+          this.outlineBaseline = outlineBaseline;
+          this.subtextBaseline = subtextBaseline;
+          this.containerHeight = containerHeight;
+          this.subtextHeight = subtextHeight;
+        }
+
+      public readonly Dictionary<RenderBox, float> boxToBaseline;
+      public readonly float? inputBaseline;
+      public readonly float? outlineBaseline;
+      public readonly float? subtextBaseline; // helper/error counter
+      public readonly float? containerHeight;
+      public readonly float? subtextHeight;
+    }
+
+    // The workhorse: layout and paint a _Decorator widget"s _Decoration.
+    class _RenderDecoration : RenderBox {
+      public _RenderDecoration(
+        _Decoration decoration,
+        TextDirection? textDirection,
+        TextBaseline? textBaseline,
+        bool isFocused
+      ) {
+           D.assert(decoration != null);
+           D.assert(textDirection != null);
+           D.assert(textBaseline != null);
+           this._decoration = decoration;
+           this._textDirection = textDirection;
+           this._textBaseline = textBaseline;
+           this._isFocused = isFocused;
+      }
+
+      public readonly Dictionary<_DecorationSlot, RenderBox> slotToChild = new Dictionary<_DecorationSlot, RenderBox>();
+      public readonly Dictionary<RenderBox, _DecorationSlot> childToSlot = new Dictionary<RenderBox, _DecorationSlot>();
+
+      RenderBox _updateChild(RenderBox oldChild, RenderBox newChild, _DecorationSlot slot) {
+        if (oldChild != null) {
+          this.dropChild(oldChild);
+          this.childToSlot.Remove(oldChild);
+          this.slotToChild.Remove(slot);
+        }
+        if (newChild != null) {
+          this.childToSlot[newChild] = slot;
+          this.slotToChild[slot] = newChild;
+          this.adoptChild(newChild);
+        }
+        return newChild;
+      }
+
+      RenderBox _icon;
+      public RenderBox icon {
+          get {
+              return this._icon;
+          }
+          set {
+            this._icon = this._updateChild(this._icon, value, _DecorationSlot.icon);
+          }
+      }
+
+      RenderBox _input;
+      public RenderBox input {
+          get {
+              return this._input;
+          }
+          set {
+            this._input = this._updateChild(this._input, value, _DecorationSlot.input);
+          }
+      }
+
+      RenderBox _label;
+      public RenderBox label {
+          get {
+              return this._label;
+          }
+          set {
+        this._label = this._updateChild(this._label, value, _DecorationSlot.label);
+          }
+      }
+
+      RenderBox _hint;
+      public RenderBox hint { get { return this._hint; } set { this._hint = this._updateChild(this._hint, value, _DecorationSlot.hint); } }
+
+      RenderBox _prefix;
+      public RenderBox prefix { get { return this._prefix; } set { this._prefix = this._updateChild(this._prefix, value, _DecorationSlot.prefix); } }
+
+      RenderBox _suffix;
+      public RenderBox suffix { get { return this._suffix; } set { this._suffix = this._updateChild(this._suffix, value, _DecorationSlot.suffix); } }
+
+      RenderBox _prefixIcon;
+      public RenderBox prefixIcon { get { return this._prefixIcon; } set { this._prefixIcon = this._updateChild(this._prefixIcon, value, _DecorationSlot.prefixIcon); } }
+
+      RenderBox _suffixIcon;
+      public RenderBox suffixIcon { get { return this._suffixIcon; } set { this._suffixIcon = this._updateChild(this._suffixIcon, value, _DecorationSlot.suffixIcon); } }
+
+      RenderBox _helperError;
+      public RenderBox helperError { get { return this._helperError; } set { this._helperError = this._updateChild(this._helperError, value, _DecorationSlot.helperError); } }
+
+      RenderBox _counter;
+      public RenderBox counter { get { return this._counter; } set { this._counter = this._updateChild(this._counter, value, _DecorationSlot.counter); } }
+
+      RenderBox _container;
+      public RenderBox container { get { return this._container; } set { this._container = this._updateChild(this._container, value, _DecorationSlot.container); } }
+
+      // The returned list is ordered for hit testing.
+      IEnumerable<RenderBox> _children {
+          get {
+            if (this.icon != null)
+              yield return this.icon;
+            if (this.input != null)
+              yield return this.input;
+            if (this.prefixIcon != null)
+              yield return this.prefixIcon;
+            if (this.suffixIcon != null)
+              yield return this.suffixIcon;
+            if (this.prefix != null)
+              yield return this.prefix;
+            if (this.suffix != null)
+              yield return this.suffix;
+            if (this.label != null)
+              yield return this.label;
+            if (this.hint != null)
+              yield return this.hint;
+            if (this.helperError != null)
+              yield return this.helperError;
+            if (this.counter != null)
+              yield return this.counter;
+            if (this.container != null)
+              yield return this.container;
+          }
+      }
+
+      public _Decoration decoration {
+          get {
+              return this._decoration;
+          }
+          set {
+            D.assert(value != null);
+            if (this._decoration == value)
+              return;
+            this._decoration = value;
+            this.markNeedsLayout();
+          }
+      }
+
+      _Decoration _decoration;
+
+      public TextDirection? textDirection {
+          get {
+              return this._textDirection;
+          }
+          set {
+            D.assert(value != null);
+            if (this._textDirection == value)
+              return;
+            this._textDirection = value;
+            this.markNeedsLayout();
+          }
+      }
+
+      TextDirection? _textDirection;
+
+      public TextBaseline? textBaseline {
+          get {
+              return this._textBaseline;
+          }
+          set {
+        D.assert(value != null);
+        if (this._textBaseline == value)
+          return;
+        this._textBaseline = value;
+        this.markNeedsLayout();
+          }
+      }
+
+      TextBaseline? _textBaseline;
+
+      public bool isFocused {
+          get {
+              return this._isFocused;
+          }
+          set {
+        D.assert(value != null);
+        if (this._isFocused == value)
+          return;
+        this._isFocused = value;
+          }
+      }
+
+      bool _isFocused;
+
+      public override void attach(Object owner) {
+        base.attach(owner);
+        foreach (RenderBox child in this._children)
+          child.attach(owner);
+      }
+
+      public override void detach() {
+        base.detach();
+        foreach (RenderBox child in this._children)
+          child.detach();
+      }
+
+      public override void redepthChildren() {
+        this._children.Each(this.redepthChild);
+      }
+
+      public override void visitChildren(RenderObjectVisitor visitor) {
+        this._children.Each((child) => {
+            visitor(child);
+        });
+      }
+
+      public override List<DiagnosticsNode> debugDescribeChildren() {
+        List<DiagnosticsNode> value = new List< DiagnosticsNode>{};
+        void add(RenderBox child, string name) {
+          if (child != null)
+            value.Add(child.toDiagnosticsNode(name: name));
+        }
+        add(this.icon, "icon");
+        add(this.input, "input");
+        add(this.label, "label");
+        add(this.hint, "hint");
+        add(this.prefix, "prefix");
+        add(this.suffix, "suffix");
+        add(this.prefixIcon, "prefixIcon");
+        add(this.suffixIcon, "suffixIcon");
+        add(this.helperError, "helperError");
+        add(this.counter, "counter");
+        add(this.container, "container");
+        return value;
+      }
+
+      protected override bool sizedByParent {
+          get {
+              return false;
+          }
+      }
+
+      static float _minWidth(RenderBox box, float height) {
+        return box == null ? 0.0f : box.getMinIntrinsicWidth(height);
+      }
+
+      static float _maxWidth(RenderBox box, float height) {
+        return box == null ? 0.0f : box.getMaxIntrinsicWidth(height);
+      }
+
+      static float _minHeight(RenderBox box, float width) {
+        return box == null ? 0.0f : box.getMinIntrinsicHeight(width);
+      }
+
+      static Size _boxSize(RenderBox box) => box == null ? Size.zero : box.size;
+
+      static BoxParentData _boxParentData(RenderBox box) => (BoxParentData) box.parentData;
+
+      public EdgeInsets contentPadding {
+          get {
+              return this.decoration.contentPadding;
+          }
+      }
+
+      _RenderDecorationLayout _layout(BoxConstraints layoutConstraints) {
+        Dictionary<RenderBox, float> boxToBaseline = new Dictionary<RenderBox, float>();
+        BoxConstraints boxConstraints = layoutConstraints.loosen();
+        float aboveBaseline = 0.0f;
+        float belowBaseline = 0.0f;
+        void layoutLineBox(RenderBox box) {
+          if (box == null)
+            return;
+          box.layout(boxConstraints, parentUsesSize: true);
+          float baseline = box.getDistanceToBaseline(this.textBaseline) ?? 0.0f;
+          D.assert(baseline != null && baseline >= 0.0f);
+          boxToBaseline[box] = baseline;
+          aboveBaseline = Math.Max(baseline, aboveBaseline);
+          belowBaseline = Math.Max(box.size.height - baseline, belowBaseline);
+        }
+        layoutLineBox(this.prefix);
+        layoutLineBox(this.suffix);
+
+        if (this.icon != null)
+          this.icon.layout(boxConstraints, parentUsesSize: true);
+        if (this.prefixIcon != null)
+          this.prefixIcon.layout(boxConstraints, parentUsesSize: true);
+        if (this.suffixIcon != null)
+          this.suffixIcon.layout(boxConstraints, parentUsesSize: true);
+
+        float inputWidth = Math.Max(0.0f, this.constraints.maxWidth - (
+          _boxSize(this.icon).width
+          + this.contentPadding.left
+          + _boxSize(this.prefixIcon).width
+          + _boxSize(this.prefix).width
+          + _boxSize(this.suffix).width
+          + _boxSize(this.suffixIcon).width
+          + this.contentPadding.right));
+
+        boxConstraints = boxConstraints.copyWith(maxWidth: inputWidth);
+        if (this.label != null) // The label is not baseline aligned.
+          this.label.layout(boxConstraints, parentUsesSize: true);
+
+        boxConstraints = boxConstraints.copyWith(minWidth: inputWidth);
+        layoutLineBox(this.hint);
+        layoutLineBox(this.input);
+
+        float inputBaseline = this.contentPadding.top + aboveBaseline;
+        float containerHeight = this.contentPadding.top
+          + aboveBaseline
+          + belowBaseline
+          + this.contentPadding.bottom;
+
+        if (this.label != null) {
+          // floatingLabelHeight includes the vertical gap between the inline
+          // elements and the floating label.
+          containerHeight += this.decoration.floatingLabelHeight;
+          inputBaseline += this.decoration.floatingLabelHeight;
+        }
+
+        containerHeight = Math.Max(
+          containerHeight,
+          Math.Max(
+            _boxSize(this.suffixIcon).height,
+            _boxSize(this.prefixIcon).height));
+
+        float outlineBaseline = aboveBaseline +
+          (containerHeight - (2.0f + aboveBaseline + belowBaseline)) / 2.0f;
+
+        float subtextBaseline = 0.0f;
+        float subtextHeight = 0.0f;
+        if (this.helperError != null || this.counter != null) {
+          boxConstraints = layoutConstraints.loosen();
+          aboveBaseline = 0.0f;
+          belowBaseline = 0.0f;
+          layoutLineBox(this.counter);
+
+          // The helper or error text can occupy the full width less the space
+          // occupied by the icon and counter.
+          boxConstraints = boxConstraints.copyWith(
+            maxWidth: Math.Max(0.0f, boxConstraints.maxWidth
+              - _boxSize(this.icon).width
+              - _boxSize(this.counter).width
+              - this.contentPadding.horizontal
+            )
+          );
+          layoutLineBox(this.helperError);
+
+          if (aboveBaseline + belowBaseline > 0.0f) {
+            const float subtextGap = 8.0f;
+            subtextBaseline = containerHeight + subtextGap + aboveBaseline;
+            subtextHeight = subtextGap + aboveBaseline + belowBaseline;
+          }
+        }
+
+        return new _RenderDecorationLayout(
+          boxToBaseline: boxToBaseline,
+          containerHeight: containerHeight,
+          inputBaseline: inputBaseline,
+          outlineBaseline: outlineBaseline,
+          subtextBaseline: subtextBaseline,
+          subtextHeight: subtextHeight
+        );
+      }
+
+      protected override float computeMinIntrinsicWidth(float height) {
+        return _minWidth(this.icon, height)
+          + this.contentPadding.left
+          + _minWidth(this.prefixIcon, height)
+          + _minWidth(this.prefix, height)
+          + Math.Max(_minWidth(this.input, height), _minWidth(this.hint, height))
+          + _minWidth(this.suffix, height)
+          + _minWidth(this.suffixIcon, height)
+          + this.contentPadding.right;
+      }
+
+      protected override float computeMaxIntrinsicWidth(float height) {
+        return _maxWidth(this.icon, height)
+          + this.contentPadding.left
+          + _maxWidth(this.prefixIcon, height)
+          + _maxWidth(this.prefix, height)
+          + Math.Max(_maxWidth(this.input, height), _maxWidth(this.hint, height))
+          + _maxWidth(this.suffix, height)
+          + _maxWidth(this.suffixIcon, height)
+          + this.contentPadding.right;
+      }
+
+      float _lineHeight(float width, List<RenderBox> boxes) {
+        float height = 0.0f;
+        foreach (RenderBox box in boxes) {
+          if (box == null)
+            continue;
+          height = Math.Max(_minHeight(box, width), height);
+        }
+        return height;
+      }
+
+      protected override float computeMinIntrinsicHeight(float width) {
+        float subtextHeight = this._lineHeight(width, new List<RenderBox>{this.helperError, this.counter});
+        if (subtextHeight > 0.0f)
+          subtextHeight += 8.0f;
+        return this.contentPadding.top
+          + (this.label == null ? 0.0f : this.decoration.floatingLabelHeight)
+          + this._lineHeight(width, new List<RenderBox>{this.prefix, this.input, this.suffix})
+          + subtextHeight
+          + this.contentPadding.bottom;
+      }
+
+      protected override float computeMaxIntrinsicHeight(float width) {
+        return this.computeMinIntrinsicHeight(width);
+      }
+
+      protected override float? computeDistanceToActualBaseline(TextBaseline baseline) {
+        D.assert(false, "not implemented");
+        return 0.0f;
+      }
+
+      Matrix3 _labelTransform;
+
+      protected override void performLayout() {
+        this._labelTransform = null;
+        _RenderDecorationLayout layout = this._layout(this.constraints);
+
+        float overallWidth = this.constraints.maxWidth;
+        float? overallHeight = layout.containerHeight + layout.subtextHeight;
+
+        if (this.container != null) {
+          BoxConstraints containerConstraints = BoxConstraints.tightFor(
+            height: layout.containerHeight,
+            width: overallWidth - _boxSize(this.icon).width
+          );
+          this.container.layout(containerConstraints, parentUsesSize: true);
+          float x;
+          switch (this.textDirection) {
+            case TextDirection.rtl:
+              x = 0.0f;
+              break;
+            case TextDirection.ltr:
+              x = _boxSize(this.icon).width;
+              break;
+            default:
+                throw new Exception("Unknown direction: " + this.textDirection);
+           }
+          _boxParentData(this.container).offset = new Offset(x, 0.0f);
+        }
+
+        float height;
+        float centerLayout(RenderBox box, float x) {
+          _boxParentData(box).offset = new Offset(x, (height - box.size.height) / 2.0f);
+          return box.size.width;
+        }
+
+        float baseline;
+        float baselineLayout(RenderBox box, float x) {
+          _boxParentData(box).offset = new Offset(x, baseline - layout.boxToBaseline[box]);
+          return box.size.width;
+        }
+
+        float left = this.contentPadding.left;
+        float right = overallWidth - this.contentPadding.right;
+
+        height = layout.containerHeight ?? 0.0f;
+        baseline = (this.decoration.isCollapsed || !this.decoration.border.isOutline
+          ? layout.inputBaseline
+          : layout.outlineBaseline) ?? 0.0f;
+
+        if (this.icon != null) {
+          float x;
+          switch (this.textDirection) {
+            case TextDirection.rtl:
+              x = overallWidth - this.icon.size.width;
+              break;
+            case TextDirection.ltr:
+              x = 0.0f;
+              break;
+            default:
+                throw new Exception("Unknown direction: " + this.textDirection);
+           }
+          centerLayout(this.icon, x);
+        }
+
+        switch (this.textDirection) {
+          case TextDirection.rtl: {
+            float start = right - _boxSize(this.icon).width;
+            float end = left;
+            if (this.prefixIcon != null) {
+              start += this.contentPadding.left;
+              start -= centerLayout(this.prefixIcon, start - this.prefixIcon.size.width);
+            }
+            if (this.label != null)
+              centerLayout(this.label, start - this.label.size.width);
+            if (this.prefix != null)
+              start -= baselineLayout(this.prefix, start - this.prefix.size.width);
+            if (this.input != null)
+              baselineLayout(this.input, start - this.input.size.width);
+            if (this.hint != null)
+              baselineLayout(this.hint, start - this.hint.size.width);
+            if (this.suffixIcon != null) {
+              end -= this.contentPadding.left;
+              end += centerLayout(this.suffixIcon, end);
+            }
+            if (this.suffix != null)
+              end += baselineLayout(this.suffix, end);
+            break;
+          }
+          case TextDirection.ltr: {
+            float start = left + _boxSize(this.icon).width;
+            float end = right;
+            if (this.prefixIcon != null) {
+              start -= this.contentPadding.left;
+              start += centerLayout(this.prefixIcon, start);
+            }
+            if (this.label != null)
+              centerLayout(this.label, start);
+            if (this.prefix != null)
+              start += baselineLayout(this.prefix, start);
+            if (this.input != null)
+              baselineLayout(this.input, start);
+            if (this.hint != null)
+              baselineLayout(this.hint, start);
+            if (this.suffixIcon != null) {
+              end += this.contentPadding.right;
+              end -= centerLayout(this.suffixIcon, end - this.suffixIcon.size.width);
+            }
+            if (this.suffix != null)
+              end -= baselineLayout(this.suffix, end - this.suffix.size.width);
+            break;
+          }
+        }
+
+        if (this.helperError != null || this.counter != null) {
+          height = layout.subtextHeight ?? 0.0f;
+          baseline = layout.subtextBaseline ?? 0.0f;
+
+          switch (this.textDirection) {
+            case TextDirection.rtl:
+              if (this.helperError != null)
+                baselineLayout(this.helperError, right - this.helperError.size.width - _boxSize(this.icon).width);
+              if (this.counter != null)
+                baselineLayout(this.counter, left);
+              break;
+            case TextDirection.ltr:
+              if (this.helperError != null)
+                baselineLayout(this.helperError, left + _boxSize(this.icon).width);
+              if (this.counter != null)
+                baselineLayout(this.counter, right - this.counter.size.width);
+              break;
+          }
+        }
+
+        if (this.label != null) {
+          float labelX = _boxParentData(this.label).offset.dx;
+          switch (this.textDirection) {
+            case TextDirection.rtl:
+              this.decoration.borderGap.start = labelX + this.label.size.width;
+              break;
+            case TextDirection.ltr:
+              // The value of _InputBorderGap.start is relative to the origin of the
+              // _BorderContainer which is inset by the icon"s width.
+              this.decoration.borderGap.start = labelX - _boxSize(this.icon).width;
+              break;
+          }
+          this.decoration.borderGap.extent = this.label.size.width * 0.75f;
+        } else {
+          this.decoration.borderGap.start = 0.0f;
+          this.decoration.borderGap.extent = 0.0f;
+        }
+
+        this.size = this.constraints.constrain(new Size(overallWidth, overallHeight ?? 0.0f));
+        D.assert(this.size.width == this.constraints.constrainWidth(overallWidth));
+        D.assert(this.size.height == this.constraints.constrainHeight(overallHeight ?? 0.0f));
+      }
+
+      void _paintLabel(PaintingContext context, Offset offset) {
+        context.paintChild(this.label, offset);
+      }
+
+      public override void paint(PaintingContext context, Offset offset) {
+        void doPaint(RenderBox child) {
+          if (child != null)
+            context.paintChild(child, _boxParentData(child).offset + offset);
+        }
+        doPaint(this.container);
+
+        if (this.label != null) {
+          Offset labelOffset = _boxParentData(this.label).offset;
+          float labelHeight = this.label.size.height;
+          float t = this.decoration.floatingLabelProgress;
+          bool isOutlineBorder = this.decoration.border != null && this.decoration.border.isOutline;
+          float floatingY = isOutlineBorder ? - labelHeight * 0.25f : this.contentPadding.top;
+          float scale = MathUtils.lerpFloat(1.0f, 0.75f, t);
+          float dx;
+          switch (this.textDirection) {
+            case TextDirection.rtl:
+              dx = labelOffset.dx + this.label.size.width * (1.0f - scale); // origin is on the right
+              break;
+            case TextDirection.ltr:
+              dx = labelOffset.dx; // origin on the left
+              break;
+            default:
+                throw new Exception("Unknown direction: " + this.textDirection);
+          }
+          float dy = MathUtils.lerpFloat(0.0f, floatingY - labelOffset.dy, t);
+          this._labelTransform = Matrix3.I();
+          this._labelTransform.preTranslate(dx, labelOffset.dy + dy);
+          this._labelTransform.preScale(scale, scale);
+          context.pushTransform(this.needsCompositing, offset, this._labelTransform, this._paintLabel);
+        }
+
+        doPaint(this.icon);
+        doPaint(this.prefix);
+        doPaint(this.suffix);
+        doPaint(this.prefixIcon);
+        doPaint(this.suffixIcon);
+        doPaint(this.hint);
+        doPaint(this.input);
+        doPaint(this.helperError);
+        doPaint(this.counter);
+      }
+
+      protected override bool hitTestSelf(Offset position) => true;
+
+      protected override bool hitTestChildren(HitTestResult result, Offset position) {
+        D.assert(position != null);
+        foreach (RenderBox child in this._children) {
+          if (child.hitTest(result, position: position - _boxParentData(child).offset))
+            return true;
+        }
+        return false;
+      }
+
+      public override void applyPaintTransform(RenderObject child, Matrix3 transform) {
+        if (child == this.label && this._labelTransform != null) {
+          Offset labelOffset = _boxParentData(this.label).offset;
+          transform.preConcat(this._labelTransform);
+          transform.preTranslate(-labelOffset.dx, -labelOffset.dy);
+        }
+        base.applyPaintTransform(child, transform);
+      }
+    }
+
+    class _RenderDecorationElement : RenderObjectElement {
+      public _RenderDecorationElement(_Decorator widget) : base(widget) {}
+
+      Dictionary<_DecorationSlot, Element> slotToChild = new Dictionary<_DecorationSlot, Element>();
+      Dictionary<Element, _DecorationSlot> childToSlot = new Dictionary<Element, _DecorationSlot>();
+
+      public _Decorator widget {
+          get {
+              return (_Decorator) base.widget;
+          }
+      }
+
+      public _RenderDecoration renderObject {
+          get {
+              return (_RenderDecoration) base.renderObject;
+          }
+      }
+
+      public override void visitChildren(ElementVisitor visitor) {
+        this.slotToChild.Values.Each((child) => {
+            visitor(child);
+        });
+      }
+
+      protected override void forgetChild(Element child) {
+        D.assert(this.slotToChild.ContainsValue(child));
+        D.assert(this.childToSlot.ContainsKey(child));
+        _DecorationSlot slot = this.childToSlot[child];
+        this.childToSlot.Remove(child);
+        this.slotToChild.Remove(slot);
+      }
+
+      void _mountChild(Widget widget, _DecorationSlot slot) {
+        Element oldChild = this.slotToChild[slot];
+        Element newChild = this.updateChild(oldChild, widget, slot);
+        if (oldChild != null) {
+          this.slotToChild.Remove(slot);
+          this.childToSlot.Remove(oldChild);
+        }
+        if (newChild != null) {
+          this.slotToChild[slot] = newChild;
+          this.childToSlot[newChild] = slot;
+        }
+      }
+
+      public override void mount(Element parent, dynamic newSlot) {
+        base.mount(parent, newSlot);
+        this._mountChild(this.widget.decoration.icon, _DecorationSlot.icon);
+        this._mountChild(this.widget.decoration.input, _DecorationSlot.input);
+        this._mountChild(this.widget.decoration.label, _DecorationSlot.label);
+        this._mountChild(this.widget.decoration.hint, _DecorationSlot.hint);
+        this._mountChild(this.widget.decoration.prefix, _DecorationSlot.prefix);
+        this._mountChild(this.widget.decoration.suffix, _DecorationSlot.suffix);
+        this._mountChild(this.widget.decoration.prefixIcon, _DecorationSlot.prefixIcon);
+        this._mountChild(this.widget.decoration.suffixIcon, _DecorationSlot.suffixIcon);
+        this._mountChild(this.widget.decoration.helperError, _DecorationSlot.helperError);
+        this._mountChild(this.widget.decoration.counter, _DecorationSlot.counter);
+        this._mountChild(this.widget.decoration.container, _DecorationSlot.container);
+      }
+
+      void _updateChild(Widget widget, _DecorationSlot slot) {
+        Element oldChild = this.slotToChild[slot];
+        Element newChild = this.updateChild(oldChild, this.widget, slot);
+        if (oldChild != null) {
+          this.childToSlot.Remove(oldChild);
+          this.slotToChild.Remove(slot);
+        }
+        if (newChild != null) {
+          this.slotToChild[slot] = newChild;
+          this.childToSlot[newChild] = slot;
+        }
+      }
+
+      public override void update(Widget newWidget) {
+        base.update(newWidget);
+        D.assert(this.widget == newWidget);
+        this._updateChild(this.widget.decoration.icon, _DecorationSlot.icon);
+        this._updateChild(this.widget.decoration.input, _DecorationSlot.input);
+        this._updateChild(this.widget.decoration.label, _DecorationSlot.label);
+        this._updateChild(this.widget.decoration.hint, _DecorationSlot.hint);
+        this._updateChild(this.widget.decoration.prefix, _DecorationSlot.prefix);
+        this._updateChild(this.widget.decoration.suffix, _DecorationSlot.suffix);
+        this._updateChild(this.widget.decoration.prefixIcon, _DecorationSlot.prefixIcon);
+        this._updateChild(this.widget.decoration.suffixIcon, _DecorationSlot.suffixIcon);
+        this._updateChild(this.widget.decoration.helperError, _DecorationSlot.helperError);
+        this._updateChild(this.widget.decoration.counter, _DecorationSlot.counter);
+        this._updateChild(this.widget.decoration.container, _DecorationSlot.container);
+      }
+
+      void _updateRenderObject(RenderObject child, _DecorationSlot slot) {
+        switch (slot) {
+          case _DecorationSlot.icon:
+            this.renderObject.icon = (RenderBox) child;
+            break;
+          case _DecorationSlot.input:
+            this.renderObject.input = (RenderBox) child;
+            break;
+          case _DecorationSlot.label:
+            this.renderObject.label = (RenderBox) child;
+            break;
+          case _DecorationSlot.hint:
+            this.renderObject.hint = (RenderBox) child;
+            break;
+          case _DecorationSlot.prefix:
+            this.renderObject.prefix = (RenderBox) child;
+            break;
+          case _DecorationSlot.suffix:
+            this.renderObject.suffix = (RenderBox) child;
+            break;
+          case _DecorationSlot.prefixIcon:
+            this.renderObject.prefixIcon = (RenderBox) child;
+            break;
+          case _DecorationSlot.suffixIcon:
+            this.renderObject.suffixIcon = (RenderBox) child;
+            break;
+          case _DecorationSlot.helperError:
+            this.renderObject.helperError = (RenderBox) child;
+            break;
+          case _DecorationSlot.counter:
+            this.renderObject.counter = (RenderBox) child;
+            break;
+          case _DecorationSlot.container:
+            this.renderObject.container = (RenderBox) child;
+            break;
+        }
+      }
+
+      protected override void insertChildRenderObject(RenderObject child, dynamic slotValue) {
+        D.assert(child is RenderBox);
+        D.assert(slotValue is _DecorationSlot);
+        _DecorationSlot slot = slotValue;
+        this._updateRenderObject(child, slot);
+        D.assert(this.renderObject.childToSlot.ContainsKey((RenderBox) child));
+        D.assert(this.renderObject.slotToChild.ContainsKey(slot));
+      }
+
+      protected override void removeChildRenderObject(RenderObject child) {
+        D.assert(child is RenderBox);
+        D.assert(this.renderObject.childToSlot.ContainsKey((RenderBox) child));
+        this._updateRenderObject(null, this.renderObject.childToSlot[(RenderBox) child]);
+        D.assert(!this.renderObject.childToSlot.ContainsKey((RenderBox) child));
+        D.assert(!this.renderObject.slotToChild.ContainsKey((_DecorationSlot) this.slot));
+      }
+
+      protected override void moveChildRenderObject(RenderObject child, dynamic slotValue) {
+        D.assert(false, "not reachable");
+      }
+    }
+
+    class _Decorator : RenderObjectWidget {
+      public _Decorator(
+        Key key = null,
+        _Decoration decoration = null,
+        TextDirection? textDirection = null,
+        TextBaseline? textBaseline = null,
+        bool isFocused = false
+      ) : base(key: key) {
+           D.assert(decoration != null);
+           D.assert(textDirection != null);
+           D.assert(textBaseline != null);
+           this.decoration = decoration;
+           this.textDirection = textDirection;
+           this.textBaseline = textBaseline;
+           this.isFocused = isFocused;
+      }
+
+      public readonly _Decoration decoration;
+      public readonly TextDirection? textDirection;
+      public readonly TextBaseline? textBaseline;
+      public readonly bool isFocused;
+
+      public override Element createElement() => new _RenderDecorationElement(this);
+
+      public override RenderObject createRenderObject(BuildContext context) {
+        return new _RenderDecoration(
+          decoration: this.decoration,
+          textDirection: this.textDirection,
+          textBaseline: this.textBaseline,
+          isFocused: this.isFocused
+        );
+      }
+
+      public override void updateRenderObject(BuildContext context, RenderObject _renderObject) {
+        _RenderDecoration renderObject = _renderObject as _RenderDecoration;
+        renderObject.decoration = this.decoration;
+        renderObject.textDirection = this.textDirection;
+        renderObject.textBaseline = this.textBaseline;
+        renderObject.isFocused = this.isFocused;
+      }
+    }
+
+    class _AffixText : StatelessWidget {
+        public _AffixText(
+            bool labelIsFloating = false,
+            string text = null,
+            TextStyle style = null,
+            Widget child = null
+        ) {
+            this.labelIsFloating = labelIsFloating;
+            this.text = text;
+            this.style = style;
+            this.child = child;
+        }
+
+      public readonly bool labelIsFloating;
+      public readonly string text;
+      public readonly TextStyle style;
+      public readonly Widget child;
+
+      public override Widget build(BuildContext context) {
+        return DefaultTextStyle.merge(
+          style: this.style,
+          child: new AnimatedOpacity(
+            duration: InputDecoratorConstants._kTransitionDuration,
+            curve: InputDecoratorConstants._kTransitionCurve,
+            opacity: this.labelIsFloating ? 1.0f : 0.0,
+            child: this.child ?? new Text(this.text, style: this.style)
+          )
+        );
+      }
+    }
+
+    public class InputDecorator : StatefulWidget {
+        public InputDecorator(
+            Key key = null,
+            InputDecoration decoration = null,
+            TextStyle baseStyle = null,
+            TextAlign? textAlign = null,
+            bool isFocused = false,
+            bool isEmpty = false,
+            Widget child = null
+        ) : base(key: key) {
+            D.assert(isFocused != null);
+            D.assert(isEmpty != null);
+        }
+
+        public readonly InputDecoration decoration;
+
+        public readonly TextStyle baseStyle;
+
+        public readonly TextAlign textAlign;
+
+        public readonly bool isFocused;
+
+        public readonly bool isEmpty;
+
+        public readonly Widget child;
+
+        bool _labelShouldWithdraw {
+            get {
+                return !this.isEmpty || this.isFocused;
+            }
+        }
+
+        public override State createState() => new _InputDecoratorState();
+
+      static RenderBox containerOf(BuildContext context) {
+        _RenderDecoration result = (_RenderDecoration) context.ancestorRenderObjectOfType(new TypeMatcher<_RenderDecoration>());
+        return result?.container;
+      }
+
+      public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+        base.debugFillProperties(properties);
+        properties.add(new DiagnosticsProperty<InputDecoration>("decoration", this.decoration));
+        properties.add(new DiagnosticsProperty<TextStyle>("baseStyle", this.baseStyle, defaultValue: null));
+        properties.add(new DiagnosticsProperty<bool>("isFocused", this.isFocused));
+        properties.add(new DiagnosticsProperty<bool>("isEmpty", this.isEmpty));
+      }
+    }
+
+    class _InputDecoratorState : TickerProviderStateMixin<InputDecorator> {
+      AnimationController _floatingLabelController;
+      AnimationController _shakingLabelController;
+      _InputBorderGap _borderGap = new _InputBorderGap();
+
+      public override void initState() {
+        base.initState();
+        this._floatingLabelController = new AnimationController(
+          duration: InputDecoratorConstants._kTransitionDuration,
+          vsync: this,
+          value: (this.widget.decoration.hasFloatingPlaceholder && this.widget._labelShouldWithdraw) ? 1.0f : 0.0,
+        );
+        _floatingLabelController.addListener(_handleChange);
+
+        _shakingLabelController = AnimationController(
+          duration: InputDecoratorConstants._kTransitionDuration,
+          vsync: this,
+        );
+      }
+
+      public override void didChangeDependencies() {
+        base.didChangeDependencies();
+        _effectiveDecoration = null;
+      }
+
+      public override void dispose() {
+        _floatingLabelController.dispose();
+        _shakingLabelController.dispose();
+        base.dispose();
+      }
+
+      void _handleChange() {
+        this.setState(() {
+          // The _floatingLabelController"s value has changed.
+        });
+      }
+
+      InputDecoration _effectiveDecoration;
+      InputDecoration get decoration {
+        _effectiveDecoration ??= this.widget.decoration.applyDefaults(
+          Theme.of(context).inputDecorationTheme
+        );
+        return _effectiveDecoration;
+      }
+
+      TextAlign get textAlign => this.widget.textAlign;
+      bool get isFocused => this.widget.isFocused;
+      bool get isEmpty => this.widget.isEmpty;
+
+      public override void didUpdateWidget(InputDecorator old) {
+        base.didUpdateWidget(old);
+        if (this.widget.decoration != old.decoration)
+          _effectiveDecoration = null;
+
+        if (this.widget._labelShouldWithdraw != old._labelShouldWithdraw && this.widget.decoration.hasFloatingPlaceholder) {
+          if (this.widget._labelShouldWithdraw) {
+            _floatingLabelController.forward();
+          }
+          else
+            _floatingLabelController.reverse();
+        }
+
+        final string errorText = decoration.errorText;
+        final string oldErrorText = old.decoration.errorText;
+
+        if (_floatingLabelController.isCompleted && errorText != null && errorText != oldErrorText) {
+          _shakingLabelController
+            ..value = 0.0f
+            ..forward();
+        }
+      }
+
+      Color _getActiveColor(ThemeData themeData) {
+        if (isFocused) {
+          switch (themeData.brightness) {
+            case Brightness.dark:
+              return themeData.accentColor;
+            case Brightness.light:
+              return themeData.primaryColor;
+          }
+        }
+        return themeData.hintColor;
+      }
+
+      Color _getFillColor(ThemeData themeData) {
+        if (decoration.filled != true) // filled == null same as filled == false
+          return Colors.transparent;
+        if (decoration.fillColor != null)
+          return decoration.fillColor;
+
+        // dark theme: 10% white (enabled), 5% white (disabled)
+        // light theme: 4% black (enabled), 2% black (disabled)
+        const Color darkEnabled = Color(0x1AFFFFFF);
+        const Color darkDisabled = Color(0x0DFFFFFF);
+        const Color lightEnabled = Color(0x0A000000);
+        const Color lightDisabled = Color(0x05000000);
+
+        switch (themeData.brightness) {
+          case Brightness.dark:
+            return decoration.enabled ? darkEnabled : darkDisabled;
+          case Brightness.light:
+            return decoration.enabled ? lightEnabled : lightDisabled;
+        }
+        return lightEnabled;
+      }
+
+      Color _getDefaultIconColor(ThemeData themeData) {
+        if (!decoration.enabled)
+          return themeData.disabledColor;
+
+        switch (themeData.brightness) {
+          case Brightness.dark:
+            return Colors.white70;
+          case Brightness.light:
+            return Colors.black45;
+          default:
+            return themeData.iconTheme.color;
+        }
+      }
+
+      // True if the label will be shown and the hint will not.
+      // If we"re not focused, there"s no value, and labelText was provided,
+      // then the label appears where the hint would.
+      bool get _hasInlineLabel => !this.widget._labelShouldWithdraw && decoration.labelText != null;
+
+      // If the label is a floating placeholder, it"s always shown.
+      bool get _shouldShowLabel => _hasInlineLabel || decoration.hasFloatingPlaceholder;
+
+
+      // The base style for the inline label or hint when they"re displayed "inline",
+      // i.e. when they appear in place of the empty text field.
+      TextStyle _getInlineStyle(ThemeData themeData) {
+        return themeData.textTheme.subhead.merge(this.widget.baseStyle)
+          .copyWith(color: decoration.enabled ? themeData.hintColor : themeData.disabledColor);
+      }
+
+      TextStyle _getFloatingLabelStyle(ThemeData themeData) {
+        final Color color = decoration.errorText != null
+          ? decoration.errorStyle?.color ?? themeData.errorColor
+          : _getActiveColor(themeData);
+        final TextStyle style = themeData.textTheme.subhead.merge(this.widget.baseStyle);
+        return style
+          .copyWith(color: decoration.enabled ? color : themeData.disabledColor)
+          .merge(decoration.labelStyle);
+      }
+
+      TextStyle _getHelperStyle(ThemeData themeData) {
+        final Color color = decoration.enabled ? themeData.hintColor : Colors.transparent;
+        return themeData.textTheme.caption.copyWith(color: color).merge(decoration.helperStyle);
+      }
+
+      TextStyle _getErrorStyle(ThemeData themeData) {
+        final Color color = decoration.enabled ? themeData.errorColor : Colors.transparent;
+        return themeData.textTheme.caption.copyWith(color: color).merge(decoration.errorStyle);
+      }
+
+      InputBorder _getDefaultBorder(ThemeData themeData) {
+        if (decoration.border?.borderSide == BorderSide.none) {
+          return decoration.border;
+        }
+
+        Color borderColor;
+        if (decoration.enabled) {
+          borderColor = decoration.errorText == null
+            ? _getActiveColor(themeData)
+            : themeData.errorColor;
+        } else {
+          borderColor = (decoration.filled == true && decoration.border?.isOutline != true)
+            ? Colors.transparent
+            : themeData.disabledColor;
+        }
+
+        float borderWeight;
+        if (decoration.isCollapsed || decoration?.border == InputBorder.none || !decoration.enabled)
+          borderWeight = 0.0f;
+        else
+          borderWeight = isFocused ? 2.0f : 1.0;
+
+        final InputBorder border = decoration.border ?? const UnderlineInputBorder();
+        return border.copyWith(borderSide: BorderSide(color: borderColor, width: borderWeight));
+      }
+
+      public override Widget build(BuildContext context) {
+        final ThemeData themeData = Theme.of(context);
+        final TextStyle inlineStyle = _getInlineStyle(themeData);
+        final TextBaseline textBaseline = inlineStyle.textBaseline;
+
+        final TextStyle hintStyle = inlineStyle.merge(decoration.hintStyle);
+        final Widget hint = decoration.hintText == null ? null : AnimatedOpacity(
+          opacity: (isEmpty && !_hasInlineLabel) ? 1.0f : 0.0,
+          duration: InputDecoratorConstants._kTransitionDuration,
+          curve: InputDecorator._kTransitionCurve,
+          child: Text(
+            decoration.hintText,
+            style: hintStyle,
+            overflow: TextOverflow.ellipsis,
+            textAlign: textAlign,
+          ),
+        );
+
+        final bool isError = decoration.errorText != null;
+        InputBorder border;
+        if (!decoration.enabled)
+          border = isError ? decoration.errorBorder : decoration.disabledBorder;
+        else if (isFocused)
+          border = isError ? decoration.focusedErrorBorder : decoration.focusedBorder;
+        else
+          border = isError ? decoration.errorBorder : decoration.enabledBorder;
+        border ??= _getDefaultBorder(themeData);
+
+        final Widget container = _BorderContainer(
+          border: border,
+          gap: _borderGap,
+          gapAnimation: _floatingLabelController.view,
+          fillColor: _getFillColor(themeData),
+        );
+
+        final TextStyle inlineLabelStyle = inlineStyle.merge(decoration.labelStyle);
+        final Widget label = decoration.labelText == null ? null : _Shaker(
+          animation: _shakingLabelController.view,
+          child: AnimatedOpacity(
+            duration: InputDecoratorConstants._kTransitionDuration,
+            curve: InputDecorator._kTransitionCurve,
+            opacity: _shouldShowLabel ? 1.0f : 0.0,
+            child: AnimatedDefaultTextStyle(
+              duration:InputDecoratorConstants._kTransitionDuration,
+              curve: InputDecorator._kTransitionCurve,
+              style: this.widget._labelShouldWithdraw
+                ? _getFloatingLabelStyle(themeData)
+                : inlineLabelStyle,
+              child: Text(
+                decoration.labelText,
+                overflow: TextOverflow.ellipsis,
+                textAlign: textAlign,
+              ),
+            ),
+          ),
+        );
+
+        final Widget prefix = decoration.prefix == null && decoration.prefixText == null ? null :
+          _AffixText(
+            labelIsFloating: this.widget._labelShouldWithdraw,
+            text: decoration.prefixText,
+            style: decoration.prefixStyle ?? hintStyle,
+            child: decoration.prefix,
+          );
+
+        final Widget suffix = decoration.suffix == null && decoration.suffixText == null ? null :
+          _AffixText(
+            labelIsFloating: this.widget._labelShouldWithdraw,
+            text: decoration.suffixText,
+            style: decoration.suffixStyle ?? hintStyle,
+            child: decoration.suffix,
+          );
+
+        final Color activeColor = _getActiveColor(themeData);
+        final bool decorationIsDense = decoration.isDense == true; // isDense == null, same as false
+        final float iconSize = decorationIsDense ? 18.0f : 24.0;
+        final Color iconColor = isFocused ? activeColor : _getDefaultIconColor(themeData);
+
+        final Widget icon = decoration.icon == null ? null :
+          Padding(
+            padding: const EdgeInsetsDirectional.only(end: 16.0f),
+            child: IconTheme.merge(
+              data: IconThemeData(
+                color: iconColor,
+                size: iconSize,
+              ),
+              child: decoration.icon,
+            ),
+          );
+
+        final Widget prefixIcon = decoration.prefixIcon == null ? null :
+          Center(
+            widthFactor: 1.0f,
+            heightFactor: 1.0f,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(minWidth: 48.0f, minHeight: 48.0),
+              child: IconTheme.merge(
+                data: IconThemeData(
+                  color: iconColor,
+                  size: iconSize,
+                ),
+                child: decoration.prefixIcon,
+              ),
+            ),
+          );
+
+        final Widget suffixIcon = decoration.suffixIcon == null ? null :
+          Center(
+            widthFactor: 1.0f,
+            heightFactor: 1.0f,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(minWidth: 48.0f, minHeight: 48.0),
+              child: IconTheme.merge(
+                data: IconThemeData(
+                  color: iconColor,
+                  size: iconSize,
+                ),
+                child: decoration.suffixIcon,
+              ),
+            ),
+          );
+
+        final Widget helperError = _HelperError(
+          textAlign: textAlign,
+          helperText: decoration.helperText,
+          helperStyle: _getHelperStyle(themeData),
+          errorText: decoration.errorText,
+          errorStyle: _getErrorStyle(themeData),
+          errorMaxLines: decoration.errorMaxLines,
+        );
+
+        final Widget counter = decoration.counterText == null ? null :
+          Semantics(
+            container: true,
+            liveRegion: isFocused,
+            child: Text(
+              decoration.counterText,
+              style: _getHelperStyle(themeData).merge(decoration.counterStyle),
+              overflow: TextOverflow.ellipsis,
+              semanticsLabel: decoration.semanticCounterText,
+            ),
+          );
+
+        // The _Decoration widget and _RenderDecoration assume that contentPadding
+        // has been resolved to EdgeInsets.
+        final TextDirection textDirection = Directionality.of(context);
+        final EdgeInsets decorationContentPadding = decoration.contentPadding?.resolve(textDirection);
+
+        EdgeInsets contentPadding;
+        float floatingLabelHeight;
+        if (decoration.isCollapsed) {
+          floatingLabelHeight = 0.0f;
+          contentPadding = decorationContentPadding ?? EdgeInsets.zero;
+        } else if (!border.isOutline) {
+          // 4.0f: the vertical gap between the inline elements and the floating label.
+          floatingLabelHeight = (4.0f + 0.75 * inlineLabelStyle.fontSize) * MediaQuery.textScaleFactorOf(context);
+          if (decoration.filled == true) { // filled == null same as filled == false
+            contentPadding = decorationContentPadding ?? (decorationIsDense
+              ? const EdgeInsets.fromLTRB(12.0f, 8.0, 12.0, 8.0)
+              : const EdgeInsets.fromLTRB(12.0f, 12.0, 12.0, 12.0));
+          } else {
+            // Not left or right padding for underline borders that aren"t filled
+            // is a small concession to backwards compatibility. This eliminates
+            // the most noticeable layout change introduced by #13734.
+            contentPadding = decorationContentPadding ?? (decorationIsDense
+              ? const EdgeInsets.fromLTRB(0.0f, 8.0, 0.0, 8.0)
+              : const EdgeInsets.fromLTRB(0.0f, 12.0, 0.0, 12.0));
+          }
+        } else {
+          floatingLabelHeight = 0.0f;
+          contentPadding = decorationContentPadding ?? (decorationIsDense
+            ? const EdgeInsets.fromLTRB(12.0f, 20.0, 12.0, 12.0)
+            : const EdgeInsets.fromLTRB(12.0f, 24.0, 12.0, 16.0));
+        }
+
+        return _Decorator(
+          decoration: _Decoration(
+            contentPadding: contentPadding,
+            isCollapsed: decoration.isCollapsed,
+            floatingLabelHeight: floatingLabelHeight,
+            floatingLabelProgress: _floatingLabelController.value,
+            border: border,
+            borderGap: _borderGap,
+            icon: this.icon,
+            input: this.widget.child,
+            label: label,
+            hint: hint,
+            prefix: prefix,
+            suffix: suffix,
+            prefixIcon: prefixIcon,
+            suffixIcon: suffixIcon,
+            helperError: helperError,
+            counter: counter,
+            container: container,
+          ),
+          textDirection: textDirection,
+          textBaseline: textBaseline,
+          isFocused: isFocused,
+        );
+      }
+    }
+
+    public class InputDecoration {
+      public InputDecoration(
+          Widget icon = null,
+          string labelText = null,
+          TextStyle labelStyle = null,
+          string helperText = null,
+          TextStyle helperStyle = null,
+          string hintText = null,
+          TextStyle hintStyle = null,
+          string errorText = null,
+          TextStyle errorStyle = null,
+          int? errorMaxLines = null,
+          bool hasFloatingPlaceholder = true,
+          bool isDense = false,
+          EdgeInsets contentPadding = null,
+          Widget prefixIcon = null,
+          Widget prefix = null,
+          string prefixText = null,
+          TextStyle prefixStyle = null,
+          Widget suffixIcon = null,
+          Widget suffix = null,
+          string suffixText = null,
+          TextStyle suffixStyle = null,
+          string counterText = null,
+          TextStyle counterStyle = null,
+          bool filled = false,
+          Color fillColor = null,
+          InputBorder errorBorder = null,
+          InputBorder focusedBorder = null,
+          InputBorder focusedErrorBorder = null,
+          InputBorder disabledBorder = null,
+          InputBorder enabledBorder = null,
+          InputBorder border = null,
+          bool enabled = true
+      ) {
+           D.assert(enabled != null),
+           D.assert(!(prefix != null && prefixText != null), "Declaring both prefix and prefixText is not allowed"),
+           D.assert(!(suffix != null && suffixText != null), "Declaring both suffix and suffixText is not allowed"),
+           this.isCollapsed = false;
+       }
+
+      public static collapsed(
+        string hintText = null,
+        bool hasFloatingPlaceholder = true,
+        TextStyle hintStyle = null,
+        bool filled = false,
+        Color fillColor = null,
+        InputBorder border = InputBorder.none,
+        bool enabled = true
+      ) {
+          return new InputDecorator(
+              icon: null,
+              labelText: null,
+              labelStyle: null,
+              helperText: null,
+              helperStyle: null,
+              errorText: null,
+              errorStyle: null,
+              errorMaxLines: null,
+              isDense: false,
+              contentPadding: EdgeInsets.zero,
+              isCollapsed: true,
+              prefixIcon: null,
+              prefix: null,
+              prefixText: null,
+              prefixStyle: null,
+              suffix: null,
+              suffixIcon: null,
+              suffixText: null,
+              suffixStyle: null,
+              counterText: null,
+              counterStyle: null,
+              errorBorder: null,
+              focusedBorder: null,
+              focusedErrorBorder: null,
+              disabledBorder: null,
+              enabledBorder: null,
+              semanticCounterText: null
+          );
+      }
+
+      public readonly Widget icon;
+
+      public readonly string labelText;
+
+      public readonly TextStyle labelStyle;
+
+      public readonly string helperText;
+
+      public readonly TextStyle helperStyle;
+
+      public readonly string hintText;
+
+      public readonly TextStyle hintStyle;
+
+      public readonly string errorText;
+
+      public readonly TextStyle errorStyle;
+
+      public readonly int? errorMaxLines;
+
+      public readonly bool hasFloatingPlaceholder;
+
+      public readonly bool isDense;
+
+      public readonly EdgeInsets contentPadding;
+
+      public readonly bool isCollapsed;
+
+      public readonly Widget prefixIcon;
+
+      public readonly Widget prefix;
+
+      public readonly string prefixText;
+
+      public readonly TextStyle prefixStyle;
+
+      public readonly Widget suffixIcon;
+
+      public readonly Widget suffix;
+
+      public readonly string suffixText;
+
+      public readonly TextStyle suffixStyle;
+
+      public readonly string counterText;
+
+      public readonly TextStyle counterStyle;
+
+      public readonly bool filled;
+
+      public readonly Color fillColor;
+
+      public readonly InputBorder errorBorder;
+
+      public readonly InputBorder focusedBorder;
+
+      public readonly InputBorder focusedErrorBorder;
+
+      public readonly InputBorder disabledBorder;
+
+      public readonly InputBorder enabledBorder;
+
+      public readonly InputBorder border;
+
+      public readonly bool enabled;
+
+      public readonly string semanticCounterText;
+
+      InputDecoration copyWith({
+        Widget icon,
+        string labelText,
+        TextStyle labelStyle,
+        string helperText,
+        TextStyle helperStyle,
+        string hintText,
+        TextStyle hintStyle,
+        string errorText,
+        TextStyle errorStyle,
+        int errorMaxLines,
+        bool hasFloatingPlaceholder,
+        bool isDense,
+        EdgeInsetsGeometry contentPadding,
+        Widget prefixIcon,
+        Widget prefix,
+        string prefixText,
+        TextStyle prefixStyle,
+        Widget suffixIcon,
+        Widget suffix,
+        string suffixText,
+        TextStyle suffixStyle,
+        string counterText,
+        TextStyle counterStyle,
+        bool filled,
+        Color fillColor,
+        InputBorder errorBorder,
+        InputBorder focusedBorder,
+        InputBorder focusedErrorBorder,
+        InputBorder disabledBorder,
+        InputBorder enabledBorder,
+        InputBorder border,
+        bool enabled,
+        string semanticCounterText,
+      }) {
+        return InputDecoration(
+          icon: icon ?? this.icon,
+          labelText: labelText ?? this.labelText,
+          labelStyle: labelStyle ?? this.labelStyle,
+          helperText: helperText ?? this.helperText,
+          helperStyle: helperStyle ?? this.helperStyle,
+          hintText: hintText ?? this.hintText,
+          hintStyle: hintStyle ?? this.hintStyle,
+          errorText: errorText ?? this.errorText,
+          errorStyle: errorStyle ?? this.errorStyle,
+          errorMaxLines: errorMaxLines ?? this.errorMaxLines,
+          hasFloatingPlaceholder: hasFloatingPlaceholder ?? this.hasFloatingPlaceholder,
+          isDense: isDense ?? this.isDense,
+          contentPadding: contentPadding ?? this.contentPadding,
+          prefixIcon: prefixIcon ?? this.prefixIcon,
+          prefix: prefix ?? this.prefix,
+          prefixText: prefixText ?? this.prefixText,
+          prefixStyle: prefixStyle ?? this.prefixStyle,
+          suffixIcon: suffixIcon ?? this.suffixIcon,
+          suffix: suffix ?? this.suffix,
+          suffixText: suffixText ?? this.suffixText,
+          suffixStyle: suffixStyle ?? this.suffixStyle,
+          counterText: counterText ?? this.counterText,
+          counterStyle: counterStyle ?? this.counterStyle,
+          filled: filled ?? this.filled,
+          fillColor: fillColor ?? this.fillColor,
+          errorBorder: errorBorder ?? this.errorBorder,
+          focusedBorder: focusedBorder ?? this.focusedBorder,
+          focusedErrorBorder: focusedErrorBorder ?? this.focusedErrorBorder,
+          disabledBorder: disabledBorder ?? this.disabledBorder,
+          enabledBorder: enabledBorder ?? this.enabledBorder,
+          border: border ?? this.border,
+          enabled: enabled ?? this.enabled,
+          semanticCounterText: semanticCounterText ?? this.semanticCounterText,
+        );
+      }
+
+      InputDecoration applyDefaults(InputDecorationTheme theme) {
+        return copyWith(
+          labelStyle: labelStyle ?? theme.labelStyle,
+          helperStyle: helperStyle ?? theme.helperStyle,
+          hintStyle: hintStyle ?? theme.hintStyle,
+          errorStyle: errorStyle ?? theme.errorStyle,
+          errorMaxLines: errorMaxLines ?? theme.errorMaxLines,
+          hasFloatingPlaceholder: hasFloatingPlaceholder ?? theme.hasFloatingPlaceholder,
+          isDense: isDense ?? theme.isDense,
+          contentPadding: contentPadding ?? theme.contentPadding,
+          prefixStyle: prefixStyle ?? theme.prefixStyle,
+          suffixStyle: suffixStyle ?? theme.suffixStyle,
+          counterStyle: counterStyle ?? theme.counterStyle,
+          filled: filled ?? theme.filled,
+          fillColor: fillColor ?? theme.fillColor,
+          errorBorder: errorBorder ?? theme.errorBorder,
+          focusedBorder: focusedBorder ?? theme.focusedBorder,
+          focusedErrorBorder: focusedErrorBorder ?? theme.focusedErrorBorder,
+          disabledBorder: disabledBorder ?? theme.disabledBorder,
+          enabledBorder: enabledBorder ?? theme.enabledBorder,
+          border: border ?? theme.border,
+        );
+      }
+
+      public override bool operator ==(dynamic other) {
+        if (identical(this, other))
+          return true;
+        if (other.runtimeType != runtimeType)
+          return false;
+        final InputDecoration typedOther = other;
+        return typedOther.icon == icon
+            && typedOther.labelText == labelText
+            && typedOther.labelStyle == labelStyle
+            && typedOther.helperText == helperText
+            && typedOther.helperStyle == helperStyle
+            && typedOther.hintText == hintText
+            && typedOther.hintStyle == hintStyle
+            && typedOther.errorText == errorText
+            && typedOther.errorStyle == errorStyle
+            && typedOther.errorMaxLines == errorMaxLines
+            && typedOther.hasFloatingPlaceholder == hasFloatingPlaceholder
+            && typedOther.isDense == isDense
+            && typedOther.contentPadding == contentPadding
+            && typedOther.isCollapsed == isCollapsed
+            && typedOther.prefixIcon == prefixIcon
+            && typedOther.prefix == prefix
+            && typedOther.prefixText == prefixText
+            && typedOther.prefixStyle == prefixStyle
+            && typedOther.suffixIcon == suffixIcon
+            && typedOther.suffix == suffix
+            && typedOther.suffixText == suffixText
+            && typedOther.suffixStyle == suffixStyle
+            && typedOther.counterText == counterText
+            && typedOther.counterStyle == counterStyle
+            && typedOther.filled == filled
+            && typedOther.fillColor == fillColor
+            && typedOther.errorBorder == errorBorder
+            && typedOther.focusedBorder == focusedBorder
+            && typedOther.focusedErrorBorder == focusedErrorBorder
+            && typedOther.disabledBorder == disabledBorder
+            && typedOther.enabledBorder == enabledBorder
+            && typedOther.border == border
+            && typedOther.enabled == enabled
+            && typedOther.semanticCounterText == semanticCounterText;
+      }
+
+      public override int get hashCode {
+        // Split into multiple hashValues calls
+        // because the hashValues function is limited to 20 parameters.
+        return hashValues(
+          icon,
+          labelText,
+          labelStyle,
+          helperText,
+          helperStyle,
+          hintText,
+          hintStyle,
+          errorText,
+          errorStyle,
+          errorMaxLines,
+          hasFloatingPlaceholder,
+          isDense,
+          hashValues(
+            contentPadding,
+            isCollapsed,
+            filled,
+            fillColor,
+            border,
+            enabled,
+            prefixIcon,
+            prefix,
+            prefixText,
+            prefixStyle,
+            suffixIcon,
+            suffix,
+            suffixText,
+          ),
+          hashValues(
+            suffixStyle,
+            counterText,
+            counterStyle,
+            filled,
+            fillColor,
+            errorBorder,
+            focusedBorder,
+            focusedErrorBorder,
+            disabledBorder,
+            enabledBorder,
+            border,
+            enabled,
+            semanticCounterText,
+          ),
+        );
+      }
+
+      public override string tostring() {
+        final List<string> description = <string>[];
+        if (icon != null)
+          description.add("icon: $icon");
+        if (labelText != null)
+          description.add("labelText: "$labelText"");
+        if (helperText != null)
+          description.add("helperText: "$helperText"");
+        if (hintText != null)
+          description.add("hintText: "$hintText"");
+        if (errorText != null)
+          description.add("errorText: "$errorText"");
+        if (errorStyle != null)
+          description.add("errorStyle: "$errorStyle"");
+        if (errorMaxLines != null)
+          description.add("errorMaxLines: "$errorMaxLines"");
+        if (hasFloatingPlaceholder == false)
+          description.add("hasFloatingPlaceholder: false");
+        if (isDense ?? false)
+          description.add("isDense: $isDense");
+        if (contentPadding != null)
+          description.add("contentPadding: $contentPadding");
+        if (isCollapsed)
+          description.add("isCollapsed: $isCollapsed");
+        if (prefixIcon != null)
+          description.add("prefixIcon: $prefixIcon");
+        if (prefix != null)
+          description.add("prefix: $prefix");
+        if (prefixText != null)
+          description.add("prefixText: $prefixText");
+        if (prefixStyle != null)
+          description.add("prefixStyle: $prefixStyle");
+        if (suffixIcon != null)
+          description.add("suffixIcon: $suffixIcon");
+        if (suffix != null)
+          description.add("suffix: $suffix");
+        if (suffixText != null)
+          description.add("suffixText: $suffixText");
+        if (suffixStyle != null)
+          description.add("suffixStyle: $suffixStyle");
+        if (counterText != null)
+          description.add("counterText: $counterText");
+        if (counterStyle != null)
+          description.add("counterStyle: $counterStyle");
+        if (filled == true) // filled == null same as filled == false
+          description.add("filled: true");
+        if (fillColor != null)
+          description.add("fillColor: $fillColor");
+        if (errorBorder != null)
+          description.add("errorBorder: $errorBorder");
+        if (focusedBorder != null)
+          description.add("focusedBorder: $focusedBorder");
+        if (focusedErrorBorder != null)
+          description.add("focusedErrorBorder: $focusedErrorBorder");
+        if (disabledBorder != null)
+          description.add("disabledBorder: $disabledBorder");
+        if (enabledBorder != null)
+          description.add("enabledBorder: $enabledBorder");
+        if (border != null)
+          description.add("border: $border");
+        if (!enabled)
+          description.add("enabled: false");
+        if (semanticCounterText != null)
+          description.add("semanticCounterText: $semanticCounterText");
+        return "InputDecoration(${description.join(", ")})";
+      }
+    }
+
+    @immutable
+    class InputDecorationTheme : Diagnosticable {
+      const InputDecorationTheme({
+        this.labelStyle,
+        this.helperStyle,
+        this.hintStyle,
+        this.errorStyle,
+        this.errorMaxLines,
+        this.hasFloatingPlaceholder = true,
+        this.isDense = false,
+        this.contentPadding,
+        this.isCollapsed = false,
+        this.prefixStyle,
+        this.suffixStyle,
+        this.counterStyle,
+        this.filled = false,
+        this.fillColor,
+        this.errorBorder,
+        this.focusedBorder,
+        this.focusedErrorBorder,
+        this.disabledBorder,
+        this.enabledBorder,
+        this.border,
+      }) : D.assert(isDense != null),
+           D.assert(isCollapsed != null),
+          D.assert(filled != null);
+
+      final TextStyle labelStyle;
+
+      final TextStyle helperStyle;
+
+      final TextStyle hintStyle;
+
+      final TextStyle errorStyle;
+
+      final int errorMaxLines;
+
+      final bool hasFloatingPlaceholder;
+
+      final bool isDense;
+
+      final EdgeInsetsGeometry contentPadding;
+
+      final bool isCollapsed;
+
+      final TextStyle prefixStyle;
+
+      final TextStyle suffixStyle;
+
+      final TextStyle counterStyle;
+
+      final bool filled;
+
+      final Color fillColor;
+
+      final InputBorder errorBorder;
+
+      final InputBorder focusedBorder;
+
+      final InputBorder focusedErrorBorder;
+
+      final InputBorder disabledBorder;
+
+      final InputBorder enabledBorder;
+
+      final InputBorder border;
+
+      public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+        base.debugFillProperties(properties);
+        const InputDecorationTheme defaultTheme = InputDecorationTheme();
+        properties.add(DiagnosticsProperty<TextStyle>("labelStyle", labelStyle, defaultValue: defaultTheme.labelStyle));
+        properties.add(DiagnosticsProperty<TextStyle>("helperStyle", helperStyle, defaultValue: defaultTheme.helperStyle));
+        properties.add(DiagnosticsProperty<TextStyle>("hintStyle", hintStyle, defaultValue: defaultTheme.hintStyle));
+        properties.add(DiagnosticsProperty<TextStyle>("errorStyle", errorStyle, defaultValue: defaultTheme.errorStyle));
+        properties.add(DiagnosticsProperty<int>("errorMaxLines", errorMaxLines, defaultValue: defaultTheme.errorMaxLines));
+        properties.add(DiagnosticsProperty<bool>("hasFloatingPlaceholder", hasFloatingPlaceholder, defaultValue: defaultTheme.hasFloatingPlaceholder));
+        properties.add(DiagnosticsProperty<bool>("isDense", isDense, defaultValue: defaultTheme.isDense));
+        properties.add(DiagnosticsProperty<EdgeInsetsGeometry>("contentPadding", contentPadding, defaultValue: defaultTheme.contentPadding));
+        properties.add(DiagnosticsProperty<bool>("isCollapsed", isCollapsed, defaultValue: defaultTheme.isCollapsed));
+        properties.add(DiagnosticsProperty<TextStyle>("prefixStyle", prefixStyle, defaultValue: defaultTheme.prefixStyle));
+        properties.add(DiagnosticsProperty<TextStyle>("suffixStyle", suffixStyle, defaultValue: defaultTheme.suffixStyle));
+        properties.add(DiagnosticsProperty<TextStyle>("counterStyle", counterStyle, defaultValue: defaultTheme.counterStyle));
+        properties.add(DiagnosticsProperty<bool>("filled", filled, defaultValue: defaultTheme.filled));
+        properties.add(DiagnosticsProperty<Color>("fillColor", fillColor, defaultValue: defaultTheme.fillColor));
+        properties.add(DiagnosticsProperty<InputBorder>("errorBorder", errorBorder, defaultValue: defaultTheme.errorBorder));
+        properties.add(DiagnosticsProperty<InputBorder>("focusedBorder", focusedBorder, defaultValue: defaultTheme.focusedErrorBorder));
+        properties.add(DiagnosticsProperty<InputBorder>("focusedErrorborder", focusedErrorBorder, defaultValue: defaultTheme.focusedErrorBorder));
+        properties.add(DiagnosticsProperty<InputBorder>("disabledBorder", disabledBorder, defaultValue: defaultTheme.disabledBorder));
+        properties.add(DiagnosticsProperty<InputBorder>("enabledBorder", enabledBorder, defaultValue: defaultTheme.enabledBorder));
+        properties.add(DiagnosticsProperty<InputBorder>("border", border, defaultValue: defaultTheme.border));
+      }
+    }
+
+}
