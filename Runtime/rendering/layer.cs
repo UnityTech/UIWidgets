@@ -748,6 +748,32 @@ namespace Unity.UIWidgets.rendering {
             properties.add(new DiagnosticsProperty<Offset>("offset", this.offset));
         }
     }
+    
+    public class BackdropFilterLayer : ContainerLayer {
+        public BackdropFilterLayer(ImageFilter filter = null) {
+            D.assert(filter != null);
+            this._filter = filter;
+        }
+
+        ImageFilter _filter;
+
+        public ImageFilter filter {
+            get { return this._filter; }
+            set {
+                if (value != this._filter) {
+                    this._filter = value;
+                    this.markNeedsAddToScene();
+                }
+            }
+        }
+
+        internal override flow.Layer addToScene(SceneBuilder builder, Offset layerOffset = null) {
+            builder.pushBackdropFilter(this.filter);
+            this.addChildrenToScene(builder, layerOffset);
+            builder.pop();
+            return null;
+        }
+    }
 
     public class LayerLink {
         public LeaderLayer leader {

@@ -32,6 +32,27 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
+    public class BackdropFilter : SingleChildRenderObjectWidget {
+        public BackdropFilter(
+            Key key = null,
+            ImageFilter filter = null,
+            Widget child = null)
+            : base(key, child) {
+            D.assert(filter != null);
+            this.filter = filter;
+        }
+
+        public readonly ImageFilter filter;
+
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderBackdropFilter(filter: this.filter);
+        }
+
+        public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
+            ((RenderBackdropFilter) renderObject).filter = this.filter;
+        }
+    }
+
     public class Opacity : SingleChildRenderObjectWidget {
         public Opacity(float opacity, Key key = null, Widget child = null) : base(key, child) {
             this.opacity = opacity;
