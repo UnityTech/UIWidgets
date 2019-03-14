@@ -13,7 +13,7 @@ namespace UIWidgetsGallery.gallery {
     
         Dictionary<string, string> _exampleCode;
     
-        IPromise<string> getExampleCode(string tag, AssetBundle bundle) {
+        public IPromise<string> getExampleCode(string tag, AssetBundle bundle) {
             if (this._exampleCode == null)
                 this._parseExampleCode(bundle);
             return Promise<string>.Resolved(this._exampleCode[tag]);

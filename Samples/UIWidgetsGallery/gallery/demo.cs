@@ -164,7 +164,7 @@ namespace UIWidgetsGallery.gallery {
         string _exampleCode;
 
         public override void didChangeDependencies() {
-            ExampleCodeParser.getExampleCode(this.widget.exampleCodeTag, DefaultAssetBundle.of(this.context)).then(
+            ExampleCodeParser.getExampleCode(this.widget.exampleCodeTag, DefaultAssetBundle.of(this.context)).Then(
                 (string code) => {
                     if (this.mounted) {
                         this.setState(() => { this._exampleCode = code ?? "Example code not found"; });
@@ -192,7 +192,7 @@ namespace UIWidgetsGallery.gallery {
                             text: new TextSpan(
                                 style: new TextStyle(fontFamily: "monospace", fontSize: 10.0f),
                                 children: new List<TextSpan> {
-                                    DartSyntaxHighlighter(style).format(this._exampleCode)
+                                    new DartSyntaxHighlighter(style).format(this._exampleCode)
                                 }
                             )
                         )
