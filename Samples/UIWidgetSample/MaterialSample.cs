@@ -79,7 +79,7 @@ namespace UIWidgetsSample {
                 appBar: new AppBar(
                     title: new Center(
                         child: new Text("AppBar Bottom Widget")
-                        ),
+                    ),
                     leading: new IconButton(
                         tooltip: "Previous choice",
                         icon: new Icon(Unity.UIWidgets.material.Icons.arrow_back),

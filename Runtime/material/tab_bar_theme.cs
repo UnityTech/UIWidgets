@@ -29,7 +29,8 @@ namespace Unity.UIWidgets.material {
             Decoration indicator = null,
             TabBarIndicatorSize? indicatorSize = null,
             Color labelColor = null,
-            Color unselectedLabelColor = null) {
+            Color unselectedLabelColor = null
+        ) {
             return new TabBarTheme(
                 indicator: indicator ?? this.indicator,
                 indicatorSize: indicatorSize ?? this.indicatorSize,
@@ -54,7 +55,7 @@ namespace Unity.UIWidgets.material {
 
         public override int GetHashCode() {
             unchecked {
-                var hashCode = (this.indicator != null ? this.indicator.GetHashCode() : 0);
+                var hashCode = this.indicator != null ? this.indicator.GetHashCode() : 0;
                 hashCode = (hashCode * 397) ^ (this.indicatorSize != null ? this.indicatorSize.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (this.labelColor != null ? this.labelColor.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^

@@ -8,18 +8,20 @@ namespace Unity.UIWidgets.material {
     public class TabController : ChangeNotifier {
         public TabController(
             int initialIndex = 0,
-            int length = 0,
+            int? length = null,
             TickerProvider vsync = null) {
-            D.assert(length >= 0);
+            D.assert(length != null && length >= 0);
             D.assert(initialIndex >= 0 && (length == 0 || initialIndex < length));
+            D.assert(vsync != null);
+            this.length = length.Value;
+
             this._index = initialIndex;
             this._previousIndex = initialIndex;
-            this.length = length;
             this._animationController = length < 2
                 ? null
                 : new AnimationController(
                     value: initialIndex,
-                    upperBound: (length - 1),
+                    upperBound: length.Value - 1,
                     vsync: vsync);
         }
 
@@ -27,7 +29,7 @@ namespace Unity.UIWidgets.material {
             get { return this._animationController?.view ?? Animations.kAlwaysCompleteAnimation; }
         }
 
-        AnimationController _animationController;
+        readonly AnimationController _animationController;
 
         public readonly int length;
 
@@ -35,6 +37,7 @@ namespace Unity.UIWidgets.material {
             D.assert(value >= 0 && (value < this.length || this.length == 0));
             D.assert(duration == null ? curve == null : true);
             D.assert(this._indexIsChangingCount >= 0);
+
             if (value == this._index || this.length < 2) {
                 return;
             }
@@ -115,11 +118,13 @@ namespace Unity.UIWidgets.material {
         }
 
         public readonly TabController controller;
+
         public readonly bool? enabled;
 
         public override bool updateShouldNotify(InheritedWidget old) {
             _TabControllerScope _old = (_TabControllerScope) old;
-            return this.enabled != _old.enabled || this.controller != _old.controller;
+            return this.enabled != _old.enabled
+                   || this.controller != _old.controller;
         }
     }
 
@@ -161,7 +166,7 @@ namespace Unity.UIWidgets.material {
             base.initState();
             this._controller = new TabController(
                 vsync: this,
-                length: this.widget.length.Value,
+                length: this.widget.length,
                 initialIndex: this.widget.initialIndex
             );
         }

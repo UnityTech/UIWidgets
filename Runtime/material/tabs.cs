@@ -25,7 +25,7 @@ namespace Unity.UIWidgets.material {
             return (controllerValue - currentIndex).abs() / (currentIndex - previousIndex).abs();
         }
 
-        public static PageScrollPhysics _kTabBarViewPhysics =
+        public static readonly PageScrollPhysics _kTabBarViewPhysics =
             (PageScrollPhysics) new PageScrollPhysics().applyTo(new ClampingScrollPhysics());
     }
 
@@ -142,7 +142,8 @@ namespace Unity.UIWidgets.material {
             TabBarTheme tabBarTheme = TabBarTheme.of(context);
 
             TextStyle defaultStyle = this.labelStyle ?? themeData.primaryTextTheme.body2;
-            TextStyle defaultUnselectedStyle = this.unselectedLabelStyle ?? themeData.primaryTextTheme.body2;
+            TextStyle defaultUnselectedStyle =
+                this.unselectedLabelStyle ?? this.labelStyle ?? themeData.primaryTextTheme.body2;
             Animation<float> animation = (Animation<float>) this.listenable;
             TextStyle textStyle = this.selected
                 ? TextStyle.lerp(defaultStyle, defaultUnselectedStyle, animation.value)
@@ -192,6 +193,7 @@ namespace Unity.UIWidgets.material {
             D.assert(mainAxisAlignment != null);
             D.assert(crossAxisAlignment != null);
             D.assert(verticalDirection != null);
+
             D.assert(onPerformLayout != null);
             this.onPerformLayout = onPerformLayout;
         }
@@ -282,11 +284,8 @@ namespace Unity.UIWidgets.material {
         public readonly List<GlobalKey> tabKeys;
 
         List<float> _currentTabOffsets;
-
         Rect _currentRect;
-
         BoxPainter _painter;
-
         bool _needsPaint = false;
 
         void markNeedsPaint() {
@@ -424,6 +423,7 @@ namespace Unity.UIWidgets.material {
         }
 
         public readonly TabController controller;
+
         public readonly int index;
 
         public override Animation<float> parent {
@@ -495,7 +495,7 @@ namespace Unity.UIWidgets.material {
         ) : base(key: key) {
             indicatorPadding = indicatorPadding ?? EdgeInsets.zero;
             D.assert(tabs != null);
-            D.assert(indicator != null || (indicatorWeight > 0.0f));
+            D.assert(indicator != null || indicatorWeight > 0.0f);
             D.assert(indicator != null || indicatorPadding != null);
             this.tabs = tabs;
             this.controller = controller;
@@ -565,7 +565,6 @@ namespace Unity.UIWidgets.material {
         TabController _controller;
         _IndicatorPainter _indicatorPainter;
         int _currentIndex;
-        float _tabStripWidth;
         List<GlobalKey> _tabKeys;
 
 
@@ -707,7 +706,7 @@ namespace Unity.UIWidgets.material {
                 position.maxScrollExtent);
         }
 
-        public float _initialScrollOffset(float viewportWidth, float minExtent, float maxExtent) {
+        float _initialScrollOffset(float viewportWidth, float minExtent, float maxExtent) {
             return this._tabScrollOffset(this._currentIndex, viewportWidth, minExtent, maxExtent);
         }
 
@@ -772,7 +771,6 @@ namespace Unity.UIWidgets.material {
         }
 
         void _saveTabOffsets(List<float> tabOffsets, float width) {
-            this._tabStripWidth = width;
             this._indicatorPainter?.saveTabOffsets(tabOffsets);
         }
 
@@ -795,7 +793,6 @@ namespace Unity.UIWidgets.material {
 
         public override Widget build(BuildContext context) {
             D.assert(MaterialD.debugCheckHasMaterialLocalizations(context));
-            MaterialLocalizations localizations = MaterialLocalizations.of(context);
 
             if (this._controller.length == 0) {
                 return new Container(
@@ -811,7 +808,9 @@ namespace Unity.UIWidgets.material {
                             padding: this.widget.labelPadding ?? Constants.kTabLabelPadding,
                             child: new KeyedSubtree(
                                 key: this._tabKeys[i],
-                                child: this.widget.tabs[i]))
+                                child: this.widget.tabs[i]
+                            )
+                        )
                     )
                 );
             }
@@ -874,7 +873,8 @@ namespace Unity.UIWidgets.material {
                     unselectedLabelStyle: this.widget.unselectedLabelStyle,
                     child: new _TabLabelBar(
                         onPerformLayout: this._saveTabOffsets,
-                        children: wrappedTabs)
+                        children: wrappedTabs
+                    )
                 )
             );
 
@@ -930,7 +930,7 @@ namespace Unity.UIWidgets.material {
                         "No TabController for " + this.widget.GetType() + "\n" +
                         "When creating a " + this.widget.GetType() + ", you must either provide an explicit " +
                         "TabController using the \"controller\" property, or you must ensure that there " +
-                        "is a DefaultTabController above the  " + this.widget.GetType() + ".\n" +
+                        "is a DefaultTabController above the " + this.widget.GetType() + ".\n" +
                         "In this case, there was neither an explicit controller nor a default controller."
                     );
                 }
@@ -965,8 +965,8 @@ namespace Unity.UIWidgets.material {
         }
 
         public override void didUpdateWidget(StatefulWidget oldWidget) {
-            TabBarView _oldWidget = (TabBarView) oldWidget;
             base.didUpdateWidget(oldWidget);
+            TabBarView _oldWidget = (TabBarView) oldWidget;
             if (this.widget.controller != _oldWidget.controller) {
                 this._updateTabController();
             }
@@ -1221,7 +1221,8 @@ namespace Unity.UIWidgets.material {
                             tabIndex,
                             tabController,
                             selectedColorTween,
-                            previousColorTween));
+                            previousColorTween)
+                        );
                     }
 
                     return new Row(
