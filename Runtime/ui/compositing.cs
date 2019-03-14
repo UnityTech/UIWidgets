@@ -75,6 +75,14 @@ namespace Unity.UIWidgets.ui {
             return layer;
         }
 
+        public Layer pushBackdropFilter(ImageFilter filter) {
+            var layer = new BackdropFilterLayer();
+            layer.filter = filter;
+            this._pushLayer(layer);
+            return layer;
+        }
+
+        
         public void addRetained(Layer layer) {
             if (this._currentLayer == null) {
                 return;
