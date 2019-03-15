@@ -137,9 +137,9 @@ namespace Unity.UIWidgets.widgets {
 
     public delegate void FormFieldSetter<T>(T newValue);
 
-    public delegate Widget FormFieldBuilder<T>(FormFieldState<T> field) where T : Diagnosticable;
+    public delegate Widget FormFieldBuilder<T>(FormFieldState<T> field) where T : class;
 
-    public class FormField<T> : StatefulWidget where T : Diagnosticable {
+    public class FormField<T> : StatefulWidget where T : class {
         public FormField(
             Key key = null,
             FormFieldBuilder<T> builder = null,
@@ -169,7 +169,7 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
-    public class FormFieldState<T> : State<FormField<T>> where T : Diagnosticable {
+    public class FormFieldState<T> : State<FormField<T>> where T : class {
         T _value;
         string _errorText;
 

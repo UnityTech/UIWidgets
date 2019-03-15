@@ -41,17 +41,21 @@ namespace Unity.UIWidgets.material {
                 borderRadius: BorderRadius.circular(2.0f),
                 boxShadow: ShadowConstants.kElevationToShadow[elevation ?? 0]
             ).createBoxPainter();
+            this.color = color;
+            this.elevation = elevation;
+            this.selectedIndex = selectedIndex;
+            this.resize = resize;
         }
 
         public readonly Color color;
-        public readonly int elevation;
-        public readonly int selectedIndex;
+        public readonly int? elevation;
+        public readonly int? selectedIndex;
         public readonly Animation<float> resize;
 
         public readonly BoxPainter _painter;
 
         public override void paint(Canvas canvas, Size size) {
-            float selectedItemOffset = this.selectedIndex * DropdownConstants._kMenuItemHeight +
+            float selectedItemOffset = this.selectedIndex ?? 0 * DropdownConstants._kMenuItemHeight +
                                        Constants.kMaterialListPadding.top;
             FloatTween top = new FloatTween(
                 begin: selectedItemOffset.clamp(0.0f, size.height - DropdownConstants._kMenuItemHeight),
@@ -91,7 +95,7 @@ namespace Unity.UIWidgets.material {
         }
     }
 
-    class _DropdownMenu<T> : StatefulWidget where T : Diagnosticable {
+    class _DropdownMenu<T> : StatefulWidget where T : class {
         public _DropdownMenu(
             Key key = null,
             EdgeInsets padding = null,
@@ -109,7 +113,7 @@ namespace Unity.UIWidgets.material {
         }
     }
 
-    class _DropdownMenuState<T> : State<_DropdownMenu<T>> where T : Diagnosticable {
+    class _DropdownMenuState<T> : State<_DropdownMenu<T>> where T : class {
         CurvedAnimation _fadeOpacity;
         CurvedAnimation _resize;
 
@@ -135,14 +139,6 @@ namespace Unity.UIWidgets.material {
         }
 
         public override Widget build(BuildContext context) {
-            // The menu is shown in three stages (unit timing in brackets):
-            // [0s - 0.25s] - Fade in a rect-sized menu container with the selected item.
-            // [0.25s - 0.5s] - Grow the otherwise empty menu container from the center
-            //   until it's big enough for as many items as we're going to show.
-            // [0.5s - 1.0fs] Fade in the remaining visible items from top to bottom.
-            //
-            // When the menu is dismissed we just fade the entire thing out
-            // in the first 0.25s.
             D.assert(MaterialD.debugCheckHasMaterialLocalizations(context));
             MaterialLocalizations localizations = MaterialLocalizations.of(context);
             _DropdownRoute<T> route = this.widget.route;
@@ -159,6 +155,7 @@ namespace Unity.UIWidgets.material {
                     opacity = new CurvedAnimation(parent: route.animation, curve: new Interval(start, end));
                 }
 
+                var index = itemIndex;
                 children.Add(new FadeTransition(
                     opacity: opacity,
                     child: new InkWell(
@@ -168,7 +165,7 @@ namespace Unity.UIWidgets.material {
                         ),
                         onTap: () => Navigator.pop(
                             context,
-                            new _DropdownRouteResult<T>(route.items[itemIndex].value)
+                            new _DropdownRouteResult<T>(route.items[index].value)
                         )
                     )
                 ));
@@ -211,6 +208,10 @@ namespace Unity.UIWidgets.material {
             float menuHeight,
             TextDirection textDirection
         ) {
+            this.buttonRect = buttonRect;
+            this.menuTop = menuTop;
+            this.menuHeight = menuHeight;
+            this.textDirection = textDirection;
         }
 
         public readonly Rect buttonRect;
@@ -242,7 +243,6 @@ namespace Unity.UIWidgets.material {
 
                 return true;
             });
-            D.assert(this.textDirection != null);
             float left;
             switch (this.textDirection) {
                 case TextDirection.rtl:
@@ -267,24 +267,19 @@ namespace Unity.UIWidgets.material {
         }
     }
 
-    class _DropdownRouteResult<T> {
+    class _DropdownRouteResult<T> where T: class {
         public _DropdownRouteResult(T result) {
             this.result = result;
         }
 
         public readonly T result;
 
-        public static bool operator ==(_DropdownRouteResult<T> left, dynamic right) {
-            if (!(right is _DropdownRouteResult<T>)) {
-                return false;
-            }
-
-            _DropdownRouteResult<T> typedOther = right as _DropdownRouteResult<T>;
-            return left.result.Equals(typedOther.result);
+        public static bool operator ==(_DropdownRouteResult<T> left, _DropdownRouteResult<T> right) {
+            return left.result == right.result;
         }
 
-        public static bool operator !=(_DropdownRouteResult<T> left, dynamic right) {
-            return !(left == right);
+        public static bool operator !=(_DropdownRouteResult<T> left, _DropdownRouteResult<T> right) {
+            return left.result != right.result;
         }
 
         public override int GetHashCode() {
@@ -292,7 +287,7 @@ namespace Unity.UIWidgets.material {
         }
     }
 
-    class _DropdownRoute<T> : PopupRoute where T : Diagnosticable {
+    class _DropdownRoute<T> : PopupRoute where T : class {
         public _DropdownRoute(
             List<DropdownMenuItem<T>> items = null,
             EdgeInsets padding = null,
@@ -373,7 +368,7 @@ namespace Unity.UIWidgets.material {
 
             if (this.scrollController == null) {
                 float scrollOffset = preferredMenuHeight > maxMenuHeight
-                    ? Mathf.Max(0.0f, selectedItemOffset - (buttonTop - menuTop) ?? 0.0f)
+                    ? Mathf.Max(0.0f, selectedItemOffset ?? 0.0f - (buttonTop - (menuTop ?? 0.0f)))
                     : 0.0f;
                 this.scrollController = new ScrollController(initialScrollOffset: scrollOffset);
             }
@@ -415,10 +410,7 @@ namespace Unity.UIWidgets.material {
         }
     }
 
-    public class DropdownMenuItem<T> : StatelessWidget where T : Diagnosticable {
-        /// Creates an item for a dropdown menu.
-        ///
-        /// The [child] argument is required.
+    public class DropdownMenuItem<T> : StatelessWidget where T : class {
         public DropdownMenuItem(
             Key key = null,
             T value = null,
@@ -443,8 +435,6 @@ namespace Unity.UIWidgets.material {
     }
 
     public class DropdownButtonHideUnderline : InheritedWidget {
-        /// Creates a [DropdownButtonHideUnderline]. A non-null [child] must
-        /// be given.
         public DropdownButtonHideUnderline(
             Key key = null,
             Widget child = null
@@ -461,7 +451,7 @@ namespace Unity.UIWidgets.material {
         }
     }
 
-    public class DropdownButton<T> : StatefulWidget where T : Diagnosticable {
+    public class DropdownButton<T> : StatefulWidget where T : class {
         public DropdownButton(
             Key key = null,
             List<DropdownMenuItem<T>> items = null,
@@ -479,6 +469,16 @@ namespace Unity.UIWidgets.material {
             D.assert(items == null || value == null ||
                      items.Where<DropdownMenuItem<T>>((DropdownMenuItem<T> item) => item.value.Equals(value)).ToList()
                          .Count == 1);
+            this.items = items;
+            this.value = value;
+            this.hint = hint;
+            this.disabledHint = disabledHint;
+            this.onChanged = onChanged;
+            this.elevation = elevation;
+            this.style = style;
+            this.iconSize = iconSize;
+            this.isDense = isDense;
+            this.isExpanded = isExpanded;
         }
 
         public readonly List<DropdownMenuItem<T>> items;
@@ -506,7 +506,7 @@ namespace Unity.UIWidgets.material {
         }
     }
 
-    class _DropdownButtonState<T> : State<DropdownButton<T>>, WidgetsBindingObserver where T : Diagnosticable {
+    class _DropdownButtonState<T> : State<DropdownButton<T>>, WidgetsBindingObserver where T : class {
         int? _selectedIndex;
         _DropdownRoute<T> _dropdownRoute;
 
@@ -595,14 +595,12 @@ namespace Unity.UIWidgets.material {
                 _DropdownRouteResult<T> value = newValue as _DropdownRouteResult<T>;
                 this._dropdownRoute = null;
                 if (!this.mounted || newValue == null) {
-                    return null;
+                    return;
                 }
 
                 if (this.widget.onChanged != null) {
                     this.widget.onChanged(value.result);
                 }
-
-                return null;
             });
         }
 
@@ -642,8 +640,6 @@ namespace Unity.UIWidgets.material {
             D.assert(MaterialD.debugCheckHasMaterial(context));
             D.assert(MaterialD.debugCheckHasMaterialLocalizations(context));
 
-            // The width of the button and the menu are defined by the widest
-            // item and the width of the hint.
             List<Widget> items = this._enabled ? new List<Widget>(this.widget.items) : new List<Widget>();
             int hintIndex = 0;
             if (this.widget.hint != null || (!this._enabled && this.widget.disabledHint != null)) {
@@ -718,7 +714,7 @@ namespace Unity.UIWidgets.material {
         }
     }
 
-    public class DropdownButtonFormField<T> : FormField<T> where T : Diagnosticable {
+    public class DropdownButtonFormField<T> : FormField<T> where T : class {
         public DropdownButtonFormField(
             Key key = null,
             T value = null,
@@ -754,15 +750,14 @@ namespace Unity.UIWidgets.material {
             this.onChanged = onChanged;
         }
 
-        /// Called when the user selects an item.
         public readonly ValueChanged<T> onChanged;
 
-        public State createState() {
+        public override State createState() {
             return new _DropdownButtonFormFieldState<T>();
         }
     }
 
-    class _DropdownButtonFormFieldState<T> : FormFieldState<T> where T : Diagnosticable {
+    class _DropdownButtonFormFieldState<T> : FormFieldState<T> where T : class {
         public DropdownButtonFormField<T> widget {
             get { return base.widget as DropdownButtonFormField<T>; }
         }

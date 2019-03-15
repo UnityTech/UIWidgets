@@ -77,13 +77,19 @@ namespace Unity.UIWidgets.material {
             TextDirection? textDirection = null,
             Color fillColor = null
         ) : base(repaint: repaint) {
+            this.borderAnimation = borderAnimation;
+            this.border = border;
+            this.gapAnimation = gapAnimation;
+            this.gap = gap;
+            this.textDirection = textDirection;
+            this.fillColor = fillColor;
         }
 
         Animation<float> borderAnimation;
         _InputBorderTween border;
         Animation<float> gapAnimation;
         _InputBorderGap gap;
-        TextDirection textDirection;
+        TextDirection? textDirection;
         Color fillColor;
 
         public override void paint(Canvas canvas, Size size) {
@@ -469,9 +475,6 @@ namespace Unity.UIWidgets.material {
             Widget container = null
         ) {
             D.assert(contentPadding != null);
-            D.assert(isCollapsed != null);
-            D.assert(floatingLabelHeight != null);
-            D.assert(floatingLabelProgress != null);
             this.contentPadding = contentPadding;
             this.isCollapsed = isCollapsed;
             this.floatingLabelHeight = floatingLabelHeight;
@@ -793,7 +796,6 @@ namespace Unity.UIWidgets.material {
         public bool isFocused {
             get { return this._isFocused; }
             set {
-                D.assert(value != null);
                 if (this._isFocused == value) {
                     return;
                 }
@@ -890,7 +892,7 @@ namespace Unity.UIWidgets.material {
 
                 box.layout(boxConstraints, parentUsesSize: true);
                 float baseline = box.getDistanceToBaseline(this.textBaseline ?? 0.0f) ?? 0.0f;
-                D.assert(baseline != null && baseline >= 0.0f);
+                D.assert(baseline >= 0.0f);
                 boxToBaseline[box] = baseline;
                 aboveBaseline = Math.Max(baseline, aboveBaseline);
                 belowBaseline = Math.Max(box.size.height - baseline, belowBaseline);
@@ -1440,10 +1442,10 @@ namespace Unity.UIWidgets.material {
             }
         }
 
-        protected override void insertChildRenderObject(RenderObject child, dynamic slotValue) {
+        protected override void insertChildRenderObject(RenderObject child, object slotValue) {
             D.assert(child is RenderBox);
             D.assert(slotValue is _DecorationSlot);
-            _DecorationSlot slot = slotValue;
+            _DecorationSlot slot = (_DecorationSlot) slotValue;
             this._updateRenderObject(child, slot);
             D.assert(this.renderObject.childToSlot.ContainsKey((RenderBox) child));
             D.assert(this.renderObject.slotToChild.ContainsKey(slot));
@@ -1457,7 +1459,7 @@ namespace Unity.UIWidgets.material {
             D.assert(!this.renderObject.slotToChild.ContainsKey((_DecorationSlot) this.slot));
         }
 
-        protected override void moveChildRenderObject(RenderObject child, dynamic slotValue) {
+        protected override void moveChildRenderObject(RenderObject child, object slotValue) {
             D.assert(false, "not reachable");
         }
     }
@@ -1547,8 +1549,6 @@ namespace Unity.UIWidgets.material {
             bool isEmpty = false,
             Widget child = null
         ) : base(key: key) {
-            D.assert(isFocused != null);
-            D.assert(isEmpty != null);
         }
 
         public readonly InputDecoration decoration;

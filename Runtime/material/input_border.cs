@@ -335,14 +335,13 @@ namespace Unity.UIWidgets.material {
             float gapPercentage = 0.0f,
             TextDirection? textDirection = null
         ) {
-            D.assert(gapExtent != null);
             D.assert(gapPercentage >= 0.0f && gapPercentage <= 1.0f);
             D.assert(_cornersAreCircular(this.borderRadius));
 
             Paint paint = this.borderSide.toPaint();
             RRect outer = this.borderRadius.toRRect(rect);
             RRect center = outer.deflate(this.borderSide.width / 2.0f);
-            if (gapStart == null || gapExtent <= 0.0f || gapPercentage == 0.0f) {
+            if (gapExtent <= 0.0f || gapPercentage == 0.0f) {
                 canvas.drawRRect(center, paint);
             }
             else {

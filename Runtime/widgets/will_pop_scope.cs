@@ -8,6 +8,8 @@ namespace Unity.UIWidgets.widgets {
             WillPopCallback onWillPop = null
         ) : base(key: key) {
             D.assert(child != null);
+            this.onWillPop = onWillPop;
+            this.child = child;
         }
 
         public readonly Widget child;
