@@ -6,6 +6,7 @@ using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
+using Unity.UIWidgets.service;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
 using UnityEngine;
@@ -1440,7 +1441,7 @@ namespace Unity.UIWidgets.material {
 
         public readonly Widget child;
 
-        bool _labelShouldWithdraw {
+        public bool _labelShouldWithdraw {
             get {
                 return !this.isEmpty || this.isFocused;
             }
@@ -1474,68 +1475,83 @@ namespace Unity.UIWidgets.material {
           vsync: this,
           value: (this.widget.decoration.hasFloatingPlaceholder && this.widget._labelShouldWithdraw) ? 1.0f : 0.0,
         );
-        _floatingLabelController.addListener(_handleChange);
+        this._floatingLabelController.addListener(this._handleChange);
 
-        _shakingLabelController = AnimationController(
+        this._shakingLabelController = new AnimationController(
           duration: InputDecoratorConstants._kTransitionDuration,
-          vsync: this,
+          vsync: this
         );
       }
 
       public override void didChangeDependencies() {
         base.didChangeDependencies();
-        _effectiveDecoration = null;
+        this._effectiveDecoration = null;
       }
 
       public override void dispose() {
-        _floatingLabelController.dispose();
-        _shakingLabelController.dispose();
+          this._floatingLabelController.dispose();
+          this._shakingLabelController.dispose();
         base.dispose();
       }
 
       void _handleChange() {
-        this.setState(() {
+        this.setState(() => {
           // The _floatingLabelController"s value has changed.
         });
       }
 
       InputDecoration _effectiveDecoration;
-      InputDecoration get decoration {
-        _effectiveDecoration ??= this.widget.decoration.applyDefaults(
-          Theme.of(context).inputDecorationTheme
-        );
-        return _effectiveDecoration;
+      public InputDecoration decoration {
+          get {
+              this._effectiveDecoration = this._effectiveDecoration ?? this.widget.decoration.applyDefaults(
+              Theme.of(this.context).inputDecorationTheme
+            );
+            return this._effectiveDecoration;
+          }
       }
 
-      TextAlign get textAlign => this.widget.textAlign;
-      bool get isFocused => this.widget.isFocused;
-      bool get isEmpty => this.widget.isEmpty;
+      TextAlign textAlign {
+          get {
+              return this.widget.textAlign;
+          }
+      }
 
-      public override void didUpdateWidget(InputDecorator old) {
-        base.didUpdateWidget(old);
-        if (this.widget.decoration != old.decoration)
-          _effectiveDecoration = null;
+      bool isFocused {
+          get {
+              return this.widget.isFocused;
+          }
+      }
+
+      bool isEmpty {
+          get {
+              return this.widget.isEmpty;
+          }
+      }
+
+      public override void didUpdateWidget(StatefulWidget _old) {
+        base.didUpdateWidget(_old);
+        InputDecorator old = _old as InputDecorator;
+        if (this.widget.decoration != old.decoration) this._effectiveDecoration = null;
 
         if (this.widget._labelShouldWithdraw != old._labelShouldWithdraw && this.widget.decoration.hasFloatingPlaceholder) {
           if (this.widget._labelShouldWithdraw) {
-            _floatingLabelController.forward();
+              this._floatingLabelController.forward();
           }
           else
-            _floatingLabelController.reverse();
+              this._floatingLabelController.reverse();
         }
 
-        final string errorText = decoration.errorText;
-        final string oldErrorText = old.decoration.errorText;
+        string errorText = this.decoration.errorText;
+        string oldErrorText = old.decoration.errorText;
 
-        if (_floatingLabelController.isCompleted && errorText != null && errorText != oldErrorText) {
-          _shakingLabelController
-            ..value = 0.0f
-            ..forward();
+        if (this._floatingLabelController.isCompleted && errorText != null && errorText != oldErrorText) {
+            this._shakingLabelController.setValue(0.0f);
+            this._shakingLabelController.forward();
         }
       }
 
       Color _getActiveColor(ThemeData themeData) {
-        if (isFocused) {
+        if (this.isFocused) {
           switch (themeData.brightness) {
             case Brightness.dark:
               return themeData.accentColor;
@@ -1547,29 +1563,29 @@ namespace Unity.UIWidgets.material {
       }
 
       Color _getFillColor(ThemeData themeData) {
-        if (decoration.filled != true) // filled == null same as filled == false
+        if (this.decoration.filled != true) // filled == null same as filled == false
           return Colors.transparent;
-        if (decoration.fillColor != null)
-          return decoration.fillColor;
+        if (this.decoration.fillColor != null)
+          return this.decoration.fillColor;
 
         // dark theme: 10% white (enabled), 5% white (disabled)
         // light theme: 4% black (enabled), 2% black (disabled)
-        const Color darkEnabled = Color(0x1AFFFFFF);
-        const Color darkDisabled = Color(0x0DFFFFFF);
-        const Color lightEnabled = Color(0x0A000000);
-        const Color lightDisabled = Color(0x05000000);
+        Color darkEnabled = new Color(0x1AFFFFFF);
+        Color darkDisabled = new Color(0x0DFFFFFF);
+        Color lightEnabled = new Color(0x0A000000);
+        Color lightDisabled = new Color(0x05000000);
 
         switch (themeData.brightness) {
           case Brightness.dark:
-            return decoration.enabled ? darkEnabled : darkDisabled;
+            return this.decoration.enabled ? darkEnabled : darkDisabled;
           case Brightness.light:
-            return decoration.enabled ? lightEnabled : lightDisabled;
+            return this.decoration.enabled ? lightEnabled : lightDisabled;
         }
         return lightEnabled;
       }
 
       Color _getDefaultIconColor(ThemeData themeData) {
-        if (!decoration.enabled)
+        if (!this.decoration.enabled)
           return themeData.disabledColor;
 
         switch (themeData.brightness) {
@@ -1582,106 +1598,107 @@ namespace Unity.UIWidgets.material {
         }
       }
 
-      // True if the label will be shown and the hint will not.
-      // If we"re not focused, there"s no value, and labelText was provided,
-      // then the label appears where the hint would.
-      bool get _hasInlineLabel => !this.widget._labelShouldWithdraw && decoration.labelText != null;
+      bool _hasInlineLabel {
+          get {
+              return !this.widget._labelShouldWithdraw && this.decoration.labelText != null;
+          }
+      }
 
-      // If the label is a floating placeholder, it"s always shown.
-      bool get _shouldShowLabel => _hasInlineLabel || decoration.hasFloatingPlaceholder;
+      bool _shouldShowLabel {
+          get {
+              return this._hasInlineLabel || this.decoration.hasFloatingPlaceholder;
+          }
+      }
 
 
-      // The base style for the inline label or hint when they"re displayed "inline",
-      // i.e. when they appear in place of the empty text field.
       TextStyle _getInlineStyle(ThemeData themeData) {
         return themeData.textTheme.subhead.merge(this.widget.baseStyle)
-          .copyWith(color: decoration.enabled ? themeData.hintColor : themeData.disabledColor);
+          .copyWith(color: this.decoration.enabled ? themeData.hintColor : themeData.disabledColor);
       }
 
       TextStyle _getFloatingLabelStyle(ThemeData themeData) {
-        final Color color = decoration.errorText != null
-          ? decoration.errorStyle?.color ?? themeData.errorColor
-          : _getActiveColor(themeData);
-        final TextStyle style = themeData.textTheme.subhead.merge(this.widget.baseStyle);
+        Color color = this.decoration.errorText != null
+          ? this.decoration.errorStyle?.color ?? themeData.errorColor
+          : this._getActiveColor(themeData);
+        TextStyle style = themeData.textTheme.subhead.merge(this.widget.baseStyle);
         return style
-          .copyWith(color: decoration.enabled ? color : themeData.disabledColor)
-          .merge(decoration.labelStyle);
+          .copyWith(color: this.decoration.enabled ? color : themeData.disabledColor)
+          .merge(this.decoration.labelStyle);
       }
 
       TextStyle _getHelperStyle(ThemeData themeData) {
-        final Color color = decoration.enabled ? themeData.hintColor : Colors.transparent;
-        return themeData.textTheme.caption.copyWith(color: color).merge(decoration.helperStyle);
+        Color color = this.decoration.enabled ? themeData.hintColor : Colors.transparent;
+        return themeData.textTheme.caption.copyWith(color: color).merge(this.decoration.helperStyle);
       }
 
       TextStyle _getErrorStyle(ThemeData themeData) {
-        final Color color = decoration.enabled ? themeData.errorColor : Colors.transparent;
-        return themeData.textTheme.caption.copyWith(color: color).merge(decoration.errorStyle);
+        Color color = this.decoration.enabled ? themeData.errorColor : Colors.transparent;
+        return themeData.textTheme.caption.copyWith(color: color).merge(this.decoration.errorStyle);
       }
 
       InputBorder _getDefaultBorder(ThemeData themeData) {
-        if (decoration.border?.borderSide == BorderSide.none) {
-          return decoration.border;
+        if (this.decoration.border?.borderSide == BorderSide.none) {
+          return this.decoration.border;
         }
 
         Color borderColor;
-        if (decoration.enabled) {
-          borderColor = decoration.errorText == null
-            ? _getActiveColor(themeData)
+        if (this.decoration.enabled) {
+          borderColor = this.decoration.errorText == null
+            ? this._getActiveColor(themeData)
             : themeData.errorColor;
         } else {
-          borderColor = (decoration.filled == true && decoration.border?.isOutline != true)
+          borderColor = (this.decoration.filled == true && this.decoration.border?.isOutline != true)
             ? Colors.transparent
             : themeData.disabledColor;
         }
 
         float borderWeight;
-        if (decoration.isCollapsed || decoration?.border == InputBorder.none || !decoration.enabled)
+        if (this.decoration.isCollapsed || this.decoration?.border == InputBorder.none || !this.decoration.enabled)
           borderWeight = 0.0f;
         else
-          borderWeight = isFocused ? 2.0f : 1.0;
+          borderWeight = this.isFocused ? 2.0f : 1.0;
 
-        final InputBorder border = decoration.border ?? const UnderlineInputBorder();
+        InputBorder border = this.decoration.border ?? new UnderlineInputBorder();
         return border.copyWith(borderSide: BorderSide(color: borderColor, width: borderWeight));
       }
 
       public override Widget build(BuildContext context) {
-        final ThemeData themeData = Theme.of(context);
-        final TextStyle inlineStyle = _getInlineStyle(themeData);
-        final TextBaseline textBaseline = inlineStyle.textBaseline;
+          ThemeData themeData = Theme.of(context);
+          TextStyle inlineStyle = this._getInlineStyle(themeData);
+          TextBaseline textBaseline = inlineStyle.textBaseline;
 
-        final TextStyle hintStyle = inlineStyle.merge(decoration.hintStyle);
-        final Widget hint = decoration.hintText == null ? null : AnimatedOpacity(
-          opacity: (isEmpty && !_hasInlineLabel) ? 1.0f : 0.0,
+          TextStyle hintStyle = inlineStyle.merge(this.decoration.hintStyle);
+          Widget hint = this.decoration.hintText == null ? null : AnimatedOpacity(
+          opacity: (this.isEmpty && !_hasInlineLabel) ? 1.0f : 0.0,
           duration: InputDecoratorConstants._kTransitionDuration,
           curve: InputDecorator._kTransitionCurve,
-          child: Text(
-            decoration.hintText,
+          child: Text(this.decoration.hintText,
             style: hintStyle,
             overflow: TextOverflow.ellipsis,
-            textAlign: textAlign,
+            textAlign: this.textAlign,
           ),
         );
 
-        final bool isError = decoration.errorText != null;
+        final bool isError = this.decoration.errorText != null;
         InputBorder border;
-        if (!decoration.enabled)
-          border = isError ? decoration.errorBorder : decoration.disabledBorder;
-        else if (isFocused)
-          border = isError ? decoration.focusedErrorBorder : decoration.focusedBorder;
+        if (!this.decoration.enabled)
+          border = isError ? this.decoration.errorBorder : this.decoration.disabledBorder;
+        else if (this.isFocused)
+          border = isError ? this.decoration.focusedErrorBorder : this.decoration.focusedBorder;
         else
-          border = isError ? decoration.errorBorder : decoration.enabledBorder;
-        border ??= _getDefaultBorder(themeData);
+          border = isError ? this.decoration.errorBorder : this.decoration.enabledBorder;
+        border ??= this._getDefaultBorder(themeData);
 
         final Widget container = _BorderContainer(
           border: border,
-          gap: _borderGap,
-          gapAnimation: _floatingLabelController.view,
-          fillColor: _getFillColor(themeData),
+          gap: this._borderGap,
+          gapAnimation: this._floatingLabelController.view,
+          fillColor: this._getFillColor(themeData),
         );
 
-        final TextStyle inlineLabelStyle = inlineStyle.merge(decoration.labelStyle);
-        final Widget label = decoration.labelText == null ? null : _Shaker(
-          animation: _shakingLabelController.view,
+        final TextStyle inlineLabelStyle = inlineStyle.merge(this.decoration.labelStyle);
+        final Widget label = this.decoration.labelText == null ? null : _Shaker(
+          animation: this._shakingLabelController.view,
           child: AnimatedOpacity(
             duration: InputDecoratorConstants._kTransitionDuration,
             curve: InputDecorator._kTransitionCurve,
@@ -1690,39 +1707,38 @@ namespace Unity.UIWidgets.material {
               duration:InputDecoratorConstants._kTransitionDuration,
               curve: InputDecorator._kTransitionCurve,
               style: this.widget._labelShouldWithdraw
-                ? _getFloatingLabelStyle(themeData)
+                ? this._getFloatingLabelStyle(themeData)
                 : inlineLabelStyle,
-              child: Text(
-                decoration.labelText,
+              child: Text(this.decoration.labelText,
                 overflow: TextOverflow.ellipsis,
-                textAlign: textAlign,
+                textAlign: this.textAlign,
               ),
             ),
           ),
         );
 
-        final Widget prefix = decoration.prefix == null && decoration.prefixText == null ? null :
+        final Widget prefix = this.decoration.prefix == null && this.decoration.prefixText == null ? null :
           _AffixText(
             labelIsFloating: this.widget._labelShouldWithdraw,
-            text: decoration.prefixText,
-            style: decoration.prefixStyle ?? hintStyle,
-            child: decoration.prefix,
+            text: this.decoration.prefixText,
+            style: this.decoration.prefixStyle ?? hintStyle,
+            child: this.decoration.prefix,
           );
 
-        final Widget suffix = decoration.suffix == null && decoration.suffixText == null ? null :
+        final Widget suffix = this.decoration.suffix == null && this.decoration.suffixText == null ? null :
           _AffixText(
             labelIsFloating: this.widget._labelShouldWithdraw,
-            text: decoration.suffixText,
-            style: decoration.suffixStyle ?? hintStyle,
-            child: decoration.suffix,
+            text: this.decoration.suffixText,
+            style: this.decoration.suffixStyle ?? hintStyle,
+            child: this.decoration.suffix,
           );
 
-        final Color activeColor = _getActiveColor(themeData);
-        final bool decorationIsDense = decoration.isDense == true; // isDense == null, same as false
+        final Color activeColor = this._getActiveColor(themeData);
+        final bool decorationIsDense = this.decoration.isDense == true; // isDense == null, same as false
         final float iconSize = decorationIsDense ? 18.0f : 24.0;
-        final Color iconColor = isFocused ? activeColor : _getDefaultIconColor(themeData);
+        final Color iconColor = this.isFocused ? activeColor : this._getDefaultIconColor(themeData);
 
-        final Widget icon = decoration.icon == null ? null :
+        final Widget icon = this.decoration.icon == null ? null :
           Padding(
             padding: const EdgeInsetsDirectional.only(end: 16.0f),
             child: IconTheme.merge(
@@ -1730,11 +1746,11 @@ namespace Unity.UIWidgets.material {
                 color: iconColor,
                 size: iconSize,
               ),
-              child: decoration.icon,
+              child: this.decoration.icon,
             ),
           );
 
-        final Widget prefixIcon = decoration.prefixIcon == null ? null :
+        final Widget prefixIcon = this.decoration.prefixIcon == null ? null :
           Center(
             widthFactor: 1.0f,
             heightFactor: 1.0f,
@@ -1745,12 +1761,12 @@ namespace Unity.UIWidgets.material {
                   color: iconColor,
                   size: iconSize,
                 ),
-                child: decoration.prefixIcon,
+                child: this.decoration.prefixIcon,
               ),
             ),
           );
 
-        final Widget suffixIcon = decoration.suffixIcon == null ? null :
+        final Widget suffixIcon = this.decoration.suffixIcon == null ? null :
           Center(
             widthFactor: 1.0f,
             heightFactor: 1.0f,
@@ -1761,46 +1777,45 @@ namespace Unity.UIWidgets.material {
                   color: iconColor,
                   size: iconSize,
                 ),
-                child: decoration.suffixIcon,
+                child: this.decoration.suffixIcon,
               ),
             ),
           );
 
         final Widget helperError = _HelperError(
-          textAlign: textAlign,
-          helperText: decoration.helperText,
-          helperStyle: _getHelperStyle(themeData),
-          errorText: decoration.errorText,
-          errorStyle: _getErrorStyle(themeData),
-          errorMaxLines: decoration.errorMaxLines,
+          textAlign: this.textAlign,
+          helperText: this.decoration.helperText,
+          helperStyle: this._getHelperStyle(themeData),
+          errorText: this.decoration.errorText,
+          errorStyle: this._getErrorStyle(themeData),
+          errorMaxLines: this.decoration.errorMaxLines,
         );
 
-        final Widget counter = decoration.counterText == null ? null :
+        final Widget counter = this.decoration.counterText == null ? null :
           Semantics(
             container: true,
-            liveRegion: isFocused,
-            child: Text(
-              decoration.counterText,
-              style: _getHelperStyle(themeData).merge(decoration.counterStyle),
+            liveRegion: this.isFocused,
+            child: Text(this.decoration.counterText,
+              style: this._getHelperStyle(themeData).merge(this.decoration.counterStyle),
               overflow: TextOverflow.ellipsis,
-              semanticsLabel: decoration.semanticCounterText,
+              semanticsLabel: this.decoration.semanticCounterText,
             ),
           );
 
         // The _Decoration widget and _RenderDecoration assume that contentPadding
         // has been resolved to EdgeInsets.
         final TextDirection textDirection = Directionality.of(context);
-        final EdgeInsets decorationContentPadding = decoration.contentPadding?.resolve(textDirection);
+        final EdgeInsets decorationContentPadding = this.decoration.contentPadding?.resolve(textDirection);
 
         EdgeInsets contentPadding;
         float floatingLabelHeight;
-        if (decoration.isCollapsed) {
+        if (this.decoration.isCollapsed) {
           floatingLabelHeight = 0.0f;
           contentPadding = decorationContentPadding ?? EdgeInsets.zero;
         } else if (!border.isOutline) {
           // 4.0f: the vertical gap between the inline elements and the floating label.
           floatingLabelHeight = (4.0f + 0.75 * inlineLabelStyle.fontSize) * MediaQuery.textScaleFactorOf(context);
-          if (decoration.filled == true) { // filled == null same as filled == false
+          if (this.decoration.filled == true) { // filled == null same as filled == false
             contentPadding = decorationContentPadding ?? (decorationIsDense
               ? const EdgeInsets.fromLTRB(12.0f, 8.0, 12.0, 8.0)
               : const EdgeInsets.fromLTRB(12.0f, 12.0, 12.0, 12.0));
@@ -1822,11 +1837,11 @@ namespace Unity.UIWidgets.material {
         return _Decorator(
           decoration: _Decoration(
             contentPadding: contentPadding,
-            isCollapsed: decoration.isCollapsed,
+            isCollapsed: this.decoration.isCollapsed,
             floatingLabelHeight: floatingLabelHeight,
-            floatingLabelProgress: _floatingLabelController.value,
+            floatingLabelProgress: this._floatingLabelController.value,
             border: border,
-            borderGap: _borderGap,
+            borderGap: this._borderGap,
             icon: this.icon,
             input: this.widget.child,
             label: label,
@@ -1841,7 +1856,7 @@ namespace Unity.UIWidgets.material {
           ),
           textDirection: textDirection,
           textBaseline: textBaseline,
-          isFocused: isFocused,
+          isFocused: this.isFocused,
         );
       }
     }
@@ -1887,7 +1902,7 @@ namespace Unity.UIWidgets.material {
            this.isCollapsed = false;
        }
 
-      public static collapsed(
+      public static InputDecorator collapsed(
         string hintText = null,
         bool hasFloatingPlaceholder = true,
         TextStyle hintStyle = null,
@@ -1998,35 +2013,49 @@ namespace Unity.UIWidgets.material {
       InputDecoration copyWith({
         Widget icon,
         string labelText,
-        TextStyle labelStyle,
+        TextStyle
+        this.labelStyle,
         string helperText,
-        TextStyle helperStyle,
+        TextStyle
+        this.helperStyle,
         string hintText,
-        TextStyle hintStyle,
+        TextStyle
+        this.hintStyle,
         string errorText,
-        TextStyle errorStyle,
+        TextStyle
+        this.errorStyle,
         int errorMaxLines,
         bool hasFloatingPlaceholder,
         bool isDense,
-        EdgeInsetsGeometry contentPadding,
+        EdgeInsetsGeometry
+        this.contentPadding,
         Widget prefixIcon,
-        Widget prefix,
+        Widget
+        this.prefix,
         string prefixText,
-        TextStyle prefixStyle,
+        TextStyle
+        this.prefixStyle,
         Widget suffixIcon,
-        Widget suffix,
+        Widget
+        this.suffix,
         string suffixText,
-        TextStyle suffixStyle,
+        TextStyle
+        this.suffixStyle,
         string counterText,
-        TextStyle counterStyle,
+        TextStyle
+        this.counterStyle,
         bool filled,
-        Color fillColor,
+        Color
+        this.fillColor,
         InputBorder errorBorder,
-        InputBorder focusedBorder,
+        InputBorder
+        this.focusedBorder,
         InputBorder focusedErrorBorder,
-        InputBorder disabledBorder,
+        InputBorder
+        this.disabledBorder,
         InputBorder enabledBorder,
-        InputBorder border,
+        InputBorder
+        this.border,
         bool enabled,
         string semanticCounterText,
       }) {
