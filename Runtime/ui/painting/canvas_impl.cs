@@ -302,7 +302,9 @@ namespace Unity.UIWidgets.ui {
                 } else {
                     layer.ignoreClip = false;
 
-                    var boundsMesh = new MeshMesh(reducedClip.scissor);
+                    // need to inflate a bit to make sure all area is cleared.
+                    var inflatedScissor = reducedClip.scissor.inflate(this._fringeWidth);
+                    var boundsMesh = new MeshMesh(inflatedScissor);
                     layer.draws.Add(CanvasShader.stencilClear(layer, boundsMesh));
 
                     foreach (var maskElement in reducedClip.maskElements) {
