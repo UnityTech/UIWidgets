@@ -128,7 +128,7 @@ namespace Unity.UIWidgets.material {
         }
     }
 
-    class DefaultTabController : StatefulWidget {
+    public class DefaultTabController : StatefulWidget {
         public DefaultTabController(
             Key key = null,
             int? length = null,

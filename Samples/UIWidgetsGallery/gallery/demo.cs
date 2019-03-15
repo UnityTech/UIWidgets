@@ -164,7 +164,7 @@ namespace UIWidgetsGallery.gallery {
         string _exampleCode;
 
         public override void didChangeDependencies() {
-            ExampleCodeParser.getExampleCode(this.widget.exampleCodeTag, DefaultAssetBundle.of(this.context)).Then(
+            new ExampleCodeParser().getExampleCode(this.widget.exampleCodeTag, DefaultAssetBundle.of(this.context)).Then(
                 (string code) => {
                     if (this.mounted) {
                         this.setState(() => { this._exampleCode = code ?? "Example code not found"; });
@@ -181,7 +181,7 @@ namespace UIWidgetsGallery.gallery {
             Widget body;
             if (this._exampleCode == null) {
                 body = new Center(
-                    child: CircularProgressIndicator()
+                    child: new CircularProgressIndicator()
                 );
             }
             else {

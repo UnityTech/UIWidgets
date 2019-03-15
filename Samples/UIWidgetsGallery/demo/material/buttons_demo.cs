@@ -10,7 +10,7 @@ using Unity.UIWidgets.widgets;
 namespace UIWidgetsGallery.gallery {
 
 class ButtonsDemo : StatefulWidget {
-  const String routeName = "/material/buttons";
+  public const String routeName = "/material/buttons";
 
   public ButtonsDemo(Key key = null) : base(key: key) {
       
@@ -292,12 +292,12 @@ class _ButtonsDemoState : State<ButtonsDemo> {
                                     this.dropdown1Value = newValue;
                                 });
                             },
-                            items: new List<string> {"One", "Two", "Free", "Four"}.map<DropdownMenuItem<String>>((string value) => {
+                            items: new List<string> {"One", "Two", "Free", "Four"}.Select((string value) => {
                                 return new DropdownMenuItem<string>(
                                     value: value,
                                     child: new Text(value)
                                 );
-                            }).toList()
+                            }).ToList()
                         )
                     ),
                     new SizedBox (
@@ -313,12 +313,12 @@ class _ButtonsDemoState : State<ButtonsDemo> {
                                     this.dropdown2Value = newValue;
                                 });
                             },
-                            items: new List<String >{"One", "Two", "Free", "Four"}.map<DropdownMenuItem<String>>((string value) => {
+                            items: new List<String >{"One", "Two", "Free", "Four"}.Select((string value) => {
                                 return new DropdownMenuItem<string>(
                                     value: value,
                                     child: new Text(value)
                                 );
-                            }).toList()
+                            }).ToList()
                         )
                     ),
                     new SizedBox (
