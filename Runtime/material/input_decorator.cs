@@ -1530,7 +1530,7 @@ namespace Unity.UIWidgets.material {
                 child: new AnimatedOpacity(
                     duration: InputDecoratorConstants._kTransitionDuration,
                     curve: InputDecoratorConstants._kTransitionCurve,
-                    opacity: this.labelIsFloating ? 1.0f : 0.0,
+                    opacity: this.labelIsFloating ? 1.0f : 0.0f,
                     child: this.child ?? new Text(this.text, style: this.style)
                 )
             );
@@ -1802,7 +1802,7 @@ namespace Unity.UIWidgets.material {
             Widget hint = this.decoration.hintText == null
                 ? null
                 : new AnimatedOpacity(
-                    opacity: (this.isEmpty && !this._hasInlineLabel) ? 1.0f : 0.0,
+                    opacity: (this.isEmpty && !this._hasInlineLabel) ? 1.0f : 0.0f,
                     duration: InputDecoratorConstants._kTransitionDuration,
                     curve: InputDecoratorConstants._kTransitionCurve,
                     child: new Text(this.decoration.hintText,
@@ -1841,7 +1841,7 @@ namespace Unity.UIWidgets.material {
                     child: new AnimatedOpacity(
                         duration: InputDecoratorConstants._kTransitionDuration,
                         curve: InputDecoratorConstants._kTransitionCurve,
-                        opacity: this._shouldShowLabel ? 1.0f : 0.0,
+                        opacity: this._shouldShowLabel ? 1.0f : 0.0f,
                         child: new AnimatedDefaultTextStyle(
                             duration: InputDecoratorConstants._kTransitionDuration,
                             curve: InputDecoratorConstants._kTransitionCurve,
