@@ -63,7 +63,7 @@ namespace Unity.UIWidgets.material {
         }
 
         public override InputBorder lerp(float t) {
-            return ShapeBorder.lerp(this.begin, this.end, t);
+            return (InputBorder) ShapeBorder.lerp(this.begin, this.end, t);
         }
     }
 
@@ -95,7 +95,7 @@ namespace Unity.UIWidgets.material {
                 paint.color = this.fillColor;
                 paint.style = PaintingStyle.fill;
                 canvas.drawPath(
-                    borderValue.getOuterPath(canvasRect, textDirection: this.textDirection),
+                    borderValue.getOuterPath(canvasRect),
                     paint
                 );
             }
@@ -2075,9 +2075,10 @@ namespace Unity.UIWidgets.material {
             TextStyle hintStyle = null,
             bool filled = false,
             Color fillColor = null,
-            InputBorder border = InputBorder.none,
+            InputBorder border = null,
             bool enabled = true
         ) {
+            border = border ?? InputBorder.none;
             InputDecoration decoration = new InputDecoration(
                 icon: null,
                 labelText: null,
