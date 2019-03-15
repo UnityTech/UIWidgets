@@ -68,7 +68,7 @@ namespace Unity.UIWidgets.material {
     }
 
     class _InputBorderTween : Tween<InputBorder> {
-      _InputBorderTween(InputBorder begin = null, InputBorder end = null) : base(begin: begin, end: end) {}
+      public _InputBorderTween(InputBorder begin = null, InputBorder end = null) : base(begin: begin, end: end) {}
 
       public override InputBorder lerp(float t) => ShapeBorder.lerp(this.begin, this.end, t);
     }
@@ -166,7 +166,7 @@ namespace Unity.UIWidgets.material {
         );
         this._borderAnimation = new CurvedAnimation(
           parent: this._controller,
-          curve: InputDecorator._kTransitionCurve
+          curve: InputDecoratorConstants._kTransitionCurve
         );
         this._border = new _InputBorderTween(
           begin: this.widget.border,
@@ -826,7 +826,7 @@ namespace Unity.UIWidgets.material {
           if (box == null)
             return;
           box.layout(boxConstraints, parentUsesSize: true);
-          float baseline = box.getDistanceToBaseline(this.textBaseline) ?? 0.0f;
+          float baseline = box.getDistanceToBaseline(this.textBaseline ?? 0.0f) ?? 0.0f;
           D.assert(baseline != null && baseline >= 0.0f);
           boxToBaseline[box] = baseline;
           aboveBaseline = Math.Max(baseline, aboveBaseline);
@@ -1238,7 +1238,7 @@ namespace Unity.UIWidgets.material {
         }
       }
 
-      public override void mount(Element parent, dynamic newSlot) {
+      public override void mount(Element parent, object newSlot) {
         base.mount(parent, newSlot);
         this._mountChild(this.widget.decoration.icon, _DecorationSlot.icon);
         this._mountChild(this.widget.decoration.input, _DecorationSlot.input);
@@ -1473,7 +1473,7 @@ namespace Unity.UIWidgets.material {
         this._floatingLabelController = new AnimationController(
           duration: InputDecoratorConstants._kTransitionDuration,
           vsync: this,
-          value: (this.widget.decoration.hasFloatingPlaceholder && this.widget._labelShouldWithdraw) ? 1.0f : 0.0,
+          value: (this.widget.decoration.hasFloatingPlaceholder == true && this.widget._labelShouldWithdraw) ? 1.0f : 0.0f
         );
         this._floatingLabelController.addListener(this._handleChange);
 
@@ -1533,7 +1533,7 @@ namespace Unity.UIWidgets.material {
         InputDecorator old = _old as InputDecorator;
         if (this.widget.decoration != old.decoration) this._effectiveDecoration = null;
 
-        if (this.widget._labelShouldWithdraw != old._labelShouldWithdraw && this.widget.decoration.hasFloatingPlaceholder) {
+        if (this.widget._labelShouldWithdraw != old._labelShouldWithdraw && this.widget.decoration.hasFloatingPlaceholder == true) {
           if (this.widget._labelShouldWithdraw) {
               this._floatingLabelController.forward();
           }
@@ -1577,15 +1577,15 @@ namespace Unity.UIWidgets.material {
 
         switch (themeData.brightness) {
           case Brightness.dark:
-            return this.decoration.enabled ? darkEnabled : darkDisabled;
+            return this.decoration.enabled == true ? darkEnabled : darkDisabled;
           case Brightness.light:
-            return this.decoration.enabled ? lightEnabled : lightDisabled;
+            return this.decoration.enabled == true ? lightEnabled : lightDisabled;
         }
         return lightEnabled;
       }
 
       Color _getDefaultIconColor(ThemeData themeData) {
-        if (!this.decoration.enabled)
+        if (!this.decoration.enabled == true)
           return themeData.disabledColor;
 
         switch (themeData.brightness) {
@@ -1606,14 +1606,14 @@ namespace Unity.UIWidgets.material {
 
       bool _shouldShowLabel {
           get {
-              return this._hasInlineLabel || this.decoration.hasFloatingPlaceholder;
+              return this._hasInlineLabel || this.decoration.hasFloatingPlaceholder == true;
           }
       }
 
 
       TextStyle _getInlineStyle(ThemeData themeData) {
         return themeData.textTheme.subhead.merge(this.widget.baseStyle)
-          .copyWith(color: this.decoration.enabled ? themeData.hintColor : themeData.disabledColor);
+          .copyWith(color: this.decoration.enabled == true ? themeData.hintColor : themeData.disabledColor);
       }
 
       TextStyle _getFloatingLabelStyle(ThemeData themeData) {
@@ -1622,17 +1622,17 @@ namespace Unity.UIWidgets.material {
           : this._getActiveColor(themeData);
         TextStyle style = themeData.textTheme.subhead.merge(this.widget.baseStyle);
         return style
-          .copyWith(color: this.decoration.enabled ? color : themeData.disabledColor)
+          .copyWith(color: this.decoration.enabled == true ? color : themeData.disabledColor)
           .merge(this.decoration.labelStyle);
       }
 
       TextStyle _getHelperStyle(ThemeData themeData) {
-        Color color = this.decoration.enabled ? themeData.hintColor : Colors.transparent;
+        Color color = this.decoration.enabled == true ? themeData.hintColor : Colors.transparent;
         return themeData.textTheme.caption.copyWith(color: color).merge(this.decoration.helperStyle);
       }
 
       TextStyle _getErrorStyle(ThemeData themeData) {
-        Color color = this.decoration.enabled ? themeData.errorColor : Colors.transparent;
+        Color color = this.decoration.enabled == true ? themeData.errorColor : Colors.transparent;
         return themeData.textTheme.caption.copyWith(color: color).merge(this.decoration.errorStyle);
       }
 
@@ -1642,7 +1642,7 @@ namespace Unity.UIWidgets.material {
         }
 
         Color borderColor;
-        if (this.decoration.enabled) {
+        if (this.decoration.enabled == true) {
           borderColor = this.decoration.errorText == null
             ? this._getActiveColor(themeData)
             : themeData.errorColor;
@@ -1653,196 +1653,185 @@ namespace Unity.UIWidgets.material {
         }
 
         float borderWeight;
-        if (this.decoration.isCollapsed || this.decoration?.border == InputBorder.none || !this.decoration.enabled)
+        if (this.decoration.isCollapsed || this.decoration?.border == InputBorder.none || !this.decoration.enabled == true)
           borderWeight = 0.0f;
         else
-          borderWeight = this.isFocused ? 2.0f : 1.0;
+          borderWeight = this.isFocused ? 2.0f : 1.0f;
 
         InputBorder border = this.decoration.border ?? new UnderlineInputBorder();
-        return border.copyWith(borderSide: BorderSide(color: borderColor, width: borderWeight));
+        return border.copyWith(borderSide: new BorderSide(color: borderColor, width: borderWeight));
       }
 
       public override Widget build(BuildContext context) {
           ThemeData themeData = Theme.of(context);
           TextStyle inlineStyle = this._getInlineStyle(themeData);
-          TextBaseline textBaseline = inlineStyle.textBaseline;
+          TextBaseline? textBaseline = inlineStyle.textBaseline;
 
           TextStyle hintStyle = inlineStyle.merge(this.decoration.hintStyle);
-          Widget hint = this.decoration.hintText == null ? null : AnimatedOpacity(
-          opacity: (this.isEmpty && !_hasInlineLabel) ? 1.0f : 0.0,
+          Widget hint = this.decoration.hintText == null ? null : new AnimatedOpacity(
+          opacity: (this.isEmpty && !this._hasInlineLabel) ? 1.0f : 0.0,
           duration: InputDecoratorConstants._kTransitionDuration,
-          curve: InputDecorator._kTransitionCurve,
-          child: Text(this.decoration.hintText,
+          curve: InputDecoratorConstants._kTransitionCurve,
+          child: new Text(this.decoration.hintText,
             style: hintStyle,
             overflow: TextOverflow.ellipsis,
-            textAlign: this.textAlign,
-          ),
+            textAlign: this.textAlign
+          )
         );
 
-        final bool isError = this.decoration.errorText != null;
+        bool isError = this.decoration.errorText != null;
         InputBorder border;
-        if (!this.decoration.enabled)
+        if (!this.decoration.enabled == true)
           border = isError ? this.decoration.errorBorder : this.decoration.disabledBorder;
         else if (this.isFocused)
           border = isError ? this.decoration.focusedErrorBorder : this.decoration.focusedBorder;
         else
           border = isError ? this.decoration.errorBorder : this.decoration.enabledBorder;
-        border ??= this._getDefaultBorder(themeData);
+        border = border ?? this._getDefaultBorder(themeData);
 
-        final Widget container = _BorderContainer(
+        Widget container = new _BorderContainer(
           border: border,
           gap: this._borderGap,
           gapAnimation: this._floatingLabelController.view,
-          fillColor: this._getFillColor(themeData),
+          fillColor: this._getFillColor(themeData)
         );
 
-        final TextStyle inlineLabelStyle = inlineStyle.merge(this.decoration.labelStyle);
-        final Widget label = this.decoration.labelText == null ? null : _Shaker(
+          TextStyle inlineLabelStyle = inlineStyle.merge(this.decoration.labelStyle);
+          Widget label = this.decoration.labelText == null ? null : new _Shaker(
           animation: this._shakingLabelController.view,
-          child: AnimatedOpacity(
+          child: new AnimatedOpacity(
             duration: InputDecoratorConstants._kTransitionDuration,
-            curve: InputDecorator._kTransitionCurve,
-            opacity: _shouldShowLabel ? 1.0f : 0.0,
-            child: AnimatedDefaultTextStyle(
+            curve: InputDecoratorConstants._kTransitionCurve,
+            opacity: this._shouldShowLabel ? 1.0f : 0.0,
+            child: new AnimatedDefaultTextStyle(
               duration:InputDecoratorConstants._kTransitionDuration,
-              curve: InputDecorator._kTransitionCurve,
+              curve: InputDecoratorConstants._kTransitionCurve,
               style: this.widget._labelShouldWithdraw
                 ? this._getFloatingLabelStyle(themeData)
                 : inlineLabelStyle,
-              child: Text(this.decoration.labelText,
+              child: new Text(this.decoration.labelText,
                 overflow: TextOverflow.ellipsis,
-                textAlign: this.textAlign,
-              ),
-            ),
-          ),
+                textAlign: this.textAlign
+              )
+            )
+          )
         );
 
-        final Widget prefix = this.decoration.prefix == null && this.decoration.prefixText == null ? null :
-          _AffixText(
+        Widget prefix = this.decoration.prefix == null && this.decoration.prefixText == null ? null :
+          new _AffixText(
             labelIsFloating: this.widget._labelShouldWithdraw,
             text: this.decoration.prefixText,
             style: this.decoration.prefixStyle ?? hintStyle,
-            child: this.decoration.prefix,
+            child: this.decoration.prefix
           );
 
-        final Widget suffix = this.decoration.suffix == null && this.decoration.suffixText == null ? null :
-          _AffixText(
+        Widget suffix = this.decoration.suffix == null && this.decoration.suffixText == null ? null :
+          new _AffixText(
             labelIsFloating: this.widget._labelShouldWithdraw,
             text: this.decoration.suffixText,
             style: this.decoration.suffixStyle ?? hintStyle,
-            child: this.decoration.suffix,
+            child: this.decoration.suffix
           );
 
-        final Color activeColor = this._getActiveColor(themeData);
-        final bool decorationIsDense = this.decoration.isDense == true; // isDense == null, same as false
-        final float iconSize = decorationIsDense ? 18.0f : 24.0;
-        final Color iconColor = this.isFocused ? activeColor : this._getDefaultIconColor(themeData);
+          Color activeColor = this._getActiveColor(themeData);
+          bool decorationIsDense = this.decoration.isDense == true; // isDense == null, same as false
+          float iconSize = decorationIsDense ? 18.0f : 24.0f;
+          Color iconColor = this.isFocused ? activeColor : this._getDefaultIconColor(themeData);
 
-        final Widget icon = this.decoration.icon == null ? null :
-          Padding(
-            padding: const EdgeInsetsDirectional.only(end: 16.0f),
+          Widget icon = this.decoration.icon == null ? null :
+          new Padding(
+            padding: EdgeInsets.only(right: 16.0f),
             child: IconTheme.merge(
-              data: IconThemeData(
+              data: new IconThemeData(
                 color: iconColor,
-                size: iconSize,
+                size: iconSize
               ),
-              child: this.decoration.icon,
-            ),
+              child: this.decoration.icon
+            )
           );
 
-        final Widget prefixIcon = this.decoration.prefixIcon == null ? null :
-          Center(
+        Widget prefixIcon = this.decoration.prefixIcon == null ? null :
+          new Center(
             widthFactor: 1.0f,
             heightFactor: 1.0f,
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(minWidth: 48.0f, minHeight: 48.0),
+            child: new ConstrainedBox(
+              constraints: new BoxConstraints(minWidth: 48.0f, minHeight: 48.0f),
               child: IconTheme.merge(
-                data: IconThemeData(
+                data: new IconThemeData(
                   color: iconColor,
-                  size: iconSize,
+                  size: iconSize
                 ),
-                child: this.decoration.prefixIcon,
-              ),
-            ),
+                child: this.decoration.prefixIcon
+              )
+            )
           );
 
-        final Widget suffixIcon = this.decoration.suffixIcon == null ? null :
-          Center(
+        Widget suffixIcon = this.decoration.suffixIcon == null ? null :
+          new Center(
             widthFactor: 1.0f,
             heightFactor: 1.0f,
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(minWidth: 48.0f, minHeight: 48.0),
+            child: new ConstrainedBox(
+              constraints: new BoxConstraints(minWidth: 48.0f, minHeight: 48.0f),
               child: IconTheme.merge(
-                data: IconThemeData(
+                data: new IconThemeData(
                   color: iconColor,
-                  size: iconSize,
+                  size: iconSize
                 ),
-                child: this.decoration.suffixIcon,
-              ),
-            ),
+                child: this.decoration.suffixIcon
+              )
+            )
           );
 
-        final Widget helperError = _HelperError(
+        Widget helperError = new _HelperError(
           textAlign: this.textAlign,
           helperText: this.decoration.helperText,
           helperStyle: this._getHelperStyle(themeData),
           errorText: this.decoration.errorText,
           errorStyle: this._getErrorStyle(themeData),
-          errorMaxLines: this.decoration.errorMaxLines,
+          errorMaxLines: this.decoration.errorMaxLines
         );
 
-        final Widget counter = this.decoration.counterText == null ? null :
-          Semantics(
-            container: true,
-            liveRegion: this.isFocused,
-            child: Text(this.decoration.counterText,
+        Widget counter = this.decoration.counterText == null ? null :
+            new Text(this.decoration.counterText,
               style: this._getHelperStyle(themeData).merge(this.decoration.counterStyle),
-              overflow: TextOverflow.ellipsis,
-              semanticsLabel: this.decoration.semanticCounterText,
-            ),
+              overflow: TextOverflow.ellipsis
           );
 
-        // The _Decoration widget and _RenderDecoration assume that contentPadding
-        // has been resolved to EdgeInsets.
-        final TextDirection textDirection = Directionality.of(context);
-        final EdgeInsets decorationContentPadding = this.decoration.contentPadding?.resolve(textDirection);
+        TextDirection textDirection = Directionality.of(context);
+        EdgeInsets decorationContentPadding = this.decoration.contentPadding;
 
         EdgeInsets contentPadding;
-        float floatingLabelHeight;
+        float? floatingLabelHeight;
         if (this.decoration.isCollapsed) {
           floatingLabelHeight = 0.0f;
           contentPadding = decorationContentPadding ?? EdgeInsets.zero;
         } else if (!border.isOutline) {
-          // 4.0f: the vertical gap between the inline elements and the floating label.
-          floatingLabelHeight = (4.0f + 0.75 * inlineLabelStyle.fontSize) * MediaQuery.textScaleFactorOf(context);
+          floatingLabelHeight = (4.0f + 0.75f * inlineLabelStyle.fontSize) * MediaQuery.textScaleFactorOf(context);
           if (this.decoration.filled == true) { // filled == null same as filled == false
             contentPadding = decorationContentPadding ?? (decorationIsDense
-              ? const EdgeInsets.fromLTRB(12.0f, 8.0, 12.0, 8.0)
-              : const EdgeInsets.fromLTRB(12.0f, 12.0, 12.0, 12.0));
+              ? EdgeInsets.fromLTRB(12.0f, 8.0f, 12.0f, 8.0f)
+              : EdgeInsets.fromLTRB(12.0f, 12.0f, 12.0f, 12.0f));
           } else {
-            // Not left or right padding for underline borders that aren"t filled
-            // is a small concession to backwards compatibility. This eliminates
-            // the most noticeable layout change introduced by #13734.
             contentPadding = decorationContentPadding ?? (decorationIsDense
-              ? const EdgeInsets.fromLTRB(0.0f, 8.0, 0.0, 8.0)
-              : const EdgeInsets.fromLTRB(0.0f, 12.0, 0.0, 12.0));
+              ? EdgeInsets.fromLTRB(0.0f, 8.0f, 0.0f, 8.0f)
+              : EdgeInsets.fromLTRB(0.0f, 12.0f, 0.0f, 12.0f));
           }
         } else {
           floatingLabelHeight = 0.0f;
           contentPadding = decorationContentPadding ?? (decorationIsDense
-            ? const EdgeInsets.fromLTRB(12.0f, 20.0, 12.0, 12.0)
-            : const EdgeInsets.fromLTRB(12.0f, 24.0, 12.0, 16.0));
+            ? EdgeInsets.fromLTRB(12.0f, 20.0f, 12.0f, 12.0f)
+            : EdgeInsets.fromLTRB(12.0f, 24.0f, 12.0f, 16.0f));
         }
 
-        return _Decorator(
-          decoration: _Decoration(
+        return new _Decorator(
+          decoration: new _Decoration(
             contentPadding: contentPadding,
             isCollapsed: this.decoration.isCollapsed,
-            floatingLabelHeight: floatingLabelHeight,
+            floatingLabelHeight: floatingLabelHeight ?? 0.0f,
             floatingLabelProgress: this._floatingLabelController.value,
             border: border,
             borderGap: this._borderGap,
-            icon: this.icon,
+            icon: icon,
             input: this.widget.child,
             label: label,
             hint: hint,
@@ -1852,11 +1841,11 @@ namespace Unity.UIWidgets.material {
             suffixIcon: suffixIcon,
             helperError: helperError,
             counter: counter,
-            container: container,
+            container: container
           ),
           textDirection: textDirection,
           textBaseline: textBaseline,
-          isFocused: this.isFocused,
+          isFocused: this.isFocused
         );
       }
     }
@@ -1873,8 +1862,8 @@ namespace Unity.UIWidgets.material {
           string errorText = null,
           TextStyle errorStyle = null,
           int? errorMaxLines = null,
-          bool hasFloatingPlaceholder = true,
-          bool isDense = false,
+          bool? hasFloatingPlaceholder = true,
+          bool? isDense = null,
           EdgeInsets contentPadding = null,
           Widget prefixIcon = null,
           Widget prefix = null,
@@ -1886,7 +1875,7 @@ namespace Unity.UIWidgets.material {
           TextStyle suffixStyle = null,
           string counterText = null,
           TextStyle counterStyle = null,
-          bool filled = false,
+          bool? filled = null,
           Color fillColor = null,
           InputBorder errorBorder = null,
           InputBorder focusedBorder = null,
@@ -1894,15 +1883,43 @@ namespace Unity.UIWidgets.material {
           InputBorder disabledBorder = null,
           InputBorder enabledBorder = null,
           InputBorder border = null,
-          bool enabled = true
+          bool? enabled = true
       ) {
-           D.assert(enabled != null),
-           D.assert(!(prefix != null && prefixText != null), "Declaring both prefix and prefixText is not allowed"),
-           D.assert(!(suffix != null && suffixText != null), "Declaring both suffix and suffixText is not allowed"),
-           this.isCollapsed = false;
-       }
+          D.assert(enabled != null);
+          D.assert(!(prefix != null && prefixText != null), "Declaring both prefix and prefixText is not allowed");
+          D.assert(!(suffix != null && suffixText != null), "Declaring both suffix and suffixText is not allowed");
+          this.isCollapsed = false;
+          this.icon = icon;
+          this.labelText = labelText;
+          this.labelStyle = labelStyle;
+          this.helperText = helperText;
+          this.helperStyle = helperStyle;
+          this.hintText = hintText;
+          this.hintStyle = hintStyle;
+          this.errorText = errorText;
+          this.errorStyle = errorStyle;
+          this.errorMaxLines = errorMaxLines;
+          this.hasFloatingPlaceholder = hasFloatingPlaceholder;
+          this.isDense = isDense;
+          this.contentPadding = contentPadding;
+          this.prefixIcon = prefixIcon;
+          this.prefixStyle = prefixStyle;
+          this.suffixIcon = suffixIcon;
+          this.suffixStyle = suffixStyle;
+          this.counterText = counterText;
+          this.counterStyle = counterStyle;
+          this.filled = filled;
+          this.fillColor = fillColor;
+          this.errorBorder = errorBorder;
+          this.focusedBorder = focusedBorder;
+          this.focusedErrorBorder = focusedErrorBorder;
+          this.disabledBorder = disabledBorder;
+          this.enabledBorder = enabledBorder;
+          this.border = border;
+          this.enabled = enabled;
+      }
 
-      public static InputDecorator collapsed(
+      public static InputDecoration collapsed(
         string hintText = null,
         bool hasFloatingPlaceholder = true,
         TextStyle hintStyle = null,
@@ -1911,7 +1928,7 @@ namespace Unity.UIWidgets.material {
         InputBorder border = InputBorder.none,
         bool enabled = true
       ) {
-          return new InputDecorator(
+          InputDecoration decoration = new InputDecoration(
               icon: null,
               labelText: null,
               labelStyle: null,
@@ -1922,7 +1939,6 @@ namespace Unity.UIWidgets.material {
               errorMaxLines: null,
               isDense: false,
               contentPadding: EdgeInsets.zero,
-              isCollapsed: true,
               prefixIcon: null,
               prefix: null,
               prefixText: null,
@@ -1938,8 +1954,16 @@ namespace Unity.UIWidgets.material {
               focusedErrorBorder: null,
               disabledBorder: null,
               enabledBorder: null,
-              semanticCounterText: null
+              hintText : hintText,
+              hasFloatingPlaceholder : hasFloatingPlaceholder,
+              hintStyle : hintStyle,
+              filled : filled,
+              fillColor : fillColor,
+              border : border,
+              enabled : enabled
           );
+          decoration.isCollapsed = true;
+          return decoration;
       }
 
       public readonly Widget icon;
@@ -1962,13 +1986,13 @@ namespace Unity.UIWidgets.material {
 
       public readonly int? errorMaxLines;
 
-      public readonly bool hasFloatingPlaceholder;
+      public readonly bool? hasFloatingPlaceholder;
 
-      public readonly bool isDense;
+      public readonly bool? isDense;
 
       public readonly EdgeInsets contentPadding;
 
-      public readonly bool isCollapsed;
+      public bool isCollapsed;
 
       public readonly Widget prefixIcon;
 
@@ -1990,7 +2014,7 @@ namespace Unity.UIWidgets.material {
 
       public readonly TextStyle counterStyle;
 
-      public readonly bool filled;
+      public readonly bool? filled;
 
       public readonly Color fillColor;
 
@@ -2006,60 +2030,43 @@ namespace Unity.UIWidgets.material {
 
       public readonly InputBorder border;
 
-      public readonly bool enabled;
+      public readonly bool? enabled;
 
-      public readonly string semanticCounterText;
-
-      InputDecoration copyWith({
-        Widget icon,
-        string labelText,
-        TextStyle
-        this.labelStyle,
-        string helperText,
-        TextStyle
-        this.helperStyle,
-        string hintText,
-        TextStyle
-        this.hintStyle,
-        string errorText,
-        TextStyle
-        this.errorStyle,
-        int errorMaxLines,
-        bool hasFloatingPlaceholder,
-        bool isDense,
-        EdgeInsetsGeometry
-        this.contentPadding,
-        Widget prefixIcon,
-        Widget
-        this.prefix,
-        string prefixText,
-        TextStyle
-        this.prefixStyle,
-        Widget suffixIcon,
-        Widget
-        this.suffix,
-        string suffixText,
-        TextStyle
-        this.suffixStyle,
-        string counterText,
-        TextStyle
-        this.counterStyle,
-        bool filled,
-        Color
-        this.fillColor,
-        InputBorder errorBorder,
-        InputBorder
-        this.focusedBorder,
-        InputBorder focusedErrorBorder,
-        InputBorder
-        this.disabledBorder,
-        InputBorder enabledBorder,
-        InputBorder
-        this.border,
-        bool enabled,
-        string semanticCounterText,
-      }) {
-        return InputDecoration(
+      public InputDecoration copyWith(
+        Widget icon = null,
+        string labelText = null,
+        TextStyle labelStyle = null,
+        string helperText = null,
+        TextStyle helperStyle = null,
+        string hintText = null,
+        TextStyle hintStyle = null,
+        string errorText = null,
+        TextStyle errorStyle = null,
+        int? errorMaxLines = null,
+        bool? hasFloatingPlaceholder = null,
+        bool? isDense = null,
+        EdgeInsets contentPadding = null,
+        Widget prefixIcon = null,
+        Widget prefix = null,
+        string prefixText = null,
+        TextStyle prefixStyle = null,
+        Widget suffixIcon = null,
+        Widget suffix = null,
+        string suffixText = null,
+        TextStyle suffixStyle = null,
+        string counterText = null,
+        TextStyle counterStyle = null,
+        bool? filled = null,
+        Color fillColor = null,
+        InputBorder errorBorder = null,
+        InputBorder focusedBorder = null,
+        InputBorder focusedErrorBorder = null,
+        InputBorder disabledBorder = null,
+        InputBorder enabledBorder = null,
+        InputBorder border = null,
+        bool? enabled = null
+      ) {
+        return new InputDecoration(
           icon: icon ?? this.icon,
           labelText: labelText ?? this.labelText,
           labelStyle: labelStyle ?? this.labelStyle,
@@ -2091,284 +2098,274 @@ namespace Unity.UIWidgets.material {
           disabledBorder: disabledBorder ?? this.disabledBorder,
           enabledBorder: enabledBorder ?? this.enabledBorder,
           border: border ?? this.border,
-          enabled: enabled ?? this.enabled,
-          semanticCounterText: semanticCounterText ?? this.semanticCounterText,
+          enabled: enabled ?? this.enabled
         );
       }
 
-      InputDecoration applyDefaults(InputDecorationTheme theme) {
-        return copyWith(
-          labelStyle: labelStyle ?? theme.labelStyle,
-          helperStyle: helperStyle ?? theme.helperStyle,
-          hintStyle: hintStyle ?? theme.hintStyle,
-          errorStyle: errorStyle ?? theme.errorStyle,
-          errorMaxLines: errorMaxLines ?? theme.errorMaxLines,
-          hasFloatingPlaceholder: hasFloatingPlaceholder ?? theme.hasFloatingPlaceholder,
-          isDense: isDense ?? theme.isDense,
-          contentPadding: contentPadding ?? theme.contentPadding,
-          prefixStyle: prefixStyle ?? theme.prefixStyle,
-          suffixStyle: suffixStyle ?? theme.suffixStyle,
-          counterStyle: counterStyle ?? theme.counterStyle,
-          filled: filled ?? theme.filled,
-          fillColor: fillColor ?? theme.fillColor,
-          errorBorder: errorBorder ?? theme.errorBorder,
-          focusedBorder: focusedBorder ?? theme.focusedBorder,
-          focusedErrorBorder: focusedErrorBorder ?? theme.focusedErrorBorder,
-          disabledBorder: disabledBorder ?? theme.disabledBorder,
-          enabledBorder: enabledBorder ?? theme.enabledBorder,
-          border: border ?? theme.border,
+      public InputDecoration applyDefaults(InputDecorationTheme theme) {
+        return this.copyWith(
+          labelStyle: this.labelStyle ?? theme.labelStyle,
+          helperStyle: this.helperStyle ?? theme.helperStyle,
+          hintStyle: this.hintStyle ?? theme.hintStyle,
+          errorStyle: this.errorStyle ?? theme.errorStyle,
+          errorMaxLines: this.errorMaxLines ?? theme.errorMaxLines,
+          hasFloatingPlaceholder: this.hasFloatingPlaceholder ?? theme.hasFloatingPlaceholder,
+          isDense: this.isDense ?? theme.isDense,
+          contentPadding: this.contentPadding ?? theme.contentPadding,
+          prefixStyle: this.prefixStyle ?? theme.prefixStyle,
+          suffixStyle: this.suffixStyle ?? theme.suffixStyle,
+          counterStyle: this.counterStyle ?? theme.counterStyle,
+          filled: this.filled ?? theme.filled,
+          fillColor: this.fillColor ?? theme.fillColor,
+          errorBorder: this.errorBorder ?? theme.errorBorder,
+          focusedBorder: this.focusedBorder ?? theme.focusedBorder,
+          focusedErrorBorder: this.focusedErrorBorder ?? theme.focusedErrorBorder,
+          disabledBorder: this.disabledBorder ?? theme.disabledBorder,
+          enabledBorder: this.enabledBorder ?? theme.enabledBorder,
+          border: this.border ?? theme.border
         );
       }
 
-      public override bool operator ==(dynamic other) {
-        if (identical(this, other))
-          return true;
-        if (other.runtimeType != runtimeType)
-          return false;
-        final InputDecoration typedOther = other;
-        return typedOther.icon == icon
-            && typedOther.labelText == labelText
-            && typedOther.labelStyle == labelStyle
-            && typedOther.helperText == helperText
-            && typedOther.helperStyle == helperStyle
-            && typedOther.hintText == hintText
-            && typedOther.hintStyle == hintStyle
-            && typedOther.errorText == errorText
-            && typedOther.errorStyle == errorStyle
-            && typedOther.errorMaxLines == errorMaxLines
-            && typedOther.hasFloatingPlaceholder == hasFloatingPlaceholder
-            && typedOther.isDense == isDense
-            && typedOther.contentPadding == contentPadding
-            && typedOther.isCollapsed == isCollapsed
-            && typedOther.prefixIcon == prefixIcon
-            && typedOther.prefix == prefix
-            && typedOther.prefixText == prefixText
-            && typedOther.prefixStyle == prefixStyle
-            && typedOther.suffixIcon == suffixIcon
-            && typedOther.suffix == suffix
-            && typedOther.suffixText == suffixText
-            && typedOther.suffixStyle == suffixStyle
-            && typedOther.counterText == counterText
-            && typedOther.counterStyle == counterStyle
-            && typedOther.filled == filled
-            && typedOther.fillColor == fillColor
-            && typedOther.errorBorder == errorBorder
-            && typedOther.focusedBorder == focusedBorder
-            && typedOther.focusedErrorBorder == focusedErrorBorder
-            && typedOther.disabledBorder == disabledBorder
-            && typedOther.enabledBorder == enabledBorder
-            && typedOther.border == border
-            && typedOther.enabled == enabled
-            && typedOther.semanticCounterText == semanticCounterText;
+      public static bool operator ==(InputDecoration left, InputDecoration other) {
+          return other.icon == left.icon
+                 && other.labelText == left.labelText
+                 && other.labelStyle == left.labelStyle
+                 && other.helperText == left.helperText
+                 && other.helperStyle == left.helperStyle
+                 && other.hintText == left.hintText
+                 && other.hintStyle == left.hintStyle
+                 && other.errorText == left.errorText
+                 && other.errorStyle == left.errorStyle
+                 && other.errorMaxLines == left.errorMaxLines
+                 && other.hasFloatingPlaceholder == left.hasFloatingPlaceholder
+                 && other.isDense == left.isDense
+                 && other.contentPadding == left.contentPadding
+                 && other.isCollapsed == left.isCollapsed
+                 && other.prefixIcon == left.prefixIcon
+                 && other.prefix == left.prefix
+                 && other.prefixText == left.prefixText
+                 && other.prefixStyle == left.prefixStyle
+                 && other.suffixIcon == left.suffixIcon
+                 && other.suffix == left.suffix
+                 && other.suffixText == left.suffixText
+                 && other.suffixStyle == left.suffixStyle
+                 && other.counterText == left.counterText
+                 && other.counterStyle == left.counterStyle
+                 && other.filled == left.filled
+                 && other.fillColor == left.fillColor
+                 && other.errorBorder == left.errorBorder
+                 && other.focusedBorder == left.focusedBorder
+                 && other.focusedErrorBorder == left.focusedErrorBorder
+                 && other.disabledBorder == left.disabledBorder
+                 && other.enabledBorder == left.enabledBorder
+                 && other.border == left.border
+                 && other.enabled == left.enabled;
       }
 
-      public override int get hashCode {
-        // Split into multiple hashValues calls
-        // because the hashValues function is limited to 20 parameters.
-        return hashValues(
-          icon,
-          labelText,
-          labelStyle,
-          helperText,
-          helperStyle,
-          hintText,
-          hintStyle,
-          errorText,
-          errorStyle,
-          errorMaxLines,
-          hasFloatingPlaceholder,
-          isDense,
-          hashValues(
-            contentPadding,
-            isCollapsed,
-            filled,
-            fillColor,
-            border,
-            enabled,
-            prefixIcon,
-            prefix,
-            prefixText,
-            prefixStyle,
-            suffixIcon,
-            suffix,
-            suffixText,
-          ),
-          hashValues(
-            suffixStyle,
-            counterText,
-            counterStyle,
-            filled,
-            fillColor,
-            errorBorder,
-            focusedBorder,
-            focusedErrorBorder,
-            disabledBorder,
-            enabledBorder,
-            border,
-            enabled,
-            semanticCounterText,
-          ),
-        );
+      public static bool operator !=(InputDecoration left, InputDecoration other) {
+          return !(left == other);
       }
 
-      public override string tostring() {
-        final List<string> description = <string>[];
-        if (icon != null)
-          description.add("icon: $icon");
-        if (labelText != null)
-          description.add("labelText: "$labelText"");
-        if (helperText != null)
-          description.add("helperText: "$helperText"");
-        if (hintText != null)
-          description.add("hintText: "$hintText"");
-        if (errorText != null)
-          description.add("errorText: "$errorText"");
-        if (errorStyle != null)
-          description.add("errorStyle: "$errorStyle"");
-        if (errorMaxLines != null)
-          description.add("errorMaxLines: "$errorMaxLines"");
-        if (hasFloatingPlaceholder == false)
-          description.add("hasFloatingPlaceholder: false");
-        if (isDense ?? false)
-          description.add("isDense: $isDense");
-        if (contentPadding != null)
-          description.add("contentPadding: $contentPadding");
-        if (isCollapsed)
-          description.add("isCollapsed: $isCollapsed");
-        if (prefixIcon != null)
-          description.add("prefixIcon: $prefixIcon");
-        if (prefix != null)
-          description.add("prefix: $prefix");
-        if (prefixText != null)
-          description.add("prefixText: $prefixText");
-        if (prefixStyle != null)
-          description.add("prefixStyle: $prefixStyle");
-        if (suffixIcon != null)
-          description.add("suffixIcon: $suffixIcon");
-        if (suffix != null)
-          description.add("suffix: $suffix");
-        if (suffixText != null)
-          description.add("suffixText: $suffixText");
-        if (suffixStyle != null)
-          description.add("suffixStyle: $suffixStyle");
-        if (counterText != null)
-          description.add("counterText: $counterText");
-        if (counterStyle != null)
-          description.add("counterStyle: $counterStyle");
-        if (filled == true) // filled == null same as filled == false
-          description.add("filled: true");
-        if (fillColor != null)
-          description.add("fillColor: $fillColor");
-        if (errorBorder != null)
-          description.add("errorBorder: $errorBorder");
-        if (focusedBorder != null)
-          description.add("focusedBorder: $focusedBorder");
-        if (focusedErrorBorder != null)
-          description.add("focusedErrorBorder: $focusedErrorBorder");
-        if (disabledBorder != null)
-          description.add("disabledBorder: $disabledBorder");
-        if (enabledBorder != null)
-          description.add("enabledBorder: $enabledBorder");
-        if (border != null)
-          description.add("border: $border");
-        if (!enabled)
-          description.add("enabled: false");
-        if (semanticCounterText != null)
-          description.add("semanticCounterText: $semanticCounterText");
-        return "InputDecoration(${description.join(", ")})";
+      public override int GetHashCode () {
+        unchecked {
+            var hashCode = this.icon.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.labelText.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.labelStyle.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.helperText.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.helperStyle.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.hintText.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.hintStyle.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.errorText.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.errorStyle.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.errorMaxLines.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.hasFloatingPlaceholder.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.isDense.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.contentPadding.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.isCollapsed.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.filled.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.fillColor.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.border.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.enabled.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.prefixIcon.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.prefix.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.prefixText.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.prefixStyle.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.suffixIcon.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.suffix.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.suffixText.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.suffixStyle.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.counterText.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.counterStyle.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.filled.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.fillColor.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.errorBorder.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.focusedBorder.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.focusedErrorBorder.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.disabledBorder.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.enabledBorder.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.border.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.enabled.GetHashCode();
+            return hashCode;
+        }
+      }
+
+      public override string ToString() {
+        List<string> description = new List<string>{};
+        if (this.icon != null)
+          description.Add($"icon: ${this.icon}");
+        if (this.labelText != null)
+          description.Add($"labelText: ${this.labelText}");
+        if (this.helperText != null)
+          description.Add($"helperText: ${this.helperText}");
+        if (this.hintText != null)
+          description.Add($"hintText: ${this.hintText}");
+        if (this.errorText != null)
+          description.Add($"errorText: ${this.errorText}");
+        if (this.errorStyle != null)
+          description.Add($"errorStyle: ${this.errorStyle}");
+        if (this.errorMaxLines != null)
+          description.Add($"errorMaxLines: ${this.errorMaxLines}");
+        if (this.hasFloatingPlaceholder == false)
+          description.Add($"hasFloatingPlaceholder: false");
+        if (this.isDense ?? false)
+          description.Add($"isDense: ${this.isDense}");
+        if (this.contentPadding != null)
+          description.Add($"contentPadding: ${this.contentPadding}");
+        if (this.isCollapsed)
+          description.Add($"isCollapsed: ${this.isCollapsed}");
+        if (this.prefixIcon != null)
+          description.Add($"prefixIcon: ${this.prefixIcon}");
+        if (this.prefix != null)
+          description.Add($"prefix: ${this.prefix}");
+        if (this.prefixText != null)
+          description.Add($"prefixText: ${this.prefixText}");
+        if (this.prefixStyle != null)
+          description.Add($"prefixStyle: ${this.prefixStyle}");
+        if (this.suffixIcon != null)
+          description.Add($"suffixIcon: ${this.suffixIcon}");
+        if (this.suffix != null)
+          description.Add($"suffix: ${this.suffix}");
+        if (this.suffixText != null)
+          description.Add($"suffixText: ${this.suffixText}");
+        if (this.suffixStyle != null)
+          description.Add($"suffixStyle: ${this.suffixStyle}");
+        if (this.counterText != null)
+          description.Add($"counterText: ${this.counterText}");
+        if (this.counterStyle != null)
+          description.Add($"counterStyle: ${this.counterStyle}");
+        if (this.filled == true)
+          description.Add($"filled: true");
+        if (this.fillColor != null)
+          description.Add($"fillColor: ${this.fillColor}");
+        if (this.errorBorder != null)
+          description.Add($"errorBorder: ${this.errorBorder}");
+        if (this.focusedBorder != null)
+          description.Add($"focusedBorder: ${this.focusedBorder}");
+        if (this.focusedErrorBorder != null)
+          description.Add($"focusedErrorBorder: ${this.focusedErrorBorder}");
+        if (this.disabledBorder != null)
+          description.Add($"disabledBorder: ${this.disabledBorder}");
+        if (this.enabledBorder != null)
+          description.Add($"enabledBorder: ${this.enabledBorder}");
+        if (this.border != null)
+          description.Add($"border: ${this.border}");
+        if (this.enabled != true)
+          description.Add("enabled: false");
+        return $"InputDecoration(${string.Join(", ", description)})";
       }
     }
 
-    @immutable
-    class InputDecorationTheme : Diagnosticable {
-      const InputDecorationTheme({
-        this.labelStyle,
-        this.helperStyle,
-        this.hintStyle,
-        this.errorStyle,
-        this.errorMaxLines,
-        this.hasFloatingPlaceholder = true,
-        this.isDense = false,
-        this.contentPadding,
-        this.isCollapsed = false,
-        this.prefixStyle,
-        this.suffixStyle,
-        this.counterStyle,
-        this.filled = false,
-        this.fillColor,
-        this.errorBorder,
-        this.focusedBorder,
-        this.focusedErrorBorder,
-        this.disabledBorder,
-        this.enabledBorder,
-        this.border,
-      }) : D.assert(isDense != null),
-           D.assert(isCollapsed != null),
-          D.assert(filled != null);
+    public class InputDecorationTheme : Diagnosticable {
+      public InputDecorationTheme(
+        TextStyle labelStyle = null,
+        TextStyle helperStyle = null,
+        TextStyle hintStyle = null,
+        TextStyle errorStyle = null,
+        int? errorMaxLines = null,
+        bool? hasFloatingPlaceholder = true,
+        bool? isDense = false,
+        EdgeInsets contentPadding = null,
+        bool? isCollapsed = false,
+        TextStyle prefixStyle = null,
+        TextStyle suffixStyle = null,
+        TextStyle counterStyle = null,
+        bool? filled = false,
+        Color fillColor = null,
+        InputBorder errorBorder = null,
+        InputBorder focusedBorder = null,
+        InputBorder focusedErrorBorder = null,
+        InputBorder disabledBorder = null,
+        InputBorder enabledBorder = null,
+        InputBorder border = null
+      )  {
+              D.assert(isDense != null);
+              D.assert(isCollapsed != null);
+              D.assert(filled != null);
+      }
 
-      final TextStyle labelStyle;
+      public readonly TextStyle labelStyle;
 
-      final TextStyle helperStyle;
+      public readonly TextStyle helperStyle;
 
-      final TextStyle hintStyle;
+      public readonly TextStyle hintStyle;
 
-      final TextStyle errorStyle;
+      public readonly TextStyle errorStyle;
 
-      final int errorMaxLines;
+      public readonly int errorMaxLines;
 
-      final bool hasFloatingPlaceholder;
+      public readonly bool hasFloatingPlaceholder;
 
-      final bool isDense;
+      public readonly bool isDense;
 
-      final EdgeInsetsGeometry contentPadding;
+      public readonly EdgeInsets contentPadding;
 
-      final bool isCollapsed;
+      public readonly bool isCollapsed;
 
-      final TextStyle prefixStyle;
+      public readonly TextStyle prefixStyle;
 
-      final TextStyle suffixStyle;
+      public readonly TextStyle suffixStyle;
 
-      final TextStyle counterStyle;
+      public readonly TextStyle counterStyle;
 
-      final bool filled;
+      public readonly bool filled;
 
-      final Color fillColor;
+      public readonly Color fillColor;
 
-      final InputBorder errorBorder;
+      public readonly InputBorder errorBorder;
 
-      final InputBorder focusedBorder;
+      public readonly InputBorder focusedBorder;
 
-      final InputBorder focusedErrorBorder;
+      public readonly InputBorder focusedErrorBorder;
 
-      final InputBorder disabledBorder;
+      public readonly InputBorder disabledBorder;
 
-      final InputBorder enabledBorder;
+      public readonly InputBorder enabledBorder;
 
-      final InputBorder border;
+      public readonly InputBorder border;
 
       public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
         base.debugFillProperties(properties);
-        const InputDecorationTheme defaultTheme = InputDecorationTheme();
-        properties.add(DiagnosticsProperty<TextStyle>("labelStyle", labelStyle, defaultValue: defaultTheme.labelStyle));
-        properties.add(DiagnosticsProperty<TextStyle>("helperStyle", helperStyle, defaultValue: defaultTheme.helperStyle));
-        properties.add(DiagnosticsProperty<TextStyle>("hintStyle", hintStyle, defaultValue: defaultTheme.hintStyle));
-        properties.add(DiagnosticsProperty<TextStyle>("errorStyle", errorStyle, defaultValue: defaultTheme.errorStyle));
-        properties.add(DiagnosticsProperty<int>("errorMaxLines", errorMaxLines, defaultValue: defaultTheme.errorMaxLines));
-        properties.add(DiagnosticsProperty<bool>("hasFloatingPlaceholder", hasFloatingPlaceholder, defaultValue: defaultTheme.hasFloatingPlaceholder));
-        properties.add(DiagnosticsProperty<bool>("isDense", isDense, defaultValue: defaultTheme.isDense));
-        properties.add(DiagnosticsProperty<EdgeInsetsGeometry>("contentPadding", contentPadding, defaultValue: defaultTheme.contentPadding));
-        properties.add(DiagnosticsProperty<bool>("isCollapsed", isCollapsed, defaultValue: defaultTheme.isCollapsed));
-        properties.add(DiagnosticsProperty<TextStyle>("prefixStyle", prefixStyle, defaultValue: defaultTheme.prefixStyle));
-        properties.add(DiagnosticsProperty<TextStyle>("suffixStyle", suffixStyle, defaultValue: defaultTheme.suffixStyle));
-        properties.add(DiagnosticsProperty<TextStyle>("counterStyle", counterStyle, defaultValue: defaultTheme.counterStyle));
-        properties.add(DiagnosticsProperty<bool>("filled", filled, defaultValue: defaultTheme.filled));
-        properties.add(DiagnosticsProperty<Color>("fillColor", fillColor, defaultValue: defaultTheme.fillColor));
-        properties.add(DiagnosticsProperty<InputBorder>("errorBorder", errorBorder, defaultValue: defaultTheme.errorBorder));
-        properties.add(DiagnosticsProperty<InputBorder>("focusedBorder", focusedBorder, defaultValue: defaultTheme.focusedErrorBorder));
-        properties.add(DiagnosticsProperty<InputBorder>("focusedErrorborder", focusedErrorBorder, defaultValue: defaultTheme.focusedErrorBorder));
-        properties.add(DiagnosticsProperty<InputBorder>("disabledBorder", disabledBorder, defaultValue: defaultTheme.disabledBorder));
-        properties.add(DiagnosticsProperty<InputBorder>("enabledBorder", enabledBorder, defaultValue: defaultTheme.enabledBorder));
-        properties.add(DiagnosticsProperty<InputBorder>("border", border, defaultValue: defaultTheme.border));
+        InputDecorationTheme defaultTheme = new InputDecorationTheme();
+        properties.add(new DiagnosticsProperty<TextStyle>("labelStyle", this.labelStyle, defaultValue: defaultTheme.labelStyle));
+        properties.add(new DiagnosticsProperty<TextStyle>("helperStyle", this.helperStyle, defaultValue: defaultTheme.helperStyle));
+        properties.add(new DiagnosticsProperty<TextStyle>("hintStyle", this.hintStyle, defaultValue: defaultTheme.hintStyle));
+        properties.add(new DiagnosticsProperty<TextStyle>("errorStyle", this.errorStyle, defaultValue: defaultTheme.errorStyle));
+        properties.add(new DiagnosticsProperty<int>("errorMaxLines", this.errorMaxLines, defaultValue: defaultTheme.errorMaxLines));
+        properties.add(new DiagnosticsProperty<bool>("hasFloatingPlaceholder", this.hasFloatingPlaceholder, defaultValue: defaultTheme.hasFloatingPlaceholder));
+        properties.add(new DiagnosticsProperty<bool>("isDense", this.isDense, defaultValue: defaultTheme.isDense));
+        properties.add(new DiagnosticsProperty<EdgeInsets>("contentPadding", this.contentPadding, defaultValue: defaultTheme.contentPadding));
+        properties.add(new DiagnosticsProperty<bool>("isCollapsed", this.isCollapsed, defaultValue: defaultTheme.isCollapsed));
+        properties.add(new DiagnosticsProperty<TextStyle>("prefixStyle", this.prefixStyle, defaultValue: defaultTheme.prefixStyle));
+        properties.add(new DiagnosticsProperty<TextStyle>("suffixStyle", this.suffixStyle, defaultValue: defaultTheme.suffixStyle));
+        properties.add(new DiagnosticsProperty<TextStyle>("counterStyle", this.counterStyle, defaultValue: defaultTheme.counterStyle));
+        properties.add(new DiagnosticsProperty<bool>("filled", this.filled, defaultValue: defaultTheme.filled));
+        properties.add(new DiagnosticsProperty<Color>("fillColor", this.fillColor, defaultValue: defaultTheme.fillColor));
+        properties.add(new DiagnosticsProperty<InputBorder>("errorBorder", this.errorBorder, defaultValue: defaultTheme.errorBorder));
+        properties.add(new DiagnosticsProperty<InputBorder>("focusedBorder", this.focusedBorder, defaultValue: defaultTheme.focusedErrorBorder));
+        properties.add(new DiagnosticsProperty<InputBorder>("focusedErrorborder", this.focusedErrorBorder, defaultValue: defaultTheme.focusedErrorBorder));
+        properties.add(new DiagnosticsProperty<InputBorder>("disabledBorder", this.disabledBorder, defaultValue: defaultTheme.disabledBorder));
+        properties.add(new DiagnosticsProperty<InputBorder>("enabledBorder", this.enabledBorder, defaultValue: defaultTheme.enabledBorder));
+        properties.add(new DiagnosticsProperty<InputBorder>("border", this.border, defaultValue: defaultTheme.border));
       }
     }
 
