@@ -251,7 +251,7 @@ namespace Unity.UIWidgets.material {
         }
 
 
-        Color getDisabledTextColor(MaterialButton button) {
+        public Color getDisabledTextColor(MaterialButton button) {
             if (button.disabledTextColor != null) {
                 return button.disabledTextColor;
             }
