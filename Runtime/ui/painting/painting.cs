@@ -378,6 +378,8 @@ namespace Unity.UIWidgets.ui {
 
         public MaskFilter maskFilter = null;
 
+        public ImageFilter backdrop = null;
+
         public PaintShader shader = null;
 
         public bool invertColors = false;
@@ -398,6 +400,7 @@ namespace Unity.UIWidgets.ui {
             this.filterMode = paint.filterMode;
             this.colorFilter = paint.colorFilter;
             this.maskFilter = paint.maskFilter;
+            this.backdrop = paint.backdrop;
             this.shader = paint.shader;
             this.invertColors = paint.invertColors;
         }

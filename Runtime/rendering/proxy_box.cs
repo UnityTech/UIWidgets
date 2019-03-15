@@ -680,6 +680,40 @@ namespace Unity.UIWidgets.rendering {
         }
     }
 
+    public class RenderBackdropFilter : RenderProxyBox {
+        public RenderBackdropFilter(
+            RenderBox child = null,
+            ImageFilter filter = null
+        ) : base(child) {
+            D.assert(filter != null);
+            this._filter = filter;
+        }
+
+        ImageFilter _filter;
+
+        public ImageFilter filter {
+            get { return this._filter; }
+            set {
+                D.assert(value != null);
+                if (this._filter == value) {
+                    return;
+                }
+
+                this.markNeedsPaint();
+            }
+        }
+
+        protected override bool alwaysNeedsCompositing {
+            get { return this.child != null; }
+        }
+
+        public override void paint(PaintingContext context, Offset offset) {
+            if (this.child != null) {
+                D.assert(this.needsCompositing);
+                context.pushLayer(new BackdropFilterLayer(this.filter), base.paint, offset);
+            }
+        }
+    }
 
     public abstract class CustomClipper<T> {
         public CustomClipper(Listenable reclip = null) {
