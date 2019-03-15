@@ -64,6 +64,7 @@ namespace Unity.UIWidgets.material {
             IconThemeData iconTheme = null,
             IconThemeData primaryIconTheme = null,
             IconThemeData accentIconTheme = null,
+            TabBarTheme tabBarTheme = null,
             RuntimePlatform? platform = null,
             MaterialTapTargetSize? materialTapTargetSize = null,
             PageTransitionsTheme pageTransitionsTheme = null,
@@ -161,6 +162,7 @@ namespace Unity.UIWidgets.material {
                               ? ThemeDataUtils._kDarkThemeSplashColor
                               : ThemeDataUtils._kLightThemeSplashColor);
 
+            tabBarTheme = tabBarTheme ?? new TabBarTheme();
             dialogTheme = dialogTheme ?? new DialogTheme();
 
             D.assert(brightness != null);
@@ -203,6 +205,7 @@ namespace Unity.UIWidgets.material {
             D.assert(colorScheme != null);
             D.assert(typography != null);
             D.assert(buttonColor != null);
+            D.assert(tabBarTheme != null);
             D.assert(dialogTheme != null);
 
             this.brightness = brightness ?? Brightness.light;
@@ -241,6 +244,7 @@ namespace Unity.UIWidgets.material {
             this.iconTheme = iconTheme;
             this.primaryIconTheme = primaryIconTheme;
             this.accentIconTheme = accentIconTheme;
+            this.tabBarTheme = tabBarTheme;
             this.platform = platform.Value;
             this.materialTapTargetSize = materialTapTargetSize ?? MaterialTapTargetSize.padded;
             this.pageTransitionsTheme = pageTransitionsTheme;
@@ -286,6 +290,7 @@ namespace Unity.UIWidgets.material {
             IconThemeData iconTheme = null,
             IconThemeData primaryIconTheme = null,
             IconThemeData accentIconTheme = null,
+            TabBarTheme tabBarTheme = null,
             RuntimePlatform? platform = null,
             MaterialTapTargetSize? materialTapTargetSize = null,
             PageTransitionsTheme pageTransitionsTheme = null,
@@ -334,6 +339,7 @@ namespace Unity.UIWidgets.material {
             D.assert(colorScheme != null);
             D.assert(typography != null);
             D.assert(buttonColor != null);
+            D.assert(tabBarTheme != null);
             D.assert(dialogTheme != null);
 
             return new ThemeData(
@@ -373,6 +379,7 @@ namespace Unity.UIWidgets.material {
                 iconTheme: iconTheme,
                 primaryIconTheme: primaryIconTheme,
                 accentIconTheme: accentIconTheme,
+                tabBarTheme: tabBarTheme,
                 platform: platform,
                 materialTapTargetSize: materialTapTargetSize,
                 pageTransitionsTheme: pageTransitionsTheme,
@@ -466,6 +473,8 @@ namespace Unity.UIWidgets.material {
 
         public readonly IconThemeData accentIconTheme;
 
+        public readonly TabBarTheme tabBarTheme;
+
         public readonly RuntimePlatform platform;
 
         public readonly MaterialTapTargetSize materialTapTargetSize;
@@ -515,6 +524,7 @@ namespace Unity.UIWidgets.material {
             IconThemeData iconTheme = null,
             IconThemeData primaryIconTheme = null,
             IconThemeData accentIconTheme = null,
+            TabBarTheme tabBarTheme = null,
             RuntimePlatform? platform = null,
             MaterialTapTargetSize? materialTapTargetSize = null,
             PageTransitionsTheme pageTransitionsTheme = null,
@@ -559,6 +569,7 @@ namespace Unity.UIWidgets.material {
                 iconTheme: iconTheme ?? this.iconTheme,
                 primaryIconTheme: primaryIconTheme ?? this.primaryIconTheme,
                 accentIconTheme: accentIconTheme ?? this.accentIconTheme,
+                tabBarTheme: tabBarTheme ?? this.tabBarTheme,
                 platform: platform ?? this.platform,
                 materialTapTargetSize: materialTapTargetSize ?? this.materialTapTargetSize,
                 pageTransitionsTheme: pageTransitionsTheme ?? this.pageTransitionsTheme,
@@ -639,6 +650,7 @@ namespace Unity.UIWidgets.material {
                 iconTheme: IconThemeData.lerp(a.iconTheme, b.iconTheme, t),
                 primaryIconTheme: IconThemeData.lerp(a.primaryIconTheme, b.primaryIconTheme, t),
                 accentIconTheme: IconThemeData.lerp(a.accentIconTheme, b.accentIconTheme, t),
+                tabBarTheme: TabBarTheme.lerp(a.tabBarTheme, b.tabBarTheme, t),
                 platform: t < 0.5 ? a.platform : b.platform,
                 materialTapTargetSize: t < 0.5 ? a.materialTapTargetSize : b.materialTapTargetSize,
                 pageTransitionsTheme: t < 0.5 ? a.pageTransitionsTheme : b.pageTransitionsTheme,
@@ -693,6 +705,7 @@ namespace Unity.UIWidgets.material {
                    other.iconTheme == this.iconTheme &&
                    other.primaryIconTheme == this.primaryIconTheme &&
                    other.accentIconTheme == this.accentIconTheme &&
+                   other.tabBarTheme == this.tabBarTheme &&
                    other.platform == this.platform &&
                    other.materialTapTargetSize == this.materialTapTargetSize &&
                    other.pageTransitionsTheme == this.pageTransitionsTheme &&
@@ -763,6 +776,7 @@ namespace Unity.UIWidgets.material {
                 hashCode = (hashCode * 397) ^ this.iconTheme.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.primaryIconTheme.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.accentIconTheme.GetHashCode();
+                hashCode = (hashCode * 397) ^ this.tabBarTheme.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.platform.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.materialTapTargetSize.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.pageTransitionsTheme.GetHashCode();
@@ -837,6 +851,7 @@ namespace Unity.UIWidgets.material {
             properties.add(new DiagnosticsProperty<IconThemeData>("iconTheme", this.iconTheme));
             properties.add(new DiagnosticsProperty<IconThemeData>("primaryIconTheme", this.primaryIconTheme));
             properties.add(new DiagnosticsProperty<IconThemeData>("accentIconTheme", this.accentIconTheme));
+            properties.add(new DiagnosticsProperty<TabBarTheme>("tabBarTheme", this.tabBarTheme));
             properties.add(
                 new DiagnosticsProperty<MaterialTapTargetSize>("materialTapTargetSize", this.materialTapTargetSize));
             properties.add(
