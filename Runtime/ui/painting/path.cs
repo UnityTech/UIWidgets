@@ -166,12 +166,22 @@ namespace Unity.UIWidgets.ui {
             this._cache = null;
         }
 
+        public void relativeMoveTo(float x, float y) {
+            var x0 = this._commandx;
+            var y0 = this._commandy;
+            
+            this._appendCommands(new[] {
+                (float) PathCommand.moveTo,
+                x + x0, y + y0,
+            });
+        }
+        
         public void moveTo(float x, float y) {
             this._appendCommands(new[] {
                 (float) PathCommand.moveTo,
                 x, y,
             });
-        }
+       }
 
         public void lineTo(float x, float y) {
             this._appendCommands(new[] {
