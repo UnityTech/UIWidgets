@@ -32,6 +32,27 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
+    public class BackdropFilter : SingleChildRenderObjectWidget {
+        public BackdropFilter(
+            Key key = null,
+            ImageFilter filter = null,
+            Widget child = null)
+            : base(key, child) {
+            D.assert(filter != null);
+            this.filter = filter;
+        }
+
+        public readonly ImageFilter filter;
+
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderBackdropFilter(filter: this.filter);
+        }
+
+        public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
+            ((RenderBackdropFilter) renderObject).filter = this.filter;
+        }
+    }
+
     public class Opacity : SingleChildRenderObjectWidget {
         public Opacity(float opacity, Key key = null, Widget child = null) : base(key, child) {
             this.opacity = opacity;
@@ -635,6 +656,33 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
+    class IndexedStack : Stack {
+        public IndexedStack(
+            Key key = null,
+            Alignment alignment = null,
+            StackFit sizing = StackFit.loose,
+            int index = 0,
+            List<Widget> children = null
+        ) : base(key: key, alignment: alignment ?? Alignment.topLeft, fit: sizing, children: children) {
+            this.index = index;
+        }
+
+        public readonly int index;
+
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderIndexedStack(
+                index: this.index,
+                alignment: this.alignment
+            );
+        }
+
+        public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
+            RenderIndexedStack renderIndexedStack = renderObject as RenderIndexedStack;
+            renderIndexedStack.index = this.index;
+            renderIndexedStack.alignment = this.alignment;
+        }
+    }
+
     public class Positioned : ParentDataWidget<Stack> {
         public Positioned(Widget child, Key key = null, float? left = null, float? top = null,
             float? right = null, float? bottom = null, float? width = null, float? height = null) :
@@ -654,7 +702,7 @@ namespace Unity.UIWidgets.widgets {
                 top: rect.top, width: rect.width, height: rect.height);
         }
 
-        public static Positioned fromRelativeRect(Rect rect, Widget child, Key key = null) {
+        public static Positioned fromRelativeRect(RelativeRect rect, Widget child, Key key = null) {
             return new Positioned(child, key: key, left: rect.left,
                 top: rect.top, right: rect.right, bottom: rect.bottom);
         }
@@ -1875,12 +1923,12 @@ namespace Unity.UIWidgets.widgets {
         public static List<Widget> ensureUniqueKeysForList(IEnumerable<Widget> items, int baseIndex = 0) {
             if (items == null) {
                 return null;
-
             }
+
             List<Widget> itemsWithUniqueKeys = new List<Widget>();
             int itemIndex = baseIndex;
             foreach (Widget item in items) {
-                itemsWithUniqueKeys.Add(KeyedSubtree.wrap(item, itemIndex));
+                itemsWithUniqueKeys.Add(wrap(item, itemIndex));
                 itemIndex += 1;
             }
 

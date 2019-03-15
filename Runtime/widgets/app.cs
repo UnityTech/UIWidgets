@@ -26,7 +26,7 @@ namespace Unity.UIWidgets.widgets {
         public readonly Dictionary<string, WidgetBuilder> routes;
         public readonly TextStyle textStyle;
         public readonly Window window;
-        public readonly bool showPerformanceoverlay;
+        public readonly bool showPerformanceOverlay;
         public readonly Locale locale;
         public readonly List<LocalizationsDelegate> localizationsDelegates;
         public readonly LocaleListResolutionCallback localeListResolutionCallback;
@@ -70,7 +70,7 @@ namespace Unity.UIWidgets.widgets {
             this.localeListResolutionCallback = localeListResolutionCallback;
             this.localeResolutionCallback = localeResolutionCallback;
             this.supportedLocales = supportedLocales;
-            this.showPerformanceoverlay = showPerformanceOverlay;
+            this.showPerformanceOverlay = showPerformanceOverlay;
 
             D.assert(
                 home == null ||
@@ -392,7 +392,7 @@ namespace Unity.UIWidgets.widgets {
             }
 
             PerformanceOverlay performanceOverlay = null;
-            if (this.widget.showPerformanceoverlay) {
+            if (this.widget.showPerformanceOverlay) {
                 performanceOverlay = PerformanceOverlay.allEnabled();
             }
 

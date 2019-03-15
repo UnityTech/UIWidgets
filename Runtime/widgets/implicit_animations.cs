@@ -437,6 +437,55 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
+    public class AnimatedOpacity : ImplicitlyAnimatedWidget {
+        public AnimatedOpacity(
+            Key key = null,
+            Widget child = null,
+            float? opacity = null,
+            Curve curve = null,
+            TimeSpan? duration = null
+        ) :
+            base(key: key, curve: curve ?? Curves.linear, duration: duration) {
+            D.assert(opacity != null && opacity >= 0.0 && opacity <= 1.0);
+            this.child = child;
+            this.opacity = opacity ?? 1.0f;
+        }
+
+        public readonly Widget child;
+
+        public readonly float opacity;
+
+        public override State createState() {
+            return new _AnimatedOpacityState();
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new FloatProperty("opacity", this.opacity));
+        }
+    }
+
+    class _AnimatedOpacityState : ImplicitlyAnimatedWidgetState<AnimatedOpacity> {
+        FloatTween _opacity;
+        Animation<float> _opacityAnimation;
+
+        protected override void forEachTween(TweenVisitor visitor) {
+            this._opacity = (FloatTween) visitor.visit(this, this._opacity, this.widget.opacity,
+                (float value) => new FloatTween(begin: value, end: 1.0f));
+        }
+
+        protected override void didUpdateTweens() {
+            this._opacityAnimation = this.animation.drive(this._opacity);
+        }
+
+        public override Widget build(BuildContext context) {
+            return new FadeTransition(
+                opacity: this._opacityAnimation,
+                child: this.widget.child
+            );
+        }
+    }
+
     public class AnimatedDefaultTextStyle : ImplicitlyAnimatedWidget {
         public AnimatedDefaultTextStyle(
             Key key = null,

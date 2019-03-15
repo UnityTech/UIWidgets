@@ -155,7 +155,7 @@ namespace UIWidgetsSample {
                 var texture = Resources.Load<RenderTexture>("VideoSampleRT");
                 return new Center(
                     child: new Container(
-                        width: 480, height: 270,
+                        width: 240, height: 135,
                         child: new Texture(texture: texture)
                     )
                 );

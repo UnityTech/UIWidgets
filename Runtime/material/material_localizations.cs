@@ -62,6 +62,8 @@ namespace Unity.UIWidgets.material {
         public abstract List<string> narrowWeekdays { get; }
 
         public abstract int firstDayOfWeekIndex { get; }
+        
+        public abstract string modalBarrierDismissLabel { get; }
 
         public static MaterialLocalizations of(BuildContext context) {
             return Localizations.of<MaterialLocalizations>(context, typeof(MaterialLocalizations));
@@ -369,6 +371,10 @@ namespace Unity.UIWidgets.material {
 
         public override string postMeridiemAbbreviation {
             get { return "PM"; }
+        }
+
+        public override string modalBarrierDismissLabel {
+            get { return "Dismiss";  }
         }
 
         public override ScriptCategory scriptCategory {

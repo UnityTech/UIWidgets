@@ -553,7 +553,7 @@ namespace UIWidgets.Tests {
                 child: new Container(
                     color: CLColors.background3,
                     child: new Transform(
-                        transform: Matrix3.makeRotate(Mathf.PI/180 * 5, px, py),
+                        transform: Matrix3.makeRotate(Mathf.PI / 180 * 5, px, py),
                         child:
                         new Column(
                             children: new List<Widget> {
@@ -564,7 +564,27 @@ namespace UIWidgets.Tests {
                     )
                 )
             );
-            return container;
+
+            var stack = new Stack(
+                children: new List<Widget> {
+                    container,
+                    new Positioned(
+                        top: 50,
+                        right: 50,
+                        child: new BackdropFilter(
+                            filter: ImageFilter.blur(10, 10),
+                            child: new Container(
+                                width: 300, height: 300,
+                                decoration: new BoxDecoration(
+                                    color: Colors.transparent
+                                )
+                            )
+                        )
+                    )
+                }
+            );
+
+            return stack;
         }
     }
 
