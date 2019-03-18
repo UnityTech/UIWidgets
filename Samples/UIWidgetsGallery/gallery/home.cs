@@ -265,135 +265,136 @@ namespace UIWidgetsGallery.gallery {
         public static bool showPreviewBanner = true;
 
         public override State createState() {
-            return new _GalleryHomeState();
+            // return new _GalleryHomeState();
+            return null;
         }
     }
 
-    class _GalleryHomeState : SingleTickerProviderStateMixin<GalleryHome> {
-        static readonly GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>.key();
-        AnimationController _controller;
-        GalleryDemoCategory _category;
-
-        static Widget _topHomeLayout(Widget currentChild, List<Widget> previousChildren) {
-            List<Widget> children = previousChildren;
-            if (currentChild != null) {
-                children = children.ToList();
-                children.Add(currentChild);
-            }
-
-            return new Stack(
-                children: children,
-                alignment: Alignment.topCenter
-            );
-        }
-
-        public static AnimatedSwitcherLayoutBuilder _centerHomeLayout = AnimatedSwitcher.defaultLayoutBuilder;
-
-        public override void initState() {
-            base.initState();
-            this._controller = new AnimationController(
-                duration: new TimeSpan(0, 0, 0, 0, 600),
-                debugLabel: "preview banner",
-                vsync: this
-            );
-            this._controller.forward();
-        }
-
-        public override void dispose() {
-            this._controller.dispose();
-            base.dispose();
-        }
-
-        public override Widget build(BuildContext context) {
-            ThemeData theme = Theme.of(context);
-            bool isDark = theme.brightness == Brightness.dark;
-            MediaQueryData media = MediaQuery.of(context);
-            bool centerHome = media.orientation == Orientation.portrait && media.size.height < 800.0;
-
-            Curve switchOutCurve = new Interval(0.4f, 1.0f, curve: Curves.fastOutSlowIn);
-            Curve switchInCurve = new Interval(0.4f, 1.0f, curve: Curves.fastOutSlowIn);
-
-            Widget home = new Scaffold(
-                key: _scaffoldKey,
-                backgroundColor: isDark ? HomeUtils._kUIWidgetsBlue : theme.primaryColor,
-                body: new SafeArea(
-                    bottom: false,
-                    child: new WillPopScope(
-                        onWillPop: () => {
-                            // Pop the category page if Android back button is pressed.
-                            if (this._category != null) {
-                                this.setState(() => this._category = null);
-                                return Promise<bool>.Resolved(false);
-                            }
-                            return Promise<bool>.Resolved(true);
-                        },
-                        child: new Backdrop(
-                            backTitle: new Text("Options"),
-                            backLayer: this.widget.optionsPage,
-                            frontAction: new AnimatedSwitcher(
-                                duration: HomeUtils._kFrontLayerSwitchDuration,
-                                switchOutCurve: switchOutCurve,
-                                switchInCurve: switchInCurve,
-                                child: this._category == null
-                                    ? (Widget) new _UIWidgetsLogo()
-                                    : new IconButton(
-                                        icon: new BackButtonIcon(),
-                                        tooltip: "Back",
-                                        onPressed: () => this.setState(() => this._category = null)
-                                    )
-                            ),
-                            frontTitle: new AnimatedSwitcher(
-                                duration: HomeUtils._kFrontLayerSwitchDuration,
-                                child: this._category == null
-                                    ? new Text("Flutter gallery")
-                                    : new Text(this._category.name)
-                            ),
-                            frontHeading: this.widget.testMode ? null : new Container(height: 24.0f),
-                            frontLayer: new AnimatedSwitcher(
-                                duration: HomeUtils._kFrontLayerSwitchDuration,
-                                switchOutCurve: switchOutCurve,
-                                switchInCurve: switchInCurve,
-                                layoutBuilder: centerHome ? _centerHomeLayout : _topHomeLayout,
-                                child: this._category != null
-                                    ? (Widget) new _DemosPage(this._category)
-                                    : new _CategoriesPage(
-                                        categories: DemoUtils.kAllGalleryDemoCategories,
-                                        onCategoryTap: (GalleryDemoCategory category) => {
-                                            this.setState(() => this._category = category);
-                                        }
-                                    )
-                            )
-                        )
-                    )
-                )
-            );
-
-            D.assert(() => {
-                GalleryHome.showPreviewBanner = false;
-                return true;
-            });
-
-            if (GalleryHome.showPreviewBanner) {
-                home = new Stack(
-                    fit: StackFit.expand,
-                    children: new List<Widget> {
-                        home,
-                        new FadeTransition(
-                            opacity: new CurvedAnimation(parent: this._controller, curve: Curves.easeInOut),
-                            child: new Banner(
-                                message: "PREVIEW",
-                                location: BannerLocation.topEnd
-                            )
-                        )
-                    }
-                );
-            }
-            home = new AnnotatedRegion<SystemUiOverlayStyle>(
-                child: home,
-                value: SystemUiOverlayStyle.light
-            );
-
-            return home;
-        }
-    }
+//    class _GalleryHomeState : SingleTickerProviderStateMixin<GalleryHome> {
+//        static readonly GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>.key();
+//        AnimationController _controller;
+//        GalleryDemoCategory _category;
+//
+//        static Widget _topHomeLayout(Widget currentChild, List<Widget> previousChildren) {
+//            List<Widget> children = previousChildren;
+//            if (currentChild != null) {
+//                children = children.ToList();
+//                children.Add(currentChild);
+//            }
+//
+//            return new Stack(
+//                children: children,
+//                alignment: Alignment.topCenter
+//            );
+//        }
+//
+//        public static AnimatedSwitcherLayoutBuilder _centerHomeLayout = AnimatedSwitcher.defaultLayoutBuilder;
+//
+//        public override void initState() {
+//            base.initState();
+//            this._controller = new AnimationController(
+//                duration: new TimeSpan(0, 0, 0, 0, 600),
+//                debugLabel: "preview banner",
+//                vsync: this
+//            );
+//            this._controller.forward();
+//        }
+//
+//        public override void dispose() {
+//            this._controller.dispose();
+//            base.dispose();
+//        }
+//
+//        public override Widget build(BuildContext context) {
+//            ThemeData theme = Theme.of(context);
+//            bool isDark = theme.brightness == Brightness.dark;
+//            MediaQueryData media = MediaQuery.of(context);
+//            bool centerHome = media.orientation == Orientation.portrait && media.size.height < 800.0;
+//
+//            Curve switchOutCurve = new Interval(0.4f, 1.0f, curve: Curves.fastOutSlowIn);
+//            Curve switchInCurve = new Interval(0.4f, 1.0f, curve: Curves.fastOutSlowIn);
+//
+//            Widget home = new Scaffold(
+//                key: _scaffoldKey,
+//                backgroundColor: isDark ? HomeUtils._kUIWidgetsBlue : theme.primaryColor,
+//                body: new SafeArea(
+//                    bottom: false,
+//                    child: new WillPopScope(
+//                        onWillPop: () => {
+//                            // Pop the category page if Android back button is pressed.
+//                            if (this._category != null) {
+//                                this.setState(() => this._category = null);
+//                                return Promise<bool>.Resolved(false);
+//                            }
+//                            return Promise<bool>.Resolved(true);
+//                        },
+//                        child: new Backdrop(
+//                            backTitle: new Text("Options"),
+//                            backLayer: this.widget.optionsPage,
+//                            frontAction: new AnimatedSwitcher(
+//                                duration: HomeUtils._kFrontLayerSwitchDuration,
+//                                switchOutCurve: switchOutCurve,
+//                                switchInCurve: switchInCurve,
+//                                child: this._category == null
+//                                    ? (Widget) new _UIWidgetsLogo()
+//                                    : new IconButton(
+//                                        icon: new BackButtonIcon(),
+//                                        tooltip: "Back",
+//                                        onPressed: () => this.setState(() => this._category = null)
+//                                    )
+//                            ),
+//                            frontTitle: new AnimatedSwitcher(
+//                                duration: HomeUtils._kFrontLayerSwitchDuration,
+//                                child: this._category == null
+//                                    ? new Text("Flutter gallery")
+//                                    : new Text(this._category.name)
+//                            ),
+//                            frontHeading: this.widget.testMode ? null : new Container(height: 24.0f),
+//                            frontLayer: new AnimatedSwitcher(
+//                                duration: HomeUtils._kFrontLayerSwitchDuration,
+//                                switchOutCurve: switchOutCurve,
+//                                switchInCurve: switchInCurve,
+//                                layoutBuilder: centerHome ? _centerHomeLayout : _topHomeLayout,
+//                                child: this._category != null
+//                                    ? (Widget) new _DemosPage(this._category)
+//                                    : new _CategoriesPage(
+//                                        categories: DemoUtils.kAllGalleryDemoCategories,
+//                                        onCategoryTap: (GalleryDemoCategory category) => {
+//                                            this.setState(() => this._category = category);
+//                                        }
+//                                    )
+//                            )
+//                        )
+//                    )
+//                )
+//            );
+//
+//            D.assert(() => {
+//                GalleryHome.showPreviewBanner = false;
+//                return true;
+//            });
+//
+//            if (GalleryHome.showPreviewBanner) {
+//                home = new Stack(
+//                    fit: StackFit.expand,
+//                    children: new List<Widget> {
+//                        home,
+//                        new FadeTransition(
+//                            opacity: new CurvedAnimation(parent: this._controller, curve: Curves.easeInOut),
+//                            child: new Banner(
+//                                message: "PREVIEW",
+//                                location: BannerLocation.topEnd
+//                            )
+//                        )
+//                    }
+//                );
+//            }
+//            home = new AnnotatedRegion<SystemUiOverlayStyle>(
+//                child: home,
+//                value: SystemUiOverlayStyle.light
+//            );
+//
+//            return home;
+//        }
+//  }
 }
