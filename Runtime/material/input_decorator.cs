@@ -9,7 +9,12 @@ using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.service;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
+using UnityEngine;
+using Canvas = Unity.UIWidgets.ui.Canvas;
+using Color = Unity.UIWidgets.ui.Color;
+using Rect = Unity.UIWidgets.ui.Rect;
 using TextStyle = Unity.UIWidgets.painting.TextStyle;
+using Transform = Unity.UIWidgets.widgets.Transform;
 
 namespace Unity.UIWidgets.material {
     class InputDecoratorConstants {
@@ -250,9 +255,6 @@ namespace Unity.UIWidgets.material {
         }
     }
 
-    // Display the helper and error text. When the error text appears
-    // it fades and the helper text fades out. The error text also
-    // slides upwards a little when it first appears.
     class _HelperError : StatefulWidget {
         public _HelperError(
             Key key = null,
@@ -314,7 +316,6 @@ namespace Unity.UIWidgets.material {
 
         void _handleChange() {
             this.setState(() => {
-                // The _controller"s value has changed.
             });
         }
 
@@ -438,7 +439,6 @@ namespace Unity.UIWidgets.material {
         }
     }
 
-    // Identifies the children of a _RenderDecorationElement.
     enum _DecorationSlot {
         icon,
         input,
@@ -453,7 +453,6 @@ namespace Unity.UIWidgets.material {
         container
     }
 
-    // An analog of InputDecoration for the _Decorator widget.
     class _Decoration {
         public _Decoration(
             EdgeInsets contentPadding,
@@ -578,12 +577,11 @@ namespace Unity.UIWidgets.material {
         public readonly Dictionary<RenderBox, float> boxToBaseline;
         public readonly float? inputBaseline;
         public readonly float? outlineBaseline;
-        public readonly float? subtextBaseline; // helper/error counter
+        public readonly float? subtextBaseline;
         public readonly float? containerHeight;
         public readonly float? subtextHeight;
     }
 
-    // The workhorse: layout and paint a _Decorator widget"s _Decoration.
     class _RenderDecoration : RenderBox {
         public _RenderDecoration(
             _Decoration decoration,
@@ -699,7 +697,6 @@ namespace Unity.UIWidgets.material {
             set { this._container = this._updateChild(this._container, value, _DecorationSlot.container); }
         }
 
-        // The returned list is ordered for hit testing.
         IEnumerable<RenderBox> _children {
             get {
                 if (this.icon != null) {
@@ -894,8 +891,8 @@ namespace Unity.UIWidgets.material {
                 float baseline = box.getDistanceToBaseline(this.textBaseline ?? 0.0f) ?? 0.0f;
                 D.assert(baseline >= 0.0f);
                 boxToBaseline[box] = baseline;
-                aboveBaseline = Math.Max(baseline, aboveBaseline);
-                belowBaseline = Math.Max(box.size.height - baseline, belowBaseline);
+                aboveBaseline = Mathf.Max(baseline, aboveBaseline);
+                belowBaseline = Mathf.Max(box.size.height - baseline, belowBaseline);
             }
 
             layoutLineBox(this.prefix);
@@ -913,7 +910,7 @@ namespace Unity.UIWidgets.material {
                 this.suffixIcon.layout(boxConstraints, parentUsesSize: true);
             }
 
-            float inputWidth = Math.Max(0.0f, this.constraints.maxWidth - (
+            float inputWidth = Mathf.Max(0.0f, this.constraints.maxWidth - (
                                                   _boxSize(this.icon).width
                                                   + this.contentPadding.left
                                                   + _boxSize(this.prefixIcon).width
@@ -923,7 +920,7 @@ namespace Unity.UIWidgets.material {
                                                   + this.contentPadding.right));
 
             boxConstraints = boxConstraints.copyWith(maxWidth: inputWidth);
-            if (this.label != null) // The label is not baseline aligned.
+            if (this.label != null)
             {
                 this.label.layout(boxConstraints, parentUsesSize: true);
             }
@@ -939,15 +936,13 @@ namespace Unity.UIWidgets.material {
                                     + this.contentPadding.bottom;
 
             if (this.label != null) {
-                // floatingLabelHeight includes the vertical gap between the inline
-                // elements and the floating label.
                 containerHeight += this.decoration.floatingLabelHeight;
                 inputBaseline += this.decoration.floatingLabelHeight;
             }
 
-            containerHeight = Math.Max(
+            containerHeight = Mathf.Max(
                 containerHeight,
-                Math.Max(
+                Mathf.Max(
                     _boxSize(this.suffixIcon).height,
                     _boxSize(this.prefixIcon).height));
 
@@ -962,10 +957,8 @@ namespace Unity.UIWidgets.material {
                 belowBaseline = 0.0f;
                 layoutLineBox(this.counter);
 
-                // The helper or error text can occupy the full width less the space
-                // occupied by the icon and counter.
                 boxConstraints = boxConstraints.copyWith(
-                    maxWidth: Math.Max(0.0f, boxConstraints.maxWidth
+                    maxWidth: Mathf.Max(0.0f, boxConstraints.maxWidth
                                              - _boxSize(this.icon).width
                                              - _boxSize(this.counter).width
                                              - this.contentPadding.horizontal
@@ -995,7 +988,7 @@ namespace Unity.UIWidgets.material {
                    + this.contentPadding.left
                    + _minWidth(this.prefixIcon, height)
                    + _minWidth(this.prefix, height)
-                   + Math.Max(_minWidth(this.input, height), _minWidth(this.hint, height))
+                   + Mathf.Max(_minWidth(this.input, height), _minWidth(this.hint, height))
                    + _minWidth(this.suffix, height)
                    + _minWidth(this.suffixIcon, height)
                    + this.contentPadding.right;
@@ -1006,7 +999,7 @@ namespace Unity.UIWidgets.material {
                    + this.contentPadding.left
                    + _maxWidth(this.prefixIcon, height)
                    + _maxWidth(this.prefix, height)
-                   + Math.Max(_maxWidth(this.input, height), _maxWidth(this.hint, height))
+                   + Mathf.Max(_maxWidth(this.input, height), _maxWidth(this.hint, height))
                    + _maxWidth(this.suffix, height)
                    + _maxWidth(this.suffixIcon, height)
                    + this.contentPadding.right;
@@ -1019,7 +1012,7 @@ namespace Unity.UIWidgets.material {
                     continue;
                 }
 
-                height = Math.Max(_minHeight(box, width), height);
+                height = Mathf.Max(_minHeight(box, width), height);
             }
 
             return height;
@@ -1224,8 +1217,6 @@ namespace Unity.UIWidgets.material {
                         this.decoration.borderGap.start = labelX + this.label.size.width;
                         break;
                     case TextDirection.ltr:
-                        // The value of _InputBorderGap.start is relative to the origin of the
-                        // _BorderContainer which is inset by the icon"s width.
                         this.decoration.borderGap.start = labelX - _boxSize(this.icon).width;
                         break;
                 }
@@ -1265,10 +1256,10 @@ namespace Unity.UIWidgets.material {
                 float dx;
                 switch (this.textDirection) {
                     case TextDirection.rtl:
-                        dx = labelOffset.dx + this.label.size.width * (1.0f - scale); // origin is on the right
+                        dx = labelOffset.dx + this.label.size.width * (1.0f - scale);
                         break;
                     case TextDirection.ltr:
-                        dx = labelOffset.dx; // origin on the left
+                        dx = labelOffset.dx;
                         break;
                     default:
                         throw new Exception("Unknown direction: " + this.textDirection);
@@ -1621,7 +1612,6 @@ namespace Unity.UIWidgets.material {
 
         void _handleChange() {
             this.setState(() => {
-                // The _floatingLabelController"s value has changed.
             });
         }
 
@@ -1688,7 +1678,7 @@ namespace Unity.UIWidgets.material {
         }
 
         Color _getFillColor(ThemeData themeData) {
-            if (this.decoration.filled != true) // filled == null same as filled == false
+            if (this.decoration.filled != true)
             {
                 return Colors.transparent;
             }
@@ -1697,8 +1687,6 @@ namespace Unity.UIWidgets.material {
                 return this.decoration.fillColor;
             }
 
-            // dark theme: 10% white (enabled), 5% white (disabled)
-            // light theme: 4% black (enabled), 2% black (disabled)
             Color darkEnabled = new Color(0x1AFFFFFF);
             Color darkDisabled = new Color(0x0DFFFFFF);
             Color lightEnabled = new Color(0x0A000000);
@@ -1875,7 +1863,7 @@ namespace Unity.UIWidgets.material {
                 );
 
             Color activeColor = this._getActiveColor(themeData);
-            bool decorationIsDense = this.decoration.isDense == true; // isDense == null, same as false
+            bool decorationIsDense = this.decoration.isDense == true;
             float iconSize = decorationIsDense ? 18.0f : 24.0f;
             Color iconColor = this.isFocused ? activeColor : this._getDefaultIconColor(themeData);
 
@@ -1955,7 +1943,6 @@ namespace Unity.UIWidgets.material {
                 floatingLabelHeight =
                     (4.0f + 0.75f * inlineLabelStyle.fontSize) * MediaQuery.textScaleFactorOf(context);
                 if (this.decoration.filled == true) {
-                    // filled == null same as filled == false
                     contentPadding = decorationContentPadding ?? (decorationIsDense
                                          ? EdgeInsets.fromLTRB(12.0f, 8.0f, 12.0f, 8.0f)
                                          : EdgeInsets.fromLTRB(12.0f, 12.0f, 12.0f, 12.0f));

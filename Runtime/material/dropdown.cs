@@ -21,11 +21,11 @@ namespace Unity.UIWidgets.material {
         public static readonly TimeSpan _kDropdownMenuDuration = new TimeSpan(0, 0, 0, 0, 300);
         public const float _kMenuItemHeight = 48.0f;
         public const float _kDenseButtonHeight = 24.0f;
-        public static EdgeInsets _kMenuItemPadding = EdgeInsets.symmetric(horizontal: 16.0f);
-        public static EdgeInsets _kAlignedButtonPadding = EdgeInsets.only(left: 16.0f, right: 4.0f);
-        public static EdgeInsets _kUnalignedButtonPadding = EdgeInsets.zero;
-        public static EdgeInsets _kAlignedMenuMargin = EdgeInsets.zero;
-        public static EdgeInsets _kUnalignedMenuMargin = EdgeInsets.only(left: 16.0f, right: 24.0f);
+        public static readonly EdgeInsets _kMenuItemPadding = EdgeInsets.symmetric(horizontal: 16.0f);
+        public static readonly EdgeInsets _kAlignedButtonPadding = EdgeInsets.only(left: 16.0f, right: 4.0f);
+        public static readonly EdgeInsets _kUnalignedButtonPadding = EdgeInsets.zero;
+        public static readonly EdgeInsets _kAlignedMenuMargin = EdgeInsets.zero;
+        public static readonly EdgeInsets _kUnalignedMenuMargin = EdgeInsets.only(left: 16.0f, right: 24.0f);
     }
 
     class _DropdownMenuPainter : AbstractCustomPainter {
@@ -122,10 +122,6 @@ namespace Unity.UIWidgets.material {
 
         public override void initState() {
             base.initState();
-            // We need to hold these animations as state because of their curve
-            // direction. When the route's animation reverses, if we were to recreate
-            // the CurvedAnimation objects in build, we'd lose
-            // CurvedAnimation._curveDirection.
             this._fadeOpacity = new CurvedAnimation(
                 parent: this.widget.route.animation,
                 curve: new Interval(0.0f, 0.25f),
@@ -234,9 +230,6 @@ namespace Unity.UIWidgets.material {
             D.assert(() => {
                 Rect container = Offset.zero & size;
                 if (container.intersect(this.buttonRect) == this.buttonRect) {
-                    // If the button was entirely on-screen, then verify
-                    // that the menu is also on-screen.
-                    // If the button was a bit off-screen, then, oh well.
                     D.assert(this.menuTop >= 0.0f);
                     D.assert(this.menuTop + this.menuHeight <= size.height);
                 }
