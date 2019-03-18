@@ -79,14 +79,12 @@ namespace Unity.UIWidgets.material {
             _InputBorderTween border = null,
             Animation<float> gapAnimation = null,
             _InputBorderGap gap = null,
-            TextDirection? textDirection = null,
             Color fillColor = null
         ) : base(repaint: repaint) {
             this.borderAnimation = borderAnimation;
             this.border = border;
             this.gapAnimation = gapAnimation;
             this.gap = gap;
-            this.textDirection = textDirection;
             this.fillColor = fillColor;
         }
 
@@ -94,7 +92,6 @@ namespace Unity.UIWidgets.material {
         public readonly _InputBorderTween border;
         public readonly Animation<float> gapAnimation;
         public readonly _InputBorderGap gap;
-        public readonly TextDirection? textDirection;
         public readonly Color fillColor;
 
         public override void paint(Canvas canvas, Size size) {
@@ -116,8 +113,7 @@ namespace Unity.UIWidgets.material {
                 canvasRect,
                 gapStart: this.gap.start,
                 gapExtent: this.gap.extent,
-                gapPercentage: this.gapAnimation.value,
-                textDirection: this.textDirection
+                gapPercentage: this.gapAnimation.value
             );
         }
 
@@ -126,8 +122,7 @@ namespace Unity.UIWidgets.material {
             return this.borderAnimation != oldPainter.borderAnimation
                    || this.gapAnimation != oldPainter.gapAnimation
                    || this.border != oldPainter.border
-                   || this.gap != oldPainter.gap
-                   || this.textDirection != oldPainter.textDirection;
+                   || this.gap != oldPainter.gap;
         }
     }
 
@@ -208,7 +203,6 @@ namespace Unity.UIWidgets.material {
                     border: this._border,
                     gapAnimation: this.widget.gapAnimation,
                     gap: this.widget.gap,
-                    textDirection: Directionality.of(context),
                     fillColor: this.widget.fillColor
                 ),
                 child: this.widget.child
@@ -585,15 +579,12 @@ namespace Unity.UIWidgets.material {
     class _RenderDecoration : RenderBox {
         public _RenderDecoration(
             _Decoration decoration,
-            TextDirection? textDirection,
             TextBaseline? textBaseline,
             bool isFocused
         ) {
             D.assert(decoration != null);
-            D.assert(textDirection != null);
             D.assert(textBaseline != null);
             this._decoration = decoration;
-            this._textDirection = textDirection;
             this._textBaseline = textBaseline;
             this._isFocused = isFocused;
         }
@@ -759,21 +750,6 @@ namespace Unity.UIWidgets.material {
         }
 
         _Decoration _decoration;
-
-        public TextDirection? textDirection {
-            get { return this._textDirection; }
-            set {
-                D.assert(value != null);
-                if (this._textDirection == value) {
-                    return;
-                }
-
-                this._textDirection = value;
-                this.markNeedsLayout();
-            }
-        }
-
-        TextDirection? _textDirection;
 
         public TextBaseline? textBaseline {
             get { return this._textBaseline; }
@@ -1055,18 +1031,7 @@ namespace Unity.UIWidgets.material {
                     width: overallWidth - _boxSize(this.icon).width
                 );
                 this.container.layout(containerConstraints, parentUsesSize: true);
-                float x;
-                switch (this.textDirection) {
-                    case TextDirection.rtl:
-                        x = 0.0f;
-                        break;
-                    case TextDirection.ltr:
-                        x = _boxSize(this.icon).width;
-                        break;
-                    default:
-                        throw new Exception("Unknown direction: " + this.textDirection);
-                }
-
+                float x = _boxSize(this.icon).width;
                 _boxParentData(this.container).offset = new Offset(x, 0.0f);
             }
 
@@ -1093,133 +1058,60 @@ namespace Unity.UIWidgets.material {
                            : layout.outlineBaseline) ?? 0.0f;
 
             if (this.icon != null) {
-                float x;
-                switch (this.textDirection) {
-                    case TextDirection.rtl:
-                        x = overallWidth - this.icon.size.width;
-                        break;
-                    case TextDirection.ltr:
-                        x = 0.0f;
-                        break;
-                    default:
-                        throw new Exception("Unknown direction: " + this.textDirection);
-                }
+                float x = 0.0f;
 
                 centerLayout(this.icon, x);
             }
 
-            switch (this.textDirection) {
-                case TextDirection.rtl: {
-                    float start = right - _boxSize(this.icon).width;
-                    float end = left;
-                    if (this.prefixIcon != null) {
-                        start += this.contentPadding.left;
-                        start -= centerLayout(this.prefixIcon, start - this.prefixIcon.size.width);
-                    }
+            float start = left + _boxSize(this.icon).width;
+            float end = right;
+            if (this.prefixIcon != null) {
+                start -= this.contentPadding.left;
+                start += centerLayout(this.prefixIcon, start);
+            }
 
-                    if (this.label != null) {
-                        centerLayout(this.label, start - this.label.size.width);
-                    }
+            if (this.label != null) {
+                centerLayout(this.label, start);
+            }
 
-                    if (this.prefix != null) {
-                        start -= baselineLayout(this.prefix, start - this.prefix.size.width);
-                    }
+            if (this.prefix != null) {
+                start += baselineLayout(this.prefix, start);
+            }
 
-                    if (this.input != null) {
-                        baselineLayout(this.input, start - this.input.size.width);
-                    }
+            if (this.input != null) {
+                baselineLayout(this.input, start);
+            }
 
-                    if (this.hint != null) {
-                        baselineLayout(this.hint, start - this.hint.size.width);
-                    }
+            if (this.hint != null) {
+                baselineLayout(this.hint, start);
+            }
 
-                    if (this.suffixIcon != null) {
-                        end -= this.contentPadding.left;
-                        end += centerLayout(this.suffixIcon, end);
-                    }
+            if (this.suffixIcon != null) {
+                end += this.contentPadding.right;
+                end -= centerLayout(this.suffixIcon, end - this.suffixIcon.size.width);
+            }
 
-                    if (this.suffix != null) {
-                        end += baselineLayout(this.suffix, end);
-                    }
-
-                    break;
-                }
-                case TextDirection.ltr: {
-                    float start = left + _boxSize(this.icon).width;
-                    float end = right;
-                    if (this.prefixIcon != null) {
-                        start -= this.contentPadding.left;
-                        start += centerLayout(this.prefixIcon, start);
-                    }
-
-                    if (this.label != null) {
-                        centerLayout(this.label, start);
-                    }
-
-                    if (this.prefix != null) {
-                        start += baselineLayout(this.prefix, start);
-                    }
-
-                    if (this.input != null) {
-                        baselineLayout(this.input, start);
-                    }
-
-                    if (this.hint != null) {
-                        baselineLayout(this.hint, start);
-                    }
-
-                    if (this.suffixIcon != null) {
-                        end += this.contentPadding.right;
-                        end -= centerLayout(this.suffixIcon, end - this.suffixIcon.size.width);
-                    }
-
-                    if (this.suffix != null) {
-                        end -= baselineLayout(this.suffix, end - this.suffix.size.width);
-                    }
-
-                    break;
-                }
+            if (this.suffix != null) {
+                end -= baselineLayout(this.suffix, end - this.suffix.size.width);
             }
 
             if (this.helperError != null || this.counter != null) {
                 height = layout.subtextHeight ?? 0.0f;
                 baseline = layout.subtextBaseline ?? 0.0f;
 
-                switch (this.textDirection) {
-                    case TextDirection.rtl:
-                        if (this.helperError != null) {
-                            baselineLayout(this.helperError,
-                                right - this.helperError.size.width - _boxSize(this.icon).width);
-                        }
-
-                        if (this.counter != null) {
-                            baselineLayout(this.counter, left);
-                        }
-
-                        break;
-                    case TextDirection.ltr:
-                        if (this.helperError != null) {
-                            baselineLayout(this.helperError, left + _boxSize(this.icon).width);
-                        }
-
-                        if (this.counter != null) {
-                            baselineLayout(this.counter, right - this.counter.size.width);
-                        }
-
-                        break;
+                if (this.helperError != null) {
+                    baselineLayout(this.helperError, left + _boxSize(this.icon).width);
                 }
+
+                if (this.counter != null) {
+                    baselineLayout(this.counter, right - this.counter.size.width);
+                }
+
             }
 
             if (this.label != null) {
                 float labelX = _boxParentData(this.label).offset.dx;
-                switch (this.textDirection) {
-                    case TextDirection.rtl:
-                        this.decoration.borderGap.start = labelX + this.label.size.width;
-                        break;
-                    case TextDirection.ltr:
-                        this.decoration.borderGap.start = labelX - _boxSize(this.icon).width;
-                        break;
-                }
+                this.decoration.borderGap.start = labelX - _boxSize(this.icon).width;
 
                 this.decoration.borderGap.extent = this.label.size.width * 0.75f;
             }
@@ -1253,18 +1145,7 @@ namespace Unity.UIWidgets.material {
                 bool isOutlineBorder = this.decoration.border != null && this.decoration.border.isOutline;
                 float floatingY = isOutlineBorder ? -labelHeight * 0.25f : this.contentPadding.top;
                 float scale = MathUtils.lerpFloat(1.0f, 0.75f, t);
-                float dx;
-                switch (this.textDirection) {
-                    case TextDirection.rtl:
-                        dx = labelOffset.dx + this.label.size.width * (1.0f - scale);
-                        break;
-                    case TextDirection.ltr:
-                        dx = labelOffset.dx;
-                        break;
-                    default:
-                        throw new Exception("Unknown direction: " + this.textDirection);
-                }
-
+                float dx = labelOffset.dx;
                 float dy = MathUtils.lerpFloat(0.0f, floatingY - labelOffset.dy, t);
                 this._labelTransform = Matrix3.I();
                 this._labelTransform.preTranslate(dx, labelOffset.dy + dy);
@@ -1459,21 +1340,17 @@ namespace Unity.UIWidgets.material {
         public _Decorator(
             Key key = null,
             _Decoration decoration = null,
-            TextDirection? textDirection = null,
             TextBaseline? textBaseline = null,
             bool isFocused = false
         ) : base(key: key) {
             D.assert(decoration != null);
-            D.assert(textDirection != null);
             D.assert(textBaseline != null);
             this.decoration = decoration;
-            this.textDirection = textDirection;
             this.textBaseline = textBaseline;
             this.isFocused = isFocused;
         }
 
         public readonly _Decoration decoration;
-        public readonly TextDirection? textDirection;
         public readonly TextBaseline? textBaseline;
         public readonly bool isFocused;
 
@@ -1484,7 +1361,6 @@ namespace Unity.UIWidgets.material {
         public override RenderObject createRenderObject(BuildContext context) {
             return new _RenderDecoration(
                 decoration: this.decoration,
-                textDirection: this.textDirection,
                 textBaseline: this.textBaseline,
                 isFocused: this.isFocused
             );
@@ -1493,7 +1369,6 @@ namespace Unity.UIWidgets.material {
         public override void updateRenderObject(BuildContext context, RenderObject _renderObject) {
             _RenderDecoration renderObject = _renderObject as _RenderDecoration;
             renderObject.decoration = this.decoration;
-            renderObject.textDirection = this.textDirection;
             renderObject.textBaseline = this.textBaseline;
             renderObject.isFocused = this.isFocused;
         }
@@ -1936,9 +1811,7 @@ namespace Unity.UIWidgets.material {
                     overflow: TextOverflow.ellipsis
                 );
 
-            TextDirection textDirection = Directionality.of(context);
             EdgeInsets decorationContentPadding = this.decoration.contentPadding;
-
             EdgeInsets contentPadding;
             float? floatingLabelHeight;
             if (this.decoration.isCollapsed) {
@@ -1986,7 +1859,6 @@ namespace Unity.UIWidgets.material {
                     counter: counter,
                     container: container
                 ),
-                textDirection: textDirection,
                 textBaseline: textBaseline,
                 isFocused: this.isFocused
             );

@@ -24,8 +24,7 @@ namespace Unity.UIWidgets.material {
         public abstract void paint(Canvas canvas, Rect rect,
             float gapStart,
             float gapExtent = 0.0f,
-            float gapPercentage = 0.0f,
-            TextDirection? textDirection = null
+            float gapPercentage = 0.0f
         );
 
         public override void paint(Canvas canvas, Rect rect) {
@@ -68,13 +67,12 @@ namespace Unity.UIWidgets.material {
         public override void paint(Canvas canvas, Rect rect,
             float gapStart,
             float gapExtent = 0.0f,
-            float gapPercentage = 0.0f,
-            TextDirection? textDirection = null
+            float gapPercentage = 0.0f
         ) {
         }
     }
 
-    class UnderlineInputBorder : InputBorder {
+    public class UnderlineInputBorder : InputBorder {
         public UnderlineInputBorder(
             BorderSide borderSide = null,
             BorderRadius borderRadius = null
@@ -150,8 +148,7 @@ namespace Unity.UIWidgets.material {
         public override void paint(Canvas canvas, Rect rect,
             float gapStart,
             float gapExtent = 0.0f,
-            float gapPercentage = 0.0f,
-            TextDirection? textDirection = null
+            float gapPercentage = 0.0f
         ) {
             if (this.borderRadius.bottomLeft != Radius.zero || this.borderRadius.bottomRight != Radius.zero) {
                 canvas.clipPath(this.getOuterPath(rect));
@@ -333,8 +330,7 @@ namespace Unity.UIWidgets.material {
         public override void paint(Canvas canvas, Rect rect,
             float gapStart,
             float gapExtent = 0.0f,
-            float gapPercentage = 0.0f,
-            TextDirection? textDirection = null
+            float gapPercentage = 0.0f
         ) {
             D.assert(gapPercentage >= 0.0f && gapPercentage <= 1.0f);
             D.assert(_cornersAreCircular(this.borderRadius));
@@ -347,18 +343,8 @@ namespace Unity.UIWidgets.material {
             }
             else {
                 float extent = MathUtils.lerpFloat(0.0f, gapExtent + this.gapPadding * 2.0f, gapPercentage);
-                switch (textDirection) {
-                    case TextDirection.rtl: {
-                        Path path = this._gapBorderPath(canvas, center, gapStart + this.gapPadding - extent, extent);
-                        canvas.drawPath(path, paint);
-                        break;
-                    }
-                    case TextDirection.ltr: {
-                        Path path = this._gapBorderPath(canvas, center, gapStart - this.gapPadding, extent);
-                        canvas.drawPath(path, paint);
-                        break;
-                    }
-                }
+                Path path = this._gapBorderPath(canvas, center, gapStart - this.gapPadding, extent);
+                canvas.drawPath(path, paint);
             }
         }
 

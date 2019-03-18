@@ -70,22 +70,18 @@ namespace Unity.UIWidgets.material {
             Color backgroundColor = null,
             Color valueColor = null,
             float? value = null,
-            float? animationValue = null,
-            TextDirection? textDirection = null
+            float? animationValue = null
         ) {
-            D.assert(textDirection != null);
             this.backgroundColor = backgroundColor;
             this.valueColor = valueColor;
             this.value = value;
             this.animationValue = animationValue;
-            this.textDirection = textDirection;
         }
 
         public readonly Color backgroundColor;
         public readonly Color valueColor;
         public readonly float? value;
         public readonly float? animationValue;
-        public readonly TextDirection? textDirection;
 
         static readonly Curve line1Head = new Interval(
             0.0f,
@@ -124,18 +120,7 @@ namespace Unity.UIWidgets.material {
                     return;
                 }
 
-                float left;
-                switch (this.textDirection) {
-                    case TextDirection.rtl:
-                        left = size.width - width - x;
-                        break;
-                    case TextDirection.ltr:
-                        left = x;
-                        break;
-                    default:
-                        throw new Exception("Unknown text direction: " + this.textDirection);
-                }
-
+                float left = x;
                 canvas.drawRect(new Offset(left, 0.0f) & new Size(width, size.height), paint);
             }
 
@@ -160,8 +145,7 @@ namespace Unity.UIWidgets.material {
             return painter.backgroundColor != this.backgroundColor
                    || painter.valueColor != this.valueColor
                    || painter.value != this.value
-                   || painter.animationValue != this.animationValue
-                   || painter.textDirection != this.textDirection;
+                   || painter.animationValue != this.animationValue;
         }
     }
 
@@ -216,7 +200,7 @@ namespace Unity.UIWidgets.material {
             base.dispose();
         }
 
-        Widget _buildIndicator(BuildContext context, float animationValue, TextDirection textDirection) {
+        Widget _buildIndicator(BuildContext context, float animationValue) {
             return new Container(
                 constraints: new BoxConstraints(
                     minWidth: float.PositiveInfinity,
@@ -227,24 +211,21 @@ namespace Unity.UIWidgets.material {
                         backgroundColor: this.widget._getBackgroundColor(context),
                         valueColor: this.widget._getValueColor(context),
                         value: this.widget.value,
-                        animationValue: animationValue,
-                        textDirection: textDirection
+                        animationValue: animationValue
                     )
                 )
             );
         }
 
         public override Widget build(BuildContext context) {
-            TextDirection textDirection = Directionality.of(context);
-
             if (this.widget.value != null) {
-                return this._buildIndicator(context, this._controller.value, textDirection);
+                return this._buildIndicator(context, this._controller.value);
             }
 
             return new AnimatedBuilder(
                 animation: this._controller.view,
                 builder: (BuildContext _context, Widget child) => {
-                    return this._buildIndicator(_context, this._controller.value, textDirection);
+                    return this._buildIndicator(_context, this._controller.value);
                 }
             );
         }

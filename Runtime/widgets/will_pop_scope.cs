@@ -1,7 +1,7 @@
 using Unity.UIWidgets.foundation;
 
 namespace Unity.UIWidgets.widgets {
-    class WillPopScope : StatefulWidget {
+    public class WillPopScope : StatefulWidget {
         public WillPopScope(
             Key key = null,
             Widget child = null,

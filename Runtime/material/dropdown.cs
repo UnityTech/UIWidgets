@@ -201,19 +201,16 @@ namespace Unity.UIWidgets.material {
         public _DropdownMenuRouteLayout(
             Rect buttonRect,
             float menuTop,
-            float menuHeight,
-            TextDirection textDirection
+            float menuHeight
         ) {
             this.buttonRect = buttonRect;
             this.menuTop = menuTop;
             this.menuHeight = menuHeight;
-            this.textDirection = textDirection;
         }
 
         public readonly Rect buttonRect;
         public readonly float menuTop;
         public readonly float menuHeight;
-        public readonly TextDirection textDirection;
 
         public override BoxConstraints getConstraintsForChild(BoxConstraints constraints) {
             float maxHeight = Mathf.Max(0.0f, constraints.maxHeight - 2 * DropdownConstants._kMenuItemHeight);
@@ -236,18 +233,7 @@ namespace Unity.UIWidgets.material {
 
                 return true;
             });
-            float left;
-            switch (this.textDirection) {
-                case TextDirection.rtl:
-                    left = this.buttonRect.right.clamp(0.0f, size.width) - childSize.width;
-                    break;
-                case TextDirection.ltr:
-                    left = this.buttonRect.left.clamp(0.0f, size.width - childSize.width);
-                    break;
-                default:
-                    throw new Exception("Unknown text direction: " + this.textDirection);
-            }
-
+            float left = this.buttonRect.right.clamp(0.0f, size.width) - childSize.width;
             return new Offset(left, this.menuTop);
         }
 
@@ -255,8 +241,7 @@ namespace Unity.UIWidgets.material {
             _DropdownMenuRouteLayout<T> oldDelegate = _oldDelegate as _DropdownMenuRouteLayout<T>;
             return this.buttonRect != oldDelegate.buttonRect
                    || this.menuTop != oldDelegate.menuTop
-                   || this.menuHeight != oldDelegate.menuHeight
-                   || this.textDirection != oldDelegate.textDirection;
+                   || this.menuHeight != oldDelegate.menuHeight;
         }
     }
 
@@ -366,7 +351,6 @@ namespace Unity.UIWidgets.material {
                 this.scrollController = new ScrollController(initialScrollOffset: scrollOffset);
             }
 
-            TextDirection textDirection = Directionality.of(context);
             Widget menu = new _DropdownMenu<T>(
                 route: this,
                 padding: this.padding
@@ -388,8 +372,7 @@ namespace Unity.UIWidgets.material {
                             layoutDelegate: new _DropdownMenuRouteLayout<T>(
                                 buttonRect: this.buttonRect,
                                 menuTop: menuTop ?? 0.0f,
-                                menuHeight: menuHeight,
-                                textDirection: textDirection
+                                menuHeight: menuHeight
                             ),
                             child: menu
                         );
@@ -567,7 +550,6 @@ namespace Unity.UIWidgets.material {
         void _handleTap() {
             RenderBox itemBox = (RenderBox) this.context.findRenderObject();
             Rect itemRect = itemBox.localToGlobal(Offset.zero) & itemBox.size;
-            TextDirection textDirection = Directionality.of(this.context);
             EdgeInsets menuMargin = ButtonTheme.of(this.context).alignedDropdown
                 ? DropdownConstants._kAlignedMenuMargin
                 : DropdownConstants._kUnalignedMenuMargin;

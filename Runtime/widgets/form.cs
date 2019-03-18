@@ -3,7 +3,7 @@ using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
 
 namespace Unity.UIWidgets.widgets {
-    class Form : StatefulWidget {
+    public class Form : StatefulWidget {
         public Form(
             Key key = null,
             Widget child = null,
@@ -36,7 +36,7 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
-    class FormState : State<Form> {
+    public class FormState : State<Form> {
         int _generation = 0;
         public readonly HashSet<FormFieldState<dynamic>> _fields = new HashSet<FormFieldState<dynamic>>();
 
