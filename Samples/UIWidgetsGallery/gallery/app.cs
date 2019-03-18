@@ -23,6 +23,12 @@ namespace UIWidgetsGallery.gallery {
             VoidCallback onSendFeedback = null,
             bool testMode = false
         ) : base(key: key) {
+            this.updateUrlFetcher = updateUrlFetcher;
+            this.enablePerformanceOverlay = enablePerformanceOverlay;
+            this.enableRasterCacheImagesCheckerboard = enableRasterCacheImagesCheckerboard;
+            this.enableOffscreenLayersCheckerboard = enableOffscreenLayersCheckerboard;
+            this.onSendFeedback = onSendFeedback;
+            this.testMode = testMode;
         }
 
         public readonly UpdateUrlFetcher updateUrlFetcher;
@@ -73,10 +79,7 @@ namespace UIWidgetsGallery.gallery {
                 if (this._options.timeDilation != newOptions.timeDilation) {
                     this._timeDilationTimer?.cancel();
                     this._timeDilationTimer = null;
-                    if (newOptions.timeDilation > 1.0) {
-                        // We delay the time dilation change long enough that the user can see
-                        // that UI has started reacting and then we slam on the brakes so that
-                        // they see that the time is in fact now dilated.
+                    if (newOptions.timeDilation > 1.0f) {
                         this._timeDilationTimer = Window.instance.run(new TimeSpan(0, 0, 0, 0, 150),
                             () => { SchedulerBinding.instance.timeDilation = newOptions.timeDilation; });
                     } else {

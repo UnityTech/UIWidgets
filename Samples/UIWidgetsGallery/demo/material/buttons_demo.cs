@@ -39,7 +39,7 @@ class _ButtonsDemoState : State<ButtonsDemo> {
     const String _outlineCode = "buttons_outline";
 
     const String _dropdownText =
-        "A dropdown button displays a menu that\"s used to select a value from a " +
+        "A dropdown button displays a menu that's used to select a value from a " +
             "small set of values. The button displays the current value and a down " +
             "arrow.";
 
@@ -47,7 +47,7 @@ class _ButtonsDemoState : State<ButtonsDemo> {
 
     const String _iconText =
         "IconButtons are appropriate for toggle buttons that allow a single choice " +
-            "to be selected or deselected, such as adding or removing an item\"s star.";
+            "to be selected or deselected, such as adding or removing an item's star.";
 
     const String _iconCode = "buttons_icon";
 

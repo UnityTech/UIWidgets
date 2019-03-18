@@ -180,12 +180,12 @@ namespace UIWidgetsGallery.gallery {
 
     public class Backdrop : StatefulWidget {
         public Backdrop(
-            Widget frontAction,
-            Widget frontTitle,
-            Widget frontHeading,
-            Widget frontLayer,
-            Widget backTitle,
-            Widget backLayer
+            Widget frontAction = null,
+            Widget frontTitle = null,
+            Widget frontHeading = null,
+            Widget frontLayer = null,
+            Widget backTitle = null,
+            Widget backLayer = null
         ) {
             this.frontAction = frontAction;
             this.frontTitle = frontTitle;
