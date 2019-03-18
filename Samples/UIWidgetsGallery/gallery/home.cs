@@ -335,7 +335,7 @@ namespace UIWidgetsGallery.gallery {
                                 switchOutCurve: switchOutCurve,
                                 switchInCurve: switchInCurve,
                                 child: this._category == null
-                                    ? new _UIWidgetsLogo()
+                                    ? (Widget) new _UIWidgetsLogo()
                                     : new IconButton(
                                         icon: new BackButtonIcon(),
                                         tooltip: "Back",
@@ -355,7 +355,7 @@ namespace UIWidgetsGallery.gallery {
                                 switchInCurve: switchInCurve,
                                 layoutBuilder: centerHome ? _centerHomeLayout : _topHomeLayout,
                                 child: this._category != null
-                                    ? new _DemosPage(_category)
+                                    ? (Widget) new _DemosPage(this._category)
                                     : new _CategoriesPage(
                                         categories: DemoUtils.kAllGalleryDemoCategories,
                                         onCategoryTap: (GalleryDemoCategory category) => {
