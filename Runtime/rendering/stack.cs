@@ -409,7 +409,7 @@ namespace Unity.UIWidgets.rendering {
             return this.defaultHitTestChildren(result, position: position);
         }
 
-        public void paintStack(PaintingContext context, Offset offset) {
+        public virtual void paintStack(PaintingContext context, Offset offset) {
             this.defaultPaint(context, offset);
         }
 
@@ -431,6 +431,69 @@ namespace Unity.UIWidgets.rendering {
             properties.add(new DiagnosticsProperty<Alignment>("alignment", this.alignment));
             properties.add(new EnumProperty<StackFit>("fit", this.fit));
             properties.add(new EnumProperty<Overflow>("overflow", this.overflow));
+        }
+    }
+
+    class RenderIndexedStack : RenderStack {
+        public RenderIndexedStack(
+            List<RenderBox> children = null,
+            Alignment alignment = null,
+            int? index = 0
+        ) : base(fit: null, overflow: null, children: children, alignment: alignment ?? Alignment.topLeft) {
+            this._index = index;
+        }
+
+        public int? index {
+            get { return this._index; }
+            set {
+                if (this._index != value) {
+                    this._index = value;
+                    this.markNeedsLayout();
+                }
+            }
+        }
+
+        int? _index;
+
+        RenderBox _childAtIndex() {
+            D.assert(this.index != null);
+            RenderBox child = this.firstChild;
+            int i = 0;
+            while (child != null && i < this.index) {
+                StackParentData childParentData = (StackParentData) child.parentData;
+                child = childParentData.nextSibling;
+                i += 1;
+            }
+
+            D.assert(i == this.index);
+            D.assert(child != null);
+            return child;
+        }
+
+        protected override bool hitTestChildren(HitTestResult result, Offset position) {
+            if (this.firstChild == null || this.index == null) {
+                return false;
+            }
+
+            D.assert(position != null);
+            RenderBox child = this._childAtIndex();
+            StackParentData childParentData = (StackParentData) child.parentData;
+            return child.hitTest(result, position: position - childParentData.offset);
+        }
+
+        public override void paintStack(PaintingContext context, Offset offset) {
+            if (this.firstChild == null || this.index == null) {
+                return;
+            }
+
+            RenderBox child = this._childAtIndex();
+            StackParentData childParentData = (StackParentData) child.parentData;
+            context.paintChild(child, childParentData.offset + offset);
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new IntProperty("index", this.index));
         }
     }
 }
