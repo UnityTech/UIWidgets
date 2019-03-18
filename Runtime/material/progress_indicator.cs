@@ -226,8 +226,8 @@ namespace Unity.UIWidgets.material {
                     painter: new _LinearProgressIndicatorPainter(
                         backgroundColor: this.widget._getBackgroundColor(context),
                         valueColor: this.widget._getValueColor(context),
-                        value: this.widget.value, // may be null
-                        animationValue: animationValue, // ignored if widget.value is not null
+                        value: this.widget.value,
+                        animationValue: animationValue,
                         textDirection: textDirection
                     )
                 )
@@ -298,7 +298,7 @@ namespace Unity.UIWidgets.material {
             paint.strokeWidth = this.strokeWidth ?? 0.0f;
             paint.style = PaintingStyle.stroke;
 
-            if (this.value == null) // Indeterminate
+            if (this.value == null)
             {
                 paint.strokeCap = StrokeCap.square;
             }
@@ -445,8 +445,6 @@ namespace Unity.UIWidgets.material {
         public readonly float? arrowheadScale;
 
         void paintArrowhead(Canvas canvas, Size size) {
-            // ux, uy: a unit vector whose direction parallels the base of the arrowhead.
-            // (So ux, -uy points in the direction the arrowhead points.)
             float arcEnd = this.arcStart + this.arcSweep ?? 0.0f;
             float ux = Mathf.Cos(arcEnd);
             float uy = Mathf.Sin(arcEnd);
@@ -534,7 +532,7 @@ namespace Unity.UIWidgets.material {
                         child: new CustomPaint(
                             painter: new _RefreshProgressIndicatorPainter(
                                 valueColor: this.widget._getValueColor(context),
-                                value: null, // Draw the indeterminate progress indicator.
+                                value: null,
                                 headValue: headValue,
                                 tailValue: tailValue,
                                 stepValue: stepValue,

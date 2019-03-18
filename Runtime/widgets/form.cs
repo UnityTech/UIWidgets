@@ -150,6 +150,12 @@ namespace Unity.UIWidgets.widgets {
             bool enabled = true
         ) : base(key: key) {
             D.assert(builder != null);
+            this.onSaved = onSaved;
+            this.validator = validator;
+            this.builder = builder;
+            this.initialValue = initialValue;
+            this.autovalidate = autovalidate;
+            this.enabled = enabled;
         }
 
         public readonly FormFieldSetter<T> onSaved;

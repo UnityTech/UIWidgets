@@ -10,7 +10,7 @@ namespace Unity.UIWidgets.material {
         public InputBorder(
             BorderSide borderSide = null
         ) {
-            this.borderSide = this.borderSide ?? BorderSide.none;
+            this.borderSide = borderSide ?? BorderSide.none;
         }
 
         public static readonly InputBorder none = new _NoInputBorder();
@@ -180,6 +180,7 @@ namespace Unity.UIWidgets.material {
             float gapPadding = 4.0f
         ) : base(borderSide: borderSide ?? new BorderSide()) {
             D.assert(gapPadding >= 0.0f);
+            this.gapPadding = gapPadding;
             this.borderRadius = borderRadius ?? BorderRadius.all(Radius.circular(4.0f));
         }
 
