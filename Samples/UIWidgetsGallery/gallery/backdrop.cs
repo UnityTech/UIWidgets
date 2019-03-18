@@ -11,7 +11,7 @@ using Unity.UIWidgets.widgets;
 using UnityEngine;
 
 namespace UIWidgetsGallery.gallery {
-    public class BackdropConstants {
+    class BackdropConstants {
         public const float _kFrontHeadingHeight = 32.0f;
         public const float _kFrontClosedHeight = 92.0f;
         public const float _kBackAppBarHeight = 56.0f;
@@ -178,7 +178,7 @@ namespace UIWidgetsGallery.gallery {
         }
     }
 
-    class Backdrop : StatefulWidget {
+    public class Backdrop : StatefulWidget {
         public Backdrop(
             Widget frontAction,
             Widget frontTitle,
