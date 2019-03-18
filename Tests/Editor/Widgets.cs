@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UIWidgets.Tests.demo_charts;
 using Unity.UIWidgets.animation;
 using Unity.UIWidgets.editor;
 using Unity.UIWidgets.foundation;
@@ -43,7 +44,8 @@ namespace UIWidgets.Tests {
                 this.eventsPage,
                 this.asPage,
                 this.stack,
-                this.mouseHover
+                this.mouseHover,
+                this.charts
             };
             this._optionStrings = this._options.Select(x => x.Method.Name).ToArray();
             this._selected = 0;
@@ -255,6 +257,10 @@ namespace UIWidgets.Tests {
 
         Widget mouseHover() {
             return new MouseHoverWidget();
+        }
+        
+        Widget charts() {
+            return new ChartPage();
         }
     }
 
