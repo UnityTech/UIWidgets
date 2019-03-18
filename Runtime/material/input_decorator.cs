@@ -90,12 +90,12 @@ namespace Unity.UIWidgets.material {
             this.fillColor = fillColor;
         }
 
-        Animation<float> borderAnimation;
-        _InputBorderTween border;
-        Animation<float> gapAnimation;
-        _InputBorderGap gap;
-        TextDirection? textDirection;
-        Color fillColor;
+        public readonly Animation<float> borderAnimation;
+        public readonly _InputBorderTween border;
+        public readonly Animation<float> gapAnimation;
+        public readonly _InputBorderGap gap;
+        public readonly TextDirection? textDirection;
+        public readonly Color fillColor;
 
         public override void paint(Canvas canvas, Size size) {
             InputBorder borderValue = this.border.evaluate(this.borderAnimation);
@@ -166,7 +166,7 @@ namespace Unity.UIWidgets.material {
         Animation<float> _borderAnimation;
         _InputBorderTween _border;
 
-        public void initState() {
+        public override void initState() {
             base.initState();
             this._controller = new AnimationController(
                 duration: InputDecoratorConstants._kTransitionDuration,
@@ -1540,13 +1540,19 @@ namespace Unity.UIWidgets.material {
             bool isEmpty = false,
             Widget child = null
         ) : base(key: key) {
+            this.decoration = decoration;
+            this.baseStyle = baseStyle;
+            this.textAlign = textAlign;
+            this.isFocused = isFocused;
+            this.isEmpty = isEmpty;
+            this.child = child;
         }
 
         public readonly InputDecoration decoration;
 
         public readonly TextStyle baseStyle;
 
-        public readonly TextAlign textAlign;
+        public readonly TextAlign? textAlign;
 
         public readonly bool isFocused;
 
@@ -1626,7 +1632,7 @@ namespace Unity.UIWidgets.material {
             }
         }
 
-        TextAlign textAlign {
+        TextAlign? textAlign {
             get { return this.widget.textAlign; }
         }
 
@@ -2499,6 +2505,26 @@ namespace Unity.UIWidgets.material {
             D.assert(isDense != null);
             D.assert(isCollapsed != null);
             D.assert(filled != null);
+            this.labelStyle = labelStyle;
+            this.helperStyle = helperStyle;
+            this.hintStyle = hintStyle;
+            this.errorStyle = errorStyle;
+            this.errorMaxLines = errorMaxLines;
+            this.hasFloatingPlaceholder = hasFloatingPlaceholder;
+            this.isDense = isDense;
+            this.contentPadding = contentPadding;
+            this.isCollapsed = isCollapsed;
+            this.prefixStyle = prefixStyle;
+            this.suffixStyle = suffixStyle;
+            this.counterStyle = counterStyle;
+            this.filled = filled;
+            this.fillColor = fillColor;
+            this.errorBorder = errorBorder;
+            this.focusedBorder = focusedBorder;
+            this.focusedErrorBorder = focusedErrorBorder;
+            this.disabledBorder = disabledBorder;
+            this.enabledBorder = enabledBorder;
+            this.border = border;
         }
 
         public readonly TextStyle labelStyle;
@@ -2509,15 +2535,15 @@ namespace Unity.UIWidgets.material {
 
         public readonly TextStyle errorStyle;
 
-        public readonly int errorMaxLines;
+        public readonly int? errorMaxLines;
 
-        public readonly bool hasFloatingPlaceholder;
+        public readonly bool? hasFloatingPlaceholder;
 
-        public readonly bool isDense;
+        public readonly bool? isDense;
 
         public readonly EdgeInsets contentPadding;
 
-        public readonly bool isCollapsed;
+        public readonly bool? isCollapsed;
 
         public readonly TextStyle prefixStyle;
 
@@ -2525,7 +2551,7 @@ namespace Unity.UIWidgets.material {
 
         public readonly TextStyle counterStyle;
 
-        public readonly bool filled;
+        public readonly bool? filled;
 
         public readonly Color fillColor;
 
@@ -2552,14 +2578,14 @@ namespace Unity.UIWidgets.material {
                 defaultValue: defaultTheme.hintStyle));
             properties.add(new DiagnosticsProperty<TextStyle>("errorStyle", this.errorStyle,
                 defaultValue: defaultTheme.errorStyle));
-            properties.add(new DiagnosticsProperty<int>("errorMaxLines", this.errorMaxLines,
+            properties.add(new DiagnosticsProperty<int?>("errorMaxLines", this.errorMaxLines,
                 defaultValue: defaultTheme.errorMaxLines));
-            properties.add(new DiagnosticsProperty<bool>("hasFloatingPlaceholder", this.hasFloatingPlaceholder,
+            properties.add(new DiagnosticsProperty<bool?>("hasFloatingPlaceholder", this.hasFloatingPlaceholder,
                 defaultValue: defaultTheme.hasFloatingPlaceholder));
-            properties.add(new DiagnosticsProperty<bool>("isDense", this.isDense, defaultValue: defaultTheme.isDense));
+            properties.add(new DiagnosticsProperty<bool?>("isDense", this.isDense, defaultValue: defaultTheme.isDense));
             properties.add(new DiagnosticsProperty<EdgeInsets>("contentPadding", this.contentPadding,
                 defaultValue: defaultTheme.contentPadding));
-            properties.add(new DiagnosticsProperty<bool>("isCollapsed", this.isCollapsed,
+            properties.add(new DiagnosticsProperty<bool?>("isCollapsed", this.isCollapsed,
                 defaultValue: defaultTheme.isCollapsed));
             properties.add(new DiagnosticsProperty<TextStyle>("prefixStyle", this.prefixStyle,
                 defaultValue: defaultTheme.prefixStyle));
@@ -2567,7 +2593,7 @@ namespace Unity.UIWidgets.material {
                 defaultValue: defaultTheme.suffixStyle));
             properties.add(new DiagnosticsProperty<TextStyle>("counterStyle", this.counterStyle,
                 defaultValue: defaultTheme.counterStyle));
-            properties.add(new DiagnosticsProperty<bool>("filled", this.filled, defaultValue: defaultTheme.filled));
+            properties.add(new DiagnosticsProperty<bool?>("filled", this.filled, defaultValue: defaultTheme.filled));
             properties.add(new DiagnosticsProperty<Color>("fillColor", this.fillColor,
                 defaultValue: defaultTheme.fillColor));
             properties.add(new DiagnosticsProperty<InputBorder>("errorBorder", this.errorBorder,
