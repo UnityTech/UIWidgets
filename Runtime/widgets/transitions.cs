@@ -223,6 +223,15 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
+    public class RelativeRectTween : Tween<RelativeRect> {
+        public RelativeRectTween(RelativeRect begin = null, RelativeRect end = null) : base(begin: begin, end: end) {
+        }
+
+        public override RelativeRect lerp(float t) {
+            return RelativeRect.lerp(this.begin, this.end, t);
+        }
+    }
+
 
     public class PositionedTransition : AnimatedWidget {
         public PositionedTransition(
@@ -261,6 +270,8 @@ namespace Unity.UIWidgets.widgets {
             D.assert(rect != null);
             D.assert(size != null);
             D.assert(child != null);
+            this.size = size;
+            this.child = child;
         }
 
         Animation<Rect> rect {
