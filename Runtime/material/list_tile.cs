@@ -419,7 +419,7 @@ namespace Unity.UIWidgets.material {
         }
 
         void _updateChild(Widget widget, _ListTileSlot slot) {
-            Element oldChild = this.slotToChild[slot];
+            Element oldChild = this.slotToChild.getOrDefault(slot);
             Element newChild = this.updateChild(oldChild, widget, slot);
             if (oldChild != null) {
                 this.childToSlot.Remove(oldChild);

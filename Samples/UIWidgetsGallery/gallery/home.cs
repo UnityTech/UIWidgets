@@ -32,7 +32,7 @@ namespace UIWidgetsGallery.gallery {
                     decoration: new BoxDecoration(
                         image: new DecorationImage(
                             image: new AssetImage(
-                                "unity.png")
+                                "unity")
                         )
                     )
                 )
