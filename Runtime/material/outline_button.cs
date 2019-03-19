@@ -50,7 +50,6 @@ namespace Unity.UIWidgets.material {
                 child: child
             ) {
             D.assert(highlightElevation == null || highlightElevation >= 0.0f);
-            D.assert(onPressed != null);
             this.highlightedBorderColor = highlightedBorderColor;
             this.disabledBorderColor = disabledBorderColor;
             this.borderSide = borderSide;

@@ -345,7 +345,7 @@ namespace UIWidgetsGallery.gallery {
                             frontTitle: new AnimatedSwitcher(
                                 duration: HomeUtils._kFrontLayerSwitchDuration,
                                 child: this._category == null
-                                    ? new Text("Flutter gallery")
+                                    ? new Text("UIWidgets gallery")
                                     : new Text(this._category.name)
                             ),
                             frontHeading: this.widget.testMode ? null : new Container(height: 24.0f),
