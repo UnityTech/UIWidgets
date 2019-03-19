@@ -656,6 +656,33 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
+    class IndexedStack : Stack {
+        public IndexedStack(
+            Key key = null,
+            Alignment alignment = null,
+            StackFit sizing = StackFit.loose,
+            int index = 0,
+            List<Widget> children = null
+        ) : base(key: key, alignment: alignment ?? Alignment.topLeft, fit: sizing, children: children) {
+            this.index = index;
+        }
+
+        public readonly int index;
+
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderIndexedStack(
+                index: this.index,
+                alignment: this.alignment
+            );
+        }
+
+        public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
+            RenderIndexedStack renderIndexedStack = renderObject as RenderIndexedStack;
+            renderIndexedStack.index = this.index;
+            renderIndexedStack.alignment = this.alignment;
+        }
+    }
+
     public class Positioned : ParentDataWidget<Stack> {
         public Positioned(Widget child, Key key = null, float? left = null, float? top = null,
             float? right = null, float? bottom = null, float? width = null, float? height = null) :
@@ -1896,12 +1923,12 @@ namespace Unity.UIWidgets.widgets {
         public static List<Widget> ensureUniqueKeysForList(IEnumerable<Widget> items, int baseIndex = 0) {
             if (items == null) {
                 return null;
-
             }
+
             List<Widget> itemsWithUniqueKeys = new List<Widget>();
             int itemIndex = baseIndex;
             foreach (Widget item in items) {
-                itemsWithUniqueKeys.Add(KeyedSubtree.wrap(item, itemIndex));
+                itemsWithUniqueKeys.Add(wrap(item, itemIndex));
                 itemIndex += 1;
             }
 
