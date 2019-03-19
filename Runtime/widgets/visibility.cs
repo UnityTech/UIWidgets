@@ -13,7 +13,6 @@ namespace Unity.UIWidgets.widgets {
             bool maintainInteractivity = false
         ) : base(key: key) {
             D.assert(child != null);
-            D.assert(replacement != null);
             D.assert(maintainState == true || maintainAnimation == false,
                 "Cannot maintain animations if the state is not also maintained.");
             D.assert(maintainAnimation == true || maintainSize == false,
