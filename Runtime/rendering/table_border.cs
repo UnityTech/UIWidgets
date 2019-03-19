@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.UIWidgets.foundation;
@@ -5,7 +6,7 @@ using Unity.UIWidgets.painting;
 using Unity.UIWidgets.ui;
 
 namespace Unity.UIWidgets.rendering {
-    public class TableBorder {
+    public class TableBorder : IEquatable<TableBorder> {
         public TableBorder(
             BorderSide top = null,
             BorderSide right = null,
