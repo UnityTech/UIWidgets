@@ -138,6 +138,20 @@ namespace Unity.UIWidgets.widgets {
 
         RenderObjectToWidgetElement<RenderBox> _renderViewElement;
 
+        public void detachRootWidget() {
+            this.pipelineOwner.rootNode = null;
+
+            void unMountAll(Element element) {
+                element.visitChildren(unMountAll);
+                element.deactivate();
+                element.unmount();
+            }
+
+            this._renderViewElement.visitChildren(unMountAll);
+            this._renderViewElement.deactivate();
+            this._renderViewElement.unmount();
+        }
+
         public void attachRootWidget(Widget rootWidget) {
             this._renderViewElement = new RenderObjectToWidgetAdapter<RenderBox>(
                 container: this.renderView,
