@@ -689,7 +689,7 @@ namespace Unity.UIWidgets.ui {
                     src.top + ty,
                     src.right + tx,
                     src.bottom + ty
-                );
+                ).normalize();
 
                 return true;
             }
@@ -746,7 +746,7 @@ namespace Unity.UIWidgets.ui {
                 src.top * sy + ty,
                 src.right * sx + tx,
                 src.bottom * sy + ty
-            );
+            ).normalize();
         }
 
         public static bool operator ==(Matrix3 a, Matrix3 b) {

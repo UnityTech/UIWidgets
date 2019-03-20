@@ -285,9 +285,14 @@ namespace Unity.UIWidgets.rendering {
 
         public void pushTransform(bool needsCompositing, Offset offset, Matrix3 transform,
             PaintingContextCallback painter) {
-            var effectiveTransform = Matrix3.makeTrans(offset.dx, offset.dy);
-            effectiveTransform.preConcat(transform);
-            effectiveTransform.preTranslate(-offset.dx, -offset.dy);
+            Matrix3 effectiveTransform;
+            if (offset == null || offset == Offset.zero) {
+                effectiveTransform = transform;
+            } else {
+                effectiveTransform = Matrix3.makeTrans(offset.dx, offset.dy);
+                effectiveTransform.preConcat(transform);
+                effectiveTransform.preTranslate(-offset.dx, -offset.dy);
+            }
 
             if (needsCompositing) {
                 var inverse = Matrix3.I();
