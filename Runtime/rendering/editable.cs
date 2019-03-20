@@ -610,13 +610,6 @@ namespace Unity.UIWidgets.rendering {
                 }
             }
 
-            if (this._hasFocus) {
-                var caretOffset = this._textPainter.getOffsetForCaret(this._selection.extendPos,
-                    Rect.fromLTWH(0, 0, 1, this.preferredLineHeight));
-                var caretRec = this._caretPrototype.shift(caretOffset + effectiveOffset);
-                Input.compositionCursorPos = new Vector2(caretRec.left, caretRec.bottom);
-            }
-
             this._textPainter.paint(context.canvas, effectiveOffset);
         }
 

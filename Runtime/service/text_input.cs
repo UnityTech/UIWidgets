@@ -476,10 +476,17 @@ namespace Unity.UIWidgets.service {
             TextInput.keyboardDelegate.setEditingState(value);
         }
 
-        public void setCompositionCursorPos(float x, float y) {
+        public void setIMEPos(Offset imeGlobalPos) {
             D.assert(this.attached);
-            TextInput.setCompositionCursorPos(x, y);
+            D.assert(imeGlobalPos != null);
+            D.assert(this.imeRequired());
+            TextInput.keyboardDelegate.setIMEPos(imeGlobalPos);
         }
+        
+        public bool imeRequired() {
+            return TextInput.keyboardDelegate != null && TextInput.keyboardDelegate.imeRequired();
+        }
+
 
         public void close() {
             if (this.attached) {
@@ -517,12 +524,13 @@ namespace Unity.UIWidgets.service {
             D.assert(client != null);
             var connection = new TextInputConnection(client);
             _currentConnection = connection;
-            string x = configuration.toJson();
             if (keyboardDelegate != null) {
                 keyboardDelegate.Dispose();
             }
 
-            if (TouchScreenKeyboard.isSupported) {
+            if (Application.isEditor) {
+                keyboardDelegate = new DefaultKeyboardDelegate();
+            } else {
 #if UNITY_IOS || UNITY_ANDROID
                 if (configuration.unityTouchKeyboard) {
                     keyboardDelegate = new UnityTouchScreenKeyboardDelegate();
@@ -530,12 +538,11 @@ namespace Unity.UIWidgets.service {
                 else {
                     keyboardDelegate = new UIWidgetsTouchScreenKeyboardDelegate();
                 }
+#elif UNITY_WEBGL
+                keyboardDelegate = new UIWidgetsWebGLKeyboardDelegate();
 #else
-                keyboardDelegate = new UnityTouchScreenKeyboardDelegate();
-#endif
-            }
-            else {
                 keyboardDelegate = new DefaultKeyboardDelegate();
+#endif
             }
             keyboardDelegate.setClient(connection._id, configuration);
             return connection;
@@ -551,10 +558,6 @@ namespace Unity.UIWidgets.service {
             if (_currentConnection != null && _currentConnection._window == Window.instance) {
                 (keyboardDelegate as TextInputOnGUIListener)?.OnGUI();
             }
-        }
-        
-        public static void setCompositionCursorPos(float x, float y) {
-            Input.compositionCursorPos = new Vector2(x, y);
         }
         
         internal static void _updateEditingState(int client, TextEditingValue value) {

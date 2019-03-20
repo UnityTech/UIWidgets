@@ -28,7 +28,7 @@ namespace Unity.UIWidgets.engine {
             managerObj.AddComponent<UIWidgetsMessageManager>();
         }
         
-#if UNITY_IOS || UNITY_ANDROID
+#if UNITY_IOS || UNITY_ANDROID || UNITY_WEBGL
         string _lastObjectName;
 #endif
         
@@ -48,7 +48,7 @@ namespace Unity.UIWidgets.engine {
         }
 
         void UpdateNameIfNeed() {
-#if UNITY_IOS || UNITY_ANDROID
+#if UNITY_IOS || UNITY_ANDROID || UNITY_WEBGL
             var name = this.gameObject.name;
             if (name != this._lastObjectName) {
 
@@ -89,7 +89,7 @@ namespace Unity.UIWidgets.engine {
             }
         }
 
-#if UNITY_IOS        
+#if UNITY_IOS || UNITY_WEBGL        
         [DllImport("__Internal")]
         static extern void UIWidgetsMessageSetObjectName(string objectName);
 #elif UNITY_ANDROID

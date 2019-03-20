@@ -14,10 +14,12 @@ namespace Unity.UIWidgets.service {
         void hide();
         void setEditingState(TextEditingValue value);
 
+        void setIMEPos(Offset imeGlobalPos);
+
         void setClient(int client, TextInputConfiguration configuration);
         void clearClient();
 
-        bool hashPreview();
+        bool imeRequired();
     }
 
     public interface TextInputUpdateListener {
@@ -44,6 +46,17 @@ namespace Unity.UIWidgets.service {
             this._value = value;
         }
 
+        public void setIMEPos(Offset imeGlobalPos) {
+            var uiWidgetWindowAdapter = Window.instance as UIWidgetWindowAdapter;
+            if (uiWidgetWindowAdapter != null) {
+                var screenPos = uiWidgetWindowAdapter.windowPosToScreenPos(imeGlobalPos);
+                Input.compositionCursorPos = new Vector2(screenPos.dx, screenPos.dy);
+            }
+            else { // editor window case
+                Input.compositionCursorPos = new Vector2(imeGlobalPos.dx, imeGlobalPos.dy);
+            }
+        }
+
         public void setClient(int client, TextInputConfiguration configuration) {
             this._client = client;
         }
@@ -52,8 +65,8 @@ namespace Unity.UIWidgets.service {
             this._client = 0;
         }
 
-        public bool hashPreview() {
-            return false;
+        public bool imeRequired() {
+            return true;
         }
 
         public void OnGUI() {
@@ -164,8 +177,11 @@ namespace Unity.UIWidgets.service {
             this._client = 0;
         }
 
-        public bool hashPreview() {
-            return this._keyboard != null;
+        public bool imeRequired() {
+            return false;
+        }
+
+        public void setIMEPos(Offset imeGlobalPos) {
         }
 
         public void setClient(int client, TextInputConfiguration configuration) {
@@ -227,42 +243,29 @@ namespace Unity.UIWidgets.service {
         }
     }
 
-#if UNITY_IOS || UNITY_ANDROID
-    class UIWidgetsTouchScreenKeyboardDelegate : KeyboardDelegate {
-
-        public UIWidgetsTouchScreenKeyboardDelegate() {
-            UIWidgetsMessageManager.instance.AddChannelMessageDelegate("TextInput", this.handleMethodCall);
+    abstract class AbstractUIWidgetsKeyboardDelegate : KeyboardDelegate {
+        protected AbstractUIWidgetsKeyboardDelegate() {
+            UIWidgetsMessageManager.instance.AddChannelMessageDelegate("TextInput", this._handleMethodCall);
         }
         
         public void Dispose() {
-            UIWidgetsMessageManager.instance.RemoveChannelMessageDelegate("TextInput", this.handleMethodCall);
+            UIWidgetsMessageManager.instance.RemoveChannelMessageDelegate("TextInput", this._handleMethodCall);
         }
 
-        public void show() {
-            UIWidgetsTextInputShow();
-        }
+        public abstract void show();
 
-        public void hide() {
-            UIWidgetsTextInputHide();
-        }
+        public abstract void hide();
 
-        public void setEditingState(TextEditingValue value) {
-            UIWidgetsTextInputSetTextInputEditingState(value.toJson().ToString());
-        }
+        public abstract void setEditingState(TextEditingValue value);
+        public abstract void setIMEPos(Offset imeGlobalPos);
+        public abstract void setClient(int client, TextInputConfiguration configuration);
 
-        public void setClient(int client, TextInputConfiguration configuration) {
-            UIWidgetsTextInputSetClient(client, configuration.toJson().ToString());
-        }
-
-        public void clearClient() {
-            UIWidgetsTextInputClearTextInputClient();
-        }
-
-        public bool hashPreview() {
+        public abstract void clearClient();
+        public virtual bool imeRequired() {
             return false;
         }
 
-        void handleMethodCall(string method, List<JSONNode> args) {
+        void _handleMethodCall(string method, List<JSONNode> args) {
             if (TextInput._currentConnection == null) {
                 return;
             }
@@ -283,6 +286,84 @@ namespace Unity.UIWidgets.service {
                         throw new UIWidgetsError($"unknown method ${method}");
                 }
             }
+        } 
+    }
+    
+#if UNITY_WEBGL
+    class UIWidgetsWebGLKeyboardDelegate : AbstractUIWidgetsKeyboardDelegate {
+        
+        public override void show() {
+            Input.imeCompositionMode = IMECompositionMode.On;
+        }
+
+        public override void hide() {
+        }
+
+        public override void setEditingState(TextEditingValue value) {
+            UIWidgetsTextInputSetTextInputEditingState(value.toJson().ToString());
+        }
+
+        public override void setIMEPos(Offset imeGlobalPos) {
+            var converter = Window.instance as WindowScreenPosConverter;
+            D.assert(converter != null, $"window should implement {typeof(WindowScreenPosConverter).FullName}");
+            var canvasPos = converter.windowPosToScreenPos(imeGlobalPos);
+            UIWidgetsTextInputSetIMEPos(canvasPos.dx, canvasPos.dy);
+        }
+
+        public override void setClient(int client, TextInputConfiguration configuration) {
+            WebGLInput.captureAllKeyboardInput = false;
+            Input.imeCompositionMode = IMECompositionMode.On;
+            UIWidgetsTextInputSetClient(client, configuration.toJson().ToString());
+        }
+
+        public override void clearClient() {
+            UIWidgetsTextInputClearTextInputClient();
+        }
+
+        public override bool imeRequired() {
+            return true;
+        }
+
+        [DllImport ("__Internal")]
+        internal static extern void UIWidgetsTextInputSetClient(int client, string configuration);
+        
+        [DllImport ("__Internal")]
+        internal static extern void UIWidgetsTextInputSetTextInputEditingState(string jsonText);
+        
+        [DllImport ("__Internal")]
+        internal static extern void UIWidgetsTextInputClearTextInputClient();
+        
+        [DllImport ("__Internal")]
+        internal static extern void UIWidgetsTextInputSetIMEPos(float x, float y);
+
+
+    }
+#endif
+    
+#if UNITY_IOS || UNITY_ANDROID
+    class UIWidgetsTouchScreenKeyboardDelegate : AbstractUIWidgetsKeyboardDelegate {
+
+        public override void show() {
+            UIWidgetsTextInputShow();
+        }
+
+        public override void hide() {
+            UIWidgetsTextInputHide();
+        }
+
+        public override void setEditingState(TextEditingValue value) {
+            UIWidgetsTextInputSetTextInputEditingState(value.toJson().ToString());
+        }
+
+        public override void setIMEPos(Offset imeGlobalPos) {
+        }
+
+        public override void setClient(int client, TextInputConfiguration configuration) {
+            UIWidgetsTextInputSetClient(client, configuration.toJson().ToString());
+        }
+
+        public override void clearClient() {
+            UIWidgetsTextInputClearTextInputClient();
         }
         
 #if UNITY_IOS
@@ -296,7 +377,7 @@ namespace Unity.UIWidgets.service {
         internal static extern void UIWidgetsTextInputSetClient(int client, string configuration);
         
         [DllImport ("__Internal")]
-        internal static extern void UIWidgetsTextInputSetTextInputEditingState(string jsonText); // also send to client ?
+        internal static extern void UIWidgetsTextInputSetTextInputEditingState(string jsonText);
         
         [DllImport ("__Internal")]
         internal static extern void UIWidgetsTextInputClearTextInputClient();

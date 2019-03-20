@@ -76,6 +76,23 @@ namespace Unity.UIWidgets.engine {
             size.y = Mathf.Round(size.y);
             return size;
         }
+
+        public Offset windowPosToScreenPos(Offset windowPos) {
+            Camera camera = null;
+            var canvas = this._uiWidgetsPanel.canvas;
+            if (canvas.renderMode != RenderMode.ScreenSpaceCamera) {
+                camera = canvas.GetComponent<GraphicRaycaster>().eventCamera;
+            }
+            var pos = new Vector2(windowPos.dx, windowPos.dy);
+            pos = pos * this.queryDevicePixelRatio() / this._uiWidgetsPanel.canvas.scaleFactor;
+            var rectTransform = this._uiWidgetsPanel.rectTransform;
+            var rect = rectTransform.rect;
+            pos.x += rect.min.x;
+            pos.y = rect.max.y - pos.y;
+            var worldPos = rectTransform.TransformPoint(new Vector2(pos.x, pos.y));
+            var screenPos = RectTransformUtility.WorldToScreenPoint(camera, worldPos);
+            return new Offset(screenPos.x, Screen.height - screenPos.y);
+        }
     }
 
     [RequireComponent(typeof(RectTransform))]
