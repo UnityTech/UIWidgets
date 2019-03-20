@@ -145,6 +145,11 @@ namespace Unity.UIWidgets.editor {
         }
 
         public void OnDisable() {
+            
+            using (this.getScope()) {
+                this._binding.detachRootWidget();
+            }
+            
             _windowAdapters.Remove(this);
             this._alive = false;
 
