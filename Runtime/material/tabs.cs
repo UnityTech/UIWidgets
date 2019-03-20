@@ -454,6 +454,15 @@ namespace Unity.UIWidgets.material {
         }
 
         public readonly _TabBarState tabBar;
+        
+        public override bool applyContentDimensions(float minScrollExtent, float maxScrollExtent) {
+            bool result = true;
+            if (!this.havePixels) {
+                this.correctPixels(this.tabBar._initialScrollOffset(this.viewportDimension, minScrollExtent, maxScrollExtent));
+                result = false;
+            }
+            return base.applyContentDimensions(minScrollExtent, maxScrollExtent) && result;
+        }
     }
 
 
@@ -706,7 +715,7 @@ namespace Unity.UIWidgets.material {
                 position.maxScrollExtent);
         }
 
-        float _initialScrollOffset(float viewportWidth, float minExtent, float maxExtent) {
+        internal float _initialScrollOffset(float viewportWidth, float minExtent, float maxExtent) {
             return this._tabScrollOffset(this._currentIndex, viewportWidth, minExtent, maxExtent);
         }
 

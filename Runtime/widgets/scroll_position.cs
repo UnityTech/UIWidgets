@@ -64,7 +64,7 @@ namespace Unity.UIWidgets.widgets {
             }
         }
 
-        public bool hasPixles {
+        public bool havePixels {
             get { return this._pixels != null; }
         }
 
