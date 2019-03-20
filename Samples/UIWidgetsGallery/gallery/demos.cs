@@ -157,14 +157,14 @@ namespace UIWidgetsGallery.gallery {
 //                ),
 //
 //                // Style
-//                new GalleryDemo(
-//                    title: "Colors",
-//                    subtitle: "All of the predefined colors",
-//                    icon: GalleryIcons.colors,
-//                    category: GalleryDemoCategory._kStyle,
-//                    routeName: ColorsDemo.routeName,
-//                    buildRoute: (BuildContext context) => ColorsDemo()
-//                ),
+                new GalleryDemo(
+                    title: "Colors",
+                    subtitle: "All of the predefined colors",
+                    icon: GalleryIcons.colors,
+                    category: DemoUtils._kStyle,
+                    routeName: ColorsDemo.routeName,
+                    buildRoute: (BuildContext context) => new ColorsDemo()
+                ),
 //                new GalleryDemo(
 //                    title: "Typography",
 //                    subtitle: "All of the predefined text styles",

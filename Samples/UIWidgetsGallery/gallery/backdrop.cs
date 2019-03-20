@@ -186,7 +186,7 @@ namespace UIWidgetsGallery.gallery {
             Widget frontLayer = null,
             Widget backTitle = null,
             Widget backLayer = null
-        ) : base(key: null) {
+        ) {
             this.frontAction = frontAction;
             this.frontTitle = frontTitle;
             this.frontHeading = frontHeading;

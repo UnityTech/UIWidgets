@@ -44,7 +44,6 @@ namespace Unity.UIWidgets.widgets {
         ) {
             D.assert(message != null);
             D.assert(location != null);
-            D.assert(textStyle != null);
             this.color = color ?? BannerConstants._kColor;
             this.message = message;
             this.location = location;
@@ -163,8 +162,6 @@ namespace Unity.UIWidgets.widgets {
             TextStyle textStyle = null
         ) : base(key: key) {
             D.assert(message != null);
-            D.assert(color != null);
-            D.assert(textStyle != null);
             this.child = child;
             this.message = message;
             this.location = location;
