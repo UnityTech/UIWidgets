@@ -471,7 +471,7 @@ namespace Unity.UIWidgets.material {
     }
 
     public static partial class PopupMenuUtils {
-        public static IPromise<T> showMenu<T>(
+        public static IPromise<object> showMenu<T>(
             BuildContext context,
             RelativeRect position,
             List<PopupMenuEntry<T>> items,
@@ -488,7 +488,7 @@ namespace Unity.UIWidgets.material {
                 initialValue: initialValue,
                 elevation: elevation,
                 theme: Theme.of(context, shadowThemeOnly: true)
-            )).Then(result => (T) result);
+            ));
         }
     }
 
@@ -566,7 +566,7 @@ namespace Unity.UIWidgets.material {
                 ),
                 Offset.zero & overlay.size
             );
-            PopupMenuUtils.showMenu<T>(
+            PopupMenuUtils.showMenu(
                     context: this.context,
                     elevation: this.widget.elevation,
                     items: this.widget.itemBuilder(this.context),
@@ -587,7 +587,7 @@ namespace Unity.UIWidgets.material {
                     }
 
                     if (this.widget.onSelected != null) {
-                        this.widget.onSelected(newValue);
+                        this.widget.onSelected((T) newValue);
                     }
                 });
         }

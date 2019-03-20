@@ -167,7 +167,7 @@ namespace Unity.UIWidgets.engine {
             this.material = mat;
         }
 
-        void Update() {
+        protected virtual void Update() {
             PerformanceUtils.instance.updateDeltaTime(Time.unscaledDeltaTime);
             this._displayMetrics.Update();
             UIWidgetsMessageManager.ensureUIWidgetsMessageManagerIfNeeded();

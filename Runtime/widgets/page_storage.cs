@@ -123,11 +123,11 @@ namespace Unity.UIWidgets.widgets {
             }
 
             if (identifier != null) {
-                return this._storage[identifier];
+                return this._storage.getOrDefault(identifier);
             }
 
             _StorageEntryIdentifier contextIdentifier = this._computeIdentifier(context);
-            return contextIdentifier.isNotEmpty ? this._storage[contextIdentifier] : null;
+            return contextIdentifier.isNotEmpty ? this._storage.getOrDefault(contextIdentifier) : null;
         }
     }
 

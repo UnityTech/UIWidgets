@@ -212,7 +212,7 @@ namespace Unity.UIWidgets.rendering {
             Curve curve = null,
             TimeSpan? duration = null
         ) {
-            D.assert(this.vsync != null);
+            D.assert(vsync != null);
             this.vsync = vsync;
             this.curve = curve ?? Curves.ease;
             this.duration = duration ?? new TimeSpan(0, 0, 0, 0, 300);
