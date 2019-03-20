@@ -139,14 +139,14 @@ namespace UIWidgetsGallery.gallery {
 //                    routeName: ShrineDemo.routeName,
 //                    buildRoute: (BuildContext context) => new ShrineDemo()
 //                ),
-//                new GalleryDemo(
-//                    title: "Contact profile",
-//                    subtitle: "Address book entry with a flexible appbar",
-//                    icon: GalleryIcons.account_box,
-//                    category: GalleryDemoCategory._kDemos,
-//                    routeName: ContactsDemo.routeName,
-//                    buildRoute: (BuildContext context) => new ContactsDemo()
-//                ),
+                new GalleryDemo(
+                    title: "Contact profile",
+                    subtitle: "Address book entry with a flexible appbar",
+                    icon: GalleryIcons.account_box,
+                    category: DemoUtils._kDemos,
+                    routeName: ContactsDemo.routeName,
+                    buildRoute: (BuildContext context) => new ContactsDemo()
+                ),
 //                new GalleryDemo(
 //                    title: "Animation",
 //                    subtitle: "Section organizer",
@@ -165,14 +165,14 @@ namespace UIWidgetsGallery.gallery {
                     routeName: ColorsDemo.routeName,
                     buildRoute: (BuildContext context) => new ColorsDemo()
                 ),
-//                new GalleryDemo(
-//                    title: "Typography",
-//                    subtitle: "All of the predefined text styles",
-//                    icon: GalleryIcons.custom_typography,
-//                    category: GalleryDemoCategory._kStyle,
-//                    routeName: TypographyDemo.routeName,
-//                    buildRoute: (BuildContext context) => TypographyDemo()
-//                ),
+                new GalleryDemo(
+                    title: "Typography",
+                    subtitle: "All of the predefined text styles",
+                    icon: GalleryIcons.custom_typography,
+                    category: DemoUtils._kStyle,
+                    routeName: TypographyDemo.routeName,
+                    buildRoute: (BuildContext context) => new TypographyDemo()
+                ),
 //
 //                // Material Components
 //                new GalleryDemo(

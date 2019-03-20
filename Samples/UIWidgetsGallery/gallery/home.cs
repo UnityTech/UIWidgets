@@ -21,8 +21,11 @@ namespace UIWidgetsGallery.gallery {
     }
 
     class _UIWidgetsLogo : StatelessWidget {
-        public _UIWidgetsLogo(Key key = null) : base(key: key) {
+        public _UIWidgetsLogo(Key key = null, bool isDark = false) : base(key: key) {
+            this._isDark = isDark;
         }
+
+        readonly bool _isDark;
 
         public override Widget build(BuildContext context) {
             return new Center(
@@ -32,7 +35,7 @@ namespace UIWidgetsGallery.gallery {
                     decoration: new BoxDecoration(
                         image: new DecorationImage(
                             image: new AssetImage(
-                                "unity")
+                                this._isDark ? "unity-black" : "unity-white")
                         )
                     )
                 )
@@ -253,14 +256,17 @@ namespace UIWidgetsGallery.gallery {
         public GalleryHome(
             Key key = null,
             bool testMode = false,
-            Widget optionsPage = null
+            Widget optionsPage = null,
+            GalleryOptions options = null
         ) : base(key: key) {
             this.testMode = testMode;
             this.optionsPage = optionsPage;
+            this.options = options;
         }
 
         public readonly Widget optionsPage;
         public readonly bool testMode;
+        public readonly GalleryOptions options;
 
         public static bool showPreviewBanner = true;
 
@@ -335,7 +341,7 @@ namespace UIWidgetsGallery.gallery {
                                 switchOutCurve: switchOutCurve,
                                 switchInCurve: switchInCurve,
                                 child: this._category == null
-                                    ? (Widget) new _UIWidgetsLogo()
+                                    ? (Widget) new _UIWidgetsLogo(isDark: this.widget.options?.theme == GalleryTheme.kDarkGalleryTheme)
                                     : new IconButton(
                                         icon: new BackButtonIcon(),
                                         tooltip: "Back",

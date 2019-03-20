@@ -113,7 +113,8 @@ namespace UIWidgetsGallery.gallery {
                     onSendFeedback: this.widget.onSendFeedback ?? (() => {
                         Application.OpenURL("https://github.com/UnityTech/UIWidgets/issues");
                     })
-                )
+                ),
+                options: this._options
             );
 
             if (this.widget.updateUrlFetcher != null) {
