@@ -13,13 +13,14 @@ using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace UIWidgetsSample {
     public class MaterialSample : UIWidgetsSamplePanel {
-        int testCaseId = 3;
+        int testCaseId = 4;
 
         List<Widget> testCases = new List<Widget> {
             new MaterialButtonWidget(),
             new MaterialInkWellWidget(),
             new MaterialAppBarWidget(),
-            new MaterialTabBarWidget()
+            new MaterialTabBarWidget(),
+            new TableWidget()
         };
 
         protected override Widget createWidget() {
@@ -31,6 +32,32 @@ namespace UIWidgetsSample {
         protected override void OnEnable() {
             base.OnEnable();
             FontManager.instance.addFont(Resources.Load<Font>(path: "MaterialIcons-Regular"));
+        }
+    }
+
+
+    class TableWidget : StatelessWidget {
+        public TableWidget(Key key = null) : base(key) {
+        }
+
+        public override Widget build(BuildContext context) {
+            return new Scaffold(
+                body: new Table(
+                    children: new List<TableRow> {
+                        new TableRow(
+                            decoration: new BoxDecoration(color: Colors.blue),
+                            children: new List<Widget> {
+                                new Text("item 1"),
+                                new Text("item 2")
+                            }
+                        ),
+                        new TableRow(children: new List<Widget> {
+                                new Text("item 3"),
+                                new Text("item 4")
+                            }
+                        )
+                    },
+                    defaultVerticalAlignment: TableCellVerticalAlignment.middle));
         }
     }
 

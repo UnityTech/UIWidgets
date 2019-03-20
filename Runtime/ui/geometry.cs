@@ -644,6 +644,19 @@ namespace Unity.UIWidgets.ui {
                 Mathf.Floor(this.right), Mathf.Floor(this.bottom));
         }
 
+        public Rect normalize() {
+            if (this.left <= this.right && this.top <= this.bottom) {
+                return this;
+            }
+
+            return fromLTRB(
+                Mathf.Min(this.left, this.right),
+                Mathf.Min(this.top, this.bottom),
+                Mathf.Max(this.left, this.right),
+                Mathf.Max(this.top, this.bottom)
+            );
+        }
+
         public static Rect lerp(Rect a, Rect b, float t) {
             if (a == null && b == null) {
                 return null;

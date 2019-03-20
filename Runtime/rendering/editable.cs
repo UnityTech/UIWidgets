@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.painting;
@@ -501,14 +500,16 @@ namespace Unity.UIWidgets.rendering {
 
         public void handleTapDown(TapDownDetails details) {
             this._lastTapDownPosition = details.globalPosition - this._paintOffset;
+            if (!Application.isMobilePlatform) {
+                this._selectForTap(this._lastTapDownPosition);
+            }
         }
 
         public void handleTap() {
             this._layoutText(this.constraints.maxWidth);
             D.assert(this._lastTapDownPosition != null);
-            if (this.onSelectionChanged != null) {
-                var position = this._textPainter.getPositionForOffset(this.globalToLocal(this._lastTapDownPosition));
-                this.onSelectionChanged(TextSelection.fromPosition(position), this, SelectionChangedCause.tap);
+            if (Application.isMobilePlatform) {
+                this._selectForTap(this._lastTapDownPosition);
             }
         }
 
@@ -609,13 +610,6 @@ namespace Unity.UIWidgets.rendering {
                 }
             }
 
-            if (this._hasFocus) {
-                var caretOffset = this._textPainter.getOffsetForCaret(this._selection.extendPos,
-                    Rect.fromLTWH(0, 0, 1, this.preferredLineHeight));
-                var caretRec = this._caretPrototype.shift(caretOffset + effectiveOffset);
-                Input.compositionCursorPos = new Vector2(caretRec.left, caretRec.bottom);
-            }
-
             this._textPainter.paint(context.canvas, effectiveOffset);
         }
 
@@ -690,6 +684,13 @@ namespace Unity.UIWidgets.rendering {
             return new TextSelection(baseOffset: word.start, extentOffset: word.end);
         }
 
+        void _selectForTap(Offset pointerPosition) {
+            if (this.onSelectionChanged != null) {
+                var position = this._textPainter.getPositionForOffset(this.globalToLocal(pointerPosition));
+                this.onSelectionChanged(TextSelection.fromPosition(position), this, SelectionChangedCause.tap);
+            }
+        }
+        
         bool _isMultiline {
             get { return this._maxLines != 1; }
         }
