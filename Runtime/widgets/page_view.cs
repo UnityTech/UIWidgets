@@ -196,7 +196,7 @@ namespace Unity.UIWidgets.widgets {
 
             bool result = base.applyViewportDimension(viewportDimension);
             float? oldPixels = null;
-            if (this.hasPixles) {
+            if (this.havePixels) {
                 oldPixels = this.pixels;
             }
 
