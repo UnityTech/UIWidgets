@@ -139,14 +139,14 @@ namespace UIWidgetsGallery.gallery {
 //                    routeName: ShrineDemo.routeName,
 //                    buildRoute: (BuildContext context) => new ShrineDemo()
 //                ),
-//                new GalleryDemo(
-//                    title: "Contact profile",
-//                    subtitle: "Address book entry with a flexible appbar",
-//                    icon: GalleryIcons.account_box,
-//                    category: GalleryDemoCategory._kDemos,
-//                    routeName: ContactsDemo.routeName,
-//                    buildRoute: (BuildContext context) => new ContactsDemo()
-//                ),
+                new GalleryDemo(
+                    title: "Contact profile",
+                    subtitle: "Address book entry with a flexible appbar",
+                    icon: GalleryIcons.account_box,
+                    category: DemoUtils._kDemos,
+                    routeName: ContactsDemo.routeName,
+                    buildRoute: (BuildContext context) => new ContactsDemo()
+                ),
 //                new GalleryDemo(
 //                    title: "Animation",
 //                    subtitle: "Section organizer",
