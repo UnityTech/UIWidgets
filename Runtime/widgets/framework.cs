@@ -359,7 +359,7 @@ namespace Unity.UIWidgets.widgets {
     }
 
     public abstract class StatefulWidget : Widget {
-        protected StatefulWidget(Key key = null) : base(key: key) {
+        protected StatefulWidget(Key key) : base(key: key) {
         }
 
         public override Element createElement() {
