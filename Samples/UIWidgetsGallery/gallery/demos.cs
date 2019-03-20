@@ -165,14 +165,14 @@ namespace UIWidgetsGallery.gallery {
                     routeName: ColorsDemo.routeName,
                     buildRoute: (BuildContext context) => new ColorsDemo()
                 ),
-//                new GalleryDemo(
-//                    title: "Typography",
-//                    subtitle: "All of the predefined text styles",
-//                    icon: GalleryIcons.custom_typography,
-//                    category: GalleryDemoCategory._kStyle,
-//                    routeName: TypographyDemo.routeName,
-//                    buildRoute: (BuildContext context) => TypographyDemo()
-//                ),
+                new GalleryDemo(
+                    title: "Typography",
+                    subtitle: "All of the predefined text styles",
+                    icon: GalleryIcons.custom_typography,
+                    category: DemoUtils._kStyle,
+                    routeName: TypographyDemo.routeName,
+                    buildRoute: (BuildContext context) => new TypographyDemo()
+                ),
 //
 //                // Material Components
 //                new GalleryDemo(
