@@ -17,7 +17,7 @@ namespace Unity.UIWidgets.flow {
 
         public override void preroll(PrerollContext context, Matrix3 matrix) {
             var childMatrix = new Matrix3(matrix);
-            childMatrix.postTranslate(this._offset.dx, this._offset.dy); // TOOD: pre or post? https://github.com/flutter/engine/pull/7945
+            childMatrix.preTranslate(this._offset.dx, this._offset.dy); // TOOD: pre or post? https://github.com/flutter/engine/pull/7945
             
             base.preroll(context, childMatrix);
             

@@ -281,12 +281,12 @@ namespace Unity.UIWidgets.ui {
             }
         }
 
-        public static PictureFlusher.RenderDraw convexFill(PictureFlusher.RenderLayer layer, Paint paint,
+        public static PictureFlusher.CmdDraw convexFill(PictureFlusher.RenderLayer layer, Paint paint,
             MeshMesh mesh) {
             var mat = _convexFillMat.getMaterial(paint.blendMode, layer.ignoreClip);
             _getShaderPassAndProps(layer, paint, mesh, 1.0f, out var pass, out var props);
 
-            return new PictureFlusher.RenderDraw {
+            return new PictureFlusher.CmdDraw {
                 mesh = mesh,
                 pass = pass,
                 material = mat,
@@ -294,7 +294,7 @@ namespace Unity.UIWidgets.ui {
             };
         }
 
-        public static PictureFlusher.RenderDraw fill0(PictureFlusher.RenderLayer layer, MeshMesh mesh) {
+        public static PictureFlusher.CmdDraw fill0(PictureFlusher.RenderLayer layer, MeshMesh mesh) {
             Vector4 viewport = layer.viewport;
             var mat = _fill0Mat.getMaterial(layer.ignoreClip);
 
@@ -302,7 +302,7 @@ namespace Unity.UIWidgets.ui {
             var props = new MaterialPropertyBlock();
             props.SetVector("_viewport", viewport);
 
-            return new PictureFlusher.RenderDraw {
+            return new PictureFlusher.CmdDraw {
                 mesh = mesh,
                 pass = pass,
                 material = mat,
@@ -310,12 +310,12 @@ namespace Unity.UIWidgets.ui {
             };
         }
 
-        public static PictureFlusher.RenderDraw fill1(PictureFlusher.RenderLayer layer, Paint paint,
+        public static PictureFlusher.CmdDraw fill1(PictureFlusher.RenderLayer layer, Paint paint,
             MeshMesh mesh) {
             var mat = _fill1Mat.getMaterial(paint.blendMode);
             _getShaderPassAndProps(layer, paint, mesh, 1.0f, out var pass, out var props);
 
-            return new PictureFlusher.RenderDraw {
+            return new PictureFlusher.CmdDraw {
                 mesh = mesh.boundsMesh,
                 pass = pass,
                 material = mat,
@@ -323,12 +323,12 @@ namespace Unity.UIWidgets.ui {
             };
         }
 
-        public static PictureFlusher.RenderDraw stroke0(PictureFlusher.RenderLayer layer, Paint paint,
+        public static PictureFlusher.CmdDraw stroke0(PictureFlusher.RenderLayer layer, Paint paint,
             float alpha, MeshMesh mesh) {
             var mat = _stroke0Mat.getMaterial(paint.blendMode, layer.ignoreClip);
             _getShaderPassAndProps(layer, paint, mesh, alpha, out var pass, out var props);
 
-            return new PictureFlusher.RenderDraw {
+            return new PictureFlusher.CmdDraw {
                 mesh = mesh,
                 pass = pass,
                 material = mat,
@@ -336,7 +336,7 @@ namespace Unity.UIWidgets.ui {
             };
         }
 
-        public static PictureFlusher.RenderDraw stroke1(PictureFlusher.RenderLayer layer, MeshMesh mesh) {
+        public static PictureFlusher.CmdDraw stroke1(PictureFlusher.RenderLayer layer, MeshMesh mesh) {
             Vector4 viewport = layer.viewport;
             var mat = _stroke1Mat;
 
@@ -344,7 +344,7 @@ namespace Unity.UIWidgets.ui {
             var props = new MaterialPropertyBlock();
             props.SetVector("_viewport", viewport);
 
-            return new PictureFlusher.RenderDraw {
+            return new PictureFlusher.CmdDraw {
                 mesh = mesh,
                 pass = pass,
                 material = mat,
@@ -352,7 +352,7 @@ namespace Unity.UIWidgets.ui {
             };
         }
 
-        public static PictureFlusher.RenderDraw stencilClear(
+        public static PictureFlusher.CmdDraw stencilClear(
             PictureFlusher.RenderLayer layer, MeshMesh mesh) {
             Vector4 viewport = layer.viewport;
             var mat = _stencilMat;
@@ -361,7 +361,7 @@ namespace Unity.UIWidgets.ui {
             var props = new MaterialPropertyBlock();
             props.SetVector("_viewport", viewport);
 
-            return new PictureFlusher.RenderDraw {
+            return new PictureFlusher.CmdDraw {
                 mesh = mesh,
                 pass = pass,
                 material = mat,
@@ -369,7 +369,7 @@ namespace Unity.UIWidgets.ui {
             };
         }
 
-        public static PictureFlusher.RenderDraw stencil0(PictureFlusher.RenderLayer layer, MeshMesh mesh) {
+        public static PictureFlusher.CmdDraw stencil0(PictureFlusher.RenderLayer layer, MeshMesh mesh) {
             Vector4 viewport = layer.viewport;
             var mat = _stencilMat;
 
@@ -377,7 +377,7 @@ namespace Unity.UIWidgets.ui {
             var props = new MaterialPropertyBlock();
             props.SetVector("_viewport", viewport);
 
-            return new PictureFlusher.RenderDraw {
+            return new PictureFlusher.CmdDraw {
                 mesh = mesh,
                 pass = pass,
                 material = mat,
@@ -385,7 +385,7 @@ namespace Unity.UIWidgets.ui {
             };
         }
 
-        public static PictureFlusher.RenderDraw stencil1(PictureFlusher.RenderLayer layer, MeshMesh mesh) {
+        public static PictureFlusher.CmdDraw stencil1(PictureFlusher.RenderLayer layer, MeshMesh mesh) {
             Vector4 viewport = layer.viewport;
             var mat = _stencilMat;
 
@@ -393,7 +393,7 @@ namespace Unity.UIWidgets.ui {
             var props = new MaterialPropertyBlock();
             props.SetVector("_viewport", viewport);
 
-            return new PictureFlusher.RenderDraw {
+            return new PictureFlusher.CmdDraw {
                 mesh = mesh,
                 pass = pass,
                 material = mat,
@@ -401,7 +401,7 @@ namespace Unity.UIWidgets.ui {
             };
         }
 
-        public static PictureFlusher.RenderDraw tex(PictureFlusher.RenderLayer layer, Paint paint,
+        public static PictureFlusher.CmdDraw tex(PictureFlusher.RenderLayer layer, Paint paint,
             MeshMesh mesh, Image image) {
             var mat = _texMat.getMaterial(paint.blendMode, layer.ignoreClip);
             _getShaderPassAndProps(layer, paint, mesh, 1.0f, out var pass, out var props);
@@ -410,7 +410,7 @@ namespace Unity.UIWidgets.ui {
             props.SetTexture("_tex", image.texture);
             props.SetInt("_texMode", image.texture is RenderTexture ? 1 : 0); // pre alpha if RT else post alpha
 
-            return new PictureFlusher.RenderDraw {
+            return new PictureFlusher.CmdDraw {
                 mesh = mesh,
                 pass = pass,
                 material = mat,
@@ -419,13 +419,13 @@ namespace Unity.UIWidgets.ui {
             };
         }
 
-        public static PictureFlusher.RenderDraw texRT(PictureFlusher.RenderLayer layer, Paint paint,
+        public static PictureFlusher.CmdDraw texRT(PictureFlusher.RenderLayer layer, Paint paint,
             MeshMesh mesh, PictureFlusher.RenderLayer renderLayer) {
             var mat = _texMat.getMaterial(paint.blendMode, layer.ignoreClip);
             _getShaderPassAndProps(layer, paint, mesh, 1.0f, out var pass, out var props);
             props.SetInt("_texMode", 1); // pre alpha
 
-            return new PictureFlusher.RenderDraw {
+            return new PictureFlusher.CmdDraw {
                 mesh = mesh,
                 pass = pass,
                 material = mat,
@@ -434,17 +434,17 @@ namespace Unity.UIWidgets.ui {
             };
         }
 
-        public static PictureFlusher.RenderDraw texAlpha(PictureFlusher.RenderLayer layer, Paint paint,
+        public static PictureFlusher.CmdDraw texAlpha(PictureFlusher.RenderLayer layer, Paint paint,
             MeshMesh mesh, Texture tex) {
             return texAlpha(layer, paint, mesh, null, tex);
         }
         
-        public static PictureFlusher.RenderDraw texAlpha(PictureFlusher.RenderLayer layer, Paint paint,
+        public static PictureFlusher.CmdDraw texAlpha(PictureFlusher.RenderLayer layer, Paint paint,
             TextBlobMesh textMesh, Texture tex) {
             return texAlpha(layer, paint, null, textMesh, tex);
         }
         
-        public static PictureFlusher.RenderDraw texAlpha(PictureFlusher.RenderLayer layer, Paint paint,
+        public static PictureFlusher.CmdDraw texAlpha(PictureFlusher.RenderLayer layer, Paint paint,
             MeshMesh mesh, TextBlobMesh textMesh, Texture tex) {
             
             var mat = _texMat.getMaterial(paint.blendMode, layer.ignoreClip);
@@ -453,7 +453,7 @@ namespace Unity.UIWidgets.ui {
             props.SetTexture("_tex", tex);
             props.SetInt("_texMode", 2); // alpha only
 
-            return new PictureFlusher.RenderDraw {
+            return new PictureFlusher.CmdDraw {
                 mesh = mesh,
                 textMesh = textMesh,
                 pass = pass,
@@ -462,7 +462,7 @@ namespace Unity.UIWidgets.ui {
             };
         }
 
-        public static PictureFlusher.RenderDraw maskFilter(PictureFlusher.RenderLayer layer, MeshMesh mesh,
+        public static PictureFlusher.CmdDraw maskFilter(PictureFlusher.RenderLayer layer, MeshMesh mesh,
             PictureFlusher.RenderLayer renderLayer, float radius, Vector2 imgInc, float[] kernel) {
             Vector4 viewport = layer.viewport;
             var mat = _filterMat;
@@ -475,7 +475,7 @@ namespace Unity.UIWidgets.ui {
             props.SetVector("_mf_imgInc", imgInc);
             props.SetFloatArray("_mf_kernel", kernel);
 
-            return new PictureFlusher.RenderDraw {
+            return new PictureFlusher.CmdDraw {
                 mesh = mesh,
                 pass = pass,
                 material = mat,

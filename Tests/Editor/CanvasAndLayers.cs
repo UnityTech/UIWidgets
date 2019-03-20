@@ -568,53 +568,61 @@ namespace UIWidgets.Tests {
         void saveLayer() {
             var pictureRecorder = new PictureRecorder();
             var canvas = new RecorderCanvas(pictureRecorder);
+            var paint1 = new Paint {
+                color = new Color(0xFFFFFFFF),
+            };
 
+            var path1 = new Path();
+            path1.moveTo(0, 0);
+            path1.lineTo(0, 90);
+            path1.lineTo(90, 90);
+            path1.lineTo(90, 0);
+            path1.close();
+            canvas.drawPath(path1, paint1);
+
+            
             var paint = new Paint {
                 color = new Color(0xFFFF0000),
             };
 
             var path = new Path();
-            path.moveTo(10, 10);
-            path.lineTo(10, 110);
-            path.lineTo(90, 110);
-            path.lineTo(110, 10);
+            path.moveTo(20, 20);
+            path.lineTo(20, 70);
+            path.lineTo(70, 70);
+            path.lineTo(70, 20);
             path.close();
 
             canvas.drawPath(path, paint);
 
-            paint = new Paint {
+            var paint2 = new Paint {
                 color = new Color(0xFFFFFF00),
             };
 
-            var rect = Unity.UIWidgets.ui.Rect.fromLTWH(10, 150, 100, 100);
-            var rrect = RRect.fromRectAndCorners(rect, 0, 4, 8, 16);
-            var rect1 = Unity.UIWidgets.ui.Rect.fromLTWH(18, 152, 88, 92);
-            var rrect1 = RRect.fromRectAndCorners(rect1, 0, 4, 8, 16);
-            canvas.drawDRRect(rrect, rrect1, paint);
+            var path2 = new Path();
+            path2.moveTo(30, 30);
+            path2.lineTo(30, 60);
+            path2.lineTo(60, 60);
+            path2.lineTo(60, 30);
+            path2.close();
 
-            canvas.rotate(-45 * Mathf.PI / 180.0f, new Offset(150, 150));
-
-//            paint = new Paint {
-//                color = new Color(0xFF00FFFF),
-//                blurSigma = 3,
-//            };
-//            canvas.drawRectShadow(
-//                Rect.fromLTWH(150, 150, 110, 120),
-//                paint);
+            canvas.drawPath(path2, paint2);
 
             var picture = pictureRecorder.endRecording();
-            Debug.Log("picture.paintBounds: " + picture.paintBounds);
 
             var editorCanvas = new CommandBufferCanvas(this._renderTexture, Window.instance.devicePixelRatio,
                 this._meshPool);
 
-            editorCanvas.saveLayer(picture.paintBounds, new Paint {color = new Color(0x7FFFFFFF)});
+            editorCanvas.saveLayer(
+                picture.paintBounds, new Paint {
+                    color = new Color(0xFFFFFFFF),
+                });
             editorCanvas.drawPicture(picture);
             editorCanvas.restore();
 
-            editorCanvas.translate(150, 0);
-            editorCanvas.saveLayer(picture.paintBounds, new Paint {color = new Color(0xFFFFFFFF)});
-            editorCanvas.drawPicture(picture);
+            editorCanvas.saveLayer(Unity.UIWidgets.ui.Rect.fromLTWH(45, 45, 90, 90), new Paint {
+                color = new Color(0xFFFFFFFF),
+                backdrop = ImageFilter.blur(3f, 3f)
+            });
             editorCanvas.restore();
 
             editorCanvas.flush();

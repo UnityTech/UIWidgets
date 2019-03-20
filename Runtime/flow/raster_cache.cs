@@ -53,13 +53,20 @@ namespace Unity.UIWidgets.flow {
             D.assert(matrix != null);
             this.picture = picture;
             this.matrix = new Matrix3(matrix);
-            var x = this.matrix[2] * devicePixelRatio;
-            var y = this.matrix[5] * devicePixelRatio;
 
-            this.matrix[2] = (x - (int) x) / devicePixelRatio; // x
-            this.matrix[5] = (y - (int) y) / devicePixelRatio; // y
-            D.assert(this.matrix[2] == 0);
-            D.assert(this.matrix[5] == 0);
+            D.assert(() => {
+                var x = this.matrix[2] * devicePixelRatio;
+                var y = this.matrix[5] * devicePixelRatio;
+                this.matrix[2] = (x - (int) x) / devicePixelRatio; // x
+                this.matrix[5] = (y - (int) y) / devicePixelRatio; // y
+                
+                D.assert(Mathf.Abs(this.matrix[2]) <= 1e-5);
+                D.assert(Mathf.Abs(this.matrix[5]) <= 1e-5);
+                return true;
+            });
+            
+            this.matrix[2] = 0.0f;
+            this.matrix[5] = 0.0f;            
             this.devicePixelRatio = devicePixelRatio;
         }
 

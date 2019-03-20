@@ -4,6 +4,8 @@ using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.ui;
+using Gradient = Unity.UIWidgets.ui.Gradient;
+using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace Unity.UIWidgets.rendering {
     public class RenderProxyBox : RenderProxyBoxMixinRenderObjectWithChildMixinRenderBox<RenderBox> {
@@ -678,6 +680,40 @@ namespace Unity.UIWidgets.rendering {
         }
     }
 
+    public class RenderBackdropFilter : RenderProxyBox {
+        public RenderBackdropFilter(
+            RenderBox child = null,
+            ImageFilter filter = null
+        ) : base(child) {
+            D.assert(filter != null);
+            this._filter = filter;
+        }
+
+        ImageFilter _filter;
+
+        public ImageFilter filter {
+            get { return this._filter; }
+            set {
+                D.assert(value != null);
+                if (this._filter == value) {
+                    return;
+                }
+
+                this.markNeedsPaint();
+            }
+        }
+
+        protected override bool alwaysNeedsCompositing {
+            get { return this.child != null; }
+        }
+
+        public override void paint(PaintingContext context, Offset offset) {
+            if (this.child != null) {
+                D.assert(this.needsCompositing);
+                context.pushLayer(new BackdropFilterLayer(this.filter), base.paint, offset);
+            }
+        }
+    }
 
     public abstract class CustomClipper<T> {
         public CustomClipper(Listenable reclip = null) {
@@ -797,32 +833,32 @@ namespace Unity.UIWidgets.rendering {
 
         protected override void debugPaintSize(PaintingContext context, Offset offset) {
             D.assert(() => {
-//                if (this._debugPaint == null) {
-//                this._debugPaint = new Paint();
-//                this._debugPaint.shader = Gradient.linear(
-//                    new Offset(0.0, 0.0),
-//                    new Offset(10.0, 10.0),
-//                    new Color(0x00000000),
-//                    new Color(0xFFFF00FF),
-//                    TileMode.repeated);
-//                this._debugPaint.strokeWidth = 2.0;
-//                this._debugPaint.style = PaintingStyle.stroke;
-//                }
-//                if (this._debugText == null) {
-//                this._debugText = new TextPainter(
-//                                      text: new TextSpan(
-//                                          text: "x",
-//                                          style: new TextStyle(
-//                                              color: new Color(0xFFFF00FF),
-//                                              fontSize: 14.0)
-//                                          ));
-//                this._debugText.layout();
-//                }
+                if (this._debugPaint == null) {
+                    this._debugPaint = new Paint();
+                    this._debugPaint.shader = Gradient.linear(
+                        new Offset(0.0f, 0.0f),
+                        new Offset(10.0f, 10.0f),
+                        new List<Color> {
+                            new Color(0x00000000),
+                            new Color(0xFFFF00FF),
+                        }, null, TileMode.repeated);
+                    this._debugPaint.strokeWidth = 2.0f;
+                    this._debugPaint.style = PaintingStyle.stroke;
+                }
+                if (this._debugText == null) {
+                    this._debugText = new TextPainter(
+                        text: new TextSpan(
+                            text: "x",
+                            style: new TextStyle(
+                                color: new Color(0xFFFF00FF),
+                                fontSize: 14.0f)
+                        ));
+                    this._debugText.layout();
+                }
                 return true;
             });
         }
     }
-
 
     public class RenderClipRect : _RenderCustomClip<Rect> {
         public RenderClipRect(
@@ -960,6 +996,8 @@ namespace Unity.UIWidgets.rendering {
         }
 
         public override bool hitTest(HitTestResult result, Offset position = null) {
+            D.assert(position != null);
+            
             if (this._clipper != null) {
                 this._updateClip();
                 D.assert(this._clip != null);
@@ -975,9 +1013,8 @@ namespace Unity.UIWidgets.rendering {
         public override void paint(PaintingContext context, Offset offset) {
             if (this.child != null) {
                 this._updateClip();
-                //todo:xingwei.zhu pushClipPath()
-//                context.pushClipPath(this.needsCompositing, offset, Offset.zero & this.size,
-//                    this._clip, base.paint, clipBehavior: this.clipBehavior);
+                context.pushClipPath(this.needsCompositing, offset, Offset.zero & this.size,
+                    this._clip, base.paint, clipBehavior: this.clipBehavior);
                 base.paint(context, offset);
             }
         }

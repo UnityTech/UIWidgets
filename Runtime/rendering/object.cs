@@ -270,11 +270,29 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
+        public void pushClipPath(bool needsCompositing, Offset offset, Rect bounds, Path clipPath,
+            PaintingContextCallback painter, Clip clipBehavior = Clip.antiAlias) {
+            Rect offsetBounds = bounds.shift(offset);
+            Path offsetClipPath = clipPath.shift(offset);
+            if (needsCompositing) {
+                this.pushLayer(new ClipPathLayer(clipPath: offsetClipPath, clipBehavior: clipBehavior), painter, offset,
+                    childPaintBounds: offsetBounds);
+            }
+            else {
+                this.clipPathAndPaint(offsetClipPath, clipBehavior, offsetBounds, () => painter(this, offset));
+            }
+        }
+
         public void pushTransform(bool needsCompositing, Offset offset, Matrix3 transform,
             PaintingContextCallback painter) {
-            var effectiveTransform = Matrix3.makeTrans(offset.dx, offset.dy);
-            effectiveTransform.preConcat(transform);
-            effectiveTransform.preTranslate(-offset.dx, -offset.dy);
+            Matrix3 effectiveTransform;
+            if (offset == null || offset == Offset.zero) {
+                effectiveTransform = transform;
+            } else {
+                effectiveTransform = Matrix3.makeTrans(offset.dx, offset.dy);
+                effectiveTransform.preConcat(transform);
+                effectiveTransform.preTranslate(-offset.dx, -offset.dy);
+            }
 
             if (needsCompositing) {
                 var inverse = Matrix3.I();

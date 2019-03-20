@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UIWidgets.Tests.demo_charts;
 using Unity.UIWidgets.animation;
 using Unity.UIWidgets.editor;
 using Unity.UIWidgets.foundation;
@@ -43,7 +44,8 @@ namespace UIWidgets.Tests {
                 this.eventsPage,
                 this.asPage,
                 this.stack,
-                this.mouseHover
+                this.mouseHover,
+                this.charts
             };
             this._optionStrings = this._options.Select(x => x.Method.Name).ToArray();
             this._selected = 0;
@@ -255,6 +257,10 @@ namespace UIWidgets.Tests {
 
         Widget mouseHover() {
             return new MouseHoverWidget();
+        }
+        
+        Widget charts() {
+            return new ChartPage();
         }
     }
 
@@ -553,7 +559,7 @@ namespace UIWidgets.Tests {
                 child: new Container(
                     color: CLColors.background3,
                     child: new Transform(
-                        transform: Matrix3.makeRotate(Mathf.PI/180 * 5, px, py),
+                        transform: Matrix3.makeRotate(Mathf.PI / 180 * 5, px, py),
                         child:
                         new Column(
                             children: new List<Widget> {
@@ -564,7 +570,27 @@ namespace UIWidgets.Tests {
                     )
                 )
             );
-            return container;
+
+            var stack = new Stack(
+                children: new List<Widget> {
+                    container,
+                    new Positioned(
+                        top: 50,
+                        right: 50,
+                        child: new BackdropFilter(
+                            filter: ImageFilter.blur(10, 10),
+                            child: new Container(
+                                width: 300, height: 300,
+                                decoration: new BoxDecoration(
+                                    color: Colors.transparent
+                                )
+                            )
+                        )
+                    )
+                }
+            );
+
+            return stack;
         }
     }
 
