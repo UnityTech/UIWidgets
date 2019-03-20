@@ -146,7 +146,7 @@ namespace Unity.UIWidgets.widgets {
                 element.deactivate();
                 element.unmount();
             }
-            
+
             this._renderViewElement.visitChildren(unMountAll);
             this._renderViewElement.deactivate();
             this._renderViewElement.unmount();

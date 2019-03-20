@@ -82,7 +82,7 @@ namespace Unity.UIWidgets.widgets {
             this.componentKey1 = componentKey1;
             this.componentKey2 = componentKey2;
         }
-        
+
         public bool Equals(CompositeKey other) {
             if (ReferenceEquals(null, other)) {
                 return false;
@@ -113,7 +113,7 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public override int GetHashCode() {
-            return (this.componentKey1 != null ? this.componentKey1.GetHashCode() : 0) ^ 
+            return (this.componentKey1 != null ? this.componentKey1.GetHashCode() : 0) ^
                    (this.componentKey2 != null ? this.componentKey2.GetHashCode() : 0);
         }
 
@@ -216,7 +216,7 @@ namespace Unity.UIWidgets.widgets {
                         D.assert(element.widget.key != null);
                         GlobalKey key = (GlobalKey) element.widget.key;
                         CompositeKey compKey = new CompositeKey(Window.instance, key);
-                        
+
                         D.assert(_registry.ContainsKey(compKey));
                         duplicates = duplicates ?? new Dictionary<GlobalKey, HashSet<Element>>();
                         var elements = duplicates.putIfAbsent(key, () => new HashSet<Element>());
@@ -506,6 +506,7 @@ namespace Unity.UIWidgets.widgets {
             if (fn != null) {
                 fn();
             }
+
             this._element.markNeedsBuild();
         }
 

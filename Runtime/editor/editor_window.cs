@@ -145,11 +145,10 @@ namespace Unity.UIWidgets.editor {
         }
 
         public void OnDisable() {
-            
             using (this.getScope()) {
                 this._binding.detachRootWidget();
             }
-            
+
             _windowAdapters.Remove(this);
             this._alive = false;
 
@@ -161,14 +160,15 @@ namespace Unity.UIWidgets.editor {
         }
 
         public override IDisposable getScope() {
-            WindowAdapter oldInstance = (WindowAdapter) Window._instance;            
-            Window._instance = this;
-            
+            WindowAdapter oldInstance = (WindowAdapter) _instance;
+            _instance = this;
+
             if (this._binding == null) {
                 this._binding = new WidgetsBinding();
-            }            
+            }
+
             SchedulerBinding._instance = this._binding;
-            
+
             return new WindowDisposable(this, oldInstance);
         }
 
@@ -182,8 +182,8 @@ namespace Unity.UIWidgets.editor {
             }
 
             public void Dispose() {
-                D.assert(Window._instance == this._window);
-                Window._instance = this._oldWindow;
+                D.assert(_instance == this._window);
+                _instance = this._oldWindow;
 
                 D.assert(SchedulerBinding._instance == this._window._binding);
                 SchedulerBinding._instance = this._oldWindow?._binding;
@@ -431,7 +431,7 @@ namespace Unity.UIWidgets.editor {
                 this._binding.attachRootWidget(root);
             }
         }
-        
+
         public void attachRootWidget(Func<Widget> root) {
             using (this.getScope()) {
                 this._binding.attachRootWidget(root());
