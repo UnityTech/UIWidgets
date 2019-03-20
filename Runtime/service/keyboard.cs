@@ -304,9 +304,8 @@ namespace Unity.UIWidgets.service {
         }
 
         public override void setIMEPos(Offset imeGlobalPos) {
-            var converter = Window.instance as WindowScreenPosConverter;
-            D.assert(converter != null, $"window should implement {typeof(WindowScreenPosConverter).FullName}");
-            var canvasPos = converter.windowPosToScreenPos(imeGlobalPos);
+            var window = Window.instance as UIWidgetWindowAdapter;
+            var canvasPos = window.windowPosToScreenPos(imeGlobalPos);
             UIWidgetsTextInputSetIMEPos(canvasPos.dx, canvasPos.dy);
         }
 
