@@ -32,7 +32,7 @@ namespace UIWidgetsGallery.gallery {
                     decoration: new BoxDecoration(
                         image: new DecorationImage(
                             image: new AssetImage(
-                                "unity.png")
+                                "unity")
                         )
                     )
                 )
@@ -270,7 +270,7 @@ namespace UIWidgetsGallery.gallery {
     }
 
     class _GalleryHomeState : SingleTickerProviderStateMixin<GalleryHome> {
-        static readonly GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>.key();
+        readonly GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>.key();
         AnimationController _controller;
         GalleryDemoCategory _category;
 
@@ -314,7 +314,7 @@ namespace UIWidgetsGallery.gallery {
             Curve switchInCurve = new Interval(0.4f, 1.0f, curve: Curves.fastOutSlowIn);
 
             Widget home = new Scaffold(
-                key: _scaffoldKey,
+                key: this._scaffoldKey,
                 backgroundColor: isDark ? HomeUtils._kUIWidgetsBlue : theme.primaryColor,
                 body: new SafeArea(
                     bottom: false,
@@ -345,7 +345,7 @@ namespace UIWidgetsGallery.gallery {
                             frontTitle: new AnimatedSwitcher(
                                 duration: HomeUtils._kFrontLayerSwitchDuration,
                                 child: this._category == null
-                                    ? new Text("Flutter gallery")
+                                    ? new Text("UIWidgets gallery")
                                     : new Text(this._category.name)
                             ),
                             frontHeading: this.widget.testMode ? null : new Container(height: 24.0f),

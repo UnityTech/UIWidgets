@@ -71,7 +71,7 @@ namespace UIWidgetsGallery.gallery {
     public class DartSyntaxHighlighter : SyntaxHighlighter {
         public DartSyntaxHighlighter(SyntaxHighlighterStyle _style = null) {
             this._spans = new List<_HighlightSpan> { };
-            this._style = this._style ?? SyntaxHighlighterStyle.darkThemeStyle();
+            this._style = _style ?? SyntaxHighlighterStyle.darkThemeStyle();
         }
 
         SyntaxHighlighterStyle _style;
@@ -100,7 +100,6 @@ namespace UIWidgetsGallery.gallery {
             this._scanner = new StringScanner(this._src);
 
             if (this._generateSpans()) {
-                // Successfully parsed the code
                 List<TextSpan> formattedText = new List<TextSpan> { };
                 int currentPosition = 0;
 
@@ -122,7 +121,6 @@ namespace UIWidgetsGallery.gallery {
                 return new TextSpan(style: this._style.baseStyle, children: formattedText);
             }
             else {
-                // Parsing failed, return with only basic formatting
                 return new TextSpan(style: this._style.baseStyle, text: src);
             }
         }
@@ -131,7 +129,6 @@ namespace UIWidgetsGallery.gallery {
             int lastLoopPosition = this._scanner.position;
 
             while (!this._scanner.isDone) {
-                // Skip White space
                 this._scanner.scan(new Regex(@"\s+"));
 
                 // Block comments

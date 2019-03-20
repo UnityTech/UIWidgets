@@ -1,5 +1,6 @@
 using System;
 using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
@@ -123,7 +124,7 @@ namespace Unity.UIWidgets.material {
                         onHighlightChanged: this._handleHighlightChanged,
                         splashColor: this.widget.splashColor,
                         highlightColor: this.widget.highlightColor,
-                        onTap: () => {
+                        onTap: this.widget.onPressed == null ? (GestureTapCallback) null : () => {
                             if (this.widget.onPressed != null) {
                                 this.widget.onPressed();
                             }

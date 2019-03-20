@@ -282,7 +282,7 @@ class _ButtonsDemoState : State<ButtonsDemo> {
               padding: EdgeInsets.all(24.0f),
               child: new Column(
                   mainAxisAlignment: MainAxisAlignment.start,
-                  children: new List < Widget > {
+                  children: new List<Widget> {
                     new ListTile(
                         title: new Text ("Simple dropdown:"),
                         trailing: new DropdownButton<string>(

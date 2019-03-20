@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using RSG;
+using Unity.UIWidgets.foundation;
 using UnityEngine;
 
 namespace UIWidgetsGallery.gallery {
@@ -13,13 +14,13 @@ namespace UIWidgetsGallery.gallery {
     
         Dictionary<string, string> _exampleCode;
     
-        public IPromise<string> getExampleCode(string tag, AssetBundle bundle) {
+        public string getExampleCode(string tag, AssetBundle bundle) {
             if (this._exampleCode == null)
                 this._parseExampleCode(bundle);
-            return Promise<string>.Resolved(this._exampleCode[tag]);
+            return this._exampleCode.getOrDefault(tag);
         }
     
-        async Task _parseExampleCode(AssetBundle bundle) {
+        void _parseExampleCode(AssetBundle bundle) {
             string code = Resources.Load<TextAsset>("example_code.cs")?.text ??
                                 "// example_code.cs not found\n";
             this._exampleCode = new Dictionary<string, string>{};
@@ -31,25 +32,17 @@ namespace UIWidgetsGallery.gallery {
     
             foreach (string line in lines) {
                 if (codeBlock == null) {
-                    // Outside a block.
                     if (line.StartsWith(_kStartTag)) {
-                        // Starting a new code block.
                         codeBlock = new List<String>();
                         codeTag = line.Substring(_kStartTag.Length).Trim();
                     } else {
-                        // Just skipping the line.
                     }
                 } else {
-                    // Inside a block.
                     if (line.StartsWith(_kEndTag)) {
-                        // Add the block.
                         this._exampleCode[codeTag] = string.Join("\n", codeBlock);
                         codeBlock = null;
                         codeTag = null;
                     } else {
-                        // Add to the current block
-                        // trimRight() to remove any \r on Windows
-                        // without removing any useful indentation
                         codeBlock.Add(line.TrimEnd());
                     }
                 }

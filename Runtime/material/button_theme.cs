@@ -279,8 +279,7 @@ namespace Unity.UIWidgets.material {
                 return fillColor;
             }
 
-//todo:xingwei.zhu: uncomment these when OutlineButton are ready
-            if (button is FlatButton /* || button is OutlineButton*/) {
+            if (button is FlatButton || button is OutlineButton) {
                 return null;
             }
 
@@ -326,8 +325,7 @@ namespace Unity.UIWidgets.material {
                         return Colors.white;
                     }
 
-//todo:xingwei.zhu: uncomment these when OutlineButton are ready
-                    if (button is FlatButton /* || button is OutlineButton*/) {
+                    if (button is FlatButton || button is OutlineButton) {
                         return this.colorScheme.primary;
                     }
 
@@ -344,8 +342,7 @@ namespace Unity.UIWidgets.material {
                 return button.splashColor;
             }
 
-//todo:xingwei.zhu: uncomment these when OutlineButton is ready
-            if (this._splashColor != null && (button is RaisedButton /* || button is OutlineButton*/)) {
+            if (this._splashColor != null && (button is RaisedButton || button is OutlineButton)) {
                 return this._splashColor;
             }
 
@@ -402,9 +399,8 @@ namespace Unity.UIWidgets.material {
                 return 0.0f;
             }
 
-//todo:xingwei.zhu: uncomment these when OutlineButton are ready
-//            if (button is OutlineButton)
-//                return 2.0;
+            if (button is OutlineButton)
+                return 2.0f;
             return 8.0f;
         }
 
