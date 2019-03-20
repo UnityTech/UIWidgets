@@ -457,7 +457,7 @@ namespace Unity.UIWidgets.material {
         
         public override bool applyContentDimensions(float minScrollExtent, float maxScrollExtent) {
             bool result = true;
-            if (this._pixels == null) {
+            if (!this.havePixels) {
                 this.correctPixels(this.tabBar._initialScrollOffset(this.viewportDimension, minScrollExtent, maxScrollExtent));
                 result = false;
             }
@@ -715,7 +715,7 @@ namespace Unity.UIWidgets.material {
                 position.maxScrollExtent);
         }
 
-        public float _initialScrollOffset(float viewportWidth, float minExtent, float maxExtent) {
+        internal float _initialScrollOffset(float viewportWidth, float minExtent, float maxExtent) {
             return this._tabScrollOffset(this._currentIndex, viewportWidth, minExtent, maxExtent);
         }
 
