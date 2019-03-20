@@ -164,13 +164,11 @@ namespace UIWidgetsGallery.gallery {
         string _exampleCode;
 
         public override void didChangeDependencies() {
-            new ExampleCodeParser().getExampleCode(this.widget.exampleCodeTag, DefaultAssetBundle.of(this.context)).Then(
-                (string code) => {
-                    if (this.mounted) {
-                        this.setState(() => { this._exampleCode = code ?? "Example code not found"; });
-                    }
-                });
             base.didChangeDependencies();
+            string code = new ExampleCodeParser().getExampleCode(this.widget.exampleCodeTag, DefaultAssetBundle.of(this.context));
+            if (this.mounted) {
+                this.setState(() => { this._exampleCode = code; });
+            }
         }
 
         public override Widget build(BuildContext context) {

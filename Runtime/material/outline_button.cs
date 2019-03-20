@@ -190,7 +190,6 @@ namespace Unity.UIWidgets.material {
                     }
                 )
             ) {
-            D.assert(onPressed != null);
             D.assert(highlightElevation == null || highlightElevation >= 0.0f);
             D.assert(icon != null);
             D.assert(label != null);
@@ -219,7 +218,6 @@ namespace Unity.UIWidgets.material {
         ) : base(key: key) {
             D.assert(highlightElevation != null && highlightElevation >= 0.0f);
             D.assert(highlightedBorderColor != null);
-            D.assert(this.onPressed != null);
             this.onPressed = onPressed;
             this.brightness = brightness;
             this.textTheme = textTheme;

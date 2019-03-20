@@ -849,8 +849,9 @@ namespace Unity.UIWidgets.material {
 
             int tabCount = this.widget.tabs.Count;
             for (int index = 0; index < tabCount; index++) {
+                int tabIndex = index;
                 wrappedTabs[index] = new InkWell(
-                    onTap: () => { this._handleTap(index); },
+                    onTap: () => { this._handleTap(tabIndex); },
                     child: new Padding(
                         padding: EdgeInsets.only(bottom: this.widget.indicatorWeight),
                         child: wrappedTabs[index]

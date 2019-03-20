@@ -270,7 +270,7 @@ namespace UIWidgetsGallery.gallery {
     }
 
     class _GalleryHomeState : SingleTickerProviderStateMixin<GalleryHome> {
-        static readonly GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>.key();
+        readonly GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>.key();
         AnimationController _controller;
         GalleryDemoCategory _category;
 
