@@ -314,7 +314,7 @@ namespace UIWidgetsGallery.gallery {
             Curve switchInCurve = new Interval(0.4f, 1.0f, curve: Curves.fastOutSlowIn);
 
             Widget home = new Scaffold(
-                key: _scaffoldKey,
+                key: this._scaffoldKey,
                 backgroundColor: isDark ? HomeUtils._kUIWidgetsBlue : theme.primaryColor,
                 body: new SafeArea(
                     bottom: false,
