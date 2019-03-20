@@ -204,8 +204,8 @@ namespace Unity.UIWidgets.foundation {
         
         static readonly Dictionary<_DependencyList, WeakReference> _canonicalObjects =
             new Dictionary<_DependencyList, WeakReference>();
-        
-        public bool alwaysUpdate { get; set; } // if canonicalEquals should not be used.
+
+        public bool alwaysUpdate { get; set; } = true; // if canonicalEquals should not be used.
 
         public override bool Equals(object obj) {
             if (ReferenceEquals(null, obj)) {
