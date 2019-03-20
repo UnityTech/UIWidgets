@@ -440,7 +440,7 @@ namespace Unity.UIWidgets.material {
         public override float? maxExtent {
             get {
                 return Mathf.Max(
-                    this.topPadding ?? 0.0f + (this.expandedHeight ?? Constants.kToolbarHeight + this._bottomHeight),
+                    (this.topPadding ?? 0.0f) + (this.expandedHeight ?? Constants.kToolbarHeight + this._bottomHeight),
                     this.minExtent ?? 0.0f);
             }
         }
