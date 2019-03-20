@@ -701,7 +701,7 @@ namespace RSG {
             // Otherwise there is now way to get the converted value to pass to the resulting promise.
 //            Argument.NotNull(() => onResolved);
 
-            var resultPromise = new Promise<ConvertedT>();
+            var resultPromise = new Promise<ConvertedT>(isSync: true);
             resultPromise.WithName(this.Name);
 
             Action resolveHandler = () => {
@@ -1040,13 +1040,13 @@ namespace RSG {
         public static IPromise Rejected(Exception ex) {
 //            Argument.NotNull(() => ex);
 
-            var promise = new Promise();
+            var promise = new Promise(isSync: true);
             promise.Reject(ex);
             return promise;
         }
         
         public static IPromise Delayed(TimeSpan duration) {
-            var promise = new Promise();
+            var promise = new Promise(isSync: true);
             Window.instance.run(duration, () => { promise.Resolve(); });
             
             return promise;
