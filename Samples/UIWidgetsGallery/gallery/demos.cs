@@ -157,14 +157,14 @@ namespace UIWidgetsGallery.gallery {
 //                ),
 //
 //                // Style
-//                new GalleryDemo(
-//                    title: "Colors",
-//                    subtitle: "All of the predefined colors",
-//                    icon: GalleryIcons.colors,
-//                    category: GalleryDemoCategory._kStyle,
-//                    routeName: ColorsDemo.routeName,
-//                    buildRoute: (BuildContext context) => ColorsDemo()
-//                ),
+                new GalleryDemo(
+                    title: "Colors",
+                    subtitle: "All of the predefined colors",
+                    icon: GalleryIcons.colors,
+                    category: DemoUtils._kStyle,
+                    routeName: ColorsDemo.routeName,
+                    buildRoute: (BuildContext context) => new ColorsDemo()
+                ),
 //                new GalleryDemo(
 //                    title: "Typography",
 //                    subtitle: "All of the predefined text styles",
@@ -219,14 +219,14 @@ namespace UIWidgetsGallery.gallery {
 //                    documentationUrl: "https://docs.flutter.io/flutter/material/ScaffoldState/showBottomSheet.html",
 //                    buildRoute: (BuildContext context) => PersistentBottomSheetDemo()
 //                ),
-//                new GalleryDemo(
-//                    title: "Buttons",
-//                    subtitle: "Flat, raised, dropdown, and more",
-//                    icon: GalleryIcons.generic_buttons,
-//                    category: GalleryDemoCategory._kMaterialComponents,
-//                    routeName: ButtonsDemo.routeName,
-//                    buildRoute: (BuildContext context) => ButtonsDemo()
-//                ),
+                new GalleryDemo(
+                    title: "Buttons",
+                    subtitle: "Flat, raised, dropdown, and more",
+                    icon: GalleryIcons.generic_buttons,
+                    category: DemoUtils._kMaterialComponents,
+                    routeName: ButtonsDemo.routeName,
+                    buildRoute: (BuildContext context) => new ButtonsDemo()
+                ),
 //                new GalleryDemo(
 //                    title: "Buttons: Floating Action Button",
 //                    subtitle: "FAB with transitions",

@@ -93,6 +93,29 @@ namespace Unity.UIWidgets.rendering {
                 container.height - this.bottom);
         }
 
+        public static RelativeRect lerp(RelativeRect a, RelativeRect b, float t) {
+            D.assert(t != null);
+            if (a == null && b == null) {
+                return null;
+            }
+
+            if (a == null) {
+                return fromLTRB(b.left * t, b.top * t, b.right * t, b.bottom * t);
+            }
+
+            if (b == null) {
+                float k = 1.0f - t;
+                return fromLTRB(b.left * k, b.top * k, b.right * k, b.bottom * k);
+            }
+
+            return fromLTRB(
+                MathUtils.lerpFloat(a.left, b.left, t),
+                MathUtils.lerpFloat(a.top, b.top, t),
+                MathUtils.lerpFloat(a.right, b.right, t),
+                MathUtils.lerpFloat(a.bottom, b.bottom, t)
+            );
+        }
+
         public bool Equals(RelativeRect other) {
             if (ReferenceEquals(null, other)) {
                 return false;
