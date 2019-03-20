@@ -373,7 +373,7 @@ namespace Unity.UIWidgets.painting {
         }
 
         Offset _getOffsetFromDownstream(int offset, Rect caretPrototype) {
-            var nextCodeUnit = this._text.codeUnitAt(offset);
+            var nextCodeUnit = this._text.codeUnitAt(offset - 1);
             if (nextCodeUnit == null) {
                 return null;
             }

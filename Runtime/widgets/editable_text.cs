@@ -230,6 +230,7 @@ namespace Unity.UIWidgets.widgets {
                 oldWidget.controller.removeListener(this._didChangeTextEditingValue);
                 this.widget.controller.addListener(this._didChangeTextEditingValue);
                 this._updateRemoteEditingValueIfNeeded();
+                this._updateImePosIfNeed();
             }
 
             if (this.widget.focusNode != oldWidget.focusNode) {
@@ -507,6 +508,7 @@ namespace Unity.UIWidgets.widgets {
                                  
                 ));
                 this._textInputConnection.setEditingState(localValue);
+                this._updateImePosIfNeed();
             }
 
             this._textInputConnection.show();
@@ -564,7 +566,7 @@ namespace Unity.UIWidgets.widgets {
 
             this._hideSelectionOverlayIfNeeded();
 
-            if (this.widget.selectionControls != null && !this._unityKeyboard()) {
+            if (this.widget.selectionControls != null && Application.isMobilePlatform && !this._unityKeyboard()) {
                 this._selectionOverlay = new TextSelectionOverlay(
                     context: this.context,
                     value: this._value,
@@ -648,6 +650,7 @@ namespace Unity.UIWidgets.widgets {
 
                 this._value = value;
                 this._updateRemoteEditingValueIfNeeded();
+                this._updateImePosIfNeed();
             }
             else {
                 this._value = value;
@@ -713,6 +716,7 @@ namespace Unity.UIWidgets.widgets {
 
         void _didChangeTextEditingValue() {
             this._updateRemoteEditingValueIfNeeded();
+            this._updateImePosIfNeed();
             this._startOrStopCursorTimerIfNeeded();
             this._updateOrDisposeSelectionOverlayIfNeeded();
             this._textChangedSinceLastCaretUpdate = true;
@@ -832,6 +836,35 @@ namespace Unity.UIWidgets.widgets {
         // in the case
         bool _unityKeyboard() {
             return TouchScreenKeyboard.isSupported && this.widget.unityTouchKeyboard;
+        }
+
+        Offset _getImePos() {
+            if (this._hasInputConnection && this._textInputConnection.imeRequired()) {
+                var localPos = this.renderEditable.getLocalRectForCaret(this._value.selection.basePos).bottomLeft;
+                return this.renderEditable.localToGlobal(localPos);
+            }
+
+            return null;
+        }
+
+        bool _imePosUpdateScheduled = false;
+        void _updateImePosIfNeed() {
+            if (!this._hasInputConnection || !this._textInputConnection.imeRequired()) {
+                return;
+            }
+
+            if (this._imePosUpdateScheduled) {
+                return;
+            }
+            
+            this._imePosUpdateScheduled = true;
+            SchedulerBinding.instance.addPostFrameCallback(_ => {
+                this._imePosUpdateScheduled = false;
+                if (!this._hasInputConnection) {
+                    return;
+                }
+                this._textInputConnection.setIMEPos(this._getImePos());
+            });
         }
     }
 
