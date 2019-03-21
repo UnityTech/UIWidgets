@@ -73,12 +73,14 @@ namespace Unity.UIWidgets.ui {
     
     public static class FontExtension  
     {  
-        public static CharacterInfo mustGetCharacterInfo(this Font font, char ch, int fontSize, UnityEngine.FontStyle fontStyle)  
+        public static CharacterInfo getCharacterInfo(this Font font, char ch, int fontSize, UnityEngine.FontStyle fontStyle)  
         {  
             CharacterInfo info;
             bool success = font.GetCharacterInfo(ch, out info, fontSize, fontStyle);
-            D.assert(success, $"fail to get character info for character '{ch}' (code{(int)ch}) from font: ${font.name}");
+            if (!success) {  
+                Debug.LogWarning($"character info not found from the given font: character '{ch}' (code{(int)ch}) font: ${font.name}");     
+            }
             return info;
-        }  
+        }
     }
 }
