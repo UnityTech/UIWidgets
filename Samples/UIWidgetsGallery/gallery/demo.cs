@@ -5,9 +5,10 @@ using Unity.UIWidgets.material;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.service;
 using Unity.UIWidgets.widgets;
+using UnityEngine;
 
 namespace UIWidgetsGallery.gallery {
-    class ComponentDemoTabData {
+    public class ComponentDemoTabData {
         public ComponentDemoTabData(
             Widget demoWidget = null,
             string exampleCodeTag = null,
@@ -51,7 +52,7 @@ namespace UIWidgetsGallery.gallery {
     }
 
 
-    class TabbedComponentDemoScaffold : StatelessWidget {
+    public class TabbedComponentDemoScaffold : StatelessWidget {
         public TabbedComponentDemoScaffold(
             string title = null,
             List<ComponentDemoTabData> demos = null,
@@ -145,7 +146,7 @@ namespace UIWidgetsGallery.gallery {
     }
 
 
-    class FullScreenCodeDialog : StatefulWidget {
+    public class FullScreenCodeDialog : StatefulWidget {
         public FullScreenCodeDialog(Key key = null, string exampleCodeTag = null) : base(key: key) {
             this.exampleCodeTag = exampleCodeTag;
         }
@@ -157,7 +158,7 @@ namespace UIWidgetsGallery.gallery {
         }
     }
 
-    class FullScreenCodeDialogState : State<FullScreenCodeDialog> {
+    public class FullScreenCodeDialogState : State<FullScreenCodeDialog> {
         public FullScreenCodeDialogState() {
         }
 
@@ -165,7 +166,8 @@ namespace UIWidgetsGallery.gallery {
 
         public override void didChangeDependencies() {
             base.didChangeDependencies();
-            string code = new ExampleCodeParser().getExampleCode(this.widget.exampleCodeTag, DefaultAssetBundle.of(this.context));
+            string code =
+                new ExampleCodeParser().getExampleCode(this.widget.exampleCodeTag, DefaultAssetBundle.of(this.context));
             if (this.mounted) {
                 this.setState(() => { this._exampleCode = code; });
             }
@@ -209,6 +211,26 @@ namespace UIWidgetsGallery.gallery {
                     title: new Text("Example code")
                 ),
                 body: body
+            );
+        }
+    }
+
+    class MaterialDemoDocumentationButton : StatelessWidget {
+        public MaterialDemoDocumentationButton(string routeName, Key key = null) : base(key: key) {
+            this.documentationUrl = DemoUtils.kDemoDocumentationUrl[routeName];
+            D.assert(DemoUtils.kDemoDocumentationUrl[routeName] != null,
+                "A documentation URL was not specified for demo route $routeName in kAllGalleryDemos"
+            );
+        }
+
+
+        public readonly string documentationUrl;
+
+        public override Widget build(BuildContext context) {
+            return new IconButton(
+                icon: new Icon(Icons.library_books),
+                tooltip: "API documentation",
+                onPressed: () => Application.OpenURL(this.documentationUrl)
             );
         }
     }

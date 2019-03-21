@@ -173,25 +173,25 @@ namespace UIWidgetsGallery.gallery {
                     routeName: TypographyDemo.routeName,
                     buildRoute: (BuildContext context) => new TypographyDemo()
                 ),
-//
-//                // Material Components
-//                new GalleryDemo(
-//                    title: "Backdrop",
-//                    subtitle: "Select a front layer from back layer",
-//                    icon: GalleryIcons.backdrop,
-//                    category: GalleryDemoCategory._kMaterialComponents,
-//                    routeName: BackdropDemo.routeName,
-//                    buildRoute: (BuildContext context) => BackdropDemo()
-//                ),
-//                new GalleryDemo(
-//                    title: "Bottom app bar",
-//                    subtitle: "Optional floating action button notch",
-//                    icon: GalleryIcons.bottom_app_bar,
-//                    category: GalleryDemoCategory._kMaterialComponents,
-//                    routeName: BottomAppBarDemo.routeName,
-//                    documentationUrl: "https://docs.flutter.io/flutter/material/BottomAppBar-class.html",
-//                    buildRoute: (BuildContext context) => BottomAppBarDemo()
-//                ),
+
+                // Material Components
+                new GalleryDemo(
+                    title: "Backdrop",
+                    subtitle: "Select a front layer from back layer",
+                    icon: GalleryIcons.backdrop,
+                    category: DemoUtils._kMaterialComponents,
+                    routeName: BackdropDemo.routeName,
+                    buildRoute: (BuildContext context) => new BackdropDemo()
+                ),
+                new GalleryDemo(
+                    title: "Bottom app bar",
+                    subtitle: "Optional floating action button notch",
+                    icon: GalleryIcons.bottom_app_bar,
+                    category: DemoUtils._kMaterialComponents,
+                    routeName: BottomAppBarDemo.routeName,
+                    documentationUrl: "https://docs.flutter.io/flutter/material/BottomAppBar-class.html",
+                    buildRoute: (BuildContext context) => new BottomAppBarDemo()
+                ),
 //                new GalleryDemo(
 //                    title: "Bottom navigation",
 //                    subtitle: "Bottom navigation with cross-fading views",
@@ -236,15 +236,15 @@ namespace UIWidgetsGallery.gallery {
 //                    documentationUrl: "https://docs.flutter.io/flutter/material/FloatingActionButton-class.html",
 //                    buildRoute: (BuildContext context) => TabsFabDemo()
 //                ),
-//                new GalleryDemo(
-//                    title: "Cards",
-//                    subtitle: "Baseline cards with rounded corners",
-//                    icon: GalleryIcons.cards,
-//                    category: GalleryDemoCategory._kMaterialComponents,
-//                    routeName: CardsDemo.routeName,
-//                    documentationUrl: "https://docs.flutter.io/flutter/material/Card-class.html",
-//                    buildRoute: (BuildContext context) => CardsDemo()
-//                ),
+                new GalleryDemo(
+                    title: "Cards",
+                    subtitle: "Baseline cards with rounded corners",
+                    icon: GalleryIcons.cards,
+                    category: DemoUtils._kMaterialComponents,
+                    routeName: CardsDemo.routeName,
+                    documentationUrl: "https://docs.flutter.io/flutter/material/Card-class.html",
+                    buildRoute: (BuildContext context) => new CardsDemo()
+                ),
 //                new GalleryDemo(
 //                    title: "Chips",
 //                    subtitle: "Labeled with delete buttons and avatars",
