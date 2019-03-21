@@ -89,6 +89,9 @@ namespace Unity.UIWidgets.gestures {
 
         protected abstract void didStopTrackingLastPointer(int pointer);
 
+        protected virtual void didStopTrackingLastScrollerPointer(int pointer) {
+        }
+
         protected virtual void resolve(GestureDisposition disposition) {
             var localEntries = new List<GestureArenaEntry>(this._entries.Values);
             this._entries.Clear();
@@ -131,6 +134,12 @@ namespace Unity.UIWidgets.gestures {
 
         protected void startTrackingScrollerPointer(int pointer) {
             GestureBinding.instance.pointerRouter.addRoute(pointer, this.handleEvent);
+        }
+
+        protected void stopTrackingScrollerPointer(int pointer) {
+            if (this._trackedPointers.isEmpty()) {
+                this.didStopTrackingLastScrollerPointer(pointer);
+            }
         }
 
         protected void startTrackingPointer(int pointer) {
