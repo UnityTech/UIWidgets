@@ -258,7 +258,7 @@ namespace UIWidgetsGallery.gallery {
         }
     }
 
-    public class _BackdropDemoState : SingleTickerProviderStateMixin<BackdropDemo> {
+    class _BackdropDemoState : SingleTickerProviderStateMixin<BackdropDemo> {
         GlobalKey _backdropKey = GlobalKey.key(debugLabel: "Backdrop");
         AnimationController _controller;
         Category _category = BackdropDemoConstants.allCategories[0];

@@ -183,15 +183,15 @@ namespace UIWidgetsGallery.gallery {
                     routeName: BackdropDemo.routeName,
                     buildRoute: (BuildContext context) => new BackdropDemo()
                 ),
-//                new GalleryDemo(
-//                    title: "Bottom app bar",
-//                    subtitle: "Optional floating action button notch",
-//                    icon: GalleryIcons.bottom_app_bar,
-//                    category: GalleryDemoCategory._kMaterialComponents,
-//                    routeName: BottomAppBarDemo.routeName,
-//                    documentationUrl: "https://docs.flutter.io/flutter/material/BottomAppBar-class.html",
-//                    buildRoute: (BuildContext context) => BottomAppBarDemo()
-//                ),
+                new GalleryDemo(
+                    title: "Bottom app bar",
+                    subtitle: "Optional floating action button notch",
+                    icon: GalleryIcons.bottom_app_bar,
+                    category: DemoUtils._kMaterialComponents,
+                    routeName: BottomAppBarDemo.routeName,
+                    documentationUrl: "https://docs.flutter.io/flutter/material/BottomAppBar-class.html",
+                    buildRoute: (BuildContext context) => new BottomAppBarDemo()
+                ),
 //                new GalleryDemo(
 //                    title: "Bottom navigation",
 //                    subtitle: "Bottom navigation with cross-fading views",
