@@ -399,8 +399,9 @@ namespace Unity.UIWidgets.material {
                 return 0.0f;
             }
 
-            if (button is OutlineButton)
+            if (button is OutlineButton) {
                 return 2.0f;
+            }
             return 8.0f;
         }
 

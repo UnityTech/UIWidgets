@@ -321,13 +321,20 @@ namespace Unity.UIWidgets.painting {
         IEnumerator _loadAssetAsync(AssetBundleImageKey key) {
             if (key.bundle == null) {
                 ResourceRequest request = Resources.LoadAsync(key.name);
-                yield return request;
-                yield return request.asset;
+                if (request.asset) {
+                    yield return request.asset;
+                } else {
+                    yield return request;
+                    yield return request.asset;
+                }
             }
             else {
                 AssetBundleRequest request = key.bundle.LoadAssetAsync(key.name);
-                yield return request;
-                yield return request.asset;
+                if (request.asset) {
+                    yield return request.asset;
+                } else {
+                    yield return request.asset;
+                }
             }
         }
     }

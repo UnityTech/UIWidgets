@@ -550,7 +550,7 @@ namespace RSG {
         /// Handle errors for the promise.
         /// </summary>
         public IPromise<PromisedT> Catch(Func<Exception, PromisedT> onRejected) {
-            var resultPromise = new Promise<PromisedT>();
+            var resultPromise = new Promise<PromisedT>(isSync: true);
             resultPromise.WithName(this.Name);
 
             Action<PromisedT> resolveHandler = v => resultPromise.Resolve(v);
@@ -631,7 +631,7 @@ namespace RSG {
             // Otherwise there is now way to get the converted value to pass to the resulting promise.
 //            Argument.NotNull(() => onResolved); 
 
-            var resultPromise = new Promise<ConvertedT>();
+            var resultPromise = new Promise<ConvertedT>(isSync: true);
             resultPromise.WithName(this.Name);
 
             Action<PromisedT> resolveHandler = v => {
@@ -820,7 +820,7 @@ namespace RSG {
             var remainingCount = promisesArray.Length;
             var results = new PromisedT[remainingCount];
             var progress = new float[remainingCount];
-            var resultPromise = new Promise<IEnumerable<PromisedT>>();
+            var resultPromise = new Promise<IEnumerable<PromisedT>>(isSync: true);
             resultPromise.WithName("All");
 
             promisesArray.Each((promise, index) => {
@@ -895,7 +895,7 @@ namespace RSG {
                 );
             }
 
-            var resultPromise = new Promise<PromisedT>();
+            var resultPromise = new Promise<PromisedT>(isSync: true);
             resultPromise.WithName("Race");
 
             var progress = new float[promisesArray.Length];
@@ -940,13 +940,13 @@ namespace RSG {
         public static IPromise<PromisedT> Rejected(Exception ex) {
 //            Argument.NotNull(() => ex);
 
-            var promise = new Promise<PromisedT>();
+            var promise = new Promise<PromisedT>(isSync: true);
             promise.Reject(ex);
             return promise;
         }
 
         public IPromise<PromisedT> Finally(Action onComplete) {
-            var promise = new Promise<PromisedT>();
+            var promise = new Promise<PromisedT>(isSync: true);
             promise.WithName(this.Name);
 
             this.Then(x => promise.Resolve(x));
