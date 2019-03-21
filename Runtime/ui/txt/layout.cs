@@ -43,8 +43,7 @@ namespace Unity.UIWidgets.ui {
             for (int i = 0; i < count; i++) {
                 int charIndex = start + i;
                 var ch = text[charIndex];
-                CharacterInfo characterInfo;
-                font.GetCharacterInfo(ch, out characterInfo, style.UnityFontSize, style.UnityFontStyle);
+                CharacterInfo characterInfo = font.MustGetCharacterInfo(ch, style.UnityFontSize, style.UnityFontStyle);
 
                 var rect = Rect.fromLTRB(characterInfo.minX, -characterInfo.maxY, characterInfo.maxX,
                     -characterInfo.minY);

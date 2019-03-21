@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -42,8 +41,7 @@ namespace Unity.UIWidgets.ui {
 
             if (this._tabWidth == int.MaxValue) {
                 this._font.RequestCharactersInTexture(" ", this._fontSize);
-                CharacterInfo characterInfo;
-                this._font.GetCharacterInfo(' ', out characterInfo, this._fontSize);
+                CharacterInfo characterInfo = this._font.MustGetCharacterInfo(' ', this._fontSize, UnityEngine.FontStyle.Normal);
                 this._tabWidth = characterInfo.advance * kTabSpaceCount;
             }
 
