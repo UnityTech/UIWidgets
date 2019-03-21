@@ -186,8 +186,12 @@ namespace Unity.UIWidgets.service {
                 return this;
             }
 
-            newText = this.selection.textBefore(this.text) + text + this.selection.textAfter(this.text);
-            newSelection = TextSelection.collapsed(this.selection.start + text.Length);
+            var selection = this.selection;
+            if (selection.start < 0) {
+                selection = TextSelection.collapsed(0, this.selection.affinity);
+            }
+            newText = selection.textBefore(this.text) + text + selection.textAfter(this.text);
+            newSelection = TextSelection.collapsed(selection.start + text.Length);
             return new TextEditingValue(
                 text: newText, selection: newSelection, composing: TextRange.empty
             );

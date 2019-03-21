@@ -79,6 +79,8 @@ namespace Unity.UIWidgets.service {
             }
 
             var currentEvent = Event.current;
+           
+            
             if (currentEvent != null && currentEvent.type == EventType.KeyDown) {
                 var action = TextInputUtils.getInputAction(currentEvent);
                 if (action != null) {
@@ -87,7 +89,14 @@ namespace Unity.UIWidgets.service {
 
                 if (action == null || action == TextInputAction.newline) {
                     if (currentEvent.keyCode == KeyCode.None) {
-                        this._value = this._value.clearCompose().insert(new string(currentEvent.character, 1));
+                        char ch = currentEvent.character;
+                        if (ch == '\r' || ch == 3) {
+                            ch = '\n';
+                        }
+                        this._value = this._value.clearCompose();
+                        if (_validateCharacter(ch)) {
+                            this._value = this._value.insert(new string(ch, 1));
+                        } 
                         Window.instance.run(() => { TextInput._updateEditingState(this._client, this._value); });
                     }
                 }
@@ -105,6 +114,10 @@ namespace Unity.UIWidgets.service {
         }
 
         public void Dispose() {
+        }
+
+        static bool _validateCharacter(char ch) {
+            return ch >= ' ' || ch == '\t' || ch == '\r' || ch == 10 || ch == '\n';
         }
     }
     
