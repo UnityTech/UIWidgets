@@ -1726,7 +1726,7 @@ namespace Unity.UIWidgets.rendering {
         }
 
         void _paintChildWithTransform(PaintingContext context, Offset offset) {
-            Offset childOffset = MatrixUtils.getAsTranslation(this._transform);
+            Offset childOffset = this._transform.getAsTranslation();
             if (childOffset == null) {
                 context.pushTransform(this.needsCompositing, offset, this._transform, base.paint);
             }
