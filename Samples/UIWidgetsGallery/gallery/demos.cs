@@ -173,16 +173,16 @@ namespace UIWidgetsGallery.gallery {
                     routeName: TypographyDemo.routeName,
                     buildRoute: (BuildContext context) => new TypographyDemo()
                 ),
-//
-//                // Material Components
-//                new GalleryDemo(
-//                    title: "Backdrop",
-//                    subtitle: "Select a front layer from back layer",
-//                    icon: GalleryIcons.backdrop,
-//                    category: GalleryDemoCategory._kMaterialComponents,
-//                    routeName: BackdropDemo.routeName,
-//                    buildRoute: (BuildContext context) => BackdropDemo()
-//                ),
+
+                // Material Components
+                new GalleryDemo(
+                    title: "Backdrop",
+                    subtitle: "Select a front layer from back layer",
+                    icon: GalleryIcons.backdrop,
+                    category: DemoUtils._kMaterialComponents,
+                    routeName: BackdropDemo.routeName,
+                    buildRoute: (BuildContext context) => new BackdropDemo()
+                ),
 //                new GalleryDemo(
 //                    title: "Bottom app bar",
 //                    subtitle: "Optional floating action button notch",
