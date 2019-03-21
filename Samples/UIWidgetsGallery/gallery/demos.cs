@@ -236,15 +236,15 @@ namespace UIWidgetsGallery.gallery {
 //                    documentationUrl: "https://docs.flutter.io/flutter/material/FloatingActionButton-class.html",
 //                    buildRoute: (BuildContext context) => TabsFabDemo()
 //                ),
-//                new GalleryDemo(
-//                    title: "Cards",
-//                    subtitle: "Baseline cards with rounded corners",
-//                    icon: GalleryIcons.cards,
-//                    category: GalleryDemoCategory._kMaterialComponents,
-//                    routeName: CardsDemo.routeName,
-//                    documentationUrl: "https://docs.flutter.io/flutter/material/Card-class.html",
-//                    buildRoute: (BuildContext context) => CardsDemo()
-//                ),
+                new GalleryDemo(
+                    title: "Cards",
+                    subtitle: "Baseline cards with rounded corners",
+                    icon: GalleryIcons.cards,
+                    category: DemoUtils._kMaterialComponents,
+                    routeName: CardsDemo.routeName,
+                    documentationUrl: "https://docs.flutter.io/flutter/material/Card-class.html",
+                    buildRoute: (BuildContext context) => new CardsDemo()
+                ),
 //                new GalleryDemo(
 //                    title: "Chips",
 //                    subtitle: "Labeled with delete buttons and avatars",
