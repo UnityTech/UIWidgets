@@ -22,7 +22,7 @@ namespace Unity.UIWidgets.async {
         internal volatile Exception lastError;
         internal bool isDone;
 
-        readonly Promise<object> _promise = new Promise<object>();
+        readonly Promise<object> _promise = new Promise<object>(isSync: true);
 
         public IPromise<object> promise {
             get { return this._promise; }
@@ -34,18 +34,22 @@ namespace Unity.UIWidgets.async {
 
             this._routine = routine;
             this._window = window;
+            this._isBackground = isBackground;
 
             if (isBackground && BackgroundCallbacks.getInstance() != null) {
                 this._unhook = BackgroundCallbacks.getInstance().addCallback(this._moveNext);
             }
             else {
                 this._unhook = this._window.run(TimeSpan.Zero, this._moveNext, periodic: true);
+                this._moveNext(true); // try to run the first enumeration in the current loop.
             }
-
-            this._isBackground = isBackground;
         }
 
         void _moveNext() {
+            this._moveNext(false);
+        }
+
+        void _moveNext(bool firstTime) {
             D.assert(!this.isDone);
 
             var lastError = this.lastError;
@@ -64,9 +68,14 @@ namespace Unity.UIWidgets.async {
                 return;
             }
 
-            bool hasNext;
+            bool hasNext = true;
             try {
-                hasNext = this._processIEnumeratorRecursive(this._routine);
+                if (firstTime) {
+                    hasNext = this._routine.MoveNext();
+                }
+                if (hasNext) {
+                    hasNext = this._processIEnumeratorRecursive(this._routine);
+                }
             }
             catch (Exception ex) {
                 this.stop(ex);

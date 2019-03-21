@@ -15,8 +15,9 @@ namespace UIWidgetsGallery.gallery {
         Dictionary<string, string> _exampleCode;
     
         public string getExampleCode(string tag, AssetBundle bundle) {
-            if (this._exampleCode == null)
+            if (this._exampleCode == null) {
                 this._parseExampleCode(bundle);
+            }
             return this._exampleCode.getOrDefault(tag);
         }
     

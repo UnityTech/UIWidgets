@@ -147,9 +147,12 @@ namespace Unity.UIWidgets.widgets {
                 element.unmount();
             }
 
-            this._renderViewElement.visitChildren(unMountAll);
-            this._renderViewElement.deactivate();
-            this._renderViewElement.unmount();
+            if (this._renderViewElement != null) {
+                this._renderViewElement.visitChildren(unMountAll);
+                this._renderViewElement.deactivate();
+                this._renderViewElement.unmount();
+                this._renderViewElement = null;
+            }
         }
 
         public void attachRootWidget(Widget rootWidget) {
