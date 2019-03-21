@@ -151,7 +151,7 @@ namespace Unity.UIWidgets.ui {
                     continue;
                 }
 
-                CharacterInfo charInfo = font.MustGetCharacterInfo(ch, fontSizeToLoad, style.UnityFontStyle);
+                CharacterInfo charInfo = font.mustGetCharacterInfo(ch, fontSizeToLoad, style.UnityFontStyle);
                 var minX = charInfo.minX / this._scale;
                 var maxX = charInfo.maxX / this._scale;
                 var minY = charInfo.minY / this._scale;
