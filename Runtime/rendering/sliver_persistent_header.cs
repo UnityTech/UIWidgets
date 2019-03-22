@@ -24,7 +24,6 @@ namespace Unity.UIWidgets.rendering {
                 }
 
                 D.assert(this.child.hasSize);
-                D.assert(this.constraints.axis != null);
                 switch (this.constraints.axis) {
                     case Axis.vertical:
                         return this.child.size.height;
@@ -49,12 +48,11 @@ namespace Unity.UIWidgets.rendering {
         }
 
         protected void layoutChild(float scrollOffset, float maxExtent, bool overlapsContent = false) {
-            D.assert(maxExtent != null);
             float shrinkOffset = Mathf.Min(scrollOffset, maxExtent);
             if (this._needsUpdateChild || this._lastShrinkOffset != shrinkOffset ||
                 this._lastOverlapsContent != overlapsContent) {
                 this.invokeLayoutCallback<SliverConstraints>((SliverConstraints constraints) => {
-                    D.assert(this.constraints == this.constraints);
+                    D.assert(constraints == this.constraints);
                     this.updateChild(shrinkOffset, overlapsContent);
                 });
                 this._lastShrinkOffset = shrinkOffset;
@@ -103,7 +101,6 @@ namespace Unity.UIWidgets.rendering {
 
         public override void paint(PaintingContext context, Offset offset) {
             if (this.child != null && this.geometry.visible) {
-                D.assert(this.constraints.axisDirection != null);
                 switch (GrowthDirectionUtils.applyGrowthDirectionToAxisDirection(this.constraints.axisDirection,
                     this.constraints.growthDirection)) {
                     case AxisDirection.up:
@@ -328,8 +325,7 @@ namespace Unity.UIWidgets.rendering {
 
         protected override void performLayout() {
             float? maxExtent = this.maxExtent;
-            if (this._lastActualScrollOffset != null &&
-                ((this.constraints.scrollOffset < this._lastActualScrollOffset) ||
+            if (((this.constraints.scrollOffset < this._lastActualScrollOffset) ||
                  (this._effectiveScrollOffset < maxExtent))) {
                 float delta = this._lastActualScrollOffset - this.constraints.scrollOffset;
                 bool allowFloatingExpansion = this.constraints.userScrollDirection == ScrollDirection.forward;

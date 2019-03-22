@@ -1630,7 +1630,6 @@ namespace Unity.UIWidgets.rendering {
             Alignment alignment = null,
             RenderBox child = null
         ) : base(child) {
-            D.assert(fit != null);
             this._fit = fit;
             this._alignment = alignment ?? Alignment.center;
         }
@@ -1653,7 +1652,6 @@ namespace Unity.UIWidgets.rendering {
         public BoxFit fit {
             get { return this._fit; }
             set {
-                D.assert(value != null);
                 if (this._fit == value) {
                     return;
                 }

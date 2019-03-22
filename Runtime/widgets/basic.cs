@@ -1301,7 +1301,6 @@ namespace Unity.UIWidgets.widgets {
             Alignment alignment = null,
             Widget child = null
         ) : base(key: key, child: child) {
-            D.assert(fit != null);
             this.fit = fit;
             this.alignment = alignment ?? Alignment.center;
         }

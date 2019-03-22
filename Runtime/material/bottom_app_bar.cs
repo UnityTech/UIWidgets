@@ -15,9 +15,7 @@ namespace Unity.UIWidgets.material {
             float notchMargin = 4.0f,
             Widget child = null
         ) : base(key: key) {
-            D.assert(elevation != null);
             D.assert(elevation >= 0.0f);
-            D.assert(clipBehavior != null);
             this.child = child;
             this.color = color;
             this.elevation = elevation;
@@ -82,7 +80,6 @@ namespace Unity.UIWidgets.material {
         ) : base(reclip: geometry) {
             D.assert(geometry != null);
             D.assert(shape != null);
-            D.assert(notchMargin != null);
             this.geometry = geometry;
             this.shape = shape;
             this.notchMargin = notchMargin;

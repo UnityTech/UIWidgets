@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using RSG.Promises;
 using Unity.UIWidgets.animation;
 using Unity.UIWidgets.foundation;
@@ -48,12 +49,29 @@ namespace Unity.UIWidgets.material {
             }
         }
 
-        public static bool operator ==(_InputBorderGap left, _InputBorderGap other) {
-            return left.start == other.start && left.extent == other.extent;
+        public static bool operator ==(_InputBorderGap left, _InputBorderGap right) {
+            return left.Equals(right);
         }
 
         public static bool operator !=(_InputBorderGap left, _InputBorderGap other) {
             return left.start != other.start || left.extent != other.extent;
+        }
+
+        public bool Equals(_InputBorderGap other) {
+            return this.start == other.start && this.extent == other.extent;
+        }
+        
+        public override bool Equals(object obj) {
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
+            return this.Equals((_InputBorderGap) obj);
         }
 
         public override int GetHashCode() {
@@ -505,27 +523,44 @@ namespace Unity.UIWidgets.material {
         public readonly Widget counter;
         public readonly Widget container;
 
-        public static bool operator ==(_Decoration left, _Decoration other) {
-            return left.contentPadding == other.contentPadding
-                   && left.floatingLabelHeight == other.floatingLabelHeight
-                   && left.floatingLabelProgress == other.floatingLabelProgress
-                   && left.border == other.border
-                   && left.borderGap == other.borderGap
-                   && left.icon == other.icon
-                   && left.input == other.input
-                   && left.label == other.label
-                   && left.hint == other.hint
-                   && left.prefix == other.prefix
-                   && left.suffix == other.suffix
-                   && left.prefixIcon == other.prefixIcon
-                   && left.suffixIcon == other.suffixIcon
-                   && left.helperError == other.helperError
-                   && left.counter == other.counter
-                   && left.container == other.container;
+        public static bool operator ==(_Decoration left, _Decoration right) {
+            return left.Equals(right);
         }
 
-        public static bool operator !=(_Decoration left, _Decoration other) {
-            return !(left == other);
+        public static bool operator !=(_Decoration left, _Decoration right) {
+            return !left.Equals(right);
+        }
+
+        public bool Equals(_Decoration other) {
+            return this.contentPadding == other.contentPadding
+                   && this.floatingLabelHeight == other.floatingLabelHeight
+                   && this.floatingLabelProgress == other.floatingLabelProgress
+                   && this.border == other.border
+                   && this.borderGap == other.borderGap
+                   && this.icon == other.icon
+                   && this.input == other.input
+                   && this.label == other.label
+                   && this.hint == other.hint
+                   && this.prefix == other.prefix
+                   && this.suffix == other.suffix
+                   && this.prefixIcon == other.prefixIcon
+                   && this.suffixIcon == other.suffixIcon
+                   && this.helperError == other.helperError
+                   && this.counter == other.counter
+                   && this.container == other.container;
+        }
+        
+        public override bool Equals(object obj) {
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
+            return this.Equals((_Decoration) obj);
         }
 
         public override int GetHashCode() {
@@ -1197,11 +1232,11 @@ namespace Unity.UIWidgets.material {
         Dictionary<_DecorationSlot, Element> slotToChild = new Dictionary<_DecorationSlot, Element>();
         Dictionary<Element, _DecorationSlot> childToSlot = new Dictionary<Element, _DecorationSlot>();
 
-        public _Decorator widget {
+        public new _Decorator widget {
             get { return (_Decorator) base.widget; }
         }
 
-        public _RenderDecoration renderObject {
+        public new _RenderDecoration renderObject {
             get { return (_RenderDecoration) base.renderObject; }
         }
 
@@ -2142,44 +2177,61 @@ namespace Unity.UIWidgets.material {
             );
         }
 
-        public static bool operator ==(InputDecoration left, InputDecoration other) {
-            return other.icon == left.icon
-                   && other.labelText == left.labelText
-                   && other.labelStyle == left.labelStyle
-                   && other.helperText == left.helperText
-                   && other.helperStyle == left.helperStyle
-                   && other.hintText == left.hintText
-                   && other.hintStyle == left.hintStyle
-                   && other.errorText == left.errorText
-                   && other.errorStyle == left.errorStyle
-                   && other.errorMaxLines == left.errorMaxLines
-                   && other.hasFloatingPlaceholder == left.hasFloatingPlaceholder
-                   && other.isDense == left.isDense
-                   && other.contentPadding == left.contentPadding
-                   && other.isCollapsed == left.isCollapsed
-                   && other.prefixIcon == left.prefixIcon
-                   && other.prefix == left.prefix
-                   && other.prefixText == left.prefixText
-                   && other.prefixStyle == left.prefixStyle
-                   && other.suffixIcon == left.suffixIcon
-                   && other.suffix == left.suffix
-                   && other.suffixText == left.suffixText
-                   && other.suffixStyle == left.suffixStyle
-                   && other.counterText == left.counterText
-                   && other.counterStyle == left.counterStyle
-                   && other.filled == left.filled
-                   && other.fillColor == left.fillColor
-                   && other.errorBorder == left.errorBorder
-                   && other.focusedBorder == left.focusedBorder
-                   && other.focusedErrorBorder == left.focusedErrorBorder
-                   && other.disabledBorder == left.disabledBorder
-                   && other.enabledBorder == left.enabledBorder
-                   && other.border == left.border
-                   && other.enabled == left.enabled;
+        public static bool operator ==(InputDecoration left, InputDecoration right) {
+            return left.Equals(right);
         }
 
-        public static bool operator !=(InputDecoration left, InputDecoration other) {
-            return !(left == other);
+        public static bool operator !=(InputDecoration left, InputDecoration right) {
+            return !left.Equals(right);
+        }
+
+        public bool Equals(InputDecoration other) {
+            return other.icon == this.icon
+                   && other.labelText == this.labelText
+                   && other.labelStyle == this.labelStyle
+                   && other.helperText == this.helperText
+                   && other.helperStyle == this.helperStyle
+                   && other.hintText == this.hintText
+                   && other.hintStyle == this.hintStyle
+                   && other.errorText == this.errorText
+                   && other.errorStyle == this.errorStyle
+                   && other.errorMaxLines == this.errorMaxLines
+                   && other.hasFloatingPlaceholder == this.hasFloatingPlaceholder
+                   && other.isDense == this.isDense
+                   && other.contentPadding == this.contentPadding
+                   && other.isCollapsed == this.isCollapsed
+                   && other.prefixIcon == this.prefixIcon
+                   && other.prefix == this.prefix
+                   && other.prefixText == this.prefixText
+                   && other.prefixStyle == this.prefixStyle
+                   && other.suffixIcon == this.suffixIcon
+                   && other.suffix == this.suffix
+                   && other.suffixText == this.suffixText
+                   && other.suffixStyle == this.suffixStyle
+                   && other.counterText == this.counterText
+                   && other.counterStyle == this.counterStyle
+                   && other.filled == this.filled
+                   && other.fillColor == this.fillColor
+                   && other.errorBorder == this.errorBorder
+                   && other.focusedBorder == this.focusedBorder
+                   && other.focusedErrorBorder == this.focusedErrorBorder
+                   && other.disabledBorder == this.disabledBorder
+                   && other.enabledBorder == this.enabledBorder
+                   && other.border == this.border
+                   && other.enabled == this.enabled;
+        }
+        
+        public override bool Equals(object obj) {
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
+            return this.Equals((InputDecoration) obj);
         }
 
         public override int GetHashCode() {

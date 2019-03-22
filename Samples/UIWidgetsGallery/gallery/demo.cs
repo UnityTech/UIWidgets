@@ -30,15 +30,33 @@ namespace UIWidgetsGallery.gallery {
         public readonly string documentationUrl;
 
         public static bool operator ==(ComponentDemoTabData left, ComponentDemoTabData right) {
-            return right.tabName == left.tabName
-                   && right.description == left.description
-                   && right.documentationUrl == left.documentationUrl;
+            return left.Equals(right);
         }
 
         public static bool operator !=(ComponentDemoTabData left, ComponentDemoTabData right) {
-            return right.tabName != left.tabName
-                   || right.description != left.description
-                   || right.documentationUrl != left.documentationUrl;
+            return !left.Equals(right);
+        }
+
+        public bool Equals(ComponentDemoTabData other) {
+            return other.tabName == this.tabName
+                   && other.description == this.description
+                   && other.documentationUrl == this.documentationUrl;
+        }
+        
+        public override bool Equals(object obj) {
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
+
+            return this.Equals((ComponentDemoTabData) obj);
         }
 
         public override int GetHashCode() {

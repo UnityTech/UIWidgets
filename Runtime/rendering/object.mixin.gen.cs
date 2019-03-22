@@ -994,7 +994,7 @@ namespace Unity.UIWidgets.rendering {
             get { return this._childCount; }
         }
 
-        public bool debugValidateChild(RenderObject child) {
+        public new bool debugValidateChild(RenderObject child) {
             D.assert(() => {
                 if (!(child is ChildType)) {
                     throw new UIWidgetsError(

@@ -83,7 +83,6 @@ namespace Unity.UIWidgets.material {
             bool selected = false,
             string indexLabel = null
         ) {
-            D.assert(selected != null);
             this.type = type;
             this.item = item;
             this.animation = animation;

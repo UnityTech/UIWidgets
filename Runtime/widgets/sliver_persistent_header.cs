@@ -28,8 +28,6 @@ namespace Unity.UIWidgets.widgets {
             bool floating = false
         ) : base(key: key) {
             D.assert(del != null);
-            D.assert(pinned != null);
-            D.assert(floating != null);
             this.del = del;
             this.pinned = pinned;
             this.floating = floating;
@@ -81,7 +79,7 @@ namespace Unity.UIWidgets.widgets {
         public _SliverPersistentHeaderElement(_SliverPersistentHeaderRenderObjectWidget widget) : base(widget) {
         }
 
-        public _SliverPersistentHeaderRenderObjectWidget widget {
+        public new _SliverPersistentHeaderRenderObjectWidget widget {
             get { return (_SliverPersistentHeaderRenderObjectWidget) base.widget; }
         }
 
