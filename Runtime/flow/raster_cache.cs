@@ -24,7 +24,7 @@ namespace Unity.UIWidgets.flow {
         public readonly float devicePixelRatio;
 
         public void draw(Canvas canvas) {
-            var bounds = canvas.getTotalMatrix().mapRect(this.logicalRect).roundOut();
+            var bounds = canvas.getTotalMatrix().mapRect(this.logicalRect).roundOut(this.devicePixelRatio);
 
             D.assert(() => {
                 var textureWidth = Mathf.CeilToInt(bounds.width * this.devicePixelRatio);
@@ -34,7 +34,6 @@ namespace Unity.UIWidgets.flow {
                 D.assert(this.image.height == textureHeight);
                 return true;
             });
-
 
             canvas.save();
             try {
@@ -215,7 +214,7 @@ namespace Unity.UIWidgets.flow {
 
         RasterCacheResult _rasterizePicture(Picture picture, Matrix3 transform, float devicePixelRatio,
             MeshPool meshPool) {
-            var bounds = transform.mapRect(picture.paintBounds).roundOut();
+            var bounds = transform.mapRect(picture.paintBounds).roundOut(devicePixelRatio);
 
             var desc = new RenderTextureDescriptor(
                 Mathf.CeilToInt((bounds.width * devicePixelRatio)),

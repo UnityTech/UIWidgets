@@ -638,6 +638,14 @@ namespace Unity.UIWidgets.ui {
                 Mathf.Ceil(this.right), Mathf.Ceil(this.bottom));
         }
 
+        public Rect roundOut(float devicePixelRatio) {
+            return fromLTRB(
+                Mathf.Floor(this.left * devicePixelRatio) / devicePixelRatio, 
+                Mathf.Floor(this.top * devicePixelRatio) / devicePixelRatio,
+                Mathf.Ceil(this.right * devicePixelRatio) / devicePixelRatio, 
+                Mathf.Ceil(this.bottom * devicePixelRatio) / devicePixelRatio);
+        }
+
         public Rect roundIn() {
             return fromLTRB(
                 Mathf.Ceil(this.left), Mathf.Ceil(this.top),
