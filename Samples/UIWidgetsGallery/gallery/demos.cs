@@ -192,15 +192,15 @@ namespace UIWidgetsGallery.gallery {
                     documentationUrl: "https://docs.flutter.io/flutter/material/BottomAppBar-class.html",
                     buildRoute: (BuildContext context) => new BottomAppBarDemo()
                 ),
-//                new GalleryDemo(
-//                    title: "Bottom navigation",
-//                    subtitle: "Bottom navigation with cross-fading views",
-//                    icon: GalleryIcons.bottom_navigation,
-//                    category: GalleryDemoCategory._kMaterialComponents,
-//                    routeName: BottomNavigationDemo.routeName,
-//                    documentationUrl: "https://docs.flutter.io/flutter/material/BottomNavigationBar-class.html",
-//                    buildRoute: (BuildContext context) => BottomNavigationDemo()
-//                ),
+                new GalleryDemo(
+                    title: "Bottom navigation",
+                    subtitle: "Bottom navigation with cross-fading views",
+                    icon: GalleryIcons.bottom_navigation,
+                    category: DemoUtils._kMaterialComponents,
+                    routeName: BottomNavigationDemo.routeName,
+                    documentationUrl: "https://docs.flutter.io/flutter/material/BottomNavigationBar-class.html",
+                    buildRoute: (BuildContext context) => new BottomNavigationDemo()
+                ),
 //                new GalleryDemo(
 //                    title: "Bottom sheet: Modal",
 //                    subtitle: "A dismissable bottom sheet",
