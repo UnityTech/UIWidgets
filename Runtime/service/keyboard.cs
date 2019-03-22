@@ -9,6 +9,7 @@ using UnityEngine;
 
 namespace Unity.UIWidgets.service {
 
+    
     interface KeyboardDelegate: IDisposable {
         void show();
         void hide();
@@ -82,23 +83,20 @@ namespace Unity.UIWidgets.service {
            
             
             if (currentEvent != null && currentEvent.type == EventType.KeyDown) {
-                var action = TextInputUtils.getInputAction(currentEvent);
-                if (action != null) {
-                    Window.instance.run(() => { TextInput._performAction(this._client, action.Value); });
+                if (currentEvent.keyCode == KeyCode.Return) {
+                    Window.instance.run(() => { TextInput._performAction(this._client, TextInputAction.newline); });
                 }
 
-                if (action == null || action == TextInputAction.newline) {
-                    if (currentEvent.keyCode == KeyCode.None) {
-                        char ch = currentEvent.character;
-                        if (ch == '\r' || ch == 3) {
-                            ch = '\n';
-                        }
-                        this._value = this._value.clearCompose();
-                        if (_validateCharacter(ch)) {
-                            this._value = this._value.insert(new string(ch, 1));
-                        } 
-                        Window.instance.run(() => { TextInput._updateEditingState(this._client, this._value); });
+                if (currentEvent.character != '\0') {
+                    char ch = currentEvent.character;
+                    if (ch == '\r' || ch == 3) {
+                        ch = '\n';
                     }
+                    this._value = this._value.clearCompose();
+                    if (_validateCharacter(ch)) {
+                        this._value = this._value.insert(new string(ch, 1));
+                    } 
+                    Window.instance.run(() => { TextInput._updateEditingState(this._client, this._value); });
                 }
 
                 currentEvent.Use();
