@@ -39,16 +39,16 @@ namespace Unity.UIWidgets.ui {
             font.hideFlags = HideFlags.DontSave & ~HideFlags.DontSaveInBuild;
 
             FontInfo current;
-            var name = font.fontNames[0];
+            var name = font.name;
             this._fonts.TryGetValue(name, out current);
-            D.assert(current == null || current.font == font, $"font with name {name} already exists, object name={font.name}");
+            D.assert(current == null || current.font == font, $"font with name {name} already exists");
             var fontInfo = new FontInfo(font);
             this._fonts[name] = fontInfo;
         }
 
         internal FontInfo getOrCreate(string name) {
             if (this._fonts.TryGetValue(name, out var fontInfo)) {
-                D.assert(fontInfo.font.fontNames[0] == name);
+                D.assert(fontInfo.font.name == name);
                 return fontInfo;
             }
 
@@ -58,7 +58,7 @@ namespace Unity.UIWidgets.ui {
             osFont.material.mainTexture.hideFlags = HideFlags.DontSave;
 
             var newFont = new FontInfo(osFont);
-            this._fonts[osFont.fontNames[0]] = newFont;
+            this._fonts[osFont.name] = newFont;
 
             return newFont;
         }
