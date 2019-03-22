@@ -87,8 +87,7 @@ in Unity Editor.
                 // Application.targetFrameRate = 60; // or higher if you want a smoother scrolling experience.
     
                 // if you want to use your own font or font icons.
-                // use the font family name instead of the file name in FontStyle.fontFamily.
-                // you can get the font family name by clicking the font file and check its Inspector.                 
+                // use the asset name of font (file name without extension) in FontStyle.fontFamily.             
                 // FontManager.instance.addFont(Resources.Load<Font>(path: "path to your font"));                
             }
     
