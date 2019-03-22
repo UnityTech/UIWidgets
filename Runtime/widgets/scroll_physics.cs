@@ -127,13 +127,9 @@ namespace Unity.UIWidgets.widgets {
             }
         }
 
-        public virtual float dragStartDistanceMotionThreshold {
+        public virtual float? dragStartDistanceMotionThreshold {
             get {
-                if (this.parent == null) {
-                    return 0.0f;
-                }
-
-                return this.parent.dragStartDistanceMotionThreshold;
+                return this.parent?.dragStartDistanceMotionThreshold;
             }
         }
 
@@ -228,7 +224,7 @@ namespace Unity.UIWidgets.widgets {
                    Mathf.Min(0.000816f * Mathf.Pow(existingVelocity.abs(), 1.967f), 40000.0f);
         }
 
-        public override float dragStartDistanceMotionThreshold {
+        public override float? dragStartDistanceMotionThreshold {
             get { return 3.5f; }
         }
     }

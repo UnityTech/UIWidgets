@@ -103,17 +103,7 @@ namespace Unity.UIWidgets.gestures {
                     });
                 }
 
-                this.invokeCallback<object>("onEnd", () => {
-                        this.onEnd(new DragEndDetails(
-                            velocity: Velocity.zero,
-                            primaryVelocity: 0.0f
-                        ));
-                        return null;
-                    }, debugReport: () => { return "Pointer scroll end"; }
-                );
-
-
-                this._state = _DragState.ready;
+                this.stopTrackingScrollerPointer(evt.pointer);
                 return;
             }
 
@@ -184,6 +174,18 @@ namespace Unity.UIWidgets.gestures {
 
         public override void rejectGesture(int pointer) {
             this.stopTrackingPointer(pointer);
+        }
+
+        protected override void didStopTrackingLastScrollerPointer(int pointer) {
+            this._state = _DragState.ready;
+            this.invokeCallback<object>("onEnd", () => {
+                    this.onEnd(new DragEndDetails(
+                        velocity: Velocity.zero,
+                        primaryVelocity: 0.0f
+                    ));
+                    return null;
+                }, debugReport: () => { return "Pointer scroll end"; }
+            );
         }
 
         protected override void didStopTrackingLastPointer(int pointer) {
