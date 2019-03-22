@@ -192,7 +192,6 @@ namespace Unity.UIWidgets.material {
         public override Widget build(BuildContext context) {
             MediaQueryData mediaQuery = MediaQuery.of(context);
             MaterialLocalizations localizations = MaterialLocalizations.of(context);
-            string routeLabel = "";
 
             return new GestureDetector(
                 onTap: () => Navigator.pop(context),

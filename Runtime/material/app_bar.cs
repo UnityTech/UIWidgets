@@ -541,13 +541,6 @@ namespace Unity.UIWidgets.material {
             bool pinned = false,
             bool snap = false
         ) : base(key: key) {
-            D.assert(automaticallyImplyLeading != null);
-            D.assert(forceElevated != null);
-            D.assert(primary != null);
-            D.assert(titleSpacing != null);
-            D.assert(floating != null);
-            D.assert(pinned != null);
-            D.assert(snap != null);
             D.assert(floating || !snap, "The 'snap' argument only makes sense for floating app bars.");
             this.leading = leading;
             this.automaticallyImplyLeading = true;

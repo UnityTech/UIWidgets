@@ -53,7 +53,7 @@ namespace UIWidgetsGallery.gallery {
         public readonly int threshold;
 
         public bool isValid {
-            get { return this.name != null && this.primary != null && this.threshold != null; }
+            get { return this.name != null && this.primary != null; }
         }
     }
 

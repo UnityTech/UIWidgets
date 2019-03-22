@@ -253,11 +253,28 @@ namespace Unity.UIWidgets.material {
         public readonly T result;
 
         public static bool operator ==(_DropdownRouteResult<T> left, _DropdownRouteResult<T> right) {
-            return left.result == right.result;
+            return left.Equals(right);
         }
 
         public static bool operator !=(_DropdownRouteResult<T> left, _DropdownRouteResult<T> right) {
-            return left.result != right.result;
+            return !left.Equals(right);
+        }
+
+        public bool Equals(_DropdownRouteResult<T> other) {
+            return this.result == other.result;
+        }
+        
+        public override bool Equals(object obj) {
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
+            return this.Equals((_DropdownRouteResult<T>) obj);
         }
 
         public override int GetHashCode() {
@@ -733,7 +750,7 @@ namespace Unity.UIWidgets.material {
     }
 
     class _DropdownButtonFormFieldState<T> : FormFieldState<T> where T : class {
-        public DropdownButtonFormField<T> widget {
+        public new DropdownButtonFormField<T> widget {
             get { return base.widget as DropdownButtonFormField<T>; }
         }
 

@@ -94,7 +94,6 @@ namespace Unity.UIWidgets.rendering {
         }
 
         public static RelativeRect lerp(RelativeRect a, RelativeRect b, float t) {
-            D.assert(t != null);
             if (a == null && b == null) {
                 return null;
             }
