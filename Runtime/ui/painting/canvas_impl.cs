@@ -13,6 +13,7 @@ namespace Unity.UIWidgets.ui {
         
         readonly List<RenderLayer> _layers = new List<RenderLayer>();
         RenderLayer _currentLayer;
+        Rect _lastScissor;
         
         public PictureFlusher(RenderTexture renderTexture, float devicePixelRatio, MeshPool meshPool) {
             D.assert(renderTexture);
@@ -253,14 +254,14 @@ namespace Unity.UIWidgets.ui {
         }
         
         void _tryAddScissor(RenderLayer layer, Rect scissor) {
-            if (scissor == layer.lastScissor) {
+            if (scissor == this._lastScissor) {
                 return;
             }
 
             layer.draws.Add(new CmdScissor {
                 deviceScissor = scissor,
             });
-            layer.lastScissor = scissor;
+            this._lastScissor = scissor;
         }
         
         bool _applyClip(Rect queryBounds) {
@@ -894,7 +895,6 @@ namespace Unity.UIWidgets.ui {
             public readonly ClipStack clipStack = new ClipStack();
             public uint lastClipGenId;
             public Rect lastClipBounds;
-            public Rect lastScissor;
             public bool ignoreClip = true;
 
             Vector4? _viewport;
