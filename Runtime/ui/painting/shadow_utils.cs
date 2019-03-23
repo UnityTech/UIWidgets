@@ -2,6 +2,8 @@ using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
     public static class ShadowUtils {
+        public const bool _drawShadowFlag = false;
+        
         public const float kAmbientHeightFactor = 1.0f / 128.0f;
         public const float kAmbientGeomFactor = 64.0f;
 
@@ -135,6 +137,10 @@ namespace Unity.UIWidgets.ui {
 
         public static void drawShadow(Canvas canvas, Path path, Vector3 zPlaneParams, Vector3 devLightPos,
             float lightRadius, Color ambientColor, Color spotColor, int flags) {
+            if (!_drawShadowFlag) {
+                return;
+            }
+            
             Matrix3 viewMatrix = canvas.getTotalMatrix();
 
             //ambient light
