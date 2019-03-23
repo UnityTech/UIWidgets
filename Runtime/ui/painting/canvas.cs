@@ -1,4 +1,5 @@
 ﻿using System;
+using Unity.UIWidgets.flow;
 using UnityEngine;
 using Unity.UIWidgets.foundation;
 
@@ -39,6 +40,8 @@ namespace Unity.UIWidgets.ui {
         void drawLine(Offset from, Offset to, Paint paint);
 
         void drawRect(Rect rect, Paint paint);
+
+        void drawShadow(Path path, Color color, float elevation, bool transparentOccluder);
 
         void drawRRect(RRect rect, Paint paint);
 
@@ -185,6 +188,11 @@ namespace Unity.UIWidgets.ui {
                 path = path,
                 paint = new Paint(paint),
             });
+        }
+
+        public void drawShadow(Path path, Color color, float elevation, bool transparentOccluder) {
+            float dpr = Window.instance.devicePixelRatio;
+            PhysicalShapeLayer.drawShadow(this, path, color, elevation, transparentOccluder, dpr);
         }
 
         public void drawRect(Rect rect, Paint paint) {

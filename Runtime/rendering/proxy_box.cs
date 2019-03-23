@@ -1102,7 +1102,7 @@ namespace Unity.UIWidgets.rendering {
 
         Color _color;
 
-        static Paint _transparentPaint {
+        protected static Paint _transparentPaint {
             get { return new Paint {color = new Color(0x00000000)}; }
         }
 
@@ -1189,7 +1189,7 @@ namespace Unity.UIWidgets.rendering {
             return base.hitTest(result, position: position);
         }
 
-        //todo:xingwei.zhu: implementation shadow
+        
         public override void paint(PaintingContext context, Offset offset) {
             if (this.child != null) {
                 this._updateClip();
@@ -1210,17 +1210,16 @@ namespace Unity.UIWidgets.rendering {
                 else {
                     Canvas canvas = context.canvas;
                     if (this.elevation != 0.0) {
-                        //draw Shadow
-                        /*canvas.drawRect(
-                            offsetBounds.inflate(20.0),
-                            _RenderPhysicalModelBase<RRect>._transparentPaint
+                        canvas.drawRect(
+                            offsetBounds.inflate(20.0f),
+                            _transparentPaint
                         );
                         canvas.drawShadow(
                             offsetRRectAsPath,
                             this.shadowColor,
                             this.elevation,
                             this.color.alpha != 0xFF
-                        );*/
+                        );
                     }
 
                     Paint paint = new Paint {color = this.color};
@@ -1278,7 +1277,7 @@ namespace Unity.UIWidgets.rendering {
             return base.hitTest(result, position: position);
         }
 
-        //todo:xingwei.zhu: implementation shadow
+        
         public override void paint(PaintingContext context, Offset offset) {
             if (this.child != null) {
                 this._updateClip();
@@ -1297,18 +1296,19 @@ namespace Unity.UIWidgets.rendering {
                 }
                 else {
                     Canvas canvas = context.canvas;
-//                if (this.elevation != 0.0 && paintShadows) {
-//                    canvas.drawRect(
-//                        offsetBounds.inflate(20.0),
-//                        _RenderPhysicalModelBase<Path>._transparentPaint
-//                    );
-//                    canvas.drawShadow(
-//                        offsetPath,
-//                        this.shadowColor,
-//                        this.elevation,
-//                        this.color.alpha != 0xFF,
-//                    );
-//                }
+                if (this.elevation != 0.0) {
+                    canvas.drawRect(
+                        offsetBounds.inflate(20.0f),
+                        _transparentPaint
+                    );
+                    
+                    canvas.drawShadow(
+                        offsetPath,
+                        this.shadowColor,
+                        this.elevation,
+                        this.color.alpha != 0xFF
+                    );
+                }
                     Paint paint = new Paint {color = this.color, style = PaintingStyle.fill};
                     canvas.drawPath(offsetPath, paint);
                     context.clipPathAndPaint(offsetPath, this.clipBehavior,
