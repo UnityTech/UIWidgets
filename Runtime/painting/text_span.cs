@@ -23,9 +23,9 @@ namespace Unity.UIWidgets.painting {
         }
 
         public void build(ParagraphBuilder builder, float textScaleFactor = 1.0f) {
-            var hasTyle = this.style != null;
-            if (hasTyle) {
-                builder.pushStyle(this.style);
+            var hasStyle = this.style != null;
+            if (hasStyle) {
+                builder.pushStyle(this.style, textScaleFactor);
             }
 
             if (!string.IsNullOrEmpty(this.text)) {
@@ -39,7 +39,7 @@ namespace Unity.UIWidgets.painting {
                 }
             }
 
-            if (hasTyle) {
+            if (hasStyle) {
                 builder.pop();
             }
         }

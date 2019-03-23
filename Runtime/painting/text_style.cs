@@ -50,11 +50,11 @@ namespace Unity.UIWidgets.painting {
             this.background = background;
         }
 
-        public ui.TextStyle getTextStyle(ui.TextStyle currentStyle = null) {
+        public ui.TextStyle getTextStyle(ui.TextStyle currentStyle = null, float textScaleFactor = 1.0f) {
             if (currentStyle != null) {
                 return new ui.TextStyle(
                     color: this.color ?? currentStyle.color,
-                    fontSize: this.fontSize ?? currentStyle.fontSize,
+                    fontSize: this.fontSize != null ? this.fontSize * textScaleFactor : currentStyle.fontSize,
                     fontWeight: this.fontWeight ?? currentStyle.fontWeight,
                     fontStyle: this.fontStyle ?? currentStyle.fontStyle,
                     letterSpacing: this.letterSpacing ?? currentStyle.letterSpacing,
@@ -70,7 +70,7 @@ namespace Unity.UIWidgets.painting {
 
             return new ui.TextStyle(
                 color: this.color,
-                fontSize: this.fontSize,
+                fontSize: this.fontSize * textScaleFactor,
                 fontWeight: this.fontWeight,
                 fontStyle: this.fontStyle,
                 letterSpacing: this.letterSpacing,

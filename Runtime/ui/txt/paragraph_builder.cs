@@ -10,7 +10,7 @@ namespace Unity.UIWidgets.ui {
         int _paragraph_style_index;
 
         public interface ITextStyleProvider {
-            TextStyle getTextStyle(TextStyle current = null);
+            TextStyle getTextStyle(TextStyle current = null, float textScaleFactor = 1.0f);
         }
 
         public ParagraphBuilder(ParagraphStyle style) {
@@ -25,8 +25,8 @@ namespace Unity.UIWidgets.ui {
             return paragraph;
         }
 
-        public void pushStyle(ITextStyleProvider style) {
-            var newStyle = style.getTextStyle(this.peekStyle());
+        public void pushStyle(ITextStyleProvider style, float textScaleFactor) {
+            var newStyle = style.getTextStyle(this.peekStyle(), textScaleFactor: textScaleFactor);
             var styleIndex = this._runs.addStyle(newStyle);
             this._styleStack.Add(styleIndex);
             this._runs.startRun(styleIndex, this._text.Length);
