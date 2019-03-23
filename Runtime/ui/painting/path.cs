@@ -345,6 +345,45 @@ namespace Unity.UIWidgets.ui {
             this._appendCommands(vals.ToArray());
         }
 
+        public Path transform(Matrix3 mat) {
+            Path ret = new Path();
+            
+            var i = 0;
+            while (i < this._commands.Count) {
+                var cmd = (PathCommand) this._commands[i];
+                switch (cmd) {
+                    case PathCommand.moveTo:
+                        var res_move = mat.mapXY(this._commands[i + 1], this._commands[i + 2]);
+                        ret.moveTo(res_move.dx, res_move.dy);
+                        i += 3;
+                        break;
+                    case PathCommand.lineTo:
+                        var res_lineto = mat.mapXY(this._commands[i + 1], this._commands[i + 2]);
+                        ret.lineTo(res_lineto.dx, res_lineto.dy);
+                        i += 3;
+                        break;
+                    case PathCommand.bezierTo:
+                        var res1 = mat.mapXY(this._commands[i + 1], this._commands[i + 2]);
+                        var res2 = mat.mapXY(this._commands[i + 3], this._commands[i + 4]);
+                        var res3 = mat.mapXY(this._commands[i + 5], this._commands[i + 6]);
+                        ret.bezierTo(res1.dx, res1.dy, res2.dx, res2.dy, res3.dx, res3.dy);
+                        i += 7;
+                        break;
+                    case PathCommand.close:
+                        i++;
+                        break;
+                    case PathCommand.winding:
+                        i += 2;
+                        break;
+                    default:
+                        D.assert(false, "unknown cmd: " + cmd);
+                        break;
+                }
+            }
+
+            return ret;
+        }
+
         void _transformCommands(List<float> commands, Matrix3 mat) {
             if (mat == null) {
                 return;

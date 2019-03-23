@@ -3,6 +3,70 @@ using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
     public static class MathUtils {
+        const float _valueNearlyZero = 1f / (1 << 12);
+
+        public static bool isConvexPolygon(Offset[] polygonVerts, int polygonSize) {
+            if (polygonSize < 3) {
+                return false;
+            }
+
+            float lastArea = 0;
+            float lastPerpDot = 0;
+
+            int prevIndex = polygonSize - 1;
+            int currIndex = 0;
+            int nextIndex = 1;
+
+            Offset origin = polygonVerts[0];
+            Vector2 v0 = (polygonVerts[currIndex] - polygonVerts[prevIndex]).toVector();
+            Vector2 v1 = (polygonVerts[nextIndex] - polygonVerts[currIndex]).toVector();
+            Vector2 w0 = (polygonVerts[currIndex] - origin).toVector();
+            Vector2 w1 = (polygonVerts[nextIndex] - origin).toVector();
+
+            for (int i = 0; i < polygonSize; i++) {
+                if (!polygonVerts[i].isFinite) {
+                    return false;
+                }
+
+                float perpDot = v0.cross(v1);
+                if (lastPerpDot * perpDot < 0) {
+                    return false;
+                }
+
+                if (0 != perpDot) {
+                    lastPerpDot = perpDot;
+                }
+
+                float quadArea = w0.cross(w1);
+                if (quadArea * lastArea < 0) {
+                    return false;
+                }
+
+                if (0 != quadArea) {
+                    lastArea = quadArea;
+                }
+
+                prevIndex = currIndex;
+                currIndex = nextIndex;
+                nextIndex = (currIndex + 1) % polygonSize;
+                v0 = v1;
+                v1 = (polygonVerts[nextIndex] - polygonVerts[currIndex]).toVector();
+                w0 = w1;
+                w1 = (polygonVerts[nextIndex] - origin).toVector();
+            }
+
+            return true;
+        }
+
+        public static float cross(this Vector2 vector1, Vector2 vector2) {
+            return Vector3.Cross(new Vector3(vector1.x, vector1.y, 0f), new Vector3(vector2.x, vector2.y, 0f)).z;
+        }
+
+        public static bool valueNearlyZero(this float x, float? tolerance = null) {
+            tolerance = tolerance ?? _valueNearlyZero;
+            return Mathf.Abs(x) <= tolerance;
+        }
+        
         public static float clamp(this float value, float min, float max) {
             if (value < min) {
                 value = min;
@@ -522,6 +586,20 @@ namespace Unity.UIWidgets.ui {
                 this.left * scaleX, this.top * scaleY.Value,
                 this.right * scaleX, this.bottom * scaleY.Value);
         }
+        
+        public Rect outset(float dx, float dy) {
+            return new Rect(this.left - dx, this.top - dy, this.right + dx, this.bottom + dy);
+        }
+
+        public Offset[] toQuad() {
+            Offset[] dst = new Offset[4];
+            dst[0] = new Offset(this.left, this.top);
+            dst[1] = new Offset(this.right, this.top);
+            dst[2] = new Offset(this.right, this.bottom);
+            dst[3] = new Offset(this.left, this.bottom);
+            return dst;
+        }
+
 
         public Rect inflate(float delta) {
             return fromLTRB(this.left - delta, this.top - delta, this.right + delta, this.bottom + delta);
