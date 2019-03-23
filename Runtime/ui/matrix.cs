@@ -749,6 +749,12 @@ namespace Unity.UIWidgets.ui {
             ).normalize();
         }
 
+        public Offset[] mapRectToQuad(Rect rect) {
+            Offset[] dst = rect.toQuad();
+            this.mapPoints(dst, dst);
+            return dst;
+        }
+
         public static bool operator ==(Matrix3 a, Matrix3 b) {
             if (ReferenceEquals(a, null) && ReferenceEquals(b, null)) {
                 return true;

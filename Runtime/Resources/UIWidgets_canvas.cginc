@@ -168,7 +168,9 @@ fixed4 frag_mf (v2f i) : SV_Target {
      half4 color = half4(0, 0, 0, 0);
      
      float2 coord = i.ftcoord - _mf_radius * _mf_imgInc;
-     int width = _mf_radius * 2 + 1;
+     int width = _mf_radius * 2.0 + 1; // use 2.0 to avoid "bitfieldInsert"
+     
+     [unroll(25)]
      for (int i = 0; i < width; i++) {
         color += tex2D(_tex, coord) * _mf_kernel[i];
         coord += _mf_imgInc;

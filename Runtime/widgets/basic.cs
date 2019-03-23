@@ -1294,6 +1294,41 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
+    public class FittedBox : SingleChildRenderObjectWidget {
+        public FittedBox(
+            Key key = null,
+            BoxFit fit = BoxFit.contain,
+            Alignment alignment = null,
+            Widget child = null
+        ) : base(key: key, child: child) {
+            this.fit = fit;
+            this.alignment = alignment ?? Alignment.center;
+        }
+
+        public readonly BoxFit fit;
+
+        public readonly Alignment alignment;
+
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderFittedBox(
+                fit: this.fit,
+                alignment: this.alignment
+            );
+        }
+
+        public override void updateRenderObject(BuildContext context, RenderObject _renderObject) {
+            RenderFittedBox renderObject = _renderObject as RenderFittedBox;
+            renderObject.fit = this.fit;
+            renderObject.alignment = this.alignment;
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new EnumProperty<BoxFit>("fit", this.fit));
+            properties.add(new DiagnosticsProperty<Alignment>("alignment", this.alignment));
+        }
+    }
+
     public class FractionalTranslation : SingleChildRenderObjectWidget {
         public FractionalTranslation(Key key = null, Offset translation = null,
             bool transformHitTests = true, Widget child = null) : base(key: key, child: child) {

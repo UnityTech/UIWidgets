@@ -1,4 +1,8 @@
 using Unity.UIWidgets.ui;
+using UnityEngine;
+using Canvas = Unity.UIWidgets.ui.Canvas;
+using Color = Unity.UIWidgets.ui.Color;
+using Rect = Unity.UIWidgets.ui.Rect;
 
 namespace Unity.UIWidgets.flow {
     public class PhysicalShapeLayer : ContainerLayer {
@@ -51,15 +55,14 @@ namespace Unity.UIWidgets.flow {
             }
             else {
                 Rect bounds = this._path.getBounds();
-                //todo xingwei.zhu: outter set shadow
-                //bounds.outset(20.0f, 20.0f);
-                this.paintBounds = bounds;
+                Rect outset = bounds.outset(20.0f, 20.0f);
+                this.paintBounds = outset;
             }
         }
 
         public override void paint(PaintContext context) {
             if (this._elevation != 0) {
-                this.drawShadow(context.canvas, this._path, this._shadow_color, this._elevation,
+                drawShadow(context.canvas, this._path, this._shadow_color, this._elevation,
                     this._color.alpha != 255, this._device_pixel_ratio);
             }
 
@@ -75,8 +78,31 @@ namespace Unity.UIWidgets.flow {
         }
 
 
-        void drawShadow(Canvas canvas, Path path, Color color, float elevation, bool transparentOccluder, float dpr) {
-            //todo xingwei.zhu: to be implemented
+        public static void drawShadow(Canvas canvas, Path path, Color color, float elevation, bool transparentOccluder,
+            float dpr) {
+            float kAmbientAlpha = 0.039f;
+            float kSpotAlpha = 0.25f;
+            float kLightHeight = 600f;
+            float kLightRadius = 800f;
+
+            Rect bounds = path.getBounds();
+            float shadow_x = (bounds.left + bounds.right) / 2f;
+            float shadow_y = bounds.top - 600.0f;
+            Color inAmbient = color.withAlpha((int) (kAmbientAlpha * color.alpha));
+            Color inSpot = color.withAlpha((int) (kSpotAlpha * color.alpha));
+            Color ambientColor = null;
+            Color spotColor = null;
+            ShadowUtils.computeTonalColors(inAmbient, inSpot, ref ambientColor, ref spotColor);
+            ShadowUtils.drawShadow(
+                canvas,
+                path,
+                new Vector3(0, 0, dpr * elevation),
+                new Vector3(shadow_x, shadow_y, dpr * kLightHeight),
+                dpr * kLightRadius,
+                ambientColor,
+                spotColor,
+                0
+            );
         }
     }
 }

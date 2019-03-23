@@ -13,14 +13,15 @@ using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace UIWidgetsSample {
     public class MaterialSample : UIWidgetsSamplePanel {
-        int testCaseId = 4;
+        int testCaseId = 2;
 
         List<Widget> testCases = new List<Widget> {
             new MaterialButtonWidget(),
             new MaterialInkWellWidget(),
             new MaterialAppBarWidget(),
             new MaterialTabBarWidget(),
-            new TableWidget()
+            new TableWidget(),
+            new BottomAppBarWidget()
         };
 
         protected override Widget createWidget() {
@@ -32,6 +33,25 @@ namespace UIWidgetsSample {
         protected override void OnEnable() {
             base.OnEnable();
             FontManager.instance.addFont(Resources.Load<Font>(path: "MaterialIcons-Regular"));
+        }
+    }
+
+    class BottomAppBarWidget : StatelessWidget {
+        public BottomAppBarWidget(Key key = null) : base(key) {
+            
+        }
+
+        public override Widget build(BuildContext context) {
+            return new Scaffold(
+                backgroundColor: Color.clear,
+                bottomNavigationBar: new BottomAppBar(
+                    child: new Row(
+                        mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: new List<Widget> {
+                            new IconButton(icon: new Icon(Unity.UIWidgets.material.Icons.menu), onPressed: () => { }),
+                            new IconButton(icon: new Icon(Unity.UIWidgets.material.Icons.account_balance), onPressed: () => { })
+                        })));
         }
     }
 

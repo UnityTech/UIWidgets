@@ -4,7 +4,7 @@ using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.widgets;
 
 namespace Unity.UIWidgets.material {
-    static class ThemeUtils {
+    public static class ThemeUtils {
         public static readonly TimeSpan kThemeAnimationDuration = new TimeSpan(0, 0, 0, 0, 200);
     }
 

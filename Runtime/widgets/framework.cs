@@ -92,8 +92,8 @@ namespace Unity.UIWidgets.widgets {
                 return true;
             }
 
-            return ReferenceEquals(this.componentKey1, other.componentKey1) &&
-                   ReferenceEquals(this.componentKey2, other.componentKey2);
+            return Equals(this.componentKey1, other.componentKey1) &&
+                   Equals(this.componentKey2, other.componentKey2);
         }
 
         public override bool Equals(object obj) {
@@ -173,7 +173,7 @@ namespace Unity.UIWidgets.widgets {
 
                 return true;
             });
-            if (_registry.getOrDefault(compKey) == element) {
+            if (_registry[compKey] == element) {
                 _registry.Remove(compKey);
                 _removedKeys.Add(compKey);
             }

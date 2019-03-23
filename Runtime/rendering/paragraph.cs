@@ -5,6 +5,7 @@ using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.ui;
 using UnityEngine;
+using Rect = Unity.UIWidgets.ui.Rect;
 
 namespace Unity.UIWidgets.rendering {
     public enum TextOverflow {
@@ -92,6 +93,11 @@ namespace Unity.UIWidgets.rendering {
                 this._textPainter.textDirection = this.textDirection;
                 this.markNeedsLayout();
             }
+        }
+
+        protected Offset getOffsetForCaret(TextPosition position, Rect caretPrototype) {
+            D.assert(this._textPainter != null);
+            return this._textPainter.getOffsetForCaret(position, caretPrototype);
         }
 
         public bool softWrap {

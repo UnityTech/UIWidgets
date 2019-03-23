@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.ui;
@@ -157,12 +158,29 @@ namespace Unity.UIWidgets.material {
             canvas.drawLine(rect.bottomLeft, rect.bottomRight, this.borderSide.toPaint());
         }
 
-        public static bool operator ==(UnderlineInputBorder left, UnderlineInputBorder other) {
-            return left.borderSide == other.borderSide;
+        public static bool operator ==(UnderlineInputBorder left, UnderlineInputBorder right) {
+            return left.Equals(right);
         }
 
-        public static bool operator !=(UnderlineInputBorder left, UnderlineInputBorder other) {
-            return left.borderSide != other.borderSide;
+        public static bool operator !=(UnderlineInputBorder left, UnderlineInputBorder right) {
+            return !left.Equals(right);
+        }
+
+        public bool Equals(UnderlineInputBorder other) {
+            return this.borderSide == other.borderSide;
+        }
+        
+        public override bool Equals(object obj) {
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
+            return this.Equals((UnderlineInputBorder) obj);
         }
 
         public override int GetHashCode() {
@@ -348,14 +366,31 @@ namespace Unity.UIWidgets.material {
             }
         }
 
-        public static bool operator ==(OutlineInputBorder left, OutlineInputBorder other) {
-            return other.borderSide == left.borderSide
-                   && other.borderRadius == left.borderRadius
-                   && other.gapPadding == left.gapPadding;
+        public static bool operator ==(OutlineInputBorder left, OutlineInputBorder right) {
+            return left.Equals(right);
         }
 
-        public static bool operator !=(OutlineInputBorder left, OutlineInputBorder other) {
-            return !(left == other);
+        public static bool operator !=(OutlineInputBorder left, OutlineInputBorder right) {
+            return !left.Equals(right);
+        }
+        
+        public override bool Equals(object obj) {
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
+            return this.Equals((OutlineInputBorder) obj);
+        }
+
+        public bool Equals(OutlineInputBorder other) {
+            return other.borderSide == this.borderSide
+                   && other.borderRadius == this.borderRadius
+                   && other.gapPadding == this.gapPadding;
         }
 
         public override int GetHashCode() {

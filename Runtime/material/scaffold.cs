@@ -655,7 +655,7 @@ namespace Unity.UIWidgets.material {
                 "The context used was:\n" + context);
         }
 
-        static ValueListenable<ScaffoldGeometry> geometryOf(BuildContext context) {
+        public static ValueListenable<ScaffoldGeometry> geometryOf(BuildContext context) {
             _ScaffoldScope scaffoldScope =
                 (_ScaffoldScope) context.inheritFromWidgetOfExactType(typeof(_ScaffoldScope));
             if (scaffoldScope == null) {

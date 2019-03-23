@@ -442,12 +442,29 @@ namespace Unity.UIWidgets.material {
             }
         }
 
-        public static bool operator ==(_OutlineBorder left, _OutlineBorder other) {
-            return left.side == other.side && left.shape == other.shape;
+        public static bool operator ==(_OutlineBorder left, _OutlineBorder right) {
+            return left.Equals(right);
         }
 
-        public static bool operator !=(_OutlineBorder left, _OutlineBorder other) {
-            return left.side != other.side || left.shape != other.shape;
+        public static bool operator !=(_OutlineBorder left, _OutlineBorder right) {
+            return !left.Equals(right);
+        }
+
+        public bool Equals(_OutlineBorder other) {
+            return this.side == other.side && this.shape == other.shape;
+        }
+        
+        public override bool Equals(object obj) {
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
+            return this.Equals((_OutlineBorder) obj);
         }
 
         public override int GetHashCode() {

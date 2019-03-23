@@ -845,6 +845,7 @@ namespace Unity.UIWidgets.rendering {
                     this._debugPaint.strokeWidth = 2.0f;
                     this._debugPaint.style = PaintingStyle.stroke;
                 }
+
                 if (this._debugText == null) {
                     this._debugText = new TextPainter(
                         text: new TextSpan(
@@ -855,6 +856,7 @@ namespace Unity.UIWidgets.rendering {
                         ));
                     this._debugText.layout();
                 }
+
                 return true;
             });
         }
@@ -997,7 +999,7 @@ namespace Unity.UIWidgets.rendering {
 
         public override bool hitTest(HitTestResult result, Offset position = null) {
             D.assert(position != null);
-            
+
             if (this._clipper != null) {
                 this._updateClip();
                 D.assert(this._clip != null);
@@ -1100,7 +1102,7 @@ namespace Unity.UIWidgets.rendering {
 
         Color _color;
 
-        static Paint _transparentPaint {
+        protected static Paint _transparentPaint {
             get { return new Paint {color = new Color(0x00000000)}; }
         }
 
@@ -1187,7 +1189,7 @@ namespace Unity.UIWidgets.rendering {
             return base.hitTest(result, position: position);
         }
 
-        //todo:xingwei.zhu: implementation shadow
+        
         public override void paint(PaintingContext context, Offset offset) {
             if (this.child != null) {
                 this._updateClip();
@@ -1208,17 +1210,16 @@ namespace Unity.UIWidgets.rendering {
                 else {
                     Canvas canvas = context.canvas;
                     if (this.elevation != 0.0) {
-                        //draw Shadow
-                        /*canvas.drawRect(
-                            offsetBounds.inflate(20.0),
-                            _RenderPhysicalModelBase<RRect>._transparentPaint
+                        canvas.drawRect(
+                            offsetBounds.inflate(20.0f),
+                            _transparentPaint
                         );
                         canvas.drawShadow(
                             offsetRRectAsPath,
                             this.shadowColor,
                             this.elevation,
                             this.color.alpha != 0xFF
-                        );*/
+                        );
                     }
 
                     Paint paint = new Paint {color = this.color};
@@ -1276,7 +1277,7 @@ namespace Unity.UIWidgets.rendering {
             return base.hitTest(result, position: position);
         }
 
-        //todo:xingwei.zhu: implementation shadow
+        
         public override void paint(PaintingContext context, Offset offset) {
             if (this.child != null) {
                 this._updateClip();
@@ -1295,18 +1296,19 @@ namespace Unity.UIWidgets.rendering {
                 }
                 else {
                     Canvas canvas = context.canvas;
-//                if (this.elevation != 0.0 && paintShadows) {
-//                    canvas.drawRect(
-//                        offsetBounds.inflate(20.0),
-//                        _RenderPhysicalModelBase<Path>._transparentPaint
-//                    );
-//                    canvas.drawShadow(
-//                        offsetPath,
-//                        this.shadowColor,
-//                        this.elevation,
-//                        this.color.alpha != 0xFF,
-//                    );
-//                }
+                if (this.elevation != 0.0) {
+                    canvas.drawRect(
+                        offsetBounds.inflate(20.0f),
+                        _transparentPaint
+                    );
+                    
+                    canvas.drawShadow(
+                        offsetPath,
+                        this.shadowColor,
+                        this.elevation,
+                        this.color.alpha != 0xFF
+                    );
+                }
                     Paint paint = new Paint {color = this.color, style = PaintingStyle.fill};
                     canvas.drawPath(offsetPath, paint);
                     context.clipPathAndPaint(offsetPath, this.clipBehavior,
@@ -1619,6 +1621,164 @@ namespace Unity.UIWidgets.rendering {
             properties.add(new DiagnosticsProperty<Offset>("origin", this.origin));
             properties.add(new DiagnosticsProperty<Alignment>("alignment", this.alignment));
             properties.add(new DiagnosticsProperty<bool>("transformHitTests", this.transformHitTests));
+        }
+    }
+
+    public class RenderFittedBox : RenderProxyBox {
+        public RenderFittedBox(
+            BoxFit fit = BoxFit.contain,
+            Alignment alignment = null,
+            RenderBox child = null
+        ) : base(child) {
+            this._fit = fit;
+            this._alignment = alignment ?? Alignment.center;
+        }
+
+        Alignment _resolvedAlignment;
+
+        void _resolve() {
+            if (this._resolvedAlignment != null) {
+                return;
+            }
+
+            this._resolvedAlignment = this.alignment;
+        }
+
+        void _markNeedResolution() {
+            this._resolvedAlignment = null;
+            this.markNeedsPaint();
+        }
+
+        public BoxFit fit {
+            get { return this._fit; }
+            set {
+                if (this._fit == value) {
+                    return;
+                }
+
+                this._fit = value;
+                this._clearPaintData();
+                this.markNeedsPaint();
+            }
+        }
+
+        BoxFit _fit;
+
+        public Alignment alignment {
+            get { return this._alignment; }
+            set {
+                D.assert(value != null);
+                if (this._alignment == value) {
+                    return;
+                }
+
+                this._alignment = value;
+                this._clearPaintData();
+                this._markNeedResolution();
+            }
+        }
+
+        Alignment _alignment;
+
+        protected override void performLayout() {
+            if (this.child != null) {
+                this.child.layout(new BoxConstraints(), parentUsesSize: true);
+                this.size = this.constraints.constrainSizeAndAttemptToPreserveAspectRatio(this.child.size);
+                this._clearPaintData();
+            }
+            else {
+                this.size = this.constraints.smallest;
+            }
+        }
+
+        bool? _hasVisualOverflow;
+        Matrix3 _transform;
+
+        void _clearPaintData() {
+            this._hasVisualOverflow = null;
+            this._transform = null;
+        }
+
+        void _updatePaintData() {
+            if (this._transform != null) {
+                return;
+            }
+
+            if (this.child == null) {
+                this._hasVisualOverflow = false;
+                this._transform = Matrix3.I();
+            }
+            else {
+                this._resolve();
+                Size childSize = this.child.size;
+                FittedSizes sizes = FittedSizes.applyBoxFit(this._fit, childSize, this.size);
+                float scaleX = sizes.destination.width / sizes.source.width;
+                float scaleY = sizes.destination.height / sizes.source.height;
+                Rect sourceRect = this._resolvedAlignment.inscribe(sizes.source, Offset.zero & childSize);
+                Rect destinationRect = this._resolvedAlignment.inscribe(sizes.destination, Offset.zero & this.size);
+                this._hasVisualOverflow = sourceRect.width < childSize.width || sourceRect.height < childSize.height;
+                this._transform = Matrix3.makeTrans(destinationRect.left, destinationRect.top);
+                this._transform.postScale(scaleX, scaleY);
+                this._transform.postTranslate(-sourceRect.left, -sourceRect.top);
+            }
+        }
+
+        void _paintChildWithTransform(PaintingContext context, Offset offset) {
+            Offset childOffset = this._transform.getAsTranslation();
+            if (childOffset == null) {
+                context.pushTransform(this.needsCompositing, offset, this._transform, base.paint);
+            }
+            else {
+                base.paint(context, offset + childOffset);
+            }
+        }
+
+        public override void paint(PaintingContext context, Offset offset) {
+            if (this.size.isEmpty) {
+                return;
+            }
+
+            this._updatePaintData();
+            if (this.child != null) {
+                if (this._hasVisualOverflow == true) {
+                    context.pushClipRect(this.needsCompositing, offset, Offset.zero & this.size,
+                        this._paintChildWithTransform);
+                }
+                else {
+                    this._paintChildWithTransform(context, offset);
+                }
+            }
+        }
+
+        protected override bool hitTestChildren(HitTestResult result, Offset position = null) {
+            if (this.size.isEmpty) {
+                return false;
+            }
+
+            this._updatePaintData();
+            Matrix3 inverse = Matrix3.I();
+            if (!this._transform.invert(inverse)) {
+                return false;
+            }
+
+            position = inverse.mapPoint(position);
+            return base.hitTestChildren(result, position: position);
+        }
+
+        public override void applyPaintTransform(RenderObject child, Matrix3 transform) {
+            if (this.size.isEmpty) {
+                transform.setAll(0, 0, 0, 0, 0, 0, 0, 0, 0);
+            }
+            else {
+                this._updatePaintData();
+                transform.postConcat(this._transform);
+            }
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new EnumProperty<BoxFit>("fit", this.fit));
+            properties.add(new DiagnosticsProperty<Alignment>("alignment", this.alignment));
         }
     }
 

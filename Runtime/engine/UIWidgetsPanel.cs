@@ -21,8 +21,8 @@ namespace Unity.UIWidgets.engine {
             this._padding = new WindowPadding(
                 Screen.safeArea.x,
                 Screen.safeArea.y,
-                Screen.width - Screen.safeArea.width,
-                Screen.height - Screen.safeArea.height);
+                Screen.width - Screen.safeArea.width - Screen.safeArea.x,
+                Screen.height - Screen.safeArea.height - Screen.safeArea.y);
         }
 
         protected override bool hasFocus() {
@@ -70,7 +70,7 @@ namespace Unity.UIWidgets.engine {
 
         protected override Vector2 queryWindowSize() {
             var rect = this._uiWidgetsPanel.rectTransform.rect;
-            var size = new Vector2(rect.width,rect.height) * 
+            var size = new Vector2(rect.width, rect.height) *
                        this._uiWidgetsPanel.canvas.scaleFactor / this._uiWidgetsPanel.devicePixelRatio;
             size.x = Mathf.Round(size.x);
             size.y = Mathf.Round(size.y);
@@ -83,6 +83,7 @@ namespace Unity.UIWidgets.engine {
             if (canvas.renderMode != RenderMode.ScreenSpaceCamera) {
                 camera = canvas.GetComponent<GraphicRaycaster>().eventCamera;
             }
+
             var pos = new Vector2(windowPos.dx, windowPos.dy);
             pos = pos * this.queryDevicePixelRatio() / this._uiWidgetsPanel.canvas.scaleFactor;
             var rectTransform = this._uiWidgetsPanel.rectTransform;
@@ -118,12 +119,12 @@ namespace Unity.UIWidgets.engine {
 
         protected override void OnEnable() {
             base.OnEnable();
-           //Disable the default touch -> mouse event conversion on mobile devices
+            //Disable the default touch -> mouse event conversion on mobile devices
             Input.simulateMouseWithTouches = false;
 
             this._displayMetrics = DisplayMetricsProvider.provider();
             this._displayMetrics.OnEnable();
-            
+
             if (_repaintEvent == null) {
                 _repaintEvent = new Event {type = EventType.Repaint};
             }
@@ -137,7 +138,8 @@ namespace Unity.UIWidgets.engine {
             using (this._windowAdapter.getScope()) {
                 root = this.createWidget();
             }
-            this._windowAdapter.attachRootWidget(root);   
+
+            this._windowAdapter.attachRootWidget(root);
             this._lastMouseMove = Input.mousePosition;
 
             this._enteredPointers = new HashSet<int>();
@@ -171,7 +173,7 @@ namespace Unity.UIWidgets.engine {
             PerformanceUtils.instance.updateDeltaTime(Time.unscaledDeltaTime);
             this._displayMetrics.Update();
             UIWidgetsMessageManager.ensureUIWidgetsMessageManagerIfNeeded();
-            
+
             if (this._mouseEntered) {
                 if (this._lastMouseMove.x != Input.mousePosition.x || this._lastMouseMove.y != Input.mousePosition.y) {
                     this.handleMouseMovement();
@@ -187,7 +189,6 @@ namespace Unity.UIWidgets.engine {
             D.assert(this._windowAdapter != null);
             this._windowAdapter.Update();
             this._windowAdapter.OnGUI(_repaintEvent);
-           
         }
 
         void OnGUI() {
