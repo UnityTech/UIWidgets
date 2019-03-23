@@ -36,9 +36,6 @@ namespace Unity.UIWidgets.rendering {
             return $"Point: {this.point}, Direction: {this.direction}";
         }
     }
-/*
-    this._doubleTapGesture = new DoubleTapGestureRecognizer(this.rendererBindings.rendererBinding);
-    this._doubleTapGesture.onDoubleTap = () => { Debug.Log("onDoubleTap"); };*/
 
     public class RenderEditable : RenderBox {
         public static readonly char obscuringCharacter = '•';
@@ -48,7 +45,6 @@ namespace Unity.UIWidgets.rendering {
 
         TextPainter _textPainter;
         Color _cursorColor;
-        bool _hasFocus;
         int? _maxLines;
         Color _selectionColor;
         ViewportOffset _offset;
@@ -73,7 +69,9 @@ namespace Unity.UIWidgets.rendering {
             TextAlign textAlign = TextAlign.left, float textScaleFactor = 1.0f, Color cursorColor = null,
             bool? hasFocus = null, int? maxLines = 1, Color selectionColor = null,
             TextSelection selection = null, bool obscureText = false, SelectionChangedHandler onSelectionChanged = null,
-            CaretChangedHandler onCaretChanged = null, bool ignorePointer = false) {
+            CaretChangedHandler onCaretChanged = null, bool ignorePointer = false,
+            TextSelectionDelegate textSelectionDelegate = null) {
+            D.assert(textSelectionDelegate != null);
             this._textPainter = new TextPainter(text: text, textAlign: textAlign, textDirection: textDirection,
                 textScaleFactor: textScaleFactor);
             this._cursorColor = cursorColor;
@@ -87,6 +85,7 @@ namespace Unity.UIWidgets.rendering {
             this.ignorePointer = ignorePointer;
             this.onCaretChanged = onCaretChanged;
             this.onSelectionChanged = onSelectionChanged;
+            this.textSelectionDelegate = textSelectionDelegate;
 
             D.assert(this._maxLines == null || this._maxLines > 0);
             D.assert(this._showCursor != null);
@@ -113,6 +112,245 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
+        public TextSelectionDelegate textSelectionDelegate;
+
+        int _extentOffset = -1;
+
+        int _baseOffset = -1;
+
+        int _previousCursorLocation;
+
+        bool _resetCursor = false;
+        
+        void _handleKeyEvent(RawKeyEvent keyEvent) {
+            if (keyEvent is RawKeyUpEvent) {
+                return;
+            }
+
+            if (this.selection.isCollapsed) {
+                this._extentOffset = this.selection.extentOffset;
+                this._baseOffset = this.selection.baseOffset;
+            }
+            
+            KeyCode pressedKeyCode = keyEvent.data.unityEvent.keyCode;
+            int modifiers = (int) keyEvent.data.unityEvent.modifiers;
+            bool shift = (modifiers & (int)EventModifiers.Shift) > 0;
+            bool ctrl = (modifiers & (int)EventModifiers.Control) > 0;
+            bool alt = (modifiers & (int)EventModifiers.Alt) > 0;
+            bool cmd = (modifiers & (int)EventModifiers.Command) > 0;
+            
+            bool rightArrow = pressedKeyCode == KeyCode.RightArrow;
+            bool leftArrow = pressedKeyCode == KeyCode.LeftArrow;
+            bool upArrow = pressedKeyCode == KeyCode.UpArrow;
+            bool downArrow = pressedKeyCode == KeyCode.DownArrow;
+            bool arrow = leftArrow || rightArrow || upArrow || downArrow;
+            bool aKey = pressedKeyCode == KeyCode.A;
+            bool xKey = pressedKeyCode == KeyCode.X;
+            bool vKey = pressedKeyCode == KeyCode.V;
+            bool cKey = pressedKeyCode == KeyCode.C;
+            bool del = pressedKeyCode == KeyCode.Delete;
+            bool backDel = pressedKeyCode == KeyCode.Backspace;
+            bool isMac = SystemInfo.operatingSystemFamily == OperatingSystemFamily.MacOSX;
+            
+            if (arrow) {
+                int newOffset = this._extentOffset;
+                var word = (isMac && alt) || ctrl;
+                if (word) {
+                    newOffset = this._handleControl(rightArrow, leftArrow, word, newOffset);
+                }
+                newOffset = this._handleHorizontalArrows(rightArrow, leftArrow, shift, newOffset);
+                if (downArrow || upArrow)
+                    newOffset = this._handleVerticalArrows(upArrow, downArrow, shift, newOffset);
+                newOffset = this._handleShift(rightArrow, leftArrow, shift, newOffset);
+
+                this._extentOffset = newOffset;
+            } else if ((ctrl || (isMac && cmd)) && (xKey || vKey || cKey || aKey)) {
+                this._handleShortcuts(pressedKeyCode);
+            }
+
+            if (del || backDel) {
+                this._handleDelete(backDel);
+            }
+        }
+
+        int _handleControl(bool rightArrow, bool leftArrow, bool ctrl, int newOffset) {
+            // If control is pressed, we will decide which way to look for a word
+            // based on which arrow is pressed.
+            if (leftArrow && this._extentOffset > 2) {
+                TextSelection textSelection = this._selectWordAtOffset(new TextPosition(offset: this._extentOffset - 2));
+                newOffset = textSelection.baseOffset + 1;
+            } else if (rightArrow && this._extentOffset < this.text.text.Length - 2) {
+                TextSelection textSelection = this._selectWordAtOffset(new TextPosition(offset: this._extentOffset + 1));
+                newOffset = textSelection.extentOffset - 1;
+            }
+            return newOffset;
+        }
+        
+        int _handleHorizontalArrows(bool rightArrow, bool leftArrow, bool shift, int newOffset) {
+            if (rightArrow && this._extentOffset < this.text.text.Length) {
+                newOffset += 1;
+                if (shift) {
+                    this._previousCursorLocation += 1;
+                }
+            }
+            if (leftArrow && this._extentOffset > 0) {
+                newOffset -= 1;
+                if (shift) {
+                    this._previousCursorLocation -= 1;
+                }
+            }
+            return newOffset;
+        }
+        
+        int _handleVerticalArrows(bool upArrow, bool downArrow, bool shift, int newOffset) {
+            float plh = this._textPainter.preferredLineHeight;
+            float verticalOffset = upArrow ? -0.5f * plh : 1.5f * plh;
+
+            Offset caretOffset = this._textPainter.getOffsetForCaret(new TextPosition(offset: this._extentOffset), this._caretPrototype);
+            Offset caretOffsetTranslated = caretOffset.translate(0.0f, verticalOffset);
+            TextPosition position = this._textPainter.getPositionForOffset(caretOffsetTranslated);
+
+            if (position.offset == this._extentOffset) {
+                if (downArrow)
+                    newOffset = this.text.text.Length;
+                else if (upArrow)
+                    newOffset = 0;
+                this._resetCursor = shift;
+            } else if (this._resetCursor && shift) {
+                newOffset = this._previousCursorLocation;
+                this._resetCursor = false;
+            } else {
+                newOffset = position.offset;
+                this._previousCursorLocation = newOffset;
+            }
+            return newOffset;
+        }
+        
+        int _handleShift(bool rightArrow, bool leftArrow, bool shift, int newOffset) {
+            if (this.onSelectionChanged == null)
+                return newOffset;
+            
+            if (shift) {
+                if (this._baseOffset < newOffset) {
+                    this.onSelectionChanged(
+                        new TextSelection(
+                            baseOffset: this._baseOffset,
+                            extentOffset: newOffset
+                        ),
+                        this,
+                        SelectionChangedCause.keyboard
+                    );
+                } else {
+                    this.onSelectionChanged(
+                        new TextSelection(
+                            baseOffset: newOffset,
+                            extentOffset: this._baseOffset
+                        ),
+                        this,
+                        SelectionChangedCause.keyboard
+                    );
+                }
+            } else {
+                if (!this.selection.isCollapsed) {
+                    if (leftArrow)
+                        newOffset = this._baseOffset < this._extentOffset ? this._baseOffset : this._extentOffset;
+                    else if (rightArrow)
+                        newOffset = this._baseOffset > this._extentOffset ? this._baseOffset : this._extentOffset;
+                }
+
+                this.onSelectionChanged(
+                    TextSelection.fromPosition(
+                        new TextPosition(
+                            offset: newOffset
+                        )
+                    ),
+                    this,
+                    SelectionChangedCause.keyboard
+                );
+            }
+            return newOffset;
+        }
+
+        void _handleShortcuts(KeyCode pressedKeyCode) {
+            switch (pressedKeyCode) {
+                case KeyCode.C:
+                    if (!this.selection.isCollapsed) {
+                        Clipboard.setData(
+                            new ClipboardData(text: this.selection.textInside(this.text.text)));
+                    }
+                    break;
+                case KeyCode.X:
+                    if (!this.selection.isCollapsed) {
+                        Clipboard.setData(
+                            new ClipboardData(text: this.selection.textInside(this.text.text)));
+                        this.textSelectionDelegate.textEditingValue = new TextEditingValue(
+                            text: this.selection.textBefore(this.text.text)
+                                  + this.selection.textAfter(this.text.text),
+                            selection: TextSelection.collapsed(offset: this.selection.start)
+                        );
+                    }
+                    break;
+                case KeyCode.V:
+                    TextEditingValue value = this.textSelectionDelegate.textEditingValue;
+                    Clipboard.getData(Clipboard.kTextPlain).Then(data => {
+                        if (data != null) {
+                            this.textSelectionDelegate.textEditingValue = new TextEditingValue(
+                                text: value.selection.textBefore(value.text)
+                                      + data.text
+                                      + value.selection.textAfter(value.text),
+                                selection: TextSelection.collapsed(
+                                    offset: value.selection.start + data.text.Length
+                                )
+                            );
+                        }
+                    });
+                    
+                    break;
+                case KeyCode.A:
+                    this._baseOffset = 0;
+                    this._extentOffset = this.textSelectionDelegate.textEditingValue.text.Length;
+                    this.onSelectionChanged(
+                        new TextSelection(
+                            baseOffset: 0,
+                            extentOffset: this.textSelectionDelegate.textEditingValue.text.Length
+                        ),
+                        this,
+                        SelectionChangedCause.keyboard
+                    );
+                    break;
+                default:
+                    D.assert(false);
+                    break;
+            }
+        }
+
+        void _handleDelete(bool backDel) {
+            var selection = this.selection;
+            if (backDel && selection.isCollapsed) {
+                if (selection.start <= 0) {
+                    return;
+                }
+                selection = TextSelection.collapsed(selection.start - 1, selection.affinity);
+            }
+            if (selection.textAfter(this.text.text).isNotEmpty()) {
+                this.textSelectionDelegate.textEditingValue = new TextEditingValue(
+                    text: selection.textBefore(this.text.text)
+                          + selection.textAfter(this.text.text).Substring(1),
+                    selection: TextSelection.collapsed(offset: selection.start)
+                );
+            } else {
+                this.textSelectionDelegate.textEditingValue = new TextEditingValue(
+                    text: selection.textBefore(this.text.text),
+                    selection: TextSelection.collapsed(offset: selection.start)
+                );
+            }
+        }
+
+        protected void markNeedsTextLayout() {
+            this._textLayoutLastWidth = null;
+            this.markNeedsLayout();
+        }
+        
         public TextSpan text {
             get { return this._textPainter.text; }
             set {
@@ -163,7 +401,7 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
-        public ValueNotifier<bool> ShowCursor {
+        public ValueNotifier<bool> showCursor {
             get { return this._showCursor; }
             set {
                 D.assert(value != null);
@@ -184,6 +422,8 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
+        bool _hasFocus;
+        bool _listenerAttached = false;
         public bool hasFocus {
             get { return this._hasFocus; }
             set {
@@ -192,6 +432,17 @@ namespace Unity.UIWidgets.rendering {
                 }
 
                 this._hasFocus = value;
+                if (this._hasFocus) {
+                    D.assert(!this._listenerAttached);
+                    RawKeyboard.instance.addListener(this._handleKeyEvent);
+                    this._listenerAttached = true;
+                }
+                else {
+                    D.assert(this._listenerAttached);
+                    RawKeyboard.instance.removeListener(this._handleKeyEvent);
+                    this._listenerAttached = false;
+                }
+                
                 this.markNeedsSemanticsUpdate();
             }
         }
@@ -267,25 +518,40 @@ namespace Unity.UIWidgets.rendering {
                 this.markNeedsLayout();
             }
         }
+        
+        float _cursorWidth = 1.0f;
 
-        public ValueNotifier<bool> showCursor {
-            get { return this._showCursor; }
-            set {
-                D.assert(value != null);
-                if (this._showCursor == value) {
+        public float cursorWidth {
+            get { return this._cursorWidth; }
+            set { 
+                if (this._cursorWidth == value)
                     return;
-                }
-
-                if (this.attached) {
-                    this._showCursor.removeListener(this.markNeedsPaint);
-                }
-
-                this._showCursor = value;
-                if (this.attached) {
-                    this._showCursor.addListener(this.markNeedsPaint);
-                }
-
-                this.markNeedsPaint();
+                this._cursorWidth = value;
+                this.markNeedsLayout();
+            }
+        }
+        
+        Radius _cursorRadius;
+        public Radius cursorRadius {
+            get { return this._cursorRadius; }
+            set { 
+                if (this._cursorRadius == value)
+                    return;
+                this._cursorRadius = value;
+                this.markNeedsLayout();
+                
+            }
+        }
+        
+        bool _enableInteractiveSelection;
+        public bool enableInteractiveSelection {
+            get { return this._enableInteractiveSelection; }
+            set { 
+                if (this._enableInteractiveSelection == value)
+                    return;
+                this._enableInteractiveSelection = value;
+                this.markNeedsTextLayout();
+                this.markNeedsSemanticsUpdate();
             }
         }
 
@@ -303,6 +569,9 @@ namespace Unity.UIWidgets.rendering {
         public override void detach() {
             this._offset.removeListener(this.markNeedsLayout);
             this._showCursor.removeListener(this.markNeedsPaint);
+            if (this._listenerAttached) {
+                RawKeyboard.instance.removeListener(this._handleKeyEvent);
+            }
             base.detach();
         }
 
@@ -497,31 +766,58 @@ namespace Unity.UIWidgets.rendering {
                 this._longPress.addPointer((PointerDownEvent) evt);
             }
         }
-
-        public void handleTapDown(TapDownDetails details) {
-            this._lastTapDownPosition = details.globalPosition - this._paintOffset;
+        
+        void handleTapDown(TapDownDetails details) {
+            this._lastTapDownPosition = details.globalPosition + - this._paintOffset;
             if (!Application.isMobilePlatform) {
-                this._selectForTap(this._lastTapDownPosition);
+                this.selectPosition(SelectionChangedCause.tap);
             }
         }
-
+        
+        void _handleTapDown(TapDownDetails details) {
+            D.assert(!this.ignorePointer);
+            this.handleTapDown(details);
+        }
+        
         public void handleTap() {
-            this._layoutText(this.constraints.maxWidth);
-            D.assert(this._lastTapDownPosition != null);
-            if (Application.isMobilePlatform) {
-                this._selectForTap(this._lastTapDownPosition);
-            }
+            this.selectPosition(cause: SelectionChangedCause.tap);
         }
 
+        void _handleTap() {
+            D.assert(!this.ignorePointer);
+            this.handleTap();
+        }
+
+        void _handleDoubleTap(DoubleTapDetails details) {
+            D.assert(!this.ignorePointer);
+            this.handleDoubleTap(details);
+        }
+        
         public void handleDoubleTap(DoubleTapDetails details) {
+            // need set _lastTapDownPosition, otherwise it would be last single tap position
             this._lastTapDownPosition = details.firstGlobalPosition - this._paintOffset;
             this.selectWord(cause: SelectionChangedCause.doubleTap);
+        }
+
+        void _handleLongPress() {
+            D.assert(!this.ignorePointer);
+            this.handleLongPress();
         }
 
         public void handleLongPress() {
             this.selectWord(cause: SelectionChangedCause.longPress);
         }
-
+        
+        void selectPosition(SelectionChangedCause? cause = null) {
+            D.assert(cause != null);
+            this._layoutText(this.constraints.maxWidth);
+            D.assert(this._lastTapDownPosition != null);
+            if (this.onSelectionChanged != null) {
+                TextPosition position = this._textPainter.getPositionForOffset(this.globalToLocal(this._lastTapDownPosition));
+                this.onSelectionChanged(TextSelection.fromPosition(position), this, cause.Value);
+            }
+        }
+        
         void selectWord(SelectionChangedCause? cause = null) {
             this._layoutText(this.constraints.maxWidth);
             D.assert(this._lastTapDownPosition != null);
@@ -532,6 +828,51 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
+        void selectWordEdge(SelectionChangedCause cause) {
+            this._layoutText(this.constraints.maxWidth);
+            D.assert(this._lastTapDownPosition != null);
+            if (this.onSelectionChanged != null) {
+                TextPosition position = this._textPainter.getPositionForOffset(this.globalToLocal(this._lastTapDownPosition));
+                TextRange word = this._textPainter.getWordBoundary(position);
+                if (position.offset - word.start <= 1) {
+                    this.onSelectionChanged(
+                        TextSelection.collapsed(offset: word.start, affinity: TextAffinity.downstream),
+                        this,
+                        cause
+                    );
+                } else {
+                    this.onSelectionChanged(
+                        TextSelection.collapsed(offset: word.end, affinity: TextAffinity.upstream),
+                        this,
+                        cause
+                    );
+                }
+            }
+        }
+        
+        TextSelection _selectWordAtOffset(TextPosition position) {
+            D.assert(this._textLayoutLastWidth == this.constraints.maxWidth);
+            var word = this._textPainter.getWordBoundary(position);
+            if (position.offset >= word.end) {
+                return TextSelection.fromPosition(position);
+            }
+
+            return new TextSelection(baseOffset: word.start, extentOffset: word.end);
+        }
+        
+        void _layoutText(float constraintWidth) {
+            if (this._textLayoutLastWidth == constraintWidth) {
+                return;
+            }
+
+            var caretMargin = _kCaretGap + _kCaretWidth;
+            var avialableWidth = Mathf.Max(0.0f, constraintWidth - caretMargin);
+            var maxWidth = this._isMultiline ? avialableWidth : float.PositiveInfinity;
+            this._textPainter.layout(minWidth: avialableWidth, maxWidth: maxWidth);
+            this._textLayoutLastWidth = constraintWidth;
+        }
+
+        
         protected override void performLayout() {
             this._layoutText(this.constraints.maxWidth);
             this._caretPrototype = Rect.fromLTWH(0.0f, _kCaretHeightOffset, _kCaretWidth,
@@ -563,24 +904,25 @@ namespace Unity.UIWidgets.rendering {
             return true;
         }
 
-        protected void markNeedsTextLayout() {
-            this._textLayoutLastWidth = null;
-            this.markNeedsLayout();
-        }
-
         // describeSemanticsConfiguration todo
-
 
         void _paintCaret(Canvas canvas, Offset effectiveOffset) {
             D.assert(this._textLayoutLastWidth == this.constraints.maxWidth);
             var caretOffset = this._textPainter.getOffsetForCaret(this._selection.extendPos, this._caretPrototype);
             var paint = new Paint() {color = this._cursorColor};
-            var caretRec = this._caretPrototype.shift(caretOffset + effectiveOffset);
-            canvas.drawRect(caretRec, paint);
-            if (!caretRec.Equals(this._lastCaretRect)) {
-                this._lastCaretRect = caretRec;
+            var caretRect = this._caretPrototype.shift(caretOffset + effectiveOffset);
+
+            if (this.cursorRadius == null) {
+                canvas.drawRect(caretRect, paint);
+            }
+            else {
+                RRect caretRRect = RRect.fromRectAndRadius(caretRect, this.cursorRadius);
+                canvas.drawRRect(caretRRect, paint);
+            }
+            if (!caretRect.Equals(this._lastCaretRect)) {
+                this._lastCaretRect = caretRect;
                 if (this.onCaretChanged != null) {
-                    this.onCaretChanged(caretRec);
+                    this.onCaretChanged(caretRect);
                 }
             }
         }
@@ -613,30 +955,6 @@ namespace Unity.UIWidgets.rendering {
             this._textPainter.paint(context.canvas, effectiveOffset);
         }
 
-        void _handleSetSelection(TextSelection selection) {
-            this.onSelectionChanged(selection, this, SelectionChangedCause.keyboard);
-        }
-
-        void _handleTapDown(TapDownDetails details) {
-            D.assert(!this.ignorePointer);
-            this.handleTapDown(details);
-        }
-
-        void _handleTap() {
-            D.assert(!this.ignorePointer);
-            this.handleTap();
-        }
-
-        void _handleDoubleTap(DoubleTapDetails details) {
-            D.assert(!this.ignorePointer);
-            this.handleDoubleTap(details);
-        }
-
-        void _handleLongPress() {
-            D.assert(!this.ignorePointer);
-            this.handleLongPress();
-        }
-
         void markNeedsSemanticsUpdate() {
             // todo
         }
@@ -662,35 +980,6 @@ namespace Unity.UIWidgets.rendering {
             return Mathf.Max(this.preferredLineHeight, this._textPainter.height);
         }
 
-        void _layoutText(float constraintWidth) {
-            if (this._textLayoutLastWidth == constraintWidth) {
-                return;
-            }
-
-            var caretMargin = _kCaretGap + _kCaretWidth;
-            var avialableWidth = Mathf.Max(0.0f, constraintWidth - caretMargin);
-            var maxWidth = this._isMultiline ? avialableWidth : float.PositiveInfinity;
-            this._textPainter.layout(minWidth: avialableWidth, maxWidth: maxWidth);
-            this._textLayoutLastWidth = constraintWidth;
-        }
-
-        TextSelection _selectWordAtOffset(TextPosition position) {
-            D.assert(this._textLayoutLastWidth == this.constraints.maxWidth);
-            var word = this._textPainter.getWordBoundary(position);
-            if (position.offset >= word.end) {
-                return TextSelection.fromPosition(position);
-            }
-
-            return new TextSelection(baseOffset: word.start, extentOffset: word.end);
-        }
-
-        void _selectForTap(Offset pointerPosition) {
-            if (this.onSelectionChanged != null) {
-                var position = this._textPainter.getPositionForOffset(this.globalToLocal(pointerPosition));
-                this.onSelectionChanged(TextSelection.fromPosition(position), this, SelectionChangedCause.tap);
-            }
-        }
-        
         bool _isMultiline {
             get { return this._maxLines != 1; }
         }
@@ -738,7 +1027,10 @@ namespace Unity.UIWidgets.rendering {
             return 0.0f;
         }
 
-
+        public override Rect describeApproximatePaintClip(RenderObject child) {
+            return this._hasVisualOverflow ? Offset.zero & size : null;
+        }
+        
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             properties.add(new DiagnosticsProperty<Color>("cursorColor", this.cursorColor));

@@ -189,6 +189,13 @@ The develop team is still working on the UIWidgets Wiki. However, since UIWidget
  you can refer to Flutter Wiki to access detailed descriptions of UIWidgets APIs 
  from those of their Flutter counterparts.
  
+
+#### NOTES
+##### Using Material Icons
+To use material Icons, you need to add font MaterialIcons-Regular.ttf into your project and add it into 
+```FontManager``` as the sample code shows. The file name must be MaterialIcons-Regular.ttf, otherwise the icons 
+could not shown 
+
 #### FAQ
 
 | Question     | Answer  |

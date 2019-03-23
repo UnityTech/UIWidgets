@@ -337,7 +337,7 @@ namespace Unity.UIWidgets.painting {
                     var builder = new ParagraphBuilder(this._createParagraphStyle(TextDirection.ltr)
                     ); // direction doesn't matter, text is just a space
                     if (this.text != null && this.text.style != null) {
-                        builder.pushStyle(this.text.style);
+                        builder.pushStyle(this.text.style, this.textScaleFactor);
                     }
 
                     builder.addText(" ");

@@ -16,16 +16,18 @@ namespace Unity.UIWidgets.painting {
         public readonly List<TextSpan> children;
         public readonly GestureRecognizer recognizer;
 
-        public TextSpan(string text = "", TextStyle style = null, List<TextSpan> children = null) {
+        public TextSpan(string text = "", TextStyle style = null, List<TextSpan> children = null, 
+            GestureRecognizer recognizer = null) {
             this.text = text;
             this.style = style;
             this.children = children;
+            this.recognizer = recognizer;
         }
 
         public void build(ParagraphBuilder builder, float textScaleFactor = 1.0f) {
-            var hasTyle = this.style != null;
-            if (hasTyle) {
-                builder.pushStyle(this.style);
+            var hasStyle = this.style != null;
+            if (hasStyle) {
+                builder.pushStyle(this.style, textScaleFactor);
             }
 
             if (!string.IsNullOrEmpty(this.text)) {
@@ -39,7 +41,7 @@ namespace Unity.UIWidgets.painting {
                 }
             }
 
-            if (hasTyle) {
+            if (hasStyle) {
                 builder.pop();
             }
         }
@@ -62,7 +64,8 @@ namespace Unity.UIWidgets.painting {
             return true;
         }
 
-        TextSpan getSpanForPosition(TextPosition position) {
+        public TextSpan getSpanForPosition(TextPosition position) {
+            D.assert(this.debugAssertIsValid());
             var offset = 0;
             var targetOffset = position.offset;
             var affinity = position.affinity;
@@ -81,7 +84,7 @@ namespace Unity.UIWidgets.painting {
             });
             return result;
         }
-
+        
         public string toPlainText() {
             var sb = new StringBuilder();
             this.visitTextSpan((span) => {
@@ -110,6 +113,27 @@ namespace Unity.UIWidgets.painting {
             return result;
         }
 
+        bool debugAssertIsValid() {
+            D.assert(() => {
+                if (!this.visitTextSpan(span => {
+                    if (span.children != null) {
+                        foreach (TextSpan child in span.children) {
+                            if (child == null)
+                                return false;
+                        }
+                    }
+                    return true;
+                })) {
+                    throw new UIWidgetsError(
+                        "A TextSpan object with a non-null child list should not have any nulls in its child list.\n" +
+                                "The full text in question was:\n" +
+                                this.toStringDeep(prefixLineOne:"  "));
+                }
+                return true;
+            });
+            return true;
+        }
+        
         public RenderComparison compareTo(TextSpan other) {
             if (this.Equals(other)) {
                 return RenderComparison.identical;
@@ -173,6 +197,7 @@ namespace Unity.UIWidgets.painting {
             unchecked {
                 var hashCode = (this.style != null ? this.style.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (this.text != null ? this.text.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (this.recognizer != null ? this.recognizer.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (this.childHash());
                 return hashCode;
             }
@@ -188,7 +213,7 @@ namespace Unity.UIWidgets.painting {
             }
 
             return Equals(this.style, other.style) && string.Equals(this.text, other.text) &&
-                   childEquals(this.children, other.children);
+                   childEquals(this.children, other.children) && this.recognizer == other.recognizer;
         }
 
         public static bool operator ==(TextSpan left, TextSpan right) {
