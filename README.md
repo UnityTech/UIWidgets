@@ -28,6 +28,23 @@ A UIWidgets App can be debug in the Unity Editor directly with many advanced too
 CPU/GPU Profiling, FPS Profiling.
 
 
+### Example
+
+<div style="text-align: center"><table><tr>
+<td style="text-align: center">
+  <img src="https://connect-prd-cdn.unity.com/20190323/p/images/2a27606f-a2cc-4c9f-9e34-bb39ae64d06c_uiwidgets1.gif" width="200"/>
+</td>
+<td style="text-align: center">
+  <img src="https://connect-prd-cdn.unity.com/20190323/p/images/097a7c53-19b3-4e0a-ad27-8ec02506905d_uiwidgets2.gif" width="200" />
+</td>
+<td style="text-align: center">
+  <img src="https://connect-prd-cdn.unity.com/20190323/p/images/1f03c1d0-758c-4dde-b3a9-2f5f7216b7d9_uiwidgets3.gif" width="200"/>
+</td>
+<td style="text-align: center">
+  <img src="https://connect-prd-cdn.unity.com/20190323/p/images/a8884fbd-9e7c-4bd7-af46-0947e01d01fd_uiwidgets4.gif" width="200"/>
+</td>
+</tr></table></div>
+
 ## Requirement
 
 #### Unity
