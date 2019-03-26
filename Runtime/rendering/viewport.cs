@@ -671,13 +671,7 @@ namespace Unity.UIWidgets.rendering {
 
             D.assert(targetOffset != null);
 
-            if (duration == TimeSpan.Zero) {
-                offset.jumpTo(targetOffset.offset);
-            }
-            else {
-                offset.animateTo(targetOffset.offset, duration: duration.Value, curve: curve);
-            }
-
+            offset.moveTo(targetOffset.offset, duration: duration.Value, curve: curve);
             return targetOffset.rect;
         }
     }
