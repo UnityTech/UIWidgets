@@ -261,8 +261,9 @@ namespace Unity.UIWidgets.widgets {
         public readonly ValueNotifier<bool> isScrollingNotifier = new ValueNotifier<bool>(false);
 
         public override IPromise moveTo(float to, TimeSpan? duration, Curve curve = null, bool clamp = true) {
-            if (clamp)
+            if (clamp) {
                 to = to.clamp(this.minScrollExtent, this.maxScrollExtent);
+            }
 
             return base.moveTo(to, duration: duration, curve: curve, clamp: clamp);
         }
