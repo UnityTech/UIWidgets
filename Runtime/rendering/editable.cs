@@ -1028,7 +1028,7 @@ namespace Unity.UIWidgets.rendering {
         }
 
         public override Rect describeApproximatePaintClip(RenderObject child) {
-            return this._hasVisualOverflow ? Offset.zero & size : null;
+            return this._hasVisualOverflow ? Offset.zero & this.size : null;
         }
         
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
