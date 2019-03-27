@@ -30,7 +30,8 @@ namespace UIWidgetsSample {
                 home: this.testCases[this.testCaseId]);
         }
 
-        void Awake() {
+        protected override void Awake() {
+            base.Awake();
             FontManager.instance.addFont(Resources.Load<Font>(path: "MaterialIcons-Regular"), "Material Icons");
         }
     }

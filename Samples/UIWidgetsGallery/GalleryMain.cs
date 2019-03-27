@@ -11,7 +11,8 @@ namespace UIWidgetsGallery {
             return new GalleryApp();
         }
 
-        void Awake() {
+        protected override void Awake() {
+            base.Awake();
             FontManager.instance.addFont(Resources.Load<Font>("MaterialIcons-Regular"), "Material Icons");
             FontManager.instance.addFont(Resources.Load<Font>("GalleryIcons"), "GalleryIcons");
         }
