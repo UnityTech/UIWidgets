@@ -137,7 +137,6 @@ namespace Unity.UIWidgets.ui {
                     this._charWidths, start, this._tabStops);
             }
 
-            var font = FontManager.instance.getOrCreate(style.fontFamily).font;
             int current = this._wordBreaker.current();
             int afterWord = start;
             int lastBreak = start;

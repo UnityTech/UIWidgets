@@ -354,6 +354,7 @@ namespace Unity.UIWidgets.editor {
                 }
             }
 
+            RawKeyboard.instance._handleKeyEvent(Event.current);
             TextInput.OnGUI();
         }
 

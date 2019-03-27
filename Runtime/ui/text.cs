@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using Unity.UIWidgets.foundation;
 
 namespace Unity.UIWidgets.ui {
     public enum FontStyle {
@@ -91,15 +93,16 @@ namespace Unity.UIWidgets.ui {
 
         internal UnityEngine.FontStyle UnityFontStyle {
             get {
+                bool isBold = this.fontWeight == FontWeight.bold;
                 if (this.fontStyle == FontStyle.italic) {
-                    if (this.fontWeight == FontWeight.w700) {
+                    if (isBold) {
                         return UnityEngine.FontStyle.BoldAndItalic;
                     }
                     else {
                         return UnityEngine.FontStyle.Italic;
                     }
                 }
-                else if (this.fontWeight == FontWeight.w700) {
+                else if (isBold) {
                     return UnityEngine.FontStyle.Bold;
                 }
 
@@ -150,7 +153,7 @@ namespace Unity.UIWidgets.ui {
             unchecked {
                 var hashCode = (this.color != null ? this.color.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ this.fontSize.GetHashCode();
-                hashCode = (hashCode * 397) ^ this.fontWeight.GetHashCode();
+                hashCode = (hashCode * 397) ^ (this.fontWeight != null ? this.fontWeight.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ this.fontStyle.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.letterSpacing.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.wordSpacing.GetHashCode();
@@ -174,7 +177,7 @@ namespace Unity.UIWidgets.ui {
 
 
         public TextStyle(Color color = null, float? fontSize = null,
-            FontWeight? fontWeight = null, FontStyle? fontStyle = null, float? letterSpacing = null,
+            FontWeight fontWeight = null, FontStyle? fontStyle = null, float? letterSpacing = null,
             float? wordSpacing = null, TextBaseline? textBaseline = null, float? height = null,
             TextDecoration decoration = null, TextDecorationStyle? decorationStyle = null, Color decorationColor = null,
             string fontFamily = null,
@@ -200,7 +203,7 @@ namespace Unity.UIWidgets.ui {
     public class ParagraphStyle : IEquatable<ParagraphStyle> {
         public ParagraphStyle(TextAlign? textAlign = null,
             TextDirection? textDirection = null,
-            FontWeight? fontWeight = null,
+            FontWeight fontWeight = null,
             FontStyle? fontStyle = null,
             int? maxLines = null,
             float? fontSize = null,
@@ -262,7 +265,7 @@ namespace Unity.UIWidgets.ui {
             unchecked {
                 var hashCode = this.textAlign.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.textDirection.GetHashCode();
-                hashCode = (hashCode * 397) ^ this.fontWeight.GetHashCode();
+                hashCode = (hashCode * 397) ^ (this.fontWeight != null ? this.fontWeight.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ this.fontStyle.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.maxLines.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.fontSize.GetHashCode();
@@ -289,7 +292,7 @@ namespace Unity.UIWidgets.ui {
 
         public readonly TextAlign? textAlign;
         public readonly TextDirection? textDirection;
-        public readonly FontWeight? fontWeight;
+        public readonly FontWeight fontWeight;
         public readonly FontStyle? fontStyle;
         public readonly int? maxLines;
         public readonly float? fontSize;
@@ -378,10 +381,98 @@ namespace Unity.UIWidgets.ui {
         downstream,
     }
 
-    public enum FontWeight {
-        w400, // normal
-        w700, // bold
+    public class FontWeight: IEquatable<FontWeight> {
+        private FontWeight(int index) {
+            this.index = index;
+        }
+    
+        public readonly int index;
+    
+        public static readonly FontWeight w100 =  new FontWeight(0);
+        public static readonly FontWeight w200 =  new FontWeight(1);
+        public static readonly FontWeight w300 =  new FontWeight(2);
+        public static readonly FontWeight w400 =  new FontWeight(3);
+        public static readonly FontWeight w500 =  new FontWeight(4);
+        public static readonly FontWeight w600 =  new FontWeight(5);
+        
+        public static readonly FontWeight w700 =  new FontWeight(6);
+        
+        public static readonly FontWeight w800 =  new FontWeight(7);
+        
+        public static readonly FontWeight w900 =  new FontWeight(8);
+        
+        
+        public static readonly FontWeight normal =  w400;
+        
+        
+        public static readonly FontWeight bold =  w700;
+        public static readonly List<FontWeight> values = new List<FontWeight>{
+            w100, w200, w300, w400, w500, w600, w700, w800, w900
+        };
+        
+        public static readonly Dictionary<int, int> indexToFontWeight = new Dictionary<int, int> {
+            {0, 100},
+            {1, 200},
+            {2, 300},
+            {3, 400},
+            {4, 500},
+            {5, 600},
+            {6, 700},
+            {7, 800},
+            {8, 900},
+        };
+        
+        public bool Equals(FontWeight other) {
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
+
+            return this.index == other.index;
+        }
+
+        public override bool Equals(object obj) {
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
+
+            return this.Equals((FontWeight) obj);
+        }
+
+        public override int GetHashCode() {
+            return this.index;
+        }
+
+        public static bool operator ==(FontWeight left, FontWeight right) {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(FontWeight left, FontWeight right) {
+            return !Equals(left, right);
+        }
+
+        public override string ToString() {
+            return $"FontWeight.w{this.weightValue}";
+        }
+        
+        public int weightValue {
+            get {
+                return indexToFontWeight[this.index];
+            }
+        }
     }
+
 
     public class TextPosition : IEquatable<TextPosition> {
         public readonly int offset;

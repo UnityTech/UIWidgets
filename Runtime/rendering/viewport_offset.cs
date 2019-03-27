@@ -48,6 +48,15 @@ namespace Unity.UIWidgets.rendering {
 
         public abstract IPromise animateTo(float to, TimeSpan duration, Curve curve);
 
+        public virtual IPromise moveTo(float to, TimeSpan? duration, Curve curve = null, bool clamp = true) {
+            if (duration == null || duration.Value == TimeSpan.Zero) {
+                this.jumpTo(to);
+                return Promise.Resolved();
+            } else {
+                return this.animateTo(to, duration: duration??TimeSpan.Zero , curve: curve ?? Curves.ease);
+            }
+        }
+
         public abstract ScrollDirection userScrollDirection { get; }
 
         public abstract bool allowImplicitScrolling { get; }

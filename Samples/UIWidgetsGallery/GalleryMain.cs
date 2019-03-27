@@ -10,11 +10,11 @@ namespace UIWidgetsGallery {
         protected override Widget createWidget() {
             return new GalleryApp();
         }
-        
-        protected override void OnEnable() {
-            base.OnEnable();
-            FontManager.instance.addFont(Resources.Load<Font>("MaterialIcons-Regular"));
-            FontManager.instance.addFont(Resources.Load<Font>("GalleryIcons"));
+
+        protected override void Awake() {
+            base.Awake();
+            FontManager.instance.addFont(Resources.Load<Font>("MaterialIcons-Regular"), "Material Icons");
+            FontManager.instance.addFont(Resources.Load<Font>("GalleryIcons"), "GalleryIcons");
         }
     }
 }

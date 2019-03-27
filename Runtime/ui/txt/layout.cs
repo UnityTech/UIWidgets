@@ -33,7 +33,7 @@ namespace Unity.UIWidgets.ui {
             this._advances.Clear();
             this._positions.Clear();
             this._count = count;
-            var font = FontManager.instance.getOrCreate(style.fontFamily).font;
+            var font = FontManager.instance.getOrCreate(style.fontFamily, style.fontWeight, style.fontStyle).font;
             font.RequestCharactersInTexture(this._text.Substring(start, count),
                 style.UnityFontSize,
                 style.UnityFontStyle);
