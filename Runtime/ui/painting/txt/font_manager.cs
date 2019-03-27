@@ -107,7 +107,6 @@ namespace Unity.UIWidgets.ui {
             font.hideFlags = HideFlags.DontSave & ~HideFlags.DontSaveInBuild;
 
             FontInfo current;
-            var name = font.name;
             this._fonts.TryGetValue(fontRef, out current);
             D.assert(current == null || current.font == font, $"font with key {fontRef} already exists");
             var fontInfo = new FontInfo(font);
