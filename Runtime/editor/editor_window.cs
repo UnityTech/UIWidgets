@@ -21,39 +21,51 @@ namespace Unity.UIWidgets.editor {
             this.wantsMouseEnterLeaveWindow = true;
         }
 
-        void OnEnable() {
+        protected virtual void Awake() {
+        }
+
+        protected virtual void OnEnable() {
             if (this._windowAdapter == null) {
                 this._windowAdapter = new EditorWindowAdapter(this);
             }
 
             this._windowAdapter.OnEnable();
 
-            var rootRenderBox = this.rootRenderBox();
+            RenderBox rootRenderBox;
+            using (this._windowAdapter.getScope()) {
+                rootRenderBox = this.createRenderBox();
+            }
+
             if (rootRenderBox != null) {
                 this._windowAdapter.attachRootRenderBox(rootRenderBox);
                 return;
             }
 
-            this._windowAdapter.attachRootWidget(this.rootWidget());
+            Widget rootWidget;
+            using (this._windowAdapter.getScope()) {
+                rootWidget = this.createWidget();
+            }
+
+            this._windowAdapter.attachRootWidget(rootWidget);
         }
 
-        void OnDisable() {
+        protected virtual void OnDisable() {
             this._windowAdapter.OnDisable();
         }
 
-        void OnGUI() {
+        protected virtual void OnGUI() {
             this._windowAdapter.OnGUI(Event.current);
         }
 
-        void Update() {
+        protected virtual void Update() {
             this._windowAdapter.Update();
         }
 
-        protected virtual RenderBox rootRenderBox() {
+        protected virtual RenderBox createRenderBox() {
             return null;
         }
 
-        protected abstract Widget rootWidget();
+        protected abstract Widget createWidget();
     }
 
     public class EditorWindowAdapter : WindowAdapter {
