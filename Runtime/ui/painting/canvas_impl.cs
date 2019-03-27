@@ -764,13 +764,11 @@ namespace Unity.UIWidgets.ui {
         
          void _drawLayer(RenderLayer layer, CommandBuffer cmdBuf) {
              if (layer.rtID == 0) {
-                 cmdBuf.SetRenderTarget(this._renderTexture,
-                     RenderBufferLoadAction.DontCare, RenderBufferStoreAction.Store);
+                 cmdBuf.SetRenderTarget(this._renderTexture);
                  cmdBuf.ClearRenderTarget(true, true, UnityEngine.Color.clear);
              }
              else {
-                 cmdBuf.SetRenderTarget(layer.rtID,
-                     RenderBufferLoadAction.DontCare, RenderBufferStoreAction.Store);
+                 cmdBuf.SetRenderTarget(layer.rtID);
                  cmdBuf.ClearRenderTarget(true, true, UnityEngine.Color.clear);
              }
 
@@ -793,12 +791,10 @@ namespace Unity.UIWidgets.ui {
                         this._drawLayer(subLayer, cmdBuf);
                         
                         if (layer.rtID == 0) {
-                            cmdBuf.SetRenderTarget(this._renderTexture,
-                                RenderBufferLoadAction.DontCare, RenderBufferStoreAction.Store);
+                            cmdBuf.SetRenderTarget(this._renderTexture);
                         }
                         else {
-                            cmdBuf.SetRenderTarget(layer.rtID,
-                                RenderBufferLoadAction.DontCare, RenderBufferStoreAction.Store);
+                            cmdBuf.SetRenderTarget(layer.rtID);
                         }
 
                         break;
