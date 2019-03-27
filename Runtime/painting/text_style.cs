@@ -10,7 +10,7 @@ namespace Unity.UIWidgets.painting {
         public readonly bool inherit;
         public readonly Color color;
         public readonly float? fontSize;
-        public readonly FontWeight? fontWeight;
+        public readonly FontWeight fontWeight;
         public readonly FontStyle? fontStyle;
         public readonly float? letterSpacing;
         public readonly float? wordSpacing;
@@ -27,7 +27,7 @@ namespace Unity.UIWidgets.painting {
 
 
         public TextStyle(bool inherit = true, Color color = null, float? fontSize = null,
-            FontWeight? fontWeight = null,
+            FontWeight fontWeight = null,
             FontStyle? fontStyle = null, float? letterSpacing = null, float? wordSpacing = null,
             TextBaseline? textBaseline = null, float? height = null, Paint background = null,
             TextDecoration decoration = null,
@@ -205,7 +205,7 @@ namespace Unity.UIWidgets.painting {
         public TextStyle copyWith(Color color = null,
             string fontFamily = null,
             float? fontSize = null,
-            FontWeight? fontWeight = null,
+            FontWeight fontWeight = null,
             FontStyle? fontStyle = null,
             float? letterSpacing = null,
             float? wordSpacing = null,
@@ -330,17 +330,10 @@ namespace Unity.UIWidgets.painting {
                 defaultValue: Diagnostics.kNullDefaultValue));
             string weightDescription = "";
             if (this.fontWeight != null) {
-                switch (this.fontWeight) {
-                    case FontWeight.w400:
-                        weightDescription = "400";
-                        break;
-                    case FontWeight.w700:
-                        weightDescription = "700";
-                        break;
-                }
+                weightDescription = this.fontWeight.weightValue.ToString();
             }
 
-            styles.Add(new DiagnosticsProperty<FontWeight?>(
+            styles.Add(new DiagnosticsProperty<FontWeight>(
                 "weight", this.fontWeight,
                 description: weightDescription,
                 defaultValue: Diagnostics.kNullDefaultValue
@@ -435,7 +428,7 @@ namespace Unity.UIWidgets.painting {
                 var hashCode = this.inherit.GetHashCode();
                 hashCode = (hashCode * 397) ^ (this.color != null ? this.color.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ this.fontSize.GetHashCode();
-                hashCode = (hashCode * 397) ^ this.fontWeight.GetHashCode();
+                hashCode = (hashCode * 397) ^ (this.fontWeight != null ? this.fontWeight.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ this.fontStyle.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.letterSpacing.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.wordSpacing.GetHashCode();

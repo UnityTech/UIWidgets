@@ -270,7 +270,8 @@ namespace Unity.UIWidgets.ui {
             }
 
             var textStyle = this._paragraphStyle.getTextStyle();
-            this._tabStops.setFont(FontManager.instance.getOrCreate(textStyle.fontFamily).font,
+            this._tabStops.setFont(FontManager.instance.getOrCreate(textStyle.fontFamily, 
+                    textStyle.fontWeight, textStyle.fontStyle).font,
                 textStyle.UnityFontSize);
 
             this._needsLayout = false;
@@ -393,7 +394,8 @@ namespace Unity.UIWidgets.ui {
                         continue;
                     }
 
-                    var font = FontManager.instance.getOrCreate(run.style.fontFamily).font;
+                    var font = FontManager.instance.getOrCreate(run.style.fontFamily, 
+                        run.style.fontWeight, run.style.fontStyle).font;
                     var metrics = FontMetrics.fromFont(font, run.style.UnityFontSize);
                     paintRecords.Add(new PaintRecord(run.style, new Offset(runXOffset, 0),
                         builder.make(), metrics, lineNumber, layout.getAdvance()
@@ -451,7 +453,8 @@ namespace Unity.UIWidgets.ui {
 
                 if (paintRecords.Count == 0) {
                     var defaultStyle = this._paragraphStyle.getTextStyle();
-                    var defaultFont = FontManager.instance.getOrCreate(defaultStyle.fontFamily).font;
+                    var defaultFont = FontManager.instance.getOrCreate(defaultStyle.fontFamily, 
+                        defaultStyle.fontWeight, defaultStyle.fontStyle).font;
                     var metrics = FontMetrics.fromFont(defaultFont, defaultStyle.UnityFontSize);
                     updateLineMetrics(metrics, defaultStyle);
                 }

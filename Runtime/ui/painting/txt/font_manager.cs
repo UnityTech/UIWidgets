@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Unity.UIWidgets.foundation;
 using UnityEngine;
@@ -22,8 +23,69 @@ namespace Unity.UIWidgets.ui {
         }
     }
 
+    class FontRef : IEquatable<FontRef> {
+        public readonly string familyName;
+        public readonly FontWeight fontWeight;
+        public readonly FontStyle fontStyle;
+
+        public FontRef(string familyName, FontWeight fontWeight, FontStyle fontStyle) {
+            this.familyName = familyName;
+            this.fontWeight = fontWeight;
+            this.fontStyle = fontStyle;
+        }
+
+        public bool Equals(FontRef other) {
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
+
+            return string.Equals(this.familyName, other.familyName) && this.fontWeight == other.fontWeight && this.fontStyle == other.fontStyle;
+        }
+
+        public override bool Equals(object obj) {
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
+
+            return this.Equals((FontRef) obj);
+        }
+
+        public override int GetHashCode() {
+            unchecked {
+                var hashCode = (this.familyName != null ? this.familyName.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (this.fontWeight != null ? this.fontWeight.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (int) this.fontStyle;
+                return hashCode;
+            }
+        }
+
+        public static bool operator ==(FontRef left, FontRef right) {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(FontRef left, FontRef right) {
+            return !Equals(left, right);
+        }
+
+        public override string ToString() {
+            return $"{nameof(this.familyName)}: {this.familyName}, {nameof(this.fontWeight)}: {this.fontWeight}, {nameof(this.fontStyle)}: {this.fontStyle}";
+        }
+    }
+    
     public class FontManager {
-        readonly Dictionary<string, FontInfo> _fonts = new Dictionary<string, FontInfo>();
+        readonly Dictionary<FontRef, FontInfo> _fonts = new Dictionary<FontRef, FontInfo>();
 
         static readonly int defaultFontSize = 14;
 
@@ -33,32 +95,50 @@ namespace Unity.UIWidgets.ui {
             Font.textureRebuilt += this.onFontTextureRebuilt;
         }
 
-        public void addFont(Font font) {
+        public void addFont(Font font, string familyName, 
+            FontWeight fontWeight = null, FontStyle fontStyle = FontStyle.normal) {
+            if (fontWeight == null) {
+                fontWeight = FontWeight.normal;
+            }
+
+            FontRef fontRef = new FontRef(familyName, fontWeight, fontStyle);
             D.assert(font != null);
             D.assert(font.dynamic, $"adding font which is not dynamic is not allowed {font.name}");
             font.hideFlags = HideFlags.DontSave & ~HideFlags.DontSaveInBuild;
 
             FontInfo current;
             var name = font.name;
-            this._fonts.TryGetValue(name, out current);
-            D.assert(current == null || current.font == font, $"font with name {name} already exists");
+            this._fonts.TryGetValue(fontRef, out current);
+            D.assert(current == null || current.font == font, $"font with key {fontRef} already exists");
             var fontInfo = new FontInfo(font);
-            this._fonts[name] = fontInfo;
+            this._fonts[fontRef] = fontInfo;
         }
 
-        internal FontInfo getOrCreate(string name) {
-            if (this._fonts.TryGetValue(name, out var fontInfo)) {
-                D.assert(fontInfo.font.name == name);
+        internal FontInfo getOrCreate(string familyName, FontWeight fontWeight, FontStyle fontStyle) {
+            if (fontWeight == null) {
+                fontWeight = FontWeight.normal;
+            }
+            FontRef fontRef = new FontRef(familyName, fontWeight, fontStyle);
+            if (this._fonts.TryGetValue(fontRef, out var fontInfo)) {
                 return fontInfo;
             }
 
-            var osFont = Font.CreateDynamicFontFromOSFont(name, defaultFontSize);
+            // fallback to normal weight & style
+            if (fontWeight != FontWeight.normal || fontStyle != FontStyle.normal) {
+                fontInfo = this.getOrCreate(familyName, FontWeight.normal, FontStyle.normal);
+                if (fontInfo != null) {
+                    return fontInfo;
+                }
+            }
+            
+            var osFont = Font.CreateDynamicFontFromOSFont(familyName, defaultFontSize);
             osFont.hideFlags = HideFlags.DontSave;
             osFont.material.hideFlags = HideFlags.DontSave;
             osFont.material.mainTexture.hideFlags = HideFlags.DontSave;
 
             var newFont = new FontInfo(osFont);
-            this._fonts[osFont.name] = newFont;
+            fontRef = new FontRef(familyName, fontWeight, fontStyle);
+            this._fonts[fontRef] = newFont;
 
             return newFont;
         }
