@@ -47,6 +47,33 @@ namespace Unity.UIWidgets.service {
                 (substring) => this.blacklistedPattern.Replace(substring, this.replacementString));
         }
     }
+    
+    public class LengthLimitingTextInputFormatter : TextInputFormatter {
+
+        public LengthLimitingTextInputFormatter(int? maxLength) {
+            D.assert(maxLength == null || maxLength > 0);
+            this.maxLength = maxLength;
+        }
+
+        public readonly int? maxLength;
+
+        public override TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
+            if (this.maxLength != null && newValue.text.Length > this.maxLength) {
+                TextSelection newSelection = newValue.selection.copyWith(
+                    baseOffset: Math.Min(newValue.selection.start, this.maxLength.Value),
+                    extentOffset: Math.Min(newValue.selection.end, this.maxLength.Value)
+                );
+                
+                string truncated = newValue.text.Substring(0, this.maxLength.Value);
+                return new TextEditingValue(
+                    text: truncated,
+                    selection: newSelection,
+                    composing: TextRange.empty
+                );
+            }
+            return newValue;
+        }
+}
 
     static class Util {
         internal static TextEditingValue _selectionAwareTextManipulation(TextEditingValue value,

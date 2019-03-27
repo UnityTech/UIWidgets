@@ -41,7 +41,6 @@ namespace Unity.UIWidgets.rendering {
         public static readonly char obscuringCharacter = '•';
         static readonly float _kCaretGap = 1.0f;
         static readonly float _kCaretHeightOffset = 2.0f;
-        static readonly float _kCaretWidth = 1.0f;
 
         TextPainter _textPainter;
         Color _cursorColor;
@@ -70,6 +69,9 @@ namespace Unity.UIWidgets.rendering {
             bool? hasFocus = null, int? maxLines = 1, Color selectionColor = null,
             TextSelection selection = null, bool obscureText = false, SelectionChangedHandler onSelectionChanged = null,
             CaretChangedHandler onCaretChanged = null, bool ignorePointer = false,
+            float cursorWidth = 1.0f,
+            Radius cursorRadius = null,
+            bool enableInteractiveSelection = true,
             TextSelectionDelegate textSelectionDelegate = null) {
             D.assert(textSelectionDelegate != null);
             this._textPainter = new TextPainter(text: text, textAlign: textAlign, textDirection: textDirection,
@@ -82,6 +84,9 @@ namespace Unity.UIWidgets.rendering {
             this._selection = selection;
             this._obscureText = obscureText;
             this._offset = offset;
+            this._cursorWidth = cursorWidth;
+            this._cursorRadius = cursorRadius;
+            this._enableInteractiveSelection = enableInteractiveSelection;
             this.ignorePointer = ignorePointer;
             this.onCaretChanged = onCaretChanged;
             this.onSelectionChanged = onSelectionChanged;
@@ -613,7 +618,7 @@ namespace Unity.UIWidgets.rendering {
         public Rect getLocalRectForCaret(TextPosition caretPosition) {
             this._layoutText(this.constraints.maxWidth);
             var caretOffset = this._textPainter.getOffsetForCaret(caretPosition, this._caretPrototype);
-            return Rect.fromLTWH(0.0f, 0.0f, _kCaretWidth, this.preferredLineHeight)
+            return Rect.fromLTWH(0.0f, 0.0f, this.cursorWidth, this.preferredLineHeight)
                 .shift(caretOffset + this._paintOffset);
         }
 
@@ -767,7 +772,7 @@ namespace Unity.UIWidgets.rendering {
             }
         }
         
-        void handleTapDown(TapDownDetails details) {
+        public void handleTapDown(TapDownDetails details) {
             this._lastTapDownPosition = details.globalPosition + - this._paintOffset;
             if (!Application.isMobilePlatform) {
                 this.selectPosition(SelectionChangedCause.tap);
@@ -865,7 +870,7 @@ namespace Unity.UIWidgets.rendering {
                 return;
             }
 
-            var caretMargin = _kCaretGap + _kCaretWidth;
+            var caretMargin = _kCaretGap + this.cursorWidth;
             var avialableWidth = Mathf.Max(0.0f, constraintWidth - caretMargin);
             var maxWidth = this._isMultiline ? avialableWidth : float.PositiveInfinity;
             this._textPainter.layout(minWidth: avialableWidth, maxWidth: maxWidth);
@@ -875,14 +880,14 @@ namespace Unity.UIWidgets.rendering {
         
         protected override void performLayout() {
             this._layoutText(this.constraints.maxWidth);
-            this._caretPrototype = Rect.fromLTWH(0.0f, _kCaretHeightOffset, _kCaretWidth,
+            this._caretPrototype = Rect.fromLTWH(0.0f, _kCaretHeightOffset, this.cursorWidth,
                 this.preferredLineHeight - 2.0f * _kCaretHeightOffset);
             this._selectionRects = null;
 
             var textPainterSize = this._textPainter.size;
             this.size = new Size(this.constraints.maxWidth,
                 this.constraints.constrainHeight(this._preferredHeight(this.constraints.maxWidth)));
-            var contentSize = new Size(textPainterSize.width + _kCaretGap + _kCaretWidth,
+            var contentSize = new Size(textPainterSize.width + _kCaretGap + this.cursorWidth,
                 textPainterSize.height);
             var _maxScrollExtent = this._getMaxScrollExtend(contentSize);
             this._hasVisualOverflow = _maxScrollExtent > 0.0;

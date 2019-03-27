@@ -1478,7 +1478,7 @@ namespace Unity.UIWidgets.material {
             return new _InputDecoratorState();
         }
 
-        static RenderBox containerOf(BuildContext context) {
+        internal static RenderBox containerOf(BuildContext context) {
             _RenderDecoration result =
                 (_RenderDecoration) context.ancestorRenderObjectOfType(new TypeMatcher<_RenderDecoration>());
             return result?.container;
