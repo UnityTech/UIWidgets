@@ -94,18 +94,26 @@ in Unity Editor.
     using Unity.UIWidgets.foundation;
     using Unity.UIWidgets.material;
     using Unity.UIWidgets.painting;
+    using Unity.UIWidgets.ui;
     using Unity.UIWidgets.widgets;
+    using UnityEngine;
+    using FontStyle = Unity.UIWidgets.ui.FontStyle;
     
     namespace UIWidgetsSample {
         public class UIWidgetsExample : UIWidgetsPanel {
-            protected override void OnEnable() {
-                base.OnEnable();
-    
+            void Awake() {
                 // Application.targetFrameRate = 60; // or higher if you want a smoother scrolling experience.
     
-                // if you want to use your own font or font icons.
-                // use the asset name of font (file name without extension) in FontStyle.fontFamily.             
-                // FontManager.instance.addFont(Resources.Load<Font>(path: "path to your font"));                
+                // if you want to use your own font or font icons.   
+                // FontManager.instance.addFont(Resources.Load<Font>(path: "path to your font"), "font family name");
+    
+                // load custom font with weight & style. The font weight & style corresponds to fontWeight, fontStyle of 
+                // a TextStyle object
+                // FontManager.instance.addFont(Resources.Load<Font>(path: "path to your font"), "Roboto", FontWeight.w500, 
+                //    FontStyle.italic);
+    
+                // add material icons, familyName must be "Material Icons"
+                // FontManager.instance.addFont(Resources.Load<Font>(path: "path to material icons"), "Material Icons");
             }
     
             protected override Widget createWidget() {
@@ -206,12 +214,6 @@ The develop team is still working on the UIWidgets Wiki. However, since UIWidget
  you can refer to Flutter Wiki to access detailed descriptions of UIWidgets APIs 
  from those of their Flutter counterparts.
  
-
-#### NOTES
-##### Using Material Icons
-To use material Icons, you need to add font MaterialIcons-Regular.ttf into your project and add it into 
-```FontManager``` as the sample code shows. The file name must be MaterialIcons-Regular.ttf, otherwise the icons 
-could not shown 
 
 #### FAQ
 

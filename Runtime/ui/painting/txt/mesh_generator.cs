@@ -125,7 +125,7 @@ namespace Unity.UIWidgets.ui {
             this._resolved = true;
             
             var style = this._textBlob.style;
-            var fontInfo = FontManager.instance.getOrCreate(style.fontFamily);
+            var fontInfo = FontManager.instance.getOrCreate(style.fontFamily, style.fontWeight, style.fontStyle);
             var key = new MeshKey(this._textBlob.instanceId, this._scale);
 
             _meshes.TryGetValue(key, out var meshInfo);
