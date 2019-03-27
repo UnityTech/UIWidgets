@@ -101,7 +101,8 @@ in Unity Editor.
     
     namespace UIWidgetsSample {
         public class UIWidgetsExample : UIWidgetsPanel {
-            void Awake() {
+            protected override void Awake() {
+                 base.Awake();
                 // Application.targetFrameRate = 60; // or higher if you want a smoother scrolling experience.
     
                 // if you want to use your own font or font icons.   

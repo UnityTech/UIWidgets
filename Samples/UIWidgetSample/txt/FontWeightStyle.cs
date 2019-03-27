@@ -8,7 +8,8 @@ using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace UIWidgetsSample {
     public class FontWeightStyle : UIWidgetsSamplePanel {
-        void Awake() {
+        protected override void Awake() {
+            base.Awake();
             // To run this sample, you need to download Roboto fonts and place them under Resources/Fonts folder
             // Roboto fonts could be downloaded from google website
             // https://fonts.google.com/specimen/Roboto?selection.family=Roboto
