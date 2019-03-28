@@ -347,18 +347,50 @@ namespace Unity.UIWidgets.ui {
                 List<PaintRecord> paintRecords = new List<PaintRecord>();
                 for (int i = 0; i < lineRuns.Count; ++i) {
                     var run = lineRuns[i];
+                    string text = this._text;
                     int textStart = Mathf.Max(run.start, lineRange.start);
                     int textEnd = Mathf.Min(run.end, lineEndIndex);
                     int textCount = textEnd - textStart;
 
-                    layout.doLayout(runXOffset, this._text, textStart, textCount, run.style);
+                    string ellipsis = this._paragraphStyle.ellipsis;
+                    if (!string.IsNullOrEmpty(ellipsis) && !this._width.isInfinite() && !lineRange.hardBreak
+                        && i == lineRuns.Count - 1 && (lineNumber == lineLimit - 1 || this._paragraphStyle.maxLines == null)) {
+
+                        float ellipsisWidth = Layout.measureText(runXOffset, ellipsis, 0,
+                            ellipsis.Length, run.style, null, 0, this._tabStops);
+                        List<float> textAdvances = new List<float>(textCount);
+                        for (int index = 0; index < textCount;++index) {
+                            textAdvances.Add(0);
+                        }
+                        float textWidth = Layout.measureText(runXOffset, this._text, textStart, textCount,
+                            run.style, textAdvances, 0, this._tabStops);
+                        
+                        int truncateCount = 0;
+                        while (truncateCount < textCount &&
+                               runXOffset + textWidth + ellipsisWidth > this._width) {
+                            textWidth -= textAdvances[textCount - truncateCount - 1];
+                            truncateCount++;
+                        }
+
+                        var ellipsizedText = this._text.Substring(textStart, textCount - truncateCount) + ellipsis;
+                        textStart = 0;
+                        textCount = ellipsizedText.Length;
+                        text = ellipsizedText;
+
+                        if (this._paragraphStyle.maxLines == null) {
+                            lineLimit = lineNumber + 1;
+                            this._didExceedMaxLines = true;
+                        }
+                    }
+
+                    layout.doLayout(runXOffset, text, textStart, textCount, run.style);
                     if (layout.nGlyphs() == 0) {
                         continue;
                     }
 
                     float wordStartPosition = float.NaN;
                     // var layoutAdvances = layout.getAdvances();
-                    builder.allocRunPos(run.style, this._text, textStart, textCount);
+                    builder.allocRunPos(run.style, text, textStart, textCount);
                     builder.setBounds(layout.getBounds());
                     glyphPositions.Clear();
 
