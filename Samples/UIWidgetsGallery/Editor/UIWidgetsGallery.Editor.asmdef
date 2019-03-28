@@ -1,0 +1,11 @@
+{
+    "name": "UIWidgetsGallery.Editor",
+    "references": [
+        "Unity.UIWidgets",
+        "UIWidgetsGallery"],
+    "optionalUnityReferences": [],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": []
+}
