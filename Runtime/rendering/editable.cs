@@ -154,8 +154,24 @@ namespace Unity.UIWidgets.rendering {
             bool vKey = pressedKeyCode == KeyCode.V;
             bool cKey = pressedKeyCode == KeyCode.C;
             bool del = pressedKeyCode == KeyCode.Delete;
-            bool backDel = pressedKeyCode == KeyCode.Backspace;
             bool isMac = SystemInfo.operatingSystemFamily == OperatingSystemFamily.MacOSX;
+
+            if (keyEvent is RawKeyCommandEvent) { // editor case
+                this._handleShortcuts(((RawKeyCommandEvent)keyEvent).command);
+                return;
+            }
+            if ((ctrl || (isMac && cmd)) && (xKey || vKey || cKey || aKey)) { // runtime case
+                if (xKey) {
+                    this._handleShortcuts(KeyCommand.Cut);
+                } else if (aKey) {
+                    this._handleShortcuts(KeyCommand.SelectAll);
+                } else if (vKey) {
+                    this._handleShortcuts(KeyCommand.Paste);
+                } else if (cKey) {
+                    this._handleShortcuts(KeyCommand.Copy);
+                }
+                return;
+            }
             
             if (arrow) {
                 int newOffset = this._extentOffset;
@@ -169,12 +185,10 @@ namespace Unity.UIWidgets.rendering {
                 newOffset = this._handleShift(rightArrow, leftArrow, shift, newOffset);
 
                 this._extentOffset = newOffset;
-            } else if ((ctrl || (isMac && cmd)) && (xKey || vKey || cKey || aKey)) {
-                this._handleShortcuts(pressedKeyCode);
             }
 
-            if (del || backDel) {
-                this._handleDelete(backDel);
+            if (del) {
+                this._handleDelete();
             }
         }
 
@@ -276,15 +290,15 @@ namespace Unity.UIWidgets.rendering {
             return newOffset;
         }
 
-        void _handleShortcuts(KeyCode pressedKeyCode) {
-            switch (pressedKeyCode) {
-                case KeyCode.C:
+        void _handleShortcuts(KeyCommand cmd) {
+            switch (cmd) {
+                case KeyCommand.Copy:
                     if (!this.selection.isCollapsed) {
                         Clipboard.setData(
                             new ClipboardData(text: this.selection.textInside(this.text.text)));
                     }
                     break;
-                case KeyCode.X:
+                case KeyCommand.Cut:
                     if (!this.selection.isCollapsed) {
                         Clipboard.setData(
                             new ClipboardData(text: this.selection.textInside(this.text.text)));
@@ -295,7 +309,7 @@ namespace Unity.UIWidgets.rendering {
                         );
                     }
                     break;
-                case KeyCode.V:
+                case KeyCommand.Paste:
                     TextEditingValue value = this.textSelectionDelegate.textEditingValue;
                     Clipboard.getData(Clipboard.kTextPlain).Then(data => {
                         if (data != null) {
@@ -311,7 +325,7 @@ namespace Unity.UIWidgets.rendering {
                     });
                     
                     break;
-                case KeyCode.A:
+                case KeyCommand.SelectAll:
                     this._baseOffset = 0;
                     this._extentOffset = this.textSelectionDelegate.textEditingValue.text.Length;
                     this.onSelectionChanged(
@@ -329,14 +343,8 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
-        void _handleDelete(bool backDel) {
+        void _handleDelete() {
             var selection = this.selection;
-            if (backDel && selection.isCollapsed) {
-                if (selection.start <= 0) {
-                    return;
-                }
-                selection = TextSelection.collapsed(selection.start - 1, selection.affinity);
-            }
             if (selection.textAfter(this.text.text).isNotEmpty()) {
                 this.textSelectionDelegate.textEditingValue = new TextEditingValue(
                     text: selection.textBefore(this.text.text)

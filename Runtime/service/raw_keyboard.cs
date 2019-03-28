@@ -26,11 +26,11 @@ namespace Unity.UIWidgets.service {
                 return;
             }
 
-            var keyboardEvent = RawKeyEvent.fromEvent(evt);
+            var keyboardEvent = RawKeyEvent.processGUIEvent(evt);
             if (keyboardEvent == null) {
                 return;
             }
-
+            
             foreach (var listener in new List<ValueChanged<RawKeyEvent>>(this._listeners)) {
                 if (this._listeners.Contains(listener)) {
                     listener(keyboardEvent);
@@ -45,11 +45,24 @@ namespace Unity.UIWidgets.service {
             this.data = data;
         }
 
-        public static RawKeyEvent fromEvent(Event evt) {
+        public static RawKeyEvent processGUIEvent(Event evt) {
             if (evt == null) {
                 return null;
             }
 
+            if (evt.type == EventType.ValidateCommand) {
+                var cmd = toKeyCommand(evt.commandName);
+                if (cmd != null) {
+                    evt.Use();
+                    return null;
+                }
+            } else if (evt.type == EventType.ExecuteCommand) { // Validate/ExecuteCommand is editor only
+                var cmd = toKeyCommand(evt.commandName);
+                if (cmd != null) {
+                    return new RawKeyCommandEvent(new RawKeyEventData(evt), cmd.Value);
+                }
+            }
+    
             if (evt.type == EventType.KeyDown) {
                 return new RawKeyDownEvent(new RawKeyEventData(evt));
             } else if (evt.type == EventType.KeyUp) {
@@ -60,6 +73,22 @@ namespace Unity.UIWidgets.service {
         }
         
         public readonly RawKeyEventData data;
+
+        static KeyCommand? toKeyCommand(string commandName) {
+            switch (commandName) {
+                case "Paste":
+                    return KeyCommand.Paste;
+                case "Copy":
+                    return KeyCommand.Copy;
+                case "SelectAll":
+                    return KeyCommand.SelectAll;
+                case "Cut":
+                    return KeyCommand.Cut;
+                    
+            }
+
+            return null;
+        }
     }
     
     public class RawKeyDownEvent: RawKeyEvent {
@@ -72,6 +101,21 @@ namespace Unity.UIWidgets.service {
         }
     }
 
+    public class RawKeyCommandEvent : RawKeyEvent {
+
+        public readonly KeyCommand command;
+        public RawKeyCommandEvent(RawKeyEventData data, KeyCommand command) : base(data) {
+            this.command = command;
+        }
+    }
+
+    public enum KeyCommand {
+        Copy,
+        Cut,
+        Paste,
+        SelectAll,
+    }
+    
     public class RawKeyEventData {
         public readonly Event unityEvent;
 

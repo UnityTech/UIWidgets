@@ -206,7 +206,8 @@ namespace Unity.UIWidgets.service {
 
                     return this.copyWith(
                         text: this.text.Substring(0, this.selection.start - 1) + this.selection.textAfter(this.text),
-                        selection: TextSelection.collapsed(this.selection.start - 1));
+                        selection: TextSelection.collapsed(this.selection.start - 1),
+                        composing: TextRange.empty);
                 }
 
                 if (this.selection.start >= this.text.Length) {
@@ -214,11 +215,13 @@ namespace Unity.UIWidgets.service {
                 }
 
                 return this.copyWith(text: this.text.Substring(0, this.selection.start) +
-                                           this.text.Substring(this.selection.start + 1));
+                                           this.text.Substring(this.selection.start + 1), 
+                    composing: TextRange.empty);
             }
             else {
                 var newText = this.selection.textBefore(this.text) + this.selection.textAfter(this.text);
-                return this.copyWith(text: newText, selection: TextSelection.collapsed(this.selection.start));
+                return this.copyWith(text: newText, selection: TextSelection.collapsed(this.selection.start), 
+                    composing: TextRange.empty);
             }
         }
 
