@@ -83,12 +83,12 @@ UIWidgets应用是用**C＃脚本**来编写的。 请按照以下步骤创建�
                 // FontManager.instance.addFont(Resources.Load<Font>(path: "path to your font"), "font family name");
  
                 // load custom font with weight & style. The font weight & style corresponds to fontWeight, fontStyle of 
-               // a TextStyle object
-               // FontManager.instance.addFont(Resources.Load<Font>(path: "path to your font"), "Roboto", FontWeight.w500, 
-               //    FontStyle.italic);
+                // a TextStyle object
+                // FontManager.instance.addFont(Resources.Load<Font>(path: "path to your font"), "Roboto", FontWeight.w500, 
+                //    FontStyle.italic);
  
-               // add material icons, familyName must be "Material Icons"
-               // FontManager.instance.addFont(Resources.Load<Font>(path: "path to material icons"), "Material Icons");
+                // add material icons, familyName must be "Material Icons"
+                // FontManager.instance.addFont(Resources.Load<Font>(path: "path to material icons"), "Material Icons");
             }
                 
             protected override Widget getWidget() {
