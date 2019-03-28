@@ -4,7 +4,6 @@ using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
 using UnityEngine;
 using DialogUtils = Unity.UIWidgets.material.DialogUtils;
-using FontStyle = Unity.UIWidgets.ui.FontStyle;
 
 namespace UIWidgetsSample {
     public class TextFieldSample : UIWidgetsSamplePanel {
@@ -21,14 +20,13 @@ namespace UIWidgetsSample {
         }
     }
 
-    class MyCustomForm: StatefulWidget {
+    class MyCustomForm : StatefulWidget {
         public override State createState() {
             return new _MyCustomFormState();
         }
     }
 
-    class _MyCustomFormState: State<MyCustomForm> {
-        
+    class _MyCustomFormState : State<MyCustomForm> {
         readonly TextEditingController myController = new TextEditingController();
 
         public override void dispose() {
@@ -46,18 +44,18 @@ namespace UIWidgetsSample {
                     child: new TextField(controller: this.myController)
                 ),
                 floatingActionButton: new FloatingActionButton(
-                // When the user presses the button, show an alert dialog with the
-                // text the user has typed into our text field.
+                    // When the user presses the button, show an alert dialog with the
+                    // text the user has typed into our text field.
                     onPressed: () => {
                         DialogUtils.showDialog(
                             context: context,
                             builder: (_context) => {
-                            return new AlertDialog(
-                                // Retrieve the text the user has typed in using our
-                                // TextEditingController
-                                content: new Text(myController.text)
-                            );
-                        });
+                                return new AlertDialog(
+                                    // Retrieve the text the user has typed in using our
+                                    // TextEditingController
+                                    content: new Text(this.myController.text)
+                                );
+                            });
                     },
                     tooltip: "Show me the value",
                     child: new Icon(Icons.search)

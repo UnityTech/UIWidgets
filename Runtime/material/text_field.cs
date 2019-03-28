@@ -31,7 +31,7 @@ namespace Unity.UIWidgets.material {
 
             this.controller = controller;
             this.focusNode = focusNode;
-            this.decoration = decoration;
+            this.decoration = decoration ?? new InputDecoration();
             this.textInputAction = textInputAction;
             this.textCapitalization = textCapitalization;
             this.style = style;

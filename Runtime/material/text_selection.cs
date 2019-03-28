@@ -13,54 +13,58 @@ using Color = Unity.UIWidgets.ui.Color;
 using Rect = Unity.UIWidgets.ui.Rect;
 using Transform = Unity.UIWidgets.widgets.Transform;
 
-
-// todo using material components: FlatButton & Material ...
 namespace Unity.UIWidgets.material {
     public static class MaterialUtils {
         public readonly static TextSelectionControls materialTextSelectionControls =
             new _MaterialTextSelectionControls();
-    }
-
-    static class _TextSelectionUtils {
+        
         internal const float _kHandleSize = 22.0f;
+        
         internal const float _kToolbarScreenPadding = 8.0f;
+        
     }
-
+    
     class _TextSelectionToolbar : StatelessWidget {
-        public _TextSelectionToolbar(Key key = null, Action handleCut = null,
-            Action handleCopy = null, Action handlePaste = null, Action handleSelectAll = null) : base(key: key) {
+        public _TextSelectionToolbar(Key key = null, VoidCallback handleCut = null,
+            VoidCallback handleCopy = null, VoidCallback handlePaste = null, VoidCallback handleSelectAll = null) : base(key: key) {
             this.handleCut = handleCut;
             this.handleCopy = handleCopy;
             this.handlePaste = handlePaste;
             this.handleSelectAll = handleSelectAll;
         }
 
-        public readonly Action handleCut;
-        public readonly Action handleCopy;
-        public readonly Action handlePaste;
-        public readonly Action handleSelectAll;
+        public readonly VoidCallback handleCut;
+        public readonly VoidCallback handleCopy;
+        public readonly VoidCallback handlePaste;
+        public readonly VoidCallback handleSelectAll;
 
         public override Widget build(BuildContext context) {
             List<Widget> items = new List<Widget>();
+            MaterialLocalizations localizations = MaterialLocalizations.of(context);
             if (this.handleCut != null) {
-                items.Add(new _TempButton(onPressed: () => this.handleCut(), child: new Text("Cut")));
+                items.Add(new FlatButton(child: new Text(localizations.cutButtonLabel), onPressed: this.handleCut));
             }
 
             if (this.handleCopy != null) {
-                items.Add(new _TempButton(onPressed: () => this.handleCopy(), child: new Text("Copy")));
+                items.Add(new FlatButton(child: new Text(localizations.copyButtonLabel), onPressed: this.handleCopy));
             }
 
             if (this.handlePaste != null) {
-                items.Add(new _TempButton(onPressed: () => this.handlePaste(), child: new Text("Past")));
+                
+                items.Add(new FlatButton(child: new Text(localizations.pasteButtonLabel), onPressed: this.handlePaste));
             }
 
             if (this.handleSelectAll != null) {
-                items.Add(new _TempButton(onPressed: () => this.handleSelectAll(), child: new Text("Select All")));
+                items.Add(new FlatButton(child: new Text(localizations.selectAllButtonLabel), 
+                    onPressed: this.handleSelectAll));
             }
 
-            return new Container(
-                color: new Color(0xFFEFEFEF),
-                height: 44.0f, child: new Row(mainAxisSize: MainAxisSize.min, children: items));
+            return new Material(
+                elevation: 1.0f,
+                child: new Container(
+                    color: new Color(0xFFEFEFEF),
+                    height: 44.0f, child: new Row(mainAxisSize: MainAxisSize.min, children: items))
+                );
         }
     }
 
@@ -86,18 +90,18 @@ namespace Unity.UIWidgets.material {
             float x = globalPosition.dx - childSize.width / 2.0f;
             float y = globalPosition.dy - childSize.height;
 
-            if (x < _TextSelectionUtils._kToolbarScreenPadding) {
-                x = _TextSelectionUtils._kToolbarScreenPadding;
+            if (x < MaterialUtils._kToolbarScreenPadding) {
+                x = MaterialUtils._kToolbarScreenPadding;
             }
-            else if (x + childSize.width > this.screenSize.width - _TextSelectionUtils._kToolbarScreenPadding) {
-                x = this.screenSize.width - childSize.width - _TextSelectionUtils._kToolbarScreenPadding;
+            else if (x + childSize.width > this.screenSize.width - MaterialUtils._kToolbarScreenPadding) {
+                x = this.screenSize.width - childSize.width - MaterialUtils._kToolbarScreenPadding;
             }
 
-            if (y < _TextSelectionUtils._kToolbarScreenPadding) {
-                y = _TextSelectionUtils._kToolbarScreenPadding;
+            if (y < MaterialUtils._kToolbarScreenPadding) {
+                y = MaterialUtils._kToolbarScreenPadding;
             }
-            else if (y + childSize.height > this.screenSize.height - _TextSelectionUtils._kToolbarScreenPadding) {
-                y = this.screenSize.height - childSize.height - _TextSelectionUtils._kToolbarScreenPadding;
+            else if (y + childSize.height > this.screenSize.height - MaterialUtils._kToolbarScreenPadding) {
+                y = this.screenSize.height - childSize.height - MaterialUtils._kToolbarScreenPadding;
             }
 
             return new Offset(x, y);
@@ -132,8 +136,8 @@ namespace Unity.UIWidgets.material {
     class _MaterialTextSelectionControls : TextSelectionControls {
         public override Size handleSize {
             get {
-                return new Size(_TextSelectionUtils._kHandleSize,
-                    _TextSelectionUtils._kHandleSize);
+                return new Size(MaterialUtils._kHandleSize,
+                    MaterialUtils._kHandleSize);
             }
         }
 
@@ -150,16 +154,16 @@ namespace Unity.UIWidgets.material {
                     child: new _TextSelectionToolbar(
                         handleCut: this.canCut(selectionDelegate)
                             ? () => this.handleCut(selectionDelegate)
-                            : (Action) null,
+                            : (VoidCallback) null,
                         handleCopy: this.canCopy(selectionDelegate)
                             ? () => this.handleCopy(selectionDelegate)
-                            : (Action) null,
+                            : (VoidCallback) null,
                         handlePaste: this.canPaste(selectionDelegate)
                             ? () => this.handlePaste(selectionDelegate)
-                            : (Action) null,
+                            : (VoidCallback) null,
                         handleSelectAll: this.canSelectAll(selectionDelegate)
                             ? () => this.handleSelectAll(selectionDelegate)
-                            : (Action) null
+                            : (VoidCallback) null
                     )
                 )
             );
@@ -169,11 +173,11 @@ namespace Unity.UIWidgets.material {
             Widget handle = new Padding(
                 padding: EdgeInsets.only(right: 26.0f, bottom: 26.0f),
                 child: new SizedBox(
-                    width: 20,
-                    height: 20,
+                    width: MaterialUtils._kHandleSize,
+                    height: MaterialUtils._kHandleSize,
                     child: new CustomPaint(
                         painter: new _TextSelectionHandlePainter(
-                            color: new Color(0xFFFF0000)
+                            color: Theme.of(context).textSelectionHandleColor
                         )
                     )
                 )
@@ -195,38 +199,6 @@ namespace Unity.UIWidgets.material {
             }
 
             return null;
-        }
-    }
-
-
-    public class _TempButton : StatelessWidget {
-        public _TempButton(
-            Key key = null,
-            GestureTapCallback onPressed = null,
-            EdgeInsets padding = null,
-            Color backgroundColor = null,
-            Widget child = null
-        ) : base(key: key) {
-            this.onPressed = onPressed;
-            this.padding = padding ?? EdgeInsets.all(8.0f);
-            this.backgroundColor = backgroundColor ?? new Color(0);
-            this.child = child;
-        }
-
-        public readonly GestureTapCallback onPressed;
-        public readonly EdgeInsets padding;
-        public readonly Widget child;
-        public readonly Color backgroundColor;
-
-        public override Widget build(BuildContext context) {
-            return new GestureDetector(
-                onTap: this.onPressed,
-                child: new Container(
-                    padding: this.padding,
-                    color: this.backgroundColor,
-                    child: this.child
-                )
-            );
         }
     }
 }

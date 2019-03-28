@@ -255,12 +255,15 @@ namespace Unity.UIWidgets.service {
     }
 
     abstract class AbstractUIWidgetsKeyboardDelegate : KeyboardDelegate {
+        
         protected AbstractUIWidgetsKeyboardDelegate() {
-            UIWidgetsMessageManager.instance.AddChannelMessageDelegate("TextInput", this._handleMethodCall);
+            UIWidgetsMessageManager.instance.
+                AddChannelMessageDelegate("TextInput", this._handleMethodCall);
         }
         
         public void Dispose() {
-            UIWidgetsMessageManager.instance.RemoveChannelMessageDelegate("TextInput", this._handleMethodCall);
+            UIWidgetsMessageManager.instance.
+                RemoveChannelMessageDelegate("TextInput", this._handleMethodCall);
         }
 
         public abstract void show();
