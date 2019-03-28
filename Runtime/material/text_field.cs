@@ -13,7 +13,7 @@ namespace Unity.UIWidgets.material {
     public class TextField : StatefulWidget {
 
         public TextField(Key key = null, TextEditingController controller = null, FocusNode focusNode = null,
-            InputDecoration decoration = null, TextInputType keyboardType = null,
+            InputDecoration decoration = null, bool noDecoration = false, TextInputType keyboardType = null,
             TextInputAction? textInputAction = null,
             TextCapitalization textCapitalization = TextCapitalization.none, TextStyle style = null,
             TextAlign textAlign = TextAlign.left, TextDirection textDirection = TextDirection.ltr,
@@ -31,7 +31,7 @@ namespace Unity.UIWidgets.material {
 
             this.controller = controller;
             this.focusNode = focusNode;
-            this.decoration = decoration ?? new InputDecoration();
+            this.decoration = noDecoration ? null : (decoration ?? new InputDecoration());
             this.textInputAction = textInputAction;
             this.textCapitalization = textCapitalization;
             this.style = style;
@@ -285,7 +285,11 @@ namespace Unity.UIWidgets.material {
             return splash;
         }
 
-        RenderEditable _renderEditable => this._editableTextKey.currentState.renderEditable;
+        RenderEditable _renderEditable {
+            get {
+                return this._editableTextKey.currentState.renderEditable;
+            }
+        } 
 
         void _handleTapDown(TapDownDetails details) {
             this._renderEditable.handleTapDown(details);
@@ -359,8 +363,6 @@ namespace Unity.UIWidgets.material {
         public override Widget build(BuildContext context) {
             base.build(context); // See AutomaticKeepAliveClientMixin.
             D.assert(MaterialD.debugCheckHasMaterial(context));
-            // TODO(jonahwilliams): uncomment out this check once we have migrated tests.
-            // assert(debugCheckHasMaterialLocalizations(context));
             D.assert(WidgetsD.debugCheckHasDirectionality(context));
             ThemeData themeData = Theme.of(context);
             TextStyle style = this.widget.style ?? themeData.textTheme.subhead;
