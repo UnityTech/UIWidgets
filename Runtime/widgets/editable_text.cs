@@ -18,7 +18,7 @@ namespace Unity.UIWidgets.widgets {
     public delegate void SelectionChangedCallback(TextSelection selection, SelectionChangedCause cause);
 
     public class TextEditingController : ValueNotifier<TextEditingValue> {
-        public TextEditingController(string text) : base(text == null
+        public TextEditingController(string text = null) : base(text == null
             ? TextEditingValue.empty
             : new TextEditingValue(text)) {
         }
@@ -26,7 +26,7 @@ namespace Unity.UIWidgets.widgets {
         TextEditingController(TextEditingValue value) : base(value ?? TextEditingValue.empty) {
         }
 
-        public TextEditingController fromValue(TextEditingValue value) {
+        public static TextEditingController fromValue(TextEditingValue value) {
             return new TextEditingController(value);
         }
 
@@ -116,7 +116,9 @@ namespace Unity.UIWidgets.widgets {
             ValueChanged<string> onSubmitted = null, SelectionChangedCallback onSelectionChanged = null,
             List<TextInputFormatter> inputFormatters = null, bool rendererIgnoresPointer = false,
             EdgeInsets scrollPadding = null, bool unityTouchKeyboard = false,
-            Key key = null) : base(key) {
+            Key key = null, float? cursorWidth = 2.0f, Radius cursorRadius = null, Brightness? keyboardAppearance = Brightness.light,
+            bool enableInteractiveSelection = true
+            ) : base(key) {
             D.assert(controller != null);
             D.assert(focusNode != null);
             D.assert(style != null);
@@ -156,10 +158,20 @@ namespace Unity.UIWidgets.widgets {
             else {
                 this.inputFormatters = inputFormatters;
             }
+
+            this.cursorWidth = cursorWidth;
+            this.cursorRadius = cursorRadius;
+            this.keyboardAppearance = keyboardAppearance;
+            this.enableInteractiveSelection = enableInteractiveSelection;
         }
 
+        public readonly float? cursorWidth;
+        public readonly Radius cursorRadius;
+        public readonly Brightness? keyboardAppearance;
         public readonly EdgeInsets scrollPadding;
 
+        public readonly bool enableInteractiveSelection;
+        
         public override State createState() {
             return new EditableTextState();
         }
@@ -368,6 +380,7 @@ namespace Unity.UIWidgets.widgets {
                                      ? TextInputAction.newline
                                      : TextInputAction.done),
                     textCapitalization: this.widget.textCapitalization,
+                    keyboardAppearance: this.widget.keyboardAppearance??Brightness.light,
                     unityTouchKeyboard: this.widget.unityTouchKeyboard
                                  
                 ));
@@ -678,6 +691,9 @@ namespace Unity.UIWidgets.widgets {
                             onSelectionChanged: this._handleSelectionChanged,
                             onCaretChanged: this._handleCaretChanged,
                             rendererIgnoresPointer: this.widget.rendererIgnoresPointer,
+                            cursorWidth: this.widget.cursorWidth,
+                            cursorRadius: this.widget.cursorRadius,
+                            enableInteractiveSelection: this.widget.enableInteractiveSelection,
                             textSelectionDelegate: this
                         )
                     )
@@ -767,6 +783,9 @@ namespace Unity.UIWidgets.widgets {
         public readonly SelectionChangedHandler onSelectionChanged;
         public readonly CaretChangedHandler onCaretChanged;
         public readonly bool rendererIgnoresPointer;
+        public readonly float? cursorWidth;
+        public readonly Radius cursorRadius;
+        public readonly bool enableInteractiveSelection;
         public readonly TextSelectionDelegate textSelectionDelegate;
 
 
@@ -776,7 +795,8 @@ namespace Unity.UIWidgets.widgets {
             TextDirection? textDirection = null, bool obscureText = false, TextAlign textAlign = TextAlign.left,
             bool autocorrect = false, ViewportOffset offset = null, SelectionChangedHandler onSelectionChanged = null,
             CaretChangedHandler onCaretChanged = null, bool rendererIgnoresPointer = false,
-            Key key = null, TextSelectionDelegate textSelectionDelegate = null) : base(key) {
+            Key key = null, TextSelectionDelegate textSelectionDelegate = null, float? cursorWidth = null, 
+            Radius cursorRadius = null, bool enableInteractiveSelection = true) : base(key) {
             this.textSpan = textSpan;
             this.value = value;
             this.cursorColor = cursorColor;
@@ -794,6 +814,10 @@ namespace Unity.UIWidgets.widgets {
             this.onCaretChanged = onCaretChanged;
             this.rendererIgnoresPointer = rendererIgnoresPointer;
             this.textSelectionDelegate = textSelectionDelegate;
+            this.cursorWidth = cursorWidth;
+            this.cursorRadius = cursorRadius;
+            this.enableInteractiveSelection = enableInteractiveSelection;
+
         }
 
         public override RenderObject createRenderObject(BuildContext context) {
@@ -813,6 +837,9 @@ namespace Unity.UIWidgets.widgets {
                 onSelectionChanged: this.onSelectionChanged,
                 onCaretChanged: this.onCaretChanged,
                 ignorePointer: this.rendererIgnoresPointer,
+                cursorWidth: this.cursorWidth??1.0f,
+                cursorRadius: this.cursorRadius,
+                enableInteractiveSelection: this.enableInteractiveSelection,
                 textSelectionDelegate: this.textSelectionDelegate
             );
         }
@@ -835,6 +862,9 @@ namespace Unity.UIWidgets.widgets {
             edit.ignorePointer = this.rendererIgnoresPointer;
             edit.obscureText = this.obscureText;
             edit.textSelectionDelegate = this.textSelectionDelegate;
+            edit.cursorWidth = this.cursorWidth ?? 1.0f;
+            edit.cursorRadius = this.cursorRadius;
+            edit.enableInteractiveSelection = this.enableInteractiveSelection;
         }
     }
 }
