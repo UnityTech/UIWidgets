@@ -2,8 +2,12 @@ using System.Collections.Generic;
 using Unity.UIWidgets.material;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
+
+#if UNITY_EDITOR
 using UnityEditor;
 using UnityEditor.UI;
+#endif
+
 using UnityEngine;
 
 
@@ -46,6 +50,7 @@ namespace UIWidgetsSample {
     }
     
     
+    #if UNITY_EDITOR
     [CustomEditor(typeof(UIWidgetsTheatre), true)]
     [CanEditMultipleObjects]
     public class UIWidgetTheatreEditor : RawImageEditor {
@@ -58,4 +63,5 @@ namespace UIWidgetsSample {
             EditorUtility.SetDirty(this.target);
         }
     }
+    #endif
 }
