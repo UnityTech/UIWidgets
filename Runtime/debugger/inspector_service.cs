@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Unity.UIWidgets.editor;
+using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.widgets;
 
 namespace Unity.UIWidgets.debugger {
@@ -21,6 +22,10 @@ namespace Unity.UIWidgets.debugger {
 
         public bool active {
             get { return this.window.alive; }
+        }
+
+        public bool debugEnabled {
+            get { return D.debugEnabled; }
         }
 
         public void close() {

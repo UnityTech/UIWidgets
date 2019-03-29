@@ -35,7 +35,8 @@ namespace Unity.UIWidgets.debugger {
         bool m_DebugPaintLayer;
 
         bool m_ShowDebugPaintToggles;
-        
+
+        GUIStyle m_MessageStyle;
         readonly List<InspectorPanel> m_Panels = new List<InspectorPanel>();
 
         Rect m_DebugPaintTogglesRect;
@@ -60,7 +61,7 @@ namespace Unity.UIWidgets.debugger {
             this.DoSelectDropDown();
             bool needDebugPaintUpdate = false;
             
-            if (this.m_InspectorService != null) {
+            if (this.m_InspectorService != null && this.m_InspectorService.debugEnabled) {
                 if (GUILayout.Button("Refersh", EditorStyles.toolbarButton)) {
                     foreach (var panel in this.m_Panels) {
                         panel.MarkNeedReload();
@@ -107,7 +108,7 @@ namespace Unity.UIWidgets.debugger {
 
             EditorGUILayout.Space();
 
-            if (this.m_InspectorService != null) {
+            if (this.m_InspectorService != null && this.m_InspectorService .debugEnabled) {
                 EditorGUILayout.BeginHorizontal(EditorStyles.toolbar, GUILayout.ExpandWidth(false));
                 this.m_Panels.Each((pannel, index) => {
                     if (GUILayout.Toggle(this.m_PanelIndex == index, pannel.title, EditorStyles.toolbarButton,
@@ -127,6 +128,16 @@ namespace Unity.UIWidgets.debugger {
                 if (shouldHandleGUI) {
                     this.m_Panels[this.m_PanelIndex].OnGUI();
                 }
+            } else if (this.m_InspectorService != null) { // debug not enabled
+                if (this.m_MessageStyle == null) {
+                    this.m_MessageStyle = new GUIStyle(GUI.skin.label);
+                    this.m_MessageStyle.fontSize = 16;
+                    this.m_MessageStyle.alignment = TextAnchor.MiddleCenter;
+                    this.m_MessageStyle.padding = new RectOffset(20, 20, 40, 0);
+                }
+                GUILayout.Label("You're not in UIWidgets Debug Mode.\nPlease define UIWidgets_DEBUG " +
+                                "symbols at \"Player Settings => Scripting Define Symbols\".",
+                    this.m_MessageStyle, GUILayout.ExpandWidth(true));
             }
             
            if (this.m_ShowDebugPaintToggles) {
