@@ -204,8 +204,10 @@ via *Window/Analysis/UIWidgets* inspector in Editor menu.
 ## Learn
 
 #### Samples
-You can find many UIWidgets App samples in the UIWidgets package in the **Samples** folder.
+You can find many UIWidgets App samples in the UIWidgets package in the **Samples** folder. 
 Feel free to try them out and make modifications to see the results.
+To get started, the UIWidgetsTheatre scene provides you
+a list of carefully selected samples to start with.
 
 You can also try UIWidgets-based Editor windows by clicking **UIWidgetsTest** on the main menu 
 and open one of the dropdown samples.
