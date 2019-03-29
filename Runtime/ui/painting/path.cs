@@ -136,13 +136,19 @@ namespace Unity.UIWidgets.ui {
                 var cmd = (PathCommand) commands[i];
                 switch (cmd) {
                     case PathCommand.moveTo:
+                        this._commandx = commands[i + 1];
+                        this._commandy = commands[i + 2];
+                        i += 3;
+                        break;
                     case PathCommand.lineTo:
+                        this._expandBounds(this._commandx, this._commandy);
                         this._expandBounds(commands[i + 1], commands[i + 2]);
                         this._commandx = commands[i + 1];
                         this._commandy = commands[i + 2];
                         i += 3;
                         break;
                     case PathCommand.bezierTo:
+                        this._expandBounds(this._commandx, this._commandy);
                         this._expandBounds(commands[i + 1], commands[i + 2]);
                         this._expandBounds(commands[i + 3], commands[i + 4]);
                         this._expandBounds(commands[i + 5], commands[i + 6]);
@@ -1115,6 +1121,7 @@ namespace Unity.UIWidgets.ui {
         void _addPoint(PathPoint point) {
             if (this._paths.Count == 0) {
                 this.addPath();
+                this.addPoint(0, 0, PointFlags.corner);
             }
 
             var path = this._paths.Last();
