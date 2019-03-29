@@ -158,7 +158,7 @@ namespace Unity.UIWidgets.ui {
         {  
             CharacterInfo info;
             bool success = font.GetCharacterInfo(ch, out info, fontSize, fontStyle);
-            if (!success) {  
+            if (!success && !char.IsControl(ch)) {  
                 Debug.LogWarning($"character info not found from the given font: character '{ch}' (code{(int)ch}) font: ${font.name}");     
             }
             return info;
