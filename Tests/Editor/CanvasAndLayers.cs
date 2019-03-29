@@ -13,7 +13,6 @@ using Color = Unity.UIWidgets.ui.Color;
 using Gradient = Unity.UIWidgets.ui.Gradient;
 using Material = UnityEngine.Material;
 using Rect = UnityEngine.Rect;
-using TextStyle = Unity.UIWidgets.ui.TextStyle;
 
 namespace UIWidgets.Tests {
     public class CanvasAndLayers : EditorWindow {
@@ -263,7 +262,11 @@ namespace UIWidgets.Tests {
                 paint);
 
             canvas.scale(3);
-            TextBlob textBlob = new TextBlob("This is a text blob", 0, 19, new Vector2d[] {
+            TextBlobBuilder builder = new TextBlobBuilder();
+            string text = "This is a text blob";
+            builder.allocRunPos(new TextStyle(), text, 0, text.Length);
+            builder.setBounds(Unity.UIWidgets.ui.Rect.fromLTWH(0, 0, 200, 50));
+            builder.positions = new Vector2d[] {
                 new Vector2d(10, 0),
                 new Vector2d(20, 0),
                 new Vector2d(30, 0),
@@ -283,9 +286,9 @@ namespace UIWidgets.Tests {
                 new Vector2d(170, 0),
                 new Vector2d(180, 0),
                 new Vector2d(190, 0),
-            }, Unity.UIWidgets.ui.Rect.fromLTWH(0, 0, 200, 50), new TextStyle());
+            };
 
-            canvas.drawTextBlob(textBlob, new Offset(100, 100), paint);
+            canvas.drawTextBlob(builder.make(), new Offset(100, 100), paint);
 
             canvas.drawLine(
                 new Offset(10, 30),

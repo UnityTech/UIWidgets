@@ -24,7 +24,7 @@ namespace Unity.UIWidgets.ui {
         }
     }
 
-    public class CodeUnitRun {
+    class CodeUnitRun {
         public readonly int lineNumber;
         public readonly TextDirection direction;
         public readonly Range<int> codeUnits;
@@ -51,7 +51,7 @@ namespace Unity.UIWidgets.ui {
     }
 
 
-    public class FontMetrics {
+    class FontMetrics {
         public readonly float ascent;
         public readonly float leading = 0.0f;
         public readonly float descent;
@@ -85,7 +85,7 @@ namespace Unity.UIWidgets.ui {
         }
     }
 
-    public class LineStyleRun {
+    class LineStyleRun {
         public readonly int start;
         public readonly int end;
         public readonly TextStyle style;
@@ -97,7 +97,7 @@ namespace Unity.UIWidgets.ui {
         }
     }
 
-    public class PositionWithAffinity {
+    class PositionWithAffinity {
         public readonly int position;
         public readonly TextAffinity affinity;
 
@@ -107,7 +107,7 @@ namespace Unity.UIWidgets.ui {
         }
     }
 
-    public class GlyphPosition {
+    class GlyphPosition {
         public readonly Range<float> xPos;
         public readonly Range<int> codeUnits;
 
@@ -121,7 +121,7 @@ namespace Unity.UIWidgets.ui {
         }
     }
 
-    public class Range<T> : IEquatable<Range<T>> {
+    class Range<T> : IEquatable<Range<T>> {
         public Range(T start, T end) {
             this.start = start;
             this.end = end;
@@ -158,14 +158,14 @@ namespace Unity.UIWidgets.ui {
         public readonly T start, end;
     }
 
-    public static class RangeUtils {
+    static class RangeUtils {
         public static Range<float> shift(Range<float> value, float shift) {
             return new Range<float>(value.start + shift, value.end + shift);
         }
     }
 
 
-    public class GlyphLine {
+    class GlyphLine {
         public readonly List<GlyphPosition> positions;
         public readonly int totalCountUnits;
 
@@ -526,7 +526,7 @@ namespace Unity.UIWidgets.ui {
         }
 
 
-        public void setText(string text, StyledRuns runs) {
+        internal void setText(string text, StyledRuns runs) {
             this._text = text;
             this._runs = runs;
             this._needsLayout = true;
@@ -621,7 +621,7 @@ namespace Unity.UIWidgets.ui {
             return TextBox.fromLTBD(0, top, 0, bottom, TextDirection.ltr);
         }
 
-        public PositionWithAffinity getGlyphPositionAtCoordinate(float dx, float dy) {
+        internal PositionWithAffinity getGlyphPositionAtCoordinate(float dx, float dy) {
             if (this._lineHeights.Count == 0) {
                 return new PositionWithAffinity(0, TextAffinity.downstream);
             }
@@ -696,11 +696,11 @@ namespace Unity.UIWidgets.ui {
             return Mathf.Max(lineCount - 1, 0);
         }
 
-        public LineRange getLineRange(int lineIndex) {
+        internal LineRange getLineRange(int lineIndex) {
             return this._lineRanges[lineIndex];
         }
 
-        public Range<int> getWordBoundary(int offset) {
+        internal Range<int> getWordBoundary(int offset) {
             WordSeparate s = new WordSeparate(this._text);
             return s.findWordRange(offset);
         }
@@ -891,7 +891,7 @@ namespace Unity.UIWidgets.ui {
         }
     }
 
-    public class SplayTree<TKey, TValue> : IDictionary<TKey, TValue> where TKey : IComparable<TKey> {
+    class SplayTree<TKey, TValue> : IDictionary<TKey, TValue> where TKey : IComparable<TKey> {
         SplayTreeNode root;
         int count;
         int version = 0;

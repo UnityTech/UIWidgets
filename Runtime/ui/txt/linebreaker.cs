@@ -3,7 +3,7 @@ using System.Linq;
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
-    public class TabStops {
+    class TabStops {
         int _tabWidth = int.MaxValue;
 
         Font _font;
@@ -53,7 +53,7 @@ namespace Unity.UIWidgets.ui {
         }
     }
 
-    public class Candidate {
+    class Candidate {
         public int offset;
         public int pre;
         public float preBreak;
@@ -64,7 +64,7 @@ namespace Unity.UIWidgets.ui {
         public int postSpaceCount;
     }
 
-    public class LineBreaker {
+    class LineBreaker {
         const float ScoreInfty = float.MaxValue;
         const float ScoreDesperate = 1e10f;
 

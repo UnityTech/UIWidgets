@@ -2,7 +2,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
-    public class Layout {
+    
+    class Layout {
         int _start;
         int _count;
         List<float> _advances = new List<float>();
