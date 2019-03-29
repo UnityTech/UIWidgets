@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using UIWidgetsGallery.gallery;
+using UIWidgetsSample;
 using Unity.UIWidgets.material;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
@@ -11,7 +13,7 @@ using UnityEditor.UI;
 using UnityEngine;
 
 
-namespace UIWidgetsSample {
+namespace UIWidgetsTheatre {
 
     class TheatreEntry {
         public string entryName;
@@ -20,8 +22,11 @@ namespace UIWidgetsSample {
     
     class UIWidgetsTheatre : UIWidgetsSamplePanel {
         static readonly List<TheatreEntry> entries = new List<TheatreEntry> {
+            new TheatreEntry{entryName = "UIWidget Gallery", entryWidget =  new GalleryApp()},
             new TheatreEntry{entryName = "Material App Bar", entryWidget = new MaterialAppBarWidget()},
-            new TheatreEntry{entryName = "Material Tab Bar" , entryWidget = new MaterialTabBarWidget()}
+            new TheatreEntry{entryName = "Material Tab Bar" , entryWidget = new MaterialTabBarWidget()},
+            new TheatreEntry{entryName = "Asset Store", entryWidget = new AsScreenSample.AsScreenWidget()},
+            new TheatreEntry{entryName = "ToDo App", entryWidget = new ToDoAppSample.ToDoListApp()}
         };
 
         public static string[] entryKeys {
@@ -46,6 +51,7 @@ namespace UIWidgetsSample {
         protected override void Awake() {
             base.Awake();
             FontManager.instance.addFont(Resources.Load<Font>("MaterialIcons-Regular"), "Material Icons");
+            FontManager.instance.addFont(Resources.Load<Font>("GalleryIcons"), "GalleryIcons");
         }
     }
     

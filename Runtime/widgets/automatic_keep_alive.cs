@@ -239,7 +239,7 @@ namespace Unity.UIWidgets.widgets {
                                 this.GetType() +
                                 " created a Ticker via its TickerProviderStateMixin, but at the time " +
                                 "dispose() was called on the mixin, that Ticker was still active. All Tickers must " +
-                                "be disposed before calling super.dispose(). Tickers used by AnimationControllers " +
+                                "be disposed before calling base.dispose(). Tickers used by AnimationControllers " +
                                 "should be disposed by calling dispose() on the AnimationController itself. " +
                                 "Otherwise, the ticker will leak.\n" +
                                 "The offending ticker was: " + ticker.toString(debugIncludeStack: true)
