@@ -12,6 +12,17 @@ namespace Unity.UIWidgets.foundation {
         public static void logError(string message, Exception ex = null) {
             Debug.LogException(new AssertionError(message, ex));
         }
+
+        public static bool debugEnabled {
+            get {
+#if UIWidgets_DEBUG
+                return true;
+#else
+                return false;
+#endif
+            }
+        }
+        
         [Conditional("UIWidgets_DEBUG")]
         public static void assert(Func<bool> result, string message = null) {
             if (!result()) {
