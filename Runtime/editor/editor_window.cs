@@ -57,7 +57,15 @@ namespace Unity.UIWidgets.editor {
             this._windowAdapter.OnGUI(Event.current);
         }
 
+        float? lastUpdateTime;
         protected virtual void Update() {
+            if (this.lastUpdateTime != null) {
+                float deltaTime = (float)EditorApplication.timeSinceStartup - this.lastUpdateTime.Value;
+                PerformanceUtils.instance.updateDeltaTime(deltaTime);
+            }
+
+            this.lastUpdateTime = (float) EditorApplication.timeSinceStartup;
+            
             this._windowAdapter.Update();
         }
 

@@ -1,4 +1,5 @@
 # UIWidgets
+[中文](README-ZH.md)
 
 
 ## Introduction
@@ -71,7 +72,7 @@ only a text label and a button. The text label will count the times of clicks up
 
 First of all, please open or create a Unity Project and open it with Unity Editor. 
 
-And then open Project Settings, go to Player section and add "UIWidgets_DEBUG" to the Scripting Debug Symbols field.
+And then open Project Settings, go to Player section and add "UIWidgets_DEBUG" to the Scripting Define Symbols field.
 This enables the debug mode of UIWidgets for your development. Remove this for your release build afterwards.
 
 #### ii. Scene Build
@@ -204,8 +205,10 @@ via *Window/Analysis/UIWidgets* inspector in Editor menu.
 ## Learn
 
 #### Samples
-You can find many UIWidgets App samples in the UIWidgets package in the **Samples** folder.
+You can find many UIWidgets App samples in the UIWidgets package in the **Samples** folder. 
 Feel free to try them out and make modifications to see the results.
+To get started, the UIWidgetsTheatre scene provides you
+a list of carefully selected samples to start with.
 
 You can also try UIWidgets-based Editor windows by clicking **UIWidgetsTest** on the main menu 
 and open one of the dropdown samples.

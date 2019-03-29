@@ -2296,7 +2296,7 @@ namespace Unity.UIWidgets.widgets {
                 }
 
                 throw new UIWidgetsError(
-                    this._state.GetType() + ".dispose failed to call super.dispose.\n" +
+                    this._state.GetType() + ".dispose failed to call base.dispose.\n" +
                     "dispose() implementations must always call their superclass dispose() method, to ensure " +
                     "that all the resources used by the widget are fully released.");
             });
