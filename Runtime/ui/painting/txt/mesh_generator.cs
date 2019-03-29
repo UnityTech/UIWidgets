@@ -151,18 +151,21 @@ namespace Unity.UIWidgets.ui {
                     continue;
                 }
 
-                CharacterInfo charInfo = font.getCharacterInfo(ch, fontSizeToLoad, style.UnityFontStyle);
-                var minX = charInfo.minX / this._scale;
-                var maxX = charInfo.maxX / this._scale;
-                var minY = charInfo.minY / this._scale;
-                var maxY = charInfo.maxY / this._scale;
+                if (fontSizeToLoad == 0) {
+                    continue;
+                }
+                var glyphInfo = font.getGlyphInfo(ch, fontSizeToLoad, style.UnityFontStyle);
+                var minX = glyphInfo.rect.left / this._scale;
+                var maxX = glyphInfo.rect.right / this._scale;
+                var minY = glyphInfo.rect.top / this._scale;
+                var maxY = glyphInfo.rect.bottom / this._scale;
 
                 var baseIndex = vertices.Count;
 
-                vertices.Add(new Vector3((position.x + minX), (position.y - maxY), 0));
-                vertices.Add(new Vector3((position.x + maxX), (position.y - maxY), 0));
-                vertices.Add(new Vector3((position.x + maxX), (position.y - minY), 0));
-                vertices.Add(new Vector3((position.x + minX), (position.y - minY), 0));
+                vertices.Add(new Vector3((position.x + minX), (position.y + minY), 0));
+                vertices.Add(new Vector3((position.x + maxX), (position.y + minY), 0));
+                vertices.Add(new Vector3((position.x + maxX), (position.y + maxY), 0));
+                vertices.Add(new Vector3((position.x + minX), (position.y + maxY), 0));
 
                 triangles.Add(baseIndex);
                 triangles.Add(baseIndex + 1);
@@ -171,10 +174,10 @@ namespace Unity.UIWidgets.ui {
                 triangles.Add(baseIndex + 2);
                 triangles.Add(baseIndex + 3);
 
-                uv.Add(charInfo.uvTopLeft);
-                uv.Add(charInfo.uvTopRight);
-                uv.Add(charInfo.uvBottomRight);
-                uv.Add(charInfo.uvBottomLeft);
+                uv.Add(glyphInfo.uvTopLeft);
+                uv.Add(glyphInfo.uvTopRight);
+                uv.Add(glyphInfo.uvBottomRight);
+                uv.Add(glyphInfo.uvBottomLeft);
             }
 
             if (vertices.Count == 0) {

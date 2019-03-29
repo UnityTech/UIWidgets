@@ -1,6 +1,6 @@
 
 namespace Unity.UIWidgets.ui {
-    public class WordBreaker {
+    class WordBreaker {
         public const uint U16_SURROGATE_OFFSET = ((0xd800 << 10) + 0xdc00 - 0x10000);
         string _text;
         int _offset;

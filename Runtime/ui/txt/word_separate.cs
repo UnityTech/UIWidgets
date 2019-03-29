@@ -1,5 +1,5 @@
 ﻿namespace Unity.UIWidgets.ui {
-    public class WordSeparate {
+    class WordSeparate {
         enum Direction {
             Forward,
             Backward,

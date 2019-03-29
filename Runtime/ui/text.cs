@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Unity.UIWidgets.foundation;
 
 namespace Unity.UIWidgets.ui {
     public enum FontStyle {
@@ -72,7 +71,7 @@ namespace Unity.UIWidgets.ui {
         }
     }
 
-    public class TextStyle : IEquatable<TextStyle> {
+    internal class TextStyle : IEquatable<TextStyle> {
         public readonly Color color = Color.fromARGB(255, 0, 0, 0);
         public readonly float fontSize = 14.0f;
         public readonly FontWeight fontWeight = FontWeight.w400;
@@ -112,6 +111,40 @@ namespace Unity.UIWidgets.ui {
 
         internal int UnityFontSize {
             get { return (int) this.fontSize; }
+        }
+
+        public static TextStyle applyStyle(TextStyle currentStyle, painting.TextStyle style, float textScaleFactor) {
+            if (currentStyle != null) {
+                return new ui.TextStyle(
+                    color: style.color ?? currentStyle.color,
+                    fontSize: style.fontSize != null ? style.fontSize * textScaleFactor : currentStyle.fontSize,
+                    fontWeight: style.fontWeight ?? currentStyle.fontWeight,
+                    fontStyle: style.fontStyle ?? currentStyle.fontStyle,
+                    letterSpacing: style.letterSpacing ?? currentStyle.letterSpacing,
+                    wordSpacing: style.wordSpacing ?? currentStyle.wordSpacing,
+                    textBaseline: style.textBaseline ?? currentStyle.textBaseline,
+                    height: style.height ?? currentStyle.height,
+                    decoration: style.decoration ?? currentStyle.decoration,
+                    decorationColor: style.decorationColor ?? currentStyle.decorationColor,
+                    fontFamily: style.fontFamily ?? currentStyle.fontFamily,
+                    background: style.background ?? currentStyle.background
+                );
+            }
+
+            return new ui.TextStyle(
+                color: style.color,
+                fontSize: style.fontSize * textScaleFactor,
+                fontWeight: style.fontWeight,
+                fontStyle: style.fontStyle,
+                letterSpacing: style.letterSpacing,
+                wordSpacing: style.wordSpacing,
+                textBaseline: style.textBaseline,
+                height: style.height,
+                decoration: style.decoration,
+                decorationColor: style.decorationColor,
+                fontFamily: style.fontFamily,
+                background: style.background
+            );
         }
 
         public bool Equals(TextStyle other) {
@@ -276,7 +309,7 @@ namespace Unity.UIWidgets.ui {
             }
         }
 
-        public TextStyle getTextStyle() {
+        internal TextStyle getTextStyle() {
             return new TextStyle(
                 fontWeight: this.fontWeight,
                 fontStyle: this.fontStyle,

@@ -718,7 +718,7 @@ namespace Unity.UIWidgets.ui {
             var font = FontManager.instance.getOrCreate(textBlob.style.fontFamily, style.fontWeight, style.fontStyle).font;
             var fontSizeToLoad = Mathf.CeilToInt(style.UnityFontSize * scale);
             var subText = textBlob.text.Substring(textBlob.textOffset, textBlob.textSize);
-            font.RequestCharactersInTexture(subText, fontSizeToLoad, style.UnityFontStyle);
+            font.RequestCharactersInTextureSafe(subText, fontSizeToLoad, style.UnityFontStyle);
 
             var tex = font.material.mainTexture;
 
