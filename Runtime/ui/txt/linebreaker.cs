@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -40,9 +41,11 @@ namespace Unity.UIWidgets.ui {
             }
 
             if (this._tabWidth == int.MaxValue) {
-                this._font.RequestCharactersInTexture(" ", this._fontSize);
-                CharacterInfo characterInfo = this._font.getCharacterInfo(' ', this._fontSize, UnityEngine.FontStyle.Normal);
-                this._tabWidth = characterInfo.advance * kTabSpaceCount;
+                this._font.RequestCharactersInTextureSafe(" ", this._fontSize);
+                if (this._fontSize > 0) {
+                    var glyphInfo = this._font.getGlyphInfo(' ', this._fontSize, UnityEngine.FontStyle.Normal);
+                    this._tabWidth = (int)Math.Round(glyphInfo.advance * kTabSpaceCount);
+                }
             }
 
             if (this._tabWidth == 0) {

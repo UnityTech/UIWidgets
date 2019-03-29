@@ -74,12 +74,9 @@ namespace Unity.UIWidgets.ui {
         public static FontMetrics fromFont(Font font, int fontSize) {
             var ascent = -font.ascent * fontSize / font.fontSize;
             var descent = (font.lineHeight - font.ascent) * fontSize / font.fontSize;
-            float? fxHeight = null;
-            font.RequestCharactersInTexture("x", fontSize);
-            CharacterInfo charInfo;
-            if (font.GetCharacterInfo('x', out charInfo, fontSize)) {
-                fxHeight = charInfo.glyphHeight;
-            }
+            font.RequestCharactersInTextureSafe("x", fontSize, UnityEngine.FontStyle.Normal);
+            var glyphInfo = font.getGlyphInfo('x', fontSize, UnityEngine.FontStyle.Normal);
+            float fxHeight = glyphInfo.glyphHeight;
 
             return new FontMetrics(ascent, descent, fxHeight: fxHeight);
         }
@@ -254,6 +251,11 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void paint(Canvas canvas, Offset offset) {
+
+            foreach (var paintRecord in this._paintRecords) {
+                this.paintBackground(canvas, paintRecord, offset);
+            }
+
             foreach (var paintRecord in this._paintRecords) {
                 var paint = new Paint {
                     filterMode = FilterMode.Bilinear,
@@ -868,6 +870,17 @@ namespace Unity.UIWidgets.ui {
                     yOffset = yOffsetOriginal;
                 }
             }
+        }
+
+        void paintBackground(Canvas canvas, PaintRecord record, Offset baseOffset) {
+            if (record.style.background == null) {
+                return;
+            }
+
+            var metrics = record.metrics;
+            Rect rect = Rect.fromLTRB(0, metrics.ascent, record.runWidth, metrics.descent);
+            rect = rect.shift(baseOffset + record.offset);
+            canvas.drawRect(rect, record.style.background);
         }
 
         float getLineXOffset(float lineTotalAdvance) {

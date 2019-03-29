@@ -164,6 +164,7 @@ namespace Unity.UIWidgets.painting {
                 decoration: other.decoration,
                 decorationColor: other.decorationColor,
                 decorationStyle: other.decorationStyle,
+                background: other.background,
                 debugLabel: mergedDebugLabel
             );
         }
