@@ -64,7 +64,8 @@ namespace UIWidgetsGallery.gallery {
                 theme: GalleryTheme.kLightGalleryTheme,
                 textScaleFactor: GalleryTextScaleValue.kAllGalleryTextScaleValues[0],
                 timeDilation: SchedulerBinding.instance.timeDilation,
-                platform: Application.platform
+                platform: Application.platform,
+                showPerformanceOverlay: this.widget.enablePerformanceOverlay
             );
         }
 
