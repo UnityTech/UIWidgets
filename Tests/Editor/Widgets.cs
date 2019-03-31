@@ -107,11 +107,9 @@ namespace UIWidgets.Tests {
             this.windowAdapter.Update();
         }
 
-        void Awake() {
-            FontManager.instance.addFont(Resources.Load<Font>("MaterialIcons-Regular"), "Material Icons");
-        }
-
         void OnEnable() {
+            FontManager.instance.addFont(Resources.Load<Font>("MaterialIcons-Regular"), "Material Icons");
+
             this.windowAdapter = new EditorWindowAdapter(this);
             this.windowAdapter.OnEnable();
         }

@@ -21,9 +21,6 @@ namespace Unity.UIWidgets.editor {
             this.wantsMouseEnterLeaveWindow = true;
         }
 
-        protected virtual void Awake() {
-        }
-
         protected virtual void OnEnable() {
             if (this._windowAdapter == null) {
                 this._windowAdapter = new EditorWindowAdapter(this);

@@ -92,8 +92,7 @@ UIWidgets应用是用**C＃脚本**来编写的。 请按照以下步骤创建�
     
     namespace UIWidgetsSample {
         public class UIWidgetsExample : UIWidgetsPanel {
-            protected override void Awake() {
-                 base.Awake();
+            protected override void OnEnable() {
                 // Application.targetFrameRate = 60; // or higher if you want a smoother scrolling experience.
     
                 // if you want to use your own font or font icons.   
@@ -106,6 +105,8 @@ UIWidgets应用是用**C＃脚本**来编写的。 请按照以下步骤创建�
     
                 // add material icons, familyName must be "Material Icons"
                 // FontManager.instance.addFont(Resources.Load<Font>(path: "path to material icons"), "Material Icons");
+
+                base.OnEnable();
             }
     
             protected override Widget createWidget() {
