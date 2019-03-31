@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using Unity.UIWidgets.async;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.rendering;
@@ -54,15 +53,7 @@ namespace Unity.UIWidgets.editor {
             this._windowAdapter.OnGUI(Event.current);
         }
 
-        float? lastUpdateTime;
         protected virtual void Update() {
-            if (this.lastUpdateTime != null) {
-                float deltaTime = (float)EditorApplication.timeSinceStartup - this.lastUpdateTime.Value;
-                PerformanceUtils.instance.updateDeltaTime(deltaTime);
-            }
-
-            this.lastUpdateTime = (float) EditorApplication.timeSinceStartup;
-            
             this._windowAdapter.Update();
         }
 
@@ -100,6 +91,22 @@ namespace Unity.UIWidgets.editor {
         protected override Vector2 queryWindowSize() {
             return this.editorWindow.position.size;
         }
+
+        protected override TimeSpan getTime() {
+            return TimeSpan.FromSeconds(EditorApplication.timeSinceStartup);
+        }
+
+        float? _lastUpdateTime;
+        
+        protected override float getUnscaledDeltaTime() {
+            if (this._lastUpdateTime == null) {
+                this._lastUpdateTime = (float) EditorApplication.timeSinceStartup;
+            }
+
+            float deltaTime = (float) EditorApplication.timeSinceStartup - this._lastUpdateTime.Value;
+            this._lastUpdateTime = (float) EditorApplication.timeSinceStartup;
+            return deltaTime;
+        }        
     }
 
 #endif
@@ -122,12 +129,10 @@ namespace Unity.UIWidgets.editor {
         float _lastWindowWidth;
         float _lastWindowHeight;
 
-        readonly TimeSpan _epoch = new TimeSpan(Stopwatch.GetTimestamp());
         readonly MicrotaskQueue _microtaskQueue = new MicrotaskQueue();
         readonly TimerProvider _timerProvider = new TimerProvider();
         readonly Rasterizer _rasterizer = new Rasterizer();
         readonly ScrollInput _scrollInput = new ScrollInput();
-
 
         bool _regenerateLayerTree;
         Surface _surface;
@@ -136,6 +141,14 @@ namespace Unity.UIWidgets.editor {
 
         public bool alive {
             get { return this._alive; }
+        }
+
+        protected virtual TimeSpan getTime() {
+            return TimeSpan.FromSeconds(Time.time);
+        }
+
+        protected virtual float getUnscaledDeltaTime() {
+            return Time.unscaledDeltaTime;
         }
 
         protected virtual void updateSafeArea() {
@@ -274,10 +287,9 @@ namespace Unity.UIWidgets.editor {
             return new EditorWindowSurface();
         }
 
-
         void _beginFrame() {
             if (this.onBeginFrame != null) {
-                this.onBeginFrame(new TimeSpan(Stopwatch.GetTimestamp()) - this._epoch);
+                this.onBeginFrame(this.getTime());
             }
 
             this.flushMicrotasks();
@@ -387,6 +399,8 @@ namespace Unity.UIWidgets.editor {
         }
 
         public void Update() {
+            PerformanceUtils.instance.updateDeltaTime(this.getUnscaledDeltaTime());
+            
             Timer.update();
 
             bool hasFocus = this.hasFocus();
