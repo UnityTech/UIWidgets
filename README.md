@@ -218,7 +218,7 @@ and open one of the dropdown samples.
 The develop team is still working on the UIWidgets Wiki. However, since UIWidgets is mainly derived from Flutter,
  you can refer to Flutter Wiki to access detailed descriptions of UIWidgets APIs 
  from those of their Flutter counterparts.
- 
+Meanwhile, you can join the discussion channel at (https://connect.unity.com/g/uiwidgets)
 
 #### FAQ
 
