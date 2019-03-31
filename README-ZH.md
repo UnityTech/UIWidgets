@@ -61,7 +61,7 @@ UIWidgets主要来自[Flutter](https://github.com/flutter/flutter)。但UIWidget
 
 首先，请打开或创建Unity项目并使用Unity编辑器打开它。
 
-然后打开Project Settings，转到Player部分并将“UIWidgets_DEBUG”添加到Scripting Define Symbols字段中。
+然后打开Project Settings，转到Player部分并**将“UIWidgets_DEBUG”添加到Scripting Define Symbols字段中。**
 
 这样就启动了UIWidgets的调试模式。 在之后发布版本的时候清空这个字段。
 
