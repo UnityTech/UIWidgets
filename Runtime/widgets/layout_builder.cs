@@ -6,8 +6,7 @@ using Unity.UIWidgets.ui;
 namespace Unity.UIWidgets.widgets {
     public delegate Widget LayoutWidgetBuilder(BuildContext context, BoxConstraints constraints);
 
-
-    class LayoutBuilder : RenderObjectWidget {
+    public class LayoutBuilder : RenderObjectWidget {
         public LayoutBuilder(
             Key key = null,
             LayoutWidgetBuilder builder = null) : base(key: key) {

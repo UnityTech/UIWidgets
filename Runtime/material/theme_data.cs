@@ -1,16 +1,30 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.service;
-using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
+using UnityEngine;
+using Color = Unity.UIWidgets.ui.Color;
 
 namespace Unity.UIWidgets.material {
+    static class ThemeDataUtils {
+        public static readonly Color _kLightThemeHighlightColor = new Color(0x66BCBCBC);
+
+        public static readonly Color _kLightThemeSplashColor = new Color(0x66C8C8C8);
+
+        public static readonly Color _kDarkThemeHighlightColor = new Color(0x40CCCCCC);
+
+        public static readonly Color _kDarkThemeSplashColor = new Color(0x40CCCCCC);
+    }
+
     public enum MaterialTapTargetSize {
         padded,
 
         shrinkWrap
     }
 
-    public class ThemeData : Diagnosticable {
+    public class ThemeData : Diagnosticable, IEquatable<ThemeData> {
         public ThemeData(
             Brightness? brightness = null,
             MaterialColor primarySwatch = null,
@@ -47,11 +61,16 @@ namespace Unity.UIWidgets.material {
             TextTheme textTheme = null,
             TextTheme primaryTextTheme = null,
             TextTheme accentTextTheme = null,
+            InputDecorationTheme inputDecorationTheme = null,
             IconThemeData iconTheme = null,
             IconThemeData primaryIconTheme = null,
             IconThemeData accentIconTheme = null,
+            TabBarTheme tabBarTheme = null,
+            RuntimePlatform? platform = null,
             MaterialTapTargetSize? materialTapTargetSize = null,
+            PageTransitionsTheme pageTransitionsTheme = null,
             ColorScheme colorScheme = null,
+            DialogTheme dialogTheme = null,
             Typography typography = null
         ) {
             brightness = brightness ?? Brightness.light;
@@ -99,7 +118,8 @@ namespace Unity.UIWidgets.material {
             indicatorColor = indicatorColor ?? (accentColor == primaryColor ? Colors.white : accentColor);
             hintColor = hintColor ?? (isDark ? new Color(0x80FFFFFF) : new Color(0x8A000000));
             errorColor = errorColor ?? Colors.red[700];
-
+            inputDecorationTheme = inputDecorationTheme ?? new InputDecorationTheme();
+            pageTransitionsTheme = pageTransitionsTheme ?? new PageTransitionsTheme();
             primaryIconTheme = primaryIconTheme ??
                                (primaryIsDark
                                    ? new IconThemeData(color: Colors.white)
@@ -110,7 +130,7 @@ namespace Unity.UIWidgets.material {
                                   : new IconThemeData(color: Colors.black));
             iconTheme = iconTheme ??
                         (isDark ? new IconThemeData(color: Colors.white) : new IconThemeData(color: Colors.black87));
-
+            platform = platform ?? Application.platform;
             typography = typography ?? new Typography();
             TextTheme defaultTextTheme = isDark ? typography.white : typography.black;
             textTheme = defaultTextTheme.merge(textTheme);
@@ -142,6 +162,9 @@ namespace Unity.UIWidgets.material {
                           (isDark
                               ? ThemeDataUtils._kDarkThemeSplashColor
                               : ThemeDataUtils._kLightThemeSplashColor);
+
+            tabBarTheme = tabBarTheme ?? new TabBarTheme();
+            dialogTheme = dialogTheme ?? new DialogTheme();
 
             D.assert(brightness != null);
             D.assert(primaryColor != null);
@@ -179,10 +202,12 @@ namespace Unity.UIWidgets.material {
             D.assert(primaryIconTheme != null);
             D.assert(accentIconTheme != null);
             D.assert(materialTapTargetSize != null);
+            D.assert(pageTransitionsTheme != null);
             D.assert(colorScheme != null);
             D.assert(typography != null);
-
             D.assert(buttonColor != null);
+            D.assert(tabBarTheme != null);
+            D.assert(dialogTheme != null);
 
             this.brightness = brightness ?? Brightness.light;
             this.primaryColor = primaryColor;
@@ -217,54 +242,64 @@ namespace Unity.UIWidgets.material {
             this.textTheme = textTheme;
             this.primaryTextTheme = primaryTextTheme;
             this.accentTextTheme = accentTextTheme;
+            this.inputDecorationTheme = inputDecorationTheme;
             this.iconTheme = iconTheme;
             this.primaryIconTheme = primaryIconTheme;
             this.accentIconTheme = accentIconTheme;
+            this.tabBarTheme = tabBarTheme;
+            this.platform = platform.Value;
             this.materialTapTargetSize = materialTapTargetSize ?? MaterialTapTargetSize.padded;
+            this.pageTransitionsTheme = pageTransitionsTheme;
             this.colorScheme = colorScheme;
+            this.dialogTheme = dialogTheme;
             this.typography = typography;
         }
 
         public static ThemeData raw(
-            Brightness? brightness,
-            Color primaryColor,
-            Brightness? primaryColorBrightness,
-            Color primaryColorLight,
-            Color primaryColorDark,
-            Color canvasColor,
-            Color accentColor,
-            Brightness? accentColorBrightness,
-            Color scaffoldBackgroundColor,
-            Color bottomAppBarColor,
-            Color cardColor,
-            Color dividerColor,
-            Color highlightColor,
-            Color splashColor,
-            InteractiveInkFeatureFactory splashFactory,
-            Color selectedRowColor,
-            Color unselectedWidgetColor,
-            Color disabledColor,
-            ButtonThemeData buttonTheme,
-            Color buttonColor,
-            Color secondaryHeaderColor,
-            Color textSelectionColor,
-            Color cursorColor,
-            Color textSelectionHandleColor,
-            Color backgroundColor,
-            Color dialogBackgroundColor,
-            Color indicatorColor,
-            Color hintColor,
-            Color errorColor,
-            Color toggleableActiveColor,
-            TextTheme textTheme,
-            TextTheme primaryTextTheme,
-            TextTheme accentTextTheme,
-            IconThemeData iconTheme,
-            IconThemeData primaryIconTheme,
-            IconThemeData accentIconTheme,
-            MaterialTapTargetSize? materialTapTargetSize,
-            ColorScheme colorScheme,
-            Typography typography
+            Brightness? brightness = null,
+            Color primaryColor = null,
+            Brightness? primaryColorBrightness = null,
+            Color primaryColorLight = null,
+            Color primaryColorDark = null,
+            Color canvasColor = null,
+            Color accentColor = null,
+            Brightness? accentColorBrightness = null,
+            Color scaffoldBackgroundColor = null,
+            Color bottomAppBarColor = null,
+            Color cardColor = null,
+            Color dividerColor = null,
+            Color highlightColor = null,
+            Color splashColor = null,
+            InteractiveInkFeatureFactory splashFactory = null,
+            Color selectedRowColor = null,
+            Color unselectedWidgetColor = null,
+            Color disabledColor = null,
+            ButtonThemeData buttonTheme = null,
+            Color buttonColor = null,
+            Color secondaryHeaderColor = null,
+            Color textSelectionColor = null,
+            Color cursorColor = null,
+            Color textSelectionHandleColor = null,
+            Color backgroundColor = null,
+            Color dialogBackgroundColor = null,
+            Color indicatorColor = null,
+            Color hintColor = null,
+            Color errorColor = null,
+            Color toggleableActiveColor = null,
+            TextTheme textTheme = null,
+            TextTheme primaryTextTheme = null,
+            TextTheme accentTextTheme = null,
+            InputDecorationTheme inputDecorationTheme = null,
+            IconThemeData iconTheme = null,
+            IconThemeData primaryIconTheme = null,
+            IconThemeData accentIconTheme = null,
+            TabBarTheme tabBarTheme = null,
+            RuntimePlatform? platform = null,
+            MaterialTapTargetSize? materialTapTargetSize = null,
+            PageTransitionsTheme pageTransitionsTheme = null,
+            ColorScheme colorScheme = null,
+            DialogTheme dialogTheme = null,
+            Typography typography = null
         ) {
             D.assert(brightness != null);
             D.assert(primaryColor != null);
@@ -298,14 +333,18 @@ namespace Unity.UIWidgets.material {
             D.assert(textTheme != null);
             D.assert(primaryTextTheme != null);
             D.assert(accentTextTheme != null);
+            D.assert(inputDecorationTheme != null);
             D.assert(iconTheme != null);
             D.assert(primaryIconTheme != null);
             D.assert(accentIconTheme != null);
+            D.assert(platform != null);
             D.assert(materialTapTargetSize != null);
+            D.assert(pageTransitionsTheme != null);
             D.assert(colorScheme != null);
             D.assert(typography != null);
-
             D.assert(buttonColor != null);
+            D.assert(tabBarTheme != null);
+            D.assert(dialogTheme != null);
 
             return new ThemeData(
                 brightness: brightness,
@@ -341,11 +380,16 @@ namespace Unity.UIWidgets.material {
                 textTheme: textTheme,
                 primaryTextTheme: primaryTextTheme,
                 accentTextTheme: accentTextTheme,
+                inputDecorationTheme: inputDecorationTheme,
                 iconTheme: iconTheme,
                 primaryIconTheme: primaryIconTheme,
                 accentIconTheme: accentIconTheme,
+                tabBarTheme: tabBarTheme,
+                platform: platform,
                 materialTapTargetSize: materialTapTargetSize,
+                pageTransitionsTheme: pageTransitionsTheme,
                 colorScheme: colorScheme,
+                dialogTheme: dialogTheme,
                 typography: typography);
         }
 
@@ -428,58 +472,73 @@ namespace Unity.UIWidgets.material {
 
         public readonly TextTheme accentTextTheme;
 
+        public readonly InputDecorationTheme inputDecorationTheme;
+
         public readonly IconThemeData iconTheme;
 
         public readonly IconThemeData primaryIconTheme;
 
         public readonly IconThemeData accentIconTheme;
 
+        public readonly TabBarTheme tabBarTheme;
+
+        public readonly RuntimePlatform platform;
+
         public readonly MaterialTapTargetSize materialTapTargetSize;
 
+        public readonly PageTransitionsTheme pageTransitionsTheme;
+
         public readonly ColorScheme colorScheme;
+
+        public readonly DialogTheme dialogTheme;
 
         public readonly Typography typography;
 
         public ThemeData copyWith(
-            Brightness? brightness,
-            Color primaryColor,
-            Brightness? primaryColorBrightness,
-            Color primaryColorLight,
-            Color primaryColorDark,
-            Color accentColor,
-            Brightness? accentColorBrightness,
-            Color canvasColor,
-            Color scaffoldBackgroundColor,
-            Color bottomAppBarColor,
-            Color cardColor,
-            Color dividerColor,
-            Color highlightColor,
-            Color splashColor,
-            InteractiveInkFeatureFactory splashFactory,
-            Color selectedRowColor,
-            Color unselectedWidgetColor,
-            Color disabledColor,
-            ButtonThemeData buttonTheme,
-            Color buttonColor,
-            Color secondaryHeaderColor,
-            Color textSelectionColor,
-            Color cursorColor,
-            Color textSelectionHandleColor,
-            Color backgroundColor,
-            Color dialogBackgroundColor,
-            Color indicatorColor,
-            Color hintColor,
-            Color errorColor,
-            Color toggleableActiveColor,
-            TextTheme textTheme,
-            TextTheme primaryTextTheme,
-            TextTheme accentTextTheme,
-            IconThemeData iconTheme,
-            IconThemeData primaryIconTheme,
-            IconThemeData accentIconTheme,
-            MaterialTapTargetSize? materialTapTargetSize,
-            ColorScheme colorScheme,
-            Typography typography
+            Brightness? brightness = null,
+            Color primaryColor = null,
+            Brightness? primaryColorBrightness = null,
+            Color primaryColorLight = null,
+            Color primaryColorDark = null,
+            Color accentColor = null,
+            Brightness? accentColorBrightness = null,
+            Color canvasColor = null,
+            Color scaffoldBackgroundColor = null,
+            Color bottomAppBarColor = null,
+            Color cardColor = null,
+            Color dividerColor = null,
+            Color highlightColor = null,
+            Color splashColor = null,
+            InteractiveInkFeatureFactory splashFactory = null,
+            Color selectedRowColor = null,
+            Color unselectedWidgetColor = null,
+            Color disabledColor = null,
+            ButtonThemeData buttonTheme = null,
+            Color buttonColor = null,
+            Color secondaryHeaderColor = null,
+            Color textSelectionColor = null,
+            Color cursorColor = null,
+            Color textSelectionHandleColor = null,
+            Color backgroundColor = null,
+            Color dialogBackgroundColor = null,
+            Color indicatorColor = null,
+            Color hintColor = null,
+            Color errorColor = null,
+            Color toggleableActiveColor = null,
+            TextTheme textTheme = null,
+            TextTheme primaryTextTheme = null,
+            TextTheme accentTextTheme = null,
+            InputDecorationTheme inputDecorationTheme = null,
+            IconThemeData iconTheme = null,
+            IconThemeData primaryIconTheme = null,
+            IconThemeData accentIconTheme = null,
+            TabBarTheme tabBarTheme = null,
+            RuntimePlatform? platform = null,
+            MaterialTapTargetSize? materialTapTargetSize = null,
+            PageTransitionsTheme pageTransitionsTheme = null,
+            ColorScheme colorScheme = null,
+            DialogTheme dialogTheme = null,
+            Typography typography = null
         ) {
             return raw(
                 brightness: brightness ?? this.brightness,
@@ -515,15 +574,40 @@ namespace Unity.UIWidgets.material {
                 textTheme: textTheme ?? this.textTheme,
                 primaryTextTheme: primaryTextTheme ?? this.primaryTextTheme,
                 accentTextTheme: accentTextTheme ?? this.accentTextTheme,
+                inputDecorationTheme: this.inputDecorationTheme ?? this.inputDecorationTheme,
                 iconTheme: iconTheme ?? this.iconTheme,
                 primaryIconTheme: primaryIconTheme ?? this.primaryIconTheme,
                 accentIconTheme: accentIconTheme ?? this.accentIconTheme,
+                tabBarTheme: tabBarTheme ?? this.tabBarTheme,
+                platform: platform ?? this.platform,
                 materialTapTargetSize: materialTapTargetSize ?? this.materialTapTargetSize,
+                pageTransitionsTheme: pageTransitionsTheme ?? this.pageTransitionsTheme,
                 colorScheme: colorScheme ?? this.colorScheme,
+                dialogTheme: dialogTheme ?? this.dialogTheme,
                 typography: typography ?? this.typography
             );
         }
 
+        const int _localizedThemeDataCacheSize = 5;
+
+        static readonly _FifoCache<_IdentityThemeDataCacheKey, ThemeData> _localizedThemeDataCache =
+            new _FifoCache<_IdentityThemeDataCacheKey, ThemeData>(_localizedThemeDataCacheSize);
+
+
+        public static ThemeData localize(ThemeData baseTheme, TextTheme localTextGeometry) {
+            D.assert(baseTheme != null);
+            D.assert(localTextGeometry != null);
+
+            return _localizedThemeDataCache.putIfAbsent(
+                new _IdentityThemeDataCacheKey(baseTheme, localTextGeometry),
+                () => {
+                    return baseTheme.copyWith(
+                        primaryTextTheme: localTextGeometry.merge(baseTheme.primaryTextTheme),
+                        accentTextTheme: localTextGeometry.merge(baseTheme.accentTextTheme),
+                        textTheme: localTextGeometry.merge(baseTheme.textTheme)
+                    );
+                });
+        }
 
         public static Brightness estimateBrightnessForColor(Color color) {
             float relativeLuminance = color.computeLuminance();
@@ -572,11 +656,16 @@ namespace Unity.UIWidgets.material {
                 textTheme: TextTheme.lerp(a.textTheme, b.textTheme, t),
                 primaryTextTheme: TextTheme.lerp(a.primaryTextTheme, b.primaryTextTheme, t),
                 accentTextTheme: TextTheme.lerp(a.accentTextTheme, b.accentTextTheme, t),
+                inputDecorationTheme: t < 0.5f ? a.inputDecorationTheme : b.inputDecorationTheme,
                 iconTheme: IconThemeData.lerp(a.iconTheme, b.iconTheme, t),
                 primaryIconTheme: IconThemeData.lerp(a.primaryIconTheme, b.primaryIconTheme, t),
                 accentIconTheme: IconThemeData.lerp(a.accentIconTheme, b.accentIconTheme, t),
+                tabBarTheme: TabBarTheme.lerp(a.tabBarTheme, b.tabBarTheme, t),
+                platform: t < 0.5 ? a.platform : b.platform,
                 materialTapTargetSize: t < 0.5 ? a.materialTapTargetSize : b.materialTapTargetSize,
+                pageTransitionsTheme: t < 0.5 ? a.pageTransitionsTheme : b.pageTransitionsTheme,
                 colorScheme: ColorScheme.lerp(a.colorScheme, b.colorScheme, t),
+                dialogTheme: DialogTheme.lerp(a.dialogTheme, b.dialogTheme, t),
                 typography: Typography.lerp(a.typography, b.typography, t)
             );
         }
@@ -622,12 +711,17 @@ namespace Unity.UIWidgets.material {
                    other.textTheme == this.textTheme &&
                    other.primaryTextTheme == this.primaryTextTheme &&
                    other.accentTextTheme == this.accentTextTheme &&
+                   other.inputDecorationTheme == this.inputDecorationTheme &&
                    other.toggleableActiveColor == this.toggleableActiveColor &&
                    other.iconTheme == this.iconTheme &&
                    other.primaryIconTheme == this.primaryIconTheme &&
                    other.accentIconTheme == this.accentIconTheme &&
+                   other.tabBarTheme == this.tabBarTheme &&
+                   other.platform == this.platform &&
                    other.materialTapTargetSize == this.materialTapTargetSize &&
+                   other.pageTransitionsTheme == this.pageTransitionsTheme &&
                    other.colorScheme == this.colorScheme &&
+                   other.dialogTheme == this.dialogTheme &&
                    other.typography == this.typography;
         }
 
@@ -690,11 +784,16 @@ namespace Unity.UIWidgets.material {
                 hashCode = (hashCode * 397) ^ this.textTheme.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.primaryTextTheme.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.accentTextTheme.GetHashCode();
+                hashCode = (hashCode * 397) ^ this.inputDecorationTheme.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.iconTheme.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.primaryIconTheme.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.accentIconTheme.GetHashCode();
+                hashCode = (hashCode * 397) ^ this.tabBarTheme.GetHashCode();
+                hashCode = (hashCode * 397) ^ this.platform.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.materialTapTargetSize.GetHashCode();
+                hashCode = (hashCode * 397) ^ this.pageTransitionsTheme.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.colorScheme.GetHashCode();
+                hashCode = (hashCode * 397) ^ this.dialogTheme.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.typography.GetHashCode();
                 return hashCode;
             }
@@ -703,6 +802,8 @@ namespace Unity.UIWidgets.material {
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             ThemeData defaultData = fallback();
+            properties.add(new EnumProperty<RuntimePlatform>("platform", this.platform,
+                defaultValue: Application.platform));
             properties.add(new EnumProperty<Brightness>("brightness", this.brightness,
                 defaultValue: defaultData.brightness));
             properties.add(new DiagnosticsProperty<Color>("primaryColor", this.primaryColor,
@@ -757,17 +858,107 @@ namespace Unity.UIWidgets.material {
             properties.add(new DiagnosticsProperty<TextTheme>("textTheme", this.textTheme));
             properties.add(new DiagnosticsProperty<TextTheme>("primaryTextTheme", this.primaryTextTheme));
             properties.add(new DiagnosticsProperty<TextTheme>("accentTextTheme", this.accentTextTheme));
+            properties.add(new DiagnosticsProperty<InputDecorationTheme>("inputDecorationTheme", this.inputDecorationTheme));
             properties.add(new DiagnosticsProperty<Color>("toggleableActiveColor", this.toggleableActiveColor,
                 defaultValue: defaultData.toggleableActiveColor));
             properties.add(new DiagnosticsProperty<IconThemeData>("iconTheme", this.iconTheme));
             properties.add(new DiagnosticsProperty<IconThemeData>("primaryIconTheme", this.primaryIconTheme));
             properties.add(new DiagnosticsProperty<IconThemeData>("accentIconTheme", this.accentIconTheme));
+            properties.add(new DiagnosticsProperty<TabBarTheme>("tabBarTheme", this.tabBarTheme));
             properties.add(
                 new DiagnosticsProperty<MaterialTapTargetSize>("materialTapTargetSize", this.materialTapTargetSize));
+            properties.add(
+                new DiagnosticsProperty<PageTransitionsTheme>("pageTransitionsTheme", this.pageTransitionsTheme));
             properties.add(new DiagnosticsProperty<ColorScheme>("colorScheme", this.colorScheme,
                 defaultValue: defaultData.colorScheme));
+            properties.add(new DiagnosticsProperty<DialogTheme>("dialogTheme", this.dialogTheme,
+                defaultValue: defaultData.dialogTheme));
             properties.add(new DiagnosticsProperty<Typography>("typography", this.typography,
                 defaultValue: defaultData.typography));
+        }
+    }
+
+
+    class _IdentityThemeDataCacheKey : IEquatable<_IdentityThemeDataCacheKey> {
+        public _IdentityThemeDataCacheKey(
+            ThemeData baseTheme,
+            TextTheme localTextGeometry) {
+            this.baseTheme = baseTheme;
+            this.localTextGeometry = localTextGeometry;
+        }
+
+        public readonly ThemeData baseTheme;
+
+        public readonly TextTheme localTextGeometry;
+
+        public bool Equals(_IdentityThemeDataCacheKey other) {
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
+
+            return this.baseTheme == other.baseTheme &&
+                   this.localTextGeometry == other.localTextGeometry;
+        }
+
+        public override bool Equals(object obj) {
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
+
+            return this.Equals((_IdentityThemeDataCacheKey) obj);
+        }
+
+        public static bool operator ==(_IdentityThemeDataCacheKey left, _IdentityThemeDataCacheKey right) {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(_IdentityThemeDataCacheKey left, _IdentityThemeDataCacheKey right) {
+            return !Equals(left, right);
+        }
+
+        public override int GetHashCode() {
+            var hashCode = this.baseTheme.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.localTextGeometry.GetHashCode();
+            return hashCode;
+        }
+    }
+
+    class _FifoCache<K, V> {
+        public _FifoCache(int maximumSize) {
+            D.assert(maximumSize > 0);
+            this._maximumSize = maximumSize;
+        }
+
+        readonly Dictionary<K, V> _cache = new Dictionary<K, V>();
+
+        readonly int _maximumSize;
+
+        public V putIfAbsent(K key, Func<V> value) {
+            D.assert(key != null);
+            D.assert(value != null);
+
+            if (this._cache.ContainsKey(key)) {
+                return this._cache[key];
+            }
+
+            if (this._cache.Count == this._maximumSize) {
+                this._cache.Remove(this._cache.Keys.First());
+            }
+
+            this._cache[key] = value();
+            return this._cache[key];
         }
     }
 }

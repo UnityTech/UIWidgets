@@ -32,6 +32,27 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
+    public class BackdropFilter : SingleChildRenderObjectWidget {
+        public BackdropFilter(
+            Key key = null,
+            ImageFilter filter = null,
+            Widget child = null)
+            : base(key, child) {
+            D.assert(filter != null);
+            this.filter = filter;
+        }
+
+        public readonly ImageFilter filter;
+
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderBackdropFilter(filter: this.filter);
+        }
+
+        public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
+            ((RenderBackdropFilter) renderObject).filter = this.filter;
+        }
+    }
+
     public class Opacity : SingleChildRenderObjectWidget {
         public Opacity(float opacity, Key key = null, Widget child = null) : base(key, child) {
             this.opacity = opacity;
@@ -355,6 +376,18 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
+    public class SliverToBoxAdapter : SingleChildRenderObjectWidget {
+        public SliverToBoxAdapter(
+            Key key = null,
+            Widget child = null) : base(key: key, child: child) {
+        }
+
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderSliverToBoxAdapter();
+        }
+    }
+
+
     public class Flex : MultiChildRenderObjectWidget {
         public Flex(
             Axis direction = Axis.vertical,
@@ -423,6 +456,17 @@ namespace Unity.UIWidgets.widgets {
             ((RenderFlex) renderObject).verticalDirection = this.verticalDirection;
             ((RenderFlex) renderObject).textBaseline = this.textBaseline ?? TextBaseline.alphabetic;
         }
+        
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new EnumProperty<Axis>("direction", this.direction));
+            properties.add(new EnumProperty<MainAxisAlignment>("mainAxisAlignment", this.mainAxisAlignment));
+            properties.add(new EnumProperty<MainAxisSize>("mainAxisSize", this.mainAxisSize, defaultValue: MainAxisSize.max));
+            properties.add(new EnumProperty<CrossAxisAlignment>("crossAxisAlignment", this.crossAxisAlignment));
+            properties.add(new EnumProperty<TextDirection?>("textDirection", this.textDirection, defaultValue: null));
+            properties.add(new EnumProperty<VerticalDirection>("verticalDirection", this.verticalDirection, defaultValue: VerticalDirection.down));
+            properties.add(new EnumProperty<TextBaseline?>("textBaseline", this.textBaseline, defaultValue: null));
+        }
     }
 
     public class Offstage : SingleChildRenderObjectWidget {
@@ -490,6 +534,65 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
+    public class IntrinsicWidth : SingleChildRenderObjectWidget {
+        public IntrinsicWidth(Key key = null, float? stepWidth = null, float? stepHeight = null, Widget child = null)
+            : base(key: key, child: child) {
+            this.stepWidth = stepWidth;
+            this.stepHeight = stepHeight;
+        }
+
+        public readonly float? stepWidth;
+
+        public readonly float? stepHeight;
+
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderIntrinsicWidth(stepWidth: this.stepWidth, stepHeight: this.stepHeight);
+        }
+
+        public override void updateRenderObject(BuildContext context, RenderObject renderObjectRaw) {
+            var renderObject = (RenderIntrinsicWidth) renderObjectRaw;
+            renderObject.stepWidth = this.stepWidth;
+            renderObject.stepHeight = this.stepHeight;
+        }
+    }
+
+    public class IntrinsicHeight : SingleChildRenderObjectWidget {
+        public IntrinsicHeight(Key key = null, Widget child = null)
+            : base(key: key, child: child) {
+        }
+
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderIntrinsicHeight();
+        }
+    }
+
+    public class Baseline : SingleChildRenderObjectWidget {
+        public Baseline(
+            Key key = null,
+            float? baseline = null,
+            TextBaseline? baselineType = null,
+            Widget child = null
+        ) : base(key: key, child: child) {
+            D.assert(baseline != null);
+            D.assert(baselineType != null);
+            this.baseline = baseline.Value;
+            this.baselineType = baselineType.Value;
+        }
+
+        public readonly float baseline;
+
+        public readonly TextBaseline baselineType;
+
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderBaseline(baseline: this.baseline, baselineType: this.baselineType);
+        }
+
+        public override void updateRenderObject(BuildContext context, RenderObject renderObjectRaw) {
+            RenderBaseline renderObject = (RenderBaseline) renderObjectRaw;
+            renderObject.baseline = this.baseline;
+            renderObject.baselineType = this.baselineType;
+        }
+    }
 
     public class ListBody : MultiChildRenderObjectWidget {
         public ListBody(
@@ -564,6 +667,33 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
+    class IndexedStack : Stack {
+        public IndexedStack(
+            Key key = null,
+            Alignment alignment = null,
+            StackFit sizing = StackFit.loose,
+            int index = 0,
+            List<Widget> children = null
+        ) : base(key: key, alignment: alignment ?? Alignment.topLeft, fit: sizing, children: children) {
+            this.index = index;
+        }
+
+        public readonly int index;
+
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderIndexedStack(
+                index: this.index,
+                alignment: this.alignment
+            );
+        }
+
+        public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
+            RenderIndexedStack renderIndexedStack = renderObject as RenderIndexedStack;
+            renderIndexedStack.index = this.index;
+            renderIndexedStack.alignment = this.alignment;
+        }
+    }
+
     public class Positioned : ParentDataWidget<Stack> {
         public Positioned(Widget child, Key key = null, float? left = null, float? top = null,
             float? right = null, float? bottom = null, float? width = null, float? height = null) :
@@ -583,7 +713,7 @@ namespace Unity.UIWidgets.widgets {
                 top: rect.top, width: rect.width, height: rect.height);
         }
 
-        public static Positioned fromRelativeRect(Rect rect, Widget child, Key key = null) {
+        public static Positioned fromRelativeRect(RelativeRect rect, Widget child, Key key = null) {
             return new Positioned(child, key: key, left: rect.left,
                 top: rect.top, right: rect.right, bottom: rect.bottom);
         }
@@ -781,6 +911,85 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
+    public class Wrap : MultiChildRenderObjectWidget {
+        public Wrap(
+            Key key = null,
+            Axis direction = Axis.horizontal,
+            WrapAlignment alignment = WrapAlignment.start,
+            float spacing = 0.0f,
+            WrapAlignment runAlignment = WrapAlignment.start,
+            float runSpacing = 0.0f,
+            WrapCrossAlignment crossAxisAlignment = WrapCrossAlignment.start,
+            TextDirection? textDirection = null,
+            VerticalDirection verticalDirection = VerticalDirection.down,
+            List<Widget> children = null
+        ) : base(key: key, children: children) {
+            this.direction = direction;
+            this.alignment = alignment;
+            this.spacing = spacing;
+            this.runAlignment = runAlignment;
+            this.runSpacing = runSpacing;
+            this.crossAxisAlignment = crossAxisAlignment;
+            this.textDirection = textDirection;
+            this.verticalDirection = verticalDirection;
+        }
+
+        public readonly Axis direction;
+
+        public readonly WrapAlignment alignment;
+
+        public readonly float spacing;
+
+        public readonly WrapAlignment runAlignment;
+
+        public readonly float runSpacing;
+
+        public readonly WrapCrossAlignment crossAxisAlignment;
+
+        public readonly TextDirection? textDirection;
+
+        public readonly VerticalDirection verticalDirection;
+
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderWrap(
+                children: null,
+                direction: this.direction,
+                alignment: this.alignment,
+                spacing: this.spacing,
+                runAlignment: this.runAlignment,
+                runSpacing: this.runSpacing,
+                crossAxisAlignment: this.crossAxisAlignment,
+                textDirection: this.textDirection ?? Directionality.of(context),
+                verticalDirection: this.verticalDirection
+            );
+        }
+
+        public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
+            D.assert(renderObject is RenderWrap);
+            RenderWrap renderWrap = renderObject as RenderWrap;
+            renderWrap.direction = this.direction;
+            renderWrap.alignment = this.alignment;
+            renderWrap.spacing = this.spacing;
+            renderWrap.runAlignment = this.runAlignment;
+            renderWrap.runSpacing = this.runSpacing;
+            renderWrap.crossAxisAlignment = this.crossAxisAlignment;
+            renderWrap.textDirection = this.textDirection ?? Directionality.of(context);
+            renderWrap.verticalDirection = this.verticalDirection;
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new EnumProperty<Axis>("direction", this.direction));
+            properties.add(new EnumProperty<WrapAlignment>("alignment", this.alignment));
+            properties.add(new FloatProperty("spacing", this.spacing));
+            properties.add(new EnumProperty<WrapAlignment>("runAlignment", this.runAlignment));
+            properties.add(new FloatProperty("runSpacing", this.runSpacing));
+            properties.add(new FloatProperty("crossAxisAlignment", this.runSpacing));
+            properties.add(new EnumProperty<TextDirection?>("textDirection", this.textDirection, defaultValue: null));
+            properties.add(new EnumProperty<VerticalDirection>("verticalDirection", this.verticalDirection,
+                defaultValue: VerticalDirection.down));
+        }
+    }
 
     public class PhysicalModel : SingleChildRenderObjectWidget {
         public PhysicalModel(
@@ -1093,6 +1302,41 @@ namespace Unity.UIWidgets.widgets {
             ((RenderFollowerLayer) renderObject).link = this.link;
             ((RenderFollowerLayer) renderObject).showWhenUnlinked = this.showWhenUnlinked;
             ((RenderFollowerLayer) renderObject).offset = this.offset;
+        }
+    }
+
+    public class FittedBox : SingleChildRenderObjectWidget {
+        public FittedBox(
+            Key key = null,
+            BoxFit fit = BoxFit.contain,
+            Alignment alignment = null,
+            Widget child = null
+        ) : base(key: key, child: child) {
+            this.fit = fit;
+            this.alignment = alignment ?? Alignment.center;
+        }
+
+        public readonly BoxFit fit;
+
+        public readonly Alignment alignment;
+
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderFittedBox(
+                fit: this.fit,
+                alignment: this.alignment
+            );
+        }
+
+        public override void updateRenderObject(BuildContext context, RenderObject _renderObject) {
+            RenderFittedBox renderObject = _renderObject as RenderFittedBox;
+            renderObject.fit = this.fit;
+            renderObject.alignment = this.alignment;
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new EnumProperty<BoxFit>("fit", this.fit));
+            properties.add(new DiagnosticsProperty<Alignment>("alignment", this.alignment));
         }
     }
 
@@ -1651,10 +1895,10 @@ namespace Unity.UIWidgets.widgets {
             bool absorbing = true,
             Widget child = null
         ) : base(key: key, child: child) {
+            this.absorbing = absorbing;
         }
 
         public readonly bool absorbing;
-
 
         public override RenderObject createRenderObject(BuildContext context) {
             return new RenderAbsorbPointer(
@@ -1704,6 +1948,45 @@ namespace Unity.UIWidgets.widgets {
             properties.add(new DiagnosticsProperty<object>("metaData", this.metaData));
         }
     }
+
+    public class KeyedSubtree : StatelessWidget {
+        public KeyedSubtree(
+            Key key,
+            Widget child = null
+        ) : base(key: key) {
+            D.assert(child != null);
+            this.child = child;
+        }
+
+
+        public static KeyedSubtree wrap(Widget child, int childIndex) {
+            Key key = child.key != null ? (Key) new ValueKey<Key>(child.key) : new ValueKey<int>(childIndex);
+            return new KeyedSubtree(key: key, child: child);
+        }
+
+        public readonly Widget child;
+
+        public static List<Widget> ensureUniqueKeysForList(IEnumerable<Widget> items, int baseIndex = 0) {
+            if (items == null) {
+                return null;
+            }
+
+            List<Widget> itemsWithUniqueKeys = new List<Widget>();
+            int itemIndex = baseIndex;
+            foreach (Widget item in items) {
+                itemsWithUniqueKeys.Add(wrap(item, itemIndex));
+                itemIndex += 1;
+            }
+
+            D.assert(!WidgetsD.debugItemsHaveDuplicateKeys(itemsWithUniqueKeys));
+            return itemsWithUniqueKeys;
+        }
+
+        public override Widget build(BuildContext context) {
+            return this.child;
+        }
+    }
+
 
     public class Builder : StatelessWidget {
         public Builder(

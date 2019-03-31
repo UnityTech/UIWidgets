@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.ui;
 using UnityEngine;
+using Rect = Unity.UIWidgets.ui.Rect;
 
 namespace Unity.UIWidgets.rendering {
     public enum TextOverflow {
@@ -93,6 +95,11 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
+        protected Offset getOffsetForCaret(TextPosition position, Rect caretPrototype) {
+            D.assert(this._textPainter != null);
+            return this._textPainter.getOffsetForCaret(position, caretPrototype);
+        }
+
         public bool softWrap {
             get { return this._softWrap; }
             set {
@@ -179,6 +186,18 @@ namespace Unity.UIWidgets.rendering {
 
         protected override bool hitTestSelf(Offset position) {
             return true;
+        }
+
+        public override void handleEvent(PointerEvent evt, HitTestEntry entry) {
+            D.assert(this.debugHandleEvent(evt, entry));
+            if (!(evt is PointerDownEvent)) {
+                return;
+            }
+            this._layoutTextWithConstraints(this.constraints);
+            Offset offset = ((BoxHitTestEntry)entry).localPosition;
+            TextPosition position = this._textPainter.getPositionForOffset(offset);
+            TextSpan span = this._textPainter.text.getSpanForPosition(position);
+            span?.recognizer?.addPointer((PointerDownEvent)evt);
         }
 
         protected override void performLayout() {

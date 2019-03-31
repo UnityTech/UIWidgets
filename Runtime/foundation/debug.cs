@@ -10,8 +10,19 @@ namespace Unity.UIWidgets.foundation {
     public static class D {
 
         public static void logError(string message, Exception ex = null) {
-            Debug.LogException(new ReportError(message, ex));
+            Debug.LogException(new AssertionError(message, ex));
         }
+
+        public static bool debugEnabled {
+            get {
+#if UIWidgets_DEBUG
+                return true;
+#else
+                return false;
+#endif
+            }
+        }
+        
         [Conditional("UIWidgets_DEBUG")]
         public static void assert(Func<bool> result, string message = null) {
             if (!result()) {
@@ -135,31 +146,19 @@ namespace Unity.UIWidgets.foundation {
 
     [Serializable]
     public class AssertionError : Exception {
+        readonly Exception innerException;
+        
         public AssertionError(string message) : base(message) {
         }
 
-        public override string StackTrace {
-            get {
-                var stackTrace = base.StackTrace;
-                var lines = stackTrace.Split('\n');
-                var strippedLines = lines.Skip(1);
-
-                return string.Join("\n", strippedLines);
-            }
-        }
-    }
-    
-    
-    public class ReportError : Exception {
-        Exception ex;
-        public ReportError(string message, Exception ex = null) : base(message) {
-            this.ex = ex;
+        public AssertionError(string message, Exception innerException = null) : base(message) {
+            this.innerException = innerException;
         }
 
         public override string StackTrace {
             get {
-                if (this.ex != null) {
-                    return this.ex.StackTrace;
+                if (this.innerException != null) {
+                    return this.innerException.StackTrace;
                 }
                 
                 var stackTrace = base.StackTrace;
@@ -169,6 +168,5 @@ namespace Unity.UIWidgets.foundation {
                 return string.Join("\n", strippedLines);
             }
         }
-        
     }
 }

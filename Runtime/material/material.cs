@@ -10,6 +10,18 @@ using Unity.UIWidgets.widgets;
 using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace Unity.UIWidgets.material {
+    static class MaterialConstantsUtils {
+        public static readonly Dictionary<MaterialType, BorderRadius> kMaterialEdges =
+            new Dictionary<MaterialType, BorderRadius> {
+                {MaterialType.canvas, null},
+                {MaterialType.card, BorderRadius.circular(2.0f)},
+                {MaterialType.circle, null},
+                {MaterialType.button, BorderRadius.circular(2.0f)},
+                {MaterialType.transparency, null}
+            };
+    }
+
+
     public delegate Rect RectCallback();
 
     public enum MaterialType {
@@ -467,7 +479,7 @@ namespace Unity.UIWidgets.material {
         ColorTween _shadowColor;
         ShapeBorderTween _border;
 
-        protected override void forEachTween(ITweenVisitor visitor) {
+        protected override void forEachTween(TweenVisitor visitor) {
             this._elevation = (FloatTween) visitor.visit(this, this._elevation, this.widget.elevation,
                 (float value) => new FloatTween(begin: value, end: value));
             this._shadowColor = (ColorTween) visitor.visit(this, this._shadowColor, this.widget.shadowColor,

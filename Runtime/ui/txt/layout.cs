@@ -2,7 +2,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
-    public class Layout {
+    
+    class Layout {
         int _start;
         int _count;
         List<float> _advances = new List<float>();
@@ -33,8 +34,8 @@ namespace Unity.UIWidgets.ui {
             this._advances.Clear();
             this._positions.Clear();
             this._count = count;
-            var font = FontManager.instance.getOrCreate(style.fontFamily).font;
-            font.RequestCharactersInTexture(this._text.Substring(start, count),
+            var font = FontManager.instance.getOrCreate(style.fontFamily, style.fontWeight, style.fontStyle).font;
+            font.RequestCharactersInTextureSafe(this._text.Substring(start, count),
                 style.UnityFontSize,
                 style.UnityFontStyle);
 
@@ -43,11 +44,9 @@ namespace Unity.UIWidgets.ui {
             for (int i = 0; i < count; i++) {
                 int charIndex = start + i;
                 var ch = text[charIndex];
-                CharacterInfo characterInfo;
-                font.GetCharacterInfo(ch, out characterInfo, style.UnityFontSize, style.UnityFontStyle);
+                var glyphInfo = font.getGlyphInfo(ch, style.UnityFontSize, style.UnityFontStyle);
 
-                var rect = Rect.fromLTRB(characterInfo.minX, -characterInfo.maxY, characterInfo.maxX,
-                    -characterInfo.minY);
+                var rect = glyphInfo.rect;
                 rect = rect.translate(this._advance, 0);
                 if (this._bounds == null || this._bounds.isEmpty) {
                     this._bounds = rect;
@@ -57,7 +56,7 @@ namespace Unity.UIWidgets.ui {
                 }
 
                 this._positions.Add(this._advance);
-                float advance = characterInfo.advance;
+                float advance = glyphInfo.advance;
                 if (ch == '\t') {
                     advance = this._tabStops.nextTab((this._advance + offset)) - this._advance;
                 }

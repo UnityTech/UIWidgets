@@ -74,6 +74,62 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
+    public class CompositeKey : Key, IEquatable<CompositeKey> {
+        readonly object componentKey1;
+        readonly object componentKey2;
+
+        public CompositeKey(object componentKey1, object componentKey2) {
+            this.componentKey1 = componentKey1;
+            this.componentKey2 = componentKey2;
+        }
+
+        public bool Equals(CompositeKey other) {
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
+
+            return Equals(this.componentKey1, other.componentKey1) &&
+                   Equals(this.componentKey2, other.componentKey2);
+        }
+
+        public override bool Equals(object obj) {
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
+
+            return this.Equals((CompositeKey) obj);
+        }
+
+        public override int GetHashCode() {
+            return (this.componentKey1 != null ? this.componentKey1.GetHashCode() : 0) ^
+                   (this.componentKey2 != null ? this.componentKey2.GetHashCode() : 0);
+        }
+
+        public static bool operator ==(CompositeKey left, CompositeKey right) {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(CompositeKey left, CompositeKey right) {
+            return !Equals(left, right);
+        }
+
+        public override string ToString() {
+            return this.GetType() + $"({this.componentKey1},{this.componentKey2})";
+        }
+    }
+
     public abstract class GlobalKey : Key {
         protected GlobalKey() {
         }
@@ -82,50 +138,53 @@ namespace Unity.UIWidgets.widgets {
             return new LabeledGlobalKey<State<StatefulWidget>>(debugLabel);
         }
 
-        static readonly Dictionary<GlobalKey, Element> _registry =
-            new Dictionary<GlobalKey, Element>();
+        static readonly Dictionary<CompositeKey, Element> _registry =
+            new Dictionary<CompositeKey, Element>();
 
-        static readonly HashSet<GlobalKey> _removedKeys = new HashSet<GlobalKey>();
+        static readonly HashSet<CompositeKey> _removedKeys = new HashSet<CompositeKey>();
         static readonly HashSet<Element> _debugIllFatedElements = new HashSet<Element>();
 
-        static readonly Dictionary<GlobalKey, Element> _debugReservations =
-            new Dictionary<GlobalKey, Element>();
+        static readonly Dictionary<CompositeKey, Element> _debugReservations =
+            new Dictionary<CompositeKey, Element>();
 
         internal void _register(Element element) {
+            CompositeKey compKey = new CompositeKey(Window.instance, this);
             D.assert(() => {
-                if (_registry.ContainsKey(this)) {
+                if (_registry.ContainsKey(compKey)) {
                     D.assert(element.widget != null);
-                    D.assert(_registry[this].widget != null);
-                    D.assert(element.widget.GetType() != _registry[this].widget.GetType());
-                    _debugIllFatedElements.Add(_registry[this]);
+                    D.assert(_registry[compKey].widget != null);
+                    D.assert(element.widget.GetType() != _registry[compKey].widget.GetType());
+                    _debugIllFatedElements.Add(_registry[compKey]);
                 }
 
                 return true;
             });
-            _registry[this] = element;
+            _registry[compKey] = element;
         }
 
         internal void _unregister(Element element) {
+            CompositeKey compKey = new CompositeKey(Window.instance, this);
             D.assert(() => {
-                if (_registry.ContainsKey(this) && _registry[this] != element) {
+                if (_registry.ContainsKey(compKey) && _registry[compKey] != element) {
                     D.assert(element.widget != null);
-                    D.assert(_registry[this].widget != null);
-                    D.assert(element.widget.GetType() != _registry[this].widget.GetType());
+                    D.assert(_registry[compKey].widget != null);
+                    D.assert(element.widget.GetType() != _registry[compKey].widget.GetType());
                 }
 
                 return true;
             });
-            if (_registry[this] == element) {
-                _registry.Remove(this);
-                _removedKeys.Add(this);
+            if (_registry[compKey] == element) {
+                _registry.Remove(compKey);
+                _removedKeys.Add(compKey);
             }
         }
 
         internal void _debugReserveFor(Element parent) {
+            CompositeKey compKey = new CompositeKey(Window.instance, this);
             D.assert(() => {
                 D.assert(parent != null);
-                if (_debugReservations.ContainsKey(this) && _debugReservations[this] != parent) {
-                    string older = _debugReservations[this].ToString();
+                if (_debugReservations.ContainsKey(compKey) && _debugReservations[compKey] != parent) {
+                    string older = _debugReservations[compKey].ToString();
                     string newer = parent.ToString();
                     if (older != newer) {
                         throw new UIWidgetsError(
@@ -142,7 +201,7 @@ namespace Unity.UIWidgets.widgets {
                         "A GlobalKey can only be specified on one widget at a time in the widget tree.");
                 }
 
-                _debugReservations[this] = parent;
+                _debugReservations[compKey] = parent;
                 return true;
             });
         }
@@ -156,11 +215,13 @@ namespace Unity.UIWidgets.widgets {
                         D.assert(element.widget != null);
                         D.assert(element.widget.key != null);
                         GlobalKey key = (GlobalKey) element.widget.key;
-                        D.assert(_registry.ContainsKey(key));
+                        CompositeKey compKey = new CompositeKey(Window.instance, key);
+
+                        D.assert(_registry.ContainsKey(compKey));
                         duplicates = duplicates ?? new Dictionary<GlobalKey, HashSet<Element>>();
                         var elements = duplicates.putIfAbsent(key, () => new HashSet<Element>());
                         elements.Add(element);
-                        elements.Add(_registry[key]);
+                        elements.Add(_registry[compKey]);
                     }
                 }
 
@@ -189,7 +250,8 @@ namespace Unity.UIWidgets.widgets {
         internal Element _currentElement {
             get {
                 Element result;
-                _registry.TryGetValue(this, out result);
+                CompositeKey compKey = new CompositeKey(Window.instance, this);
+                _registry.TryGetValue(compKey, out result);
                 return result;
             }
         }
@@ -359,7 +421,7 @@ namespace Unity.UIWidgets.widgets {
     }
 
     public abstract class StatefulWidget : Widget {
-        protected StatefulWidget(Key key) : base(key: key) {
+        protected StatefulWidget(Key key = null) : base(key: key) {
         }
 
         public override Element createElement() {
@@ -408,7 +470,7 @@ namespace Unity.UIWidgets.widgets {
         public virtual void didUpdateWidget(StatefulWidget oldWidget) {
         }
 
-        protected void setState(VoidCallback fn = null) {
+        public void setState(VoidCallback fn = null) {
             D.assert(() => {
                 if (this._debugLifecycleState == _StateLifecycle.defunct) {
                     throw new UIWidgetsError(
@@ -441,19 +503,10 @@ namespace Unity.UIWidgets.widgets {
                 return true;
             });
 
-            if (Window.hasInstance) {
-                this._setState(fn);
-            } else {
-                using (WindowProvider.of(this.context).getScope()) {
-                    this._setState(fn);
-                }
-            }
-        }
-
-        void _setState(VoidCallback fn = null) {
             if (fn != null) {
                 fn();
             }
+
             this._element.markNeedsBuild();
         }
 
@@ -2243,7 +2296,7 @@ namespace Unity.UIWidgets.widgets {
                 }
 
                 throw new UIWidgetsError(
-                    this._state.GetType() + ".dispose failed to call super.dispose.\n" +
+                    this._state.GetType() + ".dispose failed to call base.dispose.\n" +
                     "dispose() implementations must always call their superclass dispose() method, to ensure " +
                     "that all the resources used by the widget are fully released.");
             });

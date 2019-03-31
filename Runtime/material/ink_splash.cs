@@ -4,8 +4,54 @@ using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
+using UnityEngine;
+using Canvas = Unity.UIWidgets.ui.Canvas;
+using Color = Unity.UIWidgets.ui.Color;
+using Rect = Unity.UIWidgets.ui.Rect;
 
 namespace Unity.UIWidgets.material {
+    static class InkSplashUtils {
+        public static readonly TimeSpan _kUnconfirmedSplashDuration = new TimeSpan(0, 0, 0, 1, 0);
+
+        public static readonly TimeSpan _kSplashFadeDuration = new TimeSpan(0, 0, 0, 0, 200);
+
+        public const float _kSplashInitialSize = 0.0f;
+
+        public const float _kSplashConfirmedVelocity = 1.0f;
+
+        public static RectCallback _getClipCallback(RenderBox referenceBox, bool containedInkWell,
+            RectCallback rectCallback) {
+            if (rectCallback != null) {
+                D.assert(containedInkWell);
+                return rectCallback;
+            }
+
+            if (containedInkWell) {
+                return () => Offset.zero & referenceBox.size;
+            }
+
+            return null;
+        }
+
+        public static float _getTargetRadius(RenderBox referenceBox, bool containedInkWell, RectCallback rectCallback,
+            Offset position) {
+            if (containedInkWell) {
+                Size size = rectCallback != null ? rectCallback().size : referenceBox.size;
+                return _getSplashRadiusForPositionInSize(size, position);
+            }
+
+            return Material.defaultSplashRadius;
+        }
+
+        static float _getSplashRadiusForPositionInSize(Size bounds, Offset position) {
+            float d1 = (position - bounds.topLeft(Offset.zero)).distance;
+            float d2 = (position - bounds.topRight(Offset.zero)).distance;
+            float d3 = (position - bounds.bottomLeft(Offset.zero)).distance;
+            float d4 = (position - bounds.bottomRight(Offset.zero)).distance;
+            return Mathf.Max(Mathf.Max(d1, d2), Mathf.Max(d3, d4)).ceil();
+        }
+    }
+
     public class _InkSplashFactory : InteractiveInkFeatureFactory {
         public _InkSplashFactory() {
         }
@@ -167,11 +213,7 @@ namespace Unity.UIWidgets.material {
                 }
             }
 
-            //todo:xingwei.zhu: remove this condition when drawCircle bug fixed (when radius.value == 0)
-            if (this._radius.value != 0) {
-                canvas.drawCircle(center, this._radius.value, paint);
-            }
-
+            canvas.drawCircle(center, this._radius.value, paint);
             canvas.restore();
         }
     }

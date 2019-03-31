@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using Unity.UIWidgets.flow;
 using Unity.UIWidgets.foundation;
+using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
     public class SceneBuilder {
@@ -66,7 +67,7 @@ namespace Unity.UIWidgets.ui {
 
         public Layer pushOpacity(int alpha, Offset offset = null) {
             offset = offset ?? Offset.zero;
-            
+
             var layer = new OpacityLayer();
             layer.alpha = alpha;
             layer.offset = offset;
@@ -74,6 +75,14 @@ namespace Unity.UIWidgets.ui {
             return layer;
         }
 
+        public Layer pushBackdropFilter(ImageFilter filter) {
+            var layer = new BackdropFilterLayer();
+            layer.filter = filter;
+            this._pushLayer(layer);
+            return layer;
+        }
+
+        
         public void addRetained(Layer layer) {
             if (this._currentLayer == null) {
                 return;
@@ -94,7 +103,7 @@ namespace Unity.UIWidgets.ui {
             bool isComplexHint = false, bool willChangeHint = false) {
             D.assert(offset != null);
             D.assert(picture != null);
-            
+
             if (this._currentLayer == null) {
                 return;
             }
@@ -105,6 +114,51 @@ namespace Unity.UIWidgets.ui {
             layer.isComplex = isComplexHint;
             layer.willChange = willChangeHint;
             this._currentLayer.add(layer);
+        }
+
+        public void addTexture(
+            Texture texture,
+            Offset offset,
+            float width,
+            float height,
+            bool freeze) {
+            if (this._currentLayer == null) {
+                return;
+            }
+
+            var layer = new TextureLayer();
+            layer.offset = offset;
+            layer.size = new Size(width, height);
+            layer.texture = texture;
+            layer.freeze = freeze;
+            this._currentLayer.add(layer);
+        }
+
+        public void addPerformanceOverlay(int enabledOptions, Rect bounds) {
+            if (this._currentLayer == null) {
+                return;
+            }
+
+            var layer = new PerformanceOverlayLayer(enabledOptions);
+            layer.paintBounds = Rect.fromLTRB(
+                bounds.left,
+                bounds.top,
+                bounds.right,
+                bounds.bottom
+            );
+            this._currentLayer.add(layer);
+        }
+
+        public Layer pushPhysicalShape(Path path, float elevation, Color color, Color shadowColor, Clip clipBehavior) {
+            var layer = new PhysicalShapeLayer(clipBehavior);
+            layer.path = path;
+            layer.elevation = elevation;
+            layer.color = color;
+            layer.shadowColor = shadowColor;
+            layer.devicePixelRatio = Window.instance.devicePixelRatio;
+
+            this._pushLayer(layer);
+            return layer;
         }
     }
 

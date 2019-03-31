@@ -1,5 +1,5 @@
 ﻿namespace Unity.UIWidgets.ui {
-    public class PaintRecord {
+    class PaintRecord {
         public PaintRecord(TextStyle style, Offset offset, TextBlob _text,
             FontMetrics metrics,
             int line, float runWidth) {

@@ -1,3 +1,4 @@
+using System;
 using Unity.UIWidgets.animation;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.painting;
@@ -5,6 +6,10 @@ using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
 
 namespace Unity.UIWidgets.material {
+    static class InkHighlightUtils {
+        public static readonly TimeSpan _kHighlightFadeDuration = new TimeSpan(0, 0, 0, 0, 200);
+    }
+
     public class InkHighlight : InteractiveInkFeature {
         public InkHighlight(
             MaterialInkController controller = null,

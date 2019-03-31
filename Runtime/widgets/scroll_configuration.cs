@@ -3,11 +3,11 @@ using Unity.UIWidgets.painting;
 
 namespace Unity.UIWidgets.widgets {
     public class ScrollBehavior {
-        public Widget buildViewportChrome(BuildContext context, Widget child, AxisDirection axisDirection) {
+        public virtual Widget buildViewportChrome(BuildContext context, Widget child, AxisDirection axisDirection) {
             return child;
         }
 
-        public ScrollPhysics getScrollPhysics(BuildContext context) {
+        public virtual ScrollPhysics getScrollPhysics(BuildContext context) {
             return new BouncingScrollPhysics();
         }
 

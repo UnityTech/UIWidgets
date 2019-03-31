@@ -1,4 +1,7 @@
 ﻿using System;
+using Unity.UIWidgets.flow;
+using UnityEngine;
+using Unity.UIWidgets.foundation;
 
 namespace Unity.UIWidgets.ui {
     public interface Canvas {
@@ -38,6 +41,8 @@ namespace Unity.UIWidgets.ui {
 
         void drawRect(Rect rect, Paint paint);
 
+        void drawShadow(Path path, Color color, float elevation, bool transparentOccluder);
+
         void drawRRect(RRect rect, Paint paint);
 
         void drawDRRect(RRect outer, RRect inner, Paint paint);
@@ -64,6 +69,7 @@ namespace Unity.UIWidgets.ui {
 
         void drawTextBlob(TextBlob textBlob, Offset offset, Paint paint);
 
+        void drawParagraph(Paragraph paragraph, Offset offset);
         void flush();
 
         void reset();
@@ -184,6 +190,11 @@ namespace Unity.UIWidgets.ui {
             });
         }
 
+        public void drawShadow(Path path, Color color, float elevation, bool transparentOccluder) {
+            float dpr = Window.instance.devicePixelRatio;
+            PhysicalShapeLayer.drawShadow(this, path, color, elevation, transparentOccluder, dpr);
+        }
+
         public void drawRect(Rect rect, Paint paint) {
             if (rect.size.isEmpty) {
                 return;
@@ -243,7 +254,35 @@ namespace Unity.UIWidgets.ui {
 
         public void drawArc(Rect rect, float startAngle, float sweepAngle, bool useCenter, Paint paint) {
             var path = new Path();
-            //path.(c.dx, c.dy, radius);
+
+            if (useCenter) {
+                var center = rect.center;
+                path.moveTo(center.dx, center.dy);                
+            }
+
+            bool forceMoveTo = !useCenter;
+            while (sweepAngle <= -Mathf.PI * 2) {
+                path.addArc(rect, startAngle, -Mathf.PI, forceMoveTo);
+                startAngle -= Mathf.PI;
+                path.addArc(rect, startAngle, -Mathf.PI, false);
+                startAngle -= Mathf.PI;
+                forceMoveTo = false;
+                sweepAngle += Mathf.PI * 2;
+            }
+            
+            while (sweepAngle >= Mathf.PI * 2) {
+                path.addArc(rect, startAngle, Mathf.PI, forceMoveTo);
+                startAngle += Mathf.PI;
+                path.addArc(rect, startAngle, Mathf.PI, false);
+                startAngle += Mathf.PI;
+                forceMoveTo = false;
+                sweepAngle -= Mathf.PI * 2;
+            }
+
+            path.addArc(rect, startAngle, sweepAngle, forceMoveTo);
+            if (useCenter) {
+                path.close();
+            }
 
             this._recorder.addDrawCmd(new DrawPath {
                 path = path,
@@ -314,6 +353,12 @@ namespace Unity.UIWidgets.ui {
                 offset = offset,
                 paint = new Paint(paint),
             });
+        }
+        
+        public void drawParagraph(Paragraph paragraph, Offset offset) {
+            D.assert(paragraph != null);
+            D.assert(PaintingUtils._offsetIsValid(offset));
+            paragraph.paint(this, offset);
         }
 
         public virtual void flush() {

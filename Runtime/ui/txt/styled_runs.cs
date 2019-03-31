@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 namespace Unity.UIWidgets.ui {
-    public class StyledRuns {
+    class StyledRuns {
         readonly List<TextStyle> styles = new List<TextStyle>();
         readonly List<IndexedRun> runs = new List<IndexedRun>();
 
@@ -50,7 +50,7 @@ namespace Unity.UIWidgets.ui {
             }
         }
 
-        public class Run {
+        internal class Run {
             public readonly TextStyle style;
             public readonly int start;
             public readonly int end;
@@ -62,7 +62,7 @@ namespace Unity.UIWidgets.ui {
             }
         }
 
-        public class IndexedRun {
+        internal class IndexedRun {
             public readonly int styleIndex = 0;
             public readonly int start;
             public int end;

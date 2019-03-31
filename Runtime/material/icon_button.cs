@@ -1,4 +1,3 @@
-using System;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
@@ -8,6 +7,11 @@ using UnityEngine;
 using Color = Unity.UIWidgets.ui.Color;
 
 namespace Unity.UIWidgets.material {
+    static class IconButtonUtils {
+        public const float _kMinButtonSize = 48.0f;
+    }
+
+
     public class IconButton : StatelessWidget {
         public IconButton(
             Key key = null,
@@ -56,7 +60,7 @@ namespace Unity.UIWidgets.material {
         public readonly string tooltip;
 
         public override Widget build(BuildContext context) {
-            D.assert(MaterialDebug.debugCheckHasMaterial(context));
+            D.assert(MaterialD.debugCheckHasMaterial(context));
             Color currentColor;
             if (this.onPressed != null) {
                 currentColor = this.color;

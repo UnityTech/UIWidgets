@@ -4,6 +4,7 @@ using System.Diagnostics;
 using Unity.UIWidgets.async;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.rendering;
+using Unity.UIWidgets.scheduler;
 using Unity.UIWidgets.service;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
@@ -20,39 +21,59 @@ namespace Unity.UIWidgets.editor {
             this.wantsMouseEnterLeaveWindow = true;
         }
 
-        void OnEnable() {
+        protected virtual void Awake() {
+        }
+
+        protected virtual void OnEnable() {
             if (this._windowAdapter == null) {
                 this._windowAdapter = new EditorWindowAdapter(this);
             }
 
             this._windowAdapter.OnEnable();
 
-            var rootRenderBox = this.rootRenderBox();
+            RenderBox rootRenderBox;
+            using (this._windowAdapter.getScope()) {
+                rootRenderBox = this.createRenderBox();
+            }
+
             if (rootRenderBox != null) {
                 this._windowAdapter.attachRootRenderBox(rootRenderBox);
                 return;
             }
 
-            this._windowAdapter.attachRootWidget(this.rootWidget());
+            Widget rootWidget;
+            using (this._windowAdapter.getScope()) {
+                rootWidget = this.createWidget();
+            }
+
+            this._windowAdapter.attachRootWidget(rootWidget);
         }
 
-        void OnDisable() {
+        protected virtual void OnDisable() {
             this._windowAdapter.OnDisable();
         }
 
-        void OnGUI() {
+        protected virtual void OnGUI() {
             this._windowAdapter.OnGUI(Event.current);
         }
 
-        void Update() {
+        float? lastUpdateTime;
+        protected virtual void Update() {
+            if (this.lastUpdateTime != null) {
+                float deltaTime = (float)EditorApplication.timeSinceStartup - this.lastUpdateTime.Value;
+                PerformanceUtils.instance.updateDeltaTime(deltaTime);
+            }
+
+            this.lastUpdateTime = (float) EditorApplication.timeSinceStartup;
+            
             this._windowAdapter.Update();
         }
 
-        protected virtual RenderBox rootRenderBox() {
+        protected virtual RenderBox createRenderBox() {
             return null;
         }
 
-        protected abstract Widget rootWidget();
+        protected abstract Widget createWidget();
     }
 
     public class EditorWindowAdapter : WindowAdapter {
@@ -65,6 +86,10 @@ namespace Unity.UIWidgets.editor {
         public override void scheduleFrame(bool regenerateLayerTree = true) {
             base.scheduleFrame(regenerateLayerTree);
             this.editorWindow.Repaint();
+        }
+
+        protected override bool hasFocus() {
+            return EditorWindow.focusedWindow == this.editorWindow;
         }
 
         public override GUIContent titleContent {
@@ -85,7 +110,7 @@ namespace Unity.UIWidgets.editor {
     public abstract class WindowAdapter : Window {
         static readonly List<WindowAdapter> _windowAdapters = new List<WindowAdapter>();
 
-        public static IEnumerable<WindowAdapter> windowAdapters {
+        public static List<WindowAdapter> windowAdapters {
             get { return _windowAdapters; }
         }
 
@@ -96,14 +121,13 @@ namespace Unity.UIWidgets.editor {
             }
         }
 
-        WidgetsBinding _binding;
+        internal WidgetsBinding _binding;
         float _lastWindowWidth;
         float _lastWindowHeight;
 
         readonly TimeSpan _epoch = new TimeSpan(Stopwatch.GetTimestamp());
         readonly MicrotaskQueue _microtaskQueue = new MicrotaskQueue();
         readonly TimerProvider _timerProvider = new TimerProvider();
-        readonly TextInput _textInput = new TextInput();
         readonly Rasterizer _rasterizer = new Rasterizer();
         readonly ScrollInput _scrollInput = new ScrollInput();
 
@@ -119,6 +143,8 @@ namespace Unity.UIWidgets.editor {
 
         protected virtual void updateSafeArea() {
         }
+
+        protected abstract bool hasFocus();
 
         public void OnEnable() {
             this._devicePixelRatio = this.queryDevicePixelRatio();
@@ -139,6 +165,10 @@ namespace Unity.UIWidgets.editor {
         }
 
         public void OnDisable() {
+            using (this.getScope()) {
+                this._binding.detachRootWidget();
+            }
+
             _windowAdapters.Remove(this);
             this._alive = false;
 
@@ -150,28 +180,33 @@ namespace Unity.UIWidgets.editor {
         }
 
         public override IDisposable getScope() {
-            instance = this;
+            WindowAdapter oldInstance = (WindowAdapter) _instance;
+            _instance = this;
+
             if (this._binding == null) {
                 this._binding = new WidgetsBinding();
             }
-            WidgetsBinding.instance = this._binding;
 
-            return new WindowDisposable(this);
+            SchedulerBinding._instance = this._binding;
+
+            return new WindowDisposable(this, oldInstance);
         }
 
         class WindowDisposable : IDisposable {
             readonly WindowAdapter _window;
+            readonly WindowAdapter _oldWindow;
 
-            public WindowDisposable(WindowAdapter window) {
+            public WindowDisposable(WindowAdapter window, WindowAdapter oldWindow) {
                 this._window = window;
+                this._oldWindow = oldWindow;
             }
 
             public void Dispose() {
-                D.assert(instance == this._window);
-                instance = null;
+                D.assert(_instance == this._window);
+                _instance = this._oldWindow;
 
-                D.assert(WidgetsBinding.instance == this._window._binding);
-                WidgetsBinding.instance = null;
+                D.assert(SchedulerBinding._instance == this._window._binding);
+                SchedulerBinding._instance = this._oldWindow?._binding;
             }
         }
 
@@ -327,9 +362,8 @@ namespace Unity.UIWidgets.editor {
                 }
             }
 
-            if (this._textInput != null) {
-                this._textInput.keyboardManager.OnGUI();
-            }
+            RawKeyboard.instance._handleKeyEvent(Event.current);
+            TextInput.OnGUI();
         }
 
         void _updateScrollInput() {
@@ -358,12 +392,11 @@ namespace Unity.UIWidgets.editor {
         public void Update() {
             Timer.update();
 
+            bool hasFocus = this.hasFocus();
             using (this.getScope()) {
+                WidgetsBinding.instance.focusManager.focusNone(!hasFocus);
                 this._updateScrollInput();
-                if (this._textInput != null) {
-                    this._textInput.keyboardManager.Update();
-                }
-
+                TextInput.Update();
                 this._timerProvider.update(this.flushMicrotasks);
                 this.flushMicrotasks();
             }
@@ -420,10 +453,12 @@ namespace Unity.UIWidgets.editor {
             }
         }
 
-        public override TextInput textInput {
-            get { return this._textInput; }
+        public void attachRootWidget(Func<Widget> root) {
+            using (this.getScope()) {
+                this._binding.attachRootWidget(root());
+            }
         }
-        
+
         internal void _forceRepaint() {
             using (this.getScope()) {
                 RenderObjectVisitor visitor = null;

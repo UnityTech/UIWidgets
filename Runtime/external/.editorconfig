@@ -1,0 +1,5 @@
+root = true
+
+# For CSharp Only
+[*.cs]
+csharp_instance_members_qualify_members=none

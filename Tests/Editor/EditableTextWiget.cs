@@ -62,7 +62,7 @@ namespace UIWidgets.Tests {
                     cursorColor: Color.fromARGB(255, 0, 0, 0)
                 )
             );
-            this.windowAdapter.attachRootWidget(new WidgetsApp(window: this.windowAdapter, home: this.root,
+            this.windowAdapter.attachRootWidget(() => new WidgetsApp(home: this.root,
                 pageRouteBuilder: (RouteSettings settings, WidgetBuilder builder) =>
                     new PageRouteBuilder(
                         settings: settings,

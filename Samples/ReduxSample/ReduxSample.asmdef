@@ -1,6 +1,0 @@
-{
-    "name": "ReduxSample",
-    "references": ["Unity.UIWidgets"],
-    "includePlatforms": [],
-    "excludePlatforms": []
-}

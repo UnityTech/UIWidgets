@@ -689,7 +689,7 @@ namespace Unity.UIWidgets.ui {
                     src.top + ty,
                     src.right + tx,
                     src.bottom + ty
-                );
+                ).normalize();
 
                 return true;
             }
@@ -746,11 +746,21 @@ namespace Unity.UIWidgets.ui {
                 src.top * sy + ty,
                 src.right * sx + tx,
                 src.bottom * sy + ty
-            );
+            ).normalize();
+        }
+
+        public Offset[] mapRectToQuad(Rect rect) {
+            Offset[] dst = rect.toQuad();
+            this.mapPoints(dst, dst);
+            return dst;
         }
 
         public static bool operator ==(Matrix3 a, Matrix3 b) {
             if (ReferenceEquals(a, null) && ReferenceEquals(b, null)) {
+                return true;
+            }
+
+            if (ReferenceEquals(a, b)) {
                 return true;
             }
 

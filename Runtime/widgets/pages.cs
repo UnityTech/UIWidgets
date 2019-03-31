@@ -12,7 +12,7 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public override bool opaque {
-            get { return false; }
+            get { return true; }
         }
 
         public override bool barrierDismissible {
@@ -50,7 +50,6 @@ namespace Unity.UIWidgets.widgets {
             bool opaque = true,
             bool barrierDismissible = false,
             Color barrierColor = null,
-            string barrierLabel = null,
             bool maintainState = true
         ) : base(settings) {
             D.assert(pageBuilder != null);
@@ -60,7 +59,6 @@ namespace Unity.UIWidgets.widgets {
             this.transitionDuration = transitionDuration ?? TimeSpan.FromMilliseconds(300);
             this.barrierColor = barrierColor;
             this.maintainState = maintainState;
-            this.barrierLabel = barrierLabel;
             this.barrierDismissible = barrierDismissible;
         }
 
@@ -71,8 +69,6 @@ namespace Unity.UIWidgets.widgets {
         public override bool barrierDismissible { get; }
 
         public override Color barrierColor { get; }
-
-        public override string barrierLabel { get; }
 
         public override bool maintainState { get; }
 

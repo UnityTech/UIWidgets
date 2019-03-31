@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Unity.UIWidgets.animation;
 using Unity.UIWidgets.foundation;
@@ -7,6 +8,10 @@ using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
 
 namespace Unity.UIWidgets.material {
+    static class ExpansionTileUtils {
+        public static readonly TimeSpan _kExpand = new TimeSpan(0, 0, 0, 0, 200);
+    }
+
     public class ExpansionTile : StatefulWidget {
         public ExpansionTile(
             Key key = null,

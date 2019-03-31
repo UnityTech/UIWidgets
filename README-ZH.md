@@ -36,7 +36,6 @@ UIWidgets主要来自[Flutter](https://github.com/flutter/flutter)。但UIWidget
 </td>
 </tr></table></div>
 
-
 ## 使用要求
 
 #### Unity
@@ -46,10 +45,9 @@ UIWidgets主要来自[Flutter](https://github.com/flutter/flutter)。但UIWidget
 
 访问我们的Github存储库 [https://github.com/UnityTech/UIWidgets](https://github.com/UnityTech/UIWidgets)下载最新的UIWidgets包。
 
-将下载的包文件夹移动到 Unity项目的Package文件夹中。
+将下载的包文件夹移动到Unity项目的Package文件夹中。
 
-通常，你可以在控制台（或终端）应用程序中输入下面的代命令来完成这个操作：
-
+通常，你可以在控制台（或终端）应用程序中输入下面的代码来完成这个操作：
     
    ```none
     cd <YourProjectPath>/Packages
@@ -79,7 +77,6 @@ UI Canvas。
 
 UIWidgets应用是用**C＃脚本**来编写的。 请按照以下步骤创建应用程序并在Unity编辑器中播放。
 1. 创建一个新C＃脚本，命名为“ExampleCanvas.cs”，并将以下代码粘贴到其中。
-
 
 ```none
     using System.Collections.Generic;
@@ -141,8 +138,7 @@ UIWidgets应用是用**C＃脚本**来编写的。 请按照以下步骤创建�
                             new Text("Counter: " + this.counter),
                             new GestureDetector(
                                 onTap: () => {
-                                    this.setState(()
-                                        => {
+                                    this.setState(() => {
                                         this.counter++;
                                     });
                                 },
@@ -224,5 +220,3 @@ UIWidgets Inspector工具用于可视化和浏览窗口小部件树。 你可以
 
 ## 如何贡献
 请查看[CONTRIBUTING.md](CONTRIBUTING.md)
-
-

@@ -2,6 +2,9 @@
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.ui;
+using UnityEngine;
+using Color = Unity.UIWidgets.ui.Color;
+using Rect = Unity.UIWidgets.ui.Rect;
 
 namespace Unity.UIWidgets.rendering {
     public abstract class Layer : AbstractNodeMixinDiagnosticableTree {
@@ -180,6 +183,41 @@ namespace Unity.UIWidgets.rendering {
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             properties.add(new DiagnosticsProperty<Rect>("paint bounds", this.canvasBounds));
+        }
+    }
+
+    public class TextureLayer : Layer {
+        public TextureLayer(
+            Rect rect,
+            Texture texture,
+            bool freeze = false
+        ) {
+            D.assert(rect != null);
+            D.assert(texture != null);
+
+            this.rect = rect;
+            this.texture = texture;
+            this.freeze = freeze;
+        }
+
+        public readonly Rect rect;
+
+        public readonly Texture texture;
+
+        public readonly bool freeze;
+
+        internal override flow.Layer addToScene(SceneBuilder builder, Offset layerOffset = null) {
+            layerOffset = layerOffset ?? Offset.zero;
+
+            Rect shiftedRect = this.rect.shift(layerOffset);
+            builder.addTexture(
+                this.texture,
+                offset: shiftedRect.topLeft,
+                width: shiftedRect.width,
+                height: shiftedRect.height,
+                freeze: this.freeze
+            );
+            return null;
         }
     }
 
@@ -710,6 +748,32 @@ namespace Unity.UIWidgets.rendering {
             properties.add(new DiagnosticsProperty<Offset>("offset", this.offset));
         }
     }
+    
+    public class BackdropFilterLayer : ContainerLayer {
+        public BackdropFilterLayer(ImageFilter filter = null) {
+            D.assert(filter != null);
+            this._filter = filter;
+        }
+
+        ImageFilter _filter;
+
+        public ImageFilter filter {
+            get { return this._filter; }
+            set {
+                if (value != this._filter) {
+                    this._filter = value;
+                    this.markNeedsAddToScene();
+                }
+            }
+        }
+
+        internal override flow.Layer addToScene(SceneBuilder builder, Offset layerOffset = null) {
+            builder.pushBackdropFilter(this.filter);
+            this.addChildrenToScene(builder, layerOffset);
+            builder.pop();
+            return null;
+        }
+    }
 
     public class LayerLink {
         public LeaderLayer leader {
@@ -924,6 +988,163 @@ namespace Unity.UIWidgets.rendering {
             properties.add(new DiagnosticsProperty<LayerLink>("link", this.link));
             properties.add(new TransformProperty("transform", this.getLastTransform(),
                 defaultValue: Diagnostics.kNullDefaultValue));
+        }
+    }
+
+    public class PerformanceOverlayLayer : Layer {
+        public PerformanceOverlayLayer(
+            Rect overlayRect = null,
+            int? optionsMask = null
+        ) {
+            D.assert(overlayRect != null);
+            D.assert(optionsMask != null);
+            this._overlayRect = overlayRect;
+            this.optionsMask = optionsMask ?? 0;
+        }
+
+        public Rect overlayRect {
+            get { return this._overlayRect; }
+            set {
+                if (value != this._overlayRect) {
+                    this._overlayRect = value;
+                    this.markNeedsAddToScene();
+                }
+            }
+        }
+
+        Rect _overlayRect;
+
+        public readonly int optionsMask;
+
+        internal override flow.Layer addToScene(SceneBuilder builder, Offset layerOffset = null) {
+            layerOffset = layerOffset ?? Offset.zero;
+
+            builder.addPerformanceOverlay(this.optionsMask, this.overlayRect.shift(layerOffset));
+            return null;
+        }
+    }
+
+    public class AnnotatedRegionLayer<T> : ContainerLayer
+        where T : class {
+        public AnnotatedRegionLayer(
+            T value = null,
+            Size size = null) {
+            D.assert(value != null);
+            this.value = value;
+            this.size = size;
+        }
+
+        public readonly T value;
+
+        public readonly Size size;
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new DiagnosticsProperty<T>("value", this.value));
+            properties.add(new DiagnosticsProperty<Size>("size", this.size, defaultValue: null));
+        }
+    }
+
+
+    public class PhysicalModelLayer : ContainerLayer {
+        public PhysicalModelLayer(
+            Path clipPath = null,
+            Clip clipBehavior = Clip.none,
+            float? elevation = null,
+            Color color = null,
+            Color shadowColor = null) {
+            D.assert(clipPath != null);
+            D.assert(elevation != null);
+            D.assert(color != null);
+            D.assert(shadowColor != null);
+            this._clipPath = clipPath;
+            this._clipBehavior = clipBehavior;
+            this._elevation = elevation.Value;
+            this._color = color;
+            this.shadowColor = shadowColor;
+        }
+
+        public Path clipPath {
+            get { return this._clipPath; }
+            set {
+                if (value != this._clipPath) {
+                    this._clipPath = value;
+                    this.markNeedsAddToScene();
+                }
+            }
+        }
+
+        Path _clipPath;
+
+        public Clip clipBehavior {
+            get { return this._clipBehavior; }
+            set {
+                if (value != this._clipBehavior) {
+                    this._clipBehavior = value;
+                    this.markNeedsAddToScene();
+                }
+            }
+        }
+
+        Clip _clipBehavior;
+
+        public float elevation {
+            get { return this._elevation; }
+            set {
+                if (value != this._elevation) {
+                    this._elevation = value;
+                    this.markNeedsAddToScene();
+                }
+            }
+        }
+
+        float _elevation;
+
+        public Color color {
+            get { return this._color; }
+            set {
+                if (value != this._color) {
+                    this._color = value;
+                    this.markNeedsAddToScene();
+                }
+            }
+        }
+
+        Color _color;
+
+        public Color shadowColor {
+            get { return this._shadowColor; }
+            set {
+                if (value != this._shadowColor) {
+                    this._shadowColor = value;
+                    this.markNeedsAddToScene();
+                }
+            }
+        }
+
+        Color _shadowColor;
+
+        internal override flow.Layer addToScene(SceneBuilder builder, Offset layerOffset = null) {
+            layerOffset = layerOffset ?? Offset.zero;
+
+            builder.pushPhysicalShape(
+                path: this.clipPath.shift(layerOffset),
+                elevation: this.elevation,
+                color: this.color,
+                shadowColor: this.shadowColor,
+                clipBehavior: this.clipBehavior);
+
+            this.addChildrenToScene(builder, layerOffset);
+
+            builder.pop();
+            return null;
+        }
+
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new FloatProperty("elevation", this.elevation));
+            properties.add(new DiagnosticsProperty<Color>("color", this.color));
         }
     }
 }

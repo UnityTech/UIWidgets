@@ -24,7 +24,7 @@ namespace Unity.UIWidgets.flow {
         public readonly float devicePixelRatio;
 
         public void draw(Canvas canvas) {
-            var bounds = canvas.getTotalMatrix().mapRect(this.logicalRect);
+            var bounds = canvas.getTotalMatrix().mapRect(this.logicalRect).roundOut(this.devicePixelRatio);
 
             D.assert(() => {
                 var textureWidth = Mathf.CeilToInt(bounds.width * this.devicePixelRatio);
@@ -34,7 +34,6 @@ namespace Unity.UIWidgets.flow {
                 D.assert(this.image.height == textureHeight);
                 return true;
             });
-
 
             canvas.save();
             try {
@@ -53,13 +52,20 @@ namespace Unity.UIWidgets.flow {
             D.assert(matrix != null);
             this.picture = picture;
             this.matrix = new Matrix3(matrix);
-            var x = this.matrix[2] * devicePixelRatio;
-            var y = this.matrix[5] * devicePixelRatio;
 
-            this.matrix[2] = (x - (int) x) / devicePixelRatio; // x
-            this.matrix[5] = (y - (int) y) / devicePixelRatio; // y
-            D.assert(this.matrix[2] == 0);
-            D.assert(this.matrix[5] == 0);
+            D.assert(() => {
+                var x = this.matrix[2] * devicePixelRatio;
+                var y = this.matrix[5] * devicePixelRatio;
+                this.matrix[2] = (x - (int) x) / devicePixelRatio; // x
+                this.matrix[5] = (y - (int) y) / devicePixelRatio; // y
+                
+                D.assert(Mathf.Abs(this.matrix[2]) <= 1e-5);
+                D.assert(Mathf.Abs(this.matrix[5]) <= 1e-5);
+                return true;
+            });
+            
+            this.matrix[2] = 0.0f;
+            this.matrix[5] = 0.0f;            
             this.devicePixelRatio = devicePixelRatio;
         }
 
@@ -208,7 +214,7 @@ namespace Unity.UIWidgets.flow {
 
         RasterCacheResult _rasterizePicture(Picture picture, Matrix3 transform, float devicePixelRatio,
             MeshPool meshPool) {
-            var bounds = transform.mapRect(picture.paintBounds);
+            var bounds = transform.mapRect(picture.paintBounds).roundOut(devicePixelRatio);
 
             var desc = new RenderTextureDescriptor(
                 Mathf.CeilToInt((bounds.width * devicePixelRatio)),

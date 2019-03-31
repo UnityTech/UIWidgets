@@ -64,6 +64,48 @@ namespace Unity.UIWidgets.material {
             this.data = data;
         }
 
+        public static ButtonTheme fromButtonThemeData(
+            Key key = null,
+            ButtonThemeData data = null,
+            Widget child = null) {
+            return new ButtonTheme(key, data, child);
+        }
+
+        public static ButtonTheme bar(
+            Key key = null,
+            ButtonTextTheme textTheme = ButtonTextTheme.accent,
+            float minWidth = 64.0f,
+            float height = 36.0f,
+            EdgeInsets padding = null,
+            ShapeBorder shape = null,
+            bool alignedDropdown = false,
+            Color buttonColor = null,
+            Color disabledColor = null,
+            Color highlightColor = null,
+            Color splashColor = null,
+            ColorScheme colorScheme = null,
+            Widget child = null,
+            ButtonBarLayoutBehavior layoutBehavior = ButtonBarLayoutBehavior.padded
+        ) {
+            D.assert(minWidth >= 0.0);
+            D.assert(height >= 0.0);
+            return new ButtonTheme(key, new ButtonThemeData(
+                textTheme: textTheme,
+                minWidth: minWidth,
+                height: height,
+                padding: padding ?? EdgeInsets.symmetric(horizontal: 8.0f),
+                shape: shape,
+                alignedDropdown: alignedDropdown,
+                layoutBehavior: layoutBehavior,
+                buttonColor: buttonColor,
+                disabledColor: disabledColor,
+                highlightColor: highlightColor,
+                splashColor: splashColor,
+                colorScheme: colorScheme
+            ), child);
+        }
+
+
         public readonly ButtonThemeData data;
 
         public static ButtonThemeData of(BuildContext context) {
@@ -88,7 +130,7 @@ namespace Unity.UIWidgets.material {
     }
 
 
-    public class ButtonThemeData : Diagnosticable {
+    public class ButtonThemeData : Diagnosticable, IEquatable<ButtonThemeData> {
         public ButtonThemeData(
             ButtonTextTheme textTheme = ButtonTextTheme.normal,
             float minWidth = 88.0f,
@@ -209,7 +251,7 @@ namespace Unity.UIWidgets.material {
         }
 
 
-        Color getDisabledTextColor(MaterialButton button) {
+        public Color getDisabledTextColor(MaterialButton button) {
             if (button.disabledTextColor != null) {
                 return button.disabledTextColor;
             }
@@ -237,8 +279,7 @@ namespace Unity.UIWidgets.material {
                 return fillColor;
             }
 
-//todo:xingwei.zhu: uncomment these when OutlineButton are ready
-            if (button is FlatButton /* || button is OutlineButton*/) {
+            if (button is FlatButton || button is OutlineButton) {
                 return null;
             }
 
@@ -284,8 +325,7 @@ namespace Unity.UIWidgets.material {
                         return Colors.white;
                     }
 
-//todo:xingwei.zhu: uncomment these when OutlineButton are ready
-                    if (button is FlatButton /* || button is OutlineButton*/) {
+                    if (button is FlatButton || button is OutlineButton) {
                         return this.colorScheme.primary;
                     }
 
@@ -302,8 +342,7 @@ namespace Unity.UIWidgets.material {
                 return button.splashColor;
             }
 
-//todo:xingwei.zhu: uncomment these when OutlineButton is ready
-            if (this._splashColor != null && (button is RaisedButton /* || button is OutlineButton*/)) {
+            if (this._splashColor != null && (button is RaisedButton || button is OutlineButton)) {
                 return this._splashColor;
             }
 
@@ -360,9 +399,9 @@ namespace Unity.UIWidgets.material {
                 return 0.0f;
             }
 
-//todo:xingwei.zhu: uncomment these when OutlineButton are ready
-//            if (button is OutlineButton)
-//                return 2.0;
+            if (button is OutlineButton) {
+                return 2.0f;
+            }
             return 8.0f;
         }
 
@@ -505,10 +544,10 @@ namespace Unity.UIWidgets.material {
                 hashCode = (hashCode * 397) ^ this.padding.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.shape.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.alignedDropdown.GetHashCode();
-                hashCode = (hashCode * 397) ^ this._buttonColor.GetHashCode();
-                hashCode = (hashCode * 397) ^ this._disabledColor.GetHashCode();
-                hashCode = (hashCode * 397) ^ this._highlightColor.GetHashCode();
-                hashCode = (hashCode * 397) ^ this._splashColor.GetHashCode();
+                hashCode = (hashCode * 397) ^ (this._buttonColor != null ? this._buttonColor.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (this._disabledColor != null ? this._disabledColor.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (this._highlightColor != null ? this._highlightColor.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (this._splashColor != null ? this._splashColor.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ this.colorScheme.GetHashCode();
                 hashCode = (hashCode * 397) ^ this._materialTapTargetSize.GetHashCode();
                 return hashCode;

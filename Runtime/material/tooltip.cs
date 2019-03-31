@@ -1,3 +1,4 @@
+using System;
 using Unity.UIWidgets.animation;
 using Unity.UIWidgets.async;
 using Unity.UIWidgets.foundation;
@@ -9,6 +10,12 @@ using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
 
 namespace Unity.UIWidgets.material {
+    static class TooltipUtils {
+        public static readonly TimeSpan _kFadeDuration = new TimeSpan(0, 0, 0, 0, 200);
+        public static readonly TimeSpan _kShowDuration = new TimeSpan(0, 0, 0, 0, 1500);
+    }
+
+
     public class Tooltip : StatefulWidget {
         public Tooltip(
             Key key = null,

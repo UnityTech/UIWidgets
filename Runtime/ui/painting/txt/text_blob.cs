@@ -1,6 +1,7 @@
 ﻿namespace Unity.UIWidgets.ui {
     public class TextBlob {
-        public TextBlob(string text, int textOffset, int textSize, Vector2d[] positions, Rect bounds, TextStyle style) {
+        
+        internal TextBlob(string text, int textOffset, int textSize, Vector2d[] positions, Rect bounds, TextStyle style) {
             this.instanceId = ++_nextInstanceId;
             this.positions = positions;
             this.text = text;
@@ -15,13 +16,13 @@
         }
 
         static long _nextInstanceId = 0;
-        public readonly long instanceId;
-        public readonly string text;
-        public readonly int textOffset;
-        public readonly int textSize;
-        public readonly Vector2d[] positions;
-        public readonly TextStyle style;
-        public readonly Rect bounds; // bounds with positions[start] as origin       
+        internal readonly long instanceId;
+        internal readonly string text;
+        internal readonly int textOffset;
+        internal readonly int textSize;
+        internal readonly Vector2d[] positions;
+        internal readonly TextStyle style;
+        internal readonly Rect bounds; // bounds with positions[start] as origin       
     }
 
     public class TextBlobBuilder {
@@ -32,7 +33,11 @@
         int _size;
         Rect _bounds;
 
-        public void allocRunPos(TextStyle style, string text, int offset, int size) {
+        public void allocRunPos(painting.TextStyle style, string text, int offset, int size, float textScaleFactor = 1.0f) {
+            this.allocRunPos(TextStyle.applyStyle(null, style, textScaleFactor), text, offset, size);
+        }
+        
+        internal void allocRunPos(TextStyle style, string text, int offset, int size) {
             this._style = style;
             this._text = text;
             this._textOffset = offset;

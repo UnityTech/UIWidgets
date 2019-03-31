@@ -1,8 +1,6 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using RSG;
-using Unity.UIWidgets.async;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
 using UnityEngine;
@@ -21,9 +19,7 @@ namespace Unity.UIWidgets.painting {
         public readonly string assetName;
         public readonly AssetBundle bundle;
 
-
-        protected override
-            IPromise<AssetBundleImageKey> obtainKey(ImageConfiguration configuration) {
+        protected override IPromise<AssetBundleImageKey> obtainKey(ImageConfiguration configuration) {
             AssetImageConfiguration assetConfig = new AssetImageConfiguration(configuration, this.assetName);
             AssetBundleImageKey key;
             var cache = AssetBundleCache.instance.get(configuration.bundle);
@@ -33,54 +29,43 @@ namespace Unity.UIWidgets.painting {
 
             AssetBundle chosenBundle = this.bundle ? this.bundle : configuration.bundle;
             var devicePixelRatio = configuration.devicePixelRatio ?? Window.instance.devicePixelRatio;
-            var coroutine = Window.instance.startCoroutine(this._loadAssetAsync(chosenBundle, devicePixelRatio));
-            return coroutine.promise.Then(result => {
-                D.assert(result != null);
-
-                key = (AssetBundleImageKey) result;
-                cache[assetConfig] = key;
-                return key;
-            });
+            key = this._loadAsset(chosenBundle, devicePixelRatio);
+            cache[assetConfig] = key;
+            
+            return Promise<AssetBundleImageKey>.Resolved(key);
         }
 
-        IEnumerator _loadAssetAsync(AssetBundle bundle, float devicePixelRatio) {
+        AssetBundleImageKey _loadAsset(AssetBundle bundle, float devicePixelRatio) {
             var extension = Path.GetExtension(this.assetName);
             var name = Path.GetFileNameWithoutExtension(this.assetName);
 
-            var upper = devicePixelRatio.ceil();
+            var upper = Mathf.Min(3, devicePixelRatio.ceil());
             for (var scale = upper; scale >= 1; scale--) {
                 var assetName = name + "@" + scale + extension;
 
                 Object asset;
                 if (bundle == null) {
-                    ResourceRequest request = Resources.LoadAsync(assetName);
-                    yield return request;
-                    asset = request.asset;
-                }
-                else {
-                    AssetBundleRequest request = bundle.LoadAssetAsync(assetName);
-                    yield return request;
-                    asset = request.asset;
+                    asset = Resources.Load(assetName);
+                } else {
+                    asset = bundle.LoadAsset(assetName);
                 }
 
                 if (asset != null) {
                     if (bundle == null) {
                         Resources.UnloadAsset(asset);
-                    }
-                    else {
+                    } else {
                         bundle.Unload(asset);
                     }
 
-                    yield return new AssetBundleImageKey(
+                    return new AssetBundleImageKey(
                         bundle,
                         assetName,
                         scale: scale
                     );
-                    yield break;
                 }
             }
 
-            yield return new AssetBundleImageKey(
+            return new AssetBundleImageKey(
                 bundle,
                 this.assetName,
                 scale: 1.0f

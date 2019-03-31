@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
-    public class TabStops {
+    class TabStops {
         int _tabWidth = int.MaxValue;
 
         Font _font;
@@ -41,10 +41,11 @@ namespace Unity.UIWidgets.ui {
             }
 
             if (this._tabWidth == int.MaxValue) {
-                this._font.RequestCharactersInTexture(" ", this._fontSize);
-                CharacterInfo characterInfo;
-                this._font.GetCharacterInfo(' ', out characterInfo, this._fontSize);
-                this._tabWidth = characterInfo.advance * kTabSpaceCount;
+                this._font.RequestCharactersInTextureSafe(" ", this._fontSize);
+                if (this._fontSize > 0) {
+                    var glyphInfo = this._font.getGlyphInfo(' ', this._fontSize, UnityEngine.FontStyle.Normal);
+                    this._tabWidth = (int)Math.Round(glyphInfo.advance * kTabSpaceCount);
+                }
             }
 
             if (this._tabWidth == 0) {
@@ -55,7 +56,7 @@ namespace Unity.UIWidgets.ui {
         }
     }
 
-    public class Candidate {
+    class Candidate {
         public int offset;
         public int pre;
         public float preBreak;
@@ -66,7 +67,7 @@ namespace Unity.UIWidgets.ui {
         public int postSpaceCount;
     }
 
-    public class LineBreaker {
+    class LineBreaker {
         const float ScoreInfty = float.MaxValue;
         const float ScoreDesperate = 1e10f;
 
@@ -139,7 +140,6 @@ namespace Unity.UIWidgets.ui {
                     this._charWidths, start, this._tabStops);
             }
 
-            var font = FontManager.instance.getOrCreate(style.fontFamily).font;
             int current = this._wordBreaker.current();
             int afterWord = start;
             int lastBreak = start;
@@ -240,6 +240,23 @@ namespace Unity.UIWidgets.ui {
             int candIndex = this._candidates.Count;
             this._candidates.Add(cand);
             if (cand.postBreak - this._preBreak > this._lineWidth) {
+                if (this._bestBreak == this._lastBreak) {
+                    this._bestBreak = candIndex;
+                }
+                this._pushGreedyBreak();
+            }
+
+            while (this._lastBreak != candIndex && cand.postBreak - this._preBreak > this._lineWidth) {
+                for (int i = this._lastBreak + 1; i < candIndex; i++) {
+                    float penalty = this._candidates[i].penalty;
+                    if (penalty <= this._bestScore) {
+                        this._bestBreak = i;
+                        this._bestScore = penalty;
+                    }
+                }
+                if (this._bestBreak == this._lastBreak) {
+                    this._bestBreak = candIndex;
+                }
                 this._pushGreedyBreak();
             }
 

@@ -13,6 +13,7 @@ namespace Unity.UIWidgets.ui {
         
         readonly List<RenderLayer> _layers = new List<RenderLayer>();
         RenderLayer _currentLayer;
+        Rect _lastScissor;
         
         public PictureFlusher(RenderTexture renderTexture, float devicePixelRatio, MeshPool meshPool) {
             D.assert(renderTexture);
@@ -98,9 +99,65 @@ namespace Unity.UIWidgets.ui {
                 layerPaint = paint,
             };
 
-            parentLayer.layers.Add(layer);
+            parentLayer.addLayer(layer);
             this._layers.Add(layer);
             this._currentLayer = layer;
+
+            if (paint.backdrop != null) {
+                if (paint.backdrop is _BlurImageFilter) {
+                    var filter = (_BlurImageFilter) paint.backdrop;
+                    if (!(filter.sigmaX == 0 && filter.sigmaY == 0)) {
+                        var points = new[] {bounds.topLeft, bounds.bottomLeft, bounds.bottomRight, bounds.topRight};
+                        state.matrix.mapPoints(points);
+
+                        var parentBounds = parentLayer.layerBounds;
+                        for (int i = 0; i < 4; i++) {
+                            points[i] = new Offset(
+                                (points[i].dx - parentBounds.left) / parentBounds.width,
+                                (points[i].dy - parentBounds.top) / parentBounds.height
+                            );
+                        }
+
+                        var mesh = ImageMeshGenerator.imageMesh(
+                            null,
+                            points[0], points[1], points[2], points[3],
+                            bounds);
+                        var renderDraw = CanvasShader.texRT(layer, layer.layerPaint, mesh, parentLayer);
+                        layer.draws.Add(renderDraw);
+
+                        var blurLayer = this._createBlurLayer(layer, filter.sigmaX, filter.sigmaY, layer);
+                        var blurMesh = ImageMeshGenerator.imageMesh(null, Rect.one, bounds);
+                        layer.draws.Add(CanvasShader.texRT(layer, paint, blurMesh, blurLayer));
+                    }
+                } else if (paint.backdrop is _MatrixImageFilter) {
+                    var filter = (_MatrixImageFilter) paint.backdrop;
+                    if (!filter.transform.isIdentity()) {
+                        layer.filterMode = filter.filterMode;
+                    
+                        var points = new[] {bounds.topLeft, bounds.bottomLeft, bounds.bottomRight, bounds.topRight};
+                        state.matrix.mapPoints(points);
+
+                        var parentBounds = parentLayer.layerBounds;
+                        for (int i = 0; i < 4; i++) {
+                            points[i] = new Offset(
+                                (points[i].dx - parentBounds.left) / parentBounds.width,
+                                (points[i].dy - parentBounds.top) / parentBounds.height
+                            );
+                        }
+
+                        var matrix = Matrix3.makeTrans(-bounds.left, -bounds.top);
+                        matrix.postConcat(filter.transform);
+                        matrix.postTranslate(bounds.left, bounds.top);
+                        
+                        var mesh = ImageMeshGenerator.imageMesh(
+                            matrix,
+                            points[0], points[1], points[2], points[3],
+                            bounds);
+                        var renderDraw = CanvasShader.texRT(layer, layer.layerPaint, mesh, parentLayer);
+                        layer.draws.Add(renderDraw);
+                    }
+                }
+            }
         }
         
         void _restore() {
@@ -197,17 +254,21 @@ namespace Unity.UIWidgets.ui {
         }
         
         void _tryAddScissor(RenderLayer layer, Rect scissor) {
-            if (scissor == layer.lastScissor) {
+            if (scissor == this._lastScissor) {
                 return;
             }
 
-            layer.draws.Add(new RenderScissor {
+            layer.draws.Add(new CmdScissor {
                 deviceScissor = scissor,
             });
-            layer.lastScissor = scissor;
+            this._lastScissor = scissor;
         }
         
         bool _applyClip(Rect queryBounds) {
+            if (queryBounds == null || queryBounds.isEmpty) {
+                return false;
+            }
+
             var layer = this._currentLayer;
             var layerBounds = layer.layerBounds;
             ReducedClip reducedClip = new ReducedClip(layer.clipStack, layerBounds, queryBounds);
@@ -242,7 +303,9 @@ namespace Unity.UIWidgets.ui {
                 } else {
                     layer.ignoreClip = false;
 
-                    var boundsMesh = new MeshMesh(reducedClip.scissor);
+                    // need to inflate a bit to make sure all area is cleared.
+                    var inflatedScissor = reducedClip.scissor.inflate(this._fringeWidth);
+                    var boundsMesh = new MeshMesh(inflatedScissor);
                     layer.draws.Add(CanvasShader.stencilClear(layer, boundsMesh));
 
                     foreach (var maskElement in reducedClip.maskElements) {
@@ -287,7 +350,7 @@ namespace Unity.UIWidgets.ui {
                 filterMode = FilterMode.Bilinear,
             };
 
-            parentLayer.layers.Add(maskLayer);
+            parentLayer.addLayer(maskLayer);
             this._layers.Add(maskLayer);
             this._currentLayer = maskLayer;
 
@@ -304,15 +367,16 @@ namespace Unity.UIWidgets.ui {
             return maskLayer;
         }
 
-        RenderLayer _createBlurLayer(RenderLayer maskLayer, float sigma, RenderLayer parentLayer) {
-            sigma = BlurUtils.adjustSigma(sigma, out var scaleFactor, out var radius);
+        RenderLayer _createBlurLayer(RenderLayer maskLayer, float sigmaX, float sigmaY, RenderLayer parentLayer) {
+            sigmaX = BlurUtils.adjustSigma(sigmaX, out var scaleFactorX, out var radiusX);
+            sigmaY = BlurUtils.adjustSigma(sigmaY, out var scaleFactorY, out var radiusY);
 
-            var textureWidth = Mathf.CeilToInt((float) maskLayer.width / scaleFactor);
+            var textureWidth = Mathf.CeilToInt((float) maskLayer.width / scaleFactorX);
             if (textureWidth < 1) {
                 textureWidth = 1;
             }
             
-            var textureHeight = Mathf.CeilToInt((float) maskLayer.height / scaleFactor);
+            var textureHeight = Mathf.CeilToInt((float) maskLayer.height / scaleFactorY);
             if (textureHeight < 1) {
                 textureHeight = 1;
             }
@@ -325,7 +389,7 @@ namespace Unity.UIWidgets.ui {
                 filterMode = FilterMode.Bilinear,
             };
 
-            parentLayer.layers.Add(blurXLayer);
+            parentLayer.addLayer(blurXLayer);
 
             var blurYLayer = new RenderLayer {
                 rtID = Shader.PropertyToID("_rtID_" + this._layers.Count + "_" + parentLayer.layers.Count),
@@ -335,19 +399,20 @@ namespace Unity.UIWidgets.ui {
                 filterMode = FilterMode.Bilinear,
             };
 
-            parentLayer.layers.Add(blurYLayer);
+            parentLayer.addLayer(blurYLayer);
 
             var blurMesh = ImageMeshGenerator.imageMesh(null, Rect.one, maskLayer.layerBounds);
 
-            var kernel = BlurUtils.get1DGaussianKernel(sigma, radius);
+            var kernelX = BlurUtils.get1DGaussianKernel(sigmaX, radiusX);
+            var kernelY = BlurUtils.get1DGaussianKernel(sigmaY, radiusY);
 
             blurXLayer.draws.Add(CanvasShader.maskFilter(
                 blurXLayer, blurMesh, maskLayer,
-                radius, new Vector2(1f / textureWidth, 0), kernel));
+                radiusX, new Vector2(1f / textureWidth, 0), kernelX));
 
             blurYLayer.draws.Add(CanvasShader.maskFilter(
                 blurYLayer, blurMesh, blurXLayer,
-                radius, new Vector2(0, -1f / textureHeight), kernel));
+                radiusY, new Vector2(0, -1f / textureHeight), kernelY));
 
             return blurYLayer;
         }
@@ -383,7 +448,7 @@ namespace Unity.UIWidgets.ui {
 
             var maskLayer = this._createMaskLayer(layer, maskBounds, drawAction, paint);
 
-            var blurLayer = this._createBlurLayer(maskLayer, sigma, layer);
+            var blurLayer = this._createBlurLayer(maskLayer, sigma, sigma, layer);
 
             var blurMesh = ImageMeshGenerator.imageMesh(null, Rect.one, maskBounds);
             if (!this._applyClip(blurMesh.bounds)) {
@@ -646,16 +711,19 @@ namespace Unity.UIWidgets.ui {
             
             var matrix = new Matrix3(state.matrix);
             matrix.preTranslate(offset.dx, offset.dy);            
-            var mesh = MeshGenerator.generateMesh(textBlob, scale)?.transform(matrix);
-            if (mesh == null) {
-                return;
-            }
+            var mesh = new TextBlobMesh(textBlob, scale, matrix);
             
-            var font = FontManager.instance.getOrCreate(textBlob.style.fontFamily).font;
+            // request font texture so text mesh could be generated correctly
+            var style = textBlob.style;
+            var font = FontManager.instance.getOrCreate(textBlob.style.fontFamily, style.fontWeight, style.fontStyle).font;
+            var fontSizeToLoad = Mathf.CeilToInt(style.UnityFontSize * scale);
+            var subText = textBlob.text.Substring(textBlob.textOffset, textBlob.textSize);
+            font.RequestCharactersInTextureSafe(subText, fontSizeToLoad, style.UnityFontStyle);
+
             var tex = font.material.mainTexture;
 
             Action<Paint> drawMesh = (Paint p) => {
-                if (!this._applyClip(mesh.bounds)) {
+                if (!this._applyClip(matrix.mapRect(textBlob.bounds))) {
                     return;
                 }
 
@@ -664,7 +732,7 @@ namespace Unity.UIWidgets.ui {
             };
 
             if (paint.maskFilter != null && paint.maskFilter.sigma != 0) {
-                this._drawWithMaskFilter(mesh.bounds, drawMesh, paint, paint.maskFilter);
+                this._drawWithMaskFilter(textBlob.bounds, drawMesh, paint, paint.maskFilter);
                 return;
             }
 
@@ -673,6 +741,7 @@ namespace Unity.UIWidgets.ui {
 
         public void flush(Picture picture) {
             this._reset();
+            
             this._drawPicture(picture, false);
             
             D.assert(this._layers.Count == 1);
@@ -694,38 +763,48 @@ namespace Unity.UIWidgets.ui {
         }
         
          void _drawLayer(RenderLayer layer, CommandBuffer cmdBuf) {
-            foreach (var subLayer in layer.layers) {
-                var desc = new RenderTextureDescriptor(
-                    subLayer.width, subLayer.height,
-                    RenderTextureFormat.Default, 24) {
-                    useMipMap = false,
-                    autoGenerateMips = false,
-                };
-                
-                if (QualitySettings.antiAliasing != 0) {
-                    desc.msaaSamples = QualitySettings.antiAliasing;
-                }
-                
-                cmdBuf.GetTemporaryRT(subLayer.rtID, desc, subLayer.filterMode);
-                this._drawLayer(subLayer, cmdBuf);
-            }
+             if (layer.rtID == 0) {
+                 cmdBuf.SetRenderTarget(this._renderTexture);
+                 cmdBuf.ClearRenderTarget(true, true, UnityEngine.Color.clear);
+             }
+             else {
+                 cmdBuf.SetRenderTarget(layer.rtID);
+                 cmdBuf.ClearRenderTarget(true, true, UnityEngine.Color.clear);
+             }
 
-            if (layer.rtID == 0) {
-                cmdBuf.SetRenderTarget(this._renderTexture,
-                    RenderBufferLoadAction.DontCare, RenderBufferStoreAction.Store);
-                cmdBuf.ClearRenderTarget(true, true, UnityEngine.Color.clear);
-            }
-            else {
-                cmdBuf.SetRenderTarget(layer.rtID,
-                    RenderBufferLoadAction.DontCare, RenderBufferStoreAction.Store);
-                cmdBuf.ClearRenderTarget(true, true, UnityEngine.Color.clear);
-            }
-
-            foreach (var cmdObj in layer.draws) {
+             foreach (var cmdObj in layer.draws) {
                 switch (cmdObj) {
-                    case RenderDraw cmd:
+                    case CmdLayer cmd:
+                        var subLayer = cmd.layer;
+                        var desc = new RenderTextureDescriptor(
+                            subLayer.width, subLayer.height,
+                            RenderTextureFormat.Default, 24) {
+                            useMipMap = false,
+                            autoGenerateMips = false,
+                        };
+                
+                        if (QualitySettings.antiAliasing != 0) {
+                            desc.msaaSamples = QualitySettings.antiAliasing;
+                        }
+                
+                        cmdBuf.GetTemporaryRT(subLayer.rtID, desc, subLayer.filterMode);
+                        this._drawLayer(subLayer, cmdBuf);
+                        
+                        if (layer.rtID == 0) {
+                            cmdBuf.SetRenderTarget(this._renderTexture);
+                        }
+                        else {
+                            cmdBuf.SetRenderTarget(layer.rtID);
+                        }
+
+                        break;
+                    case CmdDraw cmd:
                         if (cmd.layer != null) {
-                            cmdBuf.SetGlobalTexture(RenderDraw.texId, cmd.layer.rtID);
+                            if (cmd.layer.rtID == 0) {
+                                cmdBuf.SetGlobalTexture(CmdDraw.texId, this._renderTexture);
+                            } else {
+                                cmdBuf.SetGlobalTexture(CmdDraw.texId, cmd.layer.rtID);
+                            }
                         }
 
                         D.assert(cmd.meshObj == null);
@@ -735,22 +814,32 @@ namespace Unity.UIWidgets.ui {
                         // clear triangles first in order to bypass validation in SetVertices.
                         cmd.meshObj.SetTriangles((int[]) null, 0, false);
 
-                        cmd.meshObj.SetVertices(cmd.mesh.vertices);
-                        cmd.meshObj.SetTriangles(cmd.mesh.triangles, 0, false);
-                        cmd.meshObj.SetUVs(0, cmd.mesh.uv);
-
-                        if (cmd.mesh.matrix == null) {
-                            cmd.properties.SetFloatArray(RenderDraw.matId, RenderDraw.idMat3.fMat);
-                        } else {
-                            cmd.properties.SetFloatArray(RenderDraw.matId, cmd.mesh.matrix.fMat);
+                        MeshMesh mesh = cmd.mesh;
+                        if (cmd.textMesh != null) {
+                            mesh = cmd.textMesh.resovleMesh();
                         }
 
-                        cmdBuf.DrawMesh(cmd.meshObj, RenderDraw.idMat, cmd.material, 0, cmd.pass, cmd.properties);
+                        if (mesh == null) {
+                            continue;
+                        }
+                        
+                        D.assert(mesh.vertices.Count > 0);  
+                        cmd.meshObj.SetVertices(mesh.vertices);
+                        cmd.meshObj.SetTriangles(mesh.triangles, 0, false);
+                        cmd.meshObj.SetUVs(0, mesh.uv);
+
+                        if (mesh.matrix == null) {
+                            cmd.properties.SetFloatArray(CmdDraw.matId, CmdDraw.idMat3.fMat);
+                        } else {
+                            cmd.properties.SetFloatArray(CmdDraw.matId, mesh.matrix.fMat);
+                        }
+
+                        cmdBuf.DrawMesh(cmd.meshObj, CmdDraw.idMat, cmd.material, 0, cmd.pass, cmd.properties);
                         if (cmd.layer != null) {
-                            cmdBuf.SetGlobalTexture(RenderDraw.texId, BuiltinRenderTextureType.None);
+                            cmdBuf.SetGlobalTexture(CmdDraw.texId, BuiltinRenderTextureType.None);
                         }
                         break;
-                    case RenderScissor cmd:
+                    case CmdScissor cmd:
                         if (cmd.deviceScissor == null) {
                             cmdBuf.DisableScissorRect();
                         } else {
@@ -768,7 +857,7 @@ namespace Unity.UIWidgets.ui {
         void _clearLayer(RenderLayer layer) {
             foreach (var cmdObj in layer.draws) {
                 switch (cmdObj) {
-                    case RenderDraw cmd:
+                    case CmdDraw cmd:
                         if (cmd.meshObjCreated) {
                             this._meshPool.returnMesh(cmd.meshObj);
                             cmd.meshObj = null;
@@ -802,8 +891,7 @@ namespace Unity.UIWidgets.ui {
             public readonly ClipStack clipStack = new ClipStack();
             public uint lastClipGenId;
             public Rect lastClipBounds;
-            public Rect lastScissor;
-            public bool ignoreClip;
+            public bool ignoreClip = true;
 
             Vector4? _viewport;
 
@@ -824,6 +912,11 @@ namespace Unity.UIWidgets.ui {
                 this.currentState = new State();
                 this.states.Add(this.currentState);
             }
+
+            public void addLayer(RenderLayer layer) {
+                this.layers.Add(layer);
+                this.draws.Add(new CmdLayer {layer = layer});
+            }
         }
 
         internal class State {
@@ -831,17 +924,20 @@ namespace Unity.UIWidgets.ui {
             
             Matrix3 _matrix;
             float? _scale;
+            Matrix3 _invMatrix;
 
-            public State(Matrix3 matrix = null, float? scale = null) {
+            public State(Matrix3 matrix = null, float? scale = null, Matrix3 invMatrix = null) {
                 this._matrix = matrix ?? _id;
                 this._scale = scale;
+                this._invMatrix = invMatrix;
             }
             
             public Matrix3 matrix {
                 get { return this._matrix; }
                 set {
-                    this._matrix = value;
+                    this._matrix = value ?? _id;
                     this._scale = null;
+                    this._invMatrix = null;
                 }
             }
 
@@ -853,14 +949,30 @@ namespace Unity.UIWidgets.ui {
                     return this._scale.Value;
                 }
             }
+            
+            public Matrix3 invMatrix {
+                get {
+                    if (this._invMatrix == null) {
+                        this._invMatrix = Matrix3.I();
+                        this._matrix.invert(this._invMatrix);
+                    }
+                    return this._invMatrix;
+                }
+            }
 
             public State copy() {
-                return new State(this._matrix, this._scale);
+                return new State(this._matrix, this._scale, this._invMatrix);
             }
         }
         
-        internal class RenderDraw {
+        
+        internal class CmdLayer {
+            public RenderLayer layer;
+        }
+        
+        internal class CmdDraw {
             public MeshMesh mesh;
+            public TextBlobMesh textMesh;
             public int pass;
             public MaterialPropertyBlock properties;
             public RenderLayer layer;
@@ -875,7 +987,7 @@ namespace Unity.UIWidgets.ui {
             public static readonly int matId = Shader.PropertyToID("_mat");
         }
 
-        internal class RenderScissor {
+        internal class CmdScissor {
             public Rect deviceScissor;
         }
     }
@@ -1111,6 +1223,24 @@ namespace Unity.UIWidgets.ui {
             10, 11, 14, 11, 15, 14,
         };
 
+        public static MeshMesh imageMesh(Matrix3 matrix,
+            Offset srcTL, Offset srcBL, Offset srcBR, Offset srcTR,
+            Rect dst) {
+            var vertices = new List<Vector3>(4);
+            var uv = new List<Vector2>(4);
+
+            vertices.Add(new Vector2(dst.left, dst.top));
+            uv.Add(new Vector2(srcTL.dx, 1.0f - srcTL.dy));
+            vertices.Add(new Vector2(dst.left, dst.bottom));
+            uv.Add(new Vector2(srcBL.dx, 1.0f - srcBL.dy));
+            vertices.Add(new Vector2(dst.right, dst.bottom));
+            uv.Add(new Vector2(srcBR.dx, 1.0f - srcBR.dy));
+            vertices.Add(new Vector2(dst.right, dst.top));
+            uv.Add(new Vector2(srcTR.dx, 1.0f - srcTR.dy));
+
+            return new MeshMesh(matrix, vertices, _imageTriangles, uv);
+        }
+        
         public static MeshMesh imageMesh(Matrix3 matrix, Rect src, Rect dst) {
             var vertices = new List<Vector3>(4);
             var uv = new List<Vector2>(4);

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UIWidgets.Tests.demo_charts;
 using Unity.UIWidgets.animation;
 using Unity.UIWidgets.editor;
 using Unity.UIWidgets.foundation;
@@ -43,7 +44,8 @@ namespace UIWidgets.Tests {
                 this.eventsPage,
                 this.asPage,
                 this.stack,
-                this.mouseHover
+                this.mouseHover,
+                this.charts
             };
             this._optionStrings = this._options.Select(x => x.Method.Name).ToArray();
             this._selected = 0;
@@ -60,7 +62,7 @@ namespace UIWidgets.Tests {
 
                 if (this._selected != selected) {
                     this._selected = selected;
-                    this._attachRootWidget(null);
+                    this._attachRootWidget(new Container());
                 }
 
                 if (GUILayout.Button("loadLocal")) {
@@ -90,7 +92,9 @@ namespace UIWidgets.Tests {
         }
 
         void _attachRootWidget(Widget widget) {
-            this.windowAdapter.attachRootWidget(new WidgetsApp(window: this.windowAdapter, home: widget,
+            this.windowAdapter.attachRootWidget(() => new WidgetsApp(
+                home: widget,
+                navigatorKey: GlobalKey<NavigatorState>.key(),
                 pageRouteBuilder: (RouteSettings settings, WidgetBuilder builder) =>
                     new PageRouteBuilder(
                         settings: settings,
@@ -103,11 +107,13 @@ namespace UIWidgets.Tests {
             this.windowAdapter.Update();
         }
 
+        void Awake() {
+            FontManager.instance.addFont(Resources.Load<Font>("MaterialIcons-Regular"), "Material Icons");
+        }
+
         void OnEnable() {
             this.windowAdapter = new EditorWindowAdapter(this);
             this.windowAdapter.OnEnable();
-
-            FontManager.instance.addFont(Resources.Load<Font>("MaterialIcons-Regular"));
         }
 
         void OnDisable() {
@@ -253,6 +259,10 @@ namespace UIWidgets.Tests {
 
         Widget mouseHover() {
             return new MouseHoverWidget();
+        }
+        
+        Widget charts() {
+            return new ChartPage();
         }
     }
 
@@ -452,8 +462,9 @@ namespace UIWidgets.Tests {
                 height: 450,
                 color: CLColors.white,
                 child: Image.network(
-                    "https://d2ujflorbtfzji.cloudfront.net/banner/5c57178c-4be6-4903-953b-85125bfb7154.jpg",
-                    fit: BoxFit.cover
+                    "https://assetstorev1-prd-cdn.unity3d.com/banner/9716cc07-748c-43cc-8809-10113119c97a.jpg",
+                    fit: BoxFit.cover,
+                    filterMode: FilterMode.Bilinear
                 )
             );
         }
@@ -465,7 +476,7 @@ namespace UIWidgets.Tests {
                 45.0f,
                 36.0f,
                 true,
-                "https://d2ujflorbtfzji.cloudfront.net/key-image/46dc65c1-f605-4ccb-97e0-3d60b28cfdfe.jpg"
+                "https://assetstorev1-prd-cdn.unity3d.com/key-image/76a549ae-de17-4536-bd96-4231ed20dece.jpg"
             );
             return new Container(
                 margin: EdgeInsets.only(left: 98),
@@ -550,7 +561,7 @@ namespace UIWidgets.Tests {
                 child: new Container(
                     color: CLColors.background3,
                     child: new Transform(
-                        transform: Matrix3.makeRotate(45, px, py),
+                        transform: Matrix3.makeRotate(Mathf.PI / 180 * 5, px, py),
                         child:
                         new Column(
                             children: new List<Widget> {
@@ -561,7 +572,27 @@ namespace UIWidgets.Tests {
                     )
                 )
             );
-            return container;
+
+            var stack = new Stack(
+                children: new List<Widget> {
+                    container,
+                    new Positioned(
+                        top: 50,
+                        right: 50,
+                        child: new BackdropFilter(
+                            filter: ImageFilter.blur(10, 10),
+                            child: new Container(
+                                width: 300, height: 300,
+                                decoration: new BoxDecoration(
+                                    color: Colors.transparent
+                                )
+                            )
+                        )
+                    )
+                }
+            );
+
+            return stack;
         }
     }
 

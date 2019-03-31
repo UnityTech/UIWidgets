@@ -1160,7 +1160,8 @@ namespace Unity.UIWidgets.rendering {
             });
         }
 
-        public virtual bool hitTest(HitTestResult result, Offset position) {
+        public virtual bool hitTest(HitTestResult result, Offset position = null) {
+            D.assert(position != null);
             D.assert(() => {
                 if (!this.hasSize) {
                     if (this.debugNeedsLayout) {
@@ -1315,7 +1316,7 @@ namespace Unity.UIWidgets.rendering {
                 // ideographic baseline
                 float? baselineI = this.getDistanceToBaseline(TextBaseline.ideographic, onlyReal: true);
                 if (baselineI != null) {
-                    paint.color =  new Color(0xFFFFD000);
+                    paint.color = new Color(0xFFFFD000);
                     path = new Path();
                     path.moveTo(offset.dx, offset.dy + baselineI.Value);
                     path.lineTo(offset.dx + this.size.width, offset.dy + baselineI.Value);
@@ -1325,7 +1326,7 @@ namespace Unity.UIWidgets.rendering {
                 // alphabetic baseline
                 float? baselineA = this.getDistanceToBaseline(TextBaseline.alphabetic, onlyReal: true);
                 if (baselineA != null) {
-                    paint.color = new Color (0xFF00FF00);
+                    paint.color = new Color(0xFF00FF00);
                     path = new Path();
                     path.moveTo(offset.dx, offset.dy + baselineA.Value);
                     path.lineTo(offset.dx + this.size.width, offset.dy + baselineA.Value);
@@ -1353,6 +1354,10 @@ namespace Unity.UIWidgets.rendering {
             base.debugFillProperties(properties);
             properties.add(new DiagnosticsProperty<Size>("size", this._size, missingIfNull: true));
         }
+    }
+
+    public abstract class ContainerBoxParentData<ChildType> : ContainerParentDataMixinBoxParentData<ChildType>
+        where ChildType : RenderBox {
     }
 
     public abstract class

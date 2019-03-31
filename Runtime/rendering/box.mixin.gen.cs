@@ -1,14 +1,18 @@
+using System;
 using System.Collections.Generic;
+using UnityEngine;
 using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.ui;
-using UnityEngine;
 
 namespace Unity.UIWidgets.rendering {
+
+ 
     public abstract class
         RenderBoxContainerDefaultsMixinContainerRenderObjectMixinRenderBox<ChildType, ParentDataType>
         : ContainerRenderObjectMixinRenderBox<ChildType, ParentDataType>
         where ChildType : RenderBox
         where ParentDataType : ContainerParentDataMixinBoxParentData<ChildType> {
+        
         public float? defaultComputeDistanceToFirstActualBaseline(TextBaseline baseline) {
             var child = this.firstChild;
             while (child != null) {
@@ -34,8 +38,7 @@ namespace Unity.UIWidgets.rendering {
                     candidate += childParentData.offset.dy;
                     if (result != null) {
                         result = Mathf.Min(result.Value, candidate.Value);
-                    }
-                    else {
+                    } else {
                         result = candidate;
                     }
                 }
@@ -55,18 +58,17 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
-        public bool defaultHitTestChildren(HitTestResult result, Offset position) {
+       public bool defaultHitTestChildren(HitTestResult result, Offset position) {
             // the x, y parameters have the top left of the node's box as the origin
             ChildType child = this.lastChild;
-            while (child != null) {
+            while (child != null)
+            {
                 ParentDataType childParentData = (ParentDataType) child.parentData;
                 if (child.hitTest(result, position: position - childParentData.offset)) {
                     return true;
                 }
-
                 child = childParentData.previousSibling;
             }
-
             return false;
         }
 
@@ -82,4 +84,6 @@ namespace Unity.UIWidgets.rendering {
             return result;
         }
     }
+
+
 }

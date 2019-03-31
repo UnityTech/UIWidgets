@@ -1,0 +1,344 @@
+using System.Collections.Generic;
+using Unity.UIWidgets.async;
+using Unity.UIWidgets.editor;
+using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.service;
+using Unity.UIWidgets.ui;
+using Unity.UIWidgets.widgets;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
+using RawImage = UnityEngine.UI.RawImage;
+using Rect = UnityEngine.Rect;
+using Texture = UnityEngine.Texture;
+
+namespace Unity.UIWidgets.engine {
+    public class UIWidgetWindowAdapter : WindowAdapter {
+        readonly UIWidgetsPanel _uiWidgetsPanel;
+        bool _needsPaint;
+
+        protected override void updateSafeArea() {
+            this._padding = new WindowPadding(
+                Screen.safeArea.x,
+                Screen.safeArea.y,
+                Screen.width - Screen.safeArea.width - Screen.safeArea.x,
+                Screen.height - Screen.safeArea.height - Screen.safeArea.y);
+        }
+
+        protected override bool hasFocus() {
+            return EventSystem.current != null &&
+                   EventSystem.current.currentSelectedGameObject == this._uiWidgetsPanel.gameObject;
+        }
+
+        public override void scheduleFrame(bool regenerateLayerTree = true) {
+            base.scheduleFrame(regenerateLayerTree);
+            this._needsPaint = true;
+        }
+
+        public UIWidgetWindowAdapter(UIWidgetsPanel uiWidgetsPanel) {
+            this._uiWidgetsPanel = uiWidgetsPanel;
+        }
+
+
+        public override void OnGUI(Event evt) {
+            if (this.displayMetricsChanged()) {
+                this._needsPaint = true;
+            }
+
+            if (evt.type == EventType.Repaint) {
+                if (!this._needsPaint) {
+                    return;
+                }
+
+                this._needsPaint = false;
+            }
+
+            base.OnGUI(evt);
+        }
+
+        protected override Surface createSurface() {
+            return new EditorWindowSurface(this._uiWidgetsPanel.applyRenderTexture);
+        }
+
+        public override GUIContent titleContent {
+            get { return new GUIContent(this._uiWidgetsPanel.gameObject.name); }
+        }
+
+        protected override float queryDevicePixelRatio() {
+            return this._uiWidgetsPanel.devicePixelRatio;
+        }
+
+        protected override Vector2 queryWindowSize() {
+            var rect = this._uiWidgetsPanel.rectTransform.rect;
+            var size = new Vector2(rect.width, rect.height) *
+                       this._uiWidgetsPanel.canvas.scaleFactor / this._uiWidgetsPanel.devicePixelRatio;
+            size.x = Mathf.Round(size.x);
+            size.y = Mathf.Round(size.y);
+            return size;
+        }
+
+        public Offset windowPosToScreenPos(Offset windowPos) {
+            Camera camera = null;
+            var canvas = this._uiWidgetsPanel.canvas;
+            if (canvas.renderMode != RenderMode.ScreenSpaceCamera) {
+                camera = canvas.GetComponent<GraphicRaycaster>().eventCamera;
+            }
+
+            var pos = new Vector2(windowPos.dx, windowPos.dy);
+            pos = pos * this.queryDevicePixelRatio() / this._uiWidgetsPanel.canvas.scaleFactor;
+            var rectTransform = this._uiWidgetsPanel.rectTransform;
+            var rect = rectTransform.rect;
+            pos.x += rect.min.x;
+            pos.y = rect.max.y - pos.y;
+            var worldPos = rectTransform.TransformPoint(new Vector2(pos.x, pos.y));
+            var screenPos = RectTransformUtility.WorldToScreenPoint(camera, worldPos);
+            return new Offset(screenPos.x, Screen.height - screenPos.y);
+        }
+    }
+
+    [RequireComponent(typeof(RectTransform))]
+    public class UIWidgetsPanel : RawImage, IPointerDownHandler, IPointerUpHandler, IDragHandler,
+        IPointerEnterHandler, IPointerExitHandler {
+        static Event _repaintEvent;
+
+        [SerializeField] protected float devicePixelRatioOverride;
+        WindowAdapter _windowAdapter;
+        Texture _texture;
+        Vector2 _lastMouseMove;
+
+        HashSet<int> _enteredPointers;
+
+        bool _mouseEntered {
+            get { return !this._enteredPointers.isEmpty(); }
+        }
+
+        readonly ScrollInput _scrollInput = new ScrollInput();
+        DisplayMetrics _displayMetrics;
+
+        const int mouseButtonNum = 3;
+
+        protected override void OnEnable() {
+            base.OnEnable();
+            //Disable the default touch -> mouse event conversion on mobile devices
+            Input.simulateMouseWithTouches = false;
+
+            this._displayMetrics = DisplayMetricsProvider.provider();
+            this._displayMetrics.OnEnable();
+
+            if (_repaintEvent == null) {
+                _repaintEvent = new Event {type = EventType.Repaint};
+            }
+
+            D.assert(this._windowAdapter == null);
+            this._windowAdapter = new UIWidgetWindowAdapter(this);
+
+            this._windowAdapter.OnEnable();
+
+            Widget root;
+            using (this._windowAdapter.getScope()) {
+                root = this.createWidget();
+            }
+
+            this._windowAdapter.attachRootWidget(root);
+            this._lastMouseMove = Input.mousePosition;
+
+            this._enteredPointers = new HashSet<int>();
+        }
+
+        public float devicePixelRatio {
+            get {
+                return this.devicePixelRatioOverride > 0
+                    ? this.devicePixelRatioOverride
+                    : this._displayMetrics.devicePixelRatio;
+            }
+        }
+
+        protected override void OnDisable() {
+            D.assert(this._windowAdapter != null);
+            this._windowAdapter.OnDisable();
+            this._windowAdapter = null;
+            base.OnDisable();
+        }
+
+        protected virtual Widget createWidget() {
+            return null;
+        }
+
+        internal void applyRenderTexture(Rect screenRect, Texture texture, Material mat) {
+            this.texture = texture;
+            this.material = mat;
+        }
+
+        protected virtual void Update() {
+            PerformanceUtils.instance.updateDeltaTime(Time.unscaledDeltaTime);
+            this._displayMetrics.Update();
+            UIWidgetsMessageManager.ensureUIWidgetsMessageManagerIfNeeded();
+
+            if (this._mouseEntered) {
+                if (this._lastMouseMove.x != Input.mousePosition.x || this._lastMouseMove.y != Input.mousePosition.y) {
+                    this.handleMouseMovement();
+                }
+            }
+
+            this._lastMouseMove = Input.mousePosition;
+
+            if (this._mouseEntered) {
+                this.handleMouseScroll();
+            }
+
+            D.assert(this._windowAdapter != null);
+            this._windowAdapter.Update();
+            this._windowAdapter.OnGUI(_repaintEvent);
+        }
+
+        void OnGUI() {
+            this._displayMetrics.OnGUI();
+            if (Event.current.type == EventType.KeyDown || Event.current.type == EventType.KeyUp) {
+                this._windowAdapter.OnGUI(Event.current);
+            }
+        }
+
+        void handleMouseMovement() {
+            var pos = this.getPointPosition(Input.mousePosition);
+            this._windowAdapter.postPointerEvent(new PointerData(
+                timeStamp: Timer.timespanSinceStartup,
+                change: PointerChange.hover,
+                kind: PointerDeviceKind.mouse,
+                device: this.getMouseButtonDown(),
+                physicalX: pos.x,
+                physicalY: pos.y
+            ));
+        }
+
+        void handleMouseScroll() {
+            if (Input.mouseScrollDelta.y != 0 || Input.mouseScrollDelta.x != 0) {
+                var scaleFactor = this.canvas.scaleFactor;
+                var pos = this.getPointPosition(Input.mousePosition);
+                this._scrollInput.onScroll(Input.mouseScrollDelta.x * scaleFactor,
+                    Input.mouseScrollDelta.y * scaleFactor,
+                    pos.x,
+                    pos.y,
+                    InputUtils.getScrollButtonKey());
+            }
+
+            var deltaScroll = this._scrollInput.getScrollDelta();
+            if (deltaScroll != Vector2.zero) {
+                this._windowAdapter.postPointerEvent(new ScrollData(
+                    timeStamp: Timer.timespanSinceStartup,
+                    change: PointerChange.scroll,
+                    kind: PointerDeviceKind.mouse,
+                    device: this._scrollInput.getDeviceId(),
+                    physicalX: this._scrollInput.getPointerPosX(),
+                    physicalY: this._scrollInput.getPointerPosY(),
+                    scrollX: deltaScroll.x,
+                    scrollY: deltaScroll.y
+                ));
+            }
+        }
+
+        int getMouseButtonDown() {
+            for (int key = 0; key < mouseButtonNum; key++) {
+                if (Input.GetMouseButton(key)) {
+                    return InputUtils.getMouseButtonKey(key);
+                }
+            }
+
+            return 0;
+        }
+
+        public void OnPointerDown(PointerEventData eventData) {
+            EventSystem.current.SetSelectedGameObject(this.gameObject, eventData);
+            var position = this.getPointPosition(eventData);
+            this._windowAdapter.postPointerEvent(new PointerData(
+                timeStamp: Timer.timespanSinceStartup,
+                change: PointerChange.down,
+                kind: InputUtils.getPointerDeviceKind(eventData),
+                device: InputUtils.getPointerDeviceKey(eventData),
+                physicalX: position.x,
+                physicalY: position.y
+            ));
+        }
+
+        public void OnPointerUp(PointerEventData eventData) {
+            var position = this.getPointPosition(eventData);
+            this._windowAdapter.postPointerEvent(new PointerData(
+                timeStamp: Timer.timespanSinceStartup,
+                change: PointerChange.up,
+                kind: InputUtils.getPointerDeviceKind(eventData),
+                device: InputUtils.getPointerDeviceKey(eventData),
+                physicalX: position.x,
+                physicalY: position.y
+            ));
+        }
+
+        public Vector2 getPointPosition(PointerEventData eventData) {
+            Vector2 localPoint;
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(this.rectTransform, eventData.position,
+                eventData.enterEventCamera, out localPoint);
+            var scaleFactor = this.canvas.scaleFactor;
+            localPoint.x = (localPoint.x - this.rectTransform.rect.min.x) * scaleFactor;
+            localPoint.y = (this.rectTransform.rect.max.y - localPoint.y) * scaleFactor;
+            return localPoint;
+        }
+
+        public Vector2 getPointPosition(Vector2 position) {
+            Vector2 localPoint;
+            Camera eventCamera = null;
+
+            if (this.canvas.renderMode != RenderMode.ScreenSpaceCamera) {
+                eventCamera = this.canvas.GetComponent<GraphicRaycaster>().eventCamera;
+            }
+
+
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(this.rectTransform, position,
+                eventCamera, out localPoint);
+            var scaleFactor = this.canvas.scaleFactor;
+            localPoint.x = (localPoint.x - this.rectTransform.rect.min.x) * scaleFactor;
+            localPoint.y = (this.rectTransform.rect.max.y - localPoint.y) * scaleFactor;
+            return localPoint;
+        }
+
+        public void OnDrag(PointerEventData eventData) {
+            var position = this.getPointPosition(eventData);
+            this._windowAdapter.postPointerEvent(new PointerData(
+                timeStamp: Timer.timespanSinceStartup,
+                change: PointerChange.move,
+                kind: InputUtils.getPointerDeviceKind(eventData),
+                device: InputUtils.getPointerDeviceKey(eventData),
+                physicalX: position.x,
+                physicalY: position.y
+            ));
+        }
+
+        public void OnPointerEnter(PointerEventData eventData) {
+            var pointerKey = InputUtils.getPointerDeviceKey(eventData);
+            this._enteredPointers.Add(pointerKey);
+
+            this._lastMouseMove = eventData.position;
+            var position = this.getPointPosition(eventData);
+            this._windowAdapter.postPointerEvent(new PointerData(
+                timeStamp: Timer.timespanSinceStartup,
+                change: PointerChange.hover,
+                kind: InputUtils.getPointerDeviceKind(eventData),
+                device: pointerKey,
+                physicalX: position.x,
+                physicalY: position.y
+            ));
+        }
+
+        public void OnPointerExit(PointerEventData eventData) {
+            var pointerKey = InputUtils.getPointerDeviceKey(eventData);
+            this._enteredPointers.Remove(pointerKey);
+
+            var position = this.getPointPosition(eventData);
+            this._windowAdapter.postPointerEvent(new PointerData(
+                timeStamp: Timer.timespanSinceStartup,
+                change: PointerChange.hover,
+                kind: InputUtils.getPointerDeviceKind(eventData),
+                device: pointerKey,
+                physicalX: position.x,
+                physicalY: position.y
+            ));
+        }
+    }
+}

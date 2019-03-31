@@ -44,6 +44,16 @@ namespace Unity.UIWidgets.widgets {
             return false;
         }
 
+        public static bool debugItemsHaveDuplicateKeys(IEnumerable<Widget> items) {
+            D.assert(() => {
+                Key nonUniqueKey = _firstNonUniqueKey(items);
+                if (nonUniqueKey != null) {
+                    throw new UIWidgetsError($"Duplicate key found: {nonUniqueKey}.");
+                }
+                return true;
+            });
+            return false;
+        }
 
         public static void debugWidgetBuilderValue(Widget widget, Widget built) {
             D.assert(() => {
@@ -58,6 +68,26 @@ namespace Unity.UIWidgets.widgets {
 
                 return true;
             });
+        }
+
+        public static bool debugCheckHasMediaQuery(BuildContext context) {
+            D.assert(() => {
+                if (!(context.widget is MediaQuery) && context.ancestorWidgetOfExactType(typeof(MediaQuery)) == null) {
+                    Element element = (Element) context;
+                    throw new UIWidgetsError(
+                        "No MediaQuery widget found.\n" +
+                        context.widget.GetType() + " widgets require a MediaQuery widget ancestor.\n" +
+                        "The specific widget that could not find a MediaQuery ancestor was:\n" +
+                        "  " + context.widget + "\n" +
+                        "The ownership chain for the affected widget is:\n" +
+                        "  " + element.debugGetCreatorChain(10) + "\n" +
+                        "Typically, the MediaQuery widget is introduced by the MaterialApp or " +
+                        "WidgetsApp widget at the top of your application widget tree."
+                    );
+                }
+                return true;
+            });
+            return true;
         }
 
         public static bool debugCheckHasDirectionality(BuildContext context) {

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.UIWidgets.foundation;
@@ -231,7 +230,7 @@ namespace Unity.UIWidgets.material {
         }
 
         public override Widget build(BuildContext context) {
-            D.assert(MaterialDebug.debugCheckHasMaterial(context));
+            D.assert(MaterialD.debugCheckHasMaterial(context));
             ThemeData theme = Theme.of(context);
             ListTileTheme tileTheme = ListTileTheme.of(context);
 
@@ -398,7 +397,7 @@ namespace Unity.UIWidgets.material {
         }
 
         void _mountChild(Widget widget, _ListTileSlot slot) {
-            Element oldChild = this.slotToChild[slot];
+            Element oldChild = this.slotToChild.getOrDefault(slot);
             Element newChild = this.updateChild(oldChild, widget, slot);
             if (oldChild != null) {
                 this.slotToChild.Remove(slot);
@@ -420,7 +419,7 @@ namespace Unity.UIWidgets.material {
         }
 
         void _updateChild(Widget widget, _ListTileSlot slot) {
-            Element oldChild = this.slotToChild[slot];
+            Element oldChild = this.slotToChild.getOrDefault(slot);
             Element newChild = this.updateChild(oldChild, widget, slot);
             if (oldChild != null) {
                 this.childToSlot.Remove(oldChild);

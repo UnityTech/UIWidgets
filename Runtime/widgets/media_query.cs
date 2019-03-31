@@ -313,7 +313,7 @@ namespace Unity.UIWidgets.widgets {
             return of(context, nullOk: true)?.textScaleFactor ?? 1.0f;
         }
 
-        static bool boldTextOverride(BuildContext context) {
+        public static bool boldTextOverride(BuildContext context) {
             return of(context, nullOk: true)?.boldText ?? false;
         }
 

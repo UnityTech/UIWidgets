@@ -15,6 +15,7 @@ namespace Unity.UIWidgets.flow {
             var clipPathBounds = this._clipRRect.outerRect;
             context.cullRect = context.cullRect.intersect(clipPathBounds);
 
+            this.paintBounds = Rect.zero;
             if (!context.cullRect.isEmpty) {
                 var childPaintBounds = Rect.zero;
                 this.prerollChildren(context, matrix, ref childPaintBounds);

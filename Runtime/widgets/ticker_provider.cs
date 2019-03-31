@@ -61,7 +61,7 @@ namespace Unity.UIWidgets.widgets {
                     this + " was disposed with an active Ticker.\n" +
                     this.GetType() + " created a Ticker via its SingleTickerProviderStateMixin, but at the time " +
                     "dispose() was called on the mixin, that Ticker was still active. The Ticker must " +
-                    "be disposed before calling super.dispose(). Tickers used by AnimationControllers " +
+                    "be disposed before calling base.dispose(). Tickers used by AnimationControllers " +
                     "should be disposed by calling dispose() on the AnimationController itself. " +
                     "Otherwise, the ticker will leak.\n" +
                     "The offending ticker was: " + this._ticker.toString(debugIncludeStack: true)
@@ -101,6 +101,8 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
+    // There is a copy of the implementation of this mixin at widgets/automatic_keep_alive.cs,
+    // in AutomaticKeepAliveClientWithTickerProviderStateMixin, remember to keep the copy up to date
     public abstract class TickerProviderStateMixin<T> : State<T>, TickerProvider where T : StatefulWidget {
         HashSet<Ticker> _tickers;
 
@@ -127,7 +129,7 @@ namespace Unity.UIWidgets.widgets {
                                 this.GetType() +
                                 " created a Ticker via its TickerProviderStateMixin, but at the time " +
                                 "dispose() was called on the mixin, that Ticker was still active. All Tickers must " +
-                                "be disposed before calling super.dispose(). Tickers used by AnimationControllers " +
+                                "be disposed before calling base.dispose(). Tickers used by AnimationControllers " +
                                 "should be disposed by calling dispose() on the AnimationController itself. " +
                                 "Otherwise, the ticker will leak.\n" +
                                 "The offending ticker was: " + ticker.toString(debugIncludeStack: true)

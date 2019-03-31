@@ -29,7 +29,7 @@ namespace Unity.UIWidgets.widgets {
             Window.instance.onLocaleChanged += this.handleLocaleChanged;
             this.widgetInspectorService = new WidgetInspectorService(this);
             this.addPersistentFrameCallback((duration) => {
-                MeshGenerator.tickNextFrame();
+                TextBlobMesh.tickNextFrame();
                 TessellationGenerator.tickNextFrame();
             });
         }
@@ -137,6 +137,21 @@ namespace Unity.UIWidgets.widgets {
         }
 
         RenderObjectToWidgetElement<RenderBox> _renderViewElement;
+
+        public void detachRootWidget() {
+            if (this._renderViewElement == null) {
+                return;
+            }
+            
+            this.attachRootWidget(null);
+            this.buildOwner.buildScope(this._renderViewElement);
+            this.buildOwner.finalizeTree();
+            
+            this.pipelineOwner.rootNode = null;
+            this._renderViewElement.deactivate();
+            this._renderViewElement.unmount();
+            this._renderViewElement = null;
+        }
 
         public void attachRootWidget(Widget rootWidget) {
             this._renderViewElement = new RenderObjectToWidgetAdapter<RenderBox>(

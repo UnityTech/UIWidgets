@@ -337,7 +337,7 @@ namespace Unity.UIWidgets.painting {
                     var builder = new ParagraphBuilder(this._createParagraphStyle(TextDirection.ltr)
                     ); // direction doesn't matter, text is just a space
                     if (this.text != null && this.text.style != null) {
-                        builder.pushStyle(this.text.style);
+                        builder.pushStyle(this.text.style, this.textScaleFactor);
                     }
 
                     builder.addText(" ");
@@ -373,7 +373,7 @@ namespace Unity.UIWidgets.painting {
         }
 
         Offset _getOffsetFromDownstream(int offset, Rect caretPrototype) {
-            var nextCodeUnit = this._text.codeUnitAt(offset);
+            var nextCodeUnit = this._text.codeUnitAt(offset - 1);
             if (nextCodeUnit == null) {
                 return null;
             }

@@ -163,10 +163,10 @@ namespace Unity.UIWidgets.widgets {
                 }
 
                 if (this.attached) {
-                    this.offset.removeListener(this._hasScrolled);
+                    this._offset.removeListener(this._hasScrolled);
                 }
 
-                this.offset = value;
+                this._offset = value;
                 if (this.attached) {
                     this._offset.addListener(this._hasScrolled);
                 }

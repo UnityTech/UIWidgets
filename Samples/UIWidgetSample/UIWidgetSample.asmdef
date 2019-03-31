@@ -1,6 +1,0 @@
-{
-    "name": "UIWidgetSample",
-    "references": ["Unity.UIWidgets"],
-    "includePlatforms": [],
-    "excludePlatforms": []
-}

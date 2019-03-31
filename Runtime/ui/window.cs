@@ -109,7 +109,10 @@ namespace Unity.UIWidgets.ui {
     public abstract class Window {
         public static Window instance {
             get {
-                D.assert(_instance != null, "Window.instance is null");
+                D.assert(_instance != null,
+                    "Window.instance is null. " +
+                    "This usually happens when there is a callback from outside of UIWidgets. " +
+                    "Try to use \"using (WindowProvider.of(BuildContext).getScope()) { ... }\" to wrap your code.");
                 return _instance;
             }
 
@@ -117,8 +120,7 @@ namespace Unity.UIWidgets.ui {
                 if (value == null) {
                     D.assert(_instance != null, "Window.instance is already cleared.");
                     _instance = null;
-                }
-                else {
+                } else {
                     D.assert(_instance == null, "Window.instance is already assigned.");
                     _instance = value;
                 }
@@ -129,7 +131,7 @@ namespace Unity.UIWidgets.ui {
             get { return _instance != null; }
         }
 
-        static Window _instance;
+        internal static Window _instance;
 
         public float devicePixelRatio {
             get { return this._devicePixelRatio; }
@@ -234,8 +236,6 @@ namespace Unity.UIWidgets.ui {
         }
 
         public abstract Timer runInMain(Action callback);
-
-        public abstract TextInput textInput { get; }
 
         public abstract IDisposable getScope();
     }

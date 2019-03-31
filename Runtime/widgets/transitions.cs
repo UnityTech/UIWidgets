@@ -1,10 +1,10 @@
-﻿using System;
-using Unity.UIWidgets.animation;
+﻿using Unity.UIWidgets.animation;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
 using UnityEngine;
+using Rect = Unity.UIWidgets.ui.Rect;
 
 namespace Unity.UIWidgets.widgets {
     public abstract class AnimatedWidget : StatefulWidget {
@@ -94,6 +94,39 @@ namespace Unity.UIWidgets.widgets {
     }
 
 
+    public class ScaleTransition : AnimatedWidget {
+        public ScaleTransition(
+            Key key = null,
+            Animation<float> scale = null,
+            Alignment alignment = null,
+            Widget child = null
+        ) : base(key: key, listenable: scale) {
+            alignment = alignment ?? Alignment.center;
+            D.assert(scale != null);
+            this.alignment = alignment;
+            this.child = child;
+        }
+
+        public Animation<float> scale {
+            get { return (Animation<float>) this.listenable; }
+        }
+
+        public readonly Alignment alignment;
+
+        public readonly Widget child;
+
+        protected internal override Widget build(BuildContext context) {
+            float scaleValue = this.scale.value;
+            Matrix3 transform = Matrix3.makeScale(scaleValue, scaleValue);
+            return new Transform(
+                transform: transform,
+                alignment: this.alignment,
+                child: this.child
+            );
+        }
+    }
+
+
     public class RotationTransition : AnimatedWidget {
         public RotationTransition(
             Key key = null,
@@ -123,6 +156,49 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
+    public class SizeTransition : AnimatedWidget {
+        public SizeTransition(
+            Key key = null,
+            Axis axis = Axis.vertical,
+            Animation<float> sizeFactor = null,
+            float axisAlignment = 0.0f,
+            Widget child = null) : base(key: key, listenable: sizeFactor) {
+            D.assert(sizeFactor != null);
+            this.axis = axis;
+            this.axisAlignment = axisAlignment;
+            this.child = child;
+        }
+
+        public readonly Axis axis;
+
+        public readonly float axisAlignment;
+
+        Animation<float> sizeFactor {
+            get { return (Animation<float>) this.listenable; }
+        }
+
+        public readonly Widget child;
+
+        protected internal override Widget build(BuildContext context) {
+            Alignment alignment;
+            if (this.axis == Axis.vertical) {
+                alignment = new Alignment(-1.0f, this.axisAlignment);
+            }
+            else {
+                alignment = new Alignment(this.axisAlignment, -1.0f);
+            }
+
+            return new ClipRect(
+                child: new Align(
+                    alignment: alignment,
+                    widthFactor: this.axis == Axis.horizontal ? (float?) Mathf.Max(this.sizeFactor.value, 0.0f) : null,
+                    heightFactor: this.axis == Axis.vertical ? (float?) Mathf.Max(this.sizeFactor.value, 0.0f) : null,
+                    child: this.child
+                )
+            );
+        }
+    }
+
     public class FadeTransition : SingleChildRenderObjectWidget {
         public FadeTransition(Key key = null, Animation<float> opacity = null,
             Widget child = null) : base(key: key, child: child) {
@@ -144,6 +220,141 @@ namespace Unity.UIWidgets.widgets {
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             properties.add(new DiagnosticsProperty<Animation<float>>("opacity", this.opacity));
+        }
+    }
+
+    public class RelativeRectTween : Tween<RelativeRect> {
+        public RelativeRectTween(RelativeRect begin = null, RelativeRect end = null) : base(begin: begin, end: end) {
+        }
+
+        public override RelativeRect lerp(float t) {
+            return RelativeRect.lerp(this.begin, this.end, t);
+        }
+    }
+
+
+    public class PositionedTransition : AnimatedWidget {
+        public PositionedTransition(
+            Key key = null,
+            Animation<RelativeRect> rect = null,
+            Widget child = null
+        ) : base(key: key, listenable: rect) {
+            D.assert(rect != null);
+            D.assert(child != null);
+            this.child = child;
+        }
+
+        Animation<RelativeRect> rect {
+            get { return (Animation<RelativeRect>) this.listenable; }
+        }
+
+
+        public readonly Widget child;
+
+
+        protected internal override Widget build(BuildContext context) {
+            return Positioned.fromRelativeRect(
+                rect: this.rect.value,
+                child: this.child
+            );
+        }
+    }
+
+    public class RelativePositionedTransition : AnimatedWidget {
+        public RelativePositionedTransition(
+            Key key = null,
+            Animation<Rect> rect = null,
+            Size size = null,
+            Widget child = null
+        ) : base(key: key, listenable: rect) {
+            D.assert(rect != null);
+            D.assert(size != null);
+            D.assert(child != null);
+            this.size = size;
+            this.child = child;
+        }
+
+        Animation<Rect> rect {
+            get { return (Animation<Rect>) this.listenable; }
+        }
+
+        public readonly Size size;
+
+        public readonly Widget child;
+
+        protected internal override Widget build(BuildContext context) {
+            RelativeRect offsets = RelativeRect.fromSize(this.rect.value, this.size);
+            return new Positioned(
+                top: offsets.top,
+                right: offsets.right,
+                bottom: offsets.bottom,
+                left: offsets.left,
+                child: this.child
+            );
+        }
+    }
+
+
+    public class DecoratedBoxTransition : AnimatedWidget {
+        public DecoratedBoxTransition(
+            Key key = null,
+            Animation<Decoration> decoration = null,
+            DecorationPosition position = DecorationPosition.background,
+            Widget child = null
+        ) : base(key: key, listenable: decoration) {
+            D.assert(decoration != null);
+            D.assert(child != null);
+            this.decoration = decoration;
+            this.position = position;
+            this.child = child;
+        }
+
+        public readonly Animation<Decoration> decoration;
+
+        public readonly DecorationPosition position;
+
+        public readonly Widget child;
+
+        protected internal override Widget build(BuildContext context) {
+            return new DecoratedBox(
+                decoration: this.decoration.value,
+                position: this.position,
+                child: this.child
+            );
+        }
+    }
+
+    public class AlignTransition : AnimatedWidget {
+        public AlignTransition(
+            Key key = null,
+            Animation<Alignment> alignment = null,
+            Widget child = null,
+            float? widthFactor = null,
+            float? heightFactor = null
+        ) : base(key: key, listenable: alignment) {
+            this.child = child;
+            this.widthFactor = widthFactor;
+            this.heightFactor = heightFactor;
+        }
+
+        Animation<Alignment> alignment {
+            get { return (Animation<Alignment>) this.listenable; }
+        }
+
+        public readonly float? widthFactor;
+
+        public readonly float? heightFactor;
+
+        public readonly Widget child;
+
+
+        protected internal override Widget build(BuildContext context) {
+            return new Align(
+                alignment: this.alignment.value,
+                widthFactor: this.widthFactor,
+                heightFactor: this.heightFactor,
+                child: this.child
+            );
         }
     }
 

@@ -1,4 +1,5 @@
 # UIWidgets
+[中文](README-ZH.md)
 
 
 ## Introduction
@@ -27,6 +28,23 @@ Except for basic 2D UIs, developers are also able to include 3D Models, audios, 
 A UIWidgets App can be debug in the Unity Editor directly with many advanced tools like
 CPU/GPU Profiling, FPS Profiling.
 
+
+### Example
+
+<div style="text-align: center"><table><tr>
+<td style="text-align: center">
+  <img src="https://connect-prd-cdn.unity.com/20190323/p/images/2a27606f-a2cc-4c9f-9e34-bb39ae64d06c_uiwidgets1.gif" width="200"/>
+</td>
+<td style="text-align: center">
+  <img src="https://connect-prd-cdn.unity.com/20190323/p/images/097a7c53-19b3-4e0a-ad27-8ec02506905d_uiwidgets2.gif" width="200" />
+</td>
+<td style="text-align: center">
+  <img src="https://connect-prd-cdn.unity.com/20190323/p/images/1f03c1d0-758c-4dde-b3a9-2f5f7216b7d9_uiwidgets3.gif" width="200"/>
+</td>
+<td style="text-align: center">
+  <img src="https://connect-prd-cdn.unity.com/20190323/p/images/a8884fbd-9e7c-4bd7-af46-0947e01d01fd_uiwidgets4.gif" width="200"/>
+</td>
+</tr></table></div>
 
 ## Requirement
 
@@ -69,30 +87,47 @@ UI Canvas in Unity.
 A UIWidgets App is written in **C# Scripts**. Please follow the steps to create an App and play it
 in Unity Editor.
 
-1. Create a new C# Script named "ExampleCanvas.cs" and paste the following codes into it.
+1. Create a new C# Script named "UIWidgetsExample.cs" and paste the following codes into it.
    ```none
     using System.Collections.Generic;
+    using Unity.UIWidgets.animation;
     using Unity.UIWidgets.engine;
     using Unity.UIWidgets.foundation;
     using Unity.UIWidgets.material;
     using Unity.UIWidgets.painting;
+    using Unity.UIWidgets.ui;
     using Unity.UIWidgets.widgets;
+    using UnityEngine;
+    using FontStyle = Unity.UIWidgets.ui.FontStyle;
     
     namespace UIWidgetsSample {
-        public class ExampleCanvas : WidgetCanvas {
-            protected override void OnEnable() {
-                base.OnEnable();
-                    
+        public class UIWidgetsExample : UIWidgetsPanel {
+            protected override void Awake() {
+                 base.Awake();
                 // Application.targetFrameRate = 60; // or higher if you want a smoother scrolling experience.
-                
-                // if you want to use your own font or font icons.
-                // use the font family name instead of the file name in FontStyle.fontFamily.
-                // you can get the font family name by clicking the font file and check its Inspector.                 
-                // FontManager.instance.addFont(Resources.Load<Font>(path: "path to your font"));                
+    
+                // if you want to use your own font or font icons.   
+                // FontManager.instance.addFont(Resources.Load<Font>(path: "path to your font"), "font family name");
+    
+                // load custom font with weight & style. The font weight & style corresponds to fontWeight, fontStyle of 
+                // a TextStyle object
+                // FontManager.instance.addFont(Resources.Load<Font>(path: "path to your font"), "Roboto", FontWeight.w500, 
+                //    FontStyle.italic);
+    
+                // add material icons, familyName must be "Material Icons"
+                // FontManager.instance.addFont(Resources.Load<Font>(path: "path to material icons"), "Material Icons");
             }
-                
-            protected override Widget getWidget() {
-                return new ExampleApp();
+    
+            protected override Widget createWidget() {
+                return new WidgetsApp(
+                    home: new ExampleApp(),
+                    pageRouteBuilder: (RouteSettings settings, WidgetBuilder builder) =>
+                        new PageRouteBuilder(
+                            settings: settings,
+                            pageBuilder: (BuildContext context, Animation<float> animation,
+                                Animation<float> secondaryAnimation) => builder(context)
+                        )
+                );
             }
     
             class ExampleApp : StatefulWidget {
@@ -114,7 +149,7 @@ in Unity Editor.
                             new GestureDetector(
                                 onTap: () => {
                                     this.setState(()
-                                     => {
+                                        => {
                                         this.counter++;
                                     });
                                 },
@@ -170,8 +205,10 @@ via *Window/Analysis/UIWidgets* inspector in Editor menu.
 ## Learn
 
 #### Samples
-You can find many UIWidgets App samples in the UIWidgets package in the **Samples** folder.
+You can find many UIWidgets App samples in the UIWidgets package in the **Samples** folder. 
 Feel free to try them out and make modifications to see the results.
+To get started, the UIWidgetsTheatre scene provides you
+a list of carefully selected samples to start with.
 
 You can also try UIWidgets-based Editor windows by clicking **UIWidgetsTest** on the main menu 
 and open one of the dropdown samples.
@@ -181,6 +218,7 @@ The develop team is still working on the UIWidgets Wiki. However, since UIWidget
  you can refer to Flutter Wiki to access detailed descriptions of UIWidgets APIs 
  from those of their Flutter counterparts.
  
+
 #### FAQ
 
 | Question     | Answer  |
@@ -195,28 +233,5 @@ The develop team is still working on the UIWidgets Wiki. However, since UIWidget
 | Any IDE recommendation for UIWidgets? | **Rider, VSCode(Open .sln)** |
 
 ## How to Contribute
-If you want to join us, please contact us via Github and we will respond as soon as possible.
 
-#### Code Style
-1. **Import the Customized Code Cleanup Settings**: Open Preferences -> Manage Layers, 
-Choose 'Solution "\<YourProjectName\>" personal' and Click "Add Layer" ("+") -> "Open Settings File...".
-and Open the file "UIWidgetCleanupPlugin.DotSettings" under \<YourProjectPath\>/Packages/com.unity.uiwidgets/"
-
-2. **Cleanup Code style using the Customized Code Cleanup Settings**: Open Code -> Code Cleanup,
-Pick a Cleanup scope as you want and Choose "UIWidgets" as the "Code cleanup profile", then click "OK"
-
-3. **Refine Code Style Rules**: Edit the ".editorconfig" file under \<YourProjectPath\>/Packages/com.unity.uiwidgets/". Visit
- https://www.jetbrains.com/help/rider/EditorConfig_Index.html for the detailed.
-
-#### Generate njk Code
-
-1. **Go to scripts Folder and Run npm install**:
-```
-cd <YourProjectPath>/Packages/com.unity.uiwidgets/scripts
-npm install
-```
-
-2. **Run the codegen Command**:
-```
-node uiwidgets-cli.js codegen . generate mixin code
-```
+Check [CONTRIBUTING.md](CONTRIBUTING.md)

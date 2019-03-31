@@ -181,7 +181,13 @@ namespace Unity.UIWidgets.debugger {
 
 
         public override string displayName {
-            get { return this.node.name + this.node.description; }
+            get {
+                if (this.node.showName && !string.IsNullOrEmpty(this.node.name)) {
+                    return $"{this.node.name}{this.node.separator} {this.node.description}";
+                }
+
+                return this.node.description;
+            }
         }
     }
 

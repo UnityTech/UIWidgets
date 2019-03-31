@@ -78,16 +78,28 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void touch(long timeTolive = 5) {
-            this._timeToLive = timeTolive + MeshGenerator.frameCount;
+            this._timeToLive = timeTolive + TextBlobMesh.frameCount;
         }
     }
 
-
-    static class MeshGenerator {
+    
+    class TextBlobMesh {
+        
         static readonly Dictionary<MeshKey, MeshInfo> _meshes = new Dictionary<MeshKey, MeshInfo>();
 
         static long _frameCount = 0;
+        readonly TextBlob _textBlob;
+        readonly float _scale;
+        readonly Matrix3 _transform;
+        MeshMesh _mesh;
+        bool _resolved;
 
+        public TextBlobMesh(TextBlob textBlob, float scale, Matrix3 transform) {
+            this._textBlob = textBlob;
+            this._scale = scale;
+            this._transform = transform;
+        }
+        
         public static long frameCount {
             get { return _frameCount; }
         }
@@ -105,50 +117,55 @@ namespace Unity.UIWidgets.ui {
             }
         }
 
-        public static MeshMesh generateMesh(TextBlob textBlob, float scale) {
-            var style = textBlob.style;
-            var fontInfo = FontManager.instance.getOrCreate(style.fontFamily);
-            var key = new MeshKey(textBlob.instanceId, scale);
+        public MeshMesh resovleMesh() {
+            if (this._resolved) {
+                return this._mesh;
+            }
+
+            this._resolved = true;
+            
+            var style = this._textBlob.style;
+            var fontInfo = FontManager.instance.getOrCreate(style.fontFamily, style.fontWeight, style.fontStyle);
+            var key = new MeshKey(this._textBlob.instanceId, this._scale);
 
             _meshes.TryGetValue(key, out var meshInfo);
             if (meshInfo != null && meshInfo.textureVersion == fontInfo.textureVersion) {
                 meshInfo.touch();
-                return meshInfo.mesh;
+                this._mesh = meshInfo.mesh.transform(this._transform);
+                return this._mesh;
             }
 
             var font = fontInfo.font;
-            var length = textBlob.textSize;
-            var text = textBlob.text;
-            var fontSizeToLoad = Mathf.CeilToInt(style.UnityFontSize * scale);
-            var subText = textBlob.text.Substring(textBlob.textOffset, textBlob.textSize);
-            font.RequestCharactersInTexture(subText, fontSizeToLoad, style.UnityFontStyle);
-
+            var length = this._textBlob.textSize;
+            var text = this._textBlob.text;
+            var fontSizeToLoad = Mathf.CeilToInt(style.UnityFontSize * this._scale);
 
             var vertices = new List<Vector3>(length * 4);
             var triangles = new List<int>(length * 6);
             var uv = new List<Vector2>(length * 4);
             for (int charIndex = 0; charIndex < length; ++charIndex) {
-                var ch = text[charIndex + textBlob.textOffset];
+                var ch = text[charIndex + this._textBlob.textOffset];
                 // first char as origin for mesh position 
-                var position = textBlob.positions[charIndex];
+                var position = this._textBlob.positions[charIndex];
                 if (LayoutUtils.isWordSpace(ch) || LayoutUtils.isLineEndSpace(ch) || ch == '\t') {
                     continue;
                 }
 
-                CharacterInfo charInfo;
-                font.GetCharacterInfo(ch, out charInfo, fontSizeToLoad, style.UnityFontStyle);
-
-                var minX = charInfo.minX / scale;
-                var maxX = charInfo.maxX / scale;
-                var minY = charInfo.minY / scale;
-                var maxY = charInfo.maxY / scale;
+                if (fontSizeToLoad == 0) {
+                    continue;
+                }
+                var glyphInfo = font.getGlyphInfo(ch, fontSizeToLoad, style.UnityFontStyle);
+                var minX = glyphInfo.rect.left / this._scale;
+                var maxX = glyphInfo.rect.right / this._scale;
+                var minY = glyphInfo.rect.top / this._scale;
+                var maxY = glyphInfo.rect.bottom / this._scale;
 
                 var baseIndex = vertices.Count;
 
-                vertices.Add(new Vector3((position.x + minX), (position.y - maxY), 0));
-                vertices.Add(new Vector3((position.x + maxX), (position.y - maxY), 0));
-                vertices.Add(new Vector3((position.x + maxX), (position.y - minY), 0));
-                vertices.Add(new Vector3((position.x + minX), (position.y - minY), 0));
+                vertices.Add(new Vector3((position.x + minX), (position.y + minY), 0));
+                vertices.Add(new Vector3((position.x + maxX), (position.y + minY), 0));
+                vertices.Add(new Vector3((position.x + maxX), (position.y + maxY), 0));
+                vertices.Add(new Vector3((position.x + minX), (position.y + maxY), 0));
 
                 triangles.Add(baseIndex);
                 triangles.Add(baseIndex + 1);
@@ -157,20 +174,22 @@ namespace Unity.UIWidgets.ui {
                 triangles.Add(baseIndex + 2);
                 triangles.Add(baseIndex + 3);
 
-                uv.Add(charInfo.uvTopLeft);
-                uv.Add(charInfo.uvTopRight);
-                uv.Add(charInfo.uvBottomRight);
-                uv.Add(charInfo.uvBottomLeft);
+                uv.Add(glyphInfo.uvTopLeft);
+                uv.Add(glyphInfo.uvTopRight);
+                uv.Add(glyphInfo.uvBottomRight);
+                uv.Add(glyphInfo.uvBottomLeft);
             }
 
             if (vertices.Count == 0) {
+                this._mesh = null;
                 return null;
             }
 
             MeshMesh mesh = vertices.Count > 0 ? new MeshMesh(null, vertices, triangles, uv) : null;
             _meshes[key] = new MeshInfo(key, mesh, fontInfo.textureVersion);
 
-            return mesh;
+            this._mesh = mesh.transform(this._transform);
+            return this._mesh;
         }
     }
 }
