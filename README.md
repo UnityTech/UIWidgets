@@ -72,7 +72,7 @@ only a text label and a button. The text label will count the times of clicks up
 
 First of all, please open or create a Unity Project and open it with Unity Editor. 
 
-And then open Project Settings, go to Player section and add "UIWidgets_DEBUG" to the Scripting Define Symbols field.
+And then open Project Settings, go to Player section and **add "UIWidgets_DEBUG" to the Scripting Define Symbols field.**
 This enables the debug mode of UIWidgets for your development. Remove this for your release build afterwards.
 
 #### ii. Scene Build
