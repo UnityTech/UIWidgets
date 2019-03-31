@@ -8,8 +8,7 @@ using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace UIWidgetsSample {
     public class FontWeightStyle : UIWidgetsSamplePanel {
-        protected override void Awake() {
-            base.Awake();
+        protected override void OnEnable() {
             // To run this sample, you need to download Roboto fonts and place them under Resources/Fonts folder
             // Roboto fonts could be downloaded from google website
             // https://fonts.google.com/specimen/Roboto?selection.family=Roboto
@@ -38,6 +37,8 @@ namespace UIWidgetsSample {
                 FontWeight.w100);
             FontManager.instance.addFont(Resources.Load<Font>(path: "Fonts/Roboto-ThinItalic"), "Roboto",
                 FontWeight.w100, FontStyle.italic);
+            
+            base.OnEnable();
         }
 
         protected override Widget createWidget() {

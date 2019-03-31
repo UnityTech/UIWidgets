@@ -102,8 +102,7 @@ in Unity Editor.
     
     namespace UIWidgetsSample {
         public class UIWidgetsExample : UIWidgetsPanel {
-            protected override void Awake() {
-                 base.Awake();
+            protected override void OnEnable() {
                 // Application.targetFrameRate = 60; // or higher if you want a smoother scrolling experience.
     
                 // if you want to use your own font or font icons.   
@@ -116,6 +115,8 @@ in Unity Editor.
     
                 // add material icons, familyName must be "Material Icons"
                 // FontManager.instance.addFont(Resources.Load<Font>(path: "path to material icons"), "Material Icons");
+                
+                base.OnEnable();
             }
     
             protected override Widget createWidget() {
