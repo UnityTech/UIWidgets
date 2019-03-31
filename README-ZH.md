@@ -16,10 +16,25 @@ UIWidgets主要来自[Flutter](https://github.com/flutter/flutter)。但UIWidget
 #### 多媒体支持
 除了基本的2D UI之外，开发人员还能够将3D模型，音频，粒子系统添加到UIWidgets应用中。
 
-
 #### 开发者友好
 开发者可以使用许多高级工具，如CPU/GPU Profiling和FPS Profiling，直接在Unity Editor中调试UIWidgets应用。
 
+### Example
+
+<div style="text-align: center"><table><tr>
+<td style="text-align: center">
+  <img src="https://connect-prd-cdn.unity.com/20190323/p/images/2a27606f-a2cc-4c9f-9e34-bb39ae64d06c_uiwidgets1.gif" width="200"/>
+</td>
+<td style="text-align: center">
+  <img src="https://connect-prd-cdn.unity.com/20190323/p/images/097a7c53-19b3-4e0a-ad27-8ec02506905d_uiwidgets2.gif" width="200" />
+</td>
+<td style="text-align: center">
+  <img src="https://connect-prd-cdn.unity.com/20190323/p/images/1f03c1d0-758c-4dde-b3a9-2f5f7216b7d9_uiwidgets3.gif" width="200"/>
+</td>
+<td style="text-align: center">
+  <img src="https://connect-prd-cdn.unity.com/20190323/p/images/a8884fbd-9e7c-4bd7-af46-0947e01d01fd_uiwidgets4.gif" width="200"/>
+</td>
+</tr></table></div>
 
 ## 使用要求
 
@@ -30,10 +45,9 @@ UIWidgets主要来自[Flutter](https://github.com/flutter/flutter)。但UIWidget
 
 访问我们的Github存储库 [https://github.com/UnityTech/UIWidgets](https://github.com/UnityTech/UIWidgets)下载最新的UIWidgets包。
 
-将下载的包文件夹移动到 Unity项目 的 Package 文件夹中。
+将下载的包文件夹移动到Unity项目的Package文件夹中。
 
 通常，你可以在控制台（或终端）应用程序中输入下面的代码来完成这个操作：
-
     
    ```none
     cd <YourProjectPath>/Packages
@@ -64,35 +78,46 @@ UI Canvas。
 UIWidgets应用是用**C＃脚本**来编写的。 请按照以下步骤创建应用程序并在Unity编辑器中播放。
 1. 创建一个新C＃脚本，命名为“ExampleCanvas.cs”，并将以下代码粘贴到其中。
 
-   ```none
+```none
     using System.Collections.Generic;
+    using Unity.UIWidgets.animation;
     using Unity.UIWidgets.engine;
     using Unity.UIWidgets.foundation;
     using Unity.UIWidgets.material;
     using Unity.UIWidgets.painting;
+    using Unity.UIWidgets.ui;
     using Unity.UIWidgets.widgets;
+    using UnityEngine;
+    using FontStyle = Unity.UIWidgets.ui.FontStyle;
     
     namespace UIWidgetsSample {
-        public class ExampleCanvas : WidgetCanvas {
-            protected override void OnEnable() {
-                base.OnEnable();
-                    
+        public class UIWidgetsExample : UIWidgetsPanel {
+            protected override void Awake() {
+                 base.Awake();
                 // Application.targetFrameRate = 60; // or higher if you want a smoother scrolling experience.
-                
+    
                 // if you want to use your own font or font icons.   
                 // FontManager.instance.addFont(Resources.Load<Font>(path: "path to your font"), "font family name");
- 
+    
                 // load custom font with weight & style. The font weight & style corresponds to fontWeight, fontStyle of 
                 // a TextStyle object
                 // FontManager.instance.addFont(Resources.Load<Font>(path: "path to your font"), "Roboto", FontWeight.w500, 
                 //    FontStyle.italic);
- 
+    
                 // add material icons, familyName must be "Material Icons"
                 // FontManager.instance.addFont(Resources.Load<Font>(path: "path to material icons"), "Material Icons");
             }
-                
-            protected override Widget getWidget() {
-                return new ExampleApp();
+    
+            protected override Widget createWidget() {
+                return new WidgetsApp(
+                    home: new ExampleApp(),
+                    pageRouteBuilder: (RouteSettings settings, WidgetBuilder builder) =>
+                        new PageRouteBuilder(
+                            settings: settings,
+                            pageBuilder: (BuildContext context, Animation<float> animation,
+                                Animation<float> secondaryAnimation) => builder(context)
+                        )
+                );
             }
     
             class ExampleApp : StatefulWidget {
@@ -113,8 +138,7 @@ UIWidgets应用是用**C＃脚本**来编写的。 请按照以下步骤创建�
                             new Text("Counter: " + this.counter),
                             new GestureDetector(
                                 onTap: () => {
-                                    this.setState(()
-                                     => {
+                                    this.setState(() => {
                                         this.counter++;
                                     });
                                 },
@@ -130,8 +154,8 @@ UIWidgets应用是用**C＃脚本**来编写的。 请按照以下步骤创建�
             }
         }
     }
-   ```
-   
+```
+
 2. 保存此脚本，并将其附加到Panel 1中作为其组件。
 3. 在Unity编辑器中，点击Play按钮来启动应用。
 
@@ -173,7 +197,7 @@ UIWidgets Inspector工具用于可视化和浏览窗口小部件树。 你可以
 
 #### 示例
 
-你可以在**Samples**文件夹的UIWidgets包中找到许多UIWidgets应用示例。请随意尝试并进行修改以查看结果。
+你可以在**Samples**文件夹的UIWidgets包中找到一些精心挑选的UIWidgets应用示例，并通过这些示例来开始你的学习。请随意尝试并进行修改以查看结果。
 
 你也可以在支持**UIWidgets**的编辑器中，点击主菜单上的UIWidgets，并在下拉窗口中选择一个示例。
 
@@ -195,27 +219,4 @@ UIWidgets Inspector工具用于可视化和浏览窗口小部件树。 你可以
 | 有推荐的适用于UIWidgets的IDE吗？ | Rider, VSCode(Open .sln) |
 
 ## 如何贡献
-如果你想加入我们，请通过Github与我们联系，我们将尽快回复。
-
-#### 代码风格
-1. 导入自定义代码清理设置
-    打开首选项 - >管理图层，选择“解决方案“<YourProjectName>“个人”，然后单击“添加图层”（“+”） > “打开设置文件...”。并打开<YourProjectPath> /Packages/com.unity.uiwidgets/下的文件“UIWidgetCleanupPlugin.DotSettings”。
-
-2. 使用自定义代码清理设置清理代码样式
-    打开代码 - >代码清理，根据需要选择一个清理范围，选择“UIWidgets”作为“代码清理配置文件”，然后单击“确定”。
-
-
-3. 优化代码样式规则
-    编辑<YourProjectPath> /Packages/com.unity.uiwidgets/“下的”.editorconfig“文件。获得更多详细信息，请访问[https://www.jetbrains.com/help/rider/EditorConfig_Index.html](https://www.jetbrains.com/help/rider/EditorConfig_Index.html)。
-
-#### 生成njk代码
-
-1. 转到脚本文件夹并运行npm install。
-```
-cd <YourProjectPath>/Packages/com.unity.uiwidgets/scripts
-npm install
-```
-2. 运行codegen命令。
-```
-node uiwidgets-cli.js codegen . generate mixin code
-```
+请查看[CONTRIBUTING.md](CONTRIBUTING.md)
