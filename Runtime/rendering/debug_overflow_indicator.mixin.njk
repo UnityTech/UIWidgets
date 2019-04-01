@@ -41,7 +41,8 @@ namespace UIWidgets.Runtime.rendering {
         public readonly _OverflowSide? side;
     }
 
-    public abstract class DebugOverflowIndicatorMixinRenderObject : RenderObject {
+{% macro DebugOverflowIndicatorMixin(with, paramlist, params) %} 
+    public abstract class DebugOverflowIndicatorMixin{{with}} : {{with}} {
         static readonly Color _black = new Color(0xBF000000);
         static readonly Color _yellow = new Color(0xBFFFFF00);
         const float _indicatorFraction = 0.1f;
@@ -60,7 +61,7 @@ namespace UIWidgets.Runtime.rendering {
 
         readonly List<TextPainter> _indicatorLabel;
 
-        static DebugOverflowIndicatorMixinRenderObject() {
+        static DebugOverflowIndicatorMixin{{with}}() {
             _indicatorPaint.shader = Gradient.linear(
                 new Offset(0.0f, 0.0f),
                 new Offset(10.0f, 10.0f),
@@ -71,10 +72,10 @@ namespace UIWidgets.Runtime.rendering {
             _labelBackgroundPaint.color = new Color(0xFFFFFFFF);
         }
 
-        public DebugOverflowIndicatorMixinRenderObject() {
+        public DebugOverflowIndicatorMixin{{with}}({{paramlist}}) : base({{params}}) {
             this._indicatorLabel = new List<TextPainter>(4);
-            for (int i = 0; i < this._indicatorLabel.Count; i++) {
-                this._indicatorLabel[i] = new TextPainter(null, textDirection: TextDirection.ltr);
+            for (int i = 0; i < 4; i++) {
+                this._indicatorLabel.Add(new TextPainter("", textDirection: TextDirection.ltr));
             }
         }
 
@@ -227,7 +228,7 @@ namespace UIWidgets.Runtime.rendering {
             );
         }
 
-        void paintOverflowIndicator(
+        public void paintOverflowIndicator(
             PaintingContext context,
             Offset offset,
             Rect containerRect,
@@ -272,4 +273,8 @@ namespace UIWidgets.Runtime.rendering {
             }
         }
     }
+{% endmacro %}
+
+{{ DebugOverflowIndicatorMixin('RenderAligningShiftedBox', 'Alignment alignment = null, RenderBox child = null', 'alignment, child') }}
+    
 }
