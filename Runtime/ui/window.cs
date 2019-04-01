@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Unity.UIWidgets.async;
 using Unity.UIWidgets.foundation;
-using Unity.UIWidgets.service;
 
 namespace Unity.UIWidgets.ui {
     public delegate void VoidCallback();
@@ -120,7 +119,8 @@ namespace Unity.UIWidgets.ui {
                 if (value == null) {
                     D.assert(_instance != null, "Window.instance is already cleared.");
                     _instance = null;
-                } else {
+                }
+                else {
                     D.assert(_instance == null, "Window.instance is already assigned.");
                     _instance = value;
                 }
@@ -238,5 +238,16 @@ namespace Unity.UIWidgets.ui {
         public abstract Timer runInMain(Action callback);
 
         public abstract IDisposable getScope();
+
+
+        float deltaTime;
+
+        public void updateDeltaTime(float unscaledDeltaTime) {
+            this.deltaTime += (unscaledDeltaTime - this.deltaTime) * 0.1f;
+        }
+
+        public float getFPS() {
+            return 1.0f / this.deltaTime;
+        }
     }
 }

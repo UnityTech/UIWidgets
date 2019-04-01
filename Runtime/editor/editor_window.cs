@@ -97,7 +97,7 @@ namespace Unity.UIWidgets.editor {
         }
 
         float? _lastUpdateTime;
-        
+
         protected override float getUnscaledDeltaTime() {
             if (this._lastUpdateTime == null) {
                 this._lastUpdateTime = (float) EditorApplication.timeSinceStartup;
@@ -106,7 +106,7 @@ namespace Unity.UIWidgets.editor {
             float deltaTime = (float) EditorApplication.timeSinceStartup - this._lastUpdateTime.Value;
             this._lastUpdateTime = (float) EditorApplication.timeSinceStartup;
             return deltaTime;
-        }        
+        }
     }
 
 #endif
@@ -399,8 +399,8 @@ namespace Unity.UIWidgets.editor {
         }
 
         public void Update() {
-            PerformanceUtils.instance.updateDeltaTime(this.getUnscaledDeltaTime());
-            
+            this.updateDeltaTime(this.getUnscaledDeltaTime());
+
             Timer.update();
 
             bool hasFocus = this.hasFocus();
