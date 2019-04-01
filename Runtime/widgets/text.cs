@@ -186,7 +186,7 @@ namespace Unity.UIWidgets.widgets {
                 textAlign: this.textAlign ?? defaultTextStyle.textAlign ?? TextAlign.left,
                 softWrap: this.softWrap ?? defaultTextStyle.softWrap,
                 overflow: this.overflow ?? defaultTextStyle.overflow,
-                textScaleFactor: this.textScaleFactor ?? 1.0f, // MediaQuery.textScaleFactorOf(context), todo
+                textScaleFactor: this.textScaleFactor ?? MediaQuery.textScaleFactorOf(context),
                 maxLines: this.maxLines ?? defaultTextStyle.maxLines,
                 text: new TextSpan(
                     style: effectiveTextStyle,
