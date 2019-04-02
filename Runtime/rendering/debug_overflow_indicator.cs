@@ -42,7 +42,7 @@ namespace UIWidgets.Runtime.rendering {
         public readonly _OverflowSide? side;
     }
 
-    public abstract class DebugOverflowIndicatorMixin {
+    public static class DebugOverflowIndicatorMixin {
         static readonly Color _black = new Color(0xBF000000);
         static readonly Color _yellow = new Color(0xBFFFFF00);
         const float _indicatorFraction = 0.1f;
