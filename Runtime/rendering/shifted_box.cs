@@ -448,7 +448,7 @@ namespace Unity.UIWidgets.rendering {
         }
     }
 
-    public class RenderUnconstrainedBox : DebugOverflowIndicatorMixinRenderAligningShiftedBox {
+    public class RenderUnconstrainedBox : RenderAligningShiftedBox {
         public RenderUnconstrainedBox(
             Alignment alignment = null,
             Axis? constrainedAxis = null,
@@ -525,7 +525,7 @@ namespace Unity.UIWidgets.rendering {
 
             context.pushClipRect(this.needsCompositing, offset, Offset.zero & this.size, base.paint);
             D.assert(() => {
-                this.paintOverflowIndicator(context, offset, this._overflowContainerRect, this._overflowChildRect);
+                DebugOverflowIndicatorMixin.paintOverflowIndicator(this, context, offset, this._overflowContainerRect, this._overflowChildRect);
                 return true;
             });
         }

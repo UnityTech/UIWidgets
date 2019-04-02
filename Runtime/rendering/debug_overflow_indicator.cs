@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
@@ -41,8 +42,7 @@ namespace UIWidgets.Runtime.rendering {
         public readonly _OverflowSide? side;
     }
 
-{% macro DebugOverflowIndicatorMixin(with, paramlist, params) %} 
-    public abstract class DebugOverflowIndicatorMixin{{with}} : {{with}} {
+    public abstract class DebugOverflowIndicatorMixin {
         static readonly Color _black = new Color(0xBF000000);
         static readonly Color _yellow = new Color(0xBFFFFF00);
         const float _indicatorFraction = 0.1f;
@@ -59,9 +59,9 @@ namespace UIWidgets.Runtime.rendering {
 
         static readonly Paint _labelBackgroundPaint = new Paint();
 
-        readonly List<TextPainter> _indicatorLabel;
+        static readonly List<TextPainter> _indicatorLabel = new List<TextPainter>(4);
 
-        static DebugOverflowIndicatorMixin{{with}}() {
+        static DebugOverflowIndicatorMixin() {
             _indicatorPaint.shader = Gradient.linear(
                 new Offset(0.0f, 0.0f),
                 new Offset(10.0f, 10.0f),
@@ -70,18 +70,14 @@ namespace UIWidgets.Runtime.rendering {
                 TileMode.repeated
             );
             _labelBackgroundPaint.color = new Color(0xFFFFFFFF);
-        }
-
-        public DebugOverflowIndicatorMixin{{with}}({{paramlist}}) : base({{params}}) {
-            this._indicatorLabel = new List<TextPainter>(4);
             for (int i = 0; i < 4; i++) {
-                this._indicatorLabel.Add(new TextPainter("", textDirection: TextDirection.ltr));
+                _indicatorLabel.Add(new TextPainter(new TextSpan(""), textDirection: TextDirection.ltr));
             }
         }
 
-        bool _overflowReportNeeded = true;
+        static readonly Dictionary<RenderObject, bool> _overflowReportNeeded = new Dictionary<RenderObject, Boolean>();
 
-        string _formatPixels(float value) {
+        static string _formatPixels(float value) {
             D.assert(value > 0.0f);
             string pixels;
             if (value > 10.0f) {
@@ -97,7 +93,7 @@ namespace UIWidgets.Runtime.rendering {
             return pixels;
         }
 
-        List<_OverflowRegionData> _calculateOverflowRegions(RelativeRect overflow, Rect containerRect) {
+        static List<_OverflowRegionData> _calculateOverflowRegions(RelativeRect overflow, Rect containerRect) {
             List<_OverflowRegionData> regions = new List<_OverflowRegionData> { };
             if (overflow.left > 0.0f) {
                 Rect markerRect = Rect.fromLTWH(
@@ -125,7 +121,7 @@ namespace UIWidgets.Runtime.rendering {
                 );
                 regions.Add(new _OverflowRegionData(
                     rect: markerRect,
-                    label: "RIGHT OVERFLOWED BY ${_formatPixels(overflow.right)} PIXELS",
+                    label: $"RIGHT OVERFLOWED BY {_formatPixels(overflow.right)} PIXELS",
                     labelOffset: markerRect.centerRight -
                                  new Offset(_indicatorFontSizePixels + _indicatorLabelPaddingPixels, 0.0f),
                     rotation: -Mathf.PI / 2.0f,
@@ -142,7 +138,7 @@ namespace UIWidgets.Runtime.rendering {
                 );
                 regions.Add(new _OverflowRegionData(
                     rect: markerRect,
-                    label: $"TOP OVERFLOWED BY {this._formatPixels(overflow.top)} PIXELS",
+                    label: $"TOP OVERFLOWED BY {_formatPixels(overflow.top)} PIXELS",
                     labelOffset: markerRect.topCenter + new Offset(0.0f, _indicatorLabelPaddingPixels),
                     rotation: 0.0f,
                     side: _OverflowSide.top
@@ -158,7 +154,7 @@ namespace UIWidgets.Runtime.rendering {
                 );
                 regions.Add(new _OverflowRegionData(
                     rect: markerRect,
-                    label: $"BOTTOM OVERFLOWED BY {this._formatPixels(overflow.bottom)} PIXELS",
+                    label: $"BOTTOM OVERFLOWED BY {_formatPixels(overflow.bottom)} PIXELS",
                     labelOffset: markerRect.bottomCenter -
                                  new Offset(0.0f, _indicatorFontSizePixels + _indicatorLabelPaddingPixels),
                     rotation: 0.0f,
@@ -169,37 +165,37 @@ namespace UIWidgets.Runtime.rendering {
             return regions;
         }
 
-        void _reportOverflow(RelativeRect overflow, string overflowHints) {
-            overflowHints = overflowHints ?? "The edge of the $runtimeType that is " +
+        static void _reportOverflow(RenderObject renderObject, RelativeRect overflow, string overflowHints) {
+            overflowHints = overflowHints ?? $"The edge of the {renderObject.GetType()} that is " +
                             "overflowing has been marked in the rendering with a yellow and black " +
                             "striped pattern. This is usually caused by the contents being too big " +
-                            "for the $runtimeType.\n" +
+                            $"for the {renderObject.GetType()}.\n" +
                             "This is considered an error condition because it indicates that there " +
                             "is content that cannot be seen. If the content is legitimately bigger " +
                             "than the available space, consider clipping it with a ClipRect widget " +
-                            "before putting it in the $runtimeType, or using a scrollable " +
+                            $"before putting it in the {renderObject.GetType()}, or using a scrollable " +
                             "container, like a ListView.";
 
             List<string> overflows = new List<string> { };
             if (overflow.left > 0.0f) {
-                overflows.Add($"{this._formatPixels(overflow.left)} pixels on the left");
+                overflows.Add($"{_formatPixels(overflow.left)} pixels on the left");
             }
 
             if (overflow.top > 0.0f) {
-                overflows.Add($"{this._formatPixels(overflow.top)} pixels on the top");
+                overflows.Add($"{_formatPixels(overflow.top)} pixels on the top");
             }
 
             if (overflow.bottom > 0.0f) {
-                overflows.Add($"{this._formatPixels(overflow.bottom)} pixels on the bottom");
+                overflows.Add($"{_formatPixels(overflow.bottom)} pixels on the bottom");
             }
 
             if (overflow.right > 0.0f) {
-                overflows.Add($"{this._formatPixels(overflow.right)} pixels on the right");
+                overflows.Add($"{_formatPixels(overflow.right)} pixels on the right");
             }
 
             string overflowText = "";
-            D.assert(overflows.isNotEmpty,
-                "Somehow $runtimeType didn't actually overflow like it thought it did.");
+            D.assert(overflows.isNotEmpty(),
+                $"Somehow {renderObject.GetType()} didn't actually overflow like it thought it did.");
             switch (overflows.Count) {
                 case 1:
                     overflowText = overflows.first();
@@ -215,20 +211,21 @@ namespace UIWidgets.Runtime.rendering {
 
             UIWidgetsError.reportError(
                 new UIWidgetsErrorDetails(
-                    exception: new Exception($"A {this.GetType()} overflowed by {overflowText}."),
+                    exception: new Exception($"A {renderObject.GetType()} overflowed by {overflowText}."),
                     library: "rendering library",
                     context: "during layout",
                     informationCollector: (information) => {
                         information.AppendLine(overflowHints);
-                        information.AppendLine($"The specific {this.GetType()} in question is:");
-                        information.AppendLine($"  {this.toStringShallow(joiner: "\n  ")}");
+                        information.AppendLine($"The specific {renderObject.GetType()} in question is:");
+                        information.AppendLine($"  {renderObject.toStringShallow(joiner: "\n  ")}");
                         information.AppendLine(string.Concat(Enumerable.Repeat("◢◤", 32)));
                     }
                 )
             );
         }
 
-        public void paintOverflowIndicator(
+        public static void paintOverflowIndicator(
+            RenderObject renderObject,
             PaintingContext context,
             Offset offset,
             Rect containerRect,
@@ -244,37 +241,35 @@ namespace UIWidgets.Runtime.rendering {
                 return;
             }
 
-            List<_OverflowRegionData> overflowRegions = this._calculateOverflowRegions(overflow, containerRect);
+            List<_OverflowRegionData> overflowRegions = _calculateOverflowRegions(overflow, containerRect);
             foreach (_OverflowRegionData region in overflowRegions) {
                 context.canvas.drawRect(region.rect.shift(offset), _indicatorPaint);
 
-                if (this._indicatorLabel[(int) region.side].text?.text != region.label) {
-                    this._indicatorLabel[(int) region.side].text = new TextSpan(
+                if (_indicatorLabel[(int) region.side].text?.text != region.label) {
+                    _indicatorLabel[(int) region.side].text = new TextSpan(
                         text: region.label,
                         style: _indicatorTextStyle
                     );
-                    this._indicatorLabel[(int) region.side].layout();
+                    _indicatorLabel[(int) region.side].layout();
                 }
 
                 Offset labelOffset = region.labelOffset + offset;
-                Offset centerOffset = new Offset(-this._indicatorLabel[(int) region.side].width / 2.0f, 0.0f);
-                Rect textBackgroundRect = centerOffset & this._indicatorLabel[(int) region.side].size;
+                Offset centerOffset = new Offset(-_indicatorLabel[(int) region.side].width / 2.0f, 0.0f);
+                Rect textBackgroundRect = centerOffset & _indicatorLabel[(int) region.side].size;
                 context.canvas.save();
                 context.canvas.translate(labelOffset.dx, labelOffset.dy);
                 context.canvas.rotate(region.rotation);
                 context.canvas.drawRect(textBackgroundRect, _labelBackgroundPaint);
-                this._indicatorLabel[(int) region.side].paint(context.canvas, centerOffset);
+                _indicatorLabel[(int) region.side].paint(context.canvas, centerOffset);
                 context.canvas.restore();
             }
 
-            if (this._overflowReportNeeded) {
-                this._overflowReportNeeded = false;
-                this._reportOverflow(overflow, overflowHints);
+            bool containsKey = _overflowReportNeeded.TryGetValue(renderObject, out var overflowReportNeeded);
+            overflowReportNeeded |= !containsKey;
+            if (overflowReportNeeded) {
+                _overflowReportNeeded[renderObject] = false;
+                _reportOverflow(renderObject, overflow, overflowHints);
             }
         }
     }
-{% endmacro %}
-
-{{ DebugOverflowIndicatorMixin('RenderAligningShiftedBox', 'Alignment alignment = null, RenderBox child = null', 'alignment, child') }}
-    
 }
