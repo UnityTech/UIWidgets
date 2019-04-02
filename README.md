@@ -7,7 +7,7 @@
 UIWidgets is a plugin package for Unity Editor which helps developers to create, debug and deploy efficient, 
 cross-platform Apps using the Unity Engine. 
 
-UIWidgets is mainly derived from Flutter @https://github.com/flutter/flutter. However, taking advantage of
+UIWidgets is mainly derived from [Flutter](https://github.com/flutter/flutter). However, taking advantage of
 the powerful Unity Engine, it offers developers many new features to improve their Apps 
 as well as the develop workflow significantly.
 
