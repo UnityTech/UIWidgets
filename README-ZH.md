@@ -76,7 +76,7 @@ UI Canvas。
 #### 三、创建小部件
 
 UIWidgets应用是用**C＃脚本**来编写的。 请按照以下步骤创建应用程序并在Unity编辑器中播放。
-1. 创建一个新C＃脚本，命名为“ExampleCanvas.cs”，并将以下代码粘贴到其中。
+1. 创建一个新C＃脚本，命名为“UIWidgetsExample.cs”，并将以下代码粘贴到其中。
 
 ```none
     using System.Collections.Generic;
