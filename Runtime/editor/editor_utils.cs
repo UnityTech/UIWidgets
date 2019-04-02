@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Reflection;
 using Unity.UIWidgets.engine;
+using Unity.UIWidgets.ui;
 using UnityEngine;
 
 
@@ -33,6 +34,10 @@ namespace Unity.UIWidgets.Editor {
         
         public float devicePixelRatio {
             get { return this._lastDevicePixelRatio; }
+        }
+
+        public WindowPadding viewPadding {
+            get { return WindowPadding.zero; }
         }
     }
 

@@ -17,11 +17,7 @@ namespace Unity.UIWidgets.engine {
         bool _needsPaint;
 
         protected override void updateSafeArea() {
-            this._padding = new WindowPadding(
-                Screen.safeArea.x,
-                Screen.safeArea.y,
-                Screen.width - Screen.safeArea.width - Screen.safeArea.x,
-                Screen.height - Screen.safeArea.height - Screen.safeArea.y);
+            this._padding = this._uiWidgetsPanel.viewPadding;
         }
 
         protected override bool hasFocus() {
@@ -150,6 +146,10 @@ namespace Unity.UIWidgets.engine {
                     ? this.devicePixelRatioOverride
                     : this._displayMetrics.devicePixelRatio;
             }
+        }
+
+        public WindowPadding viewPadding {
+            get { return this._displayMetrics.viewPadding; }
         }
 
         protected override void OnDisable() {
