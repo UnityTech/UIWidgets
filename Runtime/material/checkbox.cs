@@ -100,7 +100,6 @@ namespace Unity.UIWidgets.material {
             TickerProvider vsync = null,
             BoxConstraints additionalConstraints = null
         ) : base(key: key) {
-            D.assert(tristate != null);
             D.assert(tristate || value != null);
             D.assert(activeColor != null);
             D.assert(inactiveColor != null);
