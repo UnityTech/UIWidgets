@@ -5,11 +5,16 @@ using Unity.UIWidgets.ui;
 namespace Unity.UIWidgets.engine {
 
     [StructLayout(LayoutKind.Sequential)]
-    public struct ViewPadding {
-        public float top;
-        public float bottom;
-        public float left;
-        public float right;
+    public struct viewMetrics {
+        public float insets_top;
+        public float insets_bottom;
+        public float insets_left;
+        public float insets_right;
+
+        public float padding_top;
+        public float padding_bottom;
+        public float padding_left;
+        public float padding_right;
     }
 
     public static class DisplayMetricsProvider {
@@ -23,13 +28,17 @@ namespace Unity.UIWidgets.engine {
 
         float devicePixelRatio { get; } 
         
+        viewMetrics viewMetrics { get; }
+
         WindowPadding viewPadding { get; }
+        
+        WindowPadding viewInsets { get; }
     }
 
     public class PlayerDisplayMetrics: DisplayMetrics {
         
         float _devicePixelRatio = 0;
-        WindowPadding _viewPadding = null;
+        viewMetrics? _viewMetrics = null;
 
         public void OnEnable() {
         }
@@ -39,6 +48,8 @@ namespace Unity.UIWidgets.engine {
         }
 
         public void Update() {
+            //view metrics marks dirty
+            this._viewMetrics = null;
         }
 
 
@@ -70,23 +81,68 @@ namespace Unity.UIWidgets.engine {
         }
 
         public WindowPadding viewPadding {
+            get { 
+                return new WindowPadding(this.viewMetrics.padding_left,
+                this.viewMetrics.padding_top,
+                this.viewMetrics.padding_right,
+                this.viewMetrics.padding_bottom);
+            }
+        }
+        
+        public WindowPadding viewInsets { 
+            get { 
+            return new WindowPadding(this.viewMetrics.insets_left,
+                this.viewMetrics.insets_top,
+                this.viewMetrics.insets_right,
+                this.viewMetrics.insets_bottom);
+            } 
+        }
+
+        public viewMetrics viewMetrics {
             get {
-                if (this._viewPadding != null) {
-                    return this._viewPadding;
+                if (this._viewMetrics != null) {
+                    return this._viewMetrics.Value;
                 }
-#if UNITY_ANDROID
-                this._viewPadding = WindowPadding.zero;
-#elif UNITY_WEBGL
-                this._viewPadding = WindowPadding.zero;
-#elif UNITY_IOS
                 
-                ViewPadding padding = IOSGetViewportPadding();
-                this._viewPadding = new WindowPadding(left: padding.left, top: padding.top, right: padding.right,
-                    bottom: padding.bottom);
+#if UNITY_ANDROID
+                this._viewMetrics = new viewMetrics {
+                    insets_bottom = 0,
+                    insets_left = 0,
+                    insets_right = 0,
+                    insets_top = 0,
+                    padding_left = Screen.safeArea.x,
+                    padding_top = Screen.safeArea.y,
+                    padding_right = Screen.width - Screen.safeArea.width - Screen.safeArea.x,
+                    padding_bottom = Screen.height - Screen.safeArea.height - Screen.safeArea.y
+                };
+#elif UNITY_WEBGL
+                this._viewMetrics = new viewMetrics {
+                    insets_bottom = 0,
+                    insets_left = 0,
+                    insets_right = 0,
+                    insets_top = 0,
+                    padding_left = 0,
+                    padding_top = 0,
+                    padding_right = 0,
+                    padding_bottom = 0
+                };
+#elif UNITY_IOS
+                IOSDeviceStartup();
+                viewMetrics metrics = IOSGetViewportPadding();
+                this._viewMetrics = metrics;
 #else
-                this._viewPadding = WindowPadding.zero;
+                this._viewMetrics = new viewMetrics {
+                    insets_bottom = 0,
+                    insets_left = 0,
+                    insets_right = 0,
+                    insets_top = 0,
+                    padding_left = 0,
+                    padding_top = 0,
+                    padding_right = 0,
+                    padding_bottom = 0
+                };
 #endif
-                return this._viewPadding;
+                return this._viewMetrics.Value;
             }
         }
 
@@ -118,8 +174,11 @@ namespace Unity.UIWidgets.engine {
         static extern int IOSDeviceScaleFactor();
 
 		[DllImport("__Internal")]
-		static extern ViewPadding IOSGetViewportPadding();
+		static extern viewMetrics IOSGetViewportPadding();
+
+        [DllImport("__Internal")]
+        static extern void IOSDeviceStartup();
 #endif
-        
+
     }
 }

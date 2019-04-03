@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Unity.UIWidgets.async;
 using Unity.UIWidgets.editor;
+using Unity.UIWidgets.external.simplejson;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
@@ -16,8 +17,10 @@ namespace Unity.UIWidgets.engine {
         readonly UIWidgetsPanel _uiWidgetsPanel;
         bool _needsPaint;
 
+
         protected override void updateSafeArea() {
             this._padding = this._uiWidgetsPanel.viewPadding;
+            this._viewInsets = this._uiWidgetsPanel.viewInsets;
         }
 
         protected override bool hasFocus() {
@@ -102,6 +105,8 @@ namespace Unity.UIWidgets.engine {
         Vector2 _lastMouseMove;
 
         HashSet<int> _enteredPointers;
+        
+        bool _viewMetricsCallbackRegistered;
 
         bool _mouseEntered {
             get { return !this._enteredPointers.isEmpty(); }
@@ -112,6 +117,11 @@ namespace Unity.UIWidgets.engine {
 
         const int mouseButtonNum = 3;
 
+        void _handleViewMetricsChanged(string method, List<JSONNode> args) {
+            this._windowAdapter.onViewMetricsChanged();
+            this._displayMetrics.Update();
+        }
+
         protected override void OnEnable() {
             base.OnEnable();
             //Disable the default touch -> mouse event conversion on mobile devices
@@ -119,7 +129,7 @@ namespace Unity.UIWidgets.engine {
 
             this._displayMetrics = DisplayMetricsProvider.provider();
             this._displayMetrics.OnEnable();
-
+            
             if (_repaintEvent == null) {
                 _repaintEvent = new Event {type = EventType.Repaint};
             }
@@ -152,10 +162,15 @@ namespace Unity.UIWidgets.engine {
             get { return this._displayMetrics.viewPadding; }
         }
 
+        public WindowPadding viewInsets {
+            get { return this._displayMetrics.viewInsets; }
+        }
+
         protected override void OnDisable() {
             D.assert(this._windowAdapter != null);
             this._windowAdapter.OnDisable();
             this._windowAdapter = null;
+            
             base.OnDisable();
         }
 
@@ -171,6 +186,12 @@ namespace Unity.UIWidgets.engine {
         protected virtual void Update() {
             this._displayMetrics.Update();
             UIWidgetsMessageManager.ensureUIWidgetsMessageManagerIfNeeded();
+
+            if (!this._viewMetricsCallbackRegistered) {
+                this._viewMetricsCallbackRegistered = true;
+                UIWidgetsMessageManager.instance?.AddChannelMessageDelegate("ViewportMatricsChanged",
+                    this._handleViewMetricsChanged);
+            }
 
             if (this._mouseEntered) {
                 if (this._lastMouseMove.x != Input.mousePosition.x || this._lastMouseMove.y != Input.mousePosition.y) {
