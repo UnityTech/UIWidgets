@@ -49,7 +49,6 @@ class _AsyncRequestWidgetState : State<AsyncRequestWidget> {
                     UnityWebRequest www = UnityWebRequest.Get("http://worldclockapi.com/api/json/est/now");
                     var asyncOperation  = www.SendWebRequest();
                     asyncOperation.completed += operation => {
-                        Debug.Log(www.downloadHandler.text);
                         var timeData = JsonUtility.FromJson<TimeData>(www.downloadHandler.text);
                         using(WindowProvider.of(this.widget.gameObjOfUIWidgetsPanel).getScope())
                         {
