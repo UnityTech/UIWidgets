@@ -1,4 +1,5 @@
-﻿using Unity.UIWidgets.foundation;
+﻿using UIWidgets.Runtime.rendering;
+using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.ui;
@@ -523,6 +524,10 @@ namespace Unity.UIWidgets.rendering {
             }
 
             context.pushClipRect(this.needsCompositing, offset, Offset.zero & this.size, base.paint);
+            D.assert(() => {
+                DebugOverflowIndicatorMixin.paintOverflowIndicator(this, context, offset, this._overflowContainerRect, this._overflowChildRect);
+                return true;
+            });
         }
     }
 
