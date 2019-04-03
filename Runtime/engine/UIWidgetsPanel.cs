@@ -97,7 +97,7 @@ namespace Unity.UIWidgets.engine {
 
     [RequireComponent(typeof(RectTransform))]
     public class UIWidgetsPanel : RawImage, IPointerDownHandler, IPointerUpHandler, IDragHandler,
-        IPointerEnterHandler, IPointerExitHandler {
+        IPointerEnterHandler, IPointerExitHandler, WindowHost {
         static Event _repaintEvent;
 
         [SerializeField] protected float devicePixelRatioOverride;
@@ -150,13 +150,6 @@ namespace Unity.UIWidgets.engine {
                     ? this.devicePixelRatioOverride
                     : this._displayMetrics.devicePixelRatio;
             }
-        }
-
-        protected override void OnDisable() {
-            D.assert(this._windowAdapter != null);
-            this._windowAdapter.OnDisable();
-            this._windowAdapter = null;
-            base.OnDisable();
         }
 
         protected virtual Widget createWidget() {
@@ -337,6 +330,10 @@ namespace Unity.UIWidgets.engine {
                 physicalX: position.x,
                 physicalY: position.y
             ));
+        }
+
+        public Window window {
+            get { return this._windowAdapter; }
         }
     }
 }

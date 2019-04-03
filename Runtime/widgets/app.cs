@@ -1,9 +1,13 @@
 ﻿using System.Collections.Generic;
 using RSG;
+using Unity.UIWidgets.editor;
+using Unity.UIWidgets.engine;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.ui;
+using UnityEngine;
+using Color = Unity.UIWidgets.ui.Color;
 using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace Unity.UIWidgets.widgets {
@@ -126,6 +130,17 @@ namespace Unity.UIWidgets.widgets {
 
             return provider.window;
         }
+        
+        public static Window of(GameObject gameObject) {
+            var panel = gameObject.GetComponent<UIWidgetsPanel>();
+            return panel == null ? null : panel.window;
+        }
+
+#if UNITY_EDITOR
+        public static Window of(UIWidgetsEditorWindow editorWindow) {
+            return editorWindow.window;
+        }
+#endif
 
         public override bool updateShouldNotify(InheritedWidget oldWidget) {
             D.assert(this.window == ((WindowProvider) oldWidget).window);
