@@ -1378,9 +1378,10 @@ namespace Unity.UIWidgets.material {
         protected override void removeChildRenderObject(RenderObject child) {
             D.assert(child is RenderBox);
             D.assert(this.renderObject.childToSlot.ContainsKey((RenderBox) child));
+            var slot = this.renderObject.childToSlot[(RenderBox) child];
             this._updateRenderObject(null, this.renderObject.childToSlot[(RenderBox) child]);
             D.assert(!this.renderObject.childToSlot.ContainsKey((RenderBox) child));
-            D.assert(!this.renderObject.slotToChild.ContainsKey((_DecorationSlot) this.slot));
+            D.assert(!this.renderObject.slotToChild.ContainsKey(slot));
         }
 
         protected override void moveChildRenderObject(RenderObject child, object slotValue) {
