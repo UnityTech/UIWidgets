@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using com.unity.uiwidgets.Runtime.rendering;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
@@ -164,7 +165,7 @@ namespace Unity.UIWidgets.widgets {
             return new SliverMultiBoxAdaptorElement(this);
         }
 
-        public float? estimateMaxScrollOffset(
+        public virtual float? estimateMaxScrollOffset(
             SliverConstraints constraints,
             int firstIndex,
             int lastIndex,
@@ -218,6 +219,84 @@ namespace Unity.UIWidgets.widgets {
         public override void updateRenderObject(BuildContext context, RenderObject renderObjectRaw) {
             var renderObject = (RenderSliverFixedExtentList) renderObjectRaw;
             renderObject.itemExtent = this.itemExtent;
+        }
+    }
+
+    public class SliverGrid : SliverMultiBoxAdaptorWidget {
+        public SliverGrid(
+            Key key = null,
+            SliverChildDelegate layoutDelegate = null,
+            SliverGridDelegate gridDelegate = null
+        ) : base(key: key, del: layoutDelegate) {
+            D.assert(layoutDelegate != null);
+            D.assert(gridDelegate != null);
+            this.gridDelegate = gridDelegate;
+        }
+
+        public static SliverGrid count(
+            Key key = null,
+            int? crossAxisCount = null,
+            float mainAxisSpacing = 0.0f,
+            float crossAxisSpacing = 0.0f,
+            float childAspectRatio = 1.0f,
+            List<Widget> children = null
+        ) {
+            return new SliverGrid(
+                key: key,
+                layoutDelegate: new SliverChildListDelegate(children ?? new List<Widget> { }),
+                gridDelegate: new SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: crossAxisCount ?? 0,
+                    mainAxisSpacing: mainAxisSpacing,
+                    crossAxisSpacing: crossAxisSpacing,
+                    childAspectRatio: childAspectRatio
+                )
+            );
+        }
+
+        public static SliverGrid extent(
+            Key key = null,
+            float? maxCrossAxisExtent = null,
+            float mainAxisSpacing = 0.0f,
+            float crossAxisSpacing = 0.0f,
+            float childAspectRatio = 1.0f,
+            List<Widget> children = null
+        ) {
+            return new SliverGrid(key: key,
+                layoutDelegate: new SliverChildListDelegate(new List<Widget> { }),
+                gridDelegate: new SliverGridDelegateWithMaxCrossAxisExtent(
+                    maxCrossAxisExtent: maxCrossAxisExtent ?? 0,
+                    mainAxisSpacing: mainAxisSpacing,
+                    crossAxisSpacing: crossAxisSpacing,
+                    childAspectRatio: childAspectRatio
+                ));
+        }
+
+        public readonly SliverGridDelegate gridDelegate;
+
+        public override RenderObject createRenderObject(BuildContext context) {
+            SliverMultiBoxAdaptorElement element = context as SliverMultiBoxAdaptorElement;
+            return new RenderSliverGrid(childManager: element, gridDelegate: this.gridDelegate);
+        }
+
+        public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
+            (renderObject as RenderSliverGrid).gridDelegate = this.gridDelegate;
+        }
+
+        public override float? estimateMaxScrollOffset(
+            SliverConstraints constraints,
+            int firstIndex,
+            int lastIndex,
+            float leadingScrollOffset,
+            float trailingScrollOffset
+        ) {
+            return base.estimateMaxScrollOffset(
+                       constraints,
+                       firstIndex,
+                       lastIndex,
+                       leadingScrollOffset,
+                       trailingScrollOffset
+                   ) ?? this.gridDelegate.getLayout(constraints)
+                       .computeMaxScrollOffset(this.del.estimatedChildCount ?? 0);
         }
     }
 

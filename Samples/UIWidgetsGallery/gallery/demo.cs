@@ -97,9 +97,7 @@ namespace UIWidgetsGallery.gallery {
         void _showApiDocumentation(BuildContext context) {
             string url = this.demos[DefaultTabController.of(context).index].documentationUrl;
             if (url != null) {
-                // TODO: find Unity equivalent
-                // Open the URL in browser
-                // launch(url, forceWebView: true);
+                Application.OpenURL(url);
             }
         }
 

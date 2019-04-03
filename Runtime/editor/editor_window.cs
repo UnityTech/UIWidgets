@@ -137,6 +137,8 @@ namespace Unity.UIWidgets.editor {
         float _lastWindowWidth;
         float _lastWindowHeight;
 
+        bool _viewMetricsChanged;
+
         readonly MicrotaskQueue _microtaskQueue = new MicrotaskQueue();
         readonly TimerProvider _timerProvider = new TimerProvider();
         readonly Rasterizer _rasterizer = new Rasterizer();
@@ -160,6 +162,10 @@ namespace Unity.UIWidgets.editor {
         }
 
         protected virtual void updateSafeArea() {
+        }
+
+        public void onViewMetricsChanged() {
+            this._viewMetricsChanged = true;
         }
 
         protected abstract bool hasFocus();
@@ -259,6 +265,10 @@ namespace Unity.UIWidgets.editor {
                 return true;
             }
 
+            if (this._viewMetricsChanged) {
+                return true;
+            }
+
             return false;
         }
 
@@ -275,6 +285,7 @@ namespace Unity.UIWidgets.editor {
                         this._lastWindowHeight * this._devicePixelRatio);
 
                     this.updateSafeArea();
+                    this._viewMetricsChanged = false;
                     if (this.onMetricsChanged != null) {
                         this.onMetricsChanged();
                     }

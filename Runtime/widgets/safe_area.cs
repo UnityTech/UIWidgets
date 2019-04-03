@@ -63,7 +63,7 @@ namespace Unity.UIWidgets.widgets {
     }
 
 
-    class SliverSafeArea : StatelessWidget {
+    public class SliverSafeArea : StatelessWidget {
         public SliverSafeArea(
             Key key = null,
             bool left = true,
