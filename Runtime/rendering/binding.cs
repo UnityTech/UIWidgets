@@ -2,7 +2,6 @@
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.painting;
-using Unity.UIWidgets.service;
 using Unity.UIWidgets.ui;
 
 namespace Unity.UIWidgets.rendering {
@@ -62,12 +61,10 @@ namespace Unity.UIWidgets.rendering {
         }
 
         protected virtual void drawFrame() {
-            PerformanceUtils.instance.startProfile();
             this.pipelineOwner.flushLayout();
             this.pipelineOwner.flushCompositingBits();
             this.pipelineOwner.flushPaint();
             this.renderView.compositeFrame();
-            PerformanceUtils.instance.endProfile();
         }
 
         public override void hitTest(HitTestResult result, Offset position) {

@@ -7,7 +7,7 @@
 UIWidgets is a plugin package for Unity Editor which helps developers to create, debug and deploy efficient, 
 cross-platform Apps using the Unity Engine. 
 
-UIWidgets is mainly derived from Flutter @https://github.com/flutter/flutter. However, taking advantage of
+UIWidgets is mainly derived from [Flutter](https://github.com/flutter/flutter). However, taking advantage of
 the powerful Unity Engine, it offers developers many new features to improve their Apps 
 as well as the develop workflow significantly.
 
@@ -187,6 +187,23 @@ UIWidgets supports Gif as well!
 2. You can add loading1@2.gif.bytes and loading1@3.gif.bytes in the same folder to support HD screens.
 3. Use Image.asset("loading1.gif") to load the gif images.
 
+#### Using Window Scope
+If you see the error ```AssertionError: Window.instance is null``` or null pointer error of ```Window.instance```,
+it means the code is not running in the window scope. In this case, you can enclose your code
+with window scope as below:
+```
+using(WindowProvider.of(your gameObject with UIWidgetsPanel).getScope()) {
+    // code dealing with UIWidgets, 
+    // e.g. setState(() => {....})
+}
+```
+
+This is needed if the code is in methods
+not invoked by UIWidgets. For example, if the code is in ```completed``` callback of ```UnityWebRequest```, 
+you need to enclose them with window scope. 
+Please see [HttpRequestSample](./Samples/UIWidgetSample/HttpRequestSample.cs) for detail.
+For callback/event handler methods from UIWidgets (e.g ```Widget.build, State.initState...```), you don't need do
+it yourself, since the framework ensure it's in window scope. 
 ## Debug UIWidgets Application
 
 #### Define UIWidgets_DEBUG
@@ -218,7 +235,7 @@ and open one of the dropdown samples.
 The develop team is still working on the UIWidgets Wiki. However, since UIWidgets is mainly derived from Flutter,
  you can refer to Flutter Wiki to access detailed descriptions of UIWidgets APIs 
  from those of their Flutter counterparts.
- 
+Meanwhile, you can join the discussion channel at (https://connect.unity.com/g/uiwidgets)
 
 #### FAQ
 

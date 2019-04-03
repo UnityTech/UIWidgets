@@ -99,7 +99,7 @@ namespace Unity.UIWidgets.material {
 
         TickerProvider _vsync;
 
-        public bool? value {
+        public virtual bool? value {
             get { return this._value; }
             set {
                 D.assert(this.tristate || value != null);

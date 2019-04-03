@@ -68,7 +68,7 @@ namespace Unity.UIWidgets.editor {
 
             var canvas = frame.getCanvas();
 
-            using (var compositorFrame = this._compositorContext.acquireFrame(canvas)) {
+            using (var compositorFrame = this._compositorContext.acquireFrame(canvas, true)) {
                 if (compositorFrame != null && compositorFrame.raster(layerTree, false)) {
                     frame.submit();
                     this._fireNextFrameCallbackIfPresent();

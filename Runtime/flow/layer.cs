@@ -5,11 +5,13 @@ namespace Unity.UIWidgets.flow {
         public RasterCache rasterCache;
         public float devicePixelRatio;
         public Rect cullRect;
+        public Stopwatch frameTime;
     }
 
     public class PaintContext {
         public Canvas canvas;
         public RasterCache rasterCache;
+        public Stopwatch frameTime;
     }
 
     public abstract class Layer {

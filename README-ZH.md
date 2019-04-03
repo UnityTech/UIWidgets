@@ -76,7 +76,7 @@ UI Canvas。
 #### 三、创建小部件
 
 UIWidgets应用是用**C＃脚本**来编写的。 请按照以下步骤创建应用程序并在Unity编辑器中播放。
-1. 创建一个新C＃脚本，命名为“ExampleCanvas.cs”，并将以下代码粘贴到其中。
+1. 创建一个新C＃脚本，命名为“UIWidgetsExample.cs”，并将以下代码粘贴到其中。
 
 ```none
     using System.Collections.Generic;
@@ -204,7 +204,7 @@ UIWidgets Inspector工具用于可视化和浏览窗口小部件树。 你可以
 
 #### Wiki
 
-目前开发团队仍在改进UIWidgets Wiki。 由于UIWidgets主要来源于Flutter，你也可以参考Flutter Wiki中与UIWidgets API对应部分的详细描述。
+目前开发团队仍在改进UIWidgets Wiki。 由于UIWidgets主要来源于Flutter，你也可以参考Flutter Wiki中与UIWidgets API对应部分的详细描述。同时，你可以加入我们的讨论组(https://connect.unity.com/g/uiwidgets)。
  
 #### 常问问题解答
 
