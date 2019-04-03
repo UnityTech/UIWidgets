@@ -224,8 +224,8 @@ namespace Unity.UIWidgets.flow {
                 autoGenerateMips = false,
             };
 
-            if (QualitySettings.antiAliasing != 0) {
-                desc.msaaSamples = QualitySettings.antiAliasing;
+            if (Window.instance.antiAliasing != 0) {
+                desc.msaaSamples = Window.instance.antiAliasing;
             }
 
             var renderTexture = new RenderTexture(desc);

@@ -783,8 +783,8 @@ namespace Unity.UIWidgets.ui {
                             autoGenerateMips = false,
                         };
                 
-                        if (QualitySettings.antiAliasing != 0) {
-                            desc.msaaSamples = QualitySettings.antiAliasing;
+                        if (Window.instance.antiAliasing != 0) {
+                            desc.msaaSamples = Window.instance.antiAliasing;
                         }
                 
                         cmdBuf.GetTemporaryRT(subLayer.rtID, desc, subLayer.filterMode);

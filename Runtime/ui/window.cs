@@ -138,6 +138,12 @@ namespace Unity.UIWidgets.ui {
         }
 
         protected float _devicePixelRatio = 1.0f;
+        
+        public int antiAliasing {
+            get { return this._antiAliasing; }
+        }
+
+        protected int _antiAliasing = 4;
 
         public Size physicalSize {
             get { return this._physicalSize; }

@@ -141,8 +141,8 @@ namespace UIWidgets.Tests {
                     autoGenerateMips = false,
                 };
 
-                if (QualitySettings.antiAliasing != 0) {
-                    desc.msaaSamples = QualitySettings.antiAliasing;
+                if (Window.instance.antiAliasing != 0) {
+                    desc.msaaSamples = Window.instance.antiAliasing;
                 }
 
                 this._renderTexture = RenderTexture.GetTemporary(desc);
