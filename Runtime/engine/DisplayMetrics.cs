@@ -128,7 +128,6 @@ namespace Unity.UIWidgets.engine {
                     padding_bottom = 0
                 };
 #elif UNITY_IOS
-                IOSDeviceStartup();
                 viewMetrics metrics = IOSGetViewportPadding();
                 this._viewMetrics = metrics;
 #else
@@ -176,9 +175,6 @@ namespace Unity.UIWidgets.engine {
 
 		[DllImport("__Internal")]
 		static extern viewMetrics IOSGetViewportPadding();
-
-        [DllImport("__Internal")]
-        static extern void IOSDeviceStartup();
 #endif
 
     }

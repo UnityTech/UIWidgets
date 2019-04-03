@@ -89,11 +89,6 @@
 
 extern "C"
 {
-    void IOSDeviceStartup()
-    {
-        [[UIWidgetsViewController sharedInstance] tryLaunch];
-    }
-
     viewMetrics IOSGetViewportPadding()
     {
         viewMetrics metrics;
