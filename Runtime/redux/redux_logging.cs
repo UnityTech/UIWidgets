@@ -9,7 +9,7 @@ namespace Unity.UIWidgets.Redux {
                 var result = next.dispatch(action);
                 var afterState = store.getState();
                 var afterStateDump = JsonUtility.ToJson(afterState);
-                Debug.LogFormat("Action name={0} data={1}", action.GetType().Name, JsonUtility.ToJson(action));
+                Debug.LogFormat("Action name={0} data={1}", action.ToString(), JsonUtility.ToJson(action));
                 Debug.LogFormat("previousState=\n{0}", previousStateDump);
                 Debug.LogFormat("afterState=\n{0}", afterStateDump);
                 return result;

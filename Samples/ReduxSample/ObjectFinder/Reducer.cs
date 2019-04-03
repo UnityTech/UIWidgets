@@ -96,7 +96,9 @@ namespace Unity.UIWidgets.Sample.Redux.ObjectFinder {
 
     public static class SearchAction {
         public static ThunkAction<FinderAppState> create(string keyword) {
-            return new ThunkAction<FinderAppState>((dispatcher, getState) => {
+            return new ThunkAction<FinderAppState>(
+                displayName: "SearchAction",
+                action: (dispatcher, getState) => {
                 var objects = UnityEngine.Object.FindObjectsOfType(typeof(FinderGameObject)).Where(
                     obj => keyword == "" || obj.name.ToUpper().Contains(keyword.ToUpper())).Select(
                     obj => new GameObjectInfo {id = obj.GetInstanceID(), name = obj.name}).ToList();
