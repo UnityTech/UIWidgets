@@ -852,6 +852,11 @@ namespace Unity.UIWidgets.ui {
             foreach (var subLayer in layer.layers) {
                 cmdBuf.ReleaseTemporaryRT(subLayer.rtID);
             }
+            
+            if (layer.rtID == 0) {
+                // this is necessary for webgl2. not sure why... just to be safe to disable the scissor.
+                cmdBuf.DisableScissorRect();
+            }
         }
 
         void _clearLayer(RenderLayer layer) {
