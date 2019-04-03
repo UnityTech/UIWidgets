@@ -5,7 +5,7 @@ using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
 
 namespace Unity.UIWidgets.painting {
-    public class TextStyle : Diagnosticable, IEquatable<TextStyle>, ParagraphBuilder.ITextStyleProvider {
+    public class TextStyle : Diagnosticable, IEquatable<TextStyle> {
         public static readonly float _defaultFontSize = 14.0f;
         public readonly bool inherit;
         public readonly Color color;
@@ -48,40 +48,6 @@ namespace Unity.UIWidgets.painting {
             this.fontFamily = fontFamily;
             this.debugLabel = debugLabel;
             this.background = background;
-        }
-
-        public ui.TextStyle getTextStyle(ui.TextStyle currentStyle = null, float textScaleFactor = 1.0f) {
-            if (currentStyle != null) {
-                return new ui.TextStyle(
-                    color: this.color ?? currentStyle.color,
-                    fontSize: this.fontSize != null ? this.fontSize * textScaleFactor : currentStyle.fontSize,
-                    fontWeight: this.fontWeight ?? currentStyle.fontWeight,
-                    fontStyle: this.fontStyle ?? currentStyle.fontStyle,
-                    letterSpacing: this.letterSpacing ?? currentStyle.letterSpacing,
-                    wordSpacing: this.wordSpacing ?? currentStyle.wordSpacing,
-                    textBaseline: this.textBaseline ?? currentStyle.textBaseline,
-                    height: this.height ?? currentStyle.height,
-                    decoration: this.decoration ?? currentStyle.decoration,
-                    decorationColor: this.decorationColor ?? currentStyle.decorationColor,
-                    fontFamily: this.fontFamily ?? currentStyle.fontFamily,
-                    background: this.background ?? currentStyle.background
-                );
-            }
-
-            return new ui.TextStyle(
-                color: this.color,
-                fontSize: this.fontSize * textScaleFactor,
-                fontWeight: this.fontWeight,
-                fontStyle: this.fontStyle,
-                letterSpacing: this.letterSpacing,
-                wordSpacing: this.wordSpacing,
-                textBaseline: this.textBaseline,
-                height: this.height,
-                decoration: this.decoration,
-                decorationColor: this.decorationColor,
-                fontFamily: this.fontFamily,
-                background: this.background
-            );
         }
 
         public RenderComparison compareTo(TextStyle other) {
@@ -198,6 +164,7 @@ namespace Unity.UIWidgets.painting {
                 decoration: other.decoration,
                 decorationColor: other.decorationColor,
                 decorationStyle: other.decorationStyle,
+                background: other.background,
                 debugLabel: mergedDebugLabel
             );
         }

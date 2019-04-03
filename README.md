@@ -1,4 +1,5 @@
 # UIWidgets
+[中文](README-ZH.md)
 
 
 ## Introduction
@@ -6,7 +7,7 @@
 UIWidgets is a plugin package for Unity Editor which helps developers to create, debug and deploy efficient, 
 cross-platform Apps using the Unity Engine. 
 
-UIWidgets is mainly derived from Flutter @https://github.com/flutter/flutter. However, taking advantage of
+UIWidgets is mainly derived from [Flutter](https://github.com/flutter/flutter). However, taking advantage of
 the powerful Unity Engine, it offers developers many new features to improve their Apps 
 as well as the develop workflow significantly.
 
@@ -71,7 +72,7 @@ only a text label and a button. The text label will count the times of clicks up
 
 First of all, please open or create a Unity Project and open it with Unity Editor. 
 
-And then open Project Settings, go to Player section and add "UIWidgets_DEBUG" to the Scripting Debug Symbols field.
+And then open Project Settings, go to Player section and **add "UIWidgets_DEBUG" to the Scripting Define Symbols field.**
 This enables the debug mode of UIWidgets for your development. Remove this for your release build afterwards.
 
 #### ii. Scene Build
@@ -101,8 +102,7 @@ in Unity Editor.
     
     namespace UIWidgetsSample {
         public class UIWidgetsExample : UIWidgetsPanel {
-            protected override void Awake() {
-                 base.Awake();
+            protected override void OnEnable() {
                 // Application.targetFrameRate = 60; // or higher if you want a smoother scrolling experience.
     
                 // if you want to use your own font or font icons.   
@@ -115,6 +115,8 @@ in Unity Editor.
     
                 // add material icons, familyName must be "Material Icons"
                 // FontManager.instance.addFont(Resources.Load<Font>(path: "path to material icons"), "Material Icons");
+                
+                base.OnEnable();
             }
     
             protected override Widget createWidget() {
@@ -222,8 +224,10 @@ via *Window/Analysis/UIWidgets* inspector in Editor menu.
 ## Learn
 
 #### Samples
-You can find many UIWidgets App samples in the UIWidgets package in the **Samples** folder.
+You can find many UIWidgets App samples in the UIWidgets package in the **Samples** folder. 
 Feel free to try them out and make modifications to see the results.
+To get started, the UIWidgetsTheatre scene provides you
+a list of carefully selected samples to start with.
 
 You can also try UIWidgets-based Editor windows by clicking **UIWidgetsTest** on the main menu 
 and open one of the dropdown samples.
@@ -232,7 +236,7 @@ and open one of the dropdown samples.
 The develop team is still working on the UIWidgets Wiki. However, since UIWidgets is mainly derived from Flutter,
  you can refer to Flutter Wiki to access detailed descriptions of UIWidgets APIs 
  from those of their Flutter counterparts.
- 
+Meanwhile, you can join the discussion channel at (https://connect.unity.com/g/uiwidgets)
 
 #### FAQ
 

@@ -7,12 +7,13 @@ namespace Unity.UIWidgets.flow {
         public class ScopedFrame : IDisposable {
             readonly CompositorContext _context;
             readonly Canvas _canvas;
+            readonly bool _instrumentation_enabled;
 
-            public ScopedFrame(CompositorContext context, Canvas canvas) {
+            public ScopedFrame(CompositorContext context, Canvas canvas, bool instrumentation_enabled) {
                 this._context = context;
                 this._canvas = canvas;
-
-                this._context._beginFrame(this);
+                this._instrumentation_enabled = instrumentation_enabled;
+                this._context._beginFrame(this, this._instrumentation_enabled);
             }
 
             public CompositorContext context() {
@@ -30,18 +31,20 @@ namespace Unity.UIWidgets.flow {
             }
 
             public void Dispose() {
-                this._context._endFrame(this);
+                this._context._endFrame(this, this._instrumentation_enabled);
             }
         }
 
         readonly RasterCache _rasterCache;
+        readonly Stopwatch _frameTime;
 
         public CompositorContext() {
             this._rasterCache = new RasterCache();
+            this._frameTime = new Stopwatch();
         }
 
-        public ScopedFrame acquireFrame(Canvas canvas) {
-            return new ScopedFrame(this, canvas);
+        public ScopedFrame acquireFrame(Canvas canvas, bool instrumentation_enabled) {
+            return new ScopedFrame(this, canvas, instrumentation_enabled);
         }
 
         public void onGrContextCreated(Surface surface) {
@@ -57,11 +60,21 @@ namespace Unity.UIWidgets.flow {
             return this._rasterCache;
         }
 
-        void _beginFrame(ScopedFrame frame) {
+        public Stopwatch frameTime() {
+            return this._frameTime;
         }
 
-        void _endFrame(ScopedFrame frame) {
+        void _beginFrame(ScopedFrame frame, bool enable_instrumentation) {
+            if (enable_instrumentation) {
+                this._frameTime.start();
+            }
+        }
+
+        void _endFrame(ScopedFrame frame, bool enable_instrumentation) {
             this._rasterCache.sweepAfterFrame();
+            if (enable_instrumentation) {
+                this._frameTime.stop();
+            }
         }
     }
 }

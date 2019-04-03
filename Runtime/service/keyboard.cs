@@ -9,7 +9,6 @@ using UnityEngine;
 
 namespace Unity.UIWidgets.service {
 
-    
     interface KeyboardDelegate: IDisposable {
         void show();
         void hide();
@@ -34,7 +33,7 @@ namespace Unity.UIWidgets.service {
     class DefaultKeyboardDelegate : KeyboardDelegate, TextInputOnGUIListener {
 
         int _client;
-        string _lastCompositionString;
+        
         TextEditingValue _value;
 
         public void show() {
@@ -78,37 +77,40 @@ namespace Unity.UIWidgets.service {
             if (this._client == 0) {
                 return;
             }
-
+            
+            
             var currentEvent = Event.current;
-           
+            var oldValue = this._value;
             
             if (currentEvent != null && currentEvent.type == EventType.KeyDown) {
-                if (currentEvent.keyCode == KeyCode.Return) {
-                    Window.instance.run(() => { TextInput._performAction(this._client, TextInputAction.newline); });
-                }
-
-                if (currentEvent.character != '\0') {
+                if (currentEvent.keyCode == KeyCode.Backspace) {
+                    if (this._value.selection.isValid) {
+                        this._value = this._value.deleteSelection(true);
+                    }
+                } else if (currentEvent.character != '\0') {
+                    this._value = this._value.clearCompose();
                     char ch = currentEvent.character;
                     if (ch == '\r' || ch == 3) {
                         ch = '\n';
                     }
-                    this._value = this._value.clearCompose();
+
+                    if (ch == '\n') {
+                        Window.instance.run(() => { TextInput._performAction(this._client, TextInputAction.newline); });
+                    }
+                    
                     if (_validateCharacter(ch)) {
                         this._value = this._value.insert(new string(ch, 1));
-                    } 
-                    Window.instance.run(() => { TextInput._updateEditingState(this._client, this._value); });
+                    }
+                } else if (!string.IsNullOrEmpty(Input.compositionString)) {
+                    this._value = this._value.compose(Input.compositionString);
                 }
-
+                
                 currentEvent.Use();
             }
 
-            if (!string.IsNullOrEmpty(Input.compositionString) &&
-                this._lastCompositionString != Input.compositionString) {
-                this._value = this._value.compose(Input.compositionString);
+           if (this._value != oldValue) {
                 Window.instance.run(() => { TextInput._updateEditingState(this._client, this._value); });
-            }
-
-            this._lastCompositionString = Input.compositionString;
+           }
         }
 
         public void Dispose() {
@@ -255,12 +257,15 @@ namespace Unity.UIWidgets.service {
     }
 
     abstract class AbstractUIWidgetsKeyboardDelegate : KeyboardDelegate {
+        
         protected AbstractUIWidgetsKeyboardDelegate() {
-            UIWidgetsMessageManager.instance.AddChannelMessageDelegate("TextInput", this._handleMethodCall);
+            UIWidgetsMessageManager.instance.
+                AddChannelMessageDelegate("TextInput", this._handleMethodCall);
         }
         
         public void Dispose() {
-            UIWidgetsMessageManager.instance.RemoveChannelMessageDelegate("TextInput", this._handleMethodCall);
+            UIWidgetsMessageManager.instance.
+                RemoveChannelMessageDelegate("TextInput", this._handleMethodCall);
         }
 
         public abstract void show();

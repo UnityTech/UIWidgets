@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using UIWidgets.Runtime.rendering;
+using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.ui;
 using UnityEngine;
+using Rect = Unity.UIWidgets.ui.Rect;
 
 namespace Unity.UIWidgets.rendering {
     public enum FlexFit {
@@ -598,6 +601,38 @@ namespace Unity.UIWidgets.rendering {
             }
 
             context.pushClipRect(this.needsCompositing, offset, Offset.zero & this.size, this.defaultPaint);
+
+            D.assert(() => {
+                string debugOverflowHints =
+                    $"The overflowing {this.GetType()} has an orientation of {this._direction}.\n" +
+                    $"The edge of the {this.GetType()} that is overflowing has been marked " +
+                    "in the rendering with a yellow and black striped pattern. This is " +
+                    $"usually caused by the contents being too big for the {this.GetType()}. " +
+                    "Consider applying a flex factor (e.g. using an Expanded widget) to " +
+                    $"force the children of the {this.GetType()} to fit within the available " +
+                    "space instead of being sized to their natural size.\n" +
+                    "This is considered an error condition because it indicates that there " +
+                    "is content that cannot be seen. If the content is legitimately bigger " +
+                    "than the available space, consider clipping it with a ClipRect widget " +
+                    "before putting it in the flex, or using a scrollable container rather " +
+                    "than a Flex, like a ListView.";
+
+                Rect overflowChildRect;
+                switch (this._direction) {
+                    case Axis.horizontal:
+                        overflowChildRect = Rect.fromLTWH(0.0f, 0.0f, this.size.width + this._overflow, 0.0f);
+                        break;
+                    case Axis.vertical:
+                        overflowChildRect = Rect.fromLTWH(0.0f, 0.0f, 0.0f, this.size.height + this._overflow);
+                        break;
+                    default:
+                        throw new Exception("Unknown direction: " + this._direction);
+                }
+
+                DebugOverflowIndicatorMixin.paintOverflowIndicator(this, context, offset, Offset.zero & this.size,
+                    overflowChildRect, overflowHints: debugOverflowHints);
+                return true;
+            });
         }
 
         protected override bool hitTestChildren(HitTestResult result, Offset position = null) {

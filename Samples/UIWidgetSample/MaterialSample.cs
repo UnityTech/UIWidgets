@@ -30,13 +30,13 @@ namespace UIWidgetsSample {
                 home: this.testCases[this.testCaseId]);
         }
 
-        protected override void Awake() {
-            base.Awake();
+        protected override void OnEnable() {
             FontManager.instance.addFont(Resources.Load<Font>(path: "MaterialIcons-Regular"), "Material Icons");
+            base.OnEnable();
         }
     }
 
-    class BottomAppBarWidget : StatelessWidget {
+    public class BottomAppBarWidget : StatelessWidget {
         public BottomAppBarWidget(Key key = null) : base(key) {
             
         }
@@ -56,7 +56,7 @@ namespace UIWidgetsSample {
     }
 
 
-    class TableWidget : StatelessWidget {
+    public class TableWidget : StatelessWidget {
         public TableWidget(Key key = null) : base(key) {
         }
 
@@ -82,7 +82,7 @@ namespace UIWidgetsSample {
     }
 
 
-    class MaterialTabBarWidget : StatefulWidget {
+    public class MaterialTabBarWidget : StatefulWidget {
         public MaterialTabBarWidget(Key key = null) : base(key) {
         }
 
@@ -91,7 +91,7 @@ namespace UIWidgetsSample {
         }
     }
 
-    class MaterialTabBarWidgetState : SingleTickerProviderStateMixin<MaterialTabBarWidget> {
+    public class MaterialTabBarWidgetState : SingleTickerProviderStateMixin<MaterialTabBarWidget> {
         TabController _tabController;
 
         public override void initState() {
@@ -155,7 +155,7 @@ namespace UIWidgetsSample {
         }
     }
 
-    class MaterialAppBarWidget : StatefulWidget {
+    public class MaterialAppBarWidget : StatefulWidget {
         public MaterialAppBarWidget(Key key = null) : base(key) {
         }
 
@@ -164,7 +164,7 @@ namespace UIWidgetsSample {
         }
     }
 
-    class MaterialAppBarWidgetState : State<MaterialAppBarWidget> {
+    public class MaterialAppBarWidgetState : State<MaterialAppBarWidget> {
         Choice _selectedChoice = Choice.choices[0];
 
         GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>.key();
@@ -334,7 +334,7 @@ namespace UIWidgetsSample {
         }
     }
 
-    class MaterialInkWellWidget : StatefulWidget {
+    public class MaterialInkWellWidget : StatefulWidget {
         public MaterialInkWellWidget(Key key = null) : base(key) {
         }
 
@@ -343,7 +343,7 @@ namespace UIWidgetsSample {
         }
     }
 
-    class MaterialInkWidgetState : State<MaterialInkWellWidget> {
+    public class MaterialInkWidgetState : State<MaterialInkWellWidget> {
         public override Widget build(BuildContext context) {
             return new Material(
                 //color: Colors.blue,
@@ -363,7 +363,7 @@ namespace UIWidgetsSample {
         }
     }
 
-    class MaterialButtonWidget : StatefulWidget {
+   public class MaterialButtonWidget : StatefulWidget {
         public MaterialButtonWidget(Key key = null) : base(key) {
         }
 
@@ -372,7 +372,7 @@ namespace UIWidgetsSample {
         }
     }
 
-    class MaterialButtonWidgetState : State<MaterialButtonWidget> {
+    public class MaterialButtonWidgetState : State<MaterialButtonWidget> {
         public override Widget build(BuildContext context) {
             return new Stack(
                 children: new List<Widget> {

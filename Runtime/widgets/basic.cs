@@ -376,6 +376,41 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
+    public class UnconstrainedBox : SingleChildRenderObjectWidget {
+        public UnconstrainedBox(
+            Key key = null,
+            Widget child = null,
+            Alignment alignment = null,
+            Axis? constrainedAxis = null
+        ) : base(key: key, child: child) {
+            this.alignment = alignment ?? Alignment.center;
+            this.constrainedAxis = constrainedAxis;
+        }
+
+        public readonly Alignment alignment;
+
+        public readonly Axis? constrainedAxis;
+
+        public override void updateRenderObject(BuildContext context, RenderObject _renderObject) {
+            RenderUnconstrainedBox renderObject = _renderObject as RenderUnconstrainedBox;
+            renderObject.alignment = this.alignment;
+            renderObject.constrainedAxis = this.constrainedAxis;
+        }
+
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderUnconstrainedBox(
+                alignment: this.alignment,
+                constrainedAxis: this.constrainedAxis
+            );
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new DiagnosticsProperty<Alignment>("alignment", this.alignment));
+            properties.add(new DiagnosticsProperty<Axis>("constrainedAxis", null));
+        }
+    }
+
     public class SliverToBoxAdapter : SingleChildRenderObjectWidget {
         public SliverToBoxAdapter(
             Key key = null,
@@ -456,15 +491,17 @@ namespace Unity.UIWidgets.widgets {
             ((RenderFlex) renderObject).verticalDirection = this.verticalDirection;
             ((RenderFlex) renderObject).textBaseline = this.textBaseline ?? TextBaseline.alphabetic;
         }
-        
+
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             properties.add(new EnumProperty<Axis>("direction", this.direction));
             properties.add(new EnumProperty<MainAxisAlignment>("mainAxisAlignment", this.mainAxisAlignment));
-            properties.add(new EnumProperty<MainAxisSize>("mainAxisSize", this.mainAxisSize, defaultValue: MainAxisSize.max));
+            properties.add(new EnumProperty<MainAxisSize>("mainAxisSize", this.mainAxisSize,
+                defaultValue: MainAxisSize.max));
             properties.add(new EnumProperty<CrossAxisAlignment>("crossAxisAlignment", this.crossAxisAlignment));
             properties.add(new EnumProperty<TextDirection?>("textDirection", this.textDirection, defaultValue: null));
-            properties.add(new EnumProperty<VerticalDirection>("verticalDirection", this.verticalDirection, defaultValue: VerticalDirection.down));
+            properties.add(new EnumProperty<VerticalDirection>("verticalDirection", this.verticalDirection,
+                defaultValue: VerticalDirection.down));
             properties.add(new EnumProperty<TextBaseline?>("textBaseline", this.textBaseline, defaultValue: null));
         }
     }

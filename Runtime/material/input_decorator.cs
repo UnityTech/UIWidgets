@@ -24,7 +24,7 @@ namespace Unity.UIWidgets.material {
     }
 
 
-    class _InputBorderGap : ChangeNotifier {
+    class _InputBorderGap : ChangeNotifier, IEquatable<_InputBorderGap> {
         float _start;
 
         public float start {
@@ -49,35 +49,46 @@ namespace Unity.UIWidgets.material {
             }
         }
 
-        public static bool operator ==(_InputBorderGap left, _InputBorderGap right) {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(_InputBorderGap left, _InputBorderGap other) {
-            return left.start != other.start || left.extent != other.extent;
-        }
-
         public bool Equals(_InputBorderGap other) {
-            return this.start == other.start && this.extent == other.extent;
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
+
+            return this.start == other.start && this.extent == other._extent;
         }
-        
+
         public override bool Equals(object obj) {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((_InputBorderGap) obj);
         }
 
         public override int GetHashCode() {
             unchecked {
-                return (this.start.GetHashCode() * 397) ^ this.extent.GetHashCode();
+                return (this._start.GetHashCode() * 397) ^ this._extent.GetHashCode();
             }
+        }
+
+        public static bool operator ==(_InputBorderGap left, _InputBorderGap right) {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(_InputBorderGap left, _InputBorderGap right) {
+            return !Equals(left, right);
         }
     }
 
@@ -465,7 +476,7 @@ namespace Unity.UIWidgets.material {
         container
     }
 
-    class _Decoration {
+    class _Decoration : IEquatable<_Decoration> {
         public _Decoration(
             EdgeInsets contentPadding,
             bool isCollapsed,
@@ -523,66 +534,72 @@ namespace Unity.UIWidgets.material {
         public readonly Widget counter;
         public readonly Widget container;
 
-        public static bool operator ==(_Decoration left, _Decoration right) {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(_Decoration left, _Decoration right) {
-            return !left.Equals(right);
-        }
-
         public bool Equals(_Decoration other) {
-            return this.contentPadding == other.contentPadding
-                   && this.floatingLabelHeight == other.floatingLabelHeight
-                   && this.floatingLabelProgress == other.floatingLabelProgress
-                   && this.border == other.border
-                   && this.borderGap == other.borderGap
-                   && this.icon == other.icon
-                   && this.input == other.input
-                   && this.label == other.label
-                   && this.hint == other.hint
-                   && this.prefix == other.prefix
-                   && this.suffix == other.suffix
-                   && this.prefixIcon == other.prefixIcon
-                   && this.suffixIcon == other.suffixIcon
-                   && this.helperError == other.helperError
-                   && this.counter == other.counter
-                   && this.container == other.container;
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
+
+            return Equals(this.contentPadding, other.contentPadding) && this.isCollapsed == other.isCollapsed &&
+                   this.floatingLabelHeight.Equals(other.floatingLabelHeight) &&
+                   this.floatingLabelProgress.Equals(other.floatingLabelProgress) &&
+                   Equals(this.border, other.border) && Equals(this.borderGap, other.borderGap) &&
+                   Equals(this.icon, other.icon) && Equals(this.input, other.input) &&
+                   Equals(this.label, other.label) && Equals(this.hint, other.hint) &&
+                   Equals(this.prefix, other.prefix) && Equals(this.suffix, other.suffix) &&
+                   Equals(this.prefixIcon, other.prefixIcon) && Equals(this.suffixIcon, other.suffixIcon) &&
+                   Equals(this.helperError, other.helperError) && Equals(this.counter, other.counter) &&
+                   Equals(this.container, other.container);
         }
-        
+
         public override bool Equals(object obj) {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((_Decoration) obj);
         }
 
         public override int GetHashCode() {
             unchecked {
-                var hashCode = this.contentPadding.GetHashCode();
+                var hashCode = (this.contentPadding != null ? this.contentPadding.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ this.isCollapsed.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.floatingLabelHeight.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.floatingLabelProgress.GetHashCode();
-                hashCode = (hashCode * 397) ^ this.border.GetHashCode();
-                hashCode = (hashCode * 397) ^ this.borderGap.GetHashCode();
-                hashCode = (hashCode * 397) ^ this.icon.GetHashCode();
-                hashCode = (hashCode * 397) ^ this.input.GetHashCode();
-                hashCode = (hashCode * 397) ^ this.label.GetHashCode();
-                hashCode = (hashCode * 397) ^ this.hint.GetHashCode();
-                hashCode = (hashCode * 397) ^ this.prefix.GetHashCode();
-                hashCode = (hashCode * 397) ^ this.suffix.GetHashCode();
-                hashCode = (hashCode * 397) ^ this.prefixIcon.GetHashCode();
-                hashCode = (hashCode * 397) ^ this.suffixIcon.GetHashCode();
-                hashCode = (hashCode * 397) ^ this.helperError.GetHashCode();
-                hashCode = (hashCode * 397) ^ this.counter.GetHashCode();
-                hashCode = (hashCode * 397) ^ this.container.GetHashCode();
+                hashCode = (hashCode * 397) ^ (this.border != null ? this.border.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (this.borderGap != null ? this.borderGap.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (this.icon != null ? this.icon.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (this.input != null ? this.input.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (this.label != null ? this.label.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (this.hint != null ? this.hint.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (this.prefix != null ? this.prefix.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (this.suffix != null ? this.suffix.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (this.prefixIcon != null ? this.prefixIcon.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (this.suffixIcon != null ? this.suffixIcon.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (this.helperError != null ? this.helperError.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (this.counter != null ? this.counter.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (this.container != null ? this.container.GetHashCode() : 0);
                 return hashCode;
             }
+        }
+
+        public static bool operator ==(_Decoration left, _Decoration right) {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(_Decoration left, _Decoration right) {
+            return !Equals(left, right);
         }
     }
 
@@ -1253,7 +1270,7 @@ namespace Unity.UIWidgets.material {
         }
 
         void _mountChild(Widget widget, _DecorationSlot slot) {
-            Element oldChild = this.slotToChild[slot];
+            Element oldChild = this.slotToChild.getOrDefault(slot);
             Element newChild = this.updateChild(oldChild, widget, slot);
             if (oldChild != null) {
                 this.slotToChild.Remove(slot);
@@ -1282,8 +1299,8 @@ namespace Unity.UIWidgets.material {
         }
 
         void _updateChild(Widget widget, _DecorationSlot slot) {
-            Element oldChild = this.slotToChild[slot];
-            Element newChild = this.updateChild(oldChild, this.widget, slot);
+            Element oldChild = this.slotToChild.getOrDefault(slot);
+            Element newChild = this.updateChild(oldChild, widget, slot);
             if (oldChild != null) {
                 this.childToSlot.Remove(oldChild);
                 this.slotToChild.Remove(slot);
@@ -1478,7 +1495,7 @@ namespace Unity.UIWidgets.material {
             return new _InputDecoratorState();
         }
 
-        static RenderBox containerOf(BuildContext context) {
+        internal static RenderBox containerOf(BuildContext context) {
             _RenderDecoration result =
                 (_RenderDecoration) context.ancestorRenderObjectOfType(new TypeMatcher<_RenderDecoration>());
             return result?.container;
@@ -2178,11 +2195,11 @@ namespace Unity.UIWidgets.material {
         }
 
         public static bool operator ==(InputDecoration left, InputDecoration right) {
-            return left.Equals(right);
+            return Equals(left, right);
         }
 
         public static bool operator !=(InputDecoration left, InputDecoration right) {
-            return !left.Equals(right);
+            return !Equals(left, right);
         }
 
         public bool Equals(InputDecoration other) {

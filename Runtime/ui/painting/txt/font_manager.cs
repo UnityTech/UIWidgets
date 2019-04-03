@@ -151,17 +151,68 @@ namespace Unity.UIWidgets.ui {
         
 
     }
+
+    class GlyphInfo {
+
+        public static GlyphInfo empty = new GlyphInfo(Rect.zero,0, 0, new Vector2(0, 0), 
+            new Vector2(0, 0), new Vector2(0, 0), new Vector2(0, 0));
+        
+        public readonly Rect rect;
+        public readonly float advance;
+        public readonly float glyphHeight;
+        public readonly Vector2 uvTopLeft;
+        public readonly Vector2 uvTopRight;
+        public readonly Vector2 uvBottomLeft;
+        public readonly Vector2 uvBottomRight;
+        
+        public GlyphInfo(CharacterInfo info) {
+            this.rect = Rect.fromLTRB(info.minX, -info.maxY, info.maxX, -info.minY);
+            this.advance = info.advance;
+            this.glyphHeight = info.glyphHeight;
+            this.uvTopLeft = info.uvTopLeft;
+            this.uvTopRight = info.uvTopRight;
+            this.uvBottomLeft = info.uvBottomLeft;
+            this.uvBottomRight = info.uvBottomRight;
+            
+        }
+
+        public GlyphInfo(Rect rect, float advance, float glyphHeight, 
+            Vector2 uvTopLeft, Vector2 uvTopRight, Vector2 uvBottomLeft, Vector2 uvBottomRight) {
+            this.rect = rect;
+            this.advance = advance;
+            this.glyphHeight = glyphHeight;
+            this.uvTopLeft = uvTopLeft;
+            this.uvTopRight = uvTopRight;
+            this.uvBottomLeft = uvBottomLeft;
+            this.uvBottomRight = uvBottomRight;
+        }
+            
+    }
     
     public static class FontExtension  
-    {  
-        public static CharacterInfo getCharacterInfo(this Font font, char ch, int fontSize, UnityEngine.FontStyle fontStyle)  
-        {  
+    {
+        internal static GlyphInfo getGlyphInfo(this Font font, char ch, int fontSize, UnityEngine.FontStyle fontStyle) {
+            if (fontSize <= 0) {
+                return GlyphInfo.empty;
+            }
+            
             CharacterInfo info;
             bool success = font.GetCharacterInfo(ch, out info, fontSize, fontStyle);
-            if (!success) {  
-                Debug.LogWarning($"character info not found from the given font: character '{ch}' (code{(int)ch}) font: ${font.name}");     
+            if (!success) {
+                if (!char.IsControl(ch)) {
+                    Debug.LogWarning($"character info not found from the given font: character '{ch}' (code{(int)ch}) font: ${font.name}");     
+                }
+                return GlyphInfo.empty;
             }
-            return info;
+            return new GlyphInfo(info);
+        }
+        
+        internal static void RequestCharactersInTextureSafe(this Font font, string text, int fontSize, 
+                UnityEngine.FontStyle fontStyle = UnityEngine.FontStyle.Normal) {
+            if (fontSize <= 0) {
+                return;
+            }
+            font.RequestCharactersInTexture(text, fontSize, fontStyle);
         }
     }
 }
