@@ -852,9 +852,7 @@ namespace Unity.UIWidgets.widgets {
                             key: this._overlayKey,
                             initialEntries: this._initialOverlayEntries
                         )
-                    ) {
-                        alwaysUpdate = true,
-                    }
+                    )
                 )
             );
         }

@@ -205,7 +205,7 @@ namespace Unity.UIWidgets.foundation {
         static readonly Dictionary<_DependencyList, WeakReference> _canonicalObjects =
             new Dictionary<_DependencyList, WeakReference>();
 
-        public bool alwaysUpdate { get; set; } = true; // if canonicalEquals should not be used.
+        public bool pure { get; set; } // pure = false, if canonicalEquals should not be used.
 
         public override bool Equals(object obj) {
             if (ReferenceEquals(null, obj)) {
@@ -220,7 +220,7 @@ namespace Unity.UIWidgets.foundation {
                 return false;
             }
 
-            if (this.alwaysUpdate) {
+            if (!this.pure) {
                 return ReferenceEquals(this, obj);
             } else {
                 return ReferenceEquals(this._getCanonical(), ((CanonicalMixinDiagnosticableTree) obj)._getCanonical());
