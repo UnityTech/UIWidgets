@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Reflection;
 using Unity.UIWidgets.engine;
+using Unity.UIWidgets.ui;
 using UnityEngine;
 
 
@@ -34,6 +35,31 @@ namespace Unity.UIWidgets.Editor {
         public float devicePixelRatio {
             get { return this._lastDevicePixelRatio; }
         }
+
+        public viewMetrics viewMetrics {
+            get {
+                return new viewMetrics {
+                    insets_bottom = 0,
+                    insets_left = 0,
+                    insets_right = 0,
+                    insets_top = 0,
+                    padding_left = 0,
+                    padding_top = 0,
+                    padding_right = 0,
+                    padding_bottom = 0
+                };
+            }
+        }
+
+        public WindowPadding viewPadding {
+            get { return WindowPadding.zero; }
+        }
+        
+        public WindowPadding viewInsets {
+            get { return WindowPadding.zero; }
+        }
+        
+        
     }
 
     static class GameViewUtil {

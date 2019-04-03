@@ -3,11 +3,14 @@ using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
 
-namespace Unity.UIWidgets.Sample.Redux {
+namespace Unity.UIWidgets.Redux {
     public class StoreProvider<State> : InheritedWidget {
         readonly Store<State> _store;
 
-        public StoreProvider(Store<State> store, Widget child, Key key = null) : base(key: key, child: child) {
+        public StoreProvider(
+            Store<State> store = null,
+            Widget child = null,
+            Key key = null) : base(key: key, child: child) {
             D.assert(store != null);
             D.assert(child != null);
             this._store = store;
@@ -32,11 +35,11 @@ namespace Unity.UIWidgets.Sample.Redux {
         }
     }
 
-    public delegate Widget ViewModelBuilder<ViewModel>(BuildContext context, ViewModel vm);
+    public delegate Widget ViewModelBuilder<ViewModel>(BuildContext context, ViewModel viewModel, Dispatcher dispatcher);
 
-    public delegate ViewModel StoreConverter<State, ViewModel>(State state, Dispatcher dispatcher);
+    public delegate ViewModel StoreConverter<State, ViewModel>(State state);
 
-    public delegate bool ShouldRebuildCallback<ViewModel>(ViewModel pre, ViewModel current);
+    public delegate bool ShouldRebuildCallback<ViewModel>(ViewModel previous, ViewModel current);
 
     public class StoreConnector<State, ViewModel> : StatelessWidget {
         public readonly ViewModelBuilder<ViewModel> builder;
@@ -45,15 +48,17 @@ namespace Unity.UIWidgets.Sample.Redux {
 
         public readonly ShouldRebuildCallback<ViewModel> shouldRebuild;
 
-        public readonly bool distinct;
+        public readonly bool pure;
 
-
-        public StoreConnector(ViewModelBuilder<ViewModel> builder, StoreConverter<State, ViewModel> converter,
-            bool distinct = false, ShouldRebuildCallback<ViewModel> shouldRebuild = null,
+        public StoreConnector(
+            ViewModelBuilder<ViewModel> builder = null,
+            StoreConverter<State, ViewModel> converter = null,
+            bool pure = false, 
+            ShouldRebuildCallback<ViewModel> shouldRebuild = null,
             Key key = null) : base(key) {
             D.assert(builder != null);
             D.assert(converter != null);
-            this.distinct = distinct;
+            this.pure = pure;
             this.builder = builder;
             this.converter = converter;
             this.shouldRebuild = shouldRebuild;
@@ -64,7 +69,7 @@ namespace Unity.UIWidgets.Sample.Redux {
                 store: StoreProvider<State>.of(context),
                 builder: this.builder,
                 converter: this.converter,
-                distinct: this.distinct,
+                pure: this.pure,
                 shouldRebuild: this.shouldRebuild
             );
         }
@@ -79,12 +84,13 @@ namespace Unity.UIWidgets.Sample.Redux {
 
         public readonly ShouldRebuildCallback<ViewModel> shouldRebuild;
 
-        public readonly bool distinct;
+        public readonly bool pure;
 
-        public _StoreListener(ViewModelBuilder<ViewModel> builder = null,
+        public _StoreListener(
+            ViewModelBuilder<ViewModel> builder = null,
             StoreConverter<State, ViewModel> converter = null,
             Store<State> store = null,
-            bool distinct = false,
+            bool pure = false,
             ShouldRebuildCallback<ViewModel> shouldRebuild = null,
             Key key = null) : base(key) {
             D.assert(builder != null);
@@ -93,7 +99,7 @@ namespace Unity.UIWidgets.Sample.Redux {
             this.store = store;
             this.builder = builder;
             this.converter = converter;
-            this.distinct = distinct;
+            this.pure = pure;
             this.shouldRebuild = shouldRebuild;
         }
 
@@ -127,7 +133,7 @@ namespace Unity.UIWidgets.Sample.Redux {
 
         void _init() {
             this.widget.store.stateChanged += this._handleStateChanged;
-            this.latestValue = this.widget.converter(this.widget.store.state, this.widget.store.Dispatch);
+            this.latestValue = this.widget.converter(this.widget.store.getState());
         }
 
         void _handleStateChanged(State state) {
@@ -143,23 +149,23 @@ namespace Unity.UIWidgets.Sample.Redux {
 
         void _innerStateChanged(State state) {
             var preValue = this.latestValue;
-            this.latestValue = this.widget.converter(this.widget.store.state, this.widget.store.Dispatch);
+            this.latestValue = this.widget.converter(this.widget.store.getState());
             if (this.widget.shouldRebuild != null) {
                 if (!this.widget.shouldRebuild(preValue, this.latestValue)) {
                     return;
                 }
             }
-            else if (this.widget.distinct) {
+            else if (this.widget.pure) {
                 if (Equals(preValue, this.latestValue)) {
                     return;
                 }
             }
 
-            this.setState(() => { });
+            this.setState();
         }
 
         public override Widget build(BuildContext context) {
-            return this.widget.builder(context, this.latestValue);
+            return this.widget.builder(context, this.latestValue, this.widget.store.dispatcher);
         }
     }
 }

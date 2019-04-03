@@ -1,3 +1,5 @@
+using Unity.UIWidgets.Redux;
+
 namespace Unity.UIWidgets.Sample.Redux.ObjectFinder {
     public static class StoreProvider {
         static Store<FinderAppState> _store;
@@ -9,8 +11,8 @@ namespace Unity.UIWidgets.Sample.Redux.ObjectFinder {
                 }
 
                 var middlewares = new Middleware<FinderAppState>[] {
-                    ReduxLogging.Create<FinderAppState>(),
-                    GameFinderMiddleware.Create(),
+                    ReduxLogging.create<FinderAppState>(),
+                    ReduxThunk.create<FinderAppState>(),
                 };
                 _store = new Store<FinderAppState>(ObjectFinderReducer.Reduce,
                     new FinderAppState(),

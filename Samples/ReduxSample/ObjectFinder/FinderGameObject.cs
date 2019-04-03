@@ -9,7 +9,7 @@ namespace Unity.UIWidgets.Sample.Redux.ObjectFinder {
 
         // Update is called once per frame
         void Update() {
-            var selectedId = StoreProvider.store.state.selected;
+            var selectedId = StoreProvider.store.getState().selected;
             if (selectedId == this.GetInstanceID()) {
                 this.GetComponent<MeshRenderer>().material.color = new Color(1.0f, 0, 0, 1.0f);
             }
@@ -19,7 +19,7 @@ namespace Unity.UIWidgets.Sample.Redux.ObjectFinder {
         }
 
         void OnMouseDown() {
-            StoreProvider.store.Dispatch(new SelectObjectAction() {id = this.GetInstanceID()});
+            StoreProvider.store.dispatcher.dispatch(new SelectObjectAction() {id = this.GetInstanceID()});
         }
     }
 }
