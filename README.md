@@ -197,14 +197,13 @@ using(WindowProvider.of(your gameObject with UIWidgetsPanel).getScope()) {
     // e.g. setState(() => {....})
 }
 ```
-All the code dealing with UIWidgets (```setState()``` in most case) needs to be in window scope.
 
 This is needed if the code is in methods
 not invoked by UIWidgets. For example, if the code is in ```completed``` callback of ```UnityWebRequest```, 
 you need to enclose them with window scope. 
 Please see [HttpRequestSample](./Samples/UIWidgetSample/HttpRequestSample.cs) for detail.
-For callback/event handler methods from UIWidgets (e.g ```Widget.build, State.initState...```), you don't need put them
-in the window scope. 
+For callback/event handler methods from UIWidgets (e.g ```Widget.build, State.initState...```), you don't need do
+it yourself, since the framework ensure it's in window scope. 
 ## Debug UIWidgets Application
 
 #### Define UIWidgets_DEBUG
