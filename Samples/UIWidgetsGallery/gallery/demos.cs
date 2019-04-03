@@ -130,15 +130,15 @@ namespace UIWidgetsGallery.gallery {
     public static partial class DemoUtils {
         static List<GalleryDemo> _buildGalleryDemos() {
             List<GalleryDemo> galleryDemos = new List<GalleryDemo> {
-//                // Demos
-//                new GalleryDemo(
-//                    title: "Shrine",
-//                    subtitle: "Basic shopping app",
-//                    icon: GalleryIcons.shrine,
-//                    category: GalleryDemoCategory._kDemos,
-//                    routeName: ShrineDemo.routeName,
-//                    buildRoute: (BuildContext context) => new ShrineDemo()
-//                ),
+                // Demos
+                new GalleryDemo(
+                    title: "Shrine",
+                    subtitle: "Basic shopping app",
+                    icon: GalleryIcons.shrine,
+                    category: DemoUtils._kDemos,
+                    routeName: ShrineDemo.routeName,
+                    buildRoute: (BuildContext context) => new ShrineDemo()
+                ),
                 new GalleryDemo(
                     title: "Contact profile",
                     subtitle: "Address book entry with a flexible appbar",
