@@ -13,7 +13,7 @@ using UnityEngine;
 
 namespace Unity.UIWidgets.editor {
 #if UNITY_EDITOR
-    public abstract class UIWidgetsEditorWindow : EditorWindow {
+    public abstract class UIWidgetsEditorWindow : EditorWindow, WindowHost {
         WindowAdapter _windowAdapter;
 
         public UIWidgetsEditorWindow() {
@@ -66,6 +66,10 @@ namespace Unity.UIWidgets.editor {
         }
 
         protected abstract Widget createWidget();
+
+        public Window window {
+            get { return this._windowAdapter; }
+        }
     }
 
     public class EditorWindowAdapter : WindowAdapter {
@@ -99,6 +103,10 @@ namespace Unity.UIWidgets.editor {
 
 #endif
 
+    public interface WindowHost {
+        Window window { get; }
+    }
+    
     public abstract class WindowAdapter : Window {
         static readonly List<WindowAdapter> _windowAdapters = new List<WindowAdapter>();
 
