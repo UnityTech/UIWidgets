@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using Unity.UIWidgets.engine;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.painting;
+using Unity.UIWidgets.Redux;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
 using TextStyle = Unity.UIWidgets.painting.TextStyle;
@@ -34,7 +34,7 @@ namespace Unity.UIWidgets.Sample.Redux {
     public class CounterApp : StatelessWidget {
         public override Widget build(BuildContext context) {
             var store = new Store<CouterState>(reduce, new CouterState(),
-                ReduxLogging.Create<CouterState>());
+                ReduxLogging.create<CouterState>());
             return new StoreProvider<CouterState>(store, this.createWidget());
         }
 
@@ -58,19 +58,21 @@ namespace Unity.UIWidgets.Sample.Redux {
                 child: new Column(
                     children: new List<Widget>() {
                         new StoreConnector<CouterState, string>(
-                            converter: (state, dispatch) => $"Count:{state.count}",
-                            builder: (context, countText) => new Text(countText, style: new TextStyle(
+                            converter: (state) => $"Count:{state.count}",
+                            builder: (context, countText, dispatcher) => new Text(countText, style: new TextStyle(
                                 fontSize: 20, fontWeight: FontWeight.w700
-                            ))
+                            )),
+                            pure: true
                         ),
-                        new StoreConnector<CouterState, Action>(
-                            converter: (state, dispatch) => () => { dispatch(new CounterIncAction() {amount = 1}); },
-                            builder: (context, onPress) => new CustomButton(
+                        new StoreConnector<CouterState, object>(
+                            converter: (state) => null,
+                            builder: (context, _, dispatcher) => new CustomButton(
                                 backgroundColor: Color.fromARGB(255, 0, 204, 204),
                                 padding: EdgeInsets.all(10),
                                 child: new Text("Add", style: new TextStyle(
                                     fontSize: 16, color: Color.fromARGB(255, 255, 255, 255)
-                                )), onPressed: () => { onPress(); })
+                                )), onPressed: () => { dispatcher.dispatch(new CounterIncAction() {amount = 1}); }),
+                            pure: true
                         ),
                     }
                 )
