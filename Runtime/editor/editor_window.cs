@@ -91,6 +91,10 @@ namespace Unity.UIWidgets.editor {
         protected override float queryDevicePixelRatio() {
             return EditorGUIUtility.pixelsPerPoint;
         }
+        
+        protected override int queryAntiAliasing() {
+            return Window.defaultAntiAliasing;
+        }
 
         protected override Vector2 queryWindowSize() {
             return this.editorWindow.position.size;
@@ -172,6 +176,7 @@ namespace Unity.UIWidgets.editor {
 
         public void OnEnable() {
             this._devicePixelRatio = this.queryDevicePixelRatio();
+            this._antiAliasing = this.queryAntiAliasing();
             var size = this.queryWindowSize();
             this._lastWindowWidth = size.x;
             this._lastWindowHeight = size.y;
@@ -300,10 +305,11 @@ namespace Unity.UIWidgets.editor {
         }
 
         protected abstract float queryDevicePixelRatio();
+        protected abstract int queryAntiAliasing();
         protected abstract Vector2 queryWindowSize();
 
         protected virtual Surface createSurface() {
-            return new EditorWindowSurface();
+            return new EditorWindowSurface(antiAliasing: this.antiAliasing);
         }
 
         void _beginFrame() {

@@ -10,12 +10,13 @@ namespace Unity.UIWidgets.ui {
         readonly float _fringeWidth;
         readonly float _devicePixelRatio;
         readonly MeshPool _meshPool;
+        readonly int _antiAliasing;
         
         readonly List<RenderLayer> _layers = new List<RenderLayer>();
         RenderLayer _currentLayer;
         Rect _lastScissor;
         
-        public PictureFlusher(RenderTexture renderTexture, float devicePixelRatio, MeshPool meshPool) {
+        public PictureFlusher(RenderTexture renderTexture, float devicePixelRatio, MeshPool meshPool, int antiAliasing) {
             D.assert(renderTexture);
             D.assert(devicePixelRatio > 0);
             D.assert(meshPool != null);
@@ -24,6 +25,7 @@ namespace Unity.UIWidgets.ui {
             this._fringeWidth = 1.0f / devicePixelRatio;
             this._devicePixelRatio = devicePixelRatio;
             this._meshPool = meshPool;
+            this._antiAliasing = antiAliasing;
         }
         
         public float getDevicePixelRatio() {
@@ -783,8 +785,8 @@ namespace Unity.UIWidgets.ui {
                             autoGenerateMips = false,
                         };
                 
-                        if (QualitySettings.antiAliasing != 0) {
-                            desc.msaaSamples = QualitySettings.antiAliasing;
+                        if (this._antiAliasing != 0) {
+                            desc.msaaSamples = this._antiAliasing;
                         }
                 
                         cmdBuf.GetTemporaryRT(subLayer.rtID, desc, subLayer.filterMode);
@@ -1000,9 +1002,9 @@ namespace Unity.UIWidgets.ui {
     public class CommandBufferCanvas : RecorderCanvas {
         readonly PictureFlusher _flusher;
         
-        public CommandBufferCanvas(RenderTexture renderTexture, float devicePixelRatio, MeshPool meshPool) 
+        public CommandBufferCanvas(RenderTexture renderTexture, float devicePixelRatio, MeshPool meshPool, int antiAliasing = Window.defaultAntiAliasing) 
             : base(new PictureRecorder()) {
-            this._flusher = new PictureFlusher(renderTexture, devicePixelRatio, meshPool);
+            this._flusher = new PictureFlusher(renderTexture, devicePixelRatio, meshPool, antiAliasing);
         }
 
         public override float getDevicePixelRatio() {

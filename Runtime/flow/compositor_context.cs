@@ -50,6 +50,7 @@ namespace Unity.UIWidgets.flow {
         public void onGrContextCreated(Surface surface) {
             this._rasterCache.clear();
             this._rasterCache.meshPool = surface.getMeshPool();
+            this._rasterCache.antiAliasing = surface.getAntiAliasing();
         }
 
         public void onGrContextDestroyed() {

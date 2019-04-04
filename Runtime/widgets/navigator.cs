@@ -58,7 +58,7 @@ namespace Unity.UIWidgets.widgets {
             get { return false; }
         }
 
-        public object currentResult {
+        public virtual object currentResult {
             get { return null; }
         }
 

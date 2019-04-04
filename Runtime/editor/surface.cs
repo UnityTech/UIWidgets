@@ -57,6 +57,8 @@ namespace Unity.UIWidgets.editor {
         SurfaceFrame acquireFrame(Size size, float devicePixelRatio);
 
         MeshPool getMeshPool();
+
+        int getAntiAliasing();
     }
 
     public class EditorWindowSurface : Surface {
@@ -99,9 +101,15 @@ namespace Unity.UIWidgets.editor {
         GrSurface _surface;
         readonly DrawToTargetFunc _drawToTargetFunc;
         MeshPool _meshPool = new MeshPool();
+        int _antiAliasing;
 
-        public EditorWindowSurface(DrawToTargetFunc drawToTargetFunc = null) {
+        public int getAntiAliasing() {
+            return this._antiAliasing;
+        }
+
+        public EditorWindowSurface(DrawToTargetFunc drawToTargetFunc = null, int antiAliasing = Window.defaultAntiAliasing) {
             this._drawToTargetFunc = drawToTargetFunc;
+            this._antiAliasing = antiAliasing;
         }
 
         public SurfaceFrame acquireFrame(Size size, float devicePixelRatio) {
@@ -164,7 +172,7 @@ namespace Unity.UIWidgets.editor {
                 this._surface = null;
             }
 
-            this._surface = new GrSurface(size, devicePixelRatio, this._meshPool);
+            this._surface = new GrSurface(size, devicePixelRatio, this._meshPool, this._antiAliasing);
         }
     }
 
@@ -179,6 +187,12 @@ namespace Unity.UIWidgets.editor {
 
         CommandBufferCanvas _canvas;
 
+        int _antiAliasing;
+
+        public int getAntiAliasing() {
+            return this._antiAliasing;
+        }
+
         public RenderTexture getRenderTexture() {
             return this._renderTexture;
         }
@@ -186,15 +200,16 @@ namespace Unity.UIWidgets.editor {
         public Canvas getCanvas() {
             if (this._canvas == null) {
                 this._canvas = new CommandBufferCanvas(
-                    this._renderTexture, this.devicePixelRatio, this._meshPool);
+                    this._renderTexture, this.devicePixelRatio, this._meshPool, this._antiAliasing);
             }
 
             return this._canvas;
         }
 
-        public GrSurface(Size size, float devicePixelRatio, MeshPool meshPool) {
+        public GrSurface(Size size, float devicePixelRatio, MeshPool meshPool, int antiAliasing = Window.defaultAntiAliasing) {
             this.size = size;
             this.devicePixelRatio = devicePixelRatio;
+            this._antiAliasing = antiAliasing;
 
             var desc = new RenderTextureDescriptor(
                 (int) this.size.width, (int) this.size.height,
@@ -203,8 +218,8 @@ namespace Unity.UIWidgets.editor {
                 autoGenerateMips = false,
             };
 
-            if (QualitySettings.antiAliasing != 0) {
-                desc.msaaSamples = QualitySettings.antiAliasing;
+            if (antiAliasing != 0) {
+                desc.msaaSamples = antiAliasing;
             }
 
             this._renderTexture = new RenderTexture(desc);
