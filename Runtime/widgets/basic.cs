@@ -270,6 +270,62 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
+    public class OverflowBox : SingleChildRenderObjectWidget {
+        public OverflowBox(
+            Key key = null,
+            Alignment alignment = null,
+            float? minWidth = null,
+            float? maxWidth = null,
+            float? minHeight = null,
+            float? maxHeight = null,
+            Widget child = null
+        ) : base(key: key, child: child) {
+            this.alignment = alignment ?? Alignment.center;
+            this.minWidth = minWidth;
+            this.maxWidth = maxWidth;
+            this.minHeight = minHeight;
+            this.maxHeight = maxHeight;
+        }
+
+        public readonly Alignment alignment;
+
+        public readonly float? minWidth;
+
+        public readonly float? maxWidth;
+
+        public readonly float? minHeight;
+
+        public readonly float? maxHeight;
+
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderConstrainedOverflowBox(
+                alignment: this.alignment,
+                minWidth: this.minWidth,
+                maxWidth: this.maxWidth,
+                minHeight: this.minHeight,
+                maxHeight: this.maxHeight
+            );
+        }
+
+        public override void updateRenderObject(BuildContext context, RenderObject _renderObject) {
+            RenderConstrainedOverflowBox renderObject = _renderObject as RenderConstrainedOverflowBox;
+            renderObject.alignment = this.alignment;
+            renderObject.minWidth = this.minWidth;
+            renderObject.maxWidth = this.maxWidth;
+            renderObject.minHeight = this.minHeight;
+            renderObject.maxHeight = this.maxHeight;
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new DiagnosticsProperty<Alignment>("alignment", this.alignment));
+            properties.add(new FloatProperty("minWidth", this.minWidth, defaultValue: null));
+            properties.add(new FloatProperty("maxWidth", this.maxWidth, defaultValue: null));
+            properties.add(new FloatProperty("minHeight", this.minHeight, defaultValue: null));
+            properties.add(new FloatProperty("maxHeight", this.maxHeight, defaultValue: null));
+        }
+    }
+
     public class SizedBox : SingleChildRenderObjectWidget {
         public SizedBox(Key key = null, float? width = null, float? height = null, Widget child = null)
             : base(key: key, child: child) {
