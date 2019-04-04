@@ -57,7 +57,7 @@
         padding.top = cur_padding;
     }
 
-    UIWidgetsMethodMessage(@"ViewportMatricsChanged", @"UIWidgetViewController.keyboardHide", @[]);
+    UIWidgetsMethodMessage(@"ViewportMatricsChanged", @"UIWidgetViewController.keyboardChanged", @[]);
 }
 
 -(void)keyboardWillChangeFrame:(NSNotification*)notification {
@@ -68,7 +68,7 @@
     viewInsets.bottom = bottom * scale;
     padding.bottom = 0;
 
-    UIWidgetsMethodMessage(@"ViewportMatricsChanged", @"UIWidgetViewController.keyboardHide", @[]);
+    UIWidgetsMethodMessage(@"ViewportMatricsChanged", @"UIWidgetViewController.keyboardChanged", @[]);
 }
 
 -(void)tryLaunch {
