@@ -146,7 +146,7 @@ namespace Unity.UIWidgets.foundation {
                 return false;
             }
 
-            if (this.alwaysUpdate) {
+            if (!this.pure) {
                 return ReferenceEquals(this, obj);
             } else {
                 return ReferenceEquals(this._getCanonical(), ((CanonicalMixin{{with}}) obj)._getCanonical());

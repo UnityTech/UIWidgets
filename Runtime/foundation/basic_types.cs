@@ -105,6 +105,10 @@ namespace Unity.UIWidgets.foundation {
                 return true;
             }
 
+            if (ReferenceEquals(it, list)) {
+                return true;
+            }
+
             if (it == null || list == null) {
                 return false;
             }

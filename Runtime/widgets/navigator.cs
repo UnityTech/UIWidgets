@@ -58,7 +58,7 @@ namespace Unity.UIWidgets.widgets {
             get { return false; }
         }
 
-        public object currentResult {
+        public virtual object currentResult {
             get { return null; }
         }
 
@@ -852,9 +852,7 @@ namespace Unity.UIWidgets.widgets {
                             key: this._overlayKey,
                             initialEntries: this._initialOverlayEntries
                         )
-                    ) {
-                        alwaysUpdate = true,
-                    }
+                    )
                 )
             );
         }

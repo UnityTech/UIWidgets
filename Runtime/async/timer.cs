@@ -142,7 +142,7 @@ namespace Unity.UIWidgets.async {
             }
         }
 
-        class TimerImpl : Timer, IComparable<TimerImpl> {
+        public class TimerImpl : Timer, IComparable<TimerImpl> {
             float _deadline;
             readonly Action _callback;
             bool _done;

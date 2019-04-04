@@ -1,5 +1,5 @@
-using System;
 using System.Collections.Generic;
+using com.unity.uiwidgets.Runtime.rendering;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
@@ -433,6 +433,333 @@ namespace Unity.UIWidgets.widgets {
             base.debugFillProperties(properties);
             properties.add(new FloatProperty("itemExtent", this.itemExtent,
                 defaultValue: Diagnostics.kNullDefaultValue));
+        }
+    }
+
+    public class GridView : BoxScrollView {
+        public GridView(
+            Key key = null,
+            Axis scrollDirection = Axis.vertical,
+            bool reverse = false,
+            ScrollController controller = null,
+            bool? primary = null,
+            ScrollPhysics physics = null,
+            bool shrinkWrap = false,
+            EdgeInsets padding = null,
+            SliverGridDelegate gridDelegate = null,
+            bool addAutomaticKeepAlives = true,
+            bool addRepaintBoundaries = true,
+            float? cacheExtent = null,
+            List<Widget> children = null
+        ) : base(
+            key: key,
+            scrollDirection: scrollDirection,
+            reverse: reverse,
+            controller: controller,
+            primary: primary,
+            physics: physics,
+            shrinkWrap: shrinkWrap,
+            padding: padding,
+            cacheExtent: cacheExtent
+        ) {
+            D.assert(gridDelegate != null);
+            this.childrenDelegate = new SliverChildListDelegate(
+                children ?? new List<Widget>(),
+                addAutomaticKeepAlives: addAutomaticKeepAlives,
+                addRepaintBoundaries: addRepaintBoundaries
+            );
+        }
+
+        public GridView(
+            Key key = null,
+            Axis scrollDirection = Axis.vertical,
+            bool reverse = false,
+            ScrollController controller = null,
+            bool? primary = null,
+            ScrollPhysics physics = null,
+            bool shrinkWrap = false,
+            EdgeInsets padding = null,
+            SliverGridDelegate gridDelegate = null,
+            IndexedWidgetBuilder itemBuilder = null,
+            int? itemCount = null,
+            bool addAutomaticKeepAlives = true,
+            bool addRepaintBoundaries = true,
+            float? cacheExtent = null
+        ) : base(
+            key: key,
+            scrollDirection: scrollDirection,
+            reverse: reverse,
+            controller: controller,
+            primary: primary,
+            physics: physics,
+            shrinkWrap: shrinkWrap,
+            padding: padding,
+            cacheExtent: cacheExtent
+        ) {
+            this.gridDelegate = gridDelegate;
+            this.childrenDelegate = new SliverChildBuilderDelegate(
+                itemBuilder,
+                childCount: itemCount,
+                addAutomaticKeepAlives: addAutomaticKeepAlives,
+                addRepaintBoundaries: addRepaintBoundaries
+            );
+        }
+
+        public static GridView builder(
+            Key key = null,
+            Axis scrollDirection = Axis.vertical,
+            bool reverse = false,
+            ScrollController controller = null,
+            bool? primary = null,
+            ScrollPhysics physics = null,
+            bool shrinkWrap = false,
+            EdgeInsets padding = null,
+            SliverGridDelegate gridDelegate = null,
+            IndexedWidgetBuilder itemBuilder = null,
+            int? itemCount = null,
+            bool addAutomaticKeepAlives = true,
+            bool addRepaintBoundaries = true,
+            float? cacheExtent = null
+        ) {
+            return new GridView(
+                key: key,
+                scrollDirection: scrollDirection,
+                reverse: reverse,
+                controller: controller,
+                primary: primary,
+                physics: physics,
+                shrinkWrap: shrinkWrap,
+                padding: padding,
+                gridDelegate: gridDelegate,
+                itemBuilder: itemBuilder,
+                itemCount: itemCount,
+                addAutomaticKeepAlives: addAutomaticKeepAlives,
+                addRepaintBoundaries: addRepaintBoundaries,
+                cacheExtent: cacheExtent
+            );
+        }
+
+        public GridView(
+            Key key = null,
+            Axis scrollDirection = Axis.vertical,
+            bool reverse = false,
+            ScrollController controller = null,
+            bool? primary = null,
+            ScrollPhysics physics = null,
+            bool shrinkWrap = false,
+            EdgeInsets padding = null,
+            SliverGridDelegate gridDelegate = null,
+            SliverChildDelegate childrenDelegate = null,
+            float? cacheExtent = null
+        ) : base(
+            key: key,
+            scrollDirection: scrollDirection,
+            reverse: reverse,
+            controller: controller,
+            primary: primary,
+            physics: physics,
+            shrinkWrap: shrinkWrap,
+            padding: padding,
+            cacheExtent: cacheExtent
+        ) {
+            D.assert(gridDelegate != null);
+            D.assert(childrenDelegate != null);
+            this.gridDelegate = gridDelegate;
+            this.childrenDelegate = childrenDelegate;
+        }
+
+        public static GridView custom(
+            Key key = null,
+            Axis scrollDirection = Axis.vertical,
+            bool reverse = false,
+            ScrollController controller = null,
+            bool? primary = null,
+            ScrollPhysics physics = null,
+            bool shrinkWrap = false,
+            EdgeInsets padding = null,
+            SliverGridDelegate gridDelegate = null,
+            SliverChildDelegate childrenDelegate = null,
+            float? cacheExtent = null
+        ) {
+            return new GridView(
+                key: key,
+                scrollDirection: scrollDirection,
+                reverse: reverse,
+                controller: controller,
+                primary: primary,
+                physics: physics,
+                shrinkWrap: shrinkWrap,
+                padding: padding,
+                gridDelegate: gridDelegate,
+                childrenDelegate: childrenDelegate,
+                cacheExtent: cacheExtent
+            );
+        }
+
+        public GridView(
+            Key key = null,
+            Axis scrollDirection = Axis.vertical,
+            bool reverse = false,
+            ScrollController controller = null,
+            bool? primary = null,
+            ScrollPhysics physics = null,
+            bool shrinkWrap = false,
+            EdgeInsets padding = null,
+            int? crossAxisCount = null,
+            float mainAxisSpacing = 0.0f,
+            float crossAxisSpacing = 0.0f,
+            float childAspectRatio = 1.0f,
+            bool addAutomaticKeepAlives = true,
+            bool addRepaintBoundaries = true,
+            float? cacheExtent = null,
+            List<Widget> children = null
+        ) : base(
+            key: key,
+            scrollDirection: scrollDirection,
+            reverse: reverse,
+            controller: controller,
+            primary: primary,
+            physics: physics,
+            shrinkWrap: shrinkWrap,
+            padding: padding,
+            cacheExtent: cacheExtent
+        ) {
+            this.gridDelegate = new SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: crossAxisCount ?? 0,
+                mainAxisSpacing: mainAxisSpacing,
+                crossAxisSpacing: crossAxisSpacing,
+                childAspectRatio: childAspectRatio
+            );
+            this.childrenDelegate = new SliverChildListDelegate(
+                children ?? new List<Widget>(),
+                addAutomaticKeepAlives: addAutomaticKeepAlives,
+                addRepaintBoundaries: addRepaintBoundaries
+            );
+        }
+
+        public static GridView count(
+            Key key = null,
+            Axis scrollDirection = Axis.vertical,
+            bool reverse = false,
+            ScrollController controller = null,
+            bool? primary = null,
+            ScrollPhysics physics = null,
+            bool shrinkWrap = false,
+            EdgeInsets padding = null,
+            int? crossAxisCount = null,
+            float mainAxisSpacing = 0.0f,
+            float crossAxisSpacing = 0.0f,
+            float childAspectRatio = 1.0f,
+            bool addAutomaticKeepAlives = true,
+            bool addRepaintBoundaries = true,
+            float? cacheExtent = null,
+            List<Widget> children = null
+        ) {
+            return new GridView(
+                key: key,
+                scrollDirection: scrollDirection,
+                reverse: reverse,
+                controller: controller,
+                primary: primary,
+                physics: physics,
+                shrinkWrap: shrinkWrap,
+                padding: padding,
+                crossAxisCount: crossAxisCount,
+                mainAxisSpacing: mainAxisSpacing,
+                crossAxisSpacing: crossAxisSpacing,
+                childAspectRatio: childAspectRatio,
+                addAutomaticKeepAlives: addAutomaticKeepAlives,
+                addRepaintBoundaries: addRepaintBoundaries,
+                cacheExtent: cacheExtent,
+                children: children
+            );
+        }
+
+        public GridView(
+            Key key = null,
+            Axis scrollDirection = Axis.vertical,
+            bool reverse = false,
+            ScrollController controller = null,
+            bool? primary = null,
+            ScrollPhysics physics = null,
+            bool shrinkWrap = false,
+            EdgeInsets padding = null,
+            float? maxCrossAxisExtent = null,
+            float mainAxisSpacing = 0.0f,
+            float crossAxisSpacing = 0.0f,
+            float childAspectRatio = 1.0f,
+            bool addAutomaticKeepAlives = true,
+            bool addRepaintBoundaries = true,
+            bool addSemanticIndexes = true,
+            List<Widget> children = null
+        ) : base(
+            key: key,
+            scrollDirection: scrollDirection,
+            reverse: reverse,
+            controller: controller,
+            primary: primary,
+            physics: physics,
+            shrinkWrap: shrinkWrap,
+            padding: padding
+        ) {
+            this.gridDelegate = new SliverGridDelegateWithMaxCrossAxisExtent(
+                maxCrossAxisExtent: maxCrossAxisExtent ?? 0,
+                mainAxisSpacing: mainAxisSpacing,
+                crossAxisSpacing: crossAxisSpacing,
+                childAspectRatio: childAspectRatio
+            );
+            this.childrenDelegate = new SliverChildListDelegate(
+                children ?? new List<Widget> { },
+                addAutomaticKeepAlives: addAutomaticKeepAlives,
+                addRepaintBoundaries: addRepaintBoundaries
+            );
+        }
+
+        public static GridView extent(
+            Key key = null,
+            Axis scrollDirection = Axis.vertical,
+            bool reverse = false,
+            ScrollController controller = null,
+            bool? primary = null,
+            ScrollPhysics physics = null,
+            bool shrinkWrap = false,
+            EdgeInsets padding = null,
+            float? maxCrossAxisExtent = null,
+            float mainAxisSpacing = 0.0f,
+            float crossAxisSpacing = 0.0f,
+            float childAspectRatio = 1.0f,
+            bool addAutomaticKeepAlives = true,
+            bool addRepaintBoundaries = true,
+            List<Widget> children = null
+        ) {
+            return new GridView(
+                key: key,
+                scrollDirection: scrollDirection,
+                reverse: reverse,
+                controller: controller,
+                primary: primary,
+                physics: physics,
+                shrinkWrap: shrinkWrap,
+                padding: padding,
+                maxCrossAxisExtent: maxCrossAxisExtent,
+                mainAxisSpacing: mainAxisSpacing,
+                crossAxisSpacing: crossAxisSpacing,
+                childAspectRatio: childAspectRatio,
+                addAutomaticKeepAlives: addAutomaticKeepAlives,
+                addRepaintBoundaries: addRepaintBoundaries,
+                children: children
+            );
+        }
+
+        public readonly SliverGridDelegate gridDelegate;
+
+        public readonly SliverChildDelegate childrenDelegate;
+
+        protected override Widget buildChildLayout(BuildContext context) {
+            return new SliverGrid(
+                layoutDelegate: this.childrenDelegate,
+                gridDelegate: this.gridDelegate
+            );
         }
     }
 }

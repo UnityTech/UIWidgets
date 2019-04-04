@@ -36,7 +36,7 @@ namespace Unity.UIWidgets.foundation {
                 foreach (var field in fields) {
                     if (!field.IsInitOnly) {
                         throw new UIWidgetsError(
-                            type + " should be immutable. All public fields need to be readonly. " +
+                            type + " is pure and should be immutable. All public fields need to be readonly. " +
                             field + " is not readonly.");
                     }
                 }

@@ -342,7 +342,7 @@ namespace Unity.UIWidgets.gestures {
             TimeSpan? delay = null)
             : base(initialPosition) {
             D.assert(delay != null);
-            this._timer = Window.instance.run(delay ?? Constants.kLongPressTimeout, this._delayPassed, true);
+            this._timer = Window.instance.run(delay ?? Constants.kLongPressTimeout, this._delayPassed, false);
         }
 
         Timer _timer;

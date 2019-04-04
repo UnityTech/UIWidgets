@@ -1,8 +1,22 @@
 using System;
 using System.Runtime.InteropServices;
+using Unity.UIWidgets.ui;
 using UnityEngine;
 
 namespace Unity.UIWidgets.engine {
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct viewMetrics {
+        public float insets_top;
+        public float insets_bottom;
+        public float insets_left;
+        public float insets_right;
+
+        public float padding_top;
+        public float padding_bottom;
+        public float padding_left;
+        public float padding_right;
+    }
 
     public static class DisplayMetricsProvider {
         public static Func<DisplayMetrics> provider = () => new PlayerDisplayMetrics();
@@ -14,11 +28,18 @@ namespace Unity.UIWidgets.engine {
         void Update();
 
         float devicePixelRatio { get; } 
+        
+        viewMetrics viewMetrics { get; }
+
+        WindowPadding viewPadding { get; }
+        
+        WindowPadding viewInsets { get; }
     }
 
     public class PlayerDisplayMetrics: DisplayMetrics {
         
         float _devicePixelRatio = 0;
+        viewMetrics? _viewMetrics = null;
 
         public void OnEnable() {
         }
@@ -28,6 +49,8 @@ namespace Unity.UIWidgets.engine {
         }
 
         public void Update() {
+            //view metrics marks dirty
+            this._viewMetrics = null;
         }
 
 
@@ -58,6 +81,71 @@ namespace Unity.UIWidgets.engine {
             
         }
 
+        public WindowPadding viewPadding {
+            get { 
+                return new WindowPadding(this.viewMetrics.padding_left,
+                this.viewMetrics.padding_top,
+                this.viewMetrics.padding_right,
+                this.viewMetrics.padding_bottom);
+            }
+        }
+        
+        public WindowPadding viewInsets { 
+            get { 
+            return new WindowPadding(this.viewMetrics.insets_left,
+                this.viewMetrics.insets_top,
+                this.viewMetrics.insets_right,
+                this.viewMetrics.insets_bottom);
+            } 
+        }
+
+        public viewMetrics viewMetrics {
+            get {
+                if (this._viewMetrics != null) {
+                    return this._viewMetrics.Value;
+                }
+                
+#if UNITY_ANDROID
+                this._viewMetrics = new viewMetrics {
+                    insets_bottom = 0,
+                    insets_left = 0,
+                    insets_right = 0,
+                    insets_top = 0,
+                    padding_left = Screen.safeArea.x,
+                    padding_top = Screen.safeArea.y,
+                    padding_right = Screen.width - Screen.safeArea.width - Screen.safeArea.x,
+                    padding_bottom = Screen.height - Screen.safeArea.height - Screen.safeArea.y
+                };
+#elif UNITY_WEBGL
+                this._viewMetrics = new viewMetrics {
+                    insets_bottom = 0,
+                    insets_left = 0,
+                    insets_right = 0,
+                    insets_top = 0,
+                    padding_left = 0,
+                    padding_top = 0,
+                    padding_right = 0,
+                    padding_bottom = 0
+                };
+#elif UNITY_IOS
+                viewMetrics metrics = IOSGetViewportPadding();
+                this._viewMetrics = metrics;
+#else
+                this._viewMetrics = new viewMetrics {
+                    insets_bottom = 0,
+                    insets_left = 0,
+                    insets_right = 0,
+                    insets_top = 0,
+                    padding_left = 0,
+                    padding_top = 0,
+                    padding_right = 0,
+                    padding_bottom = 0
+                };
+#endif
+                return this._viewMetrics.Value;
+            }
+        }
+
 #if UNITY_ANDROID 
         static float AndroidDevicePixelRatio() {
             using (
@@ -84,7 +172,10 @@ namespace Unity.UIWidgets.engine {
 #if UNITY_IOS
         [DllImport("__Internal")]
         static extern int IOSDeviceScaleFactor();
+
+		[DllImport("__Internal")]
+		static extern viewMetrics IOSGetViewportPadding();
 #endif
-        
+
     }
 }
