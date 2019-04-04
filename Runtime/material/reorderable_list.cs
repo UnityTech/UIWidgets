@@ -14,7 +14,7 @@ namespace Unity.UIWidgets.material {
     public delegate void ReorderCallback(int oldIndex, int newIndex);
 
     public class ReorderableListView : StatefulWidget {
-        ReorderableListView(
+        public ReorderableListView(
             Widget header = null,
             List<Widget> children = null,
             ReorderCallback onReorder = null,
@@ -232,7 +232,7 @@ namespace Unity.UIWidgets.material {
 
         Widget _wrap(Widget toWrap, int index, BoxConstraints constraints) {
             D.assert(toWrap.key != null);
-            GlobalObjectKey<State> keyIndexGlobalKey = new GlobalObjectKey<State>(toWrap.key);
+            GlobalObjectKey<State<_ReorderableListContent>> keyIndexGlobalKey = new GlobalObjectKey<State<_ReorderableListContent>>(toWrap.key);
 
             void onDragStarted() {
                 this.setState(() => {
@@ -260,13 +260,31 @@ namespace Unity.UIWidgets.material {
             void onDragEnded() {
                 reorder(this._dragStartIndex, this._currentIndex);
             }
+            
+            
+            Widget wrapWithKeyedSubtree() {
+              return new KeyedSubtree(
+                key: keyIndexGlobalKey,
+                child: toWrap
+              );
+            }
 
             Widget buildDragTarget(BuildContext context, List<Key> acceptedCandidates, List<Key> rejectedCandidates) {
+                Widget toWrapWithKeyedSubtree = wrapWithKeyedSubtree();
                 Widget child = new LongPressDraggable<Key>(
                     maxSimultaneousDrags: 1,
                     axis: this.widget.scrollDirection,
                     data: toWrap.key,
-                    child: new SizedBox(),
+                    feedback: new Container(
+                        alignment: Alignment.topLeft,
+                        // These constraints will limit the cross axis of the drawn widget.
+                        constraints: constraints,
+                        child: new Material(
+                            elevation: 6.0f,
+                            child: toWrapWithKeyedSubtree
+                        )
+                    ),
+                    child: this._dragging == toWrap.key ? new SizedBox() : toWrapWithKeyedSubtree,
                     childWhenDragging: new SizedBox(),
                     dragAnchor: DragAnchor.child,
                     onDragStarted: onDragStarted,
@@ -322,7 +340,7 @@ namespace Unity.UIWidgets.material {
                             this._nextIndex = index;
                             this._requestAnimationToNextIndex();
                         });
-                        this._scrollTo(this.context);
+                        this._scrollTo(context);
                         return this._dragging == toAccept && toAccept != toWrap.key;
                     },
                     onAccept: (Key accepted) => { },

@@ -597,7 +597,7 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public GridView(
-            Key key,
+            Key key = null,
             Axis scrollDirection = Axis.vertical,
             bool reverse = false,
             ScrollController controller = null,
@@ -638,7 +638,7 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public static GridView count(
-            Key key,
+            Key key = null,
             Axis scrollDirection = Axis.vertical,
             bool reverse = false,
             ScrollController controller = null,
