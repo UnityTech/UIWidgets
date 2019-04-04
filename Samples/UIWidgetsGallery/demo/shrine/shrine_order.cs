@@ -330,7 +330,7 @@ namespace UIWidgetsGallery.gallery {
 
         public Order order;
 
-        public new Order currentResult {
+        public override object currentResult {
             get { return this.order; }
         }
 
