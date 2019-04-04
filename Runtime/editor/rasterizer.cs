@@ -14,9 +14,9 @@ namespace Unity.UIWidgets.editor {
             this._compositorContext = new CompositorContext();
         }
 
-        public void setup(Surface surface, int antiAliasing = Window.DefaultAntiAliasing) {
+        public void setup(Surface surface) {
             this._surface = surface;
-            this._compositorContext.onGrContextCreated(this._surface, antiAliasing);
+            this._compositorContext.onGrContextCreated(this._surface);
         }
 
         public void teardown() {

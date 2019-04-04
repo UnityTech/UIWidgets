@@ -15,12 +15,9 @@ namespace Unity.UIWidgets.editor {
 
         readonly SubmitCallback _submitCallback;
 
-        int _antiAliasing;
-
-        public SurfaceFrame(GrSurface surface, SubmitCallback submitCallback, int antiAliasing = Window.DefaultAntiAliasing) {
+        public SurfaceFrame(GrSurface surface, SubmitCallback submitCallback) {
             this._surface = surface;
             this._submitCallback = submitCallback;
-            this._antiAliasing = antiAliasing;
         }
 
         public void Dispose() {
@@ -30,7 +27,7 @@ namespace Unity.UIWidgets.editor {
         }
 
         public Canvas getCanvas() {
-            return this._surface != null ? this._surface.getCanvas(this._antiAliasing) : null;
+            return this._surface != null ? this._surface.getCanvas() : null;
         }
 
         public bool submit() {
@@ -60,6 +57,8 @@ namespace Unity.UIWidgets.editor {
         SurfaceFrame acquireFrame(Size size, float devicePixelRatio);
 
         MeshPool getMeshPool();
+
+        int getAntiAliasing();
     }
 
     public class EditorWindowSurface : Surface {
@@ -104,6 +103,10 @@ namespace Unity.UIWidgets.editor {
         MeshPool _meshPool = new MeshPool();
         int _antiAliasing;
 
+        public int getAntiAliasing() {
+            return this._antiAliasing;
+        }
+
         public EditorWindowSurface(DrawToTargetFunc drawToTargetFunc = null, int antiAliasing = Window.DefaultAntiAliasing) {
             this._drawToTargetFunc = drawToTargetFunc;
             this._antiAliasing = antiAliasing;
@@ -113,7 +116,7 @@ namespace Unity.UIWidgets.editor {
             this._createOrUpdateRenderTexture(size, devicePixelRatio);
 
             return new SurfaceFrame(this._surface,
-                (frame, canvas) => this._presentSurface(canvas, this._antiAliasing));
+                (frame, canvas) => this._presentSurface(canvas));
         }
 
         public MeshPool getMeshPool() {
@@ -132,13 +135,13 @@ namespace Unity.UIWidgets.editor {
             }
         }
 
-        protected bool _presentSurface(Canvas canvas, int antiAliasing) {
+        protected bool _presentSurface(Canvas canvas) {
             if (canvas == null) {
                 return false;
             }
 
-            this._surface.getCanvas(antiAliasing).flush();
-            this._surface.getCanvas(antiAliasing).reset();
+            this._surface.getCanvas().flush();
+            this._surface.getCanvas().reset();
 
             var screenRect = new Rect(0, 0,
                 this._surface.size.width / this._surface.devicePixelRatio,
@@ -184,22 +187,29 @@ namespace Unity.UIWidgets.editor {
 
         CommandBufferCanvas _canvas;
 
+        int _antiAliasing;
+
+        public int getAntiAliasing() {
+            return this._antiAliasing;
+        }
+
         public RenderTexture getRenderTexture() {
             return this._renderTexture;
         }
 
-        public Canvas getCanvas(int antiAliasing) {
+        public Canvas getCanvas() {
             if (this._canvas == null) {
                 this._canvas = new CommandBufferCanvas(
-                    this._renderTexture, this.devicePixelRatio, this._meshPool, antiAliasing);
+                    this._renderTexture, this.devicePixelRatio, this._meshPool, this._antiAliasing);
             }
 
             return this._canvas;
         }
 
-        public GrSurface(Size size, float devicePixelRatio, MeshPool meshPool, int antiAliasing) {
+        public GrSurface(Size size, float devicePixelRatio, MeshPool meshPool, int antiAliasing = Window.DefaultAntiAliasing) {
             this.size = size;
             this.devicePixelRatio = devicePixelRatio;
+            this._antiAliasing = antiAliasing;
 
             var desc = new RenderTextureDescriptor(
                 (int) this.size.width, (int) this.size.height,

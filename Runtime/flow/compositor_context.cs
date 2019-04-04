@@ -37,7 +37,6 @@ namespace Unity.UIWidgets.flow {
 
         readonly RasterCache _rasterCache;
         readonly Stopwatch _frameTime;
-        int _antiAliasing;
 
         public CompositorContext() {
             this._rasterCache = new RasterCache();
@@ -48,11 +47,10 @@ namespace Unity.UIWidgets.flow {
             return new ScopedFrame(this, canvas, instrumentation_enabled);
         }
 
-        public void onGrContextCreated(Surface surface, int antiAliasing) {
+        public void onGrContextCreated(Surface surface) {
             this._rasterCache.clear();
             this._rasterCache.meshPool = surface.getMeshPool();
-            this._antiAliasing = antiAliasing;
-            this._rasterCache.antiAliasing = this._antiAliasing;
+            this._rasterCache.antiAliasing = surface.getAntiAliasing();
         }
 
         public void onGrContextDestroyed() {

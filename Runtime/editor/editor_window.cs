@@ -188,7 +188,7 @@ namespace Unity.UIWidgets.editor {
             D.assert(this._surface == null);
             this._surface = this.createSurface();
 
-            this._rasterizer.setup(this._surface, this.antiAliasing);
+            this._rasterizer.setup(this._surface);
             _windowAdapters.Add(this);
             this._alive = true;
         }
