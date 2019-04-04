@@ -16,7 +16,7 @@ namespace Unity.UIWidgets.ui {
         RenderLayer _currentLayer;
         Rect _lastScissor;
         
-        public PictureFlusher(RenderTexture renderTexture, float devicePixelRatio, int antiAliasing, MeshPool meshPool) {
+        public PictureFlusher(RenderTexture renderTexture, float devicePixelRatio, MeshPool meshPool, int antiAliasing) {
             D.assert(renderTexture);
             D.assert(devicePixelRatio > 0);
             D.assert(meshPool != null);
@@ -1004,7 +1004,7 @@ namespace Unity.UIWidgets.ui {
         
         public CommandBufferCanvas(RenderTexture renderTexture, float devicePixelRatio, MeshPool meshPool, int antiAliasing = Window.DefaultAntiAliasing) 
             : base(new PictureRecorder()) {
-            this._flusher = new PictureFlusher(renderTexture, devicePixelRatio, antiAliasing, meshPool);
+            this._flusher = new PictureFlusher(renderTexture, devicePixelRatio, meshPool, antiAliasing);
         }
 
         public override float getDevicePixelRatio() {

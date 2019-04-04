@@ -8,7 +8,6 @@ using Unity.UIWidgets.service;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
 using UnityEditor;
-using UnityEditor.Experimental.UIElements;
 using UnityEngine;
 
 namespace Unity.UIWidgets.editor {
@@ -189,7 +188,7 @@ namespace Unity.UIWidgets.editor {
             D.assert(this._surface == null);
             this._surface = this.createSurface();
 
-            this._rasterizer.setup(this._surface, this._antiAliasing);
+            this._rasterizer.setup(this._surface, this.antiAliasing);
             _windowAdapters.Add(this);
             this._alive = true;
         }
