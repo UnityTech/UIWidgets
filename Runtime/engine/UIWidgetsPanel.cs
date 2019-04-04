@@ -177,6 +177,13 @@ namespace Unity.UIWidgets.engine {
             get { return this._displayMetrics.viewInsets; }
         }
 
+        protected override void OnDisable() {	
+            D.assert(this._windowAdapter != null);	
+            this._windowAdapter.OnDisable();	
+            this._windowAdapter = null;	
+            base.OnDisable();	
+        }
+        
         protected virtual Widget createWidget() {
             return null;
         }
