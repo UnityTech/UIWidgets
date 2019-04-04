@@ -49,7 +49,7 @@ namespace UIWidgets.Tests {
 
         static Texture2D texture6;
 
-        int _antiAliasing = Window.DefaultAntiAliasing;
+        int _antiAliasing = Window.defaultAntiAliasing;
 
         CanvasAndLayers() {
             this._options = new Action[] {

@@ -93,7 +93,7 @@ namespace Unity.UIWidgets.editor {
         }
         
         protected override int queryAntiAliasing() {
-            return Window.DefaultAntiAliasing;
+            return Window.defaultAntiAliasing;
         }
 
         protected override Vector2 queryWindowSize() {

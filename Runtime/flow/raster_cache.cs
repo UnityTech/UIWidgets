@@ -144,7 +144,7 @@ namespace Unity.UIWidgets.flow {
         public int antiAliasing {
             set { this._antiAliasing = value; }
         }
-        int _antiAliasing = Window.DefaultAntiAliasing;
+        int _antiAliasing = Window.defaultAntiAliasing;
 
         public MeshPool meshPool {
             set { this._meshPool = value; }

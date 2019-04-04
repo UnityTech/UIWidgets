@@ -107,7 +107,7 @@ namespace Unity.UIWidgets.editor {
             return this._antiAliasing;
         }
 
-        public EditorWindowSurface(DrawToTargetFunc drawToTargetFunc = null, int antiAliasing = Window.DefaultAntiAliasing) {
+        public EditorWindowSurface(DrawToTargetFunc drawToTargetFunc = null, int antiAliasing = Window.defaultAntiAliasing) {
             this._drawToTargetFunc = drawToTargetFunc;
             this._antiAliasing = antiAliasing;
         }
@@ -206,7 +206,7 @@ namespace Unity.UIWidgets.editor {
             return this._canvas;
         }
 
-        public GrSurface(Size size, float devicePixelRatio, MeshPool meshPool, int antiAliasing = Window.DefaultAntiAliasing) {
+        public GrSurface(Size size, float devicePixelRatio, MeshPool meshPool, int antiAliasing = Window.defaultAntiAliasing) {
             this.size = size;
             this.devicePixelRatio = devicePixelRatio;
             this._antiAliasing = antiAliasing;

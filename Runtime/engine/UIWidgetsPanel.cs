@@ -104,7 +104,7 @@ namespace Unity.UIWidgets.engine {
         static Event _repaintEvent;
 
         [SerializeField] protected float devicePixelRatioOverride;
-        [SerializeField] protected int antiAliasingOverride = Window.DefaultAntiAliasing;
+        [SerializeField] protected int antiAliasingOverride = Window.defaultAntiAliasing;
         WindowAdapter _windowAdapter;
         Texture _texture;
         Vector2 _lastMouseMove;
@@ -165,7 +165,7 @@ namespace Unity.UIWidgets.engine {
         
         public int antiAliasing {
             get {
-                return this.antiAliasingOverride >= 0 ? this.antiAliasingOverride : Window.DefaultAntiAliasing;
+                return this.antiAliasingOverride >= 0 ? this.antiAliasingOverride : Window.defaultAntiAliasing;
             }
         }
 

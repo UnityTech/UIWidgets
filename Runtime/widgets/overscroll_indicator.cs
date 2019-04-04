@@ -346,7 +346,7 @@ namespace Unity.UIWidgets.widgets {
             }
 
             this._pullRecedeTimer =
-                new TimerProvider.TimerImpl(this._pullHoldTime, () => this._recede(this._pullDecayTime));
+                Window.instance.run(this._pullHoldTime, () => this._recede(this._pullDecayTime));
         }
 
         public void scrollEnd() {
