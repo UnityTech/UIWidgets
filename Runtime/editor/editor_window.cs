@@ -8,6 +8,7 @@ using Unity.UIWidgets.service;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
 using UnityEditor;
+using UnityEditor.Experimental.UIElements;
 using UnityEngine;
 
 namespace Unity.UIWidgets.editor {
@@ -89,7 +90,7 @@ namespace Unity.UIWidgets.editor {
         }
         
         protected override int queryAntiAliasing() {
-            return 4;
+            return Window.DefaultAntiAliasing;
         }
 
         protected override Vector2 queryWindowSize() {
@@ -174,7 +175,7 @@ namespace Unity.UIWidgets.editor {
             D.assert(this._surface == null);
             this._surface = this.createSurface();
 
-            this._rasterizer.setup(this._surface);
+            this._rasterizer.setup(this._surface, this._antiAliasing);
             _windowAdapters.Add(this);
             this._alive = true;
         }
@@ -290,7 +291,7 @@ namespace Unity.UIWidgets.editor {
         protected abstract Vector2 queryWindowSize();
 
         protected virtual Surface createSurface() {
-            return new EditorWindowSurface();
+            return new EditorWindowSurface(antiAliasing: this.antiAliasing);
         }
 
         void _beginFrame() {

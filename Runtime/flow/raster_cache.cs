@@ -141,6 +141,11 @@ namespace Unity.UIWidgets.flow {
 
         MeshPool _meshPool;
 
+        public int antiAliasing {
+            set { this._antiAliasing = value; }
+        }
+        int _antiAliasing = Window.DefaultAntiAliasing;
+
         public MeshPool meshPool {
             set { this._meshPool = value; }
         }
@@ -224,14 +229,14 @@ namespace Unity.UIWidgets.flow {
                 autoGenerateMips = false,
             };
 
-            if (Window.instance.antiAliasing != 0) {
-                desc.msaaSamples = Window.instance.antiAliasing;
+            if (this._antiAliasing != 0) {
+                desc.msaaSamples = this._antiAliasing;
             }
 
             var renderTexture = new RenderTexture(desc);
             renderTexture.hideFlags = HideFlags.HideAndDontSave;
 
-            var canvas = new CommandBufferCanvas(renderTexture, devicePixelRatio, meshPool);
+            var canvas = new CommandBufferCanvas(renderTexture, devicePixelRatio, meshPool, this._antiAliasing);
             canvas.translate(-bounds.left, -bounds.top);
             canvas.concat(transform);
             canvas.drawPicture(picture);

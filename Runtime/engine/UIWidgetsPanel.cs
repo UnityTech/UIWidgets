@@ -56,7 +56,7 @@ namespace Unity.UIWidgets.engine {
         }
 
         protected override Surface createSurface() {
-            return new EditorWindowSurface(this._uiWidgetsPanel.applyRenderTexture);
+            return new EditorWindowSurface(this._uiWidgetsPanel.applyRenderTexture, this._antiAliasing);
         }
 
         public override GUIContent titleContent {
@@ -105,7 +105,7 @@ namespace Unity.UIWidgets.engine {
         static Event _repaintEvent;
 
         [SerializeField] protected float devicePixelRatioOverride;
-        [SerializeField] protected int antiAliasingOverride = 4;
+        [SerializeField] protected int antiAliasingOverride = Window.DefaultAntiAliasing;
         WindowAdapter _windowAdapter;
         Texture _texture;
         Vector2 _lastMouseMove;
@@ -159,7 +159,7 @@ namespace Unity.UIWidgets.engine {
         
         public int antiAliasing {
             get {
-                return this.antiAliasingOverride >= 0 ? this.antiAliasingOverride : 4;
+                return this.antiAliasingOverride >= 0 ? this.antiAliasingOverride : Window.DefaultAntiAliasing;
             }
         }
 

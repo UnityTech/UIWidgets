@@ -1,6 +1,7 @@
 using System;
 using Unity.UIWidgets.flow;
 using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.ui;
 
 namespace Unity.UIWidgets.editor {
     public class Rasterizer {
@@ -13,9 +14,9 @@ namespace Unity.UIWidgets.editor {
             this._compositorContext = new CompositorContext();
         }
 
-        public void setup(Surface surface) {
+        public void setup(Surface surface, int antiAliasing = Window.DefaultAntiAliasing) {
             this._surface = surface;
-            this._compositorContext.onGrContextCreated(this._surface);
+            this._compositorContext.onGrContextCreated(this._surface, antiAliasing);
         }
 
         public void teardown() {

@@ -15,9 +15,12 @@ namespace Unity.UIWidgets.editor {
 
         readonly SubmitCallback _submitCallback;
 
-        public SurfaceFrame(GrSurface surface, SubmitCallback submitCallback) {
+        int _antiAliasing;
+
+        public SurfaceFrame(GrSurface surface, SubmitCallback submitCallback, int antiAliasing = Window.DefaultAntiAliasing) {
             this._surface = surface;
             this._submitCallback = submitCallback;
+            this._antiAliasing = antiAliasing;
         }
 
         public void Dispose() {
@@ -27,7 +30,7 @@ namespace Unity.UIWidgets.editor {
         }
 
         public Canvas getCanvas() {
-            return this._surface != null ? this._surface.getCanvas() : null;
+            return this._surface != null ? this._surface.getCanvas(this._antiAliasing) : null;
         }
 
         public bool submit() {
@@ -99,16 +102,18 @@ namespace Unity.UIWidgets.editor {
         GrSurface _surface;
         readonly DrawToTargetFunc _drawToTargetFunc;
         MeshPool _meshPool = new MeshPool();
+        int _antiAliasing;
 
-        public EditorWindowSurface(DrawToTargetFunc drawToTargetFunc = null) {
+        public EditorWindowSurface(DrawToTargetFunc drawToTargetFunc = null, int antiAliasing = Window.DefaultAntiAliasing) {
             this._drawToTargetFunc = drawToTargetFunc;
+            this._antiAliasing = antiAliasing;
         }
 
         public SurfaceFrame acquireFrame(Size size, float devicePixelRatio) {
             this._createOrUpdateRenderTexture(size, devicePixelRatio);
 
             return new SurfaceFrame(this._surface,
-                (frame, canvas) => this._presentSurface(canvas));
+                (frame, canvas) => this._presentSurface(canvas, this._antiAliasing));
         }
 
         public MeshPool getMeshPool() {
@@ -127,13 +132,13 @@ namespace Unity.UIWidgets.editor {
             }
         }
 
-        protected bool _presentSurface(Canvas canvas) {
+        protected bool _presentSurface(Canvas canvas, int antiAliasing) {
             if (canvas == null) {
                 return false;
             }
 
-            this._surface.getCanvas().flush();
-            this._surface.getCanvas().reset();
+            this._surface.getCanvas(antiAliasing).flush();
+            this._surface.getCanvas(antiAliasing).reset();
 
             var screenRect = new Rect(0, 0,
                 this._surface.size.width / this._surface.devicePixelRatio,
@@ -164,7 +169,7 @@ namespace Unity.UIWidgets.editor {
                 this._surface = null;
             }
 
-            this._surface = new GrSurface(size, devicePixelRatio, this._meshPool);
+            this._surface = new GrSurface(size, devicePixelRatio, this._meshPool, this._antiAliasing);
         }
     }
 
@@ -183,16 +188,16 @@ namespace Unity.UIWidgets.editor {
             return this._renderTexture;
         }
 
-        public Canvas getCanvas() {
+        public Canvas getCanvas(int antiAliasing) {
             if (this._canvas == null) {
                 this._canvas = new CommandBufferCanvas(
-                    this._renderTexture, this.devicePixelRatio, this._meshPool);
+                    this._renderTexture, this.devicePixelRatio, this._meshPool, antiAliasing);
             }
 
             return this._canvas;
         }
 
-        public GrSurface(Size size, float devicePixelRatio, MeshPool meshPool) {
+        public GrSurface(Size size, float devicePixelRatio, MeshPool meshPool, int antiAliasing) {
             this.size = size;
             this.devicePixelRatio = devicePixelRatio;
 
@@ -203,8 +208,8 @@ namespace Unity.UIWidgets.editor {
                 autoGenerateMips = false,
             };
 
-            if (Window.instance.antiAliasing != 0) {
-                desc.msaaSamples = Window.instance.antiAliasing;
+            if (antiAliasing != 0) {
+                desc.msaaSamples = antiAliasing;
             }
 
             this._renderTexture = new RenderTexture(desc);

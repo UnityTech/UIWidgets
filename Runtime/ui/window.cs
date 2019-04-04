@@ -133,6 +133,8 @@ namespace Unity.UIWidgets.ui {
 
         internal static Window _instance;
 
+        public const int DefaultAntiAliasing = 4;
+
         public float devicePixelRatio {
             get { return this._devicePixelRatio; }
         }
@@ -143,7 +145,7 @@ namespace Unity.UIWidgets.ui {
             get { return this._antiAliasing; }
         }
 
-        protected int _antiAliasing = 4;
+        protected int _antiAliasing = DefaultAntiAliasing;
 
         public Size physicalSize {
             get { return this._physicalSize; }

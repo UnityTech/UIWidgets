@@ -49,6 +49,8 @@ namespace UIWidgets.Tests {
 
         static Texture2D texture6;
 
+        int _antiAliasing = Window.DefaultAntiAliasing;
+
         CanvasAndLayers() {
             this._options = new Action[] {
                 this.drawPloygon4,
@@ -141,8 +143,8 @@ namespace UIWidgets.Tests {
                     autoGenerateMips = false,
                 };
 
-                if (Window.instance.antiAliasing != 0) {
-                    desc.msaaSamples = Window.instance.antiAliasing;
+                if (this._antiAliasing != 0) {
+                    desc.msaaSamples = this._antiAliasing;
                 }
 
                 this._renderTexture = RenderTexture.GetTemporary(desc);
