@@ -203,7 +203,16 @@ not invoked by UIWidgets. For example, if the code is in ```completed``` callbac
 you need to enclose them with window scope. 
 Please see [HttpRequestSample](./Samples/UIWidgetSample/HttpRequestSample.cs) for detail.
 For callback/event handler methods from UIWidgets (e.g ```Widget.build, State.initState...```), you don't need do
-it yourself, since the framework ensure it's in window scope. 
+it yourself, since the framework ensure it's in window scope.
+
+#### Show Status Bar on Android
+Status bar is always hidden by default when an Unity project is running on an Android device. If you
+ want to show the status bar in your App, this
+ [solution](https://github.com/Over17/UnityShowAndroidStatusBar) seems to be 
+ compatible to UIWidgets, therefore can be used as a good option before we release our
+ full support solution on this issue.
+
+ 
 ## Debug UIWidgets Application
 
 #### Define UIWidgets_DEBUG

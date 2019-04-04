@@ -166,7 +166,7 @@ UIWidgets应用是用**C＃脚本**来编写的。 请按照以下步骤创建�
 1. 选择**File** > **Build Settings...**打开Build Settings面板。
 2. 选择目标平台，点击Build。 之后Unity编辑器将自动组装所有相关资源并生成最终的应用程序包。
 
-#### 如何加载图像？
+#### 五、如何加载图像？
 1. 将你的图像文件，如image1.png，放在Resources文件夹中。
 2. 你可以在同一文件夹中添加image1@2.png和image1@3.png以支持高清屏幕显示。
 3. 使用Image.asset（“image1”）加载图像。 注意：因为是在Unity中，所以不需要添加.png后缀。
@@ -176,6 +176,11 @@ UIWidgets也支持Gif！
 1. 假设你有一个loading1.gif文件，将其重命名为loading1.gif.bytes并复制到Resources文件夹。
 2. 你可以在同一文件夹中添加loading1@2.gif.bytes和loading1@3.gif.bytes以支持高清屏幕显示。
 3. 使用Image.asset（“loading1.gif”）加载gif图像。
+
+#### 六、在安卓上显示状态栏
+当一个Unity项目运行在Android设备上时，状态栏是默认隐藏且无法在编辑内进行调整的。
+如果您希望在您的UIWidgets App中显示状态栏，您可以使用这个[解决方案](https://github.com/Over17/UnityShowAndroidStatusBar)。我们将尽快推出我们自己的解决方案，并保证届时开发者可以进行无缝切换。
+
 
 
 ## 调试UIWidgets应用程序

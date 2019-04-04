@@ -124,6 +124,11 @@ namespace Unity.UIWidgets.engine {
 
         protected override void OnEnable() {
             base.OnEnable();
+            
+            
+#if UNITY_ANDROID
+            Screen.fullScreen = false;
+#endif
             //Disable the default touch -> mouse event conversion on mobile devices
             Input.simulateMouseWithTouches = false;
 
