@@ -139,10 +139,8 @@ namespace Unity.UIWidgets.material {
             switch (this.widget.materialTapTargetSize ?? theme.materialTapTargetSize) {
                 case MaterialTapTargetSize.padded:
                     return new Size(Switch._kSwitchWidth, Switch._kSwitchHeight);
-                    break;
                 case MaterialTapTargetSize.shrinkWrap:
                     return new Size(Switch._kSwitchWidth, Switch._kSwitchHeightCollapsed);
-                    break;
             }
             D.assert(false);
             return null;

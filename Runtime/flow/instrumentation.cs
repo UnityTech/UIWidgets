@@ -20,9 +20,8 @@ namespace Unity.UIWidgets.flow {
 
     public class Stopwatch {
         float _start;
-        float[] _laps;
+        readonly float[] _laps;
         int _currentSample;
-        bool _cacheDirty;
 
         public Stopwatch() {
             this._start = InstrumentationUtils.now();
@@ -33,8 +32,6 @@ namespace Unity.UIWidgets.flow {
             for (int i = 0; i < this._laps.Length; i++) {
                 this._laps[i] = delta;
             }
-
-            this._cacheDirty = true;
         }
 
         public void start() {

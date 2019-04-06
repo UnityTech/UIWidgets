@@ -16,9 +16,6 @@ namespace Unity.UIWidgets.material {
                 default:
                     return Icons.arrow_back;
             }
-
-            D.assert(false);
-            return null;
         }
 
         public override Widget build(BuildContext context) {

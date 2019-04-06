@@ -792,7 +792,6 @@ namespace Unity.UIWidgets.rendering {
                 }
             }
 
-            D.assert(!widths.Any((float value) => { return value == null; }));
             float maxWidthConstraint = constraints.maxWidth;
             float minWidthConstraint = constraints.minWidth;
 
@@ -925,7 +924,6 @@ namespace Unity.UIWidgets.rendering {
             this._columnLefts = positions;
             tableWidth = positions.Last() + widths.Last();
 
-            D.assert(!positions.Any((float value) => { return value == null; }));
             this._rowTops.Clear();
             this._baselineDistance = null;
 
