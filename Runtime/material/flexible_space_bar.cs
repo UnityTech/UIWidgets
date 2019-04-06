@@ -72,8 +72,6 @@ namespace Unity.UIWidgets.material {
                 default:
                     return false;
             }
-
-            return null;
         }
 
 
