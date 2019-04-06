@@ -62,7 +62,8 @@ namespace Unity.UIWidgets.editor {
         bool _drawToSurface(LayerTree layerTree) {
             D.assert(this._surface != null);
 
-            var frame = this._surface.acquireFrame(layerTree.frameSize, layerTree.devicePixelRatio);
+            var frame = this._surface.acquireFrame(
+                layerTree.frameSize, layerTree.devicePixelRatio, layerTree.antiAliasing);
             if (frame == null) {
                 return false;
             }

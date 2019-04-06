@@ -177,6 +177,7 @@ namespace Unity.UIWidgets.editor {
         public void OnEnable() {
             this._devicePixelRatio = this.queryDevicePixelRatio();
             this._antiAliasing = this.queryAntiAliasing();
+            
             var size = this.queryWindowSize();
             this._lastWindowWidth = size.x;
             this._lastWindowHeight = size.y;
@@ -264,6 +265,10 @@ namespace Unity.UIWidgets.editor {
                 return true;
             }
 
+            if (this._antiAliasing != this.queryAntiAliasing()) {
+                return true;
+            }
+
             var size = this.queryWindowSize();
             if (this._lastWindowWidth != size.x
                 || this._lastWindowHeight != size.y) {
@@ -282,6 +287,8 @@ namespace Unity.UIWidgets.editor {
             using (this.getScope()) {
                 if (this.displayMetricsChanged()) {
                     this._devicePixelRatio = this.queryDevicePixelRatio();
+                    this._antiAliasing = this.queryAntiAliasing();
+                    
                     var size = this.queryWindowSize();
                     this._lastWindowWidth = size.x;
                     this._lastWindowHeight = size.y;
@@ -309,7 +316,7 @@ namespace Unity.UIWidgets.editor {
         protected abstract Vector2 queryWindowSize();
 
         protected virtual Surface createSurface() {
-            return new EditorWindowSurface(antiAliasing: this.antiAliasing);
+            return new WindowSurfaceImpl();
         }
 
         void _beginFrame() {
@@ -456,6 +463,7 @@ namespace Unity.UIWidgets.editor {
 
             layerTree.frameSize = this._physicalSize;
             layerTree.devicePixelRatio = this._devicePixelRatio;
+            layerTree.antiAliasing = this._antiAliasing;
             this._rasterizer.draw(layerTree);
         }
 

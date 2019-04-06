@@ -47,7 +47,7 @@ namespace Unity.UIWidgets.flow {
     }
 
     class _RasterCacheKey : IEquatable<_RasterCacheKey> {
-        internal _RasterCacheKey(Picture picture, Matrix3 matrix, float devicePixelRatio) {
+        internal _RasterCacheKey(Picture picture, Matrix3 matrix, float devicePixelRatio, int antiAliasing) {
             D.assert(picture != null);
             D.assert(matrix != null);
             this.picture = picture;
@@ -67,6 +67,7 @@ namespace Unity.UIWidgets.flow {
             this.matrix[2] = 0.0f;
             this.matrix[5] = 0.0f;            
             this.devicePixelRatio = devicePixelRatio;
+            this.antiAliasing = antiAliasing;
         }
 
         public readonly Picture picture;
@@ -74,6 +75,8 @@ namespace Unity.UIWidgets.flow {
         public readonly Matrix3 matrix;
 
         public readonly float devicePixelRatio;
+
+        public readonly int antiAliasing;
 
         public bool Equals(_RasterCacheKey other) {
             if (ReferenceEquals(null, other)) {
@@ -86,7 +89,8 @@ namespace Unity.UIWidgets.flow {
 
             return Equals(this.picture, other.picture) &&
                    Equals(this.matrix, other.matrix) &&
-                   this.devicePixelRatio.Equals(other.devicePixelRatio);
+                   this.devicePixelRatio.Equals(other.devicePixelRatio) &&
+                   this.antiAliasing.Equals(other.antiAliasing);
         }
 
         public override bool Equals(object obj) {
@@ -110,6 +114,7 @@ namespace Unity.UIWidgets.flow {
                 var hashCode = (this.picture != null ? this.picture.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (this.matrix != null ? this.matrix.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ this.devicePixelRatio.GetHashCode();
+                hashCode = (hashCode * 397) ^ this.antiAliasing.GetHashCode();
                 return hashCode;
             }
         }
@@ -140,18 +145,12 @@ namespace Unity.UIWidgets.flow {
         readonly Dictionary<_RasterCacheKey, _RasterCacheEntry> _cache;
 
         MeshPool _meshPool;
-
-        public int antiAliasing {
-            set { this._antiAliasing = value; }
-        }
-        int _antiAliasing = Window.defaultAntiAliasing;
-
         public MeshPool meshPool {
             set { this._meshPool = value; }
         }
 
         public RasterCacheResult getPrerolledImage(
-            Picture picture, Matrix3 transform, float devicePixelRatio, bool isComplex, bool willChange) {
+            Picture picture, Matrix3 transform, float devicePixelRatio, int antiAliasing, bool isComplex, bool willChange) {
             if (this.threshold == 0) {
                 return null;
             }
@@ -164,7 +163,7 @@ namespace Unity.UIWidgets.flow {
                 return null;
             }
 
-            _RasterCacheKey cacheKey = new _RasterCacheKey(picture, transform, devicePixelRatio);
+            _RasterCacheKey cacheKey = new _RasterCacheKey(picture, transform, devicePixelRatio, antiAliasing);
 
             var entry = this._cache.putIfAbsent(cacheKey, () => new _RasterCacheEntry());
 
@@ -177,7 +176,7 @@ namespace Unity.UIWidgets.flow {
 
             if (entry.image == null) {
                 D.assert(this._meshPool != null);
-                entry.image = this._rasterizePicture(picture, transform, devicePixelRatio, this._meshPool);
+                entry.image = this._rasterizePicture(picture, transform, devicePixelRatio, antiAliasing, this._meshPool);
             }
 
             return entry.image;
@@ -218,7 +217,7 @@ namespace Unity.UIWidgets.flow {
         }
 
         RasterCacheResult _rasterizePicture(Picture picture, Matrix3 transform, float devicePixelRatio,
-            MeshPool meshPool) {
+            int antiAliasing, MeshPool meshPool) {
             var bounds = transform.mapRect(picture.paintBounds).roundOut(devicePixelRatio);
 
             var desc = new RenderTextureDescriptor(
@@ -229,14 +228,14 @@ namespace Unity.UIWidgets.flow {
                 autoGenerateMips = false,
             };
 
-            if (this._antiAliasing != 0) {
-                desc.msaaSamples = this._antiAliasing;
+            if (antiAliasing != 0) {
+                desc.msaaSamples = antiAliasing;
             }
 
             var renderTexture = new RenderTexture(desc);
             renderTexture.hideFlags = HideFlags.HideAndDontSave;
 
-            var canvas = new CommandBufferCanvas(renderTexture, devicePixelRatio, meshPool, this._antiAliasing);
+            var canvas = new CommandBufferCanvas(renderTexture, devicePixelRatio, meshPool);
             canvas.translate(-bounds.left, -bounds.top);
             canvas.concat(transform);
             canvas.drawPicture(picture);

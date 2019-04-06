@@ -55,7 +55,7 @@ namespace Unity.UIWidgets.engine {
         }
 
         protected override Surface createSurface() {
-            return new EditorWindowSurface(this._uiWidgetsPanel.applyRenderTexture, this._antiAliasing);
+            return new WindowSurfaceImpl(this._uiWidgetsPanel.applyRenderTexture);
         }
 
         public override GUIContent titleContent {
@@ -170,7 +170,7 @@ namespace Unity.UIWidgets.engine {
         
         public int antiAliasing {
             get {
-                return this.antiAliasingOverride >= 0 ? this.antiAliasingOverride : Window.defaultAntiAliasing;
+                return this.antiAliasingOverride >= 0 ? this.antiAliasingOverride : QualitySettings.antiAliasing;
             }
         }
 

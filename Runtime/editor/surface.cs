@@ -54,14 +54,12 @@ namespace Unity.UIWidgets.editor {
     }
 
     public interface Surface : IDisposable {
-        SurfaceFrame acquireFrame(Size size, float devicePixelRatio);
+        SurfaceFrame acquireFrame(Size size, float devicePixelRatio, int antiAliasing);
 
         MeshPool getMeshPool();
-
-        int getAntiAliasing();
     }
 
-    public class EditorWindowSurface : Surface {
+    public class WindowSurfaceImpl : Surface {
         static Material _guiTextureMat;
         static Material _uiDefaultMat;
 
@@ -101,19 +99,13 @@ namespace Unity.UIWidgets.editor {
         GrSurface _surface;
         readonly DrawToTargetFunc _drawToTargetFunc;
         MeshPool _meshPool = new MeshPool();
-        int _antiAliasing;
 
-        public int getAntiAliasing() {
-            return this._antiAliasing;
-        }
-
-        public EditorWindowSurface(DrawToTargetFunc drawToTargetFunc = null, int antiAliasing = Window.defaultAntiAliasing) {
+        public WindowSurfaceImpl(DrawToTargetFunc drawToTargetFunc = null) {
             this._drawToTargetFunc = drawToTargetFunc;
-            this._antiAliasing = antiAliasing;
         }
 
-        public SurfaceFrame acquireFrame(Size size, float devicePixelRatio) {
-            this._createOrUpdateRenderTexture(size, devicePixelRatio);
+        public SurfaceFrame acquireFrame(Size size, float devicePixelRatio, int antiAliasing) {
+            this._createOrUpdateRenderTexture(size, devicePixelRatio, antiAliasing);
 
             return new SurfaceFrame(this._surface,
                 (frame, canvas) => this._presentSurface(canvas));
@@ -159,11 +151,12 @@ namespace Unity.UIWidgets.editor {
             return true;
         }
 
-        void _createOrUpdateRenderTexture(Size size, float devicePixelRatio) {
+        void _createOrUpdateRenderTexture(Size size, float devicePixelRatio, int antiAliasing) {
             if (this._surface != null
                 && this._surface.size == size
                 && this._surface.devicePixelRatio == devicePixelRatio
-                && this._surface.getRenderTexture() != null) {
+                && this._surface.antiAliasing == antiAliasing
+                && this._surface.getRenderTexture() != null) {                
                 return;
             }
 
@@ -172,7 +165,7 @@ namespace Unity.UIWidgets.editor {
                 this._surface = null;
             }
 
-            this._surface = new GrSurface(size, devicePixelRatio, this._meshPool, this._antiAliasing);
+            this._surface = new GrSurface(size, devicePixelRatio, antiAliasing, this._meshPool);
         }
     }
 
@@ -180,18 +173,14 @@ namespace Unity.UIWidgets.editor {
         public readonly Size size;
 
         public readonly float devicePixelRatio;
+        
+        public readonly int antiAliasing;
 
         readonly MeshPool _meshPool;
 
         RenderTexture _renderTexture;
 
         CommandBufferCanvas _canvas;
-
-        int _antiAliasing;
-
-        public int getAntiAliasing() {
-            return this._antiAliasing;
-        }
 
         public RenderTexture getRenderTexture() {
             return this._renderTexture;
@@ -200,16 +189,16 @@ namespace Unity.UIWidgets.editor {
         public Canvas getCanvas() {
             if (this._canvas == null) {
                 this._canvas = new CommandBufferCanvas(
-                    this._renderTexture, this.devicePixelRatio, this._meshPool, this._antiAliasing);
+                    this._renderTexture, this.devicePixelRatio, this._meshPool);
             }
 
             return this._canvas;
         }
 
-        public GrSurface(Size size, float devicePixelRatio, MeshPool meshPool, int antiAliasing = Window.defaultAntiAliasing) {
+        public GrSurface(Size size, float devicePixelRatio, int antiAliasing, MeshPool meshPool) {
             this.size = size;
             this.devicePixelRatio = devicePixelRatio;
-            this._antiAliasing = antiAliasing;
+            this.antiAliasing = antiAliasing;
 
             var desc = new RenderTextureDescriptor(
                 (int) this.size.width, (int) this.size.height,
