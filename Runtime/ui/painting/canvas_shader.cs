@@ -204,6 +204,22 @@ namespace Unity.UIWidgets.ui {
             _stencilMat = new Material(stencilShader) {hideFlags = HideFlags.HideAndDontSave};
             _filterMat = new Material(filterShader) {hideFlags = HideFlags.HideAndDontSave};
         }
+        
+        static readonly int _viewportId = Shader.PropertyToID("_viewport");
+        static readonly int _alphaId = Shader.PropertyToID("_alpha");
+        static readonly int _colorId = Shader.PropertyToID("_color");
+        static readonly int _shaderMatId = Shader.PropertyToID("_shaderMat");
+        static readonly int _shaderTexId = Shader.PropertyToID("_shaderTex");
+        static readonly int _leftColorId = Shader.PropertyToID("_leftColor");
+        static readonly int _rightColorId = Shader.PropertyToID("_rightColor");
+        static readonly int _tileModeId = Shader.PropertyToID("_tileMode");
+        static readonly int _biasId = Shader.PropertyToID("_bias");
+        static readonly int _scaleId = Shader.PropertyToID("_scale");
+        static readonly int _texId = Shader.PropertyToID("_tex");
+        static readonly int _texModeId = Shader.PropertyToID("_texMode");
+        static readonly int _mfRadiusId = Shader.PropertyToID("_mf_radius");
+        static readonly int _mfImgIncId = Shader.PropertyToID("_mf_imgInc");
+        static readonly int _mfKernelId = Shader.PropertyToID("_mf_kernel");
 
         static Vector4 _colorToVector4(Color c) {
             return new Vector4(
@@ -227,54 +243,54 @@ namespace Unity.UIWidgets.ui {
         }
 
         static void _getShaderPassAndProps(
-            PictureFlusher.RenderLayer layer, Paint paint, MeshMesh mesh, float alpha,
+            PictureFlusher.RenderLayer layer, Paint paint, Matrix3 meshMatrix, float alpha,
             out int pass, out MaterialPropertyBlock props) {
             Vector4 viewport = layer.viewport;
 
             props = new MaterialPropertyBlock();
-            props.SetVector("_viewport", viewport);
-            props.SetFloat("_alpha", alpha);
+            props.SetVector(_viewportId, viewport);
+            props.SetFloat(_alphaId, alpha);
 
             switch (paint.shader) {
                 case null:
                     pass = 0;
-                    props.SetVector("_color", _colorToVector4(paint.color));
+                    props.SetVector(_colorId, _colorToVector4(paint.color));
                     return;
                 case _LinearGradient linear:
                     pass = 1;
-                    props.SetMatrix("_shaderMat", linear.getGradientMat(
-                        _getShaderMatBase(layer.currentState, mesh.matrix)).toMatrix4x4());
-                    props.SetTexture("_shaderTex", linear.gradientTex.texture);
-                    props.SetVector("_leftColor", _colorToVector4(linear.leftColor));
-                    props.SetVector("_rightColor", _colorToVector4(linear.rightColor));
-                    props.SetInt("_tileMode", (int) linear.tileMode);
+                    props.SetMatrix(_shaderMatId, linear.getGradientMat(
+                        _getShaderMatBase(layer.currentState, meshMatrix)).toMatrix4x4());
+                    props.SetTexture(_shaderTexId, linear.gradientTex.texture);
+                    props.SetVector(_leftColorId, _colorToVector4(linear.leftColor));
+                    props.SetVector(_rightColorId, _colorToVector4(linear.rightColor));
+                    props.SetInt(_tileModeId, (int) linear.tileMode);
                     return;
                 case _RadialGradient radial:
                     pass = 2;
-                    props.SetMatrix("_shaderMat", radial.getGradientMat(
-                        _getShaderMatBase(layer.currentState, mesh.matrix)).toMatrix4x4());
-                    props.SetTexture("_shaderTex", radial.gradientTex.texture);
-                    props.SetVector("_leftColor", _colorToVector4(radial.leftColor));
-                    props.SetVector("_rightColor", _colorToVector4(radial.rightColor));
-                    props.SetInt("_tileMode", (int) radial.tileMode);
+                    props.SetMatrix(_shaderMatId, radial.getGradientMat(
+                        _getShaderMatBase(layer.currentState, meshMatrix)).toMatrix4x4());
+                    props.SetTexture(_shaderTexId, radial.gradientTex.texture);
+                    props.SetVector(_leftColorId, _colorToVector4(radial.leftColor));
+                    props.SetVector(_rightColorId, _colorToVector4(radial.rightColor));
+                    props.SetInt(_tileModeId, (int) radial.tileMode);
                     return;
                 case _SweepGradient sweep:
                     pass = 3;
-                    props.SetMatrix("_shaderMat", sweep.getGradientMat(
-                        _getShaderMatBase(layer.currentState, mesh.matrix)).toMatrix4x4());
-                    props.SetTexture("_shaderTex", sweep.gradientTex.texture);
-                    props.SetVector("_leftColor", _colorToVector4(sweep.leftColor));
-                    props.SetVector("_rightColor", _colorToVector4(sweep.rightColor));
-                    props.SetInt("_tileMode", (int) sweep.tileMode);
-                    props.SetFloat("_bias", sweep.bias);
-                    props.SetFloat("_scale", sweep.scale);
+                    props.SetMatrix(_shaderMatId, sweep.getGradientMat(
+                        _getShaderMatBase(layer.currentState, meshMatrix)).toMatrix4x4());
+                    props.SetTexture(_shaderTexId, sweep.gradientTex.texture);
+                    props.SetVector(_leftColorId, _colorToVector4(sweep.leftColor));
+                    props.SetVector(_rightColorId, _colorToVector4(sweep.rightColor));
+                    props.SetInt(_tileModeId, (int) sweep.tileMode);
+                    props.SetFloat(_biasId, sweep.bias);
+                    props.SetFloat(_scaleId, sweep.scale);
                     return;
                 case ImageShader image:
                     pass = 4;
-                    props.SetMatrix("_shaderMat", image.getShaderMat(
-                        _getShaderMatBase(layer.currentState, mesh.matrix)).toMatrix4x4());
-                    props.SetTexture("_shaderTex", image.image.texture);
-                    props.SetInt("_tileMode", (int) image.tileMode);
+                    props.SetMatrix(_shaderMatId, image.getShaderMat(
+                        _getShaderMatBase(layer.currentState, meshMatrix)).toMatrix4x4());
+                    props.SetTexture(_shaderTexId, image.image.texture);
+                    props.SetInt(_tileModeId, (int) image.tileMode);
                     return;
                 default:
                     throw new Exception("Unknown paint.shader: " + paint.shader);
@@ -284,7 +300,7 @@ namespace Unity.UIWidgets.ui {
         public static PictureFlusher.CmdDraw convexFill(PictureFlusher.RenderLayer layer, Paint paint,
             MeshMesh mesh) {
             var mat = _convexFillMat.getMaterial(paint.blendMode, layer.ignoreClip);
-            _getShaderPassAndProps(layer, paint, mesh, 1.0f, out var pass, out var props);
+            _getShaderPassAndProps(layer, paint, mesh.matrix, 1.0f, out var pass, out var props);
 
             return new PictureFlusher.CmdDraw {
                 mesh = mesh,
@@ -300,7 +316,7 @@ namespace Unity.UIWidgets.ui {
 
             var pass = 0;
             var props = new MaterialPropertyBlock();
-            props.SetVector("_viewport", viewport);
+            props.SetVector(_viewportId, viewport);
 
             return new PictureFlusher.CmdDraw {
                 mesh = mesh,
@@ -313,7 +329,7 @@ namespace Unity.UIWidgets.ui {
         public static PictureFlusher.CmdDraw fill1(PictureFlusher.RenderLayer layer, Paint paint,
             MeshMesh mesh) {
             var mat = _fill1Mat.getMaterial(paint.blendMode);
-            _getShaderPassAndProps(layer, paint, mesh, 1.0f, out var pass, out var props);
+            _getShaderPassAndProps(layer, paint, mesh.matrix, 1.0f, out var pass, out var props);
 
             return new PictureFlusher.CmdDraw {
                 mesh = mesh.boundsMesh,
@@ -326,7 +342,7 @@ namespace Unity.UIWidgets.ui {
         public static PictureFlusher.CmdDraw stroke0(PictureFlusher.RenderLayer layer, Paint paint,
             float alpha, MeshMesh mesh) {
             var mat = _stroke0Mat.getMaterial(paint.blendMode, layer.ignoreClip);
-            _getShaderPassAndProps(layer, paint, mesh, alpha, out var pass, out var props);
+            _getShaderPassAndProps(layer, paint, mesh.matrix, alpha, out var pass, out var props);
 
             return new PictureFlusher.CmdDraw {
                 mesh = mesh,
@@ -342,7 +358,7 @@ namespace Unity.UIWidgets.ui {
 
             var pass = 0;
             var props = new MaterialPropertyBlock();
-            props.SetVector("_viewport", viewport);
+            props.SetVector(_viewportId, viewport);
 
             return new PictureFlusher.CmdDraw {
                 mesh = mesh,
@@ -359,7 +375,7 @@ namespace Unity.UIWidgets.ui {
 
             var pass = 0;
             var props = new MaterialPropertyBlock();
-            props.SetVector("_viewport", viewport);
+            props.SetVector(_viewportId, viewport);
 
             return new PictureFlusher.CmdDraw {
                 mesh = mesh,
@@ -375,7 +391,7 @@ namespace Unity.UIWidgets.ui {
 
             var pass = 1;
             var props = new MaterialPropertyBlock();
-            props.SetVector("_viewport", viewport);
+            props.SetVector(_viewportId, viewport);
 
             return new PictureFlusher.CmdDraw {
                 mesh = mesh,
@@ -391,7 +407,7 @@ namespace Unity.UIWidgets.ui {
 
             var pass = 2;
             var props = new MaterialPropertyBlock();
-            props.SetVector("_viewport", viewport);
+            props.SetVector(_viewportId, viewport);
 
             return new PictureFlusher.CmdDraw {
                 mesh = mesh,
@@ -404,11 +420,11 @@ namespace Unity.UIWidgets.ui {
         public static PictureFlusher.CmdDraw tex(PictureFlusher.RenderLayer layer, Paint paint,
             MeshMesh mesh, Image image) {
             var mat = _texMat.getMaterial(paint.blendMode, layer.ignoreClip);
-            _getShaderPassAndProps(layer, paint, mesh, 1.0f, out var pass, out var props);
+            _getShaderPassAndProps(layer, paint, mesh.matrix, 1.0f, out var pass, out var props);
 
             image.texture.filterMode = paint.filterMode;
-            props.SetTexture("_tex", image.texture);
-            props.SetInt("_texMode", image.texture is RenderTexture ? 1 : 0); // pre alpha if RT else post alpha
+            props.SetTexture(_texId, image.texture);
+            props.SetInt(_texModeId, image.texture is RenderTexture ? 1 : 0); // pre alpha if RT else post alpha
 
             return new PictureFlusher.CmdDraw {
                 mesh = mesh,
@@ -422,8 +438,8 @@ namespace Unity.UIWidgets.ui {
         public static PictureFlusher.CmdDraw texRT(PictureFlusher.RenderLayer layer, Paint paint,
             MeshMesh mesh, PictureFlusher.RenderLayer renderLayer) {
             var mat = _texMat.getMaterial(paint.blendMode, layer.ignoreClip);
-            _getShaderPassAndProps(layer, paint, mesh, 1.0f, out var pass, out var props);
-            props.SetInt("_texMode", 1); // pre alpha
+            _getShaderPassAndProps(layer, paint, mesh.matrix, 1.0f, out var pass, out var props);
+            props.SetInt(_texModeId, 1); // pre alpha
 
             return new PictureFlusher.CmdDraw {
                 mesh = mesh,
@@ -448,10 +464,11 @@ namespace Unity.UIWidgets.ui {
             MeshMesh mesh, TextBlobMesh textMesh, Texture tex) {
             
             var mat = _texMat.getMaterial(paint.blendMode, layer.ignoreClip);
-            _getShaderPassAndProps(layer, paint, mesh, 1.0f, out var pass, out var props);
+            var meshMatrix = mesh != null ? mesh.matrix : textMesh.matrix;
+            _getShaderPassAndProps(layer, paint, meshMatrix, 1.0f, out var pass, out var props);
             tex.filterMode = paint.filterMode;
-            props.SetTexture("_tex", tex);
-            props.SetInt("_texMode", 2); // alpha only
+            props.SetTexture(_texId, tex);
+            props.SetInt(_texModeId, 2); // alpha only
 
             return new PictureFlusher.CmdDraw {
                 mesh = mesh,
@@ -469,11 +486,11 @@ namespace Unity.UIWidgets.ui {
 
             var pass = 0;
             var props = new MaterialPropertyBlock();
-            props.SetVector("_viewport", viewport);
+            props.SetVector(_viewportId, viewport);
 
-            props.SetFloat("_mf_radius", radius);
-            props.SetVector("_mf_imgInc", imgInc);
-            props.SetFloatArray("_mf_kernel", kernel);
+            props.SetFloat(_mfRadiusId, radius);
+            props.SetVector(_mfImgIncId, imgInc);
+            props.SetFloatArray(_mfKernelId, kernel);
 
             return new PictureFlusher.CmdDraw {
                 mesh = mesh,
