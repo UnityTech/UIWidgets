@@ -121,8 +121,6 @@ namespace Unity.UIWidgets.material {
                 default:
                     return false;
             }
-
-            return null;
         }
 
         public override State createState() {
@@ -194,15 +192,6 @@ namespace Unity.UIWidgets.material {
 
             Widget title = this.widget.title;
             if (title != null) {
-                bool namesRoute = false;
-                switch (Application.platform) {
-                    case RuntimePlatform.IPhonePlayer:
-                        break;
-                    default:
-                        namesRoute = true;
-                        break;
-                }
-
                 title = new DefaultTextStyle(
                     style: centerStyle,
                     softWrap: false,
