@@ -86,18 +86,19 @@ namespace Unity.UIWidgets.ui {
     class TextBlobMesh {
         
         static readonly Dictionary<MeshKey, MeshInfo> _meshes = new Dictionary<MeshKey, MeshInfo>();
-
         static long _frameCount = 0;
-        readonly TextBlob _textBlob;
-        readonly float _scale;
-        readonly Matrix3 _transform;
+        
+        public readonly TextBlob textBlob;
+        public readonly float scale;
+        public readonly Matrix3 matrix;
+        
         MeshMesh _mesh;
         bool _resolved;
 
-        public TextBlobMesh(TextBlob textBlob, float scale, Matrix3 transform) {
-            this._textBlob = textBlob;
-            this._scale = scale;
-            this._transform = transform;
+        public TextBlobMesh(TextBlob textBlob, float scale, Matrix3 matrix) {
+            this.textBlob = textBlob;
+            this.scale = scale;
+            this.matrix = matrix;
         }
         
         public static long frameCount {
@@ -124,29 +125,29 @@ namespace Unity.UIWidgets.ui {
 
             this._resolved = true;
             
-            var style = this._textBlob.style;
+            var style = this.textBlob.style;
             var fontInfo = FontManager.instance.getOrCreate(style.fontFamily, style.fontWeight, style.fontStyle);
-            var key = new MeshKey(this._textBlob.instanceId, this._scale);
+            var key = new MeshKey(this.textBlob.instanceId, this.scale);
 
             _meshes.TryGetValue(key, out var meshInfo);
             if (meshInfo != null && meshInfo.textureVersion == fontInfo.textureVersion) {
                 meshInfo.touch();
-                this._mesh = meshInfo.mesh.transform(this._transform);
+                this._mesh = meshInfo.mesh.transform(this.matrix);
                 return this._mesh;
             }
 
             var font = fontInfo.font;
-            var length = this._textBlob.textSize;
-            var text = this._textBlob.text;
-            var fontSizeToLoad = Mathf.CeilToInt(style.UnityFontSize * this._scale);
+            var length = this.textBlob.textSize;
+            var text = this.textBlob.text;
+            var fontSizeToLoad = Mathf.CeilToInt(style.UnityFontSize * this.scale);
 
             var vertices = new List<Vector3>(length * 4);
             var triangles = new List<int>(length * 6);
             var uv = new List<Vector2>(length * 4);
             for (int charIndex = 0; charIndex < length; ++charIndex) {
-                var ch = text[charIndex + this._textBlob.textOffset];
+                var ch = text[charIndex + this.textBlob.textOffset];
                 // first char as origin for mesh position 
-                var position = this._textBlob.positions[charIndex];
+                var position = this.textBlob.positions[charIndex];
                 if (LayoutUtils.isWordSpace(ch) || LayoutUtils.isLineEndSpace(ch) || ch == '\t') {
                     continue;
                 }
@@ -155,10 +156,10 @@ namespace Unity.UIWidgets.ui {
                     continue;
                 }
                 var glyphInfo = font.getGlyphInfo(ch, fontSizeToLoad, style.UnityFontStyle);
-                var minX = glyphInfo.rect.left / this._scale;
-                var maxX = glyphInfo.rect.right / this._scale;
-                var minY = glyphInfo.rect.top / this._scale;
-                var maxY = glyphInfo.rect.bottom / this._scale;
+                var minX = glyphInfo.rect.left / this.scale;
+                var maxX = glyphInfo.rect.right / this.scale;
+                var minY = glyphInfo.rect.top / this.scale;
+                var maxY = glyphInfo.rect.bottom / this.scale;
 
                 var baseIndex = vertices.Count;
 
@@ -188,7 +189,7 @@ namespace Unity.UIWidgets.ui {
             MeshMesh mesh = vertices.Count > 0 ? new MeshMesh(null, vertices, triangles, uv) : null;
             _meshes[key] = new MeshInfo(key, mesh, fontInfo.textureVersion);
 
-            this._mesh = mesh.transform(this._transform);
+            this._mesh = mesh.transform(this.matrix);
             return this._mesh;
         }
     }

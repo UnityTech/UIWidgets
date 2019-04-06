@@ -710,8 +710,10 @@ namespace Unity.UIWidgets.ui {
             var scale = state.scale * this._devicePixelRatio;
             
             var matrix = new Matrix3(state.matrix);
-            matrix.preTranslate(offset.dx, offset.dy);            
+            matrix.preTranslate(offset.dx, offset.dy);
+            
             var mesh = new TextBlobMesh(textBlob, scale, matrix);
+            var textBlobBounds = matrix.mapRect(textBlob.boundsInText);
             
             // request font texture so text mesh could be generated correctly
             var style = textBlob.style;
@@ -723,7 +725,7 @@ namespace Unity.UIWidgets.ui {
             var tex = font.material.mainTexture;
 
             Action<Paint> drawMesh = (Paint p) => {
-                if (!this._applyClip(matrix.mapRect(textBlob.bounds))) {
+                if (!this._applyClip(textBlobBounds)) {
                     return;
                 }
 
@@ -732,7 +734,7 @@ namespace Unity.UIWidgets.ui {
             };
 
             if (paint.maskFilter != null && paint.maskFilter.sigma != 0) {
-                this._drawWithMaskFilter(textBlob.bounds, drawMesh, paint, paint.maskFilter);
+                this._drawWithMaskFilter(textBlobBounds, drawMesh, paint, paint.maskFilter);
                 return;
             }
 
