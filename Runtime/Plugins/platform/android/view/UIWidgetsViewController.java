@@ -140,7 +140,7 @@ public class UIWidgetsViewController {
         viewMetrics.padding_left = zeroSides == ZeroSides.LEFT || zeroSides == ZeroSides.BOTH ? 0 : rect.left;
         
         viewMetrics.insets_top = 0;
-        viewMetrics.insets_right = hasNavigationBar() ? 1 : 2;
+        viewMetrics.insets_right = 0;
         viewMetrics.insets_bottom = navigationBarHidden? calculateBottomKeyboardInset(rect) : rect.bottom;
         viewMetrics.insets_left = 0;
     }
