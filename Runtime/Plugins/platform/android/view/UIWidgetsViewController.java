@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.app.Activity;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.view.Surface;
 import java.util.Arrays;
 import android.view.WindowManager;
@@ -78,6 +79,24 @@ public class UIWidgetsViewController {
         }
     }
     
+    
+    private int getNavigationBarHeight() {
+         Resources resources = UnityPlayer.currentActivity.getResources();
+         int resourceId = resources.getIdentifier("navigation_bar_height", "dimen", "android");
+         if (resourceId > 0)
+         {
+            return hasNavigationBar() ? resources.getDimensionPixelSize(resourceId) : 0;
+         }
+         
+         return 0;
+    }
+            
+    private boolean hasNavigationBar() {
+        Resources resources = UnityPlayer.currentActivity.getResources();
+        int id = resources.getIdentifier("config_showNavigationBar", "bool", "android");
+        return id > 0 && resources.getBoolean(id);
+    }
+    
     public void updateViewMetrics() {
         final View unityView = ((ViewGroup)UnityPlayer.currentActivity.findViewById(android.R.id.content)).getChildAt(0);
         Rect rect = new Rect();
@@ -92,12 +111,15 @@ public class UIWidgetsViewController {
         ZeroSides zeroSides = ZeroSides.NONE;
         if (navigationBarHidden) {
             zeroSides = calculateShouldZeroSides(unityView);
+        } else {
+            rect.bottom -= getNavigationBarHeight();
+            rect.bottom = rect.bottom > 0 ? rect.bottom : 0;
         }
         
         viewMetrics.padding_top = rect.top;
         viewMetrics.padding_right = zeroSides == ZeroSides.RIGHT || zeroSides == ZeroSides.BOTH ? 0 : rect.right;
         viewMetrics.padding_bottom = 0;
-        viewMetrics.padding_left = zeroSides == ZeroSides.LEFT || zeroSides == ZeroSides.BOTH ? 0 : rect.left;  
+        viewMetrics.padding_left = zeroSides == ZeroSides.LEFT || zeroSides == ZeroSides.BOTH ? 0 : rect.left;
         
         viewMetrics.insets_top = 0;
         viewMetrics.insets_right = 0;
