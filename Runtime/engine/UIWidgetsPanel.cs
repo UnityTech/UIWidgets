@@ -21,6 +21,7 @@ namespace Unity.UIWidgets.engine {
         protected override void updateSafeArea() {
             this._padding = this._uiWidgetsPanel.viewPadding;
             this._viewInsets = this._uiWidgetsPanel.viewInsets;
+            Debug.Log("update safe area>>> " + this._padding + " ; " + this._viewInsets);
         }
 
         protected override bool hasFocus() {
@@ -118,6 +119,7 @@ namespace Unity.UIWidgets.engine {
         const int mouseButtonNum = 3;
 
         void _handleViewMetricsChanged(string method, List<JSONNode> args) {
+            Debug.Log("handle view metrics changed");
             this._windowAdapter.onViewMetricsChanged();
             this._displayMetrics.Update();
         }
