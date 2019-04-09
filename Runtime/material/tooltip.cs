@@ -79,7 +79,7 @@ namespace Unity.UIWidgets.material {
             }
         }
 
-        bool ensureTooltopVisible() {
+        bool ensureTooltipVisible() {
             if (this._entry != null) {
                 this._timer?.cancel();
                 this._timer = null;
@@ -147,6 +147,9 @@ namespace Unity.UIWidgets.material {
         }
 
         void _handleLongPress() {
+            bool tooltipCreated = this.ensureTooltipVisible();
+            if (tooltipCreated)
+                Feedback.forLongPress(this.context);
         }
 
 
