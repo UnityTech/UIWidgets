@@ -17,6 +17,7 @@ import android.view.Surface;
 import java.util.Arrays;
 import android.view.WindowManager;
 import android.os.Handler;
+import java.lang.reflect.Method;
 
 public class UIWidgetsViewController {
 
@@ -92,9 +93,26 @@ public class UIWidgetsViewController {
     }
             
     private boolean hasNavigationBar() {
+        boolean hasBar = false;
         Resources resources = UnityPlayer.currentActivity.getResources();
         int id = resources.getIdentifier("config_showNavigationBar", "bool", "android");
-        return id > 0 && resources.getBoolean(id);
+        if (id > 0) {
+            hasBar = resources.getBoolean(id);
+        }
+        try {
+                Class systemPropertiesClass = Class.forName("android.os.SystemProperties");
+                Method m = systemPropertiesClass.getMethod("get", String.class);
+                String navBarOverride = (String) m.invoke(systemPropertiesClass, "qemu.hw.mainkeys");
+                if ("1".equals(navBarOverride)) {
+                    hasBar = false;
+                } else if ("0".equals(navBarOverride)) {
+                    hasBar = true;
+                }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        return hasBar;
     }
     
     public void updateViewMetrics() {

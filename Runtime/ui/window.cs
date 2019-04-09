@@ -248,14 +248,14 @@ namespace Unity.UIWidgets.ui {
         public abstract IDisposable getScope();
 
 
-        float deltaTime;
+        float fpsDeltaTime;
 
-        public void updateDeltaTime(float unscaledDeltaTime) {
-            this.deltaTime += (unscaledDeltaTime - this.deltaTime) * 0.1f;
+        public void updateFPS(float unscaledDeltaTime) {
+            this.fpsDeltaTime += (unscaledDeltaTime - this.fpsDeltaTime) * 0.1f;
         }
 
         public float getFPS() {
-            return 1.0f / this.deltaTime;
+            return 1.0f / this.fpsDeltaTime;
         }
     }
 }

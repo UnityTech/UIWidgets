@@ -110,14 +110,13 @@ namespace Unity.UIWidgets.engine {
         Vector2 _lastMouseMove;
 
         HashSet<int> _enteredPointers;
-        
+
         bool _viewMetricsCallbackRegistered;
 
         bool _mouseEntered {
             get { return !this._enteredPointers.isEmpty(); }
         }
 
-        readonly ScrollInput _scrollInput = new ScrollInput();
         DisplayMetrics _displayMetrics;
 
         const int mouseButtonNum = 3;
@@ -129,8 +128,8 @@ namespace Unity.UIWidgets.engine {
 
         protected override void OnEnable() {
             base.OnEnable();
-            
-            
+
+
 #if UNITY_ANDROID
             Screen.fullScreen = false;
 #endif
@@ -139,7 +138,7 @@ namespace Unity.UIWidgets.engine {
 
             this._displayMetrics = DisplayMetricsProvider.provider();
             this._displayMetrics.OnEnable();
-            
+
             if (_repaintEvent == null) {
                 _repaintEvent = new Event {type = EventType.Repaint};
             }
@@ -248,25 +247,11 @@ namespace Unity.UIWidgets.engine {
             if (Input.mouseScrollDelta.y != 0 || Input.mouseScrollDelta.x != 0) {
                 var scaleFactor = this.canvas.scaleFactor;
                 var pos = this.getPointPosition(Input.mousePosition);
-                this._scrollInput.onScroll(Input.mouseScrollDelta.x * scaleFactor,
+                this._windowAdapter.onScroll(Input.mouseScrollDelta.x * scaleFactor,
                     Input.mouseScrollDelta.y * scaleFactor,
                     pos.x,
                     pos.y,
                     InputUtils.getScrollButtonKey());
-            }
-
-            var deltaScroll = this._scrollInput.getScrollDelta();
-            if (deltaScroll != Vector2.zero) {
-                this._windowAdapter.postPointerEvent(new ScrollData(
-                    timeStamp: Timer.timespanSinceStartup,
-                    change: PointerChange.scroll,
-                    kind: PointerDeviceKind.mouse,
-                    device: this._scrollInput.getDeviceId(),
-                    physicalX: this._scrollInput.getPointerPosX(),
-                    physicalY: this._scrollInput.getPointerPosY(),
-                    scrollX: deltaScroll.x,
-                    scrollY: deltaScroll.y
-                ));
             }
         }
 

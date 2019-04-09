@@ -2,13 +2,13 @@ using UnityEngine;
 
 namespace Unity.UIWidgets.editor {
     public class ScrollInput {
-        readonly int _bufferSize = 20;
-        readonly float _scrollScale = 10;
+        readonly float _bufferSize = 20.0f / 60;            // a scroll action leads to 20 frames, i.e., ( 20 / 60 ) seconds smoothly-scrolling when fps = 60 (default)
+        readonly float _scrollScale = 20;
 
         float _scrollDeltaX;
         float _scrollDeltaY;
 
-        int _bufferIndex;
+        float _bufferIndex;
         float _curDeltaX;
         float _curDeltaY;
 
@@ -16,7 +16,7 @@ namespace Unity.UIWidgets.editor {
         float _pointerY;
         int _buttonId;
 
-        public ScrollInput(int? bufferSize = null, float? scrollScale = null) {
+        public ScrollInput(float? bufferSize = null, float? scrollScale = null) {
             this._bufferSize = bufferSize ?? this._bufferSize;
             this._scrollScale = scrollScale ?? this._scrollScale;
 
@@ -51,30 +51,30 @@ namespace Unity.UIWidgets.editor {
             return this._pointerY;
         }
 
-        public Vector2 getScrollDelta() {
+        public Vector2 getScrollDelta(float deltaTime) {
             if (this._scrollDeltaX == 0 && this._scrollDeltaY == 0) {
                 return Vector2.zero;
             }
 
             var deltaScroll = new Vector2();
-            if (this._bufferIndex == 0) {
+            if (this._bufferIndex <= deltaTime) {
                 deltaScroll.x = this._scrollDeltaX;
                 deltaScroll.y = this._scrollDeltaY;
                 this._scrollDeltaX = 0;
                 this._scrollDeltaY = 0;
             }
             else {
-                deltaScroll.x = this._curDeltaX;
-                deltaScroll.y = this._curDeltaY;
+                deltaScroll.x = this._curDeltaX * deltaTime;
+                deltaScroll.y = this._curDeltaY * deltaTime;
                 this._scrollDeltaX = this._curDeltaX > 0
-                    ? Mathf.Max(0, this._scrollDeltaX - this._curDeltaX)
-                    : Mathf.Min(0, this._scrollDeltaX - this._curDeltaX);
+                    ? Mathf.Max(0, this._scrollDeltaX - this._curDeltaX * deltaTime)
+                    : Mathf.Min(0, this._scrollDeltaX - this._curDeltaX * deltaTime);
                 this._scrollDeltaY = this._curDeltaY > 0
-                    ? Mathf.Max(0, this._scrollDeltaY - this._curDeltaY)
-                    : Mathf.Min(0, this._scrollDeltaY - this._curDeltaY);
-                this._bufferIndex--;
+                    ? Mathf.Max(0, this._scrollDeltaY - this._curDeltaY * deltaTime)
+                    : Mathf.Min(0, this._scrollDeltaY - this._curDeltaY * deltaTime);
+                this._bufferIndex -= deltaTime;
             }
-
+            
             return deltaScroll;
         }
     }
