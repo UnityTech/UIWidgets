@@ -395,7 +395,7 @@ namespace Unity.UIWidgets.editor {
         }
 
         void _updateScrollInput() {
-            var deltaScroll = this._scrollInput.getScrollDelta();
+            var deltaScroll = this._scrollInput.getScrollDelta(Time.deltaTime);
 
             if (deltaScroll == Vector2.zero) {
                 return;

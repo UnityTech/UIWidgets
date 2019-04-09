@@ -237,7 +237,7 @@ namespace Unity.UIWidgets.engine {
                     InputUtils.getScrollButtonKey());
             }
 
-            var deltaScroll = this._scrollInput.getScrollDelta();
+            var deltaScroll = this._scrollInput.getScrollDelta(Time.deltaTime);
             if (deltaScroll != Vector2.zero) {
                 this._windowAdapter.postPointerEvent(new ScrollData(
                     timeStamp: Timer.timespanSinceStartup,
