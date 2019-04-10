@@ -7,7 +7,6 @@ using Unity.UIWidgets.material;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.ui;
 using UnityEditor;
-using UnityEditor.Experimental.UIElements;
 using UnityEngine;
 using Color = Unity.UIWidgets.ui.Color;
 using Gradient = Unity.UIWidgets.ui.Gradient;
@@ -68,7 +67,6 @@ namespace UIWidgets.Tests {
             this._selected = 0;
 
             this.titleContent = new GUIContent("CanvasAndLayers");
-            this.SetAntiAliasing(4);
         }
 
         void OnGUI() {
