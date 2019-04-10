@@ -153,11 +153,6 @@ namespace Unity.UIWidgets.editor {
 
         bool _alive;
 
-        Timer scheduleFrameTimer;
-        const int maxTargetFrameRate = 60;
-        const int minTargetFrameRate = 15;
-        const int targetFrameRateAdaptStep = 10;
-
         public bool alive {
             get { return this._alive; }
         }
@@ -469,21 +464,6 @@ namespace Unity.UIWidgets.editor {
             if (regenerateLayerTree) {
                 this._regenerateLayerTree = true;
             }
-
-            Application.targetFrameRate = maxTargetFrameRate;
-            this.scheduleFrameTimer?.cancel();
-            this.scheduleFrameTimer = instance.run(
-                new TimeSpan(0, 0, 0, 1),
-                () => {
-                    if (Application.targetFrameRate > minTargetFrameRate) {
-                        Application.targetFrameRate -= targetFrameRateAdaptStep;
-                    }
-                    else {
-                        Application.targetFrameRate = minTargetFrameRate;
-                        this.scheduleFrameTimer.cancel();
-                        this.scheduleFrameTimer = null;
-                    }
-                }, true);
         }
 
         public override void render(Scene scene) {
