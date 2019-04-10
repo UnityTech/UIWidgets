@@ -109,7 +109,7 @@ namespace Unity.UIWidgets.engine {
         Texture _texture;
         Vector2 _lastMouseMove;
 
-        HashSet<int> _enteredPointers;
+        readonly HashSet<int> _enteredPointers = new HashSet<int>();
 
         bool _viewMetricsCallbackRegistered;
 
@@ -129,15 +129,13 @@ namespace Unity.UIWidgets.engine {
         protected override void OnEnable() {
             base.OnEnable();
 
-
-#if UNITY_ANDROID
-            Screen.fullScreen = false;
-#endif
             //Disable the default touch -> mouse event conversion on mobile devices
             Input.simulateMouseWithTouches = false;
 
             this._displayMetrics = DisplayMetricsProvider.provider();
             this._displayMetrics.OnEnable();
+            
+            this._enteredPointers.Clear();
 
             if (_repaintEvent == null) {
                 _repaintEvent = new Event {type = EventType.Repaint};
@@ -155,8 +153,6 @@ namespace Unity.UIWidgets.engine {
 
             this._windowAdapter.attachRootWidget(root);
             this._lastMouseMove = Input.mousePosition;
-
-            this._enteredPointers = new HashSet<int>();
         }
 
         public float devicePixelRatio {
