@@ -760,7 +760,7 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
-    class IndexedStack : Stack {
+    public class IndexedStack : Stack {
         public IndexedStack(
             Key key = null,
             Alignment alignment = null,
