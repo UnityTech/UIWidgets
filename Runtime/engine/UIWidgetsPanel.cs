@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Unity.UIWidgets.async;
 using Unity.UIWidgets.editor;
@@ -109,7 +108,7 @@ namespace Unity.UIWidgets.engine {
         WindowAdapter _windowAdapter;
         Texture _texture;
         Vector2 _lastMouseMove;
-        
+
         readonly HashSet<int> _enteredPointers = new HashSet<int>();
 
         bool _viewMetricsCallbackRegistered;
