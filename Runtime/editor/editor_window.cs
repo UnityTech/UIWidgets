@@ -153,7 +153,10 @@ namespace Unity.UIWidgets.editor {
 
         bool _alive;
 
-        Timer scheduleFrameTimer = null;
+        Timer scheduleFrameTimer;
+        const int maxTargetFrameRate = 60;
+        const int minTargetFrameRate = 15;
+        const int targetFrameRateAdaptStep = 10;
 
         public bool alive {
             get { return this._alive; }
@@ -466,15 +469,15 @@ namespace Unity.UIWidgets.editor {
             if (regenerateLayerTree) {
                 this._regenerateLayerTree = true;
             }
-            Application.targetFrameRate = 60;
+            Application.targetFrameRate = maxTargetFrameRate;
             this.scheduleFrameTimer?.cancel();
             this.scheduleFrameTimer = instance.run(
                 new TimeSpan(0, 0, 0, 1),
                 () => {
-                    if (Application.targetFrameRate > 10)
-                        Application.targetFrameRate -= 10;
+                    if (Application.targetFrameRate > minTargetFrameRate)
+                        Application.targetFrameRate -= targetFrameRateAdaptStep;
                     else {
-                        Application.targetFrameRate = 10;
+                        Application.targetFrameRate = minTargetFrameRate;
                         this.scheduleFrameTimer.cancel();
                         this.scheduleFrameTimer = null;
                     }
