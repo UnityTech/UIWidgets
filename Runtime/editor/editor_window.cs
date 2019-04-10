@@ -464,8 +464,8 @@ namespace Unity.UIWidgets.editor {
             if (regenerateLayerTree) {
                 this._regenerateLayerTree = true;
             }
-            UIWidgetsGlobalSettings.instance.speedUpFrameRate();
-            UIWidgetsGlobalSettings.instance.coolDownFrameRate();
+            doSpeedUp();
+            doCoolDown();
         }
 
         public override void render(Scene scene) {

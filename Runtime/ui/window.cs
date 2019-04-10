@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Unity.UIWidgets.async;
 using Unity.UIWidgets.foundation;
+using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
     public delegate void VoidCallback();
@@ -256,6 +257,37 @@ namespace Unity.UIWidgets.ui {
 
         public float getFPS() {
             return 1.0f / this.fpsDeltaTime;
+        }
+        
+        public static Action speedUpFrameRate;
+        public static Action coolDownFrameRate;
+        
+        static Timer scheduleFrameTimer;
+        public const int defaultMaxTargetFrameRate = 60;
+        public const int defaultMinTargetFrameRate = 15;
+        
+        public static void doSpeedUp() {
+            if (speedUpFrameRate == null) {
+                Application.targetFrameRate = defaultMaxTargetFrameRate;
+            }
+            else {
+                speedUpFrameRate();
+            }
+        }
+
+        public static void doCoolDown() {
+            if (coolDownFrameRate == null) {
+                scheduleFrameTimer?.cancel();
+                scheduleFrameTimer = instance.run(
+                    new TimeSpan(0, 0, 0, 0, 200),
+                    () => {
+                        Application.targetFrameRate = defaultMinTargetFrameRate;
+                        scheduleFrameTimer = null;
+                    });
+            }
+            else {
+                coolDownFrameRate();
+            }
         }
     }
 }
