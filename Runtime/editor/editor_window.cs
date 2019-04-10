@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Unity.UIWidgets.async;
+using Unity.UIWidgets.engine;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.scheduler;
@@ -463,6 +464,8 @@ namespace Unity.UIWidgets.editor {
             if (regenerateLayerTree) {
                 this._regenerateLayerTree = true;
             }
+            UIWidgetsGlobalSettings.instance.speedUpFrameRate();
+            UIWidgetsGlobalSettings.instance.coolDownFrameRate();
         }
 
         public override void render(Scene scene) {

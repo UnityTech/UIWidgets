@@ -32,8 +32,6 @@ namespace Unity.UIWidgets.engine {
         public override void scheduleFrame(bool regenerateLayerTree = true) {
             base.scheduleFrame(regenerateLayerTree);
             this._needsPaint = true;
-            this._uiWidgetsPanel.speedUpFrameRate();
-            this._uiWidgetsPanel.coolDownFrameRate();
         }
 
         public UIWidgetWindowAdapter(UIWidgetsPanel uiWidgetsPanel) {
@@ -112,10 +110,6 @@ namespace Unity.UIWidgets.engine {
         Texture _texture;
         Vector2 _lastMouseMove;
         
-        Timer scheduleFrameTimer;
-        public const int defaultMaxTargetFrameRate = 60;
-        public const int defaultMinTargetFrameRate = 15;
-
         readonly HashSet<int> _enteredPointers = new HashSet<int>();
 
         bool _viewMetricsCallbackRegistered;
@@ -365,20 +359,6 @@ namespace Unity.UIWidgets.engine {
 
         public Window window {
             get { return this._windowAdapter; }
-        }
-
-        public virtual void speedUpFrameRate() {
-            Application.targetFrameRate = defaultMaxTargetFrameRate;
-        }
-
-        public virtual void coolDownFrameRate() {
-            this.scheduleFrameTimer?.cancel();
-            this.scheduleFrameTimer = this.window.run(
-                new TimeSpan(0, 0, 0, 0, 200),
-                () => {
-                    Application.targetFrameRate = defaultMinTargetFrameRate;
-                    this.scheduleFrameTimer = null;
-                });
         }
     }
 }
