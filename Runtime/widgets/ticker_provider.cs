@@ -47,7 +47,13 @@ namespace Unity.UIWidgets.widgets {
                     "mixing in a SingleTickerProviderStateMixin, use a regular TickerProviderStateMixin."
                 );
             });
-            this._ticker = new Ticker(onTick, debugLabel: "created by " + this);
+            
+            var debugLabel = "";
+            D.assert(() => {
+                debugLabel = "created by " + this;
+                return true;
+            });
+            this._ticker = new Ticker(onTick, debugLabel: debugLabel);
             return this._ticker;
         }
 
@@ -108,7 +114,13 @@ namespace Unity.UIWidgets.widgets {
 
         public Ticker createTicker(TickerCallback onTick) {
             this._tickers = this._tickers ?? new HashSet<Ticker>();
-            var result = new _WidgetTicker<T>(onTick, this, debugLabel: "created by " + this);
+
+            var debugLabel = "";
+            D.assert(() => {
+                debugLabel = "created by " + this;
+                return true;
+            });
+            var result = new _WidgetTicker<T>(onTick, this, debugLabel: debugLabel);
             this._tickers.Add(result);
             return result;
         }

@@ -749,7 +749,12 @@ namespace Unity.UIWidgets.material {
             return !Equals(left, right);
         }
 
+        int? _cachedHashCode = null;
+
         public override int GetHashCode() {
+            if (this._cachedHashCode != null) {
+                return this._cachedHashCode.Value;
+            }
             unchecked {
                 var hashCode = this.brightness.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.primaryColor.GetHashCode();
@@ -795,6 +800,8 @@ namespace Unity.UIWidgets.material {
                 hashCode = (hashCode * 397) ^ this.colorScheme.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.dialogTheme.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.typography.GetHashCode();
+
+                this._cachedHashCode = hashCode;
                 return hashCode;
             }
         }
@@ -900,8 +907,8 @@ namespace Unity.UIWidgets.material {
                 return true;
             }
 
-            return this.baseTheme == other.baseTheme &&
-                   this.localTextGeometry == other.localTextGeometry;
+            return ReferenceEquals(this.baseTheme, other.baseTheme) &&
+                   ReferenceEquals(this.localTextGeometry, other.localTextGeometry);
         }
 
         public override bool Equals(object obj) {
@@ -948,9 +955,10 @@ namespace Unity.UIWidgets.material {
         public V putIfAbsent(K key, Func<V> value) {
             D.assert(key != null);
             D.assert(value != null);
-
-            if (this._cache.ContainsKey(key)) {
-                return this._cache[key];
+            
+            V get_value;
+            if (this._cache.TryGetValue(key, out get_value)) {
+                return get_value;
             }
 
             if (this._cache.Count == this._maximumSize) {
