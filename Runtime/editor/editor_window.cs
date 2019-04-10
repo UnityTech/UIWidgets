@@ -153,6 +153,8 @@ namespace Unity.UIWidgets.editor {
 
         bool _alive;
 
+        Timer scheduleFrameTimer = null;
+
         public bool alive {
             get { return this._alive; }
         }
@@ -211,6 +213,7 @@ namespace Unity.UIWidgets.editor {
             D.assert(this._surface != null);
             this._surface.Dispose();
             this._surface = null;
+            QualitySettings.vSyncCount = 0;
         }
 
         public override IDisposable getScope() {
@@ -463,7 +466,20 @@ namespace Unity.UIWidgets.editor {
             if (regenerateLayerTree) {
                 this._regenerateLayerTree = true;
             }
-        }
+            Application.targetFrameRate = 60;
+            this.scheduleFrameTimer?.cancel();
+            this.scheduleFrameTimer = instance.run(
+                new TimeSpan(0, 0, 0, 1),
+                () => {
+                    if (Application.targetFrameRate > 10)
+                        Application.targetFrameRate -= 10;
+                    else {
+                        Application.targetFrameRate = 10;
+                        this.scheduleFrameTimer.cancel();
+                        this.scheduleFrameTimer = null;
+                    }
+               }, true);
+       }
 
         public override void render(Scene scene) {
             var layerTree = scene.takeLayerTree();
