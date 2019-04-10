@@ -211,7 +211,6 @@ namespace Unity.UIWidgets.editor {
             D.assert(this._surface != null);
             this._surface.Dispose();
             this._surface = null;
-            QualitySettings.vSyncCount = 0;
         }
 
         public override IDisposable getScope() {
