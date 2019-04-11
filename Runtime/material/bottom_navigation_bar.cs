@@ -157,7 +157,7 @@ namespace Unity.UIWidgets.material {
                             color: this.colorTween.evaluate(this.animation)
                         ),
                         child: new Transform(
-                            transform: Matrix3.makeAll(t, 0, 0, 0, t, 0, 0, 0, t),
+                            transform: Matrix3.makeScale(t),
                             alignment: Alignment.bottomCenter,
                             child: this.item.title
                         )
