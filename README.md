@@ -103,8 +103,6 @@ in Unity Editor.
     namespace UIWidgetsSample {
         public class UIWidgetsExample : UIWidgetsPanel {
             protected override void OnEnable() {
-                // Application.targetFrameRate = 60; // or higher if you want a smoother scrolling experience.
-    
                 // if you want to use your own font or font icons.   
                 // FontManager.instance.addFont(Resources.Load<Font>(path: "path to your font"), "font family name");
     
