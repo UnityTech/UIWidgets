@@ -91,9 +91,9 @@ namespace Unity.UIWidgets.editor {
         protected override float queryDevicePixelRatio() {
             return EditorGUIUtility.pixelsPerPoint;
         }
-        
+
         protected override int queryAntiAliasing() {
-            return Window.defaultAntiAliasing;
+            return defaultAntiAliasing;
         }
 
         protected override Vector2 queryWindowSize() {
@@ -181,7 +181,7 @@ namespace Unity.UIWidgets.editor {
         public void OnEnable() {
             this._devicePixelRatio = this.queryDevicePixelRatio();
             this._antiAliasing = this.queryAntiAliasing();
-            
+
             var size = this.queryWindowSize();
             this._lastWindowWidth = size.x;
             this._lastWindowHeight = size.y;
@@ -292,7 +292,7 @@ namespace Unity.UIWidgets.editor {
                 if (this.displayMetricsChanged()) {
                     this._devicePixelRatio = this.queryDevicePixelRatio();
                     this._antiAliasing = this.queryAntiAliasing();
-                    
+
                     var size = this.queryWindowSize();
                     this._lastWindowWidth = size.x;
                     this._lastWindowHeight = size.y;
@@ -458,11 +458,23 @@ namespace Unity.UIWidgets.editor {
                 this.flushMicrotasks();
             }
         }
-
+        
+        static readonly TimeSpan _coolDownDelay = new TimeSpan(0, 0, 0, 0, 200);
+        static Timer frameCoolDownTimer;
+        
         public override void scheduleFrame(bool regenerateLayerTree = true) {
             if (regenerateLayerTree) {
                 this._regenerateLayerTree = true;
             }
+
+            onFrameRateSpeedUp();
+            frameCoolDownTimer?.cancel();
+            frameCoolDownTimer = instance.run(
+                _coolDownDelay,
+                () => {
+                    onFrameRateCoolDown();
+                    frameCoolDownTimer = null;
+                });
         }
 
         public override void render(Scene scene) {

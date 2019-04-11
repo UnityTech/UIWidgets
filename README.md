@@ -212,6 +212,11 @@ Status bar is always hidden by default when an Unity project is running on an An
  compatible to UIWidgets, therefore can be used as a good option before we release our
  full support solution on this issue.
 
+#### Automatically Adjust Frame Rate
+
+To build an App that is able to adjust the frame rate automatically, please open Project Settings, and in the Quality tab, set the "V Sync Count" option of the target platform to "Don't Sync".
+The default logic is to set the frame rate to 15 when the screen is static, and change the frame rate to 60 whenever the screen changes.
+If you would like to modify the behavior of speeding up or cooling down the frame rate, please set `Window.onFrameRateSpeedUp` and/or `Window.onFrameRateCoolDown` to your own functions.
  
 ## Debug UIWidgets Application
 
