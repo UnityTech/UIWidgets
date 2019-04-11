@@ -141,7 +141,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         protected float _devicePixelRatio = 1.0f;
-        
+
         public int antiAliasing {
             get { return this._antiAliasing; }
         }
@@ -258,36 +258,44 @@ namespace Unity.UIWidgets.ui {
         public float getFPS() {
             return 1.0f / this.fpsDeltaTime;
         }
-        
-        public static Action speedUpFrameRate;
-        public static Action coolDownFrameRate;
-        
-        static Timer scheduleFrameTimer;
+
         public const int defaultMaxTargetFrameRate = 60;
         public const int defaultMinTargetFrameRate = 15;
-        
-        public static void doSpeedUp() {
-            if (speedUpFrameRate == null) {
-                Application.targetFrameRate = defaultMaxTargetFrameRate;
-            }
-            else {
-                speedUpFrameRate();
+
+        static Action _onFrameRateSpeedUp = () => { defaultFrateRateSpeedUp(); };
+
+        public static Action onFrameRateSpeedUp {
+            get { return _onFrameRateSpeedUp; }
+            set {
+                if (value == null) {
+                    _onFrameRateSpeedUp = () => { defaultFrateRateSpeedUp(); };
+                }
+                else {
+                    _onFrameRateSpeedUp = value;
+                }
             }
         }
 
-        public static void doCoolDown() {
-            if (coolDownFrameRate == null) {
-                scheduleFrameTimer?.cancel();
-                scheduleFrameTimer = instance.run(
-                    new TimeSpan(0, 0, 0, 0, 200),
-                    () => {
-                        Application.targetFrameRate = defaultMinTargetFrameRate;
-                        scheduleFrameTimer = null;
-                    });
+        static void defaultFrateRateSpeedUp() {
+            Application.targetFrameRate = defaultMaxTargetFrameRate;
+        }
+
+        static Action _onFrameRateCoolDown = () => { defaultFrateRateCoolDown(); };
+
+        public static Action onFrameRateCoolDown {
+            get { return _onFrameRateCoolDown; }
+            set {
+                if (value == null) {
+                    _onFrameRateCoolDown = () => { defaultFrateRateCoolDown(); };
+                }
+                else {
+                    _onFrameRateCoolDown = value;
+                }
             }
-            else {
-                coolDownFrameRate();
-            }
+        }
+
+        static void defaultFrateRateCoolDown() {
+            Application.targetFrameRate = defaultMinTargetFrameRate;
         }
     }
 }

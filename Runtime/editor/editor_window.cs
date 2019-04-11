@@ -530,5 +530,21 @@ namespace Unity.UIWidgets.editor {
                 this._binding.renderView?.visitChildren(visitor);
             }
         }
+         
+        static Timer scheduleFrameTimer;
+        
+         static void doSpeedUp() {
+            onFrameRateSpeedUp();
+        }
+
+        static void doCoolDown() {
+            scheduleFrameTimer?.cancel();
+            scheduleFrameTimer = instance.run(
+                new TimeSpan(0, 0, 0, 0, 200),
+                () => {
+                    onFrameRateCoolDown();
+                    scheduleFrameTimer = null;
+                });
+        }
     }
 }
