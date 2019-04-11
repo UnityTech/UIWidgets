@@ -458,14 +458,23 @@ namespace Unity.UIWidgets.editor {
                 this.flushMicrotasks();
             }
         }
-
+        
+        static readonly TimeSpan _coolDownDelay = new TimeSpan(0, 0, 0, 0, 200);
+        static Timer frameCoolDownTimer;
+        
         public override void scheduleFrame(bool regenerateLayerTree = true) {
             if (regenerateLayerTree) {
                 this._regenerateLayerTree = true;
             }
 
-            doSpeedUp();
-            doCoolDown();
+            onFrameRateSpeedUp();
+            frameCoolDownTimer?.cancel();
+            frameCoolDownTimer = instance.run(
+                _coolDownDelay,
+                () => {
+                    onFrameRateCoolDown();
+                    frameCoolDownTimer = null;
+                });
         }
 
         public override void render(Scene scene) {
@@ -529,22 +538,6 @@ namespace Unity.UIWidgets.editor {
                 };
                 this._binding.renderView?.visitChildren(visitor);
             }
-        }
-
-        static Timer scheduleFrameTimer;
-
-        static void doSpeedUp() {
-            onFrameRateSpeedUp();
-        }
-
-        static void doCoolDown() {
-            scheduleFrameTimer?.cancel();
-            scheduleFrameTimer = instance.run(
-                new TimeSpan(0, 0, 0, 0, 200),
-                () => {
-                    onFrameRateCoolDown();
-                    scheduleFrameTimer = null;
-                });
         }
     }
 }
