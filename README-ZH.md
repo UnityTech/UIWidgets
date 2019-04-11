@@ -93,8 +93,6 @@ UIWidgets应用是用**C＃脚本**来编写的。 请按照以下步骤创建�
     namespace UIWidgetsSample {
         public class UIWidgetsExample : UIWidgetsPanel {
             protected override void OnEnable() {
-                // Application.targetFrameRate = 60; // or higher if you want a smoother scrolling experience.
-    
                 // if you want to use your own font or font icons.   
                 // FontManager.instance.addFont(Resources.Load<Font>(path: "path to your font"), "font family name");
     
