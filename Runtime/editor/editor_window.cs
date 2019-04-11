@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Unity.UIWidgets.async;
-using Unity.UIWidgets.engine;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.scheduler;
@@ -464,6 +463,7 @@ namespace Unity.UIWidgets.editor {
             if (regenerateLayerTree) {
                 this._regenerateLayerTree = true;
             }
+
             doSpeedUp();
             doCoolDown();
         }
@@ -530,10 +530,10 @@ namespace Unity.UIWidgets.editor {
                 this._binding.renderView?.visitChildren(visitor);
             }
         }
-         
+
         static Timer scheduleFrameTimer;
-        
-         static void doSpeedUp() {
+
+        static void doSpeedUp() {
             onFrameRateSpeedUp();
         }
 
