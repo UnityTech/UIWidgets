@@ -262,13 +262,13 @@ namespace Unity.UIWidgets.ui {
         public const int defaultMaxTargetFrameRate = 60;
         public const int defaultMinTargetFrameRate = 15;
 
-        static Action _onFrameRateSpeedUp = () => { defaultFrateRateSpeedUp(); };
+        static Action _onFrameRateSpeedUp = defaultFrateRateSpeedUp;
 
         public static Action onFrameRateSpeedUp {
             get { return _onFrameRateSpeedUp; }
             set {
                 if (value == null) {
-                    _onFrameRateSpeedUp = () => { defaultFrateRateSpeedUp(); };
+                    _onFrameRateSpeedUp = defaultFrateRateSpeedUp;
                 }
                 else {
                     _onFrameRateSpeedUp = value;
@@ -280,13 +280,13 @@ namespace Unity.UIWidgets.ui {
             Application.targetFrameRate = defaultMaxTargetFrameRate;
         }
 
-        static Action _onFrameRateCoolDown = () => { defaultFrateRateCoolDown(); };
+        static Action _onFrameRateCoolDown = defaultFrateRateCoolDown;
 
         public static Action onFrameRateCoolDown {
             get { return _onFrameRateCoolDown; }
             set {
                 if (value == null) {
-                    _onFrameRateCoolDown = () => { defaultFrateRateCoolDown(); };
+                    _onFrameRateCoolDown = defaultFrateRateCoolDown;
                 }
                 else {
                     _onFrameRateCoolDown = value;
