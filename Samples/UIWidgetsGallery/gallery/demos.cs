@@ -147,16 +147,16 @@ namespace UIWidgetsGallery.gallery {
                     routeName: ContactsDemo.routeName,
                     buildRoute: (BuildContext context) => new ContactsDemo()
                 ),
-//                new GalleryDemo(
-//                    title: "Animation",
-//                    subtitle: "Section organizer",
-//                    icon: GalleryIcons.animation,
-//                    category: GalleryDemoCategory._kDemos,
-//                    routeName: AnimationDemo.routeName,
-//                    buildRoute: (BuildContext context) => new AnimationDemo()
-//                ),
-//
-//                // Style
+                new GalleryDemo(
+                    title: "Animation",
+                    subtitle: "Section organizer",
+                    icon: GalleryIcons.animation,
+                    category: DemoUtils._kDemos,
+                    routeName: AnimationDemo.routeName,
+                    buildRoute: (BuildContext context) => new AnimationDemo()
+                ),
+
+                // Style
                 new GalleryDemo(
                     title: "Colors",
                     subtitle: "All of the predefined colors",

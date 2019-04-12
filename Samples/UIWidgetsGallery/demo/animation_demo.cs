@@ -3,7 +3,7 @@ using Unity.UIWidgets.widgets;
 
 namespace UIWidgetsGallery.gallery {
     public class AnimationDemo : StatelessWidget {
-        public AnimationDemo(Key key) : base(key: key) {
+        public AnimationDemo(Key key = null) : base(key: key) {
         }
 
         public const string routeName = "/animation";
