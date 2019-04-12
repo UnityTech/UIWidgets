@@ -201,15 +201,15 @@ namespace UIWidgetsGallery.gallery {
                     documentationUrl: "https://docs.flutter.io/flutter/material/BottomNavigationBar-class.html",
                     buildRoute: (BuildContext context) => new BottomNavigationDemo()
                 ),
-//                new GalleryDemo(
-//                    title: "Bottom sheet: Modal",
-//                    subtitle: "A dismissable bottom sheet",
-//                    icon: GalleryIcons.bottom_sheets,
-//                    category: GalleryDemoCategory._kMaterialComponents,
-//                    routeName: ModalBottomSheetDemo.routeName,
-//                    documentationUrl: "https://docs.flutter.io/flutter/material/showModalBottomSheet.html",
-//                    buildRoute: (BuildContext context) => ModalBottomSheetDemo()
-//                ),
+                new GalleryDemo(
+                    title: "Bottom sheet: Modal",
+                    subtitle: "A dismissable bottom sheet",
+                    icon: GalleryIcons.bottom_sheets,
+                    category: _kMaterialComponents,
+                    routeName: ModalBottomSheetDemo.routeName,
+                    documentationUrl: "https://docs.flutter.io/flutter/material/showModalBottomSheet.html",
+                    buildRoute: (BuildContext context) => new ModalBottomSheetDemo()
+                ),
 //                new GalleryDemo(
 //                    title: "Bottom sheet: Persistent",
 //                    subtitle: "A bottom sheet that sticks around",
