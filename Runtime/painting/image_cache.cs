@@ -110,7 +110,7 @@ namespace Unity.UIWidgets.painting {
                     D.assert(this._pendingImages.ContainsKey(key));
                     this._pendingImages.Remove(key);
 
-                    int imageSize = info?.image == null ? 0 : info.image.width & (info.image.height * 4);
+                    int imageSize = info?.image == null ? 0 : info.image.width * info.image.height * 4;
                     _CachedImage cachedImage = new _CachedImage {
                         completer = result,
                         sizeBytes = imageSize,
