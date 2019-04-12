@@ -210,15 +210,15 @@ namespace UIWidgetsGallery.gallery {
                     documentationUrl: "https://docs.flutter.io/flutter/material/showModalBottomSheet.html",
                     buildRoute: (BuildContext context) => new ModalBottomSheetDemo()
                 ),
-//                new GalleryDemo(
-//                    title: "Bottom sheet: Persistent",
-//                    subtitle: "A bottom sheet that sticks around",
-//                    icon: GalleryIcons.bottom_sheet_persistent,
-//                    category: GalleryDemoCategory._kMaterialComponents,
-//                    routeName: PersistentBottomSheetDemo.routeName,
-//                    documentationUrl: "https://docs.flutter.io/flutter/material/ScaffoldState/showBottomSheet.html",
-//                    buildRoute: (BuildContext context) => PersistentBottomSheetDemo()
-//                ),
+                new GalleryDemo(
+                    title: "Bottom sheet: Persistent",
+                    subtitle: "A bottom sheet that sticks around",
+                    icon: GalleryIcons.bottom_sheet_persistent,
+                    category: _kMaterialComponents,
+                    routeName: PersistentBottomSheetDemo.routeName,
+                    documentationUrl: "https://docs.flutter.io/flutter/material/ScaffoldState/showBottomSheet.html",
+                    buildRoute: (BuildContext context) => new PersistentBottomSheetDemo()
+                ),
                 new GalleryDemo(
                     title: "Buttons",
                     subtitle: "Flat, raised, dropdown, and more",
