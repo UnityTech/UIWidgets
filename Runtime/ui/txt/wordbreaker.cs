@@ -93,12 +93,21 @@ namespace Unity.UIWidgets.ui {
             if (this._current == this._size) {
                 return -1;
             }
-
+            
             WordSeparate.characterType preType = WordSeparate.classifyChar(this._text, this._current + this._offset);
+            bool preBoundaryChar = isBoundaryChar(this._text[this._current + this._offset]);
             this._current++;
+            if (preBoundaryChar) {
+                return this._current;
+            }
+            
             for (; this._current < this._size; ++this._current) {
                 this.nextUntilCodePoint();
                 if (this._current >= this._size) {
+                    break;
+                }
+
+                if (isBoundaryChar(this._text[this._current + this._offset])) {
                     break;
                 }
                 var currentType = WordSeparate.classifyChar(this._text, this._current + this._offset);
@@ -152,6 +161,22 @@ namespace Unity.UIWidgets.ui {
             return (char) (((uint) (lead) << 10) + (uint) (trail - U16_SURROGATE_OFFSET));
         }
 
+        public static bool isBoundaryChar(char code) {
+            if (char.IsPunctuation(code)) {
+                return true;
+            }
+            if (code >= 0x4E00 && code <= 0x9FFF) { // cjk https://en.wikipedia.org/wiki/CJK_Unified_Ideographs
+                return true;
+            }
+
+            // https://social.msdn.microsoft.com/Forums/en-US/0d1888de-9745-4dd1-80fd-d3c29d3e381d/checking-for-japanese-characters-in-a-string?forum=vcmfcatl
+            if (code >= 0x3040 && code <= 0x30FF) { // Hiragana or Katakana
+                return true;
+            }
+
+            return false;
+        }
+        
         void nextUntilCodePoint() {
             while (this._current < this._size
                    && (char.IsLowSurrogate(this._text[this._current + this._offset]) 
