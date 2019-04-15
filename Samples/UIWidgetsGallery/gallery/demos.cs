@@ -227,15 +227,15 @@ namespace UIWidgetsGallery.gallery {
                     routeName: ButtonsDemo.routeName,
                     buildRoute: (BuildContext context) => new ButtonsDemo()
                 ),
-//                new GalleryDemo(
-//                    title: "Buttons: Floating Action Button",
-//                    subtitle: "FAB with transitions",
-//                    icon: GalleryIcons.buttons,
-//                    category: GalleryDemoCategory._kMaterialComponents,
-//                    routeName: TabsFabDemo.routeName,
-//                    documentationUrl: "https://docs.flutter.io/flutter/material/FloatingActionButton-class.html",
-//                    buildRoute: (BuildContext context) => TabsFabDemo()
-//                ),
+                new GalleryDemo(
+                    title: "Buttons: Floating Action Button",
+                    subtitle: "FAB with transitions",
+                    icon: GalleryIcons.buttons,
+                    category: _kMaterialComponents,
+                    routeName: TabsFabDemo.routeName,
+                    documentationUrl: "https://docs.flutter.io/flutter/material/FloatingActionButton-class.html",
+                    buildRoute: (BuildContext context) => new TabsFabDemo()
+                ),
                 new GalleryDemo(
                     title: "Cards",
                     subtitle: "Baseline cards with rounded corners",
