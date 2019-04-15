@@ -239,6 +239,10 @@ namespace Unity.UIWidgets.ui {
 
         public abstract Timer run(TimeSpan duration, Action callback, bool periodic = false);
 
+        public Timer periodic(TimeSpan duration, Action callback) {
+            return this.run(duration, callback, true);
+        }
+
         public Timer run(Action callback) {
             return this.run(TimeSpan.Zero, callback);
         }
