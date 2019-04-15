@@ -458,7 +458,6 @@ namespace Unity.UIWidgets.ui {
                     }
                 }
             }
-
             // Split arc into max 90 degree segments.
             int ndivs = Mathf.Max(1, Mathf.Min((int) (Mathf.Abs(da) / (Mathf.PI * 0.5f) + 0.5f), 5));
             float hda = (da / ndivs) / 2.0f;
@@ -1124,9 +1123,9 @@ namespace Unity.UIWidgets.ui {
                 this.addPoint(0, 0, PointFlags.corner);
             }
 
-            var path = this._paths.Last();
+            var path = this._paths[this._paths.Count - 1];
             if (path.count > 0) {
-                var pt = this._points.Last();
+                var pt = this._points[this._points.Count - 1];
                 if (PathUtils.ptEquals(pt.x, pt.y, point.x, point.y, this._distTol)) {
                     pt.flags |= point.flags;
                     return;
@@ -1147,7 +1146,7 @@ namespace Unity.UIWidgets.ui {
                 y1 = 0;
             }
             else {
-                var pt = this._points.Last();
+                var pt = this._points[this._points.Count - 1];
                 x1 = pt.x;
                 y1 = pt.y;
             }
@@ -1174,7 +1173,7 @@ namespace Unity.UIWidgets.ui {
                 return;
             }
 
-            var path = this._paths.Last();
+            var path = this._paths[this._paths.Count - 1];
             path.winding = winding;
         }
 
