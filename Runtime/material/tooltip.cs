@@ -148,8 +148,9 @@ namespace Unity.UIWidgets.material {
 
         void _handleLongPress() {
             bool tooltipCreated = this.ensureTooltipVisible();
-            if (tooltipCreated)
+            if (tooltipCreated) {
                 Feedback.forLongPress(this.context);
+            }
         }
 
 

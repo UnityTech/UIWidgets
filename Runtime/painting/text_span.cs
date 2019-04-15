@@ -16,7 +16,7 @@ namespace Unity.UIWidgets.painting {
         public readonly List<TextSpan> children;
         public readonly GestureRecognizer recognizer;
 
-        public TextSpan(string text = "", TextStyle style = null, List<TextSpan> children = null, 
+        public TextSpan(string text = "", TextStyle style = null, List<TextSpan> children = null,
             GestureRecognizer recognizer = null) {
             this.text = text;
             this.style = style;
@@ -84,7 +84,7 @@ namespace Unity.UIWidgets.painting {
             });
             return result;
         }
-        
+
         public string toPlainText() {
             var sb = new StringBuilder();
             this.visitTextSpan((span) => {
@@ -118,22 +118,25 @@ namespace Unity.UIWidgets.painting {
                 if (!this.visitTextSpan(span => {
                     if (span.children != null) {
                         foreach (TextSpan child in span.children) {
-                            if (child == null)
+                            if (child == null) {
                                 return false;
+                            }
                         }
                     }
+
                     return true;
                 })) {
                     throw new UIWidgetsError(
                         "A TextSpan object with a non-null child list should not have any nulls in its child list.\n" +
-                                "The full text in question was:\n" +
-                                this.toStringDeep(prefixLineOne:"  "));
+                        "The full text in question was:\n" +
+                        this.toStringDeep(prefixLineOne: "  "));
                 }
+
                 return true;
             });
             return true;
         }
-        
+
         public RenderComparison compareTo(TextSpan other) {
             if (this.Equals(other)) {
                 return RenderComparison.identical;
