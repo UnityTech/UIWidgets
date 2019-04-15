@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Unity.UIWidgets.async;
 using Unity.UIWidgets.foundation;
+using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
     public delegate void VoidCallback();
@@ -140,7 +141,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         protected float _devicePixelRatio = 1.0f;
-        
+
         public int antiAliasing {
             get { return this._antiAliasing; }
         }
@@ -239,6 +240,10 @@ namespace Unity.UIWidgets.ui {
 
         public abstract Timer run(TimeSpan duration, Action callback, bool periodic = false);
 
+        public Timer periodic(TimeSpan duration, Action callback) {
+            return this.run(duration, callback, true);
+        }
+
         public Timer run(Action callback) {
             return this.run(TimeSpan.Zero, callback);
         }
@@ -256,6 +261,45 @@ namespace Unity.UIWidgets.ui {
 
         public float getFPS() {
             return 1.0f / this.fpsDeltaTime;
+        }
+
+        public const int defaultMaxTargetFrameRate = 60;
+        public const int defaultMinTargetFrameRate = 15;
+
+        static Action _onFrameRateSpeedUp = defaultFrameRateSpeedUp;
+
+        public static Action onFrameRateSpeedUp {
+            get { return _onFrameRateSpeedUp; }
+            set {
+                if (value == null) {
+                    _onFrameRateSpeedUp = defaultFrameRateSpeedUp;
+                }
+                else {
+                    _onFrameRateSpeedUp = value;
+                }
+            }
+        }
+
+        static void defaultFrameRateSpeedUp() {
+            Application.targetFrameRate = defaultMaxTargetFrameRate;
+        }
+
+        static Action _onFrameRateCoolDown = defaultFrameRateCoolDown;
+
+        public static Action onFrameRateCoolDown {
+            get { return _onFrameRateCoolDown; }
+            set {
+                if (value == null) {
+                    _onFrameRateCoolDown = defaultFrameRateCoolDown;
+                }
+                else {
+                    _onFrameRateCoolDown = value;
+                }
+            }
+        }
+
+        static void defaultFrameRateCoolDown() {
+            Application.targetFrameRate = defaultMinTargetFrameRate;
         }
     }
 }

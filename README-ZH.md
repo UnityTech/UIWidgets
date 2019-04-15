@@ -93,8 +93,6 @@ UIWidgets应用是用**C＃脚本**来编写的。 请按照以下步骤创建�
     namespace UIWidgetsSample {
         public class UIWidgetsExample : UIWidgetsPanel {
             protected override void OnEnable() {
-                // Application.targetFrameRate = 60; // or higher if you want a smoother scrolling experience.
-    
                 // if you want to use your own font or font icons.   
                 // FontManager.instance.addFont(Resources.Load<Font>(path: "path to your font"), "font family name");
     
@@ -181,7 +179,10 @@ UIWidgets也支持Gif！
 当一个Unity项目运行在Android设备上时，状态栏是默认隐藏且无法在编辑内进行调整的。
 如果您希望在您的UIWidgets App中显示状态栏，您可以使用这个[解决方案](https://github.com/Over17/UnityShowAndroidStatusBar)。我们将尽快推出我们自己的解决方案，并保证届时开发者可以进行无缝切换。
 
-
+#### 七、自动调节帧率
+如果要使得构建出的应用能够自动调节帧率，请打开Project Settings，将构建目标平台对应的Quality选项卡中的V Sync Count设置为Don't Sync。
+默认的逻辑是在界面静止时将帧率降低为15，在界面变动时将帧率提高至60。
+如果您需要修改帧率升高或降低时的行为，请将`Window.onFrameRateSpeedUp`和/或`Window.onFrameRateCoolDown`设置为您自己的函数。
 
 ## 调试UIWidgets应用程序
 
@@ -209,7 +210,7 @@ UIWidgets Inspector工具用于可视化和浏览窗口小部件树。 你可以
 
 #### Wiki
 
-目前开发团队仍在改进UIWidgets Wiki。 由于UIWidgets主要来源于Flutter，你也可以参考Flutter Wiki中与UIWidgets API对应部分的详细描述。同时，你可以加入我们的讨论组(https://connect.unity.com/g/uiwidgets)。
+目前开发团队仍在改进UIWidgets Wiki。 由于UIWidgets主要来源于Flutter，你也可以参考Flutter Wiki中与UIWidgets API对应部分的详细描述。同时，你可以加入我们的讨论组( https://connect.unity.com/g/uiwidgets )。
  
 #### 常问问题解答
 
