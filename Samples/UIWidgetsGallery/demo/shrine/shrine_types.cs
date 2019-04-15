@@ -26,7 +26,7 @@ namespace UIWidgetsGallery.gallery {
         }
 
         public override string ToString() {
-            return "Vendor($name)";
+            return $"Vendor({this.name})";
         }
     }
 
@@ -104,14 +104,26 @@ namespace UIWidgetsGallery.gallery {
         }
 
         public static bool operator ==(Order left, Order right) {
-            if (left is null && right is null) return true;
-            if (left is null || right is null) return false;
+            if (left is null && right is null) {
+                return true;
+            }
+
+            if (left is null || right is null) {
+                return false;
+            }
+
             return left.Equals(right);
         }
 
         public static bool operator !=(Order left, Order right) {
-            if (left is null && right is null) return false;
-            if (left is null || right is null) return true;
+            if (left is null && right is null) {
+                return false;
+            }
+
+            if (left is null || right is null) {
+                return true;
+            }
+
             return !left.Equals(right);
         }
 

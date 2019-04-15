@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
@@ -11,7 +10,6 @@ using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace Unity.UIWidgets.material {
     public class TextField : StatefulWidget {
-
         public TextField(Key key = null, TextEditingController controller = null, FocusNode focusNode = null,
             InputDecoration decoration = null, bool noDecoration = false, TextInputType keyboardType = null,
             TextInputAction? textInputAction = null,
@@ -95,7 +93,7 @@ namespace Unity.UIWidgets.material {
 
         public readonly VoidCallback onEditingComplete;
 
-        public readonly ValueChanged<String> onSubmitted;
+        public readonly ValueChanged<string> onSubmitted;
 
         public readonly List<TextInputFormatter> inputFormatters;
 
@@ -138,11 +136,9 @@ namespace Unity.UIWidgets.material {
                 ifTrue: "max length enforced"));
             properties.add(new DiagnosticsProperty<GestureTapCallback>("onTap", this.onTap, defaultValue: null));
         }
-
     }
 
     class _TextFieldState : AutomaticKeepAliveClientMixin<TextField> {
-
         readonly GlobalKey<EditableTextState> _editableTextKey = new LabeledGlobalKey<EditableTextState>();
 
         HashSet<InteractiveInkFeature> _splashes;
@@ -267,7 +263,10 @@ namespace Unity.UIWidgets.material {
                 if (this._splashes != null) {
                     D.assert(this._splashes.Contains(splash));
                     this._splashes.Remove(splash);
-                    if (this._currentSplash == splash) this._currentSplash = null;
+                    if (this._currentSplash == splash) {
+                        this._currentSplash = null;
+                    }
+
                     this.updateKeepAlive();
                 } // else we're probably in deactivate()
             }
@@ -286,10 +285,8 @@ namespace Unity.UIWidgets.material {
         }
 
         RenderEditable _renderEditable {
-            get {
-                return this._editableTextKey.currentState.renderEditable;
-            }
-        } 
+            get { return this._editableTextKey.currentState.renderEditable; }
+        }
 
         void _handleTapDown(TapDownDetails details) {
             this._renderEditable.handleTapDown(details);
@@ -438,7 +435,6 @@ namespace Unity.UIWidgets.material {
                     child: child
                 )
             );
-
         }
     }
 }
