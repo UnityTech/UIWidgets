@@ -210,7 +210,7 @@ UIWidgets Inspector工具用于可视化和浏览窗口小部件树。 你可以
 
 #### Wiki
 
-目前开发团队仍在改进UIWidgets Wiki。 由于UIWidgets主要来源于Flutter，你也可以参考Flutter Wiki中与UIWidgets API对应部分的详细描述。同时，你可以加入我们的讨论组(https://connect.unity.com/g/uiwidgets)。
+目前开发团队仍在改进UIWidgets Wiki。 由于UIWidgets主要来源于Flutter，你也可以参考Flutter Wiki中与UIWidgets API对应部分的详细描述。同时，你可以加入我们的讨论组( https://connect.unity.com/g/uiwidgets )。
  
 #### 常问问题解答
 

@@ -317,7 +317,11 @@ namespace Unity.UIWidgets.material {
             return !Equals(left, right);
         }
 
+        int? _cachedHashCode = null;
         public override int GetHashCode() {
+            if (this._cachedHashCode != null) {
+                return this._cachedHashCode.Value;
+            }
             unchecked {
                 var hashCode = this.display4.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.display3.GetHashCode();
@@ -332,6 +336,8 @@ namespace Unity.UIWidgets.material {
                 hashCode = (hashCode * 397) ^ this.button.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.subtitle.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.overline.GetHashCode();
+
+                this._cachedHashCode = hashCode;
                 return hashCode;
             }
         }

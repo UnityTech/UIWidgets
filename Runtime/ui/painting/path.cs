@@ -1631,15 +1631,15 @@ namespace Unity.UIWidgets.ui {
             float dlx = dy;
             float dly = -dx;
 
+            for (var i = 0; i < ncap; i++) {
+                float a = (float) i / (ncap - 1) * Mathf.PI;
+                float ax = Mathf.Cos(a) * w, ay = Mathf.Sin(a) * w;
+                dst.Add(new Vector2(px - dlx * ax - dx * ay, py - dly * ax - dy * ay));
+                dst.Add(new Vector2(px, py));
+            }
 
             dst.Add(new Vector2(px + dlx * w, py + dly * w));
             dst.Add(new Vector2(px - dlx * w, py - dly * w));
-            for (var i = 0; i < ncap; i++) {
-                float a = i / (ncap - 1) * Mathf.PI;
-                float ax = Mathf.Cos(a) * w, ay = Mathf.Sin(a) * w;
-                dst.Add(new Vector2(px, py));
-                dst.Add(new Vector2(px - dlx * ax + dx * ay, py - dly * ax + dy * ay));
-            }
         }
 
         public static void roundCapEnd(this List<Vector3> dst, PathPoint p,
@@ -1649,15 +1649,15 @@ namespace Unity.UIWidgets.ui {
             float dlx = dy;
             float dly = -dx;
 
-            for (var i = 0; i < ncap; i++) {
-                float a = i / (ncap - 1) * Mathf.PI;
-                float ax = Mathf.Cos(a) * w, ay = Mathf.Sin(a) * w;
-                dst.Add(new Vector2(px - dlx * ax - dx * ay, py - dly * ax - dy * ay));
-                dst.Add(new Vector2(px, py));
-            }
-
             dst.Add(new Vector2(px + dlx * w, py + dly * w));
             dst.Add(new Vector2(px - dlx * w, py - dly * w));
+
+            for (var i = 0; i < ncap; i++) {
+                float a = (float) i / (ncap - 1) * Mathf.PI;
+                float ax = Mathf.Cos(a) * w, ay = Mathf.Sin(a) * w;
+                dst.Add(new Vector2(px, py));
+                dst.Add(new Vector2(px - dlx * ax + dx * ay, py - dly * ax + dy * ay));
+            }
         }
 
         public static void chooseBevel(bool bevel, PathPoint p0, PathPoint p1, float w,
@@ -1704,7 +1704,7 @@ namespace Unity.UIWidgets.ui {
 
                 var n = Mathf.CeilToInt((a0 - a1) / Mathf.PI * ncap).clamp(2, ncap);
                 for (var i = 0; i < n; i++) {
-                    float u = i / (n - 1);
+                    float u = (float) i / (n - 1);
                     float a = a0 + u * (a1 - a0);
                     float rx = p1.x + Mathf.Cos(a) * rw;
                     float ry = p1.y + Mathf.Sin(a) * rw;
@@ -1732,7 +1732,7 @@ namespace Unity.UIWidgets.ui {
 
                 var n = Mathf.CeilToInt((a1 - a0) / Mathf.PI * ncap).clamp(2, ncap);
                 for (var i = 0; i < n; i++) {
-                    float u = i / (n - 1);
+                    float u = (float) i / (n - 1);
                     float a = a0 + u * (a1 - a0);
                     float lx = p1.x + Mathf.Cos(a) * lw;
                     float ly = p1.y + Mathf.Sin(a) * lw;

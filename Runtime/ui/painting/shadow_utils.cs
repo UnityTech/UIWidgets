@@ -1,9 +1,9 @@
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
-    public static class ShadowUtils {
-        public const bool _drawShadowFlag = false;
-        
+    static class ShadowUtils {
+        public static bool kUseFastShadow = true;
+
         public const float kAmbientHeightFactor = 1.0f / 128.0f;
         public const float kAmbientGeomFactor = 64.0f;
 
@@ -137,10 +137,16 @@ namespace Unity.UIWidgets.ui {
 
         public static void drawShadow(Canvas canvas, Path path, Vector3 zPlaneParams, Vector3 devLightPos,
             float lightRadius, Color ambientColor, Color spotColor, int flags) {
-            if (!_drawShadowFlag) {
-                return;
+            if (kUseFastShadow) {
+                drawShadowFast(canvas, path, zPlaneParams, devLightPos, lightRadius, ambientColor, spotColor, flags);
             }
-            
+            else {
+                drawShadowFull(canvas, path, zPlaneParams, devLightPos, lightRadius, ambientColor, spotColor, flags);
+            }
+        }
+
+        static void drawShadowFull(Canvas canvas, Path path, Vector3 zPlaneParams, Vector3 devLightPos,
+            float lightRadius, Color ambientColor, Color spotColor, int flags) {
             Matrix3 viewMatrix = canvas.getTotalMatrix();
 
             //ambient light
@@ -173,6 +179,36 @@ namespace Unity.UIWidgets.ui {
             Paint paint2 = new Paint {color = spotColor};
             float sigma2 = convertRadiusToSigma(radius);
             paint2.maskFilter = MaskFilter.blur(BlurStyle.normal, sigma2);
+            canvas.drawPath(path, paint2);
+
+            canvas.restore();
+        }
+
+        static void drawShadowFast(Canvas canvas, Path path, Vector3 zPlaneParams, Vector3 devLightPos,
+            float lightRadius, Color ambientColor, Color spotColor, int flags) {
+            Matrix3 viewMatrix = canvas.getTotalMatrix();
+
+            //ambient light
+            float devSpaceOutset = ambientBlurRadius(zPlaneParams.z);
+            float oneOverA = ambientRecipAlpha(zPlaneParams.z);
+            float blurRadius = 0.5f * devSpaceOutset * oneOverA;
+            float strokeWidth = 0.5f * (devSpaceOutset - blurRadius);
+
+            Paint paint = new Paint {color = ambientColor, strokeWidth = strokeWidth, style = PaintingStyle.fill};
+            canvas.drawPath(path, paint);
+
+            //spot light
+            Matrix3 shadowMatrix = Matrix3.I();
+            float radius = 0.0f;
+
+            if (!getSpotShadowTransform(devLightPos, lightRadius, viewMatrix, zPlaneParams, path.getBounds(),
+                shadowMatrix, ref radius)) {
+                return;
+            }
+
+            canvas.save();
+            canvas.setMatrix(shadowMatrix);
+            Paint paint2 = new Paint {color = spotColor};
             canvas.drawPath(path, paint2);
 
             canvas.restore();
