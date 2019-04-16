@@ -1644,7 +1644,9 @@ namespace Unity.UIWidgets.widgets {
             bool softWrap = true,
             TextOverflow overflow = TextOverflow.clip,
             float textScaleFactor = 1.0f,
-            int? maxLines = null
+            int? maxLines = null,
+            Action onSelectionChanged = null,
+            Color selectionColor = null
         ) : base(key: key) {
             D.assert(text != null);
             D.assert(maxLines == null || maxLines > 0);
@@ -1655,6 +1657,8 @@ namespace Unity.UIWidgets.widgets {
             this.overflow = overflow;
             this.textScaleFactor = textScaleFactor;
             this.maxLines = maxLines;
+            this.onSelectionChanged = onSelectionChanged;
+            this.selectionColor = selectionColor;
         }
 
         public readonly TextSpan text;
@@ -1663,6 +1667,8 @@ namespace Unity.UIWidgets.widgets {
         public readonly TextOverflow overflow;
         public readonly float textScaleFactor;
         public readonly int? maxLines;
+        public readonly Action onSelectionChanged;
+        public readonly Color selectionColor;
 
         public override RenderObject createRenderObject(BuildContext context) {
             return new RenderParagraph(
@@ -1671,7 +1677,9 @@ namespace Unity.UIWidgets.widgets {
                 softWrap: this.softWrap,
                 overflow: this.overflow,
                 textScaleFactor: this.textScaleFactor,
-                maxLines: this.maxLines
+                maxLines: this.maxLines,
+                onSelectionChanged: this.onSelectionChanged,
+                selectionColor: this.selectionColor
             );
         }
 
@@ -1683,6 +1691,8 @@ namespace Unity.UIWidgets.widgets {
             renderObject.overflow = this.overflow;
             renderObject.textScaleFactor = this.textScaleFactor;
             renderObject.maxLines = this.maxLines;
+            renderObject.onSelectionChanged = this.onSelectionChanged;
+            renderObject.selectionColor = this.selectionColor;
         }
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {

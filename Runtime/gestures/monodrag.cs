@@ -323,8 +323,8 @@ namespace Unity.UIWidgets.gestures {
     }
 
     public class PanGestureRecognizer : DragGestureRecognizer {
-        public PanGestureRecognizer(object debugOwner = null)
-            : base(debugOwner: debugOwner) {
+        public PanGestureRecognizer(object debugOwner = null, PointerDeviceKind? kind = null)
+            : base(debugOwner: debugOwner, kind: kind) {
         }
 
         protected override bool _isFlingGesture(VelocityEstimate estimate) {
