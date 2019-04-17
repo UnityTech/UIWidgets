@@ -372,9 +372,11 @@ namespace Unity.UIWidgets.rendering {
             D.assert(this.selectionColor != null);
             var paint = new Paint {color = this.selectionColor};
 
+            Path barPath = new Path();
             foreach (var box in this._selectionRects) {
-                canvas.drawRect(box.toRect().shift(effectiveOffset), paint);
+                barPath.addRect(box.toRect().shift(effectiveOffset));
             }
+            canvas.drawPath(barPath, paint);
         }
 
         void _layoutText(float minWidth = 0.0f, float maxWidth = float.PositiveInfinity) {
