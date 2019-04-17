@@ -36,7 +36,7 @@ namespace Unity.UIWidgets.widgets {
             this.selectionColor = selectionColor;
         }
 
-        SelectableText(TextSpan textSpan,
+        public SelectableText(TextSpan textSpan,
             Key key = null,
             TextStyle style = null,
             TextAlign? textAlign = null,

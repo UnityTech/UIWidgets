@@ -266,7 +266,7 @@ namespace Unity.UIWidgets.rendering {
 
             if (kcmd == KeyCommand.Copy) {
                 Clipboard.setData(
-                    new ClipboardData(text: this.selection.textInside(this.text.text))
+                    new ClipboardData(text: this.selection.textInside(this.text.toPlainText()))
                 );
             }
         }
@@ -284,7 +284,6 @@ namespace Unity.UIWidgets.rendering {
         public void selectPositionAt(Offset from = null, Offset to = null, SelectionChangedCause? cause = null) {
             D.assert(cause != null);
             D.assert(from != null);
-            this._layoutText(this.constraints.maxWidth);
             if (true) {
                 TextPosition fromPosition =
                     this._textPainter.getPositionForOffset(this.globalToLocal(from));
