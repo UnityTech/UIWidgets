@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.painting;
@@ -20,6 +21,7 @@ namespace Unity.UIWidgets.rendering {
         doubleTap,
         longPress,
         keyboard,
+        drag
     }
 
     public class TextSelectionPoint {
@@ -860,6 +862,36 @@ namespace Unity.UIWidgets.rendering {
 
         public void handleLongPress() {
             this.selectWord(cause: SelectionChangedCause.longPress);
+        }
+
+        public void selectPositionAt(Offset from = null, Offset to = null, SelectionChangedCause? cause = null) {
+            D.assert(cause != null);
+            D.assert(from != null);
+
+            this._layoutText(this.constraints.maxWidth);
+            if (this.onSelectionChanged != null) {
+                TextPosition fromPosition =
+                    this._textPainter.getPositionForOffset(this.globalToLocal(from - this._paintOffset));
+                TextPosition toPosition = to == null
+                    ? null
+                    : this._textPainter.getPositionForOffset(this.globalToLocal(to - this._paintOffset));
+
+                int baseOffset = fromPosition.offset;
+                int extentOffset = fromPosition.offset;
+                if (toPosition != null) {
+                    baseOffset = Math.Min(fromPosition.offset, toPosition.offset);
+                    extentOffset = Math.Max(fromPosition.offset, toPosition.offset);
+                }
+
+                TextSelection newSelection = new TextSelection(
+                    baseOffset: baseOffset,
+                    extentOffset: extentOffset,
+                    affinity: fromPosition.affinity);
+
+                if (newSelection != this._selection) {
+                    this.onSelectionChanged(newSelection, this, cause.Value);
+                }
+            }
         }
 
         void selectPosition(SelectionChangedCause? cause = null) {

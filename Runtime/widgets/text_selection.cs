@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Unity.UIWidgets.animation;
+using Unity.UIWidgets.async;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.rendering;
@@ -9,6 +10,10 @@ using Unity.UIWidgets.service;
 using Unity.UIWidgets.ui;
 
 namespace Unity.UIWidgets.widgets {
+    static class TextSelectionUtils {
+        public static TimeSpan _kDragSelectionUpdateThrottle = new TimeSpan(0, 0, 0, 0, 50);
+    }
+
     public enum TextSelectionHandleType {
         left,
         right,
@@ -21,6 +26,8 @@ namespace Unity.UIWidgets.widgets {
     }
 
     public delegate void TextSelectionOverlayChanged(TextEditingValue value, Rect caretRect);
+
+    public delegate void DragSelectionUpdateCallback(DragStartDetails startDetails, DragUpdateDetails updateDetails);
 
     public abstract class TextSelectionControls {
         public abstract Widget buildHandle(BuildContext context, TextSelectionHandleType type, float textLineHeight);
@@ -449,6 +456,219 @@ namespace Unity.UIWidgets.widgets {
 
             D.assert(() => throw new UIWidgetsError($"invalid endpoint.direction {endpoint.direction}"));
             return ltrType;
+        }
+    }
+
+
+    public class TextSelectionGestureDetector : StatefulWidget {
+        public TextSelectionGestureDetector(
+            Key key = null,
+            GestureTapDownCallback onTapDown = null,
+            GestureTapUpCallback onSingleTapUp = null,
+            GestureTapCancelCallback onSingleTapCancel = null,
+            GestureLongPressCallback onSingleLongTapStart = null,
+            GestureTapDownCallback onDoubleTapDown = null,
+            GestureDragStartCallback onDragSelectionStart = null,
+            DragSelectionUpdateCallback onDragSelectionUpdate = null,
+            GestureDragEndCallback onDragSelectionEnd = null,
+            HitTestBehavior? behavior = null,
+            Widget child = null
+        ) : base(key: key) {
+            D.assert(child != null);
+            this.onTapDown = onTapDown;
+            this.onSingleTapUp = onSingleTapUp;
+            this.onSingleTapCancel = onSingleTapCancel;
+            this.onSingleLongTapStart = onSingleLongTapStart;
+            this.onDoubleTapDown = onDoubleTapDown;
+            this.onDragSelectionStart = onDragSelectionStart;
+            this.onDragSelectionUpdate = onDragSelectionUpdate;
+            this.onDragSelectionEnd = onDragSelectionEnd;
+            this.behavior = behavior;
+            this.child = child;
+        }
+
+        public readonly GestureTapDownCallback onTapDown;
+
+        public readonly GestureTapUpCallback onSingleTapUp;
+
+        public readonly GestureTapCancelCallback onSingleTapCancel;
+
+        public readonly GestureLongPressCallback onSingleLongTapStart;
+
+        public readonly GestureTapDownCallback onDoubleTapDown;
+
+        public readonly GestureDragStartCallback onDragSelectionStart;
+
+        public readonly DragSelectionUpdateCallback onDragSelectionUpdate;
+
+        public readonly GestureDragEndCallback onDragSelectionEnd;
+
+        public HitTestBehavior? behavior;
+
+        public readonly Widget child;
+
+        public override State createState() {
+            return new _TextSelectionGestureDetectorState();
+        }
+    }
+
+    class _TextSelectionGestureDetectorState : State<TextSelectionGestureDetector> {
+        Timer _doubleTapTimer;
+        Offset _lastTapOffset;
+
+        bool _isDoubleTap = false;
+
+        public override void dispose() {
+            this._doubleTapTimer?.cancel();
+            this._dragUpdateThrottleTimer?.cancel();
+            base.dispose();
+        }
+
+        void _handleTapDown(TapDownDetails details) {
+            if (this.widget.onTapDown != null) {
+                this.widget.onTapDown(details);
+            }
+
+            if (this._doubleTapTimer != null &&
+                this._isWithinDoubleTapTolerance(details.globalPosition)) {
+                if (this.widget.onDoubleTapDown != null) {
+                    this.widget.onDoubleTapDown(details);
+                }
+
+                this._doubleTapTimer.cancel();
+                this._doubleTapTimeout();
+                this._isDoubleTap = true;
+            }
+        }
+
+        void _handleTapUp(TapUpDetails details) {
+            if (!this._isDoubleTap) {
+                if (this.widget.onSingleTapUp != null) {
+                    this.widget.onSingleTapUp(details);
+                }
+
+                this._lastTapOffset = details.globalPosition;
+                this._doubleTapTimer = Window.instance.run(Constants.kDoubleTapTimeout, this._doubleTapTimeout);
+            }
+
+            this._isDoubleTap = false;
+        }
+
+        void _handleTapCancel() {
+            if (this.widget.onSingleTapCancel != null) {
+                this.widget.onSingleTapCancel();
+            }
+        }
+
+        DragStartDetails _lastDragStartDetails;
+        DragUpdateDetails _lastDragUpdateDetails;
+        Timer _dragUpdateThrottleTimer;
+
+        void _handleDragStart(DragStartDetails details) {
+            D.assert(this._lastDragStartDetails == null);
+            this._lastDragStartDetails = details;
+            if (this.widget.onDragSelectionStart != null) {
+                this.widget.onDragSelectionStart(details);
+            }
+        }
+
+        void _handleDragUpdate(DragUpdateDetails details) {
+            this._lastDragUpdateDetails = details;
+            this._dragUpdateThrottleTimer = this._dragUpdateThrottleTimer ??
+                                            Window.instance.run(TextSelectionUtils._kDragSelectionUpdateThrottle,
+                                                this._handleDragUpdateThrottled);
+        }
+
+        void _handleDragUpdateThrottled() {
+            D.assert(this._lastDragStartDetails != null);
+            D.assert(this._lastDragUpdateDetails != null);
+            if (this.widget.onDragSelectionUpdate != null) {
+                this.widget.onDragSelectionUpdate(this._lastDragStartDetails, this._lastDragUpdateDetails);
+            }
+
+            this._dragUpdateThrottleTimer = null;
+            this._lastDragUpdateDetails = null;
+        }
+
+        void _handleDragEnd(DragEndDetails details) {
+            D.assert(this._lastDragStartDetails != null);
+            if (this._lastDragUpdateDetails != null) {
+                this._dragUpdateThrottleTimer.cancel();
+                this._handleDragUpdateThrottled();
+            }
+
+            if (this.widget.onDragSelectionEnd != null) {
+                this.widget.onDragSelectionEnd(details);
+            }
+
+            this._dragUpdateThrottleTimer = null;
+            this._lastDragStartDetails = null;
+            this._lastDragUpdateDetails = null;
+        }
+
+        void _handleLongPressStart() {
+            if (!this._isDoubleTap && this.widget.onSingleLongTapStart != null) {
+                this.widget.onSingleLongTapStart();
+            }
+        }
+
+        void _doubleTapTimeout() {
+            this._doubleTapTimer = null;
+            this._lastTapOffset = null;
+        }
+
+        bool _isWithinDoubleTapTolerance(Offset secondTapOffset) {
+            D.assert(secondTapOffset != null);
+            if (this._lastTapOffset == null) {
+                return false;
+            }
+
+            Offset difference = secondTapOffset - this._lastTapOffset;
+            return difference.distance <= Constants.kDoubleTapSlop;
+        }
+
+        public override Widget build(BuildContext context) {
+            Dictionary<Type, GestureRecognizerFactory> gestures = new Dictionary<Type, GestureRecognizerFactory>();
+
+            gestures.Add(typeof(TapGestureRecognizer), new GestureRecognizerFactoryWithHandlers<TapGestureRecognizer>(
+                    () => new TapGestureRecognizer(debugOwner: this),
+                    instance => {
+                        instance.onTapDown = this._handleTapDown;
+                        instance.onTapUp = this._handleTapUp;
+                        instance.onTapCancel = this._handleTapCancel;
+                    }
+                )
+            );
+
+            if (this.widget.onSingleLongTapStart != null) {
+                gestures[typeof(LongPressGestureRecognizer)] = new GestureRecognizerFactoryWithHandlers<LongPressGestureRecognizer>(
+                    () => new LongPressGestureRecognizer(debugOwner: this, kind: PointerDeviceKind.touch),
+                    instance => {
+                        instance.onLongPress = this._handleLongPressStart;
+                    });
+            }
+
+            if (this.widget.onDragSelectionStart != null ||
+                this.widget.onDragSelectionUpdate != null ||
+                this.widget.onDragSelectionEnd != null) {
+                gestures.Add(typeof(HorizontalDragGestureRecognizer),
+                    new GestureRecognizerFactoryWithHandlers<HorizontalDragGestureRecognizer>(
+                        () => new HorizontalDragGestureRecognizer(debugOwner: this, kind: PointerDeviceKind.mouse),
+                        instance => {
+                            instance.dragStartBehavior = DragStartBehavior.down;
+                            instance.onStart = this._handleDragStart;
+                            instance.onUpdate = this._handleDragUpdate;
+                            instance.onEnd = this._handleDragEnd;
+                        }
+                    )
+                );
+            }
+
+            return new RawGestureDetector(
+                gestures: gestures,
+                behavior: this.widget.behavior,
+                child: this.widget.child
+            );
         }
     }
 }

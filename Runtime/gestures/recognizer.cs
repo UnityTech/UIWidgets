@@ -8,14 +8,38 @@ using UnityEngine;
 namespace Unity.UIWidgets.gestures {
     public delegate T RecognizerCallback<T>();
 
+    public enum DragStartBehavior {
+        down,
+        start
+    }
+
     public abstract class GestureRecognizer : DiagnosticableTree, GestureArenaMember {
-        protected GestureRecognizer(object debugOwner = null) {
+        protected GestureRecognizer(object debugOwner = null, PointerDeviceKind? kind = null) {
             this.debugOwner = debugOwner;
+            this._kind = kind;
         }
 
         public readonly object debugOwner;
 
-        public abstract void addPointer(PointerDownEvent evt);
+        readonly PointerDeviceKind? _kind;
+
+        public void addPointer(PointerDownEvent evt) {
+            if (this.isPointerAllowed(evt)) {
+                this.addAllowedPointer(evt);
+            }
+            else {
+                this.handleNonAllowedPointer(evt);
+            }
+        }
+
+        public abstract void addAllowedPointer(PointerDownEvent evt);
+
+        protected virtual void handleNonAllowedPointer(PointerDownEvent evt) {
+        }
+
+        protected bool isPointerAllowed(PointerDownEvent evt) {
+            return this._kind == null || this._kind == evt.kind;
+        }
 
         public virtual void addScrollPointer(PointerScrollEvent evt) {
         }
@@ -72,7 +96,8 @@ namespace Unity.UIWidgets.gestures {
     }
 
     public abstract class OneSequenceGestureRecognizer : GestureRecognizer {
-        protected OneSequenceGestureRecognizer(object debugOwner = null) : base(debugOwner) {
+        protected OneSequenceGestureRecognizer(object debugOwner = null, PointerDeviceKind? kind = null) : base(
+            debugOwner, kind) {
         }
 
         readonly Dictionary<int, GestureArenaEntry> _entries = new Dictionary<int, GestureArenaEntry>();
@@ -175,8 +200,9 @@ namespace Unity.UIWidgets.gestures {
     public abstract class PrimaryPointerGestureRecognizer : OneSequenceGestureRecognizer {
         protected PrimaryPointerGestureRecognizer(
             TimeSpan? deadline = null,
-            object debugOwner = null
-        ) : base(debugOwner: debugOwner) {
+            object debugOwner = null,
+            PointerDeviceKind? kind = null
+        ) : base(debugOwner: debugOwner, kind: kind) {
             this.deadline = deadline;
         }
 
@@ -190,7 +216,7 @@ namespace Unity.UIWidgets.gestures {
 
         Timer _timer;
 
-        public override void addPointer(PointerDownEvent evt) {
+        public override void addAllowedPointer(PointerDownEvent evt) {
             this.startTrackingPointer(evt.pointer);
             if (this.state == GestureRecognizerState.ready) {
                 this.state = GestureRecognizerState.possible;
