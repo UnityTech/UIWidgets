@@ -571,6 +571,7 @@ mergeInto(LibraryManager.library, {
                     h = Math.round(w / Module["forcedAspectRatio"]);
                 }
             }
+            //////////// Modification Start ////////////////////
             var dpr = window.devicePixelRatio;
             if ((document["fullscreenElement"] || document["mozFullScreenElement"] || document["msFullscreenElement"] || document["webkitFullscreenElement"] || document["webkitCurrentFullScreenElement"]) === canvas.parentNode && typeof screen != "undefined") {
                 var factor = Math.min((screen.width * dpr) / w, (screen.height * dpr) / h);
@@ -592,6 +593,7 @@ mergeInto(LibraryManager.library, {
                     if (!canvas.style.getPropertyValue("height").includes("%")) canvas.style.setProperty("height", (h / dpr) + "px", "important");
                 }
             }
+            ///////////////// Modification End ///////////////////
         }),
         wgetRequests: {},
         nextWgetRequestHandle: 0,
@@ -782,6 +784,7 @@ mergeInto(LibraryManager.library, {
             };
         }),
         fillMouseEventData: (function (eventStruct, e, target) {
+            ///////////////// Modification Start ///////////////////////
             var devicePixelRatio = window.devicePixelRatio;
             HEAPF64[eventStruct >> 3] = JSEvents.tick();
             HEAP32[eventStruct + 8 >> 2] = e.screenX * devicePixelRatio;
@@ -816,6 +819,7 @@ mergeInto(LibraryManager.library, {
                 JSEvents.previousScreenX = e.screenX * devicePixelRatio;
                 JSEvents.previousScreenY = e.screenY * devicePixelRatio;
             }
+            ////////////// Modification End //////////////////////////////
         }),
         registerMouseEventCallback: (function(target, userData, useCapture, callbackfunc, eventTypeId, eventTypeString) {
             if (!JSEvents.mouseEvent) {
@@ -1079,8 +1083,10 @@ mergeInto(LibraryManager.library, {
             stringToUTF8(id, eventStruct + 136, 128);
             HEAP32[eventStruct + 264 >> 2] = reportedElement ? reportedElement.clientWidth : 0;
             HEAP32[eventStruct + 268 >> 2] = reportedElement ? reportedElement.clientHeight : 0;
+            //////////////////// Modification Start ///////////////////////////////
             HEAP32[eventStruct + 272 >> 2] = screen.width * window.devicePixelRatio;
             HEAP32[eventStruct + 276 >> 2] = screen.height * window.devicePixelRatio;
+            //////////////////// Modification End ///////////////////////////////
             if (isFullscreen) {
                 JSEvents.previousFullscreenElement = fullscreenElement;
             }
@@ -1323,6 +1329,7 @@ mergeInto(LibraryManager.library, {
                 var canvasRect = Module["canvas"] ? Module["canvas"].getBoundingClientRect() : undefined;
                 var targetRect = JSEvents.getBoundingClientRectOrZeros(target);
                 var numTouches = 0;
+                //////////////////// Modification Start ////////////////////////////
                 var devicePixelRatio = window.devicePixelRatio;
                 for (var i in touches) {
                     var t = touches[i];
@@ -1344,6 +1351,7 @@ mergeInto(LibraryManager.library, {
                     }
                     HEAP32[ptr + 36 >> 2] = (t.clientX - targetRect.left) * devicePixelRatio;
                     HEAP32[ptr + 40 >> 2] = (t.clientY - targetRect.top) * devicePixelRatio;
+                    //////////////////// Modification End ////////////////////////////
                     ptr += 52;
                     if (++numTouches >= 32) {
                         break;
