@@ -1,18 +1,26 @@
 mergeInto(LibraryManager.library, {
     JS_SystemInfo_GetWidth: function () {
+        //////////// Modification Start ////////////////////
         return UnityLoader.SystemInfo.width * window.devicePixelRatio;
+        //////////// Modification End ////////////////////
     },
 
     JS_SystemInfo_GetHeight: function () {
+        //////////// Modification Start ////////////////////
         return UnityLoader.SystemInfo.height * window.devicePixelRatio;
+        //////////// Modification End ////////////////////
     },
 
     JS_SystemInfo_GetCurrentCanvasWidth: function () {
+        //////////// Modification Start ////////////////////
         return Module['canvas'].clientWidth * window.devicePixelRatio;
+        //////////// Modification End ////////////////////
     },
 
     JS_SystemInfo_GetCurrentCanvasHeight: function () {
+        //////////// Modification Start ////////////////////
         return Module['canvas'].clientHeight * window.devicePixelRatio;
+        //////////// Modification End ////////////////////
     },
     $Browser : {
         mainLoop: {
