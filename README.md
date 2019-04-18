@@ -215,6 +215,27 @@ Status bar is always hidden by default when an Unity project is running on an An
 To build an App that is able to adjust the frame rate automatically, please open Project Settings, and in the Quality tab, set the "V Sync Count" option of the target platform to "Don't Sync".
 The default logic is to set the frame rate to 15 when the screen is static, and change the frame rate to 60 whenever the screen changes.
 If you would like to modify the behavior of speeding up or cooling down the frame rate, please set `Window.onFrameRateSpeedUp` and/or `Window.onFrameRateCoolDown` to your own functions.
+
+#### WebGL Canvas Device Pixel Ratio Plugin
+The width and height of the Canvas in browser may differ from the number of pixels the Canvas occupies on the screen.
+Therefore, the image may blur in the builded WebGL program.
+The Plugin `Plugins/platform/webgl/UIWidgetsCanvasDevicePixelRatio.jslib` solves this issue.
+If you need to disable this plugin for any reason, please select this plugin in the **Project** panel, and put `ENABLE_CANVAS_DEVICE_PIXEL_RATIO_PLUGIN` (this is not defined by default, which renders this plugin disabled) in the **Define Constraints** field in the **Inspector** panel.
+
+This plugin overrides the following parameters in the Unity WebGL building module:
+```
+JS_SystemInfo_GetWidth
+JS_SystemInfo_GetHeight
+JS_SystemInfo_GetCurrentCanvasWidth
+JS_SystemInfo_GetCurrentCanvasHeight
+$Browser
+$JSEvents
+```
+If you would like to implement your own WebGL plugin, and your plugin overrides at least one of the above parameters, you need to disable the `UIWidgetsCanvasDevicePixelRatio` plugin in the above mentioned way to avoid possible conflicts. 
+If you still need the function provided by this plugin, you can mannually apply the modification to Unity WebGL building module introduced in this plugin.
+All the modifications introduced in `UIWidgetsCanvasDevicePixelRatio` are marked by `////////// Modifcation Start ////////////` and `////////// Modifcation End ////////////`.
+In the marked codes, all the multiplications and divisions with `devicePixelRatio` are introduced by our modification.
+To learn about the original script in detail, please refer to `SystemInfo.js` and `UnityNativeJS/UnityNative.js` in `PlaybackEngines/WebGLSupport/BuildTools/lib` in your Unity Editor installation.
  
 ## Debug UIWidgets Application
 
