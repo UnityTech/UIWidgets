@@ -71,9 +71,7 @@ namespace Unity.UIWidgets.ui {
         const float ScoreInfty = float.MaxValue;
         const float ScoreDesperate = 1e10f;
 
-        string _textBuf;
-        int _textOffset;
-        int _textLength;
+        TextBuff _textBuf;
         List<float> _charWidths = new List<float>();
         List<int> _breaks = new List<int>();
         List<float> _widths = new List<float>();
@@ -88,7 +86,7 @@ namespace Unity.UIWidgets.ui {
         TabStops _tabStops;
         int mFirstTabIndex;
         List<Candidate> _candidates = new List<Candidate>();
-
+        
         public int computeBreaks() {
             int nCand = this._candidates.Count;
             if (nCand > 0 && (nCand == 1 || this._lastBreak != nCand - 1)) {
@@ -110,10 +108,8 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void setText(string text, int textOffset, int textLength) {
-            this._textBuf = text;
-            this._textOffset = textOffset;
-            this._textLength = textLength;
-            this._wordBreaker.setText(this._textBuf, textOffset, textLength);
+            this._textBuf = new TextBuff(text, textOffset, textLength);
+            this._wordBreaker.setText(this._textBuf);
             this._wordBreaker.next();
             this._candidates.Clear();
             Candidate can = new Candidate {
@@ -136,7 +132,7 @@ namespace Unity.UIWidgets.ui {
             float width = 0.0f;
             if (style != null) {
                 width = Layout.measureText(this._width - this._preBreak, this._textBuf,
-                    start + this._textOffset, end - start, style,
+                    start, end - start, style,
                     this._charWidths, start, this._tabStops);
             }
 
@@ -149,7 +145,7 @@ namespace Unity.UIWidgets.ui {
             int postSpaceCount = this._spaceCount;
 
             for (int i = start; i < end; i++) {
-                char c = this._textBuf[i + this._textOffset];
+                char c = this._textBuf.charAt(i);
                 if (c == '\t') {
                     this._width = this._preBreak + this._tabStops.nextTab((this._width - this._preBreak));
                     if (this.mFirstTabIndex == int.MaxValue) {

@@ -2,9 +2,7 @@
 namespace Unity.UIWidgets.ui {
     class WordBreaker {
         public const uint U16_SURROGATE_OFFSET = ((0xd800 << 10) + 0xdc00 - 0x10000);
-        string _text;
-        int _offset;
-        int _size;
+        TextBuff _text;
         int _current;
         int _last;
         int _scanOffset;
@@ -24,10 +22,8 @@ namespace Unity.UIWidgets.ui {
             return this._current;
         }
 
-        public void setText(string data, int offset, int size) {
-            this._text = data;
-            this._offset = offset;
-            this._size = size;
+        public void setText(TextBuff text) {
+            this._text = text;
             this._last = 0;
             this._current = 0;
             this._scanOffset = 0;
@@ -90,27 +86,27 @@ namespace Unity.UIWidgets.ui {
         }
 
         int _findNextBoundaryNormal() {
-            if (this._current == this._size) {
+            if (this._current == this._text.size) {
                 return -1;
             }
             
-            WordSeparate.characterType preType = WordSeparate.classifyChar(this._text, this._current + this._offset);
-            bool preBoundaryChar = isBoundaryChar(this._text[this._current + this._offset]);
+            WordSeparate.characterType preType = WordSeparate.classifyChar(this._text.charAt(this._current));
+            bool preBoundaryChar = isBoundaryChar(this._text.charAt(this._current));
             this._current++;
             if (preBoundaryChar) {
                 return this._current;
             }
             
-            for (; this._current < this._size; ++this._current) {
+            for (; this._current < this._text.size; ++this._current) {
                 this.nextUntilCodePoint();
-                if (this._current >= this._size) {
+                if (this._current >= this._text.size) {
                     break;
                 }
 
-                if (isBoundaryChar(this._text[this._current + this._offset])) {
+                if (isBoundaryChar(this._text.charAt(this._current))) {
                     break;
                 }
-                var currentType = WordSeparate.classifyChar(this._text, this._current + this._offset);
+                var currentType = WordSeparate.classifyChar(this._text.charAt(this._current));
                 if ((currentType == WordSeparate.characterType.WhiteSpace) 
                     != (preType == WordSeparate.characterType.WhiteSpace)) {
                     break;
@@ -123,11 +119,12 @@ namespace Unity.UIWidgets.ui {
         void _detectEmailOrUrl() {
         }
 
-        static uint nextCode(string text, ref int index, int end) {
-            uint ch = text[index++];
+        static uint nextCode(TextBuff text, ref int index, int end) {
+            uint ch = text.charAt(index);
+            index++;
             if (isLeadSurrogate(ch)) {
-                if (index < end && isTrailSurrogate(text[index])) {
-                    char ch2 = text[index];
+                if (index < end && isTrailSurrogate(text.charAt(index))) {
+                    char ch2 = text.charAt(index);
                     index++;
                     ch = getSupplementary(ch, ch2);
                 }
@@ -136,11 +133,12 @@ namespace Unity.UIWidgets.ui {
             return ch;
         }
 
-        static uint preCode(string text, ref int index, int start) {
-            uint ch = text[--index];
+        static uint preCode(TextBuff text, ref int index, int start) {
+            --index;
+            uint ch = text.charAt(index);
             if (isTrailSurrogate(ch)) {
-                if (index > start && isLeadSurrogate(text[index - 1])) {
-                    ch = getSupplementary(text[index - 1], ch);
+                if (index > start && isLeadSurrogate(text.charAt(index - 1))) {
+                    ch = getSupplementary(text.charAt(index - 1), ch);
                     --index;
                 }
             }
@@ -178,9 +176,9 @@ namespace Unity.UIWidgets.ui {
         }
         
         void nextUntilCodePoint() {
-            while (this._current < this._size
-                   && (char.IsLowSurrogate(this._text[this._current + this._offset]) 
-                       ||  char.IsHighSurrogate(this._text[this._current + this._offset]))) {
+            while (this._current < this._text.size
+                   && (char.IsLowSurrogate(this._text.charAt(this._current)) 
+                       ||  char.IsHighSurrogate(this._text.charAt(this._current)))) {
                 this._current++;
             }
         }
