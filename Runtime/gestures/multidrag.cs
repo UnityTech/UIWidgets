@@ -140,14 +140,14 @@ namespace Unity.UIWidgets.gestures {
 
     public abstract class MultiDragGestureRecognizer<T> : GestureRecognizer where T : MultiDragPointerState {
         protected MultiDragGestureRecognizer(
-            object debugOwner) : base(debugOwner: debugOwner) {
+            object debugOwner, PointerDeviceKind? kind = null) : base(debugOwner: debugOwner, kind: kind) {
         }
 
         public GestureMultiDragStartCallback onStart;
 
         Dictionary<int, T> _pointers = new Dictionary<int, T>();
 
-        public override void addPointer(PointerDownEvent pEvent) {
+        public override void addAllowedPointer(PointerDownEvent pEvent) {
             D.assert(this._pointers != null);
             D.assert(pEvent.position != null);
             D.assert(!this._pointers.ContainsKey(pEvent.pointer));
@@ -264,7 +264,8 @@ namespace Unity.UIWidgets.gestures {
 
 
     public class ImmediateMultiDragGestureRecognizer : MultiDragGestureRecognizer<_ImmediatePointerState> {
-        public ImmediateMultiDragGestureRecognizer(object debugOwner) : base(debugOwner: debugOwner) {
+        public ImmediateMultiDragGestureRecognizer(object debugOwner, PointerDeviceKind? kind = null) : base(
+            debugOwner: debugOwner, kind: kind) {
         }
 
         public override _ImmediatePointerState createNewPointerState(PointerDownEvent pEvent) {
@@ -293,7 +294,8 @@ namespace Unity.UIWidgets.gestures {
     }
 
     public class HorizontalMultiDragGestureRecognizer : MultiDragGestureRecognizer<_HorizontalPointerState> {
-        public HorizontalMultiDragGestureRecognizer(object debugOwner) : base(debugOwner: debugOwner) {
+        public HorizontalMultiDragGestureRecognizer(object debugOwner, PointerDeviceKind? kind = null) : base(
+            debugOwner: debugOwner, kind: kind) {
         }
 
         public override _HorizontalPointerState createNewPointerState(PointerDownEvent pEvent) {
@@ -324,7 +326,8 @@ namespace Unity.UIWidgets.gestures {
 
 
     public class VerticalMultiDragGestureRecognizer : MultiDragGestureRecognizer<_VerticalPointerState> {
-        public VerticalMultiDragGestureRecognizer(object debugOwner) : base(debugOwner: debugOwner) {
+        public VerticalMultiDragGestureRecognizer(object debugOwner, PointerDeviceKind? kind = null) : base(
+            debugOwner: debugOwner, kind: kind) {
         }
 
         public override _VerticalPointerState createNewPointerState(PointerDownEvent pEvent) {
@@ -402,7 +405,8 @@ namespace Unity.UIWidgets.gestures {
     public class DelayedMultiDragGestureRecognizer : MultiDragGestureRecognizer<_DelayedPointerState> {
         public DelayedMultiDragGestureRecognizer(
             TimeSpan? delay = null,
-            object debugOwner = null) : base(debugOwner: debugOwner) {
+            object debugOwner = null,
+            PointerDeviceKind? kind = null) : base(debugOwner: debugOwner, kind: kind) {
             if (delay == null) {
                 delay = Constants.kLongPressTimeout;
             }

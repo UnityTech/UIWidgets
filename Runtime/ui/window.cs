@@ -264,7 +264,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public const int defaultMaxTargetFrameRate = 60;
-        public const int defaultMinTargetFrameRate = 15;
+        public const int defaultMinTargetFrameRate = 25;
 
         static Action _onFrameRateSpeedUp = defaultFrameRateSpeedUp;
 

@@ -53,8 +53,8 @@ namespace Unity.UIWidgets.gestures {
 
 
     public class DoubleTapGestureRecognizer : GestureRecognizer {
-        public DoubleTapGestureRecognizer(object debugOwner = null)
-            : base(debugOwner: debugOwner) {
+        public DoubleTapGestureRecognizer(object debugOwner = null, PointerDeviceKind? kind = null)
+            : base(debugOwner: debugOwner, kind: kind) {
         }
 
         public GestureDoubleTapCallback onDoubleTap;
@@ -63,7 +63,7 @@ namespace Unity.UIWidgets.gestures {
         _TapTracker _firstTap;
         readonly Dictionary<int, _TapTracker> _trackers = new Dictionary<int, _TapTracker>();
 
-        public override void addPointer(PointerDownEvent evt) {
+        public override void addAllowedPointer(PointerDownEvent evt) {
             if (this._firstTap != null &&
                 !this._firstTap.isWithinTolerance(evt, Constants.kDoubleTapSlop)) {
                 return;

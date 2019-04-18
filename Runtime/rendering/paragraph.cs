@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.painting;
+using Unity.UIWidgets.service;
 using Unity.UIWidgets.ui;
 using UnityEngine;
+using Canvas = Unity.UIWidgets.ui.Canvas;
+using Color = Unity.UIWidgets.ui.Color;
 using Rect = Unity.UIWidgets.ui.Rect;
 
 namespace Unity.UIWidgets.rendering {
@@ -29,13 +32,17 @@ namespace Unity.UIWidgets.rendering {
         readonly TextPainter _textPainter;
         bool _hasVisualOverflow = false;
 
+        List<TextBox> _selectionRects;
+
         public RenderParagraph(TextSpan text,
             TextAlign textAlign = TextAlign.left,
             TextDirection textDirection = TextDirection.ltr,
             bool softWrap = true,
             TextOverflow overflow = TextOverflow.clip,
             float textScaleFactor = 1.0f,
-            int? maxLines = null
+            int? maxLines = null,
+            Action onSelectionChanged = null,
+            Color selectionColor = null
         ) {
             D.assert(maxLines == null || maxLines > 0);
             this._softWrap = softWrap;
@@ -48,6 +55,26 @@ namespace Unity.UIWidgets.rendering {
                 maxLines,
                 overflow == TextOverflow.ellipsis ? _kEllipsis : ""
             );
+
+            this._selection = null;
+            this.onSelectionChanged = onSelectionChanged;
+            this.selectionColor = selectionColor;
+        }
+
+        public Action onSelectionChanged;
+        public Color selectionColor;
+
+        public TextSelection selection {
+            get { return this._selection; }
+            set {
+                if (this._selection == value) {
+                    return;
+                }
+
+                this._selection = value;
+                this._selectionRects = null;
+                this.markNeedsPaint();
+            }
         }
 
         public TextSpan text {
@@ -188,16 +215,118 @@ namespace Unity.UIWidgets.rendering {
             return true;
         }
 
+        bool _hasFocus = false;
+        bool _listenerAttached = false;
+
+        public bool hasFocus {
+            get { return this._hasFocus; }
+            set {
+                if (this._hasFocus == value) {
+                    return;
+                }
+
+                this._hasFocus = value;
+
+                if (this._hasFocus) {
+                    D.assert(!this._listenerAttached);
+                    RawKeyboard.instance.addListener(this._handleKeyEvent);
+                    this._listenerAttached = true;
+                }
+                else {
+                    this.selection = null;
+                    D.assert(this._listenerAttached);
+                    RawKeyboard.instance.removeListener(this._handleKeyEvent);
+                    this._listenerAttached = false;
+                }
+            }
+        }
+
+        void _handleKeyEvent(RawKeyEvent keyEvent) {
+            //only allow KCommand.copy
+            if (keyEvent is RawKeyUpEvent) {
+                return;
+            }
+
+            if (this.selection.isCollapsed) {
+                return;
+            }
+
+            KeyCode pressedKeyCode = keyEvent.data.unityEvent.keyCode;
+            int modifiers = (int) keyEvent.data.unityEvent.modifiers;
+            bool ctrl = (modifiers & (int) EventModifiers.Control) > 0;
+            bool cmd = (modifiers & (int) EventModifiers.Command) > 0;
+            bool cKey = pressedKeyCode == KeyCode.C;
+            bool isMac = SystemInfo.operatingSystemFamily == OperatingSystemFamily.MacOSX;
+
+            KeyCommand? kcmd = keyEvent is RawKeyCommandEvent
+                ? ((RawKeyCommandEvent) keyEvent).command
+                : ((ctrl || (isMac && cmd)) && cKey)
+                    ? KeyCommand.Copy
+                    : (KeyCommand?) null;
+
+            if (kcmd == KeyCommand.Copy) {
+                Clipboard.setData(
+                    new ClipboardData(text: this.selection.textInside(this.text.toPlainText()))
+                );
+            }
+        }
+
+        public override void detach() {
+            if (this._listenerAttached) {
+                RawKeyboard.instance.removeListener(this._handleKeyEvent);
+            }
+
+            base.detach();
+        }
+
+        TextSelection _selection;
+
+        public void selectPositionAt(Offset from = null, Offset to = null, SelectionChangedCause? cause = null) {
+            D.assert(cause != null);
+            D.assert(from != null);
+            if (true) {
+                TextPosition fromPosition =
+                    this._textPainter.getPositionForOffset(this.globalToLocal(from));
+                TextPosition toPosition = to == null
+                    ? null
+                    : this._textPainter.getPositionForOffset(this.globalToLocal(to));
+
+                int baseOffset = fromPosition.offset;
+                int extentOffset = fromPosition.offset;
+                if (toPosition != null) {
+                    baseOffset = Math.Min(fromPosition.offset, toPosition.offset);
+                    extentOffset = Math.Max(fromPosition.offset, toPosition.offset);
+                }
+
+                TextSelection newSelection = new TextSelection(
+                    baseOffset: baseOffset,
+                    extentOffset: extentOffset,
+                    affinity: fromPosition.affinity);
+
+                if (newSelection != this._selection) {
+                    this._handleSelectionChanged(newSelection, cause.Value);
+                }
+            }
+        }
+
+
+        void _handleSelectionChanged(TextSelection selection,
+            SelectionChangedCause cause) {
+            this.selection = selection;
+            this.onSelectionChanged?.Invoke();
+        }
+
         public override void handleEvent(PointerEvent evt, HitTestEntry entry) {
             D.assert(this.debugHandleEvent(evt, entry));
             if (!(evt is PointerDownEvent)) {
                 return;
             }
+
             this._layoutTextWithConstraints(this.constraints);
-            Offset offset = ((BoxHitTestEntry)entry).localPosition;
+            Offset offset = ((BoxHitTestEntry) entry).localPosition;
             TextPosition position = this._textPainter.getPositionForOffset(offset);
             TextSpan span = this._textPainter.text.getSpanForPosition(position);
-            span?.recognizer?.addPointer((PointerDownEvent)evt);
+            span?.recognizer?.addPointer((PointerDownEvent) evt);
         }
 
         protected override void performLayout() {
@@ -208,6 +337,8 @@ namespace Unity.UIWidgets.rendering {
 
             var didOverflowWidth = this.size.width < textSize.width;
             this._hasVisualOverflow = didOverflowWidth || didOverflowHeight;
+
+            this._selectionRects = null;
         }
 
         public override void paint(PaintingContext context, Offset offset) {
@@ -220,10 +351,31 @@ namespace Unity.UIWidgets.rendering {
                 canvas.clipRect(bounds);
             }
 
+            if (this._selection != null && this.selectionColor != null && this._selection.isValid) {
+                if (!this._selection.isCollapsed) {
+                    this._selectionRects =
+                        this._selectionRects ?? this._textPainter.getBoxesForSelection(this._selection);
+                    this._paintSelection(canvas, offset);
+                }
+            }
+
             this._textPainter.paint(canvas, offset);
             if (this._hasVisualOverflow) {
                 canvas.restore();
             }
+        }
+
+
+        void _paintSelection(Canvas canvas, Offset effectiveOffset) {
+            D.assert(this._selectionRects != null);
+            D.assert(this.selectionColor != null);
+            var paint = new Paint {color = this.selectionColor};
+
+            Path barPath = new Path();
+            foreach (var box in this._selectionRects) {
+                barPath.addRect(box.toRect().shift(effectiveOffset));
+            }
+            canvas.drawPath(barPath, paint);
         }
 
         void _layoutText(float minWidth = 0.0f, float maxWidth = float.PositiveInfinity) {

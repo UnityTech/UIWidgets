@@ -249,12 +249,12 @@ namespace Unity.UIWidgets.material {
             }
         }
 
-        InteractiveInkFeature _createInkFeature(TapDownDetails details) {
+        InteractiveInkFeature _createInkFeature(Offset globalPosition) {
             MaterialInkController inkController = Material.of(this.context);
             BuildContext editableContext = this._editableTextKey.currentContext;
             RenderBox referenceBox =
                 (RenderBox) (InputDecorator.containerOf(editableContext) ?? editableContext.findRenderObject());
-            Offset position = referenceBox.globalToLocal(details.globalPosition);
+            Offset position = referenceBox.globalToLocal(globalPosition);
             Color color = Theme.of(this.context).splashColor;
 
             InteractiveInkFeature splash = null;
@@ -290,10 +290,10 @@ namespace Unity.UIWidgets.material {
 
         void _handleTapDown(TapDownDetails details) {
             this._renderEditable.handleTapDown(details);
-            this._startSplash(details);
+            this._startSplash(details.globalPosition);
         }
 
-        void _handleTap() {
+        void _handleSingleTapUp(TapUpDetails details) {
             if (this.widget.enableInteractiveSelection) {
                 this._renderEditable.handleTap();
             }
@@ -305,7 +305,7 @@ namespace Unity.UIWidgets.material {
             }
         }
 
-        void _handleTapCancel() {
+        void _handleSingleTapCancel() {
             this._cancelCurrentSplash();
         }
 
@@ -317,12 +317,29 @@ namespace Unity.UIWidgets.material {
             this._confirmCurrentSplash();
         }
 
-        void _startSplash(TapDownDetails details) {
+        void _handleDragSelectionStart(DragStartDetails details) {
+            this._renderEditable.selectPositionAt(
+                from: details.globalPosition,
+                cause: SelectionChangedCause.drag);
+
+            this._startSplash(details.globalPosition);
+        }
+
+        void _handleDragSelectionUpdate(DragStartDetails startDetails,
+            DragUpdateDetails updateDetails) {
+            this._renderEditable.selectPositionAt(
+                from: startDetails.globalPosition,
+                to: updateDetails.globalPosition,
+                cause: SelectionChangedCause.drag);
+        }
+
+
+        void _startSplash(Offset globalPosition) {
             if (this._effectiveFocusNode.hasFocus) {
                 return;
             }
 
-            InteractiveInkFeature splash = this._createInkFeature(details);
+            InteractiveInkFeature splash = this._createInkFeature(globalPosition);
             this._splashes = this._splashes ?? new HashSet<InteractiveInkFeature>();
             this._splashes.Add(splash);
             this._currentSplash = splash;
@@ -426,12 +443,14 @@ namespace Unity.UIWidgets.material {
 
             return new IgnorePointer(
                 ignoring: !(this.widget.enabled ?? this.widget.decoration?.enabled ?? true),
-                child: new GestureDetector(
-                    behavior: HitTestBehavior.translucent,
+                child: new TextSelectionGestureDetector(
                     onTapDown: this._handleTapDown,
-                    onTap: this._handleTap,
-                    onTapCancel: this._handleTapCancel,
-                    onLongPress: this._handleLongPress,
+                    onSingleTapUp: this._handleSingleTapUp,
+                    onSingleTapCancel: this._handleSingleTapCancel,
+                    onSingleLongTapStart: this._handleLongPress,
+                    onDragSelectionStart: this._handleDragSelectionStart,
+                    onDragSelectionUpdate: this._handleDragSelectionUpdate,
+                    behavior: HitTestBehavior.translucent,
                     child: child
                 )
             );

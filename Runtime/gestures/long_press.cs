@@ -1,9 +1,11 @@
+using Unity.UIWidgets.ui;
+
 namespace Unity.UIWidgets.gestures {
     public delegate void GestureLongPressCallback();
 
     public class LongPressGestureRecognizer : PrimaryPointerGestureRecognizer {
-        public LongPressGestureRecognizer(object debugOwner = null) :
-            base(deadline: Constants.kLongPressTimeout, debugOwner: debugOwner) {
+        public LongPressGestureRecognizer(object debugOwner = null, PointerDeviceKind? kind = null) :
+            base(deadline: Constants.kLongPressTimeout, debugOwner: debugOwner, kind: kind) {
         }
 
         public GestureLongPressCallback onLongPress;
