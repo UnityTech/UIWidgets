@@ -222,7 +222,7 @@ Therefore, the image may blur in the builded WebGL program.
 The Plugin `Plugins/platform/webgl/UIWidgetsCanvasDevicePixelRatio.jslib` solves this issue.
 If you need to disable this plugin for any reason, please select this plugin in the **Project** panel, and put `ENABLE_CANVAS_DEVICE_PIXEL_RATIO_PLUGIN` in the **Define Constraints** field in the **Inspector** panel.
 
-This plugin overrides the following parameters in the Unity WebGL building model:
+This plugin overrides the following parameters in the Unity WebGL building module:
 ```
 JS_SystemInfo_GetWidth
 JS_SystemInfo_GetHeight
