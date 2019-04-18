@@ -231,7 +231,7 @@ JS_SystemInfo_GetCurrentCanvasHeight
 $Browser
 $JSEvents
 ```
-If you would like to implement your own WebGL plugin, and your plugin overrides at least one of the above parameters, you need to disable the UIWidgetsCanvasDevicePixelRatio` plugin in the above mentioned way to avoid possible conflicts. 
+If you would like to implement your own WebGL plugin, and your plugin overrides at least one of the above parameters, you need to disable the `UIWidgetsCanvasDevicePixelRatio` plugin in the above mentioned way to avoid possible conflicts. 
 If you still need the function provided by this plugin, you can mannually apply the modification to Unity WebGL building module introduced in this plugin.
 All the modifications introduced in `UIWidgetsCanvasDevicePixelRatio` are marked by `////////// Modifcation Start ////////////` and `////////// Modifcation End ////////////`.
 In the marked codes, all the multiplications and divisions with `devicePixelRatio` are introduced by our modification.
