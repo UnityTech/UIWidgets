@@ -184,6 +184,11 @@ UIWidgets也支持Gif！
 默认的逻辑是在界面静止时将帧率降低为15，在界面变动时将帧率提高至60。
 如果您需要修改帧率升高或降低时的行为，请将`Window.onFrameRateSpeedUp`和/或`Window.onFrameRateCoolDown`设置为您自己的函数。
 
+#### 八、WebGL分辨率调整插件
+因为浏览器中Canvas的宽高和其在显示器上的像素数可能不一致，所以构建出的WebGL程序中画面可能会模糊。
+插件`Plugins/platform/webgl/UIWidgetsCanvasDevicePixelRatio.jslib`解决了这个问题。
+如果您因为任何原因需要禁止此插件，请在Project面板中选中该插件，在Inspector面板中的Define Constraints参数中，填入一个未被定义的宏名称。
+
 ## 调试UIWidgets应用程序
 
 #### 定义UIWidgets_DEBUG

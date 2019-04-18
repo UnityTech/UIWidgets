@@ -215,6 +215,12 @@ Status bar is always hidden by default when an Unity project is running on an An
 To build an App that is able to adjust the frame rate automatically, please open Project Settings, and in the Quality tab, set the "V Sync Count" option of the target platform to "Don't Sync".
 The default logic is to set the frame rate to 15 when the screen is static, and change the frame rate to 60 whenever the screen changes.
 If you would like to modify the behavior of speeding up or cooling down the frame rate, please set `Window.onFrameRateSpeedUp` and/or `Window.onFrameRateCoolDown` to your own functions.
+
+#### WebGL Device Pixel Ratio Plugin
+The width and height of the Canvas in browser may differ from the number of pixels the Canvas occupies on the screen.
+Therefore, the image may blur in the builded WebGL program.
+The Plugin `Plugins/platform/webgl/UIWidgetsCanvasDevicePixelRatio.jslib` solves this issue.
+If you need to disable this plugin for any reason, please select this plugin in the **Project** panel, and put an arbitrary undefined macro name in the **Define Constraints** field in the **Inspector** panel.
  
 ## Debug UIWidgets Application
 
