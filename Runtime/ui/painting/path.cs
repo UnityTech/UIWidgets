@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,6 +7,143 @@ using Unity.UIWidgets.foundation;
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
+
+    public static class PathOptimizer {
+        public static bool optimizing = false;
+    }
+
+    public class SimpleFlash<T> where T : new() {
+        static SimpleFlash<T> _instance;
+
+        const int initial_size = 1024;
+        const int delta_size = 128;
+
+        public static SimpleFlash<T> instance {
+            get {
+                if (_instance != null) return _instance;
+                _instance = new SimpleFlash<T>();
+                _instance.setup();
+                return _instance;
+            }
+        }
+
+        List<T> flash;
+        int curIndex;
+
+        void setup() {
+            this.flash = new List<T>(initial_size);
+            for (var i = 0; i < initial_size; i++) {
+                this.flash.Add(new T());
+            }
+        }
+        
+        public T fetch() {
+            if (this.curIndex >= this.flash.Count) {
+                for (var i = 0; i < delta_size; i++) {
+                    this.flash.Add(new T());
+                }
+            }
+
+            var ret = this.flash[this.curIndex++];
+            return ret;
+        }
+
+        public void clearAll() {
+            this.curIndex = 0;
+        }
+    }
+
+    public class Flash<T> 
+        where T: new() {
+        static Flash<T> _instance;
+
+        const int initial_size = 1024;
+        const int delta_size = 128;
+
+        public static Flash<T> instance {
+            get {
+                if (_instance != null) return _instance;
+                _instance = new Flash<T>();
+                _instance.setup();
+                return _instance;
+            }
+        }
+
+        List<List<T>> flash;
+        int curIndex;
+
+        void setup() {
+            this.flash = new List<List<T>>(initial_size);
+            for (var i = 0; i < initial_size; i++) {
+                this.flash.Add(new List<T>(256));
+            }
+        }
+        
+        public List<T> fetch() {
+            if (this.curIndex >= this.flash.Count) {
+                for (var i = 0; i < delta_size; i++) {
+                    this.flash.Add(new List<T>(256));
+                }
+            }
+
+            var ret = this.flash[this.curIndex++];
+            ret.Clear();
+            return ret;
+        }
+
+        public void clearAll() {
+            this.curIndex = 0;
+        }
+    }
+    
+    public class Pool<T> where T : IList, new() {
+
+        static Pool<T> _instance;
+
+        const int initial_size = 256;
+        const int delta_size = initial_size / 2;
+
+        public static Pool<T> instance {
+            get {
+                if (_instance != null) return _instance;
+                _instance = new Pool<T>();
+                _instance.setup();
+                return _instance;
+            }
+        }
+        
+        Stack<T> pool;
+
+        void setup() {
+            this.pool = new Stack<T>(initial_size * 2);
+            for (var i = 0; i < initial_size; i++) {
+                this.pool.Push(new T());
+            }
+        }
+
+        public T fetch() {
+            if (this.pool.Count == 0) {
+                for (var i = 0; i < delta_size; i++) {
+                    this.pool.Push(new T());
+                }
+            }
+
+            var ret = this.pool.Pop();
+
+            if (ret == null) {
+                int s = 100;
+            }
+            ret.Clear();
+            return ret;
+        }
+
+        public void recycle(T obj) {
+            if (obj != null) {
+                this.pool.Push(obj);
+            }
+        }
+    }
+    
     public class Path {
         const float _KAPPA90 = 0.5522847493f;
 
@@ -17,14 +155,22 @@ namespace Unity.UIWidgets.ui {
 
         PathCache _cache;
 
+        readonly bool _use_pool;
+
+        public Path(bool use_pool = false) {
+            this._use_pool = use_pool;
+        }
+
         internal PathCache flatten(float scale) {
             if (this._cache != null && this._cache.canReuse(scale)) {
                 return this._cache;
             }
 
-            this._cache = new PathCache(scale);
-
+            this._cache = new PathCache(scale, this._use_pool);
+            
+            
             var i = 0;
+            
             while (i < this._commands.Count) {
                 var cmd = (PathCommand) this._commands[i];
                 switch (cmd) {
@@ -57,8 +203,11 @@ namespace Unity.UIWidgets.ui {
                         break;
                 }
             }
-
+            
+            
             this._cache.normalize();
+
+
             return this._cache;
         }
 
@@ -1052,6 +1201,20 @@ namespace Unity.UIWidgets.ui {
         public float len;
         public float dmx, dmy;
         public PointFlags flags;
+
+
+        public static PathPoint CreatePathPoint(float x, float y, float dx = 0, float dy = 0, float dmx = 0, float dmy = 0, PointFlags flags = PointFlags.corner) {
+            var ret = PathOptimizer.optimizing ? SimpleFlash<PathPoint>.instance.fetch() : new PathPoint();
+            ret.x = x;
+            ret.y = y;
+            ret.dx = dx;
+            ret.dy = dy;
+            ret.dmx = dmx;
+            ret.dmy = dmy;
+            ret.flags = flags;
+
+            return ret;
+        }
     }
 
     enum PathCommand {
@@ -1079,9 +1242,9 @@ namespace Unity.UIWidgets.ui {
         readonly float _distTol;
         readonly float _tessTol;
 
-        readonly List<PathPath> _paths = new List<PathPath>();
-        readonly List<PathPoint> _points = new List<PathPoint>();
-        readonly List<Vector3> _vertices = new List<Vector3>();
+        readonly List<PathPath> _paths;
+        readonly List<PathPoint> _points;
+        readonly List<Vector3> _vertices;
 
         MeshMesh _fillMesh;
         bool _fillConvex;
@@ -1092,10 +1255,21 @@ namespace Unity.UIWidgets.ui {
         StrokeJoin _lineJoin;
         float _miterLimit;
 
-        public PathCache(float scale) {
+        public PathCache(float scale, bool use_pool = false) {
             this._scale = scale;
             this._distTol = 0.01f / scale;
             this._tessTol = 0.25f / scale;
+
+            if (PathOptimizer.optimizing) {
+                this._paths = Flash<PathPath>.instance.fetch();
+                this._points = Flash<PathPoint>.instance.fetch();
+                this._vertices = Flash<Vector3>.instance.fetch();
+            }
+            else {
+                this._paths = new List<PathPath>();
+                this._points = new List<PathPoint>();
+                this._vertices = new List<Vector3>();
+            }
         }
 
         public bool canReuse(float scale) {
@@ -1114,7 +1288,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void addPoint(float x, float y, PointFlags flags) {
-            this._addPoint(new PathPoint {x = x, y = y, flags = flags});
+            this._addPoint(PathPoint.CreatePathPoint(x : x, y : y, flags : flags));
         }
 
         void _addPoint(PathPoint point) {
@@ -1140,6 +1314,7 @@ namespace Unity.UIWidgets.ui {
             float x2, float y2,
             float x3, float y3, float x4, float y4,
             PointFlags flags) {
+
             float x1, y1;
             if (this._points.Count == 0) {
                 x1 = 0;
@@ -1152,7 +1327,7 @@ namespace Unity.UIWidgets.ui {
             }
 
             var points = TessellationGenerator.tessellateBezier(x1, y1, x2, y2, x3, y3, x4, y4, this._tessTol);
-            D.assert(points.Count > 0);            
+            D.assert(points.Count > 0);  
             points[points.Count - 1].flags = flags;
             foreach (var point in points) {
                 this._addPoint(point);

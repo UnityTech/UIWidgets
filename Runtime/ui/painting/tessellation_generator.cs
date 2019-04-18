@@ -150,12 +150,10 @@ namespace Unity.UIWidgets.ui {
         }
 
         static List<PathPoint> _toPathPoints(List<Vector2> points, float x1, float y1) {
-            var pathPoints = new List<PathPoint>(points.Count);
+            var pathPoints = Flash<PathPoint>.instance.fetch();
+
             foreach (var point in points) {
-                pathPoints.Add(new PathPoint {
-                    x = point.x + x1,
-                    y = point.y + y1,
-                });
+                pathPoints.Add(PathPoint.CreatePathPoint(x: point.x + x1, y: point.y + y1));
             }
 
             return pathPoints;

@@ -4,44 +4,65 @@ using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
     public class Matrix3 : IEquatable<Matrix3> {
+         public static Matrix3 createNewMatrix(Matrix3 other = null) {
+             if (PathOptimizer.optimizing) {
+                var ret = SimpleFlash<Matrix3>.instance.fetch();
+                ret.reset();
+
+                 if (other != null) {
+                     ret.copyFrom(other);
+                 }
+
+                 return ret;
+            }
+
+             
+             var new_ret = new Matrix3();
+             if (other != null) {
+                 new_ret.copyFrom(other);
+             }
+
+             return new_ret;
+         }
+        
         public static Matrix3 makeScale(float sx, float sy) {
-            var m = new Matrix3();
+            var m = createNewMatrix();
             m.setScale(sx, sy);
             return m;
         }
 
         public static Matrix3 makeScale(float scale) {
-            var m = new Matrix3();
+            var m = createNewMatrix();
             m.setScale(scale, scale);
             return m;
         }
 
         public static Matrix3 makeTrans(float dx, float dy) {
-            var m = new Matrix3();
+            var m = createNewMatrix();
             m.setTranslate(dx, dy);
             return m;
         }
 
         public static Matrix3 makeRotate(float radians) {
-            var m = new Matrix3();
+            var m = createNewMatrix();
             m.setRotate(radians);
             return m;
         }
 
         public static Matrix3 makeRotate(float radians, float px, float py) {
-            var m = new Matrix3();
+            var m = createNewMatrix();
             m.setRotate(radians, px, py);
             return m;
         }
 
         public static Matrix3 makeTrans(Offset offset) {
-            var m = new Matrix3();
+            var m = createNewMatrix();
             m.setTranslate(offset.dx, offset.dy);
             return m;
         }
 
         public static Matrix3 makeSkew(float dx, float dy) {
-            var m = new Matrix3();
+            var m = createNewMatrix();
             m.setSkew(dx, dy);
             return m;
         }
@@ -50,7 +71,7 @@ namespace Unity.UIWidgets.ui {
             float scaleX, float skewX, float transX,
             float skewY, float scaleY, float transY,
             float pers0, float pers1, float pers2) {
-            var m = new Matrix3();
+            var m = createNewMatrix();
             m.setAll(scaleX, skewX, transX, skewY, scaleY, transY, pers0, pers1, pers2);
             return m;
         }
@@ -438,7 +459,7 @@ namespace Unity.UIWidgets.ui {
                     a.fMat[kMScaleY] * b.fMat[kMTransY] + a.fMat[kMTransY]);
             }
             else {
-                Matrix3 tmp = new Matrix3();
+                Matrix3 tmp = createNewMatrix();
 
                 if (((aType | bType) & TypeMask.kPerspective_Mask) != 0) {
                     tmp.fMat[kMScaleX] = rowcol3(a.fMat, 0, b.fMat, 0);
@@ -502,7 +523,7 @@ namespace Unity.UIWidgets.ui {
                 this.fMat[kMTransY] += dy;
             }
             else if ((mask & TypeMask.kPerspective_Mask) != 0) {
-                var m = new Matrix3();
+                var m = createNewMatrix();
                 m.setTranslate(dx, dy);
                 this.preConcat(m);
                 return;
@@ -520,7 +541,7 @@ namespace Unity.UIWidgets.ui {
                 return;
             }
 
-            var m = new Matrix3();
+            var m = createNewMatrix();
             m.setScale(sx, sy, px, py);
             this.preConcat(m);
         }
@@ -558,25 +579,25 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void preRotate(float radians, float px, float py) {
-            var m = new Matrix3();
+            var m = createNewMatrix();
             m.setRotate(radians, px, py);
             this.preConcat(m);
         }
 
         public void preRotate(float radians) {
-            var m = new Matrix3();
+            var m = createNewMatrix();
             m.setRotate(radians);
             this.preConcat(m);
         }
 
         public void preSkew(float kx, float ky, float px, float py) {
-            var m = new Matrix3();
+            var m = createNewMatrix();
             m.setSkew(kx, ky, px, py);
             this.preConcat(m);
         }
 
         public void preSkew(float kx, float ky) {
-            var m = new Matrix3();
+            var m = createNewMatrix();
             m.setSkew(kx, ky);
             this.preConcat(m);
         }
@@ -591,7 +612,7 @@ namespace Unity.UIWidgets.ui {
 
         public void postTranslate(float dx, float dy) {
             if (this.hasPerspective()) {
-                var m = new Matrix3();
+                var m = createNewMatrix();
                 m.setTranslate(dx, dy);
                 this.postConcat(m);
             }
@@ -607,7 +628,7 @@ namespace Unity.UIWidgets.ui {
                 return;
             }
 
-            var m = new Matrix3();
+            var m = createNewMatrix();
             m.setScale(sx, sy, px, py);
             this.postConcat(m);
         }
@@ -617,31 +638,31 @@ namespace Unity.UIWidgets.ui {
                 return;
             }
 
-            var m = new Matrix3();
+            var m = createNewMatrix();
             m.setScale(sx, sy);
             this.postConcat(m);
         }
 
         public void postRotate(float radians, float px, float py) {
-            var m = new Matrix3();
+            var m = createNewMatrix();
             m.setRotate(radians, px, py);
             this.postConcat(m);
         }
 
         public void postRotate(float radians) {
-            var m = new Matrix3();
+            var m = createNewMatrix();
             m.setRotate(radians);
             this.postConcat(m);
         }
 
         public void postSkew(float kx, float ky, float px, float py) {
-            var m = new Matrix3();
+            var m = createNewMatrix();
             m.setSkew(kx, ky, px, py);
             this.postConcat(m);
         }
 
         public void postSkew(float kx, float ky) {
-            var m = new Matrix3();
+            var m = createNewMatrix();
             m.setSkew(kx, ky);
             this.postConcat(m);
         }
@@ -781,13 +802,13 @@ namespace Unity.UIWidgets.ui {
         }
 
         public static Matrix3 I() {
-            var m = new Matrix3();
+            var m = createNewMatrix();
             m.reset();
             return m;
         }
 
         public static Matrix3 concat(Matrix3 a, Matrix3 b) {
-            Matrix3 result = new Matrix3();
+            Matrix3 result = createNewMatrix();
             result.setConcat(a, b);
             return result;
         }
@@ -851,7 +872,7 @@ namespace Unity.UIWidgets.ui {
         internal readonly float[] fMat = new float[9];
         int fTypeMask = 0;
 
-        Matrix3() {
+        public Matrix3() {
         }
 
         enum TypeShift {
@@ -1285,7 +1306,7 @@ namespace Unity.UIWidgets.ui {
             var tmp = inv;
 
             if (applyingInPlace || null == tmp) {
-                tmp = new Matrix3(); // we either need to avoid trampling memory or have no memory
+                tmp = createNewMatrix(); // we either need to avoid trampling memory or have no memory
             }
 
             ComputeInv(tmp.fMat, this.fMat, invDet, isPersp != 0);

@@ -2,6 +2,7 @@ using System;
 using Unity.UIWidgets.flow;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
+using UnityEngine;
 
 namespace Unity.UIWidgets.editor {
     public class Rasterizer {
@@ -71,11 +72,30 @@ namespace Unity.UIWidgets.editor {
             var canvas = frame.getCanvas();
 
             using (var compositorFrame = this._compositorContext.acquireFrame(canvas, true)) {
+
+                PathOptimizer.optimizing = true;
                 if (compositorFrame != null && compositorFrame.raster(layerTree, false)) {
+                    PathOptimizer.optimizing = false;
+                    Flash<PathPath>.instance.clearAll();
+                    Flash<PathPoint>.instance.clearAll();
+                    Flash<Vector3>.instance.clearAll();
+                    SimpleFlash<PathPoint>.instance.clearAll();
+                    SimpleFlash<Matrix3>.instance.clearAll();
+                    
                     frame.submit();
                     this._fireNextFrameCallbackIfPresent();
+                    
+                    
+
                     return true;
                 }
+
+                PathOptimizer.optimizing = false;
+                Flash<PathPath>.instance.clearAll();
+                Flash<PathPoint>.instance.clearAll();
+                Flash<Vector3>.instance.clearAll();
+                SimpleFlash<PathPoint>.instance.clearAll();
+                SimpleFlash<Matrix3>.instance.clearAll();
 
                 return false;
             }

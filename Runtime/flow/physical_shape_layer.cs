@@ -69,7 +69,10 @@ namespace Unity.UIWidgets.flow {
             Paint paint = new Paint {color = this._color};
             //todo: xingwei.zhu: process according to different clipBehavior, currently use antiAlias as default
 
-            context.canvas.drawPath(this._path, paint);
+            //out path
+            Path newPath = new Path();
+            newPath.addPath(this._path, Offset.zero);
+            context.canvas.drawPath(newPath, paint);
 
             context.canvas.save();
             context.canvas.clipPath(this._path);

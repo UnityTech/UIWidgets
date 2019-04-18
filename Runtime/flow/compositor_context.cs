@@ -1,6 +1,8 @@
 using System;
 using Unity.UIWidgets.editor;
 using Unity.UIWidgets.ui;
+using UnityEngine;
+using Canvas = Unity.UIWidgets.ui.Canvas;
 
 namespace Unity.UIWidgets.flow {
     public class CompositorContext {
