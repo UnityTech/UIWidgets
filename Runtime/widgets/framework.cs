@@ -2630,9 +2630,16 @@ namespace Unity.UIWidgets.widgets {
             int newChildrenBottom = newWidgets.Count - 1;
             int oldChildrenBottom = oldChildren.Count - 1;
 
-            var newChildren = oldChildren.Count == newWidgets.Count
-                ? oldChildren
-                : Enumerable.Repeat((Element) null, newWidgets.Count).ToList();
+            List<Element> newChildren;
+            if (oldChildren.Count == newWidgets.Count) {
+                newChildren = oldChildren;
+            }
+            else {
+                newChildren = new List<Element>(newWidgets.Count);
+                for (int i = 0; i < newWidgets.Count; i++) {
+                    newChildren.Add(null);
+                }
+            }
 
             Element previousChild = null;
 
@@ -2957,7 +2964,12 @@ namespace Unity.UIWidgets.widgets {
 
         public override void mount(Element parent, object newSlot) {
             base.mount(parent, newSlot);
-            this._children = Enumerable.Repeat((Element) null, this.widget.children.Count).ToList();
+
+            this._children = new List<Element>(this.widget.children.Count);
+            for (int i = 0; i < this.widget.children.Count; i++) {
+                this._children.Add(null);
+            }
+            
             Element previousChild = null;
             for (int i = 0; i < this._children.Count; i += 1) {
                 Element newChild = this.inflateWidget(this.widget.children[i], previousChild);

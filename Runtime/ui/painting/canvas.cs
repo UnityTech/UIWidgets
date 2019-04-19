@@ -87,24 +87,24 @@ namespace Unity.UIWidgets.ui {
         public void save() {
             PathOptimizer.cmdNum++;
             this._saveCount++;
-            this._recorder.addDrawCmd(new DrawSave {
-            });
+            this._recorder.addDrawCmd(DrawSave.createNew(
+            ));
         }
 
         public void saveLayer(Rect rect, Paint paint) {
             PathOptimizer.cmdNum++;
             this._saveCount++;
-            this._recorder.addDrawCmd(new DrawSaveLayer {
-                rect = rect,
-                paint = new Paint(paint),
-            });
+            this._recorder.addDrawCmd(DrawSaveLayer.createNew(
+                rect : rect,
+                paint : new Paint(paint)
+            ));
         }
 
         public void restore() {
             PathOptimizer.cmdNum++;
             this._saveCount--;
-            this._recorder.addDrawCmd(new DrawRestore {
-            });
+            this._recorder.addDrawCmd(DrawRestore.createNew(
+            ));
         }
 
         public int getSaveCount() {
@@ -113,41 +113,41 @@ namespace Unity.UIWidgets.ui {
 
         public void translate(float dx, float dy) {
             PathOptimizer.cmdNum++;
-            this._recorder.addDrawCmd(new DrawTranslate {
-                dx = dx,
-                dy = dy,
-            });
+            this._recorder.addDrawCmd(DrawTranslate.createNew(
+                dx : dx,
+                dy : dy
+            ));
         }
 
         public void scale(float sx, float? sy = null) {
             PathOptimizer.cmdNum++;
-            this._recorder.addDrawCmd(new DrawScale {
-                sx = sx,
-                sy = sy,
-            });
+            this._recorder.addDrawCmd(DrawScale.createNew(
+                sx : sx,
+                sy : sy
+            ));
         }
 
         public void rotate(float radians, Offset offset = null) {
             PathOptimizer.cmdNum++;
-            this._recorder.addDrawCmd(new DrawRotate {
-                radians = radians,
-                offset = offset,
-            });
+            this._recorder.addDrawCmd(DrawRotate.createNew(
+                radians : radians,
+                offset : offset
+            ));
         }
 
         public void skew(float sx, float sy) {
             PathOptimizer.cmdNum++;
-            this._recorder.addDrawCmd(new DrawSkew {
-                sx = sx,
-                sy = sy,
-            });
+            this._recorder.addDrawCmd(DrawSkew.createNew(
+                sx : sx,
+                sy : sy
+            ));
         }
 
         public void concat(Matrix3 matrix) {
             PathOptimizer.cmdNum++;
-            this._recorder.addDrawCmd(new DrawConcat {
-                matrix = matrix,
-            });
+            this._recorder.addDrawCmd(DrawConcat.createNew(
+                matrix = matrix
+            ));
         }
 
         public Matrix3 getTotalMatrix() {
@@ -156,15 +156,15 @@ namespace Unity.UIWidgets.ui {
 
         public void resetMatrix() {
             PathOptimizer.cmdNum++;
-            this._recorder.addDrawCmd(new DrawResetMatrix {
-            });
+            this._recorder.addDrawCmd(DrawResetMatrix.createNew(
+            ));
         }
 
         public void setMatrix(Matrix3 matrix) {
             PathOptimizer.cmdNum++;
-            this._recorder.addDrawCmd(new DrawSetMatrix {
-                matrix = matrix,
-            });
+            this._recorder.addDrawCmd(DrawSetMatrix.createNew(
+                matrix = matrix
+            ));
         }
 
         public virtual float getDevicePixelRatio() {
@@ -173,25 +173,25 @@ namespace Unity.UIWidgets.ui {
 
         public void clipRect(Rect rect) {
             PathOptimizer.cmdNum++;
-            this._recorder.addDrawCmd(new DrawClipRect {
-                rect = rect,
-            });
+            this._recorder.addDrawCmd(DrawClipRect.createNew(
+                rect : rect
+            ));
         }
 
         public void clipRRect(RRect rrect) {
             PathOptimizer.cmdNum++;
-            this._recorder.addDrawCmd(new DrawClipRRect {
-                rrect = rrect,
-            });
+            this._recorder.addDrawCmd(DrawClipRRect.createNew(
+                rrect : rrect
+            ));
         }
 
         public void clipPath(Path path) {
             Path newPath = new Path();
             newPath.copyFrom(path);
             PathOptimizer.cmdNum++;
-            this._recorder.addDrawCmd(new DrawClipPath {
-                path = newPath
-            });
+            this._recorder.addDrawCmd(DrawClipPath.createNew(
+                path : newPath
+            ));
         }
 
         public void drawLine(Offset from, Offset to, Paint paint) {
@@ -200,10 +200,10 @@ namespace Unity.UIWidgets.ui {
             path.lineTo(to.dx, to.dy);
             PathOptimizer.cmdNum++;
 
-            this._recorder.addDrawCmd(new DrawPath {
-                path = path,
-                paint = new Paint(paint),
-            });
+            this._recorder.addDrawCmd(DrawPath.createNew(
+                path : path,
+                paint : new Paint(paint)
+            ));
         }
 
         public void drawShadow(Path path, Color color, float elevation, bool transparentOccluder) {
@@ -223,20 +223,20 @@ namespace Unity.UIWidgets.ui {
             path.addRect(rect);
 
             PathOptimizer.cmdNum++;
-            this._recorder.addDrawCmd(new DrawPath {
-                path = path,
-                paint = new Paint(paint),
-            });
+            this._recorder.addDrawCmd(DrawPath.createNew(
+                path : path,
+                paint : new Paint(paint)
+            ));
         }
 
         public void drawRRect(RRect rrect, Paint paint) {
             var path = new Path();
             path.addRRect(rrect);
             PathOptimizer.cmdNum++;
-            this._recorder.addDrawCmd(new DrawPath {
-                path = path,
-                paint = new Paint(paint),
-            });
+            this._recorder.addDrawCmd(DrawPath.createNew(
+                path : path,
+                paint : new Paint(paint)
+            ));
         }
 
         public void drawDRRect(RRect outer, RRect inner, Paint paint) {
@@ -246,10 +246,10 @@ namespace Unity.UIWidgets.ui {
             path.winding(PathWinding.clockwise);
 
             PathOptimizer.cmdNum++;
-            this._recorder.addDrawCmd(new DrawPath {
-                path = path,
-                paint = new Paint(paint),
-            });
+            this._recorder.addDrawCmd(DrawPath.createNew(
+                path : path,
+                paint : new Paint(paint)
+            ));
         }
 
         public void drawOval(Rect rect, Paint paint) {
@@ -259,10 +259,10 @@ namespace Unity.UIWidgets.ui {
             path.addEllipse(rect.left + w, rect.top + h, w, h);
             PathOptimizer.cmdNum++;
 
-            this._recorder.addDrawCmd(new DrawPath {
-                path = path,
-                paint = new Paint(paint),
-            });
+            this._recorder.addDrawCmd(DrawPath.createNew(
+                path : path,
+                paint : new Paint(paint)
+            ));
         }
 
         public void drawCircle(Offset c, float radius, Paint paint) {
@@ -270,10 +270,10 @@ namespace Unity.UIWidgets.ui {
             path.addCircle(c.dx, c.dy, radius);
             PathOptimizer.cmdNum++;
 
-            this._recorder.addDrawCmd(new DrawPath {
-                path = path,
-                paint = new Paint(paint),
-            });
+            this._recorder.addDrawCmd(DrawPath.createNew(
+                path : path,
+                paint : new Paint(paint)
+            ));
         }
 
         public void drawArc(Rect rect, float startAngle, float sweepAngle, bool useCenter, Paint paint) {
@@ -309,85 +309,87 @@ namespace Unity.UIWidgets.ui {
             }
 
             PathOptimizer.cmdNum++;
-            this._recorder.addDrawCmd(new DrawPath {
-                path = path,
-                paint = new Paint(paint),
-            });
+            this._recorder.addDrawCmd(DrawPath.createNew(
+                path : path,
+                paint : new Paint(paint)
+            ));
         }
 
         public void drawPath(Path path, Paint paint) {
             Path newPath = new Path();
             newPath.copyFrom(path);
             PathOptimizer.cmdNum++;
-            this._recorder.addDrawCmd(new DrawPath {
-                path = newPath,
-                paint = new Paint(paint),
-            });
+            this._recorder.addDrawCmd(DrawPath.createNew(
+                path : newPath,
+                paint : new Paint(paint)
+            ));
         }
 
         public void drawImage(Image image, Offset offset, Paint paint) {
             PathOptimizer.cmdNum++;
-            this._recorder.addDrawCmd(new DrawImage {
-                image = image,
-                offset = offset,
-                paint = new Paint(paint),
-            });
+            this._recorder.addDrawCmd(DrawImage.createNew(
+                image : image,
+                offset : offset,
+                paint : new Paint(paint)
+            ));
         }
 
         public void drawImageRect(Image image, Rect dst, Paint paint) {
             PathOptimizer.cmdNum++;
-            this._recorder.addDrawCmd(new DrawImageRect {
-                image = image,
-                dst = dst,
-                paint = new Paint(paint),
-            });
+            this._recorder.addDrawCmd(DrawImageRect.createNew(
+                image : image,
+                src : null,
+                dst : dst,
+                paint : new Paint(paint)
+            ));
         }
 
         public void drawImageRect(Image image, Rect src, Rect dst, Paint paint) {
             PathOptimizer.cmdNum++;
-            this._recorder.addDrawCmd(new DrawImageRect {
-                image = image,
-                src = src,
-                dst = dst,
-                paint = new Paint(paint),
-            });
+            this._recorder.addDrawCmd(DrawImageRect.createNew(
+                image : image,
+                src : src,
+                dst : dst,
+                paint : new Paint(paint)
+            ));
         }
 
         public void drawImageNine(Image image, Rect center, Rect dst, Paint paint) {
             PathOptimizer.cmdNum++;
-            this._recorder.addDrawCmd(new DrawImageNine {
-                image = image,
-                center = center,
-                dst = dst,
-                paint = new Paint(paint),
-            });
+            this._recorder.addDrawCmd(DrawImageNine.createNew(
+                image : image,
+                src : null,
+                center : center,
+                dst : dst,
+                paint : new Paint(paint)
+            ));
         }
 
         public void drawImageNine(Image image, Rect src, Rect center, Rect dst, Paint paint) {
             PathOptimizer.cmdNum++;
-            this._recorder.addDrawCmd(new DrawImageNine {
-                image = image,
-                src = src,
-                center = center,
-                dst = dst,
-                paint = new Paint(paint),
-            });
+            this._recorder.addDrawCmd(DrawImageNine.createNew(
+                image : image,
+                src : src,
+                center : center,
+                dst : dst,
+                paint : new Paint(paint)
+            ));
         }
 
         public void drawPicture(Picture picture) {
             PathOptimizer.cmdNum++;
-            this._recorder.addDrawCmd(new DrawPicture {
-                picture = picture,
-            });
+            this._recorder.addDrawCmd(DrawPicture.createNew(
+                picture : picture
+            ));
         }
 
         public void drawTextBlob(TextBlob textBlob, Offset offset, Paint paint) {
             PathOptimizer.cmdNum++;
-            this._recorder.addDrawCmd(new DrawTextBlob {
-                textBlob = textBlob,
-                offset = offset,
-                paint = new Paint(paint),
-            });
+            this._recorder.addDrawCmd(DrawTextBlob.createNew(
+                textBlob : textBlob,
+                offset : offset,
+                paint : new Paint(paint)
+            ));
         }
         
         public void drawParagraph(Paragraph paragraph, Offset offset) {

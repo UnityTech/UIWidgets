@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+//using System.Linq;
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
@@ -105,7 +105,10 @@ namespace Unity.UIWidgets.ui {
 
         public void resize(int size) {
             if (this._charWidths.Count < size) {
-                this._charWidths.AddRange(Enumerable.Repeat(0.0f, size - this._charWidths.Count));
+                int deltaCount = size - this._charWidths.Count;
+                for (var i = 0; i < deltaCount; i++) {
+                    this._charWidths.Add(0.0f);
+                }
             }
         }
 

@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
+//using System.Linq;
 using Unity.UIWidgets.async;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
@@ -238,7 +238,9 @@ namespace Unity.UIWidgets.gestures {
 
 
         public override void dispose() {
-            this._pointers.Keys.ToList().ForEach(this._removeState);
+            foreach (var key in this._pointers.Keys) {
+                this._removeState(key);
+            }
             D.assert(this._pointers.isEmpty);
             this._pointers = null;
             base.dispose();

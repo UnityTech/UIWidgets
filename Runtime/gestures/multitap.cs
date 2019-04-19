@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using System.Linq;
+//using System.Linq;
 using RSG.Promises;
 using Unity.UIWidgets.async;
 using Unity.UIWidgets.foundation;
@@ -170,7 +170,9 @@ namespace Unity.UIWidgets.gestures {
         }
 
         void _clearTrackers() {
-            this._trackers.Values.ToList().Each(this._reject);
+            foreach (var track in this._trackers.Values) {
+                this._reject(track);
+            }
             D.assert(this._trackers.isEmpty());
         }
 

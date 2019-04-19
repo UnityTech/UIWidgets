@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
+//using System.Linq;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
 using UnityEngine;
@@ -142,8 +142,13 @@ namespace Unity.UIWidgets.gestures {
         const int _horizonMilliseconds = 100;
         const int _minSampleSize = 3;
 
-        readonly List<_PointAtTime> _samples =
-            Enumerable.Repeat<_PointAtTime>(null, _historySize).ToList();
+        readonly List<_PointAtTime> _samples = new List<_PointAtTime>(_historySize);
+
+        public VelocityTracker() {
+            for (var i = 0; i < _historySize; i++) {
+                this._samples.Add(null);
+            }
+        }
 
         int _index = 0;
 

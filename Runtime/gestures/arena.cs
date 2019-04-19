@@ -119,9 +119,9 @@ namespace Unity.UIWidgets.gestures {
             this._arenas.Remove(pointer);
             if (state.members.isNotEmpty()) {
                 D.assert(this._debugLogDiagnostic(
-                    pointer, $"Winner: {state.members.First()}"));
+                    pointer, $"Winner: {state.members[0]}"));
 
-                state.members.First().acceptGesture(pointer);
+                state.members[0].acceptGesture(pointer);
                 for (int i = 1; i < state.members.Count; i++) {
                     state.members[i].rejectGesture(pointer);
                 }
@@ -209,8 +209,8 @@ namespace Unity.UIWidgets.gestures {
             D.assert(members.Count == 1);
             this._arenas.Remove(pointer);
             D.assert(this._debugLogDiagnostic(pointer,
-                $"Default winner: {state.members.First()}"));
-            state.members.First().acceptGesture(pointer);
+                $"Default winner: {state.members[0]}"));
+            state.members[0].acceptGesture(pointer);
         }
 
         void _resolveInFavorOf(int pointer, _GestureArena state, GestureArenaMember member) {

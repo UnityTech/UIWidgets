@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
+//using System.Linq;
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
@@ -139,11 +139,19 @@ namespace Unity.UIWidgets.ui {
             get { return _tessellations.Count; }
         }
 
+        static readonly List<TessellationKey> _keysToRemove = new List<TessellationKey>();
+
         public static void tickNextFrame() {
             _frameCount++;
-            var keysToRemove = _tessellations.Values.Where(info => info.timeToLive < _frameCount)
-                .Select(info => info.key).ToList();
-            foreach (var key in keysToRemove) {
+
+            _keysToRemove.Clear();
+            foreach (var info in _tessellations.Values) {
+                if (info.timeToLive < _frameCount) {
+                    _keysToRemove.Add(info.key);
+                }
+            }
+            
+            foreach (var key in _keysToRemove) {
                 _tessellations.Remove(key);
                 SimplePool<TessellationKey>.instance.recycle(key);
             }

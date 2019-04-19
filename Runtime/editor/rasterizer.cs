@@ -99,6 +99,26 @@ namespace Unity.UIWidgets.editor {
                     Flash<PictureFlusher.RenderLayer>.instance.clearAll();
                     Flash<PictureFlusher.State>.instance.clearAll();
                     SimpleFlash<PictureFlusher.State>.instance.clearAll();
+                    ClearableSimpleFlash<DrawSave>.instance.clearAll();
+                    ClearableSimpleFlash<DrawSaveLayer>.instance.clearAll();
+                    ClearableSimpleFlash<DrawRestore>.instance.clearAll();
+                    ClearableSimpleFlash<DrawTranslate>.instance.clearAll();
+                    ClearableSimpleFlash<DrawScale>.instance.clearAll();
+                    ClearableSimpleFlash<DrawRotate>.instance.clearAll();
+                    ClearableSimpleFlash<DrawSkew>.instance.clearAll();
+                    ClearableSimpleFlash<DrawConcat>.instance.clearAll();
+                    ClearableSimpleFlash<DrawResetMatrix>.instance.clearAll();
+                    ClearableSimpleFlash<DrawSetMatrix>.instance.clearAll();
+                    ClearableSimpleFlash<DrawClipRect>.instance.clearAll();
+                    ClearableSimpleFlash<DrawClipRRect>.instance.clearAll();
+                    ClearableSimpleFlash<DrawClipPath>.instance.clearAll();
+                    ClearableSimpleFlash<DrawPath>.instance.clearAll();
+                    ClearableSimpleFlash<DrawImage>.instance.clearAll();
+                    ClearableSimpleFlash<DrawImageRect>.instance.clearAll();
+                    ClearableSimpleFlash<DrawImageNine>.instance.clearAll();
+                    ClearableSimpleFlash<DrawPicture>.instance.clearAll();
+                    ClearableSimpleFlash<DrawTextBlob>.instance.clearAll();
+                    
                     
                     this._fireNextFrameCallbackIfPresent();
                     
@@ -124,6 +144,25 @@ namespace Unity.UIWidgets.editor {
                 Flash<PictureFlusher.RenderLayer>.instance.clearAll();
                 Flash<PictureFlusher.State>.instance.clearAll();
                 SimpleFlash<PictureFlusher.State>.instance.clearAll();
+                ClearableSimpleFlash<DrawSave>.instance.clearAll();
+                ClearableSimpleFlash<DrawSaveLayer>.instance.clearAll();
+                ClearableSimpleFlash<DrawRestore>.instance.clearAll();
+                ClearableSimpleFlash<DrawTranslate>.instance.clearAll();
+                ClearableSimpleFlash<DrawScale>.instance.clearAll();
+                ClearableSimpleFlash<DrawRotate>.instance.clearAll();
+                ClearableSimpleFlash<DrawSkew>.instance.clearAll();
+                ClearableSimpleFlash<DrawConcat>.instance.clearAll();
+                ClearableSimpleFlash<DrawResetMatrix>.instance.clearAll();
+                ClearableSimpleFlash<DrawSetMatrix>.instance.clearAll();
+                ClearableSimpleFlash<DrawClipRect>.instance.clearAll();
+                ClearableSimpleFlash<DrawClipRRect>.instance.clearAll();
+                ClearableSimpleFlash<DrawClipPath>.instance.clearAll();
+                ClearableSimpleFlash<DrawPath>.instance.clearAll();
+                ClearableSimpleFlash<DrawImage>.instance.clearAll();
+                ClearableSimpleFlash<DrawImageRect>.instance.clearAll();
+                ClearableSimpleFlash<DrawImageNine>.instance.clearAll();
+                ClearableSimpleFlash<DrawPicture>.instance.clearAll();
+                ClearableSimpleFlash<DrawTextBlob>.instance.clearAll();
                 
                 return false;
             }

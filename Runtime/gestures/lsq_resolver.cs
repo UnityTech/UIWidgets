@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using System.Linq;
+//using System.Linq;
 using Unity.UIWidgets.foundation;
 using UnityEngine;
 
@@ -8,7 +8,10 @@ namespace Unity.UIWidgets.gestures {
         internal _Vector(int size) {
             this._offset = 0;
             this._length = size;
-            this._elements = Enumerable.Repeat(0.0f, size).ToList();
+            this._elements = new List<float>(size);
+            for (var i = 0; i < size; i++) {
+                this._elements.Add(0.0f);
+            }
         }
 
         _Vector(List<float> values, int offset, int length) {
@@ -49,7 +52,10 @@ namespace Unity.UIWidgets.gestures {
     class _Matrix {
         internal _Matrix(int rows, int cols) {
             this._columns = cols;
-            this._elements = Enumerable.Repeat(0.0f, rows * cols).ToList();
+            this._elements = new List<float>(rows * cols);
+            for (var i = 0; i < rows * cols; i++) {
+                this._elements.Add(0.0f);
+            }
         }
 
         readonly int _columns;
@@ -71,7 +77,10 @@ namespace Unity.UIWidgets.gestures {
 
     public class PolynomialFit {
         public PolynomialFit(int degree) {
-            this.coefficients = Enumerable.Repeat(0.0f, degree + 1).ToList();
+            this.coefficients = new List<float>(degree + 1);
+            for (var i = 0; i < degree + 1; i++) {
+                this.coefficients.Add(0.0f);
+            }
         }
 
         public readonly List<float> coefficients;

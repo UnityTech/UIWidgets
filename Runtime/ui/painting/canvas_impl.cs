@@ -753,8 +753,6 @@ namespace Unity.UIWidgets.ui {
             this._reset();
             
             this._drawPicture(picture, false);
-            
-            PathOptimizer.optimizing = false;
             D.assert(this._layers.Count == 1);
             D.assert(this._layers[0].states.Count == 1);
 

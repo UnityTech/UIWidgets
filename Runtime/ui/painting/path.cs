@@ -1,7 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
+//using System.Linq;
 using System.Text;
 using Unity.UIWidgets.foundation;
 using UnityEngine;
@@ -1495,7 +1495,7 @@ namespace Unity.UIWidgets.ui {
                 return;
             }
 
-            var path = this._paths.Last();
+            var path = this._paths[this._paths.Count - 1];
             path.closed = true;
         }
 
