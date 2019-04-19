@@ -358,13 +358,13 @@ namespace Unity.UIWidgets.ui {
                     if (!string.IsNullOrEmpty(ellipsis) && !this._width.isInfinite() && !lineRange.hardBreak
                         && i == lineRuns.Count - 1 && (lineNumber == lineLimit - 1 || this._paragraphStyle.maxLines == null)) {
 
-                        float ellipsisWidth = Layout.measureText(runXOffset, ellipsis, 0,
+                        float ellipsisWidth = Layout.measureText(runXOffset, new TextBuff(ellipsis), 0,
                             ellipsis.Length, run.style, null, 0, this._tabStops);
                         List<float> textAdvances = new List<float>(textCount);
                         for (int index = 0; index < textCount;++index) {
                             textAdvances.Add(0);
                         }
-                        float textWidth = Layout.measureText(runXOffset, this._text, textStart, textCount,
+                        float textWidth = Layout.measureText(runXOffset, new TextBuff(text), textStart, textCount,
                             run.style, textAdvances, 0, this._tabStops);
                         
                         int truncateCount = 0;
@@ -385,15 +385,15 @@ namespace Unity.UIWidgets.ui {
                         }
                     }
 
-                    layout.doLayout(runXOffset, text, textStart, textCount, run.style);
+                    layout.doLayout(runXOffset, new TextBuff(text), textStart, textCount, run.style);
                     if (layout.nGlyphs() == 0) {
                         continue;
                     }
 
                     float wordStartPosition = float.NaN;
-                    // var layoutAdvances = layout.getAdvances();
                     builder.allocRunPos(run.style, text, textStart, textCount);
-                    builder.setBounds(layout.getBounds());
+                    builder.setBounds(layout.getBounds().translate(-layout.getX(0), 0)); // bounds relative to first character
+                    
                     glyphPositions.Clear();
 
                     for (int glyphIndex = 0; glyphIndex < textCount; ++glyphIndex) {

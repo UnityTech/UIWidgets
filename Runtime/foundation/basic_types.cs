@@ -132,5 +132,22 @@ namespace Unity.UIWidgets.foundation {
             }
             return "{ " + string.Join(", ", it.Select(item => item.ToString())) + " }";
         }
+
+        public static void resize<T>(this List<T> list, int size, T value) {
+            int curSize = list.Count;
+            if (size < curSize) {
+                list.RemoveRange(size, curSize - size);
+            } else if(size > curSize) {
+                if (size > list.Capacity) {
+                    list.Capacity = size;
+                }
+                list.AddRange(Enumerable.Repeat(value, size - curSize));
+            }
+            
+            int remains = Math.Min(curSize, size);
+            for (int i = 0; i < remains; ++i) {
+                list[i] = value;
+            }
+        }
     }
 }

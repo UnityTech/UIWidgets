@@ -26,6 +26,10 @@ namespace UIWidgetsSample {
                 new Text("text with font size 0.3f", style: new TextStyle(fontSize: 0.3f)),
                 new Text("Text with background", style: new TextStyle(fontSize: 14, background:
                     new Paint(){color = new Color(0xFF00FF00)})),
+                new Text("positive letter spacing", style: new TextStyle(fontSize: 14, letterSpacing:5)),
+                new Text("negative letter spacing", style: new TextStyle(fontSize: 14, letterSpacing:-1)),
+                new Text("positive word spacing test", style: new TextStyle(fontSize: 14, wordSpacing: 20f)),
+                new Text("negative word spacing test", style: new TextStyle(fontSize: 14, wordSpacing: -4f)),
                 
             };
             return new Scaffold(
