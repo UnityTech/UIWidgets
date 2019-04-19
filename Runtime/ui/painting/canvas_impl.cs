@@ -44,6 +44,8 @@ namespace Unity.UIWidgets.ui {
                     width * this._fringeWidth,
                     height * this._fringeWidth);
 
+                bounds = new Rect(bounds.left, bounds.top, bounds.right, bounds.bottom);
+
                 firstLayer = new RenderLayer {
                     width = width,
                     height = height,
@@ -745,10 +747,13 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void flush(Picture picture) {
+
+            
             this._reset();
-
+            
             this._drawPicture(picture, false);
-
+            
+            PathOptimizer.optimizing = false;
             D.assert(this._layers.Count == 1);
             D.assert(this._layers[0].states.Count == 1);
 
@@ -941,7 +946,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         internal class State {
-            static readonly Matrix3 _id = Matrix3.I();
+            static readonly Matrix3 _id = new Matrix3(Matrix3.I());
             
             Matrix3 _matrix;
             float? _scale;

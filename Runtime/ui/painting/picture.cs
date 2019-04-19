@@ -35,13 +35,13 @@ namespace Unity.UIWidgets.ui {
         public void reset() {
             this._drawCmds.Clear();
             this._states.Clear();
-            this._states.Add(new CanvasState {
-                xform = Matrix3.I(),
-                scissor = null,
-                saveLayer = false,
-                layerOffset = null,
-                paintBounds = Rect.zero,
-            });
+            this._states.Add(CanvasState.createNew(
+                xform : Matrix3.I(),
+                scissor : null,
+                saveLayer : false,
+                layerOffset : null,
+                paintBounds : Rect.zero
+            ));
         }
 
         public Picture endRecording() {
@@ -61,13 +61,13 @@ namespace Unity.UIWidgets.ui {
                     this._states.Add(this._getState().copy());
                     break;
                 case DrawSaveLayer cmd: {
-                    this._states.Add(new CanvasState {
-                        xform = Matrix3.I(),
-                        scissor = cmd.rect.shift(-cmd.rect.topLeft),
-                        saveLayer = true,
-                        layerOffset = cmd.rect.topLeft,
-                        paintBounds = Rect.zero,
-                    });
+                    this._states.Add(CanvasState.createNew(
+                        xform : Matrix3.I(),
+                        scissor : cmd.rect.shift(-cmd.rect.topLeft),
+                        saveLayer : true,
+                        layerOffset : cmd.rect.topLeft,
+                        paintBounds : Rect.zero
+                    ));
                     break;
                 }
                 case DrawRestore _: {
@@ -256,22 +256,39 @@ namespace Unity.UIWidgets.ui {
             }
         }
 
-        class CanvasState {
-            public Matrix3 xform;
-            public Rect scissor;
-            public bool saveLayer;
-            public Offset layerOffset;
-            public Rect paintBounds;
+        
+    }
+    
+    public class CanvasState {
+        public Matrix3 xform;
+        public Rect scissor;
+        public bool saveLayer;
+        public Offset layerOffset;
+        public Rect paintBounds;
 
-            public CanvasState copy() {
-                return new CanvasState {
-                    xform = this.xform,
-                    scissor = this.scissor,
-                    saveLayer = false,
-                    layerOffset = null,
-                    paintBounds = this.paintBounds,
-                };
-            }
+        public static CanvasState createNew(
+            Matrix3 xform,
+            Rect scissor,
+            bool saveLayer,
+            Offset layerOffset,
+            Rect paintBounds) {
+            var ret = PathOptimizer.optimizing ? SimpleFlash<CanvasState>.instance.fetch() : new CanvasState();
+            ret.xform = xform;
+            ret.scissor = scissor;
+            ret.saveLayer = saveLayer;
+            ret.layerOffset = layerOffset;
+            ret.paintBounds = paintBounds;
+            return ret;
+        }
+
+        public CanvasState copy() {
+            return createNew(
+                    xform : this.xform,
+                    scissor : this.scissor,
+                    saveLayer : false,
+                    layerOffset : null,
+                    paintBounds : this.paintBounds)
+                ;
         }
     }
 }

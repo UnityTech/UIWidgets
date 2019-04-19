@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.WSA;
 
 namespace Unity.UIWidgets.ui {
     public static class MathUtils {
@@ -496,27 +497,41 @@ namespace Unity.UIWidgets.ui {
     }
 
     public class Rect : IEquatable<Rect> {
-        Rect(float left, float top, float right, float bottom) {
+        public Rect(float left, float top, float right, float bottom) {
             this.left = left;
             this.top = top;
             this.right = right;
             this.bottom = bottom;
         }
 
+
+        public Rect() {
+            
+        }
+
+        public static Rect createNew(float left = 0, float top = 0, float right = 0, float bottom = 0) {
+            var ret = PathOptimizer.optimizing ? SimpleFlash<Rect>.instance.fetch() : new Rect();
+            ret.left = left;
+            ret.top = top;
+            ret.right = right;
+            ret.bottom = bottom;
+            return ret;
+        }
+
         public static Rect fromLTRB(float left, float top, float right, float bottom) {
-            return new Rect(left, top, right, bottom);
+            return createNew(left, top, right, bottom);
         }
 
         public static Rect fromLTWH(float left, float top, float width, float height) {
-            return new Rect(left, top, left + width, top + height);
+            return createNew(left, top, left + width, top + height);
         }
 
         public static Rect fromCircle(Offset center, float radius) {
-            return new Rect(center.dx - radius, center.dy - radius, center.dx + radius, center.dy + radius);
+            return createNew(center.dx - radius, center.dy - radius, center.dx + radius, center.dy + radius);
         }
 
         public static Rect fromPoints(Offset a, Offset b) {
-            return new Rect(
+            return createNew(
                 Mathf.Min(a.dx, b.dx),
                 Mathf.Min(a.dy, b.dy),
                 Mathf.Max(a.dx, b.dx),
@@ -524,10 +539,10 @@ namespace Unity.UIWidgets.ui {
             );
         }
 
-        public readonly float left;
-        public readonly float top;
-        public readonly float right;
-        public readonly float bottom;
+        public float left;
+        public float top;
+        public float right;
+        public float bottom;
 
         public float width {
             get { return this.right - this.left; }
@@ -588,7 +603,7 @@ namespace Unity.UIWidgets.ui {
         }
         
         public Rect outset(float dx, float dy) {
-            return new Rect(this.left - dx, this.top - dy, this.right + dx, this.bottom + dy);
+            return createNew(this.left - dx, this.top - dy, this.right + dx, this.bottom + dy);
         }
 
         public Offset[] toQuad() {

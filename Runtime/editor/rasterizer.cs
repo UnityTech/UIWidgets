@@ -3,6 +3,7 @@ using Unity.UIWidgets.flow;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
 using UnityEngine;
+using Rect = Unity.UIWidgets.ui.Rect;
 
 namespace Unity.UIWidgets.editor {
     public class Rasterizer {
@@ -75,17 +76,23 @@ namespace Unity.UIWidgets.editor {
 
                 PathOptimizer.optimizing = true;
                 if (compositorFrame != null && compositorFrame.raster(layerTree, false)) {
+                    
+                    
+                    frame.submit();
+
                     PathOptimizer.optimizing = false;
                     Flash<PathPath>.instance.clearAll();
                     Flash<PathPoint>.instance.clearAll();
                     Flash<Vector3>.instance.clearAll();
+                    Flash<int>.instance.clearAll();
+                    Flash<float>.instance.clearAll();
                     SimpleFlash<PathPoint>.instance.clearAll();
                     SimpleFlash<Matrix3>.instance.clearAll();
+                    SimpleFlash<CanvasState>.instance.clearAll();
+                    SimpleFlash<PathPath>.instance.clearAll();
+                    SimpleFlash<Rect>.instance.clearAll();
                     
-                    frame.submit();
                     this._fireNextFrameCallbackIfPresent();
-                    
-                    
 
                     return true;
                 }
@@ -94,8 +101,13 @@ namespace Unity.UIWidgets.editor {
                 Flash<PathPath>.instance.clearAll();
                 Flash<PathPoint>.instance.clearAll();
                 Flash<Vector3>.instance.clearAll();
+                Flash<int>.instance.clearAll();
+                Flash<float>.instance.clearAll();
                 SimpleFlash<PathPoint>.instance.clearAll();
                 SimpleFlash<Matrix3>.instance.clearAll();
+                SimpleFlash<CanvasState>.instance.clearAll();
+                SimpleFlash<PathPath>.instance.clearAll();
+                SimpleFlash<Rect>.instance.clearAll();
 
                 return false;
             }

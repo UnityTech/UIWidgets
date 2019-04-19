@@ -175,7 +175,7 @@ namespace Unity.UIWidgets.ui {
 
         public void clipPath(Path path) {
             Path newPath = new Path();
-            newPath.addPath(path, Offset.zero);
+            newPath.copyFrom(path);
             this._recorder.addDrawCmd(new DrawClipPath {
                 path = newPath
             });
@@ -195,7 +195,7 @@ namespace Unity.UIWidgets.ui {
         public void drawShadow(Path path, Color color, float elevation, bool transparentOccluder) {
             float dpr = Window.instance.devicePixelRatio;
             Path newPath = new Path();
-            newPath.addPath(path, Offset.zero);
+            newPath.copyFrom(path);
             PhysicalShapeLayer.drawShadow(this, newPath, color, elevation, transparentOccluder, dpr);
         }
 
@@ -296,7 +296,7 @@ namespace Unity.UIWidgets.ui {
 
         public void drawPath(Path path, Paint paint) {
             Path newPath = new Path();
-            newPath.addPath(path, Offset.zero);
+            newPath.copyFrom(path);
             this._recorder.addDrawCmd(new DrawPath {
                 path = newPath,
                 paint = new Paint(paint),

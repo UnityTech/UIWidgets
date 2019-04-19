@@ -258,20 +258,14 @@ namespace Unity.UIWidgets.painting {
         void _paintShadows(Canvas canvas) {
             if (this._shadowCount != null) {
                 for (int index = 0; index < this._shadowCount.Value; index += 1) {
-                    //out path
-                    Path newPath = new Path();
-                    newPath.addPath(this._shadowPaths[index], Offset.zero);
-                    canvas.drawPath(newPath, this._shadowPaints[index]);
+                    canvas.drawPath(this._shadowPaths[index], this._shadowPaints[index]);
                 }
             }
         }
 
         void _paintInterior(Canvas canvas) {
             if (this._interiorPaint != null) {
-                //out path
-                Path newPath = new Path();
-                newPath.addPath(this._outerPath, Offset.zero);
-                canvas.drawPath(newPath, this._interiorPaint);
+                canvas.drawPath(this._outerPath, this._interiorPaint);
             }
         }
 

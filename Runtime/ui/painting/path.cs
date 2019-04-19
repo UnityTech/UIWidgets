@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using Unity.UIWidgets.foundation;
 using UnityEngine;
+using UnityEngine.Analytics;
 
 namespace Unity.UIWidgets.ui {
 
@@ -38,6 +39,9 @@ namespace Unity.UIWidgets.ui {
         }
         
         public T fetch() {
+            if (!PathOptimizer.optimizing) {
+                return new T();
+            }
             if (this.curIndex >= this.flash.Count) {
                 for (var i = 0; i < delta_size; i++) {
                     this.flash.Add(new T());
@@ -80,6 +84,10 @@ namespace Unity.UIWidgets.ui {
         }
         
         public List<T> fetch() {
+            if (!PathOptimizer.optimizing) {
+                return new List<T>();
+            }
+            
             if (this.curIndex >= this.flash.Count) {
                 for (var i = 0; i < delta_size; i++) {
                     this.flash.Add(new List<T>(256));
@@ -147,7 +155,7 @@ namespace Unity.UIWidgets.ui {
     public class Path {
         const float _KAPPA90 = 0.5522847493f;
 
-        readonly List<float> _commands = new List<float>();
+        readonly List<float> _commands = Flash<float>.instance.fetch();
         float _commandx;
         float _commandy;
         float _minX, _minY;
@@ -167,8 +175,7 @@ namespace Unity.UIWidgets.ui {
             }
 
             this._cache = new PathCache(scale, this._use_pool);
-            
-            
+
             var i = 0;
             
             while (i < this._commands.Count) {
@@ -687,12 +694,22 @@ namespace Unity.UIWidgets.ui {
             path.addPath(this, offset);
             return path;
         }
+
+        public void copyFrom(Path path) {
+            D.assert(path != null);
+            
+            this._commands.AddRange(path._commands);
+            this._commandx = path._commandx;
+            this._commandy = path._commandy;
+            this._minX = path._minY;
+            this._maxX = path._maxY;
+        }
         
         public void addPath(Path path, Offset offset) {
             D.assert(path != null);
             D.assert(offset != null);
 
-            var commands = new List<float>();
+            var commands = Flash<float>.instance.fetch();
 
             var i = 0;
             while (i < path._commands.Count) {
@@ -1225,7 +1242,7 @@ namespace Unity.UIWidgets.ui {
         winding,
     }
 
-    class PathPath {
+    public class PathPath {
         public int first;
         public int count;
         public bool closed;
@@ -1235,6 +1252,23 @@ namespace Unity.UIWidgets.ui {
         public int nstroke;
         public PathWinding winding;
         public bool convex;
+
+        public static PathPath createNew(
+            int first = 0, int count = 0, bool closed = false, int ifill = 0, int nfill = 0, int istroke = 0, int nstroke = 0, PathWinding winding = PathWinding.clockwise,
+            bool convex = false
+            ) {
+            var ret =  SimpleFlash<PathPath>.instance.fetch();
+            ret.first = first;
+            ret.count = count;
+            ret.closed = closed;
+            ret.ifill = ifill;
+            ret.nfill = nfill;
+            ret.istroke = istroke;
+            ret.nstroke = nstroke;
+            ret.winding = winding;
+            ret.convex = convex;
+            return ret;
+        }
     }
 
     class PathCache {
@@ -1281,10 +1315,10 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void addPath() {
-            this._paths.Add(new PathPath {
-                first = this._points.Count,
-                winding = PathWinding.counterClockwise
-            });
+            this._paths.Add(PathPath.createNew(
+                first : this._points.Count,
+                winding : PathWinding.counterClockwise
+            ));
         }
 
         public void addPoint(float x, float y, PointFlags flags) {
@@ -1449,7 +1483,7 @@ namespace Unity.UIWidgets.ui {
                 }
             }
 
-            var indices = new List<int>(cindices);
+            var indices = PathOptimizer.optimizing ? Flash<int>.instance.fetch() : new List<int>(cindices);
             for (var i = 0; i < this._paths.Count; i++) {
                 var path = this._paths[i];
                 if (path.count <= 2) {
