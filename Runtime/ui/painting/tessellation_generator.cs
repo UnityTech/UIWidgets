@@ -5,13 +5,30 @@ using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
     class TessellationKey : IEquatable<TessellationKey> {
-        public readonly float x2;
-        public readonly float y2;
-        public readonly float x3;
-        public readonly float y3;
-        public readonly float x4;
-        public readonly float y4;
-        public readonly float tessTol;
+        public float x2;
+        public float y2;
+        public float x3;
+        public float y3;
+        public float x4;
+        public float y4;
+        public float tessTol;
+
+        public static TessellationKey createNew(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4,
+            float tessTol) {
+            var ret = SimplePool<TessellationKey>.instance.fetch();
+
+            ret.x2 = x2 - x1;
+            ret.y2 = y2 - y1;
+            ret.x3 = x3 - x1;
+            ret.y3 = y3 - y1;
+            ret.x4 = x4 - x1;
+            ret.y4 = y4 - y1;
+            ret.tessTol = tessTol;
+            return ret;
+        }
+
+        public TessellationKey() {
+        }
 
         public TessellationKey(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4,
             float tessTol) {
@@ -128,12 +145,13 @@ namespace Unity.UIWidgets.ui {
                 .Select(info => info.key).ToList();
             foreach (var key in keysToRemove) {
                 _tessellations.Remove(key);
+                SimplePool<TessellationKey>.instance.recycle(key);
             }
         }
 
         public static List<PathPoint> tessellateBezier(float x1, float y1, float x2, float y2,
             float x3, float y3, float x4, float y4, float tessTol) {
-            var key = new TessellationKey(x1, y1, x2, y2, x3, y3, x4, y4, tessTol);
+            var key = TessellationKey.createNew(x1, y1, x2, y2, x3, y3, x4, y4, tessTol);
 
             _tessellations.TryGetValue(key, out var tessellationInfo);
             if (tessellationInfo != null) {

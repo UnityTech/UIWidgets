@@ -11,6 +11,63 @@ namespace Unity.UIWidgets.ui {
 
     public static class PathOptimizer {
         public static bool optimizing = false;
+        public static int cmdNum = 0;
+    }
+
+    public interface Clearable {
+        void clear();
+    }
+
+    public class ClearableSimpleFlash<T> where T : Clearable, new() {
+        static ClearableSimpleFlash<T> _instance;
+
+        const int initial_size = 1024;
+        const int delta_size = 128;
+        int current_size = 0;
+
+        public static ClearableSimpleFlash<T> instance {
+            get {
+                if (_instance != null) return _instance;
+                _instance = new ClearableSimpleFlash<T>();
+                _instance.setup();
+                return _instance;
+            }
+        }
+
+        List<T> flash;
+        int curIndex;
+
+        void setup() {
+            this.flash = new List<T>(initial_size);
+            for (var i = 0; i < initial_size; i++) {
+                this.flash.Add(new T());
+            }
+
+            this.current_size = this.flash.Count;
+        }
+        
+        public T fetch() {
+            if (!PathOptimizer.optimizing) {
+                return new T();
+            }
+            if (this.curIndex >= this.current_size) {
+                for (var i = 0; i < delta_size; i++) {
+                    this.flash.Add(new T());
+                }
+                this.current_size = this.flash.Count;
+            }
+
+            var ret = this.flash[this.curIndex++];
+            return ret;
+        }
+
+        public void clearAll() {
+            for (var i = 0; i < this.curIndex - 1; i++) {
+                this.flash[i].clear();
+            }
+            
+            this.curIndex = 0;
+        }
     }
 
     public class SimpleFlash<T> where T : new() {
@@ -18,6 +75,7 @@ namespace Unity.UIWidgets.ui {
 
         const int initial_size = 1024;
         const int delta_size = 128;
+        int current_size = 0;
 
         public static SimpleFlash<T> instance {
             get {
@@ -36,16 +94,19 @@ namespace Unity.UIWidgets.ui {
             for (var i = 0; i < initial_size; i++) {
                 this.flash.Add(new T());
             }
+
+            this.current_size = this.flash.Count;
         }
         
         public T fetch() {
             if (!PathOptimizer.optimizing) {
                 return new T();
             }
-            if (this.curIndex >= this.flash.Count) {
+            if (this.curIndex >= this.current_size) {
                 for (var i = 0; i < delta_size; i++) {
                     this.flash.Add(new T());
                 }
+                this.current_size = this.flash.Count;
             }
 
             var ret = this.flash[this.curIndex++];
@@ -63,6 +124,7 @@ namespace Unity.UIWidgets.ui {
 
         const int initial_size = 1024;
         const int delta_size = 128;
+        int current_size = 0;
 
         public static Flash<T> instance {
             get {
@@ -81,6 +143,8 @@ namespace Unity.UIWidgets.ui {
             for (var i = 0; i < initial_size; i++) {
                 this.flash.Add(new List<T>(256));
             }
+
+            this.current_size = this.flash.Count;
         }
         
         public List<T> fetch() {
@@ -88,11 +152,14 @@ namespace Unity.UIWidgets.ui {
                 return new List<T>();
             }
             
-            if (this.curIndex >= this.flash.Count) {
+            if (this.curIndex >= this.current_size) {
                 for (var i = 0; i < delta_size; i++) {
                     this.flash.Add(new List<T>(256));
                 }
+
+                this.current_size = this.flash.Count;
             }
+            
 
             var ret = this.flash[this.curIndex++];
             ret.Clear();
@@ -104,17 +171,18 @@ namespace Unity.UIWidgets.ui {
         }
     }
     
-    public class Pool<T> where T : IList, new() {
+    public class SimplePool<T> where T : new() {
 
-        static Pool<T> _instance;
+        static SimplePool<T> _instance;
 
         const int initial_size = 256;
         const int delta_size = initial_size / 2;
+        int current_size = 0;
 
-        public static Pool<T> instance {
+        public static SimplePool<T> instance {
             get {
                 if (_instance != null) return _instance;
-                _instance = new Pool<T>();
+                _instance = new SimplePool<T>();
                 _instance.setup();
                 return _instance;
             }
@@ -127,27 +195,28 @@ namespace Unity.UIWidgets.ui {
             for (var i = 0; i < initial_size; i++) {
                 this.pool.Push(new T());
             }
+
+            this.current_size = this.pool.Count;
         }
 
         public T fetch() {
-            if (this.pool.Count == 0) {
+            if (this.current_size == 0) {
                 for (var i = 0; i < delta_size; i++) {
                     this.pool.Push(new T());
                 }
+
+                this.current_size = this.pool.Count;
             }
 
             var ret = this.pool.Pop();
-
-            if (ret == null) {
-                int s = 100;
-            }
-            ret.Clear();
+            this.current_size--;
             return ret;
         }
 
         public void recycle(T obj) {
             if (obj != null) {
                 this.pool.Push(obj);
+                this.current_size++;
             }
         }
     }

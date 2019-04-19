@@ -222,7 +222,7 @@ namespace Unity.UIWidgets.ui {
 
         void _concat(Matrix3 matrix) {
             var state = this._currentLayer.currentState;
-            matrix = new Matrix3(matrix);
+            matrix = Matrix3.createNewMatrix(matrix);
             matrix.postConcat(state.matrix);
             state.matrix = matrix;
         }
@@ -234,7 +234,7 @@ namespace Unity.UIWidgets.ui {
 
         void _setMatrix(Matrix3 matrix) {
             var state = this._currentLayer.currentState;
-            state.matrix = new Matrix3(matrix);
+            state.matrix = Matrix3.createNewMatrix(matrix);
         }
 
         void _clipRect(Rect rect) {
@@ -704,6 +704,7 @@ namespace Unity.UIWidgets.ui {
             if (needsSave) {
                 this._restore();
             }
+
         }
 
         void _drawTextBlob(TextBlob textBlob, Offset offset, Paint paint) {
@@ -714,7 +715,7 @@ namespace Unity.UIWidgets.ui {
             var state = this._currentLayer.currentState;
             var scale = state.scale * this._devicePixelRatio;
             
-            var matrix = new Matrix3(state.matrix);
+            var matrix = Matrix3.createNewMatrix(state.matrix);
             matrix.preTranslate(offset.dx, offset.dy);
             
             var mesh = new TextBlobMesh(textBlob, scale, matrix);
@@ -996,7 +997,7 @@ namespace Unity.UIWidgets.ui {
             public RenderLayer layer;
         }
         
-        internal class CmdDraw {
+        internal class CmdDraw : Clearable {
             public MeshMesh mesh;
             public TextBlobMesh textMesh;
             public int pass;
@@ -1007,8 +1008,48 @@ namespace Unity.UIWidgets.ui {
             public Mesh meshObj;
             public bool meshObjCreated;
 
+            public CmdDraw() {
+            }
+
+            public static CmdDraw createNew(MeshMesh mesh = null,
+                TextBlobMesh textMesh = null,
+                int pass = 0,
+                MaterialPropertyBlock properties = null,
+                RenderLayer layer = null,
+                Material material = null,
+                Image image = null,
+                Mesh meshObj = null,
+                bool meshObjCreated = false
+                ) {
+                var ret = PathOptimizer.optimizing ? ClearableSimpleFlash<CmdDraw>.instance.fetch() : new CmdDraw();
+
+                ret.mesh = mesh;
+                ret.textMesh = textMesh;
+                ret.pass = pass;
+                ret.properties = properties;
+                ret.layer = layer;
+                ret.material = material;
+                ret.image = image;
+                ret.meshObj = meshObj;
+                ret.meshObjCreated = meshObjCreated;
+                
+                return ret;
+            }
+
+            public void clear() {
+                this.mesh = null;
+                this.textMesh = null;
+                this.pass = 0;
+                this.properties = null;
+                this.layer = null;
+                this.material = null;
+                this.image = null;
+                this.meshObj = null;
+                this.meshObjCreated = false;
+            }
+
             public static readonly Matrix4x4 idMat = Matrix4x4.identity;
-            public static readonly Matrix3 idMat3 = Matrix3.I();
+            public static readonly Matrix3 idMat3 = new Matrix3(Matrix3.I());
             public static readonly int texId = Shader.PropertyToID("_tex");
             public static readonly int matId = Shader.PropertyToID("_mat");
         }

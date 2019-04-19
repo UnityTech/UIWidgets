@@ -76,6 +76,12 @@ namespace Unity.UIWidgets.flow {
             context.canvas.restore();
         }
 
+        static Color _inAmbient;
+        static Color _inSpot;
+        static Color _ambientColor;
+        static Color _spotColor;
+        static Vector3 _zPlane = new Vector3();
+        static Vector3 _devLight = new Vector3();
 
         public static void drawShadow(Canvas canvas, Path path, Color color, float elevation, bool transparentOccluder,
             float dpr) {
@@ -87,19 +93,23 @@ namespace Unity.UIWidgets.flow {
             Rect bounds = path.getBounds();
             float shadow_x = (bounds.left + bounds.right) / 2f;
             float shadow_y = bounds.top - 600.0f;
-            Color inAmbient = color.withAlpha((int) (kAmbientAlpha * color.alpha));
-            Color inSpot = color.withAlpha((int) (kSpotAlpha * color.alpha));
-            Color ambientColor = null;
-            Color spotColor = null;
-            ShadowUtils.computeTonalColors(inAmbient, inSpot, ref ambientColor, ref spotColor);
+            _inAmbient = color.withAlpha((int) (kAmbientAlpha * color.alpha));
+            _inSpot = color.withAlpha((int) (kSpotAlpha * color.alpha));
+            _ambientColor = null;
+            _spotColor = null;
+            ShadowUtils.computeTonalColors(_inAmbient, _inSpot, ref _ambientColor, ref _spotColor);
+            
+            _zPlane.Set(0, 0, dpr * elevation);
+            _devLight.Set(shadow_x, shadow_y, dpr * kLightHeight);
+            
             ShadowUtils.drawShadow(
                 canvas,
                 path,
-                new Vector3(0, 0, dpr * elevation),
-                new Vector3(shadow_x, shadow_y, dpr * kLightHeight),
+                _zPlane,
+                _devLight,
                 dpr * kLightRadius,
-                ambientColor,
-                spotColor,
+                _ambientColor,
+                _spotColor,
                 0
             );
         }

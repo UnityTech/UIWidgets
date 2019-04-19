@@ -64,6 +64,8 @@ namespace Unity.UIWidgets.editor {
         bool _drawToSurface(LayerTree layerTree) {
             D.assert(this._surface != null);
 
+            PathOptimizer.cmdNum = 0;
+
             var frame = this._surface.acquireFrame(
                 layerTree.frameSize, layerTree.devicePixelRatio, layerTree.antiAliasing);
             if (frame == null) {
@@ -91,8 +93,9 @@ namespace Unity.UIWidgets.editor {
                     SimpleFlash<CanvasState>.instance.clearAll();
                     SimpleFlash<PathPath>.instance.clearAll();
                     SimpleFlash<Rect>.instance.clearAll();
-                    
                     this._fireNextFrameCallbackIfPresent();
+                    
+                    //Debug.Log(PathOptimizer.cmdNum);
 
                     return true;
                 }
@@ -108,7 +111,6 @@ namespace Unity.UIWidgets.editor {
                 SimpleFlash<CanvasState>.instance.clearAll();
                 SimpleFlash<PathPath>.instance.clearAll();
                 SimpleFlash<Rect>.instance.clearAll();
-
                 return false;
             }
         }

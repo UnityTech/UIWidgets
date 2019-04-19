@@ -227,13 +227,22 @@ namespace Unity.UIWidgets.ui {
         }
     }
 
-    class ReducedClip {
-        public readonly Rect scissor;
+    class ReducedClip : Clearable {
+        public Rect scissor;
         public readonly List<ClipElement> maskElements = new List<ClipElement>();
         ClipElement _lastElement;
 
         public bool isEmpty() {
             return this.scissor != null && this.scissor.isEmpty;
+        }
+
+        public void clear() {
+            this.maskElements.Clear();
+            this._lastElement = null;
+        }
+
+        public ReducedClip() {
+            
         }
 
         public uint maskGenID() {
