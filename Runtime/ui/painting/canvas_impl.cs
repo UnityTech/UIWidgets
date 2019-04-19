@@ -911,9 +911,9 @@ namespace Unity.UIWidgets.ui {
             public bool noMSAA = false;
             public Rect layerBounds;
             public Paint layerPaint;
-            public readonly List<object> draws = new List<object>();
-            public readonly List<RenderLayer> layers = new List<RenderLayer>();
-            public readonly List<State> states = new List<State>();
+            public readonly List<object> draws = Flash<object>.instance.fetch();
+            public readonly List<RenderLayer> layers = Flash<RenderLayer>.instance.fetch();
+            public readonly List<State> states = Flash<State>.instance.fetch();
             public State currentState;
             public readonly ClipStack clipStack = new ClipStack();
             public uint lastClipGenId;
@@ -936,7 +936,7 @@ namespace Unity.UIWidgets.ui {
             }
 
             public RenderLayer() {
-                this.currentState = new State();
+                this.currentState = State.createNew();
                 this.states.Add(this.currentState);
             }
 
@@ -952,6 +952,19 @@ namespace Unity.UIWidgets.ui {
             Matrix3 _matrix;
             float? _scale;
             Matrix3 _invMatrix;
+
+            public State() {
+                
+            }
+
+            public static State createNew(Matrix3 matrix = null, float? scale = null, Matrix3 invMatrix = null) {
+                var ret = PathOptimizer.optimizing ? SimpleFlash<State>.instance.fetch() : new State();
+                ret._matrix = matrix ?? _id;
+                ret._scale = scale;
+                ret._invMatrix = invMatrix;
+
+                return ret;
+            }
 
             public State(Matrix3 matrix = null, float? scale = null, Matrix3 invMatrix = null) {
                 this._matrix = matrix ?? _id;
@@ -988,7 +1001,7 @@ namespace Unity.UIWidgets.ui {
             }
 
             public State copy() {
-                return new State(this._matrix, this._scale, this._invMatrix);
+                return createNew(this._matrix, this._scale, this._invMatrix);
             }
         }
         

@@ -93,6 +93,13 @@ namespace Unity.UIWidgets.editor {
                     SimpleFlash<CanvasState>.instance.clearAll();
                     SimpleFlash<PathPath>.instance.clearAll();
                     SimpleFlash<Rect>.instance.clearAll();
+                    ClearableSimpleFlash<PictureFlusher.CmdDraw>.instance.clearAll();
+                    ClearableMaterialPropFlash.instance.clearAll();
+                    Flash<object>.instance.clearAll();
+                    Flash<PictureFlusher.RenderLayer>.instance.clearAll();
+                    Flash<PictureFlusher.State>.instance.clearAll();
+                    SimpleFlash<PictureFlusher.State>.instance.clearAll();
+                    
                     this._fireNextFrameCallbackIfPresent();
                     
                     //Debug.Log(PathOptimizer.cmdNum);
@@ -111,6 +118,13 @@ namespace Unity.UIWidgets.editor {
                 SimpleFlash<CanvasState>.instance.clearAll();
                 SimpleFlash<PathPath>.instance.clearAll();
                 SimpleFlash<Rect>.instance.clearAll();
+                ClearableSimpleFlash<PictureFlusher.CmdDraw>.instance.clearAll();
+                ClearableMaterialPropFlash.instance.clearAll();
+                Flash<object>.instance.clearAll();
+                Flash<PictureFlusher.RenderLayer>.instance.clearAll();
+                Flash<PictureFlusher.State>.instance.clearAll();
+                SimpleFlash<PictureFlusher.State>.instance.clearAll();
+                
                 return false;
             }
         }

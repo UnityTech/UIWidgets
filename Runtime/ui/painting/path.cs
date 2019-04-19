@@ -17,6 +17,60 @@ namespace Unity.UIWidgets.ui {
     public interface Clearable {
         void clear();
     }
+    
+    
+    public class ClearableMaterialPropFlash {
+        static ClearableMaterialPropFlash _instance;
+
+        const int initial_size = 1024;
+        const int delta_size = 128;
+        int current_size = 0;
+
+        public static ClearableMaterialPropFlash instance {
+            get {
+                if (_instance != null) return _instance;
+                _instance = new ClearableMaterialPropFlash();
+                _instance.setup();
+                return _instance;
+            }
+        }
+
+        List<MaterialPropertyBlock> flash;
+        int curIndex;
+
+        void setup() {
+            this.flash = new List<MaterialPropertyBlock>(initial_size);
+            for (var i = 0; i < initial_size; i++) {
+                this.flash.Add(new MaterialPropertyBlock());
+            }
+
+            this.current_size = this.flash.Count;
+        }
+        
+        public MaterialPropertyBlock fetch() {
+            if (!PathOptimizer.optimizing) {
+                return new MaterialPropertyBlock();
+            }
+            
+            if (this.curIndex >= this.current_size) {
+                for (var i = 0; i < delta_size; i++) {
+                    this.flash.Add(new MaterialPropertyBlock());
+                }
+                this.current_size = this.flash.Count;
+            }
+
+            var ret = this.flash[this.curIndex++];
+            return ret;
+        }
+
+        public void clearAll() {
+            for (var i = 0; i < this.curIndex - 1; i++) {
+                this.flash[i].Clear();
+            }
+            
+            this.curIndex = 0;
+        }
+    }
 
     public class ClearableSimpleFlash<T> where T : Clearable, new() {
         static ClearableSimpleFlash<T> _instance;
@@ -118,8 +172,7 @@ namespace Unity.UIWidgets.ui {
         }
     }
 
-    public class Flash<T> 
-        where T: new() {
+    public class Flash<T> {
         static Flash<T> _instance;
 
         const int initial_size = 1024;
