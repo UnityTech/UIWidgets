@@ -48,7 +48,7 @@ namespace Unity.UIWidgets.painting {
             }
         }
 
-        public bool needHoverRecognizer {
+        public bool hasHoverRecognizer {
             get {
                 bool need = false;
                 this.visitTextSpan((text) => {
@@ -58,7 +58,6 @@ namespace Unity.UIWidgets.painting {
                     }
                     return true;
                 });
-
                 return need;
             }
         }
@@ -172,7 +171,7 @@ namespace Unity.UIWidgets.painting {
                 : RenderComparison.metadata;
 
             if (!Equals(this.recognizer, other.recognizer)) {
-                result = RenderComparison.hoverCallback > result ? RenderComparison.hoverCallback : result;
+                result = RenderComparison.function > result ? RenderComparison.function : result;
             }
             
             if (this.style != null) {

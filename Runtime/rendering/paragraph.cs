@@ -59,11 +59,8 @@ namespace Unity.UIWidgets.rendering {
             this._selection = null;
             this.onSelectionChanged = onSelectionChanged;
             this.selectionColor = selectionColor;
-            
-            
-            this._listenToHoverEvent = this._textPainter.text.needHoverRecognizer;
-            this._previousHoverSpan = null;
-            this._pointerHoverInside = false;
+
+            this._resetHoverHandler();
         }
 
         public Action onSelectionChanged;
@@ -91,7 +88,7 @@ namespace Unity.UIWidgets.rendering {
                     case RenderComparison.identical:
                     case RenderComparison.metadata:
                         return;
-                    case RenderComparison.hoverCallback:
+                    case RenderComparison.function:
                         this._textPainter.text = value;
                         break;
                     case RenderComparison.paint:
@@ -104,9 +101,7 @@ namespace Unity.UIWidgets.rendering {
                         break;
                 }
 
-                this._listenToHoverEvent = this._textPainter.text.needHoverRecognizer;
-                this._previousHoverSpan = null;
-                this._pointerHoverInside = false;
+                this._resetHoverHandler();
             }
         }
 
@@ -253,6 +248,16 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
+        TextSpan _previousHoverSpan;
+        bool _pointerHoverInside;
+        bool _hasHoverRecognizer;
+
+        void _resetHoverHandler() {
+            this._hasHoverRecognizer = this._textPainter.text.hasHoverRecognizer;
+            this._previousHoverSpan = null;
+            this._pointerHoverInside = false;
+        }
+
         void _handleKeyEvent(RawKeyEvent keyEvent) {
             //only allow KCommand.copy
             if (keyEvent is RawKeyUpEvent) {
@@ -328,29 +333,18 @@ namespace Unity.UIWidgets.rendering {
             this.onSelectionChanged?.Invoke();
         }
 
-        TextSpan _previousHoverSpan = null;
-        bool _pointerHoverInside = false;
-        bool _listenToHoverEvent = false;
 
-        public override void handleEvent(PointerEvent evt, HitTestEntry entry) {
-            D.assert(this.debugHandleEvent(evt, entry));
-            if (evt is PointerDownEvent) {
-                this._layoutTextWithConstraints(this.constraints);
-                Offset offset = ((BoxHitTestEntry) entry).localPosition;
-                TextPosition position = this._textPainter.getPositionForOffset(offset);
-                TextSpan span = this._textPainter.text.getSpanForPosition(position);
-                span?.recognizer?.addPointer((PointerDownEvent) evt);
-            }
-
-            if (!this._listenToHoverEvent) {
+        void _handlePointerHover(PointerEvent evt) {
+            if (!this._hasHoverRecognizer) {
                 return;
             }
 
             if (evt is PointerEnterEvent) {
                 this._pointerHoverInside = true;
-            } else if (evt is PointerLeaveEvent) {
+            }
+            else if (evt is PointerLeaveEvent) {
                 this._pointerHoverInside = false;
-                this._previousHoverSpan?.hoverRecognizer?.OnPointerLeave();
+                this._previousHoverSpan?.hoverRecognizer?.OnPointerLeave?.Invoke();
                 this._previousHoverSpan = null;
             }
             else if (evt is PointerHoverEvent && this._pointerHoverInside) {
@@ -360,11 +354,25 @@ namespace Unity.UIWidgets.rendering {
                 TextSpan span = this._textPainter.text.getSpanForPosition(position);
 
                 if (this._previousHoverSpan != span) {
-                    this._previousHoverSpan?.hoverRecognizer?.OnPointerLeave();
-                    span?.hoverRecognizer?.OnPointerEnter();
+                    this._previousHoverSpan?.hoverRecognizer?.OnPointerLeave?.Invoke();
+                    span?.hoverRecognizer?.OnPointerEnter?.Invoke((PointerHoverEvent) evt);
                     this._previousHoverSpan = span;
                 }
             }
+        }
+
+        public override void handleEvent(PointerEvent evt, HitTestEntry entry) {
+            D.assert(this.debugHandleEvent(evt, entry));
+            if (evt is PointerDownEvent) {
+                this._layoutTextWithConstraints(this.constraints);
+                Offset offset = ((BoxHitTestEntry) entry).localPosition;
+                TextPosition position = this._textPainter.getPositionForOffset(offset);
+                TextSpan span = this._textPainter.text.getSpanForPosition(position);
+                span?.recognizer?.addPointer((PointerDownEvent) evt);
+                return;
+            }
+
+            this._handlePointerHover(evt);
         }
 
         protected override void performLayout() {
@@ -413,6 +421,7 @@ namespace Unity.UIWidgets.rendering {
             foreach (var box in this._selectionRects) {
                 barPath.addRect(box.toRect().shift(effectiveOffset));
             }
+
             canvas.drawPath(barPath, paint);
         }
 

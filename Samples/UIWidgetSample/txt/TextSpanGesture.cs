@@ -33,7 +33,7 @@ namespace UIWidgetsSample {
                 Debug.Log("Tap");
             };
             this._hoverRecognizer = new HoverRecognizer();
-            this._hoverRecognizer.OnPointerEnter = () => { Debug.Log("Pointer Enter"); };
+            this._hoverRecognizer.OnPointerEnter = (evt) => { Debug.Log("Pointer Enter"); };
             this._hoverRecognizer.OnPointerLeave = () => { Debug.Log("Pointer Leave"); };
         }
 
