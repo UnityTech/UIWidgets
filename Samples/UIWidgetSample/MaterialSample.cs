@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using RSG;
 using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.material;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
@@ -170,10 +171,21 @@ namespace UIWidgetsSample {
         GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>.key();
 
         VoidCallback _showBottomSheetCallback;
+        
+        TapGestureRecognizer _tapRecognizer;
+        HoverRecognizer _hoverRecognizer;
 
         public override void initState() {
             base.initState();
             this._showBottomSheetCallback = this._showBottomSheet;
+            
+            this._tapRecognizer = new TapGestureRecognizer();
+            this._tapRecognizer.onTap = () => {
+                Debug.Log("Tap");
+            };
+            this._hoverRecognizer = new HoverRecognizer();
+            this._hoverRecognizer.OnPointerEnter = () => { Debug.Log("Pointer Enter"); };
+            this._hoverRecognizer.OnPointerLeave = () => { Debug.Log("Pointer Leave"); };
         }
 
         void _showBottomSheet() {
@@ -212,7 +224,25 @@ namespace UIWidgetsSample {
             return new Scaffold(
                 key: this._scaffoldKey,
                 appBar: new AppBar(
-                    title: new Text("Basic AppBar"),
+                    title: new RichText(
+                        text: new TextSpan(
+                            text: "Can you ",
+                            style: new TextStyle(color: Colors.black),
+                            children: new List<TextSpan>() {
+                                new TextSpan(
+                                    text: "find the",
+                                    style: new TextStyle(
+                                        color: Colors.green,
+                                        decoration: TextDecoration.underline
+                                    ),
+                                    recognizer: this._tapRecognizer,
+                                    hoverRecognizer: this._hoverRecognizer
+                                ),
+                                new TextSpan(
+                                    text: " secret?"
+                                )
+                            }
+                        )),
                     actions: new List<Widget> {
                         new IconButton(
                             icon: new Icon(Choice.choices[0].icon),
@@ -317,7 +347,8 @@ namespace UIWidgetsSample {
                         children: new List<Widget> {
                             new Icon(this.choice.icon, size: 128.0f, color: textStyle.color),
                             new RaisedButton(
-                                child: new Text(this.choice.title, style: textStyle),
+                                //child: new Text(this.choice.title, style: textStyle),
+                                child: new Icon(Unity.UIWidgets.material.Icons.pool),
                                 onPressed: () => {
                                     SnackBar snackBar = new SnackBar(
                                         content: new Text(this.choice.title + " is chosen !"),

@@ -23,21 +23,31 @@ namespace UIWidgetsSample {
     }
 
     class _BuzzingTextState : State<BuzzingText> {
-        LongPressGestureRecognizer _longPressRecognizer;
+        TapGestureRecognizer _tapRecognizer;
+        HoverRecognizer _hoverRecognizer;
 
         public override void initState() {
             base.initState();
-            this._longPressRecognizer = new LongPressGestureRecognizer();
-            this._longPressRecognizer.onLongPress = this._handlePress;
+            this._tapRecognizer = new TapGestureRecognizer();
+            this._tapRecognizer.onTap = () => {
+                Debug.Log("Tap");
+            };
+            this._hoverRecognizer = new HoverRecognizer();
+            this._hoverRecognizer.OnPointerEnter = () => { Debug.Log("Pointer Enter"); };
+            this._hoverRecognizer.OnPointerLeave = () => { Debug.Log("Pointer Leave"); };
         }
 
         public override void dispose() {
-            this._longPressRecognizer.dispose();
+            this._tapRecognizer.dispose();
             base.dispose();
         }
 
-        void _handlePress() {
-            Debug.Log("Long Pressed Text");
+        void _handleEnter() {
+            Debug.Log("Enter");
+        }
+
+        void _handleLeave() {
+            Debug.Log("Leave");
         }
         /*
         
@@ -55,8 +65,9 @@ namespace UIWidgetsSample {
                             style: new TextStyle(
                                 color: Colors.green,
                                 decoration: TextDecoration.underline
-                            )
-                          //  recognizer: this._longPressRecognizer
+                            ),
+                            recognizer: this._tapRecognizer,
+                            hoverRecognizer: this._hoverRecognizer
                         ),
                         new TextSpan(
                             text: " secret?"

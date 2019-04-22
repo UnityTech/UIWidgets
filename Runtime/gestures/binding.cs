@@ -125,7 +125,8 @@ namespace Unity.UIWidgets.gestures {
                     timeStamp: evt.timeStamp,
                     pointer: evt.pointer,
                     device: evt.device,
-                    kind: evt.kind
+                    kind: evt.kind,
+                    position: evt.position
                 ), null);
             }
 
@@ -135,7 +136,8 @@ namespace Unity.UIWidgets.gestures {
                     timeStamp: evt.timeStamp,
                     pointer: evt.pointer,
                     device: evt.device,
-                    kind: evt.kind
+                    kind: evt.kind,
+                    position: evt.position
                 ), hitTestEntry);
             }
 
