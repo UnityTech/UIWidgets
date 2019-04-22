@@ -170,7 +170,7 @@ namespace Unity.UIWidgets.painting {
                 ? RenderComparison.identical
                 : RenderComparison.metadata;
 
-            if (!Equals(this.recognizer, other.recognizer)) {
+            if (!Equals(this.hoverRecognizer, other.hoverRecognizer)) {
                 result = RenderComparison.function > result ? RenderComparison.function : result;
             }
             

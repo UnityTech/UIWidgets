@@ -1,6 +1,4 @@
-using System;
 using Unity.UIWidgets.foundation;
-using UnityEngine;
 
 namespace Unity.UIWidgets.gestures {
     
@@ -18,5 +16,11 @@ namespace Unity.UIWidgets.gestures {
         public PointerHoverEnterCallback OnPointerEnter;
 
         public PointerHoverLeaveCallback OnPointerLeave;
+        
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new DiagnosticsProperty<object>("debugOwner", this.debugOwner,
+                defaultValue: Diagnostics.kNullDefaultValue));
+        }
     }
 }
