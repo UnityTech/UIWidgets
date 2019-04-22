@@ -52,6 +52,8 @@ namespace Unity.UIWidgets.gestures {
 
         public readonly HashSet<HitTestTarget> lastMoveTargets = new HashSet<HitTestTarget>();
 
+        public readonly HashSet<HitTestEntry> _enteredTargets = new HashSet<HitTestEntry>();
+
         void _handlePointerEvent(PointerEvent evt) {
             if (evt is PointerScrollEvent) {
                 this._handlePointerScrollEvent(evt);
@@ -106,22 +108,18 @@ namespace Unity.UIWidgets.gestures {
             HitTestResult result = new HitTestResult();
             this.hitTest(result, evt.position);
 
-            // enter event
+            D.assert(this._enteredTargets.Count == 0);
             foreach (var hitTestEntry in result.path) {
                 if (this.lastMoveTargets.Contains(hitTestEntry.target)) {
                     hitTestEntry.target.handleEvent(evt, hitTestEntry);
                     this.lastMoveTargets.Remove(hitTestEntry.target);
                 }
                 else {
-                    hitTestEntry.target.handleEvent(new PointerEnterEvent(
-                        timeStamp: evt.timeStamp,
-                        pointer: evt.pointer,
-                        device: evt.device,
-                        kind: evt.kind
-                    ), hitTestEntry);
+                    this._enteredTargets.Add(hitTestEntry);
                 }
             }
 
+            //leave events
             foreach (var lastMoveTarget in this.lastMoveTargets) {
                 lastMoveTarget.handleEvent(new PointerLeaveEvent(
                     timeStamp: evt.timeStamp,
@@ -131,10 +129,22 @@ namespace Unity.UIWidgets.gestures {
                 ), null);
             }
 
+            //enter events
+            foreach (var hitTestEntry in this._enteredTargets) {
+                hitTestEntry.target.handleEvent(new PointerEnterEvent(
+                    timeStamp: evt.timeStamp,
+                    pointer: evt.pointer,
+                    device: evt.device,
+                    kind: evt.kind
+                ), hitTestEntry);
+            }
+
             this.lastMoveTargets.Clear();
             foreach (var hitTestEntry in result.path) {
                 this.lastMoveTargets.Add(hitTestEntry.target);
             }
+
+            this._enteredTargets.Clear();
 
             this.dispatchEvent(evt, result);
         }
