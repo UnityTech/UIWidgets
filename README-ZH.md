@@ -181,7 +181,7 @@ UIWidgets也支持Gif！
 
 #### 七、自动调节帧率
 如果要使得构建出的应用能够自动调节帧率，请打开Project Settings，将构建目标平台对应的Quality选项卡中的V Sync Count设置为Don't Sync。
-默认的逻辑是在界面静止时将帧率降低为15，在界面变动时将帧率提高至60。
+默认的逻辑是在界面静止时将帧率降低为25，在界面变动时将帧率提高至60。
 如果您需要修改帧率升高或降低时的行为，请将`Window.onFrameRateSpeedUp`和/或`Window.onFrameRateCoolDown`设置为您自己的函数。
 
 #### 八、WebGL Canvas分辨率调整插件
