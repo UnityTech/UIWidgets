@@ -91,6 +91,9 @@ namespace Unity.UIWidgets.rendering {
                     case RenderComparison.identical:
                     case RenderComparison.metadata:
                         return;
+                    case RenderComparison.hoverCallback:
+                        this._textPainter.text = value;
+                        break;
                     case RenderComparison.paint:
                         this._textPainter.text = value;
                         this.markNeedsPaint();

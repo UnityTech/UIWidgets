@@ -5,6 +5,7 @@ namespace Unity.UIWidgets.painting {
     public enum RenderComparison {
         identical,
         metadata,
+        hoverCallback,
         paint,
         layout,
     }

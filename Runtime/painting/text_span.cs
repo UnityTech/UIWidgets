@@ -170,6 +170,11 @@ namespace Unity.UIWidgets.painting {
             RenderComparison result = Equals(this.recognizer, other.recognizer)
                 ? RenderComparison.identical
                 : RenderComparison.metadata;
+
+            if (!Equals(this.recognizer, other.recognizer)) {
+                result = RenderComparison.hoverCallback > result ? RenderComparison.hoverCallback : result;
+            }
+            
             if (this.style != null) {
                 var candidate = this.style.compareTo(other.style);
                 if (candidate > result) {
