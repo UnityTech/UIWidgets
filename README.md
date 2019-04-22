@@ -213,7 +213,7 @@ Status bar is always hidden by default when an Unity project is running on an An
 #### Automatically Adjust Frame Rate
 
 To build an App that is able to adjust the frame rate automatically, please open Project Settings, and in the Quality tab, set the "V Sync Count" option of the target platform to "Don't Sync".
-The default logic is to set the frame rate to 15 when the screen is static, and change the frame rate to 60 whenever the screen changes.
+The default logic is to set the frame rate to 25 when the screen is static, and change the frame rate to 60 whenever the screen changes.
 If you would like to modify the behavior of speeding up or cooling down the frame rate, please set `Window.onFrameRateSpeedUp` and/or `Window.onFrameRateCoolDown` to your own functions.
 
 #### WebGL Canvas Device Pixel Ratio Plugin
