@@ -218,8 +218,7 @@ namespace Unity.UIWidgets.animation {
         }
 
         public override T lerp(float t) => this.begin;
-
-        String toString() => $"{this.GetType()}(value: {this.begin})";
+        public override string ToString() => $"{this.GetType()}(value: {this.begin})";
     }
 
     public class CurveTween : Animatable<float> {
