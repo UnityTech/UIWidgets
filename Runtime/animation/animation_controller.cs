@@ -155,6 +155,11 @@ namespace Unity.UIWidgets.animation {
 
                 return true;
             });
+            D.assert(
+                this._ticker != null,
+                "AnimationController.forward() called after AnimationController.dispose()\n" +
+                "AnimationController methods should not be used after calling dispose."
+            );
             this._direction = _AnimationDirection.forward;
             if (from != null) {
                 this.setValue(from.Value);
@@ -175,6 +180,11 @@ namespace Unity.UIWidgets.animation {
 
                 return true;
             });
+            D.assert(
+                this._ticker != null,
+                "AnimationController.reverse() called after AnimationController.dispose()\n" +
+                "AnimationController methods should not be used after calling dispose."
+            );
             this._direction = _AnimationDirection.reverse;
             if (from != null) {
                 this.setValue(from.Value);
@@ -184,10 +194,26 @@ namespace Unity.UIWidgets.animation {
         }
 
         public TickerFuture animateTo(float target, TimeSpan? duration = null, Curve curve = null) {
+            D.assert(
+                this._ticker != null,
+                "AnimationController.animateTo() called after AnimationController.dispose()\n" +
+                "AnimationController methods should not be used after calling dispose."
+            );
             curve = curve ?? Curves.linear;
 
             this._direction = _AnimationDirection.forward;
             return this._animateToInternal(target, duration: duration, curve: curve);
+        }
+        
+        TickerFuture animateBack(float target, TimeSpan? duration, Curve curve = null) {
+            D.assert(
+                this._ticker != null,
+                "AnimationController.animateBack() called after AnimationController.dispose()\n" +
+                "AnimationController methods should not be used after calling dispose."
+            );
+            curve = curve ?? Curves.linear;
+            this._direction = _AnimationDirection.reverse;
+            return this._animateToInternal(target, duration, curve);
         }
 
         TickerFuture _animateToInternal(float target, TimeSpan? duration = null, Curve curve = null) {
@@ -236,7 +262,7 @@ namespace Unity.UIWidgets.animation {
                 new _InterpolationSimulation(this._value, target, simulationDuration.Value, curve));
         }
 
-        public TickerFuture repeat(float? min = null, float? max = null, TimeSpan? period = null) {
+        public TickerFuture repeat(float? min = null, float? max = null, bool reverse = false, TimeSpan? period = null) {
             min = min ?? this.lowerBound;
             max = max ?? this.upperBound;
             period = period ?? this.duration;
@@ -252,7 +278,10 @@ namespace Unity.UIWidgets.animation {
 
                 return true;
             });
-            return this.animateWith(new _RepeatingSimulation(min.Value, max.Value, period.Value));
+            
+            D.assert(max >= min);
+            D.assert(max <= this.upperBound && min >= this.lowerBound);
+            return this.animateWith(new _RepeatingSimulation(this._value, min.Value, max.Value, reverse, period.Value));
         }
 
         public TickerFuture fling(float velocity = 1.0f) {
@@ -268,6 +297,11 @@ namespace Unity.UIWidgets.animation {
 
 
         public TickerFuture animateWith(Simulation simulation) {
+            D.assert(
+                this._ticker != null,
+                "AnimationController.animateWith() called after AnimationController.dispose()\n" +
+                "AnimationController methods should not be used after calling dispose."
+            );
             this.stop();
             return this._startSimulation(simulation);
         }
@@ -287,6 +321,11 @@ namespace Unity.UIWidgets.animation {
         }
 
         public void stop(bool canceled = true) {
+            D.assert(
+                this._ticker != null,
+                "AnimationController.stop() called after AnimationController.dispose()\n" +
+                "AnimationController methods should not be used after calling dispose."
+            );
             this._simulation = null;
             this._lastElapsedDuration = null;
             this._ticker.stop(canceled: canceled);
@@ -395,21 +434,33 @@ namespace Unity.UIWidgets.animation {
     }
 
     class _RepeatingSimulation : Simulation {
-        internal _RepeatingSimulation(float min, float max, TimeSpan period) {
+        internal _RepeatingSimulation(float initialValue, float min, float max, bool reverse, TimeSpan period) {
             this._min = min;
             this._max = max;
             this._periodInSeconds = (float) period.Ticks / TimeSpan.TicksPerSecond;
+            this._initialT = (max == min) ? 0.0f : (initialValue / (max - min)) * (period.Ticks / TimeSpan.TicksPerSecond);
+            this._reverse = reverse;
             D.assert(this._periodInSeconds > 0.0f);
+            D.assert(this._initialT >= 0.0f);
         }
 
         readonly float _min;
         readonly float _max;
         readonly float _periodInSeconds;
+        readonly bool _reverse;
+        readonly float _initialT;
 
         public override float x(float timeInSeconds) {
             D.assert(timeInSeconds >= 0.0f);
-            float t = (timeInSeconds / this._periodInSeconds) % 1.0f;
-            return MathUtils.lerpFloat(this._min, this._max, t);
+            float totalTimeInSeconds = timeInSeconds + this._initialT;
+            float t = (totalTimeInSeconds / this._periodInSeconds) % 1.0f;
+            bool _isPlayingReverse = ((int)(totalTimeInSeconds / this._periodInSeconds)) % 2 == 1;
+
+            if (this._reverse && _isPlayingReverse) {
+                return MathUtils.lerpFloat(this._max, this._min, t);
+            } else {
+                return MathUtils.lerpFloat(this._min, this._max, t);
+            }
         }
 
         public override float dx(float timeInSeconds) {
