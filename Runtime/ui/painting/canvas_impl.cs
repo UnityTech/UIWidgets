@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.utils;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -956,7 +957,7 @@ namespace Unity.UIWidgets.ui {
             }
 
             public static State createNew(Matrix3 matrix = null, float? scale = null, Matrix3 invMatrix = null) {
-                var ret = PathOptimizer.optimizing ? SimpleFlash<State>.instance.fetch() : new State();
+                var ret = GcCacheHelper.optimizing ? SimpleFlash<State>.instance.fetch() : new State();
                 ret._matrix = matrix ?? _id;
                 ret._scale = scale;
                 ret._invMatrix = invMatrix;
@@ -1032,7 +1033,7 @@ namespace Unity.UIWidgets.ui {
                 Mesh meshObj = null,
                 bool meshObjCreated = false
                 ) {
-                var ret = PathOptimizer.optimizing ? ClearableSimpleFlash<CmdDraw>.instance.fetch() : new CmdDraw();
+                var ret = GcCacheHelper.optimizing ? ClearableSimpleFlash<CmdDraw>.instance.fetch() : new CmdDraw();
 
                 ret.mesh = mesh;
                 ret.textMesh = textMesh;

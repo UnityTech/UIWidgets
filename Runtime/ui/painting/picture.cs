@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.utils;
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
@@ -272,7 +273,7 @@ namespace Unity.UIWidgets.ui {
             bool saveLayer,
             Offset layerOffset,
             Rect paintBounds) {
-            var ret = PathOptimizer.optimizing ? SimpleFlash<CanvasState>.instance.fetch() : new CanvasState();
+            var ret = GcCacheHelper.optimizing ? SimpleFlash<CanvasState>.instance.fetch() : new CanvasState();
             ret.xform = xform;
             ret.scissor = scissor;
             ret.saveLayer = saveLayer;

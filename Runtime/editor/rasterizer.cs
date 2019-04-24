@@ -1,9 +1,7 @@
 using System;
 using Unity.UIWidgets.flow;
 using Unity.UIWidgets.foundation;
-using Unity.UIWidgets.ui;
-using UnityEngine;
-using Rect = Unity.UIWidgets.ui.Rect;
+using Unity.UIWidgets.utils;
 
 namespace Unity.UIWidgets.editor {
     public class Rasterizer {
@@ -63,9 +61,6 @@ namespace Unity.UIWidgets.editor {
 
         bool _drawToSurface(LayerTree layerTree) {
             D.assert(this._surface != null);
-
-            PathOptimizer.cmdNum = 0;
-
             var frame = this._surface.acquireFrame(
                 layerTree.frameSize, layerTree.devicePixelRatio, layerTree.antiAliasing);
             if (frame == null) {
@@ -75,96 +70,16 @@ namespace Unity.UIWidgets.editor {
             var canvas = frame.getCanvas();
 
             using (var compositorFrame = this._compositorContext.acquireFrame(canvas, true)) {
-
-                PathOptimizer.optimizing = true;
+                var frameOk = false;
+                GcCacheHelper.StartCaching();
                 if (compositorFrame != null && compositorFrame.raster(layerTree, false)) {
-                    
-                    
+                    frameOk = true;
                     frame.submit();
-
-                    PathOptimizer.optimizing = false;
-                    Flash<PathPath>.instance.clearAll();
-                    Flash<PathPoint>.instance.clearAll();
-                    Flash<Vector3>.instance.clearAll();
-                    Flash<int>.instance.clearAll();
-                    Flash<float>.instance.clearAll();
-                    SimpleFlash<PathPoint>.instance.clearAll();
-                    SimpleFlash<Matrix3>.instance.clearAll();
-                    SimpleFlash<CanvasState>.instance.clearAll();
-                    SimpleFlash<PathPath>.instance.clearAll();
-                    SimpleFlash<Rect>.instance.clearAll();
-                    ClearableSimpleFlash<PictureFlusher.CmdDraw>.instance.clearAll();
-                    ClearableMaterialPropFlash.instance.clearAll();
-                    Flash<object>.instance.clearAll();
-                    Flash<PictureFlusher.RenderLayer>.instance.clearAll();
-                    Flash<PictureFlusher.State>.instance.clearAll();
-                    SimpleFlash<PictureFlusher.State>.instance.clearAll();
-                    ClearableSimpleFlash<DrawSave>.instance.clearAll();
-                    ClearableSimpleFlash<DrawSaveLayer>.instance.clearAll();
-                    ClearableSimpleFlash<DrawRestore>.instance.clearAll();
-                    ClearableSimpleFlash<DrawTranslate>.instance.clearAll();
-                    ClearableSimpleFlash<DrawScale>.instance.clearAll();
-                    ClearableSimpleFlash<DrawRotate>.instance.clearAll();
-                    ClearableSimpleFlash<DrawSkew>.instance.clearAll();
-                    ClearableSimpleFlash<DrawConcat>.instance.clearAll();
-                    ClearableSimpleFlash<DrawResetMatrix>.instance.clearAll();
-                    ClearableSimpleFlash<DrawSetMatrix>.instance.clearAll();
-                    ClearableSimpleFlash<DrawClipRect>.instance.clearAll();
-                    ClearableSimpleFlash<DrawClipRRect>.instance.clearAll();
-                    ClearableSimpleFlash<DrawClipPath>.instance.clearAll();
-                    ClearableSimpleFlash<DrawPath>.instance.clearAll();
-                    ClearableSimpleFlash<DrawImage>.instance.clearAll();
-                    ClearableSimpleFlash<DrawImageRect>.instance.clearAll();
-                    ClearableSimpleFlash<DrawImageNine>.instance.clearAll();
-                    ClearableSimpleFlash<DrawPicture>.instance.clearAll();
-                    ClearableSimpleFlash<DrawTextBlob>.instance.clearAll();
-                    
-                    
                     this._fireNextFrameCallbackIfPresent();
-                    
-                    //Debug.Log(PathOptimizer.cmdNum);
-
-                    return true;
                 }
 
-                PathOptimizer.optimizing = false;
-                Flash<PathPath>.instance.clearAll();
-                Flash<PathPoint>.instance.clearAll();
-                Flash<Vector3>.instance.clearAll();
-                Flash<int>.instance.clearAll();
-                Flash<float>.instance.clearAll();
-                SimpleFlash<PathPoint>.instance.clearAll();
-                SimpleFlash<Matrix3>.instance.clearAll();
-                SimpleFlash<CanvasState>.instance.clearAll();
-                SimpleFlash<PathPath>.instance.clearAll();
-                SimpleFlash<Rect>.instance.clearAll();
-                ClearableSimpleFlash<PictureFlusher.CmdDraw>.instance.clearAll();
-                ClearableMaterialPropFlash.instance.clearAll();
-                Flash<object>.instance.clearAll();
-                Flash<PictureFlusher.RenderLayer>.instance.clearAll();
-                Flash<PictureFlusher.State>.instance.clearAll();
-                SimpleFlash<PictureFlusher.State>.instance.clearAll();
-                ClearableSimpleFlash<DrawSave>.instance.clearAll();
-                ClearableSimpleFlash<DrawSaveLayer>.instance.clearAll();
-                ClearableSimpleFlash<DrawRestore>.instance.clearAll();
-                ClearableSimpleFlash<DrawTranslate>.instance.clearAll();
-                ClearableSimpleFlash<DrawScale>.instance.clearAll();
-                ClearableSimpleFlash<DrawRotate>.instance.clearAll();
-                ClearableSimpleFlash<DrawSkew>.instance.clearAll();
-                ClearableSimpleFlash<DrawConcat>.instance.clearAll();
-                ClearableSimpleFlash<DrawResetMatrix>.instance.clearAll();
-                ClearableSimpleFlash<DrawSetMatrix>.instance.clearAll();
-                ClearableSimpleFlash<DrawClipRect>.instance.clearAll();
-                ClearableSimpleFlash<DrawClipRRect>.instance.clearAll();
-                ClearableSimpleFlash<DrawClipPath>.instance.clearAll();
-                ClearableSimpleFlash<DrawPath>.instance.clearAll();
-                ClearableSimpleFlash<DrawImage>.instance.clearAll();
-                ClearableSimpleFlash<DrawImageRect>.instance.clearAll();
-                ClearableSimpleFlash<DrawImageNine>.instance.clearAll();
-                ClearableSimpleFlash<DrawPicture>.instance.clearAll();
-                ClearableSimpleFlash<DrawTextBlob>.instance.clearAll();
-                
-                return false;
+                GcCacheHelper.EndCaching();
+                return frameOk;
             }
         }
 

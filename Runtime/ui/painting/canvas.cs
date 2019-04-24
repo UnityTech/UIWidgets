@@ -85,14 +85,12 @@ namespace Unity.UIWidgets.ui {
         int _saveCount = 1;
 
         public void save() {
-            PathOptimizer.cmdNum++;
             this._saveCount++;
             this._recorder.addDrawCmd(DrawSave.createNew(
             ));
         }
 
         public void saveLayer(Rect rect, Paint paint) {
-            PathOptimizer.cmdNum++;
             this._saveCount++;
             this._recorder.addDrawCmd(DrawSaveLayer.createNew(
                 rect : rect,
@@ -101,7 +99,6 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void restore() {
-            PathOptimizer.cmdNum++;
             this._saveCount--;
             this._recorder.addDrawCmd(DrawRestore.createNew(
             ));
@@ -112,7 +109,6 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void translate(float dx, float dy) {
-            PathOptimizer.cmdNum++;
             this._recorder.addDrawCmd(DrawTranslate.createNew(
                 dx : dx,
                 dy : dy
@@ -120,7 +116,6 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void scale(float sx, float? sy = null) {
-            PathOptimizer.cmdNum++;
             this._recorder.addDrawCmd(DrawScale.createNew(
                 sx : sx,
                 sy : sy
@@ -128,7 +123,6 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void rotate(float radians, Offset offset = null) {
-            PathOptimizer.cmdNum++;
             this._recorder.addDrawCmd(DrawRotate.createNew(
                 radians : radians,
                 offset : offset
@@ -136,7 +130,6 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void skew(float sx, float sy) {
-            PathOptimizer.cmdNum++;
             this._recorder.addDrawCmd(DrawSkew.createNew(
                 sx : sx,
                 sy : sy
@@ -144,7 +137,6 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void concat(Matrix3 matrix) {
-            PathOptimizer.cmdNum++;
             this._recorder.addDrawCmd(DrawConcat.createNew(
                 matrix = matrix
             ));
@@ -155,13 +147,11 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void resetMatrix() {
-            PathOptimizer.cmdNum++;
             this._recorder.addDrawCmd(DrawResetMatrix.createNew(
             ));
         }
 
         public void setMatrix(Matrix3 matrix) {
-            PathOptimizer.cmdNum++;
             this._recorder.addDrawCmd(DrawSetMatrix.createNew(
                 matrix = matrix
             ));
@@ -172,14 +162,12 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void clipRect(Rect rect) {
-            PathOptimizer.cmdNum++;
             this._recorder.addDrawCmd(DrawClipRect.createNew(
                 rect : rect
             ));
         }
 
         public void clipRRect(RRect rrect) {
-            PathOptimizer.cmdNum++;
             this._recorder.addDrawCmd(DrawClipRRect.createNew(
                 rrect : rrect
             ));
@@ -188,7 +176,6 @@ namespace Unity.UIWidgets.ui {
         public void clipPath(Path path) {
             Path newPath = new Path();
             newPath.copyFrom(path);
-            PathOptimizer.cmdNum++;
             this._recorder.addDrawCmd(DrawClipPath.createNew(
                 path : newPath
             ));
@@ -198,7 +185,6 @@ namespace Unity.UIWidgets.ui {
             var path = new Path();
             path.moveTo(from.dx, from.dy);
             path.lineTo(to.dx, to.dy);
-            PathOptimizer.cmdNum++;
 
             this._recorder.addDrawCmd(DrawPath.createNew(
                 path : path,
@@ -210,7 +196,6 @@ namespace Unity.UIWidgets.ui {
             float dpr = Window.instance.devicePixelRatio;
             Path newPath = new Path();
             newPath.copyFrom(path);
-            PathOptimizer.cmdNum++;
             PhysicalShapeLayer.drawShadow(this, newPath, color, elevation, transparentOccluder, dpr);
         }
 
@@ -221,8 +206,6 @@ namespace Unity.UIWidgets.ui {
 
             var path = new Path();
             path.addRect(rect);
-
-            PathOptimizer.cmdNum++;
             this._recorder.addDrawCmd(DrawPath.createNew(
                 path : path,
                 paint : new Paint(paint)
@@ -232,7 +215,6 @@ namespace Unity.UIWidgets.ui {
         public void drawRRect(RRect rrect, Paint paint) {
             var path = new Path();
             path.addRRect(rrect);
-            PathOptimizer.cmdNum++;
             this._recorder.addDrawCmd(DrawPath.createNew(
                 path : path,
                 paint : new Paint(paint)
@@ -244,8 +226,6 @@ namespace Unity.UIWidgets.ui {
             path.addRRect(outer);
             path.addRRect(inner);
             path.winding(PathWinding.clockwise);
-
-            PathOptimizer.cmdNum++;
             this._recorder.addDrawCmd(DrawPath.createNew(
                 path : path,
                 paint : new Paint(paint)
@@ -257,7 +237,6 @@ namespace Unity.UIWidgets.ui {
             var h = rect.height / 2;
             var path = new Path();
             path.addEllipse(rect.left + w, rect.top + h, w, h);
-            PathOptimizer.cmdNum++;
 
             this._recorder.addDrawCmd(DrawPath.createNew(
                 path : path,
@@ -268,7 +247,6 @@ namespace Unity.UIWidgets.ui {
         public void drawCircle(Offset c, float radius, Paint paint) {
             var path = new Path();
             path.addCircle(c.dx, c.dy, radius);
-            PathOptimizer.cmdNum++;
 
             this._recorder.addDrawCmd(DrawPath.createNew(
                 path : path,
@@ -308,7 +286,6 @@ namespace Unity.UIWidgets.ui {
                 path.close();
             }
 
-            PathOptimizer.cmdNum++;
             this._recorder.addDrawCmd(DrawPath.createNew(
                 path : path,
                 paint : new Paint(paint)
@@ -318,7 +295,6 @@ namespace Unity.UIWidgets.ui {
         public void drawPath(Path path, Paint paint) {
             Path newPath = new Path();
             newPath.copyFrom(path);
-            PathOptimizer.cmdNum++;
             this._recorder.addDrawCmd(DrawPath.createNew(
                 path : newPath,
                 paint : new Paint(paint)
@@ -326,7 +302,6 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void drawImage(Image image, Offset offset, Paint paint) {
-            PathOptimizer.cmdNum++;
             this._recorder.addDrawCmd(DrawImage.createNew(
                 image : image,
                 offset : offset,
@@ -335,7 +310,6 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void drawImageRect(Image image, Rect dst, Paint paint) {
-            PathOptimizer.cmdNum++;
             this._recorder.addDrawCmd(DrawImageRect.createNew(
                 image : image,
                 src : null,
@@ -345,7 +319,6 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void drawImageRect(Image image, Rect src, Rect dst, Paint paint) {
-            PathOptimizer.cmdNum++;
             this._recorder.addDrawCmd(DrawImageRect.createNew(
                 image : image,
                 src : src,
@@ -355,7 +328,6 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void drawImageNine(Image image, Rect center, Rect dst, Paint paint) {
-            PathOptimizer.cmdNum++;
             this._recorder.addDrawCmd(DrawImageNine.createNew(
                 image : image,
                 src : null,
@@ -366,7 +338,6 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void drawImageNine(Image image, Rect src, Rect center, Rect dst, Paint paint) {
-            PathOptimizer.cmdNum++;
             this._recorder.addDrawCmd(DrawImageNine.createNew(
                 image : image,
                 src : src,
@@ -377,14 +348,12 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void drawPicture(Picture picture) {
-            PathOptimizer.cmdNum++;
             this._recorder.addDrawCmd(DrawPicture.createNew(
                 picture : picture
             ));
         }
 
         public void drawTextBlob(TextBlob textBlob, Offset offset, Paint paint) {
-            PathOptimizer.cmdNum++;
             this._recorder.addDrawCmd(DrawTextBlob.createNew(
                 textBlob : textBlob,
                 offset : offset,

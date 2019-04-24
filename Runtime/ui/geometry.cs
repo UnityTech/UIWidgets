@@ -1,4 +1,5 @@
 using System;
+using Unity.UIWidgets.utils;
 using UnityEngine;
 using UnityEngine.WSA;
 
@@ -510,7 +511,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public static Rect createNew(float left = 0, float top = 0, float right = 0, float bottom = 0) {
-            var ret = PathOptimizer.optimizing ? SimpleFlash<Rect>.instance.fetch() : new Rect();
+            var ret = GcCacheHelper.optimizing ? SimpleFlash<Rect>.instance.fetch() : new Rect();
             ret.left = left;
             ret.top = top;
             ret.right = right;

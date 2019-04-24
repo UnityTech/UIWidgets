@@ -1,11 +1,12 @@
 using System;
 using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.utils;
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
     public class Matrix3 : IEquatable<Matrix3> {
          public static Matrix3 createNewMatrix(Matrix3 other = null) {
-             if (PathOptimizer.optimizing) {
+             if (GcCacheHelper.optimizing) {
                 var ret = SimpleFlash<Matrix3>.instance.fetch();
                 ret.reset();
 

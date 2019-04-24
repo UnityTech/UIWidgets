@@ -1,4 +1,5 @@
 ﻿using System.Runtime.ExceptionServices;
+using Unity.UIWidgets.utils;
 
 namespace Unity.UIWidgets.ui {
     public abstract class DrawCmd : Clearable {
@@ -9,7 +10,7 @@ namespace Unity.UIWidgets.ui {
 
     public class DrawSave : DrawCmd {
         public static DrawSave createNew() {
-            var ret = PathOptimizer.optimizing
+            var ret = GcCacheHelper.optimizing
                 ? ClearableSimpleFlash<DrawSave>.instance.fetch()
                 : new DrawSave();
 
@@ -20,7 +21,7 @@ namespace Unity.UIWidgets.ui {
     public class DrawSaveLayer : DrawCmd {
 
         public static DrawSaveLayer createNew(Rect rect, Paint paint) {
-            var ret = PathOptimizer.optimizing
+            var ret = GcCacheHelper.optimizing
                 ? ClearableSimpleFlash<DrawSaveLayer>.instance.fetch()
                 : new DrawSaveLayer();
             ret.rect = rect;
@@ -40,7 +41,7 @@ namespace Unity.UIWidgets.ui {
 
     public class DrawRestore : DrawCmd {
         public static DrawRestore createNew() {
-            var ret = PathOptimizer.optimizing
+            var ret = GcCacheHelper.optimizing
                 ? ClearableSimpleFlash<DrawRestore>.instance.fetch()
                 : new DrawRestore();
 
@@ -51,7 +52,7 @@ namespace Unity.UIWidgets.ui {
     public class DrawTranslate : DrawCmd {
         
         public static DrawTranslate createNew(float dx, float dy) {
-            var ret = PathOptimizer.optimizing
+            var ret = GcCacheHelper.optimizing
                 ? ClearableSimpleFlash<DrawTranslate>.instance.fetch()
                 : new DrawTranslate();
 
@@ -68,7 +69,7 @@ namespace Unity.UIWidgets.ui {
     public class DrawScale : DrawCmd {
         
         public static DrawScale createNew(float sx, float? sy) {
-            var ret = PathOptimizer.optimizing
+            var ret = GcCacheHelper.optimizing
                 ? ClearableSimpleFlash<DrawScale>.instance.fetch()
                 : new DrawScale();
 
@@ -85,7 +86,7 @@ namespace Unity.UIWidgets.ui {
     public class DrawRotate : DrawCmd {
         
         public static DrawRotate createNew(float radians, Offset offset) {
-            var ret = PathOptimizer.optimizing
+            var ret = GcCacheHelper.optimizing
                 ? ClearableSimpleFlash<DrawRotate>.instance.fetch()
                 : new DrawRotate();
 
@@ -106,7 +107,7 @@ namespace Unity.UIWidgets.ui {
     public class DrawSkew : DrawCmd {
         
         public static DrawSkew createNew(float sx, float sy) {
-            var ret = PathOptimizer.optimizing
+            var ret = GcCacheHelper.optimizing
                 ? ClearableSimpleFlash<DrawSkew>.instance.fetch()
                 : new DrawSkew();
 
@@ -122,7 +123,7 @@ namespace Unity.UIWidgets.ui {
 
     public class DrawConcat : DrawCmd {
         public static DrawConcat createNew(Matrix3 matrix) {
-            var ret = PathOptimizer.optimizing
+            var ret = GcCacheHelper.optimizing
                 ? ClearableSimpleFlash<DrawConcat>.instance.fetch()
                 : new DrawConcat();
 
@@ -139,7 +140,7 @@ namespace Unity.UIWidgets.ui {
 
     public class DrawResetMatrix : DrawCmd {
         public static DrawResetMatrix createNew() {
-            var ret = PathOptimizer.optimizing
+            var ret = GcCacheHelper.optimizing
                 ? ClearableSimpleFlash<DrawResetMatrix>.instance.fetch()
                 : new DrawResetMatrix();
 
@@ -149,7 +150,7 @@ namespace Unity.UIWidgets.ui {
 
     public class DrawSetMatrix : DrawCmd {
         public static DrawSetMatrix createNew(Matrix3 matrix) {
-            var ret = PathOptimizer.optimizing
+            var ret = GcCacheHelper.optimizing
                 ? ClearableSimpleFlash<DrawSetMatrix>.instance.fetch()
                 : new DrawSetMatrix();
 
@@ -166,7 +167,7 @@ namespace Unity.UIWidgets.ui {
 
     public class DrawClipRect : DrawCmd {
         public static DrawClipRect createNew(Rect rect) {
-            var ret = PathOptimizer.optimizing
+            var ret = GcCacheHelper.optimizing
                 ? ClearableSimpleFlash<DrawClipRect>.instance.fetch()
                 : new DrawClipRect();
 
@@ -183,7 +184,7 @@ namespace Unity.UIWidgets.ui {
 
     public class DrawClipRRect : DrawCmd {
         public static DrawClipRRect createNew(RRect rrect) {
-            var ret = PathOptimizer.optimizing
+            var ret = GcCacheHelper.optimizing
                 ? ClearableSimpleFlash<DrawClipRRect>.instance.fetch()
                 : new DrawClipRRect();
 
@@ -200,7 +201,7 @@ namespace Unity.UIWidgets.ui {
 
     public class DrawClipPath : DrawCmd {
         public static DrawClipPath createNew(Path path) {
-            var ret = PathOptimizer.optimizing
+            var ret = GcCacheHelper.optimizing
                 ? ClearableSimpleFlash<DrawClipPath>.instance.fetch()
                 : new DrawClipPath();
 
@@ -216,7 +217,7 @@ namespace Unity.UIWidgets.ui {
 
     public class DrawPath : DrawCmd {
         public static DrawPath createNew(Path path, Paint paint) {
-            var ret = PathOptimizer.optimizing
+            var ret = GcCacheHelper.optimizing
                 ? ClearableSimpleFlash<DrawPath>.instance.fetch()
                 : new DrawPath();
 
@@ -236,7 +237,7 @@ namespace Unity.UIWidgets.ui {
 
     public class DrawImage : DrawCmd {
         public static DrawImage createNew(Image image, Offset offset, Paint paint) {
-            var ret = PathOptimizer.optimizing
+            var ret = GcCacheHelper.optimizing
                 ? ClearableSimpleFlash<DrawImage>.instance.fetch()
                 : new DrawImage();
 
@@ -260,7 +261,7 @@ namespace Unity.UIWidgets.ui {
     public class DrawImageRect : DrawCmd {
         
         public static DrawImageRect createNew(Image image, Rect src, Rect dst, Paint paint) {
-            var ret = PathOptimizer.optimizing
+            var ret = GcCacheHelper.optimizing
                 ? ClearableSimpleFlash<DrawImageRect>.instance.fetch()
                 : new DrawImageRect();
 
@@ -286,7 +287,7 @@ namespace Unity.UIWidgets.ui {
 
     public class DrawImageNine : DrawCmd {
         public static DrawImageNine createNew(Image image, Rect src, Rect center, Rect dst, Paint paint) {
-            var ret = PathOptimizer.optimizing
+            var ret = GcCacheHelper.optimizing
                 ? ClearableSimpleFlash<DrawImageNine>.instance.fetch()
                 : new DrawImageNine();
 
@@ -315,7 +316,7 @@ namespace Unity.UIWidgets.ui {
 
     public class DrawPicture : DrawCmd {
         public static DrawPicture createNew(Picture picture) {
-            var ret = PathOptimizer.optimizing
+            var ret = GcCacheHelper.optimizing
                 ? ClearableSimpleFlash<DrawPicture>.instance.fetch()
                 : new DrawPicture();
 
@@ -331,7 +332,7 @@ namespace Unity.UIWidgets.ui {
 
     public class DrawTextBlob : DrawCmd {
         public static DrawTextBlob createNew(TextBlob textBlob, Offset offset, Paint paint) {
-            var ret = PathOptimizer.optimizing
+            var ret = GcCacheHelper.optimizing
                 ? ClearableSimpleFlash<DrawTextBlob>.instance.fetch()
                 : new DrawTextBlob();
 
