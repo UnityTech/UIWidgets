@@ -56,7 +56,7 @@ namespace UIWidgetsSample {
                                 color: Colors.green,
                                 decoration: TextDecoration.underline
                             )
-                          //  recognizer: this._longPressRecognizer
+                            //recognizer: this._longPressRecognizer
                         ),
                         new TextSpan(
                             text: " secret?"
