@@ -119,7 +119,7 @@ namespace Unity.UIWidgets.gestures {
             this._arenas.Remove(pointer);
             if (state.members.isNotEmpty()) {
                 D.assert(this._debugLogDiagnostic(
-                    pointer, $"Winner: {state.members[0]}"));
+                    pointer, $"Winner: {state.members.First()}"));
 
                 state.members[0].acceptGesture(pointer);
                 for (int i = 1; i < state.members.Count; i++) {
@@ -205,11 +205,10 @@ namespace Unity.UIWidgets.gestures {
 
             D.assert(this._arenas[pointer] == state);
             D.assert(!state.isOpen);
-            List<GestureArenaMember> members = state.members;
-            D.assert(members.Count == 1);
+            D.assert(state.members.Count == 1);
             this._arenas.Remove(pointer);
             D.assert(this._debugLogDiagnostic(pointer,
-                $"Default winner: {state.members[0]}"));
+                $"Default winner: {state.members.First()}"));
             state.members[0].acceptGesture(pointer);
         }
 

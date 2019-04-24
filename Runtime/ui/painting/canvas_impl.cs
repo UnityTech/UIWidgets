@@ -45,12 +45,10 @@ namespace Unity.UIWidgets.ui {
                     width * this._fringeWidth,
                     height * this._fringeWidth);
 
-                bounds = new Rect(bounds.left, bounds.top, bounds.right, bounds.bottom);
-
                 firstLayer = new RenderLayer {
                     width = width,
                     height = height,
-                    layerBounds = bounds,
+                    layerBounds = new Rect(bounds)
                 };
             } else {
                 D.assert(this._layers.Count > 0);
@@ -223,7 +221,7 @@ namespace Unity.UIWidgets.ui {
 
         void _concat(Matrix3 matrix) {
             var state = this._currentLayer.currentState;
-            matrix = Matrix3.createNewMatrix(matrix);
+            matrix = GcCacheHelper.CreateMatrix(matrix);
             matrix.postConcat(state.matrix);
             state.matrix = matrix;
         }
@@ -235,7 +233,7 @@ namespace Unity.UIWidgets.ui {
 
         void _setMatrix(Matrix3 matrix) {
             var state = this._currentLayer.currentState;
-            state.matrix = Matrix3.createNewMatrix(matrix);
+            state.matrix = GcCacheHelper.CreateMatrix(matrix);
         }
 
         void _clipRect(Rect rect) {
@@ -716,7 +714,7 @@ namespace Unity.UIWidgets.ui {
             var state = this._currentLayer.currentState;
             var scale = state.scale * this._devicePixelRatio;
             
-            var matrix = Matrix3.createNewMatrix(state.matrix);
+            var matrix = GcCacheHelper.CreateMatrix(state.matrix);
             matrix.preTranslate(offset.dx, offset.dy);
             
             var mesh = new TextBlobMesh(textBlob, scale, matrix);

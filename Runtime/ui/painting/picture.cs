@@ -87,19 +87,19 @@ namespace Unity.UIWidgets.ui {
                 }
                 case DrawTranslate cmd: {
                     var state = this._getState();
-                    state.xform = Matrix3.createNewMatrix(state.xform);
+                    state.xform = GcCacheHelper.CreateMatrix(state.xform);
                     state.xform.preTranslate(cmd.dx, cmd.dy);
                     break;
                 }
                 case DrawScale cmd: {
                     var state = this._getState();
-                    state.xform = Matrix3.createNewMatrix(state.xform);
+                    state.xform = GcCacheHelper.CreateMatrix(state.xform);
                     state.xform.preScale(cmd.sx, (cmd.sy ?? cmd.sx));
                     break;
                 }
                 case DrawRotate cmd: {
                     var state = this._getState();
-                    state.xform = Matrix3.createNewMatrix(state.xform);
+                    state.xform = GcCacheHelper.CreateMatrix(state.xform);
                     if (cmd.offset == null) {
                         state.xform.preRotate(cmd.radians);
                     } else {
@@ -111,13 +111,13 @@ namespace Unity.UIWidgets.ui {
                 }
                 case DrawSkew cmd: {
                     var state = this._getState();
-                    state.xform = Matrix3.createNewMatrix(state.xform);
+                    state.xform = GcCacheHelper.CreateMatrix(state.xform);
                     state.xform.preSkew(cmd.sx, cmd.sy);
                     break;
                 }
                 case DrawConcat cmd: {
                     var state = this._getState();
-                    state.xform = Matrix3.createNewMatrix(state.xform);
+                    state.xform = GcCacheHelper.CreateMatrix(state.xform);
                     state.xform.preConcat(cmd.matrix);
                     break;
                 }
@@ -128,7 +128,7 @@ namespace Unity.UIWidgets.ui {
                 }
                 case DrawSetMatrix cmd: {
                     var state = this._getState();
-                    state.xform = Matrix3.createNewMatrix(cmd.matrix);
+                    state.xform = GcCacheHelper.CreateMatrix(cmd.matrix);
                     break;
                 }
                 case DrawClipRect cmd: {

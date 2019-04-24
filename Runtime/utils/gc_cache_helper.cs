@@ -1,11 +1,37 @@
 using System.Collections.Generic;
 using Unity.UIWidgets.ui;
 using UnityEngine;
-using Rect = UnityEngine.Rect;
+using Rect = Unity.UIWidgets.ui.Rect;
 
 namespace Unity.UIWidgets.utils {
     public static class GcCacheHelper {
         public static bool optimizing = false;
+        
+        public static List<T> RepeatList<T>(T value, int length) {
+            List<T> newList = new List<T>(length);
+            for (int i = 0; i < length; i++) {
+                newList.Add(value);
+            }
+            return newList;
+        }
+
+        public static Rect CreateRect(float left = 0, float top = 0, float right = 0, float bottom = 0) {
+            var ret = SimpleFlash<Rect>.instance.fetch();
+            ret.left = left;
+            ret.top = top;
+            ret.right = right;
+            ret.bottom = bottom;
+            return ret;
+        }
+        
+        
+        public static Matrix3 CreateMatrix(Matrix3 other = null) {
+            var ret = SimpleFlash<Matrix3>.instance.fetch();
+            if (other != null) {
+                ret.copyFrom(other);
+            }
+            return ret;
+        }
 
         public static void StartCaching() {
             optimizing = true;
@@ -51,7 +77,7 @@ namespace Unity.UIWidgets.utils {
             ClearableSimpleFlash<DrawTextBlob>.instance.clearAll();
         }
     }
-
+    
     public interface Clearable {
         void clear();
     }

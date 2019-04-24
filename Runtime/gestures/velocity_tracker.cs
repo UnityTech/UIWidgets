@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-//using System.Linq;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
+using Unity.UIWidgets.utils;
 using UnityEngine;
 
 namespace Unity.UIWidgets.gestures {
@@ -142,13 +142,7 @@ namespace Unity.UIWidgets.gestures {
         const int _horizonMilliseconds = 100;
         const int _minSampleSize = 3;
 
-        readonly List<_PointAtTime> _samples = new List<_PointAtTime>(_historySize);
-
-        public VelocityTracker() {
-            for (var i = 0; i < _historySize; i++) {
-                this._samples.Add(null);
-            }
-        }
+        readonly List<_PointAtTime> _samples = GcCacheHelper.RepeatList<_PointAtTime>(null, _historySize);
 
         int _index = 0;
 

@@ -498,41 +498,37 @@ namespace Unity.UIWidgets.ui {
     }
 
     public class Rect : IEquatable<Rect> {
-        public Rect(float left, float top, float right, float bottom) {
+        Rect(float left, float top, float right, float bottom) {
             this.left = left;
             this.top = top;
             this.right = right;
             this.bottom = bottom;
         }
 
-
         public Rect() {
-            
         }
 
-        public static Rect createNew(float left = 0, float top = 0, float right = 0, float bottom = 0) {
-            var ret = GcCacheHelper.optimizing ? SimpleFlash<Rect>.instance.fetch() : new Rect();
-            ret.left = left;
-            ret.top = top;
-            ret.right = right;
-            ret.bottom = bottom;
-            return ret;
+        public Rect(Rect other) {
+            this.left = other.left;
+            this.top = other.top;
+            this.right = other.right;
+            this.bottom = other.bottom;
         }
 
         public static Rect fromLTRB(float left, float top, float right, float bottom) {
-            return createNew(left, top, right, bottom);
+            return GcCacheHelper.CreateRect(left, top, right, bottom);
         }
 
         public static Rect fromLTWH(float left, float top, float width, float height) {
-            return createNew(left, top, left + width, top + height);
+            return GcCacheHelper.CreateRect(left, top, left + width, top + height);
         }
 
         public static Rect fromCircle(Offset center, float radius) {
-            return createNew(center.dx - radius, center.dy - radius, center.dx + radius, center.dy + radius);
+            return GcCacheHelper.CreateRect(center.dx - radius, center.dy - radius, center.dx + radius, center.dy + radius);
         }
 
         public static Rect fromPoints(Offset a, Offset b) {
-            return createNew(
+            return GcCacheHelper.CreateRect(
                 Mathf.Min(a.dx, b.dx),
                 Mathf.Min(a.dy, b.dy),
                 Mathf.Max(a.dx, b.dx),
@@ -604,7 +600,7 @@ namespace Unity.UIWidgets.ui {
         }
         
         public Rect outset(float dx, float dy) {
-            return createNew(this.left - dx, this.top - dy, this.right + dx, this.bottom + dy);
+            return GcCacheHelper.CreateRect(this.left - dx, this.top - dy, this.right + dx, this.bottom + dy);
         }
 
         public Offset[] toQuad() {

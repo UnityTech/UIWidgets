@@ -5,65 +5,44 @@ using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
     public class Matrix3 : IEquatable<Matrix3> {
-         public static Matrix3 createNewMatrix(Matrix3 other = null) {
-             if (GcCacheHelper.optimizing) {
-                var ret = SimpleFlash<Matrix3>.instance.fetch();
-                ret.reset();
-
-                 if (other != null) {
-                     ret.copyFrom(other);
-                 }
-
-                 return ret;
-            }
-
-             
-             var new_ret = new Matrix3();
-             if (other != null) {
-                 new_ret.copyFrom(other);
-             }
-
-             return new_ret;
-         }
-        
         public static Matrix3 makeScale(float sx, float sy) {
-            var m = createNewMatrix();
+            var m = GcCacheHelper.CreateMatrix();
             m.setScale(sx, sy);
             return m;
         }
 
         public static Matrix3 makeScale(float scale) {
-            var m = createNewMatrix();
+            var m = GcCacheHelper.CreateMatrix();
             m.setScale(scale, scale);
             return m;
         }
 
         public static Matrix3 makeTrans(float dx, float dy) {
-            var m = createNewMatrix();
+            var m = GcCacheHelper.CreateMatrix();
             m.setTranslate(dx, dy);
             return m;
         }
 
         public static Matrix3 makeRotate(float radians) {
-            var m = createNewMatrix();
+            var m = GcCacheHelper.CreateMatrix();
             m.setRotate(radians);
             return m;
         }
 
         public static Matrix3 makeRotate(float radians, float px, float py) {
-            var m = createNewMatrix();
+            var m = GcCacheHelper.CreateMatrix();
             m.setRotate(radians, px, py);
             return m;
         }
 
         public static Matrix3 makeTrans(Offset offset) {
-            var m = createNewMatrix();
+            var m = GcCacheHelper.CreateMatrix();
             m.setTranslate(offset.dx, offset.dy);
             return m;
         }
 
         public static Matrix3 makeSkew(float dx, float dy) {
-            var m = createNewMatrix();
+            var m = GcCacheHelper.CreateMatrix();
             m.setSkew(dx, dy);
             return m;
         }
@@ -72,7 +51,7 @@ namespace Unity.UIWidgets.ui {
             float scaleX, float skewX, float transX,
             float skewY, float scaleY, float transY,
             float pers0, float pers1, float pers2) {
-            var m = createNewMatrix();
+            var m = GcCacheHelper.CreateMatrix();
             m.setAll(scaleX, skewX, transX, skewY, scaleY, transY, pers0, pers1, pers2);
             return m;
         }
@@ -460,7 +439,7 @@ namespace Unity.UIWidgets.ui {
                     a.fMat[kMScaleY] * b.fMat[kMTransY] + a.fMat[kMTransY]);
             }
             else {
-                Matrix3 tmp = createNewMatrix();
+                Matrix3 tmp = GcCacheHelper.CreateMatrix();
 
                 if (((aType | bType) & TypeMask.kPerspective_Mask) != 0) {
                     tmp.fMat[kMScaleX] = rowcol3(a.fMat, 0, b.fMat, 0);
@@ -524,7 +503,7 @@ namespace Unity.UIWidgets.ui {
                 this.fMat[kMTransY] += dy;
             }
             else if ((mask & TypeMask.kPerspective_Mask) != 0) {
-                var m = createNewMatrix();
+                var m = GcCacheHelper.CreateMatrix();
                 m.setTranslate(dx, dy);
                 this.preConcat(m);
                 return;
@@ -542,7 +521,7 @@ namespace Unity.UIWidgets.ui {
                 return;
             }
 
-            var m = createNewMatrix();
+            var m = GcCacheHelper.CreateMatrix();
             m.setScale(sx, sy, px, py);
             this.preConcat(m);
         }
@@ -580,25 +559,25 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void preRotate(float radians, float px, float py) {
-            var m = createNewMatrix();
+            var m = GcCacheHelper.CreateMatrix();
             m.setRotate(radians, px, py);
             this.preConcat(m);
         }
 
         public void preRotate(float radians) {
-            var m = createNewMatrix();
+            var m = GcCacheHelper.CreateMatrix();
             m.setRotate(radians);
             this.preConcat(m);
         }
 
         public void preSkew(float kx, float ky, float px, float py) {
-            var m = createNewMatrix();
+            var m = GcCacheHelper.CreateMatrix();
             m.setSkew(kx, ky, px, py);
             this.preConcat(m);
         }
 
         public void preSkew(float kx, float ky) {
-            var m = createNewMatrix();
+            var m = GcCacheHelper.CreateMatrix();
             m.setSkew(kx, ky);
             this.preConcat(m);
         }
@@ -613,7 +592,7 @@ namespace Unity.UIWidgets.ui {
 
         public void postTranslate(float dx, float dy) {
             if (this.hasPerspective()) {
-                var m = createNewMatrix();
+                var m = GcCacheHelper.CreateMatrix();
                 m.setTranslate(dx, dy);
                 this.postConcat(m);
             }
@@ -629,7 +608,7 @@ namespace Unity.UIWidgets.ui {
                 return;
             }
 
-            var m = createNewMatrix();
+            var m = GcCacheHelper.CreateMatrix();
             m.setScale(sx, sy, px, py);
             this.postConcat(m);
         }
@@ -639,31 +618,31 @@ namespace Unity.UIWidgets.ui {
                 return;
             }
 
-            var m = createNewMatrix();
+            var m = GcCacheHelper.CreateMatrix();
             m.setScale(sx, sy);
             this.postConcat(m);
         }
 
         public void postRotate(float radians, float px, float py) {
-            var m = createNewMatrix();
+            var m = GcCacheHelper.CreateMatrix();
             m.setRotate(radians, px, py);
             this.postConcat(m);
         }
 
         public void postRotate(float radians) {
-            var m = createNewMatrix();
+            var m = GcCacheHelper.CreateMatrix();
             m.setRotate(radians);
             this.postConcat(m);
         }
 
         public void postSkew(float kx, float ky, float px, float py) {
-            var m = createNewMatrix();
+            var m = GcCacheHelper.CreateMatrix();
             m.setSkew(kx, ky, px, py);
             this.postConcat(m);
         }
 
         public void postSkew(float kx, float ky) {
-            var m = createNewMatrix();
+            var m = GcCacheHelper.CreateMatrix();
             m.setSkew(kx, ky);
             this.postConcat(m);
         }
@@ -803,13 +782,13 @@ namespace Unity.UIWidgets.ui {
         }
 
         public static Matrix3 I() {
-            var m = createNewMatrix();
+            var m = GcCacheHelper.CreateMatrix();
             m.reset();
             return m;
         }
 
         public static Matrix3 concat(Matrix3 a, Matrix3 b) {
-            Matrix3 result = createNewMatrix();
+            Matrix3 result = GcCacheHelper.CreateMatrix();
             result.setConcat(a, b);
             return result;
         }
@@ -1307,7 +1286,7 @@ namespace Unity.UIWidgets.ui {
             var tmp = inv;
 
             if (applyingInPlace || null == tmp) {
-                tmp = createNewMatrix(); // we either need to avoid trampling memory or have no memory
+                tmp = GcCacheHelper.CreateMatrix(); // we either need to avoid trampling memory or have no memory
             }
 
             ComputeInv(tmp.fMat, this.fMat, invDet, isPersp != 0);
