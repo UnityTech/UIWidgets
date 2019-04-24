@@ -282,14 +282,68 @@ namespace Unity.UIWidgets.animation {
         public static readonly Curve linear = new _Linear();
 
         public static readonly Curve decelerate = new _DecelerateCurve();
+        
+        public static readonly Cubic fastLinearToSlowEaseIn = new Cubic(0.18f, 1.0f, 0.04f, 1.0f);
 
         public static readonly Curve ease = new Cubic(0.25f, 0.1f, 0.25f, 1.0f);
 
         public static readonly Curve easeIn = new Cubic(0.42f, 0.0f, 1.0f, 1.0f);
+        
+        public static readonly Cubic easeInToLinear = new Cubic(0.67f, 0.03f, 0.65f, 0.09f);
+        
+        public static readonly Cubic easeInSine = new Cubic(0.47f, 0, 0.745f, 0.715f);
+        
+        public static readonly Cubic easeInQuad = new Cubic(0.55f, 0.085f, 0.68f, 0.53f);
+        
+        public static readonly Cubic easeInCubic = new Cubic(0.55f, 0.055f, 0.675f, 0.19f);
+        
+        public static readonly Cubic easeInQuart = new Cubic(0.895f, 0.03f, 0.685f, 0.22f);
+        
+        public static readonly Cubic easeInQuint = new Cubic(0.755f, 0.05f, 0.855f, 0.06f);
+        
+        public static readonly Cubic easeInExpo = new Cubic(0.95f, 0.05f, 0.795f, 0.035f);
+        
+        public static readonly Cubic easeInCirc = new Cubic(0.6f, 0.04f, 0.98f, 0.335f);
+        
+        public static readonly Cubic easeInBack = new Cubic(0.6f, -0.28f, 0.735f, 0.045f);
 
         public static readonly Curve easeOut = new Cubic(0.0f, 0.0f, 0.58f, 1.0f);
+        
+        public static readonly Cubic linearToEaseOut = new Cubic(0.35f, 0.91f, 0.33f, 0.97f);
+        
+        public static readonly Cubic easeOutSine = new Cubic(0.39f, 0.575f, 0.565f, 1.0f);
+        
+        public static readonly Cubic easeOutQuad = new Cubic(0.25f, 0.46f, 0.45f, 0.94f);
+        
+        public static readonly Cubic easeOutCubic = new Cubic(0.215f, 0.61f, 0.355f, 1.0f);
+        
+        public static readonly Cubic easeOutQuart = new Cubic(0.165f, 0.84f, 0.44f, 1.0f);
+        
+        public static readonly Cubic easeOutQuint = new Cubic(0.23f, 1.0f, 0.32f, 1.0f);
+        
+        public static readonly Cubic easeOutExpo = new Cubic(0.19f, 1.0f, 0.22f, 1.0f);
+        
+        public static readonly Cubic easeOutCirc = new Cubic(0.075f, 0.82f, 0.165f, 1.0f);
+        
+        public static readonly Cubic easeOutBack = new Cubic(0.175f, 0.885f, 0.32f, 1.275f);
 
         public static readonly Curve easeInOut = new Cubic(0.42f, 0.0f, 0.58f, 1.0f);
+        
+        public static readonly Cubic easeInOutSine = new Cubic(0.445f, 0.05f, 0.55f, 0.95f);
+        
+        public static readonly Cubic easeInOutQuad = new Cubic(0.455f, 0.03f, 0.515f, 0.955f);
+        
+        public static readonly Cubic easeInOutCubic = new Cubic(0.645f, 0.045f, 0.355f, 1.0f);
+        
+        public static readonly Cubic easeInOutQuart = new Cubic(0.77f, 0, 0.175f, 1.0f);
+        
+        public static readonly Cubic easeInOutQuint = new Cubic(0.86f, 0, 0.07f, 1.0f);
+        
+        public static readonly Cubic easeInOutExpo = new Cubic(1.0f, 0, 0, 1.0f);
+        
+        public static readonly Cubic easeInOutCirc = new Cubic(0.785f, 0.135f, 0.15f, 0.86f);
+        
+        public static readonly Cubic easeInOutBack = new Cubic(0.68f, -0.55f, 0.265f, 1.55f);
 
         public static readonly Curve fastOutSlowIn = new Cubic(0.4f, 0.0f, 0.2f, 1.0f);
 
