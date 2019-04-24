@@ -212,6 +212,15 @@ namespace Unity.UIWidgets.animation {
             return (this.begin + (this.end - this.begin) * t);
         }
     }
+    
+    class ConstantTween<T> : Tween<T> {
+        public ConstantTween(T value) : base(begin: value, end: value) {
+        }
+
+        public override T lerp(float t) => this.begin;
+
+        String toString() => $"{this.GetType()}(value: {this.begin})";
+    }
 
     public class CurveTween : Animatable<float> {
         public CurveTween(Curve curve = null) {
