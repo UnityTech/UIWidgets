@@ -228,7 +228,7 @@ namespace Unity.UIWidgets.ui {
         }
     }
 
-    class ReducedClip : Clearable {
+    class ReducedClip : GcRecyclable {
         public Rect scissor;
         public readonly List<ClipElement> maskElements = new List<ClipElement>();
         ClipElement _lastElement;
@@ -237,7 +237,7 @@ namespace Unity.UIWidgets.ui {
             return this.scissor != null && this.scissor.isEmpty;
         }
 
-        public void clear() {
+        public void Recycle() {
             this.maskElements.Clear();
             this._lastElement = null;
         }

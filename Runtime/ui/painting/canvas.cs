@@ -2,6 +2,7 @@
 using Unity.UIWidgets.flow;
 using UnityEngine;
 using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.utils;
 
 namespace Unity.UIWidgets.ui {
     public interface Canvas {
@@ -86,13 +87,13 @@ namespace Unity.UIWidgets.ui {
 
         public void save() {
             this._saveCount++;
-            this._recorder.addDrawCmd(DrawSave.createNew(
+            this._recorder.addDrawCmd(GcCacheHelper.CreateDrawSaveCmd(
             ));
         }
 
         public void saveLayer(Rect rect, Paint paint) {
             this._saveCount++;
-            this._recorder.addDrawCmd(DrawSaveLayer.createNew(
+            this._recorder.addDrawCmd(GcCacheHelper.CreateDrawSaveLayer(
                 rect : rect,
                 paint : new Paint(paint)
             ));
@@ -100,7 +101,7 @@ namespace Unity.UIWidgets.ui {
 
         public void restore() {
             this._saveCount--;
-            this._recorder.addDrawCmd(DrawRestore.createNew(
+            this._recorder.addDrawCmd(GcCacheHelper.CreateDrawRestore(
             ));
         }
 
@@ -109,36 +110,36 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void translate(float dx, float dy) {
-            this._recorder.addDrawCmd(DrawTranslate.createNew(
+            this._recorder.addDrawCmd(GcCacheHelper.CreateDrawTranslate(
                 dx : dx,
                 dy : dy
             ));
         }
 
         public void scale(float sx, float? sy = null) {
-            this._recorder.addDrawCmd(DrawScale.createNew(
+            this._recorder.addDrawCmd(GcCacheHelper.CreateDrawScale(
                 sx : sx,
                 sy : sy
             ));
         }
 
         public void rotate(float radians, Offset offset = null) {
-            this._recorder.addDrawCmd(DrawRotate.createNew(
+            this._recorder.addDrawCmd(GcCacheHelper.CreateDrawRotate(
                 radians : radians,
                 offset : offset
             ));
         }
 
         public void skew(float sx, float sy) {
-            this._recorder.addDrawCmd(DrawSkew.createNew(
+            this._recorder.addDrawCmd(GcCacheHelper.CreateDrawSkew(
                 sx : sx,
                 sy : sy
             ));
         }
 
         public void concat(Matrix3 matrix) {
-            this._recorder.addDrawCmd(DrawConcat.createNew(
-                matrix = matrix
+            this._recorder.addDrawCmd(GcCacheHelper.CreateDrawConcat(
+                matrix : matrix
             ));
         }
 
@@ -147,13 +148,13 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void resetMatrix() {
-            this._recorder.addDrawCmd(DrawResetMatrix.createNew(
+            this._recorder.addDrawCmd(GcCacheHelper.CreateDrawResetMatrix(
             ));
         }
 
         public void setMatrix(Matrix3 matrix) {
-            this._recorder.addDrawCmd(DrawSetMatrix.createNew(
-                matrix = matrix
+            this._recorder.addDrawCmd(GcCacheHelper.CreateDrawSetMatrix(
+                matrix : matrix
             ));
         }
 
@@ -162,13 +163,13 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void clipRect(Rect rect) {
-            this._recorder.addDrawCmd(DrawClipRect.createNew(
+            this._recorder.addDrawCmd(GcCacheHelper.CreateDrawClipRect(
                 rect : rect
             ));
         }
 
         public void clipRRect(RRect rrect) {
-            this._recorder.addDrawCmd(DrawClipRRect.createNew(
+            this._recorder.addDrawCmd(GcCacheHelper.CreateDrawClipRRect(
                 rrect : rrect
             ));
         }
@@ -176,7 +177,7 @@ namespace Unity.UIWidgets.ui {
         public void clipPath(Path path) {
             Path newPath = new Path();
             newPath.copyFrom(path);
-            this._recorder.addDrawCmd(DrawClipPath.createNew(
+            this._recorder.addDrawCmd(GcCacheHelper.CreateDrawClipPath(
                 path : newPath
             ));
         }
@@ -186,7 +187,7 @@ namespace Unity.UIWidgets.ui {
             path.moveTo(from.dx, from.dy);
             path.lineTo(to.dx, to.dy);
 
-            this._recorder.addDrawCmd(DrawPath.createNew(
+            this._recorder.addDrawCmd(GcCacheHelper.CreateDrawPath(
                 path : path,
                 paint : new Paint(paint)
             ));
@@ -206,7 +207,7 @@ namespace Unity.UIWidgets.ui {
 
             var path = new Path();
             path.addRect(rect);
-            this._recorder.addDrawCmd(DrawPath.createNew(
+            this._recorder.addDrawCmd(GcCacheHelper.CreateDrawPath(
                 path : path,
                 paint : new Paint(paint)
             ));
@@ -215,7 +216,7 @@ namespace Unity.UIWidgets.ui {
         public void drawRRect(RRect rrect, Paint paint) {
             var path = new Path();
             path.addRRect(rrect);
-            this._recorder.addDrawCmd(DrawPath.createNew(
+            this._recorder.addDrawCmd(GcCacheHelper.CreateDrawPath(
                 path : path,
                 paint : new Paint(paint)
             ));
@@ -226,7 +227,7 @@ namespace Unity.UIWidgets.ui {
             path.addRRect(outer);
             path.addRRect(inner);
             path.winding(PathWinding.clockwise);
-            this._recorder.addDrawCmd(DrawPath.createNew(
+            this._recorder.addDrawCmd(GcCacheHelper.CreateDrawPath(
                 path : path,
                 paint : new Paint(paint)
             ));
@@ -238,7 +239,7 @@ namespace Unity.UIWidgets.ui {
             var path = new Path();
             path.addEllipse(rect.left + w, rect.top + h, w, h);
 
-            this._recorder.addDrawCmd(DrawPath.createNew(
+            this._recorder.addDrawCmd(GcCacheHelper.CreateDrawPath(
                 path : path,
                 paint : new Paint(paint)
             ));
@@ -248,7 +249,7 @@ namespace Unity.UIWidgets.ui {
             var path = new Path();
             path.addCircle(c.dx, c.dy, radius);
 
-            this._recorder.addDrawCmd(DrawPath.createNew(
+            this._recorder.addDrawCmd(GcCacheHelper.CreateDrawPath(
                 path : path,
                 paint : new Paint(paint)
             ));
@@ -286,7 +287,7 @@ namespace Unity.UIWidgets.ui {
                 path.close();
             }
 
-            this._recorder.addDrawCmd(DrawPath.createNew(
+            this._recorder.addDrawCmd(GcCacheHelper.CreateDrawPath(
                 path : path,
                 paint : new Paint(paint)
             ));
@@ -295,14 +296,14 @@ namespace Unity.UIWidgets.ui {
         public void drawPath(Path path, Paint paint) {
             Path newPath = new Path();
             newPath.copyFrom(path);
-            this._recorder.addDrawCmd(DrawPath.createNew(
+            this._recorder.addDrawCmd(GcCacheHelper.CreateDrawPath(
                 path : newPath,
                 paint : new Paint(paint)
             ));
         }
 
         public void drawImage(Image image, Offset offset, Paint paint) {
-            this._recorder.addDrawCmd(DrawImage.createNew(
+            this._recorder.addDrawCmd(GcCacheHelper.CreateDrawImage(
                 image : image,
                 offset : offset,
                 paint : new Paint(paint)
@@ -310,7 +311,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void drawImageRect(Image image, Rect dst, Paint paint) {
-            this._recorder.addDrawCmd(DrawImageRect.createNew(
+            this._recorder.addDrawCmd(GcCacheHelper.CreateDrawImageRect(
                 image : image,
                 src : null,
                 dst : dst,
@@ -319,7 +320,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void drawImageRect(Image image, Rect src, Rect dst, Paint paint) {
-            this._recorder.addDrawCmd(DrawImageRect.createNew(
+            this._recorder.addDrawCmd(GcCacheHelper.CreateDrawImageRect(
                 image : image,
                 src : src,
                 dst : dst,
@@ -328,7 +329,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void drawImageNine(Image image, Rect center, Rect dst, Paint paint) {
-            this._recorder.addDrawCmd(DrawImageNine.createNew(
+            this._recorder.addDrawCmd(GcCacheHelper.CreateDrawImageNine(
                 image : image,
                 src : null,
                 center : center,
@@ -338,7 +339,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void drawImageNine(Image image, Rect src, Rect center, Rect dst, Paint paint) {
-            this._recorder.addDrawCmd(DrawImageNine.createNew(
+            this._recorder.addDrawCmd(GcCacheHelper.CreateDrawImageNine(
                 image : image,
                 src : src,
                 center : center,
@@ -348,13 +349,13 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void drawPicture(Picture picture) {
-            this._recorder.addDrawCmd(DrawPicture.createNew(
+            this._recorder.addDrawCmd(GcCacheHelper.CreateDrawPicture(
                 picture : picture
             ));
         }
 
         public void drawTextBlob(TextBlob textBlob, Offset offset, Paint paint) {
-            this._recorder.addDrawCmd(DrawTextBlob.createNew(
+            this._recorder.addDrawCmd(GcCacheHelper.CreateDrawTextBlob(
                 textBlob : textBlob,
                 offset : offset,
                 paint : new Paint(paint)

@@ -1,7 +1,6 @@
 using System;
 using Unity.UIWidgets.utils;
 using UnityEngine;
-using UnityEngine.WSA;
 
 namespace Unity.UIWidgets.ui {
     public static class MathUtils {

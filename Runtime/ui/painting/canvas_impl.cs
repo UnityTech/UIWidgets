@@ -1007,7 +1007,7 @@ namespace Unity.UIWidgets.ui {
             public RenderLayer layer;
         }
         
-        internal class CmdDraw : Clearable {
+        internal class CmdDraw : GcRecyclable {
             public MeshMesh mesh;
             public TextBlobMesh textMesh;
             public int pass;
@@ -1046,7 +1046,7 @@ namespace Unity.UIWidgets.ui {
                 return ret;
             }
 
-            public void clear() {
+            public void Recycle() {
                 this.mesh = null;
                 this.textMesh = null;
                 this.pass = 0;
