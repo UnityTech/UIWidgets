@@ -205,7 +205,7 @@ namespace Unity.UIWidgets.animation {
             return this._animateToInternal(target, duration: duration, curve: curve);
         }
         
-        TickerFuture animateBack(float target, TimeSpan? duration, Curve curve = null) {
+        public TickerFuture animateBack(float target, TimeSpan? duration, Curve curve = null) {
             D.assert(
                 this._ticker != null,
                 "AnimationController.animateBack() called after AnimationController.dispose()\n" +
