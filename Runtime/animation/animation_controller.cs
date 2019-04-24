@@ -281,7 +281,6 @@ namespace Unity.UIWidgets.animation {
             
             D.assert(max >= min);
             D.assert(max <= this.upperBound && min >= this.lowerBound);
-            D.assert(reverse != null);
             return this.animateWith(new _RepeatingSimulation(this._value, min.Value, max.Value, reverse, period.Value));
         }
 
@@ -298,6 +297,11 @@ namespace Unity.UIWidgets.animation {
 
 
         public TickerFuture animateWith(Simulation simulation) {
+            D.assert(
+                this._ticker != null,
+                "AnimationController.animateWith() called after AnimationController.dispose()\n" +
+                "AnimationController methods should not be used after calling dispose."
+            );
             this.stop();
             return this._startSimulation(simulation);
         }
@@ -317,6 +321,11 @@ namespace Unity.UIWidgets.animation {
         }
 
         public void stop(bool canceled = true) {
+            D.assert(
+                this._ticker != null,
+                "AnimationController.stop() called after AnimationController.dispose()\n" +
+                "AnimationController methods should not be used after calling dispose."
+            );
             this._simulation = null;
             this._lastElapsedDuration = null;
             this._ticker.stop(canceled: canceled);
@@ -430,6 +439,7 @@ namespace Unity.UIWidgets.animation {
             this._max = max;
             this._periodInSeconds = (float) period.Ticks / TimeSpan.TicksPerSecond;
             this._initialT = (max == min) ? 0.0f : (initialValue / (max - min)) * (period.Ticks / TimeSpan.TicksPerSecond);
+            this._reverse = reverse;
             D.assert(this._periodInSeconds > 0.0f);
             D.assert(this._initialT >= 0.0f);
         }
