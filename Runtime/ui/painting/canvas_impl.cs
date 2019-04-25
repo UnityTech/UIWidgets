@@ -747,8 +747,6 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void flush(Picture picture) {
-
-            
             this._reset();
             
             this._drawPicture(picture, false);
@@ -908,9 +906,9 @@ namespace Unity.UIWidgets.ui {
             public bool noMSAA = false;
             public Rect layerBounds;
             public Paint layerPaint;
-            public readonly List<object> draws = Flash<object>.instance.fetch();
-            public readonly List<RenderLayer> layers = Flash<RenderLayer>.instance.fetch();
-            public readonly List<State> states = Flash<State>.instance.fetch();
+            public readonly List<object> draws = GcCacheHelper.CreateList<object>();
+            public readonly List<RenderLayer> layers = GcCacheHelper.CreateList<RenderLayer>();
+            public readonly List<State> states = GcCacheHelper.CreateList<State>();
             public State currentState;
             public readonly ClipStack clipStack = new ClipStack();
             public uint lastClipGenId;
@@ -933,7 +931,7 @@ namespace Unity.UIWidgets.ui {
             }
 
             public RenderLayer() {
-                this.currentState = State.createNew();
+                this.currentState = State.CreateFromCache();
                 this.states.Add(this.currentState);
             }
 
@@ -951,15 +949,13 @@ namespace Unity.UIWidgets.ui {
             Matrix3 _invMatrix;
 
             public State() {
-                
             }
 
-            public static State createNew(Matrix3 matrix = null, float? scale = null, Matrix3 invMatrix = null) {
-                var ret = GcCacheHelper.optimizing ? SimpleFlash<State>.instance.fetch() : new State();
+            public static State CreateFromCache(Matrix3 matrix = null, float? scale = null, Matrix3 invMatrix = null) {
+                var ret = GcCacheHelper.Create<State>();
                 ret._matrix = matrix ?? _id;
                 ret._scale = scale;
                 ret._invMatrix = invMatrix;
-
                 return ret;
             }
 
@@ -998,7 +994,7 @@ namespace Unity.UIWidgets.ui {
             }
 
             public State copy() {
-                return createNew(this._matrix, this._scale, this._invMatrix);
+                return CreateFromCache(this._matrix, this._scale, this._invMatrix);
             }
         }
         
@@ -1021,7 +1017,7 @@ namespace Unity.UIWidgets.ui {
             public CmdDraw() {
             }
 
-            public static CmdDraw createNew(MeshMesh mesh = null,
+            public static CmdDraw CreateFromCache(MeshMesh mesh = null,
                 TextBlobMesh textMesh = null,
                 int pass = 0,
                 MaterialPropertyBlock properties = null,
@@ -1031,8 +1027,7 @@ namespace Unity.UIWidgets.ui {
                 Mesh meshObj = null,
                 bool meshObjCreated = false
                 ) {
-                var ret = GcCacheHelper.optimizing ? ClearableSimpleFlash<CmdDraw>.instance.fetch() : new CmdDraw();
-
+                var ret = GcCacheHelper.CreateRecyclable<CmdDraw>();
                 ret.mesh = mesh;
                 ret.textMesh = textMesh;
                 ret.pass = pass;

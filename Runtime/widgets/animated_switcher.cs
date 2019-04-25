@@ -214,12 +214,11 @@ namespace Unity.UIWidgets.widgets {
 
         void _rebuildOutgoingWidgetsIfNeeded() {
             if (this._outgoingWidgets == null) {
-                this._outgoingWidgets = new List<Widget>(this._outgoingEntries.Count);
-                foreach (var entry in this._outgoingEntries) {
-                    this._outgoingWidgets.Add(entry.transition);
-                }
+                this._outgoingWidgets = this._outgoingWidgets ?? new List<Widget>(
+                                            this._outgoingEntries.Select((_ChildEntry entry) => entry.transition)
+                                        );
             }
-            
+
             D.assert(this._outgoingEntries.Count == this._outgoingWidgets.Count);
             D.assert(this._outgoingEntries.isEmpty() ||
                      this._outgoingEntries.Last().transition == this._outgoingWidgets.Last());

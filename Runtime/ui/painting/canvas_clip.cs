@@ -243,7 +243,6 @@ namespace Unity.UIWidgets.ui {
         }
 
         public ReducedClip() {
-            
         }
 
         public uint maskGenID() {

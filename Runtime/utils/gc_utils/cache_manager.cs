@@ -8,7 +8,7 @@ namespace Unity.UIWidgets.utils {
         public static bool optimizing = false;
         
         public static void StartCaching() {
-            optimizing = true;
+            optimizing = false;
         }
 
         public static void EndCaching() {

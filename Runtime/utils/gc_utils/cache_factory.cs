@@ -1,4 +1,7 @@
+using System.Collections.Generic;
 using Unity.UIWidgets.ui;
+using UnityEngine;
+using Rect = Unity.UIWidgets.ui.Rect;
 
 namespace Unity.UIWidgets.utils {
     
@@ -146,5 +149,20 @@ namespace Unity.UIWidgets.utils {
             return ret;
         }
 
+        public static List<T> CreateList<T>() {
+            return Flash<T>.instance.fetch();
+        }
+
+        public static T Create<T>() where T : new() {
+            return SimpleFlash<T>.instance.fetch();
+        }
+
+        public static T CreateRecyclable<T>() where T : GcRecyclable, new() {
+            return ClearableSimpleFlash<T>.instance.fetch();
+        }
+
+        public static MaterialPropertyBlock CreateMaterialPropertyBlock() {
+            return ClearableMaterialPropFlash.instance.fetch();
+        }
     }
 }

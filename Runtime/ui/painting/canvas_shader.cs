@@ -248,7 +248,7 @@ namespace Unity.UIWidgets.ui {
             out int pass, out MaterialPropertyBlock props) {
             Vector4 viewport = layer.viewport;
 
-            props = ClearableMaterialPropFlash.instance.fetch();
+            props = GcCacheHelper.CreateMaterialPropertyBlock();
             props.SetVector(_viewportId, viewport);
             props.SetFloat(_alphaId, alpha);
 
@@ -303,7 +303,7 @@ namespace Unity.UIWidgets.ui {
             var mat = _convexFillMat.getMaterial(paint.blendMode, layer.ignoreClip);
             _getShaderPassAndProps(layer, paint, mesh.matrix, 1.0f, out var pass, out var props);
 
-            return PictureFlusher.CmdDraw.createNew(
+            return PictureFlusher.CmdDraw.CreateFromCache(
                 mesh : mesh,
                 pass : pass,
                 material : mat,
@@ -316,10 +316,10 @@ namespace Unity.UIWidgets.ui {
             var mat = _fill0Mat.getMaterial(layer.ignoreClip);
 
             var pass = 0;
-            var props = ClearableMaterialPropFlash.instance.fetch();
+            var props = GcCacheHelper.CreateMaterialPropertyBlock();
             props.SetVector(_viewportId, viewport);
 
-            return PictureFlusher.CmdDraw.createNew(
+            return PictureFlusher.CmdDraw.CreateFromCache(
                 mesh : mesh,
                 pass : pass,
                 material : mat,
@@ -332,7 +332,7 @@ namespace Unity.UIWidgets.ui {
             var mat = _fill1Mat.getMaterial(paint.blendMode);
             _getShaderPassAndProps(layer, paint, mesh.matrix, 1.0f, out var pass, out var props);
 
-            return PictureFlusher.CmdDraw.createNew(
+            return PictureFlusher.CmdDraw.CreateFromCache(
                 mesh : mesh.boundsMesh,
                 pass : pass,
                 material : mat,
@@ -345,7 +345,7 @@ namespace Unity.UIWidgets.ui {
             var mat = _stroke0Mat.getMaterial(paint.blendMode, layer.ignoreClip);
             _getShaderPassAndProps(layer, paint, mesh.matrix, alpha, out var pass, out var props);
 
-            return PictureFlusher.CmdDraw.createNew(
+            return PictureFlusher.CmdDraw.CreateFromCache(
                 mesh : mesh,
                 pass : pass,
                 material : mat,
@@ -358,10 +358,10 @@ namespace Unity.UIWidgets.ui {
             var mat = _stroke1Mat;
 
             var pass = 0;
-            var props = ClearableMaterialPropFlash.instance.fetch();
+            var props = GcCacheHelper.CreateMaterialPropertyBlock();
             props.SetVector(_viewportId, viewport);
 
-            return PictureFlusher.CmdDraw.createNew(
+            return PictureFlusher.CmdDraw.CreateFromCache(
                 mesh : mesh,
                 pass : pass,
                 material : mat,
@@ -375,10 +375,10 @@ namespace Unity.UIWidgets.ui {
             var mat = _stencilMat;
 
             var pass = 0;
-            var props = ClearableMaterialPropFlash.instance.fetch();
+            var props = GcCacheHelper.CreateMaterialPropertyBlock();
             props.SetVector(_viewportId, viewport);
 
-            return PictureFlusher.CmdDraw.createNew(
+            return PictureFlusher.CmdDraw.CreateFromCache(
                 mesh : mesh,
                 pass : pass,
                 material : mat,
@@ -391,10 +391,10 @@ namespace Unity.UIWidgets.ui {
             var mat = _stencilMat;
 
             var pass = 1;
-            var props = ClearableMaterialPropFlash.instance.fetch();
+            var props = GcCacheHelper.CreateMaterialPropertyBlock();
             props.SetVector(_viewportId, viewport);
 
-            return PictureFlusher.CmdDraw.createNew(
+            return PictureFlusher.CmdDraw.CreateFromCache(
                 mesh : mesh,
                 pass : pass,
                 material : mat,
@@ -407,10 +407,10 @@ namespace Unity.UIWidgets.ui {
             var mat = _stencilMat;
 
             var pass = 2;
-            var props = ClearableMaterialPropFlash.instance.fetch();
+            var props = GcCacheHelper.CreateMaterialPropertyBlock();
             props.SetVector(_viewportId, viewport);
 
-            return PictureFlusher.CmdDraw.createNew(
+            return PictureFlusher.CmdDraw.CreateFromCache(
                 mesh : mesh,
                 pass : pass,
                 material : mat,
@@ -427,7 +427,7 @@ namespace Unity.UIWidgets.ui {
             props.SetTexture(_texId, image.texture);
             props.SetInt(_texModeId, image.texture is RenderTexture ? 1 : 0); // pre alpha if RT else post alpha
 
-            return PictureFlusher.CmdDraw.createNew(
+            return PictureFlusher.CmdDraw.CreateFromCache(
                 mesh : mesh,
                 pass : pass,
                 material : mat,
@@ -442,7 +442,7 @@ namespace Unity.UIWidgets.ui {
             _getShaderPassAndProps(layer, paint, mesh.matrix, 1.0f, out var pass, out var props);
             props.SetInt(_texModeId, 1); // pre alpha
 
-            return PictureFlusher.CmdDraw.createNew(
+            return PictureFlusher.CmdDraw.CreateFromCache(
                 mesh : mesh,
                 pass : pass,
                 material : mat,
@@ -471,7 +471,7 @@ namespace Unity.UIWidgets.ui {
             props.SetTexture(_texId, tex);
             props.SetInt(_texModeId, 2); // alpha only
 
-            return PictureFlusher.CmdDraw.createNew(
+            return PictureFlusher.CmdDraw.CreateFromCache(
                 mesh : mesh,
                 textMesh : textMesh,
                 pass : pass,
@@ -486,14 +486,14 @@ namespace Unity.UIWidgets.ui {
             var mat = _filterMat;
 
             var pass = 0;
-            var props = ClearableMaterialPropFlash.instance.fetch();
+            var props = GcCacheHelper.CreateMaterialPropertyBlock();
             props.SetVector(_viewportId, viewport);
 
             props.SetFloat(_mfRadiusId, radius);
             props.SetVector(_mfImgIncId, imgInc);
             props.SetFloatArray(_mfKernelId, kernel);
 
-            return PictureFlusher.CmdDraw.createNew(
+            return PictureFlusher.CmdDraw.CreateFromCache(
                 mesh : mesh,
                 pass : pass,
                 material : mat,
