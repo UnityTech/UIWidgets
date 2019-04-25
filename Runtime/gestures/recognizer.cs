@@ -194,6 +194,7 @@ namespace Unity.UIWidgets.gestures {
     public enum GestureRecognizerState {
         ready,
         possible,
+        accepted,
         defunct,
     }
 
@@ -201,12 +202,26 @@ namespace Unity.UIWidgets.gestures {
         protected PrimaryPointerGestureRecognizer(
             TimeSpan? deadline = null,
             object debugOwner = null,
-            PointerDeviceKind? kind = null
+            PointerDeviceKind? kind = null,
+            float? preAcceptSlotTolerance = Constants.kTouchSlop,
+            float? postAcceptSlotTolerance = Constants.kTouchSlop
         ) : base(debugOwner: debugOwner, kind: kind) {
+            D.assert(preAcceptSlotTolerance == null || preAcceptSlotTolerance >= 0,
+                "The preAcceptSlopTolerance must be positive or null");
+
+            D.assert(postAcceptSlotTolerance == null || postAcceptSlotTolerance >= 0,
+                "The postAcceptSlopTolerance must be positive or null");
+
             this.deadline = deadline;
+            this.preAcceptSlotTolerance = preAcceptSlotTolerance;
+            this.postAcceptSlotTolerance = postAcceptSlotTolerance;
         }
 
         public readonly TimeSpan? deadline;
+
+        public readonly float? preAcceptSlotTolerance;
+
+        public readonly float? postAcceptSlotTolerance;
 
         public GestureRecognizerState state = GestureRecognizerState.ready;
 
@@ -230,8 +245,16 @@ namespace Unity.UIWidgets.gestures {
 
         protected override void handleEvent(PointerEvent evt) {
             D.assert(this.state != GestureRecognizerState.ready);
-            if (this.state == GestureRecognizerState.possible && evt.pointer == this.primaryPointer) {
-                if (evt is PointerMoveEvent && this._getDistance(evt) > Constants.kTouchSlop) {
+
+            if (evt.pointer == this.primaryPointer) {
+                bool isPreAcceptSlopPastTolerance = this.state == GestureRecognizerState.possible &&
+                                                    this.preAcceptSlotTolerance != null &&
+                                                    this._getDistance(evt) > this.preAcceptSlotTolerance;
+                bool isPostAcceptSlopPastTolerance = this.state == GestureRecognizerState.accepted &&
+                                                     this.postAcceptSlotTolerance != null &&
+                                                     this._getDistance(evt) > this.postAcceptSlotTolerance;
+
+                if (evt is PointerMoveEvent && (isPreAcceptSlopPastTolerance || isPostAcceptSlopPastTolerance)) {
                     this.resolve(GestureDisposition.rejected);
                     this.stopTrackingPointer(this.primaryPointer);
                 }
@@ -249,8 +272,15 @@ namespace Unity.UIWidgets.gestures {
             D.assert(this.deadline == null);
         }
 
-        public override void rejectGesture(int pointer) {
+        public override void acceptGesture(int pointer) {
             if (pointer == this.primaryPointer && this.state == GestureRecognizerState.possible) {
+                this.state = GestureRecognizerState.accepted;
+            }
+        }
+
+        public override void rejectGesture(int pointer) {
+            if (pointer == this.primaryPointer && (this.state == GestureRecognizerState.possible ||
+                                                   this.state == GestureRecognizerState.accepted)) {
                 this._stopTimer();
                 this.state = GestureRecognizerState.defunct;
             }

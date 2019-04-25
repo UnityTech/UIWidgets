@@ -19,7 +19,7 @@ namespace Unity.UIWidgets.gestures {
         public DragGestureRecognizer(
             object debugOwner = null,
             PointerDeviceKind? kind = null,
-            DragStartBehavior dragStartBehavior = DragStartBehavior.start)
+            DragStartBehavior dragStartBehavior = DragStartBehavior.down)
             : base(debugOwner: debugOwner, kind: kind) {
             this.dragStartBehavior = dragStartBehavior;
         }
@@ -263,6 +263,11 @@ namespace Unity.UIWidgets.gestures {
         public override void dispose() {
             this._velocityTrackers.Clear();
             base.dispose();
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new EnumProperty<DragStartBehavior>("start behavior", this.dragStartBehavior));
         }
     }
 
