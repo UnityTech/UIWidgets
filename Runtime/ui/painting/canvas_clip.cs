@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
-using Unity.UIWidgets.utils;
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
@@ -228,21 +227,13 @@ namespace Unity.UIWidgets.ui {
         }
     }
 
-    class ReducedClip : GcRecyclable {
-        public Rect scissor;
+    class ReducedClip {
+        public readonly Rect scissor;
         public readonly List<ClipElement> maskElements = new List<ClipElement>();
         ClipElement _lastElement;
 
         public bool isEmpty() {
             return this.scissor != null && this.scissor.isEmpty;
-        }
-
-        public void Recycle() {
-            this.maskElements.Clear();
-            this._lastElement = null;
-        }
-
-        public ReducedClip() {
         }
 
         public uint maskGenID() {

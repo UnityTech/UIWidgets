@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Unity.UIWidgets.utils;
-//using System.Linq;
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
@@ -14,9 +13,9 @@ namespace Unity.UIWidgets.ui {
         public float y4;
         public float tessTol;
 
-        public static TessellationKey createNew(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4,
+        public static TessellationKey createFromCache(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4,
             float tessTol) {
-            var ret = SimplePool<TessellationKey>.instance.fetch();
+            var ret = GcCacheHelper.CreateFromPool<TessellationKey>();
 
             ret.x2 = x2 - x1;
             ret.y2 = y2 - y1;
@@ -154,13 +153,13 @@ namespace Unity.UIWidgets.ui {
             
             foreach (var key in _keysToRemove) {
                 _tessellations.Remove(key);
-                SimplePool<TessellationKey>.instance.recycle(key);
+                GcCacheHelper.RecycleToPool(key);
             }
         }
 
         public static List<PathPoint> tessellateBezier(float x1, float y1, float x2, float y2,
             float x3, float y3, float x4, float y4, float tessTol) {
-            var key = TessellationKey.createNew(x1, y1, x2, y2, x3, y3, x4, y4, tessTol);
+            var key = TessellationKey.createFromCache(x1, y1, x2, y2, x3, y3, x4, y4, tessTol);
 
             _tessellations.TryGetValue(key, out var tessellationInfo);
             if (tessellationInfo != null) {
@@ -177,10 +176,10 @@ namespace Unity.UIWidgets.ui {
         }
 
         static List<PathPoint> _toPathPoints(List<Vector2> points, float x1, float y1) {
-            var pathPoints = Flash<PathPoint>.instance.fetch();
+            var pathPoints = GcCacheHelper.CreateList<PathPoint>();
 
             foreach (var point in points) {
-                pathPoints.Add(PathPoint.CreatePathPoint(x: point.x + x1, y: point.y + y1));
+                pathPoints.Add(PathPoint.CreateFromCache(x: point.x + x1, y: point.y + y1));
             }
 
             return pathPoints;

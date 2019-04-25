@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-//using System.Linq;
 using System.Text;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.utils;
@@ -11,7 +10,7 @@ namespace Unity.UIWidgets.ui {
     public class Path {
         const float _KAPPA90 = 0.5522847493f;
 
-        readonly List<float> _commands = Flash<float>.instance.fetch();
+        readonly List<float> _commands = GcCacheHelper.CreateList<float>();
         float _commandx;
         float _commandy;
         float _minX, _minY;
@@ -19,21 +18,14 @@ namespace Unity.UIWidgets.ui {
 
         PathCache _cache;
 
-        readonly bool _use_pool;
-
-        public Path(bool use_pool = false) {
-            this._use_pool = use_pool;
-        }
-
         internal PathCache flatten(float scale) {
             if (this._cache != null && this._cache.canReuse(scale)) {
                 return this._cache;
             }
 
-            this._cache = new PathCache(scale, this._use_pool);
+            this._cache = new PathCache(scale);
 
             var i = 0;
-            
             while (i < this._commands.Count) {
                 var cmd = (PathCommand) this._commands[i];
                 switch (cmd) {
@@ -67,10 +59,7 @@ namespace Unity.UIWidgets.ui {
                 }
             }
             
-            
             this._cache.normalize();
-
-
             return this._cache;
         }
 
@@ -142,6 +131,49 @@ namespace Unity.UIWidgets.ui {
             return Rect.fromLTRB(this._minX, this._minY, this._maxX, this._maxY);
         }
 
+        void _appendCommands(List<float> commands) {
+            var i = 0;
+            while (i < commands.Count) {
+                var cmd = (PathCommand) commands[i];
+                switch (cmd) {
+                    case PathCommand.moveTo:
+                        this._commandx = commands[i + 1];
+                        this._commandy = commands[i + 2];
+                        i += 3;
+                        break;
+                    case PathCommand.lineTo:
+                        this._expandBounds(this._commandx, this._commandy);
+                        this._expandBounds(commands[i + 1], commands[i + 2]);
+                        this._commandx = commands[i + 1];
+                        this._commandy = commands[i + 2];
+                        i += 3;
+                        break;
+                    case PathCommand.bezierTo:
+                        this._expandBounds(this._commandx, this._commandy);
+                        this._expandBounds(commands[i + 1], commands[i + 2]);
+                        this._expandBounds(commands[i + 3], commands[i + 4]);
+                        this._expandBounds(commands[i + 5], commands[i + 6]);
+                        this._commandx = commands[i + 5];
+                        this._commandy = commands[i + 6];
+                        i += 7;
+                        break;
+                    case PathCommand.close:
+                        i++;
+                        break;
+                    case PathCommand.winding:
+                        i += 2;
+                        break;
+                    default:
+                        D.assert(false, "unknown cmd: " + cmd);
+                        break;
+                }
+            }
+
+            this._commands.AddRange(commands);
+            this._cache = null;
+        }
+
+        
         void _appendCommands(float[] commands) {
             var i = 0;
             while (i < commands.Length) {
@@ -360,7 +392,7 @@ namespace Unity.UIWidgets.ui {
                 sweepAngle >= 0 ? PathWinding.clockwise : PathWinding.counterClockwise, forceMoveTo);
 
             this._transformCommands(vals, mat);
-            this._appendCommands(vals.ToArray());
+            this._appendCommands(vals);
         }
 
         public Path transform(Matrix3 mat) {
@@ -516,7 +548,7 @@ namespace Unity.UIWidgets.ui {
         
         public void addArc(float cx, float cy, float r, float a0, float a1, PathWinding dir, bool forceMoveTo = true) {
             var vals = this._getArcCommands(cx, cy, r, a0, a1, dir, forceMoveTo);
-            this._appendCommands(vals.ToArray());
+            this._appendCommands(vals);
         }
 
         public void addPolygon(IList<Offset> points, bool close) {
@@ -541,7 +573,7 @@ namespace Unity.UIWidgets.ui {
                 commands.Add((float) PathCommand.close);
             }
 
-            this._appendCommands(commands.ToArray());
+            this._appendCommands(commands);
         }
 
         public Path shift(Offset offset) {
@@ -565,7 +597,7 @@ namespace Unity.UIWidgets.ui {
             D.assert(path != null);
             D.assert(offset != null);
 
-            var commands = Flash<float>.instance.fetch();
+            var commands = GcCacheHelper.CreateList<float>();
 
             var i = 0;
             while (i < path._commands.Count) {
@@ -603,7 +635,7 @@ namespace Unity.UIWidgets.ui {
                 }
             }
 
-            this._appendCommands(commands.ToArray());
+            this._appendCommands(commands);
         }
 
         public bool contains(Offset point) {
@@ -1075,9 +1107,8 @@ namespace Unity.UIWidgets.ui {
         public float dmx, dmy;
         public PointFlags flags;
 
-
-        public static PathPoint CreatePathPoint(float x, float y, float dx = 0, float dy = 0, float dmx = 0, float dmy = 0, PointFlags flags = PointFlags.corner) {
-            var ret = GcCacheHelper.optimizing ? SimpleFlash<PathPoint>.instance.fetch() : new PathPoint();
+        public static PathPoint CreateFromCache(float x, float y, float dx = 0, float dy = 0, float dmx = 0, float dmy = 0, PointFlags flags = PointFlags.corner) {
+            var ret = GcCacheHelper.Create<PathPoint>();
             ret.x = x;
             ret.y = y;
             ret.dx = dx;
@@ -1085,7 +1116,6 @@ namespace Unity.UIWidgets.ui {
             ret.dmx = dmx;
             ret.dmy = dmy;
             ret.flags = flags;
-
             return ret;
         }
     }
@@ -1098,7 +1128,7 @@ namespace Unity.UIWidgets.ui {
         winding,
     }
 
-    public class PathPath {
+    class PathPath {
         public int first;
         public int count;
         public bool closed;
@@ -1109,11 +1139,12 @@ namespace Unity.UIWidgets.ui {
         public PathWinding winding;
         public bool convex;
 
-        public static PathPath createNew(
-            int first = 0, int count = 0, bool closed = false, int ifill = 0, int nfill = 0, int istroke = 0, int nstroke = 0, PathWinding winding = PathWinding.clockwise,
+        public static PathPath CreateFromCache(
+            int first = 0, int count = 0, bool closed = false, int ifill = 0, int nfill = 0, int istroke = 0, int nstroke = 0, 
+            PathWinding winding = PathWinding.clockwise,
             bool convex = false
             ) {
-            var ret =  SimpleFlash<PathPath>.instance.fetch();
+            var ret = GcCacheHelper.Create<PathPath>();
             ret.first = first;
             ret.count = count;
             ret.closed = closed;
@@ -1132,9 +1163,9 @@ namespace Unity.UIWidgets.ui {
         readonly float _distTol;
         readonly float _tessTol;
 
-        readonly List<PathPath> _paths;
-        readonly List<PathPoint> _points;
-        readonly List<Vector3> _vertices;
+        readonly List<PathPath> _paths = GcCacheHelper.CreateList<PathPath>();
+        readonly List<PathPoint> _points = GcCacheHelper.CreateList<PathPoint>();
+        readonly List<Vector3> _vertices = GcCacheHelper.CreateList<Vector3>();
 
         MeshMesh _fillMesh;
         bool _fillConvex;
@@ -1145,21 +1176,10 @@ namespace Unity.UIWidgets.ui {
         StrokeJoin _lineJoin;
         float _miterLimit;
 
-        public PathCache(float scale, bool use_pool = false) {
+        public PathCache(float scale) {
             this._scale = scale;
             this._distTol = 0.01f / scale;
             this._tessTol = 0.25f / scale;
-
-            if (GcCacheHelper.optimizing) {
-                this._paths = Flash<PathPath>.instance.fetch();
-                this._points = Flash<PathPoint>.instance.fetch();
-                this._vertices = Flash<Vector3>.instance.fetch();
-            }
-            else {
-                this._paths = new List<PathPath>();
-                this._points = new List<PathPoint>();
-                this._vertices = new List<Vector3>();
-            }
         }
 
         public bool canReuse(float scale) {
@@ -1171,14 +1191,14 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void addPath() {
-            this._paths.Add(PathPath.createNew(
+            this._paths.Add(PathPath.CreateFromCache(
                 first : this._points.Count,
                 winding : PathWinding.counterClockwise
             ));
         }
 
         public void addPoint(float x, float y, PointFlags flags) {
-            this._addPoint(PathPoint.CreatePathPoint(x : x, y : y, flags : flags));
+            this._addPoint(PathPoint.CreateFromCache(x : x, y : y, flags : flags));
         }
 
         void _addPoint(PathPoint point) {
@@ -1204,7 +1224,6 @@ namespace Unity.UIWidgets.ui {
             float x2, float y2,
             float x3, float y3, float x4, float y4,
             PointFlags flags) {
-
             float x1, y1;
             if (this._points.Count == 0) {
                 x1 = 0;
@@ -1339,7 +1358,7 @@ namespace Unity.UIWidgets.ui {
                 }
             }
 
-            var indices = GcCacheHelper.optimizing ? Flash<int>.instance.fetch() : new List<int>(cindices);
+            var indices = GcCacheHelper.CreateList<int>(cindices);
             for (var i = 0; i < this._paths.Count; i++) {
                 var path = this._paths[i];
                 if (path.count <= 2) {

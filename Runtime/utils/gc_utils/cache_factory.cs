@@ -149,8 +149,8 @@ namespace Unity.UIWidgets.utils {
             return ret;
         }
 
-        public static List<T> CreateList<T>() {
-            return Flash<T>.instance.fetch();
+        public static List<T> CreateList<T>(int len = 0) {
+            return Flash<T>.instance.fetch(len);
         }
 
         public static T Create<T>() where T : new() {
@@ -163,6 +163,14 @@ namespace Unity.UIWidgets.utils {
 
         public static MaterialPropertyBlock CreateMaterialPropertyBlock() {
             return ClearableMaterialPropFlash.instance.fetch();
+        }
+
+        public static T CreateFromPool<T>() where T : new() {
+            return SimplePool<T>.instance.fetch();
+        }
+
+        public static void RecycleToPool<T>(T obj) where T : new() {
+            SimplePool<T>.instance.recycle(obj);
         }
     }
 }

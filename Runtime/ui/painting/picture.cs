@@ -36,7 +36,7 @@ namespace Unity.UIWidgets.ui {
         public void reset() {
             this._drawCmds.Clear();
             this._states.Clear();
-            this._states.Add(CanvasState.createNew(
+            this._states.Add(CanvasState.CreateFromCache(
                 xform : Matrix3.I(),
                 scissor : null,
                 saveLayer : false,
@@ -62,7 +62,7 @@ namespace Unity.UIWidgets.ui {
                     this._states.Add(this._getState().copy());
                     break;
                 case DrawSaveLayer cmd: {
-                    this._states.Add(CanvasState.createNew(
+                    this._states.Add(CanvasState.CreateFromCache(
                         xform : Matrix3.I(),
                         scissor : cmd.rect.shift(-cmd.rect.topLeft),
                         saveLayer : true,
@@ -260,20 +260,20 @@ namespace Unity.UIWidgets.ui {
         
     }
     
-    public class CanvasState {
+    class CanvasState {
         public Matrix3 xform;
         public Rect scissor;
         public bool saveLayer;
         public Offset layerOffset;
         public Rect paintBounds;
 
-        public static CanvasState createNew(
+        public static CanvasState CreateFromCache(
             Matrix3 xform,
             Rect scissor,
             bool saveLayer,
             Offset layerOffset,
             Rect paintBounds) {
-            var ret = GcCacheHelper.optimizing ? SimpleFlash<CanvasState>.instance.fetch() : new CanvasState();
+            var ret = GcCacheHelper.Create<CanvasState>();
             ret.xform = xform;
             ret.scissor = scissor;
             ret.saveLayer = saveLayer;
@@ -283,7 +283,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public CanvasState copy() {
-            return createNew(
+            return CreateFromCache(
                     xform : this.xform,
                     scissor : this.scissor,
                     saveLayer : false,

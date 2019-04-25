@@ -17,7 +17,7 @@ namespace UIWidgetsGallery.gallery {
         public GalleryApp(
             Key key = null,
             UpdateUrlFetcher updateUrlFetcher = null,
-            bool enablePerformanceOverlay = false,
+            bool enablePerformanceOverlay = true,
             bool enableRasterCacheImagesCheckerboard = true,
             bool enableOffscreenLayersCheckerboard = true,
             VoidCallback onSendFeedback = null,

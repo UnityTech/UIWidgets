@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-//using System.Linq;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
@@ -1940,11 +1939,7 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public static List<RepaintBoundary> wrapAll(List<Widget> widgets) {
-            List<RepaintBoundary> result = new List<RepaintBoundary>();
-            for (int i = 0; i < widgets.Count; i++) {
-                result.Add(null);
-            }
-            
+            List<RepaintBoundary> result = GcCacheHelper.RepeatList<RepaintBoundary>(null, widgets.Count);
             for (int i = 0; i < result.Count; ++i) {
                 result[i] = wrap(widgets[i], i);
             }

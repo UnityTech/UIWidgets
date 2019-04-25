@@ -832,7 +832,6 @@ namespace Unity.UIWidgets.widgets {
                     }
                 });
             }
-
             foreach (var pointer in this._activePointers) {
                 WidgetsBinding.instance.cancelPointer(pointer);
             }

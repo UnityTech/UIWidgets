@@ -6,6 +6,7 @@ using System.Text;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
+using Unity.UIWidgets.utils;
 using UnityEngine;
 
 namespace Unity.UIWidgets.widgets {
@@ -2630,17 +2631,10 @@ namespace Unity.UIWidgets.widgets {
             int newChildrenBottom = newWidgets.Count - 1;
             int oldChildrenBottom = oldChildren.Count - 1;
 
-            List<Element> newChildren;
-            if (oldChildren.Count == newWidgets.Count) {
-                newChildren = oldChildren;
-            }
-            else {
-                newChildren = new List<Element>(newWidgets.Count);
-                for (int i = 0; i < newWidgets.Count; i++) {
-                    newChildren.Add(null);
-                }
-            }
-
+            var newChildren = oldChildren.Count == newWidgets.Count
+                ? oldChildren
+                : GcCacheHelper.RepeatList<Element>(null, newWidgets.Count);
+            
             Element previousChild = null;
 
             while ((oldChildrenTop <= oldChildrenBottom) && (newChildrenTop <= newChildrenBottom)) {
@@ -2964,12 +2958,7 @@ namespace Unity.UIWidgets.widgets {
 
         public override void mount(Element parent, object newSlot) {
             base.mount(parent, newSlot);
-
-            this._children = new List<Element>(this.widget.children.Count);
-            for (int i = 0; i < this.widget.children.Count; i++) {
-                this._children.Add(null);
-            }
-            
+            this._children = GcCacheHelper.RepeatList<Element>(null, this.widget.children.Count);
             Element previousChild = null;
             for (int i = 0; i < this._children.Count; i += 1) {
                 Element newChild = this.inflateWidget(this.widget.children[i], previousChild);

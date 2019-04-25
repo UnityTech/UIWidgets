@@ -562,7 +562,6 @@ namespace Unity.UIWidgets.widgets {
 
         public override void visitChildren(ElementVisitor visitor) {
             D.assert(!this._childElements.Values.Any(child => child == null));
-
             foreach (var e in this._childElements.Values) {
                 visitor(e);
             }

@@ -5,6 +5,7 @@ using RSG;
 using Unity.UIWidgets.animation;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
+using Unity.UIWidgets.utils;
 
 namespace Unity.UIWidgets.widgets {
     public class ScrollController : ChangeNotifier {
@@ -56,10 +57,7 @@ namespace Unity.UIWidgets.widgets {
             Curve curve
         ) {
             D.assert(this._positions.isNotEmpty(), "ScrollController not attached to any scroll views.");
-            List<IPromise> animations = new List<IPromise>(this._positions.Count);
-            for (int i = 0; i < this._positions.Count; i++) {
-                animations.Add(null);
-            }
+            List<IPromise> animations = GcCacheHelper.RepeatList<IPromise>(null, this._positions.Count);
             for (int i = 0; i < this._positions.Count; i += 1) {
                 animations[i] = this._positions[i].animateTo(to, duration: duration, curve: curve);
             }

@@ -255,9 +255,9 @@ namespace Unity.UIWidgets.utils {
             this.current_size = this.flash.Count;
         }
 
-        public List<T> fetch() {
+        public List<T> fetch(int len) {
             if (!GcCacheHelper.optimizing) {
-                return new List<T>();
+                return len != 0 ? new List<T>(len) : new List<T>();
             }
 
             if (this.curIndex >= this.current_size) {
@@ -310,6 +310,10 @@ namespace Unity.UIWidgets.utils {
         }
 
         public T fetch() {
+            if (!GcCacheHelper.optimizing) {
+                return new T();
+            }
+            
             if (this.current_size == 0) {
                 for (var i = 0; i < delta_size; i++) {
                     this.pool.Push(new T());
