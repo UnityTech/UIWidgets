@@ -8,47 +8,49 @@ namespace Unity.UIWidgets.utils {
         public static bool optimizing = false;
         
         public static void StartCaching() {
-            optimizing = false;
+            optimizing = true;
         }
 
         public static void EndCaching() {
             optimizing = false;
 
-            Flash<PathPath>.instance.clearAll();
-            Flash<PathPoint>.instance.clearAll();
-            Flash<Vector3>.instance.clearAll();
-            Flash<int>.instance.clearAll();
-            Flash<float>.instance.clearAll();
-            SimpleFlash<PathPoint>.instance.clearAll();
-            SimpleFlash<Matrix3>.instance.clearAll();
-            SimpleFlash<CanvasState>.instance.clearAll();
-            SimpleFlash<PathPath>.instance.clearAll();
-            SimpleFlash<Rect>.instance.clearAll();
-            ClearableSimpleFlash<PictureFlusher.CmdDraw>.instance.clearAll();
-            ClearableMaterialPropFlash.instance.clearAll();
-            Flash<object>.instance.clearAll();
-            Flash<PictureFlusher.RenderLayer>.instance.clearAll();
-            Flash<PictureFlusher.State>.instance.clearAll();
-            SimpleFlash<PictureFlusher.State>.instance.clearAll();
-            ClearableSimpleFlash<DrawSave>.instance.clearAll();
-            ClearableSimpleFlash<DrawSaveLayer>.instance.clearAll();
-            ClearableSimpleFlash<DrawRestore>.instance.clearAll();
-            ClearableSimpleFlash<DrawTranslate>.instance.clearAll();
-            ClearableSimpleFlash<DrawScale>.instance.clearAll();
-            ClearableSimpleFlash<DrawRotate>.instance.clearAll();
-            ClearableSimpleFlash<DrawSkew>.instance.clearAll();
-            ClearableSimpleFlash<DrawConcat>.instance.clearAll();
-            ClearableSimpleFlash<DrawResetMatrix>.instance.clearAll();
-            ClearableSimpleFlash<DrawSetMatrix>.instance.clearAll();
-            ClearableSimpleFlash<DrawClipRect>.instance.clearAll();
-            ClearableSimpleFlash<DrawClipRRect>.instance.clearAll();
-            ClearableSimpleFlash<DrawClipPath>.instance.clearAll();
-            ClearableSimpleFlash<DrawPath>.instance.clearAll();
-            ClearableSimpleFlash<DrawImage>.instance.clearAll();
-            ClearableSimpleFlash<DrawImageRect>.instance.clearAll();
-            ClearableSimpleFlash<DrawImageNine>.instance.clearAll();
-            ClearableSimpleFlash<DrawPicture>.instance.clearAll();
-            ClearableSimpleFlash<DrawTextBlob>.instance.clearAll();
+            ListCache<PathPath>.instance.ClearAll();
+            ListCache<PathPoint>.instance.ClearAll();
+            ListCache<Vector3>.instance.ClearAll();
+            ListCache<int>.instance.ClearAll();
+            ListCache<float>.instance.ClearAll();
+            ListCache<object>.instance.ClearAll();
+            ListCache<PictureFlusher.RenderLayer>.instance.ClearAll();
+            ListCache<PictureFlusher.State>.instance.ClearAll();
+            
+            ObjectCache<PathPoint>.instance.ClearAll();
+            ObjectCache<Matrix3>.instance.ClearAll();
+            ObjectCache<CanvasState>.instance.ClearAll();
+            ObjectCache<PathPath>.instance.ClearAll();
+            ObjectCache<Rect>.instance.ClearAll();
+            ObjectCache<PictureFlusher.State>.instance.ClearAll();
+            
+            MaterialPropCache.instance.ClearAll();
+            RecyclableObjectCache<PictureFlusher.CmdDraw>.instance.ClearAll();
+            RecyclableObjectCache<DrawSave>.instance.ClearAll();
+            RecyclableObjectCache<DrawSaveLayer>.instance.ClearAll();
+            RecyclableObjectCache<DrawRestore>.instance.ClearAll();
+            RecyclableObjectCache<DrawTranslate>.instance.ClearAll();
+            RecyclableObjectCache<DrawScale>.instance.ClearAll();
+            RecyclableObjectCache<DrawRotate>.instance.ClearAll();
+            RecyclableObjectCache<DrawSkew>.instance.ClearAll();
+            RecyclableObjectCache<DrawConcat>.instance.ClearAll();
+            RecyclableObjectCache<DrawResetMatrix>.instance.ClearAll();
+            RecyclableObjectCache<DrawSetMatrix>.instance.ClearAll();
+            RecyclableObjectCache<DrawClipRect>.instance.ClearAll();
+            RecyclableObjectCache<DrawClipRRect>.instance.ClearAll();
+            RecyclableObjectCache<DrawClipPath>.instance.ClearAll();
+            RecyclableObjectCache<DrawPath>.instance.ClearAll();
+            RecyclableObjectCache<DrawImage>.instance.ClearAll();
+            RecyclableObjectCache<DrawImageRect>.instance.ClearAll();
+            RecyclableObjectCache<DrawImageNine>.instance.ClearAll();
+            RecyclableObjectCache<DrawPicture>.instance.ClearAll();
+            RecyclableObjectCache<DrawTextBlob>.instance.ClearAll();
         }
     }
     
@@ -57,20 +59,20 @@ namespace Unity.UIWidgets.utils {
     }
 
 
-    public class ClearableMaterialPropFlash {
-        static ClearableMaterialPropFlash _instance;
+    public class MaterialPropCache {
+        static MaterialPropCache _instance;
 
         const int initial_size = 1024;
         const int delta_size = 128;
         int current_size = 0;
 
-        public static ClearableMaterialPropFlash instance {
+        public static MaterialPropCache instance {
             get {
                 if (_instance != null) {
                     return _instance;
                 }
 
-                _instance = new ClearableMaterialPropFlash();
+                _instance = new MaterialPropCache();
                 _instance.setup();
                 return _instance;
             }
@@ -88,7 +90,7 @@ namespace Unity.UIWidgets.utils {
             this.current_size = this.flash.Count;
         }
 
-        public MaterialPropertyBlock fetch() {
+        public MaterialPropertyBlock Fetch() {
             if (!GcCacheHelper.optimizing) {
                 return new MaterialPropertyBlock();
             }
@@ -105,7 +107,7 @@ namespace Unity.UIWidgets.utils {
             return ret;
         }
 
-        public void clearAll() {
+        public void ClearAll() {
             for (var i = 0; i < this.curIndex - 1; i++) {
                 this.flash[i].Clear();
             }
@@ -114,20 +116,20 @@ namespace Unity.UIWidgets.utils {
         }
     }
 
-    public class ClearableSimpleFlash<T> where T : GcRecyclable, new() {
-        static ClearableSimpleFlash<T> _instance;
+    public class RecyclableObjectCache<T> where T : GcRecyclable, new() {
+        static RecyclableObjectCache<T> _instance;
 
         const int initial_size = 1024;
         const int delta_size = 128;
         int current_size = 0;
 
-        public static ClearableSimpleFlash<T> instance {
+        public static RecyclableObjectCache<T> instance {
             get {
                 if (_instance != null) {
                     return _instance;
                 }
 
-                _instance = new ClearableSimpleFlash<T>();
+                _instance = new RecyclableObjectCache<T>();
                 _instance.setup();
                 return _instance;
             }
@@ -145,7 +147,7 @@ namespace Unity.UIWidgets.utils {
             this.current_size = this.flash.Count;
         }
 
-        public T fetch() {
+        public T Fetch() {
             if (!GcCacheHelper.optimizing) {
                 return new T();
             }
@@ -162,7 +164,7 @@ namespace Unity.UIWidgets.utils {
             return ret;
         }
 
-        public void clearAll() {
+        public void ClearAll() {
             for (var i = 0; i < this.curIndex - 1; i++) {
                 this.flash[i].Recycle();
             }
@@ -171,21 +173,21 @@ namespace Unity.UIWidgets.utils {
         }
     }
 
-    public class SimpleFlash<T> where T : new() {
-        static SimpleFlash<T> _instance;
+    public class ObjectCache<T> where T : new() {
+        static ObjectCache<T> _instance;
 
         const int initial_size = 1024;
         const int delta_size = 128;
         int current_size = 0;
 
-        public static SimpleFlash<T> instance {
+        public static ObjectCache<T> instance {
             get {
                 if (_instance != null) {
                     return _instance;
                 }
 
-                _instance = new SimpleFlash<T>();
-                _instance.setup();
+                _instance = new ObjectCache<T>();
+                _instance.Setup();
                 return _instance;
             }
         }
@@ -193,7 +195,7 @@ namespace Unity.UIWidgets.utils {
         List<T> flash;
         int curIndex;
 
-        void setup() {
+        void Setup() {
             this.flash = new List<T>(initial_size);
             for (var i = 0; i < initial_size; i++) {
                 this.flash.Add(new T());
@@ -202,7 +204,7 @@ namespace Unity.UIWidgets.utils {
             this.current_size = this.flash.Count;
         }
 
-        public T fetch() {
+        public T Fetch() {
             if (!GcCacheHelper.optimizing) {
                 return new T();
             }
@@ -219,26 +221,26 @@ namespace Unity.UIWidgets.utils {
             return ret;
         }
 
-        public void clearAll() {
+        public void ClearAll() {
             this.curIndex = 0;
         }
     }
 
-    public class Flash<T> {
-        static Flash<T> _instance;
+    public class ListCache<T> {
+        static ListCache<T> _instance;
 
         const int initial_size = 1024;
         const int delta_size = 128;
         int current_size = 0;
 
-        public static Flash<T> instance {
+        public static ListCache<T> instance {
             get {
                 if (_instance != null) {
                     return _instance;
                 }
 
-                _instance = new Flash<T>();
-                _instance.setup();
+                _instance = new ListCache<T>();
+                _instance.Setup();
                 return _instance;
             }
         }
@@ -246,7 +248,7 @@ namespace Unity.UIWidgets.utils {
         List<List<T>> flash;
         int curIndex;
 
-        void setup() {
+        void Setup() {
             this.flash = new List<List<T>>(initial_size);
             for (var i = 0; i < initial_size; i++) {
                 this.flash.Add(new List<T>(256));
@@ -255,7 +257,7 @@ namespace Unity.UIWidgets.utils {
             this.current_size = this.flash.Count;
         }
 
-        public List<T> fetch(int len) {
+        public List<T> Fetch(int len) {
             if (!GcCacheHelper.optimizing) {
                 return len != 0 ? new List<T>(len) : new List<T>();
             }
@@ -274,33 +276,33 @@ namespace Unity.UIWidgets.utils {
             return ret;
         }
 
-        public void clearAll() {
+        public void ClearAll() {
             this.curIndex = 0;
         }
     }
 
-    public class SimplePool<T> where T : new() {
-        static SimplePool<T> _instance;
+    public class ObjectPool<T> where T : new() {
+        static ObjectPool<T> _instance;
 
         const int initial_size = 256;
         const int delta_size = initial_size / 2;
         int current_size = 0;
 
-        public static SimplePool<T> instance {
+        public static ObjectPool<T> instance {
             get {
                 if (_instance != null) {
                     return _instance;
                 }
 
-                _instance = new SimplePool<T>();
-                _instance.setup();
+                _instance = new ObjectPool<T>();
+                _instance.Setup();
                 return _instance;
             }
         }
 
         Stack<T> pool;
 
-        void setup() {
+        void Setup() {
             this.pool = new Stack<T>(initial_size * 2);
             for (var i = 0; i < initial_size; i++) {
                 this.pool.Push(new T());
@@ -309,7 +311,7 @@ namespace Unity.UIWidgets.utils {
             this.current_size = this.pool.Count;
         }
 
-        public T fetch() {
+        public T Fetch() {
             if (!GcCacheHelper.optimizing) {
                 return new T();
             }
@@ -327,7 +329,7 @@ namespace Unity.UIWidgets.utils {
             return ret;
         }
 
-        public void recycle(T obj) {
+        public void Recycle(T obj) {
             if (obj != null) {
                 this.pool.Push(obj);
                 this.current_size++;
