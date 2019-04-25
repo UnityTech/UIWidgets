@@ -50,6 +50,7 @@ namespace Unity.UIWidgets.material {
         ) : base(key: key) {
             D.assert(onClosing != null);
             D.assert(builder != null);
+            D.assert(elevation >= 0.0f);
             this.animationController = animationController;
             this.enableDrag = enableDrag;
             this.elevation = elevation;
