@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.painting;
@@ -20,6 +21,7 @@ namespace Unity.UIWidgets.rendering {
         doubleTap,
         longPress,
         keyboard,
+        drag
     }
 
     public class TextSelectionPoint {
@@ -126,7 +128,7 @@ namespace Unity.UIWidgets.rendering {
         int _previousCursorLocation;
 
         bool _resetCursor = false;
-        
+
         void _handleKeyEvent(RawKeyEvent keyEvent) {
             if (keyEvent is RawKeyUpEvent) {
                 return;
@@ -136,14 +138,14 @@ namespace Unity.UIWidgets.rendering {
                 this._extentOffset = this.selection.extentOffset;
                 this._baseOffset = this.selection.baseOffset;
             }
-            
+
             KeyCode pressedKeyCode = keyEvent.data.unityEvent.keyCode;
             int modifiers = (int) keyEvent.data.unityEvent.modifiers;
-            bool shift = (modifiers & (int)EventModifiers.Shift) > 0;
-            bool ctrl = (modifiers & (int)EventModifiers.Control) > 0;
-            bool alt = (modifiers & (int)EventModifiers.Alt) > 0;
-            bool cmd = (modifiers & (int)EventModifiers.Command) > 0;
-            
+            bool shift = (modifiers & (int) EventModifiers.Shift) > 0;
+            bool ctrl = (modifiers & (int) EventModifiers.Control) > 0;
+            bool alt = (modifiers & (int) EventModifiers.Alt) > 0;
+            bool cmd = (modifiers & (int) EventModifiers.Command) > 0;
+
             bool rightArrow = pressedKeyCode == KeyCode.RightArrow;
             bool leftArrow = pressedKeyCode == KeyCode.LeftArrow;
             bool upArrow = pressedKeyCode == KeyCode.UpArrow;
@@ -156,32 +158,42 @@ namespace Unity.UIWidgets.rendering {
             bool del = pressedKeyCode == KeyCode.Delete;
             bool isMac = SystemInfo.operatingSystemFamily == OperatingSystemFamily.MacOSX;
 
-            if (keyEvent is RawKeyCommandEvent) { // editor case
-                this._handleShortcuts(((RawKeyCommandEvent)keyEvent).command);
+            if (keyEvent is RawKeyCommandEvent) {
+                // editor case
+                this._handleShortcuts(((RawKeyCommandEvent) keyEvent).command);
                 return;
             }
-            if ((ctrl || (isMac && cmd)) && (xKey || vKey || cKey || aKey)) { // runtime case
+
+            if ((ctrl || (isMac && cmd)) && (xKey || vKey || cKey || aKey)) {
+                // runtime case
                 if (xKey) {
                     this._handleShortcuts(KeyCommand.Cut);
-                } else if (aKey) {
+                }
+                else if (aKey) {
                     this._handleShortcuts(KeyCommand.SelectAll);
-                } else if (vKey) {
+                }
+                else if (vKey) {
                     this._handleShortcuts(KeyCommand.Paste);
-                } else if (cKey) {
+                }
+                else if (cKey) {
                     this._handleShortcuts(KeyCommand.Copy);
                 }
+
                 return;
             }
-            
+
             if (arrow) {
                 int newOffset = this._extentOffset;
                 var word = (isMac && alt) || ctrl;
                 if (word) {
                     newOffset = this._handleControl(rightArrow, leftArrow, word, newOffset);
                 }
+
                 newOffset = this._handleHorizontalArrows(rightArrow, leftArrow, shift, newOffset);
-                if (downArrow || upArrow)
+                if (downArrow || upArrow) {
                     newOffset = this._handleVerticalArrows(upArrow, downArrow, shift, newOffset);
+                }
+
                 newOffset = this._handleShift(rightArrow, leftArrow, shift, newOffset);
 
                 this._extentOffset = newOffset;
@@ -196,15 +208,19 @@ namespace Unity.UIWidgets.rendering {
             // If control is pressed, we will decide which way to look for a word
             // based on which arrow is pressed.
             if (leftArrow && this._extentOffset > 2) {
-                TextSelection textSelection = this._selectWordAtOffset(new TextPosition(offset: this._extentOffset - 2));
+                TextSelection textSelection =
+                    this._selectWordAtOffset(new TextPosition(offset: this._extentOffset - 2));
                 newOffset = textSelection.baseOffset + 1;
-            } else if (rightArrow && this._extentOffset < this.text.text.Length - 2) {
-                TextSelection textSelection = this._selectWordAtOffset(new TextPosition(offset: this._extentOffset + 1));
+            }
+            else if (rightArrow && this._extentOffset < this.text.text.Length - 2) {
+                TextSelection textSelection =
+                    this._selectWordAtOffset(new TextPosition(offset: this._extentOffset + 1));
                 newOffset = textSelection.extentOffset - 1;
             }
+
             return newOffset;
         }
-        
+
         int _handleHorizontalArrows(bool rightArrow, bool leftArrow, bool shift, int newOffset) {
             if (rightArrow && this._extentOffset < this.text.text.Length) {
                 newOffset += 1;
@@ -212,43 +228,53 @@ namespace Unity.UIWidgets.rendering {
                     this._previousCursorLocation += 1;
                 }
             }
+
             if (leftArrow && this._extentOffset > 0) {
                 newOffset -= 1;
                 if (shift) {
                     this._previousCursorLocation -= 1;
                 }
             }
+
             return newOffset;
         }
-        
+
         int _handleVerticalArrows(bool upArrow, bool downArrow, bool shift, int newOffset) {
             float plh = this._textPainter.preferredLineHeight;
             float verticalOffset = upArrow ? -0.5f * plh : 1.5f * plh;
 
-            Offset caretOffset = this._textPainter.getOffsetForCaret(new TextPosition(offset: this._extentOffset), this._caretPrototype);
+            Offset caretOffset =
+                this._textPainter.getOffsetForCaret(new TextPosition(offset: this._extentOffset), this._caretPrototype);
             Offset caretOffsetTranslated = caretOffset.translate(0.0f, verticalOffset);
             TextPosition position = this._textPainter.getPositionForOffset(caretOffsetTranslated);
 
             if (position.offset == this._extentOffset) {
-                if (downArrow)
+                if (downArrow) {
                     newOffset = this.text.text.Length;
-                else if (upArrow)
+                }
+                else if (upArrow) {
                     newOffset = 0;
+                }
+
                 this._resetCursor = shift;
-            } else if (this._resetCursor && shift) {
+            }
+            else if (this._resetCursor && shift) {
                 newOffset = this._previousCursorLocation;
                 this._resetCursor = false;
-            } else {
+            }
+            else {
                 newOffset = position.offset;
                 this._previousCursorLocation = newOffset;
             }
+
             return newOffset;
         }
-        
+
         int _handleShift(bool rightArrow, bool leftArrow, bool shift, int newOffset) {
-            if (this.onSelectionChanged == null)
+            if (this.onSelectionChanged == null) {
                 return newOffset;
-            
+            }
+
             if (shift) {
                 if (this._baseOffset < newOffset) {
                     this.onSelectionChanged(
@@ -259,7 +285,8 @@ namespace Unity.UIWidgets.rendering {
                         this,
                         SelectionChangedCause.keyboard
                     );
-                } else {
+                }
+                else {
                     this.onSelectionChanged(
                         new TextSelection(
                             baseOffset: newOffset,
@@ -269,12 +296,15 @@ namespace Unity.UIWidgets.rendering {
                         SelectionChangedCause.keyboard
                     );
                 }
-            } else {
+            }
+            else {
                 if (!this.selection.isCollapsed) {
-                    if (leftArrow)
+                    if (leftArrow) {
                         newOffset = this._baseOffset < this._extentOffset ? this._baseOffset : this._extentOffset;
-                    else if (rightArrow)
+                    }
+                    else if (rightArrow) {
                         newOffset = this._baseOffset > this._extentOffset ? this._baseOffset : this._extentOffset;
+                    }
                 }
 
                 this.onSelectionChanged(
@@ -287,6 +317,7 @@ namespace Unity.UIWidgets.rendering {
                     SelectionChangedCause.keyboard
                 );
             }
+
             return newOffset;
         }
 
@@ -297,6 +328,7 @@ namespace Unity.UIWidgets.rendering {
                         Clipboard.setData(
                             new ClipboardData(text: this.selection.textInside(this.text.text)));
                     }
+
                     break;
                 case KeyCommand.Cut:
                     if (!this.selection.isCollapsed) {
@@ -308,6 +340,7 @@ namespace Unity.UIWidgets.rendering {
                             selection: TextSelection.collapsed(offset: this.selection.start)
                         );
                     }
+
                     break;
                 case KeyCommand.Paste:
                     TextEditingValue value = this.textSelectionDelegate.textEditingValue;
@@ -323,7 +356,7 @@ namespace Unity.UIWidgets.rendering {
                             );
                         }
                     });
-                    
+
                     break;
                 case KeyCommand.SelectAll:
                     this._baseOffset = 0;
@@ -351,7 +384,8 @@ namespace Unity.UIWidgets.rendering {
                           + selection.textAfter(this.text.text).Substring(1),
                     selection: TextSelection.collapsed(offset: selection.start)
                 );
-            } else {
+            }
+            else {
                 this.textSelectionDelegate.textEditingValue = new TextEditingValue(
                     text: selection.textBefore(this.text.text),
                     selection: TextSelection.collapsed(offset: selection.start)
@@ -363,7 +397,7 @@ namespace Unity.UIWidgets.rendering {
             this._textLayoutLastWidth = null;
             this.markNeedsLayout();
         }
-        
+
         public TextSpan text {
             get { return this._textPainter.text; }
             set {
@@ -437,6 +471,7 @@ namespace Unity.UIWidgets.rendering {
 
         bool _hasFocus;
         bool _listenerAttached = false;
+
         public bool hasFocus {
             get { return this._hasFocus; }
             set {
@@ -455,7 +490,7 @@ namespace Unity.UIWidgets.rendering {
                     RawKeyboard.instance.removeListener(this._handleKeyEvent);
                     this._listenerAttached = false;
                 }
-                
+
                 this.markNeedsSemanticsUpdate();
             }
         }
@@ -531,37 +566,44 @@ namespace Unity.UIWidgets.rendering {
                 this.markNeedsLayout();
             }
         }
-        
+
         float _cursorWidth = 1.0f;
 
         public float cursorWidth {
             get { return this._cursorWidth; }
-            set { 
-                if (this._cursorWidth == value)
+            set {
+                if (this._cursorWidth == value) {
                     return;
+                }
+
                 this._cursorWidth = value;
                 this.markNeedsLayout();
             }
         }
-        
+
         Radius _cursorRadius;
+
         public Radius cursorRadius {
             get { return this._cursorRadius; }
-            set { 
-                if (this._cursorRadius == value)
+            set {
+                if (this._cursorRadius == value) {
                     return;
+                }
+
                 this._cursorRadius = value;
                 this.markNeedsLayout();
-                
             }
         }
-        
+
         bool _enableInteractiveSelection;
+
         public bool enableInteractiveSelection {
             get { return this._enableInteractiveSelection; }
-            set { 
-                if (this._enableInteractiveSelection == value)
+            set {
+                if (this._enableInteractiveSelection == value) {
                     return;
+                }
+
                 this._enableInteractiveSelection = value;
                 this.markNeedsTextLayout();
                 this.markNeedsSemanticsUpdate();
@@ -585,6 +627,7 @@ namespace Unity.UIWidgets.rendering {
             if (this._listenerAttached) {
                 RawKeyboard.instance.removeListener(this._handleKeyEvent);
             }
+
             base.detach();
         }
 
@@ -779,19 +822,19 @@ namespace Unity.UIWidgets.rendering {
                 this._longPress.addPointer((PointerDownEvent) evt);
             }
         }
-        
+
         public void handleTapDown(TapDownDetails details) {
-            this._lastTapDownPosition = details.globalPosition + - this._paintOffset;
+            this._lastTapDownPosition = details.globalPosition + -this._paintOffset;
             if (!Application.isMobilePlatform) {
                 this.selectPosition(SelectionChangedCause.tap);
             }
         }
-        
+
         void _handleTapDown(TapDownDetails details) {
             D.assert(!this.ignorePointer);
             this.handleTapDown(details);
         }
-        
+
         public void handleTap() {
             this.selectPosition(cause: SelectionChangedCause.tap);
         }
@@ -805,7 +848,7 @@ namespace Unity.UIWidgets.rendering {
             D.assert(!this.ignorePointer);
             this.handleDoubleTap(details);
         }
-        
+
         public void handleDoubleTap(DoubleTapDetails details) {
             // need set _lastTapDownPosition, otherwise it would be last single tap position
             this._lastTapDownPosition = details.firstGlobalPosition - this._paintOffset;
@@ -820,17 +863,48 @@ namespace Unity.UIWidgets.rendering {
         public void handleLongPress() {
             this.selectWord(cause: SelectionChangedCause.longPress);
         }
-        
+
+        public void selectPositionAt(Offset from = null, Offset to = null, SelectionChangedCause? cause = null) {
+            D.assert(cause != null);
+            D.assert(from != null);
+
+            this._layoutText(this.constraints.maxWidth);
+            if (this.onSelectionChanged != null) {
+                TextPosition fromPosition =
+                    this._textPainter.getPositionForOffset(this.globalToLocal(from - this._paintOffset));
+                TextPosition toPosition = to == null
+                    ? null
+                    : this._textPainter.getPositionForOffset(this.globalToLocal(to - this._paintOffset));
+
+                int baseOffset = fromPosition.offset;
+                int extentOffset = fromPosition.offset;
+                if (toPosition != null) {
+                    baseOffset = Math.Min(fromPosition.offset, toPosition.offset);
+                    extentOffset = Math.Max(fromPosition.offset, toPosition.offset);
+                }
+
+                TextSelection newSelection = new TextSelection(
+                    baseOffset: baseOffset,
+                    extentOffset: extentOffset,
+                    affinity: fromPosition.affinity);
+
+                if (newSelection != this._selection) {
+                    this.onSelectionChanged(newSelection, this, cause.Value);
+                }
+            }
+        }
+
         void selectPosition(SelectionChangedCause? cause = null) {
             D.assert(cause != null);
             this._layoutText(this.constraints.maxWidth);
             D.assert(this._lastTapDownPosition != null);
             if (this.onSelectionChanged != null) {
-                TextPosition position = this._textPainter.getPositionForOffset(this.globalToLocal(this._lastTapDownPosition));
+                TextPosition position =
+                    this._textPainter.getPositionForOffset(this.globalToLocal(this._lastTapDownPosition));
                 this.onSelectionChanged(TextSelection.fromPosition(position), this, cause.Value);
             }
         }
-        
+
         void selectWord(SelectionChangedCause? cause = null) {
             this._layoutText(this.constraints.maxWidth);
             D.assert(this._lastTapDownPosition != null);
@@ -845,7 +919,8 @@ namespace Unity.UIWidgets.rendering {
             this._layoutText(this.constraints.maxWidth);
             D.assert(this._lastTapDownPosition != null);
             if (this.onSelectionChanged != null) {
-                TextPosition position = this._textPainter.getPositionForOffset(this.globalToLocal(this._lastTapDownPosition));
+                TextPosition position =
+                    this._textPainter.getPositionForOffset(this.globalToLocal(this._lastTapDownPosition));
                 TextRange word = this._textPainter.getWordBoundary(position);
                 if (position.offset - word.start <= 1) {
                     this.onSelectionChanged(
@@ -853,7 +928,8 @@ namespace Unity.UIWidgets.rendering {
                         this,
                         cause
                     );
-                } else {
+                }
+                else {
                     this.onSelectionChanged(
                         TextSelection.collapsed(offset: word.end, affinity: TextAffinity.upstream),
                         this,
@@ -862,7 +938,7 @@ namespace Unity.UIWidgets.rendering {
                 }
             }
         }
-        
+
         TextSelection _selectWordAtOffset(TextPosition position) {
             D.assert(this._textLayoutLastWidth == this.constraints.maxWidth);
             var word = this._textPainter.getWordBoundary(position);
@@ -872,7 +948,7 @@ namespace Unity.UIWidgets.rendering {
 
             return new TextSelection(baseOffset: word.start, extentOffset: word.end);
         }
-        
+
         void _layoutText(float constraintWidth) {
             if (this._textLayoutLastWidth == constraintWidth) {
                 return;
@@ -885,7 +961,7 @@ namespace Unity.UIWidgets.rendering {
             this._textLayoutLastWidth = constraintWidth;
         }
 
-        
+
         protected override void performLayout() {
             this._layoutText(this.constraints.maxWidth);
             this._caretPrototype = Rect.fromLTWH(0.0f, _kCaretHeightOffset, this.cursorWidth,
@@ -932,6 +1008,7 @@ namespace Unity.UIWidgets.rendering {
                 RRect caretRRect = RRect.fromRectAndRadius(caretRect, this.cursorRadius);
                 canvas.drawRRect(caretRRect, paint);
             }
+
             if (!caretRect.Equals(this._lastCaretRect)) {
                 this._lastCaretRect = caretRect;
                 if (this.onCaretChanged != null) {
@@ -1043,7 +1120,7 @@ namespace Unity.UIWidgets.rendering {
         public override Rect describeApproximatePaintClip(RenderObject child) {
             return this._hasVisualOverflow ? Offset.zero & this.size : null;
         }
-        
+
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             properties.add(new DiagnosticsProperty<Color>("cursorColor", this.cursorColor));

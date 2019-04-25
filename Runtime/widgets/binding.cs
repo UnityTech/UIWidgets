@@ -143,6 +143,8 @@ namespace Unity.UIWidgets.widgets {
                 return;
             }
             
+            //The former widget tree must be layout first before its destruction
+            this.drawFrame();
             this.attachRootWidget(null);
             this.buildOwner.buildScope(this._renderViewElement);
             this.buildOwner.finalizeTree();

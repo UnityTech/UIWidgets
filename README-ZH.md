@@ -181,8 +181,28 @@ UIWidgets也支持Gif！
 
 #### 七、自动调节帧率
 如果要使得构建出的应用能够自动调节帧率，请打开Project Settings，将构建目标平台对应的Quality选项卡中的V Sync Count设置为Don't Sync。
-默认的逻辑是在界面静止时将帧率降低为15，在界面变动时将帧率提高至60。
+默认的逻辑是在界面静止时将帧率降低为25，在界面变动时将帧率提高至60。
 如果您需要修改帧率升高或降低时的行为，请将`Window.onFrameRateSpeedUp`和/或`Window.onFrameRateCoolDown`设置为您自己的函数。
+
+#### 八、WebGL Canvas分辨率调整插件
+因为浏览器中Canvas的宽高和其在显示器上的像素数可能不一致，所以构建出的WebGL程序中画面可能会模糊。
+插件`Plugins/platform/webgl/UIWidgetsCanvasDevicePixelRatio.jslib`解决了这个问题。
+如果您因为任何原因需要禁止此插件，请在Project面板中选中该插件，在Inspector面板中的Define Constraints参数中，输入任意（没有被Unity定义为宏）的字符串（例如`ENABLE_CANVAS_DEVICE_PIXEL_RATIO_PLUGIN`），使得只有在Player Settings中定义了这个宏，此插件才会启用。
+
+此插件覆盖了Unity WebGL构建模块中的如下参数：
+```
+JS_SystemInfo_GetWidth
+JS_SystemInfo_GetHeight
+JS_SystemInfo_GetCurrentCanvasWidth
+JS_SystemInfo_GetCurrentCanvasHeight
+$Browser
+$JSEvents
+```
+如果您需要实现自己的WebGL插件，并且您的插件覆盖了这些参数中的至少一种，您需要采用上文中提到的方法禁用`UIWidgetsCanvasDevicePixelRatio`插件，以防止可能的冲突。
+如果您仍然需要此插件所提供的功能，您可以手动将此插件对Unity WebGL构建模块的修改应用到您的插件中。
+`UIWidgetsCanvasDevicePixelRatio`插件中所有的修改之处都以`////////// Modification Start ////////////`和`////////// Modification End ////////////`标识。
+在被标识的代码中，所有乘/除以`devicePixelRatio`都来自于我们的修改。
+若您需要详细了解此插件所修改的脚本，请参考您的Unity Editor安装目录下的`PlaybackEngines/WebGLSupport/BuildTools/lib`文件夹中的`SystemInfo.js`和`UnityNativeJS/UnityNative.js`。
 
 ## 调试UIWidgets应用程序
 

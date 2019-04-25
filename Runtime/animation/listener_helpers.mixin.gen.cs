@@ -61,8 +61,10 @@ namespace Unity.UIWidgets.animation {
         }
 
         public override void removeListener(VoidCallback listener) {
-            this._listeners.Remove(listener);
-            this.didUnregisterListener();
+            bool removed = this._listeners.Remove(listener);
+            if (removed) {
+                this.didUnregisterListener();
+            }
         }
 
         public void notifyListeners() {
@@ -98,8 +100,10 @@ namespace Unity.UIWidgets.animation {
         }
 
         public override void removeListener(VoidCallback listener) {
-            this._listeners.Remove(listener);
-            this.didUnregisterListener();
+            bool removed = this._listeners.Remove(listener);
+            if (removed) {
+                this.didUnregisterListener();
+            }
         }
 
         public void notifyListeners() {
@@ -136,8 +140,10 @@ namespace Unity.UIWidgets.animation {
         }
 
         public override void removeStatusListener(AnimationStatusListener listener) {
-            this._statusListeners.Remove(listener);
-            this.didUnregisterListener();
+            bool removed = this._statusListeners.Remove(listener);
+            if (removed) {
+                this.didUnregisterListener();
+            }
         }
 
         public void notifyStatusListeners(AnimationStatus status) {
@@ -173,8 +179,10 @@ namespace Unity.UIWidgets.animation {
         }
 
         public override void removeStatusListener(AnimationStatusListener listener) {
-            this._statusListeners.Remove(listener);
-            this.didUnregisterListener();
+            bool removed = this._statusListeners.Remove(listener);
+            if (removed) {
+                this.didUnregisterListener();
+            }
         }
 
         public void notifyStatusListeners(AnimationStatus status) {
@@ -210,8 +218,10 @@ namespace Unity.UIWidgets.animation {
         }
 
         public override void removeStatusListener(AnimationStatusListener listener) {
-            this._statusListeners.Remove(listener);
-            this.didUnregisterListener();
+            bool removed = this._statusListeners.Remove(listener);
+            if (removed) {
+                this.didUnregisterListener();
+            }
         }
 
         public void notifyStatusListeners(AnimationStatus status) {

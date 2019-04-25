@@ -240,6 +240,10 @@ namespace Unity.UIWidgets.ui {
 
         public abstract Timer run(TimeSpan duration, Action callback, bool periodic = false);
 
+        public Timer periodic(TimeSpan duration, Action callback) {
+            return this.run(duration, callback, true);
+        }
+
         public Timer run(Action callback) {
             return this.run(TimeSpan.Zero, callback);
         }
@@ -260,7 +264,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public const int defaultMaxTargetFrameRate = 60;
-        public const int defaultMinTargetFrameRate = 15;
+        public const int defaultMinTargetFrameRate = 25;
 
         static Action _onFrameRateSpeedUp = defaultFrameRateSpeedUp;
 

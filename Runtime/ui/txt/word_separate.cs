@@ -50,11 +50,15 @@
 
 
         internal static characterType classifyChar(string text, int index) {
-            if (char.IsWhiteSpace(text, index)) {
+            return classifyChar(text[index]);
+        }
+        
+        internal static characterType classifyChar(char ch) {
+            if (char.IsWhiteSpace(ch)) {
                 return characterType.WhiteSpace;
             }
 
-            if (char.IsLetterOrDigit(text, index) || text[index] == '\'') {
+            if (char.IsLetterOrDigit(ch) || ch == '\'') {
                 return characterType.LetterLike;
             }
 

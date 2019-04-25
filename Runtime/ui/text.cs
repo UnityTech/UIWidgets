@@ -71,7 +71,7 @@ namespace Unity.UIWidgets.ui {
         }
     }
 
-    internal class TextStyle : IEquatable<TextStyle> {
+    class TextStyle : IEquatable<TextStyle> {
         public readonly Color color = Color.fromARGB(255, 0, 0, 0);
         public readonly float fontSize = 14.0f;
         public readonly FontWeight fontWeight = FontWeight.w400;
@@ -115,7 +115,7 @@ namespace Unity.UIWidgets.ui {
 
         public static TextStyle applyStyle(TextStyle currentStyle, painting.TextStyle style, float textScaleFactor) {
             if (currentStyle != null) {
-                return new ui.TextStyle(
+                return new TextStyle(
                     color: style.color ?? currentStyle.color,
                     fontSize: style.fontSize != null ? style.fontSize * textScaleFactor : currentStyle.fontSize,
                     fontWeight: style.fontWeight ?? currentStyle.fontWeight,
@@ -131,7 +131,7 @@ namespace Unity.UIWidgets.ui {
                 );
             }
 
-            return new ui.TextStyle(
+            return new TextStyle(
                 color: style.color,
                 fontSize: style.fontSize * textScaleFactor,
                 fontWeight: style.fontWeight,
@@ -414,35 +414,36 @@ namespace Unity.UIWidgets.ui {
         downstream,
     }
 
-    public class FontWeight: IEquatable<FontWeight> {
-        private FontWeight(int index) {
+    public class FontWeight : IEquatable<FontWeight> {
+        FontWeight(int index) {
             this.index = index;
         }
-    
+
         public readonly int index;
-    
-        public static readonly FontWeight w100 =  new FontWeight(0);
-        public static readonly FontWeight w200 =  new FontWeight(1);
-        public static readonly FontWeight w300 =  new FontWeight(2);
-        public static readonly FontWeight w400 =  new FontWeight(3);
-        public static readonly FontWeight w500 =  new FontWeight(4);
-        public static readonly FontWeight w600 =  new FontWeight(5);
-        
-        public static readonly FontWeight w700 =  new FontWeight(6);
-        
-        public static readonly FontWeight w800 =  new FontWeight(7);
-        
-        public static readonly FontWeight w900 =  new FontWeight(8);
-        
-        
-        public static readonly FontWeight normal =  w400;
-        
-        
-        public static readonly FontWeight bold =  w700;
-        public static readonly List<FontWeight> values = new List<FontWeight>{
+
+        public static readonly FontWeight w100 = new FontWeight(0);
+        public static readonly FontWeight w200 = new FontWeight(1);
+        public static readonly FontWeight w300 = new FontWeight(2);
+        public static readonly FontWeight w400 = new FontWeight(3);
+        public static readonly FontWeight w500 = new FontWeight(4);
+        public static readonly FontWeight w600 = new FontWeight(5);
+
+        public static readonly FontWeight w700 = new FontWeight(6);
+
+        public static readonly FontWeight w800 = new FontWeight(7);
+
+        public static readonly FontWeight w900 = new FontWeight(8);
+
+
+        public static readonly FontWeight normal = w400;
+
+
+        public static readonly FontWeight bold = w700;
+
+        public static readonly List<FontWeight> values = new List<FontWeight> {
             w100, w200, w300, w400, w500, w600, w700, w800, w900
         };
-        
+
         public static readonly Dictionary<int, int> indexToFontWeight = new Dictionary<int, int> {
             {0, 100},
             {1, 200},
@@ -454,7 +455,7 @@ namespace Unity.UIWidgets.ui {
             {7, 800},
             {8, 900},
         };
-        
+
         public bool Equals(FontWeight other) {
             if (ReferenceEquals(null, other)) {
                 return false;
@@ -498,11 +499,9 @@ namespace Unity.UIWidgets.ui {
         public override string ToString() {
             return $"FontWeight.w{this.weightValue}";
         }
-        
+
         public int weightValue {
-            get {
-                return indexToFontWeight[this.index];
-            }
+            get { return indexToFontWeight[this.index]; }
         }
     }
 
