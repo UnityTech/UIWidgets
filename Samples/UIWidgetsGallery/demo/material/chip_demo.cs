@@ -129,7 +129,7 @@ namespace UIWidgetsGallery.gallery {
     }
 
     public class ChipDemo : StatefulWidget {
-        const string routeName = "/material/chip";
+        public const string routeName = "/material/chip";
 
         public override State createState() {
             return new _ChipDemoState();
@@ -213,7 +213,7 @@ namespace UIWidgetsGallery.gallery {
             List<Widget> inputChips = this._tools.Select<string, Widget>((string name) => {
                 return new InputChip(
                     key: ValueKey<string>.key(name),
-                    avatar: CircleAvatar(
+                    avatar: new CircleAvatar(
                         backgroundImage: this._nameToAvatar(name)
                     ),
                     label: new Text(this._capitalize(name)),

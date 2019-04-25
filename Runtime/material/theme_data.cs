@@ -66,6 +66,7 @@ namespace Unity.UIWidgets.material {
             IconThemeData primaryIconTheme = null,
             IconThemeData accentIconTheme = null,
             TabBarTheme tabBarTheme = null,
+            ChipThemeData chipTheme = null,
             RuntimePlatform? platform = null,
             MaterialTapTargetSize? materialTapTargetSize = null,
             PageTransitionsTheme pageTransitionsTheme = null,
@@ -164,6 +165,11 @@ namespace Unity.UIWidgets.material {
                               : ThemeDataUtils._kLightThemeSplashColor);
 
             tabBarTheme = tabBarTheme ?? new TabBarTheme();
+            chipTheme = chipTheme ?? ChipThemeData.fromDefaults(
+                secondaryColor: primaryColor,
+                brightness: brightness,
+                labelStyle: textTheme.body2
+            );
             dialogTheme = dialogTheme ?? new DialogTheme();
 
             D.assert(brightness != null);
@@ -294,6 +300,7 @@ namespace Unity.UIWidgets.material {
             IconThemeData primaryIconTheme = null,
             IconThemeData accentIconTheme = null,
             TabBarTheme tabBarTheme = null,
+            ChipThemeData chipTheme = null,
             RuntimePlatform? platform = null,
             MaterialTapTargetSize? materialTapTargetSize = null,
             PageTransitionsTheme pageTransitionsTheme = null,
@@ -481,6 +488,8 @@ namespace Unity.UIWidgets.material {
         public readonly IconThemeData accentIconTheme;
 
         public readonly TabBarTheme tabBarTheme;
+        
+        public readonly ChipThemeData chipTheme;
 
         public readonly RuntimePlatform platform;
 
@@ -533,6 +542,7 @@ namespace Unity.UIWidgets.material {
             IconThemeData primaryIconTheme = null,
             IconThemeData accentIconTheme = null,
             TabBarTheme tabBarTheme = null,
+            ChipThemeData chimpTheme = null,
             RuntimePlatform? platform = null,
             MaterialTapTargetSize? materialTapTargetSize = null,
             PageTransitionsTheme pageTransitionsTheme = null,
@@ -661,6 +671,7 @@ namespace Unity.UIWidgets.material {
                 primaryIconTheme: IconThemeData.lerp(a.primaryIconTheme, b.primaryIconTheme, t),
                 accentIconTheme: IconThemeData.lerp(a.accentIconTheme, b.accentIconTheme, t),
                 tabBarTheme: TabBarTheme.lerp(a.tabBarTheme, b.tabBarTheme, t),
+                chipTheme: ChipThemeData.lerp(a.chipTheme, b.chipTheme, t),
                 platform: t < 0.5 ? a.platform : b.platform,
                 materialTapTargetSize: t < 0.5 ? a.materialTapTargetSize : b.materialTapTargetSize,
                 pageTransitionsTheme: t < 0.5 ? a.pageTransitionsTheme : b.pageTransitionsTheme,
@@ -872,6 +883,7 @@ namespace Unity.UIWidgets.material {
             properties.add(new DiagnosticsProperty<IconThemeData>("primaryIconTheme", this.primaryIconTheme));
             properties.add(new DiagnosticsProperty<IconThemeData>("accentIconTheme", this.accentIconTheme));
             properties.add(new DiagnosticsProperty<TabBarTheme>("tabBarTheme", this.tabBarTheme));
+            properties.add(new DiagnosticsProperty<ChipThemeData>("chipTheme", this.chipTheme));
             properties.add(
                 new DiagnosticsProperty<MaterialTapTargetSize>("materialTapTargetSize", this.materialTapTargetSize));
             properties.add(

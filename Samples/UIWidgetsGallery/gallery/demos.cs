@@ -245,15 +245,15 @@ namespace UIWidgetsGallery.gallery {
                     documentationUrl: "https://docs.flutter.io/flutter/material/Card-class.html",
                     buildRoute: (BuildContext context) => new CardsDemo()
                 ),
-//                new GalleryDemo(
-//                    title: "Chips",
-//                    subtitle: "Labeled with delete buttons and avatars",
-//                    icon: GalleryIcons.chips,
-//                    category: GalleryDemoCategory._kMaterialComponents,
-//                    routeName: ChipDemo.routeName,
-//                    documentationUrl: "https://docs.flutter.io/flutter/material/Chip-class.html",
-//                    buildRoute: (BuildContext context) => ChipDemo()
-//                ),
+                new GalleryDemo(
+                    title: "Chips",
+                    subtitle: "Labeled with delete buttons and avatars",
+                    icon: GalleryIcons.chips,
+                    category: _kMaterialComponents,
+                    routeName: ChipDemo.routeName,
+                    documentationUrl: "https://docs.flutter.io/flutter/material/Chip-class.html",
+                    buildRoute: (BuildContext context) => new ChipDemo()
+                ),
 //                new GalleryDemo(
 //                    title: "Data tables",
 //                    subtitle: "Rows and columns",
