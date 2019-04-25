@@ -254,11 +254,11 @@ namespace Unity.UIWidgets.material {
         }
 
         public static bool operator ==(ChipThemeData left, ChipThemeData right) {
-            return left.Equals(right);
+            return Equals(left, right);
         }
 
         public static bool operator !=(ChipThemeData left, ChipThemeData right) {
-            return !left.Equals(right);
+            return !Equals(left, right);
         }
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {

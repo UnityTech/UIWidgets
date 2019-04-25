@@ -681,10 +681,7 @@ namespace Unity.UIWidgets.material {
             float? elevation = null,
             ShapeBorder avatarBorder = null
         ) : base(key: key) {
-            D.assert(selected != null);
-            D.assert(onSelected != null);
             D.assert(label != null);
-            D.assert(clipBehavior != null);
             D.assert(pressElevation == null || pressElevation >= 0.0f);
             D.assert(elevation == null || elevation >= 0.0f);
             this._avatarBorder = avatarBorder ?? new CircleBorder();
@@ -1013,7 +1010,6 @@ namespace Unity.UIWidgets.material {
         ) : base(key: key) {
             D.assert(label != null);
             D.assert(isEnabled != null);
-            D.assert(clipBehavior != null);
             D.assert(pressElevation == null || pressElevation >= 0.0f);
             D.assert(elevation == null || elevation >= 0.0f);
             deleteIcon = deleteIcon ?? ChipUtils._kDefaultDeleteIcon;
@@ -1438,8 +1434,8 @@ namespace Unity.UIWidgets.material {
             ChipThemeData chipTheme = ChipTheme.of(context);
             TextDirection textDirection = Directionality.of(context);
             ShapeBorder shape = this.widget.shape ?? chipTheme.shape;
-            float elevation = this.widget.elevation ?? chipTheme.elevation ?? _defaultElevation;
-            float pressElevation = this.widget.pressElevation ?? chipTheme.pressElevation ?? _defaultPressElevation;
+            float elevation = this.widget.elevation ?? (chipTheme.elevation ?? _defaultElevation);
+            float pressElevation = this.widget.pressElevation ?? (chipTheme.pressElevation ?? _defaultPressElevation);
 
             Widget result = new Material(
                 elevation: this.isTapping ? pressElevation : elevation,
@@ -1503,7 +1499,7 @@ namespace Unity.UIWidgets.material {
                 )
             );
             BoxConstraints constraints;
-            switch (this.widget.materialTapTargetSize) {
+            switch (this.widget.materialTapTargetSize ?? theme.materialTapTargetSize) {
                 case MaterialTapTargetSize.padded:
                     constraints = new BoxConstraints(minHeight: 48.0f);
                     break;
@@ -1657,7 +1653,7 @@ namespace Unity.UIWidgets.material {
         }
 
         void _mountChild(Widget widget, _ChipSlot slot) {
-            Element oldChild = this.slotToChild[slot];
+            Element oldChild = this.slotToChild.getOrDefault(slot);
             Element newChild = this.updateChild(oldChild, widget, slot);
             if (oldChild != null) {
                 this.slotToChild.Remove(slot);
@@ -1714,10 +1710,10 @@ namespace Unity.UIWidgets.material {
             }
         }
 
-        protected override void insertChildRenderObject(RenderObject child, dynamic slotValue) {
+        protected override void insertChildRenderObject(RenderObject child, object slotValue) {
             D.assert(child is RenderBox);
             D.assert(slotValue is _ChipSlot);
-            _ChipSlot slot = slotValue;
+            _ChipSlot slot = (_ChipSlot) slotValue;
             this._updateRenderObject(child, slot);
             D.assert(this.renderObject.childToSlot.ContainsKey((RenderBox) child));
             D.assert(this.renderObject.slotToChild.ContainsKey(slot));
@@ -1731,7 +1727,7 @@ namespace Unity.UIWidgets.material {
             D.assert(!this.renderObject.slotToChild.ContainsKey((_ChipSlot) this.slot));
         }
 
-        protected override void moveChildRenderObject(RenderObject child, dynamic slotValue) {
+        protected override void moveChildRenderObject(RenderObject child, object slotValue) {
             D.assert(false, "not reachable");
         }
     }
@@ -1798,11 +1794,11 @@ namespace Unity.UIWidgets.material {
         }
 
         public static bool operator ==(_ChipRenderTheme left, _ChipRenderTheme right) {
-            return left.Equals(right);
+            return Equals(left, right);
         }
 
         public static bool operator !=(_ChipRenderTheme left, _ChipRenderTheme right) {
-            return !left.Equals(right);
+            return !Equals(left, right);
         }
 
         public override int GetHashCode() {
@@ -1832,9 +1828,9 @@ namespace Unity.UIWidgets.material {
         ) {
             D.assert(theme != null);
             this._theme = theme;
-            this.checkmarkAnimation.addListener(this.markNeedsPaint);
+            checkmarkAnimation.addListener(this.markNeedsPaint);
             avatarDrawerAnimation.addListener(this.markNeedsLayout);
-            this.deleteDrawerAnimation.addListener(this.markNeedsLayout);
+            deleteDrawerAnimation.addListener(this.markNeedsLayout);
             enableAnimation.addListener(this.markNeedsPaint);
             this.value = value;
             this.isEnabled = isEnabled;
@@ -2141,11 +2137,10 @@ namespace Unity.UIWidgets.material {
 
 
             const float left = 0.0f;
-            float right = overallSize.width;
 
             Offset centerLayout(Size boxSize, float x) {
                 D.assert(contentSize >= boxSize.height);
-                return new Offset(x - boxSize.width, (contentSize - boxSize.height) / 2.0f);
+                return new Offset(x, (contentSize - boxSize.height) / 2.0f);
             }
 
             Offset avatarOffset = Offset.zero;
@@ -2202,11 +2197,11 @@ namespace Unity.UIWidgets.material {
             );
             this.size = this.constraints.constrain(paddedSize);
             D.assert(this.size.height == this.constraints.constrainHeight(paddedSize.height),
-                "Constrained height ${size.height} doesn't match expected height " +
-                "${constraints.constrainWidth(paddedSize.height)}");
+                $"Constrained height {this.size.height} doesn't match expected height " +
+                $"{this.constraints.constrainWidth(paddedSize.height)}");
             D.assert(this.size.width == this.constraints.constrainWidth(paddedSize.width),
-                "Constrained width ${size.width} doesn't match expected width " +
-                "${constraints.constrainWidth(paddedSize.width)}");
+                $"Constrained width {this.size.width} doesn't match expected width " +
+                $"{this.constraints.constrainWidth(paddedSize.width)}");
         }
 
         static ColorTween selectionScrimTween = new ColorTween(

@@ -50,11 +50,11 @@ namespace UIWidgetsGallery.gallery {
         };
 
         public static readonly Dictionary<string, string> _avatars = new Dictionary<string, string> {
-            {"hammer", "people/square/ali.png"},
-            {"chisel", "people/square/sandra.png"},
-            {"fryer", "people/square/trevor.png"},
-            {"fabricator", "people/square/stella.png"},
-            {"customer", "people/square/peter.png"}
+            {"hammer", "people/square/ali"},
+            {"chisel", "people/square/sandra"},
+            {"fryer", "people/square/trevor"},
+            {"fabricator", "people/square/stella"},
+            {"customer", "people/square/peter"}
         };
 
         public static readonly Dictionary<string, HashSet<string>> _toolActions =
