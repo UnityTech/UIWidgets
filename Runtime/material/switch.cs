@@ -1,6 +1,5 @@
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
-using Unity.UIWidgets.material;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.scheduler;
@@ -34,7 +33,8 @@ namespace Unity.UIWidgets.material {
             Color inactiveTrackColor = null,
             ImageProvider activeThumbImage = null,
             ImageProvider inactiveThumbImage = null,
-            MaterialTapTargetSize? materialTapTargetSize = null
+            MaterialTapTargetSize? materialTapTargetSize = null,
+            DragStartBehavior dragStartBehavior = DragStartBehavior.down
         ) : this(
             key: key,
             value: value,
@@ -46,7 +46,8 @@ namespace Unity.UIWidgets.material {
             activeThumbImage: activeThumbImage,
             inactiveThumbImage: inactiveThumbImage,
             materialTapTargetSize: materialTapTargetSize,
-            switchType: _SwitchType.material
+            switchType: _SwitchType.material,
+            dragStartBehavior: dragStartBehavior
         ) {
         }
 
@@ -61,7 +62,8 @@ namespace Unity.UIWidgets.material {
             ImageProvider activeThumbImage = null,
             ImageProvider inactiveThumbImage = null,
             MaterialTapTargetSize? materialTapTargetSize = null,
-            _SwitchType switchType = _SwitchType.material
+            _SwitchType switchType = _SwitchType.material,
+            DragStartBehavior dragStartBehavior = DragStartBehavior.down
         ) : base(key: key) {
             D.assert(value != null);
             this.value = value.Value;
@@ -75,6 +77,7 @@ namespace Unity.UIWidgets.material {
             this.inactiveThumbImage = inactiveThumbImage;
             this.materialTapTargetSize = materialTapTargetSize;
             this._switchType = switchType;
+            this.dragStartBehavior = dragStartBehavior;
         }
 
         public static Switch adaptive(
@@ -87,7 +90,8 @@ namespace Unity.UIWidgets.material {
             Color inactiveTrackColor = null,
             ImageProvider activeThumbImage = null,
             ImageProvider inactiveThumbImage = null,
-            MaterialTapTargetSize? materialTapTargetSize = null
+            MaterialTapTargetSize? materialTapTargetSize = null,
+            DragStartBehavior dragStartBehavior = DragStartBehavior.down
         ) {
             return new Switch(key: key,
                 value: value,
@@ -123,6 +127,8 @@ namespace Unity.UIWidgets.material {
 
         internal readonly _SwitchType _switchType;
 
+        public readonly DragStartBehavior dragStartBehavior;
+
         public override State createState() {
             return new _SwitchState();
         }
@@ -130,7 +136,8 @@ namespace Unity.UIWidgets.material {
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             properties.add(new FlagProperty("value", value: this.value, ifTrue: "on", ifFalse: "off", showName: true));
-            properties.add(new ObjectFlagProperty<ValueChanged<bool?>>("onChanged", this.onChanged, ifNull: "disabled"));
+            properties.add(
+                new ObjectFlagProperty<ValueChanged<bool?>>("onChanged", this.onChanged, ifNull: "disabled"));
         }
     }
 
@@ -142,6 +149,7 @@ namespace Unity.UIWidgets.material {
                 case MaterialTapTargetSize.shrinkWrap:
                     return new Size(Switch._kSwitchWidth, Switch._kSwitchHeightCollapsed);
             }
+
             D.assert(false);
             return null;
         }
@@ -161,13 +169,15 @@ namespace Unity.UIWidgets.material {
                 inactiveThumbColor = this.widget.inactiveThumbColor ??
                                      (isDark ? Colors.grey.shade400 : Colors.grey.shade50);
                 inactiveTrackColor = this.widget.inactiveTrackColor ?? (isDark ? Colors.white30 : black32);
-            } else {
+            }
+            else {
                 inactiveThumbColor = this.widget.inactiveThumbColor ??
                                      (isDark ? Colors.grey.shade800 : Colors.grey.shade400);
                 inactiveTrackColor = this.widget.inactiveTrackColor ?? (isDark ? Colors.white10 : Colors.black12);
             }
 
             return new _SwitchRenderObjectWidget(
+                dragStartBehavior: this.widget.dragStartBehavior,
                 value: this.widget.value,
                 activeColor: activeThumbColor,
                 inactiveColor: inactiveThumbColor,
@@ -233,7 +243,8 @@ namespace Unity.UIWidgets.material {
             ImageConfiguration configuration = null,
             ValueChanged<bool?> onChanged = null,
             TickerProvider vsync = null,
-            BoxConstraints additionalConstraints = null
+            BoxConstraints additionalConstraints = null,
+            DragStartBehavior? dragStartBehavior = null
         ) : base(key: key) {
             D.assert(value != null);
             this.value = value.Value;
@@ -247,6 +258,7 @@ namespace Unity.UIWidgets.material {
             this.onChanged = onChanged;
             this.vsync = vsync;
             this.additionalConstraints = additionalConstraints;
+            this.dragStartBehavior = dragStartBehavior;
         }
 
         public readonly bool value;
@@ -260,9 +272,11 @@ namespace Unity.UIWidgets.material {
         public readonly ValueChanged<bool?> onChanged;
         public readonly TickerProvider vsync;
         public readonly BoxConstraints additionalConstraints;
+        public readonly DragStartBehavior? dragStartBehavior;
 
         public override RenderObject createRenderObject(BuildContext context) {
             return new _RenderSwitch(
+                dragStartBehavior: this.dragStartBehavior,
                 value: this.value,
                 activeColor: this.activeColor,
                 inactiveColor: this.inactiveColor,
@@ -290,6 +304,7 @@ namespace Unity.UIWidgets.material {
             renderObject.configuration = this.configuration;
             renderObject.onChanged = this.onChanged;
             renderObject.additionalConstraints = this.additionalConstraints;
+            renderObject.dragStartBehavior = this.dragStartBehavior;
             renderObject.vsync = this.vsync;
         }
     }
@@ -306,7 +321,8 @@ namespace Unity.UIWidgets.material {
             ImageConfiguration configuration = null,
             BoxConstraints additionalConstraints = null,
             ValueChanged<bool?> onChanged = null,
-            TickerProvider vsync = null
+            TickerProvider vsync = null,
+            DragStartBehavior? dragStartBehavior = null
         ) : base(
             value: value,
             tristate: false,
@@ -325,6 +341,7 @@ namespace Unity.UIWidgets.material {
                 onStart = this._handleDragStart,
                 onUpdate = this._handleDragUpdate,
                 onEnd = this._handleDragEnd,
+                dragStartBehavior = dragStartBehavior ?? DragStartBehavior.down
             };
         }
 
@@ -334,6 +351,7 @@ namespace Unity.UIWidgets.material {
                 if (value == this._activeThumbImage) {
                     return;
                 }
+
                 this._activeThumbImage = value;
                 this.markNeedsPaint();
             }
@@ -347,6 +365,7 @@ namespace Unity.UIWidgets.material {
                 if (value == this._inactiveThumbImage) {
                     return;
                 }
+
                 this._inactiveThumbImage = value;
                 this.markNeedsPaint();
             }
@@ -361,6 +380,7 @@ namespace Unity.UIWidgets.material {
                 if (value == this._activeTrackColor) {
                     return;
                 }
+
                 this._activeTrackColor = value;
                 this.markNeedsPaint();
             }
@@ -375,6 +395,7 @@ namespace Unity.UIWidgets.material {
                 if (value == this._inactiveTrackColor) {
                     return;
                 }
+
                 this._inactiveTrackColor = value;
                 this.markNeedsPaint();
             }
@@ -389,12 +410,19 @@ namespace Unity.UIWidgets.material {
                 if (value == this._configuration) {
                     return;
                 }
+
                 this._configuration = value;
                 this.markNeedsPaint();
             }
         }
 
         ImageConfiguration _configuration;
+
+        public DragStartBehavior? dragStartBehavior {
+            get { return this._drag.dragStartBehavior; }
+            set { this._drag.dragStartBehavior = value ?? DragStartBehavior.down; }
+        }
+
 
         public override void detach() {
             this._cachedThumbPainter?.Dispose();
@@ -426,9 +454,11 @@ namespace Unity.UIWidgets.material {
         void _handleDragEnd(DragEndDetails details) {
             if (this.position.value >= 0.5) {
                 this.positionController.forward();
-            } else {
+            }
+            else {
                 this.positionController.reverse();
             }
+
             this.reactionController.reverse();
         }
 
@@ -437,6 +467,7 @@ namespace Unity.UIWidgets.material {
             if (evt is PointerDownEvent && this.onChanged != null) {
                 this._drag.addPointer((PointerDownEvent) evt);
             }
+
             base.handleEvent(evt, entry);
         }
 
@@ -464,14 +495,22 @@ namespace Unity.UIWidgets.material {
         public override void paint(PaintingContext context, Offset offset) {
             Canvas canvas = context.canvas;
 
-            bool isActive = this.onChanged != null;
+            bool isEnabled = this.onChanged != null;
             float currentValue = this.position.value;
 
             float visualPosition = currentValue;
 
-            Color trackColor = isActive
+            Color trackColor = isEnabled
                 ? Color.lerp(this.inactiveTrackColor, this.activeTrackColor, currentValue)
                 : this.inactiveTrackColor;
+
+            Color thumbColor = isEnabled
+                ? Color.lerp(this.inactiveColor, this.activeColor, currentValue)
+                : this.inactiveColor;
+
+            ImageProvider thumbImage = isEnabled
+                ? (currentValue < 0.5 ? this.inactiveThumbImage : this.activeThumbImage)
+                : this.inactiveThumbImage;
 
             // Paint the track
             Paint paint = new Paint {color = trackColor};
@@ -495,12 +534,6 @@ namespace Unity.UIWidgets.material {
             try {
                 this._isPainting = true;
                 BoxPainter thumbPainter;
-                Color thumbColor = isActive
-                    ? Color.lerp(this.inactiveColor, this.activeColor, currentValue)
-                    : this.inactiveColor;
-                ImageProvider thumbImage = isActive
-                    ? (currentValue < 0.5 ? this.inactiveThumbImage : this.activeThumbImage)
-                    : this.inactiveThumbImage;
                 if (this._cachedThumbPainter == null || thumbColor != this._cachedThumbColor ||
                     thumbImage != this._cachedThumbImage) {
                     this._cachedThumbColor = thumbColor;
@@ -508,6 +541,7 @@ namespace Unity.UIWidgets.material {
                     this._cachedThumbPainter = this._createDefaultThumbDecoration(thumbColor, thumbImage)
                         .createBoxPainter(this._handleDecorationChanged);
                 }
+
                 thumbPainter = this._cachedThumbPainter;
 
                 float inset = 1.0f - (currentValue - 0.5f).abs() * 2.0f;
@@ -517,7 +551,8 @@ namespace Unity.UIWidgets.material {
                     thumbPosition + offset - new Offset(radius, radius),
                     this.configuration.copyWith(size: Size.fromRadius(radius))
                 );
-            } finally {
+            }
+            finally {
                 this._isPainting = false;
             }
         }
