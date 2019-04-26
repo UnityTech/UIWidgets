@@ -28,7 +28,7 @@ namespace Unity.UIWidgets.material {
         }
     }
 
-    public class FloatingActionButton : StatefulWidget {
+    public class FloatingActionButton : StatelessWidget {
         FloatingActionButton(
             Key key = null,
             Widget child = null,
@@ -38,6 +38,7 @@ namespace Unity.UIWidgets.material {
             object heroTag = null,
             float elevation = 6.0f,
             float highlightElevation = 12.0f,
+            float? disabledElevation = null,
             VoidCallback onPressed = null,
             bool mini = false,
             ShapeBorder shape = null,
@@ -46,6 +47,9 @@ namespace Unity.UIWidgets.material {
             bool isExtended = false,
             BoxConstraints _sizeConstraints = null
         ) : base(key: key) {
+            D.assert(elevation >= 0.0f);
+            D.assert(highlightElevation >= 0.0f);
+            D.assert(disabledElevation == null || disabledElevation >= 0.0f);
             heroTag = heroTag ?? new _DefaultHeroTag();
             shape = shape ?? new CircleBorder();
             this.child = child;
@@ -61,8 +65,8 @@ namespace Unity.UIWidgets.material {
             this.clipBehavior = clipBehavior;
             this.materialTapTargetSize = materialTapTargetSize;
             this.isExtended = isExtended;
-            this._sizeConstraints = _sizeConstraints ??
-                                    (mini
+            this.disabledElevation = disabledElevation;
+            this._sizeConstraints = _sizeConstraints ?? (mini
                                         ? FloatActionButtonUtils._kMiniSizeConstraints
                                         : FloatActionButtonUtils._kSizeConstraints);
         }
@@ -107,6 +111,7 @@ namespace Unity.UIWidgets.material {
             object heroTag = null,
             float elevation = 6.0f,
             float highlightElevation = 12.0f,
+            float? disabledElevation = null,
             VoidCallback onPressed = null,
             ShapeBorder shape = null,
             bool isExtended = true,
@@ -115,10 +120,13 @@ namespace Unity.UIWidgets.material {
             Widget icon = null,
             Widget label = null
         ) {
-            heroTag = heroTag ?? new _DefaultHeroTag();
-            shape = shape ?? new StadiumBorder();
+            D.assert(elevation >= 0.0f);
+            D.assert(highlightElevation >= 0.0f);
+            D.assert(disabledElevation != null && disabledElevation >= 0.0f);
             D.assert(icon != null);
             D.assert(label != null);
+            heroTag = heroTag ?? new _DefaultHeroTag();
+            shape = shape ?? new StadiumBorder();
 
             BoxConstraints _sizeConstraints = FloatActionButtonUtils._kExtendedSizeConstraints;
             bool mini = false;
@@ -142,6 +150,7 @@ namespace Unity.UIWidgets.material {
                 heroTag: heroTag,
                 elevation: elevation,
                 highlightElevation: highlightElevation,
+                disabledElevation: disabledElevation ?? elevation,
                 onPressed: onPressed,
                 mini: mini,
                 shape: shape,
@@ -168,6 +177,8 @@ namespace Unity.UIWidgets.material {
 
         public readonly float highlightElevation;
 
+        public readonly float? disabledElevation;
+
         public readonly bool mini;
 
         public readonly ShapeBorder shape;
@@ -180,58 +191,45 @@ namespace Unity.UIWidgets.material {
 
         public readonly BoxConstraints _sizeConstraints;
 
-        public override State createState() {
-            return new _FloatingActionButtonState();
-        }
-    }
-
-
-    public class _FloatingActionButtonState : State<FloatingActionButton> {
-        bool _highlight = false;
-
-        void _handleHighlightChanged(bool value) {
-            this.setState(() => { this._highlight = value; });
-        }
-
         public override Widget build(BuildContext context) {
             ThemeData theme = Theme.of(context);
-            Color foregroundColor = this.widget.foregroundColor ?? theme.accentIconTheme.color;
+            Color foregroundColor = this.foregroundColor ?? theme.accentIconTheme.color;
             Widget result = null;
 
-            if (this.widget.child != null) {
+            if (this.child != null) {
                 result = IconTheme.merge(
                     data: new IconThemeData(
                         color: foregroundColor),
-                    child: this.widget.child
+                    child: this.child
                 );
             }
 
             result = new RawMaterialButton(
-                onPressed: this.widget.onPressed,
-                onHighlightChanged: this._handleHighlightChanged,
-                elevation: this._highlight ? this.widget.highlightElevation : this.widget.elevation,
-                constraints: this.widget._sizeConstraints,
-                materialTapTargetSize: this.widget.materialTapTargetSize ?? theme.materialTapTargetSize,
-                fillColor: this.widget.backgroundColor ?? theme.accentColor,
+                onPressed: this.onPressed,
+                elevation: this.elevation,
+                highlightElevation: this.highlightElevation,
+                disabledElevation: this.disabledElevation ?? this.elevation,
+                constraints: this._sizeConstraints,
+                materialTapTargetSize: this.materialTapTargetSize ?? theme.materialTapTargetSize,
+                fillColor: this.backgroundColor ?? theme.accentColor,
                 textStyle: theme.accentTextTheme.button.copyWith(
                     color: foregroundColor,
                     letterSpacing: 1.2f),
-                shape: this.widget.shape,
-                clipBehavior: this.widget.clipBehavior,
+                shape: this.shape,
+                clipBehavior: this.clipBehavior,
                 child: result);
 
-            if (this.widget.tooltip != null) {
+            if (this.tooltip != null) {
                 result = new Tooltip(
-                    message: this.widget.tooltip,
+                    message: this.tooltip,
                     child: result);
             }
 
-            //todo: xingwei.zhu: Hero widget
-//            if (this.widget.heroTag != null) {
-//                result = new Hero(
-//                    tag: this.widget.heroTag,
-//                    child: result);
-//            }
+            if (this.heroTag != null) {
+                result = new Hero(
+                    tag: this.heroTag,
+                    child: result);
+            }
 
             return result;
         }
