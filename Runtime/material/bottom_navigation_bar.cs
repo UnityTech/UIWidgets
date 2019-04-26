@@ -446,41 +446,30 @@ namespace Unity.UIWidgets.material {
                     break;
             }
 
-            return new Stack(
-                children: new List<Widget> {
-                    Positioned.fill(
-                        child: new Material( // Casts shadow.
-                            elevation: 8.0f,
-                            color: backgroundColor
-                        )
-                    ),
-                    new ConstrainedBox(
-                        constraints: new BoxConstraints(
-                            minHeight: Constants.kBottomNavigationBarHeight + additionalBottomPadding),
-                        child: new Stack(
-                            children: new List<Widget> {
-                                Positioned.fill(
-                                    child: new CustomPaint(
-                                        painter: new _RadialPainter(
-                                            circles: this._circles.ToList()
-                                        )
-                                    )
-                                ),
-                                new Material( // Splashes.
-                                    type: MaterialType.transparency,
-                                    child: new Padding(
-                                        padding: EdgeInsets.only(bottom: additionalBottomPadding),
-                                        child: MediaQuery.removePadding(
-                                            context: context,
-                                            removeBottom: true,
-                                            child: this._createContainer(this._createTiles())
-                                        )
-                                    )
+
+            return new Material(
+                elevation: 8.0f,
+                color: backgroundColor,
+                child: new ConstrainedBox(
+                    constraints: new BoxConstraints(
+                        minHeight: Constants.kBottomNavigationBarHeight + additionalBottomPadding),
+                    child: new CustomPaint(
+                        painter: new _RadialPainter(
+                            circles: this._circles.ToList()
+                        ),
+                        child: new Material( // Splashes.
+                            type: MaterialType.transparency,
+                            child: new Padding(
+                                padding: EdgeInsets.only(bottom: additionalBottomPadding),
+                                child: MediaQuery.removePadding(
+                                    context: context,
+                                    removeBottom: true,
+                                    child: this._createContainer(this._createTiles())
                                 )
-                            }
+                            )
                         )
                     )
-                }
+                )
             );
         }
     }

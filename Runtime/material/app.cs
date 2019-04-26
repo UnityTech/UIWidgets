@@ -33,6 +33,7 @@ namespace Unity.UIWidgets.material {
             string title = "",
             Color color = null,
             ThemeData theme = null,
+            ThemeData darkTheme = null,
             Locale locale = null,
             List<LocalizationsDelegate<MaterialLocalizations>> localizationsDelegates = null,
             LocaleListResolutionCallback localeListResolutionCallback = null,
@@ -52,6 +53,7 @@ namespace Unity.UIWidgets.material {
             this.title = title;
             this.color = color;
             this.theme = theme;
+            this.dartTheme = darkTheme;
             this.locale = locale;
             this.localizationsDelegates = localizationsDelegates;
             this.localeListResolutionCallback = localeListResolutionCallback;
@@ -79,6 +81,8 @@ namespace Unity.UIWidgets.material {
         public readonly string title;
 
         public readonly ThemeData theme;
+
+        public readonly ThemeData dartTheme;
 
         public readonly Color color;
 
@@ -143,30 +147,36 @@ namespace Unity.UIWidgets.material {
         }
 
         public override Widget build(BuildContext context) {
-            ThemeData theme = this.widget.theme ?? ThemeData.fallback();
-            Widget result = new AnimatedTheme(
-                data: theme,
-                isMaterialAppTheme: true,
-                child: new WidgetsApp(
-                    key: new GlobalObjectKey<State>(this),
-                    navigatorKey: this.widget.navigatorKey,
-                    navigatorObservers: this._navigatorObservers,
-                    pageRouteBuilder: (RouteSettings settings, WidgetBuilder builder) =>
-                        new MaterialPageRoute(settings: settings, builder: builder),
-                    home: this.widget.home,
-                    routes: this.widget.routes,
-                    initialRoute: this.widget.initialRoute,
-                    onGenerateRoute: this.widget.onGenerateRoute,
-                    onUnknownRoute: this.widget.onUnknownRoute,
-                    builder: this.widget.builder,
-                    textStyle: AppUtils._errorTextStyle,
-                    locale: this.widget.locale,
-                    localizationsDelegates: this._localizationsDelegates,
-                    localeResolutionCallback: this.widget.localeResolutionCallback,
-                    localeListResolutionCallback: this.widget.localeListResolutionCallback,
-                    supportedLocales: this.widget.supportedLocales,
-                    showPerformanceOverlay: this.widget.showPerformanceOverlay
-                )
+            Widget result = new WidgetsApp(
+                key: new GlobalObjectKey<State>(this),
+                navigatorKey: this.widget.navigatorKey,
+                navigatorObservers: this._navigatorObservers,
+                pageRouteBuilder: (RouteSettings settings, WidgetBuilder builder) =>
+                    new MaterialPageRoute(settings: settings, builder: builder),
+                home: this.widget.home,
+                routes: this.widget.routes,
+                initialRoute: this.widget.initialRoute,
+                onGenerateRoute: this.widget.onGenerateRoute,
+                onUnknownRoute: this.widget.onUnknownRoute,
+                builder: (BuildContext congtext, Widget child) => {
+                    ThemeData theme = this.widget.theme ?? ThemeData.fallback();
+                    return new AnimatedTheme(
+                        data: theme,
+                        isMaterialAppTheme: true,
+                        child: this.widget.builder != null
+                            ? new Builder(
+                                builder: (_context) => { return this.widget.builder(_context, child); }
+                            )
+                            : child
+                    );
+                },
+                textStyle: AppUtils._errorTextStyle,
+                locale: this.widget.locale,
+                localizationsDelegates: this._localizationsDelegates,
+                localeResolutionCallback: this.widget.localeResolutionCallback,
+                localeListResolutionCallback: this.widget.localeListResolutionCallback,
+                supportedLocales: this.widget.supportedLocales,
+                showPerformanceOverlay: this.widget.showPerformanceOverlay
             );
 
             return result;

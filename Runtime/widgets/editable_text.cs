@@ -4,6 +4,7 @@ using RSG;
 using Unity.UIWidgets.animation;
 using Unity.UIWidgets.async;
 using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.scheduler;
@@ -81,6 +82,8 @@ namespace Unity.UIWidgets.widgets {
 
         public readonly Color cursorColor;
 
+        public readonly Color backgroundCursorColor;
+
         public readonly int? maxLines;
 
         public readonly bool autofocus;
@@ -106,7 +109,7 @@ namespace Unity.UIWidgets.widgets {
         public readonly bool unityTouchKeyboard;
 
         public EditableText(TextEditingController controller, FocusNode focusNode, TextStyle style,
-            Color cursorColor, bool obscureText = false, bool autocorrect = false,
+            Color cursorColor, Color backgroundCursorColor = null, bool obscureText = false, bool autocorrect = false,
             TextAlign textAlign = TextAlign.left, TextDirection? textDirection = null,
             float? textScaleFactor = null, int? maxLines = 1,
             bool autofocus = false, Color selectionColor = null, TextSelectionControls selectionControls = null,
@@ -116,14 +119,18 @@ namespace Unity.UIWidgets.widgets {
             ValueChanged<string> onSubmitted = null, SelectionChangedCallback onSelectionChanged = null,
             List<TextInputFormatter> inputFormatters = null, bool rendererIgnoresPointer = false,
             EdgeInsets scrollPadding = null, bool unityTouchKeyboard = false,
-            Key key = null, float? cursorWidth = 2.0f, Radius cursorRadius = null, Brightness? keyboardAppearance = Brightness.light,
-            bool enableInteractiveSelection = true
-            ) : base(key) {
+            Key key = null, float? cursorWidth = 2.0f, Radius cursorRadius = null, bool cursorOpacityAnimates = false,
+            Offset cursorOffset = null, bool paintCursorAboveText = false,
+            Brightness? keyboardAppearance = Brightness.light,
+            DragStartBehavior dragStartBehavior = DragStartBehavior.down,
+            bool? enableInteractiveSelection = null
+        ) : base(key) {
             D.assert(controller != null);
             D.assert(focusNode != null);
             D.assert(style != null);
             D.assert(cursorColor != null);
             D.assert(maxLines == null || maxLines > 0);
+            D.assert(backgroundCursorColor != null);
             this.keyboardType = keyboardType ?? (maxLines == 1 ? TextInputType.text : TextInputType.multiline);
 
             this.scrollPadding = scrollPadding ?? EdgeInsets.all(20.0f);
@@ -161,17 +168,29 @@ namespace Unity.UIWidgets.widgets {
 
             this.cursorWidth = cursorWidth;
             this.cursorRadius = cursorRadius;
+            this.cursorOpacityAnimates = cursorOpacityAnimates;
+            this.cursorOffset = cursorOffset;
+            this.paintCursorAboveText = paintCursorAboveText;
             this.keyboardAppearance = keyboardAppearance;
             this.enableInteractiveSelection = enableInteractiveSelection;
+            this.dragStartBehavior = dragStartBehavior;
         }
 
         public readonly float? cursorWidth;
         public readonly Radius cursorRadius;
+        public readonly bool cursorOpacityAnimates;
+        public readonly Offset cursorOffset;
+        public readonly bool paintCursorAboveText;
         public readonly Brightness? keyboardAppearance;
         public readonly EdgeInsets scrollPadding;
+        public readonly DragStartBehavior dragStartBehavior;
 
-        public readonly bool enableInteractiveSelection;
-        
+        public readonly bool? enableInteractiveSelection;
+
+        public bool selectionEnabled {
+            get { return this.enableInteractiveSelection ?? !this.obscureText; }
+        }
+
         public override State createState() {
             return new EditableTextState();
         }
@@ -199,16 +218,22 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
-    public class EditableTextState : AutomaticKeepAliveClientMixin<EditableText>, WidgetsBindingObserver, TextInputClient,
+    public class EditableTextState : AutomaticKeepAliveClientWithTickerProviderStateMixin<EditableText>,
+        WidgetsBindingObserver, TextInputClient,
         TextSelectionDelegate {
         const int _kObscureShowLatestCharCursorTicks = 3;
         static TimeSpan _kCursorBlinkHalfPeriod = TimeSpan.FromMilliseconds(500);
+        static TimeSpan _kCursorBlinkWaitForStart = TimeSpan.FromMilliseconds(150);
+        static readonly TimeSpan _fadeDuration = TimeSpan.FromMilliseconds(500);
+        static readonly TimeSpan _floatingCursorResetTime = TimeSpan.FromMilliseconds(150);
         Timer _cursorTimer;
-        ValueNotifier<bool> _showCursor = new ValueNotifier<bool>(false);
+        bool _targetCursorVisibility = false;
+        ValueNotifier<bool> _cursorVisibilityNotifier = new ValueNotifier<bool>(false);
         GlobalKey _editableKey = GlobalKey.key();
         LayerLink _layerLink = new LayerLink();
         bool _didAutoFocus = false;
         public ScrollController _scrollController = new ScrollController();
+        AnimationController _cursorBlinkOpacityController;
 
         TextInputConnection _textInputConnection;
         TextSelectionOverlay _selectionOverlay;
@@ -380,9 +405,8 @@ namespace Unity.UIWidgets.widgets {
                                      ? TextInputAction.newline
                                      : TextInputAction.done),
                     textCapitalization: this.widget.textCapitalization,
-                    keyboardAppearance: this.widget.keyboardAppearance??Brightness.light,
+                    keyboardAppearance: this.widget.keyboardAppearance ?? Brightness.light,
                     unityTouchKeyboard: this.widget.unityTouchKeyboard
-                                 
                 ));
                 this._textInputConnection.setEditingState(localValue);
                 this._updateImePosIfNeed();
@@ -518,21 +542,23 @@ namespace Unity.UIWidgets.widgets {
                 );
             });
         }
-        
-        
+
+
         double _lastBottomViewInset;
 
         public void didChangeMetrics() {
-           if (this._lastBottomViewInset < Window.instance.viewInsets.bottom) {
-               this._showCaretOnScreen();
+            if (this._lastBottomViewInset < Window.instance.viewInsets.bottom) {
+                this._showCaretOnScreen();
             }
 
-           this._lastBottomViewInset = Window.instance.viewInsets.bottom;
+            this._lastBottomViewInset = Window.instance.viewInsets.bottom;
         }
 
-        public void didChangeTextScaleFactor() {}
+        public void didChangeTextScaleFactor() {
+        }
 
-        public void didChangeLocales(List<Locale> locale) {}
+        public void didChangeLocales(List<Locale> locale) {
+        }
 
         public IPromise<bool> didPopRoute() {
             return Promise<bool>.Resolved(false);
@@ -563,7 +589,7 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public bool cursorCurrentlyVisible {
-            get { return this._showCursor.value; }
+            get { return this._cursorVisibilityNotifier.value; }
         }
 
         public TimeSpan cursorBlinkInterval {
@@ -571,14 +597,14 @@ namespace Unity.UIWidgets.widgets {
         }
 
         void _cursorTick() {
-            this._showCursor.value = !this._unityKeyboard() && !this._showCursor.value;
+            this._cursorVisibilityNotifier.value = !this._unityKeyboard() && !this._cursorVisibilityNotifier.value;
             if (this._obscureShowCharTicksPending > 0) {
                 this.setState(() => { this._obscureShowCharTicksPending--; });
             }
         }
 
         void _startCursorTimer() {
-            this._showCursor.value = !this._unityKeyboard();
+            this._cursorVisibilityNotifier.value = !this._unityKeyboard();
             this._cursorTimer = Window.instance.run(_kCursorBlinkHalfPeriod, this._cursorTick,
                 periodic: true);
         }
@@ -589,7 +615,7 @@ namespace Unity.UIWidgets.widgets {
             }
 
             this._cursorTimer = null;
-            this._showCursor.value = false;
+            this._cursorVisibilityNotifier.value = false;
             this._obscureShowCharTicksPending = 0;
         }
 
@@ -628,6 +654,7 @@ namespace Unity.UIWidgets.widgets {
                 WidgetsBinding.instance.removeObserver(this);
                 this._value = new TextEditingValue(text: this._value.text);
             }
+
             this.updateKeepAlive();
         }
 
@@ -678,7 +705,7 @@ namespace Unity.UIWidgets.widgets {
                             textSpan: this.buildTextSpan(),
                             value: this._value,
                             cursorColor: this.widget.cursorColor,
-                            showCursor: this._showCursor,
+                            showCursor: this._cursorVisibilityNotifier,
                             hasFocus: this._hasFocus,
                             maxLines: this.widget.maxLines,
                             selectionColor: this.widget.selectionColor,
@@ -693,7 +720,7 @@ namespace Unity.UIWidgets.widgets {
                             rendererIgnoresPointer: this.widget.rendererIgnoresPointer,
                             cursorWidth: this.widget.cursorWidth,
                             cursorRadius: this.widget.cursorRadius,
-                            enableInteractiveSelection: this.widget.enableInteractiveSelection,
+                            enableInteractiveSelection: this.widget.enableInteractiveSelection == true,
                             textSelectionDelegate: this
                         )
                     )
@@ -746,6 +773,7 @@ namespace Unity.UIWidgets.widgets {
         }
 
         bool _imePosUpdateScheduled = false;
+
         void _updateImePosIfNeed() {
             if (!this._hasInputConnection || !this._textInputConnection.imeRequired()) {
                 return;
@@ -754,13 +782,14 @@ namespace Unity.UIWidgets.widgets {
             if (this._imePosUpdateScheduled) {
                 return;
             }
-            
+
             this._imePosUpdateScheduled = true;
             SchedulerBinding.instance.addPostFrameCallback(_ => {
                 this._imePosUpdateScheduled = false;
                 if (!this._hasInputConnection) {
                     return;
                 }
+
                 this._textInputConnection.setIMEPos(this._getImePos());
             });
         }
@@ -795,7 +824,7 @@ namespace Unity.UIWidgets.widgets {
             TextDirection? textDirection = null, bool obscureText = false, TextAlign textAlign = TextAlign.left,
             bool autocorrect = false, ViewportOffset offset = null, SelectionChangedHandler onSelectionChanged = null,
             CaretChangedHandler onCaretChanged = null, bool rendererIgnoresPointer = false,
-            Key key = null, TextSelectionDelegate textSelectionDelegate = null, float? cursorWidth = null, 
+            Key key = null, TextSelectionDelegate textSelectionDelegate = null, float? cursorWidth = null,
             Radius cursorRadius = null, bool enableInteractiveSelection = true) : base(key) {
             this.textSpan = textSpan;
             this.value = value;
@@ -817,7 +846,6 @@ namespace Unity.UIWidgets.widgets {
             this.cursorWidth = cursorWidth;
             this.cursorRadius = cursorRadius;
             this.enableInteractiveSelection = enableInteractiveSelection;
-
         }
 
         public override RenderObject createRenderObject(BuildContext context) {
@@ -837,7 +865,7 @@ namespace Unity.UIWidgets.widgets {
                 onSelectionChanged: this.onSelectionChanged,
                 onCaretChanged: this.onCaretChanged,
                 ignorePointer: this.rendererIgnoresPointer,
-                cursorWidth: this.cursorWidth??1.0f,
+                cursorWidth: this.cursorWidth ?? 1.0f,
                 cursorRadius: this.cursorRadius,
                 enableInteractiveSelection: this.enableInteractiveSelection,
                 textSelectionDelegate: this.textSelectionDelegate

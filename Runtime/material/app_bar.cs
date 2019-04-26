@@ -46,7 +46,7 @@ namespace Unity.UIWidgets.material {
             List<Widget> actions = null,
             Widget flexibleSpace = null,
             PreferredSizeWidget bottom = null,
-            float elevation = 4.0f,
+            float? elevation = null,
             Color backgroundColor = null,
             Brightness? brightness = null,
             IconThemeData iconTheme = null,
@@ -57,6 +57,7 @@ namespace Unity.UIWidgets.material {
             float toolbarOpacity = 1.0f,
             float bottomOpacity = 1.0f
         ) : base(key: key) {
+            D.assert(elevation == null || elevation >= 0.0);
             this.leading = leading;
             this.automaticallyImplyLeading = automaticallyImplyLeading;
             this.title = title;
@@ -88,7 +89,7 @@ namespace Unity.UIWidgets.material {
 
         public readonly PreferredSizeWidget bottom;
 
-        public readonly float elevation;
+        public readonly float? elevation;
 
         public readonly Color backgroundColor;
 
@@ -130,6 +131,8 @@ namespace Unity.UIWidgets.material {
 
 
     class _AppBarState : State<AppBar> {
+        const float _defaultElevation = 4.0f;
+
         void _handleDrawerButton() {
             Scaffold.of(this.context).openDrawer();
         }
@@ -141,6 +144,7 @@ namespace Unity.UIWidgets.material {
         public override Widget build(BuildContext context) {
             D.assert(MaterialD.debugCheckHasMaterialLocalizations(context));
             ThemeData themeData = Theme.of(context);
+            AppBarTheme appBarTheme = AppBarTheme.of(context);
             ScaffoldState scaffold = Scaffold.of(context, nullOk: true);
             ModalRoute parentRoute = ModalRoute.of(context);
 
@@ -149,9 +153,15 @@ namespace Unity.UIWidgets.material {
             bool canPop = parentRoute?.canPop ?? false;
             bool useCloseButton = parentRoute is PageRoute && ((PageRoute) parentRoute).fullscreenDialog;
 
-            IconThemeData appBarIconTheme = this.widget.iconTheme ?? themeData.primaryIconTheme;
-            TextStyle centerStyle = this.widget.textTheme?.title ?? themeData.primaryTextTheme.title;
-            TextStyle sideStyle = this.widget.textTheme?.body1 ?? themeData.primaryTextTheme.body1;
+            IconThemeData appBarIconTheme = this.widget.iconTheme
+                                            ?? appBarTheme.iconTheme
+                                            ?? themeData.primaryIconTheme;
+            TextStyle centerStyle = this.widget.textTheme?.title
+                                    ?? appBarTheme.textTheme?.title
+                                    ?? themeData.primaryTextTheme.title;
+            TextStyle sideStyle = this.widget.textTheme?.body1
+                                  ?? appBarTheme.textTheme?.body1
+                                  ?? themeData.primaryTextTheme.body1;
 
             if (this.widget.toolbarOpacity != 1.0f) {
                 float opacity =
@@ -273,7 +283,9 @@ namespace Unity.UIWidgets.material {
                 );
             }
 
-            Brightness brightness = this.widget.brightness ?? themeData.primaryColorBrightness;
+            Brightness brightness = this.widget.brightness
+                                    ?? appBarTheme.brightness
+                                    ?? themeData.primaryColorBrightness;
             SystemUiOverlayStyle overlayStyle = brightness == Brightness.dark
                 ? SystemUiOverlayStyle.light
                 : SystemUiOverlayStyle.dark;
@@ -281,8 +293,12 @@ namespace Unity.UIWidgets.material {
             return new AnnotatedRegion<SystemUiOverlayStyle>(
                 value: overlayStyle,
                 child: new Material(
-                    color: this.widget.backgroundColor ?? themeData.primaryColor,
-                    elevation: this.widget.elevation,
+                    color: this.widget.backgroundColor
+                           ?? appBarTheme.color
+                           ?? themeData.primaryColor,
+                    elevation: this.widget.elevation
+                               ?? appBarTheme.elevation
+                               ?? _defaultElevation,
                     child: appBar
                 ));
         }
@@ -442,9 +458,9 @@ namespace Unity.UIWidgets.material {
 
         public override Widget build(BuildContext context, float shrinkOffset, bool overlapsContent) {
             float? visibleMainHeight = this.maxExtent - shrinkOffset - this.topPadding;
-            float toolbarOpacity = this.pinned && !this.floating
-                ? 1.0f
-                : ((visibleMainHeight - this._bottomHeight) / Constants.kToolbarHeight)?.clamp(0.0f, 1.0f) ?? 0.0f;
+            float toolbarOpacity = !this.pinned || (!this.floating && this.bottom != null)
+                ? ((visibleMainHeight - this._bottomHeight) / Constants.kToolbarHeight)?.clamp(0.0f, 1.0f) ?? 1.0f
+                : 1.0f;
             Widget appBar = FlexibleSpaceBar.createSettings(
                 minExtent: this.minExtent,
                 maxExtent: this.maxExtent,

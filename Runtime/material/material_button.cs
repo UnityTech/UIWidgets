@@ -106,6 +106,7 @@ namespace Unity.UIWidgets.material {
 
             return new RawMaterialButton(
                 onPressed: this.onPressed,
+                onHighlightChanged: this.onHighlightChanged,
                 fillColor: this.color,
                 textStyle: theme.textTheme.button.copyWith(color: buttonTheme.getTextColor(this)),
                 highlightColor: this.highlightColor ?? theme.highlightColor,

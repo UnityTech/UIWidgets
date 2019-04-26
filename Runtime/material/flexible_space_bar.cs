@@ -21,11 +21,13 @@ namespace Unity.UIWidgets.material {
             Widget title = null,
             Widget background = null,
             bool? centerTitle = null,
+            EdgeInsets titlePadding = null,
             CollapseMode collapseMode = CollapseMode.parallax
         ) : base(key: key) {
             this.title = title;
             this.background = background;
             this.centerTitle = centerTitle;
+            this.titlePadding = titlePadding;
             this.collapseMode = collapseMode;
         }
 
@@ -34,8 +36,10 @@ namespace Unity.UIWidgets.material {
         public readonly Widget background;
 
         public readonly bool? centerTitle;
-
+        
         public readonly CollapseMode collapseMode;
+
+        public readonly EdgeInsets titlePadding;
 
         public static Widget createSettings(
             float? toolbarOpacity = null,
@@ -149,16 +153,17 @@ namespace Unity.UIWidgets.material {
                     color: titleStyle.color.withOpacity(toolbarOpacity));
 
                 bool effectiveCenterTitle = this._getEffectiveCenterTitle(theme).Value;
+                EdgeInsets padding = this.widget.titlePadding ??
+                    EdgeInsets.only(
+                        left: effectiveCenterTitle ? 0.0f : 72.0f,
+                        bottom: 16.0f
+                    );
                 float scaleValue = new FloatTween(begin: 1.5f, end: 1.0f).lerp(t);
                 Matrix3 scaleTransform = Matrix3.makeScale(scaleValue, scaleValue);
                 Alignment titleAlignment = this._getTitleAlignment(effectiveCenterTitle);
 
                 children.Add(new Container(
-                        padding: EdgeInsets.fromLTRB(
-                            effectiveCenterTitle ? 0.0f : 72.0f,
-                            0f,
-                            0f,
-                            16.0f),
+                        padding: padding,
                         child: new Transform(
                             alignment: titleAlignment,
                             transform: scaleTransform,
