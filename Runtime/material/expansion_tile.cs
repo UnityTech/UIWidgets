@@ -121,7 +121,6 @@ namespace Unity.UIWidgets.material {
 
         Widget _buildChildren(BuildContext context, Widget child) {
             Color borderSideColor = this._borderColor.value ?? Colors.transparent;
-            Color titleColor = this._headerColor.value;
 
             return new Container(
                 decoration: new BoxDecoration(
@@ -132,15 +131,13 @@ namespace Unity.UIWidgets.material {
                 child: new Column(
                     mainAxisSize: MainAxisSize.min,
                     children: new List<Widget> {
-                        IconTheme.merge(
-                            data: new IconThemeData(color: this._iconColor.value),
+                        ListTileTheme.merge(
+                            iconColor: this._iconColor.value,
+                            textColor: this._headerColor.value,
                             child: new ListTile(
                                 onTap: this._handleTap,
                                 leading: this.widget.leading,
-                                title: new DefaultTextStyle(
-                                    style: Theme.of(this.context).textTheme.subhead.copyWith(color: titleColor),
-                                    child: this.widget.title
-                                ),
+                                title: this.widget.title,
                                 trailing: this.widget.trailing ?? new RotationTransition(
                                               turns: this._iconTurns,
                                               child: new Icon(Icons.expand_more)
