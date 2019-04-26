@@ -19,7 +19,8 @@ namespace Unity.UIWidgets.widgets {
             AxisDirection axisDirection = AxisDirection.down,
             ScrollController controller = null,
             ScrollPhysics physics = null,
-            ViewportBuilder viewportBuilder = null
+            ViewportBuilder viewportBuilder = null,
+            DragStartBehavior dragStartBehavior = DragStartBehavior.down
         ) : base(key: key) {
             D.assert(viewportBuilder != null);
 
@@ -27,6 +28,7 @@ namespace Unity.UIWidgets.widgets {
             this.controller = controller;
             this.physics = physics;
             this.viewportBuilder = viewportBuilder;
+            this.dragStartBehavior = dragStartBehavior;
         }
 
         public readonly AxisDirection axisDirection;
@@ -36,6 +38,8 @@ namespace Unity.UIWidgets.widgets {
         public readonly ScrollPhysics physics;
 
         public readonly ViewportBuilder viewportBuilder;
+
+        public readonly DragStartBehavior dragStartBehavior;
 
         public Axis axis {
             get { return AxisUtils.axisDirectionToAxis(this.axisDirection); }
@@ -251,6 +255,7 @@ namespace Unity.UIWidgets.widgets {
                                         this._physics == null ? (float?) null : this._physics.minFlingVelocity;
                                     instance.maxFlingVelocity =
                                         this._physics == null ? (float?) null : this._physics.maxFlingVelocity;
+                                    instance.dragStartBehavior = this.widget.dragStartBehavior;
                                 }
                             ));
                         break;
@@ -271,6 +276,7 @@ namespace Unity.UIWidgets.widgets {
                                         this._physics == null ? (float?) null : this._physics.minFlingVelocity;
                                     instance.maxFlingVelocity =
                                         this._physics == null ? (float?) null : this._physics.maxFlingVelocity;
+                                    instance.dragStartBehavior = this.widget.dragStartBehavior;
                                 }
                             ));
                         break;
@@ -366,16 +372,16 @@ namespace Unity.UIWidgets.widgets {
         public override Widget build(BuildContext context) {
             D.assert(this.position != null);
 
-            Widget result = new RawGestureDetector(
-                key: this._gestureDetectorKey,
-                gestures: this._gestureRecognizers,
-                behavior: HitTestBehavior.opaque,
-                child: new IgnorePointer(
-                    key: this._ignorePointerKey,
-                    ignoring: this._shouldIgnorePointer,
-                    child: new _ScrollableScope(
-                        scrollable: this,
-                        position: this.position,
+            Widget result = new _ScrollableScope(
+                scrollable: this,
+                position: this.position,
+                child: new RawGestureDetector(
+                    key: this._gestureDetectorKey,
+                    gestures: this._gestureRecognizers,
+                    behavior: HitTestBehavior.opaque,
+                    child: new IgnorePointer(
+                        key: this._ignorePointerKey,
+                        ignoring: this._shouldIgnorePointer,
                         child: this.widget.viewportBuilder(context, this.position)
                     )
                 )

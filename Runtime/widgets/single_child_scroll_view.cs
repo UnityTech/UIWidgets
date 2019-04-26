@@ -19,7 +19,8 @@ namespace Unity.UIWidgets.widgets {
             bool? primary = null,
             ScrollPhysics physics = null,
             ScrollController controller = null,
-            Widget child = null
+            Widget child = null,
+            DragStartBehavior dragStartBehavior = DragStartBehavior.down
         ) : base(key: key) {
             D.assert(!(controller != null && primary == true),
                 "Primary ScrollViews obtain their ScrollController via inheritance from a PrimaryScrollController widget. " +
@@ -31,6 +32,7 @@ namespace Unity.UIWidgets.widgets {
             this.physics = physics;
             this.controller = controller;
             this.child = child;
+            this.dragStartBehavior = dragStartBehavior;
         }
 
         public readonly Axis scrollDirection;
@@ -47,6 +49,7 @@ namespace Unity.UIWidgets.widgets {
 
         public readonly Widget child;
 
+        public readonly DragStartBehavior dragStartBehavior;
 
         AxisDirection _getDirection(BuildContext context) {
             return AxisDirectionUtils.getAxisDirectionFromAxisReverseAndDirectionality(context, this.scrollDirection,
@@ -67,6 +70,7 @@ namespace Unity.UIWidgets.widgets {
                 : this.controller;
 
             Scrollable scrollable = new Scrollable(
+                dragStartBehavior: this.dragStartBehavior,
                 axisDirection: axisDirection,
                 controller: scrollController,
                 physics: this.physics,
