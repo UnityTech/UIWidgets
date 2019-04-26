@@ -290,16 +290,42 @@ namespace Unity.UIWidgets.material {
             );
         }
 
+        public override void didUpdateWidget(StatefulWidget _oldWidget) {
+            _OutlineButton oldWidget = _oldWidget as _OutlineButton;
+            base.didUpdateWidget(oldWidget);
+            if (this._pressed && !this.widget.enabled) {
+                this._pressed = false;
+                this._controller.reverse();
+            }
+        }
+
+        void _handleHighlightChanged(bool value) {
+            if (this._pressed == value) {
+                return;
+            }
+
+            this.setState(() => {
+                this._pressed = value;
+                if (value) {
+                    this._controller.forward();
+                }
+                else {
+                    this._controller.reverse();
+                }
+            });
+        }
+
         public override void dispose() {
             this._controller.dispose();
             base.dispose();
         }
 
         Color _getFillColor() {
-            bool themeIsDark = this.widget.brightness == Brightness.dark;
-            Color color = this.widget.color ?? (themeIsDark
-                              ? new Color(0x00000000)
-                              : new Color(0x00FFFFFF));
+            if (this.widget.highlightElevation == null || this.widget.highlightElevation == 0.0) {
+                return Colors.transparent;
+            }
+
+            Color color = this.widget.color ?? Theme.of(this.context).canvasColor;
             ColorTween colorTween = new ColorTween(
                 begin: color.withAlpha(0x00),
                 end: color.withAlpha(0xFF)
@@ -308,26 +334,27 @@ namespace Unity.UIWidgets.material {
         }
 
         BorderSide _getOutline() {
-            bool isDark = this.widget.brightness == Brightness.dark;
             if (this.widget.borderSide?.style == BorderStyle.none) {
                 return this.widget.borderSide;
             }
 
-            Color color = this.widget.enabled
-                ? (this._pressed
-                    ? this.widget.highlightedBorderColor
-                    : (this.widget.borderSide?.color ??
-                       (isDark ? Colors.grey[600] : Colors.grey[200])))
-                : (this.widget.disabledBorderColor ??
-                   (isDark ? Colors.grey[800] : Colors.grey[100]));
+            Color specifiedColor = this.widget.enabled
+                ? (this._pressed ? this.widget.highlightedBorderColor : null) ?? this.widget.borderSide?.color
+                : this.widget.disabledBorderColor;
+
+            Color themeColor = Theme.of(this.context).colorScheme.onSurface.withOpacity(0.12f);
 
             return new BorderSide(
-                color: color,
-                width: this.widget.borderSide?.width ?? 2.0f
+                color: specifiedColor ?? themeColor,
+                width: this.widget.borderSide?.width ?? 1.0f
             );
         }
 
         float _getHighlightElevation() {
+            if (this.widget.highlightElevation == null || this.widget.highlightElevation == 0.0f) {
+                return 0.0f;
+            }
+
             return new FloatTween(
                 begin: 0.0f,
                 end: this.widget.highlightElevation ?? 2.0f
@@ -349,17 +376,7 @@ namespace Unity.UIWidgets.material {
                         elevation: 0.0f,
                         disabledElevation: 0.0f,
                         highlightElevation: this._getHighlightElevation(),
-                        onHighlightChanged: (bool value) => {
-                            this.setState(() => {
-                                this._pressed = value;
-                                if (value) {
-                                    this._controller.forward();
-                                }
-                                else {
-                                    this._controller.reverse();
-                                }
-                            });
-                        },
+                        onHighlightChanged: this._handleHighlightChanged,
                         padding:
                         this.widget.padding,
                         shape: new _OutlineBorder(
@@ -453,17 +470,20 @@ namespace Unity.UIWidgets.material {
         public bool Equals(_OutlineBorder other) {
             return this.side == other.side && this.shape == other.shape;
         }
-        
+
         public override bool Equals(object obj) {
             if (ReferenceEquals(null, obj)) {
                 return false;
             }
+
             if (ReferenceEquals(this, obj)) {
                 return true;
             }
+
             if (obj.GetType() != this.GetType()) {
                 return false;
             }
+
             return this.Equals((_OutlineBorder) obj);
         }
 
