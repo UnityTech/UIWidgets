@@ -86,7 +86,9 @@ namespace Unity.UIWidgets.widgets {
             GestureDragUpdateCallback onPanUpdate = null,
             GestureDragEndCallback onPanEnd = null,
             GestureDragCancelCallback onPanCancel = null,
-            HitTestBehavior behavior = HitTestBehavior.deferToChild) : base(key) {
+            HitTestBehavior behavior = HitTestBehavior.deferToChild,
+            DragStartBehavior dragStartBehavior = DragStartBehavior.down
+        ) : base(key) {
             D.assert(() => {
                 bool haveVerticalDrag =
                     onVerticalDragStart != null || onVerticalDragUpdate != null ||
@@ -131,6 +133,7 @@ namespace Unity.UIWidgets.widgets {
             this.onPanEnd = onPanEnd;
             this.onPanCancel = onPanCancel;
             this.behavior = behavior;
+            this.dragStartBehavior = dragStartBehavior;
         }
 
         public readonly Widget child;
@@ -156,6 +159,7 @@ namespace Unity.UIWidgets.widgets {
         public readonly GestureDragEndCallback onPanEnd;
         public readonly GestureDragCancelCallback onPanCancel;
         public readonly HitTestBehavior behavior;
+        public readonly DragStartBehavior dragStartBehavior;
 
         public override Widget build(BuildContext context) {
             var gestures = new Dictionary<Type, GestureRecognizerFactory>();
@@ -206,6 +210,7 @@ namespace Unity.UIWidgets.widgets {
                             instance.onUpdate = this.onVerticalDragUpdate;
                             instance.onEnd = this.onVerticalDragEnd;
                             instance.onCancel = this.onVerticalDragCancel;
+                            instance.dragStartBehavior = this.dragStartBehavior;
                         }
                     );
             }
@@ -224,6 +229,7 @@ namespace Unity.UIWidgets.widgets {
                             instance.onUpdate = this.onHorizontalDragUpdate;
                             instance.onEnd = this.onHorizontalDragEnd;
                             instance.onCancel = this.onHorizontalDragCancel;
+                            instance.dragStartBehavior = this.dragStartBehavior;
                         }
                     );
             }
@@ -242,6 +248,7 @@ namespace Unity.UIWidgets.widgets {
                             instance.onUpdate = this.onPanUpdate;
                             instance.onEnd = this.onPanEnd;
                             instance.onCancel = this.onPanCancel;
+                            instance.dragStartBehavior = this.dragStartBehavior;
                         }
                     );
             }
@@ -251,6 +258,11 @@ namespace Unity.UIWidgets.widgets {
                 behavior: this.behavior,
                 child: this.child
             );
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new EnumProperty<DragStartBehavior>("startBehavior", this.dragStartBehavior));
         }
     }
 

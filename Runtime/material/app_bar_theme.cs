@@ -50,7 +50,6 @@ namespace Unity.UIWidgets.material {
         }
 
         public static AppBarTheme lerp(AppBarTheme a, AppBarTheme b, float t) {
-            D.assert(t != null);
             return new AppBarTheme(
                 brightness: t < 0.5f ? a?.brightness : b?.brightness,
                 color: Color.lerp(a?.color, b?.color, t),

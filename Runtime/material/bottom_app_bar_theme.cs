@@ -35,7 +35,6 @@ namespace Unity.UIWidgets.material {
         }
 
         public static BottomAppBarTheme lerp(BottomAppBarTheme a, BottomAppBarTheme b, float t) {
-            D.assert(t != null);
             return new BottomAppBarTheme(
                 color: Color.lerp(a?.color, b?.color, t),
                 elevation: MathUtils.lerpFloat(a?.elevation ?? 0.0f, b?.elevation ?? 0.0f, t),

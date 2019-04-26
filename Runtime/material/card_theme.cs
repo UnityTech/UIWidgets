@@ -51,7 +51,6 @@ namespace Unity.UIWidgets.material {
         }
 
         public static CardTheme lerp(CardTheme a, CardTheme b, float t) {
-            D.assert(t != null);
             return new CardTheme(
                 clipBehavior: t < 0.5f ? a?.clipBehavior : b?.clipBehavior,
                 color: Color.lerp(a?.color, b?.color, t),
