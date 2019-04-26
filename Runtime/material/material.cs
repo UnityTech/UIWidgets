@@ -54,10 +54,12 @@ namespace Unity.UIWidgets.material {
             TextStyle textStyle = null,
             BorderRadius borderRadius = null,
             ShapeBorder shape = null,
+            bool borderOnForeground = true,
             Clip clipBehavior = Clip.none,
             TimeSpan? animationDuration = null,
             Widget child = null
         ) : base(key: key) {
+            D.assert(elevation >= 0.0f);
             D.assert(!(shape != null && borderRadius != null));
             D.assert(!(type == MaterialType.circle && (borderRadius != null || shape != null)));
 
@@ -68,6 +70,7 @@ namespace Unity.UIWidgets.material {
             this.textStyle = textStyle;
             this.borderRadius = borderRadius;
             this.shape = shape;
+            this.borderOnForeground = borderOnForeground;
             this.clipBehavior = clipBehavior;
             this.animationDuration = animationDuration ?? Constants.kThemeChangeDuration;
             this.child = child;
@@ -86,6 +89,8 @@ namespace Unity.UIWidgets.material {
         public readonly TextStyle textStyle;
 
         public readonly ShapeBorder shape;
+
+        public readonly bool borderOnForeground;
 
         public readonly Clip clipBehavior;
 
@@ -114,7 +119,10 @@ namespace Unity.UIWidgets.material {
                 defaultValue: new Color(0xFF000000)));
             this.textStyle?.debugFillProperties(properties);
             properties.add(new DiagnosticsProperty<ShapeBorder>("shape", this.shape, defaultValue: null));
-            properties.add(new EnumProperty<BorderRadius>("borderRadius", this.borderRadius, defaultValue: null));
+            properties.add(new DiagnosticsProperty<bool>("borderOnForeground", this.borderOnForeground,
+                defaultValue: null));
+            properties.add(
+                new DiagnosticsProperty<BorderRadius>("borderRadius", this.borderRadius, defaultValue: null));
         }
 
         public const float defaultSplashRadius = 35.0f;
@@ -186,6 +194,7 @@ namespace Unity.UIWidgets.material {
 
             if (this.widget.type == MaterialType.transparency) {
                 return _transparentInterior(
+                    context: context,
                     shape: shape,
                     clipBehavior: this.widget.clipBehavior,
                     contents: contents);
@@ -195,6 +204,7 @@ namespace Unity.UIWidgets.material {
                 curve: Curves.fastOutSlowIn,
                 duration: this.widget.animationDuration,
                 shape: shape,
+                borderOnForeground: this.widget.borderOnForeground,
                 clipBehavior: this.widget.clipBehavior,
                 elevation: this.widget.elevation,
                 color: backgroundColor,
@@ -205,6 +215,7 @@ namespace Unity.UIWidgets.material {
 
 
         static Widget _transparentInterior(
+            BuildContext context = null,
             ShapeBorder shape = null,
             Clip? clipBehavior = null,
             Widget contents = null) {
@@ -427,6 +438,7 @@ namespace Unity.UIWidgets.material {
             Key key = null,
             Widget child = null,
             ShapeBorder shape = null,
+            bool borderOnForeground = true,
             Clip clipBehavior = Clip.none,
             float? elevation = null,
             Color color = null,
@@ -436,12 +448,13 @@ namespace Unity.UIWidgets.material {
         ) : base(key: key, curve: curve ?? Curves.linear, duration: duration) {
             D.assert(child != null);
             D.assert(shape != null);
-            D.assert(elevation != null);
+            D.assert(elevation != null && elevation >= 0.0f);
             D.assert(color != null);
             D.assert(shadowColor != null);
             D.assert(duration != null);
             this.child = child;
             this.shape = shape;
+            this.borderOnForeground = borderOnForeground;
             this.clipBehavior = clipBehavior;
             this.elevation = elevation ?? 0.0f;
             this.color = color;
@@ -451,6 +464,8 @@ namespace Unity.UIWidgets.material {
         public readonly Widget child;
 
         public readonly ShapeBorder shape;
+
+        public readonly bool borderOnForeground;
 
         public readonly Clip clipBehavior;
 
@@ -493,7 +508,8 @@ namespace Unity.UIWidgets.material {
             return new PhysicalShape(
                 child: new _ShapeBorderPaint(
                     child: this.widget.child,
-                    shape: shape),
+                    shape: shape,
+                    borderOnForeground: this.widget.borderOnForeground),
                 clipper: new ShapeBorderClipper(
                     shape: shape),
                 clipBehavior: this.widget.clipBehavior,
@@ -507,21 +523,26 @@ namespace Unity.UIWidgets.material {
     class _ShapeBorderPaint : StatelessWidget {
         public _ShapeBorderPaint(
             Widget child = null,
-            ShapeBorder shape = null) {
+            ShapeBorder shape = null,
+            bool borderOnForeground = true) {
             D.assert(child != null);
             D.assert(shape != null);
             this.child = child;
             this.shape = shape;
+            this.borderOnForeground = borderOnForeground;
         }
 
         public readonly Widget child;
 
         public readonly ShapeBorder shape;
 
+        public readonly bool borderOnForeground;
+
         public override Widget build(BuildContext context) {
             return new CustomPaint(
                 child: this.child,
-                foregroundPainter: new _ShapeBorderPainter(this.shape));
+                painter: this.borderOnForeground ? null : new _ShapeBorderPainter(this.shape),
+                foregroundPainter: this.borderOnForeground ? new _ShapeBorderPainter(this.shape) : null);
         }
     }
 
