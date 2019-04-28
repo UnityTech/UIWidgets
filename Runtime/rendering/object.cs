@@ -504,9 +504,9 @@ namespace Unity.UIWidgets.rendering {
             D.assert(this._debugCanPerformMutations);
             D.assert(child != null);
             this.setupParentData(child);
-            base.adoptChild(child);
             this.markNeedsLayout();
             this.markNeedsCompositingBitsUpdate();
+            base.adoptChild(child);
         }
 
         protected override void dropChild(AbstractNodeMixinDiagnosticableTree childNode) {

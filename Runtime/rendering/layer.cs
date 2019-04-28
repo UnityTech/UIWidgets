@@ -1028,20 +1028,26 @@ namespace Unity.UIWidgets.rendering {
         where T : class {
         public AnnotatedRegionLayer(
             T value = null,
-            Size size = null) {
+            Size size = null,
+            Offset offset = null) {
+            offset = offset ?? Offset.zero;
             D.assert(value != null);
             this.value = value;
             this.size = size;
+            this.offset = offset;
         }
 
         public readonly T value;
 
         public readonly Size size;
 
+        public readonly Offset offset;
+
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             properties.add(new DiagnosticsProperty<T>("value", this.value));
             properties.add(new DiagnosticsProperty<Size>("size", this.size, defaultValue: null));
+            properties.add(new DiagnosticsProperty<Offset>("offset", this.offset, defaultValue: null));
         }
     }
 

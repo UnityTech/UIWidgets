@@ -363,6 +363,8 @@ namespace Unity.UIWidgets.rendering {
             float? stepHeight = null,
             RenderBox child = null
         ) : base(child) {
+            D.assert(stepWidth == null || stepWidth > 0.0f);
+            D.assert(stepHeight == null || stepHeight > 0.0f);
             this._stepWidth = stepWidth;
             this._stepHeight = stepHeight;
         }
@@ -372,6 +374,7 @@ namespace Unity.UIWidgets.rendering {
         public float? stepWidth {
             get { return this._stepWidth; }
             set {
+                D.assert(value == null || value > 0.0f);
                 if (value == this._stepWidth) {
                     return;
                 }
@@ -386,6 +389,7 @@ namespace Unity.UIWidgets.rendering {
         public float? stepHeight {
             get { return this._stepHeight; }
             set {
+                D.assert(value == null || value > 0.0f);
                 if (value == this._stepHeight) {
                     return;
                 }
@@ -1045,7 +1049,7 @@ namespace Unity.UIWidgets.rendering {
             Clip clipBehavior = Clip.none,
             CustomClipper<T> clipper = null
         ) : base(child: child, clipBehavior: clipBehavior, clipper: clipper) {
-            D.assert(elevation != null);
+            D.assert(elevation != null && elevation >= 0.0f);
             D.assert(color != null);
             D.assert(shadowColor != null);
             this._elevation = elevation ?? 0.0f;
@@ -1056,6 +1060,7 @@ namespace Unity.UIWidgets.rendering {
         public float elevation {
             get { return this._elevation; }
             set {
+                D.assert(value >= 0.0f);
                 if (this.elevation == value) {
                     return;
                 }
@@ -1124,12 +1129,13 @@ namespace Unity.UIWidgets.rendering {
             BoxShape shape = BoxShape.rectangle,
             Clip clipBehavior = Clip.none,
             BorderRadius borderRadius = null,
-            float elevation = 0.0f,
+            float? elevation = 0.0f,
             Color color = null,
             Color shadowColor = null
         ) : base(clipBehavior: clipBehavior, child: child, elevation: elevation, color: color,
             shadowColor: shadowColor ?? new Color(0xFF000000)) {
             D.assert(color != null);
+            D.assert(elevation != null && elevation >= 0.0f);
             this._shape = shape;
             this._borderRadius = borderRadius;
         }
