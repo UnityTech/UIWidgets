@@ -130,7 +130,7 @@ namespace Unity.UIWidgets.widgets {
             D.assert(style != null);
             D.assert(cursorColor != null);
             D.assert(maxLines == null || maxLines > 0);
-            D.assert(backgroundCursorColor != null);
+            // D.assert(backgroundCursorColor != null); // TODO: remove comment when this parameter is actually used
             this.keyboardType = keyboardType ?? (maxLines == 1 ? TextInputType.text : TextInputType.multiline);
 
             this.scrollPadding = scrollPadding ?? EdgeInsets.all(20.0f);
