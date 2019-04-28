@@ -48,6 +48,9 @@ namespace Unity.UIWidgets.rendering {
         protected virtual void handleTextScaleFactorChanged() {
         }
 
+        protected virtual void handlePlatformBrightnessChanged() {
+        }
+
         protected virtual ViewConfiguration createViewConfiguration() {
             var devicePixelRatio = Window.instance.devicePixelRatio;
             return new ViewConfiguration(
