@@ -264,7 +264,7 @@ namespace Unity.UIWidgets.widgets {
             this._cursorBlinkOpacityController = new AnimationController(vsync: this, duration: _fadeDuration);
             this._cursorBlinkOpacityController.addListener(this._onCursorColorTick);
             this._floatingCursorResetController = new AnimationController(vsync: this);
-            // this._floatingCursorResetController.addListener(_onFloatingCursorResetTick); // TODO: remove comment when _onFloatingCursorResetTick is ready
+            this._floatingCursorResetController.addListener(this._onFloatingCursorResetTick);
         }
 
         public override void didChangeDependencies() {
@@ -295,7 +295,7 @@ namespace Unity.UIWidgets.widgets {
         public override void dispose() {
             this.widget.controller.removeListener(this._didChangeTextEditingValue);
             this._cursorBlinkOpacityController.removeListener(this._onCursorColorTick);
-            // this._floatingCursorResetController.removeListener(this._onFloatingCursorResetTick); // TODO: remove comment when _onFloatingCursorResetTick is ready
+            this._floatingCursorResetController.removeListener(this._onFloatingCursorResetTick);
             this._closeInputConnectionIfNeeded();
             D.assert(!this._hasInputConnection);
             this._stopCursorTimer();
@@ -357,53 +357,60 @@ namespace Unity.UIWidgets.widgets {
             get { return new Offset(0, this.renderEditable.preferredLineHeight / 2); }
         }
 
-        // TODO: remove comment when renderEditable is updated and FloatingCursorDragState is ready
-//        void updateFloatingCursor(RawFloatingCursorPoint point) {
-//            switch(point.state){
-//                case FloatingCursorDragState.Start:
-//                    TextPosition currentTextPosition = new TextPosition(offset: this.renderEditable.selection.baseOffset);
-//                    this._startCaretRect = this.renderEditable.getLocalRectForCaret(currentTextPosition);
-//                    this.renderEditable.setFloatingCursor(point.state, this._startCaretRect.center - this._floatingCursorOffset, currentTextPosition);
-//                    break;
-//                case FloatingCursorDragState.Update:
-//                    // We want to send in points that are centered around a (0,0) origin, so we cache the
-//                    // position on the first update call.
-//                    if (this._pointOffsetOrigin != null) {
-//                        Offset centeredPoint = point.offset - this._pointOffsetOrigin;
-//                        Offset rawCursorOffset = this._startCaretRect.center + centeredPoint - this._floatingCursorOffset;
-//                        this._lastBoundedOffset = this.renderEditable.calculateBoundedFloatingCursorOffset(rawCursorOffset);
-//                        this._lastTextPosition = this.renderEditable.getPositionForPoint(this.renderEditable.localToGlobal(this._lastBoundedOffset + this._floatingCursorOffset));
-//                        this.renderEditable.setFloatingCursor(point.state, this._lastBoundedOffset, this._lastTextPosition);
-//                    } else {
-//                        this._pointOffsetOrigin = point.offset;
-//                    }
-//                    break;
-//                case FloatingCursorDragState.End:
-//                    this._floatingCursorResetController.setValue(0.0f);
-//                    this._floatingCursorResetController.animateTo(1.0f, duration: _floatingCursorResetTime, curve: Curves.decelerate);
-//                    break;
-//            }
-//        }
+        public void updateFloatingCursor(RawFloatingCursorPoint point) {
+            switch (point.state) {
+                case FloatingCursorDragState.Start:
+                    TextPosition currentTextPosition =
+                        new TextPosition(offset: this.renderEditable.selection.baseOffset);
+                    this._startCaretRect = this.renderEditable.getLocalRectForCaret(currentTextPosition);
+                    this.renderEditable.setFloatingCursor(point.state,
+                        this._startCaretRect.center - this._floatingCursorOffset, currentTextPosition);
+                    break;
+                case FloatingCursorDragState.Update:
+                    // We want to send in points that are centered around a (0,0) origin, so we cache the
+                    // position on the first update call.
+                    if (this._pointOffsetOrigin != null) {
+                        Offset centeredPoint = point.offset - this._pointOffsetOrigin;
+                        Offset rawCursorOffset =
+                            this._startCaretRect.center + centeredPoint - this._floatingCursorOffset;
+                        this._lastBoundedOffset =
+                            this.renderEditable.calculateBoundedFloatingCursorOffset(rawCursorOffset);
+                        this._lastTextPosition = this.renderEditable.getPositionForPoint(
+                            this.renderEditable.localToGlobal(this._lastBoundedOffset + this._floatingCursorOffset));
+                        this.renderEditable.setFloatingCursor(point.state, this._lastBoundedOffset,
+                            this._lastTextPosition);
+                    }
+                    else {
+                        this._pointOffsetOrigin = point.offset;
+                    }
 
-        // TODO: remove comment when RenderEditable.setFloatingCursor, Floating CursorDragState, and force press is ready
-//        void _onFloatingCursorResetTick() {
-//            Offset finalPosition = this.renderEditable.getLocalRectForCaret(this._lastTextPosition).centerLeft - this._floatingCursorOffset;
-//            if (this._floatingCursorResetController.isCompleted) {
-//                this.renderEditable.setFloatingCursor(FloatingCursorDragState.End, finalPosition, this._lastTextPosition);
-//                if (this._lastTextPosition.offset != this.renderEditable.selection.baseOffset)
-//                    this._handleSelectionChanged(TextSelection.collapsed(offset: this._lastTextPosition.offset), this.renderEditable, SelectionChangedCause.forcePress);
-//                this._startCaretRect = null;
-//                this._lastTextPosition = null;
-//                this._pointOffsetOrigin = null;
-//                this._lastBoundedOffset = null;
-//            } else {
-//                float lerpValue = this._floatingCursorResetController.value;
-//                float lerpX = MathUtils.lerpFloat(this._lastBoundedOffset.dx, finalPosition.dx, lerpValue);
-//                float lerpY = MathUtils.lerpFloat(this._lastBoundedOffset.dy, finalPosition.dy, lerpValue);
-//
-//                this.renderEditable.setFloatingCursor(FloatingCursorDragState.Update, new Offset(lerpX, lerpY), this._lastTextPosition, resetLerpValue: lerpValue);
-//            }
-//        }
+                    break;
+                case FloatingCursorDragState.End:
+                    this._floatingCursorResetController.setValue(0.0f);
+                    this._floatingCursorResetController.animateTo(1.0f, duration: _floatingCursorResetTime,
+                        curve: Curves.decelerate);
+                    break;
+            }
+        }
+
+        void _onFloatingCursorResetTick() {
+            Offset finalPosition = this.renderEditable.getLocalRectForCaret(this._lastTextPosition).centerLeft - this._floatingCursorOffset;
+            if (this._floatingCursorResetController.isCompleted) {
+                this.renderEditable.setFloatingCursor(FloatingCursorDragState.End, finalPosition, this._lastTextPosition);
+                if (this._lastTextPosition.offset != this.renderEditable.selection.baseOffset)
+                    this._handleSelectionChanged(TextSelection.collapsed(offset: this._lastTextPosition.offset), this.renderEditable, SelectionChangedCause.forcePress);
+                this._startCaretRect = null;
+                this._lastTextPosition = null;
+                this._pointOffsetOrigin = null;
+                this._lastBoundedOffset = null;
+            } else {
+                float lerpValue = this._floatingCursorResetController.value;
+                float lerpX = MathUtils.lerpFloat(this._lastBoundedOffset.dx, finalPosition.dx, lerpValue);
+                float lerpY = MathUtils.lerpFloat(this._lastBoundedOffset.dy, finalPosition.dy, lerpValue);
+
+                this.renderEditable.setFloatingCursor(FloatingCursorDragState.Update, new Offset(lerpX, lerpY), this._lastTextPosition, resetLerpValue: lerpValue);
+            }
+        }
 
         void _finalizeEditing(bool shouldUnfocus) {
             if (this.widget.onEditingComplete != null) {
@@ -533,10 +540,9 @@ namespace Unity.UIWidgets.widgets {
                 this._openInputConnection();
             }
             else {
-                // TODO: remove comment when FocusScope.ancestorsOf is ready
-//                List<FocusScopeNode> ancestorScopes = FocusScope.ancestorsOf(this.context);
-//                for (int i = ancestorScopes.Count - 1; i >= 1; i -= 1)
-//                    ancestorScopes[i].setFirstFocus(ancestorScopes[i - 1]);
+                List<FocusScopeNode> ancestorScopes = FocusScope.ancestorsOf(this.context);
+                for (int i = ancestorScopes.Count - 1; i >= 1; i -= 1)
+                    ancestorScopes[i].setFirstFocus(ancestorScopes[i - 1]);
                 FocusScope.of(this.context).requestFocus(this.widget.focusNode);
             }
         }
@@ -574,8 +580,8 @@ namespace Unity.UIWidgets.widgets {
                     layerLink: this._layerLink,
                     renderObject: renderObject,
                     selectionControls: this.widget.selectionControls,
-                    selectionDelegate: this
-                    // dragStartBehavior: this.widget.dragStartBehavior // TODO: remove comment when TextSelectionOverlay is updated
+                    selectionDelegate: this,
+                    dragStartBehavior: this.widget.dragStartBehavior
                 );
                 bool longPress = cause == SelectionChangedCause.longPress;
                 if (cause != SelectionChangedCause.keyboard && (this._value.text.isNotEmpty() || longPress)) {

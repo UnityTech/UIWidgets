@@ -6,6 +6,30 @@ using Unity.UIWidgets.ui;
 using UnityEngine;
 
 namespace Unity.UIWidgets.service {
+    public enum FloatingCursorDragState {
+        Start,
+
+        Update,
+
+        End
+    }
+
+    public class RawFloatingCursorPoint {
+        public RawFloatingCursorPoint(
+            Offset offset = null,
+            FloatingCursorDragState? state = null
+        ) {
+            D.assert(state != null);
+            D.assert(state == FloatingCursorDragState.Update ? offset != null : true);
+            this.offset = offset;
+            this.state = state;
+        }
+
+        public readonly Offset offset;
+
+        public readonly FloatingCursorDragState? state;
+    }
+
     public class TextInputType : IEquatable<TextInputType> {
         public readonly int index;
         public readonly bool? signed;
@@ -108,6 +132,7 @@ namespace Unity.UIWidgets.service {
                 case "TextAffinity.upstream":
                     return TextAffinity.upstream;
             }
+
             return null;
         }
 
@@ -140,15 +165,42 @@ namespace Unity.UIWidgets.service {
                 case "TextInputAction.newline":
                     return TextInputAction.newline;
             }
+
             throw new UIWidgetsError("Unknown text input action: $action");
         }
+
+        public static FloatingCursorDragState _toTextCursorAction(string state) {
+            switch (state) {
+                case "FloatingCursorDragState.start":
+                    return FloatingCursorDragState.Start;
+                case "FloatingCursorDragState.update":
+                    return FloatingCursorDragState.Update;
+                case "FloatingCursorDragState.end":
+                    return FloatingCursorDragState.End;
+            }
+
+            throw new UIWidgetsError("Unknown text cursor action: $state");
+        }
+
+        public static RawFloatingCursorPoint _toTextPoint(FloatingCursorDragState state,
+            Dictionary<string, float?> encoded) {
+            D.assert(encoded.getOrDefault("X") != null,
+                "You must provide a value for the horizontal location of the floating cursor.");
+            D.assert(encoded.getOrDefault("Y") != null,
+                "You must provide a value for the vertical location of the floating cursor.");
+            Offset offset = state == FloatingCursorDragState.Update
+                ? new Offset(encoded["X"] ?? 0.0f, encoded["Y"] ?? 0.0f)
+                : new Offset(0, 0);
+            return new RawFloatingCursorPoint(offset: offset, state: state);
+        }
     }
-    
+
     public class TextEditingValue : IEquatable<TextEditingValue> {
         public readonly string text;
         public readonly TextSelection selection;
         public readonly TextRange composing;
         static JSONNode defaultIndexNode = new JSONNumber(-1);
+
         public TextEditingValue(string text = "", TextSelection selection = null, TextRange composing = null) {
             this.text = text;
             this.selection = selection ?? TextSelection.collapsed(-1);
@@ -172,6 +224,7 @@ namespace Unity.UIWidgets.service {
                 )
             );
         }
+
         public TextEditingValue copyWith(string text = null, TextSelection selection = null,
             TextRange composing = null) {
             return new TextEditingValue(
@@ -190,6 +243,7 @@ namespace Unity.UIWidgets.service {
             if (selection.start < 0) {
                 selection = TextSelection.collapsed(0, this.selection.affinity);
             }
+
             newText = selection.textBefore(this.text) + text + selection.textAfter(this.text);
             newSelection = TextSelection.collapsed(selection.start + text.Length);
             return new TextEditingValue(
@@ -215,12 +269,12 @@ namespace Unity.UIWidgets.service {
                 }
 
                 return this.copyWith(text: this.text.Substring(0, this.selection.start) +
-                                           this.text.Substring(this.selection.start + 1), 
+                                           this.text.Substring(this.selection.start + 1),
                     composing: TextRange.empty);
             }
             else {
                 var newText = this.selection.textBefore(this.text) + this.selection.textAfter(this.text);
-                return this.copyWith(text: newText, selection: TextSelection.collapsed(this.selection.start), 
+                return this.copyWith(text: newText, selection: TextSelection.collapsed(this.selection.start),
                     composing: TextRange.empty);
             }
         }
@@ -356,6 +410,8 @@ namespace Unity.UIWidgets.service {
         void updateEditingValue(TextEditingValue value);
 
         void performAction(TextInputAction action);
+
+        void updateFloatingCursor(RawFloatingCursorPoint point);
     }
 
     public enum TextInputAction {
@@ -384,7 +440,8 @@ namespace Unity.UIWidgets.service {
     class TextInputConfiguration {
         public TextInputConfiguration(TextInputType inputType = null,
             bool obscureText = false, bool autocorrect = true, TextInputAction inputAction = TextInputAction.done,
-            Brightness keyboardAppearance = Brightness.light, TextCapitalization textCapitalization = TextCapitalization.none,
+            Brightness keyboardAppearance = Brightness.light,
+            TextCapitalization textCapitalization = TextCapitalization.none,
             bool unityTouchKeyboard = false) {
             this.inputType = inputType ?? TextInputType.text;
             this.inputAction = inputAction;
@@ -439,7 +496,7 @@ namespace Unity.UIWidgets.service {
             D.assert(this.imeRequired());
             TextInput.keyboardDelegate.setIMEPos(imeGlobalPos);
         }
-        
+
         public bool imeRequired() {
             return TextInput.keyboardDelegate != null && TextInput.keyboardDelegate.imeRequired();
         }
@@ -487,7 +544,8 @@ namespace Unity.UIWidgets.service {
 
             if (Application.isEditor) {
                 keyboardDelegate = new DefaultKeyboardDelegate();
-            } else {
+            }
+            else {
 #if UNITY_IOS || UNITY_ANDROID
                 if (configuration.unityTouchKeyboard) {
                     keyboardDelegate = new UnityTouchScreenKeyboardDelegate();
@@ -501,6 +559,7 @@ namespace Unity.UIWidgets.service {
                 keyboardDelegate = new DefaultKeyboardDelegate();
 #endif
             }
+
             keyboardDelegate.setClient(connection._id, configuration);
             return connection;
         }
@@ -510,13 +569,13 @@ namespace Unity.UIWidgets.service {
                 (keyboardDelegate as TextInputUpdateListener)?.Update();
             }
         }
-        
+
         internal static void OnGUI() {
             if (_currentConnection != null && _currentConnection._window == Window.instance) {
                 (keyboardDelegate as TextInputOnGUIListener)?.OnGUI();
             }
         }
-        
+
         internal static void _updateEditingState(int client, TextEditingValue value) {
             if (_currentConnection == null) {
                 return;
@@ -529,7 +588,7 @@ namespace Unity.UIWidgets.service {
             _currentConnection._client.updateEditingValue(value);
         }
 
-        internal static void  _performAction(int client, TextInputAction action) {
+        internal static void _performAction(int client, TextInputAction action) {
             if (_currentConnection == null) {
                 return;
             }
@@ -556,6 +615,6 @@ namespace Unity.UIWidgets.service {
                     keyboardDelegate.hide();
                 }
             });
-        }     
+        }
     }
 }

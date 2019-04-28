@@ -121,7 +121,8 @@ namespace Unity.UIWidgets.widgets {
             LayerLink layerLink = null,
             RenderEditable renderObject = null,
             TextSelectionControls selectionControls = null,
-            TextSelectionDelegate selectionDelegate = null) {
+            TextSelectionDelegate selectionDelegate = null,
+            DragStartBehavior? dragStartBehavior = null) {
             D.assert(value != null);
             D.assert(context != null);
             this.context = context;
@@ -135,6 +136,7 @@ namespace Unity.UIWidgets.widgets {
             D.assert(overlay != null);
             this._handleController = new AnimationController(duration: _fadeDuration, vsync: overlay);
             this._toolbarController = new AnimationController(duration: _fadeDuration, vsync: overlay);
+            this.dragStartBehavior = dragStartBehavior;
         }
 
         public readonly BuildContext context;
@@ -143,6 +145,7 @@ namespace Unity.UIWidgets.widgets {
         public readonly RenderEditable renderObject;
         public readonly TextSelectionControls selectionControls;
         public readonly TextSelectionDelegate selectionDelegate;
+        public readonly DragStartBehavior? dragStartBehavior;
 
         public static TimeSpan _fadeDuration = TimeSpan.FromMilliseconds(150);
         AnimationController _handleController;
@@ -258,7 +261,8 @@ namespace Unity.UIWidgets.widgets {
                     renderObject: this.renderObject,
                     selection: this._selection,
                     selectionControls: this.selectionControls,
-                    position: position
+                    position: position,
+                    dragStartBehavior: this.dragStartBehavior ?? DragStartBehavior.down
                 )
             );
         }
@@ -328,7 +332,8 @@ namespace Unity.UIWidgets.widgets {
             RenderEditable renderObject = null,
             ValueChanged<TextSelection> onSelectionHandleChanged = null,
             VoidCallback onSelectionHandleTapped = null,
-            TextSelectionControls selectionControls = null
+            TextSelectionControls selectionControls = null,
+            DragStartBehavior dragStartBehavior = DragStartBehavior.down
         ) : base(key: key) {
             this.selection = selection;
             this.position = position;
@@ -337,6 +342,7 @@ namespace Unity.UIWidgets.widgets {
             this.onSelectionHandleChanged = onSelectionHandleChanged;
             this.onSelectionHandleTapped = onSelectionHandleTapped;
             this.selectionControls = selectionControls;
+            this.dragStartBehavior = dragStartBehavior;
         }
 
         public readonly TextSelection selection;
@@ -346,7 +352,7 @@ namespace Unity.UIWidgets.widgets {
         public readonly ValueChanged<TextSelection> onSelectionHandleChanged;
         public readonly VoidCallback onSelectionHandleTapped;
         public readonly TextSelectionControls selectionControls;
-
+        public readonly DragStartBehavior dragStartBehavior;
 
         public override State createState() {
             return new _TextSelectionHandleOverlayState();
@@ -419,6 +425,7 @@ namespace Unity.UIWidgets.widgets {
                 link: this.widget.layerLink,
                 showWhenUnlinked: false,
                 child: new GestureDetector(
+                    dragStartBehavior: this.widget.dragStartBehavior,
                     onPanStart: this._handleDragStart,
                     onPanUpdate: this._handleDragUpdate,
                     onTap: this._handleTap,
@@ -641,11 +648,10 @@ namespace Unity.UIWidgets.widgets {
             );
 
             if (this.widget.onSingleLongTapStart != null) {
-                gestures[typeof(LongPressGestureRecognizer)] = new GestureRecognizerFactoryWithHandlers<LongPressGestureRecognizer>(
-                    () => new LongPressGestureRecognizer(debugOwner: this, kind: PointerDeviceKind.touch),
-                    instance => {
-                        instance.onLongPress = this._handleLongPressStart;
-                    });
+                gestures[typeof(LongPressGestureRecognizer)] =
+                    new GestureRecognizerFactoryWithHandlers<LongPressGestureRecognizer>(
+                        () => new LongPressGestureRecognizer(debugOwner: this, kind: PointerDeviceKind.touch),
+                        instance => { instance.onLongPress = this._handleLongPressStart; });
             }
 
             if (this.widget.onDragSelectionStart != null ||

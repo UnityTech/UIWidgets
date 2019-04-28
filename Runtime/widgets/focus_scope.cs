@@ -1,4 +1,5 @@
-﻿using Unity.UIWidgets.foundation;
+﻿using System.Collections.Generic;
+using Unity.UIWidgets.foundation;
 
 namespace Unity.UIWidgets.widgets {
     class _FocusScopeMarker : InheritedWidget {
@@ -28,12 +29,31 @@ namespace Unity.UIWidgets.widgets {
         public readonly Widget child;
 
         public static FocusScopeNode of(BuildContext context) {
+            D.assert(context != null);
             var scope = (_FocusScopeMarker) context.inheritFromWidgetOfExactType(typeof(_FocusScopeMarker));
             if (scope != null && scope.node != null) {
                 return scope.node;
             }
 
             return context.owner.focusManager.rootScope;
+        }
+
+        public static List<FocusScopeNode> ancestorsOf(BuildContext context) {
+            D.assert(context != null);
+            List<FocusScopeNode> ancestors = new List<FocusScopeNode> { };
+            while (true) {
+                context = context.ancestorInheritedElementForWidgetOfExactType(typeof(_FocusScopeMarker));
+                if (context == null) {
+                    return ancestors;
+                }
+
+                _FocusScopeMarker scope = (_FocusScopeMarker) context.widget;
+                ancestors.Add(scope.node);
+                context.visitAncestorElements((Element parent) => {
+                    context = parent;
+                    return false;
+                });
+            }
         }
 
         public override State createState() {

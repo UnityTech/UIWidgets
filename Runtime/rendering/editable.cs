@@ -69,21 +69,21 @@ namespace Unity.UIWidgets.rendering {
         Offset _lastTapDownPosition;
 
         public RenderEditable(
-            TextSpan text, 
-            TextDirection textDirection, 
+            TextSpan text,
+            TextDirection textDirection,
             ViewportOffset offset,
             ValueNotifier<bool> showCursor,
-            TextAlign textAlign = TextAlign.left, 
-            float textScaleFactor = 1.0f, 
+            TextAlign textAlign = TextAlign.left,
+            float textScaleFactor = 1.0f,
             Color cursorColor = null,
             Color backgroundCursorColor = null,
-            bool? hasFocus = null, 
-            int? maxLines = 1, 
+            bool? hasFocus = null,
+            int? maxLines = 1,
             Color selectionColor = null,
-            TextSelection selection = null, 
-            bool obscureText = false, 
+            TextSelection selection = null,
+            bool obscureText = false,
             SelectionChangedHandler onSelectionChanged = null,
-            CaretChangedHandler onCaretChanged = null, 
+            CaretChangedHandler onCaretChanged = null,
             bool ignorePointer = false,
             float cursorWidth = 1.0f,
             Radius cursorRadius = null,
@@ -98,7 +98,7 @@ namespace Unity.UIWidgets.rendering {
             this._textPainter = new TextPainter(text: text, textAlign: textAlign, textDirection: textDirection,
                 textScaleFactor: textScaleFactor);
             this._cursorColor = cursorColor;
-            
+
             this._showCursor = showCursor ?? new ValueNotifier<bool>(false);
             this._hasFocus = hasFocus ?? false;
             this._maxLines = maxLines;
@@ -144,6 +144,7 @@ namespace Unity.UIWidgets.rendering {
                 this.markNeedsTextLayout();
             }
         }
+
         float _devicePixelRatio;
 
         public Color backgroundCursorColor {
@@ -157,6 +158,7 @@ namespace Unity.UIWidgets.rendering {
                 this.markNeedsPaint();
             }
         }
+
         Color _backgroundCursorColor;
 
         public bool paintCursorAboveText {
@@ -170,6 +172,7 @@ namespace Unity.UIWidgets.rendering {
                 this.markNeedsLayout();
             }
         }
+
         bool _paintCursorOnTop;
 
         public Offset cursorOffset {
@@ -183,6 +186,7 @@ namespace Unity.UIWidgets.rendering {
                 this.markNeedsLayout();
             }
         }
+
         Offset _cursorOffset;
 
         public EdgeInsets floatingCursorAddedMargin {
@@ -196,6 +200,7 @@ namespace Unity.UIWidgets.rendering {
                 this.markNeedsPaint();
             }
         }
+
         EdgeInsets _floatingCursorAddedMargin;
 
         bool _floatingCursorOn = false;
@@ -205,7 +210,7 @@ namespace Unity.UIWidgets.rendering {
         public bool selectionEnabled {
             get { return this.enableInteractiveSelection ?? !this.obscureText; }
         }
-        
+
         public bool obscureText {
             get { return this._obscureText; }
             set {
@@ -1024,7 +1029,7 @@ namespace Unity.UIWidgets.rendering {
                         baseOffset: firstWord.baseOffset,
                         extentOffset: lastWord.extentOffset,
                         affinity: firstWord.affinity),
-                    this, 
+                    this,
                     cause.Value);
             }
         }
@@ -1139,7 +1144,7 @@ namespace Unity.UIWidgets.rendering {
             if (this._cursorOffset != null) {
                 caretRect = caretRect.shift(this._cursorOffset);
             }
-            
+
             if (this.cursorRadius == null) {
                 canvas.drawRect(caretRect, paint);
             }
@@ -1156,6 +1161,29 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
+        public void setFloatingCursor(FloatingCursorDragState? state, Offset boundedOffset, TextPosition lastTextPosition,
+            float? resetLerpValue = null) {
+            D.assert(boundedOffset != null);
+            D.assert(lastTextPosition != null);
+            if (state == FloatingCursorDragState.Start) {
+                this._relativeOrigin = new Offset(0, 0);
+                this._previousOffset = null;
+                this._resetOriginOnBottom = false;
+                this._resetOriginOnTop = false;
+                this._resetOriginOnRight = false;
+                this._resetOriginOnBottom = false;
+            }
+
+            this._floatingCursorOn = state != FloatingCursorDragState.End;
+            this._resetFloatingCursorAnimationValue = resetLerpValue;
+            if (this._floatingCursorOn) {
+                this._floatingCursorOffset = boundedOffset;
+                this._floatingCursorTextPosition = lastTextPosition;
+            }
+
+            this.markNeedsPaint();
+        }
+
         void _paintFloatingCaret(Canvas canvas, Offset effectiveOffset) {
             D.assert(this._textLayoutLastWidth == this.constraints.maxWidth);
             D.assert(this._floatingCursorOn);
@@ -1166,8 +1194,10 @@ namespace Unity.UIWidgets.rendering {
             float sizeAdjustmentY = _kFloatingCaretSizeIncrease.dy;
 
             if (this._resetFloatingCursorAnimationValue != null) {
-                sizeAdjustmentX = MathUtils.lerpFloat(sizeAdjustmentX, 0f, this._resetFloatingCursorAnimationValue.Value);
-                sizeAdjustmentY = MathUtils.lerpFloat(sizeAdjustmentY, 0f, this._resetFloatingCursorAnimationValue.Value);
+                sizeAdjustmentX =
+                    MathUtils.lerpFloat(sizeAdjustmentX, 0f, this._resetFloatingCursorAnimationValue.Value);
+                sizeAdjustmentY =
+                    MathUtils.lerpFloat(sizeAdjustmentY, 0f, this._resetFloatingCursorAnimationValue.Value);
             }
 
             Rect floatingCaretPrototype = Rect.fromLTRB(
@@ -1191,7 +1221,7 @@ namespace Unity.UIWidgets.rendering {
         bool _resetOriginOnBottom = false;
         float? _resetFloatingCursorAnimationValue;
 
-        Offset calculateBoundedFloatingCursorOffset(Offset rawCursorOffset) {
+        public Offset calculateBoundedFloatingCursorOffset(Offset rawCursorOffset) {
             Offset deltaPosition = new Offset(0f, 0f);
             float topBound = -this.floatingCursorAddedMargin.top;
             float bottomBound = this._textPainter.height - this.preferredLineHeight +
@@ -1206,7 +1236,8 @@ namespace Unity.UIWidgets.rendering {
             if (this._resetOriginOnLeft && deltaPosition.dx > 0) {
                 this._relativeOrigin = new Offset(rawCursorOffset.dx - leftBound, this._relativeOrigin.dy);
                 this._resetOriginOnLeft = false;
-            } else if (this._resetOriginOnRight && deltaPosition.dx < 0) {
+            }
+            else if (this._resetOriginOnRight && deltaPosition.dx < 0) {
                 this._relativeOrigin = new Offset(rawCursorOffset.dx - rightBound, this._relativeOrigin.dy);
                 this._resetOriginOnRight = false;
             }
@@ -1214,7 +1245,8 @@ namespace Unity.UIWidgets.rendering {
             if (this._resetOriginOnTop && deltaPosition.dy > 0) {
                 this._relativeOrigin = new Offset(this._relativeOrigin.dx, rawCursorOffset.dy - topBound);
                 this._resetOriginOnTop = false;
-            } else if (this._resetOriginOnBottom && deltaPosition.dy < 0) {
+            }
+            else if (this._resetOriginOnBottom && deltaPosition.dy < 0) {
                 this._relativeOrigin = new Offset(this._relativeOrigin.dx, rawCursorOffset.dy - bottomBound);
                 this._resetOriginOnBottom = false;
             }
@@ -1227,13 +1259,15 @@ namespace Unity.UIWidgets.rendering {
 
             if (currentX < leftBound && deltaPosition.dx < 0) {
                 this._resetOriginOnLeft = true;
-            } else if (currentX > rightBound && deltaPosition.dx > 0) {
+            }
+            else if (currentX > rightBound && deltaPosition.dx > 0) {
                 this._resetOriginOnRight = true;
             }
 
             if (currentY < topBound && deltaPosition.dy < 0) {
                 this._resetOriginOnTop = true;
-            } else if (currentY > bottomBound && deltaPosition.dy > 0) {
+            }
+            else if (currentY > bottomBound && deltaPosition.dy > 0) {
                 this._resetOriginOnBottom = true;
             }
 
@@ -1262,7 +1296,8 @@ namespace Unity.UIWidgets.rendering {
             if (this._selection != null && !this._floatingCursorOn) {
                 if (this._selection.isCollapsed && this._showCursor.value && this.cursorColor != null) {
                     showCaret = true;
-                } else if (!this._selection.isCollapsed && this._selectionColor != null) {
+                }
+                else if (!this._selection.isCollapsed && this._selectionColor != null) {
                     showSelection = true;
                 }
             }
