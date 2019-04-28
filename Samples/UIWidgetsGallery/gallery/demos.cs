@@ -147,16 +147,16 @@ namespace UIWidgetsGallery.gallery {
                     routeName: ContactsDemo.routeName,
                     buildRoute: (BuildContext context) => new ContactsDemo()
                 ),
-//                new GalleryDemo(
-//                    title: "Animation",
-//                    subtitle: "Section organizer",
-//                    icon: GalleryIcons.animation,
-//                    category: GalleryDemoCategory._kDemos,
-//                    routeName: AnimationDemo.routeName,
-//                    buildRoute: (BuildContext context) => new AnimationDemo()
-//                ),
-//
-//                // Style
+                new GalleryDemo(
+                    title: "Animation",
+                    subtitle: "Section organizer",
+                    icon: GalleryIcons.animation,
+                    category: DemoUtils._kDemos,
+                    routeName: AnimationDemo.routeName,
+                    buildRoute: (BuildContext context) => new AnimationDemo()
+                ),
+
+                // Style
                 new GalleryDemo(
                     title: "Colors",
                     subtitle: "All of the predefined colors",
@@ -201,24 +201,24 @@ namespace UIWidgetsGallery.gallery {
                     documentationUrl: "https://docs.flutter.io/flutter/material/BottomNavigationBar-class.html",
                     buildRoute: (BuildContext context) => new BottomNavigationDemo()
                 ),
-//                new GalleryDemo(
-//                    title: "Bottom sheet: Modal",
-//                    subtitle: "A dismissable bottom sheet",
-//                    icon: GalleryIcons.bottom_sheets,
-//                    category: GalleryDemoCategory._kMaterialComponents,
-//                    routeName: ModalBottomSheetDemo.routeName,
-//                    documentationUrl: "https://docs.flutter.io/flutter/material/showModalBottomSheet.html",
-//                    buildRoute: (BuildContext context) => ModalBottomSheetDemo()
-//                ),
-//                new GalleryDemo(
-//                    title: "Bottom sheet: Persistent",
-//                    subtitle: "A bottom sheet that sticks around",
-//                    icon: GalleryIcons.bottom_sheet_persistent,
-//                    category: GalleryDemoCategory._kMaterialComponents,
-//                    routeName: PersistentBottomSheetDemo.routeName,
-//                    documentationUrl: "https://docs.flutter.io/flutter/material/ScaffoldState/showBottomSheet.html",
-//                    buildRoute: (BuildContext context) => PersistentBottomSheetDemo()
-//                ),
+                new GalleryDemo(
+                    title: "Bottom sheet: Modal",
+                    subtitle: "A dismissable bottom sheet",
+                    icon: GalleryIcons.bottom_sheets,
+                    category: _kMaterialComponents,
+                    routeName: ModalBottomSheetDemo.routeName,
+                    documentationUrl: "https://docs.flutter.io/flutter/material/showModalBottomSheet.html",
+                    buildRoute: (BuildContext context) => new ModalBottomSheetDemo()
+                ),
+                new GalleryDemo(
+                    title: "Bottom sheet: Persistent",
+                    subtitle: "A bottom sheet that sticks around",
+                    icon: GalleryIcons.bottom_sheet_persistent,
+                    category: _kMaterialComponents,
+                    routeName: PersistentBottomSheetDemo.routeName,
+                    documentationUrl: "https://docs.flutter.io/flutter/material/ScaffoldState/showBottomSheet.html",
+                    buildRoute: (BuildContext context) => new PersistentBottomSheetDemo()
+                ),
                 new GalleryDemo(
                     title: "Buttons",
                     subtitle: "Flat, raised, dropdown, and more",
@@ -227,15 +227,15 @@ namespace UIWidgetsGallery.gallery {
                     routeName: ButtonsDemo.routeName,
                     buildRoute: (BuildContext context) => new ButtonsDemo()
                 ),
-//                new GalleryDemo(
-//                    title: "Buttons: Floating Action Button",
-//                    subtitle: "FAB with transitions",
-//                    icon: GalleryIcons.buttons,
-//                    category: GalleryDemoCategory._kMaterialComponents,
-//                    routeName: TabsFabDemo.routeName,
-//                    documentationUrl: "https://docs.flutter.io/flutter/material/FloatingActionButton-class.html",
-//                    buildRoute: (BuildContext context) => TabsFabDemo()
-//                ),
+                new GalleryDemo(
+                    title: "Buttons: Floating Action Button",
+                    subtitle: "FAB with transitions",
+                    icon: GalleryIcons.buttons,
+                    category: _kMaterialComponents,
+                    routeName: TabsFabDemo.routeName,
+                    documentationUrl: "https://docs.flutter.io/flutter/material/FloatingActionButton-class.html",
+                    buildRoute: (BuildContext context) => new TabsFabDemo()
+                ),
                 new GalleryDemo(
                     title: "Cards",
                     subtitle: "Baseline cards with rounded corners",
@@ -245,15 +245,15 @@ namespace UIWidgetsGallery.gallery {
                     documentationUrl: "https://docs.flutter.io/flutter/material/Card-class.html",
                     buildRoute: (BuildContext context) => new CardsDemo()
                 ),
-//                new GalleryDemo(
-//                    title: "Chips",
-//                    subtitle: "Labeled with delete buttons and avatars",
-//                    icon: GalleryIcons.chips,
-//                    category: GalleryDemoCategory._kMaterialComponents,
-//                    routeName: ChipDemo.routeName,
-//                    documentationUrl: "https://docs.flutter.io/flutter/material/Chip-class.html",
-//                    buildRoute: (BuildContext context) => ChipDemo()
-//                ),
+                new GalleryDemo(
+                    title: "Chips",
+                    subtitle: "Labeled with delete buttons and avatars",
+                    icon: GalleryIcons.chips,
+                    category: _kMaterialComponents,
+                    routeName: ChipDemo.routeName,
+                    documentationUrl: "https://docs.flutter.io/flutter/material/Chip-class.html",
+                    buildRoute: (BuildContext context) => new ChipDemo()
+                ),
 //                new GalleryDemo(
 //                    title: "Data tables",
 //                    subtitle: "Rows and columns",

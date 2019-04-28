@@ -93,6 +93,16 @@ namespace Unity.UIWidgets.rendering {
                 this.markNeedsLayout();
             }
         }
+        
+        
+        ColorFilter _colorFilter;
+
+        void _updateColorFilter() {
+            if (this._color == null)
+                this._colorFilter = null;
+            else
+                this._colorFilter = ColorFilter.mode(this._color, this._colorBlendMode);
+        }
 
         Color _color;
 
@@ -268,7 +278,7 @@ namespace Unity.UIWidgets.rendering {
                 rect: offset & this.size,
                 image: this._image,
                 scale: this._scale,
-                // colorFilter: this._colorFilter,
+                colorFilter: this._colorFilter,
                 fit: this._fit,
                 alignment: this._alignment,
                 centerSlice: this._centerSlice,

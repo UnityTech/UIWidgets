@@ -64,7 +64,7 @@ namespace Unity.UIWidgets.gestures {
                 this._handlePointerHoverEvent(evt);
             }
 
-            HitTestResult result;
+            HitTestResult result = null;
             if (evt is PointerDownEvent) {
                 D.assert(!this._hitTests.ContainsKey(evt.pointer));
                 result = new HitTestResult();
@@ -86,11 +86,20 @@ namespace Unity.UIWidgets.gestures {
             else if (evt.down) {
                 result = this._hitTests.getOrDefault(evt.pointer);
             }
-            else {
-                return;
-            }
 
-            if (result != null) {
+            D.assert(() => {
+                if (D.debugPrintMouseHoverEvents && evt is PointerHoverEvent) {
+                    Debug.LogFormat("{0}", evt);
+                }
+
+                return true;
+            });
+
+            if (result != null ||
+                evt is PointerHoverEvent ||
+                evt is PointerAddedEvent ||
+                evt is PointerRemovedEvent
+            ) {
                 this.dispatchEvent(evt, result);
             }
         }
@@ -154,6 +163,27 @@ namespace Unity.UIWidgets.gestures {
         }
 
         public void dispatchEvent(PointerEvent evt, HitTestResult result) {
+            if (result == null) {
+                D.assert(evt is PointerHoverEvent || evt is PointerAddedEvent || evt is PointerRemovedEvent);
+                try {
+                    this.pointerRouter.route(evt);
+                }
+                catch (Exception ex) {
+                    UIWidgetsError.reportError(new UIWidgetsErrorDetails(
+                            exception: ex,
+                            library: "gesture library",
+                            context: "while dispatching a non-hit-tested pointer event",
+                            informationCollector: information => {
+                                information.AppendLine("Event: ");
+                                information.AppendFormat(" {0}", evt);
+                            }
+                        )
+                    );
+                }
+
+                return;
+            }
+
             foreach (HitTestEntry entry in result.path) {
                 try {
                     entry.target.handleEvent(evt, entry);
