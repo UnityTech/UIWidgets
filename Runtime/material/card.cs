@@ -38,21 +38,22 @@ namespace Unity.UIWidgets.material {
 
         public readonly Widget child;
         
-        const double _defaultElevation = 1.0;
+        const float _defaultElevation = 1.0f;
         const Clip _defaultClipBehavior = Clip.none;
 
         public override Widget build(BuildContext context) {
             CardTheme cardTheme = CardTheme.of(context);
-            
+
             return new Container(
                 margin: this.margin ?? cardTheme.margin ?? EdgeInsets.all(4.0f),
                 child: new Material(
                     type: MaterialType.card,
                     color: this.color ?? cardTheme.color ?? Theme.of(context).cardColor,
-                    elevation: this.elevation ?? cardTheme.elevation ?? 1.0f,
+                    elevation: this.elevation ?? cardTheme.elevation ?? _defaultElevation,
                     shape: this.shape ?? cardTheme.shape ?? new RoundedRectangleBorder(
                                borderRadius: BorderRadius.all(Radius.circular(4.0f))
                            ),
+                    borderOnForeground: this.borderOnForeground,
                     clipBehavior: this.clipBehavior ?? cardTheme.clipBehavior ?? _defaultClipBehavior,
                     child: this.child)
             );

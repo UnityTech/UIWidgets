@@ -59,9 +59,9 @@ namespace Unity.UIWidgets.widgets {
 
         public static IconThemeData lerp(IconThemeData a, IconThemeData b, float t) {
             return new IconThemeData(
-                color: Color.lerp(a.color, b.color, t),
-                opacity: MathUtils.lerpNullableFloat(a.opacity, b.opacity, t),
-                size: MathUtils.lerpNullableFloat(a.size, b.size, t));
+                color: Color.lerp(a?.color, b?.color, t),
+                opacity: MathUtils.lerpNullableFloat(a?.opacity, b?.opacity, t),
+                size: MathUtils.lerpNullableFloat(a?.size, b?.size, t));
         }
 
 

@@ -194,6 +194,8 @@ namespace Unity.UIWidgets.widgets {
         public override State createState() {
             return new EditableTextState();
         }
+        
+        public static bool debugDeterministicCursor = false;
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
@@ -221,27 +223,40 @@ namespace Unity.UIWidgets.widgets {
     public class EditableTextState : AutomaticKeepAliveClientWithTickerProviderStateMixin<EditableText>,
         WidgetsBindingObserver, TextInputClient,
         TextSelectionDelegate {
+        
         const int _kObscureShowLatestCharCursorTicks = 3;
         static TimeSpan _kCursorBlinkHalfPeriod = TimeSpan.FromMilliseconds(500);
         static TimeSpan _kCursorBlinkWaitForStart = TimeSpan.FromMilliseconds(150);
-        static readonly TimeSpan _fadeDuration = TimeSpan.FromMilliseconds(500);
-        static readonly TimeSpan _floatingCursorResetTime = TimeSpan.FromMilliseconds(150);
+        
         Timer _cursorTimer;
         bool _targetCursorVisibility = false;
         ValueNotifier<bool> _cursorVisibilityNotifier = new ValueNotifier<bool>(false);
         GlobalKey _editableKey = GlobalKey.key();
-        LayerLink _layerLink = new LayerLink();
-        bool _didAutoFocus = false;
-        public ScrollController _scrollController = new ScrollController();
-        AnimationController _cursorBlinkOpacityController;
-
+        
         TextInputConnection _textInputConnection;
         TextSelectionOverlay _selectionOverlay;
-        int _obscureShowCharTicksPending = 0;
-        int _obscureLatestCharIndex;
+        
+        public ScrollController _scrollController = new ScrollController();
+        AnimationController _cursorBlinkOpacityController;
+        
+        LayerLink _layerLink = new LayerLink();
+        bool _didAutoFocus = false;
+        
+        static readonly TimeSpan _fadeDuration = TimeSpan.FromMilliseconds(500);
+        
+        static readonly TimeSpan _floatingCursorResetTime = TimeSpan.FromMilliseconds(150);
+        
+        AnimationController _floatingCursorResetController;
 
         protected override bool wantKeepAlive {
             get { return this.widget.focusNode.hasFocus; }
+        }
+        
+        
+        Color _cursorColor {
+            get {
+                return this.widget.cursorColor.withOpacity(this._cursorBlinkOpacityController.value);
+            }
         }
 
         public override void initState() {
@@ -249,6 +264,10 @@ namespace Unity.UIWidgets.widgets {
             this.widget.controller.addListener(this._didChangeTextEditingValue);
             this.widget.focusNode.addListener(this._handleFocusChanged);
             this._scrollController.addListener(() => { this._selectionOverlay?.updateForScroll(); });
+            this._cursorBlinkOpacityController = new AnimationController(vsync: this, duration: _fadeDuration);
+            this._cursorBlinkOpacityController.addListener(this._onCursorColorTick);
+            this._floatingCursorResetController = new AnimationController(vsync: this);
+            // this._floatingCursorResetController.addListener(_onFloatingCursorResetTick); // TODO: remove comment when _onFLoatingCursorResetTick is ready
         }
 
         public override void didChangeDependencies() {
@@ -278,6 +297,8 @@ namespace Unity.UIWidgets.widgets {
 
         public override void dispose() {
             this.widget.controller.removeListener(this._didChangeTextEditingValue);
+            this._cursorBlinkOpacityController.removeListener(this._onCursorColorTick);
+            // this._floatingCursorResetController.removeListener(this._onFloatingCursorResetTick); // TODO: remove comment when _onFloatingCursorResetTick is ready
             this._closeInputConnectionIfNeeded();
             D.assert(!this._hasInputConnection);
             this._stopCursorTimer();
@@ -302,6 +323,9 @@ namespace Unity.UIWidgets.widgets {
 
             this._lastKnownRemoteTextEditingValue = value;
             this._formatAndSetValue(value);
+            
+            this._stopCursorTimer(resetCharTicks: false);
+            this._startCursorTimer();
         }
 
         public void performAction(TextInputAction action) {
@@ -323,6 +347,68 @@ namespace Unity.UIWidgets.widgets {
                     break;
             }
         }
+        
+        Rect _startCaretRect;
+        
+        TextPosition _lastTextPosition;
+        
+        Offset _pointOffsetOrigin;
+        
+        Offset _lastBoundedOffset;
+        
+        Offset _floatingCursorOffset {
+            get {
+                return new Offset(0, this.renderEditable.preferredLineHeight / 2);
+            }
+        }
+        
+        // TODO: remove comment when renderEditable is updated and FloatingCursorDragState is ready
+//        void updateFloatingCursor(RawFloatingCursorPoint point) {
+//            switch(point.state){
+//                case FloatingCursorDragState.Start:
+//                    TextPosition currentTextPosition = new TextPosition(offset: this.renderEditable.selection.baseOffset);
+//                    this._startCaretRect = this.renderEditable.getLocalRectForCaret(currentTextPosition);
+//                    this.renderEditable.setFloatingCursor(point.state, this._startCaretRect.center - this._floatingCursorOffset, currentTextPosition);
+//                    break;
+//                case FloatingCursorDragState.Update:
+//                    // We want to send in points that are centered around a (0,0) origin, so we cache the
+//                    // position on the first update call.
+//                    if (this._pointOffsetOrigin != null) {
+//                        Offset centeredPoint = point.offset - this._pointOffsetOrigin;
+//                        Offset rawCursorOffset = this._startCaretRect.center + centeredPoint - this._floatingCursorOffset;
+//                        this._lastBoundedOffset = this.renderEditable.calculateBoundedFloatingCursorOffset(rawCursorOffset);
+//                        this._lastTextPosition = this.renderEditable.getPositionForPoint(this.renderEditable.localToGlobal(this._lastBoundedOffset + this._floatingCursorOffset));
+//                        this.renderEditable.setFloatingCursor(point.state, this._lastBoundedOffset, this._lastTextPosition);
+//                    } else {
+//                        this._pointOffsetOrigin = point.offset;
+//                    }
+//                    break;
+//                case FloatingCursorDragState.End:
+//                    this._floatingCursorResetController.setValue(0.0f);
+//                    this._floatingCursorResetController.animateTo(1.0f, duration: _floatingCursorResetTime, curve: Curves.decelerate);
+//                    break;
+//            }
+//        }
+        
+        // TODO: remove comment when RenderEditable.setFloatingCursor, Floating CursorDragState, and force press is ready
+//        void _onFloatingCursorResetTick() {
+//            Offset finalPosition = this.renderEditable.getLocalRectForCaret(this._lastTextPosition).centerLeft - this._floatingCursorOffset;
+//            if (this._floatingCursorResetController.isCompleted) {
+//                this.renderEditable.setFloatingCursor(FloatingCursorDragState.End, finalPosition, this._lastTextPosition);
+//                if (this._lastTextPosition.offset != this.renderEditable.selection.baseOffset)
+//                    this._handleSelectionChanged(TextSelection.collapsed(offset: this._lastTextPosition.offset), this.renderEditable, SelectionChangedCause.forcePress);
+//                this._startCaretRect = null;
+//                this._lastTextPosition = null;
+//                this._pointOffsetOrigin = null;
+//                this._lastBoundedOffset = null;
+//            } else {
+//                float lerpValue = this._floatingCursorResetController.value;
+//                float lerpX = MathUtils.lerpFloat(this._lastBoundedOffset.dx, finalPosition.dx, lerpValue);
+//                float lerpY = MathUtils.lerpFloat(this._lastBoundedOffset.dy, finalPosition.dy, lerpValue);
+//
+//                this.renderEditable.setFloatingCursor(FloatingCursorDragState.Update, new Offset(lerpX, lerpY), this._lastTextPosition, resetLerpValue: lerpValue);
+//            }
+//        }
 
         void _finalizeEditing(bool shouldUnfocus) {
             if (this.widget.onEditingComplete != null) {
@@ -369,8 +455,20 @@ namespace Unity.UIWidgets.widgets {
 
         // Calculate the new scroll offset so the cursor remains visible.
         float _getScrollOffsetForCaret(Rect caretRect) {
-            float caretStart = this._isMultiline ? caretRect.top : caretRect.left;
-            float caretEnd = this._isMultiline ? caretRect.bottom : caretRect.right;
+            float caretStart;
+            float caretEnd;
+            if (this._isMultiline) {
+                // The caret is vertically centered within the line. Expand the caret's
+                // height so that it spans the line because we're going to ensure that the entire
+                // expanded caret is scrolled into view.
+                float lineHeight = this.renderEditable.preferredLineHeight;
+                float caretOffset = (lineHeight - caretRect.height) / 2;
+                caretStart = caretRect.top - caretOffset;
+                caretEnd = caretRect.bottom + caretOffset;
+            } else {
+                caretStart = caretRect.left;
+                caretEnd = caretRect.right;
+            }
             float scrollOffset = this._scrollController.offset;
             float viewportExtent = this._scrollController.position.viewportDimension;
             if (caretStart < 0.0) {
@@ -438,6 +536,10 @@ namespace Unity.UIWidgets.widgets {
                 this._openInputConnection();
             }
             else {
+                // TODO: remove comment when FocusScope.ancestorsOf is ready
+//                List<FocusScopeNode> ancestorScopes = FocusScope.ancestorsOf(this.context);
+//                for (int i = ancestorScopes.Count - 1; i >= 1; i -= 1)
+//                    ancestorScopes[i].setFirstFocus(ancestorScopes[i - 1]);
                 FocusScope.of(this.context).requestFocus(this.widget.focusNode);
             }
         }
@@ -476,6 +578,7 @@ namespace Unity.UIWidgets.widgets {
                     renderObject: renderObject,
                     selectionControls: this.widget.selectionControls,
                     selectionDelegate: this
+                    // dragStartBehavior: this.widget.dragStartBehavior // TODO: remove comment when TextSelectionOverlay is updated
                 );
                 bool longPress = cause == SelectionChangedCause.longPress;
                 if (cause != SelectionChangedCause.keyboard && (this._value.text.isNotEmpty() || longPress)) {
@@ -569,8 +672,8 @@ namespace Unity.UIWidgets.widgets {
         }
 
         void _formatAndSetValue(TextEditingValue value) {
-            var textChanged = (this._value == null ? null : this._value.text) != (value == null ? null : value.text);
-            if (this.widget.inputFormatters != null && this.widget.inputFormatters.isNotEmpty()) {
+            var textChanged = this._value?.text != value?.text;
+            if (textChanged && this.widget.inputFormatters != null && this.widget.inputFormatters.isNotEmpty()) {
                 foreach (var formatter in this.widget.inputFormatters) {
                     value = formatter.formatEditUpdate(this._value, value);
                 }
@@ -587,6 +690,11 @@ namespace Unity.UIWidgets.widgets {
                 this.widget.onChanged(value.text);
             }
         }
+        
+        void _onCursorColorTick() {
+            this.renderEditable.cursorColor = this.widget.cursorColor.withOpacity(this._cursorBlinkOpacityController.value);
+            this._cursorVisibilityNotifier.value = this._cursorBlinkOpacityController.value > 0;
+        }
 
         public bool cursorCurrentlyVisible {
             get { return this._cursorVisibilityNotifier.value; }
@@ -595,28 +703,65 @@ namespace Unity.UIWidgets.widgets {
         public TimeSpan cursorBlinkInterval {
             get { return _kCursorBlinkHalfPeriod; }
         }
+        
+        public TextSelectionOverlay selectionOverlay {
+            get {
+                return this._selectionOverlay;
+            }
+        }
+
+        int _obscureShowCharTicksPending = 0;
+        int _obscureLatestCharIndex;
 
         void _cursorTick() {
+            this._targetCursorVisibility = !this._targetCursorVisibility;
+            float targetOpacity = this._targetCursorVisibility ? 1.0f : 0.0f;
+            if (this.widget.cursorOpacityAnimates) {
+                this._cursorBlinkOpacityController.animateTo(targetOpacity, curve: Curves.easeOut);
+            } else {
+                this._cursorBlinkOpacityController.setValue(targetOpacity);
+            }
             this._cursorVisibilityNotifier.value = !this._unityKeyboard() && !this._cursorVisibilityNotifier.value;
             if (this._obscureShowCharTicksPending > 0) {
                 this.setState(() => { this._obscureShowCharTicksPending--; });
             }
         }
-
-        void _startCursorTimer() {
-            this._cursorVisibilityNotifier.value = !this._unityKeyboard();
-            this._cursorTimer = Window.instance.run(_kCursorBlinkHalfPeriod, this._cursorTick,
-                periodic: true);
+        
+        void _cursorWaitForStart() {
+            D.assert(_kCursorBlinkHalfPeriod > _fadeDuration);
+            this._cursorTimer?.cancel();
+            this._cursorTimer = Window.instance.run(_kCursorBlinkHalfPeriod, this._cursorTick, periodic: true);
         }
 
-        void _stopCursorTimer() {
-            if (this._cursorTimer != null) {
-                this._cursorTimer.cancel();
-            }
+        void _startCursorTimer() {
+            this._targetCursorVisibility = true;
+            this._cursorBlinkOpacityController.setValue(1.0f);
+            this._cursorVisibilityNotifier.value = !this._unityKeyboard();
+            if (EditableText.debugDeterministicCursor)
+                return;
 
+            if (this.widget.cursorOpacityAnimates) {
+                this._cursorTimer = Window.instance.run(_kCursorBlinkWaitForStart, this._cursorWaitForStart, periodic: true);
+            }
+            else {
+                this._cursorTimer = Window.instance.run(_kCursorBlinkHalfPeriod, this._cursorTick, periodic: true);
+            }
+        }
+
+        void _stopCursorTimer(bool resetCharTicks = true) {
+            this._cursorTimer?.cancel();
             this._cursorTimer = null;
+            this._targetCursorVisibility = false;
+            this._cursorBlinkOpacityController.setValue(0.0f);
             this._cursorVisibilityNotifier.value = false;
-            this._obscureShowCharTicksPending = 0;
+            if (EditableText.debugDeterministicCursor)
+                return;
+            if (resetCharTicks)
+                this._obscureShowCharTicksPending = 0;
+            if (this.widget.cursorOpacityAnimates) {
+                this._cursorBlinkOpacityController.stop();
+                this._cursorBlinkOpacityController.setValue(0.0f);
+            }
         }
 
         void _startOrStopCursorTimerIfNeeded() {
@@ -679,10 +824,22 @@ namespace Unity.UIWidgets.widgets {
                 this._formatAndSetValue(value);
             }
         }
+        
+        float _devicePixelRatio {
+            get { return MediaQuery.of(this.context).devicePixelRatio; }
+        }
 
         public void bringIntoView(TextPosition position) {
             this._scrollController.jumpTo(
                 this._getScrollOffsetForCaret(this.renderEditable.getLocalRectForCaret(position)));
+        }
+        
+        bool showToolbar() {
+            if (this._selectionOverlay == null)
+                return false;
+
+            this._selectionOverlay.showToolbar();
+            return true;
         }
 
         public void hideToolbar() {
@@ -697,6 +854,7 @@ namespace Unity.UIWidgets.widgets {
                 axisDirection: this._isMultiline ? AxisDirection.down : AxisDirection.right,
                 controller: this._scrollController,
                 physics: new ClampingScrollPhysics(),
+                dragStartBehavior: this.widget.dragStartBehavior,
                 viewportBuilder: (BuildContext _context, ViewportOffset offset) =>
                     new CompositedTransformTarget(
                         link: this._layerLink,
@@ -704,8 +862,11 @@ namespace Unity.UIWidgets.widgets {
                             key: this._editableKey,
                             textSpan: this.buildTextSpan(),
                             value: this._value,
-                            cursorColor: this.widget.cursorColor,
-                            showCursor: this._cursorVisibilityNotifier,
+                            cursorColor: this._cursorColor,
+                            // backgroundCursorColor: this.widget.backgroundCursorColor, // TODO
+                            showCursor: EditableText.debugDeterministicCursor
+                                ? new ValueNotifier<bool>(true)
+                                : this._cursorVisibilityNotifier,
                             hasFocus: this._hasFocus,
                             maxLines: this.widget.maxLines,
                             selectionColor: this.widget.selectionColor,
@@ -720,8 +881,11 @@ namespace Unity.UIWidgets.widgets {
                             rendererIgnoresPointer: this.widget.rendererIgnoresPointer,
                             cursorWidth: this.widget.cursorWidth,
                             cursorRadius: this.widget.cursorRadius,
+                            // cursorOffset: this.widget.cursorOffset, // TODO
+                            // paintCursorAboveText: this.widget.paintCursorAboveText, // TODO
                             enableInteractiveSelection: this.widget.enableInteractiveSelection == true,
                             textSelectionDelegate: this
+                            // devicePixelRatio: _devicePixelRatio // TODO
                         )
                     )
             );
@@ -799,6 +963,7 @@ namespace Unity.UIWidgets.widgets {
         public readonly TextSpan textSpan;
         public readonly TextEditingValue value;
         public readonly Color cursorColor;
+        public readonly Color backgroundColor;
         public readonly ValueNotifier<bool> showCursor;
         public readonly bool hasFocus;
         public readonly int? maxLines;
@@ -814,21 +979,26 @@ namespace Unity.UIWidgets.widgets {
         public readonly bool rendererIgnoresPointer;
         public readonly float? cursorWidth;
         public readonly Radius cursorRadius;
+        public readonly Offset cursorOffset;
         public readonly bool enableInteractiveSelection;
         public readonly TextSelectionDelegate textSelectionDelegate;
+        public readonly bool? paintCursorAboveText;
+        public readonly float? devicePixelRatio;
 
 
         public _Editable(TextSpan textSpan = null, TextEditingValue value = null,
-            Color cursorColor = null, ValueNotifier<bool> showCursor = null, bool hasFocus = false,
+            Color cursorColor = null, Color backgroundColor = null, ValueNotifier<bool> showCursor = null, bool hasFocus = false,
             int? maxLines = null, Color selectionColor = null, float textScaleFactor = 1.0f,
             TextDirection? textDirection = null, bool obscureText = false, TextAlign textAlign = TextAlign.left,
             bool autocorrect = false, ViewportOffset offset = null, SelectionChangedHandler onSelectionChanged = null,
             CaretChangedHandler onCaretChanged = null, bool rendererIgnoresPointer = false,
             Key key = null, TextSelectionDelegate textSelectionDelegate = null, float? cursorWidth = null,
-            Radius cursorRadius = null, bool enableInteractiveSelection = true) : base(key) {
+            Radius cursorRadius = null, Offset cursorOffset = null, bool enableInteractiveSelection = true,
+            bool? paintCursorAboveText = null, float? devicePixelRatio = null) : base(key) {
             this.textSpan = textSpan;
             this.value = value;
             this.cursorColor = cursorColor;
+            this.backgroundColor = backgroundColor;
             this.showCursor = showCursor;
             this.hasFocus = hasFocus;
             this.maxLines = maxLines;
@@ -845,7 +1015,10 @@ namespace Unity.UIWidgets.widgets {
             this.textSelectionDelegate = textSelectionDelegate;
             this.cursorWidth = cursorWidth;
             this.cursorRadius = cursorRadius;
+            this.cursorOffset = cursorOffset;
             this.enableInteractiveSelection = enableInteractiveSelection;
+            this.paintCursorAboveText = paintCursorAboveText;
+            this.devicePixelRatio = devicePixelRatio;
         }
 
         public override RenderObject createRenderObject(BuildContext context) {
@@ -855,6 +1028,7 @@ namespace Unity.UIWidgets.widgets {
                 offset: this.offset,
                 showCursor: this.showCursor,
                 cursorColor: this.cursorColor,
+                // backgroundColor: this.backgroundColor, // TODO
                 hasFocus: this.hasFocus,
                 maxLines: this.maxLines,
                 selectionColor: this.selectionColor,
@@ -867,8 +1041,11 @@ namespace Unity.UIWidgets.widgets {
                 ignorePointer: this.rendererIgnoresPointer,
                 cursorWidth: this.cursorWidth ?? 1.0f,
                 cursorRadius: this.cursorRadius,
+                // cursorOffset: this.cursorOffset, // TODO
                 enableInteractiveSelection: this.enableInteractiveSelection,
                 textSelectionDelegate: this.textSelectionDelegate
+                // paintCursorAboveText: this.paintCursorAboveText, // TODO
+                // devicePixelRatio: this.devicePixelRatio // TODO
             );
         }
 
@@ -876,6 +1053,7 @@ namespace Unity.UIWidgets.widgets {
             var edit = (RenderEditable) renderObject;
             edit.text = this.textSpan;
             edit.cursorColor = this.cursorColor;
+            // edit.backgroundColor = this.backgroundColor; // TODO
             edit.showCursor = this.showCursor;
             edit.hasFocus = this.hasFocus;
             edit.maxLines = this.maxLines;
@@ -892,7 +1070,10 @@ namespace Unity.UIWidgets.widgets {
             edit.textSelectionDelegate = this.textSelectionDelegate;
             edit.cursorWidth = this.cursorWidth ?? 1.0f;
             edit.cursorRadius = this.cursorRadius;
+            // edit.cursorOffset = this.cursorOffset; // TODO
             edit.enableInteractiveSelection = this.enableInteractiveSelection;
+            // edit.paintCursorAboveText = this.paintCursorAboveText; // TODO
+            // edit.devicePixelRatio = this.devicePixelRatio; // TODO
         }
     }
 }

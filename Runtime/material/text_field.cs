@@ -513,6 +513,7 @@ namespace Unity.UIWidgets.material {
                 ignoring: !(this.widget.enabled ?? this.widget.decoration?.enabled ?? true),
                 child: new TextSelectionGestureDetector(
                     onTapDown: this._handleTapDown,
+                    // onForcePressStart: forcePressEnabled ? this._handleForcePressStarted : null, // TODO: Remove this when force press is added
                     onSingleTapUp: this._handleSingleTapUp,
                     onSingleTapCancel: this._handleSingleTapCancel,
                     onSingleLongTapStart: this._handleLongPress,
