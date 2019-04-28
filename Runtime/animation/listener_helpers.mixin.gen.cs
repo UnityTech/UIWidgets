@@ -62,7 +62,7 @@ namespace Unity.UIWidgets.animation {
 
         public override void removeListener(VoidCallback listener) {
             bool removed = this._listeners.Remove(listener);
-            if(removed) {
+            if (removed) {
                 this.didUnregisterListener();
             }
         }
@@ -101,7 +101,7 @@ namespace Unity.UIWidgets.animation {
 
         public override void removeListener(VoidCallback listener) {
             bool removed = this._listeners.Remove(listener);
-            if(removed) {
+            if (removed) {
                 this.didUnregisterListener();
             }
         }
@@ -141,7 +141,7 @@ namespace Unity.UIWidgets.animation {
 
         public override void removeStatusListener(AnimationStatusListener listener) {
             bool removed = this._statusListeners.Remove(listener);
-            if(removed) {
+            if (removed) {
                 this.didUnregisterListener();
             }
         }
@@ -180,7 +180,7 @@ namespace Unity.UIWidgets.animation {
 
         public override void removeStatusListener(AnimationStatusListener listener) {
             bool removed = this._statusListeners.Remove(listener);
-            if(removed) {
+            if (removed) {
                 this.didUnregisterListener();
             }
         }
@@ -219,7 +219,7 @@ namespace Unity.UIWidgets.animation {
 
         public override void removeStatusListener(AnimationStatusListener listener) {
             bool removed = this._statusListeners.Remove(listener);
-            if(removed) {
+            if (removed) {
                 this.didUnregisterListener();
             }
         }

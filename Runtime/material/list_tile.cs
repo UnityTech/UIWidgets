@@ -146,6 +146,32 @@ namespace Unity.UIWidgets.material {
 
         public readonly bool selected;
 
+        public static IEnumerable<Widget> divideTiles(BuildContext context = null, IEnumerable<Widget> tiles = null,
+            Color color = null) {
+            D.assert(tiles != null);
+            D.assert(color != null || context != null);
+
+            IEnumerator<Widget> enumerator = tiles.GetEnumerator();
+            List<Widget> result = new List<Widget> { };
+
+            Decoration decoration = new BoxDecoration(
+                border: new Border(
+                    bottom: Divider.createBorderSide(context, color: color)
+                )
+            );
+
+            Widget tile = enumerator.Current;
+            while (enumerator.MoveNext()) {
+                result.Add(new DecoratedBox(
+                    position: DecorationPosition.foreground,
+                    decoration: decoration,
+                    child: tile
+                ));
+                tile = enumerator.Current;
+            }
+
+            return result;
+        }
 
         Color _iconColor(ThemeData theme, ListTileTheme tileTheme) {
             if (!this.enabled) {

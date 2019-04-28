@@ -204,8 +204,8 @@ namespace Unity.UIWidgets.animation {
             this._direction = _AnimationDirection.forward;
             return this._animateToInternal(target, duration: duration, curve: curve);
         }
-        
-        TickerFuture animateBack(float target, TimeSpan? duration, Curve curve = null) {
+
+        public TickerFuture animateBack(float target, TimeSpan? duration, Curve curve = null) {
             D.assert(
                 this._ticker != null,
                 "AnimationController.animateBack() called after AnimationController.dispose()\n" +
@@ -262,7 +262,8 @@ namespace Unity.UIWidgets.animation {
                 new _InterpolationSimulation(this._value, target, simulationDuration.Value, curve));
         }
 
-        public TickerFuture repeat(float? min = null, float? max = null, bool reverse = false, TimeSpan? period = null) {
+        public TickerFuture repeat(float? min = null, float? max = null, bool reverse = false,
+            TimeSpan? period = null) {
             min = min ?? this.lowerBound;
             max = max ?? this.upperBound;
             period = period ?? this.duration;
@@ -278,7 +279,7 @@ namespace Unity.UIWidgets.animation {
 
                 return true;
             });
-            
+
             D.assert(max >= min);
             D.assert(max <= this.upperBound && min >= this.lowerBound);
             return this.animateWith(new _RepeatingSimulation(this._value, min.Value, max.Value, reverse, period.Value));
@@ -438,7 +439,8 @@ namespace Unity.UIWidgets.animation {
             this._min = min;
             this._max = max;
             this._periodInSeconds = (float) period.Ticks / TimeSpan.TicksPerSecond;
-            this._initialT = (max == min) ? 0.0f : (initialValue / (max - min)) * (period.Ticks / TimeSpan.TicksPerSecond);
+            this._initialT =
+                (max == min) ? 0.0f : (initialValue / (max - min)) * (period.Ticks / TimeSpan.TicksPerSecond);
             this._reverse = reverse;
             D.assert(this._periodInSeconds > 0.0f);
             D.assert(this._initialT >= 0.0f);
@@ -454,11 +456,12 @@ namespace Unity.UIWidgets.animation {
             D.assert(timeInSeconds >= 0.0f);
             float totalTimeInSeconds = timeInSeconds + this._initialT;
             float t = (totalTimeInSeconds / this._periodInSeconds) % 1.0f;
-            bool _isPlayingReverse = ((int)(totalTimeInSeconds / this._periodInSeconds)) % 2 == 1;
+            bool _isPlayingReverse = ((int) (totalTimeInSeconds / this._periodInSeconds)) % 2 == 1;
 
             if (this._reverse && _isPlayingReverse) {
                 return MathUtils.lerpFloat(this._max, this._min, t);
-            } else {
+            }
+            else {
                 return MathUtils.lerpFloat(this._min, this._max, t);
             }
         }

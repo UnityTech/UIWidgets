@@ -56,6 +56,10 @@ namespace Unity.UIWidgets.gestures {
     public static class PointerEventConverter {
         static readonly Dictionary<int, _PointerState> _pointers = new Dictionary<int, _PointerState>();
 
+        static void clearPointers() {
+            _pointers.Clear();
+        }
+
         static _PointerState _ensureStateForPointer(PointerData datum, Offset position) {
             return _pointers.putIfAbsent(
                 datum.device,
@@ -152,7 +156,7 @@ namespace Unity.UIWidgets.gestures {
                         if (state == null || !state.down) {
                             break;
                         }
-                        
+
                         D.assert(state.down);
                         if (position != state.lastPosition) {
                             Offset offset = position - state.lastPosition;

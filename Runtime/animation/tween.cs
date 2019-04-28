@@ -213,6 +213,19 @@ namespace Unity.UIWidgets.animation {
         }
     }
 
+    class ConstantTween<T> : Tween<T> {
+        public ConstantTween(T value) : base(begin: value, end: value) {
+        }
+
+        public override T lerp(float t) {
+            return this.begin;
+        }
+
+        public override string ToString() {
+            return $"{this.GetType()}(value: {this.begin})";
+        }
+    }
+
     public class CurveTween : Animatable<float> {
         public CurveTween(Curve curve = null) {
             D.assert(curve != null);

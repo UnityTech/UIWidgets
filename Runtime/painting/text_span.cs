@@ -15,13 +15,15 @@ namespace Unity.UIWidgets.painting {
         public readonly string text;
         public readonly List<TextSpan> children;
         public readonly GestureRecognizer recognizer;
+        public readonly HoverRecognizer hoverRecognizer;
 
         public TextSpan(string text = "", TextStyle style = null, List<TextSpan> children = null,
-            GestureRecognizer recognizer = null) {
+            GestureRecognizer recognizer = null, HoverRecognizer hoverRecognizer = null) {
             this.text = text;
             this.style = style;
             this.children = children;
             this.recognizer = recognizer;
+            this.hoverRecognizer = hoverRecognizer;
         }
 
         public void build(ParagraphBuilder builder, float textScaleFactor = 1.0f) {
@@ -43,6 +45,20 @@ namespace Unity.UIWidgets.painting {
 
             if (hasStyle) {
                 builder.pop();
+            }
+        }
+
+        public bool hasHoverRecognizer {
+            get {
+                bool need = false;
+                this.visitTextSpan((text) => {
+                    if (text.hoverRecognizer != null) {
+                        need = true;
+                        return false;
+                    }
+                    return true;
+                });
+                return need;
             }
         }
 
@@ -153,6 +169,11 @@ namespace Unity.UIWidgets.painting {
             RenderComparison result = Equals(this.recognizer, other.recognizer)
                 ? RenderComparison.identical
                 : RenderComparison.metadata;
+
+            if (!Equals(this.hoverRecognizer, other.hoverRecognizer)) {
+                result = RenderComparison.function > result ? RenderComparison.function : result;
+            }
+            
             if (this.style != null) {
                 var candidate = this.style.compareTo(other.style);
                 if (candidate > result) {
