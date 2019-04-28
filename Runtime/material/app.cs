@@ -53,7 +53,7 @@ namespace Unity.UIWidgets.material {
             this.title = title;
             this.color = color;
             this.theme = theme;
-            this.dartTheme = darkTheme;
+            this.darkTheme = darkTheme;
             this.locale = locale;
             this.localizationsDelegates = localizationsDelegates;
             this.localeListResolutionCallback = localeListResolutionCallback;
@@ -82,7 +82,7 @@ namespace Unity.UIWidgets.material {
 
         public readonly ThemeData theme;
 
-        public readonly ThemeData dartTheme;
+        public readonly ThemeData darkTheme;
 
         public readonly Color color;
 

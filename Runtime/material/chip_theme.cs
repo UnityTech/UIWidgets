@@ -182,7 +182,6 @@ namespace Unity.UIWidgets.material {
         }
 
         public static ChipThemeData lerp(ChipThemeData a, ChipThemeData b, float t) {
-            D.assert(t != null);
             if (a == null && b == null) {
                 return null;
             }
