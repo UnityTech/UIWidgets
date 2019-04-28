@@ -196,6 +196,14 @@ namespace Unity.UIWidgets.engine {
         protected virtual void Update() {
             this._displayMetrics.Update();
             UIWidgetsMessageManager.ensureUIWidgetsMessageManagerIfNeeded();
+            
+#if UNITY_ANDROID
+            if (Input.GetKeyDown(KeyCode.Escape)) {
+                this._windowAdapter.withBinding(() => {
+                    WidgetsBinding.instance.handlePopRoute();
+                });
+            }
+#endif
 
             if (!this._viewMetricsCallbackRegistered) {
                 this._viewMetricsCallbackRegistered = true;

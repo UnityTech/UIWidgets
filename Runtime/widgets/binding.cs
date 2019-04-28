@@ -4,6 +4,7 @@ using RSG;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
+using UnityEngine;
 
 namespace Unity.UIWidgets.widgets {
     public interface WidgetsBindingObserver {
@@ -52,6 +53,23 @@ namespace Unity.UIWidgets.widgets {
 
         public bool removeObserver(WidgetsBindingObserver observer) {
             return this._observers.Remove(observer);
+        }
+
+        public void handlePopRoute() {
+            var idx = -1;
+            
+            void _handlePopRouteSub(bool result) {
+                if (!result) {
+                    idx++;
+                    if (idx >= this._observers.Count) {
+                        Application.Quit();
+                        return;
+                    }
+                    this._observers[idx].didPopRoute().Then(_handlePopRouteSub);
+                }
+            }
+            
+            _handlePopRouteSub(false);
         }
 
         public readonly WidgetInspectorService widgetInspectorService;
