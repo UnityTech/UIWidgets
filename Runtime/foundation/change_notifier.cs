@@ -86,27 +86,23 @@ namespace Unity.UIWidgets.foundation {
         }
     }
 
-    class _MergingListenable : ChangeNotifier {
+    class _MergingListenable : Listenable {
         internal _MergingListenable(List<Listenable> _children) {
             this._children = _children;
-
-            foreach (Listenable child in _children) {
-                if (child != null) {
-                    child.addListener(this.notifyListeners);
-                }
-            }
         }
 
         readonly List<Listenable> _children;
 
-        public override void dispose() {
+        public void addListener(VoidCallback listener) {
             foreach (Listenable child in this._children) {
-                if (child != null) {
-                    child.removeListener(this.notifyListeners);
-                }
+                child?.addListener(listener);
             }
+        }
 
-            base.dispose();
+        public void removeListener(VoidCallback listener) {
+            foreach (Listenable child in this._children) {
+                child?.removeListener(listener);
+            }
         }
 
         public override string ToString() {
