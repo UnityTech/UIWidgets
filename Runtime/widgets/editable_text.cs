@@ -130,7 +130,7 @@ namespace Unity.UIWidgets.widgets {
             D.assert(style != null);
             D.assert(cursorColor != null);
             D.assert(maxLines == null || maxLines > 0);
-            // D.assert(backgroundCursorColor != null); // TODO: remove comment when this parameter is actually used
+            D.assert(backgroundCursorColor != null);
             this.keyboardType = keyboardType ?? (maxLines == 1 ? TextInputType.text : TextInputType.multiline);
 
             this.scrollPadding = scrollPadding ?? EdgeInsets.all(20.0f);
@@ -264,7 +264,7 @@ namespace Unity.UIWidgets.widgets {
             this._cursorBlinkOpacityController = new AnimationController(vsync: this, duration: _fadeDuration);
             this._cursorBlinkOpacityController.addListener(this._onCursorColorTick);
             this._floatingCursorResetController = new AnimationController(vsync: this);
-            // this._floatingCursorResetController.addListener(_onFloatingCursorResetTick); // TODO: remove comment when _onFLoatingCursorResetTick is ready
+            // this._floatingCursorResetController.addListener(_onFloatingCursorResetTick); // TODO: remove comment when _onFloatingCursorResetTick is ready
         }
 
         public override void didChangeDependencies() {
@@ -865,7 +865,7 @@ namespace Unity.UIWidgets.widgets {
                             textSpan: this.buildTextSpan(),
                             value: this._value,
                             cursorColor: this._cursorColor,
-                            // backgroundCursorColor: this.widget.backgroundCursorColor, // TODO
+                            backgroundCursorColor: this.widget.backgroundCursorColor,
                             showCursor: EditableText.debugDeterministicCursor
                                 ? new ValueNotifier<bool>(true)
                                 : this._cursorVisibilityNotifier,
@@ -883,11 +883,11 @@ namespace Unity.UIWidgets.widgets {
                             rendererIgnoresPointer: this.widget.rendererIgnoresPointer,
                             cursorWidth: this.widget.cursorWidth,
                             cursorRadius: this.widget.cursorRadius,
-                            // cursorOffset: this.widget.cursorOffset, // TODO
-                            // paintCursorAboveText: this.widget.paintCursorAboveText, // TODO
+                            cursorOffset: this.widget.cursorOffset,
+                            paintCursorAboveText: this.widget.paintCursorAboveText,
                             enableInteractiveSelection: this.widget.enableInteractiveSelection == true,
-                            textSelectionDelegate: this
-                            // devicePixelRatio: _devicePixelRatio // TODO
+                            textSelectionDelegate: this,
+                            devicePixelRatio: this._devicePixelRatio
                         )
                     )
             );
@@ -965,7 +965,7 @@ namespace Unity.UIWidgets.widgets {
         public readonly TextSpan textSpan;
         public readonly TextEditingValue value;
         public readonly Color cursorColor;
-        public readonly Color backgroundColor;
+        public readonly Color backgroundCursorColor;
         public readonly ValueNotifier<bool> showCursor;
         public readonly bool hasFocus;
         public readonly int? maxLines;
@@ -989,7 +989,7 @@ namespace Unity.UIWidgets.widgets {
 
 
         public _Editable(TextSpan textSpan = null, TextEditingValue value = null,
-            Color cursorColor = null, Color backgroundColor = null, ValueNotifier<bool> showCursor = null,
+            Color cursorColor = null, Color backgroundCursorColor = null, ValueNotifier<bool> showCursor = null,
             bool hasFocus = false,
             int? maxLines = null, Color selectionColor = null, float textScaleFactor = 1.0f,
             TextDirection? textDirection = null, bool obscureText = false, TextAlign textAlign = TextAlign.left,
@@ -1001,7 +1001,7 @@ namespace Unity.UIWidgets.widgets {
             this.textSpan = textSpan;
             this.value = value;
             this.cursorColor = cursorColor;
-            this.backgroundColor = backgroundColor;
+            this.backgroundCursorColor = backgroundCursorColor;
             this.showCursor = showCursor;
             this.hasFocus = hasFocus;
             this.maxLines = maxLines;
@@ -1031,7 +1031,7 @@ namespace Unity.UIWidgets.widgets {
                 offset: this.offset,
                 showCursor: this.showCursor,
                 cursorColor: this.cursorColor,
-                // backgroundColor: this.backgroundColor, // TODO
+                backgroundCursorColor: this.backgroundCursorColor,
                 hasFocus: this.hasFocus,
                 maxLines: this.maxLines,
                 selectionColor: this.selectionColor,
@@ -1044,11 +1044,11 @@ namespace Unity.UIWidgets.widgets {
                 ignorePointer: this.rendererIgnoresPointer,
                 cursorWidth: this.cursorWidth ?? 1.0f,
                 cursorRadius: this.cursorRadius,
-                // cursorOffset: this.cursorOffset, // TODO
+                cursorOffset: this.cursorOffset,
                 enableInteractiveSelection: this.enableInteractiveSelection,
-                textSelectionDelegate: this.textSelectionDelegate
-                // paintCursorAboveText: this.paintCursorAboveText, // TODO
-                // devicePixelRatio: this.devicePixelRatio // TODO
+                textSelectionDelegate: this.textSelectionDelegate,
+                paintCursorAboveText: this.paintCursorAboveText == true,
+                devicePixelRatio: this.devicePixelRatio ?? 1.0f
             );
         }
 
@@ -1056,7 +1056,7 @@ namespace Unity.UIWidgets.widgets {
             var edit = (RenderEditable) renderObject;
             edit.text = this.textSpan;
             edit.cursorColor = this.cursorColor;
-            // edit.backgroundColor = this.backgroundColor; // TODO
+            edit.backgroundCursorColor = this.backgroundCursorColor;
             edit.showCursor = this.showCursor;
             edit.hasFocus = this.hasFocus;
             edit.maxLines = this.maxLines;
@@ -1073,10 +1073,10 @@ namespace Unity.UIWidgets.widgets {
             edit.textSelectionDelegate = this.textSelectionDelegate;
             edit.cursorWidth = this.cursorWidth ?? 1.0f;
             edit.cursorRadius = this.cursorRadius;
-            // edit.cursorOffset = this.cursorOffset; // TODO
+            edit.cursorOffset = this.cursorOffset;
             edit.enableInteractiveSelection = this.enableInteractiveSelection;
-            // edit.paintCursorAboveText = this.paintCursorAboveText; // TODO
-            // edit.devicePixelRatio = this.devicePixelRatio; // TODO
+            edit.paintCursorAboveText = this.paintCursorAboveText == true;
+            edit.devicePixelRatio = this.devicePixelRatio ?? 1.0f;
         }
     }
 }
