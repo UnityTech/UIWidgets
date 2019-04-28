@@ -695,7 +695,7 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public bool cursorCurrentlyVisible {
-            get { return this._cursorVisibilityNotifier.value; }
+            get { return this._cursorBlinkOpacityController.value > 0; }
         }
 
         public TimeSpan cursorBlinkInterval {
@@ -710,7 +710,7 @@ namespace Unity.UIWidgets.widgets {
         int _obscureLatestCharIndex;
 
         void _cursorTick() {
-            this._targetCursorVisibility = !this._targetCursorVisibility;
+            this._targetCursorVisibility = !this._unityKeyboard() && !this._targetCursorVisibility;
             float targetOpacity = this._targetCursorVisibility ? 1.0f : 0.0f;
             if (this.widget.cursorOpacityAnimates) {
                 this._cursorBlinkOpacityController.animateTo(targetOpacity, curve: Curves.easeOut);
@@ -719,7 +719,6 @@ namespace Unity.UIWidgets.widgets {
                 this._cursorBlinkOpacityController.setValue(targetOpacity);
             }
 
-            this._cursorVisibilityNotifier.value = !this._unityKeyboard() && !this._cursorVisibilityNotifier.value;
             if (this._obscureShowCharTicksPending > 0) {
                 this.setState(() => { this._obscureShowCharTicksPending--; });
             }
@@ -734,7 +733,6 @@ namespace Unity.UIWidgets.widgets {
         void _startCursorTimer() {
             this._targetCursorVisibility = true;
             this._cursorBlinkOpacityController.setValue(1.0f);
-            this._cursorVisibilityNotifier.value = !this._unityKeyboard();
             if (EditableText.debugDeterministicCursor) {
                 return;
             }
@@ -753,7 +751,6 @@ namespace Unity.UIWidgets.widgets {
             this._cursorTimer = null;
             this._targetCursorVisibility = false;
             this._cursorBlinkOpacityController.setValue(0.0f);
-            this._cursorVisibilityNotifier.value = false;
             if (EditableText.debugDeterministicCursor) {
                 return;
             }
