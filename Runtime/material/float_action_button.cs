@@ -122,7 +122,7 @@ namespace Unity.UIWidgets.material {
         ) {
             D.assert(elevation >= 0.0f);
             D.assert(highlightElevation >= 0.0f);
-            D.assert(disabledElevation != null && disabledElevation >= 0.0f);
+            D.assert(disabledElevation == null || disabledElevation >= 0.0f);
             D.assert(icon != null);
             D.assert(label != null);
             heroTag = heroTag ?? new _DefaultHeroTag();

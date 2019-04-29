@@ -842,7 +842,8 @@ namespace Unity.UIWidgets.rendering {
                 float deficit = tableWidth - maxWidthConstraint;
 
                 int availableColumns = this.columns;
-                while (deficit > 0.0f && totalFlex > 0.0f) {
+                float minimumDeficit = 0.00000001f;
+                while (deficit > 0.0f && totalFlex > minimumDeficit) {
                     float newTotalFlex = 0.0f;
                     for (int x = 0; x < this.columns; x++) {
                         if (flexes[x] != null) {

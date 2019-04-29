@@ -56,11 +56,11 @@ namespace Unity.UIWidgets.painting {
             Path ret = new Path();
             ret.moveTo(host.left, host.top);
             ret.lineTo(p[0].dx, p[0].dy);
-            ret.quadTo(p[1].dx, p[1].dy, p[2].dx, p[2].dy);
+            ret.quadraticBezierTo(p[1].dx, p[1].dy, p[2].dx, p[2].dy);
             // TODO: replace this lineTo() with arcToPoint when arcToPoint is ready
             ret.lineTo(p[3].dx, p[3].dy);
             // ret.arcToPoint(p[3], p[3], radius: Radius.circular(notchRadius), clockwise: false);
-            ret.quadTo(p[4].dx, p[4].dy, p[5].dx, p[5].dy);
+            ret.quadraticBezierTo(p[4].dx, p[4].dy, p[5].dx, p[5].dy);
             ret.lineTo(host.right, host.top);
             ret.lineTo(host.right, host.bottom);
             ret.lineTo(host.left, host.bottom);

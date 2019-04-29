@@ -70,7 +70,7 @@ namespace Unity.UIWidgets.gestures {
             D.assert(this._pointer == pointer);
 
             this._members.Add(member);
-            this._entry = this._entry ?? this._owner._gestureArena.add(pointer, this);
+            this._entry = this._entry ?? GestureBinding.instance.gestureArena.add(pointer, this);
             return new _CombiningGestureArenaEntry(this, member);
         }
 
@@ -87,6 +87,7 @@ namespace Unity.UIWidgets.gestures {
                 }
             }
             else {
+                D.assert(disposition == GestureDisposition.accepted);
                 this._winner = this._winner ?? this._owner.captain ?? member;
                 this._entry.resolve(disposition);
             }
@@ -94,12 +95,6 @@ namespace Unity.UIWidgets.gestures {
     }
 
     public class GestureArenaTeam {
-        public GestureArenaTeam(GestureArenaManager gestureArena) {
-            this._gestureArena = gestureArena;
-        }
-
-        internal readonly GestureArenaManager _gestureArena;
-
         internal readonly Dictionary<int, _CombiningGestureArenaMember> _combiners =
             new Dictionary<int, _CombiningGestureArenaMember>();
 

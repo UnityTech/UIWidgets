@@ -46,6 +46,7 @@ namespace Unity.UIWidgets.rendering {
             GrowthDirection growthDirection,
             ScrollDirection userScrollDirection,
             float scrollOffset,
+            float precedingScrollExtent,
             float overlap,
             float remainingPaintExtent,
             float crossAxisExtent,
@@ -58,6 +59,7 @@ namespace Unity.UIWidgets.rendering {
             this.growthDirection = growthDirection;
             this.userScrollDirection = userScrollDirection;
             this.scrollOffset = scrollOffset;
+            this.precedingScrollExtent = precedingScrollExtent;
             this.overlap = overlap;
             this.remainingPaintExtent = remainingPaintExtent;
             this.crossAxisExtent = crossAxisExtent;
@@ -72,6 +74,7 @@ namespace Unity.UIWidgets.rendering {
             GrowthDirection? growthDirection = null,
             ScrollDirection? userScrollDirection = null,
             float? scrollOffset = null,
+            float? precedingScrollExtent = null,
             float? overlap = null,
             float? remainingPaintExtent = null,
             float? crossAxisExtent = null,
@@ -85,6 +88,7 @@ namespace Unity.UIWidgets.rendering {
                 growthDirection: growthDirection ?? this.growthDirection,
                 userScrollDirection: userScrollDirection ?? this.userScrollDirection,
                 scrollOffset: scrollOffset ?? this.scrollOffset,
+                precedingScrollExtent: precedingScrollExtent ?? this.precedingScrollExtent,
                 overlap: overlap ?? this.overlap,
                 remainingPaintExtent: remainingPaintExtent ?? this.remainingPaintExtent,
                 crossAxisExtent: crossAxisExtent ?? this.crossAxisExtent,
@@ -102,6 +106,8 @@ namespace Unity.UIWidgets.rendering {
         public readonly ScrollDirection userScrollDirection;
 
         public readonly float scrollOffset;
+        
+        public readonly float precedingScrollExtent;
 
         public readonly float overlap;
 

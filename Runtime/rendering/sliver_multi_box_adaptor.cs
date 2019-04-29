@@ -412,7 +412,7 @@ namespace Unity.UIWidgets.rendering {
 
                 foreach (int index in indices) {
                     children.Add(this._keepAliveBucket[index].toDiagnosticsNode(
-                        name: "child with index " + index + " (kept alive offstage)",
+                        name: "child with index " + index + " (kept alive but not laid out)",
                         style: DiagnosticsTreeStyle.offstage
                     ));
                 }

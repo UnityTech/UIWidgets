@@ -21,7 +21,7 @@ namespace Unity.UIWidgets.painting {
         float _lastMinWidth;
         float _lastMaxWidth;
 
-        public TextPainter(TextSpan text,
+        public TextPainter(TextSpan text = null,
             TextAlign textAlign = TextAlign.left,
             TextDirection textDirection = TextDirection.ltr,
             float textScaleFactor = 1.0f,
@@ -66,7 +66,7 @@ namespace Unity.UIWidgets.painting {
         public TextSpan text {
             get { return this._text; }
             set {
-                if (this.text.Equals(value)) {
+                if ((this._text == null && value == null) || (this._text != null &&  this.text.Equals(value))) {
                     return;
                 }
 
