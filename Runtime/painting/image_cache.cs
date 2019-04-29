@@ -7,8 +7,8 @@ namespace Unity.UIWidgets.painting {
         const int _kDefaultSize = 1000;
         const int _kDefaultSizeBytes = 100 << 20; // 100 MiB
 
-        readonly Dictionary<object, ImageStreamCompleter> _pendingImages =
-            new Dictionary<object, ImageStreamCompleter>();
+        readonly Dictionary<object, _PendingImage> _pendingImages =
+            new Dictionary<object, _PendingImage>();
 
         readonly Dictionary<object, _CachedImage> _cache = new Dictionary<object, _CachedImage>();
         readonly LinkedList<object> _lruKeys = new LinkedList<object>();
@@ -65,16 +65,24 @@ namespace Unity.UIWidgets.painting {
 
         public void clear() {
             this._cache.Clear();
-            this._lruKeys.Clear();
+            this._pendingImages.Clear();
             this._currentSizeBytes = 0;
+
+            this._lruKeys.Clear();
         }
 
         public bool evict(object key) {
             D.assert(key != null);
 
+            if (this._pendingImages.TryGetValue(key, out var pendingImage)) {
+                pendingImage.removeListener();
+                this._pendingImages.Remove(key);
+                return true;
+            }
+
             if (this._cache.TryGetValue(key, out var image)) {
                 this._currentSizeBytes -= image.sizeBytes;
-                this._cache.Remove(image.node);
+                this._cache.Remove(key);
                 this._lruKeys.Remove(image.node);
                 return true;
             }
@@ -82,11 +90,14 @@ namespace Unity.UIWidgets.painting {
             return false;
         }
 
-        public ImageStreamCompleter putIfAbsent(object key, Func<ImageStreamCompleter> loader) {
+        public ImageStreamCompleter putIfAbsent(object key, Func<ImageStreamCompleter> loader,
+            ImageErrorListener onError = null) {
             D.assert(key != null);
             D.assert(loader != null);
 
-            if (this._pendingImages.TryGetValue(key, out var result)) {
+            ImageStreamCompleter result = null;
+            if (this._pendingImages.TryGetValue(key, out var pendingImage)) {
+                result = pendingImage.completer;
                 return result;
             }
 
@@ -97,40 +108,41 @@ namespace Unity.UIWidgets.painting {
                 return image.completer;
             }
 
-            result = loader();
+            try {
+                result = loader();
+            }
+            catch (Exception ex) {
+                if (onError != null) {
+                    onError(ex);
+                }
+                else {
+                    throw;
+                }
+            }
 
-            if (this._maximumSize > 0 && this._maximumSizeBytes > 0) {
-                D.assert(!this._pendingImages.ContainsKey(key));
-                this._pendingImages[key] = result;
+            void listener(ImageInfo info, bool syncCall) {
+                int imageSize = info?.image == null ? 0 : info.image.height * info.image.width * 4;
+                _CachedImage cachedImage = new _CachedImage(result, imageSize);
 
-                ImageListener listener = null;
-                listener = (info, syncCall) => {
-                    result.removeListener(listener);
+                if (this.maximumSizeBytes > 0 && imageSize > this.maximumSizeBytes) {
+                    this._maximumSizeBytes = imageSize + 1000;
+                }
 
-                    D.assert(this._pendingImages.ContainsKey(key));
+                this._currentSizeBytes += imageSize;
+
+                if (this._pendingImages.TryGetValue(key, out var loadedPendingImage)) {
+                    loadedPendingImage.removeListener();
                     this._pendingImages.Remove(key);
+                }
 
-                    int imageSize = info?.image == null ? 0 : info.image.width * info.image.height * 4;
-                    _CachedImage cachedImage = new _CachedImage {
-                        completer = result,
-                        sizeBytes = imageSize,
-                    };
+                D.assert(!this._cache.ContainsKey(key));
+                this._cache[key] = cachedImage;
+                cachedImage.node = this._lruKeys.AddLast(key);
+                this._checkCacheSize();
+            }
 
-                    // If the image is bigger than the maximum cache size, and the cache size
-                    // is not zero, then increase the cache size to the size of the image plus
-                    // some change.
-                    if (this._maximumSizeBytes > 0 && imageSize > this._maximumSizeBytes) {
-                        this._maximumSizeBytes = imageSize + 1000;
-                    }
-
-                    this._currentSizeBytes += imageSize;
-
-                    D.assert(!this._cache.ContainsKey(key));
-                    this._cache[key] = cachedImage;
-                    cachedImage.node = this._lruKeys.AddLast(key);
-
-                    this._checkCacheSize();
-                };
+            if (this.maximumSize > 0 && this.maximumSizeBytes > 0) {
+                this._pendingImages[key] = new _PendingImage(result, listener);
                 result.addListener(listener);
             }
 
@@ -158,8 +170,31 @@ namespace Unity.UIWidgets.painting {
     }
 
     class _CachedImage {
+        public _CachedImage(ImageStreamCompleter completer, int sizeBytes) {
+            this.completer = completer;
+            this.sizeBytes = sizeBytes;
+        }
+
         public ImageStreamCompleter completer;
         public int sizeBytes;
         public LinkedListNode<object> node;
+    }
+
+    class _PendingImage {
+        public _PendingImage(
+            ImageStreamCompleter completer,
+            ImageListener listener
+        ) {
+            this.completer = completer;
+            this.listener = listener;
+        }
+
+        public readonly ImageStreamCompleter completer;
+
+        public readonly ImageListener listener;
+
+        public void removeListener() {
+            this.completer.removeListener(this.listener);
+        }
     }
 }

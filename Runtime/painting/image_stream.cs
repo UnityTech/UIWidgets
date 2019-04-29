@@ -159,6 +159,10 @@ namespace Unity.UIWidgets.painting {
         public ImageInfo currentImage;
         public UIWidgetsErrorDetails currentError;
 
+        protected bool hasListeners {
+            get { return this._listeners.isNotEmpty(); }
+        }
+
         public virtual void addListener(ImageListener listener, ImageErrorListener onError = null) {
             this._listeners.Add(new _ImageListenerPair {listener = listener, errorListener = onError});
 
@@ -245,7 +249,7 @@ namespace Unity.UIWidgets.painting {
                     catch (Exception ex) {
                         UIWidgetsError.reportError(
                             new UIWidgetsErrorDetails(
-                                context: "by an image error listener",
+                                context: "when reporting an error to an image listener",
                                 library: "image resource service",
                                 exception: ex
                             )
@@ -325,7 +329,7 @@ namespace Unity.UIWidgets.painting {
         }
 
         void _handleAppFrame(TimeSpan timestamp) {
-            if (!this._hasActiveListeners) {
+            if (!this.hasListeners) {
                 return;
             }
 
@@ -384,12 +388,8 @@ namespace Unity.UIWidgets.painting {
             this._framesEmitted += 1;
         }
 
-        bool _hasActiveListeners {
-            get { return this._listeners.isNotEmpty(); }
-        }
-
         public override void addListener(ImageListener listener, ImageErrorListener onError = null) {
-            if (!this._hasActiveListeners && this._codec != null) {
+            if (!this.hasListeners && this._codec != null) {
                 this._decodeNextFrameAndSchedule();
             }
 
@@ -398,7 +398,7 @@ namespace Unity.UIWidgets.painting {
 
         public override void removeListener(ImageListener listener) {
             base.removeListener(listener);
-            if (!this._hasActiveListeners) {
+            if (!this.hasListeners) {
                 this._timer?.cancel();
                 this._timer = null;
             }

@@ -73,7 +73,8 @@ namespace UIWidgetsSample {
                                         fontSize: 16
                                     ),
                                     selectionColor: Color.fromARGB(255, 255, 0, 0),
-                                    cursorColor: Color.fromARGB(255, 0, 0, 0)
+                                    cursorColor: Color.fromARGB(255, 0, 0, 0),
+                                    backgroundCursorColor: Colors.blue
                                 )
                             ),
                             new Container(
