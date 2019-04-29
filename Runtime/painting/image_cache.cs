@@ -67,7 +67,7 @@ namespace Unity.UIWidgets.painting {
             this._cache.Clear();
             this._pendingImages.Clear();
             this._currentSizeBytes = 0;
-            
+
             this._lruKeys.Clear();
         }
 
@@ -86,10 +86,12 @@ namespace Unity.UIWidgets.painting {
                 this._lruKeys.Remove(image.node);
                 return true;
             }
+
             return false;
         }
 
-        public ImageStreamCompleter putIfAbsent(object key, Func<ImageStreamCompleter> loader, ImageErrorListener onError = null) {
+        public ImageStreamCompleter putIfAbsent(object key, Func<ImageStreamCompleter> loader,
+            ImageErrorListener onError = null) {
             D.assert(key != null);
             D.assert(loader != null);
 
@@ -121,18 +123,18 @@ namespace Unity.UIWidgets.painting {
             void listener(ImageInfo info, bool syncCall) {
                 int imageSize = info?.image == null ? 0 : info.image.height * info.image.width * 4;
                 _CachedImage cachedImage = new _CachedImage(result, imageSize);
-                
+
                 if (this.maximumSizeBytes > 0 && imageSize > this.maximumSizeBytes) {
                     this._maximumSizeBytes = imageSize + 1000;
                 }
-                
+
                 this._currentSizeBytes += imageSize;
 
                 if (this._pendingImages.TryGetValue(key, out var loadedPendingImage)) {
                     loadedPendingImage.removeListener();
                     this._pendingImages.Remove(key);
                 }
-                
+
                 D.assert(!this._cache.ContainsKey(key));
                 this._cache[key] = cachedImage;
                 cachedImage.node = this._lruKeys.AddLast(key);
@@ -172,7 +174,7 @@ namespace Unity.UIWidgets.painting {
             this.completer = completer;
             this.sizeBytes = sizeBytes;
         }
-        
+
         public ImageStreamCompleter completer;
         public int sizeBytes;
         public LinkedListNode<object> node;
