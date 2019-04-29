@@ -205,6 +205,27 @@ namespace Unity.UIWidgets.widgets {
             this.clipBehavior = clipBehavior;
         }
 
+        public static Widget shape(
+            Key key = null,
+            ShapeBorder shape = null,
+            Clip clipBehavior = Clip.antiAlias,
+            Widget child = null
+        ) {
+            D.assert(shape != null);
+            return new Builder(
+                key: key,
+                builder: (BuildContext context) => {
+                    return new ClipPath(
+                        clipper: new ShapeBorderClipper(
+                            shape: shape
+                        ),
+                        clipBehavior: clipBehavior,
+                        child: child
+                    );
+                }
+            );
+        }
+
         public readonly CustomClipper<Path> clipper;
 
         public readonly Clip clipBehavior;
@@ -463,7 +484,7 @@ namespace Unity.UIWidgets.widgets {
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
             properties.add(new DiagnosticsProperty<Alignment>("alignment", this.alignment));
-            properties.add(new DiagnosticsProperty<Axis>("constrainedAxis", null));
+            properties.add(new EnumProperty<Axis?>("constrainedAxis", null));
         }
     }
 
@@ -630,6 +651,8 @@ namespace Unity.UIWidgets.widgets {
     public class IntrinsicWidth : SingleChildRenderObjectWidget {
         public IntrinsicWidth(Key key = null, float? stepWidth = null, float? stepHeight = null, Widget child = null)
             : base(key: key, child: child) {
+            D.assert(stepWidth == null || stepWidth >= 0.0f);
+            D.assert(stepHeight == null || stepHeight >= 0.0f);
             this.stepWidth = stepWidth;
             this.stepHeight = stepHeight;
         }
@@ -638,14 +661,26 @@ namespace Unity.UIWidgets.widgets {
 
         public readonly float? stepHeight;
 
+        float? _stepWidth {
+            get {
+                return this.stepWidth == 0.0f ? null : this.stepWidth;
+            }
+        }
+        
+        float? _stepHeight {
+            get {
+                return this.stepHeight == 0.0f ? null : this.stepHeight;
+            }
+        }
+
         public override RenderObject createRenderObject(BuildContext context) {
-            return new RenderIntrinsicWidth(stepWidth: this.stepWidth, stepHeight: this.stepHeight);
+            return new RenderIntrinsicWidth(stepWidth: this._stepWidth, stepHeight: this._stepHeight);
         }
 
         public override void updateRenderObject(BuildContext context, RenderObject renderObjectRaw) {
             var renderObject = (RenderIntrinsicWidth) renderObjectRaw;
-            renderObject.stepWidth = this.stepWidth;
-            renderObject.stepHeight = this.stepHeight;
+            renderObject.stepWidth = this._stepWidth;
+            renderObject.stepHeight = this._stepHeight;
         }
     }
 
@@ -1095,6 +1130,7 @@ namespace Unity.UIWidgets.widgets {
             Color shadowColor = null,
             Widget child = null) : base(key: key, child: child) {
             D.assert(color != null);
+            D.assert(elevation >= 0.0f);
 
             this.shape = shape;
             this.clipBehavior = clipBehavior;
@@ -1158,6 +1194,7 @@ namespace Unity.UIWidgets.widgets {
             Widget child = null) : base(key: key, child: child) {
             D.assert(clipper != null);
             D.assert(color != null);
+            D.assert(elevation >= 0.0f);
             this.clipper = clipper;
             this.clipBehavior = clipBehavior;
             this.elevation = elevation;

@@ -517,6 +517,9 @@ namespace Unity.UIWidgets.material {
             return Promise<bool>.Resolved(false);
         }
 
+        public void didChangePlatformBrightness() {
+        }
+
         public override void initState() {
             base.initState();
             this._updateSelectedIndex();

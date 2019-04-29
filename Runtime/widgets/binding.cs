@@ -12,6 +12,8 @@ namespace Unity.UIWidgets.widgets {
 
         void didChangeTextScaleFactor();
 
+        void didChangePlatformBrightness();
+
         void didChangeLocales(List<Locale> locale);
 
         IPromise<bool> didPopRoute();
@@ -86,6 +88,12 @@ namespace Unity.UIWidgets.widgets {
             foreach (WidgetsBindingObserver observer in this._observers) {
                 observer.didChangeTextScaleFactor();
             }
+        }
+        
+        protected override void handlePlatformBrightnessChanged() {
+            base.handlePlatformBrightnessChanged();
+            foreach (WidgetsBindingObserver observer in this._observers)
+                observer.didChangePlatformBrightness();
         }
 
         protected virtual void handleLocaleChanged() {

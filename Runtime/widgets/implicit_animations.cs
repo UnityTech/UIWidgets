@@ -576,7 +576,7 @@ namespace Unity.UIWidgets.widgets {
         ) : base(key: key, curve: curve ?? Curves.linear, duration: duration) {
             D.assert(child != null);
             D.assert(shape != null);
-            D.assert(elevation != null);
+            D.assert(elevation != null && elevation >= 0.0f);
             D.assert(color != null);
             D.assert(shadowColor != null);
             D.assert(duration != null);

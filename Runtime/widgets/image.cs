@@ -32,10 +32,12 @@ namespace Unity.UIWidgets.widgets {
 
             void listener(ImageInfo image, bool sync) {
                 completer.Resolve();
+                stream.removeListener(listener);
             }
 
             void errorListener(Exception exception) {
                 completer.Resolve();
+                stream.removeListener(listener);
                 if (onError != null) {
                     onError(exception);
                 }
@@ -50,7 +52,6 @@ namespace Unity.UIWidgets.widgets {
             }
 
             stream.addListener(listener, onError: errorListener);
-            completer.Then(() => { stream.removeListener(listener); });
             return completer;
         }
     }

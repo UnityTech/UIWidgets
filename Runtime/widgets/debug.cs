@@ -50,6 +50,7 @@ namespace Unity.UIWidgets.widgets {
                 if (nonUniqueKey != null) {
                     throw new UIWidgetsError($"Duplicate key found: {nonUniqueKey}.");
                 }
+
                 return true;
             });
             return false;
@@ -64,6 +65,15 @@ namespace Unity.UIWidgets.widgets {
                         "Build functions must never return null. " +
                         "To return an empty space that causes the building widget to fill available room, return \"new Container()\". " +
                         "To return an empty space that takes as little room as possible, return \"new Container(width: 0.0, height: 0.0)\".");
+                }
+
+                if (widget == built) {
+                    throw new UIWidgetsError(
+                        "A build function returned context.widget.\n" +
+                        "The offending widget is: $widget\n" +
+                        "Build functions must never return their BuildContext parameter\'s widget or a child that contains 'context.widget'. " +
+                        "Doing so introduces a loop in the widget tree that can cause the app to crash."
+                    );
                 }
 
                 return true;
@@ -85,6 +95,7 @@ namespace Unity.UIWidgets.widgets {
                         "WidgetsApp widget at the top of your application widget tree."
                     );
                 }
+
                 return true;
             });
             return true;

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using RSG;
 using Unity.UIWidgets.animation;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
@@ -10,6 +11,8 @@ using Unity.UIWidgets.ui;
 
 namespace Unity.UIWidgets.widgets {
     public delegate void DismissDirectionCallback(DismissDirection? direction);
+
+    public delegate Promise<bool> ConfirmDismissCallback(DismissDirection? direction);
 
     public enum DismissDirection {
         vertical,
@@ -31,13 +34,15 @@ namespace Unity.UIWidgets.widgets {
             Widget child = null,
             Widget background = null,
             Widget secondaryBackground = null,
+            ConfirmDismissCallback confirmDismiss = null,
             VoidCallback onResize = null,
             DismissDirectionCallback onDismissed = null,
             DismissDirection direction = DismissDirection.horizontal,
             TimeSpan? resizeDuration = null,
             Dictionary<DismissDirection?, float?> dismissThresholds = null,
             TimeSpan? movementDuration = null,
-            float crossAxisEndOffset = 0.0f
+            float crossAxisEndOffset = 0.0f,
+            DragStartBehavior dragStartBehavior = DragStartBehavior.down
         ) : base(key: key) {
             D.assert(key != null);
             D.assert(secondaryBackground != null ? background != null : true);
@@ -47,10 +52,12 @@ namespace Unity.UIWidgets.widgets {
             this.child = child;
             this.background = background;
             this.secondaryBackground = secondaryBackground;
+            this.confirmDismiss = confirmDismiss;
             this.onResize = onResize;
             this.onDismissed = onDismissed;
             this.direction = direction;
             this.crossAxisEndOffset = crossAxisEndOffset;
+            this.dragStartBehavior = dragStartBehavior;
         }
 
         public readonly Widget child;
@@ -63,15 +70,19 @@ namespace Unity.UIWidgets.widgets {
 
         public readonly DismissDirectionCallback onDismissed;
 
+        public readonly ConfirmDismissCallback confirmDismiss;
+
         public readonly DismissDirection direction;
 
-        public readonly TimeSpan resizeDuration;
+        public readonly TimeSpan? resizeDuration;
 
         public readonly Dictionary<DismissDirection?, float?> dismissThresholds;
 
-        public readonly TimeSpan movementDuration;
+        public readonly TimeSpan? movementDuration;
 
         public readonly float crossAxisEndOffset;
+
+        public readonly DragStartBehavior dragStartBehavior;
 
         public override State createState() {
             return new _DismissibleState();
@@ -362,54 +373,75 @@ namespace Unity.UIWidgets.widgets {
             }
 
             this._dragUnderway = false;
-            if (this._moveController.isCompleted) {
-                this._startResizeAnimation();
-                return;
-            }
+            this._confirmStartResizeAnimation().Then((value) => {
+                if (this._moveController.isCompleted && value) {
+                    this._startResizeAnimation();
+                }
+                else {
+                    float flingVelocity = this._directionIsXAxis
+                        ? details.velocity.pixelsPerSecond.dx
+                        : details.velocity.pixelsPerSecond.dy;
+                    switch (this._describeFlingGesture(details.velocity)) {
+                        case _FlingGestureKind.forward:
+                            D.assert(this._dragExtent != 0.0f);
+                            D.assert(!this._moveController.isDismissed);
+                            if ((this.widget.dismissThresholds.getOrDefault(this._dismissDirection) ??
+                                 _kDismissThreshold) >= 1.0) {
+                                this._moveController.reverse();
+                                break;
+                            }
 
-            float flingVelocity = this._directionIsXAxis
-                ? details.velocity.pixelsPerSecond.dx
-                : details.velocity.pixelsPerSecond.dy;
-            switch (this._describeFlingGesture(details.velocity)) {
-                case _FlingGestureKind.forward:
-                    D.assert(this._dragExtent != 0.0f);
-                    D.assert(!this._moveController.isDismissed);
-                    if ((this.widget.dismissThresholds.getOrDefault(this._dismissDirection) ?? _kDismissThreshold) >= 1.0) {
-                        this._moveController.reverse();
-                        break;
+                            this._dragExtent = flingVelocity.sign();
+                            this._moveController.fling(velocity: flingVelocity.abs() * _kFlingVelocityScale);
+                            break;
+                        case _FlingGestureKind.reverse:
+                            D.assert(this._dragExtent != 0.0f);
+                            D.assert(!this._moveController.isDismissed);
+                            this._dragExtent = flingVelocity.sign();
+                            this._moveController.fling(velocity: -flingVelocity.abs() * _kFlingVelocityScale);
+                            break;
+                        case _FlingGestureKind.none:
+                            if (!this._moveController.isDismissed) {
+                                // we already know it's not completed, we check that above
+                                if (this._moveController.value >
+                                    (this.widget.dismissThresholds.getOrDefault(this._dismissDirection) ??
+                                     _kDismissThreshold)) {
+                                    this._moveController.forward();
+                                }
+                                else {
+                                    this._moveController.reverse();
+                                }
+                            }
+
+                            break;
                     }
-
-                    this._dragExtent = flingVelocity.sign();
-                    this._moveController.fling(velocity: flingVelocity.abs() * _kFlingVelocityScale);
-                    break;
-                case _FlingGestureKind.reverse:
-                    D.assert(this._dragExtent != 0.0);
-                    D.assert(!this._moveController.isDismissed);
-                    this._dragExtent = flingVelocity.sign();
-                    this._moveController.fling(velocity: -flingVelocity.abs() * _kFlingVelocityScale);
-                    break;
-                case _FlingGestureKind.none:
-                    if (!this._moveController.isDismissed) {
-                        // we already know it's not completed, we check that above
-                        if (this._moveController.value >
-                            (this.widget.dismissThresholds.getOrDefault(this._dismissDirection) ?? _kDismissThreshold)) {
-                            this._moveController.forward();
-                        }
-                        else {
-                            this._moveController.reverse();
-                        }
-                    }
-
-                    break;
-            }
+                }
+            });
         }
 
         void _handleDismissStatusChanged(AnimationStatus status) {
             if (status == AnimationStatus.completed && !this._dragUnderway) {
-                this._startResizeAnimation();
+                this._confirmStartResizeAnimation().Then((value) => {
+                    if (value) {
+                        this._startResizeAnimation();
+                    }
+                    else {
+                        this._moveController.reverse();
+                    }
+
+                    this.updateKeepAlive();
+                });
+            }
+        }
+
+        IPromise<bool> _confirmStartResizeAnimation() {
+            if (this.widget.confirmDismiss != null) {
+                DismissDirection? direction = this._dismissDirection;
+                D.assert(direction != null);
+                return this.widget.confirmDismiss(direction);
             }
 
-            this.updateKeepAlive();
+            return Promise<bool>.Resolved(true);
         }
 
         void _startResizeAnimation() {
@@ -535,7 +567,8 @@ namespace Unity.UIWidgets.widgets {
                     : (GestureDragUpdateCallback) this._handleDragUpdate,
                 onVerticalDragEnd: this._directionIsXAxis ? null : (GestureDragEndCallback) this._handleDragEnd,
                 behavior: HitTestBehavior.opaque,
-                child: content
+                child: content,
+                dragStartBehavior: this.widget.dragStartBehavior
             );
         }
     }

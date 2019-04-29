@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
 using UnityEngine;
@@ -73,9 +74,20 @@ namespace Unity.UIWidgets.widgets {
         internal FocusScopeNode _lastChild;
 
         internal FocusNode _focus;
+        internal List<FocusScopeNode> _focusPath;
 
         public bool isFirstFocus {
             get { return this._parent == null || this._parent._firstChild == this; }
+        }
+        
+        internal List<FocusScopeNode> _getFocusPath() {
+            List<FocusScopeNode> nodes = new List<FocusScopeNode>{this};
+            FocusScopeNode node = this._parent;
+            while(node != null && node != this._manager?.rootScope) {
+                nodes.Add(node);
+                node = node._parent;
+            }
+            return nodes;
         }
 
         internal void _prepend(FocusScopeNode child) {
@@ -187,7 +199,7 @@ namespace Unity.UIWidgets.widgets {
 
         public void requestFocus(FocusNode node) {
             D.assert(node != null);
-            if (this._focus == node) {
+            if (this._focus == node && this._focusPath.SequenceEqual(this._manager?._getCurrentFocusPath())) {
                 return;
             }
 
@@ -229,6 +241,7 @@ namespace Unity.UIWidgets.widgets {
             this._focus._manager = this._manager;
             this._focus._hasKeyboardToken = true;
             this._didChangeFocusChain();
+            this._focusPath = this._getFocusPath();
         }
 
         internal void _resignFocus(FocusNode node) {
@@ -366,6 +379,8 @@ namespace Unity.UIWidgets.widgets {
                 this._currentFocus._notify();
             }
         }
+        
+        internal List<FocusScopeNode> _getCurrentFocusPath() => this._currentFocus?._parent?._getFocusPath();
 
         public void focusNone(bool focus) {
             if (focus) {

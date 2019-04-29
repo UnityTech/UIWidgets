@@ -141,7 +141,6 @@ namespace Unity.UIWidgets.widgets {
         static readonly Dictionary<CompositeKey, Element> _registry =
             new Dictionary<CompositeKey, Element>();
 
-        static readonly HashSet<CompositeKey> _removedKeys = new HashSet<CompositeKey>();
         static readonly HashSet<Element> _debugIllFatedElements = new HashSet<Element>();
 
         static readonly Dictionary<CompositeKey, Element> _debugReservations =
@@ -175,7 +174,6 @@ namespace Unity.UIWidgets.widgets {
             });
             if (_registry[compKey] == element) {
                 _registry.Remove(compKey);
-                _removedKeys.Add(compKey);
             }
         }
 
@@ -1950,6 +1948,12 @@ namespace Unity.UIWidgets.widgets {
             }
 
             properties.add(new FlagProperty("dirty", value: this.dirty, ifTrue: "dirty"));
+            if (this._dependencies != null && this._dependencies.isNotEmpty()) {
+                List<DiagnosticsNode> diagnosticsDependencies = this._dependencies
+                    .Select((InheritedElement element) => element.widget.toDiagnosticsNode(style: DiagnosticsTreeStyle.sparse))
+                    .ToList();
+                properties.add(new DiagnosticsProperty<List<DiagnosticsNode>>("dependencies", diagnosticsDependencies));
+            }
         }
 
         public override List<DiagnosticsNode> debugDescribeChildren() {
@@ -2317,7 +2321,7 @@ namespace Unity.UIWidgets.widgets {
                         "the inherited widget is in a constructor or an initState() method, " +
                         "then the rebuilt dependent widget will not reflect the changes in the " +
                         "inherited widget.\n" +
-                        "Typically references to to inherited widgets should occur in widget build() methods. Alternatively, " +
+                        "Typically references to inherited widgets should occur in widget build() methods. Alternatively, " +
                         "initialization based on inherited widgets can be placed in the didChangeDependencies method, which " +
                         "is called after initState and whenever the dependencies change thereafter."
                     );
