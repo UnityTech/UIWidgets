@@ -236,6 +236,10 @@ If you still need the function provided by this plugin, you can mannually apply 
 All the modifications introduced in `UIWidgetsCanvasDevicePixelRatio` are marked by `////////// Modifcation Start ////////////` and `////////// Modifcation End ////////////`.
 In the marked codes, all the multiplications and divisions with `devicePixelRatio` are introduced by our modification.
 To learn about the original script in detail, please refer to `SystemInfo.js` and `UnityNativeJS/UnityNative.js` in `PlaybackEngines/WebGLSupport/BuildTools/lib` in your Unity Editor installation.
+
+#### Image Import Setting
+Unity, by default, resizes the width and height of an imported image to the nearest integer that is a power of 2.
+In UIWidgets, you should almost always disable this by selecting the image in the "Project" panel, then in the "Inspector" panel set the "Non Power of 2" option (in "Advanced") to "None", to prevent your image from being resized unexpectedly.
  
 ## Debug UIWidgets Application
 
