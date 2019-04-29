@@ -156,6 +156,9 @@ namespace Unity.UIWidgets.widgets {
 
         public void didChangeTextScaleFactor() {
         }
+        
+        public void didChangePlatformBrightness() {
+        }
 
         public void didChangeLocales(List<Locale> locale) {
         }
