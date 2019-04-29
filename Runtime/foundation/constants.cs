@@ -2,6 +2,6 @@ using UnityEngine;
 
 namespace Unity.UIWidgets.foundation {
     public class FoundationConstants {
-        public bool kReleaseMode = !Debug.isDebugBuild;
+        public static bool kReleaseMode = !Debug.isDebugBuild;
     }
 }

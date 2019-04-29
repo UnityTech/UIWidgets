@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using com.unity.uiwidgets.Runtime.rendering;
 using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
 using UnityEngine;
@@ -15,11 +16,16 @@ namespace Unity.UIWidgets.widgets {
             bool? primary = null,
             ScrollPhysics physics = null,
             bool shrinkWrap = false,
-            float? cacheExtent = null
+            Key center = null,
+            float anchor = 0.0f,
+            float? cacheExtent = null,
+            DragStartBehavior dragStartBehavior = DragStartBehavior.down
         ) : base(key: key) {
             D.assert(!(controller != null && primary == true),
                 "Primary ScrollViews obtain their ScrollController via inheritance from a PrimaryScrollController widget. " +
                 "You cannot both set primary to true and pass an explicit controller.");
+            D.assert(!shrinkWrap || center == null);
+            D.assert(anchor >= 0.0f && anchor <= 1.0f);
 
             primary = primary ?? controller == null && scrollDirection == Axis.vertical;
             physics = physics ?? (primary.Value ? new AlwaysScrollableScrollPhysics() : null);
@@ -30,7 +36,10 @@ namespace Unity.UIWidgets.widgets {
             this.primary = primary.Value;
             this.physics = physics;
             this.shrinkWrap = shrinkWrap;
+            this.center = center;
+            this.anchor = anchor;
             this.cacheExtent = cacheExtent;
+            this.dragStartBehavior = dragStartBehavior;
         }
 
         public readonly Axis scrollDirection;
@@ -39,7 +48,10 @@ namespace Unity.UIWidgets.widgets {
         public readonly bool primary;
         public readonly ScrollPhysics physics;
         public readonly bool shrinkWrap;
+        public readonly Key center;
+        public readonly float anchor;
         public readonly float? cacheExtent;
+        public readonly DragStartBehavior dragStartBehavior;
 
         protected AxisDirection getDirection(BuildContext context) {
             return LayoutUtils.getAxisDirectionFromAxisReverseAndDirectionality(
@@ -66,7 +78,9 @@ namespace Unity.UIWidgets.widgets {
                 axisDirection: axisDirection,
                 offset: offset,
                 slivers: slivers,
-                cacheExtent: this.cacheExtent
+                cacheExtent: this.cacheExtent,
+                center: this.center,
+                anchor: this.anchor
             );
         }
 
@@ -77,6 +91,7 @@ namespace Unity.UIWidgets.widgets {
             ScrollController scrollController = this.primary ? PrimaryScrollController.of(context) : this.controller;
 
             Scrollable scrollable = new Scrollable(
+                dragStartBehavior: this.dragStartBehavior,
                 axisDirection: axisDirection,
                 controller: scrollController,
                 physics: this.physics,
@@ -112,8 +127,11 @@ namespace Unity.UIWidgets.widgets {
             bool? primary = null,
             ScrollPhysics physics = null,
             bool shrinkWrap = false,
+            Key center = null,
+            float anchor = 0.0f,
             float? cacheExtent = null,
-            List<Widget> slivers = null
+            List<Widget> slivers = null,
+            DragStartBehavior dragStartBehavior = DragStartBehavior.down
         ) : base(
             key: key,
             scrollDirection: scrollDirection,
@@ -122,7 +140,10 @@ namespace Unity.UIWidgets.widgets {
             primary: primary,
             physics: physics,
             shrinkWrap: shrinkWrap,
-            cacheExtent: cacheExtent
+            center: center,
+            anchor: anchor,
+            cacheExtent: cacheExtent,
+            dragStartBehavior: dragStartBehavior
         ) {
             this.slivers = slivers ?? new List<Widget>();
         }
@@ -144,7 +165,8 @@ namespace Unity.UIWidgets.widgets {
             ScrollPhysics physics = null,
             bool shrinkWrap = false,
             EdgeInsets padding = null,
-            float? cacheExtent = null
+            float? cacheExtent = null,
+            DragStartBehavior dragStartBehavior = DragStartBehavior.down
         ) : base(
             key: key,
             scrollDirection: scrollDirection,
@@ -153,7 +175,8 @@ namespace Unity.UIWidgets.widgets {
             primary: primary,
             physics: physics,
             shrinkWrap: shrinkWrap,
-            cacheExtent: cacheExtent
+            cacheExtent: cacheExtent,
+            dragStartBehavior: dragStartBehavior
         ) {
             this.padding = padding;
         }
@@ -194,7 +217,8 @@ namespace Unity.UIWidgets.widgets {
             bool addAutomaticKeepAlives = true,
             bool addRepaintBoundaries = true,
             float? cacheExtent = null,
-            List<Widget> children = null
+            List<Widget> children = null,
+            DragStartBehavior dragStartBehavior = DragStartBehavior.down
         ) : base(
             key: key,
             scrollDirection: scrollDirection,
@@ -204,7 +228,8 @@ namespace Unity.UIWidgets.widgets {
             physics: physics,
             shrinkWrap: shrinkWrap,
             padding: padding,
-            cacheExtent: cacheExtent
+            cacheExtent: cacheExtent,
+            dragStartBehavior: dragStartBehavior
         ) {
             this.itemExtent = itemExtent;
             this.childrenDelegate = new SliverChildListDelegate(
@@ -228,7 +253,8 @@ namespace Unity.UIWidgets.widgets {
             int? itemCount = null,
             bool addAutomaticKeepAlives = true,
             bool addRepaintBoundaries = true,
-            float? cacheExtent = null
+            float? cacheExtent = null,
+            DragStartBehavior dragStartBehavior = DragStartBehavior.down
         ) : base(key: key,
             scrollDirection: scrollDirection,
             reverse: reverse,
@@ -237,7 +263,8 @@ namespace Unity.UIWidgets.widgets {
             physics: physics,
             shrinkWrap: shrinkWrap,
             padding: padding,
-            cacheExtent: cacheExtent
+            cacheExtent: cacheExtent,
+            dragStartBehavior: dragStartBehavior
         ) {
             this.itemExtent = itemExtent;
             this.childrenDelegate = new SliverChildBuilderDelegate(
@@ -262,22 +289,25 @@ namespace Unity.UIWidgets.widgets {
             int? itemCount = null,
             bool addAutomaticKeepAlives = true,
             bool addRepaintBoundaries = true,
-            float? cacheExtent = null
+            float? cacheExtent = null,
+            DragStartBehavior dragStartBehavior = DragStartBehavior.down
         ) {
             return new ListView(
-                key,
-                scrollDirection,
-                reverse,
-                controller,
-                primary,
-                physics,
-                shrinkWrap,
-                padding,
-                itemExtent,
-                itemBuilder,
-                itemCount,
-                addAutomaticKeepAlives,
-                addRepaintBoundaries
+                key: key,
+                scrollDirection: scrollDirection,
+                reverse: reverse,
+                controller: controller,
+                primary: primary,
+                physics: physics,
+                shrinkWrap: shrinkWrap,
+                padding: padding,
+                cacheExtent: cacheExtent,
+                itemExtent: itemExtent,
+                itemBuilder: itemBuilder,
+                itemCount: itemCount,
+                addAutomaticKeepAlives: addAutomaticKeepAlives,
+                addRepaintBoundaries: addRepaintBoundaries,
+                dragStartBehavior: dragStartBehavior
             );
         }
 
@@ -296,7 +326,8 @@ namespace Unity.UIWidgets.widgets {
             int itemCount = 0,
             bool addAutomaticKeepAlives = true,
             bool addRepaintBoundaries = true,
-            float? cacheExtent = null
+            float? cacheExtent = null,
+            DragStartBehavior dragStartBehavior = DragStartBehavior.down
         ) : base(
             key: key,
             scrollDirection: scrollDirection,
@@ -306,7 +337,8 @@ namespace Unity.UIWidgets.widgets {
             physics: physics,
             shrinkWrap: shrinkWrap,
             padding: padding,
-            cacheExtent: cacheExtent
+            cacheExtent: cacheExtent,
+            dragStartBehavior: dragStartBehavior
         ) {
             D.assert(itemBuilder != null);
             D.assert(separatorBuilder != null);
@@ -550,7 +582,8 @@ namespace Unity.UIWidgets.widgets {
             EdgeInsets padding = null,
             SliverGridDelegate gridDelegate = null,
             SliverChildDelegate childrenDelegate = null,
-            float? cacheExtent = null
+            float? cacheExtent = null,
+            DragStartBehavior dragStartBehavior = DragStartBehavior.down
         ) : base(
             key: key,
             scrollDirection: scrollDirection,
@@ -560,7 +593,8 @@ namespace Unity.UIWidgets.widgets {
             physics: physics,
             shrinkWrap: shrinkWrap,
             padding: padding,
-            cacheExtent: cacheExtent
+            cacheExtent: cacheExtent,
+            dragStartBehavior: dragStartBehavior
         ) {
             D.assert(gridDelegate != null);
             D.assert(childrenDelegate != null);
@@ -579,7 +613,8 @@ namespace Unity.UIWidgets.widgets {
             EdgeInsets padding = null,
             SliverGridDelegate gridDelegate = null,
             SliverChildDelegate childrenDelegate = null,
-            float? cacheExtent = null
+            float? cacheExtent = null,
+            DragStartBehavior dragStartBehavior = DragStartBehavior.down
         ) {
             return new GridView(
                 key: key,
@@ -592,7 +627,8 @@ namespace Unity.UIWidgets.widgets {
                 padding: padding,
                 gridDelegate: gridDelegate,
                 childrenDelegate: childrenDelegate,
-                cacheExtent: cacheExtent
+                cacheExtent: cacheExtent,
+                dragStartBehavior: dragStartBehavior
             );
         }
 
@@ -612,7 +648,8 @@ namespace Unity.UIWidgets.widgets {
             bool addAutomaticKeepAlives = true,
             bool addRepaintBoundaries = true,
             float? cacheExtent = null,
-            List<Widget> children = null
+            List<Widget> children = null,
+            DragStartBehavior dragStartBehavior = DragStartBehavior.down
         ) : base(
             key: key,
             scrollDirection: scrollDirection,
@@ -622,7 +659,8 @@ namespace Unity.UIWidgets.widgets {
             physics: physics,
             shrinkWrap: shrinkWrap,
             padding: padding,
-            cacheExtent: cacheExtent
+            cacheExtent: cacheExtent,
+            dragStartBehavior: dragStartBehavior
         ) {
             this.gridDelegate = new SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: crossAxisCount ?? 0,
@@ -653,7 +691,8 @@ namespace Unity.UIWidgets.widgets {
             bool addAutomaticKeepAlives = true,
             bool addRepaintBoundaries = true,
             float? cacheExtent = null,
-            List<Widget> children = null
+            List<Widget> children = null,
+            DragStartBehavior dragStartBehavior = DragStartBehavior.down
         ) {
             return new GridView(
                 key: key,
@@ -671,7 +710,8 @@ namespace Unity.UIWidgets.widgets {
                 addAutomaticKeepAlives: addAutomaticKeepAlives,
                 addRepaintBoundaries: addRepaintBoundaries,
                 cacheExtent: cacheExtent,
-                children: children
+                children: children,
+                dragStartBehavior: dragStartBehavior
             );
         }
 
@@ -691,7 +731,8 @@ namespace Unity.UIWidgets.widgets {
             bool addAutomaticKeepAlives = true,
             bool addRepaintBoundaries = true,
             bool addSemanticIndexes = true,
-            List<Widget> children = null
+            List<Widget> children = null,
+            DragStartBehavior dragStartBehavior = DragStartBehavior.down
         ) : base(
             key: key,
             scrollDirection: scrollDirection,
@@ -700,7 +741,8 @@ namespace Unity.UIWidgets.widgets {
             primary: primary,
             physics: physics,
             shrinkWrap: shrinkWrap,
-            padding: padding
+            padding: padding,
+            dragStartBehavior: dragStartBehavior
         ) {
             this.gridDelegate = new SliverGridDelegateWithMaxCrossAxisExtent(
                 maxCrossAxisExtent: maxCrossAxisExtent ?? 0,
@@ -730,7 +772,8 @@ namespace Unity.UIWidgets.widgets {
             float childAspectRatio = 1.0f,
             bool addAutomaticKeepAlives = true,
             bool addRepaintBoundaries = true,
-            List<Widget> children = null
+            List<Widget> children = null,
+            DragStartBehavior dragStartBehavior = DragStartBehavior.down
         ) {
             return new GridView(
                 key: key,
@@ -747,7 +790,8 @@ namespace Unity.UIWidgets.widgets {
                 childAspectRatio: childAspectRatio,
                 addAutomaticKeepAlives: addAutomaticKeepAlives,
                 addRepaintBoundaries: addRepaintBoundaries,
-                children: children
+                children: children,
+                dragStartBehavior: dragStartBehavior
             );
         }
 

@@ -1,6 +1,7 @@
 using System;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.painting;
+using Unity.UIWidgets.service;
 using Unity.UIWidgets.ui;
 
 namespace Unity.UIWidgets.widgets {
@@ -14,6 +15,7 @@ namespace Unity.UIWidgets.widgets {
             Size size = null,
             float devicePixelRatio = 1.0f,
             float textScaleFactor = 1.0f,
+            Brightness platformBrightness = Brightness.light,
             EdgeInsets viewInsets = null,
             EdgeInsets padding = null,
             bool alwaysUse24HourFormat = false,
@@ -25,6 +27,7 @@ namespace Unity.UIWidgets.widgets {
             this.size = size ?? Size.zero;
             this.devicePixelRatio = devicePixelRatio;
             this.textScaleFactor = textScaleFactor;
+            this.platformBrightness = platformBrightness;
             this.viewInsets = viewInsets ?? EdgeInsets.zero;
             this.padding = padding ?? EdgeInsets.zero;
             this.alwaysUse24HourFormat = alwaysUse24HourFormat;
@@ -39,6 +42,7 @@ namespace Unity.UIWidgets.widgets {
                 size: window.physicalSize / window.devicePixelRatio,
                 devicePixelRatio: window.devicePixelRatio,
                 textScaleFactor: window.textScaleFactor,
+                // platformBrightness: window.platformBrightness, // TODO: remove comment when window.platformBrightness is ready
                 viewInsets: EdgeInsets.fromWindowPadding(window.viewInsets, window.devicePixelRatio),
                 padding: EdgeInsets.fromWindowPadding(window.padding, window.devicePixelRatio)
 //                accessibleNavigation: window.accessibilityFeatures.accessibleNavigation,
@@ -54,6 +58,8 @@ namespace Unity.UIWidgets.widgets {
         public readonly float devicePixelRatio;
 
         public readonly float textScaleFactor;
+
+        public readonly Brightness platformBrightness;
 
         public readonly EdgeInsets viewInsets;
 
@@ -77,6 +83,7 @@ namespace Unity.UIWidgets.widgets {
             Size size = null,
             float? devicePixelRatio = null,
             float? textScaleFactor = null,
+            Brightness? platformBrightness = null,
             EdgeInsets viewInsets = null,
             EdgeInsets padding = null,
             bool? alwaysUse24HourFormat = null,
@@ -89,6 +96,7 @@ namespace Unity.UIWidgets.widgets {
                 size: size ?? this.size,
                 devicePixelRatio: devicePixelRatio ?? this.devicePixelRatio,
                 textScaleFactor: textScaleFactor ?? this.textScaleFactor,
+                platformBrightness: platformBrightness ?? this.platformBrightness,
                 viewInsets: viewInsets ?? this.viewInsets,
                 padding: padding ?? this.padding,
                 alwaysUse24HourFormat: alwaysUse24HourFormat ?? this.alwaysUse24HourFormat,
@@ -113,6 +121,7 @@ namespace Unity.UIWidgets.widgets {
                 size: this.size,
                 devicePixelRatio: this.devicePixelRatio,
                 textScaleFactor: this.textScaleFactor,
+                platformBrightness: this.platformBrightness,
                 padding: this.padding.copyWith(
                     left: removeLeft ? (float?) 0.0 : null,
                     top: removeTop ? (float?) 0.0 : null,
@@ -142,6 +151,7 @@ namespace Unity.UIWidgets.widgets {
                 size: this.size,
                 devicePixelRatio: this.devicePixelRatio,
                 textScaleFactor: this.textScaleFactor,
+                platformBrightness: this.platformBrightness,
                 padding: this.padding,
                 viewInsets: this.viewInsets.copyWith(
                     left: removeLeft ? (float?) 0.0 : null,
@@ -168,6 +178,7 @@ namespace Unity.UIWidgets.widgets {
 
             return Equals(this.size, other.size) && this.devicePixelRatio.Equals(other.devicePixelRatio) &&
                    this.textScaleFactor.Equals(other.textScaleFactor) &&
+                   Equals(this.platformBrightness, other.platformBrightness) &&
                    Equals(this.viewInsets, other.viewInsets) &&
                    Equals(this.padding, other.padding) &&
                    this.alwaysUse24HourFormat == other.alwaysUse24HourFormat &&
@@ -196,6 +207,7 @@ namespace Unity.UIWidgets.widgets {
                 var hashCode = (this.size != null ? this.size.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ this.devicePixelRatio.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.textScaleFactor.GetHashCode();
+                hashCode = (hashCode * 397) ^ this.platformBrightness.GetHashCode();
                 hashCode = (hashCode * 397) ^ (this.viewInsets != null ? this.viewInsets.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (this.padding != null ? this.padding.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ this.alwaysUse24HourFormat.GetHashCode();
@@ -220,6 +232,7 @@ namespace Unity.UIWidgets.widgets {
                    $"size: {this.size}, " +
                    $"devicePixelRatio: {this.devicePixelRatio:F1}, " +
                    $"textScaleFactor: {this.textScaleFactor:F1}, " +
+                   $"platformBrightness: {this.platformBrightness}, " +
                    $"padding: {this.padding}, " +
                    $"viewInsets: {this.viewInsets}, " +
                    $"alwaysUse24HourFormat: {this.alwaysUse24HourFormat}, " +
@@ -311,6 +324,10 @@ namespace Unity.UIWidgets.widgets {
 
         public static float textScaleFactorOf(BuildContext context) {
             return of(context, nullOk: true)?.textScaleFactor ?? 1.0f;
+        }
+
+        public static Brightness platformBrightnessOf(BuildContext context) {
+            return of(context, nullOk: true)?.platformBrightness ?? Brightness.light;
         }
 
         public static bool boldTextOverride(BuildContext context) {

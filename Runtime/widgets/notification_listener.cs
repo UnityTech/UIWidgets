@@ -20,8 +20,7 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public void dispatch(BuildContext target) {
-            D.assert(target != null);
-            target.visitAncestorElements(this.visitAncestor);
+            target?.visitAncestorElements(this.visitAncestor);
         }
 
         public override string ToString() {
