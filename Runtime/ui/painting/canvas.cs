@@ -262,24 +262,24 @@ namespace Unity.UIWidgets.ui {
 
             bool forceMoveTo = !useCenter;
             while (sweepAngle <= -Mathf.PI * 2) {
-                path.addArc(rect, startAngle, -Mathf.PI, forceMoveTo);
+                path.arcTo(rect, startAngle, -Mathf.PI, forceMoveTo);
                 startAngle -= Mathf.PI;
-                path.addArc(rect, startAngle, -Mathf.PI, false);
+                path.arcTo(rect, startAngle, -Mathf.PI, false);
                 startAngle -= Mathf.PI;
                 forceMoveTo = false;
                 sweepAngle += Mathf.PI * 2;
             }
             
             while (sweepAngle >= Mathf.PI * 2) {
-                path.addArc(rect, startAngle, Mathf.PI, forceMoveTo);
+                path.arcTo(rect, startAngle, Mathf.PI, forceMoveTo);
                 startAngle += Mathf.PI;
-                path.addArc(rect, startAngle, Mathf.PI, false);
+                path.arcTo(rect, startAngle, Mathf.PI, false);
                 startAngle += Mathf.PI;
                 forceMoveTo = false;
                 sweepAngle -= Mathf.PI * 2;
             }
 
-            path.addArc(rect, startAngle, sweepAngle, forceMoveTo);
+            path.arcTo(rect, startAngle, sweepAngle, forceMoveTo);
             if (useCenter) {
                 path.close();
             }

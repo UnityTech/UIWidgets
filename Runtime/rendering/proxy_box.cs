@@ -1017,7 +1017,6 @@ namespace Unity.UIWidgets.rendering {
                 this._updateClip();
                 context.pushClipPath(this.needsCompositing, offset, Offset.zero & this.size,
                     this._clip, base.paint, clipBehavior: this.clipBehavior);
-                base.paint(context, offset);
             }
         }
 
