@@ -5,6 +5,7 @@ using Unity.UIWidgets.animation;
 using Unity.UIWidgets.async;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
+using Unity.UIWidgets.material;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.scheduler;
@@ -130,7 +131,7 @@ namespace Unity.UIWidgets.widgets {
             D.assert(style != null);
             D.assert(cursorColor != null);
             D.assert(maxLines == null || maxLines > 0);
-            D.assert(backgroundCursorColor != null);
+            // D.assert(backgroundCursorColor != null); // TODO: remove comment
             this.keyboardType = keyboardType ?? (maxLines == 1 ? TextInputType.text : TextInputType.multiline);
 
             this.scrollPadding = scrollPadding ?? EdgeInsets.all(20.0f);
@@ -145,6 +146,7 @@ namespace Unity.UIWidgets.widgets {
             this.textInputAction = textInputAction;
             this.textCapitalization = textCapitalization;
             this.cursorColor = cursorColor;
+            this.backgroundCursorColor = backgroundCursorColor ?? Colors.transparent; // TODO: remove ??
             this.maxLines = maxLines;
             this.autofocus = autofocus;
             this.selectionColor = selectionColor;

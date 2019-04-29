@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
-using UnityEngine;
 
 namespace Unity.UIWidgets.widgets {
     public class FocusNode : ChangeNotifier {
@@ -79,14 +78,15 @@ namespace Unity.UIWidgets.widgets {
         public bool isFirstFocus {
             get { return this._parent == null || this._parent._firstChild == this; }
         }
-        
+
         internal List<FocusScopeNode> _getFocusPath() {
-            List<FocusScopeNode> nodes = new List<FocusScopeNode>{this};
+            List<FocusScopeNode> nodes = new List<FocusScopeNode> {this};
             FocusScopeNode node = this._parent;
-            while(node != null && node != this._manager?.rootScope) {
+            while (node != null && node != this._manager?.rootScope) {
                 nodes.Add(node);
                 node = node._parent;
             }
+
             return nodes;
         }
 
@@ -199,7 +199,10 @@ namespace Unity.UIWidgets.widgets {
 
         public void requestFocus(FocusNode node) {
             D.assert(node != null);
-            if (this._focus == node && this._focusPath.SequenceEqual(this._manager?._getCurrentFocusPath())) {
+            var focusPath = this._manager?._getCurrentFocusPath();
+            if (this._focus == node &&
+                (this._focusPath == focusPath || (focusPath != null && this._focusPath != null &&
+                                                  this._focusPath.SequenceEqual(focusPath)))) {
                 return;
             }
 
@@ -332,7 +335,7 @@ namespace Unity.UIWidgets.widgets {
         public FocusNode currentFocus {
             get { return this._currentFocus; }
         }
-        
+
         internal FocusNode _currentFocus;
 
         internal void _willDisposeFocusNode(FocusNode node) {
@@ -379,24 +382,28 @@ namespace Unity.UIWidgets.widgets {
                 this._currentFocus._notify();
             }
         }
-        
-        internal List<FocusScopeNode> _getCurrentFocusPath() => this._currentFocus?._parent?._getFocusPath();
+
+        internal List<FocusScopeNode> _getCurrentFocusPath() {
+            return this._currentFocus?._parent?._getFocusPath();
+        }
 
         public void focusNone(bool focus) {
             if (focus) {
                 if (this._noneScope._parent != null && this._noneScope.isFirstFocus) {
                     return;
                 }
+
                 this.rootScope.setFirstFocus(this._noneScope);
             }
             else {
                 if (this._noneScope._parent == null) {
                     return;
                 }
+
                 this._noneScope.detach();
             }
         }
-        
+
         public override string ToString() {
             var status = this._haveScheduledUpdate ? " UPDATE SCHEDULED" : "";
             var indent = "    ";

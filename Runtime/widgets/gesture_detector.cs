@@ -220,8 +220,8 @@ namespace Unity.UIWidgets.widgets {
             }
             
             if (this.onLongPressDragStart != null || this.onLongPressDragUpdate != null || this.onLongPressDragUp != null) {
-                gestures[LongPressDragGestureRecognizer] = new GestureRecognizerFactoryWithHandlers<LongPressDragGestureRecognizer>(
-                    () => LongPressDragGestureRecognizer(debugOwner: this),
+                gestures[typeof(LongPressDragGestureRecognizer)] = new GestureRecognizerFactoryWithHandlers<LongPressDragGestureRecognizer>(
+                    () => new LongPressDragGestureRecognizer(debugOwner: this),
                     (LongPressDragGestureRecognizer instance) => {
                         instance.onLongPressStart = this.onLongPressDragStart;
                         instance.onLongPressDragUpdate = this.onLongPressDragUpdate;
