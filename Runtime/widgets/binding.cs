@@ -65,7 +65,7 @@ namespace Unity.UIWidgets.widgets {
                         Application.Quit();
                         return;
                     }
-                    this._observers[idx].didPopRoute().Then(_handlePopRouteSub);
+                    this._observers[idx].didPopRoute().Then((Action<bool>) _handlePopRouteSub);
                 }
             }
             
