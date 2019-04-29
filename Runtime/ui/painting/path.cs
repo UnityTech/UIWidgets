@@ -181,14 +181,25 @@ namespace Unity.UIWidgets.ui {
                 x + x0, y + y0,
             });
         }
-        
+
         public void moveTo(float x, float y) {
             this._appendCommands(new[] {
                 (float) PathCommand.moveTo,
                 x, y,
             });
-       }
+        }
 
+
+        public void relativeLineTo(float x, float y) {
+            var x0 = this._commandx;
+            var y0 = this._commandy;
+            
+            this._appendCommands(new[] {
+                (float) PathCommand.lineTo,
+                x + x0, y + y0,
+            });
+        }
+        
         public void lineTo(float x, float y) {
             this._appendCommands(new[] {
                 (float) PathCommand.lineTo,
@@ -196,14 +207,21 @@ namespace Unity.UIWidgets.ui {
             });
         }
 
-        public void bezierTo(float c1x, float c1y, float c2x, float c2y, float x, float y) {
+        public void cubicTo(float c1x, float c1y, float c2x, float c2y, float x, float y) {
             this._appendCommands(new[] {
                 (float) PathCommand.bezierTo,
                 c1x, c1y, c2x, c2y, x, y,
             });
         }
+        
+        public void relativeCubicTo(float c1x, float c1y, float c2x, float c2y, float x, float y) {
+            var x0 = this._commandx;
+            var y0 = this._commandy;
+            
+            this.cubicTo(x0 + c1x, y0 + c1y, x0 + c2x, y0 + c2y, x0 + x, y0 + y);
+        }
 
-        public void quadTo(float cx, float cy, float x, float y) {
+        public void quadraticBezierTo(float cx, float cy, float x, float y) {
             var x0 = this._commandx;
             var y0 = this._commandy;
 
@@ -213,6 +231,13 @@ namespace Unity.UIWidgets.ui {
                 (x + 2.0f / 3.0f * (cx - x)), (y + 2.0f / 3.0f * (cy - y)),
                 x, y,
             });
+        }
+        
+        public void relativeQuadraticBezierTo(float cx, float cy, float x, float y) {
+            var x0 = this._commandx;
+            var y0 = this._commandy;
+
+            this.quadraticBezierTo(x0 + cx, y0 + cy, x0 + x, y0 + y);
         }
 
         public void close() {
@@ -339,7 +364,7 @@ namespace Unity.UIWidgets.ui {
             this.addArc(cx, cy, radius, a0, a1, dir);
         }
 
-        public void addArc(Rect rect, float startAngle, float sweepAngle, bool forceMoveTo = true) {
+        public void arcTo(Rect rect, float startAngle, float sweepAngle, bool forceMoveTo = true) {
             var mat = Matrix3.makeScale(rect.width / 2, rect.height / 2);
             var center = rect.center;
             mat.postTranslate(center.dx, center.dy);
@@ -349,6 +374,10 @@ namespace Unity.UIWidgets.ui {
 
             this._transformCommands(vals, mat);
             this._appendCommands(vals.ToArray());
+        }
+
+        public void addArc(Rect rect, float startAngle, float sweepAngle) {
+            this.arcTo(rect, startAngle, sweepAngle, true);
         }
 
         public Path transform(Matrix3 mat) {
@@ -372,7 +401,7 @@ namespace Unity.UIWidgets.ui {
                         var res1 = mat.mapXY(this._commands[i + 1], this._commands[i + 2]);
                         var res2 = mat.mapXY(this._commands[i + 3], this._commands[i + 4]);
                         var res3 = mat.mapXY(this._commands[i + 5], this._commands[i + 6]);
-                        ret.bezierTo(res1.dx, res1.dy, res2.dx, res2.dy, res3.dx, res3.dy);
+                        ret.cubicTo(res1.dx, res1.dy, res2.dx, res2.dy, res3.dx, res3.dy);
                         i += 7;
                         break;
                     case PathCommand.close:
