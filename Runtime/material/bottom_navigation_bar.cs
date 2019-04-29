@@ -104,7 +104,78 @@ namespace Unity.UIWidgets.material {
         public readonly bool selected;
         public readonly string indexLabel;
 
-        Widget _buildIcon() {
+        public override Widget build(BuildContext context) {
+            int size;
+            Widget label;
+            switch (this.type) {
+                case BottomNavigationBarType.fix:
+                    size = 1;
+                    label = new _FixedLabel(colorTween: this.colorTween, animation: this.animation, item: this.item);
+                    break;
+                case BottomNavigationBarType.shifting:
+                    size = ((this.flex * 1000.0f) ?? 0.0f).round();
+                    label = new _ShiftingLabel(animation: this.animation, item: this.item);
+                    break;
+                default:
+                    throw new Exception("Unknown BottomNavigationBarType: " + this.type);
+            }
+
+            return new Expanded(
+                flex: size,
+                child: new Stack(
+                    children: new List<Widget> {
+                        new InkResponse(
+                            onTap: this.onTap == null ? (GestureTapCallback) null : () => { this.onTap(); },
+                            child: new Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisSize: MainAxisSize.min,
+                                children: new List<Widget> {
+                                    new _TileIcon(
+                                        type: this.type,
+                                        colorTween: this.colorTween,
+                                        animation: this.animation,
+                                        iconSize: this.iconSize,
+                                        selected: this.selected,
+                                        item: this.item
+                                    ),
+                                    label
+                                }
+                            )
+                        )
+                    }
+                )
+            );
+        }
+    }
+
+
+    class _TileIcon : StatelessWidget {
+        public _TileIcon(
+            Key key = null,
+            BottomNavigationBarType? type = null,
+            ColorTween colorTween = null,
+            Animation<float> animation = null,
+            float? iconSize = null,
+            bool? selected = null,
+            BottomNavigationBarItem item = null
+        ) : base(key: key) {
+            this.type = type;
+            this.colorTween = colorTween;
+            this.animation = animation;
+            this.iconSize = iconSize;
+            this.selected = selected;
+            this.item = item;
+        }
+
+        BottomNavigationBarType? type;
+        ColorTween colorTween;
+        Animation<float> animation;
+        float? iconSize;
+        bool? selected;
+        BottomNavigationBarItem item;
+
+        public override Widget build(BuildContext context) {
             float tweenStart;
             Color iconColor;
             switch (this.type) {
@@ -135,13 +206,30 @@ namespace Unity.UIWidgets.material {
                             color: iconColor,
                             size: this.iconSize
                         ),
-                        child: this.selected ? this.item.activeIcon : this.item.icon
+                        child: this.selected == true ? this.item.activeIcon : this.item.icon
                     )
                 )
             );
         }
+    }
 
-        Widget _buildFixedLabel() {
+    class _FixedLabel : StatelessWidget {
+        public _FixedLabel(
+            Key key = null,
+            ColorTween colorTween = null,
+            Animation<float> animation = null,
+            BottomNavigationBarItem item = null
+        ) : base(key: key) {
+            this.colorTween = colorTween;
+            this.animation = animation;
+            this.item = item;
+        }
+
+        ColorTween colorTween;
+        Animation<float> animation;
+        BottomNavigationBarItem item;
+
+        public override Widget build(BuildContext context) {
             float t = new FloatTween(
                 begin: BottomNavigationBarUtils._kInactiveFontSize / BottomNavigationBarUtils._kActiveFontSize,
                 end: 1.0f
@@ -165,8 +253,22 @@ namespace Unity.UIWidgets.material {
                 )
             );
         }
+    }
 
-        Widget _buildShiftingLabel() {
+    class _ShiftingLabel : StatelessWidget {
+        public _ShiftingLabel(
+            Key key = null,
+            Animation<float> animation = null,
+            BottomNavigationBarItem item = null
+        ) : base(key: key) {
+            this.animation = animation;
+            this.item = item;
+        }
+
+        Animation<float> animation;
+        BottomNavigationBarItem item;
+
+        public override Widget build(BuildContext context) {
             return new Align(
                 alignment: Alignment.bottomCenter,
                 heightFactor: 1.0f,
@@ -190,41 +292,8 @@ namespace Unity.UIWidgets.material {
                 )
             );
         }
-
-        public override Widget build(BuildContext context) {
-            int size;
-            Widget label;
-            switch (this.type) {
-                case BottomNavigationBarType.fix:
-                    size = 1;
-                    label = this._buildFixedLabel();
-                    break;
-                case BottomNavigationBarType.shifting:
-                    size = ((this.flex * 1000.0f) ?? 0.0f).round();
-                    label = this._buildShiftingLabel();
-                    break;
-                default:
-                    throw new Exception("Unknown BottomNavigationBarType: " + this.type);
-            }
-
-            return new Expanded(
-                flex: size,
-                child: new Stack(
-                    children: new List<Widget> {
-                        new InkResponse(
-                            onTap: this.onTap == null ? (GestureTapCallback) null : () => { this.onTap(); },
-                            child: new Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                mainAxisSize: MainAxisSize.min,
-                                children: new List<Widget> {this._buildIcon(), label}
-                            )
-                        )
-                    }
-                )
-            );
-        }
     }
+
 
     class _BottomNavigationBarState : TickerProviderStateMixin<BottomNavigationBar> {
         public List<AnimationController> _controllers = new List<AnimationController> { };
@@ -390,7 +459,8 @@ namespace Unity.UIWidgets.material {
                                 },
                                 colorTween: colorTween,
                                 selected: i == this.widget.currentIndex,
-                                indexLabel: localizations.tabLabel(tabIndex: i + 1, tabCount: this.widget.items.Count)
+                                indexLabel: localizations.tabLabel(tabIndex: i + 1,
+                                    tabCount: this.widget.items.Count)
                             )
                         );
                     }
@@ -410,7 +480,8 @@ namespace Unity.UIWidgets.material {
                                 flex:
                                 this._evaluateFlex(this._animations[i]),
                                 selected: i == this.widget.currentIndex,
-                                indexLabel: localizations.tabLabel(tabIndex: i + 1, tabCount: this.widget.items.Count)
+                                indexLabel: localizations.tabLabel(tabIndex: i + 1,
+                                    tabCount: this.widget.items.Count)
                             )
                         );
                     }
