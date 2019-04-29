@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.service;
 using Unity.UIWidgets.ui;
@@ -66,7 +65,7 @@ namespace Unity.UIWidgets.painting {
         public TextSpan text {
             get { return this._text; }
             set {
-                if ((this._text == null && value == null) || (this._text != null &&  this.text.Equals(value))) {
+                if ((this._text == null && value == null) || (this._text != null && this.text.Equals(value))) {
                     return;
                 }
 
@@ -353,41 +352,82 @@ namespace Unity.UIWidgets.painting {
             return Mathf.Ceil(layoutValue);
         }
 
+        const int _zwjUtf16 = 0x200d;
 
         Offset _getOffsetFromUpstream(int offset, Rect caretPrototype) {
-            var prevCodeUnit = this._text.codeUnitAt(offset - 1);
+            string flattenedText = this._text.toPlainText();
+            var prevCodeUnit = this._text.codeUnitAt(Mathf.Max(0, offset - 1));
             if (prevCodeUnit == null) {
                 return null;
             }
 
-            var prevRuneOffset = _isUtf16Surrogate((int) prevCodeUnit) ? offset - 2 : offset - 1;
-            var boxes = this._paragraph.getRectsForRange(prevRuneOffset, offset);
-            if (boxes.Count == 0) {
-                return null;
+            bool needsSearch = _isUtf16Surrogate(prevCodeUnit.Value) || this._text.codeUnitAt(offset) == _zwjUtf16;
+            int graphemeClusterLength = needsSearch ? 2 : 1;
+            List<TextBox> boxes = null;
+            while ((boxes == null || boxes.isEmpty()) && flattenedText != null) {
+                int prevRuneOffset = offset - graphemeClusterLength;
+                boxes = this._paragraph.getRectsForRange(prevRuneOffset, offset);
+                if (boxes.isEmpty()) {
+                    if (!needsSearch) {
+                        break;
+                    }
+
+                    if (prevRuneOffset < -flattenedText.Length) {
+                        break;
+                    }
+
+                    graphemeClusterLength *= 2;
+                    continue;
+                }
+
+                TextBox box = boxes[0];
+                const int NEWLINE_CODE_UNIT = 10;
+                if (prevCodeUnit == NEWLINE_CODE_UNIT) {
+                    return new Offset(this._emptyOffset.dx, box.bottom);
+                }
+
+                float caretEnd = box.end;
+                float dx = box.direction == TextDirection.rtl ? caretEnd - caretPrototype.width : caretEnd;
+                return new Offset(dx, box.top);
             }
 
-            var box = boxes[0];
-            var caretEnd = box.end;
-            var dx = box.direction == TextDirection.rtl ? caretEnd : caretEnd - caretPrototype.width;
-            return new Offset(dx, box.top);
+            return null;
         }
 
         Offset _getOffsetFromDownstream(int offset, Rect caretPrototype) {
-            var nextCodeUnit = this._text.codeUnitAt(offset - 1);
+            string flattenedText = this._text.toPlainText();
+            var nextCodeUnit =
+                this._text.codeUnitAt(Mathf.Min(offset, flattenedText == null ? 0 : flattenedText.Length - 1));
             if (nextCodeUnit == null) {
                 return null;
             }
 
-            var nextRuneOffset = _isUtf16Surrogate((int) nextCodeUnit) ? offset + 2 : offset + 1;
-            var boxes = this._paragraph.getRectsForRange(offset, nextRuneOffset);
-            if (boxes.Count == 0) {
-                return null;
+            bool needsSearch = _isUtf16Surrogate(nextCodeUnit.Value) || nextCodeUnit == _zwjUtf16;
+            int graphemeClusterLength = needsSearch ? 2 : 1;
+            List<TextBox> boxes = null;
+            while ((boxes == null || boxes.isEmpty()) && flattenedText != null) {
+                int nextRuneOffset = offset + graphemeClusterLength;
+                boxes = this._paragraph.getRectsForRange(offset, nextRuneOffset);
+                if (boxes.isEmpty()) {
+                    if (!needsSearch) {
+                        break;
+                    }
+
+                    if (nextRuneOffset >= flattenedText.Length << 1) {
+                        break;
+                    }
+
+                    graphemeClusterLength *= 2;
+                    continue;
+                }
+
+                TextBox box = boxes[boxes.Count - 1];
+                float caretStart = box.start;
+                float dx = box.direction == TextDirection.rtl ? caretStart - caretPrototype.width : caretStart;
+                return new Offset(dx, box.top);
             }
 
-            var box = boxes[0];
-            var caretStart = box.start;
-            var dx = box.direction == TextDirection.rtl ? caretStart - caretPrototype.width : caretStart;
-            return new Offset(dx, box.top);
+            return null;
         }
 
         Offset _emptyOffset {
