@@ -13,21 +13,22 @@ using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace UIWidgetsSample {
     public class MaterialSample : UIWidgetsSamplePanel {
-        int testCaseId = 2;
+        const int testCaseId = 6;
 
-        List<Widget> testCases = new List<Widget> {
+        readonly List<Widget> testCases = new List<Widget> {
             new MaterialButtonWidget(),
             new MaterialInkWellWidget(),
             new MaterialAppBarWidget(),
             new MaterialTabBarWidget(),
             new TableWidget(),
-            new BottomAppBarWidget()
+            new BottomAppBarWidget(),
+            new MaterialSliderWidget()
         };
 
         protected override Widget createWidget() {
             return new MaterialApp(
                 showPerformanceOverlay: false,
-                home: this.testCases[this.testCaseId]);
+                home: this.testCases[testCaseId]);
         }
 
         protected override void OnEnable() {
@@ -390,6 +391,36 @@ namespace UIWidgetsSample {
                     ),
                     new PerformanceOverlay()
                 }
+            );
+        }
+    }
+
+    public class MaterialSliderWidget : StatefulWidget {
+        public override State createState() {
+            return new MaterialSliderState();
+        }
+    }
+
+    public class MaterialSliderState : State<MaterialSliderWidget> {
+
+        float _value = 0.0f;
+
+        void onChanged(float value) {
+            this.setState(() => { this._value = value; });
+        }
+        
+        public override Widget build(BuildContext context) {
+            return new Scaffold(
+                appBar: new AppBar(
+                    title: new Text("Slider and Indicators")),
+                body: new Column(
+                    children : new List<Widget> {
+                        new Container(
+                            child: new Slider(
+                                value: this._value,
+                                onChanged: this.onChanged))
+                    }
+                    )
             );
         }
     }

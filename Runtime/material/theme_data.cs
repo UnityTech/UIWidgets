@@ -65,6 +65,7 @@ namespace Unity.UIWidgets.material {
             IconThemeData iconTheme = null,
             IconThemeData primaryIconTheme = null,
             IconThemeData accentIconTheme = null,
+            SliderThemeData sliderTheme = null,
             TabBarTheme tabBarTheme = null,
             ChipThemeData chipTheme = null,
             RuntimePlatform? platform = null,
@@ -164,6 +165,12 @@ namespace Unity.UIWidgets.material {
                               ? ThemeDataUtils._kDarkThemeSplashColor
                               : ThemeDataUtils._kLightThemeSplashColor);
 
+            sliderTheme = sliderTheme ?? SliderThemeData.fromPrimaryColors(
+                              primaryColor: primaryColor,
+                              primaryColorLight: primaryColorLight,
+                              primaryColorDark: primaryColorDark,
+                              valueIndicatorTextStyle: accentTextTheme.body2);
+
             tabBarTheme = tabBarTheme ?? new TabBarTheme();
             chipTheme = chipTheme ?? ChipThemeData.fromDefaults(
                 secondaryColor: primaryColor,
@@ -204,6 +211,7 @@ namespace Unity.UIWidgets.material {
             D.assert(textTheme != null);
             D.assert(primaryTextTheme != null);
             D.assert(accentTextTheme != null);
+            D.assert(sliderTheme != null);
             D.assert(iconTheme != null);
             D.assert(primaryIconTheme != null);
             D.assert(accentIconTheme != null);
@@ -253,6 +261,7 @@ namespace Unity.UIWidgets.material {
             this.iconTheme = iconTheme;
             this.primaryIconTheme = primaryIconTheme;
             this.accentIconTheme = accentIconTheme;
+            this.sliderTheme = sliderTheme;
             this.tabBarTheme = tabBarTheme;
             this.chipTheme = chipTheme;
             this.platform = platform.Value;
@@ -297,6 +306,7 @@ namespace Unity.UIWidgets.material {
             TextTheme textTheme = null,
             TextTheme primaryTextTheme = null,
             TextTheme accentTextTheme = null,
+            SliderThemeData sliderTheme = null,
             InputDecorationTheme inputDecorationTheme = null,
             IconThemeData iconTheme = null,
             IconThemeData primaryIconTheme = null,
@@ -342,6 +352,7 @@ namespace Unity.UIWidgets.material {
             D.assert(textTheme != null);
             D.assert(primaryTextTheme != null);
             D.assert(accentTextTheme != null);
+            D.assert(sliderTheme != null);
             D.assert(inputDecorationTheme != null);
             D.assert(iconTheme != null);
             D.assert(primaryIconTheme != null);
@@ -394,6 +405,7 @@ namespace Unity.UIWidgets.material {
                 iconTheme: iconTheme,
                 primaryIconTheme: primaryIconTheme,
                 accentIconTheme: accentIconTheme,
+                sliderTheme: sliderTheme,
                 tabBarTheme: tabBarTheme,
                 chipTheme: chipTheme,
                 platform: platform,
@@ -483,6 +495,8 @@ namespace Unity.UIWidgets.material {
 
         public readonly TextTheme accentTextTheme;
 
+        public readonly SliderThemeData sliderTheme;
+
         public readonly InputDecorationTheme inputDecorationTheme;
 
         public readonly IconThemeData iconTheme;
@@ -541,6 +555,7 @@ namespace Unity.UIWidgets.material {
             TextTheme textTheme = null,
             TextTheme primaryTextTheme = null,
             TextTheme accentTextTheme = null,
+            SliderThemeData sliderTheme = null,
             InputDecorationTheme inputDecorationTheme = null,
             IconThemeData iconTheme = null,
             IconThemeData primaryIconTheme = null,
@@ -588,6 +603,7 @@ namespace Unity.UIWidgets.material {
                 textTheme: textTheme ?? this.textTheme,
                 primaryTextTheme: primaryTextTheme ?? this.primaryTextTheme,
                 accentTextTheme: accentTextTheme ?? this.accentTextTheme,
+                sliderTheme: sliderTheme ?? this.sliderTheme,
                 inputDecorationTheme: this.inputDecorationTheme ?? this.inputDecorationTheme,
                 iconTheme: iconTheme ?? this.iconTheme,
                 primaryIconTheme: primaryIconTheme ?? this.primaryIconTheme,
@@ -675,6 +691,7 @@ namespace Unity.UIWidgets.material {
                 iconTheme: IconThemeData.lerp(a.iconTheme, b.iconTheme, t),
                 primaryIconTheme: IconThemeData.lerp(a.primaryIconTheme, b.primaryIconTheme, t),
                 accentIconTheme: IconThemeData.lerp(a.accentIconTheme, b.accentIconTheme, t),
+                sliderTheme: SliderThemeData.lerp(a.sliderTheme, b.sliderTheme, t),
                 tabBarTheme: TabBarTheme.lerp(a.tabBarTheme, b.tabBarTheme, t),
                 chipTheme: ChipThemeData.lerp(a.chipTheme, b.chipTheme, t),
                 platform: t < 0.5 ? a.platform : b.platform,
@@ -727,6 +744,7 @@ namespace Unity.UIWidgets.material {
                    other.textTheme == this.textTheme &&
                    other.primaryTextTheme == this.primaryTextTheme &&
                    other.accentTextTheme == this.accentTextTheme &&
+                   other.sliderTheme == this.sliderTheme &&
                    other.inputDecorationTheme == this.inputDecorationTheme &&
                    other.toggleableActiveColor == this.toggleableActiveColor &&
                    other.iconTheme == this.iconTheme &&
@@ -810,6 +828,7 @@ namespace Unity.UIWidgets.material {
                 hashCode = (hashCode * 397) ^ this.iconTheme.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.primaryIconTheme.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.accentIconTheme.GetHashCode();
+                hashCode = (hashCode * 397) ^ this.sliderTheme.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.tabBarTheme.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.chipTheme.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.platform.GetHashCode();
@@ -889,6 +908,7 @@ namespace Unity.UIWidgets.material {
             properties.add(new DiagnosticsProperty<IconThemeData>("iconTheme", this.iconTheme));
             properties.add(new DiagnosticsProperty<IconThemeData>("primaryIconTheme", this.primaryIconTheme));
             properties.add(new DiagnosticsProperty<IconThemeData>("accentIconTheme", this.accentIconTheme));
+            properties.add(new DiagnosticsProperty<SliderThemeData>("sliderTheme", this.sliderTheme));
             properties.add(new DiagnosticsProperty<TabBarTheme>("tabBarTheme", this.tabBarTheme));
             properties.add(new DiagnosticsProperty<ChipThemeData>("chipTheme", this.chipTheme));
             properties.add(
