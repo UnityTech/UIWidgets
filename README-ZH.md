@@ -204,6 +204,10 @@ $JSEvents
 在被标识的代码中，所有乘/除以`devicePixelRatio`都来自于我们的修改。
 若您需要详细了解此插件所修改的脚本，请参考您的Unity Editor安装目录下的`PlaybackEngines/WebGLSupport/BuildTools/lib`文件夹中的`SystemInfo.js`和`UnityNativeJS/UnityNative.js`。
 
+#### 九、图片导入设置
+默认情况下，Unity会将导入图片的宽和高放缩为最近的等于2的幂的整数。
+在UIWidgets中使用图片时，记得将这一特性关闭，以免图片被意外放缩，方法如下：在Project面板中选中图片，在"Inspector"面板中将"Non Power of 2"（在"Advanced"中）设置为"None"。
+
 ## 调试UIWidgets应用程序
 
 #### 定义UIWidgets_DEBUG
