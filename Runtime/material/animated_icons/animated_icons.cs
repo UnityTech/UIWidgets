@@ -188,8 +188,7 @@ namespace Unity.UIWidgets.material {
             Offset controlPoint1 = AnimatedIconUtils._interpolate<Offset>(this.controlPoints1, progress, Offset.lerp);
             Offset controlPoint2 = AnimatedIconUtils._interpolate<Offset>(this.controlPoints2, progress, Offset.lerp);
             Offset targetPoint = AnimatedIconUtils._interpolate<Offset>(this.targetPoints, progress, Offset.lerp);
-            // TODO: replace with cubicTo
-            path.bezierTo(
+            path.cubicTo(
                 controlPoint1.dx, controlPoint1.dy,
                 controlPoint2.dx, controlPoint2.dy,
                 targetPoint.dx, targetPoint.dy
