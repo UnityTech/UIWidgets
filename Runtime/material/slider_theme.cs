@@ -562,7 +562,7 @@ namespace Unity.UIWidgets.material {
 
         static void _addArc(Path path, Offset center, float radius, float startAngle, float endAngle) {
             Rect arcRect = Rect.fromCircle(center: center, radius: radius);
-            path.addArc(arcRect, startAngle, endAngle - startAngle, false);
+            path.arcTo(arcRect, startAngle, endAngle - startAngle, false);
         }
 
         static void _generateBottomLobe() {
