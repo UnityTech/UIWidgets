@@ -133,7 +133,8 @@ namespace Unity.UIWidgets.gestures {
             void exitAnnotation(_TrackedAnnotation trackedAnnotation, int deviceId) {
                 if (trackedAnnotation.annotation?.onExit != null &&
                     trackedAnnotation.activeDevices.Contains(deviceId)) {
-                    trackedAnnotation.annotation.onExit(PointerExitEvent.fromHoverEvent((PointerHoverEvent)this._lastMouseEvent[deviceId]));
+                    trackedAnnotation.annotation.onExit(PointerExitEvent.fromHoverEvent(this._lastMouseEvent[deviceId]));
+                    trackedAnnotation.activeDevices.Remove(deviceId);
                 }
             }
 

@@ -60,10 +60,6 @@ namespace Unity.UIWidgets.gestures {
                 return;
             }
 
-            if (evt is PointerHoverEvent) {
-                this._handlePointerHoverEvent(evt);
-            }
-
             HitTestResult hitTestResult = null;
             if (evt is PointerDownEvent) {
                 D.assert(!this._hitTests.ContainsKey(evt.pointer));

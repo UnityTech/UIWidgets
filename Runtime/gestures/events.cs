@@ -148,7 +148,7 @@ namespace Unity.UIWidgets.gestures {
                 down: false) {
         }
         
-        public static PointerExitEvent fromHoverEvent(PointerHoverEvent hover) {
+        public static PointerExitEvent fromHoverEvent(PointerEvent hover) {
             return new PointerExitEvent(
                 timeStamp: hover.timeStamp,
                 pointer: hover.pointer,

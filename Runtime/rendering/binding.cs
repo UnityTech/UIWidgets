@@ -72,7 +72,7 @@ namespace Unity.UIWidgets.rendering {
         MouseTracker _createMouseTracker() {
             return new MouseTracker(this.pointerRouter, (Offset offset) => {
                 return this.renderView.layer.find<MouseTrackerAnnotation>(
-                        offset * Window.instance.devicePixelRatio
+                        offset
                     );
             });
         }
