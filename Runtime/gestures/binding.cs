@@ -130,7 +130,7 @@ namespace Unity.UIWidgets.gestures {
 
             //leave events
             foreach (var lastMoveTarget in this.lastMoveTargets) {
-                lastMoveTarget.handleEvent(new PointerLeaveEvent(
+                lastMoveTarget.handleEvent(new PointerExitEvent(
                     timeStamp: evt.timeStamp,
                     pointer: evt.pointer,
                     device: evt.device,

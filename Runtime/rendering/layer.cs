@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using Unity.UIWidgets.external.simplejson;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.ui;
@@ -103,6 +105,8 @@ namespace Unity.UIWidgets.rendering {
             D.assert(!this.attached);
         }
 
+        internal abstract S find<S>(Offset regionOffset) where S : class;
+
         internal abstract flow.Layer addToScene(SceneBuilder builder, Offset layerOffset = null);
 
         internal void _addToSceneWithRetainedRendering(SceneBuilder builder) {
@@ -172,6 +176,10 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
+        internal override S find<S>(Offset regionOffset) {
+            return null;
+        }
+
         internal override flow.Layer addToScene(SceneBuilder builder, Offset layerOffset = null) {
             layerOffset = layerOffset ?? Offset.zero;
 
@@ -206,6 +214,10 @@ namespace Unity.UIWidgets.rendering {
 
         public readonly bool freeze;
 
+        internal override S find<S>(Offset regionOffset) {
+            return null;
+        }
+
         internal override flow.Layer addToScene(SceneBuilder builder, Offset layerOffset = null) {
             layerOffset = layerOffset ?? Offset.zero;
 
@@ -230,6 +242,20 @@ namespace Unity.UIWidgets.rendering {
 
         public Layer lastChild {
             get { return this._lastChild; }
+        }
+        
+        internal override S find<S>(Offset regionOffset) {
+            Layer current = this.lastChild;
+            while (current != null) {
+                S value = current.find<S>(regionOffset);
+                if (value != null) {
+                    return value;
+                }
+
+                current = current.previousSibling;
+            }
+
+            return null;
         }
 
         internal Layer _lastChild;
@@ -433,6 +459,10 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
+        internal override S find<S>(Offset regionOffset) {
+            return base.find<S>(regionOffset - this.offset);
+        }
+
         public override void applyTransform(Layer child, Matrix3 transform) {
             D.assert(child != null);
             D.assert(transform != null);
@@ -496,6 +526,14 @@ namespace Unity.UIWidgets.rendering {
                     this.markNeedsAddToScene();
                 }
             }
+        }
+
+        internal override S find<S>(Offset regionOffset) {
+            if (!this.clipRect.contains(regionOffset)) {
+                return null;
+            }
+
+            return base.find<S>(regionOffset);
         }
 
         internal override flow.Layer addToScene(SceneBuilder builder, Offset layerOffset = null) {
@@ -562,6 +600,14 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
+        internal override S find<S>(Offset regionOffset) {
+            if (!this.clipRRect.contains(regionOffset)) {
+                return null;
+            }
+
+            return base.find<S>(regionOffset);
+        }
+
         internal override flow.Layer addToScene(SceneBuilder builder, Offset layerOffset = null) {
             layerOffset = layerOffset ?? Offset.zero;
 
@@ -626,6 +672,14 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
+        internal override S find<S>(Offset regionOffset) {
+            if (!this.clipPath.contains(regionOffset)) {
+                return null;
+            }
+
+            return base.find<S>(regionOffset);
+        }
+
         internal override flow.Layer addToScene(SceneBuilder builder, Offset layerOffset = null) {
             layerOffset = layerOffset ?? Offset.zero;
 
@@ -656,11 +710,31 @@ namespace Unity.UIWidgets.rendering {
 
         public Matrix3 transform {
             get { return this._transform; }
-            set { this._transform = value; }
+            set {
+                this._transform = value;
+                this._inverseDirty = true;
+            }
         }
 
         Matrix3 _transform;
         Matrix3 _lastEffectiveTransform;
+
+        readonly Matrix3 _invertedTransform = Matrix3.I();
+        bool _inverseDirty = true;
+
+        internal override S find<S>(Offset regionOffset) {
+            if (this._inverseDirty) {
+                this.transform.invert(this._invertedTransform);
+                this._inverseDirty = false;
+            }
+
+            if (this._invertedTransform == null) {
+                return null;
+            }
+            
+            Offset transform = this._invertedTransform.mapXY(regionOffset.dx, regionOffset.dy);
+            return base.find<S>(transform);
+        }
 
         internal override flow.Layer addToScene(SceneBuilder builder, Offset layerOffset = null) {
             layerOffset = layerOffset ?? Offset.zero;
@@ -819,6 +893,10 @@ namespace Unity.UIWidgets.rendering {
 
         internal Offset _lastOffset;
 
+        internal override S find<S>(Offset regionOffset) {
+            return base.find<S>(regionOffset - this.offset);
+        }
+
         internal override flow.Layer addToScene(SceneBuilder builder, Offset layerOffset = null) {
             layerOffset = layerOffset ?? Offset.zero;
 
@@ -871,6 +949,27 @@ namespace Unity.UIWidgets.rendering {
 
         Offset _lastOffset;
         Matrix3 _lastTransform;
+
+        Matrix3 _invertedTransform = Matrix3.I();
+        bool _inverseDirty = true;
+
+        internal override S find<S>(Offset regionOffset) {
+            if (this.link.leader == null) {
+                return this.showWhenUnlinked ? base.find<S>(regionOffset - this.unlinkedOffset) : null;
+            }
+
+            if (this._inverseDirty) {
+                this.getLastTransform().invert(this._invertedTransform);
+                this._inverseDirty = false;
+            }
+
+            if (this._invertedTransform == null) {
+                return null;
+            }
+
+            Offset transform = this._invertedTransform.mapXY(regionOffset.dx, regionOffset.dy);
+            return base.find<S>(transform - this.linkedOffset);
+        }
 
         public Matrix3 getLastTransform() {
             if (this._lastTransform == null) {
@@ -938,11 +1037,13 @@ namespace Unity.UIWidgets.rendering {
             inverseTransform.preConcat(forwardTransform);
             inverseTransform.preTranslate(this.linkedOffset.dx, this.linkedOffset.dy);
             this._lastTransform = inverseTransform;
+            this._inverseDirty = true;
         }
 
         protected override bool alwaysNeedsAddToScene {
             get { return true; }
         }
+        
 
         internal override flow.Layer addToScene(SceneBuilder builder, Offset layerOffset = null) {
             layerOffset = layerOffset ?? Offset.zero;
@@ -951,6 +1052,7 @@ namespace Unity.UIWidgets.rendering {
             if (this.link.leader == null && !this.showWhenUnlinked) {
                 this._lastTransform = null;
                 this._lastOffset = null;
+                this._inverseDirty = true;
                 return null;
             }
 
@@ -969,6 +1071,7 @@ namespace Unity.UIWidgets.rendering {
                 builder.pop();
             }
 
+            this._inverseDirty = true;
             return null;
         }
 
@@ -1016,6 +1119,10 @@ namespace Unity.UIWidgets.rendering {
 
         public readonly int optionsMask;
 
+        internal override S find<S>(Offset regionOffset) {
+            return null;
+        }
+
         internal override flow.Layer addToScene(SceneBuilder builder, Offset layerOffset = null) {
             layerOffset = layerOffset ?? Offset.zero;
 
@@ -1042,6 +1149,24 @@ namespace Unity.UIWidgets.rendering {
         public readonly Size size;
 
         public readonly Offset offset;
+
+        internal override S find<S>(Offset regionOffset) {
+            S result = base.find<S>(regionOffset);
+            if (result != null) {
+                return result;
+            }
+
+            if (this.size != null && !(this.offset & this.size).contains(regionOffset)) {
+                return null;
+            }
+
+            if (typeof(T) == typeof(S)) {
+                S typedResult = this.value as S;
+                return typedResult;
+            }
+
+            return base.find<S>(regionOffset);
+        }
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
             base.debugFillProperties(properties);
@@ -1129,6 +1254,14 @@ namespace Unity.UIWidgets.rendering {
         }
 
         Color _shadowColor;
+
+        internal override S find<S>(Offset regionOffset) {
+            if (!this.clipPath.contains(regionOffset)) {
+                return null;
+            }
+
+            return base.find<S>(regionOffset);
+        }
 
         internal override flow.Layer addToScene(SceneBuilder builder, Offset layerOffset = null) {
             layerOffset = layerOffset ?? Offset.zero;

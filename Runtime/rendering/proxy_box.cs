@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Unity.UIWidgets.animation;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
@@ -1862,23 +1863,17 @@ namespace Unity.UIWidgets.rendering {
 
     public delegate void PointerCancelEventListener(PointerCancelEvent evt);
 
-    public delegate void PointerHoverEventListener(PointerHoverEvent evt);
-
-    public delegate void PointerEnterEventListener(PointerEnterEvent evt);
-
-    public delegate void PointerLeaveEventListener(PointerLeaveEvent evt);
-
     public delegate void PointerScrollEventListener(PointerScrollEvent evt);
 
     public class RenderPointerListener : RenderProxyBoxWithHitTestBehavior {
         public RenderPointerListener(
             PointerDownEventListener onPointerDown = null,
             PointerMoveEventListener onPointerMove = null,
+            PointerEnterEventListener onPointerEnter = null,
+            PointerHoverEventListener onPointerHover = null,
+            PointerExitEventListener onPointerExit = null,
             PointerUpEventListener onPointerUp = null,
             PointerCancelEventListener onPointerCancel = null,
-            PointerHoverEventListener onPointerHover = null,
-            PointerLeaveEventListener onPointerLeave = null,
-            PointerEnterEventListener onPointerEnter = null,
             PointerScrollEventListener onPointerScroll = null,
             HitTestBehavior behavior = HitTestBehavior.deferToChild,
             RenderBox child = null
@@ -1887,27 +1882,109 @@ namespace Unity.UIWidgets.rendering {
             this.onPointerMove = onPointerMove;
             this.onPointerUp = onPointerUp;
             this.onPointerCancel = onPointerCancel;
-            this.onPointerHover = onPointerHover;
-            this.onPointerLeave = onPointerLeave;
-            this.onPointerEnter = onPointerEnter;
             this.onPointerScroll = onPointerScroll;
+
+            this._onPointerEnter = onPointerEnter;
+            this._onPointerHover = onPointerHover;
+            this._onPointerExit = onPointerExit;
+
+            if (this._onPointerEnter != null || this._onPointerHover != null || this._onPointerExit != null) {
+                this._hoverAnnotation = new MouseTrackerAnnotation(
+                    onEnter: this._onPointerEnter,
+                    onHover: this._onPointerHover,
+                    onExit: this._onPointerExit);
+            }
         }
 
         public PointerDownEventListener onPointerDown;
 
         public PointerMoveEventListener onPointerMove;
 
+        public PointerEnterEventListener onPointerEnter {
+            get { return this._onPointerEnter; }
+            set {
+                if (this._onPointerEnter != value) {
+                    this._onPointerEnter = value;
+                    this._updateAnnotations();
+                }
+            }
+        }
+        PointerEnterEventListener _onPointerEnter;
+
+        public PointerHoverEventListener onPointerHover {
+            get { return this._onPointerHover; }
+            set {
+                if (this._onPointerHover != value) {
+                    this._onPointerHover = value;
+                    this._updateAnnotations();
+                }
+            }
+        }
+        PointerHoverEventListener _onPointerHover;
+
+        public PointerExitEventListener onPointerExit {
+            get { return this._onPointerExit; }
+            set {
+                if (this._onPointerExit != value) {
+                    this._onPointerExit = value;
+                    this._updateAnnotations();
+                }
+            }
+        }
+        PointerExitEventListener _onPointerExit;
+
         public PointerUpEventListener onPointerUp;
 
         public PointerCancelEventListener onPointerCancel;
 
-        public PointerHoverEventListener onPointerHover;
-
-        public PointerLeaveEventListener onPointerLeave;
-
-        public PointerEnterEventListener onPointerEnter;
-
         public PointerScrollEventListener onPointerScroll;
+
+        MouseTrackerAnnotation _hoverAnnotation;
+
+        void _updateAnnotations() {
+            if (this._hoverAnnotation != null && this.attached) {
+                RendererBinding.instance.mouseTracker.detachAnnotation(this._hoverAnnotation);
+            }
+            
+            if (this._onPointerEnter != null || this._onPointerHover != null || this._onPointerExit != null)
+            {
+                this._hoverAnnotation = new MouseTrackerAnnotation(
+                    onEnter: this._onPointerEnter,
+                    onHover: this._onPointerHover,
+                    onExit: this._onPointerExit);
+
+                if (this.attached) {
+                    RendererBinding.instance.mouseTracker.attachAnnotation(this._hoverAnnotation);
+                }
+            }
+            else {
+                this._hoverAnnotation = null;
+            }
+        }
+
+        public override void attach(Object owner) {
+            base.attach(owner);
+            if (this._hoverAnnotation != null) {
+                RendererBinding.instance.mouseTracker.attachAnnotation(this._hoverAnnotation);
+            }
+        }
+
+        public override void detach() {
+            base.detach();
+            if (this._hoverAnnotation != null) {
+                RendererBinding.instance.mouseTracker.detachAnnotation(this._hoverAnnotation);
+            }
+        }
+
+        public override void paint(PaintingContext context, Offset offset) {
+            if (this._hoverAnnotation != null) {
+                AnnotatedRegionLayer<MouseTrackerAnnotation> layer = new AnnotatedRegionLayer<MouseTrackerAnnotation>(
+                    this._hoverAnnotation, size: this.size, offset: offset);
+                
+                context.pushLayer(layer, base.paint, offset);
+            }
+            base.paint(context, offset);
+        }
 
         protected override void performResize() {
             this.size = this.constraints.biggest;
@@ -1936,21 +2013,6 @@ namespace Unity.UIWidgets.rendering {
                 return;
             }
 
-            if (this.onPointerHover != null && evt is PointerHoverEvent) {
-                this.onPointerHover((PointerHoverEvent) evt);
-                return;
-            }
-
-            if (this.onPointerLeave != null && evt is PointerLeaveEvent) {
-                this.onPointerLeave((PointerLeaveEvent) evt);
-                return;
-            }
-
-            if (this.onPointerEnter != null && evt is PointerEnterEvent) {
-                this.onPointerEnter((PointerEnterEvent) evt);
-                return;
-            }
-
             if (this.onPointerScroll != null && evt is PointerScrollEvent) {
                 this.onPointerScroll((PointerScrollEvent) evt);
             }
@@ -1967,24 +2029,24 @@ namespace Unity.UIWidgets.rendering {
                 listeners.Add("move");
             }
 
-            if (this.onPointerUp != null) {
-                listeners.Add("up");
-            }
-
-            if (this.onPointerCancel != null) {
-                listeners.Add("cancel");
+            if (this.onPointerEnter != null) {
+                listeners.Add("enter");
             }
 
             if (this.onPointerHover != null) {
                 listeners.Add("hover");
             }
 
-            if (this.onPointerEnter != null) {
-                listeners.Add("enter");
+            if (this.onPointerExit != null) {
+                listeners.Add("exit");
             }
 
-            if (this.onPointerLeave != null) {
-                listeners.Add("leave");
+            if (this.onPointerUp != null) {
+                listeners.Add("up");
+            }
+
+            if (this.onPointerCancel != null) {
+                listeners.Add("cancel");
             }
 
             if (listeners.isEmpty()) {
@@ -2480,7 +2542,11 @@ namespace Unity.UIWidgets.rendering {
 
         public override void paint(PaintingContext context, Offset offset) {
             AnnotatedRegionLayer<T> layer =
-                new AnnotatedRegionLayer<T>(value: this.value, size: this.sized ? this.size : null);
+                new AnnotatedRegionLayer<T>(
+                    value: this.value, 
+                    size: this.sized ? this.size : null,
+                    offset: this.sized ? offset : null);
+            
             context.pushLayer(layer, base.paint, offset);
         }
     }

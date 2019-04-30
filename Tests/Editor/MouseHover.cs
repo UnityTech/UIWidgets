@@ -76,7 +76,7 @@ namespace UIWidgets.Tests {
                         this.setState(() => { this.hover = true; });
                     }
                 },
-                onPointerLeave: (evt) => {
+                onPointerExit: (evt) => {
                     if (this.mounted) {
                         this.setState(() => { this.hover = false; });
                     }

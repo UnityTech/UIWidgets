@@ -342,7 +342,7 @@ namespace Unity.UIWidgets.rendering {
             if (evt is PointerEnterEvent) {
                 this._pointerHoverInside = true;
             }
-            else if (evt is PointerLeaveEvent) {
+            else if (evt is PointerExitEvent) {
                 this._pointerHoverInside = false;
                 this._previousHoverSpan?.hoverRecognizer?.OnPointerLeave?.Invoke();
                 this._previousHoverSpan = null;
