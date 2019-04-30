@@ -38,9 +38,9 @@ namespace Unity.UIWidgets.material {
             ShapeBorder shape = null
         ) {
             return new CardTheme(
-                clipBehavior: this.clipBehavior ?? this.clipBehavior,
+                clipBehavior: clipBehavior ?? this.clipBehavior,
                 color: color ?? this.color,
-                elevation: this.elevation ?? this.elevation,
+                elevation: elevation ?? this.elevation,
                 margin: margin ?? this.margin,
                 shape: shape ?? this.shape
             );

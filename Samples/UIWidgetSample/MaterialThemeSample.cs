@@ -8,6 +8,7 @@ using Unity.UIWidgets.service;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
 using UnityEngine;
+using Image = Unity.UIWidgets.widgets.Image;
 
 namespace UIWidgetsSample {
     public class MaterialThemeSample: UIWidgetsSamplePanel {
@@ -44,11 +45,32 @@ namespace UIWidgetsSample {
                     ),
                     cardTheme: new CardTheme(
                         color: Colors.red,
-                        elevation: 6.0f
+                        elevation: 2.0f
                     )
                 ),
                 child: new Scaffold(
                     appBar: new AppBar(title: new Text("Test App Bar Theme")),
+                    body: new Center(
+                        child: new Card(
+                            shape: new RoundedRectangleBorder(
+                                borderRadius: BorderRadius.all(5.0f)
+                            ),
+                            child: new Container(
+                                height: 250,
+                                child: new Column(
+                                    children: new List<Widget> {
+                                        Image.asset(
+                                            "products/backpack",
+                                            fit: BoxFit.cover,
+                                            width: 200,
+                                            height: 200
+                                        ),
+                                        new Text("Card Theme")
+                                    }
+                                )
+                            )
+                        )
+                    ),
                     bottomNavigationBar: new BottomAppBar(
                         child: new Row(
                         mainAxisSize: MainAxisSize.max,
