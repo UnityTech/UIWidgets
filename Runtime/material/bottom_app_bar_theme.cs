@@ -10,6 +10,9 @@ namespace Unity.UIWidgets.material {
             float? elevation = null,
             NotchedShape shape = null
         ) {
+            this.color = color;
+            this.elevation = elevation;
+            this.shape = shape;
         }
 
         public readonly Color color;

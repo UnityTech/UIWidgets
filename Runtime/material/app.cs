@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Unity.UIWidgets.animation;
 using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.service;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
 using TextStyle = Unity.UIWidgets.painting.TextStyle;
@@ -158,14 +159,25 @@ namespace Unity.UIWidgets.material {
                 initialRoute: this.widget.initialRoute,
                 onGenerateRoute: this.widget.onGenerateRoute,
                 onUnknownRoute: this.widget.onUnknownRoute,
-                builder: (BuildContext congtext, Widget child) => {
-                    ThemeData theme = this.widget.theme ?? ThemeData.fallback();
+                builder: (BuildContext _context, Widget child) => {
+                    ThemeData theme;
+                    Brightness platformBrightness = MediaQuery.platformBrightnessOf(_context);
+                    if (platformBrightness == Brightness.dark && this.widget.darkTheme != null) {
+                        theme = this.widget.darkTheme;
+                    }
+                    else if (this.widget.theme != null) {
+                        theme = this.widget.theme;
+                    }
+                    else {
+                        theme = ThemeData.fallback();
+                    }
+
                     return new AnimatedTheme(
                         data: theme,
                         isMaterialAppTheme: true,
                         child: this.widget.builder != null
                             ? new Builder(
-                                builder: (_context) => { return this.widget.builder(_context, child); }
+                                builder: (__context) => { return this.widget.builder(__context, child); }
                             )
                             : child
                     );
