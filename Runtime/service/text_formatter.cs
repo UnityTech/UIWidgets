@@ -51,14 +51,14 @@ namespace Unity.UIWidgets.service {
     public class LengthLimitingTextInputFormatter : TextInputFormatter {
 
         public LengthLimitingTextInputFormatter(int? maxLength) {
-            D.assert(maxLength == null || maxLength > 0);
+            D.assert(maxLength == null || maxLength == -1 || maxLength > 0);
             this.maxLength = maxLength;
         }
 
         public readonly int? maxLength;
 
         public override TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
-            if (this.maxLength != null && newValue.text.Length > this.maxLength) {
+            if (this.maxLength != null && this.maxLength > 0 && newValue.text.Length > this.maxLength) {
                 TextSelection newSelection = newValue.selection.copyWith(
                     baseOffset: Math.Min(newValue.selection.start, this.maxLength.Value),
                     extentOffset: Math.Min(newValue.selection.end, this.maxLength.Value)

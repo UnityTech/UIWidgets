@@ -10,6 +10,33 @@ namespace Unity.UIWidgets.material {
         public static readonly TimeSpan kFloatingActionButtonSegue = new TimeSpan(0, 0, 0, 0, 200);
 
         public const float kFloatingActionButtonTurnInterval = 0.125f;
+
+        public static float _leftOffset(ScaffoldPrelayoutGeometry scaffoldGeometry, float offset = 0.0f) {
+            return kFloatingActionButtonMargin
+                   + scaffoldGeometry.minInsets.left
+                   - offset;
+        }
+
+        public static float _rightOffset(ScaffoldPrelayoutGeometry scaffoldGeometry, float offset = 0.0f) {
+            return scaffoldGeometry.scaffoldSize.width
+                   - kFloatingActionButtonMargin
+                   - scaffoldGeometry.minInsets.right
+                   - scaffoldGeometry.floatingActionButtonSize.width
+                   + offset;
+        }
+
+        public static float _endOffset(ScaffoldPrelayoutGeometry scaffoldGeometry, float offset = 0.0f) {
+            return _rightOffset(scaffoldGeometry, offset: offset);
+        }
+
+        public static float _startOffset(ScaffoldPrelayoutGeometry scaffoldGeometry, float offset = 0.0f) {
+            return _leftOffset(scaffoldGeometry, offset: offset);
+        }
+
+        public static float _straddleAppBar(ScaffoldPrelayoutGeometry scaffoldGeometry) {
+            float fabHalfHeight = scaffoldGeometry.floatingActionButtonSize.height / 2.0f;
+            return scaffoldGeometry.contentTop - fabHalfHeight;
+        }
     }
 
 
@@ -17,14 +44,22 @@ namespace Unity.UIWidgets.material {
         protected FloatingActionButtonLocation() {
         }
 
-        public static readonly FloatingActionButtonLocation endFloat = new _EndFloatFabLocation();
+        public static readonly FloatingActionButtonLocation endFloat = new _EndFloatFloatingActionButtonLocation();
 
-        public static readonly FloatingActionButtonLocation centerFloat = new _CenterFloatFabLocation();
+        public static readonly FloatingActionButtonLocation
+            centerFloat = new _CenterFloatFloatingActionButtonLocation();
 
         public static readonly FloatingActionButtonLocation endDocked = new _EndDockedFloatingActionButtonLocation();
 
         public static readonly FloatingActionButtonLocation centerDocked =
             new _CenterDockedFloatingActionButtonLocation();
+
+        public static readonly FloatingActionButtonLocation startTop = new _StartTopFloatingActionButtonLocation();
+
+        public static readonly FloatingActionButtonLocation miniStartTop =
+            new _MiniStartTopFloatingActionButtonLocation();
+
+        public static readonly FloatingActionButtonLocation endTop = new _EndTopFloatingActionButtonLocation();
 
         public abstract Offset getOffset(ScaffoldPrelayoutGeometry scaffoldGeometry);
 
@@ -33,8 +68,8 @@ namespace Unity.UIWidgets.material {
         }
     }
 
-    class _CenterFloatFabLocation : FloatingActionButtonLocation {
-        public _CenterFloatFabLocation() {
+    class _CenterFloatFloatingActionButtonLocation : FloatingActionButtonLocation {
+        public _CenterFloatFloatingActionButtonLocation() {
         }
 
         public override Offset getOffset(ScaffoldPrelayoutGeometry scaffoldGeometry) {
@@ -57,16 +92,18 @@ namespace Unity.UIWidgets.material {
 
             return new Offset(fabX, fabY);
         }
+
+        public override string ToString() {
+            return "FloatingActionButtonLocation.centerFloat";
+        }
     }
 
-    class _EndFloatFabLocation : FloatingActionButtonLocation {
-        public _EndFloatFabLocation() {
+    class _EndFloatFloatingActionButtonLocation : FloatingActionButtonLocation {
+        public _EndFloatFloatingActionButtonLocation() {
         }
 
         public override Offset getOffset(ScaffoldPrelayoutGeometry scaffoldGeometry) {
-            float endPadding = scaffoldGeometry.minInsets.right;
-            float fabX = scaffoldGeometry.scaffoldSize.width - scaffoldGeometry.floatingActionButtonSize.width -
-                         FloatingActionButtonLocationUtils.kFloatingActionButtonMargin - endPadding;
+            float fabX = FloatingActionButtonLocationUtils._endOffset(scaffoldGeometry);
 
             float contentBottom = scaffoldGeometry.contentBottom;
             float bottomSheetHeight = scaffoldGeometry.bottomSheetSize.height;
@@ -85,6 +122,10 @@ namespace Unity.UIWidgets.material {
             }
 
             return new Offset(fabX, fabY);
+        }
+
+        public override string ToString() {
+            return "FloatingActionButtonLocation.endFloat";
         }
     }
 
@@ -119,10 +160,12 @@ namespace Unity.UIWidgets.material {
         }
 
         public override Offset getOffset(ScaffoldPrelayoutGeometry scaffoldGeometry) {
-            float endPadding = scaffoldGeometry.minInsets.right;
-            float fabX = scaffoldGeometry.scaffoldSize.width - scaffoldGeometry.floatingActionButtonSize.width -
-                         FloatingActionButtonLocationUtils.kFloatingActionButtonMargin - endPadding;
+            float fabX = FloatingActionButtonLocationUtils._endOffset(scaffoldGeometry);
             return new Offset(fabX, this.getDockedY(scaffoldGeometry));
+        }
+
+        public override string ToString() {
+            return "FloatingActionButtonLocation.endDocked";
         }
     }
 
@@ -133,6 +176,53 @@ namespace Unity.UIWidgets.material {
         public override Offset getOffset(ScaffoldPrelayoutGeometry scaffoldGeometry) {
             float fabX = (scaffoldGeometry.scaffoldSize.width - scaffoldGeometry.floatingActionButtonSize.width) / 2.0f;
             return new Offset(fabX, this.getDockedY(scaffoldGeometry));
+        }
+
+        public override string ToString() {
+            return "FloatingActionButtonLocation.centerDocked";
+        }
+    }
+
+
+    class _StartTopFloatingActionButtonLocation : FloatingActionButtonLocation {
+        public _StartTopFloatingActionButtonLocation() {
+        }
+
+        public override Offset getOffset(ScaffoldPrelayoutGeometry scaffoldGeometry) {
+            return new Offset(FloatingActionButtonLocationUtils._startOffset(scaffoldGeometry),
+                FloatingActionButtonLocationUtils._straddleAppBar(scaffoldGeometry));
+        }
+
+        public override string ToString() {
+            return "FloatingActionButtonLocation.startTop";
+        }
+    }
+
+    class _MiniStartTopFloatingActionButtonLocation : FloatingActionButtonLocation {
+        public _MiniStartTopFloatingActionButtonLocation() {
+        }
+
+        public override Offset getOffset(ScaffoldPrelayoutGeometry scaffoldGeometry) {
+            return new Offset(FloatingActionButtonLocationUtils._startOffset(scaffoldGeometry, offset: 4.0f),
+                FloatingActionButtonLocationUtils._straddleAppBar(scaffoldGeometry));
+        }
+
+        public override string ToString() {
+            return "FloatingActionButtonLocation.miniStartTop";
+        }
+    }
+
+    class _EndTopFloatingActionButtonLocation : FloatingActionButtonLocation {
+        public _EndTopFloatingActionButtonLocation() {
+        }
+
+        public override Offset getOffset(ScaffoldPrelayoutGeometry scaffoldGeometry) {
+            return new Offset(FloatingActionButtonLocationUtils._endOffset(scaffoldGeometry),
+                FloatingActionButtonLocationUtils._straddleAppBar(scaffoldGeometry));
+        }
+
+        public override string ToString() {
+            return "FloatingActionButtonLocation.endTop";
         }
     }
 

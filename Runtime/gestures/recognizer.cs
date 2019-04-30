@@ -203,25 +203,25 @@ namespace Unity.UIWidgets.gestures {
             TimeSpan? deadline = null,
             object debugOwner = null,
             PointerDeviceKind? kind = null,
-            float? preAcceptSlotTolerance = Constants.kTouchSlop,
-            float? postAcceptSlotTolerance = Constants.kTouchSlop
+            float? preAcceptSlopTolerance = Constants.kTouchSlop,
+            float? postAcceptSlopTolerance = Constants.kTouchSlop
         ) : base(debugOwner: debugOwner, kind: kind) {
-            D.assert(preAcceptSlotTolerance == null || preAcceptSlotTolerance >= 0,
+            D.assert(preAcceptSlopTolerance == null || preAcceptSlopTolerance >= 0,
                 "The preAcceptSlopTolerance must be positive or null");
 
-            D.assert(postAcceptSlotTolerance == null || postAcceptSlotTolerance >= 0,
+            D.assert(postAcceptSlopTolerance == null || postAcceptSlopTolerance >= 0,
                 "The postAcceptSlopTolerance must be positive or null");
 
             this.deadline = deadline;
-            this.preAcceptSlotTolerance = preAcceptSlotTolerance;
-            this.postAcceptSlotTolerance = postAcceptSlotTolerance;
+            this.preAcceptSlopTolerance = preAcceptSlopTolerance;
+            this.postAcceptSlopTolerance = postAcceptSlopTolerance;
         }
 
         public readonly TimeSpan? deadline;
 
-        public readonly float? preAcceptSlotTolerance;
+        public readonly float? preAcceptSlopTolerance;
 
-        public readonly float? postAcceptSlotTolerance;
+        public readonly float? postAcceptSlopTolerance;
 
         public GestureRecognizerState state = GestureRecognizerState.ready;
 
@@ -248,11 +248,11 @@ namespace Unity.UIWidgets.gestures {
 
             if (evt.pointer == this.primaryPointer) {
                 bool isPreAcceptSlopPastTolerance = this.state == GestureRecognizerState.possible &&
-                                                    this.preAcceptSlotTolerance != null &&
-                                                    this._getDistance(evt) > this.preAcceptSlotTolerance;
+                                                    this.preAcceptSlopTolerance != null &&
+                                                    this._getDistance(evt) > this.preAcceptSlopTolerance;
                 bool isPostAcceptSlopPastTolerance = this.state == GestureRecognizerState.accepted &&
-                                                     this.postAcceptSlotTolerance != null &&
-                                                     this._getDistance(evt) > this.postAcceptSlotTolerance;
+                                                     this.postAcceptSlopTolerance != null &&
+                                                     this._getDistance(evt) > this.postAcceptSlopTolerance;
 
                 if (evt is PointerMoveEvent && (isPreAcceptSlopPastTolerance || isPostAcceptSlopPastTolerance)) {
                     this.resolve(GestureDisposition.rejected);

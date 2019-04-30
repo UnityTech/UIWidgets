@@ -19,7 +19,8 @@ namespace Unity.UIWidgets.material {
             List<Widget> children = null,
             ReorderCallback onReorder = null,
             Axis scrollDirection = Axis.vertical,
-            EdgeInsets padding = null
+            EdgeInsets padding = null,
+            bool reverse = false
         ) {
             D.assert(onReorder != null);
             D.assert(children != null);
@@ -32,6 +33,7 @@ namespace Unity.UIWidgets.material {
             this.scrollDirection = scrollDirection;
             this.padding = padding;
             this.onReorder = onReorder;
+            this.reverse = reverse;
         }
 
         public readonly Widget header;
@@ -43,6 +45,8 @@ namespace Unity.UIWidgets.material {
         public readonly EdgeInsets padding;
 
         public readonly ReorderCallback onReorder;
+
+        public readonly bool reverse;
 
         public override State createState() {
             return new _ReorderableListViewState();
@@ -64,7 +68,8 @@ namespace Unity.UIWidgets.material {
                         children: this.widget.children,
                         scrollDirection: this.widget.scrollDirection,
                         onReorder: this.widget.onReorder,
-                        padding: this.widget.padding
+                        padding: this.widget.padding,
+                        reverse: this.widget.reverse
                     );
                 }
             );
@@ -85,13 +90,15 @@ namespace Unity.UIWidgets.material {
             List<Widget> children,
             Axis scrollDirection,
             EdgeInsets padding,
-            ReorderCallback onReorder
+            ReorderCallback onReorder,
+            bool? reverse = null
         ) {
             this.header = header;
             this.children = children;
             this.scrollDirection = scrollDirection;
             this.padding = padding;
             this.onReorder = onReorder;
+            this.reverse = reverse;
         }
 
         public readonly Widget header;
@@ -99,6 +106,7 @@ namespace Unity.UIWidgets.material {
         public readonly Axis scrollDirection;
         public readonly EdgeInsets padding;
         public readonly ReorderCallback onReorder;
+        public readonly bool? reverse;
 
         public override State createState() {
             return new _ReorderableListContentState();
@@ -232,7 +240,8 @@ namespace Unity.UIWidgets.material {
 
         Widget _wrap(Widget toWrap, int index, BoxConstraints constraints) {
             D.assert(toWrap.key != null);
-            GlobalObjectKey<State<_ReorderableListContent>> keyIndexGlobalKey = new GlobalObjectKey<State<_ReorderableListContent>>(toWrap.key);
+            GlobalObjectKey<State<_ReorderableListContent>> keyIndexGlobalKey =
+                new GlobalObjectKey<State<_ReorderableListContent>>(toWrap.key);
 
             void onDragStarted() {
                 this.setState(() => {
@@ -260,13 +269,13 @@ namespace Unity.UIWidgets.material {
             void onDragEnded() {
                 reorder(this._dragStartIndex, this._currentIndex);
             }
-            
-            
+
+
             Widget wrapWithKeyedSubtree() {
-              return new KeyedSubtree(
-                key: keyIndexGlobalKey,
-                child: toWrap
-              );
+                return new KeyedSubtree(
+                    key: keyIndexGlobalKey,
+                    child: toWrap
+                );
             }
 
             Widget buildDragTarget(BuildContext context, List<Key> acceptedCandidates, List<Key> rejectedCandidates) {
@@ -381,15 +390,26 @@ namespace Unity.UIWidgets.material {
                         break;
                 }
 
-                wrappedChildren.Add(this._wrap(
-                    finalDropArea, this.widget.children.Count,
-                    constraints)
-                );
+                if (this.widget.reverse == true) {
+                    wrappedChildren.Insert(0, this._wrap(
+                        finalDropArea,
+                        this.widget.children.Count,
+                        constraints)
+                    );
+                }
+                else {
+                    wrappedChildren.Add(this._wrap(
+                        finalDropArea, this.widget.children.Count,
+                        constraints)
+                    );
+                }
+
                 return new SingleChildScrollView(
                     scrollDirection: this.widget.scrollDirection,
                     child: this._buildContainerForScrollDirection(children: wrappedChildren),
                     padding: this.widget.padding,
-                    controller: this._scrollController
+                    controller: this._scrollController,
+                    reverse: this.widget.reverse == true
                 );
             });
         }

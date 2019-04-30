@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Unity.UIWidgets.animation;
 using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.service;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
 using TextStyle = Unity.UIWidgets.painting.TextStyle;
@@ -33,6 +34,7 @@ namespace Unity.UIWidgets.material {
             string title = "",
             Color color = null,
             ThemeData theme = null,
+            ThemeData darkTheme = null,
             Locale locale = null,
             List<LocalizationsDelegate<MaterialLocalizations>> localizationsDelegates = null,
             LocaleListResolutionCallback localeListResolutionCallback = null,
@@ -52,6 +54,7 @@ namespace Unity.UIWidgets.material {
             this.title = title;
             this.color = color;
             this.theme = theme;
+            this.darkTheme = darkTheme;
             this.locale = locale;
             this.localizationsDelegates = localizationsDelegates;
             this.localeListResolutionCallback = localeListResolutionCallback;
@@ -79,6 +82,8 @@ namespace Unity.UIWidgets.material {
         public readonly string title;
 
         public readonly ThemeData theme;
+
+        public readonly ThemeData darkTheme;
 
         public readonly Color color;
 
@@ -143,30 +148,47 @@ namespace Unity.UIWidgets.material {
         }
 
         public override Widget build(BuildContext context) {
-            ThemeData theme = this.widget.theme ?? ThemeData.fallback();
-            Widget result = new AnimatedTheme(
-                data: theme,
-                isMaterialAppTheme: true,
-                child: new WidgetsApp(
-                    key: new GlobalObjectKey<State>(this),
-                    navigatorKey: this.widget.navigatorKey,
-                    navigatorObservers: this._navigatorObservers,
-                    pageRouteBuilder: (RouteSettings settings, WidgetBuilder builder) =>
-                        new MaterialPageRoute(settings: settings, builder: builder),
-                    home: this.widget.home,
-                    routes: this.widget.routes,
-                    initialRoute: this.widget.initialRoute,
-                    onGenerateRoute: this.widget.onGenerateRoute,
-                    onUnknownRoute: this.widget.onUnknownRoute,
-                    builder: this.widget.builder,
-                    textStyle: AppUtils._errorTextStyle,
-                    locale: this.widget.locale,
-                    localizationsDelegates: this._localizationsDelegates,
-                    localeResolutionCallback: this.widget.localeResolutionCallback,
-                    localeListResolutionCallback: this.widget.localeListResolutionCallback,
-                    supportedLocales: this.widget.supportedLocales,
-                    showPerformanceOverlay: this.widget.showPerformanceOverlay
-                )
+            Widget result = new WidgetsApp(
+                key: new GlobalObjectKey<State>(this),
+                navigatorKey: this.widget.navigatorKey,
+                navigatorObservers: this._navigatorObservers,
+                pageRouteBuilder: (RouteSettings settings, WidgetBuilder builder) =>
+                    new MaterialPageRoute(settings: settings, builder: builder),
+                home: this.widget.home,
+                routes: this.widget.routes,
+                initialRoute: this.widget.initialRoute,
+                onGenerateRoute: this.widget.onGenerateRoute,
+                onUnknownRoute: this.widget.onUnknownRoute,
+                builder: (BuildContext _context, Widget child) => {
+                    ThemeData theme;
+                    Brightness platformBrightness = MediaQuery.platformBrightnessOf(_context);
+                    if (platformBrightness == Brightness.dark && this.widget.darkTheme != null) {
+                        theme = this.widget.darkTheme;
+                    }
+                    else if (this.widget.theme != null) {
+                        theme = this.widget.theme;
+                    }
+                    else {
+                        theme = ThemeData.fallback();
+                    }
+
+                    return new AnimatedTheme(
+                        data: theme,
+                        isMaterialAppTheme: true,
+                        child: this.widget.builder != null
+                            ? new Builder(
+                                builder: (__context) => { return this.widget.builder(__context, child); }
+                            )
+                            : child
+                    );
+                },
+                textStyle: AppUtils._errorTextStyle,
+                locale: this.widget.locale,
+                localizationsDelegates: this._localizationsDelegates,
+                localeResolutionCallback: this.widget.localeResolutionCallback,
+                localeListResolutionCallback: this.widget.localeListResolutionCallback,
+                supportedLocales: this.widget.supportedLocales,
+                showPerformanceOverlay: this.widget.showPerformanceOverlay
             );
 
             return result;

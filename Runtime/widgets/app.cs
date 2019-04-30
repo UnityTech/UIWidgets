@@ -179,6 +179,11 @@ namespace Unity.UIWidgets.widgets {
         public void didChangeTextScaleFactor() {
             this.setState();
         }
+        
+        public void didChangePlatformBrightness() {
+            this.setState(() => {
+            });
+        }
 
         public void didChangeLocales(List<Locale> locale) {
             Locale newLocale = this._resolveLocales(locale, this.widget.supportedLocales);

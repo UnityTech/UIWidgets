@@ -253,6 +253,7 @@ namespace Unity.UIWidgets.rendering {
 
                 if (value == null) {
                     this._controller?.dispose();
+                    this._controller = null;
                 }
                 else {
                     if (this._snapConfiguration != null && value.vsync != this._snapConfiguration.vsync) {
@@ -374,13 +375,18 @@ namespace Unity.UIWidgets.rendering {
 
         protected override float updateGeometry() {
             float? minExtent = this.minExtent;
+            float? minAllowedExtent = this.constraints.remainingPaintExtent > minExtent
+                ? minExtent
+                : this.constraints.remainingPaintExtent;
             float? maxExtent = this.maxExtent;
             float? paintExtent = maxExtent - this._effectiveScrollOffset;
+            float? clampedPaintExtent =
+                paintExtent?.clamp(minAllowedExtent ?? 0.0f, this.constraints.remainingPaintExtent);
             float? layoutExtent = maxExtent - this.constraints.scrollOffset;
             this.geometry = new SliverGeometry(
                 scrollExtent: maxExtent ?? 0.0f,
-                paintExtent: paintExtent?.clamp(minExtent ?? 0.0f, this.constraints.remainingPaintExtent) ?? 0.0f,
-                layoutExtent: layoutExtent?.clamp(0.0f, this.constraints.remainingPaintExtent - minExtent ?? 0.0f),
+                paintExtent: clampedPaintExtent ?? 0.0f,
+                layoutExtent: layoutExtent?.clamp(0.0f, clampedPaintExtent ?? 0.0f),
                 maxPaintExtent: maxExtent ?? 0.0f,
                 maxScrollObstructionExtent: maxExtent ?? 0.0f,
                 hasVisualOverflow: true

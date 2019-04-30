@@ -168,9 +168,8 @@ namespace Unity.UIWidgets.widgets {
 
         internal void _remove(OverlayEntry entry) {
             if (this.mounted) {
-                this._entries.Remove(entry);
                 this.setState(() => {
-                    /* entry was removed */
+                    this._entries.Remove(entry);
                 });
             }
         }

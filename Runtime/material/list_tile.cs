@@ -811,11 +811,13 @@ namespace Unity.UIWidgets.material {
                 D.assert(isOneLine);
             }
 
+            float defaultTileHeight = this._defaultTileHeight;
+
             float tileHeight = 0.0f;
             float titleY = 0.0f;
             float subtitleY = 0.0f;
             if (!hasSubtitle) {
-                tileHeight = Mathf.Max(this._defaultTileHeight, titleSize.height + 2.0f * _minVerticalPadding);
+                tileHeight = Mathf.Max(defaultTileHeight, titleSize.height + 2.0f * _minVerticalPadding);
                 titleY = (tileHeight - titleSize.height) / 2.0f;
             }
             else {
@@ -823,7 +825,7 @@ namespace Unity.UIWidgets.material {
                 titleY = titleBaseline - _boxBaseline(this.title, this.titleBaselineType);
                 subtitleY = subtitleBaseline -
                             _boxBaseline(this.subtitle, this.subtitleBaselineType ?? TextBaseline.alphabetic);
-                tileHeight = this._defaultTileHeight;
+                tileHeight = defaultTileHeight;
 
                 float titleOverlap = titleY + titleSize.height - subtitleY;
                 if (titleOverlap > 0.0f) {
@@ -839,8 +841,17 @@ namespace Unity.UIWidgets.material {
                 }
             }
 
-            float leadingY = (tileHeight - leadingSize.height) / 2.0f;
-            float trailingY = (tileHeight - trailingSize.height) / 2.0f;
+            float leadingY;
+            float trailingY;
+
+            if (tileHeight > 72.0f) {
+                leadingY = 16.0f;
+                trailingY = 16.0f;
+            }
+            else {
+                leadingY = Mathf.Min((tileHeight - leadingSize.height) / 2.0f, 16.0f);
+                trailingY = (tileHeight - trailingSize.height) / 2.0f;
+            }
 
             if (hasLeading) {
                 _positionBox(this.leading, new Offset(0.0f, leadingY));

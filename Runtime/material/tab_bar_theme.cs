@@ -3,6 +3,7 @@ using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
+using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace Unity.UIWidgets.material {
     public class TabBarTheme : Diagnosticable, IEquatable<TabBarTheme> {
@@ -10,11 +11,15 @@ namespace Unity.UIWidgets.material {
             Decoration indicator = null,
             TabBarIndicatorSize? indicatorSize = null,
             Color labelColor = null,
-            Color unselectedLabelColor = null) {
+            TextStyle labelStyle = null,
+            Color unselectedLabelColor = null,
+            TextStyle unselectedLabelStyle = null) {
             this.indicator = indicator;
             this.indicatorSize = indicatorSize;
             this.labelColor = labelColor;
+            this.labelStyle = labelStyle;
             this.unselectedLabelColor = unselectedLabelColor;
+            this.unselectedLabelStyle = unselectedLabelStyle;
         }
 
         public readonly Decoration indicator;
@@ -23,19 +28,27 @@ namespace Unity.UIWidgets.material {
 
         public readonly Color labelColor;
 
+        public readonly TextStyle labelStyle;
+
         public readonly Color unselectedLabelColor;
+
+        public readonly TextStyle unselectedLabelStyle;
 
         public TabBarTheme copyWith(
             Decoration indicator = null,
             TabBarIndicatorSize? indicatorSize = null,
             Color labelColor = null,
-            Color unselectedLabelColor = null
+            TextStyle labelStyle = null,
+            Color unselectedLabelColor = null,
+            TextStyle unselectedLabelStyle = null
         ) {
             return new TabBarTheme(
                 indicator: indicator ?? this.indicator,
                 indicatorSize: indicatorSize ?? this.indicatorSize,
                 labelColor: labelColor ?? this.labelColor,
-                unselectedLabelColor: unselectedLabelColor ?? this.unselectedLabelColor);
+                labelStyle: labelStyle ?? this.labelStyle,
+                unselectedLabelColor: unselectedLabelColor ?? this.unselectedLabelColor,
+                unselectedLabelStyle: unselectedLabelStyle ?? this.unselectedLabelStyle);
         }
 
         public static TabBarTheme of(BuildContext context) {
@@ -49,7 +62,9 @@ namespace Unity.UIWidgets.material {
                 indicator: Decoration.lerp(a.indicator, b.indicator, t),
                 indicatorSize: t < 0.5 ? a.indicatorSize : b.indicatorSize,
                 labelColor: Color.lerp(a.labelColor, b.labelColor, t),
-                unselectedLabelColor: Color.lerp(a.unselectedLabelColor, b.unselectedLabelColor, t)
+                labelStyle: TextStyle.lerp(a.labelStyle, b.labelStyle, t),
+                unselectedLabelColor: Color.lerp(a.unselectedLabelColor, b.unselectedLabelColor, t),
+                unselectedLabelStyle: TextStyle.lerp(a.unselectedLabelStyle, b.unselectedLabelStyle, t)
             );
         }
 
@@ -58,8 +73,11 @@ namespace Unity.UIWidgets.material {
                 var hashCode = this.indicator != null ? this.indicator.GetHashCode() : 0;
                 hashCode = (hashCode * 397) ^ (this.indicatorSize != null ? this.indicatorSize.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (this.labelColor != null ? this.labelColor.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (this.labelStyle != null ? this.labelStyle.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^
                            (this.unselectedLabelColor != null ? this.unselectedLabelColor.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^
+                           (this.unselectedLabelStyle != null ? this.unselectedLabelStyle.GetHashCode() : 0);
                 return hashCode;
             }
         }

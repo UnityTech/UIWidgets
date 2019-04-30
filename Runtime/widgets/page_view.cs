@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using RSG;
 using Unity.UIWidgets.animation;
 using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.physics;
 using Unity.UIWidgets.rendering;
@@ -112,7 +113,7 @@ namespace Unity.UIWidgets.widgets {
         public float page {
             get {
                 return (Mathf.Max(0.0f, this.pixels.clamp(this.minScrollExtent, this.maxScrollExtent)) /
-                                Mathf.Max(1.0f, this.viewportDimension * this.viewportFraction));
+                        Mathf.Max(1.0f, this.viewportDimension * this.viewportFraction));
             }
         }
 
@@ -285,6 +286,7 @@ namespace Unity.UIWidgets.widgets {
             bool pageSnapping = true,
             ValueChanged<int> onPageChanged = null,
             List<Widget> children = null,
+            DragStartBehavior dragStartBehavior = DragStartBehavior.down,
             IndexedWidgetBuilder itemBuilder = null,
             SliverChildDelegate childDelegate = null,
             int itemCount = 0
@@ -294,6 +296,7 @@ namespace Unity.UIWidgets.widgets {
             this.physics = physics;
             this.pageSnapping = pageSnapping;
             this.onPageChanged = onPageChanged;
+            this.dragStartBehavior = dragStartBehavior;
             this.controller = controller ?? PageViewUtils._defaultPageController;
             if (itemBuilder != null) {
                 this.childrenDelegate = new SliverChildBuilderDelegate(itemBuilder, childCount: itemCount);
@@ -319,6 +322,8 @@ namespace Unity.UIWidgets.widgets {
         public readonly ValueChanged<int> onPageChanged;
 
         public readonly SliverChildDelegate childrenDelegate;
+
+        public readonly DragStartBehavior dragStartBehavior;
 
         public override State createState() {
             return new _PageViewState();
@@ -368,6 +373,7 @@ namespace Unity.UIWidgets.widgets {
                     return false;
                 },
                 child: new Scrollable(
+                    dragStartBehavior: this.widget.dragStartBehavior,
                     axisDirection: axisDirection,
                     controller: this.widget.controller,
                     physics: physics,

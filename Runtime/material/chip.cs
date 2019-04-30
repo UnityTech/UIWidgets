@@ -268,10 +268,7 @@ namespace Unity.UIWidgets.material {
             Color selectedShadowColor = null,
             ShapeBorder avatarBorder = null
         ) : base(key: key) {
-            D.assert(selected != null);
-            D.assert(isEnabled != null);
             D.assert(label != null);
-            D.assert(clipBehavior != null);
             D.assert(pressElevation == null || pressElevation >= 0.0f);
             D.assert(elevation == null || elevation >= 0.0f);
             this._avatarBorder = avatarBorder ?? new CircleBorder();
@@ -431,12 +428,6 @@ namespace Unity.UIWidgets.material {
 
         float? _elevation;
 
-        public Color selectedShadowColor {
-            get { return this._selectedShadowColor; }
-        }
-
-        Color _selectedShadowColor;
-
         public ShapeBorder avatarBorder {
             get { return this._avatarBorder; }
         }
@@ -501,7 +492,6 @@ namespace Unity.UIWidgets.material {
         ) : base(key: key) {
             D.assert(selected != null);
             D.assert(label != null);
-            D.assert(clipBehavior != null);
             D.assert(pressElevation == null || pressElevation >= 0.0f);
             D.assert(elevation == null || elevation >= 0.0f);
             this._avatarBorder = avatarBorder ?? new CircleBorder();

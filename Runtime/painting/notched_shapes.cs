@@ -16,7 +16,7 @@ namespace Unity.UIWidgets.painting {
         }
 
         public override Path getOuterPath(Rect host, Rect guest) {
-            if (!host.overlaps(guest)) {
+            if (guest == null || !host.overlaps(guest)) {
                 Path path = new Path();
                 path.addRect(host);
                 return path;

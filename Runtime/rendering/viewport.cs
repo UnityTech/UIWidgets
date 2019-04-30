@@ -215,6 +215,7 @@ namespace Unity.UIWidgets.rendering {
                 GrowthDirectionUtils.applyGrowthDirectionToScrollDirection(
                     this.offset.userScrollDirection, growthDirection);
             float maxPaintOffset = layoutOffset + overlap;
+            float precedingScrollExtent = 0.0f;
 
             while (child != null) {
                 float sliverScrollOffset = scrollOffset <= 0.0 ? 0.0f : scrollOffset;
@@ -232,6 +233,7 @@ namespace Unity.UIWidgets.rendering {
                     growthDirection: growthDirection,
                     userScrollDirection: adjustedUserScrollDirection,
                     scrollOffset: sliverScrollOffset,
+                    precedingScrollExtent: precedingScrollExtent,
                     overlap: maxPaintOffset - layoutOffset,
                     remainingPaintExtent: Mathf.Max(0.0f,
                         remainingPaintExtent - layoutOffset + initialLayoutOffset),
@@ -261,6 +263,7 @@ namespace Unity.UIWidgets.rendering {
                 maxPaintOffset = Mathf.Max(effectiveLayoutOffset + childLayoutGeometry.paintExtent,
                     maxPaintOffset);
                 scrollOffset -= childLayoutGeometry.scrollExtent;
+                precedingScrollExtent += childLayoutGeometry.scrollExtent;
                 layoutOffset += childLayoutGeometry.layoutExtent;
 
                 if (childLayoutGeometry.cacheExtent != 0.0) {
@@ -393,19 +396,32 @@ namespace Unity.UIWidgets.rendering {
         public RevealedOffset getOffsetToReveal(RenderObject target, float alignment, Rect rect = null) {
             float leadingScrollOffset = 0.0f;
             float targetMainAxisExtent = 0.0f;
-            RenderObject descendant;
             rect = rect ?? target.paintBounds;
 
             Matrix3 transform;
 
-            if (target is RenderBox) {
-                RenderBox targetBox = (RenderBox) target;
-
-                RenderBox pivot = targetBox;
-                while (pivot.parent is RenderBox) {
-                    pivot = (RenderBox) pivot.parent;
+            RenderObject child = target;
+            RenderBox pivot = null;
+            bool onlySlivers = target is RenderSliver;
+            while (child.parent != this) {
+                D.assert(child.parent != null, $"target must be a descendant of ${this}");
+                if (child is RenderBox) {
+                    pivot = (RenderBox) child;
                 }
 
+                if (child.parent is RenderSliver) {
+                    RenderSliver parent = (RenderSliver) child.parent;
+                    leadingScrollOffset += parent.childScrollOffset(child);
+                }
+                else {
+                    onlySlivers = false;
+                    leadingScrollOffset = 0.0f;
+                }
+
+                child = (RenderObject) child.parent;
+            }
+
+            if (pivot != null) {
                 D.assert(pivot.parent != null);
                 D.assert(pivot.parent != this);
                 D.assert(pivot != this);
@@ -413,7 +429,7 @@ namespace Unity.UIWidgets.rendering {
 
                 RenderSliver pivotParent = (RenderSliver) pivot.parent;
 
-                transform = targetBox.getTransformTo(pivot);
+                transform = target.getTransformTo(pivot);
                 Rect bounds = transform.mapRect(rect);
 
                 float offset = 0.0f;
@@ -430,15 +446,15 @@ namespace Unity.UIWidgets.rendering {
                                 break;
                         }
 
-                        leadingScrollOffset = pivot.size.height - offset;
+                        leadingScrollOffset += pivot.size.height - offset;
                         targetMainAxisExtent = bounds.height;
                         break;
                     case AxisDirection.right:
-                        leadingScrollOffset = bounds.left;
+                        leadingScrollOffset += bounds.left;
                         targetMainAxisExtent = bounds.width;
                         break;
                     case AxisDirection.down:
-                        leadingScrollOffset = bounds.top;
+                        leadingScrollOffset += bounds.top;
                         targetMainAxisExtent = bounds.height;
                         break;
                     case AxisDirection.left:
@@ -451,28 +467,17 @@ namespace Unity.UIWidgets.rendering {
                                 break;
                         }
 
-                        leadingScrollOffset = pivot.size.width - offset;
+                        leadingScrollOffset += pivot.size.width - offset;
                         targetMainAxisExtent = bounds.width;
                         break;
                 }
-
-                descendant = pivot;
             }
-            else if (target is RenderSliver) {
+            else if (onlySlivers) {
                 RenderSliver targetSliver = (RenderSliver) target;
-                leadingScrollOffset = 0.0f;
                 targetMainAxisExtent = targetSliver.geometry.scrollExtent;
-                descendant = targetSliver;
             }
             else {
                 return new RevealedOffset(offset: this.offset.pixels, rect: rect);
-            }
-
-            RenderObject child = descendant;
-            while (child.parent is RenderSliver) {
-                var parent = (RenderSliver) child.parent;
-                leadingScrollOffset += parent.childScrollOffset(child);
-                child = parent;
             }
 
             D.assert(child.parent == this);

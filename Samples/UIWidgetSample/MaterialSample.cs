@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using RSG;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.material;
@@ -13,7 +14,7 @@ using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace UIWidgetsSample {
     public class MaterialSample : UIWidgetsSamplePanel {
-        const int testCaseId = 6;
+        const int testCaseId = 7;
 
         readonly List<Widget> testCases = new List<Widget> {
             new MaterialButtonWidget(),
@@ -22,7 +23,9 @@ namespace UIWidgetsSample {
             new MaterialTabBarWidget(),
             new TableWidget(),
             new BottomAppBarWidget(),
-            new MaterialSliderWidget()
+            new MaterialSliderWidget(),
+            new MaterialNavigationBarWidget(),
+            new MaterialReorderableListViewWidget(),
         };
 
         protected override Widget createWidget() {
@@ -379,13 +382,26 @@ namespace UIWidgetsSample {
                 children: new List<Widget> {
                     new Material(
                         child: new Center(
-                            child: new FlatButton(
-                                shape: new RoundedRectangleBorder(borderRadius: BorderRadius.all(20.0f)),
-                                color: new Color(0xFF00FF00),
-                                splashColor: new Color(0xFFFF0011),
-                                highlightColor: new Color(0x88FF0011),
-                                child: new Text("Click Me"),
-                                onPressed: () => { Debug.Log("pressed here"); }
+                            child: new Column(
+                                children: new List<Widget> {
+                                    new FlatButton(
+                                        shape: new RoundedRectangleBorder(borderRadius: BorderRadius.all(20.0f)),
+                                        color: new Color(0xFF00FF00),
+                                        splashColor: new Color(0xFFFF0011),
+                                        highlightColor: new Color(0x88FF0011),
+                                        child: new Text("Click Me"),
+                                        onPressed: () => { Debug.Log("pressed flat button"); }
+                                    ),
+                                    new RaisedButton(
+                                        shape: new RoundedRectangleBorder(borderRadius: BorderRadius.all(20.0f)),
+                                        color: new Color(0xFFFF00FF),
+                                        splashColor: new Color(0xFFFF0011),
+                                        highlightColor: new Color(0x88FF0011),
+                                        elevation: 4.0f,
+                                        child: new Text("Click Me"),
+                                        onPressed: () => { Debug.Log("pressed raised button"); }
+                                    )
+                                }
                             )
                         )
                     ),
@@ -421,6 +437,135 @@ namespace UIWidgetsSample {
                                 onChanged: this.onChanged))
                     }
                     )
+            );
+        }
+    }
+    
+    internal class MaterialNavigationBarWidget : StatefulWidget
+    {
+        public MaterialNavigationBarWidget(Key key = null) : base(key)
+        {
+        }
+
+        public override State createState()
+        {
+            return new MaterialNavigationBarWidgetState();
+        }
+    }
+
+    internal class MaterialNavigationBarWidgetState : SingleTickerProviderStateMixin<MaterialNavigationBarWidget> {
+        int _currentIndex = 0;
+        public MaterialNavigationBarWidgetState()
+        {
+        }
+
+        public override Widget build(BuildContext context)
+        {
+            return new Scaffold(
+                bottomNavigationBar: new Container(
+                    height: 100,
+                    color: Colors.blue,
+                    child: new Center(
+                        child: new BottomNavigationBar(
+                            type: BottomNavigationBarType.shifting,
+                            // type: BottomNavigationBarType.fix,
+                            items: new List<BottomNavigationBarItem>
+                            {
+                                new BottomNavigationBarItem(
+                                    icon: new Icon(icon: Unity.UIWidgets.material.Icons.work, size: 30),
+                                    title: new Text("Work"),
+                                    activeIcon: new Icon(icon: Unity.UIWidgets.material.Icons.work, size: 50),
+                                    backgroundColor: Colors.blue
+                                ),
+                                new BottomNavigationBarItem(
+                                    icon: new Icon(icon: Unity.UIWidgets.material.Icons.home, size: 30),
+                                    title: new Text("Home"),
+                                    activeIcon: new Icon(icon: Unity.UIWidgets.material.Icons.home, size: 50),
+                                    backgroundColor: Colors.blue
+                                ),
+                                new BottomNavigationBarItem(
+                                    icon: new Icon(icon: Unity.UIWidgets.material.Icons.shop, size: 30),
+                                    title: new Text("Shop"),
+                                    activeIcon: new Icon(icon: Unity.UIWidgets.material.Icons.shop, size: 50),
+                                    backgroundColor: Colors.blue
+                                ),
+                                new BottomNavigationBarItem(
+                                    icon: new Icon(icon: Unity.UIWidgets.material.Icons.school, size: 30),
+                                    title: new Text("School"),
+                                    activeIcon: new Icon(icon: Unity.UIWidgets.material.Icons.school, size: 50),
+                                    backgroundColor: Colors.blue
+                                ),
+                            },
+                            currentIndex: this._currentIndex,
+                            onTap: (value) => { this.setState(() => { this._currentIndex = value; }); }
+                        )
+                    )
+                )
+            );
+        }
+    }
+    
+    internal class MaterialReorderableListViewWidget : StatefulWidget
+    {
+        public MaterialReorderableListViewWidget(Key key = null) : base(key)
+        {
+        }
+
+        public override State createState()
+        {
+            return new MaterialReorderableListViewWidgetState();
+        }
+    }
+
+    internal class MaterialReorderableListViewWidgetState : State<MaterialReorderableListViewWidget>
+    {
+        private List<string> items = new List<string> {"First", "Second", "Third"};
+
+        public override Widget build(BuildContext context)
+        {
+            return new Stack(
+                children: new List<Widget>
+                {
+                    new Scaffold(
+                        body: new Scrollbar(
+                            child: new ReorderableListView(
+                                header: new Text("Header of list"),
+                                children: this.items.Select<string, Widget>((item) => {
+                                    return new Container(
+                                        key: Key.key(item),
+                                        width: 300.0f,
+                                        height: 50.0f,
+                                        decoration: new BoxDecoration(
+                                            color: Colors.blue,
+                                            border: Border.all(
+                                                color: Colors.black
+                                            )
+                                        ),
+                                        child: new Center(
+                                            child: new Text(
+                                                item,
+                                                style: new TextStyle(
+                                                    fontSize: 32
+                                                )
+                                            )
+                                        )
+                                    );
+                                }).ToList(),
+                                onReorder: (int oldIndex, int newIndex) =>
+                                {
+                                    this.setState(() =>
+                                    {
+                                        if (newIndex > oldIndex) newIndex -= 1;
+                                        string item = this.items[oldIndex];
+                                        this.items.RemoveAt(oldIndex);
+                                        this.items.Insert(newIndex, item);
+                                    });
+                                }
+                            )
+                        )
+                    ),
+                    new PerformanceOverlay()
+                }
             );
         }
     }

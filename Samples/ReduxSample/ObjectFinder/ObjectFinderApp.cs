@@ -176,6 +176,7 @@ namespace Unity.UIWidgets.Sample.Redux.ObjectFinder {
                             padding: EdgeInsets.only(left: 8, right: 8),
                             child: new EditableText(
                                 selectionControls: MaterialUtils.materialTextSelectionControls,
+                                backgroundCursorColor: Colors.transparent,
                                 controller: this._controller,
                                 focusNode: this._focusNode,
                                 style: new TextStyle(

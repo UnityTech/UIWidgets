@@ -5,6 +5,7 @@ using RSG;
 using Unity.UIWidgets.animation;
 using Unity.UIWidgets.async;
 using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
@@ -206,6 +207,8 @@ namespace Unity.UIWidgets.material {
             float floatingActionButtonMoveAnimationProgress,
             FloatingActionButtonAnimator floatingActionButtonMotionAnimator
         ) {
+            D.assert(minInsets != null);
+            D.assert(geometryNotifier != null);
             D.assert(previousFloatingActionButtonLocation != null);
             D.assert(currentFloatingActionButtonLocation != null);
 
@@ -585,8 +588,10 @@ namespace Unity.UIWidgets.material {
             Widget bottomNavigationBar = null,
             Widget bottomSheet = null,
             Color backgroundColor = null,
-            bool resizeToAvoidBottomPadding = true,
-            bool primary = true
+            bool? resizeToAvoidBottomPadding = null,
+            bool? resizeToAvoidBottomInset = null,
+            bool primary = true,
+            DragStartBehavior drawerDragStartBehavior = DragStartBehavior.down
         ) : base(key: key) {
             this.appBar = appBar;
             this.body = body;
@@ -600,7 +605,9 @@ namespace Unity.UIWidgets.material {
             this.bottomSheet = bottomSheet;
             this.backgroundColor = backgroundColor;
             this.resizeToAvoidBottomPadding = resizeToAvoidBottomPadding;
+            this.resizeToAvoidBottomInset = resizeToAvoidBottomInset;
             this.primary = primary;
+            this.drawerDragStartBehavior = drawerDragStartBehavior;
         }
 
         public readonly PreferredSizeWidget appBar;
@@ -625,9 +632,13 @@ namespace Unity.UIWidgets.material {
 
         public readonly Widget bottomSheet;
 
-        public readonly bool resizeToAvoidBottomPadding;
+        public readonly bool? resizeToAvoidBottomPadding;
+
+        public readonly bool? resizeToAvoidBottomInset;
 
         public readonly bool primary;
+
+        public readonly DragStartBehavior drawerDragStartBehavior;
 
         public static ScaffoldState of(BuildContext context, bool nullOk = false) {
             D.assert(context != null);
@@ -969,6 +980,9 @@ namespace Unity.UIWidgets.material {
         // INTERNALS
         _ScaffoldGeometryNotifier _geometryNotifier;
 
+        bool _resizeToAvoidBottomInset {
+            get { return this.widget.resizeToAvoidBottomInset ?? this.widget.resizeToAvoidBottomPadding ?? true; }
+        }
 
         public override void initState() {
             base.initState();
@@ -1057,20 +1071,24 @@ namespace Unity.UIWidgets.material {
             bool removeLeftPadding,
             bool removeTopPadding,
             bool removeRightPadding,
-            bool removeBottomPadding
+            bool removeBottomPadding,
+            bool removeBottomInset = false
         ) {
+            MediaQueryData data = MediaQuery.of(this.context).removePadding(
+                removeLeft: removeLeftPadding,
+                removeTop: removeTopPadding,
+                removeRight: removeRightPadding,
+                removeBottom: removeBottomPadding
+            );
+            if (removeBottomInset) {
+                data = data.removeViewInsets(removeBottom: true);
+            }
+
             if (child != null) {
                 children.Add(
                     new LayoutId(
                         id: childId,
-                        child: MediaQuery.removePadding(
-                            context: this.context,
-                            removeLeft: removeLeftPadding,
-                            removeTop: removeTopPadding,
-                            removeRight: removeRightPadding,
-                            removeBottom: removeBottomPadding,
-                            child: child
-                        )
+                        child: new MediaQuery(data: data, child: child)
                     )
                 );
             }
@@ -1085,7 +1103,8 @@ namespace Unity.UIWidgets.material {
                         key: this._endDrawerKey,
                         alignment: DrawerAlignment.end,
                         child: this.widget.endDrawer,
-                        drawerCallback: this._endDrawerOpenedCallback
+                        drawerCallback: this._endDrawerOpenedCallback,
+                        dragStartBehavior: this.widget.drawerDragStartBehavior
                     ),
                     childId: _ScaffoldSlot.endDrawer,
                     removeLeftPadding: true,
@@ -1105,7 +1124,8 @@ namespace Unity.UIWidgets.material {
                         key: this._drawerKey,
                         alignment: DrawerAlignment.start,
                         child: this.widget.drawer,
-                        drawerCallback: this._drawerOpenedCallback
+                        drawerCallback: this._drawerOpenedCallback,
+                        dragStartBehavior: this.widget.drawerDragStartBehavior
                     ),
                     childId: _ScaffoldSlot.drawer,
                     removeLeftPadding: false,
@@ -1155,7 +1175,8 @@ namespace Unity.UIWidgets.material {
                 removeTopPadding: this.widget.appBar != null,
                 removeRightPadding: false,
                 removeBottomPadding: this.widget.bottomNavigationBar != null ||
-                                     this.widget.persistentFooterButtons != null
+                                     this.widget.persistentFooterButtons != null,
+                removeBottomInset: this._resizeToAvoidBottomInset
             );
 
             if (this.widget.appBar != null) {
@@ -1180,8 +1201,6 @@ namespace Unity.UIWidgets.material {
             }
 
             if (this._snackBars.isNotEmpty()) {
-                bool removeBottomPadding = this.widget.persistentFooterButtons != null ||
-                                           this.widget.bottomNavigationBar != null;
                 this._addIfNonNull(
                     children: children,
                     child: this._snackBars.First()._widget,
@@ -1189,7 +1208,8 @@ namespace Unity.UIWidgets.material {
                     removeLeftPadding: false,
                     removeTopPadding: true,
                     removeRightPadding: false,
-                    removeBottomPadding: removeBottomPadding
+                    removeBottomPadding: this.widget.bottomNavigationBar != null ||
+                                         this.widget.persistentFooterButtons != null
                 );
             }
 
@@ -1254,7 +1274,7 @@ namespace Unity.UIWidgets.material {
                     removeLeftPadding: false,
                     removeTopPadding: true,
                     removeRightPadding: false,
-                    removeBottomPadding: this.widget.resizeToAvoidBottomPadding
+                    removeBottomPadding: this._resizeToAvoidBottomInset
                 );
             }
 
@@ -1273,19 +1293,21 @@ namespace Unity.UIWidgets.material {
                 removeBottomPadding: true
             );
 
-            if (themeData.platform == RuntimePlatform.IPhonePlayer) {
-                this._addIfNonNull(
-                    children: children,
-                    new GestureDetector(
-                        behavior: HitTestBehavior.opaque,
-                        onTap: this._handleStatusBarTap
-                    ),
-                    childId: _ScaffoldSlot.statusBar,
-                    removeLeftPadding: false,
-                    removeTopPadding: true,
-                    removeRightPadding: false,
-                    removeBottomPadding: true
-                );
+            switch (themeData.platform) {
+                case RuntimePlatform.IPhonePlayer:
+                    this._addIfNonNull(
+                        children: children,
+                        new GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onTap: this._handleStatusBarTap
+                        ),
+                        childId: _ScaffoldSlot.statusBar,
+                        removeLeftPadding: false,
+                        removeTopPadding: true,
+                        removeRightPadding: false,
+                        removeBottomPadding: true
+                    );
+                    break;
             }
 
             if (this._endDrawerOpened) {
@@ -1298,7 +1320,7 @@ namespace Unity.UIWidgets.material {
             }
 
             EdgeInsets minInsets = mediaQuery.padding.copyWith(
-                bottom: this.widget.resizeToAvoidBottomPadding ? mediaQuery.viewInsets.bottom : 0.0f
+                bottom: this._resizeToAvoidBottomInset ? mediaQuery.viewInsets.bottom : 0.0f
             );
 
             return new _ScaffoldScope(

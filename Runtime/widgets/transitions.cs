@@ -202,6 +202,7 @@ namespace Unity.UIWidgets.widgets {
     public class FadeTransition : SingleChildRenderObjectWidget {
         public FadeTransition(Key key = null, Animation<float> opacity = null,
             Widget child = null) : base(key: key, child: child) {
+            D.assert(opacity != null);
             this.opacity = opacity;
         }
 
@@ -332,6 +333,8 @@ namespace Unity.UIWidgets.widgets {
             float? widthFactor = null,
             float? heightFactor = null
         ) : base(key: key, listenable: alignment) {
+            D.assert(alignment != null);
+            D.assert(child != null);
             this.child = child;
             this.widthFactor = widthFactor;
             this.heightFactor = heightFactor;
@@ -368,6 +371,7 @@ namespace Unity.UIWidgets.widgets {
             Widget child = null) :
             base(key, animation) {
             D.assert(builder != null);
+            D.assert(animation != null);
             this.builder = builder;
             this.child = child;
         }

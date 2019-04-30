@@ -250,22 +250,20 @@ namespace Unity.UIWidgets.material {
         }
 
         public static TextTheme lerp(TextTheme a, TextTheme b, float t) {
-            D.assert(a != null);
-            D.assert(b != null);
             return new TextTheme(
-                display4: TextStyle.lerp(a.display4, b.display4, t),
-                display3: TextStyle.lerp(a.display3, b.display3, t),
-                display2: TextStyle.lerp(a.display2, b.display2, t),
-                display1: TextStyle.lerp(a.display1, b.display1, t),
-                headline: TextStyle.lerp(a.headline, b.headline, t),
-                title: TextStyle.lerp(a.title, b.title, t),
-                subhead: TextStyle.lerp(a.subhead, b.subhead, t),
-                body2: TextStyle.lerp(a.body2, b.body2, t),
-                body1: TextStyle.lerp(a.body1, b.body1, t),
-                caption: TextStyle.lerp(a.caption, b.caption, t),
-                button: TextStyle.lerp(a.button, b.button, t),
-                subtitle: TextStyle.lerp(a.subtitle, b.subtitle, t),
-                overline: TextStyle.lerp(a.overline, b.overline, t)
+                display4: TextStyle.lerp(a?.display4, b?.display4, t),
+                display3: TextStyle.lerp(a?.display3, b?.display3, t),
+                display2: TextStyle.lerp(a?.display2, b?.display2, t),
+                display1: TextStyle.lerp(a?.display1, b?.display1, t),
+                headline: TextStyle.lerp(a?.headline, b?.headline, t),
+                title: TextStyle.lerp(a?.title, b?.title, t),
+                subhead: TextStyle.lerp(a?.subhead, b?.subhead, t),
+                body2: TextStyle.lerp(a?.body2, b?.body2, t),
+                body1: TextStyle.lerp(a?.body1, b?.body1, t),
+                caption: TextStyle.lerp(a?.caption, b?.caption, t),
+                button: TextStyle.lerp(a?.button, b?.button, t),
+                subtitle: TextStyle.lerp(a?.subtitle, b?.subtitle, t),
+                overline: TextStyle.lerp(a?.overline, b?.overline, t)
             );
         }
 
@@ -323,19 +321,19 @@ namespace Unity.UIWidgets.material {
                 return this._cachedHashCode.Value;
             }
             unchecked {
-                var hashCode = this.display4.GetHashCode();
-                hashCode = (hashCode * 397) ^ this.display3.GetHashCode();
-                hashCode = (hashCode * 397) ^ this.display2.GetHashCode();
-                hashCode = (hashCode * 397) ^ this.display1.GetHashCode();
-                hashCode = (hashCode * 397) ^ this.headline.GetHashCode();
-                hashCode = (hashCode * 397) ^ this.title.GetHashCode();
-                hashCode = (hashCode * 397) ^ this.subhead.GetHashCode();
-                hashCode = (hashCode * 397) ^ this.body2.GetHashCode();
-                hashCode = (hashCode * 397) ^ this.body1.GetHashCode();
-                hashCode = (hashCode * 397) ^ this.caption.GetHashCode();
-                hashCode = (hashCode * 397) ^ this.button.GetHashCode();
-                hashCode = (hashCode * 397) ^ this.subtitle.GetHashCode();
-                hashCode = (hashCode * 397) ^ this.overline.GetHashCode();
+                var hashCode = this.display4?.GetHashCode() ?? 0;
+                hashCode = (hashCode * 397) ^ this.display3?.GetHashCode() ?? 0;
+                hashCode = (hashCode * 397) ^ this.display2?.GetHashCode() ?? 0;
+                hashCode = (hashCode * 397) ^ this.display1?.GetHashCode() ?? 0;
+                hashCode = (hashCode * 397) ^ this.headline?.GetHashCode() ?? 0;
+                hashCode = (hashCode * 397) ^ this.title?.GetHashCode() ?? 0;
+                hashCode = (hashCode * 397) ^ this.subhead?.GetHashCode() ?? 0;
+                hashCode = (hashCode * 397) ^ this.body2?.GetHashCode() ?? 0;
+                hashCode = (hashCode * 397) ^ this.body1?.GetHashCode() ?? 0;
+                hashCode = (hashCode * 397) ^ this.caption?.GetHashCode() ?? 0;
+                hashCode = (hashCode * 397) ^ this.button?.GetHashCode() ?? 0;
+                hashCode = (hashCode * 397) ^ this.subtitle?.GetHashCode() ?? 0;
+                hashCode = (hashCode * 397) ^ this.overline?.GetHashCode() ?? 0;
 
                 this._cachedHashCode = hashCode;
                 return hashCode;

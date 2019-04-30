@@ -27,6 +27,10 @@ namespace Unity.UIWidgets.material {
             Clip clipBehavior = Clip.none,
             MaterialTapTargetSize? materialTapTargetSize = null,
             Widget child = null) : base(key: key) {
+            D.assert(elevation >= 0.0);
+            D.assert(highlightElevation >= 0.0);
+            D.assert(disabledElevation >= 0.0);
+
             MaterialTapTargetSize _materialTapTargetSize = materialTapTargetSize ?? MaterialTapTargetSize.padded;
             shape = shape ?? new RoundedRectangleBorder();
             padding = padding ?? EdgeInsets.zero;
@@ -97,12 +101,25 @@ namespace Unity.UIWidgets.material {
         bool _highlight = false;
 
         void _handleHighlightChanged(bool value) {
-            this.setState(() => {
-                this._highlight = value;
+            if (this._highlight != value) {
+                this.setState(() => {
+                    this._highlight = value;
+                    if (this.widget.onHighlightChanged != null) {
+                        this.widget.onHighlightChanged(value);
+                    }
+                });
+            }
+        }
+
+        public override void didUpdateWidget(StatefulWidget _oldWidget) {
+            RawMaterialButton oldWidget = _oldWidget as RawMaterialButton;
+            base.didUpdateWidget(oldWidget);
+            if (this._highlight && !this.widget.enabled) {
+                this._highlight = false;
                 if (this.widget.onHighlightChanged != null) {
-                    this.widget.onHighlightChanged(value);
+                    this.widget.onHighlightChanged(false);
                 }
-            });
+            }
         }
 
         public override Widget build(BuildContext context) {
@@ -124,11 +141,13 @@ namespace Unity.UIWidgets.material {
                         onHighlightChanged: this._handleHighlightChanged,
                         splashColor: this.widget.splashColor,
                         highlightColor: this.widget.highlightColor,
-                        onTap: this.widget.onPressed == null ? (GestureTapCallback) null : () => {
-                            if (this.widget.onPressed != null) {
-                                this.widget.onPressed();
-                            }
-                        },
+                        onTap: this.widget.onPressed == null
+                            ? (GestureTapCallback) null
+                            : () => {
+                                if (this.widget.onPressed != null) {
+                                    this.widget.onPressed();
+                                }
+                            },
                         customBorder: this.widget.shape,
                         child: IconTheme.merge(
                             data: new IconThemeData(color: this.widget.textStyle?.color),

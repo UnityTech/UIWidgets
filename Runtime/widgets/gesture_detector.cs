@@ -71,6 +71,10 @@ namespace Unity.UIWidgets.widgets {
             GestureTapCancelCallback onTapCancel = null,
             GestureDoubleTapCallback onDoubleTap = null,
             GestureLongPressCallback onLongPress = null,
+            GestureLongPressUpCallback onLongPressUp = null,
+            GestureLongPressDragStartCallback onLongPressDragStart = null,
+            GestureLongPressDragUpdateCallback onLongPressDragUpdate = null,
+            GestureLongPressDragUpCallback onLongPressDragUp = null,
             GestureDragDownCallback onVerticalDragDown = null,
             GestureDragStartCallback onVerticalDragStart = null,
             GestureDragUpdateCallback onVerticalDragUpdate = null,
@@ -86,7 +90,9 @@ namespace Unity.UIWidgets.widgets {
             GestureDragUpdateCallback onPanUpdate = null,
             GestureDragEndCallback onPanEnd = null,
             GestureDragCancelCallback onPanCancel = null,
-            HitTestBehavior behavior = HitTestBehavior.deferToChild) : base(key) {
+            HitTestBehavior behavior = HitTestBehavior.deferToChild,
+            DragStartBehavior dragStartBehavior = DragStartBehavior.down
+        ) : base(key) {
             D.assert(() => {
                 bool haveVerticalDrag =
                     onVerticalDragStart != null || onVerticalDragUpdate != null ||
@@ -94,6 +100,8 @@ namespace Unity.UIWidgets.widgets {
                 bool haveHorizontalDrag =
                     onHorizontalDragStart != null || onHorizontalDragUpdate != null ||
                     onHorizontalDragEnd != null;
+                bool haveLongPress = onLongPress != null || onLongPressUp != null;
+                bool haveLongPressDrag = onLongPressDragStart != null || onLongPressDragUpdate != null || onLongPressDragUp != null;
                 bool havePan = onPanStart != null || onPanUpdate != null || onPanEnd != null;
                 if (havePan) {
                     if (haveVerticalDrag && haveHorizontalDrag) {
@@ -103,6 +111,15 @@ namespace Unity.UIWidgets.widgets {
                             "will result in the pan gesture recognizer being ignored, since the other two will catch all drags."
                         );
                     }
+                }
+                if (haveLongPress && haveLongPressDrag) {
+                    throw new UIWidgetsError(
+                            "Incorrect GestureDetector arguments.\n" +
+                            "Having both a long press and a long press drag recognizer is " +
+                            "redundant as the long press drag is a superset of long press. " +
+                            "Except long press drag allows for drags after the long press is " +
+                            "triggered."
+                        );
                 }
 
                 return true;
@@ -115,6 +132,10 @@ namespace Unity.UIWidgets.widgets {
             this.onTapCancel = onTapCancel;
             this.onDoubleTap = onDoubleTap;
             this.onLongPress = onLongPress;
+            this.onLongPressUp = onLongPressUp;
+            this.onLongPressDragStart = onLongPressDragStart;
+            this.onLongPressDragUpdate = onLongPressDragUpdate;
+            this.onLongPressDragUp = onLongPressDragUp;
             this.onVerticalDragDown = onVerticalDragDown;
             this.onVerticalDragStart = onVerticalDragStart;
             this.onVerticalDragUpdate = onVerticalDragUpdate;
@@ -131,6 +152,7 @@ namespace Unity.UIWidgets.widgets {
             this.onPanEnd = onPanEnd;
             this.onPanCancel = onPanCancel;
             this.behavior = behavior;
+            this.dragStartBehavior = dragStartBehavior;
         }
 
         public readonly Widget child;
@@ -140,6 +162,10 @@ namespace Unity.UIWidgets.widgets {
         public readonly GestureTapCancelCallback onTapCancel;
         public readonly GestureDoubleTapCallback onDoubleTap;
         public readonly GestureLongPressCallback onLongPress;
+        public readonly GestureLongPressUpCallback onLongPressUp;
+        public readonly GestureLongPressDragStartCallback onLongPressDragStart;
+        public readonly GestureLongPressDragUpdateCallback onLongPressDragUpdate;
+        public readonly GestureLongPressDragUpCallback onLongPressDragUp;
         public readonly GestureDragDownCallback onVerticalDragDown;
         public readonly GestureDragStartCallback onVerticalDragStart;
         public readonly GestureDragUpdateCallback onVerticalDragUpdate;
@@ -156,6 +182,7 @@ namespace Unity.UIWidgets.widgets {
         public readonly GestureDragEndCallback onPanEnd;
         public readonly GestureDragCancelCallback onPanCancel;
         public readonly HitTestBehavior behavior;
+        public readonly DragStartBehavior dragStartBehavior;
 
         public override Widget build(BuildContext context) {
             var gestures = new Dictionary<Type, GestureRecognizerFactory>();
@@ -184,12 +211,23 @@ namespace Unity.UIWidgets.widgets {
                     );
             }
 
-            if (this.onLongPress != null) {
+            if (this.onLongPress != null || this.onLongPressUp != null) {
                 gestures[typeof(LongPressGestureRecognizer)] =
                     new GestureRecognizerFactoryWithHandlers<LongPressGestureRecognizer>(
                         () => new LongPressGestureRecognizer(debugOwner: this),
                         instance => { instance.onLongPress = this.onLongPress; }
                     );
+            }
+            
+            if (this.onLongPressDragStart != null || this.onLongPressDragUpdate != null || this.onLongPressDragUp != null) {
+                gestures[typeof(LongPressDragGestureRecognizer)] = new GestureRecognizerFactoryWithHandlers<LongPressDragGestureRecognizer>(
+                    () => new LongPressDragGestureRecognizer(debugOwner: this),
+                    (LongPressDragGestureRecognizer instance) => {
+                        instance.onLongPressStart = this.onLongPressDragStart;
+                        instance.onLongPressDragUpdate = this.onLongPressDragUpdate;
+                        instance.onLongPressUp = this.onLongPressDragUp;
+                    }
+                );
             }
 
             if (this.onVerticalDragDown != null ||
@@ -206,6 +244,7 @@ namespace Unity.UIWidgets.widgets {
                             instance.onUpdate = this.onVerticalDragUpdate;
                             instance.onEnd = this.onVerticalDragEnd;
                             instance.onCancel = this.onVerticalDragCancel;
+                            instance.dragStartBehavior = this.dragStartBehavior;
                         }
                     );
             }
@@ -224,6 +263,7 @@ namespace Unity.UIWidgets.widgets {
                             instance.onUpdate = this.onHorizontalDragUpdate;
                             instance.onEnd = this.onHorizontalDragEnd;
                             instance.onCancel = this.onHorizontalDragCancel;
+                            instance.dragStartBehavior = this.dragStartBehavior;
                         }
                     );
             }
@@ -242,6 +282,7 @@ namespace Unity.UIWidgets.widgets {
                             instance.onUpdate = this.onPanUpdate;
                             instance.onEnd = this.onPanEnd;
                             instance.onCancel = this.onPanCancel;
+                            instance.dragStartBehavior = this.dragStartBehavior;
                         }
                     );
             }
@@ -251,6 +292,11 @@ namespace Unity.UIWidgets.widgets {
                 behavior: this.behavior,
                 child: this.child
             );
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new EnumProperty<DragStartBehavior>("startBehavior", this.dragStartBehavior));
         }
     }
 

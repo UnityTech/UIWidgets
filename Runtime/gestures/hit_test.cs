@@ -9,7 +9,7 @@ namespace Unity.UIWidgets.gestures {
     }
 
     public interface HitTestDispatcher {
-        void dispatchEvent(PointerEvent evt, HitTestResult result);
+        void dispatchEvent(PointerEvent evt, HitTestResult hitTestResult);
     }
 
     public interface HitTestTarget {

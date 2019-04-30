@@ -1,6 +1,8 @@
 using System;
 using Unity.UIWidgets.animation;
 using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.painting;
+using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
 
@@ -41,6 +43,103 @@ namespace Unity.UIWidgets.material {
         }
     }
 
+    class _OpenUpwardsPageTransition : StatelessWidget {
+        public _OpenUpwardsPageTransition(
+            Key key = null,
+            Animation<float> animation = null,
+            Animation<float> secondaryAnimation = null,
+            Widget child = null
+        ) : base(key: key) {
+            this.animation = animation;
+            this.secondaryAnimation = secondaryAnimation;
+            this.child = child;
+        }
+
+        static readonly OffsetTween _primaryTranslationTween = new OffsetTween(
+            begin: new Offset(0.0f, 0.05f),
+            end: Offset.zero
+        );
+
+        static readonly OffsetTween _secondaryTranslationTween = new OffsetTween(
+            begin: Offset.zero,
+            end: new Offset(0.0f, -0.025f)
+        );
+
+        static readonly FloatTween _scrimOpacityTween = new FloatTween(
+            begin: 0.0f,
+            end: 0.25f
+        );
+
+        static readonly Curve _transitionCurve = new Cubic(0.20f, 0.00f, 0.00f, 1.00f);
+
+        public readonly Animation<float> animation;
+        public readonly Animation<float> secondaryAnimation;
+        public readonly Widget child;
+
+        public override Widget build(BuildContext context) {
+            return new LayoutBuilder(
+                builder: (BuildContext _context, BoxConstraints constraints) => {
+                    Size size = constraints.biggest;
+
+                    CurvedAnimation primaryAnimation = new CurvedAnimation(
+                        parent: this.animation,
+                        curve: _transitionCurve,
+                        reverseCurve: _transitionCurve.flipped
+                    );
+
+                    Animation<float> clipAnimation = new FloatTween(
+                        begin: 0.0f,
+                        end: size.height
+                    ).animate(primaryAnimation);
+
+                    Animation<float> opacityAnimation = _scrimOpacityTween.animate(primaryAnimation);
+                    Animation<Offset> primaryTranslationAnimation = _primaryTranslationTween.animate(primaryAnimation);
+
+                    Animation<Offset> secondaryTranslationAnimation = _secondaryTranslationTween.animate(
+                        new CurvedAnimation(
+                            parent: this.secondaryAnimation,
+                            curve: _transitionCurve,
+                            reverseCurve: _transitionCurve.flipped
+                        )
+                    );
+
+                    return new AnimatedBuilder(
+                        animation: this.animation,
+                        builder: (BuildContext _, Widget child) => {
+                            return new Container(
+                                color: Colors.black.withOpacity(opacityAnimation.value),
+                                alignment: Alignment.bottomLeft,
+                                child: new ClipRect(
+                                    child: new SizedBox(
+                                        height: clipAnimation.value,
+                                        child: new OverflowBox(
+                                            alignment: Alignment.bottomLeft,
+                                            maxHeight: size.height,
+                                            child: child
+                                        )
+                                    )
+                                )
+                            );
+                        },
+                        child: new AnimatedBuilder(
+                            animation: this.secondaryAnimation,
+                            child: new FractionalTranslation(
+                                translation: primaryTranslationAnimation.value,
+                                child: this.child
+                            ),
+                            builder: (BuildContext _, Widget child) => {
+                                return new FractionalTranslation(
+                                    translation: secondaryTranslationAnimation.value,
+                                    child: child
+                                );
+                            }
+                        )
+                    );
+                }
+            );
+        }
+    }
+
     public abstract class PageTransitionsBuilder {
         public PageTransitionsBuilder() {
         }
@@ -67,6 +166,25 @@ namespace Unity.UIWidgets.material {
             return new _FadeUpwardsPageTransition(
                 routeAnimation: animation,
                 child: child);
+        }
+    }
+
+    public class OpenUpwardsPageTransitionsBuilder : PageTransitionsBuilder {
+        public OpenUpwardsPageTransitionsBuilder() {
+        }
+
+        public override Widget buildTransitions(
+            PageRoute route,
+            BuildContext context,
+            Animation<float> animation,
+            Animation<float> secondaryAnimation,
+            Widget child
+        ) {
+            return new _OpenUpwardsPageTransition(
+                animation: animation,
+                secondaryAnimation: secondaryAnimation,
+                child: child
+            );
         }
     }
 

@@ -7,23 +7,30 @@ using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
+using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace Unity.UIWidgets.material {
     public class Dialog : StatelessWidget {
         public Dialog(
             Key key = null,
-            Widget child = null,
+            Color backgroundColor = null,
+            float? elevation = null,
             TimeSpan? insetAnimationDuration = null,
             Curve insetAnimationCurve = null,
-            ShapeBorder shape = null
+            ShapeBorder shape = null,
+            Widget child = null
         ) : base(key: key) {
             this.child = child;
+            this.backgroundColor = backgroundColor;
+            this.elevation = elevation;
             this.insetAnimationDuration = insetAnimationDuration ?? new TimeSpan(0, 0, 0, 0, 100);
-            this.insetAnimationCurve = Curves.decelerate;
+            this.insetAnimationCurve = insetAnimationCurve ?? Curves.decelerate;
             this.shape = shape;
         }
 
-        public readonly Widget child;
+        public readonly Color backgroundColor;
+
+        public readonly float? elevation;
 
         public readonly TimeSpan insetAnimationDuration;
 
@@ -31,12 +38,12 @@ namespace Unity.UIWidgets.material {
 
         public readonly ShapeBorder shape;
 
-        Color _getColor(BuildContext context) {
-            return Theme.of(context).dialogBackgroundColor;
-        }
+        public readonly Widget child;
 
         public static readonly RoundedRectangleBorder _defaultDialogShape =
             new RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(2.0f)));
+
+        const float _defaultElevation = 24.0f;
 
         public override Widget build(BuildContext context) {
             DialogTheme dialogTheme = DialogTheme.of(context);
@@ -55,11 +62,12 @@ namespace Unity.UIWidgets.material {
                         child: new ConstrainedBox(
                             constraints: new BoxConstraints(minWidth: 280.0f),
                             child: new Material(
-                                elevation: 24.0f,
-                                color: this._getColor(context),
+                                color: this.backgroundColor ?? dialogTheme.backgroundColor ??
+                                       Theme.of(context).dialogBackgroundColor,
+                                elevation: this.elevation ?? dialogTheme.elevation ?? _defaultElevation,
+                                shape: this.shape ?? dialogTheme.shape ?? _defaultDialogShape,
                                 type: MaterialType.card,
-                                child: this.child,
-                                shape: this.shape ?? dialogTheme.shape ?? _defaultDialogShape
+                                child: this.child
                             )
                         )
                     )
@@ -73,28 +81,43 @@ namespace Unity.UIWidgets.material {
             Key key = null,
             Widget title = null,
             EdgeInsets titlePadding = null,
+            TextStyle titleTextStyle = null,
             Widget content = null,
             EdgeInsets contentPadding = null,
+            TextStyle contentTextStyle = null,
             List<Widget> actions = null,
+            Color backgroundColor = null,
+            float? elevation = null,
             ShapeBorder shape = null
         ) : base(key: key) {
             this.title = title;
             this.titlePadding = titlePadding;
+            this.titleTextStyle = titleTextStyle;
             this.content = content;
             this.contentPadding = contentPadding ?? EdgeInsets.fromLTRB(24.0f, 20.0f, 24.0f, 24.0f);
+            this.contentTextStyle = contentTextStyle;
             this.actions = actions;
+            this.backgroundColor = backgroundColor;
+            this.elevation = elevation;
             this.shape = shape;
         }
 
         public readonly Widget title;
         public readonly EdgeInsets titlePadding;
+        public readonly TextStyle titleTextStyle;
         public readonly Widget content;
         public readonly EdgeInsets contentPadding;
+        public readonly TextStyle contentTextStyle;
         public readonly List<Widget> actions;
+        public readonly Color backgroundColor;
+        public readonly float? elevation;
         public readonly ShapeBorder shape;
 
         public override Widget build(BuildContext context) {
             // D.assert(debugCheckHasMaterialLocalizations(context));
+
+            ThemeData theme = Theme.of(context);
+            DialogTheme dialogTheme = DialogTheme.of(context);
 
             List<Widget> children = new List<Widget>();
 
@@ -103,7 +126,7 @@ namespace Unity.UIWidgets.material {
                     padding: this.titlePadding ??
                              EdgeInsets.fromLTRB(24.0f, 24.0f, 24.0f, this.content == null ? 20.0f : 0.0f),
                     child: new DefaultTextStyle(
-                        style: Theme.of(context).textTheme.title,
+                        style: this.titleTextStyle ?? dialogTheme.titleTextStyle ?? theme.textTheme.title,
                         child: this.title
                     )
                 ));
@@ -114,7 +137,7 @@ namespace Unity.UIWidgets.material {
                     child: new Padding(
                         padding: this.contentPadding,
                         child: new DefaultTextStyle(
-                            style: Theme.of(context).textTheme.subhead,
+                            style: this.contentTextStyle ?? dialogTheme.contentTextStyle ?? theme.textTheme.subhead,
                             child: this.content
                         )
                     )
@@ -137,7 +160,12 @@ namespace Unity.UIWidgets.material {
                 )
             );
 
-            return new Dialog(child: dialogChild, shape: this.shape);
+            return new Dialog(
+                backgroundColor: this.backgroundColor,
+                elevation: this.elevation,
+                shape: this.shape,
+                child: dialogChild
+            );
         }
     }
 
@@ -173,12 +201,16 @@ namespace Unity.UIWidgets.material {
             EdgeInsets titlePadding = null,
             List<Widget> children = null,
             EdgeInsets contentPadding = null,
+            Color backgroundColor = null,
+            float? elevation = null,
             ShapeBorder shape = null
         ) : base(key: key) {
             this.title = title;
             this.titlePadding = titlePadding ?? EdgeInsets.fromLTRB(24.0f, 24.0f, 24.0f, 0.0f);
             this.children = children;
             this.contentPadding = contentPadding ?? EdgeInsets.fromLTRB(0.0f, 12.0f, 0.0f, 16.0f);
+            this.backgroundColor = backgroundColor;
+            this.elevation = elevation;
             this.shape = shape;
         }
 
@@ -189,6 +221,10 @@ namespace Unity.UIWidgets.material {
         public readonly List<Widget> children;
 
         public readonly EdgeInsets contentPadding;
+
+        public readonly Color backgroundColor;
+
+        public readonly float? elevation;
 
         public readonly ShapeBorder shape;
 
@@ -228,12 +264,16 @@ namespace Unity.UIWidgets.material {
                 )
             );
 
-            return new Dialog(child: dialogChild, shape: this.shape);
+            return new Dialog(
+                backgroundColor: this.backgroundColor,
+                elevation: this.elevation,
+                shape: this.shape,
+                child: dialogChild
+            );
         }
     }
 
     public static class DialogUtils {
-
         static Widget _buildMaterialDialogTransitions(BuildContext context, Animation<float> animation,
             Animation<float> secondaryAnimation, Widget child) {
             return new FadeTransition(

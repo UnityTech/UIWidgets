@@ -64,27 +64,27 @@ namespace Unity.UIWidgets.gestures {
                 this._handlePointerHoverEvent(evt);
             }
 
-            HitTestResult result = null;
+            HitTestResult hitTestResult = null;
             if (evt is PointerDownEvent) {
                 D.assert(!this._hitTests.ContainsKey(evt.pointer));
-                result = new HitTestResult();
-                this.hitTest(result, evt.position);
+                hitTestResult = new HitTestResult();
+                this.hitTest(hitTestResult, evt.position);
 
-                this._hitTests[evt.pointer] = result;
+                this._hitTests[evt.pointer] = hitTestResult;
                 D.assert(() => {
                     if (D.debugPrintHitTestResults) {
-                        Debug.LogFormat("{0}: {1}", evt, result);
+                        Debug.LogFormat("{0}: {1}", evt, hitTestResult);
                     }
 
                     return true;
                 });
             }
             else if (evt is PointerUpEvent || evt is PointerCancelEvent) {
-                result = this._hitTests.getOrDefault(evt.pointer);
+                hitTestResult = this._hitTests.getOrDefault(evt.pointer);
                 this._hitTests.Remove(evt.pointer);
             }
             else if (evt.down) {
-                result = this._hitTests.getOrDefault(evt.pointer);
+                hitTestResult = this._hitTests.getOrDefault(evt.pointer);
             }
 
             D.assert(() => {
@@ -95,12 +95,12 @@ namespace Unity.UIWidgets.gestures {
                 return true;
             });
 
-            if (result != null ||
+            if (hitTestResult != null ||
                 evt is PointerHoverEvent ||
                 evt is PointerAddedEvent ||
                 evt is PointerRemovedEvent
             ) {
-                this.dispatchEvent(evt, result);
+                this.dispatchEvent(evt, hitTestResult);
             }
         }
 
@@ -162,8 +162,8 @@ namespace Unity.UIWidgets.gestures {
             result.add(new HitTestEntry(this));
         }
 
-        public void dispatchEvent(PointerEvent evt, HitTestResult result) {
-            if (result == null) {
+        public void dispatchEvent(PointerEvent evt, HitTestResult hitTestResult) {
+            if (hitTestResult == null) {
                 D.assert(evt is PointerHoverEvent || evt is PointerAddedEvent || evt is PointerRemovedEvent);
                 try {
                     this.pointerRouter.route(evt);
@@ -184,7 +184,7 @@ namespace Unity.UIWidgets.gestures {
                 return;
             }
 
-            foreach (HitTestEntry entry in result.path) {
+            foreach (HitTestEntry entry in hitTestResult.path) {
                 try {
                     entry.target.handleEvent(evt, entry);
                 }
