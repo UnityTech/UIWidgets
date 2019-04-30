@@ -15,7 +15,7 @@ using Color = Unity.UIWidgets.ui.Color;
 using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace UIWidgets.Tests {
-    public class RenderEditable : EditorWindow {
+    public class RenderEditable : EditorWindow, TextSelectionDelegate {
         readonly Func<RenderBox>[] _options;
 
         readonly string[] _optionStrings;
@@ -150,7 +150,8 @@ namespace UIWidgets.Tests {
                     new _FixedViewportOffset(0.0f), new ValueNotifier<bool>(true),
                     onSelectionChanged: this.selectionChanged, cursorColor: Color.fromARGB(255, 0, 0, 0),
                     maxLines: 100,
-                    selectionColor: Color.fromARGB(255, 255, 0, 0))
+                    selectionColor: Color.fromARGB(255, 255, 0, 0),
+                    textSelectionDelegate: this)
             ));
 
             span = new TextSpan("", children:
@@ -164,7 +165,8 @@ namespace UIWidgets.Tests {
                     new _FixedViewportOffset(0.0f), new ValueNotifier<bool>(true),
                     onSelectionChanged: this.selectionChanged, cursorColor: Color.fromARGB(255, 0, 0, 0),
                     maxLines: 100,
-                    selectionColor: Color.fromARGB(255, 255, 0, 0))
+                    selectionColor: Color.fromARGB(255, 255, 0, 0),
+                    textSelectionDelegate: this)
             ));
 
             span = new TextSpan("", children:
@@ -175,7 +177,8 @@ namespace UIWidgets.Tests {
                 new Unity.UIWidgets.rendering.RenderEditable(span, TextDirection.ltr,
                     new _FixedViewportOffset(0.0f), new ValueNotifier<bool>(true),
                     onSelectionChanged: this.selectionChanged, cursorColor: Color.fromARGB(255, 0, 0, 0),
-                    selectionColor: Color.fromARGB(255, 255, 0, 0))
+                    selectionColor: Color.fromARGB(255, 255, 0, 0),
+                    textSelectionDelegate: this)
                 , width: 300));
             return flexbox;
         }
@@ -185,6 +188,14 @@ namespace UIWidgets.Tests {
             SelectionChangedCause cause) {
             Debug.Log($"selection {selection}");
             renderObject.selection = selection;
+        }
+
+        public TextEditingValue textEditingValue { get; set; }
+        
+        public void hideToolbar() {
+        }
+
+        public void bringIntoView(TextPosition textPosition) {
         }
     }
 }
