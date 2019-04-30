@@ -8,11 +8,9 @@ using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
 using UnityEngine;
 using Color = Unity.UIWidgets.ui.Color;
-using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace UIWidgetsSample {
     public class TextInputSample : UIWidgetsSamplePanel {
-        
         class _TextInputSample : StatefulWidget {
             public readonly string title;
 
@@ -25,12 +23,12 @@ namespace UIWidgetsSample {
             }
         }
 
-        protected override Widget createWidget()  {
+        protected override Widget createWidget() {
             return new WidgetsApp(
                 home: new EditableInputTypeWidget(),
                 pageRouteBuilder: this.pageRouteBuilder);
         }
-        
+
 
         class _TextInputSampleState : State<_TextInputSample> {
             TextEditingController titleController = new TextEditingController("");
@@ -138,7 +136,7 @@ namespace UIWidgetsSample {
             return new _EditableInputTypeWidgetState();
         }
     }
-    
+
     class _EditableInputTypeWidgetState : State<EditableInputTypeWidget> {
         Widget rowWidgets(string title, Widget widget) {
             return new Container(
@@ -151,72 +149,83 @@ namespace UIWidgetsSample {
                     }
                 ));
         }
-        
+
         void textSubmitted(string text) {
             Debug.Log($"text submitted {text}");
         }
 
         List<Widget> buildInputs(bool unityKeyboard) {
-             List<Widget> widgets = new List<Widget>();
+            List<Widget> widgets = new List<Widget>();
             var style = new TextStyle();
             var cursorColor = new Color(0xFF000000);
             var selectionColor = new Color(0xFF6F6F6F);
-            
+
             widgets.Add(this.rowWidgets("Default", new EditStateProvider(builder: ((buildContext, controller, node) =>
-                new EditableText(controller, node, style, cursorColor, Colors.transparent, selectionColor: selectionColor,  onSubmitted: this.textSubmitted
-                , unityTouchKeyboard: unityKeyboard, selectionControls: MaterialUtils.materialTextSelectionControls)))));
+                new EditableText(controller, node, style, cursorColor, Colors.blue,
+                    selectionColor: selectionColor, onSubmitted: this.textSubmitted
+                    , unityTouchKeyboard: unityKeyboard,
+                    selectionControls: MaterialUtils.materialTextSelectionControls,
+                    cursorWidth: 5.0f, cursorRadius: Radius.circular(2.5f), cursorOpacityAnimates: true, paintCursorAboveText: true)))));
 
             widgets.Add(this.rowWidgets("Multiple Line", new EditStateProvider(
                 builder: ((buildContext, controller, node) =>
-                    new EditableText(controller, node, style, cursorColor, Colors.transparent, selectionColor: selectionColor,  maxLines: 4,
+                    new EditableText(controller, node, style, cursorColor, Colors.transparent,
+                        selectionColor: selectionColor, maxLines: 4,
                         onSubmitted: this.textSubmitted, unityTouchKeyboard: unityKeyboard,
                         selectionControls: MaterialUtils.materialTextSelectionControls)))));
 
             widgets.Add(this.rowWidgets("ObscureText", new EditStateProvider(
                 builder: ((buildContext, controller, node) =>
-                    new EditableText(controller, node, style, cursorColor, Colors.transparent, selectionColor: selectionColor, obscureText: true,
-                        onSubmitted: this.textSubmitted, unityTouchKeyboard: unityKeyboard, 
+                    new EditableText(controller, node, style, cursorColor, Colors.transparent,
+                        selectionColor: selectionColor, obscureText: true,
+                        onSubmitted: this.textSubmitted, unityTouchKeyboard: unityKeyboard,
                         selectionControls: MaterialUtils.materialTextSelectionControls)))));
 
             widgets.Add(this.rowWidgets("Number", new EditStateProvider(builder: ((buildContext, controller, node) =>
-                new EditableText(controller, node, style, cursorColor, Colors.transparent, selectionColor: selectionColor, keyboardType: TextInputType.number,
+                new EditableText(controller, node, style, cursorColor, Colors.transparent,
+                    selectionColor: selectionColor, keyboardType: TextInputType.number,
                     onSubmitted: this.textSubmitted, unityTouchKeyboard: unityKeyboard,
                     selectionControls: MaterialUtils.materialTextSelectionControls)))));
 
             widgets.Add(this.rowWidgets("Phone", new EditStateProvider(builder: ((buildContext, controller, node) =>
-                new EditableText(controller, node, style, cursorColor, Colors.transparent, selectionColor: selectionColor, keyboardType: TextInputType.phone,
+                new EditableText(controller, node, style, cursorColor, Colors.transparent,
+                    selectionColor: selectionColor, keyboardType: TextInputType.phone,
                     onSubmitted: this.textSubmitted, unityTouchKeyboard: unityKeyboard,
                     selectionControls: MaterialUtils.materialTextSelectionControls)))));
 
             widgets.Add(this.rowWidgets("Email", new EditStateProvider(builder: ((buildContext, controller, node) =>
-                new EditableText(controller, node, style, cursorColor, Colors.transparent, selectionColor: selectionColor, keyboardType: TextInputType.emailAddress,
+                new EditableText(controller, node, style, cursorColor, Colors.transparent,
+                    selectionColor: selectionColor, keyboardType: TextInputType.emailAddress,
                     onSubmitted: this.textSubmitted, unityTouchKeyboard: unityKeyboard,
                     selectionControls: MaterialUtils.materialTextSelectionControls)))));
 
             widgets.Add(this.rowWidgets("Url", new EditStateProvider(builder: ((buildContext, controller, node) =>
-                new EditableText(controller, node, style, cursorColor, Colors.transparent, selectionColor: selectionColor, keyboardType: TextInputType.url,
+                new EditableText(controller, node, style, cursorColor, Colors.transparent,
+                    selectionColor: selectionColor, keyboardType: TextInputType.url,
                     onSubmitted: this.textSubmitted, unityTouchKeyboard: unityKeyboard,
                     selectionControls: MaterialUtils.materialTextSelectionControls)))));
             return widgets;
         }
-        
+
         public override Widget build(BuildContext context) {
             List<Widget> widgets = new List<Widget>();
-         
-            widgets.Add(new Text("UIWidgets Touch Keyboard", style: new TextStyle(fontSize:20, height:2.0f), textAlign: TextAlign.center));
+
+            widgets.Add(new Text("UIWidgets Touch Keyboard", style: new TextStyle(fontSize: 20, height: 2.0f),
+                textAlign: TextAlign.center));
             widgets.AddRange(this.buildInputs(false));
-            
-            widgets.Add(new Text("Unity Touch Keyboard", style: new TextStyle(fontSize:20, height:2.0f), textAlign: TextAlign.center));
+
+            widgets.Add(new Text("Unity Touch Keyboard", style: new TextStyle(fontSize: 20, height: 2.0f),
+                textAlign: TextAlign.center));
             widgets.AddRange(this.buildInputs(true));
-            
+
             return new Container(
                 padding: EdgeInsets.all(12),
                 child: new SingleChildScrollView(child: new Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: widgets)));
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: widgets)));
         }
-        
     }
+
     public class EditStateProvider : StatefulWidget {
         public delegate EditableText EditableBuilder(BuildContext context,
             TextEditingController controller, FocusNode focusNode);

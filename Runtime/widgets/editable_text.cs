@@ -146,7 +146,7 @@ namespace Unity.UIWidgets.widgets {
             this.textInputAction = textInputAction;
             this.textCapitalization = textCapitalization;
             this.cursorColor = cursorColor;
-            this.backgroundCursorColor = backgroundCursorColor ?? Colors.transparent; // TODO: remove ??
+            this.backgroundCursorColor = backgroundCursorColor ?? Colors.grey; // TODO: remove ??
             this.maxLines = maxLines;
             this.autofocus = autofocus;
             this.selectionColor = selectionColor;
@@ -243,9 +243,9 @@ namespace Unity.UIWidgets.widgets {
         LayerLink _layerLink = new LayerLink();
         bool _didAutoFocus = false;
 
-        static readonly TimeSpan _fadeDuration = TimeSpan.FromMilliseconds(500);
+        static readonly TimeSpan _fadeDuration = TimeSpan.FromMilliseconds(250);
 
-        static readonly TimeSpan _floatingCursorResetTime = TimeSpan.FromMilliseconds(150);
+        static readonly TimeSpan _floatingCursorResetTime = TimeSpan.FromMilliseconds(125);
 
         AnimationController _floatingCursorResetController;
 
