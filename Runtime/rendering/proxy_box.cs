@@ -1942,6 +1942,11 @@ namespace Unity.UIWidgets.rendering {
         MouseTrackerAnnotation _hoverAnnotation;
 
         void _updateAnnotations() {
+            D.assert(this._onPointerEnter != this._hoverAnnotation.onEnter || 
+                     this._onPointerHover != this._hoverAnnotation.onHover ||
+                     this._onPointerExit != this._hoverAnnotation.onExit,
+                "Shouldn't call _updateAnnotations if nothing has changed.");
+            
             if (this._hoverAnnotation != null && this.attached) {
                 RendererBinding.instance.mouseTracker.detachAnnotation(this._hoverAnnotation);
             }
@@ -1960,6 +1965,8 @@ namespace Unity.UIWidgets.rendering {
             else {
                 this._hoverAnnotation = null;
             }
+            
+            this.markNeedsPaint();
         }
 
         public override void attach(Object owner) {

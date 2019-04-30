@@ -75,7 +75,6 @@ namespace Unity.UIWidgets.gestures {
 
         public void detachAnnotation(MouseTrackerAnnotation annotation) {
             _TrackedAnnotation trackedAnnotation = this._findAnnotation(annotation);
-            D.assert(trackedAnnotation != null, $"Tried to detach an annotation that wasn't attached: {annotation}");
             foreach (int deviceId in trackedAnnotation.activeDevices) {
                 annotation.onExit(PointerExitEvent.fromHoverEvent((PointerHoverEvent) this._lastMouseEvent[deviceId]));
             }
@@ -124,6 +123,10 @@ namespace Unity.UIWidgets.gestures {
             }
             
             return trackedAnnotation;
+        }
+        
+        bool isAnnotationAttached(MouseTrackerAnnotation annotation) {
+            return this._trackedAnnotations.ContainsKey(annotation);
         }
 
         public void collectMousePositions() {
