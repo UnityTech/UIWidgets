@@ -7,16 +7,16 @@ using DialogUtils = Unity.UIWidgets.material.DialogUtils;
 
 namespace UIWidgetsSample {
     public class TextFieldSample : UIWidgetsSamplePanel {
-        protected override void Awake() {
-            base.Awake();
-            FontManager.instance.addFont(Resources.Load<Font>(path: "MaterialIcons-Regular"), "Material Icons");
-        }
-
         protected override Widget createWidget() {
             return new MaterialApp(
                 title: "Text Fields",
                 home: new MyCustomForm()
             );
+        }
+
+        protected override void OnEnable() {
+            base.OnEnable();
+            FontManager.instance.addFont(Resources.Load<Font>(path: "MaterialIcons-Regular"), "Material Icons");
         }
     }
 
