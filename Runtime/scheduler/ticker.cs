@@ -16,7 +16,7 @@ namespace Unity.UIWidgets.scheduler {
     public class Ticker {
         public Ticker(TickerCallback onTick, string debugLabel = null) {
             D.assert(() => {
-                this._debugCreationStack = new StackTrace();
+                this._debugCreationStack = new Exception().StackTrace;
                 return true;
             });
             this._onTick = onTick;
@@ -195,7 +195,7 @@ namespace Unity.UIWidgets.scheduler {
 
         public readonly string debugLabel;
 
-        StackTrace _debugCreationStack;
+        string _debugCreationStack;
 
         public override string ToString() {
             return this.toString(debugIncludeStack: false);
@@ -213,7 +213,7 @@ namespace Unity.UIWidgets.scheduler {
                 if (debugIncludeStack) {
                     buffer.AppendLine();
                     buffer.AppendLine("The stack trace when the " + this.GetType() + " was actually created was:");
-                    UIWidgetsError.defaultStackFilter(this._debugCreationStack.ToString().TrimEnd().Split('\n'))
+                    UIWidgetsError.defaultStackFilter(this._debugCreationStack.TrimEnd().Split('\n'))
                         .Each(line => buffer.AppendLine(line));
                 }
 
