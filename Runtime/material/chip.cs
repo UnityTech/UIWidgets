@@ -1249,12 +1249,12 @@ namespace Unity.UIWidgets.material {
                 vsync: this
             );
 
-            float checkmarkPercentage = ChipUtils._kCheckmarkDuration.Milliseconds /
-                                        ChipUtils._kSelectDuration.Milliseconds;
-            float checkmarkReversePercentage = ChipUtils._kCheckmarkReverseDuration.Milliseconds /
-                                               ChipUtils._kSelectDuration.Milliseconds;
-            float avatarDrawerReversePercentage = ChipUtils._kReverseDrawerDuration.Milliseconds /
-                                                  ChipUtils._kSelectDuration.Milliseconds;
+            float checkmarkPercentage = (float) (ChipUtils._kCheckmarkDuration.TotalMilliseconds /
+                                        ChipUtils._kSelectDuration.TotalMilliseconds);
+            float checkmarkReversePercentage = (float) (ChipUtils._kCheckmarkReverseDuration.TotalMilliseconds /
+                                               ChipUtils._kSelectDuration.TotalMilliseconds);
+            float avatarDrawerReversePercentage = (float) (ChipUtils._kReverseDrawerDuration.TotalMilliseconds /
+                                                  ChipUtils._kSelectDuration.TotalMilliseconds);
             this.checkmarkAnimation = new CurvedAnimation(
                 parent: this.selectController,
                 curve: new Interval(1.0f - checkmarkPercentage, 1.0f, curve: Curves.fastOutSlowIn),

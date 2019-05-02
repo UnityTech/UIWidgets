@@ -1364,6 +1364,10 @@ namespace Unity.UIWidgets.ui {
             D.assert(tolerance >= 0);
             return Mathf.Abs(x - y) <= tolerance;
         }
+        
+        public static bool ScalarIsInteger(float scalar) {
+            return scalar == Mathf.FloorToInt(scalar);
+        }
 
         public static float DegreesToRadians(float degrees) {
             return degrees * (Mathf.PI / 180);

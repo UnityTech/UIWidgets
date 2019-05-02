@@ -70,9 +70,9 @@ namespace Unity.UIWidgets.animation {
             this.end = end;
         }
 
-        public T begin;
+        public virtual T begin { get; set; }
 
-        public T end;
+        public virtual T end { get; set; }
 
         public abstract T lerp(float t);
 

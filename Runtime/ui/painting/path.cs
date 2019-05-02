@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using Unity.UIWidgets.foundation;
 using UnityEngine;
@@ -239,6 +238,181 @@ namespace Unity.UIWidgets.ui {
 
             this.quadraticBezierTo(x0 + cx, y0 + cy, x0 + x, y0 + y);
         }
+
+        public void conicTo(float x1, float y1, float x2, float y2, float w) {
+            if (!(w > 0)) {
+                this.lineTo(x2, y2);
+                return;
+            } 
+            
+            if (w.isInfinite()) {
+                this.lineTo(x1, y1);
+                this.lineTo(x2, y2);
+                return;
+            } 
+            
+            if (w == 1) {
+                this.quadraticBezierTo(x1, y1, x2, y2);
+                return;
+            }
+
+            var x0 = this._commandx;
+            var y0 = this._commandy;
+
+            var conic = new _Conic {
+                x0 = x0, y0 = y0,
+                x1 = x1, y1 = y1,
+                x2 = x2, y2 = y2,
+                w = w,
+            };
+
+            var quadX = new float[5];
+            var quadY = new float[5];
+            conic.chopIntoQuadsPOW2(quadX, quadY, 1);
+            
+            this.quadraticBezierTo(quadX[1], quadY[1], quadX[2], quadY[2]);
+            this.quadraticBezierTo(quadX[3], quadY[3], quadX[4], quadY[4]);
+        }
+
+        public void relativeConicTo(float x1, float y1, float x2, float y2, float w) {
+            var x0 = this._commandx;
+            var y0 = this._commandy;
+            
+            this.conicTo(x0 + x1, y0 + y1, x0 + x2, y0 + y2, w);
+        }
+
+        // http://www.w3.org/TR/SVG/implnote.html#ArcConversionEndpointToCenter
+        public void arcToPoint(Offset arcEnd,
+            Radius radius = null,
+            float rotation = 0.0f,
+            bool largeArc = false,
+            bool clockwise = false) {
+            radius = radius ?? Radius.zero;
+
+            D.assert(PaintingUtils._offsetIsValid(arcEnd));
+            D.assert(PaintingUtils._radiusIsValid(radius));
+
+            var x0 = this._commandx;
+            var y0 = this._commandy;
+            var x1 = arcEnd.dx;
+            var y1 = arcEnd.dy;
+
+            var rx = Mathf.Abs(radius.x);
+            var ry = Mathf.Abs(radius.y);
+
+            if (rx == 0 || ry == 0) {
+                this.lineTo(x1, y1);
+                return;
+            }
+
+            if (x0 == x1 && y0 == y1) {
+                this.lineTo(x1, y1);
+                return;
+            }
+
+            var midPointDistanceX = (x0 - x1) * 0.5f;
+            var midPointDistanceY = (y0 - y1) * 0.5f;
+
+            var pointTransform = Matrix3.makeRotate(rotation);
+            var transformedMidPoint = pointTransform.mapXY(midPointDistanceX, midPointDistanceY);
+
+            var squareRx = rx * rx;
+            var squareRy = ry * ry;
+            var squareX = transformedMidPoint.dx * transformedMidPoint.dx;
+            var squareY = transformedMidPoint.dy * transformedMidPoint.dy;
+            
+            // Check if the radii are big enough to draw the arc, scale radii if not.
+            // http://www.w3.org/TR/SVG/implnote.html#ArcCorrectionOutOfRangeRadii
+            var radiiScale = squareX / squareRx + squareY / squareRy;
+            if (radiiScale > 1) {
+                radiiScale = Mathf.Sqrt(radiiScale);
+                rx *= radiiScale;
+                ry *= radiiScale;
+            }
+            
+            pointTransform.setScale(1 / rx, 1 / ry);
+            pointTransform.preRotate(-rotation);
+
+            var unitPts = new [] {
+                pointTransform.mapXY(x0, y0),
+                pointTransform.mapXY(x1, y1),
+            };
+            
+            var delta = unitPts[1] - unitPts[0];
+            
+            var d = delta.dx * delta.dx + delta.dy * delta.dy;
+            var scaleFactorSquared = Mathf.Max(1 / d - 0.25f, 0.0f);
+            
+            var scaleFactor = Mathf.Sqrt(scaleFactorSquared);
+            if (!clockwise != largeArc) {  // flipped from the original implementation
+                scaleFactor = -scaleFactor;
+            }
+            delta = delta.scale(scaleFactor);
+            
+            var centerPoint = unitPts[0] + unitPts[1];
+            centerPoint *= 0.5f;
+            centerPoint = centerPoint.translate(-delta.dy, delta.dx);
+            unitPts[0] -= centerPoint;
+            unitPts[1] -= centerPoint;
+            
+            var theta1 = Mathf.Atan2(unitPts[0].dy, unitPts[0].dx);
+            var theta2 = Mathf.Atan2(unitPts[1].dy, unitPts[1].dx);
+            var thetaArc = theta2 - theta1;
+            if (thetaArc < 0 && clockwise) {  // arcSweep flipped from the original implementation
+                thetaArc += Mathf.PI * 2;
+            } else if (thetaArc > 0 && !clockwise) {  // arcSweep flipped from the original implementation
+                thetaArc -= Mathf.PI * 2;
+            }
+            pointTransform.setRotate(rotation);
+            pointTransform.preScale(rx, ry);
+            
+            // the arc may be slightly bigger than 1/4 circle, so allow up to 1/3rd
+            int segments = Mathf.CeilToInt(Mathf.Abs(thetaArc / (2 * Mathf.PI / 3)));
+            var thetaWidth = thetaArc / segments;
+            var t = Mathf.Tan(0.5f * thetaWidth);
+            if (!t.isFinite()) {
+                return;
+            }
+            
+            var startTheta = theta1;
+            var w = Mathf.Sqrt(0.5f + Mathf.Cos(thetaWidth) * 0.5f);
+            
+            bool expectIntegers = ScalarUtils.ScalarNearlyZero(Mathf.PI/2 - Mathf.Abs(thetaWidth)) &&
+                                  ScalarUtils.ScalarIsInteger(rx) && ScalarUtils.ScalarIsInteger(ry) &&
+                                  ScalarUtils.ScalarIsInteger(x1) && ScalarUtils.ScalarIsInteger(y1);
+
+            for (int i = 0; i < segments; ++i) {
+                var endTheta = startTheta + thetaWidth;
+                var sinEndTheta = ScalarUtils.ScalarSinCos(endTheta, out var cosEndTheta);
+
+                unitPts[1] = new Offset(cosEndTheta, sinEndTheta);
+                unitPts[1] += centerPoint;
+                unitPts[0] = unitPts[1];
+                unitPts[0] = unitPts[0].translate(t * sinEndTheta, -t * cosEndTheta);
+                var mapped = new [] {
+                    pointTransform.mapPoint(unitPts[0]),
+                    pointTransform.mapPoint(unitPts[1]),
+                };
+                
+                /*
+                Computing the arc width introduces rounding errors that cause arcs to start
+                outside their marks. A round rect may lose convexity as a result. If the input
+                values are on integers, place the conic on integers as well.
+                 */
+                if (expectIntegers) {
+                    for (int index = 0; i < mapped.Length; index++) {
+                        mapped[index] = new Offset(
+                            Mathf.Round(mapped[index].dx),
+                            Mathf.Round(mapped[index].dy)
+                        );
+                    }
+                }
+
+                this.conicTo(mapped[0].dx, mapped[0].dy, mapped[1].dx, mapped[1].dy, w);
+                startTheta = endTheta;
+            }
+        }
+      
 
         public void close() {
             this._appendCommands(new[] {
@@ -1091,6 +1265,136 @@ namespace Unity.UIWidgets.ui {
         winding,
     }
 
+    class _Conic {
+        public float x0;
+        public float y0;
+        public float x1;
+        public float y1;
+        public float x2;
+        public float y2;
+        public float w;
+
+        public int chopIntoQuadsPOW2(float[] quadX, float[] quadY, int pow2) {
+            quadX[0] = this.x0;
+            quadY[0] = this.y0;
+
+            var endIndex = this._subdivide(quadX, quadY, 1, pow2);
+            var quadCount = 1 << pow2;
+            var ptCount = 2 * quadCount + 1;
+            D.assert(endIndex == ptCount);
+
+            if (!(_areFinite(quadX, 0, ptCount) && _areFinite(quadY, 0, ptCount))) {
+                for (int i = 1; i < ptCount - 1; i++) {
+                    quadX[i] = this.x1;
+                    quadY[i] = this.y1;
+                }
+            }
+
+            return quadCount;
+        }
+
+        static bool _areFinite(float[] array, int index, int count) {
+            float prod = 0;
+
+            count += index;
+            for (int i = index; i < count; ++i) {
+                prod *= array[i];
+            }
+
+            // At this point, prod will either be NaN or 0
+            return prod == 0; // if prod is NaN, this check will return false
+        }
+
+        int _subdivide(float[] quadX, float[] quadY, int index, int level) {
+            D.assert(level >= 0);
+
+            if (0 == level) {
+                quadX[0 + index] = this.x1;
+                quadY[0 + index] = this.y1;
+                quadX[1 + index] = this.x2;
+                quadY[1 + index] = this.y2;
+                return 2 + index;
+            }
+
+            _Conic c1, c2;
+            this._chop(out c1, out c2);
+
+            var startY = this.y0;
+            var endY = this.y2;
+
+            if (_between(startY, this.y1, endY)) {
+                // If the input is monotonic and the output is not, the scan converter hangs.
+                // Ensure that the chopped conics maintain their y-order.
+                var midY = c1.y2;
+                if (!_between(startY, midY, endY)) {
+                    // If the computed midpoint is outside the ends, move it to the closer one.
+                    var closerY = Mathf.Abs(midY - startY) < Mathf.Abs(midY - endY) ? startY : endY;
+                    c1.y2 = c2.y0 = closerY;
+                }
+                if (!_between(startY, c1.y1, c1.y2)) {
+                    // If the 1st control is not between the start and end, put it at the start.
+                    // This also reduces the quad to a line.
+                    c1.y1 = startY;
+                }
+                if (!_between(c2.y0, c2.y1, endY)) {
+                    // If the 2nd control is not between the start and end, put it at the end.
+                    // This also reduces the quad to a line.
+                    c2.y1 = endY;
+                }
+                // Verify that all five points are in order.
+                D.assert(_between(startY, c1.y1, c1.y2));
+                D.assert(_between(c1.y1, c1.y2, c2.y1));
+                D.assert(_between(c1.y2, c2.y1, endY));
+            }
+
+            --level;
+            index = c1._subdivide(quadX, quadY, index, level);
+            return c2._subdivide(quadX, quadY, index, level);
+        }
+
+        static bool _between(float a, float b, float c) {
+            return (a - b) * (c - b) <= 0;
+        }
+
+        void _chop(out _Conic c1, out _Conic c2) {
+            var scale = 1.0f / (1.0f + this.w);
+            var newW = Mathf.Sqrt(0.5f + this.w * 0.5f);
+
+            var wp1X = this.w * this.x1;
+            var wp1Y = this.w * this.y1;
+            var mX = (this.x0 + (wp1X + wp1X) + this.x2) * scale * 0.5f;
+            var mY = (this.y0 + (wp1Y + wp1Y) + this.y2) * scale * 0.5f;
+
+            if (!(mX.isFinite() && mY.isFinite())) {
+                double w_d = this.w;
+                double w_2 = w_d * 2.0;
+                double scale_half = 1.0 / (1.0 + w_d) * 0.5;
+                mX = (float) ((this.x0 + w_2 * this.x1 + this.x2) * scale_half);
+                mY = (float) ((this.y0 + w_2 * this.y1 + this.y2) * scale_half);
+            }
+
+            c1 = new _Conic {
+                x0 = this.x0,
+                y0 = this.y0,
+                x1 = (this.x0 + wp1X) * scale,
+                y1 = (this.y0 + wp1Y) * scale,
+                x2 = mX,
+                y2 = mY,
+                w = newW,
+            };
+
+            c2 = new _Conic {
+                x0 = mX,
+                y0 = mY,
+                x1 = (wp1X + this.x2) * scale,
+                y1 = (wp1Y + this.y2) * scale,
+                x2 = this.x2,
+                y2 = this.y2,
+                w = newW,
+            };
+        }
+    }
+
     class PathPath {
         public int first;
         public int count;
@@ -1193,7 +1497,7 @@ namespace Unity.UIWidgets.ui {
                 return;
             }
 
-            var path = this._paths.Last();
+            var path = this._paths[this._paths.Count - 1];
             path.closed = true;
         }
 
@@ -1956,6 +2260,7 @@ namespace Unity.UIWidgets.ui {
             }
             else {
                 var mesh = new Mesh();
+                mesh.MarkDynamic();
                 mesh.hideFlags = HideFlags.HideAndDontSave;
                 return mesh;
             }

@@ -166,7 +166,7 @@ namespace Unity.UIWidgets.material {
 
         ScaffoldGeometry geometry;
 
-        public new ScaffoldGeometry value {
+        public override ScaffoldGeometry value {
             get {
                 D.assert(() => {
                     RenderObject renderObject = this.context.findRenderObject();

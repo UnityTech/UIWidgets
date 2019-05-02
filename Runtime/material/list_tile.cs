@@ -697,7 +697,7 @@ namespace Unity.UIWidgets.material {
             return value;
         }
 
-        public new bool sizedByParent {
+        protected override bool sizedByParent {
             get { return false; }
         }
 
