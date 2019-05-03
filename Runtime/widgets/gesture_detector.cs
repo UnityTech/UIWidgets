@@ -29,7 +29,7 @@ namespace Unity.UIWidgets.widgets {
 
         internal override bool _debugAssertTypeMatches(Type type) {
             D.assert(type == typeof(T),
-                "GestureRecognizerFactory of type " + typeof(T) + " was used where type $type was specified.");
+                () => "GestureRecognizerFactory of type " + typeof(T) + " was used where type $type was specified.");
             return true;
         }
     }
@@ -375,7 +375,7 @@ namespace Unity.UIWidgets.widgets {
                     ? oldRecognizers[type]
                     : gestures[type].constructorRaw();
                 D.assert(this._recognizers[type].GetType() == type,
-                    "GestureRecognizerFactory of type " + type + " created a GestureRecognizer of type " +
+                    () => "GestureRecognizerFactory of type " + type + " created a GestureRecognizer of type " +
                     this._recognizers[type].GetType() +
                     ". The GestureRecognizerFactory must be specialized with the type of the class that it returns from its constructor method.");
                 gestures[type].initializerRaw(this._recognizers[type]);

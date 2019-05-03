@@ -169,7 +169,7 @@ namespace Unity.UIWidgets.painting {
                         switch (shape) {
                             case BoxShape.circle:
                                 D.assert(borderRadius == null,
-                                    "A borderRadius can only be given for rectangular boxes.");
+                                    () => "A borderRadius can only be given for rectangular boxes.");
                                 _paintUniformBorderWithCircle(canvas, rect, this.top);
                                 break;
                             case BoxShape.rectangle:
@@ -187,8 +187,8 @@ namespace Unity.UIWidgets.painting {
                 }
             }
 
-            D.assert(borderRadius == null, "A borderRadius can only be given for uniform borders.");
-            D.assert(shape == BoxShape.rectangle, "A border can only be drawn as a circle if it is uniform.");
+            D.assert(borderRadius == null, () => "A borderRadius can only be given for uniform borders.");
+            D.assert(shape == BoxShape.rectangle, () => "A border can only be drawn as a circle if it is uniform.");
 
             BorderUtils.paintBorder(canvas, rect,
                 top: this.top, right: this.right, bottom: this.bottom, left: this.left);

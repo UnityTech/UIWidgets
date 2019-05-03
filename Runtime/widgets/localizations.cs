@@ -200,7 +200,7 @@ namespace Unity.UIWidgets.widgets {
                 return null;
             }
 
-            D.assert((bool) (scope != null), "a Localizations ancestor was not found");
+            D.assert((bool) (scope != null), () => "a Localizations ancestor was not found");
             return scope.localizationsState.locale;
         }
 
@@ -208,7 +208,7 @@ namespace Unity.UIWidgets.widgets {
             D.assert(context != null);
             _LocalizationsScope scope =
                 (_LocalizationsScope) context.inheritFromWidgetOfExactType(typeof(_LocalizationsScope));
-            D.assert(scope != null, "a Localizations ancestor was not found");
+            D.assert(scope != null, () => "a Localizations ancestor was not found");
             return new List<LocalizationsDelegate>(scope.localizationsState.widget.delegates);
         }
 

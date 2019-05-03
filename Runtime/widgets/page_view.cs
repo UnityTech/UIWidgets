@@ -33,10 +33,10 @@ namespace Unity.UIWidgets.widgets {
         public float page {
             get {
                 D.assert(this.positions.isNotEmpty(),
-                    "PageController.page cannot be accessed before a PageView is built with it."
+                    () => "PageController.page cannot be accessed before a PageView is built with it."
                 );
                 D.assert(this.positions.Count == 1,
-                    "The page property cannot be read when multiple PageViews are attached to " +
+                    () => "The page property cannot be read when multiple PageViews are attached to " +
                     "the same PageController."
                 );
                 _PagePosition position = (_PagePosition) this.position;

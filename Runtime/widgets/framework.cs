@@ -2753,14 +2753,14 @@ namespace Unity.UIWidgets.widgets {
         public override void deactivate() {
             base.deactivate();
             D.assert(!this.renderObject.attached,
-                "A RenderObject was still attached when attempting to deactivate its " +
+                () => "A RenderObject was still attached when attempting to deactivate its " +
                 "RenderObjectElement: " + this.renderObject);
         }
 
         public override void unmount() {
             base.unmount();
             D.assert(!this.renderObject.attached,
-                "A RenderObject was still attached when attempting to unmount its " +
+                () => "A RenderObject was still attached when attempting to unmount its " +
                 "RenderObjectElement: " + this.renderObject);
             this.widget.didUnmountRenderObject(this.renderObject);
         }

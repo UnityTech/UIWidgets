@@ -276,7 +276,7 @@ namespace Unity.UIWidgets.widgets {
             D.assert(decoration == null || decoration.debugAssertIsValid());
             D.assert(constraints == null || constraints.debugAssertIsValid());
             D.assert(color == null || decoration == null,
-                "Cannot provide both a color and a decoration\n" +
+                () => "Cannot provide both a color and a decoration\n" +
                 "The color argument is just a shorthand for \"decoration: new BoxDecoration(backgroundColor: color)\".");
             this.alignment = alignment;
             this.padding = padding;

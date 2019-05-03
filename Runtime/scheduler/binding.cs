@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Text;
 using RSG.Promises;
 using Unity.UIWidgets.foundation;
@@ -30,7 +29,7 @@ namespace Unity.UIWidgets.scheduler {
                     });
                     this.debugStack = debugCurrentCallbackStack;
                 } else {
-                    this.debugStack = new StackTrace(2, true);
+                    this.debugStack = "skipped, use StackTraceUtility.ExtractStackTrace() if you need it"; // StackTraceUtility.ExtractStackTrace();
                 }
 
                 return true;
@@ -39,8 +38,8 @@ namespace Unity.UIWidgets.scheduler {
 
         public readonly FrameCallback callback;
 
-        public static StackTrace debugCurrentCallbackStack;
-        public StackTrace debugStack;
+        internal static string debugCurrentCallbackStack;
+        internal string debugStack;
     }
 
     public enum SchedulerPhase {
@@ -55,7 +54,7 @@ namespace Unity.UIWidgets.scheduler {
         public static SchedulerBinding instance {
             get {
                 D.assert(_instance != null,
-                    "Binding.instance is null. " +
+                    () => "Binding.instance is null. " +
                     "This usually happens when there is a callback from outside of UIWidgets. " +
                     "Try to use \"using (WindowProvider.of(BuildContext).getScope()) { ... }\" to wrap your code.");
                 return _instance;
@@ -63,10 +62,10 @@ namespace Unity.UIWidgets.scheduler {
 
             set {
                 if (value == null) {
-                    D.assert(_instance != null, "Binding.instance is already cleared.");
+                    D.assert(_instance != null, () => "Binding.instance is already cleared.");
                     _instance = null;
                 } else {
-                    D.assert(_instance == null, "Binding.instance is already assigned.");
+                    D.assert(_instance == null, () => "Binding.instance is already assigned.");
                     _instance = value;
                 }
             }
@@ -345,7 +344,7 @@ namespace Unity.UIWidgets.scheduler {
             buffer.Append("ms");
         }
 
-        void _invokeFrameCallback(FrameCallback callback, TimeSpan timeStamp, StackTrace callbackStack = null) {
+        void _invokeFrameCallback(FrameCallback callback, TimeSpan timeStamp, string callbackStack = null) {
             D.assert(callback != null);
             D.assert(_FrameCallbackEntry.debugCurrentCallbackStack == null);
             D.assert(() => {
@@ -368,7 +367,7 @@ namespace Unity.UIWidgets.scheduler {
                                 "When the scheduler callback was _registered_ (as opposed to when the " +
                                 "exception was thrown), this was the stack:"
                             );
-                            UIWidgetsError.defaultStackFilter(callbackStack.ToString().TrimEnd().Split('\n'))
+                            UIWidgetsError.defaultStackFilter(callbackStack.TrimEnd().Split('\n'))
                                 .Each((line) => information.AppendLine(line));
                         }
                 ));

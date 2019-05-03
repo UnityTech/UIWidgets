@@ -152,7 +152,7 @@ namespace Unity.UIWidgets.widgets {
             D.assert(details != null);
             D.assert(
                 motionStartDistanceThreshold == null || motionStartDistanceThreshold > 0.0,
-                "motionStartDistanceThreshold must be a positive number or null"
+                () => "motionStartDistanceThreshold must be a positive number or null"
             );
 
             this._del = del;

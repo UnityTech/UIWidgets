@@ -105,7 +105,7 @@ namespace Unity.UIWidgets.material {
             FlexibleSpaceBarSettings settings =
                 (FlexibleSpaceBarSettings) context.inheritFromWidgetOfExactType(typeof(FlexibleSpaceBarSettings));
             D.assert(settings != null,
-                "A FlexibleSpaceBar must be wrapped in the widget returned by FlexibleSpaceBar.createSettings().");
+                () => "A FlexibleSpaceBar must be wrapped in the widget returned by FlexibleSpaceBar.createSettings().");
 
             List<Widget> children = new List<Widget>();
             float deltaExtent = settings.maxExtent.Value - settings.minExtent.Value;

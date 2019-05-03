@@ -171,14 +171,14 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
-        public bool _debugHasNecessaryDirections {
+        bool _debugHasNecessaryDirections {
             get {
                 if (this.firstChild != null && this.lastChild != this.firstChild) {
                     // i.e. there"s more than one child
                     switch (this.direction) {
                         case Axis.horizontal:
                             D.assert(this.textDirection != null,
-                                "Horizontal $runtimeType with multiple children has a null textDirection, so the layout order is undefined.");
+                                () => $"Horizontal {this.GetType()} with multiple children has a null textDirection, so the layout order is undefined.");
                             break;
                         case Axis.vertical:
                             break;
@@ -189,7 +189,7 @@ namespace Unity.UIWidgets.rendering {
                     switch (this.direction) {
                         case Axis.horizontal:
                             D.assert(this.textDirection != null,
-                                "Horizontal $runtimeType with alignment $alignment has a null textDirection, so the alignment cannot be resolved.");
+                                () => $"Horizontal {this.GetType()} with alignment {this.alignment} has a null textDirection, so the alignment cannot be resolved.");
                             break;
                         case Axis.vertical:
                             break;
@@ -202,7 +202,7 @@ namespace Unity.UIWidgets.rendering {
                             break;
                         case Axis.vertical:
                             D.assert(this.textDirection != null,
-                                "Vertical $runtimeType with runAlignment $runAlignment has a null textDirection, so the alignment cannot be resolved.");
+                                () => $"Vertical {this.GetType()} with runAlignment {this.runAlignment} has a null textDirection, so the alignment cannot be resolved.");
                             break;
                     }
                 }
@@ -214,7 +214,7 @@ namespace Unity.UIWidgets.rendering {
                             break;
                         case Axis.vertical:
                             D.assert(this.textDirection != null,
-                                "Vertical $runtimeType with crossAxisAlignment $crossAxisAlignment has a null textDirection, so the alignment cannot be resolved.");
+                                () => $"Vertical {this.GetType()} with crossAxisAlignment {this.crossAxisAlignment} has a null textDirection, so the alignment cannot be resolved.");
                             break;
                     }
                 }

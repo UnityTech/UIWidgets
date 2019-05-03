@@ -78,9 +78,9 @@ namespace Unity.UIWidgets.material {
             TextStyle labelStyle = null
         ) {
             D.assert(primaryColor != null || brightness != null,
-                "One of primaryColor or brightness must be specified");
+                () => "One of primaryColor or brightness must be specified");
             D.assert(primaryColor == null || brightness == null,
-                "Only one of primaryColor or brightness may be specified");
+                () => "Only one of primaryColor or brightness may be specified");
             D.assert(secondaryColor != null);
             D.assert(labelStyle != null);
 

@@ -157,7 +157,7 @@ namespace Unity.UIWidgets.animation {
             });
             D.assert(
                 this._ticker != null,
-                "AnimationController.forward() called after AnimationController.dispose()\n" +
+                () => "AnimationController.forward() called after AnimationController.dispose()\n" +
                 "AnimationController methods should not be used after calling dispose."
             );
             this._direction = _AnimationDirection.forward;
@@ -182,7 +182,7 @@ namespace Unity.UIWidgets.animation {
             });
             D.assert(
                 this._ticker != null,
-                "AnimationController.reverse() called after AnimationController.dispose()\n" +
+                () => "AnimationController.reverse() called after AnimationController.dispose()\n" +
                 "AnimationController methods should not be used after calling dispose."
             );
             this._direction = _AnimationDirection.reverse;
@@ -196,7 +196,7 @@ namespace Unity.UIWidgets.animation {
         public TickerFuture animateTo(float target, TimeSpan? duration = null, Curve curve = null) {
             D.assert(
                 this._ticker != null,
-                "AnimationController.animateTo() called after AnimationController.dispose()\n" +
+                () => "AnimationController.animateTo() called after AnimationController.dispose()\n" +
                 "AnimationController methods should not be used after calling dispose."
             );
             curve = curve ?? Curves.linear;
@@ -208,7 +208,7 @@ namespace Unity.UIWidgets.animation {
         public TickerFuture animateBack(float target, TimeSpan? duration, Curve curve = null) {
             D.assert(
                 this._ticker != null,
-                "AnimationController.animateBack() called after AnimationController.dispose()\n" +
+                () => "AnimationController.animateBack() called after AnimationController.dispose()\n" +
                 "AnimationController methods should not be used after calling dispose."
             );
             curve = curve ?? Curves.linear;
@@ -300,7 +300,7 @@ namespace Unity.UIWidgets.animation {
         public TickerFuture animateWith(Simulation simulation) {
             D.assert(
                 this._ticker != null,
-                "AnimationController.animateWith() called after AnimationController.dispose()\n" +
+                () => "AnimationController.animateWith() called after AnimationController.dispose()\n" +
                 "AnimationController methods should not be used after calling dispose."
             );
             this.stop();
@@ -324,7 +324,7 @@ namespace Unity.UIWidgets.animation {
         public void stop(bool canceled = true) {
             D.assert(
                 this._ticker != null,
-                "AnimationController.stop() called after AnimationController.dispose()\n" +
+                () => "AnimationController.stop() called after AnimationController.dispose()\n" +
                 "AnimationController methods should not be used after calling dispose."
             );
             this._simulation = null;

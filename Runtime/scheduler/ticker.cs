@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.Text;
 using RSG;
 using RSG.Promises;
@@ -14,9 +13,9 @@ namespace Unity.UIWidgets.scheduler {
     }
 
     public class Ticker {
-        public Ticker(TickerCallback onTick, string debugLabel = null) {
+        public Ticker(TickerCallback onTick, Func<string> debugLabel = null) {
             D.assert(() => {
-                this._debugCreationStack = new Exception().StackTrace;
+                this._debugCreationStack = "skipped, use StackTraceUtility.ExtractStackTrace() if you need it"; // StackTraceUtility.ExtractStackTrace();
                 return true;
             });
             this._onTick = onTick;
@@ -163,7 +162,7 @@ namespace Unity.UIWidgets.scheduler {
             D.assert(this._startTime == null);
             D.assert(this._animationId == null);
             D.assert((originalTicker._future == null) == (originalTicker._startTime == null),
-                "Cannot absorb Ticker after it has been disposed.");
+                () => "Cannot absorb Ticker after it has been disposed.");
             if (originalTicker._future != null) {
                 this._future = originalTicker._future;
                 this._startTime = originalTicker._startTime;
@@ -193,7 +192,7 @@ namespace Unity.UIWidgets.scheduler {
             });
         }
 
-        public readonly string debugLabel;
+        internal readonly Func<string> debugLabel;
 
         string _debugCreationStack;
 
@@ -205,7 +204,9 @@ namespace Unity.UIWidgets.scheduler {
             var buffer = new StringBuilder();
             buffer.Append(this.GetType() + "(");
             D.assert(() => {
-                buffer.Append(this.debugLabel ?? "");
+                if (this.debugLabel != null) {
+                    buffer.Append(this.debugLabel());
+                }
                 return true;
             });
             buffer.Append(')');

@@ -466,10 +466,10 @@ namespace Unity.UIWidgets.rendering {
         }
 
         public virtual void insert(ChildType child, ChildType after = null) {
-            D.assert(child != this, "A RenderObject cannot be inserted into itself.");
+            D.assert(child != this, () => "A RenderObject cannot be inserted into itself.");
             D.assert(after != this,
-                "A RenderObject cannot simultaneously be both the parent and the sibling of another RenderObject.");
-            D.assert(child != after, "A RenderObject cannot be inserted after itself.");
+                () => "A RenderObject cannot simultaneously be both the parent and the sibling of another RenderObject.");
+            D.assert(child != after, () => "A RenderObject cannot be inserted after itself.");
             D.assert(child != this._firstChild);
             D.assert(child != this._lastChild);
 
@@ -765,10 +765,10 @@ namespace Unity.UIWidgets.rendering {
         }
 
         public virtual void insert(ChildType child, ChildType after = null) {
-            D.assert(child != this, "A RenderObject cannot be inserted into itself.");
+            D.assert(child != this, () => "A RenderObject cannot be inserted into itself.");
             D.assert(after != this,
-                "A RenderObject cannot simultaneously be both the parent and the sibling of another RenderObject.");
-            D.assert(child != after, "A RenderObject cannot be inserted after itself.");
+                () => "A RenderObject cannot simultaneously be both the parent and the sibling of another RenderObject.");
+            D.assert(child != after, () => "A RenderObject cannot be inserted after itself.");
             D.assert(child != this._firstChild);
             D.assert(child != this._lastChild);
 
@@ -1064,10 +1064,10 @@ namespace Unity.UIWidgets.rendering {
         }
 
         public virtual void insert(ChildType child, ChildType after = null) {
-            D.assert(child != this, "A RenderObject cannot be inserted into itself.");
+            D.assert(child != this, () => "A RenderObject cannot be inserted into itself.");
             D.assert(after != this,
-                "A RenderObject cannot simultaneously be both the parent and the sibling of another RenderObject.");
-            D.assert(child != after, "A RenderObject cannot be inserted after itself.");
+                () => "A RenderObject cannot simultaneously be both the parent and the sibling of another RenderObject.");
+            D.assert(child != after, () => "A RenderObject cannot be inserted after itself.");
             D.assert(child != this._firstChild);
             D.assert(child != this._lastChild);
 

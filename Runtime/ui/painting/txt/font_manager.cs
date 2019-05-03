@@ -103,12 +103,12 @@ namespace Unity.UIWidgets.ui {
 
             FontRef fontRef = new FontRef(familyName, fontWeight, fontStyle);
             D.assert(font != null);
-            D.assert(font.dynamic, $"adding font which is not dynamic is not allowed {font.name}");
+            D.assert(font.dynamic, () => $"adding font which is not dynamic is not allowed {font.name}");
             font.hideFlags = HideFlags.DontSave & ~HideFlags.DontSaveInBuild;
 
             FontInfo current;
             this._fonts.TryGetValue(fontRef, out current);
-            D.assert(current == null || current.font == font, $"font with key {fontRef} already exists");
+            D.assert(current == null || current.font == font, () => $"font with key {fontRef} already exists");
             var fontInfo = new FontInfo(font);
             this._fonts[fontRef] = fontInfo;
         }

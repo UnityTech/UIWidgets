@@ -20,7 +20,7 @@ namespace Unity.UIWidgets.painting {
         public static _ColorsAndStops _interpolateColorsAndStops(
             List<Color> aColors, List<float> aStops, List<Color> bColors, List<float> bStops, float t) {
             D.assert(aColors.Count == bColors.Count,
-                "Cannot interpolate between two gradients with a different number of colors.");
+                () => "Cannot interpolate between two gradients with a different number of colors.");
             D.assert((aStops == null && aColors.Count == 2) || (aStops != null && aStops.Count == aColors.Count));
             D.assert((bStops == null && bColors.Count == 2) || (bStops != null && bStops.Count == bColors.Count));
             List<Color> interpolatedColors = new List<Color>();
@@ -69,7 +69,7 @@ namespace Unity.UIWidgets.painting {
                 return null;
             }
 
-            D.assert(this.colors.Count >= 2, "colors list must have at least two colors");
+            D.assert(this.colors.Count >= 2, () => "colors list must have at least two colors");
             float separation = 1.0f / (this.colors.Count - 1);
 
             return Enumerable.Range(0, this.colors.Count).Select(i => i * separation).ToList();

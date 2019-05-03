@@ -3,65 +3,23 @@ using System.Collections.Generic;
 using System.Text;
 using Unity.UIWidgets.foundation;
 using UnityEngine;
+using Vector2 = UnityEngine.Vector2;
+using Vector3 = UnityEngine.Vector3;
 
 namespace Unity.UIWidgets.ui {
     public class Path {
         const float _KAPPA90 = 0.5522847493f;
 
-        readonly List<float> _commands = new List<float>();
+        readonly List<float> _commands;
         float _commandx;
         float _commandy;
         float _minX, _minY;
         float _maxX, _maxY;
-
+        
         PathCache _cache;
 
-        internal PathCache flatten(float scale) {
-            if (this._cache != null && this._cache.canReuse(scale)) {
-                return this._cache;
-            }
-
-            this._cache = new PathCache(scale);
-
-            var i = 0;
-            while (i < this._commands.Count) {
-                var cmd = (PathCommand) this._commands[i];
-                switch (cmd) {
-                    case PathCommand.moveTo:
-                        this._cache.addPath();
-                        this._cache.addPoint(this._commands[i + 1], this._commands[i + 2], PointFlags.corner);
-                        i += 3;
-                        break;
-                    case PathCommand.lineTo:
-                        this._cache.addPoint(this._commands[i + 1], this._commands[i + 2], PointFlags.corner);
-                        i += 3;
-                        break;
-                    case PathCommand.bezierTo:
-                        this._cache.tessellateBezier(
-                            this._commands[i + 1], this._commands[i + 2],
-                            this._commands[i + 3], this._commands[i + 4],
-                            this._commands[i + 5], this._commands[i + 6], PointFlags.corner);
-                        i += 7;
-                        break;
-                    case PathCommand.close:
-                        this._cache.closePath();
-                        i++;
-                        break;
-                    case PathCommand.winding:
-                        this._cache.pathWinding((PathWinding) this._commands[i + 1]);
-                        i += 2;
-                        break;
-                    default:
-                        D.assert(false, "unknown cmd: " + cmd);
-                        break;
-                }
-            }
-
-            this._cache.normalize();
-            return this._cache;
-        }
-
-        public Path() {
+        public Path(int capacity = 0) {
+            this._commands = new List<float>(capacity);
             this._reset();
         }
 
@@ -95,7 +53,7 @@ namespace Unity.UIWidgets.ui {
                         i += 2;
                         break;
                     default:
-                        D.assert(false, "unknown cmd: " + cmd);
+                        D.assert(false, () => "unknown cmd: " + cmd);
                         break;
                 }
             }
@@ -114,11 +72,67 @@ namespace Unity.UIWidgets.ui {
             this._cache = null;
         }
 
+        internal PathCache flatten(float scale) {
+            scale = Mathf.Round(scale * 2.0f) / 2.0f; // round to 0.5f
+            
+            if (this._cache != null && this._cache.canReuse(scale)) {
+                return this._cache;
+            }
+            
+            this._cache = new PathCache(scale);
+
+            var i = 0;
+            while (i < this._commands.Count) {
+                var cmd = (PathCommand) this._commands[i];
+                switch (cmd) {
+                    case PathCommand.moveTo:
+                        this._cache.addPath();
+                        this._cache.addPoint(this._commands[i + 1], this._commands[i + 2], PointFlags.corner);
+                        i += 3;
+                        break;
+                    case PathCommand.lineTo:
+                        this._cache.addPoint(this._commands[i + 1], this._commands[i + 2], PointFlags.corner);
+                        i += 3;
+                        break;
+                    case PathCommand.bezierTo:
+                        this._cache.tessellateBezier(
+                            this._commands[i + 1], this._commands[i + 2],
+                            this._commands[i + 3], this._commands[i + 4],
+                            this._commands[i + 5], this._commands[i + 6], PointFlags.corner);
+                        i += 7;
+                        break;
+                    case PathCommand.close:
+                        this._cache.closePath();
+                        i++;
+                        break;
+                    case PathCommand.winding:
+                        this._cache.pathWinding((PathWinding) this._commands[i + 1]);
+                        i += 2;
+                        break;
+                    default:
+                        D.assert(false, () => "unknown cmd: " + cmd);
+                        break;
+                }
+            }
+
+            this._cache.normalize();
+            return this._cache;
+        }
+
         void _expandBounds(float x, float y) {
-            this._minX = Mathf.Min(this._minX, x);
-            this._minY = Mathf.Min(this._minY, y);
-            this._maxX = Mathf.Max(this._maxX, x);
-            this._maxY = Mathf.Max(this._maxY, y);
+            if (x < this._minX) {
+                this._minX = x;
+            }
+            if (y < this._minY) {
+                this._minY = y;
+            }
+
+            if (x > this._maxX) {
+                this._maxX = x;
+            }
+            if (y > this._maxY) {
+                this._maxY = y;
+            }
         }
 
         public Rect getBounds() {
@@ -129,45 +143,56 @@ namespace Unity.UIWidgets.ui {
             return Rect.fromLTRB(this._minX, this._minY, this._maxX, this._maxY);
         }
 
-        void _appendCommands(float[] commands) {
-            var i = 0;
-            while (i < commands.Length) {
-                var cmd = (PathCommand) commands[i];
-                switch (cmd) {
-                    case PathCommand.moveTo:
-                        this._commandx = commands[i + 1];
-                        this._commandy = commands[i + 2];
-                        i += 3;
-                        break;
-                    case PathCommand.lineTo:
-                        this._expandBounds(this._commandx, this._commandy);
-                        this._expandBounds(commands[i + 1], commands[i + 2]);
-                        this._commandx = commands[i + 1];
-                        this._commandy = commands[i + 2];
-                        i += 3;
-                        break;
-                    case PathCommand.bezierTo:
-                        this._expandBounds(this._commandx, this._commandy);
-                        this._expandBounds(commands[i + 1], commands[i + 2]);
-                        this._expandBounds(commands[i + 3], commands[i + 4]);
-                        this._expandBounds(commands[i + 5], commands[i + 6]);
-                        this._commandx = commands[i + 5];
-                        this._commandy = commands[i + 6];
-                        i += 7;
-                        break;
-                    case PathCommand.close:
-                        i++;
-                        break;
-                    case PathCommand.winding:
-                        i += 2;
-                        break;
-                    default:
-                        D.assert(false, "unknown cmd: " + cmd);
-                        break;
-                }
-            }
+        void _appendMoveTo(float x, float y) {
+            this._commands.Add((float) PathCommand.moveTo);
+            this._commands.Add(x);
+            this._commands.Add(y);
 
-            this._commands.AddRange(commands);
+            this._commandx = x;
+            this._commandy = y;
+            this._cache = null;
+        }
+
+        void _appendLineTo(float x, float y) {
+            this._expandBounds(this._commandx, this._commandy);
+            this._expandBounds(x, y);
+
+            this._commands.Add((float) PathCommand.lineTo);
+            this._commands.Add(x);
+            this._commands.Add(y);
+
+            this._commandx = x;
+            this._commandy = y;
+            this._cache = null;
+        }
+
+        void _appendBezierTo(float x1, float y1, float x2, float y2, float x3, float y3) {
+            this._expandBounds(this._commandx, this._commandy);
+            this._expandBounds(x1, y1);
+            this._expandBounds(x2, y2);
+            this._expandBounds(x3, y3);
+            
+            this._commands.Add((float) PathCommand.bezierTo);
+            this._commands.Add(x1);
+            this._commands.Add(y1);
+            this._commands.Add(x2);
+            this._commands.Add(y2);
+            this._commands.Add(x3);
+            this._commands.Add(y3);
+            
+            this._commandx = x3;
+            this._commandy = y3;
+            this._cache = null;
+        }
+        
+        void _appendClose() {
+            this._commands.Add((float) PathCommand.close);
+            this._cache = null;
+        }
+
+        void _appendWinding(float winding) {
+            this._commands.Add((float) PathCommand.winding);
+            this._commands.Add(winding);
             this._cache = null;
         }
 
@@ -175,42 +200,26 @@ namespace Unity.UIWidgets.ui {
             var x0 = this._commandx;
             var y0 = this._commandy;
             
-            this._appendCommands(new[] {
-                (float) PathCommand.moveTo,
-                x + x0, y + y0,
-            });
+            this._appendMoveTo(x + x0, y + y0);
         }
 
         public void moveTo(float x, float y) {
-            this._appendCommands(new[] {
-                (float) PathCommand.moveTo,
-                x, y,
-            });
+            this._appendMoveTo(x, y);
         }
-
 
         public void relativeLineTo(float x, float y) {
             var x0 = this._commandx;
             var y0 = this._commandy;
             
-            this._appendCommands(new[] {
-                (float) PathCommand.lineTo,
-                x + x0, y + y0,
-            });
+            this._appendLineTo(x + x0, y + y0);
         }
         
         public void lineTo(float x, float y) {
-            this._appendCommands(new[] {
-                (float) PathCommand.lineTo,
-                x, y,
-            });
+            this._appendLineTo(x, y);
         }
 
         public void cubicTo(float c1x, float c1y, float c2x, float c2y, float x, float y) {
-            this._appendCommands(new[] {
-                (float) PathCommand.bezierTo,
-                c1x, c1y, c2x, c2y, x, y,
-            });
+            this._appendBezierTo(c1x, c1y, c2x, c2y, x, y);
         }
         
         public void relativeCubicTo(float c1x, float c1y, float c2x, float c2y, float x, float y) {
@@ -224,14 +233,13 @@ namespace Unity.UIWidgets.ui {
             var x0 = this._commandx;
             var y0 = this._commandy;
 
-            this._appendCommands(new[] {
-                (float) PathCommand.bezierTo,
-                (x0 + 2.0f / 3.0f * (cx - x0)), (y0 + 2.0f / 3.0f * (cy - y0)),
-                (x + 2.0f / 3.0f * (cx - x)), (y + 2.0f / 3.0f * (cy - y)),
-                x, y,
-            });
+            const float twoThird = 2.0f / 3.0f;
+            this._appendBezierTo(
+                x0 + twoThird * (cx - x0), y0 + twoThird * (cy - y0),
+                x + twoThird * (cx - x), y + twoThird * (cy - y),
+                x, y);
         }
-        
+
         public void relativeQuadraticBezierTo(float cx, float cy, float x, float y) {
             var x0 = this._commandx;
             var y0 = this._commandy;
@@ -412,29 +420,21 @@ namespace Unity.UIWidgets.ui {
                 startTheta = endTheta;
             }
         }
-      
 
         public void close() {
-            this._appendCommands(new[] {
-                (float) PathCommand.close,
-            });
+            this._appendClose();
         }
 
         public void winding(PathWinding dir) {
-            this._appendCommands(new[] {
-                (float) PathCommand.winding,
-                (float) dir
-            });
+            this._appendWinding((float) dir);
         }
 
         public void addRect(Rect rect) {
-            this._appendCommands(new[] {
-                (float) PathCommand.moveTo, rect.left, rect.top,
-                (float) PathCommand.lineTo, rect.left, rect.bottom,
-                (float) PathCommand.lineTo, rect.right, rect.bottom,
-                (float) PathCommand.lineTo, rect.right, rect.top,
-                (float) PathCommand.close
-            });
+            this._appendMoveTo(rect.left, rect.top);
+            this._appendLineTo(rect.left, rect.bottom);
+            this._appendLineTo(rect.right, rect.bottom);
+            this._appendLineTo(rect.right, rect.top);
+            this._appendClose();
         }
 
         public void addRRect(RRect rrect) {
@@ -456,37 +456,33 @@ namespace Unity.UIWidgets.ui {
             float x = rrect.left;
             float y = rrect.top;
 
-            this._appendCommands(new[] {
-                (float) PathCommand.moveTo, x, y + ryTL,
-                (float) PathCommand.lineTo, x, y + h - ryBL,
-                (float) PathCommand.bezierTo, x, y + h - ryBL * (1 - _KAPPA90),
-                x + rxBL * (1 - _KAPPA90), y + h, x + rxBL, y + h,
-                (float) PathCommand.lineTo, x + w - rxBR, y + h,
-                (float) PathCommand.bezierTo, x + w - rxBR * (1 - _KAPPA90), y + h,
-                x + w, y + h - ryBR * (1 - _KAPPA90), x + w, y + h - ryBR,
-                (float) PathCommand.lineTo, x + w, y + ryTR,
-                (float) PathCommand.bezierTo, x + w, y + ryTR * (1 - _KAPPA90),
-                x + w - rxTR * (1 - _KAPPA90), y, x + w - rxTR, y,
-                (float) PathCommand.lineTo, x + rxTL, y,
-                (float) PathCommand.bezierTo, x + rxTL * (1 - _KAPPA90), y,
-                x, y + ryTL * (1 - _KAPPA90), x, y + ryTL,
-                (float) PathCommand.close,
-            });
+            this._appendMoveTo(x, y + ryTL);
+            this._appendLineTo(x, y + h - ryBL);
+            this._appendBezierTo(x, y + h - ryBL * (1 - _KAPPA90),
+                x + rxBL * (1 - _KAPPA90), y + h, x + rxBL, y + h);
+            this._appendLineTo(x + w - rxBR, y + h);
+            this._appendBezierTo(x + w - rxBR * (1 - _KAPPA90), y + h,
+                x + w, y + h - ryBR * (1 - _KAPPA90), x + w, y + h - ryBR);
+            this._appendLineTo(x + w, y + ryTR);
+            this._appendBezierTo(x + w, y + ryTR * (1 - _KAPPA90),
+                x + w - rxTR * (1 - _KAPPA90), y, x + w - rxTR, y);
+            this._appendLineTo(x + rxTL, y);
+            this._appendBezierTo(x + rxTL * (1 - _KAPPA90), y,
+                x, y + ryTL * (1 - _KAPPA90), x, y + ryTL);
+            this._appendClose();
         }
 
         public void addEllipse(float cx, float cy, float rx, float ry) {
-            this._appendCommands(new[] {
-                (float) PathCommand.moveTo, (cx - rx), cy,
-                (float) PathCommand.bezierTo, (cx - rx), (cy + ry * _KAPPA90),
-                (cx - rx * _KAPPA90), (cy + ry), cx, (cy + ry),
-                (float) PathCommand.bezierTo, (cx + rx * _KAPPA90), (cy + ry),
-                (cx + rx), (cy + ry * _KAPPA90), (cx + rx), cy,
-                (float) PathCommand.bezierTo, (cx + rx), (cy - ry * _KAPPA90),
-                (cx + rx * _KAPPA90), (cy - ry), cx, (cy - ry),
-                (float) PathCommand.bezierTo, (cx - rx * _KAPPA90), (cy - ry),
-                (cx - rx), (cy - ry * _KAPPA90), (cx - rx), cy,
-                (float) PathCommand.close,
-            });
+            this._appendMoveTo(cx - rx, cy);
+            this._appendBezierTo(cx - rx, cy + ry * _KAPPA90,
+                cx - rx * _KAPPA90, cy + ry, cx, cy + ry);
+            this._appendBezierTo(cx + rx * _KAPPA90, cy + ry,
+                cx + rx, cy + ry * _KAPPA90, cx + rx, cy);
+            this._appendBezierTo(cx + rx, cy - ry * _KAPPA90,
+                cx + rx * _KAPPA90, cy - ry, cx, cy - ry);
+            this._appendBezierTo(cx - rx * _KAPPA90, cy - ry,
+                cx - rx, cy - ry * _KAPPA90, cx - rx, cy);
+            this._appendClose();
         }
 
         public void addCircle(float cx, float cy, float r) {
@@ -543,99 +539,17 @@ namespace Unity.UIWidgets.ui {
             var center = rect.center;
             mat.postTranslate(center.dx, center.dy);
 
-            var vals = this._getArcCommands(0, 0, 1, startAngle, startAngle + sweepAngle,
-                sweepAngle >= 0 ? PathWinding.clockwise : PathWinding.counterClockwise, forceMoveTo);
-
-            this._transformCommands(vals, mat);
-            this._appendCommands(vals.ToArray());
+            this._addArcCommands(0, 0, 1, startAngle, startAngle + sweepAngle,
+                sweepAngle >= 0 ? PathWinding.clockwise : PathWinding.counterClockwise, forceMoveTo, mat);
         }
 
         public void addArc(Rect rect, float startAngle, float sweepAngle) {
             this.arcTo(rect, startAngle, sweepAngle, true);
         }
 
-        public Path transform(Matrix3 mat) {
-            Path ret = new Path();
-            
-            var i = 0;
-            while (i < this._commands.Count) {
-                var cmd = (PathCommand) this._commands[i];
-                switch (cmd) {
-                    case PathCommand.moveTo:
-                        var res_move = mat.mapXY(this._commands[i + 1], this._commands[i + 2]);
-                        ret.moveTo(res_move.dx, res_move.dy);
-                        i += 3;
-                        break;
-                    case PathCommand.lineTo:
-                        var res_lineto = mat.mapXY(this._commands[i + 1], this._commands[i + 2]);
-                        ret.lineTo(res_lineto.dx, res_lineto.dy);
-                        i += 3;
-                        break;
-                    case PathCommand.bezierTo:
-                        var res1 = mat.mapXY(this._commands[i + 1], this._commands[i + 2]);
-                        var res2 = mat.mapXY(this._commands[i + 3], this._commands[i + 4]);
-                        var res3 = mat.mapXY(this._commands[i + 5], this._commands[i + 6]);
-                        ret.cubicTo(res1.dx, res1.dy, res2.dx, res2.dy, res3.dx, res3.dy);
-                        i += 7;
-                        break;
-                    case PathCommand.close:
-                        i++;
-                        break;
-                    case PathCommand.winding:
-                        i += 2;
-                        break;
-                    default:
-                        D.assert(false, "unknown cmd: " + cmd);
-                        break;
-                }
-            }
-
-            return ret;
-        }
-
-        void _transformCommands(List<float> commands, Matrix3 mat) {
-            if (mat == null) {
-                return;
-            }
-            
-            var i = 0;
-            while (i < commands.Count) {
-                var cmd = (PathCommand) commands[i];
-                switch (cmd) {
-                    case PathCommand.moveTo:
-                    case PathCommand.lineTo:
-                        var res = mat.mapXY(commands[i + 1], commands[i + 2]);
-                        commands[i + 1] = res.dx;
-                        commands[i + 2] = res.dy;
-                        i += 3;
-                        break;
-                    case PathCommand.bezierTo:
-                        var res1 = mat.mapXY(commands[i + 1], commands[i + 2]);
-                        commands[i + 1] = res1.dx;
-                        commands[i + 2] = res1.dy;
-                        var res2 = mat.mapXY(commands[i + 3], commands[i + 4]);
-                        commands[i + 3] = res2.dx;
-                        commands[i + 4] = res2.dy;
-                        var res3 = mat.mapXY(commands[i + 5], commands[i + 6]);
-                        commands[i + 5] = res3.dx;
-                        commands[i + 6] = res3.dy;
-                        i += 7;
-                        break;
-                    case PathCommand.close:
-                        i++;
-                        break;
-                    case PathCommand.winding:
-                        i += 2;
-                        break;
-                    default:
-                        D.assert(false, "unknown cmd: " + cmd);
-                        break;
-                }
-            }
-
-        }
-        
-        List<float>  _getArcCommands(float cx, float cy, float r, float a0, float a1, PathWinding dir, bool forceMoveTo) {
+        void _addArcCommands(
+            float cx, float cy, float r, float a0, float a1,
+            PathWinding dir, bool forceMoveTo, Matrix3 transform = null) {
             // Clamp angles
             float da = a1 - a0;
             if (dir == PathWinding.clockwise) {
@@ -646,7 +560,7 @@ namespace Unity.UIWidgets.ui {
                         da += Mathf.PI * 2;
                     }
                     if (da <= 1e-5) {
-                        return new List<float>();
+                        return;
                     }
                 }
             } else {
@@ -657,10 +571,11 @@ namespace Unity.UIWidgets.ui {
                         da -= Mathf.PI * 2;
                     }
                     if (da >= -1e-5) {
-                        return new List<float>();
+                        return;
                     }
                 }
             }
+            
             // Split arc into max 90 degree segments.
             int ndivs = Mathf.Max(1, Mathf.Min((int) (Mathf.Abs(da) / (Mathf.PI * 0.5f) + 0.5f), 5));
             float hda = (da / ndivs) / 2.0f;
@@ -673,7 +588,6 @@ namespace Unity.UIWidgets.ui {
             PathCommand move = (forceMoveTo || this._commands.Count == 0) ? PathCommand.moveTo : PathCommand.lineTo;
             float px = 0, py = 0, ptanx = 0, ptany = 0;
 
-            List<float> vals = new List<float>();
             for (int i = 0; i <= ndivs; i++) {
                 float a = a0 + da * (i / (float) ndivs);
                 float dx = Mathf.Cos(a);
@@ -684,30 +598,40 @@ namespace Unity.UIWidgets.ui {
                 float tany = dx * r * kappa;
 
                 if (i == 0) {
-                    vals.Add((float) move);
-                    vals.Add(x);
-                    vals.Add(y);
+                    float x1 = x, y1 = y;
+                    if (transform != null) {
+                        transform.mapXY(x1, y1, out x1, out y1);
+                    }
+
+                    if (move == PathCommand.moveTo) {
+                        this._appendMoveTo(x1, y1);
+                    } else {
+                        this._appendLineTo(x1, y1);
+                    }
                 } else {
-                    vals.Add((float) PathCommand.bezierTo);
-                    vals.Add(px + ptanx);
-                    vals.Add(py + ptany);
-                    vals.Add(x - tanx);
-                    vals.Add(y - tany);
-                    vals.Add(x);
-                    vals.Add(y);
+                    float c1x = px + ptanx;
+                    float c1y = py + ptany;
+                    float c2x = x - tanx;
+                    float c2y = y - tany;
+                    float x1 = x;
+                    float y1 = y;
+                    if (transform != null) {
+                        transform.mapXY(c1x, c1y, out c1x, out c1y);
+                        transform.mapXY(c2x, c2y, out c2x, out c2y);
+                        transform.mapXY(x1, y1, out x1, out y1);
+                    }
+
+                    this._appendBezierTo(c1x, c1y, c2x, c2y, x1, y1);
                 }
                 px = x;
                 py = y;
                 ptanx = tanx;
                 ptany = tany;
             }
-
-            return vals;
         }
-        
+
         public void addArc(float cx, float cy, float r, float a0, float a1, PathWinding dir, bool forceMoveTo = true) {
-            var vals = this._getArcCommands(cx, cy, r, a0, a1, dir, forceMoveTo);
-            this._appendCommands(vals.ToArray());
+            this._addArcCommands(cx, cy, r, a0, a1, dir, forceMoveTo);
         }
 
         public void addPolygon(IList<Offset> points, bool close) {
@@ -715,24 +639,17 @@ namespace Unity.UIWidgets.ui {
             if (points.Count == 0) {
                 return;
             }
-
-            var commands = new List<float>();
-            commands.Add((float) PathCommand.moveTo);
-            commands.Add(points[0].dx);
-            commands.Add(points[0].dy);
+            
+            this._appendMoveTo(points[0].dx, points[0].dy);
 
             for (int i = 1; i < points.Count; i++) {
                 var point = points[i];
-                commands.Add((float) PathCommand.lineTo);
-                commands.Add(point.dx);
-                commands.Add(point.dy);
+                this._appendLineTo(point.dx, point.dy);
             }
 
             if (close) {
-                commands.Add((float) PathCommand.close);
+                this._appendClose();
             }
-
-            this._appendCommands(commands.ToArray());
         }
 
         public Path shift(Offset offset) {
@@ -741,55 +658,84 @@ namespace Unity.UIWidgets.ui {
             path.addPath(this, offset);
             return path;
         }
-        
-        public void addPath(Path path, Offset offset) {
-            D.assert(path != null);
-            D.assert(offset != null);
 
-            var commands = new List<float>();
+        public Path transform(Matrix3 mat) {
+            var path = new Path();
+            path.addPath(this, mat);
+            return path;
+        }
+
+        public void addPath(Path path, Offset offset) {
+            if (offset == null) {
+                this.addPath(path);
+                return;
+            }
+            
+            var transform = Matrix3.makeTrans(offset.dx, offset.dy);
+            this.addPath(path, transform);
+        }
+
+        public void addPath(Path path, Matrix3 transform = null) {
+            D.assert(path != null);
 
             var i = 0;
             while (i < path._commands.Count) {
                 var cmd = (PathCommand) path._commands[i];
                 switch (cmd) {
-                    case PathCommand.moveTo:
-                    case PathCommand.lineTo:
-                        commands.Add(path._commands[i]);
-                        commands.Add(path._commands[i + 1] + offset.dx);
-                        commands.Add(path._commands[i + 2] + offset.dy);
+                    case PathCommand.moveTo: {
+                        float x = path._commands[i + 1];
+                        float y = path._commands[i + 2];
+                        if (transform != null) {
+                            transform.mapXY(x, y, out x, out y);
+                        }
+                        this._appendMoveTo(x, y);
+                    }
                         i += 3;
                         break;
-                    case PathCommand.bezierTo:
-                        commands.Add(path._commands[i]);
-                        commands.Add(path._commands[i + 1] + offset.dx);
-                        commands.Add(path._commands[i + 2] + offset.dy);
-                        commands.Add(path._commands[i + 3] + offset.dx);
-                        commands.Add(path._commands[i + 4] + offset.dy);
-                        commands.Add(path._commands[i + 5] + offset.dx);
-                        commands.Add(path._commands[i + 6] + offset.dy);
+                    case PathCommand.lineTo: {
+                        float x = path._commands[i + 1];
+                        float y = path._commands[i + 2];
+                        if (transform != null) {
+                            transform.mapXY(x, y, out x, out y);
+                        }
+                        this._appendLineTo(x, y);
+                    }
+                        i += 3;
+                        break;
+                    case PathCommand.bezierTo: {
+                        float c1x = path._commands[i + 1];
+                        float c1y = path._commands[i + 2];
+                        float c2x = path._commands[i + 3];
+                        float c2y = path._commands[i + 4];
+                        float x1 = path._commands[i + 5];
+                        float y1 = path._commands[i + 6];
+                        if (transform != null) {
+                            transform.mapXY(c1x, c1y, out c1x, out c1y);
+                            transform.mapXY(c2x, c2y, out c2x, out c2y);
+                            transform.mapXY(x1, y1, out x1, out y1);
+                        }
+                        this._appendBezierTo(c1x, c1y, c2x, c2y, x1, y1);
+                    }
                         i += 7;
                         break;
                     case PathCommand.close:
-                        commands.Add(path._commands[i]);
+                        this._appendClose();
                         i++;
                         break;
                     case PathCommand.winding:
-                        commands.Add(path._commands[i]);
-                        commands.Add(path._commands[i + 1]);
+                        this._appendWinding(path._commands[i + 1]);
                         i += 2;
                         break;
                     default:
-                        D.assert(false, "unknown cmd: " + cmd);
+                        D.assert(false, () => "unknown cmd: " + cmd);
                         break;
                 }
             }
-
-            this._appendCommands(commands.ToArray());
         }
 
         public bool contains(Offset point) {
             var bounds = this.getBounds();
-            if (bounds == null) {
+            if (bounds == null || bounds.isEmpty) {
                 return false;
             }
 
@@ -858,7 +804,7 @@ namespace Unity.UIWidgets.ui {
                         i += 2;
                         break;
                     default:
-                        D.assert(false, "unknown cmd: " + cmd);
+                        D.assert(false, () => "unknown cmd: " + cmd);
                         break;
                 }
             }
@@ -1177,7 +1123,7 @@ namespace Unity.UIWidgets.ui {
                 return 0;
             }
 
-            D.assert(r >= 0 && r < 1, $"numer {numer}, denom {denom}, r {r}");
+            D.assert(r >= 0 && r < 1, () => $"numer {numer}, denom {denom}, r {r}");
             if (r == 0) {
                 // catch underflow if numer <<<< denom
                 return 0;

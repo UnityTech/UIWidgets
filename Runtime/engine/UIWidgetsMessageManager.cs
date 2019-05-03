@@ -33,13 +33,13 @@ namespace Unity.UIWidgets.engine {
 #endif
         
         void OnEnable() {
-            D.assert(_instance == null, "Only one instance of UIWidgetsMessageManager should exists");
+            D.assert(_instance == null, () => "Only one instance of UIWidgetsMessageManager should exists");
             _instance = this;
             this.UpdateNameIfNeed();
         }
 
         void OnDisable() {
-            D.assert(_instance != null, "_instance should not be null");
+            D.assert(_instance != null, () => "_instance should not be null");
             _instance = null;
         }
 
