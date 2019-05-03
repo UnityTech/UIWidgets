@@ -344,7 +344,7 @@ namespace Unity.UIWidgets.material {
         public float value {
             get { return this._value; }
             set {
-                D.assert(value != null && value >= 0.0f && value <= 1.0f);
+                D.assert(value >= 0.0f && value <= 1.0f);
                 float convertedValue = this.isDiscrete ? this._discretize(value) : value;
                 if (convertedValue == this._value) {
                     return;

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace Unity.UIWidgets.foundation {
     public class ObserverList<T> : ICollection<T> {
-        public readonly List<T> _list = new List<T>();
-        public bool _isDirty = false;
-        public HashSet<T> _set = null;
+        readonly List<T> _list = new List<T>();
+        bool _isDirty = false;
+        HashSet<T> _set = null;
 
         IEnumerator IEnumerable.GetEnumerator() {
             return this.GetEnumerator();

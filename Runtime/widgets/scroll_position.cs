@@ -148,7 +148,7 @@ namespace Unity.UIWidgets.widgets {
         public override void correctBy(float correction) {
             D.assert(
                 this._pixels != null,
-                "An initial pixels value must exist by caling correctPixels on the ScrollPosition"
+                () => "An initial pixels value must exist by caling correctPixels on the ScrollPosition"
             );
 
             this._pixels += correction;

@@ -234,7 +234,7 @@ namespace Unity.UIWidgets.painting {
 
             fit = fit ?? (centerSlice == null ? BoxFit.scaleDown : BoxFit.fill);
             D.assert(centerSlice == null || (fit != BoxFit.none && fit != BoxFit.cover),
-                $"centerSlice was used with a BoxFit {fit} that is not supported.");
+                () => $"centerSlice was used with a BoxFit {fit} that is not supported.");
             FittedSizes fittedSizes = FittedSizes.applyBoxFit(fit.Value, inputSize / scale, outputSize);
             Size sourceSize = fittedSizes.source * scale;
             Size destinationSize = fittedSizes.destination;
@@ -242,7 +242,7 @@ namespace Unity.UIWidgets.painting {
                 outputSize += sliceBorder;
                 destinationSize += sliceBorder;
                 D.assert(sourceSize == inputSize,
-                    $"centerSlice was used with a BoxFit {fit} that does not guarantee that the image is fully visible.");
+                    () => $"centerSlice was used with a BoxFit {fit} that does not guarantee that the image is fully visible.");
             }
 
             if (repeat != ImageRepeat.noRepeat && destinationSize == outputSize) {

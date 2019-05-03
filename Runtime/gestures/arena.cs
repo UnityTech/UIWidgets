@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -36,7 +37,7 @@ namespace Unity.UIWidgets.gestures {
     }
 
     class _GestureArena {
-        public List<GestureArenaMember> members = new List<GestureArenaMember>();
+        public readonly List<GestureArenaMember> members = new List<GestureArenaMember>();
         public bool isOpen = true;
         public bool isHeld = false;
         public bool hasPendingSweep = false;
@@ -81,13 +82,13 @@ namespace Unity.UIWidgets.gestures {
 
         public GestureArenaEntry add(int pointer, GestureArenaMember member) {
             _GestureArena state = this._arenas.putIfAbsent(pointer, () => {
-                D.assert(this._debugLogDiagnostic(pointer, "★ Opening new gesture arena."));
+                D.assert(this._debugLogDiagnostic(pointer, () => "★ Opening new gesture arena."));
                 return state = new _GestureArena();
             });
 
             state.add(member);
 
-            D.assert(this._debugLogDiagnostic(pointer, $"Adding: {member}"));
+            D.assert(this._debugLogDiagnostic(pointer, () => $"Adding: {member}"));
             return new GestureArenaEntry(this, pointer, member);
         }
 
@@ -98,7 +99,7 @@ namespace Unity.UIWidgets.gestures {
             }
 
             state.isOpen = false;
-            D.assert(this._debugLogDiagnostic(pointer, "Closing", state));
+            D.assert(this._debugLogDiagnostic(pointer, () => "Closing", state));
             this._tryToResolveArena(pointer, state);
         }
 
@@ -111,15 +112,15 @@ namespace Unity.UIWidgets.gestures {
             D.assert(!state.isOpen);
             if (state.isHeld) {
                 state.hasPendingSweep = true;
-                D.assert(this._debugLogDiagnostic(pointer, "Delaying sweep", state));
+                D.assert(this._debugLogDiagnostic(pointer, () => "Delaying sweep", state));
                 return;
             }
 
-            D.assert(this._debugLogDiagnostic(pointer, "Sweeping", state));
+            D.assert(this._debugLogDiagnostic(pointer, () => "Sweeping", state));
             this._arenas.Remove(pointer);
             if (state.members.isNotEmpty()) {
                 D.assert(this._debugLogDiagnostic(
-                    pointer, $"Winner: {state.members.First()}"));
+                    pointer, () => $"Winner: {state.members.First()}"));
 
                 state.members.First().acceptGesture(pointer);
                 for (int i = 1; i < state.members.Count; i++) {
@@ -135,7 +136,7 @@ namespace Unity.UIWidgets.gestures {
             }
 
             state.isHeld = true;
-            D.assert(this._debugLogDiagnostic(pointer, "Holding", state));
+            D.assert(this._debugLogDiagnostic(pointer, () => "Holding", state));
         }
 
         public void release(int pointer) {
@@ -145,7 +146,7 @@ namespace Unity.UIWidgets.gestures {
             }
 
             state.isHeld = false;
-            D.assert(this._debugLogDiagnostic(pointer, "Releasing", state));
+            D.assert(this._debugLogDiagnostic(pointer, () => "Releasing", state));
             if (state.hasPendingSweep) {
                 this.sweep(pointer);
             }
@@ -158,7 +159,7 @@ namespace Unity.UIWidgets.gestures {
             }
 
             D.assert(this._debugLogDiagnostic(pointer,
-                $"{(disposition == GestureDisposition.accepted ? "Accepting" : "Rejecting")}: {member}"));
+                () => $"{(disposition == GestureDisposition.accepted ? "Accepting" : "Rejecting")}: {member}"));
 
             D.assert(state.members.Contains(member));
             if (disposition == GestureDisposition.rejected) {
@@ -174,7 +175,7 @@ namespace Unity.UIWidgets.gestures {
                 }
                 else {
                     D.assert(this._debugLogDiagnostic(pointer,
-                        $"Self-declared winner: {member}"));
+                        () => $"Self-declared winner: {member}"));
                     this._resolveInFavorOf(pointer, state, member);
                 }
             }
@@ -189,11 +190,11 @@ namespace Unity.UIWidgets.gestures {
             }
             else if (state.members.isEmpty()) {
                 this._arenas.Remove(pointer);
-                D.assert(this._debugLogDiagnostic(pointer, "Arena empty."));
+                D.assert(this._debugLogDiagnostic(pointer, () => "Arena empty."));
             }
             else if (state.eagerWinner != null) {
                 D.assert(this._debugLogDiagnostic(pointer,
-                    $"Eager winner: {state.eagerWinner}"));
+                    () => $"Eager winner: {state.eagerWinner}"));
                 this._resolveInFavorOf(pointer, state, state.eagerWinner);
             }
         }
@@ -209,7 +210,7 @@ namespace Unity.UIWidgets.gestures {
             D.assert(members.Count == 1);
             this._arenas.Remove(pointer);
             D.assert(this._debugLogDiagnostic(pointer,
-                $"Default winner: {state.members.First()}"));
+                () => $"Default winner: {state.members.First()}"));
             state.members.First().acceptGesture(pointer);
         }
 
@@ -229,14 +230,14 @@ namespace Unity.UIWidgets.gestures {
             member.acceptGesture(pointer);
         }
 
-        bool _debugLogDiagnostic(int pointer, string message, _GestureArena state = null) {
+        bool _debugLogDiagnostic(int pointer, Func<string> message, _GestureArena state = null) {
             D.assert(() => {
                 if (D.debugPrintGestureArenaDiagnostics) {
-                    int? count = state != null ? state.members.Count : (int?) null;
+                    int? count = state?.members.Count;
                     string s = count != 1 ? "s" : "";
                     Debug.LogFormat("Gesture arena {0} ❙ {1}{2}",
                         pointer.ToString().PadRight(4),
-                        message,
+                        message(),
                         count != null ? $" with {count} member{s}." : "");
                 }
 

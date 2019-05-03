@@ -110,7 +110,7 @@ namespace Unity.UIWidgets.ui {
         public static Window instance {
             get {
                 D.assert(_instance != null,
-                    "Window.instance is null. " +
+                    () => "Window.instance is null. " +
                     "This usually happens when there is a callback from outside of UIWidgets. " +
                     "Try to use \"using (WindowProvider.of(BuildContext).getScope()) { ... }\" to wrap your code.");
                 return _instance;
@@ -118,11 +118,11 @@ namespace Unity.UIWidgets.ui {
 
             set {
                 if (value == null) {
-                    D.assert(_instance != null, "Window.instance is already cleared.");
+                    D.assert(_instance != null, () => "Window.instance is already cleared.");
                     _instance = null;
                 }
                 else {
-                    D.assert(_instance == null, "Window.instance is already assigned.");
+                    D.assert(_instance == null, () => "Window.instance is already assigned.");
                     _instance = value;
                 }
             }

@@ -844,7 +844,7 @@ namespace Unity.UIWidgets.material {
             D.assert(label != null);
             D.assert(
                 onPressed != null,
-                "Rather than disabling an ActionChip by setting onPressed to null, " +
+                () => "Rather than disabling an ActionChip by setting onPressed to null, " +
                 "remove it from the interface entirely."
             );
             D.assert(pressElevation == null || pressElevation >= 0.0f);
@@ -1249,12 +1249,12 @@ namespace Unity.UIWidgets.material {
                 vsync: this
             );
 
-            float checkmarkPercentage = ChipUtils._kCheckmarkDuration.Milliseconds /
-                                        ChipUtils._kSelectDuration.Milliseconds;
-            float checkmarkReversePercentage = ChipUtils._kCheckmarkReverseDuration.Milliseconds /
-                                               ChipUtils._kSelectDuration.Milliseconds;
-            float avatarDrawerReversePercentage = ChipUtils._kReverseDrawerDuration.Milliseconds /
-                                                  ChipUtils._kSelectDuration.Milliseconds;
+            float checkmarkPercentage = (float) (ChipUtils._kCheckmarkDuration.TotalMilliseconds /
+                                        ChipUtils._kSelectDuration.TotalMilliseconds);
+            float checkmarkReversePercentage = (float) (ChipUtils._kCheckmarkReverseDuration.TotalMilliseconds /
+                                               ChipUtils._kSelectDuration.TotalMilliseconds);
+            float avatarDrawerReversePercentage = (float) (ChipUtils._kReverseDrawerDuration.TotalMilliseconds /
+                                                  ChipUtils._kSelectDuration.TotalMilliseconds);
             this.checkmarkAnimation = new CurvedAnimation(
                 parent: this.selectController,
                 curve: new Interval(1.0f - checkmarkPercentage, 1.0f, curve: Curves.fastOutSlowIn),
@@ -1718,7 +1718,7 @@ namespace Unity.UIWidgets.material {
         }
 
         protected override void moveChildRenderObject(RenderObject child, object slotValue) {
-            D.assert(false, "not reachable");
+            D.assert(false, () => "not reachable");
         }
     }
 
@@ -2187,10 +2187,10 @@ namespace Unity.UIWidgets.material {
             );
             this.size = this.constraints.constrain(paddedSize);
             D.assert(this.size.height == this.constraints.constrainHeight(paddedSize.height),
-                $"Constrained height {this.size.height} doesn't match expected height " +
+                () => $"Constrained height {this.size.height} doesn't match expected height " +
                 $"{this.constraints.constrainWidth(paddedSize.height)}");
             D.assert(this.size.width == this.constraints.constrainWidth(paddedSize.width),
-                $"Constrained width {this.size.width} doesn't match expected width " +
+                () => $"Constrained width {this.size.width} doesn't match expected width " +
                 $"{this.constraints.constrainWidth(paddedSize.width)}");
         }
 

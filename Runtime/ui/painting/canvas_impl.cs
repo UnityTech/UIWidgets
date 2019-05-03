@@ -793,7 +793,7 @@ namespace Unity.UIWidgets.ui {
                 toClear = false;
             }
         }
-
+        
         void _drawLayer(RenderLayer layer, CommandBuffer cmdBuf) {
             bool toClear = true;
 
@@ -860,6 +860,8 @@ namespace Unity.UIWidgets.ui {
                         }
                         break;
                     case CmdScissor cmd:
+                        this._setRenderTarget(cmdBuf, layer.rtID, ref toClear);
+                        
                         if (cmd.deviceScissor == null) {
                             cmdBuf.DisableScissorRect();
                         } else {

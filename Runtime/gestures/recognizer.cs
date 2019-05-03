@@ -207,10 +207,10 @@ namespace Unity.UIWidgets.gestures {
             float? postAcceptSlopTolerance = Constants.kTouchSlop
         ) : base(debugOwner: debugOwner, kind: kind) {
             D.assert(preAcceptSlopTolerance == null || preAcceptSlopTolerance >= 0,
-                "The preAcceptSlopTolerance must be positive or null");
+                () => "The preAcceptSlopTolerance must be positive or null");
 
             D.assert(postAcceptSlopTolerance == null || postAcceptSlopTolerance >= 0,
-                "The postAcceptSlopTolerance must be positive or null");
+                () => "The postAcceptSlopTolerance must be positive or null");
 
             this.deadline = deadline;
             this.preAcceptSlopTolerance = preAcceptSlopTolerance;

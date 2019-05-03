@@ -43,7 +43,7 @@ namespace Unity.UIWidgets.material {
             D.assert(items != null);
             D.assert(items.Count >= 2);
             D.assert(items.All((BottomNavigationBarItem item) => item.title != null) == true,
-                "Every item must have a non-null title"
+                () => "Every item must have a non-null title"
             );
             D.assert(0 <= currentIndex && currentIndex < items.Count);
             this.items = items;

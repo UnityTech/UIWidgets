@@ -26,16 +26,16 @@ namespace Unity.UIWidgets.foundation {
         }
 
         [Conditional("UIWidgets_DEBUG")]
-        public static void assert(Func<bool> result, string message = null) {
+        public static void assert(Func<bool> result, Func<string> message = null) {
             if (!result()) {
-                throw new AssertionError(message);
+                throw new AssertionError(message != null ? message() : "");
             }
         }
 
         [Conditional("UIWidgets_DEBUG")]
-        public static void assert(bool result, string message = null) {
+        public static void assert(bool result, Func<string> message = null) {
             if (!result) {
-                throw new AssertionError(message);
+                throw new AssertionError(message != null ? message() : "");
             }
         }
 

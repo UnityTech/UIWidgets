@@ -99,43 +99,38 @@ namespace Unity.UIWidgets.async {
             return timer;
         }
 
+        static readonly List<TimerImpl> _timers = new List<TimerImpl>();
+        static readonly List<TimerImpl> _appendList = new List<TimerImpl>();
+        
         public void update(Action flushMicroTasks = null) {
             var now = Timer.timeSinceStartup;
 
-            List<TimerImpl> timers = null;
-            List<TimerImpl> appendList = null;
-
+            _timers.Clear();
+            _appendList.Clear();
+                
             lock (this._queue) {
                 while (this._queue.count > 0 && this._queue.peek().deadline <= now) {
                     var timer = this._queue.dequeue();
-                    if (timers == null) {
-                        timers = new List<TimerImpl>();
-                    }
-
-                    timers.Add(timer);
+                    _timers.Add(timer);
                 }
             }
 
-            if (timers != null) {
-                foreach (var timer in timers) {
+            if (_timers.Count != 0) {
+                foreach (var timer in _timers) {
                     if (flushMicroTasks != null) {
                         flushMicroTasks();
                     }
 
                     timer.invoke();
                     if (timer.periodic && !timer.done) {
-                        if (appendList == null) {
-                            appendList = new List<TimerImpl>();
-                        }
-
-                        appendList.Add(timer);
+                        _appendList.Add(timer);
                     }
                 }
             }
 
-            if (appendList != null) {
+            if (_appendList.Count != 0) {
                 lock (this._queue) {
-                    foreach (var timer in appendList) {
+                    foreach (var timer in _appendList) {
                         this._queue.enqueue(timer);
                     }
                 }

@@ -503,7 +503,7 @@ namespace Unity.UIWidgets.material {
         }
 
         protected override void moveChildRenderObject(RenderObject child, object slotValue) {
-            D.assert(false, "not reachable");
+            D.assert(false, () => "not reachable");
         }
     }
 
@@ -697,7 +697,7 @@ namespace Unity.UIWidgets.material {
             return value;
         }
 
-        public new bool sizedByParent {
+        protected override bool sizedByParent {
             get { return false; }
         }
 

@@ -195,7 +195,7 @@ namespace UIWidgets.Runtime.rendering {
 
             string overflowText = "";
             D.assert(overflows.isNotEmpty(),
-                $"Somehow {renderObject.GetType()} didn't actually overflow like it thought it did.");
+                () => $"Somehow {renderObject.GetType()} didn't actually overflow like it thought it did.");
             switch (overflows.Count) {
                 case 1:
                     overflowText = overflows.first();

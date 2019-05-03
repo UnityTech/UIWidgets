@@ -23,7 +23,7 @@ namespace Unity.UIWidgets.widgets {
             DragStartBehavior dragStartBehavior = DragStartBehavior.down
         ) : base(key: key) {
             D.assert(!(controller != null && primary == true),
-                "Primary ScrollViews obtain their ScrollController via inheritance from a PrimaryScrollController widget. " +
+                () => "Primary ScrollViews obtain their ScrollController via inheritance from a PrimaryScrollController widget. " +
                 "You cannot both set primary to true and pass an explicit controller.");
             this.scrollDirection = scrollDirection;
             this.reverse = reverse;

@@ -546,7 +546,7 @@ namespace Unity.UIWidgets.material {
             bool pinned = false,
             bool snap = false
         ) : base(key: key) {
-            D.assert(floating || !snap, "The 'snap' argument only makes sense for floating app bars.");
+            D.assert(floating || !snap, () => "The 'snap' argument only makes sense for floating app bars.");
             this.leading = leading;
             this.automaticallyImplyLeading = true;
             this.title = title;

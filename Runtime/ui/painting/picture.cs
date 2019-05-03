@@ -181,7 +181,6 @@ namespace Unity.UIWidgets.ui {
                             paint.strokeMiterLimit).transform(state.xform);
                     }
                     
-                    
                     if (paint.maskFilter != null && paint.maskFilter.sigma != 0) {
                         float sigma = scale * paint.maskFilter.sigma;
                         float sigma3 = 3 * sigma;
