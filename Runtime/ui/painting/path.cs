@@ -18,7 +18,7 @@ namespace Unity.UIWidgets.ui {
         
         PathCache _cache;
 
-        public Path(int capacity = 0) {
+        public Path(int capacity = 128) {
             this._commands = new List<float>(capacity);
             this._reset();
         }
@@ -1187,30 +1187,6 @@ namespace Unity.UIWidgets.ui {
         clockwise = 2, // which just means the reversed order.
     }
 
-    [Flags]
-    enum PointFlags {
-        corner = 0x01,
-        left = 0x02,
-        bevel = 0x04,
-        innerBevel = 0x08,
-    }
-
-    class PathPoint {
-        public float x, y;
-        public float dx, dy;
-        public float len;
-        public float dmx, dmy;
-        public PointFlags flags;
-    }
-
-    enum PathCommand {
-        moveTo,
-        lineTo,
-        bezierTo,
-        close,
-        winding,
-    }
-
     class _Conic {
         public float x0;
         public float y0;
@@ -1341,6 +1317,30 @@ namespace Unity.UIWidgets.ui {
         }
     }
 
+    enum PathCommand {
+        moveTo,
+        lineTo,
+        bezierTo,
+        close,
+        winding,
+    }
+
+    [Flags]
+    enum PointFlags {
+        corner = 0x01,
+        left = 0x02,
+        bevel = 0x04,
+        innerBevel = 0x08,
+    }
+
+    class PathPoint {
+        public float x, y;
+        public float dx, dy;
+        public float len;
+        public float dmx, dmy;
+        public PointFlags flags;
+    }
+
     class PathPath {
         public int first;
         public int count;
@@ -1430,11 +1430,27 @@ namespace Unity.UIWidgets.ui {
                 y1 = pt.y;
             }
 
+            if (x1 == x2 && x1 == x3 && x1 == x4 &&
+                y1 == y2 && y1 == y3 && y1 == y4) {
+                return;
+            }
+
             var points = TessellationGenerator.tessellateBezier(x1, y1, x2, y2, x3, y3, x4, y4, this._tessTol);
-            D.assert(points.Count > 0);            
-            points[points.Count - 1].flags = flags;
-            foreach (var point in points) {
-                this._addPoint(point);
+            D.assert(points.Count > 0);
+            for (int i = 0; i < points.Count; i++) {
+                var point = points[i];
+                if (i == points.Count - 1) {
+                    this._addPoint(new PathPoint {
+                        x = point.x + x1,
+                        y = point.y + y1,
+                        flags = flags,
+                    });
+                } else {
+                    this._addPoint(new PathPoint {
+                        x = point.x + x1,
+                        y = point.y + y1,
+                    });
+                }
             }
         }
 

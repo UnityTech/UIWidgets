@@ -152,41 +152,49 @@ namespace Unity.UIWidgets.ui {
 
     }
 
-    class GlyphInfo {
+    struct GlyphInfo {
+        public static readonly GlyphInfo empty = new GlyphInfo();
 
-        public static GlyphInfo empty = new GlyphInfo(Rect.zero,0, 0, new Vector2(0, 0), 
-            new Vector2(0, 0), new Vector2(0, 0), new Vector2(0, 0));
-        
-        public readonly Rect rect;
-        public readonly float advance;
-        public readonly float glyphHeight;
-        public readonly Vector2 uvTopLeft;
-        public readonly Vector2 uvTopRight;
-        public readonly Vector2 uvBottomLeft;
-        public readonly Vector2 uvBottomRight;
+        Rect _rect;
+        readonly CharacterInfo _info;
         
         public GlyphInfo(CharacterInfo info) {
-            this.rect = Rect.fromLTRB(info.minX, -info.maxY, info.maxX, -info.minY);
-            this.advance = info.advance;
-            this.glyphHeight = info.glyphHeight;
-            this.uvTopLeft = info.uvTopLeft;
-            this.uvTopRight = info.uvTopRight;
-            this.uvBottomLeft = info.uvBottomLeft;
-            this.uvBottomRight = info.uvBottomRight;
-            
+            this._rect = null;
+            this._info = info;
         }
 
-        public GlyphInfo(Rect rect, float advance, float glyphHeight, 
-            Vector2 uvTopLeft, Vector2 uvTopRight, Vector2 uvBottomLeft, Vector2 uvBottomRight) {
-            this.rect = rect;
-            this.advance = advance;
-            this.glyphHeight = glyphHeight;
-            this.uvTopLeft = uvTopLeft;
-            this.uvTopRight = uvTopRight;
-            this.uvBottomLeft = uvBottomLeft;
-            this.uvBottomRight = uvBottomRight;
+        public Rect rect {
+            get {
+                if (this._rect == null) {
+                    this._rect = Rect.fromLTRB(this._info.minX, -this._info.maxY, this._info.maxX, -this._info.minY);
+                }
+                return this._rect;
+            }
         }
-            
+
+        public float advance {
+            get { return this._info.advance; }
+        }
+
+        public float glyphHeight {
+            get { return this._info.advance; }
+        }
+
+        public Vector2 uvTopLeft {
+            get { return this._info.uvTopLeft; }
+        }
+
+        public Vector2 uvTopRight {
+            get { return this._info.uvTopRight; }
+        }
+
+        public Vector2 uvBottomLeft {
+            get { return this._info.uvBottomLeft; }
+        }
+
+        public Vector2 uvBottomRight {
+            get { return this._info.uvBottomRight; }
+        }
     }
     
     public static class FontExtension  
