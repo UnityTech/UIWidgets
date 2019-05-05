@@ -90,6 +90,9 @@ namespace Unity.UIWidgets.widgets {
             GestureDragUpdateCallback onPanUpdate = null,
             GestureDragEndCallback onPanEnd = null,
             GestureDragCancelCallback onPanCancel = null,
+            GestureScaleStartCallback onScaleStart = null,
+            GestureScaleUpdateCallback onScaleUpdate = null,
+            GestureScaleEndCallback onScaleEnd = null,
             HitTestBehavior behavior = HitTestBehavior.deferToChild,
             DragStartBehavior dragStartBehavior = DragStartBehavior.down
         ) : base(key) {
@@ -151,6 +154,9 @@ namespace Unity.UIWidgets.widgets {
             this.onPanUpdate = onPanUpdate;
             this.onPanEnd = onPanEnd;
             this.onPanCancel = onPanCancel;
+            this.onScaleStart = onScaleStart;
+            this.onScaleUpdate = onScaleUpdate;
+            this.onScaleEnd = onScaleEnd;
             this.behavior = behavior;
             this.dragStartBehavior = dragStartBehavior;
         }
@@ -181,6 +187,9 @@ namespace Unity.UIWidgets.widgets {
         public readonly GestureDragUpdateCallback onPanUpdate;
         public readonly GestureDragEndCallback onPanEnd;
         public readonly GestureDragCancelCallback onPanCancel;
+        public readonly GestureScaleStartCallback onScaleStart;
+        public readonly GestureScaleUpdateCallback onScaleUpdate;
+        public readonly GestureScaleEndCallback onScaleEnd;
         public readonly HitTestBehavior behavior;
         public readonly DragStartBehavior dragStartBehavior;
 
@@ -283,6 +292,20 @@ namespace Unity.UIWidgets.widgets {
                             instance.onEnd = this.onPanEnd;
                             instance.onCancel = this.onPanCancel;
                             instance.dragStartBehavior = this.dragStartBehavior;
+                        }
+                    );
+            }
+
+            if (this.onScaleStart != null ||
+                this.onScaleUpdate != null ||
+                this.onScaleEnd != null) {
+                gestures[typeof(ScaleGestureRecognizer)] = 
+                    new GestureRecognizerFactoryWithHandlers<ScaleGestureRecognizer>(
+                        () => new ScaleGestureRecognizer(debugOwner: this),
+                        instance => {
+                            instance.onStart = this.onScaleStart;
+                            instance.onUpdate = this.onScaleUpdate;
+                            instance.onEnd = this.onScaleEnd;
                         }
                     );
             }
