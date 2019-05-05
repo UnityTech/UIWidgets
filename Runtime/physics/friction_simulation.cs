@@ -35,7 +35,7 @@ namespace Unity.UIWidgets.physics {
         readonly float _v;
 
         static float _dragFor(float startPosition, float endPosition, float startVelocity, float endVelocity) {
-            return Mathf.Pow( Mathf.Epsilon, (startVelocity - endVelocity) / (startPosition - endPosition));
+            return Mathf.Pow(Mathf.Epsilon, (startVelocity - endVelocity) / (startPosition - endPosition));
         }
 
         public override float x(float time) {
