@@ -140,11 +140,11 @@ namespace Unity.UIWidgets.physics {
         readonly float _r, _c1, _c2;
 
         public override float x(float time) {
-            return ((this._c1 + this._c2 * time) * Mathf.Pow((float) Math.E, this._r * time));
+            return ((this._c1 + this._c2 * time) * Mathf.Pow(Mathf.Epsilon, this._r * time));
         }
 
         public override float dx(float time) {
-            float power = Mathf.Pow((float) Math.E, this._r * time);
+            float power = Mathf.Pow(Mathf.Epsilon, this._r * time);
             return (this._r * (this._c1 + this._c2 * time) * power + this._c2 * power);
         }
 
@@ -179,13 +179,13 @@ namespace Unity.UIWidgets.physics {
         readonly float _r1, _r2, _c1, _c2;
 
         public override float x(float time) {
-            return (this._c1 * Mathf.Pow((float) Math.E, this._r1 * time) +
-                    this._c2 * Mathf.Pow((float) Math.E, this._r2 * time));
+            return (this._c1 * Mathf.Pow(Mathf.Epsilon, this._r1 * time) +
+                    this._c2 * Mathf.Pow(Mathf.Epsilon, this._r2 * time));
         }
 
         public override float dx(float time) {
-            return (this._c1 * this._r1 * Mathf.Pow((float) Math.E, this._r1 * time) +
-                    this._c2 * this._r2 * Mathf.Pow((float) Math.E, this._r2 * time));
+            return (this._c1 * this._r1 * Mathf.Pow(Mathf.Epsilon, this._r1 * time) +
+                    this._c2 * this._r2 * Mathf.Pow(Mathf.Epsilon, this._r2 * time));
         }
 
         public override SpringType type {
@@ -219,12 +219,12 @@ namespace Unity.UIWidgets.physics {
         readonly float _w, _r, _c1, _c2;
 
         public override float x(float time) {
-            return (Mathf.Pow((float) Math.E, this._r * time) *
+            return (Mathf.Pow(Mathf.Epsilon, this._r * time) *
                     (this._c1 * Mathf.Cos(this._w * time) + this._c2 * Mathf.Sin(this._w * time)));
         }
 
         public override float dx(float time) {
-            float power = Mathf.Pow((float) Math.E, this._r * time);
+            float power = Mathf.Pow(Mathf.Epsilon, this._r * time);
             float cosine = Mathf.Cos(this._w * time);
             float sine = Mathf.Sin(this._w * time);
             return (power * (this._c2 * this._w * cosine - this._c1 * this._w * sine) +

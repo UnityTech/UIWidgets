@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 using Unity.UIWidgets.foundation;
+using UnityEngine;
 
 namespace Unity.UIWidgets.service {
     public abstract class TextInputFormatter {
@@ -60,8 +61,8 @@ namespace Unity.UIWidgets.service {
         public override TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
             if (this.maxLength != null && this.maxLength > 0 && newValue.text.Length > this.maxLength) {
                 TextSelection newSelection = newValue.selection.copyWith(
-                    baseOffset: Math.Min(newValue.selection.start, this.maxLength.Value),
-                    extentOffset: Math.Min(newValue.selection.end, this.maxLength.Value)
+                    baseOffset: Mathf.Min(newValue.selection.start, this.maxLength.Value),
+                    extentOffset: Mathf.Min(newValue.selection.end, this.maxLength.Value)
                 );
                 
                 string truncated = newValue.text.Substring(0, this.maxLength.Value);

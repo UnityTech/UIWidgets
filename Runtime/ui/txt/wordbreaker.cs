@@ -78,7 +78,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void finish() {
-            this._text = null;
+            this._text = default;
         }
 
         int _findNextBreakInEmailOrUrl() {
