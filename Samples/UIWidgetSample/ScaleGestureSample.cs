@@ -26,7 +26,7 @@ namespace UIWidgetsSample {
         }
     }
 
-    class ScaleGesturePanelState : State<HoverMainPanel> {
+    class ScaleGesturePanelState : State<ScaleGesturePanel> {
         float scaleValue = 1.0f;
 
         public override Widget build(BuildContext context) {

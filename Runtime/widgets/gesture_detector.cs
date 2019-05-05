@@ -107,16 +107,25 @@ namespace Unity.UIWidgets.widgets {
                 bool haveLongPressDrag = onLongPressDragStart != null || onLongPressDragUpdate != null ||
                                          onLongPressDragUp != null;
                 bool havePan = onPanStart != null || onPanUpdate != null || onPanEnd != null;
-                if (havePan) {
+                bool haveScale = onScaleStart != null || onScaleUpdate != null || onScaleEnd != null;
+                if (havePan || haveScale) {
+                    if (havePan && haveScale) {
+                        throw new UIWidgetsError(
+                            "Incorrect GestureDetector arguments.\n" +
+                            "Having both a pan gesture recognizer and a scale gesture recognizer is redundant; scale is a superset of pan. Just use the scale gesture recognizer."
+                            );
+                    }
+                    
+                    string recognizer = havePan ? "pan" : "scale";
                     if (haveVerticalDrag && haveHorizontalDrag) {
                         throw new UIWidgetsError(
                             "Incorrect GestureDetector arguments.\n" +
-                            "Simultaneously having a vertical drag gesture recognizer, a horizontal drag gesture recognizer, and a pan gesture recognizer " +
-                            "will result in the pan gesture recognizer being ignored, since the other two will catch all drags."
+                            $"Simultaneously having a vertical drag gesture recognizer, a horizontal drag gesture recognizer, and a {recognizer} gesture recognizer " +
+                            $"will result in the {recognizer} gesture recognizer being ignored, since the other two will catch all drags."
                         );
                     }
                 }
-
+                
                 if (haveLongPress && haveLongPressDrag) {
                     throw new UIWidgetsError(
                         "Incorrect GestureDetector arguments.\n" +
