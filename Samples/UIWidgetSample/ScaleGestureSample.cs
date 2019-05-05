@@ -1,7 +1,5 @@
 using System.Collections.Generic;
-using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.material;
-using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
@@ -13,7 +11,7 @@ namespace UIWidgetsSample {
             return new MaterialApp(
                 showPerformanceOverlay: false,
                 home: new ScaleGesturePanel()
-                );
+            );
         }
 
         protected override void OnEnable() {
@@ -30,7 +28,7 @@ namespace UIWidgetsSample {
 
     class ScaleGesturePanelState : State<HoverMainPanel> {
         float scaleValue = 1.0f;
-        
+
         public override Widget build(BuildContext context) {
             return new Scaffold(
                 appBar: new AppBar(
@@ -44,9 +42,7 @@ namespace UIWidgetsSample {
                         Debug.Log("Scale value = " + scaleDetails.scale);
                         this.setState(() => { this.scaleValue = scaleDetails.scale; });
                     },
-                    onScaleEnd: scaleDetails => {
-                        Debug.Log("Scale End");
-                    },
+                    onScaleEnd: scaleDetails => { Debug.Log("Scale End"); },
                     child: new Card(
                         color: Colors.white,
                         child: new Center(
@@ -57,13 +53,11 @@ namespace UIWidgetsSample {
                                     new Icon(Unity.UIWidgets.material.Icons.ac_unit, size: 128.0f, color: Colors.black),
                                     new RaisedButton(
                                         child: new Text("Scale: " + this.scaleValue),
-                                        onPressed: () => {
-                                            Debug.Log("Button Pressed");
-                                        })
+                                        onPressed: () => { Debug.Log("Button Pressed"); })
                                 }
                             )
                         ))
-                    )
+                )
             );
         }
     }

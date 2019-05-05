@@ -104,7 +104,8 @@ namespace Unity.UIWidgets.widgets {
                     onHorizontalDragStart != null || onHorizontalDragUpdate != null ||
                     onHorizontalDragEnd != null;
                 bool haveLongPress = onLongPress != null || onLongPressUp != null;
-                bool haveLongPressDrag = onLongPressDragStart != null || onLongPressDragUpdate != null || onLongPressDragUp != null;
+                bool haveLongPressDrag = onLongPressDragStart != null || onLongPressDragUpdate != null ||
+                                         onLongPressDragUp != null;
                 bool havePan = onPanStart != null || onPanUpdate != null || onPanEnd != null;
                 if (havePan) {
                     if (haveVerticalDrag && haveHorizontalDrag) {
@@ -115,14 +116,15 @@ namespace Unity.UIWidgets.widgets {
                         );
                     }
                 }
+
                 if (haveLongPress && haveLongPressDrag) {
                     throw new UIWidgetsError(
-                            "Incorrect GestureDetector arguments.\n" +
-                            "Having both a long press and a long press drag recognizer is " +
-                            "redundant as the long press drag is a superset of long press. " +
-                            "Except long press drag allows for drags after the long press is " +
-                            "triggered."
-                        );
+                        "Incorrect GestureDetector arguments.\n" +
+                        "Having both a long press and a long press drag recognizer is " +
+                        "redundant as the long press drag is a superset of long press. " +
+                        "Except long press drag allows for drags after the long press is " +
+                        "triggered."
+                    );
                 }
 
                 return true;
@@ -227,16 +229,18 @@ namespace Unity.UIWidgets.widgets {
                         instance => { instance.onLongPress = this.onLongPress; }
                     );
             }
-            
-            if (this.onLongPressDragStart != null || this.onLongPressDragUpdate != null || this.onLongPressDragUp != null) {
-                gestures[typeof(LongPressDragGestureRecognizer)] = new GestureRecognizerFactoryWithHandlers<LongPressDragGestureRecognizer>(
-                    () => new LongPressDragGestureRecognizer(debugOwner: this),
-                    (LongPressDragGestureRecognizer instance) => {
-                        instance.onLongPressStart = this.onLongPressDragStart;
-                        instance.onLongPressDragUpdate = this.onLongPressDragUpdate;
-                        instance.onLongPressUp = this.onLongPressDragUp;
-                    }
-                );
+
+            if (this.onLongPressDragStart != null || this.onLongPressDragUpdate != null ||
+                this.onLongPressDragUp != null) {
+                gestures[typeof(LongPressDragGestureRecognizer)] =
+                    new GestureRecognizerFactoryWithHandlers<LongPressDragGestureRecognizer>(
+                        () => new LongPressDragGestureRecognizer(debugOwner: this),
+                        (LongPressDragGestureRecognizer instance) => {
+                            instance.onLongPressStart = this.onLongPressDragStart;
+                            instance.onLongPressDragUpdate = this.onLongPressDragUpdate;
+                            instance.onLongPressUp = this.onLongPressDragUp;
+                        }
+                    );
             }
 
             if (this.onVerticalDragDown != null ||
@@ -299,7 +303,7 @@ namespace Unity.UIWidgets.widgets {
             if (this.onScaleStart != null ||
                 this.onScaleUpdate != null ||
                 this.onScaleEnd != null) {
-                gestures[typeof(ScaleGestureRecognizer)] = 
+                gestures[typeof(ScaleGestureRecognizer)] =
                     new GestureRecognizerFactoryWithHandlers<ScaleGestureRecognizer>(
                         () => new ScaleGestureRecognizer(debugOwner: this),
                         instance => {
@@ -399,8 +403,8 @@ namespace Unity.UIWidgets.widgets {
                     : gestures[type].constructorRaw();
                 D.assert(this._recognizers[type].GetType() == type,
                     () => "GestureRecognizerFactory of type " + type + " created a GestureRecognizer of type " +
-                    this._recognizers[type].GetType() +
-                    ". The GestureRecognizerFactory must be specialized with the type of the class that it returns from its constructor method.");
+                          this._recognizers[type].GetType() +
+                          ". The GestureRecognizerFactory must be specialized with the type of the class that it returns from its constructor method.");
                 gestures[type].initializerRaw(this._recognizers[type]);
             }
 

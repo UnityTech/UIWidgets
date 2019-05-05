@@ -9,7 +9,7 @@ namespace Unity.UIWidgets.gestures {
         public const float kDoubleTapSlop = 100.0f;
 
         public const float kPanSlop = kTouchSlop * 2.0f;
-        
+
         public const float kScaleSlop = kTouchSlop;
 
         public static readonly TimeSpan kPressTimeout = new TimeSpan(0, 0, 0, 0, 100);
