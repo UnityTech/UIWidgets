@@ -14,7 +14,7 @@ using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace UIWidgetsSample {
     public class MaterialSample : UIWidgetsSamplePanel {
-        const int testCaseId = 7;
+        const int testCaseId = 6;
 
         readonly List<Widget> testCases = new List<Widget> {
             new MaterialButtonWidget(),
@@ -420,7 +420,7 @@ namespace UIWidgetsSample {
 
     public class MaterialSliderState : State<MaterialSliderWidget> {
 
-        float _value = 0.0f;
+        float _value = 0.8f;
 
         void onChanged(float value) {
             this.setState(() => { this._value = value; });
@@ -432,10 +432,16 @@ namespace UIWidgetsSample {
                     title: new Text("Slider and Indicators")),
                 body: new Column(
                     children: new List<Widget> {
-                        new Container(
+                        new Padding(
+                            padding: EdgeInsets.only(top: 100.0f),
+                            child: new Container(
                             child: new Slider(
+                                divisions: 10,
+                                min: 0.4f,
+                                label: "Here",
                                 value: this._value,
                                 onChanged: this.onChanged))
+                            )
                     }
                 )
             );
