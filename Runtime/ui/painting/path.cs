@@ -1555,10 +1555,6 @@ namespace Unity.UIWidgets.ui {
         public MeshMesh getFillMesh(out bool convex) {
             if (this._fillMesh != null) {
                 convex = this._fillConvex;
-
-                if (this._strokeMesh != null) {
-                    Debug.Log("bingo!");
-                }
                 return this._fillMesh;
             }
 
@@ -1799,11 +1795,6 @@ namespace Unity.UIWidgets.ui {
                 this._lineCap == lineCap &&
                 this._lineJoin == lineJoin &&
                 this._miterLimit == miterLimit) {
-                
-                if (this._fillMesh != null) {
-                    Debug.Log("bingo!");
-                }
-
                 return this._strokeMesh;
             }
 

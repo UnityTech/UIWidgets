@@ -877,11 +877,8 @@ namespace Unity.UIWidgets.rendering {
 
         public TextPosition getParagraphBackward(TextPosition position, TextAffinity? affinity = null) {
             var lineCount = this._textPainter.getLineCount();
-            if (lineCount == 0) {
-                return new TextPosition(position.offset, affinity ?? position.affinity);
-            }
             
-            Paragraph.LineRange line = default;
+            Paragraph.LineRange line = null;
             for (int i = lineCount - 1; i >= 0; --i) {
                 line = this._textPainter.getLineRange(i);
                 if (i != 0 && !this._textPainter.getLineRange(i - 1).hardBreak) {

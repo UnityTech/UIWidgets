@@ -36,7 +36,7 @@ namespace Unity.UIWidgets.ui {
             this._advances.reset(count);
             this._positions.reset(count);
             this._advance = 0;
-            this._bounds = UnityEngine.Rect.zero;
+            this._bounds = default;
             
             var font = FontManager.instance.getOrCreate(style.fontFamily, style.fontWeight, style.fontStyle).font;
             font.RequestCharactersInTextureSafe(buff.text, style.UnityFontSize, style.UnityFontStyle);
