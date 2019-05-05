@@ -1333,7 +1333,7 @@ namespace Unity.UIWidgets.ui {
         innerBevel = 0x08,
     }
 
-    class PathPoint {
+    struct PathPoint {
         public float x, y;
         public float dx, dy;
         public float len;
@@ -1341,7 +1341,7 @@ namespace Unity.UIWidgets.ui {
         public PointFlags flags;
     }
 
-    class PathPath {
+    struct PathPath {
         public int first;
         public int count;
         public bool closed;
@@ -1401,10 +1401,10 @@ namespace Unity.UIWidgets.ui {
                 this.addPath();
                 this.addPoint(0, 0, PointFlags.corner);
             }
-
-            var path = this._paths[this._paths.Count - 1];
+            
+            ref var path = ref this._paths.refAt(this._paths.Count - 1);
             if (path.count > 0) {
-                var pt = this._points[this._points.Count - 1];
+                ref var pt = ref this._points.refAt(this._points.Count - 1);
                 if (PathUtils.ptEquals(pt.x, pt.y, point.x, point.y, this._distTol)) {
                     pt.flags |= point.flags;
                     return;
@@ -1425,7 +1425,7 @@ namespace Unity.UIWidgets.ui {
                 y1 = 0;
             }
             else {
-                var pt = this._points[this._points.Count - 1];
+                ref var pt = ref this._points.refAt(this._points.Count - 1);
                 x1 = pt.x;
                 y1 = pt.y;
             }
@@ -1459,7 +1459,7 @@ namespace Unity.UIWidgets.ui {
                 return;
             }
 
-            var path = this._paths[this._paths.Count - 1];
+            ref var path = ref this._paths.refAt(this._paths.Count - 1);
             path.closed = true;
         }
 
@@ -1468,13 +1468,15 @@ namespace Unity.UIWidgets.ui {
                 return;
             }
 
-            var path = this._paths[this._paths.Count - 1];
+            ref var path = ref this._paths.refAt(this._paths.Count - 1);
             path.winding = winding;
         }
 
         public void normalize() {
-            for (var j = 0; j < this._paths.Count; j++) {
-                var path = this._paths[j];
+            var points = this._points.array();
+            var paths = this._paths.array();            
+            for (var j = 0; j < paths.Length; j++) {
+                ref var path = ref paths[j];
                 if (path.count <= 1) {
                     continue;
                 }
@@ -1482,8 +1484,8 @@ namespace Unity.UIWidgets.ui {
                 var ip0 = path.first + path.count - 1;
                 var ip1 = path.first;
 
-                var p0 = this._points[ip0];
-                var p1 = this._points[ip1];
+                ref var p0 = ref points[ip0];
+                ref var p1 = ref points[ip1];
                 if (PathUtils.ptEquals(p0.x, p0.y, p1.x, p1.y, this._distTol)) {
                     path.count--;
                     path.closed = true;
@@ -1498,8 +1500,10 @@ namespace Unity.UIWidgets.ui {
         }
 
         void _expandFill() {
-            for (var j = 0; j < this._paths.Count; j++) {
-                var path = this._paths[j];
+            var points = this._points.array();
+            var paths = this._paths.array();
+            for (var j = 0; j < paths.Length; j++) {
+                ref var path = ref paths[j];
                 if (path.count <= 2) {
                     continue;
                 }
@@ -1507,8 +1511,8 @@ namespace Unity.UIWidgets.ui {
                 var ip0 = path.first + path.count - 1;
                 var ip1 = path.first;
                 for (var i = 0; i < path.count; i++) {
-                    var p0 = this._points[ip0];
-                    var p1 = this._points[ip1];
+                    ref var p0 = ref points[ip0];
+                    ref var p1 = ref points[ip1];
                     p0.dx = p1.x - p0.x; // no need to normalize
                     p0.dy = p1.y - p0.y;
                     ip0 = ip1++;
@@ -1519,8 +1523,8 @@ namespace Unity.UIWidgets.ui {
                 ip0 = path.first + path.count - 1;
                 ip1 = path.first;
                 for (var i = 0; i < path.count; i++) {
-                    var p0 = this._points[ip0];
-                    var p1 = this._points[ip1];
+                    ref var p0 = ref points[ip0];
+                    ref var p1 = ref points[ip1];
 
                     float cross = p1.dx * p0.dy - p0.dx * p1.dy;
                     if (cross < 0.0f) {
@@ -1532,15 +1536,15 @@ namespace Unity.UIWidgets.ui {
             }
 
             this._vertices.Clear();
-            for (var i = 0; i < this._paths.Count; i++) {
-                var path = this._paths[i];
+            for (var i = 0; i < paths.Length; i++) {
+                ref var path = ref paths[i];
                 if (path.count <= 2) {
                     continue;
                 }
 
                 path.ifill = this._vertices.Count;
                 for (var j = 0; j < path.count; j++) {
-                    var p = this._points[path.first + j];
+                    ref var p = ref points[path.first + j];
                     this._vertices.Add(new Vector2(p.x, p.y));
                 }
 
@@ -1556,9 +1560,11 @@ namespace Unity.UIWidgets.ui {
 
             this._expandFill();
 
+            var paths = this._paths.array();
+            
             var cindices = 0;
-            for (var i = 0; i < this._paths.Count; i++) {
-                var path = this._paths[i];
+            for (var i = 0; i < paths.Length; i++) {
+                ref var path = ref paths[i];
                 if (path.count <= 2) {
                     continue;
                 }
@@ -1570,8 +1576,8 @@ namespace Unity.UIWidgets.ui {
             }
 
             var indices = new List<int>(cindices);
-            for (var i = 0; i < this._paths.Count; i++) {
-                var path = this._paths[i];
+            for (var i = 0; i < paths.Length; i++) {
+                ref var path = ref paths[i];
                 if (path.count <= 2) {
                     continue;
                 }
@@ -1591,8 +1597,8 @@ namespace Unity.UIWidgets.ui {
             this._fillMesh = mesh;
 
             this._fillConvex = false;
-            for (var i = 0; i < this._paths.Count; i++) {
-                var path = this._paths[i];
+            for (var i = 0; i < paths.Length; i++) {
+                ref var path = ref paths[i];
                 if (path.count <= 2) {
                     continue;
                 }
@@ -1618,8 +1624,10 @@ namespace Unity.UIWidgets.ui {
         void _calculateJoins(float w, StrokeJoin lineJoin, float miterLimit) {
             float iw = w > 0.0f ? 1.0f / w : 0.0f;
 
-            for (var i = 0; i < this._paths.Count; i++) {
-                var path = this._paths[i];
+            var points = this._points.array();
+            var paths = this._paths.array();
+            for (var i = 0; i < paths.Length; i++) {
+                ref var path = ref paths[i];
                 if (path.count <= 1) {
                     continue;
                 }
@@ -1628,8 +1636,8 @@ namespace Unity.UIWidgets.ui {
                 var ip1 = path.first;
 
                 for (var j = 0; j < path.count; j++) {
-                    var p0 = this._points[ip0];
-                    var p1 = this._points[ip1];
+                    ref var p0 = ref points[ip0];
+                    ref var p1 = ref points[ip1];
                     p0.dx = p1.x - p0.x;
                     p0.dy = p1.y - p0.y;
                     p0.len = PathUtils.normalize(ref p0.dx, ref p0.dy);
@@ -1639,8 +1647,8 @@ namespace Unity.UIWidgets.ui {
                 ip0 = path.first + path.count - 1;
                 ip1 = path.first;
                 for (var j = 0; j < path.count; j++) {
-                    var p0 = this._points[ip0];
-                    var p1 = this._points[ip1];
+                    ref var p0 = ref points[ip0];
+                    ref var p1 = ref points[ip1];
                     float dlx0 = p0.dy;
                     float dly0 = -p0.dx;
                     float dlx1 = p1.dy;
@@ -1697,8 +1705,11 @@ namespace Unity.UIWidgets.ui {
             }
 
             this._vertices.Clear();
-            for (var i = 0; i < this._paths.Count; i++) {
-                var path = this._paths[i];
+
+            var points = this._points.array();
+            var paths = this._paths.array();
+            for (var i = 0; i < paths.Length; i++) {
+                ref var path = ref paths[i];
                 if (path.count <= 1) {
                     continue;
                 }
@@ -1719,8 +1730,8 @@ namespace Unity.UIWidgets.ui {
                     e = path.count - 1;
                 }
 
-                var p0 = this._points[ip0];
-                var p1 = this._points[ip1];
+                ref var p0 = ref points[ip0];
+                ref var p1 = ref points[ip1];
 
                 if (!path.closed) {
                     if (lineCap == StrokeCap.butt) {
@@ -1736,8 +1747,8 @@ namespace Unity.UIWidgets.ui {
                 }
 
                 for (var j = s; j < e; j++) {
-                    p0 = this._points[ip0];
-                    p1 = this._points[ip1];
+                    p0 = ref points[ip0];
+                    p1 = ref points[ip1];
 
                     if ((p1.flags & (PointFlags.bevel | PointFlags.innerBevel)) != 0) {
                         if (lineJoin == StrokeJoin.round) {
@@ -1756,8 +1767,8 @@ namespace Unity.UIWidgets.ui {
                 }
 
                 if (!path.closed) {
-                    p0 = this._points[ip0];
-                    p1 = this._points[ip1];
+                    p0 = ref points[ip0];
+                    p1 = ref points[ip1];
                     if (lineCap == StrokeCap.butt) {
                         this._vertices.buttCapEnd(p1, p0.dx, p0.dy, w, 0.0f);
                     }
@@ -1789,9 +1800,11 @@ namespace Unity.UIWidgets.ui {
 
             this._expandStroke(strokeWidth, lineCap, lineJoin, miterLimit);
 
+            var paths = this._paths.array();
+            
             var cindices = 0;
-            for (var i = 0; i < this._paths.Count; i++) {
-                var path = this._paths[i];
+            for (var i = 0; i < paths.Length; i++) {
+                ref var path = ref paths[i];
                 if (path.count <= 1) {
                     continue;
                 }
@@ -1803,8 +1816,8 @@ namespace Unity.UIWidgets.ui {
             }
 
             var indices = new List<int>(cindices);
-            for (var i = 0; i < this._paths.Count; i++) {
-                var path = this._paths[i];
+            for (var i = 0; i < paths.Length; i++) {
+                ref var path = ref paths[i];
                 if (path.count <= 1) {
                     continue;
                 }

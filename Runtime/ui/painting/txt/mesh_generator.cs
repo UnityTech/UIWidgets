@@ -155,11 +155,13 @@ namespace Unity.UIWidgets.ui {
                 if (fontSizeToLoad == 0) {
                     continue;
                 }
-                var glyphInfo = font.getGlyphInfo(ch, fontSizeToLoad, style.UnityFontStyle);
-                var minX = glyphInfo.rect.left / this.scale;
-                var maxX = glyphInfo.rect.right / this.scale;
-                var minY = glyphInfo.rect.top / this.scale;
-                var maxY = glyphInfo.rect.bottom / this.scale;
+                
+                font.getGlyphInfo(ch, out var glyphInfo, fontSizeToLoad, style.UnityFontStyle);
+                
+                var minX = glyphInfo.minX / this.scale;
+                var maxX = glyphInfo.maxX / this.scale;
+                var minY = -glyphInfo.maxY / this.scale;
+                var maxY = -glyphInfo.minY / this.scale;
 
                 var baseIndex = vertices.Count;
 

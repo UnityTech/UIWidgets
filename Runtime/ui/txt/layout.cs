@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
+using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
     
@@ -10,7 +11,7 @@ namespace Unity.UIWidgets.ui {
         List<float> _advances = new List<float>();
         List<float> _positions = new List<float>();
         float _advance;
-        Rect _bounds;
+        UnityEngine.Rect _bounds;
         TabStops _tabStops;
 
 
@@ -32,35 +33,33 @@ namespace Unity.UIWidgets.ui {
         public void doLayout(float offset, TextBuff buff, int start, int count, TextStyle style) {
             this._start = start;
             this._count = count;
-            this._advances.resize(count, 0);
-            this._positions.resize(count, 0);
+            this._advances.reset(count);
+            this._positions.reset(count);
             this._advance = 0;
-            this._bounds = null;
+            this._bounds = default;
             
+            var font = FontManager.instance.getOrCreate(style.fontFamily, style.fontWeight, style.fontStyle).font;
+            font.RequestCharactersInTextureSafe(buff.text, style.UnityFontSize, style.UnityFontStyle);
+
             int wordstart = start == buff.size
                 ? start
                 : LayoutUtils.getPrevWordBreakForCache(buff, start + 1);
             int wordend;
             for (int iter = start; iter < start + count; iter = wordend) {
                 wordend = LayoutUtils.getNextWordBreakForCache(buff, iter);
-                int wordCount = Math.Min(start + count, wordend) - iter;
+                int wordCount = Mathf.Min(start + count, wordend) - iter;
                 this.layoutWord(offset, iter - start,  buff.subBuff(wordstart, wordend - wordstart),
-                    iter - wordstart, wordCount, style);
+                    iter - wordstart, wordCount, style, font);
                 wordstart = wordend;
             }
             this._count = count;
-            
         }
 
         void layoutWord(float offset, int layoutOffset, 
-            TextBuff buff, int start, int wordCount, TextStyle style) {
+            TextBuff buff, int start, int wordCount, TextStyle style, Font font) {
             float wordSpacing =
                 wordCount == 1 && LayoutUtils.isWordSpace(buff.charAt(start)) ? style.wordSpacing : 0;
 
-            var font = FontManager.instance.getOrCreate(style.fontFamily, style.fontWeight, style.fontStyle).font;
-            font.RequestCharactersInTextureSafe(buff.subBuff(start, wordCount).getString(),
-                style.UnityFontSize,
-                style.UnityFontStyle);
             float x = this._advance;
             float letterSpace = style.letterSpacing;
             float letterSpaceHalfLeft = letterSpace * 0.5f;
@@ -78,16 +77,31 @@ namespace Unity.UIWidgets.ui {
                     x += letterSpace;
                 }
 
-                var glyphInfo = font.getGlyphInfo(ch, style.UnityFontSize, style.UnityFontStyle);
-                var rect = glyphInfo.rect;
-                rect = rect.translate(x, 0);
-                if (this._bounds == null || this._bounds.isEmpty) {
-                    this._bounds = rect;
+                if (font.getGlyphInfo(ch, out var glyphInfo, style.UnityFontSize, style.UnityFontStyle)) {
+                    var minX = glyphInfo.minX + x;
+                    var maxX = glyphInfo.maxX + x;
+                    var minY = -glyphInfo.maxY;
+                    var maxY = -glyphInfo.minY;
+
+                    if (this._bounds.width <= 0 || this._bounds.height <= 0) {
+                        this._bounds = UnityEngine.Rect.MinMaxRect(
+                            minX, minY, maxX, maxY);
+                    } else {
+                        if (minX < this._bounds.x) {
+                            this._bounds.x = minX;
+                        }
+                        if (minY < this._bounds.y) {
+                            this._bounds.y = minY;
+                        }
+                        if (maxX > this._bounds.xMax) {
+                            this._bounds.xMax = maxX;
+                        }
+                        if (maxY > this._bounds.yMax) {
+                            this._bounds.yMax = maxY;
+                        }
+                    }
                 }
-                else {
-                    this._bounds = this._bounds.expandToInclude(rect);
-                }
-                
+
                 this._positions[i + layoutOffset] = x;
                 float advance = glyphInfo.advance;
                 if (ch == '\t') {
@@ -133,7 +147,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public Rect getBounds() {
-            return this._bounds;
+            return Rect.fromLTWH(this._bounds.x, this._bounds.y, this._bounds.width, this._bounds.height);
         }
     }
 }

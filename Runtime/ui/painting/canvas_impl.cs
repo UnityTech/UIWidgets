@@ -720,7 +720,7 @@ namespace Unity.UIWidgets.ui {
             
             // request font texture so text mesh could be generated correctly
             var style = textBlob.style;
-            var font = FontManager.instance.getOrCreate(textBlob.style.fontFamily, style.fontWeight, style.fontStyle).font;
+            var font = FontManager.instance.getOrCreate(style.fontFamily, style.fontWeight, style.fontStyle).font;
             var fontSizeToLoad = Mathf.CeilToInt(style.UnityFontSize * scale);
             var subText = textBlob.text.Substring(textBlob.textOffset, textBlob.textSize);
             font.RequestCharactersInTextureSafe(subText, fontSizeToLoad, style.UnityFontStyle);
