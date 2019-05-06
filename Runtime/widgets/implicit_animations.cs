@@ -215,7 +215,7 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public bool _shouldAnimateTween<T2>(Tween<T2> tween, T2 targetValue) {
-            return !targetValue.Equals(tween.end != null ? tween.end : tween.begin);
+            return !targetValue.Equals(tween.end == null ? tween.begin : tween.end);
         }
 
         public void _updateTween<T2>(Tween<T2> tween, T2 targetValue) {
