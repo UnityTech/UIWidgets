@@ -702,23 +702,54 @@ namespace Unity.UIWidgets.ui {
                 return true;
             }
             else {
-                var points = new[] {
-                    this.mapXY(src.left, src.top),
-                    this.mapXY(src.right, src.top),
-                    this.mapXY(src.right, src.bottom),
-                    this.mapXY(src.left, src.bottom),
-                };
+                float x1, y1, x2, y2, x3, y3, x4, y4;
+                this.mapXY(src.left, src.top, out x1, out y1);
+                this.mapXY(src.right, src.top, out x2, out y2);
+                this.mapXY(src.right, src.bottom, out x3, out y3);
+                this.mapXY(src.left, src.bottom, out x4, out y4);
 
-                var minX = points[0].dx;
-                var minY = points[0].dy;
-                var maxX = points[0].dx;
-                var maxY = points[0].dy;
+                var minX = x1;
+                var minY = y1;
+                var maxX = x1;
+                var maxY = y1;
 
-                for (int i = 1; i < 4; ++i) {
-                    minX = Mathf.Min(minX, points[i].dx);
-                    minY = Mathf.Min(minY, points[i].dy);
-                    maxX = Mathf.Max(maxX, points[i].dx);
-                    maxY = Mathf.Max(maxY, points[i].dy);
+                if (x2 < minX) {
+                    minX = x2;
+                }
+                if (x2 > maxX) {
+                    maxX = x2;
+                }
+                if (y2 < minY) {
+                    minY = y2;
+                }
+                if (y2 > maxY) {
+                    maxY = y2;
+                }
+
+                if (x3 < minX) {
+                    minX = x3;
+                }
+                if (x3 > maxX) {
+                    maxX = x3;
+                }
+                if (y3 < minY) {
+                    minY = y3;
+                }
+                if (y3 > maxY) {
+                    maxY = y3;
+                }
+
+                if (x4 < minX) {
+                    minX = x4;
+                }
+                if (x4 > maxX) {
+                    maxX = x4;
+                }
+                if (y4 < minY) {
+                    minY = y4;
+                }
+                if (y4 > maxY) {
+                    maxY = y4;
                 }
 
                 dst = Rect.fromLTRB(minX, minY, maxX, maxY);
