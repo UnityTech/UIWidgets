@@ -186,6 +186,17 @@ namespace Unity.UIWidgets.animation {
         }
     }
 
+    public class NullableFloatTween : Tween<float?> {
+        public NullableFloatTween(float? begin = null, float? end = null) : base(begin: begin, end: end) {
+        }
+
+        public override float? lerp(float t) {
+            D.assert(this.begin != null);
+            D.assert(this.end != null);
+            return this.begin + (this.end - this.begin) * t;
+        }
+    }
+
     public class FloatTween : Tween<float> {
         public FloatTween(float begin, float end) : base(begin: begin, end: end) {
         }
