@@ -191,6 +191,8 @@ namespace Unity.UIWidgets.animation {
         }
 
         public override float? lerp(float t) {
+            D.assert(this.begin != null);
+            D.assert(this.end != null);
             return this.begin + (this.end - this.begin) * t;
         }
     }

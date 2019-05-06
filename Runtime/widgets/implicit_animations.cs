@@ -215,13 +215,7 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public bool _shouldAnimateTween<T2>(Tween<T2> tween, T2 targetValue) {
-            var curTargetValue = tween.end;
-            
-            if (tween.end == null || typeof(T2) == typeof(float) &&
-                (float) Convert.ChangeType(tween.end, typeof(float)) == -1.0f) {
-                curTargetValue = tween.begin;
-            }
-            return !targetValue.Equals(curTargetValue);
+            return !targetValue.Equals(tween.end != null ? tween.end : tween.begin);
         }
 
         public void _updateTween<T2>(Tween<T2> tween, T2 targetValue) {
@@ -472,16 +466,18 @@ namespace Unity.UIWidgets.widgets {
     }
 
     class _AnimatedOpacityState : ImplicitlyAnimatedWidgetState<AnimatedOpacity> {
-        FloatTween _opacity;
+        NullableFloatTween _opacity;
         Animation<float> _opacityAnimation;
 
         protected override void forEachTween(TweenVisitor visitor) {
-            this._opacity = (FloatTween) visitor.visit(this, this._opacity, this.widget.opacity,
-                (float value) => new FloatTween(begin: value, end: -1.0f));
+            this._opacity = (NullableFloatTween) visitor.visit(this, this._opacity, this.widget.opacity,
+                (float? value) => new NullableFloatTween(begin: value));
         }
 
         protected override void didUpdateTweens() {
-            this._opacityAnimation = this.animation.drive(this._opacity);
+            float? endValue = this._opacity.end ?? this._opacity.begin ?? null;
+            D.assert(endValue != null);
+            this._opacityAnimation = this.animation.drive(new FloatTween(begin: this._opacity.begin.Value, end: endValue.Value));
         }
 
         public override Widget build(BuildContext context) {
