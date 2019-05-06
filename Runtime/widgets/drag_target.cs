@@ -5,7 +5,6 @@ using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
-using Unity.UIWidgets.utils;
 
 namespace Unity.UIWidgets.widgets {
     public delegate bool DragTargetWillAccept<T>(T data);
@@ -23,6 +22,12 @@ namespace Unity.UIWidgets.widgets {
     public enum DragAnchor {
         child,
         pointer
+    }
+    
+    static class _DragUtils {
+        public static List<T> _mapAvatarsToData<T>(List<_DragAvatar<T>> avatars) {
+            return avatars.Select(avatar => avatar.data).ToList();
+        }
     }
 
     public class Draggable<T> : StatefulWidget {
@@ -364,8 +369,8 @@ namespace Unity.UIWidgets.widgets {
             return new MetaData(
                 metaData: this,
                 behavior: HitTestBehavior.translucent,
-                child: this.widget.builder(context, DragUtils._mapAvatarsToData(this._candidateAvatars),
-                    DragUtils._mapAvatarsToData(this._rejectedAvatars)));
+                child: this.widget.builder(context, _DragUtils._mapAvatarsToData(this._candidateAvatars),
+                    _DragUtils._mapAvatarsToData(this._rejectedAvatars)));
         }
     }
 
