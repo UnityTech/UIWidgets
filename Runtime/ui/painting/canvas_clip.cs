@@ -91,46 +91,50 @@ namespace Unity.UIWidgets.ui {
             return this._genId;
         }
 
-//        bool _convexContains(float x, float y) {
-//            if (this.mesh.vertices.Count <= 2) {
-//                return false;
-//            }
-//
-//            if (this.mesh.matrix != null) {
-//                if (this._invMat == null) {
-//                    this._invMat = Matrix3.I();
-//                    this.mesh.matrix.invert(this._invMat); // ignore if not invertible for now.
-//                }
-//                
-//                var offset = this._invMat.mapXY(x, y);
-//                x = offset.dx;
-//                y = offset.dy;
-//            }
-//
-//            for (var i = 0; i < this.mesh.vertices.Count; i++) {
-//                var p0 = this.mesh.vertices[i];
-//                var p1 = this.mesh.vertices[i == this.mesh.vertices.Count - 1 ? 0 : i + 1];
-//
-//                if (PathUtils.triarea2(p0.x, p0.y, p1.x, p1.y, x, y) < 0.0f) {
-//                    return false;
-//                }
-//            }
-//
-//            return true;
-//        }
+        bool _convexContains(Rect rect) {
+            if (this.mesh.vertices.Count <= 2) {
+                return false;
+            }
+            
+            for (var i = 0; i < this.mesh.vertices.Count; i++) {
+                var p1 = this.mesh.vertices[i];
+                var p0 = this.mesh.vertices[i == this.mesh.vertices.Count - 1 ? 0 : i + 1];
+                
+                var v = p1 - p0;
+                if (v.x == 0.0 && v.y == 0.0) {
+                    continue;
+                }
+                
+                float yL = v.y * (rect.left - p0.x);
+                float xT = v.x * (rect.top - p0.y);
+                float yR = v.y * (rect.right - p0.x);
+                float xB = v.x * (rect.bottom - p0.y);
+                
+                if ((xT < yL) || (xT < yR) || (xB < yL) || (xB < yR)) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
 
         public bool contains(Rect rect) {
             if (this.isRect) {
                 return this.rect.contains(rect);
             }
 
-//            this seems to be inefficient. disable it for now.
-//            if (this.convex) {
-//                return this._convexContains(rect.left, rect.top) &&
-//                       this._convexContains(rect.left, rect.bottom) &&
-//                       this._convexContains(rect.right, rect.top) &&
-//                       this._convexContains(rect.right, rect.bottom);
-//            }
+            if (this.convex) {
+                if (this.mesh.matrix != null && !this.mesh.matrix.isIdentity()) {
+                    if (this._invMat == null) {
+                        this._invMat = Matrix3.I();
+                        this.mesh.matrix.invert(this._invMat); // ignore if not invertible for now.
+                    }
+                
+                    rect = this._invMat.mapRect(rect);
+                }
+
+                return this._convexContains(rect);
+            }
 
             return false;
         }

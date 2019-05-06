@@ -168,6 +168,8 @@ namespace Unity.UIWidgets.ui {
             public int level;
         }
 
+        static readonly Stack<_StackData> _stack = new Stack<_StackData>();
+
         static List<Vector2> _tessellateBezier(
             float x1, float y1, float x2, float y2,
             float x3, float y3, float x4, float y4,
@@ -181,13 +183,13 @@ namespace Unity.UIWidgets.ui {
 
             var points = new List<Vector2>();
 
-            var stack = new Stack<_StackData>();
-            stack.Push(new _StackData {
+            _stack.Clear();
+            _stack.Push(new _StackData {
                 x1 = 0, y1 = 0, x2 = x2, y2 = y2, x3 = x3, y3 = y3, x4 = x4, y4 = y4, level = 0,
             });
 
-            while (stack.Count > 0) {
-                var stackData = stack.Pop();
+            while (_stack.Count > 0) {
+                var stackData = _stack.Pop();
                 x1 = stackData.x1;
                 y1 = stackData.y1;
                 x2 = stackData.x2;
@@ -222,11 +224,11 @@ namespace Unity.UIWidgets.ui {
                 float y1234 = (y123 + y234) * 0.5f;
 
                 if (level < 10) {
-                    stack.Push(new _StackData {
+                    _stack.Push(new _StackData {
                         x1 = x1234, y1 = y1234, x2 = x234, y2 = y234, x3 = x34, y3 = y34, x4 = x4, y4 = y4,
                         level = level + 1,
                     });
-                    stack.Push(new _StackData {
+                    _stack.Push(new _StackData {
                         x1 = x1, y1 = y1, x2 = x12, y2 = y12, x3 = x123, y3 = y123, x4 = x1234, y4 = y1234,
                         level = level + 1,
                     });
