@@ -215,7 +215,13 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public bool _shouldAnimateTween<T2>(Tween<T2> tween, T2 targetValue) {
-            return !targetValue.Equals(tween.end == null ? tween.begin : tween.end);
+            var curTargetValue = tween.end;
+            
+            if (tween.end == null || typeof(T2) == typeof(float) &&
+                (float) Convert.ChangeType(tween.end, typeof(float)) == -1.0f) {
+                curTargetValue = tween.begin;
+            }
+            return !targetValue.Equals(curTargetValue);
         }
 
         public void _updateTween<T2>(Tween<T2> tween, T2 targetValue) {
@@ -471,7 +477,7 @@ namespace Unity.UIWidgets.widgets {
 
         protected override void forEachTween(TweenVisitor visitor) {
             this._opacity = (FloatTween) visitor.visit(this, this._opacity, this.widget.opacity,
-                (float value) => new FloatTween(begin: value, end: 1.0f));
+                (float value) => new FloatTween(begin: value, end: -1.0f));
         }
 
         protected override void didUpdateTweens() {
