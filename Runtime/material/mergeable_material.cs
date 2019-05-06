@@ -4,7 +4,6 @@ using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
-using Unity.UIWidgets.utils;
 using Unity.UIWidgets.widgets;
 
 namespace Unity.UIWidgets.material {
