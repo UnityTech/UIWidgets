@@ -32,7 +32,7 @@ namespace UIWidgets.Runtime.rendering {
 
         int _quarterTurns;
 
-        public bool _isVertical {
+        bool _isVertical {
             get { return this.quarterTurns % 2 == 1; }
         }
 
