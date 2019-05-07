@@ -93,7 +93,7 @@ namespace Unity.UIWidgets.gestures {
             int pointerStartId = 0,
             Offset pointerEndLocation = null,
             int pointerEndId = 1) {
-            pointerStartLocation = pointerEndLocation ?? Offset.zero;
+            pointerStartLocation = pointerStartLocation ?? Offset.zero;
             pointerEndLocation = pointerEndLocation ?? Offset.zero;
 
             D.assert(pointerStartId != pointerEndId);
