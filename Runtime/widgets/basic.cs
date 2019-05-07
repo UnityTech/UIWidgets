@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UIWidgets.Runtime.rendering;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
@@ -661,15 +662,11 @@ namespace Unity.UIWidgets.widgets {
         public readonly float? stepHeight;
 
         float? _stepWidth {
-            get {
-                return this.stepWidth == 0.0f ? null : this.stepWidth;
-            }
+            get { return this.stepWidth == 0.0f ? null : this.stepWidth; }
         }
-        
+
         float? _stepHeight {
-            get {
-                return this.stepHeight == 0.0f ? null : this.stepHeight;
-            }
+            get { return this.stepHeight == 0.0f ? null : this.stepHeight; }
         }
 
         public override RenderObject createRenderObject(BuildContext context) {
@@ -1234,6 +1231,28 @@ namespace Unity.UIWidgets.widgets {
             properties.add(new FloatProperty("elevation", this.elevation));
             properties.add(new DiagnosticsProperty<Color>("color", this.color));
             properties.add(new DiagnosticsProperty<Color>("shadowColor", this.shadowColor));
+        }
+    }
+
+    public class RotatedBox : SingleChildRenderObjectWidget {
+        public RotatedBox(
+            Key key = null,
+            int? quarterTurns = null,
+            Widget child = null
+        ) : base(key: key, child: child) {
+            D.assert(quarterTurns != null);
+            this.quarterTurns = quarterTurns;
+        }
+
+
+        public readonly int? quarterTurns;
+
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderRotatedBox(this.quarterTurns ?? 0);
+        }
+
+        public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
+            (renderObject as RenderRotatedBox).quarterTurns = this.quarterTurns ?? 0;
         }
     }
 
