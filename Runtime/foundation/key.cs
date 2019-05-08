@@ -9,6 +9,18 @@ namespace Unity.UIWidgets.foundation {
         public static Key key(string value) {
             return new ValueKey<string>(value);
         }
+
+        public virtual bool Equals(Key other) {
+            return base.Equals(other);
+        }
+
+        public static bool operator ==(Key left, Key right) {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(Key left, Key right) {
+            return !Equals(left, right);
+        }
     }
 
     public abstract class LocalKey : Key {
@@ -22,6 +34,24 @@ namespace Unity.UIWidgets.foundation {
         }
 
         public readonly T value;
+
+        public override bool Equals(Key other) {
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
+
+            if (other.GetType() != typeof(ValueKey<T>)) {
+                return false;
+            }
+
+            ValueKey<T> valueKey = (ValueKey<T>) other;
+
+            return this.Equals(valueKey);
+        }
 
         public bool Equals(ValueKey<T> other) {
             if (ReferenceEquals(null, other)) {
