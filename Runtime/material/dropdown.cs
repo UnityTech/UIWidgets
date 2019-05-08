@@ -709,22 +709,22 @@ namespace Unity.UIWidgets.material {
         }
     }
 
-    public class DropdownButtonFormField<T> : FormField<T> where T : class {
+    public class DropdownButtonFormField<T> : FormField where T : class {
         public DropdownButtonFormField(
             Key key = null,
             T value = null,
             List<DropdownMenuItem<T>> items = null,
             ValueChanged<T> onChanged = null,
             InputDecoration decoration = null,
-            FormFieldSetter<T> onSaved = null,
-            FormFieldValidator<T> validator = null,
+            FormFieldSetter onSaved = null,
+            FormFieldValidator validator = null,
             Widget hint = null
         ) : base(
             key: key,
             onSaved: onSaved,
             initialValue: value,
             validator: validator,
-            builder: (FormFieldState<T> field) => {
+            builder: (FormFieldState field) => {
                 InputDecoration effectiveDecoration = (decoration ?? new InputDecoration())
                     .applyDefaults(Theme.of(field.context).inputDecorationTheme);
                 return new InputDecorator(
@@ -752,15 +752,15 @@ namespace Unity.UIWidgets.material {
         }
     }
 
-    class _DropdownButtonFormFieldState<T> : FormFieldState<T> where T : class {
+    class _DropdownButtonFormFieldState<T> : FormFieldState where T : class {
         public new DropdownButtonFormField<T> widget {
             get { return base.widget as DropdownButtonFormField<T>; }
         }
 
-        public override void didChange(T value) {
+        public override void didChange(object value) {
             base.didChange(value);
             if (this.widget.onChanged != null) {
-                this.widget.onChanged(value);
+                this.widget.onChanged((T) value);
             }
         }
     }
