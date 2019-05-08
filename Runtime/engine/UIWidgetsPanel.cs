@@ -100,11 +100,12 @@ namespace Unity.UIWidgets.engine {
 
     [RequireComponent(typeof(RectTransform))]
     public class UIWidgetsPanel : RawImage, IPointerDownHandler, IPointerUpHandler, IDragHandler,
-        IPointerEnterHandler, IPointerExitHandler, WindowHost {
+        IPointerEnterHandler, IPointerExitHandler, ICanvasRaycastFilter, WindowHost {
         static Event _repaintEvent;
 
         [SerializeField] protected float devicePixelRatioOverride;
         [SerializeField] protected int antiAliasingOverride = Window.defaultAntiAliasing;
+        [SerializeField] protected bool enableRaycastFiltering = false;
         WindowAdapter _windowAdapter;
         Texture _texture;
         Vector2 _lastMouseMove;
@@ -188,9 +189,61 @@ namespace Unity.UIWidgets.engine {
             return null;
         }
 
+        Texture2D _raycastTexture;
+
         internal void applyRenderTexture(Rect screenRect, Texture texture, Material mat) {
             this.texture = texture;
             this.material = mat;
+
+            if (this.enableRaycastFiltering) {
+                
+                Texture2D toTexture2D(RenderTexture rTex)
+                {
+                    Texture2D tex = new Texture2D(rTex.width, rTex.height, TextureFormat.RGBA32, false);
+                    RenderTexture.active = rTex;
+                    tex.ReadPixels(new Rect(0, 0, rTex.width, rTex.height), 0, 0);
+                    tex.Apply();
+                    return tex;
+                }
+                
+                this._raycastTexture = toTexture2D(this.texture as RenderTexture);
+            }
+        }
+
+        public bool IsRaycastLocationValid(Vector2 screenPoint, Camera eventCamera) {
+            if (!this.enableRaycastFiltering) {
+                return true;
+            }
+
+            if (this._raycastTexture != null) {
+                Vector2 local;
+                RectTransformUtility.ScreenPointToLocalPointInRectangle(this.rectTransform, screenPoint, eventCamera, out local);
+ 
+                Rect rect = this.rectTransform.rect;
+ 
+                // Convert to have lower left corner as reference point.
+                local.x += this.rectTransform.pivot.x * rect.width;
+                local.y += this.rectTransform.pivot.y * rect.height;
+ 
+                Rect uvRect = this.uvRect;
+                float u = local.x / rect.width * uvRect.width + uvRect.x;
+                float v = local.y / rect.height * uvRect.height + uvRect.y;
+        
+                Debug.Log("alpha = " + this._raycastTexture.GetPixelBilinear(u, v).a);
+ 
+                try
+                {
+                    return this._raycastTexture.GetPixelBilinear(u, v).a != 0;
+                }
+                catch (UnityException e)
+                {
+                    Debug.LogException(e);
+                }
+ 
+                return true;
+            }
+
+            return false;
         }
 
         protected virtual void Update() {

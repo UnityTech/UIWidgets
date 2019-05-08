@@ -10,8 +10,10 @@ namespace Unity.UIWidgets.Editor {
             base.OnInspectorGUI();
             var pixelRatioProperty = this.serializedObject.FindProperty("devicePixelRatioOverride");
             var antiAliasingProperty = this.serializedObject.FindProperty("antiAliasingOverride");
+            var enableRaycastFilteringProperty = this.serializedObject.FindProperty("enableRaycastFiltering");
             EditorGUILayout.PropertyField(pixelRatioProperty);
             EditorGUILayout.PropertyField(antiAliasingProperty);
+            EditorGUILayout.PropertyField(enableRaycastFilteringProperty);
             this.serializedObject.ApplyModifiedProperties();
         }
     }
