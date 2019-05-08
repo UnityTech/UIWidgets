@@ -9,6 +9,14 @@ namespace Unity.UIWidgets.foundation {
         public static Key key(string value) {
             return new ValueKey<string>(value);
         }
+
+        public static bool operator ==(Key left, Key right) {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(Key left, Key right) {
+            return !Equals(left, right);
+        }
     }
 
     public abstract class LocalKey : Key {
