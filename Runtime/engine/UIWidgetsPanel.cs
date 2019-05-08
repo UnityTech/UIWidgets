@@ -187,6 +187,15 @@ namespace Unity.UIWidgets.engine {
         protected virtual Widget createWidget() {
             return null;
         }
+        
+        public void recreateWidget() {
+            Widget root;
+            using (this._windowAdapter.getScope()) {
+                root = this.createWidget();
+            }
+
+            this._windowAdapter.attachRootWidget(root);
+        }
 
         internal void applyRenderTexture(Rect screenRect, Texture texture, Material mat) {
             this.texture = texture;
