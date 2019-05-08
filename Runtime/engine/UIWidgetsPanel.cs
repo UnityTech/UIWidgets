@@ -65,7 +65,7 @@ namespace Unity.UIWidgets.engine {
         protected override float queryDevicePixelRatio() {
             return this._uiWidgetsPanel.devicePixelRatio;
         }
-        
+
         protected override int queryAntiAliasing() {
             return this._uiWidgetsPanel.antiAliasing;
         }
@@ -135,7 +135,7 @@ namespace Unity.UIWidgets.engine {
 
             this._displayMetrics = DisplayMetricsProvider.provider();
             this._displayMetrics.OnEnable();
-            
+
             this._enteredPointers.Clear();
 
             if (_repaintEvent == null) {
@@ -163,11 +163,9 @@ namespace Unity.UIWidgets.engine {
                     : this._displayMetrics.devicePixelRatio;
             }
         }
-        
+
         public int antiAliasing {
-            get {
-                return this.antiAliasingOverride >= 0 ? this.antiAliasingOverride : QualitySettings.antiAliasing;
-            }
+            get { return this.antiAliasingOverride >= 0 ? this.antiAliasingOverride : QualitySettings.antiAliasing; }
         }
 
         public WindowPadding viewPadding {
@@ -178,13 +176,13 @@ namespace Unity.UIWidgets.engine {
             get { return this._displayMetrics.viewInsets; }
         }
 
-        protected override void OnDisable() {	
-            D.assert(this._windowAdapter != null);	
-            this._windowAdapter.OnDisable();	
-            this._windowAdapter = null;	
-            base.OnDisable();	
+        protected override void OnDisable() {
+            D.assert(this._windowAdapter != null);
+            this._windowAdapter.OnDisable();
+            this._windowAdapter = null;
+            base.OnDisable();
         }
-        
+
         protected virtual Widget createWidget() {
             return null;
         }
@@ -196,16 +194,14 @@ namespace Unity.UIWidgets.engine {
             this.material = mat;
 
             if (this.enableRaycastFiltering) {
-                
-                Texture2D toTexture2D(RenderTexture rTex)
-                {
+                Texture2D toTexture2D(RenderTexture rTex) {
                     Texture2D tex = new Texture2D(rTex.width, rTex.height, TextureFormat.RGBA32, false);
                     RenderTexture.active = rTex;
                     tex.ReadPixels(new Rect(0, 0, rTex.width, rTex.height), 0, 0);
                     tex.Apply();
                     return tex;
                 }
-                
+
                 this._raycastTexture = toTexture2D(this.texture as RenderTexture);
             }
         }
@@ -217,29 +213,28 @@ namespace Unity.UIWidgets.engine {
 
             if (this._raycastTexture != null) {
                 Vector2 local;
-                RectTransformUtility.ScreenPointToLocalPointInRectangle(this.rectTransform, screenPoint, eventCamera, out local);
- 
+                RectTransformUtility.ScreenPointToLocalPointInRectangle(this.rectTransform, screenPoint, eventCamera,
+                    out local);
+
                 Rect rect = this.rectTransform.rect;
- 
+
                 // Convert to have lower left corner as reference point.
                 local.x += this.rectTransform.pivot.x * rect.width;
                 local.y += this.rectTransform.pivot.y * rect.height;
- 
+
                 Rect uvRect = this.uvRect;
                 float u = local.x / rect.width * uvRect.width + uvRect.x;
                 float v = local.y / rect.height * uvRect.height + uvRect.y;
-        
+
                 Debug.Log("alpha = " + this._raycastTexture.GetPixelBilinear(u, v).a);
- 
-                try
-                {
+
+                try {
                     return this._raycastTexture.GetPixelBilinear(u, v).a != 0;
                 }
-                catch (UnityException e)
-                {
+                catch (UnityException e) {
                     Debug.LogException(e);
                 }
- 
+
                 return true;
             }
 
@@ -249,7 +244,7 @@ namespace Unity.UIWidgets.engine {
         protected virtual void Update() {
             this._displayMetrics.Update();
             UIWidgetsMessageManager.ensureUIWidgetsMessageManagerIfNeeded();
-            
+
 #if UNITY_ANDROID
             if (Input.GetKeyDown(KeyCode.Escape)) {
                 this._windowAdapter.withBinding(() => {
