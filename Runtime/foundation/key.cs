@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 
 namespace Unity.UIWidgets.foundation {
-    public abstract class Key {
+    public abstract class Key : IEquatable<Key> {
         protected Key() {
         }
 
