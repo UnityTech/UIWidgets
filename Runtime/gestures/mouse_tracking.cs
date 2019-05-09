@@ -118,7 +118,7 @@ namespace Unity.UIWidgets.gestures {
 
         _TrackedAnnotation _findAnnotation(MouseTrackerAnnotation annotation) {
             if (!this._trackedAnnotations.TryGetValue(annotation, out var trackedAnnotation)) {
-                D.assert(false, "Unable to find annotation $annotation in tracked annotations. " +
+                D.assert(false, () => "Unable to find annotation $annotation in tracked annotations. " +
                                 "Check that attachAnnotation has been called for all annotated layers.");
             }
             

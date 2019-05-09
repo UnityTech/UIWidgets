@@ -1948,7 +1948,7 @@ namespace Unity.UIWidgets.rendering {
             D.assert(this._onPointerEnter != this._hoverAnnotation.onEnter ||
                      this._onPointerHover != this._hoverAnnotation.onHover ||
                      this._onPointerExit != this._hoverAnnotation.onExit,
-                "Shouldn't call _updateAnnotations if nothing has changed.");
+                () => "Shouldn't call _updateAnnotations if nothing has changed.");
 
             if (this._hoverAnnotation != null && this.attached) {
                 RendererBinding.instance.mouseTracker.detachAnnotation(this._hoverAnnotation);
