@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.UIWidgets.ui;
+using Unity.UIWidgets.InternalBridge;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -135,16 +135,16 @@ namespace Unity.UIWidgets.foundation {
         }
 
         public static void reset<T>(this List<T> list, int size) {
-            NoAllocHelpers<T>.EnsureListElemCount(list, size);
+            NoAllocHelpersBridge<T>.EnsureListElemCount(list, size);
         }
 
         public static ref T refAt<T>(this List<T> list, int index) {
-            var array = NoAllocHelpers<T>.ExtractArrayFromListT(list);
+            var array = NoAllocHelpersBridge<T>.ExtractArrayFromListT(list);
             return ref array[index];
         }
         
         public static T[] array<T>(this List<T> list) {
-            return NoAllocHelpers<T>.ExtractArrayFromListT(list);
+            return NoAllocHelpersBridge<T>.ExtractArrayFromListT(list);
         }
     }
 }
