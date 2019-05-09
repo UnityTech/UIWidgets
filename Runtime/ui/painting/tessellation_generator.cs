@@ -33,9 +33,9 @@ namespace Unity.UIWidgets.ui {
                 return true;
             }
 
-            return this.x2.Equals(other.x2) && this.y2.Equals(other.y2) && this.x3.Equals(other.x3) &&
-                   this.y3.Equals(other.y3) && this.x4.Equals(other.x4) && this.y4.Equals(other.y4) &&
-                   this.tessTol.Equals(other.tessTol);
+            return this.x2 == other.x2 && this.y2 == other.y2 && this.x3 == other.x3 &&
+                   this.y3 == other.y3 && this.x4 == other.x4 && this.y4 == other.y4 &&
+                   this.tessTol == other.tessTol;
         }
 
         public override bool Equals(object obj) {
@@ -54,15 +54,23 @@ namespace Unity.UIWidgets.ui {
             return this.Equals((TessellationKey) obj);
         }
 
-        public override int GetHashCode() {
+        public override unsafe int GetHashCode() {
             unchecked {
-                var hashCode = this.x2.GetHashCode();
-                hashCode = (hashCode * 397) ^ this.y2.GetHashCode();
-                hashCode = (hashCode * 397) ^ this.x3.GetHashCode();
-                hashCode = (hashCode * 397) ^ this.y3.GetHashCode();
-                hashCode = (hashCode * 397) ^ this.x4.GetHashCode();
-                hashCode = (hashCode * 397) ^ this.y4.GetHashCode();
-                hashCode = (hashCode * 397) ^ this.tessTol.GetHashCode();
+                var hashCode = 0;
+                float x = this.x2;
+                hashCode ^= *(int*) &x;
+                x = this.y2;
+                hashCode = (hashCode * 13) ^ *(int*) &x;
+                x = this.x3;
+                hashCode = (hashCode * 13) ^ *(int*) &x;
+                x = this.y3;
+                hashCode = (hashCode * 13) ^ *(int*) &x;
+                x = this.x4;
+                hashCode = (hashCode * 13) ^ *(int*) &x;
+                x = this.y4;
+                hashCode = (hashCode * 13) ^ *(int*) &x;
+                x = this.tessTol;
+                hashCode = (hashCode * 13) ^ *(int*) &x;
                 return hashCode;
             }
         }
@@ -131,7 +139,7 @@ namespace Unity.UIWidgets.ui {
             }
         }
 
-        public static List<PathPoint> tessellateBezier(float x1, float y1, float x2, float y2,
+        public static List<Vector2> tessellateBezier(float x1, float y1, float x2, float y2,
             float x3, float y3, float x4, float y4, float tessTol) {
             var key = new TessellationKey(x1, y1, x2, y2, x3, y3, x4, y4, tessTol);
 
@@ -139,26 +147,13 @@ namespace Unity.UIWidgets.ui {
             if (tessellationInfo != null) {
                 tessellationInfo.touch();
 
-                return _toPathPoints(tessellationInfo.points, x1, y1);
+                return tessellationInfo.points;
             }
-
-
+            
             var points = _tessellateBezier(x1, y1, x2, y2, x3, y3, x4, y4, tessTol);
             _tessellations[key] = new TessellationInfo(key, points);
 
-            return _toPathPoints(points, x1, y1);
-        }
-
-        static List<PathPoint> _toPathPoints(List<Vector2> points, float x1, float y1) {
-            var pathPoints = new List<PathPoint>(points.Count);
-            foreach (var point in points) {
-                pathPoints.Add(new PathPoint {
-                    x = point.x + x1,
-                    y = point.y + y1,
-                });
-            }
-
-            return pathPoints;
+            return points;
         }
 
         struct _StackData {
@@ -173,6 +168,8 @@ namespace Unity.UIWidgets.ui {
             public int level;
         }
 
+        static readonly Stack<_StackData> _stack = new Stack<_StackData>();
+
         static List<Vector2> _tessellateBezier(
             float x1, float y1, float x2, float y2,
             float x3, float y3, float x4, float y4,
@@ -186,13 +183,13 @@ namespace Unity.UIWidgets.ui {
 
             var points = new List<Vector2>();
 
-            var stack = new Stack<_StackData>();
-            stack.Push(new _StackData {
+            _stack.Clear();
+            _stack.Push(new _StackData {
                 x1 = 0, y1 = 0, x2 = x2, y2 = y2, x3 = x3, y3 = y3, x4 = x4, y4 = y4, level = 0,
             });
 
-            while (stack.Count > 0) {
-                var stackData = stack.Pop();
+            while (_stack.Count > 0) {
+                var stackData = _stack.Pop();
                 x1 = stackData.x1;
                 y1 = stackData.y1;
                 x2 = stackData.x2;
@@ -227,11 +224,11 @@ namespace Unity.UIWidgets.ui {
                 float y1234 = (y123 + y234) * 0.5f;
 
                 if (level < 10) {
-                    stack.Push(new _StackData {
+                    _stack.Push(new _StackData {
                         x1 = x1234, y1 = y1234, x2 = x234, y2 = y234, x3 = x34, y3 = y34, x4 = x4, y4 = y4,
                         level = level + 1,
                     });
-                    stack.Push(new _StackData {
+                    _stack.Push(new _StackData {
                         x1 = x1, y1 = y1, x2 = x12, y2 = y12, x3 = x123, y3 = y123, x4 = x1234, y4 = y1234,
                         level = level + 1,
                     });

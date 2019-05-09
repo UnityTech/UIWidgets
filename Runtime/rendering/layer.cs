@@ -998,9 +998,9 @@ namespace Unity.UIWidgets.rendering {
             }
 
             D.assert(this.link.leader.owner == this.owner,
-                "Linked LeaderLayer anchor is not in the same layer tree as the FollowerLayer.");
+                () => "Linked LeaderLayer anchor is not in the same layer tree as the FollowerLayer.");
             D.assert(this.link.leader._lastOffset != null,
-                "LeaderLayer anchor must come before FollowerLayer in paint order, but the reverse was true.");
+                () => "LeaderLayer anchor must come before FollowerLayer in paint order, but the reverse was true.");
 
             HashSet<Layer> ancestors = new HashSet<Layer>();
             Layer ancestor = this.parent;

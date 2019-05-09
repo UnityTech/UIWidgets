@@ -41,7 +41,13 @@ namespace UIWidgetsSample {
                 ),
                 body: new Padding(
                     padding: EdgeInsets.all(16.0f),
-                    child: new TextField(controller: this.myController)
+                    child: new TextField(
+                        controller: this.myController,
+                        autofocus: true,
+                        decoration: new InputDecoration(
+                            hintText: "hinthere",
+                            labelText: "pwd",
+                            prefixIcon: new Icon(Unity.UIWidgets.material.Icons.search)))
                 ),
                 floatingActionButton: new FloatingActionButton(
                     // When the user presses the button, show an alert dialog with the

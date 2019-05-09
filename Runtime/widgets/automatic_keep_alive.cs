@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.scheduler;
@@ -219,9 +220,9 @@ namespace Unity.UIWidgets.widgets {
         public Ticker createTicker(TickerCallback onTick) {
             this._tickers = this._tickers ?? new HashSet<Ticker>();
 
-            var debugLabel = "";
+            Func<string> debugLabel = null;
             D.assert(() => {
-                debugLabel = "created by " + this;
+                debugLabel = () => "created by " + this;
                 return true;
             });
             var result = new _AutomaticWidgetTicker<T>(onTick, this, debugLabel: debugLabel);

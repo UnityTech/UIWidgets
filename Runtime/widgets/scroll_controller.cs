@@ -40,8 +40,8 @@ namespace Unity.UIWidgets.widgets {
 
         public ScrollPosition position {
             get {
-                D.assert(this._positions.isNotEmpty(), "ScrollController not attached to any scroll views.");
-                D.assert(this._positions.Count == 1, "ScrollController attached to multiple scroll views.");
+                D.assert(this._positions.isNotEmpty(), () => "ScrollController not attached to any scroll views.");
+                D.assert(this._positions.Count == 1, () => "ScrollController attached to multiple scroll views.");
                 return this._positions.Single();
             }
         }
@@ -55,7 +55,7 @@ namespace Unity.UIWidgets.widgets {
             TimeSpan duration,
             Curve curve
         ) {
-            D.assert(this._positions.isNotEmpty(), "ScrollController not attached to any scroll views.");
+            D.assert(this._positions.isNotEmpty(), () => "ScrollController not attached to any scroll views.");
             List<IPromise> animations = Enumerable.Repeat((IPromise) null, this._positions.Count).ToList();
             for (int i = 0; i < this._positions.Count; i += 1) {
                 animations[i] = this._positions[i].animateTo(to, duration: duration, curve: curve);
@@ -65,7 +65,7 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public void jumpTo(float value) {
-            D.assert(this._positions.isNotEmpty(), "ScrollController not attached to any scroll views.");
+            D.assert(this._positions.isNotEmpty(), () => "ScrollController not attached to any scroll views.");
             foreach (ScrollPosition position in new List<ScrollPosition>(this._positions)) {
                 position.jumpTo(value);
             }

@@ -179,6 +179,8 @@ UIWidgets也支持Gif！
 当一个Unity项目运行在Android设备上时，状态栏是默认隐藏且无法在编辑内进行调整的。
 如果您希望在您的UIWidgets App中显示状态栏，您可以使用这个[解决方案](https://github.com/Over17/UnityShowAndroidStatusBar)。我们将尽快推出我们自己的解决方案，并保证届时开发者可以进行无缝切换。
 
+此外，为了让上述插件在Android P及以上Android系统中正常工作，请勾选上"Player Settings"中的"Render Outside Safe Area"选项。
+
 #### 七、自动调节帧率
 如果要使得构建出的应用能够自动调节帧率，请打开Project Settings，将构建目标平台对应的Quality选项卡中的V Sync Count设置为Don't Sync。
 默认的逻辑是在界面静止时将帧率降低为25，在界面变动时将帧率提高至60。
@@ -186,8 +188,9 @@ UIWidgets也支持Gif！
 
 #### 八、WebGL Canvas分辨率调整插件
 因为浏览器中Canvas的宽高和其在显示器上的像素数可能不一致，所以构建出的WebGL程序中画面可能会模糊。
-插件`Plugins/platform/webgl/UIWidgetsCanvasDevicePixelRatio.jslib`解决了这个问题。
-如果您因为任何原因需要禁止此插件，请在Project面板中选中该插件，在Inspector面板中的Define Constraints参数中，输入任意（没有被Unity定义为宏）的字符串（例如`ENABLE_CANVAS_DEVICE_PIXEL_RATIO_PLUGIN`），使得只有在Player Settings中定义了这个宏，此插件才会启用。
+插件`Plugins/platform/webgl/UIWidgetsCanvasDevicePixelRatio_20xx.x.jslib`（目前有2018.3和2019.1）解决了这个问题。
+请根据您的项目的Unity版本选择对应的插件，并禁用此插件的其他版本。方法如下：在Project面板中选中该插件，在Inspector面板中的Select platforms for plugin中，去掉WebGL后面的对勾。
+如果您因为任何原因需要完全禁止此插件的功能，请按上述方法禁用此插件的所有版本。
 
 此插件覆盖了Unity WebGL构建模块中的如下参数：
 ```

@@ -92,8 +92,9 @@ namespace Unity.UIWidgets.widgets {
         
         protected override void handlePlatformBrightnessChanged() {
             base.handlePlatformBrightnessChanged();
-            foreach (WidgetsBindingObserver observer in this._observers)
+            foreach (WidgetsBindingObserver observer in this._observers) {
                 observer.didChangePlatformBrightness();
+            }
         }
 
         protected virtual void handleLocaleChanged() {

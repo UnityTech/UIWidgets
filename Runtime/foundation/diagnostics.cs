@@ -242,7 +242,7 @@ namespace Unity.UIWidgets.foundation {
             bool showSeparator = true
         ) {
             D.assert(name == null || !name.EndsWith(":"),
-                "Names of diagnostic nodes must not end with colons.");
+                () => "Names of diagnostic nodes must not end with colons.");
             this.name = name;
             this._style = style;
             this._showName = showName;

@@ -297,7 +297,9 @@ namespace Unity.UIWidgets.rendering {
             if (needsCompositing) {
                 var inverse = Matrix3.I();
                 var invertible = effectiveTransform.invert(inverse);
-                D.assert(invertible);
+                
+                // it could just be "scale == 0", ignore the assertion.
+                // D.assert(invertible);
 
                 this.pushLayer(
                     new TransformLayer(effectiveTransform),
@@ -994,7 +996,7 @@ namespace Unity.UIWidgets.rendering {
         public OffsetLayer layer {
             get {
                 D.assert(this.isRepaintBoundary,
-                    "You can only access RenderObject.layer for render objects that are repaint boundaries.");
+                    () => "You can only access RenderObject.layer for render objects that are repaint boundaries.");
                 D.assert(!this._needsPaint);
 
                 return this._layer;

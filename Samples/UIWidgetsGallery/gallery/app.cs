@@ -18,8 +18,8 @@ namespace UIWidgetsGallery.gallery {
             Key key = null,
             UpdateUrlFetcher updateUrlFetcher = null,
             bool enablePerformanceOverlay = false,
-            bool enableRasterCacheImagesCheckerboard = true,
-            bool enableOffscreenLayersCheckerboard = true,
+            bool enableRasterCacheImagesCheckerboard = false,
+            bool enableOffscreenLayersCheckerboard = false,
             VoidCallback onSendFeedback = null,
             bool testMode = false
         ) : base(key: key) {

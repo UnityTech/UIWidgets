@@ -70,9 +70,9 @@ namespace Unity.UIWidgets.animation {
             this.end = end;
         }
 
-        public T begin;
+        public virtual T begin { get; set; }
 
-        public T end;
+        public virtual T end { get; set; }
 
         public abstract T lerp(float t);
 
@@ -183,6 +183,17 @@ namespace Unity.UIWidgets.animation {
 
         public override int lerp(float t) {
             return (this.begin + (this.end - this.begin) * t).round();
+        }
+    }
+
+    public class NullableFloatTween : Tween<float?> {
+        public NullableFloatTween(float? begin = null, float? end = null) : base(begin: begin, end: end) {
+        }
+
+        public override float? lerp(float t) {
+            D.assert(this.begin != null);
+            D.assert(this.end != null);
+            return this.begin + (this.end - this.begin) * t;
         }
     }
 

@@ -396,11 +396,15 @@ namespace Unity.UIWidgets.widgets {
         }
 
         void _onFloatingCursorResetTick() {
-            Offset finalPosition = this.renderEditable.getLocalRectForCaret(this._lastTextPosition).centerLeft - this._floatingCursorOffset;
+            Offset finalPosition = this.renderEditable.getLocalRectForCaret(this._lastTextPosition).centerLeft -
+                                   this._floatingCursorOffset;
             if (this._floatingCursorResetController.isCompleted) {
-                this.renderEditable.setFloatingCursor(FloatingCursorDragState.End, finalPosition, this._lastTextPosition);
-                if (this._lastTextPosition.offset != this.renderEditable.selection.baseOffset)
-                    this._handleSelectionChanged(TextSelection.collapsed(offset: this._lastTextPosition.offset), this.renderEditable, SelectionChangedCause.forcePress);
+                this.renderEditable.setFloatingCursor(FloatingCursorDragState.End, finalPosition,
+                    this._lastTextPosition);
+                if (this._lastTextPosition.offset != this.renderEditable.selection.baseOffset) {
+                    this._handleSelectionChanged(TextSelection.collapsed(offset: this._lastTextPosition.offset),
+                        this.renderEditable, SelectionChangedCause.forcePress);
+                }
                 this._startCaretRect = null;
                 this._lastTextPosition = null;
                 this._pointOffsetOrigin = null;
@@ -410,7 +414,8 @@ namespace Unity.UIWidgets.widgets {
                 float lerpX = MathUtils.lerpFloat(this._lastBoundedOffset.dx, finalPosition.dx, lerpValue);
                 float lerpY = MathUtils.lerpFloat(this._lastBoundedOffset.dy, finalPosition.dy, lerpValue);
 
-                this.renderEditable.setFloatingCursor(FloatingCursorDragState.Update, new Offset(lerpX, lerpY), this._lastTextPosition, resetLerpValue: lerpValue);
+                this.renderEditable.setFloatingCursor(FloatingCursorDragState.Update, new Offset(lerpX, lerpY),
+                    this._lastTextPosition, resetLerpValue: lerpValue);
             }
         }
 
@@ -540,11 +545,11 @@ namespace Unity.UIWidgets.widgets {
         public void requestKeyboard() {
             if (this._hasFocus) {
                 this._openInputConnection();
-            }
-            else {
+            } else {
                 List<FocusScopeNode> ancestorScopes = FocusScope.ancestorsOf(this.context);
-                for (int i = ancestorScopes.Count - 1; i >= 1; i -= 1)
+                for (int i = ancestorScopes.Count - 1; i >= 1; i -= 1) {
                     ancestorScopes[i].setFirstFocus(ancestorScopes[i - 1]);
+                }
                 FocusScope.of(this.context).requestFocus(this.widget.focusNode);
             }
         }
@@ -820,7 +825,7 @@ namespace Unity.UIWidgets.widgets {
             get {
                 TextDirection? result = this.widget.textDirection ?? Directionality.of(this.context);
                 D.assert(result != null,
-                    $"{this.GetType().FullName} created without a textDirection and with no ambient Directionality.");
+                    () => $"{this.GetType().FullName} created without a textDirection and with no ambient Directionality.");
                 return result;
             }
         }

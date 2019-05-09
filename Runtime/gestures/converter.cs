@@ -75,7 +75,9 @@ namespace Unity.UIWidgets.gestures {
                 switch (datum.change) {
                     case PointerChange.down: {
                         _PointerState state = _ensureStateForPointer(datum, position);
-                        D.assert(!state.down);
+                        if (state.down) {
+                            break;
+                        }
                         if (state.lastPosition != position) {
                             // a hover event to be here.
                             state.lastPosition = position;

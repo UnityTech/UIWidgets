@@ -159,7 +159,7 @@ namespace Unity.UIWidgets.material {
 
         float? _endAngle;
 
-        public new Offset begin {
+        public override Offset begin {
             get { return base.begin; }
             set {
                 if (value != base.begin) {
@@ -169,7 +169,7 @@ namespace Unity.UIWidgets.material {
             }
         }
 
-        public new Offset end {
+        public override Offset end {
             get { return base.end; }
             set {
                 if (value != base.end) {
@@ -300,7 +300,7 @@ namespace Unity.UIWidgets.material {
 
         MaterialPointArcTween _endArc;
 
-        public new Rect begin {
+        public override Rect begin {
             get { return base.begin; }
             set {
                 if (value != base.begin) {
@@ -310,7 +310,7 @@ namespace Unity.UIWidgets.material {
             }
         }
 
-        public new Rect end {
+        public override Rect end {
             get { return base.end; }
             set {
                 if (value != base.end) {
@@ -375,7 +375,7 @@ namespace Unity.UIWidgets.material {
         MaterialPointArcTween _centerArc;
 
 
-        public new Rect begin {
+        public override Rect begin {
             get { return base.begin; }
             set {
                 if (value != base.begin) {
@@ -385,7 +385,7 @@ namespace Unity.UIWidgets.material {
             }
         }
 
-        public new Rect end {
+        public override Rect end {
             get { return base.end; }
             set {
                 if (value != base.end) {

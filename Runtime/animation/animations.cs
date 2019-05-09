@@ -544,7 +544,7 @@ namespace Unity.UIWidgets.animation {
         T _lastValue;
 
         void _maybeNotifyListeners() {
-            if (Equals(this.value, this._lastValue)) {
+            if (!Equals(this.value, this._lastValue)) {
                 this._lastValue = this.value;
                 this.notifyListeners();
             }

@@ -18,7 +18,7 @@ namespace Unity.UIWidgets.material {
             D.assert(padding == null || padding.isNonNegative);
             D.assert(decoration == null || decoration.debugAssertIsValid());
             D.assert(color == null || decoration == null,
-                "Cannot provide both a color and a decoration\n" +
+                () => "Cannot provide both a color and a decoration\n" +
                 "The color argument is just a shorthand for \"decoration: new BoxDecoration(color: color)\".");
             decoration = decoration ?? (color != null ? new BoxDecoration(color: color) : null);
             this.padding = padding;

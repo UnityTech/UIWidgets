@@ -235,7 +235,7 @@ namespace UIWidgetsGallery.gallery {
         public MaterialDemoDocumentationButton(string routeName, Key key = null) : base(key: key) {
             this.documentationUrl = DemoUtils.kDemoDocumentationUrl[routeName];
             D.assert(DemoUtils.kDemoDocumentationUrl[routeName] != null,
-                "A documentation URL was not specified for demo route $routeName in kAllGalleryDemos"
+                () => $"A documentation URL was not specified for demo route {routeName} in kAllGalleryDemos"
             );
         }
 

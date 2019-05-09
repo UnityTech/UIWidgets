@@ -14,11 +14,11 @@ namespace Unity.UIWidgets.widgets {
         ) : base(key: key) {
             D.assert(child != null);
             D.assert(maintainState == true || maintainAnimation == false,
-                "Cannot maintain animations if the state is not also maintained.");
+                () => "Cannot maintain animations if the state is not also maintained.");
             D.assert(maintainAnimation == true || maintainSize == false,
-                "Cannot maintain size if animations are not maintained.");
+                () => "Cannot maintain size if animations are not maintained.");
             D.assert(maintainSize == true || maintainInteractivity == false,
-                "Cannot maintain interactivity if size is not maintained.");
+                () => "Cannot maintain interactivity if size is not maintained.");
             this.replacement = replacement ?? SizedBox.shrink();
             this.child = child;
             this.visible = visible;

@@ -1,6 +1,14 @@
 {
     "name": "Unity.UIWidgets",
-    "references": [],
+    "references": [
+        "Unity.InternalAPIEngineBridge.024"
+    ],
+    "optionalUnityReferences": [],
     "includePlatforms": [],
-    "excludePlatforms": []
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": []
 }

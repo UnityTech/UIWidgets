@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.scheduler;
@@ -48,9 +49,9 @@ namespace Unity.UIWidgets.widgets {
                 );
             });
             
-            var debugLabel = "";
+            Func<string> debugLabel = null;
             D.assert(() => {
-                debugLabel = "created by " + this;
+                debugLabel = () => "created by " + this;
                 return true;
             });
             this._ticker = new Ticker(onTick, debugLabel: debugLabel);
@@ -115,9 +116,9 @@ namespace Unity.UIWidgets.widgets {
         public Ticker createTicker(TickerCallback onTick) {
             this._tickers = this._tickers ?? new HashSet<Ticker>();
 
-            var debugLabel = "";
+            Func<string> debugLabel = null;
             D.assert(() => {
-                debugLabel = "created by " + this;
+                debugLabel = () => "created by " + this;
                 return true;
             });
             var result = new _WidgetTicker<T>(onTick, this, debugLabel: debugLabel);
@@ -181,7 +182,7 @@ namespace Unity.UIWidgets.widgets {
         internal _WidgetTicker(
             TickerCallback onTick,
             TickerProviderStateMixin<T> creator,
-            string debugLabel = null) :
+            Func<string> debugLabel = null) :
             base(onTick: onTick, debugLabel: debugLabel) {
             this._creator = creator;
         }

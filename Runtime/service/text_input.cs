@@ -185,9 +185,9 @@ namespace Unity.UIWidgets.service {
         public static RawFloatingCursorPoint _toTextPoint(FloatingCursorDragState state,
             Dictionary<string, float?> encoded) {
             D.assert(encoded.getOrDefault("X") != null,
-                "You must provide a value for the horizontal location of the floating cursor.");
+                () => "You must provide a value for the horizontal location of the floating cursor.");
             D.assert(encoded.getOrDefault("Y") != null,
-                "You must provide a value for the vertical location of the floating cursor.");
+                () => "You must provide a value for the vertical location of the floating cursor.");
             Offset offset = state == FloatingCursorDragState.Update
                 ? new Offset(encoded["X"] ?? 0.0f, encoded["Y"] ?? 0.0f)
                 : new Offset(0, 0);

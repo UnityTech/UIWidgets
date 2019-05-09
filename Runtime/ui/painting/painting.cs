@@ -5,14 +5,14 @@ using UnityEngine;
 namespace Unity.UIWidgets.ui {
     class PaintingUtils {
         internal static bool _offsetIsValid(Offset offset) {
-            D.assert(offset != null, "Offset argument was null.");
-            D.assert(!offset.dx.isNaN() && !offset.dy.isNaN(), "Offset argument contained a NaN value.");
+            D.assert(offset != null, () => "Offset argument was null.");
+            D.assert(!offset.dx.isNaN() && !offset.dy.isNaN(), () => "Offset argument contained a NaN value.");
             return true;
         }
 
         internal static bool _radiusIsValid(Radius radius) {
-            D.assert(radius != null, "Radius argument was null.");
-            D.assert(!radius.x.isNaN() && !radius.y.isNaN(), "Radius argument contained a NaN value.");
+            D.assert(radius != null, () => "Radius argument was null.");
+            D.assert(!radius.x.isNaN() && !radius.y.isNaN(), () => "Radius argument contained a NaN value.");
             return true;
         }
 

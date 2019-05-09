@@ -98,10 +98,11 @@ namespace Unity.UIWidgets.rendering {
         ColorFilter _colorFilter;
 
         void _updateColorFilter() {
-            if (this._color == null)
+            if (this._color == null) {
                 this._colorFilter = null;
-            else
+            } else {
                 this._colorFilter = ColorFilter.mode(this._color, this._colorBlendMode);
+            }
         }
 
         Color _color;

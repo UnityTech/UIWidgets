@@ -161,7 +161,7 @@ namespace Unity.UIWidgets.material {
             properties.add(new EnumProperty<TextCapitalization>("textCapitalization", this.textCapitalization, defaultValue: TextCapitalization.none));
             properties.add(new EnumProperty<TextAlign>("textAlign", this.textAlign, defaultValue: TextAlign.left));
             properties.add(new EnumProperty<TextDirection>("textDirection", this.textDirection, defaultValue: null));
-            properties.add(new FloatProperty("cursorWidth", this.cursorWidth, defaultValue: 2.0));
+            properties.add(new FloatProperty("cursorWidth", this.cursorWidth, defaultValue: 2.0f));
             properties.add(new DiagnosticsProperty<Radius>("cursorRadius", this.cursorRadius, defaultValue: null));
             properties.add(new DiagnosticsProperty<Color>("cursorColor", this.cursorColor, defaultValue: null));
             properties.add(new DiagnosticsProperty<Brightness?>("keyboardAppearance", this.keyboardAppearance, defaultValue: null));
@@ -236,12 +236,11 @@ namespace Unity.UIWidgets.material {
                 return effectiveDecoration.copyWith(counter: counter);
             }
 
-            if (this.widget.maxLength == null)
+            if (this.widget.maxLength == null) {
                 return effectiveDecoration;
+            }
 
-            
             string counterText = $"{currentLength}";
-
 
             if (this.widget.maxLength > 0) {
                 counterText += $"/{this.widget.maxLength}";
@@ -434,7 +433,7 @@ namespace Unity.UIWidgets.material {
             D.assert(
               !(this.widget.style != null && this.widget.style.inherit == false &&
                 (this.widget.style.fontSize == null || this.widget.style.textBaseline == null)),
-              "inherit false style must supply fontSize and textBaseline"
+              () => "inherit false style must supply fontSize and textBaseline"
             );
             ThemeData themeData = Theme.of(context);
             TextStyle style = themeData.textTheme.subhead.merge(this.widget.style);

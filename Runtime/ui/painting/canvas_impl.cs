@@ -720,7 +720,7 @@ namespace Unity.UIWidgets.ui {
             
             // request font texture so text mesh could be generated correctly
             var style = textBlob.style;
-            var font = FontManager.instance.getOrCreate(textBlob.style.fontFamily, style.fontWeight, style.fontStyle).font;
+            var font = FontManager.instance.getOrCreate(style.fontFamily, style.fontWeight, style.fontStyle).font;
             var fontSizeToLoad = Mathf.CeilToInt(style.UnityFontSize * scale);
             var subText = textBlob.text.Substring(textBlob.textOffset, textBlob.textSize);
             font.RequestCharactersInTextureSafe(subText, fontSizeToLoad, style.UnityFontStyle);
@@ -753,11 +753,6 @@ namespace Unity.UIWidgets.ui {
             D.assert(this._layers[0].states.Count == 1);
 
             var layer = this._currentLayer;
-            if (layer.draws.Count == 0) {
-                D.assert(layer.layers.Count == 0);
-                return;
-            }
-
             using (var cmdBuf = new CommandBuffer()) {
                 cmdBuf.name = "CommandBufferCanvas";
 
@@ -793,7 +788,7 @@ namespace Unity.UIWidgets.ui {
                 toClear = false;
             }
         }
-
+        
         void _drawLayer(RenderLayer layer, CommandBuffer cmdBuf) {
             bool toClear = true;
 
@@ -860,6 +855,8 @@ namespace Unity.UIWidgets.ui {
                         }
                         break;
                     case CmdScissor cmd:
+                        this._setRenderTarget(cmdBuf, layer.rtID, ref toClear);
+                        
                         if (cmd.deviceScissor == null) {
                             cmdBuf.DisableScissorRect();
                         } else {
@@ -868,6 +865,12 @@ namespace Unity.UIWidgets.ui {
                         break;
                 }
             }
+            
+            if (toClear) {
+                this._setRenderTarget(cmdBuf, layer.rtID, ref toClear);
+            }
+            
+            D.assert(!toClear);
 
             foreach (var subLayer in layer.layers) {
                 cmdBuf.ReleaseTemporaryRT(subLayer.rtID);

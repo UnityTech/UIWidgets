@@ -93,7 +93,7 @@ namespace Unity.UIWidgets.widgets {
         internal _AutomaticWidgetTicker(
             TickerCallback onTick,
             AutomaticKeepAliveClientWithTickerProviderStateMixin<T> creator,
-            string debugLabel = null) :
+            Func<string> debugLabel = null) :
             base(onTick: onTick, debugLabel: debugLabel) {
             this._creator = creator;
         }

@@ -26,7 +26,7 @@ namespace Unity.UIWidgets.material {
             D.assert(children != null);
             D.assert(
                 children.All((Widget w) => w.key != null),
-                "All children of this widget must have a key."
+                () => "All children of this widget must have a key."
             );
             this.header = header;
             this.children = children;

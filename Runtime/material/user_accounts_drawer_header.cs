@@ -37,7 +37,7 @@ namespace Unity.UIWidgets.material {
                         right: 0.0f,
                         child: new Row(
                             children: (this.otherAccountsPictures ?? new List<Widget> { })
-                            .GetRange(0, Math.Min(3, this.otherAccountsPictures?.Count ?? 0))
+                            .GetRange(0, Mathf.Min(3, this.otherAccountsPictures?.Count ?? 0))
                             .Select<Widget, Widget>(
                                 (Widget picture) => {
                                     return new Padding(

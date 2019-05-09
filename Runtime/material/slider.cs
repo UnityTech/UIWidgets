@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Unity.UIWidgets.animation;
 using Unity.UIWidgets.async;
 using Unity.UIWidgets.foundation;
@@ -9,7 +10,6 @@ using Unity.UIWidgets.scheduler;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
 using UnityEngine;
-using Canvas = Unity.UIWidgets.ui.Canvas;
 using Color = Unity.UIWidgets.ui.Color;
 using Rect = Unity.UIWidgets.ui.Rect;
 
@@ -253,6 +253,11 @@ namespace Unity.UIWidgets.material {
     }
 
     class _RenderSlider : RenderBox {
+        static float _positionAnimationDurationMilliSeconds = 75;
+        static float _minimumInteractionTimeMilliSeconds = 500;
+
+        const float _minPreferredTrackWidth = 144.0f;
+
         public _RenderSlider(
             float? value = null,
             int? divisions = null,
@@ -310,14 +315,46 @@ namespace Unity.UIWidgets.material {
                 curve: Curves.easeInOut);
         }
 
-        const float _positionAnimationDurationMilliSeconds = 75;
-        const float _overlayRadius = 16.0f;
-        const float _overlayDiameter = _overlayRadius * 2.0f;
-        const float _trackHeight = 2.0f;
-        const float _preferredTrackWidth = 144.0f;
-        const float _preferredTotalWidth = _preferredTrackWidth + _overlayDiameter;
-        const float _minimumInteractionTimeMilliSeconds = 500;
-        static readonly Animatable<float> _overlayRadiusTween = new FloatTween(begin: 0.0f, end: _overlayRadius);
+        float _maxSliderPartWidth {
+            get {
+                float maxValue = 0;
+                foreach (Size size in this._sliderPartSizes) {
+                    if (size.width > maxValue) {
+                        maxValue = size.width;
+                    }
+                }
+
+                return maxValue;
+            }
+        }
+
+        float _maxSliderPartHeight {
+            get {
+                float maxValue = 0;
+                foreach (Size size in this._sliderPartSizes) {
+                    if (size.width > maxValue) {
+                        maxValue = size.width;
+                    }
+                }
+
+                return maxValue;
+            }
+        }
+
+        List<Size> _sliderPartSizes {
+            get {
+                return new List<Size> {
+                    this._sliderTheme.overlayShape.getPreferredSize(this.isInteractive, this.isDiscrete),
+                    this._sliderTheme.thumbShape.getPreferredSize(this.isInteractive, this.isDiscrete),
+                    this._sliderTheme.tickMarkShape.getPreferredSize(isEnabled: this.isInteractive,
+                        sliderTheme: this.sliderTheme)
+                };
+            }
+        }
+
+        float _minPreferredTrackHeight {
+            get { return this._sliderTheme.trackHeight; }
+        }
 
         _SliderState _state;
         Animation<float> _overlayAnimation;
@@ -329,8 +366,15 @@ namespace Unity.UIWidgets.material {
         bool _active = false;
         float _currentDragValue = 0.0f;
 
-        float _trackLength {
-            get { return this.size.width - _overlayDiameter; }
+        Rect _trackRect {
+            get {
+                return this._sliderTheme.trackShape.getPreferredRect(
+                    parentBox: this,
+                    offset: Offset.zero,
+                    sliderTheme: this._sliderTheme,
+                    isDiscrete: false
+                );
+            }
         }
 
         bool isInteractive {
@@ -344,7 +388,7 @@ namespace Unity.UIWidgets.material {
         public float value {
             get { return this._value; }
             set {
-                D.assert(value != null && value >= 0.0f && value <= 1.0f);
+                D.assert(value >= 0.0f && value <= 1.0f);
                 float convertedValue = this.isDiscrete ? this._discretize(value) : value;
                 if (convertedValue == this._value) {
                     return;
@@ -548,14 +592,14 @@ namespace Unity.UIWidgets.material {
 
         float _getValueFromGlobalPosition(Offset globalPosition) {
             float visualPosition =
-                (this.globalToLocal(globalPosition).dx - _overlayRadius) / this._trackLength;
+                (this.globalToLocal(globalPosition).dx - this._trackRect.left) / this._trackRect.width;
             return this._getValueFromVisualPosition(visualPosition);
         }
 
         float _discretize(float value) {
             float result = value.clamp(0.0f, 1.0f);
             if (this.isDiscrete) {
-                result = (result * this.divisions.Value).round() / this.divisions.Value;
+                result = (result * this.divisions.Value).round() * 1.0f / this.divisions.Value;
             }
 
             return result;
@@ -584,7 +628,8 @@ namespace Unity.UIWidgets.material {
                                 this._state.valueIndicatorController.status == AnimationStatus.completed) {
                                 this._state.valueIndicatorController.reverse();
                             }
-                        });
+                        }
+                    );
                 }
             }
         }
@@ -610,7 +655,7 @@ namespace Unity.UIWidgets.material {
 
         void _handleDragUpdate(DragUpdateDetails details) {
             if (this.isInteractive) {
-                float valueDelta = details.primaryDelta.Value / this._trackLength;
+                float valueDelta = details.primaryDelta.Value / this._trackRect.width;
                 this._currentDragValue += valueDelta;
                 this.onChanged(this._discretize(this._currentDragValue));
             }
@@ -642,20 +687,19 @@ namespace Unity.UIWidgets.material {
 
 
         protected override float computeMinIntrinsicWidth(float height) {
-            return Mathf.Max(_overlayDiameter,
-                this._sliderTheme.thumbShape.getPreferredSize(this.isInteractive, this.isDiscrete).width);
+            return _minPreferredTrackWidth + this._maxSliderPartWidth;
         }
 
         protected override float computeMaxIntrinsicWidth(float height) {
-            return _preferredTotalWidth;
+            return _minPreferredTrackWidth + this._maxSliderPartWidth;
         }
 
         protected override float computeMinIntrinsicHeight(float width) {
-            return _overlayDiameter;
+            return Mathf.Max(this._minPreferredTrackHeight, this._maxSliderPartHeight);
         }
 
         protected override float computeMaxIntrinsicHeight(float width) {
-            return _overlayDiameter;
+            return Mathf.Max(this._minPreferredTrackHeight, this._maxSliderPartHeight);
         }
 
         protected override bool sizedByParent {
@@ -666,114 +710,78 @@ namespace Unity.UIWidgets.material {
             this.size = new Size(
                 this.constraints.hasBoundedWidth
                     ? this.constraints.maxWidth
-                    : _preferredTotalWidth,
+                    : _minPreferredTrackWidth + this._maxSliderPartWidth,
                 this.constraints.hasBoundedHeight
                     ? this.constraints.maxHeight
-                    : _overlayDiameter
+                    : Mathf.Max(this._minPreferredTrackHeight, this._maxSliderPartHeight)
             );
-        }
-
-        void _paintTickMarks(
-            Canvas canvas,
-            Rect trackLeft,
-            Rect trackRight,
-            Paint leftPaint,
-            Paint rightPaint) {
-            if (this.isDiscrete) {
-                const float tickRadius = _trackHeight / 2.0f;
-                float trackWidth = trackRight.right - trackLeft.left;
-                float dx = (trackWidth - _trackHeight) / this.divisions.Value;
-
-                if (dx >= 3.0 * _trackHeight) {
-                    for (int i = 0; i <= this.divisions.Value; i += 1) {
-                        float left = trackLeft.left + i * dx;
-                        Offset center = new Offset(left + tickRadius, trackLeft.top + tickRadius);
-                        if (trackLeft.contains(center)) {
-                            canvas.drawCircle(center, tickRadius, leftPaint);
-                        }
-                        else if (trackRight.contains(center)) {
-                            canvas.drawCircle(center, tickRadius, rightPaint);
-                        }
-                    }
-                }
-            }
-        }
-
-        void _paintOverlay(
-            Canvas canvas,
-            Offset center) {
-            Paint overlayPaint = new Paint {color = this._sliderTheme.overlayColor};
-            float radius = _overlayRadiusTween.evaluate(this._overlayAnimation);
-            canvas.drawCircle(center, radius, overlayPaint);
         }
 
         public override void paint(PaintingContext context, Offset offset) {
-            Canvas canvas = context.canvas;
-
-            float trackLength = this.size.width - 2 * _overlayRadius;
             float value = this._state.positionController.value;
-            ColorTween activeTrackEnableColor = new ColorTween(begin: this._sliderTheme.disabledActiveTrackColor,
-                end: this._sliderTheme.activeTrackColor);
-            ColorTween inactiveTrackEnableColor = new ColorTween(begin: this._sliderTheme.disabledInactiveTrackColor,
-                end: this._sliderTheme.inactiveTrackColor);
-            ColorTween activeTickMarkEnableColor = new ColorTween(begin: this._sliderTheme.disabledActiveTickMarkColor,
-                end: this._sliderTheme.activeTickMarkColor);
-            ColorTween inactiveTickMarkEnableColor =
-                new ColorTween(begin: this._sliderTheme.disabledInactiveTickMarkColor,
-                    end: this._sliderTheme.inactiveTickMarkColor);
-
-            Paint activeTrackPaint = new Paint {color = activeTrackEnableColor.evaluate(this._enableAnimation)};
-            Paint inactiveTrackPaint = new Paint {color = inactiveTrackEnableColor.evaluate(this._enableAnimation)};
-            Paint activeTickMarkPaint = new Paint {color = activeTickMarkEnableColor.evaluate(this._enableAnimation)};
-            Paint inactiveTickMarkPaint = new Paint
-                {color = inactiveTickMarkEnableColor.evaluate(this._enableAnimation)};
-
             float visualPosition = value;
-            Paint leftTrackPaint = activeTrackPaint;
-            Paint rightTrackPaint = inactiveTrackPaint;
-            Paint leftTickMarkPaint = activeTickMarkPaint;
-            Paint rightTickMarkPaint = inactiveTickMarkPaint;
 
-            float trackRadius = _trackHeight / 2.0f;
-            float thumbGap = 2.0f;
-
-            float trackVerticalCenter = offset.dy + (this.size.height) / 2.0f;
-            float trackLeft = offset.dx + _overlayRadius;
-            float trackTop = trackVerticalCenter - trackRadius;
-            float trackBottom = trackVerticalCenter + trackRadius;
-            float trackRight = trackLeft + trackLength;
-            float trackActive = trackLeft + trackLength * visualPosition;
-            float thumbRadius =
-                this._sliderTheme.thumbShape.getPreferredSize(this.isInteractive, this.isDiscrete).width / 2.0f;
-            float trackActiveLeft = Mathf.Max(0.0f,
-                trackActive - thumbRadius - thumbGap * (1.0f - this._enableAnimation.value));
-            float trackActiveRight =
-                Mathf.Min(trackActive + thumbRadius + thumbGap * (1.0f - this._enableAnimation.value), trackRight);
-            Rect trackLeftRect = Rect.fromLTRB(trackLeft, trackTop, trackActiveLeft, trackBottom);
-            Rect trackRightRect = Rect.fromLTRB(trackActiveRight, trackTop, trackRight, trackBottom);
-
-            Offset thumbCenter = new Offset(trackActive, trackVerticalCenter);
-
-            if (visualPosition > 0.0) {
-                canvas.drawRect(trackLeftRect, leftTrackPaint);
-            }
-
-            if (visualPosition < 1.0) {
-                canvas.drawRect(trackRightRect, rightTrackPaint);
-            }
-
-            this._paintOverlay(canvas, thumbCenter);
-
-            this._paintTickMarks(
-                canvas,
-                trackLeftRect,
-                trackRightRect,
-                leftTickMarkPaint,
-                rightTickMarkPaint
+            Rect trackRect = this._sliderTheme.trackShape.getPreferredRect(
+                parentBox: this,
+                offset: offset,
+                sliderTheme: this._sliderTheme,
+                isDiscrete: this.isDiscrete
             );
 
-            if (this.isInteractive && this.label != null &&
-                this._valueIndicatorAnimation.status != AnimationStatus.dismissed) {
+            Offset thumbCenter = new Offset(trackRect.left + visualPosition * trackRect.width, trackRect.center.dy);
+
+            this._sliderTheme.trackShape.paint(
+                context,
+                offset,
+                parentBox: this,
+                sliderTheme: this._sliderTheme,
+                enableAnimation: this._enableAnimation,
+                thumbCenter: thumbCenter,
+                isDiscrete: this.isDiscrete,
+                isEnabled: this.isInteractive
+            );
+
+            if (!this._overlayAnimation.isDismissed) {
+                this._sliderTheme.overlayShape.paint(
+                    context,
+                    thumbCenter,
+                    activationAnimation: this._overlayAnimation,
+                    enableAnimation: this._enableAnimation,
+                    isDiscrete: this.isDiscrete,
+                    labelPainter: this._labelPainter,
+                    parentBox: this,
+                    sliderTheme: this._sliderTheme,
+                    value: this._value
+                );
+            }
+
+            if (this.isDiscrete) {
+                float tickMarkWidth = this._sliderTheme.tickMarkShape.getPreferredSize(
+                    isEnabled: this.isInteractive,
+                    sliderTheme: this._sliderTheme
+                ).width;
+
+                if ((trackRect.width - tickMarkWidth) / this.divisions.Value >= 3.0f * tickMarkWidth) {
+                    for (int i = 0; i <= this.divisions; i++) {
+                        float tickValue = i / this.divisions.Value;
+                        float tickX = trackRect.left +
+                                      tickValue * (trackRect.width - tickMarkWidth) + tickMarkWidth / 2;
+                        float tickY = trackRect.center.dy;
+                        Offset tickMarkOffset = new Offset(tickX, tickY);
+                        this._sliderTheme.tickMarkShape.paint(
+                            context,
+                            tickMarkOffset,
+                            parentBox: this,
+                            sliderTheme: this._sliderTheme,
+                            enableAnimation: this._enableAnimation,
+                            thumbCenter: thumbCenter,
+                            isEnabled: this.isInteractive
+                        );
+                    }
+                }
+            }
+
+            if (this.isInteractive && this.label != null && !this._valueIndicatorAnimation.isDismissed) {
                 if (this.showValueIndicator) {
                     this._sliderTheme.valueIndicatorShape.paint(
                         context,

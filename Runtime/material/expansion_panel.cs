@@ -182,7 +182,7 @@ namespace Unity.UIWidgets.material {
         public override void initState() {
             base.initState();
             if (this.widget._allowOnlyOnePanelOpen) {
-                D.assert(this._allIdentifierUnique(), "All object identifiers are not unique!");
+                D.assert(this._allIdentifierUnique(), () => "All object identifiers are not unique!");
                 foreach (ExpansionPanelRadio child in this.widget.children) {
                     if (this.widget.initialOpenPanelValue != null &&
                         child.value == this.widget.initialOpenPanelValue) {
@@ -196,7 +196,7 @@ namespace Unity.UIWidgets.material {
             base.didUpdateWidget(oldWidget);
             ExpansionPanelList _oldWidget = (ExpansionPanelList) oldWidget;
             if (this.widget._allowOnlyOnePanelOpen) {
-                D.assert(this._allIdentifierUnique(), "All object identifiers are not unique!");
+                D.assert(this._allIdentifierUnique(), () => "All object identifiers are not unique!");
                 foreach (ExpansionPanelRadio newChild in this.widget.children) {
                     if (this.widget.initialOpenPanelValue != null &&
                         newChild.value == this.widget.initialOpenPanelValue) {

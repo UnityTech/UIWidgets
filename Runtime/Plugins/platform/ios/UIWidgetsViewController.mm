@@ -65,12 +65,6 @@
     CGFloat bottom = CGRectGetHeight([[info objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue]);
     CGFloat scale = [UIScreen mainScreen].scale;
 
-    // scale == 3 => screen is 1242 * 2208 => we have to perform down-sampling to obtain the real length
-    // 0.8696 = 1920 / 2208, the vertical down-sampling ratio
-    if (scale == 3) {
-        bottom = bottom * 0.8696;
-    }
-
     viewInsets.bottom = bottom * scale;
     padding.bottom = 0;
 
@@ -100,14 +94,18 @@ extern "C"
         viewMetrics metrics;
         viewPadding insets = [[UIWidgetsViewController sharedInstance] viewInsets];
         viewPadding padding = [[UIWidgetsViewController sharedInstance] padding];
-        metrics.insets_bottom = insets.bottom;
-        metrics.insets_top = insets.top;
-        metrics.insets_left = insets.left;
-        metrics.insets_right = insets.right;
-        metrics.padding_bottom = padding.bottom;
-        metrics.padding_top = padding.top;
-        metrics.padding_left = padding.left;
-        metrics.padding_right = padding.right;
+
+        CGFloat scale = [UIScreen mainScreen].scale;
+        BOOL needDownsample = scale == 3;
+
+        metrics.insets_bottom = needDownsample ? insets.bottom * 0.8696 : insets.bottom;
+        metrics.insets_top = needDownsample ? insets.top * 0.8696 : insets.top;
+        metrics.insets_left = needDownsample ? insets.left * 0.8696 : insets.left;
+        metrics.insets_right = needDownsample ? insets.right * 0.8696 : insets.right;
+        metrics.padding_bottom = needDownsample ? padding.bottom * 0.8696 : padding.bottom;
+        metrics.padding_top = needDownsample ? padding.top * 0.8696 : padding.top;
+        metrics.padding_left = needDownsample ? padding.left * 0.8696 : padding.left;
+        metrics.padding_right = needDownsample ? padding.right * 0.8696 : padding.right;
 
         return metrics;
     }

@@ -1071,7 +1071,7 @@ namespace Unity.UIWidgets.material {
         }
 
         protected override float? computeDistanceToActualBaseline(TextBaseline baseline) {
-            D.assert(false, "not implemented");
+            D.assert(false, () => "not implemented");
             return 0.0f;
         }
 
@@ -1396,7 +1396,7 @@ namespace Unity.UIWidgets.material {
         }
 
         protected override void moveChildRenderObject(RenderObject child, object slotValue) {
-            D.assert(false, "not reachable");
+            D.assert(false, () => "not reachable");
         }
     }
 
@@ -1972,8 +1972,8 @@ namespace Unity.UIWidgets.material {
             bool? alignLabelWithHint = null
         ) {
             D.assert(enabled != null);
-            D.assert(!(prefix != null && prefixText != null), "Declaring both prefix and prefixText is not supported");
-            D.assert(!(suffix != null && suffixText != null), "Declaring both suffix and suffixText is not supported");
+            D.assert(!(prefix != null && prefixText != null), () => "Declaring both prefix and prefixText is not supported");
+            D.assert(!(suffix != null && suffixText != null), () => "Declaring both suffix and suffixText is not supported");
             this.isCollapsed = false;
             this.icon = icon;
             this.labelText = labelText;

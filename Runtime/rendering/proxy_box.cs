@@ -1231,7 +1231,7 @@ namespace Unity.UIWidgets.rendering {
                     canvas.drawRRect(offsetRRect, paint);
                     context.clipRRectAndPaint(offsetRRect, this.clipBehavior, offsetBounds,
                         () => base.paint(context, offset));
-                    D.assert(context.canvas == canvas, "canvas changed even though needsCompositing was false");
+                    D.assert(context.canvas == canvas, () => "canvas changed even though needsCompositing was false");
                 }
             }
         }
@@ -1319,7 +1319,7 @@ namespace Unity.UIWidgets.rendering {
                     canvas.drawPath(offsetPath, paint);
                     context.clipPathAndPaint(offsetPath, this.clipBehavior,
                         offsetBounds, () => base.paint(context, offset));
-                    D.assert(context.canvas == canvas, "canvas changed even though needsCompositing was false");
+                    D.assert(context.canvas == canvas, () => "canvas changed even though needsCompositing was false");
                 }
             }
         }

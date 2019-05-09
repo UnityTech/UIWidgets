@@ -75,7 +75,7 @@ namespace Unity.UIWidgets.ui {
             var ascent = -font.ascent * fontSize / font.fontSize;
             var descent = (font.lineHeight - font.ascent) * fontSize / font.fontSize;
             font.RequestCharactersInTextureSafe("x", fontSize, UnityEngine.FontStyle.Normal);
-            var glyphInfo = font.getGlyphInfo('x', fontSize, UnityEngine.FontStyle.Normal);
+            font.getGlyphInfo('x', out var glyphInfo, fontSize, UnityEngine.FontStyle.Normal);
             float fxHeight = glyphInfo.glyphHeight;
 
             return new FontMetrics(ascent, descent, fxHeight: fxHeight);
@@ -189,9 +189,6 @@ namespace Unity.UIWidgets.ui {
             public readonly int endIncludingNewLine;
             public readonly bool hardBreak;
         }
-
-        const int TabSpaceCount = 4;
-
 
         bool _needsLayout = true;
 
@@ -788,8 +785,6 @@ namespace Unity.UIWidgets.ui {
 
                 lineBreaker.finish();
             }
-
-            return;
         }
 
         List<Range<int>> findWords(int start, int end) {

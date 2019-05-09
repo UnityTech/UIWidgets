@@ -14,7 +14,7 @@ using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace UIWidgetsSample {
     public class MaterialSample : UIWidgetsSamplePanel {
-        const int testCaseId = 7;
+        const int testCaseId = 6;
 
         readonly List<Widget> testCases = new List<Widget> {
             new MaterialButtonWidget(),
@@ -42,7 +42,7 @@ namespace UIWidgetsSample {
 
     public class BottomAppBarWidget : StatelessWidget {
         public BottomAppBarWidget(Key key = null) : base(key) {
-            
+
         }
 
         public override Widget build(BuildContext context) {
@@ -54,7 +54,8 @@ namespace UIWidgetsSample {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: new List<Widget> {
                             new IconButton(icon: new Icon(Unity.UIWidgets.material.Icons.menu), onPressed: () => { }),
-                            new IconButton(icon: new Icon(Unity.UIWidgets.material.Icons.account_balance), onPressed: () => { })
+                            new IconButton(icon: new Icon(Unity.UIWidgets.material.Icons.account_balance),
+                                onPressed: () => { })
                         })));
         }
     }
@@ -367,7 +368,7 @@ namespace UIWidgetsSample {
         }
     }
 
-   public class MaterialButtonWidget : StatefulWidget {
+    public class MaterialButtonWidget : StatefulWidget {
         public MaterialButtonWidget(Key key = null) : base(key) {
         }
 
@@ -419,48 +420,50 @@ namespace UIWidgetsSample {
 
     public class MaterialSliderState : State<MaterialSliderWidget> {
 
-        float _value = 0.0f;
+        float _value = 0.8f;
 
         void onChanged(float value) {
             this.setState(() => { this._value = value; });
         }
-        
+
         public override Widget build(BuildContext context) {
             return new Scaffold(
                 appBar: new AppBar(
                     title: new Text("Slider and Indicators")),
                 body: new Column(
-                    children : new List<Widget> {
-                        new Container(
+                    children: new List<Widget> {
+                        new Padding(
+                            padding: EdgeInsets.only(top: 100.0f),
+                            child: new Container(
                             child: new Slider(
+                                divisions: 10,
+                                min: 0.4f,
+                                label: "Here",
                                 value: this._value,
                                 onChanged: this.onChanged))
+                            )
                     }
-                    )
+                )
             );
         }
     }
-    
-    internal class MaterialNavigationBarWidget : StatefulWidget
-    {
-        public MaterialNavigationBarWidget(Key key = null) : base(key)
-        {
+
+    class MaterialNavigationBarWidget : StatefulWidget {
+        public MaterialNavigationBarWidget(Key key = null) : base(key) {
         }
 
-        public override State createState()
-        {
+        public override State createState() {
             return new MaterialNavigationBarWidgetState();
         }
     }
 
-    internal class MaterialNavigationBarWidgetState : SingleTickerProviderStateMixin<MaterialNavigationBarWidget> {
+    class MaterialNavigationBarWidgetState : SingleTickerProviderStateMixin<MaterialNavigationBarWidget> {
         int _currentIndex = 0;
-        public MaterialNavigationBarWidgetState()
-        {
+
+        public MaterialNavigationBarWidgetState() {
         }
 
-        public override Widget build(BuildContext context)
-        {
+        public override Widget build(BuildContext context) {
             return new Scaffold(
                 bottomNavigationBar: new Container(
                     height: 100,
@@ -469,8 +472,7 @@ namespace UIWidgetsSample {
                         child: new BottomNavigationBar(
                             type: BottomNavigationBarType.shifting,
                             // type: BottomNavigationBarType.fix,
-                            items: new List<BottomNavigationBarItem>
-                            {
+                            items: new List<BottomNavigationBarItem> {
                                 new BottomNavigationBarItem(
                                     icon: new Icon(icon: Unity.UIWidgets.material.Icons.work, size: 30),
                                     title: new Text("Work"),
@@ -504,28 +506,22 @@ namespace UIWidgetsSample {
             );
         }
     }
-    
-    internal class MaterialReorderableListViewWidget : StatefulWidget
-    {
-        public MaterialReorderableListViewWidget(Key key = null) : base(key)
-        {
+
+    class MaterialReorderableListViewWidget : StatefulWidget {
+        public MaterialReorderableListViewWidget(Key key = null) : base(key) {
         }
 
-        public override State createState()
-        {
+        public override State createState() {
             return new MaterialReorderableListViewWidgetState();
         }
     }
 
-    internal class MaterialReorderableListViewWidgetState : State<MaterialReorderableListViewWidget>
-    {
-        private List<string> items = new List<string> {"First", "Second", "Third"};
+    class MaterialReorderableListViewWidgetState : State<MaterialReorderableListViewWidget> {
+        List<string> items = new List<string> {"First", "Second", "Third"};
 
-        public override Widget build(BuildContext context)
-        {
+        public override Widget build(BuildContext context) {
             return new Stack(
-                children: new List<Widget>
-                {
+                children: new List<Widget> {
                     new Scaffold(
                         body: new Scrollbar(
                             child: new ReorderableListView(
@@ -551,11 +547,11 @@ namespace UIWidgetsSample {
                                         )
                                     );
                                 }).ToList(),
-                                onReorder: (int oldIndex, int newIndex) =>
-                                {
-                                    this.setState(() =>
-                                    {
-                                        if (newIndex > oldIndex) newIndex -= 1;
+                                onReorder: (int oldIndex, int newIndex) => {
+                                    this.setState(() => {
+                                        if (newIndex > oldIndex) {
+                                            newIndex -= 1;
+                                        }
                                         string item = this.items[oldIndex];
                                         this.items.RemoveAt(oldIndex);
                                         this.items.Insert(newIndex, item);

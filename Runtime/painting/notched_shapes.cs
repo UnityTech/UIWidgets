@@ -24,7 +24,6 @@ namespace Unity.UIWidgets.painting {
 
             float notchRadius = guest.width / 2.0f;
 
-
             const float s1 = 15.0f;
             const float s2 = 1.0f;
 
@@ -38,7 +37,7 @@ namespace Unity.UIWidgets.painting {
             float p2yA = Mathf.Sqrt(r * r - p2xA * p2xA);
             float p2yB = Mathf.Sqrt(r * r - p2xB * p2xB);
 
-            List<Offset> p = new List<Offset>(6);
+            Offset[] p = new Offset[6];
 
             p[0] = new Offset(a - s1, b);
             p[1] = new Offset(a, b);
@@ -49,7 +48,7 @@ namespace Unity.UIWidgets.painting {
             p[4] = new Offset(-1.0f * p[1].dx, p[1].dy);
             p[5] = new Offset(-1.0f * p[0].dx, p[0].dy);
 
-            for (int i = 0; i < p.Count; i += 1) {
+            for (int i = 0; i < p.Length; i += 1) {
                 p[i] += guest.center;
             }
 
@@ -57,9 +56,10 @@ namespace Unity.UIWidgets.painting {
             ret.moveTo(host.left, host.top);
             ret.lineTo(p[0].dx, p[0].dy);
             ret.quadraticBezierTo(p[1].dx, p[1].dy, p[2].dx, p[2].dy);
-            // TODO: replace this lineTo() with arcToPoint when arcToPoint is ready
-            ret.lineTo(p[3].dx, p[3].dy);
-            // ret.arcToPoint(p[3], p[3], radius: Radius.circular(notchRadius), clockwise: false);
+            ret.arcToPoint(
+                p[3], 
+                radius: Radius.circular(notchRadius), 
+                clockwise: false);
             ret.quadraticBezierTo(p[4].dx, p[4].dy, p[5].dx, p[5].dy);
             ret.lineTo(host.right, host.top);
             ret.lineTo(host.right, host.bottom);

@@ -79,7 +79,7 @@ namespace Unity.UIWidgets.widgets {
             D.assert(
                 home == null ||
                 !this.routes.ContainsKey(Navigator.defaultRouteName),
-                "If the home property is specified, the routes table " +
+                () => "If the home property is specified, the routes table " +
                 "cannot include an entry for \" / \", since it would be redundant."
             );
 
@@ -89,7 +89,7 @@ namespace Unity.UIWidgets.widgets {
                 this.routes.ContainsKey(Navigator.defaultRouteName) ||
                 onGenerateRoute != null ||
                 onUnknownRoute != null,
-                "Either the home property must be specified, " +
+                () => "Either the home property must be specified, " +
                 "or the routes table must include an entry for \"/\", " +
                 "or there must be on onGenerateRoute callback specified, " +
                 "or there must be an onUnknownRoute callback specified, " +
@@ -102,7 +102,7 @@ namespace Unity.UIWidgets.widgets {
                 builder != null ||
                 onGenerateRoute != null ||
                 pageRouteBuilder != null,
-                "If neither builder nor onGenerateRoute are provided, the " +
+                () => "If neither builder nor onGenerateRoute are provided, the " +
                 "pageRouteBuilder must be specified so that the default handler " +
                 "will know what kind of PageRoute transition to build."
             );
@@ -249,14 +249,14 @@ namespace Unity.UIWidgets.widgets {
 
             if (pageContentBuilder != null) {
                 D.assert(this.widget.pageRouteBuilder != null,
-                    "The default onGenerateRoute handler for WidgetsApp must have a " +
+                    () => "The default onGenerateRoute handler for WidgetsApp must have a " +
                     "pageRouteBuilder set if the home or routes properties are set.");
                 var route = this.widget.pageRouteBuilder(
                     settings,
                     pageContentBuilder
                 );
                 D.assert(route != null,
-                    "The pageRouteBuilder for WidgetsApp must return a valid non-null Route.");
+                    () => "The pageRouteBuilder for WidgetsApp must return a valid non-null Route.");
                 return route;
             }
 

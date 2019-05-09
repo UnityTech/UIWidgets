@@ -674,9 +674,12 @@ namespace Unity.UIWidgets.ui {
         }
 
         public Offset mapXY(float x, float y) {
-            Offset result;
-            this.getMapXYProc()(this, x, y, out result);
-            return result;
+            this.getMapXYProc()(this, x, y, out var x1, out var y1);
+            return new Offset(x1, y1);
+        }
+        
+        public void mapXY(float x, float y, out float x1, out float y1) {
+            this.getMapXYProc()(this, x, y, out x1, out y1);
         }
 
         public bool mapRect(out Rect dst, Rect src) {
@@ -699,23 +702,54 @@ namespace Unity.UIWidgets.ui {
                 return true;
             }
             else {
-                var points = new[] {
-                    this.mapXY(src.left, src.top),
-                    this.mapXY(src.right, src.top),
-                    this.mapXY(src.right, src.bottom),
-                    this.mapXY(src.left, src.bottom),
-                };
+                float x1, y1, x2, y2, x3, y3, x4, y4;
+                this.mapXY(src.left, src.top, out x1, out y1);
+                this.mapXY(src.right, src.top, out x2, out y2);
+                this.mapXY(src.right, src.bottom, out x3, out y3);
+                this.mapXY(src.left, src.bottom, out x4, out y4);
 
-                var minX = points[0].dx;
-                var minY = points[0].dy;
-                var maxX = points[0].dx;
-                var maxY = points[0].dy;
+                var minX = x1;
+                var minY = y1;
+                var maxX = x1;
+                var maxY = y1;
 
-                for (int i = 1; i < 4; ++i) {
-                    minX = Mathf.Min(minX, points[i].dx);
-                    minY = Mathf.Min(minY, points[i].dy);
-                    maxX = Mathf.Max(maxX, points[i].dx);
-                    maxY = Mathf.Max(maxY, points[i].dy);
+                if (x2 < minX) {
+                    minX = x2;
+                }
+                if (x2 > maxX) {
+                    maxX = x2;
+                }
+                if (y2 < minY) {
+                    minY = y2;
+                }
+                if (y2 > maxY) {
+                    maxY = y2;
+                }
+
+                if (x3 < minX) {
+                    minX = x3;
+                }
+                if (x3 > maxX) {
+                    maxX = x3;
+                }
+                if (y3 < minY) {
+                    minY = y3;
+                }
+                if (y3 > maxY) {
+                    maxY = y3;
+                }
+
+                if (x4 < minX) {
+                    minX = x4;
+                }
+                if (x4 > maxX) {
+                    maxX = x4;
+                }
+                if (y4 < minY) {
+                    minY = y4;
+                }
+                if (y4 > maxY) {
+                    maxY = y4;
                 }
 
                 dst = Rect.fromLTRB(minX, minY, maxX, maxY);
@@ -1043,7 +1077,7 @@ namespace Unity.UIWidgets.ui {
             }
         }
 
-        delegate void MapXYProc(Matrix3 mat, float x, float y, out Offset result);
+        delegate void MapXYProc(Matrix3 mat, float x, float y, out float x1, out float y1);
 
         static readonly MapXYProc[] gMapXYProcs = {
             Identity_xy, Trans_xy,
@@ -1066,54 +1100,55 @@ namespace Unity.UIWidgets.ui {
             return GetMapXYProc(this.getType());
         }
 
-        static void Identity_xy(Matrix3 m, float sx, float sy, out Offset result) {
+        static void Identity_xy(Matrix3 m, float sx, float sy, out float resX, out float resY) {
             D.assert(0 == m.getType());
 
-            result = new Offset(sx, sy);
+            resX = sx;
+            resY = sy;
         }
 
-        static void Trans_xy(Matrix3 m, float sx, float sy, out Offset result) {
+        static void Trans_xy(Matrix3 m, float sx, float sy, out float resX, out float resY) {
             D.assert(m.getType() == TypeMask.kTranslate_Mask);
 
-            result = new Offset(sx + m.fMat[kMTransX], sy + m.fMat[kMTransY]);
+            resX = sx + m.fMat[kMTransX];
+            resY = sy + m.fMat[kMTransY];
         }
 
-        static void Scale_xy(Matrix3 m, float sx, float sy, out Offset result) {
+        static void Scale_xy(Matrix3 m, float sx, float sy, out float resX, out float resY) {
             D.assert((m.getType() & (TypeMask.kScale_Mask | TypeMask.kAffine_Mask | TypeMask.kPerspective_Mask))
                      == TypeMask.kScale_Mask);
             D.assert(0 == m.fMat[kMTransX]);
             D.assert(0 == m.fMat[kMTransY]);
 
-            result = new Offset(sx * m.fMat[kMScaleX], sy * m.fMat[kMScaleY]);
+            resX = sx * m.fMat[kMScaleX];
+            resY = sy * m.fMat[kMScaleY];
         }
 
-        static void ScaleTrans_xy(Matrix3 m, float sx, float sy, out Offset result) {
+        static void ScaleTrans_xy(Matrix3 m, float sx, float sy, out float resX, out float resY) {
             D.assert((m.getType() & (TypeMask.kScale_Mask | TypeMask.kAffine_Mask | TypeMask.kPerspective_Mask))
                      == TypeMask.kScale_Mask);
 
-            result = new Offset(sx * m.fMat[kMScaleX] + m.fMat[kMTransX],
-                sy * m.fMat[kMScaleY] + m.fMat[kMTransY]);
+            resX = sx * m.fMat[kMScaleX] + m.fMat[kMTransX];
+            resY = sy * m.fMat[kMScaleY] + m.fMat[kMTransY];
         }
 
-        static void Rot_xy(Matrix3 m, float sx, float sy, out Offset result) {
+        static void Rot_xy(Matrix3 m, float sx, float sy, out float resX, out float resY) {
             D.assert((m.getType() & (TypeMask.kAffine_Mask | TypeMask.kPerspective_Mask)) == TypeMask.kAffine_Mask);
             D.assert(0 == m.fMat[kMTransX]);
             D.assert(0 == m.fMat[kMTransY]);
 
-            result = new Offset(
-                ScalarUtils.sdot(sx, m.fMat[kMScaleX], sy, m.fMat[kMSkewX]),
-                ScalarUtils.sdot(sx, m.fMat[kMSkewY], sy, m.fMat[kMScaleY]));
+            resX = ScalarUtils.sdot(sx, m.fMat[kMScaleX], sy, m.fMat[kMSkewX]);
+            resY = ScalarUtils.sdot(sx, m.fMat[kMSkewY], sy, m.fMat[kMScaleY]);
         }
 
-        static void RotTrans_xy(Matrix3 m, float sx, float sy, out Offset result) {
+        static void RotTrans_xy(Matrix3 m, float sx, float sy, out float resX, out float resY) {
             D.assert((m.getType() & (TypeMask.kAffine_Mask | TypeMask.kPerspective_Mask)) == TypeMask.kAffine_Mask);
 
-            result = new Offset(
-                ScalarUtils.sdot(sx, m.fMat[kMScaleX], sy, m.fMat[kMSkewX]) + m.fMat[kMTransX],
-                ScalarUtils.sdot(sx, m.fMat[kMSkewY], sy, m.fMat[kMScaleY]) + m.fMat[kMTransY]);
+            resX = ScalarUtils.sdot(sx, m.fMat[kMScaleX], sy, m.fMat[kMSkewX]) + m.fMat[kMTransX];
+            resY = ScalarUtils.sdot(sx, m.fMat[kMSkewY], sy, m.fMat[kMScaleY]) + m.fMat[kMTransY];
         }
 
-        static void Persp_xy(Matrix3 m, float sx, float sy, out Offset result) {
+        static void Persp_xy(Matrix3 m, float sx, float sy, out float resX, out float resY) {
             D.assert(m.hasPerspective());
 
             float x = ScalarUtils.sdot(sx, m.fMat[kMScaleX], sy, m.fMat[kMSkewX]) +
@@ -1126,7 +1161,8 @@ namespace Unity.UIWidgets.ui {
                 z = 1 / z;
             }
 
-            result = new Offset(x * z, y * z);
+            resX = x * z;
+            resY = y * z;
         }
 
         delegate void MapPtsProc(Matrix3 mat, Offset[] dst, Offset[] src, int count);
@@ -1363,6 +1399,10 @@ namespace Unity.UIWidgets.ui {
         public static bool ScalarNearlyEqual(float x, float y, float tolerance = kScalarNearlyZero) {
             D.assert(tolerance >= 0);
             return Mathf.Abs(x - y) <= tolerance;
+        }
+        
+        public static bool ScalarIsInteger(float scalar) {
+            return scalar == Mathf.FloorToInt(scalar);
         }
 
         public static float DegreesToRadians(float degrees) {

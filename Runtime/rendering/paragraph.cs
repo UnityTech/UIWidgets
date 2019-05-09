@@ -341,8 +341,8 @@ namespace Unity.UIWidgets.rendering {
                 int baseOffset = fromPosition.offset;
                 int extentOffset = fromPosition.offset;
                 if (toPosition != null) {
-                    baseOffset = Math.Min(fromPosition.offset, toPosition.offset);
-                    extentOffset = Math.Max(fromPosition.offset, toPosition.offset);
+                    baseOffset = Mathf.Min(fromPosition.offset, toPosition.offset);
+                    extentOffset = Mathf.Max(fromPosition.offset, toPosition.offset);
                 }
 
                 TextSelection newSelection = new TextSelection(

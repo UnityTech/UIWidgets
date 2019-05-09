@@ -115,7 +115,7 @@ namespace Unity.UIWidgets.foundation {
             this._value = value;
         }
 
-        public T value {
+        public virtual T value {
             get { return this._value; }
             set {
                 if (Equals(value, this._value)) {

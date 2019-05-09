@@ -404,7 +404,7 @@ namespace Unity.UIWidgets.rendering {
             RenderBox pivot = null;
             bool onlySlivers = target is RenderSliver;
             while (child.parent != this) {
-                D.assert(child.parent != null, $"target must be a descendant of ${this}");
+                D.assert(child.parent != null, () => $"target must be a descendant of ${this}");
                 if (child is RenderBox) {
                     pivot = (RenderBox) child;
                 }

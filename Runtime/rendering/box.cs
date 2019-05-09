@@ -339,19 +339,19 @@ namespace Unity.UIWidgets.rendering {
             D.assert(
                 (a.minWidth.isFinite() && b.minWidth.isFinite()) ||
                 (a.minWidth == float.PositiveInfinity && b.minWidth == float.PositiveInfinity),
-                "Cannot interpolate between finite constraints and unbounded constraints.");
+                () => "Cannot interpolate between finite constraints and unbounded constraints.");
             D.assert(
                 (a.maxWidth.isFinite() && b.maxWidth.isFinite()) ||
                 (a.maxWidth == float.PositiveInfinity && b.maxWidth == float.PositiveInfinity),
-                "Cannot interpolate between finite constraints and unbounded constraints.");
+                () => "Cannot interpolate between finite constraints and unbounded constraints.");
             D.assert(
                 (a.minHeight.isFinite() && b.minHeight.isFinite()) ||
                 (a.minHeight == float.PositiveInfinity && b.minHeight == float.PositiveInfinity),
-                "Cannot interpolate between finite constraints and unbounded constraints.");
+                () => "Cannot interpolate between finite constraints and unbounded constraints.");
             D.assert(
                 (a.maxHeight.isFinite() && b.maxHeight.isFinite()) ||
                 (a.maxHeight == float.PositiveInfinity && b.maxHeight == float.PositiveInfinity),
-                "Cannot interpolate between finite constraints and unbounded constraints.");
+                () => "Cannot interpolate between finite constraints and unbounded constraints.");
             return new BoxConstraints(
                 minWidth: a.minWidth.isFinite()
                     ? MathUtils.lerpFloat(a.minWidth, b.minWidth, t)
@@ -782,7 +782,7 @@ namespace Unity.UIWidgets.rendering {
 
         public Size size {
             get {
-                D.assert(this.hasSize, "RenderBox was not laid out: " + this);
+                D.assert(this.hasSize, () => "RenderBox was not laid out: " + this);
                 D.assert(() => {
                     if (this._size is _DebugSize) {
                         _DebugSize _size = (_DebugSize) this._size;
@@ -931,7 +931,7 @@ namespace Unity.UIWidgets.rendering {
 
         public float? getDistanceToBaseline(TextBaseline baseline, bool onlyReal = false) {
             D.assert(!_debugDoingBaseline,
-                "Please see the documentation for computeDistanceToActualBaseline for the required calling conventions of this method.");
+                () => "Please see the documentation for computeDistanceToActualBaseline for the required calling conventions of this method.");
             D.assert(!this.debugNeedsLayout);
             D.assert(() => {
                 RenderObject parent = (RenderObject) this.parent;
@@ -961,7 +961,7 @@ namespace Unity.UIWidgets.rendering {
 
         public virtual float? getDistanceToActualBaseline(TextBaseline baseline) {
             D.assert(_debugDoingBaseline,
-                "Please see the documentation for computeDistanceToActualBaseline for the required calling conventions of this method.");
+                () => "Please see the documentation for computeDistanceToActualBaseline for the required calling conventions of this method.");
 
             this._cachedBaselines = this._cachedBaselines ?? new Dictionary<TextBaseline, float?>();
             return this._cachedBaselines.putIfAbsent(baseline, () => this.computeDistanceToActualBaseline(baseline));
@@ -969,7 +969,7 @@ namespace Unity.UIWidgets.rendering {
 
         protected virtual float? computeDistanceToActualBaseline(TextBaseline baseline) {
             D.assert(_debugDoingBaseline,
-                "Please see the documentation for computeDistanceToActualBaseline for the required calling conventions of this method.");
+                () => "Please see the documentation for computeDistanceToActualBaseline for the required calling conventions of this method.");
 
             return null;
         }

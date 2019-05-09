@@ -276,7 +276,7 @@ namespace Unity.UIWidgets.widgets {
             D.assert(decoration == null || decoration.debugAssertIsValid());
             D.assert(constraints == null || constraints.debugAssertIsValid());
             D.assert(color == null || decoration == null,
-                "Cannot provide both a color and a decoration\n" +
+                () => "Cannot provide both a color and a decoration\n" +
                 "The color argument is just a shorthand for \"decoration: new BoxDecoration(backgroundColor: color)\".");
             this.alignment = alignment;
             this.padding = padding;
@@ -466,16 +466,18 @@ namespace Unity.UIWidgets.widgets {
     }
 
     class _AnimatedOpacityState : ImplicitlyAnimatedWidgetState<AnimatedOpacity> {
-        FloatTween _opacity;
+        NullableFloatTween _opacity;
         Animation<float> _opacityAnimation;
 
         protected override void forEachTween(TweenVisitor visitor) {
-            this._opacity = (FloatTween) visitor.visit(this, this._opacity, this.widget.opacity,
-                (float value) => new FloatTween(begin: value, end: 1.0f));
+            this._opacity = (NullableFloatTween) visitor.visit(this, this._opacity, this.widget.opacity,
+                (float? value) => new NullableFloatTween(begin: value));
         }
 
         protected override void didUpdateTweens() {
-            this._opacityAnimation = this.animation.drive(this._opacity);
+            float? endValue = this._opacity.end ?? this._opacity.begin ?? null;
+            D.assert(endValue != null);
+            this._opacityAnimation = this.animation.drive(new FloatTween(begin: this._opacity.begin.Value, end: endValue.Value));
         }
 
         public override Widget build(BuildContext context) {
