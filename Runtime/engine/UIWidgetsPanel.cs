@@ -260,13 +260,15 @@ namespace Unity.UIWidgets.engine {
         }
 
         int getMouseButtonDown() {
+            //default mouse button key = left mouse button
+            var defaultKey = 0;
             for (int key = 0; key < mouseButtonNum; key++) {
                 if (Input.GetMouseButton(key)) {
-                    return InputUtils.getMouseButtonKey(key);
+                    defaultKey = key;
+                    break;
                 }
             }
-
-            return 0;
+            return InputUtils.getMouseButtonKey(defaultKey);
         }
 
         public void OnPointerDown(PointerEventData eventData) {

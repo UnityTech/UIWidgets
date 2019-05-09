@@ -171,12 +171,12 @@ namespace Unity.UIWidgets.gestures {
                 if (!hitAnnotation.activeDevices.Contains(deviceId)) {
                     hitAnnotation.activeDevices.Add(deviceId);
                     if (hitAnnotation.annotation?.onEnter != null) {
-                        hitAnnotation.annotation.onEnter(PointerEnterEvent.fromHoverEvent((PointerHoverEvent)lastEvent));
+                        hitAnnotation.annotation.onEnter(PointerEnterEvent.fromHoverEvent(lastEvent));
                     }
                 }
 
                 if (hitAnnotation.annotation?.onHover != null) {
-                    hitAnnotation.annotation.onHover((PointerHoverEvent)lastEvent);
+                    hitAnnotation.annotation.onHover(PointerHoverEvent.fromHoverEvent(lastEvent));
                 }
 
                 foreach (_TrackedAnnotation trackedAnnotation in this._trackedAnnotations.Values) {
