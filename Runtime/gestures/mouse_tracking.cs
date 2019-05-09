@@ -56,7 +56,7 @@ namespace Unity.UIWidgets.gestures {
             this.annotationFinder = annotationFinder;
         }
         
-        Dictionary<int, PointerEvent> _lastMouseEvent = new Dictionary<int, PointerEvent>();
+        readonly Dictionary<int, PointerEvent> _lastMouseEvent = new Dictionary<int, PointerEvent>();
 
         public bool mouseIsConnected {
             get { return this._lastMouseEvent.isNotEmpty(); }
