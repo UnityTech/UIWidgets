@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
     static class ShadowUtils {
-        public static bool kUseFastShadow = true;
+        public static bool kUseFastShadow = false;
 
         public const float kAmbientHeightFactor = 1.0f / 128.0f;
         public const float kAmbientGeomFactor = 64.0f;

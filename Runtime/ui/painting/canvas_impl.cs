@@ -753,11 +753,6 @@ namespace Unity.UIWidgets.ui {
             D.assert(this._layers[0].states.Count == 1);
 
             var layer = this._currentLayer;
-            if (layer.draws.Count == 0) {
-                D.assert(layer.layers.Count == 0);
-                return;
-            }
-
             using (var cmdBuf = new CommandBuffer()) {
                 cmdBuf.name = "CommandBufferCanvas";
 
@@ -870,6 +865,12 @@ namespace Unity.UIWidgets.ui {
                         break;
                 }
             }
+            
+            if (toClear) {
+                this._setRenderTarget(cmdBuf, layer.rtID, ref toClear);
+            }
+            
+            D.assert(!toClear);
 
             foreach (var subLayer in layer.layers) {
                 cmdBuf.ReleaseTemporaryRT(subLayer.rtID);
