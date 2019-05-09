@@ -59,7 +59,7 @@ var UIWidgetsLibrary = {
     },
     
     UIWidgetsCopyTextToClipboard: function (text) {
-        var el = document.createElement('input');
+        var el = document.createElement('textarea');
         el.value = Pointer_stringify(text);
         el.setAttribute('readonly', '');
         el.style = {
