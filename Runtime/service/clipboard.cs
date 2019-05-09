@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using RSG;
 using UnityEngine;
 
@@ -29,7 +30,12 @@ namespace Unity.UIWidgets.service {
 
     public class UnityGUIClipboard : Clipboard {
         protected override IPromise setClipboardData(ClipboardData data) {
+#if UNITY_WEBGL
+            UIWidgetsCopyTextToClipboard(data.text);
+#else
             GUIUtility.systemCopyBuffer = data.text;
+#endif
+            
             return Promise.Resolved();
         }
 
@@ -37,5 +43,10 @@ namespace Unity.UIWidgets.service {
             var data = new ClipboardData(text: GUIUtility.systemCopyBuffer);
             return Promise<ClipboardData>.Resolved(data);
         }
+        
+#if UNITY_WEBGL
+        [DllImport ("__Internal")]
+        internal static extern void UIWidgetsCopyTextToClipboard(string text);
+#endif
     }
 }

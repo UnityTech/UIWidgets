@@ -35,7 +35,7 @@ namespace UIWidgetsSample {
             return new Scaffold(
                 appBar: new AppBar(
                     title: new Center(
-                        child: new Text("Test Hover Widget")
+                        child: new SelectableText("Test Hover Widget")
                     )
                 ),
                 body: new Card(
