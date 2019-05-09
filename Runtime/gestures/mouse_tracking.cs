@@ -168,17 +168,7 @@ namespace Unity.UIWidgets.gestures {
                 }
 
                 _TrackedAnnotation hitAnnotation = this._findAnnotation(hit);
-                if (!hitAnnotation.activeDevices.Contains(deviceId)) {
-                    hitAnnotation.activeDevices.Add(deviceId);
-                    if (hitAnnotation.annotation?.onEnter != null) {
-                        hitAnnotation.annotation.onEnter(PointerEnterEvent.fromHoverEvent(lastEvent));
-                    }
-                }
-
-                if (hitAnnotation.annotation?.onHover != null) {
-                    hitAnnotation.annotation.onHover(PointerHoverEvent.fromHoverEvent(lastEvent));
-                }
-
+                //leave
                 foreach (_TrackedAnnotation trackedAnnotation in this._trackedAnnotations.Values) {
                     if (hitAnnotation == trackedAnnotation) {
                         continue;
@@ -191,6 +181,19 @@ namespace Unity.UIWidgets.gestures {
 
                         trackedAnnotation.activeDevices.Remove(deviceId);
                     }
+                }
+                
+                //enter
+                if (!hitAnnotation.activeDevices.Contains(deviceId)) {
+                    hitAnnotation.activeDevices.Add(deviceId);
+                    if (hitAnnotation.annotation?.onEnter != null) {
+                        hitAnnotation.annotation.onEnter(PointerEnterEvent.fromHoverEvent(lastEvent));
+                    }
+                }
+
+                //hover
+                if (hitAnnotation.annotation?.onHover != null) {
+                    hitAnnotation.annotation.onHover(PointerHoverEvent.fromHoverEvent(lastEvent));
                 }
             }
         }
