@@ -56,6 +56,20 @@ var UIWidgetsLibrary = {
 
     UIWidgetsMessageSetObjectName: function (name) {
         UIWidgetsPlugin.getMessageManager().setObjectName(Pointer_stringify(name));
+    },
+    
+    UIWidgetsCopyTextToClipboard: function (text) {
+        var el = document.createElement('textarea');
+        el.value = Pointer_stringify(text);
+        el.setAttribute('readonly', '');
+        el.style = {
+            position: 'fixed',
+            left: '-9999px',
+        };
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
     }
 };
 
