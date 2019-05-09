@@ -8,7 +8,7 @@ using Unity.UIWidgets.widgets;
 using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace UIWidgets.Runtime.material {
-    public class TextFormField : FormField {
+    public class TextFormField : FormField<string> {
         public TextFormField(
             Key key = null,
             TextEditingController controller = null,
@@ -30,8 +30,8 @@ namespace UIWidgets.Runtime.material {
             int? maxLength = null,
             VoidCallback onEditingComplete = null,
             ValueChanged<string> onFieldSubmitted = null,
-            FormFieldSetter onSaved = null,
-            FormFieldValidator validator = null,
+            FormFieldSetter<string> onSaved = null,
+            FormFieldValidator<string> validator = null,
             List<TextInputFormatter> inputFormatters = null,
             bool enabled = true,
             float cursorWidth = 2.0f,
@@ -48,7 +48,7 @@ namespace UIWidgets.Runtime.material {
             validator: validator,
             autovalidate: autovalidate,
             enabled: enabled,
-            builder: (FormFieldState field) => {
+            builder: (FormFieldState<string> field) => {
                 _TextFormFieldState state = (_TextFormFieldState) field;
                 InputDecoration effectiveDecoration = (decoration ?? new InputDecoration())
                     .applyDefaults(Theme.of(field.context).inputDecorationTheme);
@@ -96,7 +96,7 @@ namespace UIWidgets.Runtime.material {
         }
     }
 
-    class _TextFormFieldState : FormFieldState {
+    class _TextFormFieldState : FormFieldState<string> {
         TextEditingController _controller;
 
         public TextEditingController _effectiveController {
@@ -110,7 +110,7 @@ namespace UIWidgets.Runtime.material {
         public override void initState() {
             base.initState();
             if (this.widget.controller == null) {
-                this._controller = new TextEditingController(text: (string) this.widget.initialValue);
+                this._controller = new TextEditingController(text: this.widget.initialValue);
             }
             else {
                 this.widget.controller.addListener(this._handleControllerChanged);

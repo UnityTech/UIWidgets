@@ -38,7 +38,7 @@ namespace Unity.UIWidgets.widgets {
 
     public class FormState : State<Form> {
         int _generation = 0;
-        public readonly HashSet<object> _fields = new HashSet<object>();
+        readonly HashSet<FormFieldState> _fields = new HashSet<FormFieldState>();
 
         public FormState() {
         }
@@ -55,11 +55,11 @@ namespace Unity.UIWidgets.widgets {
             this.setState(() => { ++this._generation; });
         }
 
-        public void _register(object field) {
+        public void _register(FormFieldState field) {
             this._fields.Add(field);
         }
 
-        public void _unregister(object field) {
+        public void _unregister(FormFieldState field) {
             this._fields.Remove(field);
         }
 
@@ -133,19 +133,19 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
-    public delegate string FormFieldValidator(object value);
+    public delegate string FormFieldValidator<T>(T value);
 
-    public delegate void FormFieldSetter(object newValue);
+    public delegate void FormFieldSetter<T>(T newValue);
 
-    public delegate Widget FormFieldBuilder(FormFieldState field);
+    public delegate Widget FormFieldBuilder<T>(FormFieldState<T> field) where T : class;
 
-    public class FormField : StatefulWidget {
+    public class FormField<T> : StatefulWidget where T : class {
         public FormField(
             Key key = null,
-            FormFieldBuilder builder = null,
-            FormFieldSetter onSaved = null,
-            FormFieldValidator validator = null,
-            object initialValue = null,
+            FormFieldBuilder<T> builder = null,
+            FormFieldSetter<T> onSaved = null,
+            FormFieldValidator<T> validator = null,
+            T initialValue = null,
             bool autovalidate = false,
             bool enabled = true
         ) : base(key: key) {
@@ -158,28 +158,36 @@ namespace Unity.UIWidgets.widgets {
             this.enabled = enabled;
         }
 
-        public readonly FormFieldSetter onSaved;
+        public readonly FormFieldSetter<T> onSaved;
 
-        public readonly FormFieldValidator validator;
+        public readonly FormFieldValidator<T> validator;
 
-        public readonly FormFieldBuilder builder;
+        public readonly FormFieldBuilder<T> builder;
 
-        public readonly object initialValue;
+        public readonly T initialValue;
 
         public readonly bool autovalidate;
 
         public readonly bool enabled;
 
         public override State createState() {
-            return new FormFieldState();
+            return new FormFieldState<T>();
         }
     }
 
-    public class FormFieldState : State<FormField> {
-        object _value;
+    public interface FormFieldState {
+        void save();
+
+        bool validate();
+
+        void reset();
+    }
+
+    public class FormFieldState<T> : State<FormField<T>>, FormFieldState where T : class {
+        T _value;
         string _errorText;
 
-        public object value {
+        public T value {
             get { return this._value; }
         }
 
@@ -191,7 +199,7 @@ namespace Unity.UIWidgets.widgets {
             get { return this._errorText != null; }
         }
 
-        public virtual void save() {
+        public void save() {
             if (this.widget.onSaved != null) {
                 this.widget.onSaved(this.value);
             }
@@ -217,12 +225,12 @@ namespace Unity.UIWidgets.widgets {
             return !this.hasError;
         }
 
-        public virtual void didChange(object value) {
+        public virtual void didChange(T value) {
             this.setState(() => { this._value = value; });
             Form.of(this.context)?._fieldDidChange();
         }
 
-        protected void setValue(object value) {
+        protected void setValue(T value) {
             this._value = value;
         }
 
