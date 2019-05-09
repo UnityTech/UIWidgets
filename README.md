@@ -208,7 +208,13 @@ Status bar is always hidden by default when an Unity project is running on an An
  want to show the status bar in your App, this
  [solution](https://github.com/Over17/UnityShowAndroidStatusBar) seems to be 
  compatible to UIWidgets, therefore can be used as a good option before we release our
- full support solution on this issue.
+ full support solution on this issue. 
+ 
+ Besides,
+ please set "Render Outside Safe Area" to true in the "Player Settings" to make this plugin working properly on Android P or later.
+ 
+ 
+
 
 #### Automatically Adjust Frame Rate
 

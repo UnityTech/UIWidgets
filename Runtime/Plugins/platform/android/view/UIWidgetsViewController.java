@@ -35,7 +35,7 @@ public class UIWidgetsViewController {
     private boolean keyboardOpen;
     
     private void setup() {
-        Log.i("tag", "On Setup");
+        //Log.i("tag", "On Setup 2");
         
         keyboardOpen = false;
         viewMetrics = new UIWidgetsViewMetrics();
@@ -111,7 +111,7 @@ public class UIWidgetsViewController {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
+        //Log.i("UIWidgetsDebug", " hasBar: " + hasBar);
         return hasBar;
     }
     
@@ -119,6 +119,8 @@ public class UIWidgetsViewController {
         final View unityView = ((ViewGroup)UnityPlayer.currentActivity.findViewById(android.R.id.content)).getChildAt(0);
         Rect rect = new Rect();
         unityView.getWindowVisibleDisplayFrame(rect);
+        
+        //Log.i("UIWidgetsDebug", "calculation: " + unityView.getRootView().getHeight() + " " + rect.bottom + " " + rect.top);
         
         rect.bottom = unityView.getRootView().getHeight() - (rect.bottom - rect.top) - rect.top;
         rect.right = unityView.getRootView().getWidth() - (rect.right - rect.left) - rect.left;
@@ -129,9 +131,6 @@ public class UIWidgetsViewController {
         ZeroSides zeroSides = ZeroSides.NONE;
         if (navigationBarHidden) {
             zeroSides = calculateShouldZeroSides(unityView);
-        } else {
-            rect.bottom -= getNavigationBarHeight();
-            rect.bottom = rect.bottom > 0 ? rect.bottom : 0;
         }
         
         viewMetrics.padding_top = rect.top;
@@ -143,6 +142,10 @@ public class UIWidgetsViewController {
         viewMetrics.insets_right = 0;
         viewMetrics.insets_bottom = navigationBarHidden? calculateBottomKeyboardInset(rect) : rect.bottom;
         viewMetrics.insets_left = 0;
+        
+        //Log.i("UIWidgetsDebug", "checks: " + navigationBarHidden + " " + rect.bottom);
+        //Log.i("UIWidgetsDebug", " padding: " + viewMetrics.padding_top + " " + viewMetrics.padding_right + " " + viewMetrics.padding_bottom + " " + viewMetrics.padding_left);
+        //Log.i("UIWidgetsDebug", " insets: " + viewMetrics.insets_top + " " + viewMetrics.insets_right + " " + viewMetrics.insets_bottom + " " + viewMetrics.insets_left);
     }
     
     public void setupViewMetricsChangedListener() {
