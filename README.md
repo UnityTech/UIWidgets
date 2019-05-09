@@ -225,8 +225,9 @@ If you would like to modify the behavior of speeding up or cooling down the fram
 #### WebGL Canvas Device Pixel Ratio Plugin
 The width and height of the Canvas in browser may differ from the number of pixels the Canvas occupies on the screen.
 Therefore, the image may blur in the builded WebGL program.
-The Plugin `Plugins/platform/webgl/UIWidgetsCanvasDevicePixelRatio.jslib` solves this issue.
-If you need to disable this plugin for any reason, please select this plugin in the **Project** panel, and put an arbitrary string (that is not defined as a macro by Unity) in the **Define Constraints** field in the **Inspector** panel (for example, `ENABLE_CANVAS_DEVICE_PIXEL_RATIO_PLUGIN`), so that the plugin is enabled only if this macro is defined in **Player Settings**, which effectively disables the plugin.
+The Plugin `Plugins/platform/webgl/UIWidgetsCanvasDevicePixelRatio_20xx.x.jslib` (2018.3 and 2019.1 for now) solves this issue.
+Please select the plugin of the Unity version corresponding to your project, and disable other versions of this plugin, as follows: select this plugin in the **Project** panel, and uncheck **WebGL** under **Select platforms for plugin** in the **Inspector** panel.
+If you need to disable this plugin for any reason, please disable all the versions of this plugin as described above.
 
 This plugin overrides the following parameters in the Unity WebGL building module:
 ```
