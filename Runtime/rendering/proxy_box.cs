@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Unity.UIWidgets.animation;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
@@ -1195,7 +1194,7 @@ namespace Unity.UIWidgets.rendering {
             return base.hitTest(result, position: position);
         }
 
-        
+
         public override void paint(PaintingContext context, Offset offset) {
             if (this.child != null) {
                 this._updateClip();
@@ -1283,7 +1282,7 @@ namespace Unity.UIWidgets.rendering {
             return base.hitTest(result, position: position);
         }
 
-        
+
         public override void paint(PaintingContext context, Offset offset) {
             if (this.child != null) {
                 this._updateClip();
@@ -1302,19 +1301,20 @@ namespace Unity.UIWidgets.rendering {
                 }
                 else {
                     Canvas canvas = context.canvas;
-                if (this.elevation != 0.0) {
-                    canvas.drawRect(
-                        offsetBounds.inflate(20.0f),
-                        _transparentPaint
-                    );
-                    
-                    canvas.drawShadow(
-                        offsetPath,
-                        this.shadowColor,
-                        this.elevation,
-                        this.color.alpha != 0xFF
-                    );
-                }
+                    if (this.elevation != 0.0) {
+                        canvas.drawRect(
+                            offsetBounds.inflate(20.0f),
+                            _transparentPaint
+                        );
+
+                        canvas.drawShadow(
+                            offsetPath,
+                            this.shadowColor,
+                            this.elevation,
+                            this.color.alpha != 0xFF
+                        );
+                    }
+
                     Paint paint = new Paint {color = this.color, style = PaintingStyle.fill};
                     canvas.drawPath(offsetPath, paint);
                     context.clipPathAndPaint(offsetPath, this.clipBehavior,
@@ -1909,6 +1909,7 @@ namespace Unity.UIWidgets.rendering {
                 }
             }
         }
+
         PointerEnterEventListener _onPointerEnter;
 
         public PointerHoverEventListener onPointerHover {
@@ -1920,6 +1921,7 @@ namespace Unity.UIWidgets.rendering {
                 }
             }
         }
+
         PointerHoverEventListener _onPointerHover;
 
         public PointerExitEventListener onPointerExit {
@@ -1931,6 +1933,7 @@ namespace Unity.UIWidgets.rendering {
                 }
             }
         }
+
         PointerExitEventListener _onPointerExit;
 
         public PointerUpEventListener onPointerUp;
@@ -1942,17 +1945,16 @@ namespace Unity.UIWidgets.rendering {
         MouseTrackerAnnotation _hoverAnnotation;
 
         void _updateAnnotations() {
-            D.assert(this._onPointerEnter != this._hoverAnnotation.onEnter || 
+            D.assert(this._onPointerEnter != this._hoverAnnotation.onEnter ||
                      this._onPointerHover != this._hoverAnnotation.onHover ||
                      this._onPointerExit != this._hoverAnnotation.onExit,
                 "Shouldn't call _updateAnnotations if nothing has changed.");
-            
+
             if (this._hoverAnnotation != null && this.attached) {
                 RendererBinding.instance.mouseTracker.detachAnnotation(this._hoverAnnotation);
             }
-            
-            if (this._onPointerEnter != null || this._onPointerHover != null || this._onPointerExit != null)
-            {
+
+            if (this._onPointerEnter != null || this._onPointerHover != null || this._onPointerExit != null) {
                 this._hoverAnnotation = new MouseTrackerAnnotation(
                     onEnter: this._onPointerEnter,
                     onHover: this._onPointerHover,
@@ -1965,11 +1967,11 @@ namespace Unity.UIWidgets.rendering {
             else {
                 this._hoverAnnotation = null;
             }
-            
+
             this.markNeedsPaint();
         }
 
-        public override void attach(Object owner) {
+        public override void attach(object owner) {
             base.attach(owner);
             if (this._hoverAnnotation != null) {
                 RendererBinding.instance.mouseTracker.attachAnnotation(this._hoverAnnotation);
@@ -1987,10 +1989,12 @@ namespace Unity.UIWidgets.rendering {
             if (this._hoverAnnotation != null) {
                 AnnotatedRegionLayer<MouseTrackerAnnotation> layer = new AnnotatedRegionLayer<MouseTrackerAnnotation>(
                     this._hoverAnnotation, size: this.size, offset: offset);
-                
+
                 context.pushLayer(layer, base.paint, offset);
             }
-            base.paint(context, offset);
+            else {
+                base.paint(context, offset);
+            }
         }
 
         protected override void performResize() {
@@ -2550,10 +2554,10 @@ namespace Unity.UIWidgets.rendering {
         public override void paint(PaintingContext context, Offset offset) {
             AnnotatedRegionLayer<T> layer =
                 new AnnotatedRegionLayer<T>(
-                    value: this.value, 
+                    value: this.value,
                     size: this.sized ? this.size : null,
                     offset: this.sized ? offset : null);
-            
+
             context.pushLayer(layer, base.paint, offset);
         }
     }
