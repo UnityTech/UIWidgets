@@ -5,7 +5,6 @@ using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
-using Unity.UIWidgets.utils;
 using UnityEngine;
 using Rect = Unity.UIWidgets.ui.Rect;
 

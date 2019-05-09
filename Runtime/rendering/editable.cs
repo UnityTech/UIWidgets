@@ -877,6 +877,7 @@ namespace Unity.UIWidgets.rendering {
 
         public TextPosition getParagraphBackward(TextPosition position, TextAffinity? affinity = null) {
             var lineCount = this._textPainter.getLineCount();
+            
             Paragraph.LineRange line = null;
             for (int i = lineCount - 1; i >= 0; --i) {
                 line = this._textPainter.getLineRange(i);
@@ -988,8 +989,8 @@ namespace Unity.UIWidgets.rendering {
                 int baseOffset = fromPosition.offset;
                 int extentOffset = fromPosition.offset;
                 if (toPosition != null) {
-                    baseOffset = Math.Min(fromPosition.offset, toPosition.offset);
-                    extentOffset = Math.Max(fromPosition.offset, toPosition.offset);
+                    baseOffset = Mathf.Min(fromPosition.offset, toPosition.offset);
+                    extentOffset = Mathf.Max(fromPosition.offset, toPosition.offset);
                 }
 
                 TextSelection newSelection = new TextSelection(

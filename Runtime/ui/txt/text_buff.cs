@@ -2,7 +2,7 @@ using System;
 using Unity.UIWidgets.foundation;
 
 namespace Unity.UIWidgets.ui {
-    class TextBuff {
+    struct TextBuff {
         public readonly string text;
         public readonly int offset;
         public readonly int size;
@@ -23,7 +23,7 @@ namespace Unity.UIWidgets.ui {
             return new TextBuff(this.text, this.offset + shift, size);
         }
 
-        public String getString() {
+        public override string ToString() {
             return this.text.Substring(this.offset, this.size);
         }
     }

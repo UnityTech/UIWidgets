@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.UIWidgets.InternalBridge;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -133,21 +134,17 @@ namespace Unity.UIWidgets.foundation {
             return "{ " + string.Join(", ", it.Select(item => item.ToString())) + " }";
         }
 
-        public static void resize<T>(this List<T> list, int size, T value) {
-            int curSize = list.Count;
-            if (size < curSize) {
-                list.RemoveRange(size, curSize - size);
-            } else if(size > curSize) {
-                if (size > list.Capacity) {
-                    list.Capacity = size;
-                }
-                list.AddRange(Enumerable.Repeat(value, size - curSize));
-            }
-            
-            int remains = Math.Min(curSize, size);
-            for (int i = 0; i < remains; ++i) {
-                list[i] = value;
-            }
+        public static void reset<T>(this List<T> list, int size) {
+            NoAllocHelpersBridge<T>.EnsureListElemCount(list, size);
+        }
+
+        public static ref T refAt<T>(this List<T> list, int index) {
+            var array = NoAllocHelpersBridge<T>.ExtractArrayFromListT(list);
+            return ref array[index];
+        }
+        
+        public static T[] array<T>(this List<T> list) {
+            return NoAllocHelpersBridge<T>.ExtractArrayFromListT(list);
         }
     }
 }

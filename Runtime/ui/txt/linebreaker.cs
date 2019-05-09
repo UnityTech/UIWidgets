@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
+using Unity.UIWidgets.InternalBridge;
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
@@ -41,10 +40,10 @@ namespace Unity.UIWidgets.ui {
             }
 
             if (this._tabWidth == int.MaxValue) {
-                this._font.RequestCharactersInTextureSafe(" ", this._fontSize);
                 if (this._fontSize > 0) {
-                    var glyphInfo = this._font.getGlyphInfo(' ', this._fontSize, UnityEngine.FontStyle.Normal);
-                    this._tabWidth = (int)Math.Round(glyphInfo.advance * kTabSpaceCount);
+                    this._font.RequestCharactersInTextureSafe(" ", this._fontSize);
+                    this._font.getGlyphInfo(' ', out var glyphInfo, this._fontSize, UnityEngine.FontStyle.Normal);
+                    this._tabWidth = glyphInfo.advance * kTabSpaceCount;
                 }
             }
 
@@ -103,7 +102,7 @@ namespace Unity.UIWidgets.ui {
 
         public void resize(int size) {
             if (this._charWidths.Count < size) {
-                this._charWidths.AddRange(Enumerable.Repeat(0.0f, size - this._charWidths.Count));
+                NoAllocHelpersBridge<float>.ResizeList(this._charWidths, size);
             }
         }
 
@@ -187,7 +186,7 @@ namespace Unity.UIWidgets.ui {
             this._candidates.Clear();
             this._widths.Clear();
             this._breaks.Clear();
-            this._textBuf = null;
+            this._textBuf = default;
         }
 
         public List<float> getWidths() {

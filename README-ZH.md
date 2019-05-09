@@ -188,8 +188,9 @@ UIWidgets也支持Gif！
 
 #### 八、WebGL Canvas分辨率调整插件
 因为浏览器中Canvas的宽高和其在显示器上的像素数可能不一致，所以构建出的WebGL程序中画面可能会模糊。
-插件`Plugins/platform/webgl/UIWidgetsCanvasDevicePixelRatio.jslib`解决了这个问题。
-如果您因为任何原因需要禁止此插件，请在Project面板中选中该插件，在Inspector面板中的Define Constraints参数中，输入任意（没有被Unity定义为宏）的字符串（例如`ENABLE_CANVAS_DEVICE_PIXEL_RATIO_PLUGIN`），使得只有在Player Settings中定义了这个宏，此插件才会启用。
+插件`Plugins/platform/webgl/UIWidgetsCanvasDevicePixelRatio_20xx.x.jslib`（目前有2018.3和2019.1）解决了这个问题。
+请根据您的项目的Unity版本选择对应的插件，并禁用此插件的其他版本。方法如下：在Project面板中选中该插件，在Inspector面板中的Select platforms for plugin中，去掉WebGL后面的对勾。
+如果您因为任何原因需要完全禁止此插件的功能，请按上述方法禁用此插件的所有版本。
 
 此插件覆盖了Unity WebGL构建模块中的如下参数：
 ```

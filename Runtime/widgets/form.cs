@@ -38,7 +38,7 @@ namespace Unity.UIWidgets.widgets {
 
     public class FormState : State<Form> {
         int _generation = 0;
-        public readonly HashSet<FormFieldState<dynamic>> _fields = new HashSet<FormFieldState<dynamic>>();
+        readonly HashSet<FormFieldState> _fields = new HashSet<FormFieldState>();
 
         public FormState() {
         }
@@ -55,11 +55,11 @@ namespace Unity.UIWidgets.widgets {
             this.setState(() => { ++this._generation; });
         }
 
-        public void _register(FormFieldState<dynamic> field) {
+        public void _register(FormFieldState field) {
             this._fields.Add(field);
         }
 
-        public void _unregister(FormFieldState<dynamic> field) {
+        public void _unregister(FormFieldState field) {
             this._fields.Remove(field);
         }
 
@@ -78,28 +78,28 @@ namespace Unity.UIWidgets.widgets {
             );
         }
 
-        void save() {
-            foreach (FormFieldState<dynamic> field in this._fields) {
+        public void save() {
+            foreach (FormFieldState field in this._fields) {
                 field.save();
             }
         }
 
-        void reset() {
-            foreach (FormFieldState<dynamic> field in this._fields) {
+        public void reset() {
+            foreach (FormFieldState field in this._fields) {
                 field.reset();
             }
 
             this._fieldDidChange();
         }
 
-        bool validate() {
+        public bool validate() {
             this._forceRebuild();
             return this._validate();
         }
 
         bool _validate() {
             bool hasError = false;
-            foreach (FormFieldState<dynamic> field in this._fields) {
+            foreach (FormFieldState field in this._fields) {
                 hasError = !field.validate() || hasError;
             }
 
@@ -175,7 +175,15 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
-    public class FormFieldState<T> : State<FormField<T>> where T : class {
+    public interface FormFieldState {
+        void save();
+
+        bool validate();
+
+        void reset();
+    }
+
+    public class FormFieldState<T> : State<FormField<T>>, FormFieldState where T : class {
         T _value;
         string _errorText;
 
@@ -197,7 +205,7 @@ namespace Unity.UIWidgets.widgets {
             }
         }
 
-        public void reset() {
+        public virtual void reset() {
             this.setState(() => {
                 this._value = this.widget.initialValue;
                 this._errorText = null;
@@ -232,7 +240,7 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public override void deactivate() {
-            Form.of(this.context)?._unregister(this as FormFieldState<dynamic>);
+            Form.of(this.context)?._unregister(this);
             base.deactivate();
         }
 
@@ -241,7 +249,7 @@ namespace Unity.UIWidgets.widgets {
                 this._validate();
             }
 
-            Form.of(context)?._register(this as FormFieldState<dynamic>);
+            Form.of(context)?._register(this);
             return this.widget.builder(this);
         }
     }

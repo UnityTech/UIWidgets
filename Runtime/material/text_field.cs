@@ -161,7 +161,7 @@ namespace Unity.UIWidgets.material {
             properties.add(new EnumProperty<TextCapitalization>("textCapitalization", this.textCapitalization, defaultValue: TextCapitalization.none));
             properties.add(new EnumProperty<TextAlign>("textAlign", this.textAlign, defaultValue: TextAlign.left));
             properties.add(new EnumProperty<TextDirection>("textDirection", this.textDirection, defaultValue: null));
-            properties.add(new FloatProperty("cursorWidth", this.cursorWidth, defaultValue: 2.0));
+            properties.add(new FloatProperty("cursorWidth", this.cursorWidth, defaultValue: 2.0f));
             properties.add(new DiagnosticsProperty<Radius>("cursorRadius", this.cursorRadius, defaultValue: null));
             properties.add(new DiagnosticsProperty<Color>("cursorColor", this.cursorColor, defaultValue: null));
             properties.add(new DiagnosticsProperty<Brightness?>("keyboardAppearance", this.keyboardAppearance, defaultValue: null));

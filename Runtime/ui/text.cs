@@ -92,7 +92,7 @@ namespace Unity.UIWidgets.ui {
 
         internal UnityEngine.FontStyle UnityFontStyle {
             get {
-                bool isBold = this.fontWeight == FontWeight.bold;
+                bool isBold = this.fontWeight.index == FontWeight.bold.index;
                 if (this.fontStyle == FontStyle.italic) {
                     if (isBold) {
                         return UnityEngine.FontStyle.BoldAndItalic;
