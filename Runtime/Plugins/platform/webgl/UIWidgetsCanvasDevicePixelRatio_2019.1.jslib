@@ -995,7 +995,7 @@ mergeInto(LibraryManager.library, {
             if (window["performance"] && window["performance"]["now"]) return window["performance"]["now"](); else return Date.now();
         }),
 
-        fillDeviceMotionEventData: function(eventStruct, e, target) {
+        fillDeviceOrientationEventData: function(eventStruct, e, target) {
             HEAPF64[JSEvents.deviceOrientationEvent >> 3] = JSEvents.tick();
             HEAPF64[JSEvents.deviceOrientationEvent + 8 >> 3] = e.alpha;
             HEAPF64[JSEvents.deviceOrientationEvent + 16 >> 3] = e.beta;
