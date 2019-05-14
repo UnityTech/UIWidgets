@@ -146,5 +146,14 @@ namespace Unity.UIWidgets.foundation {
         public static T[] array<T>(this List<T> list) {
             return NoAllocHelpersBridge<T>.ExtractArrayFromListT(list);
         }
+
+        public static List<T> CreateRepeatedList<T>(T value, int length) {
+            List<T> newList = new List<T>(length);
+            for (int i = 0; i < length; i++) {
+                newList.Add(value);
+            }
+
+            return newList;
+        }
     }
 }

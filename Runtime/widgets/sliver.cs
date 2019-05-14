@@ -562,7 +562,9 @@ namespace Unity.UIWidgets.widgets {
 
         public override void visitChildren(ElementVisitor visitor) {
             D.assert(!this._childElements.Values.Any(child => child == null));
-            this._childElements.Values.ToList().ForEach(e => visitor(e));
+            foreach (var e in this._childElements.Values) {
+                visitor(e);
+            }
         }
 
         public override void debugVisitOnstageChildren(ElementVisitor visitor) {

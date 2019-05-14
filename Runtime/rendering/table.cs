@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.painting;
@@ -268,7 +267,7 @@ namespace Unity.UIWidgets.rendering {
             D.assert(rows == null || rows >= 0);
             D.assert(rows == null || children == null);
 
-            this._columns = columns ?? (children != null && children.isNotEmpty() ? children.First().Count : 0);
+            this._columns = columns ?? (children != null && children.isNotEmpty() ? children[0].Count : 0);
             this._rows = rows ?? 0;
             this._children = new List<RenderBox>();
             for (int i = 0; i < this._columns * this._rows; i++) {
@@ -588,7 +587,7 @@ namespace Unity.UIWidgets.rendering {
             }
 
             this._children.Clear();
-            this._columns = cells.isNotEmpty() ? cells.First().Count : 0;
+            this._columns = cells.isNotEmpty() ? cells[0].Count : 0;
             this._rows = 0;
             foreach (List<RenderBox> row in cells) {
                 this.addRow(row);
@@ -923,7 +922,7 @@ namespace Unity.UIWidgets.rendering {
             }
 
             this._columnLefts = positions;
-            tableWidth = positions.Last() + widths.Last();
+            tableWidth = positions[positions.Count - 1] + widths[widths.Count - 1];
 
             this._rowTops.Clear();
             this._baselineDistance = null;
@@ -1094,7 +1093,7 @@ namespace Unity.UIWidgets.rendering {
             D.assert(this._rows == this._rowTops.Count - 1);
             D.assert(this._columns == this._columnLefts.Count);
             if (this.border != null) {
-                Rect borderRect = Rect.fromLTWH(offset.dx, offset.dy, this.size.width, this._rowTops.Last());
+                Rect borderRect = Rect.fromLTWH(offset.dx, offset.dy, this.size.width, this._rowTops[this._rowTops.Count - 1]);
                 List<float> rows = this._rowTops.GetRange(1, this._rowTops.Count - 2);
                 List<float> columns = this._columnLefts.GetRange(1, this._columnLefts.Count - 1);
                 this.border.paint(context.canvas, borderRect, rows: rows, columns: columns);
