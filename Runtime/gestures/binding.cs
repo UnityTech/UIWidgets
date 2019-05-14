@@ -60,10 +60,6 @@ namespace Unity.UIWidgets.gestures {
                 return;
             }
 
-            if (evt is PointerHoverEvent) {
-                this._handlePointerHoverEvent(evt);
-            }
-
             HitTestResult hitTestResult = null;
             if (evt is PointerDownEvent) {
                 D.assert(!this._hitTests.ContainsKey(evt.pointer));
@@ -109,51 +105,6 @@ namespace Unity.UIWidgets.gestures {
 
             HitTestResult result = new HitTestResult();
             this.hitTest(result, evt.position);
-
-            this.dispatchEvent(evt, result);
-        }
-
-        void _handlePointerHoverEvent(PointerEvent evt) {
-            HitTestResult result = new HitTestResult();
-            this.hitTest(result, evt.position);
-
-            D.assert(this._enteredTargets.Count == 0);
-            foreach (var hitTestEntry in result.path) {
-                if (this.lastMoveTargets.Contains(hitTestEntry.target)) {
-                    hitTestEntry.target.handleEvent(evt, hitTestEntry);
-                    this.lastMoveTargets.Remove(hitTestEntry.target);
-                }
-                else {
-                    this._enteredTargets.Add(hitTestEntry);
-                }
-            }
-
-            //leave events
-            foreach (var lastMoveTarget in this.lastMoveTargets) {
-                lastMoveTarget.handleEvent(new PointerLeaveEvent(
-                    timeStamp: evt.timeStamp,
-                    pointer: evt.pointer,
-                    device: evt.device,
-                    kind: evt.kind
-                ), null);
-            }
-
-            //enter events
-            foreach (var hitTestEntry in this._enteredTargets) {
-                hitTestEntry.target.handleEvent(new PointerEnterEvent(
-                    timeStamp: evt.timeStamp,
-                    pointer: evt.pointer,
-                    device: evt.device,
-                    kind: evt.kind
-                ), hitTestEntry);
-            }
-
-            this.lastMoveTargets.Clear();
-            foreach (var hitTestEntry in result.path) {
-                this.lastMoveTargets.Add(hitTestEntry.target);
-            }
-
-            this._enteredTargets.Clear();
 
             this.dispatchEvent(evt, result);
         }

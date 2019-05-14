@@ -103,6 +103,16 @@ namespace Unity.UIWidgets.gestures {
                 position: position,
                 down: false) {
         }
+        
+        public static PointerHoverEvent fromHoverEvent(PointerEvent hover) {
+            return new PointerHoverEvent(
+                timeStamp: hover.timeStamp,
+                pointer: hover.pointer,
+                kind: hover.kind,
+                device: hover.device,
+                position: hover.position
+            );
+        }
     }
 
     public class PointerEnterEvent : PointerEvent {
@@ -120,10 +130,20 @@ namespace Unity.UIWidgets.gestures {
                 position: position,
                 down: false) {
         }
+
+        public static PointerEnterEvent fromHoverEvent(PointerEvent hover) {
+            return new PointerEnterEvent(
+                timeStamp: hover.timeStamp,
+                pointer: hover.pointer,
+                kind: hover.kind,
+                device: hover.device,
+                position: hover.position
+                );
+        }
     }
 
-    public class PointerLeaveEvent : PointerEvent {
-        public PointerLeaveEvent(
+    public class PointerExitEvent : PointerEvent {
+        public PointerExitEvent(
             TimeSpan timeStamp,
             int pointer = 0,
             PointerDeviceKind kind = PointerDeviceKind.mouse,
@@ -136,6 +156,16 @@ namespace Unity.UIWidgets.gestures {
                 device: device,
                 position: position,
                 down: false) {
+        }
+        
+        public static PointerExitEvent fromHoverEvent(PointerEvent hover) {
+            return new PointerExitEvent(
+                timeStamp: hover.timeStamp,
+                pointer: hover.pointer,
+                kind: hover.kind,
+                device: hover.device,
+                position: hover.position
+            );
         }
     }
 

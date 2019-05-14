@@ -894,6 +894,9 @@ namespace Unity.UIWidgets.widgets {
         // public  TextPainter _textPainter;
         // public float _textPainterMaxWidth;
 
+        internal override S find<S>(Offset regionOffset) {
+            return null;
+        }
 
         internal override flow.Layer addToScene(SceneBuilder builder, Offset layerOffset = null) {
             layerOffset = layerOffset ?? Offset.zero;

@@ -2,8 +2,9 @@
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
-using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
+using UnityEngine;
+using Color = Unity.UIWidgets.ui.Color;
 
 namespace UIWidgets.Tests {
     public class MouseHoverWidget : StatefulWidget {
@@ -20,14 +21,14 @@ namespace UIWidgets.Tests {
             Widget result = new Container(width: 200, height: 60, color: Color.fromARGB(255, 255, 0, 255));
             if (canHover) {
                 result = new HoverTrackWidget(null,
-                    result);
+                    result, "inner");
             }
 
             if (nest) {
                 result = new Container(child: result, padding: EdgeInsets.all(40),
                     color: Color.fromARGB(255, 255, 0, 0));
                 result = new HoverTrackWidget(null,
-                    result);
+                    result, "outer");
             }
 
             return result;
@@ -50,9 +51,11 @@ namespace UIWidgets.Tests {
 
     public class HoverTrackWidget : StatefulWidget {
         public readonly Widget child;
+        public readonly string name;
 
-        public HoverTrackWidget(Key key, Widget child) : base(key) {
+        public HoverTrackWidget(Key key, Widget child, string name) : base(key) {
             this.child = child;
+            this.name = name;
         }
 
         public override State createState() {
@@ -73,11 +76,13 @@ namespace UIWidgets.Tests {
                 ),
                 onPointerEnter: (evt) => {
                     if (this.mounted) {
+                        Debug.Log(this.widget.name + " pointer enter");
                         this.setState(() => { this.hover = true; });
                     }
                 },
-                onPointerLeave: (evt) => {
+                onPointerExit: (evt) => {
                     if (this.mounted) {
+                        Debug.Log(this.widget.name + " pointer exit");
                         this.setState(() => { this.hover = false; });
                     }
                 }

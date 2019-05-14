@@ -21,6 +21,7 @@ namespace Unity.UIWidgets.rendering {
             this.initRenderView();
             D.assert(this.renderView != null);
             this.addPersistentFrameCallback(this._handlePersistentFrameCallback);
+            this._mouseTracker = this._createMouseTracker();
         }
 
         public void initRenderView() {
@@ -28,6 +29,11 @@ namespace Unity.UIWidgets.rendering {
             this.renderView = new RenderView(configuration: this.createViewConfiguration());
             this.renderView.scheduleInitialFrame();
         }
+
+        public MouseTracker mouseTracker {
+            get { return this._mouseTracker; }
+        }
+        MouseTracker _mouseTracker;
 
         public PipelineOwner pipelineOwner {
             get { return this._pipelineOwner; }
@@ -61,6 +67,14 @@ namespace Unity.UIWidgets.rendering {
 
         void _handlePersistentFrameCallback(TimeSpan timeStamp) {
             this.drawFrame();
+        }
+
+        MouseTracker _createMouseTracker() {
+            return new MouseTracker(this.pointerRouter, (Offset offset) => {
+                return this.renderView.layer.find<MouseTrackerAnnotation>(
+                        offset
+                    );
+            });
         }
 
         protected virtual void drawFrame() {

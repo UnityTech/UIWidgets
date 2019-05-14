@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UIWidgets.Runtime.rendering;
 using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
@@ -1924,11 +1925,11 @@ namespace Unity.UIWidgets.widgets {
             Key key = null,
             PointerDownEventListener onPointerDown = null,
             PointerMoveEventListener onPointerMove = null,
+            PointerEnterEventListener onPointerEnter = null,
+            PointerExitEventListener onPointerExit = null,
+            PointerHoverEventListener onPointerHover = null,
             PointerUpEventListener onPointerUp = null,
             PointerCancelEventListener onPointerCancel = null,
-            PointerHoverEventListener onPointerHover = null,
-            PointerLeaveEventListener onPointerLeave = null,
-            PointerEnterEventListener onPointerEnter = null,
             PointerScrollEventListener onPointerScroll = null,
             HitTestBehavior behavior = HitTestBehavior.deferToChild,
             Widget child = null
@@ -1938,7 +1939,7 @@ namespace Unity.UIWidgets.widgets {
             this.onPointerUp = onPointerUp;
             this.onPointerCancel = onPointerCancel;
             this.onPointerHover = onPointerHover;
-            this.onPointerLeave = onPointerLeave;
+            this.onPointerExit = onPointerExit;
             this.onPointerEnter = onPointerEnter;
             this.onPointerScroll = onPointerScroll;
             this.behavior = behavior;
@@ -1956,7 +1957,7 @@ namespace Unity.UIWidgets.widgets {
 
         public readonly PointerEnterEventListener onPointerEnter;
 
-        public readonly PointerLeaveEventListener onPointerLeave;
+        public readonly PointerExitEventListener onPointerExit;
 
         public readonly PointerScrollEventListener onPointerScroll;
 
@@ -1969,7 +1970,7 @@ namespace Unity.UIWidgets.widgets {
                 onPointerUp: this.onPointerUp,
                 onPointerCancel: this.onPointerCancel,
                 onPointerEnter: this.onPointerEnter,
-                onPointerLeave: this.onPointerLeave,
+                onPointerExit: this.onPointerExit,
                 onPointerHover: this.onPointerHover,
                 onPointerScroll: this.onPointerScroll,
                 behavior: this.behavior
@@ -1984,7 +1985,7 @@ namespace Unity.UIWidgets.widgets {
             renderObject.onPointerCancel = this.onPointerCancel;
             renderObject.onPointerEnter = this.onPointerEnter;
             renderObject.onPointerHover = this.onPointerHover;
-            renderObject.onPointerLeave = this.onPointerLeave;
+            renderObject.onPointerExit = this.onPointerExit;
             renderObject.onPointerScroll = this.onPointerScroll;
             renderObject.behavior = this.behavior;
         }
@@ -2016,8 +2017,8 @@ namespace Unity.UIWidgets.widgets {
                 listeners.Add("hover");
             }
 
-            if (this.onPointerLeave != null) {
-                listeners.Add("leave");
+            if (this.onPointerExit != null) {
+                listeners.Add("exit");
             }
 
             if (this.onPointerScroll != null) {
