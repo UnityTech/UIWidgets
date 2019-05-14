@@ -950,7 +950,7 @@ namespace Unity.UIWidgets.rendering {
         Offset _lastOffset;
         Matrix3 _lastTransform;
 
-        Matrix3 _invertedTransform = Matrix3.I();
+        readonly Matrix3 _invertedTransform = Matrix3.I();
         bool _inverseDirty = true;
 
         internal override S find<S>(Offset regionOffset) {
