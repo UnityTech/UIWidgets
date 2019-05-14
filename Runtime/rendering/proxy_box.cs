@@ -1017,8 +1017,7 @@ namespace Unity.UIWidgets.rendering {
             Offset center = this._clip.center;
             Offset offset = new Offset((position.dx - center.dx) / this._clip.width,
                 (position.dy - center.dy) / this._clip.height);
-            if (offset.distanceSquared > 0.25f) // x^2 + y^2 > r^2
-            {
+            if (offset.distanceSquared > 0.25f) {
                 return false;
             }
 
