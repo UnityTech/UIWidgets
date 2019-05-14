@@ -194,6 +194,41 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
+    public class ClipOval : SingleChildRenderObjectWidget {
+        public ClipOval(
+            Key key = null,
+            CustomClipper<Rect> clipper = null,
+            Clip clipBehavior = Clip.antiAlias,
+            Widget child = null) : base(key: key, child: child
+        ) {
+            this.clipper = clipper;
+            this.clipBehavior = clipBehavior;
+        }
+
+        public readonly CustomClipper<Rect> clipper;
+
+        public readonly Clip clipBehavior;
+
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderClipOval(clipper: this.clipper, clipBehavior: this.clipBehavior);
+        }
+
+        public override void updateRenderObject(BuildContext context, RenderObject _renderObject) {
+            RenderClipOval renderObject = _renderObject as RenderClipOval;
+            renderObject.clipper = this.clipper;
+        }
+
+        public override void didUnmountRenderObject(RenderObject _renderObject) {
+            RenderClipOval renderObject = _renderObject as RenderClipOval;
+            renderObject.clipper = null;
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new DiagnosticsProperty<CustomClipper<Rect>>("clipper", this.clipper, defaultValue: null));
+        }
+    }
+
     public class ClipPath : SingleChildRenderObjectWidget {
         public ClipPath(
             Key key = null,

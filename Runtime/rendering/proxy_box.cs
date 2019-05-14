@@ -983,6 +983,69 @@ namespace Unity.UIWidgets.rendering {
         }
     }
 
+    public class RenderClipOval : _RenderCustomClip<Rect> {
+        public RenderClipOval(
+            RenderBox child = null,
+            CustomClipper<Rect> clipper = null,
+            Clip clipBehavior = Clip.antiAlias
+        ) : base(child: child, clipper: clipper, clipBehavior: clipBehavior) {
+            D.assert(clipBehavior != Clip.none);
+        }
+
+        Rect _cachedRect;
+        Path _cachedPath;
+
+        Path _getClipPath(Rect rect) {
+            if (rect != this._cachedRect) {
+                this._cachedRect = rect;
+                this._cachedPath = new Path();
+                this._cachedPath.addOval(this._cachedRect);
+            }
+
+            return this._cachedPath;
+        }
+
+        protected override Rect _defaultClip {
+            get { return Offset.zero & this.size; }
+        }
+
+        public override bool hitTest(HitTestResult result, 
+            Offset position = null
+        ) {
+            this._updateClip();
+            D.assert(this._clip != null);
+            Offset center = this._clip.center;
+            Offset offset = new Offset((position.dx - center.dx) / this._clip.width,
+                (position.dy - center.dy) / this._clip.height);
+            if (offset.distanceSquared > 0.25f) {
+                return false;
+            }
+
+            return base.hitTest(result, position: position);
+        }
+
+        public override void paint(PaintingContext context, Offset offset) {
+            if (this.child != null) {
+                this._updateClip();
+                context.pushClipPath(this.needsCompositing, offset, this._clip, this._getClipPath(this._clip),
+                    base.paint, clipBehavior: this.clipBehavior);
+            }
+        }
+
+        protected override void debugPaintSize(PaintingContext context, Offset offset) {
+            D.assert(() => {
+                if (this.child != null) {
+                    base.debugPaintSize(context, offset);
+                    context.canvas.drawPath(this._getClipPath(this._clip).shift(offset), this._debugPaint);
+                    this._debugText.paint(context.canvas,
+                        offset + new Offset((this._clip.width - this._debugText.width) / 2.0f,
+                            -this._debugText.text.style.fontSize * 1.1f ?? 0.0f));
+                }
+
+                return true;
+            });
+        }
+    }
 
     public class RenderClipPath : _RenderCustomClip<Path> {
         public RenderClipPath(
@@ -1194,7 +1257,7 @@ namespace Unity.UIWidgets.rendering {
             return base.hitTest(result, position: position);
         }
 
-        
+
         public override void paint(PaintingContext context, Offset offset) {
             if (this.child != null) {
                 this._updateClip();
@@ -1282,7 +1345,7 @@ namespace Unity.UIWidgets.rendering {
             return base.hitTest(result, position: position);
         }
 
-        
+
         public override void paint(PaintingContext context, Offset offset) {
             if (this.child != null) {
                 this._updateClip();
@@ -1301,19 +1364,20 @@ namespace Unity.UIWidgets.rendering {
                 }
                 else {
                     Canvas canvas = context.canvas;
-                if (this.elevation != 0.0) {
-                    canvas.drawRect(
-                        offsetBounds.inflate(20.0f),
-                        _transparentPaint
-                    );
-                    
-                    canvas.drawShadow(
-                        offsetPath,
-                        this.shadowColor,
-                        this.elevation,
-                        this.color.alpha != 0xFF
-                    );
-                }
+                    if (this.elevation != 0.0) {
+                        canvas.drawRect(
+                            offsetBounds.inflate(20.0f),
+                            _transparentPaint
+                        );
+
+                        canvas.drawShadow(
+                            offsetPath,
+                            this.shadowColor,
+                            this.elevation,
+                            this.color.alpha != 0xFF
+                        );
+                    }
+
                     Paint paint = new Paint {color = this.color, style = PaintingStyle.fill};
                     canvas.drawPath(offsetPath, paint);
                     context.clipPathAndPaint(offsetPath, this.clipBehavior,
