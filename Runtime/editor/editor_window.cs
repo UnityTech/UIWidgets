@@ -467,6 +467,7 @@ namespace Unity.UIWidgets.editor {
                 this._regenerateLayerTree = true;
             }
 
+#if !UNITY_WEBGL
             onFrameRateSpeedUp();
             frameCoolDownTimer?.cancel();
             frameCoolDownTimer = instance.run(
@@ -475,6 +476,7 @@ namespace Unity.UIWidgets.editor {
                     onFrameRateCoolDown();
                     frameCoolDownTimer = null;
                 });
+#endif
         }
 
         public override void render(Scene scene) {
