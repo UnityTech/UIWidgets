@@ -586,6 +586,18 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
+    class SliverFillRemaining : SingleChildRenderObjectWidget {
+        public SliverFillRemaining(
+            Key key = null,
+            Widget child = null
+        ) : base(key: key, child: child) {
+        }
+
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderSliverFillRemaining();
+        }
+    }
+
     public class KeepAlive : ParentDataWidget<SliverMultiBoxAdaptorWidget> {
         public KeepAlive(
             Key key = null,

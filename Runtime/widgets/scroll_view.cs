@@ -60,7 +60,7 @@ namespace Unity.UIWidgets.widgets {
 
         protected abstract List<Widget> buildSlivers(BuildContext context);
 
-        protected Widget buildViewport(
+        protected virtual Widget buildViewport(
             BuildContext context,
             ViewportOffset offset,
             AxisDirection axisDirection,
