@@ -47,7 +47,7 @@ namespace Unity.UIWidgets.widgets {
 
         public readonly string debugLabel;
 
-        public readonly object _coordinator;
+        internal readonly object _coordinator;
 
         public float minScrollExtent {
             get { return this._minScrollExtent.Value; }
