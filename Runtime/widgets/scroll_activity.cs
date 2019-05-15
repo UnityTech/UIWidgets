@@ -423,7 +423,7 @@ namespace Unity.UIWidgets.widgets {
             }
         }
 
-        protected bool applyMoveTo(float value) {
+        protected virtual bool applyMoveTo(float value) {
             return this.del.setPixels(value) == 0.0;
         }
 

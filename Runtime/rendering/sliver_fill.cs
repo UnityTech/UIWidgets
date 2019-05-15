@@ -69,7 +69,7 @@ namespace Unity.UIWidgets.rendering {
 
     public class RenderSliverFillRemaining : RenderSliverSingleBoxAdapter {
         public RenderSliverFillRemaining(
-            RenderBox child
+            RenderBox child = null
         ) : base(child: child) {
         }
 
