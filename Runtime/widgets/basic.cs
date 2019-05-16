@@ -524,6 +524,50 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
+    public class FractionallySizedBox : SingleChildRenderObjectWidget {
+        public FractionallySizedBox(
+            Key key = null,
+            Alignment alignment = null,
+            float? widthFactor = null,
+            float? heightFactor = null,
+            Widget child = null
+        ) : base(key: key, child: child) {
+            D.assert(widthFactor == null || widthFactor >= 0.0f);
+            D.assert(heightFactor == null || heightFactor >= 0.0f);
+            this.alignment = alignment ?? Alignment.center;
+            this.widthFactor = widthFactor;
+            this.heightFactor = heightFactor;
+        }
+
+        public readonly float? widthFactor;
+
+        public readonly float? heightFactor;
+
+        public readonly Alignment alignment;
+
+        public override RenderObject createRenderObject(BuildContext context) {
+            return new RenderFractionallySizedOverflowBox(
+                alignment: this.alignment,
+                widthFactor: this.widthFactor,
+                heightFactor: this.heightFactor
+            );
+        }
+
+        public override void updateRenderObject(BuildContext context, RenderObject _renderObject) {
+            RenderFractionallySizedOverflowBox renderObject = _renderObject as RenderFractionallySizedOverflowBox;
+            renderObject.alignment = this.alignment;
+            renderObject.widthFactor = this.widthFactor;
+            renderObject.heightFactor = this.heightFactor;
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
+            properties.add(new DiagnosticsProperty<Alignment>("alignment", this.alignment));
+            properties.add(new FloatProperty("widthFactor", this.widthFactor, defaultValue: null));
+            properties.add(new FloatProperty("heightFactor", this.heightFactor, defaultValue: null));
+        }
+    }
+
     public class SliverToBoxAdapter : SingleChildRenderObjectWidget {
         public SliverToBoxAdapter(
             Key key = null,
