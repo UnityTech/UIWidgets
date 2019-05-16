@@ -300,7 +300,7 @@ namespace Unity.UIWidgets.material {
                             return;
                         }
 
-                        refreshResult.Then(() => {
+                        refreshResult.Finally(() => {
                             if (this.mounted && this._mode == _RefreshIndicatorMode.refresh) {
                                 completer.Resolve();
                                 this._dismiss(_RefreshIndicatorMode.done);
