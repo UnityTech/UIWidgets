@@ -83,8 +83,7 @@ namespace Unity.UIWidgets.painting {
             return new FractionalOffset(a.dx % b, a.dy % b);
         }
 
-        static FractionalOffset lerp(FractionalOffset a, FractionalOffset b, float t) {
-            D.assert(t != null);
+        public static FractionalOffset lerp(FractionalOffset a, FractionalOffset b, float t) {
             if (a == null && b == null) {
                 return null;
             }
