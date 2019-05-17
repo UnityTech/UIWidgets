@@ -1,22 +1,31 @@
->>>
-**_Package Documentation Template_**
+**UIWidgets**
 
-Use this template to create preliminary, high-level documentation meant to introduce users to the feature and the sample files included in this package. When writing your documentation, do the following:
+## Introduction
 
-1. Follow instructions in blockquotes.
+UIWidgets is a plugin package for Unity Editor which helps developers to create, debug and deploy efficient, 
+cross-platform Apps using the Unity Engine. 
 
-2. Replace angle brackets with the appropriate text. For example, replace "&lt;package name&gt;" with the official name of the package.
- 
-3. Delete sections that do not apply to your package. For example, a package containing only sample files does not have a "Using &lt;package_name&gt;" section, so this section can be removed.
- 
-4. After documentation is completed, make sure you delete all instructions and examples in blockquotes including this preamble and its title:
+UIWidgets is mainly derived from [Flutter](https://github.com/flutter/flutter). However, taking advantage of
+the powerful Unity Engine, it offers developers many new features to improve their Apps 
+as well as the develop workflow significantly.
 
-		```
-		>>>
-		Delete all of the text between pairs of blockquote markdown.
-		>>>
-		```
->>>
+
+#### Efficiency
+Using the latest Unity rendering SDKs, a UIWidgets App can run very fast and keep >60fps in most times.
+
+
+#### Cross-Platform
+A UIWidgets App can be deployed on all kinds of platforms including PCs, mobile devices and web page directly, like 
+any other Unity projects.
+
+#### Multimedia Support
+Except for basic 2D UIs, developers are also able to include 3D Models, audios, particle-systems to their UIWidgets Apps.
+
+
+#### Developer-Friendly
+A UIWidgets App can be debug in the Unity Editor directly with many advanced tools like
+CPU/GPU Profiling, FPS Profiling.
+
 
 # About &lt;package name&gt;
 
@@ -153,13 +162,7 @@ The following table indicates the root folder of each type of sample in this pac
 >>>
 
 ## Document revision history
->>>
-This section includes the revision history of the document. The revision history tracks when a document is created, edited, and updated. If you create or update a document, you must add a new row describing the revision.  The Documentation Team also uses this table to track when a document is edited and its editing level. An example is provided:
  
 |Date|Reason|
 |---|---|
-|Sept 12, 2017|Unedited. Published to package.|
-|Sept 10, 2017|Document updated for package version 1.1.<br>New features: <li>audio support for capturing MP4s.<li>Instructions on saving Recorder prefabs|
-|Sept 5, 2017|Limited edit by Documentation Team. Published to package.|
-|Aug 25, 2017|Document created. Matches package version 1.0.|
->>>
+|May 18, 2019|Unedited. Published to package.|
