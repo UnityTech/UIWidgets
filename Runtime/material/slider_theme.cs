@@ -929,6 +929,7 @@ namespace Unity.UIWidgets.material {
                     return true;
                 }
 
+#pragma warning disable 0162
                 Offset leftCenter = _topLobeCenter - new Offset(leftWidthNeeded, 0.0f) + neckStretch;
                 Offset rightCenter = _topLobeCenter + new Offset(rightWidthNeeded, 0.0f) + neckStretch;
                 Rect valueRect = Rect.fromLTRB(
@@ -943,6 +944,7 @@ namespace Unity.UIWidgets.material {
                 outlinePaint.strokeWidth = 1.0f;
                 canvas.drawRect(valueRect, outlinePaint);
                 return true;
+#pragma warning restore 0162
             });
 
             _addArc(

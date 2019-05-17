@@ -250,7 +250,10 @@ namespace Unity.UIWidgets.rendering {
         }
 
         TextSpan _previousHoverSpan;
+
+#pragma warning disable 0414
         bool _pointerHoverInside;
+#pragma warning restore 0414
         bool _hasHoverRecognizer;
         MouseTrackerAnnotation _hoverAnnotation;
 

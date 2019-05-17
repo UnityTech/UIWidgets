@@ -445,7 +445,7 @@ namespace Unity.UIWidgets.material {
                 formatters.Add(new LengthLimitingTextInputFormatter(this.widget.maxLength));
             }
             
-            bool forcePressEnabled = false;
+            // bool forcePressEnabled = false; // TODO: wait for force press is ready
             TextSelectionControls textSelectionControls = MaterialUtils.materialTextSelectionControls;;
             bool paintCursorAboveText = false;
             bool cursorOpacityAnimates = false;

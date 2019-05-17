@@ -6,6 +6,8 @@ using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
 
 namespace Unity.UIWidgets.debugger {
+#pragma warning disable 0659
+#pragma warning disable 0661
     public class DiagnosticsNode : IEquatable<DiagnosticsNode> {
         readonly Dictionary<string, object> _json; // todo use json class such as simple json
         public readonly bool isProperty;
@@ -310,6 +312,8 @@ namespace Unity.UIWidgets.debugger {
             }
         }
     }
+#pragma warning restore 0659
+#pragma warning restore 0661
 
     public class InspectorInstanceRef : IEquatable<InspectorInstanceRef> {
         public readonly string id;

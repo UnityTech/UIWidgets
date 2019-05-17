@@ -744,7 +744,9 @@ namespace UIWidgets.Tests {
         const float headerHeight = 80.0f;
 
         float _offsetY = 0.0f;
+#pragma warning disable 0414
         int _index = -1;
+#pragma warning restore 0414
 
         Widget _buildHeader(BuildContext context) {
             return new Container(

@@ -330,7 +330,6 @@ namespace Unity.UIWidgets.widgets {
         ScrollDirection _userScrollDirection = ScrollDirection.idle;
 
         public void updateUserScrollDirection(ScrollDirection value) {
-            D.assert(value != null);
             if (this.userScrollDirection == value) {
                 return;
             }
@@ -1076,7 +1075,7 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public override string ToString() {
-            string extra;
+            string extra = "";
             switch (this._writers) {
                 case 0:
                     extra = ", orphan";
@@ -1088,7 +1087,7 @@ namespace Unity.UIWidgets.widgets {
                     break;
             }
 
-            return "$GetType()($layoutExtent$extra)";
+            return $"{this.GetType()}({this.layoutExtent}{extra})";
         }
     }
 
