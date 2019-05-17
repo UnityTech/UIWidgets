@@ -5,9 +5,9 @@ using System.Linq;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
 
+namespace Unity.UIWidgets.debugger {
 #pragma warning disable 0659
 #pragma warning disable 0661
-namespace Unity.UIWidgets.debugger {
     public class DiagnosticsNode : IEquatable<DiagnosticsNode> {
         readonly Dictionary<string, object> _json; // todo use json class such as simple json
         public readonly bool isProperty;

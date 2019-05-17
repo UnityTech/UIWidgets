@@ -9,11 +9,11 @@ using UnityEditor;
 using UnityEngine;
 using Color = Unity.UIWidgets.ui.Color;
 
-#pragma warning disable 0618
 namespace UIWidgets.Tests {
     public class SceneViewTests {
         public static void show() {
             onPreSceneGUIDelegate += OnPreSceneGUI;
+#pragma warning disable 0618
             SceneView.onSceneGUIDelegate += OnSceneGUI;
             EditorApplication.update += Update;
 
@@ -30,11 +30,13 @@ namespace UIWidgets.Tests {
 
         public static void hide() {
             onPreSceneGUIDelegate -= OnPreSceneGUI;
+#pragma warning disable 0618
             SceneView.onSceneGUIDelegate -= OnSceneGUI;
             EditorApplication.update -= Update;
             SceneView.RepaintAll();
         }
 
+#pragma warning disable 0618
         public static SceneView.OnSceneFunc onPreSceneGUIDelegate {
             get {
                 var field = typeof(SceneView).GetField("onPreSceneGUIDelegate",

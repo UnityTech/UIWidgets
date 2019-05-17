@@ -10,7 +10,6 @@ using Color = Unity.UIWidgets.ui.Color;
 using Rect = Unity.UIWidgets.ui.Rect;
 using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
-#pragma warning disable 0162
 namespace Unity.UIWidgets.material {
     public class SliderTheme : InheritedWidget {
         public SliderTheme(
@@ -930,6 +929,7 @@ namespace Unity.UIWidgets.material {
                     return true;
                 }
 
+#pragma warning disable 0162
                 Offset leftCenter = _topLobeCenter - new Offset(leftWidthNeeded, 0.0f) + neckStretch;
                 Offset rightCenter = _topLobeCenter + new Offset(rightWidthNeeded, 0.0f) + neckStretch;
                 Rect valueRect = Rect.fromLTRB(

@@ -31,23 +31,24 @@ namespace Unity.UIWidgets.painting {
             get { return (this.y + 1.0f) / 2.0f; }
         }
 
-        public new readonly FractionalOffset topLeft = new FractionalOffset(0.0f, 0.0f);
+#pragma warning disable 0108
+        public static readonly FractionalOffset topLeft = new FractionalOffset(0.0f, 0.0f);
 
-        public new readonly FractionalOffset topCenter = new FractionalOffset(0.5f, 0.0f);
+        public static readonly FractionalOffset topCenter = new FractionalOffset(0.5f, 0.0f);
 
-        public new readonly FractionalOffset topRight = new FractionalOffset(1.0f, 0.0f);
+        public static readonly FractionalOffset topRight = new FractionalOffset(1.0f, 0.0f);
 
-        public new readonly FractionalOffset centerLeft = new FractionalOffset(0.0f, 0.5f);
+        public static readonly FractionalOffset centerLeft = new FractionalOffset(0.0f, 0.5f);
 
-        public new readonly FractionalOffset center = new FractionalOffset(0.5f, 0.5f);
+        public static readonly FractionalOffset center = new FractionalOffset(0.5f, 0.5f);
 
-        public new readonly FractionalOffset centerRight = new FractionalOffset(1.0f, 0.5f);
+        public static readonly FractionalOffset centerRight = new FractionalOffset(1.0f, 0.5f);
 
-        public new readonly FractionalOffset bottomLeft = new FractionalOffset(0.0f, 1.0f);
+        public static readonly FractionalOffset bottomLeft = new FractionalOffset(0.0f, 1.0f);
 
-        public new readonly FractionalOffset bottomCenter = new FractionalOffset(0.5f, 1.0f);
+        public static readonly FractionalOffset bottomCenter = new FractionalOffset(0.5f, 1.0f);
 
-        public new readonly FractionalOffset bottomRight = new FractionalOffset(1.0f, 1.0f);
+        public static readonly FractionalOffset bottomRight = new FractionalOffset(1.0f, 1.0f);
 
         public static Alignment operator -(FractionalOffset a, Alignment b) {
             if (!(b is FractionalOffset)) {

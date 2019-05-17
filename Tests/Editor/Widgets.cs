@@ -18,7 +18,6 @@ using Image = Unity.UIWidgets.widgets.Image;
 using TextStyle = Unity.UIWidgets.painting.TextStyle;
 using Transform = Unity.UIWidgets.widgets.Transform;
 
-#pragma warning disable 0414
 namespace UIWidgets.Tests {
     public class Widgets : EditorWindow {
         WindowAdapter windowAdapter;
@@ -745,6 +744,7 @@ namespace UIWidgets.Tests {
         const float headerHeight = 80.0f;
 
         float _offsetY = 0.0f;
+#pragma warning disable 0414
         int _index = -1;
 
         Widget _buildHeader(BuildContext context) {
