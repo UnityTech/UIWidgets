@@ -312,6 +312,8 @@ namespace Unity.UIWidgets.debugger {
             }
         }
     }
+#pragma warning restore 0659
+#pragma warning restore 0661
 
     public class InspectorInstanceRef : IEquatable<InspectorInstanceRef> {
         public readonly string id;

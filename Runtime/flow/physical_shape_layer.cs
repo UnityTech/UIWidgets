@@ -19,6 +19,7 @@ namespace Unity.UIWidgets.flow {
         Path _path;
 #pragma warning disable 0414
         bool _isRect;
+#pragma warning restore 0414
         Rect _frameRRect;
         Clip _clip_behavior;
 
