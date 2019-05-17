@@ -10,6 +10,7 @@ using Color = Unity.UIWidgets.ui.Color;
 using Rect = Unity.UIWidgets.ui.Rect;
 using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
+#pragma warning disable 0162
 namespace Unity.UIWidgets.material {
     public class SliderTheme : InheritedWidget {
         public SliderTheme(

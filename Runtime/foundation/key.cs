@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 
+#pragma warning disable 0660
+#pragma warning disable 0661
 namespace Unity.UIWidgets.foundation {
     public abstract class Key {
         protected Key() {

@@ -10,6 +10,7 @@ using Canvas = Unity.UIWidgets.ui.Canvas;
 using Color = Unity.UIWidgets.ui.Color;
 using Rect = Unity.UIWidgets.ui.Rect;
 
+#pragma warning disable 0414
 namespace Unity.UIWidgets.rendering {
     public enum TextOverflow {
         /// Clip the overflowing text to fix its container.

@@ -18,6 +18,7 @@ using Image = Unity.UIWidgets.widgets.Image;
 using TextStyle = Unity.UIWidgets.painting.TextStyle;
 using Transform = Unity.UIWidgets.widgets.Transform;
 
+#pragma warning disable 0414
 namespace UIWidgets.Tests {
     public class Widgets : EditorWindow {
         WindowAdapter windowAdapter;

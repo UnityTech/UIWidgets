@@ -9,6 +9,7 @@ using UnityEditor;
 using UnityEngine;
 using Color = Unity.UIWidgets.ui.Color;
 
+#pragma warning disable 0618
 namespace UIWidgets.Tests {
     public class SceneViewTests {
         public static void show() {

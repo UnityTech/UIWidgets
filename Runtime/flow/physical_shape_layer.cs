@@ -4,6 +4,7 @@ using Canvas = Unity.UIWidgets.ui.Canvas;
 using Color = Unity.UIWidgets.ui.Color;
 using Rect = Unity.UIWidgets.ui.Rect;
 
+#pragma warning disable 0414
 namespace Unity.UIWidgets.flow {
     public class PhysicalShapeLayer : ContainerLayer {
         public PhysicalShapeLayer(
