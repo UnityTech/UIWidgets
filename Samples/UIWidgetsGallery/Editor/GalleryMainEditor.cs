@@ -8,7 +8,7 @@ using UnityEngine;
 namespace UIWidgetsGallery {
     public class GalleryMainEditor : UIWidgetsEditorWindow {
         
-        [MenuItem("UIWidgetsTests/Gallery")]
+        [MenuItem("Window/UIWidgets/Tests/Gallery")]
         public static void gallery() {
             EditorWindow.GetWindow<GalleryMainEditor>();
         }
