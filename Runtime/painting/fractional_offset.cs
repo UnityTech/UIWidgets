@@ -49,6 +49,7 @@ namespace Unity.UIWidgets.painting {
         public static readonly FractionalOffset bottomCenter = new FractionalOffset(0.5f, 1.0f);
 
         public static readonly FractionalOffset bottomRight = new FractionalOffset(1.0f, 1.0f);
+#pragma warning restore 0108
 
         public static Alignment operator -(FractionalOffset a, Alignment b) {
             if (!(b is FractionalOffset)) {

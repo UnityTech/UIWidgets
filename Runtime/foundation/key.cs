@@ -21,6 +21,8 @@ namespace Unity.UIWidgets.foundation {
             return !Equals(left, right);
         }
     }
+#pragma warning restore 0660
+#pragma warning restore 0661
 
     public abstract class LocalKey : Key {
         protected LocalKey() {

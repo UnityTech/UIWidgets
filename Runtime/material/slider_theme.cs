@@ -944,6 +944,7 @@ namespace Unity.UIWidgets.material {
                 outlinePaint.strokeWidth = 1.0f;
                 canvas.drawRect(valueRect, outlinePaint);
                 return true;
+#pragma warning restore 0162
             });
 
             _addArc(
