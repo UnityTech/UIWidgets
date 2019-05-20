@@ -253,6 +253,7 @@ namespace Unity.UIWidgets.rendering {
 
 #pragma warning disable 0414
         bool _pointerHoverInside;
+#pragma warning restore 0414
         bool _hasHoverRecognizer;
         MouseTrackerAnnotation _hoverAnnotation;
 

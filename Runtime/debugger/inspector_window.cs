@@ -45,7 +45,7 @@ namespace Unity.UIWidgets.debugger {
 
         List<Action> m_UpdateActions = new List<Action>();
         
-        [MenuItem("Window/Analysis/UIWidgets Inspector")]
+        [MenuItem("Window/UIWidgets/Inspector")]
         public static void Init() {
             WidgetsInpsectorWindow window =
                 (WidgetsInpsectorWindow) GetWindow(typeof(WidgetsInpsectorWindow));
