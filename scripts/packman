@@ -1,44 +1,76 @@
 #!/bin/sh
 
+repo_url="git@github.cds.internal.unity3d.com:unity/com.unity.uiwidgets.git"
+package_name="com.unity.uiwidgets"
+target_version='7cbf99f1b'
+
 function usage() {
-    echo "$0 <path to target repository>"
+    echo "$0 [path to target repository]"
     echo
-    echo "path to target repository : the repository to upload to package manager"
-    echo "                            must be named com.unity.uiwidgets"
+    echo "path to target repository : The repository to upload to package manager ends with "
+    echo "                            com.unity.uiwidgets. If not provided, will clone from"
+    echo "                            $repo_url"
     exit -1
 }
 
-if [ "$#" != "1" ]; then
+if [ "$1" == "-h" ]; then
     usage
 fi
 
-target_repository=$1
+if [ "$#" != "1" ]; then
+    tmpdir=`mktemp -d`
+    target_repository="$tmpdir/$package_name"
+    echo "Repository path not provided. Will clone from"
+    echo "$repo_url"
+    echo "to $tmpdir/$package_name"
+    git clone $repo_url $target_repository
+else
+    target_repository=`cd $1; pwd; cd - > /dev/null`
+fi
+
+if ! [ -d "$target_repository" ]; then
+    echo "Target respository ($target_repository) does not exist!"
+    exit -1
+fi
+
 echo "Copying to $target_repository"
 
-if ! [ -d $target_repository ]; then
-    echo "Target respository does not exist!"
+# Copy the UIWidgets Repository to a temporary dir and 
+# checkout to target_version
+tmpdir=`mktemp -d`
+curr_repo_name=$(basename `cd ..; pwd; cd - > /dev/null`) # Should be UIWidgets
+cp -R ../.. $tmpdir
+echo "Switching to $tmpdir/$curr_repo_name"
+cd $tmpdir/$curr_repo_name
+git reset --hard $target_version # Cleanup any possible local change
+if [ "$?" != "0" ]; then
+    echo "Failed to setup the repo of target version"
     exit -1
 fi
 
 rm -rf $target_repository/Documentation~
-cp -R ../Documentation~ $target_repository/
+cp -R Documentation~ $target_repository/
 echo "Copied Documentation"
 
 rm -rf $target_repository/Runtime
-cp -R ../Runtime $target_repository/
+cp -R Runtime $target_repository/
 echo "Copied Runtime"
 
 rm -rf $target_repository/Editor
-cp -R ../Editor $target_repository/
+cp -R Editor $target_repository/
 echo "Copied Editor"
 
 rm -rf $target_repository/Samples
-cp -R ../Samples $target_repository/
+cp -R Samples $target_repository/
 echo "Copied Samples"
 
 rm -rf $target_repository/Tests
-cp -R ../Tests $target_repository/
+cp -R Tests $target_repository/
 echo "Copied Tests"
 
-cp ../README.md* $target_repository
+cp README.md* $target_repository
 echo "Copied README"
+
+cd $target_repository
+git add .
+git commit -m "Update to $curr_repo_name:$target_version"
