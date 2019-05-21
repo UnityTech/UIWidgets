@@ -1,4 +1,6 @@
-**UIWidgets**
+# UIWidgets
+[中文](README-ZH.md)
+
 
 ## Introduction
 
@@ -27,142 +29,271 @@ A UIWidgets App can be debug in the Unity Editor directly with many advanced too
 CPU/GPU Profiling, FPS Profiling.
 
 
-# About &lt;package name&gt;
+### Example
 
->>>
-Name the heading of the first topic after the **displayName** of the package as it appears in the package manifest. Check with your Product Manager to ensure that the package is named correctly. 
+<div style="text-align: center"><table><tr>
+<td style="text-align: center">
+  <img src="https://connect-prd-cdn.unity.com/20190323/p/images/2a27606f-a2cc-4c9f-9e34-bb39ae64d06c_uiwidgets1.gif" width="200"/>
+</td>
+<td style="text-align: center">
+  <img src="https://connect-prd-cdn.unity.com/20190323/p/images/097a7c53-19b3-4e0a-ad27-8ec02506905d_uiwidgets2.gif" width="200" />
+</td>
+<td style="text-align: center">
+  <img src="https://connect-prd-cdn.unity.com/20190323/p/images/1f03c1d0-758c-4dde-b3a9-2f5f7216b7d9_uiwidgets3.gif" width="200"/>
+</td>
+<td style="text-align: center">
+  <img src="https://connect-prd-cdn.unity.com/20190323/p/images/a8884fbd-9e7c-4bd7-af46-0947e01d01fd_uiwidgets4.gif" width="200"/>
+</td>
+</tr></table></div>
 
-This first topic includes a brief, high-level explanation of the package and, if applicable, provides links to Unity Manual topics.
+## Requirement
 
-There are two types of packages:
+#### Unity
+Install **Unity 2018.3** or above. You can download the latest Unity on https://unity3d.com/get-unity/download.
 
- - Packages that include features that augment the Unity Editor or Runtime.
- - Packages that include sample files.
-
-Choose one of the following introductory paragraphs that best fits the package:
->>>
-
-Use the &lt;UIWidgets&gt; package to &lt;list of the main uses for the package&gt;. For example, use &lt;package name&gt; to create/generate/extend/capture &lt;mention major use case, or a good example of what the package can be used for&gt;. The &lt;package name&gt; package also includes &lt;other relevant features or uses&gt;.
-
->>>
-**_Examples:_** 
-
-Here are some examples for reference only. Do not include these in the final documentation file:
-
-*Use the Unity Recorder package to capture and save in-game data. For example, use Unity Recorder to record an mp4 file during a game session. The Unity Recorder package also includes an interface for setting-up and triggering recording sessions.*
-
-*The Timeline Examples package includes examples of Timeline assets, Timeline Instances, animation, GameObjects, and scripts that illustrate how to use Unity's Timeline. For more information, see [ Unity's Timeline](https://docs.unity3d.com/Manual/TimelineSection.html) in the [Unity Manual](https://docs.unity3d.com). For licensing and usage, see Package Licensing.*
->>>
-
-# Installing &lt;package name&gt;
->>>
-Begin this section with a cross-reference to the official Unity Manual topic on how to install packages. If the package requires special installation instructions, include these steps in this section.
->>>
-
-To install this package, follow the instructions in the [Package Manager documentation](https://docs.unity3d.com/Packages/com.unity.package-manager-ui@latest/index.html). 
-
->>>
-For some packages, there may be additional steps to complete the setup. You can add those here.
->>>
-
-In addition, you need to install the following resources:
-
- - &lt;name of resource&gt;: To install, open *Window > &lt;name of menu item&gt;*. The resource appears &lt;at this location&gt;.
- - &lt;name of sample&gt;: To install, open *Window > &lt;name of menu item&gt;*. The new sample folder appears &lt;at this location&gt;.
-
-
-<a name="UsingPackageName"></a>
-# Using &lt;package name&gt;
->>>
-The contents of this section depends on the type of package.
-
-For packages that augment the Unity Editor with additional features, this section should include workflow and/or reference documentation:
-
-* At a minimum, this section should include reference documentation that describes the windows, editors, and properties that the package adds to Unity. This reference documentation should include screen grabs (see how to add screens below), a list of settings, an explanation of what each setting does, and the default values of each setting.
-* Ideally, this section should also include a workflow: a list of steps that the user can easily follow that demonstrates how to use the feature. This list of steps should include screen grabs (see how to add screens below) to better describe how to use the feature.
-
-For packages that include sample files, this section may include detailed information on how the user can use these sample files in their projects and scenes. However, workflow diagrams or illustrations could be included if deemed appropriate.
-
-## How to add images
-
-*(This section is for reference. Do not include in the final documentation file)* 
-
-If the [Using &lt;package name&gt;](#UsingPackageName) section includes screen grabs or diagrams, a link to the image must be added to this MD file, before or after the paragraph with the instruction or description that references the image. In addition, a caption should be added to the image link that includes the name of the screen or diagram. All images must be PNG files with underscores for spaces. No animated GIFs.
-
-An example is included below:
-
-![A cinematic in the Timeline Editor window.](images/example.png)
-
-Notice that the example screen shot is included in the images folder. All screen grabs and/or diagrams must be added and referenced from the images folder.
-
-For more on the Unity documentation standards for creating and adding screen grabs, see this confluence page: https://confluence.hq.unity3d.com/pages/viewpage.action?pageId=13500715
->>>
-
-
-
-# Technical details
-## Requirements
->>>
-This subtopic includes a bullet list with the compatible versions of Unity. This subtopic may also include additional requirements or recommendations for 3rd party software or hardware. An example includes a dependency on other packages. If you need to include references to non-Unity products, make sure you refer to these products correctly and that all references include the proper trademarks (tm or r)
->>>
-
-This version of &lt;package name&gt; is compatible with the following versions of the Unity Editor:
-
-* 2018.1 and later (recommended)
-
-To use this package, you must have the following 3rd party products:
-
-* &lt;product name and version with trademark or registered trademark.&gt;
-* &lt;product name and version with trademark or registered trademark.&gt;
-* &lt;product name and version with trademark or registered trademark.&gt;
-
-## Known limitations
->>>
-This section lists the known limitations with this version of the package. If there are no known limitations, or if the limitations are trivial, exclude this section. An example is provided.
->>>
-
-&lt;package name&gt; version &lt;package version&gt; includes the following known limitations:
-
-* &lt;brief one-line description of first limitation.&gt;
-* &lt;brief one-line description of second limitation.&gt;
-* &lt;and so on&gt;
-
->>>
-*Example (For reference. Do not include in the final documentation file):*
-
-The Unity Recorder version 1.0 has the following limitations:*
-
-* The Unity Recorder does not support sound.
-* The Recorder window and Recorder properties are not available in standalone players.
-* MP4 encoding is only available on Windows.
->>>
-
-## Package contents
->>>
-This section includes the location of important files you want the user to know about. For example, if this is a sample package containing textures, models, and materials separated by sample group, you may want to provide the folder location of each group.
->>>
-
-The following table indicates the &lt;describe the breakdown you used here&gt;:
-
-|Location|Description|
-|---|---|
-|`<folder>`|Contains &lt;describe what the folder contains&gt;.|
-|`<file>`|Contains &lt;describe what the file represents or implements&gt;.|
-
->>>
-*Example (For reference. Do not include in the final documentation file):*
-
-The following table indicates the root folder of each type of sample in this package. Each sample's root folder contains its own Materials, Models, or Textures folders:
-
-|Folder Location|Description|
-|---|---|
-|`WoodenCrate_Orange`|Root folder containing the assets for the orange crates.|
-|`WoodenCrate_Mahogany`|Root folder containing the assets for the mahogany crates.|
-|`WoodenCrate_Shared`|Root folder containing any material assets shared by all crates.|
->>>
-
-## Document revision history
+#### UIWidgets Package
+Visit our Github repository https://github.com/UnityTech/UIWidgets
+ to download the latest UIWidgets package.
  
-|Date|Reason|
-|---|---|
-|May 18, 2019|Unedited. Published to package.|
+Move the downloaded package folder into the **Package** folder of your Unity project.
+
+Generally, you can make it using a console (or terminal) application by just a few commands as below:
+    
+   ```none
+    cd <YourProjectPath>/Packages
+    git clone https://github.com/UnityTech/UIWidgets.git com.unity.uiwidgets
+   ```
+
+## Getting Start
+
+#### i. Overview
+In this tutorial, we will create a very simple UIWidgets App as the kick-starter. The app contains 
+only a text label and a button. The text label will count the times of clicks upon the button.
+
+First of all, please open or create a Unity Project and open it with Unity Editor. 
+
+And then open Project Settings, go to Player section and **add "UIWidgets_DEBUG" to the Scripting Define Symbols field.**
+This enables the debug mode of UIWidgets for your development. Remove this for your release build afterwards.
+
+#### ii. Scene Build
+A UIWidgets App is usually built upon a Unity UI Canvas. Please follow the steps to create a
+UI Canvas in Unity.
+1. Create a new Scene by "File -> New Scene";
+1. Create a UI Canvas in the scene by "GameObject -> UI -> Canvas";
+1. Add a Panel (i.e., **Panel 1**) to the UI Canvas by right click on the Canvas and select "UI -> Panel". Then remove the 
+**Image** Component from the Panel.
+
+#### iii. Create Widget
+A UIWidgets App is written in **C# Scripts**. Please follow the steps to create an App and play it
+in Unity Editor.
+
+1. Create a new C# Script named "UIWidgetsExample.cs" and paste the following codes into it.
+   ```none
+    using System.Collections.Generic;
+    using Unity.UIWidgets.animation;
+    using Unity.UIWidgets.engine;
+    using Unity.UIWidgets.foundation;
+    using Unity.UIWidgets.material;
+    using Unity.UIWidgets.painting;
+    using Unity.UIWidgets.ui;
+    using Unity.UIWidgets.widgets;
+    using UnityEngine;
+    using FontStyle = Unity.UIWidgets.ui.FontStyle;
+    
+    namespace UIWidgetsSample {
+        public class UIWidgetsExample : UIWidgetsPanel {
+            protected override void OnEnable() {
+                // if you want to use your own font or font icons.   
+                // FontManager.instance.addFont(Resources.Load<Font>(path: "path to your font"), "font family name");
+    
+                // load custom font with weight & style. The font weight & style corresponds to fontWeight, fontStyle of 
+                // a TextStyle object
+                // FontManager.instance.addFont(Resources.Load<Font>(path: "path to your font"), "Roboto", FontWeight.w500, 
+                //    FontStyle.italic);
+    
+                // add material icons, familyName must be "Material Icons"
+                // FontManager.instance.addFont(Resources.Load<Font>(path: "path to material icons"), "Material Icons");
+                
+                base.OnEnable();
+            }
+    
+            protected override Widget createWidget() {
+                return new WidgetsApp(
+                    home: new ExampleApp(),
+                    pageRouteBuilder: (RouteSettings settings, WidgetBuilder builder) =>
+                        new PageRouteBuilder(
+                            settings: settings,
+                            pageBuilder: (BuildContext context, Animation<float> animation,
+                                Animation<float> secondaryAnimation) => builder(context)
+                        )
+                );
+            }
+    
+            class ExampleApp : StatefulWidget {
+                public ExampleApp(Key key = null) : base(key) {
+                }
+    
+                public override State createState() {
+                    return new ExampleState();
+                }
+            }
+    
+            class ExampleState : State<ExampleApp> {
+                int counter = 0;
+    
+                public override Widget build(BuildContext context) {
+                    return new Column(
+                        children: new List<Widget> {
+                            new Text("Counter: " + this.counter),
+                            new GestureDetector(
+                                onTap: () => {
+                                    this.setState(()
+                                        => {
+                                        this.counter++;
+                                    });
+                                },
+                                child: new Container(
+                                    padding: EdgeInsets.symmetric(20, 20),
+                                    color: Colors.blue,
+                                    child: new Text("Click Me")
+                                )
+                            )
+                        }
+                    );
+                }
+            }
+        }
+    }
+   ```
+   
+1. Save this script and attach it to **Panel 1** as its component.
+1. Press the "Play" Button to start the App in Unity Editor.
+
+#### iv. Build App
+Finally, the UIWidgets App can be built to packages for any specific platform by the following steps.
+1. Open the Build Settings Panel by "File -> Build Settings..."
+1. Choose a target platform and click "Build". Then the Unity Editor will automatically assemble 
+all relevant resources and generate the final App package.
+
+#### How to load images?
+1. Put your images files in Resources folder. e.g. image1.png.
+2. You can add image1@2.png and image1@3.png in the same folder to support HD screens.
+3. Use Image.asset("image1") to load the image. Note: as in Unity, ".png" is not needed.
+
+UIWidgets supports Gif as well!
+1. Suppose you have loading1.gif. Rename it to loading1.gif.bytes and copy it to Resources folder.
+2. You can add loading1@2.gif.bytes and loading1@3.gif.bytes in the same folder to support HD screens.
+3. Use Image.asset("loading1.gif") to load the gif images.
+
+#### Using Window Scope
+If you see the error ```AssertionError: Window.instance is null``` or null pointer error of ```Window.instance```,
+it means the code is not running in the window scope. In this case, you can enclose your code
+with window scope as below:
+```
+using(WindowProvider.of(your gameObject with UIWidgetsPanel).getScope()) {
+    // code dealing with UIWidgets, 
+    // e.g. setState(() => {....})
+}
+```
+
+This is needed if the code is in methods
+not invoked by UIWidgets. For example, if the code is in ```completed``` callback of ```UnityWebRequest```, 
+you need to enclose them with window scope. 
+Please see [HttpRequestSample](./Samples/UIWidgetSample/HttpRequestSample.cs) for detail.
+For callback/event handler methods from UIWidgets (e.g ```Widget.build, State.initState...```), you don't need do
+it yourself, since the framework ensure it's in window scope.
+
+#### Show Status Bar on Android
+Status bar is always hidden by default when an Unity project is running on an Android device. If you
+ want to show the status bar in your App, this
+ [solution](https://github.com/Over17/UnityShowAndroidStatusBar) seems to be 
+ compatible to UIWidgets, therefore can be used as a good option before we release our
+ full support solution on this issue. 
+ 
+ Besides,
+ please set "Render Outside Safe Area" to true in the "Player Settings" to make this plugin working properly on Android P or later.
+ 
+ 
+
+
+#### Automatically Adjust Frame Rate
+
+To build an App that is able to adjust the frame rate automatically, please open Project Settings, and in the Quality tab, set the "V Sync Count" option of the target platform to "Don't Sync".
+The default logic is to set the frame rate to 25 when the screen is static, and change the frame rate to 60 whenever the screen changes.
+If you would like to modify the behavior of speeding up or cooling down the frame rate, please set `Window.onFrameRateSpeedUp` and/or `Window.onFrameRateCoolDown` to your own functions.
+
+#### WebGL Canvas Device Pixel Ratio Plugin
+The width and height of the Canvas in browser may differ from the number of pixels the Canvas occupies on the screen.
+Therefore, the image may blur in the builded WebGL program.
+The Plugin `Plugins/platform/webgl/UIWidgetsCanvasDevicePixelRatio_20xx.x.jslib` (2018.3 and 2019.1 for now) solves this issue.
+Please select the plugin of the Unity version corresponding to your project, and disable other versions of this plugin, as follows: select this plugin in the **Project** panel, and uncheck **WebGL** under **Select platforms for plugin** in the **Inspector** panel.
+If you need to disable this plugin for any reason, please disable all the versions of this plugin as described above.
+
+This plugin overrides the following parameters in the Unity WebGL building module:
+```
+JS_SystemInfo_GetWidth
+JS_SystemInfo_GetHeight
+JS_SystemInfo_GetCurrentCanvasWidth
+JS_SystemInfo_GetCurrentCanvasHeight
+$Browser
+$JSEvents
+```
+If you would like to implement your own WebGL plugin, and your plugin overrides at least one of the above parameters, you need to disable the `UIWidgetsCanvasDevicePixelRatio` plugin in the above mentioned way to avoid possible conflicts. 
+If you still need the function provided by this plugin, you can mannually apply the modification to Unity WebGL building module introduced in this plugin.
+All the modifications introduced in `UIWidgetsCanvasDevicePixelRatio` are marked by `////////// Modifcation Start ////////////` and `////////// Modifcation End ////////////`.
+In the marked codes, all the multiplications and divisions with `devicePixelRatio` are introduced by our modification.
+To learn about the original script in detail, please refer to `SystemInfo.js` and `UnityNativeJS/UnityNative.js` in `PlaybackEngines/WebGLSupport/BuildTools/lib` in your Unity Editor installation.
+
+#### Image Import Setting
+Unity, by default, resizes the width and height of an imported image to the nearest integer that is a power of 2.
+In UIWidgets, you should almost always disable this by selecting the image in the "Project" panel, then in the "Inspector" panel set the "Non Power of 2" option (in "Advanced") to "None", to prevent your image from being resized unexpectedly.
+ 
+## Debug UIWidgets Application
+
+#### Define UIWidgets_DEBUG
+It's recommended to define the **UIWidgets_DEBUG** script symbol in editor, this will turn on 
+debug assertion in UIWidgets, which will help to find potential bugs earlier. To do this:
+please go to **Player Settings -> Other Settings -> Configuration -> Scripting Define Symbols**, 
+and add **UIWidgets_DEBUG**.  
+The symbol is for debug purpose, please remove it from your release build.
+
+#### UIWidgets Inspector
+The UIWidgets Inspector tool is for visualizing and exploring the widget trees. You can find it
+via *Window/Analysis/UIWidgets* inspector in Editor menu.  
+**Note**
+* **UIWidgets_DEBUG** needs to be define for inspector to work properly.  
+* Inspector currently only works in Editor Play Mode, inspect standalone built application is not supported for now.
+
+## Learn
+
+#### Samples
+You can find many UIWidgets App samples in the UIWidgets package in the **Samples** folder. 
+Feel free to try them out and make modifications to see the results.
+To get started, the UIWidgetsTheatre scene provides you
+a list of carefully selected samples to start with.
+
+You can also try UIWidgets-based Editor windows by clicking **UIWidgetsTest** on the main menu 
+and open one of the dropdown samples.
+
+#### Wiki
+The develop team is still working on the UIWidgets Wiki. However, since UIWidgets is mainly derived from Flutter,
+ you can refer to Flutter Wiki to access detailed descriptions of UIWidgets APIs 
+ from those of their Flutter counterparts.
+Meanwhile, you can join the discussion channel at (https://connect.unity.com/g/uiwidgets)
+
+#### FAQ
+
+| Question     | Answer  |
+| :-----------------------------------------------| ---------------------: |
+| Can I create standalone App using UIWidgets?     | **Yes**  |
+| Can I use UIWidgets to build game UIs?   | **Yes**    |
+| Can I develop Unity Editor plugins using UIWidgets?  | **Yes** |
+| Is UIWidgets a extension of UGUI/NGUI? | **No** |
+| Is UIWidgets just a copy of Flutter? | **No** | 
+| Can I create UI with UIWidgets by simply drag&drop? | **No** |
+| Do I have to pay for using UIWidgets? | **No** |
+| Any IDE recommendation for UIWidgets? | **Rider, VSCode(Open .sln)** |
+
+## How to Contribute
+
+Check [CONTRIBUTING.md](CONTRIBUTING.md)

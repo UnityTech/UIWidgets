@@ -40,10 +40,5 @@ rm -rf $target_repository/Tests
 cp -R ../Tests $target_repository/
 echo "Copied Tests"
 
-cp ../CHANGELOG.md* $target_repository
-cp ../CONTRIBUTING.md* $target_repository
-cp ../QAReport.md* $target_repository
 cp ../README.md* $target_repository
-cp ../Third\ Party\ Notices.md* $target_repository
-cp ../package.json* $target_repository
-echo "Copied other files"
+echo "Copied README"
