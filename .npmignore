@@ -24,6 +24,3 @@ utr_output/**
 .yamato/**
 *.zip*
 scripts~/**
-
-upm-ci~/**
-TestRunnerOptions.json
