@@ -26,20 +26,22 @@ if [ "$#" != "1" ]; then
     git clone $repo_url $target_repository
 else
     target_repository=`cd $1; pwd; cd - > /dev/null`
-    current_directory=`pwd`
-    cd $target_repository
-    if [ "`git remote get-url origin`" != "$repo_url" ]; then
-        cd $current_directory
-        echo "Target repository is not pointing to $repo_url"
-        exit -1
-    fi
-    cd $current_directory
 fi
 
+# Check the validity of the target directory
 if ! [ -d "$target_repository" ]; then
     echo "Target respository ($target_repository) does not exist!"
     exit -1
 fi
+
+current_directory=`pwd`
+cd $target_repository
+if [ "`git remote get-url origin`" != "$repo_url" ]; then
+    cd $current_directory
+    echo "Target repository is not pointing to $repo_url"
+    exit -1
+fi
+cd $current_directory
 
 echo "Copying to $target_repository"
 
