@@ -240,12 +240,13 @@ namespace Unity.UIWidgets.async {
         public static BackgroundCallbacks getInstance() {
 #if UNITY_WEBGL
             return null;
-#endif
+#else
             if (_instance == null) {
                 _instance = new BackgroundCallbacks(2);
             }
 
             return _instance;
+#endif
         }
 
         readonly LinkedList<_CallbackNode> _callbackList;
