@@ -15,7 +15,7 @@ target_project=$1
 echo "Copying to $target_project"
 
 if ! [ -d $target_project ]; then
-    echo "Target respository does not exist!"
+    echo "Target project does not exist!"
     exit -1
 fi
 

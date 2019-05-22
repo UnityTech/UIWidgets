@@ -67,7 +67,11 @@ rm -rf $target_repository/Documentation~
 mkdir $target_repository/Documentation~
 sed '/README-ZH.md/d ; s/CONTRIBUTING.md/CONTRIBUTING/g' README.md > $target_repository/Documentation~/com.unity.uiwidgets.md
 cp $target_repository/Documentation~/{com.unity.uiwidgets.md,index.md}
-cp CONTRIBUTING.md $target_repository/Documentation~
+cat > $target_repository/Documentation~/CONTRIBUTING.md << END
+This repository exists for the sole purpose of publishing to package manager. Please contribute to https://github.com/UnityTech/UIWidgets instead.
+
+END
+cat CONTRIBUTING.md >> $target_repository/Documentation~/CONTRIBUTING.md
 cp README-ZH.md $target_repository/Documentation~/index-zh.md
 cat > $target_repository/Documentation~/TableOfContents.md << END
 * [UIWidgets Documentation](index)
