@@ -68,6 +68,7 @@ mkdir $target_repository/Documentation~
 sed '/README-ZH.md/d ; s/CONTRIBUTING.md/CONTRIBUTING/g' README.md > $target_repository/Documentation~/com.unity.uiwidgets.md
 cp $target_repository/Documentation~/{com.unity.uiwidgets.md,index.md}
 cp CONTRIBUTING.md $target_repository/Documentation~
+cp README-ZH.md $target_repository/Documentation~/index-zh.md
 cat > $target_repository/Documentation~/TableOfContents.md << END
 * [UIWidgets Documentation](index)
 * [UIWidgets中文文档](index-zh)
