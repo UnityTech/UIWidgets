@@ -35,6 +35,8 @@ echo "Copied Samples"
 cp -R ../Tests/Resources $target_dir/Resources
 echo "Copied Resources"
 
+rm -f $target_dir/Samples/UIWidgetSample/Resources/file_example_MOV_480_700kB.mov*
+
 mkdir -p $target_dir/Documentation
 cat > $target_dir/Documentation/README.txt << END
 # UIWidgets
