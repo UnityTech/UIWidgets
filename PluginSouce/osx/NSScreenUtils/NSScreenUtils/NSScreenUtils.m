@@ -8,6 +8,21 @@
 
 #import <Foundation/Foundation.h>
 #import <AppKit/AppKit.h>
+#import "NSScreenUtils.h"
+
+static UnityOSXCallback callback = NULL;
+
+void LinkUnityOSXCallback(UnityOSXCallback externalCallback)
+{
+    callback = externalCallback;
+}
+
+void UnityOSXSendMessage(const char *name,const char *method,const char *arg)
+{
+    if (callback) {
+        callback(name,method,arg);
+    }
+}
 
 float OSXDeviceScaleFactor()
 {

@@ -48,6 +48,7 @@ namespace Unity.UIWidgets.engine {
         public void Update() {
             //view metrics marks dirty
             this._viewMetrics = null;
+            this._devicePixelRatio = -1;
         }
 
 

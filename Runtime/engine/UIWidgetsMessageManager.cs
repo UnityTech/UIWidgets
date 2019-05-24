@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Unity.UIWidgets.external.simplejson;
@@ -28,10 +29,29 @@ namespace Unity.UIWidgets.engine {
             managerObj.AddComponent<UIWidgetsMessageManager>();
         }
         
-#if UNITY_IOS || UNITY_ANDROID || UNITY_WEBGL
+#if UNITY_IOS || UNITY_ANDROID || UNITY_WEBGL || UNITY_STANDALONE_OSX
         string _lastObjectName;
 #endif
         
+#if UNITY_STANDALONE_OSX
+        public delegate void UnityOSXCallbackDelegate(IntPtr name, IntPtr method, IntPtr arg);
+#endif
+
+        void Awake() {
+#if UNITY_STANDALONE_OSX
+            LinkUnityOSXCallback((namePtr, methodPtr, argPtr) => {
+                string name = Marshal.PtrToStringAuto(namePtr);
+                string method = Marshal.PtrToStringAuto(methodPtr);
+                string arg = Marshal.PtrToStringAuto(argPtr);
+
+                GameObject foundGameObject = GameObject.Find(name);
+                if (foundGameObject != null) {
+                    foundGameObject.SendMessage(method,arg);
+                }
+            });
+#endif
+        }
+
         void OnEnable() {
             D.assert(_instance == null, () => "Only one instance of UIWidgetsMessageManager should exists");
             _instance = this;
@@ -48,7 +68,7 @@ namespace Unity.UIWidgets.engine {
         }
 
         void UpdateNameIfNeed() {
-#if UNITY_IOS || UNITY_ANDROID || UNITY_WEBGL
+#if UNITY_IOS || UNITY_ANDROID || UNITY_WEBGL || UNITY_STANDALONE_OSX
             var name = this.gameObject.name;
             if (name != this._lastObjectName) {
 
@@ -93,7 +113,6 @@ namespace Unity.UIWidgets.engine {
         [DllImport("__Internal")]
         static extern void UIWidgetsMessageSetObjectName(string objectName);
 #elif UNITY_ANDROID
-        
         static void UIWidgetsMessageSetObjectName(string objectName) {
             using (
                 AndroidJavaClass managerClass = new AndroidJavaClass("com.unity.uiwidgets.plugin.UIWidgetsMessageManager")
@@ -105,7 +124,14 @@ namespace Unity.UIWidgets.engine {
                 }
             }
         }
+#elif UNITY_STANDALONE_OSX
+        [DllImport("NSScreenUtils")]
+        static extern void UIWidgetsMessageSetObjectName(string objectName);
+
+        [DllImport("NSScreenUtils")]
+        static extern void LinkUnityOSXCallback(
+            [MarshalAs(UnmanagedType.FunctionPtr)] UnityOSXCallbackDelegate osxCallbackDelegate);
 #endif
-        
+
     }
 }
