@@ -30,8 +30,8 @@ namespace UIWidgetsGallery.gallery {
         public override Widget build(BuildContext context) {
             return new Center(
                 child: new Container(
-                    width: 34.0f,
-                    height: 34.0f,
+                    width: 32f,
+                    height: 32f,
                     decoration: new BoxDecoration(
                         image: new DecorationImage(
                             image: new AssetImage(
