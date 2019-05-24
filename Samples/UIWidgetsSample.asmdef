@@ -1,7 +1,9 @@
 {
     "name": "UIWidgetsSample",
     "references": [
-        "Unity.UIWidgets"
+        "Unity.UIWidgets",
+        "Unity.ugui",
+        "Unity.ugui.Editor"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [],
