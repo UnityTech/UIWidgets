@@ -10,6 +10,10 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+
+/**
+ A NSWindow category class for injecting NSScreen notification
+ */
 @interface NSWindow (NSScreenUtils)
 
 @end

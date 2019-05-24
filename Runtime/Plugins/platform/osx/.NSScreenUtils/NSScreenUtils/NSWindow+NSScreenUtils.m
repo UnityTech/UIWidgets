@@ -12,6 +12,10 @@
 
 @implementation NSWindow (NSScreenUtils)
 
+
+/**
+ Using method swizzling to inject notification on library load. Notice this bundle should be marked as 'Load on Start' in Unity inspector panel
+ */
 + (void)load {
     NSLog(@"NSWindow + NSScreenUtils Load");
     static dispatch_once_t onceToken;
@@ -30,6 +34,13 @@
                   });
 }
 
+
+/**
+ Swizzling Helper
+
+ @param originalSelector original method
+ @param swizzledSelector replace method
+ */
 + (void)exchangeClassMethodMethod:(SEL)originalSelector with:(SEL)swizzledSelector
 {
     Class class = object_getClass((id)self);
@@ -72,6 +83,7 @@
 }
 
 #pragma mark - Callback
+
 
 - (void)onWindowDidChangeBackingProperties:(NSNotification *)notification
 {

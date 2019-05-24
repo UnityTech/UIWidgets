@@ -39,6 +39,7 @@ namespace Unity.UIWidgets.engine {
 
         void Awake() {
 #if UNITY_STANDALONE_OSX
+            // Call native code to construct a UnitySendMessage clone for macOS player. If there is an official way to call UnitySendMessage in macOS plugin please replace this.  
             LinkUnityOSXCallback((namePtr, methodPtr, argPtr) => {
                 string name = Marshal.PtrToStringAuto(namePtr);
                 string method = Marshal.PtrToStringAuto(methodPtr);
@@ -128,6 +129,10 @@ namespace Unity.UIWidgets.engine {
         [DllImport("NSScreenUtils")]
         static extern void UIWidgetsMessageSetObjectName(string objectName);
 
+        /// <summary>
+        /// Call this method to connect native SendMessage function to the osxCallbackDelegate delegate
+        /// </summary>
+        /// <param name="osxCallbackDelegate">Native message handler</param>
         [DllImport("NSScreenUtils")]
         static extern void LinkUnityOSXCallback(
             [MarshalAs(UnmanagedType.FunctionPtr)] UnityOSXCallbackDelegate osxCallbackDelegate);

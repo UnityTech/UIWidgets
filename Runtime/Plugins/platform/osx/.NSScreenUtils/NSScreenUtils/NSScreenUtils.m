@@ -10,6 +10,7 @@
 #import <AppKit/AppKit.h>
 #import "NSScreenUtils.h"
 
+
 static UnityOSXCallback callback = NULL;
 
 void LinkUnityOSXCallback(UnityOSXCallback externalCallback)
@@ -24,6 +25,12 @@ void UnityOSXSendMessage(const char *name,const char *method,const char *arg)
     }
 }
 
+
+/**
+ Get Screen Scale Factor using NSScreen.backingScaleFactor
+
+ @return scale
+ */
 float OSXDeviceScaleFactor()
 {
     NSArray *ar = [NSApp orderedWindows];
