@@ -44,21 +44,25 @@ namespace Unity.UIWidgets.ui {
                     width * this._fringeWidth,
                     height * this._fringeWidth);
 
-                firstLayer = new RenderLayer {
-                    width = width,
-                    height = height,
-                    layerBounds = bounds,
-                };
+                firstLayer = RenderLayer.create(
+                    width : width,
+                    height : height,
+                    layerBounds : bounds
+                );
             } else {
                 D.assert(this._layers.Count > 0);
                 firstLayer = this._layers[0];
-                firstLayer = new RenderLayer {
-                    width = firstLayer.width,
-                    height = firstLayer.height,
-                    layerBounds = firstLayer.layerBounds,
-                };
+                firstLayer = RenderLayer.create(
+                    width : firstLayer.width,
+                    height : firstLayer.height,
+                    layerBounds : firstLayer.layerBounds
+                );
             }
 
+            foreach (var layer in this._layers) {
+                layer.dispose();
+            }
+            
             this._layers.Clear();
             this._layers.Add(firstLayer);
             this._currentLayer = firstLayer;
@@ -91,13 +95,13 @@ namespace Unity.UIWidgets.ui {
                 textureHeight = 1;
             }
 
-            var layer = new RenderLayer {
-                rtID = Shader.PropertyToID("_rtID_" + this._layers.Count + "_" + parentLayer.layers.Count),
-                width = textureWidth,
-                height = textureHeight,
-                layerBounds = bounds,
-                layerPaint = paint,
-            };
+            var layer = RenderLayer.create(
+                rtID : Shader.PropertyToID("_rtID_" + this._layers.Count + "_" + parentLayer.layers.Count),
+                width : textureWidth,
+                height : textureHeight,
+                layerBounds : bounds,
+                layerPaint : paint
+            );
 
             parentLayer.addLayer(layer);
             this._layers.Add(layer);
@@ -342,14 +346,14 @@ namespace Unity.UIWidgets.ui {
                 textureHeight = 1;
             }
 
-            var maskLayer = new RenderLayer {
-                rtID = Shader.PropertyToID("_rtID_" + this._layers.Count + "_" + parentLayer.layers.Count),
-                width = textureWidth,
-                height = textureHeight,
-                layerBounds = maskBounds,
-                filterMode = FilterMode.Bilinear,
-                noMSAA = true,
-            };
+            var maskLayer = RenderLayer.create(
+                rtID : Shader.PropertyToID("_rtID_" + this._layers.Count + "_" + parentLayer.layers.Count),
+                width : textureWidth,
+                height : textureHeight,
+                layerBounds : maskBounds,
+                filterMode : FilterMode.Bilinear,
+                noMSAA : true
+            );
 
             parentLayer.addLayer(maskLayer);
             this._layers.Add(maskLayer);
@@ -382,25 +386,25 @@ namespace Unity.UIWidgets.ui {
                 textureHeight = 1;
             }
 
-            var blurXLayer = new RenderLayer {
-                rtID = Shader.PropertyToID("_rtID_" + this._layers.Count + "_" + parentLayer.layers.Count),
-                width = textureWidth,
-                height = textureHeight,
-                layerBounds = maskLayer.layerBounds,
-                filterMode = FilterMode.Bilinear,
-                noMSAA = true,
-            };
+            var blurXLayer = RenderLayer.create(
+                rtID : Shader.PropertyToID("_rtID_" + this._layers.Count + "_" + parentLayer.layers.Count),
+                width : textureWidth,
+                height : textureHeight,
+                layerBounds : maskLayer.layerBounds,
+                filterMode : FilterMode.Bilinear,
+                noMSAA : true
+            );
 
             parentLayer.addLayer(blurXLayer);
 
-            var blurYLayer = new RenderLayer {
-                rtID = Shader.PropertyToID("_rtID_" + this._layers.Count + "_" + parentLayer.layers.Count),
-                width = textureWidth,
-                height = textureHeight,
-                layerBounds = maskLayer.layerBounds,
-                filterMode = FilterMode.Bilinear,
-                noMSAA = true,
-            };
+            var blurYLayer = RenderLayer.create(
+                rtID : Shader.PropertyToID("_rtID_" + this._layers.Count + "_" + parentLayer.layers.Count),
+                width : textureWidth,
+                height : textureHeight,
+                layerBounds : maskLayer.layerBounds,
+                filterMode : FilterMode.Bilinear,
+                noMSAA : true
+            );
 
             parentLayer.addLayer(blurYLayer);
 
@@ -894,13 +898,14 @@ namespace Unity.UIWidgets.ui {
 
             foreach (var subLayer in layer.layers) {
                 this._clearLayer(subLayer);
+                subLayer.dispose();
             }
 
             layer.layers.Clear();
         }
 
 
-        internal class RenderLayer {
+        internal class RenderLayer : PoolItem {
             public int rtID;
             public int width;
             public int height;
@@ -912,7 +917,7 @@ namespace Unity.UIWidgets.ui {
             public readonly List<RenderLayer> layers = new List<RenderLayer>();
             public readonly List<State> states = new List<State>();
             public State currentState;
-            public readonly ClipStack clipStack = new ClipStack();
+            public ClipStack clipStack = new ClipStack();
             public uint lastClipGenId;
             public Rect lastClipBounds;
             public bool ignoreClip = true;
@@ -932,14 +937,35 @@ namespace Unity.UIWidgets.ui {
                 }
             }
 
-            public RenderLayer() {
-                this.currentState = new State();
-                this.states.Add(this.currentState);
+            public static RenderLayer create(int rtID = 0, int width = 0, int height = 0, FilterMode filterMode = FilterMode.Point,
+                bool noMSAA = false, Rect layerBounds = null, Paint layerPaint = null, bool ignoreClip = true) {
+                var newLayer = ItemPoolManager.alloc<RenderLayer>();
+                newLayer.rtID = rtID;
+                newLayer.width = width;
+                newLayer.height = height;
+                newLayer.filterMode = filterMode;
+                newLayer.noMSAA = noMSAA;
+                newLayer.layerBounds = layerBounds;
+                newLayer.layerPaint = layerPaint;
+                newLayer.ignoreClip = ignoreClip;
+                newLayer.currentState = new State();
+                newLayer.states.Add(newLayer.currentState);
+                
+                return newLayer;
             }
 
             public void addLayer(RenderLayer layer) {
                 this.layers.Add(layer);
                 this.draws.Add(new CmdLayer {layer = layer});
+            }
+
+            public override void dispose() {
+                this.draws.Clear();
+                this.layers.Clear();
+                this.states.Clear();
+                this.clipStack = new ClipStack();
+                this._viewport = null;
+                base.dispose();
             }
         }
 

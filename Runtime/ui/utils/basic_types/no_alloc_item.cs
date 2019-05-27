@@ -1,10 +1,34 @@
 using System;
 using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
+using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
+
+    public class ItemDebugInfo {
+        public int _watermark;
+        public int _size;
+        public string _itemKey;
+
+        public void consume() {
+            this._size++;
+            if (this._size > this._watermark) {
+                this._watermark = this._size;
+                
+                Debug.Log("Item watermark increases >>> " + this._itemKey + " = " + this._watermark);
+            }
+        }
+
+        public void recycle() {
+            this._size--;
+        }
+    }
+    
     public static class ItemPoolManager {
         static readonly Dictionary<Type, List<PoolItem>> poolDict = new Dictionary<Type, List<PoolItem>>();
+        static readonly Dictionary<Type, ItemDebugInfo> debugInfo = new Dictionary<Type, ItemDebugInfo>();
+
+        const bool _debugFlag = true;
 
         public static T alloc<T>() where T : PoolItem, new() {
             if (!poolDict.ContainsKey(typeof(T))) {
@@ -12,19 +36,23 @@ namespace Unity.UIWidgets.ui {
 
                 for (int i = 0; i < 128; i++) {
                     var item = new T();
-                    item.Setup();
+                    item.setup();
                     
                     pool.Add(item);
                 }
                 
                 poolDict[typeof(T)] = pool;
+
+                if (_debugFlag) {
+                    debugInfo[typeof(T)] = new ItemDebugInfo {_watermark = 0, _size = 0, _itemKey = typeof(T).ToString()};
+                }
             }
 
             var curPool = poolDict[typeof(T)];
             if (curPool.Count == 0) {
                 for (int i = 0; i < 128; i++) {
                     var item = new T();
-                    item.Setup();
+                    item.setup();
                     
                     curPool.Add(item);
                 }
@@ -32,6 +60,10 @@ namespace Unity.UIWidgets.ui {
 
             var curItem = curPool[0];
             curPool.RemoveAt(0);
+
+            if (_debugFlag) {
+                debugInfo[typeof(T)].consume();
+            }
             
             return (T)curItem;
         }
@@ -40,6 +72,10 @@ namespace Unity.UIWidgets.ui {
             var typeofT = item.GetType();
             D.assert(poolDict.ContainsKey(typeofT));
             poolDict[typeofT].Add(item);
+
+            if (_debugFlag) {
+                debugInfo[typeofT].recycle();
+            }
         }
     }
 
@@ -49,7 +85,7 @@ namespace Unity.UIWidgets.ui {
             
             TestPoolItem.SetLength(2f);
             
-            TestPoolItem.Dispose();
+            TestPoolItem.dispose();
         }
     }
 
@@ -60,9 +96,9 @@ namespace Unity.UIWidgets.ui {
             this.length = len;
         }
 
-        public override void Dispose() {
+        public override void dispose() {
             this.length = 0;
-            base.Dispose();
+            base.dispose();
         }
     }
 
@@ -72,15 +108,15 @@ namespace Unity.UIWidgets.ui {
             
         }
 
-        public void Setup() {
+        public virtual void setup() {
             
         }
 
-        public virtual void Dispose() {
-            this.Recycle();
+        public virtual void dispose() {
+            this.recycle();
         }
 
-        public void Recycle() {
+        public void recycle() {
             ItemPoolManager.recycle(this);
         }
     }
