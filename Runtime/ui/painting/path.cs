@@ -23,6 +23,8 @@ namespace Unity.UIWidgets.ui {
             this._reset();
         }
 
+        public List<float> commands => this._commands;
+
         public override string ToString() {
             var sb = new StringBuilder("Path: count = " + this._commands.Count);
 

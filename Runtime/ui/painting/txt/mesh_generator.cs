@@ -63,10 +63,10 @@ namespace Unity.UIWidgets.ui {
     class MeshInfo {
         public readonly MeshKey key;
         public readonly long textureVersion;
-        public readonly MeshMesh mesh;
+        public readonly uiMeshMesh mesh;
         long _timeToLive;
 
-        public MeshInfo(MeshKey key, MeshMesh mesh, long textureVersion, int timeToLive = 5) {
+        public MeshInfo(MeshKey key, uiMeshMesh mesh, long textureVersion, int timeToLive = 5) {
             this.mesh = mesh;
             this.key = key;
             this.textureVersion = textureVersion;
@@ -90,12 +90,12 @@ namespace Unity.UIWidgets.ui {
         
         public readonly TextBlob textBlob;
         public readonly float scale;
-        public readonly Matrix3 matrix;
+        public readonly uiMatrix3 matrix;
         
-        MeshMesh _mesh;
+        uiMeshMesh _mesh;
         bool _resolved;
 
-        public TextBlobMesh(TextBlob textBlob, float scale, Matrix3 matrix) {
+        public TextBlobMesh(TextBlob textBlob, float scale, uiMatrix3 matrix) {
             this.textBlob = textBlob;
             this.scale = scale;
             this.matrix = matrix;
@@ -118,7 +118,7 @@ namespace Unity.UIWidgets.ui {
             }
         }
 
-        public MeshMesh resovleMesh() {
+        public uiMeshMesh resovleMesh() {
             if (this._resolved) {
                 return this._mesh;
             }
@@ -188,7 +188,7 @@ namespace Unity.UIWidgets.ui {
                 return null;
             }
 
-            MeshMesh mesh = vertices.Count > 0 ? new MeshMesh(null, vertices, triangles, uv) : null;
+            uiMeshMesh mesh = vertices.Count > 0 ? new uiMeshMesh(null, vertices, triangles, uv) : null;
             _meshes[key] = new MeshInfo(key, mesh, fontInfo.textureVersion);
 
             this._mesh = mesh.transform(this.matrix);

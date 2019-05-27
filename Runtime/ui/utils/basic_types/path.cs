@@ -675,6 +675,60 @@ namespace Unity.UIWidgets.ui {
             this.addPath(path, transform);
         }
 
+        public static uiPath fromPath(Path path) {
+            D.assert(path != null);
+
+            uiPath uipath = new uiPath();
+
+            var i = 0;
+            var _commands = path.commands;
+            while (i < _commands.Count) {
+                var cmd = (uiPathCommand) _commands[i];
+                switch (cmd) {
+                    case uiPathCommand.moveTo: {
+                        float x = _commands[i + 1];
+                        float y = _commands[i + 2];
+                        uipath._appendMoveTo(x, y);
+                    }
+                        i += 3;
+                        break;
+                    case uiPathCommand.lineTo: {
+                        float x = _commands[i + 1];
+                        float y = _commands[i + 2];
+                        
+                        uipath._appendLineTo(x, y);
+                    }
+                        i += 3;
+                        break;
+                    case uiPathCommand.bezierTo: {
+                        float c1x = _commands[i + 1];
+                        float c1y = _commands[i + 2];
+                        float c2x = _commands[i + 3];
+                        float c2y = _commands[i + 4];
+                        float x1 = _commands[i + 5];
+                        float y1 = _commands[i + 6];
+                        
+                        uipath._appendBezierTo(c1x, c1y, c2x, c2y, x1, y1);
+                    }
+                        i += 7;
+                        break;
+                    case uiPathCommand.close:
+                        uipath._appendClose();
+                        i++;
+                        break;
+                    case uiPathCommand.winding:
+                        uipath._appendWinding(_commands[i + 1]);
+                        i += 2;
+                        break;
+                    default:
+                        D.assert(false, () => "unknown cmd: " + cmd);
+                        break;
+                }
+            }
+
+            return uipath;
+        }
+
         public void addPath(uiPath path, Matrix3 transform = null) {
             D.assert(path != null);
 
@@ -2146,7 +2200,7 @@ namespace Unity.UIWidgets.ui {
         public readonly List<Vector3> vertices;
         public readonly List<int> triangles;
         public readonly List<Vector2> uv;
-        public readonly Matrix3 matrix;
+        public readonly uiMatrix3 matrix;
         public readonly Rect rawBounds;
 
         Rect _bounds;
@@ -2193,7 +2247,7 @@ namespace Unity.UIWidgets.ui {
             this._boundsMesh = this;
         }
 
-        public uiMeshMesh(Matrix3 matrix, List<Vector3> vertices, List<int> triangles, List<Vector2> uv = null,
+        public uiMeshMesh(uiMatrix3 matrix, List<Vector3> vertices, List<int> triangles, List<Vector2> uv = null,
             Rect rawBounds = null) {
             D.assert(vertices != null);
             D.assert(vertices.Count >= 0);
@@ -2242,7 +2296,7 @@ namespace Unity.UIWidgets.ui {
             this.rawBounds = rawBounds;
         }
 
-        public uiMeshMesh transform(Matrix3 matrix) {
+        public uiMeshMesh transform(uiMatrix3 matrix) {
             return new uiMeshMesh(matrix, this.vertices, this.triangles, this.uv, this.rawBounds);
         }
     }

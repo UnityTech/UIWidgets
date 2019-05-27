@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Unity.UIWidgets.ui {
     class ClipElement {
         public readonly int saveCount;
-        public readonly MeshMesh mesh;
+        public readonly uiMeshMesh mesh;
         public readonly bool convex;
         public readonly bool isRect;
         public Rect rect { get; private set; }
@@ -13,12 +13,12 @@ namespace Unity.UIWidgets.ui {
         uint _genId;
         bool _isIntersectionOfRects;
         Rect _bound;
-        Matrix3 _invMat;
+        uiMatrix3 _invMat;
 
-        public ClipElement(int saveCount, Path path, Matrix3 matrix, float scale) {
+        public ClipElement(int saveCount, uiPath uiPath, uiMatrix3 matrix, float scale) {
             this.saveCount = saveCount;
 
-            var pathCache = path.flatten(scale);
+            var pathCache = uiPath.flatten(scale);
             this.mesh = pathCache.getFillMesh(out this.convex).transform(matrix);
 
             var vertices = this.mesh.vertices;
@@ -126,7 +126,7 @@ namespace Unity.UIWidgets.ui {
             if (this.convex) {
                 if (this.mesh.matrix != null && !this.mesh.matrix.isIdentity()) {
                     if (this._invMat == null) {
-                        this._invMat = Matrix3.I();
+                        this._invMat = uiMatrix3.I();
                         this.mesh.matrix.invert(this._invMat); // ignore if not invertible for now.
                     }
                 
@@ -179,8 +179,8 @@ namespace Unity.UIWidgets.ui {
             }
         }
 
-        public void clipPath(Path path, Matrix3 matrix, float scale) {
-            var element = new ClipElement(this._saveCount, path, matrix, scale);
+        public void clipPath(uiPath uiPath, uiMatrix3 matrix, float scale) {
+            var element = new ClipElement(this._saveCount, uiPath, matrix, scale);
             this._pushElement(element);
         }
 

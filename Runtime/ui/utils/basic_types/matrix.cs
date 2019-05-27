@@ -1386,6 +1386,34 @@ namespace Unity.UIWidgets.ui {
         public Offset mapPoint(Offset point) {
             return this.mapXY(point.dx, point.dy);
         }
+        
+        public Matrix4x4 toMatrix4x4() {
+            var matrix = Matrix4x4.identity;
+
+            matrix[0, 0] = this[0]; // row 0
+            matrix[0, 1] = this[1];
+            matrix[0, 3] = this[2];
+
+            matrix[1, 0] = this[3]; // row 1
+            matrix[1, 1] = this[4];
+            matrix[1, 3] = this[5];
+
+            matrix[3, 0] = this[6]; // row 2
+            matrix[3, 1] = this[7];
+            matrix[3, 3] = this[8];
+
+            return matrix;
+        }
+
+        public static uiMatrix3 fromMatrix3(Matrix3 mat3) {
+            var uiMat3 = I();
+            for (int i = 0; i < 9; i++) {
+                uiMat3[i] = mat3[i];
+            }
+
+            uiMat3.setTypeMask(kUnknown_Mask);
+            return uiMat3;
+        }
     }
 
     class uiScalarUtils {
