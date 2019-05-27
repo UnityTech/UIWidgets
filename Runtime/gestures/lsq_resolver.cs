@@ -8,7 +8,7 @@ namespace Unity.UIWidgets.gestures {
         internal _Vector(int size) {
             this._offset = 0;
             this._length = size;
-            this._elements = Enumerable.Repeat(0.0f, size).ToList();
+            this._elements = CollectionUtils.CreateRepeatedList(0.0f, size);
         }
 
         _Vector(List<float> values, int offset, int length) {
@@ -49,7 +49,7 @@ namespace Unity.UIWidgets.gestures {
     class _Matrix {
         internal _Matrix(int rows, int cols) {
             this._columns = cols;
-            this._elements = Enumerable.Repeat(0.0f, rows * cols).ToList();
+            this._elements = CollectionUtils.CreateRepeatedList(0.0f, rows * cols);
         }
 
         readonly int _columns;
@@ -71,7 +71,7 @@ namespace Unity.UIWidgets.gestures {
 
     public class PolynomialFit {
         public PolynomialFit(int degree) {
-            this.coefficients = Enumerable.Repeat(0.0f, degree + 1).ToList();
+            this.coefficients = CollectionUtils.CreateRepeatedList(0.0f, degree + 1);
         }
 
         public readonly List<float> coefficients;

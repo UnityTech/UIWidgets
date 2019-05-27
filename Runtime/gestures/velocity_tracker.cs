@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
 using UnityEngine;
@@ -143,7 +142,7 @@ namespace Unity.UIWidgets.gestures {
         const int _minSampleSize = 3;
 
         readonly List<_PointAtTime> _samples =
-            Enumerable.Repeat<_PointAtTime>(null, _historySize).ToList();
+            CollectionUtils.CreateRepeatedList<_PointAtTime>(null, _historySize);
 
         int _index = 0;
 

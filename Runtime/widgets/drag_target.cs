@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.painting;
@@ -26,7 +25,12 @@ namespace Unity.UIWidgets.widgets {
     
     static class _DragUtils {
         public static List<T> _mapAvatarsToData<T>(List<_DragAvatar<T>> avatars) {
-            return avatars.Select(avatar => avatar.data).ToList();
+            List<T> ret = new List<T>(avatars.Count);
+            foreach (var avatar in avatars) {
+                ret.Add(avatar.data);
+            }
+
+            return ret;
         }
     }
 
@@ -466,7 +470,7 @@ namespace Unity.UIWidgets.widgets {
             HitTestResult result = new HitTestResult();
             WidgetsBinding.instance.hitTest(result, globalPosition + this.feedbackOffset);
 
-            List<_DragTargetState<T>> targets = this._getDragTargets(result.path.ToList());
+            List<_DragTargetState<T>> targets = this._getDragTargets(result.path);
 
             bool listsMatch = false;
             if (targets.Count >= this._enteredTargets.Count && this._enteredTargets.isNotEmpty()) {
@@ -499,7 +503,7 @@ namespace Unity.UIWidgets.widgets {
             this._activeTarget = newTarget;
         }
 
-        List<_DragTargetState<T>> _getDragTargets(List<HitTestEntry> path) {
+        List<_DragTargetState<T>> _getDragTargets(IList<HitTestEntry> path) {
             List<_DragTargetState<T>> ret = new List<_DragTargetState<T>>();
 
             foreach (HitTestEntry entry in path) {

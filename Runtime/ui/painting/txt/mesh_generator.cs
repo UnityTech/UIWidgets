@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
@@ -108,12 +107,19 @@ namespace Unity.UIWidgets.ui {
         public static int meshCount {
             get { return _meshes.Count; }
         }
+        
+        static readonly List<MeshKey> _keysToRemove = new List<MeshKey>();
 
         public static void tickNextFrame() {
             _frameCount++;
-            var keysToRemove = _meshes.Values.Where(info => info.timeToLive < _frameCount)
-                .Select(info => info.key).ToList();
-            foreach (var key in keysToRemove) {
+            _keysToRemove.Clear();
+            foreach (var info in _meshes.Values) {
+                if (info.timeToLive < _frameCount) {
+                    _keysToRemove.Add(info.key);
+                }
+            }
+
+            foreach (var key in _keysToRemove) {
                 _meshes.Remove(key);
             }
         }
