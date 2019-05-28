@@ -7,20 +7,26 @@ using Vector2 = UnityEngine.Vector2;
 using Vector3 = UnityEngine.Vector3;
 
 namespace Unity.UIWidgets.ui {
-    public class uiPath {
+    public class uiPath : PoolItem {
         const float _KAPPA90 = 0.5522847493f;
 
-        readonly List<float> _commands;
+        uiList<float> _commands;
         float _commandx;
         float _commandy;
         float _minX, _minY;
         float _maxX, _maxY;
-        
-        uiPathCache _cache;
 
-        public uiPath(int capacity = 128) {
-            this._commands = new List<float>(capacity);
-            this._reset();
+        public static uiPath create(int capacity = 128) {
+            uiPath newPath = ItemPoolManager.alloc<uiPath>();
+            newPath._reset();
+            return newPath;
+        }
+
+        public uiPath() {
+        }
+
+        public override void clear() {
+            this._commands.dispose();
         }
 
         public override string ToString() {
@@ -62,51 +68,46 @@ namespace Unity.UIWidgets.ui {
         }
 
         void _reset() {
-            this._commands.Clear();
+            this._commands = ItemPoolManager.alloc<uiList<float>>();
             this._commandx = 0;
             this._commandy = 0;
             this._minX = float.MaxValue;
             this._minY = float.MaxValue;
             this._maxX = float.MinValue;
             this._maxY = float.MinValue;
-            this._cache = null;
         }
 
         internal uiPathCache flatten(float scale) {
             scale = Mathf.Round(scale * 2.0f) / 2.0f; // round to 0.5f
             
-            if (this._cache != null && this._cache.canReuse(scale)) {
-                return this._cache;
-            }
-            
-            this._cache = new uiPathCache(scale);
+            var _cache = new uiPathCache(scale);
 
             var i = 0;
             while (i < this._commands.Count) {
                 var cmd = (uiPathCommand) this._commands[i];
                 switch (cmd) {
                     case uiPathCommand.moveTo:
-                        this._cache.addPath();
-                        this._cache.addPoint(this._commands[i + 1], this._commands[i + 2], uiPointFlags.corner);
+                        _cache.addPath();
+                        _cache.addPoint(this._commands[i + 1], this._commands[i + 2], uiPointFlags.corner);
                         i += 3;
                         break;
                     case uiPathCommand.lineTo:
-                        this._cache.addPoint(this._commands[i + 1], this._commands[i + 2], uiPointFlags.corner);
+                        _cache.addPoint(this._commands[i + 1], this._commands[i + 2], uiPointFlags.corner);
                         i += 3;
                         break;
                     case uiPathCommand.bezierTo:
-                        this._cache.tessellateBezier(
+                        _cache.tessellateBezier(
                             this._commands[i + 1], this._commands[i + 2],
                             this._commands[i + 3], this._commands[i + 4],
                             this._commands[i + 5], this._commands[i + 6], uiPointFlags.corner);
                         i += 7;
                         break;
                     case uiPathCommand.close:
-                        this._cache.closePath();
+                        _cache.closePath();
                         i++;
                         break;
                     case uiPathCommand.winding:
-                        this._cache.pathWinding((uiPathWinding) this._commands[i + 1]);
+                        _cache.pathWinding((uiPathWinding) this._commands[i + 1]);
                         i += 2;
                         break;
                     default:
@@ -115,8 +116,8 @@ namespace Unity.UIWidgets.ui {
                 }
             }
 
-            this._cache.normalize();
-            return this._cache;
+            _cache.normalize();
+            return _cache;
         }
 
         void _expandBounds(float x, float y) {
@@ -150,7 +151,6 @@ namespace Unity.UIWidgets.ui {
 
             this._commandx = x;
             this._commandy = y;
-            this._cache = null;
         }
 
         void _appendLineTo(float x, float y) {
@@ -163,7 +163,6 @@ namespace Unity.UIWidgets.ui {
 
             this._commandx = x;
             this._commandy = y;
-            this._cache = null;
         }
 
         void _appendBezierTo(float x1, float y1, float x2, float y2, float x3, float y3) {
@@ -182,18 +181,15 @@ namespace Unity.UIWidgets.ui {
             
             this._commandx = x3;
             this._commandy = y3;
-            this._cache = null;
         }
         
         void _appendClose() {
             this._commands.Add((float) uiPathCommand.close);
-            this._cache = null;
         }
 
         void _appendWinding(float winding) {
             this._commands.Add((float) uiPathCommand.winding);
             this._commands.Add(winding);
-            this._cache = null;
         }
 
         public void relativeMoveTo(float x, float y) {
@@ -652,19 +648,6 @@ namespace Unity.UIWidgets.ui {
             }
         }
 
-        public uiPath shift(Offset offset) {
-            offset = offset ?? Offset.zero;
-            var path = new uiPath();
-            path.addPath(this, offset);
-            return path;
-        }
-
-        public uiPath transform(Matrix3 mat) {
-            var path = new uiPath();
-            path.addPath(this, mat);
-            return path;
-        }
-
         public void addPath(uiPath path, Offset offset) {
             if (offset == null) {
                 this.addPath(path);
@@ -678,7 +661,7 @@ namespace Unity.UIWidgets.ui {
         public static uiPath fromPath(Path path) {
             D.assert(path != null);
 
-            uiPath uipath = new uiPath();
+            uiPath uipath = uiPath.create();
 
             var i = 0;
             var _commands = path.commands;

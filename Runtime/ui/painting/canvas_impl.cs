@@ -240,13 +240,13 @@ namespace Unity.UIWidgets.ui {
         }
 
         void _clipRect(Rect rect) {
-            var path = new uiPath();
+            var path = uiPath.create();
             path.addRect(rect);
             this._clipPath(path);
         }
 
         void _clipRRect(RRect rrect) {
-            var path = new uiPath();
+            var path = uiPath.create();
             path.addRRect(rrect);
             this._clipPath(path);
         }
@@ -255,6 +255,7 @@ namespace Unity.UIWidgets.ui {
             var layer = this._currentLayer;
             var state = layer.currentState;
             layer.clipStack.clipPath(path, state.matrix, state.scale * this._devicePixelRatio);
+            path.dispose();
         }
         
         void _tryAddScissor(RenderLayer layer, Rect scissor) {
@@ -472,6 +473,7 @@ namespace Unity.UIWidgets.ui {
             if (paint.style == PaintingStyle.fill) {
                 var state = this._currentLayer.currentState;
                 var cache = path.flatten(state.scale * this._devicePixelRatio);
+                path.dispose();
 
                 bool convex;
                 var mesh = cache.getFillMesh(out convex).transform(state.matrix);
@@ -515,6 +517,8 @@ namespace Unity.UIWidgets.ui {
                 }
 
                 var cache = path.flatten(state.scale * this._devicePixelRatio);
+                path.dispose();
+                
                 var mesh = cache.getStrokeMesh(
                     strokeWidth / state.scale * 0.5f,
                     paint.strokeCap,
@@ -668,7 +672,7 @@ namespace Unity.UIWidgets.ui {
                     }
                     case DrawClipPath cmd: {
                         var uipath = uiPath.fromPath(cmd.path);
-                        this._clipPath(uiPath.fromPath(cmd.path));
+                        this._clipPath(uipath);
                         break;
                     }
                     case DrawPath cmd: {
