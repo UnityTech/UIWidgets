@@ -25,6 +25,7 @@ namespace Unity.UIWidgets.ui {
         volatile int _repetitionCount;
         volatile bool _isDone;
         volatile int _frameIndex;
+        volatile Texture2D _texture;
         readonly UIWidgetsCoroutine _coroutine;
 
         public GifCodec(byte[] bytes) {
@@ -129,20 +130,24 @@ namespace Unity.UIWidgets.ui {
             return frame.Then(frameData => {
                 this._nextFrame();
 
+                if (this._texture == null) {
+                    this._texture = new Texture2D(this._width, this._height, TextureFormat.BGRA32, false);
+                    this._texture.hideFlags = HideFlags.HideAndDontSave;
+                }
+
+                var tex = this._texture;
+                tex.LoadRawTextureData(frameData.gifFrame.bytes);
+                tex.Apply();
+
                 if (frameData.frameInfo != null) {
                     return frameData.frameInfo;
                 }
-
-                var tex = new Texture2D(this._width, this._height, TextureFormat.BGRA32, false);
-                tex.hideFlags = HideFlags.HideAndDontSave;
-                tex.LoadRawTextureData(frameData.gifFrame.bytes);
-                tex.Apply();
 
                 frameData.frameInfo = new FrameInfo {
                     image = new Image(tex),
                     duration = TimeSpan.FromMilliseconds(frameData.gifFrame.delay)
                 };
-                frameData.gifFrame = null; // dispose gifFrame
+                // frameData.gifFrame = null; // dispose gifFrame
 
                 return frameData.frameInfo;
             });
