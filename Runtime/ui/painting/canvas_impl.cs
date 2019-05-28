@@ -667,11 +667,13 @@ namespace Unity.UIWidgets.ui {
                         break;
                     }
                     case DrawClipPath cmd: {
+                        var uipath = uiPath.fromPath(cmd.path);
                         this._clipPath(uiPath.fromPath(cmd.path));
                         break;
                     }
                     case DrawPath cmd: {
-                        this._drawPath(uiPath.fromPath(cmd.path), cmd.paint);
+                        var uipath = uiPath.fromPath(cmd.path);
+                        this._drawPath(uipath, cmd.paint);
                         break;
                     }
                     case DrawImage cmd: {
@@ -959,13 +961,12 @@ namespace Unity.UIWidgets.ui {
                 this.draws.Add(new CmdLayer {layer = layer});
             }
 
-            public override void dispose() {
+            public override void clear() {
                 this.draws.Clear();
                 this.layers.Clear();
                 this.states.Clear();
                 this.clipStack = new ClipStack();
                 this._viewport = null;
-                base.dispose();
             }
         }
 
@@ -1016,11 +1017,11 @@ namespace Unity.UIWidgets.ui {
         }
         
         
-        internal class CmdLayer {
+        internal class CmdLayer : PoolItem {
             public RenderLayer layer;
         }
         
-        internal class CmdDraw {
+        internal class CmdDraw : PoolItem {
             public uiMeshMesh mesh;
             public TextBlobMesh textMesh;
             public int pass;
@@ -1035,6 +1036,11 @@ namespace Unity.UIWidgets.ui {
             public static readonly Matrix3 idMat3 = Matrix3.I();
             public static readonly int texId = Shader.PropertyToID("_tex");
             public static readonly int matId = Shader.PropertyToID("_mat");
+
+            
+            public override void clear() {
+                
+            }
         }
 
         internal class CmdScissor {

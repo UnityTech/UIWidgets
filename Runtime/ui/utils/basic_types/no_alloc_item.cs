@@ -15,7 +15,7 @@ namespace Unity.UIWidgets.ui {
             if (this._size > this._watermark) {
                 this._watermark = this._size;
                 
-                Debug.Log("Item watermark increases >>> " + this._itemKey + " = " + this._watermark);
+                //Debug.Log("Item watermark increases >>> " + this._itemKey + " = " + this._watermark);
             }
         }
 
@@ -65,12 +65,14 @@ namespace Unity.UIWidgets.ui {
                 debugInfo[typeof(T)].consume();
             }
             
+            curItem.activate();
             return (T)curItem;
         }
         
         public static void recycle<T>(T item) where T : PoolItem {
             var typeofT = item.GetType();
             D.assert(poolDict.ContainsKey(typeofT));
+
             poolDict[typeofT].Add(item);
 
             if (_debugFlag) {
@@ -96,7 +98,7 @@ namespace Unity.UIWidgets.ui {
             this.length = len;
         }
 
-        public override void dispose() {
+        public override void clear() {
             this.length = 0;
             base.dispose();
         }
@@ -104,16 +106,33 @@ namespace Unity.UIWidgets.ui {
 
     public abstract class PoolItem {
         //ensure that base class has a empty constructor
+        bool __activated_flag = false;
+        
         public PoolItem() {
             
+        }
+
+        public void activate() {
+            this.__activated_flag = true;
         }
 
         public virtual void setup() {
             
         }
 
-        public virtual void dispose() {
+        public virtual void clear() {
+            
+        }
+
+        public void dispose() {
+            if (!this.__activated_flag) {
+                //Debug.Assert(false, "an item has been recycled more than once !");
+                return;
+            }
+            
+            this.clear();
             this.recycle();
+            this.__activated_flag = false;
         }
 
         public void recycle() {
