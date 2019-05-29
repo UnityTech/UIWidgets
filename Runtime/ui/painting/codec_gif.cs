@@ -116,7 +116,7 @@ namespace Unity.UIWidgets.ui {
             }
         }
 
-        public IPromise<FrameInfo> getNextFrame() {
+        public FrameInfo getNextFrame() {
             this._nextFrame();
             this._texture.LoadRawTextureData(this._frameData.gifFrame.bytes);
             this._texture.Apply();
@@ -124,7 +124,7 @@ namespace Unity.UIWidgets.ui {
                 image = this._image,
                 duration = TimeSpan.FromMilliseconds(this._frameData.gifFrame.delay)
             };
-            return Promise<FrameInfo>.Resolved(this._frameData.frameInfo);
+            return this._frameData.frameInfo;
         }
 
         public void Dispose() {

@@ -363,24 +363,15 @@ namespace Unity.UIWidgets.painting {
         }
 
         void _decodeNextFrameAndSchedule() {
-            this._codec.getNextFrame().Then(frame => {
-                    this._nextFrame = frame;
+            var frame = this._codec.getNextFrame();
+            this._nextFrame = frame;
 
-                    if (this._codec.frameCount == 1) {
-                        this._emitFrame(new ImageInfo(image: this._nextFrame.image, scale: this._scale));
-                        return;
-                    }
+            if (this._codec.frameCount == 1) {
+                this._emitFrame(new ImageInfo(image: this._nextFrame.image, scale: this._scale));
+                return;
+            }
 
-                    SchedulerBinding.instance.scheduleFrameCallback(this._handleAppFrame);
-                },
-                ex => {
-                    this.reportError(
-                        context: "resolving an image frame",
-                        exception: ex,
-                        informationCollector: this._informationCollector,
-                        silent: true
-                    );
-                });
+            SchedulerBinding.instance.scheduleFrameCallback(this._handleAppFrame);
         }
 
         void _emitFrame(ImageInfo imageInfo) {
