@@ -1370,15 +1370,33 @@ namespace Unity.UIWidgets.ui {
         innerBevel = 0x08,
     }
 
-    class uiPathPoint {
+    class uiPathPoint : PoolItem {
         public float x, y;
         public float dx, dy;
         public float len;
         public float dmx, dmy;
         public uiPointFlags flags;
+
+        public static uiPathPoint create(float x = 0, float y = 0, float dx = 0, float dy = 0, float len = 0,
+            float dmx = 0, float dmy = 0,
+            uiPointFlags flags = uiPointFlags.corner) {
+            uiPathPoint newPoint = ItemPoolManager.alloc<uiPathPoint>();
+            newPoint.x = x;
+            newPoint.y = y;
+            newPoint.dx = dx;
+            newPoint.dy = dy;
+            newPoint.len = len;
+            newPoint.dmx = dmx;
+            newPoint.dmy = dmy;
+            newPoint.flags = flags;
+            return newPoint;
+        }
+
+        public uiPathPoint() {
+        }
     }
 
-    class uiPathPath {
+    class uiPathPath : PoolItem {
         public int first;
         public int count;
         public bool closed;
@@ -1388,6 +1406,26 @@ namespace Unity.UIWidgets.ui {
         public int nstroke;
         public uiPathWinding winding;
         public bool convex;
+
+        public static uiPathPath create(int first = 0, int count = 0, bool closed = false, int ifill = 0, int nfill = 0,
+            int istroke = 0,
+            int nstroke = 0, uiPathWinding winding = uiPathWinding.counterClockwise, bool convex = false) {
+            uiPathPath newPath = ItemPoolManager.alloc<uiPathPath>();
+            newPath.first = first;
+            newPath.count = count;
+            newPath.closed = closed;
+            newPath.ifill = ifill;
+            newPath.nfill = nfill;
+            newPath.istroke = istroke;
+            newPath.nstroke = nstroke;
+            newPath.winding = winding;
+            newPath.convex = convex;
+            
+            return newPath;
+        }
+        
+        public uiPathPath() {
+        }
     }
 
     class uiPathCache : PoolItem {
@@ -1407,6 +1445,14 @@ namespace Unity.UIWidgets.ui {
         }
 
         public override void clear() {
+            foreach (var path in this._paths) {
+                path.dispose();
+            }
+
+            foreach (var point in this._points) {
+                point.dispose();
+            }
+            
             this._paths.Clear();
             this._points.Clear();
         }
@@ -1423,14 +1469,14 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void addPath() {
-            this._paths.Add(new uiPathPath {
-                first = this._points.Count,
-                winding = uiPathWinding.counterClockwise
-            });
+            this._paths.Add(uiPathPath.create(
+                first : this._points.Count,
+                winding : uiPathWinding.counterClockwise
+            ));
         }
 
         public void addPoint(float x, float y, uiPointFlags flags) {
-            this._addPoint(new uiPathPoint {x = x, y = y, flags = flags});
+            this._addPoint(uiPathPoint.create(x : x, y : y, flags : flags));
         }
 
         void _addPoint(uiPathPoint point) {
@@ -1477,16 +1523,16 @@ namespace Unity.UIWidgets.ui {
             for (int i = 0; i < points.Count; i++) {
                 var point = points[i];
                 if (i == points.Count - 1) {
-                    this._addPoint(new uiPathPoint {
-                        x = point.x + x1,
-                        y = point.y + y1,
-                        flags = flags,
-                    });
+                    this._addPoint(uiPathPoint.create(
+                        x : point.x + x1,
+                        y : point.y + y1,
+                        flags : flags
+                    ));
                 } else {
-                    this._addPoint(new uiPathPoint {
-                        x = point.x + x1,
-                        y = point.y + y1,
-                    });
+                    this._addPoint(uiPathPoint.create(
+                        x : point.x + x1,
+                        y : point.y + y1
+                    ));
                 }
             }
         }
