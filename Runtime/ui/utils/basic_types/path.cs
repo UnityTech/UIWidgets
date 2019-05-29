@@ -80,7 +80,7 @@ namespace Unity.UIWidgets.ui {
         internal uiPathCache flatten(float scale) {
             scale = Mathf.Round(scale * 2.0f) / 2.0f; // round to 0.5f
             
-            var _cache = new uiPathCache(scale);
+            var _cache = uiPathCache.create(scale);
 
             var i = 0;
             while (i < this._commands.Count) {
@@ -1390,7 +1390,7 @@ namespace Unity.UIWidgets.ui {
         public bool convex;
     }
 
-    class uiPathCache {
+    class uiPathCache : PoolItem {
         float _scale;
         float _distTol;
         float _tessTol;
@@ -1398,10 +1398,20 @@ namespace Unity.UIWidgets.ui {
         List<uiPathPath> _paths = new List<uiPathPath>();
         List<uiPathPoint> _points = new List<uiPathPoint>();
 
-        public uiPathCache(float scale) {
-            this._scale = scale;
-            this._distTol = 0.01f / scale;
-            this._tessTol = 0.25f / scale;
+        public static uiPathCache create(float scale) {
+            uiPathCache newPathCache = ItemPoolManager.alloc<uiPathCache>();
+            newPathCache._scale = scale;
+            newPathCache._distTol = 0.01f / scale;
+            newPathCache._tessTol = 0.25f / scale;
+            return newPathCache;
+        }
+
+        public override void clear() {
+            this._paths.Clear();
+            this._points.Clear();
+        }
+
+        public uiPathCache() {
         }
 
         public bool canReuse(float scale) {

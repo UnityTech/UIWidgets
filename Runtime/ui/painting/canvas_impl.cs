@@ -477,6 +477,7 @@ namespace Unity.UIWidgets.ui {
 
                 bool convex;
                 var mesh = cache.getFillMesh(out convex).transform(state.matrix);
+                cache.dispose();
                 
                 Action<Paint> drawMesh = p => {
                     if (!this._applyClip(mesh.bounds)) {
@@ -524,6 +525,8 @@ namespace Unity.UIWidgets.ui {
                     paint.strokeCap,
                     paint.strokeJoin,
                     paint.strokeMiterLimit).transform(state.matrix);
+                
+                cache.dispose();
 
                 Action<Paint> drawMesh = p => {
                     if (!this._applyClip(mesh.bounds)) {

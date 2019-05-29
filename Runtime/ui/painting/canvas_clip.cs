@@ -20,7 +20,8 @@ namespace Unity.UIWidgets.ui {
 
             var pathCache = uiPath.flatten(scale);
             this.mesh = pathCache.getFillMesh(out this.convex).transform(matrix);
-
+            pathCache.dispose();
+            
             var vertices = this.mesh.vertices;
             if (this.convex && vertices.Count == 4 && matrix.rectStaysRect() &&
                 (Mathf.Abs(vertices[0].x - vertices[1].x) < 1e-6 && Mathf.Abs(vertices[1].y - vertices[2].y) < 1e-6 &&
