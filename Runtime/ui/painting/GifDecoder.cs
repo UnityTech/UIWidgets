@@ -621,7 +621,6 @@ namespace Unity.UIWidgets.ui {
 
             this._setPixels(); // transfer pixel data to image
 
-            var bytes = new byte[this._width * this._height * sizeof(int)];
             Buffer.BlockCopy(this._image, 0, this._currentFrame.bytes, 0, this._currentFrame.bytes.Length);
             this._currentFrame.delay = this._delay;
             this._frameCount++;
