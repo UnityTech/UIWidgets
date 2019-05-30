@@ -558,6 +558,11 @@ namespace Unity.UIWidgets.ui {
                 this._gct = this._readColorTable(this._gctSize);
                 this._bgColor = this._gct[this._bgIndex];
             }
+
+            this._currentFrame = new GifFrame {
+                bytes = new byte[this._width * this._height * sizeof(int)],
+                delay = 0
+            };
         }
 
         /**
@@ -616,9 +621,8 @@ namespace Unity.UIWidgets.ui {
 
             this._setPixels(); // transfer pixel data to image
 
-            var bytes = new byte[this._width * this._height * sizeof(int)];
-            Buffer.BlockCopy(this._image, 0, bytes, 0, bytes.Length);
-            this._currentFrame = new GifFrame {bytes = bytes, delay = this._delay};
+            Buffer.BlockCopy(this._image, 0, this._currentFrame.bytes, 0, this._currentFrame.bytes.Length);
+            this._currentFrame.delay = this._delay;
             this._frameCount++;
 
             if (this._transparency) {
