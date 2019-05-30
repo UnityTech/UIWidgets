@@ -263,9 +263,9 @@ namespace Unity.UIWidgets.ui {
                 return;
             }
 
-            layer.draws.Add(new CmdScissor {
-                deviceScissor = scissor,
-            });
+            layer.draws.Add(CmdScissor.create(
+                deviceScissor : scissor
+            ));
             this._lastScissor = scissor;
         }
         
@@ -310,7 +310,7 @@ namespace Unity.UIWidgets.ui {
 
                     // need to inflate a bit to make sure all area is cleared.
                     var inflatedScissor = reducedClip.scissor.inflate(this._fringeWidth);
-                    var boundsMesh = new uiMeshMesh(inflatedScissor);
+                    var boundsMesh = uiMeshMesh.create(inflatedScissor);
                     layer.draws.Add(CanvasShader.stencilClear(layer, boundsMesh));
 
                     foreach (var maskElement in reducedClip.maskElements) {
@@ -476,7 +476,9 @@ namespace Unity.UIWidgets.ui {
                 path.dispose();
 
                 bool convex;
-                var mesh = cache.getFillMesh(out convex).transform(state.matrix);
+                var fillMesh = cache.getFillMesh(out convex);
+                var mesh = fillMesh.transform(state.matrix);
+                fillMesh.dispose();
                 cache.dispose();
                 
                 Action<Paint> drawMesh = p => {
@@ -519,13 +521,15 @@ namespace Unity.UIWidgets.ui {
 
                 var cache = path.flatten(state.scale * this._devicePixelRatio);
                 path.dispose();
-                
-                var mesh = cache.getStrokeMesh(
+
+                var strokenMesh = cache.getStrokeMesh(
                     strokeWidth / state.scale * 0.5f,
                     paint.strokeCap,
                     paint.strokeJoin,
-                    paint.strokeMiterLimit).transform(state.matrix);
+                    paint.strokeMiterLimit);
                 
+                var mesh = strokenMesh.transform(state.matrix);
+                strokenMesh.dispose();
                 cache.dispose();
 
                 Action<Paint> drawMesh = p => {
@@ -728,7 +732,7 @@ namespace Unity.UIWidgets.ui {
             var matrix = new uiMatrix3(state.matrix);
             matrix.preTranslate(offset.dx, offset.dy);
             
-            var mesh = new TextBlobMesh(textBlob, scale, matrix);
+            var mesh = TextBlobMesh.create(textBlob, scale, matrix);
             var textBlobBounds = matrix.mapRect(textBlob.boundsInText);
             
             // request font texture so text mesh could be generated correctly
@@ -852,9 +856,9 @@ namespace Unity.UIWidgets.ui {
                         }
 
                         D.assert(mesh.vertices.Count > 0);
-                        cmd.meshObj.SetVertices(mesh.vertices);
-                        cmd.meshObj.SetTriangles(mesh.triangles, 0, false);
-                        cmd.meshObj.SetUVs(0, mesh.uv);
+                        cmd.meshObj.SetVertices(mesh.vertices?.data);
+                        cmd.meshObj.SetTriangles(mesh.triangles?.data, 0, false);
+                        cmd.meshObj.SetUVs(0, mesh.uv?.data);
 
                         if (mesh.matrix == null) {
                             cmd.properties.SetFloatArray(CmdDraw.matId, CmdDraw.idMat3.fMat);
@@ -901,6 +905,8 @@ namespace Unity.UIWidgets.ui {
                         }
                         break;
                 }
+                
+                cmdObj.dispose();
             }
 
             layer.draws.Clear();
@@ -922,7 +928,7 @@ namespace Unity.UIWidgets.ui {
             public bool noMSAA = false;
             public Rect layerBounds;
             public Paint layerPaint;
-            public readonly List<object> draws = new List<object>();
+            public readonly List<RenderCmd> draws = new List<RenderCmd>();
             public readonly List<RenderLayer> layers = new List<RenderLayer>();
             public readonly List<State> states = new List<State>();
             public State currentState;
@@ -965,7 +971,7 @@ namespace Unity.UIWidgets.ui {
 
             public void addLayer(RenderLayer layer) {
                 this.layers.Add(layer);
-                this.draws.Add(new CmdLayer {layer = layer});
+                this.draws.Add(CmdLayer.create(layer : layer));
             }
 
             public override void clear() {
@@ -1022,13 +1028,30 @@ namespace Unity.UIWidgets.ui {
                 return new State(this._matrix, this._scale, this._invMatrix);
             }
         }
-        
-        
-        internal class CmdLayer : PoolItem {
-            public RenderLayer layer;
+
+
+        internal abstract class RenderCmd : PoolItem {
+            
         }
         
-        internal class CmdDraw : PoolItem {
+        internal class CmdLayer : RenderCmd {
+            public RenderLayer layer;
+
+            public CmdLayer() {
+            }
+
+            public override void clear() {
+                this.layer = null;
+            }
+
+            public static CmdLayer create(RenderLayer layer) {
+                CmdLayer newCmd = ItemPoolManager.alloc<CmdLayer>();
+                newCmd.layer = layer;
+                return newCmd;
+            }
+        }
+        
+        internal class CmdDraw : RenderCmd {
             public uiMeshMesh mesh;
             public TextBlobMesh textMesh;
             public int pass;
@@ -1046,12 +1069,46 @@ namespace Unity.UIWidgets.ui {
 
             
             public override void clear() {
+                this.mesh?.dispose();
+            }
+
+            public CmdDraw() {
+            }
+
+            public static CmdDraw create(uiMeshMesh mesh = null, TextBlobMesh textMesh = null, int pass = 0,
+                MaterialPropertyBlock properties = null, RenderLayer layer = null, Material material = null,
+                Image image = null, Mesh meshObj = null,
+                bool meshObjCreated = false) {
+                CmdDraw newCmd = ItemPoolManager.alloc<CmdDraw>();
+                newCmd.mesh = mesh;
+                newCmd.textMesh = textMesh;
+                newCmd.pass = pass;
+                newCmd.properties = properties;
+                newCmd.layer = layer;
+                newCmd.material = material;
+                newCmd.image = image;
+                newCmd.meshObj = meshObj;
+                newCmd.meshObjCreated = meshObjCreated;
                 
+                return newCmd;
             }
         }
 
-        internal class CmdScissor {
+        internal class CmdScissor : RenderCmd {
             public Rect deviceScissor;
+
+            public CmdScissor() {
+            }
+            
+            public override void clear() {
+                this.deviceScissor = null;
+            }
+
+            public static CmdScissor create(Rect deviceScissor) {
+                CmdScissor newCmd = ItemPoolManager.alloc<CmdScissor>();
+                newCmd.deviceScissor = deviceScissor;
+                return newCmd;
+            }
         }
     }
 
@@ -1327,7 +1384,7 @@ namespace Unity.UIWidgets.ui {
             0, 2, 3, 0, 3, 2,
         };
 
-        static readonly List<int> _imageNineTriangles = new List<int>(12 * 9) {
+        static readonly List<int> _imageNineTriangles = new List<int> {
             0, 4, 1, 1, 4, 5,
             0, 1, 4, 1, 5, 4,
             1, 5, 2, 2, 5, 6,
@@ -1351,8 +1408,11 @@ namespace Unity.UIWidgets.ui {
         public static uiMeshMesh imageMesh(uiMatrix3 matrix,
             Offset srcTL, Offset srcBL, Offset srcBR, Offset srcTR,
             Rect dst) {
-            var vertices = new List<Vector3>(4);
-            var uv = new List<Vector2>(4);
+            var vertices = ItemPoolManager.alloc<uiList<Vector3>>();
+            vertices.SetCapacity(4);
+
+            var uv = ItemPoolManager.alloc<uiList<Vector2>>();
+            uv.SetCapacity(4);
 
             vertices.Add(new Vector2(dst.left, dst.top));
             uv.Add(new Vector2(srcTL.dx, 1.0f - srcTL.dy));
@@ -1363,12 +1423,18 @@ namespace Unity.UIWidgets.ui {
             vertices.Add(new Vector2(dst.right, dst.top));
             uv.Add(new Vector2(srcTR.dx, 1.0f - srcTR.dy));
 
-            return new uiMeshMesh(matrix, vertices, _imageTriangles, uv);
+            var _triangles = ItemPoolManager.alloc<uiList<int>>();
+            _triangles.AddRange(_imageTriangles);
+
+            return uiMeshMesh.create(matrix, vertices, _triangles, uv);
         }
         
         public static uiMeshMesh imageMesh(uiMatrix3 matrix, Rect src, Rect dst) {
-            var vertices = new List<Vector3>(4);
-            var uv = new List<Vector2>(4);
+            var vertices = ItemPoolManager.alloc<uiList<Vector3>>();
+            vertices.SetCapacity(4);
+
+            var uv = ItemPoolManager.alloc<uiList<Vector2>>();
+            uv.SetCapacity(4);
 
             float uvx0 = src.left;
             float uvx1 = src.right;
@@ -1383,8 +1449,11 @@ namespace Unity.UIWidgets.ui {
             uv.Add(new Vector2(uvx1, uvy1));
             vertices.Add(new Vector2(dst.right, dst.top));
             uv.Add(new Vector2(uvx1, uvy0));
+            
+            var _triangles = ItemPoolManager.alloc<uiList<int>>();
+            _triangles.AddRange(_imageTriangles);
 
-            return new uiMeshMesh(matrix, vertices, _imageTriangles, uv);
+            return uiMeshMesh.create(matrix, vertices, _triangles, uv);
         }
 
         public static uiMeshMesh imageNineMesh(uiMatrix3 matrix, Rect src, Rect center, int srcWidth, int srcHeight, Rect dst) {
@@ -1407,8 +1476,11 @@ namespace Unity.UIWidgets.ui {
             float ty2 = 1 - center.bottom;
             float ty3 = 1 - src.bottom;
 
-            var vertices = new List<Vector3>(16);
-            var uv = new List<Vector2>(16);
+            var vertices = ItemPoolManager.alloc<uiList<Vector3>>();
+            vertices.SetCapacity(16);
+
+            var uv = ItemPoolManager.alloc<uiList<Vector2>>();
+            uv.SetCapacity(16);
 
             vertices.Add(new Vector2(x0, y0));
             uv.Add(new Vector2(tx0, ty0));
@@ -1443,7 +1515,10 @@ namespace Unity.UIWidgets.ui {
             vertices.Add(new Vector2(x3, y3));
             uv.Add(new Vector2(tx3, ty3));
             
-            return new uiMeshMesh(matrix, vertices, _imageNineTriangles, uv);
+            var _triangles = ItemPoolManager.alloc<uiList<int>>();
+            _triangles.AddRange(_imageNineTriangles);
+            
+            return uiMeshMesh.create(matrix, vertices, _triangles, uv);
         }        
     }
 }

@@ -1686,7 +1686,8 @@ namespace Unity.UIWidgets.ui {
 
             D.assert(indices.Count == cindices);
 
-            var mesh = new uiMeshMesh(null, vertices.data, indices.data);
+            var mesh = uiMeshMesh.create(null, vertices, indices);
+
             var _fillMesh = mesh;
 
             var _fillConvex = false;
@@ -1940,7 +1941,7 @@ namespace Unity.UIWidgets.ui {
 
             D.assert(indices.Count == cindices);
 
-            var _strokeMesh = new uiMeshMesh(null, vertices.data, indices.data);
+            var _strokeMesh = uiMeshMesh.create(null, vertices, indices);         
             return _strokeMesh;
         }
     }
@@ -2216,12 +2217,12 @@ namespace Unity.UIWidgets.ui {
         }
     }
 
-    class uiMeshMesh {
-        public readonly List<Vector3> vertices;
-        public readonly List<int> triangles;
-        public readonly List<Vector2> uv;
-        public readonly uiMatrix3 matrix;
-        public readonly Rect rawBounds;
+    class uiMeshMesh : PoolItem {
+        public uiList<Vector3> vertices;
+        public uiList<int> triangles;
+        public uiList<Vector2> uv;
+        public uiMatrix3 matrix;
+        public Rect rawBounds;
 
         Rect _bounds;
 
@@ -2235,50 +2236,64 @@ namespace Unity.UIWidgets.ui {
             }
         }
 
-
-        uiMeshMesh _boundsMesh;
-
         static readonly List<int> _boundsTriangles = new List<int>(6) {
             0, 2, 1, 1, 2, 3
         };
 
         public uiMeshMesh boundsMesh {
             get {
-                if (this._boundsMesh == null) {
-                    this._boundsMesh = new uiMeshMesh(this.bounds);
-                }
-
-                return this._boundsMesh;
+                return uiMeshMesh.create(this.bounds);
             }
         }
 
-        public uiMeshMesh(Rect rect) {
-            this.vertices = new List<Vector3>(4) {
-                new Vector3(rect.right, rect.bottom),
-                new Vector3(rect.right, rect.top),
-                new Vector3(rect.left, rect.bottom),
-                new Vector3(rect.left, rect.top)
-            };
-
-            this.triangles = _boundsTriangles;
-            this.rawBounds = rect;
-
-            this._bounds = this.rawBounds;
-            this._boundsMesh = this;
+        public uiMeshMesh() {
         }
 
-        public uiMeshMesh(uiMatrix3 matrix, List<Vector3> vertices, List<int> triangles, List<Vector2> uv = null,
+        public override void clear() {
+            this.vertices?.dispose();
+            this.triangles?.dispose();
+            this.uv?.dispose();
+            this.vertices = null;
+            this.triangles = null;
+            this.uv = null;
+            this.matrix = null;
+            this.rawBounds = null;
+            this._bounds = null;
+        }
+
+        public static uiMeshMesh create(Rect rect) {
+            uiMeshMesh newMesh = ItemPoolManager.alloc<uiMeshMesh>();
+
+            newMesh.vertices = ItemPoolManager.alloc<uiList<Vector3>>();
+            newMesh.vertices.Add(new Vector3(rect.right, rect.bottom));
+            newMesh.vertices.Add(new Vector3(rect.right, rect.top));
+            newMesh.vertices.Add(new Vector3(rect.left, rect.bottom));
+            newMesh.vertices.Add(new Vector3(rect.left, rect.top));
+
+            newMesh.triangles = ItemPoolManager.alloc<uiList<int>>();
+            newMesh.triangles.AddRange(_boundsTriangles);
+            newMesh.rawBounds = rect;
+
+            newMesh._bounds = newMesh.rawBounds;
+
+            return newMesh;
+        }
+
+        public static uiMeshMesh create(uiMatrix3 matrix, uiList<Vector3> vertices, uiList<int> triangles, uiList<Vector2> uv = null,
             Rect rawBounds = null) {
             D.assert(vertices != null);
             D.assert(vertices.Count >= 0);
             D.assert(triangles != null);
             D.assert(triangles.Count >= 0);
             D.assert(uv == null || uv.Count == vertices.Count);
-
-            this.matrix = matrix;
-            this.vertices = vertices;
-            this.triangles = triangles;
-            this.uv = uv;
+            
+            uiMeshMesh newMesh = ItemPoolManager.alloc<uiMeshMesh>();
+            newMesh.matrix = matrix;
+            newMesh.vertices = vertices;
+            newMesh.triangles = triangles;
+            if (uv != null) {
+                newMesh.uv = uv;
+            }
 
             if (rawBounds == null) {
                 if (vertices.Count > 0) {
@@ -2313,11 +2328,32 @@ namespace Unity.UIWidgets.ui {
                 }
             }
 
-            this.rawBounds = rawBounds;
+            newMesh.rawBounds = rawBounds;
+
+            return newMesh;
         }
 
         public uiMeshMesh transform(uiMatrix3 matrix) {
-            return new uiMeshMesh(matrix, this.vertices, this.triangles, this.uv, this.rawBounds);
+            var vertices = ItemPoolManager.alloc<uiList<Vector3>>();
+            vertices.SetCapacity(this.vertices.Count);
+            vertices.AddRange(this.vertices.data);
+            
+            var triangles = ItemPoolManager.alloc<uiList<int>>();
+            triangles.SetCapacity(this.triangles.Count);
+            triangles.AddRange(this.triangles.data);
+
+
+            uiList<Vector2> uv = null;
+
+            if (this.uv != null) {
+                uv = ItemPoolManager.alloc<uiList<Vector2>>();
+                uv.SetCapacity(this.uv.Count);
+                uv.AddRange(this.uv.data);
+            }
+
+
+            var ret = uiMeshMesh.create(matrix, vertices, triangles, uv, this.rawBounds);
+            return ret;
         }
     }
 }

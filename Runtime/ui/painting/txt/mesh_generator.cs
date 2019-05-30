@@ -83,22 +83,35 @@ namespace Unity.UIWidgets.ui {
     }
 
     
-    class TextBlobMesh {
+    class TextBlobMesh : PoolItem {
         
         static readonly Dictionary<MeshKey, MeshInfo> _meshes = new Dictionary<MeshKey, MeshInfo>();
         static long _frameCount = 0;
         
-        public readonly TextBlob textBlob;
-        public readonly float scale;
-        public readonly uiMatrix3 matrix;
+        public TextBlob textBlob;
+        public float scale;
+        public uiMatrix3 matrix;
         
         uiMeshMesh _mesh;
         bool _resolved;
 
-        public TextBlobMesh(TextBlob textBlob, float scale, uiMatrix3 matrix) {
-            this.textBlob = textBlob;
-            this.scale = scale;
-            this.matrix = matrix;
+        public TextBlobMesh() {
+        }
+
+        public override void clear() {
+            this.textBlob = null;
+            this.matrix = null;
+            this._mesh?.dispose();
+            this._mesh = null;
+            this._resolved = false;
+        }
+
+        public static TextBlobMesh create(TextBlob textBlob, float scale, uiMatrix3 matrix) {
+            TextBlobMesh newMesh = ItemPoolManager.alloc<TextBlobMesh>();
+            newMesh.textBlob = textBlob;
+            newMesh.scale = scale;
+            newMesh.matrix = matrix;
+            return newMesh;
         }
         
         public static long frameCount {
@@ -114,6 +127,7 @@ namespace Unity.UIWidgets.ui {
             var keysToRemove = _meshes.Values.Where(info => info.timeToLive < _frameCount)
                 .Select(info => info.key).ToList();
             foreach (var key in keysToRemove) {
+                _meshes[key].mesh.dispose();
                 _meshes.Remove(key);
             }
         }
@@ -141,9 +155,15 @@ namespace Unity.UIWidgets.ui {
             var text = this.textBlob.text;
             var fontSizeToLoad = Mathf.CeilToInt(style.UnityFontSize * this.scale);
 
-            var vertices = new List<Vector3>(length * 4);
-            var triangles = new List<int>(length * 6);
-            var uv = new List<Vector2>(length * 4);
+            var vertices = ItemPoolManager.alloc<uiList<Vector3>>();
+            vertices.SetCapacity(length * 4);
+            
+            var triangles = ItemPoolManager.alloc<uiList<int>>();
+            triangles.SetCapacity(length * 6);
+
+            var uv = ItemPoolManager.alloc<uiList<Vector2>>();
+            uv.SetCapacity(length * 4);
+            
             for (int charIndex = 0; charIndex < length; ++charIndex) {
                 var ch = text[charIndex + this.textBlob.textOffset];
                 // first char as origin for mesh position 
@@ -185,10 +205,14 @@ namespace Unity.UIWidgets.ui {
 
             if (vertices.Count == 0) {
                 this._mesh = null;
+                vertices.dispose();
+                uv.dispose();
+                triangles.dispose();
+                
                 return null;
             }
 
-            uiMeshMesh mesh = vertices.Count > 0 ? new uiMeshMesh(null, vertices, triangles, uv) : null;
+            uiMeshMesh mesh = vertices.Count > 0 ? uiMeshMesh.create(null, vertices, triangles, uv) : null;
             _meshes[key] = new MeshInfo(key, mesh, fontInfo.textureVersion);
 
             this._mesh = mesh.transform(this.matrix);
