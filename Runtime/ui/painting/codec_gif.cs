@@ -119,6 +119,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void Dispose() {
+            this._decoder.Dispose();
         }
     }
 }
