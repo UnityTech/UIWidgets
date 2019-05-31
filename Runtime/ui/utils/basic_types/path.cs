@@ -2352,7 +2352,7 @@ namespace Unity.UIWidgets.ui {
             }
 
 
-            var ret = uiMeshMesh.create(matrix, vertices, triangles, uv, this.rawBounds);
+            var ret = create(matrix, vertices, triangles, uv, this.rawBounds);
             return ret;
         }
     }

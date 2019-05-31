@@ -174,6 +174,7 @@ namespace Unity.UIWidgets.ui {
                 return;
             }
 
+            //!!!!!!BUG ==> need dispose layer!!!!!!!!
             this._layers.RemoveAt(this._layers.Count - 1);
             var currentLayer = this._currentLayer = this._layers[this._layers.Count - 1];
             var state = currentLayer.currentState;
@@ -276,8 +277,9 @@ namespace Unity.UIWidgets.ui {
 
             var layer = this._currentLayer;
             var layerBounds = layer.layerBounds;
-            ReducedClip reducedClip = new ReducedClip(layer.clipStack, layerBounds, queryBounds);
+            ReducedClip reducedClip = ReducedClip.create(layer.clipStack, layerBounds, queryBounds);
             if (reducedClip.isEmpty()) {
+                reducedClip.dispose();
                 return false;
             }
 
@@ -295,6 +297,7 @@ namespace Unity.UIWidgets.ui {
                 deviceScissor = deviceScissor.intersect(physicalRect);
 
                 if (deviceScissor.isEmpty) {
+                    reducedClip.dispose();
                     return false;
                 }
                 
@@ -321,6 +324,8 @@ namespace Unity.UIWidgets.ui {
 
                 this._setLastClipGenId(maskGenID, reducedClip.scissor);
             }
+            
+            reducedClip.dispose();
 
             return true;
         }
@@ -932,7 +937,7 @@ namespace Unity.UIWidgets.ui {
             public readonly List<RenderLayer> layers = new List<RenderLayer>();
             public readonly List<State> states = new List<State>();
             public State currentState;
-            public ClipStack clipStack = new ClipStack();
+            public ClipStack clipStack;
             public uint lastClipGenId;
             public Rect lastClipBounds;
             public bool ignoreClip = true;
@@ -965,6 +970,7 @@ namespace Unity.UIWidgets.ui {
                 newLayer.ignoreClip = ignoreClip;
                 newLayer.currentState = new State();
                 newLayer.states.Add(newLayer.currentState);
+                newLayer.clipStack = ClipStack.create();
                 
                 return newLayer;
             }
@@ -978,7 +984,7 @@ namespace Unity.UIWidgets.ui {
                 this.draws.Clear();
                 this.layers.Clear();
                 this.states.Clear();
-                this.clipStack = new ClipStack();
+                this.clipStack.dispose();
                 this._viewport = null;
             }
         }

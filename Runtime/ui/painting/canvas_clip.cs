@@ -3,11 +3,11 @@ using Unity.UIWidgets.foundation;
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
-    class ClipElement {
-        public readonly int saveCount;
-        public readonly uiMeshMesh mesh;
-        public readonly bool convex;
-        public readonly bool isRect;
+    class ClipElement : PoolItem {
+        public int saveCount;
+        public uiMeshMesh mesh;
+        public bool convex;
+        public bool isRect;
         public Rect rect { get; private set; }
 
         uint _genId;
@@ -15,26 +15,48 @@ namespace Unity.UIWidgets.ui {
         Rect _bound;
         uiMatrix3 _invMat;
 
-        public ClipElement(int saveCount, uiPath uiPath, uiMatrix3 matrix, float scale) {
-            this.saveCount = saveCount;
+        public ClipElement() {
+            
+        }
+
+        public override void clear() {
+            this.mesh.dispose();
+            this.saveCount = 0;
+            this.mesh = null;
+            this.convex = false;
+            this.isRect = false;
+            this._genId = 0;
+            this._isIntersectionOfRects = false;
+            this._bound = null;
+            this._invMat = null;
+        }
+
+        public static ClipElement create(int saveCount, uiPath uiPath, uiMatrix3 matrix, float scale) {
+            ClipElement newElement = ItemPoolManager.alloc<ClipElement>();
+            
+            newElement.saveCount = saveCount;
 
             var pathCache = uiPath.flatten(scale);
-            this.mesh = pathCache.getFillMesh(out this.convex).transform(matrix);
+            var fillMesh = pathCache.getFillMesh(out newElement.convex);
+            newElement.mesh = fillMesh.transform(matrix);
             pathCache.dispose();
+            fillMesh.dispose();
             
-            var vertices = this.mesh.vertices;
-            if (this.convex && vertices.Count == 4 && matrix.rectStaysRect() &&
+            var vertices = newElement.mesh.vertices;
+            if (newElement.convex && vertices.Count == 4 && matrix.rectStaysRect() &&
                 (Mathf.Abs(vertices[0].x - vertices[1].x) < 1e-6 && Mathf.Abs(vertices[1].y - vertices[2].y) < 1e-6 &&
                  Mathf.Abs(vertices[2].x - vertices[3].x) < 1e-6 && Mathf.Abs(vertices[3].y - vertices[0].y) < 1e-6 ||
                  Mathf.Abs(vertices[0].y - vertices[1].y) < 1e-6 && Mathf.Abs(vertices[1].x - vertices[2].x) < 1e-6 &&
                  Mathf.Abs(vertices[2].y - vertices[3].y) < 1e-6 && Mathf.Abs(vertices[3].x - vertices[0].x) < 1e-6)) {
-                this.isRect = true;
-                this.rect = this.mesh.bounds;
+                newElement.isRect = true;
+                newElement.rect = newElement.mesh.bounds;
             }
             else {
-                this.isRect = false;
-                this.rect = null;
+                newElement.isRect = false;
+                newElement.rect = null;
             }
+
+            return newElement;
         }
 
         public void setRect(Rect rect) {
@@ -141,7 +163,7 @@ namespace Unity.UIWidgets.ui {
         }
     }
 
-    class ClipStack {
+    class ClipStack : PoolItem {
         static uint _genId = wideOpenGenID;
 
         public static uint getNextGenID() {
@@ -160,6 +182,21 @@ namespace Unity.UIWidgets.ui {
         Rect _bound;
         int _saveCount;
 
+        public static ClipStack create() {
+            return ItemPoolManager.alloc<ClipStack>();
+        }
+
+        public override void clear() {
+            this._saveCount = 0;
+            this._bound = null;
+            this._lastElement = null;
+            foreach (var clipelement in this.stack) {
+                clipelement.dispose();
+            }
+            
+            this.stack.Clear();
+        }
+
         public void save() {
             this._saveCount++;
         }
@@ -175,13 +212,16 @@ namespace Unity.UIWidgets.ui {
                     break;
                 }
 
+                var lastelement = this.stack[this.stack.Count - 1];
+                lastelement.dispose();
+                
                 this.stack.RemoveAt(this.stack.Count - 1);
                 this._lastElement = this.stack.Count == 0 ? null : this.stack[this.stack.Count - 1];
             }
         }
 
         public void clipPath(uiPath uiPath, uiMatrix3 matrix, float scale) {
-            var element = new ClipElement(this._saveCount, uiPath, matrix, scale);
+            var element = ClipElement.create(this._saveCount, uiPath, matrix, scale);
             this._pushElement(element);
         }
 
@@ -189,6 +229,7 @@ namespace Unity.UIWidgets.ui {
             ClipElement prior = this._lastElement;
             if (prior != null) {
                 if (prior.isEmpty()) {
+                    element.dispose();
                     return;
                 }
 
@@ -198,17 +239,20 @@ namespace Unity.UIWidgets.ui {
                         var isectRect = prior.rect.intersect(element.rect);
                         if (isectRect.isEmpty) {
                             prior.setEmpty();
+                            element.dispose();
                             return;
                         }
 
                         prior.setRect(isectRect);
                         var priorprior = this.stack.Count > 1 ? this.stack[this.stack.Count - 2] : null;
                         prior.updateBoundAndGenID(priorprior);
+                        element.dispose();
                         return;
                     }
 
                     if (!prior.getBound().overlaps(element.getBound())) {
                         prior.setEmpty();
+                        element.dispose();
                         return;
                     }
                 }
@@ -232,13 +276,23 @@ namespace Unity.UIWidgets.ui {
         }
     }
 
-    class ReducedClip {
-        public readonly Rect scissor;
-        public readonly List<ClipElement> maskElements = new List<ClipElement>();
+    class ReducedClip : PoolItem {
+        public Rect scissor;
+        public List<ClipElement> maskElements = new List<ClipElement>();
         ClipElement _lastElement;
 
         public bool isEmpty() {
             return this.scissor != null && this.scissor.isEmpty;
+        }
+
+        public ReducedClip() {
+            
+        }
+
+        public override void clear() {
+            this.scissor = null;
+            this.maskElements.Clear();
+            this._lastElement = null;
         }
 
         public uint maskGenID() {
@@ -250,30 +304,32 @@ namespace Unity.UIWidgets.ui {
             return element.getGenID();
         }
 
-        public ReducedClip(ClipStack stack, Rect layerBounds, Rect queryBounds) {
+        public static ReducedClip create(ClipStack stack, Rect layerBounds, Rect queryBounds) {
+            ReducedClip clip = ItemPoolManager.alloc<ReducedClip>();
             Rect stackBounds;
             bool iior;
             stack.getBounds(out stackBounds, out iior);
 
             if (stackBounds == null) {
-                this.scissor = layerBounds;
-                return;
+                clip.scissor = layerBounds;
+                return clip;
             }
 
             stackBounds = layerBounds.intersect(stackBounds);
             if (iior) {
-                this.scissor = stackBounds;
-                return;
+                clip.scissor = stackBounds;
+                return clip;
             }
 
             queryBounds = stackBounds.intersect(queryBounds);
             if (queryBounds.isEmpty) {
-                this.scissor = Rect.zero;
-                return;
+                clip.scissor = Rect.zero;
+                return clip;
             }
 
-            this.scissor = queryBounds;
-            this._walkStack(stack, this.scissor);
+            clip.scissor = queryBounds;
+            clip._walkStack(stack, clip.scissor);
+            return clip;
         }
 
         void _walkStack(ClipStack stack, Rect queryBounds) {

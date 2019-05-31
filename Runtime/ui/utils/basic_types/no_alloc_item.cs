@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Unity.UIWidgets.foundation;
 using UnityEngine;
 
@@ -30,7 +31,26 @@ namespace Unity.UIWidgets.ui {
 
         const bool _debugFlag = true;
 
+        static int _allocTick = 0;
+
+        public static void showDebugInfo() {
+            string info = "";
+            foreach (var key in debugInfo.Keys) {
+                info += "| " + key + " = " + debugInfo[key]._watermark + " |\n";
+            }
+            
+            Debug.Log(info);
+        }
+
         public static T alloc<T>() where T : PoolItem, new() {
+
+            if (_allocTick >= 5000) {
+                showDebugInfo();
+                _allocTick = 0;
+            }
+
+            _allocTick++;
+            
             if (!poolDict.ContainsKey(typeof(T))) {
                 var pool = new List<PoolItem>(128);
 
