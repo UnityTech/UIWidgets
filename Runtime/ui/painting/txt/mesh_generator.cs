@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.TextCore;
 
 namespace Unity.UIWidgets.ui {
+    public class MeshGeneratorUtils {
+        public static Glyph glyph;
+    }
     class MeshKey : IEquatable<MeshKey> {
         public readonly long textBlobId;
         public readonly float scale;
@@ -147,9 +151,9 @@ namespace Unity.UIWidgets.ui {
             var text = this.textBlob.text;
             var fontSizeToLoad = Mathf.CeilToInt(style.UnityFontSize * this.scale);
 
-            var vertices = new List<Vector3>(length * 4);
-            var triangles = new List<int>(length * 6);
-            var uv = new List<Vector2>(length * 4);
+            var vertices = new List<Vector3>((length+1) * 4);
+            var triangles = new List<int>((length+1) * 6);
+            var uv = new List<Vector2>((length+1) * 4);
             for (int charIndex = 0; charIndex < length; ++charIndex) {
                 var ch = text[charIndex + this.textBlob.textOffset];
                 // first char as origin for mesh position 
@@ -187,6 +191,35 @@ namespace Unity.UIWidgets.ui {
                 uv.Add(glyphInfo.uvTopRight);
                 uv.Add(glyphInfo.uvBottomRight);
                 uv.Add(glyphInfo.uvBottomLeft);
+            }
+
+            var glyph = MeshGeneratorUtils.glyph;
+            if (glyph != null) {
+                var pos = this.textBlob.positions[length-1];
+                pos.x += 10;
+                var _minX = 0; //glyph.metrics.horizontalAdvance / this.scale;
+                var _maxX = 80; // _minX + glyph.metrics.width / this.scale;
+                var _minY = -80; // -glyph.metrics.height / this.scale;
+                var _maxY = 0;
+                var _baseIndex = vertices.Count;
+                vertices.Add(new Vector3((pos.x + _minX), (pos.y + _minY), 0));
+                vertices.Add(new Vector3((pos.x + _maxX), (pos.y + _minY), 0));
+                vertices.Add(new Vector3((pos.x + _maxX), (pos.y + _maxY), 0));
+                vertices.Add(new Vector3((pos.x + _minX), (pos.y + _maxY), 0));
+                triangles.Add(_baseIndex);
+                triangles.Add(_baseIndex + 1);
+                triangles.Add(_baseIndex + 2);
+                triangles.Add(_baseIndex);
+                triangles.Add(_baseIndex + 2);
+                triangles.Add(_baseIndex + 3);
+                uv.Add(new Vector2(0.0f, 0.0f));
+                uv.Add(new Vector2(1.0f, 0.0f));
+                uv.Add(new Vector2(1.0f, 1.0f));
+                uv.Add(new Vector2(0.0f, 1.0f));
+                // uv.Add(new Vector2(glyph.glyphRect.x,glyph.glyphRect.y));
+                // uv.Add(new Vector2(glyph.glyphRect.x+glyph.glyphRect.width,glyph.glyphRect.y));
+                // uv.Add(new Vector2(glyph.glyphRect.x+glyph.glyphRect.width,glyph.glyphRect.y+glyph.glyphRect.height));
+                // uv.Add(new Vector2(glyph.glyphRect.x,glyph.glyphRect.y+glyph.glyphRect.height));
             }
 
             if (vertices.Count == 0) {
