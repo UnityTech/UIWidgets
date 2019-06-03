@@ -58,14 +58,14 @@ namespace Unity.UIWidgets.flow {
                 var y = this.matrix[5] * devicePixelRatio;
                 this.matrix[2] = (x - (int) x) / devicePixelRatio; // x
                 this.matrix[5] = (y - (int) y) / devicePixelRatio; // y
-                
+
                 D.assert(Mathf.Abs(this.matrix[2]) <= 1e-5);
                 D.assert(Mathf.Abs(this.matrix[5]) <= 1e-5);
                 return true;
             });
-            
+
             this.matrix[2] = 0.0f;
-            this.matrix[5] = 0.0f;            
+            this.matrix[5] = 0.0f;
             this.devicePixelRatio = devicePixelRatio;
             this.antiAliasing = antiAliasing;
         }
@@ -145,12 +145,14 @@ namespace Unity.UIWidgets.flow {
         readonly Dictionary<_RasterCacheKey, _RasterCacheEntry> _cache;
 
         MeshPool _meshPool;
+
         public MeshPool meshPool {
             set { this._meshPool = value; }
         }
 
         public RasterCacheResult getPrerolledImage(
-            Picture picture, Matrix3 transform, float devicePixelRatio, int antiAliasing, bool isComplex, bool willChange) {
+            Picture picture, Matrix3 transform, float devicePixelRatio, int antiAliasing, bool isComplex,
+            bool willChange) {
             if (this.threshold == 0) {
                 return null;
             }
@@ -176,7 +178,8 @@ namespace Unity.UIWidgets.flow {
 
             if (entry.image == null) {
                 D.assert(this._meshPool != null);
-                entry.image = this._rasterizePicture(picture, transform, devicePixelRatio, antiAliasing, this._meshPool);
+                entry.image =
+                    this._rasterizePicture(picture, transform, devicePixelRatio, antiAliasing, this._meshPool);
             }
 
             return entry.image;
@@ -210,6 +213,10 @@ namespace Unity.UIWidgets.flow {
             }
 
             if (!bounds.isFinite) {
+                return false;
+            }
+
+            if (picture.isDynamic) {
                 return false;
             }
 
