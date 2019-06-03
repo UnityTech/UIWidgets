@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.IO;
-using RSG;
 using Unity.UIWidgets.foundation;
 using UnityEngine;
 
@@ -63,6 +62,7 @@ namespace Unity.UIWidgets.ui {
                 this._image = new Image(this._texture, isDynamic: true);
                 this._frameData.frameInfo.image = this._image;
             }
+
             this._frameData.gifFrame = this._decoder.currentFrame;
             D.assert(this._frameData.gifFrame != null);
 

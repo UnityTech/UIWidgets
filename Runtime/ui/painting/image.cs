@@ -11,7 +11,8 @@ namespace Unity.UIWidgets.ui {
         readonly bool _isDynamic;
         AssetBundle _bundle;
 
-        public Image(Texture texture, bool noDispose = false, bool isAsset = false, AssetBundle bundle = null, bool isDynamic = false) {
+        public Image(Texture texture, bool noDispose = false, bool isAsset = false, AssetBundle bundle = null,
+            bool isDynamic = false) {
             D.assert(!noDispose || !isAsset && bundle == null);
             D.assert(isAsset || bundle == null);
 
@@ -35,7 +36,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public bool isDynamic {
-            get { return this._isDynamic;  }
+            get { return this._isDynamic; }
         }
 
         ~Image() {
