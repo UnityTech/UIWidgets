@@ -216,32 +216,8 @@ namespace Unity.UIWidgets.flow {
                 return false;
             }
 
-            foreach (DrawCmd drawCmd in picture.drawCmds) {
-                switch (drawCmd) {
-                    case DrawImage cmd: {
-                        if (cmd.image.isDynamic) {
-                            return false;
-                        }
-
-                        break;
-                    }
-
-                    case DrawImageNine cmd: {
-                        if (cmd.image.isDynamic) {
-                            return false;
-                        }
-
-                        break;
-                    }
-
-                    case DrawImageRect cmd: {
-                        if (cmd.image.isDynamic) {
-                            return false;
-                        }
-
-                        break;
-                    }
-                }
+            if (picture.isDynamic) {
+                return false;
             }
 
             return true;
