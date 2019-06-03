@@ -60,7 +60,7 @@ namespace Unity.UIWidgets.ui {
             if (this._texture == null) {
                 this._texture = new Texture2D(this._width, this._height, TextureFormat.BGRA32, false);
                 this._texture.hideFlags = HideFlags.HideAndDontSave;
-                this._image = new Image(this._texture);
+                this._image = new Image(this._texture, isDynamic: true);
                 this._frameData.frameInfo.image = this._image;
             }
             this._frameData.gifFrame = this._decoder.currentFrame;
