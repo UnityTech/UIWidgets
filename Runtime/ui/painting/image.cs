@@ -8,9 +8,11 @@ namespace Unity.UIWidgets.ui {
         Texture _texture;
         readonly bool _noDispose;
         readonly bool _isAsset;
+        readonly bool _isDynamic;
         AssetBundle _bundle;
 
-        public Image(Texture texture, bool noDispose = false, bool isAsset = false, AssetBundle bundle = null) {
+        public Image(Texture texture, bool noDispose = false, bool isAsset = false, AssetBundle bundle = null,
+            bool isDynamic = false) {
             D.assert(!noDispose || !isAsset && bundle == null);
             D.assert(isAsset || bundle == null);
 
@@ -18,6 +20,7 @@ namespace Unity.UIWidgets.ui {
             this._noDispose = noDispose;
             this._isAsset = isAsset;
             this._bundle = bundle;
+            this._isDynamic = isDynamic;
         }
 
         public int width {
@@ -30,6 +33,10 @@ namespace Unity.UIWidgets.ui {
 
         public Texture texture {
             get { return this._texture; }
+        }
+
+        public bool isDynamic {
+            get { return this._isDynamic; }
         }
 
         ~Image() {
