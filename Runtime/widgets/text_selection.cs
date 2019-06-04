@@ -51,7 +51,7 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public virtual bool canSelectAll(TextSelectionDelegate selectionDelegate) {
-            return selectionDelegate.textEditingValue.text.isEmpty() &&
+            return selectionDelegate.textEditingValue.text.isNotEmpty() &&
                    selectionDelegate.textEditingValue.selection.isCollapsed;
         }
 
