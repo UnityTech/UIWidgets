@@ -1,9 +1,6 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.IO;
-using RSG;
-using Unity.UIWidgets.async;
 using Unity.UIWidgets.foundation;
 using UnityEngine;
 
@@ -18,79 +15,76 @@ namespace Unity.UIWidgets.ui {
             public GifDecoder.GifFrame gifFrame;
         }
 
-        readonly List<Promise<FrameData>> _frames;
+        volatile byte[] _bytes;
         volatile int _width;
         volatile int _height;
         volatile int _frameCount;
         volatile int _repetitionCount;
         volatile bool _isDone;
         volatile int _frameIndex;
-        readonly UIWidgetsCoroutine _coroutine;
+        volatile Texture2D _texture;
+        volatile FrameData _frameData;
+        volatile Image _image;
+        volatile GifDecoder _decoder;
+        volatile MemoryStream _stream;
+        IEnumerator _coroutine;
 
         public GifCodec(byte[] bytes) {
             D.assert(bytes != null);
             D.assert(isGif(bytes));
 
-            this._frames = new List<Promise<FrameData>>();
-            this._width = 0;
-            this._height = 0;
             this._frameCount = 0;
             this._repetitionCount = 0;
             this._isDone = false;
             this._frameIndex = 0;
-
-            this._coroutine = Window.instance.startBackgroundCoroutine(
-                this._startDecoding(bytes, Window.instance));
+            this._bytes = bytes;
+            this._coroutine = this._startDecoding();
+            this._decoder = new GifDecoder();
+            this._stream = new MemoryStream(this._bytes);
+            this._frameData = new FrameData() {
+                frameInfo = new FrameInfo()
+            };
         }
 
-        IEnumerator _startDecoding(byte[] bytes, Window window) {
-            var bytesStream = new MemoryStream(bytes);
+        IEnumerator _startDecoding() {
+            this._stream.Seek(0, SeekOrigin.Begin);
 
-            var gifDecoder = new GifDecoder();
-            if (gifDecoder.read(bytesStream) != GifDecoder.STATUS_OK) {
+            if (this._decoder.read(this._stream) != GifDecoder.STATUS_OK) {
                 throw new Exception("Failed to decode gif.");
             }
 
-            this._width = gifDecoder.frameWidth;
-            this._height = gifDecoder.frameHeight;
+            this._width = this._decoder.frameWidth;
+            this._height = this._decoder.frameHeight;
+
+            if (this._texture == null) {
+                this._texture = new Texture2D(this._width, this._height, TextureFormat.BGRA32, false);
+                this._texture.hideFlags = HideFlags.HideAndDontSave;
+                this._image = new Image(this._texture, isDynamic: true);
+                this._frameData.frameInfo.image = this._image;
+            }
+
+            this._frameData.gifFrame = this._decoder.currentFrame;
+            D.assert(this._frameData.gifFrame != null);
 
             int i = 0;
             while (true) {
-                yield return null;
-
-                if (gifDecoder.nextFrame() != GifDecoder.STATUS_OK) {
+                if (this._decoder.nextFrame() != GifDecoder.STATUS_OK) {
                     throw new Exception("Failed to decode gif.");
                 }
 
-                if (gifDecoder.done) {
+                if (this._decoder.done) {
                     break;
                 }
 
-                var frameData = new FrameData {
-                    gifFrame = gifDecoder.currentFrame,
-                };
-
-                Promise<FrameData> frame;
-
-                lock (this._frames) {
-                    if (i < this._frames.Count) {
-                    }
-                    else {
-                        D.assert(this._frames.Count == i);
-                        this._frames.Add(new Promise<FrameData>());
-                    }
-
-                    frame = this._frames[i];
-                }
-
-                window.runInMain(() => { frame.Resolve(frameData); });
 
                 i++;
+
+                yield return null;
             }
 
-            D.assert(gifDecoder.frameCount == i);
-            this._frameCount = gifDecoder.frameCount;
-            this._repetitionCount = gifDecoder.loopCount;
+            D.assert(this._decoder.frameCount == i);
+            this._frameCount = this._decoder.frameCount;
+            this._repetitionCount = this._decoder.loopCount;
             this._isDone = true;
         }
 
@@ -106,50 +100,26 @@ namespace Unity.UIWidgets.ui {
         void _nextFrame() {
             this._frameIndex++;
 
+            this._coroutine.MoveNext();
+
             if (this._isDone && this._frameIndex >= this._frameCount) {
                 this._frameIndex = 0;
+                this._isDone = false;
+                this._coroutine = this._startDecoding();
+                this._coroutine.MoveNext();
             }
         }
 
-        public IPromise<FrameInfo> getNextFrame() {
-            Promise<FrameData> frame;
-
-            lock (this._frames) {
-                if (this._frameIndex == this._frames.Count) {
-                    this._frames.Add(new Promise<FrameData>());
-                }
-                else {
-                    D.assert(this._frameIndex < this._frames.Count);
-                }
-
-                frame = this._frames[this._frameIndex];
-            }
-
-
-            return frame.Then(frameData => {
-                this._nextFrame();
-
-                if (frameData.frameInfo != null) {
-                    return frameData.frameInfo;
-                }
-
-                var tex = new Texture2D(this._width, this._height, TextureFormat.BGRA32, false);
-                tex.hideFlags = HideFlags.HideAndDontSave;
-                tex.LoadRawTextureData(frameData.gifFrame.bytes);
-                tex.Apply();
-
-                frameData.frameInfo = new FrameInfo {
-                    image = new Image(tex),
-                    duration = TimeSpan.FromMilliseconds(frameData.gifFrame.delay)
-                };
-                frameData.gifFrame = null; // dispose gifFrame
-
-                return frameData.frameInfo;
-            });
+        public FrameInfo getNextFrame() {
+            this._nextFrame();
+            this._texture.LoadRawTextureData(this._frameData.gifFrame.bytes);
+            this._texture.Apply();
+            this._frameData.frameInfo.duration = TimeSpan.FromMilliseconds(this._frameData.gifFrame.delay);
+            return this._frameData.frameInfo;
         }
 
         public void Dispose() {
-            this._coroutine.stop();
+            this._decoder.Dispose();
         }
     }
 }

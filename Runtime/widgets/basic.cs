@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UIWidgets.Runtime.rendering;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
@@ -2085,7 +2084,7 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public static List<RepaintBoundary> wrapAll(List<Widget> widgets) {
-            List<RepaintBoundary> result = Enumerable.Repeat((RepaintBoundary) null, widgets.Count).ToList();
+            List<RepaintBoundary> result = CollectionUtils.CreateRepeatedList<RepaintBoundary>(null, widgets.Count);
             for (int i = 0; i < result.Count; ++i) {
                 result[i] = wrap(widgets[i], i);
             }

@@ -48,7 +48,7 @@ UIWidgets主要来自[Flutter](https://github.com/flutter/flutter)。但UIWidget
 将下载的包文件夹移动到Unity项目的Package文件夹中。
 
 通常，你可以在控制台（或终端）应用程序中输入下面的代码来完成这个操作：
-    
+
    ```none
     cd <YourProjectPath>/Packages
     git clone https://github.com/UnityTech/UIWidgets.git com.unity.uiwidgets
@@ -78,7 +78,7 @@ UI Canvas。
 UIWidgets应用是用**C＃脚本**来编写的。 请按照以下步骤创建应用程序并在Unity编辑器中播放。
 1. 创建一个新C＃脚本，命名为“UIWidgetsExample.cs”，并将以下代码粘贴到其中。
 
-```none
+```csharp
     using System.Collections.Generic;
     using Unity.UIWidgets.animation;
     using Unity.UIWidgets.engine;
@@ -89,24 +89,24 @@ UIWidgets应用是用**C＃脚本**来编写的。 请按照以下步骤创建�
     using Unity.UIWidgets.widgets;
     using UnityEngine;
     using FontStyle = Unity.UIWidgets.ui.FontStyle;
-    
+
     namespace UIWidgetsSample {
         public class UIWidgetsExample : UIWidgetsPanel {
             protected override void OnEnable() {
-                // if you want to use your own font or font icons.   
+                // if you want to use your own font or font icons.
                 // FontManager.instance.addFont(Resources.Load<Font>(path: "path to your font"), "font family name");
-    
-                // load custom font with weight & style. The font weight & style corresponds to fontWeight, fontStyle of 
+
+                // load custom font with weight & style. The font weight & style corresponds to fontWeight, fontStyle of
                 // a TextStyle object
-                // FontManager.instance.addFont(Resources.Load<Font>(path: "path to your font"), "Roboto", FontWeight.w500, 
+                // FontManager.instance.addFont(Resources.Load<Font>(path: "path to your font"), "Roboto", FontWeight.w500,
                 //    FontStyle.italic);
-    
+
                 // add material icons, familyName must be "Material Icons"
                 // FontManager.instance.addFont(Resources.Load<Font>(path: "path to material icons"), "Material Icons");
 
                 base.OnEnable();
             }
-    
+
             protected override Widget createWidget() {
                 return new WidgetsApp(
                     home: new ExampleApp(),
@@ -118,19 +118,19 @@ UIWidgets应用是用**C＃脚本**来编写的。 请按照以下步骤创建�
                         )
                 );
             }
-    
+
             class ExampleApp : StatefulWidget {
                 public ExampleApp(Key key = null) : base(key) {
                 }
-    
+
                 public override State createState() {
                     return new ExampleState();
                 }
             }
-    
+
             class ExampleState : State<ExampleApp> {
                 int counter = 0;
-    
+
                 public override Widget build(BuildContext context) {
                     return new Column(
                         children: new List<Widget> {
@@ -193,7 +193,7 @@ UIWidgets也支持Gif！
 如果您因为任何原因需要完全禁止此插件的功能，请按上述方法禁用此插件的所有版本。
 
 此插件覆盖了Unity WebGL构建模块中的如下参数：
-```
+```none
 JS_SystemInfo_GetWidth
 JS_SystemInfo_GetHeight
 JS_SystemInfo_GetCurrentCanvasWidth
@@ -214,7 +214,7 @@ $JSEvents
 ## 调试UIWidgets应用程序
 
 #### 定义UIWidgets_DEBUG
-我们建议在Unity编辑器中定义 UIWidgets_DEBUG 脚本符号，这将打开UIWidgets中的调试断言（debug assertion），有助于更早发现潜在的Bug。 
+我们建议在Unity编辑器中定义 UIWidgets_DEBUG 脚本符号，这将打开UIWidgets中的调试断言（debug assertion），有助于更早发现潜在的Bug。
 因此选择 **Player Settings** > **Other Settings** > **Configuration** > **Scripting Define Symbols** ，并添加 UIWidgets_DEBUG。
 该符号仅供调试使用，请在发布版本中删除它。
 
@@ -238,7 +238,7 @@ UIWidgets Inspector工具用于可视化和浏览窗口小部件树。 你可以
 #### Wiki
 
 目前开发团队仍在改进UIWidgets Wiki。 由于UIWidgets主要来源于Flutter，你也可以参考Flutter Wiki中与UIWidgets API对应部分的详细描述。同时，你可以加入我们的讨论组( https://connect.unity.com/g/uiwidgets )。
- 
+
 #### 常问问题解答
 
 | 问题     | 回答  |
@@ -247,7 +247,7 @@ UIWidgets Inspector工具用于可视化和浏览窗口小部件树。 你可以
 | 我可以使用UIWidgets构建游戏UI吗？   | 可以    |
 | 我可以使用UIWidgets开发Unity编辑器插件吗？ | 可以 |
 | UIWidgets是UGUI / NGUI的扩展吗？ | 不是 |
-| UIWidgets只是Flutter的副本吗？ | 不是 | 
+| UIWidgets只是Flutter的副本吗？ | 不是 |
 | 我可以通过简单的拖放操作来创建带有UIWidgets的UI吗？ | 不可以 |
 | 我是否需要付费使用UIWidgets？ | 不需要 |
 | 有推荐的适用于UIWidgets的IDE吗？ | Rider, VSCode(Open .sln) |

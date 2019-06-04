@@ -998,9 +998,7 @@ namespace Unity.UIWidgets.rendering {
                     extentOffset: extentOffset,
                     affinity: fromPosition.affinity);
 
-                if (newSelection != this._selection) {
-                    this.onSelectionChanged(newSelection, this, cause.Value);
-                }
+                this.onSelectionChanged(newSelection, this, cause.Value);
             }
         }
 

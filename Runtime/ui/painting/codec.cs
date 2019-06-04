@@ -12,7 +12,7 @@ namespace Unity.UIWidgets.ui {
     public interface Codec : IDisposable {
         int frameCount { get; }
         int repetitionCount { get; }
-        IPromise<FrameInfo> getNextFrame();
+        FrameInfo getNextFrame();
     }
 
     public class ImageCodec : Codec {
@@ -31,13 +31,13 @@ namespace Unity.UIWidgets.ui {
             get { return 0; }
         }
 
-        public IPromise<FrameInfo> getNextFrame() {
+        public FrameInfo getNextFrame() {
             D.assert(this._image != null);
 
-            return Promise<FrameInfo>.Resolved(new FrameInfo {
+            return new FrameInfo {
                 duration = TimeSpan.Zero,
                 image = this._image
-            });
+            };
         }
 
         public void Dispose() {
