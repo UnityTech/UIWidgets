@@ -1006,7 +1006,7 @@ namespace Unity.UIWidgets.rendering {
             this.selectPositionAt(from: this._lastTapDownPosition, cause: cause);
         }
 
-        void selectWord(SelectionChangedCause? cause = null) {
+        public void selectWord(SelectionChangedCause? cause = null) {
             this.selectWordsInRange(from: this._lastTapDownPosition, cause: cause);
         }
 
@@ -1033,7 +1033,7 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
-        void selectWordEdge(SelectionChangedCause cause) {
+        public void selectWordEdge(SelectionChangedCause cause) {
             this._layoutText(this.constraints.maxWidth);
             D.assert(this._lastTapDownPosition != null);
             if (this.onSelectionChanged != null) {
