@@ -851,7 +851,7 @@ namespace Unity.UIWidgets.widgets {
                 this._getScrollOffsetForCaret(this.renderEditable.getLocalRectForCaret(position)));
         }
 
-        bool showToolbar() {
+        public bool showToolbar() {
             if (this._selectionOverlay == null) {
                 return false;
             }
