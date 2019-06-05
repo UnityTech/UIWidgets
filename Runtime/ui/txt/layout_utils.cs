@@ -2,11 +2,11 @@ namespace Unity.UIWidgets.ui {
     static class LayoutUtils {
         public const char CHAR_NBSP = '\u00A0';
 
-        public static bool isWordSpace(ushort ch) {
+        public static bool isWordSpace(uint ch) {
             return ch == ' ' || ch == CHAR_NBSP;
         }
 
-        public static bool isLineEndSpace(char c) {
+        public static bool isLineEndSpace(uint c) {
             return c == '\n' || c == ' ' || c == 0x1680 || (0x2000 <= c && c <= 0x200A && c != 0x2007) ||
                    c == 0x205F || c == 0x3000;
         }
@@ -51,7 +51,7 @@ namespace Unity.UIWidgets.ui {
             return len;
         }
 
-        public static bool isWordBreakAfter(ushort c) {
+        public static bool isWordBreakAfter(uint c) {
             if (isWordSpace(c) || (c >= 0x2000 && c <= 0x200a) || c == 0x3000) {
                 // spaces
                 return true;
@@ -59,7 +59,7 @@ namespace Unity.UIWidgets.ui {
             return false;
         }
         
-        public static bool isWordBreakBefore(ushort c) {
+        public static bool isWordBreakBefore(uint c) {
             return isWordBreakAfter(c) || (c >= 0x3400 && c <= 0x9fff);
         }
         

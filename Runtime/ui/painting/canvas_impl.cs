@@ -725,7 +725,8 @@ namespace Unity.UIWidgets.ui {
             var subText = textBlob.text.Substring(textBlob.textOffset, textBlob.textSize);
             font.RequestCharactersInTextureSafe(subText, fontSizeToLoad, style.UnityFontStyle);
 
-            var tex = font.material.mainTexture;
+            // var tex = font.material.mainTexture;
+            var tex = FontManager._getFontInfo(font).fontAsset[fontSizeToLoad].atlasTexture;
 
             Action<Paint> drawMesh = (Paint p) => {
                 if (!this._applyClip(textBlobBounds)) {

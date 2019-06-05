@@ -66,7 +66,7 @@ namespace Unity.UIWidgets.ui {
             float letterSpaceHalfRight = letterSpace - letterSpaceHalfLeft;
             
             for (int i = 0; i < wordCount; i++) {
-                var ch = buff.charAt(start + i);
+                uint ch = buff.charAt(start + i);
                 if (i == 0) {
                     x += letterSpaceHalfLeft + wordSpacing;
                     this._advances[i + layoutOffset] += letterSpaceHalfLeft + wordSpacing;
@@ -75,6 +75,14 @@ namespace Unity.UIWidgets.ui {
                     this._advances[i - 1 + layoutOffset] += letterSpaceHalfRight;
                     this._advances[i + layoutOffset] += letterSpaceHalfLeft;
                     x += letterSpace;
+                }
+
+                bool isSurrogatePair = FontManager.isSurrogatePairStart((char) ch);
+                if (isSurrogatePair) {
+                    D.assert(i + 1 < wordCount);
+                    char a = (char) ch, b = buff.charAt(start + i + 1);
+                    D.assert(FontManager.isSurrogatePairEnd(b));
+                    ch = FontManager.decodeUTF16Pair(a, b);
                 }
 
                 if (font.getGlyphInfo(ch, out var glyphInfo, style.UnityFontSize, style.UnityFontStyle)) {
@@ -112,6 +120,12 @@ namespace Unity.UIWidgets.ui {
                 if (i + 1 == wordCount) {
                     this._advances[i + layoutOffset] += letterSpaceHalfRight;
                     x += letterSpaceHalfRight;
+                }
+
+                if (isSurrogatePair) {
+                    i++;
+                    this._positions[i + layoutOffset] = x;
+                    this._advances[i + layoutOffset] = 0;
                 }
             }
             

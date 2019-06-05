@@ -1,7 +1,8 @@
 {
     "name": "Unity.UIWidgets",
     "references": [
-        "Unity.InternalAPIEngineBridge.024"
+        "Unity.InternalAPIEngineBridge.024",
+        "Unity.TextMeshPro"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [],
