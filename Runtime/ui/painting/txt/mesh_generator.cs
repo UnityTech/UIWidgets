@@ -189,10 +189,10 @@ namespace Unity.UIWidgets.ui {
                 triangles.Add(baseIndex + 2);
                 triangles.Add(baseIndex + 3);
 
-                uv.Add(glyphInfo.uvTopLeft / 1024.0f);
-                uv.Add(glyphInfo.uvTopRight / 1024.0f);
-                uv.Add(glyphInfo.uvBottomRight / 1024.0f);
-                uv.Add(glyphInfo.uvBottomLeft / 1024.0f);
+                uv.Add(glyphInfo.uvTopLeft);
+                uv.Add(glyphInfo.uvTopRight);
+                uv.Add(glyphInfo.uvBottomRight);
+                uv.Add(glyphInfo.uvBottomLeft);
             }
 
             if (vertices.Count == 0) {

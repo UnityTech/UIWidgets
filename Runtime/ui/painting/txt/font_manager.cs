@@ -34,6 +34,9 @@ namespace Unity.UIWidgets.ui {
         static Dictionary<Font, FontInfo> _fontInfos = new Dictionary<Font, FontInfo>();
 
         static readonly int defaultFontSize = 14;
+        public static readonly float sampleScale = 8;
+        public static readonly float atlasWidth = 2048;
+        public static readonly float atlasHeight = 2048;
 
         public static readonly FontManager instance = new FontManager();
 
@@ -264,23 +267,28 @@ namespace Unity.UIWidgets.ui {
 
             info = new CharacterInfo() {
                 index = (int) character.unicode,
-                advance = Mathf.RoundToInt(character.glyph.metrics.horizontalAdvance),
+                advance = Mathf.RoundToInt(character.glyph.metrics.horizontalAdvance / FontManager.sampleScale),
                 size = fontSize, // (int) character.scale,
                 style = fontStyle,
-                glyphWidth = (int) character.glyph.metrics.width,
-                glyphHeight = (int) character.glyph.metrics.height,
-                bearing = (int) character.glyph.metrics.horizontalBearingX,
-                minX = (int) character.glyph.metrics.horizontalBearingX,
-                minY = (int) (character.glyph.metrics.horizontalBearingY - character.glyph.metrics.height),
-                maxX = (int) (character.glyph.metrics.width + character.glyph.metrics.horizontalBearingX), // fontSize,
-                maxY = (int) (character.glyph.metrics.horizontalBearingY), // fontSize,
-                uvBottomLeft = new Vector2(character.glyph.glyphRect.x, character.glyph.glyphRect.y),
-                uvBottomRight = new Vector2(character.glyph.glyphRect.x + character.glyph.glyphRect.width,
-                    character.glyph.glyphRect.y),
-                uvTopRight = new Vector2(character.glyph.glyphRect.x + character.glyph.glyphRect.width,
-                    character.glyph.glyphRect.y + character.glyph.glyphRect.height),
-                uvTopLeft = new Vector2(character.glyph.glyphRect.x,
-                    character.glyph.glyphRect.y + character.glyph.glyphRect.height),
+                glyphWidth = (int) (character.glyph.metrics.width / FontManager.sampleScale),
+                glyphHeight = (int) (character.glyph.metrics.height / FontManager.sampleScale),
+                bearing = (int) (character.glyph.metrics.horizontalBearingX / FontManager.sampleScale),
+                minX = (int) (character.glyph.metrics.horizontalBearingX / FontManager.sampleScale),
+                minY = (int) ((character.glyph.metrics.horizontalBearingY - character.glyph.metrics.height) / FontManager.sampleScale),
+                maxX = (int) ((character.glyph.metrics.width + character.glyph.metrics.horizontalBearingX) / FontManager.sampleScale),
+                maxY = (int) (character.glyph.metrics.horizontalBearingY / FontManager.sampleScale),
+                uvBottomLeft = new Vector2(
+                    character.glyph.glyphRect.x / FontManager.atlasWidth, 
+                    character.glyph.glyphRect.y / FontManager.atlasHeight),
+                uvBottomRight = new Vector2(
+                    (character.glyph.glyphRect.x + character.glyph.glyphRect.width) / FontManager.atlasWidth,
+                    character.glyph.glyphRect.y / FontManager.atlasHeight),
+                uvTopRight = new Vector2(
+                    (character.glyph.glyphRect.x + character.glyph.glyphRect.width) / FontManager.atlasWidth,
+                    (character.glyph.glyphRect.y + character.glyph.glyphRect.height) / FontManager.atlasHeight),
+                uvTopLeft = new Vector2(
+                    character.glyph.glyphRect.x / FontManager.atlasWidth,
+                    (character.glyph.glyphRect.y + character.glyph.glyphRect.height) / FontManager.atlasHeight),
             };
 //            }
 
@@ -301,7 +309,9 @@ namespace Unity.UIWidgets.ui {
             }
 
             if (!fontInfo.fontAsset.ContainsKey(fontSize)) {
-                var fontAsset = TMP_FontAsset.CreateFontAsset(font, fontSize, 9, GlyphRenderMode.SDFAA, 1024, 1024);
+                var fontAsset = TMP_FontAsset.CreateFontAsset(font, 
+                    (int) (fontSize * FontManager.sampleScale), 9, GlyphRenderMode.SDFAA,
+                    (int) FontManager.atlasWidth, (int) FontManager.atlasHeight);
                 fontInfo.fontAsset.Add(fontSize, fontAsset);
             }
             fontInfo.fontAsset[fontSize].TryAddCharacters(FontManager.stringToUnicodeUnique(text));
