@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Unity.UIWidgets.foundation;
 using UnityEngine;
 using UnityEngine.TextCore;
 
@@ -149,16 +150,21 @@ namespace Unity.UIWidgets.ui {
 
             var font = fontInfo.font;
             var text = this.textBlob.text;
-            var unicodes = FontManager.stringToUnicode(text);
-            var length = unicodes.Length;
+            var length = this.textBlob.textSize;
             var fontSizeToLoad = Mathf.CeilToInt(style.UnityFontSize * this.scale);
 
             var vertices = new List<Vector3>(length * 4);
             var triangles = new List<int>(length * 6);
             var uv = new List<Vector2>(length * 4);
             for (int charIndex = 0; charIndex < length; ++charIndex) {
-                var ch = unicodes[charIndex + this.textBlob.textOffset];
-                // first char as origin for mesh position 
+                uint ch = text[charIndex + this.textBlob.textOffset];
+                bool isSurrogatePair = FontManager.isSurrogatePairStart(ch);
+                if (isSurrogatePair) {
+                    D.assert(charIndex + 1 < length);
+                    char a = (char) ch, b = text[charIndex + this.textBlob.textOffset + 1];
+                    D.assert(FontManager.isSurrogatePairEnd(b));
+                    ch = FontManager.decodeUTF16Pair(a, b);
+                }
                 var position = this.textBlob.positions[charIndex];
                 if (LayoutUtils.isWordSpace(ch) || LayoutUtils.isLineEndSpace(ch) || ch == '\t') {
                     continue;
@@ -193,6 +199,10 @@ namespace Unity.UIWidgets.ui {
                 uv.Add(glyphInfo.uvTopRight);
                 uv.Add(glyphInfo.uvBottomRight);
                 uv.Add(glyphInfo.uvBottomLeft);
+
+                if (isSurrogatePair) {
+                    charIndex++;
+                }
             }
 
             if (vertices.Count == 0) {
