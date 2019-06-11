@@ -37,20 +37,30 @@ namespace Unity.UIWidgets.ui {
             this._positions.reset(count);
             this._advance = 0;
             this._bounds = default;
-            
-            var font = FontManager.instance.getOrCreate(style.fontFamily, style.fontWeight, style.fontStyle).font;
-            font.RequestCharactersInTextureSafe(buff.text, style.UnityFontSize, style.UnityFontStyle);
 
-            int wordstart = start == buff.size
-                ? start
-                : LayoutUtils.getPrevWordBreakForCache(buff, start + 1);
-            int wordend;
-            for (int iter = start; iter < start + count; iter = wordend) {
-                wordend = LayoutUtils.getNextWordBreakForCache(buff, iter);
-                int wordCount = Mathf.Min(start + count, wordend) - iter;
-                this.layoutWord(offset, iter - start,  buff.subBuff(wordstart, wordend - wordstart),
-                    iter - wordstart, wordCount, style, font);
-                wordstart = wordend;
+            Font font;
+
+            if (EmojiUtils.isSurrogatePairStart(buff.text[start])) {
+                D.assert(count == 2);
+                D.assert(EmojiUtils.isSurrogatePairEnd(buff.text[start+1]));
+
+                this.layoutEmoji(style);
+            }
+            else {
+                font = FontManager.instance.getOrCreate(style.fontFamily, style.fontWeight, style.fontStyle).font;
+                font.RequestCharactersInTextureSafe(buff.text, style.UnityFontSize, style.UnityFontStyle);
+
+                int wordstart = start == buff.size
+                    ? start
+                    : LayoutUtils.getPrevWordBreakForCache(buff, start + 1);
+                int wordend;
+                for (int iter = start; iter < start + count; iter = wordend) {
+                    wordend = LayoutUtils.getNextWordBreakForCache(buff, iter);
+                    int wordCount = Mathf.Min(start + count, wordend) - iter;
+                    this.layoutWord(offset, iter - start,  buff.subBuff(wordstart, wordend - wordstart),
+                        iter - wordstart, wordCount, style, font);
+                    wordstart = wordend;
+                }
             }
             this._count = count;
         }
@@ -114,6 +124,52 @@ namespace Unity.UIWidgets.ui {
                     x += letterSpaceHalfRight;
                 }
             }
+            
+            this._advance = x;
+        }
+        
+        void layoutEmoji(TextStyle style) {
+            float x = this._advance;
+            float letterSpace = style.letterSpacing;
+            float letterSpaceHalfLeft = letterSpace * 0.5f;
+            float letterSpaceHalfRight = letterSpace - letterSpaceHalfLeft;
+            
+            x += letterSpaceHalfLeft;
+            this._advances[0] += letterSpaceHalfLeft;
+
+            var minX = 0 + x;
+            var maxX = style.fontSize + x;
+            var minY = -style.fontSize;
+            var maxY = 0;
+
+            if (this._bounds.width <= 0 || this._bounds.height <= 0) {
+                this._bounds = UnityEngine.Rect.MinMaxRect(
+                    minX, minY, maxX, maxY);
+            } else {
+                if (minX < this._bounds.x) {
+                    this._bounds.x = minX;
+                }
+                if (minY < this._bounds.y) {
+                    this._bounds.y = minY;
+                }
+                if (maxX > this._bounds.xMax) {
+                    this._bounds.xMax = maxX;
+                }
+                if (maxY > this._bounds.yMax) {
+                    this._bounds.yMax = maxY;
+                }
+            }
+
+            this._positions[0] = x;
+            float advance = style.fontSize;
+            x += advance;
+            
+            this._advances[0] += advance;
+            this._advances[0] += letterSpaceHalfRight;
+            x += letterSpaceHalfRight;
+
+            this._advances[1] = 0;
+            this._positions[1] = x;
             
             this._advance = x;
         }

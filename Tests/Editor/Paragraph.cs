@@ -118,6 +118,12 @@ namespace UIWidgets.Tests {
                         new TextSpan(style: new TextStyle(fontSize: 18),
                             text: "FontSize 18: Get a named matrix value from the shader."),
                         new TextSpan(style: new TextStyle(fontSize: 14),
+                            text: "Emoji \ud83d\ude0a\ud83d\ude0b\ud83d\ude0d\ud83d\ude0e\ud83d\ude00"),
+                        new TextSpan(style: new TextStyle(fontSize: 18),
+                            text: "\ud83d\ude01\ud83d\ude02\ud83d\ude03\ud83d\ude04\ud83d\ude05"),
+                        new TextSpan(style: new TextStyle(fontSize: 24),
+                            text: "\ud83d\ude06\ud83d\ude1C\ud83d\ude18\ud83d\ude2D\ud83d\ude0C\ud83d\ude1E"),
+                        new TextSpan(style: new TextStyle(fontSize: 14),
                             text: "FontSize 14"),
                     })));
         }

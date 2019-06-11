@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.material;
 using UnityEngine;
 using UnityEngine.Rendering;
+using Material = UnityEngine.Material;
 
 namespace Unity.UIWidgets.ui {
     public class PictureFlusher {
@@ -723,9 +725,13 @@ namespace Unity.UIWidgets.ui {
             var font = FontManager.instance.getOrCreate(style.fontFamily, style.fontWeight, style.fontStyle).font;
             var fontSizeToLoad = Mathf.CeilToInt(style.UnityFontSize * scale);
             var subText = textBlob.text.Substring(textBlob.textOffset, textBlob.textSize);
-            font.RequestCharactersInTextureSafe(subText, fontSizeToLoad, style.UnityFontStyle);
 
-            var tex = font.material.mainTexture;
+            Texture tex = null;
+            bool alpha = !EmojiUtils.isSurrogatePairStart(subText[0]);
+            if(alpha) {
+                font.RequestCharactersInTextureSafe(subText, fontSizeToLoad, style.UnityFontStyle);
+                tex = font.material.mainTexture;
+            }
 
             Action<Paint> drawMesh = (Paint p) => {
                 if (!this._applyClip(textBlobBounds)) {
@@ -733,7 +739,13 @@ namespace Unity.UIWidgets.ui {
                 }
 
                 var layer = this._currentLayer;
-                layer.draws.Add(CanvasShader.texAlpha(layer, p, mesh, tex));
+                
+                if(alpha) layer.draws.Add(CanvasShader.texAlpha(layer, p, mesh, tex));
+                else {
+                    Paint paintWithWhite= new Paint(p);
+                    paintWithWhite.color = Colors.white;
+                    layer.draws.Add(CanvasShader.tex(layer, paintWithWhite, mesh.resovleMesh(), EmojiUtils.image));
+                }
             };
 
             if (paint.maskFilter != null && paint.maskFilter.sigma != 0) {

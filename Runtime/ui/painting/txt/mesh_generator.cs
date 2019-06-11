@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Unity.UIWidgets.foundation;
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
@@ -132,8 +133,41 @@ namespace Unity.UIWidgets.ui {
             this._resolved = true;
             
             var style = this.textBlob.style;
-            var fontInfo = FontManager.instance.getOrCreate(style.fontFamily, style.fontWeight, style.fontStyle);
+
+            var text = this.textBlob.text;
             var key = new MeshKey(this.textBlob.instanceId, this.scale);
+            if (EmojiUtils.isSurrogatePairStart(text[this.textBlob.textOffset])) {
+                D.assert(this.textBlob.textSize == 2);
+                
+                char a = text[this.textBlob.textOffset], b = text[this.textBlob.textOffset+1];
+                D.assert(EmojiUtils.isSurrogatePairEnd(b));
+                
+                var pos = this.textBlob.positions[0];
+                var vert = new List<Vector3> {
+                    new Vector3(pos.x, pos.y - style.fontSize, 0),
+                    new Vector3(pos.x + style.fontSize, pos.y - style.fontSize, 0),
+                    new Vector3(pos.x + style.fontSize, pos.y, 0),
+                    new Vector3(pos.x, pos.y, 0),
+                };
+                var tri = new List<int> {
+                    0, 1, 2, 0, 2, 3,
+                };
+                var code = EmojiUtils.decodeSurrogatePair(a, b);
+                var uvRect = EmojiUtils.getUVRect(code);
+                var uvCoord = new List<Vector2> {
+                    uvRect.bottomLeft.toVector(),
+                    uvRect.bottomRight.toVector(),
+                    uvRect.topRight.toVector(),
+                    uvRect.topLeft.toVector(),
+                };
+                MeshMesh meshMesh = new MeshMesh(null, vert, tri, uvCoord);
+                _meshes[key] = new MeshInfo(key, meshMesh, 0);
+
+                this._mesh = meshMesh.transform(this.matrix);
+                return this._mesh;
+            }
+            
+            var fontInfo = FontManager.instance.getOrCreate(style.fontFamily, style.fontWeight, style.fontStyle);
 
             _meshes.TryGetValue(key, out var meshInfo);
             if (meshInfo != null && meshInfo.textureVersion == fontInfo.textureVersion) {
@@ -144,7 +178,6 @@ namespace Unity.UIWidgets.ui {
 
             var font = fontInfo.font;
             var length = this.textBlob.textSize;
-            var text = this.textBlob.text;
             var fontSizeToLoad = Mathf.CeilToInt(style.UnityFontSize * this.scale);
 
             var vertices = new List<Vector3>(length * 4);

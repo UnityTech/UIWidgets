@@ -52,7 +52,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public static bool isWordBreakAfter(ushort c) {
-            if (isWordSpace(c) || (c >= 0x2000 && c <= 0x200a) || c == 0x3000) {
+            if (isWordSpace(c) || (c >= 0x2000 && c <= 0x200a) || c == 0x3000 || EmojiUtils.isSurrogatePairEnd(c)) {
                 // spaces
                 return true;
             }
@@ -60,7 +60,7 @@ namespace Unity.UIWidgets.ui {
         }
         
         public static bool isWordBreakBefore(ushort c) {
-            return isWordBreakAfter(c) || (c >= 0x3400 && c <= 0x9fff);
+            return isWordBreakAfter(c) || (c >= 0x3400 && c <= 0x9fff) || EmojiUtils.isSurrogatePairStart(c);
         }
         
     }

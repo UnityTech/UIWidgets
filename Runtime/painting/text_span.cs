@@ -13,6 +13,7 @@ namespace Unity.UIWidgets.painting {
 
         public readonly TextStyle style;
         public readonly string text;
+        public List<string> splitedText;
         public readonly List<TextSpan> children;
         public readonly GestureRecognizer recognizer;
         public readonly HoverRecognizer hoverRecognizer;
@@ -20,6 +21,7 @@ namespace Unity.UIWidgets.painting {
         public TextSpan(string text = "", TextStyle style = null, List<TextSpan> children = null,
             GestureRecognizer recognizer = null, HoverRecognizer hoverRecognizer = null) {
             this.text = text;
+            this.splitedText = !string.IsNullOrEmpty(text) ? EmojiUtils.splitBySurrogatePair(text) : null;
             this.style = style;
             this.children = children;
             this.recognizer = recognizer;
@@ -28,13 +30,24 @@ namespace Unity.UIWidgets.painting {
 
         public void build(ParagraphBuilder builder, float textScaleFactor = 1.0f) {
             var hasStyle = this.style != null;
+
             if (hasStyle) {
                 builder.pushStyle(this.style, textScaleFactor);
             }
-
-            if (!string.IsNullOrEmpty(this.text)) {
-                builder.addText(this.text);
+            if (this.splitedText != null) {
+                if (this.splitedText.Count == 1 && !EmojiUtils.isSurrogatePairStart(this.splitedText[0][0])) {
+                    builder.addText(this.splitedText[0]);
+                }
+                else {
+                    TextStyle style = this.style ?? new TextStyle();
+                    for (int i = 0; i < this.splitedText.Count; i++) {
+                        builder.pushStyle(style, textScaleFactor);
+                        builder.addText(this.splitedText[i]);
+                        builder.pop();
+                    }
+                }
             }
+            
 
             if (this.children != null) {
                 foreach (var child in this.children) {
