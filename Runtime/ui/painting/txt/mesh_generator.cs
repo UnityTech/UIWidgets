@@ -140,37 +140,41 @@ namespace Unity.UIWidgets.ui {
             var font = fontInfo.font;
             
             if (char.IsHighSurrogate(text[this.textBlob.textOffset])) {
-                D.assert(this.textBlob.textSize == 2);
-                
-                char a = text[this.textBlob.textOffset], b = text[this.textBlob.textOffset+1];
-                D.assert(char.IsLowSurrogate(b));
-                
-                var pos = this.textBlob.positions[0];
+                D.assert(this.textBlob.textSize % 2 == 0);
+                var vert = new List<Vector3>();
+                var tri = new List<int>();
+                var uvCoord = new List<Vector2>();
                 var metrics = FontMetrics.fromFont(font, style.UnityFontSize);
-                
                 var minMaxRect = EmojiUtils.getMinMaxRect(style.fontSize, metrics.ascent, metrics.descent);
                 var minX = minMaxRect.left;
                 var maxX = minMaxRect.right;
                 var minY = minMaxRect.top;
                 var maxY = minMaxRect.bottom;
-                
-                var vert = new List<Vector3> {
-                    new Vector3(pos.x + minX, pos.y + minY, 0),
-                    new Vector3(pos.x + maxX, pos.y + minY, 0),
-                    new Vector3(pos.x + maxX, pos.y + maxY, 0),
-                    new Vector3(pos.x + minX, pos.y + maxY, 0),
-                };
-                var tri = new List<int> {
-                    0, 1, 2, 0, 2, 3,
-                };
-                var code = char.ConvertToUtf32(a, b);
-                var uvRect = EmojiUtils.getUVRect(code);
-                var uvCoord = new List<Vector2> {
-                    uvRect.bottomLeft.toVector(),
-                    uvRect.bottomRight.toVector(),
-                    uvRect.topRight.toVector(),
-                    uvRect.topLeft.toVector(),
-                };
+
+                for (int i = 0; i < this.textBlob.textSize; i += 2) {
+                    char a = text[this.textBlob.textOffset+i], b = text[this.textBlob.textOffset+i+1];
+                    D.assert(char.IsLowSurrogate(b));
+                    
+                    var pos = this.textBlob.positions[i];
+                    
+                    vert.Add(new Vector3(pos.x + minX, pos.y + minY, 0));
+                    vert.Add(new Vector3(pos.x + maxX, pos.y + minY, 0));
+                    vert.Add(new Vector3(pos.x + maxX, pos.y + maxY, 0));
+                    vert.Add(new Vector3(pos.x + minX, pos.y + maxY, 0));
+                    
+                    tri.Add(i * 2);
+                    tri.Add(i * 2 + 1);
+                    tri.Add(i * 2 + 2);
+                    tri.Add(i * 2);
+                    tri.Add(i * 2 + 2);
+                    tri.Add(i * 2 + 3);
+                    var code = char.ConvertToUtf32(a, b);
+                    var uvRect = EmojiUtils.getUVRect(code);
+                    uvCoord.Add(uvRect.bottomLeft.toVector());
+                    uvCoord.Add(uvRect.bottomRight.toVector());
+                    uvCoord.Add(uvRect.topRight.toVector());
+                    uvCoord.Add(uvRect.topLeft.toVector());
+                }
                 MeshMesh meshMesh = new MeshMesh(null, vert, tri, uvCoord);
                 _meshes[key] = new MeshInfo(key, meshMesh, 0);
 

@@ -64,16 +64,28 @@ namespace Unity.UIWidgets.ui {
 
         public static List<string> splitBySurrogatePair(string text) {
             int start = 0;
+            bool? currentSurrogate = null;
             List<string> list = new List<string>();
+            
             for (int i = 0; i < text.Length; i++) {
                 if (i < text.Length - 1 && char.IsHighSurrogate(text[i]) && char.IsLowSurrogate(text[i + 1])) {
-                    if (i > start) {
-                        list.Add(text.Substring(start, i - start));
+                    if (currentSurrogate != true) {
+                        if (i > start) {
+                            list.Add(text.Substring(start, i - start));
+                            start = i;
+                        }
                     }
-
-                    start = i + 2;
-                    list.Add(text.Substring(i, 2));
                     i++;
+                    currentSurrogate = true;
+                }
+                else {
+                    if (currentSurrogate != false) {
+                        if (i > start) {
+                            list.Add(text.Substring(start, i - start));
+                            start = i;
+                        }
+                    }
+                    currentSurrogate = false;
                 }
             }
 

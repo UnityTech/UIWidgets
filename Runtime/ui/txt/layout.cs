@@ -41,10 +41,7 @@ namespace Unity.UIWidgets.ui {
             Font font = FontManager.instance.getOrCreate(style.fontFamily, style.fontWeight, style.fontStyle).font;
 
             if (char.IsHighSurrogate(buff.text[buff.offset + start])) {
-                D.assert(count == 2);
-                D.assert(char.IsLowSurrogate(buff.text[buff.offset + start+1]));
-
-                this.layoutEmoji(style, font);
+                this.layoutEmoji(style, font, start, count);
             }
             else {
                 font.RequestCharactersInTextureSafe(buff.text, style.UnityFontSize, style.UnityFontStyle);
@@ -127,52 +124,54 @@ namespace Unity.UIWidgets.ui {
             this._advance = x;
         }
         
-        void layoutEmoji(TextStyle style, Font font) {
-            float x = this._advance;
-            float letterSpace = style.letterSpacing;
-            float letterSpaceHalfLeft = letterSpace * 0.5f;
-            float letterSpaceHalfRight = letterSpace - letterSpaceHalfLeft;
-            
-            x += letterSpaceHalfLeft;
-            this._advances[0] += letterSpaceHalfLeft;
-            
-            var metrics = FontMetrics.fromFont(font, style.UnityFontSize);
+        void layoutEmoji(TextStyle style, Font font, int start, int count) {
+            for (int i = 0; i < count; i += 2) {
+                float x = this._advance;
+                float letterSpace = style.letterSpacing;
+                float letterSpaceHalfLeft = letterSpace * 0.5f;
+                float letterSpaceHalfRight = letterSpace - letterSpaceHalfLeft;
+                
+                x += letterSpaceHalfLeft;
+                this._advances[i] += letterSpaceHalfLeft;
+                
+                var metrics = FontMetrics.fromFont(font, style.UnityFontSize);
 
-            var minX = x;
-            var maxX = metrics.descent - metrics.ascent + x;
-            var minY = metrics.ascent;
-            var maxY = metrics.descent;
+                var minX = x;
+                var maxX = metrics.descent - metrics.ascent + x;
+                var minY = metrics.ascent;
+                var maxY = metrics.descent;
 
-            if (this._bounds.width <= 0 || this._bounds.height <= 0) {
-                this._bounds = UnityEngine.Rect.MinMaxRect(
-                    minX, minY, maxX, maxY);
-            } else {
-                if (minX < this._bounds.x) {
-                    this._bounds.x = minX;
+                if (this._bounds.width <= 0 || this._bounds.height <= 0) {
+                    this._bounds = UnityEngine.Rect.MinMaxRect(
+                        minX, minY, maxX, maxY);
+                } else {
+                    if (minX < this._bounds.x) {
+                        this._bounds.x = minX;
+                    }
+                    if (minY < this._bounds.y) {
+                        this._bounds.y = minY;
+                    }
+                    if (maxX > this._bounds.xMax) {
+                        this._bounds.xMax = maxX;
+                    }
+                    if (maxY > this._bounds.yMax) {
+                        this._bounds.yMax = maxY;
+                    }
                 }
-                if (minY < this._bounds.y) {
-                    this._bounds.y = minY;
-                }
-                if (maxX > this._bounds.xMax) {
-                    this._bounds.xMax = maxX;
-                }
-                if (maxY > this._bounds.yMax) {
-                    this._bounds.yMax = maxY;
-                }
+
+                this._positions[i] = x;
+                float advance = style.fontSize;
+                x += advance;
+                
+                this._advances[i] += advance;
+                this._advances[i] += letterSpaceHalfRight;
+                x += letterSpaceHalfRight;
+
+                this._advances[i+1] = 0;
+                this._positions[i+1] = x;
+                
+                this._advance = x;
             }
-
-            this._positions[0] = x;
-            float advance = style.fontSize;
-            x += advance;
-            
-            this._advances[0] += advance;
-            this._advances[0] += letterSpaceHalfRight;
-            x += letterSpaceHalfRight;
-
-            this._advances[1] = 0;
-            this._positions[1] = x;
-            
-            this._advance = x;
         }
 
         public void setTabStops(TabStops tabStops) {
