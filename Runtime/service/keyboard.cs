@@ -108,9 +108,9 @@ namespace Unity.UIWidgets.service {
                 currentEvent.Use();
             }
 
-           if (this._value != oldValue) {
+            if (this._value != oldValue) {
                 Window.instance.run(() => { TextInput._updateEditingState(this._client, this._value); });
-           }
+            }
         }
 
         public void Dispose() {

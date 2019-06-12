@@ -258,6 +258,23 @@ namespace Unity.UIWidgets.service {
                         return this;
                     }
 
+                    if (char.IsHighSurrogate(this.text[this.selection.start - 1])) {
+                        return this.copyWith(
+                            text: this.text.Substring(0, this.selection.start - 1) +
+                                  this.text.Substring(this.selection.start + 1),
+                            selection: TextSelection.collapsed(this.selection.start - 1),
+                            composing: TextRange.empty);
+                    }
+
+                    if (char.IsLowSurrogate(this.text[this.selection.start - 1])) {
+                        D.assert(this.selection.start > 1);
+                        return this.copyWith(
+                            text: this.text.Substring(0, this.selection.start - 2) +
+                                  this.selection.textAfter(this.text),
+                            selection: TextSelection.collapsed(this.selection.start - 2),
+                            composing: TextRange.empty);
+                    }
+
                     return this.copyWith(
                         text: this.text.Substring(0, this.selection.start - 1) + this.selection.textAfter(this.text),
                         selection: TextSelection.collapsed(this.selection.start - 1),
