@@ -501,7 +501,7 @@ namespace Unity.UIWidgets.rendering {
         void _handleDelete() {
             var selection = this.selection;
             if (selection.textAfter(this.text.text).isNotEmpty()) {
-                if (char.IsLowSurrogate(this.text.text[selection.end])) {
+                if (char.IsHighSurrogate(this.text.text[selection.end])) {
                     this.textSelectionDelegate.textEditingValue = new TextEditingValue(
                         text: selection.textBefore(this.text.text)
                               + selection.textAfter(this.text.text).Substring(2),
