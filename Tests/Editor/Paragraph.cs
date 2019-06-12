@@ -117,6 +117,8 @@ namespace UIWidgets.Tests {
                             "This is FontStyle.italic And 发撒放豆腐sad 发生的 Bold Text This is FontStyle.italic  And Bold  Text\n\n"),
                         new TextSpan(style: new TextStyle(fontSize: 18),
                             text: "FontSize 18: Get a named matrix value from the shader."),
+                        new TextSpan(style: new TextStyle(fontSize: 24),
+                            text: "Emoji \ud83d\ude0a\ud83d\ude0b\ud83d\ude0d\ud83d\ude0e\ud83d\ude00"),
                         new TextSpan(style: new TextStyle(fontSize: 14),
                             text: "Emoji \ud83d\ude0a\ud83d\ude0b\ud83d\ude0d\ud83d\ude0e\ud83d\ude00"),
                         new TextSpan(style: new TextStyle(fontSize: 18),

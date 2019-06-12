@@ -1,13 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using Unity.UIWidgets.foundation;
 using UnityEngine;
-using UnityEngine.Windows;
 
 namespace Unity.UIWidgets.ui {
     public class EmojiUtils {
-
         static Image _image;
 
         public static Image image {
@@ -27,7 +23,7 @@ namespace Unity.UIWidgets.ui {
             }
         }
 
-        public static readonly Dictionary<uint, int> emojiLookupTable = new Dictionary<uint, int> {
+        public static readonly Dictionary<int, int> emojiLookupTable = new Dictionary<int, int> {
             {0x1F60A, 0},
             {0x1F60B, 1},
             {0x1F60D, 2},
@@ -49,11 +45,11 @@ namespace Unity.UIWidgets.ui {
         public const int rowCount = 4;
         public const int colCount = 4;
 
-        public static Rect getUVRect(uint code) {
+        public static Rect getUVRect(int code) {
             bool exist = emojiLookupTable.TryGetValue(code, out int index);
             if (exist) {
                 return Rect.fromLTWH(
-                    (index % colCount) * (1.0f / colCount), 
+                    (index % colCount) * (1.0f / colCount),
                     (rowCount - 1 - (index / colCount)) * (1.0f / rowCount),
                     1.0f / colCount, 1.0f / rowCount);
             }
@@ -61,38 +57,12 @@ namespace Unity.UIWidgets.ui {
             Debug.LogWarning($"Unrecognized unicode for emoji {code:x}");
             return Rect.fromLTWH(0, 0, 0, 0);
         }
-        
-        public static void encodeSurrogatePair(uint character, out char a, out char b) {
-            uint code;
-            D.assert(0x10000 <= character && character <= 0x10FFFF);
-            code = (character - 0x10000);
-            a = (char) (0xD800 | (code >> 10));
-            b = (char) (0xDC00 | (code & 0x3FF));
-        }
-
-        public static uint decodeSurrogatePair(char a, char b) {
-            uint code;
-            D.assert(0xD800 <= a && a <= 0xDBFF);
-            D.assert(0xDC00 <= b && b <= 0xDFFF);
-            code = 0x10000;
-            code += (uint) ((a & 0x03FF) << 10);
-            code += (uint) (b & 0x03FF);
-            return code;
-        }
-
-        public static bool isSurrogatePairStart(uint c) {
-            return 0xD800 <= c && c <= 0xDBFF;
-        }
-
-        public static bool isSurrogatePairEnd(uint c) {
-            return 0xDC00 <= c && c <= 0xDFFF;
-        }
 
         public static List<string> splitBySurrogatePair(string text) {
             int start = 0;
             List<string> list = new List<string>();
             for (int i = 0; i < text.Length; i++) {
-                if (i < text.Length - 1 && isSurrogatePairStart(text[i]) && isSurrogatePairEnd(text[i + 1])) {
+                if (i < text.Length - 1 && char.IsHighSurrogate(text[i]) && char.IsLowSurrogate(text[i + 1])) {
                     if (i > start) {
                         list.Add(text.Substring(start, i - start));
                     }

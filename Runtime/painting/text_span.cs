@@ -35,7 +35,7 @@ namespace Unity.UIWidgets.painting {
                 builder.pushStyle(this.style, textScaleFactor);
             }
             if (this.splitedText != null) {
-                if (this.splitedText.Count == 1 && !EmojiUtils.isSurrogatePairStart(this.splitedText[0][0])) {
+                if (this.splitedText.Count == 1 && !char.IsHighSurrogate(this.splitedText[0][0])) {
                     builder.addText(this.splitedText[0]);
                 }
                 else {

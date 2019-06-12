@@ -40,9 +40,9 @@ namespace Unity.UIWidgets.ui {
 
             Font font;
 
-            if (EmojiUtils.isSurrogatePairStart(buff.text[start])) {
+            if (char.IsHighSurrogate(buff.text[buff.offset + start])) {
                 D.assert(count == 2);
-                D.assert(EmojiUtils.isSurrogatePairEnd(buff.text[start+1]));
+                D.assert(char.IsLowSurrogate(buff.text[buff.offset + start+1]));
 
                 this.layoutEmoji(style);
             }
@@ -137,7 +137,7 @@ namespace Unity.UIWidgets.ui {
             x += letterSpaceHalfLeft;
             this._advances[0] += letterSpaceHalfLeft;
 
-            var minX = 0 + x;
+            var minX = x;
             var maxX = style.fontSize + x;
             var minY = -style.fontSize;
             var maxY = 0;

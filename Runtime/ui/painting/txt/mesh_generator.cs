@@ -125,7 +125,7 @@ namespace Unity.UIWidgets.ui {
             }
         }
 
-        public MeshMesh resovleMesh() {
+        public MeshMesh resolveMesh() {
             if (this._resolved) {
                 return this._mesh;
             }
@@ -136,11 +136,11 @@ namespace Unity.UIWidgets.ui {
 
             var text = this.textBlob.text;
             var key = new MeshKey(this.textBlob.instanceId, this.scale);
-            if (EmojiUtils.isSurrogatePairStart(text[this.textBlob.textOffset])) {
+            if (char.IsHighSurrogate(text[this.textBlob.textOffset])) {
                 D.assert(this.textBlob.textSize == 2);
                 
                 char a = text[this.textBlob.textOffset], b = text[this.textBlob.textOffset+1];
-                D.assert(EmojiUtils.isSurrogatePairEnd(b));
+                D.assert(char.IsLowSurrogate(b));
                 
                 var pos = this.textBlob.positions[0];
                 var vert = new List<Vector3> {
@@ -152,7 +152,7 @@ namespace Unity.UIWidgets.ui {
                 var tri = new List<int> {
                     0, 1, 2, 0, 2, 3,
                 };
-                var code = EmojiUtils.decodeSurrogatePair(a, b);
+                var code = char.ConvertToUtf32(a, b);
                 var uvRect = EmojiUtils.getUVRect(code);
                 var uvCoord = new List<Vector2> {
                     uvRect.bottomLeft.toVector(),
