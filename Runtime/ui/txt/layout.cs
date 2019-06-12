@@ -38,16 +38,15 @@ namespace Unity.UIWidgets.ui {
             this._advance = 0;
             this._bounds = default;
 
-            Font font;
+            Font font = FontManager.instance.getOrCreate(style.fontFamily, style.fontWeight, style.fontStyle).font;
 
             if (char.IsHighSurrogate(buff.text[buff.offset + start])) {
                 D.assert(count == 2);
                 D.assert(char.IsLowSurrogate(buff.text[buff.offset + start+1]));
 
-                this.layoutEmoji(style);
+                this.layoutEmoji(style, font);
             }
             else {
-                font = FontManager.instance.getOrCreate(style.fontFamily, style.fontWeight, style.fontStyle).font;
                 font.RequestCharactersInTextureSafe(buff.text, style.UnityFontSize, style.UnityFontStyle);
 
                 int wordstart = start == buff.size
@@ -128,7 +127,7 @@ namespace Unity.UIWidgets.ui {
             this._advance = x;
         }
         
-        void layoutEmoji(TextStyle style) {
+        void layoutEmoji(TextStyle style, Font font) {
             float x = this._advance;
             float letterSpace = style.letterSpacing;
             float letterSpaceHalfLeft = letterSpace * 0.5f;
@@ -136,11 +135,13 @@ namespace Unity.UIWidgets.ui {
             
             x += letterSpaceHalfLeft;
             this._advances[0] += letterSpaceHalfLeft;
+            
+            var metrics = FontMetrics.fromFont(font, style.UnityFontSize);
 
             var minX = x;
-            var maxX = style.fontSize + x;
-            var minY = -style.fontSize;
-            var maxY = 0;
+            var maxX = metrics.descent - metrics.ascent + x;
+            var minY = metrics.ascent;
+            var maxY = metrics.descent;
 
             if (this._bounds.width <= 0 || this._bounds.height <= 0) {
                 this._bounds = UnityEngine.Rect.MinMaxRect(

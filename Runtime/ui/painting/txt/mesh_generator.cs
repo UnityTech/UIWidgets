@@ -136,6 +136,9 @@ namespace Unity.UIWidgets.ui {
 
             var text = this.textBlob.text;
             var key = new MeshKey(this.textBlob.instanceId, this.scale);
+            var fontInfo = FontManager.instance.getOrCreate(style.fontFamily, style.fontWeight, style.fontStyle);
+            var font = fontInfo.font;
+            
             if (char.IsHighSurrogate(text[this.textBlob.textOffset])) {
                 D.assert(this.textBlob.textSize == 2);
                 
@@ -143,11 +146,19 @@ namespace Unity.UIWidgets.ui {
                 D.assert(char.IsLowSurrogate(b));
                 
                 var pos = this.textBlob.positions[0];
+                var metrics = FontMetrics.fromFont(font, style.UnityFontSize);
+                
+                var minMaxRect = EmojiUtils.getMinMaxRect(style.fontSize, metrics.ascent, metrics.descent);
+                var minX = minMaxRect.left;
+                var maxX = minMaxRect.right;
+                var minY = minMaxRect.top;
+                var maxY = minMaxRect.bottom;
+                
                 var vert = new List<Vector3> {
-                    new Vector3(pos.x, pos.y - style.fontSize, 0),
-                    new Vector3(pos.x + style.fontSize, pos.y - style.fontSize, 0),
-                    new Vector3(pos.x + style.fontSize, pos.y, 0),
-                    new Vector3(pos.x, pos.y, 0),
+                    new Vector3(pos.x + minX, pos.y + minY, 0),
+                    new Vector3(pos.x + maxX, pos.y + minY, 0),
+                    new Vector3(pos.x + maxX, pos.y + maxY, 0),
+                    new Vector3(pos.x + minX, pos.y + maxY, 0),
                 };
                 var tri = new List<int> {
                     0, 1, 2, 0, 2, 3,
@@ -167,7 +178,6 @@ namespace Unity.UIWidgets.ui {
                 return this._mesh;
             }
             
-            var fontInfo = FontManager.instance.getOrCreate(style.fontFamily, style.fontWeight, style.fontStyle);
 
             _meshes.TryGetValue(key, out var meshInfo);
             if (meshInfo != null && meshInfo.textureVersion == fontInfo.textureVersion) {
@@ -176,7 +186,6 @@ namespace Unity.UIWidgets.ui {
                 return this._mesh;
             }
 
-            var font = fontInfo.font;
             var length = this.textBlob.textSize;
             var fontSizeToLoad = Mathf.CeilToInt(style.UnityFontSize * this.scale);
 

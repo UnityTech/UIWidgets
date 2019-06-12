@@ -14,7 +14,7 @@ namespace Unity.UIWidgets.ui {
                             Resources.Load<Texture2D>("Emoji")
                         );
                     }
-                    catch (Exception e) {
+                    catch (Exception) {
                         _image = null;
                     }
                 }
@@ -44,6 +44,10 @@ namespace Unity.UIWidgets.ui {
 
         public const int rowCount = 4;
         public const int colCount = 4;
+
+        public static Rect getMinMaxRect(float fontSize, float ascent, float descent) {
+            return Rect.fromLTWH(fontSize * 0.05f, descent - fontSize, fontSize * 0.9f, fontSize * 0.9f);
+        }
 
         public static Rect getUVRect(int code) {
             bool exist = emojiLookupTable.TryGetValue(code, out int index);
