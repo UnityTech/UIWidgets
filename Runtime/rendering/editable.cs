@@ -327,16 +327,34 @@ namespace Unity.UIWidgets.rendering {
 
         int _handleHorizontalArrows(bool rightArrow, bool leftArrow, bool shift, int newOffset) {
             if (rightArrow && this._extentOffset < this.text.text.Length) {
-                newOffset += 1;
-                if (shift) {
-                    this._previousCursorLocation += 1;
+                if (newOffset < this.text.text.Length - 1 && char.IsHighSurrogate(this.text.text[newOffset])) {
+                    // handle emoji, which takes 2 bytes
+                    newOffset += 2;
+                    if (shift) {
+                        this._previousCursorLocation += 2;
+                    }
+                }
+                else {
+                    newOffset += 1;
+                    if (shift) {
+                        this._previousCursorLocation += 1;
+                    }
                 }
             }
 
             if (leftArrow && this._extentOffset > 0) {
-                newOffset -= 1;
-                if (shift) {
-                    this._previousCursorLocation -= 1;
+                if (newOffset > 1 && char.IsLowSurrogate(this.text.text[newOffset - 1])) {
+                    // handle emoji, which takes 2 bytes
+                    newOffset -= 2;
+                    if (shift) {
+                        this._previousCursorLocation -= 2;
+                    }
+                }
+                else {
+                    newOffset -= 1;
+                    if (shift) {
+                        this._previousCursorLocation -= 1;
+                    }
                 }
             }
 
@@ -637,12 +655,10 @@ namespace Unity.UIWidgets.rendering {
         }
 
         public TextSelection selection {
-            get { return this._selection; }
+            get {
+                return this._selection;
+            }
             set {
-                if (this._selection == value) {
-                    return;
-                }
-
                 this._selection = value;
                 this._selectionRects = null;
                 this.markNeedsPaint();

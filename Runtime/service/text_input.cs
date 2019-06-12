@@ -203,8 +203,23 @@ namespace Unity.UIWidgets.service {
 
         public TextEditingValue(string text = "", TextSelection selection = null, TextRange composing = null) {
             this.text = text;
-            this.selection = selection ?? TextSelection.collapsed(-1);
             this.composing = composing ?? TextRange.empty;
+
+            if (selection != null) {
+                // handle emoji, which takes 2 bytes
+                // if selection cuts in the middle of the emoji, move it to the end
+                int start = selection.start, end = selection.end;
+                if (start < text.Length && char.IsLowSurrogate(text[start])) {
+                    start++;
+                }
+                if (end < text.Length && char.IsLowSurrogate(text[end])) {
+                    end++;
+                }
+                this.selection = selection.copyWith(start, end);
+            }
+            else {
+                this.selection = TextSelection.collapsed(-1);
+            }
         }
 
         public static TextEditingValue fromJson(JSONObject json) {
