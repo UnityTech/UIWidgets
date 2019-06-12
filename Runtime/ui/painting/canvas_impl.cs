@@ -769,8 +769,7 @@ namespace Unity.UIWidgets.ui {
                     layer.draws.Add(CanvasShader.texAlpha(layer, p, mesh, tex));
                 }
                 else {
-                    Paint paintWithWhite = new Paint(p);
-                    paintWithWhite.color = Colors.white;
+                    Paint paintWithWhite = new Paint(p) {color = Colors.white};
                     layer.draws.Add(CanvasShader.tex(layer, paintWithWhite, mesh.resolveMesh(), EmojiUtils.image));
                 }
             };

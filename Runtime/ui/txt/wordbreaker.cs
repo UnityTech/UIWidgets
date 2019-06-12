@@ -28,7 +28,7 @@ namespace Unity.UIWidgets.ui {
             this._current = 0;
             this._scanOffset = 0;
             this._inEmailOrUrl = false;
-            this.nextUntilCodePoint();
+            // this.nextUntilCodePoint();
         }
 
         public int current() {
@@ -98,7 +98,7 @@ namespace Unity.UIWidgets.ui {
             }
             
             for (; this._current < this._text.size; ++this._current) {
-                this.nextUntilCodePoint();
+                // this.nextUntilCodePoint();
                 if (this._current >= this._text.size) {
                     break;
                 }
