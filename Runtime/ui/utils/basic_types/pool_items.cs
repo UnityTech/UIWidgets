@@ -39,8 +39,10 @@ namespace Unity.UIWidgets.ui {
                 info += "| " + key + " = " + debugInfo[key]._watermark + " |\n";
                 debugInfo[key]._old_watermark = debugInfo[key]._watermark;
             }
-            
-            Debug.Log(info);
+
+            if (info != "") {
+                Debug.Log(info);
+            }
         }
 
         public static T alloc<T>() where T : PoolItem, new() {

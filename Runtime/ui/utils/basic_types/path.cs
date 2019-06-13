@@ -1519,7 +1519,7 @@ namespace Unity.UIWidgets.ui {
                 return;
             }
 
-            var points = TessellationGenerator.tessellateBezier(x1, y1, x2, y2, x3, y3, x4, y4, this._tessTol);
+            var points = uiTessellationGenerator.tessellateBezier(x1, y1, x2, y2, x3, y3, x4, y4, this._tessTol);
             D.assert(points.Count > 0);
             for (int i = 0; i < points.Count; i++) {
                 var point = points[i];

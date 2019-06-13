@@ -331,12 +331,15 @@ namespace Unity.UIWidgets.ui {
             var mat = _fill1Mat.getMaterial(paint.blendMode);
             _getShaderPassAndProps(layer, paint, mesh.matrix, 1.0f, out var pass, out var props);
 
-            return PictureFlusher.CmdDraw.create(
+            var ret = PictureFlusher.CmdDraw.create(
                 mesh : mesh.boundsMesh,
                 pass : pass,
                 material : mat,
                 properties : props
             );
+            
+            mesh.dispose();
+            return ret;
         }
 
         public static PictureFlusher.CmdDraw stroke0(PictureFlusher.RenderLayer layer, Paint paint,
