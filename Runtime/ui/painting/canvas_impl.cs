@@ -31,39 +31,29 @@ namespace Unity.UIWidgets.ui {
         }
         
         void _reset() {
-            foreach (var layer in this._layers) {
-                this._clearLayer(layer);
+            //clear all states
+            D.assert(this._layers.Count == 0 || (this._layers.Count == 1 && this._layers[0] == this._currentLayer));
+            if (this._currentLayer != null) {
+                this._clearLayer(this._currentLayer);
+                this._currentLayer.dispose();
+                this._currentLayer = null;
+                this._lastScissor = null;
+                this._layers.Clear();
             }
-            
-            RenderLayer firstLayer;
-            if (this._layers.Count == 0) {
-                var width = this._renderTexture.width;
-                var height = this._renderTexture.height;
 
-                var bounds = Rect.fromLTWH(0, 0,
+            var width = this._renderTexture.width;
+            var height = this._renderTexture.height;
+
+            var bounds = Rect.fromLTWH(0, 0,
                     width * this._fringeWidth,
                     height * this._fringeWidth);
 
-                firstLayer = RenderLayer.create(
+            RenderLayer firstLayer = RenderLayer.create(
                     width : width,
                     height : height,
                     layerBounds : bounds
-                );
-            } else {
-                D.assert(this._layers.Count > 0);
-                firstLayer = this._layers[0];
-                firstLayer = RenderLayer.create(
-                    width : firstLayer.width,
-                    height : firstLayer.height,
-                    layerBounds : firstLayer.layerBounds
-                );
-            }
+            );
 
-            foreach (var layer in this._layers) {
-                layer.dispose();
-            }
-            
-            this._layers.Clear();
             this._layers.Add(firstLayer);
             this._currentLayer = firstLayer;
         }
@@ -174,7 +164,6 @@ namespace Unity.UIWidgets.ui {
                 return;
             }
 
-            //!!!!!!BUG ==> need dispose layer!!!!!!!!
             this._layers.RemoveAt(this._layers.Count - 1);
             var currentLayer = this._currentLayer = this._layers[this._layers.Count - 1];
             var state = currentLayer.currentState;
@@ -182,6 +171,7 @@ namespace Unity.UIWidgets.ui {
             var mesh = ImageMeshGenerator.imageMesh(state.matrix, Rect.one, layer.layerBounds);
 
             if (!this._applyClip(mesh.bounds)) {
+                mesh.dispose();
                 return;
             }
 
@@ -317,8 +307,8 @@ namespace Unity.UIWidgets.ui {
                     layer.draws.Add(CanvasShader.stencilClear(layer, boundsMesh));
 
                     foreach (var maskElement in reducedClip.maskElements) {
-                        layer.draws.Add(CanvasShader.stencil0(layer, maskElement.mesh));
-                        layer.draws.Add(CanvasShader.stencil1(layer, boundsMesh));
+                        layer.draws.Add(CanvasShader.stencil0(layer, maskElement.mesh.duplicate()));
+                        layer.draws.Add(CanvasShader.stencil1(layer, boundsMesh.duplicate()));
                     }
                 }
 
@@ -424,13 +414,13 @@ namespace Unity.UIWidgets.ui {
                 radiusX, new Vector2(1f / textureWidth, 0), kernelX));
 
             blurYLayer.draws.Add(CanvasShader.maskFilter(
-                blurYLayer, blurMesh, blurXLayer,
+                blurYLayer, blurMesh.duplicate(), blurXLayer,
                 radiusY, new Vector2(0, -1f / textureHeight), kernelY));
 
             return blurYLayer;
         }
 
-        void _drawWithMaskFilter(Rect meshBounds, Action<Paint> drawAction, Paint paint, MaskFilter maskFilter) {
+        void _drawWithMaskFilter(Rect meshBounds, Action<Paint> drawAction, Paint paint, MaskFilter maskFilter, Action onQuit = null) {
             var layer = this._currentLayer;
             var clipBounds = layer.layerBounds;
 
@@ -443,12 +433,14 @@ namespace Unity.UIWidgets.ui {
             }
 
             if (clipBounds.isEmpty) {
+                onQuit?.Invoke();
                 return;
             }
 
             var state = layer.currentState;
             float sigma = state.scale * maskFilter.sigma;
             if (sigma <= 0) {
+                onQuit?.Invoke();
                 return;
             }
 
@@ -456,6 +448,7 @@ namespace Unity.UIWidgets.ui {
             var maskBounds = meshBounds.inflate(sigma3);
             maskBounds = maskBounds.intersect(clipBounds.inflate(sigma3));
             if (maskBounds.isEmpty) {
+                onQuit?.Invoke();
                 return;
             }
 
@@ -465,6 +458,8 @@ namespace Unity.UIWidgets.ui {
 
             var blurMesh = ImageMeshGenerator.imageMesh(null, Rect.one, maskBounds);
             if (!this._applyClip(blurMesh.bounds)) {
+                blurMesh.dispose();
+                onQuit?.Invoke();
                 return;
             }
 
@@ -488,6 +483,7 @@ namespace Unity.UIWidgets.ui {
                 
                 Action<Paint> drawMesh = p => {
                     if (!this._applyClip(mesh.bounds)) {
+                        mesh.dispose();
                         return;
                     }
 
@@ -502,7 +498,7 @@ namespace Unity.UIWidgets.ui {
                 };
 
                 if (paint.maskFilter != null && paint.maskFilter.sigma != 0) {
-                    this._drawWithMaskFilter(mesh.bounds, drawMesh, paint, paint.maskFilter);
+                    this._drawWithMaskFilter(mesh.bounds, drawMesh, paint, paint.maskFilter, () => {mesh.dispose();});
                     return;
                 }
                 
@@ -539,17 +535,18 @@ namespace Unity.UIWidgets.ui {
 
                 Action<Paint> drawMesh = p => {
                     if (!this._applyClip(mesh.bounds)) {
+                        mesh.dispose();
                         return;
                     }
 
                     var layer = this._currentLayer;
                     
                     layer.draws.Add(CanvasShader.stroke0(layer, p, alpha, mesh));
-                    layer.draws.Add(CanvasShader.stroke1(layer, mesh));
+                    layer.draws.Add(CanvasShader.stroke1(layer, mesh.duplicate()));
                 };
                 
                 if (paint.maskFilter != null && paint.maskFilter.sigma != 0) {
-                    this._drawWithMaskFilter(mesh.bounds, drawMesh, paint, paint.maskFilter);
+                    this._drawWithMaskFilter(mesh.bounds, drawMesh, paint, paint.maskFilter, () => {mesh.dispose();});
                     return;
                 }
                 
@@ -586,6 +583,7 @@ namespace Unity.UIWidgets.ui {
             var state = layer.currentState;
             var mesh = ImageMeshGenerator.imageMesh(state.matrix, src, dst);
             if (!this._applyClip(mesh.bounds)) {
+                mesh.dispose();
                 return;
             }
 
@@ -613,6 +611,7 @@ namespace Unity.UIWidgets.ui {
 
             var mesh = ImageMeshGenerator.imageNineMesh(state.matrix, src, center, image.width, image.height, dst);            
             if (!this._applyClip(mesh.bounds)) {
+                mesh.dispose();
                 return;
             }
 
@@ -751,6 +750,7 @@ namespace Unity.UIWidgets.ui {
 
             Action<Paint> drawMesh = (Paint p) => {
                 if (!this._applyClip(textBlobBounds)) {
+                    mesh.dispose();
                     return;
                 }
 
@@ -759,7 +759,7 @@ namespace Unity.UIWidgets.ui {
             };
 
             if (paint.maskFilter != null && paint.maskFilter.sigma != 0) {
-                this._drawWithMaskFilter(textBlobBounds, drawMesh, paint, paint.maskFilter);
+                this._drawWithMaskFilter(textBlobBounds, drawMesh, paint, paint.maskFilter, () => {mesh.dispose();});
                 return;
             }
 
@@ -786,8 +786,6 @@ namespace Unity.UIWidgets.ui {
 
                 Graphics.ExecuteCommandBuffer(cmdBuf);
             }
-
-            this._clearLayer(layer);
         }
 
         int _lastRtID;
@@ -1076,6 +1074,7 @@ namespace Unity.UIWidgets.ui {
             
             public override void clear() {
                 this.mesh?.dispose();
+                this.textMesh?.dispose();
             }
 
             public CmdDraw() {

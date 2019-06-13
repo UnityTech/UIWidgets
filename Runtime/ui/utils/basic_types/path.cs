@@ -1490,6 +1490,7 @@ namespace Unity.UIWidgets.ui {
                 var pt = this._points[this._points.Count - 1];
                 if (uiPathUtils.ptEquals(pt.x, pt.y, point.x, point.y, this._distTol)) {
                     pt.flags |= point.flags;
+                    point.dispose();
                     return;
                 }
             }
@@ -2242,7 +2243,7 @@ namespace Unity.UIWidgets.ui {
 
         public uiMeshMesh boundsMesh {
             get {
-                return uiMeshMesh.create(this.bounds);
+                return create(this.bounds);
             }
         }
 
@@ -2331,6 +2332,10 @@ namespace Unity.UIWidgets.ui {
             newMesh.rawBounds = rawBounds;
 
             return newMesh;
+        }
+
+        public uiMeshMesh duplicate() {
+            return this.transform(this.matrix);
         }
 
         public uiMeshMesh transform(uiMatrix3 matrix) {

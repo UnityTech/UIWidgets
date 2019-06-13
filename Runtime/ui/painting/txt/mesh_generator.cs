@@ -213,9 +213,10 @@ namespace Unity.UIWidgets.ui {
             }
 
             uiMeshMesh mesh = vertices.Count > 0 ? uiMeshMesh.create(null, vertices, triangles, uv) : null;
-            _meshes[key] = new MeshInfo(key, mesh, fontInfo.textureVersion);
+            //_meshes[key] = new MeshInfo(key, mesh, fontInfo.textureVersion);
 
             this._mesh = mesh.transform(this.matrix);
+            mesh.dispose();
             return this._mesh;
         }
     }
