@@ -205,7 +205,7 @@ namespace Unity.UIWidgets.service {
             this.text = text;
             this.composing = composing ?? TextRange.empty;
 
-            if (selection != null) {
+            if (selection != null && selection.start >= 0 && selection.end >= 0) {
                 // handle emoji, which takes 2 bytes
                 // if selection cuts in the middle of the emoji, move it to the end
                 int start = selection.start, end = selection.end;
