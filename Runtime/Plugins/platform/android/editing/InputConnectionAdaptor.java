@@ -131,10 +131,12 @@ class InputConnectionAdaptor extends BaseInputConnection {
                 int selStart = Selection.getSelectionStart(mEditable);
                 int selEnd = Selection.getSelectionEnd(mEditable);
                 String text = mEditable.toString();
-                if(selStart >= 0 && selStart < text.length() && isTrailSurrogate(text.charAt(selStart)))
+                if(selStart >= 0 && selStart < text.length() && isTrailSurrogate(text.charAt(selStart))) {
                     selStart++;
-                if(selEnd >= 0 && selEnd < text.length() && isTrailSurrogate(text.charAt(selEnd)))
+                }
+                if(selEnd >= 0 && selEnd < text.length() && isTrailSurrogate(text.charAt(selEnd))) {
                     selEnd++;
+                }
                 if (selEnd > selStart) {
                     // Delete the selection.
                     Selection.setSelection(mEditable, selStart);
