@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.material;
 using UnityEngine;
@@ -770,6 +771,7 @@ namespace Unity.UIWidgets.ui {
                 }
                 else {
                     Paint paintWithWhite = new Paint(p) {color = Colors.white};
+                    if (EmojiUtils.image == null) return;
                     layer.draws.Add(CanvasShader.tex(layer, paintWithWhite, mesh.resolveMesh(), EmojiUtils.image));
                 }
             };

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Unity.UIWidgets.foundation;
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
@@ -14,8 +15,9 @@ namespace Unity.UIWidgets.ui {
                             Resources.Load<Texture2D>("Emoji")
                         );
                     }
-                    catch (Exception) {
+                    catch (Exception e) {
                         _image = null;
+                        Debug.LogError(e.StackTrace);
                     }
                 }
 
