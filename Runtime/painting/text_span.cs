@@ -21,7 +21,7 @@ namespace Unity.UIWidgets.painting {
         public TextSpan(string text = "", TextStyle style = null, List<TextSpan> children = null,
             GestureRecognizer recognizer = null, HoverRecognizer hoverRecognizer = null) {
             this.text = text;
-            this.splitedText = !string.IsNullOrEmpty(text) ? EmojiUtils.splitBySurrogatePair(text) : null;
+            this.splitedText = !string.IsNullOrEmpty(text) ? EmojiUtils.splitByEmoji(text) : null;
             this.style = style;
             this.children = children;
             this.recognizer = recognizer;

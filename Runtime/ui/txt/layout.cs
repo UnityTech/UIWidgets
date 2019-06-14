@@ -40,8 +40,9 @@ namespace Unity.UIWidgets.ui {
 
             Font font = FontManager.instance.getOrCreate(style.fontFamily, style.fontWeight, style.fontStyle).font;
 
-            if (char.IsHighSurrogate(buff.text[buff.offset + start])) {
-                this.layoutEmoji(style, font, start, count);
+            char startingChar = buff.text[buff.offset + start];
+            if (char.IsHighSurrogate(startingChar) || EmojiUtils.isSingleCharEmoji(startingChar)) {
+                this.layoutEmoji(buff.text.Substring(buff.offset + start, count), style, font, start, count);
             }
             else {
                 font.RequestCharactersInTextureSafe(buff.text, style.UnityFontSize, style.UnityFontStyle);
@@ -124,52 +125,60 @@ namespace Unity.UIWidgets.ui {
             this._advance = x;
         }
         
-        void layoutEmoji(TextStyle style, Font font, int start, int count) {
-            for (int i = 0; i < count; i += 2) {
+        void layoutEmoji(string text, TextStyle style, Font font, int start, int count) {
+            for (int i = 0; i < count; i++) {
+                char c = text[i];
                 float x = this._advance;
-                float letterSpace = style.letterSpacing;
-                float letterSpaceHalfLeft = letterSpace * 0.5f;
-                float letterSpaceHalfRight = letterSpace - letterSpaceHalfLeft;
-                
-                x += letterSpaceHalfLeft;
-                this._advances[i] += letterSpaceHalfLeft;
-                
-                var metrics = FontMetrics.fromFont(font, style.UnityFontSize);
+                if (EmojiUtils.isSingleCharNonEmptyEmoji(c) || char.IsHighSurrogate(c)) {
+                    float letterSpace = style.letterSpacing;
+                    float letterSpaceHalfLeft = letterSpace * 0.5f;
+                    float letterSpaceHalfRight = letterSpace - letterSpaceHalfLeft;
 
-                var minX = x;
-                var maxX = metrics.descent - metrics.ascent + x;
-                var minY = metrics.ascent;
-                var maxY = metrics.descent;
+                    x += letterSpaceHalfLeft;
+                    this._advances[i] += letterSpaceHalfLeft;
 
-                if (this._bounds.width <= 0 || this._bounds.height <= 0) {
-                    this._bounds = UnityEngine.Rect.MinMaxRect(
-                        minX, minY, maxX, maxY);
-                } else {
-                    if (minX < this._bounds.x) {
-                        this._bounds.x = minX;
+                    var metrics = FontMetrics.fromFont(font, style.UnityFontSize);
+
+                    var minX = x;
+                    var maxX = metrics.descent - metrics.ascent + x;
+                    var minY = metrics.ascent;
+                    var maxY = metrics.descent;
+
+                    if (this._bounds.width <= 0 || this._bounds.height <= 0) {
+                        this._bounds = UnityEngine.Rect.MinMaxRect(
+                            minX, minY, maxX, maxY);
                     }
-                    if (minY < this._bounds.y) {
-                        this._bounds.y = minY;
+                    else {
+                        if (minX < this._bounds.x) {
+                            this._bounds.x = minX;
+                        }
+
+                        if (minY < this._bounds.y) {
+                            this._bounds.y = minY;
+                        }
+
+                        if (maxX > this._bounds.xMax) {
+                            this._bounds.xMax = maxX;
+                        }
+
+                        if (maxY > this._bounds.yMax) {
+                            this._bounds.yMax = maxY;
+                        }
                     }
-                    if (maxX > this._bounds.xMax) {
-                        this._bounds.xMax = maxX;
-                    }
-                    if (maxY > this._bounds.yMax) {
-                        this._bounds.yMax = maxY;
-                    }
+
+                    this._positions[i] = x;
+                    float advance = style.fontSize;
+                    x += advance;
+
+                    this._advances[i] += advance;
+                    this._advances[i] += letterSpaceHalfRight;
+                    x += letterSpaceHalfRight;
+                }
+                else {
+                    this._advances[i] = 0;
+                    this._positions[i] = x;
                 }
 
-                this._positions[i] = x;
-                float advance = style.fontSize;
-                x += advance;
-                
-                this._advances[i] += advance;
-                this._advances[i] += letterSpaceHalfRight;
-                x += letterSpaceHalfRight;
-
-                this._advances[i+1] = 0;
-                this._positions[i+1] = x;
-                
                 this._advance = x;
             }
         }

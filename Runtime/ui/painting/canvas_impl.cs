@@ -752,7 +752,7 @@ namespace Unity.UIWidgets.ui {
             var subText = textBlob.text.Substring(textBlob.textOffset, textBlob.textSize);
 
             Texture tex = null;
-            bool alpha = !char.IsHighSurrogate(subText[0]);
+            bool alpha = !char.IsHighSurrogate(subText[0]) && !EmojiUtils.isSingleCharEmoji(subText[0]);
             if (alpha) {
                 font.RequestCharactersInTextureSafe(subText, fontSizeToLoad, style.UnityFontStyle);
                 tex = font.material.mainTexture;
