@@ -752,8 +752,8 @@ namespace Unity.UIWidgets.ui {
             var subText = textBlob.text.Substring(textBlob.textOffset, textBlob.textSize);
 
             Texture tex = null;
-            bool alpha = !char.IsHighSurrogate(subText[0]) && !EmojiUtils.isSingleCharEmoji(subText[0]);
-            if (alpha) {
+            bool notEmoji = !char.IsHighSurrogate(subText[0]) && !EmojiUtils.isSingleCharEmoji(subText[0]);
+            if (notEmoji) {
                 font.RequestCharactersInTextureSafe(subText, fontSizeToLoad, style.UnityFontStyle);
                 tex = font.material.mainTexture;
             }
@@ -765,7 +765,7 @@ namespace Unity.UIWidgets.ui {
 
                 var layer = this._currentLayer;
 
-                if (alpha) {
+                if (notEmoji) {
                     layer.draws.Add(CanvasShader.texAlpha(layer, p, mesh, tex));
                 }
                 else {
