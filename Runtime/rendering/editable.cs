@@ -668,6 +668,10 @@ namespace Unity.UIWidgets.rendering {
                 return this._selection;
             }
             set {
+                if (this._selection == value) {	
+                    return;	
+                }
+                
                 this._selection = value;
                 this._selectionRects = null;
                 this.markNeedsPaint();
