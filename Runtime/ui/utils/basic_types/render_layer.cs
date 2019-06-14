@@ -1,0 +1,140 @@
+using System.Collections.Generic;
+using Unity.UIWidgets.foundation;
+using UnityEngine;
+
+namespace Unity.UIWidgets.ui {
+    public partial class PictureFlusher {
+        
+        internal class RenderLayer : PoolItem {
+            public int rtID;
+            public int width;
+            public int height;
+            public FilterMode filterMode = FilterMode.Point;
+            public bool noMSAA = false;
+            public Rect layerBounds;
+            public Paint layerPaint;
+            public readonly List<RenderCmd> draws = new List<RenderCmd>();
+            public readonly List<RenderLayer> layers = new List<RenderLayer>();
+            public readonly List<State> states = new List<State>();
+            public State currentState;
+            public ClipStack clipStack;
+            public uint lastClipGenId;
+            public Rect lastClipBounds;
+            public bool ignoreClip = true;
+
+            Vector4? _viewport;
+
+            public Vector4 viewport {
+                get {
+                    if (!this._viewport.HasValue) {
+                        this._viewport = new Vector4(
+                            this.layerBounds.left,
+                            this.layerBounds.top,
+                            this.layerBounds.width,
+                            this.layerBounds.height);
+                    }
+                    return this._viewport.Value;
+                }
+            }
+
+            public static RenderLayer create(int rtID = 0, int width = 0, int height = 0, FilterMode filterMode = FilterMode.Point,
+                bool noMSAA = false, Rect layerBounds = null, Paint layerPaint = null, bool ignoreClip = true) {
+                var newLayer = ItemPoolManager.alloc<RenderLayer>();
+                newLayer.rtID = rtID;
+                newLayer.width = width;
+                newLayer.height = height;
+                newLayer.filterMode = filterMode;
+                newLayer.noMSAA = noMSAA;
+                newLayer.layerBounds = layerBounds;
+                newLayer.layerPaint = layerPaint;
+                newLayer.ignoreClip = ignoreClip;
+                newLayer.currentState = State.create();
+                newLayer.states.Add(newLayer.currentState);
+                newLayer.clipStack = ClipStack.create();
+                
+                return newLayer;
+            }
+
+            public void addLayer(RenderLayer layer) {
+                this.layers.Add(layer);
+                this.draws.Add(CmdLayer.create(layer : layer));
+            }
+
+            public override void clear() {
+                //these two list should have been cleared in PictureFlusher._clearLayer
+                D.assert(this.draws.Count == 0);
+                D.assert(this.layers.Count == 0);
+                this.draws.Clear();
+                this.layers.Clear();
+
+                foreach (var state in this.states) {
+                    state.dispose();
+                }
+                
+                this.states.Clear();
+                this.clipStack.dispose();
+                this._viewport = null;
+            }
+        }
+
+        internal class State : PoolItem {
+
+            public State() {
+                
+            }
+            
+            static readonly uiMatrix3 _id = uiMatrix3.I();
+            
+            uiMatrix3 _matrix;
+            float? _scale;
+            uiMatrix3 _invMatrix;
+
+            public static State create(uiMatrix3 matrix = null, float? scale = null, uiMatrix3 invMatrix = null) {
+                State newState = ItemPoolManager.alloc<State>();
+                newState._matrix = matrix ?? _id;
+                newState._scale = scale;
+                newState._invMatrix = invMatrix;
+                
+                return newState;
+            }
+
+            public override void clear() {
+                this._matrix = null;
+                this._scale = null;
+                this._invMatrix = null;
+            }
+
+            public uiMatrix3 matrix {
+                get { return this._matrix; }
+                set {
+                    this._matrix = value ?? _id;
+                    this._scale = null;
+                    this._invMatrix = null;
+                }
+            }
+
+            public float scale {
+                get {
+                    if (this._scale == null) {
+                        this._scale = uiXformUtils.getScale(this._matrix);
+                    }
+                    return this._scale.Value;
+                }
+            }
+            
+            public uiMatrix3 invMatrix {
+                get {
+                    if (this._invMatrix == null) {
+                        this._invMatrix = uiMatrix3.I();
+                        this._matrix.invert(this._invMatrix);
+                    }
+                    return this._invMatrix;
+                }
+            }
+
+            public State copy() {
+                return create(this._matrix, this._scale, this._invMatrix);
+            }
+        }
+    }
+}
