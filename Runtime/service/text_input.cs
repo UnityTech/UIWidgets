@@ -206,7 +206,7 @@ namespace Unity.UIWidgets.service {
             this.composing = composing ?? TextRange.empty;
 
             if (selection != null && selection.start >= 0 && selection.end >= 0) {
-                // handle emoji, which takes 2 bytes
+                // handle surrogate pair emoji, which takes 2 utf16 chars
                 // if selection cuts in the middle of the emoji, move it to the end
                 int start = selection.start, end = selection.end;
                 if (start < text.Length && char.IsLowSurrogate(text[start])) {
