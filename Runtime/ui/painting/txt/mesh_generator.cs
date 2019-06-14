@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Unity.UIWidgets.foundation;
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
@@ -124,7 +125,7 @@ namespace Unity.UIWidgets.ui {
             }
         }
 
-        public MeshMesh resovleMesh() {
+        public MeshMesh resolveMesh() {
             if (this._resolved) {
                 return this._mesh;
             }
@@ -132,8 +133,67 @@ namespace Unity.UIWidgets.ui {
             this._resolved = true;
             
             var style = this.textBlob.style;
-            var fontInfo = FontManager.instance.getOrCreate(style.fontFamily, style.fontWeight, style.fontStyle);
+
+            var text = this.textBlob.text;
             var key = new MeshKey(this.textBlob.instanceId, this.scale);
+            var fontInfo = FontManager.instance.getOrCreate(style.fontFamily, style.fontWeight, style.fontStyle);
+            var font = fontInfo.font;
+            
+            // Handling Emoji
+            char startingChar = text[this.textBlob.textOffset];
+            if (char.IsHighSurrogate(startingChar) || EmojiUtils.isSingleCharEmoji(startingChar)) {
+                var vert = new List<Vector3>();
+                var tri = new List<int>();
+                var uvCoord = new List<Vector2>();
+                var metrics = FontMetrics.fromFont(font, style.UnityFontSize);
+                var minMaxRect = EmojiUtils.getMinMaxRect(style.fontSize, metrics.ascent, metrics.descent);
+                var minX = minMaxRect.left;
+                var maxX = minMaxRect.right;
+                var minY = minMaxRect.top;
+                var maxY = minMaxRect.bottom;
+
+                for (int i = 0; i < this.textBlob.textSize; i++) {
+                    char a = text[this.textBlob.textOffset + i];
+                    int code = a;
+                    if (char.IsHighSurrogate(a)) {
+                        D.assert(i+1 < this.textBlob.textSize);
+                        D.assert(this.textBlob.textOffset+i+1 < this.textBlob.text.Length);
+                        char b = text[this.textBlob.textOffset+i+1];
+                        D.assert(char.IsLowSurrogate(b));
+                        code = char.ConvertToUtf32(a, b);
+                    } else if (char.IsLowSurrogate(a) || EmojiUtils.isEmptyEmoji(a)) {
+                        continue;
+                    }
+                    var uvRect = EmojiUtils.getUVRect(code);
+                    
+                    var pos = this.textBlob.positions[i];
+
+                    int baseIndex = vert.Count;
+                    vert.Add(new Vector3(pos.x + minX, pos.y + minY, 0));
+                    vert.Add(new Vector3(pos.x + maxX, pos.y + minY, 0));
+                    vert.Add(new Vector3(pos.x + maxX, pos.y + maxY, 0));
+                    vert.Add(new Vector3(pos.x + minX, pos.y + maxY, 0));
+                    
+                    tri.Add(baseIndex);
+                    tri.Add(baseIndex + 1);
+                    tri.Add(baseIndex + 2);
+                    tri.Add(baseIndex);
+                    tri.Add(baseIndex + 2);
+                    tri.Add(baseIndex + 3);
+                    uvCoord.Add(uvRect.bottomLeft.toVector());
+                    uvCoord.Add(uvRect.bottomRight.toVector());
+                    uvCoord.Add(uvRect.topRight.toVector());
+                    uvCoord.Add(uvRect.topLeft.toVector());
+                    
+                    if(char.IsHighSurrogate(a)) i++;
+                }
+                MeshMesh meshMesh = new MeshMesh(null, vert, tri, uvCoord);
+                _meshes[key] = new MeshInfo(key, meshMesh, 0);
+
+                this._mesh = meshMesh.transform(this.matrix);
+                return this._mesh;
+            }
+            
 
             _meshes.TryGetValue(key, out var meshInfo);
             if (meshInfo != null && meshInfo.textureVersion == fontInfo.textureVersion) {
@@ -142,9 +202,7 @@ namespace Unity.UIWidgets.ui {
                 return this._mesh;
             }
 
-            var font = fontInfo.font;
             var length = this.textBlob.textSize;
-            var text = this.textBlob.text;
             var fontSizeToLoad = Mathf.CeilToInt(style.UnityFontSize * this.scale);
 
             var vertices = new List<Vector3>(length * 4);

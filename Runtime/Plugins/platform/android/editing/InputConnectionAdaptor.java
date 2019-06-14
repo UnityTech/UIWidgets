@@ -130,6 +130,13 @@ class InputConnectionAdaptor extends BaseInputConnection {
             if (event.getKeyCode() == KeyEvent.KEYCODE_DEL) {
                 int selStart = Selection.getSelectionStart(mEditable);
                 int selEnd = Selection.getSelectionEnd(mEditable);
+                String text = mEditable.toString();
+                if(selStart >= 0 && selStart < text.length() && isTrailSurrogate(text.charAt(selStart))) {
+                    selStart++;
+                }
+                if(selEnd >= 0 && selEnd < text.length() && isTrailSurrogate(text.charAt(selEnd))) {
+                    selEnd++;
+                }
                 if (selEnd > selStart) {
                     // Delete the selection.
                     Selection.setSelection(mEditable, selStart);
@@ -139,6 +146,8 @@ class InputConnectionAdaptor extends BaseInputConnection {
                 } else if (selStart > 0) {
                     // Delete to the left of the cursor.
                     int newSel = Math.max(selStart - 1, 0);
+                    if(selStart >= 2 && isTrailSurrogate(text.charAt(selStart-1)))
+                        newSel = selStart - 2;
                     Selection.setSelection(mEditable, newSel);
                     mEditable.delete(newSel, selStart);
                     updateEditingState();
@@ -211,5 +220,14 @@ class InputConnectionAdaptor extends BaseInputConnection {
                 break;
         }
         return true;
+    }
+    
+    private boolean isLeadSurrogate(int c) {
+        return (c & 0xfffffc00) == 0xd800;
+    }
+
+
+    private boolean isTrailSurrogate(int c) {
+        return (c & 0xfffffc00) == 0xdc00;
     }
 }

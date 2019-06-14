@@ -248,6 +248,15 @@ To learn about the original script in detail, please refer to `SystemInfo.js` an
 Unity, by default, resizes the width and height of an imported image to the nearest integer that is a power of 2.
 In UIWidgets, you should almost always disable this by selecting the image in the "Project" panel, then in the "Inspector" panel set the "Non Power of 2" option (in "Advanced") to "None", to prevent your image from being resized unexpectedly.
 
+#### Update Emoji
+UIWidgets supports rendering emoji in (editable) texts. The emoji images comes from the free
+resources provided by [https://www.joypixels.com](https://www.joypixels.com/). If you would
+like to use your own images for emoji, please update the texture image `Tests/Resources/Emoji.png`,
+and the unicode-index table in `Runtime/ui/txt/emoji.cs` which maps unicodes to specific locations
+in the texture. Specifically, remember to update the Dictionary `emojiLookupTable`, number of rows
+in the texture `rowCount`, and number of columns `colCount`.
+
+
 ## Debug UIWidgets Application
 
 #### Define UIWidgets_DEBUG
