@@ -34,8 +34,10 @@ namespace Unity.UIWidgets.painting {
             if (hasStyle) {
                 builder.pushStyle(this.style, textScaleFactor);
             }
+
             if (this.splitedText != null) {
-                if (this.splitedText.Count == 1 && !char.IsHighSurrogate(this.splitedText[0][0])) {
+                if (this.splitedText.Count == 1 && !char.IsHighSurrogate(this.splitedText[0][0]) &&
+                    !EmojiUtils.isSingleCharEmoji(this.splitedText[0][0])) {
                     builder.addText(this.splitedText[0]);
                 }
                 else {
@@ -47,7 +49,7 @@ namespace Unity.UIWidgets.painting {
                     }
                 }
             }
-            
+
 
             if (this.children != null) {
                 foreach (var child in this.children) {
@@ -69,6 +71,7 @@ namespace Unity.UIWidgets.painting {
                         need = true;
                         return false;
                     }
+
                     return true;
                 });
                 return need;
@@ -186,7 +189,7 @@ namespace Unity.UIWidgets.painting {
             if (!Equals(this.hoverRecognizer, other.hoverRecognizer)) {
                 result = RenderComparison.function > result ? RenderComparison.function : result;
             }
-            
+
             if (this.style != null) {
                 var candidate = this.style.compareTo(other.style);
                 if (candidate > result) {
