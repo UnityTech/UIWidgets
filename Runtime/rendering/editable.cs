@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.painting;
@@ -664,14 +663,12 @@ namespace Unity.UIWidgets.rendering {
         }
 
         public TextSelection selection {
-            get {
-                return this._selection;
-            }
+            get { return this._selection; }
             set {
-                if (this._selection == value) {	
-                    return;	
+                if (this._selection == value) {
+                    return;
                 }
-                
+
                 this._selection = value;
                 this._selectionRects = null;
                 this.markNeedsPaint();
@@ -906,7 +903,7 @@ namespace Unity.UIWidgets.rendering {
 
         public TextPosition getParagraphBackward(TextPosition position, TextAffinity? affinity = null) {
             var lineCount = this._textPainter.getLineCount();
-            
+
             Paragraph.LineRange line = null;
             for (int i = lineCount - 1; i >= 0; --i) {
                 line = this._textPainter.getLineRange(i);
@@ -1189,7 +1186,8 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
-        public void setFloatingCursor(FloatingCursorDragState? state, Offset boundedOffset, TextPosition lastTextPosition,
+        public void setFloatingCursor(FloatingCursorDragState? state, Offset boundedOffset,
+            TextPosition lastTextPosition,
             float? resetLerpValue = null) {
             D.assert(boundedOffset != null);
             D.assert(lastTextPosition != null);
