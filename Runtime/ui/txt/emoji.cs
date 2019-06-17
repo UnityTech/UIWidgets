@@ -255,7 +255,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public static bool isSingleCharEmoji(int c) {
-            return emojiLookupTable.ContainsKey(c) || isEmptyEmoji(c);
+            return isSingleCharNonEmptyEmoji(c) || isEmptyEmoji(c);
         }
 
         public static bool isSingleCharNonEmptyEmoji(int c) {
@@ -290,6 +290,8 @@ namespace Unity.UIWidgets.ui {
                             start = i;
                         }
                     }
+
+                    currentEmoji = true;
                 }
                 else {
                     if (currentEmoji != false) {
