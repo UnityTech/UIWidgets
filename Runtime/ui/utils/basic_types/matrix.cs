@@ -682,17 +682,18 @@ namespace Unity.UIWidgets.ui {
             this.getMapXYProc()(this, x, y, out x1, out y1);
         }
 
-        public bool mapRect(out Rect dst, Rect src) {
+        public bool mapRect(out uiRect dst, uiRect src) {
             if (this.getType() <= TypeMask.kTranslate_Mask) {
                 var tx = this.fMat[kMTransX];
                 var ty = this.fMat[kMTransY];
 
-                dst = Rect.fromLTRB(
+                dst = uiRectHelper.fromLTRB(
                     src.left + tx,
                     src.top + ty,
                     src.right + tx,
                     src.bottom + ty
-                ).normalize();
+                );
+                dst = uiRectHelper.normalize(dst);
 
                 return true;
             }
@@ -752,22 +753,22 @@ namespace Unity.UIWidgets.ui {
                     maxY = y4;
                 }
 
-                dst = Rect.fromLTRB(minX, minY, maxX, maxY);
+                dst = uiRectHelper.fromLTRB(minX, minY, maxX, maxY);
                 return this.rectStaysRect(); // might still return true if rotated by 90, etc.
             }
         }
 
-        public bool mapRect(ref Rect rect) {
+        public bool mapRect(ref uiRect rect) {
             return this.mapRect(out rect, rect);
         }
 
-        public Rect mapRect(Rect src) {
-            Rect dst;
+        public uiRect mapRect(uiRect src) {
+            uiRect dst;
             this.mapRect(out dst, src);
             return dst;
         }
 
-        public void mapRectScaleTranslate(out Rect dst, Rect src) {
+        public void mapRectScaleTranslate(out uiRect dst, uiRect src) {
             D.assert(this.isScaleTranslate());
 
             var sx = this.fMat[kMScaleX];
@@ -775,16 +776,17 @@ namespace Unity.UIWidgets.ui {
             var tx = this.fMat[kMTransX];
             var ty = this.fMat[kMTransY];
 
-            dst = Rect.fromLTRB(
+            dst = uiRectHelper.fromLTRB(
                 src.left * sx + tx,
                 src.top * sy + ty,
                 src.right * sx + tx,
                 src.bottom * sy + ty
-            ).normalize();
+            );
+            dst = uiRectHelper.normalize(dst);
         }
 
-        public Offset[] mapRectToQuad(Rect rect) {
-            Offset[] dst = rect.toQuad();
+        public Offset[] mapRectToQuad(uiRect rect) {
+            Offset[] dst = uiRectHelper.toQuad(rect);
             this.mapPoints(dst, dst);
             return dst;
         }

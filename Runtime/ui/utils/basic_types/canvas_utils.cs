@@ -206,7 +206,7 @@ namespace Unity.UIWidgets.ui {
 
         public static uiMeshMesh imageMesh(uiMatrix3 matrix,
             Offset srcTL, Offset srcBL, Offset srcBR, Offset srcTR,
-            Rect dst) {
+            uiRect dst) {
             var vertices = ItemPoolManager.alloc<uiList<Vector3>>();
             vertices.SetCapacity(4);
 
@@ -228,7 +228,7 @@ namespace Unity.UIWidgets.ui {
             return uiMeshMesh.create(matrix, vertices, _triangles, uv);
         }
         
-        public static uiMeshMesh imageMesh(uiMatrix3 matrix, Rect src, Rect dst) {
+        public static uiMeshMesh imageMesh(uiMatrix3 matrix, uiRect src, uiRect dst) {
             var vertices = ItemPoolManager.alloc<uiList<Vector3>>();
             vertices.SetCapacity(4);
 
@@ -255,7 +255,7 @@ namespace Unity.UIWidgets.ui {
             return uiMeshMesh.create(matrix, vertices, _triangles, uv);
         }
 
-        public static uiMeshMesh imageNineMesh(uiMatrix3 matrix, Rect src, Rect center, int srcWidth, int srcHeight, Rect dst) {
+        public static uiMeshMesh imageNineMesh(uiMatrix3 matrix, uiRect src, uiRect center, int srcWidth, int srcHeight, uiRect dst) {
             float x0 = dst.left;
             float x3 = dst.right;
             float x1 = x0 + ((center.left - src.left) * srcWidth);

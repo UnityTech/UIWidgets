@@ -8,11 +8,11 @@ namespace Unity.UIWidgets.ui {
         public uiMeshMesh mesh;
         public bool convex;
         public bool isRect;
-        public Rect rect { get; private set; }
+        public uiRect? rect { get; private set; }
 
         uint _genId;
         bool _isIntersectionOfRects;
-        Rect _bound;
+        uiRect _bound;
         uiMatrix3 _invMat;
 
         public ClipElement() {
@@ -27,7 +27,6 @@ namespace Unity.UIWidgets.ui {
             this.isRect = false;
             this._genId = 0;
             this._isIntersectionOfRects = false;
-            this._bound = null;
             this._invMat = null;
         }
 
@@ -59,16 +58,16 @@ namespace Unity.UIWidgets.ui {
             return newElement;
         }
 
-        public void setRect(Rect rect) {
+        public void setRect(uiRect rect) {
             D.assert(ClipStack.invalidGenID != this._genId);
-            D.assert(this.isRect && this.rect.contains(rect));
+            D.assert(this.isRect && uiRectHelper.contains(this.rect.Value, rect));
             this.rect = rect;
         }
 
         public void setEmpty() {
             this._genId = ClipStack.emptyGenID;
             this._isIntersectionOfRects = false;
-            this._bound = Rect.zero;
+            this._bound = uiRectHelper.zero;
         }
 
         public void updateBoundAndGenID(ClipElement prior) {
@@ -76,7 +75,7 @@ namespace Unity.UIWidgets.ui {
             this._isIntersectionOfRects = false;
 
             if (this.isRect) {
-                this._bound = this.rect;
+                this._bound = this.rect.Value;
                 if (prior == null || prior.isIntersectionOfRects()) {
                     this._isIntersectionOfRects = true;
                 }
@@ -86,7 +85,7 @@ namespace Unity.UIWidgets.ui {
             }
 
             if (prior != null) {
-                this._bound = this._bound.intersect(prior.getBound());
+                this._bound = uiRectHelper.intersect(this._bound, prior.getBound());
             }
 
             if (this._bound.isEmpty) {
@@ -99,7 +98,7 @@ namespace Unity.UIWidgets.ui {
             return this.getGenID() == ClipStack.emptyGenID;
         }
 
-        public Rect getBound() {
+        public uiRect getBound() {
             D.assert(ClipStack.invalidGenID != this._genId);
             return this._bound;
         }
@@ -114,7 +113,7 @@ namespace Unity.UIWidgets.ui {
             return this._genId;
         }
 
-        bool _convexContains(Rect rect) {
+        bool _convexContains(uiRect rect) {
             if (this.mesh.vertices.Count <= 2) {
                 return false;
             }
@@ -141,9 +140,9 @@ namespace Unity.UIWidgets.ui {
             return true;
         }
 
-        public bool contains(Rect rect) {
+        public bool contains(uiRect rect) {
             if (this.isRect) {
-                return this.rect.contains(rect);
+                return uiRectHelper.contains(this.rect.Value, rect);
             }
 
             if (this.convex) {
@@ -179,7 +178,7 @@ namespace Unity.UIWidgets.ui {
         public readonly List<ClipElement> stack = new List<ClipElement>();
         
         ClipElement _lastElement;
-        Rect _bound;
+        uiRect _bound;
         int _saveCount;
 
         public static ClipStack create() {
@@ -188,7 +187,6 @@ namespace Unity.UIWidgets.ui {
 
         public override void clear() {
             this._saveCount = 0;
-            this._bound = null;
             this._lastElement = null;
             foreach (var clipelement in this.stack) {
                 clipelement.dispose();
@@ -236,7 +234,7 @@ namespace Unity.UIWidgets.ui {
                 if (prior.saveCount == this._saveCount) {
                     // can not update prior if it's cross save count.
                     if (prior.isRect && element.isRect) {
-                        var isectRect = prior.rect.intersect(element.rect);
+                        var isectRect = uiRectHelper.intersect(prior.rect.Value, element.rect.Value);
                         if (isectRect.isEmpty) {
                             prior.setEmpty();
                             element.dispose();
@@ -250,7 +248,7 @@ namespace Unity.UIWidgets.ui {
                         return;
                     }
 
-                    if (!prior.getBound().overlaps(element.getBound())) {
+                    if (!uiRectHelper.overlaps(prior.getBound(),element.getBound())) {
                         prior.setEmpty();
                         element.dispose();
                         return;
@@ -263,7 +261,7 @@ namespace Unity.UIWidgets.ui {
             element.updateBoundAndGenID(prior);
         }
 
-        public void getBounds(out Rect bound, out bool isIntersectionOfRects) {
+        public void getBounds(out uiRect? bound, out bool isIntersectionOfRects) {
             if (this._lastElement == null) {
                 bound = null;
                 isIntersectionOfRects = false;
@@ -277,12 +275,12 @@ namespace Unity.UIWidgets.ui {
     }
 
     class ReducedClip : PoolItem {
-        public Rect scissor;
+        public uiRect? scissor;
         public List<ClipElement> maskElements = new List<ClipElement>();
         ClipElement _lastElement;
 
         public bool isEmpty() {
-            return this.scissor != null && this.scissor.isEmpty;
+            return this.scissor != null && this.scissor.Value.isEmpty;
         }
 
         public ReducedClip() {
@@ -304,9 +302,9 @@ namespace Unity.UIWidgets.ui {
             return element.getGenID();
         }
 
-        public static ReducedClip create(ClipStack stack, Rect layerBounds, Rect queryBounds) {
+        public static ReducedClip create(ClipStack stack, uiRect layerBounds, uiRect queryBounds) {
             ReducedClip clip = ItemPoolManager.alloc<ReducedClip>();
-            Rect stackBounds;
+            uiRect? stackBounds;
             bool iior;
             stack.getBounds(out stackBounds, out iior);
 
@@ -315,24 +313,24 @@ namespace Unity.UIWidgets.ui {
                 return clip;
             }
 
-            stackBounds = layerBounds.intersect(stackBounds);
+            stackBounds = uiRectHelper.intersect(layerBounds,stackBounds.Value);
             if (iior) {
                 clip.scissor = stackBounds;
                 return clip;
             }
 
-            queryBounds = stackBounds.intersect(queryBounds);
+            queryBounds = uiRectHelper.intersect(stackBounds.Value, queryBounds);
             if (queryBounds.isEmpty) {
-                clip.scissor = Rect.zero;
+                clip.scissor = uiRectHelper.zero;
                 return clip;
             }
 
             clip.scissor = queryBounds;
-            clip._walkStack(stack, clip.scissor);
+            clip._walkStack(stack, clip.scissor.Value);
             return clip;
         }
 
-        void _walkStack(ClipStack stack, Rect queryBounds) {
+        void _walkStack(ClipStack stack, uiRect queryBounds) {
             foreach (var element in stack.stack) {
                 if (element.isRect) {
                     continue;

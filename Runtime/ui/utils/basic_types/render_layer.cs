@@ -11,7 +11,7 @@ namespace Unity.UIWidgets.ui {
             public int height;
             public FilterMode filterMode = FilterMode.Point;
             public bool noMSAA = false;
-            public Rect layerBounds;
+            public uiRect layerBounds;
             public Paint layerPaint;
             public readonly List<RenderCmd> draws = new List<RenderCmd>();
             public readonly List<RenderLayer> layers = new List<RenderLayer>();
@@ -19,7 +19,7 @@ namespace Unity.UIWidgets.ui {
             public State currentState;
             public ClipStack clipStack;
             public uint lastClipGenId;
-            public Rect lastClipBounds;
+            public uiRect lastClipBounds;
             public bool ignoreClip = true;
 
             Vector4? _viewport;
@@ -38,14 +38,15 @@ namespace Unity.UIWidgets.ui {
             }
 
             public static RenderLayer create(int rtID = 0, int width = 0, int height = 0, FilterMode filterMode = FilterMode.Point,
-                bool noMSAA = false, Rect layerBounds = null, Paint layerPaint = null, bool ignoreClip = true) {
+                bool noMSAA = false, uiRect? layerBounds = null, Paint layerPaint = null, bool ignoreClip = true) {
+                D.assert(layerBounds != null);
                 var newLayer = ItemPoolManager.alloc<RenderLayer>();
                 newLayer.rtID = rtID;
                 newLayer.width = width;
                 newLayer.height = height;
                 newLayer.filterMode = filterMode;
                 newLayer.noMSAA = noMSAA;
-                newLayer.layerBounds = layerBounds;
+                newLayer.layerBounds = layerBounds.Value;
                 newLayer.layerPaint = layerPaint;
                 newLayer.ignoreClip = ignoreClip;
                 newLayer.currentState = State.create();

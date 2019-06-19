@@ -13,7 +13,7 @@ namespace Unity.UIWidgets.ui {
 
         readonly List<RenderLayer> _layers = new List<RenderLayer>();
         RenderLayer _currentLayer;
-        Rect _lastScissor;
+        uiRect? _lastScissor;
 
         public void dispose() {
             if (this._currentLayer != null) {
@@ -54,7 +54,7 @@ namespace Unity.UIWidgets.ui {
             var width = this._renderTexture.width;
             var height = this._renderTexture.height;
 
-            var bounds = Rect.fromLTWH(0, 0,
+            var bounds = uiRectHelper.fromLTWH(0, 0,
                 width * this._fringeWidth,
                 height * this._fringeWidth);
 
@@ -75,8 +75,7 @@ namespace Unity.UIWidgets.ui {
             layer.clipStack.save();
         }
 
-        void _saveLayer(Rect bounds, Paint paint) {
-            D.assert(bounds != null);
+        void _saveLayer(uiRect bounds, Paint paint) {
             D.assert(bounds.width > 0);
             D.assert(bounds.height > 0);
             D.assert(paint != null);
@@ -130,7 +129,7 @@ namespace Unity.UIWidgets.ui {
                         layer.draws.Add(renderDraw);
 
                         var blurLayer = this._createBlurLayer(layer, filter.sigmaX, filter.sigmaY, layer);
-                        var blurMesh = ImageMeshGenerator.imageMesh(null, Rect.one, bounds);
+                        var blurMesh = ImageMeshGenerator.imageMesh(null, uiRectHelper.one, bounds);
                         layer.draws.Add(CanvasShader.texRT(layer, paint, blurMesh, blurLayer));
                     }
                 }
@@ -180,7 +179,7 @@ namespace Unity.UIWidgets.ui {
             var currentLayer = this._currentLayer = this._layers[this._layers.Count - 1];
             var state = currentLayer.currentState;
 
-            var mesh = ImageMeshGenerator.imageMesh(state.matrix, Rect.one, layer.layerBounds);
+            var mesh = ImageMeshGenerator.imageMesh(state.matrix, uiRectHelper.one, layer.layerBounds);
 
             if (!this._applyClip(mesh.bounds)) {
                 mesh.dispose();
@@ -262,8 +261,8 @@ namespace Unity.UIWidgets.ui {
             path.dispose();
         }
 
-        void _tryAddScissor(RenderLayer layer, Rect scissor) {
-            if (scissor == this._lastScissor) {
+        void _tryAddScissor(RenderLayer layer, uiRect? scissor) {
+            if (uiRectHelper.equals(scissor, this._lastScissor)) {
                 return;
             }
 
@@ -273,32 +272,33 @@ namespace Unity.UIWidgets.ui {
             this._lastScissor = scissor;
         }
 
-        bool _applyClip(Rect queryBounds) {
-            if (queryBounds == null || queryBounds.isEmpty) {
+        bool _applyClip(uiRect? queryBounds) {
+            if (queryBounds == null || queryBounds.Value.isEmpty) {
                 return false;
             }
 
             var layer = this._currentLayer;
             var layerBounds = layer.layerBounds;
-            ReducedClip reducedClip = ReducedClip.create(layer.clipStack, layerBounds, queryBounds);
+            ReducedClip reducedClip = ReducedClip.create(layer.clipStack, layerBounds, queryBounds.Value);
             if (reducedClip.isEmpty()) {
                 reducedClip.dispose();
                 return false;
             }
 
             var scissor = reducedClip.scissor;
-            var physicalRect = Rect.fromLTRB(0, 0, layer.width, layer.height);
+            var physicalRect = uiRectHelper.fromLTRB(0, 0, layer.width, layer.height);
 
-            if (scissor == layerBounds) {
+            if (uiRectHelper.equals(scissor,layerBounds)) {
                 this._tryAddScissor(layer, null);
             }
             else {
-                var deviceScissor = Rect.fromLTRB(
-                    scissor.left - layerBounds.left, layerBounds.bottom - scissor.bottom,
-                    scissor.right - layerBounds.left, layerBounds.bottom - scissor.top
-                ).scale(layer.width / layerBounds.width, layer.height / layerBounds.height);
-                deviceScissor = deviceScissor.roundOut();
-                deviceScissor = deviceScissor.intersect(physicalRect);
+                var deviceScissor = uiRectHelper.fromLTRB(
+                    scissor.Value.left - layerBounds.left, layerBounds.bottom - scissor.Value.bottom,
+                    scissor.Value.right - layerBounds.left, layerBounds.bottom - scissor.Value.top
+                );
+                deviceScissor = uiRectHelper.scale(deviceScissor, layer.width / layerBounds.width, layer.height / layerBounds.height);
+                deviceScissor = uiRectHelper.roundOut(deviceScissor);
+                deviceScissor = uiRectHelper.intersect(deviceScissor, physicalRect);
 
                 if (deviceScissor.isEmpty) {
                     reducedClip.dispose();
@@ -309,7 +309,7 @@ namespace Unity.UIWidgets.ui {
             }
 
             var maskGenID = reducedClip.maskGenID();
-            if (this._mustRenderClip(maskGenID, reducedClip.scissor)) {
+            if (this._mustRenderClip(maskGenID, reducedClip.scissor.Value)) {
                 if (maskGenID == ClipStack.wideOpenGenID) {
                     layer.ignoreClip = true;
                 }
@@ -317,7 +317,7 @@ namespace Unity.UIWidgets.ui {
                     layer.ignoreClip = false;
 
                     // need to inflate a bit to make sure all area is cleared.
-                    var inflatedScissor = reducedClip.scissor.inflate(this._fringeWidth);
+                    var inflatedScissor = uiRectHelper.inflate(reducedClip.scissor.Value, this._fringeWidth);
                     var boundsMesh = uiMeshMesh.create(inflatedScissor);
                     layer.draws.Add(CanvasShader.stencilClear(layer, boundsMesh));
 
@@ -327,7 +327,7 @@ namespace Unity.UIWidgets.ui {
                     }
                 }
 
-                this._setLastClipGenId(maskGenID, reducedClip.scissor);
+                this._setLastClipGenId(maskGenID, reducedClip.scissor.Value);
             }
 
             reducedClip.dispose();
@@ -335,18 +335,18 @@ namespace Unity.UIWidgets.ui {
             return true;
         }
 
-        void _setLastClipGenId(uint clipGenId, Rect clipBounds) {
+        void _setLastClipGenId(uint clipGenId, uiRect clipBounds) {
             var layer = this._currentLayer;
             layer.lastClipGenId = clipGenId;
             layer.lastClipBounds = clipBounds;
         }
 
-        bool _mustRenderClip(uint clipGenId, Rect clipBounds) {
+        bool _mustRenderClip(uint clipGenId, uiRect clipBounds) {
             var layer = this._currentLayer;
-            return layer.lastClipGenId != clipGenId || layer.lastClipBounds != clipBounds;
+            return layer.lastClipGenId != clipGenId || !uiRectHelper.equals(layer.lastClipBounds, clipBounds);
         }
 
-        RenderLayer _createMaskLayer(RenderLayer parentLayer, Rect maskBounds, Action<Paint> drawCallback,
+        RenderLayer _createMaskLayer(RenderLayer parentLayer, uiRect maskBounds, Action<Paint> drawCallback,
             Paint paint) {
             var textureWidth = Mathf.CeilToInt(maskBounds.width * this._devicePixelRatio);
             if (textureWidth < 1) {
@@ -420,7 +420,7 @@ namespace Unity.UIWidgets.ui {
 
             parentLayer.addLayer(blurYLayer);
 
-            var blurMesh = ImageMeshGenerator.imageMesh(null, Rect.one, maskLayer.layerBounds);
+            var blurMesh = ImageMeshGenerator.imageMesh(null, uiRectHelper.one, maskLayer.layerBounds);
 
             var kernelX = BlurUtils.get1DGaussianKernel(sigmaX, radiusX);
             var kernelY = BlurUtils.get1DGaussianKernel(sigmaY, radiusY);
@@ -436,17 +436,17 @@ namespace Unity.UIWidgets.ui {
             return blurYLayer;
         }
 
-        void _drawWithMaskFilter(Rect meshBounds, Action<Paint> drawAction, Paint paint, MaskFilter maskFilter,
+        void _drawWithMaskFilter(uiRect meshBounds, Action<Paint> drawAction, Paint paint, MaskFilter maskFilter,
             Action onQuit = null) {
             var layer = this._currentLayer;
             var clipBounds = layer.layerBounds;
 
-            Rect stackBounds;
+            uiRect? stackBounds;
             bool iior;
             layer.clipStack.getBounds(out stackBounds, out iior);
 
             if (stackBounds != null) {
-                clipBounds = clipBounds.intersect(stackBounds);
+                clipBounds = uiRectHelper.intersect(clipBounds,stackBounds.Value);
             }
 
             if (clipBounds.isEmpty) {
@@ -462,8 +462,8 @@ namespace Unity.UIWidgets.ui {
             }
 
             float sigma3 = 3 * sigma;
-            var maskBounds = meshBounds.inflate(sigma3);
-            maskBounds = maskBounds.intersect(clipBounds.inflate(sigma3));
+            var maskBounds = uiRectHelper.inflate(meshBounds, sigma3);
+            maskBounds = uiRectHelper.intersect(maskBounds, uiRectHelper.inflate(clipBounds,sigma3));
             if (maskBounds.isEmpty) {
                 onQuit?.Invoke();
                 return;
@@ -473,7 +473,7 @@ namespace Unity.UIWidgets.ui {
 
             var blurLayer = this._createBlurLayer(maskLayer, sigma, sigma, layer);
 
-            var blurMesh = ImageMeshGenerator.imageMesh(null, Rect.one, maskBounds);
+            var blurMesh = ImageMeshGenerator.imageMesh(null, uiRectHelper.one, maskBounds);
             if (!this._applyClip(blurMesh.bounds)) {
                 blurMesh.dispose();
                 onQuit?.Invoke();
@@ -578,28 +578,27 @@ namespace Unity.UIWidgets.ui {
 
             this._drawImageRect(image,
                 null,
-                Rect.fromLTWH(
+                uiRectHelper.fromLTWH(
                     offset.dx, offset.dy,
                     image.width / this._devicePixelRatio,
                     image.height / this._devicePixelRatio),
                 paint);
         }
 
-        void _drawImageRect(Image image, Rect src, Rect dst, Paint paint) {
+        void _drawImageRect(Image image, uiRect? src, uiRect dst, Paint paint) {
             D.assert(image != null);
-            D.assert(dst != null);
             D.assert(paint != null);
 
             if (src == null) {
-                src = Rect.one;
+                src = uiRectHelper.one;
             }
             else {
-                src = src.scale(1f / image.width, 1f / image.height);
+                src = uiRectHelper.scale(src.Value, 1f / image.width, 1f / image.height);
             }
 
             var layer = this._currentLayer;
             var state = layer.currentState;
-            var mesh = ImageMeshGenerator.imageMesh(state.matrix, src, dst);
+            var mesh = ImageMeshGenerator.imageMesh(state.matrix, src.Value, dst);
             if (!this._applyClip(mesh.bounds)) {
                 mesh.dispose();
                 return;
@@ -608,27 +607,25 @@ namespace Unity.UIWidgets.ui {
             layer.draws.Add(CanvasShader.tex(layer, paint, mesh, image));
         }
 
-        void _drawImageNine(Image image, Rect src, Rect center, Rect dst, Paint paint) {
+        void _drawImageNine(Image image, uiRect? src, uiRect center, uiRect dst, Paint paint) {
             D.assert(image != null);
-            D.assert(center != null);
-            D.assert(dst != null);
             D.assert(paint != null);
 
             var scaleX = 1f / image.width;
             var scaleY = 1f / image.height;
             if (src == null) {
-                src = Rect.one;
+                src = uiRectHelper.one;
             }
             else {
-                src = src.scale(scaleX, scaleY);
+                src = uiRectHelper.scale(src.Value, scaleX, scaleY);
             }
 
-            center = center.scale(scaleX, scaleY);
+            center = uiRectHelper.scale(center, scaleX, scaleY);
 
             var layer = this._currentLayer;
             var state = layer.currentState;
 
-            var mesh = ImageMeshGenerator.imageNineMesh(state.matrix, src, center, image.width, image.height, dst);
+            var mesh = ImageMeshGenerator.imageNineMesh(state.matrix, src.Value, center, image.width, image.height, dst);
             if (!this._applyClip(mesh.bounds)) {
                 mesh.dispose();
                 return;
@@ -653,7 +650,7 @@ namespace Unity.UIWidgets.ui {
                         break;
                     case DrawSaveLayer cmd: {
                         saveCount++;
-                        this._saveLayer(cmd.rect, cmd.paint);
+                        this._saveLayer(uiRectHelper.fromRect(cmd.rect), cmd.paint);
                         break;
                     }
                     case DrawRestore _: {
@@ -715,11 +712,11 @@ namespace Unity.UIWidgets.ui {
                         break;
                     }
                     case DrawImageRect cmd: {
-                        this._drawImageRect(cmd.image, cmd.src, cmd.dst, cmd.paint);
+                        this._drawImageRect(cmd.image, uiRectHelper.fromRect(cmd.src), uiRectHelper.fromRect(cmd.dst), cmd.paint);
                         break;
                     }
                     case DrawImageNine cmd: {
-                        this._drawImageNine(cmd.image, cmd.src, cmd.center, cmd.dst, cmd.paint);
+                        this._drawImageNine(cmd.image, uiRectHelper.fromRect(cmd.src), uiRectHelper.fromRect(cmd.center), uiRectHelper.fromRect(cmd.dst), cmd.paint);
                         break;
                     }
                     case DrawPicture cmd: {
@@ -756,7 +753,7 @@ namespace Unity.UIWidgets.ui {
             matrix.preTranslate(offset.dx, offset.dy);
 
             var mesh = TextBlobMesh.create(textBlob, scale, matrix);
-            var textBlobBounds = matrix.mapRect(textBlob.boundsInText);
+            var textBlobBounds = matrix.mapRect(uiRectHelper.fromRect(textBlob.boundsInText));
 
             // request font texture so text mesh could be generated correctly
             var style = textBlob.style;
@@ -904,7 +901,7 @@ namespace Unity.UIWidgets.ui {
                             cmdBuf.DisableScissorRect();
                         }
                         else {
-                            cmdBuf.EnableScissorRect(cmd.deviceScissor.toRect());
+                            cmdBuf.EnableScissorRect(uiRectHelper.toRect(cmd.deviceScissor.Value));
                         }
 
                         break;

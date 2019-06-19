@@ -8,17 +8,17 @@ namespace Unity.UIWidgets.ui {
         public uiList<int> triangles;
         public uiList<Vector2> uv;
         public uiMatrix3 matrix;
-        public Rect rawBounds;
+        public uiRect rawBounds;
 
-        Rect _bounds;
+        uiRect? _bounds;
 
-        public Rect bounds {
+        public uiRect bounds {
             get {
                 if (this._bounds == null) {
                     this._bounds = this.matrix != null ? this.matrix.mapRect(this.rawBounds) : this.rawBounds;
                 }
 
-                return this._bounds;
+                return this._bounds.Value;
             }
         }
 
@@ -43,11 +43,10 @@ namespace Unity.UIWidgets.ui {
             this.triangles = null;
             this.uv = null;
             this.matrix = null;
-            this.rawBounds = null;
             this._bounds = null;
         }
 
-        public static uiMeshMesh create(Rect rect) {
+        public static uiMeshMesh create(uiRect rect) {
             uiMeshMesh newMesh = ItemPoolManager.alloc<uiMeshMesh>();
 
             newMesh.vertices = ItemPoolManager.alloc<uiList<Vector3>>();
@@ -66,7 +65,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public static uiMeshMesh create(uiMatrix3 matrix, uiList<Vector3> vertices, uiList<int> triangles, uiList<Vector2> uv = null,
-            Rect rawBounds = null) {
+            uiRect? rawBounds = null) {
             D.assert(vertices != null);
             D.assert(vertices.Count >= 0);
             D.assert(triangles != null);
@@ -107,14 +106,14 @@ namespace Unity.UIWidgets.ui {
                         }
                     }
 
-                    rawBounds = Rect.fromLTRB(minX, minY, maxX, maxY);
+                    rawBounds = uiRectHelper.fromLTRB(minX, minY, maxX, maxY);
                 }
                 else {
-                    rawBounds = Rect.zero;
+                    rawBounds = uiRectHelper.zero;
                 }
             }
 
-            newMesh.rawBounds = rawBounds;
+            newMesh.rawBounds = rawBounds.Value;
 
             return newMesh;
         }

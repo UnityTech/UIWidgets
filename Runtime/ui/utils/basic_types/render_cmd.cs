@@ -68,7 +68,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         internal class CmdScissor : RenderCmd {
-            public Rect deviceScissor;
+            public uiRect? deviceScissor;
 
             public CmdScissor() {
             }
@@ -77,7 +77,7 @@ namespace Unity.UIWidgets.ui {
                 this.deviceScissor = null;
             }
 
-            public static CmdScissor create(Rect deviceScissor) {
+            public static CmdScissor create(uiRect? deviceScissor) {
                 CmdScissor newCmd = ItemPoolManager.alloc<CmdScissor>();
                 newCmd.deviceScissor = deviceScissor;
                 return newCmd;
