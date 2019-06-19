@@ -18,5 +18,9 @@ namespace Unity.UIWidgets.ui {
             this._recorder.reset();
             this._flusher.flush(picture);
         }
+
+        public void dispose() {
+            this._flusher.dispose();
+        }
     }
 }

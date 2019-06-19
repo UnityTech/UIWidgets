@@ -449,7 +449,7 @@ namespace Unity.UIWidgets.ui {
                 pass : pass,
                 material : mat,
                 properties : props,
-                layer : renderLayer
+                layerId : renderLayer.rtID
             );
         }
 
@@ -500,7 +500,7 @@ namespace Unity.UIWidgets.ui {
                 pass : pass,
                 material : mat,
                 properties : props,
-                layer : renderLayer
+                layerId : renderLayer.rtID
             );
         }
     }

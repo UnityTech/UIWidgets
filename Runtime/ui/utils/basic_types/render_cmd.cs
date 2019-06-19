@@ -28,7 +28,7 @@ namespace Unity.UIWidgets.ui {
             public TextBlobMesh textMesh;
             public int pass;
             public MaterialPropertyBlock properties;
-            public RenderLayer layer;
+            public int? layerId;
             public Material material;
             public Image image; // just to keep a reference to avoid GC.
             public Mesh meshObj;
@@ -49,7 +49,7 @@ namespace Unity.UIWidgets.ui {
             }
 
             public static CmdDraw create(uiMeshMesh mesh = null, TextBlobMesh textMesh = null, int pass = 0,
-                MaterialPropertyBlock properties = null, RenderLayer layer = null, Material material = null,
+                MaterialPropertyBlock properties = null, int? layerId = null, Material material = null,
                 Image image = null, Mesh meshObj = null,
                 bool meshObjCreated = false) {
                 CmdDraw newCmd = ItemPoolManager.alloc<CmdDraw>();
@@ -57,7 +57,7 @@ namespace Unity.UIWidgets.ui {
                 newCmd.textMesh = textMesh;
                 newCmd.pass = pass;
                 newCmd.properties = properties;
-                newCmd.layer = layer;
+                newCmd.layerId = layerId;
                 newCmd.material = material;
                 newCmd.image = image;
                 newCmd.meshObj = meshObj;

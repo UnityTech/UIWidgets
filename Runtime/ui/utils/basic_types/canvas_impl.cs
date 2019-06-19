@@ -15,6 +15,16 @@ namespace Unity.UIWidgets.ui {
         RenderLayer _currentLayer;
         Rect _lastScissor;
 
+        public void dispose() {
+            if (this._currentLayer != null) {
+                this._clearLayer(this._currentLayer);
+                this._currentLayer.dispose();
+                this._currentLayer = null;
+                this._lastScissor = null;
+                this._layers.Clear();
+            }
+        }
+
         public PictureFlusher(RenderTexture renderTexture, float devicePixelRatio, MeshPool meshPool) {
             D.assert(renderTexture);
             D.assert(devicePixelRatio > 0);
@@ -844,12 +854,12 @@ namespace Unity.UIWidgets.ui {
                     case CmdDraw cmd:
                         this._setRenderTarget(cmdBuf, layer.rtID, ref toClear);
 
-                        if (cmd.layer != null) {
-                            if (cmd.layer.rtID == 0) {
+                        if (cmd.layerId != null) {
+                            if (cmd.layerId == 0) {
                                 cmdBuf.SetGlobalTexture(CmdDraw.texId, this._renderTexture);
                             }
                             else {
-                                cmdBuf.SetGlobalTexture(CmdDraw.texId, cmd.layer.rtID);
+                                cmdBuf.SetGlobalTexture(CmdDraw.texId, cmd.layerId.Value);
                             }
                         }
 
@@ -882,7 +892,7 @@ namespace Unity.UIWidgets.ui {
                         }
 
                         cmdBuf.DrawMesh(cmd.meshObj, CmdDraw.idMat, cmd.material, 0, cmd.pass, cmd.properties);
-                        if (cmd.layer != null) {
+                        if (cmd.layerId != null) {
                             cmdBuf.SetGlobalTexture(CmdDraw.texId, BuiltinRenderTextureType.None);
                         }
 

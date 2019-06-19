@@ -240,6 +240,7 @@ namespace Unity.UIWidgets.flow {
             canvas.concat(transform);
             canvas.drawPicture(picture);
             canvas.flush();
+            canvas.dispose();
 
             return new RasterCacheResult(new Image(renderTexture), picture.paintBounds, devicePixelRatio);
         }
