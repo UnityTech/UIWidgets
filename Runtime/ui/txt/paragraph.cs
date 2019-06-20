@@ -24,7 +24,7 @@ namespace Unity.UIWidgets.ui {
         }
     }
 
-    class CodeUnitRun {
+    struct CodeUnitRun {
         public readonly int lineNumber;
         public readonly TextDirection direction;
         public readonly Range<int> codeUnits;
@@ -82,7 +82,7 @@ namespace Unity.UIWidgets.ui {
         }
     }
 
-    class LineStyleRun {
+    struct LineStyleRun {
         public readonly int start;
         public readonly int end;
         public readonly TextStyle style;
@@ -94,7 +94,7 @@ namespace Unity.UIWidgets.ui {
         }
     }
 
-    class PositionWithAffinity {
+    struct PositionWithAffinity {
         public readonly int position;
         public readonly TextAffinity affinity;
 
@@ -118,7 +118,7 @@ namespace Unity.UIWidgets.ui {
         }
     }
 
-    class Range<T> : IEquatable<Range<T>> {
+    struct Range<T> : IEquatable<Range<T>> {
         public Range(T start, T end) {
             this.start = start;
             this.end = end;
@@ -162,7 +162,7 @@ namespace Unity.UIWidgets.ui {
     }
 
 
-    class GlyphLine {
+    struct GlyphLine {
         public readonly List<GlyphPosition> positions;
         public readonly int totalCountUnits;
 
@@ -460,14 +460,15 @@ namespace Unity.UIWidgets.ui {
 
                 float maxLineSpacing = 0;
                 float maxDescent = 0;
+                int line = lineNumber; // Resolve "accessing modified closure" problem
 
                 var updateLineMetrics = new Action<FontMetrics, TextStyle>((metrics, style) => {
-                    float lineSpacing = ((lineNumber == 0)
+                    float lineSpacing = ((line == 0)
                         ? -metrics.ascent * style.height
                         : (-metrics.ascent + metrics.leading) * (style.height));
                     if (lineSpacing > maxLineSpacing) {
                         maxLineSpacing = lineSpacing;
-                        if (lineNumber == 0) {
+                        if (line == 0) {
                             this._alphabeticBaseline = lineSpacing;
                             this._ideographicBaseline =
                                 (metrics.underlinePosition ?? 0.0f - metrics.ascent) * style.height;

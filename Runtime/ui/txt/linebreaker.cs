@@ -10,6 +10,8 @@ namespace Unity.UIWidgets.ui {
 
         int _fontSize;
 
+        int _spaceAdvance;
+
         const int kTabSpaceCount = 4;
 
         List<int> _stops = new List<int>();
@@ -29,7 +31,13 @@ namespace Unity.UIWidgets.ui {
             }
 
             this._font = font;
-            this._fontSize = size;
+            // Recompute the advance of space (' ') if font size changes
+            if (this._fontSize != size) {
+                this._fontSize = size;
+                this._font.RequestCharactersInTextureSafe(" ", this._fontSize);
+                this._font.getGlyphInfo(' ', out var glyphInfo, this._fontSize, UnityEngine.FontStyle.Normal);
+                this._spaceAdvance = glyphInfo.advance;
+            }
         }
 
         public float nextTab(float widthSoFar) {
@@ -41,9 +49,7 @@ namespace Unity.UIWidgets.ui {
 
             if (this._tabWidth == int.MaxValue) {
                 if (this._fontSize > 0) {
-                    this._font.RequestCharactersInTextureSafe(" ", this._fontSize);
-                    this._font.getGlyphInfo(' ', out var glyphInfo, this._fontSize, UnityEngine.FontStyle.Normal);
-                    this._tabWidth = glyphInfo.advance * kTabSpaceCount;
+                    this._tabWidth = this._spaceAdvance * kTabSpaceCount;
                 }
             }
 
@@ -136,10 +142,6 @@ namespace Unity.UIWidgets.ui {
             }
 
             int current = this._wordBreaker.current();
-            int afterWord = start;
-            int lastBreak = start;
-
-            float lastBreakWidth = this._width;
             float postBreak = this._width;
             int postSpaceCount = this._spaceCount;
 
@@ -160,19 +162,14 @@ namespace Unity.UIWidgets.ui {
                     if (!LayoutUtils.isLineEndSpace(c)) {
                         postBreak = this._width;
                         postSpaceCount = this._spaceCount;
-                        afterWord = i + 1;
                     }
                 }
 
                 if (i + 1 == current) {
-                    int wordStart = this._wordBreaker.wordStart();
-                    int wordEnd = this._wordBreaker.wordEnd();
                     if (style != null || current == end || this._charWidths[current] > 0) {
                         this._addWordBreak(current, this._width, postBreak, this._spaceCount, postSpaceCount, 0);
                     }
 
-                    lastBreak = current;
-                    lastBreakWidth = this._width;
                     current = this._wordBreaker.next();
                 }
             }

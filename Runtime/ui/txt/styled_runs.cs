@@ -6,7 +6,7 @@ namespace Unity.UIWidgets.ui {
         readonly List<TextStyle> styles = new List<TextStyle>();
         readonly List<IndexedRun> runs = new List<IndexedRun>();
 
-        public class RunIterator {
+        public struct RunIterator {
             int _charIndex;
             int _runIndex;
             StyledRuns _runs;
@@ -50,7 +50,7 @@ namespace Unity.UIWidgets.ui {
             }
         }
 
-        internal class Run {
+        internal struct Run {
             public readonly TextStyle style;
             public readonly int start;
             public readonly int end;
@@ -63,7 +63,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         internal class IndexedRun {
-            public readonly int styleIndex = 0;
+            public readonly int styleIndex;
             public readonly int start;
             public int end;
 

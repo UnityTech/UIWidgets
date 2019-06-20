@@ -1,10 +1,8 @@
-using System;
 using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
-    
     class Layout {
         int _start;
         int _count;
@@ -14,20 +12,11 @@ namespace Unity.UIWidgets.ui {
         UnityEngine.Rect _bounds;
         TabStops _tabStops;
 
+        static UnityEngine.Rect _innerBounds; // Used to pass bounds from static to non-static doLayout
 
         public static float measureText(float offset, TextBuff buff, int start, int count, TextStyle style,
             List<float> advances, int advanceOffset, TabStops tabStops) {
-            Layout layout = new Layout();
-            layout.setTabStops(tabStops);
-            layout.doLayout(offset, buff, start, count, style);
-            if (advances != null) {
-                var layoutAdv = layout.getAdvances();
-                for (int i = 0; i < count; i++) {
-                    advances[i + advanceOffset] = layoutAdv[i];
-                }
-            }
-
-            return layout.getAdvance();
+            return _doLayout(offset, buff, start, count, style, advances, null, advanceOffset, tabStops);
         }
 
         public void doLayout(float offset, TextBuff buff, int start, int count, TextStyle style) {
@@ -35,14 +24,24 @@ namespace Unity.UIWidgets.ui {
             this._count = count;
             this._advances.reset(count);
             this._positions.reset(count);
-            this._advance = 0;
-            this._bounds = default;
 
+            _innerBounds = default;
+            this._advance = _doLayout(offset, buff, start, count, style, this._advances, this._positions, 0,
+                this._tabStops);
+            this._bounds = _innerBounds;
+
+            this._count = count;
+        }
+
+        static float _doLayout(float offset, TextBuff buff, int start, int count, TextStyle style,
+            List<float> advances, List<float> positions, int advanceOffset, TabStops tabStops) {
+            float advance = 0;
             Font font = FontManager.instance.getOrCreate(style.fontFamily, style.fontWeight, style.fontStyle).font;
 
             char startingChar = buff.text[buff.offset + start];
             if (char.IsHighSurrogate(startingChar) || EmojiUtils.isSingleCharEmoji(startingChar)) {
-                this.layoutEmoji(buff.text.Substring(buff.offset + start, count), style, font, start, count);
+                advance = _layoutEmoji(buff.text.Substring(buff.offset + start, count), style, font, count,
+                    advances, positions, advanceOffset, advance);
             }
             else {
                 font.RequestCharactersInTextureSafe(buff.text, style.UnityFontSize, style.UnityFontStyle);
@@ -54,33 +53,41 @@ namespace Unity.UIWidgets.ui {
                 for (int iter = start; iter < start + count; iter = wordend) {
                     wordend = LayoutUtils.getNextWordBreakForCache(buff, iter);
                     int wordCount = Mathf.Min(start + count, wordend) - iter;
-                    this.layoutWord(offset, iter - start,  buff.subBuff(wordstart, wordend - wordstart),
-                        iter - wordstart, wordCount, style, font);
+                    advance = _layoutWord(offset, iter - start, buff.subBuff(wordstart, wordend - wordstart),
+                        iter - wordstart, wordCount, style, font, advances, positions,
+                        advanceOffset, advance, tabStops);
                     wordstart = wordend;
                 }
             }
-            this._count = count;
+
+            return advance;
         }
 
-        void layoutWord(float offset, int layoutOffset, 
-            TextBuff buff, int start, int wordCount, TextStyle style, Font font) {
+        static float _layoutWord(float offset, int layoutOffset,
+            TextBuff buff, int start, int wordCount, TextStyle style, Font font, List<float> advances,
+            List<float> positions, int advanceOffset, float initAdvance, TabStops tabStops) {
             float wordSpacing =
                 wordCount == 1 && LayoutUtils.isWordSpace(buff.charAt(start)) ? style.wordSpacing : 0;
 
-            float x = this._advance;
+            float x = initAdvance;
             float letterSpace = style.letterSpacing;
             float letterSpaceHalfLeft = letterSpace * 0.5f;
             float letterSpaceHalfRight = letterSpace - letterSpaceHalfLeft;
-            
+
             for (int i = 0; i < wordCount; i++) {
                 var ch = buff.charAt(start + i);
                 if (i == 0) {
                     x += letterSpaceHalfLeft + wordSpacing;
-                    this._advances[i + layoutOffset] += letterSpaceHalfLeft + wordSpacing;
+                    if (advances != null) {
+                        advances[i + layoutOffset + advanceOffset] = letterSpaceHalfLeft + wordSpacing;
+                    }
                 }
                 else {
-                    this._advances[i - 1 + layoutOffset] += letterSpaceHalfRight;
-                    this._advances[i + layoutOffset] += letterSpaceHalfLeft;
+                    if (advances != null) {
+                        advances[i - 1 + layoutOffset + advanceOffset] += letterSpaceHalfRight;
+                        advances[i + layoutOffset + advanceOffset] = letterSpaceHalfLeft;
+                    }
+
                     x += letterSpace;
                 }
 
@@ -90,97 +97,129 @@ namespace Unity.UIWidgets.ui {
                     var minY = -glyphInfo.maxY;
                     var maxY = -glyphInfo.minY;
 
-                    if (this._bounds.width <= 0 || this._bounds.height <= 0) {
-                        this._bounds = UnityEngine.Rect.MinMaxRect(
-                            minX, minY, maxX, maxY);
-                    } else {
-                        if (minX < this._bounds.x) {
-                            this._bounds.x = minX;
+                    if (_innerBounds.width <= 0 || _innerBounds.height <= 0) {
+                        _innerBounds.x = minX;
+                        _innerBounds.y = minY;
+                        _innerBounds.xMax = maxX;
+                        _innerBounds.yMax = maxY;
+                    }
+                    else {
+                        if (minX < _innerBounds.x) {
+                            _innerBounds.x = minX;
                         }
-                        if (minY < this._bounds.y) {
-                            this._bounds.y = minY;
+
+                        if (minY < _innerBounds.y) {
+                            _innerBounds.y = minY;
                         }
-                        if (maxX > this._bounds.xMax) {
-                            this._bounds.xMax = maxX;
+
+                        if (maxX > _innerBounds.xMax) {
+                            _innerBounds.xMax = maxX;
                         }
-                        if (maxY > this._bounds.yMax) {
-                            this._bounds.yMax = maxY;
+
+                        if (maxY > _innerBounds.yMax) {
+                            _innerBounds.yMax = maxY;
                         }
                     }
                 }
 
-                this._positions[i + layoutOffset] = x;
+                if (positions != null) {
+                    positions[i + layoutOffset] = x;
+                }
+
                 float advance = glyphInfo.advance;
                 if (ch == '\t') {
-                    advance = this._tabStops.nextTab((this._advance + offset)) - this._advance;
+                    advance = tabStops.nextTab((initAdvance + offset)) - initAdvance;
                 }
+
                 x += advance;
-                this._advances[i + layoutOffset] += advance;
+                if (advances != null) {
+                    advances[i + layoutOffset + advanceOffset] += advance;
+                }
+
                 if (i + 1 == wordCount) {
-                    this._advances[i + layoutOffset] += letterSpaceHalfRight;
+                    if (advances != null) {
+                        advances[i + layoutOffset + advanceOffset] += letterSpaceHalfRight;
+                    }
+
                     x += letterSpaceHalfRight;
                 }
             }
-            
-            this._advance = x;
+
+            return x;
         }
-        
-        void layoutEmoji(string text, TextStyle style, Font font, int start, int count) {
+
+        static float _layoutEmoji(string text, TextStyle style, Font font, int count, List<float> advances,
+            List<float> positions, int advanceOffset, float initAdvance) {
+            var metrics = FontMetrics.fromFont(font, style.UnityFontSize);
+            float x = initAdvance;
             for (int i = 0; i < count; i++) {
                 char c = text[i];
-                float x = this._advance;
                 if (EmojiUtils.isSingleCharNonEmptyEmoji(c) || char.IsHighSurrogate(c)) {
                     float letterSpace = style.letterSpacing;
                     float letterSpaceHalfLeft = letterSpace * 0.5f;
                     float letterSpaceHalfRight = letterSpace - letterSpaceHalfLeft;
 
                     x += letterSpaceHalfLeft;
-                    this._advances[i] += letterSpaceHalfLeft;
+                    if (advances != null) {
+                        advances[i + advanceOffset] = letterSpaceHalfLeft;
+                    }
 
-                    var metrics = FontMetrics.fromFont(font, style.UnityFontSize);
 
                     var minX = x;
                     var maxX = metrics.descent - metrics.ascent + x;
                     var minY = metrics.ascent;
                     var maxY = metrics.descent;
 
-                    if (this._bounds.width <= 0 || this._bounds.height <= 0) {
-                        this._bounds = UnityEngine.Rect.MinMaxRect(
-                            minX, minY, maxX, maxY);
+                    if (_innerBounds.width <= 0 || _innerBounds.height <= 0) {
+                        _innerBounds.x = minX;
+                        _innerBounds.y = minY;
+                        _innerBounds.xMax = maxX;
+                        _innerBounds.yMax = maxY;
                     }
                     else {
-                        if (minX < this._bounds.x) {
-                            this._bounds.x = minX;
+                        if (minX < _innerBounds.x) {
+                            _innerBounds.x = minX;
                         }
 
-                        if (minY < this._bounds.y) {
-                            this._bounds.y = minY;
+                        if (minY < _innerBounds.y) {
+                            _innerBounds.y = minY;
                         }
 
-                        if (maxX > this._bounds.xMax) {
-                            this._bounds.xMax = maxX;
+                        if (maxX > _innerBounds.xMax) {
+                            _innerBounds.xMax = maxX;
                         }
 
-                        if (maxY > this._bounds.yMax) {
-                            this._bounds.yMax = maxY;
+                        if (maxY > _innerBounds.yMax) {
+                            _innerBounds.yMax = maxY;
                         }
                     }
 
-                    this._positions[i] = x;
+                    if (positions != null) {
+                        positions[i] = x;
+                    }
+
                     float advance = style.fontSize;
                     x += advance;
 
-                    this._advances[i] += advance;
-                    this._advances[i] += letterSpaceHalfRight;
+                    if (advances != null) {
+                        advances[i + advanceOffset] += advance;
+                        advances[i + advanceOffset] += letterSpaceHalfRight;
+                    }
+
                     x += letterSpaceHalfRight;
                 }
                 else {
-                    this._advances[i] = 0;
-                    this._positions[i] = x;
-                }
+                    if (advances != null) {
+                        advances[i + advanceOffset] = 0;
+                    }
 
-                this._advance = x;
+                    if (positions != null) {
+                        positions[i] = x;
+                    }
+                }
             }
+
+            return x;
         }
 
         public void setTabStops(TabStops tabStops) {
