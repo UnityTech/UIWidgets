@@ -230,8 +230,8 @@ namespace Unity.UIWidgets.ui {
             );
         }
 
-        static uiMatrix3 _getShaderMatBase(PictureFlusher.State state, uiMatrix3 meshMatrix) {
-            if (state.matrix == meshMatrix) {
+        static uiMatrix3 _getShaderMatBase(PictureFlusher.State state, uiMatrix3? meshMatrix) {
+            if (uiMatrix3.equals(state.matrix, meshMatrix)) {
                 return uiMatrix3.I();
             }
 
@@ -239,11 +239,11 @@ namespace Unity.UIWidgets.ui {
                 return state.invMatrix;
             }
 
-            return uiMatrix3.concat(state.invMatrix, meshMatrix);
+            return uiMatrix3.concat(state.invMatrix, meshMatrix.Value);
         }
 
         static void _getShaderPassAndProps(
-            PictureFlusher.RenderLayer layer, Paint paint, uiMatrix3 meshMatrix, float alpha,
+            PictureFlusher.RenderLayer layer, Paint paint, uiMatrix3? meshMatrix, float alpha,
             out int pass, out MaterialPropertyBlock props) {
             Vector4 viewport = layer.viewport;
 

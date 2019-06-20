@@ -13,7 +13,7 @@ namespace Unity.UIWidgets.ui {
         uint _genId;
         bool _isIntersectionOfRects;
         uiRect _bound;
-        uiMatrix3 _invMat;
+        uiMatrix3? _invMat;
 
         public ClipElement() {
             
@@ -146,13 +146,12 @@ namespace Unity.UIWidgets.ui {
             }
 
             if (this.convex) {
-                if (this.mesh.matrix != null && !this.mesh.matrix.isIdentity()) {
+                if (this.mesh.matrix != null && !this.mesh.matrix.Value.isIdentity()) {
                     if (this._invMat == null) {
-                        this._invMat = uiMatrix3.I();
-                        this.mesh.matrix.invert(this._invMat); // ignore if not invertible for now.
+                        this._invMat = this.mesh.matrix.Value.invert();
                     }
                 
-                    rect = this._invMat.mapRect(rect);
+                    rect = this._invMat.Value.mapRect(rect);
                 }
 
                 return this._convexContains(rect);

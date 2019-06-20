@@ -111,7 +111,7 @@ namespace Unity.UIWidgets.ui {
                     var filter = (_BlurImageFilter) paint.backdrop;
                     if (!(filter.sigmaX == 0 && filter.sigmaY == 0)) {
                         var points = new[] {bounds.topLeft, bounds.bottomLeft, bounds.bottomRight, bounds.topRight};
-                        state.matrix.mapPoints(points);
+                        state.matrix.Value.mapPoints(points);
 
                         var parentBounds = parentLayer.layerBounds;
                         for (int i = 0; i < 4; i++) {
@@ -139,7 +139,7 @@ namespace Unity.UIWidgets.ui {
                         layer.filterMode = filter.filterMode;
 
                         var points = new[] {bounds.topLeft, bounds.bottomLeft, bounds.bottomRight, bounds.topRight};
-                        state.matrix.mapPoints(points);
+                        state.matrix.Value.mapPoints(points);
 
                         var parentBounds = parentLayer.layerBounds;
                         for (int i = 0; i < 4; i++) {
@@ -193,14 +193,14 @@ namespace Unity.UIWidgets.ui {
         void _translate(float dx, float dy) {
             var state = this._currentLayer.currentState;
             var matrix = uiMatrix3.makeTrans(dx, dy);
-            matrix.postConcat(state.matrix);
+            matrix.postConcat(state.matrix.Value);
             state.matrix = matrix;
         }
 
         void _scale(float sx, float? sy = null) {
             var state = this._currentLayer.currentState;
             var matrix = uiMatrix3.makeScale(sx, (sy ?? sx));
-            matrix.postConcat(state.matrix);
+            matrix.postConcat(state.matrix.Value);
             state.matrix = matrix;
         }
 
@@ -208,12 +208,12 @@ namespace Unity.UIWidgets.ui {
             var state = this._currentLayer.currentState;
             if (offset == null) {
                 var matrix = uiMatrix3.makeRotate(radians);
-                matrix.postConcat(state.matrix);
+                matrix.postConcat(state.matrix.Value);
                 state.matrix = matrix;
             }
             else {
                 var matrix = uiMatrix3.makeRotate(radians, offset.dx, offset.dy);
-                matrix.postConcat(state.matrix);
+                matrix.postConcat(state.matrix.Value);
                 state.matrix = matrix;
             }
         }
@@ -221,14 +221,14 @@ namespace Unity.UIWidgets.ui {
         void _skew(float sx, float sy) {
             var state = this._currentLayer.currentState;
             var matrix = uiMatrix3.makeSkew(sx, sy);
-            matrix.postConcat(state.matrix);
+            matrix.postConcat(state.matrix.Value);
             state.matrix = matrix;
         }
 
         void _concat(uiMatrix3 matrix) {
             var state = this._currentLayer.currentState;
             matrix = new uiMatrix3(matrix);
-            matrix.postConcat(state.matrix);
+            matrix.postConcat(state.matrix.Value);
             state.matrix = matrix;
         }
 
@@ -257,7 +257,7 @@ namespace Unity.UIWidgets.ui {
         void _clipPath(uiPath path) {
             var layer = this._currentLayer;
             var state = layer.currentState;
-            layer.clipStack.clipPath(path, state.matrix, state.scale * this._devicePixelRatio);
+            layer.clipStack.clipPath(path, state.matrix.Value, state.scale * this._devicePixelRatio);
             path.dispose();
         }
 
@@ -749,7 +749,7 @@ namespace Unity.UIWidgets.ui {
             var state = this._currentLayer.currentState;
             var scale = state.scale * this._devicePixelRatio;
 
-            var matrix = new uiMatrix3(state.matrix);
+            var matrix = new uiMatrix3(state.matrix.Value);
             matrix.preTranslate(offset.dx, offset.dy);
 
             var mesh = TextBlobMesh.create(textBlob, scale, matrix);
@@ -885,7 +885,19 @@ namespace Unity.UIWidgets.ui {
                             cmd.properties.SetFloatArray(CmdDraw.matId, CmdDraw.idMat3.fMat);
                         }
                         else {
-                            cmd.properties.SetFloatArray(CmdDraw.matId, mesh.matrix.fMat);
+                            var mat = mesh.matrix.Value;
+                            var array = new[] {
+                                mat.kMScaleX,        //0
+                                mat.kMSkewX,        //1
+                                mat.kMTransX,        //2
+                                mat.kMSkewY,         //3
+                                mat.kMScaleY,        //4
+                                mat.kMTransY,        //5
+                                mat.kMPersp0,        //6
+                                mat.kMPersp1,        //7
+                                mat.kMPersp2        //8
+                                };
+                            cmd.properties.SetFloatArray(CmdDraw.matId, array);
                         }
 
                         cmdBuf.DrawMesh(cmd.meshObj, CmdDraw.idMat, cmd.material, 0, cmd.pass, cmd.properties);

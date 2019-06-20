@@ -86,11 +86,11 @@ namespace Unity.UIWidgets.ui {
             
             static readonly uiMatrix3 _id = uiMatrix3.I();
             
-            uiMatrix3 _matrix;
+            uiMatrix3? _matrix;
             float? _scale;
-            uiMatrix3 _invMatrix;
+            uiMatrix3? _invMatrix;
 
-            public static State create(uiMatrix3 matrix = null, float? scale = null, uiMatrix3 invMatrix = null) {
+            public static State create(uiMatrix3? matrix = null, float? scale = null, uiMatrix3? invMatrix = null) {
                 State newState = ItemPoolManager.alloc<State>();
                 newState._matrix = matrix ?? _id;
                 newState._scale = scale;
@@ -105,7 +105,7 @@ namespace Unity.UIWidgets.ui {
                 this._invMatrix = null;
             }
 
-            public uiMatrix3 matrix {
+            public uiMatrix3? matrix {
                 get { return this._matrix; }
                 set {
                     this._matrix = value ?? _id;
@@ -117,7 +117,7 @@ namespace Unity.UIWidgets.ui {
             public float scale {
                 get {
                     if (this._scale == null) {
-                        this._scale = uiXformUtils.getScale(this._matrix);
+                        this._scale = uiXformUtils.getScale(this._matrix.Value);
                     }
                     return this._scale.Value;
                 }
@@ -126,10 +126,9 @@ namespace Unity.UIWidgets.ui {
             public uiMatrix3 invMatrix {
                 get {
                     if (this._invMatrix == null) {
-                        this._invMatrix = uiMatrix3.I();
-                        this._matrix.invert(this._invMatrix);
+                        this._invMatrix = this._matrix.Value.invert();
                     }
-                    return this._invMatrix;
+                    return this._invMatrix.Value;
                 }
             }
 

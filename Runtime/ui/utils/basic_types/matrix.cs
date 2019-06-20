@@ -3,6 +3,7 @@ using Unity.UIWidgets.foundation;
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
+    /*
     public class uiMatrix3 : IEquatable<uiMatrix3> {
         public static uiMatrix3 makeScale(float sx, float sy) {
             var m = new uiMatrix3();
@@ -1543,5 +1544,5 @@ namespace Unity.UIWidgets.ui {
 
             return 1.0f / (float) det;
         }
-    }
+    }*/
 }

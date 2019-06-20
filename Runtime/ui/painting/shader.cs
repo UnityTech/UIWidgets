@@ -18,7 +18,7 @@ namespace Unity.UIWidgets.ui {
         public static Gradient linear(
             Offset start, Offset end, List<Color> colors,
             List<float> colorStops = null, TileMode tileMode = TileMode.clamp,
-            uiMatrix3 matrix = null) {
+            uiMatrix3? matrix = null) {
             D.assert(PaintingUtils._offsetIsValid(start));
             D.assert(PaintingUtils._offsetIsValid(end));
             D.assert(colors != null && colors.Count >= 2);
@@ -31,7 +31,7 @@ namespace Unity.UIWidgets.ui {
         public static Gradient radial(
             Offset center, float radius, List<Color> colors,
             List<float> colorStops = null, TileMode tileMode = TileMode.clamp,
-            uiMatrix3 matrix = null) {
+            uiMatrix3? matrix = null) {
             D.assert(PaintingUtils._offsetIsValid(center));
             D.assert(colors != null && colors.Count >= 2);
 
@@ -44,7 +44,7 @@ namespace Unity.UIWidgets.ui {
             Offset center, List<Color> colors,
             List<float> colorStops = null, TileMode tileMode = TileMode.clamp,
             float startAngle = 0.0f, float endAngle = Mathf.PI * 2,
-            uiMatrix3 matrix = null) {
+            uiMatrix3? matrix = null) {
             D.assert(PaintingUtils._offsetIsValid(center));
             D.assert(colors != null && colors.Count >= 2);
             D.assert(startAngle < endAngle);
@@ -430,7 +430,7 @@ namespace Unity.UIWidgets.ui {
         public _LinearGradient(
             Offset start, Offset end, List<Color> colors,
             List<float> colorStops, TileMode tileMode,
-            uiMatrix3 matrix = null) {
+            uiMatrix3? matrix = null) {
             this.start = start;
             this.end = end;
             this.colors = colors;
@@ -446,7 +446,7 @@ namespace Unity.UIWidgets.ui {
         public readonly List<Color> colors;
         public readonly List<float> colorStops;
         public readonly TileMode tileMode;
-        public readonly uiMatrix3 matrix;
+        public readonly uiMatrix3? matrix;
         public readonly uiMatrix3 ptsToUnit;
         public readonly Image gradientTex;
 
@@ -460,7 +460,7 @@ namespace Unity.UIWidgets.ui {
 
         public uiMatrix3 getGradientMat(uiMatrix3 mat) {
             if (this.matrix != null) {
-                mat.postConcat(this.matrix);
+                mat.postConcat(this.matrix.Value);
             }
 
             mat.postConcat(this.ptsToUnit);
@@ -485,7 +485,7 @@ namespace Unity.UIWidgets.ui {
         public _RadialGradient(
             Offset center, float radius, List<Color> colors,
             List<float> colorStops = null, TileMode tileMode = TileMode.clamp,
-            uiMatrix3 matrix = null
+            uiMatrix3? matrix = null
         ) {
             this.center = center;
             this.radius = radius;
@@ -502,7 +502,7 @@ namespace Unity.UIWidgets.ui {
         public readonly List<Color> colors;
         public readonly List<float> colorStops;
         public readonly TileMode tileMode;
-        public readonly uiMatrix3 matrix;
+        public readonly uiMatrix3? matrix;
         public readonly uiMatrix3 ptsToUnit;
         public readonly Image gradientTex;
 
@@ -516,7 +516,7 @@ namespace Unity.UIWidgets.ui {
 
         public uiMatrix3 getGradientMat(uiMatrix3 mat) {
             if (this.matrix != null) {
-                mat.postConcat(this.matrix);
+                mat.postConcat(this.matrix.Value);
             }
 
             mat.postConcat(this.ptsToUnit);
@@ -538,7 +538,7 @@ namespace Unity.UIWidgets.ui {
             Offset center, List<Color> colors,
             List<float> colorStops = null, TileMode tileMode = TileMode.clamp,
             float startAngle = 0.0f, float endAngle = Mathf.PI * 2,
-            uiMatrix3 matrix = null
+            uiMatrix3? matrix = null
         ) {
             this.center = center;
             this.colors = colors;
@@ -566,7 +566,7 @@ namespace Unity.UIWidgets.ui {
         public readonly TileMode tileMode;
         public readonly float startAngle;
         public readonly float endAngle;
-        public readonly uiMatrix3 matrix;
+        public readonly uiMatrix3? matrix;
         public readonly uiMatrix3 ptsToUnit;
         public readonly Image gradientTex;
         public readonly float bias;
@@ -582,7 +582,7 @@ namespace Unity.UIWidgets.ui {
 
         public uiMatrix3 getGradientMat(uiMatrix3 mat) {
             if (this.matrix != null) {
-                mat.postConcat(this.matrix);
+                mat.postConcat(this.matrix.Value);
             }
 
             mat.postConcat(this.ptsToUnit);
@@ -592,7 +592,7 @@ namespace Unity.UIWidgets.ui {
 
     public class ImageShader : PaintShader {
         public ImageShader(Image image,
-            TileMode tileMode = TileMode.clamp, uiMatrix3 matrix = null) {
+            TileMode tileMode = TileMode.clamp, uiMatrix3? matrix = null) {
             this.image = image;
             this.tileMode = tileMode;
             this.matrix = matrix;
@@ -600,11 +600,11 @@ namespace Unity.UIWidgets.ui {
 
         public readonly Image image;
         public readonly TileMode tileMode;
-        public readonly uiMatrix3 matrix;
+        public readonly uiMatrix3? matrix;
 
         public uiMatrix3 getShaderMat(uiMatrix3 mat) {
             if (this.matrix != null) {
-                mat.postConcat(this.matrix);
+                mat.postConcat(this.matrix.Value);
             }
 
             mat.postScale(1f / this.image.width, 1f / this.image.height);
