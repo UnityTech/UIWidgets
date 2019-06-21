@@ -33,12 +33,43 @@ namespace Unity.UIWidgets.ui {
             this._count = count;
         }
 
+        public static void computeCharWidths(TextBuff buff, int start, int count, TextStyle style, List<float> advances, int advanceOffset) {
+            char startingChar = buff.charAt(start);
+            if (char.IsHighSurrogate(startingChar) || EmojiUtils.isSingleCharEmoji(startingChar)) {
+                float advance = style.fontSize + style.letterSpacing;
+                for (int i = 0; i < count; i++) {
+                    char ch = buff.charAt(start + i);
+                    if (char.IsHighSurrogate(ch) || EmojiUtils.isSingleCharNonEmptyEmoji(ch)) {
+                        advances[i + advanceOffset] = advance;
+                    }
+                    else {
+                        advances[i + advanceOffset] = 0;
+                    }
+                }
+            }
+            else {
+                Font font = FontManager.instance.getOrCreate(style.fontFamily, style.fontWeight, style.fontStyle).font;
+                font.RequestCharactersInTextureSafe(buff.text, style.UnityFontSize, style.UnityFontStyle);
+                for (int i = 0; i < count; i++) {
+                    char ch = buff.charAt(start + i);
+                    if (font.getGlyphInfo(ch, out var glyphInfo, style.UnityFontSize, style.UnityFontStyle)) {
+                        advances[i + advanceOffset] = glyphInfo.advance + style.letterSpacing;
+                    }
+                    else {
+                        advances[i + advanceOffset] = style.letterSpacing;
+                    }
+
+                    if (LayoutUtils.isWordSpace(ch)) advances[i + advanceOffset] += style.wordSpacing;
+                }
+            }
+        }
+
         static float _doLayout(float offset, TextBuff buff, int start, int count, TextStyle style,
             List<float> advances, List<float> positions, int advanceOffset, TabStops tabStops) {
             float advance = 0;
             Font font = FontManager.instance.getOrCreate(style.fontFamily, style.fontWeight, style.fontStyle).font;
 
-            char startingChar = buff.text[buff.offset + start];
+            char startingChar = buff.charAt(start);
             if (char.IsHighSurrogate(startingChar) || EmojiUtils.isSingleCharEmoji(startingChar)) {
                 advance = _layoutEmoji(buff.text.Substring(buff.offset + start, count), style, font, count,
                     advances, positions, advanceOffset, advance);

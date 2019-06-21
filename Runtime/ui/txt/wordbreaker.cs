@@ -89,24 +89,26 @@ namespace Unity.UIWidgets.ui {
             if (this._current == this._text.size) {
                 return -1;
             }
-            
-            WordSeparate.characterType preType = WordSeparate.classifyChar(this._text.charAt(this._current));
-            bool preBoundaryChar = isBoundaryChar(this._text.charAt(this._current));
+
+            char c = this._text.charAt(this._current);
+            WordSeparate.characterType preType = WordSeparate.classifyChar(c);
+            bool preBoundaryChar = isBoundaryChar(c);
             this._current++;
             if (preBoundaryChar) {
                 return this._current;
             }
             
             for (; this._current < this._text.size; ++this._current) {
+                c = this._text.charAt(this._current);
                 // this.nextUntilCodePoint();
                 if (this._current >= this._text.size) {
                     break;
                 }
 
-                if (isBoundaryChar(this._text.charAt(this._current))) {
+                if (isBoundaryChar(c)) {
                     break;
                 }
-                var currentType = WordSeparate.classifyChar(this._text.charAt(this._current));
+                var currentType = WordSeparate.classifyChar(c);
                 if ((currentType == WordSeparate.characterType.WhiteSpace) 
                     != (preType == WordSeparate.characterType.WhiteSpace)) {
                     break;

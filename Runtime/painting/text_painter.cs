@@ -213,9 +213,9 @@ namespace Unity.UIWidgets.painting {
                 var prevCodeUnit = this._text.codeUnitAt(offset);
                 if (prevCodeUnit == null) // out of upper bounds
                 {
-                    var rectNextLine = this._paragraph.getNextLineStartRect();
+                    TextBox? rectNextLine = this._paragraph.getNextLineStartRect();
                     if (rectNextLine != null) {
-                        return new Offset(rectNextLine.start, rectNextLine.top);
+                        return new Offset(((TextBox) rectNextLine).start, ((TextBox) rectNextLine).top);
                     }
                 }
             }

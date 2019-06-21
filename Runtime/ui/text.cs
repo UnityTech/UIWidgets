@@ -562,7 +562,7 @@ namespace Unity.UIWidgets.ui {
         }
     }
 
-    public class TextBox : IEquatable<TextBox> {
+    public struct TextBox : IEquatable<TextBox> {
         public readonly float left;
 
         public readonly float top;

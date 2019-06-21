@@ -1,10 +1,5 @@
 ﻿namespace Unity.UIWidgets.ui {
-    class WordSeparate {
-        enum Direction {
-            Forward,
-            Backward,
-        }
-
+    struct WordSeparate {
         internal enum characterType {
             LetterLike,
             Symbol,

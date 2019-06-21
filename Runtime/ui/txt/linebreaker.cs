@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Unity.UIWidgets.InternalBridge;
+using UnityEditorInternal;
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
@@ -61,7 +62,7 @@ namespace Unity.UIWidgets.ui {
         }
     }
 
-    class Candidate {
+    struct Candidate {
         public int offset;
         public int pre;
         public float preBreak;
@@ -75,6 +76,26 @@ namespace Unity.UIWidgets.ui {
     class LineBreaker {
         const float ScoreInfty = float.MaxValue;
         const float ScoreDesperate = 1e10f;
+
+        public static LineBreaker instance {
+            get {
+                if(_instance == null)
+                    _instance = new LineBreaker();
+                return _instance;
+            }
+        }
+
+        static LineBreaker _instance;
+
+        public static List<int> newLinePositions {
+            get {
+                if (_newLinePositions == null)
+                    _newLinePositions = new List<int>();
+                return _newLinePositions;
+            }
+        }
+
+        static List<int> _newLinePositions;
 
         TextBuff _textBuf;
         List<float> _charWidths = new List<float>();
@@ -133,12 +154,12 @@ namespace Unity.UIWidgets.ui {
             this._lineWidth = lineWidth;
         }
 
-        public float addStyleRun(TextStyle style, int start, int end) {
-            float width = 0.0f;
+        public void addStyleRun(TextStyle style, int start, int end) {
             if (style != null) {
-                width = Layout.measureText(this._width - this._preBreak, this._textBuf,
-                    start, end - start, style,
-                    this._charWidths, start, this._tabStops);
+//                Layout.measureText(this._width - this._preBreak, this._textBuf,
+//                    start, end - start, style,
+//                    this._charWidths, start, this._tabStops);
+                Layout.computeCharWidths(this._textBuf, start, end - start, style, this._charWidths, start);
             }
 
             int current = this._wordBreaker.current();
@@ -148,7 +169,7 @@ namespace Unity.UIWidgets.ui {
             for (int i = start; i < end; i++) {
                 char c = this._textBuf.charAt(i);
                 if (c == '\t') {
-                    this._width = this._preBreak + this._tabStops.nextTab((this._width - this._preBreak));
+                    this._width = this._preBreak + this._tabStops.nextTab(this._width - this._preBreak);
                     if (this.mFirstTabIndex == int.MaxValue) {
                         this.mFirstTabIndex = i;
                     }
@@ -173,8 +194,6 @@ namespace Unity.UIWidgets.ui {
                     current = this._wordBreaker.next();
                 }
             }
-
-            return width;
         }
 
         public void finish() {
