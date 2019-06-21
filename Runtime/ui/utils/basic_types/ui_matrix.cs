@@ -1038,7 +1038,6 @@ namespace Unity.UIWidgets.ui {
                     return mat.kMPersp2;
                 default: {
                     return -1;
-                    break;
                 }
             }
         }

@@ -27,7 +27,7 @@ namespace Unity.UIWidgets.ui {
             public uiMeshMesh mesh;
             public TextBlobMesh textMesh;
             public int pass;
-            public MaterialPropertyBlock properties;
+            public MaterialPropertyBlockWrapper properties;
             public int? layerId;
             public Material material;
             public Image image; // just to keep a reference to avoid GC.
@@ -43,13 +43,14 @@ namespace Unity.UIWidgets.ui {
             public override void clear() {
                 this.mesh?.dispose();
                 this.textMesh?.dispose();
+                this.properties?.dispose();
             }
 
             public CmdDraw() {
             }
 
             public static CmdDraw create(uiMeshMesh mesh = null, TextBlobMesh textMesh = null, int pass = 0,
-                MaterialPropertyBlock properties = null, int? layerId = null, Material material = null,
+                MaterialPropertyBlockWrapper properties = null, int? layerId = null, Material material = null,
                 Image image = null, Mesh meshObj = null,
                 bool meshObjCreated = false) {
                 CmdDraw newCmd = ItemPoolManager.alloc<CmdDraw>();

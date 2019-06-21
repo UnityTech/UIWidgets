@@ -900,7 +900,7 @@ namespace Unity.UIWidgets.ui {
                             cmd.properties.SetFloatArray(CmdDraw.matId, array);
                         }
 
-                        cmdBuf.DrawMesh(cmd.meshObj, CmdDraw.idMat, cmd.material, 0, cmd.pass, cmd.properties);
+                        cmdBuf.DrawMesh(cmd.meshObj, CmdDraw.idMat, cmd.material, 0, cmd.pass, cmd.properties.mpb);
                         if (cmd.layerId != null) {
                             cmdBuf.SetGlobalTexture(CmdDraw.texId, BuiltinRenderTextureType.None);
                         }
