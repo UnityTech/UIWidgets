@@ -1154,7 +1154,8 @@ namespace Unity.UIWidgets.ui {
             }
 
             public static int ScalarAs2sCompliment(float x) {
-                var result = (int) x;
+                //TODO: [ALLOCATOR] find a way to avoid the gc here
+                var result = BitConverter.ToInt32(BitConverter.GetBytes(x), 0);
                 if (result < 0) {
                     result &= 0x7FFFFFFF;
                     result = -result;
