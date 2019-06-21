@@ -26,7 +26,7 @@ namespace Unity.UIWidgets.ui {
         innerBevel = 0x08,
     }
 
-    class uiPathPoint : PoolItem {
+    struct uiPathPoint {
         public float x, y;
         public float dx, dy;
         public float len;
@@ -36,7 +36,7 @@ namespace Unity.UIWidgets.ui {
         public static uiPathPoint create(float x = 0, float y = 0, float dx = 0, float dy = 0, float len = 0,
             float dmx = 0, float dmy = 0,
             uiPointFlags flags = uiPointFlags.corner) {
-            uiPathPoint newPoint = ItemPoolManager.alloc<uiPathPoint>();
+            uiPathPoint newPoint = new uiPathPoint();
             newPoint.x = x;
             newPoint.y = y;
             newPoint.dx = dx;
@@ -47,12 +47,9 @@ namespace Unity.UIWidgets.ui {
             newPoint.flags = flags;
             return newPoint;
         }
-
-        public uiPathPoint() {
-        }
     }
 
-    class uiPathPath : PoolItem {
+    struct uiPathPath {
         public int first;
         public int count;
         public bool closed;
@@ -66,7 +63,7 @@ namespace Unity.UIWidgets.ui {
         public static uiPathPath create(int first = 0, int count = 0, bool closed = false, int ifill = 0, int nfill = 0,
             int istroke = 0,
             int nstroke = 0, uiPathWinding winding = uiPathWinding.counterClockwise, bool convex = false) {
-            uiPathPath newPath = ItemPoolManager.alloc<uiPathPath>();
+            uiPathPath newPath = new uiPathPath();
             newPath.first = first;
             newPath.count = count;
             newPath.closed = closed;
@@ -78,9 +75,6 @@ namespace Unity.UIWidgets.ui {
             newPath.convex = convex;
             
             return newPath;
-        }
-        
-        public uiPathPath() {
         }
     }
     

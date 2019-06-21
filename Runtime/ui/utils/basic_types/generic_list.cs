@@ -12,10 +12,6 @@ namespace Unity.UIWidgets.ui {
             this.list = this.list ?? new List<T>(128);
         }
 
-        public uiList(List<T> inner) {
-            this.list = inner;
-        }
-
         public uiList() {
         }
 

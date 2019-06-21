@@ -18,14 +18,6 @@ namespace Unity.UIWidgets.ui {
         }
 
         public override void clear() {
-            foreach (var path in this._paths) {
-                path.dispose();
-            }
-
-            foreach (var point in this._points) {
-                point.dispose();
-            }
-            
             this._paths.Clear();
             this._points.Clear();
         }
@@ -55,13 +47,14 @@ namespace Unity.UIWidgets.ui {
                 var pt = this._points[this._points.Count - 1];
                 if (uiPathUtils.ptEquals(pt.x, pt.y, point.x, point.y, this._distTol)) {
                     pt.flags |= point.flags;
-                    point.dispose();
+                    this._points[this._points.Count - 1] = pt;
                     return;
                 }
             }
 
             this._points.Add(point);
             path.count++;
+            this._paths[this._paths.Count - 1] = path;
         }
 
         public void tessellateBezier(
@@ -110,6 +103,7 @@ namespace Unity.UIWidgets.ui {
 
             var path = this._paths[this._paths.Count - 1];
             path.closed = true;
+            this._paths[this._paths.Count - 1] = path;
         }
 
         public void pathWinding(uiPathWinding winding) {
@@ -119,6 +113,7 @@ namespace Unity.UIWidgets.ui {
 
             var path =  this._paths[this._paths.Count - 1];
             path.winding = winding;
+            this._paths[this._paths.Count - 1] = path;
         }
 
         public void normalize() {
@@ -138,6 +133,7 @@ namespace Unity.UIWidgets.ui {
                 if (uiPathUtils.ptEquals(p0.x, p0.y, p1.x, p1.y, this._distTol)) {
                     path.count--;
                     path.closed = true;
+                    paths[j] = path;
                 }
 
                 if (path.count > 2) {
@@ -164,6 +160,7 @@ namespace Unity.UIWidgets.ui {
                      var p1 =  points[ip1];
                     p0.dx = p1.x - p0.x; // no need to normalize
                     p0.dy = p1.y - p0.y;
+                    points[ip0] = p0;
                     ip0 = ip1++;
                 }
 
@@ -182,6 +179,8 @@ namespace Unity.UIWidgets.ui {
 
                     ip0 = ip1++;
                 }
+
+                paths[j] = path;
             }
 
 
@@ -210,6 +209,7 @@ namespace Unity.UIWidgets.ui {
                 }
 
                 path.nfill = _vertices.Count - path.ifill;
+                paths[i] = path;
             }
 
             return _vertices;
@@ -301,6 +301,7 @@ namespace Unity.UIWidgets.ui {
                     p0.dx = p1.x - p0.x;
                     p0.dy = p1.y - p0.y;
                     p0.len = uiPathUtils.normalize(ref p0.dx, ref p0.dy);
+                    points[ip0] = p0;
                     ip0 = ip1++;
                 }
 
@@ -350,6 +351,9 @@ namespace Unity.UIWidgets.ui {
                             p1.flags |= uiPointFlags.bevel;
                         }
                     }
+                    
+                    points[ip0] = p0;
+                    points[ip1] = p1; 
 
                     ip0 = ip1++;
                 }
@@ -458,6 +462,7 @@ namespace Unity.UIWidgets.ui {
                 }
 
                 path.nstroke = _vertices.Count - path.istroke;
+                paths[i] = path;
             }
 
             return _vertices;

@@ -1155,7 +1155,7 @@ namespace Unity.UIWidgets.ui {
             }
 
             public static int ScalarAs2sCompliment(float x) {
-                var result = BitConverter.ToInt32(BitConverter.GetBytes(x), 0);
+                var result = (int) x;
                 if (result < 0) {
                     result &= 0x7FFFFFFF;
                     result = -result;
