@@ -13,9 +13,9 @@ namespace Unity.UIWidgets.ui {
             public bool noMSAA = false;
             public uiRect layerBounds;
             public Paint layerPaint;
-            public readonly List<RenderCmd> draws = new List<RenderCmd>();
-            public readonly List<RenderLayer> layers = new List<RenderLayer>();
-            public readonly List<State> states = new List<State>();
+            public readonly List<RenderCmd> draws = new List<RenderCmd>(128);
+            public readonly List<RenderLayer> layers = new List<RenderLayer>(16);
+            public readonly List<State> states = new List<State>(16);
             public State currentState;
             public ClipStack clipStack;
             public uint lastClipGenId;

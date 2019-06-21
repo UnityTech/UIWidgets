@@ -174,7 +174,7 @@ namespace Unity.UIWidgets.ui {
 
         public const uint wideOpenGenID = 2;
 
-        public readonly List<ClipElement> stack = new List<ClipElement>();
+        public readonly List<ClipElement> stack = new List<ClipElement>(32);
         
         ClipElement _lastElement;
         uiRect _bound;

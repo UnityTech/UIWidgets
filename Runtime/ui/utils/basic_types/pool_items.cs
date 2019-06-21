@@ -26,7 +26,7 @@ namespace Unity.UIWidgets.ui {
         static readonly Dictionary<Type, List<PoolItem>> poolDict = new Dictionary<Type, List<PoolItem>>();
         static readonly Dictionary<Type, ItemDebugInfo> debugInfo = new Dictionary<Type, ItemDebugInfo>();
 
-        const bool _debugFlag = true;
+        const bool _debugFlag = false;
 
         static int _allocTick = 0;
 

@@ -205,7 +205,7 @@ namespace Unity.UIWidgets.ui {
         };
 
         public static uiMeshMesh imageMesh(uiMatrix3? matrix,
-            Offset srcTL, Offset srcBL, Offset srcBR, Offset srcTR,
+            uiOffset srcTL, uiOffset srcBL, uiOffset srcBR, uiOffset srcTR,
             uiRect dst) {
             var vertices = ItemPoolManager.alloc<uiList<Vector3>>();
             vertices.SetCapacity(4);

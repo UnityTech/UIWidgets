@@ -680,16 +680,16 @@ namespace Unity.UIWidgets.ui {
     }
 
     public partial struct uiMatrix3 {
-        public void mapPoints(Offset[] dst, Offset[] src) {
+        public void mapPoints(uiOffset[] dst, uiOffset[] src) {
             D.assert(dst != null && src != null && dst.Length == src.Length);
             this._getMapPtsProc()(this, dst, src, src.Length);
         }
 
-        public void mapPoints(Offset[] pts) {
+        public void mapPoints(uiOffset[] pts) {
             this.mapPoints(pts, pts);
         }
         
-        delegate void MapPtsProc(uiMatrix3 mat, Offset[] dst, Offset[] src, int count);
+        delegate void MapPtsProc(uiMatrix3 mat, uiOffset[] dst, uiOffset[] src, int count);
 
         static readonly MapPtsProc[] gMapPtsProcs = {
             Identity_pts, Trans_pts,
@@ -712,7 +712,7 @@ namespace Unity.UIWidgets.ui {
             return GetMapPtsProc(this._getType());
         }
 
-        static void Identity_pts(uiMatrix3 m, Offset[] dst, Offset[] src, int count) {
+        static void Identity_pts(uiMatrix3 m, uiOffset[] dst, uiOffset[] src, int count) {
             D.assert(m._getType() == 0);
 
             if (dst != src && count > 0) {
@@ -720,18 +720,18 @@ namespace Unity.UIWidgets.ui {
             }
         }
 
-        static void Trans_pts(uiMatrix3 m, Offset[] dst, Offset[] src, int count) {
+        static void Trans_pts(uiMatrix3 m, uiOffset[] dst, uiOffset[] src, int count) {
             D.assert(m._getType() <= TypeMask.kTranslate_Mask);
             if (count > 0) {
                 var tx = m.getTranslateX();
                 var ty = m.getTranslateY();
                 for (int i = 0; i < count; ++i) {
-                    dst[i] = new Offset(src[i].dx + tx, src[i].dy + ty);
+                    dst[i] = new uiOffset(src[i].dx + tx, src[i].dy + ty);
                 }
             }
         }
 
-        static void Scale_pts(uiMatrix3 m, Offset[] dst, Offset[] src, int count) {
+        static void Scale_pts(uiMatrix3 m, uiOffset[] dst, uiOffset[] src, int count) {
             D.assert(m._getType() <= (TypeMask.kScale_Mask | TypeMask.kTranslate_Mask));
             if (count > 0) {
                 var tx = m.getTranslateX();
@@ -740,12 +740,12 @@ namespace Unity.UIWidgets.ui {
                 var sy = m.getScaleY();
 
                 for (int i = 0; i < count; ++i) {
-                    dst[i] = new Offset(src[i].dx * sx + tx, src[i].dy * sy + ty);
+                    dst[i] = new uiOffset(src[i].dx * sx + tx, src[i].dy * sy + ty);
                 }
             }
         }
 
-        static void Persp_pts(uiMatrix3 m, Offset[] dst, Offset[] src, int count) {
+        static void Persp_pts(uiMatrix3 m, uiOffset[] dst, uiOffset[] src, int count) {
             D.assert(m._hasPerspective());
 
             if (count > 0) {
@@ -762,12 +762,12 @@ namespace Unity.UIWidgets.ui {
                         z = 1 / z;
                     }
 
-                    dst[i] = new Offset(x * z, y * z);
+                    dst[i] = new uiOffset(x * z, y * z);
                 }
             }
         }
 
-        static void Affine_pts(uiMatrix3 m, Offset[] dst, Offset[] src, int count) {
+        static void Affine_pts(uiMatrix3 m, uiOffset[] dst, uiOffset[] src, int count) {
             D.assert(m._getType() != TypeMask.kPerspective_Mask);
             if (count > 0) {
                 var tx = m.getTranslateX();
@@ -778,7 +778,7 @@ namespace Unity.UIWidgets.ui {
                 var ky = m.getSkewY();
 
                 for (int i = 0; i < count; ++i) {
-                    dst[i] = new Offset(
+                    dst[i] = new uiOffset(
                         src[i].dx * sx + src[i].dy * kx + tx,
                         src[i].dx * ky + src[i].dy * sy + ty);
                 }
@@ -910,7 +910,7 @@ namespace Unity.UIWidgets.ui {
             return m;
         }
 
-        public static uiMatrix3 makeTrans(Offset offset) {
+        public static uiMatrix3 makeTrans(uiOffset offset) {
             var m = new uiMatrix3();
             m.setTranslate(offset.dx, offset.dy);
             return m;
@@ -1153,14 +1153,26 @@ namespace Unity.UIWidgets.ui {
                 return prod == 0; // if prod is NaN, this check will return false
             }
 
+            static byte[] _scalar_as_2s_compliment_vars = new byte[4];
+            
+
+            static unsafe int GetBytesToInt32(float value) {
+                var intVal = *(int*) &value;
+                fixed (byte* b = _scalar_as_2s_compliment_vars) {
+                    *((int*) b) = intVal;
+                }
+                
+                fixed (byte* pbyte = &_scalar_as_2s_compliment_vars[0]) {
+                    return *((int *) pbyte);
+                }
+            }
+            
             public static int ScalarAs2sCompliment(float x) {
-                //TODO: [ALLOCATOR] find a way to avoid the gc here
-                var result = BitConverter.ToInt32(BitConverter.GetBytes(x), 0);
+                var result = GetBytesToInt32(x);
                 if (result < 0) {
                     result &= 0x7FFFFFFF;
                     result = -result;
                 }
-
                 return result;
             }
 
