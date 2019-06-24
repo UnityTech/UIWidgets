@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.InternalBridge;
 using UnityEditorInternal;
 using UnityEngine;
@@ -216,24 +217,9 @@ namespace Unity.UIWidgets.ui {
         void _addWordBreak(int offset, float preBreak, float postBreak, int preSpaceCount, int postSpaceCount,
             float penalty) {
             
-            float width = this._candidates[this._candidates.Count - 1].preBreak;
+            float width = this._candidates.last().preBreak;
             if (postBreak - width > this._lineWidth) {
-                int i = this._candidates[this._candidates.Count - 1].offset;
-                width += this._charWidths[i++];
-                for (; i < offset; i++) {
-                    float w = this._charWidths[i];
-                    if (w > 0) {
-                        this._addCandidate(new Candidate {
-                            offset = i,
-                            preBreak = width,
-                            postBreak = width,
-                            preSpaceCount = postSpaceCount,
-                            postSpaceCount = postSpaceCount,
-                            penalty = ScoreDesperate,
-                        });
-                        width += w;
-                    }
-                }
+                this._addCandidatesInsideWord(width, offset, postSpaceCount);
             }
             
             this._addCandidate(new Candidate {
@@ -244,6 +230,25 @@ namespace Unity.UIWidgets.ui {
                 postSpaceCount = postSpaceCount,
                 penalty = penalty
             });
+        }
+
+        void _addCandidatesInsideWord(float width, int offset, int postSpaceCount) {
+            int i = this._candidates.last().offset;
+            width += this._charWidths[i++];
+            for (; i < offset; i++) {
+                float w = this._charWidths[i];
+                if (w > 0) {
+                    this._addCandidate(new Candidate {
+                        offset = i,
+                        preBreak = width,
+                        postBreak = width,
+                        preSpaceCount = postSpaceCount,
+                        postSpaceCount = postSpaceCount,
+                        penalty = ScoreDesperate,
+                    });
+                    width += w;
+                }
+            }
         }
 
 

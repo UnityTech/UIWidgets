@@ -718,14 +718,7 @@ namespace Unity.UIWidgets.ui {
             this._maxIntrinsicWidth = 0;
 
             var newLinePositions = LineBreaker.newLinePositions;
-            newLinePositions.Clear();
-            for (var i = 0; i < this._text.Length; i++) {
-                if (this._text[i] == '\n') {
-                    newLinePositions.Add(i);
-                }
-            }
-
-            newLinePositions.Add(this._text.Length);
+            this._computeNewLinePositions(newLinePositions);
 
             var lineBreaker = LineBreaker.instance;
             int runIndex = 0;
@@ -734,62 +727,90 @@ namespace Unity.UIWidgets.ui {
                 var blockEnd = newLinePositions[newlineIndex];
                 var blockSize = blockEnd - blockStart;
                 if (blockSize == 0) {
-                    this._lineRanges.Add(new LineRange(blockStart, blockEnd, blockEnd,
-                        blockEnd < this._text.Length ? blockEnd + 1 : blockEnd, true));
-                    this._lineWidths.Add(0);
+                    this._addEmptyLine(blockStart, blockEnd);
                     continue;
                 }
 
-                lineBreaker.setLineWidth(this._width);
-                lineBreaker.resize(blockSize);
-                lineBreaker.setTabStops(this._tabStops);
-                lineBreaker.setText(this._text, blockStart, blockSize);
-
-                while (runIndex < this._runs.size) {
-                    var run = this._runs.getRun(runIndex);
-                    if (run.start >= blockEnd) {
-                        break;
-                    }
-
-                    if (run.end < blockStart) {
-                        runIndex++;
-                        continue;
-                    }
-
-                    int runStart = Mathf.Max(run.start, blockStart) - blockStart;
-                    int runEnd = Mathf.Min(run.end, blockEnd) - blockStart;
-                    lineBreaker.addStyleRun(run.style, runStart, runEnd);
-
-                    if (run.end > blockEnd) {
-                        break;
-                    }
-
-                    runIndex++;
-                }
+                this._resetLineBreaker(lineBreaker, blockStart, blockSize);
+                runIndex = this._addStyleRuns(lineBreaker, runIndex, blockStart, blockEnd);
 
                 int breaksCount = lineBreaker.computeBreaks();
-                List<int> breaks = lineBreaker.getBreaks();
-                List<float> widths = lineBreaker.getWidths();
-                for (int i = 0; i < breaksCount; ++i) {
-                    var breakStart = (i > 0) ? breaks[i - 1] : 0;
-                    var lineStart = breakStart + blockStart;
-                    var lineEnd = breaks[i] + blockStart;
-                    bool hardBreak = (i == breaksCount - 1);
-                    var lineEndIncludingNewline =
-                        (hardBreak && lineEnd < this._text.Length) ? lineEnd + 1 : lineEnd;
-                    var lineEndExcludingWhitespace = lineEnd;
-                    while (lineEndExcludingWhitespace > lineStart &&
-                           LayoutUtils.isLineEndSpace(this._text[lineEndExcludingWhitespace - 1])) {
-                        lineEndExcludingWhitespace--;
-                    }
-
-                    this._lineRanges.Add(new LineRange(lineStart, lineEnd,
-                        lineEndExcludingWhitespace, lineEndIncludingNewline, hardBreak));
-                    this._lineWidths.Add(widths[i]);
-                }
+                this._updateBreaks(lineBreaker, breaksCount, blockStart);
 
                 lineBreaker.finish();
             }
+        }
+
+        void _addEmptyLine(int blockStart, int blockEnd) {
+            this._lineRanges.Add(new LineRange(blockStart, blockEnd, blockEnd,
+                blockEnd < this._text.Length ? blockEnd + 1 : blockEnd, true));
+            this._lineWidths.Add(0);
+        }
+
+        void _resetLineBreaker(LineBreaker lineBreaker, int blockStart, int blockSize) {
+            lineBreaker.setLineWidth(this._width);
+            lineBreaker.resize(blockSize);
+            lineBreaker.setTabStops(this._tabStops);
+            lineBreaker.setText(this._text, blockStart, blockSize);
+        }
+
+        int _addStyleRuns(LineBreaker lineBreaker, int runIndex, int blockStart, int blockEnd) {
+            while (runIndex < this._runs.size) {
+                var run = this._runs.getRun(runIndex);
+                if (run.start >= blockEnd) {
+                    break;
+                }
+
+                if (run.end < blockStart) {
+                    runIndex++;
+                    continue;
+                }
+
+                int runStart = Mathf.Max(run.start, blockStart) - blockStart;
+                int runEnd = Mathf.Min(run.end, blockEnd) - blockStart;
+                lineBreaker.addStyleRun(run.style, runStart, runEnd);
+
+                if (run.end > blockEnd) {
+                    break;
+                }
+
+                runIndex++;
+            }
+
+            return runIndex;
+        }
+
+        void _updateBreaks(LineBreaker lineBreaker, int breaksCount, int blockStart) {
+            List<int> breaks = lineBreaker.getBreaks();
+            List<float> widths = lineBreaker.getWidths();
+            for (int i = 0; i < breaksCount; ++i) {
+                var breakStart = (i > 0) ? breaks[i - 1] : 0;
+                var lineStart = breakStart + blockStart;
+                var lineEnd = breaks[i] + blockStart;
+                bool hardBreak = (i == breaksCount - 1);
+                var lineEndIncludingNewline =
+                    (hardBreak && lineEnd < this._text.Length) ? lineEnd + 1 : lineEnd;
+                var lineEndExcludingWhitespace = lineEnd;
+                while (lineEndExcludingWhitespace > lineStart &&
+                       LayoutUtils.isLineEndSpace(this._text[lineEndExcludingWhitespace - 1])) {
+                    lineEndExcludingWhitespace--;
+                }
+
+                this._lineRanges.Add(new LineRange(lineStart, lineEnd,
+                    lineEndExcludingWhitespace, lineEndIncludingNewline, hardBreak));
+                this._lineWidths.Add(widths[i]);
+            }
+        }
+
+        void _computeNewLinePositions(List<int> newLinePositions) {
+            newLinePositions.Clear();
+            for (var i = 0; i < this._text.Length; i++) {
+                if (this._text[i] == '\n') {
+                    newLinePositions.Add(i);
+                }
+            }
+
+            newLinePositions.Add(this._text.Length);
         }
 
         void findWords(int start, int end, List<Range<int>> words) {
