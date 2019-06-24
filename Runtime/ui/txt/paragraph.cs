@@ -360,6 +360,12 @@ namespace Unity.UIWidgets.ui {
                     if (!string.IsNullOrEmpty(ellipsis) && !this._width.isInfinite() && !lineRange.hardBreak
                         && i == lineRuns.Count - 1 &&
                         (lineNumber == lineLimit - 1 || this._paragraphStyle.maxLines == null)) {
+                        
+                        // By now, all characters have been "RequestCharactersInTexture"d by computeLineBreaks
+                        // except the ellipsis, so Layout.doLayout skips calling RequestCharactersInTexture for
+                        // performance, and the ellipsis is handled here
+                        Layout.requireEllipsisInTexture(ellipsis, run.style);
+                        
                         float ellipsisWidth = Layout.measureText(runXOffset, ellipsisTextBuff, 0,
                             ellipsis.Length, run.style, null, 0, this._tabStops);
                         textAdvances.reset(textCount);

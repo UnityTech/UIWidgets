@@ -75,7 +75,10 @@ namespace Unity.UIWidgets.ui {
                     advances, positions, advanceOffset, advance);
             }
             else {
-                font.RequestCharactersInTextureSafe(buff.text, style.UnityFontSize, style.UnityFontStyle);
+                // According to the logic of Paragraph.layout, it is assured that all the characters are requested
+                // in the texture before (in computing line breaks), so skip it here for optimization
+                // The only exception is the ellipsis, which is dealt with somewhere else.
+                // font.RequestCharactersInTextureSafe(buff.text, style.UnityFontSize, style.UnityFontStyle);
 
                 int wordstart = start == buff.size
                     ? start
@@ -251,6 +254,11 @@ namespace Unity.UIWidgets.ui {
             }
 
             return x;
+        }
+
+        public static void requireEllipsisInTexture(string text, TextStyle style) {
+            Font font = FontManager.instance.getOrCreate(style.fontFamily, style.fontWeight, style.fontStyle).font;
+            font.RequestCharactersInTextureSafe(text, style.UnityFontSize, style.UnityFontStyle);
         }
 
         public void setTabStops(TabStops tabStops) {
