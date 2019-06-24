@@ -91,31 +91,37 @@ namespace Unity.UIWidgets.ui {
             }
 
             char c = this._text.charAt(this._current);
-            WordSeparate.characterType preType = WordSeparate.classifyChar(c);
             bool preBoundaryChar = isBoundaryChar(c);
             this._current++;
             if (preBoundaryChar) {
                 return this._current;
             }
             
+            this._findBoundaryCharOrTypeChange();
+            
+            return this._current;
+        }
+
+        void _findBoundaryCharOrTypeChange() {
+            char c = this._text.charAt(this._current);
+            bool preType = char.IsWhiteSpace(c);
             for (; this._current < this._text.size; ++this._current) {
-                c = this._text.charAt(this._current);
                 // this.nextUntilCodePoint();
                 if (this._current >= this._text.size) {
                     break;
                 }
 
+                c = this._text.charAt(this._current);
                 if (isBoundaryChar(c)) {
                     break;
                 }
-                var currentType = WordSeparate.classifyChar(c);
-                if ((currentType == WordSeparate.characterType.WhiteSpace) 
-                    != (preType == WordSeparate.characterType.WhiteSpace)) {
+
+                bool currentType = char.IsWhiteSpace(c);
+                if (currentType != preType) {
                     break;
                 }
                 preType = currentType;
             }
-            return this._current;
         }
         
         void _detectEmailOrUrl() {
@@ -162,19 +168,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public static bool isBoundaryChar(char code) {
-            if (char.IsPunctuation(code)) {
-                return true;
-            }
-            if (code >= 0x4E00 && code <= 0x9FFF) { // cjk https://en.wikipedia.org/wiki/CJK_Unified_Ideographs
-                return true;
-            }
-
-            // https://social.msdn.microsoft.com/Forums/en-US/0d1888de-9745-4dd1-80fd-d3c29d3e381d/checking-for-japanese-characters-in-a-string?forum=vcmfcatl
-            if (code >= 0x3040 && code <= 0x30FF) { // Hiragana or Katakana
-                return true;
-            }
-
-            return false;
+            return char.IsPunctuation(code) || code >= 0x4E00 && code <= 0x9FFF || code >= 0x3040 && code <= 0x30FF;
         }
         
         void nextUntilCodePoint() {
