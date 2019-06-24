@@ -15,8 +15,8 @@ namespace Unity.UIWidgets.ui {
 
         public override void flush() {
             var picture = this._recorder.endRecording();
-            this._recorder.reset();
             this._flusher.flush(picture);
+            this._recorder.reset();
         }
 
         public void dispose() {

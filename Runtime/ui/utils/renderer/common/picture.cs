@@ -50,7 +50,7 @@ namespace Unity.UIWidgets.ui {
             }
 
             var state = this._getState();            
-            return new uiPicture(new List<uiDrawCmd>(this._drawCmds), state.paintBounds);
+            return new uiPicture(this._drawCmds, state.paintBounds);
         }
 
         public void addDrawCmd(uiDrawCmd drawCmd) {
