@@ -1,5 +1,6 @@
 #include "UIWidgetsViewController.h"
 #include "UIWidgetsMessageManager.h"
+#include "UIWidgetsDevice.h"
 #include <Foundation/Foundation.h>
 #include <UIKit/UIKit.h>
 
@@ -95,8 +96,7 @@ extern "C"
         viewPadding insets = [[UIWidgetsViewController sharedInstance] viewInsets];
         viewPadding padding = [[UIWidgetsViewController sharedInstance] padding];
 
-        CGFloat scale = [UIScreen mainScreen].scale;
-        BOOL needDownsample = scale == 3;
+        BOOL needDownsample = [UIWidgetsDevice NeedScreenDownSample];
 
         metrics.insets_bottom = needDownsample ? insets.bottom * 0.8696 : insets.bottom;
         metrics.insets_top = needDownsample ? insets.top * 0.8696 : insets.top;
