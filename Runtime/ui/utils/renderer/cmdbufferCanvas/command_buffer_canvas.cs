@@ -1,11 +1,11 @@
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
-    public class CommandBufferCanvas : RecorderCanvas {
+    public class CommandBufferCanvas : uiRecorderCanvas {
         readonly PictureFlusher _flusher;
 
         public CommandBufferCanvas(RenderTexture renderTexture, float devicePixelRatio, MeshPool meshPool)
-            : base(new PictureRecorder()) {
+            : base(new uiPictureRecorder()) {
             this._flusher = new PictureFlusher(renderTexture, devicePixelRatio, meshPool);
         }
 

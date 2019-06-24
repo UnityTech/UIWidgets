@@ -664,7 +664,8 @@ namespace Unity.UIWidgets.ui {
 
             layer.draws.Add(CanvasShader.tex(layer, paint, mesh, image));
         }
-
+        
+        
         void _drawPicture(Picture picture, bool needsSave = true) {
             if (needsSave) {
                 this._save();
@@ -771,6 +772,114 @@ namespace Unity.UIWidgets.ui {
                 this._restore();
             }
         }
+        
+
+        void _drawUIPicture(uiPicture picture, bool needsSave = true) {
+            if (needsSave) {
+                this._save();
+            }
+
+            int saveCount = 0;
+
+            var drawCmds = picture.drawCmds;
+            foreach (var drawCmd in drawCmds) {
+                switch (drawCmd) {
+                    case uiDrawSave _:
+                        saveCount++;
+                        this._save();
+                        break;
+                    case uiDrawSaveLayer cmd: {
+                        saveCount++;
+                        this._saveLayer(uiRectHelper.fromRect(cmd.rect), cmd.paint);
+                        break;
+                    }
+                    case uiDrawRestore _: {
+                        saveCount--;
+                        if (saveCount < 0) {
+                            throw new Exception("unmatched save/restore in picture");
+                        }
+
+                        this._restore();
+                        break;
+                    }
+                    case uiDrawTranslate cmd: {
+                        this._translate(cmd.dx, cmd.dy);
+                        break;
+                    }
+                    case uiDrawScale cmd: {
+                        this._scale(cmd.sx, cmd.sy);
+                        break;
+                    }
+                    case uiDrawRotate cmd: {
+                        this._rotate(cmd.radians, uiOffset.fromOffset(cmd.offset));
+                        break;
+                    }
+                    case uiDrawSkew cmd: {
+                        this._skew(cmd.sx, cmd.sy);
+                        break;
+                    }
+                    case uiDrawConcat cmd: {
+                        this._concat(uiMatrix3.fromMatrix3(cmd.matrix));
+                        break;
+                    }
+                    case uiDrawResetMatrix _:
+                        this._resetMatrix();
+                        break;
+                    case uiDrawSetMatrix cmd: {
+                        this._setMatrix(uiMatrix3.fromMatrix3(cmd.matrix));
+                        break;
+                    }
+                    case uiDrawClipRect cmd: {
+                        this._clipRect(cmd.rect);
+                        break;
+                    }
+                    case uiDrawClipRRect cmd: {
+                        this._clipRRect(cmd.rrect);
+                        break;
+                    }
+                    case uiDrawClipPath cmd: {
+                        var uipath = uiPath.fromPath(cmd.path);
+                        this._clipPath(uipath);
+                        break;
+                    }
+                    case uiDrawPath cmd: {
+                        var uipath = uiPath.fromPath(cmd.path);
+                        this._drawPath(uipath, cmd.paint);
+                        break;
+                    }
+                    case uiDrawImage cmd: {
+                        this._drawImage(cmd.image, (uiOffset.fromOffset(cmd.offset)).Value, cmd.paint);
+                        break;
+                    }
+                    case uiDrawImageRect cmd: {
+                        this._drawImageRect(cmd.image, uiRectHelper.fromRect(cmd.src), uiRectHelper.fromRect(cmd.dst), cmd.paint);
+                        break;
+                    }
+                    case uiDrawImageNine cmd: {
+                        this._drawImageNine(cmd.image, uiRectHelper.fromRect(cmd.src), uiRectHelper.fromRect(cmd.center), uiRectHelper.fromRect(cmd.dst), cmd.paint);
+                        break;
+                    }
+                    case uiDrawPicture cmd: {
+                        this._drawPicture(cmd.picture);
+                        break;
+                    }
+                    case uiDrawTextBlob cmd: {
+                        this._drawTextBlob(cmd.textBlob, (uiOffset.fromOffset(cmd.offset)).Value, cmd.paint);
+                        break;
+                    }
+                    default:
+                        throw new Exception("unknown drawCmd: " + drawCmd);
+                }
+            }
+
+            if (saveCount != 0) {
+                throw new Exception("unmatched save/restore in picture");
+            }
+
+            if (needsSave) {
+                this._restore();
+            }
+        }
 
         void _drawTextBlob(TextBlob textBlob, uiOffset offset, Paint paint) {
             D.assert(textBlob != null);
@@ -802,10 +911,10 @@ namespace Unity.UIWidgets.ui {
             this._drawTextDrawMeshCallback(paint, null, false, 0, tex, textBlobBounds, mesh);
         }
 
-        public void flush(Picture picture) {
+        public void flush(uiPicture picture) {
             this._reset();
 
-            this._drawPicture(picture, false);
+            this._drawUIPicture(picture, false);
 
             D.assert(this._layers.Count == 1);
             D.assert(this._layers[0].states.Count == 1);
