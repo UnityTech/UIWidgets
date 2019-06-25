@@ -5,13 +5,13 @@ using Unity.UIWidgets.foundation;
 
 namespace Unity.UIWidgets.ui {
     public class uiPicture {
-        public uiPicture(List<uiDrawCmd> drawCmds, Rect paintBounds) {
+        public uiPicture(List<uiDrawCmd> drawCmds, uiRect paintBounds) {
             this.drawCmds = drawCmds;
             this.paintBounds = paintBounds;
         }
 
         public readonly List<uiDrawCmd> drawCmds;
-        public readonly Rect paintBounds;
+        public readonly uiRect paintBounds;
     }
 
     public class uiPictureRecorder {
@@ -28,7 +28,7 @@ namespace Unity.UIWidgets.ui {
             return this._states[this._states.Count - 1];
         }
 
-        public Matrix3 getTotalMatrix() {
+        public uiMatrix3 getTotalMatrix() {
             return this._getState().xform;
         }
 
@@ -36,11 +36,11 @@ namespace Unity.UIWidgets.ui {
             this._drawCmds.Clear();
             this._states.Clear();
             this._states.Add(new uiCanvasState {
-                xform = Matrix3.I(),
+                xform = uiMatrix3.I(),
                 scissor = null,
                 saveLayer = false,
                 layerOffset = null,
-                paintBounds = Rect.zero,
+                paintBounds = uiRectHelper.zero
             });
         }
 
@@ -62,11 +62,11 @@ namespace Unity.UIWidgets.ui {
                     break;
                 case uiDrawSaveLayer cmd: {
                     this._states.Add(new uiCanvasState {
-                        xform = Matrix3.I(),
-                        scissor = cmd.rect.shift(-cmd.rect.topLeft),
+                        xform = uiMatrix3.I(),
+                        scissor = cmd.rect.shift(-cmd.rect.Value.topLeft),
                         saveLayer = true,
-                        layerOffset = cmd.rect.topLeft,
-                        paintBounds = Rect.zero,
+                        layerOffset = cmd.rect.Value.topLeft,
+                        paintBounds = uiRectHelper.zero,
                     });
                     break;
                 }
@@ -256,11 +256,11 @@ namespace Unity.UIWidgets.ui {
         }
 
         class uiCanvasState {
-            public Matrix3 xform;
-            public Rect scissor;
+            public uiMatrix3 xform;
+            public uiRect? scissor;
             public bool saveLayer;
-            public Offset layerOffset;
-            public Rect paintBounds;
+            public uiOffset? layerOffset;
+            public uiRect paintBounds;
 
             public uiCanvasState copy() {
                 return new uiCanvasState {

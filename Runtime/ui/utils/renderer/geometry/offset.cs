@@ -17,5 +17,10 @@ namespace Unity.UIWidgets.ui {
             return newOffset;
         }
         
+        
+        public static uiOffset operator -(uiOffset a) {
+            return new uiOffset(-a.dx, -a.dy);
+        }
+        
     }
 }

@@ -18,14 +18,19 @@ namespace Unity.UIWidgets.ui {
         public uiDrawSaveLayer() {
         }
 
-        public static uiDrawSaveLayer create(Rect rect, Paint paint) {
+        public static uiDrawSaveLayer create(uiRect? rect, Paint paint) {
             var drawSaveLayer = ItemPoolManager.alloc<uiDrawSaveLayer>();
             drawSaveLayer.rect = rect;
             drawSaveLayer.paint = paint;
             return drawSaveLayer;
         }
-        
-        public Rect rect;
+
+        public override void clear() {
+            this.rect = null;
+            this.paint = null;
+        }
+
+        public uiRect? rect;
         public Paint paint;
     }
 
@@ -75,15 +80,19 @@ namespace Unity.UIWidgets.ui {
             
         }
 
-        public static uiDrawRotate create(float radians, Offset offset) {
+        public static uiDrawRotate create(float radians, uiOffset? offset) {
             var drawRotate = ItemPoolManager.alloc<uiDrawRotate>();
             drawRotate.radians = radians;
             drawRotate.offset = offset;
             return drawRotate;
         }
         
+        public override void clear() {
+            this.offset = null;
+        }
+        
         public float radians;
-        public Offset offset;
+        public uiOffset? offset;
     }
 
     public class uiDrawSkew : uiDrawCmd {
@@ -107,13 +116,17 @@ namespace Unity.UIWidgets.ui {
             
         }
 
-        public static uiDrawConcat create(Matrix3 matrix) {
+        public static uiDrawConcat create(uiMatrix3? matrix) {
             var drawConcat = ItemPoolManager.alloc<uiDrawConcat>();
             drawConcat.matrix = matrix;
             return drawConcat;
         }
         
-        public Matrix3 matrix;
+        public override void clear() {
+            this.matrix = null;
+        }
+        
+        public uiMatrix3? matrix;
     }
 
     public class uiDrawResetMatrix : uiDrawCmd {
@@ -132,13 +145,17 @@ namespace Unity.UIWidgets.ui {
             
         }
 
-        public static uiDrawSetMatrix create(Matrix3 matrix) {
+        public static uiDrawSetMatrix create(uiMatrix3? matrix) {
             var drawSetMatrix = ItemPoolManager.alloc<uiDrawSetMatrix>();
             drawSetMatrix.matrix = matrix;
             return drawSetMatrix;
         }
         
-        public Matrix3 matrix;
+        public override void clear() {
+            this.matrix = null;
+        }
+        
+        public uiMatrix3? matrix;
     }
 
     public class uiDrawClipRect : uiDrawCmd {
@@ -146,13 +163,17 @@ namespace Unity.UIWidgets.ui {
             
         }
 
-        public static uiDrawClipRect create(Rect rect) {
+        public static uiDrawClipRect create(uiRect? rect) {
             var drawClipRect = ItemPoolManager.alloc<uiDrawClipRect>();
             drawClipRect.rect = rect;
             return drawClipRect;
         }
         
-        public Rect rect;
+        public override void clear() {
+            this.rect = null;
+        }
+        
+        public uiRect? rect;
     }
 
     public class uiDrawClipRRect : uiDrawCmd {
@@ -166,6 +187,10 @@ namespace Unity.UIWidgets.ui {
             return drawClipRRect;
         }
         
+        public override void clear() {
+            this.rrect = null;
+        }
+        
         public RRect rrect;
     }
 
@@ -174,13 +199,18 @@ namespace Unity.UIWidgets.ui {
             
         }
 
-        public static uiDrawClipPath create(Path path) {
+        public static uiDrawClipPath create(uiPath path) {
             var drawClipPath = ItemPoolManager.alloc<uiDrawClipPath>();
             drawClipPath.path = path;
             return drawClipPath;
         }
-        
-        public Path path;
+
+        public override void clear() {
+            this.path.dispose();
+            this.path = null;
+        }
+
+        public uiPath path;
     }
 
     public class uiDrawPath : uiDrawCmd {
@@ -188,14 +218,20 @@ namespace Unity.UIWidgets.ui {
             
         }
 
-        public static uiDrawPath create(Path path, Paint paint) {
+        public static uiDrawPath create(uiPath path, Paint paint) {
             var drawPath = ItemPoolManager.alloc<uiDrawPath>();
             drawPath.path = path;
             drawPath.paint = paint;
             return drawPath;
         }
-        
-        public Path path;
+
+        public override void clear() {
+            this.path.dispose();
+            this.path = null;
+            this.paint = null;
+        }
+
+        public uiPath path;
         public Paint paint;
     }
 
@@ -204,16 +240,22 @@ namespace Unity.UIWidgets.ui {
             
         }
 
-        public static uiDrawImage create(Image image, Offset offset, Paint paint) {
+        public static uiDrawImage create(Image image, uiOffset? offset, Paint paint) {
             var drawImage = ItemPoolManager.alloc<uiDrawImage>();
             drawImage.image = image;
             drawImage.offset = offset;
             drawImage.paint = paint;
             return drawImage;
         }
+
+        public override void clear() {
+            this.image = null;
+            this.offset = null;
+            this.paint = null;
+        }
         
         public Image image;
-        public Offset offset;
+        public uiOffset? offset;
         public Paint paint;
     }
 
@@ -222,7 +264,7 @@ namespace Unity.UIWidgets.ui {
             
         }
 
-        public static uiDrawImageRect create(Image image, Rect src, Rect dst, Paint paint) {
+        public static uiDrawImageRect create(Image image, uiRect? src, uiRect? dst, Paint paint) {
             var drawImageRect = ItemPoolManager.alloc<uiDrawImageRect>();
             drawImageRect.image = image;
             drawImageRect.src = src;
@@ -230,10 +272,17 @@ namespace Unity.UIWidgets.ui {
             drawImageRect.paint = paint;
             return drawImageRect;
         }
-        
+
+        public override void clear() {
+            this.image = null;
+            this.src = null;
+            this.dst = null;
+            this.paint = null;
+        }
+
         public Image image;
-        public Rect src;
-        public Rect dst;
+        public uiRect? src;
+        public uiRect? dst;
         public Paint paint;
     }
 
@@ -242,7 +291,7 @@ namespace Unity.UIWidgets.ui {
             
         }
 
-        public static uiDrawImageNine create(Image image, Rect src, Rect center, Rect dst, Paint paint) {
+        public static uiDrawImageNine create(Image image, uiRect? src, uiRect? center, uiRect? dst, Paint paint) {
             var drawImageNine = ItemPoolManager.alloc<uiDrawImageNine>();
             drawImageNine.image = image;
             drawImageNine.src = src;
@@ -251,11 +300,19 @@ namespace Unity.UIWidgets.ui {
             drawImageNine.paint = paint;
             return drawImageNine;
         }
-        
+
+        public override void clear() {
+            this.image = null;
+            this.src = null;
+            this.center = null;
+            this.dst = null;
+            this.paint = null;
+        }
+
         public Image image;
-        public Rect src;
-        public Rect center;
-        public Rect dst;
+        public uiRect? src;
+        public uiRect? center;
+        public uiRect? dst;
         public Paint paint;
     }
 
@@ -282,7 +339,7 @@ namespace Unity.UIWidgets.ui {
             
         }
 
-        public static uiDrawTextBlob create(TextBlob textBlob, Offset offset, Paint paint) {
+        public static uiDrawTextBlob create(TextBlob textBlob, uiOffset? offset, Paint paint) {
             var drawTextBlob = ItemPoolManager.alloc<uiDrawTextBlob>();
             drawTextBlob.textBlob = textBlob;
             drawTextBlob.offset = offset;
@@ -292,10 +349,12 @@ namespace Unity.UIWidgets.ui {
 
         public override void clear() {
             this.textBlob = null;
+            this.offset = null;
+            this.paint = null;
         }
 
         public TextBlob textBlob;
-        public Offset offset;
+        public uiOffset? offset;
         public Paint paint;
     }
 }
