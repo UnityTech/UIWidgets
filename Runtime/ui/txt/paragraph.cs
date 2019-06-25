@@ -343,10 +343,11 @@ namespace Unity.UIWidgets.ui {
             // Break the line into words if justification should be applied.
             bool justifyLine = this._paragraphStyle.textAlign == TextAlign.justify &&
                                lineNumber != lineLimit - 1 && !lineRange.hardBreak;
-            float wordGapWidth = !(justifyLine && words.Count > 1) ? 0
-                : (this._width - this._lineWidths[lineNumber]) / (words.Count - 1);
 
             this._findWords(lineRange.start, lineRange.end, words);
+            float wordGapWidth = !(justifyLine && words.Count > 1) ? 0
+                : (this._width - this._lineWidths[lineNumber]) / (words.Count - 1);
+            
             this._computeLineStyleRuns(lineStyleRuns, lineRange, ref styleRunIndex);
             for (int lineStyleRunIndex = 0; lineStyleRunIndex < lineStyleRuns.Count; ++lineStyleRunIndex) {
                 glyphPositions.Clear();
