@@ -76,8 +76,10 @@ namespace Unity.UIWidgets.ui {
             }
             else {
                 // According to the logic of Paragraph.layout, it is assured that all the characters are requested
-                // in the texture before (in computing line breaks), so skip it here for optimization
-                // The only exception is the ellipsis, which is dealt with somewhere else.
+                // in the texture before (in computing line breaks), so skip it here for optimization.
+                // The only exception is the ellipsis, which did not appear in line breaking. It is taken care with
+                // only when needed.
+                
                 // font.RequestCharactersInTextureSafe(buff.text, style.UnityFontSize, style.UnityFontStyle);
 
                 int wordstart = start == buff.size
