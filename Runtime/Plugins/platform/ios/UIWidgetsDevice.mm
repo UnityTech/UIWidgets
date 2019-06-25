@@ -98,34 +98,34 @@ static NSString* _deviceName = nil;
             switch ((int)[[UIScreen mainScreen] nativeBounds].size.height) {
                     //iPhone 5 or 5S or 5C
                 case 1136:
-                    _deviceName = @"iPhone 5";
+                    _deviceName = @"iPhone 5 Simulator";
                     break;
                     //iPhone 6 or 6S or 7 or 8
                 case 1334:
-                    _deviceName = @"iPhone 6";
+                    _deviceName = @"iPhone 6 Simulator";
                     break;
                     //iPhone 6+ or 6S+ or 7+ or 8+
                 case 1920:
-                    _deviceName = @"iPhone 6 Plus";
+                    _deviceName = @"iPhone 6 Plus Simulator";
                     break;
                     //iPhone 6+ or 6S+ or 7+ or 8+
                 case 2208:
-                    _deviceName = @"iPhone 6 Plus";
+                    _deviceName = @"iPhone 6 Plus Simulator";
                     break;
                     //iPhone X or XS
                 case 2436:
-                    _deviceName = @"iPhone X";
+                    _deviceName = @"iPhone X Simulator";
                     break;
                     //iPhone XS Max
                 case 2688:
-                    _deviceName = @"iPhone XS Max";
+                    _deviceName = @"iPhone XS Max Simulator";
                     break;
                     //iPhone XR
                 case 1792:
-                    _deviceName = @"iPhone XR";
+                    _deviceName = @"iPhone XR Simulator";
                     break;
                 default:
-                    _deviceName = @"Unknown";
+                    _deviceName = @"Unknown Simulator";
                     break;
             }
         }
