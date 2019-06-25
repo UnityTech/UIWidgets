@@ -350,12 +350,12 @@ namespace Unity.UIWidgets.ui {
             for (int lineStyleRunIndex = 0; lineStyleRunIndex < lineStyleRuns.Count; ++lineStyleRunIndex) {
                 glyphPositions.Clear();
                 var run = lineStyleRuns[lineStyleRunIndex];
+                var isLastLineStyleRun = lineStyleRunIndex == lineStyleRuns.Count - 1;
                 this._generatePaintRecordFromLineStyleRun(
                     run,
                     layout,
                     builder,
-                    lineStyleRunIndex, 
-                    lineStyleRuns.Count,
+                    isLastLineStyleRun,
                     lineNumber,
                     justifyLine,
                     wordGapWidth,
@@ -405,8 +405,7 @@ namespace Unity.UIWidgets.ui {
         void _generatePaintRecordFromLineStyleRun(
             LineStyleRun run,
             Layout layout, TextBlobBuilder builder,
-            int lineStyleRunIndex,
-            int lineRunsCount,
+            bool isLastLineStyleRun,
             int lineNumber,
             bool justifyLine,
             float wordGapWidth,
@@ -426,7 +425,7 @@ namespace Unity.UIWidgets.ui {
             int textCount = textEnd - textStart;
 
             bool hardBreak = this._lineRanges[lineNumber].hardBreak;
-            if (this._shouldConsiderEllipsis(hardBreak, lineStyleRunIndex, lineRunsCount, lineNumber, lineLimit)) {
+            if (this._shouldConsiderEllipsis(hardBreak, isLastLineStyleRun, lineNumber, lineLimit)) {
                 this._handleOverflowEllipsis(ref text, ref textStart, ref textCount, run.style, runXOffset);
                 if (this._paragraphStyle.maxLines == null) {
                     lineLimit = lineNumber + 1;
@@ -439,7 +438,6 @@ namespace Unity.UIWidgets.ui {
                 return;
             }
 
-            float wordStartPosition = float.NaN;
             builder.allocRunPos(run.style, text, textStart, textCount);
             // bounds relative to first character
             builder.setBounds(layout.getBounds().translate(-layout.getX(0), 0));
@@ -449,13 +447,12 @@ namespace Unity.UIWidgets.ui {
                 builder, layout,
                 glyphPositions,
                 words,
-                run,
+                run.start,
                 runXOffset,
                 wordGapWidth,
                 justifyLine,
                 ref wordIndex,
                 ref justifyXOffset,
-                ref wordStartPosition,
                 ref maxWordWidth);
 
             if (glyphPositions.Count == 0) {
@@ -470,10 +467,9 @@ namespace Unity.UIWidgets.ui {
             lineGlyphPositions.AddRange(glyphPositions);
         }
 
-        bool _shouldConsiderEllipsis(bool hardBreak, int lineStyleRunIndex, int lineRunsCount, int lineNumber, int lineLimit) {
+        bool _shouldConsiderEllipsis(bool hardBreak, bool isLastLineStyleRun, int lineNumber, int lineLimit) {
             return !string.IsNullOrEmpty(this._paragraphStyle.ellipsis) && !this._width.isInfinite() && !hardBreak
-                   && lineStyleRunIndex == lineRunsCount - 1 &&
-                   (lineNumber == lineLimit - 1 || this._paragraphStyle.maxLines == null);
+                   && isLastLineStyleRun && (lineNumber == lineLimit - 1 || this._paragraphStyle.maxLines == null);
         }
 
         void _handleOverflowEllipsis(ref string text, ref int textStart, ref int textCount, TextStyle style, float runXOffset) {
@@ -508,28 +504,25 @@ namespace Unity.UIWidgets.ui {
             TextBlobBuilder builder, Layout layout,
             List<GlyphPosition> glyphPositions,
             List<Range<int>> words,
-            LineStyleRun run,
+            int runStart,
             float runXOffset,
             float wordGapWidth,
             bool justifyLine,
             ref int wordIndex,
             ref float justifyXOffset,
-            ref float wordStartPosition,
             ref float maxWordWidth) {
+            float wordStartPosition = float.NaN;
             for (int glyphIndex = 0; glyphIndex < textCount; ++glyphIndex) {
                 float glyphXOffset = layout.getX(glyphIndex) + justifyXOffset;
-                builder.positions[glyphIndex] = new Vector2d(
-                    glyphXOffset, layout.getY(glyphIndex)
-                );
-
                 float glyphAdvance = layout.getCharAdvance(glyphIndex);
+                builder.positions[glyphIndex] = new Vector2d(glyphXOffset, layout.getY(glyphIndex));
                 glyphPositions.Add(new GlyphPosition(runXOffset + glyphXOffset, glyphAdvance,
                     new Range<int>(textStart + glyphIndex, textStart + glyphIndex + 1)));
-                if (wordIndex < words.Count && words[wordIndex].start == run.start + glyphIndex) {
+                if (wordIndex < words.Count && words[wordIndex].start == runStart + glyphIndex) {
                     wordStartPosition = runXOffset + glyphXOffset;
                 }
 
-                if (wordIndex < words.Count && words[wordIndex].end == run.start + glyphIndex + 1) {
+                if (wordIndex < words.Count && words[wordIndex].end == runStart + glyphIndex + 1) {
                     if (justifyLine) {
                         justifyXOffset += wordGapWidth;
                     }
@@ -544,12 +537,8 @@ namespace Unity.UIWidgets.ui {
             }
         }
 
-        void _generatePaintRecord(
-            List<PaintRecord> paintRecords,
-            TextStyle style,
-            TextBlob textBlob,
-            float runXOffset,
-            float advance) {
+        void _generatePaintRecord(List<PaintRecord> paintRecords, TextStyle style, TextBlob textBlob,
+            float runXOffset, float advance) {
             var font = FontManager.instance.getOrCreate(style.fontFamily,
                 style.fontWeight, style.fontStyle).font;
             var metrics = FontMetrics.fromFont(font, style.UnityFontSize);
