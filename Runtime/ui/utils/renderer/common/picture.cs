@@ -63,10 +63,10 @@ namespace Unity.UIWidgets.ui {
                 case uiDrawSaveLayer cmd: {
                     this._states.Add(new uiCanvasState {
                         xform = uiMatrix3.I(),
-                        scissor = cmd.rect.shift(-cmd.rect.Value.topLeft),
+                        scissor = cmd.rect.Value.shift(-cmd.rect.Value.topLeft),
                         saveLayer = true,
                         layerOffset = cmd.rect.Value.topLeft,
-                        paintBounds = uiRectHelper.zero,
+                        paintBounds = uiRectHelper.zero
                     });
                     break;
                 }
@@ -78,7 +78,7 @@ namespace Unity.UIWidgets.ui {
                     if (!stateToRestore.saveLayer) {
                         state.paintBounds = stateToRestore.paintBounds;
                     } else {
-                        var paintBounds = stateToRestore.paintBounds.shift(stateToRestore.layerOffset);
+                        var paintBounds = stateToRestore.paintBounds.shift(stateToRestore.layerOffset.Value);
                         paintBounds = state.xform.mapRect(paintBounds);
                         this._addPaintBounds(paintBounds);
                     }
@@ -86,85 +86,91 @@ namespace Unity.UIWidgets.ui {
                 }
                 case uiDrawTranslate cmd: {
                     var state = this._getState();
-                    state.xform = new Matrix3(state.xform);
+                    state.xform = new uiMatrix3(state.xform);
                     state.xform.preTranslate(cmd.dx, cmd.dy);
                     break;
                 }
                 case uiDrawScale cmd: {
                     var state = this._getState();
-                    state.xform = new Matrix3(state.xform);
+                    state.xform = new uiMatrix3(state.xform);
                     state.xform.preScale(cmd.sx, (cmd.sy ?? cmd.sx));
                     break;
                 }
                 case uiDrawRotate cmd: {
                     var state = this._getState();
-                    state.xform = new Matrix3(state.xform);
+                    state.xform = new uiMatrix3(state.xform);
                     if (cmd.offset == null) {
                         state.xform.preRotate(cmd.radians);
                     } else {
                         state.xform.preRotate(cmd.radians,
-                            cmd.offset.dx,
-                            cmd.offset.dy);
+                            cmd.offset.Value.dx,
+                            cmd.offset.Value.dy);
                     }
                     break;
                 }
                 case uiDrawSkew cmd: {
                     var state = this._getState();
-                    state.xform = new Matrix3(state.xform);
+                    state.xform = new uiMatrix3(state.xform);
                     state.xform.preSkew(cmd.sx, cmd.sy);
                     break;
                 }
                 case uiDrawConcat cmd: {
                     var state = this._getState();
-                    state.xform = new Matrix3(state.xform);
-                    state.xform.preConcat(cmd.matrix);
+                    state.xform = new uiMatrix3(state.xform);
+                    state.xform.preConcat(cmd.matrix.Value);
                     break;
                 }
                 case uiDrawResetMatrix _: {
                     var state = this._getState();
-                    state.xform = Matrix3.I();
+                    state.xform = uiMatrix3.I();
                     break;
                 }
                 case uiDrawSetMatrix cmd: {
                     var state = this._getState();
-                    state.xform = new Matrix3(cmd.matrix);
+                    state.xform = new uiMatrix3(cmd.matrix.Value);
                     break;
                 }
                 case uiDrawClipRect cmd: {
                     var state = this._getState();
 
-                    var rect = state.xform.mapRect(cmd.rect);
-                    state.scissor = state.scissor == null ? rect : state.scissor.intersect(rect);
+                    var rect = state.xform.mapRect(cmd.rect.Value);
+                    state.scissor = state.scissor == null ? rect : state.scissor.Value.intersect(rect);
                     break;
                 }
                 case uiDrawClipRRect cmd: {
                     var state = this._getState();
 
-                    var rect = state.xform.mapRect(cmd.rrect.outerRect);
-                    state.scissor = state.scissor == null ? rect : state.scissor.intersect(rect);
+                    var rect = state.xform.mapRect(uiRectHelper.fromRect(cmd.rrect.outerRect));
+                    state.scissor = state.scissor == null ? rect : state.scissor.Value.intersect(rect);
                     break;
                 }
                 case uiDrawClipPath cmd: {
                     var state = this._getState();
-                    var scale = XformUtils.getScale(state.xform);
+                    var scale = uiXformUtils.getScale(state.xform);
 
-                    var rect = cmd.path.flatten(
-                        scale * Window.instance.devicePixelRatio
-                    ).getFillMesh(out _).transform(state.xform).bounds;
-                    state.scissor = state.scissor == null ? rect : state.scissor.intersect(rect);
+                    var rectPathCache = cmd.path.flatten(
+                        scale * Window.instance.devicePixelRatio);
+                    var rectMesh = rectPathCache.getFillMesh(out _);
+                    var transformedMesh = rectMesh.transform(state.xform);
+                    var rect = transformedMesh.bounds;
+                    state.scissor = state.scissor == null ? rect : state.scissor.Value.intersect(rect);
+                    rectPathCache.dispose();
+                    rectMesh.dispose();
+                    transformedMesh.dispose();
                     break;
                 }
                 case uiDrawPath cmd: {
                     var state = this._getState();
-                    var scale = XformUtils.getScale(state.xform);
+                    var scale = uiXformUtils.getScale(state.xform);
                     var path = cmd.path;
                     var paint = cmd.paint;
                     var devicePixelRatio = Window.instance.devicePixelRatio;
 
-                    MeshMesh mesh;
+                    uiMeshMesh mesh;
                     if (paint.style == PaintingStyle.fill) {
                         var cache = path.flatten(scale * devicePixelRatio);
                         mesh = cache.getFillMesh(out _).transform(state.xform);
+                        cache.dispose();
                     } else {
                         float strokeWidth = (paint.strokeWidth * scale).clamp(0, 200.0f);
                         float fringeWidth = 1 / devicePixelRatio;
@@ -174,17 +180,21 @@ namespace Unity.UIWidgets.ui {
                         }
 
                         var cache = path.flatten(scale * devicePixelRatio);
-                        mesh = cache.getStrokeMesh(
+                        var strokenMesh = cache.getStrokeMesh(
                             strokeWidth / scale * 0.5f,
                             paint.strokeCap,
                             paint.strokeJoin,
-                            paint.strokeMiterLimit).transform(state.xform);
+                            paint.strokeMiterLimit);
+                        
+                        mesh = strokenMesh.transform(state.xform);
+                        cache.dispose();
+                        strokenMesh.dispose();
                     }
                     
                     if (paint.maskFilter != null && paint.maskFilter.sigma != 0) {
                         float sigma = scale * paint.maskFilter.sigma;
                         float sigma3 = 3 * sigma;
-                        this._addPaintBounds(mesh.bounds.inflate(sigma3));
+                        this._addPaintBounds(uiRectHelper.inflate(mesh.bounds, sigma3));
                     } else {
                         this._addPaintBounds(mesh.bounds);
                     }
@@ -192,7 +202,7 @@ namespace Unity.UIWidgets.ui {
                 }
                 case uiDrawImage cmd: {
                     var state = this._getState();
-                    var rect = Rect.fromLTWH(cmd.offset.dx, cmd.offset.dy,
+                    var rect = uiRectHelper.fromLTWH(cmd.offset.Value.dx, cmd.offset.Value.dy,
                         cmd.image.width, cmd.image.height);
                     rect = state.xform.mapRect(rect);
                     this._addPaintBounds(rect);
@@ -200,33 +210,33 @@ namespace Unity.UIWidgets.ui {
                 }
                 case uiDrawImageRect cmd: {
                     var state = this._getState();
-                    var rect = state.xform.mapRect(cmd.dst);
+                    var rect = state.xform.mapRect(cmd.dst.Value);
                     this._addPaintBounds(rect);
                     break;
                 }
                 case uiDrawImageNine cmd: {
                     var state = this._getState();
-                    var rect = state.xform.mapRect(cmd.dst);
+                    var rect = state.xform.mapRect(cmd.dst.Value);
                     this._addPaintBounds(rect);
                     break;
                 }
                 case uiDrawPicture cmd: {
                     var state = this._getState();
-                    var rect = state.xform.mapRect(cmd.picture.paintBounds);
+                    var rect = state.xform.mapRect(uiRectHelper.fromRect(cmd.picture.paintBounds));
                     this._addPaintBounds(rect);
                     break;
                 }
                 case uiDrawTextBlob cmd: {
                     var state = this._getState();
-                    var scale = XformUtils.getScale(state.xform);
-                    var rect = cmd.textBlob.boundsInText.shift(cmd.offset);
+                    var scale = uiXformUtils.getScale(state.xform);
+                    var rect = uiRectHelper.fromRect(cmd.textBlob.boundsInText).shift(cmd.offset.Value);
                     rect = state.xform.mapRect(rect);
                     
                     var paint = cmd.paint;
                     if (paint.maskFilter != null && paint.maskFilter.sigma != 0) {
                         float sigma = scale * paint.maskFilter.sigma;
                         float sigma3 = 3 * sigma;
-                        this._addPaintBounds(rect.inflate(sigma3));
+                        this._addPaintBounds(uiRectHelper.inflate(rect, sigma3));
                     } else {
                         this._addPaintBounds(rect);
                     }
@@ -238,20 +248,20 @@ namespace Unity.UIWidgets.ui {
             }
         }
 
-        void _addPaintBounds(Rect paintBounds) {
+        void _addPaintBounds(uiRect? paintBounds) {
             var state = this._getState();
             if (state.scissor != null) {
-                paintBounds = paintBounds.intersect(state.scissor);
+                paintBounds = paintBounds.Value.intersect(state.scissor.Value);
             }
 
-            if (paintBounds == null || paintBounds.isEmpty) {
+            if (paintBounds == null || paintBounds.Value.isEmpty) {
                 return;
             }
 
             if (state.paintBounds.isEmpty) {
-                state.paintBounds = paintBounds;
+                state.paintBounds = paintBounds.Value;
             } else {
-                state.paintBounds = state.paintBounds.expandToInclude(paintBounds);
+                state.paintBounds = state.paintBounds.expandToInclude(paintBounds.Value);
             }
         }
 

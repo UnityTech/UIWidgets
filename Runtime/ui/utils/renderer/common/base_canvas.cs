@@ -4,7 +4,7 @@ using Unity.UIWidgets.foundation;
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
-    public class uiRecorderCanvas : PoolItem {
+    public class uiRecorderCanvas : PoolItem, Canvas {
         public uiRecorderCanvas(uiPictureRecorder recorder) {
             this._recorder = recorder;
         }
@@ -69,8 +69,14 @@ namespace Unity.UIWidgets.ui {
             ));
         }
 
-        public uiMatrix3 getTotalMatrix() {
-            return this._recorder.getTotalMatrix();
+        readonly Matrix3 _totalMatrix = Matrix3.I();
+        public Matrix3 getTotalMatrix() {
+            var localMatrix = this._recorder.getTotalMatrix();
+            this._totalMatrix.setAll(localMatrix.kMScaleX, localMatrix.kMSkewX, localMatrix.kMTransX,
+                                     localMatrix.kMSkewY, localMatrix.kMScaleY, localMatrix.kMTransY,
+                                     localMatrix.kMPersp0, localMatrix.kMPersp1, localMatrix.kMPersp2);
+            
+            return this._totalMatrix;
         }
 
         public void resetMatrix() {

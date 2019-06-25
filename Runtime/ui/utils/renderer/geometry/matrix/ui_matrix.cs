@@ -264,6 +264,17 @@ namespace Unity.UIWidgets.ui {
                      (kUnknown_Mask | kOnlyPerspectiveValid_Mask));
             this.fTypeMask = mask;
         }
+        
+        void _orTypeMask(int mask) {
+            D.assert((mask & kORableMasks) == mask);
+            this.fTypeMask |= mask;
+        }
+
+        void _clearTypeMask(int mask) {
+            // only allow a valid mask
+            D.assert((mask & kAllMasks) == mask);
+            this.fTypeMask &= ~mask;
+        }
 
 
         int _computePerspectiveTypeMask() {
@@ -685,6 +696,65 @@ namespace Unity.UIWidgets.ui {
         public void preConcat(uiMatrix3 other) {
             if (!other.isIdentity()) {
                 this._setConcat(this, other);
+            }
+        }
+        
+        public void preScale(float sx, float sy, float px, float py) {
+            if (1 == sx && 1 == sy) {
+                return;
+            }
+
+            var m = new uiMatrix3();
+            m.setScale(sx, sy, px, py);
+            this.preConcat(m);
+        }
+
+        public void preScale(float sx, float sy) {
+            if (1 == sx && 1 == sy) {
+                return;
+            }
+
+            this.kMScaleX *= sx;
+            this.kMSkewY *= sx;
+            this.kMPersp0 *= sx;
+
+            this.kMSkewX *= sy;
+            this.kMScaleY *= sy;
+            this.kMPersp1 *= sy;
+
+            if (this.kMScaleX == 1 && this.kMScaleY == 1 && (this.fTypeMask &
+                (int) (TypeMask.kPerspective_Mask | TypeMask.kAffine_Mask)) == 0) {
+                this._clearTypeMask((int) TypeMask.kScale_Mask);
+            }
+            else {
+                this._orTypeMask((int) TypeMask.kScale_Mask);
+            }
+        }
+        
+        public void preRotate(float radians, float px, float py) {
+            var m = new uiMatrix3();
+            m.setRotate(radians, px, py);
+            this.preConcat(m);
+        }
+
+        public void preRotate(float radians) {
+            var m = new uiMatrix3();
+            m.setRotate(radians);
+            this.preConcat(m);
+        }
+        
+        public void preSkew(float kx, float ky) {
+            var m = new uiMatrix3();
+            m.setSkew(kx, ky);
+            this.preConcat(m);
+        }
+        
+        public void setScale(float sx, float sy, float px, float py) {
+            if (1 == sx && 1 == sy) {
+                this.reset();
+            }
+            else {
+                this._setScaleTranslate(sx, sy, px - sx * px, py - sy * py);
             }
         }
     }

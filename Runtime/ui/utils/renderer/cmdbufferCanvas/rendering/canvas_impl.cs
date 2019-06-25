@@ -259,6 +259,12 @@ namespace Unity.UIWidgets.ui {
 
         void _clipRect(Rect rect) {
             var path = uiPath.create();
+            path.addRect(uiRectHelper.fromRect(rect));
+            this._clipPath(path);
+        }
+        
+        void _clipUIRect(uiRect rect) {
+            var path = uiPath.create();
             path.addRect(rect);
             this._clipPath(path);
         }
@@ -790,7 +796,7 @@ namespace Unity.UIWidgets.ui {
                         break;
                     case uiDrawSaveLayer cmd: {
                         saveCount++;
-                        this._saveLayer(uiRectHelper.fromRect(cmd.rect), cmd.paint);
+                        this._saveLayer(cmd.rect.Value, cmd.paint);
                         break;
                     }
                     case uiDrawRestore _: {
@@ -811,7 +817,7 @@ namespace Unity.UIWidgets.ui {
                         break;
                     }
                     case uiDrawRotate cmd: {
-                        this._rotate(cmd.radians, uiOffset.fromOffset(cmd.offset));
+                        this._rotate(cmd.radians, cmd.offset);
                         break;
                     }
                     case uiDrawSkew cmd: {
@@ -819,18 +825,18 @@ namespace Unity.UIWidgets.ui {
                         break;
                     }
                     case uiDrawConcat cmd: {
-                        this._concat(uiMatrix3.fromMatrix3(cmd.matrix));
+                        this._concat(cmd.matrix.Value);
                         break;
                     }
                     case uiDrawResetMatrix _:
                         this._resetMatrix();
                         break;
                     case uiDrawSetMatrix cmd: {
-                        this._setMatrix(uiMatrix3.fromMatrix3(cmd.matrix));
+                        this._setMatrix(cmd.matrix.Value);
                         break;
                     }
                     case uiDrawClipRect cmd: {
-                        this._clipRect(cmd.rect);
+                        this._clipUIRect(cmd.rect.Value);
                         break;
                     }
                     case uiDrawClipRRect cmd: {
@@ -838,25 +844,23 @@ namespace Unity.UIWidgets.ui {
                         break;
                     }
                     case uiDrawClipPath cmd: {
-                        var uipath = uiPath.fromPath(cmd.path);
-                        this._clipPath(uipath);
+                        this._clipPath(cmd.path);
                         break;
                     }
                     case uiDrawPath cmd: {
-                        var uipath = uiPath.fromPath(cmd.path);
-                        this._drawPath(uipath, cmd.paint);
+                        this._drawPath(cmd.path, cmd.paint);
                         break;
                     }
                     case uiDrawImage cmd: {
-                        this._drawImage(cmd.image, (uiOffset.fromOffset(cmd.offset)).Value, cmd.paint);
+                        this._drawImage(cmd.image, cmd.offset.Value, cmd.paint);
                         break;
                     }
                     case uiDrawImageRect cmd: {
-                        this._drawImageRect(cmd.image, uiRectHelper.fromRect(cmd.src), uiRectHelper.fromRect(cmd.dst), cmd.paint);
+                        this._drawImageRect(cmd.image, cmd.src, cmd.dst.Value, cmd.paint);
                         break;
                     }
                     case uiDrawImageNine cmd: {
-                        this._drawImageNine(cmd.image, uiRectHelper.fromRect(cmd.src), uiRectHelper.fromRect(cmd.center), uiRectHelper.fromRect(cmd.dst), cmd.paint);
+                        this._drawImageNine(cmd.image, cmd.src, cmd.center.Value, cmd.dst.Value, cmd.paint);
                         break;
                     }
                     case uiDrawPicture cmd: {
@@ -864,7 +868,7 @@ namespace Unity.UIWidgets.ui {
                         break;
                     }
                     case uiDrawTextBlob cmd: {
-                        this._drawTextBlob(cmd.textBlob, (uiOffset.fromOffset(cmd.offset)).Value, cmd.paint);
+                        this._drawTextBlob(cmd.textBlob, cmd.offset.Value, cmd.paint);
                         break;
                     }
                     default:

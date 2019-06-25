@@ -63,6 +63,37 @@ namespace Unity.UIWidgets.ui {
         public uiOffset bottomRight {
             get { return new uiOffset(this.right, this.bottom); }
         }
+        
+        public uiRect shift(uiOffset offset) {
+            return uiRectHelper.fromLTRB(this.left + offset.dx, this.top + offset.dy, this.right + offset.dx,
+                this.bottom + offset.dy);
+        }
+        
+        public uiRect intersect(uiRect other) {
+            return uiRectHelper.fromLTRB(
+                Mathf.Max(this.left, other.left),
+                Mathf.Max(this.top, other.top),
+                Mathf.Min(this.right, other.right),
+                Mathf.Min(this.bottom, other.bottom)
+            );
+        }
+
+        public uiRect expandToInclude(uiRect? other) {
+            if (this.isEmpty) {
+                return other.Value;
+            }
+
+            if (other == null || other.Value.isEmpty) {
+                return this;
+            }
+
+            return uiRectHelper.fromLTRB(
+                Mathf.Min(this.left, other.Value.left),
+                Mathf.Min(this.top, other.Value.top),
+                Mathf.Max(this.right, other.Value.right),
+                Mathf.Max(this.bottom, other.Value.bottom)
+            );
+        }
     }
 
     public static class uiRectHelper {

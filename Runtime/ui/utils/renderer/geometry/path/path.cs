@@ -146,7 +146,7 @@ namespace Unity.UIWidgets.ui {
             this._commands.Add(winding);
         }
 
-        public void addRect(Rect rect) {
+        public void addRect(uiRect rect) {
             this._appendMoveTo(rect.left, rect.top);
             this._appendLineTo(rect.left, rect.bottom);
             this._appendLineTo(rect.right, rect.bottom);
