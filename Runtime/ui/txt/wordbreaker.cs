@@ -91,27 +91,26 @@ namespace Unity.UIWidgets.ui {
             }
 
             char c = this._text.charAt(this._current);
+            bool preType = char.IsWhiteSpace(c);
             bool preBoundaryChar = isBoundaryChar(c);
             this._current++;
             if (preBoundaryChar) {
                 return this._current;
             }
             
-            this._findBoundaryCharOrTypeChange();
+            this._findBoundaryCharOrTypeChange(preType);
             
             return this._current;
         }
 
-        void _findBoundaryCharOrTypeChange() {
-            char c = this._text.charAt(this._current);
-            bool preType = char.IsWhiteSpace(c);
+        void _findBoundaryCharOrTypeChange(bool preType) {
             for (; this._current < this._text.size; ++this._current) {
                 // this.nextUntilCodePoint();
                 if (this._current >= this._text.size) {
                     break;
                 }
 
-                c = this._text.charAt(this._current);
+                char c = this._text.charAt(this._current);
                 if (isBoundaryChar(c)) {
                     break;
                 }
@@ -155,20 +154,20 @@ namespace Unity.UIWidgets.ui {
         }
 
         public static bool isLeadSurrogate(uint c) {
-            return ((c) & 0xfffffc00) == 0xd800;
+            return (c & 0xfffffc00) == 0xd800;
         }
 
 
         public static bool isTrailSurrogate(uint c) {
-            return ((c) & 0xfffffc00) == 0xdc00;
+            return (c & 0xfffffc00) == 0xdc00;
         }
 
         public static uint getSupplementary(uint lead, uint trail) {
-            return (char) (((uint) (lead) << 10) + (uint) (trail - U16_SURROGATE_OFFSET));
+            return (char) (( lead << 10) +  (trail - U16_SURROGATE_OFFSET));
         }
 
         public static bool isBoundaryChar(char code) {
-            return char.IsPunctuation(code) || code >= 0x4E00 && code <= 0x9FFF || code >= 0x3040 && code <= 0x30FF;
+            return char.IsPunctuation(code) || (code >= 0x4E00 && code <= 0x9FFF) || (code >= 0x3040 && code <= 0x30FF);
         }
         
         void nextUntilCodePoint() {
