@@ -28,16 +28,14 @@ namespace Unity.UIWidgets.ui {
         public readonly int lineNumber;
         public readonly TextDirection direction;
         public readonly Range<int> codeUnits;
-        public readonly FontMetrics fontMetrics;
         public Range<float> xPos;
         public readonly List<GlyphPosition> positions;
 
-        public CodeUnitRun(List<GlyphPosition> positions, Range<int> cu, int line, Range<float> xPos,
-            FontMetrics fontMetrics, TextDirection direction) {
+        public CodeUnitRun(List<GlyphPosition> positions, Range<int> cu, Range<float> xPos, int line,
+            TextDirection direction) {
             this.lineNumber = line;
             this.codeUnits = cu;
             this.xPos = xPos;
-            this.fontMetrics = fontMetrics;
             this.positions = positions;
             this.direction = direction;
         }
@@ -354,7 +352,6 @@ namespace Unity.UIWidgets.ui {
                 var run = lineStyleRuns[lineStyleRunIndex];
                 this._generatePaintRecordFromLineStyleRun(
                     run,
-                    lineRange,
                     layout,
                     builder,
                     lineStyleRunIndex, 
@@ -375,7 +372,7 @@ namespace Unity.UIWidgets.ui {
             }
 
             float lineXOffset = this._getAndShiftByLineXOffset(runXOffset, lineCodeUnitRuns, lineGlyphPositions);
-            this._computeLineOffset(lineNumber, lineRange, lineGlyphPositions, lineCodeUnitRuns, paintRecords,
+            this._computeLineOffset(lineNumber, lineGlyphPositions, lineCodeUnitRuns, paintRecords,
                 ref yOffset, ref preMaxDescent);
             this._addPaintRecordsWithOffset(paintRecords, lineXOffset, yOffset);
         }
@@ -407,7 +404,6 @@ namespace Unity.UIWidgets.ui {
 
         void _generatePaintRecordFromLineStyleRun(
             LineStyleRun run,
-            LineRange lineRange,
             Layout layout, TextBlobBuilder builder,
             int lineStyleRunIndex,
             int lineRunsCount,
@@ -429,7 +425,8 @@ namespace Unity.UIWidgets.ui {
             int textEnd = run.end;
             int textCount = textEnd - textStart;
 
-            if (this._shouldConsiderEllipsis(lineRange, lineStyleRunIndex, lineRunsCount, lineNumber, lineLimit)) {
+            bool hardBreak = this._lineRanges[lineNumber].hardBreak;
+            if (this._shouldConsiderEllipsis(hardBreak, lineStyleRunIndex, lineRunsCount, lineNumber, lineLimit)) {
                 this._handleOverflowEllipsis(ref text, ref textStart, ref textCount, run.style, runXOffset);
                 if (this._paragraphStyle.maxLines == null) {
                     lineLimit = lineNumber + 1;
@@ -465,12 +462,16 @@ namespace Unity.UIWidgets.ui {
                 return;
             }
 
-            runXOffset = this._generatePaintRecord(run, paintRecords, builder, lineNumber, runXOffset, layout,
-                lineGlyphPositions, glyphPositions, lineCodeUnitRuns);
+            TextBlob textBlob = builder.make();
+            float advance = layout.getAdvance();
+            this._generatePaintRecord(paintRecords, run.style, textBlob, runXOffset, advance);
+            runXOffset += advance;
+            this._generateCodeUnitRun(lineCodeUnitRuns, run, lineNumber, glyphPositions);
+            lineGlyphPositions.AddRange(glyphPositions);
         }
 
-        bool _shouldConsiderEllipsis(LineRange lineRange, int lineStyleRunIndex, int lineRunsCount, int lineNumber, int lineLimit) {
-            return !string.IsNullOrEmpty(this._paragraphStyle.ellipsis) && !this._width.isInfinite() && !lineRange.hardBreak
+        bool _shouldConsiderEllipsis(bool hardBreak, int lineStyleRunIndex, int lineRunsCount, int lineNumber, int lineLimit) {
+            return !string.IsNullOrEmpty(this._paragraphStyle.ellipsis) && !this._width.isInfinite() && !hardBreak
                    && lineStyleRunIndex == lineRunsCount - 1 &&
                    (lineNumber == lineLimit - 1 || this._paragraphStyle.maxLines == null);
         }
@@ -543,23 +544,25 @@ namespace Unity.UIWidgets.ui {
             }
         }
 
-        float _generatePaintRecord(LineStyleRun run, List<PaintRecord> paintRecords, TextBlobBuilder builder,
-            int lineNumber, float runXOffset, Layout layout, List<GlyphPosition> lineGlyphPositions,
-            List<GlyphPosition> glyphPositions, List<CodeUnitRun> lineCodeUnitRuns) {
-            var font = FontManager.instance.getOrCreate(run.style.fontFamily,
-                run.style.fontWeight, run.style.fontStyle).font;
-            var metrics = FontMetrics.fromFont(font, run.style.UnityFontSize);
-            paintRecords.Add(new PaintRecord(run.style, new Offset(runXOffset, 0),
-                builder.make(), metrics, lineNumber, layout.getAdvance()
-            ));
-            lineGlyphPositions.AddRange(glyphPositions);
+        void _generatePaintRecord(
+            List<PaintRecord> paintRecords,
+            TextStyle style,
+            TextBlob textBlob,
+            float runXOffset,
+            float advance) {
+            var font = FontManager.instance.getOrCreate(style.fontFamily,
+                style.fontWeight, style.fontStyle).font;
+            var metrics = FontMetrics.fromFont(font, style.UnityFontSize);
+            paintRecords.Add(new PaintRecord(style, new Offset(runXOffset, 0), textBlob, metrics, advance));
+        }
+
+        void _generateCodeUnitRun(List<CodeUnitRun> lineCodeUnitRuns, LineStyleRun run, int lineNumber,
+            List<GlyphPosition> glyphPositions) {
             var codeUnitPositions = new List<GlyphPosition>(glyphPositions);
             lineCodeUnitRuns.Add(new CodeUnitRun(codeUnitPositions,
-                new Range<int>(run.start, run.end), lineNumber,
+                new Range<int>(run.start, run.end),
                 new Range<float>(glyphPositions[0].xPos.start, glyphPositions.last().xPos.end),
-                metrics, TextDirection.ltr));
-            runXOffset += layout.getAdvance();
-            return runXOffset;
+                lineNumber, TextDirection.ltr));
         }
 
         float _getAndShiftByLineXOffset(float runXOffset, List<CodeUnitRun> lineCodeUnitRuns, List<GlyphPosition> lineGlyphPositions) {
@@ -577,12 +580,16 @@ namespace Unity.UIWidgets.ui {
             return lineXOffset;
         }
 
-        void _computeLineOffset(int lineNumber,LineRange lineRange, List<GlyphPosition> lineGlyphPositions,
-            List<CodeUnitRun> lineCodeUnitRuns, List<PaintRecord> paintRecords, ref float yOffset, ref float preMaxDescent) {
-            int nextLineStart = (lineNumber < this._lineRanges.Count - 1)
+        void _computeLineOffset(int lineNumber,
+            List<GlyphPosition> lineGlyphPositions,
+            List<CodeUnitRun> lineCodeUnitRuns,
+            List<PaintRecord> paintRecords,
+            ref float yOffset, ref float preMaxDescent) {
+            int lineStart = this._lineRanges[lineNumber].start;
+            int nextLineStart = lineNumber < this._lineRanges.Count - 1
                 ? this._lineRanges[lineNumber + 1].start
                 : this._text.Length;
-            this._glyphLines.Add(new GlyphLine(lineGlyphPositions, nextLineStart - lineRange.start));
+            this._glyphLines.Add(new GlyphLine(lineGlyphPositions, nextLineStart - lineStart));
             this._codeUnitRuns.AddRange(lineCodeUnitRuns);
 
             float maxLineSpacing = 0;
