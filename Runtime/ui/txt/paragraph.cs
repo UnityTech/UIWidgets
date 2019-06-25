@@ -295,35 +295,91 @@ namespace Unity.UIWidgets.ui {
         void _layout() {
             int styleMaxLines = this._paragraphStyle.maxLines ?? int.MaxValue;
             this._didExceedMaxLines = this._lineRanges.Count > styleMaxLines;
+            
             var lineLimit = Mathf.Min(styleMaxLines, this._lineRanges.Count);
-
-            Layout layout = new Layout();
-            layout.setTabStops(this._tabStops);
-            TextBlobBuilder builder = new TextBlobBuilder();
             int styleRunIndex = 0;
             float yOffset = 0;
             float preMaxDescent = 0;
             float maxWordWidth = 0;
 
+            List<Range<int>> words = new List<Range<int>>();
+            List<LineStyleRun> lineStyleRuns = new List<LineStyleRun>();
             List<CodeUnitRun> lineCodeUnitRuns = new List<CodeUnitRun>();
-            List<GlyphPosition> glyphPositions = new List<GlyphPosition>();
-            List<LineStyleRun> lineRuns = new List<LineStyleRun>();
             List<GlyphPosition> lineGlyphPositions = new List<GlyphPosition>();
             List<PaintRecord> paintRecords = new List<PaintRecord>();
-            List<Range<int>> words = new List<Range<int>>();
-            List<float> textAdvances = new List<float>();
+            List<GlyphPosition> glyphPositions = new List<GlyphPosition>();
+
+            Layout layout = new Layout();
+            layout.setTabStops(this._tabStops);
+            TextBlobBuilder builder = new TextBlobBuilder();
 
             for (int lineNumber = 0; lineNumber < lineLimit; ++lineNumber) {
-                var lineRange = this._lineRanges[lineNumber];
-                this._computePaintRecordsFromLine(lineNumber, ref lineLimit, lineRange, words, lineRuns, ref styleRunIndex,
-                    lineCodeUnitRuns, lineGlyphPositions, paintRecords, builder, glyphPositions, textAdvances, layout,
-                    ref maxWordWidth, ref yOffset, ref preMaxDescent);
+                lineCodeUnitRuns.Clear();
+                lineGlyphPositions.Clear();
+                paintRecords.Clear();
+                words.Clear();
+                lineStyleRuns.Clear();
+                this._computePaintRecordsFromLine(
+                    lineNumber, ref lineLimit, ref styleRunIndex, ref maxWordWidth, ref yOffset, ref preMaxDescent,
+                    words, lineStyleRuns, lineCodeUnitRuns, lineGlyphPositions, paintRecords, glyphPositions,
+                    builder, layout
+                );
             }
 
             this._updateIntrinsicWidth(maxWordWidth);
         }
 
-        void _computeLineRuns(List<LineStyleRun> lineRuns, LineRange lineRange, ref int styleRunIndex) {
+        void _computePaintRecordsFromLine(int lineNumber,
+            ref int lineLimit, ref int styleRunIndex, ref float maxWordWidth, ref float yOffset, ref float preMaxDescent,
+            List<Range<int>> words, List<LineStyleRun> lineStyleRuns, List<CodeUnitRun> lineCodeUnitRuns,
+            List<GlyphPosition> lineGlyphPositions, List<PaintRecord> paintRecords, List<GlyphPosition> glyphPositions, 
+            TextBlobBuilder builder, Layout layout) {
+            
+            var lineRange = this._lineRanges[lineNumber];
+            int wordIndex = 0;
+            float runXOffset = 0;
+            float justifyXOffset = 0;
+            
+            // Break the line into words if justification should be applied.
+            bool justifyLine = this._paragraphStyle.textAlign == TextAlign.justify &&
+                               lineNumber != lineLimit - 1 && !lineRange.hardBreak;
+            float wordGapWidth = !(justifyLine && words.Count > 1) ? 0
+                : (this._width - this._lineWidths[lineNumber]) / (words.Count - 1);
+
+            this._findWords(lineRange.start, lineRange.end, words);
+            this._computeLineStyleRuns(lineStyleRuns, lineRange, ref styleRunIndex);
+            for (int lineStyleRunIndex = 0; lineStyleRunIndex < lineStyleRuns.Count; ++lineStyleRunIndex) {
+                glyphPositions.Clear();
+                var run = lineStyleRuns[lineStyleRunIndex];
+                this._generatePaintRecordFromLineStyleRun(
+                    run,
+                    lineRange,
+                    layout,
+                    builder,
+                    lineStyleRunIndex, 
+                    lineStyleRuns.Count,
+                    lineNumber,
+                    justifyLine,
+                    wordGapWidth,
+                    ref lineLimit,
+                    ref wordIndex,
+                    ref runXOffset,
+                    ref justifyXOffset,
+                    ref maxWordWidth,
+                    glyphPositions,
+                    words,
+                    paintRecords,
+                    lineGlyphPositions,
+                    lineCodeUnitRuns);
+            }
+
+            float lineXOffset = this._getAndShiftByLineXOffset(runXOffset, lineCodeUnitRuns, lineGlyphPositions);
+            this._computeLineOffset(lineNumber, lineRange, lineGlyphPositions, lineCodeUnitRuns, paintRecords,
+                ref yOffset, ref preMaxDescent);
+            this._addPaintRecordsWithOffset(paintRecords, lineXOffset, yOffset);
+        }
+
+        void _computeLineStyleRuns(List<LineStyleRun> lineStyleRuns, LineRange lineRange, ref int styleRunIndex) {
             // Exclude trailing whitespace from right-justified lines so the last
             // visible character in the line will be flush with the right margin.
             int lineEndIndex = this._paragraphStyle.textAlign == TextAlign.right ||
@@ -331,12 +387,13 @@ namespace Unity.UIWidgets.ui {
                 ? lineRange.endExcludingWhitespace
                 : lineRange.end;
 
-            lineRuns.Clear();
             while (styleRunIndex < this._runs.size) {
                 var styleRun = this._runs.getRun(styleRunIndex);
                 if (styleRun.start < lineEndIndex && styleRun.end > lineRange.start) {
-                    lineRuns.Add(new LineStyleRun(Mathf.Max(styleRun.start, lineRange.start),
-                        Mathf.Min(styleRun.end, lineEndIndex), styleRun.style));
+                    lineStyleRuns.Add(new LineStyleRun(
+                        Mathf.Max(styleRun.start, lineRange.start),
+                        Mathf.Min(styleRun.end, lineEndIndex),
+                        styleRun.style));
                 }
 
                 if (styleRun.end >= lineEndIndex) {
@@ -347,59 +404,36 @@ namespace Unity.UIWidgets.ui {
             }
         }
 
-        void _computePaintRecordsFromLine(int lineNumber, ref int lineLimit, LineRange lineRange, List<Range<int>> words,
-            List<LineStyleRun> lineRuns, ref int styleRunIndex, List<CodeUnitRun> lineCodeUnitRuns, List<GlyphPosition> lineGlyphPositions,
-            List<PaintRecord> paintRecords, TextBlobBuilder builder, List<GlyphPosition> glyphPositions, List<float> textAdvances,
-            Layout layout, ref float maxWordWidth, ref float yOffset, ref float preMaxDescent) {
-            float wordGapWidth = 0;
-
-            // Break the line into words if justification should be applied.
-            int wordIndex = 0;
-            bool justifyLine = this._paragraphStyle.textAlign == TextAlign.justify &&
-                               lineNumber != lineLimit - 1 && !lineRange.hardBreak;
-            words.Clear();
-            this.findWords(lineRange.start, lineRange.end, words);
-            if (justifyLine) {
-                if (words.Count > 1) {
-                    wordGapWidth = (this._width - this._lineWidths[lineNumber]) / (words.Count - 1);
-                }
-            }
-
-            this._computeLineRuns(lineRuns, lineRange, ref styleRunIndex);
-
-            float runXOffset = 0;
-            float justifyXOffset = 0;
-            lineCodeUnitRuns.Clear();
-            lineGlyphPositions.Clear();
-            paintRecords.Clear();
-            for (int i = 0; i < lineRuns.Count; ++i) {
-                var run = lineRuns[i];
-                this._generatePaintRecordFromLineStyleRun(run, i, 
-                    lineRange, lineRuns.Count, lineNumber, ref lineLimit, ref runXOffset, textAdvances,
-                    layout, builder, glyphPositions, ref justifyXOffset,
-                    words, ref wordIndex, justifyLine, wordGapWidth, ref maxWordWidth,
-                    paintRecords, lineGlyphPositions, lineCodeUnitRuns);
-            }
-
-            float lineXOffset = this._getAndShiftByLineXOffset(runXOffset, lineCodeUnitRuns, lineGlyphPositions);
-            this._computeLineOffset(lineNumber, lineRange, lineGlyphPositions, lineCodeUnitRuns, paintRecords,
-                ref yOffset, ref preMaxDescent);
-            this._addPaintRecordsWithOffset(paintRecords, lineXOffset, yOffset);
-        }
-
-        void _generatePaintRecordFromLineStyleRun(LineStyleRun run, int lineRunIndex, LineRange lineRange,
-            int lineRunsCount, int lineNumber, ref int lineLimit, ref float runXOffset, List<float> textAdvances,
-            Layout layout, TextBlobBuilder builder, List<GlyphPosition> glyphPositions, ref float justifyXOffset,
-            List<Range<int>> words, ref int wordIndex, bool justifyLine, float wordGapWidth, ref float maxWordWidth,
-            List<PaintRecord> paintRecords, List<GlyphPosition> lineGlyphPositions, List<CodeUnitRun> lineCodeUnitRuns) {
+        void _generatePaintRecordFromLineStyleRun(
+            LineStyleRun run,
+            LineRange lineRange,
+            Layout layout, TextBlobBuilder builder,
+            int lineStyleRunIndex,
+            int lineRunsCount,
+            int lineNumber,
+            bool justifyLine,
+            float wordGapWidth,
+            ref int lineLimit,
+            ref int wordIndex,
+            ref float runXOffset,
+            ref float justifyXOffset,
+            ref float maxWordWidth,
+            List<GlyphPosition> glyphPositions,
+            List<Range<int>> words,
+            List<PaintRecord> paintRecords,
+            List<GlyphPosition> lineGlyphPositions,
+            List<CodeUnitRun> lineCodeUnitRuns) {
             string text = this._text;
             int textStart = run.start;
             int textEnd = run.end;
             int textCount = textEnd - textStart;
 
-            if (this._shouldConsiderEllipsis(lineRange, lineRunIndex, lineRunsCount, lineNumber, lineLimit)) {
-                this._handleOverflowEllipsis(ref text, run, runXOffset, textAdvances,
-                    ref textStart, ref textCount, ref lineLimit, lineNumber);
+            if (this._shouldConsiderEllipsis(lineRange, lineStyleRunIndex, lineRunsCount, lineNumber, lineLimit)) {
+                this._handleOverflowEllipsis(ref text, ref textStart, ref textCount, run.style, runXOffset);
+                if (this._paragraphStyle.maxLines == null) {
+                    lineLimit = lineNumber + 1;
+                    this._didExceedMaxLines = true;
+                }
             }
 
             layout.doLayout(runXOffset, new TextBuff(text), textStart, textCount, run.style);
@@ -409,12 +443,22 @@ namespace Unity.UIWidgets.ui {
 
             float wordStartPosition = float.NaN;
             builder.allocRunPos(run.style, text, textStart, textCount);
-            builder.setBounds(layout.getBounds()
-                .translate(-layout.getX(0), 0)); // bounds relative to first character
+            // bounds relative to first character
+            builder.setBounds(layout.getBounds().translate(-layout.getX(0), 0));
 
-            glyphPositions.Clear();
-            this._populateGlyphPositions(textStart, textCount, builder, layout, ref justifyXOffset, glyphPositions,
-                runXOffset, words, ref wordIndex, run, ref wordStartPosition, justifyLine, wordGapWidth, ref maxWordWidth);
+            this._populateGlyphPositions(
+                textStart, textCount,
+                builder, layout,
+                glyphPositions,
+                words,
+                run,
+                runXOffset,
+                wordGapWidth,
+                justifyLine,
+                ref wordIndex,
+                ref justifyXOffset,
+                ref wordStartPosition,
+                ref maxWordWidth);
 
             if (glyphPositions.Count == 0) {
                 return;
@@ -424,47 +468,51 @@ namespace Unity.UIWidgets.ui {
                 lineGlyphPositions, glyphPositions, lineCodeUnitRuns);
         }
 
-        bool _shouldConsiderEllipsis(LineRange lineRange, int lineRunIndex, int lineRunsCount, int lineNumber, int lineLimit) {
+        bool _shouldConsiderEllipsis(LineRange lineRange, int lineStyleRunIndex, int lineRunsCount, int lineNumber, int lineLimit) {
             return !string.IsNullOrEmpty(this._paragraphStyle.ellipsis) && !this._width.isInfinite() && !lineRange.hardBreak
-                   && lineRunIndex == lineRunsCount - 1 &&
+                   && lineStyleRunIndex == lineRunsCount - 1 &&
                    (lineNumber == lineLimit - 1 || this._paragraphStyle.maxLines == null);
         }
 
-        void _handleOverflowEllipsis(ref string text, LineStyleRun run, float runXOffset, 
-            List<float> textAdvances, ref int textStart, ref int textCount, ref int lineLimit, int lineNumber) {
+        void _handleOverflowEllipsis(ref string text, ref int textStart, ref int textCount, TextStyle style, float runXOffset) {
             // By now, all characters have been "RequestCharactersInTexture"d by computeLineBreaks
             // except the ellipsis, so Layout.doLayout skips calling RequestCharactersInTexture for
             // performance, and the ellipsis is handled here
-            Layout.requireEllipsisInTexture(this._paragraphStyle.ellipsis, run.style);
+            Layout.requireEllipsisInTexture(this._paragraphStyle.ellipsis, style);
             
             TextBuff ellipsisTextBuff = new TextBuff(this._paragraphStyle.ellipsis);
             float ellipsisWidth = Layout.measureText(runXOffset, ellipsisTextBuff, 0,
-                this._paragraphStyle.ellipsis.Length, run.style, null, 0, this._tabStops);
-            textAdvances.reset(textCount);
-            float textWidth = Layout.measureText(runXOffset, new TextBuff(text), textStart, textCount,
-                run.style, textAdvances, 0, this._tabStops);
+                this._paragraphStyle.ellipsis.Length, style, null, 0, this._tabStops);
+            // This "new" is executed at most once in each layout, no need to bother create in the beginning
+            // and pass all the way here
+            var textAdvances = new List<float>(new float[textCount]);
+            float textWidth = Layout.measureText(runXOffset, new TextBuff(text), textStart, textCount, style,
+                textAdvances, 0, this._tabStops);
 
+            // Find the minimum number of characters to truncate, so that the truncated text appended with ellipsis
+            // is within the constraints of line width
             int truncateCount = 0;
-            while (truncateCount < textCount &&
-                   runXOffset + textWidth + ellipsisWidth > this._width) {
+            while (truncateCount < textCount && runXOffset + textWidth + ellipsisWidth > this._width) {
                 textWidth -= textAdvances[textCount - truncateCount - 1];
                 truncateCount++;
             }
 
-            var ellipsizedText = this._text.Substring(textStart, textCount - truncateCount) + this._paragraphStyle.ellipsis;
+            text = this._text.Substring(textStart, textCount - truncateCount) + this._paragraphStyle.ellipsis;
             textStart = 0;
-            textCount = ellipsizedText.Length;
-            text = ellipsizedText;
-
-            if (this._paragraphStyle.maxLines == null) {
-                lineLimit = lineNumber + 1;
-                this._didExceedMaxLines = true;
-            }
+            textCount = text.Length;
         }
 
-        void _populateGlyphPositions(int textStart, int textCount, TextBlobBuilder builder, Layout layout,
-            ref float justifyXOffset, List<GlyphPosition> glyphPositions, float runXOffset, List<Range<int>> words,
-            ref int wordIndex, LineStyleRun run, ref float wordStartPosition, bool justifyLine, float wordGapWidth,
+        void _populateGlyphPositions(int textStart, int textCount,
+            TextBlobBuilder builder, Layout layout,
+            List<GlyphPosition> glyphPositions,
+            List<Range<int>> words,
+            LineStyleRun run,
+            float runXOffset,
+            float wordGapWidth,
+            bool justifyLine,
+            ref int wordIndex,
+            ref float justifyXOffset,
+            ref float wordStartPosition,
             ref float maxWordWidth) {
             for (int glyphIndex = 0; glyphIndex < textCount; ++glyphIndex) {
                 float glyphXOffset = layout.getX(glyphIndex) + justifyXOffset;
@@ -891,7 +939,7 @@ namespace Unity.UIWidgets.ui {
             newLinePositions.Add(this._text.Length);
         }
 
-        void findWords(int start, int end, List<Range<int>> words) {
+        void _findWords(int start, int end, List<Range<int>> words) {
             var inWord = false;
             int wordStart = 0;
             for (int i = start; i < end; ++i) {
