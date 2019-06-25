@@ -40,7 +40,7 @@ namespace Unity.UIWidgets.ui {
             this.direction = direction;
         }
 
-        public void Shift(float shift) {
+        public void shift(float shift) {
             this.xPos = RangeUtils.shift(this.xPos, shift);
             for (int i = 0; i < this.positions.Count; ++i) {
                 this.positions[i] = this.positions[i].shift(shift);
@@ -274,8 +274,8 @@ namespace Unity.UIWidgets.ui {
             }
 
             var textStyle = this._paragraphStyle.getTextStyle();
-            this._tabStops.setFont(FontManager.instance.getOrCreate(textStyle.fontFamily,
-                    textStyle.fontWeight, textStyle.fontStyle).font,
+            this._tabStops.setFont(
+                FontManager.instance.getOrCreate(textStyle.fontFamily, textStyle.fontWeight, textStyle.fontStyle).font,
                 textStyle.UnityFontSize);
 
             this._needsLayout = false;
@@ -371,7 +371,8 @@ namespace Unity.UIWidgets.ui {
                     lineCodeUnitRuns);
             }
 
-            float lineXOffset = this._getAndShiftByLineXOffset(runXOffset, lineCodeUnitRuns, lineGlyphPositions);
+            float lineXOffset = this.getLineXOffset(runXOffset);
+            this._shiftByLineXOffset(runXOffset, lineCodeUnitRuns, lineGlyphPositions);
             this._computeLineOffset(lineNumber, lineGlyphPositions, lineCodeUnitRuns, paintRecords,
                 ref yOffset, ref preMaxDescent);
             this._addPaintRecordsWithOffset(paintRecords, lineXOffset, yOffset);
@@ -515,7 +516,7 @@ namespace Unity.UIWidgets.ui {
             for (int glyphIndex = 0; glyphIndex < textCount; ++glyphIndex) {
                 float glyphXOffset = layout.getX(glyphIndex) + justifyXOffset;
                 float glyphAdvance = layout.getCharAdvance(glyphIndex);
-                builder.positions[glyphIndex] = new Vector2d(glyphXOffset, layout.getY(glyphIndex));
+                builder.positions[glyphIndex] = new Vector2d(glyphXOffset);
                 glyphPositions.Add(new GlyphPosition(runXOffset + glyphXOffset, glyphAdvance,
                     new Range<int>(textStart + glyphIndex, textStart + glyphIndex + 1)));
                 if (wordIndex < words.Count && words[wordIndex].start == runStart + glyphIndex) {
@@ -554,19 +555,16 @@ namespace Unity.UIWidgets.ui {
                 lineNumber, TextDirection.ltr));
         }
 
-        float _getAndShiftByLineXOffset(float runXOffset, List<CodeUnitRun> lineCodeUnitRuns, List<GlyphPosition> lineGlyphPositions) {
-            float lineXOffset = this.getLineXOffset(runXOffset);
+        void _shiftByLineXOffset(float lineXOffset, List<CodeUnitRun> lineCodeUnitRuns, List<GlyphPosition> lineGlyphPositions) {
             if (lineXOffset != 0) {
                 foreach (var codeUnitRun in lineCodeUnitRuns) {
-                    codeUnitRun.Shift(lineXOffset);
+                    codeUnitRun.shift(lineXOffset);
                 }
 
                 for (int i = 0; i < lineGlyphPositions.Count; ++i) {
                     lineGlyphPositions[i] = lineGlyphPositions[i].shift(lineXOffset);
                 }
             }
-
-            return lineXOffset;
         }
 
         void _computeLineOffset(int lineNumber,

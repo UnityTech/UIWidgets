@@ -49,7 +49,7 @@ namespace Unity.UIWidgets.ui {
             }
             else {
                 Font font = FontManager.instance.getOrCreate(style.fontFamily, style.fontWeight, style.fontStyle).font;
-                font.RequestCharactersInTextureSafe(buff.text, style.UnityFontSize, style.UnityFontStyle);
+                font.RequestCharactersInTextureSafe(buff.subString(start, count), style.UnityFontSize, style.UnityFontStyle);
                 for (int i = 0; i < count; i++) {
                     char ch = buff.charAt(start + i);
                     if (font.getGlyphInfo(ch, out var glyphInfo, style.UnityFontSize, style.UnityFontStyle)) {
@@ -128,34 +128,7 @@ namespace Unity.UIWidgets.ui {
                 }
 
                 if (font.getGlyphInfo(ch, out var glyphInfo, style.UnityFontSize, style.UnityFontStyle)) {
-                    var minX = glyphInfo.minX + x;
-                    var maxX = glyphInfo.maxX + x;
-                    var minY = -glyphInfo.maxY;
-                    var maxY = -glyphInfo.minY;
-
-                    if (_innerBounds.width <= 0 || _innerBounds.height <= 0) {
-                        _innerBounds.x = minX;
-                        _innerBounds.y = minY;
-                        _innerBounds.xMax = maxX;
-                        _innerBounds.yMax = maxY;
-                    }
-                    else {
-                        if (minX < _innerBounds.x) {
-                            _innerBounds.x = minX;
-                        }
-
-                        if (minY < _innerBounds.y) {
-                            _innerBounds.y = minY;
-                        }
-
-                        if (maxX > _innerBounds.xMax) {
-                            _innerBounds.xMax = maxX;
-                        }
-
-                        if (maxY > _innerBounds.yMax) {
-                            _innerBounds.yMax = maxY;
-                        }
-                    }
+                    _updateInnerBounds(glyphInfo, x);
                 }
 
                 if (positions != null) {
@@ -164,7 +137,7 @@ namespace Unity.UIWidgets.ui {
 
                 float advance = glyphInfo.advance;
                 if (ch == '\t') {
-                    advance = tabStops.nextTab((initAdvance + offset)) - initAdvance;
+                    advance = tabStops.nextTab(initAdvance + offset) - initAdvance;
                 }
 
                 x += advance;
@@ -205,30 +178,7 @@ namespace Unity.UIWidgets.ui {
                     var maxX = metrics.descent - metrics.ascent + x;
                     var minY = metrics.ascent;
                     var maxY = metrics.descent;
-
-                    if (_innerBounds.width <= 0 || _innerBounds.height <= 0) {
-                        _innerBounds.x = minX;
-                        _innerBounds.y = minY;
-                        _innerBounds.xMax = maxX;
-                        _innerBounds.yMax = maxY;
-                    }
-                    else {
-                        if (minX < _innerBounds.x) {
-                            _innerBounds.x = minX;
-                        }
-
-                        if (minY < _innerBounds.y) {
-                            _innerBounds.y = minY;
-                        }
-
-                        if (maxX > _innerBounds.xMax) {
-                            _innerBounds.xMax = maxX;
-                        }
-
-                        if (maxY > _innerBounds.yMax) {
-                            _innerBounds.yMax = maxY;
-                        }
-                    }
+                    _updateInnerBounds(minX, maxX, minY, maxY);
 
                     if (positions != null) {
                         positions[i] = x;
@@ -256,6 +206,40 @@ namespace Unity.UIWidgets.ui {
             }
 
             return x;
+        }
+
+        static void _updateInnerBounds(CharacterInfo glyphInfo, float x) {
+            var minX = glyphInfo.minX + x;
+            var maxX = glyphInfo.maxX + x;
+            var minY = -glyphInfo.maxY;
+            var maxY = -glyphInfo.minY;
+            _updateInnerBounds(minX, maxX, minY, maxY);
+        }
+
+        static void _updateInnerBounds(float minX, float maxX, float minY, float maxY) {
+            if (_innerBounds.width <= 0 || _innerBounds.height <= 0) {
+                _innerBounds.x = minX;
+                _innerBounds.y = minY;
+                _innerBounds.xMax = maxX;
+                _innerBounds.yMax = maxY;
+            }
+            else {
+                if (minX < _innerBounds.x) {
+                    _innerBounds.x = minX;
+                }
+
+                if (minY < _innerBounds.y) {
+                    _innerBounds.y = minY;
+                }
+
+                if (maxX > _innerBounds.xMax) {
+                    _innerBounds.xMax = maxX;
+                }
+
+                if (maxY > _innerBounds.yMax) {
+                    _innerBounds.yMax = maxY;
+                }
+            }
         }
 
         public static void requireEllipsisInTexture(string text, TextStyle style) {

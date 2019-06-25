@@ -167,7 +167,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public static bool isBoundaryChar(char code) {
-            return char.IsPunctuation(code) || (code >= 0x4E00 && code <= 0x9FFF) || (code >= 0x3040 && code <= 0x30FF);
+            return (code >= 0x4E00 && code <= 0x9FFF) || (code >= 0x3040 && code <= 0x30FF) || char.IsPunctuation(code);
         }
         
         void nextUntilCodePoint() {
