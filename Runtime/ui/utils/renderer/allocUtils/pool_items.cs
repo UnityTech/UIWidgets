@@ -83,8 +83,9 @@ namespace Unity.UIWidgets.ui {
                 }
             }
 
-            var curItem = curPool[0];
-            curPool.RemoveAt(0);
+            var removeIdx = curPool.Count - 1;
+            var curItem = curPool[curPool.Count - 1];
+            curPool.RemoveAt(removeIdx);
 
             if (_debugFlag) {
                 debugInfo[typeof(T)].consume();
