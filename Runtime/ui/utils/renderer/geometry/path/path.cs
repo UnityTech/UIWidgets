@@ -1,10 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Unity.UIWidgets.foundation;
 using UnityEngine;
-using Vector2 = UnityEngine.Vector2;
-using Vector3 = UnityEngine.Vector3;
 
 namespace Unity.UIWidgets.ui {
     public class uiPath : PoolItem {

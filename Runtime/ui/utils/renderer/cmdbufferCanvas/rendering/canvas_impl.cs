@@ -261,25 +261,27 @@ namespace Unity.UIWidgets.ui {
             var path = uiPath.create();
             path.addRect(uiRectHelper.fromRect(rect));
             this._clipPath(path);
+            path.dispose();
         }
         
         void _clipUIRect(uiRect rect) {
             var path = uiPath.create();
             path.addRect(rect);
             this._clipPath(path);
+            path.dispose();
         }
 
         void _clipRRect(RRect rrect) {
             var path = uiPath.create();
             path.addRRect(rrect);
             this._clipPath(path);
+            path.dispose();
         }
 
         void _clipPath(uiPath path) {
             var layer = this._currentLayer;
             var state = layer.currentState;
             layer.clipStack.clipPath(path, state.matrix.Value, state.scale * this._devicePixelRatio);
-            path.dispose();
         }
 
         void _tryAddScissor(RenderLayer layer, uiRect? scissor) {
@@ -556,7 +558,6 @@ namespace Unity.UIWidgets.ui {
             if (paint.style == PaintingStyle.fill) {
                 var state = this._currentLayer.currentState;
                 var cache = path.flatten(state.scale * this._devicePixelRatio);
-                path.dispose();
 
                 bool convex;
                 var fillMesh = cache.getFillMesh(out convex);
@@ -588,7 +589,6 @@ namespace Unity.UIWidgets.ui {
                 }
 
                 var cache = path.flatten(state.scale * this._devicePixelRatio);
-                path.dispose();
 
                 var strokenMesh = cache.getStrokeMesh(
                     strokeWidth / state.scale * 0.5f,
@@ -738,11 +738,13 @@ namespace Unity.UIWidgets.ui {
                     case DrawClipPath cmd: {
                         var uipath = uiPath.fromPath(cmd.path);
                         this._clipPath(uipath);
+                        uipath.dispose();
                         break;
                     }
                     case DrawPath cmd: {
                         var uipath = uiPath.fromPath(cmd.path);
                         this._drawPath(uipath, cmd.paint);
+                        uipath.dispose();
                         break;
                     }
                     case DrawImage cmd: {

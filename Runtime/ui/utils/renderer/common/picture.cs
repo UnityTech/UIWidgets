@@ -4,20 +4,31 @@ using Unity.UIWidgets.foundation;
 
 
 namespace Unity.UIWidgets.ui {
-    public class uiPicture {
-        public uiPicture(List<uiDrawCmd> drawCmds, uiRect paintBounds) {
-            this.drawCmds = drawCmds;
-            this.paintBounds = paintBounds;
+    public class uiPicture : PoolItem {
+        public uiPicture() {
+            
+        }
+        
+        public static uiPicture create(List<uiDrawCmd> drawCmds, uiRect paintBounds) {
+            var picture = ItemPoolManager.alloc<uiPicture>();
+            picture.drawCmds = drawCmds;
+            picture.paintBounds = paintBounds;
+            return picture;
         }
 
-        public readonly List<uiDrawCmd> drawCmds;
-        public readonly uiRect paintBounds;
+        public List<uiDrawCmd> drawCmds;
+        public uiRect paintBounds;
+
+        public override void clear() {
+            //the recorder will dispose the draw commands
+            this.drawCmds = null;
+        }
     }
 
     public class uiPictureRecorder {
-        readonly List<uiDrawCmd> _drawCmds = new List<uiDrawCmd>();
+        readonly List<uiDrawCmd> _drawCmds = new List<uiDrawCmd>(128);
 
-        readonly List<uiCanvasState> _states = new List<uiCanvasState>();
+        readonly List<uiCanvasState> _states = new List<uiCanvasState>(32);
 
         public uiPictureRecorder() {
             this.reset();
@@ -33,6 +44,10 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void reset() {
+            foreach (var drawCmd in this._drawCmds) {
+                drawCmd.dispose();
+            }
+            
             this._drawCmds.Clear();
             this._states.Clear();
             this._states.Add(new uiCanvasState {
@@ -50,7 +65,7 @@ namespace Unity.UIWidgets.ui {
             }
 
             var state = this._getState();            
-            return new uiPicture(this._drawCmds, state.paintBounds);
+            return uiPicture.create(this._drawCmds, state.paintBounds);
         }
 
         public void addDrawCmd(uiDrawCmd drawCmd) {
@@ -169,7 +184,9 @@ namespace Unity.UIWidgets.ui {
                     uiMeshMesh mesh;
                     if (paint.style == PaintingStyle.fill) {
                         var cache = path.flatten(scale * devicePixelRatio);
-                        mesh = cache.getFillMesh(out _).transform(state.xform);
+                        var fillMesh = cache.getFillMesh(out _);
+                        mesh = fillMesh.transform(state.xform);
+                        fillMesh.dispose();
                         cache.dispose();
                     } else {
                         float strokeWidth = (paint.strokeWidth * scale).clamp(0, 200.0f);
@@ -198,6 +215,8 @@ namespace Unity.UIWidgets.ui {
                     } else {
                         this._addPaintBounds(mesh.bounds);
                     }
+                    
+                    mesh.dispose();
                     break;
                 }
                 case uiDrawImage cmd: {
@@ -265,7 +284,7 @@ namespace Unity.UIWidgets.ui {
             }
         }
 
-        class uiCanvasState {
+        struct uiCanvasState {
             public uiMatrix3 xform;
             public uiRect? scissor;
             public bool saveLayer;
@@ -273,12 +292,12 @@ namespace Unity.UIWidgets.ui {
             public uiRect paintBounds;
 
             public uiCanvasState copy() {
-                return new uiCanvasState {
+                return new uiCanvasState{
                     xform = this.xform,
                     scissor = this.scissor,
                     saveLayer = false,
                     layerOffset = null,
-                    paintBounds = this.paintBounds,
+                    paintBounds = this.paintBounds
                 };
             }
         }
