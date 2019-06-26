@@ -9,6 +9,16 @@ namespace Unity.UIWidgets.ui {
 
         List<uiPathPath> _paths = new List<uiPathPath>();
         List<uiPathPoint> _points = new List<uiPathPoint>();
+        
+        //mesh cache
+        uiMeshMesh _fillMesh;
+        bool _fillConvex;
+
+        uiMeshMesh _strokeMesh;
+        float _strokeWidth;
+        StrokeCap _lineCap;
+        StrokeJoin _lineJoin;
+        float _miterLimit;
 
         public static uiPathCache create(float scale) {
             uiPathCache newPathCache = ItemPoolManager.alloc<uiPathCache>();
@@ -20,6 +30,11 @@ namespace Unity.UIWidgets.ui {
         public override void clear() {
             this._paths.Clear();
             this._points.Clear();
+            this._fillMesh?.dispose();
+            this._fillMesh = null;
+            
+            this._strokeMesh?.dispose();
+            this._strokeMesh = null;
         }
 
         public uiPathCache() {
@@ -216,6 +231,11 @@ namespace Unity.UIWidgets.ui {
         }
 
         public uiMeshMesh getFillMesh(out bool convex) {
+            if (this._fillMesh != null) {
+                convex = this._fillConvex;
+                return this._fillMesh;
+            }
+            
             var vertices = this._expandFill();
 
             var paths = this._paths;
@@ -253,19 +273,18 @@ namespace Unity.UIWidgets.ui {
             D.assert(indices.Count == cindices);
 
             var mesh = uiMeshMesh.create(null, vertices, indices);
-
-            var _fillMesh = mesh;
-
-            var _fillConvex = false;
+            this._fillMesh = mesh;
+            
+             this._fillConvex = false;
             for (var i = 0; i < paths.Count; i++) {
                  var path =  paths[i];
                 if (path.count <= 2) {
                     continue;
                 }
 
-                if (_fillConvex) {
+                if (this._fillConvex) {
                     // if more than two paths, convex is false.
-                    _fillConvex = false;
+                    this._fillConvex = false;
                     break;
                 }
 
@@ -274,11 +293,11 @@ namespace Unity.UIWidgets.ui {
                     break;
                 }
 
-                _fillConvex = true;
+                this._fillConvex = true;
             }
 
-            convex = _fillConvex;
-            return _fillMesh;
+            convex = this._fillConvex;
+            return this._fillMesh;
         }
 
         void _calculateJoins(float w, StrokeJoin lineJoin, float miterLimit) {
@@ -469,6 +488,14 @@ namespace Unity.UIWidgets.ui {
         }
 
         public uiMeshMesh getStrokeMesh(float strokeWidth, StrokeCap lineCap, StrokeJoin lineJoin, float miterLimit) {
+            if (this._strokeMesh != null &&
+                this._strokeWidth == strokeWidth &&
+                this._lineCap == lineCap &&
+                this._lineJoin == lineJoin &&
+                this._miterLimit == miterLimit) {
+                return this._strokeMesh;
+            }
+            
             var vertices = this._expandStroke(strokeWidth, lineCap, lineJoin, miterLimit);
 
             var paths = this._paths;
@@ -512,8 +539,13 @@ namespace Unity.UIWidgets.ui {
 
             D.assert(indices.Count == cindices);
 
-            var _strokeMesh = uiMeshMesh.create(null, vertices, indices);         
-            return _strokeMesh;
+            this._strokeMesh?.dispose();
+            this._strokeMesh = uiMeshMesh.create(null, vertices, indices);
+            this._strokeWidth = strokeWidth;
+            this._lineCap = lineCap;
+            this._lineJoin = lineJoin;
+            this._miterLimit = miterLimit;        
+            return this._strokeMesh;
         }
     }
 }

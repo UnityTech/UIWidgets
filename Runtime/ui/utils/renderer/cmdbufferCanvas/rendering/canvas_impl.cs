@@ -562,7 +562,6 @@ namespace Unity.UIWidgets.ui {
                 bool convex;
                 var fillMesh = cache.getFillMesh(out convex);
                 var mesh = fillMesh.transform(state.matrix);
-                fillMesh.dispose();
                 cache.dispose();
 
                 if (paint.maskFilter != null && paint.maskFilter.sigma != 0) {
@@ -597,7 +596,6 @@ namespace Unity.UIWidgets.ui {
                     paint.strokeMiterLimit);
 
                 var mesh = strokenMesh.transform(state.matrix);
-                strokenMesh.dispose();
                 cache.dispose();
 
                 if (paint.maskFilter != null && paint.maskFilter.sigma != 0) {
