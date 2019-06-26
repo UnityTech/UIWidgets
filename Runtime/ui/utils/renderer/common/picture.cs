@@ -169,7 +169,6 @@ namespace Unity.UIWidgets.ui {
                     var transformedMesh = rectMesh.transform(state.xform);
                     var rect = transformedMesh.bounds;
                     state.scissor = state.scissor == null ? rect : state.scissor.Value.intersect(rect);
-                    rectPathCache.dispose();
                     transformedMesh.dispose();
                     break;
                 }
@@ -185,7 +184,6 @@ namespace Unity.UIWidgets.ui {
                         var cache = path.flatten(scale * devicePixelRatio);
                         var fillMesh = cache.getFillMesh(out _);
                         mesh = fillMesh.transform(state.xform);
-                        cache.dispose();
                     } else {
                         float strokeWidth = (paint.strokeWidth * scale).clamp(0, 200.0f);
                         float fringeWidth = 1 / devicePixelRatio;
@@ -202,7 +200,6 @@ namespace Unity.UIWidgets.ui {
                             paint.strokeMiterLimit);
                         
                         mesh = strokenMesh.transform(state.xform);
-                        cache.dispose();
                     }
                     
                     if (paint.maskFilter != null && paint.maskFilter.sigma != 0) {

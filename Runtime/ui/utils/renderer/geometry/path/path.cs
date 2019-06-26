@@ -10,6 +10,8 @@ namespace Unity.UIWidgets.ui {
         float _commandy;
         float _minX, _minY;
         float _maxX, _maxY;
+        
+        uiPathCache _cache;
 
         public static uiPath create(int capacity = 128) {
             uiPath newPath = ItemPoolManager.alloc<uiPath>();
@@ -22,6 +24,8 @@ namespace Unity.UIWidgets.ui {
 
         public override void clear() {
             this._commands.dispose();
+            this._cache?.dispose();
+            this._cache = null;
         }
 
         void _reset() {
@@ -32,10 +36,16 @@ namespace Unity.UIWidgets.ui {
             this._minY = float.MaxValue;
             this._maxX = float.MinValue;
             this._maxY = float.MinValue;
+            this._cache?.dispose();
+            this._cache = null;
         }
 
         internal uiPathCache flatten(float scale) {
             scale = Mathf.Round(scale * 2.0f) / 2.0f; // round to 0.5f
+            
+            if (this._cache != null && this._cache.canReuse(scale)) {
+                return this._cache;
+            }
             
             var _cache = uiPathCache.create(scale);
 
@@ -74,6 +84,8 @@ namespace Unity.UIWidgets.ui {
             }
 
             _cache.normalize();
+            this._cache?.dispose();
+            this._cache = _cache;
             return _cache;
         }
 
@@ -100,6 +112,9 @@ namespace Unity.UIWidgets.ui {
 
             this._commandx = x;
             this._commandy = y;
+            
+            this._cache?.dispose();
+            this._cache = null;
         }
 
         void _appendLineTo(float x, float y) {
@@ -112,6 +127,9 @@ namespace Unity.UIWidgets.ui {
 
             this._commandx = x;
             this._commandy = y;
+            
+            this._cache?.dispose();
+            this._cache = null;
         }
 
         void _appendBezierTo(float x1, float y1, float x2, float y2, float x3, float y3) {
@@ -130,15 +148,24 @@ namespace Unity.UIWidgets.ui {
             
             this._commandx = x3;
             this._commandy = y3;
+            
+            this._cache?.dispose();
+            this._cache = null;
         }
         
         void _appendClose() {
             this._commands.Add((float) uiPathCommand.close);
+            
+            this._cache?.dispose();
+            this._cache = null;
         }
 
         void _appendWinding(float winding) {
             this._commands.Add((float) uiPathCommand.winding);
             this._commands.Add(winding);
+            
+            this._cache?.dispose();
+            this._cache = null;
         }
 
         public void addRect(uiRect rect) {

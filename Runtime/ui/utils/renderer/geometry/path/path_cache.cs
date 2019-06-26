@@ -3,12 +3,15 @@ using Unity.UIWidgets.foundation;
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
+    
     class uiPathCache : PoolItem {
         float _distTol;
         float _tessTol;
 
         List<uiPathPath> _paths = new List<uiPathPath>();
         List<uiPathPoint> _points = new List<uiPathPoint>();
+
+        float _scale;
         
         //mesh cache
         uiMeshMesh _fillMesh;
@@ -24,7 +27,16 @@ namespace Unity.UIWidgets.ui {
             uiPathCache newPathCache = ItemPoolManager.alloc<uiPathCache>();
             newPathCache._distTol = 0.01f / scale;
             newPathCache._tessTol = 0.25f / scale;
+            newPathCache._scale = scale;
             return newPathCache;
+        }
+        
+        public bool canReuse(float scale) {
+            if (this._scale != scale) {
+                return false;
+            }
+
+            return true;
         }
 
         public override void clear() {

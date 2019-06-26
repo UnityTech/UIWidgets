@@ -38,7 +38,6 @@ namespace Unity.UIWidgets.ui {
             var pathCache = uiPath.flatten(scale);
             var fillMesh = pathCache.getFillMesh(out newElement.convex);
             newElement.mesh = fillMesh.transform(matrix);
-            pathCache.dispose();
             
             var vertices = newElement.mesh.vertices;
             if (newElement.convex && vertices.Count == 4 && matrix.rectStaysRect() &&
