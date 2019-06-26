@@ -91,19 +91,19 @@ namespace Unity.UIWidgets.ui {
             }
 
             char c = this._text.charAt(this._current);
-            bool preType = char.IsWhiteSpace(c);
+            bool preWhiteSpace = char.IsWhiteSpace(c);
             bool preBoundaryChar = isBoundaryChar(c);
             this._current++;
             if (preBoundaryChar) {
                 return this._current;
             }
             
-            this._findBoundaryCharOrTypeChange(preType);
+            this._findBoundaryCharOrTypeChange(preWhiteSpace);
             
             return this._current;
         }
 
-        void _findBoundaryCharOrTypeChange(bool preType) {
+        void _findBoundaryCharOrTypeChange(bool preWhiteSpace) {
             for (; this._current < this._text.size; ++this._current) {
                 // this.nextUntilCodePoint();
                 if (this._current >= this._text.size) {
@@ -116,10 +116,10 @@ namespace Unity.UIWidgets.ui {
                 }
 
                 bool currentType = char.IsWhiteSpace(c);
-                if (currentType != preType) {
+                if (currentType != preWhiteSpace) {
                     break;
                 }
-                preType = currentType;
+                preWhiteSpace = currentType;
             }
         }
         

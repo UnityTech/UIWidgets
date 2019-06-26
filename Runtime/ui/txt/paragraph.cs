@@ -43,7 +43,7 @@ namespace Unity.UIWidgets.ui {
         public void shift(float shift) {
             this.xPos = RangeUtils.shift(this.xPos, shift);
             for (int i = 0; i < this.positions.Count; ++i) {
-                this.positions[i] = this.positions[i].shift(shift);
+                this.positions[i].shiftSelf(shift);
             }
         }
     }
@@ -111,7 +111,7 @@ namespace Unity.UIWidgets.ui {
     }
 
     struct GlyphPosition {
-        public readonly Range<float> xPos;
+        public Range<float> xPos;
         public readonly Range<int> codeUnits;
 
         public GlyphPosition(float start, float advance, Range<int> codeUnits) {
@@ -121,6 +121,10 @@ namespace Unity.UIWidgets.ui {
 
         public GlyphPosition shift(float shift) {
             return new GlyphPosition(this.xPos.start + shift, this.xPos.end - this.xPos.start, this.codeUnits);
+        }
+
+        public void shiftSelf(float shift) {
+            this.xPos = new Range<float>(this.xPos.start + shift, this.xPos.end + shift);
         }
     }
 
@@ -484,7 +488,7 @@ namespace Unity.UIWidgets.ui {
                 this._paragraphStyle.ellipsis.Length, style, null, 0, this._tabStops);
             // This "new" is executed at most once in each layout, no need to bother create in the beginning
             // and pass all the way here
-            var textAdvances = new List<float>(new float[textCount]);
+            var textAdvances = new float[textCount];
             float textWidth = Layout.measureText(runXOffset, new TextBuff(text), textStart, textCount, style,
                 textAdvances, 0, this._tabStops);
 
@@ -519,20 +523,23 @@ namespace Unity.UIWidgets.ui {
                 builder.positions[glyphIndex] = new Vector2d(glyphXOffset);
                 glyphPositions.Add(new GlyphPosition(runXOffset + glyphXOffset, glyphAdvance,
                     new Range<int>(textStart + glyphIndex, textStart + glyphIndex + 1)));
-                if (wordIndex < words.Count && words[wordIndex].start == runStart + glyphIndex) {
-                    wordStartPosition = runXOffset + glyphXOffset;
-                }
-
-                if (wordIndex < words.Count && words[wordIndex].end == runStart + glyphIndex + 1) {
-                    if (justifyLine) {
-                        justifyXOffset += wordGapWidth;
+                if (wordIndex < words.Count) {
+                    Range<int> word = words[wordIndex];
+                    if (word.start == runStart + glyphIndex) {
+                        wordStartPosition = runXOffset + glyphXOffset;
                     }
 
-                    wordIndex++;
-                    if (!float.IsNaN(wordStartPosition)) {
-                        float wordWidth = glyphPositions.last().xPos.end - wordStartPosition;
-                        maxWordWidth = Mathf.Max(wordWidth, maxWordWidth);
-                        wordStartPosition = float.NaN;
+                    if (word.end == runStart + glyphIndex + 1) {
+                        if (justifyLine) {
+                            justifyXOffset += wordGapWidth;
+                        }
+
+                        wordIndex++;
+                        if (!float.IsNaN(wordStartPosition)) {
+                            float wordWidth = glyphPositions.last().xPos.end - wordStartPosition;
+                            maxWordWidth = Mathf.Max(wordWidth, maxWordWidth);
+                            wordStartPosition = float.NaN;
+                        }
                     }
                 }
             }
@@ -562,7 +569,7 @@ namespace Unity.UIWidgets.ui {
                 }
 
                 for (int i = 0; i < lineGlyphPositions.Count; ++i) {
-                    lineGlyphPositions[i] = lineGlyphPositions[i].shift(lineXOffset);
+                    lineGlyphPositions[i].shiftSelf(lineXOffset);
                 }
             }
         }

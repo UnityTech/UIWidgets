@@ -24,7 +24,9 @@ namespace Unity.UIWidgets.ui {
                 return offset - 1;
             }
             for (int i = offset - 1; i > 0; i--) {
-                if (isWordBreakBefore(buff.charAt(i)) || isWordBreakAfter(buff.charAt(i - 1))) {
+                // Since i steps down, isWordBreakAfter(i) has already been checked in the previous step
+                // isWordBreakBeforeNotAfter cuts that part out to save time.
+                if (isWordBreakBeforeNotAfter(buff.charAt(i)) || isWordBreakAfter(buff.charAt(i - 1))) {
                     return i;
                 }
             }
@@ -32,8 +34,12 @@ namespace Unity.UIWidgets.ui {
         }
 
         
-        public static int getNextWordBreakForCache(TextBuff buff, int offset) {
+        public static int getNextWordBreak(TextBuff buff, int offset, int maxOffset) {
             int len = buff.size;
+            if (len > maxOffset) {
+                len = maxOffset + 1;
+            }
+                
             if (offset >= len) {
                 return len;
             }
@@ -48,19 +54,19 @@ namespace Unity.UIWidgets.ui {
                 }
             }
 
-            return len;
+            return maxOffset;
         }
 
         public static bool isWordBreakAfter(ushort c) {
-            if (isWordSpace(c) || (c >= 0x2000 && c <= 0x200a) || c == 0x3000) {
-                // spaces
-                return true;
-            }
-            return false;
+            return isWordSpace(c) || (c >= 0x2000 && c <= 0x200a) || c == 0x3000;
         }
         
         public static bool isWordBreakBefore(ushort c) {
             return isWordBreakAfter(c) || (c >= 0x3400 && c <= 0x9fff);
+        }
+
+        public static bool isWordBreakBeforeNotAfter(ushort c) {
+            return c >= 3400 && c <= 0x9fff;
         }
         
     }

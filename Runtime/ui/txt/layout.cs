@@ -6,29 +6,29 @@ namespace Unity.UIWidgets.ui {
     class Layout {
         int _start;
         int _count;
-        List<float> _advances = new List<float>();
-        List<float> _positions = new List<float>();
+        float[] _advances;
+        float[] _positions;
         float _advance;
         UnityEngine.Rect _bounds;
         TabStops _tabStops;
 
-        static UnityEngine.Rect _innerBounds; // Used to pass bounds from static to non-static doLayout
+        static float _x, _y, _maxX, _maxY; // Used to pass bounds from static to non-static doLayout
 
         public static float measureText(float offset, TextBuff buff, int start, int count, TextStyle style,
-            List<float> advances, int advanceOffset, TabStops tabStops) {
+            float[] advances, int advanceOffset, TabStops tabStops) {
             return _doLayout(offset, buff, start, count, style, advances, null, advanceOffset, tabStops);
         }
 
         public void doLayout(float offset, TextBuff buff, int start, int count, TextStyle style) {
             this._start = start;
             this._count = count;
-            this._advances.reset(count);
-            this._positions.reset(count);
+            this._advances = new float[count];
+            this._positions = new float[count];
 
-            _innerBounds = default;
+            _x = _y = _maxX = _maxY = 0;
             this._advance = _doLayout(offset, buff, start, count, style, this._advances, this._positions, 0,
                 this._tabStops);
-            this._bounds = _innerBounds;
+            this._bounds.Set(_x, _y, _maxX - _x, _maxY - _y);
 
             this._count = count;
         }
@@ -65,7 +65,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         static float _doLayout(float offset, TextBuff buff, int start, int count, TextStyle style,
-            List<float> advances, List<float> positions, int advanceOffset, TabStops tabStops) {
+            float[] advances, float[] positions, int advanceOffset, TabStops tabStops) {
             float advance = 0;
             Font font = FontManager.instance.getOrCreate(style.fontFamily, style.fontWeight, style.fontStyle).font;
 
@@ -77,22 +77,19 @@ namespace Unity.UIWidgets.ui {
             else {
                 // According to the logic of Paragraph.layout, it is assured that all the characters are requested
                 // in the texture before (in computing line breaks), so skip it here for optimization.
-                // The only exception is the ellipsis, which did not appear in line breaking. It is taken care with
+                // The only exception is the ellipsis, which did not appear in line breaking. It is taken care of
                 // only when needed.
                 
                 // font.RequestCharactersInTextureSafe(buff.text, style.UnityFontSize, style.UnityFontStyle);
 
-                int wordstart = start == buff.size
-                    ? start
-                    : LayoutUtils.getPrevWordBreakForCache(buff, start + 1);
+//                int wordstart = start == buff.size
+//                    ? start
+//                    : LayoutUtils.getPrevWordBreakForCache(buff, start + 1);
                 int wordend;
                 for (int iter = start; iter < start + count; iter = wordend) {
-                    wordend = LayoutUtils.getNextWordBreakForCache(buff, iter);
-                    int wordCount = Mathf.Min(start + count, wordend) - iter;
-                    advance = _layoutWord(offset, iter - start, buff.subBuff(wordstart, wordend - wordstart),
-                        iter - wordstart, wordCount, style, font, advances, positions,
-                        advanceOffset, advance, tabStops);
-                    wordstart = wordend;
+                    wordend = LayoutUtils.getNextWordBreak(buff, iter, start + count);
+                    advance = _layoutWord(offset, iter - start, buff, iter, wordend - iter,
+                        style, font, advances, positions, advanceOffset, advance, tabStops);
                 }
             }
 
@@ -100,8 +97,8 @@ namespace Unity.UIWidgets.ui {
         }
 
         static float _layoutWord(float offset, int layoutOffset,
-            TextBuff buff, int start, int wordCount, TextStyle style, Font font, List<float> advances,
-            List<float> positions, int advanceOffset, float initAdvance, TabStops tabStops) {
+            TextBuff buff, int start, int wordCount, TextStyle style, Font font, float[] advances,
+            float[] positions, int advanceOffset, float initAdvance, TabStops tabStops) {
             float wordSpacing =
                 wordCount == 1 && LayoutUtils.isWordSpace(buff.charAt(start)) ? style.wordSpacing : 0;
 
@@ -157,8 +154,8 @@ namespace Unity.UIWidgets.ui {
             return x;
         }
 
-        static float _layoutEmoji(string text, TextStyle style, Font font, int count, List<float> advances,
-            List<float> positions, int advanceOffset, float initAdvance) {
+        static float _layoutEmoji(string text, TextStyle style, Font font, int count, float[] advances,
+            float[] positions, int advanceOffset, float initAdvance) {
             var metrics = FontMetrics.fromFont(font, style.UnityFontSize);
             float x = initAdvance;
             for (int i = 0; i < count; i++) {
@@ -217,27 +214,27 @@ namespace Unity.UIWidgets.ui {
         }
 
         static void _updateInnerBounds(float minX, float maxX, float minY, float maxY) {
-            if (_innerBounds.width <= 0 || _innerBounds.height <= 0) {
-                _innerBounds.x = minX;
-                _innerBounds.y = minY;
-                _innerBounds.xMax = maxX;
-                _innerBounds.yMax = maxY;
+            if (_maxX - _x <= 0 || _maxY - _y <= 0) {
+                _x = minX;
+                _y = minY;
+                _maxX = maxX;
+                _maxY = maxY;
             }
             else {
-                if (minX < _innerBounds.x) {
-                    _innerBounds.x = minX;
+                if (minX < _x) {
+                    _x = minX;
                 }
 
-                if (minY < _innerBounds.y) {
-                    _innerBounds.y = minY;
+                if (minY < _y) {
+                    _y = minY;
                 }
 
-                if (maxX > _innerBounds.xMax) {
-                    _innerBounds.xMax = maxX;
+                if (maxX > _maxX) {
+                    _maxX = maxX;
                 }
 
-                if (maxY > _innerBounds.yMax) {
-                    _innerBounds.yMax = maxY;
+                if (maxY > _maxY) {
+                    _maxY = maxY;
                 }
             }
         }
@@ -255,7 +252,7 @@ namespace Unity.UIWidgets.ui {
             return this._count;
         }
 
-        public List<float> getAdvances() {
+        public float[] getAdvances() {
             return this._advances;
         }
 
