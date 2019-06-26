@@ -39,6 +39,10 @@ namespace Unity.UIWidgets.ui {
             return this._states[this._states.Count - 1];
         }
 
+        void _setState(uiCanvasState state) {
+            this._states[this._states.Count - 1] = state;
+        }
+
         public uiMatrix3 getTotalMatrix() {
             return this._getState().xform;
         }
@@ -97,18 +101,21 @@ namespace Unity.UIWidgets.ui {
                         paintBounds = state.xform.mapRect(paintBounds);
                         this._addPaintBounds(paintBounds);
                     }
+                    this._setState(state);
                     break;
                 }
                 case uiDrawTranslate cmd: {
                     var state = this._getState();
                     state.xform = new uiMatrix3(state.xform);
                     state.xform.preTranslate(cmd.dx, cmd.dy);
+                    this._setState(state);
                     break;
                 }
                 case uiDrawScale cmd: {
                     var state = this._getState();
                     state.xform = new uiMatrix3(state.xform);
                     state.xform.preScale(cmd.sx, (cmd.sy ?? cmd.sx));
+                    this._setState(state);
                     break;
                 }
                 case uiDrawRotate cmd: {
@@ -121,28 +128,33 @@ namespace Unity.UIWidgets.ui {
                             cmd.offset.Value.dx,
                             cmd.offset.Value.dy);
                     }
+                    this._setState(state);
                     break;
                 }
                 case uiDrawSkew cmd: {
                     var state = this._getState();
                     state.xform = new uiMatrix3(state.xform);
                     state.xform.preSkew(cmd.sx, cmd.sy);
+                    this._setState(state);
                     break;
                 }
                 case uiDrawConcat cmd: {
                     var state = this._getState();
                     state.xform = new uiMatrix3(state.xform);
                     state.xform.preConcat(cmd.matrix.Value);
+                    this._setState(state);
                     break;
                 }
                 case uiDrawResetMatrix _: {
                     var state = this._getState();
                     state.xform = uiMatrix3.I();
+                    this._setState(state);
                     break;
                 }
                 case uiDrawSetMatrix cmd: {
                     var state = this._getState();
                     state.xform = new uiMatrix3(cmd.matrix.Value);
+                    this._setState(state);
                     break;
                 }
                 case uiDrawClipRect cmd: {
@@ -150,6 +162,7 @@ namespace Unity.UIWidgets.ui {
 
                     var rect = state.xform.mapRect(cmd.rect.Value);
                     state.scissor = state.scissor == null ? rect : state.scissor.Value.intersect(rect);
+                    this._setState(state);
                     break;
                 }
                 case uiDrawClipRRect cmd: {
@@ -157,6 +170,7 @@ namespace Unity.UIWidgets.ui {
 
                     var rect = state.xform.mapRect(uiRectHelper.fromRect(cmd.rrect.outerRect));
                     state.scissor = state.scissor == null ? rect : state.scissor.Value.intersect(rect);
+                    this._setState(state);
                     break;
                 }
                 case uiDrawClipPath cmd: {
@@ -169,6 +183,7 @@ namespace Unity.UIWidgets.ui {
                     var transformedMesh = rectMesh.transform(state.xform);
                     var rect = transformedMesh.bounds;
                     state.scissor = state.scissor == null ? rect : state.scissor.Value.intersect(rect);
+                    this._setState(state);
                     transformedMesh.dispose();
                     break;
                 }
@@ -276,6 +291,7 @@ namespace Unity.UIWidgets.ui {
             } else {
                 state.paintBounds = state.paintBounds.expandToInclude(paintBounds.Value);
             }
+            this._setState(state);
         }
 
         struct uiCanvasState {
