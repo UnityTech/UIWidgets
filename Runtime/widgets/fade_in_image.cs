@@ -20,7 +20,6 @@ namespace Unity.UIWidgets.widgets {
             BoxFit? fit = null,
             Alignment alignment = null,
             ImageRepeat repeat = ImageRepeat.noRepeat,
-            bool matchTextDirection = false,
             Key key = null
         ) : base(key) {
             D.assert(placeholder != null);
@@ -41,7 +40,6 @@ namespace Unity.UIWidgets.widgets {
             this.fadeInCurve = fadeInCurve ?? Curves.easeIn;
             this.alignment = alignment ?? Alignment.center;
             this.repeat = repeat;
-            this.matchTextDirection = matchTextDirection;
         }
 
         public static FadeInImage memoryNetwork(
@@ -58,7 +56,6 @@ namespace Unity.UIWidgets.widgets {
             BoxFit? fit = null,
             Alignment alignment = null,
             ImageRepeat repeat = ImageRepeat.noRepeat,
-            bool matchTextDirection = false,
             Key key = null
         ) {
             D.assert(placeholder != null);
@@ -81,7 +78,7 @@ namespace Unity.UIWidgets.widgets {
                 fit,
                 alignment,
                 repeat,
-                matchTextDirection
+                key
             );
         }
 
@@ -89,7 +86,7 @@ namespace Unity.UIWidgets.widgets {
             string placeholder,
             string image,
             AssetBundle bundle = null,
-            float placeholderScale = 0.0f,
+            float? placeholderScale = null,
             float imageScale = 1.0f,
             TimeSpan? fadeOutDuration = null,
             Curve fadeOutCurve = null,
@@ -100,7 +97,6 @@ namespace Unity.UIWidgets.widgets {
             BoxFit? fit = null,
             Alignment alignment = null,
             ImageRepeat repeat = ImageRepeat.noRepeat,
-            bool matchTextDirection = false,
             Key key = null
         ) {
             D.assert(placeholder != null);
@@ -111,7 +107,7 @@ namespace Unity.UIWidgets.widgets {
             D.assert(fadeInCurve != null);
             D.assert(alignment != null);
             var imageProvider = placeholderScale != null
-                ? new ExactAssetImage(placeholder, bundle: bundle, scale: placeholderScale)
+                ? new ExactAssetImage(placeholder, bundle: bundle, scale: placeholderScale ?? 1.0f)
                 : (ImageProvider) new AssetImage(placeholder, bundle: bundle);
 
             var networkImage = new NetworkImage(image, imageScale);
@@ -126,7 +122,7 @@ namespace Unity.UIWidgets.widgets {
                 fit,
                 alignment,
                 repeat,
-                matchTextDirection
+                key
             );
         }
 
@@ -141,8 +137,6 @@ namespace Unity.UIWidgets.widgets {
         public readonly BoxFit? fit;
         public readonly Alignment alignment;
         public readonly ImageRepeat repeat;
-        public readonly bool matchTextDirection;
-
 
         public override State createState() {
             return new _FadeInImageState();
@@ -182,7 +176,7 @@ namespace Unity.UIWidgets.widgets {
             ImageStream oldImageStream = this._imageStream;
             Size size = null;
             if (this.widget.width != null && this.widget.height != null) {
-                size = new Size(Convert.ToSingle(this.widget.width), Convert.ToSingle(this.widget.height));
+                size = new Size((int) this.widget.width, (int) this.widget.height);
             }
 
             this._imageStream = provider.resolve(ImageUtils.createLocalImageConfiguration(this.state.context, size));
