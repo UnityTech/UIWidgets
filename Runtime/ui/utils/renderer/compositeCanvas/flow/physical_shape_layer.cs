@@ -84,14 +84,16 @@ namespace Unity.UIWidgets.flow {
 
         public static void drawShadow(Canvas canvas, Path path, Color color, float elevation, bool transparentOccluder,
             float dpr) {
-            
             Rect bounds = path.getBounds();
             float shadow_x = (bounds.left + bounds.right) / 2f;
             float shadow_y = bounds.top - 600.0f;
-            Color inAmbient = color.withAlpha((int) (kAmbientAlpha * color.alpha));
-            Color inSpot = color.withAlpha((int) (kSpotAlpha * color.alpha));
-            Color ambientColor = null;
-            Color spotColor = null;
+            
+            uiColor uicolor = uiColor.fromColor(color);
+            
+            uiColor inAmbient = uicolor.withAlpha((int) (kAmbientAlpha * uicolor.alpha));
+            uiColor inSpot = uicolor.withAlpha((int) (kSpotAlpha * uicolor.alpha));
+            uiColor? ambientColor = null;
+            uiColor? spotColor = null;
             ShadowUtils.computeTonalColors(inAmbient, inSpot, ref ambientColor, ref spotColor);
             ShadowUtils.drawShadow(
                 canvas,
@@ -99,8 +101,8 @@ namespace Unity.UIWidgets.flow {
                 new Vector3(0, 0, dpr * elevation),
                 new Vector3(shadow_x, shadow_y, dpr * kLightHeight),
                 dpr * kLightRadius,
-                ambientColor,
-                spotColor,
+                ambientColor.Value,
+                spotColor.Value,
                 0
             );
         }
