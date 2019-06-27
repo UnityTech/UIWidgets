@@ -29,8 +29,6 @@ namespace Unity.UIWidgets.ui {
             this._advance = _doLayout(offset, buff, start, count, style, this._advances, this._positions, 0,
                 this._tabStops);
             this._bounds.Set(_x, _y, _maxX - _x, _maxY - _y);
-
-            this._count = count;
         }
 
         public static void computeCharWidths(TextBuff buff, int start, int count, TextStyle style, List<float> advances, int advanceOffset) {
