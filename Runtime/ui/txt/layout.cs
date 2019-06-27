@@ -273,5 +273,10 @@ namespace Unity.UIWidgets.ui {
         public Rect getBounds() {
             return Rect.fromLTWH(this._bounds.x, this._bounds.y, this._bounds.width, this._bounds.height);
         }
+
+        public Rect translatedBounds() {
+            return Rect.fromLTWH(this._bounds.x - this._positions[0], 
+                this._bounds.y, this._bounds.width, this._bounds.height);
+        }
     }
 }
