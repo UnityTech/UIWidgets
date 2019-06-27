@@ -15,6 +15,25 @@ namespace Unity.UIWidgets.ui {
         RenderLayer _currentLayer;
         uiRect? _lastScissor;
 
+        readonly List<string> _renderTextureKeys = new List<string>();
+        int _curRenderTextureId = 0;
+
+        string _getNewRenderTextureKey() {
+            if (this._curRenderTextureId == this._renderTextureKeys.Count) {
+                for (int i = 0; i < 32; i++) {
+                    this._renderTextureKeys.Add($"_RtKey_{i + this._curRenderTextureId}");
+                }
+            }
+
+            var ret = this._renderTextureKeys[this._curRenderTextureId];
+            this._curRenderTextureId++;
+            return ret;
+        }
+
+        void _resetRenderTextureId() {
+            this._curRenderTextureId = 0;
+        }
+
         public void dispose() {
             if (this._currentLayer != null) {
                 this._clearLayer(this._currentLayer);
@@ -96,7 +115,7 @@ namespace Unity.UIWidgets.ui {
             }
 
             var layer = RenderLayer.create(
-                rtID: Shader.PropertyToID("_rtID_" + this._layers.Count + "_" + parentLayer.layers.Count),
+                rtID: Shader.PropertyToID(this._getNewRenderTextureKey()),
                 width: textureWidth,
                 height: textureHeight,
                 layerBounds: bounds,
@@ -381,7 +400,7 @@ namespace Unity.UIWidgets.ui {
             }
 
             var maskLayer = RenderLayer.create(
-                rtID: Shader.PropertyToID("_rtID_" + this._layers.Count + "_" + parentLayer.layers.Count),
+                rtID: Shader.PropertyToID(this._getNewRenderTextureKey()),
                 width: textureWidth,
                 height: textureHeight,
                 layerBounds: maskBounds,
@@ -421,7 +440,7 @@ namespace Unity.UIWidgets.ui {
             }
 
             var blurXLayer = RenderLayer.create(
-                rtID: Shader.PropertyToID("_rtID_" + this._layers.Count + "_" + parentLayer.layers.Count),
+                rtID: Shader.PropertyToID(this._getNewRenderTextureKey()),
                 width: textureWidth,
                 height: textureHeight,
                 layerBounds: maskLayer.layerBounds,
@@ -432,7 +451,7 @@ namespace Unity.UIWidgets.ui {
             parentLayer.addLayer(blurXLayer);
 
             var blurYLayer = RenderLayer.create(
-                rtID: Shader.PropertyToID("_rtID_" + this._layers.Count + "_" + parentLayer.layers.Count),
+                rtID: Shader.PropertyToID(this._getNewRenderTextureKey()),
                 width: textureWidth,
                 height: textureHeight,
                 layerBounds: maskLayer.layerBounds,
@@ -499,7 +518,6 @@ namespace Unity.UIWidgets.ui {
             var blurMesh = ImageMeshGenerator.imageMesh(null, uiRectHelper.one, maskBounds);
             if (!this._applyClip(blurMesh.bounds)) {
                 blurMesh.dispose();
-                this._drawPathDrawMeshQuit(mesh);
                 return;
             }
 
@@ -909,6 +927,7 @@ namespace Unity.UIWidgets.ui {
 
         public void flush(uiPicture picture) {
             this._reset();
+            this._resetRenderTextureId();
 
             this._drawUIPicture(picture, false);
 

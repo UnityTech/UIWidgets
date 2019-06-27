@@ -6,14 +6,19 @@ using UnityEngine;
 namespace Unity.UIWidgets.ui {
     
     static class BlurUtils {
-        static readonly Dictionary<_GaussianKernelKey, float[]> _gaussianKernels
-            = new Dictionary<_GaussianKernelKey, float[]>();
+        static readonly Dictionary<int, float[]> _gaussianKernels
+            = new Dictionary<int, float[]>();
 
         public static float[] get1DGaussianKernel(float gaussianSigma, int radius) {
             var width = 2 * radius + 1;
             D.assert(width <= 25);
-
-            var key = new _GaussianKernelKey(gaussianSigma, radius);
+            
+            //round gaussian sigma to 0.1
+            gaussianSigma = Mathf.Round(gaussianSigma * 10) / 10f;
+            //assume radius < 10000
+            D.assert(radius < 10000);
+            
+            int key = (int)(gaussianSigma * 1000000) + radius;
             return _gaussianKernels.putIfAbsent(key, () => {
                 var kernel = new float[25];
                 float twoSigmaSqrd = 2.0f * gaussianSigma * gaussianSigma;
@@ -66,65 +71,6 @@ namespace Unity.UIWidgets.ui {
             radius = Mathf.CeilToInt(sigma * 3.0f);
             D.assert(radius <= 3 * MAX_BLUR_SIGMA);
             return sigma;
-        }
-
-        class _GaussianKernelKey : IEquatable<_GaussianKernelKey> {
-            public readonly float gaussianSigma;
-            public readonly int radius;
-
-            public _GaussianKernelKey(float gaussianSigma, int radius) {
-                this.gaussianSigma = gaussianSigma;
-                this.radius = radius;
-            }
-
-            public bool Equals(_GaussianKernelKey other) {
-                if (ReferenceEquals(null, other)) {
-                    return false;
-                }
-
-                if (ReferenceEquals(this, other)) {
-                    return true;
-                }
-
-                return this.gaussianSigma.Equals(other.gaussianSigma) &&
-                       this.radius == other.radius;
-            }
-
-            public override bool Equals(object obj) {
-                if (ReferenceEquals(null, obj)) {
-                    return false;
-                }
-
-                if (ReferenceEquals(this, obj)) {
-                    return true;
-                }
-
-                if (obj.GetType() != this.GetType()) {
-                    return false;
-                }
-
-                return this.Equals((_GaussianKernelKey) obj);
-            }
-
-            public override int GetHashCode() {
-                unchecked {
-                    var hashCode = this.gaussianSigma.GetHashCode();
-                    hashCode = (hashCode * 397) ^ this.radius;
-                    return hashCode;
-                }
-            }
-
-            public static bool operator ==(_GaussianKernelKey left, _GaussianKernelKey right) {
-                return Equals(left, right);
-            }
-
-            public static bool operator !=(_GaussianKernelKey left, _GaussianKernelKey right) {
-                return !Equals(left, right);
-            }
-
-            public override string ToString() {
-                return $"_GaussianKernelKey(gaussianSigma: {this.gaussianSigma:F1}, radius: {this.radius})";
-            }
         }
     }
 
