@@ -22,8 +22,13 @@ namespace Unity.UIWidgets.ui {
         public void doLayout(float offset, TextBuff buff, int start, int count, TextStyle style) {
             this._start = start;
             this._count = count;
-            this._advances = new float[count];
-            this._positions = new float[count];
+            if (this._advances == null || this._advances.Length < count) {
+                this._advances = new float[count];
+            }
+
+            if (this._positions == null || this._positions.Length < count) {
+                this._positions = new float[count];
+            }
 
             _x = _y = _maxX = _maxY = 0;
             this._advance = _doLayout(offset, buff, start, count, style, this._advances, this._positions, 0,

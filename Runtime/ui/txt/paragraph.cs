@@ -268,7 +268,7 @@ namespace Unity.UIWidgets.ui {
                     filterMode = FilterMode.Bilinear,
                     color = paintRecord.style.color
                 };
-                canvas.drawTextBlob(paintRecord.text, paintRecord.offset + offset, paint);
+                canvas.drawTextBlob(paintRecord.text, paintRecord.shiftedOffset(offset), paint);
                 this.paintDecorations(canvas, paintRecord, offset);
             }
         }
@@ -553,7 +553,7 @@ namespace Unity.UIWidgets.ui {
             var font = FontManager.instance.getOrCreate(style.fontFamily,
                 style.fontWeight, style.fontStyle).font;
             var metrics = FontMetrics.fromFont(font, style.UnityFontSize);
-            return new PaintRecord(style, new Offset(runXOffset, 0), textBlob, metrics, advance);
+            return new PaintRecord(style, runXOffset, 0, textBlob, metrics, advance);
         }
 
         CodeUnitRun _generateCodeUnitRun(LineStyleRun run, int lineNumber, GlyphPosition[] glyphPositions) {
@@ -628,7 +628,7 @@ namespace Unity.UIWidgets.ui {
         void _addPaintRecordsWithOffset(PaintRecord[] paintRecords, float lineXOffset, float yOffset) {
             for (int i = 0; i < paintRecords.Length; i++) {
                 PaintRecord paintRecord = paintRecords[i];
-                paintRecord.offset = new Offset(paintRecord.offset.dx + lineXOffset, yOffset);
+                paintRecord.shift(lineXOffset, yOffset);
                 this._paintRecords.Add(paintRecord);
             }
         }
@@ -979,7 +979,7 @@ namespace Unity.UIWidgets.ui {
             float underLineThickness = metrics.underlineThickness ?? (record.style.fontSize / 14.0f);
             paint.style = PaintingStyle.stroke;
             paint.strokeWidth = underLineThickness;
-            var recordOffset = baseOffset + record.offset;
+            var recordOffset = record.shiftedOffset(baseOffset);
             var x = recordOffset.dx;
             var y = recordOffset.dy;
 
@@ -1024,7 +1024,7 @@ namespace Unity.UIWidgets.ui {
 
             var metrics = record.metrics;
             Rect rect = Rect.fromLTRB(0, metrics.ascent, record.runWidth, metrics.descent);
-            rect = rect.shift(baseOffset + record.offset);
+            rect = rect.shift(record.shiftedOffset(baseOffset));
             canvas.drawRect(rect, record.style.background);
         }
 
