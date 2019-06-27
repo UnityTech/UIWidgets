@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Unity.UIWidgets.foundation;
 using UnityEngine;
 
@@ -8,6 +9,41 @@ namespace Unity.UIWidgets.ui {
     static class BlurUtils {
         static readonly Dictionary<int, float[]> _gaussianKernels
             = new Dictionary<int, float[]>();
+
+        static float[] calculateKernel(float _cur_gaussian_sigma, int _cur_width, int _cur_radius) {
+            var kernel = new float[25];
+            float twoSigmaSqrd = 2.0f * _cur_gaussian_sigma * _cur_gaussian_sigma;
+
+            if (ScalarUtils.ScalarNearlyZero(twoSigmaSqrd)) {
+                for (int i = 0; i < _cur_width; ++i) {
+                    kernel[i] = 0.0f;
+                }
+
+                return kernel;
+            }
+
+            float denom = 1.0f / twoSigmaSqrd;
+
+            float sum = 0.0f;
+            for (int i = 0; i < _cur_width; ++i) {
+                float x = i - _cur_radius;
+                // Note that the constant term (1/(sqrt(2*pi*sigma^2)) of the Gaussian
+                // is dropped here, since we renormalize the kernel below.
+                kernel[i] = Mathf.Exp(-x * x * denom);
+                sum += kernel[i];
+            }
+
+            // Normalize the kernel
+            float scale = 1.0f / sum;
+            for (int i = 0; i < _cur_width; ++i) {
+                kernel[i] *= scale;
+            }
+
+            _cur_gaussian_sigma = -1;
+            _cur_radius = -1;
+
+            return kernel;
+        }
 
         public static float[] get1DGaussianKernel(float gaussianSigma, int radius) {
             var width = 2 * radius + 1;
@@ -19,37 +55,15 @@ namespace Unity.UIWidgets.ui {
             D.assert(radius < 10000);
             
             int key = (int)(gaussianSigma * 1000000) + radius;
-            return _gaussianKernels.putIfAbsent(key, () => {
-                var kernel = new float[25];
-                float twoSigmaSqrd = 2.0f * gaussianSigma * gaussianSigma;
+            
+            float[] value;
+            if (_gaussianKernels.TryGetValue(key, out value)) {
+                return value;
+            }
 
-                if (ScalarUtils.ScalarNearlyZero(twoSigmaSqrd)) {
-                    for (int i = 0; i < width; ++i) {
-                        kernel[i] = 0.0f;
-                    }
-
-                    return kernel;
-                }
-
-                float denom = 1.0f / twoSigmaSqrd;
-
-                float sum = 0.0f;
-                for (int i = 0; i < width; ++i) {
-                    float x = i - radius;
-                    // Note that the constant term (1/(sqrt(2*pi*sigma^2)) of the Gaussian
-                    // is dropped here, since we renormalize the kernel below.
-                    kernel[i] = Mathf.Exp(-x * x * denom);
-                    sum += kernel[i];
-                }
-
-                // Normalize the kernel
-                float scale = 1.0f / sum;
-                for (int i = 0; i < width; ++i) {
-                    kernel[i] *= scale;
-                }
-
-                return kernel;
-            });
+            value = calculateKernel(gaussianSigma, width, radius);
+            _gaussianKernels[key] = value;
+            return value;
         }
 
         public static float adjustSigma(float sigma, out int scaleFactor, out int radius) {

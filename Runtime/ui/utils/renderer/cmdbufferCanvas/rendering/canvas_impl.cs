@@ -53,7 +53,15 @@ namespace Unity.UIWidgets.ui {
             this._fringeWidth = 1.0f / devicePixelRatio;
             this._devicePixelRatio = devicePixelRatio;
             this._meshPool = meshPool;
+            
+            this.___drawTextDrawMeshCallback = this._drawTextDrawMeshCallback;
+            this.___drawPathDrawMeshCallback2 = this._drawPathDrawMeshCallback2;
+            this.___drawPathDrawMeshCallback = this._drawPathDrawMeshCallback;
         }
+        
+        readonly _drawPathDrawMeshCallbackDelegate ___drawTextDrawMeshCallback;
+        readonly _drawPathDrawMeshCallbackDelegate ___drawPathDrawMeshCallback2;
+        readonly _drawPathDrawMeshCallbackDelegate ___drawPathDrawMeshCallback;
 
         public float getDevicePixelRatio() {
             return this._devicePixelRatio;
@@ -580,7 +588,7 @@ namespace Unity.UIWidgets.ui {
                 var mesh = fillMesh.transform(state.matrix);
 
                 if (paint.maskFilter != null && paint.maskFilter.Value.sigma != 0) {
-                    this._drawWithMaskFilter(mesh.bounds, paint, paint.maskFilter.Value, mesh, convex, 0, null, uiRectHelper.zero, null, this._drawPathDrawMeshCallback);
+                    this._drawWithMaskFilter(mesh.bounds, paint, paint.maskFilter.Value, mesh, convex, 0, null, uiRectHelper.zero, null, this.___drawPathDrawMeshCallback);
                     return;
                 }
 
@@ -613,7 +621,7 @@ namespace Unity.UIWidgets.ui {
                 var mesh = strokenMesh.transform(state.matrix);
 
                 if (paint.maskFilter != null && paint.maskFilter.Value.sigma != 0) {
-                    this._drawWithMaskFilter(mesh.bounds, paint, paint.maskFilter.Value, mesh, false, alpha, null, uiRectHelper.zero, null, this._drawPathDrawMeshCallback2);
+                    this._drawWithMaskFilter(mesh.bounds, paint, paint.maskFilter.Value, mesh, false, alpha, null, uiRectHelper.zero, null, this.___drawPathDrawMeshCallback2);
                     return;
                 }
 
@@ -918,7 +926,7 @@ namespace Unity.UIWidgets.ui {
             var tex = font.material.mainTexture;
 
             if (paint.maskFilter != null && paint.maskFilter.Value.sigma != 0) {
-                this._drawWithMaskFilter(textBlobBounds, paint, paint.maskFilter.Value, null, false, 0, tex, textBlobBounds, mesh, this._drawTextDrawMeshCallback);
+                this._drawWithMaskFilter(textBlobBounds, paint, paint.maskFilter.Value, null, false, 0, tex, textBlobBounds, mesh, this.___drawTextDrawMeshCallback);
                 return;
             }
 

@@ -63,6 +63,10 @@ namespace Unity.UIWidgets.ui {
             return sb.ToString();
         }
 
+        public void resetAll() {
+            this._reset();
+        }
+
         void _reset() {
             this._commands.Clear();
             this._commandx = 0;

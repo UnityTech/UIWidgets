@@ -46,6 +46,7 @@ namespace Unity.UIWidgets.ui {
             outSpotColor = inSpotColor;
         }
 
+        static Matrix3 _toHomogeneous = Matrix3.I();
         public static bool getSpotShadowTransform(Vector3 lightPos, float lightRadius, Matrix3 ctm,
             Vector3 zPlaneParams, Rect pathBounds, Matrix3 shadowTransform, ref float radius) {
             float heightFunc(float x, float y) {
@@ -119,15 +120,15 @@ namespace Unity.UIWidgets.ui {
                     h0.y / h2.z, h1.y / h2.z, h2.y / h2.z,
                     h0.z / h2.z, h1.z / h2.z, 1);
 
-                Matrix3 toHomogeneous = Matrix3.I();
+                _toHomogeneous.reset();
                 float xScale = 2.0f / (pathBounds.right - pathBounds.left);
                 float yScale = 2.0f / (pathBounds.bottom - pathBounds.top);
 
-                toHomogeneous.setAll(xScale, 0, -xScale * pathBounds.left - 1,
+                _toHomogeneous.setAll(xScale, 0, -xScale * pathBounds.left - 1,
                     0, yScale, -yScale * pathBounds.top - 1,
                     0, 0, 1);
 
-                shadowTransform.preConcat(toHomogeneous);
+                shadowTransform.preConcat(_toHomogeneous);
 
                 radius = spotBlurRadius(occluderHeight, lightPos.z, lightRadius);
             }
@@ -135,6 +136,7 @@ namespace Unity.UIWidgets.ui {
             return true;
         }
 
+        static Path _devSpacePath = new Path();
         public static void drawShadow(Canvas canvas, Path path, Vector3 zPlaneParams, Vector3 devLightPos,
             float lightRadius, uiColor ambientColor, uiColor spotColor, int flags) {
             if (kUseFastShadow) {
@@ -154,7 +156,8 @@ namespace Unity.UIWidgets.ui {
             Matrix3 viewMatrix = canvas.getTotalMatrix();
 
             //ambient light
-            Path devSpacePath = path.transform(viewMatrix);
+            _devSpacePath.resetAll();
+            _devSpacePath.addPath(path, viewMatrix);
             float devSpaceOutset = ambientBlurRadius(zPlaneParams.z);
             float oneOverA = ambientRecipAlpha(zPlaneParams.z);
             float blurRadius = 0.5f * devSpaceOutset * oneOverA;
@@ -170,7 +173,7 @@ namespace Unity.UIWidgets.ui {
             canvas.setMatrix(_shadowMatrix);
             float sigma = convertRadiusToSigma(blurRadius);
             _shadowPaint.maskFilter = MaskFilter.blur(BlurStyle.normal, sigma);
-            canvas.drawPath(devSpacePath, _shadowPaint);
+            canvas.drawPath(_devSpacePath, _shadowPaint);
             canvas.restore();
 
             //spot light
