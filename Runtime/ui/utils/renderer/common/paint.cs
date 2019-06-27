@@ -149,7 +149,7 @@ namespace Unity.UIWidgets.ui {
             }
             
             return new uiPaint(
-                color : uiColor.fromColor(paint.color),
+                color : paint.color == null ? (uiColor?)null : uiColor.fromColor(paint.color),
                 blendMode: paint.blendMode,
                 style: paint.style,
                 strokeWidth: paint.strokeWidth,
@@ -157,8 +157,8 @@ namespace Unity.UIWidgets.ui {
                 strokeJoin: paint.strokeJoin,
                 strokeMiterLimit: paint.strokeMiterLimit,
                 filterMode: paint.filterMode,
-                colorFilter: uiColorFilter.mode(uiColor.fromColor(paint.colorFilter.color), paint.colorFilter.blendMode),
-                maskFilter: uiMaskFilter.blur(paint.maskFilter.style, paint.maskFilter.sigma),
+                colorFilter: paint.colorFilter == null ? (uiColorFilter?) null : uiColorFilter.mode(uiColor.fromColor(paint.colorFilter.color), paint.colorFilter.blendMode),
+                maskFilter: paint.maskFilter == null ? (uiMaskFilter?) null : uiMaskFilter.blur(paint.maskFilter.style, paint.maskFilter.sigma),
                 backdrop: filter,
                 shader: paint.shader,
                 invertColors: paint.invertColors

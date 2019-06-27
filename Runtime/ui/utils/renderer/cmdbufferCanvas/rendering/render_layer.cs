@@ -12,7 +12,7 @@ namespace Unity.UIWidgets.ui {
             public FilterMode filterMode = FilterMode.Point;
             public bool noMSAA = false;
             public uiRect layerBounds;
-            public Paint layerPaint;
+            public uiPaint? layerPaint;
             public readonly List<RenderCmd> draws = new List<RenderCmd>(128);
             public readonly List<RenderLayer> layers = new List<RenderLayer>(16);
             public readonly List<State> states = new List<State>(16);
@@ -38,7 +38,7 @@ namespace Unity.UIWidgets.ui {
             }
 
             public static RenderLayer create(int rtID = 0, int width = 0, int height = 0, FilterMode filterMode = FilterMode.Point,
-                bool noMSAA = false, uiRect? layerBounds = null, Paint layerPaint = null, bool ignoreClip = true) {
+                bool noMSAA = false, uiRect? layerBounds = null, uiPaint? layerPaint = null, bool ignoreClip = true) {
                 D.assert(layerBounds != null);
                 var newLayer = ItemPoolManager.alloc<RenderLayer>();
                 newLayer.rtID = rtID;

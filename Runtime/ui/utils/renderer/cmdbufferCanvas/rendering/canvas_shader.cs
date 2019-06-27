@@ -221,6 +221,15 @@ namespace Unity.UIWidgets.ui {
         static readonly int _mfImgIncId = Shader.PropertyToID("_mf_imgInc");
         static readonly int _mfKernelId = Shader.PropertyToID("_mf_kernel");
 
+        static Vector4 _colorToVector4(uiColor c) {
+            return new Vector4(
+                c.red / 255f,
+                c.green / 255f,
+                c.blue / 255f,
+                c.alpha / 255f
+            );
+        }
+        
         static Vector4 _colorToVector4(Color c) {
             return new Vector4(
                 c.red / 255f,
@@ -243,7 +252,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         static void _getShaderPassAndProps(
-            PictureFlusher.RenderLayer layer, Paint paint, uiMatrix3? meshMatrix, float alpha,
+            PictureFlusher.RenderLayer layer, uiPaint paint, uiMatrix3? meshMatrix, float alpha,
             out int pass, out MaterialPropertyBlockWrapper props) {
             Vector4 viewport = layer.viewport;
 
@@ -297,7 +306,7 @@ namespace Unity.UIWidgets.ui {
             }
         }
 
-        public static PictureFlusher.CmdDraw convexFill(PictureFlusher.RenderLayer layer, Paint paint,
+        public static PictureFlusher.CmdDraw convexFill(PictureFlusher.RenderLayer layer, uiPaint paint,
             uiMeshMesh mesh) {
             var mat = _convexFillMat.getMaterial(paint.blendMode, layer.ignoreClip);
             _getShaderPassAndProps(layer, paint, mesh.matrix, 1.0f, out var pass, out var props);
@@ -326,7 +335,7 @@ namespace Unity.UIWidgets.ui {
             );
         }
 
-        public static PictureFlusher.CmdDraw fill1(PictureFlusher.RenderLayer layer, Paint paint,
+        public static PictureFlusher.CmdDraw fill1(PictureFlusher.RenderLayer layer, uiPaint paint,
             uiMeshMesh mesh) {
             var mat = _fill1Mat.getMaterial(paint.blendMode);
             _getShaderPassAndProps(layer, paint, mesh.matrix, 1.0f, out var pass, out var props);
@@ -342,7 +351,7 @@ namespace Unity.UIWidgets.ui {
             return ret;
         }
 
-        public static PictureFlusher.CmdDraw stroke0(PictureFlusher.RenderLayer layer, Paint paint,
+        public static PictureFlusher.CmdDraw stroke0(PictureFlusher.RenderLayer layer, uiPaint paint,
             float alpha, uiMeshMesh mesh) {
             var mat = _stroke0Mat.getMaterial(paint.blendMode, layer.ignoreClip);
             _getShaderPassAndProps(layer, paint, mesh.matrix, alpha, out var pass, out var props);
@@ -420,7 +429,7 @@ namespace Unity.UIWidgets.ui {
             );
         }
 
-        public static PictureFlusher.CmdDraw tex(PictureFlusher.RenderLayer layer, Paint paint,
+        public static PictureFlusher.CmdDraw tex(PictureFlusher.RenderLayer layer, uiPaint paint,
             uiMeshMesh mesh, Image image) {
             var mat = _texMat.getMaterial(paint.blendMode, layer.ignoreClip);
             _getShaderPassAndProps(layer, paint, mesh.matrix, 1.0f, out var pass, out var props);
@@ -438,7 +447,7 @@ namespace Unity.UIWidgets.ui {
             );
         }
 
-        public static PictureFlusher.CmdDraw texRT(PictureFlusher.RenderLayer layer, Paint paint,
+        public static PictureFlusher.CmdDraw texRT(PictureFlusher.RenderLayer layer, uiPaint paint,
             uiMeshMesh mesh, PictureFlusher.RenderLayer renderLayer) {
             var mat = _texMat.getMaterial(paint.blendMode, layer.ignoreClip);
             _getShaderPassAndProps(layer, paint, mesh.matrix, 1.0f, out var pass, out var props);
@@ -453,17 +462,17 @@ namespace Unity.UIWidgets.ui {
             );
         }
 
-        public static PictureFlusher.CmdDraw texAlpha(PictureFlusher.RenderLayer layer, Paint paint,
+        public static PictureFlusher.CmdDraw texAlpha(PictureFlusher.RenderLayer layer, uiPaint paint,
             uiMeshMesh mesh, Texture tex) {
             return texAlpha(layer, paint, mesh, null, tex);
         }
         
-        public static PictureFlusher.CmdDraw texAlpha(PictureFlusher.RenderLayer layer, Paint paint,
+        public static PictureFlusher.CmdDraw texAlpha(PictureFlusher.RenderLayer layer, uiPaint paint,
             TextBlobMesh textMesh, Texture tex) {
             return texAlpha(layer, paint, null, textMesh, tex);
         }
         
-        public static PictureFlusher.CmdDraw texAlpha(PictureFlusher.RenderLayer layer, Paint paint,
+        public static PictureFlusher.CmdDraw texAlpha(PictureFlusher.RenderLayer layer, uiPaint paint,
             uiMeshMesh mesh, TextBlobMesh textMesh, Texture tex) {
             
             var mat = _texMat.getMaterial(paint.blendMode, layer.ignoreClip);

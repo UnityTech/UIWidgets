@@ -60,16 +60,16 @@ namespace Unity.UIWidgets.flow {
             }
         }
 
+        Paint _shadowPaint = new Paint();
+
         public override void paint(PaintContext context) {
             if (this._elevation != 0) {
                 drawShadow(context.canvas, this._path, this._shadow_color, this._elevation,
                     this._color.alpha != 255, this._device_pixel_ratio);
             }
 
-            Paint paint = new Paint {color = this._color};
-            //todo: xingwei.zhu: process according to different clipBehavior, currently use antiAlias as default
-
-            context.canvas.drawPath(this._path, paint);
+            this._shadowPaint.color = this._color;
+            context.canvas.drawPath(this._path, this._shadowPaint);
 
             context.canvas.save();
             context.canvas.clipPath(this._path);
@@ -77,14 +77,14 @@ namespace Unity.UIWidgets.flow {
             context.canvas.restore();
         }
 
+        const float kAmbientAlpha = 0.039f;
+        const float kLightHeight = 600f;
+        const float kLightRadius = 800f;
+        const float kSpotAlpha = ShadowUtils.kUseFastShadow ? 0.1f : 0.25f;
 
         public static void drawShadow(Canvas canvas, Path path, Color color, float elevation, bool transparentOccluder,
             float dpr) {
-            float kAmbientAlpha = 0.039f;
-            float kSpotAlpha = ShadowUtils.kUseFastShadow ? 0.1f : 0.25f;
-            float kLightHeight = 600f;
-            float kLightRadius = 800f;
-
+            
             Rect bounds = path.getBounds();
             float shadow_x = (bounds.left + bounds.right) / 2f;
             float shadow_y = bounds.top - 600.0f;

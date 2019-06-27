@@ -22,7 +22,7 @@ namespace Unity.UIWidgets.ui {
             this._saveCount++;
             this._recorder.addDrawCmd(uiDrawSaveLayer.create(
                 rect : uiRectHelper.fromRect(rect),
-                paint : new Paint(paint)
+                paint : uiPaint.fromPaint(paint)
             ));
         }
 
@@ -113,13 +113,13 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void drawLine(Offset from, Offset to, Paint paint) {
-            var path = new Path();
+            var path = new uiPath();
             path.moveTo(from.dx, from.dy);
             path.lineTo(to.dx, to.dy);
 
             this._recorder.addDrawCmd(uiDrawPath.create(
-                path : uiPath.fromPath(path),
-                paint : new Paint(paint)
+                path : path,
+                paint : uiPaint.fromPaint(paint)
             ));
         }
 
@@ -133,60 +133,60 @@ namespace Unity.UIWidgets.ui {
                 return;
             }
 
-            var path = new Path();
+            var path = new uiPath();
             path.addRect(rect);
 
             this._recorder.addDrawCmd(uiDrawPath.create(
-                path : uiPath.fromPath(path),
-                paint : new Paint(paint)
+                path : path,
+                paint : uiPaint.fromPaint(paint)
             ));
         }
 
         public void drawRRect(RRect rrect, Paint paint) {
-            var path = new Path();
+            var path = new uiPath();
             path.addRRect(rrect);
             this._recorder.addDrawCmd(uiDrawPath.create(
-                path : uiPath.fromPath(path),
-                paint : new Paint(paint)
+                path : path,
+                paint : uiPaint.fromPaint(paint)
             ));
         }
 
         public void drawDRRect(RRect outer, RRect inner, Paint paint) {
-            var path = new Path();
+            var path = new uiPath();
             path.addRRect(outer);
             path.addRRect(inner);
             path.winding(PathWinding.clockwise);
 
             this._recorder.addDrawCmd(uiDrawPath.create(
-                path : uiPath.fromPath(path),
-                paint : new Paint(paint)
+                path : path,
+                paint : uiPaint.fromPaint(paint)
             ));
         }
 
         public void drawOval(Rect rect, Paint paint) {
             var w = rect.width / 2;
             var h = rect.height / 2;
-            var path = new Path();
+            var path = new uiPath();
             path.addEllipse(rect.left + w, rect.top + h, w, h);
 
             this._recorder.addDrawCmd(uiDrawPath.create(
-                path : uiPath.fromPath(path),
-                paint : new Paint(paint)
+                path : path,
+                paint : uiPaint.fromPaint(paint)
             ));
         }
 
         public void drawCircle(Offset c, float radius, Paint paint) {
-            var path = new Path();
+            var path = new uiPath();
             path.addCircle(c.dx, c.dy, radius);
 
             this._recorder.addDrawCmd(uiDrawPath.create(
-                path : uiPath.fromPath(path),
-                paint : new Paint(paint)
+                path : path,
+                paint : uiPaint.fromPaint(paint)
             ));
         }
 
         public void drawArc(Rect rect, float startAngle, float sweepAngle, bool useCenter, Paint paint) {
-            var path = new Path();
+            var path = new uiPath();
 
             if (useCenter) {
                 var center = rect.center;
@@ -218,15 +218,15 @@ namespace Unity.UIWidgets.ui {
             }
 
             this._recorder.addDrawCmd(uiDrawPath.create(
-                path : uiPath.fromPath(path),
-                paint : new Paint(paint)
+                path : path,
+                paint : uiPaint.fromPaint(paint)
             ));
         }
 
         public void drawPath(Path path, Paint paint) {
             this._recorder.addDrawCmd(uiDrawPath.create(
                 path : uiPath.fromPath(path),
-                paint : new Paint(paint)
+                paint : uiPaint.fromPaint(paint)
             ));
         }
 
@@ -234,7 +234,7 @@ namespace Unity.UIWidgets.ui {
             this._recorder.addDrawCmd(uiDrawImage.create(
                 image : image,
                 offset : uiOffset.fromOffset(offset),
-                paint : new Paint(paint)
+                paint : uiPaint.fromPaint(paint)
             ));
         }
 
@@ -243,7 +243,7 @@ namespace Unity.UIWidgets.ui {
                 image : image,
                 src : null,
                 dst : uiRectHelper.fromRect(dst),
-                paint : new Paint(paint)
+                paint : uiPaint.fromPaint(paint)
             ));
         }
 
@@ -252,7 +252,7 @@ namespace Unity.UIWidgets.ui {
                 image : image,
                 src : uiRectHelper.fromRect(src),
                 dst : uiRectHelper.fromRect(dst),
-                paint : new Paint(paint)
+                paint : uiPaint.fromPaint(paint)
             ));
         }
 
@@ -262,7 +262,7 @@ namespace Unity.UIWidgets.ui {
                 src : null,
                 center : uiRectHelper.fromRect(center),
                 dst : uiRectHelper.fromRect(dst),
-                paint : new Paint(paint)
+                paint : uiPaint.fromPaint(paint)
             ));
         }
 
@@ -272,7 +272,7 @@ namespace Unity.UIWidgets.ui {
                 src : uiRectHelper.fromRect(src),
                 center : uiRectHelper.fromRect(center),
                 dst : uiRectHelper.fromRect(dst),
-                paint : new Paint(paint)
+                paint : uiPaint.fromPaint(paint)
             ));
         }
 
@@ -286,7 +286,7 @@ namespace Unity.UIWidgets.ui {
             this._recorder.addDrawCmd(uiDrawTextBlob.create(
                 textBlob : textBlob,
                 offset : uiOffset.fromOffset(offset),
-                paint : new Paint(paint)
+                paint : uiPaint.fromPaint(paint)
             ));
         }
         

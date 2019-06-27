@@ -217,8 +217,8 @@ namespace Unity.UIWidgets.ui {
                         mesh = strokenMesh.transform(state.xform);
                     }
                     
-                    if (paint.maskFilter != null && paint.maskFilter.sigma != 0) {
-                        float sigma = scale * paint.maskFilter.sigma;
+                    if (paint.maskFilter != null && paint.maskFilter.Value.sigma != 0) {
+                        float sigma = scale * paint.maskFilter.Value.sigma;
                         float sigma3 = 3 * sigma;
                         this._addPaintBounds(uiRectHelper.inflate(mesh.bounds, sigma3));
                     } else {
@@ -261,8 +261,8 @@ namespace Unity.UIWidgets.ui {
                     rect = state.xform.mapRect(rect);
                     
                     var paint = cmd.paint;
-                    if (paint.maskFilter != null && paint.maskFilter.sigma != 0) {
-                        float sigma = scale * paint.maskFilter.sigma;
+                    if (paint.maskFilter != null && paint.maskFilter.Value.sigma != 0) {
+                        float sigma = scale * paint.maskFilter.Value.sigma;
                         float sigma3 = 3 * sigma;
                         this._addPaintBounds(uiRectHelper.inflate(rect, sigma3));
                     } else {

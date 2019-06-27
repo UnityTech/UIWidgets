@@ -18,7 +18,7 @@ namespace Unity.UIWidgets.ui {
         public uiDrawSaveLayer() {
         }
 
-        public static uiDrawSaveLayer create(uiRect? rect, Paint paint) {
+        public static uiDrawSaveLayer create(uiRect? rect, uiPaint paint) {
             var drawSaveLayer = ItemPoolManager.alloc<uiDrawSaveLayer>();
             drawSaveLayer.rect = rect;
             drawSaveLayer.paint = paint;
@@ -27,11 +27,10 @@ namespace Unity.UIWidgets.ui {
 
         public override void clear() {
             this.rect = null;
-            this.paint = null;
         }
 
         public uiRect? rect;
-        public Paint paint;
+        public uiPaint paint;
     }
 
     public class uiDrawRestore : uiDrawCmd {
@@ -218,7 +217,7 @@ namespace Unity.UIWidgets.ui {
             
         }
 
-        public static uiDrawPath create(uiPath path, Paint paint) {
+        public static uiDrawPath create(uiPath path, uiPaint paint) {
             var drawPath = ItemPoolManager.alloc<uiDrawPath>();
             drawPath.path = path;
             drawPath.paint = paint;
@@ -228,11 +227,10 @@ namespace Unity.UIWidgets.ui {
         public override void clear() {
             this.path.dispose();
             this.path = null;
-            this.paint = null;
         }
 
         public uiPath path;
-        public Paint paint;
+        public uiPaint paint;
     }
 
     public class uiDrawImage : uiDrawCmd {
@@ -240,7 +238,7 @@ namespace Unity.UIWidgets.ui {
             
         }
 
-        public static uiDrawImage create(Image image, uiOffset? offset, Paint paint) {
+        public static uiDrawImage create(Image image, uiOffset? offset, uiPaint paint) {
             var drawImage = ItemPoolManager.alloc<uiDrawImage>();
             drawImage.image = image;
             drawImage.offset = offset;
@@ -251,12 +249,11 @@ namespace Unity.UIWidgets.ui {
         public override void clear() {
             this.image = null;
             this.offset = null;
-            this.paint = null;
         }
         
         public Image image;
         public uiOffset? offset;
-        public Paint paint;
+        public uiPaint paint;
     }
 
     public class uiDrawImageRect : uiDrawCmd {
@@ -264,7 +261,7 @@ namespace Unity.UIWidgets.ui {
             
         }
 
-        public static uiDrawImageRect create(Image image, uiRect? src, uiRect? dst, Paint paint) {
+        public static uiDrawImageRect create(Image image, uiRect? src, uiRect? dst, uiPaint paint) {
             var drawImageRect = ItemPoolManager.alloc<uiDrawImageRect>();
             drawImageRect.image = image;
             drawImageRect.src = src;
@@ -277,13 +274,12 @@ namespace Unity.UIWidgets.ui {
             this.image = null;
             this.src = null;
             this.dst = null;
-            this.paint = null;
         }
 
         public Image image;
         public uiRect? src;
         public uiRect? dst;
-        public Paint paint;
+        public uiPaint paint;
     }
 
     public class uiDrawImageNine : uiDrawCmd {
@@ -291,7 +287,7 @@ namespace Unity.UIWidgets.ui {
             
         }
 
-        public static uiDrawImageNine create(Image image, uiRect? src, uiRect? center, uiRect? dst, Paint paint) {
+        public static uiDrawImageNine create(Image image, uiRect? src, uiRect? center, uiRect? dst, uiPaint paint) {
             var drawImageNine = ItemPoolManager.alloc<uiDrawImageNine>();
             drawImageNine.image = image;
             drawImageNine.src = src;
@@ -306,14 +302,13 @@ namespace Unity.UIWidgets.ui {
             this.src = null;
             this.center = null;
             this.dst = null;
-            this.paint = null;
         }
 
         public Image image;
         public uiRect? src;
         public uiRect? center;
         public uiRect? dst;
-        public Paint paint;
+        public uiPaint paint;
     }
 
     public class uiDrawPicture : uiDrawCmd {
@@ -339,7 +334,7 @@ namespace Unity.UIWidgets.ui {
             
         }
 
-        public static uiDrawTextBlob create(TextBlob textBlob, uiOffset? offset, Paint paint) {
+        public static uiDrawTextBlob create(TextBlob textBlob, uiOffset? offset, uiPaint paint) {
             var drawTextBlob = ItemPoolManager.alloc<uiDrawTextBlob>();
             drawTextBlob.textBlob = textBlob;
             drawTextBlob.offset = offset;
@@ -350,11 +345,10 @@ namespace Unity.UIWidgets.ui {
         public override void clear() {
             this.textBlob = null;
             this.offset = null;
-            this.paint = null;
         }
 
         public TextBlob textBlob;
         public uiOffset? offset;
-        public Paint paint;
+        public uiPaint paint;
     }
 }

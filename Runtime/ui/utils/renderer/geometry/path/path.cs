@@ -175,6 +175,14 @@ namespace Unity.UIWidgets.ui {
             this._appendLineTo(rect.right, rect.top);
             this._appendClose();
         }
+        
+        public void addRect(Rect rect) {
+            this._appendMoveTo(rect.left, rect.top);
+            this._appendLineTo(rect.left, rect.bottom);
+            this._appendLineTo(rect.right, rect.bottom);
+            this._appendLineTo(rect.right, rect.top);
+            this._appendClose();
+        }
 
         public void addRRect(RRect rrect) {
             float w = rrect.width;
@@ -209,6 +217,131 @@ namespace Unity.UIWidgets.ui {
             this._appendBezierTo(x + rxTL * (1 - _KAPPA90), y,
                 x, y + ryTL * (1 - _KAPPA90), x, y + ryTL);
             this._appendClose();
+        }
+        
+        public void moveTo(float x, float y) {
+            this._appendMoveTo(x, y);
+        }
+        
+        public void lineTo(float x, float y) {
+            this._appendLineTo(x, y);
+        }
+        
+        public void winding(PathWinding dir) {
+            this._appendWinding((float) dir);
+        }
+        
+        public void addEllipse(float cx, float cy, float rx, float ry) {
+            this._appendMoveTo(cx - rx, cy);
+            this._appendBezierTo(cx - rx, cy + ry * _KAPPA90,
+                cx - rx * _KAPPA90, cy + ry, cx, cy + ry);
+            this._appendBezierTo(cx + rx * _KAPPA90, cy + ry,
+                cx + rx, cy + ry * _KAPPA90, cx + rx, cy);
+            this._appendBezierTo(cx + rx, cy - ry * _KAPPA90,
+                cx + rx * _KAPPA90, cy - ry, cx, cy - ry);
+            this._appendBezierTo(cx - rx * _KAPPA90, cy - ry,
+                cx - rx, cy - ry * _KAPPA90, cx - rx, cy);
+            this._appendClose();
+        }
+        
+        public void addCircle(float cx, float cy, float r) {
+            this.addEllipse(cx, cy, r, r);
+        }
+        
+        public void arcTo(Rect rect, float startAngle, float sweepAngle, bool forceMoveTo = true) {
+            var mat = Matrix3.makeScale(rect.width / 2, rect.height / 2);
+            var center = rect.center;
+            mat.postTranslate(center.dx, center.dy);
+
+            this._addArcCommands(0, 0, 1, startAngle, startAngle + sweepAngle,
+                sweepAngle >= 0 ? PathWinding.clockwise : PathWinding.counterClockwise, forceMoveTo, mat);
+        }
+        
+        public void close() {
+            this._appendClose();
+        }
+        
+        void _addArcCommands(
+            float cx, float cy, float r, float a0, float a1,
+            PathWinding dir, bool forceMoveTo, Matrix3 transform = null) {
+            // Clamp angles
+            float da = a1 - a0;
+            if (dir == PathWinding.clockwise) {
+                if (Mathf.Abs(da) >= Mathf.PI * 2) {
+                    da = Mathf.PI * 2;
+                } else {
+                    while (da < 0.0f) {
+                        da += Mathf.PI * 2;
+                    }
+                    if (da <= 1e-5) {
+                        return;
+                    }
+                }
+            } else {
+                if (Mathf.Abs(da) >= Mathf.PI * 2) {
+                    da = -Mathf.PI * 2;
+                } else {
+                    while (da > 0.0f) {
+                        da -= Mathf.PI * 2;
+                    }
+                    if (da >= -1e-5) {
+                        return;
+                    }
+                }
+            }
+            
+            // Split arc into max 90 degree segments.
+            int ndivs = Mathf.Max(1, Mathf.Min((int) (Mathf.Abs(da) / (Mathf.PI * 0.5f) + 0.5f), 5));
+            float hda = (da / ndivs) / 2.0f;
+            float kappa = Mathf.Abs(4.0f / 3.0f * (1.0f - Mathf.Cos(hda)) / Mathf.Sin(hda));
+
+            if (dir == PathWinding.counterClockwise) {
+                kappa = -kappa;
+            }
+
+            PathCommand move = (forceMoveTo || this._commands.Count == 0) ? PathCommand.moveTo : PathCommand.lineTo;
+            float px = 0, py = 0, ptanx = 0, ptany = 0;
+
+            for (int i = 0; i <= ndivs; i++) {
+                float a = a0 + da * (i / (float) ndivs);
+                float dx = Mathf.Cos(a);
+                float dy = Mathf.Sin(a);
+                float x = cx + dx * r;
+                float y = cy + dy * r;
+                float tanx = -dy * r * kappa;
+                float tany = dx * r * kappa;
+
+                if (i == 0) {
+                    float x1 = x, y1 = y;
+                    if (transform != null) {
+                        transform.mapXY(x1, y1, out x1, out y1);
+                    }
+
+                    if (move == PathCommand.moveTo) {
+                        this._appendMoveTo(x1, y1);
+                    } else {
+                        this._appendLineTo(x1, y1);
+                    }
+                } else {
+                    float c1x = px + ptanx;
+                    float c1y = py + ptany;
+                    float c2x = x - tanx;
+                    float c2y = y - tany;
+                    float x1 = x;
+                    float y1 = y;
+                    if (transform != null) {
+                        transform.mapXY(c1x, c1y, out c1x, out c1y);
+                        transform.mapXY(c2x, c2y, out c2x, out c2y);
+                        transform.mapXY(x1, y1, out x1, out y1);
+                    }
+
+                    this._appendBezierTo(c1x, c1y, c2x, c2y, x1, y1);
+                }
+                px = x;
+                py = y;
+                ptanx = tanx;
+                ptany = tany;
+            }
         }
 
         public static uiPath fromPath(Path path) {
