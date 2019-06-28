@@ -2,7 +2,7 @@ using Unity.UIWidgets.foundation;
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
-    public class uiPath : PoolItem {
+    public class uiPath : PoolObject {
         const float _KAPPA90 = 0.5522847493f;
 
         uiList<float> _commands;
@@ -14,7 +14,7 @@ namespace Unity.UIWidgets.ui {
         uiPathCache _cache;
 
         public static uiPath create(int capacity = 128) {
-            uiPath newPath = ItemPoolManager.alloc<uiPath>();
+            uiPath newPath = ObjectPool<uiPath>.alloc();
             newPath._reset();
             return newPath;
         }
@@ -23,21 +23,21 @@ namespace Unity.UIWidgets.ui {
         }
 
         public override void clear() {
-            this._commands.dispose();
-            this._cache?.dispose();
+            ObjectPool<uiList<float>>.release(this._commands);
+            ObjectPool<uiPathCache>.release(this._cache);
             this._cache = null;
             this._commands = null;
         }
 
         void _reset() {
-            this._commands = ItemPoolManager.alloc<uiList<float>>();
+            this._commands = ObjectPool<uiList<float>>.alloc();
             this._commandx = 0;
             this._commandy = 0;
             this._minX = float.MaxValue;
             this._minY = float.MaxValue;
             this._maxX = float.MinValue;
             this._maxY = float.MinValue;
-            this._cache?.dispose();
+            ObjectPool<uiPathCache>.release(this._cache);
             this._cache = null;
         }
 
@@ -85,7 +85,7 @@ namespace Unity.UIWidgets.ui {
             }
 
             _cache.normalize();
-            this._cache?.dispose();
+            ObjectPool<uiPathCache>.release(this._cache);
             this._cache = _cache;
             return _cache;
         }
@@ -114,7 +114,7 @@ namespace Unity.UIWidgets.ui {
             this._commandx = x;
             this._commandy = y;
             
-            this._cache?.dispose();
+            ObjectPool<uiPathCache>.release(this._cache);
             this._cache = null;
         }
 
@@ -129,7 +129,7 @@ namespace Unity.UIWidgets.ui {
             this._commandx = x;
             this._commandy = y;
             
-            this._cache?.dispose();
+            ObjectPool<uiPathCache>.release(this._cache);
             this._cache = null;
         }
 
@@ -150,14 +150,14 @@ namespace Unity.UIWidgets.ui {
             this._commandx = x3;
             this._commandy = y3;
             
-            this._cache?.dispose();
+            ObjectPool<uiPathCache>.release(this._cache);
             this._cache = null;
         }
         
         void _appendClose() {
             this._commands.Add((float) uiPathCommand.close);
             
-            this._cache?.dispose();
+            ObjectPool<uiPathCache>.release(this._cache);
             this._cache = null;
         }
 
@@ -165,7 +165,7 @@ namespace Unity.UIWidgets.ui {
             this._commands.Add((float) uiPathCommand.winding);
             this._commands.Add(winding);
             
-            this._cache?.dispose();
+            ObjectPool<uiPathCache>.release(this._cache);
             this._cache = null;
         }
 

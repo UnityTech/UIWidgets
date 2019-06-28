@@ -256,7 +256,7 @@ namespace Unity.UIWidgets.ui {
             out int pass, out MaterialPropertyBlockWrapper props) {
             Vector4 viewport = layer.viewport;
 
-            props = ItemPoolManager.alloc<MaterialPropertyBlockWrapper>();
+            props = ObjectPool<MaterialPropertyBlockWrapper>.alloc();
             props.SetVector(_viewportId, viewport);
             props.SetFloat(_alphaId, alpha);
 
@@ -324,7 +324,7 @@ namespace Unity.UIWidgets.ui {
             var mat = _fill0Mat.getMaterial(layer.ignoreClip);
 
             var pass = 0;
-            var props = ItemPoolManager.alloc<MaterialPropertyBlockWrapper>();
+            var props = ObjectPool<MaterialPropertyBlockWrapper>.alloc();
             props.SetVector(_viewportId, viewport);
 
             return PictureFlusher.CmdDraw.create(
@@ -347,7 +347,7 @@ namespace Unity.UIWidgets.ui {
                 properties : props
             );
             
-            mesh.dispose();
+            ObjectPool<uiMeshMesh>.release(mesh);
             return ret;
         }
 
@@ -369,7 +369,7 @@ namespace Unity.UIWidgets.ui {
             var mat = _stroke1Mat;
 
             var pass = 0;
-            var props = ItemPoolManager.alloc<MaterialPropertyBlockWrapper>();
+            var props = ObjectPool<MaterialPropertyBlockWrapper>.alloc();
             props.SetVector(_viewportId, viewport);
 
             return PictureFlusher.CmdDraw.create(
@@ -386,7 +386,7 @@ namespace Unity.UIWidgets.ui {
             var mat = _stencilMat;
 
             var pass = 0;
-            var props = ItemPoolManager.alloc<MaterialPropertyBlockWrapper>();
+            var props = ObjectPool<MaterialPropertyBlockWrapper>.alloc();
             props.SetVector(_viewportId, viewport);
 
             return PictureFlusher.CmdDraw.create(
@@ -402,7 +402,7 @@ namespace Unity.UIWidgets.ui {
             var mat = _stencilMat;
 
             var pass = 1;
-            var props = ItemPoolManager.alloc<MaterialPropertyBlockWrapper>();
+            var props = ObjectPool<MaterialPropertyBlockWrapper>.alloc();
             props.SetVector(_viewportId, viewport);
 
             return PictureFlusher.CmdDraw.create(
@@ -418,7 +418,7 @@ namespace Unity.UIWidgets.ui {
             var mat = _stencilMat;
 
             var pass = 2;
-            var props = ItemPoolManager.alloc<MaterialPropertyBlockWrapper>();
+            var props = ObjectPool<MaterialPropertyBlockWrapper>.alloc();
             props.SetVector(_viewportId, viewport);
 
             return PictureFlusher.CmdDraw.create(
@@ -497,7 +497,7 @@ namespace Unity.UIWidgets.ui {
             var mat = _filterMat;
 
             var pass = 0;
-            var props = ItemPoolManager.alloc<MaterialPropertyBlockWrapper>();
+            var props = ObjectPool<MaterialPropertyBlockWrapper>.alloc();
             props.SetVector(_viewportId, viewport);
 
             props.SetFloat(_mfRadiusId, radius);

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Unity.UIWidgets.ui {
     
-    public class uiList<T> : PoolItem {
+    public class uiList<T> : PoolObject {
         List<T> list;
 
         public override void setup() {

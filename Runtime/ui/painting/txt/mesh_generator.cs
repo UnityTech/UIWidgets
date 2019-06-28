@@ -5,7 +5,7 @@ using Unity.UIWidgets.foundation;
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
-    class MeshKey : PoolItem, IEquatable<MeshKey> {
+    class MeshKey : PoolObject, IEquatable<MeshKey> {
         public long textBlobId;
         public float scale;
 
@@ -14,7 +14,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public static MeshKey create(long textBlobId, float scale) {
-            var newKey = ItemPoolManager.alloc<MeshKey>();
+            var newKey = ObjectPool<MeshKey>.alloc();
             newKey.textBlobId = textBlobId;
             newKey.scale = scale;
             return newKey;
@@ -67,7 +67,7 @@ namespace Unity.UIWidgets.ui {
         }
     }
 
-    class MeshInfo : PoolItem {
+    class MeshInfo : PoolObject {
         public MeshKey key;
         public long textureVersion;
         public uiMeshMesh mesh;
@@ -78,7 +78,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public static MeshInfo create(MeshKey key, uiMeshMesh mesh, long textureVersion, int timeToLive = 5) {
-            var meshInfo = ItemPoolManager.alloc<MeshInfo>();
+            var meshInfo = ObjectPool<MeshInfo>.alloc();
             meshInfo.mesh = mesh;
             meshInfo.key = key;
             meshInfo.textureVersion = textureVersion;
@@ -87,8 +87,8 @@ namespace Unity.UIWidgets.ui {
         }
 
         public override void clear() {
-            this.key.dispose();
-            this.mesh.dispose();
+            ObjectPool<MeshKey>.release(this.key);
+            ObjectPool<uiMeshMesh>.release(this.mesh);
         }
 
         public long timeToLive {
@@ -101,7 +101,7 @@ namespace Unity.UIWidgets.ui {
     }
 
     
-    class TextBlobMesh : PoolItem {
+    class TextBlobMesh : PoolObject {
         
         static readonly Dictionary<MeshKey, MeshInfo> _meshes = new Dictionary<MeshKey, MeshInfo>();
         static long _frameCount = 0;
@@ -118,13 +118,13 @@ namespace Unity.UIWidgets.ui {
 
         public override void clear() {
             this.textBlob = null;
-            this._mesh?.dispose();
+            ObjectPool<uiMeshMesh>.release(this._mesh);
             this._mesh = null;
             this._resolved = false;
         }
 
         public static TextBlobMesh create(TextBlob textBlob, float scale, uiMatrix3 matrix) {
-            TextBlobMesh newMesh = ItemPoolManager.alloc<TextBlobMesh>();
+            TextBlobMesh newMesh = ObjectPool<TextBlobMesh>.alloc();
             newMesh.textBlob = textBlob;
             newMesh.scale = scale;
             newMesh.matrix = matrix;
@@ -151,7 +151,7 @@ namespace Unity.UIWidgets.ui {
 
             foreach (var key in _keysToRemove)
             {
-                _meshes[key].dispose();
+                ObjectPool<MeshInfo>.release(_meshes[key]);
                 _meshes.Remove(key);
             }
             _keysToRemove.Clear();
@@ -170,7 +170,7 @@ namespace Unity.UIWidgets.ui {
 
             _meshes.TryGetValue(key, out var meshInfo);
             if (meshInfo != null && meshInfo.textureVersion == fontInfo.textureVersion) {
-                key.dispose();
+                ObjectPool<MeshKey>.release(key);
                 meshInfo.touch();
                 this._mesh = meshInfo.mesh.transform(this.matrix);
                 return this._mesh;
@@ -181,13 +181,13 @@ namespace Unity.UIWidgets.ui {
             var text = this.textBlob.text;
             var fontSizeToLoad = Mathf.CeilToInt(style.UnityFontSize * this.scale);
 
-            var vertices = ItemPoolManager.alloc<uiList<Vector3>>();
+            var vertices = ObjectPool<uiList<Vector3>>.alloc();
             vertices.SetCapacity(length * 4);
             
-            var triangles = ItemPoolManager.alloc<uiList<int>>();
+            var triangles = ObjectPool<uiList<int>>.alloc();
             triangles.SetCapacity(length * 6);
 
-            var uv = ItemPoolManager.alloc<uiList<Vector2>>();
+            var uv = ObjectPool<uiList<Vector2>>.alloc();
             uv.SetCapacity(length * 4);
             
             for (int charIndex = 0; charIndex < length; ++charIndex) {
@@ -231,9 +231,9 @@ namespace Unity.UIWidgets.ui {
 
             if (vertices.Count == 0) {
                 this._mesh = null;
-                vertices.dispose();
-                uv.dispose();
-                triangles.dispose();
+                ObjectPool<uiList<Vector3>>.release(vertices);
+                ObjectPool<uiList<Vector2>>.release(uv);
+                ObjectPool<uiList<int>>.release(triangles);
                 
                 return null;
             }

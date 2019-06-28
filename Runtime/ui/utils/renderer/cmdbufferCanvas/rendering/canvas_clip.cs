@@ -3,7 +3,7 @@ using Unity.UIWidgets.foundation;
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
-    class ClipElement : PoolItem {
+    class ClipElement : PoolObject {
         public int saveCount;
         public uiMeshMesh mesh;
         public bool convex;
@@ -20,7 +20,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public override void clear() {
-            this.mesh.dispose();
+            ObjectPool<uiMeshMesh>.release(this.mesh);
             this.saveCount = 0;
             this.mesh = null;
             this.convex = false;
@@ -31,7 +31,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public static ClipElement create(int saveCount, uiPath uiPath, uiMatrix3 matrix, float scale) {
-            ClipElement newElement = ItemPoolManager.alloc<ClipElement>();
+            ClipElement newElement = ObjectPool<ClipElement>.alloc();
             
             newElement.saveCount = saveCount;
 
@@ -159,7 +159,7 @@ namespace Unity.UIWidgets.ui {
         }
     }
 
-    class ClipStack : PoolItem {
+    class ClipStack : PoolObject {
         static uint _genId = wideOpenGenID;
 
         public static uint getNextGenID() {
@@ -179,14 +179,14 @@ namespace Unity.UIWidgets.ui {
         int _saveCount;
 
         public static ClipStack create() {
-            return ItemPoolManager.alloc<ClipStack>();
+            return ObjectPool<ClipStack>.alloc();
         }
 
         public override void clear() {
             this._saveCount = 0;
             this._lastElement = null;
             foreach (var clipelement in this.stack) {
-                clipelement.dispose();
+                ObjectPool<ClipElement>.release(clipelement);
             }
             
             this.stack.Clear();
@@ -208,7 +208,7 @@ namespace Unity.UIWidgets.ui {
                 }
 
                 var lastelement = this.stack[this.stack.Count - 1];
-                lastelement.dispose();
+                ObjectPool<ClipElement>.release(lastelement);
                 
                 this.stack.RemoveAt(this.stack.Count - 1);
                 this._lastElement = this.stack.Count == 0 ? null : this.stack[this.stack.Count - 1];
@@ -224,7 +224,7 @@ namespace Unity.UIWidgets.ui {
             ClipElement prior = this._lastElement;
             if (prior != null) {
                 if (prior.isEmpty()) {
-                    element.dispose();
+                    ObjectPool<ClipElement>.release(element);
                     return;
                 }
 
@@ -234,20 +234,20 @@ namespace Unity.UIWidgets.ui {
                         var isectRect = uiRectHelper.intersect(prior.rect.Value, element.rect.Value);
                         if (isectRect.isEmpty) {
                             prior.setEmpty();
-                            element.dispose();
+                            ObjectPool<ClipElement>.release(element);
                             return;
                         }
 
                         prior.setRect(isectRect);
                         var priorprior = this.stack.Count > 1 ? this.stack[this.stack.Count - 2] : null;
                         prior.updateBoundAndGenID(priorprior);
-                        element.dispose();
+                        ObjectPool<ClipElement>.release(element);
                         return;
                     }
 
                     if (!uiRectHelper.overlaps(prior.getBound(),element.getBound())) {
                         prior.setEmpty();
-                        element.dispose();
+                        ObjectPool<ClipElement>.release(element);
                         return;
                     }
                 }
@@ -271,7 +271,7 @@ namespace Unity.UIWidgets.ui {
         }
     }
 
-    class ReducedClip : PoolItem {
+    class ReducedClip : PoolObject {
         public uiRect? scissor;
         public List<ClipElement> maskElements = new List<ClipElement>();
         ClipElement _lastElement;
@@ -300,7 +300,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public static ReducedClip create(ClipStack stack, uiRect layerBounds, uiRect queryBounds) {
-            ReducedClip clip = ItemPoolManager.alloc<ReducedClip>();
+            ReducedClip clip = ObjectPool<ReducedClip>.alloc();
             uiRect? stackBounds;
             bool iior;
             stack.getBounds(out stackBounds, out iior);

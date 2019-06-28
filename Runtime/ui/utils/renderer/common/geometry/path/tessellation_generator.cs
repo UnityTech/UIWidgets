@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
-    class uiTessellationKey : PoolItem, IEquatable<uiTessellationKey> {
+    class uiTessellationKey : PoolObject, IEquatable<uiTessellationKey> {
         public float x2;
         public float y2;
         public float x3;
@@ -16,7 +16,7 @@ namespace Unity.UIWidgets.ui {
         public static uiTessellationKey create(float x1, float y1, float x2, float y2, float x3, float y3, float x4,
             float y4,
             float tessTol) {
-            var newKey = ItemPoolManager.alloc<uiTessellationKey>();
+            var newKey = ObjectPool<uiTessellationKey>.alloc();
             newKey.x2 = x2 - x1;
             newKey.y2 = y2 - y1;
             newKey.x3 = x3 - x1;
@@ -103,13 +103,13 @@ namespace Unity.UIWidgets.ui {
         }
     }
 
-    class uiTessellationInfo : PoolItem {
+    class uiTessellationInfo : PoolObject {
         public uiTessellationKey key;
         public uiList<Vector2> points;
         long _timeToLive;
 
         public static uiTessellationInfo create(uiTessellationKey key, uiList<Vector2> points, int timeToLive = 5) {
-            var newInfo = ItemPoolManager.alloc<uiTessellationInfo>();
+            var newInfo = ObjectPool<uiTessellationInfo>.alloc();
             newInfo.points = points;
             newInfo.key = key;
             newInfo.touch(timeToLive);
@@ -121,7 +121,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public override void clear() {
-            this.points.dispose();
+            ObjectPool<uiList<Vector2>>.release(this.points);
         }
 
         public long timeToLive {
@@ -154,8 +154,8 @@ namespace Unity.UIWidgets.ui {
             var keysToRemove = _tessellations.Values.Where(info => info.timeToLive < _frameCount)
                 .Select(info => info.key).ToList();
             foreach (var key in keysToRemove) {
-                key.dispose();
-                _tessellations[key].dispose();
+                ObjectPool<uiTessellationKey>.release(key);
+                ObjectPool<uiTessellationInfo>.release(_tessellations[key]);
                 _tessellations.Remove(key);
             }
         }
@@ -166,7 +166,7 @@ namespace Unity.UIWidgets.ui {
 
             _tessellations.TryGetValue(key, out var uiTessellationInfo);
             if (uiTessellationInfo != null) {
-                key.dispose();
+                ObjectPool<uiTessellationKey>.release(key);
                 uiTessellationInfo.touch();
                 return uiTessellationInfo.points;
             }
@@ -202,7 +202,7 @@ namespace Unity.UIWidgets.ui {
             x4 = x4 - x1;
             y4 = y4 - y1;
 
-            var points = ItemPoolManager.alloc<uiList<Vector2>>();
+            var points = ObjectPool<uiList<Vector2>>.alloc();
 
             _stack.Clear();
             _stack.Push(new _StackData {

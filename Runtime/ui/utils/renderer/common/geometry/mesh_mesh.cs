@@ -3,7 +3,7 @@ using Unity.UIWidgets.foundation;
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
-    class uiMeshMesh : PoolItem {
+    class uiMeshMesh : PoolObject {
         public uiList<Vector3> vertices;
         public uiList<int> triangles;
         public uiList<Vector2> uv;
@@ -36,9 +36,9 @@ namespace Unity.UIWidgets.ui {
         }
 
         public override void clear() {
-            this.vertices?.dispose();
-            this.triangles?.dispose();
-            this.uv?.dispose();
+            ObjectPool<uiList<Vector3>>.release(this.vertices);
+            ObjectPool<uiList<int>>.release(this.triangles);
+            ObjectPool<uiList<Vector2>>.release(this.uv);
             this.vertices = null;
             this.triangles = null;
             this.uv = null;
@@ -47,15 +47,15 @@ namespace Unity.UIWidgets.ui {
         }
 
         public static uiMeshMesh create(uiRect rect) {
-            uiMeshMesh newMesh = ItemPoolManager.alloc<uiMeshMesh>();
+            uiMeshMesh newMesh = ObjectPool<uiMeshMesh>.alloc();
 
-            newMesh.vertices = ItemPoolManager.alloc<uiList<Vector3>>();
+            newMesh.vertices = ObjectPool<uiList<Vector3>>.alloc();
             newMesh.vertices.Add(new Vector3(rect.right, rect.bottom));
             newMesh.vertices.Add(new Vector3(rect.right, rect.top));
             newMesh.vertices.Add(new Vector3(rect.left, rect.bottom));
             newMesh.vertices.Add(new Vector3(rect.left, rect.top));
 
-            newMesh.triangles = ItemPoolManager.alloc<uiList<int>>();
+            newMesh.triangles = ObjectPool<uiList<int>>.alloc();
             newMesh.triangles.AddRange(_boundsTriangles);
             newMesh.rawBounds = rect;
 
@@ -72,7 +72,7 @@ namespace Unity.UIWidgets.ui {
             D.assert(triangles.Count >= 0);
             D.assert(uv == null || uv.Count == vertices.Count);
             
-            uiMeshMesh newMesh = ItemPoolManager.alloc<uiMeshMesh>();
+            uiMeshMesh newMesh = ObjectPool<uiMeshMesh>.alloc();
             newMesh.matrix = matrix;
             newMesh.vertices = vertices;
             newMesh.triangles = triangles;
@@ -123,11 +123,11 @@ namespace Unity.UIWidgets.ui {
         }
 
         public uiMeshMesh transform(uiMatrix3? matrix) {
-            var vertices = ItemPoolManager.alloc<uiList<Vector3>>();
+            var vertices = ObjectPool<uiList<Vector3>>.alloc();
             vertices.SetCapacity(this.vertices.Count);
             vertices.AddRange(this.vertices.data);
             
-            var triangles = ItemPoolManager.alloc<uiList<int>>();
+            var triangles = ObjectPool<uiList<int>>.alloc();
             triangles.SetCapacity(this.triangles.Count);
             triangles.AddRange(this.triangles.data);
 
@@ -135,7 +135,7 @@ namespace Unity.UIWidgets.ui {
             uiList<Vector2> uv = null;
 
             if (this.uv != null) {
-                uv = ItemPoolManager.alloc<uiList<Vector2>>();
+                uv = ObjectPool<uiList<Vector2>>.alloc();
                 uv.SetCapacity(this.uv.Count);
                 uv.AddRange(this.uv.data);
             }

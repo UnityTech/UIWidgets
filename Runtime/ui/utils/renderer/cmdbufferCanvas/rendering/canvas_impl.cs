@@ -37,7 +37,7 @@ namespace Unity.UIWidgets.ui {
         public void dispose() {
             if (this._currentLayer != null) {
                 this._clearLayer(this._currentLayer);
-                this._currentLayer.dispose();
+                ObjectPool<RenderLayer>.release(this._currentLayer);
                 this._currentLayer = null;
                 this._lastScissor = null;
                 this._layers.Clear();
@@ -72,7 +72,7 @@ namespace Unity.UIWidgets.ui {
             D.assert(this._layers.Count == 0 || (this._layers.Count == 1 && this._layers[0] == this._currentLayer));
             if (this._currentLayer != null) {
                 this._clearLayer(this._currentLayer);
-                this._currentLayer.dispose();
+                ObjectPool<RenderLayer>.release(this._currentLayer);
                 this._currentLayer = null;
                 this._lastScissor = null;
                 this._layers.Clear();
@@ -209,7 +209,7 @@ namespace Unity.UIWidgets.ui {
             var layer = this._currentLayer;
             D.assert(layer.states.Count > 0);
             if (layer.states.Count > 1) {
-                layer.states[layer.states.Count - 1].dispose();
+                ObjectPool<State>.release(layer.states[layer.states.Count - 1]);
                 layer.states.RemoveAt(layer.states.Count - 1);
                 layer.currentState = layer.states[layer.states.Count - 1];
                 layer.clipStack.restore();
@@ -223,7 +223,7 @@ namespace Unity.UIWidgets.ui {
             var mesh = ImageMeshGenerator.imageMesh(state.matrix, uiRectHelper.one, layer.layerBounds);
 
             if (!this._applyClip(mesh.bounds)) {
-                mesh.dispose();
+                ObjectPool<uiMeshMesh>.release(mesh);
                 return;
             }
 
@@ -287,21 +287,21 @@ namespace Unity.UIWidgets.ui {
             var path = uiPath.create();
             path.addRect(uiRectHelper.fromRect(rect));
             this._clipPath(path);
-            path.dispose();
+            ObjectPool<uiPath>.release(path);
         }
         
         void _clipUIRect(uiRect rect) {
             var path = uiPath.create();
             path.addRect(rect);
             this._clipPath(path);
-            path.dispose();
+            ObjectPool<uiPath>.release(path);
         }
 
         void _clipRRect(RRect rrect) {
             var path = uiPath.create();
             path.addRRect(rrect);
             this._clipPath(path);
-            path.dispose();
+            ObjectPool<uiPath>.release(path);
         }
 
         void _clipPath(uiPath path) {
@@ -330,7 +330,7 @@ namespace Unity.UIWidgets.ui {
             var layerBounds = layer.layerBounds;
             ReducedClip reducedClip = ReducedClip.create(layer.clipStack, layerBounds, queryBounds.Value);
             if (reducedClip.isEmpty()) {
-                reducedClip.dispose();
+                ObjectPool<ReducedClip>.release(reducedClip);
                 return false;
             }
 
@@ -350,7 +350,7 @@ namespace Unity.UIWidgets.ui {
                 deviceScissor = uiRectHelper.intersect(deviceScissor, physicalRect);
 
                 if (deviceScissor.isEmpty) {
-                    reducedClip.dispose();
+                    ObjectPool<ReducedClip>.release(reducedClip);
                     return false;
                 }
 
@@ -379,7 +379,7 @@ namespace Unity.UIWidgets.ui {
                 this._setLastClipGenId(maskGenID, reducedClip.scissor.Value);
             }
 
-            reducedClip.dispose();
+            ObjectPool<ReducedClip>.release(reducedClip);
 
             return true;
         }
@@ -525,7 +525,7 @@ namespace Unity.UIWidgets.ui {
 
             var blurMesh = ImageMeshGenerator.imageMesh(null, uiRectHelper.one, maskBounds);
             if (!this._applyClip(blurMesh.bounds)) {
-                blurMesh.dispose();
+                ObjectPool<uiMeshMesh>.release(blurMesh);
                 return;
             }
 
@@ -536,7 +536,7 @@ namespace Unity.UIWidgets.ui {
 
         void _drawPathDrawMeshCallback(uiPaint p, uiMeshMesh mesh, bool convex, float alpha, Texture tex, uiRect textBlobBounds, TextBlobMesh textMesh) {
             if (!this._applyClip(mesh.bounds)) {
-                mesh.dispose();
+                ObjectPool<uiMeshMesh>.release(mesh);
                 return;
             }
 
@@ -552,7 +552,7 @@ namespace Unity.UIWidgets.ui {
 
         void _drawPathDrawMeshCallback2(uiPaint p, uiMeshMesh mesh, bool convex, float alpha, Texture tex, uiRect textBlobBounds, TextBlobMesh textMesh) {
             if (!this._applyClip(mesh.bounds)) {
-                mesh.dispose();
+                ObjectPool<uiMeshMesh>.release(mesh);
                 return;
             }
 
@@ -564,7 +564,7 @@ namespace Unity.UIWidgets.ui {
 
         void _drawTextDrawMeshCallback(uiPaint p, uiMeshMesh mesh, bool convex, float alpha, Texture tex, uiRect textBlobBounds, TextBlobMesh textMesh) {
             if (!this._applyClip(textBlobBounds)) {
-                textMesh.dispose();
+                ObjectPool<TextBlobMesh>.release(textMesh);
                 return;
             }
 
@@ -573,7 +573,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         void _drawPathDrawMeshQuit(uiMeshMesh mesh) {
-            mesh.dispose();
+            ObjectPool<uiMeshMesh>.release(mesh);
         }
 
         void _drawPath(uiPath path, uiPaint paint) {
@@ -655,7 +655,7 @@ namespace Unity.UIWidgets.ui {
             var state = layer.currentState;
             var mesh = ImageMeshGenerator.imageMesh(state.matrix, src.Value, dst);
             if (!this._applyClip(mesh.bounds)) {
-                mesh.dispose();
+                ObjectPool<uiMeshMesh>.release(mesh);
                 return;
             }
 
@@ -681,7 +681,7 @@ namespace Unity.UIWidgets.ui {
 
             var mesh = ImageMeshGenerator.imageNineMesh(state.matrix, src.Value, center, image.width, image.height, dst);
             if (!this._applyClip(mesh.bounds)) {
-                mesh.dispose();
+                ObjectPool<uiMeshMesh>.release(mesh);
                 return;
             }
 
@@ -755,13 +755,13 @@ namespace Unity.UIWidgets.ui {
                     case DrawClipPath cmd: {
                         var uipath = uiPath.fromPath(cmd.path);
                         this._clipPath(uipath);
-                        uipath.dispose();
+                        ObjectPool<uiPath>.release(uipath);
                         break;
                     }
                     case DrawPath cmd: {
                         var uipath = uiPath.fromPath(cmd.path);
                         this._drawPath(uipath, uiPaint.fromPaint(cmd.paint));
-                        uipath.dispose();
+                        ObjectPool<uiPath>.release(uipath);
                         break;
                     }
                     case DrawImage cmd: {
@@ -1097,14 +1097,14 @@ namespace Unity.UIWidgets.ui {
                         break;
                 }
 
-                cmdObj.dispose();
+                cmdObj.release();
             }
 
             layer.draws.Clear();
 
             foreach (var subLayer in layer.layers) {
                 this._clearLayer(subLayer);
-                subLayer.dispose();
+                ObjectPool<RenderLayer>.release(subLayer);
             }
 
             layer.layers.Clear();

@@ -4,13 +4,13 @@ using Unity.UIWidgets.foundation;
 
 
 namespace Unity.UIWidgets.ui {
-    public class uiPicture : PoolItem {
+    public class uiPicture : PoolObject {
         public uiPicture() {
             
         }
         
         public static uiPicture create(List<uiDrawCmd> drawCmds, uiRect paintBounds) {
-            var picture = ItemPoolManager.alloc<uiPicture>();
+            var picture = ObjectPool<uiPicture>.alloc();
             picture.drawCmds = drawCmds;
             picture.paintBounds = paintBounds;
             return picture;
@@ -49,7 +49,7 @@ namespace Unity.UIWidgets.ui {
 
         public void reset() {
             foreach (var drawCmd in this._drawCmds) {
-                drawCmd.dispose();
+                drawCmd.release();
             }
             
             this._drawCmds.Clear();
@@ -184,7 +184,7 @@ namespace Unity.UIWidgets.ui {
                     var rect = transformedMesh.bounds;
                     state.scissor = state.scissor == null ? rect : state.scissor.Value.intersect(rect);
                     this._setState(state);
-                    transformedMesh.dispose();
+                    ObjectPool<uiMeshMesh>.release(transformedMesh);
                     break;
                 }
                 case uiDrawPath cmd: {
@@ -225,7 +225,7 @@ namespace Unity.UIWidgets.ui {
                         this._addPaintBounds(mesh.bounds);
                     }
                     
-                    mesh.dispose();
+                    ObjectPool<uiMeshMesh>.release(mesh);
                     break;
                 }
                 case uiDrawImage cmd: {

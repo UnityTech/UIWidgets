@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Unity.UIWidgets.ui {
     public partial class PictureFlusher {
         
-        internal class RenderLayer : PoolItem {
+        internal class RenderLayer : PoolObject {
             public int rtID;
             public int width;
             public int height;
@@ -40,7 +40,7 @@ namespace Unity.UIWidgets.ui {
             public static RenderLayer create(int rtID = 0, int width = 0, int height = 0, FilterMode filterMode = FilterMode.Point,
                 bool noMSAA = false, uiRect? layerBounds = null, uiPaint? layerPaint = null, bool ignoreClip = true) {
                 D.assert(layerBounds != null);
-                var newLayer = ItemPoolManager.alloc<RenderLayer>();
+                var newLayer = ObjectPool<RenderLayer>.alloc();
                 newLayer.rtID = rtID;
                 newLayer.width = width;
                 newLayer.height = height;
@@ -69,16 +69,16 @@ namespace Unity.UIWidgets.ui {
                 this.layers.Clear();
 
                 foreach (var state in this.states) {
-                    state.dispose();
+                    ObjectPool<State>.release(state);
                 }
                 
                 this.states.Clear();
-                this.clipStack.dispose();
+                ObjectPool<ClipStack>.release(this.clipStack);
                 this._viewport = null;
             }
         }
 
-        internal class State : PoolItem {
+        internal class State : PoolObject {
 
             public State() {
                 
@@ -91,7 +91,7 @@ namespace Unity.UIWidgets.ui {
             uiMatrix3? _invMatrix;
 
             public static State create(uiMatrix3? matrix = null, float? scale = null, uiMatrix3? invMatrix = null) {
-                State newState = ItemPoolManager.alloc<State>();
+                State newState = ObjectPool<State>.alloc();
                 newState._matrix = matrix ?? _id;
                 newState._scale = scale;
                 newState._invMatrix = invMatrix;

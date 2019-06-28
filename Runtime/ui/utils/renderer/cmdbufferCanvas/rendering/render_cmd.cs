@@ -2,8 +2,8 @@ using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
     public partial class PictureFlusher {
-        internal abstract class RenderCmd : PoolItem {
-            
+        internal abstract class RenderCmd : PoolObject {
+            public abstract void release();
         }
         
         internal class CmdLayer : RenderCmd {
@@ -17,9 +17,13 @@ namespace Unity.UIWidgets.ui {
             }
 
             public static CmdLayer create(RenderLayer layer) {
-                CmdLayer newCmd = ItemPoolManager.alloc<CmdLayer>();
+                CmdLayer newCmd = ObjectPool<CmdLayer>.alloc();
                 newCmd.layer = layer;
                 return newCmd;
+            }
+
+            public override void release() {
+                ObjectPool<CmdLayer>.release(this);
             }
         }
         
@@ -41,9 +45,9 @@ namespace Unity.UIWidgets.ui {
 
             
             public override void clear() {
-                this.mesh?.dispose();
-                this.textMesh?.dispose();
-                this.properties?.dispose();
+                ObjectPool<uiMeshMesh>.release(this.mesh);
+                ObjectPool<TextBlobMesh>.release(this.textMesh);
+                ObjectPool<MaterialPropertyBlockWrapper>.release(this.properties);
             }
 
             public CmdDraw() {
@@ -53,7 +57,7 @@ namespace Unity.UIWidgets.ui {
                 MaterialPropertyBlockWrapper properties = null, int? layerId = null, Material material = null,
                 Image image = null, Mesh meshObj = null,
                 bool meshObjCreated = false) {
-                CmdDraw newCmd = ItemPoolManager.alloc<CmdDraw>();
+                CmdDraw newCmd = ObjectPool<CmdDraw>.alloc();
                 newCmd.mesh = mesh;
                 newCmd.textMesh = textMesh;
                 newCmd.pass = pass;
@@ -65,6 +69,10 @@ namespace Unity.UIWidgets.ui {
                 newCmd.meshObjCreated = meshObjCreated;
                 
                 return newCmd;
+            }
+            
+            public override void release() {
+                ObjectPool<CmdDraw>.release(this);
             }
         }
 
@@ -79,9 +87,13 @@ namespace Unity.UIWidgets.ui {
             }
 
             public static CmdScissor create(uiRect? deviceScissor) {
-                CmdScissor newCmd = ItemPoolManager.alloc<CmdScissor>();
+                CmdScissor newCmd = ObjectPool<CmdScissor>.alloc();
                 newCmd.deviceScissor = deviceScissor;
                 return newCmd;
+            }
+            
+            public override void release() {
+                ObjectPool<CmdScissor>.release(this);
             }
         }
     }

@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using Unity.UIWidgets.foundation;
 using UnityEngine;
 
@@ -118,10 +116,10 @@ namespace Unity.UIWidgets.ui {
         public static uiMeshMesh imageMesh(uiMatrix3? matrix,
             uiOffset srcTL, uiOffset srcBL, uiOffset srcBR, uiOffset srcTR,
             uiRect dst) {
-            var vertices = ItemPoolManager.alloc<uiList<Vector3>>();
+            var vertices = ObjectPool<uiList<Vector3>>.alloc();
             vertices.SetCapacity(4);
 
-            var uv = ItemPoolManager.alloc<uiList<Vector2>>();
+            var uv = ObjectPool<uiList<Vector2>>.alloc();
             uv.SetCapacity(4);
 
             vertices.Add(new Vector2(dst.left, dst.top));
@@ -133,17 +131,17 @@ namespace Unity.UIWidgets.ui {
             vertices.Add(new Vector2(dst.right, dst.top));
             uv.Add(new Vector2(srcTR.dx, 1.0f - srcTR.dy));
 
-            var _triangles = ItemPoolManager.alloc<uiList<int>>();
+            var _triangles = ObjectPool<uiList<int>>.alloc();
             _triangles.AddRange(_imageTriangles);
 
             return uiMeshMesh.create(matrix, vertices, _triangles, uv);
         }
         
         public static uiMeshMesh imageMesh(uiMatrix3? matrix, uiRect src, uiRect dst) {
-            var vertices = ItemPoolManager.alloc<uiList<Vector3>>();
+            var vertices = ObjectPool<uiList<Vector3>>.alloc();
             vertices.SetCapacity(4);
 
-            var uv = ItemPoolManager.alloc<uiList<Vector2>>();
+            var uv = ObjectPool<uiList<Vector2>>.alloc();
             uv.SetCapacity(4);
 
             float uvx0 = src.left;
@@ -160,7 +158,7 @@ namespace Unity.UIWidgets.ui {
             vertices.Add(new Vector2(dst.right, dst.top));
             uv.Add(new Vector2(uvx1, uvy0));
             
-            var _triangles = ItemPoolManager.alloc<uiList<int>>();
+            var _triangles = ObjectPool<uiList<int>>.alloc();
             _triangles.AddRange(_imageTriangles);
 
             return uiMeshMesh.create(matrix, vertices, _triangles, uv);
@@ -186,10 +184,10 @@ namespace Unity.UIWidgets.ui {
             float ty2 = 1 - center.bottom;
             float ty3 = 1 - src.bottom;
 
-            var vertices = ItemPoolManager.alloc<uiList<Vector3>>();
+            var vertices = ObjectPool<uiList<Vector3>>.alloc();
             vertices.SetCapacity(16);
 
-            var uv = ItemPoolManager.alloc<uiList<Vector2>>();
+            var uv = ObjectPool<uiList<Vector2>>.alloc();
             uv.SetCapacity(16);
 
             vertices.Add(new Vector2(x0, y0));
@@ -225,7 +223,7 @@ namespace Unity.UIWidgets.ui {
             vertices.Add(new Vector2(x3, y3));
             uv.Add(new Vector2(tx3, ty3));
             
-            var _triangles = ItemPoolManager.alloc<uiList<int>>();
+            var _triangles = ObjectPool<uiList<int>>.alloc();
             _triangles.AddRange(_imageNineTriangles);
             
             return uiMeshMesh.create(matrix, vertices, _triangles, uv);

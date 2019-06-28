@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
     
-    class uiPathCache : PoolItem {
+    class uiPathCache : PoolObject {
         float _distTol;
         float _tessTol;
 
@@ -24,7 +24,7 @@ namespace Unity.UIWidgets.ui {
         float _miterLimit;
 
         public static uiPathCache create(float scale) {
-            uiPathCache newPathCache = ItemPoolManager.alloc<uiPathCache>();
+            uiPathCache newPathCache = ObjectPool<uiPathCache>.alloc();
             newPathCache._distTol = 0.01f / scale;
             newPathCache._tessTol = 0.25f / scale;
             newPathCache._scale = scale;
@@ -42,10 +42,10 @@ namespace Unity.UIWidgets.ui {
         public override void clear() {
             this._paths.Clear();
             this._points.Clear();
-            this._fillMesh?.dispose();
+            ObjectPool<uiMeshMesh>.release(this._fillMesh);
             this._fillMesh = null;
             
-            this._strokeMesh?.dispose();
+            ObjectPool<uiMeshMesh>.release(this._strokeMesh);
             this._strokeMesh = null;
         }
 
@@ -221,7 +221,7 @@ namespace Unity.UIWidgets.ui {
                 cvertices += path.count;
             }
 
-            var _vertices = ItemPoolManager.alloc<uiList<Vector3>>();
+            var _vertices = ObjectPool<uiList<Vector3>>.alloc();
             _vertices.SetCapacity(cvertices);
             for (var i = 0; i < paths.Count; i++) {
                  var path =  paths[i];
@@ -265,7 +265,7 @@ namespace Unity.UIWidgets.ui {
                 }
             }
 
-            var indices = ItemPoolManager.alloc<uiList<int>>();
+            var indices = ObjectPool<uiList<int>>.alloc();
             indices.SetCapacity(cindices);
             for (var i = 0; i < paths.Count; i++) {
                  var path =  paths[i];
@@ -413,7 +413,7 @@ namespace Unity.UIWidgets.ui {
                 cvertices += 4;
             }
 
-            var _vertices = ItemPoolManager.alloc<uiList<Vector3>>();
+            var _vertices = ObjectPool<uiList<Vector3>>.alloc();
             _vertices.SetCapacity(cvertices);
             for (var i = 0; i < paths.Count; i++) {
                  var path =  paths[i];
@@ -525,7 +525,7 @@ namespace Unity.UIWidgets.ui {
                 }
             }
 
-            var indices = ItemPoolManager.alloc<uiList<int>>();
+            var indices = ObjectPool<uiList<int>>.alloc();
             indices.SetCapacity(cindices);
             for (var i = 0; i < paths.Count; i++) {
                 var path =  paths[i];
@@ -551,7 +551,7 @@ namespace Unity.UIWidgets.ui {
 
             D.assert(indices.Count == cindices);
 
-            this._strokeMesh?.dispose();
+            ObjectPool<uiMeshMesh>.release(this._strokeMesh);
             this._strokeMesh = uiMeshMesh.create(null, vertices, indices);
             this._strokeWidth = strokeWidth;
             this._lineCap = lineCap;

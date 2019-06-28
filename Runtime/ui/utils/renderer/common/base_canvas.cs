@@ -4,7 +4,7 @@ using Unity.UIWidgets.foundation;
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
-    public class uiRecorderCanvas : PoolItem, Canvas {
+    public class uiRecorderCanvas : Canvas {
         public uiRecorderCanvas(uiPictureRecorder recorder) {
             this._recorder = recorder;
         }

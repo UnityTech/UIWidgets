@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
 
-    public class MaterialPropertyBlockWrapper : PoolItem {
+    public class MaterialPropertyBlockWrapper : PoolObject {
         public readonly MaterialPropertyBlock mpb;
 
         public MaterialPropertyBlockWrapper() {
