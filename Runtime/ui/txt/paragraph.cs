@@ -123,10 +123,6 @@ namespace Unity.UIWidgets.ui {
             this.codeUnits = codeUnits;
         }
 
-        public GlyphPosition shift(float shift) {
-            return new GlyphPosition(this.xPos.start + shift, this.xPos.end - this.xPos.start, this.codeUnits);
-        }
-
         public void shiftSelf(float shift) {
             this.xPos = new Range<float>(this.xPos.start + shift, this.xPos.end + shift);
         }
@@ -294,10 +290,12 @@ namespace Unity.UIWidgets.ui {
                 return;
             }
 
-            var textStyle = this._paragraphStyle.getTextStyle();
             this._tabStops.setFont(
-                FontManager.instance.getOrCreate(textStyle.fontFamily, textStyle.fontWeight, textStyle.fontStyle).font,
-                textStyle.UnityFontSize);
+                FontManager.instance.getOrCreate(
+                    this._paragraphStyle.fontFamily ?? TextStyle.kDefaultFontFamily,
+                    this._paragraphStyle.fontWeight ?? TextStyle.kDefaultFontWeight,
+                    this._paragraphStyle.fontStyle ?? TextStyle.kDefaultfontStyle).font,
+                (int) (this._paragraphStyle.fontSize ?? TextStyle.kDefaultFontSize));
 
             this._needsLayout = false;
             this._width = Mathf.Floor(constraints.width);
@@ -457,7 +455,7 @@ namespace Unity.UIWidgets.ui {
             ref float justifyXOffset,
             ref float maxWordWidth,
             Range<int>[] words,
-            GlyphPosition[] lineGlyphPositions,
+            GlyphPosition[] glyphPositions,
             ref int pLineGlyphPositions) {
             string text = this._text;
             int textStart = run.start;
@@ -486,7 +484,7 @@ namespace Unity.UIWidgets.ui {
                 textStart, textCount,
                 builder, layout,
                 words,
-                lineGlyphPositions,
+                glyphPositions,
                 run.start,
                 runXOffset,
                 wordGapWidth,
@@ -500,7 +498,7 @@ namespace Unity.UIWidgets.ui {
             float advance = layout.getAdvance();
             PaintRecord paintRecord = this._generatePaintRecord(run.style, textBlob, runXOffset, advance);
             runXOffset += advance;
-            this._codeUnitRuns.Add(this._generateCodeUnitRun(run, lineNumber, lineGlyphPositions, 
+            this._codeUnitRuns.Add(this._generateCodeUnitRun(run, lineNumber, glyphPositions, 
                 pLineGlyphPositions - textCount, textCount));
 
             return paintRecord;
@@ -542,7 +540,7 @@ namespace Unity.UIWidgets.ui {
         void _populateGlyphPositions(int textStart, int textCount,
             TextBlobBuilder builder, Layout layout,
             Range<int>[] words,
-            GlyphPosition[] lineGlyphPositions,
+            GlyphPosition[] glyphPositions,
             int runStart,
             float runXOffset,
             float wordGapWidth,
@@ -558,8 +556,8 @@ namespace Unity.UIWidgets.ui {
                 float glyphXOffset = layout.getX(glyphIndex) + justifyXOffset;
                 float glyphAdvance = layout.getCharAdvance(glyphIndex);
                 builder.positions[glyphIndex] = new Vector2d(glyphXOffset);
-                lineGlyphPositions[pLineGlyphPositions++] = new GlyphPosition(runXOffset + glyphXOffset, glyphAdvance,
-                    new Range<int>(textStart + glyphIndex, textStart + glyphIndex + 1));
+                glyphPositions[pLineGlyphPositions++] = new GlyphPosition(runXOffset + glyphXOffset,
+                    glyphAdvance, new Range<int>(textStart + glyphIndex, textStart + glyphIndex + 1));
                 if (words != null && wordIndex < words.Length) {
                     Range<int> word = words[wordIndex];
                     if (word.start == runStart + glyphIndex) {
@@ -573,7 +571,7 @@ namespace Unity.UIWidgets.ui {
 
                         wordIndex++;
                         if (!float.IsNaN(wordStartPosition)) {
-                            float wordWidth = lineGlyphPositions[pLineGlyphPositions-1].xPos.end - wordStartPosition;
+                            float wordWidth = glyphPositions[pLineGlyphPositions-1].xPos.end - wordStartPosition;
                             maxWordWidth = Mathf.Max(wordWidth, maxWordWidth);
                             wordStartPosition = float.NaN;
                         }
@@ -643,10 +641,12 @@ namespace Unity.UIWidgets.ui {
                 // TODO: the default values are filled in directly, to avoid the cost of creating a new TextStyle
                 //       However this may become inconsistent with the default values in TextStyle (text.cs)
                 //       A better way is to define some global constants used in both places.
-                var defaultFont = FontManager.instance.getOrCreate(this._paragraphStyle.fontFamily ?? "Helvetica",
-                    this._paragraphStyle.fontWeight ?? FontWeight.w400, this._paragraphStyle.fontStyle ?? FontStyle.normal).font;
-                var metrics = FontMetrics.fromFont(defaultFont, (int) (this._paragraphStyle.fontSize ?? 14.0f));
-                updateLineMetrics(metrics, this._paragraphStyle.lineHeight ?? 1.0f);
+                var defaultFont = FontManager.instance.getOrCreate(
+                    this._paragraphStyle.fontFamily ?? TextStyle.kDefaultFontFamily,
+                    this._paragraphStyle.fontWeight ?? TextStyle.kDefaultFontWeight,
+                    this._paragraphStyle.fontStyle ?? TextStyle.kDefaultfontStyle).font;
+                var metrics = FontMetrics.fromFont(defaultFont, (int) (this._paragraphStyle.fontSize ?? TextStyle.kDefaultFontSize));
+                updateLineMetrics(metrics, this._paragraphStyle.lineHeight ?? TextStyle.kDefaultHeight);
             }
 
             this._lineHeights.Add(
