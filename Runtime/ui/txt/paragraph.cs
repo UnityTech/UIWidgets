@@ -357,8 +357,7 @@ namespace Unity.UIWidgets.ui {
             GlyphPosition[] lineGlyphPositions = mayConsiderEllipsis
                 ? new GlyphPosition[totalTextCount + ellipsisLength]
                 : totalTextCount > 0 ? new GlyphPosition[totalTextCount] : null;
-            PaintRecord[] paintRecords = lineStyleRunCount == 0 ? null : new PaintRecord[lineStyleRunCount];
-            if (paintRecords != null) {
+            if (lineStyleRunCount != 0) {
                 int pLineGlyphPositions = 0;
                 int tLineLimit = lineLimit;
                 float tMaxWordWidth = maxWordWidth;
@@ -378,7 +377,7 @@ namespace Unity.UIWidgets.ui {
                         // Make sure that each line is not empty
                         if (start < end) {
                             var isLastLineStyleRun = lineStyleRunIndex == lineStyleRunCount - 1;
-                            paintRecords[lineStyleRunIndex++] = this._generatePaintRecordFromLineStyleRun(
+                            this._paintRecords.Add(this._generatePaintRecordFromLineStyleRun(
                                 new LineStyleRun(start, end, styleRun.style),
                                 layout,
                                 builder,
@@ -393,7 +392,7 @@ namespace Unity.UIWidgets.ui {
                                 ref tMaxWordWidth,
                                 words,
                                 lineGlyphPositions,
-                                ref pLineGlyphPositions);
+                                ref pLineGlyphPositions));
                         }
                     }
 
@@ -407,11 +406,11 @@ namespace Unity.UIWidgets.ui {
                 maxWordWidth = tMaxWordWidth;
             }
 
-            this._computeLineOffset(lineNumber, paintRecords, ref yOffset, ref preMaxDescent);
+            this._computeLineOffset(lineNumber, lineStyleRunCount, ref yOffset, ref preMaxDescent);
             float lineXOffset = this.getLineXOffset(runXOffset);
             this._shiftByLineXOffset(runXOffset, lineGlyphPositions);
             this._populateGlyphLines(lineNumber, lineGlyphPositions);
-            this._addPaintRecordsWithOffset(paintRecords, lineXOffset, yOffset);
+            this._shiftPaintRecords(lineStyleRunCount, lineXOffset, yOffset);
         }
 
         int _countLineStyleRuns(LineRange lineRange, int styleRunIndex, out int totalTextCount, out int maxTextCount) {
@@ -613,7 +612,7 @@ namespace Unity.UIWidgets.ui {
             this._glyphLines.Add(new GlyphLine(lineGlyphPositions, nextLineStart - lineStart));
         }
 
-        void _computeLineOffset(int lineNumber, PaintRecord[] paintRecords, ref float yOffset, ref float preMaxDescent) {
+        void _computeLineOffset(int lineNumber, int lineStyleRunCount, ref float yOffset, ref float preMaxDescent) {
 
             float maxLineSpacing = 0;
             float maxDescent = 0;
@@ -635,8 +634,9 @@ namespace Unity.UIWidgets.ui {
                 maxDescent = Mathf.Max(descent, maxDescent);
             }
 
-            if (paintRecords != null) {
-                foreach (var paintRecord in paintRecords) {
+            if (lineStyleRunCount != 0) {
+                for (int i = 0; i < lineStyleRunCount; i++) {
+                    var paintRecord = this._paintRecords[this._paintRecords.Count - i - 1];
                     updateLineMetrics(paintRecord.metrics, paintRecord.style.height);
                 }
             } else {
@@ -657,13 +657,11 @@ namespace Unity.UIWidgets.ui {
             preMaxDescent = maxDescent;
         }
 
-        void _addPaintRecordsWithOffset(PaintRecord[] paintRecords, float lineXOffset, float yOffset) {
-            if (paintRecords != null) {
-                for (int i = 0; i < paintRecords.Length; i++) {
-                    PaintRecord paintRecord = paintRecords[i];
-                    paintRecord.shift(lineXOffset, yOffset);
-                    this._paintRecords.Add(paintRecord);
-                }
+        void _shiftPaintRecords(int paintRecordsCount, float lineXOffset, float yOffset) {
+            for (int i = 0; i < paintRecordsCount; i++) {
+                var paintRecord = this._paintRecords[this._paintRecords.Count - 1 - i];
+                paintRecord.shift(lineXOffset, yOffset);
+                this._paintRecords[this._paintRecords.Count - 1 - i] = paintRecord;
             }
         }
 
