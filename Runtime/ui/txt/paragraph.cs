@@ -407,9 +407,10 @@ namespace Unity.UIWidgets.ui {
                 maxWordWidth = tMaxWordWidth;
             }
 
+            this._computeLineOffset(lineNumber, paintRecords, ref yOffset, ref preMaxDescent);
             float lineXOffset = this.getLineXOffset(runXOffset);
             this._shiftByLineXOffset(runXOffset, lineGlyphPositions);
-            this._computeLineOffset(lineNumber, lineGlyphPositions, paintRecords, ref yOffset, ref preMaxDescent);
+            this._populateGlyphLines(lineNumber, lineGlyphPositions);
             this._addPaintRecordsWithOffset(paintRecords, lineXOffset, yOffset);
         }
 
@@ -604,15 +605,15 @@ namespace Unity.UIWidgets.ui {
             }
         }
 
-        void _computeLineOffset(int lineNumber,
-            GlyphPosition[] lineGlyphPositions,
-            PaintRecord[] paintRecords,
-            ref float yOffset, ref float preMaxDescent) {
+        void _populateGlyphLines(int lineNumber, GlyphPosition[] lineGlyphPositions) {
             int lineStart = this._lineRanges[lineNumber].start;
             int nextLineStart = lineNumber < this._lineRanges.Count - 1
                 ? this._lineRanges[lineNumber + 1].start
                 : this._text.Length;
             this._glyphLines.Add(new GlyphLine(lineGlyphPositions, nextLineStart - lineStart));
+        }
+
+        void _computeLineOffset(int lineNumber, PaintRecord[] paintRecords, ref float yOffset, ref float preMaxDescent) {
 
             float maxLineSpacing = 0;
             float maxDescent = 0;
