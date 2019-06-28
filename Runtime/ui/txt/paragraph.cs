@@ -348,43 +348,42 @@ namespace Unity.UIWidgets.ui {
                 : (this._width - this._lineWidths[lineNumber]) / (words.Length - 1);
 
             LineStyleRun[] lineStyleRuns = this._computeLineStyleRuns(lineRange, ref styleRunIndex, out int totalTextCount, out int maxTextCount);
-            if (lineStyleRuns == null) {
-                return;
-            }
             
             layout.allocAdvancesAndPositions(maxTextCount);
             
             // Add ellipsis length to make sure this array is big enough
-            bool mayConsiderEllipsis = lineNumber == lineLimit - 1 || this._paragraphStyle.maxLines == null;
+            bool mayConsiderEllipsis = totalTextCount > 0 && (lineNumber == lineLimit - 1 || this._paragraphStyle.maxLines == null);
             int ellipsisLength = this._paragraphStyle.ellipsis.Length;
             GlyphPosition[] lineGlyphPositions = mayConsiderEllipsis
                 ? new GlyphPosition[totalTextCount + ellipsisLength]
-                : new GlyphPosition[totalTextCount];
-            PaintRecord[] paintRecords = new PaintRecord[lineStyleRuns.Length];
-            int pLineGlyphPositions = 0;
-            for (int i = 0; i < lineStyleRuns.Length; ++i) {
-                var run = lineStyleRuns[i];
-                var isLastLineStyleRun = i == lineStyleRuns.Length - 1;
-                paintRecords[i] = this._generatePaintRecordFromLineStyleRun(
-                    run,
-                    layout,
-                    builder,
-                    isLastLineStyleRun,
-                    lineNumber,
-                    justifyLine,
-                    wordGapWidth,
-                    ref lineLimit,
-                    ref wordIndex,
-                    ref runXOffset,
-                    ref justifyXOffset,
-                    ref maxWordWidth,
-                    words,
-                    lineGlyphPositions,
-                    ref pLineGlyphPositions);
+                : totalTextCount > 0 ? new GlyphPosition[totalTextCount] : null;
+            PaintRecord[] paintRecords = lineStyleRuns == null ? null : new PaintRecord[lineStyleRuns.Length];
+            if (lineStyleRuns != null) {
+                int pLineGlyphPositions = 0;
+                for (int i = 0; i < lineStyleRuns.Length; ++i) {
+                    var run = lineStyleRuns[i];
+                    var isLastLineStyleRun = i == lineStyleRuns.Length - 1;
+                    paintRecords[i] = this._generatePaintRecordFromLineStyleRun(
+                        run,
+                        layout,
+                        builder,
+                        isLastLineStyleRun,
+                        lineNumber,
+                        justifyLine,
+                        wordGapWidth,
+                        ref lineLimit,
+                        ref wordIndex,
+                        ref runXOffset,
+                        ref justifyXOffset,
+                        ref maxWordWidth,
+                        words,
+                        lineGlyphPositions,
+                        ref pLineGlyphPositions);
+                }
             }
 
             float lineXOffset = this.getLineXOffset(runXOffset);
-            this._shiftByLineXOffset(runXOffset, lineStyleRuns.Length, lineGlyphPositions);
+            this._shiftByLineXOffset(runXOffset, lineGlyphPositions);
             this._computeLineOffset(lineNumber, lineGlyphPositions, paintRecords, ref yOffset, ref preMaxDescent);
             this._addPaintRecordsWithOffset(paintRecords, lineXOffset, yOffset);
         }
@@ -597,8 +596,8 @@ namespace Unity.UIWidgets.ui {
                 lineNumber, TextDirection.ltr, start, count);
         }
 
-        void _shiftByLineXOffset(float lineXOffset, int lineStyleRunCount, GlyphPosition[] lineGlyphPositions) {
-            if (lineXOffset != 0) {
+        void _shiftByLineXOffset(float lineXOffset, GlyphPosition[] lineGlyphPositions) {
+            if (lineXOffset != 0 && lineGlyphPositions != null) {
                 for (int i = 0; i < lineGlyphPositions.Length; ++i) {
                     lineGlyphPositions[i].shiftSelf(lineXOffset);
                 }
@@ -635,11 +634,11 @@ namespace Unity.UIWidgets.ui {
                 maxDescent = Mathf.Max(descent, maxDescent);
             }
 
-            foreach (var paintRecord in paintRecords) {
-                updateLineMetrics(paintRecord.metrics, paintRecord.style);
-            }
-
-            if (paintRecords.Length == 0) {
+            if (paintRecords != null) {
+                foreach (var paintRecord in paintRecords) {
+                    updateLineMetrics(paintRecord.metrics, paintRecord.style);
+                }
+            } else {
                 var defaultStyle = this._paragraphStyle.getTextStyle();
                 var defaultFont = FontManager.instance.getOrCreate(defaultStyle.fontFamily,
                     defaultStyle.fontWeight, defaultStyle.fontStyle).font;
@@ -656,10 +655,12 @@ namespace Unity.UIWidgets.ui {
         }
 
         void _addPaintRecordsWithOffset(PaintRecord[] paintRecords, float lineXOffset, float yOffset) {
-            for (int i = 0; i < paintRecords.Length; i++) {
-                PaintRecord paintRecord = paintRecords[i];
-                paintRecord.shift(lineXOffset, yOffset);
-                this._paintRecords.Add(paintRecord);
+            if (paintRecords != null) {
+                for (int i = 0; i < paintRecords.Length; i++) {
+                    PaintRecord paintRecord = paintRecords[i];
+                    paintRecord.shift(lineXOffset, yOffset);
+                    this._paintRecords.Add(paintRecord);
+                }
             }
         }
 
@@ -794,7 +795,7 @@ namespace Unity.UIWidgets.ui {
             }
 
             var lineGlyphPosition = this._glyphLines[yIndex].positions;
-            if (lineGlyphPosition.Length == 0) {
+            if (lineGlyphPosition == null) {
                 int lineStartIndex = this._glyphLines.Where((g, i) => i < yIndex).Sum((gl) => gl.totalCountUnits);
                 return new PositionWithAffinity(lineStartIndex, TextAffinity.downstream);
             }
