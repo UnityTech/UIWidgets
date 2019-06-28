@@ -982,6 +982,7 @@ namespace Unity.UIWidgets.ui {
                     inWord = true;
                 }
                 else if (inWord && isSpace) {
+                    inWord = false;
                     wordCount++;
                 }
             }
@@ -1006,6 +1007,7 @@ namespace Unity.UIWidgets.ui {
                     inWord = true;
                 }
                 else if (inWord && isSpace) {
+                    inWord = false;
                     words[wordCount++] = new Range<int>(wordStart, i);
                 }
             }
