@@ -7,7 +7,6 @@
             this._metrics = metrics;
             this._dx = dx;
             this._dy = dy;
-            this._offset = null;
         }
 
         public TextBlob text {
@@ -46,7 +45,6 @@
         TextStyle _style;
         TextBlob _text;
         float _runWidth;
-        Offset _offset;
         float _dx;
         float _dy;
         FontMetrics _metrics;
