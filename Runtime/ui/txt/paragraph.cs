@@ -342,17 +342,15 @@ namespace Unity.UIWidgets.ui {
                 : (this._width - this._lineWidths[lineNumber]) / (words.Count - 1);
 
             this._computeLineStyleRuns(lineStyleRuns, lineRange, ref styleRunIndex, out int totalTextCount, out int maxTextCount);
-
-            bool mayConsiderEllipsis = lineNumber == lineLimit - 1 || this._paragraphStyle.maxLines == null;
-            int ellipsisLength = this._paragraphStyle.ellipsis.Length;
-            maxTextCount = mayConsiderEllipsis ? maxTextCount + ellipsisLength : maxTextCount;
             layout.allocAdvancesAndPositions(maxTextCount);
             
-            PaintRecord[] paintRecords = new PaintRecord[lineStyleRuns.Count];
             // Add ellipsis length to make sure this array is big enough
+            bool mayConsiderEllipsis = lineNumber == lineLimit - 1 || this._paragraphStyle.maxLines == null;
+            int ellipsisLength = this._paragraphStyle.ellipsis.Length;
             GlyphPosition[] lineGlyphPositions = mayConsiderEllipsis
                 ? new GlyphPosition[totalTextCount + ellipsisLength]
                 : new GlyphPosition[totalTextCount];
+            PaintRecord[] paintRecords = new PaintRecord[lineStyleRuns.Count];
             int pLineGlyphPositions = 0;
             for (int i = 0; i < lineStyleRuns.Count; ++i) {
                 var run = lineStyleRuns[i];
@@ -916,12 +914,12 @@ namespace Unity.UIWidgets.ui {
             List<int> breaks = lineBreaker.getBreaks();
             List<float> widths = lineBreaker.getWidths();
             for (int i = 0; i < breaksCount; ++i) {
-                var breakStart = (i > 0) ? breaks[i - 1] : 0;
+                var breakStart = i > 0 ? breaks[i - 1] : 0;
                 var lineStart = breakStart + blockStart;
                 var lineEnd = breaks[i] + blockStart;
-                bool hardBreak = (i == breaksCount - 1);
+                bool hardBreak = i == breaksCount - 1;
                 var lineEndIncludingNewline =
-                    (hardBreak && lineEnd < this._text.Length) ? lineEnd + 1 : lineEnd;
+                    hardBreak && lineEnd < this._text.Length ? lineEnd + 1 : lineEnd;
                 var lineEndExcludingWhitespace = lineEnd;
                 while (lineEndExcludingWhitespace > lineStart &&
                        LayoutUtils.isLineEndSpace(this._text[lineEndExcludingWhitespace - 1])) {

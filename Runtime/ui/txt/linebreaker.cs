@@ -117,7 +117,7 @@ namespace Unity.UIWidgets.ui {
         public int computeBreaks() {
             int nCand = this._candidates.Count;
             if (nCand > 0 && (nCand == 1 || this._lastBreak != nCand - 1)) {
-                var cand = this._candidates[this._candidates.Count - 1];
+                var cand = this._candidates.last();
                 this._pushBreak(cand.offset, (cand.postBreak - this._preBreak));
             }
 
