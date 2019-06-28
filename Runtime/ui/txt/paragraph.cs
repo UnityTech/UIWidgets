@@ -347,7 +347,7 @@ namespace Unity.UIWidgets.ui {
                 ? 0
                 : (this._width - this._lineWidths[lineNumber]) / (words.Length - 1);
 
-            LineStyleRun[] lineStyleRuns = this._computeLineStyleRuns(lineRange, ref styleRunIndex, out int totalTextCount, out int maxTextCount);
+            int lineStyleRunCount = this._countLineStyleRuns(lineRange, styleRunIndex, out int totalTextCount, out int maxTextCount);
             
             layout.allocAdvancesAndPositions(maxTextCount);
             
@@ -357,29 +357,54 @@ namespace Unity.UIWidgets.ui {
             GlyphPosition[] lineGlyphPositions = mayConsiderEllipsis
                 ? new GlyphPosition[totalTextCount + ellipsisLength]
                 : totalTextCount > 0 ? new GlyphPosition[totalTextCount] : null;
-            PaintRecord[] paintRecords = lineStyleRuns == null ? null : new PaintRecord[lineStyleRuns.Length];
-            if (lineStyleRuns != null) {
+            PaintRecord[] paintRecords = lineStyleRunCount == 0 ? null : new PaintRecord[lineStyleRunCount];
+            if (paintRecords != null) {
                 int pLineGlyphPositions = 0;
-                for (int i = 0; i < lineStyleRuns.Length; ++i) {
-                    var run = lineStyleRuns[i];
-                    var isLastLineStyleRun = i == lineStyleRuns.Length - 1;
-                    paintRecords[i] = this._generatePaintRecordFromLineStyleRun(
-                        run,
-                        layout,
-                        builder,
-                        isLastLineStyleRun,
-                        lineNumber,
-                        justifyLine,
-                        wordGapWidth,
-                        ref lineLimit,
-                        ref wordIndex,
-                        ref runXOffset,
-                        ref justifyXOffset,
-                        ref maxWordWidth,
-                        words,
-                        lineGlyphPositions,
-                        ref pLineGlyphPositions);
+                int tLineLimit = lineLimit;
+                float tMaxWordWidth = maxWordWidth;
+                // Exclude trailing whitespace from right-justified lines so the last
+                // visible character in the line will be flush with the right margin.
+                int lineEndIndex = this._paragraphStyle.textAlign == TextAlign.right ||
+                                   this._paragraphStyle.textAlign == TextAlign.center
+                    ? lineRange.endExcludingWhitespace
+                    : lineRange.end;
+                int lineStyleRunIndex = 0;
+
+                while (styleRunIndex < this._runs.size) {
+                    var styleRun = this._runs.getRun(styleRunIndex);
+                    if (styleRun.start < lineEndIndex && styleRun.end > lineRange.start) {
+                        int start = Mathf.Max(styleRun.start, lineRange.start);
+                        int end = Mathf.Min(styleRun.end, lineEndIndex);
+                        // Make sure that each line is not empty
+                        if (start < end) {
+                            var isLastLineStyleRun = lineStyleRunIndex == lineStyleRunCount - 1;
+                            paintRecords[lineStyleRunIndex++] = this._generatePaintRecordFromLineStyleRun(
+                                new LineStyleRun(start, end, styleRun.style),
+                                layout,
+                                builder,
+                                isLastLineStyleRun,
+                                lineNumber,
+                                justifyLine,
+                                wordGapWidth,
+                                ref tLineLimit,
+                                ref wordIndex,
+                                ref runXOffset,
+                                ref justifyXOffset,
+                                ref tMaxWordWidth,
+                                words,
+                                lineGlyphPositions,
+                                ref pLineGlyphPositions);
+                        }
+                    }
+
+                    if (styleRun.end >= lineEndIndex) {
+                        break;
+                    }
+
+                    styleRunIndex++;
                 }
+                lineLimit = tLineLimit;
+                maxWordWidth = tMaxWordWidth;
             }
 
             float lineXOffset = this.getLineXOffset(runXOffset);
@@ -388,7 +413,7 @@ namespace Unity.UIWidgets.ui {
             this._addPaintRecordsWithOffset(paintRecords, lineXOffset, yOffset);
         }
 
-        LineStyleRun[] _computeLineStyleRuns(LineRange lineRange, ref int styleRunIndex, out int totalTextCount, out int maxTextCount) {
+        int _countLineStyleRuns(LineRange lineRange, int styleRunIndex, out int totalTextCount, out int maxTextCount) {
             // Exclude trailing whitespace from right-justified lines so the last
             // visible character in the line will be flush with the right margin.
             int lineEndIndex = this._paragraphStyle.textAlign == TextAlign.right ||
@@ -406,42 +431,17 @@ namespace Unity.UIWidgets.ui {
                     // Make sure that each line is not empty
                     if (start < end) {
                         lineStyleRunCount++;
-                    }
-                }
-
-                if (styleRun.end >= lineEndIndex) {
-                    break;
-                }
-            }
-
-            if (lineStyleRunCount == 0) {
-                return null;
-            }
-            
-            LineStyleRun[] lineStyleRuns = new LineStyleRun[lineStyleRunCount];
-
-            int pLineStyleRun = 0;
-            while (styleRunIndex < this._runs.size) {
-                var styleRun = this._runs.getRun(styleRunIndex);
-                if (styleRun.start < lineEndIndex && styleRun.end > lineRange.start) {
-                    int start = Mathf.Max(styleRun.start, lineRange.start);
-                    int end = Mathf.Min(styleRun.end, lineEndIndex);
-                    // Make sure that each line is not empty
-                    if (start < end) {
                         totalTextCount += end - start;
                         maxTextCount = Math.Max(end - start, maxTextCount);
-                        lineStyleRuns[pLineStyleRun++] = new LineStyleRun(start, end, styleRun.style);
                     }
                 }
 
                 if (styleRun.end >= lineEndIndex) {
                     break;
                 }
-
-                styleRunIndex++;
             }
 
-            return lineStyleRuns;
+            return lineStyleRunCount;
         }
 
         PaintRecord _generatePaintRecordFromLineStyleRun(
