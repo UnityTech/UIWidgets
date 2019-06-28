@@ -617,33 +617,35 @@ namespace Unity.UIWidgets.ui {
             float maxLineSpacing = 0;
             float maxDescent = 0;
 
-            void updateLineMetrics(FontMetrics metrics, TextStyle style) {
+            void updateLineMetrics(FontMetrics metrics, float styleHeight) {
                 float lineSpacing = lineNumber == 0
-                    ? -metrics.ascent * style.height
-                    : (-metrics.ascent + metrics.leading) * style.height;
+                    ? -metrics.ascent * styleHeight
+                    : (-metrics.ascent + metrics.leading) * styleHeight;
                 if (lineSpacing > maxLineSpacing) {
                     maxLineSpacing = lineSpacing;
                     if (lineNumber == 0) {
                         this._alphabeticBaseline = lineSpacing;
                         this._ideographicBaseline =
-                            (metrics.underlinePosition ?? 0.0f - metrics.ascent) * style.height;
+                            (metrics.underlinePosition ?? 0.0f - metrics.ascent) * styleHeight;
                     }
                 }
 
-                float descent = metrics.descent * style.height;
+                float descent = metrics.descent * styleHeight;
                 maxDescent = Mathf.Max(descent, maxDescent);
             }
 
             if (paintRecords != null) {
                 foreach (var paintRecord in paintRecords) {
-                    updateLineMetrics(paintRecord.metrics, paintRecord.style);
+                    updateLineMetrics(paintRecord.metrics, paintRecord.style.height);
                 }
             } else {
-                var defaultStyle = this._paragraphStyle.getTextStyle();
-                var defaultFont = FontManager.instance.getOrCreate(defaultStyle.fontFamily,
-                    defaultStyle.fontWeight, defaultStyle.fontStyle).font;
-                var metrics = FontMetrics.fromFont(defaultFont, defaultStyle.UnityFontSize);
-                updateLineMetrics(metrics, defaultStyle);
+                // TODO: the default values are filled in directly, to avoid the cost of creating a new TextStyle
+                //       However this may become inconsistent with the default values in TextStyle (text.cs)
+                //       A better way is to define some global constants used in both places.
+                var defaultFont = FontManager.instance.getOrCreate(this._paragraphStyle.fontFamily ?? "Helvetica",
+                    this._paragraphStyle.fontWeight ?? FontWeight.w400, this._paragraphStyle.fontStyle ?? FontStyle.normal).font;
+                var metrics = FontMetrics.fromFont(defaultFont, (int) (this._paragraphStyle.fontSize ?? 14.0f));
+                updateLineMetrics(metrics, this._paragraphStyle.lineHeight ?? 1.0f);
             }
 
             this._lineHeights.Add(
