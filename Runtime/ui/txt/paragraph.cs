@@ -29,22 +29,33 @@ namespace Unity.UIWidgets.ui {
         public readonly TextDirection direction;
         public readonly Range<int> codeUnits;
         public Range<float> xPos;
-        public readonly GlyphPosition[] positions;
+        public readonly int start;
+        public readonly int count;
+       
+        readonly GlyphPosition[] _positions;
 
         public CodeUnitRun(GlyphPosition[] positions, Range<int> cu, Range<float> xPos, int line,
-            TextDirection direction) {
+            TextDirection direction, int start, int count) {
             this.lineNumber = line;
             this.codeUnits = cu;
             this.xPos = xPos;
-            this.positions = positions;
+            this._positions = positions;
             this.direction = direction;
+            this.start = start;
+            this.count = count;
         }
 
         public void shift(float shift) {
+            D.assert(this.start >= 0 && this.start + this.count <= this._positions.Length);
             this.xPos = RangeUtils.shift(this.xPos, shift);
-            for (int i = 0; i < this.positions.Length; ++i) {
-                this.positions[i].shiftSelf(shift);
+            for (int i = this.start; i < this.start + this.count; ++i) {
+                this._positions[i].shiftSelf(shift);
             }
+        }
+
+        public GlyphPosition get(int i) {
+            D.assert(i < this.count);
+            return this._positions[this.start + i];
         }
     }
 
@@ -430,9 +441,7 @@ namespace Unity.UIWidgets.ui {
             int textCount = textEnd - textStart;
 
             // It is assured in the _computeLineStyleRuns that run is not empty
-//            if (textCount == 0) {
-//                return;
-//            }
+            D.assert(textCount != 0);
 
             bool hardBreak = this._lineRanges[lineNumber].hardBreak;
             if (this._shouldConsiderEllipsis(hardBreak, isLastLineStyleRun, lineNumber, lineLimit)) {
@@ -449,14 +458,16 @@ namespace Unity.UIWidgets.ui {
             // bounds relative to first character
             builder.setBounds(layout.translatedBounds());
 
-            GlyphPosition[] glyphPositions = this._populateGlyphPositions(
+            this._populateGlyphPositions(
                 textStart, textCount,
                 builder, layout,
                 words,
+                lineGlyphPositions,
                 run.start,
                 runXOffset,
                 wordGapWidth,
                 justifyLine,
+                ref pLineGlyphPositions,
                 ref wordIndex,
                 ref justifyXOffset,
                 ref maxWordWidth);
@@ -465,10 +476,8 @@ namespace Unity.UIWidgets.ui {
             float advance = layout.getAdvance();
             PaintRecord paintRecord = this._generatePaintRecord(run.style, textBlob, runXOffset, advance);
             runXOffset += advance;
-            this._codeUnitRuns.Add(this._generateCodeUnitRun(run, lineNumber, glyphPositions));
-            for (int i = 0; i < glyphPositions.Length; i++) {
-                lineGlyphPositions[pLineGlyphPositions++] = glyphPositions[i];
-            }
+            this._codeUnitRuns.Add(this._generateCodeUnitRun(run, lineNumber, lineGlyphPositions, 
+                pLineGlyphPositions - textCount, textCount));
 
             return paintRecord;
         }
@@ -506,27 +515,26 @@ namespace Unity.UIWidgets.ui {
             textCount = text.Length;
         }
 
-        GlyphPosition[] _populateGlyphPositions(int textStart, int textCount,
+        void _populateGlyphPositions(int textStart, int textCount,
             TextBlobBuilder builder, Layout layout,
             List<Range<int>> words,
+            GlyphPosition[] lineGlyphPositions,
             int runStart,
             float runXOffset,
             float wordGapWidth,
             bool justifyLine,
+            ref int pLineGlyphPositions,
             ref int wordIndex,
             ref float justifyXOffset,
             ref float maxWordWidth) {
-            if (textCount == 0) {
-                return null;
-            }
-
+            
+            D.assert(textCount != 0);
             float wordStartPosition = float.NaN;
-            GlyphPosition[] glyphPositions = new GlyphPosition[textCount];
             for (int glyphIndex = 0; glyphIndex < textCount; ++glyphIndex) {
                 float glyphXOffset = layout.getX(glyphIndex) + justifyXOffset;
                 float glyphAdvance = layout.getCharAdvance(glyphIndex);
                 builder.positions[glyphIndex] = new Vector2d(glyphXOffset);
-                glyphPositions[glyphIndex] = new GlyphPosition(runXOffset + glyphXOffset, glyphAdvance,
+                lineGlyphPositions[pLineGlyphPositions++] = new GlyphPosition(runXOffset + glyphXOffset, glyphAdvance,
                     new Range<int>(textStart + glyphIndex, textStart + glyphIndex + 1));
                 if (wordIndex < words.Count) {
                     Range<int> word = words[wordIndex];
@@ -541,15 +549,13 @@ namespace Unity.UIWidgets.ui {
 
                         wordIndex++;
                         if (!float.IsNaN(wordStartPosition)) {
-                            float wordWidth = glyphPositions.last().xPos.end - wordStartPosition;
+                            float wordWidth = lineGlyphPositions[pLineGlyphPositions-1].xPos.end - wordStartPosition;
                             maxWordWidth = Mathf.Max(wordWidth, maxWordWidth);
                             wordStartPosition = float.NaN;
                         }
                     }
                 }
             }
-
-            return glyphPositions;
         }
 
         PaintRecord _generatePaintRecord(TextStyle style, TextBlob textBlob, float runXOffset, float advance) {
@@ -559,19 +565,15 @@ namespace Unity.UIWidgets.ui {
             return new PaintRecord(style, runXOffset, 0, textBlob, metrics, advance);
         }
 
-        CodeUnitRun _generateCodeUnitRun(LineStyleRun run, int lineNumber, GlyphPosition[] glyphPositions) {
+        CodeUnitRun _generateCodeUnitRun(LineStyleRun run, int lineNumber, GlyphPosition[] glyphPositions, int start, int count) {
             return new CodeUnitRun(glyphPositions,
                 new Range<int>(run.start, run.end),
                 new Range<float>(glyphPositions[0].xPos.start, glyphPositions.last().xPos.end),
-                lineNumber, TextDirection.ltr);
+                lineNumber, TextDirection.ltr, start, count);
         }
 
         void _shiftByLineXOffset(float lineXOffset, int lineStyleRunCount, GlyphPosition[] lineGlyphPositions) {
             if (lineXOffset != 0) {
-                for (int i = 0; i < lineStyleRunCount; i++) {
-                    this._codeUnitRuns[this._codeUnitRuns.Count - 1 - i].shift(lineXOffset);
-                }
-
                 for (int i = 0; i < lineGlyphPositions.Length; ++i) {
                     lineGlyphPositions[i].shiftSelf(lineXOffset);
                 }
@@ -690,7 +692,8 @@ namespace Unity.UIWidgets.ui {
                 else {
                     left = float.MaxValue;
                     right = float.MinValue;
-                    foreach (var gp in run.positions) {
+                    for (int i = 0; i < run.count; i++) {
+                        var gp = run.get(i);
                         if (gp.codeUnits.start >= start && gp.codeUnits.end <= end) {
                             left = Mathf.Min(left, gp.xPos.start);
                             right = Mathf.Max(right, gp.xPos.end);
