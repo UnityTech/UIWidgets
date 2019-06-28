@@ -343,7 +343,7 @@ namespace Unity.UIWidgets.ui {
                                lineNumber != lineLimit - 1 && !lineRange.hardBreak;
 
             Range<int>[] words = this._findWords(lineRange.start, lineRange.end);
-            float wordGapWidth = !(justifyLine && words.Length > 1)
+            float wordGapWidth = !(justifyLine && words != null && words.Length > 1)
                 ? 0
                 : (this._width - this._lineWidths[lineNumber]) / (words.Length - 1);
 
@@ -560,7 +560,7 @@ namespace Unity.UIWidgets.ui {
                 builder.positions[glyphIndex] = new Vector2d(glyphXOffset);
                 lineGlyphPositions[pLineGlyphPositions++] = new GlyphPosition(runXOffset + glyphXOffset, glyphAdvance,
                     new Range<int>(textStart + glyphIndex, textStart + glyphIndex + 1));
-                if (wordIndex < words.Length) {
+                if (words != null && wordIndex < words.Length) {
                     Range<int> word = words[wordIndex];
                     if (word.start == runStart + glyphIndex) {
                         wordStartPosition = runXOffset + glyphXOffset;
@@ -989,6 +989,10 @@ namespace Unity.UIWidgets.ui {
 
             if (inWord) {
                 wordCount++;
+            }
+
+            if (wordCount == 0) {
+                return null;
             }
 
             Range<int>[] words = new Range<int>[wordCount];
