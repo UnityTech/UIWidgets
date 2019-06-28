@@ -316,17 +316,14 @@ namespace Unity.UIWidgets.ui {
             float preMaxDescent = 0;
             float maxWordWidth = 0;
 
-            List<Range<int>> words = new List<Range<int>>();
-
             Layout layout = new Layout();
             layout.setTabStops(this._tabStops);
             TextBlobBuilder builder = new TextBlobBuilder();
 
             for (int lineNumber = 0; lineNumber < lineLimit; ++lineNumber) {
-                words.Clear();
                 this._computePaintRecordsFromLine(
                     lineNumber, ref lineLimit, ref styleRunIndex, ref maxWordWidth, ref yOffset, ref preMaxDescent,
-                    words, builder, layout
+                    builder, layout
                 );
             }
 
@@ -334,7 +331,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         void _computePaintRecordsFromLine(int lineNumber, ref int lineLimit, ref int styleRunIndex,
-            ref float maxWordWidth, ref float yOffset, ref float preMaxDescent, List<Range<int>> words,
+            ref float maxWordWidth, ref float yOffset, ref float preMaxDescent,
             TextBlobBuilder builder, Layout layout) {
             var lineRange = this._lineRanges[lineNumber];
             int wordIndex = 0;
@@ -345,10 +342,10 @@ namespace Unity.UIWidgets.ui {
             bool justifyLine = this._paragraphStyle.textAlign == TextAlign.justify &&
                                lineNumber != lineLimit - 1 && !lineRange.hardBreak;
 
-            this._findWords(lineRange.start, lineRange.end, words);
-            float wordGapWidth = !(justifyLine && words.Count > 1)
+            Range<int>[] words = this._findWords(lineRange.start, lineRange.end);
+            float wordGapWidth = !(justifyLine && words.Length > 1)
                 ? 0
-                : (this._width - this._lineWidths[lineNumber]) / (words.Count - 1);
+                : (this._width - this._lineWidths[lineNumber]) / (words.Length - 1);
 
             LineStyleRun[] lineStyleRuns = this._computeLineStyleRuns(lineRange, ref styleRunIndex, out int totalTextCount, out int maxTextCount);
             if (lineStyleRuns == null) {
@@ -460,7 +457,7 @@ namespace Unity.UIWidgets.ui {
             ref float runXOffset,
             ref float justifyXOffset,
             ref float maxWordWidth,
-            List<Range<int>> words,
+            Range<int>[] words,
             GlyphPosition[] lineGlyphPositions,
             ref int pLineGlyphPositions) {
             string text = this._text;
@@ -545,7 +542,7 @@ namespace Unity.UIWidgets.ui {
 
         void _populateGlyphPositions(int textStart, int textCount,
             TextBlobBuilder builder, Layout layout,
-            List<Range<int>> words,
+            Range<int>[] words,
             GlyphPosition[] lineGlyphPositions,
             int runStart,
             float runXOffset,
@@ -564,7 +561,7 @@ namespace Unity.UIWidgets.ui {
                 builder.positions[glyphIndex] = new Vector2d(glyphXOffset);
                 lineGlyphPositions[pLineGlyphPositions++] = new GlyphPosition(runXOffset + glyphXOffset, glyphAdvance,
                     new Range<int>(textStart + glyphIndex, textStart + glyphIndex + 1));
-                if (wordIndex < words.Count) {
+                if (wordIndex < words.Length) {
                     Range<int> word = words[wordIndex];
                     if (word.start == runStart + glyphIndex) {
                         wordStartPosition = runXOffset + glyphXOffset;
@@ -974,8 +971,9 @@ namespace Unity.UIWidgets.ui {
             newLinePositions.Add(this._text.Length);
         }
 
-        void _findWords(int start, int end, List<Range<int>> words) {
+        Range<int>[] _findWords(int start, int end) {
             var inWord = false;
+            int wordCount = 0;
             int wordStart = 0;
             for (int i = start; i < end; ++i) {
                 bool isSpace = LayoutUtils.isWordSpace(this._text[i]);
@@ -984,14 +982,33 @@ namespace Unity.UIWidgets.ui {
                     inWord = true;
                 }
                 else if (inWord && isSpace) {
-                    words.Add(new Range<int>(wordStart, i));
-                    inWord = false;
+                    wordCount++;
                 }
             }
 
             if (inWord) {
-                words.Add(new Range<int>(wordStart, end));
+                wordCount++;
             }
+
+            Range<int>[] words = new Range<int>[wordCount];
+            wordCount = 0;
+            
+            for (int i = start; i < end; ++i) {
+                bool isSpace = LayoutUtils.isWordSpace(this._text[i]);
+                if (!inWord && !isSpace) {
+                    wordStart = i;
+                    inWord = true;
+                }
+                else if (inWord && isSpace) {
+                    words[wordCount++] = new Range<int>(wordStart, i);
+                }
+            }
+
+            if (inWord) {
+                words[wordCount] = new Range<int>(wordStart, end);
+            }
+
+            return words;
         }
 
         void paintDecorations(Canvas canvas, PaintRecord record, Offset baseOffset) {
