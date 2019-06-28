@@ -322,7 +322,7 @@ namespace Unity.UIWidgets.ui {
             Layout layout = new Layout();
             layout.setTabStops(this._tabStops);
             TextBlobBuilder builder = new TextBlobBuilder();
-            GlyphPosition[] glyphPositions = new GlyphPosition[this._text.Length + this._paragraphStyle.ellipsis.Length];
+            GlyphPosition[] glyphPositions = new GlyphPosition[this._text.Length + (this._paragraphStyle.ellipsis?.Length ?? 0)];
             int pGlyphPositions = 0;
 
             for (int lineNumber = 0; lineNumber < lineLimit; ++lineNumber) {
@@ -976,11 +976,9 @@ namespace Unity.UIWidgets.ui {
         Range<int>[] _findWords(int start, int end) {
             var inWord = false;
             int wordCount = 0;
-            int wordStart = 0;
             for (int i = start; i < end; ++i) {
                 bool isSpace = LayoutUtils.isWordSpace(this._text[i]);
                 if (!inWord && !isSpace) {
-                    wordStart = i;
                     inWord = true;
                 }
                 else if (inWord && isSpace) {
@@ -997,7 +995,9 @@ namespace Unity.UIWidgets.ui {
             }
 
             Range<int>[] words = new Range<int>[wordCount];
+            inWord = false;
             wordCount = 0;
+            int wordStart = 0;
             
             for (int i = start; i < end; ++i) {
                 bool isSpace = LayoutUtils.isWordSpace(this._text[i]);
