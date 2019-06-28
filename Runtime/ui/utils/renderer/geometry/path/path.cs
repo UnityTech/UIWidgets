@@ -26,6 +26,7 @@ namespace Unity.UIWidgets.ui {
             this._commands.dispose();
             this._cache?.dispose();
             this._cache = null;
+            this._commands = null;
         }
 
         void _reset() {

@@ -4,30 +4,30 @@ namespace Unity.UIWidgets.ui {
     static class ShadowUtils {
         public const bool kUseFastShadow = false;
 
-        public const float kAmbientHeightFactor = 1.0f / 128.0f;
-        public const float kAmbientGeomFactor = 64.0f;
+        const float kAmbientHeightFactor = 1.0f / 128.0f;
+        const float kAmbientGeomFactor = 64.0f;
 
-        public const float kBlurSigmaScale = 0.57735f;
+        const float kBlurSigmaScale = 0.57735f;
 
-        public const float kMaxAmbientRadius = 300 * kAmbientHeightFactor * kAmbientGeomFactor;
+        const float kMaxAmbientRadius = 300 * kAmbientHeightFactor * kAmbientGeomFactor;
 
-        public static float divideAndPin(float numer, float denom, float min, float max) {
+        static float divideAndPin(float numer, float denom, float min, float max) {
             return (numer / denom).clamp(min, max);
         }
 
-        public static float ambientBlurRadius(float height) {
+        static float ambientBlurRadius(float height) {
             return Mathf.Min(height * kAmbientHeightFactor * kAmbientGeomFactor, kMaxAmbientRadius);
         }
 
-        public static float ambientRecipAlpha(float height) {
+        static float ambientRecipAlpha(float height) {
             return 1.0f + Mathf.Max(height * kAmbientHeightFactor, 0.0f);
         }
 
-        public static float spotBlurRadius(float occluderZ, float lightZ, float lightRadius) {
+        static float spotBlurRadius(float occluderZ, float lightZ, float lightRadius) {
             return lightRadius * divideAndPin(occluderZ, lightZ - occluderZ, 0.0f, 0.95f);
         }
 
-        public static void getSpotParams(float occluderZ, float lightX, float lightY, float lightZ,
+        static void getSpotParams(float occluderZ, float lightX, float lightY, float lightZ,
             float lightRadius,
             ref float blurRadius, ref float scale, ref Vector2 translate) {
             float zRatio = divideAndPin(occluderZ, lightZ - occluderZ, 0.0f, 0.95f);
@@ -36,7 +36,7 @@ namespace Unity.UIWidgets.ui {
             translate = new Vector2(-zRatio * lightX, -zRatio * lightY);
         }
 
-        public static float convertRadiusToSigma(float radius) {
+        static float convertRadiusToSigma(float radius) {
             return radius > 0 ? kBlurSigmaScale * radius + 0.5f : 0.0f;
         }
 
@@ -46,8 +46,9 @@ namespace Unity.UIWidgets.ui {
             outSpotColor = inSpotColor;
         }
 
-        static Matrix3 _toHomogeneous = Matrix3.I();
-        public static bool getSpotShadowTransform(Vector3 lightPos, float lightRadius, Matrix3 ctm,
+        static readonly Matrix3 _toHomogeneous = Matrix3.I();
+        
+        static bool getSpotShadowTransform(Vector3 lightPos, float lightRadius, Matrix3 ctm,
             Vector3 zPlaneParams, Rect pathBounds, Matrix3 shadowTransform, ref float radius) {
             float heightFunc(float x, float y) {
                 return zPlaneParams.x * x + zPlaneParams.y * y + zPlaneParams.z;
@@ -136,7 +137,7 @@ namespace Unity.UIWidgets.ui {
             return true;
         }
 
-        static Path _devSpacePath = new Path();
+        static readonly Path _devSpacePath = new Path();
         public static void drawShadow(Canvas canvas, Path path, Vector3 zPlaneParams, Vector3 devLightPos,
             float lightRadius, uiColor ambientColor, uiColor spotColor, int flags) {
             if (kUseFastShadow) {

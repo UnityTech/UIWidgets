@@ -113,7 +113,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void drawLine(Offset from, Offset to, Paint paint) {
-            var path = new uiPath();
+            var path = uiPath.create();
             path.moveTo(from.dx, from.dy);
             path.lineTo(to.dx, to.dy);
 
@@ -133,7 +133,7 @@ namespace Unity.UIWidgets.ui {
                 return;
             }
 
-            var path = new uiPath();
+            var path = uiPath.create();
             path.addRect(rect);
 
             this._recorder.addDrawCmd(uiDrawPath.create(
@@ -143,7 +143,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void drawRRect(RRect rrect, Paint paint) {
-            var path = new uiPath();
+            var path = uiPath.create();
             path.addRRect(rrect);
             this._recorder.addDrawCmd(uiDrawPath.create(
                 path : path,
@@ -152,7 +152,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void drawDRRect(RRect outer, RRect inner, Paint paint) {
-            var path = new uiPath();
+            var path = uiPath.create();
             path.addRRect(outer);
             path.addRRect(inner);
             path.winding(PathWinding.clockwise);
@@ -166,7 +166,7 @@ namespace Unity.UIWidgets.ui {
         public void drawOval(Rect rect, Paint paint) {
             var w = rect.width / 2;
             var h = rect.height / 2;
-            var path = new uiPath();
+            var path = uiPath.create();
             path.addEllipse(rect.left + w, rect.top + h, w, h);
 
             this._recorder.addDrawCmd(uiDrawPath.create(
@@ -176,7 +176,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void drawCircle(Offset c, float radius, Paint paint) {
-            var path = new uiPath();
+            var path = uiPath.create();
             path.addCircle(c.dx, c.dy, radius);
 
             this._recorder.addDrawCmd(uiDrawPath.create(
@@ -186,7 +186,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void drawArc(Rect rect, float startAngle, float sweepAngle, bool useCenter, Paint paint) {
-            var path = new uiPath();
+            var path = uiPath.create();
 
             if (useCenter) {
                 var center = rect.center;
