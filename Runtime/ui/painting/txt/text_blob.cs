@@ -1,23 +1,33 @@
-﻿namespace Unity.UIWidgets.ui {
+﻿using UnityEditor.Rendering;
+
+namespace Unity.UIWidgets.ui {
     public struct TextBlob {
-        internal TextBlob(string text, int textOffset, int textSize, Vector2d[] positions, Rect bounds,
-            TextStyle style) {
+        internal TextBlob(string text, int textOffset, int textSize, Vector2d[] positions,
+            float minX, float minY, float width, float height, TextStyle style) {
             this.instanceId = ++_nextInstanceId;
             this.text = text;
             this.textOffset = textOffset;
             this.textSize = textSize;
             this.style = style;
-            this.bounds = bounds;
+            this._minX = minX;
+            this._minY = minY;
+            this._width = width;
+            this._height = height;
             this._positions = positions;
         }
 
         public Rect boundsInText {
-            get { return this.bounds.translate(this._positions[this.textOffset].x, this._positions[this.textOffset].y); }
+            get {
+                var pos = this._positions[this.textOffset];
+                return Rect.fromLTWH(this._minX + pos.x, this._minY + pos.y, this._width, this._height);
+            }
         }
 
         public Rect shiftedBoundsInText(Offset offset) {
-            return this.bounds.translate(this._positions[this.textOffset].x + offset.dx, 
-                this._positions[this.textOffset].y + offset.dy);
+            var pos = this._positions[this.textOffset];
+            pos.x += offset.dx;
+            pos.y += offset.dy;
+            return Rect.fromLTWH(this._minX + pos.x, this._minY + pos.y, this._width, this._height);
         }
 
         public Vector2d getPosition(int i) {
@@ -30,17 +40,17 @@
         internal readonly int textOffset;
         internal readonly int textSize;
         internal readonly TextStyle style;
-        internal readonly Rect bounds; // bounds with positions[start] as origin       
+        readonly float _minX, _minY, _width, _height; // bounds with positions[start] as origin       
         readonly Vector2d[] _positions;
     }
 
     public class TextBlobBuilder {
         TextStyle _style;
-        public Vector2d[] positions;
+        Vector2d[] _positions;
         string _text;
         int _textOffset;
         int _size;
-        Rect _bounds;
+        float _minX, _minY, _width, _height;
 
         public void allocRunPos(painting.TextStyle style, string text, int offset, int size,
             float textScaleFactor = 1.0f) {
@@ -59,22 +69,33 @@
         }
 
         internal void allocPos(int size) {
-            if (this.positions == null || this.positions.Length < size) {
-                this.positions = new Vector2d[size];
+            if (this._positions == null || this._positions.Length < size) {
+                this._positions = new Vector2d[size];
             }
         }
 
         public void setPosition(int i, Vector2d position) {
-            this.positions[this._textOffset + i] = position;
+            this._positions[this._textOffset + i] = position;
         }
 
-        public void setBounds(Rect bounds) {
-            this._bounds = bounds;
+        public void setPositions(Vector2d[] positions) {
+            this._positions = positions;
+        }
+
+        public void setBounds(float minX, float minY, float width, float height) {
+            this._minX = minX;
+            this._minY = minY;
+            this._width = width;
+            this._height = height;
+        }
+
+        public void setBounds(UnityEngine.Rect bounds) {
+            this.setBounds(bounds.x, bounds.y, bounds.width, bounds.height);
         }
 
         public TextBlob make() {
             var result = new TextBlob(this._text, this._textOffset,
-                this._size, this.positions, this._bounds, this._style);
+                this._size, this._positions, this._minX, this._minY, this._width, this._height, this._style);
             return result;
         }
     }
