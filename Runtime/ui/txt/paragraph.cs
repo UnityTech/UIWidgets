@@ -321,7 +321,9 @@ namespace Unity.UIWidgets.ui {
 
             Layout layout = new Layout();
             TextBlobBuilder builder = new TextBlobBuilder();
-            GlyphPosition[] glyphPositions = new GlyphPosition[this._text.Length + (this._paragraphStyle.ellipsis?.Length ?? 0)];
+            int ellipsizedLength = this._text.Length + (this._paragraphStyle.ellipsis?.Length ?? 0);
+            builder.allocPos(ellipsizedLength);
+            GlyphPosition[] glyphPositions = new GlyphPosition[ellipsizedLength];
             int pGlyphPositions = 0;
 
             for (int lineNumber = 0; lineNumber < lineLimit; ++lineNumber) {
@@ -554,7 +556,7 @@ namespace Unity.UIWidgets.ui {
             for (int glyphIndex = 0; glyphIndex < textCount; ++glyphIndex) {
                 float glyphXOffset = layout.getX(glyphIndex) + justifyXOffset;
                 float glyphAdvance = layout.getCharAdvance(glyphIndex);
-                builder.positions[glyphIndex] = new Vector2d(glyphXOffset);
+                builder.setPosition(glyphIndex, new Vector2d(glyphXOffset));
                 glyphPositions[pLineGlyphPositions++] = new GlyphPosition(runXOffset + glyphXOffset,
                     glyphAdvance, new Range<int>(textStart + glyphIndex, textStart + glyphIndex + 1));
                 if (words != null && wordIndex < words.Length) {

@@ -165,8 +165,8 @@ namespace Unity.UIWidgets.ui {
                         continue;
                     }
                     var uvRect = EmojiUtils.getUVRect(code);
-                    
-                    var pos = this.textBlob.positions[i];
+
+                    var pos = this.textBlob.getPosition(i);
 
                     int baseIndex = vert.Count;
                     vert.Add(new Vector3(pos.x + minX, pos.y + minY, 0));
@@ -211,7 +211,7 @@ namespace Unity.UIWidgets.ui {
             for (int charIndex = 0; charIndex < length; ++charIndex) {
                 var ch = text[charIndex + this.textBlob.textOffset];
                 // first char as origin for mesh position 
-                var position = this.textBlob.positions[charIndex];
+                var position = this.textBlob.getPosition(charIndex);
                 if (LayoutUtils.isWordSpace(ch) || LayoutUtils.isLineEndSpace(ch) || ch == '\t') {
                     continue;
                 }
