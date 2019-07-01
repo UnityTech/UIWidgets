@@ -733,7 +733,6 @@ namespace Unity.UIWidgets.ui {
         }
 
         void _drawTextBlob(TextBlob textBlob, Offset offset, Paint paint) {
-            D.assert(textBlob != null);
             D.assert(offset != null);
             D.assert(paint != null);
 

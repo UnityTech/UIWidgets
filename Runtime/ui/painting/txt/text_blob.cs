@@ -1,5 +1,5 @@
 ﻿namespace Unity.UIWidgets.ui {
-    public class TextBlob {
+    public struct TextBlob {
         internal TextBlob(string text, int textOffset, int textSize, Vector2d[] positions, Rect bounds,
             TextStyle style) {
             this.instanceId = ++_nextInstanceId;
