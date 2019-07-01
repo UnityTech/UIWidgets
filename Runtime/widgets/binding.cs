@@ -35,6 +35,7 @@ namespace Unity.UIWidgets.widgets {
                 TextBlobMesh.tickNextFrame();
                 TessellationGenerator.tickNextFrame();
                 uiTessellationGenerator.tickNextFrame();
+                uiPathCacheManager.tickNextFrame();
             });
         }
 

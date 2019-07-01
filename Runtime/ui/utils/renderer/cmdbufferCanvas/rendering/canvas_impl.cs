@@ -287,21 +287,21 @@ namespace Unity.UIWidgets.ui {
             var path = uiPath.create();
             path.addRect(uiRectHelper.fromRect(rect));
             this._clipPath(path);
-            ObjectPool<uiPath>.release(path);
+            uiPathCacheManager.putToCache(path);
         }
         
         void _clipUIRect(uiRect rect) {
             var path = uiPath.create();
             path.addRect(rect);
             this._clipPath(path);
-            ObjectPool<uiPath>.release(path);
+            uiPathCacheManager.putToCache(path);
         }
 
         void _clipRRect(RRect rrect) {
             var path = uiPath.create();
             path.addRRect(rrect);
             this._clipPath(path);
-            ObjectPool<uiPath>.release(path);
+            uiPathCacheManager.putToCache(path);
         }
 
         void _clipPath(uiPath path) {
@@ -755,13 +755,13 @@ namespace Unity.UIWidgets.ui {
                     case DrawClipPath cmd: {
                         var uipath = uiPath.fromPath(cmd.path);
                         this._clipPath(uipath);
-                        ObjectPool<uiPath>.release(uipath);
+                        uiPathCacheManager.putToCache(uipath);
                         break;
                     }
                     case DrawPath cmd: {
                         var uipath = uiPath.fromPath(cmd.path);
                         this._drawPath(uipath, uiPaint.fromPaint(cmd.paint));
-                        ObjectPool<uiPath>.release(uipath);
+                        uiPathCacheManager.putToCache(uipath);
                         break;
                     }
                     case DrawImage cmd: {

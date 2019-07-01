@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Unity.UIWidgets.foundation;
 using UnityEngine;
 
@@ -13,6 +15,9 @@ namespace Unity.UIWidgets.ui {
         
         uiPathCache _cache;
 
+        public uint pathKey = 0;
+        public bool needCache = false;
+
         public static uiPath create(int capacity = 128) {
             uiPath newPath = ObjectPool<uiPath>.alloc();
             newPath._reset();
@@ -27,6 +32,10 @@ namespace Unity.UIWidgets.ui {
             ObjectPool<uiPathCache>.release(this._cache);
             this._cache = null;
             this._commands = null;
+            
+            this.needCache = false;
+            this.pathKey = 0;
+
         }
 
         void _reset() {
@@ -348,7 +357,11 @@ namespace Unity.UIWidgets.ui {
         public static uiPath fromPath(Path path) {
             D.assert(path != null);
 
-            uiPath uipath = uiPath.create();
+            uiPath uipath;
+            bool exists = uiPathCacheManager.tryGetUiPath(path.pathKey, out uipath);
+            if (exists) {
+                return uipath;
+            }
 
             var i = 0;
             var _commands = path.commands;

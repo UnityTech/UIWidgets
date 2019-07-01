@@ -258,7 +258,8 @@ namespace Unity.UIWidgets.ui {
         }
 
         public override void clear() {
-            ObjectPool<uiPath>.release(this.path);
+            //ObjectPool<uiPath>.release(this.path);
+            uiPathCacheManager.putToCache(this.path);
             this.path = null;
         }
 
@@ -282,7 +283,8 @@ namespace Unity.UIWidgets.ui {
         }
 
         public override void clear() {
-            ObjectPool<uiPath>.release(this.path);
+            //ObjectPool<uiPath>.release(this.path);
+            uiPathCacheManager.putToCache(this.path);
             this.path = null;
         }
 
