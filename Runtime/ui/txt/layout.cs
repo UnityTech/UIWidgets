@@ -81,9 +81,10 @@ namespace Unity.UIWidgets.ui {
 //                    : LayoutUtils.getPrevWordBreakForCache(buff, start + 1);
                 int wordend;
                 for (int iter = start; iter < start + count; iter = wordend) {
-                    wordend = LayoutUtils.getNextWordBreak(buff, iter, start + count);
-                    advance = _layoutWord(offset, iter - start, buff, iter, wordend - iter,
-                        style, font, advances, positions, advanceOffset, advance, tabStops);
+                    wordend = LayoutUtils.getNextWordBreak(buff.text, buff.offset + iter, start + count);
+                    advance = _layoutWord(offset, iter - start, buff.text, iter + buff.offset, 
+                        wordend - iter, style, font, advances, positions, advanceOffset, advance,
+                        tabStops);
                 }
             }
 
@@ -91,10 +92,10 @@ namespace Unity.UIWidgets.ui {
         }
 
         static float _layoutWord(float offset, int layoutOffset,
-            TextBuff buff, int start, int wordCount, TextStyle style, Font font, float[] advances,
+            string text, int start, int wordCount, TextStyle style, Font font, float[] advances,
             float[] positions, int advanceOffset, float initAdvance, TabStops tabStops) {
             float wordSpacing =
-                wordCount == 1 && LayoutUtils.isWordSpace(buff.charAt(start)) ? style.wordSpacing : 0;
+                wordCount == 1 && LayoutUtils.isWordSpace(text[start]) ? style.wordSpacing : 0;
 
             float x = initAdvance;
             float letterSpace = style.letterSpacing;
@@ -102,7 +103,7 @@ namespace Unity.UIWidgets.ui {
             float letterSpaceHalfRight = letterSpace - letterSpaceHalfLeft;
 
             for (int i = 0; i < wordCount; i++) {
-                var ch = buff.charAt(start + i);
+                var ch = text[start + i];
                 if (i == 0) {
                     x += letterSpaceHalfLeft + wordSpacing;
                     if (advances != null) {

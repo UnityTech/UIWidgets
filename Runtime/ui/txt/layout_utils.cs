@@ -34,8 +34,8 @@ namespace Unity.UIWidgets.ui {
         }
 
         
-        public static int getNextWordBreak(TextBuff buff, int offset, int maxOffset) {
-            int len = buff.size;
+        public static int getNextWordBreak(string text, int offset, int maxOffset) {
+            int len = text.Length;
             if (len > maxOffset) {
                 len = maxOffset + 1;
             }
@@ -44,12 +44,12 @@ namespace Unity.UIWidgets.ui {
                 return len;
             }
 
-            if (isWordBreakAfter(buff.charAt(offset))) {
+            if (isWordBreakAfter(text[offset])) {
                 return offset + 1;
             }
 
             for (int i = offset + 1; i < len; i++) {
-                if (isWordBreakBefore(buff.charAt(i))) {
+                if (isWordBreakBefore(text[i])) {
                     return i;
                 }
             }
