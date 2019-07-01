@@ -2,7 +2,7 @@
 
 namespace Unity.UIWidgets.ui {
     public struct TextBlob {
-        internal TextBlob(string text, int textOffset, int textSize, Vector2d[] positions,
+        internal TextBlob(string text, int textOffset, int textSize, float[] positions,
             float minX, float minY, float width, float height, TextStyle style) {
             this.instanceId = ++_nextInstanceId;
             this.text = text;
@@ -19,18 +19,16 @@ namespace Unity.UIWidgets.ui {
         public Rect boundsInText {
             get {
                 var pos = this._positions[this.textOffset];
-                return Rect.fromLTWH(this._minX + pos.x, this._minY + pos.y, this._width, this._height);
+                return Rect.fromLTWH(this._minX + pos, this._minY, this._width, this._height);
             }
         }
 
         public Rect shiftedBoundsInText(Offset offset) {
             var pos = this._positions[this.textOffset];
-            pos.x += offset.dx;
-            pos.y += offset.dy;
-            return Rect.fromLTWH(this._minX + pos.x, this._minY + pos.y, this._width, this._height);
+            return Rect.fromLTWH(this._minX + pos + offset.dx, this._minY + offset.dy, this._width, this._height);
         }
 
-        public Vector2d getPosition(int i) {
+        public float getPosition(int i) {
             return this._positions[this.textOffset + i];
         }
 
@@ -41,12 +39,12 @@ namespace Unity.UIWidgets.ui {
         internal readonly int textSize;
         internal readonly TextStyle style;
         readonly float _minX, _minY, _width, _height; // bounds with positions[start] as origin       
-        readonly Vector2d[] _positions;
+        readonly float[] _positions;
     }
 
     public class TextBlobBuilder {
         TextStyle _style;
-        Vector2d[] _positions;
+        float[] _positions;
         string _text;
         int _textOffset;
         int _size;
@@ -70,15 +68,15 @@ namespace Unity.UIWidgets.ui {
 
         internal void allocPos(int size) {
             if (this._positions == null || this._positions.Length < size) {
-                this._positions = new Vector2d[size];
+                this._positions = new float[size];
             }
         }
 
-        public void setPosition(int i, Vector2d position) {
+        public void setPosition(int i, float position) {
             this._positions[this._textOffset + i] = position;
         }
 
-        public void setPositions(Vector2d[] positions) {
+        public void setPositions(float[] positions) {
             this._positions = positions;
         }
 

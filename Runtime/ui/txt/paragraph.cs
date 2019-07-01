@@ -556,7 +556,7 @@ namespace Unity.UIWidgets.ui {
             for (int glyphIndex = 0; glyphIndex < textCount; ++glyphIndex) {
                 float glyphXOffset = layout.getX(glyphIndex) + justifyXOffset;
                 float glyphAdvance = layout.getCharAdvance(glyphIndex);
-                builder.setPosition(glyphIndex, new Vector2d(glyphXOffset));
+                builder.setPosition(glyphIndex, glyphXOffset);
                 glyphPositions[pLineGlyphPositions++] = new GlyphPosition(runXOffset + glyphXOffset,
                     glyphAdvance, new Range<int>(textStart + glyphIndex, textStart + glyphIndex + 1));
                 if (words != null && wordIndex < words.Length) {

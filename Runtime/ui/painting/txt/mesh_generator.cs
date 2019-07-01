@@ -169,10 +169,10 @@ namespace Unity.UIWidgets.ui {
                     var pos = this.textBlob.getPosition(i);
 
                     int baseIndex = vert.Count;
-                    vert.Add(new Vector3(pos.x + minX, pos.y + minY, 0));
-                    vert.Add(new Vector3(pos.x + maxX, pos.y + minY, 0));
-                    vert.Add(new Vector3(pos.x + maxX, pos.y + maxY, 0));
-                    vert.Add(new Vector3(pos.x + minX, pos.y + maxY, 0));
+                    vert.Add(new Vector3(pos + minX, minY, 0));
+                    vert.Add(new Vector3(pos + maxX, minY, 0));
+                    vert.Add(new Vector3(pos + maxX, maxY, 0));
+                    vert.Add(new Vector3(pos + minX, maxY, 0));
                     
                     tri.Add(baseIndex);
                     tri.Add(baseIndex + 1);
@@ -229,10 +229,10 @@ namespace Unity.UIWidgets.ui {
 
                 var baseIndex = vertices.Count;
 
-                vertices.Add(new Vector3((position.x + minX), (position.y + minY), 0));
-                vertices.Add(new Vector3((position.x + maxX), (position.y + minY), 0));
-                vertices.Add(new Vector3((position.x + maxX), (position.y + maxY), 0));
-                vertices.Add(new Vector3((position.x + minX), (position.y + maxY), 0));
+                vertices.Add(new Vector3(position + minX, minY, 0));
+                vertices.Add(new Vector3(position + maxX, minY, 0));
+                vertices.Add(new Vector3(position + maxX, maxY, 0));
+                vertices.Add(new Vector3(position + minX, maxY, 0));
 
                 triangles.Add(baseIndex);
                 triangles.Add(baseIndex + 1);
