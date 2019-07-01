@@ -65,7 +65,7 @@ namespace Unity.UIWidgets.ui {
 
             char startingChar = buff.charAt(start);
             if (char.IsHighSurrogate(startingChar) || EmojiUtils.isSingleCharEmoji(startingChar)) {
-                advance = _layoutEmoji(buff.text.Substring(buff.offset + start, count), style, font, count,
+                advance = _layoutEmoji(buff.text, buff.offset + start, style, font, count,
                     advances, positions, advanceOffset, advance);
             }
             else {
@@ -148,12 +148,12 @@ namespace Unity.UIWidgets.ui {
             return x;
         }
 
-        static float _layoutEmoji(string text, TextStyle style, Font font, int count, float[] advances,
+        static float _layoutEmoji(string text, int start, TextStyle style, Font font, int count, float[] advances,
             float[] positions, int advanceOffset, float initAdvance) {
             var metrics = FontMetrics.fromFont(font, style.UnityFontSize);
             float x = initAdvance;
             for (int i = 0; i < count; i++) {
-                char c = text[i];
+                char c = text[start + i];
                 if (EmojiUtils.isSingleCharNonEmptyEmoji(c) || char.IsHighSurrogate(c)) {
                     float letterSpace = style.letterSpacing;
                     float letterSpaceHalfLeft = letterSpace * 0.5f;
