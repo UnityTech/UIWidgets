@@ -320,7 +320,6 @@ namespace Unity.UIWidgets.ui {
             float maxWordWidth = 0;
 
             Layout layout = new Layout();
-            layout.setTabStops(this._tabStops);
             TextBlobBuilder builder = new TextBlobBuilder();
             GlyphPosition[] glyphPositions = new GlyphPosition[this._text.Length + (this._paragraphStyle.ellipsis?.Length ?? 0)];
             int pGlyphPositions = 0;
@@ -474,7 +473,7 @@ namespace Unity.UIWidgets.ui {
                 }
             }
 
-            layout.doLayout(runXOffset, new TextBuff(text), textStart, textCount, run.style);
+            layout.doLayout(runXOffset, new TextBuff(text), textStart, textCount, run.style, this._tabStops);
 
             builder.allocRunPos(run.style, text, textStart, textCount);
             // bounds relative to first character

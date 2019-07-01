@@ -4,13 +4,11 @@ using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
     class Layout {
-        int _start;
         int _count;
         float[] _advances;
         float[] _positions;
         float _advance;
         UnityEngine.Rect _bounds;
-        TabStops _tabStops;
 
         static float _x, _y, _maxX, _maxY; // Used to pass bounds from static to non-static doLayout
 
@@ -19,14 +17,13 @@ namespace Unity.UIWidgets.ui {
             return _doLayout(offset, buff, start, count, style, advances, null, advanceOffset, tabStops);
         }
 
-        public void doLayout(float offset, TextBuff buff, int start, int count, TextStyle style) {
-            this._start = start;
+        public void doLayout(float offset, TextBuff buff, int start, int count, TextStyle style, TabStops tabStops) {
             this._count = count;
             this.allocAdvancesAndPositions(count);
 
             _x = _y = _maxX = _maxY = 0;
             this._advance = _doLayout(offset, buff, start, count, style, this._advances, this._positions, 0,
-                this._tabStops);
+                tabStops);
             this._bounds.Set(_x, _y, _maxX - _x, _maxY - _y);
         }
 
@@ -239,10 +236,6 @@ namespace Unity.UIWidgets.ui {
         public static void requireEllipsisInTexture(string text, TextStyle style) {
             Font font = FontManager.instance.getOrCreate(style.fontFamily, style.fontWeight, style.fontStyle).font;
             font.RequestCharactersInTextureSafe(text, style.UnityFontSize, style.UnityFontStyle);
-        }
-
-        public void setTabStops(TabStops tabStops) {
-            this._tabStops = tabStops;
         }
 
         public void allocAdvancesAndPositions(int count) {
