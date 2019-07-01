@@ -182,13 +182,6 @@ namespace Unity.UIWidgets.editor {
             this._devicePixelRatio = this.queryDevicePixelRatio();
             this._antiAliasing = this.queryAntiAliasing();
 
-            var size = this.queryWindowSize();
-            this._lastWindowWidth = size.x;
-            this._lastWindowHeight = size.y;
-            this._physicalSize = new Size(
-                this._lastWindowWidth * this._devicePixelRatio,
-                this._lastWindowHeight * this._devicePixelRatio);
-
             this.updateSafeArea();
             D.assert(this._surface == null);
             this._surface = this.createSurface();
@@ -444,6 +437,15 @@ namespace Unity.UIWidgets.editor {
         }
 
         public void Update() {
+            if (this._physicalSize == null) {
+                var size = this.queryWindowSize();
+                this._lastWindowWidth = size.x;
+                this._lastWindowHeight = size.y;
+                this._physicalSize = new Size(
+                    this._lastWindowWidth * this._devicePixelRatio,
+                    this._lastWindowHeight * this._devicePixelRatio);
+            }
+
             this.updateDeltaTime();
             this.updateFPS(this.unscaledDeltaTime);
 
@@ -458,10 +460,10 @@ namespace Unity.UIWidgets.editor {
                 this.flushMicrotasks();
             }
         }
-        
+
         static readonly TimeSpan _coolDownDelay = new TimeSpan(0, 0, 0, 0, 200);
         static Timer frameCoolDownTimer;
-        
+
         public override void scheduleFrame(bool regenerateLayerTree = true) {
             if (regenerateLayerTree) {
                 this._regenerateLayerTree = true;
