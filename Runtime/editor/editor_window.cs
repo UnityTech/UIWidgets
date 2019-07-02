@@ -163,6 +163,16 @@ namespace Unity.UIWidgets.editor {
 
         protected float deltaTime;
         protected float unscaledDeltaTime;
+        
+        void updatePhysicalSize() {
+            var size = this.queryWindowSize();
+            this._lastWindowWidth = size.x;
+            this._lastWindowHeight = size.y;
+            this._physicalSize = new Size(
+                this._lastWindowWidth * this._devicePixelRatio,
+                this._lastWindowHeight * this._devicePixelRatio);
+        }
+
 
         protected virtual void updateDeltaTime() {
             this.deltaTime = Time.unscaledDeltaTime;
@@ -175,19 +185,13 @@ namespace Unity.UIWidgets.editor {
         public void onViewMetricsChanged() {
             this._viewMetricsChanged = true;
         }
-
+        
         protected abstract bool hasFocus();
 
         public void OnEnable() {
             this._devicePixelRatio = this.queryDevicePixelRatio();
             this._antiAliasing = this.queryAntiAliasing();
-            var size = this.queryWindowSize();
-            this._lastWindowWidth = size.x;
-            this._lastWindowHeight = size.y;
-            this._physicalSize = new Size(
-                this._lastWindowWidth * this._devicePixelRatio,
-                this._lastWindowHeight * this._devicePixelRatio);
-
+            this.updatePhysicalSize();
             this.updateSafeArea();
             D.assert(this._surface == null);
             this._surface = this.createSurface();
@@ -444,12 +448,7 @@ namespace Unity.UIWidgets.editor {
 
         public void Update() {
             if (this._physicalSize == null || this._physicalSize.isEmpty) {
-                var size = this.queryWindowSize();
-                this._lastWindowWidth = size.x;
-                this._lastWindowHeight = size.y;
-                this._physicalSize = new Size(
-                    this._lastWindowWidth * this._devicePixelRatio,
-                    this._lastWindowHeight * this._devicePixelRatio);
+                this.updatePhysicalSize();
             }
 
             this.updateDeltaTime();

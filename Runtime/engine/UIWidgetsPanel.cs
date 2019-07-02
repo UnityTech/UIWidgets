@@ -72,6 +72,9 @@ namespace Unity.UIWidgets.engine {
 
         protected override Vector2 queryWindowSize() {
             var rect = this._uiWidgetsPanel.rectTransform.rect;
+            // Here we use ReferenceEquals instead of "==" due to
+            // https://blogs.unity3d.com/2014/05/16/custom-operator-should-we-keep-it/
+            // In short, "==" is overloaded for UnityEngine.Object and will bring performance issues
             if (!ReferenceEquals(this._uiWidgetsPanel.canvas, null)) {
                 var size = new Vector2(rect.width, rect.height) *
                            this._uiWidgetsPanel.canvas.scaleFactor / this._uiWidgetsPanel.devicePixelRatio;
