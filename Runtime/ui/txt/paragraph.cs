@@ -468,7 +468,7 @@ namespace Unity.UIWidgets.ui {
 
             bool hardBreak = this._lineRanges[lineNumber].hardBreak;
             if (this._shouldConsiderEllipsis(hardBreak, isLastLineStyleRun, lineNumber, lineLimit)) {
-                this._handleOverflowEllipsis(ref text, ref textStart, ref textCount, run.style, runXOffset);
+                this._handleOverflowEllipsis(ref text, textStart, ref textCount, run.style, runXOffset);
                 if (this._paragraphStyle.maxLines == null) {
                     lineLimit = lineNumber + 1;
                     this._didExceedMaxLines = true;
@@ -510,7 +510,7 @@ namespace Unity.UIWidgets.ui {
                    && isLastLineStyleRun && (lineNumber == lineLimit - 1 || this._paragraphStyle.maxLines == null);
         }
 
-        void _handleOverflowEllipsis(ref string text, ref int textStart, ref int textCount, TextStyle style,
+        void _handleOverflowEllipsis(ref string text, int textStart, ref int textCount, TextStyle style,
             float runXOffset) {
             // By now, all characters have been "RequestCharactersInTexture"d by computeLineBreaks
             // except the ellipsis, so Layout.doLayout skips calling RequestCharactersInTexture for
@@ -533,9 +533,8 @@ namespace Unity.UIWidgets.ui {
                 truncateCount++;
             }
 
-            text = this._text.Substring(textStart, textCount - truncateCount) + this._paragraphStyle.ellipsis;
-            textStart = 0;
-            textCount = text.Length;
+            text = text.Substring(0, textStart + textCount - truncateCount) + this._paragraphStyle.ellipsis;
+            textCount = text.Length - textStart;
         }
 
         void _populateGlyphPositions(int textStart, int textCount,
