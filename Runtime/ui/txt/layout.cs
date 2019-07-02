@@ -16,6 +16,42 @@ namespace Unity.UIWidgets.ui {
             float[] advances, int advanceOffset, TabStops tabStops) {
             return _doLayout(offset, text, start, count, style, advances, null, advanceOffset, tabStops);
         }
+        
+        public static int computeTruncateCount(string text, int start, int count, TextStyle style, float advanceLimit) {
+            char startingChar = text[start];
+            float currentAdvance = 0;
+            if (char.IsHighSurrogate(startingChar) || EmojiUtils.isSingleCharEmoji(startingChar)) {
+                float advance = style.fontSize + style.letterSpacing;
+                for (int i = 0; i < count; i++) {
+                    char ch = text[start + i];
+                    if (char.IsHighSurrogate(ch) || EmojiUtils.isSingleCharNonEmptyEmoji(ch)) {
+                        currentAdvance += advance;
+                        if (currentAdvance > advanceLimit) {
+                            return count - i;
+                        }
+                    } 
+                }
+            }
+            else {
+                Font font = FontManager.instance.getOrCreate(style.fontFamily, style.fontWeight, style.fontStyle).font;
+                for (int i = 0; i < count; i++) {
+                    char ch = text[start + i];
+                    if (font.getGlyphInfo(ch, out var glyphInfo, style.UnityFontSize, style.UnityFontStyle)) {
+                        currentAdvance += glyphInfo.advance + style.letterSpacing;
+                    }
+                    else {
+                        currentAdvance = style.letterSpacing;
+                    }
+
+                    if (LayoutUtils.isWordSpace(ch)) currentAdvance += style.wordSpacing;
+                    if (currentAdvance > advanceLimit) {
+                        return count - i;
+                    }
+                }
+            }
+
+            return 0;
+        }
 
         public void doLayout(float offset, string text, int start, int count, TextStyle style, TabStops tabStops) {
             this._count = count;

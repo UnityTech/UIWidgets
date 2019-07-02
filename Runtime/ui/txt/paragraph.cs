@@ -520,17 +520,10 @@ namespace Unity.UIWidgets.ui {
             float ellipsisWidth = Layout.measureText(runXOffset, this._paragraphStyle.ellipsis, 0,
                 this._paragraphStyle.ellipsis.Length, style, null, 0, this._tabStops);
 
-            var textAdvances = new float[textCount];
-            float textWidth = Layout.measureText(runXOffset, text, textStart, textCount, style,
-                textAdvances, 0, this._tabStops);
-
             // Find the minimum number of characters to truncate, so that the truncated text appended with ellipsis
             // is within the constraints of line width
-            int truncateCount = 0;
-            while (truncateCount < textCount && runXOffset + textWidth + ellipsisWidth > this._width) {
-                textWidth -= textAdvances[textCount - truncateCount - 1];
-                truncateCount++;
-            }
+            int truncateCount =
+                Layout.computeTruncateCount(text, textStart, textCount, style, this._width - ellipsisWidth);
 
             text = text.Substring(0, textStart + textCount - truncateCount) + this._paragraphStyle.ellipsis;
             textCount = text.Length - textStart;
