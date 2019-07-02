@@ -1,6 +1,4 @@
-﻿using UnityEditor.Rendering;
-
-namespace Unity.UIWidgets.ui {
+﻿namespace Unity.UIWidgets.ui {
     public struct TextBlob {
         internal TextBlob(string text, int textOffset, int textSize, float[] positions,
             float minX, float minY, float width, float height, TextStyle style) {

@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.InternalBridge;
-using UnityEditorInternal;
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
