@@ -62,7 +62,7 @@ namespace Unity.UIWidgets.ui {
             this._bounds.Set(_x, _y, _maxX - _x, _maxY - _y);
         }
 
-        public static void computeCharWidths(string text, int start, int count, TextStyle style, List<float> advances, int advanceOffset) {
+        public static void computeCharWidths(string text, int start, int count, TextStyle style, float[] advances, int advanceOffset) {
             char startingChar = text[start];
             if (char.IsHighSurrogate(startingChar) || EmojiUtils.isSingleCharEmoji(startingChar)) {
                 float advance = style.fontSize + style.letterSpacing;

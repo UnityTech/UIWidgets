@@ -98,7 +98,7 @@ namespace Unity.UIWidgets.ui {
         static List<int> _newLinePositions;
 
         TextBuff _textBuf;
-        List<float> _charWidths = new List<float>();
+        float[] _charWidths;
         List<int> _breaks = new List<int>();
         List<float> _widths = new List<float>();
         WordBreaker _wordBreaker = new WordBreaker();
@@ -128,8 +128,8 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void resize(int size) {
-            if (this._charWidths.Count < size) {
-                NoAllocHelpersBridge<float>.ResizeList(this._charWidths, size);
+            if (this._charWidths == null || this._charWidths.Length < size) {
+                this._charWidths = new float[size];
             }
         }
 
