@@ -65,18 +65,22 @@ namespace Unity.UIWidgets.engine {
         protected override float queryDevicePixelRatio() {
             return this._uiWidgetsPanel.devicePixelRatio;
         }
-        
+
         protected override int queryAntiAliasing() {
             return this._uiWidgetsPanel.antiAliasing;
         }
 
         protected override Vector2 queryWindowSize() {
             var rect = this._uiWidgetsPanel.rectTransform.rect;
-            var size = new Vector2(rect.width, rect.height) *
-                       this._uiWidgetsPanel.canvas.scaleFactor / this._uiWidgetsPanel.devicePixelRatio;
-            size.x = Mathf.Round(size.x);
-            size.y = Mathf.Round(size.y);
-            return size;
+            if (!ReferenceEquals(this._uiWidgetsPanel.canvas, null)) {
+                var size = new Vector2(rect.width, rect.height) *
+                           this._uiWidgetsPanel.canvas.scaleFactor / this._uiWidgetsPanel.devicePixelRatio;
+                size.x = Mathf.Round(size.x);
+                size.y = Mathf.Round(size.y);
+                return size;
+            }
+
+            return new Vector2(0, 0);
         }
 
         public Offset windowPosToScreenPos(Offset windowPos) {
@@ -134,7 +138,7 @@ namespace Unity.UIWidgets.engine {
 
             this._displayMetrics = DisplayMetricsProvider.provider();
             this._displayMetrics.OnEnable();
-            
+
             this._enteredPointers.Clear();
 
             if (_repaintEvent == null) {
@@ -162,11 +166,9 @@ namespace Unity.UIWidgets.engine {
                     : this._displayMetrics.devicePixelRatio;
             }
         }
-        
+
         public int antiAliasing {
-            get {
-                return this.antiAliasingOverride >= 0 ? this.antiAliasingOverride : QualitySettings.antiAliasing;
-            }
+            get { return this.antiAliasingOverride >= 0 ? this.antiAliasingOverride : QualitySettings.antiAliasing; }
         }
 
         public WindowPadding viewPadding {
@@ -177,17 +179,17 @@ namespace Unity.UIWidgets.engine {
             get { return this._displayMetrics.viewInsets; }
         }
 
-        protected override void OnDisable() {	
-            D.assert(this._windowAdapter != null);	
-            this._windowAdapter.OnDisable();	
-            this._windowAdapter = null;	
-            base.OnDisable();	
+        protected override void OnDisable() {
+            D.assert(this._windowAdapter != null);
+            this._windowAdapter.OnDisable();
+            this._windowAdapter = null;
+            base.OnDisable();
         }
-        
+
         protected virtual Widget createWidget() {
             return null;
         }
-        
+
         public void recreateWidget() {
             Widget root;
             using (this._windowAdapter.getScope()) {
@@ -205,12 +207,10 @@ namespace Unity.UIWidgets.engine {
         protected virtual void Update() {
             this._displayMetrics.Update();
             UIWidgetsMessageManager.ensureUIWidgetsMessageManagerIfNeeded();
-            
+
 #if UNITY_ANDROID
             if (Input.GetKeyDown(KeyCode.Escape)) {
-                this._windowAdapter.withBinding(() => {
-                    WidgetsBinding.instance.handlePopRoute();
-                });
+                this._windowAdapter.withBinding(() => { WidgetsBinding.instance.handlePopRoute(); });
             }
 #endif
 
@@ -277,6 +277,7 @@ namespace Unity.UIWidgets.engine {
                     break;
                 }
             }
+
             return InputUtils.getMouseButtonKey(defaultKey);
         }
 
