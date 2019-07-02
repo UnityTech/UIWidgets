@@ -228,7 +228,6 @@ namespace Unity.UIWidgets.ui {
         float _minIntrinsicWidth;
         float _alphabeticBaseline;
         float _ideographicBaseline;
-        float[] _characterWidths;
         List<float> _lineHeights = new List<float>();
         List<PaintRecord> _paintRecords = new List<PaintRecord>();
         List<CodeUnitRun> _codeUnitRuns = new List<CodeUnitRun>();
@@ -319,7 +318,6 @@ namespace Unity.UIWidgets.ui {
             float preMaxDescent = 0;
             float maxWordWidth = 0;
 
-            Layout layout = new Layout();
             TextBlobBuilder builder = new TextBlobBuilder();
             int ellipsizedLength = this._text.Length + (this._paragraphStyle.ellipsis?.Length ?? 0);
             builder.allocPos(ellipsizedLength);
@@ -330,12 +328,14 @@ namespace Unity.UIWidgets.ui {
             }
             
             Range<int>[] words = new Range<int>[maxWordCount];
+            float[] positions = null;
+            float[] advances = null;
             int pGlyphPositions = 0;
 
             for (int lineNumber = 0; lineNumber < lineLimit; ++lineNumber) {
                 this._computePaintRecordsFromLine(
                     lineNumber, ref lineLimit, ref styleRunIndex, ref maxWordWidth, ref yOffset, ref preMaxDescent,
-                    builder, layout, words, glyphPositions, ref pGlyphPositions
+                    builder, words, glyphPositions, ref pGlyphPositions, ref advances, ref positions
                 );
             }
 
@@ -343,8 +343,8 @@ namespace Unity.UIWidgets.ui {
         }
 
         void _computePaintRecordsFromLine(int lineNumber, ref int lineLimit, ref int styleRunIndex,
-            ref float maxWordWidth, ref float yOffset, ref float preMaxDescent, TextBlobBuilder builder, Layout layout,
-            Range<int>[] words, GlyphPosition[] glyphPositions, ref int pGlyphPositions) {
+            ref float maxWordWidth, ref float yOffset, ref float preMaxDescent, TextBlobBuilder builder,
+            Range<int>[] words, GlyphPosition[] glyphPositions, ref int pGlyphPositions, ref float[] advances, ref float[] positions) {
             var lineRange = this._lineRanges[lineNumber];
             int wordIndex = 0;
             float runXOffset = 0;
@@ -361,7 +361,12 @@ namespace Unity.UIWidgets.ui {
 
             int lineStyleRunCount = this._countLineStyleRuns(lineRange, styleRunIndex, out int maxTextCount);
             
-            layout.allocAdvancesAndPositions(maxTextCount);
+            if (advances == null || advances.Length < maxTextCount) {
+                advances = new float[maxTextCount];
+            }
+            if (positions == null || positions.Length < maxTextCount) {
+                positions = new float[maxTextCount];
+            }
             int glyphPositionStart = pGlyphPositions;
             
             if (lineStyleRunCount != 0) {
@@ -385,7 +390,6 @@ namespace Unity.UIWidgets.ui {
                             var isLastLineStyleRun = lineStyleRunIndex == lineStyleRunCount - 1;
                             this._paintRecords.Add(this._generatePaintRecordFromLineStyleRun(
                                 new LineStyleRun(start, end, styleRun.style),
-                                layout,
                                 builder,
                                 isLastLineStyleRun,
                                 lineNumber,
@@ -399,7 +403,9 @@ namespace Unity.UIWidgets.ui {
                                 ref tMaxWordWidth,
                                 words,
                                 glyphPositions,
-                                ref pGlyphPositions));
+                                ref pGlyphPositions,
+                                ref advances,
+                                ref positions));
                         }
                     }
 
@@ -452,7 +458,7 @@ namespace Unity.UIWidgets.ui {
 
         PaintRecord _generatePaintRecordFromLineStyleRun(
             LineStyleRun run,
-            Layout layout, TextBlobBuilder builder,
+            TextBlobBuilder builder,
             bool isLastLineStyleRun,
             int lineNumber,
             bool justifyLine,
@@ -465,7 +471,9 @@ namespace Unity.UIWidgets.ui {
             ref float maxWordWidth,
             Range<int>[] words,
             GlyphPosition[] glyphPositions,
-            ref int pLineGlyphPositions) {
+            ref int pLineGlyphPositions,
+            ref float[] advances,
+            ref float[] positions) {
             string text = this._text;
             int textStart = run.start;
             int textEnd = run.end;
@@ -483,17 +491,26 @@ namespace Unity.UIWidgets.ui {
                 }
             }
 
-            layout.doLayout(runXOffset, text, textStart, textCount, run.style, this._tabStops);
+            if (advances == null || advances.Length < textCount) {
+                advances = new float[textCount];
+            }
+            if (positions == null || positions.Length < textCount) {
+                positions = new float[textCount];
+            }
+            float advance = Layout.doLayout(runXOffset, text, textStart, textCount, advances, positions, run.style, this._tabStops, out var bounds);
 
             builder.allocRunPos(run.style, text, textStart, textCount);
             // bounds relative to first character
-            builder.setBounds(layout.translatedBounds());
+            bounds.x -= positions[0];
+            builder.setBounds(bounds);
 
             this._populateGlyphPositions(
                 textStart, textCount,
-                builder, layout,
+                builder,
                 words,
                 glyphPositions,
+                advances,
+                positions,
                 run.start,
                 runXOffset,
                 wordGapWidth,
@@ -505,7 +522,6 @@ namespace Unity.UIWidgets.ui {
                 ref maxWordWidth);
 
             TextBlob textBlob = builder.make();
-            float advance = layout.getAdvance();
             PaintRecord paintRecord = this._generatePaintRecord(run.style, textBlob, runXOffset, advance);
             runXOffset += advance;
             this._codeUnitRuns.Add(this._generateCodeUnitRun(run, lineNumber, glyphPositions, 
@@ -539,9 +555,11 @@ namespace Unity.UIWidgets.ui {
         }
 
         void _populateGlyphPositions(int textStart, int textCount,
-            TextBlobBuilder builder, Layout layout,
+            TextBlobBuilder builder,
             Range<int>[] words,
             GlyphPosition[] glyphPositions,
+            float[] advances,
+            float[] positions,
             int runStart,
             float runXOffset,
             float wordGapWidth,
@@ -555,8 +573,8 @@ namespace Unity.UIWidgets.ui {
             D.assert(textCount != 0);
             float wordStartPosition = float.NaN;
             for (int glyphIndex = 0; glyphIndex < textCount; ++glyphIndex) {
-                float glyphXOffset = layout.getX(glyphIndex) + justifyXOffset;
-                float glyphAdvance = layout.getCharAdvance(glyphIndex);
+                float glyphXOffset = positions[glyphIndex] + justifyXOffset;
+                float glyphAdvance = advances[glyphIndex];
                 builder.setPosition(glyphIndex, glyphXOffset);
                 glyphPositions[pLineGlyphPositions++] = new GlyphPosition(runXOffset + glyphXOffset,
                     glyphAdvance, new Range<int>(textStart + glyphIndex, textStart + glyphIndex + 1));

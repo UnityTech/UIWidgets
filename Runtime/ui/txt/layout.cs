@@ -1,19 +1,10 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
-    class Layout {
-        int _count;
-        float[] _advances;
-        float[] _positions;
-        float _advance;
-        UnityEngine.Rect _bounds;
-
-        static float _x, _y, _maxX, _maxY; // Used to pass bounds from static to non-static doLayout
-
+    static class Layout {
         public static float measureText(float offset, string text, int start, int count, TextStyle style,
             float[] advances, int advanceOffset, TabStops tabStops) {
-            return _doLayout(offset, text, start, count, style, advances, null, advanceOffset, tabStops);
+            return _doLayout(offset, text, start, count, style, advances, null, advanceOffset, tabStops, out var bounds);
         }
         
         public static int computeTruncateCount(string text, int start, int count, TextStyle style, float advanceLimit) {
@@ -52,14 +43,9 @@ namespace Unity.UIWidgets.ui {
             return 0;
         }
 
-        public void doLayout(float offset, string text, int start, int count, TextStyle style, TabStops tabStops) {
-            this._count = count;
-            this.allocAdvancesAndPositions(count);
-
-            _x = _y = _maxX = _maxY = 0;
-            this._advance = _doLayout(offset, text, start, count, style, this._advances, this._positions, 0,
-                tabStops);
-            this._bounds.Set(_x, _y, _maxX - _x, _maxY - _y);
+        public static float doLayout(float offset, string text, int start, int count, float[] advances, float[] positions, TextStyle style, TabStops tabStops, out UnityEngine.Rect bounds) {
+            return _doLayout(offset, text, start, count, style, advances, positions, 0,
+                tabStops, out bounds);
         }
 
         public static void computeCharWidths(string text, int start, int count, TextStyle style, float[] advances, int advanceOffset) {
@@ -94,14 +80,14 @@ namespace Unity.UIWidgets.ui {
         }
 
         static float _doLayout(float offset, string text, int start, int count, TextStyle style,
-            float[] advances, float[] positions, int advanceOffset, TabStops tabStops) {
+            float[] advances, float[] positions, int advanceOffset, TabStops tabStops, out UnityEngine.Rect bounds) {
             float advance = 0;
             Font font = FontManager.instance.getOrCreate(style.fontFamily, style.fontWeight, style.fontStyle).font;
 
             char startingChar = text[start];
+            bounds = new UnityEngine.Rect();
             if (char.IsHighSurrogate(startingChar) || EmojiUtils.isSingleCharEmoji(startingChar)) {
-                advance = _layoutEmoji(text, start, style, font, count,
-                    advances, positions, advanceOffset, advance);
+                advance = _layoutEmoji(text, start, style, font, count, advances, positions, advanceOffset, advance, ref bounds);
             }
             else {
                 // According to the logic of Paragraph.layout, it is assured that all the characters are requested
@@ -119,7 +105,7 @@ namespace Unity.UIWidgets.ui {
                     wordend = LayoutUtils.getNextWordBreak(text, iter, start + count);
                     advance = _layoutWord(offset, iter - start, text, iter, 
                         wordend - iter, style, font, advances, positions, advanceOffset, advance,
-                        tabStops);
+                        tabStops, ref bounds);
                 }
             }
 
@@ -128,7 +114,7 @@ namespace Unity.UIWidgets.ui {
 
         static float _layoutWord(float offset, int layoutOffset,
             string text, int start, int wordCount, TextStyle style, Font font, float[] advances,
-            float[] positions, int advanceOffset, float initAdvance, TabStops tabStops) {
+            float[] positions, int advanceOffset, float initAdvance, TabStops tabStops, ref UnityEngine.Rect bounds) {
             float wordSpacing =
                 wordCount == 1 && LayoutUtils.isWordSpace(text[start]) ? style.wordSpacing : 0;
 
@@ -155,7 +141,7 @@ namespace Unity.UIWidgets.ui {
                 }
 
                 if (font.getGlyphInfo(ch, out var glyphInfo, style.UnityFontSize, style.UnityFontStyle)) {
-                    _updateInnerBounds(glyphInfo, x);
+                    _updateBounds(glyphInfo, x, ref bounds);
                 }
 
                 if (positions != null) {
@@ -185,7 +171,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         static float _layoutEmoji(string text, int start, TextStyle style, Font font, int count, float[] advances,
-            float[] positions, int advanceOffset, float initAdvance) {
+            float[] positions, int advanceOffset, float initAdvance, ref UnityEngine.Rect bounds) {
             var metrics = FontMetrics.fromFont(font, style.UnityFontSize);
             float x = initAdvance;
             for (int i = 0; i < count; i++) {
@@ -205,7 +191,7 @@ namespace Unity.UIWidgets.ui {
                     var maxX = metrics.descent - metrics.ascent + x;
                     var minY = metrics.ascent;
                     var maxY = metrics.descent;
-                    _updateInnerBounds(minX, maxX, minY, maxY);
+                    _updateBounds(minX, maxX, minY, maxY, ref bounds);
 
                     if (positions != null) {
                         positions[i] = x;
@@ -235,36 +221,33 @@ namespace Unity.UIWidgets.ui {
             return x;
         }
 
-        static void _updateInnerBounds(CharacterInfo glyphInfo, float x) {
+        static void _updateBounds(CharacterInfo glyphInfo, float x, ref UnityEngine.Rect bounds) {
             var minX = glyphInfo.minX + x;
             var maxX = glyphInfo.maxX + x;
             var minY = -glyphInfo.maxY;
             var maxY = -glyphInfo.minY;
-            _updateInnerBounds(minX, maxX, minY, maxY);
+            _updateBounds(minX, maxX, minY, maxY, ref bounds);
         }
 
-        static void _updateInnerBounds(float minX, float maxX, float minY, float maxY) {
-            if (_maxX - _x <= 0 || _maxY - _y <= 0) {
-                _x = minX;
-                _y = minY;
-                _maxX = maxX;
-                _maxY = maxY;
+        static void _updateBounds(float minX, float maxX, float minY, float maxY, ref UnityEngine.Rect bounds) {
+            if (bounds.width <= 0 || bounds.height <= 0) {
+                bounds.Set(minX, minY, maxX - minX, maxY - minY);
             }
             else {
-                if (minX < _x) {
-                    _x = minX;
+                if (minX < bounds.x) {
+                    bounds.x = minX;
                 }
 
-                if (minY < _y) {
-                    _y = minY;
+                if (minY < bounds.y) {
+                    bounds.y = minY;
                 }
 
-                if (maxX > _maxX) {
-                    _maxX = maxX;
+                if (maxX > bounds.xMax) {
+                    bounds.xMax = maxX;
                 }
 
-                if (maxY > _maxY) {
-                    _maxY = maxY;
+                if (maxY > bounds.yMax) {
+                    bounds.yMax = maxY;
                 }
             }
         }
@@ -272,45 +255,6 @@ namespace Unity.UIWidgets.ui {
         public static void requireEllipsisInTexture(string text, TextStyle style) {
             Font font = FontManager.instance.getOrCreate(style.fontFamily, style.fontWeight, style.fontStyle).font;
             font.RequestCharactersInTextureSafe(text, style.UnityFontSize, style.UnityFontStyle);
-        }
-
-        public void allocAdvancesAndPositions(int count) {
-            if (this._advances == null || this._advances.Length < count) {
-                this._advances = new float[count];
-            }
-
-            if (this._positions == null || this._positions.Length < count) {
-                this._positions = new float[count];
-            }
-        }
-
-        public int nGlyphs() {
-            return this._count;
-        }
-
-        public float[] getAdvances() {
-            return this._advances;
-        }
-
-        public float getAdvance() {
-            return this._advance;
-        }
-
-        public float getX(int index) {
-            return this._positions[index];
-        }
-
-        public float getY(int index) {
-            return 0;
-        }
-
-        public float getCharAdvance(int index) {
-            return this._advances[index];
-        }
-
-        public UnityEngine.Rect translatedBounds() {
-            return new UnityEngine.Rect(this._bounds.x - this._positions[0], 
-                this._bounds.y, this._bounds.width, this._bounds.height);
         }
     }
 }
