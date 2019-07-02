@@ -324,12 +324,18 @@ namespace Unity.UIWidgets.ui {
             int ellipsizedLength = this._text.Length + (this._paragraphStyle.ellipsis?.Length ?? 0);
             builder.allocPos(ellipsizedLength);
             GlyphPosition[] glyphPositions = new GlyphPosition[ellipsizedLength];
+            int maxWordCount = this._computeMaxWordCount();
+            if (maxWordCount == 0) {
+                return;
+            }
+            
+            Range<int>[] words = new Range<int>[maxWordCount];
             int pGlyphPositions = 0;
 
             for (int lineNumber = 0; lineNumber < lineLimit; ++lineNumber) {
                 this._computePaintRecordsFromLine(
                     lineNumber, ref lineLimit, ref styleRunIndex, ref maxWordWidth, ref yOffset, ref preMaxDescent,
-                    builder, layout, glyphPositions, ref pGlyphPositions
+                    builder, layout, words, glyphPositions, ref pGlyphPositions
                 );
             }
 
@@ -337,8 +343,8 @@ namespace Unity.UIWidgets.ui {
         }
 
         void _computePaintRecordsFromLine(int lineNumber, ref int lineLimit, ref int styleRunIndex,
-            ref float maxWordWidth, ref float yOffset, ref float preMaxDescent,
-            TextBlobBuilder builder, Layout layout, GlyphPosition[] glyphPositions, ref int pGlyphPositions) {
+            ref float maxWordWidth, ref float yOffset, ref float preMaxDescent, TextBlobBuilder builder, Layout layout,
+            Range<int>[] words, GlyphPosition[] glyphPositions, ref int pGlyphPositions) {
             var lineRange = this._lineRanges[lineNumber];
             int wordIndex = 0;
             float runXOffset = 0;
@@ -348,10 +354,10 @@ namespace Unity.UIWidgets.ui {
             bool justifyLine = this._paragraphStyle.textAlign == TextAlign.justify &&
                                lineNumber != lineLimit - 1 && !lineRange.hardBreak;
 
-            Range<int>[] words = this._findWords(lineRange.start, lineRange.end);
-            float wordGapWidth = !(justifyLine && words != null && words.Length > 1)
+            int wordCount = this._findWords(lineRange.start, lineRange.end, words);
+            float wordGapWidth = !(justifyLine && wordCount > 1)
                 ? 0
-                : (this._width - this._lineWidths[lineNumber]) / (words.Length - 1);
+                : (this._width - this._lineWidths[lineNumber]) / (wordCount - 1);
 
             int lineStyleRunCount = this._countLineStyleRuns(lineRange, styleRunIndex, out int maxTextCount);
             
@@ -385,6 +391,7 @@ namespace Unity.UIWidgets.ui {
                                 lineNumber,
                                 justifyLine,
                                 wordGapWidth,
+                                wordCount,
                                 ref tLineLimit,
                                 ref wordIndex,
                                 ref runXOffset,
@@ -450,6 +457,7 @@ namespace Unity.UIWidgets.ui {
             int lineNumber,
             bool justifyLine,
             float wordGapWidth,
+            int wordCount,
             ref int lineLimit,
             ref int wordIndex,
             ref float runXOffset,
@@ -490,6 +498,7 @@ namespace Unity.UIWidgets.ui {
                 runXOffset,
                 wordGapWidth,
                 justifyLine,
+                wordCount,
                 ref pLineGlyphPositions,
                 ref wordIndex,
                 ref justifyXOffset,
@@ -537,6 +546,7 @@ namespace Unity.UIWidgets.ui {
             float runXOffset,
             float wordGapWidth,
             bool justifyLine,
+            int wordCount,
             ref int pLineGlyphPositions,
             ref int wordIndex,
             ref float justifyXOffset,
@@ -550,7 +560,7 @@ namespace Unity.UIWidgets.ui {
                 builder.setPosition(glyphIndex, glyphXOffset);
                 glyphPositions[pLineGlyphPositions++] = new GlyphPosition(runXOffset + glyphXOffset,
                     glyphAdvance, new Range<int>(textStart + glyphIndex, textStart + glyphIndex + 1));
-                if (words != null && wordIndex < words.Length) {
+                if (words != null && wordIndex < wordCount) {
                     Range<int> word = words[wordIndex];
                     if (word.start == runStart + glyphIndex) {
                         wordStartPosition = runXOffset + glyphXOffset;
@@ -965,31 +975,37 @@ namespace Unity.UIWidgets.ui {
             newLinePositions.Add(this._text.Length);
         }
 
-        Range<int>[] _findWords(int start, int end) {
-            var inWord = false;
-            int wordCount = 0;
-            for (int i = start; i < end; ++i) {
-                bool isSpace = LayoutUtils.isWordSpace(this._text[i]);
-                if (!inWord && !isSpace) {
-                    inWord = true;
+        int _computeMaxWordCount() {
+            int max = 0;
+            for (int lineNumber = 0; lineNumber < this._lineRanges.Count; lineNumber++) {
+                var inWord = false;
+                int wordCount = 0, start = this._lineRanges[lineNumber].start, end = this._lineRanges[lineNumber].end;
+                for (int i = start; i < end; ++i) {
+                    bool isSpace = LayoutUtils.isWordSpace(this._text[i]);
+                    if (!inWord && !isSpace) {
+                        inWord = true;
+                    }
+                    else if (inWord && isSpace) {
+                        inWord = false;
+                        wordCount++;
+                    }
                 }
-                else if (inWord && isSpace) {
-                    inWord = false;
+
+                if (inWord) {
                     wordCount++;
                 }
+
+                if (wordCount > max) {
+                    max = wordCount;
+                }
             }
 
-            if (inWord) {
-                wordCount++;
-            }
+            return max;
+        }
 
-            if (wordCount == 0) {
-                return null;
-            }
-
-            Range<int>[] words = new Range<int>[wordCount];
-            inWord = false;
-            wordCount = 0;
+        int _findWords(int start, int end, Range<int>[] words) {
+            var inWord = false;
+            int wordCount = 0;
             int wordStart = 0;
             
             for (int i = start; i < end; ++i) {
@@ -1008,7 +1024,7 @@ namespace Unity.UIWidgets.ui {
                 words[wordCount] = new Range<int>(wordStart, end);
             }
 
-            return words;
+            return wordCount;
         }
 
         void paintDecorations(Canvas canvas, PaintRecord record, Offset baseOffset) {
