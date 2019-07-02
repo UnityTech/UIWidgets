@@ -12,27 +12,27 @@ namespace Unity.UIWidgets.ui {
 
         static float _x, _y, _maxX, _maxY; // Used to pass bounds from static to non-static doLayout
 
-        public static float measureText(float offset, TextBuff buff, int start, int count, TextStyle style,
+        public static float measureText(float offset, string text, int start, int count, TextStyle style,
             float[] advances, int advanceOffset, TabStops tabStops) {
-            return _doLayout(offset, buff, start, count, style, advances, null, advanceOffset, tabStops);
+            return _doLayout(offset, text, start, count, style, advances, null, advanceOffset, tabStops);
         }
 
-        public void doLayout(float offset, TextBuff buff, int start, int count, TextStyle style, TabStops tabStops) {
+        public void doLayout(float offset, string text, int start, int count, TextStyle style, TabStops tabStops) {
             this._count = count;
             this.allocAdvancesAndPositions(count);
 
             _x = _y = _maxX = _maxY = 0;
-            this._advance = _doLayout(offset, buff, start, count, style, this._advances, this._positions, 0,
+            this._advance = _doLayout(offset, text, start, count, style, this._advances, this._positions, 0,
                 tabStops);
             this._bounds.Set(_x, _y, _maxX - _x, _maxY - _y);
         }
 
-        public static void computeCharWidths(TextBuff buff, int start, int count, TextStyle style, List<float> advances, int advanceOffset) {
-            char startingChar = buff.charAt(start);
+        public static void computeCharWidths(string text, int start, int count, TextStyle style, List<float> advances, int advanceOffset) {
+            char startingChar = text[start];
             if (char.IsHighSurrogate(startingChar) || EmojiUtils.isSingleCharEmoji(startingChar)) {
                 float advance = style.fontSize + style.letterSpacing;
                 for (int i = 0; i < count; i++) {
-                    char ch = buff.charAt(start + i);
+                    char ch = text[start + i];
                     if (char.IsHighSurrogate(ch) || EmojiUtils.isSingleCharNonEmptyEmoji(ch)) {
                         advances[i + advanceOffset] = advance;
                     }
@@ -43,9 +43,9 @@ namespace Unity.UIWidgets.ui {
             }
             else {
                 Font font = FontManager.instance.getOrCreate(style.fontFamily, style.fontWeight, style.fontStyle).font;
-                font.RequestCharactersInTextureSafe(buff.subString(start, count), style.UnityFontSize, style.UnityFontStyle);
+                font.RequestCharactersInTextureSafe(text.Substring(start, count), style.UnityFontSize, style.UnityFontStyle);
                 for (int i = 0; i < count; i++) {
-                    char ch = buff.charAt(start + i);
+                    char ch = text[start + i];
                     if (font.getGlyphInfo(ch, out var glyphInfo, style.UnityFontSize, style.UnityFontStyle)) {
                         advances[i + advanceOffset] = glyphInfo.advance + style.letterSpacing;
                     }
@@ -58,14 +58,14 @@ namespace Unity.UIWidgets.ui {
             }
         }
 
-        static float _doLayout(float offset, TextBuff buff, int start, int count, TextStyle style,
+        static float _doLayout(float offset, string text, int start, int count, TextStyle style,
             float[] advances, float[] positions, int advanceOffset, TabStops tabStops) {
             float advance = 0;
             Font font = FontManager.instance.getOrCreate(style.fontFamily, style.fontWeight, style.fontStyle).font;
 
-            char startingChar = buff.charAt(start);
+            char startingChar = text[start];
             if (char.IsHighSurrogate(startingChar) || EmojiUtils.isSingleCharEmoji(startingChar)) {
-                advance = _layoutEmoji(buff.text, buff.offset + start, style, font, count,
+                advance = _layoutEmoji(text, start, style, font, count,
                     advances, positions, advanceOffset, advance);
             }
             else {
@@ -81,8 +81,8 @@ namespace Unity.UIWidgets.ui {
 //                    : LayoutUtils.getPrevWordBreakForCache(buff, start + 1);
                 int wordend;
                 for (int iter = start; iter < start + count; iter = wordend) {
-                    wordend = LayoutUtils.getNextWordBreak(buff.text, buff.offset + iter, start + count);
-                    advance = _layoutWord(offset, iter - start, buff.text, iter + buff.offset, 
+                    wordend = LayoutUtils.getNextWordBreak(text, iter, start + count);
+                    advance = _layoutWord(offset, iter - start, text, iter, 
                         wordend - iter, style, font, advances, positions, advanceOffset, advance,
                         tabStops);
                 }

@@ -475,7 +475,7 @@ namespace Unity.UIWidgets.ui {
                 }
             }
 
-            layout.doLayout(runXOffset, new TextBuff(text), textStart, textCount, run.style, this._tabStops);
+            layout.doLayout(runXOffset, text, textStart, textCount, run.style, this._tabStops);
 
             builder.allocRunPos(run.style, text, textStart, textCount);
             // bounds relative to first character
@@ -517,12 +517,11 @@ namespace Unity.UIWidgets.ui {
             // performance, and the ellipsis is handled here
             Layout.requireEllipsisInTexture(this._paragraphStyle.ellipsis, style);
 
-            TextBuff ellipsisTextBuff = new TextBuff(this._paragraphStyle.ellipsis);
-            float ellipsisWidth = Layout.measureText(runXOffset, ellipsisTextBuff, 0,
+            float ellipsisWidth = Layout.measureText(runXOffset, this._paragraphStyle.ellipsis, 0,
                 this._paragraphStyle.ellipsis.Length, style, null, 0, this._tabStops);
 
             var textAdvances = new float[textCount];
-            float textWidth = Layout.measureText(runXOffset, new TextBuff(text), textStart, textCount, style,
+            float textWidth = Layout.measureText(runXOffset, text, textStart, textCount, style,
                 textAdvances, 0, this._tabStops);
 
             // Find the minimum number of characters to truncate, so that the truncated text appended with ellipsis

@@ -160,7 +160,7 @@ namespace Unity.UIWidgets.ui {
 //                Layout.measureText(this._width - this._preBreak, this._textBuf,
 //                    start, end - start, style,
 //                    this._charWidths, start, this._tabStops);
-                Layout.computeCharWidths(this._textBuf, start, end - start, style, this._charWidths, start);
+                Layout.computeCharWidths(this._textBuf.text, this._textBuf.offset + start, end - start, style, this._charWidths, start);
             }
 
             int current = this._wordBreaker.current();
