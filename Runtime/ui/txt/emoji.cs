@@ -250,7 +250,10 @@ namespace Unity.UIWidgets.ui {
                     1.0f / colCount, 1.0f / rowCount);
             }
 
-            Debug.LogWarning($"Unrecognized unicode for emoji {code:x}");
+            D.assert(() => {
+                Debug.LogWarning($"Unrecognized unicode for emoji {code:x}");
+                return true;
+            });
             return Rect.fromLTWH(0, 0, 0, 0);
         }
 
