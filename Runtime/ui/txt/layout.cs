@@ -4,13 +4,13 @@ namespace Unity.UIWidgets.ui {
     static class Layout {
         // Measure the length of the span of the text. Currently, this is only used to compute the length
         // of ellipsis, assuming that the ellipsis does not contain any tab, tab is not considered for simplicity
-        public static float measureText(string text, int start, int count, TextStyle style) {
-            char startingChar = text[start];
+        public static float measureText(string text, TextStyle style) {
+            char startingChar = text[0];
             float totalWidth = 0;
             if (char.IsHighSurrogate(startingChar) || EmojiUtils.isSingleCharEmoji(startingChar)) {
                 float advance = style.fontSize + style.letterSpacing;
-                for (int i = 0; i < count; i++) {
-                    char ch = text[start + i];
+                for (int i = 0; i < text.Length; i++) {
+                    char ch = text[i];
                     if (char.IsHighSurrogate(ch) || EmojiUtils.isSingleCharNonEmptyEmoji(ch)) {
                         totalWidth += advance;
                     }
@@ -18,9 +18,9 @@ namespace Unity.UIWidgets.ui {
             }
             else {
                 Font font = FontManager.instance.getOrCreate(style.fontFamily, style.fontWeight, style.fontStyle).font;
-                font.RequestCharactersInTextureSafe(text.Substring(start, count), style.UnityFontSize, style.UnityFontStyle);
-                for (int i = 0; i < count; i++) {
-                    char ch = text[start + i];
+                font.RequestCharactersInTextureSafe(text, style.UnityFontSize, style.UnityFontStyle);
+                for (int i = 0; i < text.Length; i++) {
+                    char ch = text[i];
                     if (font.getGlyphInfo(ch, out var glyphInfo, style.UnityFontSize, style.UnityFontStyle)) {
                         totalWidth += glyphInfo.advance + style.letterSpacing;
                     }
@@ -36,7 +36,7 @@ namespace Unity.UIWidgets.ui {
 
             return totalWidth;
         }
-        
+
         public static int computeTruncateCount(float offset, string text, int start, int count, TextStyle style,
             float advanceLimit, TabStops tabStops) {
             char startingChar = text[start];
@@ -50,7 +50,7 @@ namespace Unity.UIWidgets.ui {
                         if (currentAdvance > advanceLimit) {
                             return count - i;
                         }
-                    } 
+                    }
                 }
             }
             else {
@@ -64,13 +64,13 @@ namespace Unity.UIWidgets.ui {
                         currentAdvance += glyphInfo.advance + style.letterSpacing;
                     }
                     else {
-                        currentAdvance = style.letterSpacing;
+                        currentAdvance += style.letterSpacing;
                     }
 
                     if (LayoutUtils.isWordSpace(ch)) {
                         currentAdvance += style.wordSpacing;
                     }
-                    
+
                     if (currentAdvance > advanceLimit) {
                         return count - i;
                     }
@@ -80,7 +80,8 @@ namespace Unity.UIWidgets.ui {
             return 0;
         }
 
-        public static void computeCharWidths(string text, int start, int count, TextStyle style, float[] advances, int advanceOffset) {
+        public static void computeCharWidths(string text, int start, int count, TextStyle style, float[] advances,
+            int advanceOffset) {
             char startingChar = text[start];
             if (char.IsHighSurrogate(startingChar) || EmojiUtils.isSingleCharEmoji(startingChar)) {
                 float advance = style.fontSize + style.letterSpacing;
@@ -96,7 +97,8 @@ namespace Unity.UIWidgets.ui {
             }
             else {
                 Font font = FontManager.instance.getOrCreate(style.fontFamily, style.fontWeight, style.fontStyle).font;
-                font.RequestCharactersInTextureSafe(text.Substring(start, count), style.UnityFontSize, style.UnityFontStyle);
+                font.RequestCharactersInTextureSafe(text.Substring(start, count), style.UnityFontSize,
+                    style.UnityFontStyle);
                 for (int i = 0; i < count; i++) {
                     char ch = text[start + i];
                     if (font.getGlyphInfo(ch, out var glyphInfo, style.UnityFontSize, style.UnityFontStyle)) {
@@ -114,21 +116,21 @@ namespace Unity.UIWidgets.ui {
         }
 
         public static float doLayout(float offset, string text, int start, int count, TextStyle style,
-            float[] advances, float[] positions, int advanceOffset, TabStops tabStops, out UnityEngine.Rect bounds) {
+            float[] advances, float[] positions, TabStops tabStops, out UnityEngine.Rect bounds) {
             float advance = 0;
             Font font = FontManager.instance.getOrCreate(style.fontFamily, style.fontWeight, style.fontStyle).font;
 
             char startingChar = text[start];
             bounds = new UnityEngine.Rect();
             if (char.IsHighSurrogate(startingChar) || EmojiUtils.isSingleCharEmoji(startingChar)) {
-                advance = _layoutEmoji(text, start, style, font, count, advances, positions, advanceOffset, advance, ref bounds);
+                advance = _layoutEmoji(text, start, count, style, font, advances, positions, ref bounds);
             }
             else {
                 // According to the logic of Paragraph.layout, it is assured that all the characters are requested
                 // in the texture before (in computing line breaks), so skip it here for optimization.
                 // The only exception is the ellipsis, which did not appear in line breaking. It is taken care of
                 // only when needed.
-                
+
                 // font.RequestCharactersInTextureSafe(buff.text, style.UnityFontSize, style.UnityFontStyle);
 
 //                int wordstart = start == buff.size
@@ -137,8 +139,8 @@ namespace Unity.UIWidgets.ui {
                 int wordend;
                 for (int iter = start; iter < start + count; iter = wordend) {
                     wordend = LayoutUtils.getNextWordBreak(text, iter, start + count);
-                    advance = _layoutWord(offset, iter - start, text, iter, 
-                        wordend - iter, style, font, advances, positions, advanceOffset, advance,
+                    advance = _layoutWord(offset, iter - start, text, iter,
+                        wordend - iter, style, font, advances, positions, advance,
                         tabStops, ref bounds);
                 }
             }
@@ -148,7 +150,7 @@ namespace Unity.UIWidgets.ui {
 
         static float _layoutWord(float offset, int layoutOffset,
             string text, int start, int wordCount, TextStyle style, Font font, float[] advances,
-            float[] positions, int advanceOffset, float initAdvance, TabStops tabStops, ref UnityEngine.Rect bounds) {
+            float[] positions, float initAdvance, TabStops tabStops, ref UnityEngine.Rect bounds) {
             float wordSpacing =
                 wordCount == 1 && LayoutUtils.isWordSpace(text[start]) ? style.wordSpacing : 0;
 
@@ -162,13 +164,13 @@ namespace Unity.UIWidgets.ui {
                 if (i == 0) {
                     x += letterSpaceHalfLeft + wordSpacing;
                     if (advances != null) {
-                        advances[i + layoutOffset + advanceOffset] = letterSpaceHalfLeft + wordSpacing;
+                        advances[i + layoutOffset] = letterSpaceHalfLeft + wordSpacing;
                     }
                 }
                 else {
                     if (advances != null) {
-                        advances[i - 1 + layoutOffset + advanceOffset] += letterSpaceHalfRight;
-                        advances[i + layoutOffset + advanceOffset] = letterSpaceHalfLeft;
+                        advances[i - 1 + layoutOffset] += letterSpaceHalfRight;
+                        advances[i + layoutOffset] = letterSpaceHalfLeft;
                     }
 
                     x += letterSpace;
@@ -182,19 +184,22 @@ namespace Unity.UIWidgets.ui {
                     positions[i + layoutOffset] = x;
                 }
 
-                float advance = glyphInfo.advance;
+                float advance;
                 if (ch == '\t') {
                     advance = tabStops.nextTab(initAdvance + offset) - initAdvance - offset;
+                }
+                else {
+                    advance = glyphInfo.advance;
                 }
 
                 x += advance;
                 if (advances != null) {
-                    advances[i + layoutOffset + advanceOffset] += advance;
+                    advances[i + layoutOffset] += advance;
                 }
 
                 if (i + 1 == wordCount) {
                     if (advances != null) {
-                        advances[i + layoutOffset + advanceOffset] += letterSpaceHalfRight;
+                        advances[i + layoutOffset] += letterSpaceHalfRight;
                     }
 
                     x += letterSpaceHalfRight;
@@ -204,10 +209,10 @@ namespace Unity.UIWidgets.ui {
             return x;
         }
 
-        static float _layoutEmoji(string text, int start, TextStyle style, Font font, int count, float[] advances,
-            float[] positions, int advanceOffset, float initAdvance, ref UnityEngine.Rect bounds) {
+        static float _layoutEmoji(string text, int start, int count, TextStyle style, Font font, float[] advances,
+            float[] positions, ref UnityEngine.Rect bounds) {
             var metrics = FontMetrics.fromFont(font, style.UnityFontSize);
-            float x = initAdvance;
+            float x = 0;
             for (int i = 0; i < count; i++) {
                 char c = text[start + i];
                 if (EmojiUtils.isSingleCharNonEmptyEmoji(c) || char.IsHighSurrogate(c)) {
@@ -217,7 +222,7 @@ namespace Unity.UIWidgets.ui {
 
                     x += letterSpaceHalfLeft;
                     if (advances != null) {
-                        advances[i + advanceOffset] = letterSpaceHalfLeft;
+                        advances[i] = letterSpaceHalfLeft;
                     }
 
 
@@ -235,15 +240,15 @@ namespace Unity.UIWidgets.ui {
                     x += advance;
 
                     if (advances != null) {
-                        advances[i + advanceOffset] += advance;
-                        advances[i + advanceOffset] += letterSpaceHalfRight;
+                        advances[i] += advance;
+                        advances[i] += letterSpaceHalfRight;
                     }
 
                     x += letterSpaceHalfRight;
                 }
                 else {
                     if (advances != null) {
-                        advances[i + advanceOffset] = 0;
+                        advances[i] = 0;
                     }
 
                     if (positions != null) {
@@ -284,11 +289,6 @@ namespace Unity.UIWidgets.ui {
                     bounds.yMax = maxY;
                 }
             }
-        }
-
-        public static void requireEllipsisInTexture(string text, TextStyle style) {
-            Font font = FontManager.instance.getOrCreate(style.fontFamily, style.fontWeight, style.fontStyle).font;
-            font.RequestCharactersInTextureSafe(text, style.UnityFontSize, style.UnityFontStyle);
         }
     }
 }
