@@ -2,6 +2,8 @@ using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
     static class Layout {
+        // Measure the length of the span of the text. Currently, this is only used to compute the length
+        // of ellipsis, assuming that the ellipsis does not contain any tab, tab is not considered for simplicity
         public static float measureText(string text, int start, int count, TextStyle style) {
             char startingChar = text[start];
             float totalWidth = 0;
@@ -35,9 +37,10 @@ namespace Unity.UIWidgets.ui {
             return totalWidth;
         }
         
-        public static int computeTruncateCount(string text, int start, int count, TextStyle style, float advanceLimit) {
+        public static int computeTruncateCount(float offset, string text, int start, int count, TextStyle style,
+            float advanceLimit, TabStops tabStops) {
             char startingChar = text[start];
-            float currentAdvance = 0;
+            float currentAdvance = offset;
             if (char.IsHighSurrogate(startingChar) || EmojiUtils.isSingleCharEmoji(startingChar)) {
                 float advance = style.fontSize + style.letterSpacing;
                 for (int i = 0; i < count; i++) {
@@ -54,7 +57,10 @@ namespace Unity.UIWidgets.ui {
                 Font font = FontManager.instance.getOrCreate(style.fontFamily, style.fontWeight, style.fontStyle).font;
                 for (int i = 0; i < count; i++) {
                     char ch = text[start + i];
-                    if (font.getGlyphInfo(ch, out var glyphInfo, style.UnityFontSize, style.UnityFontStyle)) {
+                    if (ch == '\t') {
+                        currentAdvance = tabStops.nextTab(currentAdvance);
+                    }
+                    else if (font.getGlyphInfo(ch, out var glyphInfo, style.UnityFontSize, style.UnityFontStyle)) {
                         currentAdvance += glyphInfo.advance + style.letterSpacing;
                     }
                     else {
@@ -64,6 +70,7 @@ namespace Unity.UIWidgets.ui {
                     if (LayoutUtils.isWordSpace(ch)) {
                         currentAdvance += style.wordSpacing;
                     }
+                    
                     if (currentAdvance > advanceLimit) {
                         return count - i;
                     }
@@ -71,11 +78,6 @@ namespace Unity.UIWidgets.ui {
             }
 
             return 0;
-        }
-
-        public static float doLayout(float offset, string text, int start, int count, float[] advances, float[] positions, TextStyle style, TabStops tabStops, out UnityEngine.Rect bounds) {
-            return _doLayout(offset, text, start, count, style, advances, positions, 0,
-                tabStops, out bounds);
         }
 
         public static void computeCharWidths(string text, int start, int count, TextStyle style, float[] advances, int advanceOffset) {
@@ -109,6 +111,11 @@ namespace Unity.UIWidgets.ui {
                     }
                 }
             }
+        }
+
+        public static float doLayout(float offset, string text, int start, int count, float[] advances, float[] positions, TextStyle style, TabStops tabStops, out UnityEngine.Rect bounds) {
+            return _doLayout(offset, text, start, count, style, advances, positions, 0,
+                tabStops, out bounds);
         }
 
         static float _doLayout(float offset, string text, int start, int count, TextStyle style,
@@ -182,7 +189,7 @@ namespace Unity.UIWidgets.ui {
 
                 float advance = glyphInfo.advance;
                 if (ch == '\t') {
-                    advance = tabStops.nextTab(initAdvance + offset) - initAdvance;
+                    advance = tabStops.nextTab(initAdvance + offset) - initAdvance - offset;
                 }
 
                 x += advance;

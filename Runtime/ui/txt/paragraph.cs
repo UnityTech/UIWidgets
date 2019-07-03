@@ -547,8 +547,8 @@ namespace Unity.UIWidgets.ui {
 
             // Find the minimum number of characters to truncate, so that the truncated text appended with ellipsis
             // is within the constraints of line width
-            int truncateCount =
-                Layout.computeTruncateCount(text, textStart, textCount, style, this._width - ellipsisWidth);
+            int truncateCount = Layout.computeTruncateCount(runXOffset, text, textStart, textCount, style, 
+                this._width - ellipsisWidth, this._tabStops);
 
             text = text.Substring(0, textStart + textCount - truncateCount) + ellipsis;
             textCount = text.Length - textStart;
