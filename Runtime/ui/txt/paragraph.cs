@@ -540,17 +540,17 @@ namespace Unity.UIWidgets.ui {
             // By now, all characters have been "RequestCharactersInTexture"d by computeLineBreaks
             // except the ellipsis, so Layout.doLayout skips calling RequestCharactersInTexture for
             // performance, and the ellipsis is handled here
-            Layout.requireEllipsisInTexture(this._paragraphStyle.ellipsis, style);
+            string ellipsis = this._paragraphStyle.ellipsis;
+            Layout.requireEllipsisInTexture(ellipsis, style);
 
-            float ellipsisWidth = Layout.measureText(runXOffset, this._paragraphStyle.ellipsis, 0,
-                this._paragraphStyle.ellipsis.Length, style, null, 0, this._tabStops);
+            float ellipsisWidth = Layout.measureText(ellipsis, 0, ellipsis.Length, style);
 
             // Find the minimum number of characters to truncate, so that the truncated text appended with ellipsis
             // is within the constraints of line width
             int truncateCount =
                 Layout.computeTruncateCount(text, textStart, textCount, style, this._width - ellipsisWidth);
 
-            text = text.Substring(0, textStart + textCount - truncateCount) + this._paragraphStyle.ellipsis;
+            text = text.Substring(0, textStart + textCount - truncateCount) + ellipsis;
             textCount = text.Length - textStart;
         }
 

@@ -2,9 +2,37 @@ using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
     static class Layout {
-        public static float measureText(float offset, string text, int start, int count, TextStyle style,
-            float[] advances, int advanceOffset, TabStops tabStops) {
-            return _doLayout(offset, text, start, count, style, advances, null, advanceOffset, tabStops, out var bounds);
+        public static float measureText(string text, int start, int count, TextStyle style) {
+            char startingChar = text[start];
+            float totalWidth = 0;
+            if (char.IsHighSurrogate(startingChar) || EmojiUtils.isSingleCharEmoji(startingChar)) {
+                float advance = style.fontSize + style.letterSpacing;
+                for (int i = 0; i < count; i++) {
+                    char ch = text[start + i];
+                    if (char.IsHighSurrogate(ch) || EmojiUtils.isSingleCharNonEmptyEmoji(ch)) {
+                        totalWidth += advance;
+                    }
+                }
+            }
+            else {
+                Font font = FontManager.instance.getOrCreate(style.fontFamily, style.fontWeight, style.fontStyle).font;
+                font.RequestCharactersInTextureSafe(text.Substring(start, count), style.UnityFontSize, style.UnityFontStyle);
+                for (int i = 0; i < count; i++) {
+                    char ch = text[start + i];
+                    if (font.getGlyphInfo(ch, out var glyphInfo, style.UnityFontSize, style.UnityFontStyle)) {
+                        totalWidth += glyphInfo.advance + style.letterSpacing;
+                    }
+                    else {
+                        totalWidth += style.letterSpacing;
+                    }
+
+                    if (LayoutUtils.isWordSpace(ch)) {
+                        totalWidth += style.wordSpacing;
+                    }
+                }
+            }
+
+            return totalWidth;
         }
         
         public static int computeTruncateCount(string text, int start, int count, TextStyle style, float advanceLimit) {
@@ -33,7 +61,9 @@ namespace Unity.UIWidgets.ui {
                         currentAdvance = style.letterSpacing;
                     }
 
-                    if (LayoutUtils.isWordSpace(ch)) currentAdvance += style.wordSpacing;
+                    if (LayoutUtils.isWordSpace(ch)) {
+                        currentAdvance += style.wordSpacing;
+                    }
                     if (currentAdvance > advanceLimit) {
                         return count - i;
                     }
@@ -74,7 +104,9 @@ namespace Unity.UIWidgets.ui {
                         advances[i + advanceOffset] = style.letterSpacing;
                     }
 
-                    if (LayoutUtils.isWordSpace(ch)) advances[i + advanceOffset] += style.wordSpacing;
+                    if (LayoutUtils.isWordSpace(ch)) {
+                        advances[i + advanceOffset] += style.wordSpacing;
+                    }
                 }
             }
         }
