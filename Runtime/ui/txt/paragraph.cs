@@ -497,7 +497,8 @@ namespace Unity.UIWidgets.ui {
             if (positions == null || positions.Length < textCount) {
                 positions = new float[textCount];
             }
-            float advance = Layout.doLayout(runXOffset, text, textStart, textCount, advances, positions, run.style, this._tabStops, out var bounds);
+            float advance = Layout.doLayout(runXOffset, text, textStart, textCount, run.style, advances, positions, 
+                0, this._tabStops, out var bounds);
 
             builder.allocRunPos(run.style, text, textStart, textCount);
             // bounds relative to first character

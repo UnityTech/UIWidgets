@@ -113,12 +113,7 @@ namespace Unity.UIWidgets.ui {
             }
         }
 
-        public static float doLayout(float offset, string text, int start, int count, float[] advances, float[] positions, TextStyle style, TabStops tabStops, out UnityEngine.Rect bounds) {
-            return _doLayout(offset, text, start, count, style, advances, positions, 0,
-                tabStops, out bounds);
-        }
-
-        static float _doLayout(float offset, string text, int start, int count, TextStyle style,
+        public static float doLayout(float offset, string text, int start, int count, TextStyle style,
             float[] advances, float[] positions, int advanceOffset, TabStops tabStops, out UnityEngine.Rect bounds) {
             float advance = 0;
             Font font = FontManager.instance.getOrCreate(style.fontFamily, style.fontWeight, style.fontStyle).font;
