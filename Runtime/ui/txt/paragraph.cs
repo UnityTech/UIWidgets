@@ -195,6 +195,7 @@ namespace Unity.UIWidgets.ui {
         float _alphabeticBaseline;
         float _ideographicBaseline;
         float[] _lineHeights;
+        int _lineCount;
         List<PaintRecord> _paintRecords = new List<PaintRecord>();
         List<CodeUnitRun> _codeUnitRuns = new List<CodeUnitRun>();
         bool _didExceedMaxLines;
@@ -211,7 +212,13 @@ namespace Unity.UIWidgets.ui {
         const float kFloatDecorationSpacing = 3.0f;
 
         public float height {
-            get { return this._lineHeights?.last() ?? 0; }
+            get {
+                if (this._lineHeights == null) {
+                    return 0;
+                }
+
+                return this._lineHeights[this.getLineCount() - 1];
+            }
         }
 
         public float minIntrinsicWidth {
@@ -524,6 +531,7 @@ namespace Unity.UIWidgets.ui {
                 }
             }
 
+            this._lineCount = lineLimit;
             this._maxIntrinsicWidth = 0;
             float lineBlockWidth = 0;
             for (int i = 0; i < this._lineWidths.Count; ++i) {
@@ -675,7 +683,7 @@ namespace Unity.UIWidgets.ui {
             }
 
             int yIndex;
-            for (yIndex = 0; yIndex < this._lineHeights.Length - 1; ++yIndex) {
+            for (yIndex = 0; yIndex < this.getLineCount() - 1; ++yIndex) {
                 if (dy < this._lineHeights[yIndex]) {
                     break;
                 }
@@ -758,7 +766,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public int getLineCount() {
-            return this._lineHeights?.Length ?? 0;
+            return this._lineCount;
         }
 
         void _computeLineBreak() {
