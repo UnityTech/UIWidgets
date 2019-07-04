@@ -25,14 +25,6 @@
             get { return this._metrics; }
         }
 
-        public float dx {
-            get { return this._dx; }
-        }
-
-        public float dy {
-            get { return this._dy; }
-        }
-
         public void shift(float x, float y) {
             this._dx += x;
             this._dy += y;

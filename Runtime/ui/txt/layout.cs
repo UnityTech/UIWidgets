@@ -97,8 +97,8 @@ namespace Unity.UIWidgets.ui {
             }
             else {
                 Font font = FontManager.instance.getOrCreate(style.fontFamily, style.fontWeight, style.fontStyle).font;
-                font.RequestCharactersInTextureSafe(text.Substring(start, count), style.UnityFontSize,
-                    style.UnityFontStyle);
+                // TODO: it is kind of a waste to require the entire string for this style, but SubString causes alloc
+                font.RequestCharactersInTextureSafe(text, style.UnityFontSize, style.UnityFontStyle);
                 for (int i = 0; i < count; i++) {
                     char ch = text[start + i];
                     if (font.getGlyphInfo(ch, out var glyphInfo, style.UnityFontSize, style.UnityFontStyle)) {
