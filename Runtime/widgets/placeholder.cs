@@ -2,15 +2,12 @@ using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
 
-namespace Unity.UIWidgets.widgets
-{
-    internal class _Placeholderpainter : AbstractCustomPainter
-    {
+namespace Unity.UIWidgets.widgets {
+    class _Placeholderpainter : AbstractCustomPainter {
         public _Placeholderpainter(
             Color color,
             float strokeWidth = 0f
-        )
-        {
+        ) {
             this.color = color;
             this.strokeWidth = strokeWidth;
         }
@@ -19,12 +16,11 @@ namespace Unity.UIWidgets.widgets
         public readonly Color color;
         public readonly float strokeWidth;
 
-        public override void paint(Canvas canvas, Size size)
-        {
+        public override void paint(Canvas canvas, Size size) {
             Paint paint = new Paint();
-            paint.color = color;
+            paint.color = this.color;
             paint.style = PaintingStyle.stroke;
-            paint.strokeWidth = strokeWidth;
+            paint.strokeWidth = this.strokeWidth;
 
             Rect rect = Offset.zero & size;
             Path path = new Path();
@@ -36,28 +32,24 @@ namespace Unity.UIWidgets.widgets
             return;
         }
 
-        public override bool shouldRepaint(CustomPainter oldPainter)
-        {
-            return ((_Placeholderpainter) oldPainter).color != color ||
-                   ((_Placeholderpainter) oldPainter).strokeWidth != strokeWidth;
+        public override bool shouldRepaint(CustomPainter oldPainter) {
+            return ((_Placeholderpainter) oldPainter).color != this.color ||
+                   ((_Placeholderpainter) oldPainter).strokeWidth != this.strokeWidth;
         }
 
-        public override bool? hitTest(Offset position)
-        {
+        public override bool? hitTest(Offset position) {
             return false;
         }
     }
 
-    public class Placeholder : StatelessWidget
-    {
+    public class Placeholder : StatelessWidget {
         public Placeholder(
             Key key = null,
             Color color = null,
             float strokeWidth = 2.0f,
             float fallbackWidth = 400.0f,
             float fallbackHeight = 400.0f
-        ) : base(key)
-        {
+        ) : base(key) {
             this.color = color ?? new Color(0xFF455A64);
             this.strokeWidth = strokeWidth;
             this.fallbackWidth = fallbackWidth;
@@ -69,16 +61,15 @@ namespace Unity.UIWidgets.widgets
         public readonly float fallbackWidth;
         public readonly float fallbackHeight;
 
-        public override Widget build(BuildContext context)
-        {
+        public override Widget build(BuildContext context) {
             return new LimitedBox(
-                maxWidth: fallbackWidth,
-                maxHeight: fallbackHeight,
+                maxWidth: this.fallbackWidth,
+                maxHeight: this.fallbackHeight,
                 child: new CustomPaint(
                     size: Size.infinite,
                     foregroundPainter: new _Placeholderpainter(
-                        color: color,
-                        strokeWidth: strokeWidth
+                        color: this.color,
+                        strokeWidth: this.strokeWidth
                     )
                 )
             );
