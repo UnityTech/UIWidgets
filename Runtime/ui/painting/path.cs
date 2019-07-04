@@ -86,10 +86,8 @@ namespace Unity.UIWidgets.ui {
             this._maxX = float.MinValue;
             this._maxY = float.MinValue;
 
-            if (this._cache != null) {
-                this._pathKey = pathGlobalKey++;
-                this._cache = null;
-            }
+            this._pathKey = pathGlobalKey++;
+            this._cache = null;
         }
 
         internal PathCache flatten(float scale) {
@@ -170,10 +168,9 @@ namespace Unity.UIWidgets.ui {
 
             this._commandx = x;
             this._commandy = y;
-            if (this._cache != null) {
-                this._pathKey = pathGlobalKey++;
-                this._cache = null;
-            }
+            
+            this._pathKey = pathGlobalKey++;
+            this._cache = null;
         }
 
         void _appendLineTo(float x, float y) {
@@ -186,10 +183,9 @@ namespace Unity.UIWidgets.ui {
 
             this._commandx = x;
             this._commandy = y;
-            if (this._cache != null) {
-                this._pathKey = pathGlobalKey++;
-                this._cache = null;
-            }
+            
+            this._pathKey = pathGlobalKey++;
+            this._cache = null;
         }
 
         void _appendBezierTo(float x1, float y1, float x2, float y2, float x3, float y3) {
@@ -208,29 +204,24 @@ namespace Unity.UIWidgets.ui {
             
             this._commandx = x3;
             this._commandy = y3;
-            if (this._cache != null) {
-                this._pathKey = pathGlobalKey++;
-                this._cache = null;
-            }
+            
+            this._pathKey = pathGlobalKey++;
+            this._cache = null;
         }
         
         void _appendClose() {
             this._commands.Add((float) PathCommand.close);
+            
             this._pathKey = pathGlobalKey++;
-            if (this._cache != null) {
-                this._pathKey = pathGlobalKey++;
-                this._cache = null;
-            }
+            this._cache = null;
         }
 
         void _appendWinding(float winding) {
             this._commands.Add((float) PathCommand.winding);
             this._commands.Add(winding);
+            
             this._pathKey = pathGlobalKey++;
-            if (this._cache != null) {
-                this._pathKey = pathGlobalKey++;
-                this._cache = null;
-            }
+            this._cache = null;
         }
 
         public void relativeMoveTo(float x, float y) {
