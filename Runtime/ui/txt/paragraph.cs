@@ -188,13 +188,13 @@ namespace Unity.UIWidgets.ui {
         ParagraphStyle _paragraphStyle;
         List<LineRange> _lineRanges = new List<LineRange>();
         List<float> _lineWidths = new List<float>();
-        List<float> _lineBaseLines = new List<float>();
+        float[] _lineBaseLines;
         GlyphLine[] _glyphLines;
         float _maxIntrinsicWidth;
         float _minIntrinsicWidth;
         float _alphabeticBaseline;
         float _ideographicBaseline;
-        List<float> _lineHeights = new List<float>();
+        float[] _lineHeights;
         List<PaintRecord> _paintRecords = new List<PaintRecord>();
         List<CodeUnitRun> _codeUnitRuns = new List<CodeUnitRun>();
         bool _didExceedMaxLines;
@@ -211,7 +211,7 @@ namespace Unity.UIWidgets.ui {
         const float kFloatDecorationSpacing = 3.0f;
 
         public float height {
-            get { return this._lineHeights.Count == 0 ? 0 : this._lineHeights.last(); }
+            get { return this._lineHeights?.last() ?? 0; }
         }
 
         public float minIntrinsicWidth {
@@ -269,12 +269,12 @@ namespace Unity.UIWidgets.ui {
             this._needsLayout = false;
             this._width = Mathf.Floor(constraints.width);
             this._paintRecords.Clear();
-            this._lineHeights.Clear();
-            this._lineBaseLines.Clear();
             this._codeUnitRuns.Clear();
 
             this._computeLineBreak();
             this._glyphLines = new GlyphLine[this._lineRanges.Count];
+            this._lineBaseLines = new float[this._lineRanges.Count];
+            this._lineHeights = new float[this._lineRanges.Count];
             int styleMaxLines = this._paragraphStyle.maxLines ?? int.MaxValue;
             this._didExceedMaxLines = this._lineRanges.Count > styleMaxLines;
 
@@ -498,9 +498,9 @@ namespace Unity.UIWidgets.ui {
                     updateLineMetrics(metrics, this._paragraphStyle.lineHeight ?? TextStyle.kDefaultHeight);
                 }
 
-                this._lineHeights.Add((this._lineHeights.Count == 0 ? 0 : this._lineHeights.last())
+                this._lineHeights[lineNumber] = ((lineNumber == 0 ? 0 : this._lineHeights[lineNumber - 1])
                                       + Mathf.Round(maxLineSpacing + maxDescent));
-                this._lineBaseLines.Add(this._lineHeights.last() - maxDescent);
+                this._lineBaseLines[lineNumber] = this._lineHeights[lineNumber] - maxDescent;
                 yOffset += Mathf.Round(maxLineSpacing + preMaxDescent);
                 preMaxDescent = maxDescent;
                 float lineXOffset = this.getLineXOffset(runXOffset);
@@ -670,12 +670,12 @@ namespace Unity.UIWidgets.ui {
         }
 
         internal PositionWithAffinity getGlyphPositionAtCoordinate(float dx, float dy) {
-            if (this._lineHeights.Count == 0) {
+            if (this._lineHeights == null) {
                 return new PositionWithAffinity(0, TextAffinity.downstream);
             }
 
             int yIndex;
-            for (yIndex = 0; yIndex < this._lineHeights.Count - 1; ++yIndex) {
+            for (yIndex = 0; yIndex < this._lineHeights.Length - 1; ++yIndex) {
                 if (dy < this._lineHeights[yIndex]) {
                     break;
                 }
@@ -758,7 +758,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public int getLineCount() {
-            return this._lineHeights.Count;
+            return this._lineHeights?.Length ?? 0;
         }
 
         void _computeLineBreak() {
