@@ -195,6 +195,7 @@ namespace Unity.UIWidgets.ui {
         float _alphabeticBaseline;
         float _ideographicBaseline;
         float[] _lineHeights;
+        GlyphPosition[] glyphPositions;
         int _lineCount;
         List<PaintRecord> _paintRecords = new List<PaintRecord>();
         List<CodeUnitRun> _codeUnitRuns = new List<CodeUnitRun>();
@@ -306,7 +307,10 @@ namespace Unity.UIWidgets.ui {
             // All text blobs share a single position buffer, which is big enough taking ellipsis into consideration
             builder.allocPos(ellipsizedLength);
             // this._glyphLines and this._codeUnitRuns will refer to this array for glyph positions
-            GlyphPosition[] glyphPositions = new GlyphPosition[ellipsizedLength];
+            if (this.glyphPositions == null || this.glyphPositions.Length < ellipsizedLength) {
+                this.glyphPositions = new GlyphPosition[ellipsizedLength];
+            }
+
             // Pointer to the glyphPositions array, to keep track of where the next glyph is stored
             int pGlyphPositions = 0;
             
@@ -423,7 +427,7 @@ namespace Unity.UIWidgets.ui {
                                 float glyphXOffset = _positionsBuffer[glyphIndex] + justifyXOffset;
                                 float glyphAdvance = _advancesBuffer[glyphIndex];
                                 builder.setPosition(glyphIndex, glyphXOffset);
-                                glyphPositions[pGlyphPositions++] = new GlyphPosition(runXOffset + glyphXOffset,
+                                this.glyphPositions[pGlyphPositions++] = new GlyphPosition(runXOffset + glyphXOffset,
                                     glyphAdvance, new Range<int>(textStart + glyphIndex, textStart + glyphIndex + 1));
                                 if (wordIndex < wordCount) {
                                     Range<int> word = _wordsBuffer[wordIndex];
@@ -444,7 +448,7 @@ namespace Unity.UIWidgets.ui {
                                         // width of this word, and update the entire word
                                         if (!float.IsNaN(wordStartPosition)) {
                                             maxWordWidth = Mathf.Max(maxWordWidth,
-                                                glyphPositions[pGlyphPositions - 1].xPos.end - wordStartPosition);
+                                                this.glyphPositions[pGlyphPositions - 1].xPos.end - wordStartPosition);
                                             wordStartPosition = float.NaN;
                                         }
                                     }
@@ -462,9 +466,9 @@ namespace Unity.UIWidgets.ui {
 
                             // Create code unit run
                             this._codeUnitRuns.Add(new CodeUnitRun(
-                                glyphPositions,
+                                this.glyphPositions,
                                 new Range<int>(start, end),
-                                new Range<float>(glyphPositions[0].xPos.start, glyphPositions.last().xPos.end),
+                                new Range<float>(this.glyphPositions[0].xPos.start, this.glyphPositions.last().xPos.end),
                                 lineNumber, TextDirection.ltr, glyphPositionStyleRunStart, textCount));
 
                             lineStyleRunIndex++;
@@ -521,9 +525,9 @@ namespace Unity.UIWidgets.ui {
                 preMaxDescent = maxDescent;
                 float lineXOffset = this.getLineXOffset(runXOffset);
                 int count = pGlyphPositions - glyphPositionLineStart;
-                if (lineXOffset != 0 && glyphPositions != null) {
+                if (lineXOffset != 0 && this.glyphPositions != null) {
                     for (int i = 0; i < count; ++i) {
-                        glyphPositions[glyphPositions.Length - i - 1].shiftSelf(lineXOffset);
+                        this.glyphPositions[this.glyphPositions.Length - i - 1].shiftSelf(lineXOffset);
                     }
                 }
 
@@ -532,7 +536,7 @@ namespace Unity.UIWidgets.ui {
                     ? this._lineRanges[lineNumber + 1].start
                     : this._text.Length;
                 this._glyphLines[lineNumber] = 
-                    new GlyphLine(glyphPositions, glyphPositionLineStart, count, nextLineStart - lineStart);
+                    new GlyphLine(this.glyphPositions, glyphPositionLineStart, count, nextLineStart - lineStart);
                 for (int i = 0; i < lineStyleRunCount; i++) {
                     var paintRecord = this._paintRecords[this._paintRecords.Count - 1 - i];
                     paintRecord.shift(lineXOffset, yOffset);
