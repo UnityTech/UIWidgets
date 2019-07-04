@@ -200,6 +200,10 @@ namespace Unity.UIWidgets.ui {
         bool _didExceedMaxLines;
         TabStops _tabStops = new TabStops();
 
+        static float[] _advancesBuffer;
+        static float[] _positionsBuffer;
+        static Range<int>[] _wordsBuffer;
+
         // private float _characterWidth;
 
         float _width;
@@ -296,10 +300,10 @@ namespace Unity.UIWidgets.ui {
             if (maxWordCount == 0) {
                 return;
             }
-            Range<int>[] words = new Range<int>[maxWordCount];
-            
-            float[] positions = null;
-            float[] advances = null;
+
+            if (_wordsBuffer == null || _wordsBuffer.Length < maxWordCount) {
+                _wordsBuffer = new Range<int>[maxWordCount];
+            }
 
             // Iterate through line ranges
             for (int lineNumber = 0; lineNumber < lineLimit; ++lineNumber) {
@@ -316,7 +320,7 @@ namespace Unity.UIWidgets.ui {
                                    // This is still not taken care of in the flutter engine.
                                    !(this._paragraphStyle.ellipsized() && this._paragraphStyle.maxLines == null);
 
-                int wordCount = this._findWords(lineRange.start, lineRange.end, words);
+                int wordCount = this._findWords(lineRange.start, lineRange.end, _wordsBuffer);
                 float wordGapWidth = !(justifyLine && wordCount > 1)
                     ? 0
                     : (this._width - this._lineWidths[lineNumber]) / (wordCount - 1);
@@ -334,12 +338,12 @@ namespace Unity.UIWidgets.ui {
                 // Allocate the advances and positions to store the layout result
                 // TODO: find a way to compute the maxTextCount for the entire paragraph, so that this allocation
                 //       happens only once
-                if (advances == null || advances.Length < maxTextCount) {
-                    advances = new float[maxTextCount];
+                if (_advancesBuffer == null || _advancesBuffer.Length < maxTextCount) {
+                    _advancesBuffer = new float[maxTextCount];
                 }
 
-                if (positions == null || positions.Length < maxTextCount) {
-                    positions = new float[maxTextCount];
+                if (_positionsBuffer == null || _positionsBuffer.Length < maxTextCount) {
+                    _positionsBuffer = new float[maxTextCount];
                 }
 
                 // Keep of the position in glyphPositions before evaluating this line
@@ -393,24 +397,24 @@ namespace Unity.UIWidgets.ui {
                             }
 
                             float advance = Layout.doLayout(runXOffset, text, textStart, textCount, style,
-                                advances, positions, this._tabStops, out var bounds);
+                                _advancesBuffer, _positionsBuffer, this._tabStops, out var bounds);
 
                             builder.allocRunPos(style, text, textStart, textCount);
                             // bounds relative to first character
-                            bounds.x -= positions[0];
+                            bounds.x -= _positionsBuffer[0];
                             builder.setBounds(bounds);
 
                             // Update the max width of the words
                             // Fill in the glyph positions, and the positions of the text blob builder
                             float wordStartPosition = float.NaN;
                             for (int glyphIndex = 0; glyphIndex < textCount; ++glyphIndex) {
-                                float glyphXOffset = positions[glyphIndex] + justifyXOffset;
-                                float glyphAdvance = advances[glyphIndex];
+                                float glyphXOffset = _positionsBuffer[glyphIndex] + justifyXOffset;
+                                float glyphAdvance = _advancesBuffer[glyphIndex];
                                 builder.setPosition(glyphIndex, glyphXOffset);
                                 glyphPositions[pGlyphPositions++] = new GlyphPosition(runXOffset + glyphXOffset,
                                     glyphAdvance, new Range<int>(textStart + glyphIndex, textStart + glyphIndex + 1));
                                 if (wordIndex < wordCount) {
-                                    Range<int> word = words[wordIndex];
+                                    Range<int> word = _wordsBuffer[wordIndex];
                                     // Run into the start of current word, record the start position of this word
                                     if (word.start == start + glyphIndex) {
                                         wordStartPosition = runXOffset + glyphXOffset;

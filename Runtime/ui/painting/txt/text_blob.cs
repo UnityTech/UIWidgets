@@ -40,7 +40,7 @@
         readonly float[] _positions;
     }
 
-    public class TextBlobBuilder {
+    public struct TextBlobBuilder {
         TextStyle _style;
         float[] _positions;
         string _text;
