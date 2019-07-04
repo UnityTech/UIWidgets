@@ -189,7 +189,7 @@ namespace Unity.UIWidgets.ui {
         List<LineRange> _lineRanges = new List<LineRange>();
         List<float> _lineWidths = new List<float>();
         List<float> _lineBaseLines = new List<float>();
-        List<GlyphLine> _glyphLines = new List<GlyphLine>();
+        GlyphLine[] _glyphLines;
         float _maxIntrinsicWidth;
         float _minIntrinsicWidth;
         float _alphabeticBaseline;
@@ -272,9 +272,9 @@ namespace Unity.UIWidgets.ui {
             this._lineHeights.Clear();
             this._lineBaseLines.Clear();
             this._codeUnitRuns.Clear();
-            this._glyphLines.Clear();
 
             this._computeLineBreak();
+            this._glyphLines = new GlyphLine[this._lineRanges.Count];
             int styleMaxLines = this._paragraphStyle.maxLines ?? int.MaxValue;
             this._didExceedMaxLines = this._lineRanges.Count > styleMaxLines;
 
@@ -296,7 +296,6 @@ namespace Unity.UIWidgets.ui {
             
             // Compute max(NumberOfWords(line) for line in lines), to determine the size of word buffers
             int maxWordCount = this._computeMaxWordCount();
-            // Nothing to layout, if no visible character at all
 
             if (_wordsBuffer == null || _wordsBuffer.Length < maxWordCount) {
                 _wordsBuffer = new Range<int>[maxWordCount < 4 ? 4 : maxWordCount];
@@ -516,8 +515,8 @@ namespace Unity.UIWidgets.ui {
                 int nextLineStart = lineNumber < this._lineRanges.Count - 1
                     ? this._lineRanges[lineNumber + 1].start
                     : this._text.Length;
-                this._glyphLines.Add(
-                    new GlyphLine(glyphPositions, glyphPositionLineStart, count, nextLineStart - lineStart));
+                this._glyphLines[lineNumber] = 
+                    new GlyphLine(glyphPositions, glyphPositionLineStart, count, nextLineStart - lineStart);
                 for (int i = 0; i < lineStyleRunCount; i++) {
                     var paintRecord = this._paintRecords[this._paintRecords.Count - 1 - i];
                     paintRecord.shift(lineXOffset, yOffset);
@@ -684,7 +683,10 @@ namespace Unity.UIWidgets.ui {
 
             GlyphLine glyphLine = this._glyphLines[yIndex];
             if (glyphLine.count == 0) {
-                int lineStartIndex = this._glyphLines.Where((g, i) => i < yIndex).Sum((gl) => gl.totalCountUnits);
+                int lineStartIndex = 0;
+                for (int i = 0; i < yIndex; i++) {
+                    lineStartIndex += this._glyphLines[i].totalCountUnits;
+                }
                 return new PositionWithAffinity(lineStartIndex, TextAffinity.downstream);
             }
 
