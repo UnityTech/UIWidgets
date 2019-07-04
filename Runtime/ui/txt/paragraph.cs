@@ -297,12 +297,9 @@ namespace Unity.UIWidgets.ui {
             // Compute max(NumberOfWords(line) for line in lines), to determine the size of word buffers
             int maxWordCount = this._computeMaxWordCount();
             // Nothing to layout, if no visible character at all
-            if (maxWordCount == 0) {
-                return;
-            }
 
             if (_wordsBuffer == null || _wordsBuffer.Length < maxWordCount) {
-                _wordsBuffer = new Range<int>[maxWordCount];
+                _wordsBuffer = new Range<int>[maxWordCount < 4 ? 4 : maxWordCount];
             }
 
             // Iterate through line ranges
