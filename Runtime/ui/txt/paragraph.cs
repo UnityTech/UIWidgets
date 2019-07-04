@@ -279,9 +279,18 @@ namespace Unity.UIWidgets.ui {
             this._codeUnitRuns.Clear();
 
             this._computeLineBreak();
-            this._glyphLines = new GlyphLine[this._lineRanges.Count];
-            this._lineBaseLines = new float[this._lineRanges.Count];
-            this._lineHeights = new float[this._lineRanges.Count];
+            if (this._glyphLines == null || this._glyphLines.Length < this._lineRanges.Count) {
+                this._glyphLines = new GlyphLine[this._lineRanges.Count];
+            }
+
+            if (this._lineBaseLines == null || this._lineBaseLines.Length < this._lineRanges.Count) {
+                this._lineBaseLines = new float[this._lineRanges.Count];
+            }
+
+            if (this._lineHeights == null || this._lineHeights.Length < this._lineRanges.Count) {
+                this._lineHeights = new float[this._lineRanges.Count];
+            }
+
             int styleMaxLines = this._paragraphStyle.maxLines ?? int.MaxValue;
             this._didExceedMaxLines = this._lineRanges.Count > styleMaxLines;
 
