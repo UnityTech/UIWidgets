@@ -60,7 +60,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public static FontMetrics fromFont(Font font, int fontSize) {
-            if (fontSize == _previousFontSize && font == _previousFont) {
+            if (fontSize == _previousFontSize && ReferenceEquals(font, _previousFont)) {
                 return _previousFontMetrics;
             }
 
@@ -441,6 +441,7 @@ namespace Unity.UIWidgets.ui {
                             var metrics = FontMetrics.fromFont(font, style.UnityFontSize);
                             PaintRecord paintRecord = new PaintRecord(style, runXOffset, 0, builder.make(),
                                 metrics, advance);
+                            this._paintRecords.Add(paintRecord);
                             runXOffset += advance;
 
                             // Create code unit run
@@ -450,7 +451,6 @@ namespace Unity.UIWidgets.ui {
                                 new Range<float>(glyphPositions[0].xPos.start, glyphPositions.last().xPos.end),
                                 lineNumber, TextDirection.ltr, glyphPositionStyleRunStart, textCount));
 
-                            this._paintRecords.Add(paintRecord);
                             lineStyleRunIndex++;
                         }
 
