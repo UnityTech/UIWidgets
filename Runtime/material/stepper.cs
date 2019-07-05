@@ -81,29 +81,28 @@ namespace Unity.UIWidgets.material {
         }
     }
 
-    public class _StepperState : TickerProviderStateMixin<Stepper> {
-        readonly TextStyle _kStepStyleLight = new TextStyle(
+    class _StepperState : TickerProviderStateMixin<Stepper> {
+        static readonly TextStyle _kStepStyleLight = new TextStyle(
             fontSize: 12.0f,
             color: Colors.white
         );
 
-        readonly TextStyle _kStepStyleDark = new TextStyle(
+        static readonly TextStyle _kStepStyleDark = new TextStyle(
             fontSize: 12.0f,
             color: Colors.black87
         );
 
-        readonly Color _kErrorLight = Colors.red;
-        readonly Color _kErrorDark = Colors.red.shade400;
-        readonly Color _kCircleActiveLight = Colors.white;
-        readonly Color _kCircleActiveDark = Colors.black87;
-        readonly Color _kDisabledLight = Colors.black38;
-        readonly Color _kDisabledDark = Colors.white30;
-        readonly float _kStepSize = 24.0f;
-        readonly float _kTriangleHeight = 24.0f * 0.866025f;
+        static readonly Color _kErrorLight = Colors.red;
+        static readonly Color _kErrorDark = Colors.red.shade400;
+        static readonly Color _kCircleActiveLight = Colors.white;
+        static readonly Color _kCircleActiveDark = Colors.black87;
+        static readonly Color _kDisabledLight = Colors.black38;
+        static readonly Color _kDisabledDark = Colors.white30;
+        static readonly float _kStepSize = 24.0f;
+        static readonly float _kTriangleHeight = 24.0f * 0.866025f;
 
         List<GlobalKey> _keys;
-        public Dictionary<int, StepState> _oldStates = new Dictionary<int, StepState>();
-
+        Dictionary<int, StepState> _oldStates = new Dictionary<int, StepState>();
 
         public override void initState() {
             base.initState();
@@ -157,24 +156,24 @@ namespace Unity.UIWidgets.material {
                 case StepState.disabled:
                     return new Text(
                         (index + 1).ToString(),
-                        style: isDarkActive ? this._kStepStyleDark : this._kStepStyleLight
+                        style: isDarkActive ? _kStepStyleDark : _kStepStyleLight
                     );
                 case StepState.editing:
                     return new Icon(
                         Icons.edit,
-                        color: isDarkActive ? this._kCircleActiveDark : this._kCircleActiveLight,
+                        color: isDarkActive ? _kCircleActiveDark : _kCircleActiveLight,
                         size: 18.0f
                     );
                 case StepState.complete:
                     return new Icon(
                         Icons.check,
-                        color: isDarkActive ? this._kCircleActiveDark : this._kCircleActiveLight,
+                        color: isDarkActive ? _kCircleActiveDark : _kCircleActiveLight,
                         size: 18.0f
                     );
                 case StepState.error:
                     return new Text(
                         "!",
-                        style: this._kStepStyleLight
+                        style: _kStepStyleLight
                     );
             }
 
@@ -194,8 +193,8 @@ namespace Unity.UIWidgets.material {
         Widget _buildCircle(int index, bool oldState) {
             return new Container(
                 margin: EdgeInsets.symmetric(vertical: 8.0f),
-                width: this._kStepSize,
-                height: this._kStepSize,
+                width: _kStepSize,
+                height: _kStepSize,
                 child: new AnimatedContainer(
                     curve: Curves.fastOutSlowIn,
                     duration: ThemeUtils.kThemeAnimationDuration,
@@ -215,15 +214,15 @@ namespace Unity.UIWidgets.material {
         Widget _buildTriangle(int index, bool oldState) {
             return new Container(
                 margin: EdgeInsets.symmetric(vertical: 8.0f),
-                width: this._kStepSize,
-                height: this._kStepSize,
+                width: _kStepSize,
+                height: _kStepSize,
                 child: new Center(
                     child: new SizedBox(
-                        width: this._kStepSize,
-                        height: this._kTriangleHeight,
+                        width: _kStepSize,
+                        height: _kTriangleHeight,
                         child: new CustomPaint(
                             painter: new _TrianglePainter(
-                                color: this._isDark() ? this._kErrorDark : this._kErrorLight),
+                                color: this._isDark() ? _kErrorDark : _kErrorLight),
                             child: new Align(
                                 alignment: new Alignment(0.0f, 0.8f),
                                 child: this._buildCircleChild(index,
@@ -298,7 +297,7 @@ namespace Unity.UIWidgets.material {
                                 child: new Text(localizations.continueButtonLabel)
                             ),
                             new Container(
-                                margin: EdgeInsets.only(8.0f), // EdgeInsetsDirection
+                                margin: EdgeInsets.only(8.0f),
                                 child: new FlatButton(
                                     onPressed: this.widget.onStepCancel,
                                     textColor: cancelColor,
@@ -323,11 +322,11 @@ namespace Unity.UIWidgets.material {
                     return textTheme.body2;
                 case StepState.disabled:
                     return textTheme.body2.copyWith(
-                        color: this._isDark() ? this._kDisabledDark : this._kDisabledLight
+                        color: this._isDark() ? _kDisabledDark : _kDisabledLight
                     );
                 case StepState.error:
                     return textTheme.body2.copyWith(
-                        color: this._isDark() ? this._kErrorDark : this._kErrorLight
+                        color: this._isDark() ? _kErrorDark : _kErrorLight
                     );
             }
 
@@ -345,11 +344,11 @@ namespace Unity.UIWidgets.material {
                     return textTheme.caption;
                 case StepState.disabled:
                     return textTheme.caption.copyWith(
-                        color: this._isDark() ? this._kDisabledDark : this._kDisabledLight
+                        color: this._isDark() ? _kDisabledDark : _kDisabledLight
                     );
                 case StepState.error:
                     return textTheme.caption.copyWith(
-                        color: this._isDark() ? this._kErrorDark : this._kErrorLight
+                        color: this._isDark() ? _kErrorDark : _kErrorLight
                     );
             }
 
@@ -400,7 +399,7 @@ namespace Unity.UIWidgets.material {
                             }
                         ),
                         new Container(
-                            margin: EdgeInsets.only(12.0f), // EdgeInsetsDirectional
+                            margin: EdgeInsets.only(12.0f),
                             child: this._buildheaderText(index)
                         )
                     }
@@ -411,7 +410,7 @@ namespace Unity.UIWidgets.material {
         Widget _buildVerticalBody(int index) {
             return new Stack(
                 children: new List<Widget> {
-                    new Positioned( // PositionedDirectional
+                    new Positioned(
                         left: 24.0f,
                         top: 0.0f,
                         bottom: 0.0f,
@@ -510,7 +509,7 @@ namespace Unity.UIWidgets.material {
                                     child: new Center(child: this._buildIcon(_i))
                                 ),
                                 new Container(
-                                    margin: EdgeInsets.only(left: 12.0f), // EdgeinsetsDirectional
+                                    margin: EdgeInsets.only(left: 12.0f),
                                     child: this._buildheaderText(_i)
                                 )
                             }
@@ -578,8 +577,7 @@ namespace Unity.UIWidgets.material {
                     return this._buildHorizontal();
             }
 
-
-            return new Text("Build Failed");
+            return null;
         }
     }
 
