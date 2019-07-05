@@ -95,15 +95,32 @@ namespace Unity.UIWidgets.ui {
 
         static LineBreaker _instance;
 
-        public static List<int> newLinePositions {
-            get {
-                if (_newLinePositions == null)
-                    _newLinePositions = new List<int>();
-                return _newLinePositions;
+        public static int[] newLinePositions(string text, out int count) {
+            count = 0;
+            for (var i = 0; i < text.Length; i++) {
+                if (text[i] == '\n') {
+                    count++;
+                }
             }
+
+            count++;
+
+            if (_newLinePositions == null || _newLinePositions.Length < count) {
+                _newLinePositions = new int[count];
+            }
+
+            count = 0;
+            for (var i = 0; i < text.Length; i++) {
+                if (text[i] == '\n') {
+                    _newLinePositions[count++] = i;
+                }
+            }
+            _newLinePositions[count++] = text.Length;
+
+            return _newLinePositions;
         }
 
-        static List<int> _newLinePositions;
+        static int[] _newLinePositions;
 
         TextBuff _textBuf;
         float[] _charWidths;

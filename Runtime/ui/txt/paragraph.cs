@@ -807,13 +807,12 @@ namespace Unity.UIWidgets.ui {
                 ? this._paragraphStyle.maxLines ?? 1
                 : this._paragraphStyle.maxLines ?? 0;
 
-            var newLinePositions = LineBreaker.newLinePositions;
-            this._computeNewLinePositions(newLinePositions);
+            var newLinePositions = LineBreaker.newLinePositions(this._text, out int newLineCount);
 
             var lineBreaker = LineBreaker.instance;
             int runIndex = 0;
             int countRuns = 0;
-            for (var newlineIndex = 0; newlineIndex < newLinePositions.Count; ++newlineIndex) {
+            for (var newlineIndex = 0; newlineIndex < newLineCount; ++newlineIndex) {
                 if (lineLimit != 0 && this._lineRanges.Count >= lineLimit) {
                     break;
                 }
@@ -908,17 +907,6 @@ namespace Unity.UIWidgets.ui {
                     lineEndExcludingWhitespace, lineEndIncludingNewline, hardBreak));
                 this._lineWidths.Add(widths[i]);
             }
-        }
-
-        void _computeNewLinePositions(List<int> newLinePositions) {
-            newLinePositions.Clear();
-            for (var i = 0; i < this._text.Length; i++) {
-                if (this._text[i] == '\n') {
-                    newLinePositions.Add(i);
-                }
-            }
-
-            newLinePositions.Add(this._text.Length);
         }
 
         int _computeMaxWordCount() {
