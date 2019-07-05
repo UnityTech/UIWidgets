@@ -1,6 +1,6 @@
 
 namespace Unity.UIWidgets.ui {
-    class WordBreaker {
+    struct WordBreaker {
         public const uint U16_SURROGATE_OFFSET = ((0xd800 << 10) + 0xdc00 - 0x10000);
         TextBuff _text;
         int _current;

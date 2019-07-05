@@ -15,17 +15,6 @@ namespace Unity.UIWidgets.ui {
 
         const int kTabSpaceCount = 4;
 
-        List<int> _stops = new List<int>();
-
-        public void set(List<int> stops, int tabWidth) {
-            this._stops.Clear();
-            if (stops != null) {
-                this._stops.AddRange(stops);
-            }
-
-            this._tabWidth = tabWidth;
-        }
-
         public void setFont(Font font, int size) {
             if (this._font != font || this._fontSize != size) {
                 this._tabWidth = int.MaxValue;
@@ -42,12 +31,6 @@ namespace Unity.UIWidgets.ui {
         }
 
         public float nextTab(float widthSoFar) {
-            for (int i = 0; i < this._stops.Count; i++) {
-                if (this._stops[i] > widthSoFar) {
-                    return this._stops[i];
-                }
-            }
-
             if (this._tabWidth == int.MaxValue) {
                 if (this._fontSize > 0) {
                     this._tabWidth = this._spaceAdvance * kTabSpaceCount;
