@@ -77,6 +77,14 @@ namespace Unity.UIWidgets.ui {
         const float ScoreInfty = float.MaxValue;
         const float ScoreDesperate = 1e10f;
 
+        int _lineLimit = 0;
+
+        // Limit number of lines, 0 means no limit
+        public int lineLimit {
+            get { return this._lineLimit; }
+            set { this._lineLimit = value; }
+        }
+
         public static LineBreaker instance {
             get {
                 if(_instance == null)
@@ -291,8 +299,10 @@ namespace Unity.UIWidgets.ui {
         }
 
         void _pushBreak(int offset, float width) {
-            this._breaks.Add(offset);
-            this._widths.Add(width);
+            if (this.lineLimit == 0 || this._breaks.Count < this.lineLimit) {
+                this._breaks.Add(offset);
+                this._widths.Add(width);
+            }
         }
     }
 }

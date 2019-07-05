@@ -197,8 +197,10 @@ namespace Unity.UIWidgets.ui {
         float[] _lineHeights;
         GlyphPosition[] glyphPositions;
         int _lineCount;
-        List<PaintRecord> _paintRecords = new List<PaintRecord>();
-        List<CodeUnitRun> _codeUnitRuns = new List<CodeUnitRun>();
+        PaintRecord[] _paintRecords;
+        CodeUnitRun[] _codeUnitRuns;
+        int _paintRecordsCount;
+        int _codeUnitRunsCount;
         bool _didExceedMaxLines;
         TabStops _tabStops = new TabStops();
 
@@ -248,11 +250,13 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void paint(Canvas canvas, Offset offset) {
-            foreach (var paintRecord in this._paintRecords) {
+            for (int i = 0; i < this._paintRecordsCount; i++) {
+                var paintRecord = this._paintRecords[i];
                 this.paintBackground(canvas, paintRecord, offset);
             }
 
-            foreach (var paintRecord in this._paintRecords) {
+            for (int i = 0; i < this._paintRecordsCount; i++) {
+                var paintRecord = this._paintRecords[i];
                 var paint = new Paint {
                     filterMode = FilterMode.Bilinear,
                     color = paintRecord.style.color
@@ -276,10 +280,9 @@ namespace Unity.UIWidgets.ui {
 
             this._needsLayout = false;
             this._width = Mathf.Floor(constraints.width);
-            this._paintRecords.Clear();
-            this._codeUnitRuns.Clear();
 
-            this._computeLineBreak();
+            int lineStyleRunsCount = this._computeLineBreak();
+            
             if (this._glyphLines == null || this._glyphLines.Length < this._lineRanges.Count) {
                 this._glyphLines = new GlyphLine[this._lineRanges.Count];
             }
@@ -291,6 +294,18 @@ namespace Unity.UIWidgets.ui {
             if (this._lineHeights == null || this._lineHeights.Length < this._lineRanges.Count) {
                 this._lineHeights = new float[this._lineRanges.Count];
             }
+
+            if (this._paintRecords == null || this._paintRecords.Length < lineStyleRunsCount) {
+                this._paintRecords = new PaintRecord[lineStyleRunsCount];
+            }
+            
+            this._paintRecordsCount = 0;
+
+            if (this._codeUnitRuns == null || this._codeUnitRuns.Length < lineStyleRunsCount) {
+                this._codeUnitRuns = new CodeUnitRun[lineStyleRunsCount];
+            }
+
+            this._codeUnitRunsCount = 0;
 
             int styleMaxLines = this._paragraphStyle.maxLines ?? int.MaxValue;
             this._didExceedMaxLines = this._lineRanges.Count > styleMaxLines;
@@ -461,15 +476,16 @@ namespace Unity.UIWidgets.ui {
                             var metrics = FontMetrics.fromFont(font, style.UnityFontSize);
                             PaintRecord paintRecord = new PaintRecord(style, runXOffset, 0, builder.make(),
                                 metrics, advance);
-                            this._paintRecords.Add(paintRecord);
+                            this._paintRecords[this._paintRecordsCount++] = paintRecord;
                             runXOffset += advance;
 
                             // Create code unit run
-                            this._codeUnitRuns.Add(new CodeUnitRun(
+                            CodeUnitRun codeUnitRun = new CodeUnitRun(
                                 this.glyphPositions,
                                 new Range<int>(start, end),
                                 new Range<float>(this.glyphPositions[0].xPos.start, this.glyphPositions.last().xPos.end),
-                                lineNumber, TextDirection.ltr, glyphPositionStyleRunStart, textCount));
+                                lineNumber, TextDirection.ltr, glyphPositionStyleRunStart, textCount);
+                            this._codeUnitRuns[this._codeUnitRunsCount++] = codeUnitRun;
 
                             lineStyleRunIndex++;
                         }
@@ -504,7 +520,7 @@ namespace Unity.UIWidgets.ui {
 
                 if (lineStyleRunCount != 0) {
                     for (int i = 0; i < lineStyleRunCount; i++) {
-                        var paintRecord = this._paintRecords[this._paintRecords.Count - i - 1];
+                        var paintRecord = this._paintRecords[this._paintRecordsCount - i - 1];
                         updateLineMetrics(paintRecord.metrics, paintRecord.style.height);
                     }
                 }
@@ -538,9 +554,9 @@ namespace Unity.UIWidgets.ui {
                 this._glyphLines[lineNumber] = 
                     new GlyphLine(this.glyphPositions, glyphPositionLineStart, count, nextLineStart - lineStart);
                 for (int i = 0; i < lineStyleRunCount; i++) {
-                    var paintRecord = this._paintRecords[this._paintRecords.Count - 1 - i];
+                    var paintRecord = this._paintRecords[this._paintRecordsCount - 1 - i];
                     paintRecord.shift(lineXOffset, yOffset);
-                    this._paintRecords[this._paintRecords.Count - 1 - i] = paintRecord;
+                    this._paintRecords[this._paintRecordsCount - 1 - i] = paintRecord;
                 }
             }
 
@@ -782,17 +798,25 @@ namespace Unity.UIWidgets.ui {
             return this._lineCount;
         }
 
-        void _computeLineBreak() {
+        int _computeLineBreak() {
             this._lineRanges.Clear();
             this._lineWidths.Clear();
             this._maxIntrinsicWidth = 0;
+
+            int lineLimit = this._paragraphStyle.ellipsized()
+                ? this._paragraphStyle.maxLines ?? 1
+                : this._paragraphStyle.maxLines ?? 0;
 
             var newLinePositions = LineBreaker.newLinePositions;
             this._computeNewLinePositions(newLinePositions);
 
             var lineBreaker = LineBreaker.instance;
             int runIndex = 0;
+            int countRuns = 0;
             for (var newlineIndex = 0; newlineIndex < newLinePositions.Count; ++newlineIndex) {
+                if (lineLimit != 0 && this._lineRanges.Count >= lineLimit) {
+                    break;
+                }
                 var blockStart = newlineIndex > 0 ? newLinePositions[newlineIndex - 1] + 1 : 0;
                 var blockEnd = newLinePositions[newlineIndex];
                 var blockSize = blockEnd - blockStart;
@@ -800,15 +824,22 @@ namespace Unity.UIWidgets.ui {
                     this._addEmptyLine(blockStart, blockEnd);
                     continue;
                 }
+                if (lineLimit != 0 && this._lineRanges.Count >= lineLimit) {
+                    break;
+                }
 
-                this._resetLineBreaker(lineBreaker, blockStart, blockSize);
-                runIndex = this._addStyleRuns(lineBreaker, runIndex, blockStart, blockEnd);
+                this._resetLineBreaker(lineBreaker, blockStart, blockSize, 
+                    lineLimit == 0 ? 0 : lineLimit - this._lineRanges.Count);
+                countRuns += this._addStyleRuns(lineBreaker, ref runIndex, blockStart, blockEnd);
 
                 int breaksCount = lineBreaker.computeBreaks();
-                this._updateBreaks(lineBreaker, breaksCount, blockStart);
+                countRuns += breaksCount - 1;
+                this._updateBreaks(lineBreaker, breaksCount, blockStart, blockEnd);
 
                 lineBreaker.finish();
             }
+
+            return countRuns;
         }
 
         void _addEmptyLine(int blockStart, int blockEnd) {
@@ -817,21 +848,27 @@ namespace Unity.UIWidgets.ui {
             this._lineWidths.Add(0);
         }
 
-        void _resetLineBreaker(LineBreaker lineBreaker, int blockStart, int blockSize) {
+        void _resetLineBreaker(LineBreaker lineBreaker, int blockStart, int blockSize, int lineLimit) {
             lineBreaker.setLineWidth(this._width);
             lineBreaker.resize(blockSize);
             lineBreaker.setTabStops(this._tabStops);
             lineBreaker.setText(this._text, blockStart, blockSize);
+            lineBreaker.lineLimit = lineLimit;
         }
 
-        int _addStyleRuns(LineBreaker lineBreaker, int runIndex, int blockStart, int blockEnd) {
+        int _addStyleRuns(LineBreaker lineBreaker, ref int runIndex, int blockStart, int blockEnd) {
+            int countRuns = 0;
             while (runIndex < this._runs.size) {
                 var run = this._runs.getRun(runIndex);
                 if (run.start >= blockEnd) {
                     break;
                 }
 
-                if (run.end < blockStart) {
+                if (lineBreaker.lineLimit != 0 && lineBreaker.getBreaks().Count >= lineBreaker.lineLimit) {
+                    break;
+                }
+
+                if (run.end <= blockStart) {
                     runIndex++;
                     continue;
                 }
@@ -839,6 +876,7 @@ namespace Unity.UIWidgets.ui {
                 int runStart = Mathf.Max(run.start, blockStart) - blockStart;
                 int runEnd = Mathf.Min(run.end, blockEnd) - blockStart;
                 lineBreaker.addStyleRun(run.style, runStart, runEnd);
+                countRuns++;
 
                 if (run.end > blockEnd) {
                     break;
@@ -847,17 +885,17 @@ namespace Unity.UIWidgets.ui {
                 runIndex++;
             }
 
-            return runIndex;
+            return countRuns;
         }
 
-        void _updateBreaks(LineBreaker lineBreaker, int breaksCount, int blockStart) {
+        void _updateBreaks(LineBreaker lineBreaker, int breaksCount, int blockStart, int blockEnd) {
             List<int> breaks = lineBreaker.getBreaks();
             List<float> widths = lineBreaker.getWidths();
             for (int i = 0; i < breaksCount; ++i) {
                 var breakStart = i > 0 ? breaks[i - 1] : 0;
                 var lineStart = breakStart + blockStart;
                 var lineEnd = breaks[i] + blockStart;
-                bool hardBreak = i == breaksCount - 1;
+                bool hardBreak = lineEnd == blockEnd;
                 var lineEndIncludingNewline =
                     hardBreak && lineEnd < this._text.Length ? lineEnd + 1 : lineEnd;
                 var lineEndExcludingWhitespace = lineEnd;
