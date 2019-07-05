@@ -101,7 +101,7 @@ namespace Unity.UIWidgets.gestures {
         Offset _longPressOrigin;
 
         TimeSpan? _longPressStartTimestamp;
-        
+
         public GestureLongPressDragStartCallback onLongPressStart;
 
         public GestureLongPressDragUpdateCallback onLongPressDragUpdate;
