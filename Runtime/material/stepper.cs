@@ -102,7 +102,7 @@ namespace Unity.UIWidgets.material {
         static readonly float _kTriangleHeight = 24.0f * 0.866025f;
 
         List<GlobalKey> _keys;
-        Dictionary<int, StepState> _oldStates = new Dictionary<int, StepState>();
+        readonly Dictionary<int, StepState> _oldStates = new Dictionary<int, StepState>();
 
         public override void initState() {
             base.initState();
