@@ -235,7 +235,10 @@ namespace Unity.UIWidgets.widgets {
                 gestures[typeof(LongPressGestureRecognizer)] =
                     new GestureRecognizerFactoryWithHandlers<LongPressGestureRecognizer>(
                         () => new LongPressGestureRecognizer(debugOwner: this),
-                        instance => { instance.onLongPress = this.onLongPress; }
+                        instance => {
+                            instance.onLongPress = this.onLongPress;
+                            instance.onLongPressUp = this.onLongPressUp;
+                        }
                     );
             }
 
