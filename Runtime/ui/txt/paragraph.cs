@@ -188,7 +188,7 @@ namespace Unity.UIWidgets.ui {
         ParagraphStyle _paragraphStyle;
         List<LineRange> _lineRanges = new List<LineRange>();
         List<float> _lineWidths = new List<float>();
-        float[] _lineBaseLines;
+        // float[] _lineBaseLines;
         GlyphLine[] _glyphLines;
         float _maxIntrinsicWidth;
         float _minIntrinsicWidth;
@@ -287,9 +287,9 @@ namespace Unity.UIWidgets.ui {
                 this._glyphLines = new GlyphLine[this._lineRanges.Count];
             }
 
-            if (this._lineBaseLines == null || this._lineBaseLines.Length < this._lineRanges.Count) {
-                this._lineBaseLines = new float[this._lineRanges.Count];
-            }
+            // if (this._lineBaseLines == null || this._lineBaseLines.Length < this._lineRanges.Count) {
+            //     this._lineBaseLines = new float[this._lineRanges.Count];
+            // }
 
             if (this._lineHeights == null || this._lineHeights.Length < this._lineRanges.Count) {
                 this._lineHeights = new float[this._lineRanges.Count];
@@ -536,7 +536,7 @@ namespace Unity.UIWidgets.ui {
 
                 this._lineHeights[lineNumber] = ((lineNumber == 0 ? 0 : this._lineHeights[lineNumber - 1])
                                       + Mathf.Round(maxLineSpacing + maxDescent));
-                this._lineBaseLines[lineNumber] = this._lineHeights[lineNumber] - maxDescent;
+                // this._lineBaseLines[lineNumber] = this._lineHeights[lineNumber] - maxDescent;
                 yOffset += Mathf.Round(maxLineSpacing + preMaxDescent);
                 preMaxDescent = maxDescent;
                 float lineXOffset = this.getLineXOffset(runXOffset);
@@ -863,7 +863,7 @@ namespace Unity.UIWidgets.ui {
                     break;
                 }
 
-                if (lineBreaker.lineLimit != 0 && lineBreaker.getBreaks().Count >= lineBreaker.lineLimit) {
+                if (lineBreaker.lineLimit != 0 && lineBreaker.getBreaksCount() >= lineBreaker.lineLimit) {
                     break;
                 }
 
@@ -888,12 +888,10 @@ namespace Unity.UIWidgets.ui {
         }
 
         void _updateBreaks(LineBreaker lineBreaker, int breaksCount, int blockStart, int blockEnd) {
-            List<int> breaks = lineBreaker.getBreaks();
-            List<float> widths = lineBreaker.getWidths();
             for (int i = 0; i < breaksCount; ++i) {
-                var breakStart = i > 0 ? breaks[i - 1] : 0;
+                var breakStart = i > 0 ? lineBreaker.getBreak(i - 1) : 0;
                 var lineStart = breakStart + blockStart;
-                var lineEnd = breaks[i] + blockStart;
+                var lineEnd = lineBreaker.getBreak(i) + blockStart;
                 bool hardBreak = lineEnd == blockEnd;
                 var lineEndIncludingNewline =
                     hardBreak && lineEnd < this._text.Length ? lineEnd + 1 : lineEnd;
@@ -905,7 +903,7 @@ namespace Unity.UIWidgets.ui {
 
                 this._lineRanges.Add(new LineRange(lineStart, lineEnd,
                     lineEndExcludingWhitespace, lineEndIncludingNewline, hardBreak));
-                this._lineWidths.Add(widths[i]);
+                this._lineWidths.Add(lineBreaker.getWidth(i));
             }
         }
 

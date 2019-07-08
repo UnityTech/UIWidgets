@@ -108,7 +108,9 @@ namespace Unity.UIWidgets.ui {
         TextBuff _textBuf;
         float[] _charWidths;
         List<int> _breaks = new List<int>();
+        int _breaksCount = 0;
         List<float> _widths = new List<float>();
+        int _widthsCount = 0;
         WordBreaker _wordBreaker = new WordBreaker();
         float _width = 0.0f;
         float _preBreak;
@@ -120,19 +122,28 @@ namespace Unity.UIWidgets.ui {
         TabStops _tabStops;
         int mFirstTabIndex;
         List<Candidate> _candidates = new List<Candidate>();
+        int _candidatesCount = 0;
         
         public int computeBreaks() {
-            int nCand = this._candidates.Count;
+            int nCand = this._candidatesCount;
             if (nCand > 0 && (nCand == 1 || this._lastBreak != nCand - 1)) {
-                var cand = this._candidates.last();
+                var cand = this._candidates[this._candidatesCount - 1];
                 this._pushBreak(cand.offset, (cand.postBreak - this._preBreak));
             }
 
-            return this._breaks.Count;
+            return this._breaksCount;
         }
 
-        public List<int> getBreaks() {
-            return this._breaks;
+        public int getBreaksCount() {
+            return this._breaksCount;
+        }
+
+        public int getBreak(int i) {
+            return this._breaks[i];
+        }
+
+        public float getWidth(int i) {
+            return this._widths[i];
         }
 
         public void resize(int size) {
@@ -145,11 +156,11 @@ namespace Unity.UIWidgets.ui {
             this._textBuf = new TextBuff(text, textOffset, textLength);
             this._wordBreaker.setText(this._textBuf);
             this._wordBreaker.next();
-            this._candidates.Clear();
+            this._candidatesCount = 0;
             Candidate can = new Candidate {
                 offset = 0, postBreak = 0, preBreak = 0, postSpaceCount = 0, preSpaceCount = 0, pre = 0
             };
-            this._candidates.Add(can);
+            this._addCandidateToList(can);
             this._lastBreak = 0;
             this._bestBreak = 0;
             this._bestScore = ScoreInfty;
@@ -208,14 +219,14 @@ namespace Unity.UIWidgets.ui {
         public void finish() {
             this._wordBreaker.finish();
             this._width = 0;
-            this._candidates.Clear();
-            this._widths.Clear();
-            this._breaks.Clear();
+            this._candidatesCount = 0;
+            this._breaksCount = 0;
+            this._widthsCount = 0;
             this._textBuf = default;
         }
 
-        public List<float> getWidths() {
-            return this._widths;
+        public int getWidthsCount() {
+            return this._widthsCount;
         }
 
         public void setTabStops(TabStops tabStops) {
@@ -225,7 +236,7 @@ namespace Unity.UIWidgets.ui {
         void _addWordBreak(int offset, float preBreak, float postBreak, int preSpaceCount, int postSpaceCount,
             float penalty) {
             
-            float width = this._candidates.last().preBreak;
+            float width = this._candidates[this._candidatesCount - 1].preBreak;
             if (postBreak - width > this._lineWidth) {
                 this._addCandidatesInsideWord(width, offset, postSpaceCount);
             }
@@ -241,7 +252,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         void _addCandidatesInsideWord(float width, int offset, int postSpaceCount) {
-            int i = this._candidates.last().offset;
+            int i = this._candidates[this._candidatesCount - 1].offset;
             width += this._charWidths[i++];
             for (; i < offset; i++) {
                 float w = this._charWidths[i];
@@ -259,10 +270,19 @@ namespace Unity.UIWidgets.ui {
             }
         }
 
+        void _addCandidateToList(Candidate cand) {
+            if (this._candidates.Count == this._candidatesCount) {
+                this._candidates.Add(cand);
+                this._candidatesCount++;
+            }
+            else {
+                this._candidates[this._candidatesCount++] = cand;
+            }
+        }
 
         void _addCandidate(Candidate cand) {
-            int candIndex = this._candidates.Count;
-            this._candidates.Add(cand);
+            int candIndex = this._candidatesCount;
+            this._addCandidateToList(cand);
             if (cand.postBreak - this._preBreak > this._lineWidth) {
                 if (this._bestBreak == this._lastBreak) {
                     this._bestBreak = candIndex;
@@ -299,9 +319,22 @@ namespace Unity.UIWidgets.ui {
         }
 
         void _pushBreak(int offset, float width) {
-            if (this.lineLimit == 0 || this._breaks.Count < this.lineLimit) {
-                this._breaks.Add(offset);
-                this._widths.Add(width);
+            if (this.lineLimit == 0 || this._breaksCount < this.lineLimit) {
+                if (this._breaks.Count == this._breaksCount) {
+                    this._breaks.Add(offset);
+                    this._breaksCount++;
+                }
+                else {
+                    this._breaks[this._breaksCount++] = offset;
+                }
+
+                if (this._widths.Count == this._widthsCount) {
+                    this._widths.Add(width);
+                    this._widthsCount++;
+                }
+                else {
+                    this._widths[this._widthsCount++] = width;
+                }
             }
         }
     }
