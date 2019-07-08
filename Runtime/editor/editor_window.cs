@@ -166,11 +166,9 @@ namespace Unity.UIWidgets.editor {
         
         void updatePhysicalSize() {
             var size = this.queryWindowSize();
-            this._lastWindowWidth = size.x;
-            this._lastWindowHeight = size.y;
             this._physicalSize = new Size(
-                this._lastWindowWidth * this._devicePixelRatio,
-                this._lastWindowHeight * this._devicePixelRatio);
+                size.x * this._devicePixelRatio,
+                size.y * this._devicePixelRatio);
         }
 
 
