@@ -19,7 +19,7 @@ UIWidgets主要来自[Flutter](https://github.com/flutter/flutter)。但UIWidget
 #### 开发者友好
 开发者可以使用许多高级工具，如CPU/GPU Profiling和FPS Profiling，直接在Unity Editor中调试UIWidgets应用。
 
-### Example
+## 示例
 
 <div style="text-align: center"><table><tr>
 <td style="text-align: center">
@@ -35,6 +35,16 @@ UIWidgets主要来自[Flutter](https://github.com/flutter/flutter)。但UIWidget
   <img src="https://connect-prd-cdn.unity.com/20190323/p/images/a8884fbd-9e7c-4bd7-af46-0947e01d01fd_uiwidgets4.gif" width="200"/>
 </td>
 </tr></table></div>
+
+### 基于UIWidgets的项目
+
+#### Unity Connect App
+Unity Connect App是使用UIWidgets开发的一个移动App产品，您随时可以在Android (https://connect.unity.com/connectApp/download)
+以及iOS (Searching for "Unity Connect" in App Store)端下载到它最新的版本. 本项目的所有代码均开源@https://github.com/UnityTech/ConnectAppCN.
+
+#### Unity中文官方文档
+Unity的线上中文官方文档由UIWidgets开发，您可以点击以下网址 https://connect.unity.com/doc 来访问它的全部内容。该项目目前已开源，所有代码可以在
+https://github.com/UnityTech/DocCN 查看。
 
 ## 使用要求
 
