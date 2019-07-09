@@ -21,11 +21,39 @@ namespace Unity.UIWidgets.ui {
     
     public static class AllocDebugger {
 
-        public const bool enableDebugging = false;
+        public const bool enableDebugging = true;
 
         static int allocCount = 0;
         
         static readonly Dictionary<int, DebugMeta> debugInfos = new Dictionary<int, DebugMeta>();
+
+        public static void onFrameEnd() {
+            if (!enableDebugging) {
+                return;
+            }
+            
+            allocCount++;
+            if (allocCount >= 120) {
+                allocCount = 0;
+
+                string debugInfo = "Alloc Stats: ";
+                foreach (var key in debugInfos.Keys) {
+                    var item = debugInfos[key];
+                    if (item.watermark <= item.prev_watermark) {
+                        debugInfo += "|" + item.objName + " = " + item.watermark + "," + item.borrowed + "|";
+                        continue;
+                    }
+
+                    item.prev_watermark = item.watermark;
+                    debugInfo += "|" + item.objName + " = " + item.watermark + "," + item.borrowed + "|";
+                }
+
+                if (debugInfo == "Alloc Stats: ") {
+                    return;
+                }
+                Debug.Log(debugInfo);
+            }
+        }
 
         public static void onAlloc(int objKey, string objName) {
             if (!debugInfos.ContainsKey(objKey)) {
@@ -37,27 +65,6 @@ namespace Unity.UIWidgets.ui {
             }
 
             debugInfos[objKey].onAlloc();
-
-            allocCount++;
-            if (allocCount >= 1000) {
-                allocCount = 0;
-
-                string debugInfo = "Alloc Stats: ";
-                foreach (var key in debugInfos.Keys) {
-                    var item = debugInfos[key];
-                    if (item.watermark <= item.prev_watermark) {
-                        continue;
-                    }
-
-                    item.prev_watermark = item.watermark;
-                    debugInfo += "|" + item.objName + " = " + item.watermark + "|";
-                }
-
-                if (debugInfo == "Alloc Stats: ") {
-                    return;
-                }
-                Debug.Log(debugInfo);
-            }
         }
 
         public static void onRelease(int objKey, string objName) {

@@ -69,15 +69,7 @@ namespace Unity.UIWidgets.ui {
 
         void _reset() {
             //clear all states
-            D.assert(this._layers.Count == 0 || (this._layers.Count == 1 && this._layers[0] == this._currentLayer));
-            if (this._currentLayer != null) {
-                this._clearLayer(this._currentLayer);
-                ObjectPool<RenderLayer>.release(this._currentLayer);
-                this._currentLayer = null;
-                this._lastScissor = null;
-                this._layers.Clear();
-            }
-
+            D.assert(this._currentLayer == null && this._layers.Count == 0);
             var width = this._renderTexture.width;
             var height = this._renderTexture.height;
 
@@ -953,6 +945,15 @@ namespace Unity.UIWidgets.ui {
                 cmdBuf.DisableScissorRect();
 
                 Graphics.ExecuteCommandBuffer(cmdBuf);
+            }
+            
+            D.assert(this._layers.Count == 0 || (this._layers.Count == 1 && this._layers[0] == this._currentLayer));
+            if (this._currentLayer != null) {
+                this._clearLayer(this._currentLayer);
+                ObjectPool<RenderLayer>.release(this._currentLayer);
+                this._currentLayer = null;
+                this._lastScissor = null;
+                this._layers.Clear();
             }
         }
 

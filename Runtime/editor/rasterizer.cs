@@ -74,9 +74,11 @@ namespace Unity.UIWidgets.editor {
                 if (compositorFrame != null && compositorFrame.raster(layerTree, false)) {
                     frame.submit();
                     this._fireNextFrameCallbackIfPresent();
+                    AllocDebugger.onFrameEnd();
                     return true;
                 }
 
+                AllocDebugger.onFrameEnd();
                 return false;
             }
         }

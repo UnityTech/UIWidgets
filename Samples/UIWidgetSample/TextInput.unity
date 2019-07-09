@@ -1330,7 +1330,7 @@ MonoBehaviour:
     width: 1
     height: 1
   devicePixelRatioOverride: 0
-  antiAliasingOverride: 4
+  antiAliasingOverride: 0
 --- !u!222 &1387978529
 CanvasRenderer:
   m_ObjectHideFlags: 0

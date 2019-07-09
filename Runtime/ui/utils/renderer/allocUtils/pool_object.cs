@@ -36,7 +36,7 @@ namespace Unity.UIWidgets.ui {
             if (obj == null) {
                 return;
             }
-
+            
             if (AllocDebugger.enableDebugging) {
                 if (!obj.activated_flag) {
                     Debug.Assert(false, "an item has been recycled more than once !");
@@ -45,7 +45,13 @@ namespace Unity.UIWidgets.ui {
 
                 AllocDebugger.onRelease(debugKey, debugName);
             }
-
+            
+            if (pool.Count > 256) {
+                //there are enough items in the pool
+                //just release the obj to GC
+                return;
+            }
+            
             obj.clear();
             pool.Push(obj);
         }

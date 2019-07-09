@@ -5,7 +5,7 @@ namespace Unity.UIWidgets.ui {
     public static class uiPathCacheManager {
         static Dictionary<uint, uiPath> cache = new Dictionary<uint, uiPath>(256);
         
-        //remove unused cache items every 30 frame
+        //remove unused cache items every 1 frame
         static Dictionary<uint, bool> touched = new Dictionary<uint, bool>(256);
 
         static float curFrame;
@@ -13,13 +13,6 @@ namespace Unity.UIWidgets.ui {
         static readonly List<uint> untouched = new List<uint>();
         
         public static void tickNextFrame() {
-            curFrame++;
-            if (curFrame < 30) {
-                return;
-            }
-
-            curFrame = 0;
-            
             untouched.Clear();
             foreach (var key in cache.Keys) {
                 if (!touched.ContainsKey(key)) {
