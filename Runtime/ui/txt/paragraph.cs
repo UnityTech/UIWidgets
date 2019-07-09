@@ -190,15 +190,16 @@ namespace Unity.UIWidgets.ui {
         List<float> _lineWidths = new List<float>();
         // float[] _lineBaseLines;
         GlyphLine[] _glyphLines;
+        GlyphPosition[] glyphPositions;
+        PaintRecord[] _paintRecords;
+        CodeUnitRun[] _codeUnitRuns;
+        float[] _lineHeights;
+        float[] _textBlobPositions;
         float _maxIntrinsicWidth;
         float _minIntrinsicWidth;
         float _alphabeticBaseline;
         float _ideographicBaseline;
-        float[] _lineHeights;
-        GlyphPosition[] glyphPositions;
         int _lineCount;
-        PaintRecord[] _paintRecords;
-        CodeUnitRun[] _codeUnitRuns;
         int _paintRecordsCount;
         int _codeUnitRunsCount;
         bool _didExceedMaxLines;
@@ -320,7 +321,10 @@ namespace Unity.UIWidgets.ui {
             int ellipsizedLength = this._text.Length + (this._paragraphStyle.ellipsis?.Length ?? 0);
             
             // All text blobs share a single position buffer, which is big enough taking ellipsis into consideration
-            builder.allocPos(ellipsizedLength);
+            if (this._textBlobPositions == null || this._textBlobPositions.Length < ellipsizedLength) {
+                this._textBlobPositions = new float[ellipsizedLength];
+            }
+            builder.setPositions(this._textBlobPositions);
             // this._glyphLines and this._codeUnitRuns will refer to this array for glyph positions
             if (this.glyphPositions == null || this.glyphPositions.Length < ellipsizedLength) {
                 this.glyphPositions = new GlyphPosition[ellipsizedLength];
@@ -480,12 +484,11 @@ namespace Unity.UIWidgets.ui {
                             runXOffset += advance;
 
                             // Create code unit run
-                            CodeUnitRun codeUnitRun = new CodeUnitRun(
+                            this._codeUnitRuns[this._codeUnitRunsCount++] = new CodeUnitRun(
                                 this.glyphPositions,
                                 new Range<int>(start, end),
                                 new Range<float>(this.glyphPositions[0].xPos.start, this.glyphPositions.last().xPos.end),
                                 lineNumber, TextDirection.ltr, glyphPositionStyleRunStart, textCount);
-                            this._codeUnitRuns[this._codeUnitRunsCount++] = codeUnitRun;
 
                             lineStyleRunIndex++;
                         }
