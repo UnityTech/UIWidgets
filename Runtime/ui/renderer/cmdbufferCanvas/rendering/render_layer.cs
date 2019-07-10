@@ -4,7 +4,6 @@ using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
     public partial class PictureFlusher {
-        
         internal class RenderLayer : PoolObject {
             public int rtID;
             public int width;
@@ -33,11 +32,13 @@ namespace Unity.UIWidgets.ui {
                             this.layerBounds.width,
                             this.layerBounds.height);
                     }
+
                     return this._viewport.Value;
                 }
             }
 
-            public static RenderLayer create(int rtID = 0, int width = 0, int height = 0, FilterMode filterMode = FilterMode.Point,
+            public static RenderLayer create(int rtID = 0, int width = 0, int height = 0,
+                FilterMode filterMode = FilterMode.Point,
                 bool noMSAA = false, uiRect? layerBounds = null, uiPaint? layerPaint = null, bool ignoreClip = true) {
                 D.assert(layerBounds != null);
                 var newLayer = ObjectPool<RenderLayer>.alloc();
@@ -52,13 +53,13 @@ namespace Unity.UIWidgets.ui {
                 newLayer.currentState = State.create();
                 newLayer.states.Add(newLayer.currentState);
                 newLayer.clipStack = ClipStack.create();
-                
+
                 return newLayer;
             }
 
             public void addLayer(RenderLayer layer) {
                 this.layers.Add(layer);
-                this.draws.Add(CmdLayer.create(layer : layer));
+                this.draws.Add(CmdLayer.create(layer: layer));
             }
 
             public override void clear() {
@@ -71,7 +72,7 @@ namespace Unity.UIWidgets.ui {
                 foreach (var state in this.states) {
                     ObjectPool<State>.release(state);
                 }
-                
+
                 this.states.Clear();
                 ObjectPool<ClipStack>.release(this.clipStack);
                 this._viewport = null;
@@ -79,13 +80,11 @@ namespace Unity.UIWidgets.ui {
         }
 
         internal class State : PoolObject {
-
             public State() {
-                
             }
-            
+
             static readonly uiMatrix3 _id = uiMatrix3.I();
-            
+
             uiMatrix3? _matrix;
             float? _scale;
             uiMatrix3? _invMatrix;
@@ -95,7 +94,7 @@ namespace Unity.UIWidgets.ui {
                 newState._matrix = matrix ?? _id;
                 newState._scale = scale;
                 newState._invMatrix = invMatrix;
-                
+
                 return newState;
             }
 
@@ -119,15 +118,17 @@ namespace Unity.UIWidgets.ui {
                     if (this._scale == null) {
                         this._scale = uiXformUtils.getScale(this._matrix.Value);
                     }
+
                     return this._scale.Value;
                 }
             }
-            
+
             public uiMatrix3 invMatrix {
                 get {
                     if (this._invMatrix == null) {
                         this._invMatrix = this._matrix.Value.invert();
                     }
+
                     return this._invMatrix.Value;
                 }
             }

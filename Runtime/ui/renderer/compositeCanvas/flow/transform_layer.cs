@@ -17,7 +17,8 @@ namespace Unity.UIWidgets.flow {
             Matrix3 inverseTransform = Matrix3.I();
             if (this._transform.invert(inverseTransform)) {
                 context.cullRect = inverseTransform.mapRect(context.cullRect);
-            } else {
+            }
+            else {
                 context.cullRect = Rect.largest;
             }
 
@@ -39,7 +40,8 @@ namespace Unity.UIWidgets.flow {
             try {
                 canvas.concat(this._transform);
                 this.paintChildren(context);
-            } finally {
+            }
+            finally {
                 canvas.restore();
             }
         }

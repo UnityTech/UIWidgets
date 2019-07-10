@@ -101,7 +101,8 @@ namespace Unity.UIWidgets.flow {
                 }
 
                 var pb = new ParagraphBuilder(new ParagraphStyle { });
-                pb.addText("Current Frame Cost: " + costFrames[curFrame] * 1000 + "ms" + " ; Max(in last 120 frames): " + this.maxDelta() * 1000 + "ms");
+                pb.addText("Current Frame Cost: " + costFrames[curFrame] * 1000 + "ms" +
+                           " ; Max(in last 120 frames): " + this.maxDelta() * 1000 + "ms");
                 var paragraph = pb.build();
                 paragraph.layout(new ParagraphConstraints(width: 800));
 

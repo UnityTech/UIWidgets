@@ -1,5 +1,3 @@
-using System.Runtime.CompilerServices;
-
 namespace Unity.UIWidgets.ui {
     public abstract class uiDrawCmd : PoolObject {
         public abstract void release();
@@ -29,7 +27,7 @@ namespace Unity.UIWidgets.ui {
             drawSaveLayer.paint = paint;
             return drawSaveLayer;
         }
-        
+
         public override void release() {
             ObjectPool<uiDrawSaveLayer>.release(this);
         }
@@ -50,7 +48,7 @@ namespace Unity.UIWidgets.ui {
             var drawRestore = ObjectPool<uiDrawRestore>.alloc();
             return drawRestore;
         }
-        
+
         public override void release() {
             ObjectPool<uiDrawRestore>.release(this);
         }
@@ -66,18 +64,17 @@ namespace Unity.UIWidgets.ui {
             drawTranslate.dy = dy;
             return drawTranslate;
         }
-        
+
         public override void release() {
             ObjectPool<uiDrawTranslate>.release(this);
         }
-        
+
         public float dx;
         public float dy;
     }
 
     public class uiDrawScale : uiDrawCmd {
         public uiDrawScale() {
-            
         }
 
         public static uiDrawScale create(float sx, float? sy) {
@@ -86,18 +83,17 @@ namespace Unity.UIWidgets.ui {
             drawScale.sy = sy;
             return drawScale;
         }
-        
+
         public override void release() {
             ObjectPool<uiDrawScale>.release(this);
         }
-        
+
         public float sx;
         public float? sy;
     }
 
     public class uiDrawRotate : uiDrawCmd {
         public uiDrawRotate() {
-            
         }
 
         public static uiDrawRotate create(float radians, uiOffset? offset) {
@@ -106,22 +102,21 @@ namespace Unity.UIWidgets.ui {
             drawRotate.offset = offset;
             return drawRotate;
         }
-        
+
         public override void release() {
             ObjectPool<uiDrawRotate>.release(this);
         }
-        
+
         public override void clear() {
             this.offset = null;
         }
-        
+
         public float radians;
         public uiOffset? offset;
     }
 
     public class uiDrawSkew : uiDrawCmd {
         public uiDrawSkew() {
-            
         }
 
         public static uiDrawSkew create(float sx, float sy) {
@@ -130,18 +125,17 @@ namespace Unity.UIWidgets.ui {
             drawSkew.sy = sy;
             return drawSkew;
         }
-        
+
         public override void release() {
             ObjectPool<uiDrawSkew>.release(this);
         }
-        
+
         public float sx;
         public float sy;
     }
 
     public class uiDrawConcat : uiDrawCmd {
         public uiDrawConcat() {
-            
         }
 
         public static uiDrawConcat create(uiMatrix3? matrix) {
@@ -149,28 +143,27 @@ namespace Unity.UIWidgets.ui {
             drawConcat.matrix = matrix;
             return drawConcat;
         }
-        
+
         public override void release() {
             ObjectPool<uiDrawConcat>.release(this);
         }
-        
+
         public override void clear() {
             this.matrix = null;
         }
-        
+
         public uiMatrix3? matrix;
     }
 
     public class uiDrawResetMatrix : uiDrawCmd {
         public uiDrawResetMatrix() {
-            
         }
 
         public static uiDrawResetMatrix create() {
             var drawResetMatrix = ObjectPool<uiDrawResetMatrix>.alloc();
             return drawResetMatrix;
         }
-        
+
         public override void release() {
             ObjectPool<uiDrawResetMatrix>.release(this);
         }
@@ -178,7 +171,6 @@ namespace Unity.UIWidgets.ui {
 
     public class uiDrawSetMatrix : uiDrawCmd {
         public uiDrawSetMatrix() {
-            
         }
 
         public static uiDrawSetMatrix create(uiMatrix3? matrix) {
@@ -186,21 +178,20 @@ namespace Unity.UIWidgets.ui {
             drawSetMatrix.matrix = matrix;
             return drawSetMatrix;
         }
-        
+
         public override void release() {
             ObjectPool<uiDrawSetMatrix>.release(this);
         }
-        
+
         public override void clear() {
             this.matrix = null;
         }
-        
+
         public uiMatrix3? matrix;
     }
 
     public class uiDrawClipRect : uiDrawCmd {
         public uiDrawClipRect() {
-            
         }
 
         public static uiDrawClipRect create(uiRect? rect) {
@@ -208,21 +199,20 @@ namespace Unity.UIWidgets.ui {
             drawClipRect.rect = rect;
             return drawClipRect;
         }
-        
+
         public override void release() {
             ObjectPool<uiDrawClipRect>.release(this);
         }
-        
+
         public override void clear() {
             this.rect = null;
         }
-        
+
         public uiRect? rect;
     }
 
     public class uiDrawClipRRect : uiDrawCmd {
         public uiDrawClipRRect() {
-            
         }
 
         public static uiDrawClipRRect create(RRect rrect) {
@@ -230,21 +220,20 @@ namespace Unity.UIWidgets.ui {
             drawClipRRect.rrect = rrect;
             return drawClipRRect;
         }
-        
+
         public override void release() {
             ObjectPool<uiDrawClipRRect>.release(this);
         }
-        
+
         public override void clear() {
             this.rrect = null;
         }
-        
+
         public RRect rrect;
     }
 
     public class uiDrawClipPath : uiDrawCmd {
         public uiDrawClipPath() {
-            
         }
 
         public static uiDrawClipPath create(uiPath path) {
@@ -252,7 +241,7 @@ namespace Unity.UIWidgets.ui {
             drawClipPath.path = path;
             return drawClipPath;
         }
-        
+
         public override void release() {
             ObjectPool<uiDrawClipPath>.release(this);
         }
@@ -268,7 +257,6 @@ namespace Unity.UIWidgets.ui {
 
     public class uiDrawPath : uiDrawCmd {
         public uiDrawPath() {
-            
         }
 
         public static uiDrawPath create(uiPath path, uiPaint paint) {
@@ -277,7 +265,7 @@ namespace Unity.UIWidgets.ui {
             drawPath.paint = paint;
             return drawPath;
         }
-        
+
         public override void release() {
             ObjectPool<uiDrawPath>.release(this);
         }
@@ -294,7 +282,6 @@ namespace Unity.UIWidgets.ui {
 
     public class uiDrawImage : uiDrawCmd {
         public uiDrawImage() {
-            
         }
 
         public static uiDrawImage create(Image image, uiOffset? offset, uiPaint paint) {
@@ -304,7 +291,7 @@ namespace Unity.UIWidgets.ui {
             drawImage.paint = paint;
             return drawImage;
         }
-        
+
         public override void release() {
             ObjectPool<uiDrawImage>.release(this);
         }
@@ -313,7 +300,7 @@ namespace Unity.UIWidgets.ui {
             this.image = null;
             this.offset = null;
         }
-        
+
         public Image image;
         public uiOffset? offset;
         public uiPaint paint;
@@ -321,7 +308,6 @@ namespace Unity.UIWidgets.ui {
 
     public class uiDrawImageRect : uiDrawCmd {
         public uiDrawImageRect() {
-            
         }
 
         public static uiDrawImageRect create(Image image, uiRect? src, uiRect? dst, uiPaint paint) {
@@ -332,7 +318,7 @@ namespace Unity.UIWidgets.ui {
             drawImageRect.paint = paint;
             return drawImageRect;
         }
-        
+
         public override void release() {
             ObjectPool<uiDrawImageRect>.release(this);
         }
@@ -351,7 +337,6 @@ namespace Unity.UIWidgets.ui {
 
     public class uiDrawImageNine : uiDrawCmd {
         public uiDrawImageNine() {
-            
         }
 
         public static uiDrawImageNine create(Image image, uiRect? src, uiRect? center, uiRect? dst, uiPaint paint) {
@@ -363,7 +348,7 @@ namespace Unity.UIWidgets.ui {
             drawImageNine.paint = paint;
             return drawImageNine;
         }
-        
+
         public override void release() {
             ObjectPool<uiDrawImageNine>.release(this);
         }
@@ -384,7 +369,6 @@ namespace Unity.UIWidgets.ui {
 
     public class uiDrawPicture : uiDrawCmd {
         public uiDrawPicture() {
-            
         }
 
         public static uiDrawPicture create(Picture picture) {
@@ -392,7 +376,7 @@ namespace Unity.UIWidgets.ui {
             drawPicture.picture = picture;
             return drawPicture;
         }
-        
+
         public override void release() {
             ObjectPool<uiDrawPicture>.release(this);
         }
@@ -406,7 +390,6 @@ namespace Unity.UIWidgets.ui {
 
     public class uiDrawTextBlob : uiDrawCmd {
         public uiDrawTextBlob() {
-            
         }
 
         public static uiDrawTextBlob create(TextBlob textBlob, uiOffset? offset, uiPaint paint) {
@@ -416,7 +399,7 @@ namespace Unity.UIWidgets.ui {
             drawTextBlob.paint = paint;
             return drawTextBlob;
         }
-        
+
         public override void release() {
             ObjectPool<uiDrawTextBlob>.release(this);
         }

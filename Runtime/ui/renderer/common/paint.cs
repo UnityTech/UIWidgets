@@ -14,7 +14,7 @@ namespace Unity.UIWidgets.ui {
         public readonly BlurStyle style;
         public readonly float sigma;
     }
-    
+
     public struct uiColorFilter {
         uiColorFilter(uiColor color, BlendMode blendMode) {
             this.color = color;
@@ -28,9 +28,8 @@ namespace Unity.UIWidgets.ui {
         public readonly uiColor color;
         public readonly BlendMode blendMode;
     }
-    
+
     public interface uiImageFilter {
-        
     }
 
     public static class uiImageFilterHelper {
@@ -48,7 +47,7 @@ namespace Unity.UIWidgets.ui {
             this.sigmaX = sigmaX;
             this.sigmaY = sigmaY;
         }
-        
+
         public readonly float sigmaX;
         public readonly float sigmaY;
     }
@@ -62,10 +61,10 @@ namespace Unity.UIWidgets.ui {
         public readonly uiMatrix3 transform;
         public readonly FilterMode filterMode;
     }
-    
+
     public struct uiPaint {
         static readonly uiColor _kColorDefault = new uiColor(0xFFFFFFFF);
-        
+
         public uiColor color;
         public BlendMode blendMode;
         public PaintingStyle style;
@@ -81,8 +80,8 @@ namespace Unity.UIWidgets.ui {
         public bool invertColors;
 
         public uiPaint(
-            uiColor? color = null, 
-            BlendMode blendMode = BlendMode.srcOver, 
+            uiColor? color = null,
+            BlendMode blendMode = BlendMode.srcOver,
             PaintingStyle style = PaintingStyle.fill,
             float strokeWidth = 0f,
             StrokeCap strokeCap = StrokeCap.butt,
@@ -94,7 +93,7 @@ namespace Unity.UIWidgets.ui {
             uiImageFilter backdrop = null,
             PaintShader shader = null,
             bool invertColors = false
-            ) {
+        ) {
             this.color = color ?? _kColorDefault;
             this.blendMode = blendMode;
             this.style = style;
@@ -128,28 +127,28 @@ namespace Unity.UIWidgets.ui {
 
         public static uiPaint shapeOnly(uiPaint paint) {
             return new uiPaint(
-                style : paint.style,
-                strokeWidth : paint.strokeWidth,
-                strokeCap : paint.strokeCap,
-                strokeJoin : paint.strokeJoin,
-                strokeMiterLimit : paint.strokeMiterLimit
+                style: paint.style,
+                strokeWidth: paint.strokeWidth,
+                strokeCap: paint.strokeCap,
+                strokeJoin: paint.strokeJoin,
+                strokeMiterLimit: paint.strokeMiterLimit
             );
         }
 
         public static uiPaint fromPaint(Paint paint) {
-
             uiImageFilter filter = null;
             if (paint.backdrop is _BlurImageFilter) {
                 var blurFilter = (_BlurImageFilter) paint.backdrop;
                 filter = uiImageFilterHelper.blur(blurFilter.sigmaX, blurFilter.sigmaY);
-            } else if (paint.backdrop is _MatrixImageFilter) {
+            }
+            else if (paint.backdrop is _MatrixImageFilter) {
                 var matrixFilter = (_MatrixImageFilter) paint.backdrop;
                 filter = uiImageFilterHelper.matrix(uiMatrix3.fromMatrix3(matrixFilter.transform),
                     matrixFilter.filterMode);
             }
-            
+
             return new uiPaint(
-                color : paint.color == null ? (uiColor?)null : uiColor.fromColor(paint.color),
+                color: paint.color == null ? (uiColor?) null : uiColor.fromColor(paint.color),
                 blendMode: paint.blendMode,
                 style: paint.style,
                 strokeWidth: paint.strokeWidth,
@@ -157,12 +156,16 @@ namespace Unity.UIWidgets.ui {
                 strokeJoin: paint.strokeJoin,
                 strokeMiterLimit: paint.strokeMiterLimit,
                 filterMode: paint.filterMode,
-                colorFilter: paint.colorFilter == null ? (uiColorFilter?) null : uiColorFilter.mode(uiColor.fromColor(paint.colorFilter.color), paint.colorFilter.blendMode),
-                maskFilter: paint.maskFilter == null ? (uiMaskFilter?) null : uiMaskFilter.blur(paint.maskFilter.style, paint.maskFilter.sigma),
+                colorFilter: paint.colorFilter == null
+                    ? (uiColorFilter?) null
+                    : uiColorFilter.mode(uiColor.fromColor(paint.colorFilter.color), paint.colorFilter.blendMode),
+                maskFilter: paint.maskFilter == null
+                    ? (uiMaskFilter?) null
+                    : uiMaskFilter.blur(paint.maskFilter.style, paint.maskFilter.sigma),
                 backdrop: filter,
                 shader: paint.shader,
                 invertColors: paint.invertColors
-                );
+            );
         }
     }
 }

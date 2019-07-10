@@ -1,7 +1,6 @@
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
-
     public class MaterialPropertyBlockWrapper : PoolObject {
         public readonly MaterialPropertyBlock mpb;
 

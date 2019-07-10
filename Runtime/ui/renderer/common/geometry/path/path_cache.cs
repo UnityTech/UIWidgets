@@ -3,7 +3,6 @@ using Unity.UIWidgets.foundation;
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
-    
     class uiPathCache : PoolObject {
         float _distTol;
         float _tessTol;
@@ -12,7 +11,7 @@ namespace Unity.UIWidgets.ui {
         List<uiPathPoint> _points = new List<uiPathPoint>();
 
         float _scale;
-        
+
         //mesh cache
         uiMeshMesh _fillMesh;
         bool _fillConvex;
@@ -30,7 +29,7 @@ namespace Unity.UIWidgets.ui {
             newPathCache._scale = scale;
             return newPathCache;
         }
-        
+
         public bool canReuse(float scale) {
             if (this._scale != scale) {
                 return false;
@@ -44,7 +43,7 @@ namespace Unity.UIWidgets.ui {
             this._points.Clear();
             ObjectPool<uiMeshMesh>.release(this._fillMesh);
             this._fillMesh = null;
-            
+
             ObjectPool<uiMeshMesh>.release(this._strokeMesh);
             this._strokeMesh = null;
         }
@@ -54,13 +53,13 @@ namespace Unity.UIWidgets.ui {
 
         public void addPath() {
             this._paths.Add(uiPathPath.create(
-                first : this._points.Count,
-                winding : uiPathWinding.counterClockwise
+                first: this._points.Count,
+                winding: uiPathWinding.counterClockwise
             ));
         }
 
         public void addPoint(float x, float y, uiPointFlags flags) {
-            this._addPoint(uiPathPoint.create(x : x, y : y, flags : flags));
+            this._addPoint(uiPathPoint.create(x: x, y: y, flags: flags));
         }
 
         void _addPoint(uiPathPoint point) {
@@ -68,7 +67,7 @@ namespace Unity.UIWidgets.ui {
                 this.addPath();
                 this.addPoint(0, 0, uiPointFlags.corner);
             }
-            
+
             var path = this._paths[this._paths.Count - 1];
             if (path.count > 0) {
                 var pt = this._points[this._points.Count - 1];
@@ -110,14 +109,15 @@ namespace Unity.UIWidgets.ui {
                 var point = points[i];
                 if (i == points.Count - 1) {
                     this._addPoint(uiPathPoint.create(
-                        x : point.x + x1,
-                        y : point.y + y1,
-                        flags : flags
+                        x: point.x + x1,
+                        y: point.y + y1,
+                        flags: flags
                     ));
-                } else {
+                }
+                else {
                     this._addPoint(uiPathPoint.create(
-                        x : point.x + x1,
-                        y : point.y + y1
+                        x: point.x + x1,
+                        y: point.y + y1
                     ));
                 }
             }
@@ -138,16 +138,16 @@ namespace Unity.UIWidgets.ui {
                 return;
             }
 
-            var path =  this._paths[this._paths.Count - 1];
+            var path = this._paths[this._paths.Count - 1];
             path.winding = winding;
             this._paths[this._paths.Count - 1] = path;
         }
 
         public void normalize() {
             var points = this._points;
-            var paths = this._paths;            
+            var paths = this._paths;
             for (var j = 0; j < paths.Count; j++) {
-                 var path =  paths[j];
+                var path = paths[j];
                 if (path.count <= 1) {
                     continue;
                 }
@@ -155,8 +155,8 @@ namespace Unity.UIWidgets.ui {
                 var ip0 = path.first + path.count - 1;
                 var ip1 = path.first;
 
-                 var p0 =  points[ip0];
-                 var p1 =  points[ip1];
+                var p0 = points[ip0];
+                var p1 = points[ip1];
                 if (uiPathUtils.ptEquals(p0.x, p0.y, p1.x, p1.y, this._distTol)) {
                     path.count--;
                     path.closed = true;
@@ -175,7 +175,7 @@ namespace Unity.UIWidgets.ui {
             var points = this._points;
             var paths = this._paths;
             for (var j = 0; j < paths.Count; j++) {
-                 var path =  paths[j];
+                var path = paths[j];
                 if (path.count <= 2) {
                     continue;
                 }
@@ -183,8 +183,8 @@ namespace Unity.UIWidgets.ui {
                 var ip0 = path.first + path.count - 1;
                 var ip1 = path.first;
                 for (var i = 0; i < path.count; i++) {
-                     var p0 =  points[ip0];
-                     var p1 =  points[ip1];
+                    var p0 = points[ip0];
+                    var p1 = points[ip1];
                     p0.dx = p1.x - p0.x; // no need to normalize
                     p0.dy = p1.y - p0.y;
                     points[ip0] = p0;
@@ -196,8 +196,8 @@ namespace Unity.UIWidgets.ui {
                 ip0 = path.first + path.count - 1;
                 ip1 = path.first;
                 for (var i = 0; i < path.count; i++) {
-                     var p0 =  points[ip0];
-                     var p1 =  points[ip1];
+                    var p0 = points[ip0];
+                    var p1 = points[ip1];
 
                     float cross = p1.dx * p0.dy - p0.dx * p1.dy;
                     if (cross < 0.0f) {
@@ -213,7 +213,7 @@ namespace Unity.UIWidgets.ui {
 
             var cvertices = 0;
             for (var i = 0; i < paths.Count; i++) {
-                 var path =  paths[i];
+                var path = paths[i];
                 if (path.count <= 2) {
                     continue;
                 }
@@ -224,14 +224,14 @@ namespace Unity.UIWidgets.ui {
             var _vertices = ObjectPool<uiList<Vector3>>.alloc();
             _vertices.SetCapacity(cvertices);
             for (var i = 0; i < paths.Count; i++) {
-                 var path =  paths[i];
+                var path = paths[i];
                 if (path.count <= 2) {
                     continue;
                 }
 
                 path.ifill = _vertices.Count;
                 for (var j = 0; j < path.count; j++) {
-                     var p =  points[path.first + j];
+                    var p = points[path.first + j];
                     _vertices.Add(new Vector2(p.x, p.y));
                 }
 
@@ -247,14 +247,14 @@ namespace Unity.UIWidgets.ui {
                 convex = this._fillConvex;
                 return this._fillMesh;
             }
-            
+
             var vertices = this._expandFill();
 
             var paths = this._paths;
-            
+
             var cindices = 0;
             for (var i = 0; i < paths.Count; i++) {
-                 var path =  paths[i];
+                var path = paths[i];
                 if (path.count <= 2) {
                     continue;
                 }
@@ -268,7 +268,7 @@ namespace Unity.UIWidgets.ui {
             var indices = ObjectPool<uiList<int>>.alloc();
             indices.SetCapacity(cindices);
             for (var i = 0; i < paths.Count; i++) {
-                 var path =  paths[i];
+                var path = paths[i];
                 if (path.count <= 2) {
                     continue;
                 }
@@ -286,10 +286,10 @@ namespace Unity.UIWidgets.ui {
 
             var mesh = uiMeshMesh.create(null, vertices, indices);
             this._fillMesh = mesh;
-            
-             this._fillConvex = false;
+
+            this._fillConvex = false;
             for (var i = 0; i < paths.Count; i++) {
-                 var path =  paths[i];
+                var path = paths[i];
                 if (path.count <= 2) {
                     continue;
                 }
@@ -318,7 +318,7 @@ namespace Unity.UIWidgets.ui {
             var points = this._points;
             var paths = this._paths;
             for (var i = 0; i < paths.Count; i++) {
-                 var path =  paths[i];
+                var path = paths[i];
                 if (path.count <= 1) {
                     continue;
                 }
@@ -327,8 +327,8 @@ namespace Unity.UIWidgets.ui {
                 var ip1 = path.first;
 
                 for (var j = 0; j < path.count; j++) {
-                     var p0 =  points[ip0];
-                     var p1 =  points[ip1];
+                    var p0 = points[ip0];
+                    var p1 = points[ip1];
                     p0.dx = p1.x - p0.x;
                     p0.dy = p1.y - p0.y;
                     p0.len = uiPathUtils.normalize(ref p0.dx, ref p0.dy);
@@ -339,8 +339,8 @@ namespace Unity.UIWidgets.ui {
                 ip0 = path.first + path.count - 1;
                 ip1 = path.first;
                 for (var j = 0; j < path.count; j++) {
-                     var p0 =  points[ip0];
-                     var p1 =  points[ip1];
+                    var p0 = points[ip0];
+                    var p1 = points[ip1];
                     float dlx0 = p0.dy;
                     float dly0 = -p0.dx;
                     float dlx1 = p1.dy;
@@ -382,9 +382,9 @@ namespace Unity.UIWidgets.ui {
                             p1.flags |= uiPointFlags.bevel;
                         }
                     }
-                    
+
                     points[ip0] = p0;
-                    points[ip1] = p1; 
+                    points[ip1] = p1;
 
                     ip0 = ip1++;
                 }
@@ -404,7 +404,7 @@ namespace Unity.UIWidgets.ui {
 
             var cvertices = 0;
             for (var i = 0; i < paths.Count; i++) {
-                 var path =  paths[i];
+                var path = paths[i];
                 if (path.count <= 1) {
                     continue;
                 }
@@ -416,7 +416,7 @@ namespace Unity.UIWidgets.ui {
             var _vertices = ObjectPool<uiList<Vector3>>.alloc();
             _vertices.SetCapacity(cvertices);
             for (var i = 0; i < paths.Count; i++) {
-                 var path =  paths[i];
+                var path = paths[i];
                 if (path.count <= 1) {
                     continue;
                 }
@@ -437,8 +437,8 @@ namespace Unity.UIWidgets.ui {
                     e = path.count - 1;
                 }
 
-                 var p0 =  points[ip0];
-                 var p1 =  points[ip1];
+                var p0 = points[ip0];
+                var p1 = points[ip1];
 
                 if (!path.closed) {
                     if (lineCap == StrokeCap.butt) {
@@ -454,8 +454,8 @@ namespace Unity.UIWidgets.ui {
                 }
 
                 for (var j = s; j < e; j++) {
-                    p0 =  points[ip0];
-                    p1 =  points[ip1];
+                    p0 = points[ip0];
+                    p1 = points[ip1];
 
                     if ((p1.flags & (uiPointFlags.bevel | uiPointFlags.innerBevel)) != 0) {
                         if (lineJoin == StrokeJoin.round) {
@@ -474,8 +474,8 @@ namespace Unity.UIWidgets.ui {
                 }
 
                 if (!path.closed) {
-                    p0 =  points[ip0];
-                    p1 =  points[ip1];
+                    p0 = points[ip0];
+                    p1 = points[ip1];
                     if (lineCap == StrokeCap.butt) {
                         _vertices.buttCapEnd(p1, p0.dx, p0.dy, w, 0.0f);
                     }
@@ -507,14 +507,14 @@ namespace Unity.UIWidgets.ui {
                 this._miterLimit == miterLimit) {
                 return this._strokeMesh;
             }
-            
+
             var vertices = this._expandStroke(strokeWidth, lineCap, lineJoin, miterLimit);
 
             var paths = this._paths;
-            
+
             var cindices = 0;
             for (var i = 0; i < paths.Count; i++) {
-                 var path =  paths[i];
+                var path = paths[i];
                 if (path.count <= 1) {
                     continue;
                 }
@@ -528,7 +528,7 @@ namespace Unity.UIWidgets.ui {
             var indices = ObjectPool<uiList<int>>.alloc();
             indices.SetCapacity(cindices);
             for (var i = 0; i < paths.Count; i++) {
-                var path =  paths[i];
+                var path = paths[i];
                 if (path.count <= 1) {
                     continue;
                 }
@@ -556,7 +556,7 @@ namespace Unity.UIWidgets.ui {
             this._strokeWidth = strokeWidth;
             this._lineCap = lineCap;
             this._lineJoin = lineJoin;
-            this._miterLimit = miterLimit;        
+            this._miterLimit = miterLimit;
             return this._strokeMesh;
         }
     }

@@ -87,9 +87,9 @@ namespace Unity.UIWidgets.flow {
             Rect bounds = path.getBounds();
             float shadow_x = (bounds.left + bounds.right) / 2f;
             float shadow_y = bounds.top - 600.0f;
-            
+
             uiColor uicolor = uiColor.fromColor(color);
-            
+
             uiColor inAmbient = uicolor.withAlpha((int) (kAmbientAlpha * uicolor.alpha));
             uiColor inSpot = uicolor.withAlpha((int) (kSpotAlpha * uicolor.alpha));
             uiColor? ambientColor = null;

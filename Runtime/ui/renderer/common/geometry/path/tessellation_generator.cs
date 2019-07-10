@@ -29,7 +29,6 @@ namespace Unity.UIWidgets.ui {
         }
 
         public uiTessellationKey() {
-            
         }
 
         public bool Equals(uiTessellationKey other) {
@@ -147,7 +146,7 @@ namespace Unity.UIWidgets.ui {
         public static int tessellationCount {
             get { return _tessellations.Count; }
         }
-        
+
         public static void tickNextFrame() {
             _frameCount++;
 
@@ -170,7 +169,7 @@ namespace Unity.UIWidgets.ui {
                 uiTessellationInfo.touch();
                 return uiTessellationInfo.points;
             }
-            
+
             var points = _tessellateBezier(x1, y1, x2, y2, x3, y3, x4, y4, tessTol);
             _tessellations[key] = uiTessellationInfo.create(key, points);
 

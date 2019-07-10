@@ -1,21 +1,19 @@
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
-
     public struct uiColor {
-        
         public readonly long value;
-        
+
         public uiColor(long value) {
             this.value = value & 0xFFFFFFFF;
         }
-        
+
         public static readonly uiColor clear = new uiColor(0x00000000);
 
         public static readonly uiColor black = new uiColor(0xFF000000);
 
         public static readonly uiColor white = new uiColor(0xFFFFFFFF);
-        
+
         public int alpha {
             get { return (int) ((0xff000000 & this.value) >> 24); }
         }
@@ -39,7 +37,7 @@ namespace Unity.UIWidgets.ui {
         public static uiColor fromColor(Color color) {
             return new uiColor(color.value);
         }
-        
+
         public static uiColor fromARGB(int a, int r, int g, int b) {
             return new uiColor(
                 (((a & 0xff) << 24) |
@@ -55,7 +53,7 @@ namespace Unity.UIWidgets.ui {
                  ((g & 0xff) << 8) |
                  ((b & 0xff) << 0)) & 0xFFFFFFFF);
         }
-        
+
         public uiColor withAlpha(int a) {
             return fromARGB(a, this.red, this.green, this.blue);
         }
@@ -63,7 +61,7 @@ namespace Unity.UIWidgets.ui {
         public uiColor withOpacity(float opacity) {
             return this.withAlpha((int) (opacity * 255));
         }
-        
+
         static float _linearizeColorComponent(float component) {
             if (component <= 0.03928f) {
                 return component / 12.92f;

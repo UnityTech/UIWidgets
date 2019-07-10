@@ -82,7 +82,7 @@ namespace Unity.UIWidgets.ui {
             return layer;
         }
 
-        
+
         public void addRetained(Layer layer) {
             if (this._currentLayer == null) {
                 return;

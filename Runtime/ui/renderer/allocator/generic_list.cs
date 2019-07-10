@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 
 namespace Unity.UIWidgets.ui {
-    
     public class uiList<T> : PoolObject {
         List<T> list;
 
@@ -14,7 +13,9 @@ namespace Unity.UIWidgets.ui {
         public uiList() {
         }
 
-        public List<T> data => this.list;
+        public List<T> data {
+            get { return this.list; }
+        }
 
         public void Add(T item) {
             this.list.Add(item);
@@ -41,11 +42,9 @@ namespace Unity.UIWidgets.ui {
         public void SetCapacity(int capacity) {
             this.list.Capacity = Math.Max(capacity, this.list.Capacity);
         }
-        
+
         public T this[int index] {
-            get {
-                return this.list[index];
-            }
+            get { return this.list[index]; }
             set { this.list[index] = value; }
         }
     }

@@ -1,25 +1,23 @@
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
-
     public struct uiRect {
-
         public uiRect(float left, float top, float right, float bottom) {
             this.left = left;
             this.top = top;
             this.right = right;
             this.bottom = bottom;
         }
-        
+
         public readonly float left;
         public readonly float top;
         public readonly float right;
         public readonly float bottom;
-        
+
         public bool isEmpty {
             get { return this.left >= this.right || this.top >= this.bottom; }
         }
-        
+
         public float width {
             get { return this.right - this.left; }
         }
@@ -27,7 +25,7 @@ namespace Unity.UIWidgets.ui {
         public float height {
             get { return this.bottom - this.top; }
         }
-        
+
         public uiOffset topLeft {
             get { return new uiOffset(this.left, this.top); }
         }
@@ -63,12 +61,12 @@ namespace Unity.UIWidgets.ui {
         public uiOffset bottomRight {
             get { return new uiOffset(this.right, this.bottom); }
         }
-        
+
         public uiRect shift(uiOffset offset) {
             return uiRectHelper.fromLTRB(this.left + offset.dx, this.top + offset.dy, this.right + offset.dx,
                 this.bottom + offset.dy);
         }
-        
+
         public uiRect intersect(uiRect other) {
             return uiRectHelper.fromLTRB(
                 Mathf.Max(this.left, other.left),
@@ -100,35 +98,42 @@ namespace Unity.UIWidgets.ui {
         public static uiRect fromRect(Rect rect) {
             return new uiRect(rect.left, rect.top, rect.right, rect.bottom);
         }
-        
+
         public static uiRect fromLTRB(float left, float top, float right, float bottom) {
             return new uiRect(left, top, right, bottom);
         }
-        
+
         public static uiRect fromLTWH(float left, float top, float width, float height) {
             return new uiRect(left, top, left + width, top + height);
         }
-        
+
         public static readonly uiRect zero = new uiRect(0, 0, 0, 0);
 
         public static readonly uiRect one = new uiRect(0, 0, 1, 1);
 
         public static bool equals(uiRect? a, uiRect? b) {
-            if (a == null && b == null) return true;
-            if (a == null || b == null) return false;
+            if (a == null && b == null) {
+                return true;
+            }
+
+            if (a == null || b == null) {
+                return false;
+            }
+
             var aval = a.Value;
             var bval = b.Value;
-            
-            return aval.left == bval.left && aval.right == bval.right && aval.top == bval.top && aval.bottom == bval.bottom;
+
+            return aval.left == bval.left && aval.right == bval.right && aval.top == bval.top &&
+                   aval.bottom == bval.bottom;
         }
-        
+
         public static uiRect scale(uiRect a, float scaleX, float? scaleY = null) {
             scaleY = scaleY ?? scaleX;
             return fromLTRB(
                 a.left * scaleX, a.top * scaleY.Value,
                 a.right * scaleX, a.bottom * scaleY.Value);
         }
-        
+
         public static uiRect inflate(uiRect a, float delta) {
             return fromLTRB(a.left - delta, a.top - delta, a.right + delta, a.bottom + delta);
         }
@@ -136,7 +141,7 @@ namespace Unity.UIWidgets.ui {
         public static uiRect deflate(uiRect a, float delta) {
             return inflate(a, -delta);
         }
-        
+
         public static uiRect intersect(uiRect a, uiRect other) {
             return fromLTRB(
                 Mathf.Max(a.left, other.left),
@@ -145,7 +150,7 @@ namespace Unity.UIWidgets.ui {
                 Mathf.Min(a.bottom, other.bottom)
             );
         }
-        
+
         public static uiRect round(uiRect a) {
             return fromLTRB(
                 Mathf.Round(a.left), Mathf.Round(a.top),
@@ -160,9 +165,9 @@ namespace Unity.UIWidgets.ui {
 
         public static uiRect roundOut(uiRect a, float devicePixelRatio) {
             return fromLTRB(
-                Mathf.Floor(a.left * devicePixelRatio) / devicePixelRatio, 
+                Mathf.Floor(a.left * devicePixelRatio) / devicePixelRatio,
                 Mathf.Floor(a.top * devicePixelRatio) / devicePixelRatio,
-                Mathf.Ceil(a.right * devicePixelRatio) / devicePixelRatio, 
+                Mathf.Ceil(a.right * devicePixelRatio) / devicePixelRatio,
                 Mathf.Ceil(a.bottom * devicePixelRatio) / devicePixelRatio);
         }
 
@@ -171,7 +176,7 @@ namespace Unity.UIWidgets.ui {
                 Mathf.Ceil(a.left), Mathf.Ceil(a.top),
                 Mathf.Floor(a.right), Mathf.Floor(a.bottom));
         }
-        
+
         public static uiRect normalize(uiRect a) {
             if (a.left <= a.right && a.top <= a.bottom) {
                 return a;
@@ -184,8 +189,8 @@ namespace Unity.UIWidgets.ui {
                 Mathf.Max(a.top, a.bottom)
             );
         }
-        
-        
+
+
         public static uiOffset[] toQuad(uiRect a) {
             uiOffset[] dst = new uiOffset[4];
             dst[0] = new uiOffset(a.left, a.top);
@@ -194,15 +199,15 @@ namespace Unity.UIWidgets.ui {
             dst[3] = new uiOffset(a.left, a.bottom);
             return dst;
         }
-        
+
         public static bool contains(uiRect a, uiOffset offset) {
             return offset.dx >= a.left && offset.dx < a.right && offset.dy >= a.top && offset.dy < a.bottom;
         }
-        
+
         public static bool contains(uiRect a, uiRect rect) {
             return contains(a, rect.topLeft) && contains(a, rect.bottomRight);
         }
-        
+
         public static bool overlaps(uiRect a, uiRect other) {
             if (a.right <= other.left || other.right <= a.left) {
                 return false;
@@ -214,7 +219,7 @@ namespace Unity.UIWidgets.ui {
 
             return true;
         }
-        
+
         public static UnityEngine.Rect toRect(uiRect rect) {
             return new UnityEngine.Rect(rect.left, rect.top, rect.width, rect.height);
         }

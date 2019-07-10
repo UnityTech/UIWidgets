@@ -3,7 +3,6 @@ using Unity.UIWidgets.foundation;
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
-    
     static class BlurUtils {
         static readonly Dictionary<int, float[]> _gaussianKernels
             = new Dictionary<int, float[]>();
@@ -46,14 +45,14 @@ namespace Unity.UIWidgets.ui {
         public static float[] get1DGaussianKernel(float gaussianSigma, int radius) {
             var width = 2 * radius + 1;
             D.assert(width <= 25);
-            
+
             //round gaussian sigma to 0.1
             gaussianSigma = Mathf.Round(gaussianSigma * 10) / 10f;
             //assume radius < 10000
             D.assert(radius < 10000);
-            
-            int key = (int)(gaussianSigma * 1000000) + radius;
-            
+
+            int key = (int) (gaussianSigma * 1000000) + radius;
+
             float[] value;
             if (_gaussianKernels.TryGetValue(key, out value)) {
                 return value;
@@ -136,7 +135,7 @@ namespace Unity.UIWidgets.ui {
 
             return uiMeshMesh.create(matrix, vertices, _triangles, uv);
         }
-        
+
         public static uiMeshMesh imageMesh(uiMatrix3? matrix, uiRect src, uiRect dst) {
             var vertices = ObjectPool<uiList<Vector3>>.alloc();
             vertices.SetCapacity(4);
@@ -157,14 +156,15 @@ namespace Unity.UIWidgets.ui {
             uv.Add(new Vector2(uvx1, uvy1));
             vertices.Add(new Vector2(dst.right, dst.top));
             uv.Add(new Vector2(uvx1, uvy0));
-            
+
             var _triangles = ObjectPool<uiList<int>>.alloc();
             _triangles.AddRange(_imageTriangles);
 
             return uiMeshMesh.create(matrix, vertices, _triangles, uv);
         }
 
-        public static uiMeshMesh imageNineMesh(uiMatrix3? matrix, uiRect src, uiRect center, int srcWidth, int srcHeight, uiRect dst) {
+        public static uiMeshMesh imageNineMesh(uiMatrix3? matrix, uiRect src, uiRect center, int srcWidth,
+            int srcHeight, uiRect dst) {
             float x0 = dst.left;
             float x3 = dst.right;
             float x1 = x0 + ((center.left - src.left) * srcWidth);
@@ -222,11 +222,11 @@ namespace Unity.UIWidgets.ui {
             uv.Add(new Vector2(tx2, ty3));
             vertices.Add(new Vector2(x3, y3));
             uv.Add(new Vector2(tx3, ty3));
-            
+
             var _triangles = ObjectPool<uiList<int>>.alloc();
             _triangles.AddRange(_imageNineTriangles);
-            
+
             return uiMeshMesh.create(matrix, vertices, _triangles, uv);
-        }        
+        }
     }
 }

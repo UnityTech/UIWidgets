@@ -5,7 +5,6 @@ using Rect = Unity.UIWidgets.ui.Rect;
 
 namespace Unity.UIWidgets.flow {
     public class TextureLayer : Layer {
-        
         Offset _offset = Offset.zero;
 
         public Offset offset {
@@ -40,7 +39,7 @@ namespace Unity.UIWidgets.flow {
 
             if (this._texture == null) {
                 return;
-            }           
+            }
 
             var image = new Image(this._texture, noDispose: true);
 

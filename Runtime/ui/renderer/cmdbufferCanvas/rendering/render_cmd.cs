@@ -5,7 +5,7 @@ namespace Unity.UIWidgets.ui {
         internal abstract class RenderCmd : PoolObject {
             public abstract void release();
         }
-        
+
         internal class CmdLayer : RenderCmd {
             public RenderLayer layer;
 
@@ -26,7 +26,7 @@ namespace Unity.UIWidgets.ui {
                 ObjectPool<CmdLayer>.release(this);
             }
         }
-        
+
         internal class CmdDraw : RenderCmd {
             public uiMeshMesh mesh;
             public TextBlobMesh textMesh;
@@ -43,7 +43,7 @@ namespace Unity.UIWidgets.ui {
             public static readonly int texId = Shader.PropertyToID("_tex");
             public static readonly int matId = Shader.PropertyToID("_mat");
 
-            
+
             public override void clear() {
                 ObjectPool<uiMeshMesh>.release(this.mesh);
                 ObjectPool<TextBlobMesh>.release(this.textMesh);
@@ -67,10 +67,10 @@ namespace Unity.UIWidgets.ui {
                 newCmd.image = image;
                 newCmd.meshObj = meshObj;
                 newCmd.meshObjCreated = meshObjCreated;
-                
+
                 return newCmd;
             }
-            
+
             public override void release() {
                 ObjectPool<CmdDraw>.release(this);
             }
@@ -81,7 +81,7 @@ namespace Unity.UIWidgets.ui {
 
             public CmdScissor() {
             }
-            
+
             public override void clear() {
                 this.deviceScissor = null;
             }
@@ -91,7 +91,7 @@ namespace Unity.UIWidgets.ui {
                 newCmd.deviceScissor = deviceScissor;
                 return newCmd;
             }
-            
+
             public override void release() {
                 ObjectPool<CmdScissor>.release(this);
             }

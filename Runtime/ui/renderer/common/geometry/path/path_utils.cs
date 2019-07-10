@@ -3,13 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
-    
-    
     public enum uiPathWinding {
         counterClockwise = 1, // which just means the order as the input is.
         clockwise = 2, // which just means the reversed order.
     }
-    
+
     enum uiPathCommand {
         moveTo,
         lineTo,
@@ -73,11 +71,11 @@ namespace Unity.UIWidgets.ui {
             newPath.nstroke = nstroke;
             newPath.winding = winding;
             newPath.convex = convex;
-            
+
             return newPath;
         }
     }
-    
+
     static class uiPathUtils {
         public static bool ptEquals(float x1, float y1, float x2, float y2, float tol) {
             float dx = x2 - x1;

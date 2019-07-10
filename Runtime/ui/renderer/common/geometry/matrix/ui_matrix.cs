@@ -1,4 +1,3 @@
-using System;
 using Unity.UIWidgets.foundation;
 using UnityEngine;
 
@@ -264,7 +263,7 @@ namespace Unity.UIWidgets.ui {
                      (kUnknown_Mask | kOnlyPerspectiveValid_Mask));
             this.fTypeMask = mask;
         }
-        
+
         void _orTypeMask(int mask) {
             D.assert((mask & kORableMasks) == mask);
             this.fTypeMask |= mask;
@@ -698,7 +697,7 @@ namespace Unity.UIWidgets.ui {
                 this._setConcat(this, other);
             }
         }
-        
+
         public void preScale(float sx, float sy, float px, float py) {
             if (1 == sx && 1 == sy) {
                 return;
@@ -723,14 +722,15 @@ namespace Unity.UIWidgets.ui {
             this.kMPersp1 *= sy;
 
             if (this.kMScaleX == 1 && this.kMScaleY == 1 && (this.fTypeMask &
-                (int) (TypeMask.kPerspective_Mask | TypeMask.kAffine_Mask)) == 0) {
+                                                             (int) (TypeMask.kPerspective_Mask | TypeMask.kAffine_Mask)
+                ) == 0) {
                 this._clearTypeMask((int) TypeMask.kScale_Mask);
             }
             else {
                 this._orTypeMask((int) TypeMask.kScale_Mask);
             }
         }
-        
+
         public void preRotate(float radians, float px, float py) {
             var m = new uiMatrix3();
             m.setRotate(radians, px, py);
@@ -742,13 +742,13 @@ namespace Unity.UIWidgets.ui {
             m.setRotate(radians);
             this.preConcat(m);
         }
-        
+
         public void preSkew(float kx, float ky) {
             var m = new uiMatrix3();
             m.setSkew(kx, ky);
             this.preConcat(m);
         }
-        
+
         public void setScale(float sx, float sy, float px, float py) {
             if (1 == sx && 1 == sy) {
                 this.reset();

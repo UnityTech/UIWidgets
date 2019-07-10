@@ -16,7 +16,6 @@ namespace Unity.UIWidgets.ui {
         uiMatrix3? _invMat;
 
         public ClipElement() {
-            
         }
 
         public override void clear() {
@@ -32,13 +31,13 @@ namespace Unity.UIWidgets.ui {
 
         public static ClipElement create(int saveCount, uiPath uiPath, uiMatrix3 matrix, float scale) {
             ClipElement newElement = ObjectPool<ClipElement>.alloc();
-            
+
             newElement.saveCount = saveCount;
 
             var pathCache = uiPath.flatten(scale);
             var fillMesh = pathCache.getFillMesh(out newElement.convex);
             newElement.mesh = fillMesh.transform(matrix);
-            
+
             var vertices = newElement.mesh.vertices;
             if (newElement.convex && vertices.Count == 4 && matrix.rectStaysRect() &&
                 (Mathf.Abs(vertices[0].x - vertices[1].x) < 1e-6 && Mathf.Abs(vertices[1].y - vertices[2].y) < 1e-6 &&
@@ -115,21 +114,21 @@ namespace Unity.UIWidgets.ui {
             if (this.mesh.vertices.Count <= 2) {
                 return false;
             }
-            
+
             for (var i = 0; i < this.mesh.vertices.Count; i++) {
                 var p1 = this.mesh.vertices[i];
                 var p0 = this.mesh.vertices[i == this.mesh.vertices.Count - 1 ? 0 : i + 1];
-                
+
                 var v = p1 - p0;
                 if (v.x == 0.0 && v.y == 0.0) {
                     continue;
                 }
-                
+
                 float yL = v.y * (rect.left - p0.x);
                 float xT = v.x * (rect.top - p0.y);
                 float yR = v.y * (rect.right - p0.x);
                 float xB = v.x * (rect.bottom - p0.y);
-                
+
                 if ((xT < yL) || (xT < yR) || (xB < yL) || (xB < yR)) {
                     return false;
                 }
@@ -148,7 +147,7 @@ namespace Unity.UIWidgets.ui {
                     if (this._invMat == null) {
                         this._invMat = this.mesh.matrix.Value.invert();
                     }
-                
+
                     rect = this._invMat.Value.mapRect(rect);
                 }
 
@@ -173,7 +172,7 @@ namespace Unity.UIWidgets.ui {
         public const uint wideOpenGenID = 2;
 
         public readonly List<ClipElement> stack = new List<ClipElement>(32);
-        
+
         ClipElement _lastElement;
         uiRect _bound;
         int _saveCount;
@@ -188,7 +187,7 @@ namespace Unity.UIWidgets.ui {
             foreach (var clipelement in this.stack) {
                 ObjectPool<ClipElement>.release(clipelement);
             }
-            
+
             this.stack.Clear();
         }
 
@@ -209,7 +208,7 @@ namespace Unity.UIWidgets.ui {
 
                 var lastelement = this.stack[this.stack.Count - 1];
                 ObjectPool<ClipElement>.release(lastelement);
-                
+
                 this.stack.RemoveAt(this.stack.Count - 1);
                 this._lastElement = this.stack.Count == 0 ? null : this.stack[this.stack.Count - 1];
             }
@@ -245,7 +244,7 @@ namespace Unity.UIWidgets.ui {
                         return;
                     }
 
-                    if (!uiRectHelper.overlaps(prior.getBound(),element.getBound())) {
+                    if (!uiRectHelper.overlaps(prior.getBound(), element.getBound())) {
                         prior.setEmpty();
                         ObjectPool<ClipElement>.release(element);
                         return;
@@ -281,7 +280,6 @@ namespace Unity.UIWidgets.ui {
         }
 
         public ReducedClip() {
-            
         }
 
         public override void clear() {
@@ -310,7 +308,7 @@ namespace Unity.UIWidgets.ui {
                 return clip;
             }
 
-            stackBounds = uiRectHelper.intersect(layerBounds,stackBounds.Value);
+            stackBounds = uiRectHelper.intersect(layerBounds, stackBounds.Value);
             if (iior) {
                 clip.scissor = stackBounds;
                 return clip;

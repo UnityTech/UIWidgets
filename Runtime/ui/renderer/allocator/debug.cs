@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
-
     class DebugMeta {
         public string objName;
         public int watermark;
@@ -21,20 +20,19 @@ namespace Unity.UIWidgets.ui {
             this.allocated = allocatedCount;
         }
     }
-    
-    public static class AllocDebugger {
 
+    public static class AllocDebugger {
         public const bool enableDebugging = true;
 
         static int allocCount = 0;
-        
+
         static readonly Dictionary<int, DebugMeta> debugInfos = new Dictionary<int, DebugMeta>();
 
         public static void onFrameEnd() {
             if (!enableDebugging) {
                 return;
             }
-            
+
             allocCount++;
             if (allocCount >= 120) {
                 allocCount = 0;
@@ -54,6 +52,7 @@ namespace Unity.UIWidgets.ui {
                 if (debugInfo == "Alloc Stats: ") {
                     return;
                 }
+
                 Debug.Log(debugInfo);
             }
         }

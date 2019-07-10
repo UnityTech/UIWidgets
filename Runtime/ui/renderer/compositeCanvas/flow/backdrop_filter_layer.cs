@@ -17,7 +17,8 @@ namespace Unity.UIWidgets.flow {
 
             try {
                 this.paintChildren(context);
-            } finally {
+            }
+            finally {
                 canvas.restore();
             }
         }

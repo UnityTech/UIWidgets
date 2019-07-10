@@ -27,9 +27,7 @@ namespace Unity.UIWidgets.ui {
         };
 
         public uiMeshMesh boundsMesh {
-            get {
-                return create(this.bounds);
-            }
+            get { return create(this.bounds); }
         }
 
         public uiMeshMesh() {
@@ -64,14 +62,15 @@ namespace Unity.UIWidgets.ui {
             return newMesh;
         }
 
-        public static uiMeshMesh create(uiMatrix3? matrix, uiList<Vector3> vertices, uiList<int> triangles, uiList<Vector2> uv = null,
+        public static uiMeshMesh create(uiMatrix3? matrix, uiList<Vector3> vertices, uiList<int> triangles,
+            uiList<Vector2> uv = null,
             uiRect? rawBounds = null) {
             D.assert(vertices != null);
             D.assert(vertices.Count >= 0);
             D.assert(triangles != null);
             D.assert(triangles.Count >= 0);
             D.assert(uv == null || uv.Count == vertices.Count);
-            
+
             uiMeshMesh newMesh = ObjectPool<uiMeshMesh>.alloc();
             newMesh.matrix = matrix;
             newMesh.vertices = vertices;
@@ -126,7 +125,7 @@ namespace Unity.UIWidgets.ui {
             var vertices = ObjectPool<uiList<Vector3>>.alloc();
             vertices.SetCapacity(this.vertices.Count);
             vertices.AddRange(this.vertices.data);
-            
+
             var triangles = ObjectPool<uiList<int>>.alloc();
             triangles.SetCapacity(this.triangles.Count);
             triangles.AddRange(this.triangles.data);

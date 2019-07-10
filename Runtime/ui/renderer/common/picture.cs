@@ -2,13 +2,11 @@ using System;
 using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
 
-
 namespace Unity.UIWidgets.ui {
     public class uiPicture : PoolObject {
         public uiPicture() {
-            
         }
-        
+
         public static uiPicture create(List<uiDrawCmd> drawCmds, uiRect paintBounds) {
             var picture = ObjectPool<uiPicture>.alloc();
             picture.drawCmds = drawCmds;
@@ -51,7 +49,7 @@ namespace Unity.UIWidgets.ui {
             foreach (var drawCmd in this._drawCmds) {
                 drawCmd.release();
             }
-            
+
             this._drawCmds.Clear();
             this._states.Clear();
             this._states.Add(new uiCanvasState {
@@ -68,7 +66,7 @@ namespace Unity.UIWidgets.ui {
                 throw new Exception("unmatched save/restore commands");
             }
 
-            var state = this._getState();            
+            var state = this._getState();
             return uiPicture.create(this._drawCmds, state.paintBounds);
         }
 
@@ -96,11 +94,13 @@ namespace Unity.UIWidgets.ui {
 
                     if (!stateToRestore.saveLayer) {
                         state.paintBounds = stateToRestore.paintBounds;
-                    } else {
+                    }
+                    else {
                         var paintBounds = stateToRestore.paintBounds.shift(stateToRestore.layerOffset.Value);
                         paintBounds = state.xform.mapRect(paintBounds);
                         this._addPaintBounds(paintBounds);
                     }
+
                     this._setState(state);
                     break;
                 }
@@ -123,11 +123,13 @@ namespace Unity.UIWidgets.ui {
                     state.xform = new uiMatrix3(state.xform);
                     if (cmd.offset == null) {
                         state.xform.preRotate(cmd.radians);
-                    } else {
+                    }
+                    else {
                         state.xform.preRotate(cmd.radians,
                             cmd.offset.Value.dx,
                             cmd.offset.Value.dy);
                     }
+
                     this._setState(state);
                     break;
                 }
@@ -199,7 +201,8 @@ namespace Unity.UIWidgets.ui {
                         var cache = path.flatten(scale * devicePixelRatio);
                         var fillMesh = cache.getFillMesh(out _);
                         mesh = fillMesh.transform(state.xform);
-                    } else {
+                    }
+                    else {
                         float strokeWidth = (paint.strokeWidth * scale).clamp(0, 200.0f);
                         float fringeWidth = 1 / devicePixelRatio;
 
@@ -213,18 +216,19 @@ namespace Unity.UIWidgets.ui {
                             paint.strokeCap,
                             paint.strokeJoin,
                             paint.strokeMiterLimit);
-                        
+
                         mesh = strokenMesh.transform(state.xform);
                     }
-                    
+
                     if (paint.maskFilter != null && paint.maskFilter.Value.sigma != 0) {
                         float sigma = scale * paint.maskFilter.Value.sigma;
                         float sigma3 = 3 * sigma;
                         this._addPaintBounds(uiRectHelper.inflate(mesh.bounds, sigma3));
-                    } else {
+                    }
+                    else {
                         this._addPaintBounds(mesh.bounds);
                     }
-                    
+
                     ObjectPool<uiMeshMesh>.release(mesh);
                     break;
                 }
@@ -259,16 +263,17 @@ namespace Unity.UIWidgets.ui {
                     var scale = uiXformUtils.getScale(state.xform);
                     var rect = uiRectHelper.fromRect(cmd.textBlob.boundsInText).shift(cmd.offset.Value);
                     rect = state.xform.mapRect(rect);
-                    
+
                     var paint = cmd.paint;
                     if (paint.maskFilter != null && paint.maskFilter.Value.sigma != 0) {
                         float sigma = scale * paint.maskFilter.Value.sigma;
                         float sigma3 = 3 * sigma;
                         this._addPaintBounds(uiRectHelper.inflate(rect, sigma3));
-                    } else {
+                    }
+                    else {
                         this._addPaintBounds(rect);
                     }
-                    
+
                     break;
                 }
                 default:
@@ -288,9 +293,11 @@ namespace Unity.UIWidgets.ui {
 
             if (state.paintBounds.isEmpty) {
                 state.paintBounds = paintBounds.Value;
-            } else {
+            }
+            else {
                 state.paintBounds = state.paintBounds.expandToInclude(paintBounds.Value);
             }
+
             this._setState(state);
         }
 
@@ -302,7 +309,7 @@ namespace Unity.UIWidgets.ui {
             public uiRect paintBounds;
 
             public uiCanvasState copy() {
-                return new uiCanvasState{
+                return new uiCanvasState {
                     xform = this.xform,
                     scissor = this.scissor,
                     saveLayer = false,

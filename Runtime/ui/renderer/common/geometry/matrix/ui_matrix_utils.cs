@@ -4,7 +4,6 @@ using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
     public partial struct uiMatrix3 {
-        
         public void mapPoints(uiOffset[] dst, uiOffset[] src) {
             D.assert(dst != null && src != null && dst.Length == src.Length);
             this._getMapPtsProc()(this, dst, src, src.Length);

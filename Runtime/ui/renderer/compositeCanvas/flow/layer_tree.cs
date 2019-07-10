@@ -22,7 +22,7 @@ namespace Unity.UIWidgets.flow {
             get { return this._devicePixelRatio; }
             set { this._devicePixelRatio = value; }
         }
-        
+
         int _antiAliasing;
 
         public int antiAliasing {

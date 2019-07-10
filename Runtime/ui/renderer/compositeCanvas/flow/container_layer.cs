@@ -27,7 +27,8 @@ namespace Unity.UIWidgets.flow {
 
                 if (childPaintBounds == null || childPaintBounds.isEmpty) {
                     childPaintBounds = layer.paintBounds;
-                } else {
+                }
+                else {
                     childPaintBounds = childPaintBounds.expandToInclude(layer.paintBounds);
                 }
             }
@@ -35,7 +36,7 @@ namespace Unity.UIWidgets.flow {
 
         protected void paintChildren(PaintContext context) {
             D.assert(this.needsPainting);
-            
+
             foreach (var layer in this._layers) {
                 if (layer.needsPainting) {
                     layer.paint(context);

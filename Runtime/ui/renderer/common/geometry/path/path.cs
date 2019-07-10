@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using Unity.UIWidgets.foundation;
 using UnityEngine;
 
@@ -12,7 +10,7 @@ namespace Unity.UIWidgets.ui {
         float _commandy;
         float _minX, _minY;
         float _maxX, _maxY;
-        
+
         uiPathCache _cache;
 
         public uint pathKey = 0;
@@ -32,10 +30,9 @@ namespace Unity.UIWidgets.ui {
             ObjectPool<uiPathCache>.release(this._cache);
             this._cache = null;
             this._commands = null;
-            
+
             this.needCache = false;
             this.pathKey = 0;
-
         }
 
         void _reset() {
@@ -52,11 +49,11 @@ namespace Unity.UIWidgets.ui {
 
         internal uiPathCache flatten(float scale) {
             scale = Mathf.Round(scale * 2.0f) / 2.0f; // round to 0.5f
-            
+
             if (this._cache != null && this._cache.canReuse(scale)) {
                 return this._cache;
             }
-            
+
             var _cache = uiPathCache.create(scale);
 
             var i = 0;
@@ -103,6 +100,7 @@ namespace Unity.UIWidgets.ui {
             if (x < this._minX) {
                 this._minX = x;
             }
+
             if (y < this._minY) {
                 this._minY = y;
             }
@@ -110,6 +108,7 @@ namespace Unity.UIWidgets.ui {
             if (x > this._maxX) {
                 this._maxX = x;
             }
+
             if (y > this._maxY) {
                 this._maxY = y;
             }
@@ -122,7 +121,7 @@ namespace Unity.UIWidgets.ui {
 
             this._commandx = x;
             this._commandy = y;
-            
+
             ObjectPool<uiPathCache>.release(this._cache);
             this._cache = null;
         }
@@ -137,7 +136,7 @@ namespace Unity.UIWidgets.ui {
 
             this._commandx = x;
             this._commandy = y;
-            
+
             ObjectPool<uiPathCache>.release(this._cache);
             this._cache = null;
         }
@@ -147,7 +146,7 @@ namespace Unity.UIWidgets.ui {
             this._expandBounds(x1, y1);
             this._expandBounds(x2, y2);
             this._expandBounds(x3, y3);
-            
+
             this._commands.Add((float) uiPathCommand.bezierTo);
             this._commands.Add(x1);
             this._commands.Add(y1);
@@ -155,17 +154,17 @@ namespace Unity.UIWidgets.ui {
             this._commands.Add(y2);
             this._commands.Add(x3);
             this._commands.Add(y3);
-            
+
             this._commandx = x3;
             this._commandy = y3;
-            
+
             ObjectPool<uiPathCache>.release(this._cache);
             this._cache = null;
         }
-        
+
         void _appendClose() {
             this._commands.Add((float) uiPathCommand.close);
-            
+
             ObjectPool<uiPathCache>.release(this._cache);
             this._cache = null;
         }
@@ -173,7 +172,7 @@ namespace Unity.UIWidgets.ui {
         void _appendWinding(float winding) {
             this._commands.Add((float) uiPathCommand.winding);
             this._commands.Add(winding);
-            
+
             ObjectPool<uiPathCache>.release(this._cache);
             this._cache = null;
         }
@@ -185,7 +184,7 @@ namespace Unity.UIWidgets.ui {
             this._appendLineTo(rect.right, rect.top);
             this._appendClose();
         }
-        
+
         public void addRect(Rect rect) {
             this._appendMoveTo(rect.left, rect.top);
             this._appendLineTo(rect.left, rect.bottom);
@@ -228,19 +227,19 @@ namespace Unity.UIWidgets.ui {
                 x, y + ryTL * (1 - _KAPPA90), x, y + ryTL);
             this._appendClose();
         }
-        
+
         public void moveTo(float x, float y) {
             this._appendMoveTo(x, y);
         }
-        
+
         public void lineTo(float x, float y) {
             this._appendLineTo(x, y);
         }
-        
+
         public void winding(PathWinding dir) {
             this._appendWinding((float) dir);
         }
-        
+
         public void addEllipse(float cx, float cy, float rx, float ry) {
             this._appendMoveTo(cx - rx, cy);
             this._appendBezierTo(cx - rx, cy + ry * _KAPPA90,
@@ -253,11 +252,11 @@ namespace Unity.UIWidgets.ui {
                 cx - rx, cy - ry * _KAPPA90, cx - rx, cy);
             this._appendClose();
         }
-        
+
         public void addCircle(float cx, float cy, float r) {
             this.addEllipse(cx, cy, r, r);
         }
-        
+
         public void arcTo(Rect rect, float startAngle, float sweepAngle, bool forceMoveTo = true) {
             var mat = Matrix3.makeScale(rect.width / 2, rect.height / 2);
             var center = rect.center;
@@ -266,11 +265,11 @@ namespace Unity.UIWidgets.ui {
             this._addArcCommands(0, 0, 1, startAngle, startAngle + sweepAngle,
                 sweepAngle >= 0 ? PathWinding.clockwise : PathWinding.counterClockwise, forceMoveTo, mat);
         }
-        
+
         public void close() {
             this._appendClose();
         }
-        
+
         void _addArcCommands(
             float cx, float cy, float r, float a0, float a1,
             PathWinding dir, bool forceMoveTo, Matrix3 transform = null) {
@@ -279,27 +278,32 @@ namespace Unity.UIWidgets.ui {
             if (dir == PathWinding.clockwise) {
                 if (Mathf.Abs(da) >= Mathf.PI * 2) {
                     da = Mathf.PI * 2;
-                } else {
+                }
+                else {
                     while (da < 0.0f) {
                         da += Mathf.PI * 2;
                     }
+
                     if (da <= 1e-5) {
                         return;
                     }
                 }
-            } else {
+            }
+            else {
                 if (Mathf.Abs(da) >= Mathf.PI * 2) {
                     da = -Mathf.PI * 2;
-                } else {
+                }
+                else {
                     while (da > 0.0f) {
                         da -= Mathf.PI * 2;
                     }
+
                     if (da >= -1e-5) {
                         return;
                     }
                 }
             }
-            
+
             // Split arc into max 90 degree segments.
             int ndivs = Mathf.Max(1, Mathf.Min((int) (Mathf.Abs(da) / (Mathf.PI * 0.5f) + 0.5f), 5));
             float hda = (da / ndivs) / 2.0f;
@@ -329,10 +333,12 @@ namespace Unity.UIWidgets.ui {
 
                     if (move == PathCommand.moveTo) {
                         this._appendMoveTo(x1, y1);
-                    } else {
+                    }
+                    else {
                         this._appendLineTo(x1, y1);
                     }
-                } else {
+                }
+                else {
                     float c1x = px + ptanx;
                     float c1y = py + ptany;
                     float c2x = x - tanx;
@@ -347,6 +353,7 @@ namespace Unity.UIWidgets.ui {
 
                     this._appendBezierTo(c1x, c1y, c2x, c2y, x1, y1);
                 }
+
                 px = x;
                 py = y;
                 ptanx = tanx;
@@ -378,7 +385,7 @@ namespace Unity.UIWidgets.ui {
                     case uiPathCommand.lineTo: {
                         float x = _commands[i + 1];
                         float y = _commands[i + 2];
-                        
+
                         uipath._appendLineTo(x, y);
                     }
                         i += 3;
@@ -390,7 +397,7 @@ namespace Unity.UIWidgets.ui {
                         float c2y = _commands[i + 4];
                         float x1 = _commands[i + 5];
                         float y1 = _commands[i + 6];
-                        
+
                         uipath._appendBezierTo(c1x, c1y, c2x, c2y, x1, y1);
                     }
                         i += 7;
@@ -408,6 +415,7 @@ namespace Unity.UIWidgets.ui {
                         break;
                 }
             }
+
             return uipath;
         }
     }

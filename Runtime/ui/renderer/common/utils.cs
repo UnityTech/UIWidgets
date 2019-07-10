@@ -11,10 +11,10 @@ namespace Unity.UIWidgets.ui {
             if (matrix.getSkewY() == 0) {
                 return matrix.getScaleX();
             }
-            
+
             var x = matrix.getScaleX();
             var y = matrix.getSkewY();
-            
+
             return Mathf.Sqrt(x * x + y * y);
         }
 

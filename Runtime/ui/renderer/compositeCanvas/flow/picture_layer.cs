@@ -32,13 +32,16 @@ namespace Unity.UIWidgets.flow {
         public override void preroll(PrerollContext context, Matrix3 matrix) {
             if (context.rasterCache != null) {
                 Matrix3 ctm = new Matrix3(matrix);
-                ctm.preTranslate(this._offset.dx, this._offset.dy); // TOOD: pre or post? https://github.com/flutter/engine/pull/7945
+                ctm.preTranslate(this._offset.dx,
+                    this._offset.dy); // TOOD: pre or post? https://github.com/flutter/engine/pull/7945
                 ctm[2] = ctm[2].alignToPixel(context.devicePixelRatio);
                 ctm[5] = ctm[5].alignToPixel(context.devicePixelRatio);
 
                 this._rasterCacheResult = context.rasterCache.getPrerolledImage(
-                    this._picture, ctm, context.devicePixelRatio, context.antiAliasing, this._isComplex, this._willChange);
-            } else {
+                    this._picture, ctm, context.devicePixelRatio, context.antiAliasing, this._isComplex,
+                    this._willChange);
+            }
+            else {
                 this._rasterCacheResult = null;
             }
 
@@ -60,10 +63,12 @@ namespace Unity.UIWidgets.flow {
             try {
                 if (this._rasterCacheResult != null) {
                     this._rasterCacheResult.draw(canvas);
-                } else {
+                }
+                else {
                     canvas.drawPicture(this._picture);
                 }
-            } finally {
+            }
+            finally {
                 canvas.restore();
             }
         }

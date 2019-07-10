@@ -31,7 +31,7 @@ namespace Unity.UIWidgets.flow {
 
         public override void paint(PaintContext context) {
             D.assert(this.needsPainting);
-            
+
             var canvas = context.canvas;
 
             canvas.save();
@@ -39,7 +39,8 @@ namespace Unity.UIWidgets.flow {
 
             try {
                 this.paintChildren(context);
-            } finally {
+            }
+            finally {
                 canvas.restore();
             }
         }
