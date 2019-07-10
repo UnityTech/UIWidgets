@@ -1,4 +1,3 @@
-using System;
 using Unity.UIWidgets.animation;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.painting;
@@ -130,14 +129,14 @@ namespace Unity.UIWidgets.widgets {
                         this.minLength * (((inside / viewport) - 0.8f) / 0.2f)
                     );
                 }
+
+                float fractionPast = before / (before + after);
+                float thumbOffset = (before + after > 0.0)
+                    ? fractionPast * (viewport - thumbExtent - 2 * this.mainAxisMargin) + this.mainAxisMargin
+                    : this.mainAxisMargin;
+
+                painter(canvas, size, thumbOffset, thumbExtent);
             }
-
-            float fractionPast = before / (before + after);
-            float thumbOffset = (before + after > 0.0)
-                ? fractionPast * (viewport - thumbExtent - 2 * this.mainAxisMargin) + this.mainAxisMargin
-                : this.mainAxisMargin;
-
-            painter(canvas, size, thumbOffset, thumbExtent);
         }
 
         public override void dispose() {

@@ -2125,6 +2125,8 @@ namespace Unity.UIWidgets.widgets {
     public delegate Widget IndexedWidgetBuilder(BuildContext context, int index);
 
     public delegate Widget TransitionBuilder(BuildContext context, Widget child);
+    
+    public delegate Widget ControlsWidgetBuilder(BuildContext context, VoidCallback onStepContinue = null, VoidCallback onStepCancel = null);
 
     public abstract class ComponentElement : Element {
         protected ComponentElement(Widget widget) : base(widget) {
@@ -2636,7 +2638,7 @@ namespace Unity.UIWidgets.widgets {
 
             var newChildren = oldChildren.Count == newWidgets.Count
                 ? oldChildren
-                : Enumerable.Repeat((Element) null, newWidgets.Count).ToList();
+                : CollectionUtils.CreateRepeatedList<Element>(null, newWidgets.Count);
 
             Element previousChild = null;
 
@@ -2961,7 +2963,7 @@ namespace Unity.UIWidgets.widgets {
 
         public override void mount(Element parent, object newSlot) {
             base.mount(parent, newSlot);
-            this._children = Enumerable.Repeat((Element) null, this.widget.children.Count).ToList();
+            this._children = CollectionUtils.CreateRepeatedList<Element>(null, this.widget.children.Count);
             Element previousChild = null;
             for (int i = 0; i < this._children.Count; i += 1) {
                 Element newChild = this.inflateWidget(this.widget.children[i], previousChild);

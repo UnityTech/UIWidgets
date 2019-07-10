@@ -90,6 +90,7 @@ namespace Unity.UIWidgets.rendering {
                         return;
                     case RenderComparison.function:
                         this._textPainter.text = value;
+                        this.markNeedsPaint();
                         break;
                     case RenderComparison.paint:
                         this._textPainter.text = value;
@@ -249,13 +250,35 @@ namespace Unity.UIWidgets.rendering {
         }
 
         TextSpan _previousHoverSpan;
+
+#pragma warning disable 0414
         bool _pointerHoverInside;
+#pragma warning restore 0414
         bool _hasHoverRecognizer;
+        MouseTrackerAnnotation _hoverAnnotation;
 
         void _resetHoverHandler() {
             this._hasHoverRecognizer = this._textPainter.text.hasHoverRecognizer;
             this._previousHoverSpan = null;
             this._pointerHoverInside = false;
+
+            if (this._hoverAnnotation != null && this.attached) {
+                RendererBinding.instance.mouseTracker.detachAnnotation(this._hoverAnnotation);
+            }
+
+            if (this._hasHoverRecognizer) {
+                this._hoverAnnotation = new MouseTrackerAnnotation(
+                    onEnter: this._onPointerEnter,
+                    onHover: this._onPointerHover,
+                    onExit: this._onPointerExit);
+
+                if (this.attached) {
+                    RendererBinding.instance.mouseTracker.attachAnnotation(this._hoverAnnotation);
+                }
+            }
+            else {
+                this._hoverAnnotation = null;
+            }
         }
 
         void _handleKeyEvent(RawKeyEvent keyEvent) {
@@ -288,12 +311,22 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
+        public override void attach(object owner) {
+            base.attach(owner);
+            if (this._hoverAnnotation != null) {
+                RendererBinding.instance.mouseTracker.attachAnnotation(this._hoverAnnotation);
+            }
+        }
+
         public override void detach() {
             if (this._listenerAttached) {
                 RawKeyboard.instance.removeListener(this._handleKeyEvent);
             }
 
             base.detach();
+            if (this._hoverAnnotation != null) {
+                RendererBinding.instance.mouseTracker.detachAnnotation(this._hoverAnnotation);
+            }
         }
 
         TextSelection _selection;
@@ -333,46 +366,40 @@ namespace Unity.UIWidgets.rendering {
             this.onSelectionChanged?.Invoke();
         }
 
+        void _onPointerEnter(PointerEvent evt) {
+            this._pointerHoverInside = true;
+        }
 
-        void _handlePointerHover(PointerEvent evt) {
-            if (!this._hasHoverRecognizer) {
-                return;
-            }
+        void _onPointerExit(PointerEvent evt) {
+            this._pointerHoverInside = false;
+            this._previousHoverSpan?.hoverRecognizer?.OnPointerLeave?.Invoke();
+            this._previousHoverSpan = null;
+        }
 
-            if (evt is PointerEnterEvent) {
-                this._pointerHoverInside = true;
-            }
-            else if (evt is PointerLeaveEvent) {
-                this._pointerHoverInside = false;
+        void _onPointerHover(PointerEvent evt) {
+            this._layoutTextWithConstraints(this.constraints);
+            Offset offset = this.globalToLocal(evt.position);
+            TextPosition position = this._textPainter.getPositionForOffset(offset);
+            TextSpan span = this._textPainter.text.getSpanForPosition(position);
+
+            if (this._previousHoverSpan != span) {
                 this._previousHoverSpan?.hoverRecognizer?.OnPointerLeave?.Invoke();
-                this._previousHoverSpan = null;
-            }
-            else if (evt is PointerHoverEvent && this._pointerHoverInside) {
-                this._layoutTextWithConstraints(this.constraints);
-                Offset offset = this.globalToLocal(evt.position);
-                TextPosition position = this._textPainter.getPositionForOffset(offset);
-                TextSpan span = this._textPainter.text.getSpanForPosition(position);
-
-                if (this._previousHoverSpan != span) {
-                    this._previousHoverSpan?.hoverRecognizer?.OnPointerLeave?.Invoke();
-                    span?.hoverRecognizer?.OnPointerEnter?.Invoke((PointerHoverEvent) evt);
-                    this._previousHoverSpan = span;
-                }
+                span?.hoverRecognizer?.OnPointerEnter?.Invoke((PointerHoverEvent) evt);
+                this._previousHoverSpan = span;
             }
         }
 
         public override void handleEvent(PointerEvent evt, HitTestEntry entry) {
             D.assert(this.debugHandleEvent(evt, entry));
-            if (evt is PointerDownEvent) {
-                this._layoutTextWithConstraints(this.constraints);
-                Offset offset = ((BoxHitTestEntry) entry).localPosition;
-                TextPosition position = this._textPainter.getPositionForOffset(offset);
-                TextSpan span = this._textPainter.text.getSpanForPosition(position);
-                span?.recognizer?.addPointer((PointerDownEvent) evt);
+            if (!(evt is PointerDownEvent)) {
                 return;
             }
-
-            this._handlePointerHover(evt);
+            
+            this._layoutTextWithConstraints(this.constraints);
+            Offset offset = ((BoxHitTestEntry) entry).localPosition;
+            TextPosition position = this._textPainter.getPositionForOffset(offset);
+            TextSpan span = this._textPainter.text.getSpanForPosition(position);
+            span?.recognizer?.addPointer((PointerDownEvent) evt);
         }
 
         protected override void performLayout() {
@@ -387,7 +414,8 @@ namespace Unity.UIWidgets.rendering {
             this._selectionRects = null;
         }
 
-        public override void paint(PaintingContext context, Offset offset) {
+
+        void paintParagraph(PaintingContext context, Offset offset) {
             this._layoutTextWithConstraints(this.constraints);
             var canvas = context.canvas;
 
@@ -408,6 +436,18 @@ namespace Unity.UIWidgets.rendering {
             this._textPainter.paint(canvas, offset);
             if (this._hasVisualOverflow) {
                 canvas.restore();
+            }
+        }
+
+        public override void paint(PaintingContext context, Offset offset) {
+            if (this._hoverAnnotation != null) {
+                AnnotatedRegionLayer<MouseTrackerAnnotation> layer = new AnnotatedRegionLayer<MouseTrackerAnnotation>(
+                    this._hoverAnnotation, size: this.size, offset: offset);
+
+                context.pushLayer(layer, this.paintParagraph, offset);
+            }
+            else {
+                this.paintParagraph(context, offset);
             }
         }
 

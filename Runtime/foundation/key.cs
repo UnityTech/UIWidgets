@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 
 namespace Unity.UIWidgets.foundation {
+    
+#pragma warning disable 0660
+#pragma warning disable 0661
     public abstract class Key {
         protected Key() {
         }
@@ -18,6 +21,8 @@ namespace Unity.UIWidgets.foundation {
             return !Equals(left, right);
         }
     }
+#pragma warning restore 0660
+#pragma warning restore 0661
 
     public abstract class LocalKey : Key {
         protected LocalKey() {

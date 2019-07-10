@@ -17,7 +17,8 @@ namespace Unity.UIWidgets.widgets {
             ScrollContext context = null,
             bool keepScrollOffset = true,
             ScrollPosition oldPosition = null,
-            string debugLabel = null
+            string debugLabel = null,
+            object coordinator = null
         ) {
             D.assert(physics != null);
             D.assert(context != null);
@@ -27,6 +28,7 @@ namespace Unity.UIWidgets.widgets {
             this.context = context;
             this.keepScrollOffset = keepScrollOffset;
             this.debugLabel = debugLabel;
+            this._coordinator = coordinator;
 
             if (oldPosition != null) {
                 this.absorb(oldPosition);
@@ -44,6 +46,8 @@ namespace Unity.UIWidgets.widgets {
         public readonly bool keepScrollOffset;
 
         public readonly string debugLabel;
+
+        internal readonly object _coordinator;
 
         public float minScrollExtent {
             get { return this._minScrollExtent.Value; }

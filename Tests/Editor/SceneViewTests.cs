@@ -13,7 +13,9 @@ namespace UIWidgets.Tests {
     public class SceneViewTests {
         public static void show() {
             onPreSceneGUIDelegate += OnPreSceneGUI;
+#pragma warning disable 0618
             SceneView.onSceneGUIDelegate += OnSceneGUI;
+#pragma warning restore 0618
             EditorApplication.update += Update;
 
             SceneView.RepaintAll();
@@ -29,11 +31,14 @@ namespace UIWidgets.Tests {
 
         public static void hide() {
             onPreSceneGUIDelegate -= OnPreSceneGUI;
+#pragma warning disable 0618
             SceneView.onSceneGUIDelegate -= OnSceneGUI;
+#pragma warning restore 0618
             EditorApplication.update -= Update;
             SceneView.RepaintAll();
         }
 
+#pragma warning disable 0618
         public static SceneView.OnSceneFunc onPreSceneGUIDelegate {
             get {
                 var field = typeof(SceneView).GetField("onPreSceneGUIDelegate",
@@ -49,6 +54,7 @@ namespace UIWidgets.Tests {
                 field.SetValue(null, value);
             }
         }
+#pragma warning restore 0618
 
         static Func<Widget>[] _options;
 

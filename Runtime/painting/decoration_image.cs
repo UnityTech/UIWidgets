@@ -252,6 +252,8 @@ namespace Unity.UIWidgets.painting {
             Paint paint = new Paint();
             if (colorFilter != null) {
                 paint.colorFilter = colorFilter;
+                paint.color = colorFilter.color;
+                paint.blendMode = colorFilter.blendMode;
             }
 
             if (sourceSize != destinationSize) {

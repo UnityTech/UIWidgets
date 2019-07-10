@@ -24,9 +24,9 @@ namespace UIWidgetsSample {
         }
 
         protected override Widget createWidget() {
-            return new WidgetsApp(
-                home: new EditableInputTypeWidget(),
-                pageRouteBuilder: this.pageRouteBuilder);
+            return new MaterialApp(
+                home: new EditableInputTypeWidget()
+                );
         }
 
 
@@ -143,7 +143,7 @@ namespace UIWidgetsSample {
                 height: 80,
                 child: new Row(
                     children: new List<Widget> {
-                        new Container(width: 100, child: new Text(title)),
+                        new Container(width: 100, child: new Text(title, style: new TextStyle(fontSize: 14, height: 2.0f, color: Colors.black, decoration: TextDecoration.none))),
                         new Flexible(child: new Container(child: widget, padding: EdgeInsets.all(4), decoration:
                             new BoxDecoration(border: Border.all(color: Color.black))))
                     }
@@ -210,11 +210,11 @@ namespace UIWidgetsSample {
         public override Widget build(BuildContext context) {
             List<Widget> widgets = new List<Widget>();
 
-            widgets.Add(new Text("UIWidgets Touch Keyboard", style: new TextStyle(fontSize: 20, height: 2.0f),
+            widgets.Add(new Text("UIWidgets Touch Keyboard", style: new TextStyle(fontSize: 20, height: 2.0f, color: Colors.black, decoration: TextDecoration.none),
                 textAlign: TextAlign.center));
             widgets.AddRange(this.buildInputs(false));
 
-            widgets.Add(new Text("Unity Touch Keyboard", style: new TextStyle(fontSize: 20, height: 2.0f),
+            widgets.Add(new Text("Unity Touch Keyboard", style: new TextStyle(fontSize: 20, height: 2.0f, color: Colors.black, decoration: TextDecoration.none),
                 textAlign: TextAlign.center));
             widgets.AddRange(this.buildInputs(true));
 

@@ -122,7 +122,7 @@ namespace Unity.UIWidgets.gestures {
                 D.assert(this._debugLogDiagnostic(
                     pointer, () => $"Winner: {state.members.First()}"));
 
-                state.members.First().acceptGesture(pointer);
+                state.members[0].acceptGesture(pointer);
                 for (int i = 1; i < state.members.Count; i++) {
                     state.members[i].rejectGesture(pointer);
                 }
@@ -206,12 +206,11 @@ namespace Unity.UIWidgets.gestures {
 
             D.assert(this._arenas[pointer] == state);
             D.assert(!state.isOpen);
-            List<GestureArenaMember> members = state.members;
-            D.assert(members.Count == 1);
+            D.assert(state.members.Count == 1);
             this._arenas.Remove(pointer);
             D.assert(this._debugLogDiagnostic(pointer,
                 () => $"Default winner: {state.members.First()}"));
-            state.members.First().acceptGesture(pointer);
+            state.members[0].acceptGesture(pointer);
         }
 
         void _resolveInFavorOf(int pointer, _GestureArena state, GestureArenaMember member) {

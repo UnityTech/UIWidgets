@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.painting;
@@ -327,16 +326,34 @@ namespace Unity.UIWidgets.rendering {
 
         int _handleHorizontalArrows(bool rightArrow, bool leftArrow, bool shift, int newOffset) {
             if (rightArrow && this._extentOffset < this.text.text.Length) {
-                newOffset += 1;
-                if (shift) {
-                    this._previousCursorLocation += 1;
+                if (newOffset < this.text.text.Length - 1 && char.IsHighSurrogate(this.text.text[newOffset])) {
+                    // handle emoji, which takes 2 bytes
+                    newOffset += 2;
+                    if (shift) {
+                        this._previousCursorLocation += 2;
+                    }
+                }
+                else {
+                    newOffset += 1;
+                    if (shift) {
+                        this._previousCursorLocation += 1;
+                    }
                 }
             }
 
             if (leftArrow && this._extentOffset > 0) {
-                newOffset -= 1;
-                if (shift) {
-                    this._previousCursorLocation -= 1;
+                if (newOffset > 1 && char.IsLowSurrogate(this.text.text[newOffset - 1])) {
+                    // handle emoji, which takes 2 bytes
+                    newOffset -= 2;
+                    if (shift) {
+                        this._previousCursorLocation -= 2;
+                    }
+                }
+                else {
+                    newOffset -= 1;
+                    if (shift) {
+                        this._previousCursorLocation -= 1;
+                    }
                 }
             }
 
@@ -483,11 +500,20 @@ namespace Unity.UIWidgets.rendering {
         void _handleDelete() {
             var selection = this.selection;
             if (selection.textAfter(this.text.text).isNotEmpty()) {
-                this.textSelectionDelegate.textEditingValue = new TextEditingValue(
-                    text: selection.textBefore(this.text.text)
-                          + selection.textAfter(this.text.text).Substring(1),
-                    selection: TextSelection.collapsed(offset: selection.start)
-                );
+                if (char.IsHighSurrogate(this.text.text[selection.end])) {
+                    this.textSelectionDelegate.textEditingValue = new TextEditingValue(
+                        text: selection.textBefore(this.text.text)
+                              + selection.textAfter(this.text.text).Substring(2),
+                        selection: TextSelection.collapsed(offset: selection.start)
+                    );
+                }
+                else {
+                    this.textSelectionDelegate.textEditingValue = new TextEditingValue(
+                        text: selection.textBefore(this.text.text)
+                              + selection.textAfter(this.text.text).Substring(1),
+                        selection: TextSelection.collapsed(offset: selection.start)
+                    );
+                }
             }
             else {
                 this.textSelectionDelegate.textEditingValue = new TextEditingValue(
@@ -877,7 +903,7 @@ namespace Unity.UIWidgets.rendering {
 
         public TextPosition getParagraphBackward(TextPosition position, TextAffinity? affinity = null) {
             var lineCount = this._textPainter.getLineCount();
-            
+
             Paragraph.LineRange line = null;
             for (int i = lineCount - 1; i >= 0; --i) {
                 line = this._textPainter.getLineRange(i);
@@ -998,9 +1024,7 @@ namespace Unity.UIWidgets.rendering {
                     extentOffset: extentOffset,
                     affinity: fromPosition.affinity);
 
-                if (newSelection != this._selection) {
-                    this.onSelectionChanged(newSelection, this, cause.Value);
-                }
+                this.onSelectionChanged(newSelection, this, cause.Value);
             }
         }
 
@@ -1008,7 +1032,7 @@ namespace Unity.UIWidgets.rendering {
             this.selectPositionAt(from: this._lastTapDownPosition, cause: cause);
         }
 
-        void selectWord(SelectionChangedCause? cause = null) {
+        public void selectWord(SelectionChangedCause? cause = null) {
             this.selectWordsInRange(from: this._lastTapDownPosition, cause: cause);
         }
 
@@ -1035,7 +1059,7 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
-        void selectWordEdge(SelectionChangedCause cause) {
+        public void selectWordEdge(SelectionChangedCause cause) {
             this._layoutText(this.constraints.maxWidth);
             D.assert(this._lastTapDownPosition != null);
             if (this.onSelectionChanged != null) {
@@ -1162,7 +1186,8 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
-        public void setFloatingCursor(FloatingCursorDragState? state, Offset boundedOffset, TextPosition lastTextPosition,
+        public void setFloatingCursor(FloatingCursorDragState? state, Offset boundedOffset,
+            TextPosition lastTextPosition,
             float? resetLerpValue = null) {
             D.assert(boundedOffset != null);
             D.assert(lastTextPosition != null);

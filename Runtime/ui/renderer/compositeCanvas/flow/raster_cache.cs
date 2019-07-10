@@ -216,6 +216,10 @@ namespace Unity.UIWidgets.flow {
                 return false;
             }
 
+            if (picture.isDynamic) {
+                return false;
+            }
+
             return true;
         }
 

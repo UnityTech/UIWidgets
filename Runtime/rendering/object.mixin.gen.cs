@@ -7,7 +7,7 @@ using UnityEngine;
 namespace Unity.UIWidgets.rendering {
 
     public abstract class RenderObjectWithChildMixinRenderObject<ChildType> : RenderObject, RenderObjectWithChildMixin<ChildType>, RenderObjectWithChildMixin where ChildType : RenderObject {
-        public bool debugValidateChild(RenderObject child) {
+        public virtual bool debugValidateChild(RenderObject child) {
             D.assert(() => {
                 if (!(child is ChildType)) {
                     throw new UIWidgetsError(
@@ -88,7 +88,7 @@ namespace Unity.UIWidgets.rendering {
 
 
     public abstract class RenderObjectWithChildMixinRenderBox<ChildType> : RenderBox, RenderObjectWithChildMixin<ChildType>, RenderObjectWithChildMixin where ChildType : RenderObject {
-        public bool debugValidateChild(RenderObject child) {
+        public virtual bool debugValidateChild(RenderObject child) {
             D.assert(() => {
                 if (!(child is ChildType)) {
                     throw new UIWidgetsError(
@@ -994,7 +994,7 @@ namespace Unity.UIWidgets.rendering {
             get { return this._childCount; }
         }
 
-        public bool debugValidateChild(RenderObject child) {
+        public override bool debugValidateChild(RenderObject child) {
             D.assert(() => {
                 if (!(child is ChildType)) {
                     throw new UIWidgetsError(

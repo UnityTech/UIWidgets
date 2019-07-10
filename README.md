@@ -4,20 +4,19 @@
 
 ## Introduction
 
-UIWidgets is a plugin package for Unity Editor which helps developers to create, debug and deploy efficient, 
-cross-platform Apps using the Unity Engine. 
+UIWidgets is a plugin package for Unity Editor which helps developers to create, debug and deploy efficient,
+cross-platform Apps using the Unity Engine.
 
 UIWidgets is mainly derived from [Flutter](https://github.com/flutter/flutter). However, taking advantage of
-the powerful Unity Engine, it offers developers many new features to improve their Apps 
+the powerful Unity Engine, it offers developers many new features to improve their Apps
 as well as the develop workflow significantly.
-
 
 #### Efficiency
 Using the latest Unity rendering SDKs, a UIWidgets App can run very fast and keep >60fps in most times.
 
 
 #### Cross-Platform
-A UIWidgets App can be deployed on all kinds of platforms including PCs, mobile devices and web page directly, like 
+A UIWidgets App can be deployed on all kinds of platforms including PCs, mobile devices and web page directly, like
 any other Unity projects.
 
 #### Multimedia Support
@@ -29,7 +28,7 @@ A UIWidgets App can be debug in the Unity Editor directly with many advanced too
 CPU/GPU Profiling, FPS Profiling.
 
 
-### Example
+## Example
 
 <div style="text-align: center"><table><tr>
 <td style="text-align: center">
@@ -46,6 +45,16 @@ CPU/GPU Profiling, FPS Profiling.
 </td>
 </tr></table></div>
 
+### Projects using UIWidgets
+
+#### Unity Connect App
+The Unity Connect App is created using UIWidgets and available for both Android (https://connect.unity.com/connectApp/download)
+and iOS (Searching for "Unity Connect" in App Store). This project is open-sourced @https://github.com/UnityTech/ConnectAppCN.
+
+#### Unity Chinese Doc
+The official website of Unity Chinese Documentation (https://connect.unity.com/doc) is powered by UIWidgets and
+open-sourced @https://github.com/UnityTech/DocCN.
+
 ## Requirement
 
 #### Unity
@@ -54,11 +63,11 @@ Install **Unity 2018.3** or above. You can download the latest Unity on https://
 #### UIWidgets Package
 Visit our Github repository https://github.com/UnityTech/UIWidgets
  to download the latest UIWidgets package.
- 
+
 Move the downloaded package folder into the **Package** folder of your Unity project.
 
 Generally, you can make it using a console (or terminal) application by just a few commands as below:
-    
+
    ```none
     cd <YourProjectPath>/Packages
     git clone https://github.com/UnityTech/UIWidgets.git com.unity.uiwidgets
@@ -67,10 +76,10 @@ Generally, you can make it using a console (or terminal) application by just a f
 ## Getting Start
 
 #### i. Overview
-In this tutorial, we will create a very simple UIWidgets App as the kick-starter. The app contains 
+In this tutorial, we will create a very simple UIWidgets App as the kick-starter. The app contains
 only a text label and a button. The text label will count the times of clicks upon the button.
 
-First of all, please open or create a Unity Project and open it with Unity Editor. 
+First of all, please open or create a Unity Project and open it with Unity Editor.
 
 And then open Project Settings, go to Player section and **add "UIWidgets_DEBUG" to the Scripting Define Symbols field.**
 This enables the debug mode of UIWidgets for your development. Remove this for your release build afterwards.
@@ -80,7 +89,7 @@ A UIWidgets App is usually built upon a Unity UI Canvas. Please follow the steps
 UI Canvas in Unity.
 1. Create a new Scene by "File -> New Scene";
 1. Create a UI Canvas in the scene by "GameObject -> UI -> Canvas";
-1. Add a Panel (i.e., **Panel 1**) to the UI Canvas by right click on the Canvas and select "UI -> Panel". Then remove the 
+1. Add a Panel (i.e., **Panel 1**) to the UI Canvas by right click on the Canvas and select "UI -> Panel". Then remove the
 **Image** Component from the Panel.
 
 #### iii. Create Widget
@@ -88,7 +97,7 @@ A UIWidgets App is written in **C# Scripts**. Please follow the steps to create 
 in Unity Editor.
 
 1. Create a new C# Script named "UIWidgetsExample.cs" and paste the following codes into it.
-   ```none
+   ```csharp
     using System.Collections.Generic;
     using Unity.UIWidgets.animation;
     using Unity.UIWidgets.engine;
@@ -99,24 +108,24 @@ in Unity Editor.
     using Unity.UIWidgets.widgets;
     using UnityEngine;
     using FontStyle = Unity.UIWidgets.ui.FontStyle;
-    
+
     namespace UIWidgetsSample {
         public class UIWidgetsExample : UIWidgetsPanel {
             protected override void OnEnable() {
-                // if you want to use your own font or font icons.   
+                // if you want to use your own font or font icons.
                 // FontManager.instance.addFont(Resources.Load<Font>(path: "path to your font"), "font family name");
-    
-                // load custom font with weight & style. The font weight & style corresponds to fontWeight, fontStyle of 
+
+                // load custom font with weight & style. The font weight & style corresponds to fontWeight, fontStyle of
                 // a TextStyle object
-                // FontManager.instance.addFont(Resources.Load<Font>(path: "path to your font"), "Roboto", FontWeight.w500, 
+                // FontManager.instance.addFont(Resources.Load<Font>(path: "path to your font"), "Roboto", FontWeight.w500,
                 //    FontStyle.italic);
-    
+
                 // add material icons, familyName must be "Material Icons"
                 // FontManager.instance.addFont(Resources.Load<Font>(path: "path to material icons"), "Material Icons");
-                
+
                 base.OnEnable();
             }
-    
+
             protected override Widget createWidget() {
                 return new WidgetsApp(
                     home: new ExampleApp(),
@@ -128,19 +137,19 @@ in Unity Editor.
                         )
                 );
             }
-    
+
             class ExampleApp : StatefulWidget {
                 public ExampleApp(Key key = null) : base(key) {
                 }
-    
+
                 public override State createState() {
                     return new ExampleState();
                 }
             }
-    
+
             class ExampleState : State<ExampleApp> {
                 int counter = 0;
-    
+
                 public override Widget build(BuildContext context) {
                     return new Column(
                         children: new List<Widget> {
@@ -165,14 +174,14 @@ in Unity Editor.
         }
     }
    ```
-   
+
 1. Save this script and attach it to **Panel 1** as its component.
 1. Press the "Play" Button to start the App in Unity Editor.
 
 #### iv. Build App
 Finally, the UIWidgets App can be built to packages for any specific platform by the following steps.
 1. Open the Build Settings Panel by "File -> Build Settings..."
-1. Choose a target platform and click "Build". Then the Unity Editor will automatically assemble 
+1. Choose a target platform and click "Build". Then the Unity Editor will automatically assemble
 all relevant resources and generate the final App package.
 
 #### How to load images?
@@ -186,34 +195,34 @@ UIWidgets supports Gif as well!
 3. Use Image.asset("loading1.gif") to load the gif images.
 
 #### Using Window Scope
-If you see the error ```AssertionError: Window.instance is null``` or null pointer error of ```Window.instance```,
+If you see the error `AssertionError: Window.instance is null` or null pointer error of `Window.instance`,
 it means the code is not running in the window scope. In this case, you can enclose your code
 with window scope as below:
-```
+```csharp
 using(WindowProvider.of(your gameObject with UIWidgetsPanel).getScope()) {
-    // code dealing with UIWidgets, 
+    // code dealing with UIWidgets,
     // e.g. setState(() => {....})
 }
 ```
 
 This is needed if the code is in methods
-not invoked by UIWidgets. For example, if the code is in ```completed``` callback of ```UnityWebRequest```, 
-you need to enclose them with window scope. 
+not invoked by UIWidgets. For example, if the code is in `completed` callback of `UnityWebRequest`,
+you need to enclose them with window scope.
 Please see [HttpRequestSample](./Samples/UIWidgetSample/HttpRequestSample.cs) for detail.
-For callback/event handler methods from UIWidgets (e.g ```Widget.build, State.initState...```), you don't need do
+For callback/event handler methods from UIWidgets (e.g `Widget.build, State.initState...`), you don't need do
 it yourself, since the framework ensure it's in window scope.
 
 #### Show Status Bar on Android
 Status bar is always hidden by default when an Unity project is running on an Android device. If you
  want to show the status bar in your App, this
- [solution](https://github.com/Over17/UnityShowAndroidStatusBar) seems to be 
+ [solution](https://github.com/Over17/UnityShowAndroidStatusBar) seems to be
  compatible to UIWidgets, therefore can be used as a good option before we release our
- full support solution on this issue. 
- 
+ full support solution on this issue.
+
  Besides,
  please set "Render Outside Safe Area" to true in the "Player Settings" to make this plugin working properly on Android P or later.
- 
- 
+
+
 
 
 #### Automatically Adjust Frame Rate
@@ -230,7 +239,7 @@ Please select the plugin of the Unity version corresponding to your project, and
 If you need to disable this plugin for any reason, please disable all the versions of this plugin as described above.
 
 This plugin overrides the following parameters in the Unity WebGL building module:
-```
+```none
 JS_SystemInfo_GetWidth
 JS_SystemInfo_GetHeight
 JS_SystemInfo_GetCurrentCanvasWidth
@@ -238,7 +247,7 @@ JS_SystemInfo_GetCurrentCanvasHeight
 $Browser
 $JSEvents
 ```
-If you would like to implement your own WebGL plugin, and your plugin overrides at least one of the above parameters, you need to disable the `UIWidgetsCanvasDevicePixelRatio` plugin in the above mentioned way to avoid possible conflicts. 
+If you would like to implement your own WebGL plugin, and your plugin overrides at least one of the above parameters, you need to disable the `UIWidgetsCanvasDevicePixelRatio` plugin in the above mentioned way to avoid possible conflicts.
 If you still need the function provided by this plugin, you can mannually apply the modification to Unity WebGL building module introduced in this plugin.
 All the modifications introduced in `UIWidgetsCanvasDevicePixelRatio` are marked by `////////// Modifcation Start ////////////` and `////////// Modifcation End ////////////`.
 In the marked codes, all the multiplications and divisions with `devicePixelRatio` are introduced by our modification.
@@ -247,37 +256,46 @@ To learn about the original script in detail, please refer to `SystemInfo.js` an
 #### Image Import Setting
 Unity, by default, resizes the width and height of an imported image to the nearest integer that is a power of 2.
 In UIWidgets, you should almost always disable this by selecting the image in the "Project" panel, then in the "Inspector" panel set the "Non Power of 2" option (in "Advanced") to "None", to prevent your image from being resized unexpectedly.
- 
+
+#### Update Emoji
+UIWidgets supports rendering emoji in (editable) texts. The emoji images comes from the free
+resources provided by [https://www.joypixels.com](https://www.joypixels.com/). If you would
+like to use your own images for emoji, please update the texture image `Tests/Resources/Emoji.png`,
+and the unicode-index table in `Runtime/ui/txt/emoji.cs` which maps unicodes to specific locations
+in the texture. Specifically, remember to update the Dictionary `emojiLookupTable`, number of rows
+in the texture `rowCount`, and number of columns `colCount`.
+
+
 ## Debug UIWidgets Application
 
 #### Define UIWidgets_DEBUG
-It's recommended to define the **UIWidgets_DEBUG** script symbol in editor, this will turn on 
+It's recommended to define the **UIWidgets_DEBUG** script symbol in editor, this will turn on
 debug assertion in UIWidgets, which will help to find potential bugs earlier. To do this:
-please go to **Player Settings -> Other Settings -> Configuration -> Scripting Define Symbols**, 
-and add **UIWidgets_DEBUG**.  
+please go to **Player Settings -> Other Settings -> Configuration -> Scripting Define Symbols**,
+and add **UIWidgets_DEBUG**.
 The symbol is for debug purpose, please remove it from your release build.
 
 #### UIWidgets Inspector
 The UIWidgets Inspector tool is for visualizing and exploring the widget trees. You can find it
-via *Window/Analysis/UIWidgets* inspector in Editor menu.  
+via *Window/Analysis/UIWidgets* inspector in Editor menu.
 **Note**
-* **UIWidgets_DEBUG** needs to be define for inspector to work properly.  
+* **UIWidgets_DEBUG** needs to be define for inspector to work properly.
 * Inspector currently only works in Editor Play Mode, inspect standalone built application is not supported for now.
 
 ## Learn
 
 #### Samples
-You can find many UIWidgets App samples in the UIWidgets package in the **Samples** folder. 
+You can find many UIWidgets App samples in the UIWidgets package in the **Samples** folder.
 Feel free to try them out and make modifications to see the results.
 To get started, the UIWidgetsTheatre scene provides you
 a list of carefully selected samples to start with.
 
-You can also try UIWidgets-based Editor windows by clicking **UIWidgetsTest** on the main menu 
+You can also try UIWidgets-based Editor windows by clicking **UIWidgetsTest** on the main menu
 and open one of the dropdown samples.
 
 #### Wiki
 The develop team is still working on the UIWidgets Wiki. However, since UIWidgets is mainly derived from Flutter,
- you can refer to Flutter Wiki to access detailed descriptions of UIWidgets APIs 
+ you can refer to Flutter Wiki to access detailed descriptions of UIWidgets APIs
  from those of their Flutter counterparts.
 Meanwhile, you can join the discussion channel at (https://connect.unity.com/g/uiwidgets)
 
@@ -289,7 +307,7 @@ Meanwhile, you can join the discussion channel at (https://connect.unity.com/g/u
 | Can I use UIWidgets to build game UIs?   | **Yes**    |
 | Can I develop Unity Editor plugins using UIWidgets?  | **Yes** |
 | Is UIWidgets a extension of UGUI/NGUI? | **No** |
-| Is UIWidgets just a copy of Flutter? | **No** | 
+| Is UIWidgets just a copy of Flutter? | **No** |
 | Can I create UI with UIWidgets by simply drag&drop? | **No** |
 | Do I have to pay for using UIWidgets? | **No** |
 | Any IDE recommendation for UIWidgets? | **Rider, VSCode(Open .sln)** |
