@@ -243,6 +243,25 @@ namespace Unity.UIWidgets.ui {
         public bool didExceedMaxLines {
             get { return this._didExceedMaxLines; }
         }
+        
+        static List<Paragraph> _paragraphs = new List<Paragraph>();
+
+        public static Paragraph create() {
+            if (_paragraphs.isEmpty()) {
+                return new Paragraph();
+            }
+
+            Paragraph ret = _paragraphs.last();
+            _paragraphs.RemoveAt(_paragraphs.Count-1);
+            return ret;
+        }
+
+        public static void release(ref Paragraph paragraph) {
+            if (paragraph != null) {
+                _paragraphs.Add(paragraph);
+                paragraph = null;
+            }
+        }
 
         public void paint(Canvas canvas, Offset offset) {
             for (int i = 0; i < this._paintRecordsCount; i++) {
