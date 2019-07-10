@@ -726,15 +726,13 @@ namespace Unity.UIWidgets.ui {
             return result;
         }
 
-        public TextBox? getNextLineStartRect() {
+        public float? getNextLineStartRectTop() {
             if (this._text.Length == 0 || this._text[this._text.Length - 1] != '\n') {
                 return null;
             }
 
             var lineNumber = this.getLineCount() - 1;
-            var top = (lineNumber > 0) ? this._lineHeights[lineNumber - 1] : 0;
-            var bottom = this._lineHeights[lineNumber];
-            return TextBox.fromLTBD(0, top, 0, bottom, TextDirection.ltr);
+            return lineNumber > 0 ? this._lineHeights[lineNumber - 1] : 0;
         }
 
         internal PositionWithAffinity getGlyphPositionAtCoordinate(float dx, float dy) {
