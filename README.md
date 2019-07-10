@@ -11,7 +11,6 @@ UIWidgets is mainly derived from [Flutter](https://github.com/flutter/flutter). 
 the powerful Unity Engine, it offers developers many new features to improve their Apps
 as well as the develop workflow significantly.
 
-
 #### Efficiency
 Using the latest Unity rendering SDKs, a UIWidgets App can run very fast and keep >60fps in most times.
 
@@ -29,7 +28,7 @@ A UIWidgets App can be debug in the Unity Editor directly with many advanced too
 CPU/GPU Profiling, FPS Profiling.
 
 
-### Example
+## Example
 
 <div style="text-align: center"><table><tr>
 <td style="text-align: center">
@@ -45,6 +44,16 @@ CPU/GPU Profiling, FPS Profiling.
   <img src="https://connect-prd-cdn.unity.com/20190323/p/images/a8884fbd-9e7c-4bd7-af46-0947e01d01fd_uiwidgets4.gif" width="200"/>
 </td>
 </tr></table></div>
+
+### Projects using UIWidgets
+
+#### Unity Connect App
+The Unity Connect App is created using UIWidgets and available for both Android (https://connect.unity.com/connectApp/download)
+and iOS (Searching for "Unity Connect" in App Store). This project is open-sourced @https://github.com/UnityTech/ConnectAppCN.
+
+#### Unity Chinese Doc
+The official website of Unity Chinese Documentation (https://connect.unity.com/doc) is powered by UIWidgets and
+open-sourced @https://github.com/UnityTech/DocCN.
 
 ## Requirement
 
