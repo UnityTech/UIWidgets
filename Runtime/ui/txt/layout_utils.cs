@@ -11,28 +11,6 @@ namespace Unity.UIWidgets.ui {
                    c == 0x205F || c == 0x3000;
         }
 
-        public static int getPrevWordBreakForCache(TextBuff buff, int offset) {
-            int len = buff.size;
-            if (offset == 0) {
-                return 0;
-            }
-
-            if (offset > len) {
-                offset = len;
-            }
-            if (isWordBreakBefore(buff.charAt(offset - 1))) {
-                return offset - 1;
-            }
-            for (int i = offset - 1; i > 0; i--) {
-                // Since i steps down, isWordBreakAfter(i) has already been checked in the previous step
-                // isWordBreakBeforeNotAfter cuts that part out to save time.
-                if (isWordBreakBeforeNotAfter(buff.charAt(i)) || isWordBreakAfter(buff.charAt(i - 1))) {
-                    return i;
-                }
-            }
-            return 0;
-        }
-
         
         public static int getNextWordBreak(string text, int offset, int maxOffset) {
             int len = text.Length;
@@ -63,10 +41,6 @@ namespace Unity.UIWidgets.ui {
         
         public static bool isWordBreakBefore(ushort c) {
             return isWordBreakAfter(c) || (c >= 0x3400 && c <= 0x9fff);
-        }
-
-        public static bool isWordBreakBeforeNotAfter(ushort c) {
-            return c >= 3400 && c <= 0x9fff;
         }
 
         public static int minPowerOfTwo(int i) {

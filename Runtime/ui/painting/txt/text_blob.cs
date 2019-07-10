@@ -1,29 +1,26 @@
 ﻿namespace Unity.UIWidgets.ui {
     public struct TextBlob {
         internal TextBlob(string text, int textOffset, int textSize, float[] positions,
-            float minX, float minY, float width, float height, TextStyle style) {
+            UnityEngine.Rect bounds, TextStyle style) {
             this.instanceId = ++_nextInstanceId;
             this.text = text;
             this.textOffset = textOffset;
             this.textSize = textSize;
             this.style = style;
-            this._minX = minX;
-            this._minY = minY;
-            this._width = width;
-            this._height = height;
+            this._bounds = bounds;
             this._positions = positions;
         }
 
         public Rect boundsInText {
             get {
                 var pos = this._positions[this.textOffset];
-                return Rect.fromLTWH(this._minX + pos, this._minY, this._width, this._height);
+                return Rect.fromLTWH(this._bounds.xMin + pos, this._bounds.yMin, this._bounds.width, this._bounds.height);
             }
         }
 
         public Rect shiftedBoundsInText(Offset offset) {
             var pos = this._positions[this.textOffset];
-            return Rect.fromLTWH(this._minX + pos + offset.dx, this._minY + offset.dy, this._width, this._height);
+            return Rect.fromLTWH(this._bounds.xMin + pos + offset.dx, this._bounds.yMin + offset.dy, this._bounds.width, this._bounds.height);
         }
 
         public float getPosition(int i) {
@@ -36,7 +33,7 @@
         internal readonly int textOffset;
         internal readonly int textSize;
         internal readonly TextStyle style;
-        readonly float _minX, _minY, _width, _height; // bounds with positions[start] as origin       
+        readonly UnityEngine.Rect _bounds; // bounds with positions[start] as origin       
         readonly float[] _positions;
     }
 
@@ -46,7 +43,7 @@
         string _text;
         int _textOffset;
         int _size;
-        float _minX, _minY, _width, _height;
+        UnityEngine.Rect _bounds;
 
         public void allocRunPos(painting.TextStyle style, string text, int offset, int size,
             float textScaleFactor = 1.0f) {
@@ -78,20 +75,13 @@
             this._positions = positions;
         }
 
-        public void setBounds(float minX, float minY, float width, float height) {
-            this._minX = minX;
-            this._minY = minY;
-            this._width = width;
-            this._height = height;
-        }
-
         public void setBounds(UnityEngine.Rect bounds) {
-            this.setBounds(bounds.x, bounds.y, bounds.width, bounds.height);
+            this._bounds = bounds;
         }
 
         public TextBlob make() {
             var result = new TextBlob(this._text, this._textOffset,
-                this._size, this._positions, this._minX, this._minY, this._width, this._height, this._style);
+                this._size, this._positions, this._bounds, this._style);
             return result;
         }
     }

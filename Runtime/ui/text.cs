@@ -610,14 +610,6 @@ namespace Unity.UIWidgets.ui {
         }
 
         public bool Equals(TextBox other) {
-            if (ReferenceEquals(null, other)) {
-                return false;
-            }
-
-            if (ReferenceEquals(this, other)) {
-                return true;
-            }
-
             return this.left.Equals(other.left) && this.top.Equals(other.top) && this.right.Equals(other.right) &&
                    this.bottom.Equals(other.bottom) && this.direction == other.direction;
         }
@@ -625,10 +617,6 @@ namespace Unity.UIWidgets.ui {
         public override bool Equals(object obj) {
             if (ReferenceEquals(null, obj)) {
                 return false;
-            }
-
-            if (ReferenceEquals(this, obj)) {
-                return true;
             }
 
             if (obj.GetType() != this.GetType()) {
