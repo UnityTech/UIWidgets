@@ -106,6 +106,7 @@ namespace Unity.UIWidgets.flow {
                 paragraph.layout(new ParagraphConstraints(width: 800));
 
                 canvas.drawParagraph(paragraph, new Offset(rect.left, rect.top + rect.height - 12));
+                Paragraph.release(ref paragraph);
             }
         }
     }

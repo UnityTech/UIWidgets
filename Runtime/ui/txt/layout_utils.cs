@@ -68,6 +68,17 @@ namespace Unity.UIWidgets.ui {
         public static bool isWordBreakBeforeNotAfter(ushort c) {
             return c >= 3400 && c <= 0x9fff;
         }
+
+        public static int minPowerOfTwo(int i) {
+            // Assume that int is 32 bit
+            i--;
+            i = i | (i >> 1);
+            i = i | (i >> 2);
+            i = i | (i >> 4);
+            i = i | (i >> 8);
+            i = i | (i >> 16);
+            return i + 1;
+        }
         
     }
 }

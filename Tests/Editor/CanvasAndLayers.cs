@@ -437,6 +437,7 @@ namespace UIWidgets.Tests {
                 this._meshPool);
             canvas.drawParagraph(paragraph, new Offset(10f, 100f));
             canvas.flush();
+            Unity.UIWidgets.ui.Paragraph.release(ref paragraph);
         }
         
         void drawImageRect() {

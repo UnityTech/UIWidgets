@@ -41,6 +41,7 @@ namespace Unity.UIWidgets.flow {
             paragraph.layout(new ParagraphConstraints(width: 300));
 
             canvas.drawParagraph(paragraph, new Offset(x, y));
+            Paragraph.release(ref paragraph);
         }
     }
 }

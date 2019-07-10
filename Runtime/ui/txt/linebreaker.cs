@@ -148,7 +148,7 @@ namespace Unity.UIWidgets.ui {
 
         public void resize(int size) {
             if (this._charWidths == null || this._charWidths.Length < size) {
-                this._charWidths = new float[size];
+                this._charWidths = new float[LayoutUtils.minPowerOfTwo(size)];
             }
         }
 
