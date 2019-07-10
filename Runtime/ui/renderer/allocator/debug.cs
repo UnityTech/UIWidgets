@@ -22,7 +22,7 @@ namespace Unity.UIWidgets.ui {
     }
 
     public static class AllocDebugger {
-        public const bool enableDebugging = true;
+        public const bool enableDebugging = false;
 
         static int allocCount = 0;
 
