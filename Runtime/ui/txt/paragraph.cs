@@ -176,6 +176,8 @@ namespace Unity.UIWidgets.ui {
         bool _needsLayout = true;
 
         string _text;
+        string _ellipsizedText;
+        int _ellipsizedLength;
 
         StyledRuns _runs;
 
@@ -435,7 +437,14 @@ namespace Unity.UIWidgets.ui {
                                 int truncateCount = Layout.computeTruncateCount(runXOffset, text, textStart,
                                     textCount, style, this._width - ellipsisWidth, this._tabStops);
 
-                                text = text.Substring(0, textStart + textCount - truncateCount) + ellipsis;
+                                if(!(this._ellipsizedLength == textStart + textCount - truncateCount &&
+                                   this._ellipsizedText.Length == this._ellipsizedLength + ellipsis.Length &&
+                                   this._ellipsizedText.EndsWith(ellipsis))) {
+                                    this._ellipsizedText =
+                                        text.Substring(0, textStart + textCount - truncateCount) + ellipsis;
+                                    this._ellipsizedLength = this._ellipsizedText.Length - ellipsis.Length;
+                                }
+                                text = this._ellipsizedText;
                                 textCount = text.Length - textStart;
                                 D.assert(textCount != 0);
                                 if (this._paragraphStyle.maxLines == null) {
