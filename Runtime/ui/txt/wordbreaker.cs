@@ -163,7 +163,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public static uint getSupplementary(uint lead, uint trail) {
-            return (char) (( lead << 10) +  (trail - U16_SURROGATE_OFFSET));
+            return (char) ((lead << 10) +  (trail - U16_SURROGATE_OFFSET));
         }
 
         public static bool isBoundaryChar(char code) {

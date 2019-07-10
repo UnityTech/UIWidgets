@@ -1,26 +1,29 @@
 ﻿namespace Unity.UIWidgets.ui {
     public struct TextBlob {
+
         internal TextBlob(string text, int textOffset, int textSize, float[] positions,
             UnityEngine.Rect bounds, TextStyle style) {
             this.instanceId = ++_nextInstanceId;
+            this._positions = positions;
             this.text = text;
             this.textOffset = textOffset;
             this.textSize = textSize;
             this.style = style;
             this._bounds = bounds;
-            this._positions = positions;
         }
 
         public Rect boundsInText {
             get {
-                var pos = this._positions[this.textOffset];
-                return Rect.fromLTWH(this._bounds.xMin + pos, this._bounds.yMin, this._bounds.width, this._bounds.height);
+                var pos = this.getPosition(0);
+                return Rect.fromLTWH(this._bounds.xMin + pos, this._bounds.yMin,
+                                     this._bounds.width, this._bounds.height);
             }
         }
 
         public Rect shiftedBoundsInText(Offset offset) {
-            var pos = this._positions[this.textOffset];
-            return Rect.fromLTWH(this._bounds.xMin + pos + offset.dx, this._bounds.yMin + offset.dy, this._bounds.width, this._bounds.height);
+            var pos = this.getPosition(0);
+            return Rect.fromLTWH(this._bounds.xMin + pos + offset.dx, this._bounds.yMin + offset.dy,
+                                 this._bounds.width, this._bounds.height);
         }
 
         public float getPosition(int i) {
