@@ -327,8 +327,6 @@ namespace Unity.UIWidgets.rendering {
             if (this._hoverAnnotation != null) {
                 RendererBinding.instance.mouseTracker.detachAnnotation(this._hoverAnnotation);
             }
-
-            this._textPainter?.releaseParagraph();
         }
 
         TextSelection _selection;
