@@ -137,12 +137,10 @@ namespace Unity.UIWidgets.ui {
     struct GlyphLine {
         public readonly int start;
         public readonly int count;
-        public readonly int totalCountUnits;
 
-        public GlyphLine(int start, int count, int totalCountUnits) {
+        public GlyphLine(int start, int count) {
             this.start = start;
             this.count = count;
-            this.totalCountUnits = totalCountUnits;
         }
 
         public GlyphPosition get(int i, GlyphPosition[] glyphPositions) {
@@ -185,7 +183,6 @@ namespace Unity.UIWidgets.ui {
 
         List<float> _lineWidths = new List<float>();
 
-        // float[] _lineBaseLines;
         GlyphLine[] _glyphLines;
         GlyphPosition[] _glyphPositions;
         PaintRecord[] _paintRecords;
@@ -305,10 +302,6 @@ namespace Unity.UIWidgets.ui {
             if (this._glyphLines == null || this._glyphLines.Length < this._lineRangeCount) {
                 this._glyphLines = new GlyphLine[LayoutUtils.minPowerOfTwo(this._lineRangeCount)];
             }
-
-            // if (this._lineBaseLines == null || this._lineBaseLines.Length < this._lineRangeCount) {
-            //     this._lineBaseLines = new float[this._lineRangeCount];
-            // }
 
             if (this._lineHeights == null || this._lineHeights.Length < this._lineRangeCount) {
                 this._lineHeights = new float[LayoutUtils.minPowerOfTwo(this._lineRangeCount)];
@@ -442,6 +435,8 @@ namespace Unity.UIWidgets.ui {
                                 int truncateCount = Layout.computeTruncateCount(runXOffset, text, textStart,
                                     textCount, style, this._width - ellipsisWidth, this._tabStops);
 
+                                // If all the positions have not changed, use the cached ellipsized text
+                                // else update the cache
                                 if (!(this._ellipsizedLength == textStart + textCount - truncateCount &&
                                       this._ellipsizedText.Length == this._ellipsizedLength + ellipsis.Length &&
                                       this._ellipsizedText.EndsWith(ellipsis))) {
@@ -463,8 +458,6 @@ namespace Unity.UIWidgets.ui {
                                 _advancesBuffer, _positionsBuffer, this._tabStops, out var bounds);
 
                             builder.allocRunPos(style, text, textStart, textCount);
-                            // bounds relative to first character
-                            bounds.x -= _positionsBuffer[0];
                             builder.setBounds(bounds);
 
                             // Update the max width of the words
@@ -567,7 +560,6 @@ namespace Unity.UIWidgets.ui {
 
                 this._lineHeights[lineNumber] = ((lineNumber == 0 ? 0 : this._lineHeights[lineNumber - 1])
                                                  + Mathf.Round(maxLineSpacing + maxDescent));
-                // this._lineBaseLines[lineNumber] = this._lineHeights[lineNumber] - maxDescent;
                 yOffset += Mathf.Round(maxLineSpacing + preMaxDescent);
                 preMaxDescent = maxDescent;
                 float lineXOffset = this.getLineXOffset(runXOffset);
@@ -578,12 +570,7 @@ namespace Unity.UIWidgets.ui {
                     }
                 }
 
-                int lineStart = lineRange.start;
-                int nextLineStart = lineNumber < this._lineRangeCount - 1
-                    ? this._lineRanges[lineNumber + 1].start
-                    : this._text.Length;
-                this._glyphLines[lineNumber] =
-                    new GlyphLine(glyphPositionLineStart, count, nextLineStart - lineStart);
+                this._glyphLines[lineNumber] = new GlyphLine(glyphPositionLineStart, count);
                 for (int i = 0; i < lineStyleRunCount; i++) {
                     var paintRecord = this._paintRecords[this._paintRecordsCount - 1 - i];
                     paintRecord.shift(lineXOffset, yOffset);
@@ -592,6 +579,10 @@ namespace Unity.UIWidgets.ui {
             }
 
             this._lineCount = lineLimit;
+
+            // Compute max intrinsic width and min intrinsic width
+            // max intrinsic width := maximum width this paragraph could possibly expand, without any constraints,
+            //                        which equals the length of the maximum hard-break line
             this._maxIntrinsicWidth = 0;
             float lineBlockWidth = 0;
             for (int i = 0; i < this._lineWidthCount; ++i) {
@@ -602,6 +593,7 @@ namespace Unity.UIWidgets.ui {
                 }
             }
 
+            // min intrinsic width := minimum width this paragraph has to take, which equals the maximum word width
             this._maxIntrinsicWidth = Mathf.Max(lineBlockWidth, this._maxIntrinsicWidth);
 
             if (this._paragraphStyle.maxLines == 1 || (this._paragraphStyle.maxLines == null &&
@@ -639,6 +631,14 @@ namespace Unity.UIWidgets.ui {
             }
 
             return lineStyleRunCount;
+        }
+
+        internal int totalCodeUnitsInLine(int lineNumber) {
+            int lineStart = this._lineRanges[lineNumber].start;
+            int nextLineStart = lineNumber < this._lineRangeCount - 1
+                ? this._lineRanges[lineNumber + 1].start
+                : this._text.Length;
+            return nextLineStart - lineStart;
         }
 
         internal void setText(string text, StyledRuns runs) {
@@ -753,7 +753,7 @@ namespace Unity.UIWidgets.ui {
             if (glyphLine.count == 0) {
                 int lineStartIndex = 0;
                 for (int i = 0; i < yIndex; i++) {
-                    lineStartIndex += this._glyphLines[i].totalCountUnits;
+                    lineStartIndex += this.totalCodeUnitsInLine(i);
                 }
 
                 return new PositionWithAffinity(lineStartIndex, TextAffinity.downstream);

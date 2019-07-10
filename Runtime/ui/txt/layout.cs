@@ -145,6 +145,8 @@ namespace Unity.UIWidgets.ui {
                 }
             }
 
+            // bounds relative to first character
+            bounds.x -= positions[0];
             return advance;
         }
 
