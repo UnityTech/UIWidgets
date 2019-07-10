@@ -15,16 +15,19 @@ namespace Unity.UIWidgets.ui {
     public static class ObjectPool<TObject> where TObject : PoolObject, new() {
         static readonly Stack<TObject> pool = new Stack<TObject>();
 
+        const int POOL_MAX_SIZE = 256;
+        const int POOL_BATCH_SIZE = 128;
+
         static int allocatedCount = 0;
 
         public static TObject alloc() {
             if (pool.Count == 0) {
-                for (int i = 0; i < 128; i++) {
+                for (int i = 0; i < POOL_BATCH_SIZE; i++) {
                     var obj = new TObject();
                     pool.Push(obj);
                 }
 
-                allocatedCount += 128;
+                allocatedCount += POOL_BATCH_SIZE;
             }
 
             var ret = pool.Pop();
@@ -54,7 +57,7 @@ namespace Unity.UIWidgets.ui {
             }
 
             obj.clear();
-            if (pool.Count > 256) {
+            if (pool.Count > POOL_MAX_SIZE) {
                 allocatedCount--;
                 //there are enough items in the pool
                 //just release the obj to GC
