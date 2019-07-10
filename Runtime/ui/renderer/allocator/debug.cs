@@ -8,14 +8,17 @@ namespace Unity.UIWidgets.ui {
         public int watermark;
         public int prev_watermark;
         public int borrowed;
+        public int allocated;
 
-        public void onAlloc() {
+        public void onAlloc(int allocatedCount) {
             this.borrowed++;
             this.watermark = this.borrowed > this.watermark ? this.borrowed : this.watermark;
+            this.allocated = allocatedCount;
         }
 
-        public void onRelease() {
+        public void onRelease(int allocatedCount) {
             this.borrowed--;
+            this.allocated = allocatedCount;
         }
     }
     
@@ -55,21 +58,22 @@ namespace Unity.UIWidgets.ui {
             }
         }
 
-        public static void onAlloc(int objKey, string objName) {
+        public static void onAlloc(int objKey, string objName, int allocatedCount) {
             if (!debugInfos.ContainsKey(objKey)) {
                 debugInfos[objKey] = new DebugMeta {
                     objName = objName,
                     watermark = 0,
-                    borrowed = 0
+                    borrowed = 0,
+                    allocated = 0
                 };
             }
 
-            debugInfos[objKey].onAlloc();
+            debugInfos[objKey].onAlloc(allocatedCount);
         }
 
-        public static void onRelease(int objKey, string objName) {
+        public static void onRelease(int objKey, string objName, int allocatedCount) {
             Debug.Assert(debugInfos.ContainsKey(objKey), "An unregistered pool object cannot be released");
-            debugInfos[objKey].onRelease();
+            debugInfos[objKey].onRelease(allocatedCount);
         }
     }
 }

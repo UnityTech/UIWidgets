@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Unity.UIWidgets.foundation;
 using UnityEngine;
 
@@ -234,7 +233,7 @@ namespace Unity.UIWidgets.ui {
                 ObjectPool<uiList<Vector3>>.release(vertices);
                 ObjectPool<uiList<Vector2>>.release(uv);
                 ObjectPool<uiList<int>>.release(triangles);
-                
+                ObjectPool<MeshKey>.release(key);
                 return null;
             }
 

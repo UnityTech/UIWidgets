@@ -12,6 +12,8 @@ namespace Unity.UIWidgets.ui {
 
     public static class ObjectPool<TObject> where TObject :PoolObject, new() {
         static readonly Stack<TObject> pool = new Stack<TObject>();
+
+        static int allocatedCount = 0;
         
         public static TObject alloc() {
             if (pool.Count == 0) {
@@ -19,13 +21,15 @@ namespace Unity.UIWidgets.ui {
                     var obj = new TObject();
                     pool.Push(obj);
                 }
+
+                allocatedCount += 128;
             }
             
             var ret = pool.Pop();
             ret.setup();
             
             if (AllocDebugger.enableDebugging) {
-                AllocDebugger.onAlloc(debugKey, debugName);
+                AllocDebugger.onAlloc(debugKey, debugName, allocatedCount);
                 ret.activated_flag = true;
             }
             
@@ -43,16 +47,16 @@ namespace Unity.UIWidgets.ui {
                 }
                 obj.activated_flag = false;
 
-                AllocDebugger.onRelease(debugKey, debugName);
+                AllocDebugger.onRelease(debugKey, debugName, allocatedCount);
             }
-            
+                        
+            obj.clear();
             if (pool.Count > 256) {
+                allocatedCount--;
                 //there are enough items in the pool
                 //just release the obj to GC
                 return;
             }
-            
-            obj.clear();
             pool.Push(obj);
         }
         
