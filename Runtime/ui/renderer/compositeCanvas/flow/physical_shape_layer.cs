@@ -17,7 +17,9 @@ namespace Unity.UIWidgets.flow {
         Color _shadow_color;
         float _device_pixel_ratio;
         Path _path;
+#pragma warning disable 0414
         bool _isRect;
+#pragma warning restore 0414
         Rect _frameRRect;
         Clip _clip_behavior;
 

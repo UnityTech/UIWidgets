@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.material;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -391,7 +392,7 @@ namespace Unity.UIWidgets.ui {
         RenderLayer _createMaskLayer(RenderLayer parentLayer, uiRect maskBounds,
             _drawPathDrawMeshCallbackDelegate drawCallback,
             uiPaint paint, bool convex, float alpha, Texture tex, uiRect texBound, TextBlobMesh textMesh,
-            uiMeshMesh mesh) {
+            uiMeshMesh mesh, bool notEmoji) {
             var textureWidth = Mathf.CeilToInt(maskBounds.width * this._devicePixelRatio);
             if (textureWidth < 1) {
                 textureWidth = 1;
@@ -419,7 +420,7 @@ namespace Unity.UIWidgets.ui {
             var maskState = maskLayer.states[maskLayer.states.Count - 1];
             maskState.matrix = parentState.matrix;
 
-            drawCallback.Invoke(uiPaint.shapeOnly(paint), mesh, convex, alpha, tex, texBound, textMesh);
+            drawCallback.Invoke(uiPaint.shapeOnly(paint), mesh, convex, alpha, tex, texBound, textMesh, notEmoji);
 
             var removed = this._layers.removeLast();
             D.assert(removed == maskLayer);
@@ -481,7 +482,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         void _drawWithMaskFilter(uiRect meshBounds, uiPaint paint, uiMaskFilter maskFilter,
-            uiMeshMesh mesh, bool convex, float alpha, Texture tex, uiRect texBound, TextBlobMesh textMesh,
+            uiMeshMesh mesh, bool convex, float alpha, Texture tex, uiRect texBound, TextBlobMesh textMesh, bool notEmoji,
             _drawPathDrawMeshCallbackDelegate drawCallback) {
             var layer = this._currentLayer;
             var clipBounds = layer.layerBounds;
@@ -515,7 +516,7 @@ namespace Unity.UIWidgets.ui {
             }
 
             var maskLayer = this._createMaskLayer(layer, maskBounds, drawCallback, paint, convex, alpha, tex, texBound,
-                textMesh, mesh);
+                textMesh, mesh, notEmoji);
 
             var blurLayer = this._createBlurLayer(maskLayer, sigma, sigma, layer);
 
@@ -529,10 +530,10 @@ namespace Unity.UIWidgets.ui {
         }
 
         delegate void _drawPathDrawMeshCallbackDelegate(uiPaint p, uiMeshMesh mesh, bool convex, float alpha,
-            Texture tex, uiRect textBlobBounds, TextBlobMesh textMesh);
+            Texture tex, uiRect textBlobBounds, TextBlobMesh textMesh, bool notEmoji);
 
         void _drawPathDrawMeshCallback(uiPaint p, uiMeshMesh mesh, bool convex, float alpha, Texture tex,
-            uiRect textBlobBounds, TextBlobMesh textMesh) {
+            uiRect textBlobBounds, TextBlobMesh textMesh, bool notEmoji) {
             if (!this._applyClip(mesh.bounds)) {
                 ObjectPool<uiMeshMesh>.release(mesh);
                 return;
@@ -549,7 +550,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         void _drawPathDrawMeshCallback2(uiPaint p, uiMeshMesh mesh, bool convex, float alpha, Texture tex,
-            uiRect textBlobBounds, TextBlobMesh textMesh) {
+            uiRect textBlobBounds, TextBlobMesh textMesh, bool notEmoji) {
             if (!this._applyClip(mesh.bounds)) {
                 ObjectPool<uiMeshMesh>.release(mesh);
                 return;
@@ -562,14 +563,22 @@ namespace Unity.UIWidgets.ui {
         }
 
         void _drawTextDrawMeshCallback(uiPaint p, uiMeshMesh mesh, bool convex, float alpha, Texture tex,
-            uiRect textBlobBounds, TextBlobMesh textMesh) {
+            uiRect textBlobBounds, TextBlobMesh textMesh, bool notEmoji) {
             if (!this._applyClip(textBlobBounds)) {
                 ObjectPool<TextBlobMesh>.release(textMesh);
                 return;
             }
 
             var layer = this._currentLayer;
-            layer.draws.Add(CanvasShader.texAlpha(layer, p, textMesh, tex));
+            if (notEmoji) {
+                layer.draws.Add(CanvasShader.texAlpha(layer, p, textMesh, tex));
+            }
+            else {
+                uiPaint paintWithWhite = new uiPaint(p);
+                paintWithWhite.color = uiColor.white;
+                if (EmojiUtils.image == null) return;
+                layer.draws.Add(CanvasShader.tex(layer, paintWithWhite, textMesh.resolveMesh(), EmojiUtils.image));
+            }
         }
 
         void _drawPathDrawMeshQuit(uiMeshMesh mesh) {
@@ -589,11 +598,11 @@ namespace Unity.UIWidgets.ui {
 
                 if (paint.maskFilter != null && paint.maskFilter.Value.sigma != 0) {
                     this._drawWithMaskFilter(mesh.bounds, paint, paint.maskFilter.Value, mesh, convex, 0, null,
-                        uiRectHelper.zero, null, this.___drawPathDrawMeshCallback);
+                        uiRectHelper.zero, null, false, this.___drawPathDrawMeshCallback);
                     return;
                 }
 
-                this._drawPathDrawMeshCallback(paint, mesh, convex, 0, null, uiRectHelper.zero, null);
+                this._drawPathDrawMeshCallback(paint, mesh, convex, 0, null, uiRectHelper.zero, null, false);
             }
             else {
                 var state = this._currentLayer.currentState;
@@ -623,11 +632,11 @@ namespace Unity.UIWidgets.ui {
 
                 if (paint.maskFilter != null && paint.maskFilter.Value.sigma != 0) {
                     this._drawWithMaskFilter(mesh.bounds, paint, paint.maskFilter.Value, mesh, false, alpha, null,
-                        uiRectHelper.zero, null, this.___drawPathDrawMeshCallback2);
+                        uiRectHelper.zero, null, false, this.___drawPathDrawMeshCallback2);
                     return;
                 }
 
-                this._drawPathDrawMeshCallback2(paint, mesh, false, alpha, null, uiRectHelper.zero, null);
+                this._drawPathDrawMeshCallback2(paint, mesh, false, alpha, null, uiRectHelper.zero, null, false);
             }
         }
 
@@ -929,17 +938,20 @@ namespace Unity.UIWidgets.ui {
             var font = FontManager.instance.getOrCreate(style.fontFamily, style.fontWeight, style.fontStyle).font;
             var fontSizeToLoad = Mathf.CeilToInt(style.UnityFontSize * scale);
             var subText = textBlob.text.Substring(textBlob.textOffset, textBlob.textSize);
-            font.RequestCharactersInTextureSafe(subText, fontSizeToLoad, style.UnityFontStyle);
-
-            var tex = font.material.mainTexture;
+            Texture tex = null;
+            bool notEmoji = !char.IsHighSurrogate(subText[0]) && !EmojiUtils.isSingleCharEmoji(subText[0]);
+            if (notEmoji) {
+                font.RequestCharactersInTextureSafe(subText, fontSizeToLoad, style.UnityFontStyle);
+                tex = font.material.mainTexture;
+            }
 
             if (paint.maskFilter != null && paint.maskFilter.Value.sigma != 0) {
                 this._drawWithMaskFilter(textBlobBounds, paint, paint.maskFilter.Value, null, false, 0, tex,
-                    textBlobBounds, mesh, this.___drawTextDrawMeshCallback);
+                    textBlobBounds, mesh, notEmoji, this.___drawTextDrawMeshCallback);
                 return;
             }
 
-            this._drawTextDrawMeshCallback(paint, null, false, 0, tex, textBlobBounds, mesh);
+            this._drawTextDrawMeshCallback(paint, null, false, 0, tex, textBlobBounds, mesh, notEmoji);
         }
 
         public void flush(uiPicture picture) {
@@ -1041,7 +1053,7 @@ namespace Unity.UIWidgets.ui {
 
                         uiMeshMesh mesh = cmd.mesh;
                         if (cmd.textMesh != null) {
-                            mesh = cmd.textMesh.resovleMesh();
+                            mesh = cmd.textMesh.resolveMesh();
                         }
 
                         if (mesh == null) {
