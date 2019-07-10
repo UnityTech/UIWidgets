@@ -121,7 +121,6 @@ namespace Unity.UIWidgets.ui {
                     h0.y / h2.z, h1.y / h2.z, h2.y / h2.z,
                     h0.z / h2.z, h1.z / h2.z, 1);
 
-                _toHomogeneous.reset();
                 float xScale = 2.0f / (pathBounds.right - pathBounds.left);
                 float yScale = 2.0f / (pathBounds.bottom - pathBounds.top);
 
