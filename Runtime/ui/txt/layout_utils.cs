@@ -11,13 +11,13 @@ namespace Unity.UIWidgets.ui {
                    c == 0x205F || c == 0x3000;
         }
 
-        
+
         public static int getNextWordBreak(string text, int offset, int maxOffset) {
             int len = text.Length;
             if (len > maxOffset) {
                 len = maxOffset + 1;
             }
-                
+
             if (offset >= len) {
                 return len;
             }
@@ -38,7 +38,7 @@ namespace Unity.UIWidgets.ui {
         public static bool isWordBreakAfter(ushort c) {
             return isWordSpace(c) || (c >= 0x2000 && c <= 0x200a) || c == 0x3000;
         }
-        
+
         public static bool isWordBreakBefore(ushort c) {
             return isWordBreakAfter(c) || (c >= 0x3400 && c <= 0x9fff);
         }
@@ -53,6 +53,5 @@ namespace Unity.UIWidgets.ui {
             i = i | (i >> 16);
             return i + 1;
         }
-        
     }
 }

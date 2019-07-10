@@ -1,4 +1,3 @@
-
 namespace Unity.UIWidgets.ui {
     struct WordBreaker {
         public const uint U16_SURROGATE_OFFSET = ((0xd800 << 10) + 0xdc00 - 0x10000);
@@ -97,9 +96,9 @@ namespace Unity.UIWidgets.ui {
             if (preBoundaryChar) {
                 return this._current;
             }
-            
+
             this._findBoundaryCharOrTypeChange(preWhiteSpace);
-            
+
             return this._current;
         }
 
@@ -119,10 +118,11 @@ namespace Unity.UIWidgets.ui {
                 if (currentType != preWhiteSpace) {
                     break;
                 }
+
                 preWhiteSpace = currentType;
             }
         }
-        
+
         void _detectEmailOrUrl() {
         }
 
@@ -163,17 +163,17 @@ namespace Unity.UIWidgets.ui {
         }
 
         public static uint getSupplementary(uint lead, uint trail) {
-            return (char) ((lead << 10) +  (trail - U16_SURROGATE_OFFSET));
+            return (char) ((lead << 10) + (trail - U16_SURROGATE_OFFSET));
         }
 
         public static bool isBoundaryChar(char code) {
             return (code >= 0x4E00 && code <= 0x9FFF) || (code >= 0x3040 && code <= 0x30FF) || char.IsPunctuation(code);
         }
-        
+
         void nextUntilCodePoint() {
             while (this._current < this._text.size
-                   && (char.IsLowSurrogate(this._text.charAt(this._current)) 
-                       ||  char.IsHighSurrogate(this._text.charAt(this._current)))) {
+                   && (char.IsLowSurrogate(this._text.charAt(this._current))
+                       || char.IsHighSurrogate(this._text.charAt(this._current)))) {
                 this._current++;
             }
         }

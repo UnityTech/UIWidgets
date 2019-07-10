@@ -1,4 +1,3 @@
-using System;
 using Unity.UIWidgets.foundation;
 
 namespace Unity.UIWidgets.ui {

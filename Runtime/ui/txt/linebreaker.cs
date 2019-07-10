@@ -68,8 +68,10 @@ namespace Unity.UIWidgets.ui {
 
         public static LineBreaker instance {
             get {
-                if(_instance == null)
+                if (_instance == null) {
                     _instance = new LineBreaker();
+                }
+
                 return _instance;
             }
         }
@@ -96,6 +98,7 @@ namespace Unity.UIWidgets.ui {
                     _newLinePositions[count++] = i;
                 }
             }
+
             _newLinePositions[count++] = text.Length;
 
             return _newLinePositions;
@@ -121,7 +124,7 @@ namespace Unity.UIWidgets.ui {
         int mFirstTabIndex;
         List<Candidate> _candidates = new List<Candidate>();
         int _candidatesCount = 0;
-        
+
         public int computeBreaks() {
             int nCand = this._candidatesCount;
             if (nCand > 0 && (nCand == 1 || this._lastBreak != nCand - 1)) {
@@ -233,12 +236,11 @@ namespace Unity.UIWidgets.ui {
 
         void _addWordBreak(int offset, float preBreak, float postBreak, int preSpaceCount, int postSpaceCount,
             float penalty) {
-            
             float width = this._candidates[this._candidatesCount - 1].preBreak;
             if (postBreak - width > this._lineWidth) {
                 this._addCandidatesInsideWord(width, offset, postSpaceCount);
             }
-            
+
             this._addCandidate(new Candidate {
                 offset = offset,
                 preBreak = preBreak,
@@ -285,6 +287,7 @@ namespace Unity.UIWidgets.ui {
                 if (this._bestBreak == this._lastBreak) {
                     this._bestBreak = candIndex;
                 }
+
                 this._pushGreedyBreak();
             }
 
@@ -296,9 +299,11 @@ namespace Unity.UIWidgets.ui {
                         this._bestScore = penalty;
                     }
                 }
+
                 if (this._bestBreak == this._lastBreak) {
                     this._bestBreak = candIndex;
                 }
+
                 this._pushGreedyBreak();
             }
 

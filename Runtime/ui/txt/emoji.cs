@@ -233,7 +233,7 @@ namespace Unity.UIWidgets.ui {
             {0x2935, 1224}, {0x2b05, 1225}, {0x2b06, 1226}, {0x2b07, 1227}, {0x2b1b, 1228}, {0x2b1c, 1229},
             {0x2b50, 1230}, {0x2b55, 1231}, {0x3030, 1232}, {0x303d, 1233}, {0x3297, 1234}, {0x3299, 1235},
         };
-        
+
         public static readonly HashSet<int> SingleCharEmojiCodePoints = new HashSet<int> {
             0x203c, 0x2049, 0x2122, 0x2139, 0x2194,
             0x2195, 0x2196, 0x2197, 0x2198, 0x2199, 0x21a9,
