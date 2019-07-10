@@ -496,14 +496,14 @@ namespace Unity.UIWidgets.ui {
             }
 
             if (clipBounds.isEmpty) {
-                this._drawPathDrawMeshQuit(mesh);
+                this._drawPathDrawMeshQuit(mesh, textMesh);
                 return;
             }
 
             var state = layer.currentState;
             float sigma = state.scale * maskFilter.sigma;
             if (sigma <= 0) {
-                this._drawPathDrawMeshQuit(mesh);
+                this._drawPathDrawMeshQuit(mesh, textMesh);
                 return;
             }
 
@@ -511,7 +511,7 @@ namespace Unity.UIWidgets.ui {
             var maskBounds = uiRectHelper.inflate(meshBounds, sigma3);
             maskBounds = uiRectHelper.intersect(maskBounds, uiRectHelper.inflate(clipBounds, sigma3));
             if (maskBounds.isEmpty) {
-                this._drawPathDrawMeshQuit(mesh);
+                this._drawPathDrawMeshQuit(mesh, textMesh);
                 return;
             }
 
@@ -576,13 +576,21 @@ namespace Unity.UIWidgets.ui {
             else {
                 uiPaint paintWithWhite = new uiPaint(p);
                 paintWithWhite.color = uiColor.white;
-                if (EmojiUtils.image == null) return;
-                layer.draws.Add(CanvasShader.tex(layer, paintWithWhite, textMesh.resolveMesh(), EmojiUtils.image));
+                if (EmojiUtils.image == null) {
+                    ObjectPool<TextBlobMesh>.release(textMesh);
+                    return;
+                }
+
+                var raw_mesh = textMesh.resolveMesh();
+                var meshmesh = raw_mesh.duplicate();
+                ObjectPool<TextBlobMesh>.release(textMesh);
+                layer.draws.Add(CanvasShader.tex(layer, paintWithWhite, meshmesh, EmojiUtils.image));
             }
         }
 
-        void _drawPathDrawMeshQuit(uiMeshMesh mesh) {
+        void _drawPathDrawMeshQuit(uiMeshMesh mesh, TextBlobMesh textMesh) {
             ObjectPool<uiMeshMesh>.release(mesh);
+            ObjectPool<TextBlobMesh>.release(textMesh);
         }
 
         void _drawPath(uiPath path, uiPaint paint) {
