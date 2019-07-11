@@ -329,7 +329,7 @@ namespace Unity.UIWidgets.ui {
             return new _BlurImageFilter(sigmaX, sigmaY);
         }
 
-        public static ImageFilter matrix(Matrix3 transform, FilterMode filterMode = FilterMode.Point) {
+        public static ImageFilter matrix(Matrix3 transform, FilterMode filterMode = FilterMode.Bilinear) {
             return new _MatrixImageFilter(transform, filterMode);
         }
     }
@@ -372,7 +372,7 @@ namespace Unity.UIWidgets.ui {
 
         public float strokeMiterLimit = 4.0f;
 
-        public FilterMode filterMode = FilterMode.Point;
+        public FilterMode filterMode = FilterMode.Bilinear;
 
         public ColorFilter colorFilter = null;
 

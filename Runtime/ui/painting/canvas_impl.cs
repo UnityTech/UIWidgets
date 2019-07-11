@@ -951,7 +951,7 @@ namespace Unity.UIWidgets.ui {
             public int rtID;
             public int width;
             public int height;
-            public FilterMode filterMode = FilterMode.Point;
+            public FilterMode filterMode = FilterMode.Bilinear;
             public bool noMSAA = false;
             public Rect layerBounds;
             public Paint layerPaint;

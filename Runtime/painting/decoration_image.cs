@@ -209,7 +209,7 @@ namespace Unity.UIWidgets.painting {
             Rect centerSlice = null,
             ImageRepeat repeat = ImageRepeat.noRepeat,
             bool invertColors = false,
-            FilterMode filterMode = FilterMode.Point
+            FilterMode filterMode = FilterMode.Bilinear
         ) {
             D.assert(canvas != null);
             D.assert(rect != null);
