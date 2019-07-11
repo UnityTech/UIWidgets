@@ -37,7 +37,7 @@ namespace Unity.UIWidgets.ui {
             return new _uiBlurImageFilter(sigmaX, sigmaY);
         }
 
-        public static uiImageFilter matrix(uiMatrix3 transform, FilterMode filterMode = FilterMode.Point) {
+        public static uiImageFilter matrix(uiMatrix3 transform, FilterMode filterMode = FilterMode.Bilinear) {
             return new _uiMatrixImageFilter(transform, filterMode);
         }
     }
@@ -87,7 +87,7 @@ namespace Unity.UIWidgets.ui {
             StrokeCap strokeCap = StrokeCap.butt,
             StrokeJoin strokeJoin = StrokeJoin.miter,
             float strokeMiterLimit = 4.0f,
-            FilterMode filterMode = FilterMode.Point,
+            FilterMode filterMode = FilterMode.Bilinear,
             uiColorFilter? colorFilter = null,
             uiMaskFilter? maskFilter = null,
             uiImageFilter backdrop = null,

@@ -8,7 +8,7 @@ namespace Unity.UIWidgets.ui {
             public int rtID;
             public int width;
             public int height;
-            public FilterMode filterMode = FilterMode.Point;
+            public FilterMode filterMode = FilterMode.Bilinear;
             public bool noMSAA = false;
             public uiRect layerBounds;
             public uiPaint? layerPaint;
@@ -38,7 +38,7 @@ namespace Unity.UIWidgets.ui {
             }
 
             public static RenderLayer create(int rtID = 0, int width = 0, int height = 0,
-                FilterMode filterMode = FilterMode.Point,
+                FilterMode filterMode = FilterMode.Bilinear,
                 bool noMSAA = false, uiRect? layerBounds = null, uiPaint? layerPaint = null, bool ignoreClip = true) {
                 D.assert(layerBounds != null);
                 var newLayer = ObjectPool<RenderLayer>.alloc();

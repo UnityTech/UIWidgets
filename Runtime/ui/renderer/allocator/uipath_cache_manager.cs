@@ -2,10 +2,10 @@ using System.Collections.Generic;
 
 namespace Unity.UIWidgets.ui {
     public static class uiPathCacheManager {
-        static Dictionary<uint, uiPath> cache = new Dictionary<uint, uiPath>(256);
+        static readonly Dictionary<uint, uiPath> cache = new Dictionary<uint, uiPath>(256);
 
         //remove unused cache items every 1 frame
-        static Dictionary<uint, bool> touched = new Dictionary<uint, bool>(256);
+        static readonly Dictionary<uint, bool> touched = new Dictionary<uint, bool>(256);
 
         static float curFrame;
 
