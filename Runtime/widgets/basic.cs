@@ -1855,7 +1855,7 @@ namespace Unity.UIWidgets.widgets {
             ImageRepeat repeat = ImageRepeat.noRepeat,
             Rect centerSlice = null,
             bool invertColors = false,
-            FilterMode filterMode = FilterMode.Point
+            FilterMode filterMode = FilterMode.Bilinear
         ) : base(key) {
             this.image = image;
             this.width = width;

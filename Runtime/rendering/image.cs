@@ -19,7 +19,7 @@ namespace Unity.UIWidgets.rendering {
             ImageRepeat repeat = ImageRepeat.noRepeat,
             Rect centerSlice = null,
             bool invertColors = false,
-            FilterMode filterMode = FilterMode.Point
+            FilterMode filterMode = FilterMode.Bilinear
         ) {
             this._image = image;
             this._width = width;
