@@ -174,13 +174,15 @@ namespace Unity.UIWidgets.ui {
             this._lineWidth = lineWidth;
         }
 
-        public void addStyleRun(TextStyle style, int start, int end) {
+        public float addStyleRun(TextStyle style, int start, int end) {
+            float width = 0;
             if (style != null) {
 //                Layout.measureText(this._width - this._preBreak, this._textBuf,
 //                    start, end - start, style,
 //                    this._charWidths, start, this._tabStops);
-                Layout.computeCharWidths(this._textBuf.text, this._textBuf.offset + start, end - start, style,
-                    this._charWidths, start);
+                width = Layout.computeCharWidths(this._width - this._preBreak, this._textBuf.text,
+                    this._textBuf.offset + start, end - start, style,
+                    this._charWidths, start, this._tabStops);
             }
 
             int current = this._wordBreaker.current();
@@ -215,6 +217,8 @@ namespace Unity.UIWidgets.ui {
                     current = this._wordBreaker.next();
                 }
             }
+
+            return width;
         }
 
         public void finish() {

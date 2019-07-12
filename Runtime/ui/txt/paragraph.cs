@@ -580,22 +580,7 @@ namespace Unity.UIWidgets.ui {
 
             this._lineCount = lineLimit;
 
-            // Compute max intrinsic width and min intrinsic width
-            // max intrinsic width := maximum width this paragraph could possibly expand, without any constraints,
-            //                        which equals the length of the maximum hard-break line
-            this._maxIntrinsicWidth = 0;
-            float lineBlockWidth = 0;
-            for (int i = 0; i < this._lineWidthCount; ++i) {
-                lineBlockWidth += this._lineWidths[i];
-                if (this._lineRanges[i].hardBreak) {
-                    this._maxIntrinsicWidth = Mathf.Max(lineBlockWidth, this._maxIntrinsicWidth);
-                    lineBlockWidth = 0;
-                }
-            }
-
             // min intrinsic width := minimum width this paragraph has to take, which equals the maximum word width
-            this._maxIntrinsicWidth = Mathf.Max(lineBlockWidth, this._maxIntrinsicWidth);
-
             if (this._paragraphStyle.maxLines == 1 || (this._paragraphStyle.maxLines == null &&
                                                        this._paragraphStyle.ellipsized())) {
                 this._minIntrinsicWidth = this.maxIntrinsicWidth;
@@ -906,6 +891,7 @@ namespace Unity.UIWidgets.ui {
 
         int _addStyleRuns(LineBreaker lineBreaker, ref int runIndex, int blockStart, int blockEnd) {
             int countRuns = 0;
+            float lineBlockWidth = 0;
             while (runIndex < this._runs.size) {
                 var run = this._runs.getRun(runIndex);
                 if (run.start >= blockEnd) {
@@ -923,7 +909,8 @@ namespace Unity.UIWidgets.ui {
 
                 int runStart = Mathf.Max(run.start, blockStart) - blockStart;
                 int runEnd = Mathf.Min(run.end, blockEnd) - blockStart;
-                lineBreaker.addStyleRun(run.style, runStart, runEnd);
+                lineBlockWidth += lineBreaker.addStyleRun(run.style, runStart, runEnd);
+
                 countRuns++;
 
                 if (run.end > blockEnd) {
@@ -932,6 +919,7 @@ namespace Unity.UIWidgets.ui {
 
                 runIndex++;
             }
+            this._maxIntrinsicWidth = Mathf.Max(lineBlockWidth, this._maxIntrinsicWidth);
 
             return countRuns;
         }

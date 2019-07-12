@@ -80,15 +80,17 @@ namespace Unity.UIWidgets.ui {
             return 0;
         }
 
-        public static void computeCharWidths(string text, int start, int count, TextStyle style, float[] advances,
-            int advanceOffset) {
+        public static float computeCharWidths(float offset, string text, int start, int count, TextStyle style,
+            float[] advances, int advanceOffset, TabStops tabStops) {
             char startingChar = text[start];
+            float totalWidths = 0;
             if (char.IsHighSurrogate(startingChar) || EmojiUtils.isSingleCharEmoji(startingChar)) {
                 float advance = style.fontSize + style.letterSpacing;
                 for (int i = 0; i < count; i++) {
                     char ch = text[start + i];
                     if (char.IsHighSurrogate(ch) || EmojiUtils.isSingleCharNonEmptyEmoji(ch)) {
                         advances[i + advanceOffset] = advance;
+                        totalWidths += advance;
                     }
                     else {
                         advances[i + advanceOffset] = 0;
@@ -101,7 +103,10 @@ namespace Unity.UIWidgets.ui {
                 font.RequestCharactersInTextureSafe(text, style.UnityFontSize, style.UnityFontStyle);
                 for (int i = 0; i < count; i++) {
                     char ch = text[start + i];
-                    if (font.getGlyphInfo(ch, out var glyphInfo, style.UnityFontSize, style.UnityFontStyle)) {
+                    if (ch == '\t') {
+                        advances[i + advanceOffset] = tabStops.nextTab(offset + totalWidths) - (offset + totalWidths);
+                    }
+                    else if (font.getGlyphInfo(ch, out var glyphInfo, style.UnityFontSize, style.UnityFontStyle)) {
                         advances[i + advanceOffset] = glyphInfo.advance + style.letterSpacing;
                     }
                     else {
@@ -111,8 +116,12 @@ namespace Unity.UIWidgets.ui {
                     if (LayoutUtils.isWordSpace(ch)) {
                         advances[i + advanceOffset] += style.wordSpacing;
                     }
+
+                    totalWidths += advances[i + advanceOffset];
                 }
             }
+
+            return totalWidths;
         }
 
         public static float doLayout(float offset, string text, int start, int count, TextStyle style,
