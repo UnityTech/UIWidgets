@@ -801,11 +801,11 @@ namespace Unity.UIWidgets.ui {
 
             var offset = position.offset;
             if (position.affinity == TextAffinity.upstream && offset > 0) {
-                offset = _isUtf16Surrogate(this._text[offset - 1]) ? offset - 2 : offset - 1;
+                offset = char.IsSurrogate(this._text[offset - 1]) ? offset - 2 : offset - 1;
             }
 
             var lineCount = this.getLineCount();
-            for (int lineIndex = 0; lineIndex < this.getLineCount(); ++lineIndex) {
+            for (int lineIndex = 0; lineIndex < lineCount; ++lineIndex) {
                 var line = this._lineRanges[lineIndex];
                 if ((offset >= line.start && offset < line.endIncludingNewLine)) {
                     return lineIndex;
@@ -1089,10 +1089,6 @@ namespace Unity.UIWidgets.ui {
             }
 
             return 0;
-        }
-
-        static bool _isUtf16Surrogate(int value) {
-            return (value & 0xF800) == 0xD800;
         }
     }
 

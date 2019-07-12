@@ -162,18 +162,15 @@ namespace Unity.UIWidgets.ui {
             float letterSpaceHalfRight = letterSpace - letterSpaceHalfLeft;
 
             for (int i = 0; i < wordCount; i++) {
+                initAdvance = x;
                 var ch = text[start + i];
                 if (i == 0) {
                     x += letterSpaceHalfLeft + wordSpacing;
-                    if (advances != null) {
-                        advances[i + layoutOffset] = letterSpaceHalfLeft + wordSpacing;
-                    }
+                    advances[i + layoutOffset] = letterSpaceHalfLeft + wordSpacing;
                 }
                 else {
-                    if (advances != null) {
-                        advances[i - 1 + layoutOffset] += letterSpaceHalfRight;
-                        advances[i + layoutOffset] = letterSpaceHalfLeft;
-                    }
+                    advances[i - 1 + layoutOffset] += letterSpaceHalfRight;
+                    advances[i + layoutOffset] = letterSpaceHalfLeft;
 
                     x += letterSpace;
                 }
@@ -182,9 +179,7 @@ namespace Unity.UIWidgets.ui {
                     _updateBounds(glyphInfo, x, ref bounds);
                 }
 
-                if (positions != null) {
-                    positions[i + layoutOffset] = x;
-                }
+                positions[i + layoutOffset] = x;
 
                 float advance;
                 if (ch == '\t') {
@@ -195,15 +190,10 @@ namespace Unity.UIWidgets.ui {
                 }
 
                 x += advance;
-                if (advances != null) {
-                    advances[i + layoutOffset] += advance;
-                }
+                advances[i + layoutOffset] += advance;
 
                 if (i + 1 == wordCount) {
-                    if (advances != null) {
-                        advances[i + layoutOffset] += letterSpaceHalfRight;
-                    }
-
+                    advances[i + layoutOffset] += letterSpaceHalfRight;
                     x += letterSpaceHalfRight;
                 }
             }
@@ -223,9 +213,7 @@ namespace Unity.UIWidgets.ui {
                     float letterSpaceHalfRight = letterSpace - letterSpaceHalfLeft;
 
                     x += letterSpaceHalfLeft;
-                    if (advances != null) {
-                        advances[i] = letterSpaceHalfLeft;
-                    }
+                    advances[i] = letterSpaceHalfLeft;
 
 
                     var minX = x;
@@ -234,28 +222,19 @@ namespace Unity.UIWidgets.ui {
                     var maxY = metrics.descent;
                     _updateBounds(minX, maxX, minY, maxY, ref bounds);
 
-                    if (positions != null) {
-                        positions[i] = x;
-                    }
+                    positions[i] = x;
 
                     float advance = style.fontSize;
                     x += advance;
 
-                    if (advances != null) {
-                        advances[i] += advance;
-                        advances[i] += letterSpaceHalfRight;
-                    }
+                    advances[i] += advance;
+                    advances[i] += letterSpaceHalfRight;
 
                     x += letterSpaceHalfRight;
                 }
                 else {
-                    if (advances != null) {
-                        advances[i] = 0;
-                    }
-
-                    if (positions != null) {
-                        positions[i] = x;
-                    }
+                    advances[i] = 0;
+                    positions[i] = x;
                 }
             }
 
