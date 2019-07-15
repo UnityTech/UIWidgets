@@ -1,20 +1,17 @@
-using Unity.UIWidgets.animation;
-using Unity.UIWidgets.engine;
 using Unity.UIWidgets.material;
 using Unity.UIWidgets.widgets;
 using UnityEngine;
 
 namespace UIWidgetsSample {
-    public class LongPressSample: UIWidgetsSamplePanel {
-        
-        protected override Widget createWidget()  {
+    public class LongPressSample : UIWidgetsSamplePanel {
+        protected override Widget createWidget() {
             return new WidgetsApp(
                 home: new LongPressSampleWidget(),
                 pageRouteBuilder: this.pageRouteBuilder);
         }
     }
 
-    public class LongPressSampleWidget: StatefulWidget {
+    public class LongPressSampleWidget : StatefulWidget {
         public override State createState() {
             return new _LongPressSampleWidgetState();
         }
@@ -23,15 +20,11 @@ namespace UIWidgetsSample {
     class _LongPressSampleWidgetState : State<LongPressSampleWidget> {
         public override Widget build(BuildContext context) {
             return new GestureDetector(
-                onLongPressDragStart: (value) => {
-                    Debug.Log($"Long Press Drag Start: {value}");
-                },
-                onLongPressDragUpdate: (value) => {
-                    Debug.Log($"Long Press Drag Update: {value}");
-                },
-                onLongPressDragUp: (value) => {
-                    Debug.Log($"Long Press Drag Up: {value}");
-                },
+                onLongPressDragStart: (value) => { Debug.Log($"Long Press Drag Start: {value}"); },
+                onLongPressDragUpdate: (value) => { Debug.Log($"Long Press Drag Update: {value}"); },
+                onLongPressDragUp: (value) => { Debug.Log($"Long Press Drag Up: {value}"); },
+                onLongPressUp: () => { Debug.Log($"Long Press Up"); },
+                onLongPress: () => { Debug.Log($"Long Press"); },
                 child: new Center(
                     child: new Container(
                         width: 200,

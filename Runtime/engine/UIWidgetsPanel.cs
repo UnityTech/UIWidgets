@@ -130,7 +130,7 @@ namespace Unity.UIWidgets.engine {
 
         void _handleViewMetricsChanged(string method, List<JSONNode> args) {
             this._windowAdapter.onViewMetricsChanged();
-            this._displayMetrics.Update();
+            this._displayMetrics.onViewMetricsChanged();
         }
 
         protected override void OnEnable() {

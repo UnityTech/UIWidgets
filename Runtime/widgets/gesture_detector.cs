@@ -113,9 +113,9 @@ namespace Unity.UIWidgets.widgets {
                         throw new UIWidgetsError(
                             "Incorrect GestureDetector arguments.\n" +
                             "Having both a pan gesture recognizer and a scale gesture recognizer is redundant; scale is a superset of pan. Just use the scale gesture recognizer."
-                            );
+                        );
                     }
-                    
+
                     string recognizer = havePan ? "pan" : "scale";
                     if (haveVerticalDrag && haveHorizontalDrag) {
                         throw new UIWidgetsError(
@@ -125,7 +125,7 @@ namespace Unity.UIWidgets.widgets {
                         );
                     }
                 }
-                
+
                 if (haveLongPress && haveLongPressDrag) {
                     throw new UIWidgetsError(
                         "Incorrect GestureDetector arguments.\n" +
@@ -235,7 +235,10 @@ namespace Unity.UIWidgets.widgets {
                 gestures[typeof(LongPressGestureRecognizer)] =
                     new GestureRecognizerFactoryWithHandlers<LongPressGestureRecognizer>(
                         () => new LongPressGestureRecognizer(debugOwner: this),
-                        instance => { instance.onLongPress = this.onLongPress; }
+                        instance => {
+                            instance.onLongPress = this.onLongPress;
+                            instance.onLongPressUp = this.onLongPressUp;
+                        }
                     );
             }
 
