@@ -65,10 +65,16 @@ namespace Unity.UIWidgets.gestures {
             base(deadline: Constants.kLongPressTimeout, debugOwner: debugOwner, kind: kind) {
         }
 
+        bool _longPressAccepted = false;
+
         public GestureLongPressCallback onLongPress;
+
+        public GestureLongPressUpCallback onLongPressUp;
 
         protected override void didExceedDeadline() {
             this.resolve(GestureDisposition.accepted);
+            this._longPressAccepted = true;
+
             if (this.onLongPress != null) {
                 this.invokeCallback<object>("onLongPress", () => {
                     this.onLongPress();
@@ -79,7 +85,19 @@ namespace Unity.UIWidgets.gestures {
 
         protected override void handlePrimaryPointer(PointerEvent evt) {
             if (evt is PointerUpEvent) {
-                this.resolve(GestureDisposition.rejected);
+                if (this._longPressAccepted && this.onLongPressUp != null) {
+                    this._longPressAccepted = false;
+                    this.invokeCallback<object>("onLongPressUp", () => {
+                        this.onLongPressUp();
+                        return null;
+                    });
+                }
+                else {
+                    this.resolve(GestureDisposition.rejected);
+                }
+            }
+            else if (evt is PointerDownEvent || evt is PointerCancelEvent) {
+                this._longPressAccepted = false;
             }
         }
 
@@ -101,7 +119,7 @@ namespace Unity.UIWidgets.gestures {
         Offset _longPressOrigin;
 
         TimeSpan? _longPressStartTimestamp;
-        
+
         public GestureLongPressDragStartCallback onLongPressStart;
 
         public GestureLongPressDragUpdateCallback onLongPressDragUpdate;
