@@ -1,5 +1,6 @@
 using System;
 using Unity.UIWidgets.ui;
+using Object = UnityEngine.Object;
 
 namespace Unity.UIWidgets.gestures {
     public abstract class PointerEvent {
@@ -86,7 +87,129 @@ namespace Unity.UIWidgets.gestures {
                 delta: delta) {
         }
     }
+    public class PointerDragFromEditorEnterEvent : PointerEvent {
+        public PointerDragFromEditorEnterEvent(
+            TimeSpan timeStamp,
+            int pointer = 0,
+            PointerDeviceKind kind = PointerDeviceKind.mouse,
+            int device = 0,
+            Offset position = null
+        ) : base(
+            timeStamp,
+            pointer: pointer,
+            kind: kind,
+            device: device,
+            position: position
+        ) { }
+        
+        public static PointerDragFromEditorEnterEvent fromDragFromEditorEvent(PointerEvent evt) {
+            return new PointerDragFromEditorEnterEvent(
+                timeStamp: evt.timeStamp,
+                pointer: evt.pointer,
+                kind: evt.kind,
+                device: evt.device,
+                position: evt.position
+            );
+        }
+    }
+    public class PointerDragFromEditorExitEvent : PointerEvent {
+        public PointerDragFromEditorExitEvent(
+            TimeSpan timeStamp,
+            int pointer = 0,
+            PointerDeviceKind kind = PointerDeviceKind.mouse,
+            int device = 0,
+            Offset position = null
+        ) : base(
+            timeStamp,
+            pointer: pointer,
+            kind: kind,
+            device: device,
+            position: position
+        ) { }
+        
+        public static PointerDragFromEditorExitEvent fromDragFromEditorEvent(PointerEvent evt) {
+            return new PointerDragFromEditorExitEvent(
+                timeStamp: evt.timeStamp,
+                pointer: evt.pointer,
+                kind: evt.kind,
+                device: evt.device,
+                position: evt.position
+            );
+        }
+    }
 
+    public class PointerDragFromEditorHoverEvent : PointerEvent {
+        public PointerDragFromEditorHoverEvent(
+            TimeSpan timeStamp,
+            int pointer = 0,
+            PointerDeviceKind kind = PointerDeviceKind.mouse,
+            int device = 0,
+            Offset position = null
+        ) : base(
+            timeStamp,
+            pointer: pointer,
+            kind: kind,
+            device: device,
+            position: position
+        ) { }
+        
+        public static PointerDragFromEditorHoverEvent fromDragFromEditorEvent(PointerEvent evt) {
+            return new PointerDragFromEditorHoverEvent(
+                timeStamp: evt.timeStamp,
+                pointer: evt.pointer,
+                kind: evt.kind,
+                device: evt.device,
+                position: evt.position
+            );
+        }
+    }
+    public class PointerDragFromEditorReleaseEvent : PointerEvent {
+        public PointerDragFromEditorReleaseEvent(
+            TimeSpan timeStamp,
+            int pointer = 0,
+            PointerDeviceKind kind = PointerDeviceKind.mouse,
+            int device = 0,
+            Offset position = null,
+            Object[] objectReferences = null
+        ) : base(
+            timeStamp,
+            pointer: pointer,
+            kind: kind,
+            device: device,
+            position: position
+        ) {
+            this.objectReferences = objectReferences;
+        }
+
+        public Object[] objectReferences;
+        
+        public static PointerDragFromEditorReleaseEvent fromDragFromEditorEvent(PointerEvent evt, Object[] objectReferences) {
+            return new PointerDragFromEditorReleaseEvent(
+                timeStamp: evt.timeStamp,
+                pointer: evt.pointer,
+                kind: evt.kind,
+                device: evt.device,
+                position: evt.position,
+                objectReferences: objectReferences
+            );
+        }
+    }
+    
+    public class PointerDragFromEditorFailedEvent : PointerEvent {
+        public PointerDragFromEditorFailedEvent(
+            TimeSpan timeStamp,
+            int pointer = 0,
+            PointerDeviceKind kind = PointerDeviceKind.mouse,
+            int device = 0,
+            Offset position = null
+        ) : base(
+            timeStamp,
+            pointer: pointer,
+            kind: kind,
+            device: device,
+            position: position
+        ) { }
+    }
 
     public class PointerHoverEvent : PointerEvent {
         public PointerHoverEvent(

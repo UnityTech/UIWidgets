@@ -163,7 +163,7 @@ namespace Unity.UIWidgets.editor {
 
         protected float deltaTime;
         protected float unscaledDeltaTime;
-        
+
         void updatePhysicalSize() {
             var size = this.queryWindowSize();
             this._physicalSize = new Size(
@@ -183,7 +183,7 @@ namespace Unity.UIWidgets.editor {
         public void onViewMetricsChanged() {
             this._viewMetricsChanged = true;
         }
-        
+
         protected abstract bool hasFocus();
 
         public void OnEnable() {
@@ -398,6 +398,26 @@ namespace Unity.UIWidgets.editor {
                         evt.mousePosition.x * this._devicePixelRatio,
                         evt.mousePosition.y * this._devicePixelRatio,
                         evt.button
+                    );
+                }
+                else if (evt.type == EventType.DragUpdated) {
+                    pointerData = new PointerData(
+                        timeStamp: Timer.timespanSinceStartup,
+                        change: PointerChange.dragFromEditorMove,
+                        kind: PointerDeviceKind.mouse,
+                        device: evt.button,
+                        physicalX: evt.mousePosition.x * this._devicePixelRatio,
+                        physicalY: evt.mousePosition.y * this._devicePixelRatio
+                    );
+                }
+                else if (evt.type == EventType.DragPerform) {
+                    pointerData = new PointerData(
+                        timeStamp: Timer.timespanSinceStartup,
+                        change: PointerChange.dragFromEditorRelease,
+                        kind: PointerDeviceKind.mouse,
+                        device: evt.button,
+                        physicalX: evt.mousePosition.x * this._devicePixelRatio,
+                        physicalY: evt.mousePosition.y * this._devicePixelRatio
                     );
                 }
 

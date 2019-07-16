@@ -78,6 +78,7 @@ namespace Unity.UIWidgets.gestures {
                         if (state.down) {
                             break;
                         }
+
                         if (state.lastPosition != position) {
                             // a hover event to be here.
                             state.lastPosition = position;
@@ -194,6 +195,30 @@ namespace Unity.UIWidgets.gestures {
                                 position: position
                             );
                         }
+                    }
+                        break;
+                    case PointerChange.dragFromEditorMove: {
+                        _PointerState state = _ensureStateForPointer(datum, position);
+                        state.startNewPointer();
+                        yield return new PointerDragFromEditorHoverEvent(
+                            timeStamp: timeStamp,
+                            pointer: state.pointer,
+                            kind: kind,
+                            device: datum.device,
+                            position: position
+                        );
+                    }
+                        break;
+                    case PointerChange.dragFromEditorRelease: {
+                        _PointerState state = _ensureStateForPointer(datum, position);
+                        state.startNewPointer();
+                        yield return new PointerDragFromEditorReleaseEvent(
+                            timeStamp: timeStamp,
+                            pointer: state.pointer,
+                            kind: kind,
+                            device: datum.device,
+                            position: position
+                        );
                     }
                         break;
                 }
