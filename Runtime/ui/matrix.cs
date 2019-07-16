@@ -1438,8 +1438,22 @@ namespace Unity.UIWidgets.ui {
             return prod == 0; // if prod is NaN, this check will return false
         }
 
+        static byte[] _scalar_as_2s_compliment_vars = new byte[4];
+
+
+        static unsafe int GetBytesToInt32(float value) {
+            var intVal = *(int*) &value;
+            fixed (byte* b = _scalar_as_2s_compliment_vars) {
+                *((int*) b) = intVal;
+            }
+
+            fixed (byte* pbyte = &_scalar_as_2s_compliment_vars[0]) {
+                return *((int*) pbyte);
+            }
+        }
+
         public static int ScalarAs2sCompliment(float x) {
-            var result = BitConverter.ToInt32(BitConverter.GetBytes(x), 0);
+            var result = GetBytesToInt32(x);
             if (result < 0) {
                 result &= 0x7FFFFFFF;
                 result = -result;

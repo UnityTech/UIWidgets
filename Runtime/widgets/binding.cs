@@ -34,6 +34,8 @@ namespace Unity.UIWidgets.widgets {
             this.addPersistentFrameCallback((duration) => {
                 TextBlobMesh.tickNextFrame();
                 TessellationGenerator.tickNextFrame();
+                uiTessellationGenerator.tickNextFrame();
+                uiPathCacheManager.tickNextFrame();
             });
         }
 

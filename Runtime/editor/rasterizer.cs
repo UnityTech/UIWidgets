@@ -76,7 +76,6 @@ namespace Unity.UIWidgets.editor {
                     this._fireNextFrameCallbackIfPresent();
                     return true;
                 }
-
                 return false;
             }
         }

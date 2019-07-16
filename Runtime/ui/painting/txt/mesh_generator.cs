@@ -4,13 +4,19 @@ using Unity.UIWidgets.foundation;
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
-    class MeshKey : IEquatable<MeshKey> {
-        public readonly long textBlobId;
-        public readonly float scale;
+    class MeshKey : PoolObject, IEquatable<MeshKey> {
+        public long textBlobId;
+        public float scale;
 
-        public MeshKey(long textBlobId, float scale) {
-            this.textBlobId = textBlobId;
-            this.scale = scale;
+        public MeshKey() {
+            
+        }
+
+        public static MeshKey create(long textBlobId, float scale) {
+            var newKey = ObjectPool<MeshKey>.alloc();
+            newKey.textBlobId = textBlobId;
+            newKey.scale = scale;
+            return newKey;
         }
 
         public bool Equals(MeshKey other) {
@@ -60,17 +66,28 @@ namespace Unity.UIWidgets.ui {
         }
     }
 
-    class MeshInfo {
-        public readonly MeshKey key;
-        public readonly long textureVersion;
-        public readonly MeshMesh mesh;
+    class MeshInfo : PoolObject {
+        public MeshKey key;
+        public long textureVersion;
+        public uiMeshMesh mesh;
         long _timeToLive;
 
-        public MeshInfo(MeshKey key, MeshMesh mesh, long textureVersion, int timeToLive = 5) {
-            this.mesh = mesh;
-            this.key = key;
-            this.textureVersion = textureVersion;
-            this.touch(timeToLive);
+        public MeshInfo() {
+            
+        }
+
+        public static MeshInfo create(MeshKey key, uiMeshMesh mesh, long textureVersion, int timeToLive = 5) {
+            var meshInfo = ObjectPool<MeshInfo>.alloc();
+            meshInfo.mesh = mesh;
+            meshInfo.key = key;
+            meshInfo.textureVersion = textureVersion;
+            meshInfo.touch(timeToLive);
+            return meshInfo;
+        }
+
+        public override void clear() {
+            ObjectPool<MeshKey>.release(this.key);
+            ObjectPool<uiMeshMesh>.release(this.mesh);
         }
 
         public long timeToLive {
@@ -83,22 +100,34 @@ namespace Unity.UIWidgets.ui {
     }
 
     
-    class TextBlobMesh {
+    class TextBlobMesh : PoolObject {
         
         static readonly Dictionary<MeshKey, MeshInfo> _meshes = new Dictionary<MeshKey, MeshInfo>();
         static long _frameCount = 0;
         
-        public readonly TextBlob textBlob;
-        public readonly float scale;
-        public readonly Matrix3 matrix;
+        public TextBlob textBlob;
+        public float scale;
+        public uiMatrix3 matrix;
         
-        MeshMesh _mesh;
+        uiMeshMesh _mesh;
         bool _resolved;
 
-        public TextBlobMesh(TextBlob textBlob, float scale, Matrix3 matrix) {
-            this.textBlob = textBlob;
-            this.scale = scale;
-            this.matrix = matrix;
+        public TextBlobMesh() {
+        }
+
+        public override void clear() {
+            this.textBlob = null;
+            ObjectPool<uiMeshMesh>.release(this._mesh);
+            this._mesh = null;
+            this._resolved = false;
+        }
+
+        public static TextBlobMesh create(TextBlob textBlob, float scale, uiMatrix3 matrix) {
+            TextBlobMesh newMesh = ObjectPool<TextBlobMesh>.alloc();
+            newMesh.textBlob = textBlob;
+            newMesh.scale = scale;
+            newMesh.matrix = matrix;
+            return newMesh;
         }
         
         public static long frameCount {
@@ -108,24 +137,26 @@ namespace Unity.UIWidgets.ui {
         public static int meshCount {
             get { return _meshes.Count; }
         }
-        
-        static readonly List<MeshKey> _keysToRemove = new List<MeshKey>();
 
+        static List<MeshKey> _keysToRemove = new List<MeshKey>();
         public static void tickNextFrame() {
             _frameCount++;
-            _keysToRemove.Clear();
-            foreach (var info in _meshes.Values) {
-                if (info.timeToLive < _frameCount) {
-                    _keysToRemove.Add(info.key);
+            D.assert(_keysToRemove.Count == 0);
+            foreach (var key in _meshes.Keys) {
+                if (_meshes[key].timeToLive < _frameCount) {
+                    _keysToRemove.Add(key);
                 }
             }
 
-            foreach (var key in _keysToRemove) {
+            foreach (var key in _keysToRemove)
+            {
+                ObjectPool<MeshInfo>.release(_meshes[key]);
                 _meshes.Remove(key);
             }
+            _keysToRemove.Clear();
         }
 
-        public MeshMesh resolveMesh() {
+        public uiMeshMesh resolveMesh() {
             if (this._resolved) {
                 return this._mesh;
             }
@@ -133,18 +164,27 @@ namespace Unity.UIWidgets.ui {
             this._resolved = true;
             
             var style = this.textBlob.style;
-
+            
             var text = this.textBlob.text;
-            var key = new MeshKey(this.textBlob.instanceId, this.scale);
+            var key = MeshKey.create(this.textBlob.instanceId, this.scale);
             var fontInfo = FontManager.instance.getOrCreate(style.fontFamily, style.fontWeight, style.fontStyle);
             var font = fontInfo.font;
+            
+            _meshes.TryGetValue(key, out var meshInfo);
+            if (meshInfo != null && meshInfo.textureVersion == fontInfo.textureVersion) {
+                ObjectPool<MeshKey>.release(key);
+                meshInfo.touch();
+                this._mesh = meshInfo.mesh.transform(this.matrix);
+                return this._mesh;
+            }
             
             // Handling Emoji
             char startingChar = text[this.textBlob.textOffset];
             if (char.IsHighSurrogate(startingChar) || EmojiUtils.isSingleCharEmoji(startingChar)) {
-                var vert = new List<Vector3>();
-                var tri = new List<int>();
-                var uvCoord = new List<Vector2>();
+                var vert = ObjectPool<uiList<Vector3>>.alloc();
+                var tri = ObjectPool<uiList<int>>.alloc();
+                var uvCoord = ObjectPool<uiList<Vector2>>.alloc();
+                
                 var metrics = FontMetrics.fromFont(font, style.UnityFontSize);
                 var minMaxRect = EmojiUtils.getMinMaxRect(style.fontSize, metrics.ascent, metrics.descent);
                 var minX = minMaxRect.left;
@@ -165,7 +205,7 @@ namespace Unity.UIWidgets.ui {
                         continue;
                     }
                     var uvRect = EmojiUtils.getUVRect(code);
-                    
+
                     var pos = this.textBlob.positions[i];
 
                     int baseIndex = vert.Count;
@@ -173,7 +213,7 @@ namespace Unity.UIWidgets.ui {
                     vert.Add(new Vector3(pos.x + maxX, pos.y + minY, 0));
                     vert.Add(new Vector3(pos.x + maxX, pos.y + maxY, 0));
                     vert.Add(new Vector3(pos.x + minX, pos.y + maxY, 0));
-                    
+
                     tri.Add(baseIndex);
                     tri.Add(baseIndex + 1);
                     tri.Add(baseIndex + 2);
@@ -184,30 +224,34 @@ namespace Unity.UIWidgets.ui {
                     uvCoord.Add(uvRect.bottomRight.toVector());
                     uvCoord.Add(uvRect.topRight.toVector());
                     uvCoord.Add(uvRect.topLeft.toVector());
-                    
+
                     if(char.IsHighSurrogate(a)) i++;
                 }
-                MeshMesh meshMesh = new MeshMesh(null, vert, tri, uvCoord);
-                _meshes[key] = new MeshInfo(key, meshMesh, 0);
+                
+                uiMeshMesh meshMesh = uiMeshMesh.create(null, vert, tri, uvCoord);
+                
+                if (_meshes.ContainsKey(key)) {
+                    ObjectPool<MeshInfo>.release(_meshes[key]);
+                    _meshes.Remove(key);
+                }
+                _meshes[key] = MeshInfo.create(key, meshMesh, 0);
 
                 this._mesh = meshMesh.transform(this.matrix);
                 return this._mesh;
             }
             
-
-            _meshes.TryGetValue(key, out var meshInfo);
-            if (meshInfo != null && meshInfo.textureVersion == fontInfo.textureVersion) {
-                meshInfo.touch();
-                this._mesh = meshInfo.mesh.transform(this.matrix);
-                return this._mesh;
-            }
-
             var length = this.textBlob.textSize;
             var fontSizeToLoad = Mathf.CeilToInt(style.UnityFontSize * this.scale);
 
-            var vertices = new List<Vector3>(length * 4);
-            var triangles = new List<int>(length * 6);
-            var uv = new List<Vector2>(length * 4);
+            var vertices = ObjectPool<uiList<Vector3>>.alloc();
+            vertices.SetCapacity(length * 4);
+            
+            var triangles = ObjectPool<uiList<int>>.alloc();
+            triangles.SetCapacity(length * 6);
+
+            var uv = ObjectPool<uiList<Vector2>>.alloc();
+            uv.SetCapacity(length * 4);
+            
             for (int charIndex = 0; charIndex < length; ++charIndex) {
                 var ch = text[charIndex + this.textBlob.textOffset];
                 // first char as origin for mesh position 
@@ -249,11 +293,20 @@ namespace Unity.UIWidgets.ui {
 
             if (vertices.Count == 0) {
                 this._mesh = null;
+                ObjectPool<uiList<Vector3>>.release(vertices);
+                ObjectPool<uiList<Vector2>>.release(uv);
+                ObjectPool<uiList<int>>.release(triangles);
+                ObjectPool<MeshKey>.release(key);
                 return null;
             }
 
-            MeshMesh mesh = vertices.Count > 0 ? new MeshMesh(null, vertices, triangles, uv) : null;
-            _meshes[key] = new MeshInfo(key, mesh, fontInfo.textureVersion);
+            uiMeshMesh mesh = vertices.Count > 0 ? uiMeshMesh.create(null, vertices, triangles, uv) : null;
+            
+            if (_meshes.ContainsKey(key)) {
+                ObjectPool<MeshInfo>.release(_meshes[key]);
+                _meshes.Remove(key);
+            }
+            _meshes[key] = MeshInfo.create(key, mesh, fontInfo.textureVersion);
 
             this._mesh = mesh.transform(this.matrix);
             return this._mesh;

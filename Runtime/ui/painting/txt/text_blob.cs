@@ -12,7 +12,13 @@
         }
 
         public Rect boundsInText {
-            get { return this.bounds.shift(new Offset(this.positions[0].x, this.positions[0].y)); }
+            get {
+                if (this._boundsInText == null) {
+                    this._boundsInText = this.bounds.shift(new Offset(this.positions[0].x, this.positions[0].y));
+                }
+
+                return this._boundsInText;
+            }
         }
 
         static long _nextInstanceId = 0;
@@ -22,7 +28,9 @@
         internal readonly int textSize;
         internal readonly Vector2d[] positions;
         internal readonly TextStyle style;
-        internal readonly Rect bounds; // bounds with positions[start] as origin       
+        internal readonly Rect bounds; // bounds with positions[start] as origin
+
+        Rect _boundsInText;
     }
 
     public class TextBlobBuilder {
