@@ -116,8 +116,7 @@ namespace Unity.UIWidgets.rendering {
 
         public void compositeFrame() {
             var builder = new SceneBuilder();
-            this.layer.buildScene(builder);
-            using (var scene = builder.build()) {
+            using (var scene = this.layer.buildScene(builder)) {
                 Window.instance.render(scene);
             }
 
