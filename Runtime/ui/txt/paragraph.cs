@@ -246,24 +246,28 @@ namespace Unity.UIWidgets.ui {
             get { return this._didExceedMaxLines; }
         }
 
-        static List<Paragraph> _paragraphs = new List<Paragraph>();
+        static List<Paragraph> _paragraphPool = new List<Paragraph>();
 
         public static Paragraph create() {
-            if (_paragraphs.isEmpty()) {
+            if (_paragraphPool.isEmpty()) {
                 return new Paragraph();
             }
 
-            Paragraph ret = _paragraphs.last();
-            _paragraphs.RemoveAt(_paragraphs.Count - 1);
+            Paragraph ret = _paragraphPool.last();
+            _paragraphPool.RemoveAt(_paragraphPool.Count - 1);
             return ret;
         }
 
         public static void release(ref Paragraph paragraph) {
             if (paragraph != null) {
-                _paragraphs.Add(paragraph);
+                _paragraphPool.Add(paragraph);
                 paragraph = null;
             }
         }
+
+        readonly Paint _textPaint = new Paint {
+            filterMode = FilterMode.Bilinear
+        };
 
         public void paint(Canvas canvas, Offset offset) {
             for (int i = 0; i < this._paintRecordsCount; i++) {
@@ -273,11 +277,8 @@ namespace Unity.UIWidgets.ui {
 
             for (int i = 0; i < this._paintRecordsCount; i++) {
                 var paintRecord = this._paintRecords[i];
-                var paint = new Paint {
-                    filterMode = FilterMode.Bilinear,
-                    color = paintRecord.style.color
-                };
-                canvas.drawTextBlob(paintRecord.text, paintRecord.shiftedOffset(offset), paint);
+                this._textPaint.color = paintRecord.style.color;
+                canvas.drawTextBlob(paintRecord.text, paintRecord.shiftedOffset(offset), this._textPaint);
                 this.paintDecorations(canvas, paintRecord, offset);
             }
         }
@@ -919,6 +920,7 @@ namespace Unity.UIWidgets.ui {
 
                 runIndex++;
             }
+
             this._maxIntrinsicWidth = Mathf.Max(lineBlockWidth, this._maxIntrinsicWidth);
 
             return countRuns;
@@ -1000,20 +1002,19 @@ namespace Unity.UIWidgets.ui {
                 return;
             }
 
-            var paint = new Paint();
             if (record.style.decorationColor == null) {
-                paint.color = record.style.color;
+                this._textPaint.color = record.style.color;
             }
             else {
-                paint.color = record.style.decorationColor;
+                this._textPaint.color = record.style.decorationColor;
             }
 
 
             var width = record.runWidth;
             var metrics = record.metrics;
             float underLineThickness = metrics.underlineThickness ?? (record.style.fontSize / 14.0f);
-            paint.style = PaintingStyle.stroke;
-            paint.strokeWidth = underLineThickness;
+            this._textPaint.style = PaintingStyle.stroke;
+            this._textPaint.strokeWidth = underLineThickness;
             var recordOffset = record.shiftedOffset(baseOffset);
             var x = recordOffset.dx;
             var y = recordOffset.dy;
@@ -1033,23 +1034,26 @@ namespace Unity.UIWidgets.ui {
                 if (decoration != null && decoration.contains(TextDecoration.underline)) {
                     // underline
                     yOffset += metrics.underlinePosition ?? underLineThickness;
-                    canvas.drawLine(new Offset(x, y + yOffset), new Offset(x + width, y + yOffset), paint);
+                    canvas.drawLine(new Offset(x, y + yOffset), new Offset(x + width, y + yOffset), this._textPaint);
                     yOffset = yOffsetOriginal;
                 }
 
                 if (decoration != null && decoration.contains(TextDecoration.overline)) {
                     yOffset += metrics.ascent;
-                    canvas.drawLine(new Offset(x, y + yOffset), new Offset(x + width, y + yOffset), paint);
+                    canvas.drawLine(new Offset(x, y + yOffset), new Offset(x + width, y + yOffset), this._textPaint);
                     yOffset = yOffsetOriginal;
                 }
 
                 if (decoration != null && decoration.contains(TextDecoration.lineThrough)) {
                     yOffset += (decorationCount - 1.0f) * underLineThickness * kFloatDecorationSpacing / -2.0f;
                     yOffset += metrics.strikeoutPosition ?? (metrics.fxHeight ?? 0) / -2.0f;
-                    canvas.drawLine(new Offset(x, y + yOffset), new Offset(x + width, y + yOffset), paint);
+                    canvas.drawLine(new Offset(x, y + yOffset), new Offset(x + width, y + yOffset), this._textPaint);
                     yOffset = yOffsetOriginal;
                 }
             }
+
+            this._textPaint.style = PaintingStyle.fill;
+            this._textPaint.strokeWidth = 0;
         }
 
         void paintBackground(Canvas canvas, PaintRecord record, Offset baseOffset) {

@@ -9,13 +9,18 @@
             this.textSize = textSize;
             this.style = style;
             this._bounds = bounds;
+            this._boundsInText = null;
         }
 
         public Rect boundsInText {
             get {
-                var pos = this.getPosition(0);
-                return Rect.fromLTWH(this._bounds.xMin + pos, this._bounds.yMin,
-                    this._bounds.width, this._bounds.height);
+                if (this._boundsInText == null) {
+                    var pos = this.getPosition(0);
+                    this._boundsInText = Rect.fromLTWH(this._bounds.xMin + pos, this._bounds.yMin,
+                        this._bounds.width, this._bounds.height);
+                }
+
+                return this._boundsInText;
             }
         }
 
@@ -37,6 +42,8 @@
         internal readonly TextStyle style;
         readonly UnityEngine.Rect _bounds; // bounds with positions[start] as origin       
         readonly float[] _positions;
+
+        Rect _boundsInText;
     }
 
     public struct TextBlobBuilder {
