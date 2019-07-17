@@ -69,8 +69,10 @@ namespace UIWidgetsSample.DragNDrop {
             Scale
         }
 
+        // make custom control of cursor position in TextField.
         int oldCursorPosition = 0;
 
+        // The decimal point input-and-parse exists problem.
         Widget getCardRow(ETransfrom type, bool hasRef) {
             var xValue = hasRef
                 ? type == ETransfrom.Position
@@ -79,7 +81,7 @@ namespace UIWidgetsSample.DragNDrop {
                         ? this.transformRef.localEulerAngles.x.ToString()
                         : this.transformRef.localScale.x.ToString()
                 : "";
-
+            // Using individual TextEditingController to control TextField cursor position.
             var xValueController = TextEditingController.fromValue(
                 new TextEditingValue(xValue, TextSelection.collapsed(this.oldCursorPosition))
             );
@@ -87,7 +89,7 @@ namespace UIWidgetsSample.DragNDrop {
             var yValue = hasRef
                 ? type == ETransfrom.Position
                     ? this.transformRef.position.y.ToString()
-                    : type == ETransfrom.Scale
+                    : type == ETransfrom.Rotation
                         ? this.transformRef.localEulerAngles.y.ToString()
                         : this.transformRef.localScale.y.ToString()
                 : "";
@@ -139,10 +141,17 @@ namespace UIWidgetsSample.DragNDrop {
                                         controller: xValueController,
                                         onChanged: hasRef
                                             ? (str) => {
+                                                // While the TextField value changed, try to parse and assign to transformRef.
                                                 this.setState(() => {
                                                     float result = 0;
                                                     float.TryParse(str, out result);
-                                                    this.oldCursorPosition = xValueController.selection.startPos.offset;
+                                                    if (str == "" || str[0] == '0') {
+                                                        this.oldCursorPosition = 1;
+                                                    }
+                                                    else {
+                                                        this.oldCursorPosition =
+                                                            xValueController.selection.startPos.offset;
+                                                    }
 
                                                     switch (type) {
                                                         case ETransfrom.Position:
@@ -188,7 +197,13 @@ namespace UIWidgetsSample.DragNDrop {
                                                 this.setState(() => {
                                                     float result = 0;
                                                     float.TryParse(str, out result);
-                                                    this.oldCursorPosition = yValueController.selection.startPos.offset;
+                                                    if (str == "" || str[0] == '0') {
+                                                        this.oldCursorPosition = 1;
+                                                    }
+                                                    else {
+                                                        this.oldCursorPosition =
+                                                            yValueController.selection.startPos.offset;
+                                                    }
 
                                                     switch (type) {
                                                         case ETransfrom.Position:
@@ -234,8 +249,13 @@ namespace UIWidgetsSample.DragNDrop {
                                                 this.setState(() => {
                                                     float result = 0;
                                                     float.TryParse(str, out result);
-                                                    this.oldCursorPosition = zValueController.selection.startPos.offset;
-                                                    Debug.Log(result);
+                                                    if (str == "" || str[0] == '0') {
+                                                        this.oldCursorPosition = 1;
+                                                    }
+                                                    else {
+                                                        this.oldCursorPosition =
+                                                            zValueController.selection.startPos.offset;
+                                                    }
 
                                                     switch (type) {
                                                         case ETransfrom.Position:
@@ -292,11 +312,15 @@ namespace UIWidgetsSample.DragNDrop {
                                         mainAxisSize: MainAxisSize.min,
                                         children: new List<Widget> {
                                             new UnityObjectDetector(
+                                                // When receiving a GameObject, get its transfrom.
                                                 onRelease: (details) => {
                                                     this.setState(() => {
-                                                        this.objectRef = details.objectReferences[0] as GameObject;
-                                                        if (this.objectRef) {
-                                                            this.transformRef = this.objectRef.transform;
+                                                        var gameObj = details.objectReferences[0] as GameObject;
+                                                        if (gameObj) {
+                                                            this.objectRef = gameObj;
+                                                            if (this.objectRef) {
+                                                                this.transformRef = this.objectRef.transform;
+                                                            }
                                                         }
                                                     });
                                                 },
