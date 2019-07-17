@@ -94,9 +94,11 @@ namespace Unity.UIWidgets.gestures {
             if (hitTestResult != null ||
                 evt is PointerHoverEvent ||
                 evt is PointerAddedEvent ||
-                evt is PointerRemovedEvent ||
-                evt is PointerDragFromEditorHoverEvent ||
-                evt is PointerDragFromEditorReleaseEvent
+                evt is PointerRemovedEvent
+#if UNITY_EDITOR
+                || evt is PointerDragFromEditorHoverEvent
+                || evt is PointerDragFromEditorReleaseEvent
+#endif
             ) {
                 this.dispatchEvent(evt, hitTestResult);
             }
@@ -119,9 +121,12 @@ namespace Unity.UIWidgets.gestures {
             if (hitTestResult == null) {
                 D.assert(evt is PointerHoverEvent ||
                          evt is PointerAddedEvent ||
-                         evt is PointerRemovedEvent ||
-                         evt is PointerDragFromEditorHoverEvent ||
-                         evt is PointerDragFromEditorReleaseEvent);
+                         evt is PointerRemovedEvent
+#if UNITY_EDITOR
+                         || evt is PointerDragFromEditorHoverEvent
+                         || evt is PointerDragFromEditorReleaseEvent
+#endif
+                );
                 try {
                     this.pointerRouter.route(evt);
                 }

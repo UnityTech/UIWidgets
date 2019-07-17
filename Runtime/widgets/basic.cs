@@ -1977,11 +1977,13 @@ namespace Unity.UIWidgets.widgets {
             HitTestBehavior behavior = HitTestBehavior.deferToChild,
             Widget child = null,
             
+#if UNITY_EDITOR
             // Drag & Drop
             PointerDragFromEditorEnterEventListener onPointerDragFromEditorEnter = null,
             PointerDragFromEditorHoverEventListener onPointerDragFromEditorHover = null,
             PointerDragFromEditorExitEventListener onPointerDragFromEditorExit = null,
             PointerDragFromEditorReleaseEventListener onPointerDragFromEditorRelease = null
+#endif
         ) : base(key: key, child: child) {
             this.onPointerDown = onPointerDown;
             this.onPointerMove = onPointerMove;
@@ -1993,11 +1995,13 @@ namespace Unity.UIWidgets.widgets {
             this.onPointerScroll = onPointerScroll;
             this.behavior = behavior;
 
+#if UNITY_EDITOR
             // Drag & Drop
             this.onPointerDragFromEditorEnter = onPointerDragFromEditorEnter;
             this.onPointerDragFromEditorHover = onPointerDragFromEditorHover;
             this.onPointerDragFromEditorExit = onPointerDragFromEditorExit;
             this.onPointerDragFromEditorRelease = onPointerDragFromEditorRelease;
+#endif
         }
 
         public readonly PointerDownEventListener onPointerDown;
@@ -2018,12 +2022,13 @@ namespace Unity.UIWidgets.widgets {
 
         public readonly HitTestBehavior behavior;
 
+#if UNITY_EDITOR
         // Drag & Drop
         public readonly PointerDragFromEditorEnterEventListener onPointerDragFromEditorEnter;
         public readonly PointerDragFromEditorHoverEventListener onPointerDragFromEditorHover;
         public readonly PointerDragFromEditorExitEventListener onPointerDragFromEditorExit;
         public readonly PointerDragFromEditorReleaseEventListener onPointerDragFromEditorRelease;
-
+#endif
         public override RenderObject createRenderObject(BuildContext context) {
             return new RenderPointerListener(
                 onPointerDown: this.onPointerDown,
@@ -2036,11 +2041,13 @@ namespace Unity.UIWidgets.widgets {
                 onPointerScroll: this.onPointerScroll,
                 behavior: this.behavior,
                 
+#if UNITY_EDITOR
                 // Drag & Drop
                 onPointerDragFromEditorEnter: this.onPointerDragFromEditorEnter,
                 onPointerDragFromEditorHover: this.onPointerDragFromEditorHover,
                 onPointerDragFromEditorExit: this.onPointerDragFromEditorExit,
                 onPointerDragFromEditorRelease: this.onPointerDragFromEditorRelease
+#endif
             );
         }
 
@@ -2056,11 +2063,13 @@ namespace Unity.UIWidgets.widgets {
             renderObject.onPointerScroll = this.onPointerScroll;
             renderObject.behavior = this.behavior;
 
+#if UNITY_EDITOR
             // Drag & Drop
             renderObject.onPointerDragFromEditorEnter = this.onPointerDragFromEditorEnter;
             renderObject.onPointerDragFromEditorHover = this.onPointerDragFromEditorHover;
             renderObject.onPointerDragFromEditorExit = this.onPointerDragFromEditorExit;
             renderObject.onPointerDragFromEditorRelease = this.onPointerDragFromEditorRelease;
+#endif
         }
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
@@ -2098,11 +2107,13 @@ namespace Unity.UIWidgets.widgets {
                 listeners.Add("scroll");
             }
             
+#if UNITY_EDITOR
             // Drag & Drop
             if (this.onPointerDragFromEditorEnter != null) listeners.Add("dragFromEditorEnter");
             if (this.onPointerDragFromEditorHover != null) listeners.Add("dragFromEditorHover");
             if (this.onPointerDragFromEditorExit != null) listeners.Add("dragFromEditorExit");
             if (this.onPointerDragFromEditorRelease != null) listeners.Add("dragFromEditorRelease");
+#endif
 
             properties.add(new EnumerableProperty<string>("listeners", listeners, ifEmpty: "<none>"));
             properties.add(new EnumProperty<HitTestBehavior>("behavior", this.behavior));

@@ -197,6 +197,7 @@ namespace Unity.UIWidgets.gestures {
                         }
                     }
                         break;
+#if UNITY_EDITOR
                     case PointerChange.dragFromEditorMove: {
                         _PointerState state = _ensureStateForPointer(datum, position);
                         state.startNewPointer();
@@ -221,6 +222,7 @@ namespace Unity.UIWidgets.gestures {
                         );
                     }
                         break;
+#endif
                 }
             }
         }

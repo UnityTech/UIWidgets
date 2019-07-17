@@ -11,8 +11,10 @@ namespace Unity.UIWidgets.ui {
         move,
         up,
         scroll,
+#if UNITY_EDITOR
         dragFromEditorMove, // Drag & Drop
         dragFromEditorRelease
+#endif
     }
 
     public enum PointerDeviceKind {

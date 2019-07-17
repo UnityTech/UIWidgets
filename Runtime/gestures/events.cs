@@ -1,6 +1,8 @@
 using System;
 using Unity.UIWidgets.ui;
+#if UNITY_EDITOR
 using Object = UnityEngine.Object;
+#endif
 
 namespace Unity.UIWidgets.gestures {
     public abstract class PointerEvent {
@@ -87,6 +89,8 @@ namespace Unity.UIWidgets.gestures {
                 delta: delta) {
         }
     }
+    
+#if UNITY_EDITOR
     public class PointerDragFromEditorEnterEvent : PointerEvent {
         public PointerDragFromEditorEnterEvent(
             TimeSpan timeStamp,
@@ -194,22 +198,7 @@ namespace Unity.UIWidgets.gestures {
             );
         }
     }
-    
-    public class PointerDragFromEditorFailedEvent : PointerEvent {
-        public PointerDragFromEditorFailedEvent(
-            TimeSpan timeStamp,
-            int pointer = 0,
-            PointerDeviceKind kind = PointerDeviceKind.mouse,
-            int device = 0,
-            Offset position = null
-        ) : base(
-            timeStamp,
-            pointer: pointer,
-            kind: kind,
-            device: device,
-            position: position
-        ) { }
-    }
+#endif
 
     public class PointerHoverEvent : PointerEvent {
         public PointerHoverEvent(

@@ -4,6 +4,7 @@ using Unity.UIWidgets.scheduler;
 using UnityEditor;
 
 namespace Unity.UIWidgets.gestures {
+#if UNITY_EDITOR
     public partial class MouseTracker {
         bool _enableDragFromEditorRelease = false;
 
@@ -18,8 +19,6 @@ namespace Unity.UIWidgets.gestures {
                      evt is PointerDragFromEditorExitEvent) {
                 if (!this._lastMouseEvent.ContainsKey(deviceId) ||
                     this._lastMouseEvent[deviceId].position != evt.position) {
-                    // Only schedule a frame if we have our first event, or if the
-                    // location of the mouse has changed, and only if there are tracked annotations.
                     this._scheduleDragFromEditorMousePositionCheck();
                 }
 
@@ -30,40 +29,41 @@ namespace Unity.UIWidgets.gestures {
         void _scheduleDragFromEditorReleaseCheck() {
             DragAndDrop.AcceptDrag();
 
-            var lastMouseEvent = new List<(PointerEvent, int)>();
+            var lastMouseEvent = new List<PointerEvent>();
             foreach (int deviceId in this._lastMouseEvent.Keys) {
-                lastMouseEvent.Add((this._lastMouseEvent[deviceId], deviceId));
+                var _deviceId = deviceId;
+                lastMouseEvent.Add(this._lastMouseEvent[_deviceId]);
+                SchedulerBinding.instance.addPostFrameCallback(_ => {
+                    foreach (var lastEvent in lastMouseEvent) {
+                        MouseTrackerAnnotation hit = this.annotationFinder(lastEvent.position);
+
+                        if (hit == null) {
+                            foreach (_TrackedAnnotation trackedAnnotation in this._trackedAnnotations.Values) {
+                                if (trackedAnnotation.activeDevices.Contains(_deviceId)) {
+                                    trackedAnnotation.activeDevices.Remove(_deviceId);
+                                }
+                            }
+
+                            return;
+                        }
+
+                        _TrackedAnnotation hitAnnotation = this._findAnnotation(hit);
+
+                        // release
+                        if (hitAnnotation.activeDevices.Contains(_deviceId)) {
+                            if (hitAnnotation.annotation?.onDragFromEditorRelease != null) {
+                                hitAnnotation.annotation.onDragFromEditorRelease(
+                                    PointerDragFromEditorReleaseEvent
+                                        .fromDragFromEditorEvent(
+                                            lastEvent, DragAndDrop.objectReferences));
+                            }
+
+                            hitAnnotation.activeDevices.Remove(_deviceId);
+                        }
+                    }
+                });
             }
 
-            SchedulerBinding.instance.addPostFrameCallback(_ => {
-                foreach (var lastEvent in lastMouseEvent) {
-                    MouseTrackerAnnotation hit = this.annotationFinder(lastEvent.Item1.position);
-
-                    if (hit == null) {
-                        foreach (_TrackedAnnotation trackedAnnotation in this._trackedAnnotations.Values) {
-                            if (trackedAnnotation.activeDevices.Contains(lastEvent.Item2)) {
-                                trackedAnnotation.activeDevices.Remove(lastEvent.Item2);
-                            }
-                        }
-
-                        return;
-                    }
-
-                    _TrackedAnnotation hitAnnotation = this._findAnnotation(hit);
-
-                    // release
-                    if (hitAnnotation.activeDevices.Contains(lastEvent.Item2)) {
-                        if (hitAnnotation.annotation?.onDragFromEditorRelease != null) {
-                            hitAnnotation.annotation.onDragFromEditorRelease(
-                                PointerDragFromEditorReleaseEvent
-                                    .fromDragFromEditorEvent(
-                                        lastEvent.Item1, DragAndDrop.objectReferences));
-                        }
-
-                        hitAnnotation.activeDevices.Remove(lastEvent.Item2);
-                    }
-                }
-            });
             SchedulerBinding.instance.scheduleFrame();
         }
 
@@ -186,4 +186,6 @@ namespace Unity.UIWidgets.gestures {
             }
         }
     }
+
+#endif
 }
