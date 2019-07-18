@@ -11,7 +11,7 @@ namespace Unity.UIWidgets.rendering {
             set { PaintingBinding.instance = value; }
         }
 
-        public RendererBinding() {
+        public RendererBinding(bool inEditor = false) {
             this._pipelineOwner = new PipelineOwner(
                 onNeedVisualUpdate: this.ensureVisualUpdate
             );
@@ -21,6 +21,8 @@ namespace Unity.UIWidgets.rendering {
             this.initRenderView();
             D.assert(this.renderView != null);
             this.addPersistentFrameCallback(this._handlePersistentFrameCallback);
+
+            this.inEditor = inEditor;
             this._mouseTracker = this._createMouseTracker();
         }
 
@@ -33,6 +35,7 @@ namespace Unity.UIWidgets.rendering {
         public MouseTracker mouseTracker {
             get { return this._mouseTracker; }
         }
+
         MouseTracker _mouseTracker;
 
         public PipelineOwner pipelineOwner {
@@ -69,12 +72,14 @@ namespace Unity.UIWidgets.rendering {
             this.drawFrame();
         }
 
+        readonly protected bool inEditor;
+
         MouseTracker _createMouseTracker() {
             return new MouseTracker(this.pointerRouter, (Offset offset) => {
                 return this.renderView.layer.find<MouseTrackerAnnotation>(
-                        offset
-                    );
-            });
+                    offset
+                );
+            }, this.inEditor);
         }
 
         protected virtual void drawFrame() {
