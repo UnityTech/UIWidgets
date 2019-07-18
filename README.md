@@ -271,8 +271,6 @@ in the texture `rowCount`, and number of columns `colCount`.
   <img src="https://connect-prd-cdn.unity.com/20190718/p/images/e3c9cf9b-c732-4eb2-9afd-fe7de894f342_Custom_Inspector_Showcase_320px.gif" width="300"/>
 </div>
 
-UIWidgets can also be run on the EditorWindow without playing the runtime mode, thus, we can build some useful and pretty widgets to expand the editor. 
-
 With the provided packaged stateful widget `UnityObjectDetector` and its `onRelease` callback function, you can easily drag some objects (for example GameObject from Hierarchy, files from Project Window, etc) into the area, get the UnityEngine.Object[] references and make further modification.
 
 Please refer to "UIWidgetsTests -> Drag&Drop" for simple examples.
