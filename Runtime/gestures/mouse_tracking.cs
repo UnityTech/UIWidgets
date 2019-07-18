@@ -10,7 +10,6 @@ namespace Unity.UIWidgets.gestures {
 
     public delegate void PointerExitEventListener(PointerExitEvent evt);
 
-#if UNITY_EDITOR
     public delegate void PointerDragFromEditorEnterEventListener(PointerDragFromEditorEnterEvent evt);
 
     public delegate void PointerDragFromEditorHoverEventListener(PointerDragFromEditorHoverEvent evt);
@@ -18,7 +17,6 @@ namespace Unity.UIWidgets.gestures {
     public delegate void PointerDragFromEditorExitEventListener(PointerDragFromEditorExitEvent evt);
 
     public delegate void PointerDragFromEditorReleaseEventListener(PointerDragFromEditorReleaseEvent evt);
-#endif
 
     /// The annotation object used to annotate layers that are interested in mouse
     /// movements.
@@ -27,24 +25,20 @@ namespace Unity.UIWidgets.gestures {
         public MouseTrackerAnnotation(
             PointerEnterEventListener onEnter = null,
             PointerHoverEventListener onHover = null,
-            PointerExitEventListener onExit = null
-#if UNITY_EDITOR
-            , PointerDragFromEditorEnterEventListener onDragFromEditorEnter = null
-            , PointerDragFromEditorHoverEventListener onDragFromEditorHover = null
-            , PointerDragFromEditorExitEventListener onDragFromEditorExit = null
-            , PointerDragFromEditorReleaseEventListener onDragFromEditorRelease = null
-#endif
+            PointerExitEventListener onExit = null,
+            PointerDragFromEditorEnterEventListener onDragFromEditorEnter = null,
+            PointerDragFromEditorHoverEventListener onDragFromEditorHover = null,
+            PointerDragFromEditorExitEventListener onDragFromEditorExit = null,
+            PointerDragFromEditorReleaseEventListener onDragFromEditorRelease = null
         ) {
             this.onEnter = onEnter;
             this.onHover = onHover;
             this.onExit = onExit;
 
-#if UNITY_EDITOR
             this.onDragFromEditorEnter = onDragFromEditorEnter;
             this.onDragFromEditorHover = onDragFromEditorHover;
             this.onDragFromEditorExit = onDragFromEditorExit;
             this.onDragFromEditorRelease = onDragFromEditorRelease;
-#endif
         }
 
         public readonly PointerEnterEventListener onEnter;
@@ -53,12 +47,10 @@ namespace Unity.UIWidgets.gestures {
 
         public readonly PointerExitEventListener onExit;
 
-#if UNITY_EDITOR
         public readonly PointerDragFromEditorEnterEventListener onDragFromEditorEnter;
         public readonly PointerDragFromEditorHoverEventListener onDragFromEditorHover;
         public readonly PointerDragFromEditorExitEventListener onDragFromEditorExit;
         public readonly PointerDragFromEditorReleaseEventListener onDragFromEditorRelease;
-#endif
 
         public override string ToString() {
             return
@@ -82,10 +74,15 @@ namespace Unity.UIWidgets.gestures {
     public partial class MouseTracker {
         public MouseTracker(
             PointerRouter router,
-            MouseDetectorAnnotationFinder annotationFinder) {
+            MouseDetectorAnnotationFinder annotationFinder,
+            bool inEditor = false
+        ) {
             router.addGlobalRoute(this._handleEvent);
             this.annotationFinder = annotationFinder;
+            this.inEditor = inEditor;
         }
+
+        readonly bool inEditor;
 
         readonly Dictionary<int, PointerEvent> _lastMouseEvent = new Dictionary<int, PointerEvent>();
 
@@ -101,8 +98,11 @@ namespace Unity.UIWidgets.gestures {
         public void attachAnnotation(MouseTrackerAnnotation annotation) {
             this._trackedAnnotations[annotation] = new _TrackedAnnotation(annotation);
             this._scheduleMousePositionCheck();
+
 #if UNITY_EDITOR
-            this._scheduleDragFromEditorMousePositionCheck();
+            if (this.inEditor) {
+                this._scheduleDragFromEditorMousePositionCheck();
+            }
 #endif
         }
 
@@ -114,7 +114,7 @@ namespace Unity.UIWidgets.gestures {
                         PointerExitEvent.fromHoverEvent((PointerHoverEvent) this._lastMouseEvent[deviceId]));
                 }
 #if UNITY_EDITOR
-                if (annotation.onDragFromEditorExit != null) {
+                if (this.inEditor && annotation.onDragFromEditorExit != null) {
                     annotation.onDragFromEditorExit(
                         PointerDragFromEditorExitEvent.fromDragFromEditorEvent(this._lastMouseEvent[deviceId]));
 #endif
@@ -162,7 +162,9 @@ namespace Unity.UIWidgets.gestures {
             }
 
 #if UNITY_EDITOR
-            this._handleDragFromEditorEvent(evt, deviceId);
+            if (this.inEditor) {
+                this._handleDragFromEditorEvent(evt, deviceId);
+            }
 #endif
         }
 

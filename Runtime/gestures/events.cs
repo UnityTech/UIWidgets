@@ -1,8 +1,6 @@
 using System;
 using Unity.UIWidgets.ui;
-#if UNITY_EDITOR
 using Object = UnityEngine.Object;
-#endif
 
 namespace Unity.UIWidgets.gestures {
     public abstract class PointerEvent {
@@ -90,7 +88,6 @@ namespace Unity.UIWidgets.gestures {
         }
     }
     
-#if UNITY_EDITOR
     public class PointerDragFromEditorEnterEvent : PointerEvent {
         public PointerDragFromEditorEnterEvent(
             TimeSpan timeStamp,
@@ -198,7 +195,6 @@ namespace Unity.UIWidgets.gestures {
             );
         }
     }
-#endif
 
     public class PointerHoverEvent : PointerEvent {
         public PointerHoverEvent(

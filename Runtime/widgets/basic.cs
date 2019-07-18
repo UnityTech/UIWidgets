@@ -1977,13 +1977,11 @@ namespace Unity.UIWidgets.widgets {
             HitTestBehavior behavior = HitTestBehavior.deferToChild,
             Widget child = null,
             
-#if UNITY_EDITOR
             // Drag & Drop
             PointerDragFromEditorEnterEventListener onPointerDragFromEditorEnter = null,
             PointerDragFromEditorHoverEventListener onPointerDragFromEditorHover = null,
             PointerDragFromEditorExitEventListener onPointerDragFromEditorExit = null,
             PointerDragFromEditorReleaseEventListener onPointerDragFromEditorRelease = null
-#endif
         ) : base(key: key, child: child) {
             this.onPointerDown = onPointerDown;
             this.onPointerMove = onPointerMove;
@@ -1994,14 +1992,12 @@ namespace Unity.UIWidgets.widgets {
             this.onPointerEnter = onPointerEnter;
             this.onPointerScroll = onPointerScroll;
             this.behavior = behavior;
-
-#if UNITY_EDITOR
+            
             // Drag & Drop
             this.onPointerDragFromEditorEnter = onPointerDragFromEditorEnter;
             this.onPointerDragFromEditorHover = onPointerDragFromEditorHover;
             this.onPointerDragFromEditorExit = onPointerDragFromEditorExit;
             this.onPointerDragFromEditorRelease = onPointerDragFromEditorRelease;
-#endif
         }
 
         public readonly PointerDownEventListener onPointerDown;
@@ -2021,14 +2017,13 @@ namespace Unity.UIWidgets.widgets {
         public readonly PointerScrollEventListener onPointerScroll;
 
         public readonly HitTestBehavior behavior;
-
-#if UNITY_EDITOR
+        
         // Drag & Drop
         public readonly PointerDragFromEditorEnterEventListener onPointerDragFromEditorEnter;
         public readonly PointerDragFromEditorHoverEventListener onPointerDragFromEditorHover;
         public readonly PointerDragFromEditorExitEventListener onPointerDragFromEditorExit;
         public readonly PointerDragFromEditorReleaseEventListener onPointerDragFromEditorRelease;
-#endif
+        
         public override RenderObject createRenderObject(BuildContext context) {
             return new RenderPointerListener(
                 onPointerDown: this.onPointerDown,
@@ -2040,14 +2035,12 @@ namespace Unity.UIWidgets.widgets {
                 onPointerHover: this.onPointerHover,
                 onPointerScroll: this.onPointerScroll,
                 behavior: this.behavior,
-                
-#if UNITY_EDITOR
+
                 // Drag & Drop
                 onPointerDragFromEditorEnter: this.onPointerDragFromEditorEnter,
                 onPointerDragFromEditorHover: this.onPointerDragFromEditorHover,
                 onPointerDragFromEditorExit: this.onPointerDragFromEditorExit,
                 onPointerDragFromEditorRelease: this.onPointerDragFromEditorRelease
-#endif
             );
         }
 

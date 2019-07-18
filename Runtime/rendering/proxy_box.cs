@@ -1941,13 +1941,11 @@ namespace Unity.UIWidgets.rendering {
             HitTestBehavior behavior = HitTestBehavior.deferToChild,
             RenderBox child = null
             
-#if UNITY_EDITOR
             // Drag & Drop
             ,PointerDragFromEditorEnterEventListener onPointerDragFromEditorEnter = null
             ,PointerDragFromEditorHoverEventListener onPointerDragFromEditorHover = null
             ,PointerDragFromEditorExitEventListener onPointerDragFromEditorExit = null
             ,PointerDragFromEditorReleaseEventListener onPointerDragFromEditorRelease = null
-#endif
         ) : base(behavior: behavior, child: child) {
             this.onPointerDown = onPointerDown;
             this.onPointerMove = onPointerMove;
@@ -1959,39 +1957,32 @@ namespace Unity.UIWidgets.rendering {
             this._onPointerHover = onPointerHover;
             this._onPointerExit = onPointerExit;
             
-#if UNITY_EDITOR
             // Drag & Drop
             this._onPointerDragFromEditorEnter = onPointerDragFromEditorEnter;
             this._onPointerDragFromEditorHover = onPointerDragFromEditorHover;
             this._onPointerDragFromEditorExit = onPointerDragFromEditorExit;
             this._onPointerDragFromEditorRelease = onPointerDragFromEditorRelease;
-#endif
 
             if (this._onPointerEnter != null ||
                 this._onPointerHover != null ||
-                this._onPointerExit != null 
-#if UNITY_EDITOR
-                || this._onPointerDragFromEditorEnter != null 
-                || this._onPointerDragFromEditorHover != null 
-                || this._onPointerDragFromEditorExit != null 
-                || this._onPointerDragFromEditorRelease != null
-#endif
+                this._onPointerExit != null ||
+                this._onPointerDragFromEditorEnter != null ||
+                this._onPointerDragFromEditorHover != null ||
+                this._onPointerDragFromEditorExit != null ||
+                this._onPointerDragFromEditorRelease != null
             ) {
                 this._hoverAnnotation = new MouseTrackerAnnotation(
                     onEnter: this._onPointerEnter,
                     onHover: this._onPointerHover,
-                    onExit: this._onPointerExit
-#if UNITY_EDITOR
-                    ,onDragFromEditorEnter: this._onPointerDragFromEditorEnter
-                    ,onDragFromEditorHover: this._onPointerDragFromEditorHover
-                    ,onDragFromEditorExit: this._onPointerDragFromEditorExit
-                    ,onDragFromEditorRelease: this._onPointerDragFromEditorRelease
-#endif
+                    onExit: this._onPointerExit,
+                    onDragFromEditorEnter: this._onPointerDragFromEditorEnter,
+                    onDragFromEditorHover: this._onPointerDragFromEditorHover,
+                    onDragFromEditorExit: this._onPointerDragFromEditorExit,
+                    onDragFromEditorRelease: this._onPointerDragFromEditorRelease
                 );
             }
         }
         
-#if UNITY_EDITOR
         PointerDragFromEditorEnterEventListener _onPointerDragFromEditorEnter;
 
         public PointerDragFromEditorEnterEventListener onPointerDragFromEditorEnter {
@@ -2039,7 +2030,6 @@ namespace Unity.UIWidgets.rendering {
                 }
             }
         }
-#endif
 
         public PointerEnterEventListener onPointerEnter {
             get { return this._onPointerEnter; }
