@@ -75,14 +75,14 @@ namespace Unity.UIWidgets.gestures {
         public MouseTracker(
             PointerRouter router,
             MouseDetectorAnnotationFinder annotationFinder,
-            bool inEditor = false
+            bool inEditorWindow = false
         ) {
             router.addGlobalRoute(this._handleEvent);
             this.annotationFinder = annotationFinder;
-            this.inEditor = inEditor;
+            this.inEditorWindow = inEditorWindow;
         }
 
-        readonly bool inEditor;
+        readonly bool inEditorWindow;
 
         readonly Dictionary<int, PointerEvent> _lastMouseEvent = new Dictionary<int, PointerEvent>();
 
@@ -100,9 +100,7 @@ namespace Unity.UIWidgets.gestures {
             this._scheduleMousePositionCheck();
 
 #if UNITY_EDITOR
-            if (this.inEditor) {
-                this._scheduleDragFromEditorMousePositionCheck();
-            }
+            this._scheduleDragFromEditorMousePositionCheck();
 #endif
         }
 
@@ -114,11 +112,8 @@ namespace Unity.UIWidgets.gestures {
                         PointerExitEvent.fromHoverEvent((PointerHoverEvent) this._lastMouseEvent[deviceId]));
                 }
 #if UNITY_EDITOR
-                if (this.inEditor && annotation.onDragFromEditorExit != null) {
-                    annotation.onDragFromEditorExit(
-                        PointerDragFromEditorExitEvent.fromDragFromEditorEvent(this._lastMouseEvent[deviceId]));
+                this.detachDragFromEditorAnnotation(annotation, deviceId);
 #endif
-                }
             }
 
             this._trackedAnnotations.Remove(annotation);
@@ -162,9 +157,7 @@ namespace Unity.UIWidgets.gestures {
             }
 
 #if UNITY_EDITOR
-            if (this.inEditor) {
-                this._handleDragFromEditorEvent(evt, deviceId);
-            }
+            this._handleDragFromEditorEvent(evt, deviceId);
 #endif
         }
 
@@ -232,6 +225,7 @@ namespace Unity.UIWidgets.gestures {
                 }
 
                 _TrackedAnnotation hitAnnotation = this._findAnnotation(hit);
+
                 //enter
                 if (!hitAnnotation.activeDevices.Contains(deviceId)) {
                     hitAnnotation.activeDevices.Add(deviceId);

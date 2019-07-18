@@ -126,8 +126,8 @@ namespace Unity.UIWidgets.editor {
     public abstract class WindowAdapter : Window {
         static readonly List<WindowAdapter> _windowAdapters = new List<WindowAdapter>();
 
-        public WindowAdapter(bool inEditor = false) {
-            this.inEditor = inEditor;
+        public WindowAdapter(bool inEditorWindow = false) {
+            this.inEditorWindow = inEditorWindow;
         }
 
         public static List<WindowAdapter> windowAdapters {
@@ -218,14 +218,14 @@ namespace Unity.UIWidgets.editor {
             this._surface = null;
         }
 
-        readonly protected bool inEditor;
+        readonly protected bool inEditorWindow;
 
         public override IDisposable getScope() {
             WindowAdapter oldInstance = (WindowAdapter) _instance;
             _instance = this;
 
             if (this._binding == null) {
-                this._binding = new WidgetsBinding(this.inEditor);
+                this._binding = new WidgetsBinding(this.inEditorWindow);
             }
 
             SchedulerBinding._instance = this._binding;

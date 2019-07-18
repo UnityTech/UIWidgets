@@ -27,7 +27,7 @@ namespace Unity.UIWidgets.widgets {
             set { RendererBinding.instance = value; }
         }
 
-        public WidgetsBinding(bool inEditor = false) : base(inEditor) {
+        public WidgetsBinding(bool inEditorWindow = false) : base(inEditorWindow) {
             this.buildOwner.onBuildScheduled = this._handleBuildScheduled;
             Window.instance.onLocaleChanged += this.handleLocaleChanged;
             this.widgetInspectorService = new WidgetInspectorService(this);

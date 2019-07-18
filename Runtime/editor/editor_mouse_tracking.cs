@@ -9,6 +9,10 @@ namespace Unity.UIWidgets.gestures {
         bool _enableDragFromEditorRelease = false;
 
         void _handleDragFromEditorEvent(PointerEvent evt, int deviceId) {
+            if (!this.inEditorWindow) {
+                return;
+            }
+
             if (evt is PointerDragFromEditorReleaseEvent) {
                 this._enableDragFromEditorRelease = false;
                 this._scheduleDragFromEditorReleaseCheck();
@@ -23,6 +27,17 @@ namespace Unity.UIWidgets.gestures {
                 }
 
                 this._lastMouseEvent[deviceId] = evt;
+            }
+        }
+
+        void detachDragFromEditorAnnotation(MouseTrackerAnnotation annotation, int deviceId) {
+            if (!this.inEditorWindow) {
+                return;
+            }
+
+            if (annotation.onDragFromEditorExit != null) {
+                annotation.onDragFromEditorExit(
+                    PointerDragFromEditorExitEvent.fromDragFromEditorEvent(this._lastMouseEvent[deviceId]));
             }
         }
 
@@ -85,6 +100,10 @@ namespace Unity.UIWidgets.gestures {
         }
 
         void _scheduleDragFromEditorMousePositionCheck() {
+            if (!this.inEditorWindow) {
+                return;
+            }
+
             SchedulerBinding.instance.addPostFrameCallback(_ => { this.collectDragFromEditorMousePositions(); });
             SchedulerBinding.instance.scheduleFrame();
         }
