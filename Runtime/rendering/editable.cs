@@ -884,11 +884,11 @@ namespace Unity.UIWidgets.rendering {
             Paragraph.LineRange? line = null;
             for (int i = 0; i < lineCount; ++i) {
                 line = this._textPainter.getLineRange(i);
-                if (!((Paragraph.LineRange) line).hardBreak) {
+                if (!line.Value.hardBreak) {
                     continue;
                 }
 
-                if (((Paragraph.LineRange) line).end > position.offset) {
+                if (line.Value.end > position.offset) {
                     break;
                 }
             }
@@ -897,7 +897,7 @@ namespace Unity.UIWidgets.rendering {
                 return new TextPosition(position.offset, affinity ?? position.affinity);
             }
 
-            return new TextPosition(((Paragraph.LineRange) line).end, affinity ?? position.affinity);
+            return new TextPosition(line.Value.end, affinity ?? position.affinity);
         }
 
 
@@ -911,7 +911,7 @@ namespace Unity.UIWidgets.rendering {
                     continue;
                 }
 
-                if (((Paragraph.LineRange) line).start < position.offset) {
+                if (line.Value.start < position.offset) {
                     break;
                 }
             }
@@ -920,7 +920,7 @@ namespace Unity.UIWidgets.rendering {
                 return new TextPosition(position.offset, affinity ?? position.affinity);
             }
 
-            return new TextPosition(((Paragraph.LineRange) line).start, affinity ?? position.affinity);
+            return new TextPosition(line.Value.start, affinity ?? position.affinity);
         }
 
         protected override float computeMinIntrinsicWidth(float height) {

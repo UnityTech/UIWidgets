@@ -268,7 +268,7 @@ namespace Unity.UIWidgets.ui {
                 case DrawTextBlob cmd: {
                     var state = this._getState();
                     var scale = XformUtils.getScale(state.xform);
-                    var rect = cmd.textBlob.shiftedBoundsInText(cmd.offset);
+                    var rect = cmd.textBlob.Value.shiftedBoundsInText(cmd.offset.dx, cmd.offset.dy);
                     rect = state.xform.mapRect(rect);
 
                     var paint = cmd.paint;

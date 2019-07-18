@@ -405,10 +405,11 @@ namespace Unity.UIWidgets.ui {
         }
 
         public override void clear() {
+            this.textBlob = null;
             this.offset = null;
         }
 
-        public TextBlob textBlob;
+        public TextBlob? textBlob;
         public uiOffset? offset;
         public uiPaint paint;
     }

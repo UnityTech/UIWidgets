@@ -188,7 +188,7 @@ namespace Unity.UIWidgets.ui {
         PaintRecord[] _paintRecords;
         CodeUnitRun[] _codeUnitRuns;
         float[] _lineHeights;
-        float[] _textBlobPositions;
+        float[] _textBlobPositionXs;
         float _maxIntrinsicWidth;
         float _minIntrinsicWidth;
         float _alphabeticBaseline;
@@ -333,11 +333,11 @@ namespace Unity.UIWidgets.ui {
             int ellipsizedLength = this._text.Length + (this._paragraphStyle.ellipsis?.Length ?? 0);
 
             // All text blobs share a single position buffer, which is big enough taking ellipsis into consideration
-            if (this._textBlobPositions == null || this._textBlobPositions.Length < ellipsizedLength) {
-                this._textBlobPositions = new float[LayoutUtils.minPowerOfTwo(ellipsizedLength)];
+            if (this._textBlobPositionXs == null || this._textBlobPositionXs.Length < ellipsizedLength) {
+                this._textBlobPositionXs = new float[LayoutUtils.minPowerOfTwo(ellipsizedLength)];
             }
 
-            builder.setPositions(this._textBlobPositions);
+            builder.setPositionXs(this._textBlobPositionXs);
             // this._glyphLines and this._codeUnitRuns will refer to this array for glyph positions
             if (this._glyphPositions == null || this._glyphPositions.Length < ellipsizedLength) {
                 this._glyphPositions = new GlyphPosition[LayoutUtils.minPowerOfTwo(ellipsizedLength)];
@@ -467,7 +467,7 @@ namespace Unity.UIWidgets.ui {
                             for (int glyphIndex = 0; glyphIndex < textCount; ++glyphIndex) {
                                 float glyphXOffset = _positionsBuffer[glyphIndex] + justifyXOffset;
                                 float glyphAdvance = _advancesBuffer[glyphIndex];
-                                builder.setPosition(glyphIndex, glyphXOffset);
+                                builder.setPositionX(glyphIndex, glyphXOffset);
                                 this._glyphPositions[pGlyphPositions++] = new GlyphPosition(runXOffset + glyphXOffset,
                                     glyphAdvance, textStart + glyphIndex);
                                 if (wordIndex < wordCount) {

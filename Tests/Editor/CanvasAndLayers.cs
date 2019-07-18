@@ -265,7 +265,7 @@ namespace UIWidgets.Tests {
             TextBlobBuilder builder = new TextBlobBuilder();
             string text = "This is a text blob";
             builder.setBounds(new Rect(-10, -20, 200, 50));
-            builder.setPositions(new float[] {
+            builder.setPositionXs(new float[] {
                 10, 20, 30, 40, 50, 60, 70, 80, 90, 100,
                 110, 120, 130, 140, 150, 160, 170, 180, 190
             });

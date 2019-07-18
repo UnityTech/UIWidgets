@@ -205,13 +205,13 @@ namespace Unity.UIWidgets.ui {
 
                     var uvRect = EmojiUtils.getUVRect(code);
 
-                    var pos = this.textBlob.getPosition(i);
+                    var positionX = this.textBlob.getPositionX(i);
 
                     int baseIndex = vert.Count;
-                    vert.Add(new Vector3(pos + minX, minY, 0));
-                    vert.Add(new Vector3(pos + maxX, minY, 0));
-                    vert.Add(new Vector3(pos + maxX, maxY, 0));
-                    vert.Add(new Vector3(pos + minX, maxY, 0));
+                    vert.Add(new Vector3(positionX + minX, minY, 0));
+                    vert.Add(new Vector3(positionX + maxX, minY, 0));
+                    vert.Add(new Vector3(positionX + maxX, maxY, 0));
+                    vert.Add(new Vector3(positionX + minX, maxY, 0));
                     tri.Add(baseIndex);
                     tri.Add(baseIndex + 1);
                     tri.Add(baseIndex + 2);
@@ -256,7 +256,7 @@ namespace Unity.UIWidgets.ui {
             for (int charIndex = 0; charIndex < length; ++charIndex) {
                 var ch = text[charIndex + this.textBlob.textOffset];
                 // first char as origin for mesh position 
-                var position = this.textBlob.getPosition(charIndex);
+                var positionX = this.textBlob.getPositionX(charIndex);
                 if (LayoutUtils.isWordSpace(ch) || LayoutUtils.isLineEndSpace(ch) || ch == '\t') {
                     continue;
                 }
@@ -274,10 +274,10 @@ namespace Unity.UIWidgets.ui {
 
                 var baseIndex = vertices.Count;
 
-                vertices.Add(new Vector3(position + minX, minY, 0));
-                vertices.Add(new Vector3(position + maxX, minY, 0));
-                vertices.Add(new Vector3(position + maxX, maxY, 0));
-                vertices.Add(new Vector3(position + minX, maxY, 0));
+                vertices.Add(new Vector3(positionX + minX, minY, 0));
+                vertices.Add(new Vector3(positionX + maxX, minY, 0));
+                vertices.Add(new Vector3(positionX + maxX, maxY, 0));
+                vertices.Add(new Vector3(positionX + minX, maxY, 0));
 
                 triangles.Add(baseIndex);
                 triangles.Add(baseIndex + 1);

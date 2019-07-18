@@ -34,6 +34,10 @@ namespace Unity.UIWidgets.painting {
             this._ellipsis = ellipsis;
         }
 
+        ~TextPainter() {
+            Paragraph.release(ref this._paragraph);
+        }
+
         public float textScaleFactor {
             get { return this._textScaleFactor; }
             set {

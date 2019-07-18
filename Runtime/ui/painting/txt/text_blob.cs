@@ -1,9 +1,9 @@
 ﻿namespace Unity.UIWidgets.ui {
     public struct TextBlob {
-        internal TextBlob(string text, int textOffset, int textSize, float[] positions,
+        internal TextBlob(string text, int textOffset, int textSize, float[] positionXs,
             UnityEngine.Rect bounds, TextStyle style) {
             this.instanceId = ++_nextInstanceId;
-            this._positions = positions;
+            this._positionXs = positionXs;
             this.text = text;
             this.textOffset = textOffset;
             this.textSize = textSize;
@@ -15,7 +15,7 @@
         public Rect boundsInText {
             get {
                 if (this._boundsInText == null) {
-                    var pos = this.getPosition(0);
+                    var pos = this.getPositionX(0);
                     this._boundsInText = Rect.fromLTWH(this._bounds.xMin + pos, this._bounds.yMin,
                         this._bounds.width, this._bounds.height);
                 }
@@ -24,14 +24,14 @@
             }
         }
 
-        public Rect shiftedBoundsInText(Offset offset) {
-            var pos = this.getPosition(0);
-            return Rect.fromLTWH(this._bounds.xMin + pos + offset.dx, this._bounds.yMin + offset.dy,
+        public Rect shiftedBoundsInText(float dx, float dy) {
+            var pos = this.getPositionX(0);
+            return Rect.fromLTWH(this._bounds.xMin + pos + dx, this._bounds.yMin + dy,
                 this._bounds.width, this._bounds.height);
         }
 
-        public float getPosition(int i) {
-            return this._positions[this.textOffset + i];
+        public float getPositionX(int i) {
+            return this._positionXs[this.textOffset + i];
         }
 
         static long _nextInstanceId;
@@ -41,14 +41,14 @@
         internal readonly int textSize;
         internal readonly TextStyle style;
         readonly UnityEngine.Rect _bounds; // bounds with positions[start] as origin       
-        readonly float[] _positions;
+        readonly float[] _positionXs;
 
         Rect _boundsInText;
     }
 
     public struct TextBlobBuilder {
         TextStyle _style;
-        float[] _positions;
+        float[] _positionXs;
         string _text;
         int _textOffset;
         int _size;
@@ -71,17 +71,17 @@
         }
 
         internal void allocPos(int size) {
-            if (this._positions == null || this._positions.Length < size) {
-                this._positions = new float[size];
+            if (this._positionXs == null || this._positionXs.Length < size) {
+                this._positionXs = new float[size];
             }
         }
 
-        public void setPosition(int i, float position) {
-            this._positions[this._textOffset + i] = position;
+        public void setPositionX(int i, float positionX) {
+            this._positionXs[this._textOffset + i] = positionX;
         }
 
-        public void setPositions(float[] positions) {
-            this._positions = positions;
+        public void setPositionXs(float[] positionXs) {
+            this._positionXs = positionXs;
         }
 
         public void setBounds(UnityEngine.Rect bounds) {
@@ -90,7 +90,7 @@
 
         public TextBlob make() {
             var result = new TextBlob(this._text, this._textOffset,
-                this._size, this._positions, this._bounds, this._style);
+                this._size, this._positionXs, this._bounds, this._style);
             return result;
         }
     }
