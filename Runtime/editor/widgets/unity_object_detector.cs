@@ -1,12 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.widgets;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace Unity.UIWidgets.editor {
     public delegate void DragFromEditorEnterCallback();
@@ -84,5 +80,4 @@ namespace Unity.UIWidgets.editor {
             return result;
         }
     }
-
 }

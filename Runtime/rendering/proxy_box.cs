@@ -1009,7 +1009,7 @@ namespace Unity.UIWidgets.rendering {
             get { return Offset.zero & this.size; }
         }
 
-        public override bool hitTest(HitTestResult result, 
+        public override bool hitTest(HitTestResult result,
             Offset position = null
         ) {
             this._updateClip();
@@ -1954,7 +1954,7 @@ namespace Unity.UIWidgets.rendering {
             this._onPointerEnter = onPointerEnter;
             this._onPointerHover = onPointerHover;
             this._onPointerExit = onPointerExit;
-            
+
             this._onPointerDragFromEditorEnter = onPointerDragFromEditorEnter;
             this._onPointerDragFromEditorHover = onPointerDragFromEditorHover;
             this._onPointerDragFromEditorExit = onPointerDragFromEditorExit;
@@ -1979,7 +1979,7 @@ namespace Unity.UIWidgets.rendering {
                 );
             }
         }
-        
+
         PointerDragFromEditorEnterEventListener _onPointerDragFromEditorEnter;
 
         public PointerDragFromEditorEnterEventListener onPointerDragFromEditorEnter {
@@ -2079,11 +2079,11 @@ namespace Unity.UIWidgets.rendering {
         void _updateAnnotations() {
             D.assert(this._onPointerEnter != this._hoverAnnotation.onEnter ||
                      this._onPointerHover != this._hoverAnnotation.onHover ||
-                     this._onPointerExit != this._hoverAnnotation.onExit 
+                     this._onPointerExit != this._hoverAnnotation.onExit
 #if UNITY_EDITOR
-                     || this._onPointerDragFromEditorEnter != this._hoverAnnotation.onDragFromEditorEnter 
-                     || this._onPointerDragFromEditorHover != this._hoverAnnotation.onDragFromEditorHover 
-                     || this._onPointerDragFromEditorExit != this._hoverAnnotation.onDragFromEditorExit 
+                     || this._onPointerDragFromEditorEnter != this._hoverAnnotation.onDragFromEditorEnter
+                     || this._onPointerDragFromEditorHover != this._hoverAnnotation.onDragFromEditorHover
+                     || this._onPointerDragFromEditorExit != this._hoverAnnotation.onDragFromEditorExit
                      || this._onPointerDragFromEditorRelease != this._hoverAnnotation.onDragFromEditorRelease
 #endif
                 , () => "Shouldn't call _updateAnnotations if nothing has changed.");
@@ -2094,11 +2094,11 @@ namespace Unity.UIWidgets.rendering {
 
             if (this._onPointerEnter != null ||
                 this._onPointerHover != null ||
-                this._onPointerExit != null 
+                this._onPointerExit != null
 #if UNITY_EDITOR
-                || this._onPointerDragFromEditorEnter != null 
-                || this._onPointerDragFromEditorHover != null 
-                || this._onPointerDragFromEditorExit != null 
+                || this._onPointerDragFromEditorEnter != null
+                || this._onPointerDragFromEditorHover != null
+                || this._onPointerDragFromEditorExit != null
                 || this._onPointerDragFromEditorRelease != null
 #endif
             ) {

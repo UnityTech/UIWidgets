@@ -87,7 +87,7 @@ namespace Unity.UIWidgets.gestures {
                 delta: delta) {
         }
     }
-    
+
     public class PointerDragFromEditorEnterEvent : PointerEvent {
         public PointerDragFromEditorEnterEvent(
             TimeSpan timeStamp,
@@ -101,8 +101,9 @@ namespace Unity.UIWidgets.gestures {
             kind: kind,
             device: device,
             position: position
-        ) { }
-        
+        ) {
+        }
+
         public static PointerDragFromEditorEnterEvent fromDragFromEditorEvent(PointerEvent evt) {
             return new PointerDragFromEditorEnterEvent(
                 timeStamp: evt.timeStamp,
@@ -113,6 +114,7 @@ namespace Unity.UIWidgets.gestures {
             );
         }
     }
+
     public class PointerDragFromEditorExitEvent : PointerEvent {
         public PointerDragFromEditorExitEvent(
             TimeSpan timeStamp,
@@ -126,8 +128,9 @@ namespace Unity.UIWidgets.gestures {
             kind: kind,
             device: device,
             position: position
-        ) { }
-        
+        ) {
+        }
+
         public static PointerDragFromEditorExitEvent fromDragFromEditorEvent(PointerEvent evt) {
             return new PointerDragFromEditorExitEvent(
                 timeStamp: evt.timeStamp,
@@ -152,8 +155,9 @@ namespace Unity.UIWidgets.gestures {
             kind: kind,
             device: device,
             position: position
-        ) { }
-        
+        ) {
+        }
+
         public static PointerDragFromEditorHoverEvent fromDragFromEditorEvent(PointerEvent evt) {
             return new PointerDragFromEditorHoverEvent(
                 timeStamp: evt.timeStamp,
@@ -164,6 +168,7 @@ namespace Unity.UIWidgets.gestures {
             );
         }
     }
+
     public class PointerDragFromEditorReleaseEvent : PointerEvent {
         public PointerDragFromEditorReleaseEvent(
             TimeSpan timeStamp,
@@ -183,8 +188,9 @@ namespace Unity.UIWidgets.gestures {
         }
 
         public Object[] objectReferences;
-        
-        public static PointerDragFromEditorReleaseEvent fromDragFromEditorEvent(PointerEvent evt, Object[] objectReferences) {
+
+        public static PointerDragFromEditorReleaseEvent fromDragFromEditorEvent(PointerEvent evt,
+            Object[] objectReferences) {
             return new PointerDragFromEditorReleaseEvent(
                 timeStamp: evt.timeStamp,
                 pointer: evt.pointer,
@@ -211,7 +217,7 @@ namespace Unity.UIWidgets.gestures {
                 position: position,
                 down: false) {
         }
-        
+
         public static PointerHoverEvent fromHoverEvent(PointerEvent hover) {
             return new PointerHoverEvent(
                 timeStamp: hover.timeStamp,
@@ -246,7 +252,7 @@ namespace Unity.UIWidgets.gestures {
                 kind: hover.kind,
                 device: hover.device,
                 position: hover.position
-                );
+            );
         }
     }
 
@@ -265,7 +271,7 @@ namespace Unity.UIWidgets.gestures {
                 position: position,
                 down: false) {
         }
-        
+
         public static PointerExitEvent fromHoverEvent(PointerEvent hover) {
             return new PointerExitEvent(
                 timeStamp: hover.timeStamp,
