@@ -102,7 +102,7 @@ namespace Unity.UIWidgets.ui {
         static readonly Dictionary<MeshKey, MeshInfo> _meshes = new Dictionary<MeshKey, MeshInfo>();
         static long _frameCount = 0;
 
-        public TextBlob textBlob;
+        public TextBlob? textBlob;
         public float scale;
         public uiMatrix3 matrix;
 
@@ -116,6 +116,7 @@ namespace Unity.UIWidgets.ui {
             ObjectPool<uiMeshMesh>.release(this._mesh);
             this._mesh = null;
             this._resolved = false;
+            this.textBlob = null;
         }
 
         public static TextBlobMesh create(TextBlob textBlob, float scale, uiMatrix3 matrix) {
@@ -160,10 +161,10 @@ namespace Unity.UIWidgets.ui {
 
             this._resolved = true;
 
-            var style = this.textBlob.style;
+            var style = this.textBlob.Value.style;
 
-            var text = this.textBlob.text;
-            var key = MeshKey.create(this.textBlob.instanceId, this.scale);
+            var text = this.textBlob.Value.text;
+            var key = MeshKey.create(this.textBlob.Value.instanceId, this.scale);
             var fontInfo = FontManager.instance.getOrCreate(style.fontFamily, style.fontWeight, style.fontStyle);
             var font = fontInfo.font;
 
@@ -176,7 +177,7 @@ namespace Unity.UIWidgets.ui {
             }
 
             // Handling Emoji
-            char startingChar = text[this.textBlob.textOffset];
+            char startingChar = text[this.textBlob.Value.textOffset];
             if (char.IsHighSurrogate(startingChar) || EmojiUtils.isSingleCharEmoji(startingChar)) {
                 var vert = ObjectPool<uiList<Vector3>>.alloc();
                 var tri = ObjectPool<uiList<int>>.alloc();
@@ -189,13 +190,13 @@ namespace Unity.UIWidgets.ui {
                 var minY = minMaxRect.top;
                 var maxY = minMaxRect.bottom;
 
-                for (int i = 0; i < this.textBlob.textSize; i++) {
-                    char a = text[this.textBlob.textOffset + i];
+                for (int i = 0; i < this.textBlob.Value.textSize; i++) {
+                    char a = text[this.textBlob.Value.textOffset + i];
                     int code = a;
                     if (char.IsHighSurrogate(a)) {
-                        D.assert(i + 1 < this.textBlob.textSize);
-                        D.assert(this.textBlob.textOffset + i + 1 < this.textBlob.text.Length);
-                        char b = text[this.textBlob.textOffset + i + 1];
+                        D.assert(i + 1 < this.textBlob.Value.textSize);
+                        D.assert(this.textBlob.Value.textOffset + i + 1 < this.textBlob.Value.text.Length);
+                        char b = text[this.textBlob.Value.textOffset + i + 1];
                         D.assert(char.IsLowSurrogate(b));
                         code = char.ConvertToUtf32(a, b);
                     }
@@ -205,7 +206,7 @@ namespace Unity.UIWidgets.ui {
 
                     var uvRect = EmojiUtils.getUVRect(code);
 
-                    var positionX = this.textBlob.getPositionX(i);
+                    var positionX = this.textBlob.Value.getPositionX(i);
 
                     int baseIndex = vert.Count;
                     vert.Add(new Vector3(positionX + minX, minY, 0));
@@ -241,7 +242,7 @@ namespace Unity.UIWidgets.ui {
                 return this._mesh;
             }
 
-            var length = this.textBlob.textSize;
+            var length = this.textBlob.Value.textSize;
             var fontSizeToLoad = Mathf.CeilToInt(style.UnityFontSize * this.scale);
 
             var vertices = ObjectPool<uiList<Vector3>>.alloc();
@@ -254,9 +255,9 @@ namespace Unity.UIWidgets.ui {
             uv.SetCapacity(length * 4);
 
             for (int charIndex = 0; charIndex < length; ++charIndex) {
-                var ch = text[charIndex + this.textBlob.textOffset];
+                var ch = text[charIndex + this.textBlob.Value.textOffset];
                 // first char as origin for mesh position 
-                var positionX = this.textBlob.getPositionX(charIndex);
+                var positionX = this.textBlob.Value.getPositionX(charIndex);
                 if (LayoutUtils.isWordSpace(ch) || LayoutUtils.isLineEndSpace(ch) || ch == '\t') {
                     continue;
                 }
