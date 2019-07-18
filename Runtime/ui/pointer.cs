@@ -11,7 +11,7 @@ namespace Unity.UIWidgets.ui {
         move,
         up,
         scroll,
-        dragFromEditorMove, // Drag & Drop
+        dragFromEditorMove,
         dragFromEditorRelease
     }
 

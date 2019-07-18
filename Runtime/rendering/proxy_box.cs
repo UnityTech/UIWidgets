@@ -1938,14 +1938,12 @@ namespace Unity.UIWidgets.rendering {
             PointerUpEventListener onPointerUp = null,
             PointerCancelEventListener onPointerCancel = null,
             PointerScrollEventListener onPointerScroll = null,
+            PointerDragFromEditorEnterEventListener onPointerDragFromEditorEnter = null,
+            PointerDragFromEditorHoverEventListener onPointerDragFromEditorHover = null,
+            PointerDragFromEditorExitEventListener onPointerDragFromEditorExit = null,
+            PointerDragFromEditorReleaseEventListener onPointerDragFromEditorRelease = null,
             HitTestBehavior behavior = HitTestBehavior.deferToChild,
             RenderBox child = null
-            
-            // Drag & Drop
-            ,PointerDragFromEditorEnterEventListener onPointerDragFromEditorEnter = null
-            ,PointerDragFromEditorHoverEventListener onPointerDragFromEditorHover = null
-            ,PointerDragFromEditorExitEventListener onPointerDragFromEditorExit = null
-            ,PointerDragFromEditorReleaseEventListener onPointerDragFromEditorRelease = null
         ) : base(behavior: behavior, child: child) {
             this.onPointerDown = onPointerDown;
             this.onPointerMove = onPointerMove;
@@ -1957,7 +1955,6 @@ namespace Unity.UIWidgets.rendering {
             this._onPointerHover = onPointerHover;
             this._onPointerExit = onPointerExit;
             
-            // Drag & Drop
             this._onPointerDragFromEditorEnter = onPointerDragFromEditorEnter;
             this._onPointerDragFromEditorHover = onPointerDragFromEditorHover;
             this._onPointerDragFromEditorExit = onPointerDragFromEditorExit;
