@@ -1974,6 +1974,10 @@ namespace Unity.UIWidgets.widgets {
             PointerUpEventListener onPointerUp = null,
             PointerCancelEventListener onPointerCancel = null,
             PointerScrollEventListener onPointerScroll = null,
+            PointerDragFromEditorEnterEventListener onPointerDragFromEditorEnter = null,
+            PointerDragFromEditorHoverEventListener onPointerDragFromEditorHover = null,
+            PointerDragFromEditorExitEventListener onPointerDragFromEditorExit = null,
+            PointerDragFromEditorReleaseEventListener onPointerDragFromEditorRelease = null,
             HitTestBehavior behavior = HitTestBehavior.deferToChild,
             Widget child = null
         ) : base(key: key, child: child) {
@@ -1986,6 +1990,11 @@ namespace Unity.UIWidgets.widgets {
             this.onPointerEnter = onPointerEnter;
             this.onPointerScroll = onPointerScroll;
             this.behavior = behavior;
+
+            this.onPointerDragFromEditorEnter = onPointerDragFromEditorEnter;
+            this.onPointerDragFromEditorHover = onPointerDragFromEditorHover;
+            this.onPointerDragFromEditorExit = onPointerDragFromEditorExit;
+            this.onPointerDragFromEditorRelease = onPointerDragFromEditorRelease;
         }
 
         public readonly PointerDownEventListener onPointerDown;
@@ -2006,6 +2015,14 @@ namespace Unity.UIWidgets.widgets {
 
         public readonly HitTestBehavior behavior;
 
+        public readonly PointerDragFromEditorEnterEventListener onPointerDragFromEditorEnter;
+        
+        public readonly PointerDragFromEditorHoverEventListener onPointerDragFromEditorHover;
+        
+        public readonly PointerDragFromEditorExitEventListener onPointerDragFromEditorExit;
+        
+        public readonly PointerDragFromEditorReleaseEventListener onPointerDragFromEditorRelease;
+
         public override RenderObject createRenderObject(BuildContext context) {
             return new RenderPointerListener(
                 onPointerDown: this.onPointerDown,
@@ -2016,6 +2033,10 @@ namespace Unity.UIWidgets.widgets {
                 onPointerExit: this.onPointerExit,
                 onPointerHover: this.onPointerHover,
                 onPointerScroll: this.onPointerScroll,
+                onPointerDragFromEditorEnter: this.onPointerDragFromEditorEnter,
+                onPointerDragFromEditorHover: this.onPointerDragFromEditorHover,
+                onPointerDragFromEditorExit: this.onPointerDragFromEditorExit,
+                onPointerDragFromEditorRelease: this.onPointerDragFromEditorRelease,
                 behavior: this.behavior
             );
         }
@@ -2031,6 +2052,13 @@ namespace Unity.UIWidgets.widgets {
             renderObject.onPointerExit = this.onPointerExit;
             renderObject.onPointerScroll = this.onPointerScroll;
             renderObject.behavior = this.behavior;
+
+#if UNITY_EDITOR
+            renderObject.onPointerDragFromEditorEnter = this.onPointerDragFromEditorEnter;
+            renderObject.onPointerDragFromEditorHover = this.onPointerDragFromEditorHover;
+            renderObject.onPointerDragFromEditorExit = this.onPointerDragFromEditorExit;
+            renderObject.onPointerDragFromEditorRelease = this.onPointerDragFromEditorRelease;
+#endif
         }
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
@@ -2067,6 +2095,24 @@ namespace Unity.UIWidgets.widgets {
             if (this.onPointerScroll != null) {
                 listeners.Add("scroll");
             }
+
+#if UNITY_EDITOR
+            if (this.onPointerDragFromEditorEnter != null) {
+                listeners.Add("dragFromEditorEnter");
+            }
+
+            if (this.onPointerDragFromEditorHover != null) {
+                listeners.Add("dragFromEditorHover");
+            }
+
+            if (this.onPointerDragFromEditorExit != null) {
+                listeners.Add("dragFromEditorExit");
+            }
+
+            if (this.onPointerDragFromEditorRelease != null) {
+                listeners.Add("dragFromEditorRelease");
+            }
+#endif
 
             properties.add(new EnumerableProperty<string>("listeners", listeners, ifEmpty: "<none>"));
             properties.add(new EnumProperty<HitTestBehavior>("behavior", this.behavior));

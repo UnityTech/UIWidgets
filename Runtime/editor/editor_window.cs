@@ -71,7 +71,7 @@ namespace Unity.UIWidgets.editor {
     public class EditorWindowAdapter : WindowAdapter {
         public readonly EditorWindow editorWindow;
 
-        public EditorWindowAdapter(EditorWindow editorWindow) {
+        public EditorWindowAdapter(EditorWindow editorWindow) : base(true) {
             this.editorWindow = editorWindow;
         }
 
@@ -126,6 +126,10 @@ namespace Unity.UIWidgets.editor {
     public abstract class WindowAdapter : Window {
         static readonly List<WindowAdapter> _windowAdapters = new List<WindowAdapter>();
 
+        public WindowAdapter(bool inEditorWindow = false) {
+            this.inEditorWindow = inEditorWindow;
+        }
+
         public static List<WindowAdapter> windowAdapters {
             get { return _windowAdapters; }
         }
@@ -163,7 +167,7 @@ namespace Unity.UIWidgets.editor {
 
         protected float deltaTime;
         protected float unscaledDeltaTime;
-        
+
         void updatePhysicalSize() {
             var size = this.queryWindowSize();
             this._physicalSize = new Size(
@@ -183,7 +187,7 @@ namespace Unity.UIWidgets.editor {
         public void onViewMetricsChanged() {
             this._viewMetricsChanged = true;
         }
-        
+
         protected abstract bool hasFocus();
 
         public void OnEnable() {
@@ -214,12 +218,14 @@ namespace Unity.UIWidgets.editor {
             this._surface = null;
         }
 
+        readonly protected bool inEditorWindow;
+
         public override IDisposable getScope() {
             WindowAdapter oldInstance = (WindowAdapter) _instance;
             _instance = this;
 
             if (this._binding == null) {
-                this._binding = new WidgetsBinding();
+                this._binding = new WidgetsBinding(this.inEditorWindow);
             }
 
             SchedulerBinding._instance = this._binding;
@@ -398,6 +404,26 @@ namespace Unity.UIWidgets.editor {
                         evt.mousePosition.x * this._devicePixelRatio,
                         evt.mousePosition.y * this._devicePixelRatio,
                         evt.button
+                    );
+                }
+                else if (evt.type == EventType.DragUpdated) {
+                    pointerData = new PointerData(
+                        timeStamp: Timer.timespanSinceStartup,
+                        change: PointerChange.dragFromEditorMove,
+                        kind: PointerDeviceKind.mouse,
+                        device: evt.button,
+                        physicalX: evt.mousePosition.x * this._devicePixelRatio,
+                        physicalY: evt.mousePosition.y * this._devicePixelRatio
+                    );
+                }
+                else if (evt.type == EventType.DragPerform) {
+                    pointerData = new PointerData(
+                        timeStamp: Timer.timespanSinceStartup,
+                        change: PointerChange.dragFromEditorRelease,
+                        kind: PointerDeviceKind.mouse,
+                        device: evt.button,
+                        physicalX: evt.mousePosition.x * this._devicePixelRatio,
+                        physicalY: evt.mousePosition.y * this._devicePixelRatio
                     );
                 }
 

@@ -226,6 +226,16 @@ UIWidgets支持渲染文本中包含的表情。表情的图片来自[https://ww
 如果您希望使用自己的表情图片，请更新纹理图`Tests/Resources/Emoji.png`，以及`Runtime/ui/txt/emoji.cs`中将Unicode映射到纹理图中具体位置的映射表。
 特别地，请记得更新Dictionary变量`emojiLookupTable`，纹理图的行数`rowCount`以及纹理图的列数`colCount`。
 
+#### 十一、与GameObject进行拖拽交互
+
+<div style="text-align: center">
+  <img src="https://connect-prd-cdn.unity.com/20190718/p/images/e3c9cf9b-c732-4eb2-9afd-fe7de894f342_Custom_Inspector_Showcase_320px.gif" width="300"/>
+</div>
+
+我们提供了一个包装好的`UnityObjectDetector`组件以及`onRelease`回调函数，借此您可以实现简单地将物体（例如Hierarchy内的场景物体、Project窗口下的文件等）拖拽至区域内，来获得`UnityEngine.Object[] `类型的引用并进行操作。
+
+你可以在“UIWidgetsTests -> Drag&Drop”下找到简单的实例样例。
+
 
 ## 调试UIWidgets应用程序
 

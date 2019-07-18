@@ -1009,7 +1009,7 @@ namespace Unity.UIWidgets.rendering {
             get { return Offset.zero & this.size; }
         }
 
-        public override bool hitTest(HitTestResult result, 
+        public override bool hitTest(HitTestResult result,
             Offset position = null
         ) {
             this._updateClip();
@@ -1938,6 +1938,10 @@ namespace Unity.UIWidgets.rendering {
             PointerUpEventListener onPointerUp = null,
             PointerCancelEventListener onPointerCancel = null,
             PointerScrollEventListener onPointerScroll = null,
+            PointerDragFromEditorEnterEventListener onPointerDragFromEditorEnter = null,
+            PointerDragFromEditorHoverEventListener onPointerDragFromEditorHover = null,
+            PointerDragFromEditorExitEventListener onPointerDragFromEditorExit = null,
+            PointerDragFromEditorReleaseEventListener onPointerDragFromEditorRelease = null,
             HitTestBehavior behavior = HitTestBehavior.deferToChild,
             RenderBox child = null
         ) : base(behavior: behavior, child: child) {
@@ -1951,17 +1955,78 @@ namespace Unity.UIWidgets.rendering {
             this._onPointerHover = onPointerHover;
             this._onPointerExit = onPointerExit;
 
-            if (this._onPointerEnter != null || this._onPointerHover != null || this._onPointerExit != null) {
+            this._onPointerDragFromEditorEnter = onPointerDragFromEditorEnter;
+            this._onPointerDragFromEditorHover = onPointerDragFromEditorHover;
+            this._onPointerDragFromEditorExit = onPointerDragFromEditorExit;
+            this._onPointerDragFromEditorRelease = onPointerDragFromEditorRelease;
+
+            if (this._onPointerEnter != null ||
+                this._onPointerHover != null ||
+                this._onPointerExit != null ||
+                this._onPointerDragFromEditorEnter != null ||
+                this._onPointerDragFromEditorHover != null ||
+                this._onPointerDragFromEditorExit != null ||
+                this._onPointerDragFromEditorRelease != null
+            ) {
                 this._hoverAnnotation = new MouseTrackerAnnotation(
                     onEnter: this._onPointerEnter,
                     onHover: this._onPointerHover,
-                    onExit: this._onPointerExit);
+                    onExit: this._onPointerExit,
+                    onDragFromEditorEnter: this._onPointerDragFromEditorEnter,
+                    onDragFromEditorHover: this._onPointerDragFromEditorHover,
+                    onDragFromEditorExit: this._onPointerDragFromEditorExit,
+                    onDragFromEditorRelease: this._onPointerDragFromEditorRelease
+                );
             }
         }
 
-        public PointerDownEventListener onPointerDown;
+        PointerDragFromEditorEnterEventListener _onPointerDragFromEditorEnter;
 
-        public PointerMoveEventListener onPointerMove;
+        public PointerDragFromEditorEnterEventListener onPointerDragFromEditorEnter {
+            get { return this._onPointerDragFromEditorEnter; }
+            set {
+                if (this._onPointerDragFromEditorEnter != value) {
+                    this._onPointerDragFromEditorEnter = value;
+                    this._updateAnnotations();
+                }
+            }
+        }
+
+        PointerDragFromEditorExitEventListener _onPointerDragFromEditorExit;
+
+        public PointerDragFromEditorExitEventListener onPointerDragFromEditorExit {
+            get { return this._onPointerDragFromEditorExit; }
+            set {
+                if (this._onPointerDragFromEditorExit != value) {
+                    this._onPointerDragFromEditorExit = value;
+                    this._updateAnnotations();
+                }
+            }
+        }
+
+        PointerDragFromEditorHoverEventListener _onPointerDragFromEditorHover;
+
+        public PointerDragFromEditorHoverEventListener onPointerDragFromEditorHover {
+            get { return this._onPointerDragFromEditorHover; }
+            set {
+                if (this._onPointerDragFromEditorHover != value) {
+                    this._onPointerDragFromEditorHover = value;
+                    this._updateAnnotations();
+                }
+            }
+        }
+
+        PointerDragFromEditorReleaseEventListener _onPointerDragFromEditorRelease;
+
+        public PointerDragFromEditorReleaseEventListener onPointerDragFromEditorRelease {
+            get { return this._onPointerDragFromEditorRelease; }
+            set {
+                if (this._onPointerDragFromEditorRelease != value) {
+                    this._onPointerDragFromEditorRelease = value;
+                    this._updateAnnotations();
+                }
+            }
+        }
 
         public PointerEnterEventListener onPointerEnter {
             get { return this._onPointerEnter; }
@@ -1999,6 +2064,10 @@ namespace Unity.UIWidgets.rendering {
 
         PointerExitEventListener _onPointerExit;
 
+        public PointerDownEventListener onPointerDown;
+
+        public PointerMoveEventListener onPointerMove;
+
         public PointerUpEventListener onPointerUp;
 
         public PointerCancelEventListener onPointerCancel;
@@ -2010,18 +2079,40 @@ namespace Unity.UIWidgets.rendering {
         void _updateAnnotations() {
             D.assert(this._onPointerEnter != this._hoverAnnotation.onEnter ||
                      this._onPointerHover != this._hoverAnnotation.onHover ||
-                     this._onPointerExit != this._hoverAnnotation.onExit,
-                () => "Shouldn't call _updateAnnotations if nothing has changed.");
+                     this._onPointerExit != this._hoverAnnotation.onExit
+#if UNITY_EDITOR
+                     || this._onPointerDragFromEditorEnter != this._hoverAnnotation.onDragFromEditorEnter
+                     || this._onPointerDragFromEditorHover != this._hoverAnnotation.onDragFromEditorHover
+                     || this._onPointerDragFromEditorExit != this._hoverAnnotation.onDragFromEditorExit
+                     || this._onPointerDragFromEditorRelease != this._hoverAnnotation.onDragFromEditorRelease
+#endif
+                , () => "Shouldn't call _updateAnnotations if nothing has changed.");
 
             if (this._hoverAnnotation != null && this.attached) {
                 RendererBinding.instance.mouseTracker.detachAnnotation(this._hoverAnnotation);
             }
 
-            if (this._onPointerEnter != null || this._onPointerHover != null || this._onPointerExit != null) {
+            if (this._onPointerEnter != null ||
+                this._onPointerHover != null ||
+                this._onPointerExit != null
+#if UNITY_EDITOR
+                || this._onPointerDragFromEditorEnter != null
+                || this._onPointerDragFromEditorHover != null
+                || this._onPointerDragFromEditorExit != null
+                || this._onPointerDragFromEditorRelease != null
+#endif
+            ) {
                 this._hoverAnnotation = new MouseTrackerAnnotation(
                     onEnter: this._onPointerEnter,
                     onHover: this._onPointerHover,
-                    onExit: this._onPointerExit);
+                    onExit: this._onPointerExit
+#if UNITY_EDITOR
+                    , onDragFromEditorEnter: this._onPointerDragFromEditorEnter
+                    , onDragFromEditorHover: this._onPointerDragFromEditorHover
+                    , onDragFromEditorExit: this._onPointerDragFromEditorExit
+                    , onDragFromEditorRelease: this._onPointerDragFromEditorRelease
+#endif
+                );
 
                 if (this.attached) {
                     RendererBinding.instance.mouseTracker.attachAnnotation(this._hoverAnnotation);
