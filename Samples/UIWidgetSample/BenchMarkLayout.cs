@@ -10,21 +10,16 @@ using Color = Unity.UIWidgets.ui.Color;
 using FontStyle = Unity.UIWidgets.ui.FontStyle;
 using Material = Unity.UIWidgets.material.Material;
 
-namespace UIWidgetsSample
-{
-    public class BenchMarkLayout : UIWidgetsSamplePanel
-    {
-        protected override Widget createWidget()
-        {
+namespace UIWidgetsSample {
+    public class BenchMarkLayout : UIWidgetsSamplePanel {
+        protected override Widget createWidget() {
             return new MaterialApp(
                 showPerformanceOverlay: false,
                 home: new Material(
                     child: new BenchMarkLayoutWidget()),
-                builder: (_, child) =>
-                {
+                builder: (_, child) => {
                     return new Builder(builder:
-                        context =>
-                        {
+                        context => {
                             return new MediaQuery(
                                 data: MediaQuery.of(context).copyWith(
                                     textScaleFactor: 1.0f
@@ -34,35 +29,29 @@ namespace UIWidgetsSample
                 });
         }
 
-        protected override void OnEnable()
-        {
+        protected override void OnEnable() {
             base.OnEnable();
             FontManager.instance.addFont(Resources.Load<Font>(path: "MaterialIcons-Regular"), "Material Icons");
         }
     }
 
-    internal class BenchMarkLayoutWidget : StatefulWidget
-    {
-        public BenchMarkLayoutWidget(Key key = null) : base(key)
-        {
+    class BenchMarkLayoutWidget : StatefulWidget {
+        public BenchMarkLayoutWidget(Key key = null) : base(key) {
         }
 
-        public override State createState()
-        {
+        public override State createState() {
             return new BenchMarkLayoutWidgetState();
         }
     }
 
-    internal class BenchMarkLayoutWidgetState : State<BenchMarkLayoutWidget>
-    {
-        private int width = 260;
-        private bool visible = true;
+    class BenchMarkLayoutWidgetState : State<BenchMarkLayoutWidget> {
+        int width = 260;
+        bool visible = true;
 
-        private Widget richtext = new Container(
+        Widget richtext = new Container(
             child: new RichText(
                 text: new TextSpan("", children:
-                    new List<TextSpan>()
-                    {
+                    new List<TextSpan>() {
                         new TextSpan("Real-time 3D revolutioni\t淡粉色的方式地方\tzes the animation pipeline "),
                         new TextSpan(style: new TextStyle(color: Color.fromARGB(255, 255, 0, 0)),
                             text: "for Disney Television Animation's\t “Baymax Dreams"),
@@ -104,39 +93,36 @@ namespace UIWidgetsSample
             )
         );
 
-        public override Widget build(BuildContext context)
-        {
+        public override Widget build(BuildContext context) {
             Widget buttons = new Column(
                 mainAxisAlignment: MainAxisAlignment.end,
-                children: new List<Widget>
-                {
-                    new Text($"Width: {width}"),
+                children: new List<Widget> {
+                    new Text($"Width: {this.width}"),
                     new RaisedButton(
-                        onPressed: () => { setState(() => { width += 10; }); },
+                        onPressed: () => { this.setState(() => { this.width += 10; }); },
                         child: new Text("Add Width")
                     ),
                     new Divider(),
                     new RaisedButton(
-                        onPressed: () => { setState(() => { width -= 10; }); },
+                        onPressed: () => { this.setState(() => { this.width -= 10; }); },
                         child: new Text("Dec Width")
                     ),
                     new Divider(),
                     new RaisedButton(
-                        onPressed: () => { setState(() => { visible = true; }); },
+                        onPressed: () => { this.setState(() => { this.visible = true; }); },
                         child: new Text("Show")
                     ),
                     new Divider(),
                     new RaisedButton(
-                        onPressed: () => { setState(() => { visible = false; }); },
+                        onPressed: () => { this.setState(() => { this.visible = false; }); },
                         child: new Text("Hide")
                     )
                 }
             );
             Widget child = new Column(
-                children: new List<Widget>
-                {
-                    visible ? richtext : new Text(""),
-                    visible
+                children: new List<Widget> {
+                    this.visible ? this.richtext : new Text(""),
+                    this.visible
                         ? new Text(
                             "Very Very Very Very Very Very Very Very Very Very Very Very Very Very\nVery Very Very Very Very Very Very Very Very Very Very Long Text",
                             maxLines: 3, overflow: TextOverflow.ellipsis, textAlign: TextAlign.justify
@@ -144,13 +130,13 @@ namespace UIWidgetsSample
                         : new Text("")
                 });
             child = new Stack(
-                children: new List<Widget>{
+                children: new List<Widget> {
                     child,
                     buttons
                 }
             );
             child = new Container(
-                width: width,
+                width: this.width,
                 color: Colors.black12,
                 child: child
             );
