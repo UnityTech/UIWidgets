@@ -260,9 +260,30 @@ namespace Unity.UIWidgets.ui {
 
         public static void release(ref Paragraph paragraph) {
             if (paragraph != null) {
+                paragraph.clear();
                 _paragraphPool.Add(paragraph);
                 paragraph = null;
             }
+        }
+
+        public void clear() {
+            this._needsLayout = true;
+            this._maxIntrinsicWidth = default;
+            this._minIntrinsicWidth = default;
+            this._alphabeticBaseline = default;
+            this._ideographicBaseline = default;
+            this._lineCount = default;
+            this._paintRecordsCount = default;
+            this._codeUnitRunsCount = default;
+            this._lineRangeCount = default;
+            this._lineWidthCount = default;
+            this._didExceedMaxLines = default;
+            this._width = default;
+            this._text = default;
+            this._ellipsizedText = default;
+            this._ellipsizedLength = default;
+            this._runs = null;
+            this._paragraphStyle = null;
         }
 
         readonly Paint _textPaint = new Paint {
