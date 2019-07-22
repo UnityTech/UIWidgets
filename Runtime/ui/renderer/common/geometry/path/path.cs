@@ -15,6 +15,46 @@ namespace Unity.UIWidgets.ui {
 
         public uint pathKey = 0;
         public bool needCache = false;
+        
+        bool _isRRect = false;
+        public bool isRRect => this._isRRect;
+        
+        void _updateRRectFlag(bool isRRect) {
+            if (this._commands.Count > 0 && !this._isRRect) {
+                return;
+            }
+            this._isRRect = isRRect && this._hasOnlyMoveTos();
+
+            if (!this._isRRect) {
+                int s = 0;
+            }
+        }
+        
+        bool _hasOnlyMoveTos() {
+            var i = 0;
+            while (i < this._commands.Count) {
+                var cmd = (PathCommand) this._commands[i];
+                switch (cmd) {
+                    case PathCommand.moveTo: 
+                        i += 3;
+                        break;
+                    case PathCommand.lineTo:
+                        return false;
+                    case PathCommand.bezierTo:
+                        return false;
+                    case PathCommand.close:
+                        i++;
+                        break;
+                    case PathCommand.winding:
+                        i += 2;
+                        break;
+                    default:
+                        return false;
+                }
+            }
+
+            return true;
+        }
 
         public static uiPath create(int capacity = 128) {
             uiPath newPath = ObjectPool<uiPath>.alloc();
@@ -33,6 +73,7 @@ namespace Unity.UIWidgets.ui {
 
             this.needCache = false;
             this.pathKey = 0;
+            this._isRRect = false;
         }
 
         void _reset() {
@@ -45,6 +86,7 @@ namespace Unity.UIWidgets.ui {
             this._maxY = float.MinValue;
             ObjectPool<uiPathCache>.release(this._cache);
             this._cache = null;
+            this._isRRect = false;
         }
 
         internal uiPathCache flatten(float scale) {
@@ -178,6 +220,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void addRect(uiRect rect) {
+            this._updateRRectFlag(true);
             this._appendMoveTo(rect.left, rect.top);
             this._appendLineTo(rect.left, rect.bottom);
             this._appendLineTo(rect.right, rect.bottom);
@@ -186,6 +229,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void addRect(Rect rect) {
+            this._updateRRectFlag(true);
             this._appendMoveTo(rect.left, rect.top);
             this._appendLineTo(rect.left, rect.bottom);
             this._appendLineTo(rect.right, rect.bottom);
@@ -194,6 +238,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void addRRect(RRect rrect) {
+            this._updateRRectFlag(true);
             float w = rrect.width;
             float h = rrect.height;
             float halfw = Mathf.Abs(w) * 0.5f;
@@ -233,6 +278,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void lineTo(float x, float y) {
+            this._updateRRectFlag(false);
             this._appendLineTo(x, y);
         }
 
@@ -241,6 +287,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void addEllipse(float cx, float cy, float rx, float ry) {
+            this._updateRRectFlag(true);
             this._appendMoveTo(cx - rx, cy);
             this._appendBezierTo(cx - rx, cy + ry * _KAPPA90,
                 cx - rx * _KAPPA90, cy + ry, cx, cy + ry);
@@ -254,10 +301,12 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void addCircle(float cx, float cy, float r) {
+            this._updateRRectFlag(true);
             this.addEllipse(cx, cy, r, r);
         }
 
         public void arcTo(Rect rect, float startAngle, float sweepAngle, bool forceMoveTo = true) {
+            this._updateRRectFlag(false);
             var mat = Matrix3.makeScale(rect.width / 2, rect.height / 2);
             var center = rect.center;
             mat.postTranslate(center.dx, center.dy);
@@ -369,7 +418,9 @@ namespace Unity.UIWidgets.ui {
             if (exists) {
                 return uipath;
             }
-
+            
+            uipath._updateRRectFlag(path.isRRect);
+            
             var i = 0;
             var _commands = path.commands;
             while (i < _commands.Count) {

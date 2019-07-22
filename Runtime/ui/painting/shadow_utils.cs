@@ -1,8 +1,9 @@
+using Unity.UIWidgets.material;
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
     static class ShadowUtils {
-        public const bool kUseFastShadow = false;
+        public const bool kUseFastShadow = true;
 
         const float kAmbientHeightFactor = 1.0f / 128.0f;
         const float kAmbientGeomFactor = 64.0f;
@@ -10,6 +11,8 @@ namespace Unity.UIWidgets.ui {
         const float kBlurSigmaScale = 0.57735f;
 
         const float kMaxAmbientRadius = 300 * kAmbientHeightFactor * kAmbientGeomFactor;
+
+        const bool debugShadow = true;
 
         static float divideAndPin(float numer, float denom, float min, float max) {
             return (numer / denom).clamp(min, max);
@@ -140,7 +143,7 @@ namespace Unity.UIWidgets.ui {
         public static void drawShadow(Canvas canvas, Path path, Vector3 zPlaneParams, Vector3 devLightPos,
             float lightRadius, uiColor ambientColor, uiColor spotColor, int flags) {
             if (kUseFastShadow) {
-                drawShadowFast(canvas, path, zPlaneParams, devLightPos, lightRadius, ambientColor, spotColor, flags);
+                drawShadowFull2(canvas, path, zPlaneParams, devLightPos, lightRadius, ambientColor, spotColor, flags);
             }
             else {
                 drawShadowFull(canvas, path, zPlaneParams, devLightPos, lightRadius, ambientColor, spotColor, flags);
@@ -178,6 +181,67 @@ namespace Unity.UIWidgets.ui {
 
             //spot light
             //Matrix3 shadowMatrix = Matrix3.I();
+            float radius = 0.0f;
+
+            if (!getSpotShadowTransform(devLightPos, lightRadius, viewMatrix, zPlaneParams, path.getBounds(),
+                _shadowMatrix, ref radius)) {
+                return;
+            }
+
+            canvas.save();
+            canvas.setMatrix(_shadowMatrix);
+
+            _shadowPaint.color = new Color(spotColor.value);
+            _shadowPaint.strokeWidth = 0;
+            _shadowPaint.style = PaintingStyle.fill;
+            float sigma2 = convertRadiusToSigma(radius);
+            _shadowPaint.maskFilter = MaskFilter.blur(BlurStyle.normal, sigma2);
+            canvas.drawPath(path, _shadowPaint);
+
+            canvas.restore();
+
+            _shadowPaint.maskFilter = null;
+        }
+        
+        
+        static void drawShadowFull2(Canvas canvas, Path path, Vector3 zPlaneParams, Vector3 devLightPos,
+            float lightRadius, uiColor ambientColor, uiColor spotColor, int flags) {
+            Matrix3 viewMatrix = canvas.getTotalMatrix();
+
+            //debug shadow
+            if (debugShadow) {
+                var isRRect = path.isRRect;
+                if (isRRect) {
+                    ambientColor = uiColor.fromColor(Colors.red);
+                    spotColor = uiColor.fromColor(Colors.red);
+                }
+                else {
+                    ambientColor = uiColor.fromColor(Colors.green);
+                    spotColor = uiColor.fromColor(Colors.green);
+                }
+            }
+
+            //ambient light
+            _devSpacePath.resetAll();
+            _devSpacePath.addPath(path, viewMatrix);
+            float devSpaceOutset = ambientBlurRadius(zPlaneParams.z);
+            float oneOverA = ambientRecipAlpha(zPlaneParams.z);
+            float blurRadius = 0.5f * devSpaceOutset * oneOverA;
+            float strokeWidth = 0.5f * (devSpaceOutset - blurRadius);
+
+            _shadowPaint.color = new Color(ambientColor.value);
+            _shadowPaint.strokeWidth = strokeWidth;
+            _shadowPaint.style = PaintingStyle.fill;
+            
+            canvas.save();
+            _shadowMatrix.reset();
+            canvas.setMatrix(_shadowMatrix);
+            float sigma = convertRadiusToSigma(blurRadius);
+            _shadowPaint.maskFilter = MaskFilter.blur(BlurStyle.normal, sigma);
+            canvas.drawPath(_devSpacePath, _shadowPaint);
+            canvas.restore();
+
+            //spot light
             float radius = 0.0f;
 
             if (!getSpotShadowTransform(devLightPos, lightRadius, viewMatrix, zPlaneParams, path.getBounds(),

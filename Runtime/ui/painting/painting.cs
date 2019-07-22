@@ -200,6 +200,7 @@ namespace Unity.UIWidgets.ui {
         solid,
         outer,
         inner,
+        shadow
     }
 
     public class MaskFilter : IEquatable<MaskFilter> {
@@ -210,6 +211,10 @@ namespace Unity.UIWidgets.ui {
 
         public static MaskFilter blur(BlurStyle style, float sigma) {
             return new MaskFilter(style, sigma);
+        }
+
+        public static MaskFilter shadow(float sigma) {
+            return new MaskFilter(BlurStyle.shadow, sigma);
         }
 
         public readonly BlurStyle style;
