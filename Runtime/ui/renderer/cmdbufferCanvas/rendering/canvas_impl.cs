@@ -419,7 +419,7 @@ namespace Unity.UIWidgets.ui {
             var maskState = maskLayer.states[maskLayer.states.Count - 1];
             maskState.matrix = parentState.matrix;
 
-            drawCallback.Invoke(uiPaint.shapeOnly(paint), mesh, convex, alpha, tex, texBound, textMesh, notEmoji);
+            drawCallback.Invoke(uiPaint.shapeOnly(paint), mesh, null, convex, alpha, tex, texBound, textMesh, notEmoji);
 
             var removed = this._layers.removeLast();
             D.assert(removed == maskLayer);
@@ -528,40 +528,44 @@ namespace Unity.UIWidgets.ui {
             layer.draws.Add(CanvasShader.texRT(layer, paint, blurMesh, blurLayer));
         }
 
-        delegate void _drawPathDrawMeshCallbackDelegate(uiPaint p, uiMeshMesh mesh, bool convex, float alpha,
+        delegate void _drawPathDrawMeshCallbackDelegate(uiPaint p, uiMeshMesh fillMesh, uiMeshMesh strokeMesh, bool convex, float alpha,
             Texture tex, uiRect textBlobBounds, TextBlobMesh textMesh, bool notEmoji);
 
-        void _drawPathDrawMeshCallback(uiPaint p, uiMeshMesh mesh, bool convex, float alpha, Texture tex,
+        void _drawPathDrawMeshCallback(uiPaint p, uiMeshMesh fillMesh, uiMeshMesh strokeMesh, bool convex, float alpha, Texture tex,
             uiRect textBlobBounds, TextBlobMesh textMesh, bool notEmoji) {
-            if (!this._applyClip(mesh.bounds)) {
-                ObjectPool<uiMeshMesh>.release(mesh);
+            if (!this._applyClip(fillMesh.bounds)) {
+                ObjectPool<uiMeshMesh>.release(fillMesh);
                 return;
             }
 
             var layer = this._currentLayer;
             if (convex) {
-                layer.draws.Add(CanvasShader.convexFill(layer, p, mesh));
+                layer.draws.Add(CanvasShader.convexFill(layer, p, fillMesh));
             }
             else {
-                layer.draws.Add(CanvasShader.fill0(layer, mesh));
-                layer.draws.Add(CanvasShader.fill1(layer, p, mesh.boundsMesh));
+                layer.draws.Add(CanvasShader.fill0(layer, fillMesh));
+                layer.draws.Add(CanvasShader.fill1(layer, p, fillMesh.boundsMesh));
+            }
+
+            if (strokeMesh != null) {
+                layer.draws.Add(CanvasShader.strokeAlpha(layer, p, 1.0f, strokeMesh));
             }
         }
 
-        void _drawPathDrawMeshCallback2(uiPaint p, uiMeshMesh mesh, bool convex, float alpha, Texture tex,
+        void _drawPathDrawMeshCallback2(uiPaint p, uiMeshMesh fillMesh, uiMeshMesh strokeMesh, bool convex, float alpha, Texture tex,
             uiRect textBlobBounds, TextBlobMesh textMesh, bool notEmoji) {
-            if (!this._applyClip(mesh.bounds)) {
-                ObjectPool<uiMeshMesh>.release(mesh);
+            if (!this._applyClip(strokeMesh.bounds)) {
+                ObjectPool<uiMeshMesh>.release(strokeMesh);
                 return;
             }
 
             var layer = this._currentLayer;
 
-            layer.draws.Add(CanvasShader.stroke0(layer, p, alpha, mesh));
-            layer.draws.Add(CanvasShader.stroke1(layer, mesh.duplicate()));
+            layer.draws.Add(CanvasShader.strokeAlpha(layer, p, alpha, strokeMesh));
+            layer.draws.Add(CanvasShader.stroke1(layer, strokeMesh.duplicate()));
         }
 
-        void _drawTextDrawMeshCallback(uiPaint p, uiMeshMesh mesh, bool convex, float alpha, Texture tex,
+        void _drawTextDrawMeshCallback(uiPaint p, uiMeshMesh fillMesh, uiMeshMesh strokeMesh, bool convex, float alpha, Texture tex,
             uiRect textBlobBounds, TextBlobMesh textMesh, bool notEmoji) {
             if (!this._applyClip(textBlobBounds)) {
                 ObjectPool<TextBlobMesh>.release(textMesh);
@@ -600,16 +604,19 @@ namespace Unity.UIWidgets.ui {
                 var cache = path.flatten(state.scale * this._devicePixelRatio);
 
                 bool convex;
-                var fillMesh = cache.getFillMesh(out convex);
-                var mesh = fillMesh.transform(state.matrix);
+                cache.computeFillMesh(this._fringeWidth, out convex);
+                var fillMesh = cache.fillMesh;
+                var strokeMesh = cache.strokeMesh;
+                var fmesh = fillMesh.transform(state.matrix);
+                var smesh = strokeMesh?.transform(state.matrix);
 
                 if (paint.maskFilter != null && paint.maskFilter.Value.sigma != 0) {
-                    this._drawWithMaskFilter(mesh.bounds, paint, paint.maskFilter.Value, mesh, convex, 0, null,
+                    this._drawWithMaskFilter(fmesh.bounds, paint, paint.maskFilter.Value, fmesh, convex, 0, null,
                         uiRectHelper.zero, null, false, this.___drawPathDrawMeshCallback);
                     return;
                 }
 
-                this._drawPathDrawMeshCallback(paint, mesh, convex, 0, null, uiRectHelper.zero, null, false);
+                this._drawPathDrawMeshCallback(paint, fmesh, smesh, convex, 0, null, uiRectHelper.zero, null, false);
             }
             else {
                 var state = this._currentLayer.currentState;
@@ -629,13 +636,14 @@ namespace Unity.UIWidgets.ui {
 
                 var cache = path.flatten(state.scale * this._devicePixelRatio);
 
-                var strokenMesh = cache.getStrokeMesh(
+                var strokeMesh = cache.computeStrokeMesh(
                     strokeWidth / state.scale * 0.5f,
+                    this._fringeWidth,
                     paint.strokeCap,
                     paint.strokeJoin,
                     paint.strokeMiterLimit);
 
-                var mesh = strokenMesh.transform(state.matrix);
+                var mesh = strokeMesh.transform(state.matrix);
 
                 if (paint.maskFilter != null && paint.maskFilter.Value.sigma != 0) {
                     this._drawWithMaskFilter(mesh.bounds, paint, paint.maskFilter.Value, mesh, false, alpha, null,
@@ -643,7 +651,7 @@ namespace Unity.UIWidgets.ui {
                     return;
                 }
 
-                this._drawPathDrawMeshCallback2(paint, mesh, false, alpha, null, uiRectHelper.zero, null, false);
+                this._drawPathDrawMeshCallback2(paint, null, mesh, false, alpha, null, uiRectHelper.zero, null, false);
             }
         }
 
@@ -958,7 +966,7 @@ namespace Unity.UIWidgets.ui {
                 return;
             }
 
-            this._drawTextDrawMeshCallback(paint, null, false, 0, tex, textBlobBounds, mesh, notEmoji);
+            this._drawTextDrawMeshCallback(paint, null, null, false, 0, tex, textBlobBounds, mesh, notEmoji);
         }
 
         public void flush(uiPicture picture) {

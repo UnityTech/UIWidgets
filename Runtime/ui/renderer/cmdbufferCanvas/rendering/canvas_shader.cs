@@ -152,6 +152,7 @@ namespace Unity.UIWidgets.ui {
         static readonly MaterialByBlendModeStencilComp _texMat;
         static readonly Material _stencilMat;
         static readonly Material _filterMat;
+        static readonly MaterialByBlendModeStencilComp _strokeAlphaMat;
 
         static CanvasShader() {
             var convexFillShader = Shader.Find("UIWidgets/canvas_convexFill");
@@ -179,6 +180,11 @@ namespace Unity.UIWidgets.ui {
                 throw new Exception("UIWidgets/canvas_stroke1 not found");
             }
 
+            var strokeAlphaShader = Shader.Find("UIWidgets/canvas_strokeAlpha");
+            if (strokeAlphaShader == null) {
+                throw new Exception("UIWidgets/canvas_strokeAlpha not found");
+            }
+
             var texShader = Shader.Find("UIWidgets/canvas_tex");
             if (texShader == null) {
                 throw new Exception("UIWidgets/canvas_tex not found");
@@ -199,6 +205,7 @@ namespace Unity.UIWidgets.ui {
             _fill1Mat = new MaterialByBlendMode(fill1Shader);
             _stroke0Mat = new MaterialByBlendModeStencilComp(stroke0Shader);
             _stroke1Mat = new Material(stroke1Shader) {hideFlags = HideFlags.HideAndDontSave};
+            _strokeAlphaMat = new MaterialByBlendModeStencilComp(strokeAlphaShader);
             _texMat = new MaterialByBlendModeStencilComp(texShader);
             _stencilMat = new Material(stencilShader) {hideFlags = HideFlags.HideAndDontSave};
             _filterMat = new Material(filterShader) {hideFlags = HideFlags.HideAndDontSave};
@@ -374,6 +381,18 @@ namespace Unity.UIWidgets.ui {
             return PictureFlusher.CmdDraw.create(
                 mesh: mesh,
                 pass: pass,
+                material: mat,
+                properties: props
+            );
+        }
+
+        public static PictureFlusher.CmdDraw strokeAlpha(PictureFlusher.RenderLayer layer, uiPaint paint, float alpha, uiMeshMesh mesh) {
+            var mat = _strokeAlphaMat.getMaterial(paint.blendMode, layer.ignoreClip);
+            _getShaderPassAndProps(layer, paint, mesh.matrix, alpha, out var pass, out var props);
+
+            return PictureFlusher.CmdDraw.create(
+                mesh: mesh,
+                pass: 0,
                 material: mat,
                 properties: props
             );
