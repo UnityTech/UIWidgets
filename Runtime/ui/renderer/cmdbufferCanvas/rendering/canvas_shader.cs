@@ -152,47 +152,29 @@ namespace Unity.UIWidgets.ui {
         static readonly MaterialByBlendModeStencilComp _texMat;
         static readonly Material _stencilMat;
         static readonly Material _filterMat;
+        static readonly Material _shadowBox;
+        static readonly Material _shadowRBox;
+
+        static Shader GetShader(string shaderName) {
+            var shader = Shader.Find(shaderName);
+            if (shader == null) {
+                throw new Exception(shaderName + " not found");
+            }
+
+            return shader;
+        }
 
         static CanvasShader() {
-            var convexFillShader = Shader.Find("UIWidgets/canvas_convexFill");
-            if (convexFillShader == null) {
-                throw new Exception("UIWidgets/canvas_convexFill not found");
-            }
-
-            var fill0Shader = Shader.Find("UIWidgets/canvas_fill0");
-            if (fill0Shader == null) {
-                throw new Exception("UIWidgets/canvas_fill0 not found");
-            }
-
-            var fill1Shader = Shader.Find("UIWidgets/canvas_fill1");
-            if (fill1Shader == null) {
-                throw new Exception("UIWidgets/canvas_fill1 not found");
-            }
-
-            var stroke0Shader = Shader.Find("UIWidgets/canvas_stroke0");
-            if (stroke0Shader == null) {
-                throw new Exception("UIWidgets/canvas_stroke0 not found");
-            }
-
-            var stroke1Shader = Shader.Find("UIWidgets/canvas_stroke1");
-            if (stroke1Shader == null) {
-                throw new Exception("UIWidgets/canvas_stroke1 not found");
-            }
-
-            var texShader = Shader.Find("UIWidgets/canvas_tex");
-            if (texShader == null) {
-                throw new Exception("UIWidgets/canvas_tex not found");
-            }
-
-            var stencilShader = Shader.Find("UIWidgets/canvas_stencil");
-            if (stencilShader == null) {
-                throw new Exception("UIWidgets/canvas_stencil not found");
-            }
-
-            var filterShader = Shader.Find("UIWidgets/canvas_filter");
-            if (filterShader == null) {
-                throw new Exception("UIWidgets/canvas_filter not found");
-            }
+            var convexFillShader = GetShader("UIWidgets/canvas_convexFill");
+            var fill0Shader = GetShader("UIWidgets/canvas_fill0");
+            var fill1Shader = GetShader("UIWidgets/canvas_fill1");
+            var stroke0Shader = GetShader("UIWidgets/canvas_stroke0");
+            var stroke1Shader = GetShader("UIWidgets/canvas_stroke1");
+            var texShader = GetShader("UIWidgets/canvas_tex");
+            var stencilShader = GetShader("UIWidgets/canvas_stencil");
+            var filterShader = GetShader("UIWidgets/canvas_filter");
+            var shadowBoxShader = GetShader("UIWidgets/ShadowBox");
+            var shadowRBoxShader = GetShader("UIWidgets/ShadowRBox");
 
             _convexFillMat = new MaterialByBlendModeStencilComp(convexFillShader);
             _fill0Mat = new MaterialByStencilComp(fill0Shader);
@@ -202,6 +184,8 @@ namespace Unity.UIWidgets.ui {
             _texMat = new MaterialByBlendModeStencilComp(texShader);
             _stencilMat = new Material(stencilShader) {hideFlags = HideFlags.HideAndDontSave};
             _filterMat = new Material(filterShader) {hideFlags = HideFlags.HideAndDontSave};
+            _shadowBox = new Material(shadowBoxShader) {hideFlags = HideFlags.HideAndDontSave};
+            _shadowRBox = new Material(shadowRBoxShader) {hideFlags = HideFlags.HideAndDontSave};
         }
 
         static readonly int _viewportId = Shader.PropertyToID("_viewport");
@@ -219,6 +203,11 @@ namespace Unity.UIWidgets.ui {
         static readonly int _mfRadiusId = Shader.PropertyToID("_mf_radius");
         static readonly int _mfImgIncId = Shader.PropertyToID("_mf_imgInc");
         static readonly int _mfKernelId = Shader.PropertyToID("_mf_kernel");
+
+
+        static readonly int _shadowBoxId = Shader.PropertyToID("box");
+        static readonly int _shadowSigma = Shader.PropertyToID("sigma");
+        static readonly int _shadowColor = Shader.PropertyToID("color");
 
         static Vector4 _colorToVector4(uiColor c) {
             return new Vector4(
@@ -508,6 +497,29 @@ namespace Unity.UIWidgets.ui {
                 material: mat,
                 properties: props,
                 layerId: renderLayer.rtID
+            );
+        }
+
+        public static PictureFlusher.CmdDraw fastShadow(PictureFlusher.RenderLayer layer, uiMeshMesh mesh,
+            bool isRect, Vector4 bound) {
+            Vector4 viewport = layer.viewport;
+            var mat = _shadowBox;
+            //if (isRect) {
+            //    mat = _shadowBox;
+            //}
+            
+            //use props to set all the uniforms !!!!!
+            var props = ObjectPool<MaterialPropertyBlockWrapper>.alloc();
+            props.SetVector(_viewportId, viewport);
+            props.SetFloat(_shadowSigma, 3f);
+            props.SetVector(_shadowBoxId, bound);
+            props.SetVector(_shadowColor, new Vector4(0, 0, 0, 1));
+            
+            return PictureFlusher.CmdDraw.create(
+                mesh: mesh,
+                pass: 0,
+                material: mat,
+                properties: props
             );
         }
     }

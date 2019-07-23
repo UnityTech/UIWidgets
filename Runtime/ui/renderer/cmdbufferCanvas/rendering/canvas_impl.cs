@@ -594,6 +594,12 @@ namespace Unity.UIWidgets.ui {
 
         void _drawPath(uiPath path, uiPaint paint) {
             D.assert(path != null);
+            
+            //draw fast shadow
+            if (paint.maskFilter != null && paint.maskFilter.Value.style == BlurStyle.fast_shadow) {
+                this._drawRRectShadow(path, paint);
+                return;
+            }
 
             if (paint.style == PaintingStyle.fill) {
                 var state = this._currentLayer.currentState;
@@ -602,7 +608,6 @@ namespace Unity.UIWidgets.ui {
                 bool convex;
                 var fillMesh = cache.getFillMesh(out convex);
                 var mesh = fillMesh.transform(state.matrix);
-
                 if (paint.maskFilter != null && paint.maskFilter.Value.sigma != 0) {
                     this._drawWithMaskFilter(mesh.bounds, paint, paint.maskFilter.Value, mesh, convex, 0, null,
                         uiRectHelper.zero, null, false, this.___drawPathDrawMeshCallback);
@@ -636,7 +641,6 @@ namespace Unity.UIWidgets.ui {
                     paint.strokeMiterLimit);
 
                 var mesh = strokenMesh.transform(state.matrix);
-
                 if (paint.maskFilter != null && paint.maskFilter.Value.sigma != 0) {
                     this._drawWithMaskFilter(mesh.bounds, paint, paint.maskFilter.Value, mesh, false, alpha, null,
                         uiRectHelper.zero, null, false, this.___drawPathDrawMeshCallback2);

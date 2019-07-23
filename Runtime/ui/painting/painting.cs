@@ -200,7 +200,7 @@ namespace Unity.UIWidgets.ui {
         solid,
         outer,
         inner,
-        shadow
+        fast_shadow
     }
 
     public class MaskFilter : IEquatable<MaskFilter> {
@@ -213,8 +213,8 @@ namespace Unity.UIWidgets.ui {
             return new MaskFilter(style, sigma);
         }
 
-        public static MaskFilter shadow(float sigma) {
-            return new MaskFilter(BlurStyle.shadow, sigma);
+        public static MaskFilter fastShadow(float sigma) {
+            return new MaskFilter(BlurStyle.fast_shadow, sigma);
         }
 
         public readonly BlurStyle style;

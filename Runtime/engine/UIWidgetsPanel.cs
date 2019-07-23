@@ -43,6 +43,8 @@ namespace Unity.UIWidgets.engine {
                 this._needsPaint = true;
             }
 
+            this._needsPaint = true;
+
             if (evt.type == EventType.Repaint) {
                 if (!this._needsPaint) {
                     return;

@@ -237,8 +237,8 @@ namespace Unity.UIWidgets.ui {
             _shadowMatrix.reset();
             canvas.setMatrix(_shadowMatrix);
             float sigma = convertRadiusToSigma(blurRadius);
-            _shadowPaint.maskFilter = MaskFilter.blur(BlurStyle.normal, sigma);
-            canvas.drawPath(_devSpacePath, _shadowPaint);
+            _shadowPaint.maskFilter = _devSpacePath.isRRect ? MaskFilter.fastShadow(sigma) : MaskFilter.blur(BlurStyle.normal, sigma);
+            //canvas.drawPath(_devSpacePath, _shadowPaint);
             canvas.restore();
 
             //spot light
@@ -256,7 +256,7 @@ namespace Unity.UIWidgets.ui {
             _shadowPaint.strokeWidth = 0;
             _shadowPaint.style = PaintingStyle.fill;
             float sigma2 = convertRadiusToSigma(radius);
-            _shadowPaint.maskFilter = MaskFilter.blur(BlurStyle.normal, sigma2);
+            _shadowPaint.maskFilter = path.isRRect ? MaskFilter.fastShadow(sigma2) : MaskFilter.blur(BlurStyle.normal, sigma2);
             canvas.drawPath(path, _shadowPaint);
 
             canvas.restore();

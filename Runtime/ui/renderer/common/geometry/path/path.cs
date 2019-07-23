@@ -2,7 +2,7 @@ using Unity.UIWidgets.foundation;
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
-    public class uiPath : PoolObject {
+    public partial class uiPath : PoolObject {
         const float _KAPPA90 = 0.5522847493f;
 
         uiList<float> _commands;
@@ -19,14 +19,16 @@ namespace Unity.UIWidgets.ui {
         bool _isRRect = false;
         public bool isRRect => this._isRRect;
         
-        void _updateRRectFlag(bool isRRect) {
+        uiPathShapeHint _shapeHint = uiPathShapeHint.Other;
+        public uiPathShapeHint shapeHint => this._shapeHint;
+        
+        void _updateRRectFlag(bool isRRect, uiPathShapeHint shapeHint = uiPathShapeHint.Other) {
             if (this._commands.Count > 0 && !this._isRRect) {
                 return;
             }
             this._isRRect = isRRect && this._hasOnlyMoveTos();
-
-            if (!this._isRRect) {
-                int s = 0;
+            if (this._isRRect) {
+                this._shapeHint = shapeHint;
             }
         }
         
@@ -155,6 +157,14 @@ namespace Unity.UIWidgets.ui {
                 this._maxY = y;
             }
         }
+        
+        public uiRect getBounds() {
+            if (this._minX >= this._maxX || this._minY >= this._maxY) {
+                return uiRectHelper.zero;
+            }
+
+            return uiRectHelper.fromLTRB(this._minX, this._minY, this._maxX, this._maxY);
+        }
 
         void _appendMoveTo(float x, float y) {
             this._commands.Add((float) uiPathCommand.moveTo);
@@ -220,7 +230,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void addRect(uiRect rect) {
-            this._updateRRectFlag(true);
+            this._updateRRectFlag(true, uiPathShapeHint.Rect);
             this._appendMoveTo(rect.left, rect.top);
             this._appendLineTo(rect.left, rect.bottom);
             this._appendLineTo(rect.right, rect.bottom);
@@ -229,7 +239,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void addRect(Rect rect) {
-            this._updateRRectFlag(true);
+            this._updateRRectFlag(true, uiPathShapeHint.Rect);
             this._appendMoveTo(rect.left, rect.top);
             this._appendLineTo(rect.left, rect.bottom);
             this._appendLineTo(rect.right, rect.bottom);
@@ -238,7 +248,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void addRRect(RRect rrect) {
-            this._updateRRectFlag(true);
+            this._updateRRectFlag(true, uiPathShapeHint.RRect);
             float w = rrect.width;
             float h = rrect.height;
             float halfw = Mathf.Abs(w) * 0.5f;
@@ -287,7 +297,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void addEllipse(float cx, float cy, float rx, float ry) {
-            this._updateRRectFlag(true);
+            this._updateRRectFlag(true, uiPathShapeHint.Oval);
             this._appendMoveTo(cx - rx, cy);
             this._appendBezierTo(cx - rx, cy + ry * _KAPPA90,
                 cx - rx * _KAPPA90, cy + ry, cx, cy + ry);
@@ -301,7 +311,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void addCircle(float cx, float cy, float r) {
-            this._updateRRectFlag(true);
+            this._updateRRectFlag(true, uiPathShapeHint.Oval);
             this.addEllipse(cx, cy, r, r);
         }
 
@@ -419,7 +429,7 @@ namespace Unity.UIWidgets.ui {
                 return uipath;
             }
             
-            uipath._updateRRectFlag(path.isRRect);
+            uipath._updateRRectFlag(path.isRRect, (uiPathShapeHint)path.shapeHint);
             
             var i = 0;
             var _commands = path.commands;
