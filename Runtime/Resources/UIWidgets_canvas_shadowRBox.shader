@@ -5,18 +5,28 @@ Shader "UIWidgets/ShadowRBox"
     {
         _SrcBlend("_SrcBlend", Int) = 1 // One
         _DstBlend("_DstBlend", Int) = 10 // OneMinusSrcAlpha
+        _StencilComp("_StencilComp", Float) = 8 // - Equal, 8 - Always 
     }
     SubShader
     {
+        ZTest Always
+        ZWrite Off
         Blend [_SrcBlend] [_DstBlend]
+        
+        Stencil {
+            Ref 128
+            Comp [_StencilComp]
+        }
+        
         Pass {
             CGPROGRAM
             
             float4 box;
-            float2 window;
+            float4 _viewport;
             float sigma;
             float4 color;
             float corner;
+            float _mat[9];
             
             struct appdata
             {
@@ -81,7 +91,14 @@ Shader "UIWidgets/ShadowRBox"
                 v2f o;
                 float padding = 3.0 * sigma;
                 o.coord = lerp(box.xy - padding, box.zw + padding, v.vertex.xy);
-                o.vertex = float4(o.coord.x * 2.0 /window.x - 1.0, o.coord.y * 2.0/window.y - 1.0, 0, 1);
+                float3x3 mat = float3x3(_mat[0], _mat[1], _mat[2], _mat[3], _mat[4], _mat[5], 0, 0, 1);
+                float2 p = mul(mat, float3(o.coord.xy, 1.0)).xy - _viewport.xy;
+                
+            #if UNITY_UV_STARTS_AT_TOP
+                o.vertex = float4(2.0 * p.x / _viewport.z - 1.0, 2.0 * p.y / _viewport.w - 1.0, 0, 1);
+            #else
+                o.vertex = float4(2.0 * p.x / _viewport.z - 1.0, 1.0 - 2.0 * p.y / _viewport.w, 0, 1);
+            #endif
                 return o;
             }
             

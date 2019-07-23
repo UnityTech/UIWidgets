@@ -7,6 +7,10 @@ namespace Unity.UIWidgets.ui {
         void _drawRRectShadow(uiPath path, uiPaint paint) {
             D.assert(path.isRRect, () => "Cannot draw Shadow for non-RRect shapes");
             D.assert(paint.style == PaintingStyle.fill, () => "Cannot draw Shadow for stroke lines");
+            var bound = path.getBounds();
+            if (!this._applyClip(bound)) {
+                return;
+            }
             
             var layer = this._currentLayer;
             var state = layer.currentState;
@@ -28,9 +32,7 @@ namespace Unity.UIWidgets.ui {
             _triangles.Add(3);
             
             var mesh = uiMeshMesh.create(state.matrix, vertices, _triangles);
-            var bound = path.getBounds();
-            Debug.Log("Draw shadow>>> " + bound.top);
-            layer.draws.Add(CanvasShader.fastShadow(layer, mesh, path.isRect, new Vector4(bound.left, bound.top, bound.right, bound.bottom)));
+            layer.draws.Add(CanvasShader.fastShadow(layer, mesh, path.isRect, new Vector4(bound.left, bound.top, bound.right, bound.bottom), paint.color));
         }
 
     }

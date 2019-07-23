@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -188,6 +189,8 @@ namespace Unity.UIWidgets.ui {
             _shadowRBox = new Material(shadowRBoxShader) {hideFlags = HideFlags.HideAndDontSave};
         }
 
+        public static Material shadowBox => _shadowBox;
+
         static readonly int _viewportId = Shader.PropertyToID("_viewport");
         static readonly int _alphaId = Shader.PropertyToID("_alpha");
         static readonly int _colorId = Shader.PropertyToID("_color");
@@ -206,8 +209,9 @@ namespace Unity.UIWidgets.ui {
 
 
         static readonly int _shadowBoxId = Shader.PropertyToID("box");
-        static readonly int _shadowSigma = Shader.PropertyToID("sigma");
-        static readonly int _shadowColor = Shader.PropertyToID("color");
+        static readonly int _shadowSigmaId = Shader.PropertyToID("sigma");
+        static readonly int _shadowColorId = Shader.PropertyToID("color");
+        static readonly int _shadowCornerId = Shader.PropertyToID("corner");
 
         static Vector4 _colorToVector4(uiColor c) {
             return new Vector4(
@@ -501,19 +505,22 @@ namespace Unity.UIWidgets.ui {
         }
 
         public static PictureFlusher.CmdDraw fastShadow(PictureFlusher.RenderLayer layer, uiMeshMesh mesh,
-            bool isRect, Vector4 bound) {
+            bool isRect, Vector4 bound, uiColor color) {
             Vector4 viewport = layer.viewport;
             var mat = _shadowBox;
-            //if (isRect) {
-            //    mat = _shadowBox;
-            //}
+            if (!isRect) {
+                mat = _shadowRBox;
+            }
             
             //use props to set all the uniforms !!!!!
             var props = ObjectPool<MaterialPropertyBlockWrapper>.alloc();
             props.SetVector(_viewportId, viewport);
-            props.SetFloat(_shadowSigma, 3f);
+            props.SetFloat(_shadowSigmaId, 3f);
             props.SetVector(_shadowBoxId, bound);
-            props.SetVector(_shadowColor, new Vector4(0, 0, 0, 1));
+            props.SetVector(_shadowColorId, _colorToVector4(color));
+            if (!isRect) {
+                props.SetFloat(_shadowCornerId, 30f);
+            }
             
             return PictureFlusher.CmdDraw.create(
                 mesh: mesh,

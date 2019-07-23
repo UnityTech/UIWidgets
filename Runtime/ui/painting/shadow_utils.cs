@@ -12,7 +12,7 @@ namespace Unity.UIWidgets.ui {
 
         const float kMaxAmbientRadius = 300 * kAmbientHeightFactor * kAmbientGeomFactor;
 
-        const bool debugShadow = true;
+        const bool debugShadow = false;
 
         static float divideAndPin(float numer, float denom, float min, float max) {
             return (numer / denom).clamp(min, max);
