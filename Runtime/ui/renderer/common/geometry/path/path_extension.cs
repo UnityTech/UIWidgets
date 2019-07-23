@@ -3,8 +3,8 @@ namespace Unity.UIWidgets.ui {
 
         public enum uiPathShapeHint {
             Rect,
-            Oval,
-            RRect,
+            Circle,
+            NaiveRRect,
             Other
         }
 
@@ -12,8 +12,8 @@ namespace Unity.UIWidgets.ui {
             get { return this._shapeHint == uiPathShapeHint.Rect; }
         }
 
-        public bool isOval {
-            get { return this._shapeHint == uiPathShapeHint.Oval; }
+        public bool isCircle {
+            get { return this._shapeHint == uiPathShapeHint.Circle; }
         }
     }
 }

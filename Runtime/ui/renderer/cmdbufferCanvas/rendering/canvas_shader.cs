@@ -504,8 +504,8 @@ namespace Unity.UIWidgets.ui {
             );
         }
 
-        public static PictureFlusher.CmdDraw fastShadow(PictureFlusher.RenderLayer layer, uiMeshMesh mesh,
-            bool isRect, Vector4 bound, uiColor color) {
+        public static PictureFlusher.CmdDraw fastShadow(PictureFlusher.RenderLayer layer, uiMeshMesh mesh, float sigma,
+            bool isRect, bool isCircle, float corner, Vector4 bound, uiColor color) {
             Vector4 viewport = layer.viewport;
             var mat = _shadowBox;
             if (!isRect) {
@@ -515,11 +515,11 @@ namespace Unity.UIWidgets.ui {
             //use props to set all the uniforms !!!!!
             var props = ObjectPool<MaterialPropertyBlockWrapper>.alloc();
             props.SetVector(_viewportId, viewport);
-            props.SetFloat(_shadowSigmaId, 3f);
+            props.SetFloat(_shadowSigmaId, sigma);
             props.SetVector(_shadowBoxId, bound);
             props.SetVector(_shadowColorId, _colorToVector4(color));
             if (!isRect) {
-                props.SetFloat(_shadowCornerId, 30f);
+                props.SetFloat(_shadowCornerId, corner);
             }
             
             return PictureFlusher.CmdDraw.create(

@@ -28,6 +28,9 @@ namespace Unity.UIWidgets.ui {
         PathShapeHint _shapeHint = PathShapeHint.Other;
         public PathShapeHint shapeHint => this._shapeHint;
 
+        float _rCorner;
+        public float rCorner => this._rCorner;
+
         public uint pathKey {
             get {
                 return this._pathKey;
@@ -41,12 +44,15 @@ namespace Unity.UIWidgets.ui {
 
         public List<float> commands => this._commands;
 
-        void _updateRRectFlag(bool isRRect, PathShapeHint shapeHint = PathShapeHint.Other) {
+        void _updateRRectFlag(bool isRRect, PathShapeHint shapeHint = PathShapeHint.Other, float corner = 0) {
             if (this._commands.Count > 0 && !this._isRRect) {
                 return;
             }
             this._isRRect = isRRect && this._hasOnlyMoveTos();
-            this._shapeHint = shapeHint;
+            if (this._isRRect) {
+                this._shapeHint = shapeHint;
+                this._rCorner = corner;
+            }
         }
         
         bool _hasOnlyMoveTos() {
@@ -514,7 +520,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void addRRect(RRect rrect) {
-            this._updateRRectFlag(true, PathShapeHint.RRect);
+            this._updateRRectFlag(rrect.isNaiveRRect, PathShapeHint.NaiveRRect, rrect.blRadiusX);
             float w = rrect.width;
             float h = rrect.height;
             float halfw = Mathf.Abs(w) * 0.5f;
@@ -550,7 +556,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void addEllipse(float cx, float cy, float rx, float ry) {
-            this._updateRRectFlag(true, PathShapeHint.Oval);
+            this._updateRRectFlag(rx == ry, PathShapeHint.Circle, rx);
             this._appendMoveTo(cx - rx, cy);
             this._appendBezierTo(cx - rx, cy + ry * _KAPPA90,
                 cx - rx * _KAPPA90, cy + ry, cx, cy + ry);
@@ -564,13 +570,11 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void addCircle(float cx, float cy, float r) {
-            this._updateRRectFlag(true, PathShapeHint.Oval);
             this.addEllipse(cx, cy, r, r);
         }
 
         public void addOval(Rect oval) {
             D.assert(oval != null);
-            this._updateRRectFlag(true, PathShapeHint.Oval);
             var center = oval.center;
             this.addEllipse(center.dx, center.dy, oval.width / 2, oval.height / 2);
         }
@@ -763,7 +767,7 @@ namespace Unity.UIWidgets.ui {
         public void addPath(Path path, Matrix3 transform = null) {
             D.assert(path != null);
             
-            this._updateRRectFlag(path.isRRect, path.shapeHint);
+            this._updateRRectFlag(path.isRRect, path.shapeHint, path.rCorner);
             var i = 0;
             while (i < path._commands.Count) {
                 var cmd = (PathCommand) path._commands[i];
@@ -1405,8 +1409,8 @@ namespace Unity.UIWidgets.ui {
     
     public enum PathShapeHint {
         Rect,
-        Oval,
-        RRect,
+        Circle,
+        NaiveRRect,
         Other
     }
 

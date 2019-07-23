@@ -22,13 +22,17 @@ namespace Unity.UIWidgets.ui {
         uiPathShapeHint _shapeHint = uiPathShapeHint.Other;
         public uiPathShapeHint shapeHint => this._shapeHint;
         
-        void _updateRRectFlag(bool isRRect, uiPathShapeHint shapeHint = uiPathShapeHint.Other) {
+        float _rCorner;
+        public float rCorner => this._rCorner;
+        
+        void _updateRRectFlag(bool isRRect, uiPathShapeHint shapeHint = uiPathShapeHint.Other, float corner = 0) {
             if (this._commands.Count > 0 && !this._isRRect) {
                 return;
             }
             this._isRRect = isRRect && this._hasOnlyMoveTos();
             if (this._isRRect) {
                 this._shapeHint = shapeHint;
+                this._rCorner = corner;
             }
         }
         
@@ -248,7 +252,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void addRRect(RRect rrect) {
-            this._updateRRectFlag(true, uiPathShapeHint.RRect);
+            this._updateRRectFlag(rrect.isNaiveRRect, uiPathShapeHint.NaiveRRect, rrect.blRadiusX);
             float w = rrect.width;
             float h = rrect.height;
             float halfw = Mathf.Abs(w) * 0.5f;
@@ -297,7 +301,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void addEllipse(float cx, float cy, float rx, float ry) {
-            this._updateRRectFlag(true, uiPathShapeHint.Oval);
+            this._updateRRectFlag(rx == ry, uiPathShapeHint.Circle, rx);
             this._appendMoveTo(cx - rx, cy);
             this._appendBezierTo(cx - rx, cy + ry * _KAPPA90,
                 cx - rx * _KAPPA90, cy + ry, cx, cy + ry);
@@ -311,7 +315,6 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void addCircle(float cx, float cy, float r) {
-            this._updateRRectFlag(true, uiPathShapeHint.Oval);
             this.addEllipse(cx, cy, r, r);
         }
 
@@ -429,7 +432,7 @@ namespace Unity.UIWidgets.ui {
                 return uipath;
             }
             
-            uipath._updateRRectFlag(path.isRRect, (uiPathShapeHint)path.shapeHint);
+            uipath._updateRRectFlag(path.isRRect, (uiPathShapeHint)path.shapeHint, path.rCorner);
             
             var i = 0;
             var _commands = path.commands;

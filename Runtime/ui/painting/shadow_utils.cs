@@ -222,8 +222,6 @@ namespace Unity.UIWidgets.ui {
             }
 
             //ambient light
-            _devSpacePath.resetAll();
-            _devSpacePath.addPath(path, viewMatrix);
             float devSpaceOutset = ambientBlurRadius(zPlaneParams.z);
             float oneOverA = ambientRecipAlpha(zPlaneParams.z);
             float blurRadius = 0.5f * devSpaceOutset * oneOverA;
@@ -232,18 +230,10 @@ namespace Unity.UIWidgets.ui {
             _shadowPaint.color = new Color(ambientColor.value);
             _shadowPaint.strokeWidth = strokeWidth;
             _shadowPaint.style = PaintingStyle.fill;
-            
-            canvas.save();
-            _shadowMatrix.reset();
-            canvas.setMatrix(_shadowMatrix);
-            float sigma = convertRadiusToSigma(blurRadius);
-            _shadowPaint.maskFilter = _devSpacePath.isRRect ? MaskFilter.fastShadow(sigma) : MaskFilter.blur(BlurStyle.normal, sigma);
-            //canvas.drawPath(_devSpacePath, _shadowPaint);
-            canvas.restore();
+            canvas.drawPath(path, _shadowPaint);
 
             //spot light
             float radius = 0.0f;
-
             if (!getSpotShadowTransform(devLightPos, lightRadius, viewMatrix, zPlaneParams, path.getBounds(),
                 _shadowMatrix, ref radius)) {
                 return;

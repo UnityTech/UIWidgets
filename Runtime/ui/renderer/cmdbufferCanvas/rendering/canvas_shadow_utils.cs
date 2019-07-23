@@ -14,6 +14,7 @@ namespace Unity.UIWidgets.ui {
             
             var layer = this._currentLayer;
             var state = layer.currentState;
+            float sigma = state.scale * paint.maskFilter.Value.sigma;
             
             var vertices = ObjectPool<uiList<Vector3>>.alloc();
             vertices.SetCapacity(4);
@@ -32,7 +33,7 @@ namespace Unity.UIWidgets.ui {
             _triangles.Add(3);
             
             var mesh = uiMeshMesh.create(state.matrix, vertices, _triangles);
-            layer.draws.Add(CanvasShader.fastShadow(layer, mesh, path.isRect, new Vector4(bound.left, bound.top, bound.right, bound.bottom), paint.color));
+            layer.draws.Add(CanvasShader.fastShadow(layer, mesh, sigma, path.isRect, path.isCircle, path.rCorner, new Vector4(bound.left, bound.top, bound.right, bound.bottom), paint.color));
         }
 
     }
