@@ -21,11 +21,11 @@ Shader "UIWidgets/ShadowRBox"
         Pass {
             CGPROGRAM
             
-            float4 box;
+            float4 _sb_box;
             float4 _viewport;
-            float sigma;
-            float4 color;
-            float corner;
+            float _sb_sigma;
+            float4 _sb_color;
+            float _sb_corner;
             float _mat[9];
             
             struct appdata
@@ -89,8 +89,8 @@ Shader "UIWidgets/ShadowRBox"
             
             v2f vert(appdata v){
                 v2f o;
-                float padding = 3.0 * sigma;
-                o.coord = lerp(box.xy - padding, box.zw + padding, v.vertex.xy);
+                float padding = 3.0 * _sb_sigma;
+                o.coord = lerp(_sb_box.xy - padding, _sb_box.zw + padding, v.vertex.xy);
                 float3x3 mat = float3x3(_mat[0], _mat[1], _mat[2], _mat[3], _mat[4], _mat[5], 0, 0, 1);
                 float2 p = mul(mat, float3(o.coord.xy, 1.0)).xy - _viewport.xy;
                 
@@ -103,8 +103,8 @@ Shader "UIWidgets/ShadowRBox"
             }
             
             float4 frag(v2f i) : SV_TARGET {
-                float4 fragColor = color;
-                fragColor.a = fragColor.a * roundedBoxShadow(box.xy, box.zw, i.coord, sigma, corner);
+                float4 fragColor = _sb_color;
+                fragColor.a = fragColor.a * roundedBoxShadow(_sb_box.xy, _sb_box.zw, i.coord, _sb_sigma, _sb_corner);
                 return fragColor;
             }
             

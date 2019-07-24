@@ -207,10 +207,10 @@ namespace Unity.UIWidgets.ui {
         static readonly int _mfKernelId = Shader.PropertyToID("_mf_kernel");
 
 
-        static readonly int _shadowBoxId = Shader.PropertyToID("box");
-        static readonly int _shadowSigmaId = Shader.PropertyToID("sigma");
-        static readonly int _shadowColorId = Shader.PropertyToID("color");
-        static readonly int _shadowCornerId = Shader.PropertyToID("corner");
+        static readonly int _shadowBoxId = Shader.PropertyToID("_sb_box");
+        static readonly int _shadowSigmaId = Shader.PropertyToID("_sb_sigma");
+        static readonly int _shadowColorId = Shader.PropertyToID("_sb_color");
+        static readonly int _shadowCornerId = Shader.PropertyToID("_sb_corner");
 
         static Vector4 _colorToVector4(uiColor c) {
             return new Vector4(
