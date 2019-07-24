@@ -210,7 +210,7 @@ namespace Unity.UIWidgets.ui {
 
             //debug shadow
             if (debugShadow) {
-                var isRRect = path.isRRect;
+                var isRRect = path.isNaiveRRect;
                 if (isRRect) {
                     ambientColor = uiColor.fromColor(Colors.red);
                     spotColor = uiColor.fromColor(Colors.red);
@@ -246,7 +246,7 @@ namespace Unity.UIWidgets.ui {
             _shadowPaint.strokeWidth = 0;
             _shadowPaint.style = PaintingStyle.fill;
             float sigma2 = convertRadiusToSigma(radius);
-            _shadowPaint.maskFilter = path.isRRect ? MaskFilter.fastShadow(sigma2) : MaskFilter.blur(BlurStyle.normal, sigma2);
+            _shadowPaint.maskFilter = path.isNaiveRRect ? MaskFilter.fastShadow(sigma2) : MaskFilter.blur(BlurStyle.normal, sigma2);
             canvas.drawPath(path, _shadowPaint);
 
             canvas.restore();
@@ -264,7 +264,6 @@ namespace Unity.UIWidgets.ui {
             float blurRadius = 0.5f * devSpaceOutset * oneOverA;
             float strokeWidth = 0.5f * (devSpaceOutset - blurRadius);
 
-            //Paint paint = new Paint {color = ambientColor, strokeWidth = strokeWidth, style = PaintingStyle.fill};
             _shadowPaint.color = new Color(ambientColor.value);
             _shadowPaint.strokeWidth = strokeWidth;
             _shadowPaint.style = PaintingStyle.fill;
@@ -280,13 +279,33 @@ namespace Unity.UIWidgets.ui {
 
             canvas.save();
             canvas.setMatrix(_shadowMatrix);
-            //Paint paint2 = new Paint {color = spotColor};
             _shadowPaint.color = new Color(spotColor.value);
             _shadowPaint.strokeWidth = 0;
             _shadowPaint.style = PaintingStyle.fill;
             canvas.drawPath(path, _shadowPaint);
 
             canvas.restore();
+        }
+        
+        /*
+         * Check whether the RRect is a naive Round-Rect, of which
+         * (1) all the corner radius are the same
+         * (2) the corner radius is not bigger than either half the width or the height of the Round Rect's bounding box
+         *
+         * Usage: The shadow of a naive Round-Rect can be easily drawn using a ShadowRBox shader, so we can use it to
+         * find all the situations that a fast shadow can be drawn to tackle the performance issue
+         */
+        public static bool isNaiveRRect(this RRect rrect) {
+                var radius = rrect.tlRadiusX;
+                return rrect.tlRadiusY == radius &&
+                       rrect.trRadiusX == radius &&
+                       rrect.trRadiusY == radius &&
+                       rrect.blRadiusX == radius &&
+                       rrect.blRadiusY == radius &&
+                       rrect.brRadiusX == radius &&
+                       rrect.brRadiusY == radius &&
+                       radius <= rrect.width / 2 &&
+                       radius <= rrect.height / 2;
         }
     }
 }

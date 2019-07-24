@@ -1,5 +1,4 @@
 using System;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -512,7 +511,6 @@ namespace Unity.UIWidgets.ui {
                 mat = _shadowRBox;
             }
             
-            //use props to set all the uniforms !!!!!
             var props = ObjectPool<MaterialPropertyBlockWrapper>.alloc();
             props.SetVector(_viewportId, viewport);
             props.SetFloat(_shadowSigmaId, sigma);

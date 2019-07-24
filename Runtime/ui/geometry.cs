@@ -1089,21 +1089,6 @@ namespace Unity.UIWidgets.ui {
             get { return this.brRadius.y; }
         }
 
-        public bool isNaiveRRect {
-            get {
-                var radius = this.tlRadiusX;
-                return this.tlRadiusY == radius &&
-                       this.trRadiusX == radius &&
-                       this.trRadiusY == radius &&
-                       this.blRadiusX == radius &&
-                       this.blRadiusY == radius &&
-                       this.brRadiusX == radius &&
-                       this.brRadiusY == radius &&
-                       radius <= this.width / 2 &&
-                       radius <= this.height / 2;
-            }
-        }
-
         public static readonly RRect zero = new RRect(0, 0, 0, 0, (Radius) null);
 
         public RRect shift(Offset offset) {

@@ -22,14 +22,15 @@ namespace Unity.UIWidgets.ui {
 
         uint _pathKey = 0;
 
-        bool _isRRect = false;
-        public bool isRRect => this._isRRect;
+        //shadow speeder relevant
+        bool _isNaiveRRect = false;
+        public bool isNaiveRRect => this._isNaiveRRect;
         
         PathShapeHint _shapeHint = PathShapeHint.Other;
         public PathShapeHint shapeHint => this._shapeHint;
 
-        float _rCorner;
-        public float rCorner => this._rCorner;
+        float _rRectCorner;
+        public float rRectCorner => this._rRectCorner;
 
         public uint pathKey {
             get {
@@ -44,14 +45,14 @@ namespace Unity.UIWidgets.ui {
 
         public List<float> commands => this._commands;
 
-        void _updateRRectFlag(bool isRRect, PathShapeHint shapeHint = PathShapeHint.Other, float corner = 0) {
-            if (this._commands.Count > 0 && !this._isRRect) {
+        void _updateRRectFlag(bool isNaiveRRect, PathShapeHint shapeHint = PathShapeHint.Other, float corner = 0) {
+            if (this._commands.Count > 0 && !this._isNaiveRRect) {
                 return;
             }
-            this._isRRect = isRRect && this._hasOnlyMoveTos();
-            if (this._isRRect) {
+            this._isNaiveRRect = isNaiveRRect && this._hasOnlyMoveTos();
+            if (this._isNaiveRRect) {
                 this._shapeHint = shapeHint;
-                this._rCorner = corner;
+                this._rRectCorner = corner;
             }
         }
         
@@ -134,7 +135,7 @@ namespace Unity.UIWidgets.ui {
 
             this._pathKey = pathGlobalKey++;
             this._cache = null;
-            this._isRRect = false;
+            this._isNaiveRRect = false;
         }
 
         internal PathCache flatten(float scale) {
@@ -520,7 +521,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void addRRect(RRect rrect) {
-            this._updateRRectFlag(rrect.isNaiveRRect, PathShapeHint.NaiveRRect, rrect.blRadiusX);
+            this._updateRRectFlag(rrect.isNaiveRRect(), PathShapeHint.NaiveRRect, rrect.blRadiusX);
             float w = rrect.width;
             float h = rrect.height;
             float halfw = Mathf.Abs(w) * 0.5f;
@@ -767,7 +768,7 @@ namespace Unity.UIWidgets.ui {
         public void addPath(Path path, Matrix3 transform = null) {
             D.assert(path != null);
             
-            this._updateRRectFlag(path.isRRect, path.shapeHint, path.rCorner);
+            this._updateRRectFlag(path.isNaiveRRect, path.shapeHint, path.rRectCorner);
             var i = 0;
             while (i < path._commands.Count) {
                 var cmd = (PathCommand) path._commands[i];

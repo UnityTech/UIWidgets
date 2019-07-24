@@ -1044,9 +1044,6 @@ namespace Unity.UIWidgets.ui {
 
                         break;
                     case CmdDraw cmd:
-                        if (cmd.material != CanvasShader.shadowBox) {
-                            
-                        }
                         this._setRenderTarget(cmdBuf, layer.rtID, ref toClear);
 
                         if (cmd.layerId != null) {

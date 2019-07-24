@@ -5,8 +5,8 @@ namespace Unity.UIWidgets.ui {
     public partial class PictureFlusher {
         
         void _drawRRectShadow(uiPath path, uiPaint paint) {
-            D.assert(path.isRRect, () => "Cannot draw Shadow for non-RRect shapes");
-            D.assert(paint.style == PaintingStyle.fill, () => "Cannot draw Shadow for stroke lines");
+            D.assert(path.isNaiveRRect, () => "Cannot draw fast Shadow for non-NaiveRRect shapes");
+            D.assert(paint.style == PaintingStyle.fill, () => "Cannot draw fast Shadow for stroke lines");
             var bound = path.getBounds();
             if (!this._applyClip(bound)) {
                 return;
@@ -33,7 +33,7 @@ namespace Unity.UIWidgets.ui {
             _triangles.Add(3);
             
             var mesh = uiMeshMesh.create(state.matrix, vertices, _triangles);
-            layer.draws.Add(CanvasShader.fastShadow(layer, mesh, sigma, path.isRect, path.isCircle, path.rCorner, new Vector4(bound.left, bound.top, bound.right, bound.bottom), paint.color));
+            layer.draws.Add(CanvasShader.fastShadow(layer, mesh, sigma, path.isRect, path.isCircle, path.rRectCorner, new Vector4(bound.left, bound.top, bound.right, bound.bottom), paint.color));
         }
 
     }
