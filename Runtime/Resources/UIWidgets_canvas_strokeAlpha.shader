@@ -25,5 +25,41 @@ Shader "UIWidgets/canvas_strokeAlpha"
             #pragma fragment frag_stroke_alpha
             ENDCG
         }
+        
+        Pass { // 1, linear
+            CGPROGRAM
+            #define UIWIDGETS_LINEAR
+            #include "UIWidgets_canvas.cginc"
+            #pragma vertex vert
+            #pragma fragment frag_stroke_alpha
+            ENDCG
+        }
+
+        Pass { // 2, radial
+            CGPROGRAM
+            #define UIWIDGETS_RADIAL
+            #include "UIWidgets_canvas.cginc"
+            #pragma vertex vert
+            #pragma fragment frag_stroke_alpha
+            ENDCG
+        }
+
+        Pass { // 3, sweep
+            CGPROGRAM
+            #define UIWIDGETS_SWEEP
+            #include "UIWidgets_canvas.cginc"
+            #pragma vertex vert
+            #pragma fragment frag_stroke_alpha
+            ENDCG
+        }
+        
+        Pass { // 4, image
+            CGPROGRAM
+            #define UIWIDGETS_IMAGE
+            #include "UIWidgets_canvas.cginc"
+            #pragma vertex vert
+            #pragma fragment frag_stroke_alpha
+            ENDCG
+        }
     }
 }

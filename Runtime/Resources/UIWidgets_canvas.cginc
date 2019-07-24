@@ -184,5 +184,5 @@ float strokeMask(float u, float v) {
 }
 
 fixed4 frag_stroke_alpha(v2f i) : SV_Target {
-    return _color * strokeMask(i.ftcoord.x, i.ftcoord.y);
+    return shader_color(i) * strokeMask(i.ftcoord.x, i.ftcoord.y);
 }

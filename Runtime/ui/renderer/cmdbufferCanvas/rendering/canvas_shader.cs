@@ -392,7 +392,7 @@ namespace Unity.UIWidgets.ui {
 
             return PictureFlusher.CmdDraw.create(
                 mesh: mesh,
-                pass: 0,
+                pass: pass,
                 material: mat,
                 properties: props
             );
