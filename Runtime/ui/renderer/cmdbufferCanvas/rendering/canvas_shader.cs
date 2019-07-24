@@ -386,9 +386,9 @@ namespace Unity.UIWidgets.ui {
             );
         }
 
-        public static PictureFlusher.CmdDraw strokeAlpha(PictureFlusher.RenderLayer layer, uiPaint paint, float alpha, uiMeshMesh mesh) {
+        public static PictureFlusher.CmdDraw strokeAlpha(PictureFlusher.RenderLayer layer, uiPaint paint, float strokeMult, uiMeshMesh mesh) {
             var mat = _strokeAlphaMat.getMaterial(paint.blendMode, layer.ignoreClip);
-            _getShaderPassAndProps(layer, paint, mesh.matrix, alpha, out var pass, out var props);
+            _getShaderPassAndProps(layer, paint, mesh.matrix, strokeMult, out var pass, out var props);
 
             return PictureFlusher.CmdDraw.create(
                 mesh: mesh,
