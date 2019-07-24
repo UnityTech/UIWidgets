@@ -391,7 +391,7 @@ namespace Unity.UIWidgets.ui {
         RenderLayer _createMaskLayer(RenderLayer parentLayer, uiRect maskBounds,
             _drawPathDrawMeshCallbackDelegate drawCallback,
             uiPaint paint, bool convex, float alpha, Texture tex, uiRect texBound, TextBlobMesh textMesh,
-            uiMeshMesh mesh, bool notEmoji) {
+            uiMeshMesh fillMesh, uiMeshMesh strokeMesh, bool notEmoji) {
             var textureWidth = Mathf.CeilToInt(maskBounds.width * this._devicePixelRatio);
             if (textureWidth < 1) {
                 textureWidth = 1;
@@ -419,7 +419,7 @@ namespace Unity.UIWidgets.ui {
             var maskState = maskLayer.states[maskLayer.states.Count - 1];
             maskState.matrix = parentState.matrix;
 
-            drawCallback.Invoke(uiPaint.shapeOnly(paint), mesh, null, convex, alpha, tex, texBound, textMesh, notEmoji);
+            drawCallback.Invoke(uiPaint.shapeOnly(paint), fillMesh, strokeMesh, convex, alpha, tex, texBound, textMesh, notEmoji);
 
             var removed = this._layers.removeLast();
             D.assert(removed == maskLayer);
@@ -481,7 +481,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         void _drawWithMaskFilter(uiRect meshBounds, uiPaint paint, uiMaskFilter maskFilter,
-            uiMeshMesh mesh, bool convex, float alpha, Texture tex, uiRect texBound, TextBlobMesh textMesh, bool notEmoji,
+            uiMeshMesh fillMesh, uiMeshMesh strokeMesh, bool convex, float alpha, Texture tex, uiRect texBound, TextBlobMesh textMesh, bool notEmoji,
             _drawPathDrawMeshCallbackDelegate drawCallback) {
             var layer = this._currentLayer;
             var clipBounds = layer.layerBounds;
@@ -495,14 +495,14 @@ namespace Unity.UIWidgets.ui {
             }
 
             if (clipBounds.isEmpty) {
-                this._drawPathDrawMeshQuit(mesh, textMesh);
+                this._drawPathDrawMeshQuit(fillMesh, strokeMesh, textMesh);
                 return;
             }
 
             var state = layer.currentState;
             float sigma = state.scale * maskFilter.sigma;
             if (sigma <= 0) {
-                this._drawPathDrawMeshQuit(mesh, textMesh);
+                this._drawPathDrawMeshQuit(fillMesh, strokeMesh, textMesh);
                 return;
             }
 
@@ -510,12 +510,12 @@ namespace Unity.UIWidgets.ui {
             var maskBounds = uiRectHelper.inflate(meshBounds, sigma3);
             maskBounds = uiRectHelper.intersect(maskBounds, uiRectHelper.inflate(clipBounds, sigma3));
             if (maskBounds.isEmpty) {
-                this._drawPathDrawMeshQuit(mesh, textMesh);
+                this._drawPathDrawMeshQuit(fillMesh, strokeMesh, textMesh);
                 return;
             }
 
             var maskLayer = this._createMaskLayer(layer, maskBounds, drawCallback, paint, convex, alpha, tex, texBound,
-                textMesh, mesh, notEmoji);
+                textMesh, fillMesh, strokeMesh, notEmoji);
 
             var blurLayer = this._createBlurLayer(maskLayer, sigma, sigma, layer);
 
@@ -591,8 +591,9 @@ namespace Unity.UIWidgets.ui {
             }
         }
 
-        void _drawPathDrawMeshQuit(uiMeshMesh mesh, TextBlobMesh textMesh) {
-            ObjectPool<uiMeshMesh>.release(mesh);
+        void _drawPathDrawMeshQuit(uiMeshMesh fillMesh, uiMeshMesh strokeMesh, TextBlobMesh textMesh) {
+            ObjectPool<uiMeshMesh>.release(fillMesh);
+            ObjectPool<uiMeshMesh>.release(strokeMesh);
             ObjectPool<TextBlobMesh>.release(textMesh);
         }
 
@@ -611,7 +612,7 @@ namespace Unity.UIWidgets.ui {
                 var smesh = strokeMesh?.transform(state.matrix);
 
                 if (paint.maskFilter != null && paint.maskFilter.Value.sigma != 0) {
-                    this._drawWithMaskFilter(fmesh.bounds, paint, paint.maskFilter.Value, fmesh, convex, 0, null,
+                    this._drawWithMaskFilter(fmesh.bounds, paint, paint.maskFilter.Value, fmesh, smesh, convex, 0, null,
                         uiRectHelper.zero, null, false, this.___drawPathDrawMeshCallback);
                     return;
                 }
@@ -646,7 +647,7 @@ namespace Unity.UIWidgets.ui {
                 var mesh = strokeMesh.transform(state.matrix);
 
                 if (paint.maskFilter != null && paint.maskFilter.Value.sigma != 0) {
-                    this._drawWithMaskFilter(mesh.bounds, paint, paint.maskFilter.Value, mesh, false, alpha, null,
+                    this._drawWithMaskFilter(mesh.bounds, paint, paint.maskFilter.Value, null, mesh, false, alpha, null,
                         uiRectHelper.zero, null, false, this.___drawPathDrawMeshCallback2);
                     return;
                 }
@@ -961,7 +962,7 @@ namespace Unity.UIWidgets.ui {
             }
 
             if (paint.maskFilter != null && paint.maskFilter.Value.sigma != 0) {
-                this._drawWithMaskFilter(textBlobBounds, paint, paint.maskFilter.Value, null, false, 0, tex,
+                this._drawWithMaskFilter(textBlobBounds, paint, paint.maskFilter.Value, null, null, false, 0, tex,
                     textBlobBounds, mesh, notEmoji, this.___drawTextDrawMeshCallback);
                 return;
             }
