@@ -401,6 +401,7 @@ namespace Unity.UIWidgets.ui {
 
         VertexUV _expandFill(float fringe) {
             float aa = fringe;
+            float woff = aa * 0.5f;
             var points = this._points;
             var paths = this._paths;
             this._calculateJoins(fringe, StrokeJoin.miter, 4.0f);
@@ -449,7 +450,13 @@ namespace Unity.UIWidgets.ui {
                 path.ifill = _vertices.Count;
                 for (var j = 0; j < path.count; j++) {
                     var p = points[path.first + j];
-                    _vertices.Add(new Vector2(p.x, p.y));
+                    if (aa > 0.0f) {
+                        _vertices.Add(new Vector2(p.x + p.dmx * woff, p.y + p.dmy * woff));
+                    }
+                    else {
+                        _vertices.Add(new Vector2(p.x, p.y));
+                    }
+
                     _uv.Add(new Vector2(0.5f, 1.0f));
                 }
 
@@ -474,7 +481,6 @@ namespace Unity.UIWidgets.ui {
                 _strokeVertices.SetCapacity(cvertices);
                 _strokeUV.SetCapacity(cvertices);
 
-                float woff = aa * 0.5f;
                 float lw = this._fillConvex ? woff : aa + woff;
                 float rw = aa - woff;
                 float lu = this._fillConvex ? 0.5f : 0.0f;
