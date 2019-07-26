@@ -213,6 +213,7 @@ namespace Unity.UIWidgets.ui {
 
         static readonly int _viewportId = Shader.PropertyToID("_viewport");
         static readonly int _alphaId = Shader.PropertyToID("_alpha");
+        static readonly int _strokeMultId = Shader.PropertyToID("_strokeMult");
         static readonly int _colorId = Shader.PropertyToID("_color");
         static readonly int _shaderMatId = Shader.PropertyToID("_shaderMat");
         static readonly int _shaderTexId = Shader.PropertyToID("_shaderTex");
@@ -258,13 +259,14 @@ namespace Unity.UIWidgets.ui {
         }
 
         static void _getShaderPassAndProps(
-            PictureFlusher.RenderLayer layer, uiPaint paint, uiMatrix3? meshMatrix, float alpha,
+            PictureFlusher.RenderLayer layer, uiPaint paint, uiMatrix3? meshMatrix, float alpha, float strokeMult,
             out int pass, out MaterialPropertyBlockWrapper props) {
             Vector4 viewport = layer.viewport;
 
             props = ObjectPool<MaterialPropertyBlockWrapper>.alloc();
             props.SetVector(_viewportId, viewport);
             props.SetFloat(_alphaId, alpha);
+            props.SetFloat(_strokeMultId, strokeMult);
 
             switch (paint.shader) {
                 case null:
@@ -315,7 +317,7 @@ namespace Unity.UIWidgets.ui {
         public static PictureFlusher.CmdDraw convexFill(PictureFlusher.RenderLayer layer, uiPaint paint,
             uiMeshMesh mesh) {
             var mat = _convexFillMat.getMaterial(paint.blendMode, layer.ignoreClip);
-            _getShaderPassAndProps(layer, paint, mesh.matrix, 1.0f, out var pass, out var props);
+            _getShaderPassAndProps(layer, paint, mesh.matrix, 1.0f, 0.0f, out var pass, out var props);
 
             return PictureFlusher.CmdDraw.create(
                 mesh: mesh,
@@ -344,7 +346,7 @@ namespace Unity.UIWidgets.ui {
         public static PictureFlusher.CmdDraw fill1(PictureFlusher.RenderLayer layer, uiPaint paint,
             uiMeshMesh mesh) {
             var mat = _fill1Mat.getMaterial(paint.blendMode);
-            _getShaderPassAndProps(layer, paint, mesh.matrix, 1.0f, out var pass, out var props);
+            _getShaderPassAndProps(layer, paint, mesh.matrix, 1.0f, 0.0f, out var pass, out var props);
 
             var ret = PictureFlusher.CmdDraw.create(
                 mesh: mesh.boundsMesh,
@@ -360,7 +362,7 @@ namespace Unity.UIWidgets.ui {
         public static PictureFlusher.CmdDraw stroke0(PictureFlusher.RenderLayer layer, uiPaint paint,
             float alpha, uiMeshMesh mesh) {
             var mat = _stroke0Mat.getMaterial(paint.blendMode, layer.ignoreClip);
-            _getShaderPassAndProps(layer, paint, mesh.matrix, alpha, out var pass, out var props);
+            _getShaderPassAndProps(layer, paint, mesh.matrix, alpha, 0.0f, out var pass, out var props);
 
             return PictureFlusher.CmdDraw.create(
                 mesh: mesh,
@@ -386,9 +388,9 @@ namespace Unity.UIWidgets.ui {
             );
         }
 
-        public static PictureFlusher.CmdDraw strokeAlpha(PictureFlusher.RenderLayer layer, uiPaint paint, float strokeMult, uiMeshMesh mesh) {
+        public static PictureFlusher.CmdDraw strokeAlpha(PictureFlusher.RenderLayer layer, uiPaint paint, float alpha, float strokeMult, uiMeshMesh mesh) {
             var mat = _strokeAlphaMat.getMaterial(paint.blendMode, layer.ignoreClip);
-            _getShaderPassAndProps(layer, paint, mesh.matrix, strokeMult, out var pass, out var props);
+            _getShaderPassAndProps(layer, paint, mesh.matrix, alpha, strokeMult, out var pass, out var props);
 
             return PictureFlusher.CmdDraw.create(
                 mesh: mesh,
@@ -450,7 +452,7 @@ namespace Unity.UIWidgets.ui {
         public static PictureFlusher.CmdDraw tex(PictureFlusher.RenderLayer layer, uiPaint paint,
             uiMeshMesh mesh, Image image) {
             var mat = _texMat.getMaterial(paint.blendMode, layer.ignoreClip);
-            _getShaderPassAndProps(layer, paint, mesh.matrix, 1.0f, out var pass, out var props);
+            _getShaderPassAndProps(layer, paint, mesh.matrix, 1.0f, 0.0f, out var pass, out var props);
 
             image.texture.filterMode = paint.filterMode;
             props.SetTexture(_texId, image.texture);
@@ -468,7 +470,7 @@ namespace Unity.UIWidgets.ui {
         public static PictureFlusher.CmdDraw texRT(PictureFlusher.RenderLayer layer, uiPaint paint,
             uiMeshMesh mesh, PictureFlusher.RenderLayer renderLayer) {
             var mat = _texMat.getMaterial(paint.blendMode, layer.ignoreClip);
-            _getShaderPassAndProps(layer, paint, mesh.matrix, 1.0f, out var pass, out var props);
+            _getShaderPassAndProps(layer, paint, mesh.matrix, 1.0f, 0.0f, out var pass, out var props);
             props.SetInt(_texModeId, 1); // pre alpha
 
             return PictureFlusher.CmdDraw.create(
@@ -494,7 +496,7 @@ namespace Unity.UIWidgets.ui {
             uiMeshMesh mesh, TextBlobMesh textMesh, Texture tex) {
             var mat = _texMat.getMaterial(paint.blendMode, layer.ignoreClip);
             var meshMatrix = mesh != null ? mesh.matrix : textMesh.matrix;
-            _getShaderPassAndProps(layer, paint, meshMatrix, 1.0f, out var pass, out var props);
+            _getShaderPassAndProps(layer, paint, meshMatrix, 1.0f, 0.0f, out var pass, out var props);
             tex.filterMode = paint.filterMode;
             props.SetTexture(_texId, tex);
             props.SetInt(_texModeId, 2); // alpha only

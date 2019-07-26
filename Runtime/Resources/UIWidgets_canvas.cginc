@@ -3,6 +3,7 @@ float _mat[9];
 
 half4 _color;
 fixed _alpha;
+fixed _strokeMult;
 half4x4 _shaderMat;
 sampler2D _shaderTex;
 half4 _leftColor;
@@ -180,7 +181,7 @@ fixed4 frag_mf (v2f i) : SV_Target {
 }
 
 float strokeMask(float u, float v) {
-    return min(1.0, (1.0 - abs(u * 2.0 - 1.0)) * _alpha) * min(1.0, v);
+    return min(1.0, (1.0 - abs(u * 2.0 - 1.0)) * 1.0) * min(1.0, v);
 }
 
 fixed4 frag_stroke_alpha(v2f i) : SV_Target {

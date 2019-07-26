@@ -548,7 +548,7 @@ namespace Unity.UIWidgets.ui {
             }
 
             if (strokeMesh != null) {
-                layer.draws.Add(CanvasShader.strokeAlpha(layer, p, strokeMult, strokeMesh));
+                layer.draws.Add(CanvasShader.strokeAlpha(layer, p, alpha, strokeMult, strokeMesh));
             }
         }
 
@@ -561,7 +561,7 @@ namespace Unity.UIWidgets.ui {
 
             var layer = this._currentLayer;
 
-            layer.draws.Add(CanvasShader.strokeAlpha(layer, p, strokeMult, strokeMesh));
+            layer.draws.Add(CanvasShader.strokeAlpha(layer, p, alpha, strokeMult, strokeMesh));
             layer.draws.Add(CanvasShader.stroke1(layer, strokeMesh.duplicate()));
         }
 
@@ -618,7 +618,7 @@ namespace Unity.UIWidgets.ui {
                     return;
                 }
 
-                this._drawPathDrawMeshCallback(paint, fmesh, smesh, convex, 0, strokeMult, null, uiRectHelper.zero, null, false);
+                this._drawPathDrawMeshCallback(paint, fmesh, smesh, convex, 1.0f, strokeMult, null, uiRectHelper.zero, null, false);
             }
             else {
                 var state = this._currentLayer.currentState;
