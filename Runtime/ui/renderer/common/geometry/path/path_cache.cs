@@ -641,10 +641,10 @@ namespace Unity.UIWidgets.ui {
                     }
 
                     if (path.nstroke > 0) {
-                        strokeIndices.Add(path.nstroke - 1);
-                        strokeIndices.Add(path.nstroke - 2);
+                        strokeIndices.Add(path.istroke + path.nstroke - 1);
+                        strokeIndices.Add(path.istroke + path.nstroke - 2);
                         strokeIndices.Add(path.istroke);
-                        strokeIndices.Add(path.nstroke - 1);
+                        strokeIndices.Add(path.istroke + path.nstroke - 1);
                         strokeIndices.Add(path.istroke);
                         strokeIndices.Add(path.istroke + 1);
                         for (var j = 2; j < path.nstroke; j++) {
