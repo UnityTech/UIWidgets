@@ -31,6 +31,7 @@ namespace Unity.UIWidgets.ui {
         StrokeCap _lineCap;
         StrokeJoin _lineJoin;
         float _miterLimit;
+        float _fringe;
 
         public static uiPathCache create(float scale) {
             uiPathCache newPathCache = ObjectPool<uiPathCache>.alloc();
@@ -516,7 +517,9 @@ namespace Unity.UIWidgets.ui {
 
         public uiMeshMesh computeStrokeMesh(float strokeWidth, float fringe, StrokeCap lineCap, StrokeJoin lineJoin, float miterLimit) {
             if (this._strokeMesh != null &&
+                this._fillMesh == null && // Ensure that the cached stroke mesh was not calculated in computeFillMesh
                 this._strokeWidth == strokeWidth &&
+                this._fringe == fringe &&
                 this._lineCap == lineCap &&
                 this._lineJoin == lineJoin &&
                 this._miterLimit == miterLimit) {
@@ -568,7 +571,10 @@ namespace Unity.UIWidgets.ui {
 
             ObjectPool<uiMeshMesh>.release(this._strokeMesh);
             this._strokeMesh = uiMeshMesh.create(null, verticesUV.strokeVertices, indices, verticesUV.strokeUV);
+            ObjectPool<uiMeshMesh>.release(this._fillMesh);
+            this._fillMesh = null;
             this._strokeWidth = strokeWidth;
+            this._fringe = fringe;
             this._lineCap = lineCap;
             this._lineJoin = lineJoin;
             this._miterLimit = miterLimit;
@@ -576,7 +582,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void computeFillMesh(float fringe, out bool convex) {
-            if (this._fillMesh != null && (fringe != 0.0f || this._strokeMesh != null)) {
+            if (this._fillMesh != null && (fringe != 0.0f || this._strokeMesh != null) && this._fringe == fringe) {
                 convex = this._fillConvex;
                 return;
             }
@@ -670,6 +676,7 @@ namespace Unity.UIWidgets.ui {
 
             var mesh = uiMeshMesh.create(null, verticesUV.fillVertices, indices, verticesUV.fillUV);
             this._fillMesh = mesh;
+            this._fringe = fringe;
         }
     }
 }
