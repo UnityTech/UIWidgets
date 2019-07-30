@@ -549,7 +549,7 @@ namespace Unity.UIWidgets.ui {
 
             if (strokeMesh != null) {
                 layer.draws.Add(CanvasShader.strokeAlpha(layer, p, alpha, strokeMult, strokeMesh));
-                layer.draws.Add(CanvasShader.stroke1(layer, strokeMesh));
+                layer.draws.Add(CanvasShader.stroke1(layer, strokeMesh.duplicate()));
             }
         }
 
