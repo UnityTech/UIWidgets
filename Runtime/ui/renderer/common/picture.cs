@@ -213,12 +213,13 @@ namespace Unity.UIWidgets.ui {
                         }
 
                         var cache = path.flatten(scale * devicePixelRatio);
-                        var strokenMesh = cache.computeStrokeMesh(
+                        cache.computeStrokeMesh(
                             strokeWidth / scale * 0.5f,
                             0.0f,
                             paint.strokeCap,
                             paint.strokeJoin,
                             paint.strokeMiterLimit);
+                        var strokenMesh = cache.strokeMesh;
 
                         mesh = strokenMesh.transform(state.xform);
                     }

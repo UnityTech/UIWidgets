@@ -390,7 +390,8 @@ namespace Unity.UIWidgets.ui {
 
         RenderLayer _createMaskLayer(RenderLayer parentLayer, uiRect maskBounds,
             _drawPathDrawMeshCallbackDelegate drawCallback,
-            uiPaint paint, bool convex, float alpha, float strokeMult, Texture tex, uiRect texBound, TextBlobMesh textMesh,
+            uiPaint paint, bool convex, float alpha, float strokeMult, Texture tex, uiRect texBound,
+            TextBlobMesh textMesh,
             uiMeshMesh fillMesh, uiMeshMesh strokeMesh, bool notEmoji) {
             var textureWidth = Mathf.CeilToInt(maskBounds.width * this._devicePixelRatio);
             if (textureWidth < 1) {
@@ -419,7 +420,8 @@ namespace Unity.UIWidgets.ui {
             var maskState = maskLayer.states[maskLayer.states.Count - 1];
             maskState.matrix = parentState.matrix;
 
-            drawCallback.Invoke(uiPaint.shapeOnly(paint), fillMesh, strokeMesh, convex, alpha, strokeMult, tex, texBound, textMesh, notEmoji);
+            drawCallback.Invoke(uiPaint.shapeOnly(paint), fillMesh, strokeMesh, convex, alpha, strokeMult, tex,
+                texBound, textMesh, notEmoji);
 
             var removed = this._layers.removeLast();
             D.assert(removed == maskLayer);
@@ -481,7 +483,8 @@ namespace Unity.UIWidgets.ui {
         }
 
         void _drawWithMaskFilter(uiRect meshBounds, uiPaint paint, uiMaskFilter maskFilter,
-            uiMeshMesh fillMesh, uiMeshMesh strokeMesh, bool convex, float alpha, float strokeMult, Texture tex, uiRect texBound, TextBlobMesh textMesh, bool notEmoji,
+            uiMeshMesh fillMesh, uiMeshMesh strokeMesh, bool convex, float alpha, float strokeMult, Texture tex,
+            uiRect texBound, TextBlobMesh textMesh, bool notEmoji,
             _drawPathDrawMeshCallbackDelegate drawCallback) {
             var layer = this._currentLayer;
             var clipBounds = layer.layerBounds;
@@ -514,7 +517,8 @@ namespace Unity.UIWidgets.ui {
                 return;
             }
 
-            var maskLayer = this._createMaskLayer(layer, maskBounds, drawCallback, paint, convex, alpha, strokeMult, tex, texBound,
+            var maskLayer = this._createMaskLayer(layer, maskBounds, drawCallback, paint, convex, alpha, strokeMult,
+                tex, texBound,
                 textMesh, fillMesh, strokeMesh, notEmoji);
 
             var blurLayer = this._createBlurLayer(maskLayer, sigma, sigma, layer);
@@ -528,13 +532,16 @@ namespace Unity.UIWidgets.ui {
             layer.draws.Add(CanvasShader.texRT(layer, paint, blurMesh, blurLayer));
         }
 
-        delegate void _drawPathDrawMeshCallbackDelegate(uiPaint p, uiMeshMesh fillMesh, uiMeshMesh strokeMesh, bool convex, float alpha, float strokeMult,
+        delegate void _drawPathDrawMeshCallbackDelegate(uiPaint p, uiMeshMesh fillMesh, uiMeshMesh strokeMesh,
+            bool convex, float alpha, float strokeMult,
             Texture tex, uiRect textBlobBounds, TextBlobMesh textMesh, bool notEmoji);
 
-        void _drawPathDrawMeshCallback(uiPaint p, uiMeshMesh fillMesh, uiMeshMesh strokeMesh, bool convex, float alpha, float strokeMult, Texture tex,
+        void _drawPathDrawMeshCallback(uiPaint p, uiMeshMesh fillMesh, uiMeshMesh strokeMesh, bool convex, float alpha,
+            float strokeMult, Texture tex,
             uiRect textBlobBounds, TextBlobMesh textMesh, bool notEmoji) {
             if (!this._applyClip(fillMesh.bounds)) {
                 ObjectPool<uiMeshMesh>.release(fillMesh);
+                ObjectPool<uiMeshMesh>.release(strokeMesh);
                 return;
             }
 
@@ -553,7 +560,8 @@ namespace Unity.UIWidgets.ui {
             }
         }
 
-        void _drawPathDrawMeshCallback2(uiPaint p, uiMeshMesh fillMesh, uiMeshMesh strokeMesh, bool convex, float alpha, float strokeMult, Texture tex,
+        void _drawPathDrawMeshCallback2(uiPaint p, uiMeshMesh fillMesh, uiMeshMesh strokeMesh, bool convex, float alpha,
+            float strokeMult, Texture tex,
             uiRect textBlobBounds, TextBlobMesh textMesh, bool notEmoji) {
             if (!this._applyClip(strokeMesh.bounds)) {
                 ObjectPool<uiMeshMesh>.release(strokeMesh);
@@ -566,7 +574,8 @@ namespace Unity.UIWidgets.ui {
             layer.draws.Add(CanvasShader.stroke1(layer, strokeMesh.duplicate()));
         }
 
-        void _drawTextDrawMeshCallback(uiPaint p, uiMeshMesh fillMesh, uiMeshMesh strokeMesh, bool convex, float alpha, float strokeMult, Texture tex,
+        void _drawTextDrawMeshCallback(uiPaint p, uiMeshMesh fillMesh, uiMeshMesh strokeMesh, bool convex, float alpha,
+            float strokeMult, Texture tex,
             uiRect textBlobBounds, TextBlobMesh textMesh, bool notEmoji) {
             if (!this._applyClip(textBlobBounds)) {
                 ObjectPool<TextBlobMesh>.release(textMesh);
@@ -614,12 +623,14 @@ namespace Unity.UIWidgets.ui {
                 float strokeMult = 1.0f;
 
                 if (paint.maskFilter != null && paint.maskFilter.Value.sigma != 0) {
-                    this._drawWithMaskFilter(fmesh.bounds, paint, paint.maskFilter.Value, fmesh, smesh, convex, 0, strokeMult, null,
+                    this._drawWithMaskFilter(fmesh.bounds, paint, paint.maskFilter.Value, fmesh, smesh, convex, 0,
+                        strokeMult, null,
                         uiRectHelper.zero, null, false, this.___drawPathDrawMeshCallback);
                     return;
                 }
 
-                this._drawPathDrawMeshCallback(paint, fmesh, smesh, convex, 1.0f, strokeMult, null, uiRectHelper.zero, null, false);
+                this._drawPathDrawMeshCallback(paint, fmesh, smesh, convex, 1.0f, strokeMult, null, uiRectHelper.zero,
+                    null, false);
             }
             else {
                 var state = this._currentLayer.currentState;
@@ -642,22 +653,25 @@ namespace Unity.UIWidgets.ui {
 
                 var cache = path.flatten(state.scale * this._devicePixelRatio);
 
-                var strokeMesh = cache.computeStrokeMesh(
+                cache.computeStrokeMesh(
                     strokeWidth,
                     this._fringeWidth,
                     paint.strokeCap,
                     paint.strokeJoin,
                     paint.strokeMiterLimit);
+                var strokeMesh = cache.strokeMesh;
 
                 var mesh = strokeMesh.transform(state.matrix);
 
                 if (paint.maskFilter != null && paint.maskFilter.Value.sigma != 0) {
-                    this._drawWithMaskFilter(mesh.bounds, paint, paint.maskFilter.Value, null, mesh, false, alpha, strokeMult, null,
+                    this._drawWithMaskFilter(mesh.bounds, paint, paint.maskFilter.Value, null, mesh, false, alpha,
+                        strokeMult, null,
                         uiRectHelper.zero, null, false, this.___drawPathDrawMeshCallback2);
                     return;
                 }
 
-                this._drawPathDrawMeshCallback2(paint, null, mesh, false, alpha, strokeMult, null, uiRectHelper.zero, null, false);
+                this._drawPathDrawMeshCallback2(paint, null, mesh, false, alpha, strokeMult, null, uiRectHelper.zero,
+                    null, false);
             }
         }
 
@@ -741,6 +755,7 @@ namespace Unity.UIWidgets.ui {
                         this._saveLayer(uiRectHelper.fromRect(cmd.rect), uiPaint.fromPaint(cmd.paint));
                         break;
                     }
+
                     case DrawRestore _: {
                         saveCount--;
                         if (saveCount < 0) {
@@ -750,26 +765,32 @@ namespace Unity.UIWidgets.ui {
                         this._restore();
                         break;
                     }
+
                     case DrawTranslate cmd: {
                         this._translate(cmd.dx, cmd.dy);
                         break;
                     }
+
                     case DrawScale cmd: {
                         this._scale(cmd.sx, cmd.sy);
                         break;
                     }
+
                     case DrawRotate cmd: {
                         this._rotate(cmd.radians, uiOffset.fromOffset(cmd.offset));
                         break;
                     }
+
                     case DrawSkew cmd: {
                         this._skew(cmd.sx, cmd.sy);
                         break;
                     }
+
                     case DrawConcat cmd: {
                         this._concat(uiMatrix3.fromMatrix3(cmd.matrix));
                         break;
                     }
+
                     case DrawResetMatrix _:
                         this._resetMatrix();
                         break;
@@ -777,51 +798,61 @@ namespace Unity.UIWidgets.ui {
                         this._setMatrix(uiMatrix3.fromMatrix3(cmd.matrix));
                         break;
                     }
+
                     case DrawClipRect cmd: {
                         this._clipRect(cmd.rect);
                         break;
                     }
+
                     case DrawClipRRect cmd: {
                         this._clipRRect(cmd.rrect);
                         break;
                     }
+
                     case DrawClipPath cmd: {
                         var uipath = uiPath.fromPath(cmd.path);
                         this._clipPath(uipath);
                         uiPathCacheManager.putToCache(uipath);
                         break;
                     }
+
                     case DrawPath cmd: {
                         var uipath = uiPath.fromPath(cmd.path);
                         this._drawPath(uipath, uiPaint.fromPaint(cmd.paint));
                         uiPathCacheManager.putToCache(uipath);
                         break;
                     }
+
                     case DrawImage cmd: {
                         this._drawImage(cmd.image, (uiOffset.fromOffset(cmd.offset)).Value,
                             uiPaint.fromPaint(cmd.paint));
                         break;
                     }
+
                     case DrawImageRect cmd: {
                         this._drawImageRect(cmd.image, uiRectHelper.fromRect(cmd.src), uiRectHelper.fromRect(cmd.dst),
                             uiPaint.fromPaint(cmd.paint));
                         break;
                     }
+
                     case DrawImageNine cmd: {
                         this._drawImageNine(cmd.image, uiRectHelper.fromRect(cmd.src),
                             uiRectHelper.fromRect(cmd.center), uiRectHelper.fromRect(cmd.dst),
                             uiPaint.fromPaint(cmd.paint));
                         break;
                     }
+
                     case DrawPicture cmd: {
                         this._drawPicture(cmd.picture);
                         break;
                     }
+
                     case DrawTextBlob cmd: {
                         this._drawTextBlob(cmd.textBlob, (uiOffset.fromOffset(cmd.offset)).Value,
                             uiPaint.fromPaint(cmd.paint));
                         break;
                     }
+
                     default:
                         throw new Exception("unknown drawCmd: " + drawCmd);
                 }
@@ -856,6 +887,7 @@ namespace Unity.UIWidgets.ui {
                         this._saveLayer(cmd.rect.Value, cmd.paint);
                         break;
                     }
+
                     case uiDrawRestore _: {
                         saveCount--;
                         if (saveCount < 0) {
@@ -865,26 +897,32 @@ namespace Unity.UIWidgets.ui {
                         this._restore();
                         break;
                     }
+
                     case uiDrawTranslate cmd: {
                         this._translate(cmd.dx, cmd.dy);
                         break;
                     }
+
                     case uiDrawScale cmd: {
                         this._scale(cmd.sx, cmd.sy);
                         break;
                     }
+
                     case uiDrawRotate cmd: {
                         this._rotate(cmd.radians, cmd.offset);
                         break;
                     }
+
                     case uiDrawSkew cmd: {
                         this._skew(cmd.sx, cmd.sy);
                         break;
                     }
+
                     case uiDrawConcat cmd: {
                         this._concat(cmd.matrix.Value);
                         break;
                     }
+
                     case uiDrawResetMatrix _:
                         this._resetMatrix();
                         break;
@@ -892,42 +930,52 @@ namespace Unity.UIWidgets.ui {
                         this._setMatrix(cmd.matrix.Value);
                         break;
                     }
+
                     case uiDrawClipRect cmd: {
                         this._clipUIRect(cmd.rect.Value);
                         break;
                     }
+
                     case uiDrawClipRRect cmd: {
                         this._clipRRect(cmd.rrect);
                         break;
                     }
+
                     case uiDrawClipPath cmd: {
                         this._clipPath(cmd.path);
                         break;
                     }
+
                     case uiDrawPath cmd: {
                         this._drawPath(cmd.path, cmd.paint);
                         break;
                     }
+
                     case uiDrawImage cmd: {
                         this._drawImage(cmd.image, cmd.offset.Value, cmd.paint);
                         break;
                     }
+
                     case uiDrawImageRect cmd: {
                         this._drawImageRect(cmd.image, cmd.src, cmd.dst.Value, cmd.paint);
                         break;
                     }
+
                     case uiDrawImageNine cmd: {
                         this._drawImageNine(cmd.image, cmd.src, cmd.center.Value, cmd.dst.Value, cmd.paint);
                         break;
                     }
+
                     case uiDrawPicture cmd: {
                         this._drawPicture(cmd.picture);
                         break;
                     }
+
                     case uiDrawTextBlob cmd: {
                         this._drawTextBlob(cmd.textBlob, cmd.offset.Value, cmd.paint);
                         break;
                     }
+
                     default:
                         throw new Exception("unknown drawCmd: " + drawCmd);
                 }
@@ -1005,6 +1053,8 @@ namespace Unity.UIWidgets.ui {
                 this._lastScissor = null;
                 this._layers.Clear();
             }
+
+            AllocDebugger.onFrameEnd();
         }
 
         int _lastRtID;

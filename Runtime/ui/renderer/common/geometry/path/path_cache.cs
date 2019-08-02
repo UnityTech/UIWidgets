@@ -12,14 +12,14 @@ namespace Unity.UIWidgets.ui {
 
         float _scale;
 
+        bool _fillConvex;
+
         //mesh cache
         uiMeshMesh _fillMesh;
 
         public uiMeshMesh fillMesh {
             get { return this._fillMesh; }
         }
-
-        bool _fillConvex;
 
         uiMeshMesh _strokeMesh;
 
@@ -267,14 +267,7 @@ namespace Unity.UIWidgets.ui {
             }
         }
 
-        struct VertexUV {
-            public uiList<Vector3> fillVertices;
-            public uiList<Vector2> fillUV;
-            public uiList<Vector3> strokeVertices;
-            public uiList<Vector2> strokeUV;
-        }
-
-        VertexUV _expandStroke(float w, float fringe, StrokeCap lineCap, StrokeJoin lineJoin, float miterLimit) {
+        uiVertexUV _expandStroke(float w, float fringe, StrokeCap lineCap, StrokeJoin lineJoin, float miterLimit) {
             float aa = fringe;
             float u0 = 0.0f, u1 = 1.0f;
             int ncap = 0;
@@ -394,13 +387,13 @@ namespace Unity.UIWidgets.ui {
             }
             D.assert(_uv.Count == _vertices.Count);
 
-            return new VertexUV {
+            return new uiVertexUV {
                 strokeVertices = _vertices,
                 strokeUV = _uv,
             };
         }
 
-        VertexUV _expandFill(float fringe) {
+        uiVertexUV _expandFill(float fringe) {
             float aa = fringe;
             float woff = aa * 0.5f;
             var points = this._points;
@@ -507,7 +500,7 @@ namespace Unity.UIWidgets.ui {
                 }
             }
 
-            return new VertexUV {
+            return new uiVertexUV {
                 fillVertices = _vertices,
                 fillUV = _uv,
                 strokeVertices = _strokeVertices,
@@ -515,7 +508,7 @@ namespace Unity.UIWidgets.ui {
             };
         }
 
-        public uiMeshMesh computeStrokeMesh(float strokeWidth, float fringe, StrokeCap lineCap, StrokeJoin lineJoin, float miterLimit) {
+        public void computeStrokeMesh(float strokeWidth, float fringe, StrokeCap lineCap, StrokeJoin lineJoin, float miterLimit) {
             if (this._strokeMesh != null &&
                 this._fillMesh == null && // Ensure that the cached stroke mesh was not calculated in computeFillMesh
                 this._strokeWidth == strokeWidth &&
@@ -523,7 +516,7 @@ namespace Unity.UIWidgets.ui {
                 this._lineCap == lineCap &&
                 this._lineJoin == lineJoin &&
                 this._miterLimit == miterLimit) {
-                return this._strokeMesh;
+                return;
             }
 
             var verticesUV = this._expandStroke(strokeWidth, fringe, lineCap, lineJoin, miterLimit);
@@ -578,7 +571,7 @@ namespace Unity.UIWidgets.ui {
             this._lineCap = lineCap;
             this._lineJoin = lineJoin;
             this._miterLimit = miterLimit;
-            return this._strokeMesh;
+            return;
         }
 
         public void computeFillMesh(float fringe, out bool convex) {

@@ -9,7 +9,7 @@ Shader "UIWidgets/canvas_strokeAlpha"
     SubShader {
         ZTest Always
         ZWrite Off
-        Blend One OneMinusSrcAlpha
+        Blend [_SrcBlend] [_DstBlend]
         
         Stencil {
             Ref 128

@@ -76,6 +76,13 @@ namespace Unity.UIWidgets.ui {
         }
     }
 
+    struct uiVertexUV {
+        public uiList<Vector3> fillVertices;
+        public uiList<Vector2> fillUV;
+        public uiList<Vector3> strokeVertices;
+        public uiList<Vector2> strokeUV;
+    }
+
     static class uiPathUtils {
         public static bool ptEquals(float x1, float y1, float x2, float y2, float tol) {
             float dx = x2 - x1;
