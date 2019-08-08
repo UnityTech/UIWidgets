@@ -609,6 +609,12 @@ namespace Unity.UIWidgets.ui {
 
         void _drawPath(uiPath path, uiPaint paint) {
             D.assert(path != null);
+            
+            //draw fast shadow
+            if (paint.maskFilter != null && paint.maskFilter.Value.style == BlurStyle.fast_shadow) {
+                this._drawRRectShadow(path, paint);
+                return;
+            }
 
             if (paint.style == PaintingStyle.fill) {
                 var state = this._currentLayer.currentState;

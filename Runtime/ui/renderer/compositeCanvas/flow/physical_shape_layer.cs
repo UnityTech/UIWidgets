@@ -82,7 +82,7 @@ namespace Unity.UIWidgets.flow {
         const float kAmbientAlpha = 0.039f;
         const float kLightHeight = 600f;
         const float kLightRadius = 800f;
-        const float kSpotAlpha = ShadowUtils.kUseFastShadow ? 0.1f : 0.25f;
+        const float kSpotAlpha = 0.25f;
 
         public static void drawShadow(Canvas canvas, Path path, Color color, float elevation, bool transparentOccluder,
             float dpr) {

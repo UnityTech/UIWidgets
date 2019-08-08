@@ -27,6 +27,16 @@ namespace Unity.UIWidgets.ui {
 
         uint _pathKey = 0;
 
+        //shadow speeder relevant
+        bool _isNaiveRRect = false;
+        public bool isNaiveRRect => this._isNaiveRRect;
+        
+        PathShapeHint _shapeHint = PathShapeHint.Other;
+        public PathShapeHint shapeHint => this._shapeHint;
+
+        float _rRectCorner;
+        public float rRectCorner => this._rRectCorner;
+
         public uint pathKey {
             get { return this._pathKey; }
         }
@@ -38,6 +48,43 @@ namespace Unity.UIWidgets.ui {
 
         public List<float> commands {
             get { return this._commands; }
+        }
+
+        void _updateRRectFlag(bool isNaiveRRect, PathShapeHint shapeHint = PathShapeHint.Other, float corner = 0) {
+            if (this._commands.Count > 0 && !this._isNaiveRRect) {
+                return;
+            }
+            this._isNaiveRRect = isNaiveRRect && this._hasOnlyMoveTos();
+            if (this._isNaiveRRect) {
+                this._shapeHint = shapeHint;
+                this._rRectCorner = corner;
+            }
+        }
+        
+        bool _hasOnlyMoveTos() {
+            var i = 0;
+            while (i < this._commands.Count) {
+                var cmd = (PathCommand) this._commands[i];
+                switch (cmd) {
+                    case PathCommand.moveTo: 
+                        i += 3;
+                        break;
+                    case PathCommand.lineTo:
+                        return false;
+                    case PathCommand.bezierTo:
+                        return false;
+                    case PathCommand.close:
+                        i++;
+                        break;
+                    case PathCommand.winding:
+                        i += 2;
+                        break;
+                    default:
+                        return false;
+                }
+            }
+
+            return true;
         }
 
         public override string ToString() {
@@ -93,6 +140,7 @@ namespace Unity.UIWidgets.ui {
 
             this._pathKey = pathGlobalKey++;
             this._cache = null;
+            this._isNaiveRRect = false;
         }
 
         internal PathCache flatten(float scale) {
@@ -246,21 +294,24 @@ namespace Unity.UIWidgets.ui {
             var x0 = this._commandx;
             var y0 = this._commandy;
 
+            this._updateRRectFlag(false);
             this._appendLineTo(x + x0, y + y0);
         }
 
         public void lineTo(float x, float y) {
+            this._updateRRectFlag(false);
             this._appendLineTo(x, y);
         }
 
         public void cubicTo(float c1x, float c1y, float c2x, float c2y, float x, float y) {
+            this._updateRRectFlag(false);
             this._appendBezierTo(c1x, c1y, c2x, c2y, x, y);
         }
 
         public void relativeCubicTo(float c1x, float c1y, float c2x, float c2y, float x, float y) {
             var x0 = this._commandx;
             var y0 = this._commandy;
-
+            this._updateRRectFlag(false);
             this.cubicTo(x0 + c1x, y0 + c1y, x0 + c2x, y0 + c2y, x0 + x, y0 + y);
         }
 
@@ -269,6 +320,7 @@ namespace Unity.UIWidgets.ui {
             var y0 = this._commandy;
 
             const float twoThird = 2.0f / 3.0f;
+            this._updateRRectFlag(false);
             this._appendBezierTo(
                 x0 + twoThird * (cx - x0), y0 + twoThird * (cy - y0),
                 x + twoThird * (cx - x), y + twoThird * (cy - y),
@@ -279,10 +331,12 @@ namespace Unity.UIWidgets.ui {
             var x0 = this._commandx;
             var y0 = this._commandy;
 
+            this._updateRRectFlag(false);
             this.quadraticBezierTo(x0 + cx, y0 + cy, x0 + x, y0 + y);
         }
 
         public void conicTo(float x1, float y1, float x2, float y2, float w) {
+            this._updateRRectFlag(false);
             if (!(w > 0)) {
                 this.lineTo(x2, y2);
                 return;
@@ -320,7 +374,7 @@ namespace Unity.UIWidgets.ui {
         public void relativeConicTo(float x1, float y1, float x2, float y2, float w) {
             var x0 = this._commandx;
             var y0 = this._commandy;
-
+            this._updateRRectFlag(false);
             this.conicTo(x0 + x1, y0 + y1, x0 + x2, y0 + y2, w);
         }
 
@@ -331,7 +385,7 @@ namespace Unity.UIWidgets.ui {
             bool largeArc = false,
             bool clockwise = false) {
             radius = radius ?? Radius.zero;
-
+            this._updateRRectFlag(false);
             D.assert(PaintingUtils._offsetIsValid(arcEnd));
             D.assert(PaintingUtils._radiusIsValid(radius));
 
@@ -471,6 +525,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void addRect(Rect rect) {
+            this._updateRRectFlag(true, PathShapeHint.Rect);
             this._appendMoveTo(rect.left, rect.top);
             this._appendLineTo(rect.left, rect.bottom);
             this._appendLineTo(rect.right, rect.bottom);
@@ -479,6 +534,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void addRRect(RRect rrect) {
+            this._updateRRectFlag(rrect.isNaiveRRect(), PathShapeHint.NaiveRRect, rrect.blRadiusX);
             float w = rrect.width;
             float h = rrect.height;
             float halfw = Mathf.Abs(w) * 0.5f;
@@ -514,6 +570,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void addEllipse(float cx, float cy, float rx, float ry) {
+            this._updateRRectFlag(rx == ry, PathShapeHint.Circle, rx);
             this._appendMoveTo(cx - rx, cy);
             this._appendBezierTo(cx - rx, cy + ry * _KAPPA90,
                 cx - rx * _KAPPA90, cy + ry, cx, cy + ry);
@@ -537,6 +594,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void arcTo(float x1, float y1, float x2, float y2, float radius) {
+            this._updateRRectFlag(false);
             var x0 = this._commandx;
             var y0 = this._commandy;
 
@@ -577,6 +635,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void arcTo(Rect rect, float startAngle, float sweepAngle, bool forceMoveTo = true) {
+            this._updateRRectFlag(false);
             var mat = Matrix3.makeScale(rect.width / 2, rect.height / 2);
             var center = rect.center;
             mat.postTranslate(center.dx, center.dy);
@@ -586,6 +645,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void addArc(Rect rect, float startAngle, float sweepAngle) {
+            this._updateRRectFlag(false);
             this.arcTo(rect, startAngle, sweepAngle, true);
         }
 
@@ -681,10 +741,12 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void addArc(float cx, float cy, float r, float a0, float a1, PathWinding dir, bool forceMoveTo = true) {
+            this._updateRRectFlag(false);
             this._addArcCommands(cx, cy, r, a0, a1, dir, forceMoveTo);
         }
 
         public void addPolygon(IList<Offset> points, bool close) {
+            this._updateRRectFlag(false);
             D.assert(points != null);
             if (points.Count == 0) {
                 return;
@@ -727,7 +789,8 @@ namespace Unity.UIWidgets.ui {
 
         public void addPath(Path path, Matrix3 transform = null) {
             D.assert(path != null);
-
+            
+            this._updateRRectFlag(path.isNaiveRRect, path.shapeHint, path.rRectCorner);
             var i = 0;
             while (i < path._commands.Count) {
                 var cmd = (PathCommand) path._commands[i];
@@ -1371,6 +1434,13 @@ namespace Unity.UIWidgets.ui {
                 w = newW,
             };
         }
+    }
+    
+    public enum PathShapeHint {
+        Rect,
+        Circle,
+        NaiveRRect,
+        Other
     }
 
     enum PathCommand {
