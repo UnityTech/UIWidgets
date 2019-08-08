@@ -87,7 +87,7 @@
     }
 
     public class DrawTextBlob : DrawCmd {
-        public TextBlob textBlob;
+        public TextBlob? textBlob;
         public Offset offset;
         public Paint paint;
     }

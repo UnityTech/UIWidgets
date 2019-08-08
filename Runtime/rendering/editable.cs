@@ -881,14 +881,14 @@ namespace Unity.UIWidgets.rendering {
 
         public TextPosition getParagraphForward(TextPosition position, TextAffinity? affinity = null) {
             var lineCount = this._textPainter.getLineCount();
-            Paragraph.LineRange line = null;
+            Paragraph.LineRange? line = null;
             for (int i = 0; i < lineCount; ++i) {
                 line = this._textPainter.getLineRange(i);
-                if (!line.hardBreak) {
+                if (!line.Value.hardBreak) {
                     continue;
                 }
 
-                if (line.end > position.offset) {
+                if (line.Value.end > position.offset) {
                     break;
                 }
             }
@@ -897,21 +897,21 @@ namespace Unity.UIWidgets.rendering {
                 return new TextPosition(position.offset, affinity ?? position.affinity);
             }
 
-            return new TextPosition(line.end, affinity ?? position.affinity);
+            return new TextPosition(line.Value.end, affinity ?? position.affinity);
         }
 
 
         public TextPosition getParagraphBackward(TextPosition position, TextAffinity? affinity = null) {
             var lineCount = this._textPainter.getLineCount();
 
-            Paragraph.LineRange line = null;
+            Paragraph.LineRange? line = null;
             for (int i = lineCount - 1; i >= 0; --i) {
                 line = this._textPainter.getLineRange(i);
                 if (i != 0 && !this._textPainter.getLineRange(i - 1).hardBreak) {
                     continue;
                 }
 
-                if (line.start < position.offset) {
+                if (line.Value.start < position.offset) {
                     break;
                 }
             }
@@ -920,7 +920,7 @@ namespace Unity.UIWidgets.rendering {
                 return new TextPosition(position.offset, affinity ?? position.affinity);
             }
 
-            return new TextPosition(line.start, affinity ?? position.affinity);
+            return new TextPosition(line.Value.start, affinity ?? position.affinity);
         }
 
         protected override float computeMinIntrinsicWidth(float height) {

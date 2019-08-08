@@ -928,7 +928,7 @@ namespace Unity.UIWidgets.ui {
             }
         }
 
-        void _drawTextBlob(TextBlob textBlob, uiOffset offset, uiPaint paint) {
+        void _drawTextBlob(TextBlob? textBlob, uiOffset offset, uiPaint paint) {
             D.assert(textBlob != null);
 
             var state = this._currentLayer.currentState;
@@ -937,14 +937,14 @@ namespace Unity.UIWidgets.ui {
             var matrix = new uiMatrix3(state.matrix.Value);
             matrix.preTranslate(offset.dx, offset.dy);
 
-            var mesh = TextBlobMesh.create(textBlob, scale, matrix);
-            var textBlobBounds = matrix.mapRect(uiRectHelper.fromRect(textBlob.boundsInText));
+            var mesh = TextBlobMesh.create(textBlob.Value, scale, matrix);
+            var textBlobBounds = matrix.mapRect(uiRectHelper.fromRect(textBlob.Value.boundsInText));
 
             // request font texture so text mesh could be generated correctly
-            var style = textBlob.style;
+            var style = textBlob.Value.style;
             var font = FontManager.instance.getOrCreate(style.fontFamily, style.fontWeight, style.fontStyle).font;
             var fontSizeToLoad = Mathf.CeilToInt(style.UnityFontSize * scale);
-            var subText = textBlob.text.Substring(textBlob.textOffset, textBlob.textSize);
+            var subText = textBlob.Value.text.Substring(textBlob.Value.textOffset, textBlob.Value.textSize);
             Texture tex = null;
             bool notEmoji = !char.IsHighSurrogate(subText[0]) && !EmojiUtils.isSingleCharEmoji(subText[0]);
             if (notEmoji) {

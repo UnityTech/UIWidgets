@@ -83,7 +83,7 @@ namespace UIWidgetsGallery.gallery {
             float scrollFactor = 5.0f
         ) : base(key: key) {
             D.assert(maxHeight != null && maxHeight >= 0.0f);
-            D.assert(scrollFactor != null && scrollFactor >= 1.0f);
+            D.assert(scrollFactor >= 1.0f);
             this.maxHeight = maxHeight;
             this.scrollFactor = scrollFactor;
         }
@@ -351,6 +351,7 @@ namespace UIWidgetsGallery.gallery {
             float? midScrollOffset = null
         ) : base(parent: parent) {
             D.assert(midScrollOffset != null);
+            this.midScrollOffset = midScrollOffset ?? 0.0f;
         }
 
         public readonly float midScrollOffset;

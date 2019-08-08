@@ -33,7 +33,6 @@ namespace UIWidgetsSample {
     }
 
     class _MaterialThemeSampleWidgetState : State<MaterialThemeSampleWidget> {
-        int _currentIndex = 0;
         public override Widget build(BuildContext context) {
             return new Theme(
                 data: new ThemeData(

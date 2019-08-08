@@ -9,7 +9,6 @@ namespace Unity.UIWidgets.ui {
         public float scale;
 
         public MeshKey() {
-            
         }
 
         public static MeshKey create(long textBlobId, float scale) {
@@ -73,7 +72,6 @@ namespace Unity.UIWidgets.ui {
         long _timeToLive;
 
         public MeshInfo() {
-            
         }
 
         public static MeshInfo create(MeshKey key, uiMeshMesh mesh, long textureVersion, int timeToLive = 5) {
@@ -99,16 +97,15 @@ namespace Unity.UIWidgets.ui {
         }
     }
 
-    
+
     class TextBlobMesh : PoolObject {
-        
         static readonly Dictionary<MeshKey, MeshInfo> _meshes = new Dictionary<MeshKey, MeshInfo>();
         static long _frameCount = 0;
-        
-        public TextBlob textBlob;
+
+        public TextBlob? textBlob;
         public float scale;
         public uiMatrix3 matrix;
-        
+
         uiMeshMesh _mesh;
         bool _resolved;
 
@@ -116,10 +113,10 @@ namespace Unity.UIWidgets.ui {
         }
 
         public override void clear() {
-            this.textBlob = null;
             ObjectPool<uiMeshMesh>.release(this._mesh);
             this._mesh = null;
             this._resolved = false;
+            this.textBlob = null;
         }
 
         public static TextBlobMesh create(TextBlob textBlob, float scale, uiMatrix3 matrix) {
@@ -129,7 +126,7 @@ namespace Unity.UIWidgets.ui {
             newMesh.matrix = matrix;
             return newMesh;
         }
-        
+
         public static long frameCount {
             get { return _frameCount; }
         }
@@ -139,6 +136,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         static List<MeshKey> _keysToRemove = new List<MeshKey>();
+
         public static void tickNextFrame() {
             _frameCount++;
             D.assert(_keysToRemove.Count == 0);
@@ -148,11 +146,11 @@ namespace Unity.UIWidgets.ui {
                 }
             }
 
-            foreach (var key in _keysToRemove)
-            {
+            foreach (var key in _keysToRemove) {
                 ObjectPool<MeshInfo>.release(_meshes[key]);
                 _meshes.Remove(key);
             }
+
             _keysToRemove.Clear();
         }
 
@@ -162,14 +160,14 @@ namespace Unity.UIWidgets.ui {
             }
 
             this._resolved = true;
-            
-            var style = this.textBlob.style;
-            
-            var text = this.textBlob.text;
-            var key = MeshKey.create(this.textBlob.instanceId, this.scale);
+
+            var style = this.textBlob.Value.style;
+
+            var text = this.textBlob.Value.text;
+            var key = MeshKey.create(this.textBlob.Value.instanceId, this.scale);
             var fontInfo = FontManager.instance.getOrCreate(style.fontFamily, style.fontWeight, style.fontStyle);
             var font = fontInfo.font;
-            
+
             _meshes.TryGetValue(key, out var meshInfo);
             if (meshInfo != null && meshInfo.textureVersion == fontInfo.textureVersion) {
                 ObjectPool<MeshKey>.release(key);
@@ -177,14 +175,14 @@ namespace Unity.UIWidgets.ui {
                 this._mesh = meshInfo.mesh.transform(this.matrix);
                 return this._mesh;
             }
-            
+
             // Handling Emoji
-            char startingChar = text[this.textBlob.textOffset];
+            char startingChar = text[this.textBlob.Value.textOffset];
             if (char.IsHighSurrogate(startingChar) || EmojiUtils.isSingleCharEmoji(startingChar)) {
                 var vert = ObjectPool<uiList<Vector3>>.alloc();
                 var tri = ObjectPool<uiList<int>>.alloc();
                 var uvCoord = ObjectPool<uiList<Vector2>>.alloc();
-                
+
                 var metrics = FontMetrics.fromFont(font, style.UnityFontSize);
                 var minMaxRect = EmojiUtils.getMinMaxRect(style.fontSize, metrics.ascent, metrics.descent);
                 var minX = minMaxRect.left;
@@ -192,28 +190,29 @@ namespace Unity.UIWidgets.ui {
                 var minY = minMaxRect.top;
                 var maxY = minMaxRect.bottom;
 
-                for (int i = 0; i < this.textBlob.textSize; i++) {
-                    char a = text[this.textBlob.textOffset + i];
+                for (int i = 0; i < this.textBlob.Value.textSize; i++) {
+                    char a = text[this.textBlob.Value.textOffset + i];
                     int code = a;
                     if (char.IsHighSurrogate(a)) {
-                        D.assert(i+1 < this.textBlob.textSize);
-                        D.assert(this.textBlob.textOffset+i+1 < this.textBlob.text.Length);
-                        char b = text[this.textBlob.textOffset+i+1];
+                        D.assert(i + 1 < this.textBlob.Value.textSize);
+                        D.assert(this.textBlob.Value.textOffset + i + 1 < this.textBlob.Value.text.Length);
+                        char b = text[this.textBlob.Value.textOffset + i + 1];
                         D.assert(char.IsLowSurrogate(b));
                         code = char.ConvertToUtf32(a, b);
-                    } else if (char.IsLowSurrogate(a) || EmojiUtils.isEmptyEmoji(a)) {
+                    }
+                    else if (char.IsLowSurrogate(a) || EmojiUtils.isEmptyEmoji(a)) {
                         continue;
                     }
+
                     var uvRect = EmojiUtils.getUVRect(code);
 
-                    var pos = this.textBlob.positions[i];
+                    var positionX = this.textBlob.Value.getPositionX(i);
 
                     int baseIndex = vert.Count;
-                    vert.Add(new Vector3(pos.x + minX, pos.y + minY, 0));
-                    vert.Add(new Vector3(pos.x + maxX, pos.y + minY, 0));
-                    vert.Add(new Vector3(pos.x + maxX, pos.y + maxY, 0));
-                    vert.Add(new Vector3(pos.x + minX, pos.y + maxY, 0));
-
+                    vert.Add(new Vector3(positionX + minX, minY, 0));
+                    vert.Add(new Vector3(positionX + maxX, minY, 0));
+                    vert.Add(new Vector3(positionX + maxX, maxY, 0));
+                    vert.Add(new Vector3(positionX + minX, maxY, 0));
                     tri.Add(baseIndex);
                     tri.Add(baseIndex + 1);
                     tri.Add(baseIndex + 2);
@@ -225,37 +224,40 @@ namespace Unity.UIWidgets.ui {
                     uvCoord.Add(uvRect.topRight.toVector());
                     uvCoord.Add(uvRect.topLeft.toVector());
 
-                    if(char.IsHighSurrogate(a)) i++;
+                    if (char.IsHighSurrogate(a)) {
+                        i++;
+                    }
                 }
-                
+
                 uiMeshMesh meshMesh = uiMeshMesh.create(null, vert, tri, uvCoord);
-                
+
                 if (_meshes.ContainsKey(key)) {
                     ObjectPool<MeshInfo>.release(_meshes[key]);
                     _meshes.Remove(key);
                 }
+
                 _meshes[key] = MeshInfo.create(key, meshMesh, 0);
 
                 this._mesh = meshMesh.transform(this.matrix);
                 return this._mesh;
             }
-            
-            var length = this.textBlob.textSize;
+
+            var length = this.textBlob.Value.textSize;
             var fontSizeToLoad = Mathf.CeilToInt(style.UnityFontSize * this.scale);
 
             var vertices = ObjectPool<uiList<Vector3>>.alloc();
             vertices.SetCapacity(length * 4);
-            
+
             var triangles = ObjectPool<uiList<int>>.alloc();
             triangles.SetCapacity(length * 6);
 
             var uv = ObjectPool<uiList<Vector2>>.alloc();
             uv.SetCapacity(length * 4);
-            
+
             for (int charIndex = 0; charIndex < length; ++charIndex) {
-                var ch = text[charIndex + this.textBlob.textOffset];
+                var ch = text[charIndex + this.textBlob.Value.textOffset];
                 // first char as origin for mesh position 
-                var position = this.textBlob.positions[charIndex];
+                var positionX = this.textBlob.Value.getPositionX(charIndex);
                 if (LayoutUtils.isWordSpace(ch) || LayoutUtils.isLineEndSpace(ch) || ch == '\t') {
                     continue;
                 }
@@ -263,9 +265,9 @@ namespace Unity.UIWidgets.ui {
                 if (fontSizeToLoad == 0) {
                     continue;
                 }
-                
+
                 font.getGlyphInfo(ch, out var glyphInfo, fontSizeToLoad, style.UnityFontStyle);
-                
+
                 var minX = glyphInfo.minX / this.scale;
                 var maxX = glyphInfo.maxX / this.scale;
                 var minY = -glyphInfo.maxY / this.scale;
@@ -273,10 +275,10 @@ namespace Unity.UIWidgets.ui {
 
                 var baseIndex = vertices.Count;
 
-                vertices.Add(new Vector3((position.x + minX), (position.y + minY), 0));
-                vertices.Add(new Vector3((position.x + maxX), (position.y + minY), 0));
-                vertices.Add(new Vector3((position.x + maxX), (position.y + maxY), 0));
-                vertices.Add(new Vector3((position.x + minX), (position.y + maxY), 0));
+                vertices.Add(new Vector3(positionX + minX, minY, 0));
+                vertices.Add(new Vector3(positionX + maxX, minY, 0));
+                vertices.Add(new Vector3(positionX + maxX, maxY, 0));
+                vertices.Add(new Vector3(positionX + minX, maxY, 0));
 
                 triangles.Add(baseIndex);
                 triangles.Add(baseIndex + 1);
@@ -301,11 +303,12 @@ namespace Unity.UIWidgets.ui {
             }
 
             uiMeshMesh mesh = vertices.Count > 0 ? uiMeshMesh.create(null, vertices, triangles, uv) : null;
-            
+
             if (_meshes.ContainsKey(key)) {
                 ObjectPool<MeshInfo>.release(_meshes[key]);
                 _meshes.Remove(key);
             }
+
             _meshes[key] = MeshInfo.create(key, mesh, fontInfo.textureVersion);
 
             this._mesh = mesh.transform(this.matrix);

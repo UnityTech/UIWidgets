@@ -15,7 +15,7 @@ namespace Unity.UIWidgets.ui {
 
         public Paragraph build() {
             this._runs.endRunIfNeeded(this._text.Length);
-            var paragraph = new Paragraph();
+            var paragraph = Paragraph.create();
             paragraph.setText(this._text.ToString(), this._runs);
             paragraph.setParagraphStyle(this._paragraphStyle);
             return paragraph;
