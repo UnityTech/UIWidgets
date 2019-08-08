@@ -176,6 +176,7 @@ namespace Unity.UIWidgets.ui {
             var filterShader = GetShader("UIWidgets/canvas_filter");
             var shadowBoxShader = GetShader("UIWidgets/ShadowBox");
             var shadowRBoxShader = GetShader("UIWidgets/ShadowRBox");
+            var strokeAlphaShader = GetShader("UIWidgets/canvas_strokeAlpha");
 
             _convexFillMat = new MaterialByBlendModeStencilComp(convexFillShader);
             _fill0Mat = new MaterialByStencilComp(fill0Shader);
