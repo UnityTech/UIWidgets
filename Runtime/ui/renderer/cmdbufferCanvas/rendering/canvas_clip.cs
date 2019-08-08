@@ -35,7 +35,8 @@ namespace Unity.UIWidgets.ui {
             newElement.saveCount = saveCount;
 
             var pathCache = uiPath.flatten(scale);
-            var fillMesh = pathCache.getFillMesh(out newElement.convex);
+            pathCache.computeFillMesh(0.0f, out newElement.convex);
+            var fillMesh = pathCache.fillMesh;
             newElement.mesh = fillMesh.transform(matrix);
 
             var vertices = newElement.mesh.vertices;

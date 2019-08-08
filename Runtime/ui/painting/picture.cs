@@ -172,9 +172,11 @@ namespace Unity.UIWidgets.ui {
                     var state = this._getState();
                     var scale = XformUtils.getScale(state.xform);
 
-                    var rect = cmd.path.flatten(
+                    var cache = cmd.path.flatten(
                         scale * Window.instance.devicePixelRatio
-                    ).getFillMesh(out _).transform(state.xform).bounds;
+                    );
+                    cache.computeFillMesh(0.0f, out _);
+                    var rect = cache.fillMesh.transform(state.xform).bounds;
                     state.scissor = state.scissor == null ? rect : state.scissor.intersect(rect);
                     break;
                 }
@@ -189,7 +191,8 @@ namespace Unity.UIWidgets.ui {
                     MeshMesh mesh;
                     if (paint.style == PaintingStyle.fill) {
                         var cache = path.flatten(scale * devicePixelRatio);
-                        mesh = cache.getFillMesh(out _).transform(state.xform);
+                        cache.computeFillMesh(0.0f, out _);
+                        mesh = cache.fillMesh.transform(state.xform);
                     }
                     else {
                         float strokeWidth = (paint.strokeWidth * scale).clamp(0, 200.0f);
@@ -200,11 +203,13 @@ namespace Unity.UIWidgets.ui {
                         }
 
                         var cache = path.flatten(scale * devicePixelRatio);
-                        mesh = cache.getStrokeMesh(
+                        cache.computeStrokeMesh(
                             strokeWidth / scale * 0.5f,
+                            0.0f,
                             paint.strokeCap,
                             paint.strokeJoin,
-                            paint.strokeMiterLimit).transform(state.xform);
+                            paint.strokeMiterLimit);
+                        mesh = cache.strokeMesh.transform(state.xform);
                     }
 
                     if (paint.maskFilter != null && paint.maskFilter.sigma != 0) {
