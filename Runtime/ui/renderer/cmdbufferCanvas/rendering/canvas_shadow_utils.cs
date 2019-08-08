@@ -7,14 +7,44 @@ namespace Unity.UIWidgets.ui {
         void _drawRRectShadow(uiPath path, uiPaint paint) {
             D.assert(path.isNaiveRRect, () => "Cannot draw fast Shadow for non-NaiveRRect shapes");
             D.assert(paint.style == PaintingStyle.fill, () => "Cannot draw fast Shadow for stroke lines");
-            var bound = path.getBounds();
-            if (!this._applyClip(bound)) {
+            var layer = this._currentLayer;
+            var state = layer.currentState;
+            
+            var cache = path.flatten(state.scale * this._devicePixelRatio);
+            bool convex;
+            var fillMesh = cache.getFillMesh(out convex);
+            var meshBounds = fillMesh.transform(state.matrix);
+            var clipBounds = layer.layerBounds;
+
+            uiRect? stackBounds;
+            bool iior;
+            layer.clipStack.getBounds(out stackBounds, out iior);
+
+            if (stackBounds != null) {
+                clipBounds = uiRectHelper.intersect(clipBounds, stackBounds.Value);
+            }
+
+            if (clipBounds.isEmpty) {
+                ObjectPool<uiMeshMesh>.release(meshBounds);
                 return;
             }
             
-            var layer = this._currentLayer;
-            var state = layer.currentState;
-            float sigma = state.scale * paint.maskFilter.Value.sigma;
+            var maskBounds = meshBounds.bounds;
+            maskBounds = uiRectHelper.intersect(maskBounds, clipBounds);
+            if (maskBounds.isEmpty) {
+                ObjectPool<uiMeshMesh>.release(meshBounds);
+                return;
+            }
+            
+            var blurMesh = ImageMeshGenerator.imageMesh(null, uiRectHelper.one, maskBounds);
+            if (!this._applyClip(blurMesh.bounds)) {
+                ObjectPool<uiMeshMesh>.release(meshBounds);
+                ObjectPool<uiMeshMesh>.release(blurMesh);
+                return;
+            }
+
+            var bound =  path.getBounds();
+            var sigma = state.scale * paint.maskFilter.Value.sigma;
             
             var vertices = ObjectPool<uiList<Vector3>>.alloc();
             vertices.SetCapacity(4);
@@ -32,6 +62,8 @@ namespace Unity.UIWidgets.ui {
             _triangles.Add(1);
             _triangles.Add(3);
             
+            ObjectPool<uiMeshMesh>.release(meshBounds);
+            ObjectPool<uiMeshMesh>.release(blurMesh);
             var mesh = uiMeshMesh.create(state.matrix, vertices, _triangles);
             layer.draws.Add(CanvasShader.fastShadow(layer, mesh, sigma, path.isRect, path.isCircle, path.rRectCorner, new Vector4(bound.left, bound.top, bound.right, bound.bottom), paint.color));
         }
