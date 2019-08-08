@@ -187,7 +187,7 @@ namespace Unity.UIWidgets.engine {
 
 #if UNITY_IOS
         [DllImport("__Internal")]
-        static extern float IOSDeviceScaleFactor();
+        static extern int IOSDeviceScaleFactor();
 
 		[DllImport("__Internal")]
 		static extern viewMetrics IOSGetViewportPadding();
