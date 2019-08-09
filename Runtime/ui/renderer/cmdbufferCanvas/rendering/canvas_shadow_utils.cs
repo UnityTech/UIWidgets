@@ -12,7 +12,9 @@ namespace Unity.UIWidgets.ui {
             
             var cache = path.flatten(state.scale * this._devicePixelRatio);
             bool convex;
-            var fillMesh = cache.getFillMesh(out convex);
+            
+            cache.computeFillMesh(this._fringeWidth, out convex);
+            var fillMesh = cache.fillMesh;
             var meshBounds = fillMesh.transform(state.matrix);
             var clipBounds = layer.layerBounds;
 
