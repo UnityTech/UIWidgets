@@ -1,20 +1,18 @@
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using UnityEngine;
-using UnityEngine.Rendering;
-using Random = System.Random;
 
 namespace Unity.UIWidgets.ui {
     public partial class PictureFlusher {
         
-        struct TVertex
+        struct uiVertex
         {
             public Vector2 position;
             public Vector2 uv;
         }
 
         ComputeBuffer computeBuffer;
-        List<TVertex> tvertexes;
+        List<uiVertex> vertexes;
 
         ComputeBuffer indexBuffer;
         List<int> indexes;
@@ -22,18 +20,16 @@ namespace Unity.UIWidgets.ui {
         int startVertex;
         int startIndex;
 
-        Material material;
-
         bool supportComputeBuffer;
 
         void setupComputeBuffer() {
-            this.supportComputeBuffer = this._isMainCanvas && CanvasShader.supportComputeBuffer;
+            this.supportComputeBuffer = this._isMainCanvas && CanvasShader.supportComputeBuffer && false;
         }
 
         void initComputeBuffer() {
-            var stride = Marshal.SizeOf(typeof(TVertex));
+            var stride = Marshal.SizeOf(typeof(uiVertex));
             this.computeBuffer = new ComputeBuffer(1024 * 1024, stride);
-            this.tvertexes = new List<TVertex>();
+            this.vertexes = new List<uiVertex>();
                 
             this.indexBuffer = new ComputeBuffer(1024 * 1024, Marshal.SizeOf(typeof(int)));
             this.indexes = new List<int>();
@@ -46,7 +42,7 @@ namespace Unity.UIWidgets.ui {
                 this.initComputeBuffer();
             }
             
-            this.tvertexes.Clear();
+            this.vertexes.Clear();
             this.indexes.Clear();
             this.startVertex = 0;
             this.startIndex = 0;
@@ -55,20 +51,20 @@ namespace Unity.UIWidgets.ui {
         void bindComputeBuffer() {
             if (!this.supportComputeBuffer) return;
             
-            this.computeBuffer.SetData(this.tvertexes);
+            this.computeBuffer.SetData(this.vertexes);
             this.indexBuffer.SetData(this.indexes);
         }
 
         void addMeshToComputeBuffer(List<Vector3> vertex, List<Vector2> uv, List<int> triangles) {
             if (!this.supportComputeBuffer) return;
             
-            this.startVertex = this.tvertexes.Count;
+            this.startVertex = this.vertexes.Count;
             this.startIndex = this.indexes.Count;
 
             var hasUv = uv != null;
 
             for (int i = 0; i < vertex.Count; i++) {
-                this.tvertexes.Add(new TVertex {
+                this.vertexes.Add(new uiVertex {
                     position = new Vector2(vertex[i].x, vertex[i].y),
                     uv = hasUv ? uv[i] : Vector2.zero
                 });
@@ -79,7 +75,7 @@ namespace Unity.UIWidgets.ui {
             }
         }
         
-        public void DrawBuffer(CommandBuffer cmdBuf)
+        /*public void DrawBuffer(CommandBuffer cmdBuf)
         {
             if (this.computeBuffer == null)
             {
@@ -130,6 +126,6 @@ namespace Unity.UIWidgets.ui {
             }
             
             this.bindComputeBuffer();
-        }
+        }*/
     }
 }

@@ -42,6 +42,9 @@ namespace Unity.UIWidgets.ui {
             public static readonly Matrix3 idMat3 = Matrix3.I();
             public static readonly int texId = Shader.PropertyToID("_tex");
             public static readonly int matId = Shader.PropertyToID("_mat");
+            public static readonly int vertexBufferId = Shader.PropertyToID("databuffer");
+            public static readonly int indexBufferId = Shader.PropertyToID("indexbuffer");
+            public static readonly int startIndexId = Shader.PropertyToID("_startVertex");
 
 
             public override void clear() {

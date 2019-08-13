@@ -157,12 +157,12 @@ namespace Unity.UIWidgets.ui {
                             this._saveLayer_Points[2],
                             this._saveLayer_Points[3],
                             bounds);
-                        var renderDraw = CanvasShader.texRT(layer, layer.layerPaint.Value, mesh, parentLayer);
+                        var renderDraw = CanvasShader.texRT(layer, layer.layerPaint.Value, mesh, parentLayer, this.supportComputeBuffer);
                         layer.draws.Add(renderDraw);
 
                         var blurLayer = this._createBlurLayer(layer, filter.sigmaX, filter.sigmaY, layer);
                         var blurMesh = ImageMeshGenerator.imageMesh(null, uiRectHelper.one, bounds);
-                        layer.draws.Add(CanvasShader.texRT(layer, paint, blurMesh, blurLayer));
+                        layer.draws.Add(CanvasShader.texRT(layer, paint, blurMesh, blurLayer, this.supportComputeBuffer));
                     }
                 }
                 else if (paint.backdrop is _MatrixImageFilter) {
@@ -195,7 +195,7 @@ namespace Unity.UIWidgets.ui {
                             this._saveLayer_Points[2],
                             this._saveLayer_Points[3],
                             bounds);
-                        var renderDraw = CanvasShader.texRT(layer, layer.layerPaint.Value, mesh, parentLayer);
+                        var renderDraw = CanvasShader.texRT(layer, layer.layerPaint.Value, mesh, parentLayer, this.supportComputeBuffer);
                         layer.draws.Add(renderDraw);
                     }
                 }
@@ -224,7 +224,7 @@ namespace Unity.UIWidgets.ui {
                 return;
             }
 
-            var renderDraw = CanvasShader.texRT(currentLayer, layer.layerPaint.Value, mesh, layer);
+            var renderDraw = CanvasShader.texRT(currentLayer, layer.layerPaint.Value, mesh, layer, this.supportComputeBuffer);
             currentLayer.draws.Add(renderDraw);
         }
 
@@ -366,11 +366,11 @@ namespace Unity.UIWidgets.ui {
                     // need to inflate a bit to make sure all area is cleared.
                     var inflatedScissor = uiRectHelper.inflate(reducedClip.scissor.Value, this._fringeWidth);
                     var boundsMesh = uiMeshMesh.create(inflatedScissor);
-                    layer.draws.Add(CanvasShader.stencilClear(layer, boundsMesh));
+                    layer.draws.Add(CanvasShader.stencilClear(layer, boundsMesh, this.supportComputeBuffer));
 
                     foreach (var maskElement in reducedClip.maskElements) {
-                        layer.draws.Add(CanvasShader.stencil0(layer, maskElement.mesh.duplicate()));
-                        layer.draws.Add(CanvasShader.stencil1(layer, boundsMesh.duplicate()));
+                        layer.draws.Add(CanvasShader.stencil0(layer, maskElement.mesh.duplicate(), this.supportComputeBuffer));
+                        layer.draws.Add(CanvasShader.stencil1(layer, boundsMesh.duplicate(), this.supportComputeBuffer));
                     }
                 }
 
@@ -478,11 +478,11 @@ namespace Unity.UIWidgets.ui {
 
             blurXLayer.draws.Add(CanvasShader.maskFilter(
                 blurXLayer, blurMesh, maskLayer,
-                radiusX, new Vector2(1f / textureWidth, 0), kernelX));
+                radiusX, new Vector2(1f / textureWidth, 0), kernelX, this.supportComputeBuffer));
 
             blurYLayer.draws.Add(CanvasShader.maskFilter(
                 blurYLayer, blurMesh.duplicate(), blurXLayer,
-                radiusY, new Vector2(0, -1f / textureHeight), kernelY));
+                radiusY, new Vector2(0, -1f / textureHeight), kernelY, this.supportComputeBuffer));
 
             return blurYLayer;
         }
@@ -534,7 +534,7 @@ namespace Unity.UIWidgets.ui {
                 return;
             }
 
-            layer.draws.Add(CanvasShader.texRT(layer, paint, blurMesh, blurLayer));
+            layer.draws.Add(CanvasShader.texRT(layer, paint, blurMesh, blurLayer, this.supportComputeBuffer));
         }
 
         delegate void _drawPathDrawMeshCallbackDelegate(uiPaint p, uiMeshMesh fillMesh, uiMeshMesh strokeMesh,
@@ -555,13 +555,13 @@ namespace Unity.UIWidgets.ui {
                 layer.draws.Add(CanvasShader.convexFill(layer, p, fillMesh, this.supportComputeBuffer));
             }
             else {
-                layer.draws.Add(CanvasShader.fill0(layer, fillMesh));
-                layer.draws.Add(CanvasShader.fill1(layer, p, fillMesh.boundsMesh));
+                layer.draws.Add(CanvasShader.fill0(layer, fillMesh, this.supportComputeBuffer));
+                layer.draws.Add(CanvasShader.fill1(layer, p, fillMesh.boundsMesh, this.supportComputeBuffer));
             }
 
             if (strokeMesh != null) {
-                layer.draws.Add(CanvasShader.strokeAlpha(layer, p, alpha, strokeMult, strokeMesh));
-                layer.draws.Add(CanvasShader.stroke1(layer, strokeMesh.duplicate()));
+                layer.draws.Add(CanvasShader.strokeAlpha(layer, p, alpha, strokeMult, strokeMesh, this.supportComputeBuffer));
+                layer.draws.Add(CanvasShader.stroke1(layer, strokeMesh.duplicate(), this.supportComputeBuffer));
             }
         }
 
@@ -575,8 +575,8 @@ namespace Unity.UIWidgets.ui {
 
             var layer = this._currentLayer;
 
-            layer.draws.Add(CanvasShader.strokeAlpha(layer, p, alpha, strokeMult, strokeMesh));
-            layer.draws.Add(CanvasShader.stroke1(layer, strokeMesh.duplicate()));
+            layer.draws.Add(CanvasShader.strokeAlpha(layer, p, alpha, strokeMult, strokeMesh, this.supportComputeBuffer));
+            layer.draws.Add(CanvasShader.stroke1(layer, strokeMesh.duplicate(), this.supportComputeBuffer));
         }
 
         void _drawTextDrawMeshCallback(uiPaint p, uiMeshMesh fillMesh, uiMeshMesh strokeMesh, bool convex, float alpha,
@@ -589,7 +589,7 @@ namespace Unity.UIWidgets.ui {
 
             var layer = this._currentLayer;
             if (notEmoji) {
-                layer.draws.Add(CanvasShader.texAlpha(layer, p, textMesh, tex));
+                layer.draws.Add(CanvasShader.texAlpha(layer, p, textMesh, tex, this.supportComputeBuffer));
             }
             else {
                 uiPaint paintWithWhite = new uiPaint(p);
@@ -602,7 +602,7 @@ namespace Unity.UIWidgets.ui {
                 var raw_mesh = textMesh.resolveMesh();
                 var meshmesh = raw_mesh.duplicate();
                 ObjectPool<TextBlobMesh>.release(textMesh);
-                layer.draws.Add(CanvasShader.tex(layer, paintWithWhite, meshmesh, EmojiUtils.image));
+                layer.draws.Add(CanvasShader.tex(layer, paintWithWhite, meshmesh, EmojiUtils.image, this.supportComputeBuffer));
             }
         }
 
@@ -716,7 +716,7 @@ namespace Unity.UIWidgets.ui {
                 return;
             }
 
-            layer.draws.Add(CanvasShader.tex(layer, paint, mesh, image));
+            layer.draws.Add(CanvasShader.tex(layer, paint, mesh, image, this.supportComputeBuffer));
         }
 
         void _drawImageNine(Image image, uiRect? src, uiRect center, uiRect dst, uiPaint paint) {
@@ -743,7 +743,7 @@ namespace Unity.UIWidgets.ui {
                 return;
             }
 
-            layer.draws.Add(CanvasShader.tex(layer, paint, mesh, image));
+            layer.draws.Add(CanvasShader.tex(layer, paint, mesh, image, this.supportComputeBuffer));
         }
 
 
@@ -1166,12 +1166,12 @@ namespace Unity.UIWidgets.ui {
                         }
 
                         D.assert(mesh.vertices.Count > 0);
-                        if (this.supportComputeBuffer && CanvasShader.computeShader == cmd.material.shader) {
+                        if (this.supportComputeBuffer && CanvasShader.rshadowShader != cmd.material.shader && CanvasShader.rrshadowShader != cmd.material.shader) {
                             this.addMeshToComputeBuffer(mesh.vertices?.data, mesh.uv?.data, mesh.triangles?.data);
-                            cmd.properties.mpb.SetBuffer("databuffer", this.computeBuffer);
-                            cmd.properties.mpb.SetBuffer("indexbuffer", this.indexBuffer);
-                            cmd.properties.mpb.SetInt("_startVertex", this.startIndex);
-                            cmdBuf.DrawProcedural(Matrix4x4.identity, cmd.material, 0, MeshTopology.Triangles, mesh.triangles.Count, 1, cmd.properties.mpb);
+                            cmd.properties.SetBuffer(CmdDraw.vertexBufferId, this.computeBuffer);
+                            cmd.properties.SetBuffer(CmdDraw.indexBufferId, this.indexBuffer);
+                            cmd.properties.SetInt(CmdDraw.startIndexId, this.startIndex);
+                            cmdBuf.DrawProcedural(Matrix4x4.identity, cmd.material, cmd.pass, MeshTopology.Triangles, mesh.triangles.Count, 1, cmd.properties.mpb);
                         }
                         else {
                             cmd.meshObj.SetVertices(mesh.vertices?.data);
