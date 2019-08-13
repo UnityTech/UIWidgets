@@ -155,6 +155,8 @@ namespace Unity.UIWidgets.ui {
         static readonly MaterialByBlendModeStencilComp _strokeAlphaMat;
         static readonly Material _shadowBox;
         static readonly Material _shadowRBox;
+        
+        static readonly MaterialByBlendModeStencilComp _convexFillMat_cb;
 
         static Shader GetShader(string shaderName) {
             var shader = Shader.Find(shaderName);
@@ -164,6 +166,8 @@ namespace Unity.UIWidgets.ui {
 
             return shader;
         }
+
+        public static readonly bool supportComputeBuffer;
 
         static CanvasShader() {
             var convexFillShader = GetShader("UIWidgets/canvas_convexFill");
@@ -177,6 +181,7 @@ namespace Unity.UIWidgets.ui {
             var shadowBoxShader = GetShader("UIWidgets/ShadowBox");
             var shadowRBoxShader = GetShader("UIWidgets/ShadowRBox");
             var strokeAlphaShader = GetShader("UIWidgets/canvas_strokeAlpha");
+            var convexFillShaderCompute = GetShader("UIWidgets/canvas_convexFill_cb");
 
             _convexFillMat = new MaterialByBlendModeStencilComp(convexFillShader);
             _fill0Mat = new MaterialByStencilComp(fill0Shader);
@@ -189,9 +194,11 @@ namespace Unity.UIWidgets.ui {
             _filterMat = new Material(filterShader) {hideFlags = HideFlags.HideAndDontSave};
             _shadowBox = new Material(shadowBoxShader) {hideFlags = HideFlags.HideAndDontSave};
             _shadowRBox = new Material(shadowRBoxShader) {hideFlags = HideFlags.HideAndDontSave};
-        }
+            
+            _convexFillMat_cb = new MaterialByBlendModeStencilComp(convexFillShaderCompute);
 
-        public static Material shadowBox => _shadowBox;
+            supportComputeBuffer = convexFillShaderCompute.isSupported;
+        }
 
         static readonly int _viewportId = Shader.PropertyToID("_viewport");
         static readonly int _alphaId = Shader.PropertyToID("_alpha");

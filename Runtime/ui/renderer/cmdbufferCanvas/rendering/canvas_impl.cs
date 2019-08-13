@@ -11,6 +11,8 @@ namespace Unity.UIWidgets.ui {
         readonly float _devicePixelRatio;
         readonly MeshPool _meshPool;
 
+        readonly bool _isMainCanvas;
+
         readonly List<RenderLayer> _layers = new List<RenderLayer>();
         RenderLayer _currentLayer;
         uiRect? _lastScissor;
@@ -44,7 +46,7 @@ namespace Unity.UIWidgets.ui {
             }
         }
 
-        public PictureFlusher(RenderTexture renderTexture, float devicePixelRatio, MeshPool meshPool) {
+        public PictureFlusher(RenderTexture renderTexture, float devicePixelRatio, MeshPool meshPool, bool isMainCanvas) {
             D.assert(renderTexture);
             D.assert(devicePixelRatio > 0);
             D.assert(meshPool != null);
@@ -53,6 +55,7 @@ namespace Unity.UIWidgets.ui {
             this._fringeWidth = 1.0f / devicePixelRatio;
             this._devicePixelRatio = devicePixelRatio;
             this._meshPool = meshPool;
+            this._isMainCanvas = isMainCanvas;
 
             this.___drawTextDrawMeshCallback = this._drawTextDrawMeshCallback;
             this.___drawPathDrawMeshCallback2 = this._drawPathDrawMeshCallback2;
@@ -1042,8 +1045,11 @@ namespace Unity.UIWidgets.ui {
             using (var cmdBuf = new CommandBuffer()) {
                 cmdBuf.name = "CommandBufferCanvas";
 
-                this._lastRtID = -1;
-                this._drawLayer(layer, cmdBuf);
+                //this._lastRtID = -1;
+                //this._drawLayer(layer, cmdBuf);
+                cmdBuf.SetRenderTarget(this._renderTexture);
+                cmdBuf.ClearRenderTarget(true, true, UnityEngine.Color.grey);
+                this.DrawBuffer(cmdBuf);
 
                 // this is necessary for webgl2. not sure why... just to be safe to disable the scissor.
                 cmdBuf.DisableScissorRect();

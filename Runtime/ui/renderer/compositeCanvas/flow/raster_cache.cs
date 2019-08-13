@@ -242,7 +242,7 @@ namespace Unity.UIWidgets.flow {
             var renderTexture = new RenderTexture(desc);
             renderTexture.hideFlags = HideFlags.HideAndDontSave;
 
-            var canvas = new CommandBufferCanvas(renderTexture, devicePixelRatio, meshPool);
+            var canvas = new CommandBufferCanvas(renderTexture, devicePixelRatio, meshPool, false);
             canvas.translate(-bounds.left, -bounds.top);
             canvas.concat(transform);
             canvas.drawPicture(picture);
