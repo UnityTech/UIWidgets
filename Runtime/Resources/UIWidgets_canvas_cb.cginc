@@ -1,12 +1,16 @@
+half4 _color;
+
 struct vdata
             {
                 float2 vertex;
                 float2 uv;
             };
 
-            struct psInput
+            struct v2f
             {
-                float4 position : SV_POSITION;
+                float4 vertex : SV_POSITION;
+                float2 ftcoord : TEXCOORD0;
+                float2 fpos : TEXCOORD1;
             };
 
             StructuredBuffer<vdata> databuffer;
@@ -14,14 +18,17 @@ struct vdata
             float4 _viewport;
             int _startVertex;
             
-            psInput vert (uint vertex_id: SV_VertexID, uint instance_id: SV_InstanceID)
+            v2f vert (uint vertex_id: SV_VertexID, uint instance_id: SV_InstanceID)
             {
-                psInput o = (psInput)0;
-                o.position = float4(databuffer[indexbuffer[_startVertex + vertex_id]].vertex.x * 2.0 / _viewport.z - 1.0, databuffer[indexbuffer[_startVertex + vertex_id]].vertex.y * 2.0 / _viewport.w - 1.0, 0, 1);
+                v2f o = (v2f)0;
+                vdata v = databuffer[indexbuffer[_startVertex + vertex_id]];
+                o.vertex = float4(v.vertex.x * 2.0 / _viewport.z - 1.0, v.vertex.y * 2.0 / _viewport.w - 1.0, 0, 1);
+                o.ftcoord = v.uv;
+                o.fpos = v.vertex;
                 return o;
             }
             
-            fixed4 frag (psInput i) : SV_Target
+            fixed4 frag (v2f i) : SV_Target
             {
-                return float4(0, 1, 0, 1);
+                return _color;
             }

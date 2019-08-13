@@ -169,6 +169,8 @@ namespace Unity.UIWidgets.ui {
 
         public static readonly bool supportComputeBuffer;
 
+        public static Shader computeShader;
+
         static CanvasShader() {
             var convexFillShader = GetShader("UIWidgets/canvas_convexFill");
             var fill0Shader = GetShader("UIWidgets/canvas_fill0");
@@ -182,6 +184,8 @@ namespace Unity.UIWidgets.ui {
             var shadowRBoxShader = GetShader("UIWidgets/ShadowRBox");
             var strokeAlphaShader = GetShader("UIWidgets/canvas_strokeAlpha");
             var convexFillShaderCompute = GetShader("UIWidgets/canvas_convexFill_cb");
+
+            computeShader = convexFillShaderCompute;
 
             _convexFillMat = new MaterialByBlendModeStencilComp(convexFillShader);
             _fill0Mat = new MaterialByStencilComp(fill0Shader);
@@ -310,8 +314,9 @@ namespace Unity.UIWidgets.ui {
         }
 
         public static PictureFlusher.CmdDraw convexFill(PictureFlusher.RenderLayer layer, uiPaint paint,
-            uiMeshMesh mesh) {
-            var mat = _convexFillMat.getMaterial(paint.blendMode, layer.ignoreClip);
+            uiMeshMesh mesh, bool supportComputeBuffer = false) {
+            var mat = supportComputeBuffer ? _convexFillMat_cb.getMaterial(paint.blendMode, layer.ignoreClip) : _convexFillMat.getMaterial(paint.blendMode, layer.ignoreClip);
+
             _getShaderPassAndProps(layer, paint, mesh.matrix, 1.0f, 0.0f, out var pass, out var props);
 
             return PictureFlusher.CmdDraw.create(

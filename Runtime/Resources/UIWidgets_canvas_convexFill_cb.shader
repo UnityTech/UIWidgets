@@ -9,7 +9,15 @@ Shader "UIWidgets/canvas_convexFill_cb"
 
     SubShader
     {   
+        ZTest Always
+        ZWrite Off
         Blend [_SrcBlend] [_DstBlend]
+        
+        Stencil {
+            Ref 128
+            Comp [_StencilComp]
+        }
+        
         Pass { // 0, color
             CGPROGRAM
             #define UIWIDGETS_COLOR

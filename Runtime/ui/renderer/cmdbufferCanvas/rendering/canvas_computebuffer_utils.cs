@@ -23,23 +23,70 @@ namespace Unity.UIWidgets.ui {
         int startIndex;
 
         Material material;
-        
-        public void DrawBuffer(CommandBuffer cmdBuf)
-        {
-            if (this.computeBuffer == null)
-            {
-                var stride = Marshal.SizeOf(typeof(TVertex));
-                this.computeBuffer = new ComputeBuffer(1024 * 1024, stride);
-                this.tvertexes = new List<TVertex>();
+
+        bool supportComputeBuffer;
+
+        void setupComputeBuffer() {
+            this.supportComputeBuffer = this._isMainCanvas && CanvasShader.supportComputeBuffer;
+        }
+
+        void initComputeBuffer() {
+            var stride = Marshal.SizeOf(typeof(TVertex));
+            this.computeBuffer = new ComputeBuffer(1024 * 1024, stride);
+            this.tvertexes = new List<TVertex>();
                 
-                this.indexBuffer = new ComputeBuffer(1024 * 1024, Marshal.SizeOf(typeof(int)));
-                this.indexes = new List<int>();
+            this.indexBuffer = new ComputeBuffer(1024 * 1024, Marshal.SizeOf(typeof(int)));
+            this.indexes = new List<int>();
+        }
+
+        void resetComputeBuffer() {
+            if (!this.supportComputeBuffer) return;
+
+            if (this.computeBuffer == null) {
+                this.initComputeBuffer();
             }
             
             this.tvertexes.Clear();
             this.indexes.Clear();
             this.startVertex = 0;
             this.startIndex = 0;
+        }
+
+        void bindComputeBuffer() {
+            if (!this.supportComputeBuffer) return;
+            
+            this.computeBuffer.SetData(this.tvertexes);
+            this.indexBuffer.SetData(this.indexes);
+        }
+
+        void addMeshToComputeBuffer(List<Vector3> vertex, List<Vector2> uv, List<int> triangles) {
+            if (!this.supportComputeBuffer) return;
+            
+            this.startVertex = this.tvertexes.Count;
+            this.startIndex = this.indexes.Count;
+
+            var hasUv = uv != null;
+
+            for (int i = 0; i < vertex.Count; i++) {
+                this.tvertexes.Add(new TVertex {
+                    position = new Vector2(vertex[i].x, vertex[i].y),
+                    uv = hasUv ? uv[i] : Vector2.zero
+                });
+            }
+
+            foreach (var triangleId in triangles) {
+                this.indexes.Add(triangleId + this.startVertex);
+            }
+        }
+        
+        public void DrawBuffer(CommandBuffer cmdBuf)
+        {
+            if (this.computeBuffer == null)
+            {
+                this.initComputeBuffer();
+            }
+            
+            this.resetComputeBuffer();
 
             if (this.material == null) {
                 this.material = new Material(Shader.Find("UIWidgets/canvas_convexFill_cb"));
@@ -61,38 +108,18 @@ namespace Unity.UIWidgets.ui {
                         var width = size;
                         var height = size;
 
-                        this.startVertex = this.tvertexes.Count;
-                        this.startIndex = this.indexes.Count;
-                        
-                    
-                        this.tvertexes.AddRange(new[]
-                        {
-                            new TVertex
-                            {
-                                position = new Vector2(centerX - width / 2, centerY - height / 2),
-                                uv = new Vector2(0, 0)
-                            },
-                            new TVertex
-                            {
-                                position = new Vector2(centerX + width / 2, centerY - height / 2),
-                                uv = new Vector2(0, 0)
-                            },
-                            new TVertex
-                            {
-                                position = new Vector2(centerX + width / 2, centerY + height / 2),
-                                uv = new Vector2(0, 0)
-                            },
-                            new TVertex
-                            {
-                                position = new Vector2(centerX - width / 2, centerY + height / 2),
-                                uv = new Vector2(0, 0)
-                            }
-                        });
-                    
-                        this.indexes.AddRange(new []
-                        {
-                            this.startVertex, this.startVertex + 1, this.startVertex + 2, this.startVertex, this.startVertex + 2, this.startVertex + 3
-                        });
+                    var vert = new List<Vector3> {
+                        new Vector3(centerX - width / 2, centerY - height / 2),
+                        new Vector3(centerX + width / 2, centerY - height / 2),
+                        new Vector3(centerX + width / 2, centerY + height / 2),
+                        new Vector3(centerX - width / 2, centerY + height / 2)
+                    };
+
+                    var index = new List<int> {
+                        0, 1, 2, 0, 2, 3
+                    };
+
+                        this.addMeshToComputeBuffer(vert, null, index);
 
                         var mpb = new MaterialPropertyBlock();
                         mpb.SetBuffer("databuffer", this.computeBuffer);
@@ -102,8 +129,7 @@ namespace Unity.UIWidgets.ui {
                 }
             }
             
-            this.computeBuffer.SetData(this.tvertexes);
-            this.indexBuffer.SetData(this.indexes);
+            this.bindComputeBuffer();
         }
     }
 }

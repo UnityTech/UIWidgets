@@ -60,6 +60,8 @@ namespace Unity.UIWidgets.ui {
             this.___drawTextDrawMeshCallback = this._drawTextDrawMeshCallback;
             this.___drawPathDrawMeshCallback2 = this._drawPathDrawMeshCallback2;
             this.___drawPathDrawMeshCallback = this._drawPathDrawMeshCallback;
+
+            this.setupComputeBuffer();
         }
 
         readonly _drawPathDrawMeshCallbackDelegate ___drawTextDrawMeshCallback;
@@ -550,7 +552,7 @@ namespace Unity.UIWidgets.ui {
 
             var layer = this._currentLayer;
             if (convex) {
-                layer.draws.Add(CanvasShader.convexFill(layer, p, fillMesh));
+                layer.draws.Add(CanvasShader.convexFill(layer, p, fillMesh, this.supportComputeBuffer));
             }
             else {
                 layer.draws.Add(CanvasShader.fill0(layer, fillMesh));
@@ -1035,6 +1037,7 @@ namespace Unity.UIWidgets.ui {
         public void flush(uiPicture picture) {
             this._reset();
             this._resetRenderTextureId();
+            this.resetComputeBuffer();
 
             this._drawUIPicture(picture, false);
 
@@ -1045,15 +1048,16 @@ namespace Unity.UIWidgets.ui {
             using (var cmdBuf = new CommandBuffer()) {
                 cmdBuf.name = "CommandBufferCanvas";
 
-                //this._lastRtID = -1;
-                //this._drawLayer(layer, cmdBuf);
-                cmdBuf.SetRenderTarget(this._renderTexture);
-                cmdBuf.ClearRenderTarget(true, true, UnityEngine.Color.grey);
-                this.DrawBuffer(cmdBuf);
+                this._lastRtID = -1;
+                this._drawLayer(layer, cmdBuf);
+                //cmdBuf.SetRenderTarget(this._renderTexture);
+                //cmdBuf.ClearRenderTarget(true, true, UnityEngine.Color.grey);
+                //this.DrawBuffer(cmdBuf);
 
                 // this is necessary for webgl2. not sure why... just to be safe to disable the scissor.
                 cmdBuf.DisableScissorRect();
 
+                this.bindComputeBuffer();
                 Graphics.ExecuteCommandBuffer(cmdBuf);
             }
 
@@ -1142,12 +1146,7 @@ namespace Unity.UIWidgets.ui {
                         if (mesh == null) {
                             continue;
                         }
-
-                        D.assert(mesh.vertices.Count > 0);
-                        cmd.meshObj.SetVertices(mesh.vertices?.data);
-                        cmd.meshObj.SetTriangles(mesh.triangles?.data, 0, false);
-                        cmd.meshObj.SetUVs(0, mesh.uv?.data);
-
+                        
                         if (mesh.matrix == null) {
                             cmd.properties.SetFloatArray(CmdDraw.matId, CmdDraw.idMat3.fMat);
                         }
@@ -1166,7 +1165,22 @@ namespace Unity.UIWidgets.ui {
                             cmd.properties.SetFloatArray(CmdDraw.matId, this._drawLayer_matArray);
                         }
 
-                        cmdBuf.DrawMesh(cmd.meshObj, CmdDraw.idMat, cmd.material, 0, cmd.pass, cmd.properties.mpb);
+                        D.assert(mesh.vertices.Count > 0);
+                        if (this.supportComputeBuffer && CanvasShader.computeShader == cmd.material.shader) {
+                            this.addMeshToComputeBuffer(mesh.vertices?.data, mesh.uv?.data, mesh.triangles?.data);
+                            cmd.properties.mpb.SetBuffer("databuffer", this.computeBuffer);
+                            cmd.properties.mpb.SetBuffer("indexbuffer", this.indexBuffer);
+                            cmd.properties.mpb.SetInt("_startVertex", this.startIndex);
+                            cmdBuf.DrawProcedural(Matrix4x4.identity, cmd.material, 0, MeshTopology.Triangles, mesh.triangles.Count, 1, cmd.properties.mpb);
+                        }
+                        else {
+                            cmd.meshObj.SetVertices(mesh.vertices?.data);
+                            cmd.meshObj.SetTriangles(mesh.triangles?.data, 0, false);
+                            cmd.meshObj.SetUVs(0, mesh.uv?.data);
+
+                            cmdBuf.DrawMesh(cmd.meshObj, CmdDraw.idMat, cmd.material, 0, cmd.pass, cmd.properties.mpb);
+                        }
+
                         if (cmd.layerId != null) {
                             cmdBuf.SetGlobalTexture(CmdDraw.texId, BuiltinRenderTextureType.None);
                         }
