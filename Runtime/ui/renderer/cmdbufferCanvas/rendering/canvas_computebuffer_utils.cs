@@ -23,7 +23,7 @@ namespace Unity.UIWidgets.ui {
         bool supportComputeBuffer;
 
         void setupComputeBuffer() {
-            this.supportComputeBuffer = this._isMainCanvas && CanvasShader.supportComputeBuffer && false;
+            this.supportComputeBuffer = this._isMainCanvas && CanvasShader.supportComputeBuffer;
         }
 
         void initComputeBuffer() {

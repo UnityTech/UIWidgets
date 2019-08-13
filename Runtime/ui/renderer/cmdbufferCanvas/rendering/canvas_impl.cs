@@ -1166,7 +1166,7 @@ namespace Unity.UIWidgets.ui {
                         }
 
                         D.assert(mesh.vertices.Count > 0);
-                        if (this.supportComputeBuffer && CanvasShader.rshadowShader != cmd.material.shader && CanvasShader.rrshadowShader != cmd.material.shader) {
+                        if (this.supportComputeBuffer) {
                             this.addMeshToComputeBuffer(mesh.vertices?.data, mesh.uv?.data, mesh.triangles?.data);
                             cmd.properties.SetBuffer(CmdDraw.vertexBufferId, this.computeBuffer);
                             cmd.properties.SetBuffer(CmdDraw.indexBufferId, this.indexBuffer);

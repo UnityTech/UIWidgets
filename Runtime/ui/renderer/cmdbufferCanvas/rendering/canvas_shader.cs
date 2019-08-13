@@ -165,6 +165,8 @@ namespace Unity.UIWidgets.ui {
         static readonly Material _stencilMat_cb;
         static readonly Material _filterMat_cb;
         static readonly MaterialByBlendModeStencilComp _strokeAlphaMat_cb;
+        static readonly Material _shadowBox_cb;
+        static readonly Material _shadowRBox_cb;
 
         static Shader GetShader(string shaderName) {
             var shader = Shader.Find(shaderName);
@@ -201,6 +203,8 @@ namespace Unity.UIWidgets.ui {
             var texShaderCompute = GetShader("UIWidgets/canvas_tex_cb");
             var stencilShaderCompute = GetShader("UIWidgets/canvas_stencil_cb");
             var filterShaderCompute = GetShader("UIWidgets/canvas_filter_cb");
+            var shadowBoxShaderCompute = GetShader("UIWidgets/ShadowBox_cb");
+            var shadowRBoxShaderCompute = GetShader("UIWidgets/ShadowRBox_cb");
             var strokeAlphaShaderCompute = GetShader("UIWidgets/canvas_strokeAlpha_cb");
 
             rshadowShader = shadowBoxShader;
@@ -227,6 +231,8 @@ namespace Unity.UIWidgets.ui {
             _texMat_cb = new MaterialByBlendModeStencilComp(texShaderCompute);
             _stencilMat_cb = new Material(stencilShaderCompute) {hideFlags = HideFlags.HideAndDontSave};
             _filterMat_cb = new Material(filterShaderCompute) {hideFlags = HideFlags.HideAndDontSave};
+            _shadowBox_cb = new Material(shadowBoxShaderCompute) {hideFlags = HideFlags.HideAndDontSave};
+            _shadowRBox_cb = new Material(shadowRBoxShaderCompute) {hideFlags = HideFlags.HideAndDontSave};
 
             supportComputeBuffer = convexFillShaderCompute.isSupported;
         }
@@ -572,11 +578,11 @@ namespace Unity.UIWidgets.ui {
         }
 
         public static PictureFlusher.CmdDraw fastShadow(PictureFlusher.RenderLayer layer, uiMeshMesh mesh, float sigma,
-            bool isRect, bool isCircle, float corner, Vector4 bound, uiColor color) {
+            bool isRect, bool isCircle, float corner, Vector4 bound, uiColor color, bool supportComputeBuffer) {
             Vector4 viewport = layer.viewport;
-            var mat = _shadowBox;
+            var mat = supportComputeBuffer ? _shadowBox_cb : _shadowBox;
             if (!isRect) {
-                mat = _shadowRBox;
+                mat = supportComputeBuffer ? _shadowRBox_cb : _shadowRBox;
             }
             
             var props = ObjectPool<MaterialPropertyBlockWrapper>.alloc();
