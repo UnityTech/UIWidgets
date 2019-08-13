@@ -21,9 +21,6 @@ namespace Unity.UIWidgets.engine {
         protected override void updateSafeArea() {
             this._padding = this._uiWidgetsPanel.viewPadding;
             this._viewInsets = this._uiWidgetsPanel.viewInsets;
-            
-            Debug.Log($"update safe area: padding = {this._padding.top}, {this._padding.left}, {this._padding.bottom}, {this._padding.right} ; " +
-                      $"viewInsets = {this._viewInsets.top}, {this._viewInsets.left}, {this._viewInsets.bottom}, {this._viewInsets.right}");
         }
 
         protected override bool hasFocus() {
