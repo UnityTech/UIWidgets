@@ -11,8 +11,6 @@ namespace Unity.UIWidgets.ui {
         readonly float _devicePixelRatio;
         readonly MeshPool _meshPool;
 
-        readonly bool _isMainCanvas;
-
         readonly List<RenderLayer> _layers = new List<RenderLayer>();
         RenderLayer _currentLayer;
         uiRect? _lastScissor;
@@ -46,7 +44,7 @@ namespace Unity.UIWidgets.ui {
             }
         }
 
-        public PictureFlusher(RenderTexture renderTexture, float devicePixelRatio, MeshPool meshPool, bool isMainCanvas) {
+        public PictureFlusher(RenderTexture renderTexture, float devicePixelRatio, MeshPool meshPool) {
             D.assert(renderTexture);
             D.assert(devicePixelRatio > 0);
             D.assert(meshPool != null);
@@ -55,7 +53,6 @@ namespace Unity.UIWidgets.ui {
             this._fringeWidth = 1.0f / devicePixelRatio;
             this._devicePixelRatio = devicePixelRatio;
             this._meshPool = meshPool;
-            this._isMainCanvas = isMainCanvas;
 
             this.___drawTextDrawMeshCallback = this._drawTextDrawMeshCallback;
             this.___drawPathDrawMeshCallback2 = this._drawPathDrawMeshCallback2;

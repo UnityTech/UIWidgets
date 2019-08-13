@@ -4,9 +4,9 @@ namespace Unity.UIWidgets.ui {
     public class CommandBufferCanvas : uiRecorderCanvas {
         readonly PictureFlusher _flusher;
 
-        public CommandBufferCanvas(RenderTexture renderTexture, float devicePixelRatio, MeshPool meshPool, bool isMainCanvas = false)
+        public CommandBufferCanvas(RenderTexture renderTexture, float devicePixelRatio, MeshPool meshPool)
             : base(new uiPictureRecorder()) {
-            this._flusher = new PictureFlusher(renderTexture, devicePixelRatio, meshPool, isMainCanvas);
+            this._flusher = new PictureFlusher(renderTexture, devicePixelRatio, meshPool);
         }
 
         public override float getDevicePixelRatio() {

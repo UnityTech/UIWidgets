@@ -189,7 +189,7 @@ namespace Unity.UIWidgets.editor {
         public Canvas getCanvas() {
             if (this._canvas == null) {
                 this._canvas = new CommandBufferCanvas(
-                    this._renderTexture, this.devicePixelRatio, this._meshPool, true);
+                    this._renderTexture, this.devicePixelRatio, this._meshPool);
             }
 
             return this._canvas;
