@@ -76,6 +76,13 @@ namespace Unity.UIWidgets.ui {
         }
     }
 
+    struct uiVertexUV {
+        public uiList<Vector3> fillVertices;
+        public uiList<Vector2> fillUV;
+        public uiList<Vector3> strokeVertices;
+        public uiList<Vector2> strokeUV;
+    }
+
     static class uiPathUtils {
         public static bool ptEquals(float x1, float y1, float x2, float y2, float tol) {
             float dx = x2 - x1;
@@ -110,19 +117,25 @@ namespace Unity.UIWidgets.ui {
             return d;
         }
 
-        public static void buttCapStart(this uiList<Vector3> dst, uiPathPoint p,
-            float dx, float dy, float w, float d) {
+        public static void buttCapStart(this uiList<Vector3> dst, uiList<Vector2> uv, uiPathPoint p,
+            float dx, float dy, float w, float d, float aa, float u0, float u1) {
             float px = p.x - dx * d;
             float py = p.y - dy * d;
             float dlx = dy;
             float dly = -dx;
 
+            dst.Add(new Vector2(px + dlx * w - dx * aa, py + dly * w - dy * aa));
+            dst.Add(new Vector2(px - dlx * w - dx * aa, py - dly * w - dy * aa));
             dst.Add(new Vector2(px + dlx * w, py + dly * w));
             dst.Add(new Vector2(px - dlx * w, py - dly * w));
+            uv.Add(new Vector2(u0, 0));
+            uv.Add(new Vector2(u1, 0));
+            uv.Add(new Vector2(u0, 1));
+            uv.Add(new Vector2(u1, 1));
         }
 
-        public static void buttCapEnd(this uiList<Vector3> dst, uiPathPoint p,
-            float dx, float dy, float w, float d) {
+        public static void buttCapEnd(this uiList<Vector3> dst, uiList<Vector2> uv, uiPathPoint p,
+            float dx, float dy, float w, float d, float aa, float u0, float u1) {
             float px = p.x + dx * d;
             float py = p.y + dy * d;
             float dlx = dy;
@@ -130,10 +143,16 @@ namespace Unity.UIWidgets.ui {
 
             dst.Add(new Vector2(px + dlx * w, py + dly * w));
             dst.Add(new Vector2(px - dlx * w, py - dly * w));
+            dst.Add(new Vector2(px + dlx * w + dx * aa, py + dly * w + dy * aa));
+            dst.Add(new Vector2(px - dlx * w + dx * aa, py - dly * w + dy * aa));
+            uv.Add(new Vector2(u0, 1));
+            uv.Add(new Vector2(u1, 1));
+            uv.Add(new Vector2(u0, 0));
+            uv.Add(new Vector2(u1, 0));
         }
 
-        public static void roundCapStart(this uiList<Vector3> dst, uiPathPoint p,
-            float dx, float dy, float w, int ncap) {
+        public static void roundCapStart(this uiList<Vector3> dst, uiList<Vector2> uv, uiPathPoint p,
+            float dx, float dy, float w, int ncap, float u0, float u1) {
             float px = p.x;
             float py = p.y;
             float dlx = dy;
@@ -144,14 +163,18 @@ namespace Unity.UIWidgets.ui {
                 float ax = Mathf.Cos(a) * w, ay = Mathf.Sin(a) * w;
                 dst.Add(new Vector2(px - dlx * ax - dx * ay, py - dly * ax - dy * ay));
                 dst.Add(new Vector2(px, py));
+                uv.Add(new Vector2(u0, 1));
+                uv.Add(new Vector2(0.5f, 1));
             }
 
             dst.Add(new Vector2(px + dlx * w, py + dly * w));
             dst.Add(new Vector2(px - dlx * w, py - dly * w));
+            uv.Add(new Vector2(u0, 1));
+            uv.Add(new Vector2(u1, 1));
         }
 
-        public static void roundCapEnd(this uiList<Vector3> dst, uiPathPoint p,
-            float dx, float dy, float w, int ncap) {
+        public static void roundCapEnd(this uiList<Vector3> dst, uiList<Vector2> uv, uiPathPoint p,
+            float dx, float dy, float w, int ncap, float u0, float u1) {
             float px = p.x;
             float py = p.y;
             float dlx = dy;
@@ -159,12 +182,16 @@ namespace Unity.UIWidgets.ui {
 
             dst.Add(new Vector2(px + dlx * w, py + dly * w));
             dst.Add(new Vector2(px - dlx * w, py - dly * w));
+            uv.Add(new Vector2(u0, 1));
+            uv.Add(new Vector2(u1, 1));
 
             for (var i = 0; i < ncap; i++) {
                 float a = (float) i / (ncap - 1) * Mathf.PI;
                 float ax = Mathf.Cos(a) * w, ay = Mathf.Sin(a) * w;
                 dst.Add(new Vector2(px, py));
                 dst.Add(new Vector2(px - dlx * ax + dx * ay, py - dly * ax + dy * ay));
+                uv.Add(new Vector2(0.5f, 1));
+                uv.Add(new Vector2(u0, 1));
             }
         }
 
@@ -189,8 +216,8 @@ namespace Unity.UIWidgets.ui {
             return Mathf.Max(2, Mathf.CeilToInt(arc / da));
         }
 
-        public static void roundJoin(this uiList<Vector3> dst, uiPathPoint p0, uiPathPoint p1,
-            float lw, float rw, int ncap) {
+        public static void roundJoin(this uiList<Vector3> dst, uiList<Vector2> uv, uiPathPoint p0, uiPathPoint p1,
+            float lw, float rw, int ncap, float lu, float ru, float fringe) {
             float dlx0 = p0.dy;
             float dly0 = -p0.dx;
             float dlx1 = p1.dy;
@@ -209,6 +236,8 @@ namespace Unity.UIWidgets.ui {
 
                 dst.Add(new Vector2(lx0, ly0));
                 dst.Add(new Vector2(p1.x - dlx0 * rw, p1.y - dly0 * rw));
+                uv.Add(new Vector2(lu, 1));
+                uv.Add(new Vector2(ru, 1));
 
                 var n = Mathf.CeilToInt((a0 - a1) / Mathf.PI * ncap).clamp(2, ncap);
                 for (var i = 0; i < n; i++) {
@@ -219,10 +248,14 @@ namespace Unity.UIWidgets.ui {
 
                     dst.Add(new Vector2(p1.x, p1.y));
                     dst.Add(new Vector2(rx, ry));
+                    uv.Add(new Vector2(0.5f, 1));
+                    uv.Add(new Vector2(ru, 1));
                 }
 
                 dst.Add(new Vector2(lx1, ly1));
                 dst.Add(new Vector2(p1.x - dlx1 * rw, p1.y - dly1 * rw));
+                uv.Add(new Vector2(lu, 1));
+                uv.Add(new Vector2(ru, 1));
             }
             else {
                 float rx0, ry0, rx1, ry1;
@@ -237,6 +270,8 @@ namespace Unity.UIWidgets.ui {
 
                 dst.Add(new Vector2(p1.x + dlx0 * lw, p1.y + dly0 * lw));
                 dst.Add(new Vector2(rx0, ry0));
+                uv.Add(new Vector2(lu, 1));
+                uv.Add(new Vector2(ru, 1));
 
                 var n = Mathf.CeilToInt((a1 - a0) / Mathf.PI * ncap).clamp(2, ncap);
                 for (var i = 0; i < n; i++) {
@@ -247,15 +282,19 @@ namespace Unity.UIWidgets.ui {
 
                     dst.Add(new Vector2(lx, ly));
                     dst.Add(new Vector2(p1.x, p1.y));
+                    uv.Add(new Vector2(lu, 1));
+                    uv.Add(new Vector2(0.5f, 1));
                 }
 
                 dst.Add(new Vector2(p1.x + dlx1 * lw, p1.y + dly1 * lw));
                 dst.Add(new Vector2(rx1, ry1));
+                uv.Add(new Vector2(lu, 1));
+                uv.Add(new Vector2(ru, 1));
             }
         }
 
-        public static void bevelJoin(this uiList<Vector3> dst, uiPathPoint p0, uiPathPoint p1,
-            float lw, float rw) {
+        public static void bevelJoin(this uiList<Vector3> dst, uiList<Vector2> uv, uiPathPoint p0, uiPathPoint p1,
+            float lw, float rw, float lu, float ru, float fringe) {
             float rx0, ry0, rx1, ry1;
             float lx0, ly0, lx1, ly1;
 
@@ -270,12 +309,18 @@ namespace Unity.UIWidgets.ui {
 
                 dst.Add(new Vector2 {x = lx0, y = ly0});
                 dst.Add(new Vector2 {x = p1.x - dlx0 * rw, y = p1.y - dly0 * rw});
+                uv.Add(new Vector2(lu, 1));
+                uv.Add(new Vector2(ru, 1));
 
                 if ((p1.flags & uiPointFlags.bevel) != 0) {
                     dst.Add(new Vector2(lx0, ly0));
                     dst.Add(new Vector2(p1.x - dlx0 * rw, p1.y - dly0 * rw));
                     dst.Add(new Vector2(lx1, ly1));
                     dst.Add(new Vector2(p1.x - dlx1 * rw, p1.y - dly1 * rw));
+                    uv.Add(new Vector2(lu, 1));
+                    uv.Add(new Vector2(ru, 1));
+                    uv.Add(new Vector2(lu, 1));
+                    uv.Add(new Vector2(ru, 1));
                 }
                 else {
                     rx0 = p1.x - p1.dmx * rw;
@@ -286,10 +331,18 @@ namespace Unity.UIWidgets.ui {
                     dst.Add(new Vector2(rx0, ry0));
                     dst.Add(new Vector2(p1.x, p1.y));
                     dst.Add(new Vector2(p1.x - dlx1 * rw, p1.y - dly1 * rw));
+                    uv.Add(new Vector2(0.5f, 1));
+                    uv.Add(new Vector2(ru, 1));
+                    uv.Add(new Vector2(ru, 1));
+                    uv.Add(new Vector2(ru, 1));
+                    uv.Add(new Vector2(0.5f, 1));
+                    uv.Add(new Vector2(ru, 1));
                 }
 
                 dst.Add(new Vector2(lx1, ly1));
                 dst.Add(new Vector2(p1.x - dlx1 * rw, p1.y - dly1 * rw));
+                uv.Add(new Vector2(lu, 1));
+                uv.Add(new Vector2(ru, 1));
             }
             else {
                 chooseBevel((p1.flags & uiPointFlags.innerBevel) != 0, p0, p1, -rw,
@@ -297,12 +350,18 @@ namespace Unity.UIWidgets.ui {
 
                 dst.Add(new Vector2(p1.x + dlx0 * lw, p1.y + dly0 * lw));
                 dst.Add(new Vector2(rx0, ry0));
+                uv.Add(new Vector2(lu, 1));
+                uv.Add(new Vector2(ru, 1));
 
                 if ((p1.flags & uiPointFlags.bevel) != 0) {
                     dst.Add(new Vector2(p1.x + dlx0 * lw, p1.y + dly0 * lw));
                     dst.Add(new Vector2(rx0, ry0));
                     dst.Add(new Vector2(p1.x + dlx1 * lw, p1.y + dly1 * lw));
                     dst.Add(new Vector2(rx1, ry1));
+                    uv.Add(new Vector2(lu, 1));
+                    uv.Add(new Vector2(ru, 1));
+                    uv.Add(new Vector2(lu, 1));
+                    uv.Add(new Vector2(ru, 1));
                 }
                 else {
                     lx0 = p1.x + p1.dmx * lw;
@@ -313,10 +372,18 @@ namespace Unity.UIWidgets.ui {
                     dst.Add(new Vector2(lx0, ly0));
                     dst.Add(new Vector2(p1.x + dlx1 * lw, p1.y + dly1 * lw));
                     dst.Add(new Vector2(p1.x, p1.y));
+                    uv.Add(new Vector2(lu, 1));
+                    uv.Add(new Vector2(0.5f, 1));
+                    uv.Add(new Vector2(lu, 1));
+                    uv.Add(new Vector2(lu, 1));
+                    uv.Add(new Vector2(lu, 1));
+                    uv.Add(new Vector2(0.5f, 1));
                 }
 
                 dst.Add(new Vector2(p1.x + dlx1 * lw, p1.y + dly1 * lw));
                 dst.Add(new Vector2(rx1, ry1));
+                uv.Add(new Vector2(lu, 1));
+                uv.Add(new Vector2(ru, 1));
             }
         }
     }

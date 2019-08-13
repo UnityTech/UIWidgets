@@ -181,7 +181,8 @@ namespace Unity.UIWidgets.ui {
 
                     var rectPathCache = cmd.path.flatten(
                         scale * Window.instance.devicePixelRatio);
-                    var rectMesh = rectPathCache.getFillMesh(out _);
+                    rectPathCache.computeFillMesh(0.0f, out _);
+                    var rectMesh = rectPathCache.fillMesh;
                     var transformedMesh = rectMesh.transform(state.xform);
                     var rect = transformedMesh.bounds;
                     state.scissor = state.scissor == null ? rect : state.scissor.Value.intersect(rect);
@@ -199,7 +200,8 @@ namespace Unity.UIWidgets.ui {
                     uiMeshMesh mesh;
                     if (paint.style == PaintingStyle.fill) {
                         var cache = path.flatten(scale * devicePixelRatio);
-                        var fillMesh = cache.getFillMesh(out _);
+                        cache.computeFillMesh(0.0f, out _);
+                        var fillMesh = cache.fillMesh;
                         mesh = fillMesh.transform(state.xform);
                     }
                     else {
@@ -211,11 +213,13 @@ namespace Unity.UIWidgets.ui {
                         }
 
                         var cache = path.flatten(scale * devicePixelRatio);
-                        var strokenMesh = cache.getStrokeMesh(
+                        cache.computeStrokeMesh(
                             strokeWidth / scale * 0.5f,
+                            0.0f,
                             paint.strokeCap,
                             paint.strokeJoin,
                             paint.strokeMiterLimit);
+                        var strokenMesh = cache.strokeMesh;
 
                         mesh = strokenMesh.transform(state.xform);
                     }
@@ -261,7 +265,8 @@ namespace Unity.UIWidgets.ui {
                 case uiDrawTextBlob cmd: {
                     var state = this._getState();
                     var scale = uiXformUtils.getScale(state.xform);
-                    var rect = uiRectHelper.fromRect(cmd.textBlob.boundsInText).shift(cmd.offset.Value);
+                    var rect = uiRectHelper.fromRect(
+                        cmd.textBlob.Value.shiftedBoundsInText(cmd.offset.Value.dx, cmd.offset.Value.dy));
                     rect = state.xform.mapRect(rect);
 
                     var paint = cmd.paint;

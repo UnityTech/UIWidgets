@@ -1,8 +1,9 @@
+using Unity.UIWidgets.material;
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
     static class ShadowUtils {
-        public const bool kUseFastShadow = false;
+        public const bool kUseFastShadow = true;
 
         const float kAmbientHeightFactor = 1.0f / 128.0f;
         const float kAmbientGeomFactor = 64.0f;
@@ -10,6 +11,8 @@ namespace Unity.UIWidgets.ui {
         const float kBlurSigmaScale = 0.57735f;
 
         const float kMaxAmbientRadius = 300 * kAmbientHeightFactor * kAmbientGeomFactor;
+
+        const bool debugShadow = false;
 
         static float divideAndPin(float numer, float denom, float min, float max) {
             return (numer / denom).clamp(min, max);
@@ -199,10 +202,24 @@ namespace Unity.UIWidgets.ui {
 
             _shadowPaint.maskFilter = null;
         }
-
+        
+        
         static void drawShadowFast(Canvas canvas, Path path, Vector3 zPlaneParams, Vector3 devLightPos,
             float lightRadius, uiColor ambientColor, uiColor spotColor, int flags) {
             Matrix3 viewMatrix = canvas.getTotalMatrix();
+
+            //debug shadow
+            if (debugShadow) {
+                var isRRect = path.isNaiveRRect;
+                if (isRRect) {
+                    ambientColor = uiColor.fromColor(Colors.red);
+                    spotColor = uiColor.fromColor(Colors.red);
+                }
+                else {
+                    ambientColor = uiColor.fromColor(Colors.green);
+                    spotColor = uiColor.fromColor(Colors.green);
+                }
+            }
 
             //ambient light
             float devSpaceOutset = ambientBlurRadius(zPlaneParams.z);
@@ -210,7 +227,6 @@ namespace Unity.UIWidgets.ui {
             float blurRadius = 0.5f * devSpaceOutset * oneOverA;
             float strokeWidth = 0.5f * (devSpaceOutset - blurRadius);
 
-            //Paint paint = new Paint {color = ambientColor, strokeWidth = strokeWidth, style = PaintingStyle.fill};
             _shadowPaint.color = new Color(ambientColor.value);
             _shadowPaint.strokeWidth = strokeWidth;
             _shadowPaint.style = PaintingStyle.fill;
@@ -218,7 +234,6 @@ namespace Unity.UIWidgets.ui {
 
             //spot light
             float radius = 0.0f;
-
             if (!getSpotShadowTransform(devLightPos, lightRadius, viewMatrix, zPlaneParams, path.getBounds(),
                 _shadowMatrix, ref radius)) {
                 return;
@@ -226,13 +241,38 @@ namespace Unity.UIWidgets.ui {
 
             canvas.save();
             canvas.setMatrix(_shadowMatrix);
-            //Paint paint2 = new Paint {color = spotColor};
+
             _shadowPaint.color = new Color(spotColor.value);
             _shadowPaint.strokeWidth = 0;
             _shadowPaint.style = PaintingStyle.fill;
+            float sigma2 = convertRadiusToSigma(radius);
+            _shadowPaint.maskFilter = path.isNaiveRRect ? MaskFilter.fastShadow(sigma2) : MaskFilter.blur(BlurStyle.normal, sigma2);
             canvas.drawPath(path, _shadowPaint);
 
             canvas.restore();
+
+            _shadowPaint.maskFilter = null;
+        }
+        
+        /*
+         * Check whether the RRect is a naive Round-Rect, of which
+         * (1) all the corner radius are the same
+         * (2) the corner radius is not bigger than either half the width or the height of the Round Rect's bounding box
+         *
+         * Usage: The shadow of a naive Round-Rect can be easily drawn using a ShadowRBox shader, so we can use it to
+         * find all the situations that a fast shadow can be drawn to tackle the performance issue
+         */
+        public static bool isNaiveRRect(this RRect rrect) {
+                var radius = rrect.tlRadiusX;
+                return rrect.tlRadiusY == radius &&
+                       rrect.trRadiusX == radius &&
+                       rrect.trRadiusY == radius &&
+                       rrect.blRadiusX == radius &&
+                       rrect.blRadiusY == radius &&
+                       rrect.brRadiusX == radius &&
+                       rrect.brRadiusY == radius &&
+                       radius <= rrect.width / 2 &&
+                       radius <= rrect.height / 2;
         }
     }
 }
