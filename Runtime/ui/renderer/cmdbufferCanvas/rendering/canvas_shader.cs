@@ -179,9 +179,6 @@ namespace Unity.UIWidgets.ui {
 
         public static readonly bool supportComputeBuffer;
 
-        public static Shader rshadowShader;
-        public static Shader rrshadowShader;
-
         static CanvasShader() {
             var convexFillShader = GetShader("UIWidgets/canvas_convexFill");
             var fill0Shader = GetShader("UIWidgets/canvas_fill0");
@@ -207,9 +204,6 @@ namespace Unity.UIWidgets.ui {
             var shadowRBoxShaderCompute = GetShader("UIWidgets/ShadowRBox_cb");
             var strokeAlphaShaderCompute = GetShader("UIWidgets/canvas_strokeAlpha_cb");
 
-            rshadowShader = shadowBoxShader;
-            rrshadowShader = shadowRBoxShader;
-
             _convexFillMat = new MaterialByBlendModeStencilComp(convexFillShader);
             _fill0Mat = new MaterialByStencilComp(fill0Shader);
             _fill1Mat = new MaterialByBlendMode(fill1Shader);
@@ -234,6 +228,7 @@ namespace Unity.UIWidgets.ui {
             _shadowBox_cb = new Material(shadowBoxShaderCompute) {hideFlags = HideFlags.HideAndDontSave};
             _shadowRBox_cb = new Material(shadowRBoxShaderCompute) {hideFlags = HideFlags.HideAndDontSave};
 
+            //check compute buffer support
             supportComputeBuffer = convexFillShaderCompute.isSupported;
         }
 

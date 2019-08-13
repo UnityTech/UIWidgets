@@ -11,67 +11,65 @@ namespace Unity.UIWidgets.ui {
             public Vector2 uv;
         }
 
-        ComputeBuffer computeBuffer;
-        List<uiVertex> vertexes;
+        static ComputeBuffer computeBuffer;
+        static List<uiVertex> vertexes;
 
-        ComputeBuffer indexBuffer;
-        List<int> indexes;
+        static ComputeBuffer indexBuffer;
+        static List<int> indexes;
         
-        int startVertex;
-        int startIndex;
+        static int startVertex;
+        static int startIndex;
 
-        bool supportComputeBuffer;
-
-        void setupComputeBuffer() {
-            this.supportComputeBuffer = this._isMainCanvas && CanvasShader.supportComputeBuffer;
+        static bool supportComputeBuffer {
+            get { return CanvasShader.supportComputeBuffer; }
         }
 
         void initComputeBuffer() {
             var stride = Marshal.SizeOf(typeof(uiVertex));
-            this.computeBuffer = new ComputeBuffer(1024 * 1024, stride);
-            this.vertexes = new List<uiVertex>();
+            computeBuffer = new ComputeBuffer(1024 * 1024, stride);
+            vertexes = new List<uiVertex>();
                 
-            this.indexBuffer = new ComputeBuffer(1024 * 1024, Marshal.SizeOf(typeof(int)));
-            this.indexes = new List<int>();
+            indexBuffer = new ComputeBuffer(1024 * 1024, Marshal.SizeOf(typeof(int)));
+            indexes = new List<int>();
         }
 
         void resetComputeBuffer() {
-            if (!this.supportComputeBuffer) return;
+            if (!supportComputeBuffer) return;
 
-            if (this.computeBuffer == null) {
+            if (computeBuffer == null) {
                 this.initComputeBuffer();
             }
             
-            this.vertexes.Clear();
-            this.indexes.Clear();
-            this.startVertex = 0;
-            this.startIndex = 0;
+            vertexes.Clear();
+            indexes.Clear();
+            startVertex = 0;
+            startIndex = 0;
         }
 
         void bindComputeBuffer() {
-            if (!this.supportComputeBuffer) return;
+            if (!supportComputeBuffer) return;
             
-            this.computeBuffer.SetData(this.vertexes);
-            this.indexBuffer.SetData(this.indexes);
+            computeBuffer.SetData(vertexes);
+            indexBuffer.SetData(indexes);
         }
 
         void addMeshToComputeBuffer(List<Vector3> vertex, List<Vector2> uv, List<int> triangles) {
-            if (!this.supportComputeBuffer) return;
+            if (!supportComputeBuffer) return;
             
-            this.startVertex = this.vertexes.Count;
-            this.startIndex = this.indexes.Count;
+            startVertex = vertexes.Count;
+            startIndex = indexes.Count;
 
             var hasUv = uv != null;
 
             for (int i = 0; i < vertex.Count; i++) {
-                this.vertexes.Add(new uiVertex {
+                vertexes.Add(new uiVertex {
                     position = new Vector2(vertex[i].x, vertex[i].y),
                     uv = hasUv ? uv[i] : Vector2.zero
                 });
             }
 
             foreach (var triangleId in triangles) {
-                this.indexes.Add(triangleId + this.startVertex);
+                indexes.Add(triangleId + startVertex);
             }
         }
         
