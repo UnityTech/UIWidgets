@@ -11,71 +11,101 @@ namespace Unity.UIWidgets.ui {
             public Vector2 uv;
         }
 
-        static ComputeBuffer computeBuffer;
-        static List<uiVertex> vertexes;
+        static ComputeBuffer _computeBuffer;
+        static List<uiVertex> _vertices;
 
-        static ComputeBuffer indexBuffer;
-        static List<int> indexes;
+        static ComputeBuffer _indexBuffer;
+        static List<int> _indices;
         
-        static int startVertex;
-        static int startIndex;
+        static int _startVertex;
+        static int _startIndex;
+
+        static int _instanceNum;
+
+        public static bool enableComputeBuffer = true;
+
+        public const int COMPUTE_BUFFER_MAX_ITEM_NUM = 1024 * 1024;   // maxsize = 1M vertex/index
 
         static bool supportComputeBuffer {
-            get { return CanvasShader.supportComputeBuffer; }
+            get { return SystemInfo.supportsComputeShaders && CanvasShader.supportComputeBuffer && enableComputeBuffer; }
+        }
+
+        static void tryReleaseComputeBuffer() {
+            _instanceNum--;
+
+            if (!supportComputeBuffer) {
+                return;
+            }
+
+            if (_computeBuffer == null) {
+                return;
+            }
+
+            if (_instanceNum != 0) {
+                return;
+            }
+
+            _computeBuffer.Dispose();
+            _indexBuffer.Dispose();
+            _vertices = null;
+            _indices = null;
+            _computeBuffer = null;
+            _indexBuffer = null;
         }
 
         void initComputeBuffer() {
             var stride = Marshal.SizeOf(typeof(uiVertex));
-            computeBuffer = new ComputeBuffer(1024 * 1024, stride);
-            vertexes = new List<uiVertex>();
+            var strideIndex = Marshal.SizeOf(typeof(int));
+            _computeBuffer = new ComputeBuffer(COMPUTE_BUFFER_MAX_ITEM_NUM, stride);
+            _vertices = new List<uiVertex>();
                 
-            indexBuffer = new ComputeBuffer(1024 * 1024, Marshal.SizeOf(typeof(int)));
-            indexes = new List<int>();
+            _indexBuffer = new ComputeBuffer(COMPUTE_BUFFER_MAX_ITEM_NUM, strideIndex);
+            _indices = new List<int>();
         }
 
         void resetComputeBuffer() {
             if (!supportComputeBuffer) return;
 
-            if (computeBuffer == null) {
+            if (_computeBuffer == null) {
                 this.initComputeBuffer();
             }
             
-            vertexes.Clear();
-            indexes.Clear();
-            startVertex = 0;
-            startIndex = 0;
+            _vertices.Clear();
+            _indices.Clear();
+            _startVertex = 0;
+            _startIndex = 0;
         }
 
         void bindComputeBuffer() {
             if (!supportComputeBuffer) return;
             
-            computeBuffer.SetData(vertexes);
-            indexBuffer.SetData(indexes);
+            _computeBuffer.SetData(_vertices);
+            _indexBuffer.SetData(_indices);
         }
 
         void addMeshToComputeBuffer(List<Vector3> vertex, List<Vector2> uv, List<int> triangles) {
             if (!supportComputeBuffer) return;
             
-            startVertex = vertexes.Count;
-            startIndex = indexes.Count;
+            _startVertex = _vertices.Count;
+            _startIndex = _indices.Count;
 
             var hasUv = uv != null;
 
             for (int i = 0; i < vertex.Count; i++) {
-                vertexes.Add(new uiVertex {
+                _vertices.Add(new uiVertex {
                     position = new Vector2(vertex[i].x, vertex[i].y),
                     uv = hasUv ? uv[i] : Vector2.zero
                 });
             }
 
             foreach (var triangleId in triangles) {
-                indexes.Add(triangleId + startVertex);
+                _indices.Add(triangleId + _startVertex);
             }
         }
         
         /*public void DrawBuffer(CommandBuffer cmdBuf)
         {
-            if (this.computeBuffer == null)
+            if (this._computeBuffer == null)
             {
                 this.initComputeBuffer();
             }
@@ -116,9 +146,9 @@ namespace Unity.UIWidgets.ui {
                         this.addMeshToComputeBuffer(vert, null, index);
 
                         var mpb = new MaterialPropertyBlock();
-                        mpb.SetBuffer("databuffer", this.computeBuffer);
-                        mpb.SetBuffer("indexbuffer", this.indexBuffer);
-                        mpb.SetInt("_startVertex", this.startIndex);
+                        mpb.SetBuffer("databuffer", this._computeBuffer);
+                        mpb.SetBuffer("indexbuffer", this._indexBuffer);
+                        mpb.SetInt("_startVertex", this._startIndex);
                         cmdBuf.DrawProcedural(Matrix4x4.identity, this.material, 0, MeshTopology.Triangles, 6, 1, mpb);
                 }
             }

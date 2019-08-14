@@ -42,6 +42,8 @@ namespace Unity.UIWidgets.ui {
                 this._lastScissor = null;
                 this._layers.Clear();
             }
+
+            tryReleaseComputeBuffer();
         }
 
         public PictureFlusher(RenderTexture renderTexture, float devicePixelRatio, MeshPool meshPool) {
@@ -57,6 +59,8 @@ namespace Unity.UIWidgets.ui {
             this.___drawTextDrawMeshCallback = this._drawTextDrawMeshCallback;
             this.___drawPathDrawMeshCallback2 = this._drawPathDrawMeshCallback2;
             this.___drawPathDrawMeshCallback = this._drawPathDrawMeshCallback;
+
+            _instanceNum++;
         }
 
         readonly _drawPathDrawMeshCallbackDelegate ___drawTextDrawMeshCallback;
@@ -1045,9 +1049,6 @@ namespace Unity.UIWidgets.ui {
 
                 this._lastRtID = -1;
                 this._drawLayer(layer, cmdBuf);
-                //cmdBuf.SetRenderTarget(this._renderTexture);
-                //cmdBuf.ClearRenderTarget(true, true, UnityEngine.Color.grey);
-                //this.DrawBuffer(cmdBuf);
 
                 // this is necessary for webgl2. not sure why... just to be safe to disable the scissor.
                 cmdBuf.DisableScissorRect();
@@ -1163,9 +1164,9 @@ namespace Unity.UIWidgets.ui {
                         D.assert(mesh.vertices.Count > 0);
                         if (supportComputeBuffer) {
                             this.addMeshToComputeBuffer(mesh.vertices?.data, mesh.uv?.data, mesh.triangles?.data);
-                            cmd.properties.SetBuffer(CmdDraw.vertexBufferId, computeBuffer);
-                            cmd.properties.SetBuffer(CmdDraw.indexBufferId, indexBuffer);
-                            cmd.properties.SetInt(CmdDraw.startIndexId, startIndex);
+                            cmd.properties.SetBuffer(CmdDraw.vertexBufferId, _computeBuffer);
+                            cmd.properties.SetBuffer(CmdDraw.indexBufferId, _indexBuffer);
+                            cmd.properties.SetInt(CmdDraw.startIndexId, _startIndex);
                             cmdBuf.DrawProcedural(Matrix4x4.identity, cmd.material, cmd.pass, MeshTopology.Triangles, mesh.triangles.Count, 1, cmd.properties.mpb);
                         }
                         else {
