@@ -22,7 +22,7 @@ namespace Unity.UIWidgets.ui {
 
         static int _instanceNum;
 
-        public static bool enableComputeBuffer = false;
+        public static bool enableComputeBuffer = true;
 
         public const int COMPUTE_BUFFER_MAX_ITEM_NUM = 1024 * 1024;   // maxsize = 1M vertex/index
 
@@ -52,6 +52,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         void initComputeBuffer() {
+            Debug.Log("init compute buffer");
             var stride = Marshal.SizeOf(typeof(uiVertex));
             var strideIndex = Marshal.SizeOf(typeof(int));
             _computeBuffer = new ComputeBuffer(COMPUTE_BUFFER_MAX_ITEM_NUM, stride);
@@ -100,58 +101,5 @@ namespace Unity.UIWidgets.ui {
                 _indices.Add(triangleId + _startVertex);
             }
         }
-        
-        /*public void DrawBuffer(CommandBuffer cmdBuf)
-        {
-            if (this._computeBuffer == null)
-            {
-                this.initComputeBuffer();
-            }
-            
-            this.resetComputeBuffer();
-
-            if (this.material == null) {
-                this.material = new Material(Shader.Find("UIWidgets/canvas_convexFill_cb"));
-                this.material.SetVector("_viewport", new Vector4(0, 0, 500, 500));
-            }
-
-            var random = new Random();
-            var num = 5;
-            var size = 30;
-            
-            for (var i = 0; i < num; i++)
-            {
-                for (var j = 0; j < num; j++)
-                {
-                        var offsetY = i * size;
-                        var offsetX = j * size;
-                        var centerX = offsetX + size / 2;
-                        var centerY = offsetY + size / 2;
-                        var width = size;
-                        var height = size;
-
-                    var vert = new List<Vector3> {
-                        new Vector3(centerX - width / 2, centerY - height / 2),
-                        new Vector3(centerX + width / 2, centerY - height / 2),
-                        new Vector3(centerX + width / 2, centerY + height / 2),
-                        new Vector3(centerX - width / 2, centerY + height / 2)
-                    };
-
-                    var index = new List<int> {
-                        0, 1, 2, 0, 2, 3
-                    };
-
-                        this.addMeshToComputeBuffer(vert, null, index);
-
-                        var mpb = new MaterialPropertyBlock();
-                        mpb.SetBuffer("databuffer", this._computeBuffer);
-                        mpb.SetBuffer("indexbuffer", this._indexBuffer);
-                        mpb.SetInt("_startVertex", this._startIndex);
-                        cmdBuf.DrawProcedural(Matrix4x4.identity, this.material, 0, MeshTopology.Triangles, 6, 1, mpb);
-                }
-            }
-            
-            this.bindComputeBuffer();
-        }*/
     }
 }
