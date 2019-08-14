@@ -46,7 +46,6 @@ namespace Unity.UIWidgets.ui {
         }
 
         void initComputeBuffer() {
-            Debug.Log("init compute buffer");
             var stride = Marshal.SizeOf(typeof(uiVertex));
             var strideIndex = Marshal.SizeOf(typeof(int));
             _computeBuffer = new ComputeBuffer(COMPUTE_BUFFER_MAX_ITEM_NUM, stride);

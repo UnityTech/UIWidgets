@@ -155,18 +155,6 @@ namespace Unity.UIWidgets.ui {
         static readonly MaterialByBlendModeStencilComp _strokeAlphaMat;
         static readonly Material _shadowBox;
         static readonly Material _shadowRBox;
-        
-        static readonly MaterialByBlendModeStencilComp _convexFillMat_cb;
-        static readonly MaterialByStencilComp _fill0Mat_cb;
-        static readonly MaterialByBlendMode _fill1Mat_cb;
-        static readonly MaterialByBlendModeStencilComp _stroke0Mat_cb;
-        static readonly Material _stroke1Mat_cb;
-        static readonly MaterialByBlendModeStencilComp _texMat_cb;
-        static readonly Material _stencilMat_cb;
-        static readonly Material _filterMat_cb;
-        static readonly MaterialByBlendModeStencilComp _strokeAlphaMat_cb;
-        static readonly Material _shadowBox_cb;
-        static readonly Material _shadowRBox_cb;
 
         static Shader GetShader(string shaderName) {
             var shader = Shader.Find(shaderName);
@@ -223,17 +211,17 @@ namespace Unity.UIWidgets.ui {
                 var shadowRBoxShaderCompute = GetShader("UIWidgets/ShadowRBox_cb");
                 var strokeAlphaShaderCompute = GetShader("UIWidgets/canvas_strokeAlpha_cb");
 
-                _convexFillMat_cb = new MaterialByBlendModeStencilComp(convexFillShaderCompute);
-                _fill0Mat_cb = new MaterialByStencilComp(fill0ShaderCompute);
-                _fill1Mat_cb = new MaterialByBlendMode(fill1ShaderCompute);
-                _stroke0Mat_cb = new MaterialByBlendModeStencilComp(stroke0ShaderCompute);
-                _stroke1Mat_cb = new Material(stroke1ShaderCompute) {hideFlags = HideFlags.HideAndDontSave};
-                _strokeAlphaMat_cb = new MaterialByBlendModeStencilComp(strokeAlphaShaderCompute);
-                _texMat_cb = new MaterialByBlendModeStencilComp(texShaderCompute);
-                _stencilMat_cb = new Material(stencilShaderCompute) {hideFlags = HideFlags.HideAndDontSave};
-                _filterMat_cb = new Material(filterShaderCompute) {hideFlags = HideFlags.HideAndDontSave};
-                _shadowBox_cb = new Material(shadowBoxShaderCompute) {hideFlags = HideFlags.HideAndDontSave};
-                _shadowRBox_cb = new Material(shadowRBoxShaderCompute) {hideFlags = HideFlags.HideAndDontSave};
+                _convexFillMat = new MaterialByBlendModeStencilComp(convexFillShaderCompute);
+                _fill0Mat = new MaterialByStencilComp(fill0ShaderCompute);
+                _fill1Mat = new MaterialByBlendMode(fill1ShaderCompute);
+                _stroke0Mat = new MaterialByBlendModeStencilComp(stroke0ShaderCompute);
+                _stroke1Mat = new Material(stroke1ShaderCompute) {hideFlags = HideFlags.HideAndDontSave};
+                _strokeAlphaMat = new MaterialByBlendModeStencilComp(strokeAlphaShaderCompute);
+                _texMat = new MaterialByBlendModeStencilComp(texShaderCompute);
+                _stencilMat = new Material(stencilShaderCompute) {hideFlags = HideFlags.HideAndDontSave};
+                _filterMat= new Material(filterShaderCompute) {hideFlags = HideFlags.HideAndDontSave};
+                _shadowBox = new Material(shadowBoxShaderCompute) {hideFlags = HideFlags.HideAndDontSave};
+                _shadowRBox = new Material(shadowRBoxShaderCompute) {hideFlags = HideFlags.HideAndDontSave};
             }
         }
 
@@ -348,7 +336,7 @@ namespace Unity.UIWidgets.ui {
 
         public static PictureFlusher.CmdDraw convexFill(PictureFlusher.RenderLayer layer, uiPaint paint,
             uiMeshMesh mesh) {
-            var mat = supportComputeBuffer ? _convexFillMat_cb.getMaterial(paint.blendMode, layer.ignoreClip) : _convexFillMat.getMaterial(paint.blendMode, layer.ignoreClip);
+            var mat = _convexFillMat.getMaterial(paint.blendMode, layer.ignoreClip);
 
             _getShaderPassAndProps(layer, paint, mesh.matrix, 1.0f, 0.0f, out var pass, out var props);
 
@@ -362,7 +350,7 @@ namespace Unity.UIWidgets.ui {
 
         public static PictureFlusher.CmdDraw fill0(PictureFlusher.RenderLayer layer, uiMeshMesh mesh) {
             Vector4 viewport = layer.viewport;
-            var mat = supportComputeBuffer ? _fill0Mat_cb.getMaterial(layer.ignoreClip) : _fill0Mat.getMaterial(layer.ignoreClip);
+            var mat = _fill0Mat.getMaterial(layer.ignoreClip);
 
             var pass = 0;
             var props = ObjectPool<MaterialPropertyBlockWrapper>.alloc();
@@ -378,9 +366,7 @@ namespace Unity.UIWidgets.ui {
 
         public static PictureFlusher.CmdDraw fill1(PictureFlusher.RenderLayer layer, uiPaint paint,
             uiMeshMesh mesh) {
-            var mat = supportComputeBuffer
-                ? _fill1Mat_cb.getMaterial(paint.blendMode)
-                : _fill1Mat.getMaterial(paint.blendMode);
+            var mat = _fill1Mat.getMaterial(paint.blendMode);
             _getShaderPassAndProps(layer, paint, mesh.matrix, 1.0f, 0.0f, out var pass, out var props);
 
             var ret = PictureFlusher.CmdDraw.create(
@@ -396,9 +382,7 @@ namespace Unity.UIWidgets.ui {
 
         public static PictureFlusher.CmdDraw stroke0(PictureFlusher.RenderLayer layer, uiPaint paint,
             float alpha, uiMeshMesh mesh) {
-            var mat = supportComputeBuffer 
-                ? _stroke0Mat_cb.getMaterial(paint.blendMode, layer.ignoreClip) 
-                : _stroke0Mat.getMaterial(paint.blendMode, layer.ignoreClip);
+            var mat = _stroke0Mat.getMaterial(paint.blendMode, layer.ignoreClip);
             _getShaderPassAndProps(layer, paint, mesh.matrix, alpha, 0.0f, out var pass, out var props);
 
             return PictureFlusher.CmdDraw.create(
@@ -411,7 +395,7 @@ namespace Unity.UIWidgets.ui {
 
         public static PictureFlusher.CmdDraw stroke1(PictureFlusher.RenderLayer layer, uiMeshMesh mesh) {
             Vector4 viewport = layer.viewport;
-            var mat = supportComputeBuffer ? _stroke1Mat_cb : _stroke1Mat;
+            var mat = _stroke1Mat;
 
             var pass = 0;
             var props = ObjectPool<MaterialPropertyBlockWrapper>.alloc();
@@ -426,9 +410,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public static PictureFlusher.CmdDraw strokeAlpha(PictureFlusher.RenderLayer layer, uiPaint paint, float alpha, float strokeMult, uiMeshMesh mesh) {
-            var mat = supportComputeBuffer 
-                ? _strokeAlphaMat_cb.getMaterial(paint.blendMode, layer.ignoreClip) 
-                : _strokeAlphaMat.getMaterial(paint.blendMode, layer.ignoreClip);
+            var mat = _strokeAlphaMat.getMaterial(paint.blendMode, layer.ignoreClip);
             _getShaderPassAndProps(layer, paint, mesh.matrix, alpha, strokeMult, out var pass, out var props);
 
             return PictureFlusher.CmdDraw.create(
@@ -442,7 +424,7 @@ namespace Unity.UIWidgets.ui {
         public static PictureFlusher.CmdDraw stencilClear(
             PictureFlusher.RenderLayer layer, uiMeshMesh mesh) {
             Vector4 viewport = layer.viewport;
-            var mat = supportComputeBuffer ? _stencilMat_cb : _stencilMat;
+            var mat = _stencilMat;
 
             var pass = 0;
             var props = ObjectPool<MaterialPropertyBlockWrapper>.alloc();
@@ -458,7 +440,7 @@ namespace Unity.UIWidgets.ui {
 
         public static PictureFlusher.CmdDraw stencil0(PictureFlusher.RenderLayer layer, uiMeshMesh mesh) {
             Vector4 viewport = layer.viewport;
-            var mat = supportComputeBuffer ? _stencilMat_cb : _stencilMat;
+            var mat = _stencilMat;
 
             var pass = 1;
             var props = ObjectPool<MaterialPropertyBlockWrapper>.alloc();
@@ -474,7 +456,7 @@ namespace Unity.UIWidgets.ui {
 
         public static PictureFlusher.CmdDraw stencil1(PictureFlusher.RenderLayer layer, uiMeshMesh mesh) {
             Vector4 viewport = layer.viewport;
-            var mat = supportComputeBuffer ? _stencilMat_cb : _stencilMat;
+            var mat = _stencilMat;
 
             var pass = 2;
             var props = ObjectPool<MaterialPropertyBlockWrapper>.alloc();
@@ -490,9 +472,7 @@ namespace Unity.UIWidgets.ui {
 
         public static PictureFlusher.CmdDraw tex(PictureFlusher.RenderLayer layer, uiPaint paint,
             uiMeshMesh mesh, Image image) {
-            var mat = supportComputeBuffer 
-                ? _texMat_cb.getMaterial(paint.blendMode, layer.ignoreClip) 
-                : _texMat.getMaterial(paint.blendMode, layer.ignoreClip);
+            var mat = _texMat.getMaterial(paint.blendMode, layer.ignoreClip);
             _getShaderPassAndProps(layer, paint, mesh.matrix, 1.0f, 0.0f, out var pass, out var props);
 
             image.texture.filterMode = paint.filterMode;
@@ -510,9 +490,7 @@ namespace Unity.UIWidgets.ui {
 
         public static PictureFlusher.CmdDraw texRT(PictureFlusher.RenderLayer layer, uiPaint paint,
             uiMeshMesh mesh, PictureFlusher.RenderLayer renderLayer) {
-            var mat = supportComputeBuffer 
-                ? _texMat_cb.getMaterial(paint.blendMode, layer.ignoreClip) 
-                : _texMat.getMaterial(paint.blendMode, layer.ignoreClip);
+            var mat = _texMat.getMaterial(paint.blendMode, layer.ignoreClip);
             _getShaderPassAndProps(layer, paint, mesh.matrix, 1.0f, 0.0f, out var pass, out var props);
             props.SetInt(_texModeId, 1); // pre alpha
 
@@ -537,9 +515,7 @@ namespace Unity.UIWidgets.ui {
 
         public static PictureFlusher.CmdDraw texAlpha(PictureFlusher.RenderLayer layer, uiPaint paint,
             uiMeshMesh mesh, TextBlobMesh textMesh, Texture tex) {
-            var mat = supportComputeBuffer 
-                ?_texMat_cb.getMaterial(paint.blendMode, layer.ignoreClip) 
-                :_texMat.getMaterial(paint.blendMode, layer.ignoreClip);
+            var mat = _texMat.getMaterial(paint.blendMode, layer.ignoreClip);
             var meshMatrix = mesh != null ? mesh.matrix : textMesh.matrix;
             _getShaderPassAndProps(layer, paint, meshMatrix, 1.0f, 0.0f, out var pass, out var props);
             tex.filterMode = paint.filterMode;
@@ -558,7 +534,7 @@ namespace Unity.UIWidgets.ui {
         public static PictureFlusher.CmdDraw maskFilter(PictureFlusher.RenderLayer layer, uiMeshMesh mesh,
             PictureFlusher.RenderLayer renderLayer, float radius, Vector2 imgInc, float[] kernel) {
             Vector4 viewport = layer.viewport;
-            var mat = supportComputeBuffer ? _filterMat_cb : _filterMat;
+            var mat = _filterMat;
 
             var pass = 0;
             var props = ObjectPool<MaterialPropertyBlockWrapper>.alloc();
@@ -580,9 +556,9 @@ namespace Unity.UIWidgets.ui {
         public static PictureFlusher.CmdDraw fastShadow(PictureFlusher.RenderLayer layer, uiMeshMesh mesh, float sigma,
             bool isRect, bool isCircle, float corner, Vector4 bound, uiColor color) {
             Vector4 viewport = layer.viewport;
-            var mat = supportComputeBuffer ? _shadowBox_cb : _shadowBox;
+            var mat = _shadowBox;
             if (!isRect) {
-                mat = supportComputeBuffer ? _shadowRBox_cb : _shadowRBox;
+                mat = _shadowRBox;
             }
             
             var props = ObjectPool<MaterialPropertyBlockWrapper>.alloc();
