@@ -67,7 +67,7 @@ namespace Unity.UIWidgets.ui {
             ObjectPool<uiMeshMesh>.release(meshBounds);
             ObjectPool<uiMeshMesh>.release(blurMesh);
             var mesh = uiMeshMesh.create(state.matrix, vertices, _triangles);
-            layer.draws.Add(CanvasShader.fastShadow(layer, mesh, sigma, path.isRect, path.isCircle, path.rRectCorner, new Vector4(bound.left, bound.top, bound.right, bound.bottom), paint.color, supportComputeBuffer));
+            layer.draws.Add(CanvasShader.fastShadow(layer, mesh, sigma, path.isRect, path.isCircle, path.rRectCorner, new Vector4(bound.left, bound.top, bound.right, bound.bottom), paint.color));
         }
 
     }

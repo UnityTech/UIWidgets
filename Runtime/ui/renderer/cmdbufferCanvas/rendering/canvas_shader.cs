@@ -177,14 +177,16 @@ namespace Unity.UIWidgets.ui {
             return shader;
         }
 
+        public static bool enableComputeBuffer = true;
+
         public static readonly bool supportComputeBuffer;
 
         static CanvasShader() {
             var convexFillShaderCompute = GetShader("UIWidgets/canvas_convexFill_cb");
-            supportComputeBuffer = convexFillShaderCompute.isSupported;
+            supportComputeBuffer = enableComputeBuffer && SystemInfo.supportsComputeShaders && convexFillShaderCompute.isSupported;
             
-            //if compute buffer is not supported, load normal shaders
-            if (!PictureFlusher.supportComputeBuffer) {
+            //if compute buffer is not supported, load normal shader
+            if (!supportComputeBuffer) {
                 var convexFillShader = GetShader("UIWidgets/canvas_convexFill");
                 var fill0Shader = GetShader("UIWidgets/canvas_fill0");
                 var fill1Shader = GetShader("UIWidgets/canvas_fill1");
@@ -345,7 +347,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public static PictureFlusher.CmdDraw convexFill(PictureFlusher.RenderLayer layer, uiPaint paint,
-            uiMeshMesh mesh, bool supportComputeBuffer) {
+            uiMeshMesh mesh) {
             var mat = supportComputeBuffer ? _convexFillMat_cb.getMaterial(paint.blendMode, layer.ignoreClip) : _convexFillMat.getMaterial(paint.blendMode, layer.ignoreClip);
 
             _getShaderPassAndProps(layer, paint, mesh.matrix, 1.0f, 0.0f, out var pass, out var props);
@@ -358,7 +360,7 @@ namespace Unity.UIWidgets.ui {
             );
         }
 
-        public static PictureFlusher.CmdDraw fill0(PictureFlusher.RenderLayer layer, uiMeshMesh mesh, bool supportComputeBuffer) {
+        public static PictureFlusher.CmdDraw fill0(PictureFlusher.RenderLayer layer, uiMeshMesh mesh) {
             Vector4 viewport = layer.viewport;
             var mat = supportComputeBuffer ? _fill0Mat_cb.getMaterial(layer.ignoreClip) : _fill0Mat.getMaterial(layer.ignoreClip);
 
@@ -375,7 +377,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public static PictureFlusher.CmdDraw fill1(PictureFlusher.RenderLayer layer, uiPaint paint,
-            uiMeshMesh mesh, bool supportComputeBuffer) {
+            uiMeshMesh mesh) {
             var mat = supportComputeBuffer
                 ? _fill1Mat_cb.getMaterial(paint.blendMode)
                 : _fill1Mat.getMaterial(paint.blendMode);
@@ -393,7 +395,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public static PictureFlusher.CmdDraw stroke0(PictureFlusher.RenderLayer layer, uiPaint paint,
-            float alpha, uiMeshMesh mesh, bool supportComputeBuffer) {
+            float alpha, uiMeshMesh mesh) {
             var mat = supportComputeBuffer 
                 ? _stroke0Mat_cb.getMaterial(paint.blendMode, layer.ignoreClip) 
                 : _stroke0Mat.getMaterial(paint.blendMode, layer.ignoreClip);
@@ -407,7 +409,7 @@ namespace Unity.UIWidgets.ui {
             );
         }
 
-        public static PictureFlusher.CmdDraw stroke1(PictureFlusher.RenderLayer layer, uiMeshMesh mesh, bool supportComputeBuffer) {
+        public static PictureFlusher.CmdDraw stroke1(PictureFlusher.RenderLayer layer, uiMeshMesh mesh) {
             Vector4 viewport = layer.viewport;
             var mat = supportComputeBuffer ? _stroke1Mat_cb : _stroke1Mat;
 
@@ -423,7 +425,7 @@ namespace Unity.UIWidgets.ui {
             );
         }
 
-        public static PictureFlusher.CmdDraw strokeAlpha(PictureFlusher.RenderLayer layer, uiPaint paint, float alpha, float strokeMult, uiMeshMesh mesh, bool supportComputeBuffer) {
+        public static PictureFlusher.CmdDraw strokeAlpha(PictureFlusher.RenderLayer layer, uiPaint paint, float alpha, float strokeMult, uiMeshMesh mesh) {
             var mat = supportComputeBuffer 
                 ? _strokeAlphaMat_cb.getMaterial(paint.blendMode, layer.ignoreClip) 
                 : _strokeAlphaMat.getMaterial(paint.blendMode, layer.ignoreClip);
@@ -438,7 +440,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public static PictureFlusher.CmdDraw stencilClear(
-            PictureFlusher.RenderLayer layer, uiMeshMesh mesh, bool supportComputeBuffer) {
+            PictureFlusher.RenderLayer layer, uiMeshMesh mesh) {
             Vector4 viewport = layer.viewport;
             var mat = supportComputeBuffer ? _stencilMat_cb : _stencilMat;
 
@@ -454,7 +456,7 @@ namespace Unity.UIWidgets.ui {
             );
         }
 
-        public static PictureFlusher.CmdDraw stencil0(PictureFlusher.RenderLayer layer, uiMeshMesh mesh, bool supportComputeBuffer) {
+        public static PictureFlusher.CmdDraw stencil0(PictureFlusher.RenderLayer layer, uiMeshMesh mesh) {
             Vector4 viewport = layer.viewport;
             var mat = supportComputeBuffer ? _stencilMat_cb : _stencilMat;
 
@@ -470,7 +472,7 @@ namespace Unity.UIWidgets.ui {
             );
         }
 
-        public static PictureFlusher.CmdDraw stencil1(PictureFlusher.RenderLayer layer, uiMeshMesh mesh, bool supportComputeBuffer) {
+        public static PictureFlusher.CmdDraw stencil1(PictureFlusher.RenderLayer layer, uiMeshMesh mesh) {
             Vector4 viewport = layer.viewport;
             var mat = supportComputeBuffer ? _stencilMat_cb : _stencilMat;
 
@@ -487,7 +489,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public static PictureFlusher.CmdDraw tex(PictureFlusher.RenderLayer layer, uiPaint paint,
-            uiMeshMesh mesh, Image image, bool supportComputeBuffer) {
+            uiMeshMesh mesh, Image image) {
             var mat = supportComputeBuffer 
                 ? _texMat_cb.getMaterial(paint.blendMode, layer.ignoreClip) 
                 : _texMat.getMaterial(paint.blendMode, layer.ignoreClip);
@@ -507,7 +509,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public static PictureFlusher.CmdDraw texRT(PictureFlusher.RenderLayer layer, uiPaint paint,
-            uiMeshMesh mesh, PictureFlusher.RenderLayer renderLayer, bool supportComputeBuffer) {
+            uiMeshMesh mesh, PictureFlusher.RenderLayer renderLayer) {
             var mat = supportComputeBuffer 
                 ? _texMat_cb.getMaterial(paint.blendMode, layer.ignoreClip) 
                 : _texMat.getMaterial(paint.blendMode, layer.ignoreClip);
@@ -524,17 +526,17 @@ namespace Unity.UIWidgets.ui {
         }
 
         public static PictureFlusher.CmdDraw texAlpha(PictureFlusher.RenderLayer layer, uiPaint paint,
-            uiMeshMesh mesh, Texture tex, bool supportComputeBuffer) {
-            return texAlpha(layer, paint, mesh, null, tex, supportComputeBuffer);
+            uiMeshMesh mesh, Texture tex) {
+            return texAlpha(layer, paint, mesh, null, tex);
         }
 
         public static PictureFlusher.CmdDraw texAlpha(PictureFlusher.RenderLayer layer, uiPaint paint,
-            TextBlobMesh textMesh, Texture tex, bool supportComputeBuffer) {
-            return texAlpha(layer, paint, null, textMesh, tex, supportComputeBuffer);
+            TextBlobMesh textMesh, Texture tex) {
+            return texAlpha(layer, paint, null, textMesh, tex);
         }
 
         public static PictureFlusher.CmdDraw texAlpha(PictureFlusher.RenderLayer layer, uiPaint paint,
-            uiMeshMesh mesh, TextBlobMesh textMesh, Texture tex, bool supportComputeBuffer) {
+            uiMeshMesh mesh, TextBlobMesh textMesh, Texture tex) {
             var mat = supportComputeBuffer 
                 ?_texMat_cb.getMaterial(paint.blendMode, layer.ignoreClip) 
                 :_texMat.getMaterial(paint.blendMode, layer.ignoreClip);
@@ -554,7 +556,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public static PictureFlusher.CmdDraw maskFilter(PictureFlusher.RenderLayer layer, uiMeshMesh mesh,
-            PictureFlusher.RenderLayer renderLayer, float radius, Vector2 imgInc, float[] kernel, bool supportComputeBuffer) {
+            PictureFlusher.RenderLayer renderLayer, float radius, Vector2 imgInc, float[] kernel) {
             Vector4 viewport = layer.viewport;
             var mat = supportComputeBuffer ? _filterMat_cb : _filterMat;
 
@@ -576,7 +578,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public static PictureFlusher.CmdDraw fastShadow(PictureFlusher.RenderLayer layer, uiMeshMesh mesh, float sigma,
-            bool isRect, bool isCircle, float corner, Vector4 bound, uiColor color, bool supportComputeBuffer) {
+            bool isRect, bool isCircle, float corner, Vector4 bound, uiColor color) {
             Vector4 viewport = layer.viewport;
             var mat = supportComputeBuffer ? _shadowBox_cb : _shadowBox;
             if (!isRect) {
