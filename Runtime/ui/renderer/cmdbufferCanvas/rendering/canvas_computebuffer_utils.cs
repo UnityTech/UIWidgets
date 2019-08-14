@@ -24,7 +24,7 @@ namespace Unity.UIWidgets.ui {
 
         public const int COMPUTE_BUFFER_MAX_ITEM_NUM = 1024 * 1024;   // maxsize = 1M vertex/index
 
-        static void tryReleaseComputeBuffer() {
+        static void _releaseComputeBuffer() {
             if (!CanvasShader.supportComputeBuffer) {
                 return;
             }
@@ -45,7 +45,7 @@ namespace Unity.UIWidgets.ui {
             _indexBuffer = null;
         }
 
-        void initComputeBuffer() {
+        void _initComputeBuffer() {
             var stride = Marshal.SizeOf(typeof(uiVertex));
             var strideIndex = Marshal.SizeOf(typeof(int));
             _computeBuffer = new ComputeBuffer(COMPUTE_BUFFER_MAX_ITEM_NUM, stride);
@@ -55,11 +55,11 @@ namespace Unity.UIWidgets.ui {
             _indices = new List<int>();
         }
 
-        void resetComputeBuffer() {
+        void _resetComputeBuffer() {
             if (!CanvasShader.supportComputeBuffer) return;
 
             if (_computeBuffer == null) {
-                this.initComputeBuffer();
+                this._initComputeBuffer();
             }
             
             _vertices.Clear();
@@ -68,14 +68,14 @@ namespace Unity.UIWidgets.ui {
             _startIndex = 0;
         }
 
-        void bindComputeBuffer() {
+        void _bindComputeBuffer() {
             if (!CanvasShader.supportComputeBuffer) return;
             
             _computeBuffer.SetData(_vertices);
             _indexBuffer.SetData(_indices);
         }
 
-        void addMeshToComputeBuffer(List<Vector3> vertex, List<Vector2> uv, List<int> triangles) {
+        void _addMeshToComputeBuffer(List<Vector3> vertex, List<Vector2> uv, List<int> triangles) {
             if (!CanvasShader.supportComputeBuffer) return;
             
             _startVertex = _vertices.Count;

@@ -44,7 +44,7 @@ namespace Unity.UIWidgets.ui {
             }
 
             _instanceNum--;
-            tryReleaseComputeBuffer();
+            _releaseComputeBuffer();
         }
 
         public PictureFlusher(RenderTexture renderTexture, float devicePixelRatio, MeshPool meshPool) {
@@ -1037,7 +1037,7 @@ namespace Unity.UIWidgets.ui {
         public void flush(uiPicture picture) {
             this._reset();
             this._resetRenderTextureId();
-            this.resetComputeBuffer();
+            this._resetComputeBuffer();
 
             this._drawUIPicture(picture, false);
 
@@ -1054,7 +1054,7 @@ namespace Unity.UIWidgets.ui {
                 // this is necessary for webgl2. not sure why... just to be safe to disable the scissor.
                 cmdBuf.DisableScissorRect();
 
-                this.bindComputeBuffer();
+                this._bindComputeBuffer();
                 Graphics.ExecuteCommandBuffer(cmdBuf);
             }
 
@@ -1164,7 +1164,7 @@ namespace Unity.UIWidgets.ui {
 
                         D.assert(mesh.vertices.Count > 0);
                         if (CanvasShader.supportComputeBuffer) {
-                            this.addMeshToComputeBuffer(mesh.vertices?.data, mesh.uv?.data, mesh.triangles?.data);
+                            this._addMeshToComputeBuffer(mesh.vertices?.data, mesh.uv?.data, mesh.triangles?.data);
                             cmd.properties.SetBuffer(CmdDraw.vertexBufferId, _computeBuffer);
                             cmd.properties.SetBuffer(CmdDraw.indexBufferId, _indexBuffer);
                             cmd.properties.SetInt(CmdDraw.startIndexId, _startIndex);
