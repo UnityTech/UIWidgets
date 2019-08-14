@@ -43,6 +43,7 @@ namespace Unity.UIWidgets.ui {
                 this._layers.Clear();
             }
 
+            _instanceNum--;
             tryReleaseComputeBuffer();
         }
 

@@ -31,8 +31,6 @@ namespace Unity.UIWidgets.ui {
         }
 
         static void tryReleaseComputeBuffer() {
-            _instanceNum--;
-
             if (!supportComputeBuffer) {
                 return;
             }
