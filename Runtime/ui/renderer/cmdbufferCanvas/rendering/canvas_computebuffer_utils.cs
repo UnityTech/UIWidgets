@@ -22,11 +22,11 @@ namespace Unity.UIWidgets.ui {
 
         static int _instanceNum;
 
-        public static bool enableComputeBuffer = true;
+        public static bool enableComputeBuffer = false;
 
         public const int COMPUTE_BUFFER_MAX_ITEM_NUM = 1024 * 1024;   // maxsize = 1M vertex/index
 
-        static bool supportComputeBuffer {
+        public static bool supportComputeBuffer {
             get { return SystemInfo.supportsComputeShaders && CanvasShader.supportComputeBuffer && enableComputeBuffer; }
         }
 
