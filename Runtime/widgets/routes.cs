@@ -28,7 +28,7 @@ namespace Unity.UIWidgets.widgets {
         protected internal override void install(OverlayEntry insertionPoint) {
             D.assert(this._overlayEntries.isEmpty());
             this._overlayEntries.AddRange(this.createOverlayEntries());
-            this.navigator.overlay?.insertAll(this._overlayEntries, insertionPoint);
+            this.navigator.overlay?.insertAll(this._overlayEntries, above: insertionPoint);
             base.install(insertionPoint);
         }
 
