@@ -1973,6 +1973,7 @@ namespace Unity.UIWidgets.widgets {
             PointerHoverEventListener onPointerHover = null,
             PointerUpEventListener onPointerUp = null,
             PointerCancelEventListener onPointerCancel = null,
+            // TODO: onPointerSignal = null,
             PointerScrollEventListener onPointerScroll = null,
             PointerDragFromEditorEnterEventListener onPointerDragFromEditorEnter = null,
             PointerDragFromEditorHoverEventListener onPointerDragFromEditorHover = null,
