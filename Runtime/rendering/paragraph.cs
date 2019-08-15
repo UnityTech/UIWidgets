@@ -20,6 +20,9 @@ namespace Unity.UIWidgets.rendering {
 
         /// Use an ellipsis to indicate that the text has overflowed.
         ellipsis,
+        
+        /// Render overflowing text outside of its container.
+        visible,
     }
 
 
@@ -30,7 +33,7 @@ namespace Unity.UIWidgets.rendering {
 
         TextOverflow _overflow;
         readonly TextPainter _textPainter;
-        bool _hasVisualOverflow = false;
+        bool _needsClipping = false;
 
         List<TextBox> _selectionRects;
 
@@ -405,11 +408,27 @@ namespace Unity.UIWidgets.rendering {
         protected override void performLayout() {
             this._layoutTextWithConstraints(this.constraints);
             var textSize = this._textPainter.size;
-            var didOverflowHeight = this._textPainter.didExceedMaxLines;
+            var textDidExceedMaxLines = this._textPainter.didExceedMaxLines;
             this.size = this.constraints.constrain(textSize);
 
+            var didOverflowHeight = this.size.height < textSize.height || textDidExceedMaxLines;
             var didOverflowWidth = this.size.width < textSize.width;
-            this._hasVisualOverflow = didOverflowWidth || didOverflowHeight;
+            var hasVisualOverflow = didOverflowWidth || didOverflowHeight;
+            if (hasVisualOverflow) {
+                switch (this._overflow) {
+                case TextOverflow.visible:
+                    this._needsClipping = false;
+                    break;
+                case TextOverflow.clip:
+                case TextOverflow.ellipsis:
+                case TextOverflow.fade:
+                    this._needsClipping = true;
+                    break;
+                }
+            }
+            else {
+                this._needsClipping = false;
+            }
 
             this._selectionRects = null;
         }
@@ -419,7 +438,7 @@ namespace Unity.UIWidgets.rendering {
             this._layoutTextWithConstraints(this.constraints);
             var canvas = context.canvas;
 
-            if (this._hasVisualOverflow) {
+            if (this._needsClipping) {
                 var bounds = offset & this.size;
                 canvas.save();
                 canvas.clipRect(bounds);
@@ -434,7 +453,7 @@ namespace Unity.UIWidgets.rendering {
             }
 
             this._textPainter.paint(canvas, offset);
-            if (this._hasVisualOverflow) {
+            if (this._needsClipping) {
                 canvas.restore();
             }
         }
