@@ -224,6 +224,18 @@ namespace Unity.UIWidgets.rendering {
 
         public TextSelectionDelegate textSelectionDelegate;
 
+        public ValueListenable<bool> selectionStartInViewport {
+            get { return this._selectionStartInViewport; }
+        }
+
+        readonly ValueNotifier<bool> _selectionStartInViewport = new ValueNotifier<bool>(true);
+
+        public ValueListenable<bool> selectionEndInViewport {
+            get { return this._selectionEndInViewport; }
+        }
+
+        readonly ValueNotifier<bool> _selectionEndInViewport = new ValueNotifier<bool>(true);
+
         int _extentOffset = -1;
 
         int _baseOffset = -1;

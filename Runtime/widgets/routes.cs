@@ -122,11 +122,11 @@ namespace Unity.UIWidgets.widgets {
 
                     break;
                 case AnimationStatus.dismissed:
-                    // We might still be the current route if a subclass is controlling the
+                    // We might still be an active route if a subclass is controlling the
                     // the transition and hits the dismissed status. For example, the iOS
                     // back gesture drives this animation to the dismissed status before
                     // popping the navigator.
-                    if (!this.isCurrent) {
+                    if (!this.isActive) {
                         this.navigator.finalizeRoute(this);
                         D.assert(this.overlayEntries.isEmpty());
                     }

@@ -19,7 +19,7 @@ namespace Unity.UIWidgets.widgets {
             Key center = null,
             float anchor = 0.0f,
             float? cacheExtent = null,
-            DragStartBehavior dragStartBehavior = DragStartBehavior.down
+            DragStartBehavior dragStartBehavior = DragStartBehavior.start
         ) : base(key: key) {
             D.assert(!(controller != null && primary == true),
                 () => "Primary ScrollViews obtain their ScrollController via inheritance from a PrimaryScrollController widget. " +
@@ -131,7 +131,7 @@ namespace Unity.UIWidgets.widgets {
             float anchor = 0.0f,
             float? cacheExtent = null,
             List<Widget> slivers = null,
-            DragStartBehavior dragStartBehavior = DragStartBehavior.down
+            DragStartBehavior dragStartBehavior = DragStartBehavior.start
         ) : base(
             key: key,
             scrollDirection: scrollDirection,
@@ -166,7 +166,7 @@ namespace Unity.UIWidgets.widgets {
             bool shrinkWrap = false,
             EdgeInsets padding = null,
             float? cacheExtent = null,
-            DragStartBehavior dragStartBehavior = DragStartBehavior.down
+            DragStartBehavior dragStartBehavior = DragStartBehavior.start
         ) : base(
             key: key,
             scrollDirection: scrollDirection,
@@ -218,7 +218,7 @@ namespace Unity.UIWidgets.widgets {
             bool addRepaintBoundaries = true,
             float? cacheExtent = null,
             List<Widget> children = null,
-            DragStartBehavior dragStartBehavior = DragStartBehavior.down
+            DragStartBehavior dragStartBehavior = DragStartBehavior.start
         ) : base(
             key: key,
             scrollDirection: scrollDirection,
@@ -254,7 +254,7 @@ namespace Unity.UIWidgets.widgets {
             bool addAutomaticKeepAlives = true,
             bool addRepaintBoundaries = true,
             float? cacheExtent = null,
-            DragStartBehavior dragStartBehavior = DragStartBehavior.down
+            DragStartBehavior dragStartBehavior = DragStartBehavior.start
         ) : base(key: key,
             scrollDirection: scrollDirection,
             reverse: reverse,
@@ -290,7 +290,7 @@ namespace Unity.UIWidgets.widgets {
             bool addAutomaticKeepAlives = true,
             bool addRepaintBoundaries = true,
             float? cacheExtent = null,
-            DragStartBehavior dragStartBehavior = DragStartBehavior.down
+            DragStartBehavior dragStartBehavior = DragStartBehavior.start
         ) {
             return new ListView(
                 key: key,
@@ -327,7 +327,7 @@ namespace Unity.UIWidgets.widgets {
             bool addAutomaticKeepAlives = true,
             bool addRepaintBoundaries = true,
             float? cacheExtent = null,
-            DragStartBehavior dragStartBehavior = DragStartBehavior.down
+            DragStartBehavior dragStartBehavior = DragStartBehavior.start
         ) : base(
             key: key,
             scrollDirection: scrollDirection,
@@ -583,7 +583,7 @@ namespace Unity.UIWidgets.widgets {
             SliverGridDelegate gridDelegate = null,
             SliverChildDelegate childrenDelegate = null,
             float? cacheExtent = null,
-            DragStartBehavior dragStartBehavior = DragStartBehavior.down
+            DragStartBehavior dragStartBehavior = DragStartBehavior.start
         ) : base(
             key: key,
             scrollDirection: scrollDirection,
@@ -614,7 +614,7 @@ namespace Unity.UIWidgets.widgets {
             SliverGridDelegate gridDelegate = null,
             SliverChildDelegate childrenDelegate = null,
             float? cacheExtent = null,
-            DragStartBehavior dragStartBehavior = DragStartBehavior.down
+            DragStartBehavior dragStartBehavior = DragStartBehavior.start
         ) {
             return new GridView(
                 key: key,
@@ -649,7 +649,7 @@ namespace Unity.UIWidgets.widgets {
             bool addRepaintBoundaries = true,
             float? cacheExtent = null,
             List<Widget> children = null,
-            DragStartBehavior dragStartBehavior = DragStartBehavior.down
+            DragStartBehavior dragStartBehavior = DragStartBehavior.start
         ) : base(
             key: key,
             scrollDirection: scrollDirection,
@@ -692,7 +692,7 @@ namespace Unity.UIWidgets.widgets {
             bool addRepaintBoundaries = true,
             float? cacheExtent = null,
             List<Widget> children = null,
-            DragStartBehavior dragStartBehavior = DragStartBehavior.down
+            DragStartBehavior dragStartBehavior = DragStartBehavior.start
         ) {
             return new GridView(
                 key: key,
@@ -732,7 +732,7 @@ namespace Unity.UIWidgets.widgets {
             bool addRepaintBoundaries = true,
             bool addSemanticIndexes = true,
             List<Widget> children = null,
-            DragStartBehavior dragStartBehavior = DragStartBehavior.down
+            DragStartBehavior dragStartBehavior = DragStartBehavior.start
         ) : base(
             key: key,
             scrollDirection: scrollDirection,
@@ -773,7 +773,7 @@ namespace Unity.UIWidgets.widgets {
             bool addAutomaticKeepAlives = true,
             bool addRepaintBoundaries = true,
             List<Widget> children = null,
-            DragStartBehavior dragStartBehavior = DragStartBehavior.down
+            DragStartBehavior dragStartBehavior = DragStartBehavior.start
         ) {
             return new GridView(
                 key: key,

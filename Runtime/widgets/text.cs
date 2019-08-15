@@ -111,7 +111,7 @@ namespace Unity.UIWidgets.widgets {
             TextOverflow? overflow = null,
             float? textScaleFactor = null,
             int? maxLines = null) : base(key) {
-            D.assert(data != null);
+            D.assert(data != null, () => "A non-null string must be provided to a Text widget.");
             this.textSpan = null;
             this.data = data;
             this.style = style;
@@ -130,7 +130,7 @@ namespace Unity.UIWidgets.widgets {
             TextOverflow? overflow = null,
             float? textScaleFactor = null,
             int? maxLines = null) : base(key) {
-            D.assert(textSpan != null);
+            D.assert(textSpan != null, () => "A non-null TextSpan must be provided to a Text.rich widget.");
             this.textSpan = textSpan;
             this.data = null;
             this.style = style;
