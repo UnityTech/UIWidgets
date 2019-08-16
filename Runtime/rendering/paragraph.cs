@@ -44,6 +44,7 @@ namespace Unity.UIWidgets.rendering {
             TextOverflow overflow = TextOverflow.clip,
             float textScaleFactor = 1.0f,
             int? maxLines = null,
+            StrutStyle strutStyle = null,
             Action onSelectionChanged = null,
             Color selectionColor = null
         ) {
@@ -56,7 +57,8 @@ namespace Unity.UIWidgets.rendering {
                 textDirection,
                 textScaleFactor,
                 maxLines,
-                overflow == TextOverflow.ellipsis ? _kEllipsis : ""
+                overflow == TextOverflow.ellipsis ? _kEllipsis : "",
+                strutStyle: strutStyle
             );
 
             this._selection = null;
@@ -482,6 +484,18 @@ namespace Unity.UIWidgets.rendering {
             }
 
             canvas.drawPath(barPath, paint);
+        }
+
+        public StrutStyle strutStyle {
+            get { return this._textPainter.strutStyle; }
+            set {
+                if (this._textPainter.strutStyle == value) {
+                    return;
+                }
+
+                this._textPainter.strutStyle = value;
+                this.markNeedsLayout();
+            }
         }
 
         void _layoutText(float minWidth = 0.0f, float maxWidth = float.PositiveInfinity) {

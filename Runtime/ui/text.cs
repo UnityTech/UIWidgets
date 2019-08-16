@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Unity.UIWidgets.painting;
 
 namespace Unity.UIWidgets.ui {
     public enum FontStyle {
@@ -242,7 +243,8 @@ namespace Unity.UIWidgets.ui {
             float? fontSize = null,
             string fontFamily = null,
             float? lineHeight = null, // todo  
-            string ellipsis = null) {
+            string ellipsis = null,
+            StrutStyle strutStyle = null) {
             this.textAlign = textAlign;
             this.textDirection = textDirection;
             this.fontWeight = fontWeight;
@@ -252,6 +254,7 @@ namespace Unity.UIWidgets.ui {
             this.fontFamily = fontFamily;
             this.lineHeight = lineHeight;
             this.ellipsis = ellipsis;
+            this.strutStyle = strutStyle;
         }
 
         public bool Equals(ParagraphStyle other) {
@@ -332,6 +335,7 @@ namespace Unity.UIWidgets.ui {
         public readonly string fontFamily;
         public readonly float? lineHeight;
         public readonly string ellipsis;
+        public readonly StrutStyle strutStyle;
 
         public bool ellipsized() {
             return !string.IsNullOrEmpty(this.ellipsis);

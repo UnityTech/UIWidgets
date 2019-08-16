@@ -21,6 +21,12 @@ namespace Unity.UIWidgets.painting {
         public readonly TextDecorationStyle? decorationStyle;
         public readonly Paint background;
         public readonly string fontFamily;
+
+        public List<string> fontFamilyFallback {
+            get { return this._fontFamilyFallback; }
+        }
+
+        readonly List<string> _fontFamilyFallback;
         public readonly string debugLabel;
 
         const string _kDefaultDebugLabel = "unknown";
@@ -32,7 +38,7 @@ namespace Unity.UIWidgets.painting {
             TextBaseline? textBaseline = null, float? height = null, Paint background = null,
             TextDecoration decoration = null,
             Color decorationColor = null, TextDecorationStyle? decorationStyle = null,
-            string fontFamily = null, string debugLabel = null) {
+            string fontFamily = null, List<string> fontFamilyFallback = null, string debugLabel = null) {
             this.inherit = inherit;
             this.color = color;
             this.fontSize = fontSize;
@@ -46,6 +52,7 @@ namespace Unity.UIWidgets.painting {
             this.decorationColor = decorationColor;
             this.decorationStyle = decorationStyle;
             this.fontFamily = fontFamily;
+            this._fontFamilyFallback = fontFamilyFallback;
             this.debugLabel = debugLabel;
             this.background = background;
         }
@@ -86,6 +93,7 @@ namespace Unity.UIWidgets.painting {
             Color decorationColor = null,
             TextDecorationStyle? decorationStyle = null,
             string fontFamily = null,
+            List<string> fontFamilyFallback = null,
             float fontSizeFactor = 1.0f,
             float fontSizeDelta = 0.0f,
             int fontWeightDelta = 0,
@@ -115,6 +123,7 @@ namespace Unity.UIWidgets.painting {
                 inherit: this.inherit,
                 color: color ?? this.color,
                 fontFamily: fontFamily ?? this.fontFamily,
+                fontFamilyFallback: fontFamilyFallback ?? this.fontFamilyFallback,
                 fontSize: this.fontSize == null ? null : this.fontSize * fontSizeFactor + fontSizeDelta,
                 fontWeight: this.fontWeight == null ? null : this.fontWeight,
                 fontStyle: this.fontStyle,
@@ -154,6 +163,7 @@ namespace Unity.UIWidgets.painting {
             return this.copyWith(
                 color: other.color,
                 fontFamily: other.fontFamily,
+                fontFamilyFallback: other.fontFamilyFallback,
                 fontSize: other.fontSize,
                 fontWeight: other.fontWeight,
                 fontStyle: other.fontStyle,
@@ -171,6 +181,7 @@ namespace Unity.UIWidgets.painting {
 
         public TextStyle copyWith(Color color = null,
             string fontFamily = null,
+            List<string> fontFamilyFallback = null,
             float? fontSize = null,
             FontWeight fontWeight = null,
             FontStyle? fontStyle = null,
@@ -196,6 +207,7 @@ namespace Unity.UIWidgets.painting {
                 inherit: this.inherit,
                 color: color ?? this.color,
                 fontFamily: fontFamily ?? this.fontFamily,
+                fontFamilyFallback: fontFamilyFallback ?? this.fontFamilyFallback,
                 fontSize: fontSize ?? this.fontSize,
                 fontWeight: fontWeight ?? this.fontWeight,
                 fontStyle: fontStyle ?? this.fontStyle,
@@ -229,6 +241,7 @@ namespace Unity.UIWidgets.painting {
                     inherit: b.inherit,
                     color: Color.lerp(null, b.color, t),
                     fontFamily: t < 0.5 ? null : b.fontFamily,
+                    fontFamilyFallback: t < 0.5 ? null : b.fontFamilyFallback,
                     fontSize: t < 0.5 ? null : b.fontSize,
                     fontWeight: t < 0.5 ? null : b.fontWeight,
                     fontStyle: t < 0.5 ? null : b.fontStyle,
@@ -249,6 +262,7 @@ namespace Unity.UIWidgets.painting {
                     inherit: a.inherit,
                     color: Color.lerp(a.color, null, t),
                     fontFamily: t < 0.5 ? a.fontFamily : null,
+                    fontFamilyFallback: t < 0.5 ? a.fontFamilyFallback : null,
                     fontSize: t < 0.5 ? a.fontSize : null,
                     fontWeight: t < 0.5 ? a.fontWeight : null,
                     fontStyle: t < 0.5 ? a.fontStyle : null,
@@ -268,6 +282,7 @@ namespace Unity.UIWidgets.painting {
                 inherit: b.inherit,
                 color: Color.lerp(a.color, b.color, t),
                 fontFamily: t < 0.5 ? a.fontFamily : b.fontFamily,
+                fontFamilyFallback: t < 0.5 ? a.fontFamilyFallback : b.fontFamilyFallback,
                 fontSize: MathUtils.lerpNullableFloat(a.fontSize ?? b.fontSize, b.fontSize ?? a.fontSize, t),
                 fontWeight: t < 0.5 ? a.fontWeight : b.fontWeight,
                 fontStyle: t < 0.5 ? a.fontStyle : b.fontStyle,
@@ -293,6 +308,8 @@ namespace Unity.UIWidgets.painting {
                 defaultValue: Diagnostics.kNullDefaultValue));
             styles.Add(new StringProperty("family", this.fontFamily, defaultValue: Diagnostics.kNullDefaultValue,
                 quoted: false));
+            styles.Add(new EnumerableProperty<string>("familyFallback", this.fontFamilyFallback,
+                defaultValue: Diagnostics.kNullDefaultValue));
             styles.Add(new DiagnosticsProperty<float?>("size", this.fontSize,
                 defaultValue: Diagnostics.kNullDefaultValue));
             string weightDescription = "";
@@ -371,6 +388,7 @@ namespace Unity.UIWidgets.painting {
                    Equals(this.decoration, other.decoration) &&
                    Equals(this.decorationColor, other.decorationColor) &&
                    this.decorationStyle == other.decorationStyle && Equals(this.background, other.background) &&
+                   CollectionUtils.equalsList(this.fontFamilyFallback, other.fontFamilyFallback) &&
                    string.Equals(this.fontFamily, other.fontFamily);
         }
 
@@ -406,6 +424,8 @@ namespace Unity.UIWidgets.painting {
                 hashCode = (hashCode * 397) ^ this.decorationStyle.GetHashCode();
                 hashCode = (hashCode * 397) ^ (this.background != null ? this.background.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (this.fontFamily != null ? this.fontFamily.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^
+                           (this.fontFamilyFallback != null ? this.fontFamilyFallback.GetHashCode() : 0);
                 return hashCode;
             }
         }

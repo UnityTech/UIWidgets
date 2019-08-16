@@ -25,13 +25,15 @@ namespace Unity.UIWidgets.painting {
             TextDirection textDirection = TextDirection.ltr,
             float textScaleFactor = 1.0f,
             int? maxLines = null,
-            string ellipsis = "") {
+            string ellipsis = "",
+            StrutStyle strutStyle = null) {
             this._text = text;
             this._textAlign = textAlign;
             this._textDirection = textDirection;
             this._textScaleFactor = textScaleFactor;
             this._maxLines = maxLines;
             this._ellipsis = ellipsis;
+            this._strutStyle = strutStyle;
         }
 
 
@@ -132,6 +134,21 @@ namespace Unity.UIWidgets.painting {
                 this._needsLayout = true;
             }
         }
+
+        public StrutStyle strutStyle {
+            get { return this._strutStyle; }
+            set {
+                if (this._strutStyle == value) {
+                    return;
+                }
+
+                this._strutStyle = value;
+                this._paragraph = null;
+                this._needsLayout = true;
+            }
+        }
+
+        StrutStyle _strutStyle;
 
         public float minIntrinsicWidth {
             get {
@@ -322,7 +339,8 @@ namespace Unity.UIWidgets.painting {
                     textAlign: this.textAlign,
                     textDirection: this.textDirection ?? defaultTextDirection,
                     maxLines: this.maxLines,
-                    ellipsis: this.ellipsis
+                    ellipsis: this.ellipsis,
+                    strutStyle: this._strutStyle
                 );
             }
 

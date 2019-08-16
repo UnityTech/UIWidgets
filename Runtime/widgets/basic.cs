@@ -1780,7 +1780,8 @@ namespace Unity.UIWidgets.widgets {
             float textScaleFactor = 1.0f,
             int? maxLines = null,
             Action onSelectionChanged = null,
-            Color selectionColor = null
+            Color selectionColor = null,
+            StrutStyle strutStyle = null
         ) : base(key: key) {
             D.assert(text != null);
             D.assert(maxLines == null || maxLines > 0);
@@ -1793,6 +1794,7 @@ namespace Unity.UIWidgets.widgets {
             this.maxLines = maxLines;
             this.onSelectionChanged = onSelectionChanged;
             this.selectionColor = selectionColor;
+            this.strutStyle = strutStyle;
         }
 
         public readonly TextSpan text;
@@ -1803,6 +1805,7 @@ namespace Unity.UIWidgets.widgets {
         public readonly int? maxLines;
         public readonly Action onSelectionChanged;
         public readonly Color selectionColor;
+        public readonly StrutStyle strutStyle;
 
         public override RenderObject createRenderObject(BuildContext context) {
             return new RenderParagraph(
@@ -1827,6 +1830,7 @@ namespace Unity.UIWidgets.widgets {
             renderObject.maxLines = this.maxLines;
             renderObject.onSelectionChanged = this.onSelectionChanged;
             renderObject.selectionColor = this.selectionColor;
+            renderObject.strutStyle = this.strutStyle;
         }
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {

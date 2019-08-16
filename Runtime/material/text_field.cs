@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Text;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.painting;
@@ -23,6 +24,7 @@ namespace Unity.UIWidgets.material {
             InputDecoration decoration = null, bool noDecoration = false, TextInputType keyboardType = null,
             TextInputAction? textInputAction = null,
             TextCapitalization textCapitalization = TextCapitalization.none, TextStyle style = null,
+            StrutStyle strutStyle = null,
             TextAlign textAlign = TextAlign.left, TextDirection textDirection = TextDirection.ltr,
             bool autofocus = false, bool obscureText = false, bool autocorrect = false, int? maxLines = 1,
             int? maxLength = null, bool maxLengthEnforced = true, ValueChanged<string> onChanged = null,
@@ -44,6 +46,7 @@ namespace Unity.UIWidgets.material {
             this.textInputAction = textInputAction;
             this.textCapitalization = textCapitalization;
             this.style = style;
+            this.strutStyle = strutStyle;
             this.textAlign = textAlign;
             this.textDirection = textDirection;
             this.autofocus = autofocus;
@@ -83,6 +86,8 @@ namespace Unity.UIWidgets.material {
         public readonly TextCapitalization textCapitalization;
 
         public readonly TextStyle style;
+
+        public readonly StrutStyle strutStyle;
 
         public readonly TextAlign textAlign;
 
@@ -462,6 +467,7 @@ namespace Unity.UIWidgets.material {
                     textInputAction: this.widget.textInputAction,
                     textCapitalization: this.widget.textCapitalization,
                     style: style,
+                    strutStyle: this.widget.strutStyle,
                     textAlign: this.widget.textAlign,
                     textDirection: this.widget.textDirection,
                     autofocus: this.widget.autofocus,

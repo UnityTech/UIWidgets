@@ -78,6 +78,7 @@ namespace Unity.UIWidgets.rendering {
             Color backgroundCursorColor = null,
             bool? hasFocus = null,
             int? maxLines = 1,
+            StrutStyle strutStyle = null,
             Color selectionColor = null,
             TextSelection selection = null,
             bool obscureText = false,
@@ -95,7 +96,7 @@ namespace Unity.UIWidgets.rendering {
             floatingCursorAddedMargin = floatingCursorAddedMargin ?? EdgeInsets.fromLTRB(4, 4, 4, 5);
             D.assert(textSelectionDelegate != null);
             this._textPainter = new TextPainter(text: text, textAlign: textAlign, textDirection: textDirection,
-                textScaleFactor: textScaleFactor);
+                textScaleFactor: textScaleFactor, strutStyle: strutStyle);
             this._cursorColor = cursorColor;
 
             this._showCursor = showCursor ?? new ValueNotifier<bool>(false);
@@ -575,6 +576,18 @@ namespace Unity.UIWidgets.rendering {
                 this._textPainter.textDirection = value;
                 this.markNeedsTextLayout();
                 this.markNeedsSemanticsUpdate();
+            }
+        }
+
+        public StrutStyle strutStyle {
+            get { return this._textPainter.strutStyle; }
+            set {
+                if (this._textPainter.strutStyle == value) {
+                    return;
+                }
+
+                this._textPainter.strutStyle = value;
+                this.markNeedsTextLayout();
             }
         }
 
