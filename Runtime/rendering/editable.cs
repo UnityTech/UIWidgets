@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Xml.Schema;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.painting;
@@ -49,6 +50,8 @@ namespace Unity.UIWidgets.rendering {
         TextPainter _textPainter;
         Color _cursorColor;
         int? _maxLines;
+        int? _minLines;
+        bool _expands;
         Color _selectionColor;
         ViewportOffset _offset;
         ValueNotifier<bool> _showCursor;
@@ -78,6 +81,8 @@ namespace Unity.UIWidgets.rendering {
             Color backgroundCursorColor = null,
             bool? hasFocus = null,
             int? maxLines = 1,
+            int? minLines = null,
+            bool expands = false,
             StrutStyle strutStyle = null,
             Color selectionColor = null,
             TextSelection selection = null,
@@ -87,14 +92,16 @@ namespace Unity.UIWidgets.rendering {
             bool ignorePointer = false,
             float cursorWidth = 1.0f,
             Radius cursorRadius = null,
-            bool? enableInteractiveSelection = null,
             bool paintCursorAboveText = false,
             Offset cursorOffset = null,
             float devicePixelRatio = 1.0f,
+            bool? enableInteractiveSelection = null,
             EdgeInsets floatingCursorAddedMargin = null,
             TextSelectionDelegate textSelectionDelegate = null) {
             floatingCursorAddedMargin = floatingCursorAddedMargin ?? EdgeInsets.fromLTRB(4, 4, 4, 5);
             D.assert(textSelectionDelegate != null);
+            D.assert(minLines == null || minLines > 0);
+            D.assert((minLines == null) || maxLines >= minLines, () => "minLines can't be greater than maxLines");
             this._textPainter = new TextPainter(text: text, textAlign: textAlign, textDirection: textDirection,
                 textScaleFactor: textScaleFactor, strutStyle: strutStyle);
             this._cursorColor = cursorColor;
@@ -102,6 +109,8 @@ namespace Unity.UIWidgets.rendering {
             this._showCursor = showCursor ?? new ValueNotifier<bool>(false);
             this._hasFocus = hasFocus ?? false;
             this._maxLines = maxLines;
+            this._minLines = minLines;
+            this._expands = expands;
             this._selectionColor = selectionColor;
             this._selection = selection;
             this._obscureText = obscureText;
@@ -236,6 +245,27 @@ namespace Unity.UIWidgets.rendering {
         }
 
         readonly ValueNotifier<bool> _selectionEndInViewport = new ValueNotifier<bool>(true);
+
+        void _updateSelectionExtentsVisibility(Offset effectiveOffset) {
+            Rect visibleRegion = Offset.zero & this.size;
+            Offset startOffset = this._textPainter.getOffsetForCaret(
+                new TextPosition(offset: this._selection.start, affinity: this._selection.affinity),
+                Rect.zero
+            );
+
+            float visibleRegionSlop = 0.5f;
+            this._selectionStartInViewport.value = visibleRegion
+                .inflate(visibleRegionSlop)
+                .contains(startOffset + effectiveOffset);
+
+            Offset endOffset = this._textPainter.getOffsetForCaret(
+                new TextPosition(offset: this._selection.end, affinity: this._selection.affinity), 
+                Rect.zero
+            );
+            this._selectionEndInViewport.value = visibleRegion
+                .inflate(visibleRegionSlop)
+                .contains(endOffset + effectiveOffset);
+        }
 
         int _extentOffset = -1;
 
@@ -624,7 +654,7 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
-        bool _hasFocus;
+        bool _hasFocus = false;
         bool _listenerAttached = false;
 
         public bool hasFocus {
@@ -659,6 +689,31 @@ namespace Unity.UIWidgets.rendering {
                 }
 
                 this._maxLines = value;
+                this.markNeedsTextLayout();
+            }
+        }
+
+        public int? minLines {
+            get { return this._minLines; }
+            set {
+                D.assert(value == null || value > 0);
+                if (this._minLines == value) {
+                    return;
+                }
+
+                this._minLines = value;
+                this.markNeedsTextLayout();
+            }
+        }
+
+        public bool expands {
+            get { return this._expands; }
+            set {
+                if (this.expands == value) {
+                    return;
+                }
+
+                this._expands = value;
                 this.markNeedsTextLayout();
             }
         }
@@ -985,7 +1040,7 @@ namespace Unity.UIWidgets.rendering {
         }
 
         public void handleTapDown(TapDownDetails details) {
-            this._lastTapDownPosition = details.globalPosition - this._paintOffset;
+            this._lastTapDownPosition = details.globalPosition;
             if (!Application.isMobilePlatform) {
                 this.selectPosition(SelectionChangedCause.tap);
             }
@@ -1089,7 +1144,7 @@ namespace Unity.UIWidgets.rendering {
             D.assert(this._lastTapDownPosition != null);
             if (this.onSelectionChanged != null) {
                 TextPosition position =
-                    this._textPainter.getPositionForOffset(this.globalToLocal(this._lastTapDownPosition));
+                    this._textPainter.getPositionForOffset(this.globalToLocal(this._lastTapDownPosition - this._paintOffset));
                 TextRange word = this._textPainter.getWordBoundary(position);
                 if (position.offset - word.start <= 1) {
                     this.onSelectionChanged(
@@ -1188,12 +1243,25 @@ namespace Unity.UIWidgets.rendering {
 
         void _paintCaret(Canvas canvas, Offset effectiveOffset, TextPosition textPosition) {
             D.assert(this._textLayoutLastWidth == this.constraints.maxWidth);
-            var caretOffset = this._textPainter.getOffsetForCaret(textPosition, this._caretPrototype);
             var paint = new Paint() {color = this._floatingCursorOn ? this.backgroundCursorColor : this._cursorColor};
+            var caretOffset = this._textPainter.getOffsetForCaret(textPosition, this._caretPrototype) + effectiveOffset;
             Rect caretRect = this._caretPrototype.shift(caretOffset + effectiveOffset);
             if (this._cursorOffset != null) {
                 caretRect = caretRect.shift(this._cursorOffset);
             }
+            
+#if !UNITY_IOS
+            if (this._textPainter.getFullHeightForCaret(textPosition, this._caretPrototype) != null) {
+                caretRect = Rect.fromLTWH(
+                    caretRect.left,
+                    caretRect.top - _kCaretHeightOffset,
+                    caretRect.width,
+                    this._textPainter.getFullHeightForCaret(textPosition, this._caretPrototype)
+                );
+            }
+#endif
+
+            caretRect = caretRect.shift(this._getPixelPerfectCursorOffset(caretRect));
 
             if (this.cursorRadius == null) {
                 canvas.drawRect(caretRect, paint);
@@ -1384,8 +1452,24 @@ namespace Unity.UIWidgets.rendering {
         }
 
         float _preferredHeight(float width) {
-            if (this.maxLines != null) {
+            bool lockedMax = this.maxLines != null && this.minLines == null;
+            bool lockedBoth = this.maxLines != null && this.minLines == this.maxLines;
+            bool singleLine = this.maxLines == 1;
+            if (singleLine || lockedMax || lockedBoth) {
                 return this.preferredLineHeight * this.maxLines.Value;
+            }
+
+            bool minLimited = this.minLines != null && this.minLines > 1;
+            bool maxLimited = this.maxLines != null;
+            if (minLimited || maxLimited) {
+                this._layoutText(width);
+                if (minLimited && this._textPainter.height < this.preferredLineHeight * this.minLines.Value) {
+                    return this.preferredLineHeight * this.minLines.Value;
+                }
+
+                if (maxLimited && this._textPainter.height > this.preferredLineHeight * this.maxLines.Value) {
+                    return this.preferredLineHeight * this.maxLines.Value;
+                }
             }
 
             if (!width.isFinite()) {
@@ -1460,6 +1544,8 @@ namespace Unity.UIWidgets.rendering {
             properties.add(new DiagnosticsProperty<Color>("cursorColor", this.cursorColor));
             properties.add(new DiagnosticsProperty<ValueNotifier<bool>>("showCursor", this.showCursor));
             properties.add(new DiagnosticsProperty<int?>("maxLines", this.maxLines));
+            properties.add(new DiagnosticsProperty<int?>("minLines", this.minLines));
+            properties.add(new DiagnosticsProperty<bool>("expands", this.expands));
             properties.add(new DiagnosticsProperty<Color>("selectionColor", this.selectionColor));
             properties.add(new DiagnosticsProperty<float>("textScaleFactor", this.textScaleFactor));
             properties.add(new DiagnosticsProperty<TextSelection>("selection", this.selection));

@@ -239,6 +239,11 @@ namespace Unity.UIWidgets.painting {
             return this._caretMetrics.offset;
         }
 
+        public float getFullHeightForCaret(TextPosition position, Rect caretPrototype) {
+            this._computeCaretMetrics(position, caretPrototype);
+            return this._caretMetrics.fullHeight ?? 0;
+        }
+
         _CaretMetrics _caretMetrics;
 
         TextPosition _previousCaretPosition;
