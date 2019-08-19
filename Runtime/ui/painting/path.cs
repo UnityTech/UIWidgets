@@ -7,6 +7,13 @@ using Vector2 = UnityEngine.Vector2;
 using Vector3 = UnityEngine.Vector3;
 
 namespace Unity.UIWidgets.ui {
+    public enum PathOperation {
+        difference,
+        intersect,
+        union,
+        xor,
+        reverseDifference,
+    }
     public class Path {
         const float _KAPPA90 = 0.5522847493f;
 
@@ -159,6 +166,18 @@ namespace Unity.UIWidgets.ui {
             }
 
             return Rect.fromLTRB(this._minX, this._minY, this._maxX, this._maxY);
+        }
+
+        public static Path combine(PathOperation operation, Path path1, Path path2) {
+            D.assert(path1 != null);
+            D.assert(path2 != null);
+            Path path = new Path();
+            throw new UIWidgetsError("Path._op() not implemented yet!");
+//            if (path._op(path1, path2, (int) operation)) {
+//                return path;
+//            }
+//            throw new UIWidgetsError("Path.combine() failed.  This may be due an invalid path; " +
+//                                     "in particular, check for NaN values.");
         }
 
         void _appendMoveTo(float x, float y) {

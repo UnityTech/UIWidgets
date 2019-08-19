@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.service;
 using Unity.UIWidgets.ui;
@@ -7,6 +8,16 @@ using Canvas = Unity.UIWidgets.ui.Canvas;
 using Rect = Unity.UIWidgets.ui.Rect;
 
 namespace Unity.UIWidgets.painting {
+
+    class _CaretMetrics {
+        public _CaretMetrics(Offset offset, float? fullHeight) {
+            this.offset = offset;
+            this.fullHeight = fullHeight;
+        }
+
+        public Offset offset;
+        public float? fullHeight;
+    }
     public class TextPainter {
         TextSpan _text;
         TextAlign _textAlign;
@@ -224,29 +235,38 @@ namespace Unity.UIWidgets.painting {
         }
 
         public Offset getOffsetForCaret(TextPosition position, Rect caretPrototype) {
-            D.assert(!this._needsLayout);
-            var offset = position.offset;
-            if (offset > 0) {
-                var prevCodeUnit = this._text.codeUnitAt(offset);
-                if (prevCodeUnit == null) // out of upper bounds
-                {
-                    var rectNextLine = this._paragraph.getNextLineStartRect();
-                    if (rectNextLine != null) {
-                        return new Offset(rectNextLine.start, rectNextLine.top);
-                    }
-                }
-            }
+            this._computeCaretMetrics(position, caretPrototype);
+            return this._caretMetrics.offset;
+        }
 
+        _CaretMetrics _caretMetrics;
+
+        TextPosition _previousCaretPosition;
+        Rect _previousCaretPrototype;
+
+        void _computeCaretMetrics(TextPosition position, Rect caretPrototype) {
+            D.assert(!this._needsLayout);
+            if (position == this._previousCaretPosition && caretPrototype == this._previousCaretPrototype) {
+                return;
+            }
+            var offset = position.offset;
+            Rect rect;
             switch (position.affinity) {
                 case TextAffinity.upstream:
-                    return this._getOffsetFromUpstream(offset, caretPrototype) ??
-                           this._getOffsetFromDownstream(offset, caretPrototype) ?? this._emptyOffset;
+                    rect = this._getRectFromUpstream(offset, caretPrototype) ??
+                           this._getRectFromDownStream(offset, caretPrototype);
+                    break;
                 case TextAffinity.downstream:
-                    return this._getOffsetFromDownstream(offset, caretPrototype) ??
-                           this._getOffsetFromUpstream(offset, caretPrototype) ?? this._emptyOffset;
+                    rect = this._getRectFromDownStream(offset, caretPrototype) ??
+                           this._getRectFromUpstream(offset, caretPrototype);
+                    break;
+                default:
+                    throw new UIWidgetsError("Unknown Position Affinity");
             }
 
-            return null;
+            this._caretMetrics = new _CaretMetrics(
+                offset: rect != null ? new Offset(rect.left, rect.top) : this._emptyOffset,
+                fullHeight: rect != null ? (float?) (rect.bottom - rect.top) : null);
         }
 
         public Paragraph.LineRange getLineRange(int lineNumber) {
@@ -372,7 +392,7 @@ namespace Unity.UIWidgets.painting {
 
         const int _zwjUtf16 = 0x200d;
 
-        Offset _getOffsetFromUpstream(int offset, Rect caretPrototype) {
+        Rect _getRectFromUpstream(int offset, Rect caretPrototype) {
             string flattenedText = this._text.toPlainText();
             var prevCodeUnit = this._text.codeUnitAt(Mathf.Max(0, offset - 1));
             if (prevCodeUnit == null) {
@@ -401,18 +421,20 @@ namespace Unity.UIWidgets.painting {
                 TextBox box = boxes[0];
                 const int NEWLINE_CODE_UNIT = 10;
                 if (prevCodeUnit == NEWLINE_CODE_UNIT) {
-                    return new Offset(this._emptyOffset.dx, box.bottom);
+                    return Rect.fromLTRB(this._emptyOffset.dx, box.bottom,
+                        this._emptyOffset.dx, box.bottom + box.bottom - box.top);
                 }
 
                 float caretEnd = box.end;
                 float dx = box.direction == TextDirection.rtl ? caretEnd - caretPrototype.width : caretEnd;
-                return new Offset(dx, box.top);
+                return Rect.fromLTRB(Mathf.Min(dx, this.width), box.top,
+                    Mathf.Min(dx, this.width), box.bottom);
             }
 
             return null;
         }
 
-        Offset _getOffsetFromDownstream(int offset, Rect caretPrototype) {
+        Rect _getRectFromDownStream(int offset, Rect caretPrototype) {
             string flattenedText = this._text.toPlainText();
             var nextCodeUnit =
                 this._text.codeUnitAt(Mathf.Min(offset, flattenedText == null ? 0 : flattenedText.Length - 1));
@@ -442,7 +464,8 @@ namespace Unity.UIWidgets.painting {
                 TextBox box = boxes[boxes.Count - 1];
                 float caretStart = box.start;
                 float dx = box.direction == TextDirection.rtl ? caretStart - caretPrototype.width : caretStart;
-                return new Offset(dx, box.top);
+                return Rect.fromLTRB(Mathf.Min(dx, this.width), box.top,
+                    Mathf.Min(dx, this.width), box.bottom);
             }
 
             return null;
