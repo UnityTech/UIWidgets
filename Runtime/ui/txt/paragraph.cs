@@ -912,6 +912,12 @@ namespace Unity.UIWidgets.ui {
             this.Set(item.Key, item.Value, throwOnExisting: true);
         }
 
+        public void AddAll(IEnumerable<TKey> list) {
+            foreach (var key in list) {
+                this.Add(new KeyValuePair<TKey, TValue>(key, default));
+            }
+        }
+
         void Set(TKey key, TValue value, bool throwOnExisting) {
             if (this.count == 0) {
                 this.version++;
