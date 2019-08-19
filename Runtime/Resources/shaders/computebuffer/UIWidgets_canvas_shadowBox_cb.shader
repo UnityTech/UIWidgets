@@ -20,6 +20,7 @@ Shader "UIWidgets/ShadowBox_cb"
         
         Pass {
             CGPROGRAM
+            #pragma require compute
             
             float4 _sb_box;
             float4 _viewport;
@@ -60,7 +61,7 @@ Shader "UIWidgets/ShadowBox_cb"
                 return (integral.z - integral.x) * (integral.w - integral.y);
             }
             
-            v2f vert(uint vertex_id: SV_VertexID, uint instance_id: SV_InstanceID){
+            v2f vert(uint vertex_id: SV_VertexID){
                 v2f o;
                 vdata v = databuffer[indexbuffer[_startVertex + vertex_id]];
                 float padding = 3.0 * _sb_sigma;

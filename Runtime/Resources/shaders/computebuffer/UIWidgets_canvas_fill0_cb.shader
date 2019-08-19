@@ -22,6 +22,7 @@ Shader "UIWidgets/canvas_fill0_cb"
             
         Pass {
             CGPROGRAM
+            #pragma require compute
             #include "../UIWidgets_canvas.cginc"
             #include "UIWidgets_canvas_cb.cginc"
             #pragma vertex vert_compute

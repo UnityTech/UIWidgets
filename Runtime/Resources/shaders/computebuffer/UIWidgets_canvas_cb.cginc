@@ -8,7 +8,7 @@ StructuredBuffer<vdata> databuffer;
 StructuredBuffer<int> indexbuffer;
 int _startVertex;
 
-v2f vert_compute (uint vertex_id: SV_VertexID, uint instance_id: SV_InstanceID)
+v2f vert_compute (uint vertex_id: SV_VertexID)
 {
     v2f o = (v2f)0;
     vdata v = databuffer[indexbuffer[_startVertex + vertex_id]];

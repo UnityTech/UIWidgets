@@ -15,6 +15,7 @@ Shader "UIWidgets/canvas_stencil_cb"
             }
 
             CGPROGRAM
+            #pragma require compute
             #include "../UIWidgets_canvas.cginc"
             #include "UIWidgets_canvas_cb.cginc"
             #pragma vertex vert_compute
@@ -32,6 +33,7 @@ Shader "UIWidgets/canvas_stencil_cb"
             }
 
             CGPROGRAM
+            #pragma require compute
             #include "../UIWidgets_canvas.cginc"
             #include "UIWidgets_canvas_cb.cginc"
             #pragma vertex vert_compute
@@ -49,6 +51,7 @@ Shader "UIWidgets/canvas_stencil_cb"
             }
 
             CGPROGRAM
+            #pragma require compute
             #include "../UIWidgets_canvas.cginc"
             #include "UIWidgets_canvas_cb.cginc"
             #pragma vertex vert_compute

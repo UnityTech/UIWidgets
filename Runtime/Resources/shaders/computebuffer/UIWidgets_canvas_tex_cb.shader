@@ -18,6 +18,7 @@ Shader "UIWidgets/canvas_tex_cb"
 
         Pass { // 0, color
             CGPROGRAM
+            #pragma require compute
             #define UIWIDGETS_COLOR
             #include "../UIWidgets_canvas.cginc"
             #include "UIWidgets_canvas_cb.cginc"
@@ -28,6 +29,7 @@ Shader "UIWidgets/canvas_tex_cb"
         
         Pass { // 1, linear
             CGPROGRAM
+            #pragma require compute
             #define UIWIDGETS_LINEAR
             #include "../UIWidgets_canvas.cginc"
             #include "UIWidgets_canvas_cb.cginc"
@@ -38,6 +40,7 @@ Shader "UIWidgets/canvas_tex_cb"
 
         Pass { // 2, radial
             CGPROGRAM
+            #pragma require compute
             #define UIWIDGETS_RADIAL
             #include "../UIWidgets_canvas.cginc"
             #include "UIWidgets_canvas_cb.cginc"
@@ -48,6 +51,7 @@ Shader "UIWidgets/canvas_tex_cb"
 
         Pass { // 3, sweep
             CGPROGRAM
+            #pragma require compute
             #define UIWIDGETS_SWEEP
             #include "../UIWidgets_canvas.cginc"
             #include "UIWidgets_canvas_cb.cginc"
@@ -58,6 +62,7 @@ Shader "UIWidgets/canvas_tex_cb"
         
         Pass { // 4, image
             CGPROGRAM
+            #pragma require compute
             #define UIWIDGETS_IMAGE
             #include "../UIWidgets_canvas.cginc"
             #include "UIWidgets_canvas_cb.cginc"
