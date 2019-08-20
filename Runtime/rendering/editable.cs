@@ -1116,7 +1116,7 @@ namespace Unity.UIWidgets.rendering {
             this.selectWordsInRange(from: this._lastTapDownPosition, cause: cause);
         }
 
-        void selectWordsInRange(Offset from = null, Offset to = null, SelectionChangedCause? cause = null) {
+        public void selectWordsInRange(Offset from = null, Offset to = null, SelectionChangedCause? cause = null) {
             D.assert(cause != null);
             D.assert(from != null);
             this._layoutText(this.constraints.maxWidth);

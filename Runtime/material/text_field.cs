@@ -366,15 +366,56 @@ namespace Unity.UIWidgets.material {
             this._cancelCurrentSplash();
         }
 
-        void _handleLongPress() {
-            if (this.widget.enableInteractiveSelection == true) {
-                this._renderEditable.handleLongPress();
+        void _handleSingleLongTapStart(LongPressStartDetails details) {
+            if (this.widget.selectionEnabled) {
+                switch (Theme.of(this.context).platform) {
+                    case RuntimePlatform.IPhonePlayer:
+                        this._renderEditable.selectPositionAt(
+                            from: details.globalPosition,
+                            cause: SelectionChangedCause.longPress
+                        );
+                        break;
+                    case RuntimePlatform.Android:
+                        this._renderEditable.selectWord(cause: SelectionChangedCause.longPress);
+                        Feedback.forLongPress(this.context);
+                        break;
+                }
             }
-
             this._confirmCurrentSplash();
         }
 
-        void _handleDragSelectionStart(DragStartDetails details) {
+        void _handleSingleLongTapMoveUpdate(LongPressMoveUpdateDetails details) {
+            if (this.widget.selectionEnabled) {
+                switch (Theme.of(this.context).platform) {
+                    case RuntimePlatform.IPhonePlayer:
+                        this._renderEditable.selectPositionAt(
+                            from: details.globalPosition,
+                            cause: SelectionChangedCause.longPress
+                        );
+                        break;
+                    case RuntimePlatform.Android:
+                        this._renderEditable.selectWordsInRange(
+                            from: details.globalPosition - details.offsetFromOrigin,
+                            to: details.globalPosition,
+                            cause: SelectionChangedCause.longPress);
+                        Feedback.forLongPress(this.context);
+                        break;
+                }
+            }
+        }
+
+        void _handleSingleLongTapEnd(LongPressEndDetails details) {
+            this._editableTextKey.currentState.showToolbar();
+        }
+
+        void _handleDoubleTapDown(TapDownDetails details) {
+            if (this.widget.selectionEnabled) {
+                this._renderEditable.selectWord(cause: SelectionChangedCause.doubleTap);
+                this._editableTextKey.currentState.showToolbar();
+            }
+        }
+
+        void _handleMouseDragSelectionStart(DragStartDetails details) {
             this._renderEditable.selectPositionAt(
                 from: details.globalPosition,
                 cause: SelectionChangedCause.drag);
@@ -382,7 +423,7 @@ namespace Unity.UIWidgets.material {
             this._startSplash(details.globalPosition);
         }
 
-        void _handleDragSelectionUpdate(DragStartDetails startDetails,
+        void _handleMouseDragSelectionUpdate(DragStartDetails startDetails,
             DragUpdateDetails updateDetails) {
             this._renderEditable.selectPositionAt(
                 from: startDetails.globalPosition,
@@ -521,9 +562,12 @@ namespace Unity.UIWidgets.material {
                     // onForcePressStart: forcePressEnabled ? this._handleForcePressStarted : null, // TODO: Remove this when force press is added
                     onSingleTapUp: this._handleSingleTapUp,
                     onSingleTapCancel: this._handleSingleTapCancel,
-                    onSingleLongTapStart: this._handleLongPress,
-                    onDragSelectionStart: this._handleDragSelectionStart,
-                    onDragSelectionUpdate: this._handleDragSelectionUpdate,
+                    onSingleLongTapStart: this._handleSingleLongTapStart,
+                    onSingleLongTapMoveUpdate: this._handleSingleLongTapMoveUpdate,
+                    onSingleLongTapEnd: this._handleSingleLongTapEnd,
+                    onDoubleTapDown: this._handleDoubleTapDown,
+                    onDragSelectionStart: this._handleMouseDragSelectionStart,
+                    onDragSelectionUpdate: this._handleMouseDragSelectionUpdate,
                     behavior: HitTestBehavior.translucent,
                     child: child
                 )

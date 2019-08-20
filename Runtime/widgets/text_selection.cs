@@ -520,9 +520,9 @@ namespace Unity.UIWidgets.widgets {
             GestureTapDownCallback onTapDown = null,
             GestureTapUpCallback onSingleTapUp = null,
             GestureTapCancelCallback onSingleTapCancel = null,
-            GestureLongPressCallback onSingleLongTapStart = null,
-            // TODO: GestureLongPressMoveUpdateCallback onSingleLongTapMoveUpdate = null,
-            // TODO: GestureLongPressEndCallback onSingleLongTapEnd = null,
+            GestureLongPressStartCallback onSingleLongTapStart = null,
+            GestureLongPressMoveUpdateCallback onSingleLongTapMoveUpdate = null,
+            GestureLongPressEndCallback onSingleLongTapEnd = null,
             GestureTapDownCallback onDoubleTapDown = null,
             GestureDragStartCallback onDragSelectionStart = null,
             DragSelectionUpdateCallback onDragSelectionUpdate = null,
@@ -549,11 +549,11 @@ namespace Unity.UIWidgets.widgets {
 
         public readonly GestureTapCancelCallback onSingleTapCancel;
 
-        public readonly GestureLongPressCallback onSingleLongTapStart;
+        public readonly GestureLongPressStartCallback onSingleLongTapStart;
 
-        // TODO: public readonly GestureLongPressMoveUpdateCallback onSingleLongTapMoveUpdate;
+        public readonly GestureLongPressMoveUpdateCallback onSingleLongTapMoveUpdate;
 
-        // TODO: public readonly GestureLongPressEndCallback onSingleLongTapEnd;
+        public readonly GestureLongPressEndCallback onSingleLongTapEnd;
 
         public readonly GestureTapDownCallback onDoubleTapDown;
 
@@ -666,17 +666,25 @@ namespace Unity.UIWidgets.widgets {
             this._lastDragUpdateDetails = null;
         }
 
-        void _handleLongPressStart() {
+        void _handleLongPressStart(LongPressStartDetails details) {
             if (!this._isDoubleTap && this.widget.onSingleLongTapStart != null) {
-                this.widget.onSingleLongTapStart();
+                this.widget.onSingleLongTapStart(details);
             }
         }
 
-        // TODO: void _handleLongPressMoveUpdate(LongPressMoveUpdateDetails details) {
-        // }
+        void _handleLongPressMoveUpdate(LongPressMoveUpdateDetails details) {
+            if (!this._isDoubleTap && this.widget.onSingleLongTapMoveUpdate != null) {
+                this.widget.onSingleLongTapMoveUpdate(details);
+            }
+        }
 
-        // TODO: void _handleLongPressEnd(LongPressEndDetails details) {
-        // }
+        void _handleLongPressEnd(LongPressEndDetails details) {
+            if (!this._isDoubleTap && this.widget.onSingleLongTapEnd != null) {
+                this.widget.onSingleLongTapEnd(details);
+            }
+
+            this._isDoubleTap = false;
+        }
 
         void _doubleTapTimeout() {
             this._doubleTapTimer = null;
@@ -706,17 +714,17 @@ namespace Unity.UIWidgets.widgets {
                 )
             );
 
-            if (this.widget.onSingleLongTapStart != null // ||
-                // TODO: this.widget.onSingleLongTapMoveUpdatee != null ||
-                // TODO: this.widget.onSingleLongTapEnd != null
+            if (this.widget.onSingleLongTapStart != null ||
+                this.widget.onSingleLongTapMoveUpdate != null ||
+                this.widget.onSingleLongTapEnd != null
             ) {
                 gestures[typeof(LongPressGestureRecognizer)] =
                     new GestureRecognizerFactoryWithHandlers<LongPressGestureRecognizer>(
                         () => new LongPressGestureRecognizer(debugOwner: this, kind: PointerDeviceKind.touch),
                         instance => {
-                            instance.onLongPress = this._handleLongPressStart;
-                            // TODO: instance.onLongPressMoveUpdate = _handleLongPressMoveUpdate
-                            // TODO: instance.onLongPressEnd = _handleLongPressEnd
+                            instance.onLongPressStart = this._handleLongPressStart;
+                            instance.onLongPressMoveUpdate = this._handleLongPressMoveUpdate;
+                            instance.onLongPressEnd = this._handleLongPressEnd;
                         });
             }
 
