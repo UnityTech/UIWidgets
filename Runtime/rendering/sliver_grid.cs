@@ -113,7 +113,8 @@ namespace com.unity.uiwidgets.Runtime.rendering {
 
         float _getOffsetFromStartInCrossAxis(float crossAxisStart) {
             if (this.reverseCrossAxis == true) {
-                return (this.crossAxisCount * this.crossAxisStride - crossAxisStart - this.childCrossAxisExtent) ??
+                return (this.crossAxisCount * this.crossAxisStride - crossAxisStart - this.childCrossAxisExtent
+                        - (this.crossAxisStride - this.childCrossAxisExtent)) ??
                        0.0f;
             }
 

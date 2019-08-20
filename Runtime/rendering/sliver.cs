@@ -341,6 +341,7 @@ namespace Unity.UIWidgets.rendering {
         public readonly bool hasVisualOverflow;
         public readonly float? scrollOffsetCorrection;
         public readonly float cacheExtent;
+        public const float precisionErrorTolerance = 1e-10f;
 
         internal static string _debugCompareFloats(string labelA, float valueA, string labelB, float valueB) {
             if (valueA.ToString("F1") != valueB.ToString("F1")) {
@@ -381,7 +382,7 @@ namespace Unity.UIWidgets.rendering {
                     );
                 }
 
-                if (this.maxPaintExtent < this.paintExtent) {
+                if (this.paintExtent - this.maxPaintExtent > precisionErrorTolerance) {
                     verify(false,
                         "The \"maxPaintExtent\" is less than the \"paintExtent\".\n" +
                         _debugCompareFloats("maxPaintExtent", this.maxPaintExtent, "paintExtent",
