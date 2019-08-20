@@ -1245,7 +1245,7 @@ namespace Unity.UIWidgets.rendering {
             D.assert(this._textLayoutLastWidth == this.constraints.maxWidth);
             var paint = new Paint() {color = this._floatingCursorOn ? this.backgroundCursorColor : this._cursorColor};
             var caretOffset = this._textPainter.getOffsetForCaret(textPosition, this._caretPrototype) + effectiveOffset;
-            Rect caretRect = this._caretPrototype.shift(caretOffset + effectiveOffset);
+            Rect caretRect = this._caretPrototype.shift(caretOffset);
             if (this._cursorOffset != null) {
                 caretRect = caretRect.shift(this._cursorOffset);
             }

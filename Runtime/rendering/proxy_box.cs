@@ -1169,12 +1169,8 @@ namespace Unity.UIWidgets.rendering {
 
         Color _color;
 
-        protected static Paint _transparentPaint {
-            get { return new Paint {color = new Color(0x00000000)}; }
-        }
-
         protected override bool alwaysNeedsCompositing {
-            get { return this._elevation != 0.0; }
+            get { return true; }
         }
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder description) {
@@ -1266,36 +1262,17 @@ namespace Unity.UIWidgets.rendering {
                 Path offsetRRectAsPath = new Path();
                 offsetRRectAsPath.addRRect(offsetRRect);
 
-                if (this.needsCompositing) {
-                    PhysicalModelLayer physicalModel = new PhysicalModelLayer(
-                        clipPath: offsetRRectAsPath,
-                        clipBehavior: this.clipBehavior,
-                        elevation: this.elevation,
-                        color: this.color,
-                        shadowColor: this.shadowColor);
-                    context.pushLayer(physicalModel, base.paint, offset, childPaintBounds: offsetBounds);
-                }
-                else {
-                    Canvas canvas = context.canvas;
-                    if (this.elevation != 0.0) {
-                        canvas.drawRect(
-                            offsetBounds.inflate(20.0f),
-                            _transparentPaint
-                        );
-                        canvas.drawShadow(
-                            offsetRRectAsPath,
-                            this.shadowColor,
-                            this.elevation,
-                            this.color.alpha != 0xFF
-                        );
-                    }
-
-                    Paint paint = new Paint {color = this.color};
-                    canvas.drawRRect(offsetRRect, paint);
-                    context.clipRRectAndPaint(offsetRRect, this.clipBehavior, offsetBounds,
-                        () => base.paint(context, offset));
-                    D.assert(context.canvas == canvas, () => "canvas changed even though needsCompositing was false");
-                }
+                PhysicalModelLayer physicalModel = new PhysicalModelLayer(
+                    clipPath: offsetRRectAsPath,
+                    clipBehavior: this.clipBehavior,
+                    elevation: this.elevation,
+                    color: this.color,
+                    shadowColor: this.shadowColor);
+                D.assert(() => {
+                    physicalModel.debugCreator = this.debugCreator;
+                    return true;
+                });
+                context.pushLayer(physicalModel, base.paint, offset, childPaintBounds: offsetBounds);
             }
         }
 
@@ -1353,37 +1330,13 @@ namespace Unity.UIWidgets.rendering {
                 Path offsetPath = new Path();
                 offsetPath.addPath(this._clip, offset);
 
-                if (this.needsCompositing) {
-                    PhysicalModelLayer physicalModel = new PhysicalModelLayer(
-                        clipPath: offsetPath,
-                        clipBehavior: this.clipBehavior,
-                        elevation: this.elevation,
-                        color: this.color,
-                        shadowColor: this.shadowColor);
-                    context.pushLayer(physicalModel, base.paint, offset, childPaintBounds: offsetBounds);
-                }
-                else {
-                    Canvas canvas = context.canvas;
-                    if (this.elevation != 0.0) {
-                        canvas.drawRect(
-                            offsetBounds.inflate(20.0f),
-                            _transparentPaint
-                        );
-
-                        canvas.drawShadow(
-                            offsetPath,
-                            this.shadowColor,
-                            this.elevation,
-                            this.color.alpha != 0xFF
-                        );
-                    }
-
-                    Paint paint = new Paint {color = this.color, style = PaintingStyle.fill};
-                    canvas.drawPath(offsetPath, paint);
-                    context.clipPathAndPaint(offsetPath, this.clipBehavior,
-                        offsetBounds, () => base.paint(context, offset));
-                    D.assert(context.canvas == canvas, () => "canvas changed even though needsCompositing was false");
-                }
+                PhysicalModelLayer physicalModel = new PhysicalModelLayer(
+                    clipPath: offsetPath,
+                    clipBehavior: this.clipBehavior,
+                    elevation: this.elevation,
+                    color: this.color,
+                    shadowColor: this.shadowColor);
+                context.pushLayer(physicalModel, base.paint, offset, childPaintBounds: offsetBounds);
             }
         }
 
@@ -1925,6 +1878,8 @@ namespace Unity.UIWidgets.rendering {
     public delegate void PointerUpEventListener(PointerUpEvent evt);
 
     public delegate void PointerCancelEventListener(PointerCancelEvent evt);
+
+    // public delegate void PointerSignalEventListener(PointerSignalEvent evt);
 
     public delegate void PointerScrollEventListener(PointerScrollEvent evt);
 
