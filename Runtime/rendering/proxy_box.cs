@@ -1879,7 +1879,7 @@ namespace Unity.UIWidgets.rendering {
 
     public delegate void PointerCancelEventListener(PointerCancelEvent evt);
 
-    // public delegate void PointerSignalEventListener(PointerSignalEvent evt);
+    public delegate void PointerSignalEventListener(PointerSignalEvent evt);
 
     public delegate void PointerScrollEventListener(PointerScrollEvent evt);
 
@@ -1892,6 +1892,7 @@ namespace Unity.UIWidgets.rendering {
             PointerExitEventListener onPointerExit = null,
             PointerUpEventListener onPointerUp = null,
             PointerCancelEventListener onPointerCancel = null,
+            PointerSignalEventListener onPointerSignal = null,
             PointerScrollEventListener onPointerScroll = null,
             PointerDragFromEditorEnterEventListener onPointerDragFromEditorEnter = null,
             PointerDragFromEditorHoverEventListener onPointerDragFromEditorHover = null,
@@ -1904,6 +1905,7 @@ namespace Unity.UIWidgets.rendering {
             this.onPointerMove = onPointerMove;
             this.onPointerUp = onPointerUp;
             this.onPointerCancel = onPointerCancel;
+            this.onPointerSignal = onPointerSignal;
             this.onPointerScroll = onPointerScroll;
 
             this._onPointerEnter = onPointerEnter;
@@ -2027,9 +2029,15 @@ namespace Unity.UIWidgets.rendering {
 
         public PointerCancelEventListener onPointerCancel;
 
+        public PointerSignalEventListener onPointerSignal;
+
         public PointerScrollEventListener onPointerScroll;
 
         MouseTrackerAnnotation _hoverAnnotation;
+
+        public MouseTrackerAnnotation hoverAnnotation {
+            get { return this._hoverAnnotation; }
+        }
 
         void _updateAnnotations() {
             D.assert(this._onPointerEnter != this._hoverAnnotation.onEnter ||
@@ -2133,6 +2141,11 @@ namespace Unity.UIWidgets.rendering {
                 return;
             }
 
+            if (this.onPointerSignal != null && evt is PointerSignalEvent) {
+                this.onPointerSignal((PointerSignalEvent) evt);
+                return;
+            }
+            
             if (this.onPointerScroll != null && evt is PointerScrollEvent) {
                 this.onPointerScroll((PointerScrollEvent) evt);
             }
@@ -2167,6 +2180,10 @@ namespace Unity.UIWidgets.rendering {
 
             if (this.onPointerCancel != null) {
                 listeners.Add("cancel");
+            }
+
+            if (this.onPointerSignal != null) {
+                listeners.Add("signal");
             }
 
             if (listeners.isEmpty()) {
