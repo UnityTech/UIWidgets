@@ -3,15 +3,13 @@ Shader "UIWidgets/ShadowBox"
     //originally from http://madebyevan.com/shaders/fast-rounded-rectangle-shadows/
     Properties
     {
-        _SrcBlend("_SrcBlend", Int) = 1 // One
-        _DstBlend("_DstBlend", Int) = 10 // OneMinusSrcAlpha
         _StencilComp("_StencilComp", Float) = 8 // - Equal, 8 - Always 
     }
     SubShader
     {
         ZTest Always
         ZWrite Off
-        Blend [_SrcBlend] [_DstBlend]
+        Blend SrcAlpha OneMinusSrcAlpha
         
         Stencil {
             Ref 128
