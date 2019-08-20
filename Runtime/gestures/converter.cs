@@ -48,10 +48,24 @@ namespace Unity.UIWidgets.gestures {
 
         public Offset lastPosition;
 
+        public Offset deltaTo(Offset to) {
+            return to - this.lastPosition;
+        }
+
         public override string ToString() {
             return $"_PointerState(pointer: {this.pointer}, down: {this.down}, lastPosition: {this.lastPosition})";
         }
+
+        public int _synthesiseDownButtons(int buttons, PointerDeviceKind kind) {
+            switch (kind) {
+                case PointerDeviceKind.touch:
+                    return buttons;
+                default:
+                    return buttons;
+            }
+        }
     }
+
 
     public static class PointerEventConverter {
         static readonly Dictionary<int, _PointerState> _pointers = new Dictionary<int, _PointerState>();
