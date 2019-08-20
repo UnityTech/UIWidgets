@@ -52,8 +52,7 @@ namespace Unity.UIWidgets.gestures {
             kind: kind,
             device: device,
             position: position
-        ) {
-        }
+        ) { }
     }
 
     public class PointerRemovedEvent : PointerEvent {
@@ -65,8 +64,7 @@ namespace Unity.UIWidgets.gestures {
             timeStamp: timeStamp,
             kind: kind,
             device: device
-        ) {
-        }
+        ) { }
     }
 
     public class PointerScrollEvent : PointerEvent {
@@ -84,8 +82,7 @@ namespace Unity.UIWidgets.gestures {
                 device: device,
                 position: position,
                 down: true,
-                delta: delta) {
-        }
+                delta: delta) { }
     }
 
     public class PointerDragFromEditorEnterEvent : PointerEvent {
@@ -101,8 +98,7 @@ namespace Unity.UIWidgets.gestures {
             kind: kind,
             device: device,
             position: position
-        ) {
-        }
+        ) { }
 
         public static PointerDragFromEditorEnterEvent fromDragFromEditorEvent(PointerEvent evt) {
             return new PointerDragFromEditorEnterEvent(
@@ -128,8 +124,7 @@ namespace Unity.UIWidgets.gestures {
             kind: kind,
             device: device,
             position: position
-        ) {
-        }
+        ) { }
 
         public static PointerDragFromEditorExitEvent fromDragFromEditorEvent(PointerEvent evt) {
             return new PointerDragFromEditorExitEvent(
@@ -155,8 +150,7 @@ namespace Unity.UIWidgets.gestures {
             kind: kind,
             device: device,
             position: position
-        ) {
-        }
+        ) { }
 
         public static PointerDragFromEditorHoverEvent fromDragFromEditorEvent(PointerEvent evt) {
             return new PointerDragFromEditorHoverEvent(
@@ -215,8 +209,7 @@ namespace Unity.UIWidgets.gestures {
                 kind: kind,
                 device: device,
                 position: position,
-                down: false) {
-        }
+                down: false) { }
 
         public static PointerHoverEvent fromHoverEvent(PointerEvent hover) {
             return new PointerHoverEvent(
@@ -242,8 +235,7 @@ namespace Unity.UIWidgets.gestures {
                 kind: kind,
                 device: device,
                 position: position,
-                down: false) {
-        }
+                down: false) { }
 
         public static PointerEnterEvent fromHoverEvent(PointerEvent hover) {
             return new PointerEnterEvent(
@@ -269,8 +261,7 @@ namespace Unity.UIWidgets.gestures {
                 kind: kind,
                 device: device,
                 position: position,
-                down: false) {
-        }
+                down: false) { }
 
         public static PointerExitEvent fromHoverEvent(PointerEvent hover) {
             return new PointerExitEvent(
@@ -296,8 +287,7 @@ namespace Unity.UIWidgets.gestures {
                 kind: kind,
                 device: device,
                 position: position,
-                down: true) {
-        }
+                down: true) { }
     }
 
     public class PointerMoveEvent : PointerEvent {
@@ -317,8 +307,7 @@ namespace Unity.UIWidgets.gestures {
                 position: position,
                 delta: delta,
                 down: true,
-                synthesized: synthesized) {
-        }
+                synthesized: synthesized) { }
     }
 
     public class PointerUpEvent : PointerEvent {
@@ -334,8 +323,7 @@ namespace Unity.UIWidgets.gestures {
                 kind: kind,
                 device: device,
                 position: position,
-                down: false) {
-        }
+                down: false) { }
     }
 
     public class PointerCancelEvent : PointerEvent {
@@ -351,7 +339,22 @@ namespace Unity.UIWidgets.gestures {
                 kind: kind,
                 device: device,
                 position: position,
-                down: false) {
-        }
+                down: false) { }
+    }
+
+    public class PointerSignalEvent : PointerEvent {
+        public PointerSignalEvent(
+            TimeSpan timeStamp,
+            int pointer = 0,
+            PointerDeviceKind kind = PointerDeviceKind.mouse,
+            int device = 0,
+            Offset position = null
+        ) : base(
+            timeStamp,
+            pointer: pointer,
+            kind: kind,
+            device: device,
+            position: position
+        ) { }
     }
 }
