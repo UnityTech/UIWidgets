@@ -316,7 +316,9 @@ namespace Unity.UIWidgets.gestures {
             TimeSpan? longTapDelay = null,
             object debugOwner = null,
             PointerDeviceKind? kind = null
-        ) : base(debugOwner: debugOwner, kind: kind) { }
+        ) : base(debugOwner: debugOwner, kind: kind) {
+            this.longTapDelay = longTapDelay ?? TimeSpan.Zero;
+        }
 
         GestureMultiTapDownCallback onTapDown;
 
