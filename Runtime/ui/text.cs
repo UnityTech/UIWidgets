@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Unity.UIWidgets.painting;
 
 namespace Unity.UIWidgets.ui {
     public enum FontStyle {
@@ -241,8 +242,9 @@ namespace Unity.UIWidgets.ui {
             int? maxLines = null,
             float? fontSize = null,
             string fontFamily = null,
-            float? lineHeight = null, // todo  
-            string ellipsis = null) {
+            float? height = null, // todo  
+            string ellipsis = null,
+            StrutStyle strutStyle = null) {
             this.textAlign = textAlign;
             this.textDirection = textDirection;
             this.fontWeight = fontWeight;
@@ -250,8 +252,9 @@ namespace Unity.UIWidgets.ui {
             this.maxLines = maxLines;
             this.fontSize = fontSize;
             this.fontFamily = fontFamily;
-            this.lineHeight = lineHeight;
+            this.height = height;
             this.ellipsis = ellipsis;
+            this.strutStyle = strutStyle;
         }
 
         public bool Equals(ParagraphStyle other) {
@@ -266,7 +269,7 @@ namespace Unity.UIWidgets.ui {
             return this.textAlign == other.textAlign && this.textDirection == other.textDirection &&
                    this.fontWeight == other.fontWeight && this.fontStyle == other.fontStyle &&
                    this.maxLines == other.maxLines && this.fontSize.Equals(other.fontSize) &&
-                   string.Equals(this.fontFamily, other.fontFamily) && this.lineHeight.Equals(other.lineHeight) &&
+                   string.Equals(this.fontFamily, other.fontFamily) && this.height.Equals(other.height) &&
                    string.Equals(this.ellipsis, other.ellipsis);
         }
 
@@ -303,7 +306,7 @@ namespace Unity.UIWidgets.ui {
                 hashCode = (hashCode * 397) ^ this.maxLines.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.fontSize.GetHashCode();
                 hashCode = (hashCode * 397) ^ (this.fontFamily != null ? this.fontFamily.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ this.lineHeight.GetHashCode();
+                hashCode = (hashCode * 397) ^ this.height.GetHashCode();
                 hashCode = (hashCode * 397) ^ (this.ellipsis != null ? this.ellipsis.GetHashCode() : 0);
                 return hashCode;
             }
@@ -315,7 +318,7 @@ namespace Unity.UIWidgets.ui {
                 fontStyle: this.fontStyle,
                 fontFamily: this.fontFamily,
                 fontSize: this.fontSize,
-                height: this.lineHeight
+                height: this.height
             );
         }
 
@@ -330,8 +333,9 @@ namespace Unity.UIWidgets.ui {
         public readonly int? maxLines;
         public readonly float? fontSize;
         public readonly string fontFamily;
-        public readonly float? lineHeight;
+        public readonly float? height;
         public readonly string ellipsis;
+        public readonly StrutStyle strutStyle;
 
         public bool ellipsized() {
             return !string.IsNullOrEmpty(this.ellipsis);

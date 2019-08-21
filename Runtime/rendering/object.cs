@@ -7,6 +7,7 @@ using Unity.UIWidgets.painting;
 using Unity.UIWidgets.ui;
 using UnityEngine;
 using Canvas = Unity.UIWidgets.ui.Canvas;
+using Color = Unity.UIWidgets.ui.Color;
 using Rect = Unity.UIWidgets.ui.Rect;
 
 namespace Unity.UIWidgets.rendering {
@@ -196,7 +197,7 @@ namespace Unity.UIWidgets.rendering {
                     Paint paint = new Paint {
                         style = PaintingStyle.stroke,
                         strokeWidth = 1.0f,
-                        color = new ui.Color(0xFFFF9800),
+                        color = new Color(0xFFFF9800),
                     };
                     this.canvas.drawRect(this.estimatedBounds, paint);
                 }
@@ -288,7 +289,8 @@ namespace Unity.UIWidgets.rendering {
             Matrix3 effectiveTransform;
             if (offset == null || offset == Offset.zero) {
                 effectiveTransform = transform;
-            } else {
+            }
+            else {
                 effectiveTransform = Matrix3.makeTrans(offset.dx, offset.dy);
                 effectiveTransform.preConcat(transform);
                 effectiveTransform.preTranslate(-offset.dx, -offset.dy);
@@ -297,7 +299,7 @@ namespace Unity.UIWidgets.rendering {
             if (needsCompositing) {
                 var inverse = Matrix3.I();
                 var invertible = effectiveTransform.invert(inverse);
-                
+
                 // it could just be "scale == 0", ignore the assertion.
                 // D.assert(invertible);
 
@@ -1377,6 +1379,7 @@ namespace Unity.UIWidgets.rendering {
         }
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties);
             properties.add(new DiagnosticsProperty<object>(
                 "creator", this.debugCreator, defaultValue: Diagnostics.kNullDefaultValue,
                 level: DiagnosticLevel.debug));

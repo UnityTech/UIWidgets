@@ -122,7 +122,7 @@ namespace Unity.UIWidgets.widgets {
             RenderEditable renderObject = null,
             TextSelectionControls selectionControls = null,
             TextSelectionDelegate selectionDelegate = null,
-            DragStartBehavior? dragStartBehavior = null) {
+            DragStartBehavior dragStartBehavior = DragStartBehavior.start) {
             D.assert(value != null);
             D.assert(context != null);
             this.context = context;
@@ -133,9 +133,10 @@ namespace Unity.UIWidgets.widgets {
             this.selectionDelegate = selectionDelegate;
             this._value = value;
             OverlayState overlay = Overlay.of(context);
-            D.assert(overlay != null);
-            this._handleController = new AnimationController(duration: _fadeDuration, vsync: overlay);
-            this._toolbarController = new AnimationController(duration: _fadeDuration, vsync: overlay);
+            D.assert(overlay != null, () => $"No Overlay widget exists above {context}.\n" +
+                                            "Usually the Navigator created by WidgetsApp provides the overlay. Perhaps your " +
+                                            "app content was created above the Navigator with the WidgetsApp builder parameter.");
+            this._toolbarController = new AnimationController(duration: fadeDuration, vsync: overlay);
             this.dragStartBehavior = dragStartBehavior;
         }
 
@@ -145,15 +146,10 @@ namespace Unity.UIWidgets.widgets {
         public readonly RenderEditable renderObject;
         public readonly TextSelectionControls selectionControls;
         public readonly TextSelectionDelegate selectionDelegate;
-        public readonly DragStartBehavior? dragStartBehavior;
+        public readonly DragStartBehavior dragStartBehavior;
 
-        public static TimeSpan _fadeDuration = TimeSpan.FromMilliseconds(150);
-        AnimationController _handleController;
+        public static readonly TimeSpan fadeDuration = TimeSpan.FromMilliseconds(150);
         AnimationController _toolbarController;
-
-        Animation<float> _handleOpacity {
-            get { return this._handleController.view; }
-        }
 
         Animation<float> _toolbarOpacity {
             get { return this._toolbarController.view; }
@@ -178,7 +174,6 @@ namespace Unity.UIWidgets.widgets {
                     this._buildHandle(context, _TextSelectionHandlePosition.end)),
             };
             Overlay.of(this.context, debugRequiredFor: this.debugRequiredFor).insertAll(this._handles);
-            this._handleController.forward(from: 0.0f);
         }
 
         public void showToolbar() {
@@ -234,13 +229,11 @@ namespace Unity.UIWidgets.widgets {
             this._toolbar?.remove();
             this._toolbar = null;
 
-            this._handleController.stop();
             this._toolbarController.stop();
         }
 
         public void dispose() {
             this.hide();
-            this._handleController.dispose();
             this._toolbarController.dispose();
         }
 
@@ -250,20 +243,17 @@ namespace Unity.UIWidgets.widgets {
                 return new Container(); // hide the second handle when collapsed
             }
 
-            return new FadeTransition(
-                opacity: this._handleOpacity,
-                child: new _TextSelectionHandleOverlay(
-                    onSelectionHandleChanged: (TextSelection newSelection) => {
-                        this._handleSelectionHandleChanged(newSelection, position);
-                    },
-                    onSelectionHandleTapped: this._handleSelectionHandleTapped,
-                    layerLink: this.layerLink,
-                    renderObject: this.renderObject,
-                    selection: this._selection,
-                    selectionControls: this.selectionControls,
-                    position: position,
-                    dragStartBehavior: this.dragStartBehavior ?? DragStartBehavior.down
-                )
+            return new _TextSelectionHandleOverlay(
+                onSelectionHandleChanged: (TextSelection newSelection) => {
+                    this._handleSelectionHandleChanged(newSelection, position);
+                },
+                onSelectionHandleTapped: this._handleSelectionHandleTapped,
+                layerLink: this.layerLink,
+                renderObject: this.renderObject,
+                selection: this._selection,
+                selectionControls: this.selectionControls,
+                position: position,
+                dragStartBehavior: this.dragStartBehavior
             );
         }
 
@@ -333,7 +323,7 @@ namespace Unity.UIWidgets.widgets {
             ValueChanged<TextSelection> onSelectionHandleChanged = null,
             VoidCallback onSelectionHandleTapped = null,
             TextSelectionControls selectionControls = null,
-            DragStartBehavior dragStartBehavior = DragStartBehavior.down
+            DragStartBehavior dragStartBehavior = DragStartBehavior.start
         ) : base(key: key) {
             this.selection = selection;
             this.position = position;
@@ -357,10 +347,58 @@ namespace Unity.UIWidgets.widgets {
         public override State createState() {
             return new _TextSelectionHandleOverlayState();
         }
+
+        internal ValueListenable<bool> _visibility {
+            get {
+                switch (this.position) {
+                    case _TextSelectionHandlePosition.start:
+                        return this.renderObject.selectionStartInViewport;
+                    case _TextSelectionHandlePosition.end:
+                        return this.renderObject.selectionEndInViewport;
+                }
+
+                return null;
+            }
+        }
     }
 
-    class _TextSelectionHandleOverlayState : State<_TextSelectionHandleOverlay> {
+    class _TextSelectionHandleOverlayState : SingleTickerProviderStateMixin<_TextSelectionHandleOverlay> {
         Offset _dragPosition;
+
+        AnimationController _controller;
+
+        Animation<float> _opacity {
+            get { return this._controller.view; }
+        }
+
+        public override void initState() {
+            base.initState();
+            this._controller = new AnimationController(duration: TextSelectionOverlay.fadeDuration, vsync: this);
+            this._handleVisibilityChanged();
+            this.widget._visibility.addListener(this._handleVisibilityChanged);
+        }
+
+        void _handleVisibilityChanged() {
+            if (this.widget._visibility.value) {
+                this._controller.forward();
+            }
+            else {
+                this._controller.reverse();
+            }
+        }
+
+        public override void didUpdateWidget(StatefulWidget oldWidget) {
+            base.didUpdateWidget(oldWidget);
+            (oldWidget as _TextSelectionHandleOverlay)._visibility.removeListener(this._handleVisibilityChanged);
+            this._handleVisibilityChanged();
+            this.widget._visibility.addListener(this._handleVisibilityChanged);
+        }
+
+        public override void dispose() {
+            this.widget._visibility.removeListener(this._handleVisibilityChanged);
+            this._controller.dispose();
+            base.dispose();
+        }
 
         void _handleDragStart(DragStartDetails details) {
             this._dragPosition = details.globalPosition +
@@ -421,24 +459,33 @@ namespace Unity.UIWidgets.widgets {
                     break;
             }
 
+            Size viewport = this.widget.renderObject.size;
+            point = new Offset(
+                point.dx.clamp(0.0f, viewport.width),
+                point.dy.clamp(0.0f, viewport.height)
+            );
+
             return new CompositedTransformFollower(
                 link: this.widget.layerLink,
                 showWhenUnlinked: false,
-                child: new GestureDetector(
-                    dragStartBehavior: this.widget.dragStartBehavior,
-                    onPanStart: this._handleDragStart,
-                    onPanUpdate: this._handleDragUpdate,
-                    onTap: this._handleTap,
-                    child: new Stack(
-                        overflow: Overflow.visible,
-                        children: new List<Widget>() {
-                            new Positioned(
-                                left: point.dx,
-                                top: point.dy,
-                                child: this.widget.selectionControls.buildHandle(context, type,
-                                    this.widget.renderObject.preferredLineHeight)
-                            )
-                        }
+                child: new FadeTransition(
+                    opacity: this._opacity,
+                    child: new GestureDetector(
+                        dragStartBehavior: this.widget.dragStartBehavior,
+                        onPanStart: this._handleDragStart,
+                        onPanUpdate: this._handleDragUpdate,
+                        onTap: this._handleTap,
+                        child: new Stack(
+                            overflow: Overflow.visible,
+                            children: new List<Widget>() {
+                                new Positioned(
+                                    left: point.dx,
+                                    top: point.dy,
+                                    child: this.widget.selectionControls.buildHandle(context, type,
+                                        this.widget.renderObject.preferredLineHeight)
+                                )
+                            }
+                        )
                     )
                 )
             );
@@ -473,7 +520,9 @@ namespace Unity.UIWidgets.widgets {
             GestureTapDownCallback onTapDown = null,
             GestureTapUpCallback onSingleTapUp = null,
             GestureTapCancelCallback onSingleTapCancel = null,
-            GestureLongPressCallback onSingleLongTapStart = null,
+            GestureLongPressStartCallback onSingleLongTapStart = null,
+            GestureLongPressMoveUpdateCallback onSingleLongTapMoveUpdate = null,
+            GestureLongPressEndCallback onSingleLongTapEnd = null,
             GestureTapDownCallback onDoubleTapDown = null,
             GestureDragStartCallback onDragSelectionStart = null,
             DragSelectionUpdateCallback onDragSelectionUpdate = null,
@@ -500,7 +549,11 @@ namespace Unity.UIWidgets.widgets {
 
         public readonly GestureTapCancelCallback onSingleTapCancel;
 
-        public readonly GestureLongPressCallback onSingleLongTapStart;
+        public readonly GestureLongPressStartCallback onSingleLongTapStart;
+
+        public readonly GestureLongPressMoveUpdateCallback onSingleLongTapMoveUpdate;
+
+        public readonly GestureLongPressEndCallback onSingleLongTapEnd;
 
         public readonly GestureTapDownCallback onDoubleTapDown;
 
@@ -613,10 +666,24 @@ namespace Unity.UIWidgets.widgets {
             this._lastDragUpdateDetails = null;
         }
 
-        void _handleLongPressStart() {
+        void _handleLongPressStart(LongPressStartDetails details) {
             if (!this._isDoubleTap && this.widget.onSingleLongTapStart != null) {
-                this.widget.onSingleLongTapStart();
+                this.widget.onSingleLongTapStart(details);
             }
+        }
+
+        void _handleLongPressMoveUpdate(LongPressMoveUpdateDetails details) {
+            if (!this._isDoubleTap && this.widget.onSingleLongTapMoveUpdate != null) {
+                this.widget.onSingleLongTapMoveUpdate(details);
+            }
+        }
+
+        void _handleLongPressEnd(LongPressEndDetails details) {
+            if (!this._isDoubleTap && this.widget.onSingleLongTapEnd != null) {
+                this.widget.onSingleLongTapEnd(details);
+            }
+
+            this._isDoubleTap = false;
         }
 
         void _doubleTapTimeout() {
@@ -647,11 +714,18 @@ namespace Unity.UIWidgets.widgets {
                 )
             );
 
-            if (this.widget.onSingleLongTapStart != null) {
+            if (this.widget.onSingleLongTapStart != null ||
+                this.widget.onSingleLongTapMoveUpdate != null ||
+                this.widget.onSingleLongTapEnd != null
+            ) {
                 gestures[typeof(LongPressGestureRecognizer)] =
                     new GestureRecognizerFactoryWithHandlers<LongPressGestureRecognizer>(
                         () => new LongPressGestureRecognizer(debugOwner: this, kind: PointerDeviceKind.touch),
-                        instance => { instance.onLongPress = this._handleLongPressStart; });
+                        instance => {
+                            instance.onLongPressStart = this._handleLongPressStart;
+                            instance.onLongPressMoveUpdate = this._handleLongPressMoveUpdate;
+                            instance.onLongPressEnd = this._handleLongPressEnd;
+                        });
             }
 
             if (this.widget.onDragSelectionStart != null ||
@@ -669,6 +743,9 @@ namespace Unity.UIWidgets.widgets {
                     )
                 );
             }
+
+            // TODO: if (this.widget.onForcePressStart != null || this.widget.onForcePressEnd != null) {
+            // }
 
             return new RawGestureDetector(
                 gestures: gestures,

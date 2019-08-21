@@ -286,7 +286,7 @@ namespace Unity.UIWidgets.widgets {
             bool pageSnapping = true,
             ValueChanged<int> onPageChanged = null,
             List<Widget> children = null,
-            DragStartBehavior dragStartBehavior = DragStartBehavior.down,
+            DragStartBehavior dragStartBehavior = DragStartBehavior.start,
             IndexedWidgetBuilder itemBuilder = null,
             SliverChildDelegate childDelegate = null,
             int itemCount = 0
@@ -308,6 +308,11 @@ namespace Unity.UIWidgets.widgets {
                 this.childrenDelegate = new SliverChildListDelegate(children ?? new List<Widget>());
             }
         }
+        
+        
+        // TODO: PageView.builder
+        
+        // TODO: PageView.custom
 
         public readonly Axis scrollDirection;
 

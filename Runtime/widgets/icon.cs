@@ -1,5 +1,6 @@
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.painting;
+using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
 using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
@@ -36,6 +37,7 @@ namespace Unity.UIWidgets.widgets {
             }
 
             Widget iconWidget = new RichText(
+                overflow: TextOverflow.visible,
                 text: new TextSpan(
                     text: new string(new[] {(char) this.icon.codePoint}),
                     style: new TextStyle(

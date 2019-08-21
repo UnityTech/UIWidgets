@@ -187,7 +187,7 @@ namespace Unity.UIWidgets.painting {
                         new UIWidgetsErrorDetails(
                             exception: ex,
                             library: "image resource service",
-                            context: "by a synchronously-called image error listener"
+                            context: "when reporting an error to an image listener"
                         )
                     );
                 }
@@ -298,9 +298,6 @@ namespace Unity.UIWidgets.painting {
             this._scale = scale;
             this._informationCollector = informationCollector;
 
-            this._framesEmitted = 0;
-            this._timer = null;
-
             codec.Then((Action<Codec>) this._handleCodecReady, ex => {
                 this.reportError(
                     context: "resolving an image codec",
@@ -318,17 +315,22 @@ namespace Unity.UIWidgets.painting {
         FrameInfo _nextFrame;
         TimeSpan? _shownTimestamp;
         TimeSpan? _frameDuration;
-        int _framesEmitted;
+        int _framesEmitted = 0;
         Timer _timer;
+
+        bool _frameCallbackScheduled = false;
 
         void _handleCodecReady(Codec codec) {
             this._codec = codec;
             D.assert(this._codec != null);
 
-            this._decodeNextFrameAndSchedule();
+            if (this.hasListeners) {
+                this._decodeNextFrameAndSchedule();
+            }
         }
 
         void _handleAppFrame(TimeSpan timestamp) {
+            this._frameCallbackScheduled = false;
             if (!this.hasListeners) {
                 return;
             }
@@ -349,8 +351,7 @@ namespace Unity.UIWidgets.painting {
 
             TimeSpan delay = this._frameDuration.Value - (timestamp - this._shownTimestamp.Value);
             delay = new TimeSpan((long) (delay.Ticks * SchedulerBinding.instance.timeDilation));
-            this._timer = Window.instance.run(delay,
-                () => { SchedulerBinding.instance.scheduleFrameCallback(this._handleAppFrame); });
+            this._timer = Window.instance.run(delay, this._scheduleAppFrame);
         }
 
         bool _isFirstFrame() {
@@ -371,6 +372,15 @@ namespace Unity.UIWidgets.painting {
                 return;
             }
 
+            this._scheduleAppFrame();
+        }
+
+        void _scheduleAppFrame() {
+            if (this._frameCallbackScheduled) {
+                return;
+            }
+
+            this._frameCallbackScheduled = true;
             SchedulerBinding.instance.scheduleFrameCallback(this._handleAppFrame);
         }
 

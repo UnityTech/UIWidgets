@@ -242,7 +242,8 @@ namespace Unity.UIWidgets.painting {
                 outputSize += sliceBorder;
                 destinationSize += sliceBorder;
                 D.assert(sourceSize == inputSize,
-                    () => $"centerSlice was used with a BoxFit {fit} that does not guarantee that the image is fully visible.");
+                    () =>
+                        $"centerSlice was used with a BoxFit {fit} that does not guarantee that the image is fully visible.");
             }
 
             if (repeat != ImageRepeat.noRepeat && destinationSize == outputSize) {
@@ -281,13 +282,23 @@ namespace Unity.UIWidgets.painting {
                 Rect sourceRect = alignment.inscribe(
                     sourceSize, Offset.zero & inputSize
                 );
-                foreach (Rect tileRect in _generateImageTileRects(rect, destinationRect, repeat)) {
-                    canvas.drawImageRect(image, sourceRect, tileRect, paint);
+                if (repeat == ImageRepeat.noRepeat) {
+                    canvas.drawImageRect(image, sourceRect, destinationRect, paint);
+                }
+                else {
+                    foreach (Rect tileRect in _generateImageTileRects(rect, destinationRect, repeat)) {
+                        canvas.drawImageRect(image, sourceRect, tileRect, paint);
+                    }
                 }
             }
             else {
-                foreach (Rect tileRect in _generateImageTileRects(rect, destinationRect, repeat)) {
-                    canvas.drawImageNine(image, centerSlice, tileRect, paint);
+                if (repeat == ImageRepeat.noRepeat) {
+                    canvas.drawImageNine(image, centerSlice, destinationRect, paint);
+                }
+                else {
+                    foreach (Rect tileRect in _generateImageTileRects(rect, destinationRect, repeat)) {
+                        canvas.drawImageNine(image, centerSlice, tileRect, paint);
+                    }
                 }
             }
 
@@ -298,11 +309,6 @@ namespace Unity.UIWidgets.painting {
 
         static IEnumerable<Rect> _generateImageTileRects(Rect outputRect, Rect fundamentalRect,
             ImageRepeat repeat) {
-            if (repeat == ImageRepeat.noRepeat) {
-                yield return fundamentalRect;
-                yield break;
-            }
-
             int startX = 0;
             int startY = 0;
             int stopX = 0;

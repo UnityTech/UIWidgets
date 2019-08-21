@@ -19,7 +19,7 @@ namespace Unity.UIWidgets.widgets {
             ScrollPhysics physics = null,
             ScrollController controller = null,
             Widget child = null,
-            DragStartBehavior dragStartBehavior = DragStartBehavior.down
+            DragStartBehavior dragStartBehavior = DragStartBehavior.start
         ) : base(key: key) {
             D.assert(!(controller != null && primary == true),
                 () => "Primary ScrollViews obtain their ScrollController via inheritance from a PrimaryScrollController widget. " +

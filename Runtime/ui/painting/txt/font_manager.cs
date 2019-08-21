@@ -24,7 +24,7 @@ namespace Unity.UIWidgets.ui {
     public class FontManager {
         readonly Dictionary<string, FontInfo>[] _fonts =
             new Dictionary<string, FontInfo>[9 * 2]; // max weight size x max style size 
-        
+
         static readonly int defaultFontSize = 14;
 
         public static readonly FontManager instance = new FontManager();
@@ -33,7 +33,7 @@ namespace Unity.UIWidgets.ui {
             Font.textureRebuilt += this.onFontTextureRebuilt;
         }
 
-        public void addFont(Font font, string familyName, 
+        public void addFont(Font font, string familyName,
             FontWeight fontWeight = null, FontStyle fontStyle = FontStyle.normal) {
             fontWeight = fontWeight ?? FontWeight.normal;
 
@@ -43,7 +43,7 @@ namespace Unity.UIWidgets.ui {
 
             var fonts = this._getFonts(fontWeight.index, fontStyle);
             fonts.TryGetValue(familyName, out var current);
-            D.assert(current == null || current.font == font, 
+            D.assert(current == null || current.font == font,
                 () => $"font with key {familyName} {fontWeight} {fontStyle} already exists");
             var fontInfo = new FontInfo(font);
             fonts[familyName] = fontInfo;
@@ -74,7 +74,7 @@ namespace Unity.UIWidgets.ui {
                     return fontInfo;
                 }
             }
-            
+
             var osFont = Font.CreateDynamicFontFromOSFont(familyName, defaultFontSize);
             osFont.hideFlags = HideFlags.DontSave;
             osFont.material.hideFlags = HideFlags.DontSave;
@@ -99,8 +99,7 @@ namespace Unity.UIWidgets.ui {
         }
     }
 
-    public static class FontExtension  
-    {
+    public static class FontExtension {
         internal static bool getGlyphInfo(this Font font, char ch, out CharacterInfo info, int fontSize,
             UnityEngine.FontStyle fontStyle) {
             if (fontSize <= 0) {
@@ -111,8 +110,11 @@ namespace Unity.UIWidgets.ui {
             bool success = font.GetCharacterInfo(ch, out info, fontSize, fontStyle);
             if (!success) {
                 if (!char.IsControl(ch)) {
-                    Debug.LogWarning(
-                        $"character info not found from the given font: character '{ch}' (code{(int) ch}) font: ${font.name}");
+                    D.assert(() => {
+                        Debug.LogWarning(
+                            $"character info not found from the given font: character '{ch}' (code{(int) ch}) font: ${font.name}");
+                        return true;
+                    });
                 }
 
                 info = default;
@@ -122,11 +124,12 @@ namespace Unity.UIWidgets.ui {
             return true;
         }
 
-        internal static void RequestCharactersInTextureSafe(this Font font, string text, int fontSize, 
-                UnityEngine.FontStyle fontStyle = UnityEngine.FontStyle.Normal) {
+        internal static void RequestCharactersInTextureSafe(this Font font, string text, int fontSize,
+            UnityEngine.FontStyle fontStyle = UnityEngine.FontStyle.Normal) {
             if (fontSize <= 0) {
                 return;
             }
+
             font.RequestCharactersInTexture(text, fontSize, fontStyle);
         }
     }

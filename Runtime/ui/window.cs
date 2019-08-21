@@ -209,6 +209,13 @@ namespace Unity.UIWidgets.ui {
 
         VoidCallback _onTextScaleFactorChanged;
 
+        public VoidCallback onPlatformBrightnessChanged {
+            get { return this._onPlatformBrightnessChanged; }
+            set { this._onPlatformBrightnessChanged = value; }
+        }
+
+        VoidCallback _onPlatformBrightnessChanged;
+
         public FrameCallback onBeginFrame {
             get { return this._onBeginFrame; }
             set { this._onBeginFrame = value; }

@@ -1780,7 +1780,8 @@ namespace Unity.UIWidgets.widgets {
             float textScaleFactor = 1.0f,
             int? maxLines = null,
             Action onSelectionChanged = null,
-            Color selectionColor = null
+            Color selectionColor = null,
+            StrutStyle strutStyle = null
         ) : base(key: key) {
             D.assert(text != null);
             D.assert(maxLines == null || maxLines > 0);
@@ -1793,6 +1794,7 @@ namespace Unity.UIWidgets.widgets {
             this.maxLines = maxLines;
             this.onSelectionChanged = onSelectionChanged;
             this.selectionColor = selectionColor;
+            this.strutStyle = strutStyle;
         }
 
         public readonly TextSpan text;
@@ -1803,6 +1805,7 @@ namespace Unity.UIWidgets.widgets {
         public readonly int? maxLines;
         public readonly Action onSelectionChanged;
         public readonly Color selectionColor;
+        public readonly StrutStyle strutStyle;
 
         public override RenderObject createRenderObject(BuildContext context) {
             return new RenderParagraph(
@@ -1827,6 +1830,7 @@ namespace Unity.UIWidgets.widgets {
             renderObject.maxLines = this.maxLines;
             renderObject.onSelectionChanged = this.onSelectionChanged;
             renderObject.selectionColor = this.selectionColor;
+            renderObject.strutStyle = this.strutStyle;
         }
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
@@ -1973,6 +1977,7 @@ namespace Unity.UIWidgets.widgets {
             PointerHoverEventListener onPointerHover = null,
             PointerUpEventListener onPointerUp = null,
             PointerCancelEventListener onPointerCancel = null,
+            PointerSignalEventListener onPointerSignal = null,
             PointerScrollEventListener onPointerScroll = null,
             PointerDragFromEditorEnterEventListener onPointerDragFromEditorEnter = null,
             PointerDragFromEditorHoverEventListener onPointerDragFromEditorHover = null,
@@ -1985,6 +1990,7 @@ namespace Unity.UIWidgets.widgets {
             this.onPointerMove = onPointerMove;
             this.onPointerUp = onPointerUp;
             this.onPointerCancel = onPointerCancel;
+            this.onPointerSignal = onPointerSignal;
             this.onPointerHover = onPointerHover;
             this.onPointerExit = onPointerExit;
             this.onPointerEnter = onPointerEnter;
@@ -2004,6 +2010,8 @@ namespace Unity.UIWidgets.widgets {
         public readonly PointerUpEventListener onPointerUp;
 
         public readonly PointerCancelEventListener onPointerCancel;
+
+        public readonly PointerSignalEventListener onPointerSignal;
 
         public readonly PointerHoverEventListener onPointerHover;
 
@@ -2029,6 +2037,7 @@ namespace Unity.UIWidgets.widgets {
                 onPointerMove: this.onPointerMove,
                 onPointerUp: this.onPointerUp,
                 onPointerCancel: this.onPointerCancel,
+                onPointerSignal: this.onPointerSignal,
                 onPointerEnter: this.onPointerEnter,
                 onPointerExit: this.onPointerExit,
                 onPointerHover: this.onPointerHover,
@@ -2047,6 +2056,7 @@ namespace Unity.UIWidgets.widgets {
             renderObject.onPointerMove = this.onPointerMove;
             renderObject.onPointerUp = this.onPointerUp;
             renderObject.onPointerCancel = this.onPointerCancel;
+            renderObject.onPointerSignal = this.onPointerSignal;
             renderObject.onPointerEnter = this.onPointerEnter;
             renderObject.onPointerHover = this.onPointerHover;
             renderObject.onPointerExit = this.onPointerExit;
@@ -2078,6 +2088,10 @@ namespace Unity.UIWidgets.widgets {
 
             if (this.onPointerCancel != null) {
                 listeners.Add("cancel");
+            }
+
+            if (this.onPointerSignal != null) {
+                listeners.Add("signal");
             }
 
             if (this.onPointerEnter != null) {
