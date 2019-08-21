@@ -64,7 +64,7 @@ namespace Unity.UIWidgets.material {
             Widget child = null,
             GestureTapCallback onTap = null,
             GestureTapDownCallback onTapDown = null,
-            GestureTapCallback onTapCancel = null,
+            GestureTapCancelCallback onTapCancel = null,
             GestureTapCallback onDoubleTap = null,
             GestureLongPressCallback onLongPress = null,
             ValueChanged<bool> onHighlightChanged = null,
@@ -99,7 +99,7 @@ namespace Unity.UIWidgets.material {
 
         public readonly GestureTapDownCallback onTapDown;
 
-        public readonly GestureTapCallback onTapCancel;
+        public readonly GestureTapCancelCallback onTapCancel;
 
         public readonly GestureTapCallback onDoubleTap;
 
