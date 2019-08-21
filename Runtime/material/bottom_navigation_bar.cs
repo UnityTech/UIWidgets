@@ -184,7 +184,10 @@ namespace Unity.UIWidgets.material {
             float bottomPadding = this.selectedFontSize / 2.0f;
             float topPadding = this.selectedFontSize / 2.0f;
             if (this.showSelectedLabels && !this.showUnselectedLabels) {
-                bottomPadding = new FloatTween(begin: 0.0f, end: this.selectedFontSize / 2.0f).evaluate(this.animation);
+                bottomPadding = new FloatTween(
+                    begin: 0.0f,
+                    end: this.selectedFontSize / 2.0f
+                ).evaluate(this.animation);
                 topPadding = new FloatTween(
                     begin: this.selectedFontSize,
                     end: this.selectedFontSize / 2.0f
@@ -335,7 +338,7 @@ namespace Unity.UIWidgets.material {
                 child: new Transform(
                     transform: Matrix3.makeAll(t, 0, 0,
                                                0, t, 0,
-                                               0, 0, t),
+                                               0, 0, 1),
                     alignment: Alignment.bottomCenter,
                     child: this.item.title
                 )
