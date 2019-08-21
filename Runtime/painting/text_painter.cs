@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.service;
 using Unity.UIWidgets.ui;
@@ -8,7 +7,6 @@ using Canvas = Unity.UIWidgets.ui.Canvas;
 using Rect = Unity.UIWidgets.ui.Rect;
 
 namespace Unity.UIWidgets.painting {
-
     class _CaretMetrics {
         public _CaretMetrics(Offset offset, float? fullHeight) {
             this.offset = offset;
@@ -18,6 +16,7 @@ namespace Unity.UIWidgets.painting {
         public Offset offset;
         public float? fullHeight;
     }
+
     public class TextPainter {
         TextSpan _text;
         TextAlign _textAlign;
@@ -254,6 +253,7 @@ namespace Unity.UIWidgets.painting {
             if (position == this._previousCaretPosition && caretPrototype == this._previousCaretPrototype) {
                 return;
             }
+
             var offset = position.offset;
             Rect rect;
             switch (position.affinity) {
