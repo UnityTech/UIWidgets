@@ -223,8 +223,8 @@ namespace Unity.UIWidgets.material {
             hashCode = (hashCode * 397) ^ this.disabledColor.GetHashCode();
             hashCode = (hashCode * 397) ^ this.selectedColor.GetHashCode();
             hashCode = (hashCode * 397) ^ this.secondarySelectedColor.GetHashCode();
-            hashCode = (hashCode * 397) ^ this.shadowColor.GetHashCode();
-            hashCode = (hashCode * 397) ^ this.selectedShadowColor.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.shadowColor?.GetHashCode() ?? 0;
+            hashCode = (hashCode * 397) ^ this.selectedShadowColor?.GetHashCode() ?? 0;
             hashCode = (hashCode * 397) ^ this.labelPadding.GetHashCode();
             hashCode = (hashCode * 397) ^ this.padding.GetHashCode();
             hashCode = (hashCode * 397) ^ this.shape.GetHashCode();
