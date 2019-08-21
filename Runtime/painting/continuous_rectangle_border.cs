@@ -33,7 +33,6 @@ namespace Unity.UIWidgets.painting {
         }
 
         public override ShapeBorder lerpFrom(ShapeBorder a, float t) {
-            D.assert(t != null);
             if (a is ContinuousRectangleBorder) {
                 return new ContinuousRectangleBorder(
                     side: BorderSide.lerp((a as ContinuousRectangleBorder).side, this.side, t),
@@ -45,7 +44,6 @@ namespace Unity.UIWidgets.painting {
         }
         
         public override ShapeBorder lerpTo(ShapeBorder b, float t) {
-            D.assert(t != null);
             if (b is ContinuousRectangleBorder) {
                 return new ContinuousRectangleBorder(
                     side: BorderSide.lerp(this.side, (b as ContinuousRectangleBorder).side, t),
