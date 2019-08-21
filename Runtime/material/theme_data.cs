@@ -76,6 +76,7 @@ namespace Unity.UIWidgets.material {
             BottomAppBarTheme bottomAppBarTheme = null,
             ColorScheme colorScheme = null,
             DialogTheme dialogTheme = null,
+            FloatingActionButtonThemeData floatingActionButtonTheme = null,
             Typography typography = null
         ) {
             brightness = brightness ?? Brightness.light;
@@ -184,6 +185,7 @@ namespace Unity.UIWidgets.material {
                 labelStyle: textTheme.body2
             );
             dialogTheme = dialogTheme ?? new DialogTheme();
+            floatingActionButtonTheme = floatingActionButtonTheme ?? new FloatingActionButtonThemeData();
 
             D.assert(brightness != null);
             D.assert(primaryColor != null);
@@ -232,6 +234,7 @@ namespace Unity.UIWidgets.material {
             D.assert(cardTheme != null);
             D.assert(chipTheme != null);
             D.assert(dialogTheme != null);
+            D.assert(floatingActionButtonTheme != null);
 
             this.brightness = brightness ?? Brightness.light;
             this.primaryColor = primaryColor;
@@ -281,6 +284,7 @@ namespace Unity.UIWidgets.material {
             this.bottomAppBarTheme = bottomAppBarTheme;
             this.colorScheme = colorScheme;
             this.dialogTheme = dialogTheme;
+            this.floatingActionButtonTheme = floatingActionButtonTheme;
             this.typography = typography;
         }
 
@@ -333,6 +337,7 @@ namespace Unity.UIWidgets.material {
             BottomAppBarTheme bottomAppBarTheme = null,
             ColorScheme colorScheme = null,
             DialogTheme dialogTheme = null,
+            FloatingActionButtonThemeData floatingActionButtonTheme = null,
             Typography typography = null
         ) {
             D.assert(brightness != null);
@@ -384,6 +389,7 @@ namespace Unity.UIWidgets.material {
             D.assert(cardTheme != null);
             D.assert(chipTheme != null);
             D.assert(dialogTheme != null);
+            D.assert(floatingActionButtonTheme != null);
 
             return new ThemeData(
                 brightness: brightness,
@@ -434,6 +440,7 @@ namespace Unity.UIWidgets.material {
                 bottomAppBarTheme: bottomAppBarTheme,
                 colorScheme: colorScheme,
                 dialogTheme: dialogTheme,
+                floatingActionButtonTheme: floatingActionButtonTheme,
                 typography: typography);
         }
 
@@ -544,6 +551,8 @@ namespace Unity.UIWidgets.material {
         public readonly ColorScheme colorScheme;
 
         public readonly DialogTheme dialogTheme;
+        
+        public readonly FloatingActionButtonThemeData floatingActionButtonTheme;
 
         public readonly Typography typography;
 
@@ -596,6 +605,7 @@ namespace Unity.UIWidgets.material {
             BottomAppBarTheme bottomAppBarTheme = null,
             ColorScheme colorScheme = null,
             DialogTheme dialogTheme = null,
+            FloatingActionButtonThemeData floatingActionButtonTheme = null,
             Typography typography = null
         ) {
             return raw(
@@ -647,6 +657,7 @@ namespace Unity.UIWidgets.material {
                 bottomAppBarTheme: bottomAppBarTheme ?? this.bottomAppBarTheme,
                 colorScheme: colorScheme ?? this.colorScheme,
                 dialogTheme: dialogTheme ?? this.dialogTheme,
+                floatingActionButtonTheme: floatingActionButtonTheme ?? this.floatingActionButtonTheme,
                 typography: typography ?? this.typography
             );
         }
@@ -734,6 +745,7 @@ namespace Unity.UIWidgets.material {
                 bottomAppBarTheme: BottomAppBarTheme.lerp(a.bottomAppBarTheme, b.bottomAppBarTheme, t),
                 colorScheme: ColorScheme.lerp(a.colorScheme, b.colorScheme, t),
                 dialogTheme: DialogTheme.lerp(a.dialogTheme, b.dialogTheme, t),
+                floatingActionButtonTheme: FloatingActionButtonThemeData.lerp(a.floatingActionButtonTheme, b.floatingActionButtonTheme, t),
                 typography: Typography.lerp(a.typography, b.typography, t)
             );
         }
@@ -795,6 +807,7 @@ namespace Unity.UIWidgets.material {
                    other.bottomAppBarTheme == this.bottomAppBarTheme &&
                    other.colorScheme == this.colorScheme &&
                    other.dialogTheme == this.dialogTheme &&
+                   other.floatingActionButtonTheme == this.floatingActionButtonTheme &&
                    other.typography == this.typography;
         }
 
@@ -878,6 +891,7 @@ namespace Unity.UIWidgets.material {
                 hashCode = (hashCode * 397) ^ this.bottomAppBarTheme.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.colorScheme.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.dialogTheme.GetHashCode();
+                hashCode = (hashCode * 397) ^ this.floatingActionButtonTheme.GetHashCode();
                 hashCode = (hashCode * 397) ^ this.typography.GetHashCode();
 
                 this._cachedHashCode = hashCode;
@@ -965,6 +979,8 @@ namespace Unity.UIWidgets.material {
                 defaultValue: defaultData.colorScheme));
             properties.add(new DiagnosticsProperty<DialogTheme>("dialogTheme", this.dialogTheme,
                 defaultValue: defaultData.dialogTheme));
+            properties.add(new DiagnosticsProperty<FloatingActionButtonThemeData>("floatingActionButtonTheme",
+                this.floatingActionButtonTheme, defaultValue: defaultData.floatingActionButtonTheme));
             properties.add(new DiagnosticsProperty<Typography>("typography", this.typography,
                 defaultValue: defaultData.typography));
         }

@@ -312,7 +312,7 @@ namespace Unity.UIWidgets.material {
 
             const float cornerArcSweep = Mathf.PI / 2.0f;
             float tlCornerArcSweep = start < center.tlRadiusX
-                ? Mathf.Asin(start / center.tlRadiusX)
+                ? Mathf.Asin((start / center.tlRadiusX).clamp(-1.0f, 1.0f))
                 : Mathf.PI / 2.0f;
 
             Path path = new Path();
@@ -361,7 +361,7 @@ namespace Unity.UIWidgets.material {
             }
             else {
                 float extent = MathUtils.lerpFloat(0.0f, gapExtent + this.gapPadding * 2.0f, gapPercentage);
-                Path path = this._gapBorderPath(canvas, center, gapStart - this.gapPadding, extent);
+                Path path = this._gapBorderPath(canvas, center, Mathf.Max(0.0f,gapStart - this.gapPadding), extent);
                 canvas.drawPath(path, paint);
             }
         }

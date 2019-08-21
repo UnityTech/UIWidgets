@@ -162,8 +162,7 @@ namespace Unity.UIWidgets.material {
         public override void paint(PaintingContext context, Offset offset) {
             Canvas canvas = context.canvas;
 
-            this.paintRadialReaction(canvas, offset,
-                new Offset(Constants.kRadialReactionRadius, Constants.kRadialReactionRadius));
+            this.paintRadialReaction(canvas, offset, this.size.center(Offset.zero));
 
             Offset center = (offset & this.size).center;
             Color radioColor = this.onChanged != null ? this.activeColor : this.inactiveColor;

@@ -20,24 +20,48 @@ namespace Unity.UIWidgets.material {
         bool? isFocused);
         
     public class TextField : StatefulWidget {
-        public TextField(Key key = null, TextEditingController controller = null, FocusNode focusNode = null,
-            InputDecoration decoration = null, bool noDecoration = false, TextInputType keyboardType = null,
+        public TextField(Key key = null,
+            TextEditingController controller = null,
+            FocusNode focusNode = null,
+            InputDecoration decoration = null,
+            bool noDecoration = false,
+            TextInputType keyboardType = null,
             TextInputAction? textInputAction = null,
-            TextCapitalization textCapitalization = TextCapitalization.none, TextStyle style = null,
+            TextCapitalization textCapitalization = TextCapitalization.none,
+            TextStyle style = null,
             StrutStyle strutStyle = null,
-            TextAlign textAlign = TextAlign.left, TextDirection textDirection = TextDirection.ltr,
-            bool autofocus = false, bool obscureText = false, bool autocorrect = false, int? maxLines = 1,
-            int? maxLength = null, bool maxLengthEnforced = true, ValueChanged<string> onChanged = null,
+            TextAlign textAlign = TextAlign.left,
+            TextDirection textDirection = TextDirection.ltr,
+            bool autofocus = false,
+            bool obscureText = false,
+            bool autocorrect = false,
+            int? maxLines = 1,
+            int? minLines = null,
+            bool expands = false,
+            int? maxLength = null,
+            bool maxLengthEnforced = true,
+            ValueChanged<string> onChanged = null,
             VoidCallback onEditingComplete = null,
-            ValueChanged<string> onSubmitted = null, List<TextInputFormatter> inputFormatters = null,
-            bool? enabled = null, float? cursorWidth = 2.0f, Radius cursorRadius = null, Color cursorColor = null,
-            Brightness? keyboardAppearance = null, EdgeInsets scrollPadding = null,
-            DragStartBehavior dragStartBehavior = DragStartBehavior.down,
+            ValueChanged<string> onSubmitted = null,
+            List<TextInputFormatter> inputFormatters = null,
+            bool? enabled = null,
+            float? cursorWidth = 2.0f,
+            Radius cursorRadius = null,
+            Color cursorColor = null,
+            Brightness? keyboardAppearance = null,
+            EdgeInsets scrollPadding = null,
+            DragStartBehavior dragStartBehavior = DragStartBehavior.start,
             bool? enableInteractiveSelection = null,
             GestureTapCallback onTap = null,
-            InputCounterWidgetBuilder buildCounter = null
+            InputCounterWidgetBuilder buildCounter = null,
+            ScrollPhysics scrollPhysics = null
         ) : base(key: key) {
             D.assert(maxLines == null || maxLines > 0);
+            D.assert(minLines == null || minLines > 0);
+            D.assert((maxLines == null) || (minLines == null) || (maxLines >= minLines),
+                () => "minLines can't be greater than maxLines");
+            D.assert(!expands || (maxLines == null && minLines == null),
+                () => "minLines and maxLines must be null when expands is true.");
             D.assert(maxLength == null || maxLength == TextField.noMaxLength || maxLength > 0);
 
             this.controller = controller;
@@ -53,6 +77,8 @@ namespace Unity.UIWidgets.material {
             this.obscureText = obscureText;
             this.autocorrect = autocorrect;
             this.maxLines = maxLines;
+            this.minLines = minLines;
+            this.expands = expands;
             this.maxLength = maxLength;
             this.maxLengthEnforced = maxLengthEnforced;
             this.onChanged = onChanged;
@@ -71,6 +97,7 @@ namespace Unity.UIWidgets.material {
             this.scrollPadding = scrollPadding ?? EdgeInsets.all(20.0f);
             this.dragStartBehavior = dragStartBehavior;
             this.buildCounter = buildCounter;
+            this.scrollPhysics = scrollPhysics;
         }
 
         public readonly TextEditingController controller;
@@ -100,6 +127,10 @@ namespace Unity.UIWidgets.material {
         public readonly bool autocorrect;
 
         public readonly int? maxLines;
+
+        public readonly int? minLines;
+
+        public readonly bool expands;
         
         public const long noMaxLength = -1;
 
@@ -130,6 +161,8 @@ namespace Unity.UIWidgets.material {
         public readonly bool? enableInteractiveSelection;
         
         public readonly DragStartBehavior dragStartBehavior;
+
+        public readonly ScrollPhysics scrollPhysics;
         
         public bool selectionEnabled {
             get {
@@ -159,6 +192,8 @@ namespace Unity.UIWidgets.material {
             properties.add(new DiagnosticsProperty<bool>("obscureText", this.obscureText, defaultValue: false));
             properties.add(new DiagnosticsProperty<bool>("autocorrect", this.autocorrect, defaultValue: true));
             properties.add(new IntProperty("maxLines", this.maxLines, defaultValue: 1));
+            properties.add(new IntProperty("minLines", this.minLines, defaultValue: null));
+            properties.add(new DiagnosticsProperty<bool>("expands", this.expands, defaultValue: false));
             properties.add(new IntProperty("maxLength", this.maxLength, defaultValue: null));
             properties.add(new FlagProperty("maxLengthEnforced", value: this.maxLengthEnforced, defaultValue: true,
                 ifFalse: "maxLength not enforced"));
@@ -172,6 +207,7 @@ namespace Unity.UIWidgets.material {
             properties.add(new DiagnosticsProperty<Brightness?>("keyboardAppearance", this.keyboardAppearance, defaultValue: null));
             properties.add(new DiagnosticsProperty<EdgeInsets>("scrollPadding", this.scrollPadding, defaultValue: EdgeInsets.all(20.0f)));
             properties.add(new FlagProperty("selectionEnabled", value: this.selectionEnabled, defaultValue: true, ifFalse: "selection disabled"));
+            properties.add(new DiagnosticsProperty<ScrollPhysics>("scrollPhysics", this.scrollPhysics, defaultValue: null));
         }
     }
 
@@ -299,9 +335,14 @@ namespace Unity.UIWidgets.material {
         }
 
         void _handleSelectionChanged(TextSelection selection, SelectionChangedCause cause) {
-            if (Theme.of(this.context).platform == RuntimePlatform.IPhonePlayer
-                && cause == SelectionChangedCause.longPress) {
-                this._editableTextKey.currentState?.bringIntoView(selection.basePos);
+            switch (Theme.of(this.context).platform) {
+                case RuntimePlatform.IPhonePlayer:
+                    if (cause == SelectionChangedCause.longPress) {
+                        this._editableTextKey.currentState?.bringIntoView(selection.basePos);
+                    }
+                    return;
+                case RuntimePlatform.Android:
+                    break;
             }
         }
 
@@ -515,6 +556,8 @@ namespace Unity.UIWidgets.material {
                     obscureText: this.widget.obscureText,
                     autocorrect: this.widget.autocorrect,
                     maxLines: this.widget.maxLines,
+                    minLines: this.widget.minLines,
+                    expands: this.widget.expands,
                     selectionColor: themeData.textSelectionColor,
                     selectionControls: this.widget.selectionEnabled ? textSelectionControls : null,
                     onChanged: this.widget.onChanged,
@@ -533,7 +576,8 @@ namespace Unity.UIWidgets.material {
                     scrollPadding: this.widget.scrollPadding,
                     keyboardAppearance: keyboardAppearance,
                     enableInteractiveSelection: this.widget.enableInteractiveSelection == true,
-                    dragStartBehavior: this.widget.dragStartBehavior
+                    dragStartBehavior: this.widget.dragStartBehavior,
+                    scrollPhysics: this.widget.scrollPhysics
                 )
             );
 
@@ -548,6 +592,7 @@ namespace Unity.UIWidgets.material {
                             textAlign: this.widget.textAlign,
                             isFocused: focusNode.hasFocus,
                             isEmpty: controller.value.text.isEmpty(),
+                            expands: this.widget.expands,
                             child: _child
                         );
                     },
