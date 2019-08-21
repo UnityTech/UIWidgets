@@ -1256,7 +1256,7 @@ namespace Unity.UIWidgets.rendering {
                     caretRect.left,
                     caretRect.top - _kCaretHeightOffset,
                     caretRect.width,
-                    this._textPainter.getFullHeightForCaret(textPosition, this._caretPrototype)
+                    this._textPainter.getFullHeightForCaret(textPosition, this._caretPrototype).Value
                 );
             }
 #endif
