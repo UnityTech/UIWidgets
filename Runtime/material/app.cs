@@ -133,7 +133,7 @@ namespace Unity.UIWidgets.material {
                 this._navigatorObservers.Add(this._heroController);
             }
             else {
-                this._navigatorObservers = null;
+                this._navigatorObservers = new List<NavigatorObserver>();
             }
         }
 
