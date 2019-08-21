@@ -63,7 +63,7 @@ namespace Unity.UIWidgets.gestures {
             }
 
             HitTestResult hitTestResult = null;
-            if (evt is PointerDownEvent || evt is PointerSignalResolver) {
+            if (evt is PointerDownEvent || evt is PointerSignalEvent) {
                 D.assert(!this._hitTests.ContainsKey(evt.pointer));
                 hitTestResult = new HitTestResult();
                 this.hitTest(hitTestResult, evt.position);
