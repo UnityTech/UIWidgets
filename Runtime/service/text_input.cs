@@ -203,8 +203,23 @@ namespace Unity.UIWidgets.service {
 
         public TextEditingValue(string text = "", TextSelection selection = null, TextRange composing = null) {
             this.text = text;
-            this.selection = selection ?? TextSelection.collapsed(-1);
             this.composing = composing ?? TextRange.empty;
+
+            if (selection != null && selection.start >= 0 && selection.end >= 0) {
+                // handle surrogate pair emoji, which takes 2 utf16 chars
+                // if selection cuts in the middle of the emoji, move it to the end
+                int start = selection.start, end = selection.end;
+                if (start < text.Length && char.IsLowSurrogate(text[start])) {
+                    start++;
+                }
+                if (end < text.Length && char.IsLowSurrogate(text[end])) {
+                    end++;
+                }
+                this.selection = selection.copyWith(start, end);
+            }
+            else {
+                this.selection = TextSelection.collapsed(-1);
+            }
         }
 
         public static TextEditingValue fromJson(JSONObject json) {
@@ -256,6 +271,23 @@ namespace Unity.UIWidgets.service {
                 if (backDelete) {
                     if (this.selection.start == 0) {
                         return this;
+                    }
+
+                    if (char.IsHighSurrogate(this.text[this.selection.start - 1])) {
+                        return this.copyWith(
+                            text: this.text.Substring(0, this.selection.start - 1) +
+                                  this.text.Substring(this.selection.start + 1),
+                            selection: TextSelection.collapsed(this.selection.start - 1),
+                            composing: TextRange.empty);
+                    }
+
+                    if (char.IsLowSurrogate(this.text[this.selection.start - 1])) {
+                        D.assert(this.selection.start > 1);
+                        return this.copyWith(
+                            text: this.text.Substring(0, this.selection.start - 2) +
+                                  this.selection.textAfter(this.text),
+                            selection: TextSelection.collapsed(this.selection.start - 2),
+                            composing: TextRange.empty);
                     }
 
                     return this.copyWith(

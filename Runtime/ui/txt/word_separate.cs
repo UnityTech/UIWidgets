@@ -1,11 +1,6 @@
 ﻿namespace Unity.UIWidgets.ui {
-    class WordSeparate {
-        enum Direction {
-            Forward,
-            Backward,
-        }
-
-        internal enum characterType {
+    struct WordSeparate {
+        internal enum CharacterType {
             LetterLike,
             Symbol,
             WhiteSpace
@@ -49,20 +44,20 @@
         }
 
 
-        internal static characterType classifyChar(string text, int index) {
+        internal static CharacterType classifyChar(string text, int index) {
             return classifyChar(text[index]);
         }
         
-        internal static characterType classifyChar(char ch) {
+        internal static CharacterType classifyChar(char ch) {
             if (char.IsWhiteSpace(ch)) {
-                return characterType.WhiteSpace;
+                return CharacterType.WhiteSpace;
             }
 
             if (char.IsLetterOrDigit(ch) || ch == '\'') {
-                return characterType.LetterLike;
+                return CharacterType.LetterLike;
             }
 
-            return characterType.Symbol;
+            return CharacterType.Symbol;
         }
     }
 }

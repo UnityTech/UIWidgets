@@ -19,7 +19,7 @@ namespace Unity.UIWidgets.rendering {
             ImageRepeat repeat = ImageRepeat.noRepeat,
             Rect centerSlice = null,
             bool invertColors = false,
-            FilterMode filterMode = FilterMode.Point
+            FilterMode filterMode = FilterMode.Bilinear
         ) {
             this._image = image;
             this._width = width;
@@ -33,6 +33,7 @@ namespace Unity.UIWidgets.rendering {
             this._alignment = alignment ?? Alignment.center;
             this._invertColors = invertColors;
             this._filterMode = filterMode;
+            this._updateColorFilter();
         }
 
         Image _image;
@@ -115,6 +116,7 @@ namespace Unity.UIWidgets.rendering {
                 }
 
                 this._color = value;
+                this._updateColorFilter();
                 this.markNeedsPaint();
             }
         }
@@ -129,6 +131,7 @@ namespace Unity.UIWidgets.rendering {
                 }
 
                 this._colorBlendMode = value;
+                this._updateColorFilter();
                 this.markNeedsPaint();
             }
         }

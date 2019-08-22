@@ -34,15 +34,27 @@ public class UIWidgetsViewController {
     private UIWidgetsViewMetrics viewMetrics;
     private boolean keyboardOpen;
     
+    private float statusHeight;
+    private float navigationBarHeight;
+    
     private void setup() {
         //Log.i("tag", "On Setup 2");
         
         keyboardOpen = false;
         viewMetrics = new UIWidgetsViewMetrics();
-        
+        setupHeights();
         updateViewMetrics();
         
         setupViewMetricsChangedListener();
+    }
+    
+    private void setupHeights() {
+        final View unityView = ((ViewGroup)UnityPlayer.currentActivity.findViewById(android.R.id.content)).getChildAt(0);
+        Rect rect = new Rect();
+        unityView.getWindowVisibleDisplayFrame(rect);
+        
+        statusHeight = rect.top;
+        navigationBarHeight = unityView.getRootView().getHeight() - rect.bottom;
     }
     
     public static UIWidgetsViewMetrics getMetrics() {
@@ -142,6 +154,10 @@ public class UIWidgetsViewController {
         viewMetrics.insets_right = 0;
         viewMetrics.insets_bottom = navigationBarHidden? calculateBottomKeyboardInset(rect) : rect.bottom;
         viewMetrics.insets_left = 0;
+        
+        //adjust
+        viewMetrics.insets_bottom -= navigationBarHeight;
+        viewMetrics.padding_top -= statusHeight;
         
         //Log.i("UIWidgetsDebug", "checks: " + navigationBarHidden + " " + rect.bottom);
         //Log.i("UIWidgetsDebug", " padding: " + viewMetrics.padding_top + " " + viewMetrics.padding_right + " " + viewMetrics.padding_bottom + " " + viewMetrics.padding_left);

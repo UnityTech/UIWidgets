@@ -1,4 +1,3 @@
-using System;
 using Unity.UIWidgets.foundation;
 
 namespace Unity.UIWidgets.ui {
@@ -25,6 +24,10 @@ namespace Unity.UIWidgets.ui {
 
         public override string ToString() {
             return this.text.Substring(this.offset, this.size);
+        }
+
+        public string subString(int shift, int size) {
+            return this.text.Substring(this.offset + shift, size);
         }
     }
 }

@@ -200,6 +200,7 @@ namespace Unity.UIWidgets.ui {
         solid,
         outer,
         inner,
+        fast_shadow
     }
 
     public class MaskFilter : IEquatable<MaskFilter> {
@@ -210,6 +211,10 @@ namespace Unity.UIWidgets.ui {
 
         public static MaskFilter blur(BlurStyle style, float sigma) {
             return new MaskFilter(style, sigma);
+        }
+
+        public static MaskFilter fastShadow(float sigma) {
+            return new MaskFilter(BlurStyle.fast_shadow, sigma);
         }
 
         public readonly BlurStyle style;
@@ -329,7 +334,7 @@ namespace Unity.UIWidgets.ui {
             return new _BlurImageFilter(sigmaX, sigmaY);
         }
 
-        public static ImageFilter matrix(Matrix3 transform, FilterMode filterMode = FilterMode.Point) {
+        public static ImageFilter matrix(Matrix3 transform, FilterMode filterMode = FilterMode.Bilinear) {
             return new _MatrixImageFilter(transform, filterMode);
         }
     }
@@ -372,7 +377,7 @@ namespace Unity.UIWidgets.ui {
 
         public float strokeMiterLimit = 4.0f;
 
-        public FilterMode filterMode = FilterMode.Point;
+        public FilterMode filterMode = FilterMode.Bilinear;
 
         public ColorFilter colorFilter = null;
 

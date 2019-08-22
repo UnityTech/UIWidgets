@@ -209,7 +209,7 @@ namespace Unity.UIWidgets.painting {
             Rect centerSlice = null,
             ImageRepeat repeat = ImageRepeat.noRepeat,
             bool invertColors = false,
-            FilterMode filterMode = FilterMode.Point
+            FilterMode filterMode = FilterMode.Bilinear
         ) {
             D.assert(canvas != null);
             D.assert(rect != null);
@@ -252,6 +252,8 @@ namespace Unity.UIWidgets.painting {
             Paint paint = new Paint();
             if (colorFilter != null) {
                 paint.colorFilter = colorFilter;
+                paint.color = colorFilter.color;
+                paint.blendMode = colorFilter.blendMode;
             }
 
             if (sourceSize != destinationSize) {

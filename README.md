@@ -11,7 +11,6 @@ UIWidgets is mainly derived from [Flutter](https://github.com/flutter/flutter). 
 the powerful Unity Engine, it offers developers many new features to improve their Apps
 as well as the develop workflow significantly.
 
-
 #### Efficiency
 Using the latest Unity rendering SDKs, a UIWidgets App can run very fast and keep >60fps in most times.
 
@@ -29,7 +28,7 @@ A UIWidgets App can be debug in the Unity Editor directly with many advanced too
 CPU/GPU Profiling, FPS Profiling.
 
 
-### Example
+## Example
 
 <div style="text-align: center"><table><tr>
 <td style="text-align: center">
@@ -45,6 +44,16 @@ CPU/GPU Profiling, FPS Profiling.
   <img src="https://connect-prd-cdn.unity.com/20190323/p/images/a8884fbd-9e7c-4bd7-af46-0947e01d01fd_uiwidgets4.gif" width="200"/>
 </td>
 </tr></table></div>
+
+### Projects using UIWidgets
+
+#### Unity Connect App
+The Unity Connect App is created using UIWidgets and available for both Android (https://connect.unity.com/connectApp/download)
+and iOS (Searching for "Unity Connect" in App Store). This project is open-sourced @https://github.com/UnityTech/ConnectAppCN.
+
+#### Unity Chinese Doc
+The official website of Unity Chinese Documentation (https://connect.unity.com/doc) is powered by UIWidgets and
+open-sourced @https://github.com/UnityTech/DocCN.
 
 ## Requirement
 
@@ -247,6 +256,25 @@ To learn about the original script in detail, please refer to `SystemInfo.js` an
 #### Image Import Setting
 Unity, by default, resizes the width and height of an imported image to the nearest integer that is a power of 2.
 In UIWidgets, you should almost always disable this by selecting the image in the "Project" panel, then in the "Inspector" panel set the "Non Power of 2" option (in "Advanced") to "None", to prevent your image from being resized unexpectedly.
+
+#### Update Emoji
+UIWidgets supports rendering emoji in (editable) texts. The emoji images comes from the free
+resources provided by [https://www.joypixels.com](https://www.joypixels.com/). If you would
+like to use your own images for emoji, please update the texture image `Tests/Resources/Emoji.png`,
+and the unicode-index table in `Runtime/ui/txt/emoji.cs` which maps unicodes to specific locations
+in the texture. Specifically, remember to update the Dictionary `emojiLookupTable`, number of rows
+in the texture `rowCount`, and number of columns `colCount`.
+
+#### Interact with GameObject Drag&Drops
+
+<p align="center">
+  <img src="https://connect-prd-cdn.unity.com/20190718/p/images/e3c9cf9b-c732-4eb2-9afd-fe7de894f342_Custom_Inspector_Showcase_320px.gif" width="300"/>
+</p>
+
+With the provided packaged stateful widget `UnityObjectDetector` and its `onRelease` callback function, you can easily drag some objects (for example GameObject from Hierarchy, files from Project Window, etc) into the area, get the UnityEngine.Object[] references and make further modification.
+
+Please refer to "UIWidgetsTests -> Drag&Drop" for simple examples.
+
 
 ## Debug UIWidgets Application
 

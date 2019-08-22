@@ -1,6 +1,5 @@
-
 namespace Unity.UIWidgets.ui {
-    class WordBreaker {
+    struct WordBreaker {
         public const uint U16_SURROGATE_OFFSET = ((0xd800 << 10) + 0xdc00 - 0x10000);
         TextBuff _text;
         int _current;
@@ -28,7 +27,7 @@ namespace Unity.UIWidgets.ui {
             this._current = 0;
             this._scanOffset = 0;
             this._inEmailOrUrl = false;
-            this.nextUntilCodePoint();
+            // this.nextUntilCodePoint();
         }
 
         public int current() {
@@ -89,33 +88,41 @@ namespace Unity.UIWidgets.ui {
             if (this._current == this._text.size) {
                 return -1;
             }
-            
-            WordSeparate.characterType preType = WordSeparate.classifyChar(this._text.charAt(this._current));
-            bool preBoundaryChar = isBoundaryChar(this._text.charAt(this._current));
+
+            char c = this._text.charAt(this._current);
+            bool preWhiteSpace = char.IsWhiteSpace(c);
+            bool preBoundaryChar = isBoundaryChar(c);
             this._current++;
             if (preBoundaryChar) {
                 return this._current;
             }
-            
+
+            this._findBoundaryCharOrTypeChange(preWhiteSpace);
+
+            return this._current;
+        }
+
+        void _findBoundaryCharOrTypeChange(bool preWhiteSpace) {
             for (; this._current < this._text.size; ++this._current) {
-                this.nextUntilCodePoint();
+                // this.nextUntilCodePoint();
                 if (this._current >= this._text.size) {
                     break;
                 }
 
-                if (isBoundaryChar(this._text.charAt(this._current))) {
+                char c = this._text.charAt(this._current);
+                if (isBoundaryChar(c)) {
                     break;
                 }
-                var currentType = WordSeparate.classifyChar(this._text.charAt(this._current));
-                if ((currentType == WordSeparate.characterType.WhiteSpace) 
-                    != (preType == WordSeparate.characterType.WhiteSpace)) {
+
+                bool currentType = char.IsWhiteSpace(c);
+                if (currentType != preWhiteSpace) {
                     break;
                 }
-                preType = currentType;
+
+                preWhiteSpace = currentType;
             }
-            return this._current;
         }
-        
+
         void _detectEmailOrUrl() {
         }
 
@@ -147,38 +154,26 @@ namespace Unity.UIWidgets.ui {
         }
 
         public static bool isLeadSurrogate(uint c) {
-            return ((c) & 0xfffffc00) == 0xd800;
+            return (c & 0xfffffc00) == 0xd800;
         }
 
 
         public static bool isTrailSurrogate(uint c) {
-            return ((c) & 0xfffffc00) == 0xdc00;
+            return (c & 0xfffffc00) == 0xdc00;
         }
 
         public static uint getSupplementary(uint lead, uint trail) {
-            return (char) (((uint) (lead) << 10) + (uint) (trail - U16_SURROGATE_OFFSET));
+            return (char) ((lead << 10) + (trail - U16_SURROGATE_OFFSET));
         }
 
         public static bool isBoundaryChar(char code) {
-            if (char.IsPunctuation(code)) {
-                return true;
-            }
-            if (code >= 0x4E00 && code <= 0x9FFF) { // cjk https://en.wikipedia.org/wiki/CJK_Unified_Ideographs
-                return true;
-            }
-
-            // https://social.msdn.microsoft.com/Forums/en-US/0d1888de-9745-4dd1-80fd-d3c29d3e381d/checking-for-japanese-characters-in-a-string?forum=vcmfcatl
-            if (code >= 0x3040 && code <= 0x30FF) { // Hiragana or Katakana
-                return true;
-            }
-
-            return false;
+            return (code >= 0x4E00 && code <= 0x9FFF) || (code >= 0x3040 && code <= 0x30FF) || char.IsPunctuation(code);
         }
-        
+
         void nextUntilCodePoint() {
             while (this._current < this._text.size
-                   && (char.IsLowSurrogate(this._text.charAt(this._current)) 
-                       ||  char.IsHighSurrogate(this._text.charAt(this._current)))) {
+                   && (char.IsLowSurrogate(this._text.charAt(this._current))
+                       || char.IsHighSurrogate(this._text.charAt(this._current)))) {
                 this._current++;
             }
         }
