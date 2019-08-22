@@ -152,60 +152,50 @@ namespace Unity.UIWidgets.ui {
         static readonly MaterialByBlendModeStencilComp _texMat;
         static readonly Material _stencilMat;
         static readonly Material _filterMat;
+        static readonly MaterialByBlendModeStencilComp _strokeAlphaMat;
+        static readonly Material _shadowBox;
+        static readonly Material _shadowRBox;
+
+        static Shader GetShader(string shaderName) {
+            var shader = Shader.Find(shaderName);
+            if (shader == null) {
+                throw new Exception(shaderName + " not found");
+            }
+
+            return shader;
+        }
 
         static CanvasShader() {
-            var convexFillShader = Shader.Find("UIWidgets/canvas_convexFill");
-            if (convexFillShader == null) {
-                throw new Exception("UIWidgets/canvas_convexFill not found");
-            }
-
-            var fill0Shader = Shader.Find("UIWidgets/canvas_fill0");
-            if (fill0Shader == null) {
-                throw new Exception("UIWidgets/canvas_fill0 not found");
-            }
-
-            var fill1Shader = Shader.Find("UIWidgets/canvas_fill1");
-            if (fill1Shader == null) {
-                throw new Exception("UIWidgets/canvas_fill1 not found");
-            }
-
-            var stroke0Shader = Shader.Find("UIWidgets/canvas_stroke0");
-            if (stroke0Shader == null) {
-                throw new Exception("UIWidgets/canvas_stroke0 not found");
-            }
-
-            var stroke1Shader = Shader.Find("UIWidgets/canvas_stroke1");
-            if (stroke1Shader == null) {
-                throw new Exception("UIWidgets/canvas_stroke1 not found");
-            }
-
-            var texShader = Shader.Find("UIWidgets/canvas_tex");
-            if (texShader == null) {
-                throw new Exception("UIWidgets/canvas_tex not found");
-            }
-
-            var stencilShader = Shader.Find("UIWidgets/canvas_stencil");
-            if (stencilShader == null) {
-                throw new Exception("UIWidgets/canvas_stencil not found");
-            }
-
-            var filterShader = Shader.Find("UIWidgets/canvas_filter");
-            if (filterShader == null) {
-                throw new Exception("UIWidgets/canvas_filter not found");
-            }
+            var convexFillShader = GetShader("UIWidgets/canvas_convexFill");
+            var fill0Shader = GetShader("UIWidgets/canvas_fill0");
+            var fill1Shader = GetShader("UIWidgets/canvas_fill1");
+            var stroke0Shader = GetShader("UIWidgets/canvas_stroke0");
+            var stroke1Shader = GetShader("UIWidgets/canvas_stroke1");
+            var texShader = GetShader("UIWidgets/canvas_tex");
+            var stencilShader = GetShader("UIWidgets/canvas_stencil");
+            var filterShader = GetShader("UIWidgets/canvas_filter");
+            var shadowBoxShader = GetShader("UIWidgets/ShadowBox");
+            var shadowRBoxShader = GetShader("UIWidgets/ShadowRBox");
+            var strokeAlphaShader = GetShader("UIWidgets/canvas_strokeAlpha");
 
             _convexFillMat = new MaterialByBlendModeStencilComp(convexFillShader);
             _fill0Mat = new MaterialByStencilComp(fill0Shader);
             _fill1Mat = new MaterialByBlendMode(fill1Shader);
             _stroke0Mat = new MaterialByBlendModeStencilComp(stroke0Shader);
             _stroke1Mat = new Material(stroke1Shader) {hideFlags = HideFlags.HideAndDontSave};
+            _strokeAlphaMat = new MaterialByBlendModeStencilComp(strokeAlphaShader);
             _texMat = new MaterialByBlendModeStencilComp(texShader);
             _stencilMat = new Material(stencilShader) {hideFlags = HideFlags.HideAndDontSave};
             _filterMat = new Material(filterShader) {hideFlags = HideFlags.HideAndDontSave};
+            _shadowBox = new Material(shadowBoxShader) {hideFlags = HideFlags.HideAndDontSave};
+            _shadowRBox = new Material(shadowRBoxShader) {hideFlags = HideFlags.HideAndDontSave};
         }
+
+        public static Material shadowBox => _shadowBox;
 
         static readonly int _viewportId = Shader.PropertyToID("_viewport");
         static readonly int _alphaId = Shader.PropertyToID("_alpha");
+        static readonly int _strokeMultId = Shader.PropertyToID("_strokeMult");
         static readonly int _colorId = Shader.PropertyToID("_color");
         static readonly int _shaderMatId = Shader.PropertyToID("_shaderMat");
         static readonly int _shaderTexId = Shader.PropertyToID("_shaderTex");
@@ -219,6 +209,12 @@ namespace Unity.UIWidgets.ui {
         static readonly int _mfRadiusId = Shader.PropertyToID("_mf_radius");
         static readonly int _mfImgIncId = Shader.PropertyToID("_mf_imgInc");
         static readonly int _mfKernelId = Shader.PropertyToID("_mf_kernel");
+
+
+        static readonly int _shadowBoxId = Shader.PropertyToID("_sb_box");
+        static readonly int _shadowSigmaId = Shader.PropertyToID("_sb_sigma");
+        static readonly int _shadowColorId = Shader.PropertyToID("_sb_color");
+        static readonly int _shadowCornerId = Shader.PropertyToID("_sb_corner");
 
         static Vector4 _colorToVector4(uiColor c) {
             return new Vector4(
@@ -251,13 +247,14 @@ namespace Unity.UIWidgets.ui {
         }
 
         static void _getShaderPassAndProps(
-            PictureFlusher.RenderLayer layer, uiPaint paint, uiMatrix3? meshMatrix, float alpha,
+            PictureFlusher.RenderLayer layer, uiPaint paint, uiMatrix3? meshMatrix, float alpha, float strokeMult,
             out int pass, out MaterialPropertyBlockWrapper props) {
             Vector4 viewport = layer.viewport;
 
             props = ObjectPool<MaterialPropertyBlockWrapper>.alloc();
             props.SetVector(_viewportId, viewport);
             props.SetFloat(_alphaId, alpha);
+            props.SetFloat(_strokeMultId, strokeMult);
 
             switch (paint.shader) {
                 case null:
@@ -308,7 +305,7 @@ namespace Unity.UIWidgets.ui {
         public static PictureFlusher.CmdDraw convexFill(PictureFlusher.RenderLayer layer, uiPaint paint,
             uiMeshMesh mesh) {
             var mat = _convexFillMat.getMaterial(paint.blendMode, layer.ignoreClip);
-            _getShaderPassAndProps(layer, paint, mesh.matrix, 1.0f, out var pass, out var props);
+            _getShaderPassAndProps(layer, paint, mesh.matrix, 1.0f, 0.0f, out var pass, out var props);
 
             return PictureFlusher.CmdDraw.create(
                 mesh: mesh,
@@ -337,7 +334,7 @@ namespace Unity.UIWidgets.ui {
         public static PictureFlusher.CmdDraw fill1(PictureFlusher.RenderLayer layer, uiPaint paint,
             uiMeshMesh mesh) {
             var mat = _fill1Mat.getMaterial(paint.blendMode);
-            _getShaderPassAndProps(layer, paint, mesh.matrix, 1.0f, out var pass, out var props);
+            _getShaderPassAndProps(layer, paint, mesh.matrix, 1.0f, 0.0f, out var pass, out var props);
 
             var ret = PictureFlusher.CmdDraw.create(
                 mesh: mesh.boundsMesh,
@@ -353,7 +350,7 @@ namespace Unity.UIWidgets.ui {
         public static PictureFlusher.CmdDraw stroke0(PictureFlusher.RenderLayer layer, uiPaint paint,
             float alpha, uiMeshMesh mesh) {
             var mat = _stroke0Mat.getMaterial(paint.blendMode, layer.ignoreClip);
-            _getShaderPassAndProps(layer, paint, mesh.matrix, alpha, out var pass, out var props);
+            _getShaderPassAndProps(layer, paint, mesh.matrix, alpha, 0.0f, out var pass, out var props);
 
             return PictureFlusher.CmdDraw.create(
                 mesh: mesh,
@@ -370,6 +367,18 @@ namespace Unity.UIWidgets.ui {
             var pass = 0;
             var props = ObjectPool<MaterialPropertyBlockWrapper>.alloc();
             props.SetVector(_viewportId, viewport);
+
+            return PictureFlusher.CmdDraw.create(
+                mesh: mesh,
+                pass: pass,
+                material: mat,
+                properties: props
+            );
+        }
+
+        public static PictureFlusher.CmdDraw strokeAlpha(PictureFlusher.RenderLayer layer, uiPaint paint, float alpha, float strokeMult, uiMeshMesh mesh) {
+            var mat = _strokeAlphaMat.getMaterial(paint.blendMode, layer.ignoreClip);
+            _getShaderPassAndProps(layer, paint, mesh.matrix, alpha, strokeMult, out var pass, out var props);
 
             return PictureFlusher.CmdDraw.create(
                 mesh: mesh,
@@ -431,7 +440,7 @@ namespace Unity.UIWidgets.ui {
         public static PictureFlusher.CmdDraw tex(PictureFlusher.RenderLayer layer, uiPaint paint,
             uiMeshMesh mesh, Image image) {
             var mat = _texMat.getMaterial(paint.blendMode, layer.ignoreClip);
-            _getShaderPassAndProps(layer, paint, mesh.matrix, 1.0f, out var pass, out var props);
+            _getShaderPassAndProps(layer, paint, mesh.matrix, 1.0f, 0.0f, out var pass, out var props);
 
             image.texture.filterMode = paint.filterMode;
             props.SetTexture(_texId, image.texture);
@@ -449,7 +458,7 @@ namespace Unity.UIWidgets.ui {
         public static PictureFlusher.CmdDraw texRT(PictureFlusher.RenderLayer layer, uiPaint paint,
             uiMeshMesh mesh, PictureFlusher.RenderLayer renderLayer) {
             var mat = _texMat.getMaterial(paint.blendMode, layer.ignoreClip);
-            _getShaderPassAndProps(layer, paint, mesh.matrix, 1.0f, out var pass, out var props);
+            _getShaderPassAndProps(layer, paint, mesh.matrix, 1.0f, 0.0f, out var pass, out var props);
             props.SetInt(_texModeId, 1); // pre alpha
 
             return PictureFlusher.CmdDraw.create(
@@ -475,7 +484,7 @@ namespace Unity.UIWidgets.ui {
             uiMeshMesh mesh, TextBlobMesh textMesh, Texture tex) {
             var mat = _texMat.getMaterial(paint.blendMode, layer.ignoreClip);
             var meshMatrix = mesh != null ? mesh.matrix : textMesh.matrix;
-            _getShaderPassAndProps(layer, paint, meshMatrix, 1.0f, out var pass, out var props);
+            _getShaderPassAndProps(layer, paint, meshMatrix, 1.0f, 0.0f, out var pass, out var props);
             tex.filterMode = paint.filterMode;
             props.SetTexture(_texId, tex);
             props.SetInt(_texModeId, 2); // alpha only
@@ -508,6 +517,31 @@ namespace Unity.UIWidgets.ui {
                 material: mat,
                 properties: props,
                 layerId: renderLayer.rtID
+            );
+        }
+
+        public static PictureFlusher.CmdDraw fastShadow(PictureFlusher.RenderLayer layer, uiMeshMesh mesh, float sigma,
+            bool isRect, bool isCircle, float corner, Vector4 bound, uiColor color) {
+            Vector4 viewport = layer.viewport;
+            var mat = _shadowBox;
+            if (!isRect) {
+                mat = _shadowRBox;
+            }
+            
+            var props = ObjectPool<MaterialPropertyBlockWrapper>.alloc();
+            props.SetVector(_viewportId, viewport);
+            props.SetFloat(_shadowSigmaId, sigma);
+            props.SetVector(_shadowBoxId, bound);
+            props.SetVector(_shadowColorId, _colorToVector4(color));
+            if (!isRect) {
+                props.SetFloat(_shadowCornerId, corner);
+            }
+            
+            return PictureFlusher.CmdDraw.create(
+                mesh: mesh,
+                pass: 0,
+                material: mat,
+                properties: props
             );
         }
     }

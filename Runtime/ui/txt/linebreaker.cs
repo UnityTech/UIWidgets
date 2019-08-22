@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Unity.UIWidgets.InternalBridge;
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
@@ -10,18 +9,9 @@ namespace Unity.UIWidgets.ui {
 
         int _fontSize;
 
+        int _spaceAdvance;
+
         const int kTabSpaceCount = 4;
-
-        List<int> _stops = new List<int>();
-
-        public void set(List<int> stops, int tabWidth) {
-            this._stops.Clear();
-            if (stops != null) {
-                this._stops.AddRange(stops);
-            }
-
-            this._tabWidth = tabWidth;
-        }
 
         public void setFont(Font font, int size) {
             if (this._font != font || this._fontSize != size) {
@@ -29,21 +19,19 @@ namespace Unity.UIWidgets.ui {
             }
 
             this._font = font;
-            this._fontSize = size;
+            // Recompute the advance of space (' ') if font size changes
+            if (this._fontSize != size) {
+                this._fontSize = size;
+                this._font.RequestCharactersInTextureSafe(" ", this._fontSize);
+                this._font.getGlyphInfo(' ', out var glyphInfo, this._fontSize, UnityEngine.FontStyle.Normal);
+                this._spaceAdvance = glyphInfo.advance;
+            }
         }
 
         public float nextTab(float widthSoFar) {
-            for (int i = 0; i < this._stops.Count; i++) {
-                if (this._stops[i] > widthSoFar) {
-                    return this._stops[i];
-                }
-            }
-
             if (this._tabWidth == int.MaxValue) {
                 if (this._fontSize > 0) {
-                    this._font.RequestCharactersInTextureSafe(" ", this._fontSize);
-                    this._font.getGlyphInfo(' ', out var glyphInfo, this._fontSize, UnityEngine.FontStyle.Normal);
-                    this._tabWidth = glyphInfo.advance * kTabSpaceCount;
+                    this._tabWidth = this._spaceAdvance * kTabSpaceCount;
                 }
             }
 
@@ -55,7 +43,7 @@ namespace Unity.UIWidgets.ui {
         }
     }
 
-    class Candidate {
+    struct Candidate {
         public int offset;
         public int pre;
         public float preBreak;
@@ -70,10 +58,60 @@ namespace Unity.UIWidgets.ui {
         const float ScoreInfty = float.MaxValue;
         const float ScoreDesperate = 1e10f;
 
+        int _lineLimit = 0;
+
+        // Limit number of lines, 0 means no limit
+        public int lineLimit {
+            get { return this._lineLimit; }
+            set { this._lineLimit = value; }
+        }
+
+        public static LineBreaker instance {
+            get {
+                if (_instance == null) {
+                    _instance = new LineBreaker();
+                }
+
+                return _instance;
+            }
+        }
+
+        static LineBreaker _instance;
+
+        public static int[] newLinePositions(string text, out int count) {
+            count = 0;
+            for (var i = 0; i < text.Length; i++) {
+                if (text[i] == '\n') {
+                    count++;
+                }
+            }
+
+            count++;
+
+            if (_newLinePositions == null || _newLinePositions.Length < count) {
+                _newLinePositions = new int[count];
+            }
+
+            count = 0;
+            for (var i = 0; i < text.Length; i++) {
+                if (text[i] == '\n') {
+                    _newLinePositions[count++] = i;
+                }
+            }
+
+            _newLinePositions[count++] = text.Length;
+
+            return _newLinePositions;
+        }
+
+        static int[] _newLinePositions;
+
         TextBuff _textBuf;
-        List<float> _charWidths = new List<float>();
+        float[] _charWidths;
         List<int> _breaks = new List<int>();
+        int _breaksCount = 0;
         List<float> _widths = new List<float>();
+        int _widthsCount = 0;
         WordBreaker _wordBreaker = new WordBreaker();
         float _width = 0.0f;
         float _preBreak;
@@ -85,24 +123,33 @@ namespace Unity.UIWidgets.ui {
         TabStops _tabStops;
         int mFirstTabIndex;
         List<Candidate> _candidates = new List<Candidate>();
-        
+        int _candidatesCount = 0;
+
         public int computeBreaks() {
-            int nCand = this._candidates.Count;
+            int nCand = this._candidatesCount;
             if (nCand > 0 && (nCand == 1 || this._lastBreak != nCand - 1)) {
-                var cand = this._candidates[this._candidates.Count - 1];
+                var cand = this._candidates[this._candidatesCount - 1];
                 this._pushBreak(cand.offset, (cand.postBreak - this._preBreak));
             }
 
-            return this._breaks.Count;
+            return this._breaksCount;
         }
 
-        public List<int> getBreaks() {
-            return this._breaks;
+        public int getBreaksCount() {
+            return this._breaksCount;
+        }
+
+        public int getBreak(int i) {
+            return this._breaks[i];
+        }
+
+        public float getWidth(int i) {
+            return this._widths[i];
         }
 
         public void resize(int size) {
-            if (this._charWidths.Count < size) {
-                NoAllocHelpersBridge<float>.ResizeList(this._charWidths, size);
+            if (this._charWidths == null || this._charWidths.Length < size) {
+                this._charWidths = new float[LayoutUtils.minPowerOfTwo(size)];
             }
         }
 
@@ -110,11 +157,11 @@ namespace Unity.UIWidgets.ui {
             this._textBuf = new TextBuff(text, textOffset, textLength);
             this._wordBreaker.setText(this._textBuf);
             this._wordBreaker.next();
-            this._candidates.Clear();
+            this._candidatesCount = 0;
             Candidate can = new Candidate {
                 offset = 0, postBreak = 0, preBreak = 0, postSpaceCount = 0, preSpaceCount = 0, pre = 0
             };
-            this._candidates.Add(can);
+            this._addCandidateToList(can);
             this._lastBreak = 0;
             this._bestBreak = 0;
             this._bestScore = ScoreInfty;
@@ -128,25 +175,24 @@ namespace Unity.UIWidgets.ui {
         }
 
         public float addStyleRun(TextStyle style, int start, int end) {
-            float width = 0.0f;
+            float width = 0;
             if (style != null) {
-                width = Layout.measureText(this._width - this._preBreak, this._textBuf,
-                    start, end - start, style,
+//                Layout.measureText(this._width - this._preBreak, this._textBuf,
+//                    start, end - start, style,
+//                    this._charWidths, start, this._tabStops);
+                width = Layout.computeCharWidths(this._width - this._preBreak, this._textBuf.text,
+                    this._textBuf.offset + start, end - start, style,
                     this._charWidths, start, this._tabStops);
             }
 
             int current = this._wordBreaker.current();
-            int afterWord = start;
-            int lastBreak = start;
-
-            float lastBreakWidth = this._width;
             float postBreak = this._width;
             int postSpaceCount = this._spaceCount;
 
             for (int i = start; i < end; i++) {
                 char c = this._textBuf.charAt(i);
                 if (c == '\t') {
-                    this._width = this._preBreak + this._tabStops.nextTab((this._width - this._preBreak));
+                    this._width = this._preBreak + this._tabStops.nextTab(this._width - this._preBreak);
                     if (this.mFirstTabIndex == int.MaxValue) {
                         this.mFirstTabIndex = i;
                     }
@@ -160,19 +206,14 @@ namespace Unity.UIWidgets.ui {
                     if (!LayoutUtils.isLineEndSpace(c)) {
                         postBreak = this._width;
                         postSpaceCount = this._spaceCount;
-                        afterWord = i + 1;
                     }
                 }
 
                 if (i + 1 == current) {
-                    int wordStart = this._wordBreaker.wordStart();
-                    int wordEnd = this._wordBreaker.wordEnd();
                     if (style != null || current == end || this._charWidths[current] > 0) {
                         this._addWordBreak(current, this._width, postBreak, this._spaceCount, postSpaceCount, 0);
                     }
 
-                    lastBreak = current;
-                    lastBreakWidth = this._width;
                     current = this._wordBreaker.next();
                 }
             }
@@ -183,14 +224,14 @@ namespace Unity.UIWidgets.ui {
         public void finish() {
             this._wordBreaker.finish();
             this._width = 0;
-            this._candidates.Clear();
-            this._widths.Clear();
-            this._breaks.Clear();
+            this._candidatesCount = 0;
+            this._breaksCount = 0;
+            this._widthsCount = 0;
             this._textBuf = default;
         }
 
-        public List<float> getWidths() {
-            return this._widths;
+        public int getWidthsCount() {
+            return this._widthsCount;
         }
 
         public void setTabStops(TabStops tabStops) {
@@ -199,27 +240,11 @@ namespace Unity.UIWidgets.ui {
 
         void _addWordBreak(int offset, float preBreak, float postBreak, int preSpaceCount, int postSpaceCount,
             float penalty) {
-            
-            float width = this._candidates[this._candidates.Count - 1].preBreak;
+            float width = this._candidates[this._candidatesCount - 1].preBreak;
             if (postBreak - width > this._lineWidth) {
-                int i = this._candidates[this._candidates.Count - 1].offset;
-                width += this._charWidths[i++];
-                for (; i < offset; i++) {
-                    float w = this._charWidths[i];
-                    if (w > 0) {
-                        this._addCandidate(new Candidate {
-                            offset = i,
-                            preBreak = width,
-                            postBreak = width,
-                            preSpaceCount = postSpaceCount,
-                            postSpaceCount = postSpaceCount,
-                            penalty = ScoreDesperate,
-                        });
-                        width += w;
-                    }
-                }
+                this._addCandidatesInsideWord(width, offset, postSpaceCount);
             }
-            
+
             this._addCandidate(new Candidate {
                 offset = offset,
                 preBreak = preBreak,
@@ -230,14 +255,43 @@ namespace Unity.UIWidgets.ui {
             });
         }
 
+        void _addCandidatesInsideWord(float width, int offset, int postSpaceCount) {
+            int i = this._candidates[this._candidatesCount - 1].offset;
+            width += this._charWidths[i++];
+            for (; i < offset; i++) {
+                float w = this._charWidths[i];
+                if (w > 0) {
+                    this._addCandidate(new Candidate {
+                        offset = i,
+                        preBreak = width,
+                        postBreak = width,
+                        preSpaceCount = postSpaceCount,
+                        postSpaceCount = postSpaceCount,
+                        penalty = ScoreDesperate,
+                    });
+                    width += w;
+                }
+            }
+        }
+
+        void _addCandidateToList(Candidate cand) {
+            if (this._candidates.Count == this._candidatesCount) {
+                this._candidates.Add(cand);
+                this._candidatesCount++;
+            }
+            else {
+                this._candidates[this._candidatesCount++] = cand;
+            }
+        }
 
         void _addCandidate(Candidate cand) {
-            int candIndex = this._candidates.Count;
-            this._candidates.Add(cand);
+            int candIndex = this._candidatesCount;
+            this._addCandidateToList(cand);
             if (cand.postBreak - this._preBreak > this._lineWidth) {
                 if (this._bestBreak == this._lastBreak) {
                     this._bestBreak = candIndex;
                 }
+
                 this._pushGreedyBreak();
             }
 
@@ -249,9 +303,11 @@ namespace Unity.UIWidgets.ui {
                         this._bestScore = penalty;
                     }
                 }
+
                 if (this._bestBreak == this._lastBreak) {
                     this._bestBreak = candIndex;
                 }
+
                 this._pushGreedyBreak();
             }
 
@@ -263,15 +319,30 @@ namespace Unity.UIWidgets.ui {
 
         void _pushGreedyBreak() {
             var bestCandidate = this._candidates[this._bestBreak];
-            this._pushBreak(bestCandidate.offset, (bestCandidate.postBreak - this._preBreak));
+            this._pushBreak(bestCandidate.offset, bestCandidate.postBreak - this._preBreak);
             this._bestScore = ScoreInfty;
             this._lastBreak = this._bestBreak;
             this._preBreak = bestCandidate.preBreak;
         }
 
         void _pushBreak(int offset, float width) {
-            this._breaks.Add(offset);
-            this._widths.Add(width);
+            if (this.lineLimit == 0 || this._breaksCount < this.lineLimit) {
+                if (this._breaks.Count == this._breaksCount) {
+                    this._breaks.Add(offset);
+                    this._breaksCount++;
+                }
+                else {
+                    this._breaks[this._breaksCount++] = offset;
+                }
+
+                if (this._widths.Count == this._widthsCount) {
+                    this._widths.Add(width);
+                    this._widthsCount++;
+                }
+                else {
+                    this._widths[this._widthsCount++] = width;
+                }
+            }
         }
     }
 }
