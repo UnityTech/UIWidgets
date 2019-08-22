@@ -6,6 +6,7 @@ using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
 using UnityEngine;
 using Color = Unity.UIWidgets.ui.Color;
+using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace Unity.UIWidgets.material {
     static class FloatActionButtonUtils {
@@ -36,8 +37,8 @@ namespace Unity.UIWidgets.material {
             Color foregroundColor = null,
             Color backgroundColor = null,
             object heroTag = null,
-            float elevation = 6.0f,
-            float highlightElevation = 12.0f,
+            float? elevation = null,
+            float? highlightElevation = null,
             float? disabledElevation = null,
             VoidCallback onPressed = null,
             bool mini = false,
@@ -47,11 +48,10 @@ namespace Unity.UIWidgets.material {
             bool isExtended = false,
             BoxConstraints _sizeConstraints = null
         ) : base(key: key) {
-            D.assert(elevation >= 0.0f);
-            D.assert(highlightElevation >= 0.0f);
+            D.assert(elevation == null || elevation >= 0.0f);
+            D.assert(highlightElevation == null || highlightElevation >= 0.0f);
             D.assert(disabledElevation == null || disabledElevation >= 0.0f);
             heroTag = heroTag ?? new _DefaultHeroTag();
-            shape = shape ?? new CircleBorder();
             this.child = child;
             this.tooltip = tooltip;
             this.foregroundColor = foregroundColor;
@@ -109,8 +109,8 @@ namespace Unity.UIWidgets.material {
             Color foregroundColor = null,
             Color backgroundColor = null,
             object heroTag = null,
-            float elevation = 6.0f,
-            float highlightElevation = 12.0f,
+            float? elevation = null,
+            float? highlightElevation = null,
             float? disabledElevation = null,
             VoidCallback onPressed = null,
             ShapeBorder shape = null,
@@ -120,26 +120,30 @@ namespace Unity.UIWidgets.material {
             Widget icon = null,
             Widget label = null
         ) {
-            D.assert(elevation >= 0.0f);
-            D.assert(highlightElevation >= 0.0f);
+            D.assert(elevation == null || elevation >= 0.0f);
+            D.assert(highlightElevation == null || highlightElevation >= 0.0f);
             D.assert(disabledElevation == null || disabledElevation >= 0.0f);
-            D.assert(icon != null);
             D.assert(label != null);
             heroTag = heroTag ?? new _DefaultHeroTag();
-            shape = shape ?? new StadiumBorder();
 
             BoxConstraints _sizeConstraints = FloatActionButtonUtils._kExtendedSizeConstraints;
             bool mini = false;
             Widget child = new _ChildOverflowBox(
                 child: new Row(
                     mainAxisSize: MainAxisSize.min,
-                    children: new List<Widget> {
-                        new SizedBox(width: 16.0f),
-                        icon,
-                        new SizedBox(width: 8.0f),
-                        label,
-                        new SizedBox(width: 20.0f)
-                    }));
+                    children: icon == null
+                        ? new List<Widget> {
+                            new SizedBox(width: 20.0f),
+                            label,
+                            new SizedBox(width: 20.0f),
+                        }
+                        : new List<Widget> {
+                            new SizedBox(width: 16.0f),
+                            icon,
+                            new SizedBox(width: 8.0f),
+                            label,
+                            new SizedBox(width: 20.0f)
+                        }));
 
             return new FloatingActionButton(
                 key: key,
@@ -150,7 +154,7 @@ namespace Unity.UIWidgets.material {
                 heroTag: heroTag,
                 elevation: elevation,
                 highlightElevation: highlightElevation,
-                disabledElevation: disabledElevation ?? elevation,
+                disabledElevation: disabledElevation,
                 onPressed: onPressed,
                 mini: mini,
                 shape: shape,
@@ -173,9 +177,9 @@ namespace Unity.UIWidgets.material {
 
         public readonly VoidCallback onPressed;
 
-        public readonly float elevation;
+        public readonly float? elevation;
 
-        public readonly float highlightElevation;
+        public readonly float? highlightElevation;
 
         public readonly float? disabledElevation;
 
@@ -189,11 +193,43 @@ namespace Unity.UIWidgets.material {
 
         public readonly MaterialTapTargetSize? materialTapTargetSize;
 
-        public readonly BoxConstraints _sizeConstraints;
+        readonly BoxConstraints _sizeConstraints;
+
+        const float _defaultElevation = 6;
+        const float _defaultHighlightElevation = 12;
+        readonly ShapeBorder _defaultShape = new CircleBorder();
+        readonly ShapeBorder _defaultExtendedShape = new StadiumBorder();
 
         public override Widget build(BuildContext context) {
             ThemeData theme = Theme.of(context);
-            Color foregroundColor = this.foregroundColor ?? theme.accentIconTheme.color;
+            FloatingActionButtonThemeData floatingActionButtonTheme = theme.floatingActionButtonTheme;
+            Color backgroundColor = this.backgroundColor
+                                    ?? floatingActionButtonTheme.backgroundColor
+                                    ?? theme.colorScheme.secondary;
+            Color foregroundColor = this.foregroundColor
+                                    ?? floatingActionButtonTheme.foregroundColor
+                                    ?? theme.accentIconTheme.color
+                                    ?? theme.colorScheme.onSecondary;
+
+            float elevation = this.elevation
+                              ?? floatingActionButtonTheme.elevation
+                              ?? _defaultElevation;
+            float disabledElevation = this.disabledElevation
+                                      ?? floatingActionButtonTheme.disabledElevation
+                                      ?? elevation;
+            float highlightElevation = this.highlightElevation
+                                       ?? floatingActionButtonTheme.highlightElevation
+                                       ?? _defaultHighlightElevation;
+            MaterialTapTargetSize materialTapTargetSize = this.materialTapTargetSize
+                                                          ?? theme.materialTapTargetSize;
+            TextStyle textStyle = theme.accentTextTheme.button.copyWith(
+                color: foregroundColor,
+                letterSpacing: 1.2f
+            );
+            ShapeBorder shape = this.shape
+                                ?? floatingActionButtonTheme.shape
+                                ?? (this.isExtended ? this._defaultExtendedShape : this._defaultShape);
+
             Widget result = null;
 
             if (this.child != null) {
@@ -206,16 +242,14 @@ namespace Unity.UIWidgets.material {
 
             result = new RawMaterialButton(
                 onPressed: this.onPressed,
-                elevation: this.elevation,
-                highlightElevation: this.highlightElevation,
-                disabledElevation: this.disabledElevation ?? this.elevation,
+                elevation: elevation,
+                highlightElevation: highlightElevation,
+                disabledElevation: disabledElevation,
                 constraints: this._sizeConstraints,
-                materialTapTargetSize: this.materialTapTargetSize ?? theme.materialTapTargetSize,
-                fillColor: this.backgroundColor ?? theme.accentColor,
-                textStyle: theme.accentTextTheme.button.copyWith(
-                    color: foregroundColor,
-                    letterSpacing: 1.2f),
-                shape: this.shape,
+                materialTapTargetSize: materialTapTargetSize,
+                fillColor: backgroundColor,
+                textStyle: textStyle,
+                shape: shape,
                 clipBehavior: this.clipBehavior,
                 child: result);
 
