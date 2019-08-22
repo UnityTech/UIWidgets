@@ -107,7 +107,7 @@ namespace Unity.UIWidgets.material {
             return new RawMaterialButton(
                 onPressed: this.onPressed,
                 onHighlightChanged: this.onHighlightChanged,
-                fillColor: this.color,
+                fillColor: buttonTheme.getFillColor(this),
                 textStyle: theme.textTheme.button.copyWith(color: buttonTheme.getTextColor(this)),
                 highlightColor: this.highlightColor ?? theme.highlightColor,
                 splashColor: this.splashColor ?? theme.splashColor,
@@ -117,7 +117,7 @@ namespace Unity.UIWidgets.material {
                 constraints: buttonTheme.getConstraints(this).copyWith(
                     minWidth: this.minWidth,
                     minHeight: this.height),
-                shape: buttonTheme.shape,
+                shape: buttonTheme.getShape(this),
                 clipBehavior: this.clipBehavior ?? Clip.none,
                 animationDuration: buttonTheme.getAnimationDuration(this),
                 child: this.child,

@@ -368,10 +368,16 @@ namespace Unity.UIWidgets.widgets {
                 this.position.maxScrollExtent);
         }
         
-        // TODO: float _receivedPointerSignal(PointerSignalEvent event) {
-        // }
+        void _receivedPointerSignal(PointerSignalEvent e) {
+            if (e is PointerScrollEvent && this.position != null) {
+                float targetScrollOffset = this._targetScrollOffsetForPointerScroll(e as PointerScrollEvent);
+                if (targetScrollOffset != this.position.pixels) {
+                    GestureBinding.instance.pointerSignalResolver.register(e, this._handlePointerScroll);
+                }
+            }
+        }
 
-        void _handlePointerrScroll(PointerEvent e) {
+        void _handlePointerScroll(PointerEvent e) {
             D.assert(e is PointerScrollEvent);
             float targetScrollOffset = this._targetScrollOffsetForPointerScroll(e as PointerScrollEvent);
             if (targetScrollOffset != this.position.pixels) {
@@ -394,7 +400,7 @@ namespace Unity.UIWidgets.widgets {
                 scrollable: this,
                 position: this.position,
                 child: new Listener(
-                    // TODO: onPointerSignal: _receivePointerSignal,
+                    onPointerSignal: this._receivedPointerSignal,
                     child: new RawGestureDetector(
                         key: this._gestureDetectorKey,
                         gestures: this._gestureRecognizers,

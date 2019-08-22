@@ -292,10 +292,10 @@ namespace Unity.UIWidgets.material {
         ) {
             D.assert(MaterialD.debugCheckHasMaterialLocalizations(context));
 
+            ThemeData theme = Theme.of(context, shadowThemeOnly: true);
             return widgets.DialogUtils.showGeneralDialog(
                 context: context,
                 pageBuilder: (buildContext, animation, secondaryAnimation) => {
-                    ThemeData theme = Theme.of(context, shadowThemeOnly: true);
                     Widget pageChild = new Builder(builder: builder);
                     return new SafeArea(
                         child: new Builder(

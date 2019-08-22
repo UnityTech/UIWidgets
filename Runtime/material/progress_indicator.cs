@@ -233,6 +233,7 @@ namespace Unity.UIWidgets.material {
 
     class _CircularProgressIndicatorPainter : AbstractCustomPainter {
         public _CircularProgressIndicatorPainter(
+            Color backgroundColor = null,
             Color valueColor = null,
             float? value = null,
             float? headValue = null,
@@ -241,6 +242,7 @@ namespace Unity.UIWidgets.material {
             float? rotationValue = null,
             float? strokeWidth = null
         ) {
+            this.backgroundColor = backgroundColor;
             this.valueColor = valueColor;
             this.value = value;
             this.headValue = headValue;
@@ -257,6 +259,7 @@ namespace Unity.UIWidgets.material {
                 : Mathf.Max(headValue * 3 / 2 * Mathf.PI - tailValue * 3 / 2 * Mathf.PI ?? 0.0f, _epsilon);
         }
 
+        public readonly Color backgroundColor;
         public readonly Color valueColor;
         public readonly float? value;
         public readonly float? headValue;
@@ -279,6 +282,15 @@ namespace Unity.UIWidgets.material {
             paint.strokeWidth = this.strokeWidth ?? 0.0f;
             paint.style = PaintingStyle.stroke;
 
+            if (this.backgroundColor != null) {
+                Paint backgroundPaint = new Paint() {
+                    color = this.backgroundColor,
+                    strokeWidth = this.strokeWidth ?? 0.0f,
+                    style = PaintingStyle.stroke
+                };
+                canvas.drawArc(Offset.zero & size, 0, _sweep, false, backgroundPaint);
+            }
+
             if (this.value == null)
             {
                 paint.strokeCap = StrokeCap.square;
@@ -290,7 +302,8 @@ namespace Unity.UIWidgets.material {
         public override bool shouldRepaint(CustomPainter oldPainter) {
             D.assert(oldPainter is _CircularProgressIndicatorPainter);
             _CircularProgressIndicatorPainter painter = oldPainter as _CircularProgressIndicatorPainter;
-            return painter.valueColor != this.valueColor
+            return painter.backgroundColor != this.backgroundColor
+                   || painter.valueColor != this.valueColor
                    || painter.value != this.value
                    || painter.headValue != this.headValue
                    || painter.tailValue != this.tailValue
@@ -365,6 +378,7 @@ namespace Unity.UIWidgets.material {
                 ),
                 child: new CustomPaint(
                     painter: new _CircularProgressIndicatorPainter(
+                        backgroundColor: this.widget.backgroundColor,
                         valueColor: this.widget._getValueColor(context),
                         value: this.widget.value,
                         headValue: headValue,

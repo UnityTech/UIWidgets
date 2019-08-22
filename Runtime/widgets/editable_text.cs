@@ -36,7 +36,9 @@ namespace Unity.UIWidgets.widgets {
             get { return this.value.text; }
 
             set {
-                this.value = this.value.copyWith(text: value, selection: TextSelection.collapsed(-1),
+                this.value = this.value.copyWith(
+                    text: value,
+                    selection: TextSelection.collapsed(-1),
                     composing: TextRange.empty);
             }
         }
@@ -63,66 +65,6 @@ namespace Unity.UIWidgets.widgets {
     }
 
     public class EditableText : StatefulWidget {
-        public readonly TextEditingController controller;
-
-        public readonly FocusNode focusNode;
-
-        public readonly bool obscureText;
-
-        public readonly bool autocorrect;
-
-        public readonly TextStyle style;
-
-        public StrutStyle strutStyle {
-            get {
-                if (this._strutStyle == null) {
-                    return this.style != null
-                        ? StrutStyle.fromTextStyle(this.style, forceStrutHeight: true)
-                        : StrutStyle.disabled;
-                }
-
-                return this._strutStyle.inheritFromTextStyle(this.style);
-            }
-        }
-
-        readonly StrutStyle _strutStyle;
-
-        public readonly TextAlign textAlign;
-
-        public readonly TextDirection? textDirection;
-
-        public readonly TextCapitalization textCapitalization;
-
-        public readonly float? textScaleFactor;
-
-        public readonly Color cursorColor;
-
-        public readonly Color backgroundCursorColor;
-
-        public readonly int? maxLines;
-
-        public readonly bool autofocus;
-
-        public readonly Color selectionColor;
-
-        public readonly TextSelectionControls selectionControls;
-
-        public readonly TextInputType keyboardType;
-
-        public readonly TextInputAction? textInputAction;
-
-        public readonly ValueChanged<string> onChanged;
-        public readonly VoidCallback onEditingComplete;
-        public readonly ValueChanged<string> onSubmitted;
-
-        public readonly SelectionChangedCallback onSelectionChanged;
-
-        public readonly List<TextInputFormatter> inputFormatters;
-
-        public readonly bool rendererIgnoresPointer;
-
-        public readonly bool unityTouchKeyboard;
-
         public EditableText(
             TextEditingController controller = null,
             FocusNode focusNode = null, TextStyle style = null,
@@ -135,6 +77,8 @@ namespace Unity.UIWidgets.widgets {
             TextDirection? textDirection = null,
             float? textScaleFactor = null,
             int? maxLines = 1,
+            int? minLines = null,
+            bool expands = false,
             bool autofocus = false,
             Color selectionColor = null,
             TextSelectionControls selectionControls = null,
@@ -157,13 +101,19 @@ namespace Unity.UIWidgets.widgets {
             bool paintCursorAboveText = false,
             Brightness? keyboardAppearance = Brightness.light,
             DragStartBehavior dragStartBehavior = DragStartBehavior.down,
-            bool? enableInteractiveSelection = null
+            bool? enableInteractiveSelection = null,
+            ScrollPhysics scrollPhysics = null
         ) : base(key) {
             D.assert(controller != null);
             D.assert(focusNode != null);
             D.assert(style != null);
             D.assert(cursorColor != null);
             D.assert(maxLines == null || maxLines > 0);
+            D.assert(minLines == null || minLines > 0);
+            D.assert((maxLines == null) || (minLines == null) || (maxLines >= minLines),
+                () => "minLines can't be greater than maxLines");
+            D.assert(!expands || (maxLines == null && minLines == null),
+                () => "minLines and maxLines must be null when expands is true.");
             // D.assert(backgroundCursorColor != null); // TODO: remove comment
             this.keyboardType = keyboardType ?? (maxLines == 1 ? TextInputType.text : TextInputType.multiline);
 
@@ -182,6 +132,8 @@ namespace Unity.UIWidgets.widgets {
             this.cursorColor = cursorColor;
             this.backgroundCursorColor = backgroundCursorColor ?? Colors.grey; // TODO: remove ??
             this.maxLines = maxLines;
+            this.minLines = minLines;
+            this.expands = expands;
             this.autofocus = autofocus;
             this.selectionColor = selectionColor;
             this.onChanged = onChanged;
@@ -210,8 +162,48 @@ namespace Unity.UIWidgets.widgets {
             this.keyboardAppearance = keyboardAppearance;
             this.enableInteractiveSelection = enableInteractiveSelection;
             this.dragStartBehavior = dragStartBehavior;
+            this.scrollPhysics = scrollPhysics;
         }
 
+        public readonly TextEditingController controller;
+        public readonly FocusNode focusNode;
+        public readonly bool obscureText;
+        public readonly bool autocorrect;
+        public readonly TextStyle style;
+        public StrutStyle strutStyle {
+            get {
+                if (this._strutStyle == null) {
+                    return this.style != null
+                        ? StrutStyle.fromTextStyle(this.style, forceStrutHeight: true)
+                        : StrutStyle.disabled;
+                }
+
+                return this._strutStyle.inheritFromTextStyle(this.style);
+            }
+        }
+
+        readonly StrutStyle _strutStyle;
+        public readonly TextAlign textAlign;
+        public readonly TextDirection? textDirection;
+        public readonly TextCapitalization textCapitalization;
+        public readonly float? textScaleFactor;
+        public readonly Color cursorColor;
+        public readonly Color backgroundCursorColor;
+        public readonly int? maxLines;
+        public readonly int? minLines;
+        public readonly bool expands;
+        public readonly bool autofocus;
+        public readonly Color selectionColor;
+        public readonly TextSelectionControls selectionControls;
+        public readonly TextInputType keyboardType;
+        public readonly TextInputAction? textInputAction;
+        public readonly ValueChanged<string> onChanged;
+        public readonly VoidCallback onEditingComplete;
+        public readonly ValueChanged<string> onSubmitted;
+        public readonly SelectionChangedCallback onSelectionChanged;
+        public readonly List<TextInputFormatter> inputFormatters;
+        public readonly bool rendererIgnoresPointer;
+        public readonly bool unityTouchKeyboard;
         public readonly float? cursorWidth;
         public readonly Radius cursorRadius;
         public readonly bool cursorOpacityAnimates;
@@ -220,8 +212,8 @@ namespace Unity.UIWidgets.widgets {
         public readonly Brightness? keyboardAppearance;
         public readonly EdgeInsets scrollPadding;
         public readonly DragStartBehavior dragStartBehavior;
-
         public readonly bool? enableInteractiveSelection;
+        public readonly ScrollPhysics scrollPhysics;
 
         public bool selectionEnabled {
             get { return this.enableInteractiveSelection ?? !this.obscureText; }
@@ -250,9 +242,14 @@ namespace Unity.UIWidgets.widgets {
             properties.add(new DiagnosticsProperty<float?>("textScaleFactor", this.textScaleFactor,
                 defaultValue: Diagnostics.kNullDefaultValue));
             properties.add(new DiagnosticsProperty<int?>("maxLines", this.maxLines, defaultValue: 1));
+            properties.add(new DiagnosticsProperty<int?>("minLines", this.minLines,
+                defaultValue: Diagnostics.kNullDefaultValue));
+            properties.add(new DiagnosticsProperty<bool>("expands", this.expands, defaultValue: false));
             properties.add(new DiagnosticsProperty<bool>("autofocus", this.autofocus, defaultValue: false));
             properties.add(
                 new DiagnosticsProperty<TextInputType>("keyboardType", this.keyboardType, defaultValue: null));
+            properties.add(new DiagnosticsProperty<ScrollPhysics>("scrollPhysics", this.scrollPhysics,
+                defaultValue: Diagnostics.kNullDefaultValue));
         }
     }
 
@@ -364,7 +361,7 @@ namespace Unity.UIWidgets.widgets {
         public void performAction(TextInputAction action) {
             switch (action) {
                 case TextInputAction.newline:
-                    if (this.widget.maxLines == 1) {
+                    if (!this._isMultiline) {
                         this._finalizeEditing(true);
                     }
 
@@ -396,6 +393,10 @@ namespace Unity.UIWidgets.widgets {
         public void updateFloatingCursor(RawFloatingCursorPoint point) {
             switch (point.state) {
                 case FloatingCursorDragState.Start:
+                    if (this._floatingCursorResetController.isAnimating) {
+                        this._floatingCursorResetController.stop();
+                        this._onFloatingCursorResetTick();
+                    }
                     TextPosition currentTextPosition =
                         new TextPosition(offset: this.renderEditable.selection.baseOffset);
                     this._startCaretRect = this.renderEditable.getLocalRectForCaret(currentTextPosition);
@@ -904,13 +905,14 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public override Widget build(BuildContext context) {
+            D.assert(WidgetsD.debugCheckHasMediaQuery(context));
             FocusScope.of(context).reparentIfNeeded(this.widget.focusNode);
             base.build(context); // See AutomaticKeepAliveClientMixin.
 
             return new Scrollable(
                 axisDirection: this._isMultiline ? AxisDirection.down : AxisDirection.right,
                 controller: this._scrollController,
-                physics: new ClampingScrollPhysics(),
+                physics: this.widget.scrollPhysics,
                 dragStartBehavior: this.widget.dragStartBehavior,
                 viewportBuilder: (BuildContext _context, ViewportOffset offset) =>
                     new CompositedTransformTarget(
@@ -926,6 +928,8 @@ namespace Unity.UIWidgets.widgets {
                                 : this._cursorVisibilityNotifier,
                             hasFocus: this._hasFocus,
                             maxLines: this.widget.maxLines,
+                            minLines: this.widget.minLines,
+                            expands: this.widget.expands,
                             strutStyle: this.widget.strutStyle,
                             selectionColor: this.widget.selectionColor,
                             textScaleFactor: this.widget.textScaleFactor ?? MediaQuery.textScaleFactorOf(context),
@@ -1025,6 +1029,8 @@ namespace Unity.UIWidgets.widgets {
         public readonly ValueNotifier<bool> showCursor;
         public readonly bool hasFocus;
         public readonly int? maxLines;
+        public readonly int? minLines;
+        public readonly bool expands;
         public readonly StrutStyle strutStyle;
         public readonly Color selectionColor;
         public readonly float textScaleFactor;
@@ -1045,17 +1051,34 @@ namespace Unity.UIWidgets.widgets {
         public readonly float? devicePixelRatio;
 
 
-        public _Editable(TextSpan textSpan = null, TextEditingValue value = null,
-            Color cursorColor = null, Color backgroundCursorColor = null, ValueNotifier<bool> showCursor = null,
+        public _Editable(TextSpan textSpan = null,
+            TextEditingValue value = null,
+            Color cursorColor = null,
+            Color backgroundCursorColor = null,
+            ValueNotifier<bool> showCursor = null,
             bool hasFocus = false,
-            int? maxLines = null, StrutStyle strutStyle = null, Color selectionColor = null,
+            int? maxLines = null,
+            int? minLines = null,
+            bool expands = false,
+            StrutStyle strutStyle = null,
+            Color selectionColor = null,
             float textScaleFactor = 1.0f,
-            TextDirection? textDirection = null, bool obscureText = false, TextAlign textAlign = TextAlign.left,
-            bool autocorrect = false, ViewportOffset offset = null, SelectionChangedHandler onSelectionChanged = null,
-            CaretChangedHandler onCaretChanged = null, bool rendererIgnoresPointer = false,
-            Key key = null, TextSelectionDelegate textSelectionDelegate = null, float? cursorWidth = null,
-            Radius cursorRadius = null, Offset cursorOffset = null, bool enableInteractiveSelection = true,
-            bool? paintCursorAboveText = null, float? devicePixelRatio = null) : base(key) {
+            TextDirection? textDirection = null,
+            bool obscureText = false,
+            TextAlign textAlign = TextAlign.left,
+            bool autocorrect = false,
+            ViewportOffset offset = null,
+            SelectionChangedHandler onSelectionChanged = null,
+            CaretChangedHandler onCaretChanged = null,
+            bool rendererIgnoresPointer = false,
+            Key key = null,
+            TextSelectionDelegate textSelectionDelegate = null,
+            float? cursorWidth = null,
+            Radius cursorRadius = null,
+            Offset cursorOffset = null,
+            bool enableInteractiveSelection = true,
+            bool? paintCursorAboveText = null,
+            float? devicePixelRatio = null) : base(key) {
             this.textSpan = textSpan;
             this.value = value;
             this.cursorColor = cursorColor;
@@ -1063,6 +1086,7 @@ namespace Unity.UIWidgets.widgets {
             this.showCursor = showCursor;
             this.hasFocus = hasFocus;
             this.maxLines = maxLines;
+            this.minLines = minLines;
             this.strutStyle = strutStyle;
             this.selectionColor = selectionColor;
             this.textScaleFactor = textScaleFactor;
@@ -1093,6 +1117,8 @@ namespace Unity.UIWidgets.widgets {
                 backgroundCursorColor: this.backgroundCursorColor,
                 hasFocus: this.hasFocus,
                 maxLines: this.maxLines,
+                minLines: this.minLines,
+                expands: this.expands,
                 strutStyle: this.strutStyle,
                 selectionColor: this.selectionColor,
                 textScaleFactor: this.textScaleFactor,

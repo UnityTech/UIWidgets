@@ -279,7 +279,7 @@ namespace Unity.UIWidgets.material {
                 return fillColor;
             }
 
-            if (button is FlatButton || button is OutlineButton) {
+            if (button is FlatButton || button is OutlineButton || button.GetType() == typeof(MaterialButton)) {
                 return null;
             }
 
