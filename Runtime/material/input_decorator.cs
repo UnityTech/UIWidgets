@@ -939,11 +939,21 @@ namespace Unity.UIWidgets.material {
         _RenderDecorationLayout _layout(BoxConstraints layoutConstraints) {
             Dictionary<RenderBox, float> boxToBaseline = new Dictionary<RenderBox, float>();
             BoxConstraints boxConstraints = layoutConstraints.loosen();
-            boxToBaseline[this.prefix] = this._layoutLineBox(this.prefix, boxConstraints);
-            boxToBaseline[this.suffix] = this._layoutLineBox(this.suffix, boxConstraints);
-            boxToBaseline[this.icon] = this._layoutLineBox(this.icon, boxConstraints);
-            boxToBaseline[this.prefixIcon] = this._layoutLineBox(this.prefixIcon, boxConstraints);
-            boxToBaseline[this.suffixIcon] = this._layoutLineBox(this.suffixIcon, boxConstraints);
+            if (this.prefix != null) {
+                boxToBaseline[this.prefix] = this._layoutLineBox(this.prefix, boxConstraints);
+            }
+            if (this.suffix != null) {
+                boxToBaseline[this.suffix] = this._layoutLineBox(this.suffix, boxConstraints);
+            }
+            if (this.icon != null) {
+                boxToBaseline[this.icon] = this._layoutLineBox(this.icon, boxConstraints);
+            }
+            if (this.prefixIcon != null) {
+                boxToBaseline[this.prefixIcon] = this._layoutLineBox(this.prefixIcon, boxConstraints);
+            }
+            if (this.suffixIcon != null) {
+                boxToBaseline[this.suffixIcon] = this._layoutLineBox(this.suffixIcon, boxConstraints);
+            }
 
             float inputWidth = Math.Max(0.0f, this.constraints.maxWidth - (
                                                   _boxSize(this.icon).width
@@ -953,23 +963,33 @@ namespace Unity.UIWidgets.material {
                                                   + _boxSize(this.suffix).width
                                                   + _boxSize(this.suffixIcon).width
                                                   + this.contentPadding.right));
-            boxToBaseline[this.label] = this._layoutLineBox(this.label,
-                boxConstraints.copyWith(maxWidth: inputWidth)
-            );
-            boxToBaseline[this.hint] = this._layoutLineBox(this.hint,
-                boxConstraints.copyWith(minWidth: inputWidth, maxWidth: inputWidth)
-            );
-            boxToBaseline[this.counter] = this._layoutLineBox(this.counter, boxConstraints);
+            if (this.label != null) {
+                boxToBaseline[this.label] = this._layoutLineBox(this.label,
+                    boxConstraints.copyWith(maxWidth: inputWidth)
+                );
+            }
 
-            boxToBaseline[this.helperError] = this._layoutLineBox(this.helperError,
-                boxConstraints.copyWith(
-                    maxWidth: Math.Max(0.0f, boxConstraints.maxWidth
-                                             - _boxSize(this.icon).width
-                                             - _boxSize(this.counter).width
-                                             - this.contentPadding.horizontal
+            if (this.hint != null) {
+                boxToBaseline[this.hint] = this._layoutLineBox(this.hint,
+                    boxConstraints.copyWith(minWidth: inputWidth, maxWidth: inputWidth)
+                );
+            }
+
+            if (this.counter != null) {
+                boxToBaseline[this.counter] = this._layoutLineBox(this.counter, boxConstraints);
+            }
+
+            if (this.helperError != null) {
+                boxToBaseline[this.helperError] = this._layoutLineBox(this.helperError,
+                    boxConstraints.copyWith(
+                        maxWidth: Math.Max(0.0f, boxConstraints.maxWidth
+                                                 - _boxSize(this.icon).width
+                                                 - _boxSize(this.counter).width
+                                                 - this.contentPadding.horizontal
+                        )
                     )
-                )
-            );
+                );
+            }
 
             float labelHeight = this.label == null
                 ? 0
@@ -989,23 +1009,25 @@ namespace Unity.UIWidgets.material {
                 counterHeight,
                 helperErrorHeight
             );
-            boxToBaseline[this.input] = this._layoutLineBox(this.input,
-                boxConstraints.deflate(EdgeInsets.only(
-                    top: this.contentPadding.top + topHeight,
-                    bottom: this.contentPadding.bottom + bottomHeight
-                )).copyWith(
-                    minWidth: inputWidth,
-                    maxWidth: inputWidth
-                )
-            );
+            if (this.input != null) {
+                boxToBaseline[this.input] = this._layoutLineBox(this.input,
+                    boxConstraints.deflate(EdgeInsets.only(
+                        top: this.contentPadding.top + topHeight,
+                        bottom: this.contentPadding.bottom + bottomHeight
+                    )).copyWith(
+                        minWidth: inputWidth,
+                        maxWidth: inputWidth
+                    )
+                );
+            }
 
             // The field can be occupied by a hint or by the input itself
             float hintHeight = this.hint == null ? 0 : this.hint.size.height;
             float inputDirectHeight = this.input == null ? 0 : this.input.size.height;
             float inputHeight = Math.Max(hintHeight, inputDirectHeight);
             float inputInternalBaseline = Math.Max(
-                boxToBaseline[this.input],
-                boxToBaseline[this.hint]
+                boxToBaseline.getOrDefault(this.input, 0.0f),
+                boxToBaseline.getOrDefault(this.hint, 0.0f)
             );
 
             // Calculate the amount that prefix/suffix affects height above and below
@@ -1013,13 +1035,13 @@ namespace Unity.UIWidgets.material {
             float prefixHeight = this.prefix == null ? 0 : this.prefix.size.height;
             float suffixHeight = this.suffix == null ? 0 : this.suffix.size.height;
             float fixHeight = Math.Max(
-                boxToBaseline[this.prefix],
-                boxToBaseline[this.suffix]
+                boxToBaseline.getOrDefault(this.prefix, 0.0f),
+                boxToBaseline.getOrDefault(this.suffix, 0.0f)
             );
             float fixAboveInput = Math.Max(0, fixHeight - inputInternalBaseline);
             float fixBelowBaseline = Math.Max(
-                prefixHeight - boxToBaseline[this.prefix],
-                suffixHeight - boxToBaseline[this.suffix]
+                prefixHeight - boxToBaseline.getOrDefault(this.prefix, 0.0f),
+                suffixHeight - boxToBaseline.getOrDefault(this.suffix, 0.0f)
             );
             float fixBelowInput = Math.Max(
                 0,
@@ -1067,13 +1089,13 @@ namespace Unity.UIWidgets.material {
             float subtextHelperHeight = 0;
             if (this.counter != null) {
                 subtextCounterBaseline =
-                    containerHeight + subtextGap + boxToBaseline[this.counter];
+                    containerHeight + subtextGap + boxToBaseline.getOrDefault(this.counter, 0.0f);
                 subtextCounterHeight = this.counter.size.height + subtextGap;
             }
 
             if (helperErrorExists) {
                 subtextHelperBaseline =
-                    containerHeight + subtextGap + boxToBaseline[this.helperError];
+                    containerHeight + subtextGap + boxToBaseline.getOrDefault(this.helperError, 0.0f);
                 subtextHelperHeight = helperErrorHeight;
             }
 

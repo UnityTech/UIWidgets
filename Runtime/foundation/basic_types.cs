@@ -72,6 +72,15 @@ namespace Unity.UIWidgets.foundation {
             it.TryGetValue(key, out v);
             return v;
         }
+        
+        public static TValue getOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> it, TKey key, TValue defaultVal) {
+            TValue v = defaultVal;
+            if (key == null) {
+                return v;
+            }
+            it.TryGetValue(key, out v);
+            return v;
+        }
 
         public static T first<T>(this IList<T> it) {
             return it[0];
