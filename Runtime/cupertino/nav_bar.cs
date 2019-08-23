@@ -1088,7 +1088,6 @@ namespace Unity.UIWidgets.cupertino {
         }
 
         public override Widget build(BuildContext context) {
-            TextDirection textDirection = Directionality.of(context);
             TextStyle textStyle = DefaultTextStyle.of(context).style;
 
             Widget iconWidget = Text.rich(
@@ -1102,18 +1101,6 @@ namespace Unity.UIWidgets.cupertino {
                     )
                 )
             );
-            switch (textDirection) {
-                case TextDirection.rtl:
-                    iconWidget = new Transform(
-                        transform: Matrix3.makeScale(-1.0f, 1.0f),
-                        alignment: Alignment.center,
-                        transformHitTests: false,
-                        child: iconWidget
-                    );
-                    break;
-                case TextDirection.ltr:
-                    break;
-            }
 
             return iconWidget;
         }
