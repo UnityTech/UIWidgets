@@ -432,7 +432,7 @@ namespace Unity.UIWidgets.widgets {
     }
 
     public class HeroController : NavigatorObserver {
-        public HeroController(CreateRectTween createRectTween) {
+        public HeroController(CreateRectTween createRectTween = null) {
             this.createRectTween = createRectTween;
         }
 

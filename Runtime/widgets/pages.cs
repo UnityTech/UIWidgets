@@ -26,6 +26,8 @@ namespace Unity.UIWidgets.widgets {
         public override bool canTransitionFrom(TransitionRoute previousRoute) {
             return previousRoute is PageRoute;
         }
+        
+        public bool _hasScopedWillPopCallback => this.hasScopedWillPopCallback;
 
         public override AnimationController createAnimationController() {
             var controller = base.createAnimationController();
