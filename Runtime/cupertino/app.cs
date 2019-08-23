@@ -25,20 +25,12 @@ namespace Unity.UIWidgets.cupertino {
             LocaleListResolutionCallback localeListResolutionCallback = null,
             LocaleResolutionCallback localeResolutionCallback = null,
             List<Locale> supportedLocales = null,
-            bool showPerformanceOverlay = false,
-            bool checkerboardRasterCacheImages = false,
-            bool checkerboardOffscreenLayers = false,
-            bool showSemanticsDebugger = false,
-            bool debugShowCheckedModeBanner = true
+            bool showPerformanceOverlay = false
         ) : base(key: key) {
             D.assert(routes != null);
             D.assert(navigatorObservers != null);
             D.assert(title != null);
             D.assert(showPerformanceOverlay != null);
-            D.assert(checkerboardRasterCacheImages != null);
-            D.assert(checkerboardOffscreenLayers != null);
-            D.assert(showSemanticsDebugger != null);
-            D.assert(debugShowCheckedModeBanner != null);
 
             supportedLocales = supportedLocales ?? new List<Locale> {new Locale("en", "US")};
             this.navigatorKey = navigatorKey;
@@ -59,10 +51,6 @@ namespace Unity.UIWidgets.cupertino {
             this.localeResolutionCallback = localeResolutionCallback;
             this.supportedLocales = supportedLocales;
             this.showPerformanceOverlay = showPerformanceOverlay;
-            this.checkerboardRasterCacheImages = checkerboardRasterCacheImages;
-            this.checkerboardOffscreenLayers = checkerboardOffscreenLayers;
-            this.showSemanticsDebugger = showSemanticsDebugger;
-            this.debugShowCheckedModeBanner = debugShowCheckedModeBanner;
         }
 
         public readonly GlobalKey<NavigatorState> navigatorKey;
@@ -83,10 +71,6 @@ namespace Unity.UIWidgets.cupertino {
         public readonly LocaleResolutionCallback localeResolutionCallback;
         public readonly List<Locale> supportedLocales;
         public readonly bool showPerformanceOverlay;
-        public readonly bool checkerboardRasterCacheImages;
-        public readonly bool checkerboardOffscreenLayers;
-        public readonly bool showSemanticsDebugger;
-        public readonly bool debugShowCheckedModeBanner;
 
         public override State createState() {
             return new _CupertinoAppState();
@@ -157,18 +141,6 @@ namespace Unity.UIWidgets.cupertino {
         public override Widget build(BuildContext context) {
             CupertinoThemeData effectiveThemeData = this.widget.theme ?? new CupertinoThemeData();
 
-            Widget _InspectorSelectButtonBuilder(BuildContext _context, VoidCallback onPressed) {
-                return CupertinoButton.filled(
-                    child: new Icon(
-                        CupertinoIcons.search,
-                        size: 28.0f,
-                        color: CupertinoColors.white
-                    ),
-                    padding: EdgeInsets.zero,
-                    onPressed: onPressed
-                );
-            }
-
             return new ScrollConfiguration(
                 behavior: new _AlwaysCupertinoScrollBehavior(),
                 child: new CupertinoTheme(
@@ -192,11 +164,17 @@ namespace Unity.UIWidgets.cupertino {
                         localeListResolutionCallback: this.widget.localeListResolutionCallback,
                         supportedLocales: this.widget.supportedLocales,
                         showPerformanceOverlay: this.widget.showPerformanceOverlay,
-                        checkerboardRasterCacheImages: this.widget.checkerboardRasterCacheImages,
-                        checkerboardOffscreenLayers: this.widget.checkerboardOffscreenLayers,
-                        showSemanticsDebugger: this.widget.showSemanticsDebugger,
-                        debugShowCheckedModeBanner: this.widget.debugShowCheckedModeBanner,
-                        inspectorSelectButtonBuilder: _InspectorSelectButtonBuilder
+                        inspectorSelectButtonBuilder: (BuildContext _context, VoidCallback onPressed) => {
+                            return CupertinoButton.filled(
+                                child: new Icon(
+                                    CupertinoIcons.search,
+                                    size: 28.0f,
+                                    color: CupertinoColors.white
+                                ),
+                                padding: EdgeInsets.zero,
+                                onPressed: onPressed
+                            );
+                        }
                     )
                 )
             );

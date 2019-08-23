@@ -42,10 +42,6 @@ namespace Unity.UIWidgets.widgets {
         public readonly string title;
         public readonly GenerateAppTitle onGenerateTitle;
         public readonly Color color;
-        public readonly bool checkerboardRasterCacheImages;
-        public readonly bool checkerboardOffscreenLayers;
-        public readonly bool showSemanticsDebugger;
-        public readonly bool debugShowCheckedModeBanner;
         public readonly InspectorSelectButtonBuilder inspectorSelectButtonBuilder;
 
         public WidgetsApp(
@@ -69,10 +65,6 @@ namespace Unity.UIWidgets.widgets {
             GenerateAppTitle onGenerateTitle = null,
             string title = "",
             Color color = null,
-            bool checkerboardRasterCacheImages = false,
-            bool checkerboardOffscreenLayers = false,
-            bool showSemanticsDebugger = false,
-            bool debugShowCheckedModeBanner = true,
             InspectorSelectButtonBuilder inspectorSelectButtonBuilder = null
         ) : base(key) {
             routes = routes ?? new Dictionary<string, WidgetBuilder>();
@@ -98,10 +90,6 @@ namespace Unity.UIWidgets.widgets {
             this.onGenerateTitle = onGenerateTitle;
             this.title = title;
             this.color = color;
-            this.checkerboardRasterCacheImages = checkerboardRasterCacheImages;
-            this.checkerboardOffscreenLayers = checkerboardOffscreenLayers;
-            this.showSemanticsDebugger = showSemanticsDebugger;
-            this.debugShowCheckedModeBanner = debugShowCheckedModeBanner;
             this.inspectorSelectButtonBuilder = inspectorSelectButtonBuilder;
 
             D.assert(
