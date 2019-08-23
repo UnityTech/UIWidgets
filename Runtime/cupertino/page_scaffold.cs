@@ -67,12 +67,12 @@ namespace Unity.UIWidgets.cupertino {
                     ? existingMediaQuery.viewInsets.copyWith(bottom: 0.0f)
                     : existingMediaQuery.viewInsets;
 
-                bool fullObstruction =
+                bool? fullObstruction =
                     this.widget.navigationBar.fullObstruction == false
                         ? CupertinoTheme.of(context).barBackgroundColor.alpha == 0xFF
                         : this.widget.navigationBar.fullObstruction;
 
-                if (fullObstruction) {
+                if (fullObstruction == true) {
                     paddedContent = new MediaQuery(
                         data: existingMediaQuery
                             .removePadding(removeTop: true)
@@ -138,6 +138,8 @@ namespace Unity.UIWidgets.cupertino {
     }
 
     public abstract class ObstructingPreferredSizeWidget : PreferredSizeWidget {
-        public bool fullObstruction { get; }
+
+        protected ObstructingPreferredSizeWidget(Key key = null) : base(key: key) {}
+        public virtual bool? fullObstruction { get; }
     }
 }

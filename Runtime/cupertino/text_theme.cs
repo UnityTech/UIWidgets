@@ -134,7 +134,7 @@ namespace Unity.UIWidgets.cupertino {
 
         readonly TextStyle _navTitleTextStyle;
 
-        TextStyle navTitleTextStyle {
+        public TextStyle navTitleTextStyle {
             get {
                 return this._navTitleTextStyle ??
                        (this._isLight

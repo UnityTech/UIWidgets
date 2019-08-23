@@ -5,6 +5,7 @@ using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
 using UnityEngine;
 using Rect = Unity.UIWidgets.ui.Rect;
+using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace Unity.UIWidgets.widgets {
     public abstract class AnimatedWidget : StatefulWidget {
@@ -356,6 +357,48 @@ namespace Unity.UIWidgets.widgets {
                 alignment: this.alignment.value,
                 widthFactor: this.widthFactor,
                 heightFactor: this.heightFactor,
+                child: this.child
+            );
+        }
+    }
+
+    public class DefaultTextStyleTransition : AnimatedWidget {
+        public DefaultTextStyleTransition(
+            Key key = null,
+            Animation<TextStyle> style = null,
+            Widget child = null,
+            TextAlign? textAlign = null,
+            bool softWrap = true,
+            TextOverflow overflow = TextOverflow.clip,
+            int? maxLines = null
+        ) : base(key: key, listenable: style) {
+            D.assert(style != null);
+            D.assert(child != null);
+            this.textAlign = textAlign;
+            this.softWrap = softWrap;
+            this.overflow = overflow;
+            this.maxLines = maxLines;
+            this.child = child;
+        }
+
+        Animation<TextStyle> style {
+            get { return (Animation<TextStyle>) this.listenable; }
+        }
+
+        public readonly TextAlign? textAlign;
+
+        public readonly bool softWrap;
+        public readonly TextOverflow overflow;
+        public readonly int? maxLines;
+        public readonly Widget child;
+
+        protected internal override Widget build(BuildContext context) {
+            return new DefaultTextStyle(
+                style: this.style.value,
+                textAlign: this.textAlign,
+                softWrap: this.softWrap,
+                overflow: this.overflow,
+                maxLines: this.maxLines,
                 child: this.child
             );
         }
