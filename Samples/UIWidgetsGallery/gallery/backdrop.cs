@@ -95,7 +95,7 @@ namespace UIWidgetsGallery.gallery {
         public readonly Widget child0;
         public readonly Widget child1;
 
-        protected override Widget build(BuildContext context) {
+        protected internal override Widget build(BuildContext context) {
             Animation<float> progress = this.listenable as Animation<float>;
 
             float opacity1 = new CurvedAnimation(

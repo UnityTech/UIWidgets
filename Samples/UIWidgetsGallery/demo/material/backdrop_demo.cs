@@ -222,7 +222,7 @@ namespace UIWidgetsGallery.gallery {
         ) : base(key: key, listenable: listenable) {
         }
 
-        protected override Widget build(BuildContext context) {
+        protected internal override Widget build(BuildContext context) {
             Animation<float> animation = (Animation<float>) this.listenable;
             return new DefaultTextStyle(
                 style: Theme.of(context).primaryTextTheme.title,
