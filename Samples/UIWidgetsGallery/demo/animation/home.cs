@@ -340,7 +340,7 @@ namespace UIWidgetsGallery.gallery {
             );
         }
 
-        protected internal override Widget build(BuildContext context) {
+        protected override Widget build(BuildContext context) {
             return new LayoutBuilder(builder: this._build);
         }
     }
