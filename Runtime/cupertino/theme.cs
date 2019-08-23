@@ -173,12 +173,12 @@ namespace Unity.UIWidgets.cupertino {
         }
 
         public CupertinoThemeData copyWith(
-            Brightness? brightness,
-            Color primaryColor,
-            Color primaryContrastingColor,
-            CupertinoTextThemeData textTheme,
-            Color barBackgroundColor,
-            Color scaffoldBackgroundColor
+            Brightness? brightness = null,
+            Color primaryColor = null,
+            Color primaryContrastingColor = null,
+            CupertinoTextThemeData textTheme = null,
+            Color barBackgroundColor = null,
+            Color scaffoldBackgroundColor = null
         ) {
             return new CupertinoThemeData(
                 brightness: brightness ?? this._brightness,
