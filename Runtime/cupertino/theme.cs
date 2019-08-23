@@ -9,7 +9,7 @@ namespace Unity.UIWidgets.cupertino {
         public static readonly Color _kDefaultBarDarkBackgroundColor = new Color(0xB7212121);
     }
 
-    class CupertinoTheme : StatelessWidget {
+    public class CupertinoTheme : StatelessWidget {
         public CupertinoTheme(
             CupertinoThemeData data,
             Widget child,
