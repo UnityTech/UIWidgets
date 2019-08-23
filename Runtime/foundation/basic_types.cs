@@ -8,6 +8,10 @@ using Object = UnityEngine.Object;
 namespace Unity.UIWidgets.foundation {
     public delegate void ValueChanged<T>(T value);
 
+    public delegate void ValueSetter<T>(T value);
+
+    public delegate T ValueGetter<T>();
+
     public delegate IEnumerable<T> EnumerableFilter<T>(IEnumerable<T> input);
 
     public static class ObjectUtils {
