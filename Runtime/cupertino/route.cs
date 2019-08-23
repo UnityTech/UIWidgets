@@ -328,7 +328,7 @@ namespace Unity.UIWidgets.cupertino {
                 return false;
             }
 
-            if (route._hasScopedWillPopCallback) {
+            if (route.hasScopedWillPopCallback) {
                 return false;
             }
 
