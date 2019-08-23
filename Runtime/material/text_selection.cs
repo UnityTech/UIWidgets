@@ -15,7 +15,7 @@ using Transform = Unity.UIWidgets.widgets.Transform;
 
 namespace Unity.UIWidgets.material {
     public static class MaterialUtils {
-        public readonly static TextSelectionControls materialTextSelectionControls =
+        public static readonly TextSelectionControls materialTextSelectionControls =
             new _MaterialTextSelectionControls();
         
         internal const float _kHandleSize = 22.0f;
