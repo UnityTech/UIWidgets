@@ -69,7 +69,7 @@ namespace Unity.UIWidgets.cupertino {
             get { return Size.fromHeight(BottomAppBarUtils._kTabBarHeight); }
         }
 
-        bool opaque(BuildContext context) {
+        public bool opaque(BuildContext context) {
             Color backgroundColor =
                 this.backgroundColor ?? CupertinoTheme.of(context).barBackgroundColor;
             return backgroundColor.alpha == 0xFF;
@@ -175,7 +175,7 @@ namespace Unity.UIWidgets.cupertino {
             );
         }
 
-        CupertinoTabBar copyWith(
+        public CupertinoTabBar copyWith(
             Key key = null,
             List<BottomNavigationBarItem> items = null,
             Color backgroundColor = null,
