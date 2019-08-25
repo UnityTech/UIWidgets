@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Unity.UIWidgets.cupertino;
-using Unity.UIWidgets.material;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.widgets;
@@ -8,7 +7,10 @@ using Unity.UIWidgets.widgets;
 namespace UIWidgetsGallery.gallery {
     class CupertinoButtonsDemo : StatefulWidget {
         public static string routeName = "/cupertino/buttons";
-        public override State createState() => new _CupertinoButtonDemoState();
+
+        public override State createState() {
+            return new _CupertinoButtonDemoState();
+        }
     }
 
     class _CupertinoButtonDemoState : State<CupertinoButtonsDemo> {

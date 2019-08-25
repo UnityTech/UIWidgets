@@ -532,29 +532,29 @@ namespace UIWidgetsGallery.gallery {
                 //     documentationUrl: "https://docs.flutter.io/flutter/cupertino/CupertinoSegmentedControl-class.html",
                 //     buildRoute: (BuildContext context) => CupertinoSegmentedControlDemo()
                 // ),
-                // new GalleryDemo(
-                //     title: "Sliders",
-                //     icon: GalleryIcons.sliders,
-                //     category: GalleryDemoCategory._kCupertinoComponents,
-                //     routeName: CupertinoSliderDemo.routeName,
-                //     documentationUrl: "https://docs.flutter.io/flutter/cupertino/CupertinoSlider-class.html",
-                //     buildRoute: (BuildContext context) => CupertinoSliderDemo()
-                // ),
-                // new GalleryDemo(
-                //     title: "Switches",
-                //     icon: GalleryIcons.cupertino_switch,
-                //     category: GalleryDemoCategory._kCupertinoComponents,
-                //     routeName: CupertinoSwitchDemo.routeName,
-                //     documentationUrl: "https://docs.flutter.io/flutter/cupertino/CupertinoSwitch-class.html",
-                //     buildRoute: (BuildContext context) => CupertinoSwitchDemo()
-                // ),
-                // new GalleryDemo(
-                //     title: "Text Fields",
-                //     icon: GalleryIcons.text_fields_alt,
-                //     category: GalleryDemoCategory._kCupertinoComponents,
-                //     routeName: CupertinoTextFieldDemo.routeName,
-                //     buildRoute: (BuildContext context) => CupertinoTextFieldDemo()
-                // ),
+                new GalleryDemo(
+                    title: "Sliders",
+                    icon: GalleryIcons.sliders,
+                    category: _kCupertinoComponents,
+                    routeName: CupertinoSliderDemo.routeName,
+                    documentationUrl: "https://docs.flutter.io/flutter/cupertino/CupertinoSlider-class.html",
+                    buildRoute: (BuildContext context) => new CupertinoSliderDemo()
+                ),
+                new GalleryDemo(
+                    title: "Switches",
+                    icon: GalleryIcons.cupertino_switch,
+                    category: _kCupertinoComponents,
+                    routeName: CupertinoSwitchDemo.routeName,
+                    documentationUrl: "https://docs.flutter.io/flutter/cupertino/CupertinoSwitch-class.html",
+                    buildRoute: (BuildContext context) => new CupertinoSwitchDemo()
+                ),
+                new GalleryDemo(
+                    title: "Text Fields",
+                    icon: GalleryIcons.text_fields_alt,
+                    category: _kCupertinoComponents,
+                    routeName: CupertinoTextFieldDemo.routeName,
+                    buildRoute: (BuildContext context) => new CupertinoTextFieldDemo()
+                ),
                 //
                 // // Media
                 // new GalleryDemo(
