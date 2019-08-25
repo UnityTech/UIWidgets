@@ -103,7 +103,7 @@ namespace Unity.UIWidgets.cupertino {
 
 
         public override RenderObject createRenderObject(BuildContext context) {
-            return (RenderObject) new _RenderCupertinoSwitch(
+            return new _RenderCupertinoSwitch(
                 value: this.value,
                 activeColor: this.activeColor,
                 onChanged: this.onChanged,
@@ -131,7 +131,7 @@ namespace Unity.UIWidgets.cupertino {
             Color activeColor,
             TextDirection textDirection,
             TickerProvider vsync,
-            ValueChanged<bool> onChanged,
+            ValueChanged<bool> onChanged = null,
             DragStartBehavior dragStartBehavior = DragStartBehavior.start
         ) : base(additionalConstraints: BoxConstraints.tightFor(
             width: CupertinoSwitchUtils._kSwitchWidth,
@@ -197,6 +197,7 @@ namespace Unity.UIWidgets.cupertino {
                 }
 
                 this._value = value;
+                // this.markNeedsSemanticsUpdate();
                 this._position.curve = Curves.ease;
                 this._position.reverseCurve = Curves.ease.flipped;
                 if (value) {
@@ -209,7 +210,6 @@ namespace Unity.UIWidgets.cupertino {
         }
 
         bool _value;
-
 
         public TickerProvider vsync {
             get { return this._vsync; }
@@ -372,14 +372,17 @@ namespace Unity.UIWidgets.cupertino {
                 this._position.curve = null;
                 this._position.reverseCurve = null;
                 float delta = details.primaryDelta / CupertinoSwitchUtils._kTrackInnerLength ?? 0f;
-                switch (this.textDirection) {
-                    case TextDirection.rtl:
-                        this._positionController.setValue(this._positionController.value - delta);
-                        break;
-                    case TextDirection.ltr:
-                        this._positionController.setValue(this._positionController.value + delta);
-                        break;
-                }
+                
+                this._positionController.setValue(this._positionController.value + delta);
+                
+                // switch (this.textDirection) {
+                //     case TextDirection.rtl:
+                //         this._positionController.setValue(this._positionController.value - delta);
+                //         break;
+                //     case TextDirection.ltr:
+                //         this._positionController.setValue(this._positionController.value + delta);
+                //         break;
+                // }
             }
         }
 

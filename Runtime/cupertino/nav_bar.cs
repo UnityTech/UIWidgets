@@ -11,7 +11,6 @@ using UnityEngine;
 using Color = Unity.UIWidgets.ui.Color;
 using Rect = Unity.UIWidgets.ui.Rect;
 using TextStyle = Unity.UIWidgets.painting.TextStyle;
-using Transform = Unity.UIWidgets.widgets.Transform;
 
 namespace Unity.UIWidgets.cupertino {
     class NavBarUtils {
@@ -40,9 +39,9 @@ namespace Unity.UIWidgets.cupertino {
         public static readonly _HeroTag _defaultHeroTag = new _HeroTag(null);
 
         public static Widget _wrapWithBackground(
-            Border border,
-            Color backgroundColor,
-            Widget child,
+            Border border = null,
+            Color backgroundColor = null,
+            Widget child = null,
             bool updateSystemUiOverlay = true
         ) {
             Widget result = child;
@@ -240,16 +239,6 @@ namespace Unity.UIWidgets.cupertino {
             bool transitionBetweenRoutes = true,
             object heroTag = null
         ) : base(key: key) {
-            D.assert(
-                heroTag != null,
-                () => "heroTag cannot be null. Use transitionBetweenRoutes = false to " +
-                      "disable Hero transition on this navigation bar."
-            );
-            D.assert(
-                !transitionBetweenRoutes || ReferenceEquals(heroTag, NavBarUtils._defaultHeroTag),
-                () => "Cannot specify a heroTag override if this navigation bar does not " +
-                      "transition due to transitionBetweenRoutes = false."
-            );
             this.leading = leading;
             this.automaticallyImplyLeading = automaticallyImplyLeading;
             this.automaticallyImplyMiddle = automaticallyImplyMiddle;
@@ -262,6 +251,18 @@ namespace Unity.UIWidgets.cupertino {
             this.actionsForegroundColor = actionsForegroundColor;
             this.transitionBetweenRoutes = transitionBetweenRoutes;
             this.heroTag = heroTag ?? NavBarUtils._defaultHeroTag;
+
+            D.assert(
+                this.heroTag != null,
+                () => "heroTag cannot be null. Use transitionBetweenRoutes = false to " +
+                      "disable Hero transition on this navigation bar."
+            );
+
+            D.assert(
+                !transitionBetweenRoutes || ReferenceEquals(this.heroTag, NavBarUtils._defaultHeroTag),
+                () => "Cannot specify a heroTag override if this navigation bar does not " +
+                      "transition due to transitionBetweenRoutes = false."
+            );
         }
 
         public readonly Widget leading;
@@ -663,6 +664,9 @@ namespace Unity.UIWidgets.cupertino {
             EdgeInsets padding = null,
             bool? middleVisible = null
         ) : base(key: key) {
+            this.components = components;
+            this.padding = padding;
+            this.middleVisible = middleVisible ?? true;
         }
 
         public readonly _NavigationBarStaticComponents components;
@@ -1084,8 +1088,7 @@ namespace Unity.UIWidgets.cupertino {
 
 
     class _BackChevron : StatelessWidget {
-        public _BackChevron(Key key = null) : base(key: key) {
-        }
+        public _BackChevron(Key key = null) : base(key: key) { }
 
         public override Widget build(BuildContext context) {
             TextStyle textStyle = DefaultTextStyle.of(context).style;
@@ -1172,6 +1175,7 @@ namespace Unity.UIWidgets.cupertino {
         ) : base(key: componentsKeys.navBarBoxKey) {
             D.assert(largeExpanded != null);
             D.assert(!largeExpanded.Value || this.largeTitleTextStyle != null);
+
             this.componentsKeys = componentsKeys;
             this.backgroundColor = backgroundColor;
             this.backButtonTextStyle = backButtonTextStyle;

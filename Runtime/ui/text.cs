@@ -425,22 +425,17 @@ namespace Unity.UIWidgets.ui {
 
         public readonly int index;
 
-        public static readonly FontWeight w100 = new FontWeight(0);
-        public static readonly FontWeight w200 = new FontWeight(1);
-        public static readonly FontWeight w300 = new FontWeight(2);
-        public static readonly FontWeight w400 = new FontWeight(3);
-        public static readonly FontWeight w500 = new FontWeight(4);
-        public static readonly FontWeight w600 = new FontWeight(5);
-
-        public static readonly FontWeight w700 = new FontWeight(6);
-
-        public static readonly FontWeight w800 = new FontWeight(7);
-
-        public static readonly FontWeight w900 = new FontWeight(8);
-
-
+        public static readonly FontWeight w100 = new FontWeight(0); // Ultralight
+        public static readonly FontWeight w200 = new FontWeight(1); // Thin
+        public static readonly FontWeight w300 = new FontWeight(2); // Light
+        public static readonly FontWeight w400 = new FontWeight(3); // Regular
+        public static readonly FontWeight w500 = new FontWeight(4); // Medium
+        public static readonly FontWeight w600 = new FontWeight(5); // Semibold
+        public static readonly FontWeight w700 = new FontWeight(6); // Bold
+        public static readonly FontWeight w800 = new FontWeight(7); // Heavy
+        public static readonly FontWeight w900 = new FontWeight(8); // Black
+        
         public static readonly FontWeight normal = w400;
-
 
         public static readonly FontWeight bold = w700;
 
