@@ -24,12 +24,16 @@ namespace UIWidgets.Tests {
                     result, "inner");
             }
 
+            //WARNING: nested MouseTracker is not supported by the current implementation that ported from flutter
+            //refer to this issue https://github.com/flutter/flutter/issues/28407 and wait Google guys fixing it
+            /*
             if (nest) {
                 result = new Container(child: result, padding: EdgeInsets.all(40),
                     color: Color.fromARGB(255, 255, 0, 0));
                 result = new HoverTrackWidget(null,
                     result, "outer");
             }
+            */
 
             return result;
         }
