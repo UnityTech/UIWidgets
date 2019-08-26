@@ -264,29 +264,12 @@ namespace UIWidgets.Tests {
             canvas.scale(3);
             TextBlobBuilder builder = new TextBlobBuilder();
             string text = "This is a text blob";
+            builder.setBounds(new Rect(-10, -20, 200, 50));
+            builder.setPositionXs(new float[] {
+                10, 20, 30, 40, 50, 60, 70, 80, 90, 100,
+                110, 120, 130, 140, 150, 160, 170, 180, 190
+            });
             builder.allocRunPos(new TextStyle(), text, 0, text.Length);
-            builder.setBounds(Unity.UIWidgets.ui.Rect.fromLTWH(-10, -20, 200, 50));
-            builder.positions = new Vector2d[] {
-                new Vector2d(10, 0),
-                new Vector2d(20, 0),
-                new Vector2d(30, 0),
-                new Vector2d(40, 0),
-                new Vector2d(50, 0),
-                new Vector2d(60, 0),
-                new Vector2d(70, 0),
-                new Vector2d(80, 0),
-                new Vector2d(90, 0),
-                new Vector2d(100, 0),
-                new Vector2d(110, 0),
-                new Vector2d(120, 0),
-                new Vector2d(130, 0),
-                new Vector2d(140, 0),
-                new Vector2d(150, 0),
-                new Vector2d(160, 0),
-                new Vector2d(170, 0),
-                new Vector2d(180, 0),
-                new Vector2d(190, 0),
-            };
 
             var textBlob = builder.make();
             canvas.drawTextBlob(textBlob, new Offset(100, 100), new Paint {
@@ -437,6 +420,7 @@ namespace UIWidgets.Tests {
                 this._meshPool);
             canvas.drawParagraph(paragraph, new Offset(10f, 100f));
             canvas.flush();
+            Unity.UIWidgets.ui.Paragraph.release(ref paragraph);
         }
         
         void drawImageRect() {

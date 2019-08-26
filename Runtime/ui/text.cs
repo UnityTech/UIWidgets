@@ -73,18 +73,30 @@ namespace Unity.UIWidgets.ui {
     }
 
     class TextStyle : IEquatable<TextStyle> {
-        public readonly Color color = Color.fromARGB(255, 0, 0, 0);
-        public readonly float fontSize = 14.0f;
-        public readonly FontWeight fontWeight = FontWeight.w400;
-        public readonly FontStyle fontStyle = FontStyle.normal;
-        public readonly float letterSpacing = 0.0f;
-        public readonly float wordSpacing = 0.0f;
-        public readonly TextBaseline textBaseline = TextBaseline.alphabetic;
-        public readonly float height = 1.0f;
-        public readonly TextDecoration decoration = TextDecoration.none;
+        public static readonly Color kDefaultColor = Color.fromARGB(255, 0, 0, 0);
+        public const float kDefaultFontSize = 14.0f;
+        public static readonly FontWeight kDefaultFontWeight = FontWeight.w400;
+        public const FontStyle kDefaultfontStyle = FontStyle.normal;
+        public const float kDefaultLetterSpacing = 0.0f;
+        public const float kDefaultWordSpacing = 0.0f;
+        public const TextBaseline kDefaultTextBaseline = TextBaseline.alphabetic;
+        public const float kDefaultHeight = 1.0f;
+        public static readonly TextDecoration kDefaultDecoration = TextDecoration.none;
+        public const TextDecorationStyle kDefaultDecorationStyle = TextDecorationStyle.solid;
+        public const string kDefaultFontFamily = "Helvetica";
+
+        public readonly Color color = kDefaultColor;
+        public readonly float fontSize = kDefaultFontSize;
+        public readonly FontWeight fontWeight = kDefaultFontWeight;
+        public readonly FontStyle fontStyle = kDefaultfontStyle;
+        public readonly float letterSpacing = kDefaultLetterSpacing;
+        public readonly float wordSpacing = kDefaultWordSpacing;
+        public readonly TextBaseline textBaseline = kDefaultTextBaseline;
+        public readonly float height = kDefaultHeight;
+        public readonly TextDecoration decoration = kDefaultDecoration;
         public readonly Color decorationColor;
-        public readonly TextDecorationStyle decorationStyle = TextDecorationStyle.solid;
-        public readonly string fontFamily = "Helvetica";
+        public readonly TextDecorationStyle decorationStyle = kDefaultDecorationStyle;
+        public readonly string fontFamily = kDefaultFontFamily;
         public readonly Paint background;
 
         internal UnityEngine.Color UnityColor {
@@ -566,7 +578,7 @@ namespace Unity.UIWidgets.ui {
         }
     }
 
-    public class TextBox : IEquatable<TextBox> {
+    public struct TextBox : IEquatable<TextBox> {
         public readonly float left;
 
         public readonly float top;
@@ -602,14 +614,6 @@ namespace Unity.UIWidgets.ui {
         }
 
         public bool Equals(TextBox other) {
-            if (ReferenceEquals(null, other)) {
-                return false;
-            }
-
-            if (ReferenceEquals(this, other)) {
-                return true;
-            }
-
             return this.left.Equals(other.left) && this.top.Equals(other.top) && this.right.Equals(other.right) &&
                    this.bottom.Equals(other.bottom) && this.direction == other.direction;
         }
@@ -617,10 +621,6 @@ namespace Unity.UIWidgets.ui {
         public override bool Equals(object obj) {
             if (ReferenceEquals(null, obj)) {
                 return false;
-            }
-
-            if (ReferenceEquals(this, obj)) {
-                return true;
             }
 
             if (obj.GetType() != this.GetType()) {

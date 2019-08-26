@@ -2,7 +2,7 @@ using Unity.UIWidgets.foundation;
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
-    public class uiPath : PoolObject {
+    public partial class uiPath : PoolObject {
         const float _KAPPA90 = 0.5522847493f;
 
         uiList<float> _commands;
@@ -15,6 +15,52 @@ namespace Unity.UIWidgets.ui {
 
         public uint pathKey = 0;
         public bool needCache = false;
+        
+        bool _isNaiveRRect = false;
+        public bool isNaiveRRect => this._isNaiveRRect;
+        
+        uiPathShapeHint _shapeHint = uiPathShapeHint.Other;
+        public uiPathShapeHint shapeHint => this._shapeHint;
+        
+        float _rRectCorner;
+        public float rRectCorner => this._rRectCorner;
+        
+        void _updateRRectFlag(bool isNaiveRRect, uiPathShapeHint shapeHint = uiPathShapeHint.Other, float corner = 0) {
+            if (this._commands.Count > 0 && !this._isNaiveRRect) {
+                return;
+            }
+            this._isNaiveRRect = isNaiveRRect && this._hasOnlyMoveTos();
+            if (this._isNaiveRRect) {
+                this._shapeHint = shapeHint;
+                this._rRectCorner = corner;
+            }
+        }
+        
+        bool _hasOnlyMoveTos() {
+            var i = 0;
+            while (i < this._commands.Count) {
+                var cmd = (PathCommand) this._commands[i];
+                switch (cmd) {
+                    case PathCommand.moveTo: 
+                        i += 3;
+                        break;
+                    case PathCommand.lineTo:
+                        return false;
+                    case PathCommand.bezierTo:
+                        return false;
+                    case PathCommand.close:
+                        i++;
+                        break;
+                    case PathCommand.winding:
+                        i += 2;
+                        break;
+                    default:
+                        return false;
+                }
+            }
+
+            return true;
+        }
 
         public static uiPath create(int capacity = 128) {
             uiPath newPath = ObjectPool<uiPath>.alloc();
@@ -33,6 +79,7 @@ namespace Unity.UIWidgets.ui {
 
             this.needCache = false;
             this.pathKey = 0;
+            this._isNaiveRRect = false;
         }
 
         void _reset() {
@@ -45,6 +92,7 @@ namespace Unity.UIWidgets.ui {
             this._maxY = float.MinValue;
             ObjectPool<uiPathCache>.release(this._cache);
             this._cache = null;
+            this._isNaiveRRect = false;
         }
 
         internal uiPathCache flatten(float scale) {
@@ -113,6 +161,14 @@ namespace Unity.UIWidgets.ui {
                 this._maxY = y;
             }
         }
+        
+        public uiRect getBounds() {
+            if (this._minX >= this._maxX || this._minY >= this._maxY) {
+                return uiRectHelper.zero;
+            }
+
+            return uiRectHelper.fromLTRB(this._minX, this._minY, this._maxX, this._maxY);
+        }
 
         void _appendMoveTo(float x, float y) {
             this._commands.Add((float) uiPathCommand.moveTo);
@@ -178,6 +234,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void addRect(uiRect rect) {
+            this._updateRRectFlag(true, uiPathShapeHint.Rect);
             this._appendMoveTo(rect.left, rect.top);
             this._appendLineTo(rect.left, rect.bottom);
             this._appendLineTo(rect.right, rect.bottom);
@@ -186,6 +243,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void addRect(Rect rect) {
+            this._updateRRectFlag(true, uiPathShapeHint.Rect);
             this._appendMoveTo(rect.left, rect.top);
             this._appendLineTo(rect.left, rect.bottom);
             this._appendLineTo(rect.right, rect.bottom);
@@ -194,6 +252,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void addRRect(RRect rrect) {
+            this._updateRRectFlag(rrect.isNaiveRRect(), uiPathShapeHint.NaiveRRect, rrect.blRadiusX);
             float w = rrect.width;
             float h = rrect.height;
             float halfw = Mathf.Abs(w) * 0.5f;
@@ -233,6 +292,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void lineTo(float x, float y) {
+            this._updateRRectFlag(false);
             this._appendLineTo(x, y);
         }
 
@@ -241,6 +301,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void addEllipse(float cx, float cy, float rx, float ry) {
+            this._updateRRectFlag(rx == ry, uiPathShapeHint.Circle, rx);
             this._appendMoveTo(cx - rx, cy);
             this._appendBezierTo(cx - rx, cy + ry * _KAPPA90,
                 cx - rx * _KAPPA90, cy + ry, cx, cy + ry);
@@ -258,6 +319,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void arcTo(Rect rect, float startAngle, float sweepAngle, bool forceMoveTo = true) {
+            this._updateRRectFlag(false);
             var mat = Matrix3.makeScale(rect.width / 2, rect.height / 2);
             var center = rect.center;
             mat.postTranslate(center.dx, center.dy);
@@ -369,7 +431,9 @@ namespace Unity.UIWidgets.ui {
             if (exists) {
                 return uipath;
             }
-
+            
+            uipath._updateRRectFlag(path.isNaiveRRect, (uiPathShapeHint)path.shapeHint, path.rRectCorner);
+            
             var i = 0;
             var _commands = path.commands;
             while (i < _commands.Count) {

@@ -385,7 +385,8 @@ namespace UIWidgetsSample {
                         child: new Center(
                             child: new Column(
                                 children: new List<Widget> {
-                                    new FlatButton(
+                                    new Padding(padding: EdgeInsets.only(top: 30f)),
+                                    new MaterialButton(
                                         shape: new RoundedRectangleBorder(borderRadius: BorderRadius.all(20.0f)),
                                         color: new Color(0xFF00FF00),
                                         splashColor: new Color(0xFFFF0011),
@@ -393,7 +394,8 @@ namespace UIWidgetsSample {
                                         child: new Text("Click Me"),
                                         onPressed: () => { Debug.Log("pressed flat button"); }
                                     ),
-                                    new RaisedButton(
+                                    new Padding(padding: EdgeInsets.only(top: 30f)),
+                                    new MaterialButton(
                                         shape: new RoundedRectangleBorder(borderRadius: BorderRadius.all(20.0f)),
                                         color: new Color(0xFFFF00FF),
                                         splashColor: new Color(0xFFFF0011),

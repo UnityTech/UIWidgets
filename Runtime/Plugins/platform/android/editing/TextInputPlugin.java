@@ -43,7 +43,7 @@ public class TextInputPlugin {
         ViewGroup contentView = (ViewGroup)UnityPlayer.currentActivity.findViewById(android.R.id.content);
         mView = new TextInputView(UnityPlayer.currentActivity);
         mView.requestFocus();
-        contentView.addView(mView, 0, 0);
+        contentView.addView(mView, 1, 1);
         mImm = (InputMethodManager) mView.getContext().getSystemService(
                 Context.INPUT_METHOD_SERVICE);
     }

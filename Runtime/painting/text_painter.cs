@@ -46,7 +46,6 @@ namespace Unity.UIWidgets.painting {
             this._strutStyle = strutStyle;
         }
 
-
         public float textScaleFactor {
             get { return this._textScaleFactor; }
             set {
@@ -55,9 +54,9 @@ namespace Unity.UIWidgets.painting {
                 }
 
                 this._textScaleFactor = value;
-                this._paragraph = null;
                 this._layoutTemplate = null;
                 this._needsLayout = true;
+                Paragraph.release(ref this._paragraph);
             }
         }
 
@@ -69,7 +68,7 @@ namespace Unity.UIWidgets.painting {
                 }
 
                 this._ellipsis = value;
-                this._paragraph = null;
+                Paragraph.release(ref this._paragraph);
                 this._needsLayout = true;
             }
         }
@@ -86,7 +85,7 @@ namespace Unity.UIWidgets.painting {
                 }
 
                 this._text = value;
-                this._paragraph = null;
+                Paragraph.release(ref this._paragraph);
                 this._needsLayout = true;
             }
         }
@@ -106,7 +105,7 @@ namespace Unity.UIWidgets.painting {
                 }
 
                 this._textDirection = value;
-                this._paragraph = null;
+                Paragraph.release(ref this._paragraph);
                 this._layoutTemplate = null;
                 this._needsLayout = true;
             }
@@ -120,7 +119,7 @@ namespace Unity.UIWidgets.painting {
                 }
 
                 this._textAlign = value;
-                this._paragraph = null;
+                Paragraph.release(ref this._paragraph);
                 this._needsLayout = true;
             }
         }
@@ -140,7 +139,7 @@ namespace Unity.UIWidgets.painting {
                 }
 
                 this._maxLines = value;
-                this._paragraph = null;
+                Paragraph.release(ref this._paragraph);
                 this._needsLayout = true;
             }
         }

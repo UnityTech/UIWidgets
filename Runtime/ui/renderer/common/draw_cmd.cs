@@ -409,7 +409,7 @@ namespace Unity.UIWidgets.ui {
             this.offset = null;
         }
 
-        public TextBlob textBlob;
+        public TextBlob? textBlob;
         public uiOffset? offset;
         public uiPaint paint;
     }
