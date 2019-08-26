@@ -663,7 +663,6 @@ namespace Unity.UIWidgets.ui {
             var lineBoxes = new SplayTree<int, List<TextBox>>();
             for (int runIndex = 0; runIndex < this._codeUnitRunsCount; runIndex++) {
                 var run = this._codeUnitRuns[runIndex];
-                Debug.Log($"start: {start} end: {end} codeUnits.start {run.codeUnits.start} codeUnits.end {run.codeUnits.end}");
                 if (run.codeUnits.start >= end) {
                     break;
                 }
