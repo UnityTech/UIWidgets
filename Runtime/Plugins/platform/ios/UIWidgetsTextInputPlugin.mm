@@ -211,6 +211,11 @@ static UIReturnKeyType ToUIReturnKeyType(NSString* inputType) {
         [self.inputDelegate textWillChange:self];
         [self.text setString:newText];
     }
+
+    NSInteger composingBase = [state[@"composingBase"] intValue];
+    NSInteger composingExtent = [state[@"composingExtent"] intValue];
+    NSRange composingRange = [self clampSelection:NSMakeRange(MIN(composingBase, composingExtent), ABS(composingBase - composingExtent)) forText:self.text];
+    self.markedTextRange = composingRange.length > 0 ? [UIWidgetsTextRange rangeWithNSRange:composingRange] : nil;
     
     NSInteger selectionBase = [state[@"selectionBase"] intValue];
     NSInteger selectionExtent = [state[@"selectionExtent"] intValue];
@@ -228,14 +233,6 @@ static UIReturnKeyType ToUIReturnKeyType(NSString* inputType) {
             _selectionAffinity = _kTextAffinityUpstream;
         [self.inputDelegate selectionDidChange:self];
     }
-    
-    NSInteger composingBase = [state[@"composingBase"] intValue];
-    NSInteger composingExtent = [state[@"composingExtent"] intValue];
-    NSRange composingRange = [self clampSelection:NSMakeRange(MIN(composingBase, composingExtent),
-                                                              ABS(composingBase - composingExtent))
-                                          forText:self.text];
-    self.markedTextRange =
-    composingRange.length > 0 ? [UIWidgetsTextRange rangeWithNSRange:composingRange] : nil;
     
     if (textChanged) {
         [self.inputDelegate textDidChange:self];
