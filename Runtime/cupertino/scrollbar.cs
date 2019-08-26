@@ -6,13 +6,13 @@ using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
 
 namespace Unity.UIWidgets.cupertino {
-    public class CupertinoScrollbarUtils {
+    class CupertinoScrollbarUtils {
         public static Color _kScrollbarColor = new Color(0x99777777);
-        public static float _kScrollbarThickness = 2.5f;
-        public static float _kScrollbarMainAxisMargin = 4.0f;
-        public static float _kScrollbarCrossAxisMargin = 2.5f;
-        public static float _kScrollbarMinLength = 36.0f;
-        public static float _kScrollbarMinOverscrollLength = 8.0f;
+        public const float _kScrollbarThickness = 2.5f;
+        public const float _kScrollbarMainAxisMargin = 4.0f;
+        public const float _kScrollbarCrossAxisMargin = 2.5f;
+        public const float _kScrollbarMinLength = 36.0f;
+        public const float _kScrollbarMinOverscrollLength = 8.0f;
         public static Radius _kScrollbarRadius = Radius.circular(1.25f);
         public static TimeSpan _kScrollbarTimeToFade = new TimeSpan(0, 0, 0, 0, 50);
         public static TimeSpan _kScrollbarFadeDuration = new TimeSpan(0, 0, 0, 0, 250);
@@ -28,7 +28,9 @@ namespace Unity.UIWidgets.cupertino {
 
         public readonly Widget child;
 
-        public override State createState() => new _CupertinoScrollbarState();
+        public override State createState() {
+            return new _CupertinoScrollbarState();
+        }
     }
 
     class _CupertinoScrollbarState : TickerProviderStateMixin<CupertinoScrollbar> {

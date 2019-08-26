@@ -13,15 +13,15 @@ using Rect = Unity.UIWidgets.ui.Rect;
 
 namespace Unity.UIWidgets.cupertino {
     class CupertinoSwitchUtils {
-        public static float _kTrackWidth = 51.0f;
-        public static float _kTrackHeight = 31.0f;
-        public static float _kTrackRadius = _kTrackHeight / 2.0f;
-        public static float _kTrackInnerStart = _kTrackHeight / 2.0f;
-        public static float _kTrackInnerEnd = _kTrackWidth - _kTrackInnerStart;
-        public static float _kTrackInnerLength = _kTrackInnerEnd - _kTrackInnerStart;
-        public static float _kSwitchWidth = 59.0f;
-        public static float _kSwitchHeight = 39.0f;
-        public static float _kCupertinoSwitchDisabledOpacity = 0.5f;
+        public const float _kTrackWidth = 51.0f;
+        public const float _kTrackHeight = 31.0f;
+        public const float _kTrackRadius = _kTrackHeight / 2.0f;
+        public const float _kTrackInnerStart = _kTrackHeight / 2.0f;
+        public const float _kTrackInnerEnd = _kTrackWidth - _kTrackInnerStart;
+        public const float _kTrackInnerLength = _kTrackInnerEnd - _kTrackInnerStart;
+        public const float _kSwitchWidth = 59.0f;
+        public const float _kSwitchHeight = 39.0f;
+        public const float _kCupertinoSwitchDisabledOpacity = 0.5f;
         public static Color _kTrackColor = CupertinoColors.lightBackgroundGray;
         public static TimeSpan _kReactionDuration = new TimeSpan(0, 0, 0, 0, 300);
         public static TimeSpan _kToggleDuration = new TimeSpan(0, 0, 0, 0, 200);
@@ -100,10 +100,9 @@ namespace Unity.UIWidgets.cupertino {
         public readonly ValueChanged<bool> onChanged;
         public readonly TickerProvider vsync;
         public readonly DragStartBehavior dragStartBehavior;
-
-
+        
         public override RenderObject createRenderObject(BuildContext context) {
-            return (RenderObject) new _RenderCupertinoSwitch(
+            return new _RenderCupertinoSwitch(
                 value: this.value,
                 activeColor: this.activeColor,
                 onChanged: this.onChanged,
@@ -131,7 +130,7 @@ namespace Unity.UIWidgets.cupertino {
             Color activeColor,
             TextDirection textDirection,
             TickerProvider vsync,
-            ValueChanged<bool> onChanged,
+            ValueChanged<bool> onChanged = null,
             DragStartBehavior dragStartBehavior = DragStartBehavior.start
         ) : base(additionalConstraints: BoxConstraints.tightFor(
             width: CupertinoSwitchUtils._kSwitchWidth,
@@ -197,6 +196,7 @@ namespace Unity.UIWidgets.cupertino {
                 }
 
                 this._value = value;
+                // this.markNeedsSemanticsUpdate();
                 this._position.curve = Curves.ease;
                 this._position.reverseCurve = Curves.ease.flipped;
                 if (value) {
@@ -209,7 +209,6 @@ namespace Unity.UIWidgets.cupertino {
         }
 
         bool _value;
-
 
         public TickerProvider vsync {
             get { return this._vsync; }
@@ -294,8 +293,8 @@ namespace Unity.UIWidgets.cupertino {
         TapGestureRecognizer _tap;
         HorizontalDragGestureRecognizer _drag;
 
-        public override void attach(object owne) {
-            base.attach(this.owner);
+        public override void attach(object _owner) {
+            base.attach(_owner);
             if (this.value) {
                 this._positionController.forward();
             }
@@ -372,14 +371,17 @@ namespace Unity.UIWidgets.cupertino {
                 this._position.curve = null;
                 this._position.reverseCurve = null;
                 float delta = details.primaryDelta / CupertinoSwitchUtils._kTrackInnerLength ?? 0f;
-                switch (this.textDirection) {
-                    case TextDirection.rtl:
-                        this._positionController.setValue(this._positionController.value - delta);
-                        break;
-                    case TextDirection.ltr:
-                        this._positionController.setValue(this._positionController.value + delta);
-                        break;
-                }
+
+                this._positionController.setValue(this._positionController.value + delta);
+
+                // switch (this.textDirection) {
+                //     case TextDirection.rtl:
+                //         this._positionController.setValue(this._positionController.value - delta);
+                //         break;
+                //     case TextDirection.ltr:
+                //         this._positionController.setValue(this._positionController.value + delta);
+                //         break;
+                // }
             }
         }
 
