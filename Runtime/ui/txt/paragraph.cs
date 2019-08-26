@@ -661,7 +661,8 @@ namespace Unity.UIWidgets.ui {
 
         public List<TextBox> getRectsForRange(int start, int end) {
             var lineBoxes = new SplayTree<int, List<TextBox>>();
-            foreach (var run in this._codeUnitRuns) {
+            for (int runIndex = 0; runIndex < this._codeUnitRunsCount; runIndex++) {
+                var run = this._codeUnitRuns[runIndex];
                 if (run.codeUnits.start >= end) {
                     break;
                 }
@@ -784,7 +785,8 @@ namespace Unity.UIWidgets.ui {
             }
 
             TextDirection direction = TextDirection.ltr;
-            foreach (var run in this._codeUnitRuns) {
+            for (int runIndex = 0; runIndex < this._codeUnitRunsCount; runIndex++) {
+                var run = this._codeUnitRuns[runIndex];
                 if (gp.codeUnit >= run.codeUnits.start && gp.codeUnit + 1 <= run.codeUnits.end) {
                     direction = run.direction;
                     break;
