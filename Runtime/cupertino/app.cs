@@ -27,10 +27,10 @@ namespace Unity.UIWidgets.cupertino {
             List<Locale> supportedLocales = null,
             bool showPerformanceOverlay = false
         ) : base(key: key) {
-            D.assert(routes != null);
-            D.assert(navigatorObservers != null);
-            D.assert(title != null);
-            D.assert(showPerformanceOverlay != null);
+            // D.assert(routes != null);
+            // D.assert(navigatorObservers != null);
+            // D.assert(title != null);
+            // D.assert(showPerformanceOverlay != null);
 
             supportedLocales = supportedLocales ?? new List<Locale> {new Locale("en", "US")};
             this.navigatorKey = navigatorKey;
