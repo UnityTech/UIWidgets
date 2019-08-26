@@ -133,7 +133,6 @@ namespace Unity.UIWidgets.cupertino {
             _CupertinoEdgeShadowDecoration b,
             float t
         ) {
-            D.assert(t != null);
             if (a == null && b == null) {
                 return null;
             }
@@ -161,6 +160,10 @@ namespace Unity.UIWidgets.cupertino {
 
         public override BoxPainter createBoxPainter(VoidCallback onChanged = null) {
             return new _CupertinoEdgeShadowPainter(this, onChanged);
+        }
+
+        public override int GetHashCode() {
+            return this.edgeGradient.GetHashCode();
         }
 
         public bool Equals(_CupertinoEdgeShadowDecoration other) {
@@ -244,8 +247,6 @@ namespace Unity.UIWidgets.cupertino {
         ) :
             base(settings: settings, fullscreenDialog: fullscreenDialog) {
             D.assert(builder != null);
-            D.assert(maintainState != null);
-            D.assert(fullscreenDialog != null);
             D.assert(this.opaque);
             this.builder = builder;
             this.title = title;
@@ -409,7 +410,7 @@ namespace Unity.UIWidgets.cupertino {
             return buildPageTransitions(this, context, animation, secondaryAnimation, child);
         }
 
-        public string debugLabel {
+        public new string debugLabel {
             get { return $"{base.debugLabel}(${this.settings.name})"; }
         }
     }
@@ -422,7 +423,6 @@ namespace Unity.UIWidgets.cupertino {
             bool linearTransition,
             Key key = null
         ) : base(key: key) {
-            D.assert(linearTransition != null);
             this._primaryPositionAnimation =
                 (linearTransition
                     ? primaryRouteAnimation
@@ -717,10 +717,9 @@ namespace Unity.UIWidgets.cupertino {
             get { return CupertinoRouteUtils._kModalPopupTransitionDuration; }
         }
 
-        Animation<float> _animation;
+        new Animation<float> _animation;
 
         Tween<Offset> _offsetTween;
-
 
         public override Animation<float> createAnimation() {
             D.assert(this._animation == null);

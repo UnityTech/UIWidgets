@@ -35,8 +35,6 @@ namespace Unity.UIWidgets.cupertino {
         ) : base(key: key) {
             D.assert(value != null);
             D.assert(onChanged != null);
-            D.assert(min != null);
-            D.assert(max != null);
             D.assert(value >= min && value <= max);
             D.assert(divisions == null || divisions > 0);
             this.value = value.Value;
@@ -171,7 +169,7 @@ namespace Unity.UIWidgets.cupertino {
             TickerProvider vsync = null
         ) : base(additionalConstraints: BoxConstraints.tightFor(width: SliderUtils._kSliderWidth,
             height: SliderUtils._kSliderHeight)) {
-            D.assert(value != null && value >= 0.0f && value <= 1.0f);
+            D.assert(value >= 0.0f && value <= 1.0f);
             this._value = value;
             this._divisions = divisions;
             this._activeColor = activeColor;
@@ -191,7 +189,7 @@ namespace Unity.UIWidgets.cupertino {
         public float value {
             get { return this._value; }
             set {
-                D.assert(value != null && value >= 0.0f && value <= 1.0f);
+                D.assert(value >= 0.0f && value <= 1.0f);
                 if (value == this._value) {
                     return;
                 }

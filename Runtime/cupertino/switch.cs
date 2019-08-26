@@ -34,11 +34,7 @@ namespace Unity.UIWidgets.cupertino {
             Key key = null,
             Color activeColor = null,
             DragStartBehavior dragStartBehavior = DragStartBehavior.start
-        ) :
-            base(key: key) {
-            D.assert(value != null);
-            D.assert(dragStartBehavior != null);
-
+        ) : base(key: key) {
             this.value = value;
             this.onChanged = onChanged;
             this.activeColor = activeColor;
@@ -136,7 +132,6 @@ namespace Unity.UIWidgets.cupertino {
             width: CupertinoSwitchUtils._kSwitchWidth,
             height: CupertinoSwitchUtils._kSwitchHeight)
         ) {
-            D.assert(value != null);
             D.assert(activeColor != null);
             D.assert(vsync != null);
             this._value = value;
@@ -190,7 +185,6 @@ namespace Unity.UIWidgets.cupertino {
         public bool value {
             get { return this._value; }
             set {
-                D.assert(value != null);
                 if (value == this._value) {
                     return;
                 }
@@ -261,7 +255,6 @@ namespace Unity.UIWidgets.cupertino {
         public TextDirection textDirection {
             get { return this._textDirection; }
             set {
-                D.assert(value != null);
                 if (this._textDirection == value) {
                     return;
                 }
@@ -277,7 +270,6 @@ namespace Unity.UIWidgets.cupertino {
         public DragStartBehavior dragStartBehavior {
             get { return this._drag.dragStartBehavior; }
             set {
-                D.assert(value != null);
                 if (this._drag.dragStartBehavior == value) {
                     return;
                 }

@@ -137,9 +137,11 @@ namespace Unity.UIWidgets.cupertino {
             int tabNumber,
             IndexedWidgetBuilder tabBuilder
         ) {
-            D.assert(currentTabIndex != null);
-            D.assert(tabNumber != null && tabNumber > 0);
+            D.assert(tabNumber > 0);
             D.assert(tabBuilder != null);
+            this.currentTabIndex = currentTabIndex;
+            this.tabNumber = tabNumber;
+            this.tabBuilder = tabBuilder;
         }
 
         public readonly int currentTabIndex;

@@ -17,7 +17,6 @@ namespace Unity.UIWidgets.cupertino {
             bool resizeToAvoidBottomInset = true
         ) : base(key: key) {
             D.assert(child != null);
-            D.assert(resizeToAvoidBottomInset != null);
 
             this.child = child;
             this.navigationBar = navigationBar;

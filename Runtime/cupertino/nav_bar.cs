@@ -100,7 +100,7 @@ namespace Unity.UIWidgets.cupertino {
             BuildContext toHeroContext
         ) => {
             D.assert(animation != null);
-            D.assert(flightDirection != null);
+
             D.assert(fromHeroContext != null);
             D.assert(toHeroContext != null);
             D.assert(fromHeroContext.widget is Hero);
@@ -130,7 +130,6 @@ namespace Unity.UIWidgets.cupertino {
                         bottomNavBar: fromNavBar,
                         topNavBar: toNavBar
                     );
-                    break;
                 case HeroFlightDirection.pop:
                     return new _NavigationBarTransition(
                         animation: animation,
@@ -351,7 +350,7 @@ namespace Unity.UIWidgets.cupertino {
                 new Builder(
                     builder: (BuildContext _context) => {
                         return new Hero(
-                            tag: this.widget.heroTag == NavBarUtils._defaultHeroTag
+                            tag: this.widget.heroTag as _HeroTag == NavBarUtils._defaultHeroTag
                                 ? new _HeroTag(Navigator.of(_context))
                                 : this.widget.heroTag,
                             createRectTween: NavBarUtils._linearTranslateWithLargestRectSizeTween,
@@ -393,8 +392,6 @@ namespace Unity.UIWidgets.cupertino {
             bool transitionBetweenRoutes = true,
             object heroTag = null
         ) : base(key: key) {
-            D.assert(automaticallyImplyLeading != null);
-            D.assert(automaticallyImplyTitle != null);
             D.assert(
                 automaticallyImplyTitle == true || largeTitle != null,
                 () => "No largeTitle has been provided but automaticallyImplyTitle is also " +
@@ -516,9 +513,6 @@ namespace Unity.UIWidgets.cupertino {
             float persistentHeight,
             bool alwaysShowMiddle
         ) {
-            D.assert(this.persistentHeight != null);
-            D.assert(this.alwaysShowMiddle != null);
-            D.assert(this.transitionBetweenRoutes != null);
             this.keys = keys;
             this.components = components;
             this.userMiddle = userMiddle;
@@ -621,7 +615,7 @@ namespace Unity.UIWidgets.cupertino {
             }
 
             return new Hero(
-                tag: this.heroTag == NavBarUtils._defaultHeroTag
+                tag: this.heroTag as _HeroTag == NavBarUtils._defaultHeroTag
                     ? new _HeroTag(Navigator.of(context))
                     : this.heroTag,
                 createRectTween: NavBarUtils._linearTranslateWithLargestRectSizeTween,
@@ -682,13 +676,11 @@ namespace Unity.UIWidgets.cupertino {
                     style: CupertinoTheme.of(context).textTheme.navTitleTextStyle,
                     child: middle
                 );
-                middle = this.middleVisible == null
-                    ? middle
-                    : new AnimatedOpacity(
-                        opacity: this.middleVisible ? 1.0f : 0.0f,
-                        duration: NavBarUtils._kNavBarTitleFadeDuration,
-                        child: middle
-                    );
+                middle = new AnimatedOpacity(
+                    opacity: this.middleVisible ? 1.0f : 0.0f,
+                    duration: NavBarUtils._kNavBarTitleFadeDuration,
+                    child: middle
+                );
             }
 
             Widget leading = this.components.leading;
@@ -1247,6 +1239,9 @@ namespace Unity.UIWidgets.cupertino {
             _TransitionableNavigationBar topNavBar,
             _TransitionableNavigationBar bottomNavBar
         ) {
+            this.animation = animation;
+            this.topNavBar = topNavBar;
+            this.bottomNavBar = bottomNavBar;
             this.heightTween = new FloatTween(
                 begin: this.bottomNavBar.renderBox.size.height,
                 end: this.topNavBar.renderBox.size.height
@@ -1325,6 +1320,7 @@ namespace Unity.UIWidgets.cupertino {
             _TransitionableNavigationBar topNavBar,
             TextDirection directionality
         ) {
+            this.animation = animation;
             this.bottomComponents = bottomNavBar.componentsKeys;
             this.topComponents = topNavBar.componentsKeys;
             this.bottomNavBarBox = bottomNavBar.renderBox;
