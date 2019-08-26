@@ -1,4 +1,5 @@
 using System;
+using RSG;
 using Unity.UIWidgets.animation;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
@@ -168,12 +169,10 @@ namespace Unity.UIWidgets.cupertino {
                 ? this._animationController.animateTo(1.0f, duration: kFadeOutDuration)
                 : this._animationController.animateTo(0.0f, duration: kFadeInDuration);
 
-            ticker.Then<VoidCallback>(() => {
+            ticker.Then(() => {
                 if (this.mounted && wasHeldDown != this._buttonHeldDown) {
                     this._animate();
                 }
-
-                return null;
             });
         }
 
