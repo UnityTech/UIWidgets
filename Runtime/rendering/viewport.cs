@@ -185,7 +185,7 @@ namespace Unity.UIWidgets.rendering {
             return 0.0f;
         }
 
-        protected override float computeMaxIntrinsicHeight(float width) {
+        protected internal override float computeMaxIntrinsicHeight(float width) {
             D.assert(this.debugThrowIfNotCheckingIntrinsics());
             return 0.0f;
         }

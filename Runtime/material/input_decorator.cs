@@ -1166,7 +1166,7 @@ namespace Unity.UIWidgets.material {
                    + this.contentPadding.bottom;
         }
 
-        protected override float computeMaxIntrinsicHeight(float width) {
+        protected internal override float computeMaxIntrinsicHeight(float width) {
             return this.computeMinIntrinsicHeight(width);
         }
 

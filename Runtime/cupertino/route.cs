@@ -58,11 +58,11 @@ namespace Unity.UIWidgets.cupertino {
         );
 
 
-        public static IPromise<T> showCupertinoModalPopup<T>(
+        public static IPromise<object> showCupertinoModalPopup(
             BuildContext context,
             WidgetBuilder builder
         ) {
-            return (IPromise<T>) Navigator.of(context, rootNavigator: true).push(
+            return Navigator.of(context, rootNavigator: true).push(
                 new _CupertinoModalPopupRoute(
                     builder: builder,
                     barrierLabel: "Dismiss"
@@ -97,18 +97,17 @@ namespace Unity.UIWidgets.cupertino {
             );
         }
 
-        public static IPromise<T> showCupertinoDialog<T>(
+        public static IPromise<object> showCupertinoDialog(
             BuildContext context,
             WidgetBuilder builder
         ) {
             D.assert(builder != null);
-            return (IPromise<T>) DialogUtils.showGeneralDialog(
+            return DialogUtils.showGeneralDialog(
                 context: context,
                 barrierDismissible: false,
                 barrierColor: _kModalBarrierColor,
                 transitionDuration: new TimeSpan(0, 0, 0, 0, 250),
-                pageBuilder:
-                (BuildContext _context, Animation<float> animation, Animation<float> secondaryAnimation) => {
+                pageBuilder: (BuildContext _context, Animation<float> animation, Animation<float> secondaryAnimation) => {
                     return builder(_context);
                 },
                 transitionBuilder: _buildCupertinoDialogTransitions

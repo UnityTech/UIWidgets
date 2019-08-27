@@ -772,7 +772,7 @@ namespace Unity.UIWidgets.rendering {
                 this.computeMaxIntrinsicHeight);
         }
 
-        protected virtual float computeMaxIntrinsicHeight(float width) {
+        protected internal virtual float computeMaxIntrinsicHeight(float width) {
             return 0.0f;
         }
 

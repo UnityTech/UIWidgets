@@ -124,7 +124,13 @@ namespace Unity.UIWidgets.cupertino {
                 this._navigatorObservers = new List<NavigatorObserver>();
             }
         }
-
+        
+        // Iterable<LocalizationsDelegate<dynamic>> get _localizationsDelegates sync* {
+        //     if (widget.localizationsDelegates != null)
+        //         yield* widget.localizationsDelegates;
+        //     yield DefaultCupertinoLocalizations.delegate; 
+        // }
+        
         List<LocalizationsDelegate> _localizationsDelegates {
             get {
                 List<LocalizationsDelegate<CupertinoLocalizations>> _delegates =

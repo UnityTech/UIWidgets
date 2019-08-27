@@ -483,14 +483,14 @@ namespace UIWidgetsGallery.gallery {
                 //     documentationUrl: "https://docs.flutter.io/flutter/cupertino/CupertinoActivityIndicator-class.html",
                 //     buildRoute: (BuildContext context) => CupertinoProgressIndicatorDemo()
                 // ),
-                // new GalleryDemo(
-                //     title: "Alerts",
-                //     icon: GalleryIcons.dialogs,
-                //     category: GalleryDemoCategory._kCupertinoComponents,
-                //     routeName: CupertinoAlertDemo.routeName,
-                //     documentationUrl: "https://docs.flutter.io/flutter/cupertino/showCupertinoDialog.html",
-                //     buildRoute: (BuildContext context) => CupertinoAlertDemo()
-                // ),
+                new GalleryDemo(
+                    title: "Alerts",
+                    icon: GalleryIcons.dialogs,
+                    category: _kCupertinoComponents,
+                    routeName: CupertinoAlertDemo.routeName,
+                    documentationUrl: "https://docs.flutter.io/flutter/cupertino/showCupertinoDialog.html",
+                    buildRoute: (BuildContext context) => new CupertinoAlertDemo()
+                ),
                 new GalleryDemo(
                     title: "Buttons",
                     icon: GalleryIcons.generic_buttons,
