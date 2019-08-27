@@ -30,21 +30,21 @@ namespace UIWidgetsGallery.gallery {
                             child: new Column(
                                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                                 children: new List<Widget> {
-                                    new Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: new List<Widget> {
-                                            new CupertinoSlider(
-                                                value: this._value,
-                                                min: 0.0f,
-                                                max: 100.0f,
-                                                divisions: 100, // TODO: FIX BUG
-                                                onChanged: (float value) => {
-                                                    this.setState(() => { this._value = value; });
-                                                }
-                                            ),
-                                            new Text($"Cupertino Continuous: {this._value.ToString("F1")}"),
-                                        }
-                                    ),
+                                    // TODO: FIX BUG
+                                    // new Column(
+                                    //     mainAxisSize: MainAxisSize.min,
+                                    //     children: new List<Widget> {
+                                    //         new CupertinoSlider(
+                                    //             value: this._value,
+                                    //             min: 0.0f,
+                                    //             max: 100.0f,
+                                    //             onChanged: (float value) => {
+                                    //                 this.setState(() => { this._value = value; });
+                                    //             }
+                                    //         ),
+                                    //         new Text($"Cupertino Continuous: {this._value.ToString("F1")}"),
+                                    //     }
+                                    // ),
                                     new Column(
                                         mainAxisSize: MainAxisSize.min,
                                         children: new List<Widget> {
