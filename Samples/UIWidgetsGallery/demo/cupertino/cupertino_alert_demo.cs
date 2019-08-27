@@ -5,10 +5,12 @@ using Unity.UIWidgets.painting;
 using Unity.UIWidgets.widgets;
 
 namespace UIWidgetsGallery.gallery {
-    /*
     class CupertinoAlertDemo : StatefulWidget {
         public static string routeName = "/cupertino/alert";
-        public override State createState() => new _CupertinoAlertDemoState();
+
+        public override State createState() {
+            return new _CupertinoAlertDemoState();
+        }
     }
 
     class _CupertinoAlertDemoState : State<CupertinoAlertDemo> {
@@ -18,12 +20,12 @@ namespace UIWidgetsGallery.gallery {
             BuildContext context = null,
             Widget child = null
         ) {
-            CupertinoRouteUtils.showCupertinoDialog<string>(
+            CupertinoRouteUtils.showCupertinoDialog(
                 context: context,
                 builder: (BuildContext _context) => child
-            ).Then((string value) => {
+            ).Then((object value) => {
                 if (value != null) {
-                    this.setState(() => { this.lastSelectedValue = value; });
+                    this.setState(() => { this.lastSelectedValue = value as string; });
                 }
             });
         }
@@ -32,12 +34,12 @@ namespace UIWidgetsGallery.gallery {
             BuildContext context = null,
             Widget child = null
         ) {
-            CupertinoRouteUtils.showCupertinoModalPopup<string>(
+            CupertinoRouteUtils.showCupertinoModalPopup(
                 context: context,
                 builder: (BuildContext _context) => child
-            ).Then((string value) => {
+            ).Then((object value) => {
                 if (value != null) {
-                    this.setState(() => { this.lastSelectedValue = value; });
+                    this.setState(() => { this.lastSelectedValue = value as string; });
                 }
             });
         }
@@ -64,7 +66,8 @@ namespace UIWidgetsGallery.gallery {
                                             onPressed: () => {
                                                 this.showDemoDialog(
                                                     context: _context,
-                                                    child: new CupertinoAlertDialog(
+                                                    child:
+                                                    new CupertinoAlertDialog(
                                                         title: new Text("Discard draft?"),
                                                         actions: new List<Widget> {
                                                             new CupertinoDialogAction(
@@ -141,6 +144,7 @@ namespace UIWidgetsGallery.gallery {
                                                 );
                                             }
                                         ),
+                                        // TODO: FIX BUG
                                         new Padding(padding: EdgeInsets.all(8.0f)),
                                         CupertinoButton.filled(
                                             child: new Text("Action Sheet"),
@@ -150,34 +154,30 @@ namespace UIWidgetsGallery.gallery {
                                                     context: _context,
                                                     child: new CupertinoActionSheet(
                                                         title: new Text("Favorite Dessert"),
-                                                        message:
-                                                        new Text(
+                                                        message: new Text(
                                                             "Please select the best dessert from the options below."),
-                                                        actions:
-                                                        new List<Widget> {
-                                                            new CupertinoActionSheetAction(
-                                                                child: new Text("Profiteroles"),
-                                                                onPressed: () => {
-                                                                    Navigator.pop(_context, "Profiteroles");
-                                                                }
-                                                            ),
-                                                            new CupertinoActionSheetAction(
-                                                                child: new Text("Cannolis"),
-                                                                onPressed: () => {
-                                                                    Navigator.pop(_context, "Cannolis");
-                                                                }
-                                                            ),
-                                                            new CupertinoActionSheetAction(
-                                                                child: new Text("Trifle"),
-                                                                onPressed: () => { Navigator.pop(_context, "Trifle"); }
-                                                            ),
+                                                        actions: new List<Widget> {
+                                                            // new CupertinoActionSheetAction(
+                                                            //     child: new Text("Profiteroles"),
+                                                            //     onPressed: () => {
+                                                            //         Navigator.pop(_context, "Profiteroles");
+                                                            //     }
+                                                            // ),
+                                                            // new CupertinoActionSheetAction(
+                                                            //     child: new Text("Cannolis"),
+                                                            //     onPressed: () => {
+                                                            //         Navigator.pop(_context, "Cannolis");
+                                                            //     }
+                                                            // ),
+                                                            // new CupertinoActionSheetAction(
+                                                            //     child: new Text("Trifle"),
+                                                            //     onPressed: () => { Navigator.pop(_context, "Trifle"); }
+                                                            // )
                                                         },
                                                         cancelButton: new CupertinoActionSheetAction(
                                                             child: new Text("Cancel"),
-                                                            isDefaultAction:
-                                                            true,
-                                                            onPressed:
-                                                            () => { Navigator.pop(_context, "Cancel"); }
+                                                            isDefaultAction: true,
+                                                            onPressed: () => { Navigator.pop(_context, "Cancel"); }
                                                         )
                                                     )
                                                 );
@@ -191,7 +191,7 @@ namespace UIWidgetsGallery.gallery {
                                 stackChildren.Add(
                                     new Positioned(
                                         bottom: 32.0f,
-                                        child: new Text("You selected: $lastSelectedValue")
+                                        child: new Text($"You selected: {this.lastSelectedValue}")
                                     )
                                 );
                             }
@@ -222,8 +222,8 @@ namespace UIWidgetsGallery.gallery {
 
         public override Widget build(BuildContext context) {
             return new CupertinoAlertDialog(
-                title: title,
-                content: content,
+                title: this.title,
+                content: this.content,
                 actions: new List<Widget> {
                     new CupertinoDialogAction(
                         child: new Text("Cheesecake"),
@@ -269,5 +269,4 @@ namespace UIWidgetsGallery.gallery {
             );
         }
     }
-    */
 }

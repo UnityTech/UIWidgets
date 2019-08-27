@@ -31,7 +31,7 @@ namespace Unity.UIWidgets.cupertino {
             BorderRadius borderRadius = null,
             bool filled = false
         ) : base(key: key) {
-            D.assert(pressedOpacity == null || (pressedOpacity >= 0.0 && pressedOpacity <= 1.0));
+            D.assert(pressedOpacity >= 0.0 && pressedOpacity <= 1.0);
             this._filled = filled;
             this.child = child;
             this.onPressed = onPressed;
@@ -53,7 +53,7 @@ namespace Unity.UIWidgets.cupertino {
             float pressedOpacity = 0.1f,
             BorderRadius borderRadius = null
         ) {
-            D.assert(pressedOpacity == null || (pressedOpacity >= 0.0 && pressedOpacity <= 1.0));
+            D.assert(pressedOpacity >= 0.0 && pressedOpacity <= 1.0);
             return new CupertinoButton(
                 key: key,
                 color: null,
@@ -202,12 +202,10 @@ namespace Unity.UIWidgets.cupertino {
                         }
                     },
                 child: new ConstrainedBox(
-                    constraints: this.widget.minSize == null
-                        ? new BoxConstraints()
-                        : new BoxConstraints(
-                            minWidth: this.widget.minSize,
-                            minHeight: this.widget.minSize
-                        ),
+                    constraints: new BoxConstraints(
+                        minWidth: this.widget.minSize,
+                        minHeight: this.widget.minSize
+                    ),
                     child: new FadeTransition(
                         opacity: this._opacityAnimation,
                         child: new DecoratedBox(

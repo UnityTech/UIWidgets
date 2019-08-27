@@ -483,14 +483,14 @@ namespace UIWidgetsGallery.gallery {
                 //     documentationUrl: "https://docs.flutter.io/flutter/cupertino/CupertinoActivityIndicator-class.html",
                 //     buildRoute: (BuildContext context) => CupertinoProgressIndicatorDemo()
                 // ),
-                // new GalleryDemo(
-                //     title: "Alerts",
-                //     icon: GalleryIcons.dialogs,
-                //     category: GalleryDemoCategory._kCupertinoComponents,
-                //     routeName: CupertinoAlertDemo.routeName,
-                //     documentationUrl: "https://docs.flutter.io/flutter/cupertino/showCupertinoDialog.html",
-                //     buildRoute: (BuildContext context) => CupertinoAlertDemo()
-                // ),
+                new GalleryDemo(
+                    title: "Alerts",
+                    icon: GalleryIcons.dialogs,
+                    category: _kCupertinoComponents,
+                    routeName: CupertinoAlertDemo.routeName,
+                    documentationUrl: "https://docs.flutter.io/flutter/cupertino/showCupertinoDialog.html",
+                    buildRoute: (BuildContext context) => new CupertinoAlertDemo()
+                ),
                 new GalleryDemo(
                     title: "Buttons",
                     icon: GalleryIcons.generic_buttons,
@@ -502,10 +502,10 @@ namespace UIWidgetsGallery.gallery {
                 // new GalleryDemo(
                 //     title: "Navigation",
                 //     icon: GalleryIcons.bottom_navigation,
-                //     category: GalleryDemoCategory._kCupertinoComponents,
+                //     category: _kCupertinoComponents,
                 //     routeName: CupertinoNavigationDemo.routeName,
                 //     documentationUrl: "https://docs.flutter.io/flutter/cupertino/CupertinoTabScaffold-class.html",
-                //     buildRoute: (BuildContext context) => CupertinoNavigationDemo()
+                //     buildRoute: (BuildContext context) => new CupertinoNavigationDemo()
                 // ),
                 // new GalleryDemo(
                 //     title: "Pickers",

@@ -1017,7 +1017,7 @@ namespace Unity.UIWidgets.rendering {
             return this._preferredHeight(width);
         }
 
-        protected override float computeMaxIntrinsicHeight(float width) {
+        protected internal override float computeMaxIntrinsicHeight(float width) {
             return this._preferredHeight(width);
         }
 

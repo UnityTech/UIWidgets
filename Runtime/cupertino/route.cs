@@ -58,11 +58,11 @@ namespace Unity.UIWidgets.cupertino {
         );
 
 
-        public static IPromise<T> showCupertinoModalPopup<T>(
+        public static IPromise<object> showCupertinoModalPopup(
             BuildContext context,
             WidgetBuilder builder
         ) {
-            return (IPromise<T>) Navigator.of(context, rootNavigator: true).push(
+            return Navigator.of(context, rootNavigator: true).push(
                 new _CupertinoModalPopupRoute(
                     builder: builder,
                     barrierLabel: "Dismiss"
@@ -97,18 +97,17 @@ namespace Unity.UIWidgets.cupertino {
             );
         }
 
-        public static IPromise<T> showCupertinoDialog<T>(
+        public static IPromise<object> showCupertinoDialog(
             BuildContext context,
             WidgetBuilder builder
         ) {
             D.assert(builder != null);
-            return (IPromise<T>) DialogUtils.showGeneralDialog(
+            return DialogUtils.showGeneralDialog(
                 context: context,
                 barrierDismissible: false,
                 barrierColor: _kModalBarrierColor,
                 transitionDuration: new TimeSpan(0, 0, 0, 0, 250),
-                pageBuilder:
-                (BuildContext _context, Animation<float> animation, Animation<float> secondaryAnimation) => {
+                pageBuilder: (BuildContext _context, Animation<float> animation, Animation<float> secondaryAnimation) => {
                     return builder(_context);
                 },
                 transitionBuilder: _buildCupertinoDialogTransitions
@@ -133,7 +132,6 @@ namespace Unity.UIWidgets.cupertino {
             _CupertinoEdgeShadowDecoration b,
             float t
         ) {
-            D.assert(t != null);
             if (a == null && b == null) {
                 return null;
             }
@@ -161,6 +159,10 @@ namespace Unity.UIWidgets.cupertino {
 
         public override BoxPainter createBoxPainter(VoidCallback onChanged = null) {
             return new _CupertinoEdgeShadowPainter(this, onChanged);
+        }
+
+        public override int GetHashCode() {
+            return this.edgeGradient.GetHashCode();
         }
 
         public bool Equals(_CupertinoEdgeShadowDecoration other) {
@@ -237,15 +239,13 @@ namespace Unity.UIWidgets.cupertino {
     public class CupertinoPageRoute : PageRoute {
         public CupertinoPageRoute(
             WidgetBuilder builder,
-            RouteSettings settings,
+            RouteSettings settings = null,
             string title = "",
             bool maintainState = true,
             bool fullscreenDialog = false
         ) :
             base(settings: settings, fullscreenDialog: fullscreenDialog) {
             D.assert(builder != null);
-            D.assert(maintainState != null);
-            D.assert(fullscreenDialog != null);
             D.assert(this.opaque);
             this.builder = builder;
             this.title = title;
@@ -409,7 +409,7 @@ namespace Unity.UIWidgets.cupertino {
             return buildPageTransitions(this, context, animation, secondaryAnimation, child);
         }
 
-        public string debugLabel {
+        public new string debugLabel {
             get { return $"{base.debugLabel}(${this.settings.name})"; }
         }
     }
@@ -422,7 +422,6 @@ namespace Unity.UIWidgets.cupertino {
             bool linearTransition,
             Key key = null
         ) : base(key: key) {
-            D.assert(linearTransition != null);
             this._primaryPositionAnimation =
                 (linearTransition
                     ? primaryRouteAnimation
@@ -717,10 +716,9 @@ namespace Unity.UIWidgets.cupertino {
             get { return CupertinoRouteUtils._kModalPopupTransitionDuration; }
         }
 
-        Animation<float> _animation;
+        new Animation<float> _animation;
 
         Tween<Offset> _offsetTween;
-
 
         public override Animation<float> createAnimation() {
             D.assert(this._animation == null);

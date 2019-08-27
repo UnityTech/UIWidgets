@@ -27,10 +27,7 @@ namespace Unity.UIWidgets.cupertino {
             List<Locale> supportedLocales = null,
             bool showPerformanceOverlay = false
         ) : base(key: key) {
-            // D.assert(routes != null);
-            // D.assert(navigatorObservers != null);
-            // D.assert(title != null);
-            // D.assert(showPerformanceOverlay != null);
+            D.assert(title != null);
 
             supportedLocales = supportedLocales ?? new List<Locale> {new Locale("en", "US")};
             this.navigatorKey = navigatorKey;
@@ -124,7 +121,13 @@ namespace Unity.UIWidgets.cupertino {
                 this._navigatorObservers = new List<NavigatorObserver>();
             }
         }
-
+        
+        // Iterable<LocalizationsDelegate<dynamic>> get _localizationsDelegates sync* {
+        //     if (widget.localizationsDelegates != null)
+        //         yield* widget.localizationsDelegates;
+        //     yield DefaultCupertinoLocalizations.delegate; 
+        // }
+        
         List<LocalizationsDelegate> _localizationsDelegates {
             get {
                 List<LocalizationsDelegate<CupertinoLocalizations>> _delegates =

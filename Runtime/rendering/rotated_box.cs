@@ -64,7 +64,7 @@ namespace UIWidgets.Runtime.rendering {
             return this._isVertical ? this.child.getMinIntrinsicWidth(width) : this.child.getMinIntrinsicHeight(width);
         }
 
-        protected override float computeMaxIntrinsicHeight(float width) {
+        protected internal override float computeMaxIntrinsicHeight(float width) {
             if (this.child == null) {
                 return 0.0f;
             }

@@ -698,7 +698,7 @@ namespace Unity.UIWidgets.material {
             return Mathf.Max(this._minPreferredTrackHeight, this._maxSliderPartHeight);
         }
 
-        protected override float computeMaxIntrinsicHeight(float width) {
+        protected internal override float computeMaxIntrinsicHeight(float width) {
             return Mathf.Max(this._minPreferredTrackHeight, this._maxSliderPartHeight);
         }
 

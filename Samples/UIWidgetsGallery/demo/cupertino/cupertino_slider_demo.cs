@@ -37,7 +37,6 @@ namespace UIWidgetsGallery.gallery {
                                                 value: this._value,
                                                 min: 0.0f,
                                                 max: 100.0f,
-                                                divisions: 100, // TODO: FIX BUG
                                                 onChanged: (float value) => {
                                                     this.setState(() => { this._value = value; });
                                                 }

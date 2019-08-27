@@ -708,7 +708,7 @@ namespace Unity.UIWidgets.rendering {
             return rowTop;
         }
 
-        protected override float computeMaxIntrinsicHeight(float width) {
+        protected internal override float computeMaxIntrinsicHeight(float width) {
             return this.computeMinIntrinsicHeight(width);
         }
 

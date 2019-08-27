@@ -31,7 +31,8 @@ namespace Unity.UIWidgets.cupertino {
                 () => "Tabs need at least 2 items to conform to Apple's HIG"
             );
             D.assert(0 <= currentIndex && currentIndex < items.Count);
-            D.assert(inactiveColor != null);
+            
+
             this.items = items;
             this.onTap = onTap;
             this.currentIndex = currentIndex;
@@ -122,13 +123,14 @@ namespace Unity.UIWidgets.cupertino {
 
             for (int index = 0; index < this.items.Count; index += 1) {
                 bool active = index == this.currentIndex;
+                var tabIndex = index;
                 result.Add(
                     this._wrapActiveItem(
                         context,
                         new Expanded(
                             child: new GestureDetector(
                                 behavior: HitTestBehavior.opaque,
-                                onTap: this.onTap == null ? null : (GestureTapCallback) (() => { this.onTap(index); }),
+                                onTap: this.onTap == null ? null : (GestureTapCallback) (() => { this.onTap(tabIndex); }),
                                 child: new Padding(
                                     padding: EdgeInsets.only(bottom: 4.0f),
                                     child: new Column(
