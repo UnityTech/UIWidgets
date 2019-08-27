@@ -34,7 +34,7 @@ namespace Unity.UIWidgets.material {
             ImageProvider activeThumbImage = null,
             ImageProvider inactiveThumbImage = null,
             MaterialTapTargetSize? materialTapTargetSize = null,
-            DragStartBehavior dragStartBehavior = DragStartBehavior.down
+            DragStartBehavior dragStartBehavior = DragStartBehavior.start
         ) : this(
             key: key,
             value: value,
@@ -63,7 +63,7 @@ namespace Unity.UIWidgets.material {
             ImageProvider inactiveThumbImage = null,
             MaterialTapTargetSize? materialTapTargetSize = null,
             _SwitchType switchType = _SwitchType.material,
-            DragStartBehavior dragStartBehavior = DragStartBehavior.down
+            DragStartBehavior dragStartBehavior = DragStartBehavior.start
         ) : base(key: key) {
             D.assert(value != null);
             this.value = value.Value;

@@ -149,7 +149,11 @@ namespace Unity.UIWidgets.material {
 
         public override Widget build(BuildContext context) {
             Color backgroundColor = this._getBackgroundColor(context);
-            D.assert(backgroundColor != null || this.widget.type == MaterialType.transparency);
+            D.assert(backgroundColor != null || this.widget.type == MaterialType.transparency,
+                () => "If Material type is not MaterialType.transparency, a color must" +
+                      "either be passed in through the 'color' property, or be defined " +
+                      "in the theme (ex. canvasColor != null if type is set to " +
+                      "MaterialType.canvas");
             Widget contents = this.widget.child;
             if (contents != null) {
                 contents = new AnimatedDefaultTextStyle(

@@ -330,15 +330,72 @@ namespace Unity.UIWidgets.material {
 
         public override Widget buildPage(BuildContext context, Animation<float> animation,
             Animation<float> secondaryAnimation) {
+            return new LayoutBuilder(
+                builder: (ctx, constraints) => {
+                    return new _DropdownRoutePage<T>(
+                        route: this,
+                        constraints: constraints,
+                        items: this.items,
+                        padding: this.padding,
+                        buttonRect: this.buttonRect,
+                        selectedIndex: this.selectedIndex,
+                        elevation: this.elevation,
+                        theme: this.theme,
+                        style: this.style
+                    );
+                }
+            );
+        }
+
+        internal void _dismiss() {
+            this.navigator?.removeRoute(this);
+        }
+    }
+
+    class _DropdownRoutePage<T> : StatelessWidget where T : class {
+        public _DropdownRoutePage(
+            Key key = null,
+            _DropdownRoute<T> route = null,
+            BoxConstraints constraints = null,
+            List<DropdownMenuItem<T>> items = null,
+            EdgeInsets padding = null,
+            Rect buttonRect = null,
+            int? selectedIndex = null,
+            int elevation = 0,
+            ThemeData theme = null,
+            TextStyle style = null
+        ) : base(key: key) {
+            this.route = route;
+            this.constraints = constraints;
+            this.items = items;
+            this.padding = padding;
+            this.buttonRect = buttonRect;
+            this.selectedIndex = selectedIndex;
+            this.elevation = elevation;
+            this.theme = theme;
+            this.style = style;
+        }
+
+        public readonly _DropdownRoute<T> route;
+        public readonly BoxConstraints constraints;
+        public readonly List<DropdownMenuItem<T>> items;
+        public readonly EdgeInsets padding;
+        public readonly Rect buttonRect;
+        public readonly int? selectedIndex;
+        public readonly int elevation;
+        public readonly ThemeData theme;
+        public readonly TextStyle style;
+        
+        public override Widget build(BuildContext context) {
             D.assert(WidgetsD.debugCheckHasDirectionality(context));
-            float screenHeight = MediaQuery.of(context).size.height;
-            float maxMenuHeight = screenHeight - 2.0f * DropdownConstants._kMenuItemHeight;
+            float availableHeight = this.constraints.maxHeight;
+            float maxMenuHeight = availableHeight - 2.0f * DropdownConstants._kMenuItemHeight;
 
             float buttonTop = this.buttonRect.top;
-            float buttonBottom = this.buttonRect.bottom;
+            float buttonBottom = Mathf.Min(this.buttonRect.bottom, availableHeight);
 
             float topLimit = Mathf.Min(DropdownConstants._kMenuItemHeight, buttonTop);
-            float bottomLimit = Mathf.Max(screenHeight - DropdownConstants._kMenuItemHeight, buttonBottom);
+            float bottomLimit = Mathf.Max(availableHeight - DropdownConstants._kMenuItemHeight, buttonBottom);
 
             float? selectedItemOffset = this.selectedIndex * DropdownConstants._kMenuItemHeight +
                                         Constants.kMaterialListPadding.top;
@@ -361,15 +418,15 @@ namespace Unity.UIWidgets.material {
                 menuTop = menuBottom - menuHeight;
             }
 
-            if (this.scrollController == null) {
+            if (this.route.scrollController == null) {
                 float scrollOffset = preferredMenuHeight > maxMenuHeight
                     ? Mathf.Max(0.0f, selectedItemOffset ?? 0.0f - (buttonTop - (menuTop ?? 0.0f)))
                     : 0.0f;
-                this.scrollController = new ScrollController(initialScrollOffset: scrollOffset);
+                this.route.scrollController = new ScrollController(initialScrollOffset: scrollOffset);
             }
 
             Widget menu = new _DropdownMenu<T>(
-                route: this,
+                route: this.route,
                 padding: this.padding
             );
 
@@ -396,10 +453,6 @@ namespace Unity.UIWidgets.material {
                     }
                 )
             );
-        }
-
-        public void _dismiss() {
-            this.navigator?.removeRoute(this);
         }
     }
 
@@ -454,6 +507,10 @@ namespace Unity.UIWidgets.material {
             ValueChanged<T> onChanged = null,
             int elevation = 8,
             TextStyle style = null,
+            Widget underline = null,
+            Widget icon = null,
+            Color iconDisabledColor = null,
+            Color iconEnabledColor = null,
             float iconSize = 24.0f,
             bool isDense = false,
             bool isExpanded = false
@@ -469,6 +526,10 @@ namespace Unity.UIWidgets.material {
             this.onChanged = onChanged;
             this.elevation = elevation;
             this.style = style;
+            this.underline = underline;
+            this.icon = icon;
+            this.iconDisabledColor = iconDisabledColor;
+            this.iconEnabledColor = iconEnabledColor;
             this.iconSize = iconSize;
             this.isDense = isDense;
             this.isExpanded = isExpanded;
@@ -487,6 +548,14 @@ namespace Unity.UIWidgets.material {
         public readonly int elevation;
 
         public readonly TextStyle style;
+
+        public readonly Widget underline;
+            
+        public readonly Widget icon;
+                    
+        public readonly Color iconDisabledColor;
+                    
+        public readonly Color iconEnabledColor;
 
         public readonly float iconSize;
 
@@ -606,24 +675,34 @@ namespace Unity.UIWidgets.material {
             }
         }
 
-        Color _downArrowColor {
+        Color _iconColor {
             get {
                 if (this._enabled) {
-                    if (Theme.of(this.context).brightness == Brightness.light) {
-                        return Colors.grey.shade700;
+                    if (this.widget.iconEnabledColor != null) {
+                        return this.widget.iconEnabledColor;
                     }
-                    else {
-                        return Colors.white70;
+
+                    switch (Theme.of(this.context).brightness) {
+                        case Brightness.light:
+                            return Colors.grey.shade700;
+                        case Brightness.dark:
+                            return Colors.white70;
                     }
                 }
                 else {
-                    if (Theme.of(this.context).brightness == Brightness.light) {
-                        return Colors.grey.shade400;
+                    if (this.widget.iconDisabledColor != null) {
+                        return this.widget.iconDisabledColor;
                     }
-                    else {
-                        return Colors.white10;
+
+                    switch (Theme.of(this.context).brightness) {
+                        case Brightness.light:
+                            return Colors.grey.shade400;
+                        case Brightness.dark:
+                            return Colors.white10;
                     }
                 }
+                D.assert(false);
+                return null;
             }
         }
 
@@ -661,6 +740,7 @@ namespace Unity.UIWidgets.material {
                 children: items
             );
 
+            Icon defaultIcon = new Icon(Icons.arrow_drop_down);
             Widget result = new DefaultTextStyle(
                 style: this._textStyle,
                 child: new Container(
@@ -671,9 +751,12 @@ namespace Unity.UIWidgets.material {
                         mainAxisSize: MainAxisSize.min,
                         children: new List<Widget> {
                             this.widget.isExpanded ? new Expanded(child: innerItemsWidget) : (Widget) innerItemsWidget,
-                            new Icon(Icons.arrow_drop_down,
-                                size: this.widget.iconSize,
-                                color: this._downArrowColor
+                            new IconTheme(
+                                data: new IconThemeData(
+                                    color: this._iconColor,
+                                    size: this.widget.iconSize
+                                ),
+                                child: this.widget.icon ?? defaultIcon
                             )
                         }
                     )
@@ -689,7 +772,7 @@ namespace Unity.UIWidgets.material {
                             left: 0.0f,
                             right: 0.0f,
                             bottom: bottom,
-                            child: new Container(
+                            child: this.widget.underline ?? new Container(
                                 height: 1.0f,
                                 decoration: new BoxDecoration(
                                     border: new Border(

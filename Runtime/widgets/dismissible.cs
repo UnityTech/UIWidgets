@@ -42,7 +42,7 @@ namespace Unity.UIWidgets.widgets {
             Dictionary<DismissDirection?, float?> dismissThresholds = null,
             TimeSpan? movementDuration = null,
             float crossAxisEndOffset = 0.0f,
-            DragStartBehavior dragStartBehavior = DragStartBehavior.down
+            DragStartBehavior dragStartBehavior = DragStartBehavior.start
         ) : base(key: key) {
             D.assert(key != null);
             D.assert(secondaryBackground != null ? background != null : true);

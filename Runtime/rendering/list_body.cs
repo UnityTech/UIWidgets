@@ -253,7 +253,7 @@ namespace Unity.UIWidgets.rendering {
         }
 
 
-        protected override float computeMaxIntrinsicHeight(float width) {
+        protected internal override float computeMaxIntrinsicHeight(float width) {
             switch (this.mainAxis) {
                 case Axis.horizontal:
                     return this._getIntrinsicMainAxis((RenderBox child) => child.getMaxIntrinsicHeight(width));

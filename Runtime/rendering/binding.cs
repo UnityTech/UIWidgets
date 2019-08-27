@@ -18,6 +18,7 @@ namespace Unity.UIWidgets.rendering {
 
             Window.instance.onMetricsChanged += this.handleMetricsChanged;
             Window.instance.onTextScaleFactorChanged += this.handleTextScaleFactorChanged;
+            Window.instance.onPlatformBrightnessChanged += this.handlePlatformBrightnessChanged;
             this.initRenderView();
             D.assert(this.renderView != null);
             this.addPersistentFrameCallback(this._handlePersistentFrameCallback);

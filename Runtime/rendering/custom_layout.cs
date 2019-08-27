@@ -233,7 +233,7 @@ namespace Unity.UIWidgets.rendering {
             return 0.0f;
         }
 
-        protected override float computeMaxIntrinsicHeight(float width) {
+        protected internal override float computeMaxIntrinsicHeight(float width) {
             float height = this._getSize(BoxConstraints.tightForFinite(width: width)).height;
             if (height.isFinite()) {
                 return height;

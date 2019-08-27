@@ -9,6 +9,7 @@ using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.scheduler;
 using Unity.UIWidgets.ui;
+using UnityEngine;
 
 namespace Unity.UIWidgets.widgets {
     public delegate Widget ViewportBuilder(BuildContext context, ViewportOffset position);
@@ -20,7 +21,7 @@ namespace Unity.UIWidgets.widgets {
             ScrollController controller = null,
             ScrollPhysics physics = null,
             ViewportBuilder viewportBuilder = null,
-            DragStartBehavior dragStartBehavior = DragStartBehavior.down
+            DragStartBehavior dragStartBehavior = DragStartBehavior.start
         ) : base(key: key) {
             D.assert(viewportBuilder != null);
 
@@ -360,6 +361,29 @@ namespace Unity.UIWidgets.widgets {
             D.assert(this._hold == null);
             D.assert(this._drag == null);
         }
+        
+        float _targetScrollOffsetForPointerScroll(PointerScrollEvent e) {
+            float delta = this.widget.axis == Axis.horizontal ? e.delta.dx : e.delta.dy;
+            return Mathf.Min(Mathf.Max(this.position.pixels + delta, this.position.minScrollExtent),
+                this.position.maxScrollExtent);
+        }
+        
+        void _receivedPointerSignal(PointerSignalEvent e) {
+            if (e is PointerScrollEvent && this.position != null) {
+                float targetScrollOffset = this._targetScrollOffsetForPointerScroll(e as PointerScrollEvent);
+                if (targetScrollOffset != this.position.pixels) {
+                    GestureBinding.instance.pointerSignalResolver.register(e, this._handlePointerScroll);
+                }
+            }
+        }
+
+        void _handlePointerScroll(PointerEvent e) {
+            D.assert(e is PointerScrollEvent);
+            float targetScrollOffset = this._targetScrollOffsetForPointerScroll(e as PointerScrollEvent);
+            if (targetScrollOffset != this.position.pixels) {
+                this.position.jumpTo(targetScrollOffset);
+            }
+        }
 
         void _disposeHold() {
             this._hold = null;
@@ -375,14 +399,17 @@ namespace Unity.UIWidgets.widgets {
             Widget result = new _ScrollableScope(
                 scrollable: this,
                 position: this.position,
-                child: new RawGestureDetector(
-                    key: this._gestureDetectorKey,
-                    gestures: this._gestureRecognizers,
-                    behavior: HitTestBehavior.opaque,
-                    child: new IgnorePointer(
-                        key: this._ignorePointerKey,
-                        ignoring: this._shouldIgnorePointer,
-                        child: this.widget.viewportBuilder(context, this.position)
+                child: new Listener(
+                    onPointerSignal: this._receivedPointerSignal,
+                    child: new RawGestureDetector(
+                        key: this._gestureDetectorKey,
+                        gestures: this._gestureRecognizers,
+                        behavior: HitTestBehavior.opaque,
+                        child: new IgnorePointer(
+                            key: this._ignorePointerKey,
+                            ignoring: this._shouldIgnorePointer,
+                            child: this.widget.viewportBuilder(context, this.position)
+                        )
                     )
                 )
             );

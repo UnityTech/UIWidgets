@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
@@ -577,7 +577,7 @@ namespace Unity.UIWidgets.ui {
                         this._paragraphStyle.fontStyle ?? TextStyle.kDefaultfontStyle).font;
                     var metrics = FontMetrics.fromFont(defaultFont,
                         (int) (this._paragraphStyle.fontSize ?? TextStyle.kDefaultFontSize));
-                    updateLineMetrics(metrics, this._paragraphStyle.lineHeight ?? TextStyle.kDefaultHeight);
+                    updateLineMetrics(metrics, this._paragraphStyle.height ?? TextStyle.kDefaultHeight);
                 }
 
                 this._lineHeights[lineNumber] = ((lineNumber == 0 ? 0 : this._lineHeights[lineNumber - 1])
@@ -661,7 +661,8 @@ namespace Unity.UIWidgets.ui {
 
         public List<TextBox> getRectsForRange(int start, int end) {
             var lineBoxes = new SplayTree<int, List<TextBox>>();
-            foreach (var run in this._codeUnitRuns) {
+            for (int runIndex = 0; runIndex < this._codeUnitRunsCount; runIndex++) {
+                var run = this._codeUnitRuns[runIndex];
                 if (run.codeUnits.start >= end) {
                     break;
                 }
@@ -784,7 +785,8 @@ namespace Unity.UIWidgets.ui {
             }
 
             TextDirection direction = TextDirection.ltr;
-            foreach (var run in this._codeUnitRuns) {
+            for (int runIndex = 0; runIndex < this._codeUnitRunsCount; runIndex++) {
+                var run = this._codeUnitRuns[runIndex];
                 if (gp.codeUnit >= run.codeUnits.start && gp.codeUnit + 1 <= run.codeUnits.end) {
                     direction = run.direction;
                     break;
@@ -1116,6 +1118,12 @@ namespace Unity.UIWidgets.ui {
 
         public void Add(KeyValuePair<TKey, TValue> item) {
             this.Set(item.Key, item.Value, throwOnExisting: true);
+        }
+        
+        public void AddAll(IEnumerable<TKey> list) {
+            foreach (var key in list) {
+                this.Add(new KeyValuePair<TKey, TValue>(key, default));
+            }
         }
 
         void Set(TKey key, TValue value, bool throwOnExisting) {

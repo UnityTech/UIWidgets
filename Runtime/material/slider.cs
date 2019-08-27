@@ -698,7 +698,7 @@ namespace Unity.UIWidgets.material {
             return Mathf.Max(this._minPreferredTrackHeight, this._maxSliderPartHeight);
         }
 
-        protected override float computeMaxIntrinsicHeight(float width) {
+        protected internal override float computeMaxIntrinsicHeight(float width) {
             return Mathf.Max(this._minPreferredTrackHeight, this._maxSliderPartHeight);
         }
 
@@ -761,13 +761,13 @@ namespace Unity.UIWidgets.material {
                     sliderTheme: this._sliderTheme
                 ).width;
 
-                if ((trackRect.width - tickMarkWidth) / this.divisions.Value >= 3.0f * tickMarkWidth) {
+                float adjustedTrackWidth = trackRect.width - tickMarkWidth;
+                if (adjustedTrackWidth / this.divisions.Value >= 3.0f * tickMarkWidth) {
+                    float dy = trackRect.center.dy;
                     for (int i = 0; i <= this.divisions; i++) {
                         float tickValue = i / this.divisions.Value;
-                        float tickX = trackRect.left +
-                                      tickValue * (trackRect.width - tickMarkWidth) + tickMarkWidth / 2;
-                        float tickY = trackRect.center.dy;
-                        Offset tickMarkOffset = new Offset(tickX, tickY);
+                        float dx = trackRect.left + tickValue * adjustedTrackWidth + tickMarkWidth / 2;
+                        Offset tickMarkOffset = new Offset(dx, dy);
                         this._sliderTheme.tickMarkShape.paint(
                             context,
                             tickMarkOffset,

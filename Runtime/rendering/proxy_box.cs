@@ -125,7 +125,7 @@ namespace Unity.UIWidgets.rendering {
             return height;
         }
 
-        protected override float computeMaxIntrinsicHeight(float width) {
+        protected internal override float computeMaxIntrinsicHeight(float width) {
             if (this._additionalConstraints.hasBoundedHeight && this._additionalConstraints.hasTightHeight) {
                 return this._additionalConstraints.minHeight;
             }
@@ -300,7 +300,7 @@ namespace Unity.UIWidgets.rendering {
             return 0.0f;
         }
 
-        protected override float computeMaxIntrinsicHeight(float width) {
+        protected internal override float computeMaxIntrinsicHeight(float width) {
             if (width.isFinite()) {
                 return width / this._aspectRatio;
             }
@@ -435,7 +435,7 @@ namespace Unity.UIWidgets.rendering {
             return _applyStep(height, this._stepHeight);
         }
 
-        protected override float computeMaxIntrinsicHeight(float width) {
+        protected internal override float computeMaxIntrinsicHeight(float width) {
             if (this.child == null) {
                 return 0.0f;
             }
@@ -1169,12 +1169,8 @@ namespace Unity.UIWidgets.rendering {
 
         Color _color;
 
-        protected static Paint _transparentPaint {
-            get { return new Paint {color = new Color(0x00000000)}; }
-        }
-
         protected override bool alwaysNeedsCompositing {
-            get { return this._elevation != 0.0; }
+            get { return true; }
         }
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder description) {
@@ -1266,36 +1262,17 @@ namespace Unity.UIWidgets.rendering {
                 Path offsetRRectAsPath = new Path();
                 offsetRRectAsPath.addRRect(offsetRRect);
 
-                if (this.needsCompositing) {
-                    PhysicalModelLayer physicalModel = new PhysicalModelLayer(
-                        clipPath: offsetRRectAsPath,
-                        clipBehavior: this.clipBehavior,
-                        elevation: this.elevation,
-                        color: this.color,
-                        shadowColor: this.shadowColor);
-                    context.pushLayer(physicalModel, base.paint, offset, childPaintBounds: offsetBounds);
-                }
-                else {
-                    Canvas canvas = context.canvas;
-                    if (this.elevation != 0.0) {
-                        canvas.drawRect(
-                            offsetBounds.inflate(20.0f),
-                            _transparentPaint
-                        );
-                        canvas.drawShadow(
-                            offsetRRectAsPath,
-                            this.shadowColor,
-                            this.elevation,
-                            this.color.alpha != 0xFF
-                        );
-                    }
-
-                    Paint paint = new Paint {color = this.color};
-                    canvas.drawRRect(offsetRRect, paint);
-                    context.clipRRectAndPaint(offsetRRect, this.clipBehavior, offsetBounds,
-                        () => base.paint(context, offset));
-                    D.assert(context.canvas == canvas, () => "canvas changed even though needsCompositing was false");
-                }
+                PhysicalModelLayer physicalModel = new PhysicalModelLayer(
+                    clipPath: offsetRRectAsPath,
+                    clipBehavior: this.clipBehavior,
+                    elevation: this.elevation,
+                    color: this.color,
+                    shadowColor: this.shadowColor);
+                D.assert(() => {
+                    physicalModel.debugCreator = this.debugCreator;
+                    return true;
+                });
+                context.pushLayer(physicalModel, base.paint, offset, childPaintBounds: offsetBounds);
             }
         }
 
@@ -1353,37 +1330,13 @@ namespace Unity.UIWidgets.rendering {
                 Path offsetPath = new Path();
                 offsetPath.addPath(this._clip, offset);
 
-                if (this.needsCompositing) {
-                    PhysicalModelLayer physicalModel = new PhysicalModelLayer(
-                        clipPath: offsetPath,
-                        clipBehavior: this.clipBehavior,
-                        elevation: this.elevation,
-                        color: this.color,
-                        shadowColor: this.shadowColor);
-                    context.pushLayer(physicalModel, base.paint, offset, childPaintBounds: offsetBounds);
-                }
-                else {
-                    Canvas canvas = context.canvas;
-                    if (this.elevation != 0.0) {
-                        canvas.drawRect(
-                            offsetBounds.inflate(20.0f),
-                            _transparentPaint
-                        );
-
-                        canvas.drawShadow(
-                            offsetPath,
-                            this.shadowColor,
-                            this.elevation,
-                            this.color.alpha != 0xFF
-                        );
-                    }
-
-                    Paint paint = new Paint {color = this.color, style = PaintingStyle.fill};
-                    canvas.drawPath(offsetPath, paint);
-                    context.clipPathAndPaint(offsetPath, this.clipBehavior,
-                        offsetBounds, () => base.paint(context, offset));
-                    D.assert(context.canvas == canvas, () => "canvas changed even though needsCompositing was false");
-                }
+                PhysicalModelLayer physicalModel = new PhysicalModelLayer(
+                    clipPath: offsetPath,
+                    clipBehavior: this.clipBehavior,
+                    elevation: this.elevation,
+                    color: this.color,
+                    shadowColor: this.shadowColor);
+                context.pushLayer(physicalModel, base.paint, offset, childPaintBounds: offsetBounds);
             }
         }
 
@@ -1926,6 +1879,8 @@ namespace Unity.UIWidgets.rendering {
 
     public delegate void PointerCancelEventListener(PointerCancelEvent evt);
 
+    public delegate void PointerSignalEventListener(PointerSignalEvent evt);
+
     public delegate void PointerScrollEventListener(PointerScrollEvent evt);
 
     public class RenderPointerListener : RenderProxyBoxWithHitTestBehavior {
@@ -1937,6 +1892,7 @@ namespace Unity.UIWidgets.rendering {
             PointerExitEventListener onPointerExit = null,
             PointerUpEventListener onPointerUp = null,
             PointerCancelEventListener onPointerCancel = null,
+            PointerSignalEventListener onPointerSignal = null,
             PointerScrollEventListener onPointerScroll = null,
             PointerDragFromEditorEnterEventListener onPointerDragFromEditorEnter = null,
             PointerDragFromEditorHoverEventListener onPointerDragFromEditorHover = null,
@@ -1949,6 +1905,7 @@ namespace Unity.UIWidgets.rendering {
             this.onPointerMove = onPointerMove;
             this.onPointerUp = onPointerUp;
             this.onPointerCancel = onPointerCancel;
+            this.onPointerSignal = onPointerSignal;
             this.onPointerScroll = onPointerScroll;
 
             this._onPointerEnter = onPointerEnter;
@@ -2072,9 +2029,15 @@ namespace Unity.UIWidgets.rendering {
 
         public PointerCancelEventListener onPointerCancel;
 
+        public PointerSignalEventListener onPointerSignal;
+
         public PointerScrollEventListener onPointerScroll;
 
         MouseTrackerAnnotation _hoverAnnotation;
+
+        public MouseTrackerAnnotation hoverAnnotation {
+            get { return this._hoverAnnotation; }
+        }
 
         void _updateAnnotations() {
             D.assert(this._onPointerEnter != this._hoverAnnotation.onEnter ||
@@ -2178,6 +2141,11 @@ namespace Unity.UIWidgets.rendering {
                 return;
             }
 
+            if (this.onPointerSignal != null && evt is PointerSignalEvent) {
+                this.onPointerSignal((PointerSignalEvent) evt);
+                return;
+            }
+            
             if (this.onPointerScroll != null && evt is PointerScrollEvent) {
                 this.onPointerScroll((PointerScrollEvent) evt);
             }
@@ -2212,6 +2180,10 @@ namespace Unity.UIWidgets.rendering {
 
             if (this.onPointerCancel != null) {
                 listeners.Add("cancel");
+            }
+
+            if (this.onPointerSignal != null) {
+                listeners.Add("signal");
             }
 
             if (listeners.isEmpty()) {
@@ -2392,7 +2364,7 @@ namespace Unity.UIWidgets.rendering {
             return base.computeMinIntrinsicHeight(width);
         }
 
-        protected override float computeMaxIntrinsicHeight(float width) {
+        protected internal override float computeMaxIntrinsicHeight(float width) {
             if (this.offstage) {
                 return 0.0f;
             }

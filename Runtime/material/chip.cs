@@ -52,6 +52,8 @@ namespace Unity.UIWidgets.material {
         MaterialTapTargetSize? materialTapTargetSize { get; }
 
         float? elevation { get; }
+        
+        Color shadowColor { get; }
     }
 
     public interface DeletableChipAttributes {
@@ -76,6 +78,8 @@ namespace Unity.UIWidgets.material {
         string tooltip { get; }
 
         ShapeBorder avatarBorder { get; }
+        
+        Color selectedShadowColor { get; }
     }
 
     public interface DisabledChipAttributes {
@@ -108,7 +112,8 @@ namespace Unity.UIWidgets.material {
             Color backgroundColor = null,
             EdgeInsets padding = null,
             MaterialTapTargetSize? materialTapTargetSize = null,
-            float? elevation = null
+            float? elevation = null,
+            Color shadowColor = null
         ) : base(key: key) {
             D.assert(label != null);
             D.assert(elevation == null || elevation >= 0.0f);
@@ -126,6 +131,7 @@ namespace Unity.UIWidgets.material {
             this._padding = padding;
             this._materialTapTargetSize = materialTapTargetSize;
             this._elevation = elevation;
+            this._shadowColor = shadowColor;
         }
 
         public Widget avatar {
@@ -212,6 +218,12 @@ namespace Unity.UIWidgets.material {
 
         float? _elevation;
 
+        public Color shadowColor {
+            get { return this._shadowColor; }
+        }
+
+        Color _shadowColor;
+
         public override Widget build(BuildContext context) {
             D.assert(MaterialD.debugCheckHasMaterial(context));
             return new RawChip(
@@ -230,6 +242,7 @@ namespace Unity.UIWidgets.material {
                 padding: this.padding,
                 materialTapTargetSize: this.materialTapTargetSize,
                 elevation: this.elevation,
+                shadowColor: this.shadowColor,
                 isEnabled: true
             );
         }
@@ -265,6 +278,7 @@ namespace Unity.UIWidgets.material {
             EdgeInsets padding = null,
             MaterialTapTargetSize? materialTapTargetSize = null,
             float? elevation = null,
+            Color shadowColor = null,
             Color selectedShadowColor = null,
             ShapeBorder avatarBorder = null
         ) : base(key: key) {
@@ -294,6 +308,8 @@ namespace Unity.UIWidgets.material {
             this._padding = padding;
             this._materialTapTargetSize = materialTapTargetSize;
             this._elevation = elevation;
+            this._shadowColor = shadowColor;
+            this._selectedShadowColor = selectedShadowColor;
         }
 
         public Widget avatar {
@@ -428,6 +444,18 @@ namespace Unity.UIWidgets.material {
 
         float? _elevation;
 
+        public Color shadowColor {
+            get { return this._shadowColor; }
+        }
+
+        Color _shadowColor;
+
+        public Color selectedShadowColor {
+            get { return this._selectedShadowColor; }
+        }
+
+        Color _selectedShadowColor;
+        
         public ShapeBorder avatarBorder {
             get { return this._avatarBorder; }
         }
@@ -459,6 +487,8 @@ namespace Unity.UIWidgets.material {
                 padding: this.padding,
                 materialTapTargetSize: this.materialTapTargetSize,
                 elevation: this.elevation,
+                shadowColor: this.shadowColor,
+                selectedShadowColor: this.selectedShadowColor,
                 isEnabled: this.isEnabled == true &&
                            (this.onSelected != null || this.onDeleted != null || this.onPressed != null),
                 avatarBorder: this.avatarBorder
@@ -488,6 +518,8 @@ namespace Unity.UIWidgets.material {
             EdgeInsets padding = null,
             MaterialTapTargetSize? materialTapTargetSize = null,
             float? elevation = null,
+            Color shadowColor = null,
+            Color selectedShadowColor = null,
             ShapeBorder avatarBorder = null
         ) : base(key: key) {
             D.assert(selected != null);
@@ -511,6 +543,8 @@ namespace Unity.UIWidgets.material {
             this._padding = padding;
             this._materialTapTargetSize = materialTapTargetSize;
             this._elevation = elevation;
+            this._shadowColor = shadowColor;
+            this._selectedShadowColor = selectedShadowColor;
         }
 
         public Widget avatar {
@@ -609,6 +643,18 @@ namespace Unity.UIWidgets.material {
 
         float? _elevation;
 
+        public Color shadowColor {
+            get { return this._shadowColor; }
+        }
+
+        Color _shadowColor;
+
+        public Color selectedShadowColor {
+            get { return this._selectedShadowColor; }
+        }
+
+        Color _selectedShadowColor;
+
         public ShapeBorder avatarBorder {
             get { return this._avatarBorder; }
         }
@@ -642,6 +688,8 @@ namespace Unity.UIWidgets.material {
                 isEnabled: this.isEnabled,
                 materialTapTargetSize: this.materialTapTargetSize,
                 elevation: this.elevation,
+                shadowColor: this.shadowColor,
+                selectedShadowColor: this.selectedShadowColor,
                 avatarBorder: this.avatarBorder
             );
         }
@@ -669,6 +717,8 @@ namespace Unity.UIWidgets.material {
             EdgeInsets padding = null,
             MaterialTapTargetSize? materialTapTargetSize = null,
             float? elevation = null,
+            Color shadowColor = null,
+            Color selectedShadowColor = null,
             ShapeBorder avatarBorder = null
         ) : base(key: key) {
             D.assert(label != null);
@@ -691,6 +741,8 @@ namespace Unity.UIWidgets.material {
             this._padding = padding;
             this._materialTapTargetSize = materialTapTargetSize;
             this._elevation = elevation;
+            this._shadowColor = shadowColor;
+            this._selectedShadowColor = selectedShadowColor;
         }
 
         public Widget avatar {
@@ -789,6 +841,18 @@ namespace Unity.UIWidgets.material {
 
         float? _elevation;
 
+        public Color shadowColor {
+            get { return this._shadowColor; }
+        }
+
+        Color _shadowColor;
+
+        public Color selectedShadowColor {
+            get { return this._selectedShadowColor; }
+        }
+
+        Color _selectedShadowColor;
+
         public ShapeBorder avatarBorder {
             get { return this._avatarBorder; }
         }
@@ -819,6 +883,8 @@ namespace Unity.UIWidgets.material {
                 isEnabled: this.isEnabled,
                 materialTapTargetSize: this.materialTapTargetSize,
                 elevation: this.elevation,
+                shadowColor: this.shadowColor,
+                selectedShadowColor: this.selectedShadowColor,
                 avatarBorder: this.avatarBorder
             );
         }
@@ -839,7 +905,8 @@ namespace Unity.UIWidgets.material {
             Color backgroundColor = null,
             EdgeInsets padding = null,
             MaterialTapTargetSize? materialTapTargetSize = null,
-            float? elevation = null
+            float? elevation = null,
+            Color shadowColor = null
         ) : base(key: key) {
             D.assert(label != null);
             D.assert(
@@ -862,6 +929,7 @@ namespace Unity.UIWidgets.material {
             this._padding = padding;
             this._materialTapTargetSize = materialTapTargetSize;
             this._elevation = elevation;
+            this._shadowColor = shadowColor;
         }
 
 
@@ -943,6 +1011,12 @@ namespace Unity.UIWidgets.material {
 
         float? _elevation;
 
+        public Color shadowColor {
+            get { return this._shadowColor; }
+        }
+
+        Color _shadowColor;
+
         public override Widget build(BuildContext context) {
             D.assert(MaterialD.debugCheckHasMaterial(context));
             return new RawChip(
@@ -959,7 +1033,8 @@ namespace Unity.UIWidgets.material {
                 labelPadding: this.labelPadding,
                 isEnabled: true,
                 materialTapTargetSize: this.materialTapTargetSize,
-                elevation: this.elevation
+                elevation: this.elevation,
+                shadowColor: this._shadowColor
             );
         }
     }
@@ -996,6 +1071,8 @@ namespace Unity.UIWidgets.material {
             Color backgroundColor = null,
             MaterialTapTargetSize? materialTapTargetSize = null,
             float? elevation = null,
+            Color shadowColor = null,
+            Color selectedShadowColor = null,
             ShapeBorder avatarBorder = null
         ) : base(key: key) {
             D.assert(label != null);
@@ -1028,6 +1105,8 @@ namespace Unity.UIWidgets.material {
             this._backgroundColor = backgroundColor;
             this._materialTapTargetSize = materialTapTargetSize;
             this._elevation = elevation;
+            this._shadowColor = shadowColor;
+            this._selectedShadowColor = selectedShadowColor;
         }
 
 
@@ -1163,6 +1242,18 @@ namespace Unity.UIWidgets.material {
 
         float? _elevation;
 
+        public Color shadowColor {
+            get { return this._shadowColor; }
+        }
+
+        Color _shadowColor;
+
+        public Color selectedShadowColor {
+            get { return this._selectedShadowColor; }
+        }
+
+        Color _selectedShadowColor;
+        
         public ShapeBorder avatarBorder {
             get { return this._avatarBorder; }
         }
@@ -1426,16 +1517,21 @@ namespace Unity.UIWidgets.material {
             ShapeBorder shape = this.widget.shape ?? chipTheme.shape;
             float elevation = this.widget.elevation ?? (chipTheme.elevation ?? _defaultElevation);
             float pressElevation = this.widget.pressElevation ?? (chipTheme.pressElevation ?? _defaultPressElevation);
+            Color shadowColor = this.widget.shadowColor ?? chipTheme.shadowColor ?? _defaultShadowColor;
+            Color selectedShadowColor = this.widget.selectedShadowColor ?? chipTheme.selectedShadowColor ?? _defaultShadowColor;
+            bool selected = this.widget.selected ?? false;
 
             Widget result = new Material(
                 elevation: this.isTapping ? pressElevation : elevation,
+                shadowColor: selected ? selectedShadowColor : shadowColor,
                 animationDuration: pressedAnimationDuration,
                 shape: shape,
                 clipBehavior: this.widget.clipBehavior,
-                child: new InkResponse(
+                child: new InkWell(
                     onTap: this.canTap ? this._handleTap : (GestureTapCallback) null,
                     onTapDown: this.canTap ? this._handleTapDown : (GestureTapDownCallback) null,
-                    onTapCancel: this.canTap ? this._handleTapCancel : (GestureTapCallback) null,
+                    onTapCancel: this.canTap ? this._handleTapCancel : (GestureTapCancelCallback) null,
+                    customBorder: shape,
                     child: new AnimatedBuilder(
                         animation: ListenableUtils.merge(new List<Listenable>
                             {this.selectController, this.enableController}),
@@ -2008,7 +2104,7 @@ namespace Unity.UIWidgets.material {
             );
         }
 
-        protected override float computeMaxIntrinsicHeight(float width) {
+        protected internal override float computeMaxIntrinsicHeight(float width) {
             return this.computeMinIntrinsicHeight(width);
         }
 

@@ -274,7 +274,7 @@ namespace Unity.UIWidgets.rendering {
             );
         }
 
-        protected override float computeMaxIntrinsicHeight(float width) {
+        protected internal override float computeMaxIntrinsicHeight(float width) {
             return this._getIntrinsicSize(
                 sizingDirection: Axis.vertical,
                 extent: width,
@@ -385,6 +385,8 @@ namespace Unity.UIWidgets.rendering {
             if (totalFlex > 0 || this.crossAxisAlignment == CrossAxisAlignment.baseline) {
                 float spacePerFlex = canFlex && totalFlex > 0 ? (freeSpace / totalFlex) : float.NaN;
                 child = this.firstChild;
+                float maxSizeAboveBaseline = 0;
+                float maxSizeBelowBaseline = 0;
                 while (child != null) {
                     int flex = this._getFlex(child);
                     if (flex > 0) {
@@ -448,6 +450,9 @@ namespace Unity.UIWidgets.rendering {
                         float? distance = child.getDistanceToBaseline(this.textBaseline, onlyReal: true);
                         if (distance != null) {
                             maxBaselineDistance = Mathf.Max(maxBaselineDistance, distance.Value);
+                            maxSizeAboveBaseline = Mathf.Max(distance.Value, maxSizeAboveBaseline);
+                            maxSizeBelowBaseline = Mathf.Max(child.size.height - distance.Value, maxSizeBelowBaseline);
+                            crossSize = maxSizeAboveBaseline + maxSizeBelowBaseline;
                         }
                     }
 

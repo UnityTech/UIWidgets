@@ -17,29 +17,45 @@ namespace Unity.UIWidgets.painting {
         public readonly List<Color> colors;
         public readonly List<float> stops;
 
-        public static _ColorsAndStops _interpolateColorsAndStops(
-            List<Color> aColors, List<float> aStops, List<Color> bColors, List<float> bStops, float t) {
-            D.assert(aColors.Count == bColors.Count,
-                () => "Cannot interpolate between two gradients with a different number of colors.");
-            D.assert((aStops == null && aColors.Count == 2) || (aStops != null && aStops.Count == aColors.Count));
-            D.assert((bStops == null && bColors.Count == 2) || (bStops != null && bStops.Count == bColors.Count));
-            List<Color> interpolatedColors = new List<Color>();
+        static Color _sample(List<Color> colors, List<float> stops, float t) {
+            D.assert(colors != null);
+            D.assert(colors.isNotEmpty);
+            D.assert(stops != null);
+            D.assert(stops.isNotEmpty);
 
-            for (int i = 0; i < aColors.Count; i += 1) {
-                interpolatedColors.Add(Color.lerp(aColors[i], bColors[i], t));
+            if (t < stops.first()) {
+                return colors.first();
             }
 
-            List<float> interpolatedStops = null;
-            if (aStops != null || bStops != null) {
-                aStops = aStops ?? new List<float> {0.0f, 1.0f};
-                bStops = bStops ?? new List<float> {0.0f, 1.0f};
-
-                D.assert(aStops.Count == bStops.Count);
-                interpolatedStops = new List<float>();
-                for (int i = 0; i < aStops.Count; i += 1) {
-                    interpolatedStops.Add(MathUtils.lerpFloat(aStops[i], bStops[i], t).clamp(0.0f, 1.0f));
-                }
+            if (t > stops.last()) {
+                return colors.last();
             }
+
+            int index = stops.FindLastIndex((float s) => { return s <= t; });
+            D.assert(index != -1);
+            return Color.lerp(colors[index], colors[index + 1], 
+                (t - stops[index]) / (stops[index + 1] - stops[index]));
+        }
+
+        internal static _ColorsAndStops _interpolateColorsAndStops(
+            List<Color> aColors,
+            List<float> aStops,
+            List<Color> bColors,
+            List<float> bStops,
+            float t) {
+            D.assert(aColors.Count >= 2);
+            D.assert(bColors.Count >= 2);
+            D.assert(aStops.Count == aColors.Count);
+            D.assert(bStops.Count == bColors.Count);
+
+            SplayTree<float, bool> stops = new SplayTree<float, bool>();
+            stops.AddAll(aStops);
+            stops.AddAll(bStops);
+
+            List<float> interpolatedStops = stops.Keys.ToList();
+            List<Color> interpolatedColors = interpolatedStops.Select<float, Color>((float stop) => {
+                return Color.lerp(_sample(aColors, aStops, stop), _sample(bColors, bStops, stop), t);
+            }).ToList();
 
             return new _ColorsAndStops(interpolatedColors, interpolatedStops);
         }
@@ -63,10 +79,6 @@ namespace Unity.UIWidgets.painting {
         protected List<float> _impliedStops() {
             if (this.stops != null) {
                 return this.stops;
-            }
-
-            if (this.colors.Count == 2) {
-                return null;
             }
 
             D.assert(this.colors.Count >= 2, () => "colors list must have at least two colors");
@@ -159,16 +171,16 @@ namespace Unity.UIWidgets.painting {
         }
 
         protected override Gradient lerpFrom(Gradient a, float t) {
-            if (a == null || (a is LinearGradient && a.colors.Count == this.colors.Count)) {
-                return LinearGradient.lerp((LinearGradient) a, this, t);
+            if (a == null || (a is LinearGradient)) {
+                return lerp((LinearGradient) a, this, t);
             }
 
             return base.lerpFrom(a, t);
         }
 
         protected override Gradient lerpTo(Gradient b, float t) {
-            if (b == null || (b is LinearGradient && b.colors.Count == this.colors.Count)) {
-                return LinearGradient.lerp(this, (LinearGradient) b, t);
+            if (b == null || (b is LinearGradient)) {
+                return lerp(this, (LinearGradient) b, t);
             }
 
             return base.lerpTo(b, t);
@@ -187,8 +199,12 @@ namespace Unity.UIWidgets.painting {
                 return (LinearGradient) a.scale(1.0f - t);
             }
 
-            _ColorsAndStops interpolated =
-                _ColorsAndStops._interpolateColorsAndStops(a.colors, a.stops, b.colors, b.stops, t);
+            _ColorsAndStops interpolated = _ColorsAndStops._interpolateColorsAndStops(
+                a.colors,
+                a._impliedStops(),
+                b.colors,
+                b._impliedStops(),
+                t);
             return new LinearGradient(
                 begin: Alignment.lerp(a.begin, b.begin, t),
                 end: Alignment.lerp(a.end, b.end, t),
@@ -250,7 +266,7 @@ namespace Unity.UIWidgets.painting {
             return !Equals(left, right);
         }
 
-        public override String ToString() {
+        public override string ToString() {
             return $"{this.GetType()}({this.begin}, {this.end}," +
                    $"{this.colors.toStringList()}, {this.stops.toStringList()}, {this.tileMode})";
         }
@@ -296,16 +312,16 @@ namespace Unity.UIWidgets.painting {
         }
 
         protected override Gradient lerpFrom(Gradient a, float t) {
-            if (a == null || (a is RadialGradient && a.colors.Count == this.colors.Count)) {
-                return RadialGradient.lerp((RadialGradient) a, this, t);
+            if (a == null || (a is RadialGradient)) {
+                return lerp((RadialGradient) a, this, t);
             }
 
             return base.lerpFrom(a, t);
         }
 
         protected override Gradient lerpTo(Gradient b, float t) {
-            if (b == null || (b is RadialGradient && b.colors.Count == this.colors.Count)) {
-                return RadialGradient.lerp(this, (RadialGradient) b, t);
+            if (b == null || (b is RadialGradient)) {
+                return lerp(this, (RadialGradient) b, t);
             }
 
             return base.lerpTo(b, t);
@@ -324,8 +340,12 @@ namespace Unity.UIWidgets.painting {
                 return (RadialGradient) a.scale(1.0f - t);
             }
 
-            _ColorsAndStops interpolated =
-                _ColorsAndStops._interpolateColorsAndStops(a.colors, a.stops, b.colors, b.stops, t);
+            _ColorsAndStops interpolated = _ColorsAndStops._interpolateColorsAndStops(
+                a.colors,
+                a._impliedStops(),
+                b.colors,
+                b._impliedStops(),
+                t);
             return new RadialGradient(
                 center: Alignment.lerp(a.center, b.center, t),
                 radius: Mathf.Max(0.0f, MathUtils.lerpFloat(a.radius, b.radius, t)),
@@ -387,7 +407,7 @@ namespace Unity.UIWidgets.painting {
             return !Equals(left, right);
         }
 
-        public override String ToString() {
+        public override string ToString() {
             return $"{this.GetType()}({this.center}, {this.radius}," +
                    $"{this.colors.toStringList()}, {this.stops.toStringList()}, {this.tileMode})";
         }
@@ -439,7 +459,7 @@ namespace Unity.UIWidgets.painting {
 
         protected override Gradient lerpFrom(Gradient a, float t) {
             if (a == null || (a is SweepGradient && a.colors.Count == this.colors.Count)) {
-                return SweepGradient.lerp((SweepGradient) a, this, t);
+                return lerp((SweepGradient) a, this, t);
             }
 
             return base.lerpFrom(a, t);
@@ -532,7 +552,7 @@ namespace Unity.UIWidgets.painting {
             return !Equals(left, right);
         }
 
-        public override String ToString() {
+        public override string ToString() {
             return $"{this.GetType()}({this.center}, {this.startAngle}, {this.endAngle}, " +
                    $"{this.colors.toStringList()}, {this.stops.toStringList()}, {this.tileMode})";
         }

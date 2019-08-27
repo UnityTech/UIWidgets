@@ -66,9 +66,29 @@ namespace Unity.UIWidgets.widgets {
         public readonly bool transitionOnUserGestures;
 
         internal static Dictionary<object, _HeroState>
-            _allHeroesFor(BuildContext context, bool isUserGestureTransition) {
+            _allHeroesFor(BuildContext context, bool isUserGestureTransition, NavigatorState navigator) {
             D.assert(context != null);
+            D.assert(navigator != null);
             Dictionary<object, _HeroState> result = new Dictionary<object, _HeroState> { };
+
+            void addHero(StatefulElement hero, object tag) {
+                D.assert(() => {
+                    if (result.ContainsKey(tag)) {
+                        throw new UIWidgetsError(
+                            "There are multiple heroes that share the same tag within a subtree.\n" +
+                            "Within each subtree for which heroes are to be animated (typically a PageRoute subtree), " +
+                            "each Hero must have a unique non-null tag.\n" +
+                            $"In this case, multiple heroes had the following tag: {tag}\n" +
+                            "Here is the subtree for one of the offending heroes:\n" +
+                            $"{hero.toStringDeep(prefixLineOne: "# ")}"
+                        );
+                    }
+
+                    return true;
+                });
+                _HeroState heroState = (_HeroState) hero.state;
+                result[tag] = heroState;
+            }
 
             void visitor(Element element) {
                 if (element.widget is Hero) {
@@ -77,22 +97,15 @@ namespace Unity.UIWidgets.widgets {
                     if (!isUserGestureTransition || heroWidget.transitionOnUserGestures) {
                         object tag = heroWidget.tag;
                         D.assert(tag != null);
-                        D.assert(() => {
-                            if (result.ContainsKey(tag)) {
-                                throw new UIWidgetsError(
-                                    "There are multiple heroes that share the same tag within a subtree.\n" +
-                                    "Within each subtree for which heroes are to be animated (typically a PageRoute subtree), " +
-                                    "each Hero must have a unique non-null tag.\n" +
-                                    $"In this case, multiple heroes had the following tag: {tag}\n" +
-                                    "Here is the subtree for one of the offending heroes:\n" +
-                                    $"{element.toStringDeep(prefixLineOne: "# ")}"
-                                );
+                        if (Navigator.of(hero) == navigator) {
+                            addHero(hero, tag);
+                        }
+                        else {
+                            ModalRoute heroRoute = ModalRoute.of(hero);
+                            if (heroRoute != null && heroRoute is PageRoute && heroRoute.isCurrent) {
+                                addHero(hero, tag);
                             }
-
-                            return true;
-                        });
-                        _HeroState heroState = (_HeroState) hero.state;
-                        result[tag] = heroState;
+                        }
                     }
                 }
 
@@ -131,6 +144,8 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public override Widget build(BuildContext context) {
+            D.assert(context.ancestorWidgetOfExactType(typeof(Hero)) == null,
+                () => "A Hero widget cannot be the descendant of another Hero widget.");
             if (this._placeholderSize != null) {
                 if (this.widget.placeholderBuilder == null) {
                     return new SizedBox(
@@ -163,7 +178,7 @@ namespace Unity.UIWidgets.widgets {
             HeroFlightShuttleBuilder shuttleBuilder,
             bool isUserGestureTransition
         ) {
-            D.assert(this.fromHero.widget.tag == this.toHero.widget.tag);
+            D.assert(fromHero.widget.tag == toHero.widget.tag);
             this.type = type;
             this.overlay = overlay;
             this.navigatorRect = navigatorRect;
@@ -417,7 +432,7 @@ namespace Unity.UIWidgets.widgets {
     }
 
     public class HeroController : NavigatorObserver {
-        HeroController(CreateRectTween createRectTween) {
+        public HeroController(CreateRectTween createRectTween = null) {
             this.createRectTween = createRectTween;
         }
 
@@ -434,7 +449,16 @@ namespace Unity.UIWidgets.widgets {
         public override void didPop(Route route, Route previousRoute) {
             D.assert(this.navigator != null);
             D.assert(route != null);
-            this._maybeStartHeroTransition(route, previousRoute, HeroFlightDirection.pop, false);
+            if (!this.navigator.userGestureInProgress) {
+                this._maybeStartHeroTransition(route, previousRoute, HeroFlightDirection.pop, false);
+            }
+        }
+
+        public override void didReplace(Route newRoute = null, Route oldRoute = null) {
+            D.assert(this.navigator != null);
+            if (newRoute?.isCurrent == true) {
+                this._maybeStartHeroTransition(oldRoute, newRoute, HeroFlightDirection.push, false);
+            }
         }
 
         public override void didStartUserGesture(Route route, Route previousRoute) {
@@ -496,14 +520,15 @@ namespace Unity.UIWidgets.widgets {
 
             Rect navigatorRect = HeroUtils._globalBoundingBoxFor(this.navigator.context);
 
-            Dictionary<object, _HeroState>
-                fromHeroes = Hero._allHeroesFor(from.subtreeContext, isUserGestureTransition);
-            Dictionary<object, _HeroState> toHeroes = Hero._allHeroesFor(to.subtreeContext, isUserGestureTransition);
+            Dictionary<object, _HeroState> fromHeroes =
+                Hero._allHeroesFor(from.subtreeContext, isUserGestureTransition, this.navigator);
+            Dictionary<object, _HeroState> toHeroes =
+                Hero._allHeroesFor(to.subtreeContext, isUserGestureTransition, this.navigator);
 
             to.offstage = false;
 
             foreach (object tag in fromHeroes.Keys) {
-                if (toHeroes[tag] != null) {
+                if (toHeroes.ContainsKey(tag)) {
                     HeroFlightShuttleBuilder fromShuttleBuilder = fromHeroes[tag].widget.flightShuttleBuilder;
                     HeroFlightShuttleBuilder toShuttleBuilder = toHeroes[tag].widget.flightShuttleBuilder;
 
@@ -521,16 +546,16 @@ namespace Unity.UIWidgets.widgets {
                         isUserGestureTransition: isUserGestureTransition
                     );
 
-                    if (this._flights[tag] != null) {
-                        this._flights[tag].divert(manifest);
+                    if (this._flights.TryGetValue(tag, out var result)) {
+                        result.divert(manifest);
                     }
                     else {
                         this._flights[tag] = new _HeroFlight(this._handleFlightEnded);
                         this._flights[tag].start(manifest);
                     }
                 }
-                else if (this._flights[tag] != null) {
-                    this._flights[tag].abort();
+                else if (this._flights.TryGetValue(tag, out var result)) {
+                    result.abort();
                 }
             }
         }

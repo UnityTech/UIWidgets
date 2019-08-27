@@ -32,6 +32,9 @@ namespace UIWidgets.Tests {
             EditorWindow.GetWindow(typeof(Widgets));
         }
 
+        //These samples are not available after Unity2019.1
+        /*
+        [MenuItem("UIWidgetsTests/Show SceneViewTests")]
         [MenuItem("Window/UIWidgets/Tests/Show SceneViewTests")]
         public static void showSceneView() {
             SceneViewTests.show();
@@ -40,6 +43,6 @@ namespace UIWidgets.Tests {
         [MenuItem("Window/UIWidgets/Tests/Hide SceneViewTests")]
         public static void hideSceneView() {
             SceneViewTests.hide();
-        }
+        }*/
     }
 }

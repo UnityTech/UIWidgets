@@ -68,7 +68,7 @@ namespace UIWidgets.Tests {
             return null;
         }
 
-        RenderBox box(RenderParagraph p, int width = 200, int height = 200) {
+        RenderBox box(RenderParagraph p, int width = 200, int height = 600) {
             return new RenderConstrainedOverflowBox(
                     minWidth: width,
                     maxWidth: width,
@@ -76,8 +76,7 @@ namespace UIWidgets.Tests {
                     maxHeight: height,
                     alignment: Alignment.center,
                     child: p
-                )
-                ;
+                );
         }
 
         RenderBox flexItemBox(RenderParagraph p, int width = 200, int height = 150) {

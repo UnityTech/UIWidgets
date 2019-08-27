@@ -198,6 +198,91 @@ namespace Unity.UIWidgets.material {
         }
     }
 
+    class _BodyBoxConstraints : BoxConstraints {
+        public _BodyBoxConstraints(
+            float minWidth = 0.0f,
+            float maxWidth = float.PositiveInfinity,
+            float minHeight = 0.0f,
+            float maxHeight = float.PositiveInfinity,
+            float? bottomWidgetsHeight = null
+        ) : base(minWidth: minWidth, maxWidth: maxWidth, minHeight: minHeight, maxHeight: maxHeight) {
+            D.assert(bottomWidgetsHeight != null);
+            D.assert(bottomWidgetsHeight >= 0);
+            this.bottomWidgetsHeight = bottomWidgetsHeight.Value;
+        }
+
+        public readonly float bottomWidgetsHeight;
+        
+        public bool Equals(_BodyBoxConstraints other) {
+            if (ReferenceEquals(null, other)) {
+                return false;
+            }
+
+            if (ReferenceEquals(this, other)) {
+                return true;
+            }
+
+            return this.bottomWidgetsHeight.Equals(other.bottomWidgetsHeight)
+                   && base.Equals(other);
+        }
+
+        public override bool Equals(object obj) {
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+
+            if (obj.GetType() != this.GetType()) {
+                return false;
+            }
+
+            return this.Equals((_BodyBoxConstraints) obj);
+        }
+
+        public override int GetHashCode() {
+            unchecked {
+                var hashCode = base.GetHashCode();
+                hashCode = (hashCode * 397) ^ this.bottomWidgetsHeight.GetHashCode();
+                return hashCode;
+            }
+        }
+
+        public static bool operator ==(_BodyBoxConstraints left, _BodyBoxConstraints right) {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(_BodyBoxConstraints left, _BodyBoxConstraints right) {
+            return !Equals(left, right);
+        }
+    }
+
+    class _BodyBuilder : StatelessWidget {
+        public _BodyBuilder(Key key = null, Widget body = null) : base(key: key) {
+            this.body = body;
+        }
+
+        public readonly Widget body;
+
+        public override Widget build(BuildContext context) {
+            return new LayoutBuilder(
+                builder: (ctx, constraints) => {
+                    _BodyBoxConstraints bodyConstraints = (_BodyBoxConstraints) constraints;
+                    MediaQueryData metrics = MediaQuery.of(context);
+                    return new MediaQuery(
+                        data: metrics.copyWith(
+                            padding: metrics.padding.copyWith(
+                                bottom: Mathf.Max(metrics.padding.bottom, bodyConstraints.bottomWidgetsHeight)
+                            )
+                        )
+                    );
+                }
+            );
+        }
+    }
+
     class _ScaffoldLayout : MultiChildLayoutDelegate {
         public _ScaffoldLayout(
             EdgeInsets minInsets,
@@ -205,7 +290,8 @@ namespace Unity.UIWidgets.material {
             FloatingActionButtonLocation previousFloatingActionButtonLocation,
             FloatingActionButtonLocation currentFloatingActionButtonLocation,
             float floatingActionButtonMoveAnimationProgress,
-            FloatingActionButtonAnimator floatingActionButtonMotionAnimator
+            FloatingActionButtonAnimator floatingActionButtonMotionAnimator,
+            bool extendBody
         ) {
             D.assert(minInsets != null);
             D.assert(geometryNotifier != null);
@@ -218,8 +304,11 @@ namespace Unity.UIWidgets.material {
             this.currentFloatingActionButtonLocation = currentFloatingActionButtonLocation;
             this.floatingActionButtonMoveAnimationProgress = floatingActionButtonMoveAnimationProgress;
             this.floatingActionButtonMotionAnimator = floatingActionButtonMotionAnimator;
+            this.extendBody = extendBody;
         }
 
+        public readonly bool extendBody;
+        
         public readonly EdgeInsets minInsets;
 
         public readonly _ScaffoldGeometryNotifier geometryNotifier;
@@ -270,9 +359,15 @@ namespace Unity.UIWidgets.material {
             float contentBottom = Mathf.Max(0.0f, bottom - Mathf.Max(this.minInsets.bottom, bottomWidgetsHeight));
 
             if (this.hasChild(_ScaffoldSlot.body)) {
-                BoxConstraints bodyConstraints = new BoxConstraints(
+                float bodyMaxHeight = Mathf.Max(0.0f, contentBottom - contentTop);
+                if (this.extendBody) {
+                    bodyMaxHeight += bottomWidgetsHeight;
+                    D.assert(bodyMaxHeight <= Mathf.Max(0.0f, looseConstraints.maxHeight - contentTop));
+                }
+                BoxConstraints bodyConstraints = new _BodyBoxConstraints(
                     maxWidth: fullWidthConstraints.maxWidth,
-                    maxHeight: Mathf.Max(0.0f, contentBottom - contentTop)
+                    maxHeight: bodyMaxHeight,
+                    bottomWidgetsHeight: this.extendBody ? bottomWidgetsHeight : 0.0f
                 );
                 this.layoutChild(_ScaffoldSlot.body, bodyConstraints);
                 this.positionChild(_ScaffoldSlot.body, new Offset(0.0f, contentTop));
@@ -591,7 +686,8 @@ namespace Unity.UIWidgets.material {
             bool? resizeToAvoidBottomPadding = null,
             bool? resizeToAvoidBottomInset = null,
             bool primary = true,
-            DragStartBehavior drawerDragStartBehavior = DragStartBehavior.down
+            DragStartBehavior drawerDragStartBehavior = DragStartBehavior.start,
+            bool extendBody = false
         ) : base(key: key) {
             this.appBar = appBar;
             this.body = body;
@@ -608,7 +704,10 @@ namespace Unity.UIWidgets.material {
             this.resizeToAvoidBottomInset = resizeToAvoidBottomInset;
             this.primary = primary;
             this.drawerDragStartBehavior = drawerDragStartBehavior;
+            this.extendBody = extendBody;
         }
+
+        public readonly bool extendBody;
 
         public readonly PreferredSizeWidget appBar;
 
@@ -1169,7 +1268,8 @@ namespace Unity.UIWidgets.material {
 
             this._addIfNonNull(
                 children: children,
-                child: this.widget.body,
+                child: this.widget.body != null && this.widget.extendBody
+                    ? new _BodyBuilder(body: this.widget.body) : this.widget.body,
                 childId: _ScaffoldSlot.body,
                 removeLeftPadding: false,
                 removeTopPadding: this.widget.appBar != null,
@@ -1323,6 +1423,8 @@ namespace Unity.UIWidgets.material {
                 bottom: this._resizeToAvoidBottomInset ? mediaQuery.viewInsets.bottom : 0.0f
             );
 
+            bool _extendBody = !(minInsets.bottom > 0) && this.widget.extendBody;
+            
             return new _ScaffoldScope(
                 hasDrawer: this.hasDrawer,
                 geometryNotifier: this._geometryNotifier,
@@ -1335,6 +1437,7 @@ namespace Unity.UIWidgets.material {
                                 return new CustomMultiChildLayout(
                                     children: new List<Widget>(children),
                                     layoutDelegate: new _ScaffoldLayout(
+                                        extendBody: _extendBody,
                                         minInsets: minInsets,
                                         currentFloatingActionButtonLocation: this._floatingActionButtonLocation,
                                         floatingActionButtonMoveAnimationProgress: this

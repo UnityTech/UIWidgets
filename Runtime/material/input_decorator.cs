@@ -635,14 +635,18 @@ namespace Unity.UIWidgets.material {
         public _RenderDecoration(
             _Decoration decoration,
             TextBaseline? textBaseline,
-            bool isFocused
+            bool isFocused,
+            bool expands
         ) {
             D.assert(decoration != null);
             D.assert(textBaseline != null);
             this._decoration = decoration;
             this._textBaseline = textBaseline;
             this._isFocused = isFocused;
+            this._expands = expands;
         }
+
+        public const float subtextGap = 8.0f;
 
         public readonly Dictionary<_DecorationSlot, RenderBox> slotToChild =
             new Dictionary<_DecorationSlot, RenderBox>();
@@ -834,6 +838,20 @@ namespace Unity.UIWidgets.material {
 
         bool _isFocused;
 
+        public bool expands {
+            get { return this._expands; }
+            set {
+                if (this._expands == value) {
+                    return;
+                }
+
+                this._expands = value;
+                this.markNeedsLayout();
+            }
+        }
+
+        bool _expands = false;
+
         public override void attach(object owner) {
             base.attach(owner);
             foreach (RenderBox child in this._children) {
@@ -907,106 +925,188 @@ namespace Unity.UIWidgets.material {
             get { return this.decoration.contentPadding; }
         }
 
+        float _layoutLineBox(RenderBox box, BoxConstraints constraints) {
+            if (box == null) {
+                return 0.0f;
+            }
+
+            box.layout(constraints, parentUsesSize: true);
+            float baseline = box.getDistanceToBaseline(this.textBaseline.Value).Value;
+            D.assert(baseline >= 0.0f);
+            return baseline;
+        }
+
         _RenderDecorationLayout _layout(BoxConstraints layoutConstraints) {
             Dictionary<RenderBox, float> boxToBaseline = new Dictionary<RenderBox, float>();
             BoxConstraints boxConstraints = layoutConstraints.loosen();
-            float aboveBaseline = 0.0f;
-            float belowBaseline = 0.0f;
-
-            void layoutLineBox(RenderBox box) {
-                if (box == null) {
-                    return;
-                }
-
-                box.layout(boxConstraints, parentUsesSize: true);
-                float baseline = box.getDistanceToBaseline(this.textBaseline ?? 0.0f) ?? 0.0f;
-                D.assert(baseline >= 0.0f);
-                boxToBaseline[box] = baseline;
-                aboveBaseline = Mathf.Max(baseline, aboveBaseline);
-                belowBaseline = Mathf.Max(box.size.height - baseline, belowBaseline);
+            if (this.prefix != null) {
+                boxToBaseline[this.prefix] = this._layoutLineBox(this.prefix, boxConstraints);
             }
-
-            layoutLineBox(this.prefix);
-            layoutLineBox(this.suffix);
-
+            if (this.suffix != null) {
+                boxToBaseline[this.suffix] = this._layoutLineBox(this.suffix, boxConstraints);
+            }
             if (this.icon != null) {
-                this.icon.layout(boxConstraints, parentUsesSize: true);
+                boxToBaseline[this.icon] = this._layoutLineBox(this.icon, boxConstraints);
             }
-
             if (this.prefixIcon != null) {
-                this.prefixIcon.layout(boxConstraints, parentUsesSize: true);
+                boxToBaseline[this.prefixIcon] = this._layoutLineBox(this.prefixIcon, boxConstraints);
             }
-
             if (this.suffixIcon != null) {
-                this.suffixIcon.layout(boxConstraints, parentUsesSize: true);
+                boxToBaseline[this.suffixIcon] = this._layoutLineBox(this.suffixIcon, boxConstraints);
             }
 
-            float inputWidth = Mathf.Max(0.0f, this.constraints.maxWidth - (
-                                                   _boxSize(this.icon).width
-                                                   + this.contentPadding.left
-                                                   + _boxSize(this.prefixIcon).width
-                                                   + _boxSize(this.prefix).width
-                                                   + _boxSize(this.suffix).width
-                                                   + _boxSize(this.suffixIcon).width
-                                                   + this.contentPadding.right));
-
-            boxConstraints = boxConstraints.copyWith(maxWidth: inputWidth);
+            float inputWidth = Math.Max(0.0f, this.constraints.maxWidth - (
+                                                  _boxSize(this.icon).width
+                                                  + this.contentPadding.left
+                                                  + _boxSize(this.prefixIcon).width
+                                                  + _boxSize(this.prefix).width
+                                                  + _boxSize(this.suffix).width
+                                                  + _boxSize(this.suffixIcon).width
+                                                  + this.contentPadding.right));
             if (this.label != null) {
-                if (this.decoration.alignLabelWithHint == true) {
-                    layoutLineBox(this.label);
-                }
-                else {
-                    this.label.layout(boxConstraints, parentUsesSize: true);
-                }
+                boxToBaseline[this.label] = this._layoutLineBox(this.label,
+                    boxConstraints.copyWith(maxWidth: inputWidth)
+                );
             }
 
-            boxConstraints = boxConstraints.copyWith(minWidth: inputWidth);
-            layoutLineBox(this.hint);
-            layoutLineBox(this.input);
-
-            float inputBaseline = this.contentPadding.top + aboveBaseline;
-            float containerHeight = this.contentPadding.top
-                                    + aboveBaseline
-                                    + belowBaseline
-                                    + this.contentPadding.bottom;
-
-            if (this.label != null) {
-                containerHeight += this.decoration.floatingLabelHeight;
-                inputBaseline += this.decoration.floatingLabelHeight;
+            if (this.hint != null) {
+                boxToBaseline[this.hint] = this._layoutLineBox(this.hint,
+                    boxConstraints.copyWith(minWidth: inputWidth, maxWidth: inputWidth)
+                );
             }
 
-            containerHeight = Mathf.Max(
-                containerHeight,
-                Mathf.Max(
-                    _boxSize(this.suffixIcon).height,
-                    _boxSize(this.prefixIcon).height));
+            if (this.counter != null) {
+                boxToBaseline[this.counter] = this._layoutLineBox(this.counter, boxConstraints);
+            }
 
-            float outlineBaseline = aboveBaseline +
-                                    (containerHeight - (2.0f + aboveBaseline + belowBaseline)) / 2.0f;
-
-            float subtextBaseline = 0.0f;
-            float subtextHeight = 0.0f;
-            if (this.helperError != null || this.counter != null) {
-                boxConstraints = layoutConstraints.loosen();
-                aboveBaseline = 0.0f;
-                belowBaseline = 0.0f;
-                layoutLineBox(this.counter);
-
-                boxConstraints = boxConstraints.copyWith(
-                    maxWidth: Mathf.Max(0.0f, boxConstraints.maxWidth
-                                              - _boxSize(this.icon).width
-                                              - _boxSize(this.counter).width
-                                              - this.contentPadding.horizontal
+            if (this.helperError != null) {
+                boxToBaseline[this.helperError] = this._layoutLineBox(this.helperError,
+                    boxConstraints.copyWith(
+                        maxWidth: Math.Max(0.0f, boxConstraints.maxWidth
+                                                 - _boxSize(this.icon).width
+                                                 - _boxSize(this.counter).width
+                                                 - this.contentPadding.horizontal
+                        )
                     )
                 );
-                layoutLineBox(this.helperError);
-
-                if (aboveBaseline + belowBaseline > 0.0f) {
-                    const float subtextGap = 8.0f;
-                    subtextBaseline = containerHeight + subtextGap + aboveBaseline;
-                    subtextHeight = subtextGap + aboveBaseline + belowBaseline;
-                }
             }
+
+            float labelHeight = this.label == null
+                ? 0
+                : this.decoration.floatingLabelHeight;
+            float topHeight = this.decoration.border.isOutline
+                ? Math.Max(labelHeight - boxToBaseline[this.label], 0)
+                : labelHeight;
+            float counterHeight = this.counter == null
+                ? 0
+                : boxToBaseline[this.counter] + subtextGap;
+            bool helperErrorExists = this.helperError?.size != null
+                                     && this.helperError.size.height > 0;
+            float helperErrorHeight = !helperErrorExists
+                ? 0
+                : this.helperError.size.height + subtextGap;
+            float bottomHeight = Math.Max(
+                counterHeight,
+                helperErrorHeight
+            );
+            if (this.input != null) {
+                boxToBaseline[this.input] = this._layoutLineBox(this.input,
+                    boxConstraints.deflate(EdgeInsets.only(
+                        top: this.contentPadding.top + topHeight,
+                        bottom: this.contentPadding.bottom + bottomHeight
+                    )).copyWith(
+                        minWidth: inputWidth,
+                        maxWidth: inputWidth
+                    )
+                );
+            }
+
+            // The field can be occupied by a hint or by the input itself
+            float hintHeight = this.hint == null ? 0 : this.hint.size.height;
+            float inputDirectHeight = this.input == null ? 0 : this.input.size.height;
+            float inputHeight = Math.Max(hintHeight, inputDirectHeight);
+            float inputInternalBaseline = Math.Max(
+                boxToBaseline.getOrDefault(this.input, 0.0f),
+                boxToBaseline.getOrDefault(this.hint, 0.0f)
+            );
+
+            // Calculate the amount that prefix/suffix affects height above and below
+            // the input.
+            float prefixHeight = this.prefix == null ? 0 : this.prefix.size.height;
+            float suffixHeight = this.suffix == null ? 0 : this.suffix.size.height;
+            float fixHeight = Math.Max(
+                boxToBaseline.getOrDefault(this.prefix, 0.0f),
+                boxToBaseline.getOrDefault(this.suffix, 0.0f)
+            );
+            float fixAboveInput = Math.Max(0, fixHeight - inputInternalBaseline);
+            float fixBelowBaseline = Math.Max(
+                prefixHeight - boxToBaseline.getOrDefault(this.prefix, 0.0f),
+                suffixHeight - boxToBaseline.getOrDefault(this.suffix, 0.0f)
+            );
+            float fixBelowInput = Math.Max(
+                0,
+                fixBelowBaseline - (inputHeight - inputInternalBaseline)
+            );
+
+            // Calculate the height of the input text container.
+            float prefixIconHeight = this.prefixIcon == null ? 0 : this.prefixIcon.size.height;
+            float suffixIconHeight = this.suffixIcon == null ? 0 : this.suffixIcon.size.height;
+            float fixIconHeight = Math.Max(prefixIconHeight, suffixIconHeight);
+            float contentHeight = Math.Max(
+                fixIconHeight,
+                topHeight
+                + this.contentPadding.top
+                + fixAboveInput
+                + inputHeight
+                + fixBelowInput
+                + this.contentPadding.bottom
+            );
+            float maxContainerHeight = boxConstraints.maxHeight - bottomHeight;
+            float containerHeight = this.expands
+                ? maxContainerHeight
+                : Math.Min(contentHeight, maxContainerHeight);
+
+            // Always position the prefix/suffix in the same place (baseline).
+            float overflow = Math.Max(0, contentHeight - maxContainerHeight);
+            float baselineAdjustment = fixAboveInput - overflow;
+
+            // The baselines that will be used to draw the actual input text content.
+            float inputBaseline = this.contentPadding.top
+                                  + topHeight
+                                  + inputInternalBaseline
+                                  + baselineAdjustment;
+            // The text in the input when an outline border is present is centered
+            // within the container less 2.0 dps at the top to account for the vertical
+            // space occupied by the floating label.
+            float outlineBaseline = inputInternalBaseline
+                                    + baselineAdjustment / 2
+                                    + (containerHeight - (2.0f + inputHeight)) / 2.0f;
+
+            // Find the positions of the text below the input when it exists.
+            float subtextCounterBaseline = 0;
+            float subtextHelperBaseline = 0;
+            float subtextCounterHeight = 0;
+            float subtextHelperHeight = 0;
+            if (this.counter != null) {
+                subtextCounterBaseline =
+                    containerHeight + subtextGap + boxToBaseline.getOrDefault(this.counter, 0.0f);
+                subtextCounterHeight = this.counter.size.height + subtextGap;
+            }
+
+            if (helperErrorExists) {
+                subtextHelperBaseline =
+                    containerHeight + subtextGap + boxToBaseline.getOrDefault(this.helperError, 0.0f);
+                subtextHelperHeight = helperErrorHeight;
+            }
+
+            float subtextBaseline = Math.Max(
+                subtextCounterBaseline,
+                subtextHelperBaseline
+            );
+            float subtextHeight = Math.Max(
+                subtextCounterHeight,
+                subtextHelperHeight
+            );
 
             return new _RenderDecorationLayout(
                 boxToBaseline: boxToBaseline,
@@ -1056,7 +1156,7 @@ namespace Unity.UIWidgets.material {
         protected override float computeMinIntrinsicHeight(float width) {
             float subtextHeight = this._lineHeight(width, new List<RenderBox> {this.helperError, this.counter});
             if (subtextHeight > 0.0f) {
-                subtextHeight += 8.0f;
+                subtextHeight += subtextGap;
             }
 
             return this.contentPadding.top
@@ -1066,13 +1166,12 @@ namespace Unity.UIWidgets.material {
                    + this.contentPadding.bottom;
         }
 
-        protected override float computeMaxIntrinsicHeight(float width) {
+        protected internal override float computeMaxIntrinsicHeight(float width) {
             return this.computeMinIntrinsicHeight(width);
         }
 
         protected override float? computeDistanceToActualBaseline(TextBaseline baseline) {
-            D.assert(false, () => "not implemented");
-            return 0.0f;
+            return _boxParentData(this.input).offset.dy + this.input.getDistanceToActualBaseline(baseline);
         }
 
         Matrix3 _labelTransform;
@@ -1405,18 +1504,22 @@ namespace Unity.UIWidgets.material {
             Key key = null,
             _Decoration decoration = null,
             TextBaseline? textBaseline = null,
-            bool isFocused = false
+            bool isFocused = false,
+            bool? expands = null
         ) : base(key: key) {
             D.assert(decoration != null);
             D.assert(textBaseline != null);
+            D.assert(expands != null);
             this.decoration = decoration;
             this.textBaseline = textBaseline;
             this.isFocused = isFocused;
+            this.expands = expands.Value;
         }
 
         public readonly _Decoration decoration;
         public readonly TextBaseline? textBaseline;
         public readonly bool isFocused;
+        public readonly bool expands;
 
         public override Element createElement() {
             return new _RenderDecorationElement(this);
@@ -1426,7 +1529,8 @@ namespace Unity.UIWidgets.material {
             return new _RenderDecoration(
                 decoration: this.decoration,
                 textBaseline: this.textBaseline,
-                isFocused: this.isFocused
+                isFocused: this.isFocused,
+                expands: this.expands
             );
         }
 
@@ -1435,6 +1539,7 @@ namespace Unity.UIWidgets.material {
             renderObject.decoration = this.decoration;
             renderObject.textBaseline = this.textBaseline;
             renderObject.isFocused = this.isFocused;
+            renderObject.expands = this.expands;
         }
     }
 
@@ -1476,6 +1581,7 @@ namespace Unity.UIWidgets.material {
             TextStyle baseStyle = null,
             TextAlign? textAlign = null,
             bool isFocused = false,
+            bool expands = false,
             bool isEmpty = false,
             Widget child = null
         ) : base(key: key) {
@@ -1483,6 +1589,7 @@ namespace Unity.UIWidgets.material {
             this.baseStyle = baseStyle;
             this.textAlign = textAlign;
             this.isFocused = isFocused;
+            this.expands = expands;
             this.isEmpty = isEmpty;
             this.child = child;
         }
@@ -1494,6 +1601,8 @@ namespace Unity.UIWidgets.material {
         public readonly TextAlign? textAlign;
 
         public readonly bool isFocused;
+        
+        public readonly bool expands;
 
         public readonly bool isEmpty;
 
@@ -1518,6 +1627,7 @@ namespace Unity.UIWidgets.material {
             properties.add(new DiagnosticsProperty<InputDecoration>("decoration", this.decoration));
             properties.add(new DiagnosticsProperty<TextStyle>("baseStyle", this.baseStyle, defaultValue: null));
             properties.add(new DiagnosticsProperty<bool>("isFocused", this.isFocused));
+            properties.add(new DiagnosticsProperty<bool>("expands", this.expands));
             properties.add(new DiagnosticsProperty<bool>("isEmpty", this.isEmpty));
         }
     }
@@ -1928,7 +2038,8 @@ namespace Unity.UIWidgets.material {
                     container: container
                 ),
                 textBaseline: textBaseline,
-                isFocused: this.isFocused
+                isFocused: this.isFocused,
+                expands: this.widget.expands
             );
         }
     }
@@ -1972,8 +2083,10 @@ namespace Unity.UIWidgets.material {
             bool? alignLabelWithHint = null
         ) {
             D.assert(enabled != null);
-            D.assert(!(prefix != null && prefixText != null), () => "Declaring both prefix and prefixText is not supported");
-            D.assert(!(suffix != null && suffixText != null), () => "Declaring both suffix and suffixText is not supported");
+            D.assert(!(prefix != null && prefixText != null),
+                () => "Declaring both prefix and prefixText is not supported");
+            D.assert(!(suffix != null && suffixText != null),
+                () => "Declaring both suffix and suffixText is not supported");
             this.isCollapsed = false;
             this.icon = icon;
             this.labelText = labelText;
