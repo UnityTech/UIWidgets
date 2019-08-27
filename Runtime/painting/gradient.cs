@@ -27,7 +27,7 @@ namespace Unity.UIWidgets.painting {
                 return colors.first();
             }
 
-            if (t < stops.last()) {
+            if (t > stops.last()) {
                 return colors.last();
             }
 
