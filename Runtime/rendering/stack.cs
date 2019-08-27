@@ -300,7 +300,7 @@ namespace Unity.UIWidgets.rendering {
             return this._getIntrinsicDimension((RenderBox child) => child.getMinIntrinsicHeight(width));
         }
 
-        protected override float computeMaxIntrinsicHeight(float width) {
+        protected internal override float computeMaxIntrinsicHeight(float width) {
             return this._getIntrinsicDimension((RenderBox child) => child.getMaxIntrinsicHeight(width));
         }
 

@@ -141,12 +141,15 @@ namespace Unity.UIWidgets.material {
         protected internal override Widget build(BuildContext context) {
             ThemeData themeData = Theme.of(context);
             TabBarTheme tabBarTheme = TabBarTheme.of(context);
-
-            TextStyle defaultStyle = this.labelStyle ?? tabBarTheme.labelStyle ?? themeData.primaryTextTheme.body2;
-            TextStyle defaultUnselectedStyle = this.unselectedLabelStyle
-                                               ?? tabBarTheme.unselectedLabelStyle
-                                               ?? this.labelStyle ?? themeData.primaryTextTheme.body2;
             Animation<float> animation = (Animation<float>) this.listenable;
+            
+            TextStyle defaultStyle = (this.labelStyle
+                                      ?? tabBarTheme.labelStyle
+                                      ?? themeData.primaryTextTheme.body2).copyWith(inherit: true);
+            TextStyle defaultUnselectedStyle = (this.unselectedLabelStyle
+                                               ?? tabBarTheme.unselectedLabelStyle
+                                               ?? this.labelStyle
+                                               ?? themeData.primaryTextTheme.body2).copyWith(inherit: true);
             TextStyle textStyle = this.selected
                 ? TextStyle.lerp(defaultStyle, defaultUnselectedStyle, animation.value)
                 : TextStyle.lerp(defaultUnselectedStyle, defaultStyle, animation.value);
@@ -508,7 +511,7 @@ namespace Unity.UIWidgets.material {
             EdgeInsets labelPadding = null,
             Color unselectedLabelColor = null,
             TextStyle unselectedLabelStyle = null,
-            DragStartBehavior dragStartBehavior = DragStartBehavior.down,
+            DragStartBehavior dragStartBehavior = DragStartBehavior.start,
             ValueChanged<int> onTap = null
         ) : base(key: key) {
             indicatorPadding = indicatorPadding ?? EdgeInsets.zero;
@@ -634,6 +637,16 @@ namespace Unity.UIWidgets.material {
                         "TabController using the \"controller\" property, or you must ensure that there " +
                         "is a DefaultTabController above the " + this.widget.GetType() + ".\n" +
                         "In this case, there was neither an explicit controller nor a default controller."
+                    );
+                }
+
+                return true;
+            });
+            D.assert(() => {
+                if (newController.length != this.widget.tabs.Count) {
+                    throw new UIWidgetsError(
+                        $"Controller's length property {newController.length} does not match the\n" +
+                        $"number of tab elements {this.widget.tabs.Count} present in TabBar's tabs property."
                     );
                 }
 
@@ -827,12 +840,14 @@ namespace Unity.UIWidgets.material {
                 );
             }
 
+            TabBarTheme tabBarTheme = TabBarTheme.of(context);
+
             List<Widget> wrappedTabs = new List<Widget>();
             for (int i = 0; i < this.widget.tabs.Count; i++) {
                 wrappedTabs.Add(new Center(
                         heightFactor: 1.0f,
                         child: new Padding(
-                            padding: this.widget.labelPadding ?? Constants.kTabLabelPadding,
+                            padding: this.widget.labelPadding ?? tabBarTheme.labelPadding ?? Constants.kTabLabelPadding,
                             child: new KeyedSubtree(
                                 key: this._tabKeys[i],
                                 child: this.widget.tabs[i]
@@ -926,7 +941,7 @@ namespace Unity.UIWidgets.material {
             List<Widget> children = null,
             TabController controller = null,
             ScrollPhysics physics = null,
-            DragStartBehavior dragStartBehavior = DragStartBehavior.down
+            DragStartBehavior dragStartBehavior = DragStartBehavior.start
         ) : base(key: key) {
             D.assert(children != null);
             this.children = children;
@@ -965,6 +980,16 @@ namespace Unity.UIWidgets.material {
                         "TabController using the \"controller\" property, or you must ensure that there " +
                         "is a DefaultTabController above the " + this.widget.GetType() + ".\n" +
                         "In this case, there was neither an explicit controller nor a default controller."
+                    );
+                }
+
+                return true;
+            });
+            D.assert(() => {
+                if (newController.length != this.widget.children.Count) {
+                    throw new UIWidgetsError(
+                        $"Controller's length property {newController.length} does not match the\n" +
+                        $"number of elements {this.widget.children.Count} present in TabBarView's children property."
                     );
                 }
 

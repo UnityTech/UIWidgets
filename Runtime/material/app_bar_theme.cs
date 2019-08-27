@@ -10,12 +10,14 @@ namespace Unity.UIWidgets.material {
             Color color = null,
             float? elevation = null,
             IconThemeData iconTheme = null,
+            IconThemeData actionsIconTheme = null,
             TextTheme textTheme = null
         ) {
             this.brightness = brightness;
             this.color = color;
             this.elevation = elevation;
             this.iconTheme = iconTheme;
+            this.actionsIconTheme = actionsIconTheme;
             this.textTheme = textTheme;
         }
 
@@ -27,6 +29,8 @@ namespace Unity.UIWidgets.material {
 
         public readonly IconThemeData iconTheme;
 
+        public readonly IconThemeData actionsIconTheme;
+
         public readonly TextTheme textTheme;
 
         AppBarTheme copyWith(
@@ -34,6 +38,7 @@ namespace Unity.UIWidgets.material {
             Color color = null,
             float? elevation = null,
             IconThemeData iconTheme = null,
+            IconThemeData actionsIconTheme = null,
             TextTheme textTheme = null
         ) {
             return new AppBarTheme(
@@ -41,6 +46,7 @@ namespace Unity.UIWidgets.material {
                 color: color ?? this.color,
                 elevation: elevation ?? this.elevation,
                 iconTheme: iconTheme ?? this.iconTheme,
+                actionsIconTheme: actionsIconTheme ?? this.actionsIconTheme,
                 textTheme: textTheme ?? this.textTheme
             );
         }
@@ -55,6 +61,7 @@ namespace Unity.UIWidgets.material {
                 color: Color.lerp(a?.color, b?.color, t),
                 elevation: MathUtils.lerpFloat(a?.elevation ?? 0.0f, b?.elevation ?? 0.0f, t),
                 iconTheme: IconThemeData.lerp(a?.iconTheme, b?.iconTheme, t),
+                actionsIconTheme: IconThemeData.lerp(a?.actionsIconTheme, b?.actionsIconTheme, t),
                 textTheme: TextTheme.lerp(a?.textTheme, b?.textTheme, t)
             );
         }
@@ -64,6 +71,7 @@ namespace Unity.UIWidgets.material {
             hashCode = (hashCode * 397) ^ this.color?.GetHashCode() ?? 0;
             hashCode = (hashCode * 397) ^ this.elevation?.GetHashCode() ?? 0;
             hashCode = (hashCode * 397) ^ this.iconTheme?.GetHashCode() ?? 0;
+            hashCode = (hashCode * 397) ^ this.actionsIconTheme?.GetHashCode() ?? 0;
             hashCode = (hashCode * 397) ^ this.textTheme?.GetHashCode() ?? 0;
             return hashCode;
         }
@@ -97,6 +105,7 @@ namespace Unity.UIWidgets.material {
                    && other.color == this.color
                    && other.elevation == this.elevation
                    && other.iconTheme == this.iconTheme
+                   && other.actionsIconTheme == this.actionsIconTheme
                    && other.textTheme == this.textTheme;
         }
 
@@ -106,6 +115,7 @@ namespace Unity.UIWidgets.material {
             properties.add(new DiagnosticsProperty<Color>("color", this.color, defaultValue: null));
             properties.add(new DiagnosticsProperty<float?>("elevation", this.elevation, defaultValue: null));
             properties.add(new DiagnosticsProperty<IconThemeData>("iconTheme", this.iconTheme, defaultValue: null));
+            properties.add(new DiagnosticsProperty<IconThemeData>("actionsIconTheme", this.actionsIconTheme, defaultValue: null));
             properties.add(new DiagnosticsProperty<TextTheme>("textTheme", this.textTheme, defaultValue: null));
         }
     }

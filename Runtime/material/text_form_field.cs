@@ -19,6 +19,7 @@ namespace UIWidgets.Runtime.material {
             TextCapitalization textCapitalization = TextCapitalization.none,
             TextInputAction? textInputAction = null,
             TextStyle style = null,
+            StrutStyle strutStyle = null,
             TextDirection? textDirection = null,
             TextAlign textAlign = TextAlign.left,
             bool autofocus = false,
@@ -26,7 +27,9 @@ namespace UIWidgets.Runtime.material {
             bool autocorrect = true,
             bool autovalidate = false,
             bool maxLengthEnforced = true,
-            int maxLines = 1,
+            int? maxLines = 1,
+            int? minLines = null,
+            bool expands = false,
             int? maxLength = null,
             VoidCallback onEditingComplete = null,
             ValueChanged<string> onFieldSubmitted = null,
@@ -59,6 +62,7 @@ namespace UIWidgets.Runtime.material {
                     keyboardType: keyboardType,
                     textInputAction: textInputAction,
                     style: style,
+                    strutStyle: strutStyle,
                     textAlign: textAlign,
                     textDirection: textDirection ?? TextDirection.ltr,
                     textCapitalization: textCapitalization,
@@ -67,6 +71,8 @@ namespace UIWidgets.Runtime.material {
                     autocorrect: autocorrect,
                     maxLengthEnforced: maxLengthEnforced,
                     maxLines: maxLines,
+                    minLines: minLines,
+                    expands: expands,
                     maxLength: maxLength,
                     onChanged: field.didChange,
                     onEditingComplete: onEditingComplete,
@@ -85,6 +91,12 @@ namespace UIWidgets.Runtime.material {
         ) {
             D.assert(initialValue == null || controller == null);
             D.assert(maxLines > 0);
+            D.assert(maxLines == null || maxLines > 0);
+            D.assert(minLines == null || minLines > 0);
+            D.assert((maxLines == null) || (minLines == null) || (maxLines >= minLines),
+                () => "minLines can't be greater than maxLines");
+            D.assert(!expands || (maxLines == null && minLines == null),
+                () => "minLines and maxLines must be null when expands is true.");
             D.assert(maxLength == null || maxLength > 0);
             this.controller = controller;
         }

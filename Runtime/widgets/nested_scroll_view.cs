@@ -25,7 +25,7 @@ namespace Unity.UIWidgets.widgets {
             ScrollPhysics physics = null,
             NestedScrollViewHeaderSliversBuilder headerSliverBuilder = null,
             Widget body = null,
-            DragStartBehavior dragStartBehavior = DragStartBehavior.down
+            DragStartBehavior dragStartBehavior = DragStartBehavior.start
         ) : base(key: key) {
             D.assert(headerSliverBuilder != null);
             D.assert(body != null);
@@ -157,7 +157,7 @@ namespace Unity.UIWidgets.widgets {
             ScrollController controller,
             List<Widget> slivers,
             SliverOverlapAbsorberHandle handle,
-            DragStartBehavior dragStartBehavior = DragStartBehavior.down
+            DragStartBehavior dragStartBehavior = DragStartBehavior.start
         ) : base(
             scrollDirection: scrollDirection,
             reverse: reverse,

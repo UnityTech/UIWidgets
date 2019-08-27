@@ -8,6 +8,10 @@ using Object = UnityEngine.Object;
 namespace Unity.UIWidgets.foundation {
     public delegate void ValueChanged<T>(T value);
 
+    public delegate void ValueSetter<T>(T value);
+
+    public delegate T ValueGetter<T>();
+
     public delegate IEnumerable<T> EnumerableFilter<T>(IEnumerable<T> input);
 
     public static class ObjectUtils {
@@ -69,6 +73,15 @@ namespace Unity.UIWidgets.foundation {
 
         public static TValue getOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> it, TKey key) {
             TValue v;
+            it.TryGetValue(key, out v);
+            return v;
+        }
+        
+        public static TValue getOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> it, TKey key, TValue defaultVal) {
+            TValue v = defaultVal;
+            if (key == null) {
+                return v;
+            }
             it.TryGetValue(key, out v);
             return v;
         }

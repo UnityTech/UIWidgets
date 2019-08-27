@@ -68,4 +68,24 @@ namespace Unity.UIWidgets.painting {
             return ret;
         }
     }
+
+    class AutomaticNotchedShape : NotchedShape {
+        public AutomaticNotchedShape(ShapeBorder host, ShapeBorder guest = null) {
+            this.host = host;
+            this.guest = guest;
+        }
+
+        public readonly ShapeBorder host;
+        public readonly ShapeBorder guest;
+
+        public override Path getOuterPath(Rect hostRect, Rect guestRect) {
+            Path hostPath = this.host.getOuterPath(hostRect);
+            if (this.guest != null && guestRect != null) {
+                Path guestPath = this.guest.getOuterPath(guestRect);
+                return Path.combine(PathOperation.difference, hostPath, guestPath);
+            }
+
+            return hostPath;
+        }
+    }
 }

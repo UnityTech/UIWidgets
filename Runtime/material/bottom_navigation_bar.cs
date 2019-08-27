@@ -18,13 +18,6 @@ using TextStyle = Unity.UIWidgets.painting.TextStyle;
 using Transform = Unity.UIWidgets.widgets.Transform;
 
 namespace Unity.UIWidgets.material {
-    class BottomNavigationBarUtils {
-        public const float _kActiveFontSize = 14.0f;
-        public const float _kInactiveFontSize = 12.0f;
-        public const float _kTopMargin = 6.0f;
-        public const float _kBottomMargin = 8.0f;
-    }
-
     public enum BottomNavigationBarType {
         fix,
         shifting
@@ -36,9 +29,17 @@ namespace Unity.UIWidgets.material {
             List<BottomNavigationBarItem> items = null,
             ValueChanged<int> onTap = null,
             int currentIndex = 0,
+            float elevation = 8.0f,
             BottomNavigationBarType? type = null,
             Color fixedColor = null,
-            float iconSize = 24.0f
+            Color backgroundColor = null,
+            float iconSize = 24.0f,
+            Color selectedItemColor = null,
+            Color unselectedItemColor = null,
+            float selectedFontSize = 14.0f,
+            float unselectedFontSize = 12.0f,
+            bool showSelectedLabels = true,
+            bool? showUnselectedLabels = null
         ) : base(key: key) {
             D.assert(items != null);
             D.assert(items.Count >= 2);
@@ -46,12 +47,26 @@ namespace Unity.UIWidgets.material {
                 () => "Every item must have a non-null title"
             );
             D.assert(0 <= currentIndex && currentIndex < items.Count);
+            D.assert(elevation >= 0.0f);
+            D.assert(iconSize >= 0.0f);
+            D.assert(selectedItemColor == null || fixedColor == null,
+                () => "Either selectedItemColor or fixedColor can be specified, but not both!");
+            D.assert(selectedFontSize >= 0.0f);
+            D.assert(unselectedFontSize >= 0.0f);
+            type = _type(type, items);
             this.items = items;
             this.onTap = onTap;
             this.currentIndex = currentIndex;
+            this.elevation = elevation;
             this.type = type ?? (items.Count <= 3 ? BottomNavigationBarType.fix : BottomNavigationBarType.shifting);
-            this.fixedColor = fixedColor;
+            this.backgroundColor = backgroundColor;
             this.iconSize = iconSize;
+            this.selectedItemColor = selectedItemColor ?? fixedColor;
+            this.unselectedItemColor = unselectedItemColor;
+            this.selectedFontSize = selectedFontSize;
+            this.unselectedFontSize = unselectedFontSize;
+            this.showSelectedLabels = showSelectedLabels;
+            this.showUnselectedLabels = showUnselectedLabels ?? _defaultShowUnselected(_type(type, items));
         }
 
         public readonly List<BottomNavigationBarItem> items;
@@ -60,11 +75,53 @@ namespace Unity.UIWidgets.material {
 
         public readonly int currentIndex;
 
+        public readonly float elevation;
+
         public readonly BottomNavigationBarType? type;
 
-        public readonly Color fixedColor;
+        public Color fixedColor {
+            get { return this.selectedItemColor; }
+        }
+
+        public readonly Color backgroundColor;
 
         public readonly float iconSize;
+
+
+        public readonly Color selectedItemColor;
+
+        public readonly Color unselectedItemColor;
+
+        public readonly float selectedFontSize;
+
+        public readonly float unselectedFontSize;
+
+        public readonly bool showUnselectedLabels;
+
+        public readonly bool showSelectedLabels;
+
+        static BottomNavigationBarType _type(
+            BottomNavigationBarType? type,
+            List<BottomNavigationBarItem> items
+        ) {
+            if (type != null) {
+                return type.Value;
+            }
+
+            return items.Count <= 3 ? BottomNavigationBarType.fix : BottomNavigationBarType.shifting;
+        }
+
+        static bool _defaultShowUnselected(BottomNavigationBarType type) {
+            switch (type) {
+                case BottomNavigationBarType.shifting:
+                    return false;
+                case BottomNavigationBarType.fix:
+                    return true;
+            }
+
+            D.assert(false);
+            return false;
+        }
 
         public override State createState() {
             return new _BottomNavigationBarState();
@@ -81,8 +138,17 @@ namespace Unity.UIWidgets.material {
             ColorTween colorTween = null,
             float? flex = null,
             bool selected = false,
+            float? selectedFontSize = null,
+            float? unselectedFontSize = null,
+            bool? showSelectedLabels = null,
+            bool? showUnselectedLabels = null,
             string indexLabel = null
         ) {
+            D.assert(type != null);
+            D.assert(item != null);
+            D.assert(animation != null);
+            D.assert(selectedFontSize != null && selectedFontSize >= 0);
+            D.assert(unselectedFontSize != null && unselectedFontSize >= 0);
             this.type = type;
             this.item = item;
             this.animation = animation;
@@ -91,6 +157,10 @@ namespace Unity.UIWidgets.material {
             this.colorTween = colorTween;
             this.flex = flex;
             this.selected = selected;
+            this.selectedFontSize = selectedFontSize.Value;
+            this.unselectedFontSize = unselectedFontSize.Value;
+            this.showSelectedLabels = showSelectedLabels ?? false;
+            this.showUnselectedLabels = showUnselectedLabels ?? false;
             this.indexLabel = indexLabel;
         }
 
@@ -102,19 +172,37 @@ namespace Unity.UIWidgets.material {
         public readonly ColorTween colorTween;
         public readonly float? flex;
         public readonly bool selected;
+        public readonly float selectedFontSize;
+        public readonly float unselectedFontSize;
         public readonly string indexLabel;
+        public readonly bool showSelectedLabels;
+        public readonly bool showUnselectedLabels;
 
         public override Widget build(BuildContext context) {
             int size;
-            Widget label;
+            float bottomPadding = this.selectedFontSize / 2.0f;
+            float topPadding = this.selectedFontSize / 2.0f;
+            if (this.showSelectedLabels && !this.showUnselectedLabels) {
+                bottomPadding = new FloatTween(
+                    begin: 0.0f,
+                    end: this.selectedFontSize / 2.0f
+                ).evaluate(this.animation);
+                topPadding = new FloatTween(
+                    begin: this.selectedFontSize,
+                    end: this.selectedFontSize / 2.0f
+                ).evaluate(this.animation);
+            }
+
+            if (!this.showSelectedLabels && !this.showUnselectedLabels) {
+                bottomPadding = 0.0f;
+                topPadding = this.selectedFontSize;
+            }
             switch (this.type) {
                 case BottomNavigationBarType.fix:
                     size = 1;
-                    label = new _FixedLabel(colorTween: this.colorTween, animation: this.animation, item: this.item);
                     break;
                 case BottomNavigationBarType.shifting:
                     size = ((this.flex * 1000.0f) ?? 0.0f).round();
-                    label = new _ShiftingLabel(animation: this.animation, item: this.item);
                     break;
                 default:
                     throw new Exception("Unknown BottomNavigationBarType: " + this.type);
@@ -126,21 +214,31 @@ namespace Unity.UIWidgets.material {
                     children: new List<Widget> {
                         new InkResponse(
                             onTap: this.onTap == null ? (GestureTapCallback) null : () => { this.onTap(); },
-                            child: new Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                mainAxisSize: MainAxisSize.min,
-                                children: new List<Widget> {
-                                    new _TileIcon(
-                                        type: this.type,
-                                        colorTween: this.colorTween,
-                                        animation: this.animation,
-                                        iconSize: this.iconSize,
-                                        selected: this.selected,
-                                        item: this.item
-                                    ),
-                                    label
-                                }
+                            child: new Padding(
+                                padding: EdgeInsets.only(top: topPadding, bottom: bottomPadding),
+                                child: new Column(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: new List<Widget> {
+                                        new _TileIcon(
+                                            colorTween: this.colorTween,
+                                            animation: this.animation,
+                                            iconSize: this.iconSize,
+                                            selected: this.selected,
+                                            item: this.item
+                                        ),
+                                        new _Label(
+                                            colorTween: this.colorTween,
+                                            animation: this.animation,
+                                            item: this.item,
+                                            selectedFontSize: this.selectedFontSize,
+                                            unselectedFontSize: this.unselectedFontSize,
+                                            showSelectedLabels: this.showSelectedLabels,
+                                            showUnselectedLabels: this.showUnselectedLabels
+                                        )
+                                    }
+                                )
                             )
                         )
                     }
@@ -153,14 +251,14 @@ namespace Unity.UIWidgets.material {
     class _TileIcon : StatelessWidget {
         public _TileIcon(
             Key key = null,
-            BottomNavigationBarType? type = null,
             ColorTween colorTween = null,
             Animation<float> animation = null,
             float? iconSize = null,
             bool? selected = null,
             BottomNavigationBarItem item = null
         ) : base(key: key) {
-            this.type = type;
+            D.assert(selected != null);
+            D.assert(item != null);
             this.colorTween = colorTween;
             this.animation = animation;
             this.iconSize = iconSize;
@@ -168,7 +266,6 @@ namespace Unity.UIWidgets.material {
             this.item = item;
         }
 
-        BottomNavigationBarType? type;
         ColorTween colorTween;
         Animation<float> animation;
         float? iconSize;
@@ -176,31 +273,12 @@ namespace Unity.UIWidgets.material {
         BottomNavigationBarItem item;
 
         public override Widget build(BuildContext context) {
-            float tweenStart;
-            Color iconColor;
-            switch (this.type) {
-                case BottomNavigationBarType.fix:
-                    tweenStart = 8.0f;
-                    iconColor = this.colorTween.evaluate(this.animation);
-                    break;
-                case BottomNavigationBarType.shifting:
-                    tweenStart = 16.0f;
-                    iconColor = Colors.white;
-                    break;
-                default:
-                    throw new Exception("Unknown BottomNavigationBarType: " + this.type);
-            }
+            Color iconColor = this.colorTween.evaluate(this.animation);
 
             return new Align(
                 alignment: Alignment.topCenter,
                 heightFactor: 1.0f,
                 child: new Container(
-                    margin: EdgeInsets.only(
-                        top: new FloatTween(
-                            begin: tweenStart,
-                            end: BottomNavigationBarUtils._kTopMargin
-                        ).evaluate(this.animation)
-                    ),
                     child: new IconTheme(
                         data: new IconThemeData(
                             color: iconColor,
@@ -213,87 +291,82 @@ namespace Unity.UIWidgets.material {
         }
     }
 
-    class _FixedLabel : StatelessWidget {
-        public _FixedLabel(
+    class _Label : StatelessWidget {
+        public _Label(
             Key key = null,
             ColorTween colorTween = null,
             Animation<float> animation = null,
-            BottomNavigationBarItem item = null
+            BottomNavigationBarItem item = null,
+            float? selectedFontSize = null,
+            float? unselectedFontSize = null,
+            bool? showSelectedLabels = null,
+            bool? showUnselectedLabels = null
         ) : base(key: key) {
+            D.assert(colorTween != null);
+            D.assert(animation != null);
+            D.assert(item != null);
+            D.assert(selectedFontSize != null);
+            D.assert(unselectedFontSize != null);
+            D.assert(showSelectedLabels != null);
+            D.assert(showUnselectedLabels != null);
             this.colorTween = colorTween;
             this.animation = animation;
             this.item = item;
+            this.selectedFontSize = selectedFontSize.Value;
+            this.unselectedFontSize = unselectedFontSize.Value;
+            this.showSelectedLabels = showSelectedLabels.Value;
+            this.showUnselectedLabels = showUnselectedLabels.Value;
         }
 
-        ColorTween colorTween;
-        Animation<float> animation;
-        BottomNavigationBarItem item;
+        public readonly ColorTween colorTween;
+        public readonly Animation<float> animation;
+        public readonly BottomNavigationBarItem item;
+        public readonly float selectedFontSize;
+        public readonly float unselectedFontSize;
+        public readonly bool showSelectedLabels;
+        public readonly bool showUnselectedLabels;
 
         public override Widget build(BuildContext context) {
-            float t = new FloatTween(
-                begin: BottomNavigationBarUtils._kInactiveFontSize / BottomNavigationBarUtils._kActiveFontSize,
-                end: 1.0f
-            ).evaluate(this.animation);
+            float t = new FloatTween(begin: this.unselectedFontSize / this.selectedFontSize, end: 1.0f)
+                    .evaluate(this.animation);
+            Widget text = DefaultTextStyle.merge(
+                style: new TextStyle(
+                    fontSize: this.selectedFontSize,
+                    color: this.colorTween.evaluate(this.animation)
+                ),
+                child: new Transform(
+                    transform: Matrix3.makeAll(t, 0, 0,
+                                               0, t, 0,
+                                               0, 0, 1),
+                    alignment: Alignment.bottomCenter,
+                    child: this.item.title
+                )
+            );
+            if (!this.showUnselectedLabels && !this.showSelectedLabels) {
+                text = new Opacity(
+                    opacity: 0.0f,
+                    child: text
+                );
+            }
+            else if (this.showUnselectedLabels) {
+                text = new FadeTransition(
+                    opacity: this.animation,
+                    child: text
+                );
+            }
+            else if (!this.showSelectedLabels) {
+                text = new FadeTransition(
+                    opacity: new FloatTween(begin: 1.0f, end: 0.0f).animate(this.animation),
+                    child: text
+                );
+            }
             return new Align(
                 alignment: Alignment.bottomCenter,
                 heightFactor: 1.0f,
-                child: new Container(
-                    margin: EdgeInsets.only(bottom: BottomNavigationBarUtils._kBottomMargin),
-                    child: DefaultTextStyle.merge(
-                        style: new TextStyle(
-                            fontSize: BottomNavigationBarUtils._kActiveFontSize,
-                            color: this.colorTween.evaluate(this.animation)
-                        ),
-                        child: new Transform(
-                            transform: Matrix3.makeScale(t),
-                            alignment: Alignment.bottomCenter,
-                            child: this.item.title
-                        )
-                    )
-                )
+                child: new Container(child: text)
             );
         }
     }
-
-    class _ShiftingLabel : StatelessWidget {
-        public _ShiftingLabel(
-            Key key = null,
-            Animation<float> animation = null,
-            BottomNavigationBarItem item = null
-        ) : base(key: key) {
-            this.animation = animation;
-            this.item = item;
-        }
-
-        Animation<float> animation;
-        BottomNavigationBarItem item;
-
-        public override Widget build(BuildContext context) {
-            return new Align(
-                alignment: Alignment.bottomCenter,
-                heightFactor: 1.0f,
-                child: new Container(
-                    margin: EdgeInsets.only(
-                        bottom: new FloatTween(
-                            begin: 2.0f,
-                            end: BottomNavigationBarUtils._kBottomMargin
-                        ).evaluate(this.animation)
-                    ),
-                    child: new FadeTransition(
-                        opacity: this.animation,
-                        child: DefaultTextStyle.merge(
-                            style: new TextStyle(
-                                fontSize: BottomNavigationBarUtils._kActiveFontSize,
-                                color: Colors.white
-                            ),
-                            child: this.item.title
-                        )
-                    )
-                )
-            );
-        }
-    }
-
 
     class _BottomNavigationBarState : TickerProviderStateMixin<BottomNavigationBar> {
         public List<AnimationController> _controllers = new List<AnimationController> { };
@@ -426,70 +499,62 @@ namespace Unity.UIWidgets.material {
         List<Widget> _createTiles() {
             MaterialLocalizations localizations = MaterialLocalizations.of(this.context);
             D.assert(localizations != null);
-            List<Widget> children = new List<Widget> { };
-            switch (this.widget.type) {
-                case BottomNavigationBarType.fix:
-                    ThemeData themeData = Theme.of(this.context);
-                    TextTheme textTheme = themeData.textTheme;
-                    Color themeColor;
-                    switch (themeData.brightness) {
-                        case Brightness.light:
-                            themeColor = themeData.primaryColor;
-                            break;
-                        case Brightness.dark:
-                            themeColor = themeData.accentColor;
-                            break;
-                        default:
-                            throw new Exception("Unknown brightness: " + themeData.brightness);
-                    }
-
-                    ColorTween colorTween = new ColorTween(
-                        begin: textTheme.caption.color,
-                        end: this.widget.fixedColor ?? themeColor
-                    );
-                    for (int i = 0; i < this.widget.items.Count; i += 1) {
-                        int index = i;
-                        children.Add(
-                            new _BottomNavigationTile(this.widget.type, this.widget.items[i], this._animations[i],
-                                this.widget.iconSize,
-                                onTap: () => {
-                                    if (this.widget.onTap != null) {
-                                        this.widget.onTap(index);
-                                    }
-                                },
-                                colorTween: colorTween,
-                                selected: i == this.widget.currentIndex,
-                                indexLabel: localizations.tabLabel(tabIndex: i + 1,
-                                    tabCount: this.widget.items.Count)
-                            )
-                        );
-                    }
-
+            ThemeData themeData = Theme.of(this.context);
+            Color themeColor;
+            switch (themeData.brightness) {
+                case Brightness.light:
+                    themeColor = themeData.primaryColor;
                     break;
-                case BottomNavigationBarType.shifting:
-                    for (int i = 0; i < this.widget.items.Count; i += 1) {
-                        int index = i;
-                        children.Add(
-                            new _BottomNavigationTile(this.widget.type, this.widget.items[i], this._animations[i],
-                                this.widget.iconSize,
-                                onTap: () => {
-                                    if (this.widget.onTap != null) {
-                                        this.widget.onTap(index);
-                                    }
-                                },
-                                flex:
-                                this._evaluateFlex(this._animations[i]),
-                                selected: i == this.widget.currentIndex,
-                                indexLabel: localizations.tabLabel(tabIndex: i + 1,
-                                    tabCount: this.widget.items.Count)
-                            )
-                        );
-                    }
-
+                case Brightness.dark:
+                    themeColor = themeData.accentColor;
                     break;
+                default:
+                    throw new Exception("Unknown brightness: " + themeData.brightness);
             }
 
-            return children;
+            ColorTween colorTween;
+            switch (this.widget.type) {
+                case BottomNavigationBarType.fix:
+                    colorTween = new ColorTween(
+                        begin: this.widget.unselectedItemColor ?? themeData.textTheme.caption.color,
+                        end: this.widget.selectedItemColor ?? this.widget.fixedColor ?? themeColor
+                    );
+                    break;
+                case BottomNavigationBarType.shifting:
+                    colorTween = new ColorTween(
+                        begin: this.widget.unselectedItemColor ?? Colors.white,
+                        end: this.widget.selectedItemColor ?? Colors.white
+                    );
+                    break;
+                default:
+                    throw new UIWidgetsError($"Unknown bottom navigation bar type: {this.widget.type}");
+            }
+
+            List<Widget> tiles = new List<Widget>();
+            for (int i = 0; i < this.widget.items.Count; i++) {
+                int index = i;
+                tiles.Add(new _BottomNavigationTile(
+                    this.widget.type,
+                    this.widget.items[i],
+                    this._animations[i],
+                    this.widget.iconSize,
+                    selectedFontSize: this.widget.selectedFontSize,
+                    unselectedFontSize: this.widget.unselectedFontSize,
+                    onTap: () => {
+                        if (this.widget.onTap != null) {
+                            this.widget.onTap(index);
+                        }
+                    },
+                    colorTween: colorTween,
+                    flex: this._evaluateFlex(this._animations[i]),
+                    selected: i == this.widget.currentIndex,
+                    showSelectedLabels: this.widget.showSelectedLabels,
+                    showUnselectedLabels: this.widget.showUnselectedLabels,
+                    indexLabel: localizations.tabLabel(tabIndex: i+1, tabCount: this.widget.items.Count)
+                ));
+            }
+
+            return tiles;
         }
 
         Widget _createContainer(List<Widget> tiles) {
@@ -507,7 +572,7 @@ namespace Unity.UIWidgets.material {
             D.assert(MaterialD.debugCheckHasMaterialLocalizations(context));
 
             float additionalBottomPadding =
-                Mathf.Max(MediaQuery.of(context).padding.bottom - BottomNavigationBarUtils._kBottomMargin, 0.0f);
+                Mathf.Max(MediaQuery.of(context).padding.bottom - this.widget.selectedFontSize / 2.0f, 0.0f);
             Color backgroundColor = null;
             switch (this.widget.type) {
                 case BottomNavigationBarType.fix:
@@ -519,7 +584,7 @@ namespace Unity.UIWidgets.material {
 
 
             return new Material(
-                elevation: 8.0f,
+                elevation: this.widget.elevation,
                 color: backgroundColor,
                 child: new ConstrainedBox(
                     constraints: new BoxConstraints(

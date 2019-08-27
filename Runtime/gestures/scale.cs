@@ -115,8 +115,8 @@ namespace Unity.UIWidgets.gestures {
 
 
     public class ScaleGestureRecognizer : OneSequenceGestureRecognizer {
-        public ScaleGestureRecognizer(object debugOwner) : base(debugOwner: debugOwner) {
-        }
+        public ScaleGestureRecognizer(object debugOwner, PointerDeviceKind? kind = null) : base(debugOwner: debugOwner,
+            kind: kind) { }
 
         public GestureScaleStartCallback onStart;
 

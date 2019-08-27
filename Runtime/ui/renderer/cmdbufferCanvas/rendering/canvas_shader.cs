@@ -1,4 +1,5 @@
 using System;
+using Unity.UIWidgets.foundation;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -62,7 +63,10 @@ namespace Unity.UIWidgets.ui {
                 mat.SetInt(_dstBlend, (int) UnityEngine.Rendering.BlendMode.Zero);
             }
             else {
-                Debug.LogWarning("Not supported BlendMode: " + op + ". Defaults to srcOver");
+                D.assert(() => {
+                    Debug.LogWarning("Not supported BlendMode: " + op + ". Defaults to srcOver");
+                    return true;
+                });
                 mat.SetInt(_srcBlend, (int) UnityEngine.Rendering.BlendMode.One);
                 mat.SetInt(_dstBlend, (int) UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
             }

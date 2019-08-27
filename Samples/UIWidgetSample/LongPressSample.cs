@@ -20,9 +20,9 @@ namespace UIWidgetsSample {
     class _LongPressSampleWidgetState : State<LongPressSampleWidget> {
         public override Widget build(BuildContext context) {
             return new GestureDetector(
-                onLongPressDragStart: (value) => { Debug.Log($"Long Press Drag Start: {value}"); },
-                onLongPressDragUpdate: (value) => { Debug.Log($"Long Press Drag Update: {value}"); },
-                onLongPressDragUp: (value) => { Debug.Log($"Long Press Drag Up: {value}"); },
+                onLongPressStart: (value) => { Debug.Log($"Long Press Drag Start: {value}"); },
+                onLongPressMoveUpdate: (value) => { Debug.Log($"Long Press Drag Update: {value}"); },
+                onLongPressEnd: (value) => { Debug.Log($"Long Press Drag Up: {value}"); },
                 onLongPressUp: () => { Debug.Log($"Long Press Up"); },
                 onLongPress: () => { Debug.Log($"Long Press"); },
                 child: new Center(

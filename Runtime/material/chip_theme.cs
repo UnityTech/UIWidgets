@@ -37,6 +37,8 @@ namespace Unity.UIWidgets.material {
             Color disabledColor = null,
             Color selectedColor = null,
             Color secondarySelectedColor = null,
+            Color shadowColor = null,
+            Color selectedShadowColor = null,
             EdgeInsets labelPadding = null,
             EdgeInsets padding = null,
             ShapeBorder shape = null,
@@ -61,6 +63,8 @@ namespace Unity.UIWidgets.material {
             this.disabledColor = disabledColor;
             this.selectedColor = selectedColor;
             this.secondarySelectedColor = secondarySelectedColor;
+            this.shadowColor = shadowColor;
+            this.selectedShadowColor = selectedShadowColor;
             this.labelPadding = labelPadding;
             this.padding = padding;
             this.shape = shape;
@@ -133,6 +137,10 @@ namespace Unity.UIWidgets.material {
 
         public readonly Color secondarySelectedColor;
 
+        public readonly Color shadowColor;
+
+        public readonly Color selectedShadowColor;
+
         public readonly EdgeInsets labelPadding;
 
         public readonly EdgeInsets padding;
@@ -155,6 +163,8 @@ namespace Unity.UIWidgets.material {
             Color disabledColor = null,
             Color selectedColor = null,
             Color secondarySelectedColor = null,
+            Color shadowColor = null,
+            Color selectedShadowColor = null,
             EdgeInsets labelPadding = null,
             EdgeInsets padding = null,
             ShapeBorder shape = null,
@@ -170,6 +180,8 @@ namespace Unity.UIWidgets.material {
                 disabledColor: disabledColor ?? this.disabledColor,
                 selectedColor: selectedColor ?? this.selectedColor,
                 secondarySelectedColor: secondarySelectedColor ?? this.secondarySelectedColor,
+                shadowColor: shadowColor ?? this.shadowColor,
+                selectedShadowColor: selectedShadowColor ?? this.selectedShadowColor,
                 labelPadding: labelPadding ?? this.labelPadding,
                 padding: padding ?? this.padding,
                 shape: shape ?? this.shape,
@@ -192,6 +204,8 @@ namespace Unity.UIWidgets.material {
                 disabledColor: Color.lerp(a?.disabledColor, b?.disabledColor, t),
                 selectedColor: Color.lerp(a?.selectedColor, b?.selectedColor, t),
                 secondarySelectedColor: Color.lerp(a?.secondarySelectedColor, b?.secondarySelectedColor, t),
+                shadowColor: Color.lerp(a?.shadowColor, b?.shadowColor, t),
+                selectedShadowColor: Color.lerp(a?.selectedShadowColor, b?.selectedShadowColor, t),
                 labelPadding: EdgeInsets.lerp(a?.labelPadding, b?.labelPadding, t),
                 padding: EdgeInsets.lerp(a?.padding, b?.padding, t),
                 shape: ShapeBorder.lerp(a?.shape, b?.shape, t),
@@ -209,6 +223,8 @@ namespace Unity.UIWidgets.material {
             hashCode = (hashCode * 397) ^ this.disabledColor.GetHashCode();
             hashCode = (hashCode * 397) ^ this.selectedColor.GetHashCode();
             hashCode = (hashCode * 397) ^ this.secondarySelectedColor.GetHashCode();
+            hashCode = (hashCode * 397) ^ this.shadowColor?.GetHashCode() ?? 0;
+            hashCode = (hashCode * 397) ^ this.selectedShadowColor?.GetHashCode() ?? 0;
             hashCode = (hashCode * 397) ^ this.labelPadding.GetHashCode();
             hashCode = (hashCode * 397) ^ this.padding.GetHashCode();
             hashCode = (hashCode * 397) ^ this.shape.GetHashCode();
@@ -226,6 +242,8 @@ namespace Unity.UIWidgets.material {
                    && other.disabledColor == this.disabledColor
                    && other.selectedColor == this.selectedColor
                    && other.secondarySelectedColor == this.secondarySelectedColor
+                   && other.shadowColor == this.shadowColor
+                   && other.selectedShadowColor == this.selectedShadowColor
                    && other.labelPadding == this.labelPadding
                    && other.padding == this.padding
                    && other.shape == this.shape
@@ -278,6 +296,10 @@ namespace Unity.UIWidgets.material {
                 defaultValue: defaultData.selectedColor));
             properties.add(new DiagnosticsProperty<Color>("secondarySelectedColor", this.secondarySelectedColor,
                 defaultValue: defaultData.secondarySelectedColor));
+            properties.add(new DiagnosticsProperty<Color>("shadowColor", this.shadowColor,
+                defaultValue: defaultData.shadowColor));
+            properties.add(new DiagnosticsProperty<Color>("selectedShadowColor", this.selectedShadowColor,
+                defaultValue: defaultData.selectedShadowColor));
             properties.add(new DiagnosticsProperty<EdgeInsets>("labelPadding", this.labelPadding,
                 defaultValue: defaultData.labelPadding));
             properties.add(

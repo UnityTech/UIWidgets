@@ -749,7 +749,7 @@ namespace Unity.UIWidgets.material {
                 this.title.getMinIntrinsicHeight(width) + this.subtitle?.getMinIntrinsicHeight(width) ?? 0.0f);
         }
 
-        protected override float computeMaxIntrinsicHeight(float width) {
+        protected internal override float computeMaxIntrinsicHeight(float width) {
             return this.computeMinIntrinsicHeight(width);
         }
 
@@ -783,11 +783,23 @@ namespace Unity.UIWidgets.material {
             bool hasTrailing = this.trailing != null;
             bool isTwoLine = !this.isThreeLine && hasSubtitle;
             bool isOneLine = !this.isThreeLine && !hasSubtitle;
+            BoxConstraints maxIconHeightConstrains = new BoxConstraints(
+                maxHeight: this.isDense ? 48.0f: 56.0f
+            );
             BoxConstraints looseConstraints = this.constraints.loosen();
+            BoxConstraints iconConstraints = looseConstraints.enforce(maxIconHeightConstrains);
 
             float tileWidth = looseConstraints.maxWidth;
-            Size leadingSize = _layoutBox(this.leading, looseConstraints);
-            Size trailingSize = _layoutBox(this.trailing, looseConstraints);
+            Size leadingSize = _layoutBox(this.leading, iconConstraints);
+            Size trailingSize = _layoutBox(this.trailing, iconConstraints);
+            D.assert(
+                tileWidth != leadingSize.width,
+                () => "Leading widget consumes entire width. Please use a sized widget."
+            );
+            D.assert(
+                tileWidth != trailingSize.width,
+                () => "Trailing widget consumes entire width. Please use a sized widget."
+            );
 
             float titleStart = hasLeading
                 ? Mathf.Max(_minLeadingWidth, leadingSize.width) + _horizontalTitleGap

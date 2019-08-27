@@ -139,18 +139,41 @@ namespace Unity.UIWidgets.widgets {
             this.insertAll(this.widget.initialEntries);
         }
 
-        public void insert(OverlayEntry entry, OverlayEntry above = null) {
-            D.assert(entry._overlay == null);
-            D.assert(above == null || (above._overlay == this && this._entries.Contains(above)));
-            entry._overlay = this;
-            this.setState(() => {
-                int index = above == null ? this._entries.Count : this._entries.IndexOf(above) + 1;
-                this._entries.Insert(index, entry);
-            });
+        internal int _insertionIndex(OverlayEntry below, OverlayEntry above) {
+            D.assert(below == null || above == null);
+            if (below != null) {
+                return this._entries.IndexOf(below);
+            }
+
+            if (above != null) {
+                return this._entries.IndexOf(above) + 1;
+            }
+
+            return this._entries.Count;
         }
 
-        public void insertAll(ICollection<OverlayEntry> entries, OverlayEntry above = null) {
-            D.assert(above == null || (above._overlay == this && this._entries.Contains(above)));
+        public void insert(OverlayEntry entry, OverlayEntry below = null, OverlayEntry above = null) {
+            D.assert(above == null || below == null, () => "Only one of `above` and `below` may be specified.");
+            D.assert(above == null || (above._overlay == this && this._entries.Contains(above)),
+                () => "The provided entry for `above` is not present in the Overlay.");
+            D.assert(below == null || (below._overlay == this && this._entries.Contains(below)),
+                () => "The provided entry for `below` is not present in the Overlay.");
+            D.assert(!this._entries.Contains(entry), () => "The specified entry is already present in the Overlay.");
+            D.assert(entry._overlay == null, () => "The specified entry is already present in another Overlay.");
+            entry._overlay = this;
+            this.setState(() => { this._entries.Insert(this._insertionIndex(below, above), entry); });
+        }
+
+        public void insertAll(ICollection<OverlayEntry> entries, OverlayEntry below = null, OverlayEntry above = null) {
+            D.assert(above == null || below == null, () => "Only one of `above` and `below` may be specified.");
+            D.assert(above == null || (above._overlay == this && this._entries.Contains(above)),
+                () => "The provided entry for `above` is not present in the Overlay.");
+            D.assert(below == null || (below._overlay == this && this._entries.Contains(below)),
+                () => "The provided entry for `below` is not present in the Overlay.");
+            D.assert(entries.All(entry => !this._entries.Contains(entry)),
+                () => "One or more of the specified entries are already present in the Overlay.");
+            D.assert(entries.All(entry => entry._overlay == null),
+                () => "One or more of the specified entries are already present in another Overlay.");
             if (entries.isEmpty()) {
                 return;
             }
@@ -161,16 +184,48 @@ namespace Unity.UIWidgets.widgets {
             }
 
             this.setState(() => {
-                int index = above == null ? this._entries.Count : this._entries.IndexOf(above) + 1;
-                this._entries.InsertRange(index, entries);
+                this._entries.InsertRange(this._insertionIndex(below, above), entries);
+            });
+        }
+
+        public void rearrange(IEnumerable<OverlayEntry> newEntries, OverlayEntry below = null, OverlayEntry above = null) {
+            List<OverlayEntry> newEntriesList =
+                newEntries is List<OverlayEntry> ?(newEntries as List<OverlayEntry>) : newEntries.ToList();
+            D.assert(above == null || below == null, () => "Only one of `above` and `below` may be specified.");
+            D.assert(above == null || (above._overlay == this && this._entries.Contains(above)),
+                () => "The provided entry for `above` is not present in the Overlay.");
+            D.assert(below == null || (below._overlay == this && this._entries.Contains(below)),
+                () => "The provided entry for `below` is not present in the Overlay.");
+            D.assert(newEntriesList.All(entry => !this._entries.Contains(entry)),
+                () => "One or more of the specified entries are already present in the Overlay.");
+            D.assert(newEntriesList.All(entry => entry._overlay == null),
+                () => "One or more of the specified entries are already present in another Overlay.");
+            if (newEntriesList.isEmpty()) {
+                return;
+            }
+
+            if (this._entries.SequenceEqual(newEntriesList)) {
+                return;
+            }
+
+            HashSet<OverlayEntry> old = new HashSet<OverlayEntry>(this._entries);
+            foreach(OverlayEntry entry in newEntriesList) {
+                entry._overlay = entry._overlay ?? this;
+            }
+            this.setState(() => {
+                this._entries.Clear();
+                this._entries.AddRange(newEntriesList);
+                foreach (OverlayEntry entry in newEntriesList) {
+                    old.Remove(entry);
+                }
+
+                this._entries.InsertRange(this._insertionIndex(below, above), old);
             });
         }
 
         internal void _remove(OverlayEntry entry) {
             if (this.mounted) {
-                this.setState(() => {
-                    this._entries.Remove(entry);
-                });
+                this.setState(() => { this._entries.Remove(entry); });
             }
         }
 

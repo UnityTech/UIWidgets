@@ -22,13 +22,18 @@ namespace Unity.UIWidgets.painting {
             this.left = left ?? BorderSide.none;
         }
 
+        public static Border fromBorderSide(BorderSide side) {
+            D.assert(side != null);
+            return new Border(top: side, right: side, bottom: side, left: side);
+        }
+
         public static Border all(
             Color color = null,
             float width = 1.0f,
             BorderStyle style = BorderStyle.solid
         ) {
             BorderSide side = new BorderSide(color: color, width: width, style: style);
-            return new Border(top: side, right: side, bottom: side, left: side);
+            return Border.fromBorderSide(side);
         }
 
         public static Border merge(Border a, Border b) {
