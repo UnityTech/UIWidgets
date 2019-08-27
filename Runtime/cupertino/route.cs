@@ -239,7 +239,7 @@ namespace Unity.UIWidgets.cupertino {
     public class CupertinoPageRoute : PageRoute {
         public CupertinoPageRoute(
             WidgetBuilder builder,
-            RouteSettings settings,
+            RouteSettings settings = null,
             string title = "",
             bool maintainState = true,
             bool fullscreenDialog = false
