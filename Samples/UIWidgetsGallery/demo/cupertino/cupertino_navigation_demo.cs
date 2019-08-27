@@ -12,7 +12,6 @@ using UnityEngine;
 using Color = Unity.UIWidgets.ui.Color;
 
 namespace UIWidgetsGallery.gallery {
-    /*
     class CupertinoNavigationDemoUtils {
         public const string _kGalleryAssetsPackage = "flutter_gallery_assets";
 
@@ -86,669 +85,668 @@ namespace UIWidgetsGallery.gallery {
                 ),
             };
         }
+    }
 
 
-        class CupertinoNavigationDemo : StatelessWidget {
-            public CupertinoNavigationDemo() {
-                this.colorItems = new List<Color>();
+    public class CupertinoNavigationDemo : StatelessWidget {
+        public CupertinoNavigationDemo() {
+            this.colorItems = new List<Color>();
 
-                for (int i = 0; i < _kChildCount; i++) {
-                    this.colorItems.Add(coolColors[
-                        Random.Range(0, coolColors.Count)
-                    ]);
-                }
-
-                this.colorNameItems = new List<string>();
-
-                for (int i = 0; i < _kChildCount; i++) {
-                    this.colorNameItems.Add(coolColorNames[
-                        Random.Range(0, coolColorNames.Count)
-                    ]);
-                }
+            for (int i = 0; i < CupertinoNavigationDemoUtils._kChildCount; i++) {
+                this.colorItems.Add(CupertinoNavigationDemoUtils.coolColors[
+                    Random.Range(0, CupertinoNavigationDemoUtils.coolColors.Count)
+                ]);
             }
 
-            public static string routeName = "/cupertino/navigation";
-            public readonly List<Color> colorItems;
-            public readonly List<string> colorNameItems;
+            this.colorNameItems = new List<string>();
 
-            public override Widget build(BuildContext context) {
-                return new WillPopScope(
-                    onWillPop: () => new IPromise<bool>().value(true),
-                    child: new DefaultTextStyle(
-                        style: CupertinoTheme.of(context).textTheme.textStyle,
-                        child: new CupertinoTabScaffold(
-                            tabBar: new CupertinoTabBar(
-                                items: new List<BottomNavigationBarItem> {
-                                    new BottomNavigationBarItem(
-                                        icon: new Icon(CupertinoIcons.home),
-                                        title: new Text("Home")
-                                    ),
-                                    new BottomNavigationBarItem(
-                                        icon: new Icon(CupertinoIcons.conversation_bubble),
-                                        title: new Text("Support")
-                                    ),
-                                    new BottomNavigationBarItem(
-                                        icon: new Icon(CupertinoIcons.profile_circled),
-                                        title: new Text("Profile")
-                                    )
-                                }
-                            ),
-                            tabBuilder: (BuildContext _context, int index) => {
-                                D.assert(index >= 0 && index <= 2);
-                                switch (index) {
-                                    case 0:
-                                        return new CupertinoTabView(
-                                            builder: (BuildContext _context1) => {
-                                                return new CupertinoDemoTab1(
-                                                    colorItems: this.colorItems,
-                                                    colorNameItems: this.colorNameItems
-                                                );
-                                            },
-                                            defaultTitle: "Colors"
-                                        );
-                                        break;
-                                    case 1:
-                                        return new CupertinoTabView(
-                                            builder: (BuildContext _context2) => new CupertinoDemoTab2(),
-                                            defaultTitle: "Support Chat"
-                                        );
-                                        break;
-                                    case 2:
-                                        return new CupertinoTabView(
-                                            builder: (BuildContext _context3) => new CupertinoDemoTab3(),
-                                            defaultTitle: "Account"
-                                        );
-                                        break;
-                                }
+            for (int i = 0; i < CupertinoNavigationDemoUtils._kChildCount; i++) {
+                this.colorNameItems.Add(CupertinoNavigationDemoUtils.coolColorNames[
+                    Random.Range(0, CupertinoNavigationDemoUtils.coolColorNames.Count)
+                ]);
+            }
+        }
 
-                                return null;
+        public static string routeName = "/cupertino/navigation";
+        public readonly List<Color> colorItems;
+        public readonly List<string> colorNameItems;
+
+        public override Widget build(BuildContext context) {
+            return new WillPopScope(
+                onWillPop: () => { return Promise<bool>.Resolved(true); },
+                child: new DefaultTextStyle(
+                    style: CupertinoTheme.of(context).textTheme.textStyle,
+                    child: new CupertinoTabScaffold(
+                        tabBar: new CupertinoTabBar(
+                            items: new List<BottomNavigationBarItem> {
+                                new BottomNavigationBarItem(
+                                    icon: new Icon(CupertinoIcons.home),
+                                    title: new Text("Home")
+                                ),
+                                new BottomNavigationBarItem(
+                                    icon: new Icon(CupertinoIcons.conversation_bubble),
+                                    title: new Text("Support")
+                                ),
+                                new BottomNavigationBarItem(
+                                    icon: new Icon(CupertinoIcons.profile_circled),
+                                    title: new Text("Profile")
+                                )
                             }
-                        )
-                    )
-                );
-            }
-        }
-
-        class ExitButton : StatelessWidget {
-            public ExitButton() { }
-
-            public override Widget build(BuildContext context) {
-                return new CupertinoButton(
-                    padding: EdgeInsets.zero,
-                    child: new Tooltip(
-                        message: "Back",
-                        child: new Text("Exit")
-                    ),
-                    onPressed: () => { Navigator.of(context, rootNavigator: true).pop(); }
-                );
-            }
-        }
-
-
-        class CupertinoDemoTab1 : StatelessWidget {
-            public CupertinoDemoTab1(
-                List<Color> colorItems = null,
-                List<string> colorNameItems = null
-            ) {
-                this.colorItems = colorItems;
-                this.colorNameItems = colorNameItems;
-            }
-
-            public readonly List<Color> colorItems;
-            public readonly List<string> colorNameItems;
-
-            public override Widget build(BuildContext context) {
-                return new CupertinoPageScaffold(
-                    child: new CustomScrollView(
-                        slivers: new List<Widget> {
-                            new CupertinoSliverNavigationBar(
-                                trailing: trailingButtons
-                            ),
-                            new SliverPadding(
-                                padding: MediaQuery.of(context).removePadding(
-                                    removeTop: true,
-                                    removeLeft: true,
-                                    removeRight: true
-                                ).padding,
-                                sliver: new SliverList(
-                                    del: new SliverChildBuilderDelegate(
-                                        (BuildContext _context, int index) => {
-                                            return new Tab1RowItem(
-                                                index: index,
-                                                lastItem: index == _kChildCount - 1,
-                                                color: this.colorItems[index],
-                                                colorName: this.colorNameItems[index]
+                        ),
+                        tabBuilder: (BuildContext _context, int index) => {
+                            D.assert(index >= 0 && index <= 2);
+                            switch (index) {
+                                case 0:
+                                    return new CupertinoTabView(
+                                        builder: (BuildContext _context1) => {
+                                            return new CupertinoDemoTab1(
+                                                colorItems: this.colorItems,
+                                                colorNameItems: this.colorNameItems
                                             );
                                         },
-                                        childCount: _kChildCount
-                                    )
-                                )
-                            )
+                                        defaultTitle: "Colors"
+                                    );
+                                    break;
+                                case 1:
+                                    return new CupertinoTabView(
+                                        builder: (BuildContext _context2) => new CupertinoDemoTab2(),
+                                        defaultTitle: "Support Chat"
+                                    );
+                                    break;
+                                case 2:
+                                    return new CupertinoTabView(
+                                        builder: (BuildContext _context3) => new CupertinoDemoTab3(),
+                                        defaultTitle: "Account"
+                                    );
+                                    break;
+                            }
+
+                            return null;
                         }
                     )
-                );
-            }
+                )
+            );
+        }
+    }
+
+    class ExitButton : StatelessWidget {
+        public ExitButton() { }
+
+        public override Widget build(BuildContext context) {
+            return new CupertinoButton(
+                padding: EdgeInsets.zero,
+                child: new Tooltip(
+                    message: "Back",
+                    child: new Text("Exit")
+                ),
+                onPressed: () => { Navigator.of(context, rootNavigator: true).pop(); }
+            );
+        }
+    }
+
+
+    class CupertinoDemoTab1 : StatelessWidget {
+        public CupertinoDemoTab1(
+            List<Color> colorItems = null,
+            List<string> colorNameItems = null
+        ) {
+            this.colorItems = colorItems;
+            this.colorNameItems = colorNameItems;
         }
 
-        class Tab1RowItem : StatelessWidget {
-            public Tab1RowItem(
-                int index,
-                bool lastItem,
-                Color color,
-                string colorName
-            ) {
-                this.index = index;
-                this.lastItem = lastItem;
-                this.color = color;
-                this.colorName = colorName;
-            }
+        public readonly List<Color> colorItems;
+        public readonly List<string> colorNameItems;
 
-            public readonly int index;
-            public readonly bool lastItem;
-            public readonly Color color;
-            public readonly string colorName;
-
-            public override Widget build(BuildContext context) {
-                Widget row = new GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: () => {
-                        Navigator.of(context).push(new CupertinoPageRoute(
-                            title: this.colorName,
-                            builder: (BuildContext _context) => new Tab1ItemPage(
-                                color: this.color,
-                                colorName: this.colorName,
-                                index: this.index
+        public override Widget build(BuildContext context) {
+            return new CupertinoPageScaffold(
+                child: new CustomScrollView(
+                    slivers: new List<Widget> {
+                        new CupertinoSliverNavigationBar(
+                            trailing: CupertinoNavigationDemoUtils.trailingButtons
+                        ),
+                        new SliverPadding(
+                            padding: MediaQuery.of(context).removePadding(
+                                removeTop: true,
+                                removeLeft: true,
+                                removeRight: true
+                            ).padding,
+                            sliver: new SliverList(
+                                del: new SliverChildBuilderDelegate(
+                                    (BuildContext _context, int index) => {
+                                        return new Tab1RowItem(
+                                            index: index,
+                                            lastItem: index == CupertinoNavigationDemoUtils._kChildCount - 1,
+                                            color: this.colorItems[index],
+                                            colorName: this.colorNameItems[index]
+                                        );
+                                    },
+                                    childCount: CupertinoNavigationDemoUtils._kChildCount
+                                )
                             )
-                        ));
-                    },
-                    child: new SafeArea(
-                        top: false,
-                        bottom: false,
-                        child: new Padding(
-                            padding: EdgeInsets.only(left: 16.0f, top: 8.0f, bottom: 8.0f, right: 8.0f),
-                            child: new Row(
-                                children: new List<Widget> {
-                                    new Container(
-                                        height: 60.0f,
-                                        width: 60.0f,
-                                        decoration: new BoxDecoration(
-                                            color: this.color,
-                                            borderRadius: BorderRadius.circular(8.0f)
-                                        )
-                                    ),
-                                    new Expanded(
-                                        child: new Padding(
-                                            padding: EdgeInsets.symmetric(horizontal: 12.0f),
-                                            child: new Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: new List<Widget> {
-                                                    new Text(this.colorName),
-                                                    new Padding(padding: EdgeInsets.only(top: 8.0f)),
-                                                    new Text(
-                                                        "Buy this cool color",
-                                                        style: new TextStyle(
-                                                            color: new Color(0xf8E8E93),
-                                                            fontSize: 13.0f,
-                                                            fontWeight: FontWeight.w300
-                                                        )
-                                                    )
-                                                }
-                                            )
-                                        )
-                                    ),
-                                    new CupertinoButton(
-                                        padding: EdgeInsets.zero,
-                                        child: new Icon(CupertinoIcons.plus_circled
-                                        ),
-                                        onPressed: () => { }
-                                    ),
-                                    new CupertinoButton(
-                                        padding: EdgeInsets.zero,
-                                        child: new Icon(CupertinoIcons.share
-                                        ),
-                                        onPressed: () => { }
-                                    )
-                                }
-                            )
-                        )
-                    )
-                );
-                if (this.lastItem) {
-                    return row;
-                }
-
-                return new Column(
-                    children: new List<Widget> {
-                        row,
-                        new Container(
-                            height: 1.0f,
-                            color: new Color(0xfD9D9D9)
                         )
                     }
-                );
-            }
+                )
+            );
+        }
+    }
+
+    class Tab1RowItem : StatelessWidget {
+        public Tab1RowItem(
+            int index,
+            bool lastItem,
+            Color color,
+            string colorName
+        ) {
+            this.index = index;
+            this.lastItem = lastItem;
+            this.color = color;
+            this.colorName = colorName;
         }
 
-        class Tab1ItemPage : StatefulWidget {
-            public Tab1ItemPage(
-                Color color,
-                string colorName,
-                int index
-            ) {
-                this.color = color;
-                this.colorName = colorName;
-                this.index = index;
-            }
+        public readonly int index;
+        public readonly bool lastItem;
+        public readonly Color color;
+        public readonly string colorName;
 
-            public readonly Color color;
-            public readonly string colorName;
-            public readonly int index;
-
-            public override State createState() {
-                return new Tab1ItemPageState();
-            }
-        }
-
-        class Tab1ItemPageState : State<Tab1ItemPage> {
-            public override void initState() {
-                base.initState();
-
-                for (int i = 0; i < 10; i++) {
-                    this.relatedColors.Add(
-                        Color.fromARGB(
-                            255, this.widget.color.red + Random.Range(0, 50).clamp(0, 255),
-                            this.widget.color.green + Random.Range(0, 50).clamp(0, 255),
-                            this.widget.color.blue + Random.Range(0, 50).clamp(0, 255)
+        public override Widget build(BuildContext context) {
+            Widget row = new GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () => {
+                    Navigator.of(context).push(new CupertinoPageRoute(
+                        title: this.colorName,
+                        builder: (BuildContext _context) => new Tab1ItemPage(
+                            color: this.color,
+                            colorName: this.colorName,
+                            index: this.index
                         )
-                    );
-                }
-            }
-
-            List<Color> relatedColors;
-
-            public override Widget build(BuildContext context) {
-                return new CupertinoPageScaffold(
-                    navigationBar: new CupertinoNavigationBar(
-                        trailing: new ExitButton()
-                    ),
-                    child: new SafeArea(
-                        top: false,
-                        bottom: false,
-                        child: new ListView(
+                    ));
+                },
+                child: new SafeArea(
+                    top: false,
+                    bottom: false,
+                    child: new Padding(
+                        padding: EdgeInsets.only(left: 16.0f, top: 8.0f, bottom: 8.0f, right: 8.0f),
+                        child: new Row(
                             children: new List<Widget> {
-                                new Padding(padding: EdgeInsets.only(top: 16.0f)),
-                                new Padding(
-                                    padding: EdgeInsets.symmetric(horizontal: 16.0f),
-                                    child: new Row(
-                                        mainAxisSize: MainAxisSize.max,
-                                        children: new List<Widget> {
-                                            new Container(
-                                                height: 128.0f,
-                                                width: 128.0f,
-                                                decoration: new BoxDecoration(
-                                                    color: this.widget.color,
-                                                    borderRadius: BorderRadius.circular(24.0f)
-                                                )
-                                            ),
-                                            new Padding(padding: EdgeInsets.only(left: 18.0f)),
-                                            new Expanded(
-                                                child: new Column(
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                    mainAxisSize: MainAxisSize.min,
-                                                    children: new List<Widget> {
-                                                        new Text(this.widget.colorName,
-                                                            style: new TextStyle(fontSize: 24.0f,
-                                                                fontWeight: FontWeight.bold)
-                                                        ),
-                                                        new Padding(padding: EdgeInsets.only(top: 6.0f)),
-                                                        new Text(
-                                                            "Item number ${widget.index}",
-                                                            style: new TextStyle(
-                                                                color: new Color(0xf8E8E93),
-                                                                fontSize: 16.0f,
-                                                                fontWeight: FontWeight.w100
-                                                            )
-                                                        ),
-                                                        new Padding(padding: EdgeInsets.only(top: 20.0f)),
-                                                        new Row(
-                                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                            children: new List<Widget> {
-                                                                CupertinoButton.filled(
-                                                                    minSize: 30.0f,
-                                                                    padding: EdgeInsets.symmetric(horizontal: 24.0f),
-                                                                    borderRadius: BorderRadius.circular(32.0f),
-                                                                    child: new Text(
-                                                                        "GET",
-                                                                        style: new TextStyle(
-                                                                            fontSize: 14.0f,
-                                                                            fontWeight: FontWeight.w700,
-                                                                            letterSpacing: -0.28f
-                                                                        )
-                                                                    ),
-                                                                    onPressed: () => { }
-                                                                ),
-                                                                CupertinoButton.filled(
-                                                                    minSize: 30.0f,
-                                                                    padding: EdgeInsets.zero,
-                                                                    borderRadius: BorderRadius.circular(32.0f),
-                                                                    child: new Icon(CupertinoIcons.ellipsis),
-                                                                    onPressed: () => { }
-                                                                )
-                                                            }
-                                                        )
-                                                    }
-                                                )
-                                            )
-                                        }
+                                new Container(
+                                    height: 60.0f,
+                                    width: 60.0f,
+                                    decoration: new BoxDecoration(
+                                        color: this.color,
+                                        borderRadius: BorderRadius.circular(8.0f)
                                     )
                                 ),
-                                new Padding(
-                                    padding: EdgeInsets.only(left: 16.0f, top: 28.0f, bottom: 8.0f),
-                                    child: new Text(
-                                        "USERS ALSO LIKED",
-                                        style: new TextStyle(
-                                            color: new Color(0xf646464),
-                                            letterSpacing: -0.60f,
-                                            fontSize: 15.0f,
-                                            fontWeight: FontWeight.w500
+                                new Expanded(
+                                    child: new Padding(
+                                        padding: EdgeInsets.symmetric(horizontal: 12.0f),
+                                        child: new Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: new List<Widget> {
+                                                new Text(this.colorName),
+                                                new Padding(padding: EdgeInsets.only(top: 8.0f)),
+                                                new Text(
+                                                    "Buy this cool color",
+                                                    style: new TextStyle(
+                                                        color: new Color(0xf8E8E93),
+                                                        fontSize: 13.0f,
+                                                        fontWeight: FontWeight.w300
+                                                    )
+                                                )
+                                            }
                                         )
                                     )
                                 ),
-                                new SizedBox(
-                                    height: 200.0f,
-                                    child: ListView.builder(
-                                        scrollDirection: Axis.horizontal,
-                                        itemCount: 10,
-                                        itemExtent: 160.0f,
-                                        itemBuilder: (BuildContext _context, int index) => {
-                                            return new Padding(
-                                                padding: EdgeInsets.only(left: 16.0f),
-                                                child: new Container(
-                                                    decoration: new BoxDecoration(
-                                                        borderRadius: BorderRadius.circular(8.0f),
-                                                        color: this.relatedColors[index]
-                                                    ),
-                                                    child: new Center(
-                                                        child: new CupertinoButton(
-                                                            child: new Icon(
-                                                                CupertinoIcons.plus_circled,
-                                                                color: CupertinoColors.white,
-                                                                size: 36.0f
-                                                            ),
-                                                            onPressed: () => { }
-                                                        )
-                                                    )
-                                                )
-                                            );
-                                        }
-                                    )
+                                new CupertinoButton(
+                                    padding: EdgeInsets.zero,
+                                    child: new Icon(CupertinoIcons.plus_circled
+                                    ),
+                                    onPressed: () => { }
                                 ),
+                                new CupertinoButton(
+                                    padding: EdgeInsets.zero,
+                                    child: new Icon(CupertinoIcons.share
+                                    ),
+                                    onPressed: () => { }
+                                )
                             }
                         )
                     )
-                );
+                )
+            );
+            if (this.lastItem) {
+                return row;
             }
+
+            return new Column(
+                children: new List<Widget> {
+                    row,
+                    new Container(
+                        height: 1.0f,
+                        color: new Color(0xfD9D9D9)
+                    )
+                }
+            );
+        }
+    }
+
+    class Tab1ItemPage : StatefulWidget {
+        public Tab1ItemPage(
+            Color color,
+            string colorName,
+            int index
+        ) {
+            this.color = color;
+            this.colorName = colorName;
+            this.index = index;
         }
 
-        class CupertinoDemoTab2 : StatelessWidget {
-            public override Widget build(BuildContext context) {
-                var listViewList = new List<Widget>();
-                listViewList.Add(new Tab2Header());
-                listViewList.AddRange(buildTab2Conversation());
+        public readonly Color color;
+        public readonly string colorName;
+        public readonly int index;
 
-                return new CupertinoPageScaffold(
-                    navigationBar: new CupertinoNavigationBar(
-                        trailing: trailingButtons
-                    ),
-                    child: new ListView(
-                        children: listViewList
+        public override State createState() {
+            return new Tab1ItemPageState();
+        }
+    }
+
+    class Tab1ItemPageState : State<Tab1ItemPage> {
+        public override void initState() {
+            base.initState();
+
+            for (int i = 0; i < 10; i++) {
+                this.relatedColors.Add(
+                    Color.fromARGB(
+                        255, this.widget.color.red + Random.Range(0, 50).clamp(0, 255),
+                        this.widget.color.green + Random.Range(0, 50).clamp(0, 255),
+                        this.widget.color.blue + Random.Range(0, 50).clamp(0, 255)
                     )
                 );
             }
         }
 
-        class Tab2Header : StatelessWidget {
-            public override Widget build(BuildContext context) {
-                return new Padding(
-                    padding: EdgeInsets.all(16.0f),
-                    child: new SafeArea(
-                        top: false,
-                        bottom: false,
-                        child: new ClipRRect(
-                            borderRadius: BorderRadius.all(Radius.circular(16.0f)),
-                            child: new Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: new List<Widget> {
-                                    new Container(
-                                        decoration: new BoxDecoration(
-                                            color: new Color(0xfE5E5E5)
-                                        ),
-                                        child: new Padding(
-                                            padding: EdgeInsets.symmetric(horizontal: 18.0f, vertical: 12.0f),
-                                            child: new Row(
-                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                children: new List<Widget> {
-                                                    new Text(
-                                                        "SUPPORT TICKET",
-                                                        style: new TextStyle(
-                                                            color: new Color(0xf646464),
-                                                            letterSpacing: -0.9f,
-                                                            fontSize: 14.0f,
-                                                            fontWeight: FontWeight.w500
-                                                        )
-                                                    ),
-                                                    new Text(
-                                                        "Show More",
-                                                        style: new TextStyle(
-                                                            color: new Color(0xf646464),
-                                                            letterSpacing: -0.6f,
-                                                            fontSize: 12.0f,
-                                                            fontWeight: FontWeight.w500
-                                                        )
-                                                    )
-                                                }
+        List<Color> relatedColors;
+
+        public override Widget build(BuildContext context) {
+            return new CupertinoPageScaffold(
+                navigationBar: new CupertinoNavigationBar(
+                    trailing: new ExitButton()
+                ),
+                child: new SafeArea(
+                    top: false,
+                    bottom: false,
+                    child: new ListView(
+                        children: new List<Widget> {
+                            new Padding(padding: EdgeInsets.only(top: 16.0f)),
+                            new Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 16.0f),
+                                child: new Row(
+                                    mainAxisSize: MainAxisSize.max,
+                                    children: new List<Widget> {
+                                        new Container(
+                                            height: 128.0f,
+                                            width: 128.0f,
+                                            decoration: new BoxDecoration(
+                                                color: this.widget.color,
+                                                borderRadius: BorderRadius.circular(24.0f)
                                             )
-                                        )
-                                    ),
-                                    new Container(
-                                        decoration: new BoxDecoration(
-                                            color: new Color(0xfF3F3F3)
                                         ),
-                                        child: new Padding(
-                                            padding: EdgeInsets.symmetric(horizontal: 18.0f, vertical: 12.0f),
+                                        new Padding(padding: EdgeInsets.only(left: 18.0f)),
+                                        new Expanded(
                                             child: new Column(
                                                 crossAxisAlignment: CrossAxisAlignment.start,
+                                                mainAxisSize: MainAxisSize.min,
                                                 children: new List<Widget> {
+                                                    new Text(this.widget.colorName,
+                                                        style: new TextStyle(fontSize: 24.0f,
+                                                            fontWeight: FontWeight.bold)
+                                                    ),
+                                                    new Padding(padding: EdgeInsets.only(top: 6.0f)),
                                                     new Text(
-                                                        "Product or product packaging damaged during transit",
+                                                        "Item number ${widget.index}",
                                                         style: new TextStyle(
+                                                            color: new Color(0xf8E8E93),
                                                             fontSize: 16.0f,
-                                                            fontWeight: FontWeight.w700,
-                                                            letterSpacing: -0.46f
+                                                            fontWeight: FontWeight.w100
                                                         )
                                                     ),
-                                                    new Padding(padding: EdgeInsets.only(top: 16.0f)),
-                                                    new Text(
-                                                        "REVIEWERS",
-                                                        style: new TextStyle(
-                                                            color: new Color(0xf646464),
-                                                            fontSize: 12.0f,
-                                                            letterSpacing: -0.6f,
-                                                            fontWeight: FontWeight.w500
-                                                        )
-                                                    ),
-                                                    new Padding(padding: EdgeInsets.only(top: 8.0f)),
+                                                    new Padding(padding: EdgeInsets.only(top: 20.0f)),
                                                     new Row(
+                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                         children: new List<Widget> {
-                                                            new Container(
-                                                                width: 44.0f,
-                                                                height: 44.0f,
-                                                                decoration: new BoxDecoration(
-                                                                    image: new DecorationImage(
-                                                                        image: new AssetImage(
-                                                                            "people/square/trevor.png",
-                                                                            package: _kGalleryAssetsPackage
-                                                                        )
-                                                                    ),
-                                                                    shape: BoxShape.circle
-                                                                )
+                                                            CupertinoButton.filled(
+                                                                minSize: 30.0f,
+                                                                padding: EdgeInsets.symmetric(horizontal: 24.0f),
+                                                                borderRadius: BorderRadius.circular(32.0f),
+                                                                child: new Text(
+                                                                    "GET",
+                                                                    style: new TextStyle(
+                                                                        fontSize: 14.0f,
+                                                                        fontWeight: FontWeight.w700,
+                                                                        letterSpacing: -0.28f
+                                                                    )
+                                                                ),
+                                                                onPressed: () => { }
                                                             ),
-                                                            new Padding(padding: EdgeInsets.only(left: 8.0f)),
-                                                            new Container(
-                                                                width: 44.0f,
-                                                                height: 44.0f,
-                                                                decoration: new BoxDecoration(
-                                                                    image: new DecorationImage(
-                                                                        image: new AssetImage(
-                                                                            "people/square/sandra.png",
-                                                                            package: _kGalleryAssetsPackage
-                                                                        )
-                                                                    ),
-                                                                    shape: BoxShape.circle
-                                                                )
-                                                            ),
-                                                            new Padding(padding: EdgeInsets.only(left: 2.0f)),
-                                                            new Icon(
-                                                                CupertinoIcons.check_mark_circled,
-                                                                color: new Color(0xf646464),
-                                                                size: 20.0f
+                                                            CupertinoButton.filled(
+                                                                minSize: 30.0f,
+                                                                padding: EdgeInsets.zero,
+                                                                borderRadius: BorderRadius.circular(32.0f),
+                                                                child: new Icon(CupertinoIcons.ellipsis),
+                                                                onPressed: () => { }
                                                             )
                                                         }
                                                     )
                                                 }
                                             )
                                         )
+                                    }
+                                )
+                            ),
+                            new Padding(
+                                padding: EdgeInsets.only(left: 16.0f, top: 28.0f, bottom: 8.0f),
+                                child: new Text(
+                                    "USERS ALSO LIKED",
+                                    style: new TextStyle(
+                                        color: new Color(0xf646464),
+                                        letterSpacing: -0.60f,
+                                        fontSize: 15.0f,
+                                        fontWeight: FontWeight.w500
                                     )
-                                }
-                            )
-                        )
+                                )
+                            ),
+                            new SizedBox(
+                                height: 200.0f,
+                                child: ListView.builder(
+                                    scrollDirection: Axis.horizontal,
+                                    itemCount: 10,
+                                    itemExtent: 160.0f,
+                                    itemBuilder: (BuildContext _context, int index) => {
+                                        return new Padding(
+                                            padding: EdgeInsets.only(left: 16.0f),
+                                            child: new Container(
+                                                decoration: new BoxDecoration(
+                                                    borderRadius: BorderRadius.circular(8.0f),
+                                                    color: this.relatedColors[index]
+                                                ),
+                                                child: new Center(
+                                                    child: new CupertinoButton(
+                                                        child: new Icon(
+                                                            CupertinoIcons.plus_circled,
+                                                            color: CupertinoColors.white,
+                                                            size: 36.0f
+                                                        ),
+                                                        onPressed: () => { }
+                                                    )
+                                                )
+                                            )
+                                        );
+                                    }
+                                )
+                            ),
+                        }
                     )
-                );
-            }
+                )
+            );
         }
+    }
 
-        enum Tab2ConversationBubbleColor {
-            blue,
-            gray,
+    class CupertinoDemoTab2 : StatelessWidget {
+        public override Widget build(BuildContext context) {
+            var listViewList = new List<Widget>();
+            listViewList.Add(new Tab2Header());
+            listViewList.AddRange(CupertinoNavigationDemoUtils.buildTab2Conversation());
+
+            return new CupertinoPageScaffold(
+                navigationBar: new CupertinoNavigationBar(
+                    trailing: CupertinoNavigationDemoUtils.trailingButtons
+                ),
+                child: new ListView(
+                    children: listViewList
+                )
+            );
         }
+    }
 
-        class Tab2ConversationBubble : StatelessWidget {
-            public Tab2ConversationBubble(
-                string text,
-                Tab2ConversationBubbleColor color
-            ) {
-                this.text = text;
-                this.color = color;
-            }
-
-            public readonly string text;
-            public readonly Tab2ConversationBubbleColor color;
-
-            public override Widget build(BuildContext context) {
-                return new Container(
-                    decoration: new BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(18.0f)),
-                        color: this.color == Tab2ConversationBubbleColor.blue
-                            ? CupertinoColors.activeBlue
-                            : CupertinoColors.lightBackgroundGray
-                    ),
-                    margin: EdgeInsets.symmetric(horizontal: 8.0f, vertical: 8.0f),
-                    padding: EdgeInsets.symmetric(horizontal: 14.0f, vertical: 10.0f),
-                    child: new Text(this.text,
-                        style: new TextStyle(
-                            color: this.color == Tab2ConversationBubbleColor.blue
-                                ? CupertinoColors.white
-                                : CupertinoColors.black,
-                            letterSpacing: -0.4f,
-                            fontSize: 15.0f,
-                            fontWeight: FontWeight.w400
-                        )
-                    )
-                );
-            }
-        }
-
-        class Tab2ConversationAvatar : StatelessWidget {
-            public Tab2ConversationAvatar(
-                string text,
-                Color color
-            ) {
-                this.text = text;
-                this.color = color;
-            }
-
-            public readonly string text;
-            public readonly Color color;
-
-            public override Widget build(BuildContext context) {
-                return new Container(
-                    decoration: new BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: new LinearGradient(
-                            begin: Alignment.topCenter, // FractionalOfset.topCenter,
-                            end: Alignment.bottomCenter, // FractionalOfset.bottomCenter,
-                            colors: new List<Color> {
-                                this.color,
-                                Color.fromARGB(this.color.alpha,
-                                    (this.color.red - 60).clamp(0, 255),
-                                    (this.color.green - 60).clamp(0, 255),
-                                    (this.color.blue - 60).clamp(0, 255)
+    class Tab2Header : StatelessWidget {
+        public override Widget build(BuildContext context) {
+            return new Padding(
+                padding: EdgeInsets.all(16.0f),
+                child: new SafeArea(
+                    top: false,
+                    bottom: false,
+                    child: new ClipRRect(
+                        borderRadius: BorderRadius.all(Radius.circular(16.0f)),
+                        child: new Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: new List<Widget> {
+                                new Container(
+                                    decoration: new BoxDecoration(
+                                        color: new Color(0xfE5E5E5)
+                                    ),
+                                    child: new Padding(
+                                        padding: EdgeInsets.symmetric(horizontal: 18.0f, vertical: 12.0f),
+                                        child: new Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: new List<Widget> {
+                                                new Text(
+                                                    "SUPPORT TICKET",
+                                                    style: new TextStyle(
+                                                        color: new Color(0xf646464),
+                                                        letterSpacing: -0.9f,
+                                                        fontSize: 14.0f,
+                                                        fontWeight: FontWeight.w500
+                                                    )
+                                                ),
+                                                new Text(
+                                                    "Show More",
+                                                    style: new TextStyle(
+                                                        color: new Color(0xf646464),
+                                                        letterSpacing: -0.6f,
+                                                        fontSize: 12.0f,
+                                                        fontWeight: FontWeight.w500
+                                                    )
+                                                )
+                                            }
+                                        )
+                                    )
+                                ),
+                                new Container(
+                                    decoration: new BoxDecoration(
+                                        color: new Color(0xfF3F3F3)
+                                    ),
+                                    child: new Padding(
+                                        padding: EdgeInsets.symmetric(horizontal: 18.0f, vertical: 12.0f),
+                                        child: new Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: new List<Widget> {
+                                                new Text(
+                                                    "Product or product packaging damaged during transit",
+                                                    style: new TextStyle(
+                                                        fontSize: 16.0f,
+                                                        fontWeight: FontWeight.w700,
+                                                        letterSpacing: -0.46f
+                                                    )
+                                                ),
+                                                new Padding(padding: EdgeInsets.only(top: 16.0f)),
+                                                new Text(
+                                                    "REVIEWERS",
+                                                    style: new TextStyle(
+                                                        color: new Color(0xf646464),
+                                                        fontSize: 12.0f,
+                                                        letterSpacing: -0.6f,
+                                                        fontWeight: FontWeight.w500
+                                                    )
+                                                ),
+                                                new Padding(padding: EdgeInsets.only(top: 8.0f)),
+                                                new Row(
+                                                    children: new List<Widget> {
+                                                        new Container(
+                                                            width: 44.0f,
+                                                            height: 44.0f,
+                                                            decoration: new BoxDecoration(
+                                                                image: new DecorationImage(
+                                                                    image: new AssetImage(
+                                                                        "people/square/trevor"
+                                                                    )
+                                                                ),
+                                                                shape: BoxShape.circle
+                                                            )
+                                                        ),
+                                                        new Padding(padding: EdgeInsets.only(left: 8.0f)),
+                                                        new Container(
+                                                            width: 44.0f,
+                                                            height: 44.0f,
+                                                            decoration: new BoxDecoration(
+                                                                image: new DecorationImage(
+                                                                    image: new AssetImage(
+                                                                        "people/square/sandra"
+                                                                    )
+                                                                ),
+                                                                shape: BoxShape.circle
+                                                            )
+                                                        ),
+                                                        new Padding(padding: EdgeInsets.only(left: 2.0f)),
+                                                        new Icon(
+                                                            CupertinoIcons.check_mark_circled,
+                                                            color: new Color(0xf646464),
+                                                            size: 20.0f
+                                                        )
+                                                    }
+                                                )
+                                            }
+                                        )
+                                    )
                                 )
                             }
                         )
-                    ),
-                    margin: EdgeInsets.only(left: 8.0f, bottom: 8.0f),
-                    padding: EdgeInsets.all(12.0f),
-                    child: new Text(this.text,
-                        style: new TextStyle(
-                            color: CupertinoColors.white,
-                            fontSize: 13.0f,
-                            fontWeight: FontWeight.w500
-                        )
                     )
-                );
-            }
-        }
-
-        class Tab2ConversationRow : StatelessWidget {
-            public Tab2ConversationRow(
-                string text,
-                Tab2ConversationAvatar avatar = null
-            ) {
-                this.avatar = avatar;
-                this.text = text;
-            }
-
-            public readonly Tab2ConversationAvatar avatar;
-            public readonly string text;
-
-            public override Widget build(BuildContext context) {
-                List<Widget> children = new List<Widget>();
-
-                if (this.avatar != null) {
-                    children.Add(this.avatar);
-                }
-
-                bool isSelf = this.avatar == null;
-                children.Add(
-                    new Tab2ConversationBubble(
-                        text: this.text,
-                        color: isSelf
-                            ? Tab2ConversationBubbleColor.blue
-                            : Tab2ConversationBubbleColor.gray
-                    )
-                );
-                return new SafeArea(
-                    child: new Row(
-                        mainAxisAlignment: isSelf ? MainAxisAlignment.end : MainAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: isSelf ? CrossAxisAlignment.center : CrossAxisAlignment.end,
-                        children: children
-                    )
-                );
-            }
+                )
+            );
         }
     }
+
+    enum Tab2ConversationBubbleColor {
+        blue,
+        gray,
+    }
+
+    class Tab2ConversationBubble : StatelessWidget {
+        public Tab2ConversationBubble(
+            string text,
+            Tab2ConversationBubbleColor color
+        ) {
+            this.text = text;
+            this.color = color;
+        }
+
+        public readonly string text;
+        public readonly Tab2ConversationBubbleColor color;
+
+        public override Widget build(BuildContext context) {
+            return new Container(
+                decoration: new BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(18.0f)),
+                    color: this.color == Tab2ConversationBubbleColor.blue
+                        ? CupertinoColors.activeBlue
+                        : CupertinoColors.lightBackgroundGray
+                ),
+                margin: EdgeInsets.symmetric(horizontal: 8.0f, vertical: 8.0f),
+                padding: EdgeInsets.symmetric(horizontal: 14.0f, vertical: 10.0f),
+                child: new Text(this.text,
+                    style: new TextStyle(
+                        color: this.color == Tab2ConversationBubbleColor.blue
+                            ? CupertinoColors.white
+                            : CupertinoColors.black,
+                        letterSpacing: -0.4f,
+                        fontSize: 15.0f,
+                        fontWeight: FontWeight.w400
+                    )
+                )
+            );
+        }
+    }
+
+    class Tab2ConversationAvatar : StatelessWidget {
+        public Tab2ConversationAvatar(
+            string text,
+            Color color
+        ) {
+            this.text = text;
+            this.color = color;
+        }
+
+        public readonly string text;
+        public readonly Color color;
+
+        public override Widget build(BuildContext context) {
+            return new Container(
+                decoration: new BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: new LinearGradient(
+                        begin: Alignment.topCenter, // FractionalOfset.topCenter,
+                        end: Alignment.bottomCenter, // FractionalOfset.bottomCenter,
+                        colors: new List<Color> {
+                            this.color,
+                            Color.fromARGB(this.color.alpha,
+                                (this.color.red - 60).clamp(0, 255),
+                                (this.color.green - 60).clamp(0, 255),
+                                (this.color.blue - 60).clamp(0, 255)
+                            )
+                        }
+                    )
+                ),
+                margin: EdgeInsets.only(left: 8.0f, bottom: 8.0f),
+                padding: EdgeInsets.all(12.0f),
+                child: new Text(this.text,
+                    style: new TextStyle(
+                        color: CupertinoColors.white,
+                        fontSize: 13.0f,
+                        fontWeight: FontWeight.w500
+                    )
+                )
+            );
+        }
+    }
+
+    class Tab2ConversationRow : StatelessWidget {
+        public Tab2ConversationRow(
+            string text,
+            Tab2ConversationAvatar avatar = null
+        ) {
+            this.avatar = avatar;
+            this.text = text;
+        }
+
+        public readonly Tab2ConversationAvatar avatar;
+        public readonly string text;
+
+        public override Widget build(BuildContext context) {
+            List<Widget> children = new List<Widget>();
+
+            if (this.avatar != null) {
+                children.Add(this.avatar);
+            }
+
+            bool isSelf = this.avatar == null;
+            children.Add(
+                new Tab2ConversationBubble(
+                    text: this.text,
+                    color: isSelf
+                        ? Tab2ConversationBubbleColor.blue
+                        : Tab2ConversationBubbleColor.gray
+                )
+            );
+            return new SafeArea(
+                child: new Row(
+                    mainAxisAlignment: isSelf ? MainAxisAlignment.end : MainAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: isSelf ? CrossAxisAlignment.center : CrossAxisAlignment.end,
+                    children: children
+                )
+            );
+        }
+    }
+
 
     class CupertinoDemoTab3 : StatelessWidget {
         public override Widget build(BuildContext context) {
@@ -838,5 +836,4 @@ namespace UIWidgetsGallery.gallery {
             );
         }
     }
-    */
 }

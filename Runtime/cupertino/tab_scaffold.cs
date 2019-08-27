@@ -43,6 +43,7 @@ namespace Unity.UIWidgets.cupertino {
         public override void initState() {
             base.initState();
             this._currentPage = this.widget.tabBar.currentIndex;
+            
         }
 
         public override void didUpdateWidget(StatefulWidget _oldWidget) {
@@ -160,6 +161,9 @@ namespace Unity.UIWidgets.cupertino {
         public override void initState() {
             base.initState();
             this.tabs = new List<Widget>(this.widget.tabNumber);
+            for (int i = 0; i < this.widget.tabNumber; i++) {
+                this.tabs.Add(null);
+            }
             this.tabFocusNodes = Enumerable.Repeat(new FocusScopeNode(), this.widget.tabNumber).ToList();
         }
 
@@ -191,8 +195,9 @@ namespace Unity.UIWidgets.cupertino {
             for (int index = 0; index < this.widget.tabNumber; index++) {
                 bool active = index == this.widget.currentTabIndex;
 
+                var tabIndex = index;
                 if (active || this.tabs[index] != null) {
-                    this.tabs[index] = this.widget.tabBuilder(context, index);
+                    this.tabs[index] = this.widget.tabBuilder(context, tabIndex);
                 }
 
                 children.Add(new Offstage(

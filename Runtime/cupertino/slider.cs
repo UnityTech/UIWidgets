@@ -150,7 +150,7 @@ namespace Unity.UIWidgets.cupertino {
         public override void updateRenderObject(BuildContext context, RenderObject _renderObject) {
             _RenderCupertinoSlider renderObject = _renderObject as _RenderCupertinoSlider;
             renderObject.value = this.value ?? 0.0f;
-            renderObject.divisions = this.divisions ?? 0;
+            renderObject.divisions = this.divisions;
             renderObject.activeColor = this.activeColor;
             renderObject.onChanged = this.onChanged;
             renderObject.onChangeStart = this.onChangeStart;

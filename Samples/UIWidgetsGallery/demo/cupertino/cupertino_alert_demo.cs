@@ -145,44 +145,44 @@ namespace UIWidgetsGallery.gallery {
                                             }
                                         ),
                                         // TODO: FIX BUG
-                                        // new Padding(padding: EdgeInsets.all(8.0f)),
-                                        // CupertinoButton.filled(
-                                        //     child: new Text("Action Sheet"),
-                                        //     padding: EdgeInsets.symmetric(vertical: 16.0f, horizontal: 36.0f),
-                                        //     onPressed: () => {
-                                        //         this.showDemoActionSheet(
-                                        //             context: _context,
-                                        //             child: new CupertinoActionSheet(
-                                        //                 title: new Text("Favorite Dessert"),
-                                        //                 message: new Text(
-                                        //                     "Please select the best dessert from the options below."),
-                                        //                 actions: new List<Widget> {
-                                        //                     new CupertinoActionSheetAction(
-                                        //                         child: new Text("Profiteroles"),
-                                        //                         onPressed: () => {
-                                        //                             Navigator.pop(_context, "Profiteroles");
-                                        //                         }
-                                        //                     ),
-                                        //                     new CupertinoActionSheetAction(
-                                        //                         child: new Text("Cannolis"),
-                                        //                         onPressed: () => {
-                                        //                             Navigator.pop(_context, "Cannolis");
-                                        //                         }
-                                        //                     ),
-                                        //                     new CupertinoActionSheetAction(
-                                        //                         child: new Text("Trifle"),
-                                        //                         onPressed: () => { Navigator.pop(_context, "Trifle"); }
-                                        //                     )
-                                        //                 },
-                                        //                 cancelButton: new CupertinoActionSheetAction(
-                                        //                     child: new Text("Cancel"),
-                                        //                     isDefaultAction: true,
-                                        //                     onPressed: () => { Navigator.pop(_context, "Cancel"); }
-                                        //                 )
-                                        //             )
-                                        //         );
-                                        //     }
-                                        // )
+                                        new Padding(padding: EdgeInsets.all(8.0f)),
+                                        CupertinoButton.filled(
+                                            child: new Text("Action Sheet"),
+                                            padding: EdgeInsets.symmetric(vertical: 16.0f, horizontal: 36.0f),
+                                            onPressed: () => {
+                                                this.showDemoActionSheet(
+                                                    context: _context,
+                                                    child: new CupertinoActionSheet(
+                                                        title: new Text("Favorite Dessert"),
+                                                        message: new Text(
+                                                            "Please select the best dessert from the options below."),
+                                                        actions: new List<Widget> {
+                                                            // new CupertinoActionSheetAction(
+                                                            //     child: new Text("Profiteroles"),
+                                                            //     onPressed: () => {
+                                                            //         Navigator.pop(_context, "Profiteroles");
+                                                            //     }
+                                                            // ),
+                                                            // new CupertinoActionSheetAction(
+                                                            //     child: new Text("Cannolis"),
+                                                            //     onPressed: () => {
+                                                            //         Navigator.pop(_context, "Cannolis");
+                                                            //     }
+                                                            // ),
+                                                            // new CupertinoActionSheetAction(
+                                                            //     child: new Text("Trifle"),
+                                                            //     onPressed: () => { Navigator.pop(_context, "Trifle"); }
+                                                            // )
+                                                        },
+                                                        cancelButton: new CupertinoActionSheetAction(
+                                                            child: new Text("Cancel"),
+                                                            isDefaultAction: true,
+                                                            onPressed: () => { Navigator.pop(_context, "Cancel"); }
+                                                        )
+                                                    )
+                                                );
+                                            }
+                                        )
                                     }
                                 )
                             };

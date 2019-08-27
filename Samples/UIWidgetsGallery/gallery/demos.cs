@@ -502,10 +502,10 @@ namespace UIWidgetsGallery.gallery {
                 // new GalleryDemo(
                 //     title: "Navigation",
                 //     icon: GalleryIcons.bottom_navigation,
-                //     category: GalleryDemoCategory._kCupertinoComponents,
+                //     category: _kCupertinoComponents,
                 //     routeName: CupertinoNavigationDemo.routeName,
                 //     documentationUrl: "https://docs.flutter.io/flutter/cupertino/CupertinoTabScaffold-class.html",
-                //     buildRoute: (BuildContext context) => CupertinoNavigationDemo()
+                //     buildRoute: (BuildContext context) => new CupertinoNavigationDemo()
                 // ),
                 // new GalleryDemo(
                 //     title: "Pickers",
