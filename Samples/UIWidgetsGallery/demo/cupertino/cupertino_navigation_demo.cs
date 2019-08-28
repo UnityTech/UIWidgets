@@ -146,19 +146,16 @@ namespace UIWidgetsGallery.gallery {
                                         },
                                         defaultTitle: "Colors"
                                     );
-                                    break;
                                 case 1:
                                     return new CupertinoTabView(
                                         builder: (BuildContext _context2) => new CupertinoDemoTab2(),
                                         defaultTitle: "Support Chat"
                                     );
-                                    break;
                                 case 2:
                                     return new CupertinoTabView(
                                         builder: (BuildContext _context3) => new CupertinoDemoTab3(),
                                         defaultTitle: "Account"
                                     );
-                                    break;
                             }
 
                             return null;
@@ -353,6 +350,7 @@ namespace UIWidgetsGallery.gallery {
         public override void initState() {
             base.initState();
 
+            this.relatedColors = new List<Color>();
             for (int i = 0; i < 10; i++) {
                 this.relatedColors.Add(
                     Color.fromARGB(

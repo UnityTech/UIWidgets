@@ -1087,6 +1087,7 @@ namespace Unity.UIWidgets.widgets {
             this.hasFocus = hasFocus;
             this.maxLines = maxLines;
             this.minLines = minLines;
+            this.expands = expands;
             this.strutStyle = strutStyle;
             this.selectionColor = selectionColor;
             this.textScaleFactor = textScaleFactor;

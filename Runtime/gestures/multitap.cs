@@ -15,8 +15,8 @@ namespace Unity.UIWidgets.gestures {
 
     public delegate void GestureMultiTapCancelCallback(int pointer);
 
-    public class _CountdownZoned {
-        _CountdownZoned(TimeSpan duration) {
+    class _CountdownZoned {
+        public _CountdownZoned(TimeSpan duration) {
             D.assert(duration != null);
             this._timer = Window.instance.run(duration, this._onTimeout);
         }
@@ -49,6 +49,7 @@ namespace Unity.UIWidgets.gestures {
         ) {
             this.pointer = evt.pointer;
             this._initialPosition = evt.position;
+            this._doubleTapMinTimeCountdown = new _CountdownZoned(duration: doubleTapMinTime);
             this.entry = entry;
         }
 
@@ -320,17 +321,17 @@ namespace Unity.UIWidgets.gestures {
             this.longTapDelay = longTapDelay ?? TimeSpan.Zero;
         }
 
-        GestureMultiTapDownCallback onTapDown;
+        public GestureMultiTapDownCallback onTapDown;
 
-        GestureMultiTapUpCallback onTapUp;
+        public GestureMultiTapUpCallback onTapUp;
 
-        GestureMultiTapCallback onTap;
+        public GestureMultiTapCallback onTap;
 
-        GestureMultiTapCancelCallback onTapCancel;
+        public GestureMultiTapCancelCallback onTapCancel;
 
-        TimeSpan longTapDelay;
+        public TimeSpan longTapDelay;
 
-        GestureMultiTapDownCallback onLongTapDown;
+        public GestureMultiTapDownCallback onLongTapDown;
 
         readonly Dictionary<int, _TapGesture> _gestureMap = new Dictionary<int, _TapGesture>();
 

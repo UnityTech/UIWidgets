@@ -33,6 +33,7 @@ namespace Unity.UIWidgets.ui {
                 return;
             }
 
+            #pragma warning disable CS0162
             allocCount++;
             if (allocCount >= 120) {
                 allocCount = 0;
@@ -55,6 +56,7 @@ namespace Unity.UIWidgets.ui {
 
                 Debug.Log(debugInfo);
             }
+            #pragma warning restore CS0162
         }
 
         public static void onAlloc(int objKey, string objName, int allocatedCount) {
