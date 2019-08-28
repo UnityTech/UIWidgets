@@ -34,7 +34,6 @@ namespace UIWidgets.Tests {
 
         //These samples are not available after Unity2019.1
         /*
-        [MenuItem("UIWidgetsTests/Show SceneViewTests")]
         [MenuItem("Window/UIWidgets/Tests/Show SceneViewTests")]
         public static void showSceneView() {
             SceneViewTests.show();

@@ -14,7 +14,7 @@ using Transform = UnityEngine.Transform;
 
 namespace UIWidgetsSample.DragNDrop {
     public class CustomInspectorSample : UIWidgetsEditorWindow {
-        [MenuItem("UIWidgetsTests/Drag&Drop/Custom Inspector")]
+        [MenuItem("Window/UIWidgets/Tests/Drag&Drop/Custom Inspector")]
         public static void ShowEditorWindow() {
             var window = GetWindow<CustomInspectorSample>();
             window.titleContent.text = "Custom Inspector Sample";
