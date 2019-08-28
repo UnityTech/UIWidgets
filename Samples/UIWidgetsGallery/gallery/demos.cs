@@ -499,14 +499,14 @@ namespace UIWidgetsGallery.gallery {
                     documentationUrl: "https://docs.flutter.io/flutter/cupertino/CupertinoButton-class.html",
                     buildRoute: (BuildContext context) => new CupertinoButtonsDemo()
                 ),
-                // new GalleryDemo(
-                //     title: "Navigation",
-                //     icon: GalleryIcons.bottom_navigation,
-                //     category: _kCupertinoComponents,
-                //     routeName: CupertinoNavigationDemo.routeName,
-                //     documentationUrl: "https://docs.flutter.io/flutter/cupertino/CupertinoTabScaffold-class.html",
-                //     buildRoute: (BuildContext context) => new CupertinoNavigationDemo()
-                // ),
+                new GalleryDemo(
+                    title: "Navigation",
+                    icon: GalleryIcons.bottom_navigation,
+                    category: _kCupertinoComponents,
+                    routeName: CupertinoNavigationDemo.routeName,
+                    documentationUrl: "https://docs.flutter.io/flutter/cupertino/CupertinoTabScaffold-class.html",
+                    buildRoute: (BuildContext context) => new CupertinoNavigationDemo()
+                ),
                 // new GalleryDemo(
                 //     title: "Pickers",
                 //     icon: GalleryIcons.@event,

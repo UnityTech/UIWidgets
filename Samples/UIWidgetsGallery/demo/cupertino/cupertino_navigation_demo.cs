@@ -13,8 +13,6 @@ using Color = Unity.UIWidgets.ui.Color;
 
 namespace UIWidgetsGallery.gallery {
     class CupertinoNavigationDemoUtils {
-        public const string _kGalleryAssetsPackage = "flutter_gallery_assets";
-
         public const int _kChildCount = 50;
 
         public static List<Color> coolColors = new List<Color> {
@@ -86,7 +84,6 @@ namespace UIWidgetsGallery.gallery {
             };
         }
     }
-
 
     public class CupertinoNavigationDemo : StatelessWidget {
         public CupertinoNavigationDemo() {
@@ -187,8 +184,8 @@ namespace UIWidgetsGallery.gallery {
             List<Color> colorItems = null,
             List<string> colorNameItems = null
         ) {
-            this.colorItems = colorItems;
-            this.colorNameItems = colorNameItems;
+            this.colorItems = colorItems ?? new List<Color>();
+            this.colorNameItems = colorNameItems ?? new List<string>();
         }
 
         public readonly List<Color> colorItems;
@@ -354,7 +351,8 @@ namespace UIWidgetsGallery.gallery {
             for (int i = 0; i < 10; i++) {
                 this.relatedColors.Add(
                     Color.fromARGB(
-                        255, this.widget.color.red + Random.Range(0, 50).clamp(0, 255),
+                        255,
+                        this.widget.color.red + Random.Range(0, 50).clamp(0, 255),
                         this.widget.color.green + Random.Range(0, 50).clamp(0, 255),
                         this.widget.color.blue + Random.Range(0, 50).clamp(0, 255)
                     )
@@ -370,7 +368,6 @@ namespace UIWidgetsGallery.gallery {
                     trailing: new ExitButton()
                 ),
                 child: new SafeArea(
-                    top: false,
                     bottom: false,
                     child: new ListView(
                         children: new List<Widget> {
@@ -480,7 +477,7 @@ namespace UIWidgetsGallery.gallery {
                                         );
                                     }
                                 )
-                            ),
+                            )
                         }
                     )
                 )
@@ -752,52 +749,54 @@ namespace UIWidgetsGallery.gallery {
                 navigationBar: new CupertinoNavigationBar(
                     trailing: CupertinoNavigationDemoUtils.trailingButtons
                 ),
-                child: new DecoratedBox(
-                    decoration: new BoxDecoration(
-                        color: CupertinoTheme.of(context).brightness == Brightness.light
-                            ? CupertinoColors.extraLightBackgroundGray
-                            : CupertinoColors.darkBackgroundGray
-                    ),
-                    child: new ListView(
-                        children: new List<Widget> {
-                            new Padding(padding: EdgeInsets.only(top: 32.0f)),
-                            new GestureDetector(
-                                onTap: () => {
-                                    Navigator.of(context, rootNavigator: true).push(
-                                        new CupertinoPageRoute(
-                                            fullscreenDialog: true,
-                                            builder: (BuildContext _context) => new Tab3Dialog()
-                                        )
-                                    );
-                                },
-                                child: new Container(
-                                    decoration: new BoxDecoration(
-                                        color: CupertinoTheme.of(context).scaffoldBackgroundColor,
-                                        border: new Border(
-                                            top: new BorderSide(color: new Color(0xfBCBBC1), width: 0.0f),
-                                            bottom: new BorderSide(color: new Color(0xfBCBBC1), width: 0.0f)
-                                        )
-                                    ),
-                                    height: 44.0f,
-                                    child: new Padding(
-                                        padding: EdgeInsets.symmetric(horizontal: 16.0f, vertical: 8.0f),
-                                        child: new SafeArea(
-                                            top: false,
-                                            bottom: false,
-                                            child: new Row(
-                                                children: new List<Widget> {
-                                                    new Text(
-                                                        "Sign in",
-                                                        style: new TextStyle(color: CupertinoTheme.of(context)
-                                                            .primaryColor)
-                                                    ),
-                                                }
+                child: new SafeArea(
+                    child: new DecoratedBox(
+                        decoration: new BoxDecoration(
+                            color: CupertinoTheme.of(context).brightness == Brightness.light
+                                ? CupertinoColors.extraLightBackgroundGray
+                                : CupertinoColors.darkBackgroundGray
+                        ),
+                        child: new ListView(
+                            children: new List<Widget> {
+                                new Padding(padding: EdgeInsets.only(top: 32.0f)),
+                                new GestureDetector(
+                                    onTap: () => {
+                                        Navigator.of(context, rootNavigator: true).push(
+                                            new CupertinoPageRoute(
+                                                fullscreenDialog: true,
+                                                builder: (BuildContext _context) => new Tab3Dialog()
+                                            )
+                                        );
+                                    },
+                                    child: new Container(
+                                        decoration: new BoxDecoration(
+                                            color: CupertinoTheme.of(context).scaffoldBackgroundColor,
+                                            border: new Border(
+                                                top: new BorderSide(color: new Color(0xfBCBBC1), width: 0.0f),
+                                                bottom: new BorderSide(color: new Color(0xfBCBBC1), width: 0.0f)
+                                            )
+                                        ),
+                                        height: 44.0f,
+                                        child: new Padding(
+                                            padding: EdgeInsets.symmetric(horizontal: 16.0f, vertical: 8.0f),
+                                            child: new SafeArea(
+                                                top: false,
+                                                bottom: false,
+                                                child: new Row(
+                                                    children: new List<Widget> {
+                                                        new Text(
+                                                            "Sign in",
+                                                            style: new TextStyle(color: CupertinoTheme.of(context)
+                                                                .primaryColor)
+                                                        ),
+                                                    }
+                                                )
                                             )
                                         )
                                     )
                                 )
-                            )
-                        }
+                            }
+                        )
                     )
                 )
             );
