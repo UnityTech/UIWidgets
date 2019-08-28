@@ -273,7 +273,7 @@ in the texture `rowCount`, and number of columns `colCount`.
 
 With the provided packaged stateful widget `UnityObjectDetector` and its `onRelease` callback function, you can easily drag some objects (for example GameObject from Hierarchy, files from Project Window, etc) into the area, get the UnityEngine.Object[] references and make further modification.
 
-Please refer to "UIWidgetsTests -> Drag&Drop" for simple examples.
+Please refer to "Window -> UIWidgets -> Tests -> Drag&Drop" for simple examples.
 
 
 ## Debug UIWidgets Application
