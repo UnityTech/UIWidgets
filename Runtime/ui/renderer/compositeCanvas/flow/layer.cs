@@ -4,7 +4,6 @@ namespace Unity.UIWidgets.flow {
     public class PrerollContext {
         public RasterCache rasterCache;
         public float devicePixelRatio;
-        public int antiAliasing;
         public Rect cullRect;
         public Stopwatch frameTime;
     }
