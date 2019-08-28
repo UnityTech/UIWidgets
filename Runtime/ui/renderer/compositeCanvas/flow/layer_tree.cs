@@ -23,20 +23,12 @@ namespace Unity.UIWidgets.flow {
             set { this._devicePixelRatio = value; }
         }
 
-        int _antiAliasing;
-
-        public int antiAliasing {
-            get { return this._antiAliasing; }
-            set { this._antiAliasing = value; }
-        }
-
         static readonly Matrix3 _identityMatrix = Matrix3.I();
 
         public void preroll(CompositorContext.ScopedFrame frame, bool ignoreRasterCache = false) {
             var prerollContext = new PrerollContext {
                 rasterCache = ignoreRasterCache ? null : frame.context().rasterCache(),
                 devicePixelRatio = frame.canvas().getDevicePixelRatio(),
-                antiAliasing = this.antiAliasing,
                 cullRect = Rect.largest,
                 frameTime = frame.context().frameTime()
             };
