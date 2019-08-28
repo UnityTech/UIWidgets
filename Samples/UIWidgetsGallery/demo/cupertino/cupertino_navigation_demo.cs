@@ -346,7 +346,6 @@ namespace UIWidgetsGallery.gallery {
     class Tab1ItemPageState : State<Tab1ItemPage> {
         public override void initState() {
             base.initState();
-            this.relatedColors = new List<Color>(10);
 
             this.relatedColors = new List<Color>();
             for (int i = 0; i < 10; i++) {
