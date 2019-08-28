@@ -271,6 +271,10 @@ namespace Unity.UIWidgets.painting {
             this._caretMetrics = new _CaretMetrics(
                 offset: rect != null ? new Offset(rect.left, rect.top) : this._emptyOffset,
                 fullHeight: rect != null ? (float?) (rect.bottom - rect.top) : null);
+            
+            // Cache the caret position. This was forgot in flutter until https://github.com/flutter/flutter/pull/38821
+            this._previousCaretPosition = position;
+            this._previousCaretPrototype = caretPrototype;
         }
 
         public Paragraph.LineRange getLineRange(int lineNumber) {

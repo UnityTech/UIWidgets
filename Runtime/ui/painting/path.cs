@@ -1363,7 +1363,7 @@ namespace Unity.UIWidgets.ui {
             return new PathMetricIterator(_pathMeasure);
         }
 
-        PathMetric _pathMetric;
+        // PathMetric _pathMetric; // TODO
         _PathMeasure _pathMeasure;
 
         public void Reset() {
@@ -1371,11 +1371,15 @@ namespace Unity.UIWidgets.ui {
         }
 
         public PathMetric Current {
-            get { return this._pathMetric; }
+            get {
+                return null; // TODO : return this._pathMetric;
+            }
         }
 
         object IEnumerator.Current {
-            get { return this._pathMetric; }
+            get {
+                return null; // TODO : return this._pathMetric;
+            }
         }
 
         public bool MoveNext() {

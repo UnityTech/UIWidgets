@@ -142,12 +142,14 @@ namespace Unity.UIWidgets.ui {
         static readonly Path _devSpacePath = new Path();
         public static void drawShadow(Canvas canvas, Path path, Vector3 zPlaneParams, Vector3 devLightPos,
             float lightRadius, uiColor ambientColor, uiColor spotColor, int flags) {
+            #pragma warning disable CS0162
             if (kUseFastShadow) {
                 drawShadowFast(canvas, path, zPlaneParams, devLightPos, lightRadius, ambientColor, spotColor, flags);
             }
             else {
                 drawShadowFull(canvas, path, zPlaneParams, devLightPos, lightRadius, ambientColor, spotColor, flags);
             }
+            #pragma warning restore CS0162
         }
         
         //cached variables
@@ -209,6 +211,7 @@ namespace Unity.UIWidgets.ui {
             Matrix3 viewMatrix = canvas.getTotalMatrix();
 
             //debug shadow
+            #pragma warning disable CS0162
             if (debugShadow) {
                 var isRRect = path.isNaiveRRect;
                 if (isRRect) {
@@ -220,6 +223,7 @@ namespace Unity.UIWidgets.ui {
                     spotColor = uiColor.fromColor(Colors.green);
                 }
             }
+            #pragma warning restore CS0162
 
             //ambient light
             float devSpaceOutset = ambientBlurRadius(zPlaneParams.z);

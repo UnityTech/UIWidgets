@@ -52,7 +52,6 @@ namespace Unity.UIWidgets.material {
 
         public static FloatingActionButtonThemeData lerp(FloatingActionButtonThemeData a, FloatingActionButtonThemeData b,
             float t) {
-            D.assert(t != null);
             if (a == null && b == null) {
                 return null;
             }
