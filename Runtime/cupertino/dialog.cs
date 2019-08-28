@@ -13,7 +13,7 @@ using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace Unity.UIWidgets.cupertino {
     class CupertinoDialogUtils {
-        public static TextStyle _kCupertinoDialogTitleStyle = new TextStyle(
+        public static readonly TextStyle _kCupertinoDialogTitleStyle = new TextStyle(
             fontFamily: ".SF UI Display",
             fontSize: 18.0f,
             fontWeight: FontWeight.w600,
@@ -22,7 +22,7 @@ namespace Unity.UIWidgets.cupertino {
             textBaseline: TextBaseline.alphabetic
         );
 
-        public static TextStyle _kCupertinoDialogContentStyle = new TextStyle(
+        public static readonly TextStyle _kCupertinoDialogContentStyle = new TextStyle(
             fontFamily: ".SF UI Text",
             fontSize: 13.4f,
             fontWeight: FontWeight.w400,
@@ -32,7 +32,7 @@ namespace Unity.UIWidgets.cupertino {
             textBaseline: TextBaseline.alphabetic
         );
 
-        public static TextStyle _kCupertinoDialogActionStyle = new TextStyle(
+        public static readonly TextStyle _kCupertinoDialogActionStyle = new TextStyle(
             fontFamily: ".SF UI Text",
             fontSize: 16.8f,
             fontWeight: FontWeight.w400,
@@ -43,7 +43,7 @@ namespace Unity.UIWidgets.cupertino {
         public const float _kCupertinoDialogWidth = 270.0f;
         public const float _kAccessibilityCupertinoDialogWidth = 310.0f;
 
-        public static BoxDecoration _kCupertinoDialogBlurOverlayDecoration = new BoxDecoration(
+        public static readonly BoxDecoration _kCupertinoDialogBlurOverlayDecoration = new BoxDecoration(
             color: CupertinoColors.white,
             backgroundBlendMode: BlendMode.overlay
         );
@@ -54,13 +54,11 @@ namespace Unity.UIWidgets.cupertino {
         public const float _kMinButtonFontSize = 10.0f;
         public const float _kDialogCornerRadius = 12.0f;
         public const float _kDividerThickness = 1.0f;
-
-        public static Color _kDialogColor = new Color(0xC0FFFFFF);
-        public static Color _kDialogPressedColor = new Color(0x90FFFFFF);
-        public static Color _kButtonDividerColor = new Color(0x40FFFFFF);
-
-
         public const float _kMaxRegularTextScaleFactor = 1.4f;
+
+        public static readonly Color _kDialogColor = new Color(0xC0FFFFFF);
+        public static readonly Color _kDialogPressedColor = new Color(0x90FFFFFF);
+        public static readonly Color _kButtonDividerColor = new Color(0x40FFFFFF);
 
         public static bool _isInAccessibilityMode(BuildContext context) {
             MediaQueryData data = MediaQuery.of(context, nullOk: true);

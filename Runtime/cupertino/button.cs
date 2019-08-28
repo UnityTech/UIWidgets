@@ -12,10 +12,10 @@ using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace Unity.UIWidgets.cupertino {
     public class CupertinoButtonUtils {
-        public static Color _kDisabledBackground = new Color(0xFFA9A9A9);
-        public static Color _kDisabledForeground = new Color(0xFFD1D1D1);
-        public static EdgeInsets _kButtonPadding = EdgeInsets.all(16.0f);
-        public static EdgeInsets _kBackgroundButtonPadding = EdgeInsets.symmetric(vertical: 14.0f, horizontal: 64.0f);
+        public static readonly Color _kDisabledBackground = new Color(0xFFA9A9A9);
+        public static readonly Color _kDisabledForeground = new Color(0xFFD1D1D1);
+        public static readonly EdgeInsets _kButtonPadding = EdgeInsets.all(16.0f);
+        public static readonly EdgeInsets _kBackgroundButtonPadding = EdgeInsets.symmetric(vertical: 14.0f, horizontal: 64.0f);
     }
 
     public class CupertinoButton : StatefulWidget {
