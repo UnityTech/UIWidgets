@@ -21,7 +21,9 @@ fi
 
 target_dir=$target_project/Assets/UIWidgets
 rm -rf $target_dir
+echo "rm -rf $target_dir"
 mkdir -p $target_dir
+echo "mkdir -p $target_dir"
 
 cp -R ../Runtime $target_dir/Runtime
 echo "Copied Runtime"

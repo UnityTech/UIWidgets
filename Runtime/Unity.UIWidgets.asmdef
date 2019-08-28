@@ -1,8 +1,7 @@
 {
     "name": "Unity.UIWidgets",
     "references": [
-        "Unity.InternalAPIEngineBridge.024",
-        "Unity.ugui"
+        "Unity.InternalAPIEngineBridge.024"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [],
