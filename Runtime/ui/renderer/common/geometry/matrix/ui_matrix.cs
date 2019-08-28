@@ -316,7 +316,7 @@ namespace Unity.UIWidgets.ui {
             TypeMask mask = this._getType();
 
             if (0 == (mask & ~(TypeMask.kScale_Mask | TypeMask.kTranslate_Mask))) {
-                bool invertible = true;
+                // bool invertible = true; // Fix warning: value is never used
 
                 if (!invertableCheck) {
                     if ((mask & TypeMask.kScale_Mask) != 0) {
