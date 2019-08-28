@@ -101,3 +101,17 @@ echo "Copied README"
 cd $target_repository
 git add .
 git commit -m "Update to $curr_repo_name:$target_version"
+
+echo "Please complete the following steps mannually"
+echo
+echo "cd $target_repository"
+echo "Update CHANGELOG.md, adding entry for the new version."
+echo "Update package.json, changing the version number."
+echo "git commit"
+echo "git push"
+echo "Visit https://yamato.cds.internal.unity3d.com/jobs/242-com.unity.uiwidgets and wait for the jobs to succeed."
+echo "Update the tags:"
+echo "git tag rc-x.x.x-preview.x && git push -u origin rc-x.x.x-preview.x"
+echo "Waiting for the jobs to succeed"
+echo "git tag vx.x.x-preview.x && git push -u origin vx.x.x-preview.x"
+echo "Waiting for the jobs to succeed"
