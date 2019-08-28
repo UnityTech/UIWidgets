@@ -157,22 +157,22 @@ namespace UIWidgetsGallery.gallery {
                                                         message: new Text(
                                                             "Please select the best dessert from the options below."),
                                                         actions: new List<Widget> {
-                                                            // new CupertinoActionSheetAction(
-                                                            //     child: new Text("Profiteroles"),
-                                                            //     onPressed: () => {
-                                                            //         Navigator.pop(_context, "Profiteroles");
-                                                            //     }
-                                                            // ),
-                                                            // new CupertinoActionSheetAction(
-                                                            //     child: new Text("Cannolis"),
-                                                            //     onPressed: () => {
-                                                            //         Navigator.pop(_context, "Cannolis");
-                                                            //     }
-                                                            // ),
-                                                            // new CupertinoActionSheetAction(
-                                                            //     child: new Text("Trifle"),
-                                                            //     onPressed: () => { Navigator.pop(_context, "Trifle"); }
-                                                            // )
+                                                            new CupertinoActionSheetAction(
+                                                                child: new Text("Profiteroles"),
+                                                                onPressed: () => {
+                                                                    Navigator.pop(_context, "Profiteroles");
+                                                                }
+                                                            ),
+                                                            new CupertinoActionSheetAction(
+                                                                child: new Text("Cannolis"),
+                                                                onPressed: () => {
+                                                                    Navigator.pop(_context, "Cannolis");
+                                                                }
+                                                            ),
+                                                            new CupertinoActionSheetAction(
+                                                                child: new Text("Trifle"),
+                                                                onPressed: () => { Navigator.pop(_context, "Trifle"); }
+                                                            )
                                                         },
                                                         cancelButton: new CupertinoActionSheetAction(
                                                             child: new Text("Cancel"),

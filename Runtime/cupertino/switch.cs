@@ -22,9 +22,9 @@ namespace Unity.UIWidgets.cupertino {
         public const float _kSwitchWidth = 59.0f;
         public const float _kSwitchHeight = 39.0f;
         public const float _kCupertinoSwitchDisabledOpacity = 0.5f;
-        public static Color _kTrackColor = CupertinoColors.lightBackgroundGray;
-        public static TimeSpan _kReactionDuration = new TimeSpan(0, 0, 0, 0, 300);
-        public static TimeSpan _kToggleDuration = new TimeSpan(0, 0, 0, 0, 200);
+        public static readonly Color _kTrackColor = CupertinoColors.lightBackgroundGray;
+        public static readonly TimeSpan _kReactionDuration = new TimeSpan(0, 0, 0, 0, 300);
+        public static readonly TimeSpan _kToggleDuration = new TimeSpan(0, 0, 0, 0, 200);
     }
 
     public class CupertinoSwitch : StatefulWidget {
