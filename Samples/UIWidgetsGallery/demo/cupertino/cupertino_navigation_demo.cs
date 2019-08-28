@@ -423,7 +423,7 @@ namespace UIWidgetsGallery.gallery {
                                                             CupertinoButton.filled(
                                                                 minSize: 30.0f,
                                                                 padding: EdgeInsets.zero,
-                                                                borderRadius: BorderRadius.circular(32.0f),
+                                                                borderRadius: BorderRadius.circular(16.0f),
                                                                 child: new Icon(CupertinoIcons.ellipsis),
                                                                 onPressed: () => { }
                                                             )
