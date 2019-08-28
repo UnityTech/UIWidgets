@@ -1035,6 +1035,10 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void flush(uiPicture picture) {
+            if (!CanvasShader.isReady()) {
+                return;
+            }
+            
             this._reset();
             this._resetRenderTextureId();
             this._resetComputeBuffer();
