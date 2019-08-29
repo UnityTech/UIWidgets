@@ -4,16 +4,16 @@ using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
     public partial struct uiMatrix3 {
-        public void mapPoints(uiOffset[] dst, uiOffset[] src) {
+        public uiOffset[] mapPoints(uiOffset[] dst, uiOffset[] src) {
             D.assert(dst != null && src != null && dst.Length == src.Length);
-            this._getMapPtsProc()(this, dst, src, src.Length);
+            return this._getMapPtsProc()(this, dst, src, src.Length);
         }
 
-        public void mapPoints(uiOffset[] pts) {
-            this.mapPoints(pts, pts);
+        public uiOffset[] mapPoints(uiOffset[] pts) {
+            return this.mapPoints(pts, pts);
         }
 
-        delegate void MapPtsProc(uiMatrix3 mat, uiOffset[] dst, uiOffset[] src, int count);
+        delegate uiOffset[] MapPtsProc(uiMatrix3 mat, uiOffset[] dst, uiOffset[] src, int count);
 
         static readonly MapPtsProc[] gMapPtsProcs = {
             Identity_pts, Trans_pts,
@@ -36,15 +36,17 @@ namespace Unity.UIWidgets.ui {
             return GetMapPtsProc(this._getType());
         }
 
-        static void Identity_pts(uiMatrix3 m, uiOffset[] dst, uiOffset[] src, int count) {
+        static uiOffset[] Identity_pts(uiMatrix3 m, uiOffset[] dst, uiOffset[] src, int count) {
             D.assert(m._getType() == 0);
 
             if (dst != src && count > 0) {
                 Array.Copy(src, dst, count);
             }
+
+            return dst;
         }
 
-        static void Trans_pts(uiMatrix3 m, uiOffset[] dst, uiOffset[] src, int count) {
+        static uiOffset[] Trans_pts(uiMatrix3 m, uiOffset[] dst, uiOffset[] src, int count) {
             D.assert(m._getType() <= TypeMask.kTranslate_Mask);
             if (count > 0) {
                 var tx = m.getTranslateX();
@@ -53,9 +55,11 @@ namespace Unity.UIWidgets.ui {
                     dst[i] = new uiOffset(src[i].dx + tx, src[i].dy + ty);
                 }
             }
+
+            return dst;
         }
 
-        static void Scale_pts(uiMatrix3 m, uiOffset[] dst, uiOffset[] src, int count) {
+        static uiOffset[] Scale_pts(uiMatrix3 m, uiOffset[] dst, uiOffset[] src, int count) {
             D.assert(m._getType() <= (TypeMask.kScale_Mask | TypeMask.kTranslate_Mask));
             if (count > 0) {
                 var tx = m.getTranslateX();
@@ -67,9 +71,11 @@ namespace Unity.UIWidgets.ui {
                     dst[i] = new uiOffset(src[i].dx * sx + tx, src[i].dy * sy + ty);
                 }
             }
+
+            return dst;
         }
 
-        static void Persp_pts(uiMatrix3 m, uiOffset[] dst, uiOffset[] src, int count) {
+        static uiOffset[] Persp_pts(uiMatrix3 m, uiOffset[] dst, uiOffset[] src, int count) {
             D.assert(m._hasPerspective());
 
             if (count > 0) {
@@ -89,9 +95,11 @@ namespace Unity.UIWidgets.ui {
                     dst[i] = new uiOffset(x * z, y * z);
                 }
             }
+
+            return dst;
         }
 
-        static void Affine_pts(uiMatrix3 m, uiOffset[] dst, uiOffset[] src, int count) {
+        static uiOffset[] Affine_pts(uiMatrix3 m, uiOffset[] dst, uiOffset[] src, int count) {
             D.assert(m._getType() != TypeMask.kPerspective_Mask);
             if (count > 0) {
                 var tx = m.getTranslateX();
@@ -107,6 +115,8 @@ namespace Unity.UIWidgets.ui {
                         src[i].dx * ky + src[i].dy * sy + ty);
                 }
             }
+
+            return dst;
         }
     }
 
