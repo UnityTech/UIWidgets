@@ -9,3 +9,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### This is the first release of *Unity Package UIWidgets*.
 
 *just the first release*
+
+
+##【1.5.4-release] - 2019-08-30
+
+#### In this release we mainly focus on the optimization and stabilization of the framework. 
+#### We also upgrade UIWidgets to version 1.5.4, mainly derived from flutter 1.5.4.
+
+### New Features
+- Optimize the GC performance of the rendering system [\#247](https://github.com/UnityTech/UIWidgets/pull/247)
+- Optimize the rendering performance of shadows [\#257](https://github.com/UnityTech/UIWidgets/pull/257)
+- Leverage Compute Buffer to optimize GPU-CPU communication [\#272](https://github.com/UnityTech/UIWidgets/pull/272)
