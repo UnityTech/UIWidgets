@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 *just the first release*
 
 
-##【1.5.4-release] - 2019-08-30
+## [1.5.4-release] - 2019-08-30
 
 #### In this release we mainly focus on the optimization and stabilization of the framework. 
 #### We also upgrade UIWidgets to version 1.5.4, mainly derived from flutter 1.5.4.
