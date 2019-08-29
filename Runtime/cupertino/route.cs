@@ -22,26 +22,26 @@ namespace Unity.UIWidgets.cupertino {
 
         public const int _kMaxPageBackAnimationTime = 300; // Milliseconds.
 
-        public static Color _kModalBarrierColor = new Color(0x6604040F);
+        public static readonly Color _kModalBarrierColor = new Color(0x6604040F);
 
-        public static TimeSpan _kModalPopupTransitionDuration = new TimeSpan(0, 0, 0, 0, 335);
+        public static readonly TimeSpan _kModalPopupTransitionDuration = new TimeSpan(0, 0, 0, 0, 335);
 
-        public static Animatable<Offset> _kRightMiddleTween = new OffsetTween(
+        public static readonly Animatable<Offset> _kRightMiddleTween = new OffsetTween(
             begin: new Offset(1.0f, 0.0f),
             end: Offset.zero
         );
 
-        public static Animatable<Offset> _kMiddleLeftTween = new OffsetTween(
+        public static readonly Animatable<Offset> _kMiddleLeftTween = new OffsetTween(
             begin: Offset.zero,
             end: new Offset(-1.0f / 3.0f, 0.0f)
         );
 
-        public static Animatable<Offset> _kBottomUpTween = new OffsetTween(
+        public static readonly Animatable<Offset> _kBottomUpTween = new OffsetTween(
             begin: new Offset(0.0f, 1.0f),
             end: Offset.zero
         );
 
-        public static DecorationTween _kGradientShadowTween = new DecorationTween(
+        public static readonly DecorationTween _kGradientShadowTween = new DecorationTween(
             end: new _CupertinoEdgeShadowDecoration(
                 edgeGradient: new LinearGradient(
                     begin: new Alignment(0.9f, 0.0f),
@@ -71,7 +71,7 @@ namespace Unity.UIWidgets.cupertino {
         }
 
 
-        public static Animatable<float> _dialogScaleTween = new FloatTween(begin: 1.3f, end: 1.0f)
+        public static readonly Animatable<float> _dialogScaleTween = new FloatTween(begin: 1.3f, end: 1.0f)
             .chain(new CurveTween(curve: Curves.linearToEaseOut));
 
         public static Widget _buildCupertinoDialogTransitions(BuildContext context, Animation<float> animation,

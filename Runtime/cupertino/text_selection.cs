@@ -14,7 +14,7 @@ using Transform = Unity.UIWidgets.widgets.Transform;
 
 namespace Unity.UIWidgets.cupertino {
     public static class CupertinoTextSelectionUtils {
-        public static TextSelectionControls cupertinoTextSelectionControls = new _CupertinoTextSelectionControls();
+        public static readonly TextSelectionControls cupertinoTextSelectionControls = new _CupertinoTextSelectionControls();
         
         public const float _kHandlesPadding = 18.0f;
 

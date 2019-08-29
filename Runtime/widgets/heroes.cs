@@ -178,7 +178,7 @@ namespace Unity.UIWidgets.widgets {
             HeroFlightShuttleBuilder shuttleBuilder,
             bool isUserGestureTransition
         ) {
-            D.assert(fromHero.widget.tag == toHero.widget.tag);
+            D.assert(fromHero.widget.tag.Equals(toHero.widget.tag));
             this.type = type;
             this.overlay = overlay;
             this.navigatorRect = navigatorRect;
