@@ -23,4 +23,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Cupertino Theme Supported [\#287](https://github.com/UnityTech/UIWidgets/pull/287)
 - Support Unity Editor Drag&Drop mouse event [\#253](https://github.com/UnityTech/UIWidgets/pull/253)
 - Implement geometric shapes anti-alias draw [\#262](https://github.com/UnityTech/UIWidgets/pull/262)
+- Optimize paragraph layout [\#254](https://github.com/UnityTech/UIWidgets/pull/254)
+- Support emoji display and edit [\#231](https://github.com/UnityTech/UIWidgets/pull/231)
 
