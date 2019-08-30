@@ -20,3 +20,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Optimize the GC performance of the rendering system [\#247](https://github.com/UnityTech/UIWidgets/pull/247)
 - Optimize the rendering performance of shadows [\#257](https://github.com/UnityTech/UIWidgets/pull/257)
 - Leverage Compute Buffer to optimize GPU-CPU communication [\#272](https://github.com/UnityTech/UIWidgets/pull/272)
+- Cupertino Theme Supported [\#287](https://github.com/UnityTech/UIWidgets/pull/287)
+- Support Unity Editor Drag&Drop mouse event [\#253](https://github.com/UnityTech/UIWidgets/pull/253)
+- Implement geometric shapes anti-alias draw [\#262](https://github.com/UnityTech/UIWidgets/pull/262)
+
