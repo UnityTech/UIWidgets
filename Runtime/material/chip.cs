@@ -2469,8 +2469,7 @@ namespace Unity.UIWidgets.material {
         const bool _debugShowTapTargetOutlines = false;
 
         public override void debugPaint(PaintingContext context, Offset offset) {
-            D.assert(!_debugShowTapTargetOutlines);
-            D.assert(() => {
+            bool visualizeTapTargets() {
                 Paint outlinePaint = new Paint();
                 outlinePaint.color = new Color(0xff800000);
                 outlinePaint.strokeWidth = 1.0f;
@@ -2482,7 +2481,9 @@ namespace Unity.UIWidgets.material {
                 outlinePaint.color = new Color(0xff008000);
                 context.canvas.drawRect(this.pressRect.shift(offset), outlinePaint);
                 return true;
-            });
+            }
+
+            D.assert(!_debugShowTapTargetOutlines || visualizeTapTargets());
         }
 
         protected override bool hitTestSelf(Offset position) {
